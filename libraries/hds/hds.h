@@ -38,14 +38,14 @@ datBasic(const HDSLoc *locator, const char *mode_c, unsigned char **pntr, size_t
 /*=====================================*/
 
 int
-datCcopy(const HDSLoc *locator1, const HDSLoc *locator2, const char *name, HDSLoc **locator3, int *status );
+datCcopy(const HDSLoc *locator1, const HDSLoc *locator2, const char *name, HDSLoc **locator3, int *status);
 
 /*=======================================*/
 /* datCctyp - construct _CHAR*nnn string */
 /*=======================================*/
 
 void
-datCctyp( size_t size, char type[DAT__SZTYP+1] );
+datCctyp(size_t size, char type[DAT__SZTYP+1]);
 
 
 /*===========================================*/
@@ -53,21 +53,21 @@ datCctyp( size_t size, char type[DAT__SZTYP+1] );
 /*===========================================*/
 
 int
-datCell( const HDSLoc *locator1, int ndim, const hdsdim subs[], HDSLoc **locator2, int *status);
+datCell(const HDSLoc *locator1, int ndim, const hdsdim subs[], HDSLoc **locator2, int *status);
 
 /*=================================================*/
 /* datChscn - validate the supplied component name */
 /*=================================================*/
 
 int
-datChscn( const char * name, int *status );
+datChscn(const char * name, int *status);
 
 /*==========================================*/
 /* datClen - Obtain character string length */
 /*==========================================*/
 
 int
-datClen( const HDSLoc *locator, size_t *clen, int *status );
+datClen(const HDSLoc *locator, size_t *clen, int *status);
 
 /*===========================*/
 /* datClone - clone locator */
@@ -88,7 +88,7 @@ datCoerc(const HDSLoc *locator1, int ndim, HDSLoc **locator2, int *status);
 /*=======================*/
 
 int
-datCopy(const HDSLoc *locator1, const HDSLoc *locator2, const char *name_c, int *status );
+datCopy(const HDSLoc *locator1, const HDSLoc *locator2, const char *name_c, int *status);
 
 /*============================================================*/
 /* datDrep - Obtain primitive data representation information */
@@ -116,7 +116,7 @@ datErmsg(int status, size_t *len, char *msg_str);
 /*================================*/
 
 int
-datFind( const HDSLoc *locator1, const char *name_str, HDSLoc **locator2, int *status );
+datFind(const HDSLoc *locator1, const char *name_str, HDSLoc **locator2, int *status);
 
 /*============================*/
 /* datGet - Read primitive(s) */
@@ -172,7 +172,7 @@ datGetUW(const HDSLoc *locator, int ndim, const hdsdim dims[], unsigned short va
 /*======================================*/
 
 int
-datGetL(const HDSLoc *locator, int ndim, const hdsdim dims[], int values[], int *status);
+datGetL(const HDSLoc *locator, int ndim, const hdsdim dims[], hdsbool_t values[], int *status);
 
 /*===================================*/
 /* datGetR - Read _REAL primitive(s) */
@@ -186,119 +186,119 @@ datGetR(const HDSLoc *locator, int ndim, const hdsdim dims[], float values[], in
 /*======================================*/
 
 int
-datGet0C( const HDSLoc * loc, char * value, size_t len, int * status );
+datGet0C(const HDSLoc * loc, char * value, size_t len, int * status);
 
 /*======================================*/
 /* datGet0D - Read scalar double value  */
 /*======================================*/
 
 int
-datGet0D( const HDSLoc * loc, double * value, int * status );
+datGet0D(const HDSLoc * loc, double * value, int * status);
 
 /*=====================================*/
 /* datGet0R - Read scalar float value  */
 /*=====================================*/
 
 int
-datGet0R( const HDSLoc * loc, float * value, int * status );
+datGet0R(const HDSLoc * loc, float * value, int * status);
 
 /*=======================================*/
 /* datGet0I - Read scalar integer value  */
 /*=======================================*/
 
 int
-datGet0I( const HDSLoc * loc, int * value, int * status );
+datGet0I(const HDSLoc * loc, int * value, int * status);
 
 /*================================================*/
 /* datGet0K - Read scalar 64-bit integer value  */
 /*================================================*/
 
 int
-datGet0K( const HDSLoc * loc, int64_t * value, int * status );
+datGet0K(const HDSLoc * loc, int64_t * value, int * status);
 
 /*=============================================*/
 /* datGet0W - Read scalar short integer value  */
 /*=============================================*/
 
 int
-datGet0W( const HDSLoc * loc, short * value, int * status );
+datGet0W(const HDSLoc * loc, short * value, int * status);
 
 /*=============================================*/
 /* datGet0UW - Read scalar unsigned short integer value  */
 /*=============================================*/
 
 int
-datGet0UW( const HDSLoc * loc, unsigned short * value, int * status );
+datGet0UW(const HDSLoc * loc, unsigned short * value, int * status);
 
 /*=======================================*/
 /* datGet0L - Read scalar logical value  */
 /*=======================================*/
 
 int
-datGet0L( const HDSLoc * loc, int * value, int * status );
+datGet0L(const HDSLoc * loc, hdsbool_t * value, int * status);
 
 /*==================================*/
 /* DAT_GET1C - Read 1D string array */
 /*==================================*/
 
 int
-datGet1C( const HDSLoc * locator, size_t maxval, size_t bufsize, char *buffer, char *pntrs[], size_t * actval, int * status );
+datGet1C(const HDSLoc * locator, size_t maxval, size_t bufsize, char *buffer, char *pntrs[], size_t * actval, int * status);
 
 /*==================================*/
 /* DAT_GET1D - Read 1D Double array */
 /*==================================*/
 
 int
-datGet1D( const HDSLoc * locator, size_t maxval, double values[], size_t *actval, int * status );
+datGet1D(const HDSLoc * locator, size_t maxval, double values[], size_t *actval, int * status);
 
 /*==================================*/
 /* DAT_GET1I - Read 1D Integer array */
 /*==================================*/
 
 int
-datGet1I( const HDSLoc * locator, size_t maxval, int values[], size_t *actval, int * status );
+datGet1I(const HDSLoc * locator, size_t maxval, int values[], size_t *actval, int * status);
 
 /*============================================*/
 /* DAT_GET1K - Read 1D 64-bit Integer array */
 /*============================================*/
 
 int
-datGet1K( const HDSLoc * locator, size_t maxval, int64_t values[], size_t *actval, int * status );
+datGet1K(const HDSLoc * locator, size_t maxval, int64_t values[], size_t *actval, int * status);
 
 /*=========================================*/
 /* DAT_GET1W - Read 1D Short Integer array */
 /*=========================================*/
 
 int
-datGet1W( const HDSLoc * locator, size_t maxval, short values[], size_t *actval, int * status );
+datGet1W(const HDSLoc * locator, size_t maxval, short values[], size_t *actval, int * status);
 
 /*===================================================*/
 /* DAT_GET1UW - Read 1D Unsigned Short Integer array */
 /*===================================================*/
 
 int
-datGet1UW( const HDSLoc * locator, size_t maxval, unsigned short values[], size_t *actval, int * status );
+datGet1UW(const HDSLoc * locator, size_t maxval, unsigned short values[], size_t *actval, int * status);
 
 /*==================================*/
 /* DAT_GET1R - Read 1D REAL array */
 /*==================================*/
 
 int
-datGet1R( const HDSLoc * locator, size_t maxval, float values[], size_t *actval, int * status );
+datGet1R(const HDSLoc * locator, size_t maxval, float values[], size_t *actval, int * status);
 
 /*==================================*/
 /* DAT_GET1L - Read 1D Logical array */
 /*==================================*/
 
 int
-datGet1L( const HDSLoc * locator, size_t maxval, int values[], size_t *actval, int * status );
+datGet1L(const HDSLoc * locator, size_t maxval, hdsbool_t values[], size_t *actval, int * status);
 
 /*==================================*/
 /* DAT_GETVC - Read vectorized 1D string array */
 /*==================================*/
 
 int
-datGetVC( const HDSLoc * locator, size_t maxval, size_t bufsize, char *buffer, char *pntrs[], size_t * actval, int * status );
+datGetVC(const HDSLoc * locator, size_t maxval, size_t bufsize, char *buffer, char *pntrs[], size_t * actval, int * status);
 
 
 /*==========================================*/
@@ -306,35 +306,35 @@ datGetVC( const HDSLoc * locator, size_t maxval, size_t bufsize, char *buffer, c
 /*==========================================*/
 
 int
-datGetVD( const HDSLoc * locator, size_t maxval, double values[], size_t *actval, int * status );
+datGetVD(const HDSLoc * locator, size_t maxval, double values[], size_t *actval, int * status);
 
 /*==========================================*/
 /* DAT_GETVI - Read vectorized Integer array */
 /*==========================================*/
 
 int
-datGetVI( const HDSLoc * locator, size_t maxval, int values[], size_t *actval, int * status );
+datGetVI(const HDSLoc * locator, size_t maxval, int values[], size_t *actval, int * status);
 
 /*==========================================*/
 /* DAT_GETVK - Read vectorized Int64 array */
 /*==========================================*/
 
 int
-datGetVK( const HDSLoc * locator, size_t maxval, int64_t values[], size_t *actval, int * status );
+datGetVK(const HDSLoc * locator, size_t maxval, int64_t values[], size_t *actval, int * status);
 
 /*==========================================*/
 /* DAT_GETVR - Read vectorized REAL array */
 /*==========================================*/
 
 int
-datGetVR( const HDSLoc * locator, size_t maxval, float values[], size_t *actval, int * status );
+datGetVR(const HDSLoc * locator, size_t maxval, float values[], size_t *actval, int * status);
 
 /*==========================================*/
 /* DAT_GETVL - Read vectorized Logical array */
 /*==========================================*/
 
 int
-datGetVL( const HDSLoc * locator, size_t maxval, int values[], size_t *actval, int * status );
+datGetVL(const HDSLoc * locator, size_t maxval, hdsbool_t values[], size_t *actval, int * status);
 
 
 /*======================================*/
@@ -342,7 +342,7 @@ datGetVL( const HDSLoc * locator, size_t maxval, int values[], size_t *actval, i
 /*======================================*/
 
 int
-datIndex(const HDSLoc *locator1, int index, HDSLoc **locator2, int *status );
+datIndex(const HDSLoc *locator1, int index, HDSLoc **locator2, int *status);
 
 /*===================================*/
 /* datLen - Inquire primitive length */
@@ -363,42 +363,42 @@ datMap(const HDSLoc *locator, const char *type_str, const char *mode_str, int nd
 /*==================================*/
 
 int
-datMapC(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], unsigned char **pntr, int *status );
+datMapC(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], unsigned char **pntr, int *status);
 
 /*====================================*/
 /* datMapD - Map _DOUBLE primitive(s) */
 /*====================================*/
 
 int
-datMapD(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], double **pntr, int *status );
+datMapD(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], double **pntr, int *status);
 
 /*=====================================*/
 /* datMapI - Map _INTEGER primitive(s) */
 /*=====================================*/
 
 int
-datMapI(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], int **pntr, int *status );
+datMapI(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], int **pntr, int *status);
 
 /*=====================================*/
 /* datMapK - Map _INT64 primitive(s) */
 /*=====================================*/
 
 int
-datMapK(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], int **pntr, int *status );
+datMapK(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], int **pntr, int *status);
 
 /*=====================================*/
 /* datMapL - Map _LOGICAL primitive(s) */
 /*=====================================*/
 
 int
-datMapL(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], int **pntr, int *status );
+datMapL(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], hdsbool_t **pntr, int *status);
 
 /*==================================*/
 /* datMapR - Map _REAL primitive(s) */
 /*==================================*/
 
 int
-datMapR(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], float **pntr, int *status );
+datMapR(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], float **pntr, int *status);
 
 
 /*========================================*/
@@ -413,7 +413,7 @@ datMapN(const HDSLoc *locator, const char *type_str, const char *mode_str, int n
 /*==================================*/
 
 int
-datMapV(const HDSLoc *locator, const char *type_str, const char *mode_str, void **pntr, size_t *actval, int *status );
+datMapV(const HDSLoc *locator, const char *type_str, const char *mode_str, void **pntr, size_t *actval, int *status);
 
 
 /*==================================*/
@@ -435,7 +435,7 @@ datMove(HDSLoc **locator1, const HDSLoc *locator2, const char *name_str, int *st
 /*======================================*/
 
 void
-datMsg( const char * token, const HDSLoc * loc );
+datMsg(const char * token, const HDSLoc * loc);
 
 /*===============================*/
 /* datName - Enquire object name */
@@ -449,14 +449,14 @@ datName(const HDSLoc *locator, char name_str[DAT__SZNAM+1], int *status);
 /*=========================================*/
 
 int
-datNcomp( const HDSLoc *locator, int *ncomp, int *status);
+datNcomp(const HDSLoc *locator, int *ncomp, int *status);
 
 /*===============================*/
 /* datNew - Create new component */
 /*===============================*/
 
 int
-datNew( const HDSLoc *locator, const char *name_str, const char *type_str, int ndim, const hdsdim dims[], int *status);
+datNew(const HDSLoc *locator, const char *name_str, const char *type_str, int ndim, const hdsdim dims[], int *status);
 
 /*============================================*/
 /* datNewC - Create new _CHAR type component */
@@ -470,63 +470,63 @@ datNewC(const HDSLoc *locator, const char *name_str, size_t len, int ndim, const
 /*=======================================*/
 
 int
-datNew0( const HDSLoc *locator, const char *name_str, const char *type_str, int *status);
+datNew0(const HDSLoc *locator, const char *name_str, const char *type_str, int *status);
 
 /*===============================================*/
 /* datNew0D - Create new scalar double component */
 /*===============================================*/
 
 int
-datNew0D( const HDSLoc *locator, const char *name_str, int *status);
+datNew0D(const HDSLoc *locator, const char *name_str, int *status);
 
 /*================================================*/
 /* datNew0I - Create new scalar integer component */
 /*================================================*/
 
 int
-datNew0I( const HDSLoc *locator, const char *name_str, int *status);
+datNew0I(const HDSLoc *locator, const char *name_str, int *status);
 
 /*=========================================================*/
 /* datNew0K - Create new scalar 64-bit integer component */
 /*=========================================================*/
 
 int
-datNew0K( const HDSLoc *locator, const char *name_str, int *status);
+datNew0K(const HDSLoc *locator, const char *name_str, int *status);
 
 /*======================================================*/
 /* datNew0W - Create new scalar short integer component */
 /*======================================================*/
 
 int
-datNew0W( const HDSLoc *locator, const char *name_str, int *status);
+datNew0W(const HDSLoc *locator, const char *name_str, int *status);
 
 /*================================================================*/
 /* datNew0UW - Create new scalar unsigned short integer component */
 /*================================================================*/
 
 int
-datNew0UW( const HDSLoc *locator, const char *name_str, int *status);
+datNew0UW(const HDSLoc *locator, const char *name_str, int *status);
 
 /*=============================================*/
 /* datNew0R - Create new scalar real component */
 /*=============================================*/
 
 int
-datNew0R( const HDSLoc *locator, const char *name_str, int *status);
+datNew0R(const HDSLoc *locator, const char *name_str, int *status);
 
 /*================================================*/
 /* datNew0L - Create new scalar logical component */
 /*================================================*/
 
 int
-datNew0L( const HDSLoc *locator, const char *name_str, int *status);
+datNew0L(const HDSLoc *locator, const char *name_str, int *status);
 
 /*================================================*/
 /* datNew0L - Create new scalar logical component */
 /*================================================*/
 
 int
-datNew0C( const HDSLoc *locator, const char *name_str, size_t len, int *status);
+datNew0C(const HDSLoc *locator, const char *name_str, size_t len, int *status);
 
 
 
@@ -535,63 +535,63 @@ datNew0C( const HDSLoc *locator, const char *name_str, size_t len, int *status);
 /*=======================================*/
 
 int
-datNew1( const HDSLoc *locator, const char *name_str, const char *type_str, size_t len, int *status);
+datNew1(const HDSLoc *locator, const char *name_str, const char *type_str, size_t len, int *status);
 
 /*=======================================*/
 /* datNew1C - Create new vector string  */
 /*=======================================*/
 
 int
-datNew1C( const HDSLoc *locator, const char *name_str, size_t len, size_t nelem, int *status);
+datNew1C(const HDSLoc *locator, const char *name_str, size_t len, size_t nelem, int *status);
 
 /*=======================================*/
 /* datNew1d - Create new vector double   */
 /*=======================================*/
 
 int
-datNew1D( const HDSLoc *locator, const char *name_str, size_t len, int *status);
+datNew1D(const HDSLoc *locator, const char *name_str, size_t len, int *status);
 
 /*=======================================*/
 /* datNew1I - Create new vector integer  */
 /*=======================================*/
 
 int
-datNew1I( const HDSLoc *locator, const char *name_str, size_t len, int *status);
+datNew1I(const HDSLoc *locator, const char *name_str, size_t len, int *status);
 
 /*================================================*/
 /* datNew1K - Create new vector 64-bit integer  */
 /*================================================*/
 
 int
-datNew1K( const HDSLoc *locator, const char *name_str, size_t len, int *status);
+datNew1K(const HDSLoc *locator, const char *name_str, size_t len, int *status);
 
 /*=============================================*/
 /* datNew1W - Create new vector short integer  */
 /*=============================================*/
 
 int
-datNew1W( const HDSLoc *locator, const char *name_str, size_t len, int *status);
+datNew1W(const HDSLoc *locator, const char *name_str, size_t len, int *status);
 
 /*=======================================================*/
 /* datNew1UW - Create new vector unsigned short integer  */
 /*=======================================================*/
 
 int
-datNew1UW( const HDSLoc *locator, const char *name_str, size_t len, int *status);
+datNew1UW(const HDSLoc *locator, const char *name_str, size_t len, int *status);
 
 /*=======================================*/
 /* datNew1L - Create new vector logical   */
 /*=======================================*/
 
 int
-datNew1L( const HDSLoc *locator, const char *name_str, size_t len, int *status);
+datNew1L(const HDSLoc *locator, const char *name_str, size_t len, int *status);
 
 /*=======================================*/
 /* datNew1R - Create new vector float   */
 /*=======================================*/
 
 int
-datNew1R( const HDSLoc *locator, const char *name_str, size_t len, int *status);
+datNew1R(const HDSLoc *locator, const char *name_str, size_t len, int *status);
 
 /*====================================*/
 /* datParen - Locate parent structure */
@@ -613,231 +613,231 @@ datPrec(const HDSLoc *locator, size_t *nbytes, int *status);
 /*====================================*/
 
 int
-datPrim(const HDSLoc *locator, int *prim, int *status);
+datPrim(const HDSLoc *locator, hdsbool_t *prim, int *status);
 
 /*=========================================================*/
 /* datPrmry - Set/Enquire primary/secondary locator status */
 /*=========================================================*/
 
 int
-datPrmry(int set, HDSLoc **locator, int *prmry, int *status);
+datPrmry(int set, HDSLoc **locator, hdsbool_t *prmry, int *status);
 
 /*==================================*/
 /* datPutC - Write _CHAR primitive */
 /*==================================*/
 
 int
-datPutC( const HDSLoc *locator, int ndim, const hdsdim dims[], const char string[], size_t string_length, int *status);
+datPutC(const HDSLoc *locator, int ndim, const hdsdim dims[], const char string[], size_t string_length, int *status);
 
 /*====================================*/
 /* datPutD - Write _DOUBLE primitives */
 /*====================================*/
 
 int
-datPutD( const HDSLoc *locator, int ndim, const hdsdim dims[], const double values[], int *status);
+datPutD(const HDSLoc *locator, int ndim, const hdsdim dims[], const double values[], int *status);
 
 /*=====================================*/
 /* datPutI - Write _INTEGER primitives */
 /*=====================================*/
 
 int
-datPutI( const HDSLoc *locator, int ndim, const hdsdim dims[], const int values[], int *status);
+datPutI(const HDSLoc *locator, int ndim, const hdsdim dims[], const int values[], int *status);
 
 /*=====================================*/
 /* datPutK - Write _INT64 primitives */
 /*=====================================*/
 
 int
-datPutK( const HDSLoc *locator, int ndim, const hdsdim dims[], const int64_t values[], int *status);
+datPutK(const HDSLoc *locator, int ndim, const hdsdim dims[], const int64_t values[], int *status);
 
 /*=====================================*/
 /* datPutW - Write _WORD primitives */
 /*=====================================*/
 
 int
-datPutW( const HDSLoc *locator, int ndim, const hdsdim dims[], const short values[], int *status);
+datPutW(const HDSLoc *locator, int ndim, const hdsdim dims[], const short values[], int *status);
 
 /*====================================*/
 /* datPutUW - Write _UWORD primitives */
 /*====================================*/
 
 int
-datPutUW( const HDSLoc *locator, int ndim, const hdsdim dims[], const unsigned short values[], int *status);
+datPutUW(const HDSLoc *locator, int ndim, const hdsdim dims[], const unsigned short values[], int *status);
 
 /*==================================*/
 /* datPutR - Write _REAL primitives */
 /*==================================*/
 
 int
-datPutR( const HDSLoc *locator, int ndim, const hdsdim dims[], const float values[], int *status);
+datPutR(const HDSLoc *locator, int ndim, const hdsdim dims[], const float values[], int *status);
 
 /*=====================================*/
 /* datPutL - Write _LOGICAL primitives */
 /*=====================================*/
 
 int
-datPutL( const HDSLoc *locator, int ndim, const hdsdim dims[], const int values[], int *status);
+datPutL(const HDSLoc *locator, int ndim, const hdsdim dims[], const hdsbool_t values[], int *status);
 
 /*==========================*/
 /* datPut - Write primitive */
 /*==========================*/
 
 int
-datPut( const HDSLoc *locator, const char *type_str, int ndim, const hdsdim dims[], const void *values, int *status);
+datPut(const HDSLoc *locator, const char *type_str, int ndim, const hdsdim dims[], const void *values, int *status);
 
 /*=======================================*/
 /* datPut0C - Write scalar string value  */
 /*=======================================*/
 
 int
-datPut0C( const HDSLoc * loc, const char * value, int * status );
+datPut0C(const HDSLoc * loc, const char * value, int * status);
 
 /*=======================================*/
 /* datPut0D - Write scalar double value  */
 /*=======================================*/
 
 int
-datPut0D( const HDSLoc * loc, double value, int * status );
+datPut0D(const HDSLoc * loc, double value, int * status);
 
 /*======================================*/
 /* datPut0R - Write scalar float value  */
 /*======================================*/
 
 int
-datPut0R( const HDSLoc * loc, float value, int * status );
+datPut0R(const HDSLoc * loc, float value, int * status);
 
 /*========================================*/
 /* datPut0I - Write scalar integer value  */
 /*========================================*/
 
 int
-datPut0I( const HDSLoc * loc, int value, int * status );
+datPut0I(const HDSLoc * loc, int value, int * status);
 
 /*========================================*/
 /* datPut0I - Write scalar 64-bit integer value  */
 /*========================================*/
 
 int
-datPut0K( const HDSLoc * loc, int64_t value, int * status );
+datPut0K(const HDSLoc * loc, int64_t value, int * status);
 
 /*==============================================*/
 /* datPut0W - Write scalar short integer value  */
 /*===============================================*/
 
 int
-datPut0W( const HDSLoc * loc, short value, int * status );
+datPut0W(const HDSLoc * loc, short value, int * status);
 
 /*========================================================*/
 /* datPut0UW - Write scalar unsigned short integer value  */
 /*========================================================*/
 
 int
-datPut0UW( const HDSLoc * loc, unsigned short value, int * status );
+datPut0UW(const HDSLoc * loc, unsigned short value, int * status);
 
 /*========================================*/
 /* datPut0L - Write scalar logical value  */
 /*========================================*/
 
 int
-datPut0L( const HDSLoc * loc, int value, int * status );
+datPut0L(const HDSLoc * loc, hdsbool_t value, int * status);
 
 /*========================================*/
 /* datPut1C - Write 1D character array       */
 /*========================================*/
 
 int
-datPut1C( const HDSLoc * locator, size_t nval, const char *values[], int * status );
+datPut1C(const HDSLoc * locator, size_t nval, const char *values[], int * status);
 
 /*========================================*/
 /* datPut1D - Write 1D double array       */
 /*========================================*/
 
 int
-datPut1D( const HDSLoc * loc, size_t nval, const double values[], int * status );
+datPut1D(const HDSLoc * loc, size_t nval, const double values[], int * status);
 
 /*========================================*/
 /* datPut1I - Write 1D int array       */
 /*========================================*/
 
 int
-datPut1I( const HDSLoc * loc, size_t nval, const int values[], int * status );
+datPut1I(const HDSLoc * loc, size_t nval, const int values[], int * status);
 
 /*========================================*/
 /* datPut1K - Write 1D 64-bit int array */
 /*========================================*/
 
 int
-datPut1K( const HDSLoc * loc, size_t nval, const int64_t values[], int * status );
+datPut1K(const HDSLoc * loc, size_t nval, const int64_t values[], int * status);
 
 /*===========================================*/
 /* datPut1W - Write 1D short int array       */
 /*===========================================*/
 
 int
-datPut1W( const HDSLoc * loc, size_t nval, const short values[], int * status );
+datPut1W(const HDSLoc * loc, size_t nval, const short values[], int * status);
 
 /*===============================================*/
 /* datPut1UW - Write 1D unsigned short int array */
 /*===============================================*/
 
 int
-datPut1UW( const HDSLoc * loc, size_t nval, const unsigned short values[], int * status );
+datPut1UW(const HDSLoc * loc, size_t nval, const unsigned short values[], int * status);
 
 /*========================================*/
 /* datPut1R - Write 1D double array       */
 /*========================================*/
 
 int
-datPut1R( const HDSLoc * loc, size_t nval, const float values[], int * status );
+datPut1R(const HDSLoc * loc, size_t nval, const float values[], int * status);
 
 /*========================================*/
 /* datPut1L - Write 1D Logical/int array       */
 /*========================================*/
 
 int
-datPut1L( const HDSLoc * loc, size_t nval, const int values[], int * status );
+datPut1L(const HDSLoc * loc, size_t nval, const hdsbool_t values[], int * status);
 
 /*================================================*/
 /* datPutVD - Write vectorized double array       */
 /*================================================*/
 
 int
-datPutVD( const HDSLoc * loc, size_t nval, const double values[], int * status );
+datPutVD(const HDSLoc * loc, size_t nval, const double values[], int * status);
 
 /*================================================*/
 /* datPutVI - Write vectorized int array       */
 /*================================================*/
 
 int
-datPutVI( const HDSLoc * loc, size_t nval, const int values[], int * status );
+datPutVI(const HDSLoc * loc, size_t nval, const int values[], int * status);
 
 /*================================================*/
 /* datPutVI - Write vectorized int64 array       */
 /*================================================*/
 
 int
-datPutVK( const HDSLoc * loc, size_t nval, const int64_t values[], int * status );
+datPutVK(const HDSLoc * loc, size_t nval, const int64_t values[], int * status);
 
 /*================================================*/
 /* datPutVR - Write vectorized REAL/float array       */
 /*================================================*/
 
 int
-datPutVR( const HDSLoc * loc, size_t nval, const float values[], int * status );
+datPutVR(const HDSLoc * loc, size_t nval, const float values[], int * status);
 
 /*================================================*/
 /* datPutVL - Write vectorized Logical array       */
 /*================================================*/
 
 int
-datPutVL( const HDSLoc * loc, size_t nval, const int values[], int * status );
+datPutVL(const HDSLoc * loc, size_t nval, const hdsbool_t values[], int * status);
 
 /*================================================*/
 /* datPutVC - Write vectorized character array       */
 /*================================================*/
 
 int
-datPutVC( const HDSLoc * locator, size_t nval, const char *values[], int * status );
+datPutVC(const HDSLoc * locator, size_t nval, const char *values[], int * status);
 
 
 /*========================================*/
@@ -845,7 +845,7 @@ datPutVC( const HDSLoc * locator, size_t nval, const char *values[], int * statu
 /*========================================*/
 
 int
-datRef( const HDSLoc * loc, char * ref, size_t reflen, int *status );
+datRef(const HDSLoc * loc, char * ref, size_t reflen, int *status);
 
 /*===================================================*/
 /* datRefct - Enquire container file reference count */
@@ -887,28 +887,28 @@ datShape(const HDSLoc *locator, int maxdim, hdsdim dims[], int *actdim, int *sta
 /*===============================*/
 
 int
-datSize(const HDSLoc *locator, size_t *size, int *status );
+datSize(const HDSLoc *locator, size_t *size, int *status);
 
 /*================================*/
 /* datSlice - Locate object slice */
 /*================================*/
 
 int
-datSlice(const HDSLoc *locator1, int ndim, const hdsdim lower[], const hdsdim upper[], HDSLoc **locator2, int *status );
+datSlice(const HDSLoc *locator1, int ndim, const hdsdim lower[], const hdsdim upper[], HDSLoc **locator2, int *status);
 
 /*=================================*/
 /* datState - Enquire object state */
 /*=================================*/
 
 int
-datState(const HDSLoc *locator, int *state, int *status);
+datState(const HDSLoc *locator, hdsbool_t *state, int *status);
 
 /*=====================================*/
 /* datStruc - Enquire object structure */
 /*=====================================*/
 
 int
-datStruc(const HDSLoc *locator, int *struc, int *status);
+datStruc(const HDSLoc *locator, hdsbool_t *struc, int *status);
 
 /*===================================*/
 /* datTemp - Create temporary object */
@@ -922,14 +922,14 @@ datTemp(const char *type_str, int ndim, const hdsdim dims[], HDSLoc **locator, i
 /*=========================================*/
 
 int
-datThere(const HDSLoc *locator, const char *name_c, int *there, int *status);
+datThere(const HDSLoc *locator, const char *name_c, hdsbool_t *there, int *status);
 
 /*===============================*/
 /* datType - Enquire object type */
 /*===============================*/
 
 int
-datType(const HDSLoc *locator, char type_str[DAT__SZTYP + 1], int *status );
+datType(const HDSLoc *locator, char type_str[DAT__SZTYP + 1], int *status);
 
 /*=========================*/
 /* datUnmap - Unmap object */
@@ -943,14 +943,14 @@ datUnmap(const HDSLoc *locator, int *status);
 /*==================================*/
 
 int
-datValid(const HDSLoc *locator, int *valid, int *status);
+datValid(const HDSLoc *locator, hdsbool_t *valid, int *status);
 
 /*===========================*/
 /* datVec - Vectorise object */
 /*===========================*/
 
 int
-datVec(const HDSLoc *locator1, HDSLoc **locator2, int *status );
+datVec(const HDSLoc *locator1, HDSLoc **locator2, int *status);
 
 /*================================================*/
 /* datWhere - Find primitive position in HDS file */
@@ -963,7 +963,7 @@ datVec(const HDSLoc *locator1, HDSLoc **locator2, int *status );
 /*==================================================*/
 
 int
-hdsCopy(const HDSLoc *locator, const char *file_str, const char name_str[DAT__SZNAM], int *status );
+hdsCopy(const HDSLoc *locator, const char *file_str, const char name_str[DAT__SZNAM], int *status);
 
 /*=================================*/
 /* hdsErase - Erase container file */
@@ -977,14 +977,14 @@ hdsErase(HDSLoc **locator, int *status);
 /*===============================================================*/
 
 int
-hdsEwild( int *iwld, int *status);
+hdsEwild(int *iwld, int *status);
 
 /*================================*/
 /* hdsFlush - Flush locator group */
 /*=================================*/
 
 int
-hdsFlush( const char *group_str, int *status);
+hdsFlush(const char *group_str, int *status);
 
 /*===============================*/
 /* hdsFree - Free container file */
@@ -1054,14 +1054,14 @@ hdsShow(const char *topic_str, int *status);
 /*===============================================*/
 
 int
-hdsState( int *state, int *status);
+hdsState(hdsbool_t *state, int *status);
 
 /*============================*/
 /* hdsStop - Close down HDS   */
 /*============================*/
 
 int
-hdsStop( int *status);
+hdsStop(int *status);
 
 /*==============================*/
 /* hdsTrace - Trace object path */
@@ -1093,7 +1093,7 @@ hdsWild(const char *fspec, const char *mode, int *iwld, HDSLoc **loc, int *statu
 /*========================================*/
 
 int
-datConv(const HDSLoc *locator, const char *type_str, int *conv, int *status);
+datConv(const HDSLoc *locator, const char *type_str, hdsbool_t *conv, int *status);
 
 /*=====================================================*/
 /* hdsClose - Close container file (Obsolete routine!) */
@@ -1107,7 +1107,7 @@ hdsClose(HDSLoc **locator, int *status);
 /* hdsFind - Find an object (Fortran routine, requires hdsf library) */
 /*===================================================================*/
 void
-hdsFind( const HDSLoc *loc1, const char *name, const char *mode, HDSLoc **loc2, int *status );
+hdsFind(const HDSLoc *loc1, const char *name, const char *mode, HDSLoc **loc2, int *status);
 
 
 
