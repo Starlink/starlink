@@ -63,7 +63,7 @@ itcl::class ::gaia3d::Gaia3dVtkOutline {
 
       #  Create the mapper.
       set mapper_ [::vtkPolyDataMapper New]
-      $mapper_ SetInput [$source_ GetOutput]
+      $mapper_ SetInputConnection [$source_ GetOutputPort]
 
       #  And the prop.
       set prop_ [::vtkActor New]
@@ -124,7 +124,7 @@ itcl::class ::gaia3d::Gaia3dVtkOutline {
    #  available.
    public variable dataset {} {
       if { $dataset != {} } {
-         $dataset Update
+         #$dataset Update
          set bounds [$dataset GetBounds]
          if { $bounds != {} } {
             eval $source_ SetBounds $bounds

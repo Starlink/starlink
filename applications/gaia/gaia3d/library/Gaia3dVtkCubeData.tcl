@@ -132,7 +132,9 @@ itcl::class ::gaia3d::Gaia3dVtkCubeData {
       if { $imagedata_ != {} } {
          $imagedata_ Delete
       }
+      $imageimport_ Update
       set imagedata_ [$imageimport_ GetOutput]
+      #$imagedata_ Update
 
       #  Origins are 1, not 0 for AST GRID coordinates, so stick to that.
       #  We have a default spacing of 1,1,1.
@@ -188,8 +190,8 @@ itcl::class ::gaia3d::Gaia3dVtkCubeData {
             if { $stencil_filter_ == {} } {
                set stencil_filter_ [::vtkPolyDataToImageStencil New]
             }
-            $stencil_ SetInput $imagedata_
-            $stencil_ SetStencil [$stencil_filter_ GetOutput]
+            $stencil_ SetInputData $imagedata_
+            $stencil_ SetStencilConnection [$stencil_filter_ GetOutputPort]
             $stencil_ SetBackgroundValue 0.0
 
             if { [$pixelmask invert 0] } {

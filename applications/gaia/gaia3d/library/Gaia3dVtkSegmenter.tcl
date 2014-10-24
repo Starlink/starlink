@@ -219,7 +219,7 @@ itcl::class ::gaia3d::Gaia3dVtkSegmenter {
 
    #  Set the imagedata object. If blank remove visibility.
    protected method update_imagedata_ {} {
-      $segmenter_ SetInput $imagedata
+      $segmenter_ SetInputData $imagedata
       if { $imagedata == {} } {
          remove_from_window
          set_invisible

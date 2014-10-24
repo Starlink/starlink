@@ -64,7 +64,7 @@ itcl::class ::gaia3d::Gaia3dVtkLine {
 
       #  Create the mapper.
       set mapper_ [::vtkPolyDataMapper New]
-      $mapper_ SetInput [$line_ GetOutput]
+      $mapper_ SetInputConnection [$line_ GetOutputPort]
 
       #  And the prop.
       set prop_ [::vtkActor New]
@@ -278,7 +278,7 @@ itcl::class ::gaia3d::Gaia3dVtkLine {
    #  available.
    public variable dataset {} {
       if { $dataset != {} } {
-         $dataset Update
+         #$dataset Update
       }
    }
 

@@ -149,7 +149,7 @@ itcl::class ::gaia3d::Gaia3dVtkIso {
 
       #  If masking with a stencil connect using that to partition the data.
       if { $stencil == {} } {
-         $contour_ SetInput $imagedata
+         $contour_ SetInputData $imagedata
       } else {
          $contour_ SetInputConnection [$stencil GetOutputPort]
       }

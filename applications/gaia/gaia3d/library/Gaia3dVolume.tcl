@@ -406,8 +406,8 @@ itcl::class gaia3d::Gaia3dVolume {
       if { $newdata } {
          set stencil [$imagedata_ get_stencil]
          if { $stencil == {} } {
-            $mainmapper_ SetInput [$imagedata_ get_imagedata]
-            $fastmapper_ SetInput [$imagedata_ get_imagedata]
+            $mainmapper_ SetInputData [$imagedata_ get_imagedata]
+            $fastmapper_ SetInputData [$imagedata_ get_imagedata]
          } else {
             $mainmapper_ SetInputConnection [$stencil GetOutputPort]
             $fastmapper_ SetInputConnection [$stencil GetOutputPort]

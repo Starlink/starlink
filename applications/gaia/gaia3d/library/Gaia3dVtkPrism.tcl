@@ -68,13 +68,13 @@ itcl::class ::gaia3d::Gaia3dVtkPrism {
 
       #  Object to perform the extrusion.
       set extrude_ [::vtkLinearExtrusionFilter New]
-      $extrude_ SetInput $polydata_
+      $extrude_ SetInputData $polydata_
       $extrude_ SetExtrusionTypeToVectorExtrusion
       $extrude_ CappingOff
 
       #  Mapper.
       set mapper_ [::vtkPolyDataMapper New]
-      $mapper_ SetInput [$extrude_ GetOutput]
+      $mapper_ SetInputConnection [$extrude_ GetOutputPort]
 
       #  And the prop.
       set prop_ [::vtkActor New]
@@ -207,7 +207,7 @@ itcl::class ::gaia3d::Gaia3dVtkPrism {
    protected method extrude_polygon_ {} {
       eval $extrude_ SetVector $extrusion_vector_
       $extrude_ SetScaleFactor $length_
-      $extrude_ SetInput $polydata_
+      $extrude_ SetInputData $polydata_
       $polydata_ Modified
    }
 

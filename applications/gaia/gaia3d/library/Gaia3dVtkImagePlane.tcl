@@ -123,7 +123,7 @@ itcl::class ::gaia3d::Gaia3dVtkImagePlane {
 
    #  Handle the setting of a dataset.
    protected method set_dataset_ {} {
-      $plane_ SetInput $dataset
+      $plane_ SetInputData $dataset
       $plane_ RestrictPlaneToVolumeOn
       update
    }
