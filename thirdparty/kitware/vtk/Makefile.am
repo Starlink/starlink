@@ -43,6 +43,9 @@ all:
 	        -D TK_INCLUDE_PATH:PATH=$(prefix)/include \
                 -D TK_XLIB_PATH:PATH=$(X11_INCLUDES) \
 	        -D TK_LIBRARY:FILEPATH=$(prefix)/lib/libtk8.5$(SHLIB_EXT) \
+	        -D Module_vtkRenderingTk:BOOL=ON \
+	        -D VTK_Group_Tk:BOOL=ON \
+	        -D VTK_Group_Imaging:BOOL=ON \
 	        -D VTK_OPENGL_HAS_OSMESA:BOOL=OFF \
                 -D CMAKE_FIND_FRAMEWORK=NEVER $(GLPATH_INFO) \
 	        -D VTK_USE_CARBON:BOOL=OFF \
