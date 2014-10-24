@@ -363,6 +363,13 @@ int main (int argc, char ** argv ) {
 	  "#define HDS_COPY_FORTRAN_DIMS %d\n\n",
 	  copydims);
 
+  /* Logical type -- the C side does not need to be the same as the Fortran
+     side. */
+  fprintf( OutputFile,
+          "/* Public type for Logical type */\n"
+          "typedef %s hdsbool_t;\n"
+          "#define HDS_BOOL_FORMAT \"%s\"\n\n",
+          "int", "d");
 
   fprintf(OutputFile,
 	  "#endif /* _INCLUDED */\n\n");
