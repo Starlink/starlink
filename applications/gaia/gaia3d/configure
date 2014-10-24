@@ -9182,7 +9182,6 @@ fi
 
 
 
-
 if test "$with_vtk" = "yes"; then
 
    with_vtk="$STARCONF_DEFAULT_PREFIX"
@@ -9191,15 +9190,15 @@ fi
 if test "$with_vtk" != "no"; then
    VTK_PREFIX="$with_vtk"
 
-   as_ac_File=`$as_echo "ac_cv_file_$VTK_PREFIX/include/vtk/vtkCommonInstantiator.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $VTK_PREFIX/include/vtk/vtkCommonInstantiator.h" >&5
-$as_echo_n "checking for $VTK_PREFIX/include/vtk/vtkCommonInstantiator.h... " >&6; }
+   as_ac_File=`$as_echo "ac_cv_file_$VTK_PREFIX/include/vtk/vtkVersionMacros.h" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $VTK_PREFIX/include/vtk/vtkVersionMacros.h" >&5
+$as_echo_n "checking for $VTK_PREFIX/include/vtk/vtkVersionMacros.h... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$VTK_PREFIX/include/vtk/vtkCommonInstantiator.h"; then
+if test -r "$VTK_PREFIX/include/vtk/vtkVersionMacros.h"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -9223,78 +9222,38 @@ $as_echo "no" >&6; }
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
-            VTK_LIBS="-lvtkCommon -lvtkDICOMParser -lvtkexpat -lvtkFiltering -lvtkfreetype -lvtkftgl -lvtkGraphics -lvtkHybrid -lvtkImaging -lvtkIO -lvtkjpeg -lvtkpng -lvtkRendering -lvtktiff -lvtkzlib"
+            if test -n "6.1.0"; then
 
-            VTK_CFLAGS="-I$VTK_PREFIX/include/vtk"
-      VTK_CXXFLAGS="$VTK_CFLAGS"
-      VTK_LDFLAGS="-L$VTK_PREFIX/lib/vtk $VTK_LIBS"
-
-            if test -n "5.0.0"; then
-
-                  maj=`echo 5.0.0 | sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/'`
-         min=`echo 5.0.0 | sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/'`
-         rel=`echo 5.0.0 | sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
+                  maj=`echo 6.1.0 | sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/'`
+         min=`echo 6.1.0 | sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/'`
+         rel=`echo 6.1.0 | sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
          { $as_echo "$as_me:${as_lineno-$LINENO}: checking if VTK version is at least $maj.$min.$rel" >&5
 $as_echo_n "checking if VTK version is at least $maj.$min.$rel... " >&6; }
 
+                           MAJ=`grep VTK_MAJOR_VERSION $VTK_PREFIX/include/vtk/vtkVersionMacros.h| sed 's/[^0-9]*\([0-9]*\)/\1/'`
+         MIN=`grep VTK_MINOR_VERSION $VTK_PREFIX/include/vtk/vtkVersionMacros.h| sed 's/[^0-9]*\([0-9]*\)/\1/'`
 
-         OLD_CXXFLAGS=$CXXFLAGS
-         OLD_LDFLAGS=$LDFLAGS
-         CFLAGS="$VTK_CFLAGS $CFLAGS"
-         CXXFLAGS="$VTK_CXXFLAGS $CXXFLAGS"
-         LDFLAGS="$VTK_LDFLAGS $LDFLAGS"
+         if test $MAJ -eq $maj -a $MIN -ge $min || test $MAJ -gt $maj; then
+            VERS="-${MAJ}.${MIN}"
+            VTK_LIBS=""
+            for l in CommonCore IOImage RenderingCore FiltersProgrammable RenderingAnnotation DICOMParser expat freetype ftgl jpeg png tiff zlib; do
+                VTK_LIBS="${VTK_LIBS} -lvtk${l}${VERS}"
+            done
 
-                  ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+                        VTK_CFLAGS="-I$VTK_PREFIX/include/vtk"
+            VTK_CXXFLAGS="$VTK_CFLAGS"
+            VTK_LDFLAGS="-L$VTK_PREFIX/lib/vtk $VTK_LIBS"
 
-         cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <vtkVersion.h>
-int
-main ()
-{
+            CFLAGS="$VTK_CFLAGS $CFLAGS"
+            CXXFLAGS="$VTK_CXXFLAGS $CXXFLAGS"
+            LDFLAGS="$VTK_LDFLAGS $LDFLAGS"
 
-            printf("VTK version is: %d.%d.%d", VTK_MAJOR_VERSION, VTK_MINOR_VERSION, VTK_BUILD_VERSION);
-            #if VTK_MAJOR_VERSION < $maj
-            #error Installed VTK is too old !
-            #endif
-            #if VTK_MINOR_VERSION < $min
-            #error Installed VTK is too old !
-            #endif
-            #if VTK_BUILD_VERSION < $rel
-            #error Installed VTK is too old !
-            #endif
-
-  ;
-  return 0;
-}
-
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  vtkVersion="OK"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-         ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-         if test "$vtkVersion" = "OK"; then
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
          else
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-
-                        CFLAGS=$OLD_CFLAGS
-            CXXFLAGS=$OLD_CXXFLAGS
-            LDFLAGS=$OLD_LDFLAGS
 
          fi
       else

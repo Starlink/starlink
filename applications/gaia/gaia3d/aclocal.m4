@@ -103,7 +103,7 @@ if test $ac_cv_sizeof_long -eq 8; then
    AC_DEFINE( INT64, [long], [Type for 64 bit integers] )
 fi
 
-]) 
+])
 #  GAIA3D_CONFIG
 
 
@@ -114,7 +114,7 @@ AC_DEFUN(GAIA3D_COMPILER_TESTS, [
 #  Some compiler flags are set by tcl.m4, but are protected to survive
 #  unexpanded into Makefile, work around that (tcl.4m should not be handling
 #  CFLAGS at all, it should stick to another name and merge that in the
-#  Makefile, CFLAGS are for users, not systems).  
+#  Makefile, CFLAGS are for users, not systems).
 old_CFLAGS="$CFLAGS"
 CFLAGS=`eval echo "$CFLAGS"`
 
@@ -139,16 +139,16 @@ AC_SUBST(SHLIB_LD_CXX_LIBS)
 
 #-------------------------------------------------------------------------
 #  The cxx C++ compiler under Tru64 UNIX needs the special
-#  CXXFLAGS "-std gnu -D__USE_STD_IOSTREAM=1". These allow the standard 
-#  library streams headers to work and to generate templates that do 
-#  not require special handling throughout skycat directories (normally 
+#  CXXFLAGS "-std gnu -D__USE_STD_IOSTREAM=1". These allow the standard
+#  library streams headers to work and to generate templates that do
+#  not require special handling throughout skycat directories (normally
 #  template object files are created in various cxx_repository subdirectories,
-#  this way the object files are kept embedded the usual object files, see 
+#  this way the object files are kept embedded the usual object files, see
 #  the cxx man page for details).
 #-------------------------------------------------------------------------
 export CXXFLAGS
 case $system in
-   OSF*) 
+   OSF*)
       case "x$CXX" in
          xcxx*)
             CXXFLAGS="$CXXFLAGS -g3 -std gnu -D__USE_STD_IOSTREAM=1"
@@ -201,7 +201,7 @@ fi
 if test "$with_vtk" != "no"; then
    VTK_PREFIX="$with_vtk"
 
-   AC_CHECK_FILE([$VTK_PREFIX/include/vtk/vtkCommonInstantiator.h], 
+   AC_CHECK_FILE([$VTK_PREFIX/include/vtk/vtkVersionMacros.h],
                  [vtkFound="OK"])
    AC_MSG_CHECKING([if VTK is installed in $VTK_PREFIX])
 
@@ -210,14 +210,6 @@ if test "$with_vtk" != "no"; then
       $3
    else
       AC_MSG_RESULT([yes])
-
-      dnl these are the VTK libraries of a default build
-      VTK_LIBS="-lvtkCommon -lvtkDICOMParser -lvtkexpat -lvtkFiltering -lvtkfreetype -lvtkftgl -lvtkGraphics -lvtkHybrid -lvtkImaging -lvtkIO -lvtkjpeg -lvtkpng -lvtkRendering -lvtktiff -lvtkzlib"
-
-      dnl set VTK cpp,ld flags
-      VTK_CFLAGS="-I$VTK_PREFIX/include/vtk"
-      VTK_CXXFLAGS="$VTK_CFLAGS"
-      VTK_LDFLAGS="-L$VTK_PREFIX/lib/vtk $VTK_LIBS"
 
       dnl now, eventually check version
       if test -n "$1"; then
@@ -228,47 +220,36 @@ if test "$with_vtk" != "no"; then
          rel=`echo $1 | sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
          AC_MSG_CHECKING([if VTK version is at least $maj.$min.$rel])
 
-         dnl in order to be able to compile the following test program, we need
-         dnl to add to the current flags, the VTK settings...
+         dnl these are the VTK libraries of a default build.
+         dnl XXX oddly version is now in name not type, so we need to know it.
+         MAJ=`grep VTK_MAJOR_VERSION $VTK_PREFIX/include/vtk/vtkVersionMacros.h| sed 's/[[^0-9]]*\([[0-9]]*\)/\1/'`
+         MIN=`grep VTK_MINOR_VERSION $VTK_PREFIX/include/vtk/vtkVersionMacros.h| sed 's/[[^0-9]]*\([[0-9]]*\)/\1/'`
 
-         OLD_CXXFLAGS=$CXXFLAGS
-         OLD_LDFLAGS=$LDFLAGS
-         CFLAGS="$VTK_CFLAGS $CFLAGS"
-         CXXFLAGS="$VTK_CXXFLAGS $CXXFLAGS"
-         LDFLAGS="$VTK_LDFLAGS $LDFLAGS"
+         if test $MAJ -eq $maj -a $MIN -ge $min || test $MAJ -gt $maj; then 
+            VERS="-${MAJ}.${MIN}"   
+            VTK_LIBS=""
+            for l in CommonCore IOImage RenderingCore FiltersProgrammable RenderingAnnotation DICOMParser expat freetype ftgl jpeg png tiff zlib; do
+                VTK_LIBS="${VTK_LIBS} -lvtk${l}${VERS}"
+            done
 
-         dnl check if the installed VTK is greater or not
-         AC_LANG_PUSH([C++])
-         AC_COMPILE_IFELSE([AC_LANG_PROGRAM([#include <vtkVersion.h>], [
-            printf("VTK version is: %d.%d.%d", VTK_MAJOR_VERSION, VTK_MINOR_VERSION, VTK_BUILD_VERSION);
-            #if VTK_MAJOR_VERSION < $maj
-            #error Installed VTK is too old !
-            #endif
-            #if VTK_MINOR_VERSION < $min
-            #error Installed VTK is too old !
-            #endif
-            #if VTK_BUILD_VERSION < $rel
-            #error Installed VTK is too old !
-            #endif
-            ])
-         ], [vtkVersion="OK"])
-         AC_LANG_POP([C++])
+            dnl set VTK cpp,ld flags
+            VTK_CFLAGS="-I$VTK_PREFIX/include/vtk"
+            VTK_CXXFLAGS="$VTK_CFLAGS"
+            VTK_LDFLAGS="-L$VTK_PREFIX/lib/vtk $VTK_LIBS"
 
-         if test "$vtkVersion" = "OK"; then
+            CFLAGS="$VTK_CFLAGS $CFLAGS"
+            CXXFLAGS="$VTK_CXXFLAGS $CXXFLAGS"
+            LDFLAGS="$VTK_LDFLAGS $LDFLAGS"
+
             AC_MSG_RESULT([yes])
             $2
          else
             AC_MSG_RESULT([no])
-
-            dnl restore all flags without VTK values
-            CFLAGS=$OLD_CFLAGS
-            CXXFLAGS=$OLD_CXXFLAGS
-            LDFLAGS=$OLD_LDFLAGS
             $3
          fi
       else
-         dnl if we don't have to check for minimum version (because the user 
-         dnl did not set that option), then we can execute here the block 
+         dnl if we don't have to check for minimum version (because the user
+         dnl did not set that option), then we can execute here the block
          dnl action-if-found
          CFLAGS="$VTK_CFLAGS $CFLAGS"
          CXXFLAGS="$VTK_CXXFLAGS $CXXFLAGS"
