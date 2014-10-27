@@ -169,3 +169,6 @@
 [submodule "libext/hds-v5"]
 	path = libext/hds-v5
 	url = https://github.com/Starlink/hds-v5.git
+[submodule "libext/hds-v4"]
+	path = libext/hds-v4
+	url = ../hds-v4.git
