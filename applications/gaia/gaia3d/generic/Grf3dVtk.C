@@ -1014,7 +1014,7 @@ static int vtkG3DTxExt( const char *text, float ref[3], const char *just,
     vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
     vtkFollower *prop = vtkFollower::New();
     prop->SetMapper( mapper );
-    mapper->SetInputData( vtext->GetOutput() );
+    mapper->SetInputConnection( vtext->GetOutputPort() );
 
     double *bbox = prop->GetBounds();
     vtext->Delete();
@@ -1283,9 +1283,6 @@ static vtkFollower *CreateVectorText( const char *text, float ref[3],
      * so we increase the power for ambient lighting. */
     property->SetAmbient( 10.0 );
 
-    /* Do the positioning... */
-    mapper->Update();
-
     /* Calculate the rotation of text plane. */
     double orient[3];
     char newjust[3];
@@ -1293,6 +1290,7 @@ static vtkFollower *CreateVectorText( const char *text, float ref[3],
     TextOrientation( ref, up, norm, just, orient, newjust, tx, ty, tz );
 
     /* Adjust initial position for justification. */
+    mapper->Update();
     double *bounds = prop->GetBounds();
     double *centre = prop->GetCenter();
     double origin[3];
@@ -1515,7 +1513,7 @@ static void TextOrientation( float ref[3], float up[3], float norm[3],
  *  Purpose:
  *     Create objects needed for drawing markers.
 
- *-
+  *-
  */
 static void CreateMarkerObjects( void )
 {
