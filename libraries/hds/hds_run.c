@@ -2,9 +2,9 @@
 #  include <config.h>
 #endif
 
+#include "sae_par.h"
 #include "ems.h"                 /* EMS error reporting routines            */
-#include "hds1.h"                /* Global definitions for HDS              */
-#include "str.h"                 /* Character string import/export macros   */
+#include "dat_par.h"             /* Global definitions for HDS              */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 #include "f77.h"                 /* Fortran interface                       */
 
@@ -68,7 +68,7 @@ F77_SUBROUTINE(hds_run)( SUBROUTINE(subroutine),
 */
 
 /* Check the inherited global status. */
-      if ( !_ok( *status ) ) return;
+      if ( *status != SAI__OK ) return;
 
 /* Start up HDS, call the application and close HDS down.
    We do not need to lock because we know that internally these
@@ -78,7 +78,7 @@ F77_SUBROUTINE(hds_run)( SUBROUTINE(subroutine),
       F77_CALL(hds_stop)( status );
 
 /* If an error occurred, then report contextual information.  */
-      if ( !_ok( *status ) )
+      if ( *status != SAI__OK )
       {
          emsRep( "HDS_RUN_ERR",
                    "HDS_RUN: Error running an HDS application subroutine.",

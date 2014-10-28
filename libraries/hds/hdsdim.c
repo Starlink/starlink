@@ -7,11 +7,9 @@
 #include <string.h>
 
 #include "ems.h"
+#include "sae_par.h"
 #include "star/mem.h"
 
-#include "hds1.h"
-#include "rec.h"
-#include "dat1.h"
 #include "hds_types.h"
 #include "dat_err.h"
 
@@ -115,7 +113,7 @@ hdsDimC2F( int ndim, const hdsdim dims[],
 #endif
   F77_INTEGER_TYPE * retval = NULL;
 
-  if ( *status != DAT__OK ) return NULL;
+  if ( *status != SAI__OK ) return NULL;
 
 #if HDS_COPY_FORTRAN_DIMS
   /* sizes or signs differ so we need to copy one at a time
@@ -131,7 +129,7 @@ hdsDimC2F( int ndim, const hdsdim dims[],
   }
 
   /* check status is good before deciding to use this array */
-  if (*status == DAT__OK) retval = fdims;
+  if (*status == SAI__OK) retval = fdims;
 
 #else
   /* hdsdim is the same size and sign so fast copy can
@@ -230,7 +228,7 @@ hdsDimF2C( int ndim, const F77_INTEGER_TYPE fdims[],
 #endif
   hdsdim * retval = NULL;
 
-  if ( *status != DAT__OK ) return NULL;
+  if ( *status != SAI__OK ) return NULL;
 
 #if HDS_COPY_FORTRAN_DIMS
   /* sizes or signs differ so we need to copy one at a time
@@ -241,7 +239,7 @@ hdsDimF2C( int ndim, const F77_INTEGER_TYPE fdims[],
   }
 
   /* check status is good before deciding to use this array */
-  if (*status == DAT__OK) retval = cdims;
+  if (*status == SAI__OK) retval = cdims;
 
 #else
   /* hdsdim is the same size and sign so no copy required */

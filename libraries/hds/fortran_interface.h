@@ -54,11 +54,8 @@
 #include <stdio.h>
 #include "f77.h"              /* F77 <-> C interface macros                  */
 #include "cnf.h"              /* F77 <-> C string handling functions         */
-#include "str.h"              /* String constants                            */
 #include "hds1_types.h"
 #include "hds_types.h"
-#include "hds1.h"
-#include "hds2.h"             /* for datWhere                                */
 #include "hds.h"              /* HDS C interface			     */
 #include "dat_par.h"          /* DAT__ constant definitions                  */
 #include "ems.h"

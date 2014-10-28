@@ -4,16 +4,15 @@
 
 #include <stdio.h>
 #include "f77.h"              /* F77 <-> C interface macros                  */
+
 #include "hds1_types.h"
-#include "hds_types.h"
-#include "hds1.h"
-#include "hds2.h"             /* for datWhere                                */
+#define HDS_INTERNAL_INCLUDES 1
+
 #include "hds.h"              /* HDS C interface			     */
 #include "dat_par.h"          /* DAT__ constant definitions                  */
 #include "ems.h"
 #include "ems_par.h"
 #include "dat_err.h"
-
 #include "hds_fortran.h"      /* Fortran import/export */
 #include "fortran_interface.h"  /* Fortran interface itself */
 
@@ -2766,7 +2765,6 @@ F77_SUBROUTINE(dat_shape)( CHARACTER(locator),
 
 /* Handle copying to Fortran dims */
    (void)hdsDimC2F( *ndim, cdims, dims, status );
-
 }
 
 F77_SUBROUTINE(dat_size)( CHARACTER(locator),
@@ -3089,42 +3087,12 @@ F77_SUBROUTINE(dat_where)( CHARACTER(locator),
 /* DAT_WHERE Find primitive position in HDS file */
 /*===============================================*/
 
-/* Local variables.     */
-   HDSLoc *locator_c = NULL;
-   INT_BIG bloc;
-   INT_BIG OFFSET;
-
-/* Enter routine.      */
-
-/* Import the input locator string                  */
-   datImportFloc( locator, locator_length, &locator_c, status);
-
-/* Call pure C routine                                       */
-   datWhere( locator_c, &bloc, &OFFSET, status );
-
-   if (bloc <= INT_MAX) {
-     *block = (F77_INTEGER_TYPE)bloc;
-   } else {
-     *block = 0;
-     if (*status != DAT__OK) {
-       *status = DAT__DTRNC;
-       dat1emsSetBigi( "BLOCK", bloc );
-       emsSeti( "MAX", INT_MAX );
-       emsRep( " ", "DAT_WHERE: Position overflows Fortran integer (^BLOCK > ^MAX)", status );
-     }
-   }
-
-   if (OFFSET <= INT_MAX) {
-     *offset = (F77_INTEGER_TYPE)OFFSET;
-   } else {
-     *offset = 0;
-     if (*status != DAT__OK) {
-       *status = DAT__DTRNC;
-       dat1emsSetBigi( "OFFSET", OFFSET );
-       emsSeti( "MAX", INT_MAX );
-       emsRep( " ", "DAT_WHERE: Position offset overflows Fortran integer (^BLOCK > ^MAX)", status );
-     }
-   }
+  if (*status == SAI__OK) {
+    *status = DAT__FATAL;
+    emsRep("","DAT_WHERE is not supported in this implementation",
+           status);
+  }
+  return;
 }
 
 F77_SUBROUTINE(hds_copy)( CHARACTER(locator),
@@ -3892,4 +3860,9 @@ F77_SUBROUTINE(dat_erdsn)( CHARACTER(locator), CHARACTER(cmp),
   emsRlse();
 
 
+}
+
+F77_SUBROUTINE(hds_start)( F77_INTEGER_TYPE(*status) )
+{
+  
 }

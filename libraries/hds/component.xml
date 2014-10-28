@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="hds" support="S">
-  <version>5.1-1</version>
+  <version>6.0-1</version>
   <path>libraries/hds</path>
   <description>Hierarchical Data System</description>
   <abstract>
@@ -28,7 +28,7 @@
       software.</p>
   </abstract>
   <dependencies >
-    <build>sae</build><build>chr</build><build>cnf</build><build>ems</build><build>starmem</build><link>chr</link><link>cnf</link><link>ems</link><link>starmem</link><test>chr</test><test>cnf</test><test>ems</test><test>prm</test><test>starmem</test><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>chr</build><build>cnf</build><build>ems</build><build>starmem</build><build>one</build><build>hds-v4</build><build>hds-v5</build><link>chr</link><link>cnf</link><link>ems</link><link>starmem</link><link>one</link><link>hds-v4</link><link>hds-v5</link><test>chr</test><test>cnf</test><test>ems</test><test>prm</test><test>starmem</test><test>one</test><test>hds-v4</test><test>hds-v5</test><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

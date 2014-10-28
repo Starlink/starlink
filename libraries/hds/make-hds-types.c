@@ -321,7 +321,11 @@ int main (int argc, char ** argv ) {
 	   "/* Public type for dealing with HDS locators */\n"
 	   "/* The contents of the struct are private to HDS. The only public */\n"
 	   "/* part is the HDSLoc typedef. Never use 'struct LOC' directly.   */\n"
-	   "typedef struct LOC HDSLoc;\n\n");
+           "/* Do not redefine if an internal definition has been made.       */\n"
+           "#ifndef HDS_USE_INTERNAL_STRUCT\n"
+	   "  typedef struct LOC HDSLoc;\n"
+           "#endif\n"
+           "\n");
 
   /* Dimensions */
   fprintf( OutputFile,

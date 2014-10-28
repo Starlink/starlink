@@ -7,9 +7,8 @@
 #include <string.h>
 
 #include "ems.h"
+#include "sae_par.h"
 
-#include "hds1.h"
-#include "rec.h"
 #include "dat1.h"
 #include "hds_types.h"
 #include "dat_err.h"
@@ -123,7 +122,7 @@ void datImportFloc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc ** 
 
   /* Check that we have a null pointer for HDSLoc */
   if ( *clocator != NULL ) {
-    if( *status == DAT__OK ) {
+    if( *status == SAI__OK ) {
        *status = DAT__WEIRD;
        emsRep( "datImportFloc", "datImportFloc: Supplied C locator is non-NULL",
       	       status);
@@ -134,7 +133,7 @@ void datImportFloc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc ** 
   /* For these HDS/HDF5 locators that are either hex pointers or "<xxx_xxx>" strings
      we can validate them immediately */
   if (flocator[0] != '0' && flocator[0] != '<') {
-    if (*status == DAT__OK) {
+    if (*status == SAI__OK) {
       char flocstr[DAT__SZLOC+1];
       *status = DAT__WEIRD;
       memmove( flocstr, flocator, DAT__SZLOC);
@@ -154,14 +153,14 @@ void datImportFloc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc ** 
         set bad by this routine, since that will result in garbage in the
         HDS locator. */
      emsMark();
-     lstat = DAT__OK;
+     lstat = SAI__OK;
      *clocator = dat1_import_floc( flocator, loc_length, &lstat);
-     if (lstat != DAT__OK) {
+     if (lstat != SAI__OK) {
 
        /* Annul all this if status was already bad, since we do not
           want the extra meaningless messages on the stack. If status
           was good, we retain everything */
-       if (*status == DAT__OK) {
+       if (*status == SAI__OK) {
          *status = lstat;
        } else {
          emsAnnul(&lstat);

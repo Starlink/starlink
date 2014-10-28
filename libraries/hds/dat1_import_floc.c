@@ -7,9 +7,8 @@
 #include <string.h>
 
 #include "ems.h"
+#include "sae_par.h"
 
-#include "hds1.h"
-#include "rec.h"
 #include "dat1.h"
 #include "hds_types.h"
 #include "dat_err.h"
@@ -36,7 +35,7 @@
  *    len = int (Given)
  *       Size of Fortran character buffer. Sanity check.
  *    status = int * (Given and Returned)
- *       Inherited status. Attempts to execute even if status is not DAT__OK
+ *       Inherited status. Attempts to execute even if status is not SAI__OK
  *       on entry.
 
  *  Returned Value:
@@ -105,7 +104,7 @@ dat1_import_floc ( const char flocator[DAT__SZLOC], int loc_length, int * status
 
   /* Validate the locator length. */
   if (loc_length != DAT__SZLOC ) {
-    if (*status == DAT__OK ) {
+    if (*status == SAI__OK ) {
        *status = DAT__LOCIN;
        emsRepf( "DAT1_IMPORT_FLOC", "Locator length is %d not %d", status,
                 loc_length, DAT__SZLOC);
@@ -115,7 +114,7 @@ dat1_import_floc ( const char flocator[DAT__SZLOC], int loc_length, int * status
 
   /* Check obvious error conditions */
   if (strncmp( DAT__ROOT, flocator, loc_length) == 0 ){
-    if( *status == DAT__OK ) {
+    if( *status == SAI__OK ) {
        *status = DAT__LOCIN;
        emsRep( "dat1ImportFloc_ROOT",
                "Input HDS Locator corresponds to DAT__ROOT but that can only be used from NDF",
@@ -126,7 +125,7 @@ dat1_import_floc ( const char flocator[DAT__SZLOC], int loc_length, int * status
 
   /* Check obvious error conditions */
   if (strncmp( DAT__NOLOC, flocator, loc_length) == 0 ){
-    if( *status == DAT__OK ) {
+    if( *status == SAI__OK ) {
        *status = DAT__LOCIN;
        emsRep( "datImportFloc_NOLOC",
                "Input HDS Locator corresponds to DAT__NOLOC but status is good (Possible programming error)",
@@ -144,7 +143,7 @@ dat1_import_floc ( const char flocator[DAT__SZLOC], int loc_length, int * status
 
   if (ptr_as_long == 0) {
     /* This should not have happened */
-    if (*status == DAT__OK) {
+    if (*status == SAI__OK) {
       *status = DAT__LOCIN;
       emsRep("dat1_import_floc_3",
              "Error importing locator from Fortran", status );

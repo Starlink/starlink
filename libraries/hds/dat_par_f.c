@@ -6,9 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "hds1.h"                /* Global definitions for HDS              */
-#include "rec.h"                 /* Public rec_ definitions                 */
-#include "dat1.h"                /* Internal dat_ definitions               */
+#include "dat_par.h"
 
    int main( int argc, char *argv[] )
    {

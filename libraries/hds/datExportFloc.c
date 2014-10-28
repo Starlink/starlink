@@ -8,10 +8,8 @@
 
 #include "ems.h"
 #include "star/one.h"
+#include "sae_par.h"
 
-#include "hds1.h"
-#include "rec.h"
-#include "dat1.h"
 #include "hds_types.h"
 #include "dat_err.h"
 
@@ -124,7 +122,7 @@
 void datExportFloc ( HDSLoc **clocator, int free, int loc_length, char flocator[DAT__SZLOC], int * status) {
 
   /* Validate the locator length */
-  if (*status == DAT__OK && loc_length != DAT__SZLOC ) {
+  if (*status == SAI__OK && loc_length != DAT__SZLOC ) {
     *status = DAT__LOCIN;
     emsRepf( "datExportFloc", "Locator length is %d not %d", status,
             loc_length, DAT__SZLOC);
@@ -132,7 +130,7 @@ void datExportFloc ( HDSLoc **clocator, int free, int loc_length, char flocator[
 
   /* if everything is okay we store the pointer location in the Fortran
      locator */
-  if ( *status == DAT__OK && *clocator != NULL ) {
+  if ( *status == SAI__OK && *clocator != NULL ) {
 
     /* We export from C by storing the pointer of the C struct in the
        Fortran character buffer. We can not store a clone in the Fortran
