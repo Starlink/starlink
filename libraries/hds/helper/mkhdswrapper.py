@@ -88,24 +88,41 @@ def func_special(line):
         print("  return *status;")
 
 def func_both(line):
-    v4 = line.replace("(", "_v4(")
-    print("  "+v4)
-    v5 = line.replace("(", "_v5(")
-    print("  return "+v5)
+    (v4,v5) = version_names(line)
+    print("  "+v5)
+    print("  return "+v4)
 
 def func_v5(line):
     v5 = line.replace("(", "_v5(")
     print("  return "+v5)
 
+def func_move(func,line):
+    (v4,v5) = version_names(line)
+    loc1 = "locator1"
+    if line.startswith("datMove"):
+        loc1 = "*locator1"
+    print("""  /* Requires special code */
+  if (ISHDSv5({0}) && ISHDSv5(locator2)) {{
+    /* Just call the v5 code */
+    {1}
+  }} else if ( !ISHDSv5({0}) && !ISHDSv5(locator2) ) {{
+    {2}
+  }} else {{
+    printf(\"Aborting. {3}: Special code required for copy across different versions of files.\\n\");
+    abort();
+  }}
+  return *status;""".format(loc1,v5,v4,func))
+
+
 
 # Dictionary indicating special cases
 special = dict({
-    "datCcopy": "special",
+    "datCcopy": "move",
     "datCctyp": "v5",
     "datChscn": "v5",
-    "datCopy": "special",
+    "datCopy": "move",
     "datErmsg": "v5",
-    "datMove": "special",
+    "datMove": "move",
     "datTemp": "v5",
     "hdsEwild": "special",
     "hdsFlush": "both",
@@ -151,6 +168,8 @@ for line in open("hds.h"):
                 func_special(line)
             elif mode == "v5":
                 func_v5(line)
+            elif mode == "move":
+                func_move(hds_function,line)
             else:
                 raise ValueError("Unrecognized mode for function {0}".format(hds_function))
         else:
@@ -167,7 +186,7 @@ for line in open("hds.h"):
             print("")
             inserted_includes=1
         elif line.find("dat_par.h") != -1:
-            print('#include "hds1_types.h"')
-            print("#define HDS_INTERNAL_INCLUDES 1")
+            print('#include "dat1.h"')
+            print('#include "hds_types.h"')
         print(line)
 
