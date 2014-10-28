@@ -582,6 +582,52 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     }
   }
 
+  /* The telescope goes crazy at the end of observation 61 on 2013-03-29. Null
+     the telescope data for subscans 64 and 65*/
+  if (fitsvals.utdate == 20130329) {
+    char obsid[61];
+    smf_getobsidss( hdr->fitshdr, obsid, sizeof(obsid), NULL, 0, status);
+
+    if (strcmp(obsid, "scuba2_00061_20130329T163501") == 0 ) {
+      int subscan;
+      smf_getfitsi( hdr, "NSUBSCAN", &subscan, status );
+      if (subscan == 64 || subscan == 65) {
+        size_t nframes = hdr->nframes;
+        JCMTState * curstate;
+        size_t i;
+        for ( i=0; i<nframes; i++ ) {
+          curstate = &((hdr->allState)[i]);
+          curstate->jos_drcontrol |= DRCNTRL__PTCS_BIT;
+        }
+        msgOutif( msglev, "", INDENT "Blanking telescope data due to extreme excursion", status );
+        have_fixed |= SMF__FIXED_JCMTSTATE;
+      }
+    }
+  }
+
+  /* The telescope goes crazy at the start of observation 71 on 2012-10-04. Null
+     the telescope data for subscans 3*/
+  if (fitsvals.utdate == 20121004) {
+    char obsid[71];
+    smf_getobsidss( hdr->fitshdr, obsid, sizeof(obsid), NULL, 0, status);
+
+    if (strcmp(obsid, "scuba2_00071_20121004T153603") == 0 ) {
+      int subscan;
+      smf_getfitsi( hdr, "NSUBSCAN", &subscan, status );
+      if (subscan == 64 || subscan == 65) {
+        size_t nframes = hdr->nframes;
+        JCMTState * curstate;
+        size_t i;
+        for ( i=0; i<nframes; i++ ) {
+          curstate = &((hdr->allState)[i]);
+          curstate->jos_drcontrol |= DRCNTRL__PTCS_BIT;
+        }
+        msgOutif( msglev, "", INDENT "Blanking telescope data due to extreme excursion", status );
+        have_fixed |= SMF__FIXED_JCMTSTATE;
+      }
+    }
+  }
+
 
   return have_fixed;
 }
