@@ -195,6 +195,22 @@ package cupid {
             helpkey *
           }
 
+         parameter shape {
+            type LITERAL
+            access READ
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Spatial clump shape in output catalogue}
+            helpkey *
+	 }
+
+          parameter nclumps {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+	  }
       }
 
       action findback {
