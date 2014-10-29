@@ -23,7 +23,7 @@ static void EnterCheck( const char * func, int status ) { printf("Enter HDS rout
 /*=================================*/
 
 int
-datAlter(const HDSLoc *locator, int ndim, const hdsdim dims[], int *status) {
+datAlter(HDSLoc *locator, int ndim, const hdsdim dims[], int *status) {
 
   int retval = 0;
   int instat = *status;
