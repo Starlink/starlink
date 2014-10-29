@@ -80,7 +80,7 @@ BLOCK_DATA_FILES = cmp_blk.f
 
 C_ROUTINES = \
 	datExportFloc.c datImportFloc.c dat1_import_floc.c hdsdim.c \
-	hds_select.c
+	hds_select.c datCopy5to4.c datCopy4to5.c
 
 DAT_PAR: dat_par_f$(EXEEXT)
 	./dat_par_f > DAT_PAR

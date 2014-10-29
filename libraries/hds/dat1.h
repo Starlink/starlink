@@ -66,5 +66,11 @@ typedef struct LOC { int hds_version; } HDSLoc;
 HDSLoc *
 dat1_import_floc ( const char flocator[DAT__SZLOC], int loc_length, int * status);
 
+int
+datCopy5to4(const HDSLoc *locatorX, const HDSLoc *locatorY, const char *name_c, int *status);
+
+int
+datCopy4to5(const HDSLoc *locatorX, const HDSLoc *locatorY, const char *name_c, int *status);
+
 #endif
 
