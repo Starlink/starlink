@@ -72,5 +72,13 @@ datCopy5to4(const HDSLoc *locatorX, const HDSLoc *locatorY, const char *name_c, 
 int
 datCopy4to5(const HDSLoc *locatorX, const HDSLoc *locatorY, const char *name_c, int *status);
 
+int
+datCcopy4to5(const HDSLoc *locator1X, const HDSLoc *locator2Y, const char *name,
+             HDSLoc **locator3Y, int *status );
+
+int
+datCcopy5to4(const HDSLoc *locator1X, const HDSLoc *locator2Y, const char *name,
+             HDSLoc **locator3Y, int *status );
+
 #endif
 
