@@ -1,14 +1,9 @@
-/* Protect against multiple inclusion */
-#ifndef STAR_HDS_H_INCLUDED
-#define STAR_HDS_H_INCLUDED
-
-#include "dat1.h"
-#include "hds_types.h"
-#include "dat_par.h"
-
 #include <stdlib.h>
 #include <stdio.h>
 #include "sae_par.h"
+#include "dat_par.h"
+#include "dat1.h"
+#include "hds_types.h"
 #include "ems.h"
 #include "hds.h"
 #include "dat_err.h"
@@ -92,18 +87,25 @@ datCcopy(const HDSLoc *locator1, const HDSLoc *locator2, const char *name, HDSLo
   /* Requires special code */
   int instat = *status;
   int isv5 = 0;
+  int loc1isv5 = 0;
+  int loc2isv5 = 0;
   EnterCheck("datCcopy",*status);
   if (*status != SAI__OK) return *status;
-  if (ISHDSv5(locator1) && ISHDSv5(locator2)) {
+  loc1isv5 = ISHDSv5(locator1);
+  loc2isv5 = ISHDSv5(locator2);
+  if (loc1isv5 && loc2isv5) {
     /* Just call the v5 code */
     isv5 = 1;
     datCcopy_v5(locator1, locator2, name, locator3, status);
-  } else if ( !ISHDSv5(locator1) && !ISHDSv5(locator2) ) {
+  } else if ( !loc1isv5 && !loc2isv5 ) {
     isv5 = 0;
     datCcopy_v4(locator1, locator2, name, locator3, status);
   } else {
-    printf("Aborting. datCcopy: Special code required for copy across different versions of files.\n");
-    abort();
+    if (loc1isv5) {
+      datCcopy5to4(locator1, locator2, name, locator3, status);
+    } else {
+      datCcopy4to5(locator1, locator2, name, locator3, status);
+    }
   }
   HDS_CHECK_STATUS("datCcopy",(isv5 ? "(v5)" : "(v4)"));
   return *status;
@@ -225,18 +227,25 @@ datCopy(const HDSLoc *locator1, const HDSLoc *locator2, const char *name_c, int 
   /* Requires special code */
   int instat = *status;
   int isv5 = 0;
+  int loc1isv5 = 0;
+  int loc2isv5 = 0;
   EnterCheck("datCopy",*status);
   if (*status != SAI__OK) return *status;
-  if (ISHDSv5(locator1) && ISHDSv5(locator2)) {
+  loc1isv5 = ISHDSv5(locator1);
+  loc2isv5 = ISHDSv5(locator2);
+  if (loc1isv5 && loc2isv5) {
     /* Just call the v5 code */
     isv5 = 1;
     datCopy_v5(locator1, locator2, name_c, status);
-  } else if ( !ISHDSv5(locator1) && !ISHDSv5(locator2) ) {
+  } else if ( !loc1isv5 && !loc2isv5 ) {
     isv5 = 0;
     datCopy_v4(locator1, locator2, name_c, status);
   } else {
-    printf("Aborting. datCopy: Special code required for copy across different versions of files.\n");
-    abort();
+    if (loc1isv5) {
+      datCopy5to4(locator1, locator2, name_c, status);
+    } else {
+      datCopy4to5(locator1, locator2, name_c, status);
+    }
   }
   HDS_CHECK_STATUS("datCopy",(isv5 ? "(v5)" : "(v4)"));
   return *status;
@@ -1185,18 +1194,31 @@ datMove(HDSLoc **locator1, const HDSLoc *locator2, const char *name_str, int *st
   /* Requires special code */
   int instat = *status;
   int isv5 = 0;
+  int loc1isv5 = 0;
+  int loc2isv5 = 0;
   EnterCheck("datMove",*status);
   if (*status != SAI__OK) return *status;
-  if (ISHDSv5(*locator1) && ISHDSv5(locator2)) {
+  loc1isv5 = ISHDSv5(*locator1);
+  loc2isv5 = ISHDSv5(locator2);
+  if (loc1isv5 && loc2isv5) {
     /* Just call the v5 code */
     isv5 = 1;
     datMove_v5(locator1, locator2, name_str, status);
-  } else if ( !ISHDSv5(*locator1) && !ISHDSv5(locator2) ) {
+  } else if ( !loc1isv5 && !loc2isv5 ) {
     isv5 = 0;
     datMove_v4(locator1, locator2, name_str, status);
   } else {
-    printf("Aborting. datMove: Special code required for copy across different versions of files.\n");
-    abort();
+    HDSLoc * parenloc = NULL;
+    char namestr[DAT__SZNAM+1];
+    /* Just do a copy */
+    datCopy(*locator1, locator2, name_str, status);
+    /* and then erase - HDS API insists that we can not erase
+       based on a locator so we need to get the parent and this name. */
+    datName(*locator1, namestr, status);
+    datParen(*locator1, &parenloc, status);
+    datAnnul(locator1, status);
+    datErase(parenloc, namestr, status);
+    datAnnul(&parenloc, status);
   }
   HDS_CHECK_STATUS("datMove",(isv5 ? "(v5)" : "(v4)"));
   return *status;
@@ -3065,5 +3087,3 @@ hdsFind(const HDSLoc *locator1, const char *name, const char *mode, HDSLoc **loc
 }
 
 
-/* STAR_HDS_H_INCLUDED */
-#endif

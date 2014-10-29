@@ -136,29 +136,72 @@ def func_v5(func,line):
         print('  EnterCheck("'+func+'",-1);')
         print("  return " +v5)
 
-def func_move(func,line):
+def func_copy(func,line):
     (v4,v5) = version_names(line)
+    v4to5 = line.replace("(", "4to5(")
+    v5to4 = line.replace("(", "5to4(")
     loc1 = "locator1"
     if line.startswith("datMove"):
         loc1 = "*locator1"
     print("""  /* Requires special code */
   int instat = *status;
   int isv5 = 0;
+  int loc1isv5 = 0;
+  int loc2isv5 = 0;
   EnterCheck(\"{3}\",*status);
   if (*status != SAI__OK) return *status;
-  if (ISHDSv5({0}) && ISHDSv5(locator2)) {{
+  loc1isv5 = ISHDSv5({0});
+  loc2isv5 = ISHDSv5(locator2);
+  if (loc1isv5 && loc2isv5) {{
     /* Just call the v5 code */
     isv5 = 1;
     {1}
-  }} else if ( !ISHDSv5({0}) && !ISHDSv5(locator2) ) {{
+  }} else if ( !loc1isv5 && !loc2isv5 ) {{
     isv5 = 0;
     {2}
   }} else {{
-    printf(\"Aborting. {3}: Special code required for copy across different versions of files.\\n\");
-    abort();
+    if (loc1isv5) {{
+      {4}
+    }} else {{
+      {5}
+    }}
   }}
   HDS_CHECK_STATUS(\"{3}\",(isv5 ? "(v5)" : "(v4)"));
-  return *status;""".format(loc1,v5,v4,func))
+  return *status;""".format(loc1,v5,v4,func,v5to4,v4to5))
+
+def func_datMove(func,line):
+    (v4,v5) = version_names(line)
+    print("""  /* Requires special code */
+  int instat = *status;
+  int isv5 = 0;
+  int loc1isv5 = 0;
+  int loc2isv5 = 0;
+  EnterCheck(\"{2}\",*status);
+  if (*status != SAI__OK) return *status;
+  loc1isv5 = ISHDSv5(*locator1);
+  loc2isv5 = ISHDSv5(locator2);
+  if (loc1isv5 && loc2isv5) {{
+    /* Just call the v5 code */
+    isv5 = 1;
+    {0}
+  }} else if ( !loc1isv5 && !loc2isv5 ) {{
+    isv5 = 0;
+    {1}
+  }} else {{
+    HDSLoc * parenloc = NULL;
+    char namestr[DAT__SZNAM+1];
+    /* Just do a copy */
+    datCopy(*locator1, locator2, name_str, status);
+    /* and then erase - HDS API insists that we can not erase
+       based on a locator so we need to get the parent and this name. */
+    datName(*locator1, namestr, status);
+    datParen(*locator1, &parenloc, status);
+    datAnnul(locator1, status);
+    datErase(parenloc, namestr, status);
+    datAnnul(&parenloc, status);
+  }}
+  HDS_CHECK_STATUS(\"{2}\",(isv5 ? "(v5)" : "(v4)"));
+  return *status;""".format(v5,v4,func))
 
 def func_hdsOpen(line):
     print("""    int instat = *status;
@@ -202,12 +245,12 @@ def func_hdsFlush(line):
 
 # Dictionary indicating special cases
 special = dict({
-    "datCcopy": "move",
+    "datCcopy": "copy",
     "datCctyp": "v5+void",
     "datChscn": "v5",
-    "datCopy": "move",
+    "datCopy": "copy",
     "datErmsg": "v5",
-    "datMove": "move",
+    "datMove": "datMove",
     "datMsg": "void",
     "datTemp": "v5",
     "hdsEwild": "special",
@@ -222,7 +265,7 @@ special = dict({
     "hdsWild": "special"
 })
 
-inserted_includes = 0
+in_prologue = 1
 for line in open("hds.h"):
     line = line.strip()
     func_match = hfunc_re.search(line)
@@ -258,24 +301,29 @@ for line in open("hds.h"):
                 func_v5void(hds_function,line)
             elif mode == "v5":
                 func_v5(hds_function,line)
+            elif mode == "datMove":
+                func_datMove(hds_function,line)
             elif mode == "hdsOpen":
                 func_hdsOpen(line)
             elif mode == "hdsGtune":
                 func_hdsGtune(line)
             elif mode == "hdsFlush":
                 func_hdsFlush(line)
-            elif mode == "move":
-                func_move(hds_function,line)
+            elif mode == "copy":
+                func_copy(hds_function,line)
             else:
                 raise ValueError("Unrecognized mode {0} for function {1}".format(mode,hds_function))
         else:
             func_simple(hds_function,line)
         print("}")
     else:
-        if not inserted_includes and line.startswith("/*=="):
+        if in_prologue and line.startswith("/*=="):
             print('#include <stdlib.h>')  # For abort()
             print('#include <stdio.h>')  # For printf()
             print('#include "sae_par.h"')
+            print('#include "dat_par.h"')
+            print('#include "dat1.h"')
+            print('#include "hds_types.h"')
             print('#include "ems.h"')
             print('#include "hds.h"')
             print('#include "dat_err.h"')
@@ -290,9 +338,14 @@ for line in open("hds.h"):
             print("#  define EnterCheck(A,B) ;")
             print('#endif')
             print("")
-            inserted_includes=1
-        elif line.find("dat_par.h") != -1:
-            print('#include "dat1.h"')
-            print('#include "hds_types.h"')
-        print(line)
+            print(line)
+            in_prologue = 0
+        elif in_prologue:
+            # We want to ignore the prologue and write our own
+            pass
+        elif line.startswith("/* STAR_HDS_H"):
+            # this is the end of the include file
+            in_prologue = 1
+        else:
+            print(line)
 
