@@ -11,7 +11,7 @@
 #include "star/hds_v5.h"
 #define ISHDSv5(loc) ((loc) && (loc)->hds_version >= 5)
 #if DEBUG_HDS
-#define HDS_CHECK_STATUS(func,txt) if (*status != instat && *status != SAI__OK) { emsRepf("wrap_" func, func ": Error in call to HDS %s", status, txt); printf("Bad status from %s: %d\n", func, *status);}
+#define HDS_CHECK_STATUS(func,txt) if (*status != instat && *status != SAI__OK) { emsRepf("wrap_" func, func ": Error in call to HDS %s", status, txt); printf("Bad status from %s %s: %d\n", func, txt, *status);}
 static void EnterCheck( const char * func, int status ) { printf("Enter HDS routine: %s [%d]\n", func,status); }
 #else
 #  define HDS_CHECK_STATUS(func,txt) if (*status != instat && *status != SAI__OK) { emsRepf("wrap_" func, func ": Error in call to HDS %s", status, txt);}
