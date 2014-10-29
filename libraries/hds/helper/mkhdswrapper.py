@@ -66,7 +66,7 @@ def version_names(line):
     return (v4,v5)
 
 # Code for the different type of functions
-def func_simple(line):
+def func_simple(func,line):
     (v4,v5) = version_names(line)
     # are we dealing with locator or locator1?
     locvar = "locator"
@@ -75,26 +75,66 @@ def func_simple(line):
     elif line.startswith("datAnnul") or line.startswith("datPrmry") or line.startswith("hdsErase") or line.startswith("hdsClose"):
         locvar = "*locator"
     print("""
-  if (ISHDSv5({0})) return {1}
-  return {2}
-""".format(locvar, v5, v4))
+  int retval = 0;
+  int instat = *status;
+  int isv5 = ISHDSv5({0});
+  EnterCheck(\"{3}\",*status);
+  if (isv5) {{
+    retval = {1}
+  }} else {{
+    retval = {2}
+  }}
+  HDS_CHECK_STATUS(\"{3}\",(isv5 ? "(v5)" : "(v4)"));
+  return retval;""".format(locvar, v5, v4, func))
 
 
-def func_special(line):
+def func_special(func,line):
     print("  /* Requires special code */")
     print('  printf("Aborting. Special code required in: %s\\n", "{0}");'.format(line))
     print("  abort();")
     if line.find("status") > -1:
         print("  return *status;")
 
-def func_both(line):
+def func_both(func,line):
     (v4,v5) = version_names(line)
-    print("  "+v5)
-    print("  return "+v4)
+    print("""  int retval = 0;
+  int instat = *status;
+  EnterCheck(\"{2}\",*status);
+  if (*status != SAI__OK) return *status;
+  retval = {0}
+  retval = {1}
+  HDS_CHECK_STATUS(\"{2}\", "(both)");
+  return retval;""".format(v5,v4,func))
 
-def func_v5(line):
-    v5 = line.replace("(", "_v5(")
-    print("  return "+v5)
+def func_void(func, line):
+    (v4,v5) = version_names(line)
+    print("""  EnterCheck(\"{3}\",-1);
+  if (ISHDSv5({0})) {{
+    {1}
+  }} else {{
+    {2}
+  }}
+  return;""".format("locator", v5, v4,func))
+
+def func_v5void(func,line):
+    (v4,v5) = version_names(line)
+    print('  EnterCheck("'+func+'",-1);')
+    print("  "+v5)
+    print("  return;")
+
+def func_v5(func,line):
+    (v4,v5) = version_names(line)
+    if line.find("status)") > -1:
+        print("""  int retval = 0;
+  int instat = *status;
+  EnterCheck(\"{1}\",*status);
+  if (*status != SAI__OK) return *status;
+  retval = {0}
+  HDS_CHECK_STATUS(\"{1}\","(v5)");
+  return retval;""".format(v5,func))
+    else:
+        print('  EnterCheck("'+func+'",-1);')
+        print("  return " +v5)
 
 def func_move(func,line):
     (v4,v5) = version_names(line)
@@ -102,33 +142,79 @@ def func_move(func,line):
     if line.startswith("datMove"):
         loc1 = "*locator1"
     print("""  /* Requires special code */
+  int instat = *status;
+  int isv5 = 0;
+  EnterCheck(\"{3}\",*status);
+  if (*status != SAI__OK) return *status;
   if (ISHDSv5({0}) && ISHDSv5(locator2)) {{
     /* Just call the v5 code */
+    isv5 = 1;
     {1}
   }} else if ( !ISHDSv5({0}) && !ISHDSv5(locator2) ) {{
+    isv5 = 0;
     {2}
   }} else {{
     printf(\"Aborting. {3}: Special code required for copy across different versions of files.\\n\");
     abort();
   }}
+  HDS_CHECK_STATUS(\"{3}\",(isv5 ? "(v5)" : "(v4)"));
   return *status;""".format(loc1,v5,v4,func))
 
+def func_hdsOpen(line):
+    print("""    int instat = *status;
+  EnterCheck(\"hdsOpen\",*status);
+  if (*status != SAI__OK) return *status;
+  hdsOpen_v5(file_str, mode_str, locator, status);
+  if (*status != SAI__OK) {
+    emsAnnul(status);
+    hdsOpen_v4(file_str, mode_str, locator, status);
+  }
+  HDS_CHECK_STATUS( "hdsOpen", "(v5)" );
+  return *status;""")
 
+def func_hdsGtune(line):
+    print("""  int instat = *status;
+  EnterCheck(\"hdsGtune\",*status);
+  if (*status != SAI__OK) return *status;
+  hdsGtune_v4(param_str, value, status);
+  hdsGtune_v5(param_str, value, status);
+  if (*status != SAI__OK) {
+    emsRepf("hdsGtune_wrap", "hdsGtune: Error obtaining value of tuning parameter '%s'",
+            status, param_str);
+  }
+  return *status;""")
+
+def func_hdsFlush(line):
+    print("""  /* We are only allowed to flush a group that actually exists */
+  int instat = *status;
+  EnterCheck(\"hdsFlush\",*status);
+  if (*status != SAI__OK) return *status;
+
+  /* We need a new API that will let us query whether a group
+     exists before we try to flush it. _v5 triggers an error
+     if the group doesn't exist but v4 does not trigger such an error.
+     For now we catch the specific error from v5 and assume that means
+     v4 will deal with it. */
+  hdsFlush_v5(group_str, status);
+  if (*status == DAT__GRPIN) emsAnnul(status);
+  hdsFlush_v4(group_str, status);
+  return *status;""")
 
 # Dictionary indicating special cases
 special = dict({
     "datCcopy": "move",
-    "datCctyp": "v5",
+    "datCctyp": "v5+void",
     "datChscn": "v5",
     "datCopy": "move",
     "datErmsg": "v5",
     "datMove": "move",
+    "datMsg": "void",
     "datTemp": "v5",
     "hdsEwild": "special",
-    "hdsFlush": "both",
-    "hdsGtune": "both",
+    "hdsFlush": "hdsFlush",
+    "hdsGtune": "hdsGtune",
     "hdsNew":  "v5",
-    "hdsOpen": "both",
+    "hdsOpen": "hdsOpen",
     "hdsShow": "special",
     "hdsState": "both",
     "hdsStop": "both",
@@ -163,26 +249,46 @@ for line in open("hds.h"):
         if hds_function in special:
             mode = special[hds_function]
             if mode == "both":
-                func_both(line)
+                func_both(hds_function,line)
             elif mode == "special":
-                func_special(line)
+                func_special(hds_function,line)
+            elif mode == "void":
+                func_void(hds_function,line)
+            elif mode == "v5+void":
+                func_v5void(hds_function,line)
             elif mode == "v5":
-                func_v5(line)
+                func_v5(hds_function,line)
+            elif mode == "hdsOpen":
+                func_hdsOpen(line)
+            elif mode == "hdsGtune":
+                func_hdsGtune(line)
+            elif mode == "hdsFlush":
+                func_hdsFlush(line)
             elif mode == "move":
                 func_move(hds_function,line)
             else:
-                raise ValueError("Unrecognized mode for function {0}".format(hds_function))
+                raise ValueError("Unrecognized mode {0} for function {1}".format(mode,hds_function))
         else:
-            func_simple(line)
+            func_simple(hds_function,line)
         print("}")
     else:
         if not inserted_includes and line.startswith("/*=="):
             print('#include <stdlib.h>')  # For abort()
             print('#include <stdio.h>')  # For printf()
+            print('#include "sae_par.h"')
+            print('#include "ems.h"')
             print('#include "hds.h"')
+            print('#include "dat_err.h"')
             print('#include "star/hds_v4.h"')
             print('#include "star/hds_v5.h"')
             print('#define ISHDSv5(loc) ((loc) && (loc)->hds_version >= 5)')
+            print('#if DEBUG_HDS')
+            print('#define HDS_CHECK_STATUS(func,txt) if (*status != instat && *status != SAI__OK) { emsRepf("wrap_" func, func ": Error in call to HDS %s", status, txt); printf("Bad status from %s: %d\\n", func, *status);}')
+            print('static void EnterCheck( const char * func, int status ) { printf("Enter HDS routine: %s [%d]\\n", func,status); }')
+            print("#else")
+            print('#  define HDS_CHECK_STATUS(func,txt) if (*status != instat && *status != SAI__OK) { emsRepf("wrap_" func, func ": Error in call to HDS %s", status, txt);}')
+            print("#  define EnterCheck(A,B) ;")
+            print('#endif')
             print("")
             inserted_includes=1
         elif line.find("dat_par.h") != -1:
