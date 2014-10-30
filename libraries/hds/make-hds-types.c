@@ -327,6 +327,16 @@ int main (int argc, char ** argv ) {
            "#endif\n"
            "\n");
 
+   /* HDS wild card matching needs a struct but we just create a stub for now
+     until we know for sure how it's going to work. Has never worked in C anyhow */
+  fprintf( OutputFile,
+           "/* HDS Wild card matching structure */\n"
+           "/* This is a stub structure. The C API for this routine is unstable */\n"
+           "typedef struct HDSWild {\n"
+           "   int wild;\n"
+           "} HDSWild;\n"
+           "\n");
+
   /* Dimensions */
   fprintf( OutputFile,
            "/* Public type for specifying HDS dimensions */\n"
