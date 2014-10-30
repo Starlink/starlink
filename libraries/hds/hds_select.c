@@ -988,7 +988,7 @@ datLen(const HDSLoc *locator, size_t *len, int *status) {
 /*===========================*/
 
 int
-datMap(const HDSLoc *locator, const char *type_str, const char *mode_str, int ndim, const hdsdim dims[], void **pntr, int *status) {
+datMap(HDSLoc *locator, const char *type_str, const char *mode_str, int ndim, const hdsdim dims[], void **pntr, int *status) {
 
   int retval = 0;
   int instat = *status;
@@ -1008,7 +1008,7 @@ datMap(const HDSLoc *locator, const char *type_str, const char *mode_str, int nd
 /*==================================*/
 
 int
-datMapC(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], unsigned char **pntr, int *status) {
+datMapC(HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], unsigned char **pntr, int *status) {
 
   int retval = 0;
   int instat = *status;
@@ -1028,7 +1028,7 @@ datMapC(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims
 /*====================================*/
 
 int
-datMapD(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], double **pntr, int *status) {
+datMapD(HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], double **pntr, int *status) {
 
   int retval = 0;
   int instat = *status;
@@ -1048,7 +1048,7 @@ datMapD(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims
 /*=====================================*/
 
 int
-datMapI(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], int **pntr, int *status) {
+datMapI(HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], int **pntr, int *status) {
 
   int retval = 0;
   int instat = *status;
@@ -1068,7 +1068,7 @@ datMapI(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims
 /*=====================================*/
 
 int
-datMapK(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], int **pntr, int *status) {
+datMapK(HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], int **pntr, int *status) {
 
   int retval = 0;
   int instat = *status;
@@ -1088,7 +1088,7 @@ datMapK(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims
 /*=====================================*/
 
 int
-datMapL(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], hdsbool_t **pntr, int *status) {
+datMapL(HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], hdsbool_t **pntr, int *status) {
 
   int retval = 0;
   int instat = *status;
@@ -1108,7 +1108,7 @@ datMapL(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims
 /*==================================*/
 
 int
-datMapR(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], float **pntr, int *status) {
+datMapR(HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims[], float **pntr, int *status) {
 
   int retval = 0;
   int instat = *status;
@@ -1129,7 +1129,7 @@ datMapR(const HDSLoc *locator, const char *mode_str, int ndim, const hdsdim dims
 /*========================================*/
 
 int
-datMapN(const HDSLoc *locator, const char *type_str, const char *mode_str, int ndim, void **pntr, hdsdim dims[], int *status) {
+datMapN(HDSLoc *locator, const char *type_str, const char *mode_str, int ndim, void **pntr, hdsdim dims[], int *status) {
 
   int retval = 0;
   int instat = *status;
@@ -1149,7 +1149,7 @@ datMapN(const HDSLoc *locator, const char *type_str, const char *mode_str, int n
 /*==================================*/
 
 int
-datMapV(const HDSLoc *locator, const char *type_str, const char *mode_str, void **pntr, size_t *actval, int *status) {
+datMapV(HDSLoc *locator, const char *type_str, const char *mode_str, void **pntr, size_t *actval, int *status) {
 
   int retval = 0;
   int instat = *status;
@@ -1170,7 +1170,7 @@ datMapV(const HDSLoc *locator, const char *type_str, const char *mode_str, void 
 /*==================================*/
 
 int
-datMould(const HDSLoc *locator, int ndim, const hdsdim dims[], int *status) {
+datMould(HDSLoc *locator, int ndim, const hdsdim dims[], int *status) {
 
   int retval = 0;
   int instat = *status;
@@ -2428,7 +2428,7 @@ datRefct(const HDSLoc *locator, int *refct, int *status) {
 /*=============================*/
 
 int
-datRenam(const HDSLoc *locator, const char *name_str, int *status) {
+datRenam(HDSLoc *locator, const char *name_str, int *status) {
 
   int retval = 0;
   int instat = *status;
@@ -2643,7 +2643,7 @@ datType(const HDSLoc *locator, char type_str[DAT__SZTYP + 1], int *status) {
 /*=========================*/
 
 int
-datUnmap(const HDSLoc *locator, int *status) {
+datUnmap(HDSLoc *locator, int *status) {
 
   int retval = 0;
   int instat = *status;
@@ -2749,7 +2749,7 @@ hdsErase(HDSLoc **locator, int *status) {
 /*===============================================================*/
 
 int
-hdsEwild(int *iwld, int *status) {
+hdsEwild(HDSWild *iwld, int *status) {
   /* Requires special code */
   printf("Aborting. Special code required in: %s\n", "hdsEwild(iwld, status);");
   abort();
@@ -2863,7 +2863,7 @@ hdsInfoI(const HDSLoc* locator, const char *topic_str, const char *extra, int *r
 /*=================================*/
 
 int
-hdsLink(const HDSLoc *locator, const char *group_str, int *status) {
+hdsLink(HDSLoc *locator, const char *group_str, int *status) {
 
   int retval = 0;
   int instat = *status;
@@ -3016,7 +3016,7 @@ hdsTune(const char *param_str, int value, int *status) {
 /*=================================================================*/
 
 int
-hdsWild(const char *fspec, const char *mode, int *iwld, HDSLoc **locator, int *status) {
+hdsWild(const char *fspec, const char *mode, HDSWild **iwld, HDSLoc **locator, int *status) {
   /* Requires special code */
   printf("Aborting. Special code required in: %s\n", "hdsWild(fspec, mode, iwld, locator, status);");
   abort();
