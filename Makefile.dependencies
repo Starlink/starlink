@@ -2533,6 +2533,7 @@ $(MANIFESTS)/smurf: \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/thr \
 		$(MANIFESTS)/trn
 	cd applications/smurf \
 	  && $(MAKE_CPT)
