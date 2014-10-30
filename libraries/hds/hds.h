@@ -620,7 +620,7 @@ datPrim(const HDSLoc *locator, hdsbool_t *prim, int *status);
 /*=========================================================*/
 
 int
-datPrmry(int set, HDSLoc **locator, hdsbool_t *prmry, int *status);
+datPrmry(hdsbool_t set, HDSLoc **locator, hdsbool_t *prmry, int *status);
 
 /*==================================*/
 /* datPutC - Write _CHAR primitive */
