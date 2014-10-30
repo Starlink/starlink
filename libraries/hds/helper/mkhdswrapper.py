@@ -204,7 +204,7 @@ def func_datMove(func,line):
   return *status;""".format(v5,v4,func))
 
 def func_hdsOpen(line):
-    print("""    int instat = *status;
+    print("""  int instat = *status;
   EnterCheck(\"hdsOpen\",*status);
   if (*status != SAI__OK) return *status;
   hdsOpen_v5(file_str, mode_str, locator, status);
@@ -212,19 +212,20 @@ def func_hdsOpen(line):
     emsAnnul(status);
     hdsOpen_v4(file_str, mode_str, locator, status);
   }
-  HDS_CHECK_STATUS( "hdsOpen", "(v5)" );
+  HDS_CHECK_STATUS( "hdsOpen", file_str);
   return *status;""")
 
 def func_hdsGtune(line):
     print("""  int instat = *status;
   EnterCheck(\"hdsGtune\",*status);
   if (*status != SAI__OK) return *status;
-  hdsGtune_v4(param_str, value, status);
   hdsGtune_v5(param_str, value, status);
+  hdsGtune_v4(param_str, value, status);
   if (*status != SAI__OK) {
     emsRepf("hdsGtune_wrap", "hdsGtune: Error obtaining value of tuning parameter '%s'",
             status, param_str);
   }
+  HDS_CHECK_STATUS("hdsGtune", "(both)");
   return *status;""")
 
 def func_hdsFlush(line):
@@ -241,6 +242,7 @@ def func_hdsFlush(line):
   hdsFlush_v5(group_str, status);
   if (*status == DAT__GRPIN) emsAnnul(status);
   hdsFlush_v4(group_str, status);
+  HDS_CHECK_STATUS("hdsFlush", "(both)");
   return *status;""")
 
 # Dictionary indicating special cases

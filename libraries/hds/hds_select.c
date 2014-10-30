@@ -2775,6 +2775,7 @@ hdsFlush(const char *group_str, int *status) {
   hdsFlush_v5(group_str, status);
   if (*status == DAT__GRPIN) emsAnnul(status);
   hdsFlush_v4(group_str, status);
+  HDS_CHECK_STATUS("hdsFlush", "(both)");
   return *status;
 }
 
@@ -2827,12 +2828,13 @@ hdsGtune(const char *param_str, int *value, int *status) {
   int instat = *status;
   EnterCheck("hdsGtune",*status);
   if (*status != SAI__OK) return *status;
-  hdsGtune_v4(param_str, value, status);
   hdsGtune_v5(param_str, value, status);
+  hdsGtune_v4(param_str, value, status);
   if (*status != SAI__OK) {
     emsRepf("hdsGtune_wrap", "hdsGtune: Error obtaining value of tuning parameter '%s'",
             status, param_str);
   }
+  HDS_CHECK_STATUS("hdsGtune", "(both)");
   return *status;
 }
 
@@ -2917,7 +2919,7 @@ hdsNew(const char *file_str, const char *name_str, const char *type_str, int ndi
 
 int
 hdsOpen(const char *file_str, const char *mode_str, HDSLoc **locator, int *status) {
-    int instat = *status;
+  int instat = *status;
   EnterCheck("hdsOpen",*status);
   if (*status != SAI__OK) return *status;
   hdsOpen_v5(file_str, mode_str, locator, status);
@@ -2925,7 +2927,7 @@ hdsOpen(const char *file_str, const char *mode_str, HDSLoc **locator, int *statu
     emsAnnul(status);
     hdsOpen_v4(file_str, mode_str, locator, status);
   }
-  HDS_CHECK_STATUS( "hdsOpen", "(v5)" );
+  HDS_CHECK_STATUS( "hdsOpen", file_str);
   return *status;
 }
 
