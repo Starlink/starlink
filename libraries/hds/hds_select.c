@@ -2738,18 +2738,36 @@ datVec(const HDSLoc *locator1, HDSLoc **locator2, int *status) {
 
 int
 hdsCopy(const HDSLoc *locator, const char *file_str, const char name_str[DAT__SZNAM], int *status) {
-
-  int retval = 0;
   int instat = *status;
-  int isv5 = ISHDSv5(locator);
+  int ndim = 0;
+  hdsdim dims[DAT__MXDIM];
+  char type_str[DAT__SZTYP+1];
+  HDSLoc * outloc = NULL;
+  hdsbool_t struc = 0;
   EnterCheck("hdsCopy",*status);
-  if (isv5) {
-    retval = hdsCopy_v5(locator, file_str, name_str, status);
+  if (*status != SAI__OK) return *status;
+  /* We always want to end up with output files that match
+     the format currently in use for hdsNew (which may depend
+     on an environment variable). We can not simply call hdsCopy_v5.
+     so we have to do some manual leg work. Would be a bit easier if
+     we had a function in this file that returned the default output
+     format version so we could call the native version.
+   */
+  datType( locator, type_str, status );
+  datShape( locator, DAT__MXDIM, dims, &ndim, status );
+  /* Unfortunately this locator is one level down */
+  hdsNew(file_str, name_str, type_str, ndim, dims, &outloc, status );
+  /* So we need to walk through and can not simply use datCopy
+    - we can use two routines used by dat1CopyXtoY though. */
+  datStruc(locator, &struc, status);
+  if (struc) {
+    dat1CopyStrucXtoY( locator, outloc, status );
   } else {
-    retval = hdsCopy_v4(locator, file_str, name_str, status);
+    dat1CopyPrimXtoY( locator, outloc, status );
   }
-  HDS_CHECK_STATUS("hdsCopy",(isv5 ? "(v5)" : "(v4)"));
-  return retval;
+  datAnnul(&outloc, status);
+  HDS_CHECK_STATUS("hdsCopy", (ISHDSv5(locator) ? "(v5)" : "(v4)"));
+  return *status;
 }
 
 /*=================================*/

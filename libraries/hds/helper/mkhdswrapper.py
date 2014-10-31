@@ -259,6 +259,38 @@ def func_hdsFlush(line):
   HDS_CHECK_STATUS("hdsFlush", "(both)");
   return *status;""")
 
+def func_hdsCopy(line):
+    print("""  int instat = *status;
+  int ndim = 0;
+  hdsdim dims[DAT__MXDIM];
+  char type_str[DAT__SZTYP+1];
+  HDSLoc * outloc = NULL;
+  hdsbool_t struc = 0;
+  EnterCheck(\"hdsCopy\",*status);
+  if (*status != SAI__OK) return *status;
+  /* We always want to end up with output files that match
+     the format currently in use for hdsNew (which may depend
+     on an environment variable). We can not simply call hdsCopy_v5.
+     so we have to do some manual leg work. Would be a bit easier if
+     we had a function in this file that returned the default output
+     format version so we could call the native version.
+   */
+  datType( locator, type_str, status );
+  datShape( locator, DAT__MXDIM, dims, &ndim, status );
+  /* Unfortunately this locator is one level down */
+  hdsNew(file_str, name_str, type_str, ndim, dims, &outloc, status );
+  /* So we need to walk through and can not simply use datCopy
+    - we can use two routines used by dat1CopyXtoY though. */
+  datStruc(locator, &struc, status);
+  if (struc) {
+    dat1CopyStrucXtoY( locator, outloc, status );
+  } else {
+    dat1CopyPrimXtoY( locator, outloc, status );
+  }
+  datAnnul(&outloc, status);
+  HDS_CHECK_STATUS("hdsCopy", (ISHDSv5(locator) ? "(v5)" : "(v4)"));
+  return *status;""")
+
 # Dictionary indicating special cases
 special = dict({
     "datCcopy": "copy",
@@ -269,6 +301,7 @@ special = dict({
     "datMove": "datMove",
     "datMsg": "void",
     "datTemp": "v5",
+    "hdsCopy": "hdsCopy",
     "hdsEwild": "special",
     "hdsFlush": "hdsFlush",
     "hdsGtune": "hdsGtune",
@@ -325,6 +358,8 @@ for line in open("hds.h"):
                 func_hdsGtune(line)
             elif mode == "hdsFlush":
                 func_hdsFlush(line)
+            elif mode == "hdsCopy":
+                func_hdsCopy(line)
             elif mode == "copy":
                 func_copy(hds_function,line)
             else:
