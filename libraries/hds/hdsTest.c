@@ -116,15 +116,19 @@ int main (void) {
     hdsdim celldims[] = {1};
     hdsdim gdims[DAT__MXDIM];
     datShape(loc1, DAT__MXDIM, gdims, &gndim, &status);
-    printf("GROUP NDIMS: %d\n", gndim);
-    for (i=0; i<gndim; i++) {
-      printf(" Dim[%d] = %zu\n", i, (size_t)gdims[i]);
+    if (status == SAI__OK) {
+      printf("GROUP NDIMS: %d\n", gndim);
+      for (i=0; i<gndim; i++) {
+        printf(" Dim[%d] = %zu\n", i, (size_t)gdims[i]);
+      }
     }
     datVec( loc1, &loc2, &status);
     datShape(loc2, DAT__MXDIM, gdims, &gndim, &status);
-    printf("GROUP NDIMS: %d\n", gndim);
-    for (i=0; i<gndim; i++) {
-      printf(" Dim[%d] = %zu\n", i, (size_t)gdims[i]);
+    if (status == SAI__OK) {
+      printf("GROUP NDIMS: %d\n", gndim);
+      for (i=0; i<gndim; i++) {
+        printf(" Dim[%d] = %zu\n", i, (size_t)gdims[i]);
+      }
     }
     datCell( loc2, 1, celldims, &loc3, &status );
     datAnnul( &loc3, &status );
@@ -481,7 +485,9 @@ static void traceme (const HDSLoc * loc, int *status) {
     hdsTrace( loc, &nlev, path_str, file_str,
               status, sizeof(path_str),
               sizeof(file_str));
-    printf("File: '%s' Path: '%s' Level = %d\n", file_str,
-           path_str, nlev);
+    if (*status == SAI__OK) {
+      printf("File: '%s' Path: '%s' Level = %d\n", file_str,
+             path_str, nlev);
+    }
   }
 
