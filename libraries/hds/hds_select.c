@@ -101,13 +101,27 @@ datCcopy(const HDSLoc *locator1, const HDSLoc *locator2, const char *name, HDSLo
     isv5 = 0;
     datCcopy_v4(locator1, locator2, name, locator3, status);
   } else {
+    /* Manual copy of X to Y */
     if (loc1isv5) {
-      datCcopy5to4(locator1, locator2, name, locator3, status);
+      isv5 = -1;
     } else {
-      datCcopy4to5(locator1, locator2, name, locator3, status);
+      isv5 = -2;
     }
+    dat1CcopyXtoY(locator1, locator2, name, locator3, status);
   }
-  HDS_CHECK_STATUS("datCcopy",(isv5 ? "(v5)" : "(v4)"));
+  {
+    const char *helptxt = "(unexpected)";
+    if (isv5 == 1) {
+      helptxt = "(v5)";
+    } else if (isv5 == 0) {
+      helptxt = "(v4)";
+    } else if (isv5 == -1) {
+      helptxt = "(v5->v4)";
+    } else if (isv5 == -2) {
+      helptxt = "(v4->v5)";
+    }
+    HDS_CHECK_STATUS("datCcopy",helptxt);
+  }
   return *status;
 }
 
@@ -241,13 +255,27 @@ datCopy(const HDSLoc *locator1, const HDSLoc *locator2, const char *name_c, int 
     isv5 = 0;
     datCopy_v4(locator1, locator2, name_c, status);
   } else {
+    /* Manual copy of X to Y */
     if (loc1isv5) {
-      datCopy5to4(locator1, locator2, name_c, status);
+      isv5 = -1;
     } else {
-      datCopy4to5(locator1, locator2, name_c, status);
+      isv5 = -2;
     }
+    dat1CopyXtoY(locator1, locator2, name_c, status);
   }
-  HDS_CHECK_STATUS("datCopy",(isv5 ? "(v5)" : "(v4)"));
+  {
+    const char *helptxt = "(unexpected)";
+    if (isv5 == 1) {
+      helptxt = "(v5)";
+    } else if (isv5 == 0) {
+      helptxt = "(v4)";
+    } else if (isv5 == -1) {
+      helptxt = "(v5->v4)";
+    } else if (isv5 == -2) {
+      helptxt = "(v4->v5)";
+    }
+    HDS_CHECK_STATUS("datCopy",helptxt);
+  }
   return *status;
 }
 

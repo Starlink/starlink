@@ -62,23 +62,28 @@
 /* compiler to be able to know how to read the version.           */
 #define HDS_USE_INTERNAL_STRUCT 1
 typedef struct LOC { int hds_version; } HDSLoc;
+#include "hds_types.h"
 
 HDSLoc *
 dat1_import_floc ( const char flocator[DAT__SZLOC], int loc_length, int * status);
 
 int
-datCopy5to4(const HDSLoc *locatorX, const HDSLoc *locatorY, const char *name_c, int *status);
+dat1CopyXtoY(const HDSLoc *locatorX, const HDSLoc *locatorY, const char *name_c, int *status);
 
 int
-datCopy4to5(const HDSLoc *locatorX, const HDSLoc *locatorY, const char *name_c, int *status);
+dat1CcopyXtoY(const HDSLoc *locator1X, const HDSLoc *locator2Y, const char *name,
+              HDSLoc **locator3Y, int *status );
+
+HDSLoc *
+dat1CcopyLocXtoY(const HDSLoc *locatorX, const HDSLoc *locatorY, const char *name,
+                 hdsbool_t * struc, int *status );
 
 int
-datCcopy4to5(const HDSLoc *locator1X, const HDSLoc *locator2Y, const char *name,
-             HDSLoc **locator3Y, int *status );
+dat1CopyPrimXtoY( const HDSLoc *locatorX, HDSLoc *locatorY, int *status );
 
 int
-datCcopy5to4(const HDSLoc *locator1X, const HDSLoc *locator2Y, const char *name,
-             HDSLoc **locator3Y, int *status );
+dat1CopyStrucXtoY( const HDSLoc *locatorX, const HDSLoc *locatorY,
+                   int *status );
 
 #endif
 

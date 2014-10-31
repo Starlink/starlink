@@ -79,9 +79,10 @@ F_C_ROUTINES = hds_run.c fortran_interface.c hdsFind.c
 BLOCK_DATA_FILES = cmp_blk.f
 
 C_ROUTINES = \
+	dat1CcopyLocXtoY.c dat1CcopyXtoY.c \
+	dat1CopyPrimXtoY.c dat1CopyStrucXtoY.c dat1CopyXtoY.c \
 	datExportFloc.c datImportFloc.c dat1_import_floc.c hdsdim.c \
-	hds_select.c datCopy5to4.c datCopy4to5.c \
-	datCcopy5to4.c datCcopy4to5.c
+	hds_select.c
 
 DAT_PAR: dat_par_f$(EXEEXT)
 	./dat_par_f > DAT_PAR

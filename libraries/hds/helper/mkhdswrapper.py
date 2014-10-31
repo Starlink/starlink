@@ -138,8 +138,8 @@ def func_v5(func,line):
 
 def func_copy(func,line):
     (v4,v5) = version_names(line)
-    v4to5 = line.replace("(", "4to5(")
-    v5to4 = line.replace("(", "5to4(")
+    vXtoY = line.replace("(", "XtoY(")
+    vXtoY = vXtoY.replace("datC","dat1C")
     loc1 = "locator1"
     if line.startswith("datMove"):
         loc1 = "*locator1"
@@ -160,14 +160,28 @@ def func_copy(func,line):
     isv5 = 0;
     {2}
   }} else {{
+    /* Manual copy of X to Y */
     if (loc1isv5) {{
-      {4}
+      isv5 = -1;
     }} else {{
-      {5}
+      isv5 = -2;
     }}
+    {4}
   }}
-  HDS_CHECK_STATUS(\"{3}\",(isv5 ? "(v5)" : "(v4)"));
-  return *status;""".format(loc1,v5,v4,func,v5to4,v4to5))
+  {{
+    const char *helptxt = "(unexpected)";
+    if (isv5 == 1) {{
+      helptxt = "(v5)";
+    }} else if (isv5 == 0) {{
+      helptxt = "(v4)";
+    }} else if (isv5 == -1) {{
+      helptxt = "(v5->v4)";
+    }} else if (isv5 == -2) {{
+      helptxt = "(v4->v5)";
+    }}
+    HDS_CHECK_STATUS(\"{3}\",helptxt);
+  }}
+  return *status;""".format(loc1,v5,v4,func,vXtoY))
 
 def func_datMove(func,line):
     (v4,v5) = version_names(line)

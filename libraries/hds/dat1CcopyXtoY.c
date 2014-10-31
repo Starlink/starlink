@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     datCcopyXtoY
+*     dat1CcopyXtoY
 
 *  Purpose:
 *     Copy one structure level from version X locator to version Y locator
@@ -13,8 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     datCcopyXtoY(const HDSLoc *locator1X, const HDSLoc *locator2Y, const char *name,
-         HDSLoc **locator3Y, int *status );
+*     dat1CcopyXtoY(const HDSLoc *locator1X, const HDSLoc *locator2Y, const char *name,
+*                   HDSLoc **locator3Y, int *status );
 
 *  Arguments:
 *     locator1X = const HDSLoc * (Given)
@@ -40,6 +40,8 @@
 *     {enter_new_authors_here}
 
 *  Notes:
+*     - Use datCcopy directly when the source and target locator
+*       are from the same version.
 *     - When copying primitive types the data will be mapped and
 *       copied from one location to another.
 *     - In general this routine will be no less efficient than
@@ -75,46 +77,12 @@
 
 #include "sae_par.h"
 #include "dat1.h"
-#include "star/hds_v4.h"
-#include "star/hds_v5.h"
+#include "hds.h"
 
 int
-datCcopyXtoY(const HDSLoc *locator1X, const HDSLoc *locator2Y, const char *name,
+dat1CcopyXtoY(const HDSLoc *locator1X, const HDSLoc *locator2Y, const char *name,
              HDSLoc **locator3Y, int *status ) {
-  char type_str[DAT__SZTYP+1];
-  hdsdim hdims[DAT__MXDIM];
-  int ndims;
-  hdsbool_t struc = 0;
-
   if (*status != SAI__OK) return *status;
-
-  datStruc_vX( locator1X, &struc, status );
-
-  if (struc) {
-
-    /* need the type and dimensionality of the structure to create
-       in new location */
-    datType_vX( locator1X, type_str, status );
-    datShape_vX( locator1X, DAT__MXDIM, hdims, &ndims, status );
-    datNew_vY( locator2Y, name, type_str, ndims, hdims, status );
-
-  } else {
-    hdsbool_t state = 0;
-    /* We only copy if the primitive object is defined */
-    datState_vX( locator1X, &state, status );
-    if ( state ) {
-      datCopyXtoY( locator1X, locator2Y, name, status );
-    } else {
-      /* Undefined so just make something of the right shape and type */
-      datType_vX( locator1X, type_str, status );
-      datShape_vX( locator1X, DAT__MXDIM, hdims, &ndims, status );
-      datNew_vY( locator2Y, name, type_str, ndims, hdims, status );
-    }
-
-  }
-
-  /* and get a locator to the copied entity */
-  datFind_vY( locator2Y, name, locator3Y, status );
-
+  *locator3Y = dat1CcopyLocXtoY( locator1X, locator2Y, name, NULL, status );
   return *status;
 }
