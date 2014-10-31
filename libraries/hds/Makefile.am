@@ -95,7 +95,7 @@ hds1_types.h: make-hds-types$(EXEEXT)
 # Have to make sure that hds_types appears before DAT_PAR so that
 # the include file generation routines are built in the correct order
 BUILT_SOURCES = hds_types.h hds1_types.h \
-	$(include_MESSAGES) $(noinst_MESSAGES) DAT_PAR dat_par.h
+	$(include_MESSAGES) $(noinst_MESSAGES) DAT_PAR
 
 CLEANFILES = DAT_PAR dat_par.h hds_machine.txt CMP_ERR DAT_ERR dat_err.h \
 	hds_types.h hds1_types.h
