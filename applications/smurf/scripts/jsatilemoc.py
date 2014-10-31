@@ -107,7 +107,7 @@ def jsa_tile_moc(in_, out, max_order):
 
     moc.normalize(max_order=max_order)
 
-    write_moc_fits(moc, out)
+    write_moc_fits(moc, out, clobber=True)
 
 
 def read_jsa_tile_fits(filename):
