@@ -65,7 +65,7 @@
 #
 # Define the number of times to execute the loop.
 #
-      set ntimes = 1
+      set ntimes = 10
 #
 # Copy the CCD image.
 #
