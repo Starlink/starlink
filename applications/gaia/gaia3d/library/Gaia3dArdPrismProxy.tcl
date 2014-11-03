@@ -235,8 +235,6 @@ itcl::class ::gaia3d::Gaia3dArdPrismProxy {
    #  available.
    public variable dataset {} {
       if { $dataset != {} } {
-         puts [$dataset Print]
-         #$dataset Update
          apply_configuration_
          fit_to_data
       }
