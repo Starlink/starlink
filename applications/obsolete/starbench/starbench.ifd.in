@@ -23,6 +23,41 @@ package starbench {
 
     sh {
       export BENCH_VERSION=@PACKAGE_VERSION@
+
+      echo -n "   USSC packages: "
+      unset BENCH_KAPPA BENCH_PISA BENCH_FIG BENCH_CCDPACK BENCH_USSC
+      if test ! -z "${KAPPA_DIR}"; then
+          if test -d "${KAPPA_DIR}"; then
+              export BENCH_KAPPA=yes
+          fi
+      fi
+      if test ! -z "${PISA_DIR}"; then
+          if test -d "${PISA_DIR}"; then
+              export BENCH_PISA=yes
+          fi
+      fi
+      if test ! -z "${FIG_DIR}"; then
+          if test -d "${FIG_DIR}"; then
+              export BENCH_FIG=yes
+          fi
+      fi
+      if test ! -z "${CCDPACK_DIR}"; then
+          if test -d "${CCDPACK_DIR}"; then
+              export BENCH_CCDPACK=yes
+          fi
+      fi
+      if test ! -z "${BENCH_KAPPA}" -a ! -z "${BENCH_PISA}" -a ! -z "${BENCH_FIG}" -a ! -z "${BENCH_CCDPACK}"; then
+          export BENCH_USSC=yes
+      fi
+      if test ! -z "${BENCH_USSC}"; then
+          echo " Available"
+
+          # Get the version number for the Starlink installation
+          ussc_ver=`tail -1 $STARLINK_DIR/manifests/starlink.version`
+          export BENCH_USSC_VER=$ussc_ver[1]
+      else
+          echo " Not available"
+      fi
     }
 
     csh {
