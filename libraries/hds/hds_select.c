@@ -3118,20 +3118,5 @@ hdsClose(HDSLoc **locator, int *status) {
 /* hdsFind - Find an object (Fortran routine, requires hdsf library) */
 /*===================================================================*/
 
-int
-hdsFind(const HDSLoc *locator1, const char *name, const char *mode, HDSLoc **locator2, int *status) {
-
-  int retval = 0;
-  int instat = *status;
-  int isv5 = ISHDSv5(locator1);
-  EnterCheck("hdsFind",*status);
-  if (isv5) {
-    retval = hdsFind_v5(locator1, name, mode, locator2, status);
-  } else {
-    retval = hdsFind_v4(locator1, name, mode, locator2, status);
-  }
-  HDS_CHECK_STATUS("hdsFind",(isv5 ? "(v5)" : "(v4)"));
-  return retval;
-}
 
 

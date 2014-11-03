@@ -317,6 +317,9 @@ special = dict({
 in_prologue = 1
 for line in open("hds.h"):
     line = line.strip()
+    if line.startswith("int hds"):
+        # This is a function that should be ignored
+        continue
     func_match = hfunc_re.search(line)
     if func_match:
         hds_function = func_match.group(1)
