@@ -98,11 +98,11 @@
       echo "  Setting the characteristics of the CCD device using the "
       echo "  CCDSETUP routine."
       echo " "
-      if ( -e ccdtest_ard.dat ) then
-        'rm' ccdtest_ard.dat
+      if ( -e ccdtest.ard ) then
+        'rm' ccdtest.ard
       endif
-      if ( -e $CCDPACK_DIR/ccdtest_ard.dat ) then
-         'cp' $CCDPACK_DIR/ccdtest_ard.dat ./
+      if ( -e $CCDPACK_DIR/ccdtest.ard ) then
+         'cp' $CCDPACK_DIR/ccdtest.ard ./
 
 #  Found the ARD file setup CCDPACK appropriately.
          ccdsetup \
@@ -114,7 +114,7 @@
 	    logfile=ccdtest.log \
 	    preserve=true \
 	    direction=x \
-            mask=ccdtest_ard.dat \
+            mask=ccdtest.ard \
 	    reset accept
 #        end ccdsetup
       else
