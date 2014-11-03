@@ -125,7 +125,7 @@ END
 setenv LC_COLLATE C
 ls -1a > dir_index_after
 diff dir_index_before dir_index_after | awk '/>/{print $2}' > newfiles
-set check = `diff newfiles $BENCH_DIR/bch_ccdred.chk`
+set check = `diff newfiles $BENCH_DATA_DIR/bch_ccdred.chk`
 if ( "$check" != "" ) then
    echo "`date` : CCDRED benchmark failed" >> status_file
 endif

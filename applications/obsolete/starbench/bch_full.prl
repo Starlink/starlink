@@ -45,7 +45,7 @@
 #
       $calfile = $ENV{"BENCH_CALFILE"};
       if ( $calfile eq "" ) {
-        $calfile = $ENV{"BENCH_DIR"}."/starbench.cal";
+        $calfile = $ENV{"BENCH_DATA_DIR"}."/starbench.cal";
       }
 #
 # Read the incoming string and parse to get the name of the benchmark

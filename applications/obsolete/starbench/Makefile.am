@@ -19,7 +19,7 @@ bch_cfp_LDADD = slatest/libsbm.la -lm
 
 bch_sysinfo_SOURCES = sysinfo.c
 
-bin_DATA = $(DATA_FILES)
+dist_pkgdata_DATA = $(DATA_FILES)
 
 #
 

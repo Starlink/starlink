@@ -23,6 +23,7 @@ package starbench {
 
     sh {
       export BENCH_VERSION=@PACKAGE_VERSION@
+      export BENCH_DATA_DIR=${BENCH_DIR}/../../share/starbench
 
       echo -n "   USSC packages: "
       unset BENCH_KAPPA BENCH_PISA BENCH_FIG BENCH_CCDPACK BENCH_USSC
@@ -62,6 +63,7 @@ package starbench {
 
     csh {
       setenv BENCH_VERSION @PACKAGE_VERSION@
+      setenv BENCH_DATA_DIR ${BENCH_DIR}/../../share/starbench
 
       echo -n "   USSC packages: "
       unsetenv BENCH_KAPPA BENCH_PISA BENCH_FIG BENCH_CCDPACK BENCH_USSC

@@ -599,7 +599,7 @@ EXIT:
       ls -1 > dir_index_after
       unsetenv LC_COLLATE
       diff dir_index_before dir_index_after | awk '/>/{print $2}' > newfiles
-      set check = `diff newfiles $BENCH_DIR/bch_ccdpk.chk`
+      set check = `diff newfiles $BENCH_DATA_DIR/bch_ccdpk.chk`
       if ( "$check" != "" ) then
         echo "`date` : CCDPACK benchmark failed" >> status_file
       endif

@@ -164,5 +164,5 @@ abort_script:
 # Remove the input file and the application .sdf files.
 #
 end_script:
-      rm ccdframec.sdf `cat $BENCH_DIR/bch_kappa.chk`
+      rm ccdframec.sdf `cat $BENCH_DATA_DIR/bch_kappa.chk`
       exit
