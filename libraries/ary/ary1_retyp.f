@@ -122,6 +122,9 @@
 *        Add DEFER argument.
 *     2012-05-07 (TIMJ):
 *        Add _INT64 support.
+*     4-NOV-2014 (DSB):
+*        If the type need not be changed, do not reset the data object if 
+*        array creation has been deferred.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -178,10 +181,12 @@
 *  Initialise the DCE value and check whether the new type matches the
 *  old type. If so, then the data object type does not need changing.
 *  Ensure that the object is in the expected state by resetting it if
-*  appropriate.
+*  appropriate (but only if creation of the HDS arrays has not been
+*  deferred) .
       DCE = .FALSE.
       IF ( CHR_SIMLR( TYPE, NTYPE ) ) THEN
-         IF ( .NOT. STATE .AND. LOC .NE. ARY__NOLOC ) THEN
+         IF ( .NOT. DEFER .AND. .NOT. STATE .AND.
+     :        LOC .NE. ARY__NOLOC ) THEN
             CALL DAT_RESET( LOC, STATUS )
          END IF
 
