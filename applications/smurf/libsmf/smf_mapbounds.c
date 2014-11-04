@@ -177,6 +177,8 @@
 *        than any supplied spatial reference FrameSet.
 *     2014-10-08 (DSB):
 *        Report an error if either axis of the map spans more than 20000 pixels.
+*     2014-11-04 (DSB):
+*        Fix memory leak (ac1list and ac2list not being freed).
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -672,6 +674,10 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
           msgOutif( MSG__DEBUG, " ",
                     "Extrema time slices are ^X1, ^X2, ^X3 and ^X4",
                     status);
+
+          ac1list = astFree( ac1list );
+          ac2list = astFree( ac2list );
+
         }
       }
 
