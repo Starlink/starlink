@@ -98,7 +98,7 @@ proc get {endpoint query outfile} {
    if { [::http::ncode $response] == 302 || [::http::ncode $response] == 303 } {
       array set meta [eval set $response\(meta\)]
       set location $meta(Location)
-      puts "Redirected to: $newquery"
+      puts "Redirected to: $location"
       catch {::close $fid}
       get $location $query $outfile
       return
