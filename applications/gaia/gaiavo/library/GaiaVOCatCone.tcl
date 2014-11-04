@@ -192,7 +192,9 @@ itcl::class gaiavo::GaiaVOCatCone {
    #  New catalogue, set default plot symbol.
    public method query_done {status result} {
       GaiaVOCat::query_done $status $result
-      set_default_plot_symbol_
+      if { $status } {
+         set_default_plot_symbol_
+      }
    }
 
    #  Open a service, "args" is a list of values from a row of the current
