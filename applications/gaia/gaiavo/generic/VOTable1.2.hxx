@@ -1403,16 +1403,20 @@ namespace votable_12
     // value
     // 
     typedef ::xml_schema::string value_type;
+    typedef ::xsd::cxx::tree::optional< value_type > value_optional;
     typedef ::xsd::cxx::tree::traits< value_type, char > value_traits;
 
-    const value_type&
+    const value_optional&
     value () const;
 
-    value_type&
+    value_optional&
     value ();
 
     void
     value (const value_type& x);
+
+    void
+    value (const value_optional& x);
 
     void
     value (::std::auto_ptr< value_type > p);
@@ -1545,8 +1549,7 @@ namespace votable_12
 
     // Constructors.
     //
-    INFO (const name_type&,
-          const value_type&);
+    INFO (const name_type&);
 
     INFO (const ::xercesc::DOMElement& e,
           ::xml_schema::flags f = 0,
@@ -1575,7 +1578,7 @@ namespace votable_12
     VALUES_optional VALUES_;
     LINK_sequence LINK_;
     ::xsd::cxx::tree::one< name_type > name_;
-    ::xsd::cxx::tree::one< value_type > value_;
+    value_optional value_;
     ID_optional ID_;
     unit_optional unit_;
     xtype_optional xtype_;

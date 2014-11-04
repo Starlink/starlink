@@ -179,7 +179,7 @@
     <xs:element name="LINK" type="LINK" minOccurs="0" maxOccurs="unbounded"/> 
   </xs:sequence>
   <xs:attribute name="name" type="xs:token" use="required"/>
-  <xs:attribute name="value" type="xs:string" use="required"/>
+  <xs:attribute name="value" type="xs:string" />
   <xs:attribute name="ID" type="xs:ID"/>
   <xs:attribute name="unit" type="xs:token"/>
   <xs:attribute name="xtype" type="xs:token"/>

@@ -970,22 +970,28 @@ namespace votable_12
     this->name_.set (x);
   }
 
-  const INFO::value_type& INFO::
+  const INFO::value_optional& INFO::
   value () const
   {
-    return this->value_.get ();
+    return this->value_;
   }
 
-  INFO::value_type& INFO::
+  INFO::value_optional& INFO::
   value ()
   {
-    return this->value_.get ();
+    return this->value_;
   }
 
   void INFO::
   value (const value_type& x)
   {
     this->value_.set (x);
+  }
+
+  void INFO::
+  value (const value_optional& x)
+  {
+    this->value_ = x;
   }
 
   void INFO::
@@ -5121,14 +5127,13 @@ namespace votable_12
   //
 
   INFO::
-  INFO (const name_type& name,
-        const value_type& value)
+  INFO (const name_type& name)
   : ::xml_schema::type (),
     DESCRIPTION_ (::xml_schema::flags (), this),
     VALUES_ (::xml_schema::flags (), this),
     LINK_ (::xml_schema::flags (), this),
     name_ (name, ::xml_schema::flags (), this),
-    value_ (value, ::xml_schema::flags (), this),
+    value_ (::xml_schema::flags (), this),
     ID_ (::xml_schema::flags (), this),
     unit_ (::xml_schema::flags (), this),
     xtype_ (::xml_schema::flags (), this),
@@ -5316,13 +5321,6 @@ namespace votable_12
     {
       throw ::xsd::cxx::tree::expected_attribute< char > (
         "name",
-        "");
-    }
-
-    if (!value_.present ())
-    {
-      throw ::xsd::cxx::tree::expected_attribute< char > (
-        "value",
         "");
     }
   }
@@ -9037,13 +9035,14 @@ namespace votable_12
 
     // value
     //
+    if (i.value ())
     {
       ::xercesc::DOMAttr& a (
         ::xsd::cxx::xml::dom::create_attribute (
           "value",
           e));
 
-      a << i.value ();
+      a << *i.value ();
     }
 
     // ID
