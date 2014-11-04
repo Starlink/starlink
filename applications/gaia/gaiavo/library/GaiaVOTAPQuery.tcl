@@ -106,11 +106,12 @@ itcl::class gaiavo::GaiaVOTAPQuery {
       add_short_help $itk_component(servicename) "The TAP service name"
 
       itk_component add serviceurl {
-         LabelValue $itk_component(actionframe).serviceurl \
+         LabelEntry $itk_component(actionframe).serviceurl \
             -text "        " \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -value $itk_option(-accessURL)
+            -value $itk_option(-accessURL) \
+            -textvariable [scope itk_option(-accessURL)]
       }
       pack $itk_component(serviceurl) -side top -fill x -expand 1
       add_short_help $itk_component(serviceurl) "The TAP service endpoint"
@@ -249,10 +250,10 @@ itcl::class gaiavo::GaiaVOTAPQuery {
    }
 
    #  Query the TAP service about the tables that it provides and display some
-   #  of the metadata. Only done once, as should be fixed for an accessURL.
+   #  of the metadata. Only done once, or when accessURL is changed.
    protected method query_tables_ {} {
-      if { $tables_doc_ == {} } {
-         set query "$itk_option(-accessURL)/tables"
+      set query "$itk_option(-accessURL)/tables"
+      if { $tables_doc_ == {} || $query != $last_tables_query_ } {
          if { $querytaptask_ == {} } {
             set querytaptask_ [gaia::GaiaForeignExec \#auto \
                                   -application $::gaia_dir/querytapthings \
@@ -262,6 +263,7 @@ itcl::class gaiavo::GaiaVOTAPQuery {
 
          blt::busy hold $w_
          set tables_doc_ {}
+         set last_tables_query_ $query
          $querytaptask_ runwith $itk_option(-accessURL) "tables"
       } else {
          #  Just make sure the results window can be viewed.
@@ -325,8 +327,11 @@ itcl::class gaiavo::GaiaVOTAPQuery {
    #  Task to query the TAP service about it's tables.
    protected variable querytaptask_ {}
 
-   #  Output from querytaptask_, an XML document.
+   #  Output from query tables task, an XML document.
    protected variable tables_doc_ {}
+
+   #  Last query tables task query.
+   protected variable last_tables_query_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
