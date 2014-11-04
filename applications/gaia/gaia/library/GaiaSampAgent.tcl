@@ -64,6 +64,7 @@ itcl::class gaia::GaiaSampAgent {
       return {
          image.load.fits
          coord.pointAt.sky
+         table.load.fits
          table.load.votable
          table.select.rowList
          table.highlight.row
@@ -136,6 +137,30 @@ itcl::class gaia::GaiaSampAgent {
    #   return [array get result]
    #}
 
+   #  Load a catalog in FITS format.
+   public method table.load.fits {sender_id param_list} {
+      array set params $param_list
+      set url $params(url)
+      set table_id [get_param_ params table-id $url]
+      set table_name [get_param_ params name ""]
+
+      set fname [get_file_ $url]
+      if { $fname != {} } {
+         display_table_ $table_id $fname "image/fits"
+
+      } else {
+         #  Remote file, arrange to download this in the background, if not
+         #  already busy downloading...
+         if { $urlget_ == {} } {
+            set urlget_ \
+               [GaiaUrlGet .\#auto -notify_cmd [code $this display_table_ $table_id]]
+            $urlget_ get $url
+         } else {
+            error "Already downloading - can't do two at once"
+         }
+      }
+   }
+
    #  Load a VOTable as a catalogue.
    public method table.load.votable {sender_id param_list} {
       array set params $param_list
@@ -156,8 +181,7 @@ itcl::class gaia::GaiaSampAgent {
          error "VOTable conversion failed"
       }
 
-      set window [display_table_ $tst_file $table_id]
-      set cat_windows_($table_id) $window
+      display_table_ $table_id $tst_file "application/x-votable+xml"
    }
 
    #  Display only a selection of the rows from a previously loaded catalogue.
@@ -191,7 +215,7 @@ itcl::class gaia::GaiaSampAgent {
 
    #  Displays a catalogue in TST format.
    #  Returns the GaiaSearch widget which displays the catalogue.
-   protected method display_table_ {filename table_id} {
+   protected method display_table_ {table_id filename type} {
       set images [skycat::SkyCat::get_skycat_images]
       set ctrlwidget [lindex $images 0]
       set gaia [winfo parent $ctrlwidget]
@@ -202,7 +226,7 @@ itcl::class gaia::GaiaSampAgent {
       #  Set symbol, after realization of window.
       set next_symbol [next_symbol_spec_]
       after idle "$window maybe_set_symbol $next_symbol"
-      return $window
+      set cat_windows_($table_id) $window
    }
 
    #  Returns a window associated with a previously received table.
