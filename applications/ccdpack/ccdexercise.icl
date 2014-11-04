@@ -78,10 +78,10 @@ hidden proc ccdexercise
      echo "  Setting the characteristics of the CCD device using the "
      echo "  ccdsetup routine."
      echo " "
-     if file_exists( (CCDdir) & "/ccdtest_ard.dat" )
+     if file_exists( (CCDdir) & "/ccdtest.ard" )
 {
 {  Found the ARD file setup CCDPACK appropriately.
-        mask = (CCDdir) & '/ccdtest_ard.dat'
+        mask = (CCDdir) & '/ccdtest.ard'
         ccdsetup ~
             bounds=[1,5,120,128] ~
             extent=[6,119,1,128] ~
