@@ -2407,6 +2407,49 @@ package polpack {
 
    }
 
+   sh {
+#
+#  Here look to see if there is an ADAM_USER directory.  If there is not
+#  check whether or not there is an adam file that is not a directory.
+#  If there is, issue a warning and exit.  Otherwise create the required
+#  directory.
+#
+      if test -d "$HOME/adam"; then
+         echo -n
+      else
+         if test -f "$HOME/adam"; then
+            echo "You have a file called adam in your home directory.  Please rename "
+            echo "since adam must be a directory for ADAM files."
+            exit
+         else
+            mkdir $HOME/adam
+         fi
+      fi
+#
+#  Set up the commands and environment variables needed to export and
+#  import POLPACK extension information to and from foreign data formats.
+#
+      if test ! -z "$NDF_XTN"; then
+          # see if the environment variable already include CCDPACK
+          # else append POLPACK
+          case $NDF_XTN in
+              *POLPACK*)
+                  ;;
+              *) export NDF_XTN=${NDF_XTN},POLPACK
+                  ;;
+          esac
+      else
+          export NDF_XTN=POLPACK
+      fi
+
+      export NDF_IMP_POLPACK='$POLPACK_DIR/polimp.csh ^ndf'
+      export NDF_EXP_POLPACK='$POLPACK_DIR/polexp.csh ^ndf'
+      export NDF_IMP_POLPACK_COMPRESSED=' '
+      export NDF_EXP_POLPACK_COMPRESSED=' '
+      export NDF_IMP_POLPACK_GZIP=' '
+      export NDF_EXP_POLPACK_GZIP=' '
+   }
+
    display {
 
      POLPACK commands are now available -- (Version @PACKAGE_VERSION@)
