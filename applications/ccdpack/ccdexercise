@@ -257,7 +257,7 @@
       echo " "
       echo "  Adding a note to the logfile. "
       echo " "
-      set name = `who am i`
+      set name = `whoami`
       ccdnote \
          '"'$name : exercising CCDPACK'"' \
          accept
