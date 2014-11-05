@@ -85,6 +85,8 @@
 *        Converted to PGPLOT.
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL
+*     05-NOV-2014 (TIMJ):
+*        Annul the palette locator after writing the data.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -254,6 +256,10 @@
 *  Store the required section of the colour table in the array.
       CALL KPG1_PLPUT( LCI1, LCI2, 0, LCI2, %VAL( CNF_PVAL( PNTR ) ),
      :                 STATUS )
+
+*  Unmap the data array
+      CALL DAT_UNMAP( PLOC, STATUS )
+      CALL DAT_ANNUL( PLOC, STATUS )
 
 *  Tidy up.
 *  ========
