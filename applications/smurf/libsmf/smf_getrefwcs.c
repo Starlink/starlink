@@ -93,6 +93,9 @@
 *        observation instersects an HPX discontinuity.
 *     1-OCT-2014 (DSB):
 *        Added support for HPX projections centred on RA=12h.
+*     11-NOV-2014 (DSB):
+*        Re-write of the NDF code to ensure that the returned ref FrameSet
+*        always has sky axes in the order (lon,lat).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -127,6 +130,7 @@
 #include "grp.h"
 #include "sae_par.h"
 #include "star/subpar.h"
+#include "star/atl.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -137,24 +141,16 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
                     AstFrameSet **spacewcs, int *isjsa, int *status ){
 
 /* Local Variables */
-   AstFrame *bfrm = NULL;       /* Frame describing full PIXEL coords */
-   AstFrame *cfrm = NULL;       /* Frame describing required WCS coords */
    AstFrame *frm = NULL;
-   AstFrame *gfrm = NULL;       /* Frame describing required PIXEL coords */
-   AstFrame *template = NULL;   /* A Frame defining what we are looking for */
-   AstFrameSet *fs = NULL;      /* A conversion FrameSet */
    AstFrameSet *refwcs = NULL;  /* The WCS FrameSet from the reference NDF */
-   AstMapping *map = NULL;      /* Mapping from full wcs to PIXEL coords */
-   AstMapping *splitmap = NULL; /* Mapping from required wcs to PIXEL coords */
    AstRegion *circle;
    char text[ 255 ];            /* Parameter value */
    int *tiles;
    int i;
-   int inax[ 2 ];               /* Indices of required WCS axes */
    int jsatiles;
    int lbnd[2];                 /* Lower pixel index bounds of mid tile */
    int ntile;
-   int outax[ 7 ];              /* Indices of corresponding PIXEL axes */
+   int perm[ 2 ];
    int refndf;                  /* NDF identifier for the refence NDF */
    int ubnd[2];                 /* Upper pixel index bounds of mid tile */
    size_t code;
@@ -310,61 +306,35 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
 /* Get the WCS FrameSet from the reference NDF. */
          ndfGtwcs( refndf, &refwcs, status );
 
-/* We no longer need the NDF so annul it. */
-         ndfAnnul( &refndf, status );
-
-/* We want astFindFrame to return us the conversion from PIXEL coords to
-   celestial or spectral coords, so we need to make the PIXEL Frame the
-   base Frame in the reference WCS FrameSet. The NDF libray ensures that
-   the PIXEL Frame is always frame 2. */
+/* Attempt to extract a new FrameSet from this WCS FrameSet, in which the
+   current Frame is a SkyFrame, and the base Frame is a 2D PIXEL Frame.
+   Since the NDF library sets the GRID Frame to be the Base Frame, we need
+   to make the PIXEL Frame the base Frame first. The NDF library ensures
+   that the pixel Frame is Frame 2. */
          astSetI( refwcs, "Base", 2 );
-
-/* First look for the spatial WCS. Create a SkyFrame that we can use as a
-   template for searching the reference WCS. Set a high value for MaxAxes
-   so that SkyFrames can be found within CmpFrames (which will have
-   more than 2 axes). We also set PreserveAxes true so that the order of
-   the sky axes in the reference WCS is preserved. */
-         template = (AstFrame *) astSkyFrame( "MaxAxes=7,PreserveAxes=1" );
-
-/* Use astFindFrame to search the reference WCS for a SkyFrame. This search
-   includes the component Frames contained within CmpFrames. */
-         fs = astFindFrame( refwcs, template, " " );
-
-/* If a SkyFrame was found... */
-         if( fs ) {
-
-/* Get the Mapping from sky coords to PIXEL coords. */
-            map = astGetMapping( fs, AST__CURRENT, AST__BASE );
-
-/* Get the sky coords Frame. This will be a SkyFrame, but its attributes
-   will be inherited form the reference WCS rather than the template
-   SkyFrame. */
-            cfrm = astGetFrame( fs, AST__CURRENT );
-
-/* Get the PIXEL Frame. If the reference NDF is a cube this will be a 3D
-   Frame. */
-            bfrm = astGetFrame( fs, AST__BASE );
-
-/* Since the mappiong above may include a spectral axis, see if we can split
-   off the sky axes from the total Mapping. If we can, this will give us the
-   Mapping from 2D sky coords to 2D PIXEL coords. */
-            inax[ 0 ] = 1;
-            inax[ 1 ] = 2;
-            astMapSplit( map, 2, inax, outax, &splitmap );
-            if( splitmap && astGetI( splitmap, "Nout" ) == 2 ) {
-
-/* Pick the corresponding 2 axes form the (potentially 3D) PIXEL Frame. */
-               gfrm = astPickAxes( bfrm, 2, outax, NULL );
-
-/* Create the returned spatial FrameSet. */
-               *spacewcs = astFrameSet( gfrm, " " );
-               astInvert( splitmap );
-               astAddFrame( *spacewcs, AST__BASE, splitmap, cfrm );
+         *spacewcs = atlFrameSetSplit( refwcs, "SKY", NULL, NULL, status );
+         if( !(*spacewcs) ) {
+            if( *status == SAI__OK ) {
+               ndfMsg( "N", refndf );
+               *status = SAI__ERROR;
+               errRep( "", "The supplied reference NDF (^N) either has no "
+                       "celestial WCS axes, or the celestial axes cannot "
+                       "be separated from the non-celestial axes.", status );
             }
+
+/* The rest of makemap assumes that the sky frame axes are in the default
+   order (lon,lat). If this is not the case, permute them. */
+         } else if( astGetI( *spacewcs, "IsLatAxis(1)" ) ) {
+            perm[ 0 ] = 2;
+            perm[ 1 ] = 1;
+            astPermAxes( *spacewcs, perm );
          }
 
 /* Now look for the spectral WCS (described by a DSBSpecFrame). */
          smf_getspectralwcs( refwcs, 1, specwcs, status );
+
+/* We no longer need the NDF so annul it. */
+         ndfAnnul( &refndf, status );
       }
    }
 
