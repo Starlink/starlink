@@ -34,6 +34,8 @@
 *        Original version.
 *     3-JUL-1998 (MBT):
 *        Made it generic.
+*     2014-11-12 (TIMJ):
+*        Use PRM instead of the (obsolete) DCV routines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -68,7 +70,8 @@
       REAL NOISE
 
 *  Statement functions:
-      INCLUDE 'DCV_FUN'          ! Generic type conversion functions
+      INCLUDE 'NUM_DEC'
+      INCLUDE 'NUM_DEF'          ! Generic type conversion functions
 *.
 
 *  Check inherited global status.
@@ -79,7 +82,7 @@
          IF( IMAGE( I ) .NE. VAL__BAD<T> ) THEN
 
 *  Scale image value to estimate the real mean.
-            VALUE = DCV_<T>TOR( IMAGE( I ) ) * ADU
+            VALUE = NUM_<T>TOR( IMAGE( I ) ) * ADU
 
 *  Find the noise value for this means standard deviation.
             NOISE = CCD1_RNORM( 0.0, SQRT( ABS( VALUE)  ), STATUS )
@@ -88,7 +91,7 @@
             NOISE = NOISE / ADU
 
 *  Modify the image value with this noise estimate.
-            IMAGE( I ) = IMAGE( I ) + DCV_RTO<T>( NOISE )
+            IMAGE( I ) = IMAGE( I ) + NUM_RTO<T>( NOISE )
          END IF
  2    CONTINUE
 

@@ -102,6 +102,8 @@
 *        Added variable ellipticity option.
 *     3-JUL-1998 (MBT):
 *        Made generic.
+*     2014-11-12 (TIMJ):
+*        Use PRM instead of the (obsolete) DCV routines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -158,7 +160,8 @@
       EXTERNAL CCD1_TFUN
 
 *  Statement functions:
-      INCLUDE 'DCV_FUN'          ! Generic type conversion functions
+      INCLUDE 'NUM_DEC'
+      INCLUDE 'NUM_DEF'          ! Generic type conversion functions
 
 *.
 
@@ -171,7 +174,7 @@
       RSCSQ = RSCALE * RSCALE
 
 *  Convert background value to the right type.
-      TBACK = DCV_RTO<T>( BACK )
+      TBACK = NUM_RTO<T>( BACK )
 
 *  Initialise frame
       DO 1 I = 1, XDIM
@@ -274,19 +277,19 @@
                            IF ( IDX * SCALE .NE. IX ) IDX = IDX + 1
                            IDY = IY / SCALE
                            IF ( IDY * SCALE .NE. IY ) IDY = IDY + 1
-                           VAL = DCV_<T>TOR( FRAME( IDX, IDY ) ) +
+                           VAL = NUM_<T>TOR( FRAME( IDX, IDY ) ) +
      :                                 MAG * CCD1_TFUN( RADSQ ) / RSCSQ
 *  saturate if necessary
                            VAL = MIN( VAL, SAT )
-                           FRAME( IDX, IDY ) = DCV_RTO<T>( VAL )
+                           FRAME( IDX, IDY ) = NUM_RTO<T>( VAL )
                         ELSE
 
 *  pixels values are correct for expanded frame.
-                           VAL = DCV_<T>TOR( FRAME( IX, IY ) ) +
+                           VAL = NUM_<T>TOR( FRAME( IX, IY ) ) +
      :                                 MAG * CCD1_TFUN( RADSQ )
 *  saturate if necessary
                            VAL = MIN( VAL, SAT )
-                           FRAME( IX, IY ) = DCV_RTO<T>( VAL )
+                           FRAME( IX, IY ) = NUM_RTO<T>( VAL )
                         END IF
                      END IF
                   END IF

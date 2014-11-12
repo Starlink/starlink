@@ -44,6 +44,8 @@
 *  History:
 *     15-JUN-1998 (MBT):
 *        Original version.
+*     2014-11-12 (TIMJ):
+*        Use PRM instead of the (obsolete) DCV routines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,7 +85,8 @@
       REAL SD                    ! std deviation of Gaussian distribution
 
 *  Statement functions:
-      INCLUDE 'DCV_FUN'          ! Generic type conversion functions
+      INCLUDE 'NUM_DEC'
+      INCLUDE 'NUM_DEF'          ! Generic type conversion functions
 
 *  Data
       DATA MEAN /100.0/
@@ -109,12 +112,12 @@
             IF ( I .GE. INL .AND. I .LE. UP ) THEN
 
 *     Add bias noise to image in data region.
-               IMAGE( I, J ) = IMAGE( I, J ) + DCV_RTO<T>( NOISE )
+               IMAGE( I, J ) = IMAGE( I, J ) + NUM_RTO<T>( NOISE )
 
             ELSE
 
 *     Replace image by bias noise in bias strip region.
-               IMAGE( I, J ) = DCV_RTO<T>( NOISE )
+               IMAGE( I, J ) = NUM_RTO<T>( NOISE )
 
             END IF
 
