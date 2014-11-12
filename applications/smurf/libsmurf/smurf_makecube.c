@@ -1616,8 +1616,9 @@ void smurf_makecube( int *status ) {
 /* Save the output file name. */
          strcpy( oname, file->name );
 
-/* Create a history component in the output NDF. */
-         ndfHcre( ondf, status );
+/* Create a history component in the output NDF by copying the History
+   component from the first input file. */
+         smf_history_copy( igrp, 1, ondf, status );
 
 /* Copy the Label and Unit strings from the first input NDF, and check
    that all input NDFs have the same Label and Unit strings. */

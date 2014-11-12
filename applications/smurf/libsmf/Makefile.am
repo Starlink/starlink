@@ -267,6 +267,7 @@ smf_grp_related.c \
 smf_handler.c \
 smf_history_add.c \
 smf_history_check.c \
+smf_history_copy.c \
 smf_history_read.c \
 smf_history_write.c \
 smf_inbeam_str.c \
