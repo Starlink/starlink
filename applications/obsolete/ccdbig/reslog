@@ -1,0 +1,386 @@
+#!/bin/csh -f
+
+#+
+#  Name:
+#     RESLOG
+
+#  Purpose:
+#     Enables logging of resource (time + memory usage) of large processes
+#     run from its parent shell (e.g. a shell script)
+
+#  Language:
+#     C shell
+
+#  Description:
+#     The script records the time and memory usage of the largest 
+#     process to have run since the last time an external 'label' file
+#     was altered, and logs this information to a file.
+#
+#     It works as follows.  The script spends most of its time sleeping, 
+#     but at intervals wakes up and takes a look at what processes are 
+#     running, which have the same parent as it does.  It takes note
+#     of the largest (biggest memory usage) and records the current 
+#     CPU and elapsed time values, and the maximum so far total virtual
+#     memory use and resident set size (i.e. real memory use).
+#     Every time the contents of a given external label file are changed
+#     (presumably by the parent process) it writes the contents of the 
+#     label file (typically the name of the program which has been 
+#     running, perhaps with other data describing the invocation of that
+#     program), plus a summary of the resource usage since last time 
+#     the label file was changed, to a log file.
+#     The only communication between the parent and this process, 
+#     between starting and terminating, is via the label file.
+#
+#     Accuracy of the summary will necessarily depend on the length of
+#     the intervals during which the script sleeps.  In particular 
+#     it cannot be expected to report accurately on processes whose
+#     elapsed time is comparable with, or shorter than, the interval time, 
+#     and may miss reporting on these altogether.  
+#     The figures recorded therefore are lower limits, since if the 
+#     logged process exceeds these values between the last time the
+#     logging process checks it, and its termination, then these
+#     larger values will be missed.  Underestimation of times should
+#     not however be (much) more than the sleep interval, and if
+#     a large memory requirement is only in effect for a short time,
+#     it's probably not very important anyway.
+#
+#     Inevitably running this script will interfere
+#     with the process(es) being measured; although this script is 
+#     not a heavy user of CPU time, the disk activity caused by 
+#     loading the various commands in it may have a significant impact
+#     on the performance of the machine in the event that there is
+#     heavy use of disks, especially if this is caused by heavy paging
+#     activity.
+#
+#     Only direct children of the parent process will be identified for
+#     logging.  Children of children etc are excluded, which means, e.g.,
+#     that processes started from scripts started from the parent process
+#     will be ignored.
+#
+#     If this process receives an interrupt, or if it detects that its
+#     parent no longer exists, it will terminate.
+
+#  Output:
+#     Output is to a log file whose default name is reslog.log, but
+#     which can be specified using the -f flag.
+#
+#     Each time the label file is modified, resource usage is written
+#     to the log file for the major process to run since the last time 
+#     the label file was modified.
+#     The major process is defined as the one with the largest instantaneous
+#     memory use (size or RSS) in that interval.
+#     Thus any other process running between modifications of the label
+#     file smaller than the major process (or of the same size) will not
+#     be logged at all.
+#
+#     One line is printed per each logged process, with an entry in each
+#     of the following columns:
+#
+#     (unlabelled)
+#        The first column consists of the contents of the label file
+#     Elapsed(s)
+#        Seconds of elapsed time used by the major process.
+#        Note this is not the time which has elapsed since the last log entry.
+#     CPU(s)
+#        Seconds of CPU time used by the major process.
+#     RSS(k)
+#        Maximum resident set size (kilobytes of real memory occupied) 
+#        by the major process.
+#     Size(k)
+#        Maximum kilobytes of total (real + virtual) memory occupied 
+#        by the major process.
+#     Diskfree(M)
+#        Number of megabytes free on the disk (partition) being used.
+#        This isn't directly a measure of resource usage by the process,
+#        but it's useful to see if it is dropping to or near zero.
+
+#  Implementation status:
+#     Determining resource usage is inherently a highly system-dependent
+#     task, and the script cannot be expected to be portable to 
+#     arbitrary platforms.  In particular the 'ps' command, which has
+#     to be used heavily, exists in two very different forms, one 
+#     descending from BSD and one from Sytem V Unix.
+#     The script as it stands has been tested on the following systems:
+#        Red Hat Linux 5.0
+#        Solaris 2.6
+#        Digital Unix 4.0B
+#     however it's likely to be sensitive to details of the systems it's
+#     running on.  There may also be problems, for instance, if (e.g. 
+#     for a process with very high memory usage) the columns from ps 
+#     run into each other.
+#
+#     Although this script was designed for use with the CCDBIG script, 
+#     there is no reason (apart from the caveats above) it shouldn't be 
+#     applicable to assessing resource usage for other sets of 
+#     applications.
+
+#  Parameters:
+#     If the -h flag is used on the command line a usage message 
+#     (list of options and defaults) is printed, and execution is 
+#     terminated.
+
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     27-MAY-1998 (MBT):
+#        Original version.
+#     {enter_further_changes_here}
+#-
+#
+
+
+# Set up variables
+#
+set logfile = reslog.log                 # can be overridden with -f flag
+set interval = 30                        # can be overridden with -i flag
+set labelfile = reslog.label             # can be overridden with -l flag
+set tmpfile = tmpfile
+
+# Parse command line
+#
+set scriptname = $0
+set scriptname = ${scriptname:t}
+
+while ("$argv" != "")
+   set arg = $argv[1]
+   shift 
+   switch ("$arg")
+   case "-i":
+      set interval = "$argv[1]"
+      shift
+      breaksw
+   case "-f":
+      set logfile = "$argv[1]"
+      shift
+      breaksw
+   case "-l":
+      set labelfile = "$argv[1]"
+      shift
+      breaksw
+   case "-h":
+   default:
+      goto USAGE
+      breaksw
+   endsw
+end
+
+
+echo
+echo "${scriptname}:  Logging to file:  $logfile"
+echo "${scriptname}:  Logging interval: $interval seconds"
+echo "${scriptname}:  Label file:       $labelfile"
+echo
+
+
+# Print out header
+#
+set  format = "%27s %10d %8d %8d %8d %11d\n"
+set hformat = "%27s %10s %8s %8s %8s %11s\n"
+printf >>$logfile \
+   "$hformat" " " "Elapsed(s)" "CPU(s)" "RSS(k)" "Size(k)" "Diskfree(M)"
+
+# Classify operating system 
+# (currently works for Red Hat Linux, Solaris, Digital Unix) 
+#
+if ("`uname`" == "Linux") then
+   set pstype = 'BSD'
+else
+   set pstype = 'SYSV'
+endif
+
+
+# Set up alias for pulling fields out of 'ps' output
+#
+alias getfield awk "'\\
+   BEGIN {f_i=0; s_i=0;} \\
+   NR==1 {for (i=1;i<=NF;i++) {if("\$"i==field) f_i=i; if("\$"i==sortby) s_i=i;}} \\
+   NR==2 {out = "\$"f_i; s_max="\$"s_i} \\
+   NR>2 && s_i>0 {if ("\$"s_i > s_max) out="\$"f_i;} \\
+   END  {if (f_i>0) print out}'"
+
+# Set up alias for converting from hh:mm:ss to seconds
+#
+alias tosec awk -F: "'\\
+   {mult=1; for (i=NF;i>0;i--) {sec += "\$"i * mult; mult *= 60} print sec }'"
+
+# Set up alias for converting from quantities in M or K to kilobytes
+#
+alias tokb "sed -e 's/M *"'$'"/e3/' -e 's/K *"'$'"//' | awk '{print int("'$'"1)}'"
+
+# Some initialisation
+#
+set size_max = 0
+set rss_max = 0
+set diskfree_min = 99999999
+set label = ""
+rm -f $labelfile
+onintr SIGNAL
+
+# Work out parent's PID
+#
+if ("$pstype" == "BSD") then
+   set pscmd = "ps l $$"
+else 
+   set pscmd = "ps -p $$ -opid -oppid -ocomm"
+endif
+set ppid = `$pscmd | getfield field=PPID`
+if ("$ppid" == "") then
+   set name = $0
+   echo "${name:t}:  No parent process - aborting"
+   goto EXIT
+endif
+if ("$pstype" == "BSD") then
+   set parent_pscmd = "ps $ppid"
+else
+   set parent_pscmd = "ps -p $ppid -opid -ocomm"
+endif
+
+# Main loop checking process status
+#
+while (`$parent_pscmd |& getfield field=PID`) 
+
+   # See what is the currently active application
+   #
+   set label_last = "$label"
+   if (-e $labelfile) set label = "`cat $labelfile`"
+
+   # See if current application has changed since we last looked
+   #
+   if (   "$label_last" != "" \
+       && "$label" != "$label_last" \
+       && $?elapsed_major \
+       && $size_max > 0 ) then
+
+      # Application has changed since we last looked.  
+      # Write summary to log and reset values.
+      #
+      ( printf >> $logfile "$format" \
+          "$label_last" \
+          "$elapsed_major" "$cpu_major" "$rss_max" "$size_max" "$diskfree_min"\
+          ) >& /dev/null
+      set rss_max = 0
+      set size_max = 0
+      set cpu = 0
+      set elapsed = 0
+      set diskfree = 0
+   endif
+
+   # Find the process we're interested in.
+   # We do this (somewhat haphazardly) by checking the processes which have
+   # the same parent as this one, and then selecting the one with the 
+   # largest (total virtual) memory size.
+   #
+   if ("$pstype" == "BSD") then
+      ps lx > $tmpfile
+   else
+   # This is more complicated than it would be if there weren't a bug
+   # in Solaris 2.5 ps.
+      set pids = `ps -u $LOGNAME | awk 'NR>1{print $1}'`
+      ps -p "$pids" -opid -oppid -ovsz=SIZE \
+         | sed -e 's/M *$/e6/' -e 's/K *$/e3/' > $tmpfile
+   endif 
+
+   # The awk here is to select only processes with the right PPID
+   #
+   set awkprog = 'NR==1{for (i=1;i<=NF;i++) {if ($i=="PPID") f_i=i} print;}                       NR>1 && $f_i=="'$ppid'" {print;}'
+   set pid = `cat $tmpfile | awk $awkprog:q  | getfield field=PID sortby=SIZE`
+
+   # Find out the stats we want from ps (cpu, elapsed, size, rss)
+   #
+   if ("$pstype" == "BSD") then
+      (ps u $pid > $tmpfile) >& /dev/null
+      @ ps_worked = (`cat $tmpfile | wc -l` == 2)
+      if ($ps_worked) then
+         set command = `cat $tmpfile | getfield field=COMMAND`
+         set cpu     = `cat $tmpfile | getfield field=TIME | tosec`
+         set size    = `cat $tmpfile | getfield field=SIZE`
+         set rss     = `cat $tmpfile | getfield field=RSS`
+         set percent = `cat $tmpfile | getfield field=%CPU`
+         set elapsed = `echo $cpu $percent | awk '{print ($2>0) ? int(100.*$1/$2):0}'`
+      endif
+   else
+      # The 'xxxxxx's here are to give wide enough columns for big numbers
+      #
+      ( ps -p $pid -otime=TIME -oetime=ETIME -ovsz=xxxxxxVSZ -orss=xxxxxxRSS -ocomm > $tmpfile ) >& /dev/null
+      @ ps_worked = (`cat $tmpfile | wc -l` == 2)
+      if ($ps_worked) then
+         set command = `cat $tmpfile | getfield field=COMMAND`
+         set cpu     = `cat $tmpfile | getfield field=TIME | tosec`
+         set size    = `cat $tmpfile | getfield field=xxxxxxVSZ | tokb`
+         set rss     = `cat $tmpfile | getfield field=xxxxxxRSS | tokb`
+         set elapsed = `cat $tmpfile | getfield field=ETIME | tosec`
+      endif
+   endif
+
+   # Find out number of Mb left on disk containing current directory.
+   # (careful: df can output header plus one or two lines)
+   #
+   set dfline = `df -k . | tail +2`
+   set diskfree = `echo $dfline | awk '{print $4}'`
+   @ diskfree = $diskfree / 1024
+   
+   # Update maxima and make sure the current stats are those for the 
+   # so far biggest process
+   #
+   if ($ps_worked) then
+
+      # The major process is the one which has had the largest SIZE or RSS
+      # since the last reset.
+      # Check if the major process is the same as last time
+      #
+      if ($size > $size_max || $rss > $rss_max) set pid_major = $pid
+      if ($size > $size_max) set size_max = $size
+      if ($rss  > $rss_max)  set rss_max  = $rss
+
+      # Update the times as long as we're still looking at the major process
+      #
+      if ($pid_major == $pid) then
+         set command_major = "$command"
+         set elapsed_major = "$elapsed"
+         set cpu_major     = "$cpu"
+      endif
+   endif
+   if ($diskfree < $diskfree_min) set diskfree_min = $diskfree
+   
+   # Go back to sleep for a while
+   #
+   sleep $interval
+   
+end
+
+echo
+echo >> $logfile
+echo "${scriptname:t}:  Parent died.  Logging terminated" >> $logfile
+
+goto EXIT
+
+#####################################################
+
+SIGNAL:
+   echo >> $logfile
+   echo "${scriptname}:  Caught a signal.  Logging terminated" >> $logfile
+   goto EXIT
+
+
+USAGE:
+   cat << END_USAGE
+Usage:  $scriptname [flags]
+    -h
+          Print usage.
+    -i interval
+          Set interval (in seconds) between checking processes [${interval}].
+    -f logfile
+          Set filename for logging data [${logfile}].
+    -l labelfile
+          Set file name for communication with parent [${labelfile}].
+END_USAGE
+   goto EXIT
+
+
+EXIT:
+   rm -f $tmpfile $labelfile
+   exit
+   
+* $Id: reslog,v 1.15 1998/07/06 14:25:48 mbt Exp $

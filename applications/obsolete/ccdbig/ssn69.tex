@@ -1,0 +1,727 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocsource}    {ssn\stardocnumber}
+\newcommand{\stardocnumber}    {69.1(Draft)}
+\newcommand{\stardocauthors}   {Mark Taylor}
+\newcommand{\stardocdate}      {6 July 1998}
+\newcommand{\stardoctitle}     {
+   CCDBIG: assessing CCDPACK resource usage for large data sets
+}
+\newcommand{\stardocabstract}  {
+CCDBIG is a small package to investigate 
+how CCDPACK behaves with large sets of data.
+A typical data reduction sequence is performed for 
+various large frame sizes, and the resource 
+(memory and time) usage is logged. 
+This document describes operation of the package and interpretation
+of the results.
+}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\bf \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+% \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+
+
+% User defined
+
+\newcommand{\KAPPAref}{\xref{KAPPA}{sun95}{}}
+\newcommand{\CCDPref}{\xref{CCDPACK}{sun139}{}}
+\newcommand{\GWMref}{\xref{GWM}{sun130}{}}
+\newcommand{\KAPPAcmd}[1]{\xref{#1}{sun95}{#1}}
+\newcommand{\CCDPcmd}[1]{\xref{#1}{sun139}{#1}}
+
+\newcommand{\atimesb}[2]{\mbox{$#1 \times #2$}}
+\begin{htmlonly}
+  \renewcommand{\atimesb}[2]{\mbox{$#1$ x $#2$}}
+\end{htmlonly}
+
+
+
+\section{Introduction}
+\xlabel{introduction}
+
+Running applications on large data sets 
+is inevitably more demanding than on smaller ones.
+Resource usage is heavier, and as well as longer 
+elapsed times and increased degradation of machine performance, 
+this can lead ultimately to failure of the job. 
+CCDBIG does not give a benchmark result as such,
+but provides a tool to gauge resource usage 
+for data reduction of frames of varying size,
+using various options,
+so that the capability of a given platform to handle data sets
+of a given size can be assessed, 
+and the reasons for any failures can be determined.
+
+Typically, CCDBIG will be run by a user who is about to
+embark on reduction of unusually large images, or by a 
+system manager who expects his system to be used for such work, 
+or suspects that problems are being encountered as the result of it.
+Its use requires some care and can disrupt the system being 
+assessed, so that novice users might wish to seek assistance
+from their system manager in using the package.
+
+How the results of such an investigation are used is
+outside the scope of this document,
+but at the coarsest level, if an application fails 
+or the machine crashes
+as a result of the size of a job,
+then it's too big. 
+At a more sophisticated level, if a job takes ``too long'',
+or degrades performance of the machine to an unacceptable degree,
+then it may be too big.
+In either of these cases, examining the log file
+generated by CCDBIG should give some
+insight into the cause of the problem.
+The approach
+can then be modified;
+either by editing the script as described in sections
+\ref{sec:parameters} and \ref{sec:adapt},
+or by reconfiguring or reselecting the platform it's being run on,
+to find a happier combination.
+
+This guide is a brief instruction for use
+of CCDBIG and interpretation of its output.
+For further discussion of the issues involved in running large
+data reduction jobs in general, and using {\CCDPref} in particular,
+see \xref{SC/5}{sc5}{LARGE}.
+
+
+
+\section{Running CCDBIG}
+\xlabel{running}
+
+Ideally, CCDBIG should be run on a machine which is not
+heavily loaded, and furthermore one which is not being used
+for important processes.
+The latter is desirable, because if the {\CCDPref} applications
+are being tested to destruction then at the least they will
+cause heavy swapping between memory and disk, which 
+dramatically degrades performance of the machine 
+(particularly interactive response time),
+and they can sometimes lead to termination of other processes and
+even system crashes.
+
+To run the script, the recommended procedure is
+to change to an empty directory, on a local disk with 
+ample free space, and then:
+\begin{quote}
+{\tt \% cp \$CCDBIG\_DIR/ccdbig .} \\
+\hspace*{3em} (edit {\tt ccdbig} as required) \\
+{\tt \% ./ccdbig}
+\end{quote}
+
+
+\subsection{Setting parameters}
+\xlabel{parameters} \label{sec:parameters}
+
+The portion of the script which you might want to edit 
+is after the initial comment section, and looks like this:
+\begin{quote}
+\begin{verbatim}
+###################################################################
+# Set up the parameters of the reduction sequences.
+# These can be changed to test behaviour of the programs under
+# different circumstances.
+# The defaults are sensible.  For all the Boolean variables, 
+# TRUE is a more resource-intensive option than FALSE.
+
+      # Do we want variances calculated and propagated (TRUE or FALSE)?
+            set variance = TRUE
+
+      # Do we want to treat ARD mask within CCDPACK (TRUE or FALSE)?  
+      # (else explicitly impose mask on data using ARDMASK).
+            set keepard = TRUE
+
+      # Do we want to use a bias frame? (TRUE or FALSE)?
+      # (else interpolate between bias strips)
+            set biasframe = TRUE
+
+      # Do we want to normalize the frames for scale and zero factors?
+            set normalise = TRUE
+
+      # Data type (_WORD, _INTEGER, _REAL or _DOUBLE)
+            set datatype = _REAL
+
+      # List of image sizes for frames (pixels along a side)
+            set image_sizes = ( 1000 2000 3000 4000 )
+
+      # List of object densities (objects per million pixels).
+      # If this is set to ( 0 ) then min_objects will always be used.
+            set object_densities = ( 50 )
+
+      # Minimum number of objects per frame (can override object_densities)
+            set min_objects = 300
+
+      # Graphic display device ("xwindows" is GWM window, "NONE" is none)
+            set device = NONE
+
+      # Set logging interval (seconds)
+            set interval = 15
+
+      # Set filename for logging resource usage
+            set reslogfile = ccdbig_res.log
+
+# End of parameter setup.
+###################################################################
+\end{verbatim}
+\end{quote}
+The significance of these options is as follows:
+\begin{itemize}
+%
+\item {\tt variance}: 
+If set to TRUE then the variance component of the NDFs will be  
+calculated where appropriate 
+(in \CCDPcmd{MAKEBIAS}, \CCDPcmd{DEBIAS} and \CCDPcmd{MAKEMOS}) 
+and propagated.
+Setting to FALSE decreases memory, disk and CPU time usage.
+%
+\item {\tt keepard}:
+If set to TRUE then the information in the example ARD mask file
+{\tt ccdtest.ard} will be used by the 
+{\CCDPref} applications where appropriate;
+this increases memory and CPU time usage, especially in \CCDPcmd{DEBIAS}.
+If FALSE, then the ARD mask will be applied explicitly 
+between stages of the reduction process 
+by the \KAPPAref\ application \KAPPAcmd{ARDMASK}.
+%
+\item {\tt biasframe}:
+If set to TRUE then bias frames will be used to debias the images. 
+If FALSE, then the images will be debiassed using interpolation
+between the bias strips, which means that \CCDPcmd{MAKEBIAS}
+does not need to be run and the demands made by \CCDPcmd{DEBIAS}
+are reduced.
+%
+\item {\tt normalise}:
+Determines whether \CCDPcmd{MAKEMOS} performs 
+inter-frame normalisation before combining the images.
+This is a CPU-intensive step which
+is not necessary for the synthetic data used by CCDBIG;
+for real data it may or may not be.
+%
+\item {\tt datatype}:
+This determines the numeric type used to represent the
+DATA (and VARIANCE, if present) components of the NDFs.
+This choice is honoured by most parts of the reduction 
+process, but \CCDPcmd{MAKEFLAT} always generates a 
+master flat frame of type at least \_REAL.
+The smaller the type the less disk space and I/O resources
+will be required, but the effect on CPU time requirements
+is architecture-dependent.
+%
+\item {\tt image\_sizes}:
+The data reduction process is performed in turn on 
+test CCD frames of \atimesb{N}{N} pixels, where $N$ takes each
+of the values given in this list.
+%
+\item {\tt object\_densities}:
+The number of objects generated in the test data can be altered
+with this value.  If more than one number is given,  more than one
+run will be performed at each frame size.
+%
+\item {\tt min\_objects}:
+The minimum number of objects (roughly) in a data frame.
+If too few objects are present then the registration process
+runs into trouble.
+If behaviour as a function of number of objects is not being assessed 
+(for most purposes the number of objects is not very important)
+then {\tt object\_densities} can be set to {\tt ( 0 )} and
+{\tt min\_objects} to some medium sized number for a fixed
+number of objects regardless of frame size.
+%
+\item {\tt device}:
+This is the graphics device for display.
+If set to {\tt NONE} no graphics display is attempted.
+%
+\item {\tt interval}:
+This determines how often the logging process examines the 
+application processes. 
+A smaller value will improve the resolution of the statistics,
+but will place a heavier load on the system.
+%
+\item {\tt reslogfile}:
+This is the name of the file to which the resource usage summary is logged.
+\end{itemize}
+
+
+\subsection{Customising the script}
+\xlabel{adapt} \label{sec:adapt}
+
+If you wish to modify the data reduction process more
+than can be done by editing the parameter block
+at the head of the {\tt ccdbig} script,
+the body of the script can be modified directly,
+for instance to insert different applications or 
+to run them with different options.
+To insert new applications no special
+care needs to be taken, but in order to perform the 
+resource logging, 
+prior to each major process run from the script
+there must be inserted a line of the form
+\begin{quote}
+{\tt log\_start}\ {\it label}
+\end{quote}
+where {\it label} should be an identifier of not more
+than 11 characters, 
+and is typically the name of the application about to be executed.
+For instance to log resource usage of the {\KAPPAref}
+application \KAPPAcmd{COMPAVE},
+the following could be inserted
+after the invocations of MAKEMOS:
+\begin{quote}
+\begin{verbatim}
+#  Average pixels to produce a smaller image.
+      log_start compave
+      compave mosaic shrunk-mosaic 2
+\end{verbatim}
+\end{quote}
+Examples of this can easily be seen by examining the {\tt ccdbig} 
+script as distributed.
+
+In the case that more complex modifications are to be
+made however, e.g.\ running more than one command 
+between invocations of {\tt log\_start}, 
+it would be wise to consult the inline comments 
+at the head of the {\tt reslog}
+script to gain a better understanding of how the
+resource logging works.
+
+
+
+\section{Interpretation of results}
+\xlabel{interpretation}
+
+\subsection{Structure of the output file}
+\xlabel{outputfile}
+
+As it runs, the logging process will append to a log file 
+(by default {\tt ccdbig\_time.log}).
+Initially a header will be written indicating some of the
+operating parameters and details of the machine which is
+being run on.
+One subsequent line will be written for each program as it is run,
+giving
+the size of the image, 
+the number of objects in the data frame,
+the name of the application being run,
+the CPU time and
+elapsed time in seconds,
+the maximum total (virtual memory) size and
+maximum resident (real memory) size of the process in kilobytes,
+and the remaining disk space.
+A section of a log file could therefore look something like this:
+\begin{quote}
+\begin{verbatim}
+                            Elapsed(s)   CPU(s)   RSS(k)  Size(k) Diskfree(M)
+SunOS cass58 5.6 Generic sun4u sparc SUNW,Ultra-1
+ 10:32am  up 19 day(s), 22:21,  0 users,  load average: 0.04, 0.14, 0.12
+Tue Jul  7 10:32:57 BST 1998
+714     /data/cass58a/mbt/scratch
+ 
+Variance:           FALSE
+Keepard:            FALSE 
+Biasframe:          TRUE
+Normalisation:      TRUE
+Data type:          _REAL
+Logging interval:   15
+
+Pixels Objects     Command
+                            Elapsed(s)   CPU(s)   RSS(k)  Size(k) Diskfree(M)
+   3000   1012     ccdbgen:        403      349    39024    42024        2910
+   3000   1012     display:          3        2    19496    45984        2910
+   3000   1012    makebias:         43       36    39440    42840        2879
+   3000   1012      debias:        593       54   174208   179784        2715
+   3000   1012     display:         17        2    14664    41944        2715
+   3000   1012    makeflat:        179       60    92384   101632        2635
+   3000   1012     ardmask:          6        3    94800   135424         140
+   3000   1012     flatcor:         17        4    89032   101616        2635
+   3000   1012     findobj:         25       16    35944    42760        2635
+   3000   1012     tranndf:        187      167    95568   105360        2600
+   3000   1012 makemosnorm:        600      515    51704    59256        2567
+   3000   1012  makmoscomb:         47        7     4920    12128        2546
+\end{verbatim}
+\end{quote}
+
+The meanings of the values logged are as follows:
+\begin{itemize}
+%
+\item {\bf Pixels}:
+The test data frames are $N \times N$ pixels in size.
+This number is $N$.
+%
+\item{\bf Objects}:
+This is the number of objects placed in the star field;
+each frame occupies a subsection of this area and will 
+contain around 0.4 times as many.
+%
+\item {\bf Command}:
+Name of the application to which the statistics apply.
+This is a label determined by the {\tt ccdbig} script and in general
+is the name of a {\CCDPref} or {\KAPPAref} application, 
+except for {\tt makemosnorm} and {\tt makemoscomb},
+which are the normalisation and combination parts respectively
+of \CCDPcmd{MAKEMOS}
+(see the {\tt ccdbig} script for details).
+\item {\bf Elapsed}:
+This is the ``wall-clock'' time in seconds between the start of the process
+in question and its termination. 
+Large data reduction processes are typically I/O bound, so
+for most of the applications the discrepancy between this and the
+CPU time will be accounted for mainly by waiting for I/O,
+either simple writes and reads to and from disk files, 
+or swapping virtual memory between disk and core.
+On a heavily loaded system however it will reflect processor 
+usage by other processes as well.
+%
+\item {\bf CPU}:
+Number of seconds of system plus user time spent by the program executing.
+%
+\item {\bf RSS}:
+The maximum amount of real memory used (resident set size) in kilobytes. 
+This will not exceed the physical memory installed in the machine.
+%
+\item {\bf Size}:
+The maximum amount of real plus virtual memory in kilobytes 
+used by the whole process.
+This can be as large as the whole of real memory plus the
+whole of swap space. 
+As it approaches and exceeds the physical memory available
+(where availability takes account of requirements of other 
+processes running concurrently)
+the machine's performance is likely to degrade significantly 
+as much time is spent swapping pages to and from disk.
+%
+\item {\bf Diskfree}:
+The number of megabytes still available in the filesystem
+holding the data files.
+This is not a direct measure of the resource usage of the programs,
+but it is an important value to monitor, 
+since if it falls to zero the programs will probably fail with
+a write error.
+If it falls to within a few percent of the total size of the 
+disk then disk performance can sometimes be degraded.
+\end{itemize}
+
+
+\subsection{Limitations of the resource logging}
+\xlabel{reslog-warning}
+
+Determining CPU time and elapsed time usage under Unix 
+is relatively straightforward. 
+However there is no tidy and portable way of
+assessing memory usage and the solution used here is
+a little bit messy.
+For details of the method used and a better insight into
+the problems which can occur, see the inline comments in 
+the script {\tt reslog}.
+Broadly speaking however, the following comments apply:
+\begin{itemize}
+%
+\item
+The logging script will not work well for assessing applications
+with a short run time or small memory footprint.  
+Since the purpose of these scripts is to assess resource usage
+for large data reduction jobs we do not consider this a serious problem.
+%
+\item
+The logging script relies heavily on the details of output from 
+the {\tt ps} command, amongst others; therefore it is 
+likely to be sensitive to changes in operating system and environment.
+%
+\item
+When very large jobs are running, 
+the system can behave badly,
+response can be very slow,
+and processes can fail unexpectedly, even ones which 
+do not themselves have extreme requirements.
+\end{itemize}
+For all the above reasons, CCDBIG is not a foolproof application,
+so its results should be regarded critically; 
+if there are anomalous results they should be checked further 
+(a monitoring tool like {\tt top} may be of use here)
+before being believed!
+
+
+\subsection{Limitations of the data reduction script}
+\xlabel{ccdbig-warning}
+
+The script {\tt ccdbig} itself aims to 
+emulate a typical data reduction sequence,
+under a few different circumstances 
+as specified by the user,
+with particular attention to the most expensive (especially with 
+regard to memory) parts of the process.
+It does not however work through all the possibilities 
+one might require in treating large CCD frames,
+and there are certainly problems which might arise
+in a real data reduction sequence which would not show
+up from using this package.
+
+The following are some of the fixed characteristics 
+of the model data reduction sequence in {\tt ccdbig}:
+\begin{itemize}
+\item
+The number of frames produced is always two.
+\item
+The two frames always overlap by (about)
+one-quarter of the area of each.
+\item
+The bad-pixel mask is always the same (and quite simple).
+\item
+The frames are square.
+\item
+The frames used are synthetic and may have different 
+characteristics from a given set of observed data.
+\item
+Although MAKEMOS normalisation is performed, the actual normalisation
+scale and zero factors are 1 and 0 respectively.
+\item
+Many {\KAPPAref} and {\CCDPref} applications 
+which may be required as
+part of a large data reduction sequence are not tested here.
+\end{itemize}
+
+
+It ought to be fairly easy to adapt the script,
+so that if an application
+can be identified which 
+is causing problems,
+a suitable invocation can be inserted into the 
+{\tt ccdbig} script and the modified package run to assess
+resource usage.
+Alternatively, a new script (not necessarily to do with CCDs) 
+could be written using {\tt ccdbig} as a template,
+which uses {\tt reslog} to log resource usage.
+
+
+\section{Acknowledgements}
+\xlabel{acknowlegements}
+
+The basic application script {\tt ccdbig}
+is a slightly adapted version of the {\tt ccdexercise} script
+provided with {\CCDPref} by Peter Draper (Starlink).
+
+
+
+
+\end{document}
+

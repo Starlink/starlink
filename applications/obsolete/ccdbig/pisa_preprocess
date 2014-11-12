@@ -1,0 +1,63 @@
+#!/bin/sh
+
+# This script takes the output of a PISAFIND run (the pisafind.dat file)
+# and prepares it to make it useful for supplying to the program which
+# generates large object files for use with ccdgenerate.
+#
+# It does two things:
+#
+#  1. scales the data so that each object has x,y coordinates between
+#       0 and 1.
+#  2. sorts the points in order of intensity.
+#
+# The point of this is so that the first N lines of the resulting file
+# can be used by a program picking out N objects to put in a synthetic
+# CCD frame (which can have an arbitrary size).  Thus a frame with the 
+# required density of objects can be generated.
+
+# Format of pisafind.dat file is:
+#    Column   Name       Description
+#     1        INDEX      Index number of object.
+#     2        XPOS       X position of object in pixels.
+#     3        YPOS       Y position of object in pixels.
+#     4        INTENSITY  Integrated intensity of object.
+#     5        NPIX       Number of pixels above threshold.
+#     6        PEAK       Peak intensity of object in one pixel.
+#     7        ELLIPT     Ellipticity of object.
+#     8        ANGLE      Orientation of object, anti-clockwise from y-axis
+
+# Input file and dimensions
+pisafile='pisafind.dat'
+xmax=1500
+ymax=1500
+echo "Reading from $pisafile, dimensions $xmax * $ymax"
+
+# Output file
+outfile='ccdbig_obj.dat'
+echo "Writing to $outfile"
+
+# Set up awk script
+# Exclude the very brightest objects because ccdgenerate doesn't 
+# deal with them very well
+awkprog=' /^ *[^#]/ && $4 < 500000 \
+                    {printf "%10.8f %12.8f %12.8f %14.0f %9.4f %8.1f\n", \
+                             rand(), $2/'$xmax', $3'/$ymax', $4, $7, $8; } '
+
+# Print a header line
+echo >$outfile \
+     "#  INDEX    X            Y            INTENSITY    ELLIPT    ANGLE"
+
+echo "Processing ..."
+
+# Select fields and 'sort' into a random order
+# The final awk adds index numbers
+   awk "$awkprog" $pisafile \
+ | sort -n \
+ | awk '/^ *[^#]/ {printf "%6d %12.8f %12.8f %14.0f %9.4f %8.1f\n", \
+                          ++ix, $2,   $3,    $4,    $5,   $6}'  >> $outfile
+
+nobj=`grep -v '^ *[#]' $outfile | wc -l`
+
+echo "... Finished"
+echo "List has $nobj objects."
+

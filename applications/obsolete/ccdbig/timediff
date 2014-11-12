@@ -1,0 +1,81 @@
+#!/usr/local/bin/perl -w
+
+#+
+# timediff:
+# This utility takes as arguments the outputs of the builtin 'time'
+# command of the [t]C-shell.  It subtracts the elements of one from
+# those of the other and prints out the result in the same format.
+#
+# It is invoked
+#
+#   timediff "first-time" "last-time"
+#
+# and might be used in a script like this:
+#
+#   time >tmpfile; set t1 = `cat tmpfile`
+#   longcommand
+#   time >tmpfile; set t2 = `cat tmpfile`
+#   timediff "$t1" "$t2"
+#
+# (note that enclosing "time" itself in backquotes will not work
+# because time would then be executed in a shell of its own).
+#
+#
+# It makes few assumptions about the form of the elements of its
+# arguments and none about their meaning.
+# The purpose of the utility is so that you can work out within a 
+# shell how long (etc) a command executed within that shell has 
+# taken.  Direct use of the time builtin is not always possible.
+# This relies of course on the time builtin reporting on the 
+# resource usage of child processes as well as those of the shell
+# itself.
+#-
+
+
+# Get strings from arguments of program
+@time[0,1] = @ARGV[0,1];
+
+# Convert each number in the time strings to a decimal value
+# and store numbers and units in an array
+for $ix (0, 1) {
+  $time = $time[$ix];
+  while ($time =~ /([0-9.:]+)([^0-9.:]*)/g) {
+    ($num, $unit) = ($1, $2);
+    $unit =~ s/ +$/ /;
+    if ($unit =~ '%') {          # makes no sense to subtract percentages
+      $num = 0;
+    }
+    elsif ($num =~ /:/) {        # [[hh:]mm:]ss
+      $sec = $min = $hour = 0;
+      ($sec, $min, $hour) = reverse split (/:/, $num);
+      $min = 0 unless (defined $min);
+      $hour = 0 unless (defined $hour);
+      $num = $sec + $min * 60 + $hour * 60 * 60;
+    }
+    if (defined $num) {
+      push @{$num[$ix]}, $num;
+      push @{$unit[$ix]}, $unit;
+    }
+  }
+}
+
+# Check (by looking at the units) that the two time strings 
+# have the same quantities
+for $ix (0..$#{$unit[0]} - 1) {
+  if ($unit[1][$ix] ne $unit[0][$ix]) {
+    die "$0: Time strings don't match: '$unit[1][$ix]', '$unit[0][$ix]'.\n";
+  }
+}
+
+
+# Do the subtractions
+$out = '';
+for $ix (0..($#{$unit[0]})) {
+  $out .= (int ($num[1][$ix] - $num[0][$ix])) . $unit[0][$ix];
+  }
+
+# Output
+print "$out\n";
+
+
+

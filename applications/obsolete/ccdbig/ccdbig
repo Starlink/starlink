@@ -1,0 +1,635 @@
+#!/bin/csh -f
+#+
+#  Name:
+#     CCDBIG
+
+#  Purpose:
+#     Tests CCDPACK functionality for a variety of image sizes.
+
+#  Language:
+#     C shell
+
+#  Description:
+#     The script creates a series of test frames using CCDBGEN. It
+#     then executes various of the CCDPACK Atasks, as well as a few 
+#     KAPPA ones, simulating a data reduction sequence. 
+#     Intermediary results are displayed on a graphics device (if requested).
+#     The process is repeated for different image sizes:
+#     both the size of the image in pixels and the number of objects
+#     per image can be changed.
+#     By modifying the assignments at the head of the script some
+#     aspects of the reduction process and characteristics of the 
+#     synthetic data can be controlled.
+#
+#     The script calls another script "reslog" which logs resources used
+#     by processes started from this one.  Communication with the reslog
+#     script is done using the alias "log_start".
+#     For more details on how this resource logging works, see the 
+#     comments at the head of the "reslog" script.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     4-APR-1992 (PDRAPER):
+#        Original version.
+#     29-JUN-1993 (PDRAPER):
+#     	 Changed to include automated alignment.
+#     18-JUL-1995 (PDRAPER):
+#        Now references $CCDPACK_DIR instead of editting INSTALL at
+#        install time.
+#     11-JUN-1998 (MBT):
+#        Added resource logging (mainly external to this script).
+#        Modified to deal with varying image sizes and numbers of objects.
+#        Added options for cutting corners in some of the reduction steps.
+#        Name changed to ccdbig from (ccdexercise).
+#     {enter_further_changes_here}
+#-
+
+###################################################################
+# Set up the parameters of the reduction sequences.
+# These can be changed to test behaviour of the programs under
+# different circumstances.
+# The defaults are sensible.  For all the Boolean variables, 
+# TRUE is a more resource-intensive option than FALSE.
+
+      # Do we want variances calculated and propagated (TRUE or FALSE)?
+            set variance = TRUE
+
+      # Do we want to treat ARD mask within CCDPACK (TRUE or FALSE)?  
+      # (else explicitly impose mask on data using ARDMASK).
+            set keepard = TRUE
+
+      # Do we want to use a bias frame? (TRUE or FALSE)?
+      # (else interpolate between bias strips)
+            set biasframe = TRUE
+
+      # Do we want to normalise the frames for scale and zero factors?
+            set normalise = TRUE
+
+      # Data type (_WORD, _INTEGER, _REAL or _DOUBLE)
+            set datatype = _REAL
+
+      # List of image sizes for frames (pixels along a side)
+            set image_sizes = ( 1000 2000 3000 4000 )
+
+      # List of object densities (objects per million pixels).
+      # If this is set to ( 0 ) then min_objects will always be used.
+            set object_densities = ( 50 )
+
+      # Minimum number of objects per frame (can override object_densities)
+            set min_objects = 300
+
+      # Graphic display device ("xwindows" is GWM window, "NONE" is none)
+            set device = NONE
+
+      # Set logging interval (seconds)
+            set interval = 15
+
+      # Set filename for logging resource usage
+            set reslogfile = ccdbig_res.log
+
+# End of parameter setup.
+###################################################################
+
+      onintr EXIT
+      set null = "\!"
+      set abort = "\!\!"
+
+#  Validation of booleans
+#  (since we test on TRUE and FALSE a value which was neither would
+#  have messy consequences so it's best to check).
+      foreach boolean ( variance keepard biasframe normalise )
+         set value = `eval echo '$'$boolean`
+         if ( "$value" != "TRUE" && "$value" != "FALSE" ) then
+            echo "Variable $boolean='$value'; must be set to 'TRUE' or 'FALSE'."
+            goto EXIT
+         endif
+      end
+
+#  Initialize starlink environment
+      source /star/etc/cshrc
+      source /star/etc/login
+
+#  Ensure CCDPACK commands are available
+      ccdpack
+
+#  Ensure KAPPA commands are available
+      kappa
+
+#  Establish the current directory as ADAM_USER and clear 
+#  any global values already existing 
+      setenv ADAM_USER $cwd
+      if ( -e ${ADAM_USER}/GLOBAL.sdf ) then
+	 ccdclear accept 
+      endif
+
+#  Check CCDBIG_DIR is defined
+      if ( ! $?CCDBIG_DIR ) then
+         echo " "
+         echo "  Directory CCDBIG_DIR must be defined to run this script."
+         echo "  Please define CCDBIG_DIR as the directory containing the"
+         echo "  original ccdbig script and data files."
+         echo " "
+         goto EXIT
+      endif
+
+#  Check CCDBIG_DIR is in path
+      set path = ( $path $CCDBIG_DIR )
+
+#  Copy required files from source directory.
+      if ( -e $CCDBIG_DIR/ccdbig_obj.dat )  cp $CCDBIG_DIR/ccdbig_obj.dat .
+      if ( -e $CCDBIG_DIR/ccdtest.ard )     cp $CCDBIG_DIR/ccdtest.ard .
+      if ( -e $CCDBIG_DIR/reslog )          cp $CCDBIG_DIR/reslog .
+      if ( ! -x ./reslog )                  chmod +x reslog
+      if ( ! -e ccdbig_obj.dat ) then
+        echo "Can't find file of objects ccdbig_obj.dat - aborting"
+        goto EXIT
+      endif
+
+#  Set up graphics device if necessary
+      if ( "$device" != "NONE" ) then
+         idset $device \\
+         gdset $device \\
+         gdclear \\
+         paldef \\
+         palentry colour=white palnum=0 \\
+      endif
+
+#  Write some startup info to the log file
+      echo                                                >>$reslogfile
+      uname -a                                            >>$reslogfile
+      uptime                                              >>$reslogfile
+      date                                                >>$reslogfile 
+      du -sk $PWD                                         >>$reslogfile
+      echo " "                                            >>$reslogfile 
+      echo "Variance:           $variance"                >>$reslogfile
+      echo "Keepard:            $keepard "                >>$reslogfile
+      echo "Biasframe:          $biasframe"               >>$reslogfile
+      echo "Normalisation:      $normalise"               >>$reslogfile
+      echo "Data type:          $datatype"                >>$reslogfile
+      echo "Logging interval:   $interval"                >>$reslogfile
+      echo " "                                            >>$reslogfile
+      printf "\n%7s%7s%12s\n"   'Pixels ' Objects Command >>$reslogfile 
+      echo                                                >>$reslogfile
+
+#  Set up alias for logging run times to a file.
+      set labelfile = reslog.label
+      alias log_start \
+         'printf "%7d%7d%12s:" $frame_pixels $objects \!\!:1 >$labelfile'
+
+#  Start logging process
+      ./reslog -f $reslogfile -i $interval -l $labelfile  &
+
+#  Loop over sizes of images
+      foreach frame_pixels ( $image_sizes )
+         @ field_pixels = ($frame_pixels * 15) / 10
+
+#  Loop over number of objects in frame
+         foreach density ( $object_densities )
+            @ objects = ((($field_pixels * $field_pixels) / 1000) * $density) \
+                        / 1000
+            if ( $objects < $min_objects ) set objects = $min_objects
+
+#  Generate file containing objects for use by ccdbgen:
+#  First strip comments and blank lines,
+#  then sort for more efficient test data generation,
+#  then select fields and scale by image size.
+            rm -f ccdtest_obj.dat
+            sed -e'/^ *#/d' -e'/^ *$/d' ccdbig_obj.dat  \
+          | head -$objects \
+          | sort -n -k 3 \
+          | awk 'NR <= '$objects' { print NR, $2*'$field_pixels', $3*'$field_pixels', $4*0.1, $5 }' \
+          > ccdtest_obj.dat
+            set lines = `cat ccdtest_obj.dat | wc -l`
+            if ( "$lines" < "$objects" ) then
+               echo " "
+               echo " Not enough test objects in data file ccdbig_obj.dat."
+               echo " Using only $lines objects instead of $objects."
+               echo " "
+            endif
+
+#  Set up geometry of CCD.
+#  This matches (and must match) the prescription used in ccdbgen.
+            set minlobias = 3
+            @   maxhibias = $frame_pixels - 5 + 1
+            @   lobias = ($frame_pixels * 5) / 100
+            @   hibias = $frame_pixels - ( ($frame_pixels * 6) / 100 )
+            if ($lobias < $minlobias) set lobias = $minlobias
+            if ($hibias > $maxhibias) set hibias = $maxhibias
+            @   loframe = $lobias + 1
+            @   hiframe = $hibias - 1
+
+#  Try to locate the ARD file which goes with the test. If this is 
+#  not found, or if we're treating the mask external to CCDPACK,
+#  then proceed without it.
+            echo " "
+            echo "  Setting the characteristics of the CCD device using the "
+            echo "  CCDSETUP routine."
+            echo " "
+            if ( -e ccdtest.ard && "$keepard" == "TRUE" ) then
+
+#  Found the ARD file setup CCDPACK appropriately.
+#  We use the same ARD file regardless of size.  This is probably OK.
+               log_start ccdsetup
+               ccdsetup \
+                  genvar=$variance \
+                  bounds="[1,$lobias,$hibias,$frame_pixels]" \
+                  extent="[$loframe,$hiframe,1,$frame_pixels]" \
+                  adc=1 \
+                  rnoise=9.95 \
+                  logto=both \
+                  logfile=ccdtest.log \
+                  preserve=true \
+                  direction=x \
+                  mask=ccdtest.ard \
+                  reset accept
+#              end ccdsetup
+
+            else
+
+#  Do the "device" setup without an ARD file.
+               ccdsetup \
+                  genvar=$variance \
+                  bounds="[1,$lobias,$hibias,$frame_pixels]" \
+                  extent="[$loframe,$hiframe,1,$frame_pixels]" \
+                  adc=1 \
+                  rnoise=10.0 \
+                  logto=both \
+                  logfile=ccdtest.log \
+                  preserve=true \
+                  direction=x \
+                  reset accept
+#              end ccdsetup
+            endif
+
+#  Try to locate the file containing the long list of objects.
+#  If this does not exist then exit.
+            if ( ! -e ccdbig_obj.dat ) then
+               echo "Can't find file ccdbig_obj.dat of objects"
+               goto EXIT
+            endif
+
+#  Create the test frames.
+#  They are displaced from each other to give an overlap of about one quarter.
+            echo " "
+            echo "  Creating the test data. "
+            echo " "
+            echo "  The test data consists of :-"
+            echo "     2 bias frames    "
+            echo "     2 flatfields     "
+            echo "     2 object fields. "
+            echo " "
+            echo "  The target data is a simulated starfield in which the"
+            echo "  telescope position has been moved between exposures."
+            echo " "
+            @ x1lo = 1
+            @ x2lo = 1 + ($frame_pixels * 50) / 100
+            @ y1lo = 1
+            @ y2lo = 1 + ($frame_pixels * 50) / 100
+            @ x1hi = $x1lo + $frame_pixels - 1
+            @ x2hi = $x2lo + $frame_pixels - 1
+            @ y1hi = $y1lo + $frame_pixels - 1
+            @ y2hi = $y2lo + $frame_pixels - 1
+            log_start ccdbgen
+            ccdbgen \
+               nseq=2 \
+               ubnds="[$x1hi,$y1hi,$x2hi,$y2hi]" \
+               lbnds="[$x1lo,$y1lo,$x2lo,$y2lo]" \
+     	       file=ccdtest_obj.dat \
+               bias=$biasframe \
+               dtype=$datatype \
+     	       accept
+#           end ccdbgen
+
+#  If display capability is enabled then display one DATA frame.
+            if ( "$device" != "NONE" ) then
+               echo " "
+               echo "  Displaying one raw target frame."
+               echo " "
+               lutheat \
+                  accept
+#              end lutheat
+               log_start display
+               display \
+                  in=data1 \
+                  mode=percentiles \
+                  percentiles='[2,98]' \
+                  accept
+#              end display
+            endif
+ 
+#  Add note to logfile.
+            echo " "
+            echo "  Adding a note to the logfile. "
+            echo " "
+            set name = `who am i`
+            ccdnote \
+               '"'$name : exercising CCDPACK \
+                  with $objects objects \
+                  in $frame_pixels \* $frame_pixels frames'"' \
+               accept
+#           end ccdnote
+ 
+
+            if ( $biasframe == "TRUE" ) then
+
+#  Make a BIAS frame.
+               echo " "
+               echo "  Producing a master bias calibration frame. This is"
+               echo "  produced by median stacking the ordinary bias frames."
+               echo "  This process reduces the noise introduced in debiassing."
+               echo " "
+               log_start makebias
+               makebias \
+                  in='bias*' \
+                  out=master_bias \
+                  preserve=true \
+                  genvar=$variance \
+                  accept
+#              end makebias
+
+#  DEBIAS all frames (including flatfields) using master bias frame
+               echo " "
+               echo "  Debias the data and flatfield frames, using the master"
+               echo "  bias frame."
+               echo " "
+               log_start debias
+               debias \
+                  in='"data?,ff?"' \
+                  out='debias_*' \
+                  getmask=$keepard \
+                  genvar=$variance \
+                  bias=master_bias \
+                  accept
+#              end debias
+
+            else
+
+#  DEBIAS all frames (including flatfields) using bias strips
+               log_start debias
+               echo " "
+               echo "  Debias the data and flatfield frames, determining the"
+               echo "  bias level by interpolating between the bias strips."
+               echo " "
+               debias \
+                  in='"data?,ff?"' \
+                  out='debias_*' \
+                  getmask=$keepard \
+                  genvar=$variance \
+                  bias=\! \
+                  accept
+#              end debias
+
+            endif
+            
+#  Display a debiassed frame.
+           if ( "$device" != "NONE" ) then
+              echo " "
+              echo "  Displaying debiassed target frame. Note the absence of"
+              echo "  the bias strips (which were along the Y edges) and the"
+              echo "  removal of defective regions. The flatfields have also"
+              echo "  been debiassed but are not displayed."
+              echo " "
+              gdclear \\
+              log_start display
+              display \
+                 in=debias_data1 \
+                 mode=percentiles \
+                 percentiles='[2,98]' \
+                 accept
+#             end display
+           endif
+
+#  Create a flat field master
+           echo " "
+           echo "   Producing a master flatfield. This frame will be used to"
+           echo "   correct for the sensitivity variations in the detector"
+           echo "   response and any variations in the optical throughput" 
+           echo "   (vignetting).  As in the creation of the master bias"
+           echo "   frame median stacking is used to combine a series of"
+           echo "   flatfields."
+           echo " "
+           log_start makeflat
+           makeflat \
+              in='debias_ff?' \
+              out=master_flat \
+              accept
+#          end makeflat
+
+#  Display the master flatfield.
+           if ( "$device" != "NONE" ) then 
+              echo " "
+              echo "  Displaying master flatfield (the flatfield used in this"
+              echo "  case is a ramp, normal flatfields are not like this). "
+              echo " "
+              gdclear \\
+              log_start display
+              display \
+                 in=master_flat \
+                 mode=percentiles \
+                 percentiles='[2,98]' \
+                 accept
+#             end display
+           endif
+
+#  If we're not using the ARD file implicitly, then apply masking directly
+#  to the master flatfield (it will get propagated from there to subsequent 
+#  reduced frames).
+            if ( "$keepard" == "FALSE" ) then
+               echo " "
+               echo "  Use ARDMASK to apply ARD file directly to master flat."
+               echo " "
+               log_start ardmask
+               ardmask  \
+                  in=master_flat \
+                  out=masked_flat \
+                  ardfile=ccdtest.ard 
+#              end ardmask
+               mv masked_flat.sdf master_flat.sdf
+            endif
+
+#  Flatfield all the DATA frames
+           echo " "
+           echo "  Flatfielding all the target frames."
+           echo " "
+           log_start flatcor
+           flatcor \
+              in='debias_data?' \
+              out='*|debias|reduced|' \
+              accept
+#          end flatcor
+           if ( "$device" != "NONE" ) then
+              echo " "
+              echo "  Displaying one flatfielded target frame."
+              echo " "
+              gdclear \\
+              lutheat \
+                 accept
+#             end lutheat
+              log_start display
+              display \
+                 in=reduced_data1 \
+                 mode=percentiles \
+                 percentiles='[2,98]' \
+                 accept
+#             end display
+           endif
+
+#  Now proceed to test out some alignment functionality.
+           echo " "
+           echo "  CCDPACK will now attempt to realign the target frames to"
+           echo "  produce a complete mosaic of whole of the target region."
+           echo " "
+
+#  Locate all the objects on the frames
+           echo " " 
+           echo "  The first stage of the automated registration process is"
+           echo "  to detect the positions of objects (stars and galaxies)."
+           echo "  "
+           log_start findobj
+           findobj \
+              in='reduced_data?' \
+              outlist='*.find' \
+              percentile=95 \
+              binfrac=0 \
+              accept
+#          end findobj
+           if ( "$device" != "NONE" ) then
+
+#  Display the objects located.
+              echo " "
+              echo "  Displaying the positions of the object which have been"
+              echo "  detected."
+              echo " "
+              log_start plotlist
+              plotlist \
+                 inlist='reduced_data1' \
+                 palnum=4 \
+                 mtype=23 \
+                 accept
+#             end plotlist
+           endif
+     	
+#  Determine matches between the positions.
+           echo " "
+           echo "  After locating the objects it is now necessary to determine"
+           echo "  which objects correspond."
+           echo " "
+           log_start findoff
+           findoff \
+              inlist='reduced_data?' \
+              ndfnames=true \
+              outlist='*.off' \
+              accept
+#          end findoff
+           if ( "$device" != "NONE" ) then
+
+#  Display the objects located.
+              echo " "
+              echo "  Displaying the labels of objects which have been matched."
+              echo " "
+              log_start plotlist
+              plotlist \
+                 inlist='reduced_data1' \
+                 palnum=3 \
+                 mtype=-1 \
+                 thick=2 \
+                 msize=1.5 \
+                 accept
+#             end plotlist
+           endif
+
+#  Set the registration structures.
+           echo " "
+           echo "  Now that the object-object correspondence is known it is"
+           echo "  possible to work out the inter-NDF transformations."
+           echo "  The next routine does this for a range of different"
+           echo "  transformation types. It also writes the information into"
+           echo "  the NDFs so that other routines may use it."
+           echo " "
+           log_start register
+           register \
+              inlist='reduced_data?' \
+              fittype=1 \
+              accept
+#          end register
+
+#  Resample the data.
+           echo " "
+           echo "  The reduced NDFs will now be resampled to the same"
+           echo "  coordinate system.  They can then be combined"
+           echo "  (after determining normalising scale and zero points which "
+           echo "  take into account any variations in sky transparency and "
+           echo "  exposure time) into a single frame which shows the complete"
+           echo "  data coverage for the target area."
+           echo " "
+           log_start tranndf
+           tranndf \
+              in='reduced_data?' \
+              out='*|reduced|resamp|' \
+              accept
+#          end tranndf
+
+#  Normalise it.
+           if ("$normalise" == "TRUE") then
+              echo " "
+              echo "  Normalising the aligned datasets."
+              echo " "
+              log_start makemosnorm
+              makemos \
+                 in='resamp_data?' \
+                 scale=true \
+                 zero=true \
+                 modify=true \
+                 out=\! \
+                 accept
+#             end makemos
+           endif
+
+#  Combine to produce a mosaic.
+           echo " "
+           echo "  Combining the aligned datasets."
+           echo " "
+           log_start makmoscomb
+           makemos \
+              in='resamp_data?' \
+              scale=false \
+              zero=false \
+              out=mosaic \
+              accept
+#          end makemos
+
+#  Display the final mosaic.
+           if ( "$device" != "NONE" ) then 
+              echo " "
+              echo "  Displaying the final mosaic."
+              echo " "
+              gdclear \\
+              log_start display
+              display \
+                 in=mosaic \
+                 mode=percentiles \
+                 percentiles='[2,98]' \
+                 accept
+#             end display
+           endif
+
+#  Exercise is completed.
+           ccdnote \
+              '"Exercise completed"' \
+              accept
+#          end ccdnote
+
+        end        # density loop
+
+     end           # frame_pixels loop
+
+     log_start "done"
+
+#  Exit label
+     EXIT:
+     exit
+# $Id: ccdbig,v 1.25 1998/07/07 11:15:48 mbt Exp $
