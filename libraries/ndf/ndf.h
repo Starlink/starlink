@@ -862,4 +862,7 @@ void ndfGtdlt( int indf,
                float *zratio,
                int *status );
 
+void ndfHcopy( int indf1,
+               int indf2,
+               int *status );
 #endif

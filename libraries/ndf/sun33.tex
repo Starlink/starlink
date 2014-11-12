@@ -12,13 +12,13 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {33.10}
+\newcommand{\stardocnumber}    {33.11}
 \newcommand{\stardocauthors}   {R.F.~Warren-Smith \& D.S.~Berry}
-\newcommand{\stardocdate}      {16th July 2012}
+\newcommand{\stardocdate}      {11th November 2014}
 \newcommand{\stardoctitle}     {NDF \\ [\latex{1ex}]
                                 Routines for Accessing the\\
                                 Extensible N-Dimensional Data Format}
-\newcommand{\stardocversion}   {Version 1.12}
+\newcommand{\stardocversion}   {Version 1.13}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -8239,6 +8239,13 @@ applications need take no action to ensure that history information is
 kept, since it will be maintained automatically via the
 \st{propagation\/} and \st{default history recording\/} mechanisms.
 
+Some applications create new NDFs from scratch using (for instance)
+\htmlref{NDF\_NEW}{NDF_NEW} or \htmlref{NDF\_CREAT}{NDF_CREAT}, rather
+than by propagation via \htmlref{NDF\_PROP}{NDF_PROP}. In many cases,
+such applications will still want to propagate history information to the
+new NDF from some specified input NDF. This can be achieved using
+\htmlref{NDF\_HCOPY}{NDF_HCOPY}.
+
 \subsection{\xlabel{explicitly_controlling_history_text}\label{ss:controllinghistory}Explicitly Controlling History Text}
 
 When writing an application, you have the option of accepting the
@@ -10912,6 +10919,8 @@ The following is an example \xref{ADAM}{sg4}{} interface file
             {Obtain world coordinate system information from an NDF}
 \noteroutine{NDF\_HAPPN( APPN, STATUS )}
             {Declare a new application name for NDF history recording}
+\noteroutine{NDF\_HCOPY( INDF1, INDF2, STATUS )}
+            {Copy history information from one NDF to another}
 \noteroutine{NDF\_HCRE( INDF, STATUS )}
             {Ensure that a history component exists for an NDF}
 \noteroutine{NDF\_HDEF( INDF, APPN, STATUS )}
@@ -11333,6 +11342,8 @@ locator}{sun92}{using_locators}}
 
 \noteroutine{\htmlref{NDF\_HAPPN}{NDF_HAPPN}( APPN, STATUS )}
             {Declare a new application name for NDF history recording}
+\noteroutine{\htmlref{NDF\_HCOPY}{NDF_HCOPY}( INDF1, INDF2, STATUS )}
+            {Copy history information from one NDF to another}
 \noteroutine{\htmlref{NDF\_HCRE}{NDF_HCRE}( INDF, STATUS )}
             {Ensure that a history component exists for an NDF}
 \noteroutine{\htmlref{NDF\_HDEF}{NDF_HDEF}( INDF, APPN, STATUS )}
@@ -14027,6 +14038,41 @@ locator}{sun92}{using_locators}}
          number of characters are supplied. The NDF\_\_SZAPP constant is
          defined in the include file NDF\_PAR.
       }
+   }
+}
+\sstroutine{
+   NDF\_HCOPY
+}{
+   Copy history information from one NDF to another
+}{
+   \sstdescription{
+      The routine copies history information from one NDF to another,
+      replacing any that already exists in the destination NDF.
+   }
+   \sstinvocation{
+      CALL NDF\_HCOPY( INDF1, INDF2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF1 = INTEGER (Given)
+      }{
+         Identifier for the NDF (or NDF section) containing the history
+         information to be copied.
+      }
+      \sstsubsection{
+         INDF2 = INTEGER (Given)
+      }{
+         Identifier for the NDF to receive the copied history information.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      This routine returns without action leaving the destination NDF
+      unchanged if no History component exists in the destination NDF.
    }
 }
 \sstroutine{
@@ -19271,6 +19317,8 @@ Appendix~\ref{ss:cinterface}.\\[1.0ex]
             {Obtain world coordinate system information from an NDF}
 \noteroutineC{\xlabel{ndfHappn}void \htmlref{ndfHappn}{NDF_HAPPN}}{( const char $*$appn, int $*$status );}
             {Declare a new application name for NDF history recording}
+\noteroutineC{\xlabel{ndfHcopy}void \htmlref{ndfHcopy}{NDF_HCOPY}}{( int indf1, int indf2, int $*$status );}
+            {Copy history information from one NDF to another}
 \noteroutineC{\xlabel{ndfHcre}void \htmlref{ndfHcre}{NDF_HCRE}}{( int indf, int $*$status );}
             {Ensure that a history component exists for an NDF}
 \noteroutineC{\xlabel{ndfHdef}void \htmlref{ndfHdef}{NDF_HDEF}}{( int indf, const char $*$appn, int $*$status );}
@@ -19798,10 +19846,10 @@ the NDF\_ system between versions V1.10 and V1.11:
 
 \end{enumerate}
 
-\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V1.12}
+\subsection{Changes Introduced in V1.12}
 
 The following describes the most significant changes which occurred in
-the NDF\_ system between versions V1.11 and V1.12 (the current version):
+the NDF\_ system between versions V1.11 and V1.12:
 
 \begin{enumerate}
 
@@ -19817,6 +19865,17 @@ the NDF\_ system between versions V1.11 and V1.12 (the current version):
    cancel all NDF parameters in a single call, without needing to know
    their names.
 
+\end{enumerate}
+
+
+\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V1.13}
+
+The following describes the most significant changes that occurred in
+the NDF\_ system between versions V1.12 and V1.13 (the current version):
+
+\begin{enumerate}
+   \item  A new routine NDF\_HCOPY has been added to copy history information
+          from one NDF to another.
 \end{enumerate}
 
 No changes to existing applications should be required, nor is any

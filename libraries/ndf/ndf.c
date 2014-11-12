@@ -4622,3 +4622,28 @@ DECLARE_INTEGER(fstatus);
 }
 
 
+F77_SUBROUTINE(ndf_hcopy)( INTEGER(indf1),
+                           INTEGER(indf2),
+                           INTEGER(status) );
+
+void ndfHcopy( int indf1,
+               int indf2,
+               int *status ) {
+
+DECLARE_INTEGER(findf1);
+DECLARE_INTEGER(findf2);
+DECLARE_INTEGER(fstatus);
+
+   F77_EXPORT_INTEGER( indf1, findf1 );
+   F77_EXPORT_INTEGER( indf2, findf2 );
+   F77_EXPORT_INTEGER( *status, fstatus );
+
+   F77_LOCK( F77_CALL(ndf_hcopy)( INTEGER_ARG(&findf1),
+                        INTEGER_ARG(&findf2),
+                        INTEGER_ARG(&fstatus) ); )
+
+   F77_IMPORT_INTEGER( fstatus, *status );
+
+   return;
+}
+
