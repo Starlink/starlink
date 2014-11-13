@@ -117,6 +117,18 @@ else
 endif
 
 #
+#   CCDbig
+#
+
+if ( -e ${bindir}/ccdbig/ccdbig.csh ) then
+   alias ccdbig source ${bindir}/ccdbig/ccdbig.csh
+   alias ccdbigsetup source ${bindir}/ccdbig/ccdbig.csh
+else
+   alias ccdbig ${staretcdir}/notinst ccdbig
+   alias ccdbigsetup ${staretcdir}/notinst ccdbigsetup
+endif
+
+#
 #   CCDpack
 #
 
