@@ -90,7 +90,7 @@
 *     by the DTYPE ADAM parameter.
 *
 *     -  Since it is intended to be able to generate very large test
-*     frames without failing, the code is optimised to minimise 
+*     frames without failing, the code is optimised to minimise
 *     memory use.  This leads to non-optimal CPU time usage, for instance
 *     some sequences of pseudo-random numbers are calculated two or
 *     three times rather than calculated once and stored for later use.
@@ -121,7 +121,7 @@
 *        Removed HDS calls and replaced with new NDF equivalents. This
 *        allows generation of foreign data formats.
 *     21-APR-1997 (PDRAPER):
-*        Added TYPE parameter to control the output of foreign 
+*        Added TYPE parameter to control the output of foreign
 *        data formats.
 *     13-NOV-1997 (PDRAPER):
 *        Removed calls to NDF_HCRE. History component exceeds IRAFs
@@ -195,10 +195,10 @@
       LOGICAL BOK               ! Bounds ok
       LOGICAL FOPEN             ! Input file is open
       LOGICAL FLAT              ! Create flat fields
-      
+
 *  Local data. This names follow the ING/WHT convention.
 
-      DATA  BLOCK / 
+      DATA  BLOCK /
      :'NAXIS   =                    2 /',
      :'NAXIS1  =                      /',
      :'NAXIS2  =                      /',
@@ -330,7 +330,7 @@
          IAT = 10
          CALL CHR_PUTI( DIMS( 1 ), BLOCK( 2 ), IAT )
          IAT = 10
-         CALL CHR_PUTI( DIMS( 2 ), BLOCK( 3 ), IAT ) 
+         CALL CHR_PUTI( DIMS( 2 ), BLOCK( 3 ), IAT )
          IAT = 10
          CALL CHR_PUTI( ( DIMS( 1 ) - ( WID1 + WID2 ) ), BLOCK( 4 ),
      :                  IAT )
@@ -347,7 +347,7 @@
          SEEDO = INT( 1E6 * PDA_RAND( 0 ) ) * 4 + 1
          SEEDB = INT( 1E6 * PDA_RAND( 0 ) ) * 4 + 1
          SEEDF = INT( 1E6 * PDA_RAND( 0 ) ) * 4 + 1
-         
+
 *  Object frame.
 
 *    Get the frame.
@@ -389,7 +389,7 @@ C         CALL NDF_HCRE( IDO, STATUS )
      :                    WID1, WID2, SEEDB, STATUS )
 
 *    Include FITS block.
-         CALL NDF_XNEW( IDO, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
+         CALL NDF_XNEW( IDO, 'FITS', '_CHAR*80', 1, 15, LOCEXT,
      :                  STATUS )
          BLOCK(13 ) = 'OBSTYPE = ''TARGET            '''
          CALL DAT_PUT( LOCEXT, '_CHAR*80', 1, 15, BLOCK, STATUS )
@@ -423,7 +423,7 @@ C            CALL NDF_HCRE( IDB, STATUS )
      :                       WID1, WID2, SEEDB, STATUS )
 
 *    Include FITS block.
-            CALL NDF_XNEW( IDB, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
+            CALL NDF_XNEW( IDB, 'FITS', '_CHAR*80', 1, 15, LOCEXT,
      :                     STATUS )
             BLOCK( 13 ) = 'OBSTYPE = ''BIAS'''
             CALL DAT_PUT( LOCEXT, '_CHAR*80', 1, 15, BLOCK, STATUS )
@@ -436,7 +436,7 @@ C            CALL NDF_HCRE( IDB, STATUS )
 
 *  Flat field frame (if required).
          IF ( FLAT ) THEN
-            
+
 *    Get the frame.
             CALL CHR_ITOC( I, COUNT, NCHAR )
             FNAME = 'ff'//COUNT( :NCHAR )//TYPE
@@ -469,7 +469,7 @@ C            CALL NDF_HCRE( IDF, STATUS )
      :                       DIMS( 2 ), WID1, WID2, SEEDB, STATUS )
 
 *    Include FITS block.
-            CALL NDF_XNEW( IDF, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
+            CALL NDF_XNEW( IDF, 'FITS', '_CHAR*80', 1, 15, LOCEXT,
      :                     STATUS )
             BLOCK(13 ) = 'OBSTYPE = ''FLAT              '''
             CALL DAT_PUT( LOCEXT, '_CHAR*80', 1, 15, BLOCK, STATUS )

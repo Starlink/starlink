@@ -23,7 +23,7 @@
 *        The global status.
 
 *  Notes:
-*     Assumes there are no bad pixels.  Since multiplication is by a 
+*     Assumes there are no bad pixels.  Since multiplication is by a
 *     value between 0 and 1, this means that no bad pixels will result
 *     in the output either.
 

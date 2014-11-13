@@ -1,4 +1,4 @@
-      SUBROUTINE BGG1_ABIA<T>( IMAGE, DIM1, DIM2, INL, INR, SEED, 
+      SUBROUTINE BGG1_ABIA<T>( IMAGE, DIM1, DIM2, INL, INR, SEED,
      :                          STATUS )
 *+
 *  Name:
