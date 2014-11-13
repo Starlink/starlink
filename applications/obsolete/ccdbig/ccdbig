@@ -11,20 +11,20 @@
 
 #  Description:
 #     The script creates a series of test frames using CCDBGEN. It
-#     then executes various of the CCDPACK Atasks, as well as a few 
-#     KAPPA ones, simulating a data reduction sequence. 
+#     then executes various of the CCDPACK Atasks, as well as a few
+#     KAPPA ones, simulating a data reduction sequence.
 #     Intermediary results are displayed on a graphics device (if requested).
 #     The process is repeated for different image sizes:
 #     both the size of the image in pixels and the number of objects
 #     per image can be changed.
 #     By modifying the assignments at the head of the script some
-#     aspects of the reduction process and characteristics of the 
+#     aspects of the reduction process and characteristics of the
 #     synthetic data can be controlled.
 #
 #     The script calls another script "reslog" which logs resources used
 #     by processes started from this one.  Communication with the reslog
 #     script is done using the alias "log_start".
-#     For more details on how this resource logging works, see the 
+#     For more details on how this resource logging works, see the
 #     comments at the head of the "reslog" script.
 
 #  Authors:
@@ -52,13 +52,13 @@
 # Set up the parameters of the reduction sequences.
 # These can be changed to test behaviour of the programs under
 # different circumstances.
-# The defaults are sensible.  For all the Boolean variables, 
+# The defaults are sensible.  For all the Boolean variables,
 # TRUE is a more resource-intensive option than FALSE.
 
       # Do we want variances calculated and propagated (TRUE or FALSE)?
             set variance = TRUE
 
-      # Do we want to treat ARD mask within CCDPACK (TRUE or FALSE)?  
+      # Do we want to treat ARD mask within CCDPACK (TRUE or FALSE)?
       # (else explicitly impose mask on data using ARDMASK).
             set keepard = TRUE
 
@@ -119,11 +119,11 @@
 #  Ensure KAPPA commands are available
       kappa
 
-#  Establish the current directory as ADAM_USER and clear 
-#  any global values already existing 
+#  Establish the current directory as ADAM_USER and clear
+#  any global values already existing
       setenv ADAM_USER $cwd
       if ( -e ${ADAM_USER}/GLOBAL.sdf ) then
-	 ccdclear accept 
+	 ccdclear accept
       endif
 
 #  Check CCDBIG_DIR is defined
@@ -139,9 +139,14 @@
 #  Check CCDBIG_DIR is in path
       set path = ( $path $CCDBIG_DIR )
 
+#  Derive the data directory from the environment variable
+        if ( ! $?CCDBIG_DATA_DIR ) then
+            setenv CCDBIG_DATA_DIR ${CCDBIG_DIR}/../../share/ccdbig
+        endif
+
 #  Copy required files from source directory.
-      if ( -e $CCDBIG_DIR/ccdbig_obj.dat )  cp $CCDBIG_DIR/ccdbig_obj.dat .
-      if ( -e $CCDBIG_DIR/ccdtest.ard )     cp $CCDBIG_DIR/ccdtest.ard .
+      if ( -e $CCDBIG_DATA_DIR/ccdbig_obj.dat )  cp $CCDBIG_DATA_DIR/ccdbig_obj.dat .
+      if ( -e $CCDBIG_DATA_DIR/ccdtest.ard )     cp $CCDBIG_DATA_DIR/ccdtest.ard .
       if ( -e $CCDBIG_DIR/reslog )          cp $CCDBIG_DIR/reslog .
       if ( ! -x ./reslog )                  chmod +x reslog
       if ( ! -e ccdbig_obj.dat ) then
@@ -151,7 +156,6 @@
 
 #  Set up graphics device if necessary
       if ( "$device" != "NONE" ) then
-         idset $device \\
          gdset $device \\
          gdclear \\
          paldef \\
@@ -162,9 +166,9 @@
       echo                                                >>$reslogfile
       uname -a                                            >>$reslogfile
       uptime                                              >>$reslogfile
-      date                                                >>$reslogfile 
+      date                                                >>$reslogfile
       du -sk $PWD                                         >>$reslogfile
-      echo " "                                            >>$reslogfile 
+      echo " "                                            >>$reslogfile
       echo "Variance:           $variance"                >>$reslogfile
       echo "Keepard:            $keepard "                >>$reslogfile
       echo "Biasframe:          $biasframe"               >>$reslogfile
@@ -172,7 +176,7 @@
       echo "Data type:          $datatype"                >>$reslogfile
       echo "Logging interval:   $interval"                >>$reslogfile
       echo " "                                            >>$reslogfile
-      printf "\n%7s%7s%12s\n"   'Pixels ' Objects Command >>$reslogfile 
+      printf "\n%7s%7s%12s\n"   'Pixels ' Objects Command >>$reslogfile
       echo                                                >>$reslogfile
 
 #  Set up alias for logging run times to a file.
@@ -222,7 +226,7 @@
             @   loframe = $lobias + 1
             @   hiframe = $hibias - 1
 
-#  Try to locate the ARD file which goes with the test. If this is 
+#  Try to locate the ARD file which goes with the test. If this is
 #  not found, or if we're treating the mask external to CCDPACK,
 #  then proceed without it.
             echo " "
@@ -320,7 +324,7 @@
                   accept
 #              end display
             endif
- 
+
 #  Add note to logfile.
             echo " "
             echo "  Adding a note to the logfile. "
@@ -332,7 +336,7 @@
                   in $frame_pixels \* $frame_pixels frames'"' \
                accept
 #           end ccdnote
- 
+
 
             if ( $biasframe == "TRUE" ) then
 
@@ -384,7 +388,7 @@
 #              end debias
 
             endif
-            
+
 #  Display a debiassed frame.
            if ( "$device" != "NONE" ) then
               echo " "
@@ -407,7 +411,7 @@
            echo " "
            echo "   Producing a master flatfield. This frame will be used to"
            echo "   correct for the sensitivity variations in the detector"
-           echo "   response and any variations in the optical throughput" 
+           echo "   response and any variations in the optical throughput"
            echo "   (vignetting).  As in the creation of the master bias"
            echo "   frame median stacking is used to combine a series of"
            echo "   flatfields."
@@ -420,7 +424,7 @@
 #          end makeflat
 
 #  Display the master flatfield.
-           if ( "$device" != "NONE" ) then 
+           if ( "$device" != "NONE" ) then
               echo " "
               echo "  Displaying master flatfield (the flatfield used in this"
               echo "  case is a ramp, normal flatfields are not like this). "
@@ -436,7 +440,7 @@
            endif
 
 #  If we're not using the ARD file implicitly, then apply masking directly
-#  to the master flatfield (it will get propagated from there to subsequent 
+#  to the master flatfield (it will get propagated from there to subsequent
 #  reduced frames).
             if ( "$keepard" == "FALSE" ) then
                echo " "
@@ -446,7 +450,7 @@
                ardmask  \
                   in=master_flat \
                   out=masked_flat \
-                  ardfile=ccdtest.ard 
+                  ardfile=ccdtest.ard
 #              end ardmask
                mv masked_flat.sdf master_flat.sdf
             endif
@@ -485,7 +489,7 @@
            echo " "
 
 #  Locate all the objects on the frames
-           echo " " 
+           echo " "
            echo "  The first stage of the automated registration process is"
            echo "  to detect the positions of objects (stars and galaxies)."
            echo "  "
@@ -512,7 +516,7 @@
                  accept
 #             end plotlist
            endif
-     	
+
 #  Determine matches between the positions.
            echo " "
            echo "  After locating the objects it is now necessary to determine"
@@ -603,7 +607,7 @@
 #          end makemos
 
 #  Display the final mosaic.
-           if ( "$device" != "NONE" ) then 
+           if ( "$device" != "NONE" ) then
               echo " "
               echo "  Displaying the final mosaic."
               echo " "

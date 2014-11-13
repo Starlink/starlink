@@ -35,6 +35,8 @@
 *        Original version.
 *     3-JUL1998 (MBT)
 *        Now supply REAL value whatever the type of the array.
+*     2014-11-12 (TIMJ):
+*        Use PRM instead of the (obsolete) DCV routines.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -65,7 +67,8 @@
       <TYPE> TVAL                ! Value of same type as array
 
 *  Statement functions:
-      INCLUDE 'DCV_FUN'          ! Generic type conversion functions
+      INCLUDE 'NUM_DEC'
+      INCLUDE 'NUM_DEF'          ! Generic type conversion functions
 
 *.
 
@@ -73,7 +76,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get a value of the right type and right value
-      TVAL = DCV_RTO<T>( VAL )
+      TVAL = NUM_RTO<T>( VAL )
 
       DO 1 I = 1, SIZE
          ARR( I ) = TVAL

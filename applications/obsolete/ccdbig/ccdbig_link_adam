@@ -3,7 +3,8 @@ echo "\
       `fio_link_adam` \
       `chr_link_adam` \
       `prm_link_adam` \
-       -lpda " \
+      `kaplibs_link_adam -nogrf -nogks` \
+      `pda_link` " \
     | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

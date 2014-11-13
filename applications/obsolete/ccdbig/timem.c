@@ -7,9 +7,11 @@
 #include <sys/resource.h>
 #include <sys/wait.h>
 #include <time.h>
+#include <stdlib.h>
 
 #define LINELENG 100
 
+int
 main(int argc, char *argv[]) {
 
    char *iam;                /* Name of this program */
@@ -18,7 +20,7 @@ main(int argc, char *argv[]) {
    pid_t pid;                /* Child process ID     */
    char *c_cmd, **c_argv;    /* Child exec arguments */
    int ptr_stat;             /* Pointer to child process status info */
-   int status;               /* Status of returning child process */
+   int status = 0;           /* Status of returning child process */
    struct rusage usage;      /* Contains info about resource usage */
    struct timeval tvbuf;     /* Workspace of type struct timeval */
    int pagesize;             /* Number of bytes per page */
@@ -34,7 +36,7 @@ main(int argc, char *argv[]) {
    FILE *outfile;            /* Stream for output */
 
                        /* Get name (excluding path) of program */
-   if (iam = rindex(argv[0], '/'))
+   if ( (iam = rindex(argv[0], '/')) )
       iam++;
    else
       iam=argv[0];
@@ -88,7 +90,7 @@ main(int argc, char *argv[]) {
                            * then leave it.                             * 
                            * Otherwise use the root name of the command */
       if (!label) {
-          if (label = rindex(c_cmd, '/'))
+        if ( (label = rindex(c_cmd, '/')) )
              label++;
           else
              label = c_cmd;
@@ -122,7 +124,7 @@ main(int argc, char *argv[]) {
          printf ("%s terminated abnormally\n", c_cmd);
          exit (1);
       }
-      if (status = WEXITSTATUS(ptr_stat))
+      if (status == WEXITSTATUS(ptr_stat))
          printf ("WARNING: %s exited with status %d\n", c_cmd, status);
    
       if (getrusage (RUSAGE_CHILDREN, &usage)) {
@@ -144,7 +146,7 @@ main(int argc, char *argv[]) {
    
       pagesize = getpagesize();
       max_rss = (((int) usage.ru_maxrss) * pagesize) / 1024;
-      printf ("%d  %d  %d  \n", usage.ru_maxrss, pagesize, max_rss);
+      printf ("%ld  %d  %d  \n", (long)usage.ru_maxrss, pagesize, max_rss);
 
       max_size = 0;
    
@@ -180,9 +182,9 @@ main(int argc, char *argv[]) {
    }
 
                       /* Write the line to the file */
-   ret = fprintf (outfile, linebuf);
+   ret = fprintf (outfile, "%s", linebuf);
    if (ret < 0) {
-      printf ("%s: Output error\n");
+      printf ("%s: Output error\n", iam);
       exit (1);
    }
 

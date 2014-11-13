@@ -23,7 +23,7 @@
 *        The global status.
 
 *  Notes:
-*     Assumes there are no bad pixels.  Since multiplication is by a 
+*     Assumes there are no bad pixels.  Since multiplication is by a
 *     value between 0 and 1, this means that no bad pixels will result
 *     in the output either.
 
@@ -34,6 +34,8 @@
 *  History:
 *     15-JUN-1998 (MBT):
 *        Original version.
+*     2014-11-12 (TIMJ):
+*        Use PRM instead of the (obsolete) DCV routines.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -64,7 +66,8 @@
       INTEGER I, J
 
 *  Statement functions:
-      INCLUDE 'DCV_FUN'          ! Generic type conversion functions
+      INCLUDE 'NUM_DEC'
+      INCLUDE 'NUM_DEF'          ! Generic type conversion functions
 
 *.
 
@@ -74,7 +77,7 @@
       INTER  = 1.0 / REAL ( NCOLS - 1 )
       DO  J  =  1, NLINES
          DO  I  =  1, NCOLS
-            IMAGE( I, J ) = DCV_RTO<T>( DCV_<T>TOR( IMAGE( I, J ) )
+            IMAGE( I, J ) = NUM_RTO<T>( NUM_<T>TOR( IMAGE( I, J ) )
      :                      * ( 0.5 + ( INTER * REAL ( I - 1 ) ) ) )
          END DO
       END DO

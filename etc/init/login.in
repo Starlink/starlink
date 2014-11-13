@@ -240,6 +240,12 @@ if ( -e ${bindir}/catpac/catpac ) then
 endif
 
 #
+#  CCDBIG
+if ( -e ${bindir}/ccdbig/ccdbig.csh ) then
+   setenv CCDBIG_DIR ${bindir}/ccdbig
+endif
+
+#
 #  CCDPACK
 if ( -e ${bindir}/ccdpack/ccdpack.csh ) then
    setenv CCDPACK_DIR ${bindir}/ccdpack

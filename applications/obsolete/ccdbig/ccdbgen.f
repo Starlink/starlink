@@ -90,7 +90,7 @@
 *     by the DTYPE ADAM parameter.
 *
 *     -  Since it is intended to be able to generate very large test
-*     frames without failing, the code is optimised to minimise 
+*     frames without failing, the code is optimised to minimise
 *     memory use.  This leads to non-optimal CPU time usage, for instance
 *     some sequences of pseudo-random numbers are calculated two or
 *     three times rather than calculated once and stored for later use.
@@ -121,7 +121,7 @@
 *        Removed HDS calls and replaced with new NDF equivalents. This
 *        allows generation of foreign data formats.
 *     21-APR-1997 (PDRAPER):
-*        Added TYPE parameter to control the output of foreign 
+*        Added TYPE parameter to control the output of foreign
 *        data formats.
 *     13-NOV-1997 (PDRAPER):
 *        Removed calls to NDF_HCRE. History component exceeds IRAFs
@@ -141,6 +141,7 @@
       INCLUDE 'DAT_PAR'         ! HDS/DAT constants
       INCLUDE 'NDF_PAR'         ! NDF_ public constants
       INCLUDE 'CCD1_PAR'        ! CCDPACK parameters
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS            ! Global status
@@ -194,10 +195,10 @@
       LOGICAL BOK               ! Bounds ok
       LOGICAL FOPEN             ! Input file is open
       LOGICAL FLAT              ! Create flat fields
-      
+
 *  Local data. This names follow the ING/WHT convention.
 
-      DATA  BLOCK / 
+      DATA  BLOCK /
      :'NAXIS   =                    2 /',
      :'NAXIS1  =                      /',
      :'NAXIS2  =                      /',
@@ -262,13 +263,17 @@
       CALL CCD1_MALL( NOBJ, '_DOUBLE', IPY, STATUS )
       CALL CCD1_MALL( NOBJ, '_DOUBLE', IPINT, STATUS )
       CALL CCD1_MALL( NOBJ, '_DOUBLE', IPELL, STATUS )
-      CALL CCD1_LEXT( %VAL( IPDAT ), NOBJ, NVAL, 1, %VAL( IPX ),
+      CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), NOBJ, NVAL, 1,
+     :                %VAL( CNF_PVAL( IPX ) ),
      :                STATUS )
-      CALL CCD1_LEXT( %VAL( IPDAT ), NOBJ, NVAL, 2, %VAL( IPY ),
+      CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), NOBJ, NVAL, 2,
+     :                %VAL( CNF_PVAL( IPY ) ),
      :                STATUS )
-      CALL CCD1_LEXT( %VAL( IPDAT ), NOBJ, NVAL, 3, %VAL( IPINT ),
+      CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), NOBJ, NVAL, 3,
+     :                %VAL( CNF_PVAL( IPINT ) ),
      :                STATUS )
-      CALL CCD1_LEXT( %VAL( IPDAT ), NOBJ, NVAL, 4, %VAL( IPELL ),
+      CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), NOBJ, NVAL, 4,
+     :                %VAL( CNF_PVAL( IPELL ) ),
      :                STATUS )
 
 *  Size of output images.
@@ -325,7 +330,7 @@
          IAT = 10
          CALL CHR_PUTI( DIMS( 1 ), BLOCK( 2 ), IAT )
          IAT = 10
-         CALL CHR_PUTI( DIMS( 2 ), BLOCK( 3 ), IAT ) 
+         CALL CHR_PUTI( DIMS( 2 ), BLOCK( 3 ), IAT )
          IAT = 10
          CALL CHR_PUTI( ( DIMS( 1 ) - ( WID1 + WID2 ) ), BLOCK( 4 ),
      :                  IAT )
@@ -342,7 +347,7 @@
          SEEDO = INT( 1E6 * PDA_RAND( 0 ) ) * 4 + 1
          SEEDB = INT( 1E6 * PDA_RAND( 0 ) ) * 4 + 1
          SEEDF = INT( 1E6 * PDA_RAND( 0 ) ) * 4 + 1
-         
+
 *  Object frame.
 
 *    Get the frame.
@@ -358,27 +363,33 @@ C         CALL NDF_HCRE( IDO, STATUS )
      :                 STATUS )
 
 *    Create the objects.
-         CALL BIG1_OBJST( DTYPE, %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
+         CALL BIG1_OBJST( DTYPE, %VAL( CNF_PVAL( IPOBJ ) ),
+     :                    DIMS( 1 ), DIMS( 2 ),
      :                    LBND( 1, I ), LBND( 2, I ),
-     :                    %VAL( IPX ), %VAL( IPY ), %VAL( IPINT ), NOBJ,
-     :                    3.0, 0.75, 0.8, %VAL( IPELL ),
+     :                    %VAL( CNF_PVAL( IPX ) ),
+     :                    %VAL( CNF_PVAL( IPY ) ),
+     :                    %VAL( CNF_PVAL( IPINT ) ), NOBJ,
+     :                    3.0, 0.75, 0.8, %VAL( CNF_PVAL( IPELL ) ),
      :                    0.0, 500.0, 100000.0, 15.0, .FALSE., 1,
      :                    STATUS )
 
 *    Add noise to it.
          CALL PDA_RNSED( SEEDO )
-         CALL BIG1_ANOIT( DTYPE, %VAL( IPOBJ ), EL, 8.0, STATUS )
+         CALL BIG1_ANOIT( DTYPE, %VAL( CNF_PVAL( IPOBJ ) ),
+     :                    EL, 8.0, STATUS )
 
 *    Multiply data by the flatfield.
-         CALL BIG1_FLMULT( DTYPE, %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
+         CALL BIG1_FLMULT( DTYPE, %VAL( CNF_PVAL( IPOBJ ) ),
+     :                     DIMS( 1 ), DIMS( 2 ),
      :                     STATUS )
 
 *    Add bias to it.
-         CALL BIG1_ABIAT( DTYPE, %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
+         CALL BIG1_ABIAT( DTYPE, %VAL( CNF_PVAL( IPOBJ ) ),
+     :                    DIMS( 1 ), DIMS( 2 ),
      :                    WID1, WID2, SEEDB, STATUS )
 
 *    Include FITS block.
-         CALL NDF_XNEW( IDO, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
+         CALL NDF_XNEW( IDO, 'FITS', '_CHAR*80', 1, 15, LOCEXT,
      :                  STATUS )
          BLOCK(13 ) = 'OBSTYPE = ''TARGET            '''
          CALL DAT_PUT( LOCEXT, '_CHAR*80', 1, 15, BLOCK, STATUS )
@@ -403,14 +414,16 @@ C            CALL NDF_HCRE( IDB, STATUS )
      :                    STATUS )
 
 *    Clear data.
-            CALL BIG1_STVT( DTYPE, 0.0, EL, %VAL( IPBIA ), STATUS )
+            CALL BIG1_STVT( DTYPE, 0.0, EL, %VAL( CNF_PVAL( IPBIA ) ),
+     :                      STATUS )
 
 *    Add bias to it.
-            CALL BIG1_ABIAT( DTYPE, %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
+            CALL BIG1_ABIAT( DTYPE, %VAL( CNF_PVAL( IPOBJ ) ),
+     :                       DIMS( 1 ), DIMS( 2 ),
      :                       WID1, WID2, SEEDB, STATUS )
 
 *    Include FITS block.
-            CALL NDF_XNEW( IDB, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
+            CALL NDF_XNEW( IDB, 'FITS', '_CHAR*80', 1, 15, LOCEXT,
      :                     STATUS )
             BLOCK( 13 ) = 'OBSTYPE = ''BIAS'''
             CALL DAT_PUT( LOCEXT, '_CHAR*80', 1, 15, BLOCK, STATUS )
@@ -423,7 +436,7 @@ C            CALL NDF_HCRE( IDB, STATUS )
 
 *  Flat field frame (if required).
          IF ( FLAT ) THEN
-            
+
 *    Get the frame.
             CALL CHR_ITOC( I, COUNT, NCHAR )
             FNAME = 'ff'//COUNT( :NCHAR )//TYPE
@@ -437,22 +450,26 @@ C            CALL NDF_HCRE( IDF, STATUS )
      :                    STATUS )
 
 *    Assign a constant value to all elments.
-            CALL BIG1_STVT( DTYPE, 1000.0, EL, %VAL( IPFF ), STATUS )
+            CALL BIG1_STVT( DTYPE, 1000.0, EL, %VAL( CNF_PVAL( IPFF ) ),
+     :                      STATUS )
 
 *    Multiply by flatfield.
-            CALL BIG1_FLMULT( DTYPE, %VAL( IPOBJ ), DIMS( 1 ), 
+            CALL BIG1_FLMULT( DTYPE, %VAL( CNF_PVAL( IPOBJ ) ),
+     :                        DIMS( 1 ),
      :                        DIMS( 2 ), STATUS )
 
 *    Add noise.
             CALL PDA_RNSED( SEEDF )
-            CALL BIG1_ANOIT( DTYPE, %VAL( IPOBJ ), EL, 1.0, STATUS )
+            CALL BIG1_ANOIT( DTYPE, %VAL( CNF_PVAL( IPOBJ ) ),
+     :                       EL, 1.0, STATUS )
 
 *    Add bias to it.
-            CALL BIG1_ABIAT( DTYPE, %VAL( IPOBJ ), DIMS( 1 ), 
+            CALL BIG1_ABIAT( DTYPE, %VAL( CNF_PVAL( IPOBJ ) ),
+     :                       DIMS( 1 ),
      :                       DIMS( 2 ), WID1, WID2, SEEDB, STATUS )
 
 *    Include FITS block.
-            CALL NDF_XNEW( IDF, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
+            CALL NDF_XNEW( IDF, 'FITS', '_CHAR*80', 1, 15, LOCEXT,
      :                     STATUS )
             BLOCK(13 ) = 'OBSTYPE = ''FLAT              '''
             CALL DAT_PUT( LOCEXT, '_CHAR*80', 1, 15, BLOCK, STATUS )

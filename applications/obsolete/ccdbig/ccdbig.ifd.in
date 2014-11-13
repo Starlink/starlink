@@ -1,0 +1,147 @@
+package @PACKAGE@ {
+#+
+#  Name:
+#     CCDBGEN.IFD
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     TIMJ: Tim Jenness (Cornell)
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     2-JUL-1992 (PDRAPER):
+#     	 Original version.
+#     2014-11-12 (TIMJ):
+#        Convert to IFD format. Add commands.
+#     {enter_changes_here}
+
+#-
+
+    version @PACKAGE_VERSION@
+    prefix @PACKAGE@
+
+    executable ccdbgen {
+        action ccdbgen {
+
+            parameter file {
+                # Name of input list
+                position 1
+                type LITERAL
+                access READ
+                vpath PROMPT CURRENT
+                ppath CURRENT
+                prompt {List containing object positions etc.}
+                helpkey *
+            }
+
+            parameter nseq {
+                # Number of test sequences to create
+                position 2
+                type _INTEGER
+                vpath PROMPT CURRENT {DEFAULT }
+                ppath CURRENT DEFAULT
+                default 5
+                range 1 26
+                prompt {How many data sequences do you want}
+                helpkey *
+            }
+
+            parameter ubnds {
+                type _INTEGER
+                vpath PROMPT CURRENT
+                ppath CURRENT
+                prompt {Upper bounds}
+                helpkey *
+            }
+
+            parameter type {
+                type _CHAR
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default .sdf
+                prompt {Output data type}
+                helpkey *
+            }
+
+            parameter lbnds {
+                type _INTEGER
+                vpath PROMPT CURRENT
+                ppath CURRENT
+                prompt {Lower bounds}
+                helpkey *
+            }
+
+            parameter logto {
+                # Logging system interaction level
+                type LITERAL
+                access UPDATE
+                vpath GLOBAL CURRENT DEFAULT
+                ppath GLOBAL CURRENT DEFAULT
+                association <-global.ccdpack_logto
+                prompt {Write log to (Logfile,Terminal,Neither,Both)}
+                default Both
+                helpkey *
+            }
+
+            parameter logfile {
+                # The log file
+                type LITERAL
+                access READ
+                vpath GLOBAL CURRENT DEFAULT
+                ppath GLOBAL CURRENT DEFAULT
+                association <-global.ccdpack_logfile
+                prompt {Logfile name}
+                default CCDPACK.LOG
+                helpkey *
+            }
+
+            parameter flat {
+                # Do we generate flat fields?
+                type _LOGICAL
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Generate flatfields}
+                default TRUE
+                helpkey *
+            }
+
+            parameter bias {
+                # Do we generate bias frames?
+                type _LOGICAL
+                access READ
+                vpath PROMPT CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Generate bias frames}
+                default TRUE
+                helpkey *
+            }
+
+            parameter dtype {
+                type _CHAR
+                access READ
+                vpath PROMPT CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Data type for NDFs}
+                in _WORD _INTEGER _REAL _DOUBLE
+                default _REAL
+                helpkey *
+            }
+        }
+    }
+    command ccdbig {
+        obey {$CCDBIG_DIR/ccdbig}
+    }
+
+    display {
+        @PACKAGE@ commands are now available -- (Version @PACKAGE_VERSION@)
+
+        You would normally want to copy the $CCDBIG_DIR/ccdbig script and edit
+        it to suit your environment. See SSN/69.
+
+        Type "showme ssn69" to view documentation.
+    }
+}
