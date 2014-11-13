@@ -26,8 +26,11 @@
 *        The global status.
 
 *  Notes:
-*     This routine returns without action leaving the destination NDF
-*     unchanged if no History component exists in the destination NDF.
+*     - This routine returns without action leaving the destination NDF
+*     unchanged if no History component exists in the input NDF.
+*     - If the input NDF contains a History component, then a History
+*     component is added to the destination NDF automatically, if one
+*     does not already exist.
 
 *  Copyright:
 *     Copyright (C) 2014 Science & Technology Facilities Council.
@@ -106,19 +109,19 @@
       IDCB1 = ACB_IDCB( IACB1 )
       IDCB2 = ACB_IDCB( IACB2 )
 
-*  Ensure history structure information is available for the destination
+*  Ensure history structure information is available for the input
 *  NDF.
-      CALL NDF1_DH( IDCB2, STATUS )
+      CALL NDF1_DH( IDCB1, STATUS )
 
 *  Use the component locator to determine the state of the History
-*  component in the destination NDF. Onlt proceed if it is defined.
+*  component in the input NDF. Only proceed if it is defined.
       IF ( STATUS .EQ. SAI__OK ) THEN
-         IF( DCB_HLOC( IDCB2 ) .NE. DAT__NOLOC ) THEN
+         IF( DCB_HLOC( IDCB1 ) .NE. DAT__NOLOC ) THEN
 
-*  Reset the existing History component in the destination NDF.
+*  Reset any pre-existing History component in the destination NDF.
             CALL NDF1_RST( IACB2, 'HISTORY', STATUS )
 
-*  Copy History component from input to output.
+*  Copy the History component from input to output.
             CALL NDF1_HPRP( IDCB1, .TRUE., IDCB2, STATUS )
          END IF
       END IF

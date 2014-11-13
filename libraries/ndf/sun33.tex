@@ -14071,8 +14071,17 @@ locator}{sun92}{using_locators}}
       }
    }
    \sstnotes{
-      This routine returns without action leaving the destination NDF
-      unchanged if no History component exists in the destination NDF.
+      \sstitemlist{
+
+         \sstitem
+         This routine returns without action leaving the destination NDF
+         unchanged if no History component exists in the input NDF.
+
+         \sstitem
+         If the input NDF contains a History component, then a History
+         component is added to the destination NDF automatically, if one
+         does not already exist.
+      }
    }
 }
 \sstroutine{
