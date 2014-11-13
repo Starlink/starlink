@@ -13,7 +13,7 @@ dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
 AC_CONFIG_SRCDIR([ccdbgen.f])
 
-STAR_DEFAULTS
+STAR_DEFAULTS(per-package-dirs)
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
@@ -22,17 +22,18 @@ STAR_MONOLITHS
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-STAR_CHECK_PROGS([fgeneric])
+STAR_CHECK_PROGS([fgeneric ifd2star])
 
 dnl    Build dependencies for this package.
-dnl    Includes: fio, par, sae; 
-dnl    links to: chr, mers, fio, psx, task.
-STAR_DECLARE_DEPENDENCIES([build], [fio generic chr prm par sae hds img], [link])
+dnl    Includes: fio, par, sae;
+dnl    links to: chr, mers, fio, psx, task, kaplibs, pda.
+dnl    also links against a private ccdpack library
+STAR_DECLARE_DEPENDENCIES([build], [fio generic chr ifd prm par sae hds img kaplibs pda ccdpack], [link])
 STAR_DECLARE_DEPENDENCIES([use], [ccdpack kappa])
 dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(ssn69)
 
-AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES([Makefile component.xml ccdbig.ifd])
 
 AC_OUTPUT
