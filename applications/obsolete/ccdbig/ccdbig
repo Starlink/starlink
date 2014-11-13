@@ -156,7 +156,6 @@
 
 #  Set up graphics device if necessary
       if ( "$device" != "NONE" ) then
-         idset $device \\
          gdset $device \\
          gdclear \\
          paldef \\
