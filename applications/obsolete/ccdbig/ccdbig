@@ -139,9 +139,14 @@
 #  Check CCDBIG_DIR is in path
       set path = ( $path $CCDBIG_DIR )
 
+#  Derive the data directory from the environment variable
+        if ( ! $?CCDBIG_DATA_DIR ) then
+            setenv CCDBIG_DATA_DIR ${CCDBIG_DIR}/../../share/ccdbig
+        endif
+
 #  Copy required files from source directory.
-      if ( -e $CCDBIG_DIR/ccdbig_obj.dat )  cp $CCDBIG_DIR/ccdbig_obj.dat .
-      if ( -e $CCDBIG_DIR/ccdtest.ard )     cp $CCDBIG_DIR/ccdtest.ard .
+      if ( -e $CCDBIG_DATA_DIR/ccdbig_obj.dat )  cp $CCDBIG_DATA_DIR/ccdbig_obj.dat .
+      if ( -e $CCDBIG_DATA_DIR/ccdtest.ard )     cp $CCDBIG_DATA_DIR/ccdtest.ard .
       if ( -e $CCDBIG_DIR/reslog )          cp $CCDBIG_DIR/reslog .
       if ( ! -x ./reslog )                  chmod +x reslog
       if ( ! -e ccdbig_obj.dat ) then
