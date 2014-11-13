@@ -137,7 +137,7 @@ package @PACKAGE@ {
     }
 
     display {
-        @PACKAGE_UPCASE@ commands are now available -- (Version @PACKAGE_VERSION@)
+        @PACKAGE@ commands are now available -- (Version @PACKAGE_VERSION@)
 
         You would normally want to copy the $CCDBIG_DIR/ccdbig script and edit
         it to suit your environment. See SSN/69.
