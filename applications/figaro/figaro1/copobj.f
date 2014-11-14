@@ -134,6 +134,7 @@
 *     KS: Keith Shortridge (AAO)
 *     HME: Horst Meyerdierks (UoE, Starlink)
 *     JFL: John Lightfoot (ROE)
+*     TIMJ: Tim Jenness (Cornell)
 *     {enter_new_authors_here}
 
 *  History:
@@ -166,6 +167,12 @@
 *        Report errors immediately.
 *     06-APR-1993 (HME):
 *        Split away from LET.
+*     14-NOV-2014 (TIMJ):
+*        HDSv5 can not open a file for READ and then for UPDATE
+*        so the logic is reopened to allow the source to be tested,
+*        then closed, then reopened later on. The reason for DAT_REF/HDS_FIND
+*        is because DAT_ASSOC retains an internal primary locator that will
+*        not free the file.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -195,6 +202,7 @@
       INTEGER STYPE, DTYPE       ! Type of source/destin.
       INTEGER TNDIM              ! Temporary array dimensionality
       INTEGER TDIMS( DAT__MXDIM ) ! Temporary array dimensions
+      INTEGER LPATH              ! Length of SPATH
       CHARACTER * ( 64 ) MESSAG  ! Error message
       CHARACTER * ( DAT__SZLOC ) LOC( 3 ) ! HDS locators
       CHARACTER * ( DAT__SZNAM ) OBJECT ! HDS component name
@@ -204,6 +212,7 @@
       CHARACTER * ( 132 ) FILE   ! HDS file names
       CHARACTER * ( 132 ) SNAME  ! Source HDS hierarchy path
       CHARACTER * ( 132 ) DNAME  ! Destin. HDS hierarchy path
+      CHARACTER * ( 256 ) SPATH  ! Full reference to source object (FILE+hierarchy)
 
 *  Internal References:
       INTEGER CHR_LEN            ! Used length of string
@@ -217,6 +226,11 @@
 
 *  Locate source by association with an ADAM parameter.
 *  Also get the source object name via HDS_TRACE.
+*  We use the parameter system to find the name but then
+*  we close it and re-open the file later on.
+*  This is because some HDS implementations do not like
+*  a file to be opened for READ and then later opened for UPDATE
+*  whilst still being opened for READ.
       CALL DAT_ASSOC( 'SOURCE', 'READ', LOC(1), STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
          MESSAG = 'Source object not found.'
@@ -225,6 +239,10 @@
       END IF
       SFOUND = .TRUE.
       CALL HDS_TRACE( LOC(1), I, SNAME, FILE, STATUS )
+      CALL DAT_REF( LOC(1), SPATH, LPATH, STATUS )
+      CALL DAT_ANNUL( LOC(1), STATUS )
+      LOC(1) = DAT__NOLOC
+      CALL DAT_CANCL('SOURCE', STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 500
 
 *  Locate destination by association with an ADAM parameter. This may
@@ -289,6 +307,9 @@
 *  Reset the types of source and destination.
       STYPE  = 0
       DTYPE  = 0
+
+*Now open the source file properly
+      CALL HDS_FIND( DAT__ROOT, SPATH, 'READ', LOC(1), STATUS )
 
 *  We can deduce whether the objects are cells or not.
 *  (The destination can be a cell only if it existed. And in that
