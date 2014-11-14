@@ -74,7 +74,10 @@ C     18th Jul 1996  MJCL / Starlink, UCL.  Set variables for storage
 C                    of file names to 132 chars.
 C     2005 June 15   MJC / Starlink  Use CNF_PVAL for pointers to
 C                    mapped data.
-C+
+C     2014 Nobember 14 TIMJ / Cornell Code thought it was using
+C                   DSA_GET_WORK_ARRAY but was actually using
+C                   DSA_GET_WORKSPACE.
+C     +
       IMPLICIT NONE
 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
@@ -325,10 +328,10 @@ C
 C     Get workspace needed.
 C
       NPLUS1=NORDER+1
-      CALL DSA_GET_WORKSPACE(NPTS,'DOUBLE',IPX,SLOT,STATUS)
-      CALL DSA_GET_WORKSPACE(2*NPLUS1,'DOUBLE',IPDP,SLOT,STATUS)
-      CALL DSA_GET_WORKSPACE(ID1(1),'FLOAT',IPYR,SLOT,STATUS)
-      CALL DSA_GET_WORKSPACE(NPTS,'FLOAT',IPYL,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NPTS,'DOUBLE',IPX,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(2*NPLUS1,'DOUBLE',IPDP,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(ID1(1),'FLOAT',IPYR,SLOT,STATUS)
+      CALL DSA_GET_WORK_ARRAY(NPTS,'FLOAT',IPYL,SLOT,STATUS)
       IF(STATUS.NE.0) GOTO 500
 C
 C     Do the actual extraction
