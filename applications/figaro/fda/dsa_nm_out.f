@@ -198,7 +198,8 @@
 *  Open a new temporary NDF instead of the permanent one.
 *  Store intended name in common block.
       IF ( NEW .EQ. 0 .AND.
-     :   ( STATUS .EQ. DAT__FILIN .OR. STATUS .EQ. NDF__FILIN ) ) THEN
+     :   ( STATUS .EQ. DAT__FILIN .OR. STATUS .EQ. DAT__FILCR .OR.
+     :     STATUS .EQ. NDF__FILIN ) ) THEN
          CALL ERR_ANNUL( STATUS )
          CALL NDF_TEMP( DSA__REFPLC(SLOT), STATUS )
          IF ( STATUS .EQ. SAI__OK ) DSA__REFNDF(SLOT) = NDFNAM
