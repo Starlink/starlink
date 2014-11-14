@@ -2968,10 +2968,12 @@ hdsOpen(const char *file_str, const char *mode_str, HDSLoc **locator, int *statu
   int instat = *status;
   EnterCheck("hdsOpen",*status);
   if (*status != SAI__OK) return *status;
-  hdsOpen_v5(file_str, mode_str, locator, status);
-  if (*status != SAI__OK) {
+  /* HDSv4 can reliably spot when a file is not v4
+     format so for now we open in v4 and catch that specific error */
+  hdsOpen_v4(file_str, mode_str, locator, status);
+  if (*status == DAT__INCHK || *status == DAT__FILIN) {
     emsAnnul(status);
-    hdsOpen_v4(file_str, mode_str, locator, status);
+    hdsOpen_v5(file_str, mode_str, locator, status);
   }
   HDS_CHECK_STATUS( "hdsOpen", file_str);
   return *status;
@@ -2983,10 +2985,14 @@ hdsOpen(const char *file_str, const char *mode_str, HDSLoc **locator, int *statu
 
 int
 hdsShow(const char *topic_str, int *status) {
-  /* Requires special code */
-  printf("Aborting. Special code required in: %s\n", "hdsShow(topic_str, status);");
-  abort();
-  return *status;
+  int retval = 0;
+  int instat = *status;
+  EnterCheck("hdsShow",*status);
+  if (*status != SAI__OK) return *status;
+  retval = hdsShow_v5(topic_str, status);
+  retval = hdsShow_v4(topic_str, status);
+  HDS_CHECK_STATUS("hdsShow", "(both)");
+  return retval;
 }
 
 /*===============================================*/

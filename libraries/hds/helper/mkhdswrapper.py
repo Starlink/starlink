@@ -221,10 +221,12 @@ def func_hdsOpen(line):
     print("""  int instat = *status;
   EnterCheck(\"hdsOpen\",*status);
   if (*status != SAI__OK) return *status;
-  hdsOpen_v5(file_str, mode_str, locator, status);
-  if (*status != SAI__OK) {
+  /* HDSv4 can reliably spot when a file is not v4
+     format so for now we open in v4 and catch that specific error */
+  hdsOpen_v4(file_str, mode_str, locator, status);
+  if (*status == DAT__INCHK || *status == DAT__FILIN) {
     emsAnnul(status);
-    hdsOpen_v4(file_str, mode_str, locator, status);
+    hdsOpen_v5(file_str, mode_str, locator, status);
   }
   HDS_CHECK_STATUS( "hdsOpen", file_str);
   return *status;""")
@@ -307,7 +309,7 @@ special = dict({
     "hdsGtune": "hdsGtune",
     "hdsNew":  "v5",
     "hdsOpen": "hdsOpen",
-    "hdsShow": "special",
+    "hdsShow": "both",
     "hdsState": "both",
     "hdsStop": "both",
     "hdsTune": "both",
