@@ -323,7 +323,7 @@ hdsShow(const char *topic_str,
                _chcopy(DAT__SZGRP, data->group, 0,
                        STR_K_LENGTH-8-len,
                        ( (char *) path.body ) + len + 8 );
-               printf("%s\n",path.body);
+               printf("%s [%s]\n",path.body, (lcp->primary ? "primary" : "secondary"));
             }
             lcp               = lcp->flink;
          }
