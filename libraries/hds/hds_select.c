@@ -2893,14 +2893,26 @@ hdsInfoI(const HDSLoc* locator, const char *topic_str, const char *extra, int *r
 
   int retval = 0;
   int instat = *status;
-  int isv5 = ISHDSv5(locator);
+  *result = 0;
+  const char * used = "(both)";
   EnterCheck("hdsInfoI",*status);
-  if (isv5) {
+  if (*status != SAI__OK) return *status;
+  /* Call both versions and sum the result if we have a NULL locator */
+  if (!locator) {
+    int res_v4 = 0;
+    int res_v5 = 0;
+    hdsInfoI_v4(locator, topic_str, extra, &res_v4, status);
+    hdsInfoI_v5(locator, topic_str, extra, &res_v5, status);
+    retval = *status;
+    *result = res_v4 + res_v5;
+  } else if (ISHDSv5(locator)) {
     retval = hdsInfoI_v5(locator, topic_str, extra, result, status);
+    used = "(v5)";
   } else {
+    used = "(v4)";
     retval = hdsInfoI_v4(locator, topic_str, extra, result, status);
   }
-  HDS_CHECK_STATUS("hdsInfoI",(isv5 ? "(v5)" : "(v4)"));
+  HDS_CHECK_STATUS("hdsInfoI", used);
   return retval;
 }
 

@@ -30,6 +30,7 @@ Routines that don't take a locator at all:
    hdsShow  - call one or both depending on whether we have used any v5 or v4 locators.
    hdsState - call both (error if different)
    hdsStop - call both
+   hdsInfoI - calls both and adds the result
    hdsTune  - call both routines
 
 Routines that open a file:
@@ -244,6 +245,32 @@ def func_hdsGtune(line):
   HDS_CHECK_STATUS("hdsGtune", "(both)");
   return *status;""")
 
+def func_hdsInfoI(line):
+    print("""
+  int retval = 0;
+  int instat = *status;
+  *result = 0;
+  const char * used = "(both)";
+  EnterCheck("hdsInfoI",*status);
+  if (*status != SAI__OK) return *status;
+  /* Call both versions and sum the result if we have a NULL locator */
+  if (!locator) {
+    int res_v4 = 0;
+    int res_v5 = 0;
+    hdsInfoI_v4(locator, topic_str, extra, &res_v4, status);
+    hdsInfoI_v5(locator, topic_str, extra, &res_v5, status);
+    retval = *status;
+    *result = res_v4 + res_v5;
+  } else if (ISHDSv5(locator)) {
+    retval = hdsInfoI_v5(locator, topic_str, extra, result, status);
+    used = "(v5)";
+  } else {
+    used = "(v4)";
+    retval = hdsInfoI_v4(locator, topic_str, extra, result, status);
+  }
+  HDS_CHECK_STATUS("hdsInfoI", used);
+  return retval;""")
+
 def func_hdsFlush(line):
     print("""  /* We are only allowed to flush a group that actually exists */
   int instat = *status;
@@ -307,6 +334,7 @@ special = dict({
     "hdsEwild": "special",
     "hdsFlush": "hdsFlush",
     "hdsGtune": "hdsGtune",
+    "hdsInfoI": "hdsInfoI",
     "hdsNew":  "v5",
     "hdsOpen": "hdsOpen",
     "hdsShow": "both",
@@ -365,6 +393,8 @@ for line in open("hds.h"):
                 func_hdsFlush(line)
             elif mode == "hdsCopy":
                 func_hdsCopy(line)
+            elif mode == "hdsInfoI":
+                func_hdsInfoI(line)
             elif mode == "copy":
                 func_copy(hds_function,line)
             else:
