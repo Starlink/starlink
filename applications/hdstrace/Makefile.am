@@ -18,7 +18,7 @@ starhelp_DATA = $(HELP_SOURCES:.hlp=.shl)
 
 
 # no variable hdstrace_TASKS -- hdstrace is an ATASK
-hdstrace_LDADD = $(LDADD) tra/libtra.la `prm_link_adam` `hds_link_adam` `fio_link_adam` `par_link_adam`
+hdstrace_LDADD = $(LDADD) tra/libtra.la `prm_link_adam` `hds_link_adam` `fio_link_adam` `par_link_adam` `one_link`
 
 TESTS = hdtest
 dist_check_SCRIPTS = hdtest

@@ -9,6 +9,7 @@
 
 #  Copyright:
 #     Copyright (C) 1991-1993 Science & Engineering Research Council.
+#     Copyright (C) 2014 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -38,6 +39,8 @@
 #         Removed the default for OBJECT to be portable.
 #     1993 November 4 (MJC):
 #         Renamed HDSTRACE from TRACE for use on UNIX systems.
+#     2014 November 15 (MJC):
+#         Add WIDTH.
 #     {enter_further_changes_here}
 
 #-
@@ -89,13 +92,24 @@ interface HDSTRACE
    endparameter
 
    parameter      WIDEPAGE       # 80- or 132-character output
-      position    9
+      position    10
       type        '_LOGICAL'
       access      'READ'
       vpath       'DEFAULT'
       default     NO
       ppath       'CURRENT,DEFAULT'
       prompt      'Do you want a wide page?'
+      helpkey     *
+   endparameter
+
+   parameter      WIDTH         # Width of output
+      position    9
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'DYNAMIC,DEFAULT'
+      default     80
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Width of the output in characters'
       helpkey     *
    endparameter
 

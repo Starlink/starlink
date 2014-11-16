@@ -64,19 +64,19 @@
 *     additional parameters: a) the indentation of the type string with
 *     respect to the beginning of the name string; b) indentation of the
 *     value(s) (if not on a new line) with respect to the beginning of
-*     the type string; and c) the width of the output, 80 or 132.  If
-*     the name and dimensions do not fit within the space given by
-*     parameters a) and b), the alignment will be lost because at least
-*     two spaces will separate the name from the type, or the type from
-*     the value(s).  The fourth parameter defines how character arrays
-*     are arranged.  The default is that character-array elements are
+*     the type string; and c) the width of the output.  If the name
+*     and dimensions do not fit within the space given by parameters
+*     a) and b), the alignment will be lost because at least two spaces
+*     will separate the name from the type, or the type from the
+*     value(s).  The fourth parameter defines how character arrays are
+*     arranged.  The default is that character-array elements are
 *     concatenated to fill the available space delimited by commas.  The
 *     alternative is to write the value of each element on a new line.
 *     This improves readability for long strings.
 
 *  Usage:
-*     HDSTRACE OBJECT [FULL] [NLINES] [TYPIND] [VALIND] [LOGFILE]
-*        [EACHLINE] [NEWLINE] [WIDEPAGE]
+*     hdstrace object [full] [nlines] [typind] [valind] [logfile]
+*        [eachline] [newline] [width] [widepage]
 
 *  ADAM Parameters:
 *     EACHLINE = _LOGICAL (Read)
@@ -128,7 +128,10 @@
 *     WIDEPAGE = _LOGICAL (Read)
 *        If true a 132-character-wide format is used to report the
 *        examination.  Otherwise the format is 80 characters wide.
-*        [FALSE]
+*        It is only accessed if WIDTH is null.  [FALSE]
+*     WIDTH = _INTEGER (Read)
+*        Maximum width of the the output in characters.  The default is
+*        the screen width of a terminal and 80 for a file.  []
 
 *  Notes:
 *     This application allows far more flexibility in layout than
@@ -162,7 +165,9 @@
 
 *  Copyright:
 *     Copyright (C) 1989, 1991-1993 Science & Engineering Research
-*     Council. All Rights Reserved.
+*     Council.
+*     Copyright (C) 2014 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -208,6 +213,12 @@
 *     1993 November 4 (MJC):
 *        Renamed to HDSTRACE from TRACE to avoid a name clash on UNIX
 *        systems.
+*     2014 November 15 (MJC):
+*        Added WIDTH parameter to allow more control over the width,
+*        which defaults to the terminal width.  Adjust the
+*        message-system output size to match.  Only access WIDEPAGE if
+*        WIDTH is undefined.  WIDEPAGE is retained only for backwards
+*        compatibility.
 *     {enter_further_changes_here}
 
 *-
@@ -230,9 +241,11 @@
 *  Local Constants:
       INTEGER
      :  LNSIZE,                ! Length of message buffer
+     :  MAXWID,                ! Maximum width of output in characters
      :  STEP,                  ! Indentation step size
      :  WDSIZE                 ! Length of wide message buffer
       PARAMETER ( LNSIZE = 78 )
+      PARAMETER ( MAXWID = 512 )
       PARAMETER ( STEP = 3 )
       PARAMETER ( WDSIZE = 130 )
 
@@ -243,7 +256,7 @@
      :  TYPE                   ! Type of the object
       CHARACTER * ( DAT__SZNAM )
      :  NAME                   ! Name of the object
-      CHARACTER * ( LNSIZE )
+      CHARACTER * ( MAXWID )
      :  DUMMY,                 ! Buffer for output of labels to logfile
      :  LINE                   ! Message buffer
 
@@ -251,9 +264,6 @@
      :  FILSPC,                ! File specification (not used)
      :  NLC,                   ! Number of lines (character form)
      :  OBJNAM                 ! Data object's name
-
-      CHARACTER * ( WDSIZE )
-     :  WDLINE                 ! Wide message buffer
 
       LOGICAL                  ! True if:
      :  FULL,                  ! Full trace of arrays of structures
@@ -277,6 +287,9 @@
      :  NLEV,                  ! Number of path levels (not used)
      :  NLINES,                ! Number of lines to be used for values
      :  SIZE,                  ! Size of object if vectorised
+     :  THEIGH,                ! Height of the terminal in characters
+     :  TWIDTH,                ! Width of the terminal in characters
+     :  WIDTH,                 ! Width of the output in characters
      :  DIMS( DAT__MXDIM )     ! Dimensions of the object
 
 *.
@@ -322,9 +335,33 @@
          CALL CHR_CTOI( NLC, NLINES, STATUS )
       END IF
 
+*    Get the screen width if there is a terminal.  80 is returned
+*    otherwise.
+
+      CALL ONE_SCRSZ( TWIDTH, THEIGH, STATUS )
+
+*    Obtain the desired width, defaulting to the terminal width.  A null
+*    return asks that the old WIDEPAGE parameter be used.
+
+      CALL ERR_MARK
+      CALL PAR_GDR0I( 'WIDTH', TWIDTH, MIN( TWIDTH, 60 ), MAXWID,
+     :                 .FALSE., WIDTH, STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL ( STATUS )
+
 *    Get the switch for wide page.
 
-      CALL PAR_GTD0L( 'WIDEPAGE', .FALSE., .TRUE., WIDEPG, STATUS )
+         CALL PAR_GTD0L( 'WIDEPAGE', .FALSE., .TRUE., WIDEPG, STATUS )
+         IF ( WIDEPG ) THEN
+            WIDTH = WDSIZE + 2
+         ELSE
+            WIDTH = LNSIZE + 2
+         END IF
+      END IF
+      CALL ERR_RLSE
+
+*    Tell the message system the desired width.
+      CALL MSG_TUNE( 'SZOUT', WIDTH + 2, STATUS )
 
 *    Get the indentation columns for the type and value.
 
@@ -351,23 +388,14 @@
 *    listing.  Handle the null case transparently.
 
       CALL ERR_MARK
-      IF ( WIDEPG ) THEN
 
-*       Open the output log file with a wide page.
+*    Open the output log file of the desired width of page.
 
-         CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', WDSIZE+2,
-     :                   FD, STATUS )
-         LOGEXM = STATUS .EQ. SAI__OK
-      ELSE
-
-*       Open the output log file with a normal-width page.
-
-         CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', LNSIZE+2,
-     :                   FD, STATUS )
-         LOGEXM = STATUS .EQ. SAI__OK
-      END IF
+      CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', WIDTH, FD, STATUS )
+      LOGEXM = STATUS .EQ. SAI__OK
 
 *    Annul a null status.
+
       IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
 
 *    Release the new error context.
@@ -428,105 +456,51 @@
 
 *    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-*    For the wide page...
+*    Deal with the object depending on whether it is PRIMITIVE,
+*    a STRUCTURE or an ARRAY of STRUCTURES.
 
-      IF ( WIDEPG ) THEN
+      IF ( PRIM ) THEN
 
-*       Deal with the object depending on whether it is PRIMITIVE,
-*       a STRUCTURE or an ARRAY of STRUCTURES
+*       Write out the information and values associated with the
+*       primitive object.
 
-         IF ( PRIM ) THEN
+         CALL TRA_PRIMI( OBJLOC, NAME, TYPE, SIZE, NDIM, DIMS,
+     :                   INDENT, CMNVAL, NEWLIN, NLINES, ONEPLN,
+     :                   LOGEXM, FD, LINE( :WIDTH ), STATUS )
 
-*          Write out the information and values associated with the
-*          primitive object.
+*       Insert a blank line to match the output from the Hierarchical
+*       trace.
 
-            CALL TRA_PRIMI( OBJLOC, NAME, TYPE, SIZE, NDIM, DIMS,
-     :                      INDENT, CMNVAL, NEWLIN, NLINES, ONEPLN,
-     :                      LOGEXM, FD, WDLINE, STATUS )
-
-*          Insert a blank line to match the output from the Hierarchical
-*          trace.
-
-            CALL MSG_BLANK( STATUS )
-            IF ( LOGEXM ) CALL FIO_WRITE( FD, ' ', STATUS )
-
-         ELSE
-
-*          Check for a scalar-structure object.
-
-            IF ( NDIM .GT. 0 ) THEN
-
-*             We must have an array of structures; output its name and
-*             dimensions.
-*
-               CALL TRA1_ARSTR( NAME, NDIM, DIMS, INDENT, LOGEXM, FD,
-     :                          WDLINE, STATUS )
-
-*             Increment the indentation by one step so that in the
-*             output the "Contents of..." message is aligned with the
-*             structure's name, and therefore the names of the objects
-*             within the arrays of structures are indented with respect
-*             to the structure's name.
-
-               INDENT = INDENT + STEP
-            END IF
-
-*          Examine the scalar structure using the recursive routine.
-
-            CALL TRA1_THIER( OBJLOC, INDENT, FULL, STEP, CMNTYP,
-     :                       CMNVAL, NEWLIN, NLINES, ONEPLN, LOGEXM,
-     :                       FD, WDLINE, STATUS )
-         END IF
-
-*    Now for the normal-width buffer.
+         CALL MSG_BLANK( STATUS )
+         IF ( LOGEXM ) CALL FIO_WRITE( FD, ' ', STATUS )
 
       ELSE
 
-*       Deal with the object depending on whether it is PRIMITIVE,
-*       a STRUCTURE or an ARRAY of STRUCTURES.
+*      Check for a scalar-structure object.
 
-         IF ( PRIM ) THEN
+         IF ( NDIM .GT. 0 ) THEN
 
-*          Write the information and values associated with the
-*          primitive object.
+*         We must have an array of structures; output its name and
+*         dimensions.
+*
+            CALL TRA1_ARSTR( NAME, NDIM, DIMS, INDENT, LOGEXM, FD,
+     :                       LINE( :WIDTH ), STATUS )
 
-            CALL TRA_PRIMI( OBJLOC, NAME, TYPE, SIZE, NDIM, DIMS,
-     :                      INDENT, CMNVAL, NEWLIN, NLINES, ONEPLN,
-     :                      LOGEXM, FD, LINE, STATUS )
+*         Increment the indentation by one step so that in the output
+*         the "Contents of..." message is aligned with the structure's
+*         name, and therefore the names of the objects within the arrays
+*         of structures are indented with respect to the structure's
+*         name.
 
-*          Insert a blank line to match the output from the hieraRchical
-*          trace.
-
-            CALL MSG_BLANK( STATUS )
-            IF ( LOGEXM ) CALL FIO_WRITE( FD, ' ', STATUS )
-
-         ELSE
-
-*          Check for a scalar-structure object.
-
-            IF ( NDIM .GT. 0 ) THEN
-
-*             We must have an array of structures; output its name and
-*             dimensions.
-
-               CALL TRA1_ARSTR( NAME, NDIM, DIMS, INDENT, LOGEXM, FD,
-     :                          LINE, STATUS )
-
-*             Increment the indentation by one step so that in the
-*             output the "Contents of..." message is aligned with the
-*             structure's name, and therefore the names of the objects
-*             within the arrays of structures are indented with respect
-*             to the structure's name.
-
-               INDENT = INDENT + STEP
-            END IF
-
-*          Examine the scalar structure using the recursive routine.
-
-            CALL TRA1_THIER( OBJLOC, INDENT, FULL, STEP, CMNTYP,
-     :                       CMNVAL, NEWLIN, NLINES, ONEPLN, LOGEXM,
-     :                       FD, LINE, STATUS )
+            INDENT = INDENT + STEP
          END IF
+
+*       Examine the scalar structure using the recursive routine.
+
+         CALL TRA1_THIER( OBJLOC, INDENT, FULL, STEP, CMNTYP,
+     :                    CMNVAL, NEWLIN, NLINES, ONEPLN, LOGEXM,
+     :                    FD, LINE( : WIDTH ), STATUS )
+
       END IF
 
 *    Write the termination message.

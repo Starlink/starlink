@@ -4,11 +4,13 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocnumber}    {102.3}
+\newcommand{\stardocnumber}    {102.4}
 \newcommand{\stardocauthors}   {Malcolm J. Currie}
-\newcommand{\stardocdate}      {1993 November 5}
+\newcommand{\stardocdate}      {2014 November 15}
 \newcommand{\stardoctitle}     {HDSTRACE --- Listing HDS Data Files}
-%------------------------------------------------------------------------------
+\newcommand{\stardocversion}   {1.2}
+\newcommand{\stardocmanual}    {User's Guide}
+% -----------------------------------------------------------------------------
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
 \renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
@@ -864,7 +866,13 @@ would give a full trace of the last object traced.
       }{
          If true a 132-character-wide format is used to report the
          examination.  Otherwise the format is 80 characters wide.
-         {\tt [FALSE]}
+         It is only accessed if WIDTH is null.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         WIDTH = \_INTEGER (Read)
+      }{
+         Maximum width of the the output in characters.  The default is
+         the screen width of a terminal and 80 for a file.  {\tt []}
       }
    }
    \sstnotes{

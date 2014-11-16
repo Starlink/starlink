@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT([hdstrace],[1.2-3],[starlink@jiscmail.ac.uk])
+AC_INIT([hdstrace],[1.2-4],[starlink@jiscmail.ac.uk])
 AC_CONFIG_AUX_DIR([build-aux])
 
 dnl    Require autoconf-2.50 at least
@@ -27,7 +27,7 @@ STAR_CHECK_PROGS([fgeneric])
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
 dnl    links to: chr, mers, fio, psx, task.
-STAR_DECLARE_DEPENDENCIES([build], [fio generic prm par sae hds], [link])
+STAR_DECLARE_DEPENDENCIES([build], [fio generic one prm par sae hds], [link])
 dnl    No use dependencies
 
 dnl    Need "hlib" command to build the help library.
