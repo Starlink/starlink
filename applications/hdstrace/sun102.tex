@@ -216,17 +216,12 @@ is where {\footnotesize HDSTRACE} comes in handy.
 
 {\footnotesize HDSTRACE} lists recursively the name, data type, and
 values of an HDS structure or object.  The type is bracketed by $<>$ to
-distinguish it from the name ({\it c.f.}\ SGP/38).  Indentation
+distinguish it from the name ({\it cf.}\ SGP/38).  Indentation
 delineates structures.  The format of the output is flexible; and more
 importantly, you can now always see the data values---something that was
 often impossible with original version.  You control the formatting by
 specifying optional parameters on the command line, otherwise they have
 sensible defaults.
-
-Until this release {\footnotesize HDSTRACE} was called {\footnotesize
-TRACE}. However, because of a clash with the UNIX command {\bf trace} it
-has been renamed, though on VMS the command {\tt TRACE} will continue to
-invoke this utility.
 
 
 \section{Running HDSTRACE}
@@ -485,7 +480,7 @@ to align the trace into neat columns.  In the above examples the
 type of the DATA\_ARRAY is displaced because of the dimensions.  The
 indentation of the type with respect to the start of the name, and the
 values with respect to the start of the type may be controlled by
-parameters TYPIND and VALIND respectively.  For example,
+Parameters TYPIND and VALIND respectively.  For example,
 
 \small
 \begin{verbatim}
@@ -526,8 +521,8 @@ This can help when dealing with moderate-sized arrays.
 \end{verbatim}
 \normalsize
 A record of the trace may be stored in an text file given by the
-parameter LOGFILE.  The width of the output may be altered to 132
-characters instead of 80 via parameter WIDEPAGE.
+Parameter LOGFILE.  The width of the output defaults to the screen
+width and may be altered via Parameter WIDTH.
 
 \subsection{Structures}
 
@@ -605,7 +600,7 @@ AXIS is an array of structures.  Therefore it has no values and
 {\footnotesize TRACE} puts the comment {\tt \{array of structures\}}.
 By default {\footnotesize HDSTRACE} only lists the contents of the first
 element of an array of structures.  To obtain a full trace of arrays of
-structures you must set the parameter FULL to be true.
+structures you must set the Parameter FULL to be true.
 
 \small
 \begin{verbatim}
@@ -753,8 +748,8 @@ would give a full trace of the last object traced.
          nested structures.
 
       3) $X$ is an {\em array of structures}.  All elements will be listed
-         if parameter FULL is set to TRUE; only the first element will
-         be listed when parameter FULL is set to FALSE (default).
+         if Parameter FULL is set to TRUE; only the first element will
+         be listed when Parameter FULL is set to FALSE (default).
 
       Listings are in the following order: name; dimensions, if any;
       type; and value or comment.  Comments are enclosed in braces.
@@ -776,7 +771,7 @@ would give a full trace of the last object traced.
       additional parameters: a) the indentation of the type string with
       respect to the beginning of the name string; b) indentation of the
       value(s) (if not on a new line) with respect to the beginning of
-      the type string; and c) the width of the output, 80 or 132.  If
+      the type string; and c) the width of the output.  If
       the name and dimensions do not fit within the space given by
       parameters a) and b), the alignment will be lost because at least
       two spaces will separate the name from the type, or the type from
@@ -787,8 +782,8 @@ would give a full trace of the last object traced.
       This improves readability for long strings.
    }
    \sstusage{
-      HDSTRACE OBJECT [FULL] [NLINES] [TYPIND] [VALIND] [LOGFILE]
-         [EACHLINE] [NEWLINE] [WIDEPAGE]
+      hdstrace object [full] [nlines] [typind] [valind] [logfile]
+         [eachline] [newline] [width] [widepage]
    }
    \sstparameters{
       \sstsubsection{
