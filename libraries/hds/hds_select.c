@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "sae_par.h"
 #include "dat_par.h"
 #include "dat1.h"
@@ -2619,10 +2620,17 @@ int
 datTemp(const char *type_str, int ndim, const hdsdim dims[], HDSLoc **locator, int *status) {
   int retval = 0;
   int instat = *status;
+  const char * used = "(none)";
   EnterCheck("datTemp",*status);
   if (*status != SAI__OK) return *status;
-  retval = datTemp_v5(type_str, ndim, dims, locator, status);
-  HDS_CHECK_STATUS("datTemp","(v5)");
+  if (hds1UseVersion5()) {
+    retval = datTemp_v5(type_str, ndim, dims, locator, status);
+    used = "(v5)";
+  } else {
+    retval = datTemp_v4(type_str, ndim, dims, locator, status);
+    used = "(v4)";
+  }
+  HDS_CHECK_STATUS("datTemp", used);
   return retval;
 }
 
@@ -2872,15 +2880,22 @@ hdsGroup(const HDSLoc *locator, char group_str[DAT__SZGRP+1], int *status) {
 int
 hdsGtune(const char *param_str, int *value, int *status) {
   int instat = *status;
+  const char * used = "(none)";
   EnterCheck("hdsGtune",*status);
   if (*status != SAI__OK) return *status;
-  hdsGtune_v5(param_str, value, status);
-  hdsGtune_v4(param_str, value, status);
+  if ( strncasecmp(param_str, "VERSION5", 8) == 0 ) {
+    hds1GtuneWrapper( param_str, value, status );
+    used = "(wrapper)";
+  } else {
+    hdsGtune_v5(param_str, value, status);
+    hdsGtune_v4(param_str, value, status);
+    used = "(both)";
+  }
   if (*status != SAI__OK) {
     emsRepf("hdsGtune_wrap", "hdsGtune: Error obtaining value of tuning parameter '%s'",
             status, param_str);
   }
-  HDS_CHECK_STATUS("hdsGtune", "(both)");
+  HDS_CHECK_STATUS("hdsGtune", used);
   return *status;
 }
 
@@ -2964,10 +2979,17 @@ int
 hdsNew(const char *file_str, const char *name_str, const char *type_str, int ndim, const hdsdim dims[], HDSLoc **locator, int *status) {
   int retval = 0;
   int instat = *status;
+  const char * used = "(none)";
   EnterCheck("hdsNew",*status);
   if (*status != SAI__OK) return *status;
-  retval = hdsNew_v5(file_str, name_str, type_str, ndim, dims, locator, status);
-  HDS_CHECK_STATUS("hdsNew","(v5)");
+  if (hds1UseVersion5()) {
+    retval = hdsNew_v5(file_str, name_str, type_str, ndim, dims, locator, status);
+    used = "(v5)";
+  } else {
+    retval = hdsNew_v4(file_str, name_str, type_str, ndim, dims, locator, status);
+    used = "(v4)";
+  }
+  HDS_CHECK_STATUS("hdsNew", used);
   return retval;
 }
 
@@ -3065,14 +3087,24 @@ hdsTrace(const HDSLoc *locator, int *nlev, char *path_str, char *file_str, int *
 
 int
 hdsTune(const char *param_str, int value, int *status) {
-  int retval = 0;
   int instat = *status;
+  const char * used = "(none)";
   EnterCheck("hdsTune",*status);
   if (*status != SAI__OK) return *status;
-  retval = hdsTune_v5(param_str, value, status);
-  retval = hdsTune_v4(param_str, value, status);
-  HDS_CHECK_STATUS("hdsTune", "(both)");
-  return retval;
+  if ( strncasecmp(param_str, "VERSION5", 8) == 0 ) {
+    hds1TuneWrapper( param_str, value, status );
+    used = "(wrapper)";
+  } else {
+    hdsTune_v5(param_str, value, status);
+    hdsTune_v4(param_str, value, status);
+    used = "(both)";
+  }
+  if (*status != SAI__OK) {
+    emsRepf("hdsTune_wrap", "hdsTune: Error setting value of tuning parameter '%s'",
+            status, param_str);
+  }
+  HDS_CHECK_STATUS("hdsTune", used);
+  return *status;
 }
 
 /*=================================================================*/

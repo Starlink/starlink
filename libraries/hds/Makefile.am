@@ -82,6 +82,7 @@ C_ROUTINES = \
 	dat1CcopyLocXtoY.c dat1CcopyXtoY.c \
 	dat1CopyPrimXtoY.c dat1CopyStrucXtoY.c dat1CopyXtoY.c \
 	datExportFloc.c datImportFloc.c dat1_import_floc.c hdsdim.c \
+	dat1Getenv.c hdstuning.c \
 	hds_select.c
 
 DAT_PAR: dat_par_f$(EXEEXT)

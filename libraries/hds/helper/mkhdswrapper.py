@@ -107,6 +107,23 @@ def func_both(func,line):
   HDS_CHECK_STATUS(\"{2}\", "(both)");
   return retval;""".format(v5,v4,func))
 
+def func_versioned(func,line):
+    (v4,v5) = version_names(line)
+    print("""  int retval = 0;
+  int instat = *status;
+  const char * used = "(none)";
+  EnterCheck(\"{2}\",*status);
+  if (*status != SAI__OK) return *status;
+  if (hds1UseVersion5()) {{
+    retval = {0}
+    used = "(v5)";
+  }} else {{
+    retval = {1}
+    used = "(v4)";
+  }}
+  HDS_CHECK_STATUS(\"{2}\", used);
+  return retval;""".format(v5,v4,func))
+
 def func_void(func, line):
     (v4,v5) = version_names(line)
     print("""  EnterCheck(\"{3}\",-1);
@@ -234,15 +251,42 @@ def func_hdsOpen(line):
 
 def func_hdsGtune(line):
     print("""  int instat = *status;
+  const char * used = "(none)";
   EnterCheck(\"hdsGtune\",*status);
   if (*status != SAI__OK) return *status;
-  hdsGtune_v5(param_str, value, status);
-  hdsGtune_v4(param_str, value, status);
+  if ( strncasecmp(param_str, "VERSION5", 8) == 0 ) {
+    hds1GtuneWrapper( param_str, value, status );
+    used = "(wrapper)";
+  } else {
+    hdsGtune_v5(param_str, value, status);
+    hdsGtune_v4(param_str, value, status);
+    used = "(both)";
+  }
   if (*status != SAI__OK) {
     emsRepf("hdsGtune_wrap", "hdsGtune: Error obtaining value of tuning parameter '%s'",
             status, param_str);
   }
-  HDS_CHECK_STATUS("hdsGtune", "(both)");
+  HDS_CHECK_STATUS("hdsGtune", used);
+  return *status;""")
+
+def func_hdsTune(line):
+    print("""  int instat = *status;
+  const char * used = "(none)";
+  EnterCheck(\"hdsTune\",*status);
+  if (*status != SAI__OK) return *status;
+  if ( strncasecmp(param_str, "VERSION5", 8) == 0 ) {
+    hds1TuneWrapper( param_str, value, status );
+    used = "(wrapper)";
+  } else {
+    hdsTune_v5(param_str, value, status);
+    hdsTune_v4(param_str, value, status);
+    used = "(both)";
+  }
+  if (*status != SAI__OK) {
+    emsRepf("hdsTune_wrap", "hdsTune: Error setting value of tuning parameter '%s'",
+            status, param_str);
+  }
+  HDS_CHECK_STATUS("hdsTune", used);
   return *status;""")
 
 def func_hdsInfoI(line):
@@ -329,18 +373,18 @@ special = dict({
     "datErmsg": "v5",
     "datMove": "datMove",
     "datMsg": "void",
-    "datTemp": "v5",
+    "datTemp": "versioned",
     "hdsCopy": "hdsCopy",
     "hdsEwild": "special",
     "hdsFlush": "hdsFlush",
     "hdsGtune": "hdsGtune",
     "hdsInfoI": "hdsInfoI",
-    "hdsNew":  "v5",
+    "hdsNew":  "versioned",
     "hdsOpen": "hdsOpen",
     "hdsShow": "both",
     "hdsState": "both",
     "hdsStop": "both",
-    "hdsTune": "both",
+    "hdsTune": "hdsTune",
     "hdsWild": "special"
 })
 
@@ -389,12 +433,16 @@ for line in open("hds.h"):
                 func_hdsOpen(line)
             elif mode == "hdsGtune":
                 func_hdsGtune(line)
+            elif mode == "hdsTune":
+                func_hdsTune(line)
             elif mode == "hdsFlush":
                 func_hdsFlush(line)
             elif mode == "hdsCopy":
                 func_hdsCopy(line)
             elif mode == "hdsInfoI":
                 func_hdsInfoI(line)
+            elif mode == "versioned":
+                func_versioned(hds_function,line)
             elif mode == "copy":
                 func_copy(hds_function,line)
             else:
@@ -406,6 +454,7 @@ for line in open("hds.h"):
         if in_prologue and line.startswith("/*=="):
             print('#include <stdlib.h>')  # For abort()
             print('#include <stdio.h>')  # For printf()
+            print('#include <string.h>')
             print('#include "sae_par.h"')
             print('#include "dat_par.h"')
             print('#include "dat1.h"')

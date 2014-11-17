@@ -85,5 +85,14 @@ int
 dat1CopyStrucXtoY( const HDSLoc *locatorX, const HDSLoc *locatorY,
                    int *status );
 
+int hds1TuneWrapper ( const char * param_str, int value, int *status );
+
+int
+hds1GtuneWrapper(const char *param_str, int *value, int *status);
+
+hdsbool_t hds1UseVersion5();
+
+void dat1Getenv( const char *varname, int def, int *val );
+
 #endif
 
