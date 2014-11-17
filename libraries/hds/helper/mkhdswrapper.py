@@ -235,7 +235,7 @@ def func_datMove(func,line):
   HDS_CHECK_STATUS(\"{2}\",(isv5 ? "(v5)" : "(v4)"));
   return *status;""".format(v5,v4,func))
 
-def func_hdsOpen(line):
+def func_hdsOpen(func,line):
     print("""  int instat = *status;
   EnterCheck(\"hdsOpen\",*status);
   if (*status != SAI__OK) return *status;
@@ -249,7 +249,7 @@ def func_hdsOpen(line):
   HDS_CHECK_STATUS( "hdsOpen", file_str);
   return *status;""")
 
-def func_hdsGtune(line):
+def func_hdsGtune(func,line):
     print("""  int instat = *status;
   const char * used = "(none)";
   EnterCheck(\"hdsGtune\",*status);
@@ -269,7 +269,7 @@ def func_hdsGtune(line):
   HDS_CHECK_STATUS("hdsGtune", used);
   return *status;""")
 
-def func_hdsTune(line):
+def func_hdsTune(func,line):
     print("""  int instat = *status;
   const char * used = "(none)";
   EnterCheck(\"hdsTune\",*status);
@@ -289,7 +289,7 @@ def func_hdsTune(line):
   HDS_CHECK_STATUS("hdsTune", used);
   return *status;""")
 
-def func_hdsInfoI(line):
+def func_hdsInfoI(func,line):
     print("""
   int retval = 0;
   int instat = *status;
@@ -315,7 +315,7 @@ def func_hdsInfoI(line):
   HDS_CHECK_STATUS("hdsInfoI", used);
   return retval;""")
 
-def func_hdsFlush(line):
+def func_hdsFlush(func,line):
     print("""  /* We are only allowed to flush a group that actually exists */
   int instat = *status;
   EnterCheck(\"hdsFlush\",*status);
@@ -332,7 +332,7 @@ def func_hdsFlush(line):
   HDS_CHECK_STATUS("hdsFlush", "(both)");
   return *status;""")
 
-def func_hdsCopy(line):
+def func_hdsCopy(func,line):
     print("""  int instat = *status;
   int ndim = 0;
   hdsdim dims[DAT__MXDIM];
@@ -366,26 +366,26 @@ def func_hdsCopy(line):
 
 # Dictionary indicating special cases
 special = dict({
-    "datCcopy": "copy",
-    "datCctyp": "v5+void",
-    "datChscn": "v5",
-    "datCopy": "copy",
-    "datErmsg": "v5",
-    "datMove": "datMove",
-    "datMsg": "void",
-    "datTemp": "versioned",
-    "hdsCopy": "hdsCopy",
-    "hdsEwild": "special",
-    "hdsFlush": "hdsFlush",
-    "hdsGtune": "hdsGtune",
-    "hdsInfoI": "hdsInfoI",
-    "hdsNew":  "versioned",
-    "hdsOpen": "hdsOpen",
-    "hdsShow": "both",
-    "hdsState": "both",
-    "hdsStop": "both",
-    "hdsTune": "hdsTune",
-    "hdsWild": "special"
+    "datCcopy": func_copy,
+    "datCctyp": func_v5void,
+    "datChscn": func_v5,
+    "datCopy": func_copy,
+    "datErmsg": func_v5,
+    "datMove": func_datMove,
+    "datMsg": func_void,
+    "datTemp": func_versioned,
+    "hdsCopy": func_hdsCopy,
+    "hdsEwild": func_special,
+    "hdsFlush": func_hdsFlush,
+    "hdsGtune": func_hdsGtune,
+    "hdsInfoI": func_hdsInfoI,
+    "hdsNew":  func_versioned,
+    "hdsOpen": func_hdsOpen,
+    "hdsShow": func_both,
+    "hdsState": func_both,
+    "hdsStop": func_both,
+    "hdsTune": func_hdsTune,
+    "hdsWild": func_special
 })
 
 in_prologue = 1
@@ -416,37 +416,7 @@ for line in open("hds.h"):
         # put the line back together
         line = hds_function + "(" + ", ".join(argsout) + ");"
         if hds_function in special:
-            mode = special[hds_function]
-            if mode == "both":
-                func_both(hds_function,line)
-            elif mode == "special":
-                func_special(hds_function,line)
-            elif mode == "void":
-                func_void(hds_function,line)
-            elif mode == "v5+void":
-                func_v5void(hds_function,line)
-            elif mode == "v5":
-                func_v5(hds_function,line)
-            elif mode == "datMove":
-                func_datMove(hds_function,line)
-            elif mode == "hdsOpen":
-                func_hdsOpen(line)
-            elif mode == "hdsGtune":
-                func_hdsGtune(line)
-            elif mode == "hdsTune":
-                func_hdsTune(line)
-            elif mode == "hdsFlush":
-                func_hdsFlush(line)
-            elif mode == "hdsCopy":
-                func_hdsCopy(line)
-            elif mode == "hdsInfoI":
-                func_hdsInfoI(line)
-            elif mode == "versioned":
-                func_versioned(hds_function,line)
-            elif mode == "copy":
-                func_copy(hds_function,line)
-            else:
-                raise ValueError("Unrecognized mode {0} for function {1}".format(mode,hds_function))
+            special[hds_function](hds_function,line)
         else:
             func_simple(hds_function,line)
         print("}")
