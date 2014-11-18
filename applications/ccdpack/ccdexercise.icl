@@ -60,7 +60,6 @@ hidden proc ccdexercise
 {  If we're going to use a device we need KAPPA.
      if device <> "none"
         kappa
-        idset (device) accept
         gdset (device) accept
         gdclear accept
         paldef accept
