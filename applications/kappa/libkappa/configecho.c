@@ -4,6 +4,7 @@
 #include "star/ndg.h"
 #include "star/kaplibs.h"
 #include "star/grp.h"
+#include "star/one.h"
 #include "par.h"
 #include "par_par.h"
 #include "prm_par.h"
@@ -355,7 +356,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
       } else if( *STATUS == SAI__OK ) {
          fd = fopen( logfile, "w" );
          if( !fd ) {
-            *STATUS == SAI__ERROR;
+            *STATUS = SAI__ERROR;
             errRepf( "", "Failed to create log file (%s): %s.", STATUS,
                      logfile, strerror(errno) );
          }
