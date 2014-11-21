@@ -384,9 +384,20 @@ my $REALDESTDIR = File::Spec->catdir($TEXDIR, $TEXNAME. '.htx');
 my $DESTFILE = File::Spec->catfile($DESTDIR, $TEXNAME . '.tex');
 my $FILE;
 
+my $usehtlatex = 0;
+
 #  Check file exists and is a text file we can write to.
 if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
    print( "Processing file: $TEXFILE\n" );
+
+# Check if current file is calling latex class 'starlink'.
+   open my $file, '<', "$TEXFILE";
+   my $firstline = <$file>;
+   close $file;
+   $usehtlatex=0;
+   if ($firstline =~ /\\documentclass.*\{starlink\}/) {
+     $usehtlatex=1;
+   }
 
 #  Create the target directory. Note if ".htx" form already exists
 #  then we move this into place.
@@ -510,27 +521,34 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
          }
        }
 
-       if ($suffix eq ".png") {
-         # do not copy if there is a version already there and this one is not newer
-         my $outfile = File::Spec->catfile($destdir, $name.".png");
-         if (!-e $outfile || (-M $outfile > -M $file ) ) {
-           print "Copying $file to $destdir\n";
-           system("cp", $file, $destdir ) and
-             &clear_up( "Star2HTML fatal: cannot copy $file into $destdir\n" );
-         }
-       } elsif ($suffix eq ".pdf") {
-         # Must convert this to postscript unless there is an .eps version
-         # in TEXDIR already
-         if ( ! -e File::Spec->catfile($TEXDIR, $name . ".eps" ) ) {
-           my $outfile = File::Spec->catfile($destdir, $name.".ps");
-           if (!-e $outfile || (-M $outfile > -M $file) ) {
-             print "Using $pdftops[0] to convert $file to $outfile\n";
+       # If using htlatex, just copy the file in and assume that
+       # htlatex will convert it.
+       if ($usehtlatex == 1) {
+	 print ( "cp $file $destdir" );
+         system ( "cp $file $destdir") and &clear_up("Star2HTML fatal: cannot copy $file into $destdir\n");
+       } else {
+	 if ($suffix eq ".png") {
+	   # do not copy if there is a version already there and this one is not newer
+	   my $outfile = File::Spec->catfile($destdir, $name.".png");
+	   if (!-e $outfile || (-M $outfile > -M $file ) ) {
+	     print "Copying $file to $destdir\n";
+	     system("cp", $file, $destdir ) and
+	       &clear_up( "Star2HTML fatal: cannot copy $file into $destdir\n" );
+	   }
+	 } elsif ($suffix eq ".pdf") {
+	   # Must convert this to postscript unless there is an .eps version
+	   # in TEXDIR already
+	   if ( ! -e File::Spec->catfile($TEXDIR, $name . ".eps" ) ) {
+	     my $outfile = File::Spec->catfile($destdir, $name.".ps");
+	     if (!-e $outfile || (-M $outfile > -M $file) ) {
+	       print "Using $pdftops[0] to convert $file to $outfile\n";
                system(@pdftops, $file, $outfile) and
                  &clear_up( "Could not convert $file to PS using $pdftops[0]\n");
-           }
-         }
-       } else {
-         warn "Did not know what to do with file $file\n";
+	     }
+	   }
+	 } else {
+	   warn "Did not know what to do with file $file\n";
+	 }
        }
      }
    }
@@ -676,17 +694,23 @@ create_initfile();
 #------------------------------------------------------------------------------
 #  Invoke latex2html on the temporary file. Note we inhibit index file
 #  production.
-print( "Preparations finished - now starting LaTeX2HTML\n\n");
-my $cwd = Cwd::getcwd();
-system( $LATEX2HTML,
-        "-init_file", ".star2html-init", "-no_subdir", "-tmp", $cwd,
-        "-no_auto_link", "-local_icons", @ARGV, $DESTFILE );
-if ( $? ) {
-  print( "Star2HTML fatal: Translation of document $TEXFILE failed.\n" );
-} elsif ( $COPYRIGHT ) {
-   $COPYRIGHT =~ s/&copy\;?/(C)/g;
-   $COPYRIGHT =~ s/<BR>//g;
-   print("Document copyrighted:\n$COPYRIGHT\n");
+
+if ($usehtlatex==1){
+  print ("Preparations finished - now starting htlatex\n\n");
+  system( "htlatex $TEXFILE \"starlinkxhtml.cfg,charset=\"utf-8\",fn-in\" ' -cvalidate -cstarfont'" "" "-interaction=nonstopmode");
+} else {
+  print( "Preparations finished - now starting LaTeX2HTML\n\n");
+  my $cwd = Cwd::getcwd();
+  system( $LATEX2HTML,
+	  "-init_file", ".star2html-init", "-no_subdir", "-tmp", $cwd,
+	  "-no_auto_link", "-local_icons", @ARGV, $DESTFILE );
+  if ( $? ) {
+    print( "Star2HTML fatal: Translation of document $TEXFILE failed.\n" );
+  } elsif ( $COPYRIGHT ) {
+    $COPYRIGHT =~ s/&copy\;?/(C)/g;
+    $COPYRIGHT =~ s/<BR>//g;
+    print("Document copyrighted:\n$COPYRIGHT\n");
+  }
 }
 
 #  Try to copy some special icons from @l2hdir@ to this directory.
