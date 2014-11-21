@@ -234,27 +234,43 @@
 
 
 
-%% EDLONG: An enumerated description list
-\newcounter{enumdesc}
-\newcounter{enumdesci}
-\newlist{edlong}{description}{2}
-\setlist[edlong,1]{%
-  before={\stepcounter{enumdesc}\setcounter{enumdesci}{0}},%
+%% enumdesc: An enumerated description list
+\newcounter{enumdescc}
+\newcounter{enumdescci}
+\newlist{enumdesc}{description}{2}
+\setlist[enumdesc,1]{%
+  before={\stepcounter{enumdescc}\setcounter{enumdescci}{0}},%
   style=nextline,leftmargin=0.5cm,labelindent=0.5cm,rightmargin=0.5cm,
-  topsep=0.5\baselineskip, font={\phantomsection\normalfont\normalsize\bfseries\refstepcounter{enumdesci}\theenumdesci~}
+  topsep=0.5\baselineskip, font={\phantomsection\normalfont\normalsize\bfseries\refstepcounter{enumdescci}\theenumdescci~}
 }
 
 
 
-%% A description list with the label on the left in 15% of the space
-%% (e.g. for descriptions where the label has a pretty short section
-%% of the space.
-\newlist{sldes}{description}{2}
-\setlist[sldes,1]{%
-  style=nextline,leftmargin=0.15\textwidth%
-  }
+% %% A description list with the label on the left in 15% of the space
+% %% (e.g. for descriptions where the label has a pretty short section
+% %% of the space.
+% \newlist{sldes}{description}{2}
+% \setlist[sldes]{%
+%   style=sameline,leftmargin=*%
+%   }
 
-\newlist{sldes2}{description}{2}
+%% A description list which has the labels in a box on the left with
+%% the length of the widest label, and the definitions aligned past
+%% it. In HTML output, starstyle.4ht will format this as a table.
+
+%% use eqparbox to get the box of width of the widest label (takes 2
+%% runs of pdflatex).
+\usepackage{eqparbox}
+\newcounter{desc}
+\newcommand{\descriptionmakelabel}[1]{\eqparbox{descnb\romannumeral\value{desc}}{#1\hfill}}
+
+\newlist{aligndesc}{description}{2}
+\setlist[aligndesc]{before={\refstepcounter{desc}\renewcommand{\makelabel}{\descriptionmakelabel}},
+  leftmargin=\dimexpr\eqboxwidth{descnb\romannumeral\numexpr\value{desc}+1\relax}+3em\relax,
+%  leftmargin=\dimexpr\labelwidth+2em\relax,
+labelsep=1em, labelindent=2em, rightmargin=2em}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Starlink xref command
