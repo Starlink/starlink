@@ -147,9 +147,9 @@
 
 
 %% Set up minipage to be a div of class minipage. (won't make it look right)
-\ConfigureEnv{minipage}{
-  \ifvmode \ShowPar\fi \HCode{<div class="minipage">}
-}{\Tg</div>}{}{}
+%\ConfigureEnv{minipage}{
+%  \ifvmode \ShowPar\fi \HCode{<div class="minipage">}
+%}{\Tg</div>}{}{}
 
 % Macros using sub and superscripts -- use \sb instead of _ and \sp
 % instead of ^. Alternatively you can compile using the options early_

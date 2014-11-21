@@ -308,3 +308,13 @@ labelsep=1em, labelindent=2em, rightmargin=2em}
 
 % A starlink Hyperref.
 \newcommand{\slhyperref}[4]{#2\ref{#4}#3}
+
+%--------------------------------------------------------------------
+%%%% Set up defaults for images
+
+% maximum size of 'top area'
+\renewcommand{\topfraction}{0.9}
+% maximum size of 'bottom area'
+\renewcommand{\bottomfraction}{0.9}
+% minimum amount of text on a non-float page
+\renewcommand{\textfraction}{0.1}
