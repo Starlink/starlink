@@ -24,27 +24,45 @@
 
 %%%%%%%--------- Navigation links
 
-% Custom commands to go forward and back.
+% Custom commands to go forward and back -- default one doesn't work
+% with our custom SST sections.
+%% This came from stackoverflow?
 \def\my:nextlink{%
-\ifx\nextCut\empty\relax\else[\Link[\nextCut]{}{}next\EndLink]\fi
-}
+\ifx\nextCut\empty\relax\else \Link[\nextCut]{}{}Next\HCode{&\#8594}\EndLink \fi }
 \def\my:prevlink{%
-\ifx\prevCut\empty\relax\else[\Link[\prevCut]{}{}prev\EndLink]\fi
-}
+\ifx\prevCut\empty\relax\else \Link[\prevCut]{}{}\HCode{&\#8592}Prev\EndLink \fi }
+
 
 % Set up the default crosslinks to only use tail-prev, head and tail
-\Configure{crosslinks}{[}{]}{}{}{tail-prev}{head}{tail}{}
+
+% change the order of crosslinks
+%% Default order:
+%\Configure{crosslinks*}{next}{prev}{prevtail}{tail} {front}{up}{}
+
+\Configure{crosslinks*}{next}{prev}{prevtail}{tail}{front}{up}{}
+
+% Crosslinks at top in order: <my defined before> [tail-prev] [tail] <my defined to go after>
+% Crosslinks at bottom in order: <my defined before> [tail-prev] [top] <my defined to go after>
+
+%% Using tail-prev, top and tail links
+%\Configure{crosslinks}{\HCode{<li>}}{\HCode{</li>}}{}{}{tail-prev}{top}{tail}{}
+
+%% Only using the next and previous defined above...
+\Configure{crosslinks}{\HCode{<li>}}{\HCode{</li>}}{}{}{}{}{}{}
 
 % Set up the before and after to include the custom next and previous,
 % and ensure the footnotes are still availabel.
 
 % Following code slightly altered from html4.4ht:
 \Configure{crosslinks+}
-   {\IgnorePar\EndP\HCode{<!--l. \the\inputlineno-->%
-       <div class="crosslinks"><p class="noindent">}
-     [\hyperlink{toc}{toc}]\my:prevlink\my:nextlink%
+   {%\HCode{<div class="titlebar">}\thestardoctitle{}\HCode{</div>}
+     \HCode{<div class="crosslinks"><ul class='nav'>}
+     \HCode{<li class="prev">} \my:prevlink\ \HCode{</li>}
+     \HCode{<li class="title">}\thestardoctitle{}\HCode{</li>}
+     \HCode{<li class="next">}\my:nextlink\ \HCode{</li>}
+     \HCode{<li class="toc">}\hyperlink{toc}{TOC \HCode{&\#8593}}\HCode{</li>}
    }
-   {\HCode{</p></div>}\par\ShowPar}
+   {\HCode{</ul></div>}\par\ShowPar}
    {\ifvmode \IgnorePar\fi\EndP
      \ifvoid \fn:box\else
      \HCode{<div class="footnotes">}\box\fn:box\HCode{</div>}
@@ -52,12 +70,15 @@
      \fi
      % 
      \ifvmode \IgnorePar\fi \EndP
-     \HCode{<!--l. \the\inputlineno-->%
-       % 
-       <div class="crosslinks"><p class="noindent">}%
-     [\hyperlink{toc}{toc}]\my:prevlink\my:nextlink%
+     \HCode{<div class="crosslinks">}
+     \HCode{<div class="copyright">}\scpushright{\thestardoccopyright{}}\HCode{</div>}
+     \HCode{<ul class='nav'>}
+     \HCode{<li class="prev">} \my:prevlink\ \HCode{</li>}
+     \HCode{<li class="title">}\thestardoctitle{}\HCode{</li>}
+     \HCode{<li class="next">}\my:nextlink\ \HCode{</li>}
+     \HCode{<li class="toc">}\hyperlink{toc}{TOC \HCode{&\#8593}}\HCode{</li>}
    }
-   {\HCode{</p></div>}\par\ShowPar}
+   {\HCode{</ul></div>}\par\ShowPar}
 
 
 
