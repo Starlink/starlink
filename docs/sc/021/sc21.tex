@@ -400,10 +400,9 @@ would like your integration time concentrated and the degree of
 extended emission you wish to recover.
 %\newline\newline
 
-\begin{minipage}[t]{0.12\linewidth}
-\textbf{PONG}
-\end{minipage}
-\begin{minipage}[t]{0.87\linewidth}A \textsc{pong} map is the scan
+\begin{aligndesc}
+\item[\textbf{PONG}]
+A \textsc{pong} map is the scan
 strategy for covering a large area. The default options allow for three
 sizes---900\,arcsec, 1800\,arcsec and 3600\,arcsec. A single \textsc{pong} map is
 a square of these dimensions and the telescope fills in the square by
@@ -413,27 +412,21 @@ is recommended a minimum of three, but preferably more than five,
 rotation introduced between each one. In this way a circular pattern
 is built up, (see the lower right-hand panel of \cref{Figure}{fig:scan}{graphic below}),
 with a diameter equal to your requested map size.
-\vspace{0.2cm}\\
+
 To recover large-scale extended structure you are advised to use
 larger \textsc{pong} maps which scan at a higher rate. This option is
 preferable to tiling multiple smaller maps. Ultimately it is the
 size of the SCUBA-2 field-of-view that determines the sensitivity to
 large-scale structure.
-\end{minipage}
-%\latex{\\ \\ \\}
-\vspace{3.\baselineskip}
-\begin{minipage}[t]{0.12\linewidth}
-\textbf{DAISY}
-\end{minipage}
-\begin{minipage}[t]{0.87\linewidth}
+
+\item[\textbf{DAISY}]
 \textsc{daisy} maps are the option for point-like or compact sources
 ($<$3~arcmin) by maximising the exposure time on the centre of the
 image. The telescope moves at a constant velocity in a `spirograph'
 pattern that has the advantage of keeping the source on the array
 throughout the observation. This is shown in the top panel of
 \cref{Figure}{fig:scan}{the figure below}.
-\end{minipage}
-%\latex{\vspace{1cm}}\\
+\end{aligndesc}
 
 \subsubsection{Why these patterns?}%\\*
 
