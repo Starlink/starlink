@@ -185,3 +185,7 @@
 \providecommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
 \providecommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
 \providecommand{\topcat}{\xref{\textsc{Topcat}}{sun253}{}}
+
+% prevent issues if a pdf .aux file is still around
+\providecommand{\pgfsyspdfmark}[3]{}
+
