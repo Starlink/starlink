@@ -339,7 +339,7 @@
 }
 
 \renewcommand{\myfigduo}[8]{
-  \begin{figure}[#3]
+  \begin{figure}
     \begin{center}
     \includegraphics[#4]{#1}
     \typeout{#1 inserted on page \arabic{page}}
@@ -353,7 +353,8 @@
 
 
 % Fix bug in mathcal 
-\renewcommand{\cal}[1]{\HCode{<mi mathvariant="bold-script">}#1\HCode{</mi>}}
+%\renewcommand{\cal}[1]{\HCode{<mi class="ltx_font_mathcalligraphic" mathvariant="script">}#1\HCode{</mi>}}
+%\renewcommand{\mathfrak}[1]{\HCode{<mi mathvariant="bold-fraktur">}#1\HCode{</mi>}}
 
 
 

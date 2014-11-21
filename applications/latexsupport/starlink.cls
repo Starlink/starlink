@@ -2,7 +2,7 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{starlink}
 
-% Declare options 
+% Declare options
 
 % With chapters...
 \newif\ifwithchapters
@@ -31,9 +31,15 @@
    \typeout{..........Article!..........}
 \fi
 
+% Packages required for all reports
+% chek if in a pdf or not
+\RequirePackage{ifpdf}
+
 
 % Font types and encoding.
+\ifpdf
 \RequirePackage[T1]{fontenc}
+\fi
 \RequirePackage[utf8]{inputenc}
 
 % microtype For improved pdf typography (must come after loading class)
@@ -48,9 +54,6 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Packages required for all reports
-% chek if in a pdf or not
-\RequirePackage{ifpdf}
 
 
 % Titlesec.
