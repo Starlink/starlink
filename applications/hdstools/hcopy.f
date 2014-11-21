@@ -102,6 +102,10 @@
 *       V3.0-1 Close HDS locator when finished, initialise locators.
 *     18-JUL-2007 (TIMJ):
 *       Add CNF_PVAL for 64-bit
+*     2014-11-21 (TIMJ):
+*       Open input file, then close it, and then reopen it. Required
+*       to stop HDS potentially complaining about the same file being
+*       opened for READ and then UPDATE.
 *-
 
 *    Type Definitions :
@@ -215,6 +219,20 @@
       OUTSLICE = .FALSE.
       IF ( OUT(LENOUT:LENOUT) .EQ. ")" ) OUTSLICE = .TRUE.
 
+*    HDS may not be able to open a file for write that
+*    has already been opened for read, so to mitigate that
+*    we close the input and will re-open it later. Only do this
+*    if we are not going to be creating a new file
+      IF ( (.NOT.INSLICE .AND. OUTTOP .AND. .NOT. OUTSLICE) .OR.
+     :     (OUTTOP .AND. .NOT. OUTSLICE) ) THEN
+*        This will be a HDS_NEW or HDS_COPY below which will
+*        not require UPDATE access to the input file.
+      ELSE
+         CALL DAT_ANNUL( ILOC, STATUS )
+         ILOC = DAT__NOLOC
+         CALL DAT_CANCL('INP', STATUS )
+      END IF
+
 *    Initialise DONE
       DONE = .FALSE.
 
@@ -233,6 +251,7 @@
              CALL DAT_CLONE( FILOC, OLOC, STATUS )
          ELSE
             CALL HDS_OPEN( OUT(:IDOT-1), 'UPDATE', FILOC, STATUS )
+            CALL HDS_FIND( DAT__ROOT, REF, 'READ', ILOC, STATUS )
             IF ( IDOT .EQ. JPAR ) IDOT = IDOT - 1
 
             IF ( OUTSLICE ) THEN
@@ -353,6 +372,6 @@
 
 *    Tidy up
  99   CONTINUE
+      IF (ILOC .NE. DAT__NOLOC) CALL DAT_ANNUL( ILOC, STATUS )
       CALL DAT_CANCL('INP', STATUS)
-
       END
