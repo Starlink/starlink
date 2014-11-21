@@ -697,7 +697,7 @@ create_initfile();
 
 if ($usehtlatex==1){
   print ("Preparations finished - now starting htlatex\n\n");
-  system( "htlatex $TEXFILE \"starlinkxhtml.cfg,charset=\"utf-8\",fn-in\" ' -cvalidate -cstarfont'" "" "-interaction=nonstopmode");
+  system( "htlatex $TEXFILE \"starlinkxhtml.cfg,charset=\"utf-8\",fn-in\" ' -cvalidate -cstarfont'" "" "-interaction=batchmode");
 } else {
   print( "Preparations finished - now starting LaTeX2HTML\n\n");
   my $cwd = Cwd::getcwd();
