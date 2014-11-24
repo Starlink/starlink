@@ -1,0 +1,120 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {182.1}
+\newcommand{\stardocauthors}   {M J Bly}
+\newcommand{\stardocdate}      {29 March 1994}
+\newcommand{\stardoctitle}     {EMAIL --- E-mail address searching}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+There exists an extensive list of the electronic mail addresses of the
+world's Astronomers, maintained by Chris Benn of the RGO. Starlink also
+has its lists of users and their email addresses. The EMAIL utility is
+an easy way conducting to search these lists on-line by name to find
+the email address of elusive collaborators. 
+
+\section{Searching for E-mail addresses}
+
+The facilities offered be email vary slightly on Unix and VMS. Both
+versions offer the searching facility to find usernames and email
+addresses.  The VMS version has an on-line help facility giving details
+about email addressing methods for VMS users.
+
+Both versions search the following files:
+
+\begin{itemize}
+
+\item The list of Astronomical Institutions:
+{\tt /star/etc/email/astroplaces.lis}
+
+\item The list of local users: {\tt /star/local/admin/usernames.lis}
+
+\item The World list of Astronomers: {\tt /star/etc/email/astropersons.lis}.
+
+\end{itemize}
+
+Thus EMAIL can be used to search for Institutional email
+addresses as well as individuals.
+
+\subsection{Unix}
+
+The Unix version is used thus:
+
+\begin{verbatim}
+      % email keyword keyword ...
+\end{verbatim}
+
+where \verb+keyword keyword ...+ is a list of one or more
+keywords for the search. It is thus possible to search for many
+addresses at once, or conduct a search based on similar spellings of a
+name in one pass.
+
+\subsection{VMS}
+
+To use the VMS version, type:
+
+\begin{verbatim}
+      $ EMAIL keyword,keyword,...
+\end{verbatim}
+
+where \verb+keyword,keyword,...+ is a list of one or more
+keywords for the search. It is thus possible to search for many
+addresses at once, or conduct a search based on similar spellings of a
+name in one pass.
+
+To access the EMAIL help system, type:
+
+\begin{verbatim}
+      $ EMAIL
+\end{verbatim}
+
+which will start the VMS style help facility.
+
+\end{document}
