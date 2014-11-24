@@ -1,4 +1,4 @@
-\documentstyle{article}
+\documentstyle{article} 
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -39,98 +39,418 @@ RUTHERFORD APPLETON LABORATORY\\
 \end{center}
 \vspace{5mm}
 
-\newpage
-\setcounter{page}{8}
-\setcounter{table}{1}
+\section{Introduction}
 
-{\scriptsize
-\begin{table}
+The Starlink Software Collection was last reorganised on 9th December 1981 and
+the structure then implemented has served us well through the 80's.
+However, over 380 software releases and about 66 new software items have been
+issued since then and the size and complexity of the software has grown
+enormously.
+Some of the original design concepts have become outdated or unworkable and the
+management of the Collection now tends to be difficult and error prone --- in
+particular, it is not immediately obvious which files belong to which
+software items and some items are not stored in the appropriate directory.
+Thus, the time has come to reorganise the way in which the Collection is stored,
+particularly the \mbox{[STARLINK]} directory.
+The new design will make the Collection easier to manage and distribute and
+should see us through the 90s.
+
+The changes should be invisible to the software user, so you need not take any
+action.
+However, you may find that, unless you take some action, some Starlink software
+will run less efficiently after the reorganisation than it did before, so you
+should read the section {\em Recommended User Actions} to determine whether or
+not you will be affected and if so, what you should do about it.
+
+The time of installation at your site of the reorganised software will depend
+on your Site Manager.
+RAL expects to implement the changes in early May.
+If this is successful, other sites should implement it a few days or weeks
+later --- ask your Site Manager.
+
+\section{Organisational Considerations}
+
+Two important aspects of the organisation of the Starlink Software Collection
+are:
+\begin{itemize}
+\item The Physical organisation.
+\item The Logical organisation.
+\end{itemize}
+By `Physical organisation' I mean how the software files are organised on disk
+into directories.
+As you know, directories are organised in tree structures and at the top of
+the tree there is a directory with a simple name like [ABC].
+Let us call this a top-level directory.
+Some of the files in [ABC] may be directory files such as XYZ.DIR.
+This means that there is a directory called [ABC.XYZ] which is a sub-directory
+of [ABC].
+Now, when I say `top-level directory', I mean just those files that belong to
+[ABC] (say), and not those files that belong to any sub-directory such as
+[ABC.XYZ].
+However, when I say `tree', I mean all the files in the tree-like directory
+structure with [ABC] at its head.
+Thus
+\begin{verbatim}
+    $ DIR [ABC]
+\end{verbatim}
+will show me all the files in the {\em top-level directory} [ABC], while
+\begin{verbatim}
+    $ DIR [ABC...]
+\end{verbatim}
+will show me all the files in the {\em tree} [ABC].
+
+The physical organisation of the Collection comprises a set of trees.
+I will refer to these trees by the name of the top-level directory, such as
+[STARLINK], [ADAM], and so on.
+When Starlink started we thought it would be a good idea to store the Collection
+in a single tree called [STARLINK].
+The main attraction was that this would enable us to transport the Collection to
+another computer using a single command:
+\begin{verbatim}
+    $ BACKUP [STARLINK...] TAPE:STARLINK.BCK
+\end{verbatim}
+to write to tape a single `save-set' called STARLINK.BCK which would preserve
+the directory structure and enable the [STARLINK] tree to be recreated on
+another computer using the command:
+\begin{verbatim}
+    $ BACKUP TAPE:STARLINK.BCK [*...]
+\end{verbatim}
+This worked fine until the Collection grew so large that some sites had
+difficulty in storing the tree on a disk.
+The solution to this problem was to extract the files belonging to some of the
+larger items from the [STARLINK] tree and store them in a separate tree which
+could be stored on a different disk or even omitted all together.
+Starlink also began to install some astronomical catalogues which took up a
+lot of disk space and which were also stored in their own trees.
+Thus, the most convenient way of storing the Collection now is as a set of
+moderately sized trees.
+
+At the logical level, Starlink software is considered to be made up of items.
+An {\em item} is an identifiable piece of software which is convenient to
+manage and refer to as a unit.
+It is given an acronym (such as `PHOTOM') and a title (such as `An aperture
+photometry routine').
+The Starlink software index \mbox{(ADMINDIR:SSI.LIS)} lists the acronyms and
+titles of all the items in the Collection, and this is the final court of appeal
+when deciding which software is or is not in the Collection.
+An item is stored on the computer as one or more files in one or more
+directories.
+When I refer to an `item' in this note, I mean all the files which belong to
+it.
+
+One of the current problems is that some subdirectories of the [STARLINK]
+tree contain files belonging to many different items, so sometimes it is
+necessary to identify files individually in the Starlink software index when
+describing items.
+It would be much easier to identify the files belonging to an item if they
+were all stored in a single directory or tree and if this did not contain any
+files belonging to other items; then we could refer to the item by the name of
+this directory or tree.
+Also, the management of the software would be simplified as directories and
+trees could easily be moved, copied or deleted as an entity, without interfering
+with other items.
+This is one of the main things that has been done in the current reorganisation
+of the Starlink software.
+
+The {\em size} of an item is the number of blocks needed to store the directory
+or tree which holds its files.
+The distribution of sizes in the Collection is such that there are a few big
+items and a lot of small items.
+The most convenient way of storing these is to store the big items in trees by
+themselves and to store the small items in subdirectories of a composite tree.
+That way, all the small items can be transported in a single save-set, yet no
+single tree is very large.
+The composite tree can also be used to store documentation and administration
+data.
+This is the [STARLINK] tree.
+
+One of the advantages of having the Collection stored in a number of separate
+trees is that it makes it easier for a site to install a subset.
+All it need do is to select the trees that contain the software it wants and
+install those.
+This leads to another consideration, which is that some items depend on other
+items in order to work properly.
+The commonest case is an item which needs the GKS shareable graphics library
+to be installed.
+The web of interrelationships between Starlink software items has never been
+fully documented.
+However, we know that the items which are needed by other items tend to be
+fairly small in size --- typically subroutine libraries or shareable images ---
+and would, because of their size, be found in the [STARLINK] tree.
+Any such item which wasn't there because of its size could be stored there
+because it is required by other items.
+Thus the [STARLINK] tree satisfies three separate requirements:
+\begin{itemize}
+\item Somewhere to store lots of small items which can then be transported as
+a single entity.
+\item Somewhere to store items which may be needed by other items and which must
+therefore be installed.
+\item Somewhere to store Starlink documentation and administrative data.
+\end{itemize}
+We insist that the [STARLINK] tree be installed at every Starlink site
+(or site running any Starlink software), as then we can be fairly confident
+that any other Starlink item will work if we install its tree.
+Also, all the basic information on Starlink is available in DOCSDIR and
+ADMINDIR.
+
+Another consideration which affects the software organisation is that some
+software items are {\em proprietary} and are licensed to be used only at
+specific sites.
+As we have said that the [STARLINK] tree should always be installed at
+Starlink sites and other sites running Starlink software, we must not store
+proprietary items in this tree, even if they are small; we must store them in
+their own separate trees..
+There is one exception to this, and that is GKS which is required by many other
+items.
+Fortunately, the Starlink project is permitted to distribute this without
+charge to sites which run Starlink software for astronomical, non-commercial
+research.
+GKS has, therefore, been stored in the [STARLINK] tree.
+
+Another useful concept to use when managing the Collection is that of a
+{\em standard set} of items.
+This is a recommended minimal set of items that should be installed at any
+site claiming to run `Starlink software'.
+It is also useful as a standard response to the oft-repeated request: {\em
+Please send me the Starlink software.}
+In general, it would be wasteful to respond to every such request by sending
+the whole Collection as this is very large.
+Normally, what is required is a useful subset to which specific items can be
+added as required.
+
+Some items are used mainly by Site Managers to manage hardware or users.
+Other items may represent a security risk.
+It is convenient to set up another composite tree like [STARLINK] to hold these
+items.
+The software held in this tree is called {\em secure software}.
+
+\section{The New Organisation}
+
+The considerations described in the previous section have formed the basis
+of the reorganisation of the Starlink Software Collection.
+This will now be stored as a set of trees belonging to the following categories:
+\begin{description}
+\begin{description}
+\item [Standard set] :
+
+ The [STARLINK] tree, together with other trees as specified in the Starlink
+ software index --- currently ADAM, ADAMAPP, FIGARO, and KAPPA.
+ Items stored in one of these trees are called {\em standard items}.
+ The fact that an item is in the standard set does {\em not} imply that it is
+ important or supported --- it may merely be small.
+
+\item [Secure set] :
+
+ This is a single tree containing items issued mainly for managing Starlink
+ software or users, and items which could represent a security risk.
+ Items stored in this set are called {\em secure items}.
+
+\item [Option set] :
+
+ Trees containing a single item and which do not belong to the standard set or
+ the secure set.
+ The tree name should be the same as the acronym used in the Starlink software
+ index to describe the item it contains.
+ Items stored in trees in the option set are called {\em option items}.
+ The fact that an item is in the option set does {\em not} imply that it is
+ unimportant or not supported.
+ 
+\end{description}
+\end{description}
+The word `set' can refer to trees or items.
+Thus, the `standard set of items' comprises the items contained in the `standard
+set of trees'.
+Two further categories are useful:
+
+\begin{description}
+\begin{description}
+\item [Local software] :
+
+ The [STARLOCAL] tree whose structure should be based on \mbox{[STARLINK]} and
+ whose contents is determined locally.
+ There should be a local software index (LADMINDIR:SSI.LIS) which defines the
+ items stored in this tree; these items are called {\em local items}.
+
+\item [Data] :
+
+ A set of trees containing optional data files used by various items --- mainly
+ astronomical catalogues at the moment.
+ The trees are specified in file RLVAD::LADMINDIR:SIZE.LIS.
+
+\end{description}
+\end{description}
+
+The structure of the [STARLINK] tree has been simplified and rationalised.
+Libraries and utilities formerly stored in LIBDIR, STARDIR, SYSTEMDIR, and
+UTILITYDIR have been transferred into their own sub-trees.
+Also, the directory STARDIR has been eliminated and the packages in
+[STARLINK.PACK] have been transferred to their own trees.
+Software is now stored in only three subtrees:
+\begin{description}
+\begin{description}
+\item [LIBDIR] --- contains subroutine libraries.
+\item [SYSTEMDIR] --- contains general purpose utilities.
+\item [UTILITYDIR] --- contains astronomical utilities.
+\end{description}
+\end{description}
+
+\section{Summary of changes}
+
+The following transfers and deletions have taken place:
+
+\begin{description}
+\begin{description}
+
+\item [ASSOCIATED items $\Longrightarrow$ STANDARD items] :
+
+The following items have been moved into the [STARLINK] tree:
+
+\begin{description}
+\begin{description}
+\item [DSCL]
+\item [GKS]
+\item [PRIMDAT]
+\end{description}
+\end{description}
+DSCL has been extracted from the [ASPIC] tree as it is a way of using ASPIC
+rather than an ASPIC program.
+GKS has been put into [STARLINK] because it is {\em always} required when
+Starlink software is distributed and is used by many other items.
+PRIMDAT is a fairly small subroutine library and is most naturally stored in
+LIBDIR with the other libraries.
+
+\item [STANDARD items $\Longrightarrow$ OPTION items] :
+
+The following items have been taken out of the [STARLINK] tree and stored in
+their own trees.
+They are mostly refugees from the deleted [STARLINK.PACK] tree.
+\begin{description}
+\begin{description}
+\item [ADAMAPP]
+\item [DIPSO]
+\item [IRAS]
+\item [IUEDR]
+\item [JPL]
+\item [KAPPA]
+\item [MONGO]
+\item [REXEC]
+\end{description}
+\end{description}
+
+\item [STANDARD items $\Longrightarrow$ SECURE items] :
+
+The following items have been transferred from the [STARLINK] tree to the secure
+tree.
+\begin{description}
+\begin{description}
+\item [NETWORK]
+\item [NEWSMAINT]
+\item [UAFPROBE]
+\end{description}
+\end{description}
+
+\item [DELETIONS] :
+
+The following items have been withdrawn.
+If you still need them, ask your Site Manager to install them locally:
+\begin{description}
+\begin{description}
+\item [ADC]
+\item [FINGS]
+\item [HIGR]
+\item [OPWRIT]
+\item [SPECHAR]
+\end{description}
+\end{description}
+The withdrawn ADC is an obsolete stand-alone version of software which still
+exists as part of SCAR (where it is called FACTS).
+FINGS, HIGR, and SPECHAR have come to the end of their working lives as they
+have been replaced by better software.
+OPWRIT is no longer useful as the Optronics device it was designed to feed is
+no longer available.
+
+\item [RECLASSIFICATIONS] :
+
+The following item is still installed, but is no longer considered to be part
+of the Starlink Software Collection.
+It is commercial software that is only installed on STADAT:
+\begin{description}
+\begin{description}
+\item [SPAG]
+\end{description}
+\end{description}
+
+\end{description}
+\end{description}
+
+\section{Recommended User Actions}
+
+All but two of the changes should be invisible to users.
+This is because the relocations have been accounted for by altering the
+definitions of logical names and global symbols in the Starlink command
+procedures executed at startup and login time, and by making appropriate
+changes to command procedures belonging to the items involved.
+However, some of the changes may slow you down because some of the logical
+names used have become search lists rather than single values.
+In these cases you should change the logical name to a more specific one.
+The table below shows which logical name should be replaced by which other
+logical name when using a specified item.
+{\em In the case of JPL and NEWSMAINT these changes are essential as the old
+logical names will not work at all.}
+
+Old documentation on these items will no longer be correct --- I suggest you
+amend your existing copies of the indicated documents.
+New versions of all these documents have been released, except for SUN/33 which
+is very large and very obsolete.
+\begin{table}[h]
 \begin{center}
-\begin{tabular}{||l||c|c|c||c||c||} \hline
-{\bf Item} & {\bf LIBDIR} & {\bf SYSTEMDIR} &  {\bf UTILITYDIR} &
-{\bf Secure tree} & {\bf Separate trees} \\
+\begin{tabular}{|l|l|l|l|}
 \hline
+Software item & Replace & By & Document \\
 \hline
-AGI       & standard &   &   &   &   \\
-ARGSLIB   & standard &   &   &   &   \\
-ARGSMAC   & standard &   &   &   &   \\
-DIAGRAM   & standard &   &   &   &   \\
-GKS       & standard &   &   &   &   \\
-GKS6      & standard &   &   &   &   \\
-HDS       & standard &   &   &   &   \\
-INTERIM   & standard &   &   &   &   \\
-NCAR      & standard &   &   &   &   \\
-PGPLOT    & standard &   &   &   &   \\
-PRIMDAT   & standard &   &   &   &   \\
-SGS       & standard &   &   &   &   \\
-SGS6      & standard &   &   &   &   \\
-SLALIB    & standard &   &   &   &   \\
-SNX       & standard &   &   &   &   \\
-TAPEIO    & standard &   &   &   &   \\
-TRANSFORM & standard &   &   &   &   \\
+{\bf ARGSLIB}   & LIBDIR            & ARGSLIB\_DIR   & --- \\
+{\bf ARGSMAC}   & LIBDIR            & ARGSMAC\_DIR   & SSN/12 \\
+{\bf FORMCON}   & STARDIR           & FORMCON\_DIR   & SUN/3 \\
+{\bf GENERIC}   & UTILITYDIR/LIBDIR & GENERIC\_DIR   & SUN/7 \\
+{\bf HINDLEGS}  & UTILITYDIR        & SYSTEMDIR      & SUN/22 \\
+{\bf IDDRIVER}  & SYSTEMDIR         & IDDRIVER\_DIR  & SSN/26 \\
+{\bf INTERIM}   & STARDIR           & INTERIM\_DIR   & SUN/4 \\
+{\bf JPL}       & LIBDIR            & JPLDIR         & SUN/87 \\
+{\bf LIBX}      & UTILITYDIR        & LIBX\_DIR      & SUN/8 \\
+{\bf NEWSMAINT} & UTILITYDIR        & NEWSMAINT\_DIR & SSN/50 \\
+{\bf SGS6}      & LIBDIR            & SGS6\_DIR      & SUN/33 \\
+{\bf SLALIB}    & LIBDIR            & SLALIB\_DIR    & SUN/67 \\
+{\bf TAPECOPY}  & UTILITYDIR        & TAPECOPY\_DIR  & SUN/47 \\
+{\bf TAPEIO}    & LIBDIR            & TAPEIO\_DIR    & SUN/21 \\
+{\bf TPU}       & UTILITYDIR        & TPU\_DIR       & SUN/68 \\
 \hline
-DSCL      &   & standard &   &   &   \\
-EDFITS    &   & standard &   &   &   \\
-FIND      &   & standard &   &   &   \\
-FORMCON   &   & standard &   &   &   \\
-GENERIC   &   & standard &   &   &   \\
-GEROFF    &   & standard &   &   &   \\
-HINDLEGS  &   & standard &   &   &   \\
-IDDRIVER  &   & standard &   &   &   \\
-LIBMAINT  &   & standard &   &   &   \\
-LIBX      &   & standard &   &   &   \\
-LZCMP     &   & standard &   &   &   \\
-RASTSYMB  &   & standard &   &   &   \\
-RUNSTAR   &   & standard &   &   &   \\
-TAPECOPY  &   & standard &   &   &   \\
-TPU       &   & standard &   &   &   \\
-\hline
-AATGS     &   &   & standard &   &   \\
-APLATE    &   &   & standard &   &   \\
-ASTROM    &   &   & standard &   &   \\
-CHART     &   &   & standard &   &   \\
-COCO      &   &   & standard &   &   \\
-IUEDEARCH &   &   & standard &   &   \\
-PATT      &   &   & standard &   &   \\
-RPS       &   &   & standard &   &   \\
-RV        &   &   & standard &   &   \\
-UKIRTHELP &   &   & standard &   &   \\
-\hline
-\hline
-NETWORK   &   &   &   & secure   &   \\
-NEWSMAINT &   &   &   & secure   &   \\
-UAFPROBE  &   &   &   & secure   &   \\
-\hline
-\hline
-ADAM      &   &   &   &   & standard \\
-ADAMAPP   &   &   &   &   & standard \\
-ASPIC     &   &   &   &   & option   \\
-ASTERIX   &   &   &   &   & option   \\
-DAOPHOT   &   &   &   &   & option   \\
-DIPSO     &   &   &   &   & option   \\
-FIGARO    &   &   &   &   & standard \\
-GASP      &   &   &   &   & option   \\
-HAGGIS    &   &   &   &   & option   \\
-HXIS      &   &   &   &   & option   \\
-IRAS      &   &   &   &   & option   \\
-IRCAM     &   &   &   &   & option   \\
-IUEDR     &   &   &   &   & option   \\
-JPL       &   &   &   &   & option   \\
-KAPPA     &   &   &   &   & standard \\
-MANUAL    &   &   &   &   & option   \\
-MONGO     &   &   &   &   & option   \\
-NAG       &   &   &   &   & option   \\
-NOD2      &   &   &   &   & option   \\
-PHOTOM    &   &   &   &   & option   \\
-REXEC     &   &   &   &   & option   \\
-SCAR      &   &   &   &   & option   \\
-SPECX     &   &   &   &   & option   \\
-TEX       &   &   &   &   & option   \\
-TPOINT    &   &   &   &   & option   \\
-\hline
-\end {tabular}
-\caption {New organisation of the Starlink Software Collection}
+\end{tabular}
 \end{center}
-\end{table}}
+\end{table}
 
+As an example, suppose you want to link your program with the SLALIB routines.
+SUN/67.7 tells you to do this using the command:
+\begin{verbatim}
+    $ LINK progname,LIBDIR:SLALIB/LIB
+\end{verbatim}
+After the reorganisation, you should change this command to:
+\begin{verbatim}
+    $ LINK progname,SLALIB_DIR:SLALIB/LIB
+\end{verbatim}
+because the SLALIB library has been moved from LIBDIR to a subdirectory with
+the logical name SLALIB\_DIR.
+The use of the other items will involve similar changes in logical names.
+You may need to revise some of your own command procedures which refer to these
+items.
+
+If you have any problems that you suspect have been caused by the
+reorganisation, please send a mail message to RLVAD::STAR describing the
+problem.
+
+\section{Old and new organisation}
+
+The two tables at the end of this paper show the old and new organisation of
+the Starlink software.
+They show which trees hold the files for a specific item.
+Table 2 shows the category to which each item belongs.
 \end{document}
