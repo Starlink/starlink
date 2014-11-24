@@ -473,7 +473,6 @@ can be extracted using exactly the same extraction weights.  The parameters
 are  as follows
 
 \begin{description}
-\begin{description}
 
 \item[BASIS] This is the name of the file whose header is to act as the basis.
 It is important that this file has been run completely through the extraction
@@ -513,7 +512,6 @@ profile weights and obviously only required if an optimal extraction is being
 performed.
 
 \end{description}
-\end{description}
 
 \subsection{SAM\_DEKKER}
 
@@ -521,7 +519,6 @@ SAM\_DEKKER sets up the DEKKER file.  Some sort of two dimensional display is
 required as the user indicates the limits of the dekker with a cursor.  The
 parameters are as follows:
 
-\begin{description}
 \begin{description}
 
 \item[INPUT] This is the name of the data frame which is to be displayed.
@@ -540,7 +537,6 @@ the x axis and `2' for the y axis.
 \item[DEKKER] This is the output file for the dekker coordinates.
 
 \end{description}
-\end{description}
 
 \subsection{SAM\_EXTRACT}
 
@@ -550,7 +546,6 @@ optimal extraction, then the choice of the extraction method to be used will
 be made automatically based on whether a TRACE file has been used in the
 previous reduction procedures.   The parameters are as follows:
 
-\begin{description}
 \begin{description}
 
 \item[INPUT]  This is the name of the input sky-subtracted frame.
@@ -586,7 +581,6 @@ it is not prompted for and it defaults to TRUE.  If tramline extraction is
 wanted, then NOOPTIMAL must be specified on the command line.
 
 \end{description}
-\end{description}
 
 \subsection{SAM\_FIND}
 
@@ -598,7 +592,6 @@ program locates the spectrum itself with the help of a few parameters). If
 interactive mode is used, then a device for line plotting will be needed.  The
 parameters are as follows:
 
-\begin{description}
 \begin{description}
 
 \item[INPUT]  This is the name of the input frame.
@@ -660,7 +653,6 @@ parallel to the y axis.  Note that is is only used if $\mbox{NOBJ} > 1$.
 located automatically.
 
 \end{description}
-\end{description}
 
 \subsection{SAM\_PROC}
 
@@ -675,14 +667,12 @@ SAM\_SETUP.  In addition to the list below, one should consult section
 \ref{sec:samsetup} for a list of the hidden parameters which can be set.
 
 \begin{description}
-\begin{description}
 
 \item[INPUT] This is the name of the input frame.
 
 \item[OUTPUT] This the output file name.  The output will be in the form of a
 one dimensional spectrum.
 
-\end{description}
 \end{description}
 
 It is worth noting that in the case where a series of spectra are to be
@@ -701,7 +691,6 @@ optimal extraction algorithms on offer.  The choice is made automatically by
 looking in the input file header to see if a TRACE file is being used.  The
 parameters are:
 
-\begin{description}
 \begin{description}
 
 \item[INPUT] This is the name of the input sky-subtracted frame.
@@ -742,7 +731,6 @@ The sigma here is the error for the individual pixel.
 optimal extraction profile weights.
 
 \end{description}
-\end{description}
 
 \subsection{SAM\_SETUP} \label{sec:samsetup}
 
@@ -765,7 +753,6 @@ needs them.
 
 {\bf Parameters from SAM\_FIND}
 
-\begin{description}
 \begin{description}
 
 \item[NITER] SAM\_FIND attempts to locate the centroid of the spectral profile
@@ -812,11 +799,9 @@ parallel to the y axis.  Note that is is only used if $\mbox{NOBJ} > 1$.
 located automatically.
 
 \end{description}
-\end{description}
 
 {\bf Parameters from SAM\_SKY}
 
-\begin{description}
 \begin{description}
 
 \item[SKY\_ORD] This is the order of the polynomials to be fit to the sky
@@ -830,11 +815,9 @@ number of pixels which will be rejected.  Again one should be careful to not
 reject too many pixels as it may become impossible to get a good fit.
 
 \end{description}
-\end{description}
 
 {\bf Parameters from SAM\_PROFILE}
 
-\begin{description}
 \begin{description}
 
 \item[BLOCK] The user may block the spectra in wavelength in order to increase
@@ -855,11 +838,9 @@ residuals are this number of sigma above the predicted profile are rejected.
 The sigma here is the error for the individual pixel.
 
 \end{description}
-\end{description}
 
 {\bf Parameters from SAM\_EXTRACT}
 
-\begin{description}
 \begin{description}
 
 \item[EXT\_THR] This is a threshold over which pixels will be rejected from the
@@ -870,11 +851,9 @@ units are in number of sigma of the individual pixels.
 \item[OPTIMAL]  This is TRUE if the user wants optimal extraction.
 
 \end{description}
-\end{description}
 
 {\bf Other parameters}
 
-\begin{description}
 \begin{description}
 
 \item[AXIS] This is the axis to which the spectra are parallel.  Answer `1' for
@@ -895,7 +874,6 @@ dekker, e.g. an arc spectrum, where sky subtraction etc doesn't matter.  This
 is the same as using SAM\_WHOLE.
 
 \end{description}
-\end{description}
 
 \subsection{SAM\_SHOW}
 
@@ -903,7 +881,6 @@ This routine displays a frame as a two-dimensional colour plot. superimposed
 tramlines show the position of the spectrum, the limits of the spectral
 rows/columns and the positions of the two sky bands.  The parameters are:
 
-\begin{description}
 \begin{description}
 
 \item[INPUT] This is the name of the input frame to be displayed.
@@ -932,14 +909,12 @@ limits are found by SAM\_FIND.  Two values are required.
 \item[LOW, HIGH] These are the low and high data values for the greyscale.
 
 \end{description}
-\end{description}
 
 \subsection{SAM\_SKY}
 
 SAM\_SKY does the sky subtraction after the sky regions and the object region
 has been defined.  The parameters are:
 
-\begin{description}
 \begin{description}
 
 \item[INPUT] This is the name of the input frame to be displayed.
@@ -976,7 +951,6 @@ reject too many pixels as it may be impossible to get a good fit.
 \item[OUTPUT] This the output file for the sky subtracted spectral frame.
 
 \end{description}
-\end{description}
 
 \subsection{SAM\_STRT}
 
@@ -989,7 +963,6 @@ within the limits defined by the DEKKER file and by the parameter SPEC\_RNG
 will be processed.  The rest of the input data is discarded. The parameters
 are:
 
-\begin{description}
 \begin{description}
 
 \item[INPUT] This is the name of the input frame with the spectrum to be
@@ -1010,7 +983,6 @@ required.
 spectrum.
 
 \end{description}
-\end{description}
 
 \subsection{SAM\_TRACE}
 
@@ -1021,7 +993,6 @@ best results it should be run on a spectrum with reasonably high  signal/noise
 coefficients, but also information used in later programs to scale the
 coordinates.  The parameters are:
 
-\begin{description}
 \begin{description}
 
 \item[INPUT] This is the name of the input frame with the spectrum to be fit.
@@ -1060,7 +1031,6 @@ required.
 \item[NORD] This is the order of the polynomial to be fit to the centroids.
 
 \end{description}
-\end{description}
 
 \subsection{SAM\_WHOLE}
 
@@ -1070,7 +1040,6 @@ irrelevant (e.g. arc or flat field spectra).  All this routine does is to set
 up information in the input file header.  SAM\_EXTRACT does the actual
 extraction.  The parameters are:
 
-\begin{description}
 \begin{description}
 
 \item[INPUT] This is the name of the input frame.
@@ -1088,7 +1057,6 @@ the x axis and `2' for the y axis.
 extracted. These are the lower and upper limits in pixel numbers.  Two values
 are required.
 
-\end{description}
 \end{description}
 
 \section {Acknowledgments and references}

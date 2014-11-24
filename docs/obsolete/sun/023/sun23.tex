@@ -375,11 +375,9 @@ To get out of DSCL type:
 Suppose that you have a program ADD which adds together two frames.
 It has three parameters:
 \begin{description}
-\begin{description}
 \item [IN1]: the first input frame.
 \item [IN2]: the second input frame.
 \item [OUT]: the output frame.
-\end{description}
 \end{description}
 The normal way of running this program outside DSCL, perhaps during its
 development, would be to type:
@@ -509,7 +507,6 @@ The HELP library is grouped into classes which correspond to the sections of
 Appendix B.
 It also contains information on the following topics:
 \begin{description}
-\begin{description}
 \item [ASPIC]: Some brief notes on ASPIC.
 \item [DSCL]: Detailed information about DSCL under various headings.
 \item [HELP]: How to use the HELP system.
@@ -517,7 +514,6 @@ It also contains information on the following topics:
 cannot be accessed by DSCL unless prefaced by a locally-defined directory name.
 Some sites may adopt other strategies such as defining a `local' DSCL command
 LDSCL.
-\end{description}
 \end{description}
 Because of the way HELP libraries work, if a program should be in more than one
 class then a second copy of the documentation must be stored.
@@ -533,11 +529,9 @@ However, there are three differences from the standard HELP:
 \item The first library to be searched is the ASPIC HELP library. The structure
 of this means that:
 \begin{description}
-\begin{description}
 \item [Topics]: are the {\em classes} of ASPIC programs.
 \item [Sub-topics]: are the individual programs.
 \item [Sub-sub-topics]: are {\em date}, {\em author} and {\em parameters}.
-\end{description}
 \end{description}
 This means that it is no-longer possible to ask for HELP on an individual
 program; you must either specify a class or use the command:
@@ -767,7 +761,6 @@ Also, check that ASPDIR:ASPINST.COM is acceptable.
 \section {REFERENCES}
 
 \begin{description}
-\begin{description}
 \item [SG/1]: ASPIC Guide.
 \item [SUN/4]: INTERIM --- Starlink software environment.
 \item [SUN/24]: ASPIC --- Image processing programs (2).
@@ -776,7 +769,6 @@ Also, check that ASPDIR:ASPINST.COM is acceptable.
 \item [SUN/94]: ADAM --- Starlink software environment.
 \item [LGP/3 (RGO)]: Some comments on displaying images.
 \item [LUN/42 (RGO)]: A simple interactive astrometry package.
-\end{description}
 \end{description}
 \appendix
 
@@ -825,7 +817,6 @@ For example, {\bf INDPIX} is a procedure which runs program {\bf INDPIXP}.
 In the list below, such procedure/program combinations are indicated by
 following the procedure name by the character `*', eg.\ {\bf INDPIX*}.
 \subsection {ARGS}
-\begin{description}
 \begin{description}
 \item [ABLINK]: Display two images on the ARGS and allow them to be registered
 and blinked under trackerball control.
@@ -877,9 +868,7 @@ It also allows compression of an image so that it will fit on the ARGS screen.
 \item [UNZOOM]: Set the ARGS zoom factors to 1 and 1 on the centre of the
 screen.
 \end{description}
-\end{description}
 \subsection {ARITHMETIC}
-\begin{description}
 \begin{description}
 \item [ADD]: Add two frames.
 \item [ADDMSK]: Combine two images where effect is defined by 2 masks
@@ -899,9 +888,7 @@ created by POLIFILLA.
 \item [SQRT]: Replace each element by its square root.
 \item [SUB]: Subtract the second frame from the first.
 \end{description}
-\end{description}
 \subsection {ASTROMETRY}
-\begin{description}
 \begin{description}
 \item [CCIRD]: Set the transformation coefficients calculated by CINVERT to the
 input for RDTOXY.
@@ -926,9 +913,7 @@ of a stellar image for which approximate coordinates are input by the user.
 \item [XYTORD]: Convert cursor defined positions on the ARGS into a list of
 right ascensions and declinations.
 \end{description}
-\end{description}
 \subsection {COMPRESS}
-\begin{description}
 \begin{description}
 \item [CONFLEV]: Rescale an image using the background level and noise variance.
 \item [PACK]: Pack an image which has been scaled from 0 to 1 (thresholded) or
@@ -936,9 +921,7 @@ right ascensions and declinations.
 \item [UNPACK]: Unpack images created by PACK (PACK and UNPACK may be used to
 compress images for transmission over the network).
 \end{description}
-\end{description}
 \subsection {DETAILS}
-\begin{description}
 \begin{description}
 \item [CCDCON]: Change the dimensions of an image by resetting the values of
 the NAXIS1 and NAXIS2 descriptors.
@@ -974,9 +957,7 @@ image displayed on the ARGS.
 \item [WRDSCR]: Write new items as descriptors into an existing frame.
 \item [WRHIST]: Form, store and/or write out the histogram of a frame.
 \end{description}
-\end{description}
 \subsection {DISPLAY}
-\begin{description}
 \begin{description}
 \item [AHARDCOPY]: Copy the current ARGS pixel store onto the Printronix
 lineprinter.
@@ -1016,9 +997,7 @@ is visible on the ARGS.
 \item [WONB]: Set the ARGS to white lines on a black background when it is used
 in vector mode.
 \end{description}
-\end{description}
 \subsection {DOCS}
-\begin{description}
 \begin{description}
 \item [CREDOC]: Guide user through the creation of program documentation
 (calls the program DOCIT).
@@ -1032,9 +1011,7 @@ procedure EDITIT).
 \item [UNDOC]: Remove the documentation from the start of a program if major
 changes are required (calls the program STRIP).
 \end{description}
-\end{description}
 \subsection {EDRS}
-\begin{description}
 \begin{description}
 \item [ARGPIC]: Display images on the ARGS with autoscaling and choice of
 screen position. Can also display images on a Digisolve IKON display.
@@ -1108,9 +1085,7 @@ on an ARGS or IKON.
 \item [XYLISTA]: Type up to 20 parameters in the same format as XYLIST.
 \item [XYTRAN]: Apply a linear transformation to a set of (X,Y) positions.
 \end{description}
-\end{description}
 \subsection {EDRSX}
-\begin{description}
 \begin{description}
 \item[BDFGEN]: Produces a BDF image or XY list from data stored in a text file.
 A wide range of text file formats can be handled.
@@ -1175,7 +1150,6 @@ against those in another.
 image.
 \item[XYPLOT]: Plots positions held in an XY list on an image overlay device.
 \end{description}
-\end{description}
 In addition to these, there are several DCSL command procedures which use EDRSX
 and EDRS program, as examples of what can be done with these packages.
 These procedures use the features of DSCL and DCL to run programs automatically
@@ -1184,7 +1158,6 @@ The user should look at these procedures for examples of how to use EDRS and
 EDRSX.
 They are in files with file extension .SCL and in directory EDRSX (e.g.\
 EDRSX:DESTRIPE.SCL):
-\begin{description}
 \begin{description}
 \item [BIGCONV]: Convolves two images by multiplying their Fourier transforms.
 {\em Much} quicker than program CONVOLVE when using large images.
@@ -1200,9 +1173,7 @@ MEMCRDD.
 it off the image.
 \item [WEIGHTGEN]: Used to create weight images for destriping IRAS images.
 \end{description}
-\end{description}
 The following utilities also exist :
-\begin{description}
 \begin{description}
 \item[BATCH]: Submits a DSCL command to run in batch with ALL currently defined
 logical names and symbols copied over from the current process to the batch job.
@@ -1212,9 +1183,7 @@ spaces to maintain the same appearance.
 Any tab positions can be set up but by default EDT tab spacing is assumed.
 This program can be run from DCL using the RUN command as well as from DSCL.
 \end{description}
-\end{description}
 \subsection {FC}
-\begin{description}
 \begin{description}
 \item [FC]: Perform the `standard' false colour and colour enhancement
 operations in sequence.
@@ -1234,9 +1203,7 @@ Saturation, Intensity) images.
 \item [VIDISP]: Display an image created by VELINT as a colour coded velocity
 map but with intensities represented as well.
 \end{description}
-\end{description}
 \subsection {FILTER}
-\begin{description}
 \begin{description}
 \item [BLURR]: Generate a 5x5 frame containing a Gaussian profile.
 \item [CONV]: Convolve an image with a second (smaller) one as may have been
@@ -1262,9 +1229,7 @@ image.
 \item [USMASK]: Form an `un-sharp' masked image by subtracting a smoothed
 version of an image from the original.
 \end{description}
-\end{description}
 \subsection {FOURIER}
-\begin{description}
 \begin{description}
 \item [COSBELL]: Apply a cosine-bell function to a 1D or 2D image.
 \item [DFFTASP]: Efficient 2D FFT program.
@@ -1274,9 +1239,7 @@ version of an image from the original.
 \item [PSFEST]: Point-spread-function (star profile) from an image.
 \item [PSPEC]: Power spectrum from the Fourier transform.
 \end{description}
-\end{description}
 \subsection {GALPHOT}
-\begin{description}
 \begin{description}
 \item [ABOXASP]: Define and save a series of rectangular boxes drawn round
 selected features in an image.
@@ -1317,9 +1280,7 @@ computed from a model with fixed parameters.
 galaxy.
 \item [STAREMASP]: Interactively remove stars and blemishes from an image.
 \end{description}
-\end{description}
 \subsection {GEOMETRY}
-\begin{description}
 \begin{description}
 \item [FLIP]: Invert an image with respect to a horizontal or vertical axis.
 \item [MOVE]: Move an image by a non-integral shift in X and Y.
@@ -1328,9 +1289,7 @@ Designed for use in conjunction with STK23 to convert a set of 2 spectra (such
 as long slit IPCS) into a TAURUS-compatible cube.
 \item [STK23]: Combine a set of 2D images into a 3-D cube.
 \end{description}
-\end{description}
 \subsection {GRASP}
-\begin{description}
 \begin{description}
 \item [ALIGN]: Align an image with a reference image.
 \item [APERCUR]: Aperture photometry using a circular aperture positioned on an
@@ -1458,9 +1417,7 @@ for one of the parameters present inside or outside a defined range.
 \item [XYWEEDA]: Take an (X,Y) list and extract those entries whose (X,Y) lie
 in a pixel of the reference image which has a non-zero value.
 \end{description}
-\end{description}
 \subsection {INPUT}
-\begin{description}
 \begin{description}
 \item [FITSIN]: Convert FITS data on magnetic tape into Starlink frames.
 \item [IPCSIN]: Convert IPCS data on magnetic tape into Starlink frames.
@@ -1475,9 +1432,7 @@ The interiors are set to 1, the exteriors to 0.
 \item [TOSTAR]: Convert RGODR-format images into Starlink frames.
 \item [TYPEIN]: Keyboard input to a 1D frame.
 \end{description}
-\end{description}
 \subsection {LUT}
-\begin{description}
 \begin{description}
 \item [COLCYCLE]: Generate a colour table consisting of cyclic replicas of an
 original colour table.
@@ -1516,9 +1471,7 @@ table.
 \item [VARGREY]: Generate a grey colour table with user defined end points.
 \item [ZEBRA]: Generate a {\em pseudo contour} colour table.
 \end{description}
-\end{description}
 \subsection {MISCELLANEOUS}
-\begin{description}
 \begin{description}
 \item [ASAVE]: Save the current ARGS pixel store in a BDF file.
 \item [CALHELP]: Short help program for {\em CALIBRATION} package.
@@ -1597,9 +1550,7 @@ lower and upper limits.
 \item [ZAPLIN]: Replace a vertical or horizontal strip in an image to remove
 defects.
 \end{description}
-\end{description}
 \subsection {PERIODS}
-\begin{description}
 \begin{description}
 \item [CONCAT]: Concatenate two or more input datasets.
 \item [DETREND]: Fit a polynomial to the raw observations to remove any trends;
@@ -1646,9 +1597,7 @@ file.
 \item [SYNTH]: Generate sinusoidal data with user-defined periods and noise
 levels at the same epochs as an input data set.
 \end{description}
-\end{description}
 \subsection {PHOTOMETRY}
-\begin{description}
 \begin{description}
 \item [APERASP]: Perform all the tasks related to aperture photometry.
 \item [ARGSCIR]: Display a circular cursor on the ARGS and return its position
@@ -1676,9 +1625,7 @@ quadrant.
 \item [SETMAG*]: Set IAM sky background.
 \item [SETPER*]: Set threshold parameter of histogram.
 \end{description}
-\end{description}
 \subsection {POLARIMETRY}
-\begin{description}
 \begin{description}
 \item [CVPLOT]: Produce annotated contour map of an image with corresponding
 polarization vectors overlayed.
@@ -1689,9 +1636,7 @@ and polarization angle data.
 \item [STOKES]: Generate Stokes parameters Q and U from total polarization
 and polarization angle.
 \end{description}
-\end{description}
 \subsection {SIZE}
-\begin{description}
 \begin{description}
 \item [CMPRS]: Compress an image by integer factors in X and Y.
 \item [COMPAVE]: Compress an image by averaging adjacent elements.
@@ -1707,7 +1652,6 @@ MANIC handles much more general cases.
 \item [PIXDUPE]: Expand an image by pixel duplication.
 \item [SQORST]: Either squashes or expands an `unknown' image into a defined
 shape by performing bi-linear interpolation.
-\end{description}
 \end{description}
 \newpage
 
