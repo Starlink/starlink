@@ -1,0 +1,576 @@
+.title SUN/58.5
+.set date 1,6,1990
+.autoparagraph
+.set paragraph 0,1,2
+.layout 3,2
+.lm 10
+.page size 57,75
+.flags substitute
+.nofill
+.keep
+.justify
+SCIENCE#AND#ENGINEERING#RESEARCH#COUNCIL SUN/58.5
+RUTHERFORD#APPLETON#LABORATORY
+ASTROPHYSICS#AND#GEOPHYSICS#DIVISION
+
+Starlink#Project Issued#by
+Starlink#User#Note#58.5
+
+.right;C. Lloyd
+.right;$$date
+
+.fill
+.repeat 60,"-"
+.blank
+.centre;IUEDEARCH and access to IUE archive data
+.centre;----------------------------------------
+.b.nfl substitute
+.hl1 Introduction
+The IUE data archive is supported and maintained by members of the UK IUE 
+Project in the Space Science Department at RAL. 
+The archive comprises some 1000 tapes, containing about 70000 images,
+and a catalogue which gives details of the exposures. New images are continually
+added to the archive and the catalogue is updated every month.
+All IUE data are available to the astronomical community about six months after
+the observations were made and appear in the catalogue a few 
+months before release.
+The aim of the system is to provide UK astronomers with quick and painless 
+access to IUE data.
+This document describes how to interrogate the catalogue and extract data from
+the archive. There are also two other documents relating to IUE data. SUN/37
+IUEDR - IUE data reduction package,
+describes how to extract spectra from IUE data files and SUN/20 ULDA/USSP
+- Accessing the IUE ULDA,
+describes a subsiduary archive of extracted low resolution spectra.
+
+Access to the IUE archive is possible through the captive IUE account
+on the database machine at RAL and through a small number of global commands
+which may be issued from your own username.
+From the captive IUE account it is possible to interrogate the IUE catalogue,
+issue dearchiving requests and use some other facilities.
+The dearchiving program copies the required files from archive tapes to an
+output tape and runs on the IBM at RAL (RL.IB) as a batch program
+under MVS.
+Before using the package ensure that @NET$DIR:NETSYMB is included in your 
+LOGIN.COM file.
+To run the dearchiving program remotely and to use FTP it is 
+necessary to be connected to the boot node of your cluster.
+The following sections contain details on
+.sk
+.br;2: The IUE captive account
+.br;3: Global commands
+.br;4: Consulting the catalogue
+.br;5: Allocating a tape to contain your data
+.br;6: Dearchiving images
+.br;7: Resubmitting a job
+.br;8: Dispatching the tape
+.br;9: Error messages
+
+.hl1 THE IUE CAPTIVE ACCOUNT.
+
+The IUE captive account is a username on the database machine at RAL 
+(STADAT::IUE) 
+which anyone may use for accessing the IUE data archive.
+All aspects of the archive may be used from the captive account,
+however, it is recommended that dearchiving requests are issued from
+your own username using one of the global commands described below.
+Access to the IUE catalogue is possible only through the captive account.
+To use the captive account login to your own username on a STARLINK node
+and then
+.lt
+
+	$ SET HOST STADAT
+
+.el
+and login to username IUE (no password is required).
+You are asked for a name which is used for a subdirectory to contain your files
+and then the system displays a list of options. These give access to the 
+catalogue, dearchiving and other 
+facilities, and enable a few DCL commands to be issued.
+These options are:
+.ls
+.le;HELP - An online help facility which gives brief descriptions of how to use
+the various options in IUE.
+.le;MAIL - Gives access to the VMS mail facility.
+.le;IUEDEARCH - Runs the dearchiving program for copying data onto magnetic
+tapes.
+.le;IUELOG - Searches the IUE catalogue.
+.le;CLASSKEY - Displays a list of the various classification codes used in the
+IUE catalogue.
+.le;TYPE - Same as the DCL command 'TYPE'.
+It can be used to view any of the files in the IUE directory. 
+Wild card characters can not be used in the TYPE command.
+.le;DIR - Displays the contents of the IUE directory.
+It may be used with the same options as the DCL equivalent.
+.le;TRANS - Files which have been created in the IUE directory can be
+transferred to one of your own directories with this option.
+You will be prompted for your username, password, VAX mnemonic, the directory
+you wish the files to be transferred to, and the file name.
+Wild card characters may be used in the filename to allow several versions of
+a file to be transferred at once.
+.le;PRINT - Obtains a hard copy of a file in the IUE directory on RLVAD
+SYS$PRINTER.
+Wild card characters may not be used when using this option.
+.le;SUBMIT - Resubmit a job.
+.le;DESPATCH - Request your output WDCnnn tape to be sent to you.
+.le;BETA - Calculates beta and other angles for targets observed with IUE.
+.le;LOG - End the session and log-out.
+.els
+Any file you create in the IUE directory will be deleted automatically after
+two weeks.
+If you wish to keep a file for longer than this it must be transferred to one of
+your own directories using MAIL or TRANS.
+
+.hl1 Global commands
+The intention is to replace the captive IUE account (as much as possible)
+with global commands which may be issued from your own username on your
+local STARLINK node.
+To set up the appropriate symbols include
+.lt
+
+	$ @STADAT::DISK$STARDATA:[IUES.CAPACCNT]REMOTESTART
+
+.el
+in your LOGIN.COM. The commands currently available are
+.lt
+
+	$ IUEHELP - brief outline of the remote commands
+
+	$ IUENEWS - any news of log updates etc
+
+	and
+	$ IUEDEARCH
+
+	$ IUERESUBMIT
+
+	$ IUEDESPATCH
+
+.el
+which are described in detail in the appropriate sections below.
+
+.hl1 Consulting the catalogue
+At present consulting the catalogue is possible only by accessing the IUE 
+captive account.
+Having logged into STADAT::IUE, see section 2 which describes how to do this,
+select the IUELOG option. You are prompted for a name which acts as an
+identifier for your files.
+You will first want to search the MAIN catalogue and create work files. 
+These may also be searched and refined to provide the list you want. Any of
+the work files may be kept (KEEP) and will be saved as identifier.IUE files. 
+Initially these are
+in RA order but it is possible to sort (ORDER) them by either date or camera
+and image number. All the KEEPed and ORDERed files are saved as different
+generations of [IUE]identifier.IUE where the identifier is the name you 
+gave at the start. The identifier.IUE files may be MAILed or transfered by FTP
+using the TRANS option to your own username.
+
+.hl1 Allocating a tape to contain your data
+Before dearchiving IUE images it is necessary to allocate yourself an
+output data tape.
+At present allocating a tape is possible only from the IUE captive account.
+Login and select the ALLOCATE option. In response to the prompts select
+either 16 or 62 for a 1600 or 6250 bpi tape. Give your name and address. 
+The name of the tape will be selected automatically and is of the form
+WDCnnn.
+The tapes are all NL (no label).
+
+.hl1 Dearchiving images
+.hl2 Preparing \and submitting \the \job
+First allocate yourself a tape.
+IUEDEARCH can only be run from a machine that has both a link to JANET and a
+DECnet connection to Starlink.
+Dearchiving jobs may be submitted from the IUE captive account using the 
+IUEDEARCH option but the prefered way is from your own username using the 
+global command
+.lt
+
+	$ IUEDEARCH
+
+.el  
+If IUEDEARCH is not recognized, contact your site manager and RLVAD::IUES.
+In both cases the program appears the same. You 
+will be prompted for the following:
+.ls
+.le;Your name (surname first, then your initials).
+.le;Name of your establishment (one line).
+.le;Your output tape name, density and label
+(type as shown by the prompt; one space between each field).
+.le;A code for type of file required (ie GPHOT image or/and EXTRACTED etc).
+If you do not know the code, type "?" for a list. Some information relating to
+the image is available in a more understandable form in the header of the 
+EXTRACTED spectrum, so for HIRES it is usual to dearchive the G/PHOT and the
+EXTRACTED files.
+.le;Number of first file on output tape. If you have copied 10 files on this
+tape previously, you would type 11.
+.le;If you type a number other than 1 in step 5, you will be asked to give the
+length of tape already used.
+This information is given in REQU.FIL of the previous job; see below.
+The program keeps track of the length of output tape used, so the tape is used
+efficiently and the IBM job should not crash when the tape is full.
+.le;Camera name and image number of the required data.
+No space is needed between the camera and image number, eg LWR123, or LWR1234,
+or LWR12345 will work.
+.le;Check that the object identification is correct.
+Repeat for the required images and enter END to finish.
+.le;VAX username.
+.le;VAX password.
+.le;Your VAX NRS name. A list is available in the program and SUN/36.
+.els
+IUEDEARCH has a list of bad archive tapes, ie tapes which cannot be used to
+retrieve data for one reason or another, and copying will not be attempted from
+such tapes.
+It also checks the release date of all images requested, to safeguard the data.
+
+Alternatively, the program will stop when it estimates that the output tape will
+be filled by the data, or when there are eighteen archive tapes required, as
+this is the maximum number the IBM can process at one time.
+
+Your VAX username, password and NRS name are required by FTP to enable the 
+output of the IBM job to be routed back to your node and placed in your 
+directory.
+
+By this time you will have created two new files; IUEWDC.JCL and REQU.FIL.
+The former is a batch job which is submitted to the IBM at your request, and 
+you should remember the generation number in case it needs to be resubmitted.
+The latter contains the list of images you requested.
+If you realise that an error has been made, you can stop the job from being
+submitted by replying 'N' to the prompt at this stage.
+A copy of REQU.FIL is sent to the IUE data archive for dearchiving 
+statistics, and so you may be notified
+when any bad tapes you required are replaced.
+If you get a message TRANSFER NOT KNOWN, it probably means you do not 
+have @NET$DIR:NETSYMB in your LOGIN.COM file.
+The order of the files on the tape may be different from the order in which you
+entered them.
+This is to ensure that files are copied from the archive tapes in an efficient
+way.
+.hl2 Waiting \for \the job \to \run.
+Turnaround time for the IBM job is usually a few hours and if it takes much
+longer than this contact RLVAD::IUES.
+If you have access to CMS at RAL, you can check the progress of your job by
+logging in and typing JSTAT AMWDCnnn where WDCnnn is your output tape.
+Do not submit a new job using the same output tape until you are sure the
+previous job has finished.
+
+.hl2 Output \from IUEDEARCH 
+The output of the IBM job should appear in a file called WDCnnn.OUT within
+a few hours. 
+It contains several pages of the IBM log file and then for each file that has
+been copied five lines from the image header for identification. 
+If this file appears almost immediately then most probably
+the job has been rejected.
+You should examine the output for errors (see section 7) and if necessary report
+any problems with a copy of the WDCnnn.OUT file to RLVAD::IUES.
+If your output does not appear within a day or so you should also report it.
+Your output tape is retained at RAL until you request it 
+so you may append data from further
+dearchiving jobs. Finally be aware that the output file in your directory 
+(WDCnnn.OUT) 
+is overwritten every time a job using the same output tape is submitted.
+
+.hl2 When \things \go \wrong
+If a job is rejected immediately and the problem appears to be with the IBM
+tape management system (TDMS, see the section on errors) then resubmit the
+job perhaps an hour later. If most of the file copying is successful but
+for various reasons some files are not copied correctly then do not resubmit the
+whole job again but re-dearchive the missing images. If some files still refuse
+to be copied or it is not clear why the job has failed then send the WDCnnn.OUT
+file to RLVAD::IUES.
+
+.hl2 Submitting \another job.
+Now that you have checked the job has run and inspected the output in your
+files, you may if you wish run another job to copy a further set of files to
+the same output tape. You will need to know the number of files on the tape
+and an estimate of the amount of tape used, from the previous REQU.FIL.
+Do not submit another job using the same output tape until you have checked 
+that the previous one has finished. Remember that the WDCnnn.OUT file will
+be overwritten.
+
+.hl1 Resubmitting a job.
+Sometimes the file transfer to the IBM is not successful for example if
+the network is down.
+You will then be informed by the FTP system; it retries a limited number of
+times automatically before giving up and it informs you each time.
+You can resubmit the job later when the network is working, without
+going through IUEDEARCH again. There may be other circumstances when the job as
+submitted is correct but it has failed, perhaps 
+because of operator error. To resubmit a job use the global command
+
+.lt
+
+	$ IUERESUBMIT generation_number
+
+.el
+As your directory may contain several generations of WDCIUE.JCL it is important
+that you are sure of which one to submit. If the generation_number is omitted
+IUERESUBMIT will in the first instance assume you wish to resubmit the most 
+recent version of WDCIUE.JCL but you may change this or escape at the prompts.
+If you are using the IUE captive account use the SUBMIT option.
+
+.hl1 DESPATCHING THE TAPE
+When you have all the required data on tape you may request the tape to be
+despatched to you by using the global command
+.lt
+
+	$ IUEDESPATCH tapename
+
+.el
+or the DESPATCH option from the IUE captive account,
+which send a standard message to RLVAD::IUES.
+If the tapename is omitted it is prompted for.
+Your tape will then be despatched to you by post and
+you will receive an acknowledgement that it has been sent.
+
+.hl1 Error messages
+Various error messages may be issued to the user interactively during the
+running of the layout program. 
+Most of these errors are not fatal and the program continues.
+These messages and the actions taken are listed below.
+This section also includes IBM errors and ABENDS which may appear in the log
+section of the output file and finally some examples of output.
+
+.hl2 Fatal Errors
+
+.ls "o"
+.le;INDEX.DAT file is write locked.
+
+Terminates program and users should run IUEDEARCH later, (update of the index is
+in progress).
+.le;**DIMENSION OF BADTAPE FILE, FILE NEEDS TO BE CHANGED**
+
+Terminates program and users should contact RLVAD::IUES to rectify the problem.
+.le;/TRANSFER/ unrecognized command
+
+Terminates the program and users should ensure that they have
+@NET$DIR:NETSYMB in their LOGIN.COM file.
+.els
+.hl2 Non-fatal Errors
+.ls "o"
+.le;**OUTPUT TAPE IS FULL**
+
+Continues the program but no more images can be copied. 
+.le;**NO MORE TAPES CAN BE PROCESSED**
+
+Continues the program but no more images can be copied.
+.le;**NO MORE THAN A 100 IMAGES CAN BE PROCESSED**
+
+Continues the program but no more images can be copied.
+.els
+In these 3 cases, the last requested image will not be copied.
+
+.hl2 IBM job errors \and ABENDS
+Various error messages and abends may show up on your output (WDCnnn.OUT)
+file.
+Some of these error messages and abends are listed below:
+.ls "o"
+.le;ABEND S222
+
+Job cancelled, usually due to exceeding output, ie output tape is full or the
+number of lines on the IBM output exceeded the default limit.
+Rerun the program for the images not copied on another output tape.
+.le;ABEND S322
+
+Job step exceeded its CPU time limit. 
+Rerun the program for images not copied.
+.le;ABEND S337
+
+Your output tape is full.
+Rerun the program for the images not copied using another tape.
+.le;ABEND S522
+
+Wait time limited exceeded.
+Resubmit the job.
+.le;ABEND 613/A13
+
+File on output tape not found.
+Check the first file number on your output tape and resubmit.
+If job fails again with the same error, send output file to RLVAD::IUES.
+.le;"Index Error"
+
+This may occur on your output file. 
+If it occurs for ONE IMAGE ONLY, send a copy of the output file to RLVAD::IUES
+immediately.
+If it occurs for many images, resubmit the job (operators may have mounted the
+wrong tapes).
+.le;Volume "tapename" not known to TDMS
+
+Send output file to RLVAD::IUES immediately.
+If "tapename" is an archive tape name (ie beginning WIL or NAS), rerun IUEDEARCH
+omitting the images on that tape.
+NB: If this error occurs, the output is usually returned immediately.
+.els
+If an ABEND or an ERROR not stated above is shown on your output, resubmit the
+job and if the same error occurs again, send your output file to RLVAD::IUES,
+and await a reply.
+
+It should be safe to assume that if the header of a certain file has been
+printed, and the next file number has been written in WDCnnn.OUT, or the
+end of copying message has been written, then that file will be on the tape. 
+
+.hl2 Examples
+First a warning: the IBM program is in the process of being updated and some
+of the comments which appear in the output no longer apply. Please follow the
+instructions given here.
+The start of the WDCnnn.OUT file looks like this but any errors will be
+highlighted between lines of asterisks. In this case the output was returned
+immediately owing to a TDMS error. Resubmit the job perhaps an hour later.
+.lm2.lt
+ 
+ *INFO MVS C990NETW       ORK          JESMSG               
+ 
+  IAT6140 JOB ORIGIN FROM GROUP=JANET   , DSP=NJE, DEVICE=NETWORK , 000
+  IAT0310 ACCOUNT FIELDS SUCCESSFULLY SCANNED
+  *ACF01137 AMGHK LAST SYSTEM ACCESS 14.52-14/05/90 FROM AMGHK
+  Estimate:      0.01 AUs
+  Last Job Monday 14 May 90 14:52:46
+  IAT0308 CPU Time     0 Min  40 Sec         %
+  15:13:28 IAT4401  LOCATE FOR STEP=STEP1    DD=JOBLIB   DSN=AP01.IUE.LB2
+  15:13:28 IAT4402 UNIT=3380    ,VOL(S)=MVSU22
+  15:13:33 ****************************************************************
+  15:13:33 ed for 1 volumes out of 1 tried Volume busy: NAS549rary: LOCL  
+  15:13:33 ****************************************************************
+  15:13:33 ****************************************************************
+  15:13:33 IAT0803 TDMS ERROR 0315 OCCURRED WHILE LOCATING VOLUME NAS549 JO
+  15:13:33 ****************************************************************
+
+.el.lm10
+If under similar circumstances the output includes something like
+.lm2.lt
+
+  14:52:51 ****************************************************************
+  14:52:52 Volume unknown: NAS08807 3420   NL      6250 *None           0  
+  14:52:52 ****************************************************************
+  14:52:52 ***************************************************
+  14:52:52 IAT0800 VOLUME NAS088 UNKNOWN TO TDMS, JOB REJECTED
+  14:52:52 ***************************************************
+
+.el.lm10
+then send the WDCnnn.OUT file to RLVAD::IUES and re-dearchive the images which
+are not on the offending tape.
+
+If the job has run then the start of the file copying will look like this
+with five lines from the image header for each file copied.
+.lm2.lt
+
+1   IUE DEARCHIVING PROGRAM VERSION 1.2
+    ===================================
+ 
+ 
+ OUTPUT TAPE FILE NUMBER     1
+ =======================
+ 
+ 
+                          0001000107681536   1 1 023030032   #101     1  C
+      99*   5*06JAN-1 *   *   *  3000*      *   *  * * * * * *     *  2  C
+  BD+75 325,SWP30032,HRES,LAP,25M0S,11:27:08                          3  C
+  870106,SPREP,MAXG,LOREAD,PHCAL,CLAVEL                               4  C
+  16,500,FO,9.8                                                       5  C
+ 
+.el.lm10 
+ 
+This shows an index error where the file read does not correspond to that
+expected. The same error can occur in the wrong tape is mounted. Re-dearchive
+the image again and if the same promblem occurs send the WDCnnn.OUT file to
+RLVAD::IUES.
+.lm2.lt
+ 
+ OUTPUT TAPE FILE NUMBER     7
+ =======================
+ 
+ 
+                             1   1   72048   1 1 013130095            1  C
+    7212*   8*IUESOC  *   *   *  1200*      *   *  * * * * * *     *  2  C
+  SWP 30095, HD 128620, 20 MIN EXPO,  LO DISP, LG APERTURE            3  C
+                                                                      4  C
+                                                                      5  C
+0 *************************************************************************
+0 *               TAPE FILE WAS     SWP  30095
+0 *               SHOULD HAVE BEEN  SWP  26060
+0 *  IF THIS IS AN ISOLATED INSTANCE
+0 *    PLEASE MAIL THIS FILE TO RLVAD::CD,     (NO send it to RLVAD::IUES)
+0 *    - OTHERWISE RESUBMIT JOB - IT MAY BE    (NO re-dearchive this image)
+0 *      CAUSED BY THE OPERATOR MOUNTING
+0 *      THE ARCHIVE TAPES IN THE WRONG ORDER
+0 *      ----------------------------
+0 *      THE FILE HAS NOT BEEN COPIED
+0 *      ----------------------------
+0 *
+0 *************************************************************************
+
+.el.lm10
+
+The following two examples show where a tape read error occured. In the first
+case while reading the header and in the second while reading the data.
+The first error can also be caused by not having a tape on the drive.
+.lm2.lt
+
+ OUTPUT TAPE FILE NUMBER    25
+ =======================
+ 
+ 
+ CRNIO003 IOGET/IOREAD: ERROR DURING INPUT OPERATION, 583,TA,IOFILE10,READ 
+ IOFILE10 TAPE STATUS: ECB=41 CSW=1148E00E400000 UCB=000000BB010000D3000000
+   187 START I/O OPERATIONS,     0 NOISE BLOCKS ENCOUNTERED,    0 ERASE GAP
+     0 TEMPORARY READ ERRORS,    0 TEMPORARY WRITE ERRORS,      1 PERMANENT
+0ECB=41 : THE I/O OPERATION TERMINATED WITH A PERMANENT ERROR
+0CCW ADDRESS = 1148E0,     RESIDUAL BYTE COUNT =     0
+ CSW BIT 38 ON, UNUSUAL CONDITION DETECTED, SEE SENSE BYTE INFORMATION
+ CSW BIT 41 ON, INCORRECT BLOCK LENGTH, REFER TO THE PRINCIPLES OF OPERATIO
+ 
+ SENSE BYTE  0, BIT 4 ON, DATA CHECK, NOISE OR END-OF-BLOCK SENSED BEFORE A
+ SENSE BYTE  1, BIT 0 ON, NOISE
+ SENSE BYTE  1, BIT 6 ON, THE TAPE IS FILE PROTECTED
+ SENSE BYTE 21, BIT 3 OFF, NO TAPE PRESENT ON DRIVE
+ 
+ *************************************************
+ ***ERROR READING INPUT LABELS AT LABEL RECORD    1
+ *** RETURN CODE FROM IOGET     3
+ *** READING    360 BYTES
+ ***  THIS FILE HAS NOT BEEN COPIED PROPERLY
+ *** MAIL OUTPUT FILE TO RLVAD::CD,     (NO send it to RLVAD::IUES)
+ ***    SUBJECT: LABEL ERROR
+ ***        ----------------------------
+ ***        THE FILE HAS NOT BEEN COPIED
+ ***        ----------------------------
+ **********************************************
+ 
+
+ 
+ OUTPUT TAPE FILE NUMBER     5
+ =======================
+ 
+ 
+                          0001000103612048   1 1 023028771   #101     1  C
+      99*  13*28JUL-1 *   *   *   780*      *   *  * * * * * *     *  2  C
+  HD60753,SWP28771,HRES,LAP,13M0S,02:18:35                            3  C
+  860729,SPREP,MAXG,LOREAD,PHCAL,CLAVEL                               4  C
+  21,5880,FO,9.82                                                     5  C
+0CRNIO003 IOGET/IOREAD: ERROR DURING INPUT OPERATION, 583,TA,IOFILE10,READ 
+ IOFILE10 TAPE STATUS: ECB=41 CSW=1148E00E400000 UCB=01000174020000D3000000
+0  372 START I/O OPERATIONS,     0 NOISE BLOCKS ENCOUNTERED,    0 ERASE GAP
+     1 TEMPORARY READ ERRORS,    0 TEMPORARY WRITE ERRORS,      2 PERMANENT
+0ECB=41 : THE I/O OPERATION TERMINATED WITH A PERMANENT ERROR
+0CCW ADDRESS = 1148E0,     RESIDUAL BYTE COUNT =     0
+ CSW BIT 38 ON, UNUSUAL CONDITION DETECTED, SEE SENSE BYTE INFORMATION
+ CSW BIT 41 ON, INCORRECT BLOCK LENGTH, REFER TO THE PRINCIPLES OF OPERATIO
+ 
+ SENSE BYTE  0, BIT 4 ON, DATA CHECK, NOISE OR END-OF-BLOCK SENSED BEFORE A
+ SENSE BYTE  1, BIT 0 ON, NOISE
+ SENSE BYTE  1, BIT 6 ON, THE TAPE IS FILE PROTECTED
+ SENSE BYTE 21, BIT 3 OFF, NO TAPE PRESENT ON DRIVE
+ 
+ ***************************************************
+ ***  ERROR READING ARCHIVE FILE AT LINE   292
+ ***      RETURN CODE FROM IOGET     3
+ ***      READING   2048 BYTES
+ ***     EXPECTING  2048 BYTES
+ ***
+ ***  THIS FILE HAS NOT BEEN COPIED PROPERLY
+ *** MAIL THIS OUTPUT TO RLVAD::CD       (NO send it to RLVAD::IUES)
+ *** SUBJECT:   COPY ERROR
+ ***        ----------------------------
+ ***        THE FILE HAS NOT BEEN COPIED
+ ***        ----------------------------
+ *****************************************************
+ 
+.el
