@@ -121,6 +121,8 @@ if test -z "$PROFILINGOPTION" -o -z "$NOUNDERSCORES"; then
     esac
 fi
 
+AC_PROG_FC
+
 dnl  Now test the options we have set up, by compiling a simple
 dnl  Fortran program
 AC_LANG_PUSH([Fortran 77])
