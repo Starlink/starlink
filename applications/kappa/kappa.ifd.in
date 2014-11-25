@@ -2263,6 +2263,16 @@ package kappa {
             helpkey *
          }
 
+         parameter qvalue {
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Quality value (0-255)}
+            default !
+            helpkey *
+         }
+
          parameter readonly {
             type _LOGICAL
             access READ

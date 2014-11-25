@@ -139,6 +139,10 @@
 *        If Parameter LIKE is null, then this parameter determines how
 *        the pixels are selected, and can take the values "Mask",
 *        "List" or "ARD" (see Parameters MASK, LIST, and ARD). ["Mask"]
+*     QVALUE = _INTEGER (Read)
+*        If not null, then the whole Quality array is filled with the
+*        constant value given by QVALUE, which must be in the range 0 to
+*        255. No other changes are made to the NDF. [!]
 *     XNAME = LITERAL (Read)
 *        If an NDF already contains any quality name definitions then
 *        new quality names are put in the same extension as the old
@@ -229,6 +233,8 @@
 *        Add READONLY parameter.
 *     10-DEC-2013 (DSB):
 *        Add LIKE parameter.
+*     25-NOV-2014 (DSB):
+*        Add QVALUE parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -310,6 +316,7 @@
       INTEGER NINDEX             ! The total number of pixel indices
                                  ! obtained.
       CHARACTER QNAME*(IRQ__SZQNM)! Supplied quality name.
+      INTEGER QVALUE             ! Constant quality value to assign
       LOGICAL RDONLY             ! Read-only flag for quality name
       INTEGER REGVAL             ! Highest value in ARD mask
       CHARACTER SELECT*4         ! Value of parameter SELECT
@@ -426,6 +433,34 @@
             ELSE
                CALL ERR_ANNUL( STATUS )
             END IF
+
+*  Nothing more to do.
+            GO TO 999
+
+         END IF
+      END IF
+
+*  See if the Quality array is to be filled with a constant value.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL PAR_GDR0I( 'QVALUE', 0, 0, 255, .FALSE., QVALUE, STATUS )
+
+*  If not, annull the error.
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+
+*  Otherwise store the constant value in the NDF.
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+
+*  Map the NDF quality array.
+            CALL NDF_MAP( NDFIN, 'QUALITY', '_UBYTE', 'WRITE',
+     :                    IPQOUT, EL, STATUS )
+
+*  Fill it with the requested value.
+            CALL KPG1_FILLUB( QVALUE, EL, %VAL( CNF_PVAL( IPQOUT ) ),
+     :                        STATUS )
+
+*  Unmap the NDF quality array.
+            CALL NDF_UNMAP( NDFIN, '*', STATUS )
 
 *  Nothing more to do.
             GO TO 999
