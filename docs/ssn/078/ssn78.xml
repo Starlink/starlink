@@ -28,8 +28,12 @@
   <!ENTITY fig-versinfo-gif   SYSTEM "ssn78-5.gif" NDATA gif89a>
   <!ENTITY fig-versinfo-eps   SYSTEM "ssn78-5.eps" NDATA eps>
   <!ENTITY fig-versinfo-pdf   SYSTEM "ssn78-5.pdf" NDATA pdf>
+  <!-- XXX The following two entities are NOT updated automatically,
+     but were inserted by hand, and refer to the last Git revision
+     before 2014-11-25, which touched this file. -->
+  <!ENTITY gitrevision "5d0546ba">
+  <!ENTITY gitdate "22-Oct-2013">
 ]>
-<!-- $Revision$ -->
 
 <!-- Tell psgmls not to auto-indent verbatim elements -->
 <?PSGML nofill verbatim ?>
@@ -57,6 +61,17 @@
 <px>First properly public release (revision 1.97)</px>
 </version>
 
+<!-- XXX
+     The values in this element were expected to be filled in during a
+     Subversion checkout; this no longer happens since the system was
+     migrated to Git.  The values here are obtained from the
+     gitrevision and gitdate entities defined above. -->
+<distribution string='snapshot: &gitrevision;'
+              date='&gitdate;'
+              author='nxg'>
+<px>This is a post-version-1 snapshot: &gitrevision;, &gitdate;</px>
+</distribution>
+<!-- Original:
 <distribution
   string="snapshot: $Revision$"
   date="$Date$"
@@ -65,6 +80,7 @@
 $Revision$,
 $Date$</px>
 </distribution>
+-->
 </history>
 
 <copyright>
@@ -102,10 +118,10 @@ doc="SUN/248"/>, which additionally includes platform-specific notes.</px>
 <tgroup cols="1">
 <tbody>
 <row>
-<entry>$Revision$</entry>
+<entry>Revision &gitrevision;</entry>
 </row>
 <row>
-<entry>$Date$</entry>
+<entry>Date &gitdate;</entry>
 </row>
 </tbody>
 </tgroup>
@@ -4652,7 +4668,7 @@ $(RECURSIVE_TARGETS):
           contains a list of relative file names (to the directory 
           containing the <code>bootstrap</code> script), in the order
           from oldest to newest. Look for an example of one of these
-          files in the source tree.
+          files in the source tree.</p>
         </subsubsect>
 
       </subsect>
