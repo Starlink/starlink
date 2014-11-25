@@ -89,19 +89,12 @@ on the verso of the titlepage.  It may then call <code>\\TableOfContents</code>.
 \\setlength{\\parindent}{0mm}
 \\setlength{\\parskip}{\\medskipamount}
 \\setlength{\\unitlength}{1mm}
-<!-- Are we using pdftex?  This is the effective content of 
-     Heiko Oberdiek's ifpdf package. -->
-\\newif\\ifpdf % initially false
-\\ifx\\pdfoutput\\undefined
-\\else
-  \\ifx\\pdfoutput\\relax
-  \\else
-    \\ifcase\\pdfoutput
-    \\else
-      \\pdftrue
-    \\fi
-  \\fi
-\\fi
+<!-- Are we using pdftex?  Use the ifpdf package, rather than attempting
+     to roll our own: we can by now (2014) assume that this package will be
+     present in any half-way reasonably up-to-date TeX installation.
+     Rolling our own just causes breakage when some other package includes
+     ifpdf, which hyper-cautiously bails out if it finds \ifpdf already defined. -->
+\\usepackage{ifpdf}
 <!-- Prepare to use @ in command names -->
 \\makeatletter
 <!-- Catcode all specials to other, and add discretionary hyphenation for

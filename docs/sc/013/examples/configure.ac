@@ -9,14 +9,13 @@ dnl  extent educational might mean that we can sensibly expose more of
 dnl  this than we would otherwise want to.
 
 AC_INIT(sc13-examples, 1.0, norman@astro.gla.ac.uk)
-dnl AC_REVISION($Id$)dnl
 
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR(fpp.c)
 
 AC_PROG_CC
-AC_PROG_F77
+AC_PROG_FC
 
 AC_CHECK_HEADERS([errno.h])
 
@@ -120,8 +119,6 @@ if test -z "$PROFILINGOPTION" -o -z "$NOUNDERSCORES"; then
          ;;
     esac
 fi
-
-AC_PROG_FC
 
 dnl  Now test the options we have set up, by compiling a simple
 dnl  Fortran program
