@@ -145,7 +145,6 @@ Detailed specifications for all these programs are given below.
 \subsubsection {Database Management Functions}
 You can do the following to a data catalogue (omitting the CAR\_):
 \begin{description}
-\begin{description}
 \item [SEARCH] it to select subsets.
 \item [SORT] it to reorder the catalogue.
 \item [JOIN] it with another catalogue to find objects in common.
@@ -156,10 +155,8 @@ You can do the following to a data catalogue (omitting the CAR\_):
 \item [CONVERT] it to another format, make indexes, new fields etc.
 \item [EDIT] it to add and delete records and correct values.
 \end{description}
-\end{description}
 \subsubsection {Display Catalogue Data}
 In order to study the contents of a catalogue you can:
-\begin{description}
 \begin{description}
 \item [REPORT] it to list all or some of its contents.
 \item [LISTOUT] the values of a given field.
@@ -173,10 +170,8 @@ than 132 characters.
 \item [AITOFF] plot all the objects on an all-sky plot.
 \item [IMAGEPLOT] objects in it for COSMOS style processing.
 \end{description}
-\end{description}
 \subsubsection {Perform Statistics}
 In order to generate statistics on the contents of a catalogue you can use:
-\begin{description}
 \begin{description}
 \item [LITTLEBIG] to find either the largest or smallest numbers in the
   catalogue.
@@ -187,9 +182,7 @@ In order to generate statistics on the contents of a catalogue you can use:
 \item [LINCOR] to compute the Pearson product-moment linear correlation
   coefficient.
 \end{description}
-\end{description}
 \subsubsection {Create and Process Description Files}
-\begin{description}
 \begin{description}
 \item [EXTAPE] -- Examines the contents of an ASCII tape and dumps it to disk.
 \item [LISTIN] -- Reads a simple VMS file into SCAR.
@@ -202,9 +195,7 @@ In order to generate statistics on the contents of a catalogue you can use:
  data.
 \item [POLYGON] -- Creates a description file of polygon vertices.
 \end{description}
-\end{description}
 \subsubsection {Small Tools}
-\begin{description}
 \begin{description}
 \item [SETUP] -- Defines default values for certain options.
 \item [CATSIZE] -- Finds the number of objects in a catalogue.
@@ -218,7 +209,6 @@ logical name.
 \item [DSCFHELP] -- Inserts a description file into a help library.
 \item [DEBUG] -- Switches on the VMS debugger (for Programmers only).
 \item [GETPAR] -- Get a parameter value when in the ICL environment.
-\end{description}
 \end{description}
 
 
@@ -444,7 +434,6 @@ Rather than prompting you, CHART reads the files for their values.
 These are set up for the most popular styles of plot --- all you have to know
 is the name of each plate parameter set, they are:
 \begin{description}
-\begin{description}
 \item [PSS] -- Palomar Sky Survey 2 degrees by 2 degrees in GNOMONIC projection
 \item [PSS/BIG] -- Palomar Sky Survey 4 degrees by 4 degrees in GNOMONIC
   projection
@@ -452,7 +441,6 @@ is the name of each plate parameter set, they are:
 \item [ESOB/BIG] -- ESO R plate 4 degrees by 4 degrees in GNOMONIC projection
 \item [SRC] -- SRC J plate 2 degrees by 2 degrees in GNOMONIC projection
 \item [SRC/BIG] -- SRC J plate 4 degrees by 4 degrees in GNOMONIC projection
-\end{description}
 \end{description}
 You can store the parameters of more than one style, so it is easy to switch
 plot style.
@@ -1241,12 +1229,10 @@ routines HISTOGRAM, SCATTER, AITOFF, CHART.
 There is one mandatory parameter and two other optional parameters, as
 described below:
 \begin{description}
-\begin{description}
 \item [P1] -- Either AITOFF,CHART,HISTOGRAM or SCATTER: depending on the program.
 \item [P2] -- Either VERSATEC, CANON, ZETA or PRINTRONIX: hardcopy device.
 \item [P3] -- With CHART input the number of field centres.
 \item [P4] -- Type YES if you want a points listing of objects.
-\end{description}
 \end{description}
 Any parameters that you omit will be prompted for.
 Examples:
@@ -2755,7 +2741,6 @@ Note that the output is not an FACTS format catalogue.
 \end{verbatim}
 
 \subsection{Summary of parameter definitions}
-\begin{description}
 \begin{itemize}
 \item{\bf ACCESS} File access type - one of READ, WRITE, UPDATE
 \item{\bf ACTION} Dump file(D)/Reject file(R)/View more(V)
@@ -3474,7 +3459,6 @@ measures 1 in that direction.
 For example the RH extremity of a TEK screen is about 1.4.
 \item{\bf YUNITS} Units for the Y axis.
 \end{itemize}
-\end{description}
 
 \subsection {QCAR Language}
 

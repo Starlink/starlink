@@ -45,7 +45,6 @@ This  note  describes  a  set  of  routines  for  performing  physical  I/O
 operations on non-VAX-standard magnetic tapes.
 The following routines are available:
 \begin{description}
-\begin{description}
 \item[TIO\_OPEN]: assign an I/O channel to a device.
 \item[TIO\_SETDEN]: set the recording density for a tape.
 \item[TIO\_MOUNT]: mount a tape on a device.
@@ -59,30 +58,23 @@ The following routines are available:
 \item[TIO\_REWIND]: reposition a tape to the BOT marker.
 \item[TIO\_CLOSE]: deassign an I/O channel from a device.
 \end{description}
-\end{description}
 All the routines return a status value indicating the success of the operation.
 Currently, this value is the VAX/VMS System Service return status [1], although
 this may not be the case in future versions.
 Therefore, to facilitate VMS-independent validation of the status value, the
 following LOGICAL functions are provided:
 \begin{description}
-\begin{description}
 \item[TIO\_EOF]: test for a physical end-of-file condition.
 \item[TIO\_ERR]: test for an error condition.
-\end{description}
 \end{description}
 A further routine is provided that returns the message text associated with a
 particular status value:
 \begin{description}
-\begin{description}
 \item[TIO\_GETMSG]: return message text.
-\end{description}
 \end{description}
 Finally, the following LOGICAL function is also provided :
 \begin{description}
-\begin{description}
 \item[TIO\_SENSE]: get information about a tape drive.
-\end{description}
 \end{description}
 Before a process can perform any actual I/O operations on a tape device, an I/O
 channel must be assigned using {\bf TIO\_OPEN}.

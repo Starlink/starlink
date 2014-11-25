@@ -297,11 +297,9 @@ ICL, the data on an RWOD may be recovered to disk as follows:
 The files which are essential for the sorting software to work are:
 
 \begin{description}
-\begin{description}
 \item [{\tt mcf\_nn.sdf}] The WFC Master Calibration File, version {\tt nn}
 {\em e.g.}, 12.
 \item [{\tt \verb+<+RWOD\verb+>+.sdf}] Events, housekeeping, attitude data file
-\end{description}
 \end{description}
 
 {\tt mcf\_nn.sdf} defines the time history of the WFC calibration
@@ -446,7 +444,6 @@ characteristics may change with different HT settings.
 The programs involved are:
 
 \begin{description}
-\begin{description}
 \item [{\tt wfcdbm}]   Data Base Manager
 \item [{\tt wfcsort}]  Sorts events into images, time series, {\em etc.}
 \item [{\tt wfcexp}]   Exposure corrects a binned data set
@@ -456,7 +453,6 @@ The programs involved are:
 \item [{\tt wfcslmrg}] Merges a pair of time slot files
 \item [{\tt wpsscorr}] Exposure corrects a PSS source search list
 \item [{\tt wfchelp}]  Help information on WFCPACK programs and ICL procedures
-\end{description}
 \end{description}
 
 These programs are described below in terms of the parameters which
@@ -825,7 +821,6 @@ The following parameters are stored in the HDS file (in arrays
 of the same names):
 
 \begin{description}
-\begin{description}
 \item [{\tt TEVS}] Total events output by the detector preamplifiers
 \item [{\tt VEVS}] Valid events, {\em i.e.}, TEVS within pulse height limits
 \item [{\tt LEVS}] Limited events, {\em i.e.}, VEVS within the electronic f.o.v.
@@ -833,7 +828,6 @@ of the same names):
 \item [{\tt FEVS}] Final events, {\em i.e.}, AEVS telemetered to ground
 \item [{\tt RA}]   Pointing direction RA (degrees)
 \item [{\tt DEC}]  Pointing direction DEC (degrees)
-\end{description}
 \end{description}
 
 The program gives the option of binning directly from the RWODs' HKR
@@ -1016,7 +1010,6 @@ commonly required series of operations with minimum user interaction.
 The procedures described here are:
 
 \begin{description}
-\begin{description}
 \item [{\tt wfcdisk}]   Load data from an RWOD onto disk
 \item [{\tt wfcauto} ]  Standard analysis of a series of RWODs
 \item [{\tt wfcbop}]    Maximise signal to noise in producing images
@@ -1025,7 +1018,6 @@ The procedures described here are:
 \item [{\tt wfclight}]  Produce a light curve at a point in the current image
 \item [{\tt wfcspc}]    Produce a WFC spectrum at a point in the current image
 \item [{\tt wfcsub}]    Subtracts two contemporary time series
-\end{description}
 \end{description}
 
 The procedures have been written to exploit the NOCHECKPARS switch in

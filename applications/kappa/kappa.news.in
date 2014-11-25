@@ -18,6 +18,11 @@
       components, only setting it false if no bad pixels were copied
       and none existed in the input NDF.
 
+   o  SETQUAL
+
+      -  A new parameter QVALUE can be used to store a constant integer
+      value in the range 0 to 255 in the QUALITY component for all pixels.
+
 1 KAPPA_Version_2.1
 
    A new release of KAPPA (2.1) is available.  The main

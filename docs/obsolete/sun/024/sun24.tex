@@ -861,7 +861,6 @@ For further details and definitions of the parameters, de Vaucouleurs (1959,
 \subsubsection {Integration table parameters}
 The following parameters are listed for each isophote in the integration table:
 \begin{description}
-\begin{description}
 \item [Log I]: Log intensity above a sky level normalised to 1.0.
 \item [A]: Area bounded by isophote (square arcminutes).
 \item [P]: (mean intensity)x(difference in area of successive isophotes).
@@ -873,7 +872,6 @@ dimensionless variable.
 \item [Log J]: Logarithm of intensity scaled by the intensity at the effective
 radius to give a dimensionless variable.
 \item [Mu]: Brightness of isophote (magnitudes per square arcsecond).
-\end{description}
 \end{description}
 \subsubsection {Photometric parameters}
 The following parameters are listed for the entire nebular image:
@@ -1244,11 +1242,9 @@ Because these parameters are passed to a batch program, the directory structure
 must be specified in full.
 \subsection {Command checklist}
 \begin{description}
-\begin{description}
 \item [STARSIM]: Generate an artificial image frame.
 \item [TARGET]: Overlay markers showing the positions of the brighter stars on
 top of the image frame displayed on the ARGS.
-\end{description}
 \end{description}
 \subsection {Default luminosity functions}
 The default luminosity functions used by {\bf STARSIM}, taken from Allen (1973)
@@ -1899,11 +1895,9 @@ The third and vital program is used to create synthetic data.
 Note that {\bf STORE} will also sort the data into order of increasing epoch, so
 using {\bf RESTORE}, followed by {\bf STORE} will sort the data.
 \begin{description}
-\begin{description}
 \item [STORE]: copies data from a .DAT file to a frame.
 \item [RESTORE]: copies data from a frame to a .DAT file.
 \item [SYNTH]: creates synthetic data.
-\end{description}
 \end{description}
 \subsubsection {Data manipulation}
 These programs allow trends to be removed from the data (which should always be
@@ -1917,14 +1911,12 @@ with pauses to measure standard stars then it should be possible.
 However, if any gap in the data is significant compared to any likely variation,
 this technique will not produce meaningful results.
 \begin{description}
-\begin{description}
 \item [DETREND]: removes an underlying trend from the data.
 \item [FLAG]: allows deletion of bad points.
 \item [EXTRACT]: allows extraction of a subset between two epochs.
 \item [SELECT]: general-purpose subset selection.
 \item [CONCAT]: concatenates datasets to make one new one.
 \item [SPLEQ]: re-samples data at equal time intervals.
-\end{description}
 \end{description}
 \subsubsection {Computing power spectra}
 The most commonly used program is {\bf POWER}, which computes the power spectrum
@@ -1946,10 +1938,8 @@ has some less restrictive conditions.
 It will add enough zeros to the end of the data so that it can handle them, but
 will not add more than 19 of them!
 \begin{description}
-\begin{description}
 \item [POWER]: computes power spectrum of any dataset.
 \item [FFTPOW]: computes power spectrum using FFT.
-\end{description}
 \end{description}
 \subsubsection {Auto-regressive models}
 Ulrych and his collaborators have emphasised the relationship between
@@ -1966,13 +1956,11 @@ M is called the `lag' of the auto-regressive model.
 It is possible to compute the power spectrum from the $A_{j}$ and use them to
 fill in gaps between continuous runs of data and to extend existing datasets.
 \begin{description}
-\begin{description}
 \item [MEMPOW]: computes power spectrum from several datasets, each of which is
 regularly sampled.
 \item [FILLGAP]: fills gaps between several datasets, each of which is
 regularly sampled.
 \item [EXTEND]: extends an existing dataset.
-\end{description}
 \end{description}
 \subsubsection {Phase dispersion methods}
 These methods work best on relatively sparse data.
@@ -1982,9 +1970,7 @@ Then try a different frequency and try to assess which gives the smoothest
 curve.
 The approach used here is described by Dworetsky.
 \begin{description}
-\begin{description}
 \item [PDM]: finds periods by phase dispersion methods.
-\end{description}
 \end{description}
 \subsubsection {Least squares fitting}
 Once a set of possible frequencies has been identified by using any of the above
@@ -1999,13 +1985,11 @@ A detailed log of the fitting procedure, and the results obtained, is written to
 LINRES.LIS and NONRES.LIS.
 It is also possible to list a set of parameters.
 \begin{description}
-\begin{description}
 \item [LIN]: linear least squares fit to estimate amplitude and phase.
 \item [NON]: non-linear least squares fit to refine estimates of frequency,
 amplitude and phase.
 \item [LISTPAR]: lists the contents of a parameter file created by {\bf LIN}
 or {\bf NON}.
-\end{description}
 \end{description}
 \subsubsection {Pre-whitening}
 It is usually desirable to remove all `known' effects from a dataset, especially
@@ -2019,10 +2003,8 @@ simply fold the data at the `known' frequency, fit the best mean curve
 numerically (ie.\ without any assumptions about its shape) and simply subtract
 it from the original data.
 \begin{description}
-\begin{description}
 \item [PW]: removes all components obtained by {\bf LIN} or {\bf NON}.
 \item [FOLD]: removes mean curve at selected frequencies.
-\end{description}
 \end{description}
 \subsubsection {Graphics}
 Wherever useful the above programs make use of graphics, but there are also
@@ -2051,12 +2033,10 @@ In general, output to terminals fills the whole screen whereas for hard copy
 devices the user is prompted for the size of the plot in centimetres, the
 default size being chosen so that the plot will fit onto A4 paper.
 \begin{description}
-\begin{description}
 \item [PLOTDAT]: plots one or two datasets.
 \item [PLOTPS]: plots power spectrum and/or window function.
 \item [PLOTFIT]: plots data and superimposes results from {\bf LIN} and
 {\bf NON}.
-\end{description}
 \end{description}
 \subsection {Demonstration}
 A simple, though quite typical, demonstration dataset is available called

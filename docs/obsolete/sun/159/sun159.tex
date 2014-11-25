@@ -503,13 +503,11 @@ to the FIS and BRR files:
 \subsubsection{IDL X-Windows/Widget Programs}
 
 \begin{description}
-\begin{description}
 \item[FCS --- ]          Creates a widget interface to run FCS software.
 \item[BCS --- ]          Creates a widget interface to run BCS software.
 \item[LISTBCS --- ]      Creates a widget interface to the  BCS catalog of
  flares.
 \item[SCANPATH --- ]     Reads and extracts procedures within the XRP library.
-\end{description}
 \end{description}
 
 \subsection{Getting started --- some examples for new users}
@@ -969,7 +967,6 @@ as first guesses and iterate further. This is the default option.
 \end{itemize}
 The input files are as follows:
 \begin{description}
-\begin{description}
 \item [BRRxxxx.xxx] ---	The BCS data is read from the BRR files.
 The files must have been updated by the CALBRR program before SPCFIT will
 attempt to fit the spectra.
@@ -977,9 +974,7 @@ attempt to fit the spectra.
 directory, and then in the directory of the BRR file if the BRR file is not in
 the current directory.
 \end{description}
-\end{description}
 The output files are as follows:
-\begin{description}
 \begin{description}
 \item [FITxxxx.xxx] --- Results are written to an Ascii file called
 FITyymmdd.hhmm, which has the same file id as the input BRR file.
@@ -991,7 +986,6 @@ These parameters can be examined by using the IDL program PLOTFIT.
 has the same file id as the input BRR file created.
 This file contains the final synthesized theory spectra.
 These spectra can be examined using the IDL program PLOTFIT.
-\end{description}
 \end{description}
 
 \subsubsection{BCSPRO}
@@ -1089,7 +1083,7 @@ filename must be entered on the command line. MKFIS will prompt  for these
 inputs if 'filid' is not entered. Note that MKFIS may often not  process
 incomplete image or spectral modes (such as modes interrupted by  spacecraft
 night of South Atlantic Anomaly [SAA]). In addition to creating a FIS  file,
-MKFIS will output a log file: FISyymmdd$\_$E.hhmm. The log file can usually  be
+MKFIS will output a log file: FISyymmdd\_E.hhmm. The log file can usually  be
 ignored.
 
 \subsubsection{LISTFIS}

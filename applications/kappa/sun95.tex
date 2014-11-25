@@ -46919,6 +46919,13 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
          already defined within the NDF.
       }
       \sstsubsection{
+         QVALUE = \_INTEGER (Read)
+      }{
+         If not null, then the whole QUALITY array is filled with the
+         constant value given by QVALUE, which must be in the range 0 to
+         255. No other changes are made to the NDF. {\tt [!]}
+      }
+      \sstsubsection{
          READONLY = \_LOGICAL (Read)
       }{
          If TRUE, then an error will be reported if any attempt is
@@ -54577,6 +54584,14 @@ The following applications have been modified:
         components, only setting it false if no bad pixels were copied
         and none existed in the input NDF.
       \end{itemize}
+
+   \item [\htmlref{SETQUAL}{SETQUAL}]\mbox{}
+      \begin{itemize}
+        \item  A new parameter QVALUE can be used to store a constant
+        integer value in the range 0 to 255 in the QUALITY component for
+        all pixels.
+      \end{itemize}
+
 \end{description}
 
 
