@@ -1,0 +1,564 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{SUG}
+\setlength{\textwidth}{100mm}
+\setlength{\textheight}{154mm}
+\setlength{\topmargin}{-0mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill SUG \\
+RUTHERFORD APPLETON LABORATORY\\
+{\Large\bf Starlink Project\\}
+\begin{flushright}
+M D Lawden\\
+10 September 1993
+\end{flushright}
+\vspace{-8mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\LARGE\bf STARLINK USER'S GUIDE}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{SUG}
+
+\newpage
+
+blank page
+
+\newpage
+\setcounter{page}{1}
+
+\section{The Starlink Project}
+
+Starlink is a computing facility provided for UK astronomers by the Science and
+Engineering Research Council (SERC) under its Particles, Space and Astronomy
+Board (PSAB).
+In April 1994 the SERC will cease to exist, and its astronomical work will be
+taken over by the new Particle Physics and Astronomy Research Council (PPARC).
+
+Starlink started in 1980.
+Its main objectives are to:
+\begin{itemize}
+\item Provide and coordinate interactive data reduction and analysis facilities
+for use as a research tool by UK astronomers.
+\item Encourage software sharing and standardisation to prevent unnecessary
+duplication of effort.
+\item Provide systems software support for astronomers.
+\end{itemize}
+To achieve these objectives, Starlink provides:
+\begin{itemize}
+\item A compatible set of computer hardware installed at astronomical centres
+throughout the country.
+These Starlink sites are connected by a communications network.
+\item A collection of astronomical software which is distributed to every site.
+\item Management, programming and user support staff.
+\end{itemize}
+For its first ten years, Starlink was based on DEC VAX hardware, which made
+software sharing easy.
+However, in 1991 it was decided to change over to Unix-based hardware as this
+was becoming the {\em de facto}\, standard in Astronomy, and would enable the
+Project to exploit the most cost-effective hardware.
+The speed of change is governed by financial constraints and the need to
+port Starlink software to the new environment.
+It is anticipated that the changeover will effectively be completed by the
+end of 1995.
+The transition period is complicated by the existence of both VMS and Unix
+systems running in parallel.
+This guide deals with both.
+
+In this guide, commands and file references for Unix systems are shown in
+this typeface: {\tt /star/\-admin/\-whoswho}.
+The VMS equivalent is shown in parentheses following the Unix specification
+in this typeface: ({\tt ADMINDIR:\-WHOSWHO}).
+
+\section{Organisation and Management}
+
+The central management is located at Rutherford Appleton Laboratory (RAL) and
+is headed by the Project Manager.
+There is also a Project Scientist, who acts as an independent interface
+between the users and the Project.
+There are various committees which look after things:
+\begin{description}
+\item [SP] --- Starlink Panel.
+This determines overall policy, monitors progress, and reports to the
+Astronomy and Astrophysics Committee (AAC) of the PSAB.
+\item [SLUG] --- Starlink Local User Group.
+Individual sites may hold meetings at which any user may comment on its
+operation and policies.
+At least one of these meetings each year is attended by Starlink Project staff.
+If you feel strongly about something, go along to your SLUG and make your
+views known.
+Meeting dates are advertised locally.
+\item [HAG] --- Hardware Advisory Group.
+This meets from time to time in order to assess current computer hardware trends
+and to advise Starlink management on appropriate purchases.
+\end{description}
+Starlink's computer hardware can be regarded as a set of nodes linked by a
+communications network.
+Current details of Starlink sites, managers, network addresses, staff, and
+committees are stored in file {\tt /star/\-admin/\-whoswho} 
+({\tt ADMINDIR:\-WHOSWHO})\footnote{All VMS files mentioned in this paper have
+the file type `.LIS' unless otherwise specified.}---you should get a copy of
+this when you register as a user.
+A brief list of Starlink sites is also given in Appendix A.
+Most of the nodes serve their local population of astronomers.
+However, there are two special nodes which are located at RAL:
+\begin{description}
+\item [PRO] --- This serves the requirements of the central Project management
+team and is used for administration, software development and distribution, and
+document production.
+\item [CEN] --- This provides all users with a central data and software
+facility and a VMS service (SUN/30).
+It stores astronomical catalogues which are accessed via a database management
+system called SCAR (SUN/70).
+It also stores some general purpose software which is only licensed for use
+on this node.
+Its network name is STADAT.
+\end{description}
+Your main point of contact with the Project is your Site Manager, from whom you
+should seek help if you run into difficulties or have special
+requirements (like using STADAT).
+Some sites have ``Assistant Site Managers" or ``User Support Assistants", but in
+general there are no computer operators; you are expected to load your own
+tapes and take your own output off printers and plotters.
+
+\section{User Registration}
+
+Every Starlink user must be formally accredited before he or she can use
+Starlink computers.
+If you want to use Starlink, get a User Application Form from the Manager of
+the site you want to use, complete and return it.
+Authorisation to use the computers for interactive data reduction will
+normally be granted immediately by the Site Manager.
+All applications are vetted by the Project Scientist.
+
+When your application has been approved, you will be given a username, password
+and other resources on your local Starlink computer system.
+Each site has its own distribution policy for documentation, but you should get
+this guide, a local guide, and an introduction to Unix (SUN/145); add whatever
+else you need.
+{\em Please read the documents!}\,
+Your local guide tells you what resources are available and how to login to
+the computers, and the Unix introduction tells you how to create, edit,
+compile, and link programs, manage files and directories, and use the e-mail
+system.
+
+You may register at more than one site, but this is rarely necessary and
+is discouraged.
+Consult your Site Manager if your requirements are not satisfied by a single
+username.
+
+The Data Protection Act (UK) controls the storage of personal information on
+computers.
+Starlink policy is to make all such information completely open to inspection.
+It is held on computers solely to enable users to be supported and resources
+to be managed efficiently.
+A full list of the files involved is in file {\tt /star/\-local/\-admin/\-dpa}
+({\tt RLVAD::LADMINDIR:DPA}) at the PRO site, but the most important data files
+are the local {\tt /star/\-local/\-admin/\-usernames} ({\tt LADMINDIR:USERNAMES}) and
+{\tt /star/\-local/\-admin/\-users} ({\tt LADMINDIR:USERS}) files stored locally
+at each site.
+Please inform your Site Manager if any information stored about you is
+incorrect, and please tell him or her when you leave!
+
+\section{Using Starlink Computers}
+
+Do {\em not}\, share your username and password with anyone else, and make
+passwords non-obvious---computer networks are vulnerable to criminals called
+hackers.
+If you tell someone your password for what you believe at the time is a
+legitimate reason, allow them access to the computer for as short a time as
+possible and change your password immediately they have finished their login
+session.
+Tell your Site Manager what you have done.
+Anyone whose username is used by a hacker, and who has not taken reasonable
+precautions against its misuse, will bear the responsibility for any wasted
+resources or damage.
+
+In order to use a Starlink Unix computer effectively, you must be familiar
+with the contents of SUN/145.
+In particular:
+\begin{itemize}
+\item know how to use the {\tt man} command to find information on Unix
+commands.
+\item know how to display and print text files such as those referred to in this
+guide (you must consult your local guide for information as printing
+techniques are locally determined).
+\item look at {\tt /star/\-docs/\-news} ({\tt DOCSDIR:NEWS}) frequently to keep abreast
+of changes to Starlink software and documentation.
+\item know how to use an e-mail system ({\tt pine} is recommended), and login
+frequently to check for messages.
+The usernames and addresses needed to send e-mail to other people are
+specified in {\tt /star/\-admin/\-unixnames} and {\tt /star/\-admin/\-usernames}
+({\tt ADMINDIR:\-UNIXNAMES} and {\tt ADMINDIR:\-USERNAMES}).
+\item learn how to use the network facilities described in SUN/36.
+\end{itemize}
+
+Please report suspected errors in Starlink documents and software to your Site
+Manager and to the Starlink Software Librarian ({\tt ussc@star.rl.ac.uk}).
+Please give sufficient detail in software bug reports to enable another person
+to understand and reproduce the bug.
+Known software bugs are reported in a VAXnotes conference called BUG\_REPORTS
+(SGP/1, SUN/44).
+
+\section{Finding Information}
+
+Starlink is a big project (25 sites, 55 staff, 1600 users, 600Mbyte software,
+400 documents); a great deal of information is available about its facilities,
+and it is important that you know how to find it.
+There are three main sources:
+\begin{description}
+\item [Personal contact] ---
+This can be the most efficient source when you start to use Starlink.
+Being shown how to do something cuts through the documentation barrier which is
+such an intimidating feature of big systems.
+Find out how other users work and what they find useful.
+Don't stop there though.
+There is a lot of useful information available and the people you talk to may
+not use it or be aware of it.
+If you are thinking of using a software package or analysing a standard type of
+data ({\em e.g.}\, IUE images), seek out and make friends with other users of
+them.
+They can tell you what the documentation leaves out, and they may have solved
+the problems that are worrying you.
+Your Site Manager should be able to put you in touch with them.
+\item [Paper documents] ---
+These are mainly:
+\begin{itemize}
+\item Starlink documents.
+\item Books on Unix and related software, such as X-windows.
+\end{itemize}
+These sources are described in more detail below.
+\item [On-line files] ---
+These are convenient for interactive users and may be printed out for reference.
+Compared with paper documents, they are more likely to be up to date and the
+computer can help search for information.
+However, they are not as easy to use, may be incomplete, and diagrams are not
+normally available.
+The text of most Starlink documents is available on-line (but may not be easily
+readable as most of them are meant for processing by the \LaTeX\ document
+preparation system).
+Unix has an on-line manual which can be examined with the {\tt man} command.
+\end{description}
+
+\subsection{Starlink documents}
+
+Starlink classifies its documents as follows:
+{\small
+\begin{tabbing}
+xx\=MUDxx\=- Starlink General Papersxxx\=LUNxx\=x\kill
+\>{\bf SG}\>-- Starlink Guides\\
+\>{\bf SUN}\>-- Starlink User Notes     \>{\bf LUN}\>-- Local User Notes\\
+\>{\bf SGP}\>-- Starlink General Papers \>{\bf LGP}\>-- Local General Papers\\
+\>{\bf SSN}\>-- Starlink System Notes   \>{\bf LSN}\>-- Local System Notes\\
+\>{\bf MUD}\>-- Miscellaneous User Documents
+\end{tabbing}
+}
+{\em Starlink}\, documents are project-wide and are available at every site.
+{\em Local}\, documents are issued by individual sites and contain information
+of local relevance; they are not normally available away from the site of issue.
+\begin{itemize}
+\item {\em Guides}\, provide tutorial information on large or complex software
+ items.
+\item {\em User Notes}\, describe how to use a particular program or package.
+\item {\em General Papers}\, contain a wide variety of material concerning the
+development and management of Starlink.
+\item {\em System Notes}\, describe system software and give implementation and
+installation details for applications software.
+\end{itemize}
+Starlink documents are indexed by type and serial number in
+{\tt /star/\-docs/\-docs\_lis} ({\tt DOCSDIR:\-DOCS}) and by subject and keyword in
+{\tt /star/\-docs/\-subject\_lis} ({\tt DOCSDIR:\-SUBJECT}).
+Local documents are indexed in {\tt /star/\-local/\-docs/\-docs\_lis}
+({\tt LDOCSDIR:\-DOCS}) at the local site.
+However, the best way to find which documents describe a specific software item
+is to look in {\tt /star/\-docs/\-analysis\_lis} ({\tt DOCSDIR:\-ANALYSIS}).
+
+Starlink recommends \LaTeX\ for document production (SGP/28).
+Anyone may contribute documents to the Starlink series, but please use the
+standard templates held in files such as {\tt /star/\-docs/\-sun.tex}
+({\tt DOCSDIR:\-SUN.TEX}).
+This makes life much easier for Starlink staff as many potential formatting
+traps have been thought out and {\em solved}\, in these templates, and their use
+gives Starlink documentation a uniform appearance.
+The Project reserves the right to make minor corrections and stylistic changes
+to submitted documents in order to achieve a uniform Starlink style.
+When revising documents you {\em must,} therefore, start from the released
+version stored in directory {\tt /star/\-docs} ({\tt DOCSDIR:}) rather than from
+your own copy.
+
+\subsection{On-line files}
+
+On-line files exist in two main forms:
+\begin{description}
+\item [HELP libraries] --- for access via the VMS HELP utility.
+The main HELP library is that provided by DEC to support their DCL command
+language and other VMS features.
+Some Starlink packages have their own HELP libraries.
+There is also a general Starlink HELP library which may be accessed by typing:
+\begin{verbatim}
+    $ HELP STARLINK
+\end{verbatim}
+\item [Text files] --- for printing or for display on a terminal.
+They can be classified as follows:
+\begin{itemize}
+\item Starlink documents.
+These are stored in the following directories:
+\begin{itemize}
+\item {\tt /star/docs} ({\tt DOCSDIR:}) contains {\em Starlink} documents
+ (SG, SUG, SUN, SGP, SSN).
+\item {\tt /star/local/docs} ({\tt LDOCSDIR:}) contains {\em Local} documents
+ (LUN, LGP, LSN).
+\item {\tt /star/local/mud} ({\tt LMUDSDIR:}) contains Miscellaneous documents
+ where these are available in on-line form.
+\end{itemize}
+\item Information summaries.
+These are maintained at the PRO site (usually in {\tt /star/\-local/\-admin} or
+{\tt /star/\-local/\-docs}) as a reference for the whole project.
+File {\tt /star/\-local/\-docs/\-online} ({\tt RLVAD::\-LDOCSDIR:\-ONLINE}) contains
+an annotated list of such files.
+Each summary includes the date on which it was last revised.
+\item Internal documents.
+\end{itemize}
+\end{description}
+
+\subsection{Computer searching}
+
+The {\tt grep} ({\tt SEARCH}) command examines files for a given text string
+and displays all the lines found to contain it.
+As an example, suppose you want to find documents describing programs for
+handling magnetic tapes.
+You can search the document and subject indexes for the string `TAPE' with the
+command:
+{\small
+\begin{verbatim}
+    % grep tape /star/docs/docs_lis /star/docs/subject_lis
+   ($ SEARCH  DOCSDIR:DOCS,SUBJECT TAPE)
+\end{verbatim}
+}
+{\tt grep} ({\tt SEARCH}) can also be used to find a person's username:
+{\small
+\begin{verbatim}
+    % grep surname /star/admin/usernames /star/admin/unixnames
+   ($ SEARCH  ADMINDIR:USERNAMES,UNIXNAMES)
+\end{verbatim}
+}
+You can then e-mail messages to this username.
+
+On VMS systems you can find a Starlink document on a particular topic by typing
+\begin{verbatim}
+    $ DOCFIND topic
+\end{verbatim}
+
+\subsection{Summary}
+
+Here is a table showing sources of information on the main topics you are
+likely to want to know about.
+{\footnotesize
+\begin{center}
+\begin{tabular}{|l|l|l|l|}
+\hline
+{\em Unix source} & {\em VMS source} & {\em Contents} \\
+\hline
+\hline
+{\tt /star/docs/docs\_lis} & {\tt DOCSDIR:DOCS} & Starlink series \\
+{\tt /star/docs/mud\_lis}  & {\tt DOCSDIR:MUD} & Miscellaneous \\
+{\tt /star/docs/analysis\_lis} & {\tt DOCSDIR:ANALYSIS} & Acronym \\
+{\tt /star/docs/subject\_lis} & {\tt DOCSDIR:SUBJECT} & Keyword \\
+\hline
+{\tt /star/admin/ssi} & {\tt ADMINDIR:SSI}  & Software index \\
+SUN/1                 & SUN/1               & General intro \\
+SG/4                  & SG/4                & ADAM intron \\
+                      & LOOKUP command      & Commands \\
+                      & HELP STARLINK       & On-line help \\
+\hline
+{\tt /star/admin/whoswho} & {\tt ADMINDIR:WHOSWHO} & Project staff \\
+{\tt /star/admin/usernames} & {\tt ADMINDIR:USERNAMES} & Users \\
+{\tt /star/admin/unixnames} & {\tt ADMINDIR:UNIXNAMES} & e-mail addresses \\
+                            & {\tt EMAIL name}     & e-mail addresses \\
+\hline
+SGP/31                & SGP/31              & Purpose/history \\
+Starlink Bulletin     & Starlink Bulletin   & Newsletter \\
+\hline
+Local guide           & Local guide         & Local guide \\
+\hline
+\end{tabular}
+\end{center}
+}
+
+\section{Hardware}
+
+The computer hardware operated by Starlink consists of Unix workstations and
+servers from various manufacturers, together with VAX computers running VMS
+which are being phased out.
+Your local guide should describe the hardware available at your site.
+The most common computers that run Unix are Sun workstations and DEC
+DECstations and Alpha workstations.
+The computers at each site are linked together by Local Area Networks.
+
+Each site is connected to the UK-wide JANET communications network.
+The links between different sites differ in speed, but even on the slowest
+sections it is possible to transfer several thousand Kbyte an hour over the
+network.
+
+\section{Software}
+
+Starlink software is managed by the Starlink Software Librarian at RAL.
+It exists in two forms: the {\em Starlink Software Collection} (SSC), which
+runs on VAXes, and the {\em Unix Starlink Software Collection} (USSC), which
+runs under Unix.
+These are similar, except that some of the older software has not been ported
+to Unix, and some of the most recent software is not available under VMS.
+Most of it was written and supported by people outside RAL, but it is installed
+and distributed from there.
+Its total size is currently about 300 Mbyte (600 Mbyte for VMS), and there are
+about 3 million lines of source code.
+It is called a {\em Collection}\, rather than a {\em Package}\, or
+{\em System}\, because it consists of about a hundred {\em software items}\,
+which are largely autonomous.
+
+Wherever possible, standard software interfaces are used.
+These include the NAG library of mathematical routines and the international
+standard GKS graphics package.
+The Flexible Image Transport System (FITS) is recommended for data interchange
+via magnetic tape.
+
+SUN/1 describes the items in the Collection.
+SGP/20 describes the definition, organisation, and management of the Collection.
+SGP/13 discusses the nature, philosophy, and development of Starlink
+applications software.
+
+Updates to Starlink software are routinely distributed by network to all
+Starlink sites.
+The Collection has also been distributed to over 100 non-Starlink sites, most of
+which are outside the UK.
+These include the AAO, LPO, ESO/ST-ECF, JACH, STScI and VILSPA, so astronomers
+visiting these places can use their favourite Starlink software just like at
+home.
+
+Starlink supports this software to the best of its abilities, within the
+limited resources available.
+Expert help is available for most things, but Starlink may have difficulties
+with some items, especially as many of the original writers were not software
+professionals and/or have since left.
+Software support is, in fact, one of the most intractable problems facing
+Starlink.
+The support level of each item is specified in {\tt /star/\-local/\-admin/\-support}
+at the PRO site.
+Some reported bugs take a long time to fix, although some others can be cured
+and the updated software released within a day or two.
+
+Starlink recognises the need for a {\em Software Environment}\, into which its
+applications software can be integrated.
+The principle is to provide a standard user interface (for example a command
+language) and programmer interface (subroutine libraries), and to allow
+part-processed data to be transferred easily from application to application
+during a processing run.
+The command language enables you to manipulate data in a concise but natural
+way.
+The subroutine libraries give programmers efficient and easy access to
+command parameters, bulk data, graphics devices, and other resources.
+The standard Starlink environment is called ADAM (SG/4) and most Starlink
+applications run within it.
+
+\appendix
+
+\newpage
+
+\section {Starlink Sites}
+
+Up-to-date site information is kept in {\tt /star/\-admin/\-whoswho}
+(or {\tt ADMINDIR:WHOSWHO}).
+This includes the names of Site Managers and their e-mail addresses.
+
+Each site has a three letter code which can be used to identify it.
+These are:
+\begin{description}
+\begin{description}
+\item [ARM] : Armagh Observatory
+\item [BEL] : Queen's University of Belfast --- Pure \& Applied Physics Dept
+\item [BIR] : Birmingham University --- School of Physics \& Space Research
+\item [CAM] : Cambridge: Institute of Astronomy, Royal Greenwich Observatory, 
+ Mullard Radio Astronomy Observatory.
+\item [CAR] : University of Wales College of Cardiff --- Physics \& Astronomy
+ Dept
+\item [DUR] : Durham University --- Physics Dept
+\item [GLA] : Glasgow University --- Physics \& Astronomy Dept
+\item [HAT] : Hertfordshire University, Hatfield --- Physics \& Astronomy Dept
+\item [IMP] : Imperial College, London --- Physics Dept
+\item [JOD] : Nuffield Radio Astronomy Lab, Jodrell Bank
+\item [KEE] : Keele University --- Physics Dept
+\item [KEN] : Kent University --- Electronic Engineering Lab
+\item [LEI] : Leicester University --- Physics \& Astronomy Dept
+\item [LJM] : Liverpool John Moores University --- School of Chemical \&
+ Physical Sciences
+\item [MAN] : Manchester University --- Astronomy Dept
+\item [OXF] : Oxford University --- Astrophysics Dept
+\item [PRE] : Central Lancashire University, Preston --- Physics \& Astronomy
+ School
+\item [PRO] : Rutherford Appleton Laboratory --- Project Management
+\item [QMW] : Queen Mary \& Westfield College, London --- Physics Dept
+\item [RAL] : Rutherford Appleton Laboratory --- Astrophysics Division
+\item [ROE] : Royal Observatory Edinburgh, Edinburgh University --- Astronomy
+ Dept
+\item [STA] : St Andrews University --- Physics \& Astronomy Dept
+\item [SOU] : Southampton University --- Physics Dept
+\item [SUS] : Sussex University --- Astronomy Centre
+\item [UCL] : University College London --- Physics \& Astronomy Dept
+\end{description}
+\end{description}
+
+\newpage
+
+\section {Checklist}
+
+Do you know how to:
+\begin{itemize}
+\item Get help?\\
+\hspace*{10mm} {\em (Ask your Starlink Site Manager)}
+\item Login and logout?\\
+\hspace*{10mm} {\em (SUN/145 \& Local Guide)}
+\item Interpret directory and file names?\\
+\hspace*{10mm} {\em (SUN/145)}
+\item Find information on a Unix Command?\\
+\hspace*{10mm} {\em (\% man command)}
+\item Change your password?\\
+\hspace*{10mm} {\em (\% yppasswd)}
+\item Send and receive MAIL and purge your mail file?\\
+\hspace*{10mm} {\em (\% pine)}
+\item Find a person's username or a username's owner?\\
+\hspace*{10mm} {\em (\% grep surname or username /star/\-admin/\-usernames)}
+\item Examine a file?\\
+\hspace*{10mm} {\em (\% more filename)}
+\item Print a file?\\
+\hspace*{10mm} {\em (Ask your Site Manager or look at your Local Guide)}
+\item Get a copy of a document?\\
+\hspace*{10mm} {\em (Get a copy from your local document store)}
+\item Find a document about a Starlink software item?\\
+\hspace*{10mm} {\em (Look at /star/\-docs/\-analysis\_lis)}
+\item Find out about the latest software and documentation releases?\\
+\hspace*{10mm} {\em (Look at /star/\-docs/\-news)}
+\item Find out about Starlink personnel, sites, and committees?\\
+\hspace*{10mm} {\em (Look at /star/\-admin/\-whoswho)}
+\item Find out about a specific topic?\\
+\hspace*{10mm} {\em (Look at /star/\-docs/\-subject\_lis)}
+\item Find out about on-line information?\\
+\hspace*{10mm} {\em (Look at /star/\-local/\-docs/\-online)}
+\item Guard your files against loss?\\
+\hspace*{10mm} {\em (Use the tar utility to write to tape)}
+\item Report an error in Starlink software or documentation?\\
+\hspace*{10mm} {\em (Send a mail message to ussc@star.rl.ac.uk)}
+\end{itemize}
+\end{document}
