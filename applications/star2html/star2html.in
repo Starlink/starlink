@@ -701,8 +701,24 @@ create_initfile();
 #  production.
 
 if ($usehtlatex==1){
-  print ("Preparations finished - now starting htlatex\n\n");
-  system( "htlatex $TEXFILE \"starlinkxhtml.cfg,charset=\"utf-8\",fn-in\" ' -cvalidate -cstarfont'" "" "-interaction=batchmode");
+  print ("Preparations finished - now starting TeX4HT htlatex\n\n");
+  my $TEX4HTENV = "";
+  my $TEX4HTHTF = "";
+  my $TEXINPUTS = "";
+  if (defined $ENV{TEXINPUTS}) {
+      $TEXINPUTS = $ENV{TEXINPUTS};
+  }
+
+  if (defined $ENV{STARLATEXSUPPORT}) {
+      $TEX4HTENV = "TEX4HTENV=" . $ENV{STARLATEXSUPPORT} . '/tex4ht.env';
+      $TEX4HTHTF = "TEX4HTHTF=" . ':' . $ENV{STARLATEXSUPPORT} . ':';
+      $TEXINPUTS = join('//:', $TEXINPUTS, $ENV{STARLATEXSUPPORT});
+  }
+  my $tex4htcommand =  "TEXINPUTS=$TEXINPUTS $TEX4HTENV $TEX4HTHTF htlatex $DESTFILE \"starlinkxhtml.cfg,charset=\"utf-8\",fn-in\" ' -cvalidate -cstarfont' \"\" \"-interaction=batchmode\"";
+  print $tex4htcommand . "\n";
+  system($tex4htcommand);
+  if ($? ) {
+    print( "Star2HTML fatal: Translation of document $TEXFILE failed.\n" );
 } else {
   print( "Preparations finished - now starting LaTeX2HTML\n\n");
   my $cwd = Cwd::getcwd();
