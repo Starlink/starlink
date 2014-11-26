@@ -394,9 +394,9 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
    open my $file, '<', "$TEXFILE";
    my $firstline = <$file>;
    close $file;
-   $usehtlatex=0;
+   $usehtlatex = 0;
    if ($firstline =~ /\\documentclass.*\{starlink\}/) {
-     $usehtlatex=1;
+     $usehtlatex = 1;
    }
 
 #  Create the target directory. Note if ".htx" form already exists
@@ -529,8 +529,8 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
        # If using htlatex, just copy the file in and assume that
        # htlatex will convert it.
        if ($usehtlatex == 1) {
-	 print ( "cp $file $destdir" );
-         system ( "cp $file $destdir") and &clear_up("Star2HTML fatal: cannot copy $file into $destdir\n");
+         system ( "cp $file $destdir") and
+	   &clear_up("Star2HTML fatal: cannot copy $file into $destdir\n");
        } else {
 	 if ($suffix eq ".png") {
 	   # do not copy if there is a version already there and this one is not newer
