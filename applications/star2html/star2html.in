@@ -384,9 +384,20 @@ my $REALDESTDIR = File::Spec->catdir($TEXDIR, $TEXNAME. '.htx');
 my $DESTFILE = File::Spec->catfile($DESTDIR, $TEXNAME . '.tex');
 my $FILE;
 
+my $usehtlatex = 0;
+
 #  Check file exists and is a text file we can write to.
 if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
    print( "Processing file: $TEXFILE\n" );
+
+# Check if current file is calling latex class 'starlink'.
+   open my $file, '<', "$TEXFILE";
+   my $firstline = <$file>;
+   close $file;
+   $usehtlatex = 0;
+   if ($firstline =~ /\\documentclass.*\{starlink\}/) {
+     $usehtlatex = 1;
+   }
 
 #  Create the target directory. Note if ".htx" form already exists
 #  then we move this into place.
@@ -409,8 +420,13 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
      or &clear_up( "Star2HTML fatal: cannot chdir to $DESTDIR\n" );
 
 #  Edit the necessary corrections to the tex file. This makes a copy
-#  in $DESTDIR.
-   &edit_main;
+#  in $DESTDIR. (different version for htlatex and star2html.
+   if ($usehtlatex == 1){
+     &edit_main_htlatex;
+   } else {
+     &edit_main;
+   }
+
    $have_texfile = 1;
 
 #  Copy aux, lot and lof files if they exist and we've been asked to.
@@ -510,27 +526,34 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
          }
        }
 
-       if ($suffix eq ".png") {
-         # do not copy if there is a version already there and this one is not newer
-         my $outfile = File::Spec->catfile($destdir, $name.".png");
-         if (!-e $outfile || (-M $outfile > -M $file ) ) {
-           print "Copying $file to $destdir\n";
-           system("cp", $file, $destdir ) and
-             &clear_up( "Star2HTML fatal: cannot copy $file into $destdir\n" );
-         }
-       } elsif ($suffix eq ".pdf") {
-         # Must convert this to postscript unless there is an .eps version
-         # in TEXDIR already
-         if ( ! -e File::Spec->catfile($TEXDIR, $name . ".eps" ) ) {
-           my $outfile = File::Spec->catfile($destdir, $name.".ps");
-           if (!-e $outfile || (-M $outfile > -M $file) ) {
-             print "Using $pdftops[0] to convert $file to $outfile\n";
+       # If using htlatex, just copy the file in and assume that
+       # htlatex will convert it.
+       if ($usehtlatex == 1) {
+         system ( "cp $file $destdir") and
+	   &clear_up("Star2HTML fatal: cannot copy $file into $destdir\n");
+       } else {
+	 if ($suffix eq ".png") {
+	   # do not copy if there is a version already there and this one is not newer
+	   my $outfile = File::Spec->catfile($destdir, $name.".png");
+	   if (!-e $outfile || (-M $outfile > -M $file ) ) {
+	     print "Copying $file to $destdir\n";
+	     system("cp", $file, $destdir ) and
+	       &clear_up( "Star2HTML fatal: cannot copy $file into $destdir\n" );
+	   }
+	 } elsif ($suffix eq ".pdf") {
+	   # Must convert this to postscript unless there is an .eps version
+	   # in TEXDIR already
+	   if ( ! -e File::Spec->catfile($TEXDIR, $name . ".eps" ) ) {
+	     my $outfile = File::Spec->catfile($destdir, $name.".ps");
+	     if (!-e $outfile || (-M $outfile > -M $file) ) {
+	       print "Using $pdftops[0] to convert $file to $outfile\n";
                system(@pdftops, $file, $outfile) and
                  &clear_up( "Could not convert $file to PS using $pdftops[0]\n");
-           }
-         }
-       } else {
-         warn "Did not know what to do with file $file\n";
+	     }
+	   }
+	 } else {
+	   warn "Did not know what to do with file $file\n";
+	 }
        }
      }
    }
@@ -676,29 +699,52 @@ create_initfile();
 #------------------------------------------------------------------------------
 #  Invoke latex2html on the temporary file. Note we inhibit index file
 #  production.
-print( "Preparations finished - now starting LaTeX2HTML\n\n");
-my $cwd = Cwd::getcwd();
-system( $LATEX2HTML,
-        "-init_file", ".star2html-init", "-no_subdir", "-tmp", $cwd,
-        "-no_auto_link", "-local_icons", @ARGV, $DESTFILE );
-if ( $? ) {
-  print( "Star2HTML fatal: Translation of document $TEXFILE failed.\n" );
-} elsif ( $COPYRIGHT ) {
-   $COPYRIGHT =~ s/&copy\;?/(C)/g;
-   $COPYRIGHT =~ s/<BR>//g;
-   print("Document copyrighted:\n$COPYRIGHT\n");
-}
 
-#  Try to copy some special icons from @l2hdir@ to this directory.
-my $LATEX2HTML_DIR = "$ENV{'STARLINK_DIR'}/share/latex2html/bin";
-if ( ! -d $LATEX2HTML_DIR ) {
-  $LATEX2HTML_DIR = "@l2hdir@";
-}
+if ($usehtlatex==1){
+  print ("Preparations finished - now starting TeX4HT htlatex\n\n");
+  my $TEX4HTENV = "";
+  my $TEX4HTHTF = "";
+  my $TEXINPUTS = "";
+  if (defined $ENV{TEXINPUTS}) {
+      $TEXINPUTS = $ENV{TEXINPUTS};
+  }
 
-my $ICONDIR = $LATEX2HTML_DIR . '/../icons';
-if ( -d $ICONDIR ) {
-  system( "cp", "$ICONDIR/contents_motif.gif", File::Spec->curdir) &&
-    warn("Failed to copy contents_motif.gif from $ICONDIR to output directory\n");
+  if (defined $ENV{STARLATEXSUPPORT}) {
+      $TEX4HTENV = "TEX4HTENV=" . $ENV{STARLATEXSUPPORT} . '/tex4ht.env';
+      $TEX4HTHTF = "TEX4HTHTF=" . ':' . $ENV{STARLATEXSUPPORT} . ':';
+      $TEXINPUTS = join('//:', $TEXINPUTS, $ENV{STARLATEXSUPPORT});
+  }
+  my $tex4htcommand =  "TEXINPUTS=$TEXINPUTS $TEX4HTENV $TEX4HTHTF htlatex $DESTFILE \"starlinkxhtml.cfg,charset=\"utf-8\",fn-in\" ' -cvalidate -cstarfont' \"\" '-interaction=batchmode'";
+  print $tex4htcommand . "\n";
+  system($tex4htcommand);
+  if ($? ) {
+    print( "Star2HTML fatal: Translation of document $TEXFILE failed.\n" );
+  }
+} else {
+  print( "Preparations finished - now starting LaTeX2HTML\n\n");
+  my $cwd = Cwd::getcwd();
+  system( $LATEX2HTML,
+	  "-init_file", ".star2html-init", "-no_subdir", "-tmp", $cwd,
+	  "-no_auto_link", "-local_icons", @ARGV, $DESTFILE );
+  if ( $? ) {
+    print( "Star2HTML fatal: Translation of document $TEXFILE failed.\n" );
+  } elsif ( $COPYRIGHT ) {
+    $COPYRIGHT =~ s/&copy\;?/(C)/g;
+    $COPYRIGHT =~ s/<BR>//g;
+    print("Document copyrighted:\n$COPYRIGHT\n");
+  }
+
+  #  Try to copy some special icons from @l2hdir@ to this directory.
+  my $LATEX2HTML_DIR = "$ENV{'STARLINK_DIR'}/share/latex2html/bin";
+  if ( ! -d $LATEX2HTML_DIR ) {
+    $LATEX2HTML_DIR = "@l2hdir@";
+  }
+
+  my $ICONDIR = $LATEX2HTML_DIR . '/../icons';
+  if ( -d $ICONDIR ) {
+    system( "cp", "$ICONDIR/contents_motif.gif", File::Spec->curdir) &&
+      warn("Failed to copy contents_motif.gif from $ICONDIR to output directory\n");
+  }
 }
 
 #  Extract the retrieve source icon. Could avoid the above if this can
@@ -725,11 +771,75 @@ rename( $FROMDIR, $TODIR ) || print( "Star2HTML warning: failed to move $FROMDIR
 exit(0);
 
 #  End of star2html.
+
+
 #------------------------------------------------------------------------------
+sub edit_main_htlatex {
+#+
+#  Subroutine to edit the main file when using htlatex
+#
+#  Copies the input texfile to the DESTDIR, and replaces any \input commands
+#  with a version of the line that looks for the file in the working directory
+#  and copies the file into the working directory.
+#-
+
+  #  Open the the main file for readonly.
+  open( my $FILE, $TEXFILE )
+    || &clear_up( "Star2HTML fatal: Failed to open main tex file ($TEXFILE).\n" );
+
+  #  Open the "copy".
+  open( my $EDIT, ">", $DESTFILE )
+    || &clear_up( "Star2HTML fatal: Cannot open new file for editing.\n" );
+
+  #  Now start copying the main file to the edited version.
+
+  my $fileIO = $EDIT;
+  my $SECTION;
+  my $need_styles = 1;
+  my $comment_out = 0;
+  while (defined (my $texline = <$FILE>)) {
+
+    # Look for an input line
+    if ($texline =~ /input\{(.*?)\} /x) {
+
+      my $inputfile = $1;
+
+      # Copy this file into output directory.
+      # Turn it into an absolute path
+      my $abs_path = File::Spec->rel2abs( $inputfile, $TEXDIR ) ;
+
+      if (-e $abs_path){
+	system("cp $abs_path $DESTDIR");
+      } elsif (-e "$abs_path.tex"){
+	system("cp $abs_path.tex $DESTDIR");
+      } else {
+	print "Can't find input $inputfile or $abs_path. \n";
+      }
+
+      # Change the texline to have the new basename for the file.
+      use File::Basename;
+      my $basename = basename($inputfile);
+      $texline =~ s/\Q$inputfile\E/$basename/g;
+    }
+
+    # I have no idea what this line does, but it looks like it could
+    # be important.
+
+    # Check for hcserver line, if changing and if found change.
+      if ( $HCSERVER ne 0 and index( $_, $HCSERVER_SUBSTRING ) != -1 ) {
+         s/$HCSERVER_PATTERN/$HCSERVER/;
+      }
+
+      # Write line back to output file.
+      print ( $EDIT $texline );
+  }
+
+  #  Files close automatically on exit
+}
 
 sub edit_main {
 #+
-#  Subroutine to edit the main file.
+#  Subroutine to edit the main file (used by latex2html).
 #
 #  Assumes the default directory is where a copy will be made.
 #

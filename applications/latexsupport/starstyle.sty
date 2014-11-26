@@ -1,0 +1,366 @@
+\ProvidesPackage{starstyle}
+%%%%
+%% Package for styling the output (primarily in pdf)
+%%%%
+
+
+
+
+% % Command for text that should be pushed to the right of the line (eg
+% % following an hfill, on a single line of text
+
+\newcommand*{\scpushright}[1]{\hfill #1}
+
+
+\DeclareGraphicsExtensions{.pdf,.png,.jpg,.jpeg}
+
+
+
+% %...reference and link commands
+\newcommand{\cref}[3]{#1~\ref{#2}}
+\newcommand{\xlabel}[1]{\label{\protect{xref_#1}}}
+\newcommand{\latexhtml}[3]{#1}
+\renewcommand{\htmladdnormallink}[2]{\href{#2}{#1}\footnote{\url{#2}}}
+
+
+\newcommand*{\scfrontmatter}{
+\renewcommand{\thepage}{\roman{page}}
+\setcounter{page}{1}
+\begin{titlepage}%
+\startitlepage
+\end{titlepage}
+\Abstract{}
+\clearpage
+\begingroup \catcode`\_=12 \tableofcontents \endgroup
+\clearpage
+\ifwithlof
+\typeout{Testing lof!}
+\begingroup \catcode`\_=12 \listoffigures \endgroup
+\fi
+\clearpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+}
+
+
+% %.. verbatim environment for quoting terminal.
+\DefineVerbatimEnvironment{terminalv}{Verbatim}{xleftmargin=.5in,formatcom=\color{MidnightBlue}}
+
+
+% %.. Empty environment latex only.
+\newenvironment{latexonly}{}{}
+
+
+
+
+%.. environments that don't do anything
+\def\makeinnocent#1{\catcode`#1=12 }
+ \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+ \def\ThrowAwayComment#1{\begingroup
+     \def\CurrentComment{#1}%
+     \let\do\makeinnocent \dospecials
+     \makeinnocent\^^L% and whatever other special cases
+     \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+ {\catcode`\^^M=12 \endlinechar=-1 %
+  \gdef\xComment#1^^M{\def\test{#1}
+       \csarg\ifx{PlainEnd\CurrentComment Test}\test
+           \let\html@next\endgroup
+       \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+             \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+       \else \let\html@next\xComment
+       \fi \fi \html@next}
+ }
+ \def\excludecomment
+   #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+      {\escapechar=-1\relax
+       \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+       \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+      }}
+
+\excludecomment{htmlonly}
+
+\newcommand{\latex}[1]{#1}
+
+
+% % Graphics commands
+% %--------------------------------------
+
+\newcommand{\myfig}[6]{
+  \begin{figure}#2
+    \centering\includegraphics[#3]{#1}
+    \typeout{#1 inserted on page \arabic{page}}
+    \caption[#5]{\label{#4} #6}
+  \end{figure}
+}
+
+
+% Address twin (side-by-side) graphics in a similar fashion where the
+% second argument is the second graphic, and the remaining arguments
+% incremented by one slot save an extra argument #6 for the size of
+% the gap between the two graphics, thus #7 and #8 are the captions.
+\newcommand{\myfigduo}[8]{
+  \begin{figure}#3
+    \includegraphics[#4]{#1}
+    \typeout{#1 inserted on page \arabic{page}}
+    \hspace{#6}
+    \includegraphics[#4]{#2}
+    \typeout{#2 inserted on page \arabic{page}}
+    \caption[#7]{\label{#5}\small #8}
+  \end{figure}
+}
+
+% command for a text box that floats around and pops out from the text (framed)
+\mdfsetup{%
+ backgroundcolor=white,%
+    middlelinewidth=4pt,%
+    middlelinecolor=bblue,%
+    userdefinedwidth=0.8\textwidth,%
+    roundcorner=10pt, %
+    innertopmargin=\topskip}%
+
+\newenvironment{sltextbox}[1]{%
+\begin{figure*}[h]\begin{mdframed}[userdefinedwidth=0.8\textwidth,
+                            align=center,%
+                       frametitle=#1,%
+        frametitlebackgroundcolor=bblue]%
+\setlength{\parskip}{\medskipamount}%
+}%
+{\end{mdframed}\end{figure*}}
+
+
+
+%Framed  boxes (obsolete).
+\newsavebox{\fmbox}
+\newenvironment{fmpage}[1]{\begin{lrbox}{\fmbox}\begin{minipage}{#1}}{\end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}}}
+
+
+%.. Tip box
+\newenvironment{tip}%
+{\begin{figure*}[h]\begin{mdframed}[userdefinedwidth=0.8\textwidth,align=center,frametitle=Tip,frametitlebackgroundcolor=bblue]%
+\setlength{\parskip}{\medskipamount}%
+}%
+{\end{mdframed}\end{figure*}}
+
+%.........................................
+
+% Format the abstract page
+\renewcommand{\abstractnamefont}{\normalfont\Large\bfseries\colorsectionnumberless}
+\renewcommand{\abstracttextfont}{\normalfont}
+
+
+\newcommand{\Abstract}{%
+    \ifwithchapters
+        \chapter*{}
+    \fi
+    \section*{Abstract}
+    \thispagestyle{fancy}
+    \markboth{Abstract}{}
+    \thestardocabstract{}
+    \\
+    \vspace*{\fill}
+    \\
+    {\small\thestardoccopyright{}}
+    \clearpage
+}
+
+
+\newcommand{\Acronyms}{%
+  \ifwithchapters
+  \chapter*{}
+  \fi
+  \section*{Acronyms}
+  \markboth{Acronyms}{}
+  \addcontentsline{toc}{section}{\protect\numberline{}Acronyms}
+}
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % Number sections down to subsection level
+% %\setcounter{secnumdepth}{0}
+
+% %%% Formatting of the section headging
+\newcommand{\colorsection}[1]{%
+\colorbox{bblue}{\strut\parbox{\dimexpr\textwidth-2\fboxsep}{\thesection\ \quad #1}{\huge\strut}}}
+
+\newcommand{\colorsectionnumberless}[1]{%
+\colorbox{bblue}{\strut\parbox{\dimexpr\textwidth-2\fboxsep}{#1}\strut}}
+
+
+% % Section headings (including numberless)
+
+\ifpdf
+\titleformat{name=\section}%
+{\normalfont\Large\bfseries}{}{0pt}{\colorsection}
+\titleformat{name=\section,numberless}%
+{\normalfont\Large\bfseries}{}{0pt}{\colorsectionnumberless}
+
+\fi
+
+%... Chapter headings
+\ifwithchapters
+  \titleformat{name=\chapter}[display]%
+  {\normalfont\huge\bfseries\thispagestyle{plain}}{%
+    \chaptertitlename\ \thechapter}{0pt}{}
+
+  \titleformat{name=\chapter,numberless}[display]%
+  {\normalfont\huge\bfseries\thispagestyle{plain}}{}{0pt}{\Huge}
+
+  %... spacing after chapter headings
+  \titlespacing*{\chapter}{0pt}{0pt}{20pt}
+
+\fi
+
+
+%.. section spacing
+\titlespacing*{\section}{0pt}{3.5ex plus 1ex minus .2ex}{2.3ex plus .2ex}
+\titlespacing*{\subsection}{0pt}{2ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+\titlespacing*{\subsubsection}{0pt}{2ex plus 1ex minus .2ex}{1ex plus .2ex}
+\titlespacing*{\paragraph}{0pt}{2ex plus 1ex minus .2ex}{1em}
+\titlespacing*{\subparagraph}{\parindent}{2ex plus 1ex minus
+  .2ex}{1em}
+
+
+% Do set up. Should this include acronyms?
+\newcommand{\scstart}{
+\Abstract
+\cleardoublepage
+\tableofcontents
+\cleardoublepage
+\listoffigures
+\cleardoublepage
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Page styles (e.g. headers and footers)
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\slshape \thestardocinitials{}/\thestardocnumber{} \leftmark}
+\lhead{\thepage}
+\renewcommand{\headrulewidth}{0.0pt}
+
+
+\ifwithchapters
+\renewcommand{\chaptermark}[1]{
+  \markboth{#1}{}}
+\else
+\renewcommand{\sectionmark}[1]{
+  \markboth{#1}{}}
+\fi
+
+% .. Reset the plain pagestyle (used on chapter pages) to only have
+% the page number and no rules. 
+\fancypagestyle{plain}{%
+\fancyhf{}%
+
+\iftwoside
+\fancyhead[RE,LO]{\thepage}%
+\fancyhead[LE,RO]{\slshape
+  \thestardocinitials{}/\thestardocnumber{}\nouppercase{---\leftmark}}%
+\else
+\fancyhead[LO]{\thepage}
+\fancyhead[RO]{\slshape
+\thestardocinitials{}/\thestardocnumber{}\nouppercase{---\leftmark}}%
+\fi
+
+\renewcommand{\headrulewidth}{0pt}%
+\renewcommand{\footrulewidth}{0pt}%
+}
+
+% ensure correct chaptermakr is used when in pagestyle plain
+\pagestyle{plain}
+\fancyhf{}
+
+\iftwoside
+\fancyhead[LE,RO]{\slshape \thestardocinitials{}/\thestardocnumber{} \nouppercase{---\leftmark}}
+\fancyhead[RE,LO]{\thepage}
+\else
+\lhead{\slshape \thestardocinitials{}/\thestardocnumber{} \nouppercase{---\leftmark}}
+\rhead{\thepage}
+\fi
+
+\renewcommand{\headrulewidth}{0.0pt}
+
+\ifwithchapters
+\renewcommand{\chaptermark}[1]{
+  \markboth{#1}{}}
+\else
+\renewcommand{\sectionmark}[1]{
+  \markboth{#1}{}}
+\fi
+
+
+\renewcommand{\headrulewidth}{0pt}%
+\renewcommand{\footrulewidth}{0pt}%
+
+\ifwithchapters
+\renewcommand{\chaptermark}[1]{\markboth{{#1}}{}}%
+\else
+\renewcommand{\sectionmark}[1]{\markboth{{#1}}{}}%
+\fi
+
+%% Select the fancy pagestyle as default
+\pagestyle{fancy}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Format the table of contents
+%\ifpdf
+%\setlength{\cftbeforetoctitleskip}{-3em}
+%\setlength{\cftbeforechapskip}{0.5em}
+%\setlength{\cftbeforesecskip}{0.5em}
+%\fi
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% General spacing
+\setlength{\headheight}{1.5cm}
+\setlength{\parskip}{\medskipamount}
+\renewcommand{\arraystretch}{1.5}
+
+
+
+
+
+
+
+\setlength{\LTcapwidth}{\textwidth}
+\newenvironment{sllongtable}[2]{%
+\begin{longtable}{#1}\caption{#2}\\}
+{\end{longtable}}
+
+
+\setlist[enumerate,1]{label=(\arabic*)}
+
+
+%\renewcommand{\thesection}{\arabic{chapter.section}}
+
+
+
+
+
+
+
+% macros for typesetting parameters
+\providecommand{\aparam}[1]{\texttt{#1}}     % ADAM parameter
+\providecommand{\cparam}[1]{\texttt{#1}}     % CONFIG parameter
+\providecommand{\ndfcomp}[1]{\texttt{#1}}    % NDF component
+
+
+%hyperref command in sun95 renewed
+\newcommand{\sthyperref}[4]{#2\ref{\protect{#4}}#3}
+
+\newcommand{\menuitem}[2]{\item[\protect{\hyperref[#1]{#1}}] #2}
+\newcommand{\classitem}[1]{\item [\protect{\hyperref[#1]{#1}}]}
+
+
+
+
+
+%problems with _ in labels (e.g. in xrefs)
+\renewcommand{\_}{\string_}

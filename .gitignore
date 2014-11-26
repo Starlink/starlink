@@ -123,3 +123,12 @@ world-stamp
 *.texml_tar
 *-eps-converted-to.pdf
 *.idx
+
+# TeX4HT
+*.4ct
+*.4tc
+*.brf
+*.css
+*.idv
+*.lg
+*.xref

@@ -1,0 +1,362 @@
+
+%%%%%%%%%%%%%%%%%%% Table of contents and sectioning formatting
+
+
+% This needs to occur before the TocAt commands.
+\ConfigureToc{sstrefsection}{}{}{}{}
+
+% Set up the places to cut and the places to put tocs.
+\ifwithchapters
+   \typeout{...WithChapters starlinkxhtml.cfg...}
+   \CutAt{chapter}
+
+   \TocAt{chapter,section,subsection,sstrefsection}
+\else
+   \typeout{...WithoutChapters stalrinkxhtml.cfg...}
+   \CutAt{section}
+   \TocAt{section,subsection,sstrefsection}
+\fi
+\CutAt{appendix}
+\Configure{+CutAt}{appendix}{[}{]}
+\TocAt{appendix, section, subsection, sstrefsection}
+\CutAt{sstrefsection,sstrefsection}
+\Configure{+CutAt}{sstrefsection}{[}{]}
+
+%%%%%%%--------- Navigation links
+
+% Custom commands to go forward and back -- default one doesn't work
+% with our custom SST sections.
+%% This came from stackoverflow?
+\def\my:nextlink{%
+\ifx\nextCut\empty\relax\else \Link[\nextCut]{}{}Next\HCode{&\#8594}\EndLink \fi }
+\def\my:prevlink{%
+\ifx\prevCut\empty\relax\else \Link[\prevCut]{}{}\HCode{&\#8592}Prev\EndLink \fi }
+
+
+% Set up the default crosslinks to only use tail-prev, head and tail
+
+% change the order of crosslinks
+%% Default order:
+%\Configure{crosslinks*}{next}{prev}{prevtail}{tail} {front}{up}{}
+
+\Configure{crosslinks*}{next}{prev}{prevtail}{tail}{front}{up}{}
+
+% Crosslinks at top in order: <my defined before> [tail-prev] [tail] <my defined to go after>
+% Crosslinks at bottom in order: <my defined before> [tail-prev] [top] <my defined to go after>
+
+%% Using tail-prev, top and tail links
+%\Configure{crosslinks}{\HCode{<li>}}{\HCode{</li>}}{}{}{tail-prev}{top}{tail}{}
+
+%% Only using the next and previous defined above...
+\Configure{crosslinks}{\HCode{<li>}}{\HCode{</li>}}{}{}{}{}{}{}
+
+% Set up the before and after to include the custom next and previous,
+% and ensure the footnotes are still availabel.
+
+% Following code slightly altered from html4.4ht:
+\Configure{crosslinks+}
+   {%\HCode{<div class="titlebar">}\thestardoctitle{}\HCode{</div>}
+     \HCode{<div class="crosslinks"><ul class='nav'>}
+     \HCode{<li class="prev">} \my:prevlink\ \HCode{</li>}
+     \HCode{<li class="title">}\thestardoctitle{}\HCode{</li>}
+     \HCode{<li class="next">}\my:nextlink\ \HCode{</li>}
+     \HCode{<li class="toc">}\hyperlink{toc}{TOC \HCode{&\#8593}}\HCode{</li>}
+   }
+   {\HCode{</ul></div>}\par\ShowPar}
+   {\ifvmode \IgnorePar\fi\EndP
+     \ifvoid \fn:box\else
+     \HCode{<div class="footnotes">}\box\fn:box\HCode{</div>}
+     \IgnorePar\EndP
+     \fi
+     % 
+     \ifvmode \IgnorePar\fi \EndP
+     \HCode{<div class="crosslinks">}
+     \HCode{<div class="copyright">}\scpushright{\thestardoccopyright{}}\HCode{</div>}
+     \HCode{<ul class='nav'>}
+     \HCode{<li class="prev">} \my:prevlink\ \HCode{</li>}
+     \HCode{<li class="title">}\thestardoctitle{}\HCode{</li>}
+     \HCode{<li class="next">}\my:nextlink\ \HCode{</li>}
+     \HCode{<li class="toc">}\hyperlink{toc}{TOC \HCode{&\#8593}}\HCode{</li>}
+   }
+   {\HCode{</ul></div>}\par\ShowPar}
+
+
+
+%%%%%%% ---- sort out the front matter
+
+\renewcommand{\scfrontmatter}{%
+
+  %% Setup the title to be the contents of @title,
+  \Tag{TITLE+}{\@title}
+
+  %% Version of the latex title `page`.
+  \begin{titlepage}
+    \startitlepage{}
+  \end{titlepage}
+
+  %% Abstract
+  \Abstract{}
+  %% Create a target we can link to for the table of contents,
+  \hypertarget{toc}{}
+
+  %% Slightly different table of contents with or without chapters.
+  \ifwithchapters
+  \tableofcontents[chapter,section,subsection,subsubsection,appendix]
+  \else
+  \tableofcontents[section,subsection,subsubsection,appendix]
+  \fi
+}
+
+
+%%%%%------- Custom commands
+
+
+%% An equivalent for hfill (to push things to the right)
+\NewConfigure{scpushright}{2}
+\renewcommand\scpushright[1]{\a:scpushright#1\b:scpushright}
+\Configure{scpushright}{\Tg<span class="pushright">}{\Tg</span>}
+
+%% Fix the starlink \htmladdnormallink for the web.
+\renewcommand{\htmladdnormallink}[2]{\href{#2}{#1}}
+
+%% Tasks -- set up as a span of their own class.
+\NewConfigure{task}{2}
+\renewcommand\task[1]{\a:task#1\b:task}
+\Configure{task}{\ifvmode \ShowPar\fi \HCode{<span class="task">}}{\Tg</span>}
+
+
+
+%% Set up the title page as a div, class="titlesection"
+\ConfigureEnv{titlepage}{\Tg<div class="titlesection">}{\Tg</div>}{}{}
+
+%% Configure the format of the starlink title.
+\NewConfigure{sctitleformat}{2}
+\renewcommand\sctitleformat[1]{\a:sctitleformat#1\b:sctitleformat \Tag{Title+}{\thetitle}}
+\Configure{sctitleformat}{
+  \ifvmode \ShowPar\fi \HCode{<span class="sctitleformat">}
+}{\Tg</span>}
+
+%% Configure the verbatim environment as a div, class labelled verb.
+\ConfigureEnv{verbatim}{
+  \ifvmode \ShowPar\fi \HCode{<div class="verb">}
+}{\Tg</div>}{}{}
+
+
+%% use html plus/minus symbol -- not necessary?
+%\renewcommand\pm{\HCode{&plusmn}}
+
+
+%% Set up minipage to be a div of class minipage. (won't make it look right)
+%\ConfigureEnv{minipage}{
+%  \ifvmode \ShowPar\fi \HCode{<div class="minipage">}
+%}{\Tg</div>}{}{}
+
+% Macros using sub and superscripts -- use \sb instead of _ and \sp
+% instead of ^. Alternatively you can compile using the options early_
+% and early^ in the second command line parameter.
+% ( You can still use _ and ^ in the document, its only in macros defined
+% in the class/styles or defined before the \begin{document} that you can't)
+\renewcommand{\fcfbe}{\ensuremath{\mathrm{FCF\sb{beamequiv}}}}
+\renewcommand{\fcfb}{\ensuremath{\mathrm{FCF\sb{beam}}}}
+\renewcommand{\fcfa}{$\mathrm{FCF\sb{arcsec}}$}
+\renewcommand{\fcfm}{$\mathrm{FCF\sb{match}}$}
+
+
+%% Starlink xreferences (cludge. This needs fixing when incorporated
+%% in the build script)
+\renewcommand{\xref}[3]{\href{http://starlink.jach.hawaii.edu/cgi-bin/htxserver/#2.htx/#2.html?xref_#3}{#1}}
+\renewcommand{\xlabel}[1]{\HCode{<a name="xref_#1">}\Tg</a>}
+
+
+%% latexhtml stuff, should be removed from texts eventually. Set to
+%% use the latex option
+\renewcommand{\latexhtml}[2]{#2}
+
+%% htmlref -- just use standard \hyperref, eventually remove?
+\renewcommand{\htmlref}[2]{\hyperref[#2]{#1}}
+
+
+%% starlink textbox, as its own div
+\ConfigureEnv{sltextbox}{
+  \ifvmode\ShowPar\fi\HCode{<div class="sltextbox">}}{\Tg</div>}{}{}
+\renewenvironment{sltextbox}[1]{\tbtitle{#1}\begin{tipboxtext}}{\end{tipboxtext}}
+
+% The title of the tip box
+\NewConfigure{tbtitle}{2}
+\newcommand{\tbtitle}[1]{\a:tbtitle#1\b:tbtitle}
+\Configure{tbtitle}{%
+  \ifvmode \ShowPar\fi \HCode{<span class="tbtitle">}}{\Tg</span>}
+
+% The text in the tip box
+\newenvironment{tipboxtext}{}{}
+\ConfigureEnv{tipboxtext}{%
+  \ifvmode\ShowPar\fi\HCode{<div class="tipbox-text">}}{\Tg</div>}{}{}
+
+
+% The tip environment as a whole.
+\ConfigureEnv{tip}{\ifvmode\ShowPar\fi\HCode{<div class="tipbox">}}{\Tg</div>}{}{}
+\renewenvironment{tip}{\tbtitle{Tip:}\begin{tipboxtext}}{\end{tipboxtext}}
+
+
+% the framed page environment
+\ConfigureEnv{fmpage}{\ifvmode\ShowPar\fi\HCode{<div class="fmpage">}}{\Tg</div>}{}{}
+\renewenvironment{fmpage}[1]{}{}
+
+
+
+% Section title colouring
+\renewcommand{\colorsection}[1]{#1}
+\renewcommand{\colorsectionnumberless}[1]{#1}
+
+
+% Fix some weirdness in symbols
+%\renewcommand{\^}{\HCode{^}}
+\renewcommand\${\HCode{$}}%$ %$ is to fix syntax highlighting.
+
+
+%% Put the center enviornment in its own div.
+\renewenvironment{center}{\Tg<div class="center">}{\Tg</div>}
+
+%% Set up the abstract
+\renewcommand{\Abstract}{
+    \ifwithchapters
+        \chapter*{}
+        \typeout{....AbstractChapter...}
+        \else
+        \typeout{....No chapters....}
+     \fi
+     \section*{Abstract}
+     \thestardocabstract{}%
+}
+
+
+%% Set up acronyms if used.
+\renewcommand{\Acronyms}{
+  \ifwithchapters
+     \chapter*{}
+  \fi
+    \section*{Acronyms}
+\addcontentsline{toc}{chapter}{\protect\numberline{}Acronyms}
+}
+
+%% Configure the enumerated description list environment (enumdesc)
+\renewenvironment{enumdesc}{\begin{description}}{\end{description}}
+\ConfigureList{enumdesc}{\EndP\HCode{<dl \a:LRdir class="enumdesc">}%
+  \PushMacro\end:itm
+\global\let\end:itm=\empty}
+{\PopMacro\end:itm \global\let\end:itm \end:itm
+\EndP\HCode{</dd></dl>}\ShowPar}
+   {\end:itm \global\def\end:itm{\EndP\Tg</dd>}\HCode{<dt>}\bgroup \bf}
+   {\egroup\EndP\HCode{</dt><dd\Hnewline >}}
+
+
+
+
+%% Configure the general description class
+\let\description@orig=\description
+\def\description{\@ifnextchar[% ]
+{\description@ht}{\description@orig}}
+\def\description@ht[#1]{\description@orig}
+
+\ConfigureList{description}%
+   {\EndP\HCode{<dl \a:LRdir class="description">}%
+      \PushMacro\end:itm
+\global\let\end:itm=\empty}
+   {\PopMacro\end:itm \global\let\end:itm \end:itm
+\EndP\HCode{</dd></dl>}\ShowPar}
+   {\end:itm \global\def\end:itm{\EndP\Tg</dd>}\HCode{<dt
+        class="description">}\bgroup \bf}
+   {\egroup\EndP\HCode{</dt><dd\Hnewline class="description">}}
+
+
+
+% aligndesc: a description list with left labels aligned; formatted
+% as a table in html.
+\renewenvironment{aligndesc}{\begin{description}}{\end{description}}
+
+\ConfigureList{aligndesc}{\EndP\HCode{<table \a:LRdir class="aligndesc">}%
+ \PushMacro\end:itm
+\global\let\end:itm=\empty}
+   {\PopMacro\end:itm \global\let\end:itm \end:itm
+\EndP\HCode{</dd></table>}\ShowPar}
+   {\end:itm \global\def\end:itm{\EndP\Tg</td>\Tg</tr>}\HCode{<tr><td>}\bgroup \bf}
+   {\egroup\EndP\HCode{</td><td\Hnewline>}}
+
+\Css{table.aligndesc td{vertical-align:top; padding: 0px 5px 0px 5px;}}
+\Css{table.aligndesc{margin-left:1em;margin-right:1em}}
+
+
+%% Long tables
+
+% This will break captions, but they're not well supported by tex4ht
+% to start with so don't worry too mcuh.
+\renewenvironment{longtable}[1]{%
+\begin{table}\begin{tabular}{#1}}{\end{tabular}\end{table}}{}{}
+
+% Break the endhead and endfoot commands...
+\renewcommand{\endhead}{}
+\renewcommand{\endfoot}{}
+
+%% set up the starlink longtable environment
+\renewenvironment{sllongtable}[2]{
+\begin{table}\caption{#2}\begin{longtable}{#1 }}
+{\end{longtable}\end{table}}
+
+
+
+
+
+
+
+% Css for toc (depends on whether or not chappters are included, so
+% not in standard table)
+\Css{.sectionToc{}}
+\Css{.subsectionToc{padding-left:1em;}}
+\Css{.subsubsectionToc{padding-left:3em;font-size:100\%}}
+\Css{.chapterHead,.appendixHead{line-height:150\%}}
+
+\ifwithchapters
+\Css{.chapterToc{}}
+\Css{.sectionToc{padding-left:1em}}
+\Css{.subsectionToc{padding-left:4em;}}
+\Css{.subsubsectionToc{padding-left:7em}}
+\fi
+
+
+
+
+%#don't include -cunithtf as commandline option -- it will enable
+%ligatures as htmlcharacters. Breaks cut and paste etc.
+
+\renewcommand{\myfig}[6]{
+  \begin{figure}#2
+  \begin{center}
+    \includegraphics[#3]{#1}
+    \typeout{#1 inserted on page \arabic{page}}
+    \end{center}
+    \caption[#5]{\label{#4} #6}
+  \end{figure}
+}
+
+\renewcommand{\myfigduo}[8]{
+  \begin{figure}
+    \begin{center}
+    \includegraphics[#4]{#1}
+    \typeout{#1 inserted on page \arabic{page}}
+    \hspace{#6}
+    \includegraphics[#4]{#2}
+    \typeout{#2 inserted on page \arabic{page}}
+    \end{center}
+    \caption[#7]{\label{#5} #8}
+  \end{figure}
+}
+
+
+% Fix bug in mathcal 
+%\renewcommand{\cal}[1]{\HCode{<mi class="ltx_font_mathcalligraphic" mathvariant="script">}#1\HCode{</mi>}}
+%\renewcommand{\mathfrak}[1]{\HCode{<mi mathvariant="bold-fraktur">}#1\HCode{</mi>}}
+
+
+
+% replace \rule with an html <HR>:
+\renewcommand\rule[2]{\HCode{<HR>}}

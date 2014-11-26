@@ -1,0 +1,41 @@
+htlatex has a lot of options. Current command line example is:
+
+
+htlatex sc21.tex "starlinkxhtml.cfg,charset="utf-8",fn-in" '  -cvalidate -cstarfont'
+
+
+Where starlinkxhtml.cfg loads the correct configuration file,
+
+charset=utf-8 gives you unicode characters (otherwise accents are broken)
+
+fn-in gives footnotes at the bottom of page (although note if you
+redefine the lower crosslinks you can accidentally hide this)
+
+-cstarfont will use a custom htf font setup, which is the same as the
+ unihtf option except that it turns off standard ligatures. This is to
+ ensure that search within the html output works correctly.
+
+This is a custom option, and to use it you must set the TEX4HTENV and
+the TEX4HTHTF environmental variables. (see below)
+
+Using the flag -cunihtf will by default use unicode ligature
+characters. These prevent browsers from correctly searching etc, so
+don't turn it on. There are many other htf flags, but if not using
+unicode characters tex4ht will frequently use images for e.g. \cal
+math characters and this will breka mathjax.
+
+
+Tex4ht.env configuration:
+
+To use the local env file here, please set the environmental variable
+TEX4HTENV to the full path of this file.
+
+And then set the TEX4HTHTF environmental variable to e.g. (the latexsupport directory).
+
+e.g.
+export TEX4HTENV=/Users/sarah/JAC/StarSoft/starlink/applications/latexsupport/tex4ht.env
+export TEX4HTHTF=:/Users/sarah/JAC/StarSoft/starlink/applications/latexsupport/:
+
+Note that this environmental variable must have a character marking
+the beginning and end of the path that does not appear within the
+path.

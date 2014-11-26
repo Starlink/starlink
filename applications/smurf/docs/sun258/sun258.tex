@@ -1,731 +1,37 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[oneside,11pt]{starlink}
 
-% ? Specify used packages
-\usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
-% ? End of specify used packages
 
-\pagestyle{myheadings}
-
-% -----------------------------------------------------------------------------
-% ? Document identification
-% Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright}
-{Copyright \copyright\ 2012 University of British Columbia \& the Science \& Technology Facilities Council}
-
-% Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {258.3}
-\newcommand{\stardocauthors}   {Edward Chapin, Andrew G. Gibb, Tim Jenness, David S. Berry, Douglas Scott \& Remo Tilanus}
-\newcommand{\stardocdate}      {14th February 2013}
-\newcommand{\stardoctitle}     {SMURF -- the Sub-Millimetre User Reduction Facility}
-\newcommand{\stardocversion}   {Version 1.5.0}
-\newcommand{\stardocmanual}    {User's Guide}
-\newcommand{\stardocabstract}  {
-
+% ------------------------------------------------------------------------
+% starlink set up
+%\title{SUN/258}
+\stardoccategory  {Starlink User Note}
+\stardocinitials  {SUN}
+\stardoccopyright{Copyright \copyright\ 2012 University of British Columbia \& the Science \& Technology Facilities Council}
+\stardocnumber    {258.3}
+\stardocsource    {sun\thestardocnumber}
+\stardocauthors   {Edward Chapin, Andrew G. Gibb, Tim Jenness, David S. Berry, Douglas Scott \& Remo Tilanus}
+\stardocdate      {14th February 2013}
+\stardoctitle     {SMURF -- the Sub-Millimetre User Reduction Facility}
+\stardocversion   {Version 1.5.0}
+\stardocmanual    {User's Guide}
+\stardocabstract  {
   The Sub-Millimetre User Reduction Facility (SMURF) is a software
   package for reducing data produced by the ACSIS correlater and the
   SCUBA-2 bolometer array on the James Clerk Maxwell Telescope
   (JCMT). This document describes how to use SMURF to process raw
   ACSIS data into data cubes, and raw SCUBA-2 data into images.
-
 }
-% ? End of document identification
-% -----------------------------------------------------------------------------
+\starfunders{University of British Columbia \& the Science \& Technology Facilities Council}
+\startitlepic{\includegraphics[width=0.55\textwidth]{sun258_logo}}
 
-% +
-%  Name:
-%     sun258.tex
-%
-%  Purpose:
-%     Documentation for ACSIS and SCUBA-2 data reduction
-%
-%  Authors:
-%     EC: Edward Chapin (UBC)
-%     AGG: Andy Gibb (UBC)
-%
-%  History:
-%     2008-11-14 (EC):
-%        Initial version -- based on sun.tex
-%     2009-04-15 (AGG):
-%        Convert Maria's document to LaTeX
-%     2009-07-20 (AGG):
-%        Significant updates in time for Nanahope Starlink release
-%     2009-07-24 (EC):
-%        Updated DIMM section, removed .eps from filenames, other cleanup
-%     2009-08-06 (EC):
-%        Move/re-size some figures, address some comments from Per Friberg
-%     2009-08-26 (AGG):
-%        Comments from Douglas, add more references
-%     2010-01-08 (AGG):
-%        More comments from Douglas, update author list and dates
-%     2012-08-30 (RPT):
-%        Added section on FIT1D
-%     {Add further history here}
-%
-% -
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
 
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
-% A new environment for quoting verbatim
-% Environment for indenting and using a small font.
-\newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
-
-\newcommand{\starlink}{\htmladdnormallink{Starlink}{http://starlink.jach.hawaii.edu}}
-
-% Shorthand and HTML references for other Starlink tasks
-\newcommand{\CCDPACK}{\textsc{ccdpack}}
-\newcommand{\CCDPACKref}{\xref{\CCDPACK}{sun139}{}}
-\newcommand{\GAIA}{\textsc{gaia}}
-\newcommand{\GAIAref}{\xref{\GAIA}{sun214}{}}
-\newcommand{\HDSTRACE}{\textsc{hdstrace}}
-\newcommand{\HDSTRACEref}{\xref{\HDSTRACE}{sun102}{}}
-\newcommand{\KAPPA}{\textsc{kappa}}
-\newcommand{\CURSA}{\xref{\textsc{cursa}}{sun190}{}}
-\newcommand{\KAPPAref}{\xref{(SUN/95)}{sun95}{}}
-\newcommand{\SMURF}{\textsc{smurf}}
-\newcommand{\SMURFcook}{\xref{SC/19}{sc19}{}}
-\newcommand{\ADAMsgref}{\xref{SG/4}{sg4}{}}
-\newcommand{\ADAMsunref}{\xref{SUN/101}{sun101}{}}
-\newcommand{\astref}{\xref{SUN/211}{sun211}{}}
-\newcommand{\ndfref}{\xref{SUN/33}{sun33}{}}
-
-% Application tasks
-\newcommand{\task}[1]{\textsf{#1}}
-
-% SMURF tasks
-\newcommand{\badbolos}{\xref{\task{badbolos}}{sun258}{BADBOLOS}}
-\newcommand{\calcdark}{\xref{\task{calcdark}}{sun258}{CALCDARK}}
-\newcommand{\calcflat}{\xref{\task{calcflat}}{sun258}{CALCFLAT}}
-\newcommand{\calcnoise}{\xref{\task{calcnoise}}{sun258}{CALCNOISE}}
-\newcommand{\calcresp}{\xref{\task{calcresp}}{sun258}{CALCRESP}}
-\newcommand{\copyflat}{\xref{\task{copyflat}}{sun258}{COPYFLAT}}
-\newcommand{\dreamsolve}{\xref{\task{dreamsolve}}{sun258}{DREAMSOLVE}}
-\newcommand{\dreamweights}{\xref{\task{dreamweights}}{sun258}{DREAMWEIGHTS}}
-%  ...use fitdd instead of fit1d because the 1 breaks the macro
-\newcommand{\fitdd}{\xref{\task{fit1d}}{sun258}{FIT1D}}
-\newcommand{\gsdtoacsis}{\xref{\task{gsd2acsis}}{sun258}{GSD2ACSIS}}
-\newcommand{\gsdshow}{\xref{\task{gsdshow}}{sun258}{GSDSHOW}}
-\newcommand{\smurfhelp}{\xref{\task{smurfhelp}}{sun258}{SMURFHELP}}
-\newcommand{\impaztec}{\xref{\task{impaztec}}{sun258}{IMPAZTEC}}
-\newcommand{\makecube}{\xref{\task{makecube}}{sun258}{MAKECUBE}}
-\newcommand{\rawunpress}{\xref{\task{rawunpress}}{sun258}{RAWUNPRESS}}
-\newcommand{\rawfixmeta}{\xref{\task{rawfixmeta}}{sun258}{RAWFIXMETA}}
-\newcommand{\sctwosim}{\xref{\task{sc2sim}}{sun258}{SC2SIM}}
-\newcommand{\sctwothreadtest}{\xref{\task{sc2threadtest}}{sun258}{SC2THREADTEST}}
-\newcommand{\scanfit}{\xref{\task{scanfit}}{sun258}{SCANFIT}}
-\newcommand{\skynoise}{\xref{\task{skynoise}}{sun258}{SKYNOISE}}
-\newcommand{\smurfcopy}{\xref{\task{smurfcopy}}{sun258}{SMURFCOPY}}
-\newcommand{\stackframes}{\xref{\task{stackframes}}{sun258}{STACKFRAMES}}
-\newcommand{\starecalc}{\xref{\task{starecalc}}{sun258}{STARECALC}}
-\newcommand{\timesort}{\xref{\task{timesort}}{sun258}{TIMESORT}}
-\newcommand{\unmakecube}{\xref{\task{unmakecube}}{sun258}{UNMAKECUBE}}
-
-\newcommand{\extinction}{\xref{\task{extinction}}{sun258}{EXTINCTION}}
-\newcommand{\flatfield}{\xref{\task{flatfield}}{sun258}{FLATFIELD}}
-\newcommand{\jcmtstate}{\xref{\task{jcmtstate2cat}}{sun258}{JCMTSTATE2CAT}}
-\newcommand{\dumpocscfg}{\xref{\task{dumpocscfg}}{sun258}{DUMPOCSCFG}}
-\newcommand{\makemap}{\xref{\task{makemap}}{sun258}{MAKEMAP}}
-\newcommand{\gettsys}{\xref{\task{gettsys}}{sun258}{GETTSYS}}
-
-\newcommand{\remsky}{\xref{\task{remsky}}{sun258}{REMSKY}}
-\newcommand{\clean}{\xref{\task{sc2clean}}{sun258}{SC2CLEAN}}
-\newcommand{\concat}{\xref{\task{sc2concat}}{sun258}{SC2CONCAT}}
-\newcommand{\fft}{\xref{\task{sc2fft}}{sun258}{SC2FFT}}
-\newcommand{\fts}{\xref{\task{sc2fts}}{sun258}{SC2FTS}}
-
-\newcommand{\rebin}{\texttt{rebin}}
-\newcommand{\iterate}{\texttt{iterate}}
-
-% Other tasks
-\newcommand{\makemos}{\xref{\task{makemos}}{sun139}{MAKEMOS}}
-\newcommand{\csub}{\xref{\task{csub}}{sun95}{CSUB}}
-\newcommand{\clinplot}{\xref{\task{clinplot}}{sun95}{CLINPLOT}}
-\newcommand{\mlinplot}{\xref{\task{mlinplot}}{sun95}{MLINPLOT}}
-\newcommand{\collapse}{\xref{\task{collapse}}{sun95}{COLLAPSE}}
-\newcommand{\fillbad}{\xref{\task{fillbad}}{sun95}{FILLBAD}}
-\newcommand{\fitsedit}{\xref{\task{fitsedit}}{sun95}{FITSEDIT}}
-\newcommand{\kapdiv}{\xref{\task{div}}{sun95}{DIV}}
-\newcommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
-\newcommand{\parget}{\xref{\task{parget}}{sun95}{PARGET}}
-\newcommand{\provshow}{\xref{\task{provshow}}{sun95}{PROVSHOW}}
-\newcommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
-\newcommand{\wcsmosaic}{\xref{\task{wcsmosaic}}{sun95}{WCSMOSAIC}}
-\newcommand{\wcsalign}{\xref{\task{wcsalign}}{sun95}{WCSALIGN}}
-\newcommand{\wcsattrib}{\xref{\task{wcsattrib}}{sun95}{WCSATTRIB}}
-\newcommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
-\newcommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
-\newcommand{\topcat}{\xref{\textsc{Topcat}}{sun253}{}}
-
-
-% macros for typesetting parameters
-\newcommand{\aparam}[1]{\texttt{#1}}     % ADAM parameter
-\newcommand{\cparam}[1]{\texttt{#1}}     % CONFIG parameter
-\newcommand{\ndfcomp}[1]{\texttt{#1}}    % NDF component
-
-%% Definitions imported from SUN/95
-
-% A kind of list item, like description, but with an easily adjustable
-% item separation.  Note that the paragraph and fount-size change are
-% needed to make the revised \baselinestretch work.
-\newlength{\menuwidth}
-\newlength{\menuindent}
-\newcommand{\menuitem}[2]
-  {{\bf #1} \settowidth{\menuwidth}{{\bf #1} }
-  \setlength{\menuindent}{-0.5em}
-  \addtolength{\menuwidth}{-2\menuwidth}
-  \addtolength{\menuwidth}{\textwidth}
-  \addtolength{\menuwidth}{\menuindent}
-  \hspace{\menuindent}\parbox[t]{\menuwidth}{
-  \renewcommand{\baselinestretch}{0.75}\small
-  #2 \par \vspace{1.0ex}
-  \renewcommand{\baselinestretch}{1.0}\normalsize} \\ }
-\begin{htmlonly}
-\newcommand{\menuitem}[2]
-  {\item [\htmlref{#1}{#1}] #2}
-\end{htmlonly}
-
-\newcommand{\classitem}[1]{\item [\htmlref{#1}{#1}]}
-
-% an environment for references (for the SST sstdiytopic command).
-\newenvironment{refs}{\vspace{-4ex} % normally 3ex
-                      \begin{list}{}{\setlength{\topsep}{0mm}
-                                     \setlength{\partopsep}{0mm}
-                                     \setlength{\itemsep}{0mm}
-                                     \setlength{\parsep}{0mm}
-                                     \setlength{\leftmargin}{1.5em}
-                                     \setlength{\itemindent}{-\leftmargin}
-                                     \setlength{\labelsep}{0mm}
-                                     \setlength{\labelwidth}{0mm}}
-                    }{\end{list}}
-
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     21-JUL-2009 (TIMJ):
-%        Added \sstdiylist{}{} as used when a Parameters section is located that
-%        is not "ADAM Parameters".
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the a generic section as a list
-\newcommand{\sstdiylist}[2]{
-   \item[#1:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #2
-   \end{description}
-}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%  Format the attribute data type section.
-\newcommand{\sstattributetype}[1]{
-   \item[Type:] \mbox{} \\
-      #1
-}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-
-%  sstattributetype
-   \newcommand{\sstattributetype}[1]{
-      \item[Type:] #1
-   }
-
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
-
-
-
-% ? End of document specific commands
-% -----------------------------------------------------------------------------
-%  Title Page.
-%  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
 
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   \textsc{University of British Columbia} / \textsc{Joint Astronomy Centre} \hfill \textbf{\stardocname}\\
-   {\large Science \& Technology Facilities Council}\\
-   {\large Starlink Software Collection\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-\begin{center}
-\includegraphics[scale=0.3]{sun258_logo}
-\end{center}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-\includegraphics[scale=0.7]{sun258_logo}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{University of British Columbia}
-                        {http://www.ubc.ca} \\
-      \htmladdnormallink{Joint Astronomy Centre}
-                        {http://www.jach.hawaii.edu}\\
-      \htmladdnormallink{Science \& Technology Facilities Council}
-                        {http://www.stfc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Software Collection}{http://starlink.jach.hawaii.edu/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://starlink.jach.hawaii.edu/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? Latex Copyright Statement
-%  =========================
-\begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
-\end{latexonly}
-% ? End of Latex copyright statement
-
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-
-% Main text
+\scfrontmatter
 
 \section{\xlabel{introduction}Introduction\label{se:smurfintro}}
+
 
 This guide is divided into two main parts, one dedicated to processing
 ACSIS data (\cite{acsis}, see Section \ref{se:acsisdr}) and the other
@@ -771,8 +77,7 @@ listed in the bibliography.
 
 Enable the \SMURF\ environment by typing \verb+smurf+ at the shell
 prompt. The welcome message will appear as shown below:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 
         SMURF commands are now available -- (Version 1.0.0)
 
@@ -783,8 +88,7 @@ prompt. The welcome message will appear as shown below:
         parameter lists. See the 'Release Notes' section of SUN/258 for
         details.
 
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This defines aliases for each \SMURF\ command, gives a reminder of the
 help command and shows the version number. You can now use \SMURF\
 routines or ask for help.
@@ -809,18 +113,15 @@ Further help on the help system maybe obtained by accessing the topic
 \verb+smurfhelp+ from within \smurfhelp. If you know which topic you
 want help on you can access it directly using
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % smurfhelp makemap parameters
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 If an application prompts you for input and you do not know what the
 parameter means, you can use \verb+?+ at the prompt for more
 information.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % calcflat
 IN - Input flatfield files > ?
 
@@ -835,8 +136,7 @@ CALCFLAT
          observation and the same subarray.
 
 IN - Input flatfield files >
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \subsubsection{SMURF parameters}
 
@@ -925,16 +225,14 @@ explicitly separated by commas. For more information on specifying
 groups of objects for input and output see \xref{the section
   \textit{Specifying Groups of Objects} in
   SUN/95}{sun95}{se_groups}. Examples of valid inputs are:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 IN=s8a20090620_00075_0001.sdf
 IN=s8a20090620_00075_*
 IN=s8a20090620_00075_00??
 IN=file1,file2
 IN=^myfile.lis
 OUT=*_out
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Note that if you are providing a text file containing output
 filenames, those should be listed in the same order as the input
@@ -960,10 +258,9 @@ The main (top-level) components are:
 \item Raw data units (K for ACSIS, adu (possibly as compressed integers) for raw SCUBA-2 data,
   pW for flatfielded SCUBA-2 data).
 \end{itemize}
-For ACSIS, the raw data are stored as $N_{\rm chan} \times N_{\rm
-  receptors} \times N_{\rm samp}$, while SCUBA-2 data are stored as
-$N_{\rm columns} \times N_{\rm rows} \times N_{\rm samp}$, where
-$N_{\rm samp}$ is the number of time samples in a file.
+For ACSIS, the raw data are stored as $N_{\textrm{chan}} \times N_{\textrm{receptors}} \times N_{\textrm{samp}}$, while SCUBA-2 data are stored as
+$N_{\textrm{columns}} \times N_{\textrm{rows}} \times N_{\textrm{samp}}$, where
+$N_{\textrm{samp}}$ is the number of time samples in a file.
 
 The files also contain additional NDF components common to both
 instruments:
@@ -995,7 +292,7 @@ MCE information that can be included in the output catalogue using the
 
 \begin{figure}
 \begin{center}
-\includegraphics{sun258_scan_pattern}
+\includegraphics[width=1\textwidth]{sun258_scan_pattern}
 \caption{The telescope positions during observation number 7 on
   20090107. The plot is created by \topcat\ from the output from
 \jcmtstate\ plotting the DRA columns against the DDEC column. The pong
@@ -1066,16 +363,14 @@ precision for all calculations.
 SMURF contains a small number of commands specifically directed towards
 the reduction of ACSIS data. This section contains an introduction to
 each of these commands. The reduction of ACSIS data is described
-more fully in the {\em ACSIS Data Reduction Cookbook}:
-\htmladdnormallink{\texttt{http://www.jach.hawaii.edu/JCMT/spectral\_line/data\_reduction/acsisdr/}}
-{http://www.jach.hawaii.edu/JCMT/spectral_line/data_reduction/acsisdr/}.
+more fully in the \htmladdnormallink{\em ACSIS Data Reduction
+  Cookbook}{http://www.jach.hawaii.edu/JCMT/spectral\_line/data\_reduction/acsisdr/}. 
 
 \subsection{The makecube command}
 
 The central step in the reduction of ACSIS data is the conversion of one
-or more time-series cubes with {\tt [spectral channel number, receptor
-index, time-slice index]} axes, into a spatial cube with {\tt
-[RA, Dec, spectral channel number]} axes\footnote{The RA and Dec axes may
+or more time-series cubes with \texttt{[spectral channel number, receptor
+index, time-slice index]} axes, into a spatial cube with \texttt{[RA, Dec, spectral channel number]} axes\footnote{The RA and Dec axes may
 be replaced by axes appropriate for other celestial co-ordinate
 systems.}. This step is accomplished using the \makecube\ command.
 
@@ -1196,7 +491,7 @@ differences between the ``genuine'' and ``artificial'' time-series cubes.
 \begin{figure}[htb]
   \begin{center}
     \includegraphics[width=0.8\linewidth]{sun258_gaussherm}
-    \caption{Fit1d $-$ Gauss-Hermite shapes as a function of the 3rd-order
+    \caption[Gauss-Hermite shapes]{Fit1d $-$ Gauss-Hermite shapes as a function of the 3rd-order
       ``skewness'' coefficient h3 and the 4th-order the ``peakiness''
       coefficient h4.  the 3rd-order, h3, and the 4th-order, h4,
       coefficients. The red box indicates the limits on acceptable
@@ -1269,11 +564,9 @@ shapes that can be fitted are ``gaussians'', ``gausshermite1'',
 ``gausshermite2'', and ``voigt'' functions, which are discussed in
 detail in:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % smurfhelp fit1d fitting_functions
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Gauss-Hermite profiles are easiest visualized as the combination of a
 Gaussian and decaying asymmetric 3rd-order and/or symmetric 4th-order
@@ -1311,7 +604,7 @@ To emphasize a number of issues:
 \item {\em ONLY for Gaussians} do the fitted parameters correspond
   {\em exactly} to amplitude, centre, and FWHM! For the other functions
   such correspondence does not exist: while they are related, the
-  numerical values are not exact. Users are {\bf strongly cautioned} to
+  numerical values are not exact. Users are \textbf{strongly cautioned} to
   keep this in mind. The above-mentioned help for ``fitting\_functions''
   outlines the exact relations.
 \item The fitted ``gauss*'' functions can in principle be mixed along a
@@ -1353,14 +646,12 @@ Besides a cube with the fitted profiles \fitdd\ also outputs so-called
 the header of the output file. They can be accessed there directly but
 also copied out as independent files:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % gaiadisp outfile.more.smurf_fit1d.comp_1 outfile.more.smurf_fit1d.comp_2
 % ndfcopy outfile.more.smurf_fit1d.comp_0 comp_0
 % ndfcopy outfile.more.smurf_fit1d.comp_1 comp_1
 etc.
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 There is a parameter file for each component (``line'') that was
 fitted along the profile upto the number of components requested by
@@ -1372,8 +663,7 @@ and a return code from the fitting routine.
 The Component parameter files have 7 images along the axis that was
 fitted, with each representing a fitted parameter:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
     COMP_1..N fitted profiles, planes:
                (gaussian)          (gausshermite)        (voigt)
          1 =   amplitude                a                 area
@@ -1388,12 +678,11 @@ fitted, with each representing a fitted parameter:
     COMP_0 diagnostics info, planes:
          1 = number of components found
          2 = fit error: (see help fit1d)
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
-Thus, for Gaussian fits \ndfcomp{OUTFILE.MORE.SMURF\_FIT1D.COMP\_1(,,1)} is
+Thus, for Gaussian fits \ndfcomp{OUTFILE.MORE.SMURF\_FIT1D.COMP\_1(,\phantom{},1)} is
 an image of the fitted amplitudes of Component 1 of each profile,
-while \ndfcomp{OUTFILE.MORE.SMURF\_FIT1D.COMP\_1(,,3)} shows the fitted FWHMs
+while \ndfcomp{OUTFILE.MORE.SMURF\_FIT1D.COMP\_1(,\phantom{},3)} shows the fitted FWHMs
 across the field-of-view.
 
 Much of the (anticipated) use of \fitdd\ derives from the fact that
@@ -1420,8 +709,7 @@ the former can vary across the field-of-view whereas the latter will
 result in the same value being used for all profiles.
 
 In principle a Component parameter file can be created from ``scratch'':
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 # Copy a 7-image section from the cube and fill with blanks
 % ndfcopy infile'(,,1~7)' temp
 
@@ -1440,8 +728,7 @@ In principle a Component parameter file can be created from ``scratch'':
 # Generate a cube with the model profiles using fit1d with model_only=1
 % fit1d in=infile out=model rms=1 parcomp=comp_1 \
 %       config='"^/star/bin/smurf/smurf_fit1d.def,model_only=1"'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Obviously, this is not a very practical example given that the profile
 is the same across the field: setting values in the user definition
@@ -1478,16 +765,14 @@ interpolated over using \fillbad. The ``fixed'' parameter file was
 then used to provide initial estimates for a subsequent file,
 resulting in the fitted Amplitudes on the right.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % fit1d in=infile out=outfile rms=0.22 config=^fit1d.def
 % ndfcopy outfile.more.smurf_fit1d.comp_1 comp_1
 % thresh comp_1'(,,2)' out=pos thrlo=2 thrhi=5 newlo=bad newhi=bad
 % fillbad pos out=pos_fix
 % paste comp_1 p1=pos_fix out=comp_1_fix
 % fit1d in=infile out=outfile rms=0.22 config=^fit1d.def parcomp=comp_1b_fix
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 These fairly simple examples are presented to illustrate the use of
 ``Component parameter files'', but more elaborate schemes are
@@ -1563,8 +848,7 @@ The output from processing a FLATFIELD observation is a data file
 solution in the NDF extension \texttt{.MORE.SCUBA2.FLATCAL}, the same
 location as for the raw data. The main data array for this output file
 is a three-dimensional array containing the reference-subtracted
-measurements for each heater setting ($N_{\rm row}\times N_{\rm
-  column} \times N_{\rm heat}$).
+measurements for each heater setting ($N_{\textrm{row}}\times N_{\textrm{column}} \times N_{\textrm{heat}}$).
 
 In addition to generating the flatfield solution, \calcflat\ can also
 create a responsivity image for the current subarray. The
@@ -1664,7 +948,7 @@ and its offset from a one-to-one relationship with the input
 radiation. Thus the output power from bolometer $i$ is related to the
 input (optical) power by:
 \begin{equation}
-P_{{\rm out},i} = G_i P_{{\rm in},i} + O_i.
+P_{{\textrm{out}},i} = G_i P_{{\textrm{in}},i} + O_i.
 \end{equation}
 where $G$ is the gain and $O$ is the offset.
 
@@ -1696,7 +980,7 @@ atmospheric emission varies significantly over the timescales of a
 typical observation, further swamping any contribution from the
 source. Fortunately, the emission from the sky is correlated over the
 SCUBA-2 field of view, which enables simple sky removal techniques to
-be used effectively\cite{archibald,dempsey,sc2ana002}.
+be used effectively\cite{archibald,sc2ana002}.
 
 \begin{figure}[htb]
   \begin{center}
@@ -1751,42 +1035,40 @@ there is more atmosphere along the line of sight between the source
 and the telescope.
 
 The radiation received by SCUBA-2 is the sum of the radiation from the
-astronomical source (represented by $I_{\rm src}$ in Equation
-\ref{eq:iobs} below) and the radiation from the atmosphere ($I_{\rm
-  atm}$). However, $I_{\rm src}$ is diminished by the optical depth
+astronomical source (represented by $I_{\textrm{src}}$ in Equation
+\ref{eq:iobs} below) and the radiation from the atmosphere ($I_{\textrm{atm}}$). However, $I_{\textrm{src}}$ is diminished by the optical depth
 of the atmosphere ($\tau$) as follows:
 \begin{equation}
-I_{\rm obs} = I_{\rm atm} + I_{\rm src} \exp(-\tau).
+I_{\textrm{obs}} = I_{\textrm{atm}} + I_{\textrm{src}} \exp(-\tau).
 \label{eq:iobs}
 \end{equation}
 The optical depth is usually quoted as the value at the zenith
-($\tau_{\rm zenith}$), but you need the value of tau at the same
-elevation as your observations ($\tau_{\rm obs}$). For a
-plane-parallel atmosphere, $\tau_{\rm obs} = A \times \tau_{\rm
-  zenith}$, where airmass ($A$) is a measure of the total atmosphere
+($\tau_{\textrm{zenith}}$), but you need the value of tau at the same
+elevation as your observations ($\tau_{\textrm{obs}}$). For a
+plane-parallel atmosphere, $\tau_{\textrm{obs}} = A \times \tau_{\textrm{zenith}}$, where airmass ($A$) is a measure of the total atmosphere
 along the line of sight.
 
 Airmass is defined as $1 / \cos \theta$, where $\theta$ is the zenith
 angle. The zenith angle is the vertical angle measured from the zenith
 ($\theta = 0^\circ$) towards the horizon ($\theta = 90^\circ$) and is
 thus equal to $90-\phi$, where $\phi$ is the elevation. You can now
-calculate $\tau_{\rm obs}$ from $\tau_{\rm zenith}$ and $\phi$ as
+calculate $\tau_{\textrm{obs}}$ from $\tau_{\textrm{zenith}}$ and $\phi$ as
 follows:
 \begin{equation}
-\tau_{\rm obs} = \tau_{\rm zenith} / \cos(90^\circ - \phi ).
+\tau_{\textrm{obs}} = \tau_{\textrm{zenith}} / \cos(90^\circ - \phi ).
 \label{eq:tau}
 \end{equation}
 
 Using Equation \ref{eq:tau}, rewrite Equation \ref{eq:iobs} as:
 \begin{equation}
-I_{\rm obs} = I_{\rm atm} + I_{\rm src} \exp \left(
-\frac{-\tau_{\rm zenith}}{\cos(90^\circ-\phi)}\right).
+I_{\textrm{obs}} = I_{\textrm{atm}} + I_{\textrm{src}} \exp \left(
+\frac{-\tau_{\textrm{zenith}}}{\cos(90^\circ-\phi)}\right).
 \end{equation}
 %The top graph in Figure ??? shows how the observed signal varies with elevation
 %and airmass.
 
 The elevation angle of each bolometer can be calculated, and given
-$\tau_{\rm zenith}$ \remsky\ calculates the $\tau_{\rm obs}$ at the
+$\tau_{\textrm{zenith}}$ \remsky\ calculates the $\tau_{\textrm{obs}}$ at the
 elevation angle of each bolometer.
 
 The zenith optical depth can be obtained via three methods:
@@ -1797,20 +1079,18 @@ The zenith optical depth can be obtained via three methods:
   process SCUBA-2 skydips.
 
 \item CSO tipping radiometer: The Caltech Submillimeter Observatory
-  (CSO) radiometer measures $\tau_{\rm zenith}$ from skydip
-  observations at 225 GHz. The CSO radiometer records a new $\tau_{\rm
-    zenith}$ every 10 minutes and values are stored in the FITS
+  (CSO) radiometer measures $\tau_{\textrm{zenith}}$ from skydip
+  observations at 225 GHz. The CSO radiometer records a new $\tau_{\textrm{zenith}}$ every 10 minutes and values are stored in the FITS
   headers corresponding to the start and end timestamps of the file
   (\texttt{TAU225ST} and \texttt{TAU225EN}). \SMURF\ converts CSO
-  $\tau_{\rm zenith}$ to $\tau_{\rm zenith}$ at 450 or 850 $\mu$m,
-  relying on an empirical relationship between $\tau_{\rm zenith}$ at
-  225 GHz and $\tau_{\rm zenith}$ at 450 or 850 $\mu$m.
+  $\tau_{\textrm{zenith}}$ to $\tau_{\textrm{zenith}}$ at 450 or 850 $\mu$m,
+  relying on an empirical relationship between $\tau_{\textrm{zenith}}$ at
+  225 GHz and $\tau_{\textrm{zenith}}$ at 450 or 850 $\mu$m.
 
 \item JCMT Water Vapour Monitor: The JCMT Water Vapour Monitor (WVM)
   provides opacity estimates every 1.2 seconds by measuring the
   spectral shape of the 183 GHz water line along the telescope
-  line-of-sight, and then converting this to an effective $\tau_{\rm
-    zenith}$ at 225 GHz. Since the measurement is aligned with the
+  line-of-sight, and then converting this to an effective $\tau_{\textrm{zenith}}$ at 225 GHz. Since the measurement is aligned with the
   submillimetre beam this method circumvents the need to apply the
   plane parallel approximation (which breaks down at the horizon). The
   raw WVM data are stored in the JCMT state structure, though the
@@ -1823,7 +1103,7 @@ variable atmospheric conditions where the CSO radiometer may not be
 giving sufficiently-frequent readings.
 
 The \SMURF\ routine that corrects for atmospheric extinction is called
-\extinction. The \extinction\ routine can use $\tau_{\rm zenith}$
+\extinction. The \extinction\ routine can use $\tau_{\textrm{zenith}}$
 determined by all of the above methods, and obtains values
 automatically from the FITS headers for the WVM and CSO cases or uses
 the raw WVM data if desired.
@@ -2099,21 +1379,20 @@ and $DKS$ signals described above. Therefore we express the residual
 noise as
 %
 \begin{equation}
-N^i(t) = N^i_{\rm w}(t) + N^i_{\rm lf}(t),
+N^{i}(t) = N^i_{\textrm{w}}(t) + N^i_{\textrm{lf}}(t),
 \label{eq:dimm_noise}
 \end{equation}
 %
-where $N^i_{\rm w}(t)$ and $N^i_{\rm lf}(t)$ are the white and
+where $N^{i}_{\textrm{w}}(t)$ and $N^{i}_{\textrm{lf}}(t)$ are the white and
 independent low-frequency noise components, respectively. The DIMM can
-attempt to fit $N^i_{\rm lf}(t)$ using the $FLT$ model component such
-that the residual signal is given only by $N^i_{\rm w}(t)$.
+attempt to fit $N^{i}_{\textrm{lf}}(t)$ using the $FLT$ model component such
+that the residual signal is given only by $N^{i}_{\textrm{w}}(t)$.
 
 The strategy used by the DIMM is to estimate each of the signal
 components sequentially, roughly in order of decreasing amplitude. At
 the end of this procedure a numerical value proportional to $\chi^2$
 (quantifying the mismatch between the model and the data) is
-calculated from the r.m.s. in the residual noise $N^i_{\rm
-  w}(t)$. Provided that the model components are in some sense
+calculated from the r.m.s. in the residual noise $N^{i}_{\textrm{w}}(t)$. Provided that the model components are in some sense
 `orthogonal', multiple iterations of this procedure produces improved
 estimates of each component with stable convergence properties. This
 can be checked by monitoring the value of $\chi^2$: if the change
@@ -2202,7 +1481,7 @@ below:
 \item[5. Fit post-map estimate models:] Once the map has been
   estimated and the astronomical signal removed from the data, the
   residual should contain only noise. However, this signal often
-  contains a weak drift ($N_{\rm lf}$ in Eq.~\ref{eq:dimm_noise}) that
+  contains a weak drift ($N_{\textrm{lf}}$ in Eq.~\ref{eq:dimm_noise}) that
   is independent from one detector to the next. By specifying the
   $FLT$ model component after $AST$, it is possible to remove this
   component using, for example, a low-pass filter. It is advisable to
@@ -2224,7 +1503,7 @@ below:
   the CHITOL value specified in the configuration file. In the latter
   case, $\chi^2$ is calculated in the following way. In the first
   iteration, $NOI$ estimates the white-noise contribution to the
-  r.m.s., $\sigma_{\rm w}$, in each detector directly from the flat
+  r.m.s., $\sigma_{\textrm{w}}$, in each detector directly from the flat
   part of their power spectra (presently defined over the frequency
   range 2 to 10 Hz). If any astronomical signal, or low-frequency
   signal components are present in the data, the r.m.s.\ of the data
@@ -2232,12 +1511,12 @@ below:
   power spectrum). However, as the solution converges, the residual
   signal should slowly approach a white noise distribution, once the
   other signal components are estimated and removed. $\chi^2$ is
-  therefore calculated as $(1/N) \sum_i[ r_i^2/\sigma^2_{\rm w}]$,
+  therefore calculated as $(1/N) \sum_i[ r_i^2/\sigma^2_{\textrm{w}}]$,
   where $r_i$ is the $i$th residual sample for a given detector, and
   $N$ is the total number of samples for that detector. This number,
   averaged over all samples and detectors, should tend to 1 as the
   solution converges, although in practice it will be off by some
-  factor related to the bandwidth used to calculate $\sigma_{\rm w}$.
+  factor related to the bandwidth used to calculate $\sigma_{\textrm{w}}$.
 
   The final map estimate, the model signal components, and the
   residual signal may then all be exported to files for examination
@@ -2359,11 +1638,11 @@ flt.filt\_edgelow    &                                                          
 flt.filt\_notchhigh, &                                                                 & -- \\
 flt.filt\_notchlow   &                                                                 & -- \\
 ext.tausrc       & Source of opacity data: water vapour monitor (WVMRAW),              & WVMRAW \\
-                 & $\tau_\mathrm{CSO}$ (CSOTAU), or explicit value for filter (FILTERTAU). & \\
+                 & $\tau_{\mathrm{CSO}}$ (CSOTAU), or explicit value for filter (FILTERTAU). & \\
 ext.taumethod    & Airmass calculation: full (separate value for each detector each    & ADAPTIVE \\
                  & timeslice), quick (single airmass all detectors each timeslice), or & \\
                  & adaptive (decide dynamically to use full or quick).                 & \\
-ext.csotau       & Value of zenith $\tau_\mathrm{CSO}$ if ext.tausrc=CSOTAU.            & -- \\
+ext.csotau       & Value of zenith $\tau_{\mathrm{CSO}}$ if ext.tausrc=CSOTAU.            & -- \\
 ext.filtertau    & Value of zenith optical depth for filter if ext.tausrc=FILTERTAU    & -- \\
 \hline
 \hline
@@ -2402,7 +1681,7 @@ times a point on the sky is observed) for different mapping strategies
 or the impact of non-working bolometers. Several different scanning
 models are supported: boustrophedon (conventional back-and-forth
 raster scan), two variations of `pong' (or box-scan) with either
-sharp or gentle turnarounds and a lissajous pattern \cite{kackley}.
+sharp or gentle turnarounds and a lissajous pattern. [REF TO ANA SCAN DOC]
 
 \subsection{\xlabel{simuse}Simulator workflow\label{se:simuse}}
 
@@ -2492,7 +1771,7 @@ simulate data for, the names of the atmosphere model and astronomical
 source files and the zenith opacity (at 225 GHz). The zenith opacty is
 converted to a value at the appropriate wavelength using the empirical
 relations derived for SCUBA by Archibald et al. (2002). Similar
-relations for SCUBA-2 are available from Dempsey et al.\ (2013).
+relations for SCUBA-2 will be derived.
 
 Data for all subarrays (at the specified wavelength) may be generated
 in a single run. The size of the output files is governed by the
@@ -2533,16 +1812,6 @@ pipeline rather than \SMURF, as their analysis involves multiple
 steps. POINTING observations are equivalent to short science
 observations and should be processed in the same way.
 
-\section{Citing SMURF}
-
-If you use SMURF in your work please use the following references:
-
-For the continuum map-maker: Chapin et al., 2013, MNRAS, 430, 2545
-
-For the heterodyne components see Jenness et al., Astronomy \& Computing, in preparation.
-
-The general SMURF reference should be to use the Astrophysics Source Code Library entry of \texttt{ascl:1310.007}.
-
 \section{Acknowledgments}
 
 The authors are grateful for the documentation written by Maria Kelly
@@ -2554,8 +1823,9 @@ task by Jen Balfour.
 
 % End of main text
 
+
 \begin{thebibliography}{}
-\addcontentsline{toc}{section}{References}
+\addcontentsline{toc}{section}{\protect\numberline{}References}
 
 \bibitem{archibald}
 Archibald~E.~N., et~al., 2002, MNRAS, 336, 1
@@ -2576,11 +1846,8 @@ Buckle~J.~V., et~al., 2009, MNRAS, 399, 1026
 %Analysis Tool},
 %\xref{Starlink User Note 214}{sun214}{}
 
-\bibitem{dempsey}
-Dempsey~J.~T., et al., 2013, MNRAS, 430, 2534
-
 \bibitem{scuba2}
-Holland~W.~S., et~al., 2013, MNRAS, 430, 2513
+Holland~W.~S., et~al., 2006, Proc. SPIE, 6275, 45
 
 \bibitem{jenness}
 Jenness~T., et~al., 2002, MNRAS, 336, 14
@@ -2589,9 +1856,6 @@ Jenness~T., et~al., 2002, MNRAS, 336, 14
 Jenness~T., Gibb,~A., 2007, \textit{Data Acquisition/Data Reduction
   Pipeline Interface Control Document}, SCUBA-2 Data Reduction
 document SC2/SOF/IC210/01
-
-\bibitem{kackley}
-Kackley~R., et al., 2010, Proc.\ SPIE, 7740, 77401Z
 
 \bibitem{dream}
 Le~Poole~R.~S., van~Someren~Greve~H.~W., 1998, Proc. SPIE, 3357, 638
@@ -2800,16 +2064,15 @@ First official release supporting SCUBA-2 raw data (rather than simulated data).
 \end{itemize}
 
 \newpage
+
 \appendix
-\begin{small}
+%\renewcommand{\thesection}{\Alph{section}}%
+
 \section{\xlabel{ap_summary}An Alphabetical Summary of SMURF Commands
 \label{ap:summary}}
-\begin{htmlonly}
-\begin{description}
-\end{htmlonly}
 
-\menuitem{ACSIS\_INDEX}{
-  Provide a listing of ACSIS data files in a directory.}
+\begin{description}[itemsep=0.pt]
+\menuitem{ACSIS\_INDEX}{Provide a listing of ACSIS data files in a directory.}
 \menuitem{BADBOLOS}{
   Generate a map of random dead bolometers and store in extension of the input file.}
 \menuitem{CALCDARK}{
@@ -2904,9 +2167,9 @@ Stack multiple 2-d images into a 3d cube, optionally sorted by time.}
  Produce simulated time series data from a regridded ACSIS data cube.}
 \menuitem{UNMAKEMAP}{
 Produce simulated time-series data from a SCUBA-2 map.}
-\begin{htmlonly}
+
 \end{description}
-\end{htmlonly}
+
 
 \newpage
 \section{\xlabel{ap_classified}Classified SMURF Commands
@@ -2917,15 +2180,17 @@ functions as follows.
 
 {\large
 \begin{center}
-{\bf General Purpose}
+\textbf{General Purpose}
 \end{center}
 }
 
-\begin{description}
+\begin{description}[itemsep=0.pt]
 \classitem{DUMPOCSCFG}
 Retrieve OCS XML configuration used to generate the raw data.
+
 \classitem{JCMTSTATE2CAT}
 Dump JCMTSTATE information to ASCII table.
+
 \classitem{SMURFHELP}
 Give help about SMURF.
 \classitem{STACKFRAMES}
@@ -2934,11 +2199,11 @@ Stack multiple 2-d images into a 3d cube, optionally sorted by time.
 
 {\large
 \begin{center}
-{\bf SCUBA-2 Data Processing}
+\textbf{SCUBA-2 Data Processing}
 \end{center}
 }
 
-\begin{description}
+\begin{description}[itemsep=0.pt]
 \classitem{CALCDARK}
  Calculate the 2d dark frame from a dark observation.
 \classitem{CALCFLAT}
@@ -3007,11 +2272,11 @@ Copy a 2d image out of a time series file.
 
 {\large
 \begin{center}
-{\bf ACSIS Data Processing}
+\textbf{ACSIS Data Processing}
 \end{center}
 }
 
-\begin{description}
+\begin{description}[itemsep=0.pt]
 \classitem{ACSIS\_INDEX}
   Provide a listing of ACSIS data files in a directory.
 \classitem{GETTSYS}
@@ -3028,11 +2293,11 @@ Retrieve TSYS (or TRX) from ACSIS data files.
 
 {\large
 \begin{center}
-{\bf Data Import}
+\textbf{Data Import}
 \end{center}
 }
 
-\begin{description}
+\begin{description}[itemsep=0.pt]
 \classitem{GSD2ACSIS}
  Convert a GSD format DAS data file to an ACSIS format NDF. (beta test)
 \classitem{GSDSHOW}
@@ -3043,11 +2308,11 @@ Retrieve TSYS (or TRX) from ACSIS data files.
 
 {\large
 \begin{center}
-{\bf SCUBA-2 Simulations}
+\textbf{SCUBA-2 Simulations}
 \end{center}
 }
 
-\begin{description}
+\begin{description}[itemsep=0.pt]
 \classitem{BADBOLOS}
  Generate a map of random dead bolometers and add it as an NDF extension to the input file.
 \classitem{SC2SIM}
@@ -3056,9 +2321,10 @@ SCUBA-2 simulator.
  Generate a simulated sky background.
 \end{description}
 
-\end{small}
+
 
 \section{\xlabel{ap_full}Specifications of SMURF Applications\label{ap:full}}
+%\CutAt{sstrefsection,section} 
 
 The following pages describe all the SMURF commands in detail. Default
 values for parameters are quoted in square brackets. Empty brackets
@@ -3067,8 +2333,7 @@ time. Parameters for which an array should be supplied (or are
 returned) are shown with parentheses after the parameter name. A
 number within those parentheses indicates the size of the array.
 
-\subsection{ADAM routines}
-
+\section{ADAM routines}
 \input{../../libsmurf/smurfmon}
 \clearpage
 
@@ -3200,25 +2465,20 @@ command with the \verb+--help+ option on the command line.
 }
 
 \clearpage
-\sstroutine{
-   DUMPOCSCFG
-}{
-   Retrieve OCS configuration XML from data file.
-}{
-  \sstdescription{
-Searches for the OCS configuration in the file (if present) and writes
-it to standard output. If the configuration is not present in the file
-(older data will not contain it) the OCS configuration name is
-retrieved and an attempt made to locate the file on the file system
-(only valid at JAC).
- }
- \sstusage{
-  dumpocscfg a20070105\_00050\_01\_0001.sdf
- }
+\sstroutine{DUMPOCSCFG}
+{ Retrieve OCS configuration XML from data file.}
+{ \sstdescription{
+    Searches for the OCS configuration in the file (if present) and writes
+    it to standard output. If the configuration is not present in the file
+    (older data will not contain it) the OCS configuration name is
+    retrieved and an attempt made to locate the file on the file system
+    (only valid at JAC).
+  }
+  \sstusage{
+    dumpocscfg a20070105\_00050\_01\_0001.sdf
+  }
   \sstparameters{
-     \sstsubsection{
-        $-$help
-      }{
+    \sstsubsection{$-$help}{
             Print help information.
       }
       \sstsubsection{
@@ -3300,7 +2560,7 @@ as additional lines of median, mean and standard deviation.
       the state information to standard out. The output file is in TST
       format and can be read into the TOPCAT application (but may
       require that TOPCAT is told explicitly that the catalogue is in
-      TST format, e.g. with the {\tt "}-f tst{\tt "} command line option).
+      TST format, e.g. with the \texttt{"}-f tst\texttt{"} command line option).
 
       This information includes the telescope pointing position (Actual,
       Demand and Base) in both the tracking system and AZEL coordinate
