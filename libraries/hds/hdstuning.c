@@ -11,11 +11,11 @@
 /* Variable storing tuned state */
 
 /* Indicates that we have looked at the environment */
-hdsbool_t HAVE_INITIALIZED_TUNING = 0;
+static hdsbool_t HAVE_INITIALIZED_TUNING = 0;
 
 /* Use version 5 or version 4? Default to
    use version 4 */
-int USE_VERSION5 = 0;
+static int USE_VERSION5 = 0;
 
 /* Parse tuning environment variables. Should only be called once the
    first time a tuning parameter is required */
