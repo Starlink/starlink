@@ -714,11 +714,12 @@ if ($usehtlatex==1){
       $TEX4HTHTF = "TEX4HTHTF=" . ':' . $ENV{STARLATEXSUPPORT} . ':';
       $TEXINPUTS = join('//:', $TEXINPUTS, $ENV{STARLATEXSUPPORT});
   }
-  my $tex4htcommand =  "TEXINPUTS=$TEXINPUTS $TEX4HTENV $TEX4HTHTF htlatex $DESTFILE \"starlinkxhtml.cfg,charset=\"utf-8\",fn-in\" ' -cvalidate -cstarfont' \"\" \"-interaction=batchmode\"";
+  my $tex4htcommand =  "TEXINPUTS=$TEXINPUTS $TEX4HTENV $TEX4HTHTF htlatex $DESTFILE \"starlinkxhtml.cfg,charset=\"utf-8\",fn-in\" ' -cvalidate -cstarfont' \"\" '-interaction=batchmode'";
   print $tex4htcommand . "\n";
   system($tex4htcommand);
   if ($? ) {
     print( "Star2HTML fatal: Translation of document $TEXFILE failed.\n" );
+  }
 } else {
   print( "Preparations finished - now starting LaTeX2HTML\n\n");
   my $cwd = Cwd::getcwd();
