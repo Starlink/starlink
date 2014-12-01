@@ -6,6 +6,7 @@
 % ? End of specify used packages
 
 \usepackage{palatino}
+\usepackage{rotating}
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
@@ -1504,6 +1505,15 @@ form \texttt{GSD\_XXX} rather than \texttt{gsdXxx}.
    }
 }
 
+\clearpage
+\section{Mapping}
 
-% ? End of main text
+The following tables define the mapping (in version 5.3 of the JCMT
+storage task) from item names that will be found in the data files
+(the ``NRAO'' name) to the JCMT name. Also included is the nominal
+FITS header equivalent, emphasis indicating a JCMT-specific variant,
+and a text description of the field.
+
+\input{sun229_mapping}
+
 \end{document}

@@ -1,0 +1,364 @@
+
+\begin{sidewaystable*}
+\caption{Mapping of GSD names to FITS equivalents.}
+\begin{center}
+\small
+\begin{tabular}{llll}
+\hline
+NRAO & JCMT & FITS & Description\\ \hline
+
+CELL\_V2Y & CELL\_V2Y & \emph{YPOSANG} & Position angle of cell y axis (CCW)\\
+UAZ & SDIS(36) & UXPNT & User az correction\\
+UEL & SDIS(37) & UYPNT & User el correction\\
+C1BKE & BACKEND & BACKEND & Name of the backend\\
+C1BTYP & BE\_TYPE & \emph{BACKTYPE} & Type of backend\\
+C1DP & DATA\_PRECISION & PRECIS & Precision of the data from the backend\\
+C1FTYP & FE\_TYPE & \emph{FRONTYPE} & Type of frontend\\
+C1HGT & TEL\_HEIGHT & \emph{HEIGHT} & Height of telescope above sea level\\
+C1IFS & IF\_DEVICE & IFDEVICE & Name of the IF device\\
+C1LAT & TEL\_LATITUDE & \emph{LATITUDE} & Geodetic latitude of telescope (North +ve)\\
+C1LONG & TEL\_LONGITUDE & \emph{LONGITUD} & Geographical longitude of telescope (West +ve)\\
+C1OBS & PROJECT\_OBS\_1 & OBSID & Name of the primary observer\\
+C1ONA & PROJECT\_OBS\_1 & OBSERVER & Name of the primary observer\\
+C1ONA1 & PROJECT\_OBS\_2 & OBSERVER & Name of the support scientist\\
+C1ONA2 & PROJECT\_OBS\_3 & \emph{OPERATOR} & Name of the telescope operator\\
+C1PID & PROJECT & PROJID & Identifies the observing program\\
+C1RCV & FRONTEND & FRONTEND & Name of the frontend\\
+C1SNA1 & CENTRE\_NAME\_1 & OBJECT & Source name part 1\\
+C1SNA2 & CENTRE\_NAME\_2 & \emph{OBJECT2} & Source name part 2 or altern. name\\
+C1SNO & NOBS & SCAN & Observation number\\
+C1STC & OBS\_TYPE & OBSTYPE & Type of observation\\
+C1TEL & TEL\_NAME & TELESCOP & Telescope name\\
+C2FL & DY & FOCUSL & Secondary mirror y displacement from nominal at observation start\\
+C2FR & DZ & FOCUSR & Secondary mirror z displacement from nominal at observation start\\
+C2FV & DX & FOCUSV & Secondary mirror x displacement from nominal at observation start\\
+C2ORI & SECONDARY\_ORI & ORIENT & Rotation or polarization angle orientation of the frontend/reflector\\
+
+\hline
+\end{tabular}
+\end{center}
+\end{sidewaystable*}
+
+
+\begin{sidewaystable*}
+\caption{Mapping of GSD names to FITS equivalents.}
+\begin{center}
+\small
+\begin{tabular}{llll}
+\hline
+NRAO & JCMT & FITS & Description\\ \hline
+
+C2PC1 & TEL\_PC\_LAN & PTCON1 & Angle by which lower axis is north of ideal\\
+C2PC2 & TEL\_PC\_LAE & PTCON2 & Angle by which lower axis is east of ideal\\
+C2PC3 & TEL\_PC\_UANP & PTCON3 & Angle by which upper axis is not perpendicular to lower\\
+C2PC4 & TEL\_PC\_BNP & PTCON4 & Angle by which beam is not perpendicular to upper axis\\
+C2XPC & TEL\_PC\_LAZ & AXPOINT & Azimuth/RA enc.zero; enc.reading = az + pc\_laz\\
+C2YPC & TEL\_PC\_UAZ & AYPOINT & Altitude/DEC enc.zero; enc.reading = az + pc\_uaz\\
+C3BEFENULO & BES\_FE\_NULO & \emph{BEFENULO} & Copy of frontend LO frequency per backend section\\
+C3BEFESB & BES\_FE\_SB\_SIGN & \emph{BEFESB} & Copy of frontend sideband sign per backend section\\
+C3BEINCON & BE\_IN\_CONN & \emph{BEINCON} & IF output channels connected to BE input channels\\
+C3BESCONN & BES\_CONN & \emph{BESCON} & BE input channels connected to this section\\
+C3BESSPEC & BES\_SPECTRUM & \emph{BESSPEC} & Subsystem nr to which each backend section belongs.\\
+C3BETOTIF & BES\_TOT\_IF & \emph{BETOTIF} & Total IF per backend section\\
+C3CAL & OBS\_CALIBRATION & \emph{OBSCAL} & Calibration observation?\\
+C3CEN & OBS\_CENTRE & \emph{OBSCEN} & Centre moves between scans?\\
+C3CL & CYCLE\_TIME & CYCLLEN & Duration of each cycle\\
+C3CONFIGNR & DAS\_CONF\_NR & \emph{CONFIG} & Backend configuration\\
+C3DASCALSRC & DAS\_CAL\_SOURCE & \emph{CALSRC} & DAS calibration source for backend calibration (POWER or DATA)\\
+C3DASOUTPUT & DAS\_OUTPUT & \emph{OUTPUT} & Description of output in DAS DATA (SPECTRUM, T\_REC, T\_SYS, etc.)\\
+C3DASSHFTFRAC & DAS\_SHIFT\_FRAC & \emph{SHFTFRAC} & DAS calibration source for backend calibration (POWER or DATA)\\
+C3DAT & OBS\_UT1D & UTDATE & UT1 date of observation\\
+C3FLY & OBS\_CONTINUOUS & \emph{OBSFLY} & Data taken on the fly or in discrete mode?\\
+C3FOCUS & OBS\_FOCUS & \emph{OBSFOCUS} & Focus observation?\\
+C3INTT & INTGRN\_TIME & \emph{INTGR} & Scan integration time\\
+C3LSPC & NO\_BES\_O\_CH & \emph{NOBESDCH} & Number of channels per backend section\\
+C3LST & OBS\_LST & LST & Local sidereal time at the start of the observation\\
+C3MAP & OBS\_MAP & \emph{OBSMAP} & Map observation?\\
+
+\hline
+\end{tabular}
+\end{center}
+\end{sidewaystable*}
+
+
+\begin{sidewaystable*}
+\caption{Mapping of GSD names to FITS equivalents.}
+\begin{center}
+\small
+\begin{tabular}{llll}
+\hline
+NRAO & JCMT & FITS & Description\\ \hline
+
+C3MXP & NO\_SCAN\_PNTS & \emph{NOSCNPTS} & Maximum number of map points done in a phase\\
+C3NCH & NO\_BE\_O\_CH & \emph{NOBEOCH} & No.backend output channels\\
+C3NCI & NO\_CYCLES & \emph{NOCYCLES} & Maximum number of cycles in the scan\\
+C3NCP & NO\_CYCLE\_PNTS & \emph{NOCYCPTS} & Total number of xy positions observed during a cycle\\
+C3NCYCLE & NCYCLE & \emph{NCYCLE} & Number of cycles done in the scan\\
+C3NFOC & NO\_FE\_O\_CH & \emph{NOFCHAN} & NO\_FE\_O\_CH:No. of frontend output channels\\
+C3NIS & NO\_SCANS & \emph{NOSCANS} & Number of scans\\
+C3NLOOPS & NO\_SCANS & NSCANS & Number of scans per observation commanded at observation start\\
+C3NMAP & NO\_MAP\_PNTS & NOPTS & Number of map points\\
+C3NOIFPBES & NO\_IF\_PER\_BES & \emph{NOIFPBES} & Number of IF inputs to each section (2 for correlator, 1 for AOS)\\
+C3NO\_SCAN\_VARS1 & NO\_SCAN\_VARS1 & \emph{NOSCNVR1} & Number of scan table 1 variables\\
+C3NO\_SCAN\_VARS2 & NO\_SCAN\_VARS2 & \emph{NOSCNVR2} & Number of scan table 2 variables\\
+C3NPP & NO\_MAP\_DIMS & \emph{NOMAPDIM} & Number of dimension in the map table\\
+C3NRC & NRC & NORCHAN & NO\_BE\_I\_CH:No.backend input channels\\
+C3NRS & NO\_BES & \emph{NORSECT} & Number of backend sections\\
+C3NSAMPLE & NSCAN & \emph{NSCAN} & Number of scans done\\
+C3NSV & NO\_PHASE\_VARS & NOSWVAR & Number of phase table variables\\
+C3OVERLAP & BES\_OVERLAP & \emph{OVERLAP} & Subband overlap\\
+C3PPC & NO\_PHASES & NOPHASE & Number of phases per cycle\\
+C3SRT & SCAN\_TIME & SAMPRAT & Total time of scan (=total integration time if OBS\_CONTINUOUS = .FALSE.)\\
+C3UT & OBS\_UT1H & UT & UT1 hour of observation\\
+C3UT1C & OBS\_UT1C & \emph{UT1C} & UT1-UTC correction interpolated from time service telex (in days)\\
+C4AMPL\_EW & AMPL\_EW & CHOPAZ & Secondary mirror chopping amplitude parallel to lower axis\\
+C4AMPL\_NS & AMPL\_NS & CHOPEL & Secondary mirror chopping amplitude parallel to upper axis\\
+C4AXY & CELL\_X2Y & \emph{XYANGLE} & Angle between cell y axis and x-axis (CCW)\\
+C4AZ & CENTRE\_AZ & AZ & Azimuth at observation date\\
+
+\hline
+\end{tabular}
+\end{center}
+\end{sidewaystable*}
+
+
+\begin{sidewaystable*}
+\caption{Mapping of GSD names to FITS equivalents.}
+\begin{center}
+\small
+\begin{tabular}{llll}
+\hline
+NRAO & JCMT & FITS & Description\\ \hline
+
+C4AZERR & SDIS(7) & XPOINT & DAZ:Net Az offset at start (inc.tracker ball setting and user correction)\\
+C4CECO & CENTRE\_CODE & \emph{COORDCD2} & centre coords. AZ= 1;EQ=3;RD=4;RB=6;RJ=7;GA=8\\
+C4CSC & CENTRE\_COORDS & COORDCD & Character code of commanded centre or source coordinate system\\
+C4DAZ & DAZ\_SM & XPOINT & Telescope lower axis correction for secondary mirror XYZ\\
+C4DECDATE & CENTRE\_DEC & \emph{DECDATE} & Declination of date\\
+C4DEL & DEL\_SM & YPOINT & Telescope upper axis correction for secondary mirror XYZ\\
+C4DO1 & CELL\_X & DESORG1 & Cell x dimension; descriptive origin item 1\\
+C4DO2 & CELL\_Y & DESORG2 & Cell y dimension; descriptive origin item 2\\
+C4DO3 & CELL\_V2X & DESORG3 & Angle by which the cell x axis is oriented with respect to local vertical\\
+C4EDC & CENTRE\_DEC & EPOCDEC & Declination of date\\
+C4EDEC & CENTRE\_DEC1950 & EPOCDEC & Declination of source for EPOCH\\
+C4EDEC2000 & CENTRE\_DEC2000 & \emph{DECJ2000} & Declination J2000\\
+C4EL & CENTRE\_EL & EL & Elevation at observation date\\
+C4ELERR & SDIS(8) & YPOINT & DEL:Net El offset at start (inc.tracker ball setting and user correction)\\
+C4EPH & CENTRE\_EPOCH & EPOCH & Date of the RA/DEC coordinates (1950)\\
+C4EPT & EPOCH\_TYPE & \emph{EPOCHTYP} & Type of epoch, JULIAN, BESSELIAN or APPARENT\\
+C4ERA & CENTRE\_RA1950 & EPOCRA & Right ascension of source for EPOCH\\
+C4EW\_ENCODER & AMPL\_E\_SET & \emph{EW\_ENCOD} & Secondary mirror ew encoder value\\
+C4EW\_SCALE & EW\_AMPL\_SCALE & \emph{EW\_SCALE} & Secondary mirror ew chop scale\\
+C4FRQ & FREQUENCY & \emph{CHOPFREQ} & Secondary mirror chopping period\\
+C4FUN & WAVEFORM & \emph{WAVEFORM} & Secondary mirror chopping waveform\\
+C4GB & CENTRE\_GB & GALLAT & Galactic latitude\\
+C4GL & CENTRE\_GL & GALLONG & Galactic longitude\\
+C4LSC & CELL\_COORDS & FRAME & Char. code for local x-y coord.system\\
+C4MCF & CENTRE\_MOVING & \emph{CENMOVE} & Centre moving flag (solar system object)\\
+C4MOCO & TEL\_COORDS & \emph{MOUNTING} & Mounting of telescope; defined as LOWER/UPPER axes, e.g; AZ/ALT\\
+
+\hline
+\end{tabular}
+\end{center}
+\end{sidewaystable*}
+
+
+\begin{sidewaystable*}
+\caption{Mapping of GSD names to FITS equivalents.}
+\begin{center}
+\small
+\begin{tabular}{llll}
+\hline
+NRAO & JCMT & FITS & Description\\ \hline
+
+C4NS\_ENCODER & AMPL\_N\_SET & \emph{NS\_ENCOD} & Secondary mirror ns encoder value\\
+C4NS\_SCALE & NS\_AMPL\_SCALE & \emph{NS\_SCALE} & Secondary mirror ns chop scale\\
+C4ODCO & CELL\_UNIT & \emph{MAPUNIT} & Units of cell and mapping coordinates;offset definition code\\
+C4OFFS\_EW & OFFS\_EW & \emph{EWTILT} & Secondary mirror offset parallel to lower axis (East-West Tilt)\\
+C4OFFS\_NS & OFFS\_NS & \emph{NSTILT} & Secondary mirror offset parallel to upper axis (North-South Tilt)\\
+C4PER & PERIOD & CHOPTIME & Secondary mirror chopping period\\
+C4POSANG & POSANG & \emph{CHOPDIRN} & Secondary mirror chop position angle\\
+C4RA2000 & CENTRE\_RA2000 & \emph{RAJ2000} & Right ascension J2000\\
+C4RADATE & CENTRE\_RA & \emph{RADATE} & Right Ascension of date\\
+C4RX & REFERENCE\_X & \emph{XREF} & Reference x position (JCMT cells wrt to centre; NRAO abs. degrees)\\
+C4RY & REFERENCE\_Y & \emph{YREF} & Reference y position (JCMT cells wrt to centre; NRAO abs. degrees)\\
+C4SM & CHOPPING & \emph{CHOPPING} & Secondary mirror is chopping\\
+C4SMCO & COORDS & \emph{CHOPCOOR} & Secondary mirror chopping coordinate system\\
+C4SX & CENTRE\_OFFSET\_X & \emph{XSOURCE} & Commanded x centre position (JCMT cells wrt to centre; NRAO abs. degrees)\\
+C4SY & CENTRE\_OFFSET\_Y & \emph{YSOURCE} & Commanded y centre position (JCMT cells wrt to centre; NRAO abs. degrees)\\
+C4THROW & THROW & \emph{CHOPTHRW} & Secondary mirror chop throw\\
+C4X & X & \emph{AFOCUSV} & Secondary mirror absolute X position at observation start\\
+C4Y & Y & \emph{AFOCUSH} & Secondary mirror absolute Y position at observation start\\
+C4Z & Z & \emph{AFOCUSR} & Secondary mirror absolute Z position at observation start\\
+C5AT & TAMB & TAMB & Ambient temperature\\
+C5DP & DEW\_POINT & DEW\_PT & Mean atmospheric dew point\\
+C5IR & REF\_INDEX & REFRAC & Mean atmospheric refractive index (alternative)\\
+C5IR1 & TEL\_REFR\_A & REFRAC1 & Refraction constant A (see MTIN026)\\
+C5IR2 & TEL\_REFR\_B & REFRAC2 & Refraction constant B (see MTIN026)\\
+C5IR3 & TEL\_REFR\_C & REFRAC3 & Refraction constant C (see MTIN026)\\
+C5MM & VAP\_PRESSURE & MMH2O & Mean atmospheric vapour pressure\\
+
+\hline
+\end{tabular}
+\end{center}
+\end{sidewaystable*}
+
+
+\begin{sidewaystable*}
+\caption{Mapping of GSD names to FITS equivalents.}
+\begin{center}
+\small
+\begin{tabular}{llll}
+\hline
+NRAO & JCMT & FITS & Description\\ \hline
+
+C5PRS & PAMB & PRESSURE & Mean atmospheric pressure\\
+C5RH & HAMB & HUMIDITY & Mean atmospheric relative humidity\\
+C6CYCLREV & CYCLE\_REVERSAL & \emph{CYCLREV} & Cycle reversal flag\\
+C6DX & CELL\_X & DELTAX & Cell x dim,; descriptive origin item 1\\
+C6DY & CELL\_Y & DELTAY & Cell y dimension; descriptive origin item 2\\
+C6FC & CELL\_CODE & \emph{FRAME2} & Local x-y AZ= 1;EQ=3;RD=4;RB=6;RJ=7;GA=8\\
+C6MODE & SWITCH\_MODE & \emph{SWMODE} & Observation mode\\
+C6MSA & CELL\_V2X & SCANANG & Scanning angle - angle from local vertical to x axis measured CW\\
+C6NP & NCYCLE\_PNTS & \emph{NCYCPTS} & Number of sky points completed in the observation\\
+C6REV & SCAN\_REVERSAL & \emph{REVERSAL} & Map rows scanned in alternate directions?\\
+C6SD & OBS\_DIRECTION & DIRECTN & Map rows are in X (horizontal) or Y(vertical) direction\\
+C6ST & OBS\_TYPE & OBSMODE & Type of observation\\
+C6XGC & X\_MAP\_START & XCELL0 & X coordinate of the first map point\\
+C6XNP & NO\_X\_MAP\_PNTS & NOXPTS & X map dimension; number of points in the x-direction\\
+C6XPOS & X\_MAP\_POSITIVE & \emph{XSIGN} & In first row x increases (TRUE) or decreases (FALSE)\\
+C6YGC & Y\_MAP\_START & YCELL0 & Y coordinate of the first map point\\
+C6YNP & NO\_Y\_MAP\_PNTS & NOYPTS & Y map dimension; number of points in the y-direction\\
+C6YPOS & Y\_MAP\_POSITIVE & \emph{YSIGN} & In first row y increases (TRUE) or decreases (FALSE)\\
+C7AP & APERTURE & \emph{APERTURE} & Aperture\\
+C7BCV & BAD\_CHANNEL & BADCHV & Bad channel value\\
+C7CAL & CAL\_TYPE & TYPECAL & Calibration type (standard or direct, chopperwheel)\\
+C7FIL & FILTER & \emph{FILTER} & Filter\\
+C7HP & FWHM &  & FWHM of the beam profile (mean)\\
+C7NIF & NO\_IF\_CH & NOIFCHAN & Number of IF channels\\
+C7OSN & OBS\_REF\_SCAN & OFFSCAN & Calibration observation number (in which a standard was observed)\\
+C7PHASE & PHASE & \emph{PHASE} & Lockin phase\\
+
+\hline
+\end{tabular}
+\end{center}
+\end{sidewaystable*}
+
+
+\begin{sidewaystable*}
+\caption{Mapping of GSD names to FITS equivalents.}
+\begin{center}
+\small
+\begin{tabular}{llll}
+\hline
+NRAO & JCMT & FITS & Description\\ \hline
+
+C7SEEING & SAO\_SEEING & \emph{SEEING} & Seeing at JCMT\\
+C7SEETIME & SAO\_YYMMDDHHMM & \emph{SEETIME} & SAO seeing time (YYMMDDHHMM)\\
+C7SNSTVTY & SENSITIVITY & \emph{SNSTVTY} & Lockin sensitivity in scale range units\\
+C7SNTVTYRG & RANGE & \emph{SNTVTYRG} & Sensitivity range of lockin\\
+C7SZVRAD & SZVRAD & SZVRAD & Number of elements of vradial array\\
+C7TAU225 & CSO\_TAU & \emph{TAU225} & CSO tau at 225GHz\\
+C7TAURMS & CSO\_TAU\_RMS & \emph{TAURMS} & CSO tau rms\\
+C7TAUTIME & CSO\_YYMMDDHHMM & \emph{TAUTIME} & CSO tau time (YYMMDDHHMM)\\
+C7TIMECNST & TIME\_CONSTANT & \emph{TIMECNST} & Lockin time constant\\
+C7VC & VEL\_COR & RVSYS & Velocity correction\\
+C7VR & VELOCITY & VELOCITY & Radial velocity of the source\\
+C7VRD & VEL\_DEF & VELDEF & Velocity definition code; method of computing the velocity\\
+C7VREF & VEL\_REF & VELREF & Velocity reference code; reference point for telescope \& source velocity\\
+C8AAE & APERTURE\_EFF & APPEFF & Ratio total power observed/incident on the telescope\\
+C8ABE & BEAM\_EFF & BEAMEFF & Fraction of beam in diffraction limited main beam\\
+C8EF & ETAFSS & ETAFSS & Forward spillover and scattering efficiency\\
+C8EL & ETAL & ETAL & Rear spillover and scattering efficiency\\
+C8GN & ANTENNA\_GAIN & ANTGAIN & Antenna gain\\
+C9OT & TEL\_TOLERANCE & OBSTOL & Observing tolerance\\
+C11PHA & PHASE\_TABLE & \emph{PHASTB} & Phase table: switching scheme dependent\\
+C11VD & PHASE\_VARS & \emph{VARDES} & Names of the cols. of phase table\\
+C12ALPHA & BES\_ALPHA & \emph{ALPHA} & Ratio of signal sideband to image sideband sky transmission\\
+C12BM & BES\_BITMODE & BM & Correlation bit mode\\
+C12BW & BANDWIDTH & BW & Bandwidth\\
+C12CAL & DATA\_UNITS & \emph{DATAUNIT} & Units of spectrum data\\
+C12CALTASK & BE\_CAL\_TASK & \emph{CALTASK} & Calibration instrument used (FE, BE, or USER)\\
+
+\hline
+\end{tabular}
+\end{center}
+\end{sidewaystable*}
+
+
+\begin{sidewaystable*}
+\caption{Mapping of GSD names to FITS equivalents.}
+\begin{center}
+\small
+\begin{tabular}{llll}
+\hline
+NRAO & JCMT & FITS & Description\\ \hline
+
+C12CALTYPE & BE\_CAL\_TYPE & \emph{CALTYPE} & Type of calibration (THREELOADS or TWOLOADS)\\
+C12CF & FE\_NUOBS & OBSFREQ & Centre frequency\\
+C12CM & BES\_CORR\_MODE & CM & Correlation function mode\\
+C12CT & TCAL & TCAL & Calibration temperature\\
+C12ETASKY & BES\_ETA\_SKY & \emph{ETA\_SKY} & Sky transmission from last calibration\\
+C12ETASKYIM & BES\_ETA\_SKY\_IM & \emph{ETA\_SKY\_} & Frontend-derived sky transmission\\
+C12ETATEL & BES\_ETA\_TEL & \emph{ETA\_TEL} & Telescope transmission\\
+C12FR & DELTANU & FREQRES & Frequency resolution [MHz]\\
+C12GAINS & GAIN & \emph{GAINS} & Gains\\
+C12GNORM & G\_NORM & GNORM & Data normalisation factor\\
+C12GREC & GREC &  & Raw data units per Kelvin\\
+C12GS & BES\_G\_S & \emph{G\_S} & Normalizes signal sideband gain\\
+C12INFREQ & BE\_NUIN & \emph{INFREQ} & BE input frequencies [GHz]\\
+C12NOI & NOISE & \emph{NOISE} & Noise value\\
+C12REDMODE & BE\_RED\_MODE & \emph{REDMODE} & Way of calibrating the data (RATIO or DIFFERENCE)\\
+C12RF & FE\_NUREST & RESTFREQ & Rest frequency\\
+C12RST & TSYS\_OFF & RTSYS & Reference system temperature\\
+C12RT & TREC & TRX & Receiver temperature\\
+C12SBRAT & BE\_SB\_RATIO & \emph{SBRATIO} & Sideband ratio\\
+C12SCAN\_TABLE\_1 & SCAN\_TABLE1 & \emph{SCANTAB1} & Begin scan table\\
+C12SCAN\_TABLE\_2 & SCAN\_TABLE2 & \emph{SCANTAB2} & End scan table\\
+C12SCAN\_VARS1 & SCAN\_VARS1 & \emph{SCANVRS1} & Names of the cols. of scan table1\\
+C12SCAN\_VARS2 & SCAN\_VARS2 & \emph{SCANVRS2} & Names of the cols. of scan table2\\
+C12SST & TSYS\_ON & STSYS & Source system temperature\\
+C12TAMB & T\_HOT & \emph{THOT} & Ambient load temperature\\
+C12TASKY & BES\_TA\_SKY & \emph{TA\_SKY} & Ratio of signal sideband to image sideband sky transmission\\
+
+\hline
+\end{tabular}
+\end{center}
+\end{sidewaystable*}
+
+
+\begin{sidewaystable*}
+\caption{Mapping of GSD names to FITS equivalents.}
+\begin{center}
+\small
+\begin{tabular}{llll}
+\hline
+NRAO & JCMT & FITS & Description\\ \hline
+
+C12TCOLD & T\_COLD & \emph{TCOLD} & Cold load temperature\\
+C12TSKY & TSKY & \emph{TSKY} & Sky temperature at last calibration\\
+C12TSKYIM & BES\_T\_SKY\_IM & \emph{T\_SKY\_IM} & Frontend-derived Tsky, image sideband\\
+C12TSYSIM & BES\_T\_SYS\_IM & \emph{T\_SYS\_IM} & Frontend-derived Tsys, image sideband\\
+C12TTEL & TTEL & \emph{TTEL} & Telescope temp. from last skydip\\
+C12VCOLD & IF\_V\_COLD & \emph{VCOLD} & \\
+C12VDEF & VEL\_DEFN &  & Velocity definition code - radio, optical, or relativistic\\
+C12VHOT & IF\_V\_HOT & \emph{VHOT} & \\
+C12VREF & VEL\_REF &  & Velocity frame of reference - LSR, Bary-, Helio-, or Geo- centric\\
+C12VSKY & IF\_V\_SKY & \emph{VSKY} & \\
+C12WO & H2O\_OPACITY & TAUH2O & Water opacity\\
+C13DAT & DATA & SPECT & Reduced data\\
+C13ERR & ERROR & TRMS & Standard error\\
+C13RAW\_ERROR & DATA\_ERROR & \emph{RAWERROR} & \\
+C13RAW\_ERROR\_OP & RAW\_ERROR\_OP & \emph{RAWERROR} & Raw (out of phase) error also to be stored at end scan\\
+C13RESP & RESP & \emph{RESP} & array of responsivities\\
+C13SPV & SAMPLES & \emph{RAWSPECT} & \\
+C13SPV\_OP & SAMPLES\_OP & \emph{RAWSPECT} & Raw out of phase data samples in each phase\\
+C13STD & STDEV & \emph{STDSPECT} & Phase data standard deviation\\
+C14PHIST & MAP\_TABLE & \emph{MAPTABLE} & List of xy offsets for each scan\\
+C90T & TEL\_TOLERANCE & OBSTOL & Observing tolerance\\
+
+\hline
+\end{tabular}
+\end{center}
+\end{sidewaystable*}
+
