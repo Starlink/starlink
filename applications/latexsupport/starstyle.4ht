@@ -360,3 +360,6 @@
 
 % replace \rule with an html <HR>:
 \renewcommand\rule[2]{\HCode{<HR>}}
+
+% replace \linebreak with an html <BR>:
+\renewcommand\linebreak{\HCode{<BR>}}
