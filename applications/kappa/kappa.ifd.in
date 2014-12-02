@@ -18359,6 +18359,15 @@ iraf! {
             helpkey *
          }
 
+         parameter alignref {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Align using the WCS attributes of the reference?}
+            helpkey *
+            default FALSE
+         }
+
          parameter conserve {
             type _LOGICAL
             vpath DEFAULT
@@ -18536,6 +18545,15 @@ iraf! {
             default 0.05
             prompt {Positional accuracy in pixels}
             helpkey *
+         }
+
+         parameter alignref {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Align using the WCS attributes of the reference?}
+            helpkey *
+            default FALSE
          }
 
          parameter conserve {

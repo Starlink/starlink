@@ -1,4 +1,5 @@
-      SUBROUTINE KPS1_WALA7( INDF1, IWCSR, MAP, MAP4, ORIGIN, STATUS )
+      SUBROUTINE KPS1_WALA7( INDF1, REFALN, IWCSR, MAP, MAP4, ORIGIN,
+     :                       STATUS )
 *+
 *  Name:
 *     KPS1_WALA7
@@ -10,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_WALA7( INDF1, IWCSR, MAP, MAP4, ORIGIN, STATUS )
+*     CALL KPS1_WALA7( INDF1, REFALN, IWCSR, MAP, MAP4, ORIGIN, STATUS )
 
 *  Description:
 *     This routine finds the Mapping from input pixel co-ordinates to
@@ -21,6 +22,15 @@
 *  Arguments:
 *     INDF1 = INTEGER (Given)
 *        Identifier for the input NDF.
+*     REFALN = LOGICAL (Given)
+*        If .TRUE., the WCS attributes in the current Frame of each NDF
+*        (both reference NDF and input NDFs) are set so that alignment
+*        occurs in the System, Standard of Rest, Time Scale, etc, of the
+*        reference NDF. This is done by setting each AST "AlignXxx"
+*        attribute in the current Frame to the value of the corresponding
+*        "Xxx" attribute in the current Frame of the reference NDF. If
+*        FALSE, the existing values of teh "AlignXxx" attributes are left
+*        unchanged.
 *     IWCSR = INTEGER (Given)
 *        AST pointer for the WCS FrameSet from the reference NDF.
 *     MAP = INTEGER (Returned)
@@ -69,6 +79,8 @@
 *     6-JAN-2008 (DSB):
 *        Correct conversion from pixel index limits to pixel coordinate
 *        limits before checking for a linear mapping.
+*     1-DEC-2014 (DSB):
+*        Added argument REFALN.
 *     {enter_further_changes_here}
 
 *-
@@ -84,6 +96,7 @@
 
 *  Arguments Given:
       INTEGER INDF1
+      LOGICAL REFALN
       INTEGER IWCSR
 
 *  Arguments Returned:
@@ -108,6 +121,7 @@
       INTEGER IPIX1              ! Index of PIXEL Frame in input NDF FrameSet
       INTEGER IPIXR              ! Index of PIXEL Frame in ref. NDF FrameSet
       INTEGER IWCS1              ! AST pointer to input WCS FrameSet
+      INTEGER IWCSRC             ! Temp copy of the reference WCS FrameSet
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of input NDF
       INTEGER N                  ! Nearest integer to fit coefficient
       INTEGER NDIM1              ! No. of pixel axes in input NDF
@@ -153,10 +167,20 @@
       CALL CHR_APPND( AST_GETC( IWCS1, 'DOMAIN', STATUS ), DOMLST, IAT )
       CALL CHR_APPND( ',PIXEL', DOMLST, IAT )
 
+*  If required, set the alignment properties of the current Frame to match
+*  the main properties of the reference frame.
+      IF( REFALN ) THEN
+         CALL KPG1_ASALN( IWCS1, IWCSR, STATUS )
+         IWCSRC = AST_COPY( IWCSR, STATUS )
+         CALL KPG1_ASALN( IWCSRC, IWCSR, STATUS )
+      ELSE
+         IWCSRC = AST_CLONE( IWCSR, STATUS )
+      END IF
+
 *  Merge the reference WCS FrameSet into this NDFs WCS FrameSet, aligning
 *  them in a suitable Frame (the current Frame of IWCSR by preference, or
 *  the first possible domain in the above list otherwise).
-      CALL KPG1_ASMRG( IWCS1, IWCSR, DOMLST( : IAT ), .FALSE., 4,
+      CALL KPG1_ASMRG( IWCS1, IWCSRC, DOMLST( : IAT ), .FALSE., 4,
      :                 STATUS )
 
 *  Get the simplified Mapping from input pixel Frame to reference (i.e.

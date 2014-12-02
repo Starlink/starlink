@@ -141,6 +141,7 @@ KPG_NONGEN = \
 kpg_env0c.f \
 kpg1_abset.f \
 kpg1_arcol.f \
+kpg1_asaln.f \
 kpg1_asapa.f \
 kpg1_asdis.f \
 kpg1_asdsv.f \

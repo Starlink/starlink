@@ -97,6 +97,57 @@
 *        than the value supplied for ACC (in pixels), then a smaller
 *        region is used.  High accuracy is paid for by longer run times.
 *        [0.05]
+*     ALIGNREF = _LOGICAL (Read)
+*        Determines the coordinate system in which each input NDF is
+*        aligned with the reference NDF. If TRUE, alignment is performed
+*        in the coordinate system described by the current Frame of the WCS
+*        FrameSet in the reference NDF. If FALSE, alignment is performed
+*        in the coordinate system specified by the following set of WCS
+*        attributes in the reference NDF: AlignSystem AlignStdOfRest,
+*        AlignOffset, AlignSpecOffset, AlignSideBand, AlignTimeScale. The
+*        AST library provides fixed defaults for all these. So for
+*        instance, AlignSystem defaults to ICRS for celestial axes and
+*        Wavelength for spectral axes, meaning that celestial axes will
+*        be aligned in ICRS and spectral axes in wavelength, by default.
+*        Similarly, AlignStdOfRest defaults to Heliocentric, meaning that
+*        by default spectral axes will be aligned in the Heliocentric rest
+*        frame.
+*
+*        As an example, if you are mosaicing two spectra which both use
+*        radio velocity as the current WCS, but which have different rest
+*        frequencies, then setting ALIGNREF to TRUE will cause alignment
+*        to be performed in radio velocity, meaning that the differences
+*        in rest frequency are ignored. That is, a channel with 10 Km/s
+*        in the input is mapping onto the channel with 10 km/s in the output.
+*        If ALIGNREF is FALSE (and no value has been set for the AlignSystem
+*        attribute in the reference WCS), then alignment will be performed
+*        in wavelength, meaning that the different rest frequencies cause
+*        an additional shift. That is, a channel with 10 Km/s in the input
+*        will be mapping onto which ever output channel has the same
+*        wavelength, taking into account the different rest frequencies.
+*
+*        As another example, consider mosaicing two maps which both have
+*        (azimuth,elevation) axes. If ALIGNREF is TRUE, then any given
+*        (az,el) values in one image will be mapped onto the exact same
+*        (az,el) values in the other image, regardless of whether the
+*        two images were taken at the same time. But if ALIGNREF is FALSE,
+*        then a given (az,el) value in one image will be mapped onto
+*        pixel that has the same ICRS coordinates in the other image
+*        (since AlignSystem default to ICRS for celestial axes). Thus any
+*        different in the observation time of the two images will result
+*        in an additional shift.
+*
+*        As yet another example, consider mosaicing two spectra which are
+*        both in frequency with respect to the LSRK, but which refer to
+*        different points on the sky. If ALIGNREF is TRUE, then a given
+*        LSRK frequency in one spectra will be mapped onto the exact same
+*        LSRK frequency in the other image, regardless of the different sky
+*        positions. But if ALIGNREF is FALSE, then a given input frequency
+*        will first be converted to Heliocentric frequency (the default
+*        value for AlignStdOfRest is "Heliocentric"), and will be mapped
+*        onto the output channel that has the same Heliocentric frequency.
+*        Thus the differecen in sky positions will result in an additional
+*        shift.   [FALSE]
 *     CONSERVE = _LOGICAL (Read)
 *        If set TRUE, then the output pixel values will be scaled in
 *        such a way as to preserve the total data value in a feature on
@@ -407,6 +458,8 @@
 *        instead (set by the global MSG_FILTER environment variable).
 *     30-AUG-2012 (DSB):
 *        Added Parameters CONSERVE and NORM.
+*     1-DEC-2014 (DSB):
+*        Added parameter ALIGNREF.
 *     {enter_further_changes_here}
 
 *-
@@ -481,6 +534,7 @@
       LOGICAL GENVAR         ! Use i/p spread to create o/p variance?
       LOGICAL HASVAR         ! Do all i/p NDFs have variances?
       LOGICAL NORM           ! Normalise the o/p values?
+      LOGICAL REFALN         ! Use ref. to define alignment properties?
       LOGICAL USEVAR         ! Use i/p variances to create o/p variance?
       LOGICAL VARWGT         ! Use i/p variances as weights?
       REAL ERRLIM            ! Positional accuracy in pixels
@@ -519,12 +573,17 @@
 *  Get the number of pixel axes in the reference NDF.
       CALL NDF_BOUND( INDFR, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
+*  See if the reference NDF is to be used to define the cordinate system
+*  in which alignment will occur.
+      CALL PAR_GET0L( 'ALIGNREF', REFALN, STATUS )
+
 *  Extract required global information describing the group of input
 *  NDF.  This includes the default values for LBND and UBND, and the
 *  Mappings from the input PIXEL Frames to the output PIXEL Frame.
       CALL PSX_CALLOC( SIZE, '_INTEGER', IPMAP, STATUS )
-      CALL KPS1_WMOS0( INDFR, IGRP1, NDIM, DLBND, DUBND, HASVAR,
-     :                 %VAL( CNF_PVAL( IPMAP ) ), IWCSR, STATUS )
+      CALL KPS1_WMOS0( INDFR, IGRP1, NDIM, REFALN, DLBND, DUBND,
+     :                 HASVAR, %VAL( CNF_PVAL( IPMAP ) ), IWCSR,
+     :                 STATUS )
 
 *  Set the default bounds for the output NDF.
       CALL PAR_DEF1I( 'LBND', NDIM, DLBND, STATUS )

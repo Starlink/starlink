@@ -14363,6 +14363,59 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
 }
 \sstroutine{
+   KPG1\_ASALN
+}{
+   Set Alignment attributes for a Frame to mimic a second frame
+}{
+   \sstdescription{
+      This routine determines how the {\tt "}IWCS1{\tt "} FrameSet will align with
+      other FrameSets. It sets the following attributes of the current
+      Frame of IWCS1:
+
+      \sstitemlist{
+
+         \sstitem
+         AlignSystem is set to the value of System in IWCS2
+
+         \sstitem
+         AlignStdOfRest is set to the value of StdOfRest in IWCS2
+
+         \sstitem
+         AlignSideBand is set to the value of SideBand in IWCS2
+
+         \sstitem
+         AlignTimeScale is set to the value of TimeScale in IWCS2
+
+         \sstitem
+         AlignOffset is set to 1 if SkyRefIs in IWCS2 is not {\tt "}Ignored{\tt "}.
+
+         \sstitem
+         AlignSpecOffset is set to 1 if SpecOrigin in IWCS2 is non-zero.
+      }
+   }
+   \sstinvocation{
+      CALL KPG1\_ASALN( IWCS1, IWCS2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IWCS1 = INTEGER (Given)
+      }{
+         An AST pointer to the FrameSet to be modified.
+      }
+      \sstsubsection{
+         IWCS2 = INTEGER (Given)
+      }{
+         An AST pointer to the FrameSet defining the required attribute
+         values.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    KPG1\_ASAPA
 }{
    Determines which pixel axis is most closely aligned with a WCS
@@ -21258,18 +21311,18 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
 }
 \sstroutine{
-   KPG1\_ENV0R
+   KPG1\_ENV0x
 }{
-   Reads a floating-point value from an environment variable
+   Reads a numerical value from an environment variable
 }{
    \sstdescription{
-      This routine reads a floating-point value from a specified
-      environment variable. No error occurs if the environment variable
-      is not defined, or has a non-numeric value, and the supplied value
-      is returned unchanged.
+      This routine reads a numerical value from a specified environment
+      variable. No error occurs if the environment variable is not
+      defined, or has a non-numeric value, and the supplied value is
+      returned unchanged.
    }
    \sstinvocation{
-      CALL KPG1\_ENV0R( VARNAM, RVAL, STATUS )
+      CALL KPG1\_ENV0x( VARNAM, VALUE, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -21278,9 +21331,9 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          The environment variable to check.
       }
       \sstsubsection{
-         RVAL = REAL (Returned)
+         VALUE = ? (Returned)
       }{
-         The value.
+         The numerical value.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -33773,6 +33826,9 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       machines it is possible for an application to be called several times
       each second, resulting in the same seed being used each time if the
       seed is based only on the time.
+
+      Alternatively, a fixed seed can be used by assigning the seed value
+      to environment variable STAR\_SEED.
    }
    \sstinvocation{
       CALL KPG1\_PSEED( STATUS )
@@ -41173,7 +41229,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       the supplied NDF (the extension is a character array).
    }
    \sstinvocation{
-      void kpgPutOutline( int indf, float wlim, int $*$status )
+      void kpgPutOutline( int indf, float wlim, int convex, int $*$status )
    }
    \sstarguments{
       \sstsubsection{
@@ -41189,6 +41245,17 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          Minimum fraction of good values per pixel required when
          collapsing a 3D NDF. Ignored if the NDF has only two significant
          pixel axes.
+      }
+      \sstsubsection{
+         convex = int (Given)
+      }{
+         Indicates the nature of the polygon. If zero, the polygon will
+         be a simple outline that hugs the edges of the good pixels. If
+         the NDF contains multiple dis-contiguous regions of good pixels,
+         the outline will be of a randomly selected contiguous clump of
+         good pixels. If {\tt "}convex{\tt "} is non-zero, the polygon will be the
+         shortest polygon that encloses all good pixels in the NDF. Such
+         a polygon will not in general hug the edges of the good pixels.
       }
       \sstsubsection{
          status = int $*$ (Given and Returned)

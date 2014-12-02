@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_WMOS0( INDFR, IGRP, NDIM, LBND, UBND, USEVAR,
-     :                       MAPS, IWCSR, STATUS )
+      SUBROUTINE KPS1_WMOS0( INDFR, IGRP, NDIM, REFALN, LBND,
+     :                       UBND, USEVAR, MAPS, IWCSR, STATUS )
 *+
 *  Name:
 *     KPS1_WMOS0
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_WMOS0( INDFR, IGRP, NDIM, LBND, UBND, USEVAR, MAPS,
-*                      IWCSR, STATUS )
+*     CALL KPS1_WMOS0( INDFR, IGRP, NDIM, REFALN, LBND, UBND, USEVAR,
+*                      MAPS, IWCSR, STATUS )
 
 *  Description:
 *     This routine extracts the global information required by WCSMOSAIC
@@ -24,8 +24,17 @@
 *        The NDF identifier for the reference NDF.
 *     IGRP = INTEGER (Given)
 *        The GRP identifier for the group containing the input NDF names.
-*     NDIM
+*     NDIM = INTEGER (Given)
 *        The number of pixel axes in the output NDF.
+*     REFALN = LOGICAL (Given)
+*        If .TRUE., the WCS attributes in the current Frame of each NDF
+*        (both reference NDF and input NDFs) are set so that alignment
+*        occurs in the System, Standard of Rest, Time Scale, etc, of the
+*        reference NDF. This is done by setting each AST "AlignXxx"
+*        attribute in the current Frame to the value of the corresponding
+*        "Xxx" attribute in the current Frame of the reference NDF. If
+*        FALSE, the existing values of teh "AlignXxx" attributes are left
+*        unchanged.
 *     LBND( NDIM ) = INTEGER (Returned)
 *        The lower pixel index bounds for the output NDF so that the output NDF just
 *        encompasses all the input data.
@@ -51,8 +60,7 @@
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
-*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     Copyright (C) 2007,2012,2014 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -101,6 +109,8 @@
 *     15-OCT-2012 (DSB):
 *        Allow 2D input images to align with 3D reference images, if the
 *        extra reference axis is a degenerate pixel axis.
+*     1-DEC-2014 (DSB):
+*        Added argument REFALN.
 *     {enter_further_changes_here}
 
 *-
@@ -119,6 +129,7 @@
       INTEGER INDFR
       INTEGER IGRP
       INTEGER NDIM
+      LOGICAL REFALN
 
 *  Arguments Returned:
       INTEGER LBND( NDIM )
@@ -153,6 +164,7 @@
       INTEGER IPIXR              ! Index of PIXEL Frame in ref. NDF FrameSet
       INTEGER IU                 ! Integer upper bound
       INTEGER IWCS1              ! AST pointer to input WCS FrameSet
+      INTEGER IWCSRA             ! Reference WCS with "AlignXxx" atts set
       INTEGER J                  ! Axis count
       INTEGER LBND1( NDF__MXDIM )! Lower bounds of input NDF
       INTEGER LBNDR( NDF__MXDIM )! Lower bounds of reference NDF
@@ -201,8 +213,17 @@
 
       END IF
 
+*  If required, set the alignment properties of the current Frame to match
+*  the main properties of the current frame.
+      IF( REFALN ) THEN
+         IWCSRA = AST_COPY( IWCSR, STATUS )
+         CALL KPG1_ASALN( IWCSRA, IWCSR, STATUS )
+      ELSE
+         IWCSRA = AST_CLONE( IWCSR, STATUS )
+      END IF
+
 *  Find the index of the PIXEL Frame in the reference NDF.
-      CALL KPG1_ASFFR( IWCSR, 'PIXEL', IPIXR, STATUS )
+      CALL KPG1_ASFFR( IWCSRA, 'PIXEL', IPIXR, STATUS )
 
 *  Get the pixel index bounds of the reference NDF.
       CALL NDF_BOUND( INDFR, NDF__MXDIM, LBNDR, UBNDR, NDIMR,
@@ -234,6 +255,10 @@
 *  Get the WCS FrameSet from the current input NDF.
          CALL KPG1_GTWCS( INDF1, IWCS1, STATUS )
 
+*  If required, set the alignment properties of the current Frame to match
+*  the properties of the current frame in the reference NDF.
+         IF( REFALN ) CALL KPG1_ASALN( IWCS1, IWCSRA, STATUS )
+
 *  Find the index of the PIXEL Frame in the input NDF.
          CALL KPG1_ASFFR( IWCS1, 'PIXEL', IPIX1, STATUS )
 
@@ -242,7 +267,7 @@
 
 *  Store the list of preferences for the alignment Frame Domain (current
 *  FRAME in the input NDF, followed by PIXEL). KPG1_ASMRG always uses the
-*  Domain of the second FrameSet (IWCSR) first, so we do not need to include
+*  Domain of the second FrameSet (IWCSRA) first, so we do not need to include
 *  it in this list.
          DOMLST = ' '
          IAT = 0
@@ -251,9 +276,9 @@
          CALL CHR_APPND( ',PIXEL', DOMLST, IAT )
 
 *  Merge the reference WCS FrameSet into this NDFs WCS FrameSet, aligning
-*  them in a suitable Frame (the current Frame of IWCSR by preference, or
+*  them in a suitable Frame (the current Frame of IWCSRA by preference, or
 *  the first possible domain in the above list otherwise).
-         CALL KPG1_ASMRG( IWCS1, IWCSR, DOMLST( : IAT ), .TRUE., 4,
+         CALL KPG1_ASMRG( IWCS1, IWCSRA, DOMLST( : IAT ), .TRUE., 4,
      :                    STATUS )
 
 *  Get the simplified Mapping from input pixel Frame to reference (i.e.

@@ -79,6 +79,57 @@
 *        region is used. High accuracy is paid for by larger run times.
 *        A value of zero prevents any linear approximations being used -
 *        each pixel position is transformed explicitly. [0.05]
+*     ALIGNREF = _LOGICAL (Read)
+*        Determines the coordinate system in which each input NDF is
+*        aligned with the reference NDF. If TRUE, alignment is performed
+*        in the coordinate system described by the current Frame of the WCS
+*        FrameSet in the reference NDF. If FALSE, alignment is performed
+*        in the coordinate system specified by the following set of WCS
+*        attributes in the reference NDF: AlignSystem AlignStdOfRest,
+*        AlignOffset, AlignSpecOffset, AlignSideBand, AlignTimeScale. The
+*        AST library provides fixed defaults for all these. So for
+*        instance, AlignSystem defaults to ICRS for celestial axes and
+*        Wavelength for spectral axes, meaning that celestial axes will
+*        be aligned in ICRS and spectral axes in wavelength, by default.
+*        Similarly, AlignStdOfRest defaults to Heliocentric, meaning that
+*        by default spectral axes will be aligned in the Heliocentric rest
+*        frame.
+*
+*        As an example, if you are aligning two spectra which both use
+*        radio velocity as the current WCS, but which have different rest
+*        frequencies, then setting ALIGNREF to TRUE will cause alignment
+*        to be performed in radio velocity, meaning that the differences
+*        in rest frequency are ignored. That is, a channel with 10 Km/s
+*        in the input is mapping onto the channel with 10 km/s in the output.
+*        If ALIGNREF is FALSE (and no value has been set for the AlignSystem
+*        attribute in the reference WCS), then alignment will be performed
+*        in wavelength, meaning that the different rest frequencies cause
+*        an additional shift. That is, a channel with 10 Km/s in the input
+*        will be mapping onto which ever output channel has the same
+*        wavelength, taking into account the different rest frequencies.
+*
+*        As another example, consider aligning two maps which both have
+*        (azimuth,elevation) axes. If ALIGNREF is TRUE, then any given
+*        (az,el) values in one image will be mapped onto the exact same
+*        (az,el) values in the other image, regardless of whether the
+*        two images were taken at the same time. But if ALIGNREF is FALSE,
+*        then a given (az,el) value in one image will be mapped onto
+*        pixel that has the same ICRS coordinates in the other image
+*        (since AlignSystem default to ICRS for celestial axes). Thus any
+*        different in the observation time of the two images will result
+*        in an additional shift.
+*
+*        As yet another example, consider aligning two spectra which are
+*        both in frequency with respect to the LSRK, but which refer to
+*        different points on the sky. If ALIGNREF is TRUE, then a given
+*        LSRK frequency in one spectra will be mapped onto the exact same
+*        LSRK frequency in the other image, regardless of the different sky
+*        positions. But if ALIGNREF is FALSE, then a given input frequency
+*        will first be converted to Heliocentric frequency (the default
+*        value for AlignStdOfRest is "Heliocentric"), and will be mapped
+*        onto the output channel that has the same Heliocentric frequency.
+*        Thus the differecen in sky positions will result in an additional
+*        shift.   [FALSE]
 *     CONSERVE = _LOGICAL (Read)
 *        If set TRUE, then the output pixel values will be scaled in
 *        such a way as to preserve the total data value in a feature on
@@ -455,6 +506,8 @@
 *        Allow an ACC value of zero to be supplied.
 *     6-DEC-2013 (DSB):
 *        No longer any reason prevent Gauss kernel being used with REBIN=NO.
+*     1-DEC-2014 (DSB):
+*        Added parameter ALIGNREF.
 *     {enter_further_changes_here}
 
 *-
@@ -514,6 +567,7 @@
       LOGICAL ISECT              ! Do 2 NDF intersect?
       LOGICAL MORE               ! Continue looping?
       LOGICAL REBIN              ! Create output pixels by rebinning?
+      LOGICAL REFALN             ! Use ref. to define alignment properties?
       LOGICAL SAME               ! Do 2 NDF identifier refer to the same NDF?
       REAL ERRLIM                ! Positional accuracy in pixels
       REAL WLIM                  ! Minimum good output weight
@@ -547,6 +601,10 @@
 
 *  Get the associated WCS FrameSet.
       CALL KPG1_GTWCS( INDFR, IWCSR, STATUS )
+
+*  See if the reference NDF is to be used to define the cordinate system
+*  in which alignment will occur.
+      CALL PAR_GET0L( 'ALIGNREF', REFALN, STATUS )
 
 *  Get the dimensionality and pixel bounds of the reference NDF.
       CALL NDF_BOUND( INDFR, NDF__MXDIM, LBNDR, UBNDR, NDIMR, STATUS )
@@ -748,7 +806,8 @@
 *  output) pixel co-ordinates. This also determines if the Mapping is a
 *  simple integer pixel shift of origin. If it is, it returns the new pixel
 *  origin in ORIGIN.
-         CALL KPS1_WALA7( INDF1, IWCSRT, MAP, MAP4, ORIGIN, STATUS )
+         CALL KPS1_WALA7( INDF1, REFALN, IWCSRT, MAP, MAP4, ORIGIN,
+     :                    STATUS )
 
 *  If the input pixel->output pixel Mapping is a shift of origin, we do
 *  not need to do a full resampling or rebinning. However, if the output
