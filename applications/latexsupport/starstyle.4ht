@@ -363,3 +363,6 @@
 
 % replace \linebreak with an html <BR>:
 \renewcommand\linebreak{\HCode{<BR>}}
+
+\renewenvironment{small}{}{}
+\ConfigureEnv{small}{\HCode{<div class="small">}}{\HCode{</div>}}{}{}

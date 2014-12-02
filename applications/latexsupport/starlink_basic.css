@@ -13,7 +13,8 @@ body{
     font-family: "Verdana";
     font-size:85%;
 }
-small{font-size: .8em;}
+
+.small{font-size: .8em;}
 
 .tt{
     font-family: "Droid Sans Mono",monospace;
