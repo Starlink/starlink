@@ -303,10 +303,13 @@
 {\end{longtable}\end{table}}
 
 
+%% Sideways tables -- format as regular table
+\renewenvironment{sidewaystable}{\begin{table}}{\end{table}}{}
+\renewenvironment{sidewaystable*}{\begin{table}}{\end{table}}{}
 
 
-
-
+%% landscape pages -- ignore command
+\renewenvironment{landscape}{}{}
 
 % Css for toc (depends on whether or not chappters are included, so
 % not in standard table)

@@ -80,6 +80,12 @@
 %.. Allow tables on multiple pages
 \RequirePackage{longtable}
 
+%.. Allow sideways tables
+\RequirePackage{rotating}
+
+%.. Allow landscape pdf pages
+\RequirePackage{pdflscape}
+
 %.. Set up the page
 \RequirePackage[text={160mm,230mm},centering]{geometry}
 
