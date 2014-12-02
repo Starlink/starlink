@@ -69,39 +69,33 @@ names = sorted( itemsdict.keys(), key=itemnum )
 
 # Then dump to table
 tablehdr = r"""
-\begin{sidewaystable*}
-\caption{Mapping of GSD names to FITS equivalents.}
-\begin{center}
-\small
-\begin{tabular}{llll}
+\begin{small}
+\begin{landscape}
+\begin{sllongtable}{lllp{12cm}}{Mapping of GSD names to FITS equivalents.}
 \hline
-NRAO & JCMT & FITS & Description\\ \hline
-"""
-tableftr = r"""
+NRAO & JCMT & FITS & Description\\
 \hline
-\end{tabular}
-\end{center}
-\end{sidewaystable*}
+\endhead
+\hline
+\endfoot
 """
 
-MAX = 25
-counter = 0
+tableftr = r"""
+\hline
+\end{sllongtable}
+\end{landscape}
+\end{small}
+"""
+
+print(tablehdr)
 for i in names:
     d = itemsdict[i]
     if "NRAO_NAME" in d:
-        if counter == 0:
-            print(tablehdr)
         typpre = ""
         typsuf = ""
         if d["FITS_TYPE"].startswith("J"):
             typpre = r"\emph{"
             typsuf = "}"
         print( d["NRAO_NAME"] + " & " + d["JCMT_NAME"] + " & " + typpre + d["FITS_NAME"] + typsuf + " & " + d["JCMT_COMMENT"] + "\\\\" )
-        counter = counter + 1
-        if counter > MAX:
-            counter = 0
-            print(tableftr)
-
-if counter > 0:
-    print(tableftr)
+print(tableftr)
 

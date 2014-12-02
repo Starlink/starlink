@@ -1,11 +1,13 @@
 
-\begin{sidewaystable*}
-\caption{Mapping of GSD names to FITS equivalents.}
-\begin{center}
-\small
-\begin{tabular}{llll}
+\begin{small}
+\begin{landscape}
+\begin{sllongtable}{lllp{12cm}}{Mapping of GSD names to FITS equivalents.}
 \hline
-NRAO & JCMT & FITS & Description\\ \hline
+NRAO & JCMT & FITS & Description\\
+\hline
+\endhead
+\hline
+\endfoot
 
 CELL\_V2Y & CELL\_V2Y & \emph{YPOSANG} & Position angle of cell y axis (CCW)\\
 UAZ & SDIS(36) & UXPNT & User az correction\\
@@ -33,21 +35,6 @@ C2FL & DY & FOCUSL & Secondary mirror y displacement from nominal at observation
 C2FR & DZ & FOCUSR & Secondary mirror z displacement from nominal at observation start\\
 C2FV & DX & FOCUSV & Secondary mirror x displacement from nominal at observation start\\
 C2ORI & SECONDARY\_ORI & ORIENT & Rotation or polarization angle orientation of the frontend/reflector\\
-
-\hline
-\end{tabular}
-\end{center}
-\end{sidewaystable*}
-
-
-\begin{sidewaystable*}
-\caption{Mapping of GSD names to FITS equivalents.}
-\begin{center}
-\small
-\begin{tabular}{llll}
-\hline
-NRAO & JCMT & FITS & Description\\ \hline
-
 C2PC1 & TEL\_PC\_LAN & PTCON1 & Angle by which lower axis is north of ideal\\
 C2PC2 & TEL\_PC\_LAE & PTCON2 & Angle by which lower axis is east of ideal\\
 C2PC3 & TEL\_PC\_UANP & PTCON3 & Angle by which upper axis is not perpendicular to lower\\
@@ -74,21 +61,6 @@ C3INTT & INTGRN\_TIME & \emph{INTGR} & Scan integration time\\
 C3LSPC & NO\_BES\_O\_CH & \emph{NOBESDCH} & Number of channels per backend section\\
 C3LST & OBS\_LST & LST & Local sidereal time at the start of the observation\\
 C3MAP & OBS\_MAP & \emph{OBSMAP} & Map observation?\\
-
-\hline
-\end{tabular}
-\end{center}
-\end{sidewaystable*}
-
-
-\begin{sidewaystable*}
-\caption{Mapping of GSD names to FITS equivalents.}
-\begin{center}
-\small
-\begin{tabular}{llll}
-\hline
-NRAO & JCMT & FITS & Description\\ \hline
-
 C3MXP & NO\_SCAN\_PNTS & \emph{NOSCNPTS} & Maximum number of map points done in a phase\\
 C3NCH & NO\_BE\_O\_CH & \emph{NOBEOCH} & No.backend output channels\\
 C3NCI & NO\_CYCLES & \emph{NOCYCLES} & Maximum number of cycles in the scan\\
@@ -115,21 +87,6 @@ C4AMPL\_EW & AMPL\_EW & CHOPAZ & Secondary mirror chopping amplitude parallel to
 C4AMPL\_NS & AMPL\_NS & CHOPEL & Secondary mirror chopping amplitude parallel to upper axis\\
 C4AXY & CELL\_X2Y & \emph{XYANGLE} & Angle between cell y axis and x-axis (CCW)\\
 C4AZ & CENTRE\_AZ & AZ & Azimuth at observation date\\
-
-\hline
-\end{tabular}
-\end{center}
-\end{sidewaystable*}
-
-
-\begin{sidewaystable*}
-\caption{Mapping of GSD names to FITS equivalents.}
-\begin{center}
-\small
-\begin{tabular}{llll}
-\hline
-NRAO & JCMT & FITS & Description\\ \hline
-
 C4AZERR & SDIS(7) & XPOINT & DAZ:Net Az offset at start (inc.tracker ball setting and user correction)\\
 C4CECO & CENTRE\_CODE & \emph{COORDCD2} & centre coords. AZ= 1;EQ=3;RD=4;RB=6;RJ=7;GA=8\\
 C4CSC & CENTRE\_COORDS & COORDCD & Character code of commanded centre or source coordinate system\\
@@ -156,21 +113,6 @@ C4GL & CENTRE\_GL & GALLONG & Galactic longitude\\
 C4LSC & CELL\_COORDS & FRAME & Char. code for local x-y coord.system\\
 C4MCF & CENTRE\_MOVING & \emph{CENMOVE} & Centre moving flag (solar system object)\\
 C4MOCO & TEL\_COORDS & \emph{MOUNTING} & Mounting of telescope; defined as LOWER/UPPER axes, e.g; AZ/ALT\\
-
-\hline
-\end{tabular}
-\end{center}
-\end{sidewaystable*}
-
-
-\begin{sidewaystable*}
-\caption{Mapping of GSD names to FITS equivalents.}
-\begin{center}
-\small
-\begin{tabular}{llll}
-\hline
-NRAO & JCMT & FITS & Description\\ \hline
-
 C4NS\_ENCODER & AMPL\_N\_SET & \emph{NS\_ENCOD} & Secondary mirror ns encoder value\\
 C4NS\_SCALE & NS\_AMPL\_SCALE & \emph{NS\_SCALE} & Secondary mirror ns chop scale\\
 C4ODCO & CELL\_UNIT & \emph{MAPUNIT} & Units of cell and mapping coordinates;offset definition code\\
@@ -197,21 +139,6 @@ C5IR1 & TEL\_REFR\_A & REFRAC1 & Refraction constant A (see MTIN026)\\
 C5IR2 & TEL\_REFR\_B & REFRAC2 & Refraction constant B (see MTIN026)\\
 C5IR3 & TEL\_REFR\_C & REFRAC3 & Refraction constant C (see MTIN026)\\
 C5MM & VAP\_PRESSURE & MMH2O & Mean atmospheric vapour pressure\\
-
-\hline
-\end{tabular}
-\end{center}
-\end{sidewaystable*}
-
-
-\begin{sidewaystable*}
-\caption{Mapping of GSD names to FITS equivalents.}
-\begin{center}
-\small
-\begin{tabular}{llll}
-\hline
-NRAO & JCMT & FITS & Description\\ \hline
-
 C5PRS & PAMB & PRESSURE & Mean atmospheric pressure\\
 C5RH & HAMB & HUMIDITY & Mean atmospheric relative humidity\\
 C6CYCLREV & CYCLE\_REVERSAL & \emph{CYCLREV} & Cycle reversal flag\\
@@ -238,21 +165,6 @@ C7HP & FWHM &  & FWHM of the beam profile (mean)\\
 C7NIF & NO\_IF\_CH & NOIFCHAN & Number of IF channels\\
 C7OSN & OBS\_REF\_SCAN & OFFSCAN & Calibration observation number (in which a standard was observed)\\
 C7PHASE & PHASE & \emph{PHASE} & Lockin phase\\
-
-\hline
-\end{tabular}
-\end{center}
-\end{sidewaystable*}
-
-
-\begin{sidewaystable*}
-\caption{Mapping of GSD names to FITS equivalents.}
-\begin{center}
-\small
-\begin{tabular}{llll}
-\hline
-NRAO & JCMT & FITS & Description\\ \hline
-
 C7SEEING & SAO\_SEEING & \emph{SEEING} & Seeing at JCMT\\
 C7SEETIME & SAO\_YYMMDDHHMM & \emph{SEETIME} & SAO seeing time (YYMMDDHHMM)\\
 C7SNSTVTY & SENSITIVITY & \emph{SNSTVTY} & Lockin sensitivity in scale range units\\
@@ -279,21 +191,6 @@ C12BM & BES\_BITMODE & BM & Correlation bit mode\\
 C12BW & BANDWIDTH & BW & Bandwidth\\
 C12CAL & DATA\_UNITS & \emph{DATAUNIT} & Units of spectrum data\\
 C12CALTASK & BE\_CAL\_TASK & \emph{CALTASK} & Calibration instrument used (FE, BE, or USER)\\
-
-\hline
-\end{tabular}
-\end{center}
-\end{sidewaystable*}
-
-
-\begin{sidewaystable*}
-\caption{Mapping of GSD names to FITS equivalents.}
-\begin{center}
-\small
-\begin{tabular}{llll}
-\hline
-NRAO & JCMT & FITS & Description\\ \hline
-
 C12CALTYPE & BE\_CAL\_TYPE & \emph{CALTYPE} & Type of calibration (THREELOADS or TWOLOADS)\\
 C12CF & FE\_NUOBS & OBSFREQ & Centre frequency\\
 C12CM & BES\_CORR\_MODE & CM & Correlation function mode\\
@@ -320,21 +217,6 @@ C12SCAN\_VARS2 & SCAN\_VARS2 & \emph{SCANVRS2} & Names of the cols. of scan tabl
 C12SST & TSYS\_ON & STSYS & Source system temperature\\
 C12TAMB & T\_HOT & \emph{THOT} & Ambient load temperature\\
 C12TASKY & BES\_TA\_SKY & \emph{TA\_SKY} & Ratio of signal sideband to image sideband sky transmission\\
-
-\hline
-\end{tabular}
-\end{center}
-\end{sidewaystable*}
-
-
-\begin{sidewaystable*}
-\caption{Mapping of GSD names to FITS equivalents.}
-\begin{center}
-\small
-\begin{tabular}{llll}
-\hline
-NRAO & JCMT & FITS & Description\\ \hline
-
 C12TCOLD & T\_COLD & \emph{TCOLD} & Cold load temperature\\
 C12TSKY & TSKY & \emph{TSKY} & Sky temperature at last calibration\\
 C12TSKYIM & BES\_T\_SKY\_IM & \emph{T\_SKY\_IM} & Frontend-derived Tsky, image sideband\\
@@ -358,7 +240,7 @@ C14PHIST & MAP\_TABLE & \emph{MAPTABLE} & List of xy offsets for each scan\\
 C90T & TEL\_TOLERANCE & OBSTOL & Observing tolerance\\
 
 \hline
-\end{tabular}
-\end{center}
-\end{sidewaystable*}
+\end{sllongtable}
+\end{landscape}
+\end{small}
 
