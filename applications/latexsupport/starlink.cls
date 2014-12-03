@@ -37,10 +37,9 @@
 
 
 % Font types and encoding.
-\ifpdf
 \RequirePackage[T1]{fontenc}
-\fi
 \RequirePackage[utf8]{inputenc}
+
 
 % microtype For improved pdf typography (must come after loading class)
 \RequirePackage{microtype}
