@@ -158,9 +158,9 @@
 *  Detect those requiring {\tt} text.
          ELSE IF ( ( CH .EQ. '''' ) .OR.
      :             ( CH .EQ. '"' ) ) THEN
-            BUF( II + 1 : II + 7 ) =
-     :         '{' // SST__BKSLH // 'tt ' // CH // '}'
-            II = II + 7
+            BUF( II + 1 : II + 11 ) =
+     :         SST__BKSLH // 'texttt{' //  CH // '}'
+            II = II + 11
 
 *  Detect those needing special maths symbols.
          ELSE IF ( CH .EQ. '^' ) THEN
