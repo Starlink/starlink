@@ -32,6 +32,6 @@
       print "\n\nmake_quickdes: Ill-formed prologue in $ARGV[0]\n\n";
    } else {
       open( OUTFILE, ">$ARGV[0].quickdes" );
-      print OUTFILE "\\quickdes\{$name\}\{$purpose\}\{ $name \}\n\n";
+      print OUTFILE "\\menuitem\{$name\}\{$purpose\}\n\n";
       close( OUTFILE );
    }
