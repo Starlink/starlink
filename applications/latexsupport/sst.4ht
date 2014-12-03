@@ -79,6 +79,7 @@
 % Derived commands.
 \renewcommand{\sstdescription}[1]{\basictopic{Description:}{#1}}
 \renewcommand{\sstparameters}[1]{\basictopic{Parameters:}{#1}}
+\renewcommand{\sstkeywords}[1]{\basictopic{Keywords:}{#1}}
 \renewcommand{\sstnotes}[1]{\basictopic{Notes:}{#1}}
 \renewcommand{\sstbugs}[1]{\basictopic{Bugs:}{#1}}
 \renewcommand{\sstdiytopic}[2]{\basictopic{#1}{#2}}

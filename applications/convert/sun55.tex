@@ -1,34 +1,23 @@
-\documentclass[twoside,11pt]{article}
-
-% ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
-% ? End of specify used packages
-
-\pagestyle{myheadings}
+\documentclass[twoside,11pt]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-% Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocnumber      {55.31}
+\stardocsource      {sun\stardocnumber}
+\stardoccopyright
 {Copyright \copyright\ 2014 Science and Technology Research Council}
-
-% Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {55.31}
-\newcommand{\stardocauthors}   {Malcolm J. Currie\\
+\stardocauthors   {Malcolm J. Currie\\
                                 G.J.Privett\\
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2014 July 9}
-\newcommand{\stardoctitle}     {CONVERT\\
-                                A Format-conversion Package}
-\newcommand{\stardocversion}   {Version 1.8}
-\newcommand{\stardocmanual}    {User's Manual}
-\newcommand{\stardocabstract}  {
+\stardocdate        {2014 July 9}
+\stardoctitle     {CONVERT -- A Format-conversion Package}
+\stardocversion     {Version 1.8}
+\stardocmanual      {User's Manual}
+\stardocabstract  {
 The \CONVERT\ package contains utilities for converting data files
 between Starlink's Extensible {\em n}-dimensional Data Format
 \xref{(NDF)}{sun33}{abstract},
@@ -42,705 +31,65 @@ the normal way, or invoked automatically by the NDF library's `on-the-fly'
 data-conversion system, but there are also
 \IDLref\
 procedures for handling NDFs from within IDL.}
-% ? End of document identification
 % -----------------------------------------------------------------------------
+\stardocname  {\stardocinitials /\stardocnumber}
 
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%      1-FEB-2000 (AJC):
-%        Add Copyright statement in LaTeX
-%     {Add further history here}
-%
-%-
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
-
-\newcommand{\dqt}[1]{{\texttt{"#1"}}}
-\newcommand{\hash}{\dqt{\#}}
+\providecommand{\dqt}[1]{{\texttt{"#1"}}}
+\providecommand{\hash}{\dqt{\#}}
 
 % centre an asterisk
-\newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
+\providecommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
 
-\begin{htmlonly}
-  \newcommand{\hash}{\dqt{#}}
-\end{htmlonly}
+
+
 
 % conditional text
-\newcommand{\latexelsehtml}[2]{#1}
-\begin{htmlonly}
-  \newcommand{\latexelsehtml}[2]{#2}
-\end{htmlonly}
+\providecommand{\latexelsehtml}[2]{#1}
 
-% A kind of list item, like description, but with an easily adjustable
-% item separation.  Note that the paragraph and fount-size change are
-% needed to make the revised \baselinestretch work.
-\newlength{\menuwidth}
-\newlength{\menuindent}
-\newcommand{\menuitem}[2]
-  {{\bf #1} \settowidth{\menuwidth}{{\bf #1} }
-  \setlength{\menuindent}{-0.5em}
-  \addtolength{\menuwidth}{-2\menuwidth}
-  \addtolength{\menuwidth}{\textwidth}
-  \addtolength{\menuwidth}{\menuindent}
-  \hspace{\menuindent}\parbox[t]{\menuwidth}{
-  \newcommand{\baselinestretch}{0.75}\small
-  #2 \par \vspace{1.0ex}
-  \newcommand{\baselinestretch}{1.0}\normalsize} \\ }
 
-\begin{htmlonly}
-\newcommand{\menuitem}[2]
-  {\item [\htmlref{#1}{#1}] #2}
-\end{htmlonly}
-
-\newcommand{\classitem}[1]{\item [\htmlref{#1}{#1}]}
-
-% an environment for references (for the SST sstdiytopic command).
-\newenvironment{refs}{\vspace{-4ex} % normally 3ex
-                      \begin{list}{}{\setlength{\topsep}{0mm}
-                                     \setlength{\partopsep}{0mm}
-                                     \setlength{\itemsep}{0mm}
-                                     \setlength{\parsep}{0mm}
-                                     \setlength{\leftmargin}{1.5em}
-                                     \setlength{\itemindent}{-\leftmargin}
-                                     \setlength{\labelsep}{0mm}
-                                     \setlength{\labelwidth}{0mm}}
-                    }{\end{list}}
-
-\begin{htmlonly}
-% an environment for references (for the SST sstdiytopic command).
-   \newenvironment{refs}{\vspace{-4ex} % normally 3ex
-                         \begin{list}{}{\setlength{\topsep}{-2ex}
-                                     \setlength{\partopsep}{0mm}
-                                     \setlength{\itemsep}{0mm}
-                                     \setlength{\parsep}{0mm}
-                                     \setlength{\leftmargin}{1.5em}
-                                     \setlength{\itemindent}{-\leftmargin}
-                                     \setlength{\labelsep}{0mm}
-                                     \setlength{\labelwidth}{0mm}}
-                       }{\end{list}}
-\end{htmlonly}
 
 % Shorthands for hypertext links.
 % -------------------------------
-\newcommand{\CONVERT}{{\footnotesize CONVERT}}
-\newcommand{\BCONVERT}{{\normalsize CONVERT}}
-\newcommand{\CURSA}{{\footnotesize CURSA}}
-\newcommand{\FIGARO}{{\footnotesize FIGARO}}
-\newcommand{\Figaroref}{\xref{{\footnotesize FIGARO}}{sun86}{abstract}}
-\newcommand{\FITSref}{\htmladdnormallink{FITS}{http://fits.gsfc.nasa.gov/}}
-\newcommand{\GIFref}{\htmladdnormallink{GIF}{http://en.wikipedia.org/wiki/GIF}}
-\newcommand{\HDSref}{\xref{HDS}{sun92}{}}
-\newcommand{\ICL}{{\footnotesize ICL}}
-\newcommand{\ICLref}{\xref{\ICL}{sg5}{}}
-\newcommand{\IRAF}{{\footnotesize IRAF}}
-%\newcommand{\IRAFref}{\htmladdnormallink{{\footnotesize IRAF}}{http://iraf.noao.edu/iraf-homepage.html}}
-\newcommand{\IRAFURL}{http://www.starlink.ac.uk/iraf/web/iraf-homepage.html}
-\newcommand{\IRAFref}{\htmladdnormallink{\IRAF}{\IRAFURL}}
-\newcommand{\KAPPA}{{\footnotesize KAPPA}}
-\newcommand{\KAPPAref}{\xref{\KAPPA}{sun95}{}}
-\newcommand{\KAPLIBS}{{\footnotesize KAPLIBS}}
-\newcommand{\KAPLIBSref}{\xref{\KAPLIBS}{sun238}{}}
-\newcommand{\IDLURL}{http://www.rsinc.com/idl/}
-\newcommand{\IDLref}{\htmladdnormallink{IDL}{\IDLURL}}
-\newcommand{\IDLAULURL}{http://idlastro.gsfc.nasa.gov/homepage.html}
-\newcommand{\NDFref}{\xref{NDF}{sun33}{}}
-\newcommand{\Netpbm}{{\footnotesize NETPBM}}
-\newcommand{\Netpbmref}{\htmladdnormallink{\Netpbm}{http://netpbm.sourceforge.net/}}
-\newcommand{\PBMPLUS}{{\footnotesize PBMPLUS}}
-\newcommand{\PBMPLUSref}{\htmladdnormallink{\PBMPLUS}{http://www.acme.com/software/pbmplus/}}
-\newcommand{\SPECDRE}{\xref{{\footnotesize SPECDRE}}{sun140}{}}
-\newcommand{\TIFFref}{\htmladdnormallink{TIFF}{http://en.wikipedia.org/wiki/TIFF}}
+\providecommand{\CONVERT}{{\footnotesize CONVERT}}
+\providecommand{\BCONVERT}{{\normalsize CONVERT}}
+\providecommand{\CURSA}{{\footnotesize CURSA}}
+\providecommand{\FIGARO}{{\footnotesize FIGARO}}
+\providecommand{\Figaroref}{\xref{{\footnotesize FIGARO}}{sun86}{abstract}}
+\providecommand{\FITSref}{\htmladdnormallink{FITS}{http://fits.gsfc.nasa.gov/}}
+\providecommand{\GIFref}{\htmladdnormallink{GIF}{http://en.wikipedia.org/wiki/GIF}}
+\providecommand{\HDSref}{\xref{HDS}{sun92}{}}
+\providecommand{\ICL}{{\footnotesize ICL}}
+\providecommand{\ICLref}{\xref{\ICL}{sg5}{}}
+\providecommand{\IRAF}{{\footnotesize IRAF}}
+%\providecommand{\IRAFref}{\htmladdnormallink{{\footnotesize IRAF}}{http://iraf.noao.edu/iraf-homepage.html}}
+\providecommand{\IRAFURL}{http://www.starlink.ac.uk/iraf/web/iraf-homepage.html}
+\providecommand{\IRAFref}{\htmladdnormallink{\IRAF}{\IRAFURL}}
+\providecommand{\KAPPA}{{\footnotesize KAPPA}}
+\providecommand{\KAPPAref}{\xref{\KAPPA}{sun95}{}}
+\providecommand{\KAPLIBS}{{\footnotesize KAPLIBS}}
+\providecommand{\KAPLIBSref}{\xref{\KAPLIBS}{sun238}{}}
+\providecommand{\IDLURL}{http://www.rsinc.com/idl/}
+\providecommand{\IDLref}{\htmladdnormallink{IDL}{\IDLURL}}
+\providecommand{\IDLAULURL}{http://idlastro.gsfc.nasa.gov/homepage.html}
+\providecommand{\NDFref}{\xref{NDF}{sun33}{}}
+\providecommand{\Netpbm}{{\footnotesize NETPBM}}
+\providecommand{\Netpbmref}{\htmladdnormallink{\Netpbm}{http://netpbm.sourceforge.net/}}
+\providecommand{\PBMPLUS}{{\footnotesize PBMPLUS}}
+\providecommand{\PBMPLUSref}{\htmladdnormallink{\PBMPLUS}{http://www.acme.com/software/pbmplus/}}
+\providecommand{\SPECDRE}{\xref{{\footnotesize SPECDRE}}{sun140}{}}
+\providecommand{\TIFFref}{\htmladdnormallink{TIFF}{http://en.wikipedia.org/wiki/TIFF}}
 %+
 %  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commands.
-
-%  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty
-%     on your TEXINPUTS path (and including the name as part of the
-%     documentstyle declaration).
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-%     MJC: Malcolm J. Currie (STARLINK)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     1995 October 4 (MJC):
-%        Added goodbreaks and pagebreak[3] in various places to improve
-%        pages breaking before headings, not immediately after.
-%        Corrected banner width.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\large\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-%\newcommand{\sstusage}[1]{\pagebreak[3] \item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\sloppy \item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the keywords section.
-\newcommand{\sstkeywords}[1]{
-   \item[Keywords:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \goodbreak
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the output results parameters section (for an application).
-\newcommand{\sstresparameters}[1]{
-   \goodbreak
-   \item[Results Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \goodbreak
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{0.5ex}
-\\ #2 \vspace{1.0ex}}
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\pagebreak[3] \item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\goodbreak \item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \pagebreak[3] \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Specify a variant of the itemize environment where the top separation
-%  is reduced.  It is needed because a \vspace is ignored in the
-%  \sstitemlist command.
-\newenvironment{sstitemize}{%
-  \vspace{-4.3ex}\begin{itemize}}{\end{itemize}}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{sstitemize}
-     #1
-  \end{sstitemize}
-}
-
-%  Format a list of items while in paragraph mode, and where there
-%  is a heading, thus the negative vertical space is not needed.
-\newcommand{\ssthitemlist}[1]{
-  \latex{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  }
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[\htmlref{Usage:}{app_usage}]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstkeywords
-   \newcommand{\sstkeywords}[1]{
-      \item[Keywords:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[\xref{Parameters:}{sun95}{se_param}] \\
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-
-%  sstresparameters
-   \newcommand{\sstresparameters}[1]{
-      \item[\\ \xref{Results Parameters:}{sun95}{se_parout}] \\
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-   \item[\vspace{0.35ex}\htmlref{Examples:\vspace{-0.5ex}}{app_example}]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{
-   \vspace{-1.0ex} \item[{\ssttt #1}] #2 \vspace{0.2ex}}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\\ \item[{#1}:]
-      \begin{description}
-         #2
-      \end{description}
-   }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{\\ \item[Implementation Status:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-   }
-
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
 %.
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   \textsc{RAL Space} \hfill \textbf{\stardocname}\\
-   {\large Science \& Technology Facilities Council}\\
-   {\large Starlink Software\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{RAL Space}
-                        {http://www.stfc.ac.uk/RALSpace/Default.aspx} \\
-      \htmladdnormallink{Science \& Technology Facilities Council}
-                        {http://www.stfc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Software}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? Latex Copyright Statement
-%  =========================
-\begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
-\end{latexonly}
-% ? End of Latex copyright statement
-
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
+\scfrontmatter
 
 \cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+
 
 \section{\label{introduction}Introduction}
 
@@ -850,7 +199,7 @@ axis centres, then it should be possible to avoid loss of information except
 with \GIFref\ and \TIFFref\ formats which will reduce the absolute data values to 256
 greyscale levels.
 
-{\sl Note -- the input data file is not deleted or altered in any way.}
+\textit{ Note -- the input data file is not deleted or altered in any way.}
 
 \newpage
 \section[Running {\small \bf CONVERT}]{\label{running_convert}Running \BCONVERT}
@@ -862,16 +211,15 @@ Starting \BCONVERT\ from the UNIX shell}
 The command \texttt{convert} defines \CONVERT\ commands from
 the UNIX shell.
 
-\small
-\begin{verbatim}
+\begin{terminalv}
       % convert
-\end{verbatim}
-\normalsize
+\end{terminalv}
+
 Note that the \texttt{\%} is the UNIX shell's prompt which you do not type.
 
 A message similar to:
-\small
-\begin{verbatim}
+
+\begin{terminalv}
 
    CONVERT commands are now available -- (Version 1.0, 1997 August)
 
@@ -880,8 +228,8 @@ A message similar to:
    Type conhelp for help on CONVERT commands.
    Type "showme sun55" to browse the hypertext documentation.
 
-\end{verbatim}
-\normalsize
+\end{terminalv}
+
 will be displayed. You will then be able to mix \CONVERT\ and UNIX commands.
 
 The \texttt{convert} command is defined by the Starlink startup procedures to
@@ -892,16 +240,16 @@ Non-Starlink sites must make their own arrangements.
 {\xlabel{starting_convert_from_icl}
 Starting \BCONVERT\ from ICL}
 To start \ICLref, type:
-\small
-\begin{verbatim}
+
+\begin{terminalv}
      % icl
-\end{verbatim}
-\normalsize
+\end{terminalv}
+
 You will see any messages produced by system and user procedures, followed
 by the \texttt{ICL>} prompt, something like the following.
 
-\small
-\begin{quote} \begin{verbatim}
+
+\begin{terminalv}
 ICL (UNIX) Version 3.1-5 20/05/97
 
 Loading installed package definitions...
@@ -911,25 +259,25 @@ Loading installed package definitions...
   - Type HELP [command] for help on ICL and its commands
 
 ICL>
-\end{verbatim} \end{quote}
-\normalsize
+\end{terminalv}
+
 Then, to make the \CONVERT\ commands known to the command language, type:
-\small
-\begin{quote} \begin{verbatim}
+
+\begin{terminalv}
 ICL> CONVERT
-\end{verbatim} \end{quote}
-\normalsize
+\end{terminalv}
+
 This will produce a \CONVERT\ startup message similar to:
-\small
-\begin{quote} \begin{verbatim}
+
+\begin{terminalv}
 CONVERT commands are now available -- (Version 1.0, 1997 August)
 
 Defaults for automatic NDF conversion are set.
 
 Type CONHELP or HELP CONVERT for help on CONVERT commands.
 Type "showme sun55" to browse the hypertext documentation.
-\end{verbatim} \end{quote}
-\normalsize
+\end{terminalv}
+
 
 The ICL command \texttt{CONVERT} is defined by the standard Starlink ICL login
 files to \texttt{LOAD} file \texttt{convert.icl} in the \CONVERT\ executables
@@ -953,27 +301,27 @@ from \ICL\ the case does not matter.
 
 Most \CONVERT\ applications can be run as simply as:
 
-\small
-\begin{verbatim}
+
+\begin{terminalv}
      <application> <in> <out>
-\end{verbatim}
-\normalsize
+\end{terminalv}
+
 where \texttt{$<$application$>$} is the application's name, \texttt{$<$in$>$}
 is the input file, and \texttt{$<$out$>$} is the output
 file following the conversion.  For instance, from the UNIX shell,
 
-\small
-\begin{verbatim}
+
+\begin{terminalv}
      % dst2ndf old new
-\end{verbatim}
-\normalsize
+\end{terminalv}
+
 or, from ICL,
 
-\small
-\begin{verbatim}
+
+\begin{terminalv}
      ICL> DST2NDF old new
-\end{verbatim}
-\normalsize
+\end{terminalv}
+
 both instruct the application \htmlref{DST2NDF}{DST2NDF} to convert the
 DST file called \texttt{old.dst} to the NDF called \texttt{new.sdf}.
 Note that for UNIX, the case of the filename is significant.
@@ -981,13 +329,13 @@ Note that for UNIX, the case of the filename is significant.
 The following example has the same effect as those immediately above,
 only this time you are prompted for the filenames needed by DST2NDF.
 
-\small
-\begin{verbatim}
+
+\begin{terminalv}
      ICL> DST2NDF
      IN - Name of Figaro (.DST) file to be converted /' '/ > old
      OUT - Name of output NDF /@f1/ > new
-\end{verbatim}
-\normalsize
+\end{terminalv}
+
 The value between the \texttt{/ /} delimiters is a suggested default.  You
 can choose to accept the suggestion by pressing carriage return.
 
@@ -1018,17 +366,14 @@ file conversion but in some cases, inputs may be defined as
 \subsection{\xlabel{obtaining_help}Obtaining Help}
 You can get the top-level help information for \CONVERT\  by typing:
 
-\small
-\begin{verbatim}
+
+\begin{terminalv}
      % conhelp
-\end{verbatim}
-\normalsize
+\end{terminalv}
 from the UNIX shell, or:
-\small
-\begin{verbatim}
+\begin{terminalv}
      ICL> CONHELP
-\end{verbatim}
-\normalsize
+\end{terminalv}
 from ICL. (You can also access \CONVERT\ help from ICL by using the ICL command,
 HELP.)
 
@@ -1037,18 +382,18 @@ but also include global information on matters such as using parameters.
 {\em{e.g.}}\ the following command gives help on the application
 \htmlref{UNF2NDF}{UNF2NDF}.
 
-\small
-\begin{verbatim}
+
+\begin{terminalv}
      % conhelp unf2ndf
-\end{verbatim}
-\normalsize
+\end{terminalv}
+
 
 If you have commenced running an application you can still access the
 help library whenever you are prompted for a parameter; you enter \texttt{?}.
 Here is an example.
 
-\small
-\begin{verbatim}
+
+\begin{terminalv}
      NOPEREC - Number of data values per output record /512/ > ?
 
      NDF2UNF
@@ -1062,8 +407,7 @@ Here is an example.
             default is the current value. [The first dimension of the NDF]
 
      NOPEREC - Number of data values per output record /512/ >
-\end{verbatim}
-\normalsize
+\end{terminalv}
 
 \subsection{\xlabel{sun55_se_hypertext}Hypertext Help\label{se_hypertext}}
 
@@ -1071,16 +415,15 @@ A modified version of this document exists in hypertext form.  One way
 to access it is to use the
 \xref{\texttt{showme}}{sun188}{displaying_parts_of_documents} command
 
-\small
-\begin{verbatim}
+\begin{terminalv}
      % showme sun55
-\end{verbatim}
-\normalsize
+\end{terminalv}
+
 and a Web browser will appear, presenting the index to the hypertext
 form of this document.  The hypertext permits easy location of
 referenced documents and applications.
 
-\newpage
+
 \section{\label{sect_auto}\xlabel{sect_auto}Automatic Format Conversion with
 the NDF Library}
 \xref{SSN/20}{ssn20}{} describes a system incorporated into the
@@ -1096,11 +439,8 @@ variables which permit automatic conversion of files in the formats handled by
 \CONVERT\ (except for AST, IRCAM, PGM. SPECX and FITS tapes).
 It also allows data compression.
 
-\begin{htmlonly}
-The list of format names and associated filename extensions defined by
-\CONVERT\ is set out in the table below---the filename extensions tell the
-system which format the file is in.
-\end{htmlonly}
+
+
 \begin{latexonly}
 The list of format names and associated filename extensions
 defined by \CONVERT\ is set out in Table~\ref{tab:formats}---the filename
@@ -1143,11 +483,8 @@ GZIP        & .sdf.gz & & {\bf gzip} compressed NDF \\
 \end{center}
 \end{table}
 
-\begin{htmlonly}
-The table below lists the utilities used to perform the conversions.
-In general the default parameter values are used---non-default parameters
-(other than the input and output filenames) are listed in the table.
-\end{htmlonly}
+
+
 \begin{latexonly}
 Table \ref{tab:conversions} lists the utilities used to perform the conversions.
 In general the default parameter values are used---non-default parameters
@@ -1201,14 +538,8 @@ NDF\_FROM\_\-{\em fmt}\_\-PARS or NDF\_TO\_{\em fmt}\_PARS as appropriate
 This may be used to give additional parameters to the command if you do not
 want to define a completely new command for yourself.
 \end{latexonly}
-\begin{htmlonly}
-The table also contains a column headed `Variable'.
-Most of the command lines issued to do the automatic conversion will include
-the translation of an environment variable named NDF\_FROM\_{\em fmt}\_PARS or
-NDF\_TO\_{\em fmt}\_PARS as appropriate (where {\em fmt} is the format name).
-This may be used to give additional parameters to the command if you do not
-want to define a completely new command for yourself.
-\end{htmlonly}
+
+
 Where the `Variable' column contains a tick, the variable {\em must} be used
 to supply the SHAPE parameter; where it contains a cross, additional parameters
 cannot be specified.
@@ -1220,8 +551,8 @@ parameter). This application could be made to read a TEXT file
 containing the required values for a 50 $\times$ 10 data array, and write its
 results as a FITS file (\texttt{output.fit}) as follows:
 
-\small
-\begin{quote} \begin{verbatim}
+
+\begin{terminalv}
 % convert
 CONVERT commands are now available -- (Version 1.4, 2001 November)
 
@@ -1232,9 +563,7 @@ Type "showme sun55" to browse the hypertext documentation.
 
 % setenv NDF_FROM_TEXT_PARS 'SHAPE=[50,10]'
 % rdndf data.txt output.fit
-\end{verbatim} \end{quote}
-\normalsize
-\bigskip
+\end{terminalv}
 
 The order of the formats in the tables also defines a search path.  If
 you omit the file extension, the system will search for an NDF of that
@@ -1244,40 +573,36 @@ their order is defined through the environment variable
 NDF\_FORMATS\_IN.  The shell \texttt{convert} startup defines
 NDF\_FORMATS\_IN as given below.
 
-\small
-\begin{verbatim}
+
+\begin{terminalv}
      'FITS(.fit),FIGARO(.dst),IRAF(.imh),STREAM(.das),UNFORMATTED(.unf),
      UNF0(.dat),ASCII(.asc),TEXT(.txt),GIF(.gif),TIFF(.tif),GASP(.hdr),
      COMPRESSED(.sdf.Z),GZIP(.sdf.gz),FITS(.fits),FITS(.fts),FITS(.FTS),
      FITS(.FITS),FITS(.FIT),FITS(.lilo),FITS(.lihi),
      FITS(.silo),FITS(.sihi),FITS(.mxlo),FITS(.mxhi),
      FITS(.rilo),FITS(.rihi),FITS(.vdlo),FITS(.vdhi),STREAM(.str)'
-\end{verbatim}
-\normalsize
+\end{terminalv}
+
 
 but from ICL the \texttt{CONVERT} command does not define the synonyms due
 to a limitation of ICL.  Thus NDF\_FORMATS\_IN is defined to be the
 following.
 
-\small
-\begin{verbatim}
+\begin{terminalv}
      'FITS(.fit),FIGARO(.dst),IRAF(.imh),STREAM(.das),UNFORMATTED(.unf),
       UNF0(.dat),ASCII(.asc),TEXT(.txt),GIF(.gif),TIFF(.tif),GASP(.hdr),
       COMPRESSED(.sdf.Z),GZIP(.sdf.gz)'
-\end{verbatim}
-\normalsize
+\end{terminalv}
 
 When creating an output file, there is a similar list of recognised
 formats.  The \CONVERT\ startup procedures define NDF\_FORMATS\_OUT
 as follows.
 
-\small
-\begin{verbatim}
+\begin{terminalv}
      '.,FITS(.fit),FIGARO(.dst),IRAF(.imh),STREAM(.das),UNFORMATTED(.unf),
      UNF0(.dat),ASCII(.asc),TEXT(.txt),GIF(.gif),TIFF(.tif),GASP(.hdr),
      COMPRESSED(.sdf.Z),GZIP(.sdf.gz)'
-\end{verbatim}
-\normalsize
+\end{terminalv}
 
 The leading dot indicates that if you omit the file extension, the
 output file will be an NDF.
@@ -1327,17 +652,16 @@ of it.
 \newpage
 \appendix
 
-\section[Specifications of {\small \bf CONVERT} Applications]
-{\label{app_full}Specifications of \BCONVERT\ Applications}
+\section{\label{app_full}Specifications of \BCONVERT\ Applications}
 \subsection{\xlabel{explanatory_notes}Explanatory Notes}
 
 The {\em Parameters\/} section \label{app_parameters}
 lists the application's parameters, with the format:
 
-\begin{verbatim}
+\begin{terminalv}
      name  =  type (access)
         description
-\end{verbatim}
+\end{terminalv}
 
 The description entry has a notation scheme to indicate
 normally defaulted parameters, {\it i.e.}\ those for which there will
@@ -1351,7 +675,7 @@ by the application, and may depend on the values of other parameters.
 Therefore, the default cannot be given explicitly.
 \item[\texttt{[,]}]
 As above, but there are two default values that are created dynamically.
-\item[\texttt{[}{\rm default}\texttt{]}]
+\item[\texttt{[}{\textrm{default}}\texttt{]}]
 Occasionally, a description of the default is given in normal type.
 \item[\texttt{[default]}]
 If the brackets contain a value in teletype-fount, this is the explicit
@@ -1369,9 +693,9 @@ number of parameters are large, and usually occur because they depend on
 the value of another parameter.  An example should clarify.
 \smallskip
 
-\begin{verbatim}
+\begin{terminalv}
      ndf2ascii in out [comp] [reclen] noperec=?
-\end{verbatim}
+\end{terminalv}
 \normalsize
 \smallskip
 
@@ -1391,10 +715,10 @@ the UNIX shell, {\em metacharacters\/} (notably \texttt{[}, \texttt{]} and
 \texttt{"})
 {\em must be escaped or enclosed in single quotes}.  For example:
 
-\begin{quote} \begin{verbatim}
+ \begin{terminalv}
 ascii2ndf ngc253q.dat ngc253 q shape='[100,60]'
 fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
-\end{verbatim} \end{quote}
+\end{terminalv}
 \normalsize
 
 \newpage
@@ -2699,13 +2023,13 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             TITLE, LABEL, and UNITS components respectively.
             \sstitem
             LBOUND\textit{n} --- if present, this specifies the pixel origin
-            for the $\textit{n}^{\rm th}$ dimension.
+            for the $n^{\textrm{th}}$ dimension.
          }
          \sstitem
          Additional sub-files within the FITS files are converted into
          extensions within the NDF if Parameter PROEXTS is \texttt{TRUE}.
          These extensions are named FITS\_EXT\_\textit{m} for the
-         $\textit{m}^{\rm th}$ sub-file.
+         $m^{\textrm{th}}$ sub-file.
          \sstitem
          An IMAGE sub-file is treated like the primary data array, and
          follows the rules give above. However, the resultant NDF is an
@@ -4781,7 +4105,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
             \sstitem
             LBOUND{\textit{n}} --- is the pixel origin for the
-              $\textit{n}^{\rm th}$ dimension
+              $n^{\textrm{th}}$ dimension
               when any of the pixel origins is not equal to 1.  (This is not a
               standard FITS keyword.)
 
@@ -5691,11 +5015,14 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       set to 0 for positives and 255 for negatives.
    }
    \sstusage{
-      ndf2tiff in out [scale] $\left\{\begin{tabular}{l}
-                    low=? high=? \\
-                    percentiles=? [nbins=?] \\
-                    sigmas=?
-                   \end{tabular}\right.$
+     \begin{tabular}{c l}
+      ndf2tiff in out [scale] &
+      { $\begin{cases}
+                    \mathtt{low=? high=?} \\
+                    \mathtt{percentiles=? [nbins=?]} \\
+                    \mathtt{sigmas=?}
+                   \end{cases}$}
+                 \end{tabular}
    }
    \sstparameters{
       \sstsubsection{
@@ -6270,11 +5597,11 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       \xref{WCSALIGN}{sun95}{WCSALIGN} task).
    }
 }
-\clearpage
+%\clearpage
 
 %\begin{figure}[htbp]
 \begin{figure}[t]
-\begin{verbatim}
+\begin{terminalv}
                        Schematic map grid for CO21
 
                            +---------+
@@ -6289,12 +5616,10 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
                           1|         |
                            +---------+
                             123456789
-\end{verbatim}
-\caption{Example of a map schematic
-\label{MAPSCHEMATIC} }
+\end{terminalv}
+\caption{Example of a map schematic \label{MAPSCHEMATIC} }
 \end{figure}
-\vspace*{\fill}
-\newpage
+
 \sstroutine{
    TIFF2NDF
 }{
@@ -6368,7 +5693,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    }
 }
 
-\newpage
+
 \sstroutine{
    UNF2NDF
 }{
@@ -6589,11 +5914,12 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    }
 }
 
-\newpage
-\section{\label{app_idl}Handling NDFs in \IDLref}
-\subsection{\label{idl_easy}The Easy Way}
-\emph{Note that this method cannot be used with the 64-bit Solaris version of
-IDL (use \texttt{\% idl -32}}).
+\section{Handling NDFs in IDL}
+\label{app_idl}
+\subsection{The Easy Way}
+\label{idl_easy}
+
+\emph{Note that this method cannot be used with the 64-bit Solaris version of IDL (use \texttt{\% idl -32})}.
 
 \IDLref\
 function
@@ -6602,27 +5928,26 @@ is available to convert a component of an NDF to an IDL array, and IDL
 procedure
 \htmlref{WRITE\_NDF}{WRITE_NDF}
 will create an NDF component from an IDL array. So, for example:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 IDL> tv,read_ndf('comwest')
-\end{verbatim} \end{quote}
+\end{terminalv}
 will display the data array of the NDF, \texttt{comwest.sdf}, using the IDL
 command, \texttt{TV}, and:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 IDL> write_ndf,field,'stars'
-\end{verbatim} \end{quote}
+\end{terminalv}
 will create an NDF, \texttt{stars.sdf}, of a suitable type and size, and write
 the IDL array, \texttt{field}, to its \texttt{DATA\_ARRAY} component.
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 IDL> write_ndf,q,'stars','QUALITY'
-\end{verbatim} \end{quote}
+\end{terminalv}
 will write the IDL array, \texttt{q}, to the \texttt{QUALITY} component of an
 existing NDF, \texttt{stars.sdf}.
 
 Both READ\_NDF and WRITE\_NDF can take special action on \xref{bad
 values}{sun95}{se_masking}. For a full description of their arguments see
-\begin{htmlonly}
-\htmlref{Specifications of \BCONVERT\ IDL Procedure}{idl_specs}.
-\end{htmlonly}
+
+
 \latex{Appendix~\ref{idl_specs}.}
 
 Complete structures can be handled by function
@@ -6630,7 +5955,7 @@ Complete structures can be handled by function
 and procedure
 \htmlref{IDL2HDS}{IDL2HDS}.
 So, for example:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 IDL> comwest=hds2idl('comwest')
 % Loaded DLM: HDS2IDL.
 IDL> help,comwest,/str
@@ -6641,13 +5966,13 @@ IDL> help,comwest,/str
    DATA_MIN        FLOAT           3.89062
    DATA_MAX        FLOAT           245.937
 IDL>tv,comwest.data_array
-\end{verbatim} \end{quote}
+\end{terminalv}
 will display the same image as the READ\_NDF example above, but the other
 components of the NDF are also available in the IDL structure,
 \texttt{comwest}, so that:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 IDL> idl2hds,comwest,'newcomwest'
-\end{verbatim} \end{quote}
+\end{terminalv}
 will create a duplicate of \texttt{comwest.sdf} in \texttt{newcomwest.sdf}.
 Exact duplication of the type and structure is not always possible -- see the
 routine descriptions for details.
@@ -6658,9 +5983,9 @@ that directory must be added to the IDL search paths, \texttt{IDL\_PATH} and
 \texttt{IDL\_DLM\_PATH}. This will be done if the environment variable
 IDL\_PATH has been set (usually by `sourcing' the
 \texttt{idl\_setup} script) when you start the \CONVERT\ package by typing:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 % convert
-\end{verbatim} \end{quote}
+\end{terminalv}
 Note that \texttt{convert} must be run \emph{after} sourcing the
 \texttt{idl\_setup} script.
 
@@ -6673,9 +5998,9 @@ of any files given as parameters. This opens up the possibility of using almost
 any data format with IDL.}
 
 As an example:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 IDL> tv,read_ndf('moon.imh')
-\end{verbatim} \end{quote}
+\end{terminalv}
 will display the \IRAFref\ file, \texttt{moon.imh}.
 
 \subsection{Other Methods}
@@ -6686,16 +6011,16 @@ using the \CONVERT\ package application
 \htmlref{NDF2ASCII}{NDF2ASCII} and then read
 the resulting file with IDL. The steps taken might be something like:
 
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 % ndf2ascii in=imagein out=fileout
-\end{verbatim} \end{quote}
+\end{terminalv}
 This will create a file, \texttt{fileout}, containing the DATA component
 of the NDF called \texttt{imagein}. If you want to store the VARIANCE or
 QUALITY components you would use \texttt{comp=v} or \texttt{comp=q} respectively
 as additional parameters.
 
 You can then employ a simple IDL batch file such as:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 ; Create IMAGE an 339x244 single precision floating point array.
 IMAGE=FLTARR(339,244)
 
@@ -6711,7 +6036,7 @@ CLOSE, UNIT
 
 ; Display the image after suitable scaling.
 TVSCL, IMAGE
-\end{verbatim} \end{quote}
+\end{terminalv}
 The above example assumes image dimensions of 339$\times$244 pixels.
 If you are in any doubt as to the dimensions of your image you can
 determine them using the \KAPPA\ application
@@ -6732,15 +6057,15 @@ However, the NDF2ASCII routine is not fast and makes this route awkward
 if time is important. Consequently, you may want to use
 \htmlref{NDF2UNF}{NDF2UNF} to create an F77 unformatted sequential file thus:
 
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 % ndf2unf in=imagein out=fileout noperec=339
-\end{verbatim} \end{quote}
+\end{terminalv}
 Where the \texttt{noperec} number should be the size of the first axis of
 the image.
 
 You can then read the created file using an IDL batch file similar to:
 
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 ; Supply the name of the image and its dimensions.
 FNAME='fileout'
 SD1=339
@@ -6772,7 +6097,7 @@ WINDOW, 0,XSIZE=SD1,YSIZE=SD2
 
 ; Display the image.
 TVSCL, IMAGE
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 The image is then contained in the integer array \texttt{IMAGE} and may be
 manipulated by IDL. This would allow such operations as storing it as
@@ -6804,13 +6129,13 @@ that seems particularly easy to use.
 So if you first convert your NDF into a FITS file using
 \htmlref{NDF2FITS}{NDF2FITS} like this:
 
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 % ndf2fits in=m42 out=m42.fit comp=d
-\end{verbatim} \end{quote}
+\end{terminalv}
 you can then use the following code from within IDL to place the image
 into an IDL structure and display it.
 
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 ; Read the FITS file
 fxread, 'm42.fit', DATA, HEADER
 
@@ -6827,7 +6152,7 @@ window, 0,xsize=SIZEX,ysize=SIZEY
 
 ; Display the image
 TVSCL, IMAGE
-\end{verbatim} \end{quote}
+\end{terminalv}
 As can be seen above, various values contained within the FITS header
 of the original can be obtained using the FXPAR procedure.
 
@@ -7255,8 +6580,10 @@ Starlink programs from \IRAF\ cl if an output image is produced by
 Details of which IRAF version libraries are used in \CONVERT\ will be given in
 the release notes.
 
-\section{Release Notes -- V1.2}
-\subsection{New Applications}
+\section{Release Notes}
+
+\subsection{Release Notes V1.2}
+\subsubsection{New Applications}
 \begin{description}
 \item[\htmlref{READ\_NDF}{READ_NDF}] An IDL function to read an NDF component
 into an IDL array.
@@ -7264,9 +6591,9 @@ into an IDL array.
 an NDF component.
 \end{description}
 The use of these converters for IDL is described in
-\latexelsehtml{Section~\ref{app_idl}}{\htmlref{Handling NDFs in \IDLref}{app_idl}}
+\latexelsehtml{Section~\ref{app_idl}}{\htmlref{Handling NDFs in IDL}{app_idl}}
 
-\subsection{Changed applications}
+\subsubsection{Changed applications}
 \begin{description}
 \item[\htmlref{NDF2TIFF}{NDF2TIFF}] Various alternative methods of scaling the
 NDF data are provided.
@@ -7282,10 +6609,10 @@ These are re-built using libraries from \IRAFref\ release V2.11.1.
 \end{description}
 
 
-\subsection{Documentation}
+\subsubsection{Documentation}
 This document and \CONVERT\ help has been modified to reflect these changes.
 
-\section{Release Notes -- V1.2-4}
+\subsection{Release Notes -- V1.2-4}
 
 All the converters which are ADAM tasks have been combined into a monolith
 to save disk space.
@@ -7310,7 +6637,7 @@ and
 This document has been updated to include this section and a copyright
 statement. Some bugs in the HTML version header have been corrected.
 
-\section{Release Notes -- V1.3-2}
+\subsection{Release Notes -- V1.3-2}
 Two new converters,
 \htmlref{HDS2IDL}{HDS2IDL}
 and
@@ -7360,7 +6687,7 @@ Early release-note sections have been removed.
 On installation, only a link to the installed \LaTeX\ document is now retained
 in the source directory.
 
-\subsection{Release Notes -- V1.3-5}
+\subsubsection{Release Notes -- V1.3-5}
 \htmlref{FITS2NDF}{FITS2NDF}
 now creates a component of type FITS\_HEADER, not NDF, in the container
 file for multi-extension FITS files if the FITS HDU does not contain a data
@@ -7379,7 +6706,7 @@ This document has been updated to include this section and to update the
 description of the CONTAINER parameter of
 \htmlref{FITS2NDF}{FITS2NDF}.
 
-\subsection{Release Notes -- V1.3-6}
+\subsubsection{Release Notes -- V1.3-6}
 \htmlref{FITS2NDF}{FITS2NDF}
 \begin{itemize}
 \item Improve error reporting if no WCS encoding can be used.
@@ -7389,7 +6716,7 @@ description of the CONTAINER parameter of
 \item Correct handling of NDF history records in the FITS header.
 \end{itemize}
 
-\section{Release Notes -- V1.4}
+\subsection{Release Notes -- V1.4}
 Added application \htmlref{MTFITS2NDF}{MTFITS2NDF} to convert FITS tapes to NDFs.
 
 \subsubsection{Release Notes -- V1.4-1}
@@ -7401,22 +6728,22 @@ Corrected an error in the section of this document describing the easy
 way to do IDL/NDF conversions.  \htmlref{WRITE\_NDF}{WRITE_NDF} was
 described as if it were a function rather than a procedure.
 
-\subsection{Release Notes -- V1.4-2}
+\subsubsection{Release Notes -- V1.4-2}
 Parameter WCSATTRS is added to \htmlref{FITS2NDF}{FITS2NDF}.
 This enables users to modify the way WCS information is extracted from the
 FITS headers. This can be useful when the headers do not conform to conventions.
 
-\subsection{Release Notes -- V1.4-3}
+\subsubsection{Release Notes -- V1.4-3}
 Fixed a problem in \htmlref{NDF2FITS}{NDF2FITS} caused by a mismatch of
 conventions used in the TFORM\textit{n} and TDIM\textit{n} header cards for
 multi-dimensional character arrays.  A corresponding fix was required for
 \htmlref{FITS2NDF}{FITS2NDF}.
 
-\subsection{Release Notes -- V1.4-4}
+\subsubsection{Release Notes -- V1.4-4}
 Fixed a bug in \htmlref{FITS2NDF}{FITS2NDF} caused by a missing END card on a
 merged header.
 
-\section{Release Notes -- V1.5}
+\subsection{Release Notes -- V1.5}
 
 \htmlref{SPECX2NDF}{SPECX2NDF} has been revamped so that it now uses
 the new AST \xref{SpecFrame functionality}{sun95}{se_wcsuse},
@@ -7442,11 +6769,11 @@ preserved where values have not changed significantly.
 The references to the old VMS-only tasks have been removed from the
 documentation because the residual VMS service no longer exists.
 
-\subsection{Release Notes -- V1.5-4}
+\subsubsection{Release Notes -- V1.5-4}
 Added IRAF compatibility libs for Linux systems.  CONVERT should now
 build on any ix86 Linux platform.
 
-\subsection{Release Notes -- V1.5-5}
+\subsubsection{Release Notes -- V1.5-5}
 
 Added FITS-AIPS$++$ and FITS-CLASS encodings to
 \htmlref{FITS2NDF}{FITS2NDF} and \htmlref{NDF2FITS}{NDF2FITS}.
@@ -7459,7 +6786,7 @@ data, not just the output NDF.
 double-sideband SpecFrame.  See the AST documentation for more details
 on double-sideband spectra.
 
-\subsection{Release Notes -- V1.5-6}
+\subsubsection{Release Notes -- V1.5-6}
 
 FITSGZ is a new on-the-fly conversion format for GZIP-compressed FITS
 files.  The recognised extensions are \texttt{fits.gz}, \texttt{fit.gz}, and
@@ -7468,7 +6795,7 @@ files.  The recognised extensions are \texttt{fits.gz}, \texttt{fit.gz}, and
 FITS2NDF supports the new AAO Instruments (AAOMEGA and FMOS) that use
 the 2dF data structures.
 
-\subsection{Release Notes -- V1.5-7}
+\subsubsection{Release Notes -- V1.5-7}
 
 \htmlref{FITS2NDF}{FITS2NDF} has a new TYPE group parameter to set the
 data type of the NDF, overriding the value propagated from the FITS
@@ -7477,7 +6804,7 @@ BITPIX, or BSCALE and BZERO precision when FMTCNV is \texttt{TRUE}.
 \htmlref{NDF2FITS}{NDF2FITS} now supports multi-NDFs HDS container files
 through the new CONTAINER and MERGE parameters.
 
-\subsection{Release Notes -- V1.5-8}
+\subsubsection{Release Notes -- V1.5-8}
 
 \htmlref{FITS2NDF}{FITS2NDF} Parameter FMTCNV has a new allowed value
 of \texttt{"Native"} requesting that there is no format conversion, and
@@ -7494,14 +6821,14 @@ scaled array too.  This new facility preserves the data compression
 of large files.  In the absence of a scaled array, the application
 behaves as if BITPIX=\texttt{-1} were specified.
 
-\subsection{Release Notes -- V1.5-9}
+\subsubsection{Release Notes -- V1.5-9}
 
 \htmlref{NDF2FITS}{NDF2FITS} Parameter ENCODING has a new allowed
 value of \texttt{"FITS-WCS(CD)"}.  This is the same as
 \texttt{"FITS-WCS"} except that it uses the old CD matrix formalism
 to describe the data array's rotation and scaling.
 
-\subsection{Release Notes -- V1.5-10}
+\subsubsection{Release Notes -- V1.5-10}
 
 \htmlref{FITS2NDF}{FITS2NDF} supports externally and internally compressed
 FITS files.
@@ -7510,7 +6837,7 @@ FITS files.
 and DATASUM at the end of each header if new Parameter CHECKSUMS is
 \texttt{TRUE}.
 
-\subsection{Release Notes -- V1.5-11}
+\subsubsection{Release Notes -- V1.5-11}
 
 \htmlref{NDF2FITS}{NDF2FITS} writes the correct BUNIT keyword value in
 the IMAGE extension storing the VARIANCE component.  The BUNIT
@@ -7520,13 +6847,13 @@ There is a new DUPLEX parameter.  When set \texttt{TRUE} (and PROFITS
 is also \texttt{TRUE}), it permits the FITS airlock headers to appear
 also in the IMAGE extensions for the VARIANCE and QUALITY arrays.
 
-\subsection{Release Notes -- V1.5-12}
+\subsubsection{Release Notes -- V1.5-12}
 
 \htmlref{NDF2FITS}{NDF2FITS} now makes special provision for the JCMT
 SMURF-package extension.  It treats the extension contents as NDFs
 rather than arbitrary HDS structures.
 
-\subsection{Release Notes -- V1.5-13}
+\subsubsection{Release Notes -- V1.5-13}
 
 \htmlref{NDF2FITS}{NDF2FITS} supports the propagation of provenance
 information to FITS headers.  There is a choice of generic propagation
@@ -7542,7 +6869,7 @@ structure.
 better, permitting a roundtrip via FITS, perserving the original
 data structures, save for some additional FITS headers.
 
-\subsection{Release Notes -- V1.5-14}
+\subsubsection{Release Notes -- V1.5-14}
 
 The creation of AXIS structures by \htmlref{SPECX2NDF}{SPECX2NDF} can
 now be suppressed using its new AXIS parameter.
@@ -7550,14 +6877,14 @@ now be suppressed using its new AXIS parameter.
 \htmlref{NDF2FITS}{NDF2FITS} is now much quicker when writing out WCS
 information that includes a large table of values.
 
-\subsection{Release Notes -- V1.5-15}
+\subsubsection{Release Notes -- V1.5-15}
 
 The CADC provenance processing now also modifies the PRODUCT keyword's
 value in FITS extensions to the original PRODUCT string followed by
 underscore and the extension name in lowercase.  Also the CADC
 provenance now only records unique OBSIDD values.
 
-\subsection{Release Notes -- V1.5-16}
+\subsubsection{Release Notes -- V1.5-16}
 
 The FITS converters use the new NDG provenance system that inherits
 history records too.  \htmlref{NDF2FITS}{NDF2FITS} also ignores hidden
@@ -7576,12 +6903,12 @@ Various internal improvements were made, particularly to reuse
 Correct a bug in \htmlref{FITS2NDF}{FITS2NDF} affecting the import of
 SMURF data containing VARIANCE or QUALITY that was formerly in an NDF.
 
-\subsection{Release Notes -- V1.5-17}
+\subsubsection{Release Notes -- V1.5-17}
 
 The bash \CONVERT\ initialisation script has been changed so that it
 now works from any Bourne-compatible shell.
 
-\subsection{Release Notes -- V1.5-18}
+\subsubsection{Release Notes -- V1.5-18}
 
 \htmlref{FITS2NDF}{FITS2NDF} recognises the new {\tt "Group:"} heading
 in HISTORY headers that originally came from an exported NDF.  [This
@@ -7592,7 +6919,7 @@ NDF$\rightarrow$FITS$\rightarrow$NDF cycle.
 \htmlref{NDF2FITS}{NDF2FITS} allows three-letter permutations for
 Parameter COMP.  There is now no automatic quality masking of data
 and variance whenever the quality array is exported to the FITS file
-too.  A new section of the NDF2FITS reference documentation explains
+too.  A new subsection of the NDF2FITS reference documentation explains
 this in more detail.
 
 Removed default history recording in FITS2NDF's output NDF since
@@ -7600,7 +6927,7 @@ you can control automatic history creation via the
 \xref{NDF\_AUTO\_HISTORY}{sun33}{preparing_to_record_history_information}
 environment variable.
 
-\subsection{Release Notes -- V1.5-19}
+\subsubsection{Release Notes -- V1.5-19}
 
 Propagate LABEL keyword to NDF label in \htmlref{FITS2NDF}{FITS2NDF}.
 FITS2NDF can now recreate data that were formerly in a UKIRT\_HDS
@@ -7622,7 +6949,7 @@ The IDL scripts \htmlref{READ\_NDF}{READ_NDF} and
 \htmlref{WRITE\_NDF}{WRITE_NDF} have been fixed to use STARLINK\_DIR
 to specify the correct IDL library path.
 
-\subsection{Release Notes -- V1.6}
+\subsubsection{Release Notes -- V1.6}
 
 Support for FITS -TAB projection type added.
 
@@ -7638,7 +6965,7 @@ co-ordinates if a WCS component exists in the NDF.
 Changed the default ORIGIN keyword from \texttt{Starlink Project,
 U.K.} to \texttt{Starlink Software} in NDF2FITS.
 
-\subsection{Release Notes -- V1.7}
+\subsubsection{Release Notes -- V1.7}
 
 Support for 64-bit integers is now available in
 \htmlref{ASCII2NDF}{ASCII2NDF}, \htmlref{DA2NDF}{DA2NDF},
@@ -7656,7 +6983,7 @@ algorithm.
 \htmlref{SPECX2NDF}{SPECX2NDF} has a new SYSTEM parameter that
 specifies the NDF's co-ordinate system.
 
-\subsection{Release Notes -- V1.8}
+\subsubsection{Release Notes -- V1.8}
 
 NDF2FITS has a new literal parameter called AXISORDER to specify the
 order of WCS axes in the output FITS header.  This is introduced so
