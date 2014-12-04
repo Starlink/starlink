@@ -1,512 +1,19 @@
-\documentstyle[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun183.6}
-\newcommand{\stardocnumber}    {183.6}
-\newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {2nd October 2007}
-\newcommand{\stardoctitle}     {ARD \\ [1ex]
-                                A Textual Language for Describing \\
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun183.6}
+\stardocnumber      {183.6}
+\stardocauthors     {D.S. Berry}
+\stardocdate        {2nd October 2007}
+\stardoctitle    {ARD ---
+                                A Textual Language for Describing
                                 Regions within a Data Array}
-\newcommand{\stardocversion}   {Version 2.2}
-\newcommand{\stardocmanual}    {Programmer's Manual}
-% ? End of document identification
-% -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\html}[1]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-%\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
-% Command for displaying routines in routine lists:
-% =================================================
-
-\newcommand{\noteroutine}[3]{
-\begin{description}
-\item [{\small \bf {#1} \parbox[t]{4in}{#2}}]
-\mbox{} \nopagebreak \\
-{\em #3}
-\end{description}
-}
-
-\begin{htmlonly}
-
-\newcommand{\noteroutine}[3]{
-\begin{description}
-\item [{\small \bf {#1}{#2}}]
-{\em #3}
-\end{description}
-}
-
-\end{htmlonly}
-
-% +
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2HTML. The contents of this file should be included in the
-%     source prior to any statements that make use of the SST commands.
-
-%  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty
-%     on your TEXINPUTS path (and including the name as part of the
-%     documentstyle declaration).
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-% -
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
-
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%  Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  Re-define \ssttt.
-   \newcommand{\ssttt}{\tt}
-
-%  \sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  \sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  \sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  \sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  \sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
-
-%  \sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}]
-      \begin{description}
-         #2
-      \end{description}
-   }
-
-%  \sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-   }
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-% .
-% @(#)sst.tex   1.4   95/06/06 11:46:41   95/06/06 11:49:58
-
-
-% ? End of document specific commands
-% -----------------------------------------------------------------------------
-%  Title Page.
-%  ===========
-\renewcommand{\thepage}{\roman{page}}
-\begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%   ==================
+\stardocversion     {Version 2.2}
+\stardocmanual      {Programmer's Manual}
+\stardocabstract {
 The ARD (ASCII Region Definition) system provides a textual language for
 describing regions within a data array, together with software for converting
 a textual description into a pixel mask, or plotting it on a graphics
@@ -514,23 +21,31 @@ device. The textual language is based on a set of keywords identifying simple
 shapes (boxes, circles, lines, etc.). These keywords can be combined together
 using Boolean-style operators (AND, OR, NOT, etc.) to create more complex
 shapes. Data arrays can be multi-dimensional.
-% ? End of document abstract
+}
+% ? End of document identification
 % -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
- \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
 
+
+% -----------------------------------------------------------------------------
+% ? Document specific \providecommand or \newenvironment commands.
+
+% Command for displaying routines in routine lists:
+% =================================================
+
+\providecommand{\noteroutine}[3]{
+\begin{description}
+\item [{\small \bf {#1} \parbox[t]{4in}{#2}}]
+\mbox{} \nopagebreak \\
+{\em #3}
+\end{description}
+}
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\begin{document}
+\scfrontmatter
 
 \section{Introduction}
 
@@ -556,14 +71,14 @@ Multi-dimensional data arrays can be handled. A simple 2-dimensional ARD
 description such as:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CIRCLE( 20, 20, 5 ) .OR. RECT( 20, 20, 30, 30 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
-tells the application to process all pixels which are {\em either} within a
+tells the application to process all pixels which are \emph{either} within a
 circle centred on pixel coordinates (20,20) with a radius of 5 pixels,
-{\em or} are within the rectangle with opposite corners at pixels coordinates
+\emph{or} are within the rectangle with opposite corners at pixels coordinates
 (20,20) and (30,30). The \htmlref{ARD\_WORK}{ARD_WORK}
 subroutine will convert an ARD description such as this into a pixel mask, with
 a shape and size specified by the application. The application will usually know
@@ -575,7 +90,7 @@ keep permanent copies of the pixel mask on disk.
 As well as creating pixel masks, the ARD library also provides facilities
 to plot an ARD description on a graphics device. The \htmlref{ARD\_PLOT}{ARD_PLOT}
 routine draws the borders of the regions described in the ARD description,
-using a supplied {\em AST Plot} (see \xref{SUN/210}{sun210}{}) to perform
+using a supplied \emph{AST Plot} (see \xref{SUN/210}{sun210}{}) to perform
 the graphics.
 
 In the above example, positions and distances in the ARD description were given
@@ -585,7 +100,7 @@ positions and distances to be given in other coordinate systems:
 
 \item As of ARD version 2.0, the calling application can define an
 arbitrary collection of coordinate systems (which need not be linearly
-related to pixel coordinates) by supplying an {\em AST FrameSet} (see
+related to pixel coordinates) by supplying an \emph{AST FrameSet} (see
 \xref{SUN/210}{sun210}{}). The FrameSet contains information which allows
 positions to be mapped from any of these coordinate systems into pixel
 coordinates. Positions within the ARD description can then be given
@@ -638,9 +153,9 @@ text file. Such lines are effectively concatenated together into a single string
 before being processed by ARD:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       ROTBOX( 0, 0, 20, 10, 30 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This example is simply a single keyword representing one of the basic shapes
@@ -651,9 +166,9 @@ sides of length 20 and 10. The first side of the box (i.e. the one with length
 anti-clockwise).
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CIR( 0, 0, 10 ) .AND. .NOT. ( COLUMN( 10 ) .OR. ROW( 5 ) )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This example uses logical \htmlref{operators}{SEC:OPER} and parentheses to combine several basic
@@ -662,10 +177,10 @@ shapes together into a more complex shape. It also shows the use of abbreviated
 selected, except for those which are on column 10 or row 5.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       COFRAME( SKY, System=FK5, Equinox=2003.5 )
       BOX( 12:23:41, -89:14, 1h40m, 20m )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This example shows the use of \htmlref{statements}{SEC:STAT} to specify the
@@ -680,13 +195,13 @@ close to the south equatorial pole, the pixel region containing this
 "box" will have quite strongly curved sides.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       PIXEL(  1,  1 )
       PIXEL( 20, 13 )
       PIXEL(-55,122 )
       PIXEL(112, 87 )
       PIXEL( 33, 12 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This example demonstrates the ability of ARD to recognise implicit
@@ -706,7 +221,7 @@ region specified by the ARD description. The application will deal with
 NDFs of any dimensionality up to the limit imposed by the NDF\_ system.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE ARD_TEST( STATUS )                             [1]
       IMPLICIT NONE
 
@@ -790,10 +305,10 @@ NDFs of any dimensionality up to the limit imposed by the NDF\_ system.
       CALL NDF_ANNUL( INDF, STATUS )                            [18]
 
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
-{\bf Programming notes:}
+\textbf{Programming notes:}
 
 \begin{enumerate}
 
@@ -833,7 +348,7 @@ has the wrong value.
 involve prompting the user, or the NDF may be identified using some other means
 (for instance, the NDF may have been specified on the command line which
 invoked the application). An integer value is returned to the application in
-variable INDF. This is an NDF {\em identifier} and is used to refer to the NDF
+variable INDF. This is an NDF \emph{identifier} and is used to refer to the NDF
 throughout the rest of the application.
 
 \item The shape and size of the NDF is now obtained. This returns the number of
@@ -841,7 +356,7 @@ dimensions, and the upper and lower bounds on each axis. These bounds are needed
 to be able to correctly locate positions supplied within the ARD description.
 
 \item The DATA array in the NDF is then accessed by calling NDF\_MAP. Rather
-than returning actual data values, this routine returns a {\em pointer} to the
+than returning actual data values, this routine returns a \emph{pointer} to the
 data values in IPDATA. The total number of pixels in the array is returned in
 EL.
 
@@ -864,7 +379,7 @@ library is a Fortran interface to the POSIX library and is described in SUN/121.
 
 \item An NDF structure can have a range of ``World Coordinate Systems''
 associated with it. Information describing these coordinate systems, and
-how to transform positions between them, is stored in the {\em WCS
+how to transform positions between them, is stored in the \emph{WCS
 component} of the NDF. The NDF\_GTWCS routine returns an identifier for an
 AST FrameSet which is a representation of the WCS component. The facilities
 of the \xref{AST library}{sun210}{} can then be used to manipulate the WCS
@@ -894,7 +409,7 @@ is not part of the ARD package, but would be written by the application
 programmer. It may look like this:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE SUMIT( EL, DATA, MASK, SUM, STATUS )
       IMPLICIT NONE
 
@@ -944,7 +459,7 @@ programmer. It may look like this:
       END DO
 
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The two arrays can be treated as one dimensional vectors because they are the
@@ -984,10 +499,10 @@ instance, if the positions in the ARD description are 3-dimensional, the user
 may want to give an ARD description such as:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       DIMENSION( 3 )
       CIRCLE( 40, 50, 60, 10) .OR. CIRCLE( 45, 55, 65, 10 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The \htmlref{DIMENSION}{ST:DIM} statement tells ARD to expect three values per position. The rest
@@ -1009,9 +524,9 @@ ADAM parameter system and is not actually typed in by the user:
 \item The entire ARD description could be given as a single literal string:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       > DIMENSION(3) CIRCLE( 40, 50, 60, 10) .OR. CIRCLE( 45, 55, 65, 10 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 All blanks and tabs are ignored.
@@ -1021,11 +536,11 @@ response to successive prompts. This is particularly useful for long ARD
 descriptions:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       > DIMENSION(3) -
       > CIRCLE( 40, 50, 60, 10) .OR. -
       > CIRCLE( 45, 55, 65, 10 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 If an ARD description ends with a minus sign (``$-$''), the \htmlref{ARD\_GROUP}{ARD_GROUP} subroutine
@@ -1037,11 +552,11 @@ which doesn't end with a minus sign.
 value. So, for instance, the following responses would be valid:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       > DIMENSION(3) CIRCLE( 40, 50, -
       > 60, 10) .OR. CIRCLE( 45, 55, -
       > 65, 10 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \item If ARD finds adjacent keywords without any intervening operator, an
@@ -1050,11 +565,11 @@ operator is not explicitly included, would give the same results as the previous
 examples:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       > DIMENSION(3) -
       > CIRCLE( 40, 50, 60, 10 ) -
       > CIRCLE( 45, 55, 65, 10 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \item Instead of supplying the ARD description directly in response to the
@@ -1064,19 +579,19 @@ preceded by an up-arrow symbol (``\verb+^+''). If the file \verb+desc.ard+
 contained the three lines:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       DIMENSION(3)
       CIRCLE( 40, 50, 60, 10 )
       CIRCLE( 45, 55, 65, 10 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 then the user could give the following response:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       > ^desc.ard
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The ARD description can be split between the lines of the file in any way the
@@ -1087,19 +602,19 @@ methods can be combined. For instance, if the \htmlref{DIMENSION}{ST:DIM} statem
 from the file, so that \verb+desc.ard+ contains:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CIRCLE( 40, 50, 60, 10 )
       CIRCLE( 45, 55, 65, 10 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 then the user could give the complete ARD description by giving the following
 response:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       > DIMENSION(3);^desc.ard
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This would cause the contents of the file \verb+desc.ard+ to be concatenated with the
@@ -1110,9 +625,9 @@ the ARD description returned by \htmlref{ARD\_GROUP}{ARD_GROUP}.
 of the files could be concatenated together in a similar way:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       > ^desc1.ard;^desc2.ard;^desc3.ard
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This would cause the contents of files \verb+desc1.ard+, \verb+desc2.ard+ and
@@ -1122,34 +637,34 @@ combined to form the final ARD description.
 \item Indirection through text files can be nested. So if the string
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       ^desc1.ard;^desc2.ard;^desc3.ard
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 were stored in a file \verb+total.ard+, then the user could give the response:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       > ^total.ard
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \end{enumerate}
 
 \section{\xlabel{ARDSyntax}ARD Description Syntax}
-An ARD description consists of a stream of {\em fields}, optionally
+An ARD description consists of a stream of \emph{fields}, optionally
 separated by one or more spaces, or tabs. There are three types of fields:
 
 \begin{enumerate}
 
-\item \htmlref{{\em Keyword}}{SEC:KEYW} fields: These specify the basic shapes known to ARD
+\item \htmlref{\emph{Keyword}}{SEC:KEYW} fields: These specify the basic shapes known to ARD
 (\htmlref{CIRCLE}{KEY:CIR}, \htmlref{BOX}{KEY:BOX}, etc.) from which more complex shapes are constructed.
 
-\item \htmlref{{\em Operator}}{SEC:OPER} fields: These are logical operators, as in Fortran
+\item \htmlref{\emph{Operator}}{SEC:OPER} fields: These are logical operators, as in Fortran
 (\htmlref{.AND.}{OP:AND}, \htmlref{.OR.}{OP:OR}, \htmlref{.XOR.}{OP:XOR}, \htmlref{.NOT.}{OP:NOT} etc.).
 
-\item \htmlref{{\em Statement}}{SEC:STAT} fields: These are fields which
+\item \htmlref{\emph{Statement}}{SEC:STAT} fields: These are fields which
 effect the way that the keyword fields are interpreted, e.g. setting up
 the dimensionality of the system (\htmlref{DIMENSION}{ST:DIM}), the
 recognized coordinate systems (\htmlref{COFRAME}{ST:COFRAME}), etc.
@@ -1166,7 +681,7 @@ spaces, blank records in a file, blank group expressions) is ignored.
 
 \subsection{Restrictions on the Order of Fields}
 An ARD description is basically an algebraic expression in which the \htmlref{operators}{SEC:OPER}
-are {\em logical} operators (\htmlref{.AND.}{OP:AND}, \htmlref{.OR.}{OP:OR}, etc.) and the operands are represented
+are \emph{logical} operators (\htmlref{.AND.}{OP:AND}, \htmlref{.OR.}{OP:OR}, etc.) and the operands are represented
 by \htmlref{keywords}{SEC:KEYW} (\htmlref{CIRCLE}{KEY:CIR}, \htmlref{BOX}{KEY:BOX}, etc.) which notionally take true or false values
 depending on whether or not the current pixel is inside or outside the specified
 region. Therefore, all the usual restrictions exist on the placing of operators
@@ -1196,24 +711,24 @@ implicit \htmlref{.OR.}{OP:OR} operator is assumed. This allows a simple list of
 be specified such as:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
    #
    #  ARD description file
    #
    POLYGON( 20, 20, 50, 50, 25, 75)      # A triangle
    ELLIPSE( 10.0, 10.0, 8.0, 5.0, 45.0 )
    CIRCLE( 22, 22, 40 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This is effectively equivalent to:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
    POLYGON( 20, 20, 50, 50, 25, 75) .OR.
    ELLIPSE( 10.0, 10.0, 8.0, 5.0, 45.0 ) .OR.
    CIRCLE( 22, 22, 40 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The returned integer mask will contain positive values within the union of the
@@ -1224,16 +739,16 @@ three regions, and zero outside.
 as the following to be given:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
    POLYGON( 20, 20, 50, 50, 25, 75)
    .NOT.ELLIPSE( 10.0, 10.0, 8.0, 5.0, 45.0 )
    .NOT.CIRCLE( 22, 22, 40 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
-The returned mask will contain positive values for all pixels which are {\em
-either} within the polygon, or are {\em not} within the ellipse, or are {\em
-not} within the circle. It may need to be emphasised here that \htmlref{.OR.}{OP:OR} operators
+The returned mask will contain positive values for all pixels which are
+\emph{either} within the polygon, or are \emph{not} within the ellipse, or are
+\emph{not} within the circle. It may need to be emphasised here that \htmlref{.OR.}{OP:OR} operators
 are inserted and not \htmlref{.AND.}{OP:AND} operators.
 
 \end{itemize}
@@ -1291,8 +806,8 @@ be replaced by 200.
 
 A complete ARD description can be broken across several lines of an indirection
 file, or across several directly supplied group expressions (each one terminated
-with the flag character ``\verb+-+''). However, breaks must occur either {\em
-between} fields or between values in a keyword or statement argument list.
+with the flag character ``\verb+-+''). However, breaks must occur either
+\emph{between} fields or between values in a keyword or statement argument list.
 
 \subsection{\label{SEC:MOD}Use of GRP Modification Elements}
 The GRP system provides a facility which allows a user to modify the
@@ -1307,16 +822,16 @@ will be modified according to the instructions in the modification
 element, and the results incorporated into the returned group. Note, the
 specified editing is applied separately to each element in the existing
 group, to produce the corresponding element for the new group. Elements are
-delimited in ARD descriptions by the ``\verb+;+'' character, {\em and by
+delimited in ARD descriptions by the ``\verb+;+'' character, \emph{and by
 carriage returns}.
 
 For instance, suppose that the application has already created a group
 containing the following ARD description:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CIRCLE( 0, 10, 10 ) .OR. CIRCLE( 0, -10, 10 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 If the GRP identifier for this group is supplied as argument IGRP1 to
@@ -1324,9 +839,9 @@ routine \htmlref{ARD\_GROUP}{ARD_GROUP}, the user may supply an ARD
 description including a modification element such as:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       ( * ) .AND. BOX( 0, 0, 5, 5 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The asterisk is replaced in turn by each element of the contents of the
@@ -1334,9 +849,9 @@ group identified by IGRP1 (the ``basis'' group).
 Thus, the above ARD description is equivalent to the following:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       ( CIRCLE( 0, 10, 10 ) .OR. CIRCLE( 0, -10, 10 ) ) .AND. BOX( 0, 0, 5, 5 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Note, the original ARD description was supplied on a single line, and was
@@ -1345,19 +860,19 @@ then each line would have been edited separately. For instance, if the
 original ARD description had been supplied as follows, on two lines:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CIRCLE( 0, 10, 10 ) .OR.
       CIRCLE( 0, -10, 10 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 then the modified ARD description would be :
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       ( CIRCLE( 0, 10, 10 ) .OR. ) .AND. BOX( 0, 0, 5, 5 )
       ( CIRCLE( 0, -10, 10 ) ) .AND. BOX( 0, 0, 5, 5 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This group expression would not be accepted by \htmlref{ARD\_WORK}{ARD_WORK}
@@ -1367,9 +882,9 @@ If the user has supplied the ARD description on a single line, and then
 modified it using the following ARD description:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       ( *|10|5| ) .AND. BOX( 0, 0, 5, 5 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 then the basis group would be edited by replacing all occurrences of the
@@ -1377,9 +892,9 @@ string ``10'' by the string ``5'', before being included in the final ARD
 description. Thus the above would be equivalent to:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       ( CIRCLE( 0, 5, 5 ) .OR. CIRCLE( 0, -5, 5 ) ) .AND. BOX( 0, 0, 5, 5 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The syntax of such modification elements is described fully in \xref{SUN/150}{sun150}{}.
@@ -1397,13 +912,13 @@ operands depends on the type of keyword:
 
 \item Operands for regions which (in general) have non-zero volume (e.g.
 \htmlref{POLYGON}{KEY:POL},
-\htmlref{CIRCLE}{KEY:CIR}, \htmlref{BOX}{KEY:BOX}, etc.) are .TRUE. if the {\em centre} of the current pixel lies on or
+\htmlref{CIRCLE}{KEY:CIR}, \htmlref{BOX}{KEY:BOX}, etc.) are .TRUE. if the \emph{centre} of the current pixel lies on or
 within the boundary of the region, and are .FALSE. otherwise.
 
 \item Operands for regions which have zero volume (e.g.
 \htmlref{POINT}{KEY:POINT},
 \htmlref{LINE}{KEY:LINE}, \htmlref{ROW}{KEY:ROW}, \htmlref{COLUMN}{KEY:COL},
-etc.) are .TRUE. if the boundary of the region passes {\em through} the current
+etc.) are .TRUE. if the boundary of the region passes \emph{through} the current
 pixel. The pixel with index $I$ along some axis is assumed to cover a range of
 pixel coordinates $P$ given by $(I-1) < P \leq I$.
 
@@ -1422,18 +937,18 @@ basis of the pixel mask alone.
 
 \subsubsection{Background Pixels}
 The \htmlref{.NOT.}{OP:NOT} operator adds a few complications in that it requests pixels to be
-included which are {\em not} within a given region. For instance:
+included which are \emph{not} within a given region. For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       .NOT.CIRCLE( 0, 0, 10)
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 includes all pixels which are not within the circle of radius 10 centred on the
 origin. If (say) the value 2 was used to represent the \htmlref{CIRCLE}{KEY:CIR} region, what value
-should be used to represent the pixels which are {\em not} within the circle?
-The solution adopted by ARD is to consider all pixels {\em not} within a region
+should be used to represent the pixels which are \emph{not} within the circle?
+The solution adopted by ARD is to consider all pixels \emph{not} within a region
 to be ``background'' pixels, and to reserve the value 1 to represent such
 pixels. All \htmlref{.NOT.}{OP:NOT} operators in an ARD description use the value 1 to represent
 included background pixels. Note, ARD doesn't know if a pixel is truly part of
@@ -1442,17 +957,17 @@ operator will be background. This gives rise to a possible anomaly which can be
 illustrated by the ARD description:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       .NOT. ( .NOT. CIRCLE( 0, 0, 10 ) )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 One might expect this to be equivalent to the ARD description:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CIRCLE( 0, 0, 10 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 but there will be a difference. The two ARD descriptions will store positive
@@ -1468,9 +983,9 @@ returned mask, and such background pixels are again represented by the value 1.
 The ARD description:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CIRCLE( 0, 0, 10 ) .EQV. CIRCLE( 10, 0, 10)
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 selects pixels which are either within both circles or within neither circle.
@@ -1501,9 +1016,9 @@ ARD description does not effect the integer values used to represent other
 \htmlref{keywords}{SEC:KEYW}. Thus if REGVAL is supplied equal to 2 and the ARD description is:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CIRCLE( 0, 0, 10 ) .AND. ( INPUT .OR. CIRCLE( 0, 10, 10 ) )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 then the \htmlref{CIRCLE}{KEY:CIR}(0,0,10) region is assigned the value 2 and the \htmlref{CIRCLE}{KEY:CIR}(0,10,10)
@@ -1534,13 +1049,13 @@ operand is zero, then 1 is returned.
 Let's look at an example:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CIR( 0, 0, 50 )
       CIR( 0, 0, 40 )
       CIR( 0, 0, 30 )
       CIR( 0, 0, 20 )
       CIR( 0, 0, 10 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 An implicit \htmlref{.OR.}{OP:OR} operator is assumed to exist between each of the \htmlref{CIRCLE}{KEY:CIR}
@@ -1564,9 +1079,9 @@ virtue of being within a keyword region. Consider the following (assuming that
 REGVAL is again supplied equal to 2):
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CIRCLE( 0, 0, 10 ) .AND. .NOT. CIRCLE( 0, 0, 5 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This ARD description will be evaluated by first creating two intermediate masks,
@@ -1580,7 +1095,7 @@ The second intermediate mask is initially set to hold the region \htmlref{CIRCLE
 This means that pixels within the circle are given the value 3 and all others
 are given the value zero. The mask is then inverted to take account of the \htmlref{.NOT.}{OP:NOT}
 operator. Pixels inside the circle which previously held the value 3 are changed
-to zero (indicating that these pixels have {\em not} been selected). Pixels
+to zero (indicating that these pixels have \emph{not} been selected). Pixels
 outside the circle which previously held the value zero are assigned the value 1
 (indicating that these pixels are background pixels).
 
@@ -1611,9 +1126,9 @@ zero or negative. This keyword can be used at any point in an ARD description,
 and can be included any number of times. A simple example of its use could be:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       .NOT. INPUT
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 which inverts the supplied mask. If the ARD description does not include any
@@ -1623,47 +1138,47 @@ for \htmlref{ARD\_WORK}{ARD_WORK} argument CONCAT. For instance, if CONCAT is su
 the ARD description:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       BOX( 0, 0, 10, 10 ) .OR. CIR( 0, 0, 10 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 becomes
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INPUT BOX( 0, 0, 10, 10 ) .OR. CIR( 0, 0, 10 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 There is now no operator between the \htmlref{INPUT}{KEY:INP} and \htmlref{BOX}{KEY:BOX} keywords, and so ARD inserts
 an implicit \htmlref{.OR.}{OP:OR} so that the final ARD description used is:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INPUT .OR. BOX( 0, 0, 10, 10 ) .OR. CIR( 0, 0, 10 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 If the supplied ARD description had started with an operator, for instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       .AND.( BOX( 0, 0, 10, 10 ) .OR. CIR( 0, 0, 10 ) )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 then there would be no need to insert an implicit \htmlref{.OR.}{OP:OR} after the \htmlref{INPUT}{KEY:INP} keyword,
 and so the final used ARD description would be:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INPUT .AND.( BOX( 0, 0, 10, 10 ) .OR. CIR( 0, 0, 10 ) )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 To re-iterate, an \htmlref{INPUT}{KEY:INP} keyword is inserted at the start of the ARD description
-only if the ARD description as supplied contains no \htmlref{INPUT}{KEY:INP} keywords, {\em and}
+only if the ARD description as supplied contains no \htmlref{INPUT}{KEY:INP} keywords, \emph{and}
 the \htmlref{ARD\_WORK}{ARD_WORK} argument CONCAT is supplied .TRUE.. If either of these conditions
 is broken then the ARD description is left as supplied.
 
@@ -1675,7 +1190,7 @@ mask where the selected pixels are located, and only processes pixels in those
 regions. Precisely, ARD maintains a pair of ``bounding boxes'' throughout its
 evaluation of an ARD description. These are referred to as the internal and
 external bounding boxes. Each bounding box is a rectangular region of the mask.
-The internal bounding box contains {\em all} included pixels in the mask, but
+The internal bounding box contains \emph{all} included pixels in the mask, but
 may also contain some excluded pixels. Conversely, the external bounding box
 contains all excluded pixels and may also contain some included pixels.
 
@@ -1689,9 +1204,9 @@ at least be restricted to the region of the internal bounding box. The external
 bounding box can be used in a similar way if the application is only interested
 in excluded pixels.
 
-If {\em all} mask pixels are included (i.e. if there are no excluded pixels)
+If \emph{all} mask pixels are included (i.e. if there are no excluded pixels)
 then the external bounding box will be returned ``null'', and the internal
-bounding box will be returned covering the entire mask. Likewise, if {\em all}
+bounding box will be returned covering the entire mask. Likewise, if \emph{all}
 mask pixels are excluded (i.e. if there are no included pixels) then the
 internal bounding box will be returned ``null'', and the external bounding box
 will be returned covering the entire mask. Null bounding boxes are identified by
@@ -1702,7 +1217,7 @@ bounding box.
 \section{\label{SEC:COORD}\xlabel{ARDCoords}Coordinate Systems}
 ARD\_WORK needs to be able to locate pixels within the given pixel mask.
 To do this, every position supplied in an ARD description must be
-converted into {\em pixel coordinates}. The position of the origin of
+converted into \emph{pixel coordinates}. The position of the origin of
 pixel coordinates within the mask is fixed by the upper and lower bounds
 of the mask supplied to \htmlref{ARD\_WORK}{ARD_WORK}. The conventions
 for pixel coordinates used by Starlink software are described in
@@ -1807,27 +1322,27 @@ STRETCH, SCALE can be used to modify the relationship between the
 coordinate system used within the ARD description and the default
 coordinate system describe above. If any of these statements are found,
 then any earlier COFRAME or WCS statements are ignored, and the requested
-operation (stretch, twist, offset, {\em etc}) is applied to the default
+operation (stretch, twist, offset, \emph{etc}) is applied to the default
 coordinate system described above.
 
 \end{enumerate}
 
 An ARD description can contain zero, one or more of the above WCS-related
-statements. The positions, {\em etc}, defining a given region in the
+statements. The positions, \emph{etc}, defining a given region in the
 description are interpreted using the most recent WCS-related statement.
 Thus, WCS information given later in an ARD description over-rides any
 given earlier.
 
 If any of the deprecated version 1 statements (COEFFS, OFFSET, TWIST,
 STRETCH, SCALE) are found, then any earlier COFRAME or WCS statements are
-ignored, and the requested operation (stretch, twist, offset, {\em etc}) is
+ignored, and the requested operation (stretch, twist, offset, \emph{etc}) is
 applied to the default coordinate system described above. For this
 reason, you should not normally mix the old and the new statements.
 
 \subsection{Coordinate Handling in ARD Prior to Version 2}
 
 ARD version 1 required the transformation between ``user coordinates''
-({\em i.e.} the coordinate system in which positions are supplied in the
+(\emph{i.e.} the coordinate system in which positions are supplied in the
 ARD description) to pixel coordinates to be linear. This linear
 transformation was split up into two components; the application specified
 a linear transformation from pixel coordinates to ``application
@@ -1993,8 +1508,8 @@ list should contain an even number of values; each pair giving the
 user coordinates of a vertex of the polygon. These vertices are joined
 together in the order given to form the polygon. The last vertex is
 joined to the first to close the polygon. This keyword can only be used
-in 2-dimensional ARD descriptions. Note, the edges of a polygon are {\em
-geodesics} within the user coordinate Frame. So, for instance, if user
+in 2-dimensional ARD descriptions. Note, the edges of a polygon are
+\emph{geodesics} within the user coordinate Frame. So, for instance, if user
 coordinates are RA and DEC then the edges of a polygon will correspond to
 great circles on the sky.
 
@@ -2012,7 +1527,7 @@ gives the angle (in degrees) from the first axis of the user coordinate system
 to the first side of the box (positive rotation is from the first to
 the second user axis). This keyword can only be used in 2-dimensional ARD
 Note, the
-edges of a rotated box are {\em geodesics} within the user coordinate
+edges of a rotated box are \emph{geodesics} within the user coordinate
 Frame. So, for instance, if user coordinates are RA and DEC then the
 edges of a rotated box will correspond to great circles on the sky.
 
@@ -2040,19 +1555,19 @@ expression (i.e. included pixels become excluded, and excluded pixels become
 included). A minus sign is recognised as a synonym for .NOT..
 
 \item [\label{OP:AND}.AND.] - Take the intersection of the two regions. A pixel is included
-only if it is within {\em both} of the regions given on either side of the
+only if it is within \emph{both} of the regions given on either side of the
 .AND. field.
 
 \item [\label{OP:OR}.OR.] - Take the union of the two regions. A pixel is included if it is
-within {\em either} of the regions given on either side of the .OR. field.
+within \emph{either} of the regions given on either side of the .OR. field.
 
 \item [\label{OP:XOR}.XOR.] - Take the exclusive OR of the two regions. A pixel is included if
 it is within one, but not both, of the regions given on either side of the .XOR.
 field.
 
 \item [\label{OP:EQV}.EQV.] - Take the equivalence of the two regions. A pixel is included if
-it is within {\em both} of the regions given on either side of the .EQV. field,
-or if it is within {\em neither}.
+it is within \emph{both} of the regions given on either side of the .EQV. field,
+or if it is within \emph{neither}.
 
 \end{description}
 
@@ -2080,7 +1595,7 @@ compatible DIMENSION statements. Note, N gives the number of dimensions
 in the user co-ordinate system; this may not necessaily be the saem as
 the number of pixel axes in the mask array.
 
-\item [\label{ST:COE}COEFFS( C1, C2, ... )] - {\bf DEPRECATED. Use the COFRAME or WCS statement instead.} This establishes
+\item [\label{ST:COE}COEFFS( C1, C2, ... )] - \textbf{DEPRECATED. Use the COFRAME or WCS statement instead.} This establishes
 a new linear mapping from user coordinates to application coordinates
 replacing any previous mapping (see Section \ref{SEC:COORD}). The
 statement must have $N*(N+1)$ arguments. If ($X_{1}$, $X_{2}$, $X_{3}$, ...,
@@ -2103,7 +1618,7 @@ coordinates. The \htmlref{OFFSET}{ST:OFF}, \htmlref{SCALE}{ST:SCALE}, \htmlref{T
 mappings to be created without the use of COEFF statement in certain cases.
 
 \item [\label{ST:COFRAME}COFRAME(DOMAIN,...)] - Specifies the user
-coordinate system ({\em i.e.} the coordinate system in which positions
+coordinate system (\emph{i.e.} the coordinate system in which positions
 are supplied within the remainder of the ARD description). The first
 argument is the Domain of the coordinate system. There are several
 special values that causes specialised AST objects to be created to
@@ -2121,11 +1636,11 @@ will be created.
 \end{itemize}
 
 Any other Domain value will cause a simple AST Frame to be created
-instead. Any subsequent arguments should be of the form {\tt
-<keyword>=<value>} where {\tt <keyword>} is the name of an AST attribute
-and {\tt <value>} is the value to assign to the attribute.
+instead. Any subsequent arguments should be of the form \texttt{
+<keyword>=<value>} where \texttt{ <keyword>} is the name of an AST attribute
+and \texttt{ <value>} is the value to assign to the attribute.
 
-\item [\label{ST:OFF}OFFSET( X, Y, Z, ... )] - {\bf DEPRECATED. Use the COFRAME or WCS statement instead.} This modifies the current mapping
+\item [\label{ST:OFF}OFFSET( X, Y, Z, ... )] - \textbf{DEPRECATED. Use the COFRAME or WCS statement instead.} This modifies the current mapping
 from user coordinates to application coordinates so that the origin of the
 user coordinate system is moved by the given offsets in application
 coordinates. The initial position for the origin of user coordinates is
@@ -2134,20 +1649,20 @@ would put the origin at (10,15) in the application coordinates system. A second
 statement OFFSET(2,3) would move it to (12,18). The statement must have $N$
 arguments.
 
-\item [\label{ST:SCA}SCALE( F )] - {\bf DEPRECATED. Use the COFRAME or WCS statement instead.} This modifies the current mapping from user coordinates to
+\item [\label{ST:SCA}SCALE( F )] - \textbf{DEPRECATED. Use the COFRAME or WCS statement instead.} This modifies the current mapping from user coordinates to
 application coordinates so that the user coordinate system is magnified by the
 given factor F along all axes. The magnification is centred on the origin of the
 application coordinate system.
 
-\item [\label{ST:STR}STRETCH( F1, F2, F3, ... )] - {\bf DEPRECATED. Use the COFRAME or WCS statement instead.} This modifies the current mapping from user
+\item [\label{ST:STR}STRETCH( F1, F2, F3, ... )] - \textbf{DEPRECATED. Use the COFRAME or WCS statement instead.} This modifies the current mapping from user
 coordinates to application coordinates so that the user coordinate system is
 magnified by the given factor $F_{i}$ along axis $i$. Unlike the SCALE
-statement, the magnifications are centred on the origin of the {\em user}
+statement, the magnifications are centred on the origin of the \emph{user}
 coordinate system (i.e. the position of the origin of the user coordinate
 system within the application coordinate system is not changed by this
 statement). The statement must have $N$ arguments.
 
-\item [\label{ST:TWI}TWIST( T )] - {\bf DEPRECATED. Use the COFRAME or WCS statement instead.} This statement modifies the current mapping from user
+\item [\label{ST:TWI}TWIST( T )] - \textbf{DEPRECATED. Use the COFRAME or WCS statement instead.} This statement modifies the current mapping from user
 coordinates to application coordinates so that the user coordinate system is
 rotated by an angle T (in degrees). The rotation is about the origin of the
 application coordinate system. If the ARD description has more than 2
@@ -2157,17 +1672,17 @@ axis to the Y axis is positive. ``TWIST'' is used rather than the more obvious
 \htmlref{ROTBOX}{KEY:ROT}.
 
 \item [\label{ST:WCS}WCS(...)] - Specifies an AST FrameSet in which the
-current Frame is the user coordinate system ({\em i.e.} the coordinate
+current Frame is the user coordinate system (\emph{i.e.} the coordinate
 system in which positions are supplied within the remainder of the ARD
 description). The ``argument list'' should be a textual dump of an AST
-FrameSet as produced by the AST Channel class ({\em e.g.} using the
+FrameSet as produced by the AST Channel class (\emph{e.g.} using the
 AST\_SHOW routine). Each line of the dump should be stored as a separate
 GRP element in the supplied ARD expression - the simplest way to do this
 is probably to supply the ARD description within a text file, and put
 each line of the dump on a separate line in the file:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
    WCS(<!!
        Begin FrameSet
        IsA Frame
@@ -2176,7 +1691,7 @@ each line of the dump on a separate line in the file:
        ...
        End FrameSet
    !!>)
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The \verb+<!!+ and \verb+!!>+ strings tell GRP to treat the enclosed text as
@@ -2194,7 +1709,7 @@ commands should be used (see \xref{SUN/144}{sun144}{}):
 \verb#      % alink adamprog.f -L/star/lib# `\verb#ard_link_adam#`
 \normalsize
 
-(note the use of {\em opening} apostrophes (`) rather than
+(note the use of \emph{opening} apostrophes (`) rather than
 closing apostrophe (') ). To compile and link a stand-alone UNIX application with
 the ARD package, the following commands should be used:
 
@@ -2244,7 +1759,7 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
       An ARD description is obtained from the environment using the
       supplied parameter name and stored in a group identified by the
       returned value of IGRP2. If the last character in the ARD
-      description is a minus sign ({\tt "}-{\tt "}) then the parameter value is
+      description is a minus sign (\texttt{ "}-\texttt{ "}) then the parameter value is
       then cancelled and further ARD descriptions are obtained and
       appended to the returned group. This process continues until an
       ARD description is supplied which does not end with a minus
@@ -2344,7 +1859,7 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
          FLAG = LOGICAL (Returned)
       }{
          Returned .TRUE. if the last non-blank character in the
-         supplied ARD description is a minus sign ({\tt "}-{\tt "}).
+         supplied ARD description is a minus sign (\texttt{ "}-\texttt{ "}).
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -2554,7 +2069,7 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
       }{
          The Domain name corresponding to pixel coordinates within the
          mask array passed to routine ARD\_WORK. If a blank value is
-         supplied, {\tt "}PIXEL{\tt "} will be used. The IWCS FrameSet (if supplied)
+         supplied, \texttt{ "}PIXEL\texttt{ "} will be used. The IWCS FrameSet (if supplied)
          must contain a Frame with this Domain. If the supplied string is
          longer than 40 characters, the trailing characters are ignored.
       }
