@@ -1,547 +1,44 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {48.8}
-\newcommand{\stardocauthors}   {Nicholas Eaton\\Brian McIlwrath}
-\newcommand{\stardocdate}      {24 April 2013}
-\newcommand{\stardoctitle}     {AGI --- Applications Graphics Interface
-                                Library}
-%\\[2.5ex]
-%                                A Subroutine Library for Accessing the\\
-%                                Graphics Database}
-\newcommand{\stardocversion}   {Version 2.2}
-\newcommand{\stardocmanual}    {Programmer's Manual}
-\newcommand{\stardocabstract}  {}
+\stardocnumber      {48.8}
+\stardocauthors     {Nicholas Eaton\\Brian McIlwrath}
+\stardocdate        {24 April 2013}
+\stardoctitle   {AGI --- Applications Graphics Interface Library}
+\stardocversion     {Version 2.2}
+\stardocmanual      {Programmer's Manual}
+\stardoccopyright {Copyright \copyright 2000, Central Laboratory of the Research Councils}
+
+\stardocabstract {
+  AGI is a graphics database system that can be used to store
+  information about the size and position of a plot on a graphics
+  device. This document explains how to interact with this database
+  using the AGI library.
+}
+\startitlepic{\input{sun48a}}
 % ? End of document identification
 % -----------------------------------------------------------------------------
 
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
 % -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-\newcommand{\noteroutine}[2]{\textbf{#1}\hspace*{\fill}\nopagebreak \\
+% ? Document specific \providecommand or \newenvironment commands.
+\providecommand{\noteroutine}[2]{\textbf{#1}\hspace*{\fill}\nopagebreak \\
                              \hspace*{3em}\emph{#2}\hspace*{\fill}\par}
 
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
 % ? End of document specific commands
-%.
 % -----------------------------------------------------------------------------
-%  Title Page.
-%  ===========
-\renewcommand{\thepage}{\roman{page}}
+
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-   \input{sun48a.tex}
-
-% ? Heading for abstract if used.
-%   \vspace{10mm}
-%   \begin{center}
-%      {\Large\textbf{Abstract}}
-%   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-%  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-%
-% ? Copyright statement
-%
-\vfill
-Copyright \copyright 2000, Central Laboratory of the Research Councils
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 % ? Main text
 
@@ -813,9 +310,9 @@ database, such as KAPPA:DISPLAY. Note that, as this example uses
 PGPLOT, it can be linked with either the GKS-based AGI library or the
 native-PGPLOT AGP library. However Starlink policy is that GKS is
 being phased out and so all new production applications should be
-linked with the {\bf AGP} library as described \hyperref{here}{in
+linked with the {\bf AGP} library as described \slhyperref{here}{in
 Section~}{}{linking}.
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PPLOT( STATUS )
       INCLUDE 'SAE_PAR'
       INTEGER I, ID1, ID2, N, STATUS
@@ -850,10 +347,10 @@ Section~}{}{linking}.
 
   99  CONTINUE
       END
-\end{verbatim}
+\end{terminalv}
 The program requires an interface file to define the DEVICE parameter.
 The following example will do the job:-
-\begin{verbatim}
+\begin{terminalv}
 interface PPLOT
    parameter DEVICE
       access 'READ'
@@ -861,7 +358,7 @@ interface PPLOT
       prompt 'Display device '
    endparameter
 endinterface
-\end{verbatim}
+\end{terminalv}
 
 {\bf Program notes:}
 \begin{enumerate}
@@ -879,7 +376,7 @@ routines. This also tidies up any picture identifiers returned from AGI
 routines, and in this example cancels the parameter association.
 \end{enumerate}
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PCURS( STATUS )
       INCLUDE 'SAE_PAR'
       INTEGER ID, STATUS
@@ -905,7 +402,7 @@ routines, and in this example cancels the parameter association.
 
   99  CONTINUE
       END
-\end{verbatim}
+\end{terminalv}
 
 {\bf Program notes:}
 \begin{enumerate}
@@ -931,7 +428,7 @@ is performed separately from the opening and closing of the database
 \footnote{There are routines, such as {\bf AGP\_ASSOC} and {\bf AGP\_DEASS},
 which package both operations in one unit.}.
 The following simplified block diagram illustrates this operation.
-\begin{verbatim}
+\begin{terminalv}
           OPEN AGI ( e.g. AGI_ASSOC )
 
              OPEN the graphics package ( e.g. AGP_ACTIV )
@@ -940,7 +437,7 @@ The following simplified block diagram illustrates this operation.
              CLOSE the graphics package ( e.g. AGP_DEACT )
 
           CLOSE AGI ( e.g. AGI_CANCL )
-\end{verbatim}
+\end{terminalv}
 
 The first step of opening the database is done by calling either
 \htmlref{{\bf AGI\_ASSOC}}{AGI_ASSOC} or
@@ -948,9 +445,9 @@ The first step of opening the database is done by calling either
 {\bf AGI\_ASSOC} is used in ADAM
 tasks and obtains the name of the device through the ADAM parameter
 system.
-\begin{verbatim}
+\begin{terminalv}
           CALL AGI_ASSOC( PARAM, ACMODE, PICID, STATUS )
-\end{verbatim}
+\end{terminalv}
 PARAM is the name of the parameter in the ADAM interface file through
 which the device name is to be obtained. It should be stressed that
 {\bf AGI\_ASSOC} does not open the specified device for plotting, it
@@ -973,15 +470,15 @@ This `BASE' picture will fill the display area and will be created with a
 default world coordinate system, in the same way as the SGS base zone.
 
 \htmlref{{\bf AGI\_OPEN}}{AGI_OPEN} is used in non-ADAM tasks.
-\begin{verbatim}
+\begin{terminalv}
           CALL AGI_OPEN( WKNAME, ACMODE, PICID, STATUS )
-\end{verbatim}
+\end{terminalv}
 WKNAME is the device name. The other arguments are the same as those in
 {\bf AGI\_ASSOC}.
 
 The given device name, whether passed through the parameter system or the
 argument list, should obey the syntax rules described
-\hyperref{here}{in the next Section~(}{)}{devnames}.
+\slhyperref{here}{in the next Section~(}{)}{devnames}.
 
 Devices with windowing capabilities allow the user to change the size of the
 display window between applications. This has a detrimental affect on AGI
@@ -989,10 +486,10 @@ because the size of the base picture, and the relationship between pictures
 changes. Rather than considering this an error status, which could terminate
 an application, AGI deletes all the pictures on this device, creates a
 new base picture and sends the following message to the user.
-\begin{verbatim}
+\begin{terminalv}
 Display has changed size.
 Deleting previous database entries.
-\end{verbatim}
+\end{terminalv}
 This allows any application that can continue from such a situation to do so.
 For instance it is sensible to allow a display application that uses the
 current picture for output to continue in this situation. In this case, after
@@ -1031,8 +528,8 @@ Logic has been incorporated into the AGP library to perform this name
 translation process.
 Also in AGP typing a single ? for the device name will list all the possible
 translations. At the time of writing this document these were (but see also
-section \hyperref{this section}{Section~}{}{aps}):
-\begin{verbatim}
+section \slhyperref{this section}{Section~}{}{aps}):
+\begin{terminalv}
 gif_l     (/GIF)           GIF-format file, landscape
 gif_p     (/VGIF)          GIF-format file, portrait
 hpgl_l    (/HPGL)          Hewlett-Packard HP-GL plotters, landscape
@@ -1056,7 +553,7 @@ xwindows  (xwindows/GWM)   Starlink GWM xwindow
 x2windows (xwindows2/GWM)  Starlink GWM xwindow
 x3windows (xwindows3/GWM)  Starlink GWM xwindow
 x4windows (xwindows4/GWM)  Starlink GWM xwindow
-\end{verbatim}
+\end{terminalv}
 
 As an example of the overall effect native-PGPLOT graphics
 specifications of {\tt xwindows/gwm}, {\tt \//gwm} or {\tt xwindows}
@@ -1096,7 +593,7 @@ Once a picture is no longer required it is good practice to release it using
 \htmlref{{\bf AGI\_ANNUL}}{AGI_ANNUL}
  which liberates internal workspace. Picture identifiers
 can be automatically released by using a begin-end block (see
-\hyperref{this section}{Section~}{}{bend}).
+\slhyperref{this section}{Section~}{}{bend}).
 
 \subsection{Closing the Database}
 
@@ -1155,7 +652,7 @@ the corresponding {\bf AGI\_BEGIN} was called (since the database had
 not been opened) the negative argument in {\bf AGI\_END} has no effect
 in this case, and the picture that was current just before the call to
 {\bf AGI\_END} remains current.
-\begin{verbatim}
+\begin{terminalv}
     *   Begin an AGI scope
           CALL AGI_BEGIN
 
@@ -1167,7 +664,7 @@ in this case, and the picture that was current just before the call to
 
     *   Annul identifiers and close the database
           CALL AGI_END( -1, STATUS )
-\end{verbatim}
+\end{terminalv}
 In the second example {\bf AGI\_BEGIN} is put after {\bf AGI\_ASSOC}.
 When {\bf AGI\_END} is called the identifier returned from
 \htmlref{{\bf AGI\_ASSOC}}{AGI_ASSOC}
@@ -1175,7 +672,7 @@ is not annulled, since it is outside the scope of the begin-end block.
 The negative argument in {\bf AGI\_END} makes the picture that was current
 when the corresponding {\bf AGI\_BEGIN} was called current again (in this
 example the picture that was current when the application began).
-\begin{verbatim}
+\begin{terminalv}
     *   Open AGI on a device obtained from the parameter system
           CALL AGI_ASSOC( 'DEVICE', 'WRITE', ID, STATUS )
 
@@ -1191,7 +688,7 @@ example the picture that was current when the application began).
 
     *   Annul the initial identifier and close the database
           CALL AGI_ANNUL( ID, STATUS )
-\end{verbatim}
+\end{terminalv}
 
 \subsection{The Database file}
 
@@ -1242,10 +739,10 @@ PICID returns the identifier for the new picture in the database.
 There is one routine, \htmlref{{\bf AGI\_NUPIC}}{AGI_NUPIC},
 that allows new pictures to be created
 in the database without necessarily opening a graphics package first.
-\begin{verbatim}
+\begin{terminalv}
           CALL AGI_NUPIC( WX1, WX2, WY1, WY2, PNAME, COMENT,
          :                NEWX1, NEWX2, NEWY1, NEWY2, PICID, STATUS )
-\end{verbatim}
+\end{terminalv}
 WX1, WX2, WY1, WY2 define the rectangular extent of the new picture in terms of
 the world coordinates of the current picture.
 PNAME and COMENT describe the picture as discussed in the following
@@ -1298,8 +795,8 @@ than any picture being sought as the current one. The base picture is
 the most convenient as this is larger than any picture in the database.
 The following example shows how to search backwards through the database
 for a picture with a particular label (labels are discussed in
-\hyperref{this section}{Section~}{}{lab}).
-\begin{verbatim}
+\slhyperref{this section}{Section~}{}{lab}).
+\begin{terminalv}
     *   Get an identifier for the base picture and select it as current.
           CALL AGI_IBASE( BASEID, STATUS )
           CALL AGI_SELP( BASEID, STATUS )
@@ -1323,7 +820,7 @@ for a picture with a particular label (labels are discussed in
     *   Inquire the label of this picture
              CALL AGI_ILAB( PICID, PLABEL, STATUS )
           ENDDO
-\end{verbatim}
+\end{terminalv}
 
 \subsection{The root picture}
 For devices that allow the memories to be scrolled independently there is
@@ -1353,7 +850,7 @@ and from bottom to top. If the required coordinate system does not correspond
 to these rules then the user should choose a basic world coordinate system
 that does obey them, and then define a transformation to go to and from
 the basic system and the required one (see
-\hyperref{this section}{the section on transformations~}{}{tran}).
+\slhyperref{this section}{the section on transformations~}{}{tran}).
 
 When a picture is created with one of the package interface routines the
 current world coordinates of the graphics zone are stored in the database.
@@ -1507,7 +1004,7 @@ $x = r \cos( \theta )$ and $y = r \sin( \theta )$.
 The inverse transformation is defined by the equations
 $r = \sqrt{x^2+y^2}$ and $\theta = \tan^{-1}(y/x)$.
 These are formulated in a program in the following way.
-\begin{verbatim}
+\begin{terminalv}
     *   Define the number of input ( data ) and output ( world ) variables
     *   Note: This should be 2 for each transformation.
           INTEGER NCD, NCW
@@ -1523,7 +1020,7 @@ These are formulated in a program in the following way.
     *   Assign the world to data transformation functions
           WTOD( 1 ) = 'R = SQRT( X * X + Y * Y )'
           WTOD( 2 ) = 'THETA = ATAN2( Y, X )'
-\end{verbatim}
+\end{terminalv}
 
 The transformation is then stored in the database using the routine
 \htmlref{{\bf AGI\_TNEW}}{AGI_TNEW}.
@@ -1588,9 +1085,9 @@ application may need to cope with the situation of a corrupted structure.
 
 The MORE structure is accessed for reading and writing using the routine
 {\bf AGI\_MORE}
-\begin{verbatim}
+\begin{terminalv}
           CALL AGI_MORE( PICID, ACMODE, MORLOC, STATUS )
-\end{verbatim}
+\end{terminalv}
 The access mode (ACMODE) controls the action of this routine. If the mode
 is 'WRITE' then an HDS locator to an empty MORE structure is returned. If
 there was no previous MORE structure then one is created, and if there was
@@ -1614,9 +1111,9 @@ The AGI database is useful in two basic contexts. The first is to pass
 information between separate applications that may or may not be
 plotting on the device with the same graphics package. An example of two
 independent PGPLOT based applications has been given
-\hyperref{earlier}{in Section~}{}{exam} while the use of the database file
+\slhyperref{earlier}{in Section~}{}{exam} while the use of the database file
 to allow native-PGPLOT based applications to interact with GKS-based
-applications is described \hyperref{here}{in Section~}{}{devnames}.
+applications is described \slhyperref{here}{in Section~}{}{devnames}.
 For applications using the {\bf AGI} GKS-based library a second use is
 to allow different graphics packages to interact within a single
 application, for example by using SGS to draw on top of an image
@@ -1632,7 +1129,7 @@ beyond the limits of another.
 
 The following simplified block diagram illustrates the recommended operation
 of AGI and two graphics packages within one application.
-\begin{verbatim}
+\begin{terminalv}
           OPEN AGI ( e.g. AGI_ASSOC )
 
              OPEN the first graphics package ( e.g. AGD_ACTIV )
@@ -1646,16 +1143,16 @@ of AGI and two graphics packages within one application.
              CLOSE the second graphics package ( e.g. AGS_DEACT )
 
           CLOSE AGI ( e.g. AGI_CANCL )
-\end{verbatim}
+\end{terminalv}
 
 \subsection{Interface to PGPLOT}
 
-As described \hyperref{previously}{in Section~}{}{descript} versions
+As described \slhyperref{previously}{in Section~}{}{descript} versions
 of the PGPLOT interface routines with prefix {\bf AGP\_} exist in two
 libraries. The {\bf AGI} library includes these and SGS routines based
 on GKS graphics together with IDI routines. The {\bf AGP} library is
 designed to only interface to native-PGPLOT and has its own link
-commands described \hyperref{here}{in Section~}{}{linking}. The {\bf
+commands described \slhyperref{here}{in Section~}{}{linking}. The {\bf
 AGP\_} routines have indentical names and argument lists for both
 libraries. Note, however, that the {\bf AGP} library does {\bf not}
 support the concept of PGPLOT plotting into an SGS zone.
@@ -1703,7 +1200,7 @@ The following code segment gives an example of an application that
 creates a viewport that matches the size of the current picture if the
 overlay flag is true, or creates a viewport with a border for annotation
 if the overlay flag is false.
-\begin{verbatim}
+\begin{terminalv}
     *   Open AGI on a device obtained from the parameter system.
     *   Do not clear the viewport if overlay mode is requested.
           IF ( OVER ) THEN
@@ -1736,12 +1233,12 @@ if the overlay flag is false.
           ELSE
              CALL AGP_NVIEW( .TRUE., STATUS )
           ENDIF
-\end{verbatim}
+\end{terminalv}
 
 The next piece of code shows how the viewport and frame from the previous
 example can be stored in the database as pictures. If the overlay mode has
 been used then the viewport and associated frame will be the same size.
-\begin{verbatim}
+\begin{terminalv}
     *   Select the picture within which the viewport was created
     *   and inquire its world coordinates
           CALL AGI_SELP( ID1, STATUS )
@@ -1755,7 +1252,7 @@ been used then the viewport and associated frame will be the same size.
 
     *   Save the current viewport as the data picture
           CALL AGP_SVIEW( 'DATA', 'Data picture', VID, STATUS )
-\end{verbatim}
+\end{terminalv}
 
 There are wrap-up routines to open and close AGI and PGPLOT within the
 ADAM environment using single calls. The sequence of calls {\bf AGI\_ASSOC},
@@ -1775,7 +1272,7 @@ is initialised while SGS is still open. This is the only situation where
 AGI allows more than one graphics package to be open at one time.
 The following simplified program section illustrates the opening of
 PGPLOT from within an SGS zone.
-\begin{verbatim}
+\begin{terminalv}
     *   Open AGI and SGS on a device obtained from the parameter system
           CALL AGS_ASSOC( 'DEVICE', 'WRITE', ID, IZONE, STATUS )
 
@@ -1792,7 +1289,7 @@ PGPLOT from within an SGS zone.
     *   Close down PGPLOT, SGS and AGI
           CALL AGP_DEACT( STATUS )
           CALL AGS_DEASS( 'DEVICE', .TRUE., STATUS )
-\end{verbatim}
+\end{terminalv}
 
 Note that when using the AGP routines to open PGPLOT in the current SGS
 zone it is essential that SGS has been opened using the AGS routines.
@@ -1837,7 +1334,7 @@ AGS\_ routines.
 
 The first example shows how an application might save an SGS zone in the
 database.
-\begin{verbatim}
+\begin{terminalv}
     *   Obtain the device name from the ADAM parameter system
           CALL AGI_ASSOC( 'DEVICE', 'WRITE', ID1, STATUS )
           CALL AGI_BEGIN
@@ -1856,14 +1353,14 @@ database.
           CALL AGS_DEACT( STATUS )
           CALL AGI_END( -1, STATUS )
           CALL AGI_CANCL( 'DEVICE', STATUS )
-\end{verbatim}
+\end{terminalv}
 
 The second example shows how another application could recreate a zone,
 perhaps to overlay one plot with another, or to obtain coordinates with
 a cursor. It assumes that the current picture in the database is the one
 that is wanted. If this is not the case the recall routines can be used
 to search the database for the correct picture.
-\begin{verbatim}
+\begin{terminalv}
     *   Obtain the device name from the ADAM parameter system
     *   Use update mode to ensure the original plot is not cleared
           CALL AGI_ASSOC( 'DEVICE', 'UPDATE', ID1, STATUS )
@@ -1881,7 +1378,7 @@ to search the database for the correct picture.
           CALL AGS_DEACT( STATUS )
           CALL AGI_END( -1, STATUS )
           CALL AGI_CANCL( 'DEVICE', STATUS )
-\end{verbatim}
+\end{terminalv}
 
 These examples show that the AGI operations of accessing the database and
 opening the graphics package are common to both applications. These
@@ -1897,7 +1394,7 @@ ADAM interface. If the application is using the non-ADAM routines
 {\bf AGI\_OPEN} and {\bf AGI\_CLOSE} then the sequence of calls has to
 be made explicitly. Using these wrap-up routines then second application
 above would become
-\begin{verbatim}
+\begin{terminalv}
     *   Obtain the device name from the ADAM parameter system and open
     *   SGS on the given device
           CALL AGS_ASSOC( 'DEVICE', 'UPDATE', ' ', ID1, IZONE, STATUS )
@@ -1907,7 +1404,7 @@ above would become
 
     *   Close down
           CALL AGS_DEASS( 'DEVICE', .TRUE., STATUS )
-\end{verbatim}
+\end{terminalv}
 The third (picture name) argument in {\bf AGS\_ASSOC} can optionally be
 used to recall the last picture of the given name using \htmlref{{\bf AGI\_RCL}}{AGI_RCL}.
 If the name string is blank (as in the example above) then this recall
@@ -1926,12 +1423,12 @@ wrong and requests that the plot be redrawn in the new colours.
 By default this request does not happen immediately but is deferred until
 closedown. An application can force the update to happen immediately by
 setting the deferral mode:
-\begin{verbatim}
+\begin{terminalv}
     *   Set the GKS deferral mode to 'ASAP'
           CALL SGS_ICURW( IWKID )
           CALL GSDS( IWKID, 0, 1 )
 
-\end{verbatim}
+\end{terminalv}
 
 \subsection{Interface to IDI -- ({\bf AGI} library only)}
 
@@ -1970,7 +1467,7 @@ will save such a window as a picture in the
 database. The following code segment shows how a transfer window which has
 been set up to load an image into a memory can be saved as a picture in the
 database.
-\begin{verbatim}
+\begin{terminalv}
     *   Set up the transfer window defined by XSIZE, YSIZE, XOFF, YOFF
     *   to match the size of the image NX * NY
           XSIZE = NX
@@ -1985,7 +1482,7 @@ database.
           CALL AGD_SWIND( DISPID, MEMID, XSIZE, YSIZE, XOFF, YOFF,
          :                'DATA', 'IDI transfer window', 0.0, REAL( NX ),
          :                 0.0, REAL( NY ), ID, STATUS )
-\end{verbatim}
+\end{terminalv}
 As usual when creating a picture in the database if this new picture lies
 outside the current picture an error status is returned.
 
@@ -2006,7 +1503,7 @@ the picture. The transfer window is set up so that the bottom left corner
 of the image is aligned with the bottom left corner of the picture, but the
 size of the transfer window is defined by the size of the image and not the
 size of the picture.
-\begin{verbatim}
+\begin{terminalv}
     *   Get the size of the current picture from the database
           CALL AGD_NWIND( DISPID, MEMID, XSIZE, YSIZE, XOFF, YOFF, STATUS )
 
@@ -2021,7 +1518,7 @@ size of the picture.
              NPIX = NX * NY
              CALL IIMWMY( DISPID, MEMID, ADATA, NPIX, 8, 1, 0, 0, STATUS )
           ENDIF
-\end{verbatim}
+\end{terminalv}
 There is a slight difference between the definition of an IDI window and
 a picture in the database due to the former being stored as integers and
 the latter being stored as floating point numbers. This does not matter
@@ -2106,7 +1603,7 @@ changes on disk. Combined with these ``accumulating'' Postscript devices,
 this provides a scheme that is similar to the use of a traditional
 persistent X-window device. A typical scenario could be:
 
-\begin{verbatim}
+\begin{terminalv}
    % rm pgplot.ps
    % kappa
    % gdset /acps
@@ -2119,7 +1616,7 @@ persistent X-window device. A typical scenario could be:
    % linplot clear=no $KAPPA_DIR/m31'(,140)' style='+colour=red'
    % picsel a3
    % display $KAPPA_DIR/m57 accept
-\end{verbatim}
+\end{terminalv}
 
 The {\tt okular} display will update as each KAPPA command adds additional
 pictures into the {\tt pgplot.ps} file. Some notes:
@@ -2139,28 +1636,28 @@ containing the program source code with the command:
 agi\_dev}
 \end{quote}
 and use and include statement such as:
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'AGI_ERR'
       INCLUDE 'AGI_PAR'
-\end{verbatim}
+\end{terminalv}
 
 
 For programs in the ADAM environment one of the the shell scripts
 {\tt agi\_link\_adam} or {\tt agp\_link\_adam}
 should be used. For example to compile and link an ADAM task called `task.f'
 which is designed to use PGPLOT only the following is used:
-\begin{verbatim}
+\begin{terminalv}
           % alink task.f `agp_link_adam`
-\end{verbatim}
+\end{terminalv}
 (note the use of the backward quotes).
 
 A standalone program is linked by specifying one of {\tt `agi\_link`}
 or {\tt `agp\_link`} on the compiler
 command line. Thus to compile and link a standalone application called
 `prog.f' which, this time, uses GKS based graphics the following is used:
-\begin{verbatim}
+\begin{terminalv}
           % f77 prog.f -o prog `agi_link`
-\end{verbatim}
+\end{terminalv}
 
 \newpage
 
