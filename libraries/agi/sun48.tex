@@ -68,19 +68,19 @@ applications.
 The AGI database system implementation has changed in the current
 version. It now exists as two subroutine libraries -- one, which is
 unchanged from earlier versions, to handle all graphics interactions
-where GKS is the underlying graphics package (the {\bf AGI} library)
-and a new library which interfaces to native PGPLOT only (the {\bf
-AGP} library). In both these libraries the routines are split into two
+where GKS is the underlying graphics package (the \textbf{AGI} library)
+and a new library which interfaces to native PGPLOT only (the
+\textbf{AGP} library). In both these libraries the routines are split into two
 functional types. One set of routines deals with the manipulation of,
 and navigation around, the database; these routines are prefixed with
-{\bf AGI\_}. The other set of routines provides an interface between
+\textbf{AGI\_}. The other set of routines provides an interface between
 the database and the graphics package used by the application. In the
-AGI library these routines are prefixed {\bf AGS\_} if the
-graphics package is SGS (\xref{SUN/85}{sun85}{}), {\bf AGP\_} if the
-package is GKS-based PGPLOT (\xref{SUN/15}{sun15}{}) and {\bf AGD\_}
+AGI library these routines are prefixed \textbf{AGS\_} if the
+graphics package is SGS (\xref{SUN/85}{sun85}{}), \textbf{AGP\_} if the
+package is GKS-based PGPLOT (\xref{SUN/15}{sun15}{}) and \textbf{AGD\_}
 if the package is IDI (\xref{SUN/65}{sun65}{}). The new AGP
 library only interfaces to native PGPLOT (\xref{SUN/15}{sun15}{}) and
-so only contains those  graphics routines prefixed with {\bf AGP\_}. The two
+so only contains those  graphics routines prefixed with \textbf{AGP\_}. The two
 libraries can create identical database files on disk and thus new
 native-PGPLOT applications can be arranged to co-exist with older
 applications based on GKS. Current Starlink policy is that GKS is
@@ -93,7 +93,7 @@ information about the coordinate system in use when the picture was
 created. Pictures are usually created in the database by one of the
 interface routines specific to a particular graphics package. For
 instance the routine
-\htmlref{{\bf AGS\_SZONE}}{AGS_SZONE} will save the extent and coordinate
+\htmlref{\textbf{AGS\_SZONE}}{AGS_SZONE} will save the extent and coordinate
 system of the current SGS zone as a picture in the database. However
 pictures in the database are independent of the graphics package that
 created them. This means that, for example, a picture created by one
@@ -310,7 +310,7 @@ database, such as KAPPA:DISPLAY. Note that, as this example uses
 PGPLOT, it can be linked with either the GKS-based AGI library or the
 native-PGPLOT AGP library. However Starlink policy is that GKS is
 being phased out and so all new production applications should be
-linked with the {\bf AGP} library as described \slhyperref{here}{in
+linked with the \textbf{AGP} library as described \slhyperref{here}{in
 Section~}{}{linking}.
 \begin{terminalv}
       SUBROUTINE PPLOT( STATUS )
@@ -360,9 +360,9 @@ interface PPLOT
 endinterface
 \end{terminalv}
 
-{\bf Program notes:}
+\textbf{Program notes:}
 \begin{enumerate}
-\item[1.] The routine \htmlref{{\bf AGP\_ASSOC}}{AGP_ASSOC}
+\item[1.] The routine \htmlref{\textbf{AGP\_ASSOC}}{AGP_ASSOC}
  is used to access the database and
 open PGPLOT. It is a wrap-up routine for a number of commonly called AGI
 functions. The mode is set to 'WRITE' so that the plotting area is cleared
@@ -404,15 +404,15 @@ routines, and in this example cancels the parameter association.
       END
 \end{terminalv}
 
-{\bf Program notes:}
+\textbf{Program notes:}
 \begin{enumerate}
-\item[4.] The mode argument in {\bf AGP\_ASSOC} is set to 'READ' to ensure
+\item[4.] The mode argument in \textbf{AGP\_ASSOC} is set to 'READ' to ensure
 that the plot is not cleared. The name argument specifies that the last
 picture of type DATA should be recalled.
 The border argument is set false to ensure that the PGPLOT viewport is
 created to exactly match the DATA picture.
-\item[5.] The call to \htmlref{{\bf AGI\_END}}{AGI_END}
-within \htmlref{{\bf AGP\_DEASS}}{AGP_DEASS} resets the
+\item[5.] The call to \htmlref{\textbf{AGI\_END}}{AGI_END}
+within \htmlref{\textbf{AGP\_DEASS}}{AGP_DEASS} resets the
 current picture to be the one current when the application began.
 \end{enumerate}
 
@@ -425,7 +425,7 @@ no specific graphics system is associated with the database.
 When it is required to display something on a device, a graphics package
 is selected and the plotting done. The opening and closing of the package
 is performed separately from the opening and closing of the database
-\footnote{There are routines, such as {\bf AGP\_ASSOC} and {\bf AGP\_DEASS},
+\footnote{There are routines, such as \textbf{AGP\_ASSOC} and \textbf{AGP\_DEASS},
 which package both operations in one unit.}.
 The following simplified block diagram illustrates this operation.
 \begin{terminalv}
@@ -440,9 +440,9 @@ The following simplified block diagram illustrates this operation.
 \end{terminalv}
 
 The first step of opening the database is done by calling either
-\htmlref{{\bf AGI\_ASSOC}}{AGI_ASSOC} or
-\htmlref{{\bf AGI\_OPEN}}{AGI_OPEN}.
-{\bf AGI\_ASSOC} is used in ADAM
+\htmlref{\textbf{AGI\_ASSOC}}{AGI_ASSOC} or
+\htmlref{\textbf{AGI\_OPEN}}{AGI_OPEN}.
+\textbf{AGI\_ASSOC} is used in ADAM
 tasks and obtains the name of the device through the ADAM parameter
 system.
 \begin{terminalv}
@@ -450,10 +450,10 @@ system.
 \end{terminalv}
 PARAM is the name of the parameter in the ADAM interface file through
 which the device name is to be obtained. It should be stressed that
-{\bf AGI\_ASSOC} does not open the specified device for plotting, it
+\textbf{AGI\_ASSOC} does not open the specified device for plotting, it
 opens the database entry for that device. The opening of the device for
 plotting is handled by the routines specific to a particular graphics
-package, for instance the {\bf AGS\_} routines.
+package, for instance the \textbf{AGS\_} routines.
 ACMODE is an access mode which has a particular meaning for AGI. It does
 not refer to the access mode of the database, i.e. whether an application
 can update the database or not, but instead it refers to the access mode
@@ -469,12 +469,12 @@ device then a `BASE' picture will be created.
 This `BASE' picture will fill the display area and will be created with a
 default world coordinate system, in the same way as the SGS base zone.
 
-\htmlref{{\bf AGI\_OPEN}}{AGI_OPEN} is used in non-ADAM tasks.
+\htmlref{\textbf{AGI\_OPEN}}{AGI_OPEN} is used in non-ADAM tasks.
 \begin{terminalv}
           CALL AGI_OPEN( WKNAME, ACMODE, PICID, STATUS )
 \end{terminalv}
 WKNAME is the device name. The other arguments are the same as those in
-{\bf AGI\_ASSOC}.
+\textbf{AGI\_ASSOC}.
 
 The given device name, whether passed through the parameter system or the
 argument list, should obey the syntax rules described
@@ -498,7 +498,7 @@ the base picture.
 
 \subsection{Device names\label{devnames}}
 
-For applications linked with the GKS based {\bf AGI} library the user
+For applications linked with the GKS based \textbf{AGI} library the user
 should supply a valid GNS device name (\xref{SUN/57}{sun57}{}) which
 AGI converts into an internal name that locates the workstation
 structure in the database. For devices that have more than one
@@ -509,16 +509,16 @@ for pictures on these different planes, which are different devices in
 GKS and SGS, will therefore appear in the same AGI workstation
 structure.
 
-The {\bf AGP} library is based on native-PGPLOT style device names of the
-form {\tt <devname>/<devtype>}. The graphics device to be used is
-selected by the {\tt <devtype>} component. The {\tt <devname>}
+The \textbf{AGP} library is based on native-PGPLOT style device names of the
+form \texttt{<devname>/<devtype>}. The graphics device to be used is
+selected by the \texttt{<devtype>} component. The \texttt{<devname>}
 component before the \// will be some form of name used by the device
 driver (typically a physical device on the system or an output file
 name) but is often omitted as most drivers contain a sensible default
-value. For example a graphics device of just {\tt \//gwm} will open a
-Starlink GWM X11 window with a default window name of {\tt xwindows}
-while a complete specification of {\tt mywindow/gwm} will open a GWM
-window with the name {\tt mywindow}.
+value. For example a graphics device of just \texttt{\//gwm} will open a
+Starlink GWM X11 window with a default window name of \texttt{xwindows}
+while a complete specification of \texttt{mywindow/gwm} will open a GWM
+window with the name \texttt{mywindow}.
 
 For native-PGPLOT based applications to co-exist with GKS-based ones
 it is important that users can continue to supply ``old\_style'' GKS device
@@ -556,12 +556,12 @@ x4windows (xwindows4/GWM)  Starlink GWM xwindow
 \end{terminalv}
 
 As an example of the overall effect native-PGPLOT graphics
-specifications of {\tt xwindows/gwm}, {\tt \//gwm} or {\tt xwindows}
-are all valid and equivalent in the {\bf AGP} version of the AGI
-library. They will select a GWM window with name {\tt xwindows} which
-will have AGI database records identical to those created by the {\bf
-AGI} library routines for the graphics device with the GNS name of
-{\tt xwindows}.
+specifications of \texttt{xwindows/gwm}, \texttt{\//gwm} or \texttt{xwindows}
+are all valid and equivalent in the \textbf{AGP} version of the AGI
+library. They will select a GWM window with name \texttt{xwindows} which
+will have AGI database records identical to those created by the
+\textbf{AGI} library routines for the graphics device with the GNS name of
+\texttt{xwindows}.
 
 The user will still see some slight differences from previous GKS behaviour
 when using GKS style device names via this scheme. For example:
@@ -580,9 +580,9 @@ syntax ps\_l;fred.ps or the native-PGPLOT syntax fred.ps/PS
 Pictures are flagged by means of an integer identifier (the picture
 identifier) which combines knowledge of a device name and a picture
 number in the same way that an SGS zone number does. Both
-\htmlref{{\bf AGI\_ASSOC}}{AGI_ASSOC}
+\htmlref{\textbf{AGI\_ASSOC}}{AGI_ASSOC}
 and
-\htmlref{{\bf AGI\_OPEN}}{AGI_ASSOC}
+\htmlref{\textbf{AGI\_OPEN}}{AGI_ASSOC}
 return a picture identifier to the current picture on
 the given device. Pictures in the database can only be referenced by means
 of these identifiers which are returned to the application from the
@@ -590,7 +590,7 @@ appropriate AGI routines. These identifiers should only be passed on to
 other AGI routines and should not be altered in any way by an application.
 
 Once a picture is no longer required it is good practice to release it using
-\htmlref{{\bf AGI\_ANNUL}}{AGI_ANNUL}
+\htmlref{\textbf{AGI\_ANNUL}}{AGI_ANNUL}
  which liberates internal workspace. Picture identifiers
 can be automatically released by using a begin-end block (see
 \slhyperref{this section}{Section~}{}{bend}).
@@ -600,24 +600,24 @@ can be automatically released by using a begin-end block (see
 It may seem a bit premature to close the database having only just
 described how to open it, but some things are best explained at this stage.
 In an ADAM environment the routine
-\htmlref{{\bf AGI\_CANCL}}{AGI_CANCL} cancels the
+\htmlref{\textbf{AGI\_CANCL}}{AGI_CANCL} cancels the
 association of the specified parameter and performs specific tidying
 up operations concerning that parameter. If the parameter association
-has to be retained outside the program then {\bf AGI\_CANCL} should not
+has to be retained outside the program then \textbf{AGI\_CANCL} should not
 be called.
 
-If the workstation structure is opened by {\bf AGI\_OPEN}, a call to
-\htmlref{{\bf AGI\_CLOSE}}{AGI_CLOSE} should be used to close it.
+If the workstation structure is opened by \textbf{AGI\_OPEN}, a call to
+\htmlref{\textbf{AGI\_CLOSE}}{AGI_CLOSE} should be used to close it.
 
 General tidying up operations (e.g. closing the database) are performed
 when the last active identifier has been annulled, either with
-{\bf AGI\_ANNUL} or
-\htmlref{{\bf AGI\_END}}{AGI_END}. It is important that tasks clean
+\textbf{AGI\_ANNUL} or
+\htmlref{\textbf{AGI\_END}}{AGI_END}. It is important that tasks clean
 up all their identifiers otherwise unusual side effects may occur if
 the executable image is permanently resident in memory (such as an
 ADAM task).
 
-Once the database has been closed, \htmlref{{\bf AGI\_TRUNC}}{AGI_TRUNC} can
+Once the database has been closed, \htmlref{\textbf{AGI\_TRUNC}}{AGI_TRUNC} can
 be called to truncate the database file to remove any unused space, thus
 keeping the file size at a minimum.
 
@@ -627,31 +627,31 @@ it is important that each task keeps its allocation of identifiers
 under control. For a complicated application annulling individual
 identifiers may be tiresome and so a general tidying up scheme is
 available using a begin-end block. The routines
-\htmlref{{\bf AGI\_BEGIN}}{AGI_BEGIN} and
-\htmlref{{\bf AGI\_END}}{AGI_END}
+\htmlref{\textbf{AGI\_BEGIN}}{AGI_BEGIN} and
+\htmlref{\textbf{AGI\_END}}{AGI_END}
 are used to bracket a block of code and all the
 identifiers allocated within the block are automatically annulled
-by {\bf AGI\_END}. These routines may be nested, (up to a depth of eight)
-but each {\bf AGI\_BEGIN} must have its corresponding {\bf AGI\_END}.
+by \textbf{AGI\_END}. These routines may be nested, (up to a depth of eight)
+but each \textbf{AGI\_BEGIN} must have its corresponding \textbf{AGI\_END}.
 
-As well as annulling identifiers the routine {\bf AGI\_END} performs another
+As well as annulling identifiers the routine \textbf{AGI\_END} performs another
 important function. The routine takes a picture identifier as its input
 and this picture is made current. If the identifier is valid then this is
-no different to calling \htmlref{{\bf AGI\_SELP}}{AGI_SELP},
+no different to calling \htmlref{\textbf{AGI\_SELP}}{AGI_SELP},
 but if the argument passed to
-{\bf AGI\_END} is a negative number then the picture that was current when
-the corresponding {\bf AGI\_BEGIN} was called is made current again. This
+\textbf{AGI\_END} is a negative number then the picture that was current when
+the corresponding \textbf{AGI\_BEGIN} was called is made current again. This
 is useful for applications that need to restore the current picture to
 that which was current when the application began.
 
 The following two examples show different uses of a begin-end block.
-In the first example the call to {\bf AGI\_END} annuls all the
+In the first example the call to \textbf{AGI\_END} annuls all the
 identifiers, which results in the database being closed, since there
 are no more active identifiers. As there was no current picture when
-the corresponding {\bf AGI\_BEGIN} was called (since the database had
-not been opened) the negative argument in {\bf AGI\_END} has no effect
+the corresponding \textbf{AGI\_BEGIN} was called (since the database had
+not been opened) the negative argument in \textbf{AGI\_END} has no effect
 in this case, and the picture that was current just before the call to
-{\bf AGI\_END} remains current.
+\textbf{AGI\_END} remains current.
 \begin{terminalv}
     *   Begin an AGI scope
           CALL AGI_BEGIN
@@ -665,12 +665,12 @@ in this case, and the picture that was current just before the call to
     *   Annul identifiers and close the database
           CALL AGI_END( -1, STATUS )
 \end{terminalv}
-In the second example {\bf AGI\_BEGIN} is put after {\bf AGI\_ASSOC}.
-When {\bf AGI\_END} is called the identifier returned from
-\htmlref{{\bf AGI\_ASSOC}}{AGI_ASSOC}
+In the second example \textbf{AGI\_BEGIN} is put after \textbf{AGI\_ASSOC}.
+When \textbf{AGI\_END} is called the identifier returned from
+\htmlref{\textbf{AGI\_ASSOC}}{AGI_ASSOC}
 is not annulled, since it is outside the scope of the begin-end block.
-The negative argument in {\bf AGI\_END} makes the picture that was current
-when the corresponding {\bf AGI\_BEGIN} was called current again (in this
+The negative argument in \textbf{AGI\_END} makes the picture that was current
+when the corresponding \textbf{AGI\_BEGIN} was called current again (in this
 example the picture that was current when the application began).
 \begin{terminalv}
     *   Open AGI on a device obtained from the parameter system
@@ -729,14 +729,14 @@ The AGI interface to each graphics package will interpret the meaning of a
 picture to suit the design of that particular package.
 When used in conjunction with SGS a picture is made equivalent to an SGS zone.
 For example to save an SGS zone as a picture use
-\begin{quote}{\tt
+\begin{quote}\texttt{
           CALL \htmlref{AGS\_SZONE}{AGS_SZONE}( PNAME, COMENT, PICID, STATUS )}
 \end{quote}
 PNAME and COMENT are used to identify the picture in the database as described
 in the sections below.
 PICID returns the identifier for the new picture in the database.
 
-There is one routine, \htmlref{{\bf AGI\_NUPIC}}{AGI_NUPIC},
+There is one routine, \htmlref{\textbf{AGI\_NUPIC}}{AGI_NUPIC},
 that allows new pictures to be created
 in the database without necessarily opening a graphics package first.
 \begin{terminalv}
@@ -758,9 +758,9 @@ then becomes the current picture.
 Pictures are recalled from the database only if they lie within the physical
 bounds of the current one; the recalled picture then becomes the current one.
 A picture can be made current by calling the routine
-\htmlref{{\bf AGI\_SELP}}{AGI_SELP}.
+\htmlref{\textbf{AGI\_SELP}}{AGI_SELP}.
 
-The picture recall routines, {\bf AGI\_RC*}, provide the means of traversing
+The picture recall routines, \textbf{AGI\_RC*}, provide the means of traversing
 the database.
 The key to the search is the picture name, and the search ends when a picture
 of the given name is found that lies within completely the bounds of the
@@ -769,19 +769,19 @@ If no suitable picture is found then an error status is returned.
 The search can be made more general by giving an empty name string. This
 results in the first picture on the search path, that lies within the current
 one, being recalled.
-\htmlref{{\bf AGI\_RCL}}{AGI_RCL}
+\htmlref{\textbf{AGI\_RCL}}{AGI_RCL}
 searches backwards from the last (most recent) picture in the database.
-\htmlref{{\bf AGI\_RCF}}{AGI_RCF}
+\htmlref{\textbf{AGI\_RCF}}{AGI_RCF}
 searches forwards from the first (most ancient) picture in the database.
-\htmlref{{\bf AGI\_RCP}}{AGI_RCP}
+\htmlref{\textbf{AGI\_RCP}}{AGI_RCP}
 searches backwards starting at the picture given by the PSTART
-identifier, and \htmlref{{\bf AGI\_RCS}}{AGI_RCS}
+identifier, and \htmlref{\textbf{AGI\_RCS}}{AGI_RCS}
 does the same searching forwards.
 
 A further restriction on the search can be introduced by using the
-{\bf AGI\_RC*P} routines.
+\textbf{AGI\_RC*P} routines.
 With these, a picture is only recalled if it corresponds to the given name,
-lies within the bounds of the current picture, {\em and} encompasses a given
+lies within the bounds of the current picture, \emph{and} encompasses a given
 point in the world coordinate space of the current picture.
 This type of recall is useful when a cursor has been put up on the display,
 and the user asked to select a picture with the cursor.
@@ -831,11 +831,11 @@ different memory planes then this can be negated by scrolling one of the
 memories. To overcome this a more general search is allowed by selecting
 the root picture which contains all other pictures (including the base
 picture). A call to the routine
-\htmlref{{\bf AGI\_SROOT}}{AGI_SROOT} selects the root
-picture. A subsequent call to any of the recall routines {\bf AGI\_RC*}
+\htmlref{\textbf{AGI\_SROOT}}{AGI_SROOT} selects the root
+picture. A subsequent call to any of the recall routines \textbf{AGI\_RC*}
 will obtain the relevant picture without it having to lie within the
 current picture. The root picture is deselected in the recall routine, and
-so {\bf AGI\_SROOT} has to be called on every occasion that an unlimited
+so \textbf{AGI\_SROOT} has to be called on every occasion that an unlimited
 search is to be made. Recall is the only operation allowed with the root
 picture. Any other operation called while the root picture is selected
 will result in the previously current picture being used.
@@ -857,7 +857,7 @@ current world coordinates of the graphics zone are stored in the database.
 If the user subsequently changes the world coordinate system of the graphics
 space on the physical device, errors may result if information is requested
 from the database by position.
-The routine \htmlref{{\bf AGI\_IWOCO}}{AGI_IWOCO}
+The routine \htmlref{\textbf{AGI\_IWOCO}}{AGI_IWOCO}
 can be used to inquire the world coordinates of the current picture.
 
 \subsection{Name}
@@ -906,12 +906,12 @@ will be deleted and replaced by a blank string. Although the labels are
 stored with mixed case the comparison is done with leading blanks removed
 and in uppercase only.
 
-The routine \htmlref{{\bf AGI\_SLAB}}{AGI_SLAB}
+The routine \htmlref{\textbf{AGI\_SLAB}}{AGI_SLAB}
 will associate a label with an existing picture,
 indicated by the picture identifier. If the picture identifier is negative
 then the current picture is used to store the label. If a label already
 exists for a picture then the old one will be overwritten.
-The routine \htmlref{{\bf AGI\_ILAB}}{AGI_ILAB}
+The routine \htmlref{\textbf{AGI\_ILAB}}{AGI_ILAB}
 will return the label of the requested picture.
 If the picture identifier is negative then the current picture is searched.
 If no label is associated with this picture then a blank string is returned.
@@ -946,21 +946,21 @@ NDF reference mechanism is well established the HDS interface will be
 removed.
 
 A reference is saved in the database by calling the routine
-\htmlref{{\bf AGI\_PTREF}}{AGI_PTREF}. The reference
+\htmlref{\textbf{AGI\_PTREF}}{AGI_PTREF}. The reference
 structure is stored within the picture indicated by the picture
 identifier. If the picture identifier is negative then the current
 picture is used to store the reference. If a reference already exists
 in the picture then an error status will be returned.
 
 A reference is obtained from the database by calling the routine
-\htmlref{{\bf AGI\_GTREF}}{AGI_GTREF}.
+\htmlref{\textbf{AGI\_GTREF}}{AGI_GTREF}.
 The reference is obtained from the picture indicated
 by the picture identifier. If the picture identifier is negative then
 the current picture is used to obtain the reference.
 If the reference was created from an HDS locator then an HDS locator
 is returned and this should be annulled in the application using
-\xref{{\bf REF\_ANNUL}}{sun31}{REF_ANNUL}
-rather than \xref{{\bf DAT\_ANNUL}}{sun92}{DAT_ANNUL}. This will ensure that
+\xref{\textbf{REF\_ANNUL}}{sun31}{REF_ANNUL}
+rather than \xref{\textbf{DAT\_ANNUL}}{sun92}{DAT_ANNUL}. This will ensure that
 the file containing the reference is properly shut down.
 
 One important point to note is that AGI does not check if the data being
@@ -1023,18 +1023,18 @@ These are formulated in a program in the following way.
 \end{terminalv}
 
 The transformation is then stored in the database using the routine
-\htmlref{{\bf AGI\_TNEW}}{AGI_TNEW}.
+\htmlref{\textbf{AGI\_TNEW}}{AGI_TNEW}.
 
 If a transformation already exists in an HDS structure which converts
 the data coordinates into the two dimensional world coordinates of the
 display screen then the transformation can be copied into the database
-using the routine \htmlref{{\bf AGI\_TCOPY}}{AGI_TCOPY}.
+using the routine \htmlref{\textbf{AGI\_TCOPY}}{AGI_TCOPY}.
 
 The AGI interface has four routines which will perform transformations
 that have been stored in the database. The routine
-\htmlref{{\bf AGI\_TDTOW}}{AGI_TDTOW}
+\htmlref{\textbf{AGI\_TDTOW}}{AGI_TDTOW}
 will transform data coordinates into world coordinates, and the routine
-\htmlref{{\bf AGI\_TWTOD}}{AGI_TWTOD} will perform the inverse.
+\htmlref{\textbf{AGI\_TWTOD}}{AGI_TWTOD} will perform the inverse.
 The argument list for these routines includes a picture identifier which
 indicates the picture containing the transformation. If the identifier is
 negative then the current picture is searched.
@@ -1047,26 +1047,26 @@ example r and $\theta$ correspond to the x and y coordinates of the
 data. If no transformation is found in the indicated picture then the
 identity transformation (output = input) is used. The transformations
 can be executed with double precision by calling the equivalent routines
-\htmlref{{\bf AGI\_TDDTW}}{AGI_TDDTW} and \htmlref{{\bf AGI\_TWTDD}}{AGI_TWTDD}.
+\htmlref{\textbf{AGI\_TDDTW}}{AGI_TDDTW} and \htmlref{\textbf{AGI\_TWTDD}}{AGI_TWTDD}.
 
 \subsection{Inquiries}
 There are a number of inquiry routines available to investigate the properties
 of the current picture.
-\htmlref{{\bf AGI\_INAME}}{AGI_INAME} and
-\htmlref{{\bf AGI\_ICOM}}{AGI_ICOM} inquire the name and description of the
+\htmlref{\textbf{AGI\_INAME}}{AGI_INAME} and
+\htmlref{\textbf{AGI\_ICOM}}{AGI_ICOM} inquire the name and description of the
 current picture.
-\htmlref{{\bf AGI\_ISAMD}}{AGI_ISAMD} inquires if the given picture is on
+\htmlref{\textbf{AGI\_ISAMD}}{AGI_ISAMD} inquires if the given picture is on
 the same physical device as the current picture.
-\htmlref{{\bf AGI\_ISAMP}}{AGI_ISAMP} inquires if the given picture identifier
+\htmlref{\textbf{AGI\_ISAMP}}{AGI_ISAMP} inquires if the given picture identifier
 points to the same picture in the database as the current picture identifier.
-\htmlref{{\bf AGI\_IPOBS}}{AGI_IPOBS} tests if the current picture is
+\htmlref{\textbf{AGI\_IPOBS}}{AGI_IPOBS} tests if the current picture is
 obscured either partially or totally by a specified picture in the database.
 Obscuration means here that the given picture intersects the current picture
 and that it overlays the current picture (was created more recently).
 The obscuration of the current picture can be tested against all subsequent
 pictures in the database by specifying a negative number in place of the
 picture identifier in the argument list.
-\htmlref{{\bf AGI\_ITOBS}}{AGI_ITOBS} tests the obscuration of a number
+\htmlref{\textbf{AGI\_ITOBS}}{AGI_ITOBS} tests the obscuration of a number
 of test points.
 The test points are specified in the coordinate system of the current picture,
 and each point is tested in turn for obscuration by any picture overlying the
@@ -1076,7 +1076,7 @@ current one.
 It may be desirable for an application to store information in the database
 that is outside the scope of the routines provided. For this reason an
 application can access a MORE structure using the routine
-\htmlref{{\bf AGI\_MORE}}{AGI_MORE}
+\htmlref{\textbf{AGI\_MORE}}{AGI_MORE}
 and save arbitrary HDS objects within it. A MORE structure can be created
 for each of the pictures in the database. It must be stressed that if an
 application uses this facility then it is responsible for the contents
@@ -1084,7 +1084,7 @@ and whatever any subsequent application may make of them. Also an
 application may need to cope with the situation of a corrupted structure.
 
 The MORE structure is accessed for reading and writing using the routine
-{\bf AGI\_MORE}
+\textbf{AGI\_MORE}
 \begin{terminalv}
           CALL AGI_MORE( PICID, ACMODE, MORLOC, STATUS )
 \end{terminalv}
@@ -1100,7 +1100,7 @@ locator returned by this routine has to be annulled by the calling
 application.
 
 The presence of a MORE structure can be tested using the routine
-{\bf AGI\_IMORE}. The return argument is true if a MORE structure exists
+\textbf{AGI\_IMORE}. The return argument is true if a MORE structure exists
 for the given picture, otherwise the argument is false.
 
 %\newpage
@@ -1114,7 +1114,7 @@ independent PGPLOT based applications has been given
 \slhyperref{earlier}{in Section~}{}{exam} while the use of the database file
 to allow native-PGPLOT based applications to interact with GKS-based
 applications is described \slhyperref{here}{in Section~}{}{devnames}.
-For applications using the {\bf AGI} GKS-based library a second use is
+For applications using the \textbf{AGI} GKS-based library a second use is
 to allow different graphics packages to interact within a single
 application, for example by using SGS to draw on top of an image
 displayed with IDI. These two packages have completely different
@@ -1148,42 +1148,42 @@ of AGI and two graphics packages within one application.
 \subsection{Interface to PGPLOT}
 
 As described \slhyperref{previously}{in Section~}{}{descript} versions
-of the PGPLOT interface routines with prefix {\bf AGP\_} exist in two
-libraries. The {\bf AGI} library includes these and SGS routines based
-on GKS graphics together with IDI routines. The {\bf AGP} library is
+of the PGPLOT interface routines with prefix \textbf{AGP\_} exist in two
+libraries. The \textbf{AGI} library includes these and SGS routines based
+on GKS graphics together with IDI routines. The \textbf{AGP} library is
 designed to only interface to native-PGPLOT and has its own link
-commands described \slhyperref{here}{in Section~}{}{linking}. The {\bf
-AGP\_} routines have indentical names and argument lists for both
-libraries. Note, however, that the {\bf AGP} library does {\bf not}
+commands described \slhyperref{here}{in Section~}{}{linking}. The
+\textbf{AGP\_} routines have indentical names and argument lists for both
+libraries. Note, however, that the \textbf{AGP} library does \textbf{not}
 support the concept of PGPLOT plotting into an SGS zone.
 
 A set of routines are supplied to interface the database to the PGPLOT
 graphics package, these are prefixed by AGP\_ instead of AGI\_. A
 picture in the database is equated with a PGPLOT viewport. Previous
 versions of PGPLOT only allowed one device to be open at one time and
-this restriction still exists in the {\bf AGP\_} routines. The PGPLOT
+this restriction still exists in the \textbf{AGP\_} routines. The PGPLOT
 interface to AGI signifies this by returning an error status if
 another device is requested while a current PGPLOT device is open.
 
 PGPLOT is activated with a call to
-\htmlref{{\bf AGP\_ACTIV}}{AGP_ACTIV}, but it does not
+\htmlref{\textbf{AGP\_ACTIV}}{AGP_ACTIV}, but it does not
 actually open a device for plotting.
 A device is opened when the first call to
-\htmlref{{\bf AGP\_NVIEW}}{AGP_NVIEW} is made.
+\htmlref{\textbf{AGP\_NVIEW}}{AGP_NVIEW} is made.
 The actual device that is opened will be the one associated with the
 current picture in the database.
-{\bf AGP\_NVIEW} creates a new PGPLOT viewport from the current AGI
+\textbf{AGP\_NVIEW} creates a new PGPLOT viewport from the current AGI
 picture.
-If the border argument in {\bf AGP\_NVIEW} is false then the
+If the border argument in \textbf{AGP\_NVIEW} is false then the
 new viewport fills the area specified by the picture and the world
 coordinate system of the database picture is recreated in the viewport.
-If however the border argument in {\bf AGP\_NVIEW} is true then
+If however the border argument in \textbf{AGP\_NVIEW} is true then
 the viewport is created smaller than the area defined by the picture so
 that a standard width border surrounds the viewport. The world coordinates
 of this viewport are given the default values of 0 to 1 in each axis.
 
 The current viewport can be saved as a picture in the database using a
-call to \htmlref{{\bf AGP\_SVIEW}}{AGP_SVIEW}.
+call to \htmlref{\textbf{AGP\_SVIEW}}{AGP_SVIEW}.
 The size of the new picture must be less than
 or equal to the size of the current picture in the database, otherwise
 an error status is returned.
@@ -1194,7 +1194,7 @@ picture in the database from within the associated viewport. If such a
 'FRAME' picture is required in the database then it must be saved before
 the viewport is created, or must be recreated from an existing picture.
 
-PGPLOT is shut down using \htmlref{{\bf AGP\_DEACT}}{AGP_DEACT}.
+PGPLOT is shut down using \htmlref{\textbf{AGP\_DEACT}}{AGP_DEACT}.
 
 The following code segment gives an example of an application that
 creates a viewport that matches the size of the current picture if the
@@ -1255,18 +1255,18 @@ been used then the viewport and associated frame will be the same size.
 \end{terminalv}
 
 There are wrap-up routines to open and close AGI and PGPLOT within the
-ADAM environment using single calls. The sequence of calls {\bf AGI\_ASSOC},
-{\bf AGI\_BEGIN},  {\bf AGP\_ACTIV}, {\bf AGP\_NVIEW} can be replaced by a
+ADAM environment using single calls. The sequence of calls \textbf{AGI\_ASSOC},
+\textbf{AGI\_BEGIN},  \textbf{AGP\_ACTIV}, \textbf{AGP\_NVIEW} can be replaced by a
 single call to
-\htmlref{{\bf AGP\_ASSOC}}{AGP_ASSOC}. As with {\bf AGS\_ASSOC} an optional call
-to \htmlref{{\bf AGI\_RCL}}{AGI_RCL} can be made by passing a non-blank
+\htmlref{\textbf{AGP\_ASSOC}}{AGP_ASSOC}. As with \textbf{AGS\_ASSOC} an optional call
+to \htmlref{\textbf{AGI\_RCL}}{AGI_RCL} can be made by passing a non-blank
 name argument.
-The sequence of calls {\bf AGP\_DEACT}, {\bf AGI\_END}, {\bf AGI\_CANCL}
-or {\bf AGI\_ANNUL} can be replaced by a single call to
-\htmlref{{\bf AGP\_DEASS}}{AGP_DEASS}.
+The sequence of calls \textbf{AGP\_DEACT}, \textbf{AGI\_END}, \textbf{AGI\_CANCL}
+or \textbf{AGI\_ANNUL} can be replaced by a single call to
+\htmlref{\textbf{AGP\_DEASS}}{AGP_DEASS}.
 
 PGPLOT can be used as a stand-alone package. When GKS-based PGPLOT is
-used from the {\bf AGI} library PGPLOT can also be started from
+used from the \textbf{AGI} library PGPLOT can also be started from
 within an SGS zone. In this case PGPLOT
 is initialised while SGS is still open. This is the only situation where
 AGI allows more than one graphics package to be open at one time.
@@ -1293,7 +1293,7 @@ PGPLOT from within an SGS zone.
 
 Note that when using the AGP routines to open PGPLOT in the current SGS
 zone it is essential that SGS has been opened using the AGS routines.
-Normally {\bf AGP\_NVIEW} creates a viewport that matches the size of
+Normally \textbf{AGP\_NVIEW} creates a viewport that matches the size of
 the current picture in the database, but in this instance the size of
 the viewport matches the current SGS zone.
 The new viewport inherits the world coordinate system of the current picture
@@ -1304,32 +1304,32 @@ and therefore PGBEGIN and PGEND should not be called in an application
 using AGI. Similarly the routines PGENV, PGPAPER and PGVSTAND should not be
 called as these subvert the underlying coordinate system.
 
-\subsection{Interface to SGS -- ({\bf AGI} library only)}
+\subsection{Interface to SGS -- (\textbf{AGI} library only)}
 
 A set of routines are supplied to interface the database to the SGS graphics
 package, these are prefixed by AGS\_ instead of AGI\_.
 A picture in the database is equated with an SGS zone.
-SGS is activated with a call to \htmlref{{\bf AGS\_ACTIV}}{AGS_ACTIV}.
+SGS is activated with a call to \htmlref{\textbf{AGS\_ACTIV}}{AGS_ACTIV}.
 This does not open a device for plotting.
-A device is opened when the first call to \htmlref{{\bf AGS\_NZONE}}{AGS_NZONE}
+A device is opened when the first call to \htmlref{\textbf{AGS\_NZONE}}{AGS_NZONE}
 is made.
 The actual device that is opened will be the one associated with the
 current picture in the database.
-This means that AGI has to be open before {\bf AGS\_NZONE} can be called.
-{\bf AGS\_NZONE} creates an SGS zone from the current AGI picture, and returns
+This means that AGI has to be open before \textbf{AGS\_NZONE} can be called.
+\textbf{AGS\_NZONE} creates an SGS zone from the current AGI picture, and returns
 the zone identifier.
 An SGS zone is saved as a picture in the database using a call to
-\htmlref{{\bf AGS\_SZONE}}{AGS_SZONE}.
+\htmlref{\textbf{AGS\_SZONE}}{AGS_SZONE}.
 The size of the new picture must be less than or equal
 to the size of the current picture in the database otherwise and error
 status is returned.
-SGS is shut down using \htmlref{{\bf AGS\_DEACT}}{AGS_DEACT}.
+SGS is shut down using \htmlref{\textbf{AGS\_DEACT}}{AGS_DEACT}.
 
 The job of opening and closing the device is handled by the AGS\_ routines
-and therefore the routines \xref{{\bf SGS\_ASSOC}}{sun113}{SGS_ASSOC}
-and \xref{{\bf SGS\_CANCL}}{sun113}{SGS_CANCL} or
-\xref{{\bf SGS\_OPEN}}{sun85}{SGS_OPEN} and
-\xref{{\bf SGS\_CLOSE}}{sun85}{SGS_CLOSE} should not be called when using the
+and therefore the routines \xref{\textbf{SGS\_ASSOC}}{sun113}{SGS_ASSOC}
+and \xref{\textbf{SGS\_CANCL}}{sun113}{SGS_CANCL} or
+\xref{\textbf{SGS\_OPEN}}{sun85}{SGS_OPEN} and
+\xref{\textbf{SGS\_CLOSE}}{sun85}{SGS_CLOSE} should not be called when using the
 AGS\_ routines.
 
 The first example shows how an application might save an SGS zone in the
@@ -1383,15 +1383,15 @@ to search the database for the correct picture.
 These examples show that the AGI operations of accessing the database and
 opening the graphics package are common to both applications. These
 common opening and closing operations have been packaged up into single
-routines. Thus the sequence of calls {\bf AGI\_ASSOC}, {\bf AGI\_BEGIN},
-{\bf AGS\_ACTIV}, {\bf AGS\_NZONE} can be replaced by a single call to
-\htmlref{{\bf AGS\_ASSOC}}{AGS_ASSOC},
-and the sequence of calls {\bf AGS\_DEACT},
-{\bf AGI\_END}, {\bf AGI\_CANCL} can be replaced by a single call to
-\htmlref{{\bf AGS\_DEASS}}{AGS_DEASS}.
+routines. Thus the sequence of calls \textbf{AGI\_ASSOC}, \textbf{AGI\_BEGIN},
+\textbf{AGS\_ACTIV}, \textbf{AGS\_NZONE} can be replaced by a single call to
+\htmlref{\textbf{AGS\_ASSOC}}{AGS_ASSOC},
+and the sequence of calls \textbf{AGS\_DEACT},
+\textbf{AGI\_END}, \textbf{AGI\_CANCL} can be replaced by a single call to
+\htmlref{\textbf{AGS\_DEASS}}{AGS_DEASS}.
 Note that these wrap-up routines only exist for the
 ADAM interface. If the application is using the non-ADAM routines
-{\bf AGI\_OPEN} and {\bf AGI\_CLOSE} then the sequence of calls has to
+\textbf{AGI\_OPEN} and \textbf{AGI\_CLOSE} then the sequence of calls has to
 be made explicitly. Using these wrap-up routines then second application
 above would become
 \begin{terminalv}
@@ -1405,13 +1405,13 @@ above would become
     *   Close down
           CALL AGS_DEASS( 'DEVICE', .TRUE., STATUS )
 \end{terminalv}
-The third (picture name) argument in {\bf AGS\_ASSOC} can optionally be
-used to recall the last picture of the given name using \htmlref{{\bf AGI\_RCL}}{AGI_RCL}.
+The third (picture name) argument in \textbf{AGS\_ASSOC} can optionally be
+used to recall the last picture of the given name using \htmlref{\textbf{AGI\_RCL}}{AGI_RCL}.
 If the name string is blank (as in the example above) then this recall
 routine is not called and the current database picture is returned.
-If the second argument in {\bf AGS\_DEASS} is false then the ADAM parameter
+If the second argument in \textbf{AGS\_DEASS} is false then the ADAM parameter
 is not cancelled and instead the picture identifier returned from
-{\bf AGS\_ASSOC} is annulled.
+\textbf{AGS\_ASSOC} is annulled.
 
 If GKS calls are mixed in with the SGS calls to produce the plot
 then some GKS operations may result in the plot being cleared when the
@@ -1430,7 +1430,7 @@ setting the deferral mode:
 
 \end{terminalv}
 
-\subsection{Interface to IDI -- ({\bf AGI} library only)}
+\subsection{Interface to IDI -- (\textbf{AGI} library only)}
 
 A set of routines are supplied to interface the database to the IDI graphics
 package, these are prefixed by AGD\_ instead of AGI\_. IDI is a low-level
@@ -1442,16 +1442,16 @@ therefore more contrived than for the other packages.
 
 IDI instructions are directed to a specific device by means of a display
 identifier that has to be supplied as an argument to the IDI subroutines.
-The routine \htmlref{{\bf AGD\_NWIND}}{AGD_NWIND}
+The routine \htmlref{\textbf{AGD\_NWIND}}{AGD_NWIND}
 returns a display identifier that corresponds
 to the device associated with the current picture. This identifier can
 then be used as input to the IDI routines. If the device is not already
-open then {\bf AGD\_NWIND} will open the relevant device. Subsequent calls
-to {\bf AGD\_NWIND} will return the same identifier if the current picture
+open then \textbf{AGD\_NWIND} will open the relevant device. Subsequent calls
+to \textbf{AGD\_NWIND} will return the same identifier if the current picture
 is associated with the same device.
 
-The routines \htmlref{{\bf AGD\_ACTIV}}{AGD_ACTIV} and
-\htmlref{{\bf AGD\_DEACT}}{AGD_DEACT} should be called before
+The routines \htmlref{\textbf{AGD\_ACTIV}}{AGD_ACTIV} and
+\htmlref{\textbf{AGD\_DEACT}}{AGD_DEACT} should be called before
 and after any other AGD\_ routines.
 
 IDI has no structure that matches the concept of a picture in the database,
@@ -1462,7 +1462,7 @@ which is used to load images into the display memory.
 IDI works in pixel coordinates and a window is defined by its size in
 pixels along each axis (XSIZE and YSIZE), and by an offset, in pixels,
 of its bottom left hand corner from the memory origin (XOFF and YOFF).
-The routine \htmlref{{\bf AGD\_SWIND}}{AGD_SWIND}
+The routine \htmlref{\textbf{AGD\_SWIND}}{AGD_SWIND}
 will save such a window as a picture in the
 database. The following code segment shows how a transfer window which has
 been set up to load an image into a memory can be saved as a picture in the
@@ -1486,7 +1486,7 @@ database.
 As usual when creating a picture in the database if this new picture lies
 outside the current picture an error status is returned.
 
-The routine \htmlref{{\bf AGD\_NWIND}}{AGD_NWIND}
+The routine \htmlref{\textbf{AGD\_NWIND}}{AGD_NWIND}
 will return the size and offsets of a window that
 matches the current picture in the database. The returned arguments should
 not be used to define a transfer window directly unless it is known that
@@ -1495,7 +1495,7 @@ into the transfer window. This is because IDI uses the transfer window to
 define where the end of one row occurs in the input stream of pixel values.
 If the transfer window is the wrong shape for the image then the line
 breaks will not occur in the correct place and the image will appear
-garbled. When using {\bf AGD\_NWIND} to set up a transfer window it is best
+garbled. When using \textbf{AGD\_NWIND} to set up a transfer window it is best
 to compare the returned arguments to the size of the image and set up the
 transfer window accordingly. The following code segment shows how a
 transfer window is set up so that the image loads from the bottom left of
@@ -1526,24 +1526,24 @@ when saving a window in the database because the integer coordinates are
 simply expressed as reals in the database, but a picture already defined in
 the database may have limits that correspond to partial pixels on the screen.
 In the latter case the pixel coordinates returned by the routine
-{\bf AGD\_NWIND} are rounded up from the picture coordinates so that the
+\textbf{AGD\_NWIND} are rounded up from the picture coordinates so that the
 window contains the whole picture. This means that the resulting window
 may be slightly larger (by fractions of a pixel) than the original picture.
 
 There are wrap-up routines to open and close AGI and IDI within the
-ADAM environment using single calls. The sequence of calls {\bf AGI\_ASSOC},
-{\bf AGI\_BEGIN},  {\bf AGD\_ACTIV}, {\bf AGD\_NWIND} can be replaced by a
-single call to \htmlref{{\bf AGD\_ASSOC}}{AGD_ASSOC}.
-As with {\bf AGS\_ASSOC} an optional call
-to \htmlref{{\bf AGI\_RCL}}{AGI_RCL}
+ADAM environment using single calls. The sequence of calls \textbf{AGI\_ASSOC},
+\textbf{AGI\_BEGIN},  \textbf{AGD\_ACTIV}, \textbf{AGD\_NWIND} can be replaced by a
+single call to \htmlref{\textbf{AGD\_ASSOC}}{AGD_ASSOC}.
+As with \textbf{AGS\_ASSOC} an optional call
+to \htmlref{\textbf{AGI\_RCL}}{AGI_RCL}
 can be made by passing a non-blank name argument.
-The sequence of calls {\bf AGD\_DEACT}, {\bf AGI\_END}, {\bf AGI\_CANCL}
-or {\bf AGI\_ANNUL} can be replaced by a single call to
-\htmlref{{\bf AGD\_DEASS}}{AGD_DEASS}.
+The sequence of calls \textbf{AGD\_DEACT}, \textbf{AGI\_END}, \textbf{AGI\_CANCL}
+or \textbf{AGI\_ANNUL} can be replaced by a single call to
+\htmlref{\textbf{AGD\_DEASS}}{AGD_DEASS}.
 
 The job of opening and closing the device is handled by the AGD\_ routines
-and therefore the routines {\bf IDI\_ASSOC} and {\bf IDI\_CANCL} or
-{\bf IIDOPN} and {\bf IIDCLO} should not be called when using the
+and therefore the routines \textbf{IDI\_ASSOC} and \textbf{IDI\_CANCL} or
+\textbf{IIDOPN} and \textbf{IIDCLO} should not be called when using the
 AGD\_ routines.
 
 \section {Additional Postscript Features for Native PGPLOT}\label{aps}
@@ -1566,7 +1566,7 @@ apscol\_l & /ACPS        & Accumulating EPS, color, landscape \\
 AGI strips the leading ``A'' from the above PGPLOT device names to create
 the device names that are actually used by PGPLOT. The name of the file
 to receive the Postscript output can be included in the device name as
-normal (\emph{e.g.} ``{\tt fred.ps/ACPS}'' or ``{\tt apscol\_l;fred.ps}'').
+normal (\emph{e.g.} ``\texttt{fred.ps/ACPS}'' or ``\texttt{apscol\_l;fred.ps}'').
 
 If one of these devices is used, then the AGI library will automatically
 concatenate the new Postscript output created by PGPLOT, with any old
@@ -1592,12 +1592,12 @@ file. Such empty files can be created for instance (when using the
 standard Postscript devices), by the KAPPA:PICSEL command that simply
 selects a different AGI picture but does not draw anything.
 
-An additional minor feature of this merging process - the {\tt BoundingBox}
+An additional minor feature of this merging process - the \texttt{BoundingBox}
 comment that PGPLOT places at the end of the Postscript output is moved
 to the start by this process. This allows a wider range of applications
 to read the resulting Postscript file.
 
-Some Postscript viewing tools such as Okular (see {\tt okular.kde.org}) will
+Some Postscript viewing tools such as Okular (see \url{http://okular.kde.org}) will
 automatically re-draw the display if the contents of the displayed file
 changes on disk. Combined with these ``accumulating'' Postscript devices,
 this provides a scheme that is similar to the use of a traditional
@@ -1618,11 +1618,11 @@ persistent X-window device. A typical scenario could be:
    % display $KAPPA_DIR/m57 accept
 \end{terminalv}
 
-The {\tt okular} display will update as each KAPPA command adds additional
-pictures into the {\tt pgplot.ps} file. Some notes:
+The \texttt{okular} display will update as each KAPPA command adds additional
+pictures into the \texttt{pgplot.ps} file. Some notes:
 
 \begin{enumerate}
-\item The {\tt okular} command was put into the background by the trailing
+\item The \texttt{okular} command was put into the background by the trailing
 ``\&'' character in order to allow subsequent commands to execute.
 \item The LINPLOT style setting begins with a ``+'' to indicate that it
 should be used only for one invocation of LINPLOT.
@@ -1632,7 +1632,7 @@ should be used only for one invocation of LINPLOT.
 
 To include either of the AGI include files, create links in the directory
 containing the program source code with the command:
-\begin{quote}{\tt
+\begin{quote}\texttt{
 agi\_dev}
 \end{quote}
 and use and include statement such as:
@@ -1643,7 +1643,7 @@ and use and include statement such as:
 
 
 For programs in the ADAM environment one of the the shell scripts
-{\tt agi\_link\_adam} or {\tt agp\_link\_adam}
+\texttt{agi\_link\_adam} or \texttt{agp\_link\_adam}
 should be used. For example to compile and link an ADAM task called `task.f'
 which is designed to use PGPLOT only the following is used:
 \begin{terminalv}
@@ -1651,8 +1651,8 @@ which is designed to use PGPLOT only the following is used:
 \end{terminalv}
 (note the use of the backward quotes).
 
-A standalone program is linked by specifying one of {\tt `agi\_link`}
-or {\tt `agp\_link`} on the compiler
+A standalone program is linked by specifying one of \texttt{`agi\_link`}
+or \texttt{`agp\_link`} on the compiler
 command line. Thus to compile and link a standalone application called
 `prog.f' which, this time, uses GKS based graphics the following is used:
 \begin{terminalv}
@@ -1714,7 +1714,7 @@ command line. Thus to compile and link a standalone application called
       \sstsubsection{
          ACMODE = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         Access mode for pictures. {\tt '}READ{\tt '}, {\tt '}WRITE{\tt '} or {\tt '}UPDATE{\tt '}.
+         Access mode for pictures. \texttt{'}READ\texttt{'}, \texttt{'}WRITE\texttt{'} or \texttt{'}UPDATE\texttt{'}.
       }
       \sstsubsection{
          PNAME = CHARACTER $*$ ( $*$ ) (Given)
@@ -1832,7 +1832,7 @@ command line. Thus to compile and link a standalone application called
       up of whole pixels, that completely contains the picture. If the
       device associated with the current picture is not already open
       then this routine will open the device and return the display
-      identifier. Furthermore if the device was opened with {\tt '}WRITE{\tt '}
+      identifier. Furthermore if the device was opened with \texttt{'}WRITE\texttt{'}
       access (in \htmlref{AGI\_ASSOC}{AGI_ASSOC} or
       \htmlref{AGI\_OPEN}{AGI_OPEN}) then the window will be cleared.
       If the device is already open then the display identifier will be
@@ -2015,7 +2015,7 @@ command line. Thus to compile and link a standalone application called
       sent to the user. The access mode does not affect the database
       operation, but it is used by the graphics system to determine if
       the display should be cleared the first time the device is opened;
-      {\tt '}READ{\tt '} and {\tt '}UPDATE{\tt '} access do not clear the display, but {\tt '}WRITE{\tt '}
+      \texttt{'}READ\texttt{'} and \texttt{'}UPDATE\texttt{'} access do not clear the display, but \texttt{'}WRITE\texttt{'}
       access does.
    }
    \sstinvocation{
@@ -2030,7 +2030,7 @@ command line. Thus to compile and link a standalone application called
       \sstsubsection{
          ACMODE = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         Access mode: {\tt '}READ{\tt '}, {\tt '}WRITE{\tt '} or {\tt '}UPDATE{\tt '}
+         Access mode: \texttt{'}READ\texttt{'}, \texttt{'}WRITE\texttt{'} or \texttt{'}UPDATE\texttt{'}
       }
       \sstsubsection{
          PICID = INTEGER (Returned)
@@ -2159,7 +2159,7 @@ command line. Thus to compile and link a standalone application called
       \sstsubsection{
          MODE = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         Access mode for object, {\tt '}READ{\tt '}, {\tt '}WRITE{\tt '}, or {\tt '}UPDATE{\tt '}
+         Access mode for object, \texttt{'}READ\texttt{'}, \texttt{'}WRITE\texttt{'}, or \texttt{'}UPDATE\texttt{'}
       }
       \sstsubsection{
          DATREF = CHARACTER $*$ ( $*$ ) (Returned)
@@ -2525,10 +2525,10 @@ command line. Thus to compile and link a standalone application called
       is returned. A MORE structure can be associated with any picture
       and it can be used to store any application specific information.
       If the given value for PICID is negative then the current picture
-      is used. If the access mode is {\tt '}WRITE{\tt '} then an empty MORE structure
+      is used. If the access mode is \texttt{'}WRITE\texttt{'} then an empty MORE structure
       is created if none existed. If there is an existing structure then
-      {\tt '}WRITE{\tt '} mode will erase the existing contents and return a locator
-      to an empty structure. If the access mode is {\tt '}READ{\tt '} or {\tt '}UPDATE{\tt '} then
+      \texttt{'}WRITE\texttt{'} mode will erase the existing contents and return a locator
+      to an empty structure. If the access mode is \texttt{'}READ\texttt{'} or \texttt{'}UPDATE\texttt{'} then
       a locator to an existing structure is returned. In this case an
       error is returned if there is not a MORE structure for the given
       picture. The database is not responsible for what goes in the MORE
@@ -2547,7 +2547,7 @@ command line. Thus to compile and link a standalone application called
       \sstsubsection{
          ACMODE = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         Access mode for MORE structure. {\tt '}READ{\tt '}, {\tt '}WRITE{\tt '} or {\tt '}UPDATE{\tt '}.
+         Access mode for MORE structure. \texttt{'}READ\texttt{'}, \texttt{'}WRITE\texttt{'} or \texttt{'}UPDATE\texttt{'}.
       }
       \sstsubsection{
          MORLOC = CHARACTER $*$ (DAT\_\_SZLOC) (Returned)
@@ -2654,8 +2654,8 @@ command line. Thus to compile and link a standalone application called
       and a message sent to the user. The access mode does not affect the
       database operation, but it is used by the graphics system to
       determine if the display should be cleared the first time a zone is
-      created; {\tt '}READ{\tt '} and {\tt '}UPDATE{\tt '} access do not clear the display, but
-      {\tt '}WRITE{\tt '} access does.
+      created; \texttt{'}READ\texttt{'} and \texttt{'}UPDATE\texttt{'} access do not clear the display, but
+      \texttt{'}WRITE\texttt{'} access does.
    }
    \sstinvocation{
       CALL AGI\_OPEN( WKNAME, ACMODE, PICID, STATUS )
@@ -2669,7 +2669,7 @@ command line. Thus to compile and link a standalone application called
       \sstsubsection{
          ACMODE = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         Access mode: {\tt '}READ{\tt '}, {\tt '}WRITE{\tt '} or {\tt '}UPDATE{\tt '}
+         Access mode: \texttt{'}READ\texttt{'}, \texttt{'}WRITE\texttt{'} or \texttt{'}UPDATE\texttt{'}
       }
       \sstsubsection{
          PICID = INTEGER (Returned)
@@ -3563,7 +3563,7 @@ command line. Thus to compile and link a standalone application called
       \sstsubsection{
          ACMODE = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         Access mode for pictures. {\tt '}READ{\tt '}, {\tt '}WRITE{\tt '} or {\tt '}UPDATE{\tt '}.
+         Access mode for pictures. \texttt{'}READ\texttt{'}, \texttt{'}WRITE\texttt{'} or \texttt{'}UPDATE\texttt{'}.
       }
       \sstsubsection{
          PNAME = CHARACTER $*$ ( $*$ ) (Given)
@@ -3657,7 +3657,7 @@ command line. Thus to compile and link a standalone application called
       annotation. If false the viewport matches the picture exactly.
       If the device associated with the current picture is not open then
       this routine will open it, and additionally the viewport will be
-      cleared if the access mode is {\tt '}WRITE{\tt '} (in
+      cleared if the access mode is \texttt{'}WRITE\texttt{'} (in
       \htmlref{AGI\_ASSOC}{AGI_ASSOC} or \htmlref{AGI\_OPEN}{AGI_OPEN}).
       If the SGS interface is already active then the first call to
       this routine will open PGPLOT in the current SGS zone. In this
@@ -3770,7 +3770,7 @@ command line. Thus to compile and link a standalone application called
       \sstsubsection{
          ACMODE = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         Access mode for pictures. {\tt '}READ{\tt '}, {\tt '}WRITE{\tt '} or {\tt '}UPDATE{\tt '}.
+         Access mode for pictures. \texttt{'}READ\texttt{'}, \texttt{'}WRITE\texttt{'} or \texttt{'}UPDATE\texttt{'}.
       }
       \sstsubsection{
          PNAME = CHARACTER $*$ ( $*$ ) (Given)
@@ -3860,7 +3860,7 @@ command line. Thus to compile and link a standalone application called
       created with the coordinate system of the current picture.
       If the device associated with the current picture is not already
       open then this routine will open it, and additionally the zone
-      will be cleared if the access mode is {\tt '}WRITE{\tt '} (in
+      will be cleared if the access mode is \texttt{'}WRITE\texttt{'} (in
       \htmlref{AGI\_ASSOC}{AGI_ASSOC} or \htmlref{AGI\_OPEN}{AGI_OPEN}).
    }
    \sstinvocation{
