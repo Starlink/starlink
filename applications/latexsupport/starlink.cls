@@ -172,7 +172,9 @@
 %  Ensure the title etc is available.
 \newcommand{\thetitle}{\@stardoctitle}
 \title{\@stardoctitle}
-\newcommand{\thedate}{\@date}
+
+\newcommand{\thestardocdate}{\@stardocdate}
+%\date{\thedate}
 % Uncommeting the following line causes the \scfrontmatter command for
 % pdf to break with a 'no line to end here fault...'
 %\date{\@stardocdate}
@@ -220,7 +222,7 @@
 \vspace{-7mm}
 \begin{flushright}
   \thestardocauthors\\
-  \thedate\\
+  \thestardocdate\\
 \end{flushright}
 \vspace{-2mm}
 \rule{\textwidth}{0.5mm}
