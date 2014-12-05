@@ -115,6 +115,7 @@ my %stylemap = ( em => "emph",
                  sc => "textsc",
                  it => "textit",
                  tt => "texttt",
+                 sf => "textsf",
                  bf => "textbf" );
 for my $old (keys %stylemap) {
   $text =~ s/\{\\$old\s+/\\$stylemap{$old}\{/g;
