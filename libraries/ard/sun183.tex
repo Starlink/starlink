@@ -916,8 +916,8 @@ operands depends on the type of keyword:
 within the boundary of the region, and are .FALSE. otherwise.
 
 \item Operands for regions which have zero volume (e.g.
-\htmlref{POINT}{KEY:POINT},
-\htmlref{LINE}{KEY:LINE}, \htmlref{ROW}{KEY:ROW}, \htmlref{COLUMN}{KEY:COL},
+\htmlref{POINT}{KEY:POI},
+\htmlref{LINE}{KEY:LIN}, \htmlref{ROW}{KEY:ROW}, \htmlref{COLUMN}{KEY:COL},
 etc.) are .TRUE. if the boundary of the region passes \emph{through} the current
 pixel. The pixel with index $I$ along some axis is assumed to cover a range of
 pixel coordinates $P$ given by $(I-1) < P \leq I$.
@@ -1417,13 +1417,13 @@ coordinates to application coordinates. Such mappings were set up using the
 \htmlref{statements}{SEC:STAT}
 \htmlref{COEFFS}{ST:COE},
 \htmlref{OFFSET}{ST:OFF},
-\htmlref{SCALE}{ST:SCALE},
+\htmlref{SCALE}{ST:SCA},
 \htmlref{TWIST}{ST:TWI} and
 \htmlref{STRETCH}{ST:STR}.
 
 For instance, if the application expects coordinates to be given in
 arc-seconds but the user wishes to give them in arc-minutes, then the
-statement \htmlref{SCALE}{ST:SCALE}( 60 ) should be included in the ARD
+statement \htmlref{SCALE}{ST:SCA}( 60 ) should be included in the ARD
 description before the first keyword. This mapping is then concatenated
 with the mapping supplied by the application to get the mapping from user
 coordinates to pixel coordinates.
@@ -1614,7 +1614,7 @@ Y_{N} & = & C_{N.N} + C_{N.(N+1)}.X_{1} + C_{N.(N+2)}.X_{2} + ... + C_{N.(N+1)}.
 The mapping established replaces any previous mapping, and is used to transform
 all following coordinates, until another mapping is established. The default
 mapping results in user coordinates being identical with application
-coordinates. The \htmlref{OFFSET}{ST:OFF}, \htmlref{SCALE}{ST:SCALE}, \htmlref{TWIST}{ST:TWI} and \htmlref{STRETCH}{ST:STR} statements allow complex
+coordinates. The \htmlref{OFFSET}{ST:OFF}, \htmlref{SCALE}{ST:SCA}, \htmlref{TWIST}{ST:TWI} and \htmlref{STRETCH}{ST:STR} statements allow complex
 mappings to be created without the use of COEFF statement in certain cases.
 
 \item [\label{ST:COFRAME}COFRAME(DOMAIN,...)] - Specifies the user
