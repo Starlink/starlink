@@ -1,29 +1,28 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[nolof,twoside,11pt]{starlink}
 
 % ? Specify used packages
-\usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
-\usepackage[english]{babel}  %  Ensure sensible hyphenation (esp. linux)
+%\usepackage        %  Use this one for final production.
+%% \usepackage %  Use this one for drafting.
+%\usepackage  %  Ensure sensible hyphenation (esp. linux)
 % ? End of specify used packages
 
-\pagestyle{myheadings}
+
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {139.18}
-\newcommand{\stardocauthors}   {Peter W. Draper, Mark Taylor, Alasdair Allan}
-\newcommand{\stardocdate}      {7 July 2011}
-\newcommand{\stardoctitle}     {CCDPACK}
-\newcommand{\stardoconeline}   {CCD data reduction package}
-\newcommand{\stardocversion}   {Version 4.0}
-\newcommand{\stardocmanual}    {Users' Manual}
-\newcommand{\stardocabstract}  {
+\stardocnumber      {139.18}
+\stardocauthors     {Peter W. Draper, Mark Taylor, Alasdair Allan}
+\stardocdate        {7 July 2011}
+\stardoctitle       {CCDPACK -- CCD data reduction package}
+\stardocversion     {Version 4.0}
+\stardocmanual      {Users' Manual}
+\stardocabstract  {
 CCDPACK is a package of programs for reducing CCD-like data. They
 allow you to debias, remove dark current, flatfield, register,
 resample and normalize data from single- or multiple-CCD instruments.
@@ -71,109 +70,23 @@ programs.
 %
 % -
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
+\stardocname  {\stardocinitials /\stardocnumber}
 
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
+%\setlength{\textwidth}{160mm}
+%\setlength{\textheight}{230mm}
+%\setlength{\topmargin}{-2mm}
+%\setlength{\oddsidemargin}{0mm}
+%\setlength{\evensidemargin}{0mm}
+%\setlength{\parindent}{0mm}
+%\setlength{\parskip}{\medskipamount}
+%\setlength{\unitlength}{1mm}
 
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
 %  Remove % on the following to debug links in the HTML version using Latex.
 
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \providecommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
 % \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
 % \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
@@ -181,333 +94,60 @@ programs.
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
 %end{latexonly}
 % -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document specific \providecommand or \newenvironment commands.
 
 % Size of \tt text - looks better smaller in LaTeX but not HTML.
-\newcommand{\ttsize}{\latexhtml{\small}{}}
+\providecommand{\ttsize}{\latexhtml{\small}{}}
 
 % Environment for indenting and using a small font.
-\newenvironment{myquote}{\begin{quote}\ttsize}{\end{quote}}
+\newenvironment{myquote}{\begin{quote}}{\end{quote}}
 
 % In-line typed text, buttons and menu items.
-\newcommand{\butt}[1]{{\ttsize \bf \tt #1}}
-\newcommand{\menu}[1]{{\ttsize \bf \em #1}}
-\newcommand{\wlab}[1]{{\ttsize \bf #1}}
-\newcommand{\text}[1]{{\ttsize \tt #1}}
+\providecommand{\butt}[1]{{\ttsize \bf \tt #1}}
+\providecommand{\menu}[1]{{\ttsize \bf \em #1}}
+\providecommand{\wlab}[1]{{\ttsize \bf #1}}
+\renewcommand{\text}[1]{\texttt{#1}}
 
 % Quick routine descriptions
-\newcommand{\quickdes}[3]{
+\providecommand{\quickdes}[3]{
                          \parbox{1.1in}{\bf #1}
                          \parbox{4.4in}{\raggedright #2 \dotfill}
                          \parbox{0.6in}{\pageref{#3}}
                          \vspace*{0.2in}}
 
 % Quotes for SST.
-\newcommand{\qt}[1]{{\tt "}#1{\tt "}}
-\newcommand{\qs}[1]{{\tt '}#1{\tt '}}
+\providecommand{\qt}[1]{{\tt "}#1{\tt "}}
+\providecommand{\qs}[1]{{\tt '}#1{\tt '}}
 
 % Routines with descriptions in the appendix.
-\newcommand{\routine}[1]{{\sc #1}}
-\newcommand{\xroutine}[1]{\htmlref{{\sc #1}}{#1}}
+\providecommand{\routine}[1]{{\sc #1}}
+\providecommand{\xroutine}[1]{\htmlref{{\sc #1}}{#1}}
 
 % Reference to a section of this document.
-\newcommand{\secref}[2]{\latexhtml{Section \ref{#1} ``#2''}{``\htmlref{#2}{#1}''}}
+\providecommand{\secref}[2]{\latexhtml{Section \ref{#1} ``#2''}{``\htmlref{#2}{#1}''}}
 
 % Latex only sections, subsections etc. Surround these with a latexonly
 % environment.
-\newcommand{\latexonlysection}[1]{\section{#1}}
-\newcommand{\latexonlysubsection}[1]{\subsection{#1}}
-\newcommand{\latexonlysubsubsection}[1]{\subsubsection{#1}}
-\begin{htmlonly}
-   \newcommand{\latexonlysection}[1]{#1}
-   \newcommand{\latexonlysubsection}[1]{#1}
-   \newcommand{\latexonlysubsubsection}[1]{#1}
-\end{htmlonly}
+\providecommand{\latexonlysection}[1]{\section{#1}}
+\providecommand{\latexonlysubsection}[1]{\subsection{#1}}
+\providecommand{\latexonlysubsubsection}[1]{\subsubsection{#1}}
+
+
 
 % Figure environment. Defined for latex2html. #1 is postscript file
 % #2 the qualifiers, #3 the gif file, #4 the label, #5 the caption.
-\newcommand{\myfig} [5] {
+\renewcommand{\myfig} [5] {
   \begin{figure}
     \centering\includegraphics[#2]{#1}
     \typeout{#1 inserted on page \arabic{page}}
     \caption{\label{#4}#5}
   \end{figure}
   }
-\begin{htmlonly}
-  \newcommand{\myfig}[5]{
-    \htmladdimg{#3}\\
-    Figure: \label{#4} #5
-    }
-\end{htmlonly}
+
+
 
 %+
 %  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \newpage
-   \label{#1}
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-   \begin{description}
-      {\ssttt \item #1}
-   \end{description}
-}
-% \newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-% \\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\sloppy \item[Invocation:]\hspace{0.4em}{\tt #1}}
-%\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy \item{\ssttt #1} \mbox{} \\ #2 }
-%\newcommand{\sstexamplesubsection}[2]{\sloppy
-%\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-%\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[#1:] \mbox{} \\[1.3ex] #2}
-%\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-%\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1:}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
 %.
 
 
@@ -517,90 +157,13 @@ programs.
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
+\scfrontmatter
 
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\textbf \stardoconeline \\ [4ex]}
-   {\large \bf \stardocversion}
-   \end{center}
-   \vspace{5mm}
 
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
 %  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
-      \stardoctitle\\
-      \stardoconeline \\
-      \stardocversion
-
-% ? Add picture here if required for the hypertext version.
-      \htmladdimg{main.gif}
-% ? End of picture
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
 
 
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
 
 % -----------------------------------------------------------------------------
 % ? Document Abstract. (if used)
@@ -612,16 +175,15 @@ programs.
 %  ===========================================
   \newpage
   \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
+    %\setlength{\parskip}{0mm}
+    
+    %\setlength{\parskip}{\medskipamount}
+    
   \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+
 
 \section{\xlabel{introduction}Introduction}
 
@@ -715,11 +277,9 @@ and to keep track of known alignments during registration.
 \section{\xlabel{startup}Starting up CCDPACK}
 
 CCDPACK commands are made available from the C shell using the command:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ccdpack
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 (note that the \text{\%} represents the C-shell prompt and shouldn't be typed).
 
 CCDPACK commands can also be used from the Starlink/\xref{ICL}{sg5}{}
@@ -731,17 +291,13 @@ and IRAF/CL command languages (IRAF users should consult section
 Help is available in two forms; from the command-line and via a
 hypertext version of this document.
 Just type:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ccdhelp
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 to get the command-line version, and:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ccdwww
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 to load the hypertext version. The hypertext version has one optional
 parameter, the name of the WWW browser to use. The default is
 \htmladdnormallink{the Netscape Navigator}{http://home.netscape.com/}
@@ -749,11 +305,9 @@ although
 \htmladdnormallink{NCSA Mosaic}
 {http://www.ncsa.uiuc.edu/SDG/Software/Mosaic/Docs/help-about.html}
 can also be used. If you prefer Mosaic try the command:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ccdwww Mosaic
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 If this doesn't work then replace the word \text{Mosaic} with the
 command that starts the browser for you (this shouldn't be an alias).
 If you want to always use Mosaic then set the environment variable
@@ -775,11 +329,9 @@ must be protected as these are expanded internally by CCDPACK, rather than by
 the shell).
 So for instance to pass the names of several data frames and the extent
 of the useful part of a CCD you might use a command like:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % debias in='"datar*,ffr?"' extent='[51,1094,1,1024]'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 If in doubt, it is a good idea to put single quotes around arguments
 in this way -- it can't hurt.
 
@@ -789,42 +341,34 @@ If you want to get a feel for what CCDPACK can do before reading
 further, you might like to run one or more of the three
 demonstration scripts:
 \begin{description}
-\item[{\tt ccdexercise}]
+\item[\texttt{ccdexercise}]
 emphasises the data reduction aspects of CCDPACK (debiassing,
 dark calibration, flatfielding)
-\item[{\tt wcsexercise}]
+\item[\texttt{wcsexercise}]
 shows more of the advanced image registration capabilities
-\item[{\tt setexercise}]
+\item[\texttt{setexercise}]
 organises data frames into Sets as if obtained from a mosaic camera
 and demonstrates CCDPACK's Set-handling abilities
 \end{description}
 
 To run any of these scripts, change to an empty directory,
 start up CCDPACK:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ccdpack
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 and then type the name of the demonstration script you want to see,
 either
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ccdexercise
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 or
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsexercise
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 or
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setexercise
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 You will then be prompted for a graphics device:
 answer `xw' to see the progress graphically on an Xwindows display,
 or `!' to run without graphics.
@@ -864,7 +408,7 @@ Usually the bias level is removed by the subtraction of specifically
 taken `bias-frames' ($0$ second exposure readouts) or by using
 estimates derived from bias data that is added in regions around
 the real data. These regions are known as the bias strips or
-over/under-scan regions (see \hyperref{this figure}{Figure
+over/under-scan regions (see \slhyperref{this figure}{Figure
 \S}{}{CCDPICCY}).
 
 After bias subtraction the data values are now directly related to the
@@ -941,12 +485,10 @@ when the need arises.
             \label{usingxreduce}\xlabel{usingxreduce}}
 
 If you are sitting at an X display then type the commands:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 %  ccdpack
 %  xreduce &
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 These commands will start the CCDPACK GUI.  The GUI will lead you
 through the stages necessary for organising your data so that it can
 be scheduled for processing and will start a background job to do the
@@ -1001,7 +543,7 @@ to those possible).
 Debiassing is done by two basic methods, either by subtracting bias frames
 or using the bias strips. If you have bias frames then use them, if
 you don't look for dark strips down the sides of your data; these are
-the bias strips (have a look at \hyperref{this figure}{Figure
+the bias strips (have a look at \slhyperref{this figure}{Figure
 \S}{}{CCDPICCY}).
 If you have bias frames and bias strips then use both (this is the
 \text{zeroed master, offsetting to bias strips} option).
@@ -1013,7 +555,7 @@ are finished (this is after you have accepted the options under
 
 One final piece of information concerns the nature of the ``data
 frames'' as they have been called so far. These may be of any kind (as
-described \hyperref{later}{in section \S}{}{datatypes}) providing you
+described \slhyperref{later}{in section \S}{}{datatypes}) providing you
 have initialized the \xref{CONVERT}{sun55}{} package before starting
 up \routine{XREDUCE}.  If you have not initialized CONVERT then you
 will only be able to use data frames that are stored in the Starlink
@@ -1028,17 +570,13 @@ If you have a ungraceful exit from \xroutine{XREDUCE} you may have
 some CCDPACK and \xref{KAPPA}{sun95}{} processes left running.  You
 will now have to kill these by hand.  How you do this is system
 dependent.  On BSD type systems (like Digital UNIX and Linux) try:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ps ux
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 and on system V machines (Solaris) try:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ps -ef | grep $USER
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 and look for the processes named \text{ccdpack\_res} and
 \text{kapview\_mon} (and perhaps others, such as
 \text{ndfpack\_mon}).
@@ -1049,11 +587,9 @@ process identifiers (usually the number in the second column).
 There is a command-line interface with similar abilities to
 \xroutine{XREDUCE} if you do not have access to an X display (or prefer
 a command-line anyway) it is started using the command:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % reduce
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 \xroutine{REDUCE} it isn't quite as capable as \routine{XREDUCE} so
 you'll have to work a bit harder.  Consult the description in the
 appendix for a little more about this routine, but it's probably
@@ -1078,11 +614,9 @@ astronomical format such as IRAF, disk FITS or old FIGARO then CCDPACK
 can also process these, but with an additional processing overhead. To
 use data in these formats you should initialise the CONVERT package
 (\xref{SUN/55}{sun55}{}):
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % convert
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 and the necessary facilities will be set up.
 Having done this, the simplest way to proceed is to use the
 full name of the unconverted files (i.e.\ including an extension
@@ -1098,19 +632,15 @@ A full description of how to do this is given in \xref{SUN/55}{sun55}{},
 but normally it just consists of running a command called `$<$TYPE$>$2NDF'.
 For instance converting all the FITS files in the current directory
 to NDF files with the same name can be done like this:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % fits2ndf in='*.fits' out='*'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 One useful tip for \xref{FITS2NDF}{sun55}{FITS2NDF}
 is to set the CONTAINER parameter to true if you are using Multi-Extension
 FITS files (MEFs), i.e.\ type instead
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % fits2ndf in='*.fits' out='*' container=true
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This will convert an MEF into a single HDS container file
 containing each of the HDUs in the MEF --- the upshot of this is that
 you can pass a single file name to CCDPACK programs and it will
@@ -1176,7 +706,7 @@ bias interpolation direction).
 \item The useful CCD area.
 \end{itemize}
 The routine also initialises the CCDPACK logging system (see
-\hyperref{later}{\S}{}{logsystem}).
+\slhyperref{later}{\S}{}{logsystem}).
 
 Which of this information you'll have to supply depends on whether or
 not your data has the correct information stored with it.
@@ -1190,17 +720,15 @@ column numbers, usually starting at 1,1 for the lower left-hand corner
 of the data array).
 
 A typical set up command is:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ccdsetup adc=1.5 bounds='[2,10,400,416]' rnoise=10 extent='[11,399,1,576]'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 In this example certain required characters (the \text{[ ]}) are also
 special to the C shell so must be protected.
 
 \xroutine{CCDSETUP} also allows you to define which parts of the CCD are
 corrupt or unreliable (due to hot spots, bad columns etc.); see
-\hyperref{the section on data-masks}{\S}{}{datamasks}, if you need to do this.
+\slhyperref{the section on data-masks}{\S}{}{datamasks}, if you need to do this.
 
 \myfig{sun139_geo}{}{geo.gif}{CCDPICCY}{Typical CCD geometries.
 In the figure on the left the readout direction is `Y', the bias
@@ -1233,18 +761,16 @@ are available with CCDPACK, check \xroutine{XREDUCE} or \xroutine{REDUCE}
 isn't a trivial task and you should probably opt for using
 \routine{PRESENT}, even if you have some FITS information available.
 A description of how to create a FITS import control table is given in
-the \routine{IMPORT} \hyperref{description}{description in \S}{}{IMPORT}.
+the \routine{IMPORT} \slhyperref{description}{description in \S}{}{IMPORT}.
 
 Using \routine{PRESENT} is fairly trivial as long as you've
 run \routine{CCDSETUP} and answered all the relevant parts.
 \routine{PRESENT} just requires lists of the
 data frames of each type and a filter type (any old value will do if this
 isn't relevant). So an invocation of \routine{PRESENT} might be:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % present bias='bias*' target='ngc891*' flat='ff*'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 although you'd generally run it and respond to the prompts
 interactively. CCDPACK programs can generally accept lists of data
 frames, so it this case it processes all the frames with names
@@ -1256,7 +782,7 @@ When running \routine{PRESENT} it's a good idea to check the output to
 make sure that your frames are given the correct frame type. The known frame
 types are:
 \begin{itemize}
-\item \text{TARGET}: These are the frames with the real data. The
+\item \texttt{TARGET}: These are the frames with the real data. The
 ``target'' of your observations (or perhaps the target that the
 telescope points at).
 \item \text{FLAT}: The flatfields.
@@ -1303,11 +829,9 @@ parameters with similar names.
 \subsubsection{\label{scheduling}Scheduling a reduction}
 After you've performed the first two tasks this part is easy. Just run the
 application \xroutine{SCHEDULE}:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % schedule in='*' execute=true
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This requires a list of the data frames to reduce and will show what
 processing it reckons is required (including a range of possible
 debiassing options), write a script to perform this and (optionally)
@@ -1332,8 +856,7 @@ then you would just need a script that contained something like:
 \begin{center}
 \fbox{Example 1}
 \end{center}
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 #!/bin/csh
 #
 #   Initialize ccdpack
@@ -1356,8 +879,7 @@ import in='*' table=$CCDPACK_DIR/WHTFLAT.DAT reset accept
 #
 schedule in='*' execute=true debias=1 spacesave=some reset accept
 exit
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 assuming that only the frames to be processed are in the current
 directory. A copy of this file is available as
 \text{\$CCDPACK\_DIR/ccdpack\_ex1.csh}
@@ -1371,8 +893,7 @@ script might be like:
 \begin{center}
 \fbox{Example 2}
 \end{center}
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 #!/bin/csh
 #
 #   Initialize ccdpack
@@ -1399,8 +920,7 @@ present target='DATAR*' flat='FFR*' onefilter=true filter=R \
 schedule in='"DATA*,BIAS*,FF*"' execute=true debias=1 spacesave=some \
          reset accept
 exit
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The file \text{CCDPACK\_SETUP.DAT}
 is a \xroutine{CCDSETUP} restoration file and has been created by
 running \routine{CCDSETUP} and saving its configuration.
@@ -1438,7 +958,7 @@ the device characteristics using the routine:
 \begin{itemize}
 \item \xroutine{CCDSETUP}.
 \end{itemize}
-\routine{CCDSETUP} is described \hyperref{elsewhere}{in \S}{}{configuration}.
+\routine{CCDSETUP} is described \slhyperref{elsewhere}{in \S}{}{configuration}.
 
 \subsubsection{Step 2 - Making a bias calibration frame \xlabel{masterbias}
                \label{masterbias}}
@@ -1465,17 +985,13 @@ You make a master bias by running the program:
 \end{itemize}
 If you want to make a master bias using the first method, then use a
 command like:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makebias in='bias/*' out=master_bias rnoise=10 zero=false
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 for the second method use:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makebias in='bias/*' out=master_bias rnoise=10
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The IN specification \text{bias/*} means get all the frames
 in the subdirectory \text{bias/}.
@@ -1526,12 +1042,10 @@ contaminated by residual charge), if it has only one then the choice
 is obvious.
 
 To subtract a zeroed master bias frame type something like:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % debias in='"rdata/*,ffr/*"' out='*_debias' bounds='[2,10,400,416]' rnoise=10
          adc=1 bias=master_bias
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 or conversely let \routine{DEBIAS} prompt you. If you meet any questions which you
 do not understand hit return to accept the default, or respond with a
 `?' to get some help. If things are really bad then `!!' (abort) will
@@ -1542,12 +1056,10 @@ BOUNDS and RNOISE need not be given if you've used
 If your master bias frame has a non zero mean (if you've selected
 the ZERO=FALSE option in \routine{MAKEBIAS}) you just want to subtract
 it so use:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % debias in='"rdata/*,ffr/*"' out='*_debias' rnoise=10 adc=1 bias=master_bias
          offset=false
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The ADC  -- analogue-to-digital conversion --  factor is
 required to generate error estimates from the number of ADUs recorded in
 each pixel, as is the RNOISE value.
@@ -1566,12 +1078,10 @@ is used. In this case a single value is derived for each line or
 one global value for the whole frame.
 
 To subtract the bias using interpolation type something like:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 %  debias in='"rdata/*,ffr/*"' out='*_tmp' bounds='[2,10,400,416]' rnoise=10
           adc=2
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This will interpolate between each pair of lines in the bias strips
 using a  constant. Before the interpolation occurs the bias strips are
 smoothed using a box filter (this aims to reduce the variation {\em along}
@@ -1583,11 +1093,9 @@ actually is (this is also useful when the debiassing has already been
 done for you and you want to add estimates of the errors, such as in
 IR data).
 To debias using a constant try something like:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % debias in='"rdata/*,ffr/*"' out='*_tmp' usecon zero=100.0
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This subtracts \text{100.0} from all the data before making error
 estimates applying data masks etc.
 
@@ -1614,7 +1122,7 @@ file}{datamasks}).
 \end{itemize}
 
 For details about these functions see
-\hyperref{the full description}{appendix \S}{}{DEBIAS}.
+\slhyperref{the full description}{appendix \S}{}{DEBIAS}.
 
 \subsubsection{\xlabel{flashordark}Step 4 - Flash or dark calibration
                \label{flashordark}}
@@ -1632,11 +1140,9 @@ using the routine:
 This combines a list of frames together using an associated list
 of (relative) exposure times. A typical invocation of \routine{MAKECAL} in which
 the data has been collected with the same exposure time is:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makecal in='darks/*' expose=1 out=master_dark
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This uses all the frames in the \text{darks/} directory to make a
 master dark frame. The exposure times given are 1 as the dark frames
 have exactly the same exposure time as the data. Note that if the input
@@ -1649,12 +1155,10 @@ the routine:
 \item \xroutine{CALCOR}
 \end{itemize}
 which just subtracts a scaled master calibration frame from a list.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % calcor in='"rdata/*_debias,ffr/*_debias"' out='*_dark' cal=master_dark
          expose=1
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Performing pre-flash subtraction is just as straight-forward if the
 pre-flash calibration frames are exposed for the same time as the
@@ -1663,12 +1167,10 @@ pre-flash on the data.
 If the calibration data have different exposure times then an explicit
 list of data frame names is required, together with their associated
 times (all entered in the correct order). So you might use:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makecal in=^darkframes.lis out=master_dark expose=^darkexposures.lis
 % calcor in=^frames.lis out='*_dark' cal=master_dark expose=^exposures.lis
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The contents of the text files \text{darkframes.lis} and
 \text{frames.lis} are the names of all the frames to be
 processed. The contents of the files \text{darkexposures.lis} and
@@ -1696,15 +1198,13 @@ After this has been done it estimates the mean value in each frame
 (this is how it copes with different exposures) and using the mean as
 a weight it then combines the data using a method,
 such as median stacking (see
-\hyperref{elsewhere}{\S}{\,}{combinations}), which rejects even more bad
+\slhyperref{elsewhere}{\S}{\,}{combinations}), which rejects even more bad
 data (in fact any method except the mean will reject some spurious
 data).
 To use \routine{MAKEFLAT} just type something like:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makeflat in='ffr/*' out=master_flatr
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 and it's done.
 One master flatfield should be made for each filter used.
 
@@ -1713,12 +1213,10 @@ flatfield. The flatfield corrects for such things as
 vignetting (the optical response) and the pixel-to-pixel variations in
 the CCD response (these can be up to 10 percent).
 \xroutine{FLATCOR} divides data by a flatfield.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % flatcor in='rdata/*_debias_darkc' out='*|debias_darkc|processed|'
           flat=master_flatr
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The specification \text{out=*|debias\_darkc|processed|} is one we
 have not seen before, its meaning is; call all the output frames the
 same as the inputs except remove the string \text{`debias\_darkc'}
@@ -1728,13 +1226,12 @@ from the names and replace it with \text{`processed'}.
 This example is a full reduction with two filter types, error
 generation and defect removal. The debiassing is performed using a
 zeroed master bias that is offset to the bias strips. To execute this
-in the background \hyperref{see elsewhere}{consult \S}{}{backgroundprocessing}.
+in the background \slhyperref{see elsewhere}{consult \S}{}{backgroundprocessing}.
 
 \begin{center}
 \fbox{Example 3}
 \end{center}
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 #
 # Command file to run a CCDPACK reduction sequence from a
 # C shell background job.
@@ -1777,8 +1274,7 @@ flatcor in='bdata/*_debias' out='*|debias|flattened|' \
 #
 ccdnote '"Test reduction finished"'
 #
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 
 The next example is a less comprehensive one with no error generation
@@ -1789,8 +1285,7 @@ subtracted without offsetting as the data has no bias strips.
 \fbox{Example 4}
 \end{center}
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 #
 # Command file to run a CCDPACK reduction sequence from a
 # C shell background job.
@@ -1820,8 +1315,7 @@ makeflat in='ff*-db' out=master_flat accept
 #
 flatcor in='data*-db' out='*-fl' accept
 #
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The next example debiasses using bias strips.
 
@@ -1830,8 +1324,7 @@ The next example debiasses using bias strips.
 \fbox{Example 5}
 \end{center}
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 #
 # Command file to run a CCDPACK reduction sequence from a
 # C shell background job.
@@ -1857,8 +1350,7 @@ makeflat in='ff*-db' out=master_flat accept
 #
 flatcor in='data*-db' out='*-fl' accept
 #
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The next example debiasses using bias strips and creates a flatfield
 using known exposure times and avoids the defect cleaning process in
@@ -1868,8 +1360,7 @@ using known exposure times and avoids the defect cleaning process in
 \fbox{Example 6}
 \end{center}
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 #
 # Command file to run a CCDPACK reduction sequence from a
 # C shell background job.
@@ -1900,8 +1391,7 @@ cdiv in=master_tmp scalar=$mean out=master_flat
 #
 flatcor in='data[1-3]-db' out='*-fl' flat=master_flat accept
 #
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Note that in all these examples it is necessary to protect certain
 symbols from being interpreted by the shell. The
@@ -1919,13 +1409,16 @@ directory, called
 The reduction sequences outlined above are shown in a schematic format
 \latex{in figure \ref{reductionpicture}}.
 
-\myfig{sun139_red}{height=0.85\textheight}{red.gif}{reductionpicture}
-{A schematic outline of the order in which CCDPACK reduction
-routines should be used.
-Dashed boxes indicate that this part is optional or not required.
-The \xroutine{MAKECAL}/\xroutine{CALCOR} section may need repeating
-more than once (e.g. if flash and dark frames are to be processed)}
-
+\begin{figure}
+\includegraphics[height=0.85\linewidth]{sun139_red}
+\caption[A schematic outline of the order in which CCDPACK reduction
+  routines should be used] {A schematic outline of the order in which
+  CCDPACK reduction routines should be used.  Dashed boxes indicate
+  that this part is optional or not required. The
+  \xroutine{MAKECAL}/\xroutine{CALCOR} section may need repeating more
+  than once (e.g. if flash and dark frames are to be
+  processed). \label{reductionpicture}}
+\end{figure}
 %  Make sure that this schematic gets printed out now.
 \clearpage
 
@@ -1946,11 +1439,9 @@ and/or generate error estimates for your data (the \xref{PHOTOM
 -- SUN/45}{sun45}{} package can make use of these), you can miss out
 the debiassing stage. If you want to pass your data through \xroutine{DEBIAS} use
 the option to subtract a constant as in:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % debias in='irdata*' out='*_db' usecon zero=0.0
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Another way that IR data can be debiassed is by subtracting the bias
 contribution at the same time as the dark current (since a dark
@@ -1982,8 +1473,7 @@ to deglitch and generate errors if your data is already debiassed.
 \fbox{Example 7}
 \end{center}
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 #
 #  Clear any existing setup.
 #
@@ -2015,8 +1505,7 @@ flatcor in='*_dk' flat=master_flat out='*-fl'
 #
 # The next step is to mosaic the frames, using PAIRNDF, REGISTER,
 # TRANNDF and MAKEMOS routines...
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 A copy of this file is available from
 \text{\$CCDPACK\_DIR} in the file \text{ccdpack\_ex7.csh}.
@@ -2029,8 +1518,7 @@ debiassed and uses the object data frames to produce a flatfield.
 \fbox{Example 8}
 \end{center}
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 #!/bin/csh
 #
 #  Initialise ccdpack
@@ -2064,8 +1552,7 @@ schedule in='"^hframes,^jframes,^kframes,^darks"' irflats=true \
          execute=true debias=4 spacesave=some reset accept
 #
 exit
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 A copy of this file is available from
 \text{\$CCDPACK\_DIR} in the file \text{ccdpack\_ex8.csh}.
 
@@ -2172,12 +1659,10 @@ These attached
 coordinate systems are understood by other Starlink applications
 so that for instance using KAPPA's
 \xref{DISPLAY}{sun95}{DISPLAY} command:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % display myimage axes
-\end{verbatim}
-\end{myquote}
-will display {\tt myimage} with axes showing coordinates from
+\end{terminalv}
+will display \texttt{myimage} with axes showing coordinates from
 the Current system attached to the image.
 
 CCDPACK provides four main categories of facility
@@ -2187,20 +1672,20 @@ which are described later in this section as follows:
 \item[Object matching methods:]
 \routine{FINDOBJ}, \routine{FINDOFF}, \routine{PAIRNDF}, \routine{CCDALIGN}
 and \routine{REGISTER} are described
-\hyperref{here}{in \S}{}{object_matching}.
+\slhyperref{here}{in \S}{}{object_matching}.
 These are suitable if you have a set of mutually overlapping images
 which can be aligned by identifying the same objects in different images.
 %
 \item[Direct manipulation of coordinate systems:]
 \routine{WCSEDIT} is decribed
-\hyperref{here}{in \S}{}{wcsdirect} and
+\slhyperref{here}{in \S}{}{wcsdirect} and
 can be used to examine coordinate systems attached to an image,
 add them, remove them, or change which one is Current for an image when
 it's necessary to do this manually.
 %
 \item[Dealing with externally stored coordinate systems:]
 \routine{ASTIMP} and \routine{ASTEXP} are described
-\hyperref{here}{in \S}{}{astfiles}.
+\slhyperref{here}{in \S}{}{astfiles}.
 These allow coordinate system information to be saved in and restored
 from external files, and can be used to align multiple sets of images
 in the same way relative to each other --- this can for instance be
@@ -2212,7 +1697,7 @@ see the section on dealing with Sets (\ref{ccdpack_sets}).
 %
 \item[Combining information from existing coordinate systems:]
 \routine{WCSREG} is described
-\hyperref{here}{in \S}{}{wcscombine},
+\slhyperref{here}{in \S}{}{wcscombine},
 and can be used to produce a unified coordinate system out of several
 present in a set of images when this is possible.
 \end{description}
@@ -2335,12 +1820,10 @@ object-matching-based registration,
 the rest being essentially straight-forward.
 
 The main mapping used by \routine{REGISTER} is the linear mapping:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 XX = A + B * X + C * Y
 YY = D + E * X + F * Y
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 where the \text{A-F} are the coefficients which are to be
 determined, \text{X} and \text{Y} the current coordinates and
 \text{XX} and \text{YY} the new coordinates. \routine{REGISTER} supports
@@ -2398,7 +1881,7 @@ used in that order.
 correspondence of the image-features and \routine{REGISTER} produces the
 mappings from this information. This sequence is used in the
 demonstration script
-\hyperref{{\tt ccdexercise}}{{\tt ccdexercise} described in \S}{}{demos}.
+\slhyperref{\texttt{ccdexercise}}{\texttt{ccdexercise} described in \S}{}{demos}.
 
 \routine{FINDOBJ} works by looking for pixels above a threshold value,
 objects are
@@ -2507,17 +1990,15 @@ or \routine{ASTIMP} as explained in later sections.
 
 Invoking \xroutine{FINDOBJ}, \xroutine{FINDOFF} and
 \xroutine{REGISTER} is simple.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % findobj in='*' outlist='*.find'
 % findoff inlist='*' outlist='*.off' error=1
 % register inlist='*' fittype=1
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This locates the objects on all the images in the current directory,
 performs pattern-matching and finally registers them, attaching
 a new coordinate system labelled `CCD\_REG' to each image.
-See ``\hyperref{Using position lists}{\S}{}{using_position_lists}''
+See ``\slhyperref{Using position lists}{\S}{}{using_position_lists}''
 if using `\text{*}' for both the IN and INLIST
 parameters seems mysterious.
 
@@ -2531,7 +2012,7 @@ Current coordinate system, which can dramatically decrease running time
 and the likelihood of a false match.
 
 \routine{FINDOFF}'s other parameters are detailed in
-\hyperref{a later section}{\S}{}{FINDOFF} and some of its internals are
+\slhyperref{a later section}{\S}{}{FINDOFF} and some of its internals are
 explained in P.W. Draper, {\bf 1993}, `Preparing multiple CCD frames for the
 photometry of extended fields', Proceedings of the 5th ESO/ST-ECF Data
 Analysis Workshop.
@@ -2651,11 +2132,9 @@ In CCDPACK the positions of identified/detected image features are
 stored in ordinary text files which are referred to as `position lists'.
 The format of these lists is flexible. Usually position lists have three
 columns:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 Identifier    X-position    Y-position
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 these may be separated by commas or blanks. The identifier is an
 integer value which is used to identify positions which are related
 (i.e.\ are of the same object) in different lists.
@@ -2664,17 +2143,15 @@ If more than three columns exist then only the values in the first
 three are used, though some of the programs propagate extra columns
 from the input to the output lists.
 If only two columns exist it is assumed that they are:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 X-position    Y-position
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 such lists may be produced by \xref{KAPPA}{sun95}{} applications. In
 this case applications which rely on a knowledge of the identifiers
 assume they are monotonically increasing from one.
 
 Whole and in-line comments are allowed in position lists using the
-character `{\tt \#}'.  These are not propagated from input to output lists.
+character `\texttt{\#}'.  These are not propagated from input to output lists.
 Note that the final line of the file should be terminated by a
 newline character (certain text editors do not always enforce this).
 
@@ -2706,7 +2183,7 @@ the NDFNAMES global parameter
 (\xroutine{CCDSETUP}) to false. In this case, position lists must be specified
 explicitly as a comma separated list of names or gotten from a text
 file using indirection, this is exactly the same as for naming images
-(see ``\hyperref{processing lists of data}{\S}{}{ndflists}'') except that
+(see ``\slhyperref{processing lists of data}{\S}{}{ndflists}'') except that
 wildcards are {\em not} allowed. Output list names may be formed
 from the modification of these names when NDFNAMES is false, otherwise
 the input image names are {\em always} used.
@@ -2740,8 +2217,7 @@ and select the coordinate system to be regarded as Current.
 To examine the coordinate systems attached to an image, you
 can use \routine{WCSEDIT} with the parameter MODE set to SHOW;
 for example:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsedit obs1 show
 
     WCSEDIT
@@ -2757,8 +2233,7 @@ obs1:
       3        AXIS              Axis coordinates; first pixel at (0.5,0.5)
       4    *   SKY               FK5 equatorial coordinates; mean equinox...
       5        CCD_REG           Alignment by REGISTER
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This shows that there are five coordinate systems in the image and
 that number~4, labelled `SKY' is the Current one.
 Note that the first three coordinate systems attached to an image
@@ -2775,7 +2250,7 @@ This is given using the FRAME parameter, and you can use one
 of the following formats:
 \begin{itemize}
 \item
-The null value (`{\tt !}'), indicating the Current coordinate system
+The null value (`\texttt{!}'), indicating the Current coordinate system
 \item
 The domain (name) of the coordinate system
 \item
@@ -2786,23 +2261,19 @@ A \qt{Sky Co-ordinate System} (SCS) value such as EQUAT(J2000)
 \xref{SUN/95}{sun95}{}).
 \end{itemize}
 The first two options are usually the most appropriate.
-As you can see above, the output of `{\tt wcsedit show}'
+As you can see above, the output of `\texttt{wcsedit show}'
 will show you what domains there are, what the index of each is,
 and which coordinate system is Current for a given image.
 
 To change the coordinate system to be used as the Current one
 therefore, simply write something like:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsedit in='image*' mode=current frame=pixel
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 or just
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsedit 'image*' current pixel
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 which will set the Current coordinate system of all the image files
 indicated to pixel coordinates.
 Since the PIXEL coordinates are in some sense the native ones,
@@ -2811,13 +2282,11 @@ the images will behave in most respects as if they had no attached
 coordinate systems at all.
 
 Syntax for removing coordinate systems is much the same:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsedit image remove 4
-\end{verbatim}
-\end{myquote}
-will remove the fourth (as listed by {\tt wcsedit show}) coordinate
-system from file {\tt image}.
+\end{terminalv}
+will remove the fourth (as listed by \texttt{wcsedit show}) coordinate
+system from file \texttt{image}.
 
 When adding a new
 coordinate system you must give the transformation which connects it
@@ -2859,20 +2328,16 @@ add a new coordinate system, labelled `SQUASHED',
 representing a barrel distortion of the coordinates labelled `FOCAL'
 having a magnitude of $7\times 10^{-6}$
 and an optical centre at coordinates (1000,1000):
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsedit 'image*' add frame=focal domain=squashed maptype=pincushion
           coeffs='[-7e-6,1000,1000]'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 It's also possible to make fine adjustments to the coordinate
 systems attached to an image using the SET mode, for example:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsedit file1 set frame='!' set='domain=obs1'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 changes the name of the Current coordinate system to `OBS1'.
 For more sophisticated use of this feature, see the documentation
 of \xroutine{WCSEDIT} in appendix \S\ref{app:description}, and of
@@ -2890,8 +2355,7 @@ which were successfully accessed, which normally
 means those which had a coordinate system matching that
 given by the FRAME parameter.  So it's easy to find out which
 images were successfully modified:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsedit 'data?' current focal
 
     WCSEDIT
@@ -2911,18 +2375,15 @@ data4: Current frame set to domain FOCAL
 data1
 data2
 data4
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This name list file can be used as an indirection file to pass to the
 input of another CCDPACK task.  For instance, if you want to do an
 interactive alignment of only those files which have coordinate
 systems with the name ``FOCAL'', you could follow the above command
 with this:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % pairndf '^WCSEDIT.LIS'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 
 
@@ -2971,14 +2432,12 @@ or by usng FITS headers in the file,
 according to how the AST file was constructed by \routine{ASTEXP}.
 
 Full details on how to use \routine{ASTIMP} and \routine{ASTEXP}
-can be found in \hyperref{an appendix}{appendix }{}{app:description},
+can be found in \slhyperref{an appendix}{appendix }{}{app:description},
 but the following gives an example.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % astexp '"reg_data[1234]"' astfile=inst.ast idtype=fitsid fitsid=chipname
 % astimp 'new_data*' astfile=inst.ast
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The first command takes a set of 4 images, one from each chip of an array,
 which are aligned in their Current coordinate system,
 (possibly by object matching)
@@ -3031,11 +2490,9 @@ and if it's possible to align them all using only these coordinate
 systems it will do so,
 adding a new coordinate system labelled `CCD\_WCSREG' to them all.
 In the above example you would write something like
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsreg in='image*' domains='[ccd_reg,sky]'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Where there is a choice between coordinate systems to use for alignment,
 ones given earlier in the DOMAINS list are preferred.
 The square brackets around the named domains are required here because it
@@ -3052,12 +2509,10 @@ you can align them in a pixel-sized coordinate system using
 Giving a null (`!') value for the list of domains will automatically
 use the current attached coordinates of the reference image for
 alignment, so that running
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsreg in='regdat*' domains='!'
-\end{verbatim}
-\end{myquote}
-will ensure the group of already registered images {\tt regdat*}
+\end{terminalv}
+will ensure the group of already registered images \texttt{regdat*}
 keeps its existing alignment, but in a coordinate system in
 which a unit is pixel-sized.
 This can be a useful trick prior to resampling,
@@ -3075,7 +2530,7 @@ different sources however,
 \routine{WCSREG}, in conjunction with the other programs described
 in this section, provides powerful facilities for making use of
 this information.  Some examples of them at work can be found
-in \hyperref{the examples section}{\S }{}{regexamples}.
+in \slhyperref{the examples section}{\S }{}{regexamples}.
 
 
 \subsection{\xlabel{view-align}\label{view-align}Viewing image alignment}
@@ -3114,7 +2569,7 @@ You can see an example of this in Figure \ref{OUTCLEAR}.
 \myfig{sun139_outclear}{height=0.4\textheight}{outclear.gif}{OUTCLEAR}{
 This image was generated by registering the images and running the
 command:\protect\\
-\hspace*{2em}{\tt drawndf r1059* clear noaxes labname labnum}}
+\hspace*{2em}\texttt{drawndf r1059* clear noaxes labname labnum}}
 
 If CLEAR is FALSE however, \routine{DRAWNDF} will try to align the
 outlines with an existing picture on the graphics display.
@@ -3139,7 +2594,7 @@ You can see an example of this in Figure \ref{OUTSKY}.
 \myfig{sun139_outsky}{height=0.5\textheight}{outsky.gif}{OUTSKY}{DRAWNDF
 command with CLEAR=FALSE.  This picture was generated by displaying
 the sky region and then running the command:\protect\\
-\hspace*{2em}{\tt drawndf "gc6352p1-?" noclear
+\hspace*{2em}\texttt{drawndf "gc6352p1-?" noclear
                   labpos=cf style="width(curves)=2"}}
 
 Finally, \routine{DRAWNDF} can display the actual image data for you.
@@ -3164,7 +2619,7 @@ in this way is given in Figure \ref{OUTIM}.
 \myfig{sun139_outim}{height=0.5\textheight}{outim.gif}{OUTIM}{DRAWNDF
 command with IMAGE=TRUE.  This display was generated using the
 command:\protect\\
-\hspace*{2em}{\tt drawndf "r10629?" image=yes}}
+\hspace*{2em}\texttt{drawndf "r10629?" image=yes}}
 
 
 \subsection{\xlabel{resampling}\label{resampling}Data resampling}
@@ -3203,11 +2658,9 @@ selected boundary positions, which is very useful when transforming whole
 lists of images as the output images are made only as big as necessary.
 
 To use \routine{TRANNDF} type something like:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % tranndf in='*' out='*-trn'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This resamples all the images in the current directory naming the output
 images the same as the inputs except that the string `\text{-trn}' is
 appended to each output name.
@@ -3224,7 +2677,7 @@ adding a new coordinate system with the
 In particular it's no good running \routine{TRANNDF} on a set of
 images which have SKY coordinates as Current, since they have
 units of radians, which are far too big.
-See the example in \hyperref{the section about WCSREG}{\S }{}{wcscombine}
+See the example in \slhyperref{the section about WCSREG}{\S }{}{wcscombine}
 for how to deal with this.
 
 For a quick look at what the resampled data will look like,
@@ -3255,13 +2708,11 @@ with data normalisation.
 Normalisation is determined as two components, a scaling factor and a
 zero point factor. These may be controlled independently by the
 parameters SCALE and ZERO. So:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makemos in='*' out=mosaic scale
 % makemos in='*' out=mosaic zero
 % makemos in='*' out=mosaic scale zero
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 would determine just scale factors, just zero points or both scale
 factors and zero points respectively. The option also exists to modify
 the data values of the input datasets so that their values are
@@ -3304,7 +2755,7 @@ Each drop affects the pixels in the output grid which it covers
 in proportion to the area of overlap; if an output pixel is
 not touched by any of the drops it receives no data from the image.
 This is shown schematically
-in \hyperref{the figure}{figure }{}{drizzlepicture}.
+in \slhyperref{the figure}{figure }{}{drizzlepicture}.
 
 \myfig{sun139_driz}{height=0.5\textheight}{driz.gif}{drizzlepicture}
 {A schematic representation of Drizzling. The input pixel grid
@@ -3356,7 +2807,7 @@ A.S.~Fruchter and R.N.~Hook, {\bf 1998},
 press}{http://xxx.soton.ac.uk/abs/astro-ph/9808087}) which discusses the
 algorithm in depth. Further information can also be found on the web at
 \htmladdnormallink{
-{\tt http://www.stsci.edu/\%7Efruchter/dither/drizzle.html}
+\texttt{http://www.stsci.edu/\%7Efruchter/dither/drizzle.html}
 }{http://www.stsci.edu/~fruchter/dither/drizzle.html}
 where the authors of the algorithm discuss its use in reconstructing
 the Hubble Deep Field.
@@ -3369,21 +2820,17 @@ If you wish the \routine{DRIZZLE} program to carry out scaling and/or
 zero-point corrections this is controlled via the SCALE and
 ZERO parameters (as for \routine{MAKEMOS}) and, additionally,
 the CORRECT parameter. So:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % drizzle in='*' out=mosaic scale zero correct='!'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 would determine (and apply) both scale and zero-point corrections. However,
 \routine{DRIZZLE} also has the capability to read scale and zero-point
 corrections in from a (correctly) formatted file by setting the
 CORRECT parameter to point to the file. So:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % drizzle in='*' out=mosaic scale zero correct='drizzle.dat'
-\end{verbatim}
-\end{myquote}
-would read the corrections in from the file {\tt drizzle.dat}.
+\end{terminalv}
+would read the corrections in from the file \texttt{drizzle.dat}.
 \routine{MAKEMOS} has the ability to generate this file,
 although it should be noted that it does so in the same manner as
 \routine{DRIZZLE} finds the corrections, so there is no advantage in
@@ -3395,7 +2842,7 @@ given in appendix \S\ref{descriptions}.
 Since it does its own resampling, the remarks
 about the units of the Current coordinate systems made about
 \routine{TRANNDF} apply here ---
-see \hyperref{the section on resampling}{\S }{}{resampling}.
+see \slhyperref{the section on resampling}{\S }{}{resampling}.
 
 
 
@@ -3411,11 +2858,9 @@ We would like to fine-tune this alignment by matching image features.
 We begin by setting SKY as the Current coordinate system for all
 the images (they may be in this state anyway
 but it doesn't hurt to make sure):
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsedit in='data*' mode=current frame=sky
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Since the SKY (now Current) coordinates are approximately right,
 they take account of any rotations of the telescope between
 exposures, so that the images are effectively related by a simple offset,
@@ -3425,30 +2870,24 @@ we can tell FINDOFF (by setting the RESTRICT parameter)
 to look for matching objects
 only in the regions which ought to overlap, which makes it faster
 and less prone to finding a false match.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % findobj in='data*' outlist='*.obj'
 % findoff inlist='data*' outlist='*.off' restrict=true
 % register inlist='data*'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The REGISTER program adds a new pixel-like coordinate system
 labelled CCD\_REG to all the images.
 We can now resample all the images into these coordinates, which
 aligns them pixel-for-pixel, and combine them into a mosaic.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % tranndf in='data*' out='*-r'
 % makemos in='data*-r' out=mosaic
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Finally, we set the Current coordinate system of the mosaic to SKY, so
 that when it is displayed RA and Dec coordinates will be shown.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsedit in=mosaic mode=current frame=sky
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 
 \subsubsection{\label{mosexnoset}Registering frames from a mosaic camera}
@@ -3470,26 +2909,24 @@ taken using a mosaic camera.}
 
 We suppose that we have two observations from a mosaic camera,
 which were taken on the sky in roughly the positions
-shown in \hyperref{the figure}{Figure }{}{fig:overlap}.
+shown in \slhyperref{the figure}{Figure }{}{fig:overlap}.
 Because of the way they overlap the object matching methods of
-\hyperref{a previous section}{section \S}{}{object_matching}
+\slhyperref{a previous section}{section \S}{}{object_matching}
 can be used to apply a common coordinate system to some,
 but not all, of the images.
 Furthermore, the geometry of the CCD chips in the instrument
 is known and stored in an AST file \text{instrument.ast} as
-\hyperref{explained earlier}{in section \S}{}{astfiles},
+\slhyperref{explained earlier}{in section \S}{}{astfiles},
 so that a common coordinate system can be applied to
 images \text{1a}, \text{1b} and \text{1c},
 and another to images \text{2a}, \text{2b} and \text{2c}.
 
 First of all therefore, we attach the instrument coordinates
 to each set of files as follows:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % astimp in='1?' astfile=instrument.ast indomain=obs1
 % astimp in='2?' astfile=instrument.ast indomain=obs2
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The file \text{instrument.ast} has been set up previously so that
 it attaches coordinate systems to the images according to
 a FITS header which distinguishes them from each other.
@@ -3498,20 +2935,16 @@ telescope pointing or orientation however, so we have to add
 our knowledge that the camera was rotated 180 degrees between
 exposures by adding a new coordinate system to one set,
 related to the one just added by a linear transformation:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsedit in='2?' mode=add frame=obs2 domain=obs2-rot
          maptype=linear coeffs='[0,-1,0,0,0,-1]'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 In fact since this is quite a common situation the \xroutine{ASTIMP}
 command has a parameter for adding rotations, so that the second
 ASTIMP and the WCSEDIT could be replaced by:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % astimp in='2?' astfile=instrument.ast indomain=obs2-rot rot=180
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 --- this step can also be automated under some circumstances by using
 \routine{ASTIMP}'s FITSROT parameter.
 Since all the images now have the same orientation
@@ -3519,30 +2952,25 @@ Since all the images now have the same orientation
 they are related
 by a simple offset so that the automatic object matching routines
 can be applied to the overlapping frames:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % findobj in='"1?,2?"' outlist='*.find'
 % findoff inlist='"1?,2?"' outlist='*.off'
 % register inlist='"1?,2?"' fittype=2
-\end{verbatim}
-\end{myquote}
-Note that unlike the previous example we do not use {\tt restrict=true} here,
+\end{terminalv}
+Note that unlike the previous example we do not use \texttt{restrict=true} here,
 since although the orientations are now (about) right
 the positionings may not be.
 If \routine{FINDOFF} has trouble or you would rather do the alignment
 by eye you could use \xroutine{PAIRNDF} instead of
 \routine{FINDOBJ} and \routine{FINDOFF} like this:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % pairndf in='"1?,2?"' outlist='*.off'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 before continuing with the \routine{REGISTER} command.
 
 To see what coordinate systems have now been attached we
 can examine the images using \xroutine{WCSEDIT}:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsedit '1?' show
 
     WCSEDIT
@@ -3571,8 +2999,7 @@ can examine the images using \xroutine{WCSEDIT}:
       3        AXIS              Axis coordinates; first pixel at (0.5,0.5)
       4        OBS1              Alignment on instrument focal plane
       5    *   CCD_REG           Alignment by REGISTER
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 and similarly for the other three.
 We can see that, because of the way the images overlap,
 \routine{REGISTER} has managed to add an aligning coordinate system
@@ -3608,8 +3035,7 @@ Note that \routine{WCSREG} can't do the impossible, so that if
 none of the images had CCD\_REG coordinates there would be nothing
 to connect group 1 to group 2 and the process would fail.
 The command we use is therefore
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsreg '"1?,2?"' domains='[ccd_reg,obs1,obs2]'
 
     WCSREG
@@ -3648,8 +3074,7 @@ The command we use is therefore
   6) 2c:
            6  ->   2            CCD_REG
            2  ->   1            OBS1
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This completes successfully and adds a new coordinate system
 labelled CCD\_WCSREG to each of the images.
 Since they are all aligned with the same coordinates, we should now be
@@ -3658,29 +3083,25 @@ It is a good idea at this stage to check that the alignment looks right
 before generating the mosaic, which may be time-consuming.
 You can see the alignment by using the \xroutine{DRAWNDF}
 command:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % drawndf '"1?,2?"' clear
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This should display a plot which resembles
-\hyperref{the above figure}{Figure }{}{fig:overlap};
+\slhyperref{the above figure}{Figure }{}{fig:overlap};
 if it shows an alignment different from what you expect,
 now is the time to go back
 and find the problem rather than producing an incorrect mosaic.
 
 Assuming all is well, it only remains to do the resampling and
 combination as before:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % tranndf '"1?,2?"' '*-r'
 % makemos '*-r' mosaic
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 To see this sort of procedure in action you can run the
 demonstration script
-\hyperref{{\tt wcsexercise}}{{\tt wcsexercise} described in \S}{}{demos}.
+\slhyperref{\texttt{wcsexercise}}{\texttt{wcsexercise} described in \S}{}{demos}.
 
 
 
@@ -3693,19 +3114,17 @@ the Isaac Newton Telescope at La Palma,
 and consists of four CCDs each 2048$\times$4096 pixels.
 Because the area occupied by detectors is large,
 optical distortion effects become quite important near the edges.
-After registering four images {\tt sb1,sb2,sb3,sb4},
+After registering four images \texttt{sb1,sb2,sb3,sb4},
 which included taking account of a pincushion distortion,
 the file was constructed by the following command:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % astexp astfile=INT-WFC.ast in='"sb[1234]"' outdomain=INT-WFC
          outtitle='"INT wide field camera undistorted"'
          idtype=fitsid fitsid=chipname fitsrot=rotskypa accept
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The OUTDOMAIN and OUTTITLE parameters write labels indicating
 the source of the coordinate information.
-The {\tt IDTYPE=FITSID} and {\tt FITSID=CHIPNAME} parameters
+The \texttt{IDTYPE=FITSID} and \texttt{FITSID=CHIPNAME} parameters
 indicate that the chip which each
 one comes from is to be distinguished by the value of its
 ``CHIPNAME'' FITS header card, and the FITSROT=ROTSKYPA
@@ -3714,8 +3133,7 @@ contains an angle in degrees through which the telescope has
 been rotated.
 Applying this to a set of files from the same instrument has
 the following effect:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % astimp 'o1059??' astfile=INT-WFC.ast accept
 
     ASTIMP
@@ -3750,12 +3168,11 @@ the following effect:
     Matched with frameset ID "FITSID CHIPNAME 'A5382-1-7'"
     Rotating additional 180 degrees
     New frame in domain "INT-WFC" added
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Since they now share a coordinate system they can now be, for instance,
 aligned with other images from the same instrument or resampled directly.
 
-The AST file can be found in {\tt \$CCDPACK\_DIR/INT-WFC.ast}.
+The AST file can be found in \texttt{\$CCDPACK\_DIR/INT-WFC.ast}.
 It is thought to be correct to an accuracy of 1 or 2 pixels,
 which is around half an arcsecond, over the whole focal plane.
 
@@ -3763,7 +3180,7 @@ which is around half an arcsecond, over the whole focal plane.
 \subsection{Schematic registration sequences}
 
 One outline for using the various applications is shown in
-\hyperref{the following figure}{Figure }{}{fig:registration}.
+\slhyperref{the following figure}{Figure }{}{fig:registration}.
 This illustrates the ways to proceed if you are using the
 object matching methods (\S \ref{object_matching})
 for alignment --- if you are using coordinate system information
@@ -3853,11 +3270,9 @@ consult the USESET global parameter to see whether they should
 use Set header information if it exists.
 To make CCDPACK use Set headers, you should use \xroutine{CCDSETUP}
 to set USESET true like this:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ccdsetup useset=true accept
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 All subsequent commands will then use Set headers where they have been
 added.  Alternatively you could specify USESET=TRUE on the command line
 of each CCDPACK program.
@@ -3901,8 +3316,7 @@ of \routine{MAKESET} in appendix \ref{MAKESET}.
 
 In the most straightforward case, you can use \xroutine{MAKESET}
 to make a single Set out of a group of files listed by name:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makeset '"im01,im02,im03"' mode=list accept
 
     MAKESET
@@ -3916,8 +3330,7 @@ to make a single Set out of a group of files listed by name:
                1       im01
                2       im02
                3       im03
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This will write a Set header to each of the named files.
 As the output shows, the same Set Name attribute ``im01''
 (the name of the first file in the list) is given to each,
@@ -3929,8 +3342,7 @@ can generate many Sets at the same time.  If your directory contains
 the files \text{im01} \ldots\ \text{im12} and each group of three in
 order represents the data from the three CCDs in a mosaic camera,
 you can write
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makeset 'im*' mode=list setsize=3 accept
 
     MAKESET
@@ -3959,26 +3371,21 @@ you can write
                1       im10
                2       im11
                3       im12
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Care has to be taken with this usage however; it relies on the
 files being presented to \routine{MAKESET} in the correct order,
 which in turn may depend on how your operating system expands
 wildcards, which is normally alphabetically.
 If for instance in the above example the files had been named
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
   im1   im2   im3   im4   im5   im6   im7   im8   im9  im10  im11  im12
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 (i.e.\ without the leading zero for numbers less than 10)
 then they would probably have been presented to \routine{MAKESET}
 in the order
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
   im1   im10  im11  im12  im2   im3   im4   im5   im6  im7   im8   im9
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 which is almost certainly not what you want.
 If you use \routine{MAKESET} with wildcards you should be careful
 to check the logged output to ensure that it has done the right thing.
@@ -3992,11 +3399,9 @@ By running \routine{MAKESET}
 with MODE=CONTAINER,
 it will assume that each HDS container file corresponds to a single Set.
 In this case you can just type something like
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makeset in='obs*' mode=container accept
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 and the correct headers will be added.
 
 Note that if your data initially exists in the form of one
@@ -4005,8 +3410,7 @@ you can convert these quite easily to
 HDS container files using the \xref{FITS2NDF}{sun55}{FITS2NDF} command
 with CONTAINER=TRUE.  So supposing you have three exposures,
 each stored in a 2-HDU MEF, you can do:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % convert
 
    CONVERT commands are now available -- (Version 1.3-5 2001 January)
@@ -4039,8 +3443,7 @@ each stored in a 2-HDU MEF, you can do:
  conv-obs3:
                1       conv-obs3.HDU_1
                2       conv-obs3.HDU_2
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 For subsequent work you need only
 supply the names of the container files (\text{conv-obs*})
 and the CCDPACK commands will look inside and find the
@@ -4069,8 +3472,7 @@ array into grid of rectangles which butt up to each other the
 XSTART and YSTART parameters are easier.
 The following example shows creation of a Set made by dividing
 a 2048x4096 array into quarters:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makeset in=sg28948 mode=split out='*_sp' \
           sections='!' xstart='[1,1025]' ystart='[1,2049]'
 
@@ -4087,8 +3489,7 @@ a 2048x4096 array into quarters:
                2       sg28948(1:1025,2049:)               PIXEL
                3       sg28948(1025:,1:2049)               PIXEL
                4       sg28948(1025:,2049:)                PIXEL
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The command creates a single new HDS container file ``sg28948\_sp'':
 when you give this as an input to CCDPACK commands they will look inside
 and process each of the four images in turn.
@@ -4139,14 +3540,11 @@ plane of the instrument --- this may have been added by the observing
 system, and it is known to be accurate.
 First ensure that the FOCAL coordinates are the Current coordinates
 of all the frames:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsedit '*' current focal
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 and then add the Set headers with the ADDWCS parameter set true:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makeset '*' mode=container addwcs=yes accept
 
     MAKESET
@@ -4160,8 +3558,7 @@ and then add the Set headers with the ADDWCS parameter set true:
                1       f10001.I1                           FOCAL
                2       f10001.I2                           FOCAL
                3       f10001.I3                           FOCAL
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 As you can see, the FOCAL coordinate system is listed as the one copied to
 make the new one.
 Note that since the new CCD\_SET coordinate system is a {\em copy\/}
@@ -4171,7 +3568,7 @@ remain attached to the images even if the FOCAL one is erased or modified.
 Variations on these methods of adding Set headers, as well as the
 possibility of controlling Set formation from FITS headers,
 are discussed in the description of \routine{MAKESET}
-in \hyperref{the appendix}{\S}{}{MAKESET}.
+in \slhyperref{the appendix}{\S}{}{MAKESET}.
 
 If you need to add Set alignment coordinates to some files after
 \routine{MAKESET} has already been run, you can just attach a new
@@ -4188,11 +3585,9 @@ It will not normally be necessary to remove Set headers once they
 have been added by \xroutine{MAKESET}, but if you find you have
 added them in error, you can erase them using the \xroutine{CCDEDIT}
 task, as follows:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ccdedit in='*' mode=erase name=set fixwcs=yes
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The FIXWCS parameter determines whether any existing Set alignment
 coordinate systems (ones with Domain CCD\_SET) should be erased also.
 It normally doesn't matter much whether this is erased or not,
@@ -4200,11 +3595,9 @@ since without a valid Set header it is ignored anyway.
 
 If you just want to remove the Set alignment frame, you can
 remove this attached coordinate frame directly using \xroutine{WCSEDIT}:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsedit in='*' mode=remove frame=ccd_set
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Both of these commands will erase the information in question if
 it exists, and note the fact with a non-fatal error if it does not.
@@ -4234,8 +3627,7 @@ In its simplest mode of operation, it will show you the Set headers
 of a list of images, grouped by Set Name or Set Index.
 Here is a simple invocation, showing the result of the
 example in Section \ref{makeset_container}:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % showset 'conv-obs?' reset
 
     SHOWSET
@@ -4257,14 +3649,12 @@ example in Section \ref{makeset_container}:
            2           conv-obs3.HDU_2                               no
 
   Namelist written to file: showset.lis
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 As you can see, it gives very similar output to that written
 by \routine{MAKESET} when the headers were being added.
 If you prefer to corresponding images from different Sets grouped together,
 then change the LISTBY parameter (which defaults to `NAME'):
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % showset 'conv-obs?' listby=index reset
 
     SHOWSET
@@ -4284,8 +3674,7 @@ then change the LISTBY parameter (which defaults to `NAME'):
          conv-obs3                     conv-obs3.HDU_2               no
 
   Namelist written to file: showset.lis
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 As well as showing the Set information of all the files presented,
 \routine{SHOWSET} is also able to
@@ -4311,8 +3700,7 @@ we can pick out only those images in the same Set as (i.e.\ having
 the same Set Name attribute as) \text{im12}
 but which have Set Index of 1 or 2 as follows
 (in this case some of the parameters are input as the response to prompts):
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % showset 'im*' pickindex=equal pickname=like listby=none
 
     SHOWSET
@@ -4331,8 +3719,7 @@ INDEX - Acceptable Set Index values > 2,3
  3       im10                          im12                          no
 
   Namelist written to file: showset.lis
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Here we have also set the LISTBY parameter to `NONE', which does
 no grouping and lists the images in their input order.
 
@@ -4340,25 +3727,21 @@ As it points out, \routine{SHOWSET} writes a list of the images it
 has output to a file given by the NAMELIST parameter, by default
 \text{showset.lis}.
 In the above case that list would read:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 # SHOWSET - selected NDF name list
 im11
 im12
-\end{verbatim}
-\end{myquote}
-This file can be used with the indirection character (`$^\wedge$')
+\end{terminalv}
+This file can be used with the indirection character (`$\wedge$')
 to provide input for any other CCDPACK program, so you can write scripts
 with commands which will operate only on members of certain Sets
 or certain Index values.
 For example, you could subsequently use \xroutine{DRAWNDF} to
 display the outlines of the images that the above command has
 selected like this:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % drawndf in='^showset.lis' clear lines
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 
 \subsection{\label{setglobals}\xlabel{setglobals}Global parameters with Sets}
@@ -4406,8 +3789,7 @@ mosaic camera which all use the same global parameters, except that
 the readout noise and ADC factor is different according to which
 chip each image comes from.
 You can configure the global variables like this:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ccdsetup
 
   Type "?" for help on any prompt.
@@ -4453,22 +3835,18 @@ USESET - Use CCDPACK Set headers if available /YES/ >
   CCDPACK Set header information will be used where available
 
 SAVE - Save CCD parameters for future restoration /NO/ >
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Having set up the values for Set Index 1, you can do the same for
 the other Set Index values, entering the changed values
 explicitly and leaving the others to default to the ones
 you have just entered:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ccdsetup index=2 adc=2.18 rnoise=6.0 accept
 % ccdsetup index=3 adc=1.95 rnoise=9.1 accept
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 You can then see the global configuration using the \xroutine{CCDSHOW}
 command:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ccdshow
 
     CCDSHOW
@@ -4492,8 +3870,7 @@ command:
   Variances will not be generated
   Position lists will be associated with NDFs
   CCDPACK Set header information will be used if available
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Note that Index-specific values are only shown where they were
 assigned and are different;
 in the other cases a common value will be shown, and used,
@@ -4519,11 +3896,9 @@ reduction tasks
 do when they encounter input files with Set header information.
 It assumes that the global USESET parameter is TRUE,
 so you should first have set it using a command like
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ccdsetup useset=true accept
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The reduction tasks considered here are all concerned with constructing
 calibration frames from a stack of input frames
@@ -4583,23 +3958,19 @@ For each Set Index value represented in the input files:
 
 So if you have several observations from a three-chip mosaic camera
 sorted into Sets to debias, you can replace a sequence like this:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makebias in='bias*_chip1' out=master_chip1
 % makebias in='bias*_chip2' out=master_chip2
 % makebias in='bias*_chip3' out=master_chip3
 % debias in='data*_chip1' bias=master_chip1 out='debias_*'
 % debias in='data*_chip2' bias=master_chip2 out='debias_*'
 % debias in='data*_chip3' bias=master_chip3 out='debias_*'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 by this one, which does just the same thing:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makebias in='bias*_chip?' out=master
 % debias in='data*_chip?' bias=master out='debias_*'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 You may notice from the scheme above that
 the output frames have exactly the same Set headers
@@ -4727,35 +4098,27 @@ but the output files will be generated in a more manageable way
 (their names will be more compact) if we convert them first by
 hand to NDF format.  We do this using the \xref{CONVERT}{sun55}{}
 package:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % convert
 % fits2ndf in='"data-*.fit,bias-*.fit,flat-*.fit"' out='*' container=true
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This creates one new HDS container file for each MEF with the same name,
 but with the extension \text{.sdf} instead of \text{.fit}.
 We next indicate to CCDPACK that we will be using Set headers:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ccdsetup useset=yes accept
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The next job is to inform CCDPACK that each HDS container file
 represents a single Set:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makeset in='"data-*,bias-*,flat-*"' mode=container
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This creates no new files, but adds suitable Set header information to
 each frame.
 We can now proceed to the data reduction itself:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makebias in='bias-*' out=master-bias
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This combines all the bias container files and produces one new
 container file called \text{master-bias}.  The new file will have
 the same structure as the files which went to generate it, that is
@@ -4763,18 +4126,14 @@ it will represent a single Set, and will have as many constituent
 frames as those files, one for each Set Index value in the inputs.
 The master bias Set can now be used to debias the data and flat field
 frames like this:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % debias in='"data-*,flat-*"' bias=master-bias out='db-*'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 and master flat field generation and correction proceeds in the same way:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makeflat in='"db_flat-*"' out=master-flat
 % flatcor in='db_data-*' flat=master-flat out='*|db_|red_|'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 We now have a set of HDS container files called \text{red\_data-*.sdf}
 which contain the reduced data, one Set (=one exposure) per file.
 
@@ -4793,23 +4152,19 @@ the same job can be done with less user effort.
 
 As always when working with Sets, the first thing to do is to
 tell CCDPACK that Set headers are important:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ccdsetup useset=true accept
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The data files are the same as in the un-Setted example.
 This time however the first thing we do with them is to group the
 images into two Sets, one for each exposure.  Using \xroutine{MAKESET}'s
 ASTFILE parameter we can import the saved AST file alignment information
 at the same time
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makeset in='1?' mode=list astfile=instrument.ast
 % makeset in='2?' mode=list astfile=instrument.ast
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 These commands add a new coordinate system with the Domain (name)
 ``CCD\_SET'' as well as suitable Set headers.
 
@@ -4822,15 +4177,12 @@ for more details).  This simply means we can avoid adding a
 We now perform the familiar automatic registration steps.
 First execute \xroutine{FINDOBJ}, which pays no attention to Set headers
 and behaves just as usual.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % findobj in='"1?,2?"' outlist='*.find'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The \xroutine{FINDOFF} program however takes special notice
 of the Set headers:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % findoff inlist='"1?,2?"' outlist='*.off'
 
     NDFs containing position lists     Current domain      Set Name attribute
@@ -4871,8 +4223,7 @@ of the Set headers:
   1c.off
   2b.off
   2c.off
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 (much of the output is omitted here for reasons of brevity).
 What it has done is to construct one list for each Set, rather than
 one for each frame, on the assumption that the CCD\_SET
@@ -4882,8 +4233,7 @@ it writes and associates matched position lists for each of the files
 which would actually contain at least one of the matched points.
 
 Finally, we can simply invoke \xroutine{REGISTER}
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % register inlist='"1?,2?"' fittype=1
   6 input NDFs accessed using parameter INLIST
   There is no associated list for NDF 1a.
@@ -4912,8 +4262,7 @@ Finally, we can simply invoke \xroutine{REGISTER}
   List 2)
     A =    +164.203695       B = 0.9999997            C = 0.0007688743
     D =    +310.941640       E = -0.0007688743        F = 0.9999997
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Again it has constructed a list for each Set, and worked out the
 transformation coefficients between these.
 When it has successfully done this, every members of each Set
@@ -4947,7 +4296,7 @@ response to a prompt. The program which sets up the global parameters is:
 \item \routine{CCDSETUP}
 \end{itemize}
 
-This routine is described \hyperref{elsewhere}{in \S}{}{configuration}.
+This routine is described \slhyperref{elsewhere}{in \S}{}{configuration}.
 
 The current values of the global parameters can be viewed at any time by
 using the routine:
@@ -5026,7 +4375,7 @@ command line, or in response to the prompts.
 
 The command file which controls CCDPACK can be written as if
 responding to the C shell. Examples of such CCDPACK command files
-are shown \hyperref{elsewhere}{in \S}{}{examplescripts}.
+are shown \slhyperref{elsewhere}{in \S}{}{examplescripts}.
 
 The next step after creating your command file is to run:
 \begin{itemize}
@@ -5058,15 +4407,13 @@ CCD device using \routine{CCDSETUP} {\em interactively}, this command does not
 then need to be repeated in the background job.  So the chances
 of making a mistake in this crucial stage are reduced. A typical
 preparation sequence is:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ccdsetup etc.
 % edit ccdpack_back
   <make modifications to script>
 % ccdfork ccdpack_back
 % nice ccdpack_fork >&ccdpack_fork.log &
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \section{The CCDPACK logging system \xlabel{logsystem} \label{logsystem}}
 
@@ -5081,14 +4428,12 @@ optional feature, the level of reporting being controlled by a global
 or application parameter LOGTO which is set by
 \xroutine{CCDSETUP}. LOGTO is a character variable and can take
 one of the following values:
-\begin{myquote}
 \begin{description}
-\item \text{NEITHER} - perform no output.
-\item \text{TERMINAL} - perform output to the terminal only.
-\item \text{LOGFILE} - perform output to logfile only.
-\item \text{BOTH} - perform output to the logfile and the terminal [default].
+\item[NEITHER] - perform no output.
+\item[TERMINAL] - perform output to the terminal only.
+\item[LOGFILE] - perform output to logfile only.
+\item[BOTH] - perform output to the logfile and the terminal [default].
 \end{description}
-\end{myquote}
 It is recommended that LOGTO is set so that some output
 occurs, this is felt very necessary given the flexibility of the
 parameter system; it is all too easy to be using values which you are
@@ -5119,7 +4464,7 @@ file, redirect comments into it etc.
 Perhaps the most noticeable `feature' of CCDPACK programs is their ability to
 accept, and process, lists of data files and other associated parameters,
 such as exposure times and position list names (see
-``\hyperref{using position lists}{\S}{}{using_position_lists}'').
+``\slhyperref{using position lists}{\S}{}{using_position_lists}'').
 A list of `names' can be supplied in
 response to one prompt, or can be supplied on successive lines using the
 continuation character `\text{-}' to force a reprompt for more
@@ -5134,23 +4479,18 @@ still contains these (so a suitable response would be \text{'"ndf1,ndf2"'}).
 \subsection{Input wildcards}
 The names of images (NDFs or some foreign format) given to CCDPACK
 routines may include wildcard specifications such as:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
    *, ?, [a-z], {one,two,three}
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 all of which have usual meanings, i.e.\ any number of characters,
 a single character, a range of characters, and a list of strings.
 The simplest return would then be:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
    IN > *
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 and all the images in the current directory would be accessed. Other
 possibilities include specifications such as:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
    IN > bias/*              (all images in the bias/ subdirectory)
 
    IN > rdata/*,bdata/*     (all images in the rdata/ and bdata/
@@ -5159,8 +4499,7 @@ possibilities include specifications such as:
 
    IN > NGC2261_?           (all images whose names begin with NGC2261,
                              followed by one extra character)
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 If any of the image names you specify is an HDS container file
 holding more than one NDF structure, then each NDF contained directly
@@ -5171,11 +4510,9 @@ from one exposure of a mosaic camera,
 this makes it much easier to process a group of images at once.
 So if you had an
 appropriate container file \text{expos1234.sdf}, then just supplying:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
    IN > expos1234
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 would allow processing of a whole group of related images.
 Note that it is easy to convert Multi-Extension FITS files (MEFs)
 into HDS container files --- this is explained in section \ref{datatypes}.
@@ -5187,48 +4524,40 @@ use (when for instance several images of the same name, but of
 different types are available). However, the file extension will
 be accepted if given. So for instance repeating the last examples
 for IRAF data frames could look like:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
    IN > bias/*.imh
    IN > rdata/*.imh,bdata/*.imh
    IN > ffr*.imh
    IN > NGC2261_?.imh
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \subsection{Indirection}
 Names can also be stored in ordinary text files. Indirection through a
 text file is indicated by the character.
 
 \begin{description}
-   \item \hspace{13pt}{\bf$^\wedge$}\hspace{3ex}   (tophat)
+   \item \hspace{13pt}{\bf$\wedge$}\hspace{3ex}   (tophat)
 \end{description}
 
 The names may include wildcards (for images) and other indirections (up to
 7 deep). A typical response might be:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 IN > ^rflatfields.lis
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 And the \text{rflatfields.lis} file would contain something like:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 ffr1
 ffr4
 ffr10
 rflats/*
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Indirection can be mixed with other specifications in response to a
 prompt (or on the command line) i.e.:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 IN > *,^otherframes,elsewhere/r*
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 etc.
 
 \subsection{Output names}
@@ -5237,29 +4566,23 @@ All output names may be created from wildcards and/or formed through
 indirection. However, this is not as flexible as the input scheme,
 and wildcards and indirection cannot be mixed. An example of an
 output specification is:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 OUT > *
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This means call all the output images the same as the input images and put
 them in the same directory.
 Not necessarily what you want to do.
 Alternatively:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 OUT > *_debias
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 means call all the output images the same name as the associated
 input images, but append the string `\text{\_debias}' to the names. A
 third option using wildcard methods is to replace the occurrences of a
 particular string within the input names with a new string, e.g.:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 OUT > *|debias|flattened|
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This will end with the image names having the string `\text{debias}'
 replaced with `\text{flattened}'. Indirection files follow the usual
 rules --- but if a wildcard is used in the file this must be the only
@@ -5270,12 +4593,10 @@ When image names include the directories too, only the file name itself may
 be modified. Changing the directory of the output images (which otherwise
 will always be the same as the input images) is achieved by commands
 like:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 IN > /temp/auser/raw/*_ccd
 OUT > /home/auser/pro/*|_ccd|-pr|
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Which in this case will take all the images `\text{*\_ccd}' from one
 directory and create new images in the second directory replacing any
 occurrences of the string
@@ -5286,23 +4607,19 @@ the extension or the NDF's name within an HDS container file)},
 these are only used if no `preferences' are shown
 in the output expression. To keep images from other directories
 in the current directory use commands like:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 IN > elsewhere/*
 OUT > ./*
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 If the input group was a set of images in an HDS container file,
 the output group will have the same structure.
 So if the file \text{expo1234.sdf}
 contains two NDFs called I1 and I2, then specifying
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 IN > expo1234
 OUT > *-out
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 will write a new container file \text{expo1234-out.sdf}
 holding the output images as NDFs called I1 and I2.
 
@@ -5319,8 +4636,7 @@ output images then append the appropriate file type (if you use the
 CONVERT defaults then output images without types are created as
 NDFs). So for instance repeating the above commands with FITS output
 images, you'd use:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 OUT > *.fit
 
 OUT > *_debias.fit
@@ -5332,8 +4648,7 @@ OUT > /home/auser/pro/*.fit|_ccd|-pr|
 
 IN > elsewhere/*.fit
 OUT > ./*.fit
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \section{Bad data masks (ARD) \label{datamasks} \xlabel{datamasks}}
 The CCDPACK routine \xroutine{DEBIAS} allows regions to be defined as
@@ -5382,8 +4697,7 @@ information:
 The angles are measured X through Y positive.
 
 A sample ARD description follows:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 #
 # ARD description file for bad regions of my CCD.
 
@@ -5398,8 +4712,7 @@ POLYGON( 2.2, 96.4, 12.1, 81.5, 26.9, 63.7, 47.7, 41.9,
 POLYGON( 6.2, 294.3, 27.9, 321.0, 52.6, 348.7, 74.4, 371.5,
          80.0, 384.0, 0.0, 384.0 )
 #
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 But you should use the \xref{ARDGEN}{sun95}{ARDGEN} application to
 produce these files.
@@ -5446,9 +4759,9 @@ CCDPACK is available for use from the IRAF command line. If it is
 available on your system then you should initialise it in the usual
 way:
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 cl> ccdpack
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 and all the commands that are available will be listed. You can also
 get help on the commands in the usual way. A useful document to
@@ -5471,16 +4784,16 @@ will {\em{not}} be able to set the values of these parameters by using
 If this approach is too strange for you to accept then you can switch
 off this behaviour by issuing the command:
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 cc> use_globals
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 {\em{immediately}} after initialising CCDPACK. You can achieve this effect
 permanently by adding the command:
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 set CCDPACK_GLOBALS=no
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 to your \text{login.cl}. If you have already run another CCDPACK
 command before using \text{use\_globals} then run the \text{flpr}
@@ -5495,9 +4808,9 @@ loss of efficiency due to the conversion processes that CCDPACK uses
 to access non-NDF data. To get around this you can tell CCDPACK to
 output its results as NDFs by using the command:
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 cc> use_ndf
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 and then {\em{not}} adding a file extension to any output names. You can
 now process these new data sets much more efficiently. To get your
@@ -5806,7 +5119,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       or \xroutine{WCSEDIT} applications)
       can be transferred using \xroutine{ASTIMP} and \xroutine{ASTEXP}
       to another similar set.
-      This {\tt "}similar set{\tt "} will typically be one from chips in the same
+      This \texttt{"}similar set\texttt{"} will typically be one from chips in the same
       mosaic camera instrument.
 
       A 2-frame frameset is output for each image.  The Base frame is one
@@ -5934,7 +5247,7 @@ The CCDPACK routine descriptions are contained in the following pages.
           should be a frame in which the different images are correctly
           registered.  The image names may be specified using wildcards,
           or may be specified using an indirection file (the indirection
-          character is \qt{$^\wedge$}).
+          character is \qt{$\wedge$}).
       }
       \sstsubsection{
           INDICES( ) = \_INTEGER (Read)
@@ -6017,11 +5330,11 @@ The CCDPACK routine descriptions are contained in the following pages.
              outdomain=camera
       }{
          This will save the information about the relative positioning
-         of the images {\tt '}reg\_data$*${\tt '} to the file {\tt '}camera.ast{\tt '}, calling the
-         alignment domain {\tt '}CAMERA{\tt '}.  The file {\tt '}camera.ast{\tt '} can later be
+         of the images \texttt{'}reg\_data$*$\texttt{'} to the file \texttt{'}camera.ast\texttt{'}, calling the
+         alignment domain \texttt{'}CAMERA\texttt{'}.  The file \texttt{'}camera.ast\texttt{'} can later be
          used by the \xroutine{ASTIMP} or \xroutine{MAKESET} applications to add the same coordinate
          information to a different set of images from the same instrument.
-         Before running this, the images {\tt '}reg\_data$*${\tt '} should be correctly
+         Before running this, the images \texttt{'}reg\_data$*$\texttt{'} should be correctly
          aligned in their Current domain.  CHIPNUM must be the name
          of a FITS header keyword present in the FITS extension of each
          image whose value distinguishes the CCDs from each other
@@ -6030,14 +5343,14 @@ The CCDPACK routine descriptions are contained in the following pages.
          input images are recorded.
       }
       \sstexamplesubsection{
-         astexp {\tt "}im1,im2,im3{\tt "} astfile=camera.ast baseframe=axis
-             title={\tt "}Focal plane alignment{\tt "} accept
+         astexp \texttt{"}im1,im2,im3\texttt{"} astfile=camera.ast baseframe=axis
+             title=\texttt{"}Focal plane alignment\texttt{"} accept
       }{
          In this case the OUTDOMAIN parameter takes its default value
-         of {\tt '}CCD\_EXPORT{\tt '}, but mappings are between the Current
-         coordinates of the input images and their {\tt '}AXIS{\tt '} coordinates.
+         of \texttt{'}CCD\_EXPORT\texttt{'}, but mappings are between the Current
+         coordinates of the input images and their \texttt{'}AXIS\texttt{'} coordinates.
          This could be a good idea if the images had been shrunk using
-         KAPPA{\tt '}s COMPAVE or something similar, which modifies the
+         KAPPA\texttt{'}s COMPAVE or something similar, which modifies the
          PIXEL coordinates but leaves the AXIS coordinates unchanged.
          No suitable FITS header is available to distinguish the
          different types of image, so the IDTYPE parameter is allowed to
@@ -6048,7 +5361,7 @@ The CCDPACK routine descriptions are contained in the following pages.
          will be as given.
       }
       \sstexamplesubsection{
-         astexp {\tt "}r10595[2345]{\tt "} wfc.ast outdomain=wfc
+         astexp \texttt{"}r10595[2345]\texttt{"} wfc.ast outdomain=wfc
              idtype=fitsid fitsid=CHIPNAME fitsrot=ROTSKYPA
       }{
          This exports the alignment information from the four named
@@ -6091,7 +5404,7 @@ The CCDPACK routine descriptions are contained in the following pages.
             (end of file)  \\
          \end{myquote}
 
-         Characters after a {\tt '}\#{\tt '} character are normally ignored.  The
+         Characters after a \texttt{'}\#\texttt{'} character are normally ignored.  The
          constituent parts are composed as follows:
 
          {\bf Blank line:} \\
@@ -6107,7 +5420,7 @@ The CCDPACK routine descriptions are contained in the following pages.
             same, and likewise for all the Current frames.  For the
             images to which the file will be applied by ASTIMP, their
             WCS components should contain frames in the same domain
-            as the AST file{\tt '}s Base frame.
+            as the AST file\texttt{'}s Base frame.
 
             The ID of each frameset is used to determine, for each image,
             which of the framesets in the file should be applied to it.
@@ -6117,7 +5430,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       \sstitemlist{
 
          \sstitem
-               {\tt "}FITSID KEY VALUE{\tt "} ---
+               \texttt{"}FITSID KEY VALUE\texttt{"} ---
                      This will match an image if the first FITS header card
                      with the keyword KEY has the value VALUE.  If the
                      value is of type CHARACTER it must be in single
@@ -6126,14 +5439,14 @@ The CCDPACK routine descriptions are contained in the following pages.
                      hierarchical keywords.
 
          \sstitem
-               {\tt "}INDEX N{\tt "} ---
+               \texttt{"}INDEX N\texttt{"} ---
                      This associates a frameset with an integer N.
                      Usually N will take the values 1,2,3,... for the
-                     framesets in the file.  Typically the N{\tt '}th image in a
-                     list will match the one with an ID of {\tt "}INDEX N{\tt "}.
+                     framesets in the file.  Typically the N\texttt{'}th image in a
+                     list will match the one with an ID of \texttt{"}INDEX N\texttt{"}.
 
          \sstitem
-               {\tt "}SET N{\tt "} ---
+               \texttt{"}SET N\texttt{"} ---
                      This will match an image if the Set Index attribute
                      iin its CCDPACK Set header is equal to the integer N.
       }
@@ -6241,7 +5554,7 @@ The CCDPACK routine descriptions are contained in the following pages.
          A list of image names whose WCS components are to be modified
          according to ASTFILE.  The image names may be specified using
          wildcards, or may be specified using an indirection file
-         (the indirection character is \qt{$^\wedge$}).
+         (the indirection character is \qt{$\wedge$}).
       }
       \sstsubsection{
          INDICES( $*$ ) = \_INTEGER (Read)
@@ -6377,7 +5690,7 @@ The CCDPACK routine descriptions are contained in the following pages.
             (end of file) \\
          \end{myquote}
 
-         Characters after a {\tt '}\#{\tt '} character are normally ignored.  The
+         Characters after a \texttt{'}\#\texttt{'} character are normally ignored.  The
          constituent parts are composed as follows:
 
          {\bf Blank line:} \\
@@ -6393,7 +5706,7 @@ The CCDPACK routine descriptions are contained in the following pages.
             same, and likewise for all the Current frames.  For the
             images to which the file will be applied by \routine{ASTIMP}, their
             WCS components should contain frames in the same domain
-            as the AST file{\tt '}s Base frame.
+            as the AST file\texttt{'}s Base frame.
 
             The ID of each frameset is used to determine, for each image,
             which of the framesets in the file should be applied to it.
@@ -6403,7 +5716,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       \sstitemlist{
 
          \sstitem
-               {\tt "}FITSID KEY VALUE{\tt "} ---
+               \texttt{"}FITSID KEY VALUE\texttt{"} ---
                      This will match an image if the first FITS header card
                      with the keyword KEY has the value VALUE.  If the
                      value is of type CHARACTER it must be in single
@@ -6412,14 +5725,14 @@ The CCDPACK routine descriptions are contained in the following pages.
                      hierarchical keywords.
 
          \sstitem
-               {\tt "}INDEX N{\tt "} ---
+               \texttt{"}INDEX N\texttt{"} ---
                      This associates a frameset with an integer N.
                      Usually N will take the values 1,2,3,... for the
-                     framesets in the file.  Typically the N{\tt '}th image in a
-                     list will match the one with an ID of {\tt "}INDEX N{\tt "}.
+                     framesets in the file.  Typically the N\texttt{'}th image in a
+                     list will match the one with an ID of \texttt{"}INDEX N\texttt{"}.
 
          \sstitem
-               {\tt "}SET N{\tt "} ---
+               \texttt{"}SET N\texttt{"} ---
                      This will match an image if the Set Index attribute
                      iin its CCDPACK Set header is equal to the integer N.
       }
@@ -6704,8 +6017,8 @@ The CCDPACK routine descriptions are contained in the following pages.
          input data.
       }
       \sstexamplesubsection{
-         calcor in=$^\wedge$frames.dat out=\qs{$*$\_darksub} cal=dark\_master
-                expose=$^\wedge$dark\_exposures
+         calcor in=$\wedge$frames.dat out=\qs{$*$\_darksub} cal=dark\_master
+                expose=$\wedge$dark\_exposures
       } {
          In this example a list of images are sequentially processed. The
          list of image names is stored in the file frames.dat. The output
@@ -6827,7 +6140,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       in the other CCDPACK routines (the labelled positions will be
       called IMAGE\_NAME.acc). If you choose the option to continue then
       a full registration of the images will be attempted. This may only
-      be performed for {\tt '}linear{\tt '} transformations.
+      be performed for \texttt{'}linear\texttt{'} transformations.
 
       After choosing a transformation type the procedure will then go on
       to calculate a transformation set between all the images; this is
@@ -6859,7 +6172,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       one).  It is possible to edit the points marked on the reference
       image while you are marking points on the other images.  When
       you have selected all the points you wish to on a given image,
-      click the {\tt '}Done{\tt '} button and you will be presented with the next
+      click the \texttt{'}Done\texttt{'} button and you will be presented with the next
       one.
    }
    \sstusage{
@@ -6933,7 +6246,7 @@ The CCDPACK routine descriptions are contained in the following pages.
 
          If the logging system has been initialised using \xroutine{CCDSETUP}
          then the value specified there will be used. Otherwise, the
-         default is {\tt '}CCDPACK.LOG{\tt '}.
+         default is \texttt{'}CCDPACK.LOG\texttt{'}.
          [CCDPACK.LOG]
       }
       \sstsubsection{
@@ -6962,7 +6275,7 @@ The CCDPACK routine descriptions are contained in the following pages.
          }
          If the logging system has been initialised using \xroutine{CCDSETUP}
          then the value specified there will be used. Otherwise, the
-         default is {\tt '}BOTH{\tt '}.
+         default is \texttt{'}BOTH\texttt{'}.
          [BOTH]
       }
       \sstsubsection{
@@ -6970,7 +6283,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       }{
          A string indicating how markers are initially to be plotted in
          the aligner widget.  It consists of a comma-separated list of
-         {\tt "}attribute=value{\tt "} type strings.  The available attributes are:
+         \texttt{"}attribute=value\texttt{"} type strings.  The available attributes are:
          \sstitemlist{
 
             \sstitem
@@ -6994,7 +6307,7 @@ The CCDPACK routine descriptions are contained in the following pages.
          If specifying this value on the command line, it is not
          necessary to give values for all the attributes; missing ones
          will be given sensible defaults.
-         [{\tt "}{\tt "}]
+         [\texttt{"}\texttt{"}]
       }
       \sstsubsection{
          MAXCANV = INTEGER (Read and Write)
@@ -7111,15 +6424,15 @@ The CCDPACK routine descriptions are contained in the following pages.
          invite you to mark corresponding image features on each one
          in turn.  When you have done this, the centroids will be
          calculated and you will be left with a position list with
-         the extension `.acc{\tt '} associated with each one.
+         the extension `.acc\texttt{'} associated with each one.
       }
       \sstexamplesubsection{
-         ccdalign {\tt "}x1008,x1009,x1010{\tt "} refndf=xmos extras=yes continue
+         ccdalign \texttt{"}x1008,x1009,x1010\texttt{"} refndf=xmos extras=yes continue
       }{
          Here the EXTRAS parameter is true, so for each of the named
          images you will be prompted for a list of other images
          which were taken pointing in the same direction.
-         The file `xmos{\tt '} is being used as the reference image,
+         The file `xmos\texttt{'} is being used as the reference image,
          so that will be presented first for marking features.
          When you have marked features on all four images, the
          program will go on to match them all up and produce a
@@ -7138,9 +6451,9 @@ The CCDPACK routine descriptions are contained in the following pages.
       Behaviour of parameters
    }{
       All parameters retain their current value as default. The
-      {\tt '}current{\tt '} value is the value assigned on the last run of the
+      \texttt{'}current\texttt{'} value is the value assigned on the last run of the
       application. If the application has not been run then the
-      {\tt '}intrinsic{\tt '} defaults, as shown in the parameter help, apply.
+      \texttt{'}intrinsic\texttt{'} defaults, as shown in the parameter help, apply.
 
       Certain parameters (LOGTO, LOGFILE and USESET) have global values.
       These global values will always take precedence, except when an
@@ -7460,7 +6773,7 @@ The CCDPACK routine descriptions are contained in the following pages.
          Position list names may NOT include wildcards. So a comma
          separated list of explicit names should be used and/or the
          names should be read from indirection files (the indirection
-         indicator is \qt{$^\wedge$}).
+         indicator is \qt{$\wedge$}).
       }
       \sstsubsection{
          LOGFILE = FILENAME (Read)
@@ -8614,7 +7927,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
            Continuation lines are indicated by a \qt{-} as the last character.
            An example of the contents of a restoration file is shown next
            (this is an actual file created by \routine{CCDSETUP}):
-           {\tt \begin{myquote}
+           \texttt{\begin{myquote}
            \#\\
            \#   CCDPACK - Restoration file\\
            \#\\
@@ -8638,7 +7951,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
            \end{myquote}}
           If you are using CCDPACK Sets, then some lines of this file
           may be of the form "setindex,keyword=value"; so this sequence:
-          {\tt \begin{myquote}
+          \texttt{\begin{myquote}
           1,RNOISE = 9.80  ! Nominal readout noise in ADUs (Set Index 1)\\
           2,RNOISE = 8.65  ! Nominal readout noise in ADUs (Set Index 2)\\
           3,RNOISE = 9.10  ! Nominal readout noise in ADUs (Set Index 3)
@@ -9444,7 +8757,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       ARD descriptions can be created using the KAPPA application
       \xref{ARDGEN}{sun95}{ARDGEN}, or you can of course create your own by hand. An example
       of the contents of an ARD file follows:
-      {\tt \begin{myquote}
+      \texttt{\begin{myquote}
          \#\\
          \# ARD description file for bad regions of my CCD.\\
          \\
@@ -9541,10 +8854,10 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       be restricted to the useful extent of the image, enabling
       overscan regions or bias strips to be ignored.
 
-      If the LINES parameter is true, the position of each image{\tt '}s
+      If the LINES parameter is true, the position of each image\texttt{'}s
       data array will be indicated by a (perhaps distorted) rectangle
       drawn on the device.  If the IMAGE parameter is true, then
-      the image{\tt '}s pixels will be plotted as well as its position.
+      the image\texttt{'}s pixels will be plotted as well as its position.
       The colour levels in this case are determined by the PERCENTILES
       argument applied separately to each plotted frame, and overlapping
       images will simply be drawn on top of each other - no averaging
@@ -9599,7 +8912,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 
          If you want the outlines to be drawn over the top
          of an existing DATA picture, for instance one displayed with
-         KAPPA{\tt '}s \xref{DISPLAY}{sun95}{DISPLAY} application, then set CLEAR to false.  If
+         KAPPA\texttt{'}s \xref{DISPLAY}{sun95}{DISPLAY} application, then set CLEAR to false.  If
          possible, alignment will occur within the Current coordinate
          system of the image.  If this is not possible, an attempt is
          made in SKY, PIXEL or GRID domains.  If the image cannot be
@@ -9687,7 +9000,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          true).  The first letter indicates the side-to-side
          position and the second indicates the up-and-down position
          in the pixel coordinates of each image.  Each letter must be
-         {\tt "}N{\tt "}, {\tt "}C{\tt "} or {\tt "}F{\tt "}, for Near to the origin, Central or Far from
+         \texttt{"}N\texttt{"}, \texttt{"}C\texttt{"} or \texttt{"}F\texttt{"}, for Near to the origin, Central or Far from
          the origin.  Normally (unless LABUP is true) the text
          will be written parallel or antiparallel to the X pixel
          direction for each image, with one edge anchored as per the
@@ -9696,9 +9009,9 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 
          Only the first two characters are significant.
 
-         LABPOS normally defaults to {\tt "}NN{\tt "}, indicating the label written
+         LABPOS normally defaults to \texttt{"}NN\texttt{"}, indicating the label written
          next to the origin, but if LABUP is set TRUE, then it
-         defaults to {\tt "}CC{\tt "}.
+         defaults to \texttt{"}CC\texttt{"}.
          [NN]
       }
       \sstsubsection{
@@ -9712,7 +9025,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          In this case the positioning algorithm may fail to place it
          inside the corresponding outline; it is generally not advisable
          to set LABUP to TRUE unless the label is positioned in the
-         centre of the outline by setting LABPOS={\tt "}CC{\tt "}.
+         centre of the outline by setting LABPOS=\texttt{"}CC\texttt{"}.
          [FALSE]
       }
       \sstsubsection{
@@ -9731,7 +9044,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 
          If the logging system has been initialised using CCDSETUP
          then the value specified there will be used. Otherwise, the
-         default is {\tt "}CCDPACK.LOG{\tt "}.
+         default is \texttt{"}CCDPACK.LOG\texttt{"}.
          [CCDPACK.LOG]
       }
       \sstsubsection{
@@ -9760,7 +9073,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          }
          If the logging system has been initialised using CCDSETUP
          then the value specified there will be used. Otherwise, the
-         default is {\tt "}BOTH{\tt "}.
+         default is \texttt{"}BOTH\texttt{"}.
          [BOTH]
       }
       \sstsubsection{
@@ -9800,7 +9113,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }{
          A group of attribute settings describing the plotting style
          to use for the outlines and annotated axes.  This should be
-         a string consisting of comma-separated `attribute=value{\tt '}
+         a string consisting of comma-separated `attribute=value\texttt{'}
          items; as explained in the `\xref{Plotting Styles and Attributes}{sun95}{se_style}'
          section of SUN/95, except that colours may only be specified
          by number, and not by name.
@@ -9836,7 +9149,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
                title           -- title to draw above the plot [coords title]
 
          }
-         [{\tt "}{\tt "}]
+         [\texttt{"}\texttt{"}]
       }
       \sstsubsection{
          TRIM = \_LOGICAL (Read)
@@ -9877,7 +9190,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          drawndf reg-data$*$ clear
       }{
          This will clear the current graphics device and plot on it
-         labelled outlines of all the `reg-data$*${\tt '} images, as well as
+         labelled outlines of all the `reg-data$*$\texttt{'} images, as well as
          axes showing the common coordinate system in which they
          all reside.  The plotting area will be made just large enough
          that all the outlines fit in.  Prior to running this, the
@@ -9887,7 +9200,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       \sstexamplesubsection{
          drawndf ccd$*$ noclear
       }{
-         This will attempt to plot boundaries of all the `ccd$*${\tt '} images
+         This will attempt to plot boundaries of all the `ccd$*$\texttt{'} images
          aligned with whatever is already plotted on the graphics
          device, for instance the result of a KAPPA \xref{DISPLAY}{sun95}{DISPLAY} command
          or of a previous call of \routine{DRAWNDF}.  Parts of the image outlines
@@ -9896,20 +9209,20 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          the graphics device it will fail with an error.
       }
       \sstexamplesubsection{
-         drawndf in={\tt "}one,two,three{\tt "} axes labname labnum penrot
+         drawndf in=\texttt{"}one,two,three\texttt{"} axes labname labnum penrot
       }{
-              style={\tt "}size(strings)=2,width(curves)=3{\tt "}
-         This will draw outlines of the images `one{\tt '}, `two{\tt '} and `three{\tt '}
+              style=\texttt{"}size(strings)=2,width(curves)=3\texttt{"}
+         This will draw outlines of the images `one\texttt{'}, `two\texttt{'} and `three\texttt{'}
          in the current directory with labelled axes, in triple-thick
-         lines and with double-size text labels which read `1: one{\tt '},
-         `2: two{\tt '} and `3: three{\tt '} respectively.  The colour of each
+         lines and with double-size text labels which read `1: one\texttt{'},
+         `2: two\texttt{'} and `3: three\texttt{'} respectively.  The colour of each
          outline and its associated text label will be different from
          the others.
       }
       \sstexamplesubsection{
-         drawndf in=a$*$ noclear nopenrot style={\tt "}colour=2{\tt "} nolabel nolabnum
+         drawndf in=a$*$ noclear nopenrot style=\texttt{"}colour=2\texttt{"} nolabel nolabnum
       }{
-         All the images beginning with `a{\tt '} will be outlined in colour 2,
+         All the images beginning with `a\texttt{'} will be outlined in colour 2,
          with no text labels or indication of the origin.
       }
       \sstexamplesubsection{
@@ -9922,7 +9235,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          the dimmest 20\% in the lowest.
       }
       \sstexamplesubsection{
-         drawndf {\tt "}obs-[abc]{\tt "} image lines labup labopaque=false
+         drawndf \texttt{"}obs-[abc]\texttt{"} image lines labup labopaque=false
       }{
          The files obs-a, obs-b and obs-c will be plotted; both the
          outlines and the pixel data will be shown, and the name of
@@ -9966,16 +9279,16 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          Display:
             The IMAGE display mode is not particularly sophisticated.
             If you wish to view a single image in its pixel coordinate
-            system, you may find KAPPA{\tt '}s \xref{DISPLAY}{sun95}{DISPLAY} program more versatile.
+            system, you may find KAPPA\texttt{'}s \xref{DISPLAY}{sun95}{DISPLAY} program more versatile.
       }
    }
    \sstdiytopic{
       Behaviour of Parameters
    }{
       All parameters retain their current value as default. The
-      {\tt "}current{\tt "} value is the value assigned on the last run of the
+      \texttt{"}current\texttt{"} value is the value assigned on the last run of the
       application. If the application has not been run then the
-      {\tt "}intrinsic{\tt "} defaults, as shown in the parameter help, apply.
+      \texttt{"}intrinsic\texttt{"} defaults, as shown in the parameter help, apply.
 
       Retaining parameter values has the advantage of allowing you to
       define the default behaviour of the application. The intrinsic
@@ -9999,8 +9312,8 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       from its global or command-line value if it is not present there.
    }
    \sstimplementationstatus{
-      \routine{DRAWNDF}{\tt '}s communication with the AGI database is compatible with
-      most of \xref{KAPPA}{sun95}{}{\tt '}s behaviour, but is slightly less capable; in
+      \routine{DRAWNDF}\texttt{'}s communication with the AGI database is compatible with
+      most of \xref{KAPPA}{sun95}{}\texttt{'}s behaviour, but is slightly less capable; in
       particular it will fail to align with pictures whose alignment
       has been stored using TRANSFORM structures instead of MORE.AST
       extensions.  This affects only older applications.
@@ -10019,7 +9332,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       each other.
 
       The algorithm used for combining the images on the output grid
-      is Variable-Pixel Linear Reconstruction, or so-called {\tt `}drizzling{\tt '}.
+      is Variable-Pixel Linear Reconstruction, or so-called \texttt{`}drizzling\texttt{'}.
       The user is allowed to shrink the input pixels to a smaller size
       (drops) so that each pixel of the input image only affects pixels
       in the output image under the corresponding drop.
@@ -10069,7 +9382,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 
          If the logging system has been initialised using CCDSETUP,
          then the value specified there will be used. Otherwise, the
-         default is {\tt "}CCDPACK.LOG{\tt "}.
+         default is \texttt{"}CCDPACK.LOG\texttt{"}.
          [CCDPACK.LOG]
       }
       \sstsubsection{
@@ -10098,7 +9411,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          }
          If the logging system has been initialised using CCDSETUP,
          then the value specified there will be used. Otherwise, the
-         default is {\tt "}BOTH{\tt "}.
+         default is \texttt{"}BOTH\texttt{"}.
          [BOTH]
       }
       \sstsubsection{
@@ -10140,7 +9453,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       \sstsubsection{
          PIXFRAC = \_DOUBLE (Read)
       }{
-         The linear {\tt "}drop{\tt "} size, this being the ratio of the linear
+         The linear \texttt{"}drop\texttt{"} size, this being the ratio of the linear
          size of the drizzled drop to that of the input pixel. Interlacing
          is equivalent to setting PIXFRAC=0.0, while shift-and-add is
          equivalent to setting PIXFRAC=1.0. For low values of PIXFRAC the
@@ -10153,7 +9466,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          If a TRUE value is given for this parameter (the default),
          then the data type of the output mosaic image will be derived
          from that of the input image with the highest precision, so that
-         the input data type will be {\tt "}preserved{\tt "} in the output image.
+         the input data type will be \texttt{"}preserved\texttt{"} in the output image.
          Alternatively, if a FALSE value is given, then the output image
          will be given an appropriate floating point data type.
 
@@ -10177,13 +9490,13 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          list (IN) will be used as a reference image. However, if an image
          is given via the REF parameter (so as to over-ride its default
          null value), then the weighting will instead be relative to
-         the {\tt "}reference image{\tt "} supplied via this parameter.
+         the \texttt{"}reference image\texttt{"} supplied via this parameter.
 
          If scale-factor, zero-point corrections (see the SCALE and ZERO
          parameters respectively) have not been specified via a sequential
          file listing (see the CORRECT parameter) then if an image is given
          via the REF parameter the program will attempt to normalise the
-         input images to the {\tt "}reference image{\tt "} supplied.
+         input images to the \texttt{"}reference image\texttt{"} supplied.
 
          This provides a means of retaining the calibration of a set of
          data, even when corrections are being applied, by nominating a
@@ -10298,16 +9611,16 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       \sstexamplesubsection{
          drizzle $*$ out pixfrac=0.7
       }{
-         Drizzles a set of images matching the wild-card {\tt "}$*${\tt "} into a mosaic
-         called {\tt "}out{\tt "}. The drop size of the input pixel is set to 0.7, i.e.
+         Drizzles a set of images matching the wild-card \texttt{"}$*$\texttt{"} into a mosaic
+         called \texttt{"}out\texttt{"}. The drop size of the input pixel is set to 0.7, i.e.
          it is scaled to 70\% of its orginal size before being drizzled onto
          the output grid.
       }
       \sstexamplesubsection{
          drizzle in=img$*$ out=combined scale=true zero=true ref=! multi=4.0
       }{
-         Drizzles a set of images matching the wild-card {\tt "}img$*${\tt "} into a
-         mosaic called {\tt "}combined{\tt "}. Both scaling and zero-point
+         Drizzles a set of images matching the wild-card \texttt{"}img$*$\texttt{"} into a
+         mosaic called \texttt{"}combined\texttt{"}. Both scaling and zero-point
          corrections are enabled (the program will request a
          correction file), however no reference image has been
          supplied (the program will use the first image supplied in the
@@ -10340,7 +9653,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       \sstitem
             ZERO   = the zero-point correction for the image
       }
-      Comment lines may be added, by must be prefixed with a {\tt "}\#{\tt "}
+      Comment lines may be added, by must be prefixed with a \texttt{"}\#\texttt{"}
       character.
    }
    \sstdiytopic{
@@ -10352,29 +9665,29 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
    \sstdiytopic{
       Algorithms Used
    }{
-      Taken from Fruchter et al., {\tt "}A package for the reduction of dithered
-      undersampled images{\tt "}, in Casertano et al. (eds), HST Calibration
+      Taken from Fruchter et al., \texttt{"}A package for the reduction of dithered
+      undersampled images\texttt{"}, in Casertano et al. (eds), HST Calibration
       Workshop, STSCI, 1997, pp. 518--528:
       \begin{quotation}
        The drizzle algorithm is conceptually straightforward. Pixels in
        the original input images are mapped into pixels in the subsampled
        output image, taking into account shifts and rotations between the
        images and the optical distortion of the camera. However, in order
-       to avoid convolving the image with the larger pixel {\tt `}footprint{\tt '} of
+       to avoid convolving the image with the larger pixel \texttt{`}footprint\texttt{'} of
        the camera, we allow the user to shrink the pixel before it is
        averaged into the output image.
 
-       The new shrunken pixels, or {\tt `}drops{\tt '}, rain down upon the subsampled
+       The new shrunken pixels, or \texttt{`}drops\texttt{'}, rain down upon the subsampled
        output. In the case of the Hubble Deep Field (HDF), the drops used
        had linear dimensions one-half that of the input pixel -- slightly
        larger than the dimensions of the output subsampled pixels. The value
        of an input pixel is averaged into the output pixel with a weight
-       proportional to the area of overlap between the {\tt `}drop{\tt '} and the output
+       proportional to the area of overlap between the \texttt{`}drop\texttt{'} and the output
        pixel. Note that, if the drop size if sufficently small, not all
        output pixels have data added to them from each input image. One
        must therefore choose a drop size that is small enough to avoid
        degrading the image, but large enough so that after all images
-       are {\tt `}dripped{\tt '} the coverage is fairly uniform.
+       are \texttt{`}dripped\texttt{'} the coverage is fairly uniform.
 
        The drop pize if controlled by a user-adjustable parameter called
        PIXFRAC, which is simply the ratio of the linear size of the drop to
@@ -10647,7 +9960,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          written into the file new\_position\_lists which can be used to
          pass these names onto another application using indirection
          (in which invoke the next application with ndfnames=false
-         inlist=$^\wedge$new\_position\_lists).
+         inlist=$\wedge$new\_position\_lists).
       }
    }
    \sstnotes{
@@ -11190,7 +10503,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          specified using indirection (other CCDPACK position list
          processing routines will write the names of their results file
          into files suitable for use in this manner) the indirection
-         character is \qt{$^\wedge$}.
+         character is \qt{$\wedge$}.
       }
       \sstsubsection{
          LOGFILE = FILENAME (Read)
@@ -11445,9 +10758,9 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          are rejected.
       }
       \sstexamplesubsection{
-         findoff inlist={\tt '}data$*${\tt '} outlist={\tt '}$*$.off{\tt '} restrict=true
+         findoff inlist=\texttt{'}data$*$\texttt{'} outlist=\texttt{'}$*$.off\texttt{'} restrict=true
       }{
-         This form would be used if the images {\tt '}data$*${\tt '} are already
+         This form would be used if the images \texttt{'}data$*$\texttt{'} are already
          approximately aligned in their Current coordinates. Setting the
          RESTRICT parameter then tells FINDOFF to consider only objects
          in the region which overlaps in the Current coordinates of
@@ -11457,7 +10770,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          aligned reasonably well in the first place.
       }
       \sstexamplesubsection{
-         findoff inlist={\tt '}data$*${\tt '} outlist={\tt '}$*$.off{\tt '} restrict minmatch=2
+         findoff inlist=\texttt{'}data$*$\texttt{'} outlist=\texttt{'}$*$.off\texttt{'} restrict minmatch=2
               maxdisp=20 minsep=30
       }{
          In this example the images are sparsely populated, and a pair
@@ -11557,7 +10870,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       your position lists contain and the expected size of the overlaps
       between the datasets. Obviously it is much easier to detect two
       lists with most of their positions in common. With small overlaps
-      a serious concern is the likelihood of finding a `false{\tt '} match.
+      a serious concern is the likelihood of finding a `false\texttt{'} match.
       False matches must be more likely the larger the datasets and the
       smaller the overlap.
 
@@ -11591,16 +10904,16 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       modified by a completeness factor which attempts to assess the
       quality of the match (this is based on the ratio of the expected
       number of matches in the overlap region to the actual number,
-      random matches shouldn{\tt '}t return good statistics when compared
+      random matches shouldn\texttt{'}t return good statistics when compared
       with genuine ones). This still leaves a possibility of false
       matches disrupting any attempt to register the datasets so a
-      single {\tt "}spanning tree{\tt "} is chosen (this is a graph which just
+      single \texttt{"}spanning tree\texttt{"} is chosen (this is a graph which just
       visits each node the minimum number of times required to get
       complete connectivity, no loops allowed) which has the highest
       possible number of matched positions (rejecting edges with few
       matched positions/low completenesses where possible). This gives
       a most likely solution to the offsets between the position lists,
-      rather than the {\tt "}best{\tt "} solution which could well include false
+      rather than the \texttt{"}best\texttt{"} solution which could well include false
       matches; compare this solution with a median as opposed to a
       mean. The final registration is then used to identify all the
       objects which are the same in all datasets (using a relaxation
@@ -11921,7 +11234,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       Points are marked on the image by clicking mouse button 1
       (usually the left one) and may be removed using mouse button 3
       (usually the right one).  When you have marked all the points
-      that you wish to, click the {\tt '}Done{\tt '} button.
+      that you wish to, click the \texttt{'}Done\texttt{'} button.
    }
    \sstusage{
       idicurs in
@@ -11985,7 +11298,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 
          If the logging system has been initialised using \xroutine{CCDSETUP}
          then the value specified there will be used. Otherwise, the
-         default is {\tt "}CCDPACK.LOG{\tt "}.
+         default is \texttt{"}CCDPACK.LOG\texttt{"}.
          [CCDPACK.LOG]
       }
       \sstsubsection{
@@ -12014,7 +11327,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          }
          If the logging system has been initialised using \xroutine{CCDSETUP}
          then the value specified there will be used. Otherwise, the
-         default is {\tt "}BOTH{\tt "}.
+         default is \texttt{"}BOTH\texttt{"}.
          [BOTH]
       }
       \sstsubsection{
@@ -12022,7 +11335,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }{
          A string indicating how markers are initially to be plotted on
          the image.  It consists of a comma-separated list of
-         {\tt "}attribute=value{\tt "} type strings.  The available attributes are:
+         \texttt{"}attribute=value\texttt{"} type strings.  The available attributes are:
          \sstitemlist{
 
             \sstitem
@@ -12046,7 +11359,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          If specifying this value on the command line, it is not
          necessary to give values for all the attributes; missing ones
          will be given sensible defaults.
-         [{\tt "}showindex=1{\tt "}]
+         [\texttt{"}showindex=1\texttt{"}]
       }
       \sstsubsection{
          MAXCANV = \_INTEGER (Read and Write)
@@ -12195,7 +11508,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }{
          This starts up the graphical user interface, allowing you to
          select a number of points which will be written to the
-         position list file {\tt '}mos.lis{\tt '}, which will be associated with
+         position list file \texttt{'}mos.lis\texttt{'}, which will be associated with
          the image file.
       }
       \sstexamplesubsection{
@@ -12203,7 +11516,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }{
          Each of the images in the current directory will be displayed,
          and the positions marked on it written to a list with the same
-         name as the image but the extension {\tt '}.pts{\tt '}, which will be
+         name as the image but the extension \texttt{'}.pts\texttt{'}, which will be
          associated with the image in question.  The display will
          initially be scaled so that pixels with a value higher than
          the 90th percentile will all be displayed as the brightest
@@ -12216,10 +11529,10 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
       \sstexamplesubsection{
          idicurs in=gc6253 readlist inlist=found.lis outlist=out.lis
-              markstyle={\tt "}colour=skyblue,showindex=0{\tt "}
+              markstyle=\texttt{"}colour=skyblue,showindex=0\texttt{"}
       }{
          The image gc6253 will be displayed, with the points stored in
-         the position list {\tt '}found.lis{\tt '} already plotted on it.  These
+         the position list \texttt{'}found.lis\texttt{'} already plotted on it.  These
          may be added to, moved and deleted, and the resulting list
          will be written to the file out.lis.  Points will initially
          be marked using skyblue markers, and not labelled with index
@@ -12284,8 +11597,8 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
         This format is used by KAPPA applications such as \xref{CURSOR}{sun95}{CURSOR}.
 
-        Comments may be included in a file using the characters {\tt "}\#{\tt "} and
-        {\tt "}!{\tt "}. Columns may be separated by the use of commas or spaces.
+        Comments may be included in a file using the characters \texttt{"}\#\texttt{"} and
+        \texttt{"}!\texttt{"}. Columns may be separated by the use of commas or spaces.
 
         Input position lists read when READLIST is true may be in either
         of these formats.  The output list named by the OUTLIST
@@ -12310,9 +11623,9 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       Behaviour of parameters
    }{
       All parameters retain their current value as default. The
-      {\tt "}current{\tt "} value is the value assigned on the last run of the
+      \texttt{"}current\texttt{"} value is the value assigned on the last run of the
       application. If the application has not been run then the
-      {\tt "}intrinsic{\tt "} defaults, as shown in the parameter help, apply.
+      \texttt{"}intrinsic\texttt{"} defaults, as shown in the parameter help, apply.
 
       Retaining parameter values has the advantage of allowing you to
       define the default behaviour of the application.  The intrinsic
@@ -12918,7 +12231,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          separated list on the command line.
       }
       \sstexamplesubsection{
-         makebias in=$^\wedge$bias\_frames.lis out=master\_bias
+         makebias in=$\wedge$bias\_frames.lis out=master\_bias
       } {
          In this example the list of images is read from the file
          bias\_frames.lis. This file may contain indirection to other files
@@ -13292,7 +12605,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          master\_dark.
       }
       \sstexamplesubsection{
-         makecal $^\wedge$flash\_frames $^\wedge$flash\_exposures flash\_master
+         makecal $\wedge$flash\_frames $\wedge$flash\_exposures flash\_master
       } {
          In this example a list of frames to be processed is passed to
          the program by indirection through an ASCII file
@@ -13662,7 +12975,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          entering a comma separated list on the command line.
       }
       \sstexamplesubsection{
-         makeflat in=$^\wedge$flat\_frames.lis out=master\_flat
+         makeflat in=$\wedge$flat\_frames.lis out=master\_flat
       } {
          In this example the list of images is read from the file
          flat\_frames.lis. This file may contain indirection to other files
@@ -14563,14 +13876,14 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       \item[1.]
             The Set NAME (a string identifying all images in the same Set)
       \item[2.]
-            The Set INDEX (an integer identifying the image{\tt '}s position
+            The Set INDEX (an integer identifying the image\texttt{'}s position
             within the Set)
       \end{itemize}
       and it will also optionally (if ADDWCS is set true) write:
       \begin{itemize}
       \item[3.]
-            The Set coordinate system (a coordinate frame in the NDF{\tt '}s
-            WCS component with the Domain {\tt '}CCD\_SET{\tt '}).
+            The Set coordinate system (a coordinate frame in the NDF\texttt{'}s
+            WCS component with the Domain \texttt{'}CCD\_SET\texttt{'}).
       \end{itemize}
 
       Normally by just presenting a list of image names to the program the
@@ -14587,7 +13900,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          If ADDWCS is true, then MAKESET will attach a new coordinate
          system to the WCS component of the image.  The new coordinate
          frame will be a copy of the Current coordinate frame of
-         the image, and will have the Domain name of {\tt '}CCD\_SET{\tt '};
+         the image, and will have the Domain name of \texttt{'}CCD\_SET\texttt{'};
          CCDPACK tasks concerned with registration know about this
          name and will use those coordinates on the assumption that
          they constitute a correct registration of images if they
@@ -14606,7 +13919,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          If this parameter is supplied, it gives the name of a file
          containing Set coordinate information.  A new coordinate
          frame will accordingly be written into the WCS component
-         of each image, with the Domain name {\tt '}CCD\_SET{\tt '}; CCDPACK
+         of each image, with the Domain name \texttt{'}CCD\_SET\texttt{'}; CCDPACK
          tasks concerned with registration know about this name
          and will use those coordinates on the assumption that they
          constitute a correct registration of images if they are
@@ -14682,7 +13995,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
 
          If the logging system has been initialised using \xroutine{CCDSETUP}
          then the value specified there will be used. Otherwise, the
-         default is {\tt "}CCDPACK.LOG{\tt "}.
+         default is \texttt{"}CCDPACK.LOG\texttt{"}.
          [CCDPACK.LOG]
       }
       \sstsubsection{
@@ -14711,7 +14024,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          }
          If the logging system has been initialised using \xroutine{CCDSETUP}
          then the value specified there will be used. Otherwise, the
-         default is {\tt "}BOTH{\tt "}.
+         default is \texttt{"}BOTH\texttt{"}.
          [BOTH]
       }
       \sstsubsection{
@@ -14785,10 +14098,10 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          have the same NAME.  The value of this parameter should be
          a group expression containing the same number of elements
          as the number of Sets being created; if it contains
-         modification elements such as {\tt "}$*${\tt "} they are applied to the
+         modification elements such as \texttt{"}$*$\texttt{"} they are applied to the
          name of the first image in each Set.
 
-         The default value is {\tt "}$*${\tt "}, which means the Set NAME is the
+         The default value is \texttt{"}$*$\texttt{"}, which means the Set NAME is the
          same as the name of the image first entered into each Set
          (if MODE=LIST) or the name of the HDS container file
          (if MODE=CONTAINER).  If MODE=FITS it is ignored.  There
@@ -14803,9 +14116,9 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          specified for each input image.  These may be given as a
          comma-separated list of names, using indirection if required,
          or as a single modification element (of the input names).
-         A common modification element is {\tt '}$*${\tt '}, meaning the same name
-         as the input file, so out={\tt "}$*$-set{\tt "} would create output
-         files with the same name as the input files but with {\tt "}-set{\tt "}
+         A common modification element is \texttt{'}$*$\texttt{'}, meaning the same name
+         as the input file, so out=\texttt{"}$*$-set\texttt{"} would create output
+         files with the same name as the input files but with \texttt{"}-set\texttt{"}
          appended.
 
          If MODE is not SPLIT then no new output files are created, so
@@ -14818,12 +14131,12 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          of NDF section specifiers from which to form the members of
          the newly created Set.  Each element may optionally be
          enclosed in parentheses, and should be of the form
-         explained in the {\tt "}\xref{NDF Sections}{sun33}{ndf_sections}{\tt "} section of \xref{SUN/33}{sun33}{};
-         typically it will be of the form {\tt "}(xmin:xmax,ymin:ymax){\tt "}.
+         explained in the \texttt{"}\xref{NDF Sections}{sun33}{ndf_sections}\texttt{"} section of \xref{SUN/33}{sun33}{};
+         typically it will be of the form \texttt{"}(xmin:xmax,ymin:ymax)\texttt{"}.
          Note that if supplying this parameter on the command line
          it will be necessary to include each element in quotes and
          the whole list in square brackets, e.g.:
-            sections=[{\tt "}(17:500,1:1024){\tt "},{\tt "}(525:1000,1:1024){\tt "}]
+            sections=[\texttt{"}(17:500,1:1024)\texttt{"},\texttt{"}(525:1000,1:1024)\texttt{"}]
 
          When using a Unix shell the whole thing will have to be
          placed in single quotes as well.
@@ -14864,7 +14177,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          XSTART(IX)..XSTART(IX$+$1)-1 in the X direction and
          YSTART(IY)..YSTART(IY$+$1)-1 in the Y direction, where the
          last pixel in the input image is implied for the upper
-         bound of the NX{\tt '}th element of XSTART.  The
+         bound of the NX\texttt{'}th element of XSTART.  The
          XSTART and YSTART parameters are given for convenience; the
          same information can be given by specifying an appropriate
          value for the more flexible SECTIONS parameter.
@@ -14881,7 +14194,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          XSTART(IX)..XSTART(IX$+$1)-1 in the X direction and
          YSTART(IY)..YSTART(IY$+$1)-1 in the Y direction, where the
          last pixel in the input image is implied for the upper
-         bound of the NY{\tt '}th element of YSTART.  The
+         bound of the NY\texttt{'}th element of YSTART.  The
          XSTART and YSTART parameters are given for convenience; the
          same information can be given by specifying an appropriate
          value for the more flexible SECTIONS parameter.
@@ -14889,14 +14202,14 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
    }
    \sstexamples{
       \sstexamplesubsection{
-         makeset {\tt "}data1,data2,data3,data4{\tt "} addwcs mode=list
+         makeset \texttt{"}data1,data2,data3,data4\texttt{"} addwcs mode=list
       }{
          This will write Set information into the named images; they will
-         all be given the same Set Name attribute ({\tt "}data1{\tt "}) and will
+         all be given the same Set Name attribute (\texttt{"}data1\texttt{"}) and will
          be given the Set Index attributes 1, 2, 3 and 4 respectively.
          Additionally, a new attached coordinate system with the Domain
-         {\tt "}CCD\_SET{\tt "} will be added to the World Coordinate System (WCS)
-         component of each; this will be a copy of each one{\tt '}s Current
+         \texttt{"}CCD\_SET\texttt{"} will be added to the World Coordinate System (WCS)
+         component of each; this will be a copy of each one\texttt{'}s Current
          attached coordinate system.  If not all of them have the
          same Current coordinate system when the program is run
          (i.e. they do not all have the same Domain), then a warning
@@ -14916,7 +14229,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          directory, grouping them into Sets of 4 images each.  If \routine{MAKESET}
          is to be used in this way however it must be done with care,
          since it will group the files in the order in which they
-         are presented.  This depends on what order the {\tt "}$*${\tt "} character
+         are presented.  This depends on what order the \texttt{"}$*$\texttt{"} character
          is expanded in, which depends on the details of the shell
          that you are using.  Typically shells expand alphabetically,
          so that if the directory contains files with the names
@@ -14930,17 +14243,17 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          to list Set members explicitly as in the previous example.
       }
       \sstexamplesubsection{
-         makeset {\tt "}d1,d2,d3,e1,e2,e3{\tt "} name=night1-$*$ setsize=3 addwcs=no
+         makeset \texttt{"}d1,d2,d3,e1,e2,e3\texttt{"} name=night1-$*$ setsize=3 addwcs=no
       }{
          This will construct two Sets, which will be given Set Name
-         attributes of {\tt "}night1-d1{\tt "} and {\tt "}night1-e1{\tt "} respectively.
+         attributes of \texttt{"}night1-d1\texttt{"} and \texttt{"}night1-e1\texttt{"} respectively.
          You might want to do this if you are going to use these
          files along with other Sets generated from files with the
          names the same as these.  No additions are made to the
          WCS componnent of the images.
       }
       \sstexamplesubsection{
-         makeset {\tt "}d1,d3{\tt "} indices=[1,3]
+         makeset \texttt{"}d1,d3\texttt{"} indices=[1,3]
       }{
          This will construct a Set of the two named images, giving them
          the Set Index attributes of 1 and 3 respectively.  This
@@ -14951,8 +14264,8 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       \sstexamplesubsection{
          makeset multi split out=multi-s
       }{
-              sections=[{\tt "}(1:32,1:48){\tt "},{\tt "}(1:32,49:96){\tt "},
-                        {\tt "}(33:64,1:48){\tt "},{\tt "}(33:64,49:96){\tt "}]
+              sections=[\texttt{"}(1:32,1:48)\texttt{"},\texttt{"}(1:32,49:96)\texttt{"},
+                        \texttt{"}(33:64,1:48)\texttt{"},\texttt{"}(33:64,49:96)\texttt{"}]
          A new HDS container file called multi-s is created which
          contains the data from the single image multi, split up
          into four new images.  A new coordinate system with the
@@ -14963,7 +14276,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       \sstexamplesubsection{
          makeset multi split out=multi-s
       }{
-              sections=[{\tt "}(:32,:48){\tt "},{\tt "}(:32,49:){\tt "},{\tt "}(33:,:48){\tt "},{\tt "}(33:,49:){\tt "}]
+              sections=[\texttt{"}(:32,:48)\texttt{"},\texttt{"}(:32,49:)\texttt{"},\texttt{"}(33:,:48)\texttt{"},\texttt{"}(33:,49:)\texttt{"}]
          If the input image `multi' has X pixels in the range 1:64 and
          Y pixels in the range 1:96, this does exactly the same as
          the previous example, cutting multi into quarters.  The
@@ -14973,12 +14286,12 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       \sstexamplesubsection{
          makeset in=$*$ mode=split out=$*$-s sections=!
       }{
-              xstart={\tt "}1,33{\tt "} ystart={\tt "}1,49{\tt "}
+              xstart=\texttt{"}1,33\texttt{"} ystart=\texttt{"}1,49\texttt{"}
          This does the same as the previous example again, using the
          somewhat simpler XSTART and YSTART parameters.  This time
          a new Set is created for each of the images in the current
          directory, and written into a container file with the
-         same name but {\tt '}-s{\tt '} appended.
+         same name but \texttt{'}-s\texttt{'} appended.
       }
    }
    \sstdiytopic{
@@ -14996,7 +14309,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          it resides, but by the pathname supplied to the IN parameter
          which identifies that HDS container file.  Thus it is possible
          to create members of two Sets within a single container file
-         in one invocation of \routine{MAKESET}, but it{\tt '}s most unlikely that this
+         in one invocation of \routine{MAKESET}, but it\texttt{'}s most unlikely that this
          will result unless you are deliberately invoking it in a
          bizarre way.
 
@@ -15009,9 +14322,9 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       Behaviour of Parameters
    }{
       All parameters retain their current value as default. The
-      {\tt "}current{\tt "} value is the value assigned on the last run of the
+      \texttt{"}current\texttt{"} value is the value assigned on the last run of the
       application. If the application has not been run then the
-      {\tt "}intrinsic{\tt "} defaults, as shown in the parameter help, apply.
+      \texttt{"}intrinsic\texttt{"} defaults, as shown in the parameter help, apply.
 
       Retaining parameter values has the advantage of allowing you to
       define the default behaviour of the application. The intrinsic
@@ -15061,10 +14374,10 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       to select a pair of images which have a region in common
       (if you only have two images this step may be skipped).
       Use the tabs at either side of the screen to pick the image to
-      appear on that side.  You can use the {\tt "}Show FITS{\tt "} button to
+      appear on that side.  You can use the \texttt{"}Show FITS\texttt{"} button to
       select one or more FITS headers to be displayed alongside
       each image if this will make it easier to identify which is which.
-      You can use the {\tt "}Display cutoff{\tt "} menu to select the percentiles
+      You can use the \texttt{"}Display cutoff\texttt{"} menu to select the percentiles
       controlling the brightness of each pixel; alignment is easier if
       the same features are of a similar brightness in different images.
       The images are displayed resampled into their Current coordinates,
@@ -15077,7 +14390,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       different method.  The whole of each image will be displayed in
       the chooser window, select a pair with
       an overlapping region which you wish to align, and click the
-      {\tt "}Use this pair{\tt "} button.  The aligner window will then appear,
+      \texttt{"}Use this pair\texttt{"} button.  The aligner window will then appear,
       displaying the two images which you have selected.
       The chooser window can normally be resized in the normal way to
       make the images bigger or smaller.  However there is currently
@@ -15088,7 +14401,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       In the aligner window you can drag either of these images around
       the display region by holding down mouse button 1 (usually the
       left one) as you move the mouse; the easiest way to align the pair
-      is to {\tt "}pick up{\tt "} one image by an identifiable feature and {\tt "}drop{\tt "} it
+      is to \texttt{"}pick up\texttt{"} one image by an identifiable feature and \texttt{"}drop\texttt{"} it
       on the same feature in the other image.  Where the images overlap
       their pixels will be averaged.  If they are not correctly
       positioned, you can move them again.  Once you are happy that
@@ -15115,17 +14428,17 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       this point (with mouse button 3).
 
       The aligner window can be resized, the magnification changed
-      using the {\tt "}Zoom{\tt "} control, the display region scrolled using
+      using the \texttt{"}Zoom\texttt{"} control, the display region scrolled using
       the scrollbars, and the shape and colour of the point markers
       selected.  When you have aligned the images and marked shared
       features, or if you decide that the pair cannot be satisfactorily
-      registered, click the {\tt "}Done{\tt "} button.
+      registered, click the \texttt{"}Done\texttt{"} button.
 
       You will then be returned to the chooser window to select another
       pair and repeat the process.  After the first time however,
       you will only be allowed to select a pair of images to align
       if at least one of them has already been aligned.  Those
-      which have already been done are marked with a `$+${\tt '} sign on their
+      which have already been done are marked with a `$+$\texttt{'} sign on their
       selection tabs.
 
       Once you have made enough pairings to register the whole set, the
@@ -15165,7 +14478,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
 
          If the logging system has been initialised using \xroutine{CCDSETUP}
          then the value specified there will be used. Otherwise, the
-         default is {\tt "}CCDPACK.LOG{\tt "}.
+         default is \texttt{"}CCDPACK.LOG\texttt{"}.
          [CCDPACK.LOG]
       }
       \sstsubsection{
@@ -15194,7 +14507,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          }
          If the logging system has been initialised using \xroutine{CCDSETUP}
          then the value specified there will be used. Otherwise, the
-         default is {\tt "}BOTH{\tt "}.
+         default is \texttt{"}BOTH\texttt{"}.
          [BOTH]
       }
       \sstsubsection{
@@ -15202,7 +14515,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       }{
          A string indicating how markers are initially to be plotted in the
          aligner widget to represent points on the left hand image.
-         It consists of a comma-separated list of {\tt "}attribute=value{\tt "} type
+         It consists of a comma-separated list of \texttt{"}attribute=value\texttt{"} type
          strings.  The available attributes are:
          \sstitemlist{
 
@@ -15224,14 +14537,14 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          If specifying this value on the command line, it is not
          necessary to give values for all the attributes; missing ones
          will be given sensible defaults.
-         [{\tt "}shape=plus{\tt "}]
+         [\texttt{"}shape=plus\texttt{"}]
       }
       \sstsubsection{
          MARKSTYLE2 = LITERAL (Read and Write)
       }{
          A string indicating how markers are initially to be plotted in the
          aligner widget to represent points on the right hand image.
-         It consists of a comma-separated list of {\tt "}attribute=value{\tt "} type
+         It consists of a comma-separated list of \texttt{"}attribute=value\texttt{"} type
          strings.  The available attributes are:
          \sstitemlist{
 
@@ -15253,7 +14566,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          If specifying this value on the command line, it is not
          necessary to give values for all the attributes; missing ones
          will be given sensible defaults.
-         [{\tt "}shape=circle{\tt "}]
+         [\texttt{"}shape=circle\texttt{"}]
       }
       \sstsubsection{
          MAXCANV = \_INTEGER (Read and Write)
@@ -15296,9 +14609,9 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          These may be specified as list of comma separated names,
          using indirection if required, OR, as a single modification
          element (of the input names). The simplest modification
-         element is the asterisk {\tt "}$*${\tt "} which means call each of the
+         element is the asterisk \texttt{"}$*$\texttt{"} which means call each of the
          output lists the same name as the corresponding input images (but
-         without the {\tt "}.sdf{\tt "} extension).
+         without the \texttt{"}.sdf\texttt{"} extension).
          So,
             IN $>$ $*$
             OUTLIST $>$ $*$
@@ -15308,10 +14621,10 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          Other types of modification can also occur, such as,
             OUTLIST $>$ $*$\_objs.dat
          which means call the position lists the same as the input images
-         but put {\tt "}\_objs.dat{\tt "} after the names. Replacement of a specified
+         but put \texttt{"}\_objs.dat\texttt{"} after the names. Replacement of a specified
          string with another in the output file names can also be used,
             OUTLIST $>$ $*$$|$\_debias$|$\_images.dat$|$
-         this replaces the string {\tt "}\_debias{\tt "} with {\tt "}\_images.dat{\tt "} in any
+         this replaces the string \texttt{"}\_debias\texttt{"} with \texttt{"}\_images.dat\texttt{"} in any
          of the output names.
 
          If wildcarded names for the input images are used then it is
@@ -15434,8 +14747,8 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          percentile, which shows bright detail well.
       }
       \sstexamplesubsection{
-         pairndf in={\tt "}data1,data2{\tt "} outlist={\tt "}d1-pos,d2-pos{\tt "} zoom=2 maxcanv=0
-              markstyle1={\tt "}shape=circle,size=8,thickness=1,colour=HotPink{\tt "}
+         pairndf in=\texttt{"}data1,data2\texttt{"} outlist=\texttt{"}d1-pos,d2-pos\texttt{"} zoom=2 maxcanv=0
+              markstyle1=\texttt{"}shape=circle,size=8,thickness=1,colour=HotPink\texttt{"}
       }{
          Only the two images data1 and data2 will be aligned, and the
          corresponding sets of positions will be written to the
@@ -15500,9 +14813,9 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       Behaviour of parameters
    }{
       All parameters retain their current value as default. The
-      {\tt "}current{\tt "} value is the value assigned on the last run of the
+      \texttt{"}current\texttt{"} value is the value assigned on the last run of the
       application. If the application has not been run then the
-      {\tt "}intrinsic{\tt "} defaults, as shown in the parameter help, apply.
+      \texttt{"}intrinsic\texttt{"} defaults, as shown in the parameter help, apply.
 
       Retaining parameter values has the advantage of allowing you to
       define the default behaviour of the application.  The intrinsic
@@ -15578,7 +14891,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          specified using indirection (other CCDPACK position list
          processing routines will write the names of their results
          files into files suitable for use in this manner) the
-         indirection character is \qt{$^\wedge$}.
+         indirection character is \qt{$\wedge$}.
       }
       \sstsubsection{
          LOGFILE = FILENAME (Read)
@@ -15825,7 +15138,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
    application.
 
    If the input images have not already been categorised then this
-   routine performs this task for the {\tt "}frame types{\tt "} BIAS, TARGET,
+   routine performs this task for the \texttt{"}frame types\texttt{"} BIAS, TARGET,
    DARK, FLASH, FLAT, MASTER\_BIAS, MASTER\_FLAT, MASTER\_DARK and
    MASTER\_FLASH (these are input as different groups of images).
 
@@ -16232,7 +15545,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          \sstitemlist{
 
             \sstitem
-               SIMPLE MULTIENTRY IN=$^\wedge$XREDUCE.NDFS
+               SIMPLE MULTIENTRY IN=$\wedge$XREDUCE.NDFS
 
          }
          This parameter is intended as an aid when using this program
@@ -16567,7 +15880,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
 
          The image names may (although this is probably not advisable)
          be specified using wildcards, or may be specified using an
-         indirection file (the indirection character is {\tt "}$\wedge${\tt "}).
+         indirection file (the indirection character is \texttt{"}$\wedge$\texttt{"}).
       }
       \sstsubsection{
          INLIST = LITERAL (Read)
@@ -16585,7 +15898,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          specified using indirection (other CCDPACK position list
          processing routines will write the names of their results
          files into files suitable for use in this manner) the
-         indirection character is \qt{$^\wedge$}.
+         indirection character is \qt{$\wedge$}.
       }
       \sstsubsection{
          LOGFILE = FILENAME (Read)
@@ -16654,7 +15967,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          coordinate system is added, any previously existing one with
          the same Domain will be removed.
 
-         If PLACEIN is {\tt "}SINGLE{\tt "}, then the new coordinate systems are all
+         If PLACEIN is \texttt{"}SINGLE\texttt{"}, then the new coordinate systems are all
          attached to a single image.  In this case the  domains are
          OUTDOMAIN\_1, OUTDOMAIN\_2, ....
 
@@ -16705,7 +16018,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          SIMPFI = \_LOGICAL (Read)
       }{
          If FITTYPE=6 and FULL=TRUE, this gives the value of the
-         mapping{\tt '}s SimpFI attribute (whether it is legitimate to simplify
+         mapping\texttt{'}s SimpFI attribute (whether it is legitimate to simplify
          the forward followed by the inverse transformation to a unit
          transformation).
          [TRUE]
@@ -16714,7 +16027,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          SIMPIF = \_LOGICAL (Read)
       }{
          If FITTYPE=6 and FULL=TRUE this gives the value of the
-         mapping{\tt '}s SimpIF attribute (whether it is legitimate to simplify
+         mapping\texttt{'}s SimpIF attribute (whether it is legitimate to simplify
          the inverse followed by the forward transformation to a unit
          transformation).
          [TRUE]
@@ -16774,10 +16087,10 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       \sstsubsection{
          WCSFILE = NDF (Read)
       }{
-         If PLACEIN is {\tt "}SINGLE{\tt "} then the value of this parameter gives the
+         If PLACEIN is \texttt{"}SINGLE\texttt{"} then the value of this parameter gives the
          the name of an image which will have the new coordinate systems
          attached to it.  They will be added with domains given by the
-         OUTDOMAIN parameter with {\tt '}\_1{\tt '}, {\tt '}\_2{\tt '}, \ldots\ appended.  If the image
+         OUTDOMAIN parameter with \texttt{'}\_1\texttt{'}, \texttt{'}\_2\texttt{'}, \ldots\ appended.  If the image
          named by this parameter does not exist, a dummy one will be
          created.
       }
@@ -16856,9 +16169,9 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          accessed and their associated position lists are opened.  A
          global fit between all the datasets is then performed which
          results in estimates for the offsets from the first input
-         image{\tt '}s position.  These offsets are between the Current
+         image\texttt{'}s position.  These offsets are between the Current
          coordinate systems of the images.  The results are then
-         attached as new coordinate systems, labelled {\tt '}CCD\_REG{\tt '}, in
+         attached as new coordinate systems, labelled \texttt{'}CCD\_REG\texttt{'}, in
          the WCS component of the images.  Actual registration of the
          images  can then be achieved by aligning all the images in the
          CCD\_REG domain using \xroutine{TRANNDF}.
@@ -16870,7 +16183,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          transformations are derived for a full 6-parameter linear fit
          (which allows offset, rotation, magnification and shear).
          The results are coded as attached coordinate systems labelled
-         {\tt '}RESULT-SET1{\tt '}.
+         \texttt{'}RESULT-SET1\texttt{'}.
       }
       \sstexamplesubsection{
          register inlist=\qs{\qt{myimage1,myimage2}} fittype=4 refpos=2
@@ -16882,11 +16195,11 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          same as the pixel coordinates in image myimage2.
       }
       \sstexamplesubsection{
-         register inlist={\tt '}{\tt "}one,two{\tt "}{\tt '} fittype=6 xfor={\tt '}pa$+$pb$*$x{\tt '} yfor={\tt '}pa$+$pb$*$y{\tt '}
+         register inlist=\texttt{'}\texttt{"}one,two\texttt{"}\texttt{'} fittype=6 xfor=\texttt{'}pa$+$pb$*$x\texttt{'} yfor=\texttt{'}pa$+$pb$*$y\texttt{'}
       }{
          In this example the position lists associated with the images
          one and two are said to be related by the algebraic
-         expressions {\tt "}pa$+$pb$*$x{\tt "} and {\tt "}pa$+$pb$*$y{\tt "}, which indicates that a
+         expressions \texttt{"}pa$+$pb$*$x\texttt{"} and \texttt{"}pa$+$pb$*$y\texttt{"}, which indicates that a
          single offset applies in both directions and a single scale
          factor. A solution for the values PA and PB is found using a
          general least-squares minimization technique. Starting values
@@ -16895,8 +16208,8 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          registered in the same run.
       }
       \sstexamplesubsection{
-         register inlist={\tt '}{\tt "}image1,image2{\tt "}{\tt '} fittype=6 xfor={\tt '}pa$+$pb$*$x$+$pc$*$y$+$pd$*$x$*$y{\tt '}
-               yfor={\tt '}pe$+$pf$*$x$+$pg$*$y$+$ph$*$x$*$y{\tt '}
+         register inlist=\texttt{'}\texttt{"}image1,image2\texttt{"}\texttt{'} fittype=6 xfor=\texttt{'}pa$+$pb$*$x$+$pc$*$y$+$pd$*$x$*$y\texttt{'}
+               yfor=\texttt{'}pe$+$pf$*$x$+$pg$*$y$+$ph$*$x$*$y\texttt{'}
       }{
          In this example a non-linear transformation is fit between the
          positions associated with the images image1 and image2. This analysis
@@ -16909,8 +16222,8 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          only the forward transformation).
       }
       \sstexamplesubsection{
-         register ndfnames=false inlist={\tt '}{\tt "}list1.acc,list2.acc,list3.acc{\tt "}{\tt '}
-               fittype=3 placein=each in={\tt '}{\tt "}image1,image2,image3{\tt "}{\tt '}
+         register ndfnames=false inlist=\texttt{'}\texttt{"}list1.acc,list2.acc,list3.acc\texttt{"}\texttt{'}
+               fittype=3 placein=each in=\texttt{'}\texttt{"}image1,image2,image3\texttt{"}\texttt{'}
       }{
          In this example the input position lists are not associated
          with images (ndfnames=false) and have to be specified by name
@@ -16918,7 +16231,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          associated with images there is no natural home for the
          new coordinate systems. In this example it has been decided to
          attach the coordinate systems to a set of images anyway.
-         PLACEIN could also be given as {\tt "}SINGLE{\tt "} in which case the
+         PLACEIN could also be given as \texttt{"}SINGLE\texttt{"} in which case the
          coordinate systems would be attached to a single image with
          Domain names CCD\_REG\_1, CCD\_REG\_2, ...
       }
@@ -17409,7 +16722,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          LISTBY = LITERAL (Read)
       }{
          Indicates the way in which images should be grouped for output.
-         It may take the values {\tt '}NAME{\tt '}, {\tt '}INDEX{\tt '} or {\tt '}NONE{\tt '}.
+         It may take the values \texttt{'}NAME\texttt{'}, \texttt{'}INDEX\texttt{'} or \texttt{'}NONE\texttt{'}.
          If set to NAME, then all the images in the same Set are grouped
          together in the output; if set to INDEX then all the
          corresponding images from different Sets are grouped together,
@@ -17427,7 +16740,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
 
          If the logging system has been initialised using \xroutine{CCDSETUP}
          then the value specified there will be used. Otherwise, the
-         default is {\tt "}CCDPACK.LOG{\tt "}.
+         default is \texttt{"}CCDPACK.LOG\texttt{"}.
          [CCDPACK.LOG]
       }
       \sstsubsection{
@@ -17456,7 +16769,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          }
          If the logging system has been initialised using \xroutine{CCDSETUP}
          then the value specified there will be used. Otherwise, the
-         default is {\tt "}BOTH{\tt "}.
+         default is \texttt{"}BOTH\texttt{"}.
          [BOTH]
       }
       \sstsubsection{
@@ -17485,7 +16798,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          the images selected for output.  The (non-comment) lines of
          this file are of the form:
          \begin{quote}
-            {\tt image-name \# set-index set-name}
+            \texttt{image-name \# set-index set-name}
          \end{quote}
          since the set-index and set-name values appear to the right
          of a comment character, the file can thus be used as an
@@ -17561,7 +16874,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          as well.
       }
       \sstexamplesubsection{
-         showset $*$ pickname=like namelike={\tt "}gc6235a,gc4021a{\tt "} namelist=gc.lis
+         showset $*$ pickname=like namelike=\texttt{"}gc6235a,gc4021a\texttt{"} namelist=gc.lis
       }{
          This will list all the images in the current directory which
          are in the same Set as the images gc6235a and gc4021a.
@@ -17595,9 +16908,9 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       Behaviour of Parameters
    }{
       All parameters retain their current value as default. The
-      {\tt "}current{\tt "} value is the value assigned on the last run of the
+      \texttt{"}current\texttt{"} value is the value assigned on the last run of the
       application. If the application has not been run then the
-      {\tt "}intrinsic{\tt "} defaults, as shown in the parameter help, apply.
+      \texttt{"}intrinsic\texttt{"} defaults, as shown in the parameter help, apply.
 
       Retaining parameter values has the advantage of allowing you to
       define the default behaviour of the application. The intrinsic
@@ -17767,7 +17080,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          specified using indirection (other CCDPACK position list
          processing routines will write the names of their results
          files into a file suitable for use in this manner) the
-         indirection character is \qt{$^\wedge$}.
+         indirection character is \qt{$\wedge$}.
       }
       \sstsubsection{
          LOGFILE = FILENAME (Read)
@@ -18078,7 +17391,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          used when they are available -- see previous examples). The
          names of the output lists are written to the file newfiles,
          this could be used to specify the names of these files to
-         another application using indirection (e.g inlist=$^\wedge$newfiles,
+         another application using indirection (e.g inlist=$\wedge$newfiles,
          with ndfnames=false again).  The transformation type is not
          specified in this example and will be obtained by prompting.
       }
@@ -18182,9 +17495,9 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       of images.  The output images are calculated by resampling
       the data of the input images. Output array elements are set to the
       bad value if their inverse-transformed coordinates lie outside the
-      corresponding input image{\tt '}s coordinate limits.  Many images can
+      corresponding input image\texttt{'}s coordinate limits.  Many images can
       be resampled with a single invocation of \routine{TRANNDF}, but it is
-      the user{\tt '}s responsibility to ensure that they are resampled
+      the user\texttt{'}s responsibility to ensure that they are resampled
       into the same coordinate system if they are subsequently to be
       combined or compared on a pixel-by-pixel basis.
 
@@ -18200,7 +17513,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       coordinates is not suitable because they have units of radians).
       The Current coordinate system will typically have been added
       by the CCDPACK \xroutine{REGISTER} or \xroutine{WCSREG} applications, and be labelled
-      {\tt '}CCD\_REG{\tt '} or {\tt '}CCD\_WCSREG{\tt '} accordingly - if it has another label
+      \texttt{'}CCD\_REG\texttt{'} or \texttt{'}CCD\_WCSREG\texttt{'} accordingly - if it has another label
       (domain) a warning will be issued but resampling will proceed.
       A copy of the original PIXEL coordinate system will be retained
       in the WCS component of the new image under the name CCD\_OLDPIXEL;
@@ -18395,9 +17708,9 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          USEWCS = \_LOGICAL (Read)
       }{
          If TRUE then the transformation which is to be applied to the
-         image is stored in the image{\tt '}s WCS extension as an attached
+         image is stored in the image\texttt{'}s WCS extension as an attached
          coordinate system. If FALSE then the transformation is either
-         stored as a TRN structure in the image{\tt '}s CCDPACK extension
+         stored as a TRN structure in the image\texttt{'}s CCDPACK extension
          (.MORE.CCDPACK.TRANSFORM), or is supplied by the user (see
          the INEXT parameter). [TRUE]
       }
@@ -18761,7 +18074,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          SIMPFI = \_LOGICAL (Read)
       }{
          If MODE=SET and MAPTYPE=MATH, this gives the value of the
-         mapping{\tt '}s SimpFI attribute (whether it is legitimate to simplify
+         mapping\texttt{'}s SimpFI attribute (whether it is legitimate to simplify
          the forward followed by the inverse transformation to a unit
          transformation).
          [TRUE]
@@ -18770,7 +18083,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          SIMPIF = \_LOGICAL (Read)
       }{
          If MODE=SET and MAPTYPE=MATH, this gives the value of the
-         mapping{\tt '}s SimpIF attribute (whether it is legitimate to simplivy
+         mapping\texttt{'}s SimpIF attribute (whether it is legitimate to simplivy
          the inverse followed by the forward transformation to a unit
          transformation).
          [TRUE]
@@ -18781,7 +18094,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          wcsedit $*$ current ccd\_reg
       }{
          This sets the Current coordinate system of all the images in
-         the current directory to {\tt '}CCD\_REG{\tt '}.  The names of all the
+         the current directory to \texttt{'}CCD\_REG\texttt{'}.  The names of all the
          images which had this coordinate system are written to the
          file WCSEDIT.LIS.  Any which do not appear in this file were
          not modified by the program.
@@ -18790,13 +18103,13 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          wcsedit data$*$ remove frame=4
       }{
          The fourth coordinate frame in the WCS component of each image
-         {\tt '}data$*$.sdf{\tt '} is removed.
+         \texttt{'}data$*$.sdf\texttt{'} is removed.
       }
       \sstexamplesubsection{
-         wcsedit {\tt "}first,second{\tt "} mode=add frame=GRID maptype=pincushion
+         wcsedit \texttt{"}first,second\texttt{"} mode=add frame=GRID maptype=pincushion
               coeffs=[-6.8e-8,0,0] domain=NEW
       }{
-         A new coordinate system, called {\tt '}NEW{\tt '}, is added to the images
+         A new coordinate system, called \texttt{'}NEW\texttt{'}, is added to the images
          first  and second.  It is connected to the previously
          existing GRID domain by a pincushion distortion mapping
          centred at the origin with a distortion coefficient of
@@ -18808,12 +18121,12 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          }
       }
       \sstexamplesubsection{
-         wcsedit image1 set ! set={\tt "}domain=NEW,title=New frame{\tt "}
+         wcsedit image1 set ! set=\texttt{"}domain=NEW,title=New frame\texttt{"}
       }{
          This changes the value of the Domain attribute of the Current
          coordinate frame in the WCS component of image1 to the name
-         {\tt "}NEW{\tt "} and  sets the Title attribute of the frame to {\tt "}New
-         frame{\tt "}.
+         \texttt{"}NEW\texttt{"} and  sets the Title attribute of the frame to \texttt{"}New
+         frame\texttt{"}.
       }
       \sstexamplesubsection{
          wcsedit image1 show
@@ -18823,7 +18136,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       }
       \sstexamplesubsection{
          wcsedit frm mode=add frame=pixel maptype=math simpif simpfi
-              forexp=[{\tt "}r=sqrt(x$*$x$+$y$*$y){\tt "},{\tt "}theta=atan2(y,x){\tt "}]
+              forexp=[\texttt{"}r=sqrt(x$*$x$+$y$*$y)\texttt{"},\texttt{"}theta=atan2(y,x)\texttt{"}]
               invexp=[x=r$*$cos(theta),y=r$*$sin(theta)]
       }{
          Adds a frame giving a polar coordinate view of the PIXEL frame.
@@ -18930,7 +18243,7 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
           A list of the names of the images which are to be aligned.  The
           names should be separated by commas and may include wildcards.
           They may alternatively be specified using an indirection file
-          (the indirection character is \qt{$^\wedge$}).
+          (the indirection character is \qt{$\wedge$}).
 
           If the application is successful, a new frame with a domain
           determined by the OUTDOMAIN parameter will be added to each of
@@ -19066,10 +18379,10 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          resampling prior to making a mosaic.
       }
       \sstexamplesubsection{
-         wcsreg {\tt "}obs1\_$*$,obs2\_$*${\tt "} outdomain=final
+         wcsreg \texttt{"}obs1\_$*$,obs2\_$*$\texttt{"} outdomain=final
              domains=[ccd\_reg,inst\_obs1,inst\_obs2]
       }{
-         In this example images with names starting {\tt '}obs1\_{\tt '} and {\tt '}obs2\_{\tt '} are aligned.
+         In this example images with names starting \texttt{'}obs1\_\texttt{'} and \texttt{'}obs2\_\texttt{'} are aligned.
          Where they share CCD\_REG coordinates this will be used for
          alignment, but otherwise the INST\_OBS1 and INST\_OBS2
          coordinate systems will be used.  These perhaps contain
@@ -19079,13 +18392,13 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
          used for the new domain added to the WCS component.
       }
       \sstexamplesubsection{
-         wcsreg {\tt "}skyfr1,skyfr2,skyfr3,skyfr4{\tt "} refpos=2 domains=!
+         wcsreg \texttt{"}skyfr1,skyfr2,skyfr3,skyfr4\texttt{"} refpos=2 domains=!
       }{
          Here wcsreg is being used with a somewhat different intent.
          The images named are already fully aligned in their Current
          coordinates, but executing this command has the effect of
          aligning them in a new coordinate system which is a copy of
-         the pixel coordinate system of {\tt '}skyfr2{\tt '}.  Since this has
+         the pixel coordinate system of \texttt{'}skyfr2\texttt{'}.  Since this has
          units which are the size of pixels, the resulting image files
          are suitable for resampling using \xroutine{TRANNDF}.  Supposing that
          they were originally aligned in SKY coordinates they could
@@ -19298,8 +18611,7 @@ and you should check these if required (none of the methods described
 here will actually work for foreign data types).
 
 An example trace of a transform structure is shown next:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 NDF.MORE.CCDPACK.TRANSFORM  <TRN_TRANSFORM>
   TRN_VERSION    <_REAL>   0.9
   FORWARD        <_CHAR*9>   'DEFINED'
@@ -19323,8 +18635,7 @@ NDF.MORE.CCDPACK.TRANSFORM  <TRN_TRANSFORM>
     UNIT_DET       <_LOGICAL>   TRUE
 
 End of Trace.
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Note that a full transform is defined with a forward and an inverse
 mapping (these are produced automatically by CCDPACK when using linear
 transforms). All transformations (and positions) are stored in double
@@ -19339,7 +18650,7 @@ linear transformations).
 \subsection{Transforming\xlabel{transformingpositions} position lists}
 
 As explained in
-\hyperref{the section on position lists}{\S}{}{using_position_lists},
+\slhyperref{the section on position lists}{\S}{}{using_position_lists},
 when a position list is associated with an image which has
 suitable coordinate systems attached to it,
 explicit transformation of positions in the list is usually not necessary,
@@ -19383,8 +18694,7 @@ application) to a reference coordinate system (or vice-versa), is
 fairly straight-forward given registered datasets. It is also possible
 to transform to the coordinates of another dataset. The sequence of
 commands for this operation goes like:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % display  img                                      [1]
 % idicurs  in=img outlist=img.approx                [2]
 % findcent inlist=img outlist=img.acc               [3]
@@ -19393,8 +18703,7 @@ commands for this operation goes like:
 % tranlist trtype=wcs inlist=img inext=false        [5]
            outlist=img.look wcsfile=newimg
            framein=pixel frameout=ccd_reg
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Notes:
 \begin{enumerate}
@@ -19419,12 +18728,10 @@ such a good idea.
 
 Using linear coefficients is a quick way of applying offsets, scales and
 rotations to data. The linear transform form is:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 XX = TR(1) + TR(2) * X + TR(3) * Y
 YY = TR(4) + TR(5) * X + TR(6) * Y
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The \text{TR(1-6)} correspond to the coefficients you give to
 \routine{TRANLIST}.
 The identity transformation is \text{[0,1,0,0,0,1]} which corresponds
@@ -19452,14 +18759,12 @@ use the functions \text{SIN}, \text{TAN}, \text{COS},
 \text{ACOS}, \text{LOG}, \text{LOG10} and many others  which are
 listed in SUN/61 appendix A. An example of using this capability is to
 transform positions by a parameterised pin-cushion distortion:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % tranlist  xfor = ( fx * ( 1 + pa * ( fx*fx + fy*fy ) ) ) * ps + px
             yfor = ( fy * ( 1 + pa * ( fx*fx + fy*fy ) ) ) * ps + py
             fx = ( x - px ) / ps  fy = ( y - py ) / ps
             pa = 21.4 px = 100.0 py = 200.0 ps=11.5
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This also shows how to use sub-expressions to reduce complex formulae to
 more manageable levels (\text{x} and \text{y} are offset and scaled
 to some arbitrary level and now masquerade as \text{fx} and
@@ -19467,7 +18772,7 @@ to some arbitrary level and now masquerade as \text{fx} and
 of the parameters need to be changed on re-runs.
 Note that a coordinate system representing a pincushion distortion
 could be added instead to an image using \xroutine{WCSEDIT}
-(described \hyperref{elsewhere}{in \S}{}{wcsdirect}).
+(described \slhyperref{elsewhere}{in \S}{}{wcsdirect}).
 
 
 
@@ -19735,9 +19040,9 @@ documentation.
 In this release CCDPACK can now access foreign data files. This
 makes it possible to wildcard lists of IRAF and FITS files, i.e.:
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 makemos in=*.fit out=mosaic.imh
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 CCDPACK can now also be used from the IRAF/CL command interpreter.
 
