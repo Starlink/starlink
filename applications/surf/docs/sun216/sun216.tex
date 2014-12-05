@@ -1,7 +1,4 @@
-\documentclass[twoside,11pt]{article}
-
-\usepackage{graphicx}
-%%\usepackage[draft]{graphicx}
+\documentclass[twoside,11pt]{starlink}
 
 % +
 %  Name:
@@ -32,31 +29,30 @@
 %     2003 Apr 03 (TIMJ)
 %        Tweaks for 1.6-11 release. Update references and recommended
 %        citations. Remove statement about SURF being in constant development.
+%     2014-12-04 (TIMJ):
+%        Use Starlink class file
 %     {Add further history here}
 %
 % -
 
-
-\pagestyle{myheadings}
-
 % -----------------------------------------------------------------------------
 % ? Document identification
 
-\newcommand{\scusoft}          {{\sc Surf}}
-\newcommand{\micronm}          {$\mu$m}
+\providecommand{\scusoft}          {\textsc{Surf}}
+\providecommand{\micronm}          {$\mu$m}
 
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {216.8}
-\newcommand{\stardocauthors}   {T. Jenness, J.~F. Lightfoot\\
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {216.8}
+\stardocauthors   {T. Jenness, J.~F. Lightfoot\\
                                 Joint Astronomy Centre, Hilo, Hawaii}
-\newcommand{\stardocdate}      {3 April 2003}
-\newcommand{\stardoctitle}     {SURF -- SCUBA User Reduction Facility}
-\newcommand{\stardocversion}   {1.6}
-\newcommand{\stardocmanual}    {User's manual}
-\newcommand{\stardoccopyright} {Copyright \copyright\ 1997-2000,2003 Particle Physics and Astronomy Research Council}
-\newcommand{\stardocabstract}  {%
+\stardocdate        {3 April 2003}
+\stardoctitle       {SURF -- SCUBA User Reduction Facility}
+\stardocversion     {1.6}
+\stardocmanual      {User's manual}
+\stardoccopyright   {Copyright \copyright\ 1997-2000,2003 Particle Physics and Astronomy Research Council}
+\stardocabstract  {%
 \scusoft\ is a set of ADAM tasks necessary for reducing demodulated
 Submillimetre Common-User Bolometer Array (SCUBA) data obtained from
 the James Clerk Maxwell Telescope. The tasks allows one to completely
@@ -68,127 +64,127 @@ descriptions of each task.
 % ? End of document identification
 
 % set up some common package names
-\newcommand{\Kappa}{\xref{{\sc{Kappa}}}{sun95}{}}
-\newcommand{\Figaro}{\xref{{\sc{Figaro}}}{sun86}{}}
-\newcommand{\gaia}{\xref{{\sc{Gaia}}}{sun214}{}}
-\newcommand{\convert}{\xref{{\sc{Convert}}}{sun55}{}}
-\newcommand{\fluxes}{\xref{{\sc{Fluxes}}}{sun213}{}}
-\newcommand{\Iras}{\xref{{\sc{Iras90}}}{sun163}{}}
-\newcommand{\ndf}{\xref{NDF}{sun33}{}}
-\newcommand{\agi}{\xref{AGI}{sun48}{}}
-\newcommand{\ESP}{\xref{ESP}{sun180}{}}
-\newcommand{\specx}{\xref{{\sc{Specx}}}{sc8}{}}
-\newcommand{\polpack}{\xref{{\sc{Polpack}}}{sun223}{}}
-\newcommand{\ccdpack}{\xref{CCDPACK}{sun139}{}}
-\newcommand{\cursa}{\xref{{\sc{Cursa}}}{sun190}{}}
+\providecommand{\Kappa}{\xref{{\textsc{Kappa}}}{sun95}{}}
+\providecommand{\Figaro}{\xref{{\textsc{Figaro}}}{sun86}{}}
+\providecommand{\gaia}{\xref{{\textsc{Gaia}}}{sun214}{}}
+\providecommand{\convert}{\xref{{\textsc{Convert}}}{sun55}{}}
+\providecommand{\fluxes}{\xref{{\textsc{Fluxes}}}{sun213}{}}
+\providecommand{\Iras}{\xref{{\textsc{Iras90}}}{sun163}{}}
+\providecommand{\ndf}{\xref{NDF}{sun33}{}}
+\providecommand{\agi}{\xref{AGI}{sun48}{}}
+\providecommand{\ESP}{\xref{ESP}{sun180}{}}
+\providecommand{\specx}{\xref{{\textsc{Specx}}}{sc8}{}}
+\providecommand{\polpack}{\xref{{\textsc{Polpack}}}{sun223}{}}
+\providecommand{\ccdpack}{\xref{CCDPACK}{sun139}{}}
+\providecommand{\cursa}{\xref{{\textsc{Cursa}}}{sun190}{}}
 
 
 % Application tasks
-\newcommand{\task}[1]{{\sf #1}}
-
+%%\providecommand{\task}[1]{\textsf{#1}}
+\providecommand{\task}[1]{#1}
 % ADAM parameters
-\newcommand{\param}[1]{{\tt #1}}
+\providecommand{\param}[1]{\texttt{#1}}
 
 % Common tasks
-\newcommand{\renoise}{\htmlref{\task{reduce\_noise}}{REDUCE_NOISE}}
-\newcommand{\rebin}{\htmlref{\task{rebin}}{REBIN}}
-\newcommand{\bolrebin}{\htmlref{\task{bolrebin}}{BOLREBIN}}
-\newcommand{\intrebin}{\htmlref{\task{intrebin}}{INTREBIN}}
-\newcommand{\calcsky}{\htmlref{\task{calcsky}}{CALCSKY}}
-\newcommand{\chgqual}{\htmlref{\task{change\_quality}}{CHANGE_QUALITY}}
-\newcommand{\chgflat}{\htmlref{\task{change\_flat}}{CHANGE_FLAT}}
-\newcommand{\chgpnt}{\htmlref{\task{change\_pointing}}{CHANGE_POINTING}}
-\newcommand{\chgdata}{\htmlref{\task{change\_data}}{CHANGE_DATA}}
-\newcommand{\resw}{\htmlref{\task{reduce\_switch}}{REDUCE_SWITCH}}
-\newcommand{\flatf}{\htmlref{\task{flatfield}}{FLATFIELD}}
-\newcommand{\skydip}{\htmlref{\task{skydip}}{SKYDIP}}
-\newcommand{\scuphot}{\htmlref{\task{scuphot}}{SCUPHOT}}
-\newcommand{\ext}{\htmlref{\task{extinction}}{EXTINCTION}}
-\newcommand{\scuquick}{\htmlref{\task{scuquick}}{SCUQUICK}}
-\newcommand{\scuhelp}{\htmlref{\task{scuhelp}}{SCUHELP}}
-\newcommand{\remsky}{\htmlref{\task{remsky}}{REMSKY}}
-\newcommand{\scuover}{\htmlref{\task{scuover}}{SCUOVER}}
-\newcommand{\extdata}{\htmlref{\task{extract\_data}}{EXTRACT_DATA}}
-\newcommand{\sculog}{\htmlref{\task{sculog}}{SCULOG}}
-\newcommand{\scucat}{\htmlref{\task{scucat}}{SCUCAT}}
-\newcommand{\photsum}{\htmlref{\task{photsum}}{PHOTSUM}}
-\newcommand{\mapsum}{\htmlref{\task{mapsum}}{MAPSUM}}
-\newcommand{\skysum}{\htmlref{\task{skysum}}{SKYSUM}}
-\newcommand{\pointsum}{\htmlref{\task{pointsum}}{POINTSUM}}
-\newcommand{\qdraw}{\htmlref{\task{qdraw}}{QDRAW}}
-\newcommand{\sigclip}{\htmlref{\task{sigclip}}{SIGCLIP}}
-\newcommand{\restore}{\htmlref{\task{restore}}{RESTORE}}
-\newcommand{\sdip}{\htmlref{\task{sdip}}{SDIP}}
-\newcommand{\scupa}{\htmlref{\task{scupa}}{SCUPA}}
-\newcommand{\obssum}{\htmlref{\task{obssum}}{OBSSUM}}
-\newcommand{\despike}{\htmlref{\task{despike}}{DESPIKE}}
-\newcommand{\despikeb}{\htmlref{\task{despike2}}{DESPIKE2}}
-\newcommand{\extflat}{\htmlref{\task{extract\_flat}}{EXTRACT_FLAT}}
-\newcommand{\scushift}{\htmlref{\task{scushift}}{SCUSHIFT}}
-\newcommand{\scuclip}{\htmlref{\task{scuclip}}{SCUCLIP}}
-\newcommand{\scuclkerr}{\htmlref{\task{scuclkerr}}{SCUCLKERR}}
-\newcommand{\scanrlb}{\htmlref{\task{scan\_rlb}}{SCAN_RLB}}
-\newcommand{\dspbol}{\htmlref{\task{dspbol}}{DSPBOL}}
-\newcommand{\pltbol}{\htmlref{\task{pltbol}}{PLTBOL}}
-\newcommand{\rlinplot}{\htmlref{\task{rlinplot}}{RLINPLOT}}
-\newcommand{\scuplot}{\htmlref{\task{scuplot}}{SCUPLOT}}
-\newcommand{\remdbm}{\htmlref{\task{remdbm}}{REMDBM}}
-\newcommand{\scumakewt}{\htmlref{\task{scumakewt}}{SCUMAKEWT}}
-\newcommand{\chgnacent}{\htmlref{\task{change\_nacentre}}{CHANGE_NACENTRE}}
-\newcommand{\scunoise}{\htmlref{\task{scunoise}}{SCUNOISE}}
-\newcommand{\setbolwt}{\htmlref{\task{setbolwt}}{SETBOLWT}}
-\newcommand{\adddbm}{\htmlref{\task{add\_dbm}}{ADD_DBM}}
-\newcommand{\remip}{\htmlref{\task{remip}}{REMIP}}
-\newcommand{\scusetenv}{\htmlref{\task{scusetenv}}{SCUSETENV}}
-\newcommand{\scubamem}{\htmlref{\task{scuba2mem}}{SCUBA2MEM}}
+\providecommand{\renoise}{\htmlref{\task{reduce\_noise}}{REDUCE_NOISE}}
+\providecommand{\rebin}{\htmlref{\task{rebin}}{REBIN}}
+\providecommand{\bolrebin}{\htmlref{\task{bolrebin}}{BOLREBIN}}
+\providecommand{\intrebin}{\htmlref{\task{intrebin}}{INTREBIN}}
+\providecommand{\calcsky}{\htmlref{\task{calcsky}}{CALCSKY}}
+\providecommand{\chgqual}{\htmlref{\task{change\_quality}}{CHANGE_QUALITY}}
+\providecommand{\chgflat}{\htmlref{\task{change\_flat}}{CHANGE_FLAT}}
+\providecommand{\chgpnt}{\htmlref{\task{change\_pointing}}{CHANGE_POINTING}}
+\providecommand{\chgdata}{\htmlref{\task{change\_data}}{CHANGE_DATA}}
+\providecommand{\resw}{\htmlref{\task{reduce\_switch}}{REDUCE_SWITCH}}
+\providecommand{\flatf}{\htmlref{\task{flatfield}}{FLATFIELD}}
+\providecommand{\skydip}{\htmlref{\task{skydip}}{SKYDIP}}
+\providecommand{\scuphot}{\htmlref{\task{scuphot}}{SCUPHOT}}
+\providecommand{\ext}{\htmlref{\task{extinction}}{EXTINCTION}}
+\providecommand{\scuquick}{\htmlref{\task{scuquick}}{SCUQUICK}}
+\providecommand{\scuhelp}{\htmlref{\task{scuhelp}}{SCUHELP}}
+\providecommand{\remsky}{\htmlref{\task{remsky}}{REMSKY}}
+\providecommand{\scuover}{\htmlref{\task{scuover}}{SCUOVER}}
+\providecommand{\extdata}{\htmlref{\task{extract\_data}}{EXTRACT_DATA}}
+\providecommand{\sculog}{\htmlref{\task{sculog}}{SCULOG}}
+\providecommand{\scucat}{\htmlref{\task{scucat}}{SCUCAT}}
+\providecommand{\photsum}{\htmlref{\task{photsum}}{PHOTSUM}}
+\providecommand{\mapsum}{\htmlref{\task{mapsum}}{MAPSUM}}
+\providecommand{\skysum}{\htmlref{\task{skysum}}{SKYSUM}}
+\providecommand{\pointsum}{\htmlref{\task{pointsum}}{POINTSUM}}
+\providecommand{\qdraw}{\htmlref{\task{qdraw}}{QDRAW}}
+\providecommand{\sigclip}{\htmlref{\task{sigclip}}{SIGCLIP}}
+\providecommand{\restore}{\htmlref{\task{restore}}{RESTORE}}
+\providecommand{\sdip}{\htmlref{\task{sdip}}{SDIP}}
+\providecommand{\scupa}{\htmlref{\task{scupa}}{SCUPA}}
+\providecommand{\obssum}{\htmlref{\task{obssum}}{OBSSUM}}
+\providecommand{\despike}{\htmlref{\task{despike}}{DESPIKE}}
+\providecommand{\despikeb}{\htmlref{\task{despike2}}{DESPIKE2}}
+\providecommand{\extflat}{\htmlref{\task{extract\_flat}}{EXTRACT_FLAT}}
+\providecommand{\scushift}{\htmlref{\task{scushift}}{SCUSHIFT}}
+\providecommand{\scuclip}{\htmlref{\task{scuclip}}{SCUCLIP}}
+\providecommand{\scuclkerr}{\htmlref{\task{scuclkerr}}{SCUCLKERR}}
+\providecommand{\scanrlb}{\htmlref{\task{scan\_rlb}}{SCAN_RLB}}
+\providecommand{\dspbol}{\htmlref{\task{dspbol}}{DSPBOL}}
+\providecommand{\pltbol}{\htmlref{\task{pltbol}}{PLTBOL}}
+\providecommand{\rlinplot}{\htmlref{\task{rlinplot}}{RLINPLOT}}
+\providecommand{\scuplot}{\htmlref{\task{scuplot}}{SCUPLOT}}
+\providecommand{\remdbm}{\htmlref{\task{remdbm}}{REMDBM}}
+\providecommand{\scumakewt}{\htmlref{\task{scumakewt}}{SCUMAKEWT}}
+\providecommand{\chgnacent}{\htmlref{\task{change\_nacentre}}{CHANGE_NACENTRE}}
+\providecommand{\scunoise}{\htmlref{\task{scunoise}}{SCUNOISE}}
+\providecommand{\setbolwt}{\htmlref{\task{setbolwt}}{SETBOLWT}}
+\providecommand{\adddbm}{\htmlref{\task{add\_dbm}}{ADD_DBM}}
+\providecommand{\remip}{\htmlref{\task{remip}}{REMIP}}
+\providecommand{\scusetenv}{\htmlref{\task{scusetenv}}{SCUSETENV}}
+\providecommand{\scubamem}{\htmlref{\task{scuba2mem}}{SCUBA2MEM}}
 
 
 % Non surf tasks
 
-\newcommand{\fillbad}{\xref{\task{fillbad}}{sun95}{FILLBAD}}
-\newcommand{\ndftrace}{\xref{\task{ndftrace}}{sun95}{NDFTRACE}}
-\newcommand{\glitch}{\xref{\task{glitch}}{sun95}{GLITCH}}
-\newcommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
-\newcommand{\linplot}{\xref{\task{linplot}}{sun95}{LINPLOT}}
-\newcommand{\mlinplot}{\xref{\task{mlinplot}}{sun95}{MLINPLOT}}
-\newcommand{\drawsig}{\xref{\task{drawsig}}{sun95}{DRAWSIG}}
-\newcommand{\centroid}{\xref{\task{centroid}}{sun95}{CENTROID}}
-\newcommand{\setaxis}{\xref{\task{setaxis}}{sun95}{SETAXIS}}
-\newcommand{\kstest}{\xref{\task{kstest}}{sun95}{KSTEST}}
-\newcommand{\stats}{\xref{\task{stats}}{sun95}{STATS}}
-\newcommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
-\newcommand{\setbb}{\xref{\task{setbb}}{sun95}{SETBB}}
-\newcommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
-\newcommand{\fourier}{\xref{\task{fourier}}{sun95}{FOURIER}}
-\newcommand{\hislist}{\xref{\task{hislist}}{sun95}{HISLIST}}
-\newcommand{\ndffits}{\xref{\task{ndf2fits}}{sun55}{NDF2FITS}}
-\newcommand{\ndftoascii}{\xref{\task{ndf2ascii}}{sun55}{NDF2ASCII}}
-\newcommand{\cadd}{\xref{\task{cadd}}{sun95}{CADD}}
-\newcommand{\hdstrace}{\xref{\task{hdstrace}}{sun102}{}}
-\newcommand{\psmerge}{\xref{\task{psmerge}}{sun164}{}}
-\newcommand{\wdfits}{\xref{\task{wdfits}}{sun86}{WDFITS}}
-\newcommand{\delobj}{\xref{\task{delobj}}{sun86}{DELOBJ}}
-\newcommand{\sclean}{\xref{\task{sclean}}{sun86}{SCLEAN}}
-\newcommand{\setvar}{\xref{\task{setvar}}{sun95}{SETVAR}}
-\newcommand{\wcsalign}{\xref{\task{wcsalign}}{sun95}{WCSALIGN}}
-\newcommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
-\newcommand{\manic}{\xref{\task{manic}}{sun95}{MANIC}}
-\newcommand{\cdiv}{\xref{\task{cdiv}}{sun95}{CDIV}}
-\newcommand{\sub}{\xref{\task{sub}}{sun95}{SUB}}
-\newcommand{\cursor}{\xref{\task{cursor}}{sun95}{CURSOR}}
-\newcommand{\gdset}{\xref{\task{gdset}}{sun95}{GDSET}}
-\newcommand{\image}{\xref{\task{image}}{sun86}{IMAGE}}
-\newcommand{\gaufit}{\xref{\task{gaufit}}{sun180}{GAUFIT}}
-\newcommand{\makemos}{\xref{\task{makemos}}{sun139}{MAKEMOS}}
+\providecommand{\fillbad}{\xref{\task{fillbad}}{sun95}{FILLBAD}}
+\providecommand{\ndftrace}{\xref{\task{ndftrace}}{sun95}{NDFTRACE}}
+\providecommand{\glitch}{\xref{\task{glitch}}{sun95}{GLITCH}}
+\providecommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
+\providecommand{\linplot}{\xref{\task{linplot}}{sun95}{LINPLOT}}
+\providecommand{\mlinplot}{\xref{\task{mlinplot}}{sun95}{MLINPLOT}}
+\providecommand{\drawsig}{\xref{\task{drawsig}}{sun95}{DRAWSIG}}
+\providecommand{\centroid}{\xref{\task{centroid}}{sun95}{CENTROID}}
+\providecommand{\setaxis}{\xref{\task{setaxis}}{sun95}{SETAXIS}}
+\providecommand{\kstest}{\xref{\task{kstest}}{sun95}{KSTEST}}
+\providecommand{\stats}{\xref{\task{stats}}{sun95}{STATS}}
+\providecommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
+\providecommand{\setbb}{\xref{\task{setbb}}{sun95}{SETBB}}
+\providecommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
+\providecommand{\fourier}{\xref{\task{fourier}}{sun95}{FOURIER}}
+\providecommand{\hislist}{\xref{\task{hislist}}{sun95}{HISLIST}}
+\providecommand{\ndffits}{\xref{\task{ndf2fits}}{sun55}{NDF2FITS}}
+\providecommand{\ndftoascii}{\xref{\task{ndf2ascii}}{sun55}{NDF2ASCII}}
+\providecommand{\cadd}{\xref{\task{cadd}}{sun95}{CADD}}
+\providecommand{\hdstrace}{\xref{\task{hdstrace}}{sun102}{}}
+\providecommand{\psmerge}{\xref{\task{psmerge}}{sun164}{}}
+\providecommand{\wdfits}{\xref{\task{wdfits}}{sun86}{WDFITS}}
+\providecommand{\delobj}{\xref{\task{delobj}}{sun86}{DELOBJ}}
+\providecommand{\sclean}{\xref{\task{sclean}}{sun86}{SCLEAN}}
+\providecommand{\setvar}{\xref{\task{setvar}}{sun95}{SETVAR}}
+\providecommand{\wcsalign}{\xref{\task{wcsalign}}{sun95}{WCSALIGN}}
+\providecommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
+\providecommand{\manic}{\xref{\task{manic}}{sun95}{MANIC}}
+\providecommand{\cdiv}{\xref{\task{cdiv}}{sun95}{CDIV}}
+\providecommand{\sub}{\xref{\task{sub}}{sun95}{SUB}}
+\providecommand{\cursor}{\xref{\task{cursor}}{sun95}{CURSOR}}
+\providecommand{\gdset}{\xref{\task{gdset}}{sun95}{GDSET}}
+\providecommand{\image}{\xref{\task{image}}{sun86}{IMAGE}}
+\providecommand{\gaufit}{\xref{\task{gaufit}}{sun180}{GAUFIT}}
+\providecommand{\makemos}{\xref{\task{makemos}}{sun139}{MAKEMOS}}
 
-\newcommand{\polimp}{\xref{\task{polimp}}{sun223}{POLIMP}}
-\newcommand{\polcal}{\xref{\task{polcal}}{sun223}{POLCAL}}
-\newcommand{\polbin}{\xref{\task{polbin}}{sun223}{POLBIN}}
-\newcommand{\polvec}{\xref{\task{polvec}}{sun223}{POLVEC}}
-\newcommand{\polplot}{\xref{\task{polplot}}{sun223}{POLPLOT}}
-\newcommand{\polstack}{\xref{\task{polstack}}{sun223}{POLSTACK}}
+\providecommand{\polimp}{\xref{\task{polimp}}{sun223}{POLIMP}}
+\providecommand{\polcal}{\xref{\task{polcal}}{sun223}{POLCAL}}
+\providecommand{\polbin}{\xref{\task{polbin}}{sun223}{POLBIN}}
+\providecommand{\polvec}{\xref{\task{polvec}}{sun223}{POLVEC}}
+\providecommand{\polplot}{\xref{\task{polplot}}{sun223}{POLPLOT}}
+\providecommand{\polstack}{\xref{\task{polstack}}{sun223}{POLSTACK}}
 
-\newcommand{\catselect}{\xref{\task{catselect}}{sun190}{}}
+\providecommand{\catselect}{\xref{\task{catselect}}{sun190}{}}
 
 
 %%% Some macros
@@ -197,7 +193,7 @@ descriptions of each task.
 
 % This is the latex version
 
-\newcommand{\quickdes}[3]{
+\providecommand{\quickdes}[3]{
 \item \textbf{#1:} {\raggedright  #2 (page \pageref{#3})}}
 
 % The HTML version is redefined later when the htmlonly environment
@@ -206,542 +202,15 @@ descriptions of each task.
 % Environment for indenting and using a small font.
 \newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
 
-\newcommand{\text}[1]{{\small \tt #1}}
+\providecommand{\text}[1]{{\small \texttt{#1}}}
 
-
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-
-
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
-
-
-
-
-% ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
+\scfrontmatter
 
-
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\textsc Rutherford Appleton Laboratory} \hfill {\textbf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   \includegraphics[width=2.0in]{sun216_logo}
-
-   {\Huge\textbf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\textbf \stardocversion \\ [4ex]}
-   {\Huge\textbf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
 %  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-\includegraphics[width=2.0in]{sun216_logo}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-
-  \section{\xlabel{abstract} Abstract }
-
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-
-\stardocabstract
-
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? LateX Copyright Statement
-%  =========================
-\begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
-\end{latexonly}
-% ? End of Latex copyright statement
-
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-
 
 \section{\xlabel{introduction}Introduction\label{introduction}}
 
@@ -780,22 +249,15 @@ package (note that nested NDFs are used - see Appendix \ref{filenames}).
 \end{center}
 \end{latexonly}
 
-\begin{htmlonly}
-\begin{figure}
-\includegraphics[scale=0.65]{sun216_arrays}
-\caption{The SCUBA arrays.}
-\label{arrays}
-\end{figure}
 
-\end{htmlonly}
+
 
 \section{\xlabel{startup}Starting up \scusoft \label{startup}}
 
 The \scusoft\ environment can be initialised from the C-shell using the
 \texttt{surf} command.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % surf
 
    SURF - SCUBA User Reduction Facility
@@ -804,8 +266,7 @@ The \scusoft\ environment can be initialised from the C-shell using the
      Type scuhelp for help on SURF commands.
      Type "showme sun216" to browse the hypertext documentation.
 
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Note that the \texttt{\%} represents the C-shell prompt and shouldn't be typed.
 \scusoft\ is also available from the ICL command language.
@@ -816,25 +277,19 @@ Note that the \texttt{\%} represents the C-shell prompt and shouldn't be typed.
 Help is available in two forms; from the command-line and via a hypertext
 version of this document. The command-line version is available with
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % scuhelp
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 and the hypertext version can be obtained with
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % findme surf
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 or
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % showme sun216
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 A WWW browser will be started up if necessary.
 
 It is possible to start the help system when responding to
@@ -856,26 +311,23 @@ list is at
 subscribe, send an email message to
 \htmladdnormallink{\texttt{majordomo@jach.hawaii.edu}}{mailto:majordomo@jach.hawaii.edu}
 with an empty subject and containing the message:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 subscribe scubadr you@some.email.address
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 
 \section{\xlabel{journal}What data do I have?\label{journal}}
 
 Journal software is available to aid with book-keeping of observation
-files.\footnote{only available if {\tt ndfperl} is installed on your system
+files.\footnote{only available if \texttt{ndfperl} is installed on your system
 (see Appendix \ref{ndfperl})}  If you are reducing your data at the Joint
 Astronomy Centre you may need to read Appendix \ref{JAC} to find where the
 data are stored.
 
 \sculog\ will give a summary of all NDF files in
 a directory (the directory is the current working directory and, if set, the
-directory specified by the {\sc datadir} environment variable (\S\ref{env})).
-\begin{myquote}
-\begin{verbatim}
+directory specified by the \textsc{datadir} environment variable (\S\ref{env})).
+\begin{terminalv}
 % sculog
 
  Enter starting observation number [0] 94
@@ -897,13 +349,11 @@ directory specified by the {\sc datadir} environment variable (\S\ref{env})).
    Accept: NO               DATA_KPT: DEMOD              Gain: 1
    Observation file: scuba_skydip.obs           Data file: apr25_dem_0095
 ---------
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 In most cases \sculog\ provides far too much information and a one
 line summary is more desirable. \obssum\footnote{\obssum\ is simply an alias
 for \texttt{\sculog\ $-$summary}.} is provided for this purpose:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % obssum -demod
 
  Enter starting observation number [0] 92
@@ -920,10 +370,9 @@ for \texttt{\sculog\ $-$summary}.} is provided for this purpose:
 96   07:54   POINTING  uranus      1/2   1.337 450N:850N LONG
 97   07:57   MAP       uranus      1/1   1.407 450N:850N SHORT,LONG
 98   08:45   POINTING  uranus      1/2   1.488 450N:850N LONG
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 In this example a summary listing has been requested for observations 92
-through 98 from the {\sc \$datadir} directory %%%% $ for emacs
+through 98 from the \textsc{\$datadir} directory %%%% $ for emacs
 (there were no
 demodulated data files in my current directory).  The `--demod' flag indicated
 that I am only interested in raw demodulated data (i.e.\ files containing
@@ -936,8 +385,7 @@ more specialized listing programs \photsum, \mapsum, \pointsum\ and
 observations (and, in fact, skydip observations), \mapsum\ lists map
 observations and \skysum\ lists skydip observations. Using
 \photsum\ instead of \sculog\ on the data used above gives:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % photsum --begin=92 --end=98
  #    HST    Source   Meas/Int  Am   Filter  SubInst Signal   S/N   Tau  Seeing
 ---  -----   -------  -------- ---- -------- ------- ------  -----  ---  ------
@@ -948,8 +396,7 @@ observations and \skysum\ lists skydip observations. Using
 **************
 95   07:46   SKYDIP     10/20       450N:850 SHORT:  1.756          0.074 0.423
                                              LONG    0.310
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 In this case I specify the range of observations on the command line and
 the format of the listing has changed from that returned by \sculog. Note that
 the signal and signal-to-noise are now provided\footnote{Note that HDS creates
@@ -957,14 +404,13 @@ temporary files when mapping the reduced data. If the files are in a directory
 in which you do not have write permission, this operation will fail and
 \photsum\ will return an error message. This can be overcome by forcing
 HDS to write temporary files to another directory by setting the
-{\sc hds\_scratch} environment variable to a writeable directory
-(e.g.\ {\tt \% setenv HDS\_SCRATCH /tmp})} -- this is only the case
+\textsc{hds\_scratch} environment variable to a writeable directory
+(e.g.\ \texttt{\% setenv HDS\_SCRATCH /tmp})} -- this is only the case
 if RO files are catalogued since the demodulated data files do not
 contain results (the column is left blank if no reduced data is found).
 
 On the other hand, \mapsum\ gives this output:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % mapsum --begin=92 --end=100
  #    HST    Source   Meas/Int  Am   Filter    Mode   Thr Crd  PA   Tau  Seeing
 ---  -----   -------  -------- ---- -------- -------- --- --- ----  ---  ------
@@ -973,12 +419,10 @@ On the other hand, \mapsum\ gives this output:
                                              LONG    0.310
 --------------
 97   07:57   uranus      1/1   1.41 450N:850 RASTER   40  SC     0  0.074 0.423
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \pointsum\ can be used to list pointing data:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % pointsum --begin=50 --end=98
  #    LST    Source  Meas/Int Az  El  Filter  Inst   Uaz  Uel   Tau  Seeing Hum
 ---  -----   ------- -------- --- -- -------  ----   ---  ---   ---  ------ ---
@@ -987,8 +431,7 @@ On the other hand, \mapsum\ gives this output:
 83   20:56   jupiter    1/1   168 53 450N:850 LONG  -1.8 -11.  0.074 0.242  15%
 96   21:47   uranus     1/2   203 48 450N:850 LONG  -2.7 -11.  0.074 0.423  14%
 98   22:38   uranus     1/2   218 42 450N:850 LONG  -3.0 -9.6  0.074 0.984  20%
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Note that UAZ and UEL indicate the offsets before the pointing observation
 and that the time is now quoted as LST instead of HST since this is the format
 expected by \chgpnt.
@@ -997,11 +440,9 @@ In all cases the output can be stored in a file using standard unix
 redirection so long as the search path is fully specified (either with the
 `\texttt{-all}' flag or with `\texttt{--begin=}' and `\texttt{--end=}') so
 that the programs are not waiting for input. e.g.:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % obssum -all > summary.txt
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 
 \section{\xlabel{obsmodes}Supported Observing Modes\label{obsmodes}}
@@ -1010,7 +451,7 @@ The \scusoft\ package supports the following SCUBA observing modes:
 
 \begin{itemize}
 
-\item {\bf ALIGN}
+\item \textbf{ALIGN}
 
 This is the mode used for setting the X and Y alignment of the secondary
 mirror. This mode usually consists of 5 measurements, one for each secondary
@@ -1027,7 +468,7 @@ at all secondary mirror positions (the unfocussed images will dominate). Note
 that no special processing is perfomed on these data and \scusoft\ does not
 provide a way of calculating the secondary mirror offset.
 
-\item {\bf FOCUS}
+\item \textbf{FOCUS}
 
 This is the mode used for focussing the Z axis of telescope. This mode is
 similar to ALIGN in that five measurements are taken and that the single pixel
@@ -1035,7 +476,7 @@ mode is not supported. The same care must be taken when reducing the
 unfocussed images since each measurement will be from a different secondary
 mirror position.
 
-\item {\bf JIGGLE/MAP}
+\item \textbf{JIGGLE/MAP}
 
 This is the main imaging mode for sources which are smaller than the array
 (i.e.\ less than about 2 arcmin). All JIGGLE/MAP observations (including
@@ -1043,12 +484,12 @@ ALIGN, FOCUS and POINTING) are reduced in the same way using \rebin\ to
 make the final image. [info on how a JIGGLE/MAP is taken - reference exposures
 and switches]
 
-\item {\bf NOISE}
+\item \textbf{NOISE}
 
 This is the mode used to measure the noise behaviour of the array. Data
 are reduced using \renoise. Noise data can be inspected with \scunoise.
 
-\item {\bf PHOTOM}
+\item \textbf{PHOTOM}
 
 This mode is used to measure the flux of a point source. In its simplest guise
 the observation involves pointing a single bolometer at the source, measuring
@@ -1059,7 +500,7 @@ the long and short wave arrays, and jiggling on source to reduce the effects
 of seeing. The \scuphot\ task is used to reduce photometry observations
 to a simpler form (one data point per integration) for further analysis.
 
-\item {\bf POINTING}
+\item \textbf{POINTING}
 
 This mode is used to check the pointing of the telescope by observing a bright
 source with a known position. A single-pixel observing mode is available and
@@ -1067,7 +508,7 @@ is not supported by \scusoft. The JIGGLE/MAP implementation can be processed
 as a standard JIGGLE/MAP. The pointing offset can be checked by using, say,
 the \Kappa\ \centroid\ task.
 
-\item {\bf POLPHOT/POLMAP}
+\item \textbf{POLPHOT/POLMAP}
 
 These are PHOTOM or MAP observations observed in polarimetry mode.
 For these observations a measurement is taken (usually consisting
@@ -1076,7 +517,7 @@ of one integration) for different positions of a half-wave plate.
 be processed by a specialized polarimetry data reduction package
 such as \polpack.
 
-\item {\bf SCAN/MAP}
+\item \textbf{SCAN/MAP}
 
 In SCAN/MAP mode (also known as `on-the-fly' mapping) the telescope is
 continuously scanned across the sky (usually at a Nasmyth position angle of 18
@@ -1093,7 +534,7 @@ involves chopping along the scan direction \cite{ekh} whilst the
 other involves chopping in a fixed direction on the sky but combining
 data from many chop configurations \cite{EII,spietj}.
 
-\item {\bf SKYDIP}
+\item \textbf{SKYDIP}
 
 This mode measures the sky brightness temperature at a range of elevations and
 uses that data to calculate the zenith sky opacity. In most cases the values
@@ -1232,11 +673,9 @@ directly and never take their own copies) and saves disk space.
 
 As an example, at the JAC, to access demodulated data taken on the 30th
 October 1997 all that is needed is
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv DATADIR /scuba/observe/19971030/dem
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 \$DATADIR is supported by all routines that access demodulated data
 (\resw, \sdip, \skydip, \sculog\ etc.) but is not recognised by routines that
 deal with partly processed data.
@@ -1273,18 +712,14 @@ of the form of the fixed prefix. Data files of the form
 Also, if the full path name is specified for SCUBA\_PREFIX, DATADIR is not
 required. As an example, data in \texttt{/scuba/observe/19971015/dem}
 can be accessed by number either by setting
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv DATADIR /scuba/observe/19971015/dem
 % setenv SCUBA_PREFIX 19971015
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 or by just setting SCUBA\_PREFIX:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv SCUBA_PREFIX /scuba/observe/19971015/dem/19971015
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Note that the current directory is not searched in the second case (since the
 software adds the prefix before trying to load the file). The \scusetenv\
 command can be used to set this variable (this command is especially useful
@@ -1373,11 +808,9 @@ the filename becomes longer and longer as the reduction proceeds.
 
 The method of choice can be selected by setting SCUBA\_SUFFIX to one of the
 above values (case independent) e.g.:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv SCUBA_SUFFIX verbose
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The suffix strings related to each task and mode are detailed in table
 \ref{tab_suffices} and typical examples from a data reduction are shown in
 table \ref{tab_suff_eg}. Currently modes \textsf{LONG} and \textsf{VERBOSE}
@@ -1424,11 +857,9 @@ when you are accessing data from directories in which you do not have write
 permission.
 
 Usually, this variable should be set to a local scratch disk:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv HDS_SCRATCH /tmp
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 This has the additional advantage that NFS traffic can be reduced when
 accessing data on remote disks as the scratch files can be written locally.
 
@@ -1479,7 +910,7 @@ All SCUBA data reduction must include the following stages (see Figs.\
 \ref{flowpath_phot}, \ref{flowpath_jig} and \ref{flowpath_scan} for flow
 diagrams):
 \begin{enumerate}
-\item {\bf Nod compensation}
+\item \textbf{Nod compensation}
 
 The task \resw\ takes the raw beam switched data and subtracts the
 off-position from the on-position (`nods'). If required, this task also
@@ -1487,7 +918,7 @@ divides the data with the internal calibrator signal (this is stored in
 the demodulated data file as well as the switch information) and sets the
 level at which spikes detected by the transputers become significant.
 
-\item {\bf Flatfielding}
+\item \textbf{Flatfielding}
 
 The \flatf\ task takes the output of \resw\ and flatfields the array by
 multiplying each bolometer by the volume flatfield value (these are the
@@ -1503,7 +934,7 @@ between files a combination of \extflat\ and \chgflat\ should be used.
 It is not necessary to flatfield PHOTOM data unless sky removal is to be used
 or, in some cases, multiple bolometers are to be analysed together.
 
-\item {\bf Extinction correction}
+\item \textbf{Extinction correction}
 
 The \ext\ task takes the flatfielded data and applies an extinction
 correction to each pixel one jiggle at a time. The zenith sky opacity (tau)
@@ -1516,7 +947,7 @@ point that the two arrays must be dealt with independently -- the output of
 this task will contain data for one sub-instrument.
 
 
-\item {\bf Single-beam restoration}
+\item \textbf{Single-beam restoration}
 
 The dual-beam SCAN/MAP data must be restored to a single-beam map
 at some stage. For data taken whilst chopping along the scan, this
@@ -1583,26 +1014,26 @@ Conversely, tasks annotated with a double asterisk can not process
 
 A number of optional tasks are also available:
 \begin{itemize}
-\item {\bf Changing header parameters}
+\item \textbf{Changing header parameters}
 
 Tasks are available to change header parameters such as flatfield
 information (\chgflat), applying pointing corrections
 (\chgpnt) or setting pixels (bolometers) and integrations to bad
 values (\chgqual).
 
-\item {\bf Changing data values}
+\item \textbf{Changing data values}
 
 Data can be changed using the \chgdata\ task. This task can be used to
 change Data, Variance or Quality arrays and should be used with
 care.
 
-\item {\bf Sky noise removal}
+\item \textbf{Sky noise removal}
 
 Instrumental variations and sky-noise can be removed either by using the task
 \remsky\ (when sky bolometers can be identified) or by using \calcsky\ in
 combination with \remsky\ (for more complicated sources and scan map data).
 
-\item {\bf Despiking}
+\item \textbf{Despiking}
 
 Occasionally, spikes get through the transputers and into the demodulated
 data. Tasks are provided for despiking jiggle/map data (\despike),
@@ -1610,19 +1041,19 @@ scan/map data (\despikeb) and photometry data (\scuclip\footnote{\scuclip\
 can also be used for despiking jiggle/map data as long as sources are weak}).
 
 
-\item {\bf IP Correction}
+\item \textbf{IP Correction}
 
 Polarimetry observations need to be corrected for instrumental
 polarisation. The \remip\ task can be used for this.
 
-\item {\bf Array overlay}
+\item \textbf{Array overlay}
 
 If the rebinned images are displayed using a program that writes to the \agi\
 graphics database \cite{agi}, such as \Kappa\ \display, the array can be
 overlaid on the image using the task \scuover. This is very useful for
 identifying noisy bolometers or bad pixels.
 
-\item{\bf Display data values}
+\item\textbf{Display data values}
 
 The task \extdata\ is similar to the \rebin\ tasks except that the
 X, Y and data values are written to an ASCII text file instead of
@@ -1652,17 +1083,14 @@ taken}.
 
 The data is not in the work directory so DATADIR should be set:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv DATADIR /scuba/observe/apr8/dem
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 assuming a C-shell type environment. I can now make a log of a subset
 of the nights data to find out which observations should be processed:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % sculog -summary --begin=54 --end=63
 -Log for directory: /home/timj/scuba/maps/sun216
                     /scuba/observe/apr8/dem
@@ -1682,17 +1110,14 @@ of the nights data to find out which observations should be processed:
  :                                  :                :
  :                                  :                :
 98   03:18   SKYDIP    SKY        10/20          450N:850 SHORT_DC,LONG_DC
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 In order to save time typing in the filename every time we wish to access
 demodulated data, we also set the SCUBA\_PREFIX environment variable:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv SCUBA_PREFIX apr8
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 This variable allows demodulated data to be referenced by observation number.
 It is also possible to set the style for the default output filename provided
@@ -1714,8 +1139,7 @@ In most cases these numbers will be sufficient for use by \ext\ but
 it is possible to recalculate the tau by using the \skydip\ task. As an
 example here is the result of \skydip\ on scan 54:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % skydip 54
 SURF: Opening apr8_dem_0054 in /scuba/observe/apr8/dem
 SURF: run 54 was a SKYDIP observation
@@ -1732,8 +1156,7 @@ B_VAL - B parameter /-1/ >
 SCULIB: fit for filter 850 and sub-instrument LONG_DC
  eta =  0.91 +/-  0.00  b =  0.86 +/-  0.00  tau =   0.220 +/- 0.002
  Standard Deviation of fit residual =   0.74 K (X=     1.0 N=    9)
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \begin{figure}
 \begin{center}
@@ -1774,15 +1197,13 @@ In some cases this text file is not available and the \renoise\ task
 can be used to recreate it (as well as generating an NDF file containing
 the results) from the raw demodulated data file.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % reduce_noise 19981113_dem_0001
 SURF: Opening 19981113_dem_0001 in /scuba/observe/19981113/dem
 SURF: run 1 was a NOISE observation
 OUT - Name of container file to hold map and time-sequence data /'o1'/ >
 FILE - Name of ASCII file to contain results summary /'noise_981113_1.dat'/ >
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \subsection{Common data reduction}
 
@@ -1790,25 +1211,23 @@ Now the data processing can begin. We will start by running
 \resw\ in order to subtract the off from the on and to split the
 data array of the raw data into separate components.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % reduce_switch 59
 SURF: Opening apr8_dem_0059 in /scuba/observe/apr8/dem
 SURF: run 59 was a MAP observation of object 3c279
 SURF: file contains data for 2 switch(es) in 4 exposure(s) in 3 integration(s)
 in 1 measurement(s)
 OUT - Name of output file to contain reduced switch data /'o59'/ >
-\end{verbatim}
+\end{terminalv}
 or with the full file specification:
-\begin{verbatim}
+\begin{terminalv}
 % reduce_switch apr8_dem_0059
 SURF: Opening apr8_dem_0059 in /scuba/observe/apr8/dem
 SURF: run 59 was a MAP observation of object 3c279
 SURF: file contains data for 2 switch(es) in 4 exposure(s) in 3 integration(s)
 in 1 measurement(s)
 OUT - Name of output file to contain reduced switch data /'o59'/ >
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 
 In this example the calibrator signal has not been used and any datum from
@@ -1818,23 +1237,19 @@ o59.sdf.
 
 In this case we need to change the flatfield file (since the flatfield was
 updated after the data were taken) using \chgflat:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % change_flat
 IN - Name of input file containing demodulated map data /@o59/ >
 SURF: run 59 was a MAP observation of 3c279
 NEW_FLAT - The name of the file containing the new flat-field > photflat1.dat
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The next task is to flatfield the data:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % flatfield o59 o59_flat
 SURF: run 59 was a MAP observation of 3c279
 SURF: applying flatfield from photflat1.dat
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 If the input and output files are not specified on the command line they will
 be requested.
@@ -1847,8 +1262,7 @@ for each jiggle will be calculated by linear interpolation -- obviously this
 assumes that the $\tau$ varied linearly with time. For this example we will
 assume the $\tau$ variations are correct in order to demonstrate the principle:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % extinction
 IN - Name of NDF containing demodulated data /@o59_flat/ >
 SURF: run 59 was a MAP observation with JIGGLE sampling of object 3c279
@@ -1864,8 +1278,7 @@ FIRST_LST - Sidereal time of first opacity measurement; hh mm ss.ss /'0.0'/ > 11
 SECOND_TAU - Second zenith sky opacity measured /0.22/ > 0.187
 SECOND_LST - Sidereal time of second opacity measurement; hh mm ss.ss /'11 54'/ > 16 10
 OUT - Name of output NDF /'o59_lon_ext'/ >
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The arrays are separated at this point (since the extinction correction would
 be different). In this case the LONG-wave array was selected; \ext\
 would have to be re-run to select the SHORT-wave array (the question is not
@@ -1900,8 +1313,7 @@ that step. \remsky\ is sufficient for the mapping of compact sources in jiggle
 mode and for photometry; if the source structure is complex then \calcsky\
 should be considered (\S\ref{scan:sky}).
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % remsky
 IN - Name of input file containing demodulated map data /@w48_newrebin/ > o59_lon_ext
 SURF: run 59 was a MAP observation with JIGGLE sampling of object 3c279
@@ -1910,8 +1322,7 @@ BOLOMETERS - The Sky bolometers, [a1,a2] for an array /['all','-h7']/ >
 SURF: Using 36 sky bolometers
 MODE - Sky removal mode /'median'/ >
 Adding mean background level onto data (value=1.5316721E-6)
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 In this example we have used all the bolometers except for the central pixel
 (H7) and then used median sky removal for each jiggle. The average background
@@ -1920,8 +1331,8 @@ level has also been added back onto the data.
 \begin{figure}
 \begin{center}
 \includegraphics[width=5in,height=5in]{sun216_remsky}
-\caption{The 3C279 data after processing through \ext\ and \remsky. The next
-stage is to regrid the data using \rebin. The source can clearly be seen
+\caption{The 3C279 data after processing through \task{extinction} and \task{remsky}. The next
+stage is to regrid the data using \task{rebin}. The source can clearly be seen
 in bolometer 19 (H7). The negative stripes are indicating that the chop
 throw was smaller than the array.}
 \label{remsky}
@@ -2095,8 +1506,7 @@ All that is required now is that the data be rebinned onto a rectangular grid
 with the \rebin\ task. If necessary it is possible to enter Az/El pointing
 corrections by using \chgpnt:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % change_pointing n59_sky_lon
 SURF: run 59 was a MAP observation of 3c279
 SURF: observation started at LST 12 19 59 and ended at 12 28 40
@@ -2109,8 +1519,7 @@ POINT_LST - The sidereal time of the pointing offset (hh mm ss.ss) /!/ > 12 50
 POINT_DAZ - The azimuth pointing correction to be added (arcsec) > 1.1
 POINT_DEL - The elevation pointing correction to be added (arcsec) > -0.9
 POINT_LST - The sidereal time of the pointing offset (hh mm ss.ss) /!/ >
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The time for the pointing corrections must be in LST (they also must be
 entered in chronological order). The pointing offset is assumed to vary
 linearly with time. Here I have assumed good pointing at an LST of 12h
@@ -2123,7 +1532,7 @@ task to find any offset.
 
 A number of questions need to be asked before regridding the data :-
 \begin{description}
-\item {\bf What rebin method should be used?}
+\item \textbf{What rebin method should be used?}
 
 Currently, three methods are available. The data can be regridded with a
 weighting function, interpolated using spline fitting or by calculating
@@ -2148,7 +1557,7 @@ holes.
 The spline fitting algorithms are experimental and have
 not been thoroughly tested -- please use with care.
 
-\item {\bf What coordinate system should be used?}
+\item \textbf{What coordinate system should be used?}
 
 The data can be rebinned in the following coordinate systems:
 
@@ -2172,14 +1581,14 @@ and no astrometry information is stored.  The remaining coordinate systems
 correct for source rotation and do have associated FITS
 World-Coordinate-Systems (WCS) astrometry information \cite{WCS,ast}.
 
-\item {\bf Map centre}
+\item \textbf{Map centre}
 
 The default map centre will be the map centre of the first map entered into
 \rebin\ modified to the epoch of the output map if necessary.  coordinates
 used as the map centre of the This question is not asked if a NA, AZ or PL
 coordinate system is being used.
 
-\item {\bf Pixel size}
+\item \textbf{Pixel size}
 
 The regridded image can be in any pixel size. The main point is that account
 is taken of the beam sizes: approximately 7 arcsec at 450 microns and 14
@@ -2194,8 +1603,7 @@ reasonable pixel sizes.
 The map can now be made with \rebin\ (in this case using linear interpolation,
 J2000 coordinates, 1 arcsec pixels and default map centre, looping is turned
 off since I am only regridding one map):
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % rebin noloop
 REBIN_METHOD - Rebinning method to be used /'LINEAR'/ >
 SURF: Initialising LINEAR weighting functions
@@ -2221,8 +1629,7 @@ OUT - Name of file to contain rebinned map > n59_reb_lon
 WTFN_REGRID: Entering second rebin phase (T = 0.9061 seconds)
 WTFN_REGRID: Entering third rebin phase (T = 3.682912 seconds)
 WTFN_REGRID: Regrid complete. Elapsed time = 4.055644 seconds.
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 If more than one map is available the extinction corrected data (with or
 without sky removal) can all be added into a single map at this stage. The
@@ -2261,8 +1668,7 @@ coordinates with the long wave bolometer array overlaid (note that
 Fig.\ \ref{image} was made as follows (note that this requires
 \psmerge\ \cite{psmerge} in addition to \Kappa's \display):
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % display n59_reb_lon axes lut=$KAPPA_DIR/bgyrw_lut device=epsfcol_p
 MODE - Method to define the scaling limits /'SCALE'/ >
 LOW - Low value for display /-0.01095889788121/ >
@@ -2283,8 +1689,7 @@ NAME - Display bolometer name (else number)? /TRUE/ >
 
 
 % psmerge -e gks74.ps gks74.ps.1 > 3c279.eps
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 In general, for faint sources it would now be necessary to go back to the
 extinction corrected (or sky-removed) data so that any bad bolometers and
@@ -2312,8 +1717,7 @@ This text file contains information on one input set per line. This line
 must contain either a space separated list of with the NDF, weight, shift\_dx
 and shift\_dy, or the name of another text file:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 # Regrid text file for 3c279
 
 # Format of text file should be
@@ -2328,8 +1732,7 @@ n61_reb_lon{i2} 1.02            # Only want the second integration from
 n62_reb_lon   0.98 1.0   2.0
 
 3c279_old.bat                   # Include previous 3c279 data via a text file.
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 From this example we can see that blank line are ignored and a `\#' indicates
 the start of a comment; all text on the line after the `\#' is ignored. Not
@@ -2356,8 +1759,7 @@ additional SKY coordinate frame.
 
 They can be listed with the \ndftrace\ command:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 lapaki[M82/short]>ndftrace m82 fullwcs
 
    NDF structure ..../m82:
@@ -2420,8 +1822,7 @@ lapaki[M82/short]>ndftrace m82 fullwcs
       No. records:  9
       Last update:  1999 Jun 16 17:00:07 (MATHS           (KAPPA 0.13-6))
       Update mode:  NORMAL
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 In the above example, the SKY frame is the current frame (this will
 be used by \Kappa\ \display) and is set to FK5 J2000. The AXIS frame contains
@@ -2442,7 +1843,7 @@ After the data have been regridded with \rebin\ the image can then be
 analysed with an image-analysis tool. Obviously \Kappa, \Figaro\ \cite{figaro}
 or \gaia\ can be used immediately since they support the NDF standard.
 
-In order to use packages such as {\sc iraf}, {\sc aips} or {\sc miriad} the
+In order to use packages such as \textsc{iraf}, \textsc{aips} or \textsc{miriad} the
 data must first be converted to FITS format by using either the \convert\ task
 \ndffits\ or the \Figaro\ task \wdfits.  The \ndffits\ task is recommended
 since it can understand FITS tables, floating-point FITS, and the new AST
@@ -2461,24 +1862,20 @@ using \Figaro's \delobj\ or \Kappa's \setaxis. For example, if the
 image is stored in file scuba\_image.sdf and we wish to convert this to an
 integer FITS file scuba\_image.fits, with
 \Kappa/\convert\ we would do:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % kappa
 % convert
 % setaxis scuba_image mode=delete
 % ndf2fits bitpix=32 profits scuba_image scuba_image.fits
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The \param{PROFITS} parameter is there to ensure that all the FITS information in the
 NDF is propagated to the FITS file.
 With \Figaro\ we would do:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % figaro
 % delobj scuba_image.axis
 % wdfits scuba_image scuba_image.fits
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Note that \wdfits\ always writes integer FITS whereas \ndffits\
 would by default write REAL FITS (bitpix=$-32$). \ndffits\ also writes
 the Variance and Quality arrays to FITS tables in the output file (this can be
@@ -2504,8 +1901,7 @@ For this example I will use photometry data on 3C279 taken just before
 the example used for mapping. The data have been processed in the same
 way as scan 59.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % scuphot n56_sky_lon
 SURF: run 56 was a PHOTOM observation of 3c279
 SURF: file contains data for 1 exposure(s) in 10 integrations(s) in 1
@@ -2513,8 +1909,7 @@ measurement(s)
 ANALYSIS - Which reduction method /'AVERAGE'/ >
 OUT - Name of container file to hold map and time-sequence data > n56_pht_lon
 FILE - Name of ASCII file to contain results summary /!/ > n56.txt
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 In this example n56\_sky\_lon.sdf is processed with \scuphot.  This
 observation consisted of 10 integrations and used a 9-point jiggle pattern.
@@ -2546,8 +1941,7 @@ produced with \scuphot\ (\scucat\ knows about the \_peak NDFs). In this
 case we have combined the three photometry observations listed in
 \S\ref{prelim}:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % scucat
 METHOD - Concatenation method /'SEPARATE'/ >
 OUT - Rootname of files to contain concatenated data > 3c279
@@ -2561,8 +1955,7 @@ IN - Name of input file containing photometry data /!/ > n58_pht_lon
 SURF: Found data for the following bolometers: h7
 SURF: This is a PHOTOM observation of 3c279. There are 10 integrations
 IN - Name of input file containing photometry data /!/ >
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \scucat\ continues to request input data until a null value (!) is given for
 the \param{IN} parameter. Since different bolometers should be processed
@@ -2574,8 +1967,7 @@ packages (e.g.\ \Kappa\ \stats\ and \kstest).
 
 An alternative to the above for \scucat\ is to use a text file to contain
 the list of filenames to be processed (useful for scripts):
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % scucat noloop
 METHOD - Concatenation method /'SEPARATE'/ >
 OUT - Rootname of files to contain concatenated data > 3c279
@@ -2586,8 +1978,7 @@ SURF: Found data for the following bolometers: h7
 SURF: This is a PHOTOM observation of 3c279. There are 10 integrations
 SURF: Found data for the following bolometers: h7
 SURF: This is a PHOTOM observation of 3c279. There are 10 integrations
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 where \texttt{in.lis} contains the names of the 3 filenames to be
 processed (a comma separated list is also allowed).
 
@@ -2597,7 +1988,7 @@ be concatenated together regardless of bolometer and the output filename
 will match that specified in OUT (rather than being OUT + bolometer name).
 
 
-\subsubsection{\scusoft\ photometry and \xref{{\sc Kappa}}{sun95}{}}
+\subsubsection{\scusoft\ photometry and \xref{\textsc{Kappa}}{sun95}{}}
 
 The photometry data reduction system produces one flux measurement per
 integration per bolometer. Further analysis simply involves finding a
@@ -2809,8 +2200,7 @@ RA chopping, 30 arcsec RA chopping, 20 arcsec dec chopping and
 Once these images have been generated, they can be processed by
 \remdbm:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % remdbm o8?_lon_reb.sdf -out=m82
 Starting monoliths...Done
 Loop number 1
@@ -2840,8 +2230,7 @@ Doing inverse transformation
 
 Result stored in m82
 %
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Note the use of shell wildcards. The final image can be seen in
 Fig.\ \ref{m82:final}.
 
@@ -2881,8 +2270,7 @@ Assuming the output of \intrebin\ is stored in file \texttt{omc1\_reb.sdf}
 \polpack\ must first be told where to find the rotation angle and waveplate
 position:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % polimp table=$SURF_DIR/polimp.scuba omc1_reb
   16 input images to process...
 
@@ -2899,16 +2287,14 @@ position:
      Setting ANGROT to 75.46666
      Setting IMGID to 'omc1_reb.I16'
      Setting FILTER to '850_335'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \scusoft\ provides a suitable import table.
 
 The next stage is to generate the I, Q and U images from these individual
 waveplate images. This can be done by the \polcal\ task directly:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % polcal weights=3 ilevel=2 omc1_reb
    Processing 16 images in single-beam mode...
 
@@ -2927,8 +2313,7 @@ OUT - Output Stokes cube > omc1_cube
    Total number of aberrant input pixels rejected: 219
 
  None of the output pixels failed the test specified by parameter MINFRAC.
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 
 In this case, we use WEIGHTS=3 to generate the variance information
@@ -2965,14 +2350,12 @@ information that agrees with theory.
 
 Once the IQU cube is made \polvec\ can be used to generate the vectors:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % polvec omc1_cube
 CAT - Output catalogue > omc1_cat
 
    2530 vectors written to the output catalogue.
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 
 This catalogue can then be binned using \polbin, sections selected using
@@ -3517,15 +2900,15 @@ First public release of \scusoft.
 
 \begin{description}
 
-\item{{\bf chopping}} The secondary mirror is continuously moved on and off
+\item{\textbf{chopping}} The secondary mirror is continuously moved on and off
 source at approximately 7~Hz in order to remove the sky to zeroth order. This
 is done in addition to standard jiggling.
 
-\item{{\bf demodulation}} Removal of the chop signal by the transputers.
+\item{\textbf{demodulation}} Removal of the chop signal by the transputers.
 At this time, the raw data can not be accessed, only the demodulated data are
 stored.
 
-\item{{\bf exposure}} An exposure is the result from a complete set of
+\item{\textbf{exposure}} An exposure is the result from a complete set of
 switches. For example, in a JIGGLE/MAP or PHOTOM observation where the
 telescope is nodding the source between left and right beams, the data from
 each nod position is a switch and the reduced result `left switch' - `right
@@ -3533,7 +2916,7 @@ switch' say, is an exposure. In a SCAN/MAP observation there is no beam
 switching so, in this case, an exposure is the same as a switch.
 
 
-\item{{\bf integration}} An integration means different things for different
+\item{\textbf{integration}} An integration means different things for different
 observations.
 
 For one of the mapping modes it means the data from one fully-sampled coverage
@@ -3552,26 +2935,26 @@ For a SKYDIP observation, an integration is the data from a single revolution
 of the sector chopper in front of the cryostat window.
 
 
-\item{{\bf jiggle}} In order to sample an image fully the secondary mirror
+\item{\textbf{jiggle}} In order to sample an image fully the secondary mirror
 is moved once a second (whilst chopping) to move the position of the array on
 the sky; this is called `jiggling.'  There are a  complete set of jiggle
 positions for each integration. A PHOTOM observation can also jiggle in order
 to correct for seeing effects.
 
-\item{{\bf measurement}} A measurement is a group of integrations. Most MAP or
+\item{\textbf{measurement}} A measurement is a group of integrations. Most MAP or
 PHOTOM observations will consist of only one measurement.
 
 A FOCUS or ALIGN observation consists of five measurements (one for each
 secondary mirror position). A SKYDIP observation consists of one measurement
 at each elevation.
 
-\item{{\bf nod}} In order to correct for atmospheric variation the telescope
+\item{\textbf{nod}} In order to correct for atmospheric variation the telescope
 is moved off-source in each exposure so that sky can be measured.
 
-\item{{\bf ODF}} The observation definition file (ODF) is a file containing a
+\item{\textbf{ODF}} The observation definition file (ODF) is a file containing a
 list of instructions for an observation with SCUBA.
 
-\item{{\bf sub-instrument}} SCUBA contains bolometer arrays and photometric
+\item{\textbf{sub-instrument}} SCUBA contains bolometer arrays and photometric
 pixels that can operate at several wavelengths simultaneously. Each of these
 is called a sub-instrument. They are:
 
@@ -3584,12 +2967,12 @@ is called a sub-instrument. They are:
 \end{itemize}
 
 
-\item{{\bf switch}} The switch is the fundamental unit of data-taking in an
+\item{\textbf{switch}} The switch is the fundamental unit of data-taking in an
 observation. For example in a JIGGLE/MAP or PHOTOM observation each chunk of
 jiggle positions measured with the object in the beam of a telescope is a
 switch. Each scan across the source in a SCAN/MAP observation is also a switch.
 
-\item{{\bf tau ($\tau$)}} Submillimetre extinction is measured using the
+\item{\textbf{tau ($\tau$)}} Submillimetre extinction is measured using the
 zenith optical depth, tau or $\tau$, this is a measure of the amount of water
 vapour present in the atmosphere. For a tau, $\tau$ at a given airmass, $A$,
 the attenuation due to the atmosphere is given as e$^{-A \tau}$. Note that tau
@@ -3619,41 +3002,41 @@ Griffin~M.~J., Duncan~W.~D., Murphy~J.~A., Naylor~D.~A., 1999,
 \textit{MNRAS}, \textbf{303}, 659
 
 \bibitem{ndf}
-Warren-Smith~R.~F., 1995, {\it NDF -- Routines for Accessing the Extensible
+Warren-Smith~R.~F., 1995, \textit{NDF -- Routines for Accessing the Extensible
 N-Dimensional Data Format}, \xref{Starlink User Note 33}{sun33}{}
 
 \bibitem{gaia}
-Draper~P.~W., 1997, {\it GAIA -- Graphical Astronomy and Image Analysis Tool},
+Draper~P.~W., 1997, \textit{GAIA -- Graphical Astronomy and Image Analysis Tool},
 \xref{Starlink User Note 214}{sun214}{}
 
 \bibitem{kappa}
-Currie~M.~J., 1997, {\it KAPPA --- Kernel Application Package},
+Currie~M.~J., 1997, \textit{KAPPA --- Kernel Application Package},
 \xref{Starlink User Note 95}{sun95}{}
 
 \bibitem{fluxes}
-Privett~G.~J., Jenness~T., Matthews~H.~E., 1997, {\it FLUXES --
+Privett~G.~J., Jenness~T., Matthews~H.~E., 1997, \textit{FLUXES --
 JCMT Position and Flux Density Calibration},
 \xref{Starlink User Note 213}{sun213}{}
 
 \bibitem{convert}
-Currie~M.~J., Privett~G.~J., Chipperfield~A.~J., 1995 {\it CONVERT --
+Currie~M.~J., Privett~G.~J., Chipperfield~A.~J., 1995 \textit{CONVERT --
 A format-conversion package}, \xref{Starlink User Note 55}{sun55}{}
 
 \bibitem{hdstrace}
-Currie~M.~J., 1994, {\it HDSTRACE -- HDS data file listing},
+Currie~M.~J., 1994, \textit{HDSTRACE -- HDS data file listing},
 \xref{Starlink User Note 102}{sun102}{}
 
 \bibitem{S97}
-Stevens~J.~A., Ivison~R.~J., Jenness~T., 1997, {\it The SCUBA photometry
+Stevens~J.~A., Ivison~R.~J., Jenness~T., 1997, \textit{The SCUBA photometry
 cookbook},
 \xref{Starlink Cookbook 10}{sc10}{}
 
 \bibitem{SANDELL97}
-Sandell~G., 1997, {\it The SCUBA mapping cookbook: A first step to
+Sandell~G., 1997, \textit{The SCUBA mapping cookbook: A first step to
 proper map reduction}, \xref{Starlink Cookbook 11}{sc11}{}
 
 \bibitem{ekh}
-Emerson~D.~T., Klein~U., Haslam~C.~G.~T., 1979, {\it ApJ}, {\bf 76}, 92
+Emerson~D.~T., Klein~U., Haslam~C.~G.~T., 1979, \textit{ApJ}, \textbf{76}, 92
 
 \bibitem{EII}
 Emerson~D.~T., \textit{A.S.P. Conf. Ser} \textbf{75}, 309
@@ -3673,19 +3056,19 @@ Chipperfield~A.~J., 1999,
 \textit{ADAM}, \xref{Starlink User Note 144}{sun144}{}
 
 \bibitem{R92}
-Richer~J.~S., 1992, {\it MNRAS}, {\bf 254}, 165
+Richer~J.~S., 1992, \textit{MNRAS}, \textbf{254}, 165
 
 \bibitem{agi}
-Eaton~N., 1995, {\it AGI --- Applications Graphics Interface},
+Eaton~N., 1995, \textit{AGI --- Applications Graphics Interface},
 \xref{Starlink User Note 48}{sun48}{}
 
 \bibitem{mers}
-Rees~P.~C.~T., Chipperfield~A.~J., 1995, {\it MERS (MSG and ERR) -- Message
+Rees~P.~C.~T., Chipperfield~A.~J., 1995, \textit{MERS (MSG and ERR) -- Message
 and Error Reporting Systems}, \xref{Starlink User Note 104}{sun104}{}
 
 \bibitem{WCS}
-Greisen~E.~W., Calabretta~M., 2002, {\it Representations of celestial
-coordinates in FITS}, {\it A\&A}, \textbf{395}, 1077
+Greisen~E.~W., Calabretta~M., 2002, \textit{Representations of celestial
+coordinates in FITS}, \textit{A\&A}, \textbf{395}, 1077
 
 \bibitem{ast}
 Warren-Smith~R.~F., Berry~D.~S., 1998, \textit{AST -- A Library for Handling
@@ -3693,15 +3076,15 @@ World Coordinate Systems in Astronomy},
 \xref{Starlink User Note 210}{sun210}{}
 
 \bibitem{hds}
-Warren-Smith~R.~F., Lawden~M.~D., 1995, {\it HDS -- Hierarchical Data System},
+Warren-Smith~R.~F., Lawden~M.~D., 1995, \textit{HDS -- Hierarchical Data System},
 \xref{Starlink User Note 92}{sun92}{}
 
 \bibitem{psmerge}
-Terrett~D.~L., 1993, {\it PSMERGE -- Encapsulated Postscript handling utility},
+Terrett~D.~L., 1993, \textit{PSMERGE -- Encapsulated Postscript handling utility},
 \xref{Starlink User Note 164}{sun164}{}
 
 \bibitem{iras90}
-Berry~D.~S., Gong~W., Parsons~D.~C., 1995, {\it IRAS90 --- IRAS Survey and PO
+Berry~D.~S., Gong~W., Parsons~D.~C., 1995, \textit{IRAS90 --- IRAS Survey and PO
 Data Analysis Package -- Reference Guide}, \xref{Starlink User Note
 163}{sun163}{}
 
@@ -3712,11 +3095,11 @@ Robson~E.I., \textit{MNRAS}, \textbf{336}, 14
 
 \bibitem{figaro}
 Shortridge~K., Meyerdierks~H.~M., Currie~M.~J., Clayton~M.,
-{\it FIGARO -- A general data reduction system},
+\textit{FIGARO -- A general data reduction system},
 \xref{Starlink User Note 86}{sun86}{}
 
 \bibitem{dhh}
-Hughes~D.~H., 1993, {\it JCMT--UKIRT Newsletter}, {\bf 4}, 32
+Hughes~D.~H., 1993, \textit{JCMT--UKIRT Newsletter}, \textbf{4}, 32
 
 \bibitem{oracdr}
 Economou~F., Bridger~A., Wright~G.~S., Rees~N.~P., Jenness~T., 1998,
@@ -3737,7 +3120,7 @@ Berry~D.~S., Gledhill~T.~M., 1999,
 \xref{Starlink User Note 223}{sun223}{}
 
 \bibitem{ssn72}
-Jenness~T., Lightfoot~J.~F., 1999, {\it The SURF Programming Interface},
+Jenness~T., Lightfoot~J.~F., 1999, \textit{The SURF Programming Interface},
 \xref{Starlink System Note 72}{ssn72}{}
 
 \bibitem{ENA}
@@ -3747,7 +3130,7 @@ Stevens~J.A., Robson~E.I., Tilanus~R.P.J., Duncan~W.D., Lightfoot~J.F., 2002,
 
 
 \bibitem{SR94}
-Stevens~J.~A.,  Robson~E.~I.,  1994, {\it  MNRAS}, {\bf 270}, L75
+Stevens~J.~A.,  Robson~E.~I.,  1994, \textit{ MNRAS}, \textbf{270}, L75
 
 
 \bibitem{pda}
@@ -4113,7 +3496,7 @@ The \scusoft\ routines are described in the following pages:
       \sstexamplesubsection{
          add\_dbm gaussian 0 30 dbm\_out
       }{
-         Generate a dual beam image from the single beam {\tt '}gaussian{\tt '}
+         Generate a dual beam image from the single beam \texttt{'}gaussian\texttt{'}
          input NDF using a 30 pixel chop at 0 degrees. Write the
          resulting image to dbm\_out.sdf.
       }
@@ -4660,7 +4043,7 @@ Astrometry information is stored in the WCS component and not
          calcsky test\_rlb model=! $\backslash$$\backslash$
       }{
          Calculate sky for test\_rlb.sdf. Only read in one file and
-         don{\tt '}t use an external source model.
+         don\texttt{'}t use an external source model.
       }
       \sstexamplesubsection{
          calcsky list.inp model=m82 noloop$\backslash$$\backslash$
@@ -4729,17 +4112,17 @@ Astrometry information is stored in the WCS component and not
          COMP = LITERAL (Read)
       }{
          The name of the NDF array component which should be changed:
-         {\tt "}Data{\tt "},{\tt "}Error{\tt "}, {\tt "}Quality{\tt "} or {\tt "}Variance{\tt "} (where {\tt "}Error{\tt "} is the
-         alternative to {\tt "}Variance{\tt "} and causes the square root of the
+         \texttt{"}Data\texttt{"},\texttt{"}Error\texttt{"}, \texttt{"}Quality\texttt{"} or \texttt{"}Variance\texttt{"} (where \texttt{"}Error\texttt{"} is the
+         alternative to \texttt{"}Variance\texttt{"} and causes the square root of the
          variance values to be taken). The default component is always DATA.
-         If {\tt "}Quality{\tt "} is specified, then the quality values are treated
+         If \texttt{"}Quality\texttt{"} is specified, then the quality values are treated
          as numerical values (in the range 0 to 255).
       }
       \sstsubsection{
          IN = CHAR (Read)
       }{
          Name of data set and the specification of the data to be changed.
-         Usually of the form `ndf\{spec1\}\{spec2\}{\tt '} where ndf is the filename
+         Usually of the form `ndf\{spec1\}\{spec2\}\texttt{'} where ndf is the filename
          and spec1...n are the section specifications.
          The section can be read from the SECTION parameter if the
          SCUBA section is omitted.
@@ -4771,7 +4154,7 @@ Astrometry information is stored in the WCS component and not
          system will split multiple entries on commas unless the entire
          section is quoted:
 
-         \hskip 0.75in \texttt{SECTION $>$ [ {\tt "}\{b3,5\}{\tt "} , \{i2\} ]}
+         \hskip 0.75in \texttt{SECTION $>$ [ \texttt{"}\{b3,5\}\texttt{"} , \{i2\} ]}
 
          If necessary the negation character should come after a
          section (ie after the closing curly bracket) and that
@@ -4790,26 +4173,26 @@ Astrometry information is stored in the WCS component and not
          VALUE = LITERAL (Read)
       }{
          Value to which all selected data points should be set. A value of
-         `bad{\tt '} will set the data point to VAL\_\_BAD (Starlink bad data
+         `bad\texttt{'} will set the data point to VAL\_\_BAD (Starlink bad data
          value). For COMP=Quality only numbers 0 to 255 are allowed - numbers
          outside this range are assumed to be bad values.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         change\_data {\tt '}ndf\{b2\}{\tt '} bad changed
+         change\_data \texttt{'}ndf\{b2\}\texttt{'} bad changed
       }{
          Copy all data in ndf.sdf to changed.sdf and change all data
          in bolometer 2 to bad.
       }
       \sstexamplesubsection{
-         change\_data {\tt '}ndf\{\}{\tt '} comp=variance value=0.0001
+         change\_data \texttt{'}ndf\{\}\texttt{'} comp=variance value=0.0001
       }{
          Copy ndf.sdf to the output file (asked for explicitly) and
          set all variance values to 0.0001.
       }
       \sstexamplesubsection{
-         change\_data test  section={\tt '}[\{b47\},\{i3\}]{\tt '} value=1.02
+         change\_data test  section=\texttt{'}[\{b47\},\{i3\}]\texttt{'} value=1.02
       }{
          Select data from bolometer 47 and integration 3 in test.sdf and set
          this to a value of 1.02. This method of selecting a section is not
@@ -4817,20 +4200,20 @@ Astrometry information is stored in the WCS component and not
          brackets.
       }
       \sstexamplesubsection{
-         change\_data test2 section={\tt '}[{\tt "}\{b2,5\}{\tt "}, \{i2\}-]{\tt '} value=0.2 comp=err
+         change\_data test2 section=\texttt{'}[\texttt{"}\{b2,5\}\texttt{"}, \{i2\}-]\texttt{'} value=0.2 comp=err
       }{
          Select everything except integration 2 and bolometers 2 and 5.
          Set the error for this section to 0.2
       }
       \sstexamplesubsection{
-         change\_data {\tt '}phot\{i2:6\}\{b3\}{\tt '} comp=quality value=8
+         change\_data \texttt{'}phot\{i2:6\}\{b3\}\texttt{'} comp=quality value=8
       }{
          Explicitly set the quality array to 8 for integrations 2 through
          6 and bolometer 3. The task \chgqual\ is recommended in this
          case since then only bit 3 is affected.
       }
       \sstexamplesubsection{
-         change\_data {\tt '}map\{i2,5\}-{\tt '} value=0.0
+         change\_data \texttt{'}map\{i2,5\}-\texttt{'} value=0.0
       }{
          Set everything except integrations 2 and 5 to zero.
       }
@@ -4991,11 +4374,11 @@ Astrometry information is stored in the WCS component and not
       This application is used to change the pointing corrections to map
       data.
 
-         If the observing mode of the input datafile is `MAP{\tt '} the
+         If the observing mode of the input datafile is `MAP\texttt{'} the
       application will search for pointing corrections in the file and, if it
       finds any, report them. You will be asked if you wish to change the
-      pointing correction data in the file. `No{\tt '} will result in the data
-      remaining unaltered, `yes{\tt '} will then ask you for the time of the
+      pointing correction data in the file. `No\texttt{'} will result in the data
+      remaining unaltered, `yes\texttt{'} will then ask you for the time of the
       pointing offset (LST in hh mm ss.ss format) and the azimuth and
       elevation correction (in arcseconds) that would have to be added to
       the observation position to correct the pointing at that time. If
@@ -5096,15 +4479,15 @@ Astrometry information is stored in the WCS component and not
       \sstsubsection{
          BAD\_QUALITY = LOGICAL (Read)
       }{
-         Set quality to BAD. Answering this question with a `yes{\tt '} will
-         mean that the selected data will be set to BAD. `no{\tt '}
+         Set quality to BAD. Answering this question with a `yes\texttt{'} will
+         mean that the selected data will be set to BAD. `no\texttt{'}
          will set them to good.
       }
       \sstsubsection{
          IN = CHAR (Read)
       }{
          Name of data set and the specification of the data to be changed.
-         Usually of the form `ndf\{spec1\}\{spec2\}{\tt '} where ndf is the filename
+         Usually of the form `ndf\{spec1\}\{spec2\}\texttt{'} where ndf is the filename
          and spec1...n are the section specifications.
          The section can be read from the SECTION parameter if the
          SCUBA section is omitted.
@@ -5131,7 +4514,7 @@ Astrometry information is stored in the WCS component and not
          system will split multiple entries on commas unless the entire
          section is quoted:
 
-         \hskip 0.75in\texttt{SECTION $>$ [ {\tt "}\{b3,5\}{\tt "} , \{i2\} ]}
+         \hskip 0.75in\texttt{SECTION $>$ [ \texttt{"}\{b3,5\}\texttt{"} , \{i2\} ]}
 
          If necessary the negation character should come after a
          section (ie after the closing curly bracket) and that
@@ -5149,28 +4532,28 @@ Astrometry information is stored in the WCS component and not
    }
    \sstexamples{
       \sstexamplesubsection{
-         change\_quality {\tt '}ndf\{\}{\tt '} BAD\_QUALITY=false
+         change\_quality \texttt{'}ndf\{\}\texttt{'} BAD\_QUALITY=false
       }{
          Select the entire array and unset bit 3.
       }
       \sstexamplesubsection{
-         change\_quality {\tt '}ndf\{b2\}{\tt '} BAD\_QUALITY
+         change\_quality \texttt{'}ndf\{b2\}\texttt{'} BAD\_QUALITY
       }{
          Select the second bolometer and mark it bad.
       }
       \sstexamplesubsection{
-         change\_quality {\tt '}ndf\{b2;i3\}-{\tt '} BAD\_QUALITY
+         change\_quality \texttt{'}ndf\{b2;i3\}-\texttt{'} BAD\_QUALITY
       }{
          Select the third integration of bolometer two but set all
          other data points bad by inverting the section.
       }
       \sstexamplesubsection{
-         change\_quality {\tt '}ndf\{b16\}\{i2\}{\tt '} BAD\_QUALITY
+         change\_quality \texttt{'}ndf\{b16\}\{i2\}\texttt{'} BAD\_QUALITY
       }{
          Select all of bolometer 16 and the whole of integration 2.
       }
       \sstexamplesubsection{
-         change\_quality {\tt '}ndf\{e5,16:18\}{\tt '} MSG\_FILTER=quiet
+         change\_quality \texttt{'}ndf\{e5,16:18\}\texttt{'} MSG\_FILTER=quiet
       }{
          Select exposure 5 and 16 through 18. Messaging is turned off.
       }
@@ -5181,14 +4564,14 @@ Astrometry information is stored in the WCS component and not
          for a section later.
       }
       \sstexamplesubsection{
-         change\_quality test SECTION={\tt '}[{\tt "}\{b41,52\}{\tt "},\{i3\}]{\tt '} BAD\_QUALITY
+         change\_quality test SECTION=\texttt{'}[\texttt{"}\{b41,52\}\texttt{"},\{i3\}]\texttt{'} BAD\_QUALITY
       }{
          Set bolometers 41 and 52 as well as integration 3 to bad quality.
          Use of SECTION here is not recommended given the complication
          when using commas and square brackets.
       }
       \sstexamplesubsection{
-         change\_quality test SECTION={\tt '}[\{b2;i2\}-]{\tt '} BAD\_QUALITY
+         change\_quality test SECTION=\texttt{'}[\{b2;i2\}-]\texttt{'} BAD\_QUALITY
       }{
          Set everything bad except bolometer 2 and integration 2.
       }
@@ -5784,7 +5167,7 @@ proceeding.
    }
    \sstexamples{
       \sstexamplesubsection{
-         extinction flat long 0.24 {\tt '}01 00 00{\tt '} 0.3 {\tt '}02 00 00{\tt '} corr
+         extinction flat long 0.24 \texttt{'}01 00 00\texttt{'} 0.3 \texttt{'}02 00 00\texttt{'} corr
       }{
          Process the LONG sub-instrument from flat.sdf using the
          knowledge that the 850 tau (assuming LONG refers to the 850
@@ -7585,7 +6968,7 @@ Astrometry information is stored in the WCS component and not
          names out\_noise.sdf. Do not write a text file.
       }
       \sstexamplesubsection{
-         reduce\_noise {\tt '}3{\tt '} ! accept
+         reduce\_noise \texttt{'}3\texttt{'} ! accept
       }{
          Process observation 3 but do not write an NDF output file.
          Use the default file name for the text file.
@@ -7850,7 +7233,7 @@ can be the number of the observation rather than the full filename.
       \sstsubsection{
          IPFILE = FILE (Read)
       }{
-         File containing the IP `flatfield{\tt '}
+         File containing the IP `flatfield\texttt{'}
       }
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
@@ -7862,7 +7245,7 @@ can be the number of the observation rather than the full filename.
          OUT = NDF (Write)
       }{
          Output file containing IP removed data. Default output
-         filename is `\_ip{\tt '} (`i{\tt '} for short form).
+         filename is `\_ip\texttt{'} (`i\texttt{'} for short form).
       }
    }
    \sstexamples{
@@ -8032,7 +7415,7 @@ would leave you with bolometer H7.
    }
    \sstexamples{
       \sstexamplesubsection{
-         remsky ndf sky\_removed bolometers={\tt '}[g1,g2,g3,g4,g5]{\tt '} mode=median $\backslash$
+         remsky ndf sky\_removed bolometers=\texttt{'}[g1,g2,g3,g4,g5]\texttt{'} mode=median $\backslash$
       }{
          Use the median of bolometers g1,g2,g3,g4,g5 (not necessarily
          the best choice) to calculate the sky signal and write the
@@ -8603,7 +7986,7 @@ menu.
          until a NULL (!) value is given. The input dataset can either
          be output from \scuphot\ or an NDF file. A comma-separated list
          of files is allowed. A text file containing a list of files
-         can be specified using the up-carat symbol ($^\wedge$) in
+         can be specified using the up-carat symbol ($\wedge$) in
          front of the text file name.
       }
       \sstsubsection{
@@ -8656,7 +8039,7 @@ menu.
          files containing the rootname of `outfile'.
       }
       \sstexamplesubsection{
-         scucat outfile in=$^\wedge$input.lis noloop method=catall
+         scucat outfile in=$\wedge$input.lis noloop method=catall
       }{
          This will copy all the data contained in the files listed in
          \texttt{input.lis} and write it to a file called
@@ -8956,7 +8339,7 @@ menu.
    }{
       The help information is arranged hierarchically.  You can move
       around the help information whenever SCUHELP prompts.  This
-      occurs when it has either presented a screen{\tt '}s worth of text or
+      occurs when it has either presented a screen\texttt{'}s worth of text or
       has completed displaying the previously requested help.  The
       information displayed by SCUHELP on a particular topic includes a
       description of the topic and a list of subtopics that further
@@ -8968,12 +8351,12 @@ menu.
 
          \sstitem
             a topic and/or subtopic name(s) to display the help for that
-               topic or subtopic, so for example, {\tt "}block parameters box{\tt "}
+               topic or subtopic, so for example, \texttt{"}block parameters box\texttt{"}
                gives help on BOX, which is a subtopic of Parameters, which
                in turn is a subtopic of BLOCK;
 
          \sstitem
-            a $<$CR$>$ to see more text at a {\tt "}Press RETURN to continue ...{\tt "}
+            a $<$CR$>$ to see more text at a \texttt{"}Press RETURN to continue ...\texttt{"}
                request;
 
          \sstitem
@@ -8986,12 +8369,12 @@ menu.
                response to any prompt will terminate the help session;
 
          \sstitem
-            a question mark {\tt "}?{\tt "} to redisplay the text for the current
+            a question mark \texttt{"}?\texttt{"} to redisplay the text for the current
                topic, including the list of topic or subtopic names; or
 
          \sstitem
-            an ellipsis {\tt "}...{\tt "} to display all the text below the
-               current point in the hierarchy.  For example, {\tt "}BLOCK...{\tt "}
+            an ellipsis \texttt{"}...\texttt{"} to display all the text below the
+               current point in the hierarchy.  For example, \texttt{"}BLOCK...\texttt{"}
                displays information on the BLOCK topic as well as
                information on all the subtopics under BLOCK.
 
@@ -9002,16 +8385,16 @@ menu.
       \sstitemlist{
 
          \sstitem
-            Just give the first few characters, e.g. {\tt "}PARA{\tt "} for
+            Just give the first few characters, e.g. \texttt{"}PARA\texttt{"} for
                Parameters.
 
          \sstitem
             Some topics are composed of several words separated by
                underscores.  Each word of the keyword may be abbreviated,
-               e.g. {\tt "}Colour\_Set{\tt "} can be shortened to {\tt "}C\_S{\tt "}.
+               e.g. \texttt{"}Colour\_Set\texttt{"} can be shortened to \texttt{"}C\_S\texttt{"}.
 
          \sstitem
-            The characters {\tt "}\%{\tt "} and {\tt "}$*${\tt "} act as wildcards, where the
+            The characters \texttt{"}\%\texttt{"} and \texttt{"}$*$\texttt{"} act as wildcards, where the
                percent sign matches any single character, and asterisk
                matches any sequence of characters.  Thus to display
                information on all available topics, type an asterisk in
@@ -9297,7 +8680,7 @@ menu.
    }
    \sstexamples{
       \sstexamplesubsection{
-         scumakewt 20 90 3 {\tt '}[256,256]{\tt '} ft wt
+         scumakewt 20 90 3 \texttt{'}[256,256]\texttt{'} ft wt
       }{
          Generate the FT and weight of a 20 arcsec RA chop using
          3 arcsec pixels and a 256 square output image. The weight
@@ -9485,12 +8868,12 @@ menu.
          The bolometer names will be overlaid using the default colour.
       }
       \sstexamplesubsection{
-         scuover style={\tt '}colour(bol)=red{\tt '} noname
+         scuover style=\texttt{'}colour(bol)=red\texttt{'} noname
       }{
          This command will overlay bolometer numbers over the image in red.
       }
       \sstexamplesubsection{
-         scuover style={\tt '}colour(bol)=yellow,font(text)=3,colour(text)=cyan{\tt '}
+         scuover style=\texttt{'}colour(bol)=yellow,font(text)=3,colour(text)=cyan\texttt{'}
       }{
          Draw yellow circles but draw the labels in cyan using font 3
          (italics).
@@ -9807,7 +9190,7 @@ menu.
               data from the second input file (equivalent to \pltbol)
            d: interactively despike the data for the bolometers in
               specified file (equivalent to \dspbol).
-           r: same as {\tt '}p{\tt '} except that a whole set of bolometers is
+           r: same as \texttt{'}p\texttt{'} except that a whole set of bolometers is
               plotted in a window (equivalent to \rlinplot).
       }
       \sstsubsection{
@@ -10788,23 +10171,19 @@ UT date in YYYYMMDD format. i.e.\ on June 27th 1997 the directory will be
 called 19970627. The data should not be copied into the working directory
 (primarily to save disk space) and can be accessed by setting
 \textsc{\$datadir}:     %%%%%%%%%%%$%%%%%%%%%%
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv DATADIR /jcmtarchive/19970627
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 This can be automated by using the \scusetenv\ command:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % scusetenv
 Setting up SURF for UT date 19990618
 SCUBA_PREFIX set to 19990618
 DATADIR has been set to /jcmtarchive/19990618
 ORAC_DATA_IN has also been set to this value
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \subsection{Hilo}
 
@@ -10814,17 +10193,13 @@ taken during semester M99A) containing a UT directory and an \texttt{ro/UT}
 directory. Data can be accessed by setting
 \textsc{\$datadir}: %%%%%%%%%%%$%%%%%%%%%%
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv DATADIR /scuba/m99a/19990615/
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 or
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv DATADIR /scuba/m98b/ro/19980927/
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Note that, unlike at the summit, the demodulated and reduced data are in
 separate directories. The directories containing the demodulated data also
@@ -10832,15 +10207,13 @@ contain index and log files which summarise the observations.
 
 This can be automated by using the \scusetenv\ command:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % scusetenv 19990205
 Setting up SURF for UT date 19990205
 SCUBA_PREFIX set to 19990205
 DATADIR has been set to /scuba/m99a/19990205
 ORAC_DATA_IN has also been set to this value
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 
 \section{\xlabel{filenames}File naming and data structures\label{filenames}}
@@ -10851,18 +10224,16 @@ reduced observation (RO) file to disk.
 
 \subsection{Naming Conventions}
 
-SCUBA data files have the following naming convention: {\it string\_obs
+SCUBA data files have the following naming convention: \textit{string\_obs
 type\_run number}.sdf. Where string is either the UT date of the observation
 in YYYYMMDD format or the PATT ID for the observation.
 
 Therefore the first data from 23rd June 1997 will be in files
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ls
 19970623_dem_0001.sdf
 19970623_red_0001.sdf
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 for the demodulated and reduced data respectively.
 
 The RO file contains the reduced data calculated by the telescope during the
@@ -10881,8 +10252,7 @@ is a blank NDF containing a FITS extension).
 For example, a map observation with the LONG and SHORT wave array would
 produce an RO file with the following structure:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % hdstrace m97az98_red_0001
 M_970308_50  <SCUDR_MAP>
 
@@ -10894,23 +10264,18 @@ M_970308_50  <SCUDR_MAP>
 
     HEADER <NDF>
         ....Observation parameters in FITS extension
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 
 The image from the long wave array would be displayed in \Kappa\
 with:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % display clear axes m97az98_red_0001.long
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 and the FITS information would be displayed with:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % fitslist m97az98_red_0001.header
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 In addition to one NDF per sub-instrument, there is also one NDF per
 measurement. For example, the RO file from a FOCUS observation would contain
@@ -10929,8 +10294,7 @@ for the array as a whole.
 Demodulated data files are much more complicated as they have to contain a
 full description of the state of SCUBA for each observation.
 Here is an example trace (the map of 3C279 used in the example):
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % hdstrace apr8_dem_0059
 
 STRUCT  < >
@@ -10987,14 +10351,13 @@ STRUCT  < >
                                         ... 0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1
 
 End of Trace.
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 From this we can see that there is a 3 dimensional data array and 4 NDF
 extensions. Each will be described in turn:
 
 \begin{description}
-\item {\bf DATA\_ARRAY}
+\item \textbf{DATA\_ARRAY}
 
 The data array contains three dimensions. The first dimension is a vector of
 size 5 and relates to the chop data, the chop error, the calibrator data the
@@ -11004,23 +10367,23 @@ positions $\times$ number of integrations $\times$ 2 (number of nods)). These
 data can be displayed to examine each component in turn (for example checking
 whether the OFF position contains a source) by using NDF sections.
 
-\item {\bf FIGARO extension}
+\item \textbf{FIGARO extension}
 
 The \Figaro\ extension is not used by the \scusoft\ package.
 
-\item {\bf SCUCD extension}
+\item \textbf{SCUCD extension}
 
 The SCUCD extension contains information on the position of the telescope for
 each sample along with the local sidereal time of each sample.
 
-\item {\bf SCUBA extension}
+\item \textbf{SCUBA extension}
 
 The SCUBA extension contains the flatfield information (position of the
 bolometers, sub-intrument of bolometers, quality of bolometers and A-to-D
 card). There are also arrays to aid in the location of each jiggle in the data
 array (DEM\_PNTR).
 
-\item {\bf FITS extension}
+\item \textbf{FITS extension}
 
 The FITS Extension is described in the next appendix.
 
@@ -11049,8 +10412,7 @@ All observation parameters are stored in the NDF FITS extension. They can be
 accessed using the \Kappa\ task \fitslist. The same information is
 stored in the reduced files but in the HEADER component.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % fitslist apr8_dem_0059
 ACCEPT  = 'not used'           / accept update; PROMPT, YES or NO
 ALIGN_AX= 'not used'           / Alignment measurements in X or Y axis
@@ -11216,16 +10578,14 @@ WAVE_3  =                    0 / Wavelength of map (microns)
 WAVE_4  =                    0 / Wavelength of map (microns)
 WAVE_5  =                    0 / Wavelength of map (microns)
 END
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \subsection{Rebinned data}
 
 The rebinned data files contain the following. Note that the astrometry
 information is not stored in the FITS extension.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % fitslist n59_reb_lon
 OBJECT  = '3c279   '           / name of object
 FILE_1  = 'n59_sky_lon'        / name of input datafile
@@ -11244,8 +10604,7 @@ DATE    = '2000-07-06T02:35:49'/ file creation date (YYYY-MM-DDThh:mm:ss UTC)
 ORIGIN  = 'SCUBA User Reduction Facility (SURF)'/  Origin of the FITS file
 OBSRA   =      194.04654166665 / RA of map centre (degrees; deprecated)
 OBSDEC  =     -5.7894722222218 / Dec. of map centre (degrees; deprecated)
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 
 \section{\xlabel{despiking_eg}Description of despiking method used by \task{despike}\label{despiking_eg}}
@@ -11483,8 +10842,7 @@ other SCUBA data by using \chgqual. The following extra steps are required:
 \item Run \resw\ to calculate the sky brightness temperature for each
 integration at each airmass (measurement). The cold load temperature for each
 sub instrument will be requested.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % reduce_switch 70
 SURF: Opening 19971115_dem_0070 in /scuba/observe/19971115/dem
 SURF: run 70 was a SKYDIP observation
@@ -11493,16 +10851,15 @@ in 10 measurement(s)
 OUT - Name of output file to contain reduced switch data /'o70'/ >
 T_COLD - Temperature of cold load for SHORT_DC /95/ >
 T_COLD - Temperature of cold load for LONG_DC /55/ >
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 
 \begin{figure}
 \begin{center}
 \includegraphics[width=2.6in]{sun216_rawsdip}
 \includegraphics[width=2.6in]{sun216_rawsdip2}
-\caption{Skydip data after processing with \resw\ (left) and after measurement
-5 has been removed with \chgqual\ (right).}
+\caption{Skydip data after processing with \task{reduce\_switch} (left) and after measurement
+5 has been removed with \task{change\_quality} (right).}
 \label{rawsdip}
 \end{center}
 \end{figure}
@@ -11515,23 +10872,19 @@ number along the first axis and sample number (number of integrations times
 number of measurements) along the second axis. You can find the sub-instrument corresponding to each `bolometer'
 number either by running \skydip\ and noting the order of the listed
 sub-instruments or by using the \Kappa\ \fitslist\ command:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % fitslist o70 | grep SUB_
 SUB_1   = 'SHORT   '           / SCUBA instrument being used
 SUB_2   = 'LONG    '           / SCUBA instrument being used
 SUB_3   = 'not used'           / SCUBA instrument being used
 SUB_4   = 'not used'           / SCUBA instrument being used
 SUB_5   = 'not used'           / SCUBA instrument being used
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 For example, the data for the
 second  sub-instrument (in this case the LONG array) can be plotted by using:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % linplot mode=2 device=xwindows 'o70(2,)'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Fig.\ \ref{rawsdip} shows an example. Note that, in contrast with
 other observing modes, the second axis is labelled in measurements rather than
 integrations.
@@ -11540,14 +10893,12 @@ integrations.
 
 \item Once a bad measurement has been identified, it can be switched off using
 \chgqual:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % change_quality 'o70{b2;m5}' yes
 SURF: run 70 was a SKYDIP observation of not used
 SURF: file has data for 2 bolometers, measured at 100 positions.
  - there are data for 1 exposure(s) in 10 integration(s) in 10 measurements.
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The main thing here is that the \texttt{m} identifier should be used to specify
 measurements\footnote{Of course it is still possible to specify an integration
 to be marked bad but remember to specify also the measurement otherwise the
@@ -11559,8 +10910,7 @@ sub-instrument) 2 should be affected.
 
 
 \item Now \skydip (or \sdip) can be run on the file:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % skydip o70
 SURF: run 70 was a SKYDIP observation
 SURF: observation started at sidereal time 1 10 41 and ended at 1 16 38
@@ -11574,8 +10924,7 @@ B_VAL - B parameter /-1/ >
 SCULIB: fit for filter 750 and sub-instrument LONG_DC
  eta =  0.87 +/-  0.00  b =  0.86 +/-  0.01  tau =   0.667 +/- 0.007
  Standard Deviation of fit residual =   0.81 K (X=     0.9 N=    7)
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The fit is shown in Fig.\ \ref{fitsdip}. \skydip\ is the only task that can
 process raw demodulated data and data processed with \resw.
 \begin{figure}
@@ -11691,8 +11040,7 @@ Demodulated data can be checked as follows:
 before running \resw). The simplest way to extract the signal is to use
 the \Kappa\ command \manic:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % manic
 INPUT - Input image /@calsig_450_850_map/ > 19971008_dem_0039
 Array is 3 -dimensional
@@ -11705,8 +11053,7 @@ XRANGE - Range for summation over the X-axis of the input data array /[1,5]/ > [
 ZRANGE - Range for summation over the Z-axis of the input data array /[1,384]/ >
 OUTPUT - Output image > calsig
 LOOP - Produce another output IMAGE structure and data array? /NO/ >
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The dimensions of the data array in the demodulated file should be [5,
 \textit{n\_bols}, \textit{n\_jiggles}] (\S\ref{demodstruc}), where
@@ -11723,34 +11070,28 @@ Alternatively, it should be possible to use \ndfcopy\ to extract the
 NDF section, using the TRIM parameter to reduce the resultant section
 to 2 dimensions.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ndfcopy '19971008_dem_0039(3,,)'  TRIM TRIMWCS
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 
 \item Normalise the calibrator signal by using \cdiv\ to divide the result
 from \manic\ by \textit{n\_jiggles} (384 in this example):
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % cdiv
 IN - Input NDF data structure /@calsig/ >
 SCALAR - Division constant /1280/ > 384
 OUT - Output NDF > calsig_div
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \item Plot the standard calibrator and overlay the calibrator signal derived
 above.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % linplot ${SURF_DIR}/calsig_450_850_map
 % linplot calsig_div noclear lincol=(some colour)
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 where `\textit{some colour}' is a different colour to that used to display
 the first calibrator signal.
 
@@ -11758,8 +11099,7 @@ the first calibrator signal.
 \scushift\ command. Since the shift is usually caused by adding extra bytes to
 the data stream, a negative shift must be applied to correct the problem.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % scushift
 Input NDF (no .sdf): r95
 Which A to D card (a single letter): B
@@ -11770,8 +11110,7 @@ Before: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13
 14 15 16 1...<cut>
 Bolchan: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 15 16 1 2 3 4 5 6 7 8 9 10
 11 12 13 14 1...<cut>
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 \scushift\ is very verbose! The `before' and 'bolchan' entries simply tell the
 user the form of the correction used. If you look carefully you will see
  that the 17th number in the list has changed from a 1 to a 15 indicating that
