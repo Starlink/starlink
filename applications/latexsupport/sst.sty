@@ -105,19 +105,29 @@
 
 %  Format a list of items while in paragraph mode.
 \newcommand{\sstitemlist}[1]{
-  \mbox{}\vspace{-1\baselineskip}
+  \mbox{}%\vspace{-1\baselineskip}
   \begin{itemize}
      #1
   \end{itemize}
 }
-\newcommand{\sstexamplesubsection}[2]{
-\item[\texttt{#1}] %\mbox{}\\% \vspace{1.0ex}
+\newcommand{\sstexamplesubsection}[2]{\sloppy
+\item[{\texttt{\textcolor{MidnightBlue}{#1}}}] %\mbox{}\\% \vspace{1.0ex}
 #2 }
 
+
+% SSTEXAMPLES
+
+% Set the font of the label of the sstexample items:
+% (extra \\ spacing is required to not have weird effects. I think the
+% important point is to explicitly force the label into vertical mode,
+% so it doesn't try and continue the previous paragraph).
+\newcommand{\sstexamplefont}[1]{\\#1\\\\}
+
 \newcommand{\sstexamples}[1]{
+  \setlength{\parindent}{0mm}
    \item[Examples:]
-   \begin{description}[style=nextline]
-     \item[]
+   \begin{description}[style=unboxed,font=\sstexamplefont,
+     leftmargin=0pt,]
       #1
    \end{description}
 }
