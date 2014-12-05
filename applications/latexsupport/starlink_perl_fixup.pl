@@ -110,6 +110,16 @@ $text =~ s/\n(\s*?)\n(\s*?)}{(\s*?)\n/\n$2}{\n/g;
 # comment out use package lines (with options;
 $text =~ s/(.*?)\\usepackage(.*?){(.*?)}(.*?)\n/\%$1\\usepackage$2{$3}$4\n/g;
 
+# Remove old-style font modifiers: \em \sc \it \bf etc
+my %stylemap = ( em => "emph",
+                 sc => "textsc",
+                 it => "textit",
+                 tt => "texttt",
+                 bf => "textbf" );
+for my $old (keys %stylemap) {
+  $text =~ s/\{\\$old\s+/\\$stylemap{$old}\{/g;
+}
+
 # Write out file again
 write_file($outname, $text);
 
