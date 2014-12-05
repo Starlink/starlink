@@ -1,22 +1,24 @@
 #!/usr/bin/env perl
 
+use strict;
+use warnings;
+
 # module to let you read whole file into one string
 use File::Slurp;
 use Term::ANSIColor;
-use File::Copy;
 
 # Read in filename and output name from command line.
-$filename = shift;
-$outname = shift;
+my $filename = shift;
+my $outname = shift;
 
 # Open this file.
-open DOCFILE, $filename or die "error opening $filename\n";
+open (my $DOCFILE, $filename) or die "error opening $filename\n";
 
 # Open temp file to write to
-open (OUTPUTFILE, ">$outname");
+open (my $OUTPUTFILE, ">", $outname);
 
 # Go through each line.
-while ($line=<DOCFILE>)
+while (my $line=<$DOCFILE>)
   {
     # Change document class.
     if ($line =~/(.*?)documentclass(.*?)\{article\}(.*?)/)
@@ -35,15 +37,15 @@ while ($line=<DOCFILE>)
       }
 
 
-    print OUTPUTFILE "$line";
+    print $OUTPUTFILE "$line";
   }
 
-close DOCFILE;
-close OUTPUTFILE;
+close $DOCFILE;
+close $OUTPUTFILE;
 
 
 #write out file
-my $text = read_file("$outname");
+my $text = read_file($outname);
 $text =~s/\\newcommand{\\stardoc(.*?)}(.*?){(.*?)}/\\stardoc$1 $2 {$3}/g;
 
 $text =~s/\\newcommand{\\stardocabstract}/\\stardocabstract/g;
@@ -109,19 +111,19 @@ $text =~ s/\n(\s*?)\n(\s*?)}{(\s*?)\n/\n$2}{\n/g;
 $text =~ s/(.*?)\\usepackage(.*?){(.*?)}(.*?)\n/\%$1\\usepackage$2{$3}$4\n/g;
 
 # Write out file again
-write_file("$outname", $text);
+write_file($outname, $text);
 
 #
 # read in file line by line, to remove certain sections
-open INFILE, "$outname" or die "error opening $outname\n";
+open (my $INFILE, $outname) or die "error opening $outname\n";
 
 # Open output file to write to
-open (OUTPUTFILE, ">$outname.temp");
+open ($OUTPUTFILE, ">", "$outname.temp");
 
 
 # Remove hyptertext definitions
 my $echo = 1;
-while ($line=<INFILE>)
+while (my $line=<$INFILE>)
 {
   if ($line=~/\%  Hypertext definitions(.*)/)
     {
@@ -130,7 +132,7 @@ while ($line=<INFILE>)
     }
   if ($echo == 1)
       {
-	print OUTPUTFILE "$line";
+	print $OUTPUTFILE "$line";
       }
     else
       {
@@ -145,21 +147,20 @@ while ($line=<INFILE>)
 
 
 # close file handles.
-close INFILE;
-close OUTPUTFILE;
+close $INFILE;
+close $OUTPUTFILE;
 
 
-# Copy $outname.temp to outname.
-copy("$outname.temp","$outname") or die "Copy failed: $!";
+rename("$outname.temp","$outname") or die "Rename failed: $!";
 
 
 
 
 # Remove latex title
-open INFILE, "$outname" or die "error opening $outname\n";
-open (OUTPUTFILE, ">$outname.temp");
-my $echo = 1;
-while($line=<INFILE>)
+open ($INFILE, "$outname") or die "error opening $outname\n";
+open ($OUTPUTFILE, ">", "$outname.temp");
+$echo = 1;
+while(my $line=<$INFILE>)
   {
     if ($line=~/\%  Latex document header(.*)/)
       {
@@ -168,7 +169,7 @@ while($line=<INFILE>)
       }
     if ($echo == 1)
       {
-	print OUTPUTFILE "$line";
+	print $OUTPUTFILE "$line";
       }
     else
       {
@@ -180,16 +181,16 @@ while($line=<INFILE>)
 	$echo = 1;
       }
   }
-close INFILE;
-close OUTPUTFILE;
-copy ("$outname.temp", "$outname") or die "Copy failed: $!";
+close $INFILE;
+close $OUTPUTFILE;
+rename ("$outname.temp", "$outname") or die "Rename failed: $!";
 
 
 # Remove sst definitions.
-open INFILE, "$outname" or die "error opening $outname\n";
-open (OUTPUTFILE, ">$outname.temp");
-my $echo = 1;
-while($line=<INFILE>)
+open ($INFILE, "$outname") or die "error opening $outname\n";
+open ($OUTPUTFILE, ">", "$outname.temp");
+$echo = 1;
+while(my $line=<$INFILE>)
   {
     if ($line=~/\%(\s*)SST.TEX(.*?)/)
       {
@@ -198,7 +199,7 @@ while($line=<INFILE>)
       }
     if ($echo == 1)
       {
-	print OUTPUTFILE "$line";
+	print $OUTPUTFILE "$line";
       }
     else
       {
@@ -210,26 +211,26 @@ while($line=<INFILE>)
 	$echo = 1;
       }
   }
-close INFILE;
-close OUTPUTFILE;
-copy ("$outname.temp", "$outname") or die "Copy failed: $!";
+close $INFILE;
+close $OUTPUTFILE;
+rename ("$outname.temp", "$outname") or die "Rename failed: $!";
 
 
 # Remove htmlonly sections
-open INFILE, "$outname" or die "error opening $outname\n";
-open (OUTPUTFILE, ">$outname.temp");
-my $echo = 1;
-while($line=<INFILE>)
+open ($INFILE, "$outname") or die "error opening $outname\n";
+open ($OUTPUTFILE, ">", "$outname.temp");
+$echo = 1;
+while(my $line=<$INFILE>)
   {
     if ($line=~/(.*?)\\begin{htmlonly}(.*?)/)
       {
 	print "Removing htmlonly text:\n";
-	print OUTPUTFILE "$1\n";
+	print $OUTPUTFILE "$1\n";
 	$echo = 0;
       }
     if ($echo == 1)
       {
-	print OUTPUTFILE "$line";
+	print $OUTPUTFILE "$line";
       }
     else
       {
@@ -238,14 +239,14 @@ while($line=<INFILE>)
     if ($line=~/(.*?)\\end{htmlonly}(.*?)/)
       {
 	print "Turning echo back on\n\n";
-	print OUTPUTFILE "$2\n";
+	print $OUTPUTFILE "$2\n";
 	$echo = 1;
       }
   }
 
-close INFILE;
-close OUTPUTFILE;
-copy ("$outname.temp", "$outname") or die "Copy failed: $!";
+close $INFILE;
+close $OUTPUTFILE;
+rename ("$outname.temp", "$outname") or die "Rename failed: $!";
 # Remove menu item and classitem
 
 #while($line=<FILE>)
