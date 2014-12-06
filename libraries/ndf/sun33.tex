@@ -1,527 +1,23 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {33.11}
-\newcommand{\stardocauthors}   {R.F.~Warren-Smith \& D.S.~Berry}
-\newcommand{\stardocdate}      {11th November 2014}
-\newcommand{\stardoctitle}     {NDF \\ [\latex{1ex}]
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {33.11}
+\stardocauthors     {R.F.~Warren-Smith \& D.S.~Berry}
+\stardocdate        {11th November 2014}
+\stardoctitle       {NDF \\ [\latex{1ex}]
                                 Routines for Accessing the\\
                                 Extensible N-Dimensional Data Format}
-\newcommand{\stardocversion}   {Version 1.13}
-\newcommand{\stardocmanual}    {Programmer's Manual}
-% ? End of document identification
-% -----------------------------------------------------------------------------
+\stardocversion     {Version 1.13}
+\stardocmanual      {Programmer's Manual}
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\html}[1]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-% Latex only sections, subsections etc. Surround these with a latexonly
-% environment.
-
-\newcommand{\latexonlysection}[1]{\section{#1}}
-\newcommand{\latexonlysubsection}[1]{\subsection{#1}}
-\newcommand{\latexonlysubsubsection}[1]{\subsubsection{#1}}
-\begin{htmlonly}
-   \newcommand{\latexonlysection}[1]{#1}
-   \newcommand{\latexonlysubsection}[1]{#1}
-   \newcommand{\latexonlysubsubsection}[1]{#1}
-\end{htmlonly}
-\newcommand{\st}[1]{{\em{#1}}}
-\newcommand{\hi}[1]{{\tt{#1}}}
-
-% Command for displaying routines in routine lists:
-% =================================================
-
-\newlength{\routineindent}
-\newlength{\routineparboxwidth}
-\newcommand{\noteroutine}[2]{{\small{\bf{#1}}}\nopagebreak\\
-                             \hspace*{3em}\st{#2}\\[1.5ex]}
-\newcommand{\noteroutineC}[3]{\small
-                              \settowidth{\routineindent}{\bf{#1( }}
-                              \setlength{\routineparboxwidth}{\textwidth}
-                              \addtolength{\routineparboxwidth}{-\routineindent}
-                              \hspace*{\routineindent}
-                              \parbox{\routineparboxwidth}
-                                     {\setlength{\parindent}{-\routineindent}
-                                     {\bf{#1#2}}}
-                              \nopagebreak\hspace*{3em}\st{#3}\\[1.5ex]
-                              \normalsize}
-\newcommand{\argbrk}[0]{\\ }
-\begin{htmlonly}
-   \newcommand{\noteroutine}[2]{{\small{\bf{#1}}}\\
-                                  --- \st{#2}\\[1.0ex]}
-   \newcommand{\noteroutineC}[3]{{\bf{#1#2}}\\
-                                  ---\st{#3}\\[1.0ex]}
-   \newcommand{\argbrk}[0]{}
-\end{htmlonly}
-
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
-
-
-
-
-% ? End of document specific commands
-% -----------------------------------------------------------------------------
-%  Title Page.
-%  ===========
-\renewcommand{\thepage}{\roman{page}}
-\begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{15mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%   ==================
+\stardocabstract{%
 The \st{Extensible N-Dimensional Data Format\/} (NDF) is a format for
 storing bulk data in the form of N-dimensional arrays of numbers. It
 is typically used for storing spectra, images and similar datasets
@@ -535,42 +31,48 @@ type.
 This document describes the routines provided for accessing NDF data
 objects. It also discusses all the important NDF concepts and includes
 a selection of simple example applications.
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
- \newpage
- \begin{latexonly}
-   \null\vspace {5mm}
-   \begin {center}
-   \rule{80mm}{0.5mm} \\ [1ex]
-   {\Large\bf \stardoctitle \\ [2.5ex]
-              \stardocversion} \\ [2ex]
-   \rule{80mm}{0.5mm}
-   \end{center}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
- \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-%  Introduction page heading.
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-\begin{latexonly}
-   \null\vspace {5mm}
-   \begin {center}
-   \rule{80mm}{0.5mm} \\ [1ex]
-   {\Large\bf \stardoctitle \\ [2.5ex]
-              \stardocversion} \\ [2ex]
-   \rule{80mm}{0.5mm}
-   \end{center}
+}
 
-% Main text of document.
-   \vspace{30mm}
-\end{latexonly}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% -----------------------------------------------------------------------------
+% ? Document specific \providecommand or \newenvironment commands.
+% Latex only sections, subsections etc. Surround these with a latexonly
+% environment.
+
+\providecommand{\latexonlysection}[1]{\section{#1}}
+\providecommand{\latexonlysubsection}[1]{\subsection{#1}}
+\providecommand{\latexonlysubsubsection}[1]{\subsubsection{#1}}
+
+\providecommand{\st}[1]{{\emph{#1}}}
+\providecommand{\hi}[1]{{\texttt{#1}}}
+
+% Command for displaying routines in routine lists:
+% =================================================
+
+\newlength{\routineindent}
+\newlength{\routineparboxwidth}
+\providecommand{\noteroutine}[2]{{\small{\bf{#1}}}\nopagebreak\\
+                             \hspace*{3em}\st{#2}\\[1.5ex]}
+\providecommand{\noteroutineC}[3]{\small
+                              \settowidth{\routineindent}{\bf{#1( }}
+                              %\setlength{\routineparboxwidth}{\textwidth}
+                              \addtolength{\routineparboxwidth}{-\routineindent}
+                              \hspace*{\routineindent}
+                              \parbox{\routineparboxwidth}
+                                     {%\setlength{\parindent}{-\routineindent}
+                                     {\bf{#1#2}}}
+                              \nopagebreak\hspace*{3em}\st{#3}\\[1.5ex]
+                              \normalsize}
+\providecommand{\argbrk}[0]{\\ }
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\begin{document}
+\scfrontmatter
 
 \section{\xlabel{introduction}INTRODUCTION}
 
@@ -721,16 +223,16 @@ number of other items which are conveniently categorised as follows:
 \begin{quote}
 \begin{center}
 \begin{tabular}{rl@{ --- }l}
-    \st{Character components:} & {\bf TITLE} & NDF title\\
-                                & {\bf LABEL} & Data label\\
-                                & {\bf UNITS} & Data units\\[1ex]
-        \st{Array components:} & {\bf DATA}  & Data pixel values\\
-                                & {\bf VARIANCE} & Pixel variance estimates\\
-                                & {\bf QUALITY} & Pixel quality values\\[1ex]
-\st{Miscellaneous components:} & {\bf AXIS} & Coordinate axes\\
-                                & {\bf WCS} & World coordinate systems\\
-                                & {\bf HISTORY} & Processing history\\[1ex]
-              \st{Extensions:} & {\bf EXTENSION} & Provides extensibility
+    \st{Character components:} & \textbf{TITLE} & NDF title\\
+                                & \textbf{LABEL} & Data label\\
+                                & \textbf{UNITS} & Data units\\[1ex]
+        \st{Array components:} & \textbf{DATA}  & Data pixel values\\
+                                & \textbf{VARIANCE} & Pixel variance estimates\\
+                                & \textbf{QUALITY} & Pixel quality values\\[1ex]
+\st{Miscellaneous components:} & \textbf{AXIS} & Coordinate axes\\
+                                & \textbf{WCS} & World coordinate systems\\
+                                & \textbf{HISTORY} & Processing history\\[1ex]
+              \st{Extensions:} & \textbf{EXTENSION} & Provides extensibility
 \end{tabular}
 \end{center}
 \end{quote}
@@ -749,15 +251,15 @@ slightly more detail.
 
 \begin{description}
 
-\item[{\bf TITLE}] -- This is a character string, whose value is
+\item[\textbf{TITLE}] -- This is a character string, whose value is
 intended for general use as a heading for such things as graphical output;
 \st{e.g.}\ `M51 in good seeing'.
 
-\item[{\bf LABEL}] -- This is a character string, whose value is
+\item[\textbf{LABEL}] -- This is a character string, whose value is
 intended to be used on the axis of graphs to describe the quantity in the
 NDF's \st{data\/} component; \st{e.g.}\ `Surface brightness'.
 
-\item[{\bf UNITS}] -- This is a character string, whose value
+\item[\textbf{UNITS}] -- This is a character string, whose value
 describes the physical units of the quantity stored in the NDF's \st{data\/}
 component; \st{e.g.}\ `J/(m$**$2$*$Ang$*$s)'.
 
@@ -767,18 +269,18 @@ component; \st{e.g.}\ `J/(m$**$2$*$Ang$*$s)'.
 
 \begin{description}
 
-\item[{\bf DATA}] -- This is an N-dimensional array of pixel values
+\item[\textbf{DATA}] -- This is an N-dimensional array of pixel values
 representing the spectrum, image, \st{etc.}\ stored in the NDF.
 This is the only NDF component which must always be present.
 All the others are optional.
 
-\item[{\bf VARIANCE}] -- This is an array of the same shape and size
+\item[\textbf{VARIANCE}] -- This is an array of the same shape and size
 as the \st{data\/} array, and represents the measurement errors or
 uncertainties associated with the individual \st{data\/} values.
 If present, these are always stored as \st{variance\/} estimates for each
 pixel.
 
-\item[{\bf QUALITY}] -- This is an array of the same shape and size as
+\item[\textbf{QUALITY}] -- This is an array of the same shape and size as
 the \st{data\/} array, and holds a set of unsigned byte values.
 These are used to assign additional ``quality'' attributes to each pixel
 (for instance, whether it is part of the active area of a detector).
@@ -793,7 +295,7 @@ software and by specialised applications.
 
 \begin{description}
 
-\item[{\bf AXIS}] -- This component name represents a group of \st{axis\/}
+\item[\textbf{AXIS}] -- This component name represents a group of \st{axis\/}
 components which may be used to describe the shape and position of the NDF's
 pixels in a rectangular coordinate system.
 The physical units and a label for each axis of this coordinate system may
@@ -803,7 +305,7 @@ also be stored.
 \xref{SGP/38}{sgp38}{}, is not yet
 available via the NDF access routines described here.)
 
-\item[{\bf WCS}] -- This component may be used to hold information
+\item[\textbf{WCS}] -- This component may be used to hold information
 about any ``world coordinate systems'' associated with the NDF. These
 may include celestial coordinate systems, such as right ascension and
 declination (in various flavours), but may also represent other
@@ -827,7 +329,7 @@ provides. The NDF\_ library simply provides routines for reading and
 writing this information (see~\htmlref{NDF\_GTWCS}{NDF_GTWCS} and
 \htmlref{NDF\_PTWCS}{NDF_PTWCS}).
 
-\item[{\bf HISTORY}] -- This component may be used to keep a record of
+\item[\textbf{HISTORY}] -- This component may be used to keep a record of
 the processing history which the NDF undergoes.
 If present, this component should be updated by any applications which
 modify the data structure.
@@ -839,7 +341,7 @@ modify the data structure.
 
 \begin{description}
 
-\item[{\bf EXTENSIONs}] are user-defined \xref{HDS
+\item[\textbf{EXTENSIONs}] are user-defined \xref{HDS
 structures}{sun92}{HDS_objects} associated with the NDF, and are used
 to give the data format flexibility by allowing it to be extended.
 Their formulation is not covered by the NDF definition, but a few simple
@@ -969,7 +471,7 @@ If you are interested, a more sophisticated ``add'' application with extra
 commentary can also be found in \S\ref{ss:addexample}.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE ADD( STATUS )                                 [1]
       INCLUDE 'SAE_PAR'                                        [2]
       INTEGER STATUS, EL, NDF1, NDF2, NDF3, PNTR1( 1 ), PNTR2( 1 ), PNTR3( 1 )
@@ -1016,10 +518,10 @@ commentary can also be found in \S\ref{ss:addexample}.
          C( I ) = A( I ) + B( I )
  1    CONTINUE
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
-{\bf Programming notes:}
+\textbf{Programming notes:}
 
 \begin{enumerate}
 
@@ -1129,13 +631,13 @@ The normal method of obtaining access to an NDF for input is via a
 an NDF with the parameter:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER INDF
 
       ...
 
       CALL NDF_ASSOC( 'IN', 'READ', INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, the `IN' is being used to obtain `READ' access to an NDF data structure.
@@ -1158,7 +660,7 @@ details can be found in the reference document \xref{SUN/115}{sun115}{}.
 Here, only a very simple interface file is given as an example:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
    interface PROG              # The name of the application
 
       parameter IN             # The name of the parameter
@@ -1166,7 +668,7 @@ Here, only a very simple interface file is given as an example:
       endparameter
 
    endinterface
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Other parameter entries may also be present in the same file (the text
@@ -1178,9 +680,9 @@ an NDF data structure, most probably simply the name of an
 \xref{HDS}{sun92}{} container file, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
    IN - Input NDF data structure > datafile
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Assuming that the data structure is a valid NDF, NDF\_ASSOC will return an
@@ -1223,9 +725,9 @@ returns a logical value of .TRUE.\ via its VALID argument if the identifier
 supplied is valid:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_VALID( INDF, VALID, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This is the only NDF\_ routine to which an invalid identifier may be passed
@@ -1255,9 +757,9 @@ available for re-use.
 An identifier is annulled using the routine \htmlref{NDF\_ANNUL}{NDF_ANNUL}, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_ANNUL( INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Note that annulling an invalid identifier will produce an error, but this will
@@ -1285,7 +787,7 @@ When NDF\_END is called, it will annul all the NDF identifiers issued since
 the matching call to NDF\_BEGIN, for example:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_BEGIN
       CALL NDF_ASSOC( 'IN1', ... )
       CALL NDF_ASSOC( 'IN2', ... )
@@ -1293,7 +795,7 @@ the matching call to NDF\_BEGIN, for example:
       <allocate more NDF identifiers>
 
       CALL NDF_END( STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 As with IF...END~IF blocks, matching pairs of calls to NDF\_BEGIN and NDF\_END
@@ -1316,9 +818,9 @@ process called \st{cloning}, which is performed by the routine \htmlref{NDF\_CLO
 follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_CLONE( INDF1, INDF2, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This returns a second identifier INDF2 which refers to the same NDF data
@@ -1377,13 +879,13 @@ An NDF's pixel-index bounds and dimensionality may be determined from its
 identifier with the routine \htmlref{NDF\_BOUND}{NDF_BOUND}, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER NDIMX, LBND( NDIMX ), UBND( NDIMX ), NDIM
 
       ...
 
       CALL NDF_BOUND( INDF, NDIMX, LBND, UBND, NDIM, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, the integer arrays LBND and UBND are supplied to receive the lower and
@@ -1405,7 +907,7 @@ For instance, suppose an application expects a 2-dimensional NDF and determines
 the pixel-index bounds as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER LBND( 2 ), UBND( 2 ), NDIM
 
       ...
@@ -1414,7 +916,7 @@ the pixel-index bounds as follows:
       NDIM = 2
 
       ...
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Although this application simply asserts that the NDF is 2-dimensional, it
@@ -1464,13 +966,13 @@ $D = U - L + 1$
 but may be obtained more directly using the routine \htmlref{NDF\_DIM}{NDF_DIM}, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER NDIMX, DIM( NDIMX ), NDIM
 
       ...
 
       CALL NDF_DIM( INDF, NDIMX, DIM, NDIM, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 As with \htmlref{NDF\_BOUND}{NDF_BOUND}, an integer array DIM is provided to receive the returned
@@ -1489,7 +991,7 @@ For instance, a smoothing application might expect an NDF to contain a
 and NY, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER DIM( 2 ), NDIM, NX, NY
 
       ...
@@ -1499,7 +1001,7 @@ and NY, as follows:
       NY = DIM( 2 )
 
       ...
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 No explicit check on the number of NDF dimensions would be necessary.
@@ -1512,9 +1014,9 @@ Many applications require only this information about an NDF's  shape and can
 conveniently obtain it using the routine \htmlref{NDF\_SIZE}{NDF_SIZE}, as  follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_SIZE( INDF, NPIX, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This routine returns the total number of pixels via its integer argument
@@ -1536,10 +1038,10 @@ then passed to another routine where it specifies the size of an adjustable
 array, A:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_SIZE( INDF, NPIX, STATUS )
       CALL DOIT( NPIX, A, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Normally, this will cause no problems.
@@ -1628,13 +1130,13 @@ specifying the component name in a call to the routine \htmlref{NDF\_STATE}{NDF_
 For example:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       LOGICAL STATE
 
       ...
 
       CALL NDF_STATE( INDF, 'Variance', STATE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will return a .TRUE.\ value if the NDF's \st{variance\/} component is defined,
@@ -1649,9 +1151,9 @@ argument, a list of components may also be supplied to NDF\_STATE, for
 example:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_STATE( INDF, 'Dat,Var,Lab', STATE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 In this case, the routine will return the logical ``AND'' of the values
@@ -1679,9 +1181,9 @@ component or a list of components in the same way as \htmlref{NDF\_STATE}{NDF_ST
 For example:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_RESET( INDF, 'Data,Variance,Units', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would reset the state of the three named components, making their values
@@ -1725,14 +1227,14 @@ components.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CHARACTER * ( 80 ) VALUE
 
       ...
 
       VALUE = 'Default label'
       CALL NDF_CGET( INDF, 'Label', VALUE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will obtain the value of the \st{label\/} component, if defined, and return
@@ -1747,10 +1249,10 @@ Thus an application might generate a message about the \st{title\/} of an NDF as
 follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_CMSG( 'TITLE', INDF, 'Title', STATUS )
       CALL MSG_OUT( 'PROG_TITLE', 'NDF title: ^TITLE', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, `TITLE' is the name of a message token (see
@@ -1763,9 +1265,9 @@ components.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_CPUT( 'Surface Brightness', INDF, 'Lab', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will assign the value `Surface Brightness' to the \st{label\/} component,
@@ -1784,11 +1286,11 @@ instance, the following will obtain new values for all three character
 components via suitable parameters and write the values to an NDF:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_CINP( 'LABEL', INDF, 'Label', STATUS )
       CALL NDF_CINP( 'TITLE', INDF, 'Title', STATUS )
       CALL NDF_CINP( 'UNITS', INDF, 'Units', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The first argument to NDF\_CINP specifies the parameter to be used, while
@@ -1812,13 +1314,13 @@ characters it contains) is determined by the last assignment made to it,
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER LENGTH
 
       ...
 
       CALL NDF_CLEN( INDF, 'Units', LENGTH, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will return the number of characters in the \st{units\/} component via the
@@ -1834,9 +1336,9 @@ This routine will also accept a list of components.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_RESET( INDF, 'Title,Label,Units', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will reset all three character components, effectively erasing them.
@@ -1865,7 +1367,7 @@ types, as follows:
 \begin{center}
 \begin{tabular}{|c|c|c|}
 \hline
-{\bf Character String} & {\bf Numeric Type} & {\bf Fortran Type}\\
+\textbf{Character String} & \textbf{Numeric Type} & \textbf{Fortran Type}\\
 \hline \hline
 \hi{'\_DOUBLE'} & Double-precision & \hi{DOUBLE PRECISION}\\
 \hi{'\_REAL'} & Single-precision & \hi{REAL}\\
@@ -1900,14 +1402,14 @@ routine \htmlref{NDF\_TYPE}{NDF_TYPE}.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'NDF_PAR'
       CHARACTER * ( NDF__SZTYP ) TYPE
 
       ...
 
       CALL NDF_TYPE( INDF, 'Data', TYPE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will return the numeric type of an NDF's \st{data\/} component as an upper
@@ -1925,9 +1427,9 @@ an NDF were to be combined, then a suitable numeric type for performing the
 processing could be obtained as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_TYPE( INDF, 'Data,Variance', TYPE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 If the \st{data\/} component held `\_WORD' values and the \st{variance\/}
@@ -1958,9 +1460,9 @@ by using the routine \htmlref{NDF\_CMPLX}{NDF_CMPLX}.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_CMPLX( INDF, 'Variance', CMPLX, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would return a logical .TRUE.\ result via the CMPLX argument if the NDF's
@@ -1970,9 +1472,9 @@ the logical ``OR'' of the results for each component will be returned.
 Thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_CMPLX( INDF, 'Data,Variance', CMPLX, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will return a .TRUE.\ result if either the \st{data\/} or \st{variance\/} component
@@ -2011,14 +1513,14 @@ routine \htmlref{NDF\_FTYPE}{NDF_FTYPE} will return it directly.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'NDF_PAR'
       CHARACTER * ( NDF__SZFTP ) FTYPE
 
       ...
 
       CALL NDF_FTYPE( INDF, 'Data', FTYPE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will return the full type of an NDF's \st{data\/} component as an upper-case
@@ -2034,9 +1536,9 @@ way as the routines \htmlref{NDF\_TYPE}{NDF_TYPE} and \htmlref{NDF\_CMPLX}{NDF_C
 Thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_FTYPE( INDF, 'Data,Variance', FTYPE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will combine the full type specifications of both the \st{data\/} and
@@ -2054,9 +1556,9 @@ This may be done using the routine \htmlref{NDF\_STYPE}{NDF_STYPE}.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_STYPE( '_REAL', INDF, 'Data', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would change the type of an NDF's \st{data\/} component to `\_REAL'.
@@ -2070,10 +1572,10 @@ This is done by calling \htmlref{NDF\_RESET}{NDF_RESET} to reset the component's
 undefined state prior to changing its type, thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_RESET( INDF, 'Data', STATUS )
       CALL NDF_STYPE( '_REAL', INDF, 'Data', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 No attempt will then be made by NDF\_STYPE to convert individual pixel values,
@@ -2087,9 +1589,9 @@ the same type.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_STYPE( 'COMPLEX_DOUBLE', INDF, 'Data,Variance', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would set both the \st{data\/} and \st{variance\/} components of an NDF to be
@@ -2137,13 +1639,13 @@ performed using the routine \htmlref{NDF\_MAP}{NDF_MAP}.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER PNTR( 1 ), EL
 
       ...
 
       CALL NDF_MAP( INDF, 'Data', '_REAL', 'READ', PNTR, EL, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will map an NDF's \st{data\/} component as an array of `\_REAL' (\st{i.e.}\
@@ -2163,7 +1665,7 @@ facility (see below).  Afterwards, access is relinquished by
 following illustrates the process:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER PNTR( 1 ), EL
       REAL SUM
 
@@ -2187,7 +1689,7 @@ following illustrates the process:
          SUM = SUM + ARRAY( I )
  1    CONTINUE
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, the call to NDF\_MAP maps the NDF's \st{data\/} component and returns a
@@ -2212,7 +1714,7 @@ necessary dimension size information, which would then be passed to the
 subroutine which accesses the mapped values, for instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER PNTR( 1 ), EL, DIM( 2 ), NDIM
       REAL SUM
 
@@ -2228,14 +1730,14 @@ subroutine which accesses the mapped values, for instance:
       ...
 
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 In this case, the routine SUMIT would declare the array to have the
 appropriate shape, and access it accordingly, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE SUMIT( NX, NY, ARRAY, SUM )
       INTEGER NX, NY, I
       REAL ARRAY( NX, NY ), SUM
@@ -2247,7 +1749,7 @@ appropriate shape, and access it accordingly, as follows:
  1       CONTINUE
  2    CONTINUE
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The routine NDF\_MAP will also accept a list of component names and will map
@@ -2259,7 +1761,7 @@ NDF  might be mapped for access, passed to a subroutine DOIT for processing, and
 then unmapped:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER PNTR( 2 ), EL
 
       ...
@@ -2269,7 +1771,7 @@ then unmapped:
       CALL NDF_UNMAP( INDF, 'Data,Variance', STATUS )
 
       ...
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Note how NDF\_UNMAP is also provided with a list of components to unmap.
@@ -2295,9 +1797,9 @@ identifier will first be implicitly unmapped.
 The effect is as if:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_UNMAP( INDF, '*', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 had been executed first.
@@ -2322,11 +1824,11 @@ The transfer of these new values back to the NDF is completed when the
 array is unmapped, for instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_MAP( INDF, 'Variance', '_REAL', 'WRITE', PNTR, EL, STATUS )
       CALL SETVAR( EL, %VAL( PNTR( 1 ) ), STATUS )
       CALL NDF_UNMAP( INDF, 'Variance', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, an NDF's \st{variance\/} component is mapped for `WRITE' access and
@@ -2345,7 +1847,7 @@ separate use, and the following describes how they operate in detail:
 
 \begin{description}
 
-\item[{\bf `READ' --}] When an array component is mapped for `READ'
+\item[\textbf{`READ' --}] When an array component is mapped for `READ'
 access, its pre-existing values are read into memory and made available to
 the calling routine (if the component's state is undefined, then an error
 will result since there will be no values to read).
@@ -2355,13 +1857,13 @@ data structure (in fact the values should not be modified, because the
 region of memory used may sometimes be write-protected and this will result
 in a run-time error).
 
-\item[{\bf `UPDATE' --}] When an array component is mapped for `UPDATE' access,
+\item[\textbf{`UPDATE' --}] When an array component is mapped for `UPDATE' access,
 its pre-existing values are read into memory exactly as for `READ' access (an
 error will similarly be produced if the component is in an undefined state).
 When the component is unmapped, any modifications made to the mapped values
 are written back to the NDF, which is therefore permanently modified.
 
-\item[{\bf `WRITE' --}] When an array component is mapped for `WRITE'
+\item[\textbf{`WRITE' --}] When an array component is mapped for `WRITE'
 access, an array is created to receive new values, but no pre-existing
 values are read in.
 Since the mapped array is un-initialised it may contain garbage at this
@@ -2385,9 +1887,9 @@ absence of defined values.
 For instance, if `READ/ZERO' is specified, thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_MAP( INDF, 'Data', '_REAL', 'READ/ZERO', PNTR, EL, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 then NDF\_MAP will read the component's values if available, but instead of
@@ -2430,9 +1932,9 @@ type will be made available.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_MAP( INDF, 'Data', '_WORD', 'READ', PNTR, EL, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will map an array of `\_WORD' (\st{i.e.}\ Fortran INTEGER$*$2) values,
@@ -2449,7 +1951,7 @@ component which is to be mapped and using the same type for access, so that
 type conversion becomes unnecessary, for instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'NDF_PAR'
       CHARACTER * ( NDF__SZTYP ) TYPE
 
@@ -2457,7 +1959,7 @@ type conversion becomes unnecessary, for instance:
 
       CALL NDF_TYPE( INDF, TYPE, STATUS )
       CALL NDF_MAP( INDF, 'Variance', TYPE, 'READ', PNTR, EL, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The application must then be prepared to explicitly process whatever numeric
@@ -2478,13 +1980,13 @@ imaginary parts.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER RPNTR( 1 ), IPNTR( 1 )
 
       ...
 
       CALL NDF_MAPZ( INDF, 'Data', '_DOUBLE', RPNTR, IPNTR, EL, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will return pointers to the real (\st{i.e.}\ non-imaginary\/) and imaginary parts
@@ -2549,9 +2051,9 @@ by specifying a special component name of `Error'.
 For example:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_MAP( INDF, 'Error', '_REAL', 'READ', PNTR, EL, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would return a pointer to a mapped array of single-precision standard
@@ -2561,9 +2063,9 @@ These values should later be unmapped in the usual way, either implicitly,
 or by an explicit call to \htmlref{NDF\_UNMAP}{NDF_UNMAP}, thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_UNMAP( INDF, 'Variance', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 If a mapping mode of `UPDATE' or `WRITE' had been specified, then the mapped
@@ -2698,7 +2200,7 @@ single-precision (\st{i.e.}\ `\_REAL') array A by another B, to give a result
 in the array C:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER I, EL
       REAL A( EL ), B( EL ), C( EL )
 
@@ -2707,7 +2209,7 @@ in the array C:
       DO 1 I = 1, EL
          C( I ) = A( I ) / B( I )
  1    CONTINUE
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This algorithm is obviously flawed, because if any element of B is zero,
@@ -2716,7 +2218,7 @@ However, we can test for this case, and assign \st{bad\/} pixels to affected
 elements of the output array as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
 *  Define the VAL__BADx constants.
       INCLUDE 'PRM_PAR'
 
@@ -2733,7 +2235,7 @@ elements of the output array as follows:
             C( I ) = A( I ) / B( I )
          END IF
  1    CONTINUE
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Subsequent algorithms will then need to recognise these \st{bad\/} pixels and
@@ -2745,7 +2247,7 @@ The above algorithm could therefore be adapted to recognise \st{bad\/} pixels
 in either of the input arrays (A and B) and to propagate them, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'PRM_PAR'
 
       ...
@@ -2765,7 +2267,7 @@ in either of the input arrays (A and B) and to propagate them, as follows:
             C( I ) = A( I ) / B( I )
          END IF
  1    CONTINUE
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Different action may be required in other algorithms, but the process
@@ -2812,9 +2314,9 @@ as follows:
 \begin{quote}
 \begin{center}
 \begin{tabular}{rcl}
-{\bf .FALSE.} & $\Rightarrow$ & \st{There are definitely no bad pixels
+\textbf{.FALSE.} & $\Rightarrow$ & \st{There are definitely no bad pixels
 present}\\
-{\bf .TRUE.} & $\Rightarrow$ & \st{There \underline{may} be bad pixels
+\textbf{.TRUE.} & $\Rightarrow$ & \st{There \underline{may} be bad pixels
 present}
 \end{tabular}
 \end{center}
@@ -2838,13 +2340,13 @@ obtained using the routine \htmlref{NDF\_BAD}{NDF_BAD}.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       LOGICAL BAD
 
       ...
 
       CALL NDF_BAD( INDF, 'Data', .FALSE., BAD, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will return the logical \st{bad\/}-pixel flag for an NDF's \st{data\/} component
@@ -2860,7 +2362,7 @@ array IA might be written to adapt to the absence or possible presence of
 \st{bad\/} pixels as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'PRM_PAR'
       INTEGER EL, IA( EL ), I
       LOGICAL BAD
@@ -2881,7 +2383,7 @@ array IA might be written to adapt to the absence or possible presence of
             END IF
  2       CONTINUE
       END IF
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Note that this example is provided to illustrate the principle only, and
@@ -2897,9 +2399,9 @@ values for each component.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_BAD( INDF, 'Data,Variance', .FALSE., BAD, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would return a logical value indicating whether there may be \st{bad\/}
@@ -2921,9 +2423,9 @@ any additional checks necessary to determine whether \st{bad\/} pixels are
 actually present, for instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_BAD( INDF, 'Data', .TRUE., BAD, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This may involve explicitly examining every pixel, which could take a
@@ -2936,7 +2438,7 @@ interpretation of a .TRUE.\ value changes to become:
 \begin{quote}
 \begin{center}
 \begin{tabular}{rcl}
-{\bf .TRUE.} & $\Rightarrow$ & \st{There is definitely \underline{at least one}
+\textbf{.TRUE.} & $\Rightarrow$ & \st{There is definitely \underline{at least one}
 bad pixel present}
 \end{tabular}
 \end{center}
@@ -2959,7 +2461,7 @@ pixels checks whether there are any present, and aborts with an appropriate
 error message if there are:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'SAE_PAR'
       CALL NDF_BEGIN
 
@@ -2980,7 +2482,7 @@ error message if there are:
  99   CONTINUE
       CALL NDF_END( STATUS )
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, the cost of an explicit check is justified, because the cost of not
@@ -3004,9 +2506,9 @@ values, so the routine \htmlref{NDF\_SBAD}{NDF_SBAD} is provided to explicitly s
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_SBAD( .FALSE., INDF, 'Data', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 constitutes a declaration by the calling routine that the \st{data\/} component
@@ -3027,9 +2529,9 @@ This time, the first (BAD) argument to \htmlref{NDF\_BAD}{NDF_BAD} would be set 
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_SBAD( .TRUE., INDF, 'Data,Variance', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, a simultaneous declaration for both the \st{data\/} and \st{variance\/}
@@ -3107,7 +2609,7 @@ update the bad-pixel flag before unmapping it.}
 The following program fragment shows what action is typically required:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER PNTR1( 1 ), PNTR( 1 ), EL, NBAD
       LOGICAL BAD
 
@@ -3134,7 +2636,7 @@ The following program fragment shows what action is typically required:
 *  Unmap the arrays.
       CALL NDF_UNMAP( INDF1, 'Data', STATUS )
       CALL NDF_UNMAP( INDF2, 'Data', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 In this example, a single input \st{data\/} array is being processed to produce a
@@ -3227,9 +2729,9 @@ For instance, the following call maps it for read access in exactly the same
 way that the NDF's \st{data\/} component might be accessed:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_MAP( INDF, 'Quality', '_UBYTE', 'READ', PNTR, EL STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Note that when accessing the \st{quality\/} array in this way a numeric type
@@ -3272,13 +2774,13 @@ The value of the bad-bits mask for an NDF is obtained by calling the routine
 \htmlref{NDF\_BB}{NDF_BB}:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       BYTE BADBIT
 
       ...
 
       CALL NDF_BB( INDF, BADBIT, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The returned result BADBIT is an \st{unsigned byte\/} number.
@@ -3288,9 +2790,9 @@ not previously been set, then a value of zero is returned.
 A new value for the bad-bits mask may be set with the routine \htmlref{NDF\_SBB}{NDF_SBB}:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_SBB( BADBIT, INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 By definition, the \st{quality\/} value of an individual pixel QUAL is
@@ -3308,9 +2810,9 @@ In Fortran implementations which support bit-wise operations, the
 logical value might be computed as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       OK = IIAND( IZEXT( QUAL ), IZEXT( BADBIT ) ) .EQ. 0
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 where a .FALSE.\ result indicates a \st{bad\/} pixel.
@@ -3333,18 +2835,18 @@ NDF\_FUNC\_DEF (in this order) which respectively declare and define the
 function.}
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'NDF_FUNC'
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Conversion of the \st{quality\/} value into a logical value is then performed by
 the function as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       OK = NDF_QMASK( QUAL, BADBIT )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The following example shows how a simple loop to find the average value of
@@ -3352,7 +2854,7 @@ a pixel in an image array DATA might be written so as to take account of
 associated \st{quality\/} values, and exclude affected pixels:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       BYTE QUAL( NX, NY )
       INTEGER NGOOD, NX, NY, I, J
       REAL DATA( NX, NY ), SUM, AVERAG
@@ -3372,7 +2874,7 @@ associated \st{quality\/} values, and exclude affected pixels:
  2    CONTINUE
 
       IF ( NGOOD .GT. 0 ) AVERAG = SUM / REAL( NGOOD )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 As an alternative to the above explicit conversion of \st{quality\/} values into
@@ -3381,9 +2883,9 @@ already converted into this form by calling the routine \htmlref{NDF\_MAPQL}{NDF
 follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_MAPQL( INDF, PNTR, EL, BAD, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This routine returns a pointer to a mapped array of logical values which are
@@ -3449,13 +2951,13 @@ This indicates why it may be more efficient to map both the \st{data\/} and
 \st{variance\/} components in a single call to \htmlref{NDF\_MAP}{NDF_MAP}, e.g:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER PNTR( 2 ), EL
 
       ...
 
       CALL NDF_MAP( INDF, 'Data,Variance', '_REAL', 'READ', PNTR, EL, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 which returns a pair of pointers in the PNTR array.
@@ -3495,7 +2997,7 @@ the \st{quality\/} component.
 The following sequence of operations might be typical:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_MAP( INDF, 'Quality', '_UBYTE', 'READ', QPNTR, EL, STATUS )
       CALL NDF_MAP( INDF, 'Data', '_REAL', 'READ', DPNTR, EL, STATUS )
 
@@ -3506,7 +3008,7 @@ The following sequence of operations might be typical:
       ...
 
       CALL NDF_UNMAP( INDF, 'Quality,Data', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, the \st{quality\/} masking flag is set to .FALSE.\ by the first call to
@@ -3520,21 +3022,21 @@ The value of the \st{quality\/} masking flag associated with an NDF identifier
 may be determined at any time with the routine \htmlref{NDF\_QMF}{NDF_QMF}:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       LOGICAL QMF
 
       ...
 
       CALL NDF_QMF( INDF, QMF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 and a new value may be set with the routine \htmlref{NDF\_SQMF}{NDF_SQMF}:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_SQMF( QMF, INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This allows the normal behaviour to be over-ridden if necessary.
@@ -3543,10 +3045,10 @@ without automatic \st{quality\/} masking occurring, then masking could be
 disabled as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_SQMF( .FALSE., INDF, STATUS )
       CALL NDF_MAP( INDF, 'Data', '_REAL', 'UPDATE', PNTR, EL, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \S\ref{ss:tracingndf} contains an example of this technique in use.
@@ -3646,9 +3148,9 @@ determined using the routine \htmlref{NDF\_XSTAT}{NDF_XSTAT}.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_XSTAT( INDF, 'IRAS', THERE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will return a .TRUE.\ value via the logical argument THERE if an extension
@@ -3657,13 +3159,13 @@ If it is, then it can be accessed using the routine \htmlref{NDF\_XLOC}{NDF_XLOC
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CHARACTER * ( DAT__SZLOC ) LOC
 
       ...
 
       CALL NDF_XLOC( INDF, 'IRAS', 'READ', LOC, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will return an \xref{HDS locator}{sun92}{using_locators} to the
@@ -3686,7 +3188,7 @@ For instance, the value of an integer component called OFFSET within the
 `IRAS' extension could be obtained as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CHARACTER * ( DAT__SZLOC ) LOC
       INTEGER OFFSET
 
@@ -3695,7 +3197,7 @@ For instance, the value of an integer component called OFFSET within the
       CALL NDF_XLOC( INDF, 'IRAS', 'READ', LOC, STATUS )
       CALL CMP_GET0I( LOC, 'OFFSET', OFFSET, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Note that the extension locator LOC must be annulled using the routine
@@ -3713,9 +3215,9 @@ extension could also be performed with a single call to NDF\_XGT0I, as
 follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_XGT0I( INDF, 'IRAS', 'OFFSET', OFFSET, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 These routines also have the advantage that they will accept a
@@ -3726,9 +3228,9 @@ elements of non-scalar components and extensions may be accessed. For
 example:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_XGT0C( INDF, 'FITS', '(13)', RECORD, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Would read the 13th element from a `FITS' extension which consists of
@@ -3742,13 +3244,13 @@ shape}{sun92}{HDS_objects}.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CHARACTER * ( DAT__SZLOC ) LOC
 
       ...
 
       CALL NDF_XNEW( INDF, 'IRAS', 'IRAS_EXTENSION', 0, 0, LOC, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would create a new scalar `IRAS' extension with an HDS type of
@@ -3766,7 +3268,7 @@ called ANGLE in a newly-created `IRAS' extension, the following calls might
 be used:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CHARACTER * ( DAT__SZLOC ) LOC
       REAL ANGLE
 
@@ -3776,7 +3278,7 @@ be used:
       CALL CMP_MOD( LOC, 'ANGLE', '_REAL', 0, 0, STATUS )
       CALL CMP_PUT0R( LOC, 'ANGLE', 30.5, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, the call to \xref{CMP\_MOD}{sun92}{CMP_MOD} ensures that the
@@ -3796,9 +3298,9 @@ extension can therefore be performed with a single call to NDF\_XPT0R, as
 follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_XPT0R( ANGLE, INDF, 'IRAS', 'ANGLE', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 As with the \htmlref{NDF\_XGT0x}{NDF_XGT0x} routines (see
@@ -3837,7 +3339,7 @@ routine may be used to obtain mapped access to an array, so that the process of
 accessing the temperature data might be as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
 *  Obtain a locator to the extension.
       CALL NDF_XLOC( INDF, 'INSTR_EXTN', 'READ', LOC, STATUS )
 
@@ -3852,7 +3354,7 @@ accessing the temperature data might be as follows:
 *  Clean up.
       CALL ARY_ANNUL( IARY, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, the integer value IARY is an ARY\_ system identifier, analogous to an NDF
@@ -3863,14 +3365,14 @@ routine \htmlref{NDF\_XIARY}{NDF_XIARY}, which combines the process of locating 
 finding the array into a single call, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_XIARY( INDF, 'INSTR_EXTN', 'TEMPERATURE', 'READ', IARY, STATUS )
       CALL ARY_MAP( IARY, '_REAL', 'READ', PNTR, EL, STATUS )
 
       <access the mapped array values>
 
       CALL ARY_ANNUL( IARY, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 An additional advantage of this latter method is that NDF\_XIARY will
@@ -3887,9 +3389,9 @@ Specific extensions may be deleted from an NDF using the routine \htmlref{NDF\_X
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_XDEL( INDF, 'IRAS', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would delete the `IRAS' extension, if present, together with its contents.
@@ -3902,13 +3404,13 @@ extensions by specifying a component name of `Extension'.
 Thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       LOGICAL STATE
 
       ...
 
       CALL NDF_STATE( INDF, 'Extension', STATE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will return a .TRUE.\ value via the STATE argument if one or more extensions
@@ -3918,13 +3420,13 @@ The actual number of extensions present can be determined using the routine
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER NEXTN
 
       ...
 
       CALL NDF_XNUMB( INDF, NEXTN, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will return the number of extensions via the NEXTN argument.
@@ -3933,14 +3435,14 @@ using the routine \htmlref{NDF\_XNAME}{NDF_XNAME}.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CHARACTER * ( NDF__SZXNM ) XNAME
       INTEGER N
 
       ...
 
       CALL NDF_XNAME( INDF, N, XNAME, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will return the name of the N'th extension in upper-case via the XNAME
@@ -3954,14 +3456,14 @@ As an example, the following loop will list the names of all the extensions
 in an NDF:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_XNUMB( INDF, NEXTN, STATUS )
       DO 1 I = 1, NEXTN
          CALL NDF_XNAME( INDF, I, XNAME, STATUS )
          CALL MSG_SETC( 'NAME', XNAME )
          CALL MSG_OUT( 'NAME', '^NAME', STATUS )
  1    CONTINUE
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 
@@ -3995,14 +3497,14 @@ routine \htmlref{NDF\_FORM}{NDF_FORM}.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'NDF_PAR'
       CHARACTER * ( NDF__SZFRM ) FORM
 
       ...
 
       CALL NDF_FORM( INDF, 'Data', FORM, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will return the storage form of an NDF's \st{data\/} component as an
@@ -4039,9 +3541,9 @@ component are a scaled form of the external values of interest to
 application code. Specifically, the internal scaled values are related to
 the external unscaled values via:
 
-\begin{verbatim}
+\begin{terminalv}
          (unscaled value) = ZERO + (scaled value) * SCALE
-\end{verbatim}
+\end{terminalv}
 
 where ZERO and SCALE are two constant values stored with the array. In
 all other respects, a scaled array is exactly like a simple array.
@@ -4264,7 +3766,7 @@ following simple example which obtains a new value for an NDF's \st{title\/}
 component:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE TITLE( STATUS )
       INTEGER STATUS, INDF
 
@@ -4273,7 +3775,7 @@ component:
       CALL NDF_CINP( 'TITLE', INDF, 'Title', STATUS )
       CALL NDF_ANNUL( INDF, STATUS )
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The same principle would also be used to write a new NDF \st{data\/}
@@ -4295,13 +3797,13 @@ The \htmlref{NDF\_CREAT}{NDF_CREAT} routine will perform this task.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER NDIM, LBND( NDIM ), UBND( NDIM )
 
       ...
 
       CALL NDF_CREAT( 'OUT', '_REAL', NDIM, LBND, UBND, INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will create a new NDF and associate it with the parameter `OUT'.  If
@@ -4333,7 +3835,7 @@ than re-prompting the user to supply a new name.
 The following illustrates how NDF\_EXIST might be used:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'NDF_PAR'
 
       ...
@@ -4342,7 +3844,7 @@ The following illustrates how NDF\_EXIST might be used:
       IF ( INDF .EQ. NDF__NOID ) THEN
          CALL NDF_CREAT( 'OUT', '_INTEGER', NDIM, LBND, UBND, INDF, STATUS )
       END IF
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, an existing NDF is accessed if it exists, otherwise a new structure
@@ -4362,9 +3864,9 @@ dimensions, so NDF\_CREP lacks the LBND argument of NDF\_CREAT, the
 appropriate lower bounds being assumed:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_CREP( 'OUT', '_REAL', NDIM, UBND, INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Its use is otherwise identical to NDF\_CREAT.
@@ -4420,7 +3922,7 @@ This then dictates the action which should be taken, as follows:
 
 \begin{enumerate}
 
-\item {\bf Process it.}
+\item \textbf{Process it.}
 \st{Any component which an application is capable of processing must be
 processed in such a way that its validity is maintained.}
 
@@ -4437,7 +3939,7 @@ below (and is simply ignored).
 \end{quote}
 \normalsize
 
-\item {\bf Propagate it.}
+\item \textbf{Propagate it.}
 \st{Any components which will not be rendered invalid by the processing
 can be propagated without change.}
 
@@ -4453,7 +3955,7 @@ components in the same way.
 \end{quote}
 \normalsize
 
-\item {\bf Ignore it.}
+\item \textbf{Ignore it.}
 {Any remaining components whose subsequent validity is in any doubt
 \underline{must} be ignored, \underline{never} propagated.}
 
@@ -4500,7 +4002,7 @@ optimistic lines, as follows:
 
 \begin{enumerate}
 
-\item {\bf Process it.}
+\item \textbf{Process it.}
 \st{If an application recognises an extension, and can process it, then it
 should ensure that its validity is maintained.}
 
@@ -4513,7 +4015,7 @@ performs, making changes to the extension to achieve this if necessary.
 \end{quote}
 \normalsize
 
-\item {\bf Suppress it.}
+\item \textbf{Suppress it.}
 \st{If an application recognises an extension but cannot process it, then
 propagation should be suppressed.}
 
@@ -4527,7 +4029,7 @@ extension so that it is lost from the output data structure.
 \end{quote}
 \normalsize
 
-\item {\bf Propagate it.}
+\item \textbf{Propagate it.}
 \st{Any extension which is not recognised will be propagated by default.}
 
 \small
@@ -4574,9 +4076,9 @@ components (and extensions) in the new NDF.
 For example:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_PROP( INDF1, ' ', 'OUT', INDF2, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will create a new output NDF, associate it with the parameter `OUT' and
@@ -4617,9 +4119,9 @@ components can be specified by listing them in the CLIST argument to
 \htmlref{NDF\_PROP}{NDF_PROP}, thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_PROP( INDF1, 'Axis,Qual,Var', 'OUT', INDF2, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 These components would then be copied to the output NDF and would not need
@@ -4634,9 +4136,9 @@ prefix `NO' in the CLIST argument to NDF\_PROP.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_PROP( INDF1, 'Quality,NoLab', 'OUT', INDF2, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would force propagation of the \st{quality\/} component, but inhibit the
@@ -4650,9 +4152,9 @@ extensions to be omitted between the parentheses.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_PROP( INDF1, 'Axis,Noext(IRAS,ASTERIX)', 'OUT', INDF2, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would force propagation of the \st{axis\/} components, but inhibit the
@@ -4668,17 +4170,17 @@ efficient and may lead to an unnecessarily large output file.
 An asterisk may be used to indicate ``all extensions''. Thus
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_PROP( INDF1, 'Axis,Noext(*)', 'OUT', INDF2, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would inhibit the propagation of all extensions. Likewise,
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_PROP( INDF1, 'Axis,Noext(*),Ext(IRAS)', 'OUT', INDF2, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would propagate just the IRAS extension.
@@ -4714,13 +4216,13 @@ An NDF section may be created using the routine \htmlref{NDF\_SECT}{NDF_SECT}.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER NDIM, LBND( NDIM ), UBND( NDIM )
 
       ...
 
       CALL NDF_SECT( INDF1, NDIM, LBND, UBND, INDF2, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will create an NDF section starting from an NDF with identifier INDF1, and
@@ -4774,9 +4276,9 @@ NDF section using the routine \htmlref{NDF\_ISBAS}{NDF_ISBAS}.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_ISBAS( INDF, ISBAS, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will return a logical value of .TRUE.\ via the ISBAS argument if the
@@ -4785,9 +4287,9 @@ It is also possible to obtain an identifier for the base NDF to which an NDF
 section refers by using the routine \htmlref{NDF\_BASE}{NDF_BASE}, thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_BASE( INDF1, INDF2, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 However, this routine should be used sparingly because it tends to subvert
@@ -4978,13 +4480,13 @@ using the routine \htmlref{NDF\_SAME}{NDF_SAME}.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       LOGICAL SAME, ISECT
 
       ...
 
       CALL NDF_SAME( INDF1, INDF2, SAME, ISECT, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will return a .TRUE.\ value via the SAME argument if the two NDF identifiers
@@ -5053,7 +4555,7 @@ successive \st{chunks\/}). The following illustrates how these routines
 might be used:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER ICHUNK, ICH, MXPIX, NCHUNK
       PARAMETER ( MXPIX = 10000 )
 
@@ -5071,7 +4573,7 @@ might be used:
 *  Annul the section identifier.
          CALL NDF_ANNUL( ICH, STATUS )
  1    CONTINUE
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, MXPIX is set equal to the maximum number of pixels which a
@@ -5118,7 +4620,7 @@ used to apply a smoothing algorithm to each image in a 3-dimensional stack
 without needing to access the entire NDF at once:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
 *  Obtain the input NDF shape and set MXPIX.
       CALL NDF_DIM( INDF, NDF__MXDIM, DIM, NDIM, STATUS )
       MXPIX = DIM( 1 ) * DIM( 2 )
@@ -5146,7 +4648,7 @@ without needing to access the entire NDF at once:
 *  End the NDF context.
          CALL NDF_END( STATUS )
  1    CONTINUE
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Note the use of an NDF context to simplify ``cleaning up'' after processing
@@ -5184,7 +4686,7 @@ while \htmlref{NDF\_BLOCK}{NDF_BLOCK} creates the NDF sections which refer to th
 following illustrates the principle:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER IBLOCK, IBL, MXDIM( 2 ), NBLOCK
       DATA MXDIM / 100, 100 /
 
@@ -5202,7 +4704,7 @@ following illustrates the principle:
 *  Annul the section identifier.
          CALL NDF_ANNUL( IBL, STATUS )
  1    CONTINUE
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 In this 2-dimensional example, each \st{block\/} is constrained so as not to
@@ -5227,28 +4729,28 @@ the integer array DIM holds the original NDF dimensions, then the
 assignment:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       MXDIM( 1 ) = DIM( 1 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 could be used to step through an image in ``lines'', while the
 assignment:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       MXDIM( 1 ) = DIM( 1 )
       MXDIM( 2 ) = DIM( 2 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would step through a 3-dimensional image stack in ``planes''. The assignment:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       MXDIM( 1 ) = 1
       MXDIM( 2 ) = DIM( 2 )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 could also be used to step through an image in ``columns'', but note
@@ -5265,17 +4767,17 @@ processed. To see how this works, consider an application which
 requests access to an NDF data structure as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_ASSOC( 'IN', 'READ', INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 and suppose this results in a prompt asking for the name of an NDF:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
    IN - Input NDF data structure > name
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 If you were to respond simply with the name of an \xref{HDS}{sun92}{}
@@ -5284,9 +4786,9 @@ NDF identifier for the specified data structure via its INDF
 argument. However, if a set of subscripts is also supplied, thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
    IN - Input NDF data structure > name(3:256,-8:4)
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 then NDF\_ASSOC will return an identifier for the specified NDF section
@@ -5490,7 +4992,7 @@ on both pixel axes, either of the following sections could be used:
 \normalsize
 
 
-\subsection{\xlabel{changing_dimensionality}Changing Dimensionality}
+\subsection{\xlabel{changing_dimensionality_subscripts}Changing Dimensionality}
 
 The number of dimensions given when specifying an NDF section need not
 necessarily correspond with the actual number of NDF dimensions, although
@@ -5640,7 +5142,7 @@ reduced to two by \st{merging\/} the \st{bad\/}-pixel flags of the separate
 array components using a logical ``OR'', for instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       LOGICAL BAD1, BAD2, BAD
 
       ...
@@ -5650,7 +5152,7 @@ array components using a logical ``OR'', for instance:
       BAD = BAD1 .OR. BAD2
 
       ...
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The resulting value of BAD could then be used to determine whether checks
@@ -5659,7 +5161,7 @@ For instance, if the two \st{data\/} arrays were to be added, the main
 processing algorithm might look like this:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE ADDIT( BAD, EL, A, B, C, STATUS )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
@@ -5689,7 +5191,7 @@ processing algorithm might look like this:
  2       CONTINUE
       END IF
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Although this is the most sophisticated response to the presence of
@@ -5730,13 +5232,13 @@ Its first (BADOK) argument is supplied with a logical value indicating whether
 the calling application can handle \st{bad\/} pixels or not, for instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       LOGICAL BADOK, CHECK, BAD
 
       ...
 
       CALL NDF_MBAD( BADOK, INDF1, INDF2, 'Data', CHECK, BAD, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 If the BADOK argument is set to .TRUE., then NDF\_MBAD simply returns
@@ -5767,13 +5269,13 @@ array.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER N, NDFS( N )
 
       ...
 
       CALL NDF_MBADN( .FALSE., N, NDFS, 'Data', .TRUE., BAD, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 could be used by an application which was incapable of handling \st{bad\/}
@@ -5785,9 +5287,9 @@ The routine NDF\_MBADN may be called with N set to 1, but NDF\_MBAD may also
 be used by passing the same identifier value twice, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_MBAD( BADOK, INDF1, INDF1, COMP, CHECK, BAD, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 NDF\_MBAD is designed to expect this kind of usage, and will detect it and
@@ -5859,9 +5361,9 @@ appropriate NDF sections, may be performed using the routine \htmlref{NDF\_MBND}
 which matches the bounds of a pair of NDFs, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_MBND( 'TRIM', INDF1, INDF2, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 If necessary, NDF\_MBND will annul the NDF identifiers supplied and replace
@@ -5877,13 +5379,13 @@ This will match the bounds of an arbitrary number of NDFs, whose
 identifiers should be held in an integer array, for instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER N, NDFS( N )
 
       ...
 
       CALL NDF_MBNDN( 'TRIM', N, NDFS, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This routine will create sections with matching bounds from each NDF
@@ -5899,10 +5401,10 @@ identifiers passed to them.
 For example:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_CLONE( INDF1, INDFK, STATUS )
       CALL NDF_MBND( 'TRIM', INDF1, INDF2, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would ensure that an identifier INDFK is retained for the NDF whose original
@@ -5917,9 +5419,9 @@ NDF\_MBND or NDF\_MBNDN.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_MBND( 'PAD', INDF1, INDF2, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 In this case, the NDF sections produced may represent super-sets of the
@@ -5936,7 +5438,7 @@ following lines, where an output pixel value is generated if either or both
 input pixels are valid:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER EL, I
       REAL A( EL ), B( EL ), C( EL )
       INCLUDE 'PRM_PAR'
@@ -5959,7 +5461,7 @@ input pixels are valid:
             C( I ) = B( I )
          END IF
  1    CONTINUE
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 When using the `TRIM' option, the output NDF may be smaller than either of
@@ -6015,14 +5517,14 @@ invoke in a particular case, depending on the declared capabilities of an
 application, for instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'NDF_PAR'
       CHARACTER ITYPE * ( NDF__SZTYP ), DTYPE * ( NDF__SZFTP )
 
       ...
 
       CALL NDF_MTYPE( '_REAL,_DOUBLE', INDF1, INDF2, 'Data', ITYPE, DTYPE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The first (TYPLST) argument is a list of the numeric types which the
@@ -6041,7 +5543,7 @@ argument to \htmlref{NDF\_MAP}{NDF_MAP} for accessing the NDFs' values, as well 
 which version of the main algorithm to invoke, for instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_MTYPE( '_REAL,_DOUBLE', INDF1, INDF2, 'Data', ITYPE, DTYPE, STATUS )
 
 *  Access the input array values using the selected implementation type.
@@ -6054,7 +5556,7 @@ which version of the main algorithm to invoke, for instance:
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          <invoke the double-precision algorithm>
       END IF
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The NDF\_MTYPE routine also addresses the question of how to store the
@@ -6069,11 +5571,11 @@ which has already been created by a call to \htmlref{NDF\_PROP}{NDF_PROP} (see \
 for instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_PROP( INDF1, ' ', 'OUT', INDF3, STATUS )
       CALL NDF_MTYPE( '_REAL,_DOUBLE', INDF1, INDF2, 'Dat,Var', ITYPE, DTYPE, STATUS )
       CALL NDF_STYPE( DTYPE, INDF3, 'Dat,Var', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, a new output NDF is created based on the first input NDF by using
@@ -6094,13 +5596,13 @@ matching the numeric types of an arbitrary number of NDFs, whose identifiers
 are supplied in an integer array, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER N, NDFS( N )
 
       ...
 
       CALL NDF_MTYPN( '_INTEGER,_REAL', N, NDFS, 'Data', ITYPE, DTYPE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Both this routine and NDF\_MTYPE will report an error and set STATUS to
@@ -6116,7 +5618,7 @@ ignoring the error condition.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'NDF_ERR'
 
       ...
@@ -6125,7 +5627,7 @@ For instance:
       CALL NDF_MTYPE( '_REAL', INDF1, INDF1, 'Data', ITYPE, DTYPE, STATUS )
       IF ( STATUS .EQ. NDF__TYPNI ) CALL ERR_FLUSH( STATUS )
       CALL ERR_RLSE
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, the error system routine \xref{ERR\_FLUSH}{sun104}{ERR_FLUSH}
@@ -6182,7 +5684,7 @@ have its ``lower'' and ``upper'' corners located at positions (0.0,0.0) and
 \begin{quote}
 \begin{center}
 
-\setlength{\unitlength}{1.0mm}
+%\setlength{\unitlength}{1.0mm}
 \begin{picture}(15,25)(0,-7.5)
 
 \thicklines
@@ -6220,7 +5722,7 @@ follows:
 \begin{quote}
 \begin{center}
 
-\setlength{\unitlength}{0.65mm}
+%\setlength{\unitlength}{0.65mm}
 \begin{picture}(70,57)(-10,-7)
 
 \multiput(10,10)(0,3){11}{\line(1,0){45}}
@@ -6229,9 +5731,9 @@ follows:
 
 \thicklines
 \put(0,0){\vector(1,0){60}}
-\put(25,-5){\bf Axis 1}
+\put(25,-5)\textbf{Axis 1}
 \put(0,0){\vector(0,1){45}}
-\put(0,48){\makebox(0,0)[b]{\bf Axis 2}}
+\put(0,48){\makebox(0,0)[b]\textbf{Axis 2}}
 
 \end{picture}
 \end{center}
@@ -6294,7 +5796,7 @@ each \st{axis:}
 \small
 \begin{quote}
 \begin{center}
-\setlength{\unitlength}{0.65mm}
+%\setlength{\unitlength}{0.65mm}
 \begin{picture}(90,80)(-15,-15)
 
 %  Pixel array with label above.
@@ -6337,9 +5839,9 @@ each \st{axis:}
 %  Axis vectors and labels.
 \thicklines
 \put(-10,-10){\vector(1,0){80}}
-\put(25,-15){\bf Axis 1}
+\put(25,-15)\textbf{Axis 1}
 \put(-10,-10){\vector(0,1){65}}
-\put(-10,58){\makebox(0,0)[b]{\bf Axis 2}}
+\put(-10,58){\makebox(0,0)[b]\textbf{Axis 2}}
 
 \end{picture}
 \end{center}
@@ -6727,14 +6229,14 @@ The state of an \st{axis\/} component may be determined by using the routine
 about which information is required, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER IAXIS
       LOGICAL STATE
 
       ...
 
       CALL NDF_ASTAT( INDF, 'Width', IAXIS, STATE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 In this example, a .TRUE. result would be returned via the logical STATE
@@ -6756,9 +6258,9 @@ that all the NDF's axes should be considered at the same time.  Thus,
 the single call:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_ASTAT( INDF, 'Label,Units', 0, STATE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 could be used to determine whether all the NDF's axes had
@@ -6803,9 +6305,9 @@ The routine \htmlref{NDF\_STATE}{NDF_STATE} can be used to test whether or not a
 coordinate system is defined by using a component name of `Axis', thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_STATE( INDF, 'Axis', STATE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 A .TRUE. value will be returned via the logical STATE argument if the
@@ -6818,9 +6320,9 @@ NDF's \st{axis\/} arrays, thereby defining a default \st{axis\/}
 coordinate system, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_ACRE( INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 If the \st{axis\/} coordinate system is already defined, then all the
@@ -6852,9 +6354,9 @@ The \st{axis\/} coordinate system of an NDF may be reset by specifying the
 component name `Axis' in a call to \htmlref{NDF\_RESET}{NDF_RESET}, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_RESET( INDF, 'Axis', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This will cause all the NDF's \st{axis\/} components to become undefined,
@@ -6867,9 +6369,9 @@ The routine \htmlref{NDF\_AREST}{NDF_AREST} is also provided for resetting indiv
 Thus, a particular \st{axis variance\/} array could be reset as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_AREST( INDF, 'Variance', IAXIS, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 and any subsequent attempt to read from it would result in the default
@@ -6881,9 +6383,9 @@ apply to all the NDF's axes at once.
 Thus, the following call:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_AREST( INDF, 'Wid,Var', 0, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would reset all of an NDF's \st{axis width\/} and \st{variance\/} arrays.
@@ -6906,14 +6408,14 @@ The value of either of these \st{axis\/} components may be obtained by
 calling the routine \htmlref{NDF\_ACGET}{NDF_ACGET}, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CHARACTER * ( 80 ) VALUE
 
       ...
 
       VALUE = 'Default label'
       CALL NDF_ACGET( INDF, 'Label', IAXIS, VALUE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This will return the value of the specified component, if it is defined.
@@ -6933,11 +6435,11 @@ Thus, a message showing the \st{label\/} and \st{units\/} values for a
 particular NDF \st{axis\/} could be generated as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_ACMSG( 'LABEL', INDF, 'Label', IAXIS, STATUS )
       CALL NDF_ACMSG( 'UNITS', INDF, 'Units', IAXIS, STATUS )
       CALL MSG_OUT( 'MESSAGE', '^LABEL (^UNITS)', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, `LABEL' and `UNITS' are the names of message tokens (see
@@ -6948,10 +6450,10 @@ routine \htmlref{NDF\_ACPUT}{NDF_ACPUT}.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_ACPUT( 'Wavelength', INDF, 'Lab', 1, STATUS )
       CALL NDF_ACPUT( 'nm', INDF, 'Unit', 1, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would assign the \st{label\/} value `Wavelength' and the \st{units\/} value
@@ -6977,13 +6479,13 @@ characters it contains) is determined by the last assignment made to it,
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER LENGTH
 
       ...
 
       CALL NDF_ACLEN( INDF, 'Units', IAXIS, LENGTH, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will return the number of characters in the specified \st{axis units\/}
@@ -7004,13 +6506,13 @@ Thus, to read values from an NDF's \st{axis centre\/} array, the following
 call might be used:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER PNTR( 1 ), EL
 
       ...
 
       CALL NDF_AMAP( INDF, 'Centre', IAXIS, '_REAL', 'READ', PNTR, EL, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, a numeric type of `\_REAL' has been specified to indicate that an
@@ -7042,7 +6544,7 @@ particular NDF dimension could be obtained using this facility, and then
 passed to another routine for processing:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER PNTR( 3 ), EL
 
       ...
@@ -7051,7 +6553,7 @@ passed to another routine for processing:
      :               STATUS )
       CALL DOAXIS( EL, %VAL( PNTR( 1 ) ), %VAL( PNTR( 2 ) ), %VAL( PNTR( 3 ) ),
      :             STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Note that it is not possible to map \st{axis\/} arrays for all the
@@ -7075,9 +6577,9 @@ Alternatively, the routine \htmlref{NDF\_UNMAP}{NDF_UNMAP} may be used by specif
 name of `Axis', as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_UNMAP( INDF, 'Axis', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This will unmap all \st{axis\/} arrays which are mapped.
@@ -7089,9 +6591,9 @@ If \st{axis\/} arrays are to be unmapped individually, then the routine
 Thus,
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_AUNMP( INDF, 'Width', IAXIS, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 might be used to unmap a particular \st{axis width\/} array.
@@ -7103,17 +6605,17 @@ unmapping operation is to be applied to all the NDF's axes.
 Thus,
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_AUNMP( INDF, '*', 1, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would unmap all the \st{axis\/} arrays for \st{axis\/} 1 of an NDF, while:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_AUNMP( INDF, 'Centre', 0, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would unmap the \st{centre\/} array for all of the axes.
@@ -7130,7 +6632,7 @@ for write access, passed to a routine SETVAL which assigns values to it, and
 then unmapped:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER PNTR( 1 ), EL
 
       ...
@@ -7153,7 +6655,7 @@ then unmapped:
          WIDTH( I ) = VALUE
  1    CONTINUE
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 When using update access, NDF\_AMAP will ensure that the mapped array is
@@ -7194,13 +6696,13 @@ The value of an \st{axis\/} normalisation flag
 \htmlref{NDF\_ANORM}{NDF_ANORM}, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       LOGICAL NORM
 
       ...
 
       CALL NDF_ANORM( INDF, IAXIS, NORM, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This will return the normalisation flag value for the specified \st{axis\/}
@@ -7214,9 +6716,9 @@ A new value for an \st{axis\/} normalisation flag may be set by using the
 \htmlref{NDF\_ASNRM}{NDF_ASNRM} routine, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_ASNRM( NORM, INDF, IAXIS, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The new flag value is supplied via the NORM argument.
@@ -7245,14 +6747,14 @@ The routine \htmlref{NDF\_ATYPE}{NDF_ATYPE} is provided for determining the nume
 \st{axis\/} array, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'NDF_PAR'
       CHARACTER * ( NDF__SZTYP ) TYPE
 
       ...
 
       CALL NDF_ATYPE( INDF, 'Centre', IAXIS, TYPE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This will return the numeric type as an upper-case character string
@@ -7280,9 +6782,9 @@ centre\/} and \st{width\/} values were stored in double-precision
 arrays:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_ASTYP( '_DOUBLE', INDF, 'Cen,Wid', 0, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Note that the numeric type attribute of an \st{axis\/} array exists
@@ -7300,14 +6802,14 @@ The storage form of an \st{axis\/} array may be obtained by using the
 routine \htmlref{NDF\_AFORM}{NDF_AFORM}, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'NDF_PAR'
       CHARACTER * ( NDF__SZFRM ) FORM
 
       ...
 
       CALL NDF_AFORM( INDF, 'Centre', IAXIS, FORM, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This example would return the storage form of the specified \st{axis
@@ -7435,9 +6937,9 @@ follows:\footnote{Different rules may apply when accessing foreign
 format datasets and these are described in \xref{SSN/20}{ssn20}{}.}
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       <file_name><hds_path><subscripts>
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, $<$file\_name$>$ is the name of the HDS ``\xref{container
@@ -7450,18 +6952,18 @@ file name is always required, but the other two components are
 optional. Thus, a simple NDF name might look like:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       mydatafile
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 (if the NDF were the top-level object in the container file, which is
 often the case), while a fairly complicated NDF name might resemble:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       /users/bill/datafiles/today.RUN(66).BAND_B(1:66,1.04)
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, the first `.' separates the HDS path from the file name. Names
@@ -7498,9 +7000,9 @@ Using the example above, suppose that LOC is an active \xref{HDS
 locator}{sun92}{using_locators} associated with the data structure:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       /users/bill/datafiles/today.RUN(66)
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The routine \htmlref{NDF\_FIND}{NDF_FIND} could then be used to find an NDF data structure
@@ -7508,18 +7010,18 @@ relative to this object, and to import it into (\st{i.e.}\ make it
 known to) the NDF\_ library, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_FIND( LOC, 'BAND_B(1:66,1.04)', INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 (note that here we have specified a \st{relative\/} name for the second
 argument). This would find the NDF section whose absolute name is:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       /users/bill/datafiles/today.RUN(66).BAND_B(1:66,1.04)
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 An identifier for this NDF would be returned via the INDF argument and
@@ -7534,9 +7036,9 @@ relative name could be entirely blank, in which case the locator
 supplied would be taken to identify the NDF directly. Thus, in:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_FIND( LOC, ' ', INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 the locator LOC should be associated with the NDF data structure
@@ -7552,7 +7054,7 @@ value allows the associated NDF name to be an \st{absolute\/}
 name. Thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'DAT_PAR'
 
       ...
@@ -7560,7 +7062,7 @@ name. Thus:
       CALL NDF_FIND( DAT__ROOT,
      :               '/users/bill/datafiles/today.RUN(66).BAND_B(1:66,1.04)',
      :               INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would access the same NDF section as in the examples above, this time
@@ -7595,9 +7097,9 @@ importation process described in \S\ref{ss:findingandimporting}. It is
 performed by the \htmlref{NDF\_LOC}{NDF_LOC} routine, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_LOC( INDF, MODE, LOC, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The MODE argument specifies the mode of access required (`READ', `UPDATE' or
@@ -7627,9 +7129,9 @@ the same way as when accessing an existing NDF
 with an existing HDS structure, then:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_PLACE( LOC, 'NEW_NDF', PLACE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would return an integer value PLACE, which is a placeholder for a new
@@ -7637,13 +7139,13 @@ NDF called 'NEW\_NDF' contained within that structure. Similarly,
 the absolute name of a new NDF could be specified as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'DAT_PAR'
 
       ...
 
       CALL NDF_PLACE( DAT__ROOT, 'file.STRUCT(2,2).NEW_NDF', PLACE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 All the HDS structures residing at levels above the actual NDF object
@@ -7664,7 +7166,7 @@ structures is created with 5 elements, and a placeholder is then
 obtained for the second element:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER DIM( 1 )
 
       ...
@@ -7672,7 +7174,7 @@ obtained for the second element:
       DIM( 1 ) = 5
       CALL DAT_NEW( LOC, 'NDF_ARRAY', 'NDF', 1, DIM, STATUS )
       CALL NDF_PLACE( LOC, 'NDF_ARRAY(2)', PLACE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 As with \htmlref{NDF\_FIND}{NDF_FIND}, a blank name string may be supplied to NDF\_PLACE
@@ -7688,10 +7190,10 @@ Thus, to create a new simple NDF by this means, the routine \htmlref{NDF\_NEW}{N
 be used along with \htmlref{NDF\_PLACE}{NDF_PLACE}, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_PLACE( LOC, 'NEW_NDF', PLACE, STATUS )
       CALL NDF_NEW( '_INTEGER', NDIM, LBND, UBND, PLACE, INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The call to NDF\_NEW will create the required new simple NDF (in this case
@@ -7726,10 +7228,10 @@ placeholder for a \st{temporary\/} NDF.
 To create a temporary simple NDF, the following calls might be used:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_TEMP( PLACE, STATUS )
       CALL NDF_NEW( '_INTEGER', NDIM, LBND, UBND, PLACE, INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The resulting NDF identifier INDF may be used in exactly the same way as an
@@ -7744,15 +7246,15 @@ It is possible to determine whether an existing NDF identifier refers to a
 temporary NDF using the routine \htmlref{NDF\_ISTMP}{NDF_ISTMP}:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_ISTMP( INDF, ISTMP, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 A logical value of .TRUE.\ is returned via the ISTMP argument if the NDF is
 temporary.
 
-\subsection{\xlabel{copying_ndfs}Copying NDFs}
+\subsection{\xlabel{copying_ndfs_section}Copying NDFs}
 
 Placeholders also play a role in the copying of NDF data structures from one
 location to another within the data system.
@@ -7762,10 +7264,10 @@ This should be preceded by a call which generates a suitable placeholder.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_PLACE( LOC, 'MY_NDF_COPY', PLACE, STATUS )
       CALL NDF_COPY( INDF1, PLACE, INDF2, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, the placeholder causes NDF\_COPY to copy the NDF with identifier
@@ -7783,10 +7285,10 @@ Naturally, it is also possible to create a temporary copy of an NDF by using
 \htmlref{NDF\_TEMP}{NDF_TEMP} to obtain the placeholder, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_TEMP( PLACE, STATUS )
       CALL NDF_COPY( INDF1, PLACE, INDF2, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \subsection{\xlabel{selective_copying_of_ndf_components}\label{ss:selectivecopy}Selective Copying of NDF Components}
@@ -7797,10 +7299,10 @@ that it also accepts a list of the NDF components to be copied as its
 second argument, thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_SCOPY( INDF1, 'Data,Var,Axis,Nohist,Noext(CCDPACK)',
      :                PLACE, INDF2, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The component list has the same syntax, and is used in exactly the same
@@ -7825,9 +7327,9 @@ behaves like NDF\_FIND, allowing you to access an existing NDF.  For
 example:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_OPEN( DAT__ROOT, 'any_ndf', 'UPDATE', 'OLD', INDF, PLACE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would obtain `UPDATE' access to the specified NDF and return an
@@ -7855,13 +7357,13 @@ A typical use of NDF\_OPEN might be to access an existing NDF if it
 exists, or to create a new one if it does not, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_OPEN( LOC, 'CALIB.BAND_B', 'UPDATE', 'UNKNOWN',
      :               INDF, PLACE,  STATUS )
       IF ( PLACE .NE. NDF__NOPL ) THEN
          CALL NDF_NEWP( '_INTEGER', 1, UBND, PLACE, INDF, STATUS )
       END IF
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \subsection{\xlabel{deleting_ndfs}\label{ss:delet}Deleting NDFs}
@@ -7869,9 +7371,9 @@ exists, or to create a new one if it does not, as follows:
 Deletion of an NDF may be performed by calling the routine \htmlref{NDF\_DELET}{NDF_DELET}, thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_DELET( INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 If the necessary access is available (see \S\ref{ss:restrictingaccess}), the
@@ -7895,13 +7397,13 @@ The dimensionality of the NDF may also be changed at the same time.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER NDIM, LBND( NDIM ), UBND( NDIM )
 
       ...
 
       CALL NDF_SBND( NDIM, LBND, UBND, INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will change an NDF's dimensionality to the value specified by the NDIM
@@ -7912,18 +7414,18 @@ component which is in a defined state may be affected, as follows:
 
 \begin{description}
 
-\item[{\bf Retained Pixels}] -- These are pixels with indices which lie
+\item[\textbf{Retained Pixels}] -- These are pixels with indices which lie
 within both the initial and final NDF pixel-index bounds.
 The values of these pixels are retained.
 
-\item[{\bf New Pixels}] -- These are pixels with indices which lie within
+\item[\textbf{New Pixels}] -- These are pixels with indices which lie within
 the new pixel-index bounds, but did not exist within the initial bounds.
 These pixels will be assigned the appropriate \st{bad\/}-pixel value (see
 \S\ref{ss:badpixels}).
 If such pixels are introduced, then the \st{bad\/}-pixel flag of affected NDF
 components will be updated to reflect this fact.
 
-\item[{\bf Lost Pixels}] -- These are pixels with indices which lie within
+\item[\textbf{Lost Pixels}] -- These are pixels with indices which lie within
 the initial NDF pixel-index bounds, but outside the new bounds.
 The values of such pixels are lost and cannot be recovered, even by changing
 the NDF's bounds back to their original values.
@@ -7948,10 +7450,10 @@ base NDF.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_RESET( INDF, 'Data,Variance,Quality', STATUS )
       CALL NDF_SBND( NDIM, LBND, UBND, INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would ensure that no array values are retained and that no time is
@@ -7964,13 +7466,13 @@ shifts to its pixel indices using the routine \htmlref{NDF\_SHIFT}{NDF_SHIFT}.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER NSHIFT, SHIFT( NSHIFT )
 
       ...
 
       CALL NDF_SHIFT( NSHIFT, SHIFT, INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would apply a set of NSHIFT shifts to an NDF (one to each dimension) as
@@ -8061,9 +7563,9 @@ the \htmlref{NDF\_STATE}{NDF_STATE} routine by specifying a component name of `H
 thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_STATE( INDF, 'History', STATE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The state information is returned via the LOGICAL argument STATE.
@@ -8087,9 +7589,9 @@ necessary to explicitly define a \st{history\/} component to receive it.
 The \htmlref{NDF\_HCRE}{NDF_HCRE} routine will perform this, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_HCRE( INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 NDF\_HCRE will return without error if a \st{history\/} component is
@@ -8109,13 +7611,13 @@ undefined state, may be performed using the \htmlref{NDF\_RESET}{NDF_RESET} rout
 component name of `History', thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_RESET( INDF, 'History', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This has the effect of rendering the \st{history\/} component undefined
-and of {\bf deleting all the information it contains}. Because this
+and of \textbf{deleting all the information it contains}. Because this
 operation is irreversible and destroys all previous history
 information, it is performed only if explicitly requested. In
 particular, the \st{history\/} component remains unaffected when a
@@ -8210,7 +7712,7 @@ generally regarded as unnecessary to retain this wealth of history
 information as it would lead to exponential growth in the amount of
 information to be processed and stored.  A more practical proposition,
 and the one supported by the NDF\_ library, is to \st{propagate\/} the
-past history from {\bf only} the \st{primary\/} input dataset to the
+past history from \textbf{only} the \st{primary\/} input dataset to the
 output, and then to update this by appending a new record to reflect
 the action of the current application.
 
@@ -8260,7 +7762,7 @@ The routine which allows this is \htmlref{NDF\_HPUT}{NDF_HPUT}, which writes new
 information to a \st{history\/} record, thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CHARACTER HMODE * ( NDF__SZHUM ), TEXT( 2 ) * ( NDF__SZHIS )
       LOGICAL REPL, TRANS, WRAP, RJUST
 
@@ -8276,7 +7778,7 @@ information to a \st{history\/} record, thus:
       RJUST = .FALSE.
       CALL NDF_HPUT( HMODE, APPN, REPL, 2, TEXT, TRANS, WRAP, RJUST, INDF,
                      STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 In this example, NDF\_HPUT is being used to append two lines of text,
@@ -8302,9 +7804,9 @@ different order is required, then the routine \htmlref{NDF\_HDEF}{NDF_HDEF} may 
 force the default history information to be written prematurely, thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_HDEF( INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 It will then not be written when the NDF is released. This makes it
@@ -8358,9 +7860,9 @@ defaults to `NORMAL'. This may subsequently be altered using the
 NDF, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_HSMOD( 'DISABLED', INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The update mode string may be abbreviated (to not less than 3 characters).
@@ -8432,7 +7934,7 @@ message tokens). In the following example, the results of an earlier
 calculation are inserted into a \st{history\/} record in this way:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL MSG_SETI( 'NPIX', N )
       CALL MSG_SETR( 'VALUE', RESULT )
       CALL MSG_SETC( 'UNITS', CVAL )
@@ -8441,7 +7943,7 @@ calculation are inserted into a \st{history\/} record in this way:
       TRANS = .TRUE.
       CALL NDF_HPUT( HMODE, APPN, REPL, 2, TEXT, TRANS, WRAP, RJUST, INDF,
                      STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \subsection{\xlabel{history_text_width}History Text Width}
@@ -8557,9 +8059,9 @@ history enquiry routine \htmlref{NDF\_HINFO}{NDF_HINFO}, or more directly using 
 \htmlref{NDF\_HNREC}{NDF_HNREC} routine, thus:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_HNREC( INDF, NREC, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The number of records is returned via the INTEGER argument NREC. Note
@@ -8576,7 +8078,7 @@ recently modified an NDF as follows (the result is returned in the
 APPN variable):
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'NDF_PAR'
       CHARACTER * ( NDF__SZAPP ) APPN
 
@@ -8584,7 +8086,7 @@ APPN variable):
 
       CALL NDF_HNREC( INDF, NREC, STATUS )
       CALL NDF_HINFO( INDF, 'APPLICATION', NREC, APPN, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Other information about individual records may also be obtained using
@@ -8602,7 +8104,7 @@ provides a search facility which allows records to be identified by
 date and time:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER YMDHM( 5 )
       LOGICAL EQ
       REAL SEC
@@ -8611,7 +8113,7 @@ date and time:
 
       EQ = .FALSE.
       CALL NDF_HFIND( INDF, YMDHM, SEC, EQ, IREC, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Given a date and time (with the years, months, days, hours and minutes
@@ -8648,7 +8150,7 @@ described in Appendix~\ref{ss:routinedescriptions}, but an outline of
 how it works is given here:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE NDF_HECHO( NLINES, TEXT, STATUS )
       INCLUDE 'SAE_PAR'
 
@@ -8665,20 +8167,20 @@ how it works is given here:
  1    CONTINUE
 
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 To invoke this as a service routine, it is passed as an argument to
 NDF\_HOUT, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       EXTERNAL NDF_HECHO
 
       ...
 
       CALL NDF_HOUT( INDF, IREC, NDF_HECHO, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Note that it must be declared in a Fortran EXTERNAL statement.
@@ -8693,7 +8195,7 @@ KEY), thus allowing a simple keyword search through \st{history\/}
 records to be performed:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE SEARCH( NLINES, TEXT, STATUS )
       INCLUDE 'SAE_PAR'
 
@@ -8720,7 +8222,7 @@ records to be performed:
  2    CONTINUE
 
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Note that additional data must be passed to and from such a service
@@ -8734,13 +8236,13 @@ information can be removed, usually to save space. The routine
 \htmlref{NDF\_HPURG}{NDF_HPURG} will perform this, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER IREC1, IREC2
 
       ...
 
       CALL NDF_HPURG( INDF, IREC1, IREC2, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, the \st{history\/} record numbers IREC1 and IREC2 specify a range of
@@ -8787,9 +8289,9 @@ uses it. A current name may be declared at any time by calling the
 routine \htmlref{NDF\_HAPPN}{NDF_HAPPN}, for example:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_HAPPN( 'ADDSPEC Version 6.1-5', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 and may be revoked by calling the same routine with a blank first
@@ -8802,7 +8304,7 @@ repeatedly obtained and the appropriate routine (application) is then
 invoked:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
 *  Loop to obtain commands.
  1    CONTINUE
       CALL GETCMD( CMD, STATUS )
@@ -8828,7 +8330,7 @@ invoked:
 
 *  Return for the next command.
       GO TO 1
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 In such a situation, the NDF\_ library has no way of telling when one
@@ -8864,9 +8366,9 @@ history information. To overcome this problem, a call to \htmlref{NDF\_HEND}{NDF
 be used at the end of each application, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_HEND( STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 This notifies the NDF\_ system that the current application has
@@ -8896,9 +8398,9 @@ The act of disabling a particular type of access is performed by the routine
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_NOACC( 'DELETE', INDF, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would disable \st{delete\/} access for the identifier INDF.
@@ -8916,7 +8418,7 @@ the corresponding restriction on NDF access:
 
 \begin{description}
 
-\item{\bf `BOUNDS' --} Disabling \st{bounds\/} access prevents the
+\item\textbf{`BOUNDS' --} Disabling \st{bounds\/} access prevents the
 pixel-index bounds of a base NDF from being altered (\st{e.g.}\ with the
 routine \htmlref{NDF\_SBND}{NDF_SBND} -- \S\ref{ss:sbnd}).
 The pixel-index bounds of an NDF \st{section\/} can always be altered
@@ -8924,21 +8426,21 @@ regardless of this access restriction, but the restriction will be
 propagated to any new identifier obtained from an NDF section via the
 routine \htmlref{NDF\_BASE}{NDF_BASE}.
 
-\item{\bf `DELETE' --} Disabling \st{delete\/} access prevents the NDF from
+\item\textbf{`DELETE' --} Disabling \st{delete\/} access prevents the NDF from
 being deleted (\st{e.g.}\ with the routine \htmlref{NDF\_DELET}{NDF_DELET} -- \S\ref{ss:delet}).
 
-\item{\bf `SHIFT' --} Disabling \st{shift\/} access prevents pixel-index
+\item\textbf{`SHIFT' --} Disabling \st{shift\/} access prevents pixel-index
 shifts from being applied to a base NDF (\st{e.g.}\ with the routine
 \htmlref{NDF\_SHIFT}{NDF_SHIFT} -- \S\ref{ss:shift}).
 Pixel-index shifts may always be applied to an NDF section regardless of
 this access restriction, but the restriction will be propagated to any new
 identifier obtained from an NDF section via the routine NDF\_BASE.
 
-\item{\bf `TYPE' --} Disabling \st{type\/} access prevents the type of any
+\item\textbf{`TYPE' --} Disabling \st{type\/} access prevents the type of any
 NDF component from being altered (\st{e.g.}\ with the routine \htmlref{NDF\_STYPE}{NDF_STYPE} --
 \S\ref{ss:stype}).
 
-\item{\bf `WRITE' --} Disabling \st{write\/} access prevents new values from
+\item\textbf{`WRITE' --} Disabling \st{write\/} access prevents new values from
 being written to any of the NDF's components.
 It also prevents the state of any of its components from being reset
 (\st{e.g.}\ with the routine \htmlref{NDF\_RESET}{NDF_RESET} --
@@ -8954,15 +8456,15 @@ identifier by using the routine \htmlref{NDF\_ISACC}{NDF_ISACC}.
 For instance:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_ISACC( INDF, 'WRITE', ISACC, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 will return a logical value ISACC indicating whether \st{write\/} access is
 available for the identifier INDF.
 
-\subsection{\xlabel{message_system_routines}Message System Routines}
+\subsection{\xlabel{message_system_routines_section}Message System Routines}
 
 Several of the NDF\_ routines are dedicated to generating components
 of messages, either for information or as part of an error report.
@@ -8973,11 +8475,11 @@ The routine \htmlref{NDF\_MSG}{NDF_MSG} may be used to assign the name of an NDF
 token, so that references to NDFs can form part of a message, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_MSG( 'NAME', INDF )
       CALL MSG_OUT( 'MESS_DEMO',
      :              'This NDF structure is called ^NAME', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, `NAME' is the message token name.
@@ -8989,7 +8491,7 @@ assign the value of an \st{axis\/} character component (such as an
 Their use is illustrated in \S\ref{ss:cmsg} and \S\ref{ss:acmsg}
 respectively.
 
-\subsection{\xlabel{tuning_the_ndf_system}\label{ss:tuning}Tuning the NDF\_ System}
+\subsection{\xlabel{tuning_the_ndf_system_section}\label{ss:tuning}Tuning the NDF\_ System}
 
 The routine \htmlref{NDF\_TUNE}{NDF_TUNE} is provided to allow various features of the
 NDF\_ system to be configured for individual needs if the default
@@ -8997,9 +8499,9 @@ behaviour is not appropriate.  This process is referred to as
 \st{tuning} the system, and is performed as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_TUNE( 0, 'WARN', STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Here, a new value of zero is specified for the \st{tuning parameter}
@@ -9008,13 +8510,13 @@ determined using the related routine \htmlref{NDF\_GTUNE}{NDF_GTUNE} which retur
 parameter's value via its VALUE argument, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       INTEGER VALUE
 
       ...
 
       CALL NDF_GTUNE( 'WARN', VALUE, STATUS )
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 By using these two routines in pairs it is possible to determine the original
@@ -9027,14 +8529,14 @@ parameters currently available are as follows:
 
 \begin{description}
 
-\item[{\bf AUTO\_HISTORY:}]\mbox{}\\
+\item[\textbf{AUTO\_HISTORY:}]\mbox{}\\
 Controls whether to include an empty History component in NDFs created
 using NDF\_NEW or NDF\_CREAT. If the tuning parameter is zet to zero (the
 default), no History component will be included in the new NDFs. If the
 tuning parameter is zet non-zero, a History component will be added
 automatically to the new NDFs.
 
-\item[{\bf DOCVT:}]\mbox{}\\
+\item[\textbf{DOCVT:}]\mbox{}\\
 Controls whether to convert foreign format data files to and from
 native NDF format for access (using the facilities described in
 \xref{SSN/20}{ssn20}{}). If DOCVT is set to 1 (the default), and the
@@ -9049,7 +8551,7 @@ when a dataset is acquired by the NDF\_ library (or a
 \htmlref{placeholder}{ss:placeholders} for a new dataset is created)
 which is significant.
 
-\item[{\bf KEEP:}]\mbox{}\\
+\item[\textbf{KEEP:}]\mbox{}\\
 Controls whether to retain a native format NDF copy of any foreign
 format data files which are accessed by the NDF\_ library (and
 automatically converted using the facilities described in
@@ -9067,7 +8569,7 @@ The value of KEEP may be changed at any time. It is the value current
 when a foreign format file is first accessed by the NDF\_ library
 which is significant.
 
-\item[{\bf SECMAX:}]\mbox{}\\
+\item[\textbf{SECMAX:}]\mbox{}\\
 Specifies the maximum number of pixels allowed in an NDF section, in
 units of mega-pixels. An error will be reported if an attempt is made to
 create a section containing more than this number of pixels. The primary
@@ -9077,7 +8579,7 @@ result in huge sections being requested. The default value is 2147
 mega-pixels, which is the largest value that can be held by a four byte
 integer.
 
-\item[{\bf SHCVT:}]\mbox{}\\
+\item[\textbf{SHCVT:}]\mbox{}\\
 Controls whether diagnostic information is displayed to show the
 actions being taken to convert to and from foreign data formats (using
 the facilities described in \xref{SSN/20}{ssn20}{}). If SHCVT is set
@@ -9087,7 +8589,7 @@ conversion software whenever a foreign format file is accessed. If
 SHCVT is set to 0 (the default), this information does not appear and
 format conversion proceeds silently unless an error occurs.
 
-\item[{\bf TRACE:}]\mbox{}\\
+\item[\textbf{TRACE:}]\mbox{}\\
 Controls the reporting of additional error messages which may
 occasionally be useful for diagnosing internal problems within the
 NDF\_ library. If TRACE is set to 1, then any error occurring within
@@ -9096,7 +8598,7 @@ which internal routines have exited prematurely as a result. If TRACE
 is set to 0 (the default), this internal diagnostic information will
 not appear and only standard error messages will be produced.
 
-\item[{\bf WARN:}]\mbox{}\\
+\item[\textbf{WARN:}]\mbox{}\\
 Controls the issuing of warning messages when certain non-fatal errors
 in the structure of NDF data objects are detected. If WARN is set to 1
 (the default), then a warning message is issued. If WARN is set to 0,
@@ -9112,9 +8614,9 @@ constructed by prefixing `NDF\_' to the name of the tuning parameter
 to be set. Thus, the shell command:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
    % setenv NDF_TRACE 1
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 would set the `TRACE' tuning parameter to 1 by default for all
@@ -9141,17 +8643,17 @@ command line. Thus, to compile and link a Fortran application called
 ``prog'', the following might be used:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
    % f77 -I$STARLINK_DIR/include prog.f -L$STARLINK_DIR/lib `ndf_link` -o prog
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 while for an application written in C, you might use:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
    % cc prog.c -I$STARLINK_DIR/include -L$STARLINK_DIR/lib `ndf_link` -o prog
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Note the use of backward quote characters, which cause the
@@ -9168,9 +8670,9 @@ the NDF\_ library by including execution of the command
 ``ndf\_link\_adam'' on the command line, as follows:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
    % alink adamprog.f `ndf_link_adam`
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Again, note the use of backward quote characters. To build a program
@@ -9204,7 +8706,7 @@ library. It
 outputs a message showing how many pixels there are in an NDF.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE SHOW( STATUS )
 *+
 *  Name:
@@ -9253,14 +8755,14 @@ outputs a message showing how many pixels there are in an NDF.
       CALL NDF_ANNUL( INDF, STATUS )
 
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The following is an example ADAM interface file (show.ifl) for the application
 above.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
 interface SHOW
 
    parameter NDF                 # NDF to be inspected
@@ -9269,7 +8771,7 @@ interface SHOW
    endparameter
 
 endinterface
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \newpage
@@ -9281,7 +8783,7 @@ since an
 existing NDF is being modified rather than creating a new one.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE SETTITLE( STATUS )
 *+
 *  Name:
@@ -9335,14 +8837,14 @@ existing NDF is being modified rather than creating a new one.
       CALL NDF_ANNUL( NDF, STATUS )
 
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The following is an example \xref{ADAM}{sg4}{} interface file
 (settitle.ifl) for the application above.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
    interface SETTITLE
 
       parameter NDF                 # NDF to be modified
@@ -9357,7 +8859,7 @@ The following is an example \xref{ADAM}{sg4}{} interface file
       endparameter
 
    endinterface
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \newpage
@@ -9376,7 +8878,7 @@ inadvertently use this program on data which does contain \st{bad\/}
 pixels.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE GETMAX( STATUS )
 *+
 *  Name:
@@ -9496,14 +8998,14 @@ pixels.
  1    CONTINUE
 
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The following is an example \xref{ADAM}{sg4}{} interface file
 (getmax.ifl) for the application above.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
 interface GETMAX
 
    parameter NDF                 # NDF to be examined
@@ -9512,7 +9014,7 @@ interface GETMAX
    endparameter
 
 endinterface
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \newpage
@@ -9530,7 +9032,7 @@ generated if the input data array does not contain any good (\st{i.e.\/}
 non-\st{bad\/}) pixels.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE GETSUM( STATUS )
 *+
 *  Name:
@@ -9685,14 +9187,14 @@ non-\st{bad\/}) pixels.
       END IF
 
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The following is an example \xref{ADAM}{sg4}{} interface file
 (getsum.ifl) for the application above.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
 interface GETSUM
 
    parameter NDF                 # NDF to be examined
@@ -9701,7 +9203,7 @@ interface GETSUM
    endparameter
 
 endinterface
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \newpage
@@ -9722,7 +9224,7 @@ helpful error messages in response to I/O errors and a final
 contextual report at the end of the application.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE READIMG( STATUS )
 *+
 *  Name:
@@ -9905,14 +9407,14 @@ contextual report at the end of the application.
 *  Jump to here if an error occurs.
  99   CONTINUE
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The following is an example \xref{ADAM}{sg4}{} interface file
 (readimg.ifl) for the application above.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
 interface READIMG
 
    parameter FILE                # Input file name
@@ -9939,7 +9441,7 @@ interface READIMG
    endparameter
 
 endinterface
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \newpage
@@ -9963,7 +9465,7 @@ the output image (although a check for this could easily be added). The output
 .TRUE..
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE ZAPPIX( STATUS )
 *+
 *  Name:
@@ -10161,14 +9663,14 @@ the output image (although a check for this could easily be added). The output
  4    CONTINUE
 
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The following is an example \xref{ADAM}{sg4}{} interface file
 (zappix.ifl) for the application above.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
 interface ZAPPIX
 
    parameter IN                  # Input NDF
@@ -10188,7 +9690,7 @@ interface ZAPPIX
    endparameter
 
 endinterface
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 
@@ -10203,7 +9705,7 @@ shape and data type.  A much simpler example is given in
 \S\ref{ss:applicationoverview}.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE ADD( STATUS )
 *+
 *  Name:
@@ -10378,14 +9880,14 @@ shape and data type.  A much simpler example is given in
       END IF
 
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The following is an example \xref{ADAM}{sg4}{} interface file
 (add.ifl) for the application above.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
    interface ADD
 
       parameter IN1                 # First input NDF
@@ -10411,7 +9913,7 @@ The following is an example \xref{ADAM}{sg4}{} interface file
       endparameter
 
    endinterface
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \newpage
@@ -10424,7 +9926,7 @@ put, but it demonstrates the use of most of the enquiry routines and
 provides a ``guided tour'' of the NDF components.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE NDFTRACE( STATUS )
 *+
 *  Name:
@@ -10800,14 +10302,14 @@ provides a ``guided tour'' of the NDF components.
       END IF
 
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The following is an example \xref{ADAM}{sg4}{} interface file
 (ndftrace.ifl) for the application above.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
    interface NDFTRACE
 
       parameter NDF                 # NDF to be inspected
@@ -10816,7 +10318,7 @@ The following is an example \xref{ADAM}{sg4}{} interface file
       endparameter
 
    endinterface
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \begin{latexonly}
@@ -12697,7 +12199,7 @@ locator}{sun92}{using_locators}}
 
          \sstitem
          Any remaining NDF identifiers for the associated NDF are
-         unaffected by this routine. It{\tt '}s only affect is to cause NDF\_ASSOC
+         unaffected by this routine. It\texttt{'}s only affect is to cause NDF\_ASSOC
          or NDF\_EXIST to prompt for a new NDF when called subsequently.
 
          \sstitem
@@ -13816,7 +13318,7 @@ locator}{sun92}{using_locators}}
       \sstsubsection{
          COMP = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         Name of the NDF array component; {\tt '}DATA{\tt '}, {\tt '}QUALITY{\tt '} or {\tt '}VARIANCE{\tt '}.
+         Name of the NDF array component; \texttt{'}DATA\texttt{'}, \texttt{'}QUALITY\texttt{'} or \texttt{'}VARIANCE\texttt{'}.
       }
       \sstsubsection{
          ZAXIS = INTEGER (Returned)
@@ -13829,8 +13331,8 @@ locator}{sun92}{using_locators}}
          ZTYPE = CHARACTER $*$ ( $*$ ) (Returned)
       }{
          The data type in which the differences between adjacent array
-         values are stored. This will be one of {\tt '}\_BYTE{\tt '}, {\tt '}\_WORD{\tt '} or
-         {\tt '}\_INTEGER{\tt '}. The data type of the array itself is returned if the
+         values are stored. This will be one of \texttt{'}\_BYTE\texttt{'}, \texttt{'}\_WORD\texttt{'} or
+         \texttt{'}\_INTEGER\texttt{'}. The data type of the array itself is returned if the
          supplid array is not stored in DELTA form.
       }
       \sstsubsection{
@@ -13872,7 +13374,7 @@ locator}{sun92}{using_locators}}
       \sstsubsection{
          COMP = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         Name of the NDF array component; {\tt '}DATA{\tt '} or {\tt '}VARIANCE{\tt '}.
+         Name of the NDF array component; \texttt{'}DATA\texttt{'} or \texttt{'}VARIANCE\texttt{'}.
       }
       \sstsubsection{
          SCALE = ? (Returned)
@@ -13895,7 +13397,7 @@ locator}{sun92}{using_locators}}
 
          \sstitem
          There is a routine for each of the standard Fortran numerical data
-         types: integer, real and double precision. Replace the (lower case) {\tt "}x{\tt "}
+         types: integer, real and double precision. Replace the (lower case) \texttt{"}x\texttt{"}
          in the routine name by I, R or D as appropriate.
       }
    }
@@ -14350,7 +13852,7 @@ locator}{sun92}{using_locators}}
       \sstsubsection{
          HMODE = CHARACTER $*$ ( $*$ ) (Returned)
       }{
-         The history update mode: {\tt '}DISABLED{\tt '}, {\tt '}QUIET{\tt '}, {\tt '}NORMAL{\tt '} or {\tt '}VERBOSE{\tt '}.
+         The history update mode: \texttt{'}DISABLED\texttt{'}, \texttt{'}QUIET\texttt{'}, \texttt{'}NORMAL\texttt{'} or \texttt{'}VERBOSE\texttt{'}.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -14841,7 +14343,7 @@ locator}{sun92}{using_locators}}
       those added using NDF\_HPUT). If no date and time is set using
       this routine, then the curent date and time will be used. Any
       date and time established by a previous call to this function can be
-      removed by supplying a blank value for argument {\tt "}DATE{\tt "}, in which
+      removed by supplying a blank value for argument \texttt{"}DATE\texttt{"}, in which
       case the current date and time will be used for subsequent history
       records.
    }
@@ -14855,7 +14357,7 @@ locator}{sun92}{using_locators}}
          The time and date to be used for subsequent history records, or
          blank to re-establish the default behaviour (i.e. to use the
          current time). The allowed formats are described later in the
-         {\tt "}Date and Time Formats:{\tt "} section.
+         \texttt{"}Date and Time Formats:\texttt{"} section.
       }
       \sstsubsection{
          INDF = INTEGER (Given)
@@ -14871,7 +14373,7 @@ locator}{sun92}{using_locators}}
    \sstdiytopic{
       Date and Time Formats
    }{
-      The formats accepted for the {\tt "}DATE{\tt "} argument are listed
+      The formats accepted for the \texttt{"}DATE\texttt{"} argument are listed
       below. They are all case-insensitive and are generally tolerant
       of extra white space and alternative field delimiters:
 
@@ -14880,34 +14382,34 @@ locator}{sun92}{using_locators}}
          \sstitem
          Gregorian Calendar Date: With the month expressed either as an
          integer or a 3-character abbreviation, and with optional decimal
-         places to represent a fraction of a day ({\tt "}1996-10-2{\tt "} or
-         {\tt "}1996-Oct-2.6{\tt "} for example). If no fractional part of a day is
+         places to represent a fraction of a day (\texttt{"}1996-10-2\texttt{"} or
+         \texttt{"}1996-Oct-2.6\texttt{"} for example). If no fractional part of a day is
          given, the time refers to the start of the day (zero hours).
 
          \sstitem
          Gregorian Date and Time: Any calendar date (as above) but with
          a fraction of a day expressed as hours, minutes and seconds
-         ({\tt "}1996-Oct-2 12:13:56.985{\tt "} for example). The date and time can be
-         separated by a space or by a {\tt "}T{\tt "} (as used by ISO8601 format).
+         (\texttt{"}1996-Oct-2 12:13:56.985\texttt{"} for example). The date and time can be
+         separated by a space or by a \texttt{"}T\texttt{"} (as used by ISO8601 format).
 
          \sstitem
          Modified Julian Date: With or without decimal places
-         ({\tt "}MJD 54321.4{\tt "} for example).
+         (\texttt{"}MJD 54321.4\texttt{"} for example).
 
          \sstitem
-         Julian Date: With or without decimal places ({\tt "}JD 2454321.9{\tt "} for
+         Julian Date: With or without decimal places (\texttt{"}JD 2454321.9\texttt{"} for
          example).
 
          \sstitem
          Besselian Epoch: Expressed in decimal years, with or without
-         decimal places ({\tt "}B1950{\tt "} or {\tt "}B1976.13{\tt "} for example).
+         decimal places (\texttt{"}B1950\texttt{"} or \texttt{"}B1976.13\texttt{"} for example).
 
          \sstitem
          Julian Epoch: Expressed in decimal years, with or without
-         decimal places ({\tt "}J2000{\tt "} or {\tt "}J2100.9{\tt "} for example).
+         decimal places (\texttt{"}J2000\texttt{"} or \texttt{"}J2100.9\texttt{"} for example).
 
          \sstitem
-         Year: Decimal years, with or without decimal places ({\tt "}1996.8{\tt "}
+         Year: Decimal years, with or without decimal places (\texttt{"}1996.8\texttt{"}
          for example).  Such values are interpreted as a Besselian epoch
          (see above) if less than 1984.0 and as a Julian epoch otherwise.
       }
@@ -14931,11 +14433,11 @@ locator}{sun92}{using_locators}}
       \sstsubsection{
          HMODE = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The history update mode required: {\tt '}DISABLED{\tt '}, {\tt '}QUIET{\tt '},
-         {\tt '}NORMAL{\tt '} or {\tt '}VERBOSE{\tt '}. This value may be abbreviated, to no
-         less than three characters. In addition, {\tt '}SKIP{\tt '} may be supplied.
-         This is similar to {\tt '}DISABLED{\tt '}, in that no history record will
-         be added to the NDF when the NDF is closed. However, {\tt '}SKIP{\tt '} makes
+         The history update mode required: \texttt{'}DISABLED\texttt{'}, \texttt{'}QUIET\texttt{'},
+         \texttt{'}NORMAL\texttt{'} or \texttt{'}VERBOSE\texttt{'}. This value may be abbreviated, to no
+         less than three characters. In addition, \texttt{'}SKIP\texttt{'} may be supplied.
+         This is similar to \texttt{'}DISABLED\texttt{'}, in that no history record will
+         be added to the NDF when the NDF is closed. However, \texttt{'}SKIP\texttt{'} makes
          no permanent change to the update mode - the next time the NDF
          is accessed it will have its original update mode.
       }
@@ -16576,7 +16078,7 @@ locator}{sun92}{using_locators}}
       The routine creates a new NDF data structure through the ADAM
       parameter system, associates it with a parameter and returns an
       identifier for it. The shape, data type, etc. of this new NDF are
-      based on a existing {\tt "}template{\tt "} NDF, and the values of components
+      based on a existing \texttt{"}template\texttt{"} NDF, and the values of components
       of this template may be selectively propagated to initialise the
       new data structure.
    }
@@ -16597,8 +16099,8 @@ locator}{sun92}{using_locators}}
          propagated to the new data structure. By default, the HISTORY,
          LABEL and TITLE components are propagated. All extensions are
          also propagated by default except for any that have had a zero
-         value assigned to the corresponding {\tt "}PXT...{\tt "} tuning parameter
-         using NDF\_TUNE. See the {\tt "}Component Propagation{\tt "} section for
+         value assigned to the corresponding \texttt{"}PXT...\texttt{"} tuning parameter
+         using NDF\_TUNE. See the \texttt{"}Component Propagation\texttt{"} section for
          further details.
       }
       \sstsubsection{
@@ -16637,28 +16139,28 @@ locator}{sun92}{using_locators}}
          \sstitem
          The template components whose values are to be propagated to
          initialise the new data structure are specified via the CLIST
-         argument. Thus CLIST={\tt '}DATA,QUALITY{\tt '} would cause the new NDF to
+         argument. Thus CLIST=\texttt{'}DATA,QUALITY\texttt{'} would cause the new NDF to
          inherit its DATA and QUALITY values (if available) from the
          template structure, in addition to those propagated by default.
          Component propagation may be suppressed by supplying a component
-         name with the prefix {\tt '}NO{\tt '}. Thus CLIST={\tt '}DATA,NOHISTORY{\tt '} would
+         name with the prefix \texttt{'}NO\texttt{'}. Thus CLIST=\texttt{'}DATA,NOHISTORY\texttt{'} would
          propagate the DATA component, but suppress propagation of
          HISTORY. If component names appear more than once in the CLIST
          value, then the last occurrence takes precedence.
 
          \sstitem
          Propagation of specific NDF extensions may be suppressed by
-         using {\tt '}NOEXTENSION(){\tt '} as one of the items in the CLIST argument;
+         using \texttt{'}NOEXTENSION()\texttt{'} as one of the items in the CLIST argument;
          a list of the extensions to be suppressed should appear between
-         the parentheses. Thus CLIST={\tt '}AXIS,NOEXTENSION(IRAS,ASTERIX){\tt '}
+         the parentheses. Thus CLIST=\texttt{'}AXIS,NOEXTENSION(IRAS,ASTERIX)\texttt{'}
          would propagate the AXIS component, but suppress propagation of
          the IRAS and ASTERIX extensions (if present). Propagation of
          suppressed extensions may be re-enabled by specifying
-         {\tt '}EXTENSION(){\tt '} in a similar manner at a later point in the CLIST
+         \texttt{'}EXTENSION()\texttt{'} in a similar manner at a later point in the CLIST
          value.
 
          \sstitem An asterisk ($*$) may be used as a wild card to match all
-         extension names. Thus {\tt '}NOEXTENSION($*$),EXTENSION(IRAS){\tt '}
+         extension names. Thus \texttt{'}NOEXTENSION($*$),EXTENSION(IRAS)\texttt{'}
          may be used to indicate that only the IRAS extension should be
          propagated.
 
@@ -16667,7 +16169,7 @@ locator}{sun92}{using_locators}}
          controlled via an NDF tuning parameter (see NDF\_TUNE). The defaults
          established using NDF\_TUNE can be over-ridden by specifying the
          extension explicitly within the CLIST parameter; e.g.
-         {\tt '}EXTENSION(FITS){\tt '} or {\tt '}NOEXTENSION(FITS){\tt '} can be used to over-ride
+         \texttt{'}EXTENSION(FITS)\texttt{'} or \texttt{'}NOEXTENSION(FITS)\texttt{'} can be used to over-ride
          the default established by the PXTFITS tuning parameter.
 
          \sstitem
@@ -16710,7 +16212,7 @@ locator}{sun92}{using_locators}}
       \sstsubsection{
          COMP = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         Name of the NDF array component; {\tt '}DATA{\tt '} or {\tt '}VARIANCE{\tt '}.
+         Name of the NDF array component; \texttt{'}DATA\texttt{'} or \texttt{'}VARIANCE\texttt{'}.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -16723,7 +16225,7 @@ locator}{sun92}{using_locators}}
 
          \sstitem
          There is a routine for each of the standard Fortran numerical data
-         types: integer, real and double precision. Replace the (lower case) {\tt "}x{\tt "}
+         types: integer, real and double precision. Replace the (lower case) \texttt{"}x\texttt{"}
          in the routine name by I, R or D as appropriate.
 
          \sstitem
@@ -17241,8 +16743,8 @@ locator}{sun92}{using_locators}}
          propagated to the new data structure. By default, the HISTORY,
          LABEL and TITLE components are propagated. All extensions are
          also propagated by default except for any that have had a zero
-         value assigned to the corresponding {\tt "}PXT...{\tt "} tuning parameter
-         using NDF\_TUNE. See the {\tt "}Component Propagation{\tt "} section for
+         value assigned to the corresponding \texttt{"}PXT...\texttt{"} tuning parameter
+         using NDF\_TUNE. See the \texttt{"}Component Propagation\texttt{"} section for
          further details.
       }
       \sstsubsection{
@@ -17285,29 +16787,29 @@ locator}{sun92}{using_locators}}
          \sstitem
          The components whose values are to be propagated (copied) from
          the existing NDF to the new data structure are specified via the
-         CLIST argument. Thus CLIST={\tt '}DATA,QUALITY{\tt '} would cause the DATA
+         CLIST argument. Thus CLIST=\texttt{'}DATA,QUALITY\texttt{'} would cause the DATA
          and QUALITY components to be propagated (if available) from the
          existing NDF to the new structure, in addition to those
          propagated by default.  Component propagation may be suppressed
-         by supplying a component name with the prefix {\tt '}NO{\tt '}. Thus
-         CLIST={\tt '}DATA,NOHISTORY{\tt '} would propagate the DATA component, but
+         by supplying a component name with the prefix \texttt{'}NO\texttt{'}. Thus
+         CLIST=\texttt{'}DATA,NOHISTORY\texttt{'} would propagate the DATA component, but
          suppress propagation of HISTORY. If component names appear more
          than once in the CLIST value, then the last occurrence takes
          precedence.
 
          \sstitem
          Propagation of specific NDF extensions may be suppressed by
-         using {\tt '}NOEXTENSION(){\tt '} as one of the items in the CLIST argument;
+         using \texttt{'}NOEXTENSION()\texttt{'} as one of the items in the CLIST argument;
          a list of the extensions to be suppressed should appear between
-         the parentheses. Thus CLIST={\tt '}AXIS,NOEXTENSION(IRAS,ASTERIX){\tt '}
+         the parentheses. Thus CLIST=\texttt{'}AXIS,NOEXTENSION(IRAS,ASTERIX)\texttt{'}
          would propagate the AXIS component, but suppress propagation of
          the IRAS and ASTERIX extensions (if present). Propagation of
          suppressed extensions may be re-enabled by specifying
-         {\tt '}EXTENSION(){\tt '} in a similar manner at a later point in the CLIST
+         \texttt{'}EXTENSION()\texttt{'} in a similar manner at a later point in the CLIST
          value.
 
          \sstitem An asterisk ($*$) may be used as a wild card to match all
-         extension names. Thus {\tt '}NOEXTENSION($*$),EXTENSION(IRAS){\tt '}
+         extension names. Thus \texttt{'}NOEXTENSION($*$),EXTENSION(IRAS)\texttt{'}
          may be used to indicate that only the IRAS extension should be
          propagated.
 
@@ -17316,7 +16818,7 @@ locator}{sun92}{using_locators}}
          controlled via an NDF tuning parameter (see NDF\_TUNE). The defaults
          established using NDF\_TUNE can be over-ridden by specifying the
          extension explicitly within the CLIST parameter; e.g.
-         {\tt '}EXTENSION(FITS){\tt '} or {\tt '}NOEXTENSION(FITS){\tt '} can be used to over-ride
+         \texttt{'}EXTENSION(FITS)\texttt{'} or \texttt{'}NOEXTENSION(FITS)\texttt{'} can be used to over-ride
          the default established by the PXTFITS tuning parameter.
 
          \sstitem
@@ -17332,7 +16834,7 @@ locator}{sun92}{using_locators}}
 }{
    \sstdescription{
       The routine returns the numeric type of a scaled NDF array component
-      as an upper-case character string (e.g. {\tt '}\_REAL{\tt '}). The returned type
+      as an upper-case character string (e.g. \texttt{'}\_REAL\texttt{'}). The returned type
       describes the values stored in the array, before they are unscaled
       using the associated scale and zero values. Use NDF\_TYPE if you
       need the data type of the array after it has been unscaled.
@@ -17350,7 +16852,7 @@ locator}{sun92}{using_locators}}
          COMP = CHARACTER $*$ ( $*$ ) (Given)
       }{
          Name of the NDF array component whose type is required:
-         {\tt '}DATA{\tt '} or {\tt '}VARIANCE{\tt '}.
+         \texttt{'}DATA\texttt{'} or \texttt{'}VARIANCE\texttt{'}.
       }
       \sstsubsection{
          TYPE = CHARACTER $*$ ( $*$ ) (Returned)
@@ -17909,7 +17411,7 @@ locator}{sun92}{using_locators}}
       \sstitemlist{
 
          \sstitem
-         {\tt '}AUTO\_HISTORY{\tt '}; Controls whether to include an empty
+         \texttt{'}AUTO\_HISTORY\texttt{'}; Controls whether to include an empty
          History component in NDFs created using NDF\_NEW or NDF\_CREAT.
 	 If the tuning parameter is zet to zero (the default), no History
 	 component will be included in the new NDFs. If the tuning
@@ -17917,7 +17419,7 @@ locator}{sun92}{using_locators}}
 	 automatically to the new NDFs.
 
          \sstitem
-         {\tt '}DOCVT{\tt '}: Controls whether to convert foreign format data files
+         \texttt{'}DOCVT\texttt{'}: Controls whether to convert foreign format data files
          to and from native NDF format for access (using the facilities
          described in SSN/20). If DOCVT is set to 1 (the default), and the
          other necessary steps described in SSN/20 have been taken, then
@@ -17929,7 +17431,7 @@ locator}{sun92}{using_locators}}
          first accessed by the NDF\_ library which is significant.
 
          \sstitem
-         {\tt '}KEEP{\tt '}: Controls whether to retain a native format NDF copy of
+         \texttt{'}KEEP\texttt{'}: Controls whether to retain a native format NDF copy of
          any foreign format data files which are accessed by the NDF\_
          library (and automatically converted using the facilities
          described in SSN/20). If KEEP is set to 0 (the default), then
@@ -17938,14 +17440,14 @@ locator}{sun92}{using_locators}}
          is set to 1, the results of the conversion will instead be stored
          in permanent NDF data files in the default directory (such files
          will have the same name as the foreign file from which they are
-         derived and a file type of {\tt '}.sdf{\tt '}). Setting KEEP to 1 may be
+         derived and a file type of \texttt{'}.sdf\texttt{'}). Setting KEEP to 1 may be
          useful if the same datasets are to be re-used, as it avoids having
          to convert them on each occasion. The value of KEEP may be changed
          at any time. It is the value current when a foreign format file is
          first accessed by the NDF\_ library which is significant.
 
          \sstitem
-         {\tt '}SHCVT{\tt '}: Controls whether diagnostic information is displayed
+         \texttt{'}SHCVT\texttt{'}: Controls whether diagnostic information is displayed
          to show the actions being taken to convert to and from foreign
          data formats (using the facilities described in SSN/20). If SHCVT
          is set to 1, then this information is displayed to assist in
@@ -17955,7 +17457,7 @@ locator}{sun92}{using_locators}}
          silently unless an error occurs.
 
          \sstitem
-         {\tt '}TRACE{\tt '}: Controls the reporting of additional error messages
+         \texttt{'}TRACE\texttt{'}: Controls the reporting of additional error messages
          which may occasionally be useful for diagnosing internal problems
          within the NDF\_ library. If TRACE is set to 1, then any error
          occurring within the NDF\_ system will be accompanied by error
@@ -17965,7 +17467,7 @@ locator}{sun92}{using_locators}}
          standard error messages will be produced.
 
          \sstitem
-         {\tt '}WARN{\tt '}: Controls the issuing of warning messages when certain
+         \texttt{'}WARN\texttt{'}: Controls the issuing of warning messages when certain
          non-fatal errors in the structure of NDF data objects are
          detected. If WARN is set to 1 (the default), then a warning
          message is issued. If WARN is set to 0, then no message is
@@ -17973,9 +17475,9 @@ locator}{sun92}{using_locators}}
          value is set.
 
          \sstitem
-         {\tt '}PXT...{\tt '}: Controls whether a named NDF extension should be
+         \texttt{'}PXT...\texttt{'}: Controls whether a named NDF extension should be
          propagated by default when NDF\_PROP or NDF\_SCOPY is called. The
-         name of the extension should be appended to the string {\tt "}PXT{\tt "} to
+         name of the extension should be appended to the string \texttt{"}PXT\texttt{"} to
          form the complete tuning parameter name. Thus the tuning parameter
          PXTFITS would control whether the FITS extension is propagated by
          default. If the value for the parameter is non-zero, then the
@@ -17984,7 +17486,7 @@ locator}{sun92}{using_locators}}
          default. The default established by this tuning parameter can be
          over-ridden by specifying the extension explicitly within the CLIST
          argument when calling NDF\_PROP or NDF\_SCOPY. The default value for
-         all {\tt "}PXT...{\tt "} tuning parameters is 1, meaning that all extensions
+         all \texttt{"}PXT...\texttt{"} tuning parameters is 1, meaning that all extensions
          are propagated by default.
       }
    }
@@ -18730,8 +18232,8 @@ locator}{sun92}{using_locators}}
          COMP = CHARACTER $*$ ( $*$ ) (Given)
       }{
          A comma-separated list of component names to be compressed.
-         These may be selected from {\tt '}DATA, {\tt '}VARIANCE{\tt '} or {\tt '}QUALITY{\tt '}.
-         Additionally, if {\tt '}$*${\tt '} is supplied all three components will be
+         These may be selected from \texttt{'}DATA, \texttt{'}VARIANCE\texttt{'} or \texttt{'}QUALITY\texttt{'}.
+         Additionally, if \texttt{'}$*$\texttt{'} is supplied all three components will be
          compressed.
       }
       \sstsubsection{
@@ -18757,7 +18259,7 @@ locator}{sun92}{using_locators}}
          TYPE = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The data type in which to store the differences between adjacent
-         array values. This must be one of {\tt '}\_BYTE{\tt '}, {\tt '}\_WORD{\tt '} or {\tt '}\_INTEGER{\tt '}.
+         array values. This must be one of \texttt{'}\_BYTE\texttt{'}, \texttt{'}\_WORD\texttt{'} or \texttt{'}\_INTEGER\texttt{'}.
          Additionally, a blank string may be supplied in which case a
          default value will be selected for each array that gives the
          greatest compression.
@@ -18815,7 +18317,7 @@ locator}{sun92}{using_locators}}
 
          \sstitem
          Complex arrays cannot be compressed using this routine. An error
-         will be reported if the input NDF has a complex type, or if {\tt "}TYPE{\tt "}
+         will be reported if the input NDF has a complex type, or if \texttt{"}TYPE\texttt{"}
          represents a complex data type.
 
          \sstitem
@@ -18875,8 +18377,8 @@ locator}{sun92}{using_locators}}
       \sstsubsection{
          TYPE = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         Numeric type of the output NDF{\tt '}s DATA component (e.g. {\tt '}\_REAL{\tt '} or
-         {\tt '}\_INTEGER{\tt '}).
+         Numeric type of the output NDF\texttt{'}s DATA component (e.g. \texttt{'}\_REAL\texttt{'} or
+         \texttt{'}\_INTEGER\texttt{'}).
       }
       \sstsubsection{
          SCALE( 2 ) = DOUBLE PRECISION (Given and Returned)
@@ -18887,7 +18389,7 @@ locator}{sun92}{using_locators}}
          If either of these is set to VAL\_\_BADD, then a suitable value
          will be found automatically by inspecting the supplied array
          values. The values actually used will be returned on exit. See
-         {\tt "}Notes:{\tt "} below. On exit, any supplied values will be rounded to
+         \texttt{"}Notes:\texttt{"} below. On exit, any supplied values will be rounded to
          values that can be represented accurately in the data type of
          the input NDF.
       }
@@ -18900,7 +18402,7 @@ locator}{sun92}{using_locators}}
          If either of these is set to VAL\_\_BADD, then a suitable value
          will be found automatically by inspecting the supplied array
          values. The values actually used will be returned on exit. See
-         {\tt "}Notes:{\tt "} below. On exit, any supplied values will be rounded to
+         \texttt{"}Notes:\texttt{"} below. On exit, any supplied values will be rounded to
          values that can be represented accurately in the data type of
          the input NDF.
       }
@@ -18929,7 +18431,7 @@ locator}{sun92}{using_locators}}
 
          \sstitem
          The compressed data may not be of type \_DOUBLE. An error will be
-         reported if TYPE is {\tt '}\_DOUBLE{\tt '}.
+         reported if TYPE is \texttt{'}\_DOUBLE\texttt{'}.
 
          \sstitem
          Only arrays that are stored in SIMPLE or PRIMITIVE form can
@@ -18948,7 +18450,7 @@ locator}{sun92}{using_locators}}
 
          \sstitem
          Complex arrays cannot be compressed using this routine. An error
-         will be reported if the input NDF has a complex type, or if {\tt "}TYPE{\tt "}
+         will be reported if the input NDF has a complex type, or if \texttt{"}TYPE\texttt{"}
          represents a complex data type.
 
          \sstitem
@@ -19138,7 +18640,7 @@ facilities from the NDF\_ library:
 
 \small
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 #include "ndf.h"                 /* Define NDF interface */
 #include "sae_par.h"             /* Define SAI__OK */
 
@@ -19151,7 +18653,7 @@ int main( int argc, char *argv[] ) {
    ...
 
 }
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 \normalsize
 
@@ -19219,10 +18721,8 @@ prototypes.
 \begin{latexonly}For details of each function, see the Fortran routine
 description in Appendix~\ref{ss:routinedescriptions}.
 \end{latexonly}
-\begin{htmlonly}
-The name of each function is linked to a description of the
-corresponding Fortran routine.
-\end{htmlonly}
+
+
 For general information about the C interface, see
 Appendix~\ref{ss:cinterface}.\\[1.0ex]
 
