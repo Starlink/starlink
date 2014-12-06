@@ -264,6 +264,60 @@ $(MANIFESTS)/cat: \
 	cd libraries/cat \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/ccdbig: \
+		$(MANIFESTS)/agi \
+		$(MANIFESTS)/ary \
+		$(MANIFESTS)/ast \
+		$(MANIFESTS)/atl \
+		$(MANIFESTS)/cat \
+		$(MANIFESTS)/ccdpack \
+		$(MANIFESTS)/cfitsio \
+		$(MANIFESTS)/chr \
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ctg \
+		$(MANIFESTS)/ems \
+		$(MANIFESTS)/fio \
+		$(MANIFESTS)/generic \
+		$(MANIFESTS)/gks \
+		$(MANIFESTS)/gns \
+		$(MANIFESTS)/graphpar \
+		$(MANIFESTS)/grp \
+		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hds \
+		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/idi \
+		$(MANIFESTS)/ifd \
+		$(MANIFESTS)/img \
+		$(MANIFESTS)/irq \
+		$(MANIFESTS)/kaplibs \
+		$(MANIFESTS)/lpg \
+		$(MANIFESTS)/mers \
+		$(MANIFESTS)/ncar \
+		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/ndg \
+		$(MANIFESTS)/one \
+		$(MANIFESTS)/par \
+		$(MANIFESTS)/pcs \
+		$(MANIFESTS)/pda \
+		$(MANIFESTS)/pgp \
+		$(MANIFESTS)/pgplot \
+		$(MANIFESTS)/prm \
+		$(MANIFESTS)/psx \
+		$(MANIFESTS)/ref \
+		$(MANIFESTS)/sae \
+		$(MANIFESTS)/sgs \
+		$(MANIFESTS)/sla \
+		$(MANIFESTS)/snx \
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
+		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
+		$(MANIFESTS)/trn
+	cd applications/obsolete/ccdbig \
+	  && $(MAKE_CPT)
+
 # Component ccdpack has configure dependencies on { blt itcl tcl tk },
 # which must be built before this component is configured.
 $(MANIFESTS)/ccdpack: \
@@ -1184,6 +1238,7 @@ $(MANIFESTS)/hdstrace: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
