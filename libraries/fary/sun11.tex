@@ -1,566 +1,42 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
 
-\pagestyle{myheadings}
+
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {11.5}
-\newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {19th July 2012}
-\newcommand{\stardoctitle}     {ARY\\[\latex{2.5ex}]
+\stardocnumber      {11.5}
+\stardocauthors     {R.F. Warren-Smith \& D.S. Berry}
+\stardocdate        {19th July 2012}
+\stardoctitle       {ARY\\[\latex{2.5ex}]
                                 A Subroutine Library for Accessing\\
                                 ARRAY Data Structures}
-\newcommand{\stardocversion}   {Version 1.4}
-\newcommand{\stardocmanual}    {Reference Manual}
-\newcommand{\stardocabstract}  {%
+\stardocversion     {Version 1.4}
+\stardocmanual      {Reference Manual}
+\stardocabstract  {%
 The ARY library is a set of routines for accessing Starlink ARRAY data
 structures built using the Hierarchical Data System (HDS).
 }
-% ? End of document identification
 % -----------------------------------------------------------------------------
+% ? Document specific \providecommand or \newenvironment commands.
 
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\html}[1]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
-\newcommand{\noteroutine}[2]{\textbf{#1}\hspace*{\fill}\nopagebreak \\
+\providecommand{\noteroutine}[2]{\textbf{#1}\hspace*{\fill}\nopagebreak \\
                              \hspace*{3em}\emph{#2}\hspace*{\fill}\par}
-
-% +
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2HTML. The contents of this file should be included in the
-%     source prior to any statements that make use of the SST commands.
-
-%  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty
-%     on your TEXINPUTS path (and including the name as part of the
-%     documentstyle declaration).
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-% -
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
-
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%  Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  Re-define \ssttt.
-   \newcommand{\ssttt}{\tt}
-
-%  \sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  \sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  \sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  \sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  \sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
-
-%  \sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}]
-      \begin{description}
-         #2
-      \end{description}
-   }
-
-%  \sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-   }
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-% .
-% @(#)sst.tex   1.4   95/06/06 11:46:41   95/06/06 11:49:58
-
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \null\vspace {5mm}
-    \begin {center}
-    \rule{80mm}{0.5mm} \\ [1ex]
-    {\Large\bf \stardoctitle \\ [2.5ex]
-               \stardocversion} \\ [2ex]
-    \rule{80mm}{0.5mm}
-    \end{center}
-    \setlength{\parskip}{0mm}
-    \latexonlytoc
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-\begin{latexonly}
-\null\vspace {5mm}
-\begin {center}
-\rule{80mm}{0.5mm} \\ [1ex]
-{\Large\bf \stardoctitle \\ [2.5ex]
-           \stardocversion} \\ [2ex]
-\rule{80mm}{0.5mm}
-\end{center}
-\end{latexonly}
+\scfrontmatter
 
 % ? Main text
 
@@ -893,9 +369,9 @@ Before compiling or linking applications which call ARY\_ routines, you
 should first ``log in'' for software development using these routines.
 This is done using the \texttt{ary\_dev} command.
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 % ary_dev
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 This will generate links to the ARY include files required for
 programming (note that this is only necessary if you reference ARY\_
@@ -908,9 +384,9 @@ command line.  For example, to compile and link an application called
 \texttt{adamprog} using the \texttt{alink} command, the following might be
 used:
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 % alink adamprog.f -o adamprog `ary_link_adam`
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 A ``stand-alone'' (\emph{i.e.} non-ADAM) version of the ARY\_ system is
 also available and should be used by those applications which do not
@@ -919,9 +395,9 @@ options file \mbox{ary\_link} on the linker command line.  For example,
 to compile and link a stand-alone application called \texttt{prog}, the
 following might be used:
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 % f77 -O prog.f -o prog `ary_link`
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 Both versions of the ARY\_ system contain the same set of user-callable
 routines.
@@ -1252,7 +728,7 @@ Creation and Control of Identifiers}
          BAD = LOGICAL (Returned)
       }{
          Whether it is necessary to check for bad pixels when processing
-         the array{\tt '}s values.
+         the array\texttt{'}s values.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -1282,7 +758,7 @@ Creation and Control of Identifiers}
          supplied, then the value of BAD will refer to the actual mapped
          values. It may differ from its original (unmapped) value if
          conversion errors occurred during the mapping process, or if an
-         initialisation option of {\tt '}/ZERO{\tt '} was specified for an array which
+         initialisation option of \texttt{'}/ZERO\texttt{'} was specified for an array which
          was initially undefined, or if the mapped values have subsequently
          been modified.
 
@@ -1387,7 +863,7 @@ Creation and Control of Identifiers}
          \sstitem
          If the array has fewer than NDIMX dimensions, then any
          remaining elements of the LBND and UBND arguments will be filled
-         with 1{\tt '}s.
+         with 1\texttt{'}s.
 
          \sstitem
          If the array has more than NDIMX dimensions, then the NDIM
@@ -1410,7 +886,7 @@ Creation and Control of Identifiers}
    Clone an array identifier
 }{
    \sstdescription{
-      The routine produces a {\tt "}cloned{\tt "} copy of an array identifier (i.e.
+      The routine produces a \texttt{"}cloned\texttt{"} copy of an array identifier (i.e.
       it produces a new identifier describing an array with identical
       attributes to the original).
    }
@@ -1641,8 +1117,8 @@ Creation and Control of Identifiers}
          TYPE = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The data type in which to store the differences between adjacent
-         input values. This must be one of {\tt '}\_BYTE{\tt '}, {\tt '}\_WORD{\tt '} or
-         {\tt '}\_INTEGER{\tt '}. Additionally, a blank string may be supplied in which
+         input values. This must be one of \texttt{'}\_BYTE\texttt{'}, \texttt{'}\_WORD\texttt{'} or
+         \texttt{'}\_INTEGER\texttt{'}. Additionally, a blank string may be supplied in which
          case a default value will be selected that gives the greatest
          compression.
       }
@@ -1671,7 +1147,7 @@ Creation and Control of Identifiers}
          supplied array size to the compressed array size). Genuine
          compressions are represented by values more than 1.0, but values
          less than 1.0 may be returned if the input data is not suited
-         to delta compression (i.e. if the {\tt "}compression{\tt "} actually expands
+         to delta compression (i.e. if the \texttt{"}compression\texttt{"} actually expands
          the array storage). Note, the returned value of ZRATIO may be
          smaller than MINRAT, in which case the supplied array is left
          unchanged. The returned compression factor is approximate as it
@@ -1721,7 +1197,7 @@ Creation and Control of Identifiers}
    \sstdescription{
       The routine returns the size in pixels of each dimension of an
       array, together with the total number of dimensions (the size of
-      a dimension is the difference between that dimension{\tt '}s upper and
+      a dimension is the difference between that dimension\texttt{'}s upper and
       lower pixel-index bounds $+$ 1).
    }
    \sstinvocation{
@@ -1760,7 +1236,7 @@ Creation and Control of Identifiers}
 
          \sstitem
          If the array has fewer than NDIMX dimensions, then any
-         remaining elements of the DIM argument will be filled with 1{\tt '}s.
+         remaining elements of the DIM argument will be filled with 1\texttt{'}s.
 
          \sstitem
          If the array has more than NDIMX dimensions, then the NDIM
@@ -1888,7 +1364,7 @@ Creation and Control of Identifiers}
 }{
    \sstdescription{
       The routine returns the storage form of an array as an upper-case
-      character string (e.g. {\tt '}SIMPLE{\tt '}).
+      character string (e.g. \texttt{'}SIMPLE\texttt{'}).
    }
    \sstinvocation{
       CALL ARY\_FORM( IARY, FORM, STATUS )
@@ -1919,9 +1395,9 @@ Creation and Control of Identifiers}
          array. This constant is defined in the include file ARY\_PAR.
 
          \sstitem
-         At present, the ARY\_ routines only support {\tt "}primitive{\tt "}, {\tt "}scaled{\tt "},
-         {\tt "}simple{\tt "} and {\tt "}delta{\tt "} arrays, so only the values {\tt '}PRIMITIVE{\tt '}, {\tt '}SCALED{\tt '}
-         {\tt '}DELTA{\tt '} and {\tt '}SIMPLE{\tt '} can be returned.
+         At present, the ARY\_ routines only support \texttt{"}primitive\texttt{"}, \texttt{"}scaled\texttt{"},
+         \texttt{"}simple\texttt{"} and \texttt{"}delta\texttt{"} arrays, so only the values \texttt{'}PRIMITIVE\texttt{'}, \texttt{'}SCALED\texttt{'}
+         \texttt{'}DELTA\texttt{'} and \texttt{'}SIMPLE\texttt{'} can be returned.
       }
    }
 }
@@ -1932,7 +1408,7 @@ Creation and Control of Identifiers}
 }{
    \sstdescription{
       The routine returns the full data type of an array as an
-      upper-case character string (e.g. {\tt '}\_REAL{\tt '} or {\tt '}COMPLEX\_BYTE{\tt '}).
+      upper-case character string (e.g. \texttt{'}\_REAL\texttt{'} or \texttt{'}COMPLEX\_BYTE\texttt{'}).
    }
    \sstinvocation{
       CALL ARY\_FTYPE( IARY, FTYPE, STATUS )
@@ -1963,7 +1439,7 @@ Creation and Control of Identifiers}
          array. This constant is defined in the include file ARY\_PAR.
 
          \sstitem
-         For {\tt "}Scaled{\tt "} arrays, the data type returned by this function is
+         For \texttt{"}Scaled\texttt{"} arrays, the data type returned by this function is
          the data type of the SCALE and ZERO terms, rather than the data
          type of the stored array.
       }
@@ -2009,8 +1485,8 @@ Creation and Control of Identifiers}
          ZTYPE = CHARACTER $*$ ( $*$ ) (Returned)
       }{
          The data type in which the differences between adjacent array
-         values are stored. This will be one of {\tt '}\_BYTE{\tt '}, {\tt '}\_WORD{\tt '} or
-         {\tt '}\_INTEGER{\tt '}. The data type of the array itself is returned if the
+         values are stored. This will be one of \texttt{'}\_BYTE\texttt{'}, \texttt{'}\_WORD\texttt{'} or
+         \texttt{'}\_INTEGER\texttt{'}. The data type of the array itself is returned if the
          supplid array is not stored in DELTA form.
       }
       \sstsubsection{
@@ -2136,8 +1612,8 @@ Creation and Control of Identifiers}
       \sstsubsection{
          ACCESS = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The type of array access required: {\tt '}BOUNDS{\tt '}, {\tt '}DELETE{\tt '},
-         {\tt '}SHIFT{\tt '}, {\tt '}TYPE{\tt '} or {\tt '}WRITE{\tt '} (see the Notes section for
+         The type of array access required: \texttt{'}BOUNDS\texttt{'}, \texttt{'}DELETE\texttt{'},
+         \texttt{'}SHIFT\texttt{'}, \texttt{'}TYPE\texttt{'} or \texttt{'}WRITE\texttt{'} (see the Notes section for
          details).
       }
       \sstsubsection{
@@ -2157,22 +1633,22 @@ Creation and Control of Identifiers}
       \sstitemlist{
 
          \sstitem
-         {\tt '}BOUNDS{\tt '} permits the pixel-index bounds of a base array to be
+         \texttt{'}BOUNDS\texttt{'} permits the pixel-index bounds of a base array to be
          altered.
 
          \sstitem
-         {\tt '}DELETE{\tt '} permits deletion of the array.
+         \texttt{'}DELETE\texttt{'} permits deletion of the array.
 
          \sstitem
-         {\tt '}SHIFT{\tt '} permits pixel-index shifts to be applied to a base
+         \texttt{'}SHIFT\texttt{'} permits pixel-index shifts to be applied to a base
          array.
 
          \sstitem
-         {\tt '}TYPE{\tt '} permits the data type of the array to be altered.
+         \texttt{'}TYPE\texttt{'} permits the data type of the array to be altered.
 
          \sstitem
-         {\tt '}WRITE{\tt '} permits new values to be written to the array, or the
-         array{\tt '}s state to be reset.
+         \texttt{'}WRITE\texttt{'} permits new values to be written to the array, or the
+         array\texttt{'}s state to be reset.
       }
    }
 }
@@ -2323,14 +1799,14 @@ Creation and Control of Identifiers}
       \sstsubsection{
          TYPE = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The numerical data type required for access (e.g. {\tt '}\_REAL{\tt '}).
+         The numerical data type required for access (e.g. \texttt{'}\_REAL\texttt{'}).
       }
       \sstsubsection{
          MMOD = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The mapping mode for access to the array: {\tt '}READ{\tt '}, {\tt '}UPDATE{\tt '} or
-         {\tt '}WRITE{\tt '}, with an optional initialisation mode {\tt '}/BAD{\tt '} or
-         {\tt '}/ZERO{\tt '} appended.
+         The mapping mode for access to the array: \texttt{'}READ\texttt{'}, \texttt{'}UPDATE\texttt{'} or
+         \texttt{'}WRITE\texttt{'}, with an optional initialisation mode \texttt{'}/BAD\texttt{'} or
+         \texttt{'}/ZERO\texttt{'} appended.
       }
       \sstsubsection{
          PNTR = INTEGER (Returned)
@@ -2390,14 +1866,14 @@ Creation and Control of Identifiers}
          TYPE = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The numerical data type required for accessing the array (e.g.
-         {\tt '}\_REAL{\tt '}).
+         \texttt{'}\_REAL\texttt{'}).
       }
       \sstsubsection{
          MMOD = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The mapping mode for access to the array: {\tt '}READ{\tt '}, {\tt '}UPDATE{\tt '} or
-         {\tt '}WRITE{\tt '}, with an optional initialisation mode {\tt '}/BAD{\tt '} or
-         {\tt '}/ZERO{\tt '} appended.
+         The mapping mode for access to the array: \texttt{'}READ\texttt{'}, \texttt{'}UPDATE\texttt{'} or
+         \texttt{'}WRITE\texttt{'}, with an optional initialisation mode \texttt{'}/BAD\texttt{'} or
+         \texttt{'}/ZERO\texttt{'} appended.
       }
       \sstsubsection{
          RPNTR = INTEGER (Returned)
@@ -2571,7 +2047,7 @@ Creation and Control of Identifiers}
       \sstsubsection{
          FTYPE = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         Data type of the array (e.g. {\tt '}\_REAL{\tt '}). Note that complex types
+         Data type of the array (e.g. \texttt{'}\_REAL\texttt{'}). Note that complex types
          are not allowed for primitive arrays.
       }
       \sstsubsection{
@@ -2637,8 +2113,8 @@ Creation and Control of Identifiers}
       \sstsubsection{
          ACCESS = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The type of access to be disabled: {\tt '}BOUNDS{\tt '}, {\tt '}DELETE{\tt '},
-         {\tt '}MODIFY{\tt '}, {\tt '}SCALE{\tt '}, {\tt '}SHIFT{\tt '}, {\tt '}TYPE{\tt '} or {\tt '}WRITE{\tt '}.
+         The type of access to be disabled: \texttt{'}BOUNDS\texttt{'}, \texttt{'}DELETE\texttt{'},
+         \texttt{'}MODIFY\texttt{'}, \texttt{'}SCALE\texttt{'}, \texttt{'}SHIFT\texttt{'}, \texttt{'}TYPE\texttt{'} or \texttt{'}WRITE\texttt{'}.
       }
       \sstsubsection{
          IARY = INTEGER (Given)
@@ -2657,29 +2133,29 @@ Creation and Control of Identifiers}
       \sstitemlist{
 
          \sstitem
-         {\tt '}BOUNDS{\tt '} prevents the pixel-index bounds of a base array from
+         \texttt{'}BOUNDS\texttt{'} prevents the pixel-index bounds of a base array from
          being altered.
 
          \sstitem
-         {\tt '}DELETE{\tt '} prevents the array being deleted.
+         \texttt{'}DELETE\texttt{'} prevents the array being deleted.
 
          \sstitem
-         {\tt '}MODIFY{\tt '} prevents any form of modification to the array (i.e.
+         \texttt{'}MODIFY\texttt{'} prevents any form of modification to the array (i.e.
          it disables all the other access types).
 
          \sstitem
-         {\tt '}SCALE{\tt '} prevents the scale and zero values from being changed.
+         \texttt{'}SCALE\texttt{'} prevents the scale and zero values from being changed.
 
          \sstitem
-         {\tt '}SHIFT{\tt '} prevents pixel-index shifts from being applied to a
+         \texttt{'}SHIFT\texttt{'} prevents pixel-index shifts from being applied to a
          base array.
 
          \sstitem
-         {\tt '}TYPE{\tt '} prevents the data type of the array from being altered.
+         \texttt{'}TYPE\texttt{'} prevents the data type of the array from being altered.
 
          \sstitem
-         {\tt '}WRITE{\tt '} prevents new values from being written to the array,
-         or the array{\tt '}s state from being reset.
+         \texttt{'}WRITE\texttt{'} prevents new values from being written to the array,
+         or the array\texttt{'}s state from being reset.
       }
    }
 }
@@ -3044,12 +2520,12 @@ Creation and Control of Identifiers}
          it is mapped for access (i.e. even through another identifier).
 
          \sstitem
-         The array{\tt '}s pixel values (if defined) will be retained for
+         The array\texttt{'}s pixel values (if defined) will be retained for
          those pixels which lie within both the old and new bounds. Any
          pixels lying outside the new bounds will be lost (and cannot
-         later be recovered by further changes to the array{\tt '}s bounds).
+         later be recovered by further changes to the array\texttt{'}s bounds).
          Any new pixels introduced where the new bounds extend beyond the
-         old ones will be assigned the {\tt "}bad{\tt "} value, and the subsequent
+         old ones will be assigned the \texttt{"}bad\texttt{"} value, and the subsequent
          value of the bad-pixel flag will reflect this.
 
          \sstitem
@@ -3069,7 +2545,7 @@ Creation and Control of Identifiers}
 }{
    \sstdescription{
       The routine returns the numeric type of a scaled array as an
-      upper-case character string (e.g. {\tt '}\_REAL{\tt '}). The returned type
+      upper-case character string (e.g. \texttt{'}\_REAL\texttt{'}). The returned type
       describes the values stored in the array, before they are unscaled
       using the associated scale and zero values. Use ARY\_TYPE if you
       need the data type of the array after it has been unscaled.
@@ -3161,7 +2637,7 @@ Creation and Control of Identifiers}
          \sstitem
          The number of section dimensions need not match the number of
          dimensions in the initial array. Pixel-index bounds will be
-         padded with 1{\tt '}s as necessary to identify the pixels to which the
+         padded with 1\texttt{'}s as necessary to identify the pixels to which the
          new section should refer.
 
          \sstitem
@@ -3186,7 +2662,7 @@ Creation and Control of Identifiers}
       The routine applies pixel-index shifts to an array. An integer
       shift is applied to each dimension so that its pixel-index
       bounds, and the indices of each pixel, change by the amount of
-      shift applied to the corresponding dimension. The array{\tt '}s pixels
+      shift applied to the corresponding dimension. The array\texttt{'}s pixels
       retain their values and none are lost.
    }
    \sstinvocation{
@@ -3337,7 +2813,7 @@ Creation and Control of Identifiers}
          This routine takes account of the regions of each base array
          to which the input array sections have access. It may therefore
          restrict the region accessible to the new section (and pad with
-         {\tt "}bad{\tt "} pixels) so as not to grant access to regions of the base
+         \texttt{"}bad\texttt{"} pixels) so as not to grant access to regions of the base
          array which were not previously accessible through the input
          arrays.
 
@@ -3356,7 +2832,7 @@ Creation and Control of Identifiers}
    Determine the state of an array (defined or undefined)
 }{
    \sstdescription{
-      The routine returns a logical value indicating whether an array{\tt '}s
+      The routine returns a logical value indicating whether an array\texttt{'}s
       pixel values are currently defined.
    }
    \sstinvocation{
@@ -3371,7 +2847,7 @@ Creation and Control of Identifiers}
       \sstsubsection{
          STATE = LOGICAL (Returned)
       }{
-         Whether the array{\tt '}s pixel values are defined.
+         Whether the array\texttt{'}s pixel values are defined.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -3387,7 +2863,7 @@ Creation and Control of Identifiers}
 }{
    \sstdescription{
       The routine sets a new full type for an array, causing its data
-      storage type to be changed. If the array{\tt '}s pixel values are
+      storage type to be changed. If the array\texttt{'}s pixel values are
       defined, then they will be converted from the old type to the new
       one.  If they are undefined, then no conversion will be
       necessary.  Subsequent enquiries will reflect the new type.
@@ -3402,8 +2878,8 @@ Creation and Control of Identifiers}
       \sstsubsection{
          FTYPE = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The new full type specification for the array (e.g.  {\tt '}\_REAL{\tt '}
-         or {\tt '}COMPLEX\_INTEGER{\tt '}).
+         The new full type specification for the array (e.g.  \texttt{'}\_REAL\texttt{'}
+         or \texttt{'}COMPLEX\_INTEGER\texttt{'}).
       }
       \sstsubsection{
          IARY = INTEGER (Given)
@@ -3529,7 +3005,7 @@ Creation and Control of Identifiers}
 }{
    \sstdescription{
       The routine returns the numeric type of an array as an upper-case
-      character string (e.g. {\tt '}\_REAL{\tt '}).
+      character string (e.g. \texttt{'}\_REAL\texttt{'}).
    }
    \sstinvocation{
       CALL ARY\_TYPE( IARY, TYPE, STATUS )
@@ -3633,12 +3109,12 @@ Creation and Control of Identifiers}
 \sstroutine{
    ARY\_VERFY
 }{
-   Verify that an array{\tt '}s data structure is correctly constructed
+   Verify that an array\texttt{'}s data structure is correctly constructed
 }{
    \sstdescription{
       The routine checks that the data structure containing an array is
-      correctly constructed and that the array{\tt '}s pixel values are
-      defined. It also checks for the presence of any {\tt "}rogue{\tt "}
+      correctly constructed and that the array\texttt{'}s pixel values are
+      defined. It also checks for the presence of any \texttt{"}rogue\texttt{"}
       components in the data structure. If an anomaly is found, then an
       error results. Otherwise, the routine returns without further
       action.
