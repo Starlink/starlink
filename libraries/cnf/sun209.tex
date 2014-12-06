@@ -1,32 +1,30 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
 
-\pagestyle{myheadings}
+
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {209.11}
-\newcommand{\stardocauthors}   {P.M.\ Allan\\
+\stardocnumber      {209.11}
+\stardocauthors   {P.M.\ Allan\\
                                 A.J.\ Chipperfield\\
                                 R.F.\ Warren-Smith\\
                                 P.W.\ Draper\\
                                 D.S.\ Berry}
-\newcommand{\stardocdate}      {12 May 2011}
-\newcommand{\stardoctitle}     {CNF and F77 \\ [1ex]
+\stardocdate        {12 May 2011}
+\stardoctitle     {CNF and F77 \\ [1ex]
                                 Mixed Language Programming -- FORTRAN and C}
-\newcommand{\stardocversion}   {Version 4.3}
-\newcommand{\stardocmanual}    {Programmer's Manual}
-\newcommand{\stardocabstract}  {
+\stardocversion     {Version 4.3}
+\stardocmanual      {Programmer's Manual}
+\stardocabstract  {
 The CNF package comprises two sets of software which ease the task of writing
 portable programs in a mixture of FORTRAN and C\@.
 F77 is a set of C macros for handling the FORTRAN/C subroutine linkage in a
@@ -36,463 +34,54 @@ dynamically allocated memory.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
 
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-\newcounter{examples}
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
-%+
-% Extra sst definitions written by PMA.
-%-
-
 % Definition to give a banner that only has the name of the routine on the
 % left, not on the left and right.
 
-\newcommand{\sstmacro}[3]{
+\newcounter{examples}
+
+\providecommand{\sstmacro}[3]{
    \goodbreak
    \rule{\textwidth}{0.5mm}
    \vspace{-7ex}
    \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
+   \settowidth{\sstbannerlength}{{\Large \textbf{#1}}}
+   %\setlength{\sstcaptionlength}{\textwidth}
+   %\setlength{\sstexampleslength}{\textwidth}
    \addtolength{\sstbannerlength}{0.5em}
    \addtolength{\sstcaptionlength}{-1.0\sstbannerlength}
    \addtolength{\sstcaptionlength}{-4.45pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \settowidth{\sstexampleswidth}{\textbf{Examples:}}
    \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large \textbf{#1}}}
    \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
    \begin{description}
       #3
    \end{description}
 }
 
-\begin{htmlonly}
-   \newcommand{\sstmacro}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-\end{htmlonly}
-
 % Define a table for use in examples
-\newcommand{\sstexamplestable}[1]{\begin{tabular}{ll}
+\providecommand{\sstexamplestable}[1]{\begin{tabular}{ll}
                               #1
                               \end{tabular}
                              }
-\newcommand{\sstexamplestableentry}[2]{#1 & {\ssttt {#2}}}
+\providecommand{\sstexamplestableentry}[2]{#1 & {\texttt{#2}}}
 
-\newcommand{\relabel}[1]{}
-\begin{htmlonly}
-\newcommand{\relabel}[1]{\xlabel{#1}\label{#1}}
-\end{htmlonly}
+\providecommand{\relabel}[1]{}
+
+
 
 % Define layout of brief listing sections.
-\newcommand{\routinelist}[1]{\small
+\providecommand{\routinelist}[1]{\small
                              \begin{description} #1 \end{description}
                              \normalsize
                             }
-\newcommand{\listroutine}[2]{\item[\htmlref{#1}{#1}]
+\providecommand{\listroutine}[2]{\item[\htmlref{#1}{#1}]
                              \hspace*{\fill} \nopagebreak
-                             \subitem {\em #2} \hspace*{\fill}
+                             \subitem \emph{#2} \hspace*{\fill}
                             }
-\newcommand{\listgenroutine}[3]{\item[\htmlref{#1}{#3}]
+\providecommand{\listgenroutine}[3]{\item[\htmlref{#1}{#3}]
                              \hspace*{\fill} \nopagebreak
-                             \subitem {\em #2} \hspace*{\fill}
+                             \subitem \emph{#2} \hspace*{\fill}
                             }
 % End of extra sst definitions.
 %.
@@ -502,110 +91,8 @@ dynamically allocated memory.}
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section{\xlabel{how_to_read_this_document}\label{how_to}How to read this document}
 
@@ -637,9 +124,8 @@ Full descriptions of the C
 and
 \htmlref{functions}{cnf_description}
 involved are
-\begin{htmlonly}
-provided.
-\end{htmlonly}
+
+
 \latex{provided in appendices \ref{f77_description} and
 \ref{cnf_description}.} The macro names in the text will often include the
 legend \texttt{\textit{type}} to indicate a generic macro name. In this case,
@@ -692,7 +178,8 @@ Example\latex{~\ref{cook_argsf2c}}
 -- Calling C from FORTRAN\@.
 \end{center}
 FORTRAN program:
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       PROGRAM COOK1
       INTEGER I,J
       REAL A,B
@@ -707,37 +194,40 @@ FORTRAN program:
       PRINT *, LINE
 
       END
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 \end{samepage}
 C function:
 \nopagebreak[4]
-{\small \begin{verbatim}
-      #include "f77.h"
+\begin{small}
+\begin{terminalv}
+#include "f77.h"
 
-      F77_SUBROUTINE(silly1)( REAL(a), REAL(b), INTEGER(i), INTEGER(j),
-         CHARACTER(line), INTEGER(line_l), LOGICAL(x) TRAIL(line) )
-      {
-         GENPTR_REAL(a)
-         GENPTR_REAL(b)
-         GENPTR_INTEGER(i)
-         GENPTR_INTEGER(j)
-         GENPTR_CHARACTER(line)
-         GENPTR_INTEGER(line_l)
-         GENPTR_LOGICAL(x)
+F77_SUBROUTINE(silly1)( REAL(a), REAL(b), INTEGER(i), INTEGER(j),
+  CHARACTER(line), INTEGER(line_l), LOGICAL(x) TRAIL(line) )
+{
+  GENPTR_REAL(a)
+  GENPTR_REAL(b)
+  GENPTR_INTEGER(i)
+  GENPTR_INTEGER(j)
+  GENPTR_CHARACTER(line)
+  GENPTR_INTEGER(line_l)
+  GENPTR_LOGICAL(x)
 
-         char str[] = "This is a string";
+  char str[] = "This is a string";
 
-         if( F77_ISTRUE(*x) )
-         {
-            *b = *a;
-            *j = *i;
-         }
-         else
-         {
-            cnfExprt( str, line, *line_l );
-         }
-      }
-\end{verbatim} }
+  if( F77_ISTRUE(*x) )
+  {
+     *b = *a;
+     *j = *i;
+  }
+  else
+  {
+     cnfExprt( str, line, *line_l );
+  }
+}
+\end{terminalv}
+\end{small}
 
 This is a rather silly example, but it does illustrate all of the important
 points of calling C from FORTRAN\@. The FORTRAN program is completely standard.
@@ -807,45 +297,48 @@ Example\latex{~\ref{cook_argsc2f}}
 \end{center}
 \nopagebreak[4]
 C program:
-{\small \begin{verbatim}
-      #include "f77.h"
+\begin{small}
+\begin{terminalv}
+#include "f77.h"
 
-      #define FLINE_LENGTH 80
+#define FLINE_LENGTH 80
 
-      extern F77_SUBROUTINE(silly2)( REAL(a), REAL(b), INTEGER(i), INTEGER(j),
-         CHARACTER(line), INTEGER(line_l), LOGICAL(x) TRAIL(line) );
+extern F77_SUBROUTINE(silly2)( REAL(a), REAL(b), INTEGER(i), INTEGER(j),
+  CHARACTER(line), INTEGER(line_l), LOGICAL(x) TRAIL(line) );
 
-      main()
-      {
-         DECLARE_INTEGER(i);
-         DECLARE_INTEGER(j);
-         DECLARE_INTEGER(fline_l);
-         DECLARE_REAL(a);
-         DECLARE_REAL(b);
-         DECLARE_LOGICAL(x);
-         DECLARE_CHARACTER(fline,FLINE_LENGTH);
+main()
+{
+  DECLARE_INTEGER(i);
+  DECLARE_INTEGER(j);
+  DECLARE_INTEGER(fline_l);
+  DECLARE_REAL(a);
+  DECLARE_REAL(b);
+  DECLARE_LOGICAL(x);
+  DECLARE_CHARACTER(fline,FLINE_LENGTH);
 
-         char line[FLINE_LENGTH+1];
+  char line[FLINE_LENGTH+1];
 
-         fline_l = FLINE_LENGTH;
+  fline_l = FLINE_LENGTH;
 
-         i = 1;
-         a = 5.0;
-         x = F77_FALSE;
+  i = 1;
+  a = 5.0;
+  x = F77_FALSE;
 
-         F77_CALL(silly2)( REAL_ARG(&a), REAL_ARG(&b), INTEGER_ARG(&i),
-           INTEGER_ARG(&j), CHARACTER_ARG(fline), INTEGER_ARG(&fline_l),
-           LOGICAL_ARG(&x) TRAIL_ARG(fline) );
+  F77_CALL(silly2)( REAL_ARG(&a), REAL_ARG(&b), INTEGER_ARG(&i),
+    INTEGER_ARG(&j), CHARACTER_ARG(fline), INTEGER_ARG(&fline_l),
+    LOGICAL_ARG(&x) TRAIL_ARG(fline) );
 
-         cnfImprt( fline, FLINE_LENGTH, line );
+  cnfImprt( fline, FLINE_LENGTH, line );
 
-         printf( "%s\n", line );
-      }
-\end{verbatim} }
+  printf( "%s\n", line );
+}
+\end{terminalv}
+\end{small}
 \pagebreak[3]
 FORTRAN function:
 \nopagebreak[4]
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       SUBROUTINE SILLY2( A, B, I, J, LINE, LINE_L, X )
       REAL A, B
       INTEGER I, J
@@ -861,10 +354,11 @@ FORTRAN function:
       END IF
 
       END
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 
 In the above C main program, the variable \texttt{fline\_l} is declared and set
-equal to the constant {\tt FLINE\_LENGTH}. At first sight this is unnecessary.
+equal to the constant \texttt{FLINE\_LENGTH}. At first sight this is unnecessary.
 However, this is not the case, as we need to pass the value of
 \texttt{FLINE\_LENGTH} to the subroutine and it is not possible to pass
 constants to FORTRAN subroutines. Only variables can be passed.
@@ -875,10 +369,10 @@ The final step is compiling and linking the program.
 Suppose, on Unix, the main FORTRAN program is in the file \texttt{cook1.f} and
 the C function is in the file \texttt{silly1.c}, then the commands might be:
 
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 % cc -c -I/star/include silly1.c
 % f77 cook1.f silly1.o -L/star/lib `cnf_link`
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 Note that the compiling and linking commands are somewhat machine-specific
 -- compiling the FORTRAN routine first and then trying to link the routine
@@ -955,7 +449,7 @@ hardware does not impose a meaning on a given bit pattern. It is the operating
 system that does that. The character codes that are in common use are the ASCII
 collating sequence and the EBCDIC collating sequence. EBCDIC is only used by
 IBM mainframe and minicomputers (and their clones), but there are a lot of IBM
-computers around. (The IBM PC does {\it not}\, use EBCDIC\@.) Again it would be
+computers around. (The IBM PC does \textit{not}\, use EBCDIC\@.) Again it would be
 rather perverse if, on a given computer, FORTRAN and C used a different
 representation of characters, so that is not really worth worrying about. What
 certainly is worth paying attention to is the possibility that any given
@@ -1058,15 +552,15 @@ There are additional problems with FORTRAN character arrays.
 This is because C handles a one dimensional FORTRAN character array as a two
 dimensional array of type \texttt{char}, \textit{i.e.}\ the FORTRAN statement:
 
-\begin{quote}
-\texttt{CHARACTER * ( NCHAR ) NAMES(DIM)}
-\end{quote}
+\begin{terminalv}
+CHARACTER * ( NCHAR ) NAMES(DIM)
+\end{terminalv}
 
 is equivalent to the C statement:
 
-\begin{quote}
-\texttt{character names[dim][nchar]}
-\end{quote}
+\begin{terminalv}
+char names[dim][nchar]
+\end{terminalv}
 
 \subsection{\xlabel{same_language_dash_different_compiler}Same Language -- Different Compiler}
 
@@ -1230,9 +724,9 @@ GAP\@. For example,
 \texttt{CALL BANNER( LINE, 5, 10, 3 )} would return with \texttt{LINE} set to
 the following character string.
 
-\begin{verbatim}
-   -----   **********   -----
-\end{verbatim}
+\begin{terminalv}
+-----   **********   -----
+\end{terminalv}
 
 \newpage
 \refstepcounter{examples}
@@ -1243,7 +737,8 @@ Example\latex{~\ref{f77_argsf2c}}
 \end{center}
 \begin{samepage}
 FORTRAN program:
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       PROGRAM F1
       INTEGER FIRST, MIDDLE, GAP
       CHARACTER*(80) LINE
@@ -1255,51 +750,54 @@ FORTRAN program:
       PRINT *, LINE
 
       END
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 \end{samepage}
 \pagebreak[3]
 C function:
 \nopagebreak[4]
-{\small \begin{verbatim}
-      #include "f77.h"
+\begin{small}
+\begin{terminalv}
+#include "f77.h"
 
-      F77_SUBROUTINE(banner)( CHARACTER(line), INTEGER(first), INTEGER(middle),
-                              INTEGER(gap) TRAIL(line) )  {
-         GENPTR_CHARACTER(line)
-         GENPTR_INTEGER(first)
-         GENPTR_INTEGER(middle)
-         GENPTR_INTEGER(gap)
-         int i, j;       /* Loop counters.  */
-         char *cp;       /* Pointer to a character.  */
+F77_SUBROUTINE(banner)( CHARACTER(line), INTEGER(first), INTEGER(middle),
+                       INTEGER(gap) TRAIL(line) )  {
+  GENPTR_CHARACTER(line)
+  GENPTR_INTEGER(first)
+  GENPTR_INTEGER(middle)
+  GENPTR_INTEGER(gap)
+  int i, j;       /* Loop counters.  */
+  char *cp;       /* Pointer to a character.  */
 
-      /* Make cp point to the beginning of the string line.  */
-         cp = line;
+/* Make cp point to the beginning of the string line.  */
+  cp = line;
 
-      /* First blanks.  */
-         for( i = 0, j = 0 ; (j < line_length) && (i < *gap) ; i++, j++ )
-            *cp++ = ' ';
+/* First blanks.  */
+  for( i = 0, j = 0 ; (j < line_length) && (i < *gap) ; i++, j++ )
+     *cp++ = ' ';
 
-      /* First hyphens.  */
-         for( i = 0 ; (j < line_length) && (i < *first) ; i++, j++ )
-            *cp++ = '-';
+/* First hyphens.  */
+  for( i = 0 ; (j < line_length) && (i < *first) ; i++, j++ )
+     *cp++ = '-';
 
-      /* More blanks.  */
-         for( i = 0 ; (j < line_length) && (i < *gap) ; i++, j++ )
-            *cp++ = ' ';
+/* More blanks.  */
+  for( i = 0 ; (j < line_length) && (i < *gap) ; i++, j++ )
+     *cp++ = ' ';
 
-      /* Middle stars.  */
-         for( i = 0 ; (j < line_length) && (i < *middle) ; i++, j++ )
-            *cp++ = '*';
+/* Middle stars.  */
+  for( i = 0 ; (j < line_length) && (i < *middle) ; i++, j++ )
+     *cp++ = '*';
 
-      /* More blanks.  */
-         for( i = 0 ; (j < line_length) && (i < *gap) ; i++, j++ )
-            *cp++ = ' ';
+/* More blanks.  */
+  for( i = 0 ; (j < line_length) && (i < *gap) ; i++, j++ )
+     *cp++ = ' ';
 
-      /* Last hyphens.  */
-         for( i = 0 ; (j < line_length) && (i < *first) ; i++, j++ )
-            *cp++ = '-';
-      }
-\end{verbatim} }
+/* Last hyphens.  */
+  for( i = 0 ; (j < line_length) && (i < *first) ; i++, j++ )
+     *cp++ = '-';
+}
+\end{terminalv}
+\end{small}
 
 The FORTRAN part of this example is completely standard; it is the C code that
 need further explanation. Firstly there is the declaration of the subroutine
@@ -1483,14 +981,16 @@ arrays of more than one dimension. Unfortunately, such declarations cannot be
 made portable as some FORTRAN systems pass arrays by descriptor. If you really
 must declare arrays with fixed dimensions, you can do so as follows:
 
-{\small \begin{verbatim}
-      F77_SUBROUTINE(subname)( F77_INTEGER_TYPE array[3][3] )
-      {
-         ...
-         elem = array[i][j]
-         ...
-      }
-\end{verbatim} }
+\begin{small}
+\begin{terminalv}
+F77_SUBROUTINE(subname)( F77_INTEGER_TYPE array[3][3] )
+{
+  ...
+  elem = array[i][j]
+  ...
+}
+\end{terminalv}
+\end{small}
 
 This example declares the dummy argument to be an INTEGER array of fixed size.
 Although the subscript calculation can be performed as the routine knows the
@@ -1511,7 +1011,8 @@ to C\@.
 \nopagebreak[4]
 FORTRAN program:
 \nopagebreak[4]
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       PROGRAM ARY
 
       INTEGER NDIMS, DIM1, DIM2, DIM3
@@ -1526,34 +1027,37 @@ FORTRAN program:
       CALL INIT( A, NDIMS, DIMS )
 
       END
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 \pagebreak[1]
 C function:
 \nopagebreak[4]
-{\small \begin{verbatim}
-      #include "f77.h"
+\begin{small}
+\begin{terminalv}
+#include "f77.h"
 
-      F77_SUBROUTINE(init)( INTEGER_ARRAY(a), INTEGER(ndims), INTEGER_ARRAY(dims) )
-      {
-         GENPTR_INTEGER_ARRAY(a)
-         GENPTR_INTEGER(ndims)
-         GENPTR_INTEGER_ARRAY(dims)
+F77_SUBROUTINE(init)( INTEGER_ARRAY(a), INTEGER(ndims), INTEGER_ARRAY(dims) )
+{
+  GENPTR_INTEGER_ARRAY(a)
+  GENPTR_INTEGER(ndims)
+  GENPTR_INTEGER_ARRAY(dims)
 
-         int *ptr = &a[0];  /* ptr now points to the first element of a.  */
-         int size = 1;      /* Declare and initialize size.  */
-         int i;             /* A loop counter.  */
+  int *ptr = &a[0];  /* ptr now points to the first element of a.  */
+  int size = 1;      /* Declare and initialize size.  */
+  int i;             /* A loop counter.  */
 
-         /* Find the number of elements in a.  */
+  /* Find the number of elements in a.  */
 
-         for( i = 0; i < *ndims ; i++ )
-            size = size * dims[i];
+  for( i = 0; i < *ndims ; i++ )
+     size = size * dims[i];
 
-         /* Set each element of a to zero.  */
+  /* Set each element of a to zero.  */
 
-         for( i = 0 ; i < size ; i++ )
-            *ptr++ = 0;
-      }
-\end{verbatim} }
+  for( i = 0 ; i < size ; i++ )
+     *ptr++ = 0;
+}
+\end{terminalv}
+\end{small}
 
 In this example, each element of the array \texttt{a} is accessed via the
 pointer \texttt{ptr}, which is incremented each time around the last loop.
@@ -1618,9 +1122,9 @@ is changed in the function, then it should of course be copied back into the
 argument at the end of the function. Alternatively you could define C macros to
 refer to the pointers, such as
 
-\begin{quote}
-\texttt{\#define STATUS *status}
-\end{quote}
+\begin{terminalv}
+#define STATUS *status
+\end{terminalv}
 
 Note that although ANSI C will allow the above as \texttt{status} and
 \texttt{STATUS}
@@ -1681,21 +1185,25 @@ components of those structures in the C code. The following declares a common
 block named ``block'' that contains three \texttt{INTEGER} variables and three
 \texttt{REAL} variables.
 
-{\small \begin{verbatim}
-      extern struct
-      {
-        F77_INTEGER_TYPE i,j,k;
-        F77_REAL_TYPE a,b,c;
-      } F77_NAMED_COMMON(block);
-\end{verbatim} }
+\begin{small}
+\begin{terminalv}
+extern struct
+{
+ F77_INTEGER_TYPE i,j,k;
+ F77_REAL_TYPE a,b,c;
+} F77_NAMED_COMMON(block);
+\end{terminalv}
+\end{small}
 
 The corresponding FORTRAN statements are
 
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       INTEGER I,J,K
       REAL A,B,C
       COMMON /BLOCK/ I,J,K,A,B,C
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 
 Within the C function the variables would be referred to as:
 
@@ -1756,7 +1264,8 @@ Example\latex{~\ref{f77_char}}
 \nopagebreak[4]
 FORTRAN program:
 \nopagebreak[4]
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       PROGRAM STRING
       CHARACTER STR*20
 
@@ -1764,23 +1273,26 @@ FORTRAN program:
       PRINT *,STR
 
       END
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 \pagebreak[1]
 C function:
 \nopagebreak[4]
-{\small \begin{verbatim}
-      #include "f77.h"
+\begin{small}
+\begin{terminalv}
+#include "f77.h"
 
-      F77_SUBROUTINE(getstr)( CHARACTER(fortchar) TRAIL(fortchar) )
-      {
-         GENPTR_CHARACTER(fortchar)           /* Generate pointer to fortchar */
+F77_SUBROUTINE(getstr)( CHARACTER(fortchar) TRAIL(fortchar) )
+{
+  GENPTR_CHARACTER(fortchar)           /* Generate pointer to fortchar */
 
-         char  *string = "This is a string";  /* A string to be printed */
+  char  *string = "This is a string";  /* A string to be printed */
 
-      /* Copy the string to the function argument */
-         cnfExprt( string, fortchar, fortchar_length );
-      }
-\end{verbatim} }
+/* Copy the string to the function argument */
+  cnfExprt( string, fortchar, fortchar_length );
+}
+\end{terminalv}
+\end{small}
 Other examples in this document illustrate the use of CNF functions for
 importing strings and calling FORTRAN from C.
 
@@ -1827,8 +1339,8 @@ Example\latex{~\ref{f77_exchardyn}}
 \end{center}
 
 C main program
-{\small
-\begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 void strStrip( char *in, char *out, int maxout );
 
 main(){
@@ -1839,9 +1351,11 @@ printf( "Input string is: %s\n", in );
 strStrip( in, out, 20 );
 printf( "Output string is: %s.\n", out );
 }
-\end{verbatim} \end{quote}}
+\end{terminalv}
+\end{small}
 C wrap-around for a FORTRAN subroutine
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 /* strStrip - A C wrap-around for FORTRAN subroutine STR_STRIP */
 #include "f77.h"
 
@@ -1849,27 +1363,29 @@ extern F77_SUBROUTINE(str_strip)
   ( CHARACTER(fin), CHARACTER(fout) TRAIL(fin) TRAIL(fout) );
 
 void strStrip( char *in, char *out, int maxout ){
-DECLARE_CHARACTER_DYN(fin);
-DECLARE_CHARACTER_DYN(fout);
+  DECLARE_CHARACTER_DYN(fin);
+  DECLARE_CHARACTER_DYN(fout);
 
-F77_CREATE_CHARACTER(fin,strlen(in));
-F77_CREATE_CHARACTER(fout,maxout-1);
+  F77_CREATE_CHARACTER(fin,strlen(in));
+  F77_CREATE_CHARACTER(fout,maxout-1);
 
-cnfExprt( in, fin, fin_length );
+  cnfExprt( in, fin, fin_length );
 
-F77_CALL(str_strip)
-   ( CHARACTER_ARG(fin), CHARACTER_ARG(fout)
-     TRAIL_ARG(fin) TRAIL_ARG(fout) );
+  F77_CALL(str_strip)
+     ( CHARACTER_ARG(fin), CHARACTER_ARG(fout)
+       TRAIL_ARG(fin) TRAIL_ARG(fout) );
 
-cnfImprt( fout, fout_length, out );
+  cnfImprt( fout, fout_length, out );
 
-F77_FREE_CHARACTER(fin);
-F77_FREE_CHARACTER(fout);
+  F77_FREE_CHARACTER(fin);
+  F77_FREE_CHARACTER(fout);
 }
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 
 which is a C wrapper for the FORTRAN subroutine:
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       SUBROUTINE STR_STRIP( FIN, FOUT )
 * Remove multiple spaces from a string
       IMPLICIT NONE
@@ -1895,7 +1411,8 @@ which is a C wrapper for the FORTRAN subroutine:
       ENDDO
 
       END
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 Here,
 \htmlref{\texttt{DECLARE\_CHARACTER\_DYN}}{DECLARE_CHARACTER_DYN}
 is used in place of
@@ -2026,7 +1543,8 @@ For example, here is how you should allocate space for an array of
 \texttt{N} FORTRAN \texttt{REAL} values in a C function and pass back
 the resulting pointer to FORTRAN:
 
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 F77_POINTER_FUNCTION(ralloc)( INTEGER(N) )
 {
    GENPTR_INTEGER(N)
@@ -2034,7 +1552,8 @@ F77_POINTER_FUNCTION(ralloc)( INTEGER(N) )
 /* Allocate the memory and return the converted pointer. */
    return cnfFptr(cnfMalloc(*N*sizeof(F77_REAL_TYPE)));
 }
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 
 When the allocated memory is no longer required, it should be freed
 using
@@ -2042,7 +1561,8 @@ using
 This is how you might import the FORTRAN
 pointer value allocated above back into C in order to free it:
 
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 F77_SUBROUTINE(rfree)( POINTER(FPNTR) )
 {
    GENPTR_POINTER(FPNTR)
@@ -2050,7 +1570,8 @@ F77_SUBROUTINE(rfree)( POINTER(FPNTR) )
 /* Convert back to a C pointer and then free it. */
    cnfFree(cnfCptr(*FPNTR));
 }
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 
 Externally, these CNF memory allocation functions behave exactly like
 their standard C equivalents \texttt{malloc}, \texttt{calloc} and
@@ -2095,7 +1616,8 @@ values stored in the memory. For example, to print out the contents of
 a dynamically allocated array of FORTRAN \texttt{REAL} data from a C
 function, you might use the following:
 
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 F77_SUBROUTINE(rprint)( INTEGER(N), POINTER(FPNTR) )
 {
    GENPTR_INTEGER(N)
@@ -2108,7 +1630,8 @@ F77_SUBROUTINE(rprint)( INTEGER(N), POINTER(FPNTR) )
 /* Access the data. */
    for(i=0;i<*N;i++) printf("%g\n",cpntr[i]);
 }
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 
 Accessing dynamically allocated memory via a pointer from FORTRAN
 requires two steps. First, the pointer value stored in a
@@ -2128,16 +1651,19 @@ the \texttt{\%VAL} method is the one most widely used in Starlink
 software.}  For example, to convert a pointer into a \texttt{REAL}
 array, you might call an auxiliary routine \texttt{RWRITE} as
 follows:
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       INCLUDE 'CNF_PAR'
 
       ...
 
       CALL RWRITE(N,%VAL(CNF_PVAL(PNTR)))
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 and the \texttt{RWRITE} routine could then access the array of values as
 follows:
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       SUBROUTINE RWRITE( N, RDATA )
       INTEGER I, N
       REAL RDATA( N )
@@ -2145,7 +1671,8 @@ follows:
          WRITE(*,*) RDATA(I)
     1 CONTINUE
       END
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 
 Note how the argument of the \texttt{\%VAL} directive is
 \texttt{CNF\_PVAL(PNTR)}. The FORTRAN-callable
@@ -2200,9 +1727,8 @@ Calling FORTRAN from C}
 The operations needed to write a C routine that can call a FORTRAN subroutine
 or function are fairly similar to those needed when calling C from FORTRAN\@.
 Many of the macros that are used are the same, so you should read
-\begin{htmlonly}
-\htmlref{More on Calling C from FORTRAN}{f77_cfromf} before reading this.
-\end{htmlonly}
+
+
 \latex{Section~\ref{f77_cfromf} before reading this.}
 
 A typical reason to call FORTRAN from C is to use a pre-existing subroutine
@@ -2216,93 +1742,95 @@ Example\latex{~\ref{f77_ccallsf}}
 \end{center}
 \nopagebreak[4]
 C main program:
-{\small \begin{verbatim}
-      #include "f77.h"
+\begin{small}
+\begin{terminalv}
+#include "f77.h"
 
-      extern F77_SUBROUTINE(pgbegin)
-         ( INTEGER(unit), CHARACTER(file), INTEGER(nxsub), INTEGER(nysub)
-           TRAIL(file) );
+extern F77_SUBROUTINE(pgbegin)
+  ( INTEGER(unit), CHARACTER(file), INTEGER(nxsub), INTEGER(nysub)
+    TRAIL(file) );
 
-      extern F77_SUBROUTINE(pgenv)
-         ( REAL(xmin), REAL(xmax), REAL(ymin), REAL(ymax), INTEGER(just),
-           INTEGER(axis) );
+extern F77_SUBROUTINE(pgenv)
+  ( REAL(xmin), REAL(xmax), REAL(ymin), REAL(ymax), INTEGER(just),
+    INTEGER(axis) );
 
-      extern F77_SUBROUTINE(pglabel)
-         ( CHARACTER(xlab), CHARACTER(ylab), CHARACTER(toplab)
-           TRAIL(xlab) TRAIL(ylab) TRAIL(toplab) );
+extern F77_SUBROUTINE(pglabel)
+  ( CHARACTER(xlab), CHARACTER(ylab), CHARACTER(toplab)
+    TRAIL(xlab) TRAIL(ylab) TRAIL(toplab) );
 
-      extern F77_SUBROUTINE(pgpoint)
-         ( INTEGER(n), REAL_ARRAY(xs), REAL_ARRAY(ys), INTEGER(symbol) );
+extern F77_SUBROUTINE(pgpoint)
+  ( INTEGER(n), REAL_ARRAY(xs), REAL_ARRAY(ys), INTEGER(symbol) );
 
-      extern F77_SUBROUTINE(pgend) ( );
+extern F77_SUBROUTINE(pgend) ( );
 
-      extern F77_SUBROUTINE(pgline)
-         ( INTEGER(n), REAL_ARRAY(xpnts), REAL_ARRAY(ypnts) );
+extern F77_SUBROUTINE(pgline)
+  ( INTEGER(n), REAL_ARRAY(xpnts), REAL_ARRAY(ypnts) );
 
-      main()
-      {
-         int i;
-         float xs[] = {1.,2.,3.,4.,5.};
-         float ys[] = {1.,4.,9.,16.,25.};
+main()
+{
+  int i;
+  float xs[] = {1.,2.,3.,4.,5.};
+  float ys[] = {1.,4.,9.,16.,25.};
 
-         DECLARE_INTEGER(unit);
-         DECLARE_CHARACTER(file,10);
-         DECLARE_INTEGER(nxsub);
-         DECLARE_INTEGER(nysub);
-         DECLARE_REAL(xmin);
-         DECLARE_REAL(xmax);
-         DECLARE_REAL(ymin);
-         DECLARE_REAL(ymax);
-         DECLARE_INTEGER(just);
-         DECLARE_INTEGER(axis);
-         DECLARE_CHARACTER(xlab,50);
-         DECLARE_CHARACTER(ylab,50);
-         DECLARE_CHARACTER(toplab,50);
-         DECLARE_INTEGER(n);
-         DECLARE_REAL_ARRAY(xpnts,60);
-         DECLARE_REAL_ARRAY(ypnts,60);
-         DECLARE_INTEGER(symbol);
+  DECLARE_INTEGER(unit);
+  DECLARE_CHARACTER(file,10);
+  DECLARE_INTEGER(nxsub);
+  DECLARE_INTEGER(nysub);
+  DECLARE_REAL(xmin);
+  DECLARE_REAL(xmax);
+  DECLARE_REAL(ymin);
+  DECLARE_REAL(ymax);
+  DECLARE_INTEGER(just);
+  DECLARE_INTEGER(axis);
+  DECLARE_CHARACTER(xlab,50);
+  DECLARE_CHARACTER(ylab,50);
+  DECLARE_CHARACTER(toplab,50);
+  DECLARE_INTEGER(n);
+  DECLARE_REAL_ARRAY(xpnts,60);
+  DECLARE_REAL_ARRAY(ypnts,60);
+  DECLARE_INTEGER(symbol);
 
 
-         unit = 0; cnfExprt( "?", file, file_length); nxsub = 1; nysub = 1;
-         F77_CALL(pgbegin) ( INTEGER_ARG(&unit), CHARACTER_ARG(file),
-                             INTEGER_ARG(&nxsub), INTEGER_ARG(&nysub)
-                             TRAIL_ARG(file) );
+  unit = 0; cnfExprt( "?", file, file_length); nxsub = 1; nysub = 1;
+  F77_CALL(pgbegin) ( INTEGER_ARG(&unit), CHARACTER_ARG(file),
+                      INTEGER_ARG(&nxsub), INTEGER_ARG(&nysub)
+                      TRAIL_ARG(file) );
 
-         xmin = 0.0; xmax = 10.0; ymin = 0.0; ymax = 20.0; just = 0; axis = 1;
-         F77_CALL(pgenv) ( REAL_ARG(&xmin), REAL_ARG(&xmax), REAL_ARG(&ymin),
-                           REAL_ARG(&ymax), INTEGER_ARG(&just), INTEGER_ARG(&axis) );
+  xmin = 0.0; xmax = 10.0; ymin = 0.0; ymax = 20.0; just = 0; axis = 1;
+  F77_CALL(pgenv) ( REAL_ARG(&xmin), REAL_ARG(&xmax), REAL_ARG(&ymin),
+                    REAL_ARG(&ymax), INTEGER_ARG(&just), INTEGER_ARG(&axis) );
 
-         cnfExprt( "(x)", xlab, xlab_length );
-         cnfExprt( "(y)", ylab, ylab_length );
-         cnfExprt( "PGPLOT Example 1 - y = x\\u2", toplab, toplab_length );
-         F77_CALL(pglabel) ( CHARACTER_ARG(xlab), CHARACTER_ARG(ylab),
-                             CHARACTER_ARG(toplab)
-                             TRAIL_ARG(xlab) TRAIL_ARG(ylab) TRAIL_ARG(toplab) );
+  cnfExprt( "(x)", xlab, xlab_length );
+  cnfExprt( "(y)", ylab, ylab_length );
+  cnfExprt( "PGPLOT Example 1 - y = x\\u2", toplab, toplab_length );
+  F77_CALL(pglabel) ( CHARACTER_ARG(xlab), CHARACTER_ARG(ylab),
+                      CHARACTER_ARG(toplab)
+                      TRAIL_ARG(xlab) TRAIL_ARG(ylab) TRAIL_ARG(toplab) );
 
-         n = 5;
-         for( i=0 ; i<n ; i++ )
-         {
-            xpnts[i] = xs[i];
-            ypnts[i] = ys[i];
-         }
-         symbol = 9;
-         F77_CALL(pgpoint) ( INTEGER_ARG(&n), REAL_ARRAY_ARG(xpnts),
-                             REAL_ARRAY_ARG(ypnts), INTEGER_ARG(&symbol) );
+  n = 5;
+  for( i=0 ; i<n ; i++ )
+  {
+     xpnts[i] = xs[i];
+     ypnts[i] = ys[i];
+  }
+  symbol = 9;
+  F77_CALL(pgpoint) ( INTEGER_ARG(&n), REAL_ARRAY_ARG(xpnts),
+                      REAL_ARRAY_ARG(ypnts), INTEGER_ARG(&symbol) );
 
-         n = 60;
-         for( i=0 ; i<n ; i++ )
-         {
-            xpnts[i] = 0.1 * i;
-            ypnts[i] = xpnts[i]*xpnts[i];
-         }
-         F77_CALL(pgline) ( INTEGER_ARG(&n), REAL_ARRAY_ARG(xpnts),
-                            REAL_ARRAY_ARG(ypnts) );
+  n = 60;
+  for( i=0 ; i<n ; i++ )
+  {
+     xpnts[i] = 0.1 * i;
+     ypnts[i] = xpnts[i]*xpnts[i];
+  }
+  F77_CALL(pgline) ( INTEGER_ARG(&n), REAL_ARRAY_ARG(xpnts),
+                     REAL_ARRAY_ARG(ypnts) );
 
-         F77_CALL(pgend)();
+  F77_CALL(pgend)();
 
-      }
-\end{verbatim} }
+}
+\end{terminalv}
+\end{small}
 
 This is a realistic example of calling PGPLOT routines from C\@. The module
 begins with a set of function prototypes for the FORTRAN routines that will be
@@ -2362,12 +1890,14 @@ So any C code that may potentially need to be executed in a threaded
 context (for instance, C wrappers for Fortran subroutine libraries)
 should use the F77\_LOCK macro to invoke each Fortran call:
 
-{\small \begin{verbatim}
-    F77_LOCK ( F77_CALL(silly2)( REAL_ARG(&a), REAL_ARG(&b),
-                                 INTEGER_ARG(&i), INTEGER_ARG(&j),
-                                 CHARACTER_ARG(fline), INTEGER_ARG(&fline_l),
-                                 LOGICAL_ARG(&x) TRAIL_ARG(fline) ); )
-\end{verbatim} }
+\begin{small}
+\begin{terminalv}
+F77_LOCK ( F77_CALL(silly2)( REAL_ARG(&a), REAL_ARG(&b),
+                            INTEGER_ARG(&i), INTEGER_ARG(&j),
+                            CHARACTER_ARG(fline), INTEGER_ARG(&fline_l),
+                            LOGICAL_ARG(&x) TRAIL_ARG(fline) ); )
+\end{terminalv}
+\end{small}
 
 If this is done consistently, then it ensures that no two threads will
 attempt to run any Fortran code simultaneously.
@@ -2426,7 +1956,8 @@ the \texttt{CHARACTER} array which has been reset, and \texttt{FALSE} elsewhere.
 Example\latex{~\ref{cook_reset}}
 -- Import and export of arrays.\@.
 \end{center}
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 #include <stdio.h>
 #include "f77.h"
 F77_SUBROUTINE(str_reset)(CHARACTER_ARRAY(in), LOGICAL_ARRAY(lin),
@@ -2482,9 +2013,11 @@ int i,j;
       }
    }
 }
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       SUBROUTINE STR_RESET( ARRAY, LIN, DIM1, DIM2, OUT, LOUT )
 *  Purpose:
 *     Reset elements of an array
@@ -2522,12 +2055,14 @@ int i,j;
 20    ENDDO
 
       END
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 
 As an example of how to write a C function to be called from FORTRAN with array
 arguments, the above subroutine could be re-written in C as follows:
 
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 #include "f77.h"
 
 F77_SUBROUTINE(str_reset)(CHARACTER_ARRAY(in_f), LOGICAL_ARRAY(lin_f),
@@ -2579,7 +2114,8 @@ int dims[2];
    free( lin_c );
    free( lout_c );
 }
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 
 \subsection{\xlabel{arrays_of_pointer_to_char}\label{char_ptrs}Arrays of \texttt{pointer to char}}
 In C, arrays of character strings are often held as arrays of
@@ -2602,7 +2138,8 @@ The C program prints the strings before and after the call to PRARR.
 Example\latex{~\ref{cook_exprtap}}
 -- IMPORT/EXPORT with arrays of pointers to char.
 \end{center}
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 rlsaxp_101% more temp.c
 #include "f77.h"
 F77_SUBROUTINE(prarr)(CHARACTER_ARRAY(arr) TRAIL(arr));
@@ -2618,8 +2155,10 @@ F77_CALL(prarr)(CHARACTER_ARRAY_ARG(arr) TRAIL_ARG(arr));
 cnfImprtap(arr[0],12,ptr,1,1,dims);
 for(i=0;i<3;i++) printf("%d:%s:\n",i,ptr[i]);
 }
-\end{verbatim} \end{quote} }
-{\small \begin{quote} \begin{verbatim}
+\end{terminalv}
+\end{small}
+\begin{small}
+\begin{terminalv}
       SUBROUTINE PRARR( ARR )
       CHARACTER*(*) ARR(3)
       INTEGER I
@@ -2629,7 +2168,8 @@ for(i=0;i<3;i++) printf("%d:%s:\n",i,ptr[i]);
          ARR( I ) = ' '
 10    CONTINUE
       END
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 
 \subsection{\xlabel{pointer_arrays}POINTER Arrays}
 An array of pointers would need to be converted back and forth between
@@ -2644,14 +2184,16 @@ according to the direction of conversion.
 
 For example, to call a FORTRAN subroutine which returns an array of three
 pointers to real, the C code would need to be something like:
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 F77_REAL_TYPE * pntr[3]
 DECLARE_POINTER_ARRAY(fpntr,3)
 
 F77_CALL(getptr)(POINTER_ARRAY_ARG(fpntr))
 /* Import the pointers to C */
 for (i=0;i<3;i++) pntr[i]=(F77_REAL_TYPE *)cnfCptr(fpntr[i]);
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 
 See also
 \htmlref{The IMPORT and EXPORT macros}{import_export}\latex{ (Section
@@ -2733,7 +2275,8 @@ could be written as follows:
 Example\latex{~\ref{cook_resetwrap}}
 -- Use of \texttt{IMPORT/EXPORT} macros\@.
 \end{center}
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 #include "f77.h"
 F77_SUBROUTINE(str_reset)( CHARACTER_ARRAY(array),
                            LOGICAL_ARRAY(lin),
@@ -2796,9 +2339,11 @@ int nels;
 
    return;
 }
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 and the corresponding main routine would be:
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 #include <stdio.h>
 #include "f77.h"
 void strReset( char *array,
@@ -2831,7 +2376,8 @@ int i,j;
      }
    }
 }
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 
 \section{\xlabel{subroutines_and_functions_as_arguments}\label{f77_externalargs}Subroutines and Functions as Arguments}
 
@@ -2849,7 +2395,8 @@ Example\latex{~\ref{cook_namectof}}
 \end{center}
 A C program which calls a FORTRAN subroutine which needs the name of an INTEGER
 function as an argument.
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 #include "f77.h"
 
 extern F77_SUBROUTINE(tst_ifun)( INTEGER_FUNCTION(name),
@@ -2868,9 +2415,11 @@ DECLARE_INTEGER(status);
    printf( "Status set is: %d\n", status );
 
 }
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 The FORTRAN subroutine:
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 *+ TST_IFUN - Call an integer function
       SUBROUTINE TST_IFUN( NAME, STATUS )
 
@@ -2883,9 +2432,11 @@ The FORTRAN subroutine:
       STATUS = NAME( STATUS )
 
       END
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 The INTEGER function:
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 *+ IFUN - A very simple FORTRAN INTEGER FUNCTION
       INTEGER FUNCTION IFUN( STATUS )
 
@@ -2894,7 +2445,8 @@ The INTEGER function:
       IFUN = STATUS + 99
 
       END
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 Corresponding macros are defined for other types of function and for
 FORTRAN subroutines.
 
@@ -2908,7 +2460,8 @@ Example\latex{~\ref{cook_nameftoc}}
 -- Passing names from FORTRAN to C.
 \end{center}
 
-{\small \begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 *+ TESTIFUN - Call a SUBROUTINE which requires a function name argument.
       PROGRAM TSTIFUN
 
@@ -2919,8 +2472,10 @@ Example\latex{~\ref{cook_nameftoc}}
       PRINT *, 'STATUS is: ', STATUS
 
       END
-\end{verbatim} \end{quote} }
-{\small \begin{quote} \begin{verbatim}
+\end{terminalv}
+\end{small}
+\begin{small}
+\begin{terminalv}
 #include "f77.h"
 
 F77_INTEGER_FUNCTION(ifun)();
@@ -2931,7 +2486,8 @@ GENPTR_INTEGER_FUNCTION(name)
 GENPTR_INTEGER(status)
 
 *status = F77_EXTERNAL_NAME(name)( INTEGER_ARG(status) );
-\end{verbatim} \end{quote} }
+\end{terminalv}
+\end{small}
 
 
 \section{\xlabel{other_approaches_to_mixed_language_programming}Other Approaches to Mixed Language Programming}
@@ -2975,23 +2531,23 @@ described in
 \htmlref{Accessing Dynamic Memory from C and
 FORTRAN}{percentval}\latex{ (Section~\ref{percentval})},
 the FORTRAN code must include the statement:
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 INCLUDE 'CNF_PAR'
-\end{verbatim}\end{quote}
+\end{terminalv}
 to define the function \texttt{CNF\_PVAL}.
 
 Type:
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 % cnf_dev
-\end{verbatim}\end{quote}
+\end{terminalv}
 to define the link, \texttt{CNF\_PAR}, to the required include file.
 
 When compiling a C function that is
 to be called from FORTRAN, it should contain the line:
 
-\begin{quote}
-\texttt{\#include "f77.h"}
-\end{quote}
+\begin{terminalv}
+#include "f77.h"
+\end{terminalv}
 
 to define the F77 macros and CNF functions\footnote{The two CNF header files,
 \texttt{cnf.h} and \texttt{f77.h} are now identical. For legacy reasons
@@ -3002,9 +2558,9 @@ On a Unix system, you can usually tell the C compiler where to look for
 header files with the \texttt{-I} qualifier to the cc command,
 \textit{e.g.}:
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 % cc -I/star/include -c func.c
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 All FORTRAN \texttt{INCLUDE} and C header files for Starlink software are
 stored in the directory \texttt{/star/include}, and the object files for all
@@ -3014,10 +2570,10 @@ To link a FORTRAN program \texttt{prog.f} and a C function \texttt{sub.c} with
 the CNF library, first compile the C function and then compile and link the
 FORTRAN program:
 
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 % cc -c -I/star/include sub.c
 % f77 prog.f sub.o -L/star/lib `cnf_link` -o prog
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 To link a C program \texttt{prog.c} with a FORTRAN subroutine \texttt{sub.f},
 the procedure varies depending upon the system being used.
@@ -3028,10 +2584,10 @@ However, in some cases there is confusion over the main routine and either
 
 For example, on Alpha/OSF1 it might be:
 
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 % f77 -c sub.f
 % cc prog.c sub.o -L/star/lib `cnf_link` -lfor -lots -o prog
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 For
 \xref{ADAM}{sg4}{}
@@ -3039,13 +2595,13 @@ tasks\latex{ (see SG/4)}, much of the complication is removed by the task
 linking scripts
 \xref{alink and ilink}{sun144}{ADAM_link_scripts} which will accept a mixture of
 FORTRAN and C modules to compile. For example:
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 % alink task.f subr.c ...
-\end{verbatim}\end{quote}
+\end{terminalv}
 or
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 % alink task.c subr.f ...
-\end{verbatim}\end{quote}
+\end{terminalv}
 The CNF library will be linked automatically and \texttt{/star/include} searched
 for any required C header files.
 
@@ -3085,9 +2641,8 @@ and C in this subsection refer to the Sun~FORTRAN and ANSI~C compilers.
 There is a simple correspondence between Sun FORTRAN and C numeric variable
 types.
 The standard types are given in the upper part of
-\begin{htmlonly}
-the table below,
-\end{htmlonly}
+
+
 \latex{Table~\ref{sun_datatypes}} and
 non-standard extensions in the lower part. These should generally be avoided
 for reasons of portability, however, they are provided since
@@ -3207,7 +2762,8 @@ Example\latex{~\ref{sun_f2c}}
 \nopagebreak[4]
 FORTRAN program:
 \nopagebreak[4]
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       PROGRAM FORT1
       INTEGER A
       REAL B
@@ -3215,23 +2771,26 @@ FORTRAN program:
       B = 2.0
       CALL C1( A, B )
       END
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 \pagebreak[1]
 C function:
 \nopagebreak[4]
-{\small \begin{verbatim}
-      void c1_( int *a, float *b)
-      {
-         int x;
-         float y;
+\begin{small}
+\begin{terminalv}
+void c1_( int *a, float *b)
+{
+  int x;
+  float y;
 
-         x = *a;    /* x is now equal to 1 */
-         y = *b;    /* y is now equal to 2.0 */
+  x = *a;    /* x is now equal to 1 */
+  y = *b;    /* y is now equal to 2.0 */
 
-         printf( "x = %d\n", x );
-         printf( "y = %f\n", y );
-      }
-\end{verbatim} }
+  printf( "x = %d\n", x );
+  printf( "y = %f\n", y );
+}
+\end{terminalv}
+\end{small}
 
 The C function name requires the underscore as the FORTRAN compiler generates
 this automatically.
@@ -3257,26 +2816,30 @@ Example\latex{~\ref{sun_c2f}}
 \nopagebreak[4]
 C main program:
 \nopagebreak[4]
-{\small \begin{verbatim}
-      main()
-      {
-        int  i = 2;             /* Declare i and initialize it.  */
-        void fort2_( int *i );  /* Declare function fort2_. */
+\begin{small}
+\begin{terminalv}
+main()
+{
+ int  i = 2;             /* Declare i and initialize it.  */
+ void fort2_( int *i );  /* Declare function fort2_. */
 
-        fort2_( &i );           /* Call fort2.  */
-      }
-\end{verbatim} }
+ fort2_( &i );           /* Call fort2.  */
+}
+\end{terminalv}
+\end{small}
 \pagebreak[1]
 FORTRAN subroutine:
 \nopagebreak[4]
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       SUBROUTINE FORT2( I )
       INTEGER I
 
       PRINT *,I
 
       END
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 
 The C main function declares and initializes a variable, \texttt{i}, and declares
 a function \texttt{fort2\_} (note the underscore). It calls \texttt{fort2\_}, passing
@@ -3305,7 +2868,8 @@ Example\latex{~\ref{sun_char}}
 \nopagebreak[4]
 FORTRAN program:
 \nopagebreak[4]
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       PROGRAM FORT3
       CHARACTER STR*20
 
@@ -3313,26 +2877,29 @@ FORTRAN program:
       PRINT *,STR
 
       END
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 \pagebreak[1]
 C function:
 \nopagebreak[4]
-{\small \begin{verbatim}
-      #include <stdio.h>                      /* Standard I/O functions */
+\begin{small}
+\begin{terminalv}
+#include <stdio.h>                      /* Standard I/O functions */
 
-      void c3_( char *fortchar, int length )
-      {
-         int  i;                              /* A loop counter */
-         char  *string = "This is a string";  /* A string to be printed */
+void c3_( char *fortchar, int length )
+{
+  int  i;                              /* A loop counter */
+  char  *string = "This is a string";  /* A string to be printed */
 
-      /* Copy the string to the function argument */
-         strncpy( fortchar, string, length );
+/* Copy the string to the function argument */
+  strncpy( fortchar, string, length );
 
-      /* Pad the character argument with trailing blanks */
-         for( i = strlen( string ) ; i < length ; i++ )
-            fortchar[i] = ' ';
-      }
-\end{verbatim} }
+/* Pad the character argument with trailing blanks */
+  for( i = strlen( string ) ; i < length ; i++ )
+     fortchar[i] = ' ';
+}
+\end{terminalv}
+\end{small}
 
 The second variable declaration in the C subprogram declares a local variable
 to be a string and initializes it. This string is then copied to the storage
@@ -3368,7 +2935,8 @@ Example\latex{~\ref{sun_charfn}}
 \nopagebreak[4]
 FORTRAN program:
 \nopagebreak[4]
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       PROGRAM CFUNC
       CHARACTER*(10) VAR, FUNC
 
@@ -3376,34 +2944,37 @@ FORTRAN program:
       PRINT *, VAR
 
       END
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 \pagebreak[1]
 C function:
 \nopagebreak[4]
-{\small \begin{verbatim}
-      void func_( char *retval, int length, int *n )
-      {
-         char *cp;
-         int i, max;
+\begin{small}
+\begin{terminalv}
+void func_( char *retval, int length, int *n )
+{
+  char *cp;
+  int i, max;
 
-      /* Find the number of characters to be copied.  */
-         if( *n < length )
-            max = *n;
-         else
-            max = length;
+/* Find the number of characters to be copied.  */
+  if( *n < length )
+     max = *n;
+  else
+     max = length;
 
-      /* Set a local character pointer equal to the return address.  */
-         cp = retval;
+/* Set a local character pointer equal to the return address.  */
+  cp = retval;
 
-      /* Copy some asterisks to the "return value".  */
-         for( i = 0 ; i < max ; i++ )
-            *cp++ = '*';
+/* Copy some asterisks to the "return value".  */
+  for( i = 0 ; i < max ; i++ )
+     *cp++ = '*';
 
-      /* Fill the rest of the string with blanks.  */
-         for( ; i < length ; i++ )
-            *cp++ = ' ';
-      }
-\end{verbatim} }
+/* Fill the rest of the string with blanks.  */
+  for( ; i < length ; i++ )
+     *cp++ = ' ';
+}
+\end{terminalv}
+\end{small}
 
 The C function copies some asterisks into the location that Sun~FORTRAN will
 interpret as the return value of the FORTRAN \texttt{CHARACTER} function.
@@ -3427,16 +2998,20 @@ single variable.
 \end{center}
 \nopagebreak[4]
 FORTRAN common block:
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       CHARACTER*(10) STRING
       COMMON /BLOCK/ STRING
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 
 C external variable:
 \nopagebreak[4]
-{\small \begin{verbatim}
-      extern char block_[10];
-\end{verbatim} }
+\begin{small}
+\begin{terminalv}
+extern char block_[10];
+\end{terminalv}
+\end{small}
 
 Note that the name of the C variable corresponds to the name of the FORTRAN
 common block, not the name of the FORTRAN variable. This example shows that you
@@ -3459,16 +3034,20 @@ Example\latex{~\ref{sun_common2}}
 \nopagebreak[4]
 FORTRAN common block:
 \nopagebreak[4]
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       INTEGER I,J,K
       COMMON /NUMS/ I,J,K
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 
 C external variable:
 \nopagebreak[4]
-{\small \begin{verbatim}
-      extern struct { int i,j,k; } nums_;
-\end{verbatim} }
+\begin{small}
+\begin{terminalv}
+extern struct { int i,j,k; } nums_;
+\end{terminalv}
+\end{small}
 
 \subsection{\xlabel{dec_unix}DEC Unix}
 \subsubsection{General}
@@ -3527,9 +3106,8 @@ produced by DEC\@.
 
 There is a simple correspondence between VAX~FORTRAN and VAX~C numeric variable
 types. The standard types are given in the upper part of
-\begin{htmlonly}
-the table below
-\end{htmlonly}
+
+
 \latex{Table~\ref{vms_datatypes}} and non-standard extensions in the lower
 part.
 These should generally be avoided for reasons of portability. However, they are
@@ -3661,7 +3239,8 @@ Example\latex{~\ref{vms_f2c}}
 \nopagebreak[4]
 FORTRAN program:
 \nopagebreak[4]
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       PROGRAM FORT1
       INTEGER A
       REAL B
@@ -3669,23 +3248,26 @@ FORTRAN program:
       B = 2.0
       CALL C1( A, B )
       END
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 \pagebreak[1]
 C function:
 \nopagebreak[4]
-{\small \begin{verbatim}
-      void c1( int *a, float *b )
-      {
-         int x;
-         float y;
+\begin{small}
+\begin{terminalv}
+void c1( int *a, float *b )
+{
+  int x;
+  float y;
 
-         x = *a;    /* x is now equal to 1 */
-         y = *b;    /* y is now equal to 2.0 */
+  x = *a;    /* x is now equal to 1 */
+  y = *b;    /* y is now equal to 2.0 */
 
-         printf( "x = %d\n", x );
-         printf( "y = %f\n", y );
-      }
-\end{verbatim} }
+  printf( "x = %d\n", x );
+  printf( "y = %f\n", y );
+}
+\end{terminalv}
+\end{small}
 
 In this first example, a FORTRAN program passes an \texttt{INTEGER} and
 \texttt{REAL} variable to a C function.
@@ -3709,26 +3291,30 @@ Example\latex{~\ref{vms_c2f}}
 \nopagebreak[4]
 C main program:
 \nopagebreak[4]
-{\small \begin{verbatim}
-      main()
-      {
-        int  i = 2;            /* Declare i and initialize it.  */
-        void fort2( int *i );  /* Declare function fort2. */
+\begin{small}
+\begin{terminalv}
+main()
+{
+ int  i = 2;            /* Declare i and initialize it.  */
+ void fort2( int *i );  /* Declare function fort2. */
 
-        fort2( &i );           /* Call fort2.  */
-      }
-\end{verbatim} }
+ fort2( &i );           /* Call fort2.  */
+}
+\end{terminalv}
+\end{small}
 \pagebreak[1]
 FORTRAN subroutine:
 \nopagebreak[4]
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       SUBROUTINE FORT2( I )
       INTEGER I
 
       PRINT *,I
 
       END
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 
 The VAX~C main function declares and initializes a variable, \texttt{i}, and
 declares a function \texttt{fort2}.
@@ -3764,7 +3350,8 @@ VAX~C\@.
 \nopagebreak[4]
 FORTRAN program:
 \nopagebreak[4]
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       PROGRAM FORT3
       CHARACTER STR*20
 
@@ -3772,27 +3359,30 @@ FORTRAN program:
       PRINT *,STR
 
       END
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 \pagebreak[1]
 C function:
 \nopagebreak[4]
-{\small \begin{verbatim}
-      #include <descrip.h>                    /* VMS Descriptors */
-      #include <stdio.h>                      /* Standard I/O functions */
+\begin{small}
+\begin{terminalv}
+#include <descrip.h>                    /* VMS Descriptors */
+#include <stdio.h>                      /* Standard I/O functions */
 
-      void c3( struct dsc$descriptor_s  *fortchar )
-      {
-         int  i;                              /* A loop counter */
-         char  *string = "This is a string";  /* A string to be printed */
+void c3( struct dsc$descriptor_s  *fortchar )
+{
+  int  i;                              /* A loop counter */
+  char  *string = "This is a string";  /* A string to be printed */
 
-      /* Copy the string to the function argument */
-         strncpy( fortchar->dsc$a_pointer, string, fortchar->dsc$w_length );
+/* Copy the string to the function argument */
+  strncpy( fortchar->dsc$a_pointer, string, fortchar->dsc$w_length );
 
-      /* Pad the character argument with trailing blanks */
-         for( i = strlen( string ) ; i < fortchar->dsc$w_length ; i++ )
-            fortchar->dsc$a_pointer[i] = ' ';
-      }
-\end{verbatim} }
+/* Pad the character argument with trailing blanks */
+  for( i = strlen( string ) ; i < fortchar->dsc$w_length ; i++ )
+     fortchar->dsc$a_pointer[i] = ' ';
+}
+\end{terminalv}
+\end{small}
 
 The second variable declaration in the C subprogram declares a local variable
 to be a string and initializes it. This string is then copied to the storage
@@ -3854,15 +3444,19 @@ Example\latex{~\ref{vms_charfn}}
 VMS subroutine.
 \end{center}
 \nopagebreak[4]
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       CHARACTER*(10) RETURN
       CALL CHARFN( RETURN, A, B )
-
+\end{terminalv}
+\end{small}
    or
-
+\begin{small}
+\begin{terminalv}
       CHARACTER*(10) RETURN, CHARFN
       RETURN = CHARFN( A, B )
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 If written as a function, CHARFN returns a value of type \texttt{CHARACTER}\@.
 It is left as an exercise for the reader to demonstrate that the above
 assertion is true using just FORTRAN\@.
@@ -3882,15 +3476,19 @@ Example\latex{~\ref{vms_common}}
 \end{center}
 \nopagebreak[4]
 FORTRAN common block:
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       CHARACTER*(10) STRING
       COMMON /BLOCK/ STRING
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 
 C external variable:
-{\small \begin{verbatim}
-      extern char block[10];
-\end{verbatim} }
+\begin{small}
+\begin{terminalv}
+extern char block[10];
+\end{terminalv}
+\end{small}
 
 Note that the name of the C variable corresponds to the name of the FORTRAN
 common block, not the name of the FORTRAN variable. This example shows that you
@@ -3912,15 +3510,19 @@ Example\latex{~\ref{vms_common2}}
 \end{center}
 \nopagebreak[4]
 FORTRAN common block:
-{\small \begin{verbatim}
+\begin{small}
+\begin{terminalv}
       INTEGER I,J,K
       COMMON /NUMS/ I,J,K
-\end{verbatim} }
+\end{terminalv}
+\end{small}
 
 C external variable:
-{\small \begin{verbatim}
-      extern struct { int i,j,k; } nums;
-\end{verbatim} }
+\begin{small}
+\begin{terminalv}
+extern struct { int i,j,k; } nums;
+\end{terminalv}
+\end{small}
 
 \subsection{\xlabel{other_operating_systems}Other Operating Systems}
 
@@ -3982,11 +3584,8 @@ machine-specific routines for system services.
 
 How to mix FORTRAN and C in a way that is portable to all current Starlink
 hardware is described in
-\begin{htmlonly}
-\htmlref{More on Calling C from FORTRAN}{f77_cfromf}
-and
-\htmlref{More on Calling FORTRAN from C}{f77_ffromc}.
-\end{htmlonly}
+
+
 \latex{Sections \ref{f77_cfromf} and \ref{f77_ffromc}.}
 
 It is quite likely that you will often want to use C to make use of something
@@ -4424,12 +4023,12 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
                {F77\_\textit{type}\_TYPE arg}
           }
 
-         where {\ssttt F77\_\textit{type}\_TYPE} expands to the appropriate C
+         where \texttt{F77\_\textit{type}\_TYPE} expands to the appropriate C
          type.
       }
    }
    \sstdiytopic{Associated macro:}{
-        \htmlref{{\ssttt DECLARE\_CHARACTER}}{DECLARE_CHARACTER}
+        \htmlref{\texttt{DECLARE\_CHARACTER}}{DECLARE_CHARACTER}
    }
 }
 
@@ -4481,11 +4080,11 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
           }
       }
 
-      \item where {\ssttt F77\_\textit{type}\_TYPE} expands to the appropriate
+      \item where \texttt{F77\_\textit{type}\_TYPE} expands to the appropriate
             C type.
    }
    \sstdiytopic{Associated macro:}{
-        \htmlref{{\ssttt DECLARE\_CHARACTER\_ARRAY}}{DECLARE_CHARACTER_ARRAY}
+        \htmlref{\texttt{DECLARE\_CHARACTER\_ARRAY}}{DECLARE_CHARACTER_ARRAY}
    }
 }
 
@@ -4578,7 +4177,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       \sstexamplesubsection{
          F77\_ASSOC\_\textit{type}\_ARRAY(farg,carg)
       }{
-         \textit{type} {\em not} CHARACTER, LOGICAL or POINTER will expand as
+         \textit{type} \emph{not} CHARACTER, LOGICAL or POINTER will expand as
          follows:
 
           \sstexamplestable{
@@ -4638,7 +4237,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 
           \sstexamplestable{
             \sstexamplestableentry{All systems:}
-               { \{\ssttt int f77dims[1];f77dims[0]=n;}\\
+               { \{\texttt{int f77dims[1];f77dims[0]=n;}}\\
             \sstexamplestableentry{}
                { farg=cnfCrela(1,f77dims);\} }
           }
@@ -4661,13 +4260,13 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
    \sstdiytopic{Associated macros:}{
-     \htmlref{\ssttt{F77\_\-CREATE\_\-CHARACTER\_\-ARRAY}}
+     \htmlref{\texttt{F77\_\-CREATE\_\-CHARACTER\_\-ARRAY}}
              {F77_CREATE_CHARACTER_ARRAY},
-     \htmlref{\ssttt{F77\_\-ASSOC\_\-\textit{type}\_\-ARRAY}}
+     \htmlref{\texttt{F77\_\-ASSOC\_\-\textit{type}\_\-ARRAY}}
              {F77_ASSOC_type_ARRAY},
-     \htmlref{\ssttt{F77\_\-EXPORT\_\-\textit{type}\_\-ARRAY}}
+     \htmlref{\texttt{F77\_\-EXPORT\_\-\textit{type}\_\-ARRAY}}
              {F77_EXPORT_type_ARRAY},\\
-     \htmlref{\ssttt{F77\_\-IMPORT\_\-\textit{type}\_\-ARRAY}}
+     \htmlref{\texttt{F77\_\-IMPORT\_\-\textit{type}\_\-ARRAY}}
              {F77_IMPORT_type_ARRAY}
    }
 }
@@ -4731,7 +4330,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
    \sstdiytopic{Associated macro:}{
-      \htmlref{\ssttt{F77\_EXPORT\_CHARACTER}}{F77_EXPORT_CHARACTER}
+      \htmlref{\texttt{F77\_EXPORT\_CHARACTER}}{F77_EXPORT_CHARACTER}
    }
 }
 
@@ -4775,7 +4374,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 
           \sstexamplestable{
             \sstexamplestableentry{All systems:}
-               { \{\ssttt int f77dims[1];f77dims[0]=nels;}\\
+               { \{\texttt{int f77dims[1];f77dims[0]=nels;}}\\
             \sstexamplestableentry{}
                { cnfExpla(carg,farg,1,f77dims);\} }\\
           }
@@ -4784,7 +4383,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 
           \sstexamplestable{
             \sstexamplestableentry{All systems:}
-              {\{\ssttt int f77i; for(f77i=0;nels>f77i;f77i++) \{}\\
+              {\{\texttt{ int f77i; for(f77i=0;nels>f77i;f77i++) \{}}\\
             \sstexamplestableentry{}
               {farg[f77i]=cnfFptr(carg[f77i]);
                \}\} }
@@ -4799,7 +4398,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
    \sstdiytopic{Associated macro:}{
-      \htmlref{\ssttt{F77\_EXPORT\_CHARACTER\_ARRAY}}
+      \htmlref{\texttt{F77\_EXPORT\_CHARACTER\_ARRAY}}
               {F77_EXPORT_CHARACTER_ARRAY}
    }
 }
@@ -4898,7 +4497,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
    \sstdiytopic{Associated macro:}{
-      \htmlref{\ssttt{F77\_IMPORT\_CHARACTER}}{F77_EXPORT_CHARACTER}
+      \htmlref{\texttt{F77\_IMPORT\_CHARACTER}}{F77_EXPORT_CHARACTER}
    }
 }
 
@@ -4942,7 +4541,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 
           \sstexamplestable{
             \sstexamplestableentry{All systems:}
-               { \{\ssttt int f77dims[1];f77dims[0]=nels;}\\
+               { \{\texttt{ int f77dims[1];f77dims[0]=nels;}}\\
             \sstexamplestableentry{}
                { cnfImpla(farg,carg,1,f77dims);\} }
           }
@@ -4951,7 +4550,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 
           \sstexamplestable{
             \sstexamplestableentry{All systems:}
-              {\{\ssttt int f77i;for(f77i=0;nels>f77i;f77i++)\{}\\
+              {\{\texttt{ int f77i;for(f77i=0;nels>f77i;f77i++)\{}}\\
             \sstexamplestableentry{}
               {carg[f77i]=cnfCptr(farg[f77i]);
               \}\} }
@@ -4966,7 +4565,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
    \sstdiytopic{Associated macro:}{
-      \htmlref{\ssttt{F77\_IMPORT\_CHARACTER\_ARRAY}}
+      \htmlref{\texttt{F77\_IMPORT\_CHARACTER\_ARRAY}}
               {F77_IMPORT_CHARACTER_ARRAY}
    }
 }
@@ -5004,7 +4603,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
               {F77\_\textit{type}\_TYPE name}
           }
 
-         where {\ssttt F77\_\textit{type}\_TYPE} expands to the appropriate C
+         where \texttt{F77\_\textit{type}\_TYPE} expands to the appropriate C
          type.
       }
    }
@@ -5046,7 +4645,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
    \sstdiytopic{Associated macro:}{
-        \htmlref{{\ssttt GENPTR\_CHARACTER}}{GENPTR_CHARACTER}
+        \htmlref{\texttt{GENPTR\_CHARACTER}}{GENPTR_CHARACTER}
    }
 }
 
@@ -5085,7 +4684,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
    \sstdiytopic{Associated macro:}{
-        \htmlref{{\ssttt GENPTR\_CHARACTER\_ARRAY}}{GENPTR_CHARACTER_ARRAY}
+        \htmlref{\texttt{GENPTR\_CHARACTER\_ARRAY}}{GENPTR_CHARACTER_ARRAY}
    }
 }
 
@@ -5164,12 +4763,12 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
                 {F77\_\textit{type}\_TYPE $*$const arg}
           }
 
-         where {\ssttt F77\_\textit{type}\_TYPE} expands to the appropriate C
+         where \texttt{F77\_\textit{type}\_TYPE} expands to the appropriate C
          type.
       }
    }
    \sstdiytopic{Associated macro:}{
-        \htmlref{{\ssttt CHARACTER}}{CHARACTER}
+        \htmlref{\texttt{CHARACTER}}{CHARACTER}
    }
 }
 
@@ -5205,7 +4804,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
    \sstdiytopic{Associated macro:}{
-        \htmlref{{\ssttt CHARACTER\_ARG}}{CHARACTER_ARG}
+        \htmlref{\texttt{CHARACTER\_ARG}}{CHARACTER_ARG}
    }
 }
 
@@ -5242,12 +4841,12 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
                {F77\_\textit{type}\_TYPE $*$const arg}
           }
 
-         where {\ssttt F77\_\textit{type}\_TYPE} expands to the appropriate C
+         where \texttt{F77\_\textit{type}\_TYPE} expands to the appropriate C
          type.
       }
    }
    \sstdiytopic{Associated macro:}{
-        \htmlref{{\ssttt CHARACTER\_ARRAY}}{CHARACTER_ARRAY}
+        \htmlref{\texttt{CHARACTER\_ARRAY}}{CHARACTER_ARRAY}
    }
 }
 \sstmacro{
@@ -5288,7 +4887,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       DECLARE\_\textit{type}\_ARRAY, may be passed.
    }
    \sstdiytopic{Associated macro:}{
-        \htmlref{{\ssttt CHARACTER\_ARRAY\_ARG}}{CHARACTER_ARRAY_ARG}
+        \htmlref{\texttt{CHARACTER\_ARRAY\_ARG}}{CHARACTER_ARRAY_ARG}
    }
 }
 
@@ -5324,8 +4923,8 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
                {F77\_\textit{type}\_TYPE ($*$F77\_EXTERNAL\_NAME(arg))()}
           }
 
-         where {\ssttt F77\_\textit{type}\_TYPE} and
-         {\ssttt F77\_EXTERNAL\_NAME} expand appropriately for the platform.
+         where \texttt{F77\_\textit{type}\_TYPE} and
+         \texttt{F77\_EXTERNAL\_NAME} expand appropriately for the platform.
       }
    }
 }
@@ -5362,12 +4961,11 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
               {F77\_EXTERNAL\_NAME(arg)}
           }
 
-         where {\ssttt F77\_EXTERNAL\_NAME} expands appropriately for the
+         where \texttt{F77\_EXTERNAL\_NAME} expands appropriately for the
          platform.
       }
    }
 }
-
 
 \newpage
 \subsection{\xlabel{specific_descriptions}\label{f77_specific}Specific Descriptions}
@@ -5630,7 +5228,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
             \sstexamplestableentry{}
                     {struct dsc\$descriptor\_s C\_descr =}\\
             \sstexamplestableentry{}
-                    {\{\ssttt 50, DSC\$K\_DTYPE\_T, DSC\$K\_CLASS\_S, C \};}\\
+                    {\{\texttt{50, DSC\$K\_DTYPE\_T, DSC\$K\_CLASS\_S, C \};}}\\
             \sstexamplestableentry{}
                     {struct dsc\$descriptor\_s $*$C\_arg =\&C\_descr}
           }
@@ -5688,7 +5286,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
             \sstexamplestableentry{}
                     {struct dsc\$descriptor\_s C\_descr =}\\
             \sstexamplestableentry{}
-                    {\{\ssttt 50, DSC\$K\_DTYPE\_T, DSC\$K\_CLASS\_S, C \};}\\
+                    {\{\texttt{50, DSC\$K\_DTYPE\_T, DSC\$K\_CLASS\_S, C \};}}\\
             \sstexamplestableentry{}
                     {struct dsc\$descriptor\_s $*$C\_arg =\&C\_descr}
           }
@@ -5776,7 +5374,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
           }
       }
       \sstexamplesubsection{
-         extern struct \{\ssttt int i,j,k;\} F77\_BLANK\_COMMON;
+         extern struct \{\texttt{ int i,j,k;\} F77\_BLANK\_COMMON;}
       }{
          declares an external structure to use the same storage as the
          FORTRAN blank common.
@@ -6040,13 +5638,13 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 
           \sstexamplestable{
             \sstexamplestableentry{All Unix:}
-               {\{\ssttt int f77dims[1];f77dims[0]=nels;}\\
+               {\{\texttt{ int f77dims[1];f77dims[0]=nels;}}\\
             \sstexamplestableentry{}
                {fstring=cnfCrefa(strlen(cstring),1,f77dims);}\\
             \sstexamplestableentry{}
                {fstring\_length=strlen(cstring);\}}\\
             \sstexamplestableentry{VAX/VMS:}
-                    {\{\ssttt int f77dims[1];f77dims[0]=nels;}\\
+                    {\{\texttt{ int f77dims[1];f77dims[0]=nels;}}\\
             \sstexamplestableentry{}
                     {fstring\_arg = cnfCrefa(strlen(cstring),1,f77dims);}\\
             \sstexamplestableentry{}
@@ -6248,7 +5846,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
    \sstdiytopic{Associated macro:}{
-      \htmlref{\ssttt{F77\_IMPORT\_CHARACTER}}{F77_IMPORT_CHARACTER}
+      \htmlref{\texttt{F77\_IMPORT\_CHARACTER}}{F77_IMPORT_CHARACTER}
    }
 }
 
@@ -6299,14 +5897,14 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 
          \sstexamplestable{
             \sstexamplestableentry{}
-               {\{\ssttt int f77dims[1];f77dims[0]=nels;}\\
+               {\{\texttt{ int f77dims[1];f77dims[0]=nels;}}\\
             \sstexamplestableentry{}
                {cnfExprta(carg,lc,farg,lf,1,f77dims);\} }
          }
       }
    }
    \sstdiytopic{Associated macro:}{
-      \htmlref{\ssttt{F77\_IMPORT\_CHARACTER\_ARRAY}}
+      \htmlref{\texttt{F77\_IMPORT\_CHARACTER\_ARRAY}}
               {F77_IMPORT_CHARACTER_ARRAY}
    }
 }
@@ -6354,14 +5952,14 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 
          \sstexamplestable{
             \sstexamplestableentry{All systems:}
-               { \{\ssttt int f77dims[1];f77dims[0]=nels;}\\
+               { \{\texttt{ int f77dims[1];f77dims[0]=nels;}}\\
             \sstexamplestableentry{}
                {cnfExprtap(carg,farg,lf,1,f77dims);\}}
          }
       }
    }
    \sstdiytopic{Associated macro:}{
-      \htmlref{\ssttt{F77\_IMPORT\_CHARACTER\_ARRAY\_P}}
+      \htmlref{\texttt{F77\_IMPORT\_CHARACTER\_ARRAY\_P}}
               {F77_IMPORT_CHARACTER_ARRAY_P}
    }
 }
@@ -6462,7 +6060,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
    \sstdiytopic{Associated macro:}{
-      \htmlref{\ssttt{F77\_EXPORT\_CHARACTER}}{F77_EXPORT_CHARACTER}
+      \htmlref{\texttt{F77\_EXPORT\_CHARACTER}}{F77_EXPORT_CHARACTER}
    }
 }
 
@@ -6513,14 +6111,14 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 
          \sstexamplestable{
             \sstexamplestableentry{All systems:}
-               {\{\ssttt int f77dims[1];f77dims[0]=nels;}\\
+               {\{\texttt{ int f77dims[1];f77dims[0]=nels;}}\\
             \sstexamplestableentry{}
                {cnfImprta(farg,lf,carg,lc,1,f77dims);\}}
          }
       }
    }
    \sstdiytopic{Associated macro:}{
-      \htmlref{\ssttt{F77\_EXPORT\_CHARACTER\_ARRAY}}
+      \htmlref{\texttt{F77\_EXPORT\_CHARACTER\_ARRAY}}
               {F77_EXPORT_CHARACTER_ARRAY}
    }
 }
@@ -6575,14 +6173,14 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 
          \sstexamplestable{
             \sstexamplestableentry{All systems:}
-               {\{\ssttt int f77dims[1];f77dims[0]=nels;}\\
+               {\{\texttt{ int f77dims[1];f77dims[0]=nels;}}\\
             \sstexamplestableentry{}
                {cnfImprtap(farg,lf,carg,lc,f77dims);\}}
          }
       }
    }
    \sstdiytopic{Associated macro:}{
-      \htmlref{\ssttt{F77\_EXPORT\_CHARACTER\_ARRAY\_P}}
+      \htmlref{\texttt{F77\_EXPORT\_CHARACTER\_ARRAY\_P}}
               {F77_EXPORT_CHARACTER_ARRAY_P}
    }
 }
@@ -7358,7 +6956,7 @@ characters}
 {   Register a pointer for use from both C and FORTRAN}
 \listroutine{cnfUregp}
 {   Unregister a pointer previously registered using cnfRegp}
-\listroutine{cnfpVAL}
+\listroutine{CNF\_PVAL}
 {   Expand a FORTRAN pointer to its full value (FORTRAN function)}
 }
 \newpage
@@ -7878,7 +7476,6 @@ characters}
       }
    }
 }
-
 \sstroutine{
    cnfExprt
 }{
@@ -8817,20 +8414,29 @@ characters}
 \rule{\textwidth}{0.5mm}
 
 \section{\xlabel{references}References}
-
+\nocite{fortran:std}
+\nocite{c:std}
+\nocite{Banahan}
 \begin{thebibliography}{9}
-\bibitem{fortran:std}American National Standard -- Programming Language
+
+\bibitem{fortran:std}
+American National Standard -- Programming Language
 -- FORTRAN (ANSI X3.9-1978, ISO 1539-1980(E)). Publ, American National
 Standards Institute.
-%
-\bibitem{c:std}American National Standard for Information Systems --
+
+\bibitem{c:std}
+American National Standard for Information Systems --
 Programming Language -- C (ANSI X3.159-1989). Publ, American National
 Standards Institute.
+
 %\bibitem{psx:std}IEEE Standard Portable Operating System Interface for Computer
 %Environments (IEEE Std 1003.1-1988). Publ, Institute of Electrical and
 %Electronic Engineers, Inc.
-\bibitem{Banahan}Banahan, M.F., 1988. The C Book: featuring the draft ANSI C
+
+\bibitem{Banahan}
+Banahan, M.F., 1988. The C Book: featuring the draft ANSI C
 standard. Publ, Addison-Wesley.
+
 \end{thebibliography}
 
 \end{document}
