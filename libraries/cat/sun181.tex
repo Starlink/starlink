@@ -1,3 +1,4 @@
+\documentclass[11pt,twoside]{starlink}
 %
 % CAT Catalogue and Table Manipulation Library: Programmer's Manual
 
@@ -18,505 +19,41 @@
 %
 % Set the CAT version number.
 
-\newcommand{\CATversion}{8.1~}
+\providecommand{\CATversion}{8.1~}
 
 %
 % Commands for displaying sexagesimal angles.
 
-\newcommand{\tmin}   {\mbox{$^{\rm m}\!\!.$}}
-\newcommand{\hm}[3] {$#1^{\rm h}\,#2\tmin#3$}
-\newcommand{\dm}[2] {$#1^{\circ}\,#2\raisebox{-0.5ex}{$^{'}$}$}
-\newcommand{\arcmin} {\raisebox{-0.5ex}{$^{'}$} }
+\providecommand{\tmin}   {\mbox{$^{\rm m}\!\!.$}}
+\providecommand{\hm}[3] {$#1^{\rm h}\,#2\tmin#3$}
+\providecommand{\dm}[2] {$#1^{\circ}\,#2\raisebox{-0.5ex}{$^{'}$}$}
+\providecommand{\arcmin} {\raisebox{-0.5ex}{$^{'}$} }
 
-\newcommand{\arcsec} {$\hspace{-0.05em}\raisebox{-0.5ex}
+\providecommand{\arcsec} {$\hspace{-0.05em}\raisebox{-0.5ex}
                      {$^{'\hspace{-0.1em}'}$}
                      \hspace{-0.7em}.\hspace{-0.05em}$}
-\newcommand{\tsec}   {\mbox{$^{\rm s}\!\!.$}}
-\newcommand{\hms}[4] {$#1^{\rm h}\,#2^{\rm m}\,#3\tsec#4$}
-\newcommand{\dms}[4] {$#1^{\circ}\,#2\raisebox{-0.5ex}{$^{'}$}\,#3\arcsec#4$}
+\providecommand{\tsec}   {\mbox{$^{\rm s}\!\!.$}}
+\providecommand{\hms}[4] {$#1^{\rm h}\,#2^{\rm m}\,#3\tsec#4$}
+\providecommand{\dms}[4] {$#1^{\circ}\,#2\raisebox{-0.5ex}{$^{'}$}\,#3\arcsec#4$}
 
 
 %-------------------------------------------------------------------
-\documentstyle[11pt,twoside]{article}
-\pagestyle{myheadings}
+
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardoccopyright
 {Copyright \copyright\ 2001 Council for the Central Laboratory of the Research Councils}
 
-\newcommand{\stardocnumber}    {181.11}
-\newcommand{\stardocauthors}   {A.C.~Davenhall \& D.S.~Berry}
-\newcommand{\stardocdate}      {11th November 2013}
-\newcommand{\stardoctitle}     {CAT \\ [\latex{1ex}]
+\stardocnumber      {181.11}
+\stardocauthors     {A.C.~Davenhall \& D.S.~Berry}
+\stardocdate        {11th November 2013}
+\stardoctitle       {CAT \\ [\latex{1ex}]
                               Catalogue and Table Manipulation Library}
-\newcommand{\stardocversion}   {Version \CATversion}
-\newcommand{\stardocmanual}    {Programmer's Manual}
-% ? End of document identificationabstarct
-
-% -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\html}[1]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-%-------------------------------------------------------------------
-% +
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2HTML. The contents of this file should be included in the
-%     source prior to any statements that make use of the SST commands.
-
-%  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty
-%     on your TEXINPUTS path (and including the name as part of the
-%     documentstyle declaration).
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-% -
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
-
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%  Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  \sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  \sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  \sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  \sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  \sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
-
-%  \sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}]
-      \begin{description}
-         #2
-      \end{description}
-   }
-
-%  \sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-   }
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-% .
-% @(#)sst.tex   1.4   95/06/06 11:46:41   95/06/06 11:49:58
-
-% -----------------------------------------------------------------------------
-% ? End of document specific commands
-% -----------------------------------------------------------------------------
-%  Title Page.
-%  ===========
-\renewcommand{\thepage}{\roman{page}}
-\begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-\end{htmlonly}
-
-%  Package Description
+\stardocversion     {Version \CATversion\ }
+\stardocmanual      {Programmer's Manual}
+\stardocabstract{%
 CAT is the Starlink Fortran subroutine library for manipulating
 astronomical catalogues and similar tabular datasets. This manual is
 intended for programmers who plan to write applications which use the
@@ -528,13 +65,13 @@ programming environment is described. All the subroutines in the
 interface to the library are covered. However, the principles underlying
 the library, and their justification, are described only insofar as they
 affect its use.
+}
+% ? End of document identification
 
-\pagebreak
-\markboth{\stardocname}{\stardocname}
-
-\begin{htmlonly}
-\section*{Using This Document}
-\end{htmlonly}
+%  Title Page.
+%  ===========
+\begin{document}
+\scfrontmatter
 
 \subsection*{Readership}
 
@@ -596,7 +133,7 @@ Edinburgh, \\
 EH9 3HJ, United Kingdom.  \\
 \end{tabular}
 
-Electronic mail: {\tt acd@roe.ac.uk}
+Electronic mail: \texttt{acd@roe.ac.uk}
 
 Fax: \\
 \begin{tabular}{lr}
@@ -629,7 +166,7 @@ and suggested several useful improvements.
 I am grateful to all these people for sharing their time and expertise.
 \begin{flushright}
 Clive Davenhall \\
-\latex{\raggedright} {\it Department of Physics and Astronomy, University of
+\latex{\raggedright} \textit{Department of Physics and Astronomy, University of
 Leicester \\
 Saint Edmund's Day 1994}
 \end{flushright}
@@ -666,8 +203,7 @@ Saint Edmund's Day 1994}
    not be visible to the user (except that the library should be
    somewhat faster).  One visible change is that the capitalisation
    of the file type specified by the user when a new catalogue is
-   opened is now preserved.  One new routine has been added: {\tt
-   CAT\_IINQ} (ACD).
+   opened is now preserved.  One new routine has been added: \texttt{CAT\_IINQ} (ACD).
 
   \item 26th November 1998: Version 7.  Modified for release 6.1 of the
    CAT library.  The major enhancement to the library in this release
@@ -697,52 +233,9 @@ Saint Edmund's Day 1994}
 
 \end{enumerate}
 
-\cleardoublepage
-%------------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
- \newpage
- \begin{latexonly}
-   \null\vspace {5mm}
-   \begin {center}
-   \rule{80mm}{0.5mm} \\ [1ex]
-   {\Large\bf \stardoctitle \\ [2.5ex]
-              \stardocversion} \\ [2ex]
-   \rule{80mm}{0.5mm}
-   \end{center}
-   \vspace{20mm}
-
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \pagebreak
-   \listoftables
-   \listoffigures
-
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
- \end{latexonly}
-% ? End of Latex document table of contents
-%------------------------------------------------------------------------------
-
-\cleardoublepage
-% Section 1 begins ...
-\renewcommand{\thepage}{\arabic{page}}
-\markboth{\stardocname}{\stardocname}
-\setcounter{page}{1}
-
-\null\vspace {5mm}
-\begin {center}
-\rule{80mm}{0.5mm} \\ [1ex]
-{\Large\bf \stardoctitle \\ [2.5ex]
-           \stardocversion} \\ [2ex]
-\rule{80mm}{0.5mm}
-\end{center}
-\vspace{20mm}
-
-\pagenumbering{arabic}
 
 \part{Preliminaries}
-\markboth{\stardocname}{\stardocname}
+
 
 \section{\label{INTRO}\xlabel{INTRO}Introduction}
 
@@ -750,7 +243,7 @@ Saint Edmund's Day 1994}
 \begin{center}
 A harmless necessary cat.
 \end{center}
-{\it The Merchant of Venice} \latex{\raggedleft}
+\textit{The Merchant of Venice} \latex{\raggedleft}
 \end{quote}
 % Dictionary of Quotations: p202:4
 
@@ -799,14 +292,14 @@ formats and they are described in Appendix~\ref{FORMAT}.
 \section{\label{TERM}\xlabel{TERM}Terminology}
 
 \begin{quote} \latex{\raggedright}
-`When {\it I}\, use a word,' Humpty Dumpty said, in a rather scornful
+`When \textit{I}\, use a word,' Humpty Dumpty said, in a rather scornful
 tone, `it means just what I choose it to mean --- neither more nor
 less.' \\
-{\it Through the Looking-Glass and What Alice Found There} \latex{\raggedleft}
+\textit{Through the Looking-Glass and What Alice Found There} \latex{\raggedleft}
 \\ Lewis Carroll
 \end{quote}
 
-An astronomical {\bf catalogue} is basically a {\bf table} of values,
+An astronomical \textbf{catalogue} is basically a \textbf{table} of values,
 consisting of the measurements of the same property for a set of
 objects, together with the auxiliary information necessary to describe
 this table. There are several different terminologies for describing
@@ -828,8 +321,7 @@ astronomical catalogues is used:
 \end{description}
 
 Some of the other terminologies are shown for comparison in
-Table~\ref{TABLE_NOT}\footnote{This table is adapted from {\it
-Database Systems in Science and Engineering}\, by J.R.~Rumble and
+Table~\ref{TABLE_NOT}\footnote{This table is adapted from \textit{Database Systems in Science and Engineering}\, by J.R.~Rumble and
 F.J.~Smith\cite{RUMBLE}, p158.}.
 
 \begin{table}[htbp]
@@ -852,11 +344,10 @@ tables}
 
 \end{table}
 
-In the CAT library each {\bf catalogue} can contain only one {\bf
-table} and the two terms can usually be used interchangeably without
+In the CAT library each \textbf{catalogue} can contain only one \textbf{table} and the two terms can usually be used interchangeably without
 introducing any ambiguity. However, where it is necessary to
-differentiate between the two sorts of entities, {\bf table} is used
-to denote the simple matrix of rows and columns and {\bf catalogue} is
+differentiate between the two sorts of entities, \textbf{table} is used
+to denote the simple matrix of rows and columns and \textbf{catalogue} is
 used to denote the combination of a table and its associated auxiliary
 information. Note that this usage implies nothing about the contents
 of the catalogue; it may contain a published astronomical catalogue, a
@@ -864,13 +355,13 @@ set of private astronomical results or, indeed, data which are entirely
 non-astronomical.
 
 In CAT the auxiliary information which applies to the entire catalogue
-comprises an arbitrary number of {\bf parameters}. Each parameter
+comprises an arbitrary number of \textbf{parameters}. Each parameter
 comprises a single datum. Examples might be the epoch or equinox of
 celestial coordinates stored in a catalogue. CAT parameters are
 similar to FITS keywords (in fact, CAT interprets named keywords in
 a FITS table as parameters).
 
-Columns and parameters both have a number of {\bf attributes}, such
+Columns and parameters both have a number of \textbf{attributes}, such
 as their name and data type. A full list of the attributes of
 columns and parameters is given in Sections~\ref{COLS} and
 \ref{PARS} respectively, though normally you will only need to
@@ -878,8 +369,8 @@ manipulate a few of them.  All columns have the same set of attributes
 (though they take different values, of course) and similarly all
 parameters have the same set of attributes.
 
-Columns may either be {\bf scalars} in which case each field comprises
-a single datum, or {\bf vectors}, one-dimensional arrays where each
+Columns may either be \textbf{scalars} in which case each field comprises
+a single datum, or \textbf{vectors}, one-dimensional arrays where each
 field comprises a one-dimensional array of values. Parameters may only
 be scalars.
 
@@ -897,7 +388,7 @@ and if not attempt to persuade him to install it.
 Version \CATversion of CAT comprises a subroutine library and two INCLUDE
 files.  In addition, the CAT-EXAMPLES package provides five simple
 applications which are either examples of how to write CAT applications
-or simple utilities to examine catalogues ({\it cf}\, the {\tt hdstrace}
+or simple utilities to examine catalogues (\textit{cf}\, the \texttt{hdstrace}
 utility for examining HDS files). To write programs which use CAT you
 should have access to the library, the INCLUDE files and the CAT-EXAMPLES
 package.  Some of the CAT-EXAMPLES applications serve as examples in
@@ -911,15 +402,15 @@ You do not need any special quotas or privileges to use CAT.
 The following description applies to all the variants of Unix supported
 by Starlink.  Simply type:
 
-\begin{verse}
-{\tt source ~ /star/bin/examples/cat/cat-examples.csh}
-\end{verse}
+\begin{terminalv}
+source /star/bin/examples/cat/cat-examples.csh
+\end{terminalv}
 
 The following message should appear:
 
-\begin{verse}
-{\tt CAT example programs now available -- (for CAT Version 4.2-1)} \\
-\end{verse}
+\begin{terminalv}
+CAT example programs now available -- (for CAT Version 4.2-1)
+\end{terminalv}
 
 If it does not, then the probable cause is that CAT-EXAMPLES is not
 installed correctly at your site; check with your local site manager.
@@ -927,51 +418,50 @@ installed correctly at your site; check with your local site manager.
 \subsection{\label{INCLUDE}INCLUDE files}
 
 The programming interface to the CAT library includes two INCLUDE files:
-{\tt CAT\_PAR} and {\tt CAT\_ERR}. These INCLUDE files define symbolic
+\texttt{CAT\_PAR} and \texttt{CAT\_ERR}. These INCLUDE files define symbolic
 constants which your application programs may use:
 
 \begin{description}
 
-  \item[{\tt CAT\_PAR}] contains general constants pertaining to the
+  \item[\texttt{CAT\_PAR}] contains general constants pertaining to the
    CAT library,
 
-  \item[{\tt CAT\_ERR}] contains constants corresponding to the various
+  \item[\texttt{CAT\_ERR}] contains constants corresponding to the various
    error codes which can be set by the CAT library.
 
 \end{description}
 
 All the symbolic constants defined in both these files begin with the
-prefix {\tt CAT\_\_} (in conformance with normal Starlink practice).
+prefix \texttt{CAT\_\_} (in conformance with normal Starlink practice).
 
 You can INCLUDE either or both of these files in a subroutine by
 including either or both of the following lines in the subroutine,
 as appropriate:
 
-\begin{verbatim}
-      INCLUDE 'CAT_PAR'   ! CAT symbolic constants.
-      INCLUDE 'CAT_ERR'   ! CAT error codes.
-\end{verbatim}
+\begin{terminalv}
+INCLUDE 'CAT_PAR'   ! CAT symbolic constants.
+INCLUDE 'CAT_ERR'   ! CAT error codes.
+\end{terminalv}
 
 If you are using a standard ADAM prologue for the subroutine these
 lines will go in the `global constants' section.
 
 The example applications included with CAT (see Section~\ref{SIMPLE}),
 and probably your own applications, also need to access the standard
-ADAM INCLUDE file {\tt SAE\_PAR}. For convenience the instructions
+ADAM INCLUDE file \texttt{SAE\_PAR}. For convenience the instructions
 given below include setting up access to this file.
 
 The following description applies to all the variants of Unix supported
 by Starlink.  The files are kept in
-directory {\tt /star/include} with names {\tt cat\_par} and {\tt
-cat\_err}. You should set up soft links to these files, following the
+directory \texttt{/star/include} with names \texttt{cat\_par} and \texttt{cat\_err}. You should set up soft links to these files, following the
 normal Starlink procedure, which is described in
 \xref{SUN/111.2}{sun111}{}\cite{SUN111}.  See in particular Section 4.4,
 p6.  Simply type:
 
-\begin{verse}
-  {\tt star\_dev \\
-  cat\_dev}
-\end{verse}
+\begin{terminalv}
+star_dev
+cat_dev
+\end{terminalv}
 
 \subsection{\label{LINK}Linking}
 
@@ -982,11 +472,11 @@ applications which call CAT and it seems sensible to get the somewhat
 separate question of linking out of the way first.
 
 Your application should be written as an ADAM A-task.  The Starlink
-shell script for linking an A-task, {\tt alink}, will automatically compile
+shell script for linking an A-task, \texttt{alink}, will automatically compile
 the source code for the A-task. Type:
 
 \begin{verse}
-{\tt alink}\,\, {\it  your\_source\_code}\,\,  {\tt `cat\_link\_adam`}
+\texttt{alink}\,\, \textit{your\_source\_code}\,\,  \texttt{`cat\_link\_adam`}
 \end{verse}
 
 This description applies to all the variants of Unix supported by
@@ -997,41 +487,41 @@ Starlink.
 Once you have written an application which uses the CAT library to
 manipulate a catalogue you will often want to examine the contents of
 the catalogues which the application reads or writes.  The catalogue
-browser {\tt xcatview} in the Starlink package CURSA (see
+browser \texttt{xcatview} in the Starlink package CURSA (see
 \xref{SUN/190}{sun190}{}\cite{SUN190}) is a convenient way to examine
 catalogues.  It can access catalogues in any of the formats supported
 by CAT\footnote{CURSA uses the CAT library to access catalogues.}.
 
 Catalogues written in the STL or TST formats (see Appendix~\ref{FORMAT})
 are text files and can be examined with standard Unix commands such
-as {\tt more} or {\tt cat}.
+as \texttt{more} or \texttt{cat}.
 
 In addition, CAT-EXAMPLES contains two simple utilities for examining the
 contents of catalogues.  These utilities are largely of historical
-interest and are less easy to use than {\tt xcatview}.  They are mentioned
+interest and are less easy to use than \texttt{xcatview}.  They are mentioned
 here for completeness.  The utilities are:
 
 \begin{description}
 
-  \item[{\tt details}] reports the details of all the parameters and
+  \item[\texttt{details}] reports the details of all the parameters and
    columns in a catalogue. All the attributes of every column and
    parameter are listed. The output is directed to the standard Fortran
    output stream.
 
-  \item[{\tt listout}] lists selected columns from a catalogue to the
+  \item[\texttt{listout}] lists selected columns from a catalogue to the
    terminal screen or a text file, or both. You are prompted for the
    columns which are to be displayed.
 
 \end{description}
 
-To invoke either of these applications simply type either {\tt details}
-or {\tt listout}, as appropriate, and answer the prompts, which are
+To invoke either of these applications simply type either \texttt{details}
+or \texttt{listout}, as appropriate, and answer the prompts, which are
 self-explanatory.
 
 
 \newpage
 \part{Tutorial}
-\markboth{\stardocname}{\stardocname}
+
 
 \section{\label{SIMPLE}\xlabel{SIMPLE}A simple example application}
 
@@ -1039,7 +529,7 @@ self-explanatory.
 \begin{center}
 Example is always more efficacious than precept.
 \end{center}
-{\it Lives of the English Poets} vol. ii \latex{\raggedleft}
+\textit{Lives of the English Poets} vol. ii \latex{\raggedleft}
 \\ Samuel Johnson
 \end{quote}
 % Dictionary of Quotations: p116:25
@@ -1051,23 +541,22 @@ First, however, a few preliminaries.
 \begin{itemize}
 
   \item The programming interface to the CAT library comprises two
-   components: the CAT subroutines and two INCLUDE files, {\tt CAT\_PAR}
-   and {\tt CAT\_ERR}. These INCLUDE files define symbolic constants
+   components: the CAT subroutines and two INCLUDE files, \texttt{CAT\_PAR}
+   and \texttt{CAT\_ERR}. These INCLUDE files define symbolic constants
    which application programs may use. Section~\ref{INCLUDE} explains
    how to access these files. It is worth your while printing out and
    examining copies of both files. The comments included in the files
-   should be sufficient to explain the purpose of each constant. {\tt
-   CAT\_PAR} contains general constants pertaining to the CAT library.
-   {\tt CAT\_ERR} contains constants corresponding to the various error
+   should be sufficient to explain the purpose of each constant. \texttt{CAT\_PAR} contains general constants pertaining to the CAT library.
+   \texttt{CAT\_ERR} contains constants corresponding to the various error
    codes which can be set by the CAT library. If your application needs
-   to access one of these values you should {\it always}\, use the
-   appropriate symbolic constant; {\it never}\, hard-code the actual
+   to access one of these values you should \textit{always}\, use the
+   appropriate symbolic constant; \textit{never}\, hard-code the actual
    value into your code. The values may (and probably will) change in
    subsequent releases of the CAT library.
 
   \item Within the CAT interface items in a catalogue, such as columns
    and parameters, and, indeed, the catalogue itself, are identified
-   by an {\bf identifier}. This approach is consistent with the
+   by an \textbf{identifier}. This approach is consistent with the
    treatment of data items in other ADAM libraries. Each identifier is
    an INTEGER number. The value of an identifier is unique (within a
    given invocation of an application) and is sufficient to identify
@@ -1076,10 +565,10 @@ First, however, a few preliminaries.
 
   \begin{itemize}
 
-    \item You should {\it never}\, set the value of a new identifier
-     yourself; CAT will {\it always}\, generate an identifier for you.
+    \item You should \textit{never}\, set the value of a new identifier
+     yourself; CAT will \textit{always}\, generate an identifier for you.
 
-    \item You should {\it never}\, alter the value of an identifier
+    \item You should \textit{never}\, alter the value of an identifier
      once CAT has allocated it.
 
     \item You never need to know the actual value of an identifier. I
@@ -1094,9 +583,9 @@ First, however, a few preliminaries.
 
   \begin{description}
 
-    \item[{\tt .TRUE.}] -- the field is null; no datum is available,
+    \item[\texttt{.TRUE.}] -- the field is null; no datum is available,
 
-    \item[{\tt .FALSE.}] -- the field is not null; a valid datum is
+    \item[\texttt{.FALSE.}] -- the field is not null; a valid datum is
      available.
 
   \end{description}
@@ -1120,7 +609,7 @@ First, however, a few preliminaries.
 
    Not all catalogues support null values in all their columns. If a
    column does not support null values then the null value flag will
-   always be returned set to {\tt .FALSE.}
+   always be returned set to \texttt{.FALSE.}
 
    The treatment of null values is described in greater detail in
    Section~\ref{NULLS}. In particular, Section~\ref{NULLAPP} prescribes
@@ -1130,13 +619,13 @@ First, however, a few preliminaries.
 
 We are now ready to examine a simple application which uses the CAT
 library. We will use one of the example applications released with
-the library, {\tt EXAMPLE\_WRITE}. This example creates and writes
+the library, \texttt{EXAMPLE\_WRITE}. This example creates and writes
 values to a small catalogue. I strongly recommend that you print out a
 copy of the source code and refer to it as you work through the example.
 The source code is available in file:
 
 \begin{center}
-{\tt /star/share/cat/example\_write.f}
+\texttt{/star/share/cat/example\_write.f}
 \end{center}
 
 This example program is simpler than a real application. Starting at the
@@ -1144,35 +633,35 @@ beginning, the first thing to notice about the application is that,
 because it is an ADAM A-task, at its top level it is a subroutine, not
 a main program:
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE EXAMPLE_WRITE (STATUS)
-\end{verbatim}
+\end{terminalv}
 
 The status argument is used to keep track of the success of the
 application as it proceeds with its task.
 
-\begin{verbatim}
+\begin{terminalv}
 *+
 *  Name:
 *     EXAMPLE_WRITE
     .
     .
     .
-\end{verbatim}
+\end{terminalv}
 
 After the ADAM prologue comments the CAT symbolic constants are
 INCLUDEd. Some of the constants defined in this file will be used by
 the application.
 
-\begin{verbatim}
+\begin{terminalv}
 *  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'CAT_PAR'
-\end{verbatim}
+\end{terminalv}
 
 The various variables used in the application are defined next.
 
-\begin{verbatim}
+\begin{terminalv}
 *  Status:
       INTEGER STATUS             ! Global status.
 *  Local Variables:
@@ -1196,65 +685,64 @@ The various variables used in the application are defined next.
      :  NULR,     !  "    "         "       "  VALR.
      :  NULC      !  "    "         "       "  VALC.
 *.
-\end{verbatim}
+\end{terminalv}
 
 The first executable statement is the usual check that the status is ok.
 This check is mandatory in ADAM applications.
 
-\begin{verbatim}
+\begin{terminalv}
       IF (STATUS .EQ. SAI__OK) THEN
-\end{verbatim}
+\end{terminalv}
 
 Once it is out of the way the application proper can start. It starts
-with a call to {\tt CAT\_CREAT}:
+with a call to \texttt{CAT\_CREAT}:
 
-\begin{verbatim}
-         CALL CAT_CREAT ('CNAME', CI, STATUS)
-\end{verbatim}
+\begin{terminalv}
+      CALL CAT_CREAT ('CNAME', CI, STATUS)
+\end{terminalv}
 
 This subroutine will create a new catalogue, whose name it obtains
 from the ADAM parameter system (in practice the user will be prompted
 for it)\footnote{It is possible to create or open a CAT catalogue
 without going through the ADAM parameter system by calling routine
-{\tt CAT\_TOPEN} rather than {\tt CAT\_CREAT}. This routine is not used
+\texttt{CAT\_TOPEN} rather than \texttt{CAT\_CREAT}. This routine is not used
 in the present example, but is described in Section~\ref{NONADAM},
-below.}. The first argument of {\tt CAT\_CREAT} is the name of the ADAM
+below.}. The first argument of \texttt{CAT\_CREAT} is the name of the ADAM
 parameter which will supply the catalogue name. The remaining two
-arguments are returned by {\tt CAT\_CREAT}; {\tt CI} is the identifier
+arguments are returned by \texttt{CAT\_CREAT}; \texttt{CI} is the identifier
 for the catalogue. We will use this variable to refer to the catalogue
-throughout the application. {\tt STATUS} is the running status argument
+throughout the application. \texttt{STATUS} is the running status argument
 which is usual in ADAM libraries. If the routine has succeeded its value
-is {\tt SAI\_\_OK}.
+is \texttt{SAI\_\_OK}.
 
-After {\tt CAT\_CREAT} has executed successfully a new catalogue has
+After \texttt{CAT\_CREAT} has executed successfully a new catalogue has
 been created, but no columns or parameters have been defined for it,
 and it contains no data. The next step is to define some columns. The
-first column defined is an INTEGER column called {\tt COLI}. Subroutine
-{\tt CAT\_PNEW0} is used for this task:
+first column defined is an INTEGER column called \texttt{COLI}. Subroutine
+\texttt{CAT\_PNEW0} is used for this task:
 
-\begin{verbatim}
+\begin{terminalv}
          CALL CAT_PNEW0 (CI, CAT__FITYP, 'COLI', CAT__TYPEI, FII,
      :     STATUS)
-\end{verbatim}
+\end{terminalv}
 
-The first argument, {\tt CI}, identifies the catalogue to which the
-new column belongs. The second argument tells {\tt CAT\_PNEW0} that it
-has to create a new column; this argument should always be {\tt
-CAT\_\_FITYP} when a column is to be created. The third argument is the
-name of the column, {\tt COLI} in the present case, and the fourth
+The first argument, \texttt{CI}, identifies the catalogue to which the
+new column belongs. The second argument tells \texttt{CAT\_PNEW0} that it
+has to create a new column; this argument should always be \texttt{CAT\_\_FITYP} when a column is to be created. The third argument is the
+name of the column, \texttt{COLI} in the present case, and the fourth
 argument defines its data type. There are symbolic constants defined in
-{\tt CAT\_PAR} for each of the data types supported by CAT. {\tt COLI}
+\texttt{CAT\_PAR} for each of the data types supported by CAT. \texttt{COLI}
 is an INTEGER column, so the code for an INTEGER is used. The codes for
 the different data types are listed in Table~\ref{DTYPES}.
 
-The fifth argument, {\tt FII}, is returned rather than given and is an
+The fifth argument, \texttt{FII}, is returned rather than given and is an
 identifier for the column; subsequent references to the column will be
 via this identifier. The final argument is the usual ADAM running
 status.
 
 The mandatory information which you must supply to define a column is:
 the catalogue to which it belongs, its name and its data type. All these
-values are specified using routine {\tt CAT\_PNEW0}. However, as
+values are specified using routine \texttt{CAT\_PNEW0}. However, as
 explained in Section~\ref{TERM}, a column is defined by a set of
 attributes, of which the name and data type are but two, albeit
 mandatory ones. Section~\ref{COLS} lists all the attributes for a
@@ -1262,31 +750,30 @@ column. If you do not specify the remaining attributes default
 values are adopted for them. You can, however, supply your own values to
 over-ride the defaults. The next line is an example of doing so.
 
-\begin{verbatim}
+\begin{terminalv}
          CALL CAT_TATTC (FII, 'COMM', 'Integer column', STATUS)
-\end{verbatim}
+\end{terminalv}
 
 This routine is one of a family of similar routines, one for each
-data type ({\tt CAT\_TATTC} for attributes of data type CHARACTER,
-{\tt CAT\_TATTI} attributes of type INTEGER etc). Here it is used
-to set the comment attribute, COMM of column {\tt FII} to the
-value `Integer column'. Other attributes of column {\tt COLI} could have
+data type (\texttt{CAT\_TATTC} for attributes of data type CHARACTER,
+\texttt{CAT\_TATTI} attributes of type INTEGER etc). Here it is used
+to set the comment attribute, COMM of column \texttt{FII} to the
+value `Integer column'. Other attributes of column \texttt{COLI} could have
 been set in the same way, but in this example they are not, and the
 defaults are adopted\footnote{For convenience two additional routines,
 which are not used in the present example, are provided for creating
-columns. {\tt CAT\_CNEWS} creates a column and simultaneously sets some
-of the more commonly used attributes; {\tt CAT\_CNEWA} creates a column
+columns. \texttt{CAT\_CNEWS} creates a column and simultaneously sets some
+of the more commonly used attributes; \texttt{CAT\_CNEWA} creates a column
 and simultaneously sets all of its attributes. These routines may be
-more convenient to use than a call to {\tt CAT\_PNEW0} followed by
-multiple calls to {\tt CAT\_TATT$<$t$>$}. They are described in
+more convenient to use than a call to \texttt{CAT\_PNEW0} followed by
+multiple calls to \texttt{CAT\_TATT$<$t$>$}. They are described in
 Section~\ref{SUBINT_COL}, below.}.
 
 Two additional columns are created in the same way; the REAL column
-{\tt COLR} and the CHARACTER column {\tt COLC}. Note that in the case of
-{\tt COLC} the CHARACTER size attribute CSIZE is set using routine {\tt
-CAT\_TATTI}.
+\texttt{COLR} and the CHARACTER column \texttt{COLC}. Note that in the case of
+\texttt{COLC} the CHARACTER size attribute CSIZE is set using routine \texttt{CAT\_TATTI}.
 
-\begin{verbatim}
+\begin{terminalv}
          CALL CAT_PNEW0 (CI, CAT__FITYP, 'COLR', CAT__TYPER, FIR,
      :     STATUS)
          CALL CAT_TATTC (FIR, 'COMM', 'Real column', STATUS)
@@ -1295,7 +782,7 @@ CAT\_TATTI}.
      :     STATUS)
          CALL CAT_TATTC (FIC, 'COMM', 'Character column', STATUS)
          CALL CAT_TATTI (FIC, 'CSIZE', 10, STATUS)
-\end{verbatim}
+\end{terminalv}
 
 An important restriction to remember is that columns must be created,
 and their attributes set, before any rows of data are written to the
@@ -1304,54 +791,52 @@ details of its existing columns are frozen and no new columns can be
 created for it.
 
 After creating the columns, some parameters are created. The first of
-these is the INTEGER parameter {\tt PARI}. It is created with the same
-routine that was used to create the columns, {\tt CAT\_PNEW0}:
+these is the INTEGER parameter \texttt{PARI}. It is created with the same
+routine that was used to create the columns, \texttt{CAT\_PNEW0}:
 
-\begin{verbatim}
+\begin{terminalv}
          CALL CAT_PNEW0 (CI, CAT__QITYP, 'PARI', CAT__TYPEI, QII,
      :     STATUS)
-\end{verbatim}
+\end{terminalv}
 
 Again the first argument is the catalogue identifier. The second
 argument indicates that a parameter is to be created; this argument
-should always be set to {\tt CAT\_\_QITYP} when a parameter is to be
+should always be set to \texttt{CAT\_\_QITYP} when a parameter is to be
 created. The remaining arguments are exactly the same as they were for
-creating a column: {\tt PARI} is the parameter name, {\tt CAT\_\_TYPEI}
-the data type and {\tt QII} and {\tt STATUS} are the identifier for the
+creating a column: \texttt{PARI} is the parameter name, \texttt{CAT\_\_TYPEI}
+the data type and \texttt{QII} and \texttt{STATUS} are the identifier for the
 parameter and the running status, respectively.
 
 As for columns, only the minimum, mandatory attributes for the parameter
-are set with {\tt CAT\_PNEW0}, and default values are adopted for the
+are set with \texttt{CAT\_PNEW0}, and default values are adopted for the
 remaining attributes. Section~\ref{PARS} lists the attributes of a
 parameter. Also just like columns, the attributes of parameters can be
-set using the {\tt CAT\_TATT$<$t$>$} family of routines (where {\tt
-t = C} for CHARACTER attributes, {\tt I} for INTEGER etc). In the
-example {\tt CAT\_TATTC} is used to set the comments attribute, COMM of
-parameter {\tt PARI} and {\tt CAT\_TATTI} is used to set the value
+set using the \texttt{CAT\_TATT$<$t$>$} family of routines (where \texttt{t = C} for CHARACTER attributes, \texttt{I} for INTEGER etc). In the
+example \texttt{CAT\_TATTC} is used to set the comments attribute, COMM of
+parameter \texttt{PARI} and \texttt{CAT\_TATTI} is used to set the value
 attribute VALUE. The latter point is worth remembering; having created
-a parameter with {\tt CAT\_PNEW0} it is necessary to use one of the {\tt
-CAT\_TATT$<$t$>$} routines to set its value, and the routine chosen
+a parameter with \texttt{CAT\_PNEW0} it is necessary to use one of the \texttt{CAT\_TATT$<$t$>$} routines to set its value, and the routine chosen
 should correspond to the data type of the parameter\footnote{For
 convenience two additional routines, which are not used in the present
-example, are provided for creating parameters. {\tt CAT\_PPTS$<$t$>$}
+example, are provided for creating parameters. \texttt{CAT\_PPTS$<$t$>$}
 creates a parameter and simultaneously sets some of the more commonly
-used attributes; {\tt CAT\_PPTA$<$t$>$} creates a parameter and
+used attributes; \texttt{CAT\_PPTA$<$t$>$} creates a parameter and
 simultaneously sets all of its attributes. These routines may be more
-convenient to use than a call to {\tt CAT\_PNEW0} followed by multiple
-calls to {\tt CAT\_TATT$<$t$>$}. They are described in
+convenient to use than a call to \texttt{CAT\_PNEW0} followed by multiple
+calls to \texttt{CAT\_TATT$<$t$>$}. They are described in
 Section~\ref{SUBINT_PAR}, below.}.
 
-\begin{verbatim}
+\begin{terminalv}
          CALL CAT_TATTC (QII, 'COMM', 'Integer parameter', STATUS)
          CALL CAT_TATTI (QII, 'VALUE', 23, STATUS)
-\end{verbatim}
+\end{terminalv}
 
-Two additional parameters are created; the REAL parameter {\tt PARR} and
-the CHARACTER parameter {\tt PARC}. Note that, as was the case for
-columns, for the CHARACTER parameter {\tt PARC} the CHARACTER size
-attribute `CSIZE' must be set using {\tt CAT\_TATTI}.
+Two additional parameters are created; the REAL parameter \texttt{PARR} and
+the CHARACTER parameter \texttt{PARC}. Note that, as was the case for
+columns, for the CHARACTER parameter \texttt{PARC} the CHARACTER size
+attribute `CSIZE' must be set using \texttt{CAT\_TATTI}.
 
-\begin{verbatim}
+\begin{terminalv}
          CALL CAT_PNEW0 (CI, CAT__QITYP, 'PARR', CAT__TYPER, QIR,
      :     STATUS)
          CALL CAT_TATTC (QIR, 'COMM', 'Real parameter', STATUS)
@@ -1362,7 +847,7 @@ attribute `CSIZE' must be set using {\tt CAT\_TATTI}.
          CALL CAT_TATTC (QIC, 'COMM', 'Character parameter', STATUS)
          CALL CAT_TATTI (QIC, 'CSIZE', 20, STATUS)
          CALL CAT_TATTC (QIC, 'VALUE', 'Example string', STATUS)
-\end{verbatim}
+\end{terminalv}
 
 Note that, unlike columns, parameters can be created at any stage
 while writing a catalogue. They do not have to be created prior to
@@ -1371,9 +856,9 @@ writing the table of values for the catalogue.
 Once the parameters have been created the example starts a loop which
 will write the table of values.
 
-\begin{verbatim}
+\begin{terminalv}
          DO LOOP = 1, 25
-\end{verbatim}
+\end{terminalv}
 
 In the CAT interface the basic method of writing (and reading) a
 catalogue is one row at a time. Each increment of the loop will
@@ -1387,7 +872,7 @@ flags are set to null). In a real application, of course, these values
 would not be invented, but would either be the results of a calculation
 or read from an external file.
 
-\begin{verbatim}
+\begin{terminalv}
             VALI = LOOP
             VALR = 2.3E1 + REAL(LOOP)
             VALC = ' '
@@ -1406,72 +891,71 @@ or read from an external file.
                NULR = .TRUE.
                NULC = .TRUE.
             END IF
-\end{verbatim}
+\end{terminalv}
 
 The line:
 
-\begin{verbatim}
+\begin{terminalv}
             CALL CAT_PUT0I (FII, VALI, NULI, STATUS)
-\end{verbatim}
+\end{terminalv}
 
-writes a single value to column {\tt COLI}. {\tt FII} is the column
-identifier, {\tt VALI} and {\tt NULI} the value and null value flag
-respectively. {\tt STATUS} is, of course, the running status. {\tt
-CAT\_PUT0I} is one of the family of {\tt CAT\_PUT0$<$t$>$} routines,
-with one routine per data type. ({\tt I} for INTEGER, {\tt C} for
+writes a single value to column \texttt{COLI}. \texttt{FII} is the column
+identifier, \texttt{VALI} and \texttt{NULI} the value and null value flag
+respectively. \texttt{STATUS} is, of course, the running status. \texttt{CAT\_PUT0I} is one of the family of \texttt{CAT\_PUT0$<$t$>$} routines,
+with one routine per data type. (\texttt{I} for INTEGER, \texttt{C} for
 CHARACTER etc). Thus there are corresponding calls to write the REAL and
-CHARACTER columns {\tt COLR} and {\tt COLC}:
+CHARACTER columns \texttt{COLR} and \texttt{COLC}:
 
-\begin{verbatim}
+\begin{terminalv}
             CALL CAT_PUT0R (FIR, VALR, NULR, STATUS)
             CALL CAT_PUT0C (FIC, VALC, NULC, STATUS)
-\end{verbatim}
+\end{terminalv}
 
 CAT has the concept of the `current row buffer', which is an internal
 copy of the row of the catalogue which it is working on currently. The
-{\tt CAT\_PUT0$<$t$>$} routines put fields to the current row buffer
-(and the corresponding {\tt CAT\_GET0$<$t$>$} routines read values from
+\texttt{CAT\_PUT0$<$t$>$} routines put fields to the current row buffer
+(and the corresponding \texttt{CAT\_GET0$<$t$>$} routines read values from
 it).
 
-\begin{verbatim}
+\begin{terminalv}
             CALL CAT_RAPND (CI, STATUS)
-\end{verbatim}
+\end{terminalv}
 
-Writes out the current row buffer for catalogue {\tt CI} to the actual
+Writes out the current row buffer for catalogue \texttt{CI} to the actual
 catalogue file, appending it to the end of the catalogue. The internal
 current row buffer is initialized ready to receive new values, and the
 internal count of the actual catalogue row number to which the current
-row buffer corresponds is incremented by one. That is, {\tt CAT\_RAPND}
+row buffer corresponds is incremented by one. That is, \texttt{CAT\_RAPND}
 takes care of writing the current row buffer to the catalogue and
 readies CAT to receive values for a new current row buffer. When a
 catalogue is created the current row buffer is initialized automatically
 and the row number to which it corresponds is set to one.
 
 Thus a loop with one increment corresponding to one row in the
-catalogue and containing calls to {\tt CAT\_PUT0$<$t$>$} routines to put
-values to the current row buffer and a call to {\tt CAT\_RAPND} to
+catalogue and containing calls to \texttt{CAT\_PUT0$<$t$>$} routines to put
+values to the current row buffer and a call to \texttt{CAT\_RAPND} to
 append the current row buffer to the catalogue is all that is necessary
 to write a table of values to a catalogue. The current row has been
 written, so the loop generating each row can now terminate:
 
-\begin{verbatim}
+\begin{terminalv}
          END DO
-\end{verbatim}
+\end{terminalv}
 
 There is one final call to a CAT routine:
 
-\begin{verbatim}
+\begin{terminalv}
          CALL CAT_TRLSE (CI, STATUS)
-\end{verbatim}
+\end{terminalv}
 
-This call `releases' catalogue identifier {\tt CI} and closes the
+This call `releases' catalogue identifier \texttt{CI} and closes the
 corresponding catalogue. Identifiers to items within the catalogue, such
 as the various columns and parameters, are also released. Any remaining
 values are written to disk, the files are closed etc. The creation of
 the catalogue is complete. Finally, if all has succeeded, the
 application reports a message and then terminates.
 
-\begin{verbatim}
+\begin{terminalv}
          IF (STATUS .EQ. SAI__OK) THEN
             CALL MSG_OUT (' ', 'Catalogue created successfully.',
      :        STATUS)
@@ -1483,44 +967,43 @@ application reports a message and then terminates.
       END IF
 
       END
-\end{verbatim}
+\end{terminalv}
 
 Having worked through this example application you might like to try
 it out. Type:
 
-\begin{verbatim}
+\begin{terminalv}
 example_write
-\end{verbatim}
+\end{terminalv}
 
 You will be prompted for the catalogue name. Reply, for example:
 
-\begin{verbatim}
+\begin{terminalv}
 test.fit
-\end{verbatim}
+\end{terminalv}
 
-After a couple of moments the message `{\tt Catalogue created
-successfully.}' should appear and a binary FITS table called {\tt
-test.fit} should have been created in your current directory. You can
-examine its contents using the {\tt xcatview} catalogue browser in
-CURSA (see \xref{SUN/190}{sun190}{}\cite{SUN190}) or the {\tt listout}
+After a couple of moments the message `\texttt{Catalogue created
+successfully.}' should appear and a binary FITS table called \texttt{test.fit} should have been created in your current directory. You can
+examine its contents using the \texttt{xcatview} catalogue browser in
+CURSA (see \xref{SUN/190}{sun190}{}\cite{SUN190}) or the \texttt{listout}
 utility in CAT-EXAMPLES.  For the latter simply type:
 
-\begin{verbatim}
+\begin{terminalv}
 listout
-\end{verbatim}
+\end{terminalv}
 
 and answer the prompts (see Section~\ref{UTIL} for details).
 
 Another example program is available which reads back the catalogue
-created by {\tt EXAMPLE\_WRITE}. It is called {\tt EXAMPLE\_READ}
+created by \texttt{EXAMPLE\_WRITE}. It is called \texttt{EXAMPLE\_READ}
 and the source code is available in file:
 
-\begin{center}
-{\tt /star/share/cat/example\_read.f}
-\end{center}
+\begin{terminalv}
+/star/share/cat/example_read.f
+\end{terminalv}
 
 You might like to print out a copy and try to understand it. If you
-have followed the discussion for {\tt EXAMPLE\_WRITE} you should be
+have followed the discussion for \texttt{EXAMPLE\_WRITE} you should be
 able to do so without any difficulty.
 
 
@@ -1584,11 +1067,11 @@ This facility works as follows:
 
   \item when the value for a field in a column containing angles
    is obtained using
-  \newline {\tt CAT\_EGT0D} or {\tt CAT\_EGT0R} it is returned as a
+  \newline \texttt{CAT\_EGT0D} or \texttt{CAT\_EGT0R} it is returned as a
    DOUBLE PRECISION or REAL value in radians,
 
   \item when the value for a field in a column containing angles
-   is obtained formatted for display using {\tt CAT\_EGT0F} it is
+   is obtained formatted for display using \texttt{CAT\_EGT0F} it is
    returned as a CHARACTER string containing the value expressed in
    hours or degrees and formatted as a sexagesimal value.
 
@@ -1603,18 +1086,17 @@ creating a column of angles in a CAT catalogue is as follows.
 
   \item Create the column with data type DOUBLE PRECISION.
 
-  \item The UNITS attribute should start with the string {\tt
-   RADIANS} to indicate that the column contains an angle in
+  \item The UNITS attribute should start with the string \texttt{RADIANS} to indicate that the column contains an angle in
    radians and this should be followed by a specifier enclosed in
    curly brackets `\{\}' indicating how it is to be formatted for
    display. For example:
 
   \begin{description}
 
-    \item[{\tt RADIANS\{HOURS\} }] if it is to be displayed in
+    \item[\texttt{RADIANS\{HOURS\} }] if it is to be displayed in
      hours,
 
-    \item[{\tt RADIANS\{DEGREES\} }] if it is to be displayed in
+    \item[\texttt{RADIANS\{DEGREES\} }] if it is to be displayed in
      degrees.
 
   \end{description}
@@ -1632,23 +1114,23 @@ creating a column of angles in a CAT catalogue is as follows.
 
   \item When writing the table of values for the catalogue,
    express the angles in radians as DOUBLE PRECISION variables and
-   write them to the catalogue using {\tt CAT\_PUT0D}.
+   write them to the catalogue using \texttt{CAT\_PUT0D}.
 
 \end{enumerate}
 
 An example program is available which illustrates the creation
 of columns containing angular celestial coordinates. It creates
 a catalogue containing (fake) equatorial coordinates and B
-magnitudes for a set of stars. It is called {\tt EXAMPLE\_ANGLES} and
+magnitudes for a set of stars. It is called \texttt{EXAMPLE\_ANGLES} and
 the source code is available in file:
 
-\begin{center}
-{\tt /star/share/cat/example\_angles.f}
-\end{center}
+\begin{terminalv}
+/star/share/cat/example_angles.f
+\end{terminalv}
 
 The overall structure is very similar to the previous example of
 writing a catalogue,
-\newline {\tt EXAMPLE\_WRITE}, but note the way that the three points
+\newline \texttt{EXAMPLE\_WRITE}, but note the way that the three points
 outlined above are followed in order to create the angular columns.
 
 
@@ -1663,18 +1145,18 @@ PUT values using the identifier just as you would for a scalar column.
 
 The name of a vector element is the name of the vector column followed
 by the number of the element\footnote{The first element of a vector
-is numbered one.} enclosed in square brackets. Thus, {\tt FLUX[4]}
-corresponds to the fourth element of vector {\tt FLUX}. Identifiers for
-vector elements are obtained using {\tt CAT\_TIDNT}, just as for scalar
+is numbered one.} enclosed in square brackets. Thus, \texttt{FLUX[4]}
+corresponds to the fourth element of vector \texttt{FLUX}. Identifiers for
+vector elements are obtained using \texttt{CAT\_TIDNT}, just as for scalar
 columns.
 
 The following example illustrates obtaining the values of the fourth
-element of vector {\tt FLUX} for the first twenty-five rows of a
+element of vector \texttt{FLUX} for the first twenty-five rows of a
 catalogue. The value obtained for each row is read into REAL variable
-{\tt FLXVAL}. In the example the value is overwritten by each successive
+\texttt{FLXVAL}. In the example the value is overwritten by each successive
 row; in a real application it would be processed or stored in some way.
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER
      :  CI,      ! Catalogue identifier.
      :  VEI,     ! Vector element identifier.
@@ -1686,18 +1168,18 @@ row; in a real application it would be processed or stored in some way.
        .
        .
        .
-\end{verbatim}
+\end{terminalv}
 
 First get an identifier for the vector element.
 
-\begin{verbatim}
+\begin{terminalv}
       CALL CAT_TIDNT (CI, 'FLUX[4]', VEI, STATUS)
-\end{verbatim}
+\end{terminalv}
 
 Then loop through the first twenty-five rows getting the value for the
 vector element.
 
-\begin{verbatim}
+\begin{terminalv}
       DO ROW = 1, 25
          CALL CAT_RGET (CI, ROW, STATUS)
 
@@ -1707,7 +1189,7 @@ vector element.
            .
 
       END DO
-\end{verbatim}
+\end{terminalv}
 
 
 \subsection{Expressions}
@@ -1716,7 +1198,7 @@ In CAT an expression is an algebraic expression involving the names of
 columns and parameters and constants, linked by arithmetic operators and
 mathematical and astronomical functions. The syntax for expressions is
 described in Appendix~\ref{EXPR}. The first step towards manipulating an
-expression is to obtain an identifier for it. Routine {\tt CAT\_EIDNT}
+expression is to obtain an identifier for it. Routine \texttt{CAT\_EIDNT}
 is used for this purpose. If the expression is invalid (for example
 because it contains the name of a column which does not exist in the
 catalogue) this routine will return with an error status. Once you have
@@ -1725,19 +1207,19 @@ the same routines that GET the values of a column (you are `getting the
 value of the expression'). Clearly, values cannot be written to
 expressions and there is no equivalent of PUTting a value to a column.
 
-Suppose that a catalogue contained columns called {\tt x} and {\tt y}
-and parameter {\tt p}. The following example illustrates evaluating the
-expression `{\tt x + y + p + 2.0}' (that is, getting its value) for the
+Suppose that a catalogue contained columns called \texttt{x} and \texttt{y}
+and parameter \texttt{p}. The following example illustrates evaluating the
+expression `\texttt{x + y + p + 2.0}' (that is, getting its value) for the
 first twenty-five rows of the catalogue. The evaluated expression for
 each row is read into REAL variable\footnote{Internally, inside CAT,
 numeric expressions are always evaluated using data type DOUBLE
 PRECISION. If you are unsure about the data type to use for the
 evaluated result of an expression the safest choice is to use DOUBLE
-PRECISION in order to ensure that accuracy is not lost.} {\tt EXPVAL}.
+PRECISION in order to ensure that accuracy is not lost.} \texttt{EXPVAL}.
 In the example the value is overwritten for each successive row; in a
 real application it would be processed or stored in some way.
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER
      :  CI,      ! Catalogue identifier.
      :  EI,      ! Expression identifier.
@@ -1749,18 +1231,18 @@ real application it would be processed or stored in some way.
        .
        .
        .
-\end{verbatim}
+\end{terminalv}
 
 First get an identifier for the expression.
 
-\begin{verbatim}
+\begin{terminalv}
       CALL CAT_EIDNT (CI, 'x + y + p + 2.0', EI, STATUS)
-\end{verbatim}
+\end{terminalv}
 
 Then loop through the first twenty-five rows getting the value for the
 expression.
 
-\begin{verbatim}
+\begin{terminalv}
       DO ROW = 1, 25
          CALL CAT_RGET (CI, ROW, STATUS)
 
@@ -1770,13 +1252,13 @@ expression.
            .
 
       END DO
-\end{verbatim}
+\end{terminalv}
 
 Null values for expressions work just like null values for scalar
-columns. If a null value is generated {\tt CAT\_EGT0$<$t$>$} returns
+columns. If a null value is generated \texttt{CAT\_EGT0$<$t$>$} returns
 the appropriate Starlink `bad' value rather than a genuine datum, and
-the null value flag (argument {\tt NULFLG} in the example) is set to
-{\tt .TRUE.} Expressions can evaluate to null in a number of ways:
+the null value flag (argument \texttt{NULFLG} in the example) is set to
+\texttt{.TRUE.} Expressions can evaluate to null in a number of ways:
 perhaps individual fields in the expression are themselves null, or
 an arithmetic exception (such as $\div$ by zero) might occur in the
 expression.
@@ -1787,26 +1269,25 @@ expression.
 In CAT a selection is a set of rows in a catalogue which satisfy some
 criteria. Every selection that you create has a unique identifier.
 Once you have obtained a selection identifier it can be passed to
-{\tt CAT\_RGET} instead of a catalogue identifier, and {\tt
-CAT\_RGET} will operate on just the rows in the selection, rather than
+\texttt{CAT\_RGET} instead of a catalogue identifier, and \texttt{CAT\_RGET} will operate on just the rows in the selection, rather than
 all the rows in the catalogue.
 
 There are two routines for creating selections (that is, generating
-selection identifiers): {\tt CAT\_SELCT} and {\tt CAT\_SFND$<$t$>$}.
-{\tt CAT\_SELCT} allows selections to be made on complex criteria
-whereas {\tt CAT\_SFND$<$t$>$} selects values in a simple range for a
-given sorted column. {\tt CAT\_SFND$<$t$>$} will usually be faster than
-{\tt CAT\_SELCT} (a useful mnemonic is F for Fast and Find, S for Slow
+selection identifiers): \texttt{CAT\_SELCT} and \texttt{CAT\_SFND$<$t$>$}.
+\texttt{CAT\_SELCT} allows selections to be made on complex criteria
+whereas \texttt{CAT\_SFND$<$t$>$} selects values in a simple range for a
+given sorted column. \texttt{CAT\_SFND$<$t$>$} will usually be faster than
+\texttt{CAT\_SELCT} (a useful mnemonic is F for Fast and Find, S for Slow
 and Select), but is much less flexible. Both these routines optionally
 allow you to create a second selection comprising the rejected rows,
 as well as the primary selection of selected rows.
 
-Suppose a catalogue was sorted on column {\tt DEC} of data type REAL
-and you wished to find the rows for which {\tt DEC} was in the range
+Suppose a catalogue was sorted on column \texttt{DEC} of data type REAL
+and you wished to find the rows for which \texttt{DEC} was in the range
 10.0 to 20.0. Because this is a simple range selection on a sorted
-column routine {\tt CAT\_SFND$<$t$>$} can be used.
+column routine \texttt{CAT\_SFND$<$t$>$} can be used.
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER
      :  CI,      ! Catalogue identifier.
      :  FI,      ! Identifier for column DEC.
@@ -1822,31 +1303,30 @@ column routine {\tt CAT\_SFND$<$t$>$} can be used.
        .
        .
        .
-\end{verbatim}
+\end{terminalv}
 
 First get an identifier for column DEC.
 
-\begin{verbatim}
+\begin{terminalv}
       CALL CAT_TIDNT (CI, 'DEC', FI, STATUS)
-\end{verbatim}
+\end{terminalv}
 
 Next create the selection and get an identifier for it. Note that
-because column {\tt DEC} is of type REAL, the REAL version of {\tt
-CAT\_SFND$<$t$>$}, {\tt CAT\_SFNDR}, is used, and in this example the
+because column \texttt{DEC} is of type REAL, the REAL version of \texttt{CAT\_SFND$<$t$>$}, \texttt{CAT\_SFNDR}, is used, and in this example the
 optional second selection, comprising the rejected rows, is not
 generated.
 
-\begin{verbatim}
+\begin{terminalv}
       CALL CAT_SFNDR (CI, FI, 10.0, 20.0, .FALSE., SI, NUMSEL,
      :  SIR, NUMREJ, STATUS)
-\end{verbatim}
+\end{terminalv}
 
 Loop through all the rows in the selection, getting values for
-column {\tt DEC}.  Note how the selection identifier, {\tt SI}, rather
-than the catalogue identifier, is passed to routine {\tt CAT\_RGET}.
+column \texttt{DEC}.  Note how the selection identifier, \texttt{SI}, rather
+than the catalogue identifier, is passed to routine \texttt{CAT\_RGET}.
 
 
-\begin{verbatim}
+\begin{terminalv}
       DO ROW = 1, NUMSEL
          CALL CAT_RGET (SI, ROW, STATUS)
 
@@ -1856,14 +1336,14 @@ than the catalogue identifier, is passed to routine {\tt CAT\_RGET}.
            .
 
       END DO
-\end{verbatim}
+\end{terminalv}
 
 As a second example, suppose that the catalogue was not sorted on column
-{\tt DEC}. {\tt CAT\_SFND$<$t$>$} could not now be used to create the
-selection, and {\tt CAT\_SELCT} would have to be used instead. The
+\texttt{DEC}. \texttt{CAT\_SFND$<$t$>$} could not now be used to create the
+selection, and \texttt{CAT\_SELCT} would have to be used instead. The
 procedure would then be as follows.
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER
      :  CI,      ! Catalogue identifier.
      :  FI,      ! Identifier for column DEC.
@@ -1880,25 +1360,25 @@ procedure would then be as follows.
        .
        .
        .
-\end{verbatim}
+\end{terminalv}
 
-First {\tt CAT\_EIDNT} is used to get an expression identifier for the
+First \texttt{CAT\_EIDNT} is used to get an expression identifier for the
 expression representing the criteria.  This identifier is then passed
-to {\tt CAT\_SELCT}. Remember that the criterion is that {\tt DEC}
+to \texttt{CAT\_SELCT}. Remember that the criterion is that \texttt{DEC}
 should be in the range 10.0 to 20.0.
 
-\begin{verbatim}
+\begin{terminalv}
       CAT_EIDNT (CI, '(DEC >= 10.0) & (DEC <= 20.0)', EI, STATUS)
 
       CAT_SELCT (CI, EI, .FALSE., SI, NUMSEL, SIR, NUMREJ, STATUS)
-\end{verbatim}
+\end{terminalv}
 
-Next get an identifier for column {\tt DEC}, then loop through all the
-rows in the selection, getting values for {\tt DEC}.  Again note how the
-selection identifier, {\tt SI}, rather than the catalogue identifier,
-is passed to routine {\tt CAT\_RGET}.
+Next get an identifier for column \texttt{DEC}, then loop through all the
+rows in the selection, getting values for \texttt{DEC}.  Again note how the
+selection identifier, \texttt{SI}, rather than the catalogue identifier,
+is passed to routine \texttt{CAT\_RGET}.
 
-\begin{verbatim}
+\begin{terminalv}
       CAT_TIDNT (CI, 'DEC', FI, STATUS)
 
       DO ROW = 1, NUMSEL
@@ -1910,7 +1390,7 @@ is passed to routine {\tt CAT\_RGET}.
            .
 
       END DO
-\end{verbatim}
+\end{terminalv}
 
 
 \subsection{Indices}
@@ -1921,22 +1401,21 @@ or descending order on some (numeric) column. That is, an index presents
 the application with a `virtual catalogue' which appears to have been
 sorted on the specified column. Every index that you create has a unique
 identifier. Once you have obtained an index identifier it can be passed to
-{\tt CAT\_RGET} instead of a catalogue identifier, and {\tt
-CAT\_RGET} will return subsequent rows corresponding to ascending or
+\texttt{CAT\_RGET} instead of a catalogue identifier, and \texttt{CAT\_RGET} will return subsequent rows corresponding to ascending or
 descending order of the column used to generate the index.
 
-Indices are created using routine {\tt CAT\_INEW}. {\it Version
+Indices are created using routine \texttt{CAT\_INEW}. \textit{Version
 \CATversion of CAT supports only temporary indices which persist only
 for the duration of the application which generated them and perish
 when it terminates.} Future versions of CAT will support permanent
 indices which persist after the program which generated them terminates.
 
-Suppose that you wished to generate an index on column {\tt DEC} of data
+Suppose that you wished to generate an index on column \texttt{DEC} of data
 type REAL\footnote{Indices can be generated on columns of any of the
 numeric data types.} and then process the rows of the catalogue
 using this index.
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER
      :  CI,      ! Catalogue identifier.
      :  FI,      ! Identifier for column DEC.
@@ -1950,33 +1429,31 @@ using this index.
        .
        .
        .
-\end{verbatim}
+\end{terminalv}
 
 First get an identifier for column DEC.
 
-\begin{verbatim}
+\begin{terminalv}
       CALL CAT_TIDNT (CI, 'DEC', FI, STATUS)
-\end{verbatim}
+\end{terminalv}
 
 Next create an index and get an identifier for it.
 
-\begin{verbatim}
+\begin{terminalv}
       CALL CAT_INEW (FI, 'TEMP', CAT__ASCND, II, STATUS)
-\end{verbatim}
+\end{terminalv}
 
 The second argument indicates that the index is temporary rather than
-permanent; `{\tt TEMP}' is the only permitted value here in version
+permanent; `\texttt{TEMP}' is the only permitted value here in version
 \CATversion of CAT. The third argument indicates whether the index is to
-correspond to ascending (`{\tt CAT\_\_ASCND}') or descending (`{\tt
-CAT\_\_DSCND}') order.
+correspond to ascending (`\texttt{CAT\_\_ASCND}') or descending (`\texttt{CAT\_\_DSCND}') order.
 
 To access the rows via the index simply determine the number of rows in
 the catalogue and then loop through the rows, passing the index identifier,
-{\tt II}, rather than then catalogue identifier, to routine {\tt
-CAT\_RGET}. The values obtained might be processed in some way, or
+\texttt{II}, rather than then catalogue identifier, to routine \texttt{CAT\_RGET}. The values obtained might be processed in some way, or
 written out to generate a sorted catalogue.
 
-\begin{verbatim}
+\begin{terminalv}
       CALL CAT_TROWS (CI, NUMROW, STATUS)
 
       DO ROW = 1, NUMROW
@@ -1988,12 +1465,12 @@ written out to generate a sorted catalogue.
            .
 
       END DO
-\end{verbatim}
+\end{terminalv}
 
 
 \newpage
 \part{Reference}
-\markboth{\stardocname}{\stardocname}
+
 
 \section{\label{COMP}\xlabel{COMP}Components of a CAT catalogue}
 
@@ -2026,7 +1503,7 @@ The routines for manipulating textual information are described in
 Section~\ref{SUBINT_TEXT}. They do not interact with any other items
 in a CAT catalogue and they are not mentioned again in this section.
 
-The table in a CAT catalogue is very similar to a {\bf relation} in the
+The table in a CAT catalogue is very similar to a \textbf{relation} in the
 theory of relational databases, and has many of the same properties.
 Each row in the table must contain the same number of fields.
 Corresponding fields in different rows must be of the same type. The
@@ -2044,8 +1521,7 @@ the CAT library.
 \subsection{Provision for future enhancements}
 
 This manual describes version \CATversion of the CAT library.  The
-original specification for the library is described in the document {\it
-The Starlink Subroutine Interface for Manipulating Catalogues}
+original specification for the library is described in the document \textit{The Starlink Subroutine Interface for Manipulating Catalogues}
 (StarBase/ACD/3.4)\cite{STARBASE34}.  Version \CATversion of CAT is a
 subset of this full implementation and some of the items present in it
 serve no apparent purpose.  These items correspond to features which were
@@ -2057,16 +1533,15 @@ of the library.
 \subsection{Symbolic constants}
 
 Various symbolic constants are referred to throughout this section.
-These constants are defined in INCLUDE file {\tt CAT\_PAR}, which may
+These constants are defined in INCLUDE file \texttt{CAT\_PAR}, which may
 be INCLUDEd in the subroutines of an application. See
 Section~\ref{INCLUDE} for details of how to access this file.
 
 
 \subsection{\label{CCA}Catalogues, components and attributes}
 
-In the CAT model of a catalogue a catalogue comprises a number of {\bf
-components}. In version \CATversion of CAT a catalogue may contain
-two sorts of components: {\bf columns} and {\bf parameters}:
+In the CAT model of a catalogue a catalogue comprises a number of \textbf{components}. In version \CATversion of CAT a catalogue may contain
+two sorts of components: \textbf{columns} and \textbf{parameters}:
 
 \begin{description}
 
@@ -2087,8 +1562,8 @@ number of parameters. Columns and parameters are permanent entities
 which persist in between invocations of applications accessing the
 catalogue through the CAT library (typically as items in a disk file).
 In addition to these permanent components additional sorts of temporary
-components may be created by CAT: {\bf expressions}, {\bf selections}
-and {\bf indices}.
+components may be created by CAT: \textbf{expressions}, \textbf{selections}
+and \textbf{indices}.
 
 \begin{description}
 
@@ -2109,7 +1584,7 @@ ephemeral entities\footnote{Future versions of CAT will support permanent
 indices.} which perish when the application using CAT which created them
 terminates.
 
-Every component consists of a number of {\bf attributes}. Each type of
+Every component consists of a number of \textbf{attributes}. Each type of
 component (permanent or temporary; column, parameter, expression,
 selection or index) has a fixed set of attributes, each identified by name.
 The values of the attributes differ between components, and their totality
@@ -2206,18 +1681,18 @@ attributes}
 \subsection{Identifiers}
 
 Catalogues, columns, parameters, expressions, selections and indices are
-all identified by an {\bf identifier}. Each identifier is an INTEGER
+all identified by an \textbf{identifier}. Each identifier is an INTEGER
 number. The value of an identifier is unique (within a given invocation of
 an application) and is sufficient to identify the item to which it refers.
 The following rules apply when using CAT identifiers in applications:
 
 \begin{itemize}
 
-  \item an application should {\it never}\, set the value of a new
-   identifier itself; the CAT library will {\it always}\, generate a
+  \item an application should \textit{never}\, set the value of a new
+   identifier itself; the CAT library will \textit{always}\, generate a
    new identifier,
 
-  \item an application should {\it never} modify the value of an
+  \item an application should \textit{never} modify the value of an
    existing identifier once CAT has allocated it,
 
   \item an application never needs to know the actual value of an
@@ -2226,8 +1701,7 @@ The following rules apply when using CAT identifiers in applications:
 \end{itemize}
 
 An application can inquire what sort of item (catalogue, column,
-parameter etc.) an identifier represents using subroutine {\tt
-CAT\_TIDTP}. The various types of identifiers are represented using
+parameter etc.) an identifier represents using subroutine \texttt{CAT\_TIDTP}. The various types of identifiers are represented using
 INTEGER codes, and symbolic constants are defined for these codes. They
 are listed in Table~\ref{IDTYPE}.
 
@@ -2236,16 +1710,16 @@ are listed in Table~\ref{IDTYPE}.
 \begin{center}
 \begin{tabular}{lc}
 Type of identifier        &  CAT symbolic constant \\ \hline
-Catalogue                 &  {\tt CAT\_\_CITYP}   \\
-Column or field           &  {\tt CAT\_\_FITYP}   \\
-Vector column element     &  {\tt CAT\_\_FETYP}   \\
-Parameter                 &  {\tt CAT\_\_QITYP}   \\
-Expression                &  {\tt CAT\_\_EITYP}   \\
-Selection                 &  {\tt CAT\_\_SITYP}   \\
-Index                     &  {\tt CAT\_\_IITYP}   \\
-% Join                      &  {\tt CAT\_\_JITYP}   \\
-% Vector parameter element  &  {\tt CAT\_\_QETYP}   \\
-Null identifier           &  {\tt CAT\_\_NOID}   \\
+Catalogue                 &  \texttt{CAT\_\_CITYP}   \\
+Column or field           &  \texttt{CAT\_\_FITYP}   \\
+Vector column element     &  \texttt{CAT\_\_FETYP}   \\
+Parameter                 &  \texttt{CAT\_\_QITYP}   \\
+Expression                &  \texttt{CAT\_\_EITYP}   \\
+Selection                 &  \texttt{CAT\_\_SITYP}   \\
+Index                     &  \texttt{CAT\_\_IITYP}   \\
+% Join                      &  \texttt{CAT\_\_JITYP}   \\
+% Vector parameter element  &  \texttt{CAT\_\_QETYP}   \\
+Null identifier           &  \texttt{CAT\_\_NOID}   \\
 \end{tabular}
 \end{center}
 
@@ -2254,10 +1728,8 @@ Null identifier           &  {\tt CAT\_\_NOID}   \\
 \end{table}
 
 The catalogue to which a component (column, parameter etc.) belongs is
-referred to as the {\bf parent} of that component. Subroutine {\tt
-CAT\_TIDPR} can be used to inquire the parent of an identifier. In
-CAT version \CATversion catalogues do not have parents. If {\tt
-CAT\_TIDPR} is used to try to find the parent of a catalogue then the
+referred to as the \textbf{parent} of that component. Subroutine \texttt{CAT\_TIDPR} can be used to inquire the parent of an identifier. In
+CAT version \CATversion catalogues do not have parents. If \texttt{CAT\_TIDPR} is used to try to find the parent of a catalogue then the
 null identifier is returned.
 
 \subsubsection{The null identifier}
@@ -2266,7 +1738,7 @@ When CAT is asked to generate an identifier for an item which does not
 exist (such as the parent of a catalogue) it will return the `null
 identifier'. The meaning of this identifier is that the specified
 component does not exist. The symbolic constant for the null identifier
-is {\tt CAT\_\_NOID}.
+is \texttt{CAT\_\_NOID}.
 
 
 \subsection{Attributes}
@@ -2282,9 +1754,9 @@ and inquire the values of attributes:
 
 \begin{description}
 
-  \item[{\tt CAT\_TATT$<$t$>$}] -- set an attribute,
+  \item[\texttt{CAT\_TATT$<$t$>$}] -- set an attribute,
 
-  \item[{\tt CAT\_TIQA$<$t$>$} ] -- inquire the value of an attribute.
+  \item[\texttt{CAT\_TIQA$<$t$>$} ] -- inquire the value of an attribute.
 
 \end{description}
 
@@ -2314,16 +1786,16 @@ an individual component (see Figure~\ref{CHIER} in Section~\ref{CCA}).
 These attributes are described below.
 
 \paragraph{NAME}
-(data type: \_CHAR, size = {\tt CAT\_\_SZCNM}) The name of the
+(data type: \_CHAR, size = \texttt{CAT\_\_SZCNM}) The name of the
 catalogue. It is specified when the catalogue is created and is
 mandatory and immutable. The NAME attribute is related to the file name
 of the catalogue as follows. It is the same as the file name, but
 without any preceding directory specification or trailing file type.
-Thus, if {\tt CATNAME} is the NAME attribute then the corresponding
+Thus, if \texttt{CATNAME} is the NAME attribute then the corresponding
 file name is:
 
 \begin{center}
-{\tt directory\_specification/CATNAME.file\_type}
+\texttt{directory\_specification/CATNAME.file\_type}
 \end{center}
 
 The file type corresponds to the format of the catalogue (FITS table,
@@ -2354,7 +1826,7 @@ not used. It is set to 0.0D0 when the column is created.
 % thereafter.
 
 \paragraph{PATH}
-(data type: \_CHAR, size = {\tt CAT\_\_SZCNF}) The full path of the
+(data type: \_CHAR, size = \texttt{CAT\_\_SZCNF}) The full path of the
 catalogue file. It is specified when the catalogue is created and is
 mandatory and immutable.
 
@@ -2364,8 +1836,7 @@ A column may contain either a single value for each row (as in
 standard relational database theory) or a one-dimensional array of
 values for each row. An array must be of fixed size, defined when the
 column is created. There is no upper limit to the number of elements
-which an array may contain. A single-valued column is called a {\bf
-scalar} and a column containing an array is called  a {\bf vector}.
+which an array may contain. A single-valued column is called a \textbf{scalar} and a column containing an array is called  a \textbf{vector}.
 The attributes of a column are listed in Table~\ref{CATTRIB} and
 described below.
 
@@ -2379,17 +1850,17 @@ different and are described in Section~\ref{COLUMN_ELM}, below.
 Attribute         & Name    & Data       & Mut-      & Mand-     & Default \\
                   &         & type       & -able     & -atory    &         \\ \hline
 Name              & NAME    & \_CHAR     &           & $\bullet$ &         \\
-Genus             & GENUS   & \_INTEGER  &           &           & physical: {\tt CAT\_\_GPHYS} \\
+Genus             & GENUS   & \_INTEGER  &           &           & physical: \texttt{CAT\_\_GPHYS} \\
 Expression        & EXPR    & \_CHAR     &           &           & `~'     \\
 Data type         & DTYPE   & \_INTEGER  &           & $\bullet$ &         \\
 Character size    & CSIZE   & \_INTEGER  &           &           & 20\dag  \\
-Dimensionality    & DIMS    & \_INTEGER  &           &           & scalar: {\tt CAT\_\_SCALR} \\
+Dimensionality    & DIMS    & \_INTEGER  &           &           & scalar: \texttt{CAT\_\_SCALR} \\
 Size\S            & SIZE    & \_INTEGER  &           &           & 1       \\
-Null or locum     & NULL    & \_INTEGER  &           &           & HDS: {\tt CAT\_\_NULLD} \\
+Null or locum     & NULL    & \_INTEGER  &           &           & HDS: \texttt{CAT\_\_NULLD} \\
 Exception values  & EXCEPT  & \_CHAR     &           &           & `~'  \\
 Scale factor      & SCALEF  & \_DOUBLE   &           &           & 1.0D0   \\
 Zero point        & ZEROP   & \_DOUBLE   &           &           & 0.0D0   \\
-Order             & ORDER   & \_INTEGER  &           &           & none: {\tt CAT\_\_NOORD} \\
+Order             & ORDER   & \_INTEGER  &           &           & none: \texttt{CAT\_\_NOORD} \\
 Units             & UNITS   & \_CHAR     & $\bullet$ &           & `~'     \\
 External format   & EXFMT   & \_CHAR     & $\bullet$ &           & varies with data type \\
 Preferential display & PRFDSP & \_LOGICAL & $\bullet$ &          & true    \\
@@ -2413,7 +1884,7 @@ Modification date & DATE    & \_DOUBLE   & $\bullet$ &           & 0.0D0   \\
 \end{table}
 
 \paragraph{NAME}
-(data type: \_CHAR, size = {\tt CAT\_\_SZCMP})
+(data type: \_CHAR, size = \texttt{CAT\_\_SZCMP})
 The name of the column. The rules for column names are as follows.
 
 \begin{itemize}
@@ -2423,17 +1894,15 @@ The name of the column. The rules for column names are as follows.
    a component (parameter or column) may be identified unambiguously
    when its name is used in an expression.
 
-  \item A name may comprise up to fifteen characters {\tt
-   (CAT\_\_SZCMP}). This value is chosen for consistency with HDS and
+  \item A name may comprise up to fifteen characters \texttt{(CAT\_\_SZCMP}). This value is chosen for consistency with HDS and
    is adequate for FITS tables.
 
   \item The name can contain only: upper or lower case alphabetic
    characters (a-z, A-Z), numeric characters (0-9) and the underscore
    character (`\_'). Note that lower case alphabetic characters must
-   be allowed in order to access existing FITS tables. {\it However,
+   be allowed in order to access existing FITS tables. \textit{However,
    corresponding upper and lower case characters are considered to be
-   equivalent.} Thus, for example, the names: {\tt HD\_NUMBER}, {\tt
-   HD\_Number} and {\tt hd\_number} would all refer to the same column.
+   equivalent.} Thus, for example, the names: \texttt{HD\_NUMBER}, \texttt{HD\_Number} and \texttt{hd\_number} would all refer to the same column.
 
   \item The first character must be a letter.
 
@@ -2442,13 +1911,13 @@ The name of the column. The rules for column names are as follows.
 \paragraph{GENUS}
 (Data type: \_INTEGER)
 In version \CATversion of CAT the genus attribute is present, but not
-used. It is set to {\tt CAT\_\_GPHYS} when the column is created.
+used. It is set to \texttt{CAT\_\_GPHYS} when the column is created.
 % The genus of a column indicates whether it is physical or virtual.
 % Two values are permitted. Unsurprisingly they correspond to
 % physical and virtual columns.
 
 \paragraph{EXPR}
-(Data type: \_CHAR, size = {\tt CAT\_\_SZEXS})
+(Data type: \_CHAR, size = \texttt{CAT\_\_SZEXS})
 In version \CATversion of CAT the expression attribute is present, but
 not used. It is set to blank (`~~') when the column is created.
 % The expression used to define a virtual column. In practice this
@@ -2467,15 +1936,15 @@ types permitted in HDS and include the standard types of Fortran 77.
 \begin{tabular}{llllc}
  HDS Type    & DEC Fortran & CAT symbolic & Description & Standard     \\
              & Type        & constant     &             & Fortran 77?  \\ \hline
-% \_UBYTE      & BYTE             & {\tt CAT\_\_TYPEUB} & Unsigned byte    & No   \\
-\_BYTE       & BYTE             & {\tt CAT\_\_TYPEB}  & Signed byte      & No   \\
-% \_UWORD      & INTEGER$*$2      & {\tt CAT\_\_TYPEUW} & Unsigned word    & No   \\
-\_WORD       & INTEGER$*$2      & {\tt CAT\_\_TYPEW}  & Signed word      & No   \\
-\_INTEGER    & INTEGER          & {\tt CAT\_\_TYPEI}  & Signed integer   & Yes  \\
-\_REAL       & REAL             & {\tt CAT\_\_TYPER}  & Single precision & Yes  \\
-\_DOUBLE     & DOUBLE PRECISION & {\tt CAT\_\_TYPED}  & Double precision & Yes  \\
-\_LOGICAL    & LOGICAL          & {\tt CAT\_\_TYPEL}  & Logical          & Yes  \\
-\_CHAR[$*n$] & CHARACTER[$*n$]  & {\tt CAT\_\_TYPEC}  & Character string & Yes  \\
+% \_UBYTE      & BYTE             & \texttt{CAT\_\_TYPEUB} & Unsigned byte    & No   \\
+\_BYTE       & BYTE             & \texttt{CAT\_\_TYPEB}  & Signed byte      & No   \\
+% \_UWORD      & INTEGER$*$2      & \texttt{CAT\_\_TYPEUW} & Unsigned word    & No   \\
+\_WORD       & INTEGER$*$2      & \texttt{CAT\_\_TYPEW}  & Signed word      & No   \\
+\_INTEGER    & INTEGER          & \texttt{CAT\_\_TYPEI}  & Signed integer   & Yes  \\
+\_REAL       & REAL             & \texttt{CAT\_\_TYPER}  & Single precision & Yes  \\
+\_DOUBLE     & DOUBLE PRECISION & \texttt{CAT\_\_TYPED}  & Double precision & Yes  \\
+\_LOGICAL    & LOGICAL          & \texttt{CAT\_\_TYPEL}  & Logical          & Yes  \\
+\_CHAR[$*n$] & CHARACTER[$*n$]  & \texttt{CAT\_\_TYPEC}  & Character string & Yes  \\
 \end{tabular}
 \end{center}
 
@@ -2513,8 +1982,8 @@ by convention set to zero.
 \paragraph{DIMS}
 (Data type: \_INTEGER)
 The dimensionality of the column; a flag indicating whether it is a
-scalar or a vector. For a scalar column it is set to {\tt CAT\_\_SCALR}
-and for a vector to {\tt CAT\_\_VECTR}.
+scalar or a vector. For a scalar column it is set to \texttt{CAT\_\_SCALR}
+and for a vector to \texttt{CAT\_\_VECTR}.
 
 \paragraph{SIZE}
 (Data type: \_INTEGER; a single element array\footnote{An array is used
@@ -2531,20 +2000,20 @@ column. Three cases are recognized:
 \begin{itemize}
 
   \item null values are present and are represented using the
-   standard HDS null values (code: {\tt CAT\_\_NULLD}),
+   standard HDS null values (code: \texttt{CAT\_\_NULLD}),
 
   \item null values are present and are represented using a value
-   specified when the column was created (code: {\tt CAT\_\_NULLS}),
+   specified when the column was created (code: \texttt{CAT\_\_NULLS}),
 
   \item null values are not present in the column (code:
-   {\tt CAT\_\_LOCUM}).
+   \texttt{CAT\_\_LOCUM}).
 
 \end{itemize}
 
 The treatment of null values is discussed in Section~\ref{NULLS}, below.
 
 \paragraph{EXCEPT}
-(Data type: \_CHAR, size = {\tt CAT\_\_SZVAL})
+(Data type: \_CHAR, size = \texttt{CAT\_\_SZVAL})
 The value used to represent the null value, or the locum value
 generated if nulls are not supported in the column. See
 Section~\ref{NULLS} for a full description.
@@ -2576,9 +2045,9 @@ are listed in Table~\ref{CORDER}.
 \begin{center}
 \begin{tabular}{lc}
 Column order  &  CAT symbolic constants \\ \hline
-ascending     &  {\tt CAT\_\_ASCND}     \\
-descending    &  {\tt CAT\_\_DSCND}     \\
-unordered     &  {\tt CAT\_\_NOORD}     \\
+ascending     &  \texttt{CAT\_\_ASCND}     \\
+descending    &  \texttt{CAT\_\_DSCND}     \\
+unordered     &  \texttt{CAT\_\_NOORD}     \\
 \end{tabular}
 \end{center}
 
@@ -2587,7 +2056,7 @@ unordered     &  {\tt CAT\_\_NOORD}     \\
 \end{table}
 
 \paragraph{UNITS}
-(Data type: \_CHAR, size = {\tt CAT\_\_SZUNI})
+(Data type: \_CHAR, size = \texttt{CAT\_\_SZUNI})
 The units in which values stored in the column are expressed. The UNITS
 attribute is used to identify, and control the appearance of, columns
 of angles (see Section~\ref{ANGLES}). Apart from this exception the units
@@ -2603,7 +2072,7 @@ of course, have units of `MAGNITUDES' or `MAG' or whatever, if so
 desired.}.
 
 \paragraph{EXFMT}
-(Data type: \_CHAR, size = {\tt CAT\_\_SZEXF})
+(Data type: \_CHAR, size = \texttt{CAT\_\_SZEXF})
 The format used to represent a datum extracted from a column for
 external display on a screen or in a text file. These formats are used
 solely for external display, not internal conversion.  The external
@@ -2613,21 +2082,21 @@ data type of the column.
 \paragraph{PRFDSP}
 (Data type: \_LOGICAL)
 The preferential display flag; a logical flag which indicates to
-reporting applications whether, {\it by default}, the column is to be
+reporting applications whether, \textit{by default}, the column is to be
 displayed or not. It is coded as follows:
 
 \begin{description}
 
-  \item[{\tt .TRUE.}] -- display the column by default,
+  \item[\texttt{.TRUE.}] -- display the column by default,
 
-  \item[{\tt .FALSE.}] -- do not display the column by default.
+  \item[\texttt{.FALSE.}] -- do not display the column by default.
 
 \end{description}
 
 \paragraph{COMM}
-(Data type: \_CHAR, size = {\tt CAT\_\_SZCOM})
+(Data type: \_CHAR, size = \texttt{CAT\_\_SZCOM})
 Explanatory comments describing the column. The comments may be up to
-eighty characters long ({\tt CAT\_\_SZCOM}).
+eighty characters long (\texttt{CAT\_\_SZCOM}).
 
 \paragraph{DATE}
 (Data type: \_DOUBLE)
@@ -2646,8 +2115,8 @@ or PUT for individual vector elements; there are no routines for
 processing entire vectors. In order to access individual elements it
 is necessary to assign identifiers to them. Identifiers for vector
 elements, like those for scalar columns and parameters, are obtained
-using {\tt CAT\_TIDNT}. The name of a vector column element passed to
-{\tt CAT\_TIDNT} has the same syntax as the NAME attribute of the
+using \texttt{CAT\_TIDNT}. The name of a vector column element passed to
+\texttt{CAT\_TIDNT} has the same syntax as the NAME attribute of the
 element, as described below. The attributes of a vector column element
 identifier are different to the identifiers for the whole column; they
 are listed in Table~\ref{VCOL_ELEM}.
@@ -2673,18 +2142,17 @@ All these attributes are created automatically when an identifier is
 obtained for the element; they are all mandatory and immutable.
 
 The vector column to which a vector column element belongs is
-referred to as the column element's {\bf base column}. The DTYPE and
+referred to as the column element's \textbf{base column}. The DTYPE and
 CSIZE attributes of a vector column element are necessarily identical
 to the corresponding attributes for its base column. The details of the
 remaining attributes are as follows.
 
 \paragraph{NAME}
-(data type: \_CHAR, size = {\tt CAT\_\_SZCMP})
+(data type: \_CHAR, size = \texttt{CAT\_\_SZCMP})
 The name of the vector column element. That is, the name of the base
 column, followed by the number of the vector element, enclosed in
 square brackets. The number of the first element is one. Thus, the name
-of the fourth element of vector column {\tt FLUX} would be {\tt
-FLUX[4]}.
+of the fourth element of vector column \texttt{FLUX} would be \texttt{FLUX[4]}.
 
 \paragraph{BASEID}
 (data type: \_INTEGER)
@@ -2694,7 +2162,7 @@ The identifier of the base column of the vector element.
 (data type: \_INTEGER)
 The sequence number of the element in the column vector. The first
 element is numbered one. Thus, for example, if the name of the vector
-column element was {\tt FLUX[4]} the value of the ELEM attribute
+column element was \texttt{FLUX[4]} the value of the ELEM attribute
 would be four.
 
 
@@ -2716,8 +2184,8 @@ Attribute          & Name    & Data       & Mand-     & Default \\
                    &         & type       & -atory    &       \\ \hline
 Name               & NAME    & \_CHAR     & $\bullet$ &         \\
 Data type          & DTYPE   & \_INTEGER  & $\bullet$ &         \\
-Character size     & CSIZE   & \_INTEGER  &           & {\tt CAT\_\_SZVAL}\dag \\
-Dimensionality     & DIMS    & \_INTEGER  &           & scalar: {\tt CAT\_\_SCALR} \\
+Character size     & CSIZE   & \_INTEGER  &           & \texttt{CAT\_\_SZVAL}\dag \\
+Dimensionality     & DIMS    & \_INTEGER  &           & scalar: \texttt{CAT\_\_SCALR} \\
 Size\S             & SIZE    & \_INTEGER  &           & 1       \\
 Units              & UNITS   & \_CHAR     &           & `~'     \\
 External format    & EXFMT   & \_CHAR     &           & varies with data type \\
@@ -2741,7 +2209,7 @@ Modification date  & DATE    & \_DOUBLE   &           & 0.0D0   \\
 
 \end{table}
 
-All these attributes, except {\bf VALUE}, are deliberately identical to
+All these attributes, except \textbf{VALUE}, are deliberately identical to
 the corresponding attributes for columns (see Table~\ref{CATTRIB} and
 Section~\ref{COLS}, above, for details).
 
@@ -2760,8 +2228,7 @@ its value is computed `on the fly' from existing columns (and
 parameters), rather than being stored in the catalogue. Usually an
 expression will evaluate to a numeric value, but it may equally well
 evaluate to a LOGICAL or CHARACTER value. For example, if a catalogue
-contained columns {\tt x} and {\tt y} an expression might be `{\tt
-x + y}'. The syntax for specifying expressions is described in
+contained columns \texttt{x} and \texttt{y} an expression might be `\texttt{x + y}'. The syntax for specifying expressions is described in
 Appendix~\ref{EXPR}.
 
 An expression has a set of attributes which are identical to those for
@@ -2770,12 +2237,12 @@ with the following exceptions.
 
 \begin{itemize}
 
-  \item The GENUS attribute is always set to {\tt CAT\_\_GVIRT}.
+  \item The GENUS attribute is always set to \texttt{CAT\_\_GVIRT}.
 
   \item The EXPR attribute is set to the algebraic expression used to
    compute the value of the expression.
 
-  \item The DIMS attribute is always {\tt CAT\_\_SCALR}; expressions are
+  \item The DIMS attribute is always \texttt{CAT\_\_SCALR}; expressions are
    always scalars and vector expressions are forbidden.
 
 \end{itemize}
@@ -2784,10 +2251,10 @@ with the following exceptions.
 \subsection{Selections}
 
 Selections define a set of rows selected from a catalogue according to
-some criteria. For example, if a catalogue contained column {\tt x}
-then the selection criterion might be `{\tt x $>$ 10.0}', that is, the
+some criteria. For example, if a catalogue contained column \texttt{x}
+then the selection criterion might be `\texttt{x $>$ 10.0}', that is, the
 selection would comprise the set of rows for which the field of column
-{\tt x} was greater than 10.0. The syntax for specifying expressions is
+\texttt{x} was greater than 10.0. The syntax for specifying expressions is
 described in Appendix~\ref{EXPR}.
 
 The attributes of a selection are listed in Table~\ref{SELECT_ATT}
@@ -2812,7 +2279,7 @@ Modification date & DATE    & \_DOUBLE   \\
 \end{table}
 
 \paragraph{EXPR}
-(Data type: \_CHAR, size = {\tt CAT\_\_SZEXS})
+(Data type: \_CHAR, size = \texttt{CAT\_\_SZEXS})
 The expression which rows in the catalogue must satisfy in order to be
 included in the selection.
 
@@ -2821,7 +2288,7 @@ included in the selection.
 The number of rows in the selection.
 
 \paragraph{COMM}
-(Data type: \_CHAR, size = {\tt CAT\_\_SZCOM})
+(Data type: \_CHAR, size = \texttt{CAT\_\_SZCOM})
 Explanatory comments describing the selection.
 
 \paragraph{DATE}
@@ -2838,9 +2305,9 @@ not used. It is set to 0.0D0 when the selection is created.
 
 Indices are a mechanism for accessing the rows of a catalogue as though
 they were sorted into ascending or descending order on some column.  For
-example, if an ascending index was created on REAL column {\tt DEC} and
+example, if an ascending index was created on REAL column \texttt{DEC} and
 the rows of the catalogue were accessed through this index the rows
-would appear in ascending order of {\tt DEC}. {\it In CAT version
+would appear in ascending order of \texttt{DEC}. \textit{In CAT version
 \CATversion indices are temporary entities which persist only for the
 duration of the application which generated them and perish when it
 terminates.} Future versions of CAT will support permanent indices which
@@ -2882,8 +2349,8 @@ The identifier of the column from which the index was created.
 The order of the index. The possibilities are:
 
 \begin{verse}
-{\tt CAT\_\_ASCND} -- ascending,  \\
-{\tt CAT\_\_DSCND} -- descending.
+\texttt{CAT\_\_ASCND} -- ascending,  \\
+\texttt{CAT\_\_DSCND} -- descending.
 \end{verse}
 
 \paragraph{NUMSEL}
@@ -2894,7 +2361,7 @@ The attribute is present in order to allow indices to be created from
 selections in future versions of CAT.
 
 \paragraph{COMM}
-(Data type: \_CHAR, size = {\tt CAT\_\_SZCOM})
+(Data type: \_CHAR, size = \texttt{CAT\_\_SZCOM})
 Explanatory comments describing the index.
 
 \paragraph{DATE}
@@ -2938,8 +2405,7 @@ calling sequences given in this section.
 \subsection{Provision for future enhancements}
 
 This manual describes version \CATversion of the CAT library.  The
-original specification for the library is described in the document {\it
-The Starlink Subroutine Interface for Manipulating Catalogues}\/
+original specification for the library is described in the document \textit{The Starlink Subroutine Interface for Manipulating Catalogues}\/
 (StarBase/ACD/3.4)\cite{STARBASE34}.  Version \CATversion of CAT is a
 subset of this full implementation and some of the items present in it
 serve no apparent purpose.  These items correspond to features which were
@@ -2951,17 +2417,17 @@ of the library.
 \subsection{Symbolic constants}
 
 Two INCLUDE files of symbolic constants are available for use with these
-subroutines: {\tt CAT\_PAR} and {\tt CAT\_ERR}. {\tt CAT\_PAR} contains
+subroutines: \texttt{CAT\_PAR} and \texttt{CAT\_ERR}. \texttt{CAT\_PAR} contains
 symbolic constants which specify the size of various items, codes
 corresponding to various types of items, values for various flags etc.
-{\tt CAT\_ERR} contains symbolic constants corresponding to the various
+\texttt{CAT\_ERR} contains symbolic constants corresponding to the various
 error codes which the CAT library can set. Section~\ref{INCLUDE}
 explains how to access these files. I recommend that you print out
 copies of these files and have them to hand when writing applications.
 The comments included in the files should be sufficient to explain the
 purpose of each constant. If your application needs to access one of
-these values you should {\it always}\, use the appropriate symbolic
-constant; {\it never}\, hard-code the actual value into your code.
+these values you should \textit{always}\, use the appropriate symbolic
+constant; \textit{never}\, hard-code the actual value into your code.
 The values may (and probably will) change in subsequent releases of
 the CAT library.
 
@@ -2995,7 +2461,7 @@ ADAM libraries.
 \subsection{Identifiers}
 
 CAT identifies catalogues and components by various sorts of
-{\bf identifiers}; INTEGER numbers, each with a unique value. In the
+\textbf{identifiers}; INTEGER numbers, each with a unique value. In the
 calling arguments for the subroutines the following names are usually
 used for the various sorts of identifier:
 
@@ -3015,17 +2481,17 @@ The following rules apply:
 
 \begin{enumerate}
 
-  \item A generic identifier may be substituted by {\it any}\, type
+  \item A generic identifier may be substituted by \textit{any}\, type
    of identifier,
 
 %  \item a catalogue identifier may be substituted by an index, selection
-%   or join identifier for any READ operation, but {\it never}\, for an
+%   or join identifier for any READ operation, but \textit{never}\, for an
 %   UPDATE or WRITE operation,
 
   \item there are circumstances where it is sensible to consider columns
    and parameters to be a single sort of component; in these
    circumstances, components and parameters are referred to collectively
-   as {\it parts;}\, a part identifier may be substituted by either a
+   as \textit{parts;}\, a part identifier may be substituted by either a
    column or a parameter identifier.
 
   \item an expression identifier may be substituted by a field,
@@ -3036,7 +2502,7 @@ The following rules apply:
 % The relations between the various sorts of identifiers are shown in
 % Figure~\ref{HIERID}.
 
-% {\sf I am still not sure that this is either correct or useful.}
+% \textsf{I am still not sure that this is either correct or useful.}
 
 % \begin{figure}[htbp]
 % \begin{center}
@@ -3067,21 +2533,20 @@ The following rules apply:
 
 Every open catalogue is identified to CAT by a catalogue identifier;
 an INTEGER number with a unique value. The catalogue identifier is
-subroutine argument {\tt CI} in the following notes. The ADAM routines
-(see Section~\ref{ADAM}, below) provide an alternative to {\tt
-CAT\_TOPEN} for opening or creating a catalogue.
+subroutine argument \texttt{CI} in the following notes. The ADAM routines
+(see Section~\ref{ADAM}, below) provide an alternative to \texttt{CAT\_TOPEN} for opening or creating a catalogue.
 
 \begin{description}
 
-  \item[ {\tt CAT\_TOPEN (CNAME, STATE, MODE; CI; STATUS) } ] ~
+  \item[ \texttt{CAT\_TOPEN (CNAME, STATE, MODE; CI; STATUS) } ] ~
   \newline Open a catalogue and obtain an identifier to it.
   \newline STATE = one of: NEW or OLD,
   \newline MODE = one of: WRITE or READ.
 
-  \item[ {\tt CAT\_TRLSE (CI; STATUS) } ] ~
+  \item[ \texttt{CAT\_TRLSE (CI; STATUS) } ] ~
   \newline Release a catalogue identifier.
 
-  \item[ {\tt CAT\_RSET (CI, ROWS, STATUS) } ] ~
+  \item[ \texttt{CAT\_RSET (CI, ROWS, STATUS) } ] ~
   \newline Set the number of rows which a new catalogue is expected to
    contain.  This routine is optional.  If used, then it is ignored by
    some catalogue formats.  With others, such as the Small Text List,
@@ -3093,23 +2558,23 @@ CAT\_TOPEN} for opening or creating a catalogue.
 \subsection{\label{ADAM}ADAM subroutines}
 
 These subroutines interact with the ADAM parameter system. They provide
-alternatives to {\tt CAT\_TOPEN} (see Section~\ref{NONADAM}, above) for
+alternatives to \texttt{CAT\_TOPEN} (see Section~\ref{NONADAM}, above) for
 opening a catalogue. They are provided for compatibility with other
 ADAM libraries and each provides analogous functionality to equivalently
 named routines in other ADAM libraries.
 
 \begin{description}
 
-  \item[ {\tt CAT\_ASSOC (PCNAME, MODE; CI; STATUS) } ] ~
+  \item[ \texttt{CAT\_ASSOC (PCNAME, MODE; CI; STATUS) } ] ~
   \newline Open an existing catalogue; the name of the catalogue is
-   obtained from an ADAM parameter. Argument {\tt MODE} must always
-   be {\tt `READ'} in version \CATversion of CAT.
+   obtained from an ADAM parameter. Argument \texttt{MODE} must always
+   be \texttt{`READ'} in version \CATversion of CAT.
 
-  \item[ {\tt CAT\_CREAT (PCNAME; CI; STATUS) } ] ~
+  \item[ \texttt{CAT\_CREAT (PCNAME; CI; STATUS) } ] ~
   \newline Create a new catalogue; the name of the catalogue is obtained
    from an ADAM parameter.
 
-  \item[ {\tt CAT\_EXIST (PCNAME, MODE; CI; STATUS) } ] ~
+  \item[ \texttt{CAT\_EXIST (PCNAME, MODE; CI; STATUS) } ] ~
   \newline Attempt to open a catalogue, the name being taken from the
    ADAM parameter system. If the attempt fails then instead of
    re-prompting the subroutine returns with an error status. This
@@ -3121,27 +2586,27 @@ named routines in other ADAM libraries.
 \subsection{Catalogue inquiry routines}
 
 These routines perform general `high-level' inquiries on a catalogue.
-{\tt CAT\_TCOLS} is not strictly necessary; its function is
-provided by {\tt CAT\_TDETL}. However, it is convenient in practice.
+\texttt{CAT\_TCOLS} is not strictly necessary; its function is
+provided by \texttt{CAT\_TDETL}. However, it is convenient in practice.
 
 \begin{description}
 
-  \item[ {\tt CAT\_TDETL (CI, COLFLG; NUMROW, NUMCOL, NUMIND, NUMPAR,
+  \item[ \texttt{CAT\_TDETL (CI, COLFLG; NUMROW, NUMCOL, NUMIND, NUMPAR,
    DATE; STATUS) } ] ~
   \newline Get the details of a catalogue. In CAT version \CATversion
-   argument {\tt COLFLG} should be set to {\tt CAT\_\_GPHYS}.
+   argument \texttt{COLFLG} should be set to \texttt{CAT\_\_GPHYS}.
 
-  \item[ {\tt CAT\_TROWS (CI; NUMROW; STATUS) } ] ~ \\
+  \item[ \texttt{CAT\_TROWS (CI; NUMROW; STATUS) } ] ~ \\
    Get the number of rows in a catalogue, selection or index. This
    routine may be given a catalogue, selection or index identifier.  It
    will return the number of rows in the catalogue, selection or index,
    as appropriate.
 
-  \item[ {\tt CAT\_TCOLS (CI, COLFLG; NUMCOL; STATUS) } ] ~ \\
+  \item[ \texttt{CAT\_TCOLS (CI, COLFLG; NUMCOL; STATUS) } ] ~ \\
    Get the number of columns in a catalogue. In CAT version \CATversion
-   argument {\tt COLFLG} should be set to {\tt CAT\_\_GPHYS}.
+   argument \texttt{COLFLG} should be set to \texttt{CAT\_\_GPHYS}.
 
-  \item[ {\tt CAT\_TIDTP (GI; IDTYP; STATUS) } ] ~ \\
+  \item[ \texttt{CAT\_TIDTP (GI; IDTYP; STATUS) } ] ~ \\
    Determine the type of an identifier. The codes for the various types
    of identifiers are shown in Table~\ref{IDTYPE}.
 
@@ -3151,16 +2616,16 @@ provided by {\tt CAT\_TDETL}. However, it is convenient in practice.
 
 \begin{description}
 
-  \item[ {\tt CAT\_TIDNT (CI, GNAME; GI; STATUS) } ] ~
+  \item[ \texttt{CAT\_TIDNT (CI, GNAME; GI; STATUS) } ] ~
   \newline Get an identifier for a named pre-existing component.
 
-  \item[ {\tt CAT\_TNDNT (CI, IDTYP, N; GI; STATUS) } ] ~
+  \item[ \texttt{CAT\_TNDNT (CI, IDTYP, N; GI; STATUS) } ] ~
   \newline Get an identifier for the $n$\/th (pre-existing) component of a
    given type.  Note that if component $n$\, could not be found then the
-   routine returns an ok status, but {\tt GI} is set to null identifier
-   {\tt CAT\_\_NOID}.
+   routine returns an ok status, but \texttt{GI} is set to null identifier
+   \texttt{CAT\_\_NOID}.
 
-  \item[ {\tt CAT\_TIDPR (GI; CI; STATUS) } ] ~
+  \item[ \texttt{CAT\_TIDPR (GI; CI; STATUS) } ] ~
   \newline Determine the parent of a component.
 
 \end{description}
@@ -3169,11 +2634,11 @@ provided by {\tt CAT\_TDETL}. However, it is convenient in practice.
 
 \begin{description}
 
-  \item[ {\tt CAT\_TATT<t> (GI, ATTRIB, VALUE; STATUS) } ] ~
+  \item[ \texttt{CAT\_TATT<t> (GI, ATTRIB, VALUE; STATUS) } ] ~
   \newline Set an attribute of a component to a given value. Type
    conversions are performed if necessary.
 
-  \item[ {\tt CAT\_TIQA<t> (GI, ATTRIB; VALUE; STATUS) } ] ~ \\
+  \item[ \texttt{CAT\_TIQA<t> (GI, ATTRIB; VALUE; STATUS) } ] ~ \\
    Inquire the value of a single attribute for a component.
 
 \end{description}
@@ -3182,7 +2647,7 @@ provided by {\tt CAT\_TDETL}. However, it is convenient in practice.
 
 \begin{description}
 
-  \item[ {\tt CAT\_PNEW0 (CI, PTYPE, PNAME, DTYPE; PI; STATUS) } ] ~
+  \item[ \texttt{CAT\_PNEW0 (CI, PTYPE, PNAME, DTYPE; PI; STATUS) } ] ~
   \newline Create a scalar part (column or parameter).
 
 \end{description}
@@ -3191,25 +2656,25 @@ provided by {\tt CAT\_TDETL}. However, it is convenient in practice.
 
 \begin{description}
 
-  \item[ {\tt CAT\_CNEWA (CI, FNAME, EXPR, DTYPE,
+  \item[ \texttt{CAT\_CNEWA (CI, FNAME, EXPR, DTYPE,
    CSIZE, DIMS, SIZEA, NULL, EXCEPT, } ] ~
-  \newline {\tt SCALEF, ZEROP, ORDER, UNITS, EXTFMT, PRFDSP, COMM;
+  \newline \texttt{SCALEF, ZEROP, ORDER, UNITS, EXTFMT, PRFDSP, COMM;
    FI; STATUS) }
   \newline Create a column, simultaneously setting all its attributes.
 
-  \item[ {\tt CAT\_CNEWS (CI, FNAME, DTYPE, CSIZE, UNITS, EXTFMT, COMM;
+  \item[ \texttt{CAT\_CNEWS (CI, FNAME, DTYPE, CSIZE, UNITS, EXTFMT, COMM;
    FI; STATUS)} ] ~
   \newline Create a column, simultaneously setting some of the more
    frequently used attributes. These attributes deliberately correspond
    to the ones usually used in FITS tables. Note that if a CHARACTER
    column is created then the default CHARACTER size of twenty will be
-   adopted unless {\tt CAT\_TATTC} is used to set the character size.
+   adopted unless \texttt{CAT\_TATTC} is used to set the character size.
 
-  \item[ {\tt CAT\_CINQ (FI, SZDIM; CI, FNAME, GENUS, EXPR, DTYPE,
+  \item[ \texttt{CAT\_CINQ (FI, SZDIM; CI, FNAME, GENUS, EXPR, DTYPE,
    CSIZE, DIMS, SIZEA, } ] ~
-  \newline {\tt NULL, EXCEPT, SCALEF, ZEROP, ORDER, UNITS, EXTFMT,
+  \newline \texttt{NULL, EXCEPT, SCALEF, ZEROP, ORDER, UNITS, EXTFMT,
    PRFDSP, COMM,}
-  \newline {\tt DATE; STATUS) }
+  \newline \texttt{DATE; STATUS) }
   \newline Inquire the values of all the attributes for a column. Type
    conversions are performed if necessary. If the conversion fails a
    status is set (this is only likely to be important for null values).
@@ -3223,24 +2688,23 @@ provided by {\tt CAT\_TDETL}. However, it is convenient in practice.
 
 \begin{description}
 
-  \item[ {\tt CAT\_PPTA$<$t$>$ (CI, QNAME, CSIZE, DIMS, SIZEA, UNITS,
+  \item[ \texttt{CAT\_PPTA$<$t$>$ (CI, QNAME, CSIZE, DIMS, SIZEA, UNITS,
    EXTFMT, PRFDSP, COMM, } ] ~
-  \newline {\tt VALUE; QI; STATUS) }
+  \newline \texttt{VALUE; QI; STATUS) }
   \newline Create a parameter, simultaneously setting all its
    attributes.
 
-  \item[ {\tt CAT\_PPTS$<$t$>$ (CI, QNAME, VALUE, COMM; QI; STATUS)
+  \item[ \texttt{CAT\_PPTS$<$t$>$ (CI, QNAME, VALUE, COMM; QI; STATUS)
    } ] ~
   \newline Create a parameter, simultaneously setting its value and
    comment attributes. These attributes deliberately correspond to the
    ones usually used in FITS tables. Note that if a CHARACTER
-   parameter is created then the default character size of {\tt
-   CAT\_\_SZVAL} will be adopted unless {\tt CAT\_TATTC} is used to set
+   parameter is created then the default character size of \texttt{CAT\_\_SZVAL} will be adopted unless \texttt{CAT\_TATTC} is used to set
    the character size.
 
-  \item[ {\tt CAT\_PINQ (QI, SZDIM; CI, PNAME, DTYPE, CSIZE, DIMS,
+  \item[ \texttt{CAT\_PINQ (QI, SZDIM; CI, PNAME, DTYPE, CSIZE, DIMS,
    SIZEA, UNITS, EXTFMT, } ] ~
-  \newline {\tt PRFDSP, COMM, VALUE, DATE; STATUS) }
+  \newline \texttt{PRFDSP, COMM, VALUE, DATE; STATUS) }
   \newline Inquire the values of all the attributes for a parameter.
 
 \end{description}
@@ -3249,7 +2713,7 @@ provided by {\tt CAT\_TDETL}. However, it is convenient in practice.
 
 \begin{description}
 
-  \item[ {\tt CAT\_EIDNT (CI, EXPR; EI; STATUS) } ] ~
+  \item[ \texttt{CAT\_EIDNT (CI, EXPR; EI; STATUS) } ] ~
   \newline Get an identifier for an expression. The syntax of
    expressions is described in Appendix~\ref{EXPR}.
 
@@ -3259,20 +2723,19 @@ provided by {\tt CAT\_TDETL}. However, it is convenient in practice.
 
 The selection routines return a selection identifier which corresponds
 to the set of rows which satisfy the criteria of the selection. There
-are two routines for generating a selection: {\tt CAT\_SELCT} and
-{\tt CAT\_SFND$<$t$>$}. {\tt CAT\_SELCT} allows complex selections to be
+are two routines for generating a selection: \texttt{CAT\_SELCT} and
+\texttt{CAT\_SFND$<$t$>$}. \texttt{CAT\_SELCT} allows complex selections to be
 performed according to complicated criteria. A logical (or boolean)
 expression defining the selection is supplied and all the rows in the
-catalogue for which this expression evaluates to {\tt .TRUE.} are
-selected. {\tt CAT\_SFND$<$t$>$} allows a simple range of values to be
-selected for a sorted column. Usually {\tt CAT\_SELCT} will execute
-more slowly than {\tt CAT\_SFND$<$t$>$} because whereas {\tt
-CAT\_SELCT} must necessarily access every row in the catalogue,
-{\tt CAT\_SFND$<$t$>$} can exploit the ordering of the chosen column to
+catalogue for which this expression evaluates to \texttt{.TRUE.} are
+selected. \texttt{CAT\_SFND$<$t$>$} allows a simple range of values to be
+selected for a sorted column. Usually \texttt{CAT\_SELCT} will execute
+more slowly than \texttt{CAT\_SFND$<$t$>$} because whereas \texttt{CAT\_SELCT} must necessarily access every row in the catalogue,
+\texttt{CAT\_SFND$<$t$>$} can exploit the ordering of the chosen column to
 immediately identify the required rows (remember the mnemonic F for
 Find and Fast, S for Select and Slow).
 
-{\tt CAT\_SLIST} allows a specialized application to create a non-standard
+\texttt{CAT\_SLIST} allows a specialized application to create a non-standard
 selection.
 
 All the selection routines may operate on either an entire catalogue
@@ -3281,21 +2744,21 @@ provide an option to create a second selection of all the rejected rows.
 
 \begin{description}
 
-  \item[ {\tt CAT\_SELCT (CI, EI, REJFLG; SI, NUMSEL, SIR, NUMREJ;
+  \item[ \texttt{CAT\_SELCT (CI, EI, REJFLG; SI, NUMSEL, SIR, NUMREJ;
    STATUS) } ] ~
   \newline Create a selection of rows satisfying some expression.
 
-  \item[ {\tt CAT\_SFND$<$t$>$ (CI, FI, MINRNG, MAXRNG, REJFLG; SI,
+  \item[ \texttt{CAT\_SFND$<$t$>$ (CI, FI, MINRNG, MAXRNG, REJFLG; SI,
    NUMSEL, SIR, NUMREJ; } ] ~
-  \newline {\tt STATUS) }
+  \newline \texttt{STATUS) }
   \newline Create a selection of the rows in a catalogue for which the
    fields of a specified sorted column lie within a given range.
 
-  \item[ {\tt CAT\_SLIST (NUMSEL, SELIST, CRIT, REJFLG, CI, SI, SIR,
+  \item[ \texttt{CAT\_SLIST (NUMSEL, SELIST, CRIT, REJFLG, CI, SI, SIR,
    NUMREJ, STATUS) } ] ~
   \newline Create a selection from an array of row numbers.
 
-  \item[ {\tt CAT\_SINQ (SI; CI, EXPR, NUMSEL, COMM, DATE; STATUS) } ] ~
+  \item[ \texttt{CAT\_SINQ (SI; CI, EXPR, NUMSEL, COMM, DATE; STATUS) } ] ~
   \newline Inquire all the attributes of a selection.
 
 \end{description}
@@ -3304,16 +2767,16 @@ provide an option to create a second selection of all the rejected rows.
 
 The index generation routine generates an index from a given numeric
 column and returns an identifier which allows the rows in the catalogue
-to be accessed as though they were sorted on the column.   {\it In CAT
+to be accessed as though they were sorted on the column.   \textit{In CAT
 version \CATversion only temporary indices, which persist for the
 duration of the application which generated them, are supported.}
 
 \begin{description}
 
-  \item[ {\tt CAT\_INEW (FI, DISP, ORDER; II; STATUS) } ] ~
+  \item[ \texttt{CAT\_INEW (FI, DISP, ORDER; II; STATUS) } ] ~
   \newline Create an index on a column.
 
-  \item[ {\tt CAT\_IINQ (II; CI, FI, ORDER, NUMSEL, COMM, DATE; STATUS) } ] ~
+  \item[ \texttt{CAT\_IINQ (II; CI, FI, ORDER, NUMSEL, COMM, DATE; STATUS) } ] ~
   \newline Inquire all the attributes of an index.
 
 \end{description}
@@ -3338,7 +2801,7 @@ catalogue into the `current row buffer' and having the GET and PUT
 operations operate on this buffer. Applications should be written in the
 form:
 
-\begin{verbatim}
+\begin{terminalv}
 for all the rows to be processed
   Read the required row into the current row buffer.
   Get a field from the buffer.
@@ -3346,7 +2809,7 @@ for all the rows to be processed
   Get yet another field from the buffer.
   and so on...
 end for
-\end{verbatim}
+\end{terminalv}
 
 None of the solutions to this problem are ideal and the disadvantage of
 the one adopted is that the resulting subroutine interface is quite
@@ -3361,18 +2824,18 @@ to the end of the catalogue.
 When a catalogue is opened (that is, an identifier is obtained for it),
 its first row is copied into the current row buffer.  Thus, if the
 current row buffer is accessed without first GETting a specified
-row with {\tt CAT\_RGET} the contents of the first row will be obtained.
+row with \texttt{CAT\_RGET} the contents of the first row will be obtained.
 
 \begin{description}
 
-  \item[ {\tt CAT\_RGET (CI, ROWNO; STATUS) } ] ~
+  \item[ \texttt{CAT\_RGET (CI, ROWNO; STATUS) } ] ~
   \newline Read a specified row from the catalogue into the current row
-   buffer. {\tt CI} may be either a catalogue, selection or index
+   buffer. \texttt{CI} may be either a catalogue, selection or index
    identifier.
 
-  \item[ {\tt CAT\_RAPND (CI; STATUS) } ] ~
+  \item[ \texttt{CAT\_RAPND (CI; STATUS) } ] ~
   \newline Append the current row buffer as a new row at the end of the
-   catalogue. {\tt CI} must necessarily be a catalogue identifier.
+   catalogue. \texttt{CI} must necessarily be a catalogue identifier.
 
 \end{description}
 
@@ -3389,7 +2852,7 @@ the current row buffer. The following rules apply:
    the current row buffer). However, simple column names and parameter
    names are valid expressions. Therefore, any one of an: expression,
    column, vector column element or parameter identifier may be used
-   in the GET routine {\tt CAT\_EGT0$<$t$>$},
+   in the GET routine \texttt{CAT\_EGT0$<$t$>$},
 
   \item values can only be PUT to scalar columns or vector column
    elements, not to expressions or parameters (the notion of PUTting to
@@ -3403,45 +2866,42 @@ values.
 
 \begin{description}
 
-  \item[ {\tt CAT\_EGT0<t> (GI; VALUE, NULFLG; STATUS) } ] ~
+  \item[ \texttt{CAT\_EGT0<t> (GI; VALUE, NULFLG; STATUS) } ] ~
   \newline Get the value of a scalar expression, evaluated from the
-   current row buffer. {\tt GI} may be either: an expression, column,
+   current row buffer. \texttt{GI} may be either: an expression, column,
    vector column element or parameter identifier.
 
-  \item[ {\tt CAT\_EGT0F (GI; VALUE, NULFLG; STATUS) } ] ~
+  \item[ \texttt{CAT\_EGT0F (GI; VALUE, NULFLG; STATUS) } ] ~
   \newline Get the value of a scalar expression, evaluated from the
    current row buffer and formatted into a character string using the
-   external display format for the column, parameter or expression. {\tt
-   GI} may be either: an expression, column, vector column element or
+   external display format for the column, parameter or expression. \texttt{GI} may be either: an expression, column, vector column element or
    parameter identifier.
 
-  \item[ {\tt CAT\_PUT0<t> (FI, VALUE, NULFLG; STATUS) } ] ~
+  \item[ \texttt{CAT\_PUT0<t> (FI, VALUE, NULFLG; STATUS) } ] ~
   \newline Put a value to a field. The value is written to the current
-   row buffer. {\tt FI} may be either a column or vector column element
+   row buffer. \texttt{FI} may be either a column or vector column element
    identifier.
 
 \end{description}
 
 For convenience two additional routines are provided for getting
 values which include the row from which the value is to be obtained.
-Otherwise they are similar to {\tt CAT\_EGT0<t>} and {\tt CAT\_EGT0F}
-(indeed they are wrap-arounds of {\tt CAT\_RGET} followed by
-{\tt CAT\_EGT0<t>} or {\tt CAT\_EGT0F}).
+Otherwise they are similar to \texttt{CAT\_EGT0<t>} and \texttt{CAT\_EGT0F}
+(indeed they are wrap-arounds of \texttt{CAT\_RGET} followed by
+\texttt{CAT\_EGT0<t>} or \texttt{CAT\_EGT0F}).
 
 \begin{description}
 
-  \item[ {\tt CAT\_FGT0<t> (CI, ROWNO, GI; VALUE, NULFLG; STATUS) } ] ~
+  \item[ \texttt{CAT\_FGT0<t> (CI, ROWNO, GI; VALUE, NULFLG; STATUS) } ] ~
   \newline Get the value of a scalar expression, evaluated from a
-   specified row. {\tt CI} may be either: a catalogue, selection or
-   index identifier. {\tt GI} may be either: an expression, column,
+   specified row. \texttt{CI} may be either: a catalogue, selection or
+   index identifier. \texttt{GI} may be either: an expression, column,
    vector column element or parameter identifier.
 
-  \item[ {\tt CAT\_FGT0F (CI, ROWNO, GI; VALUE, NULFLG; STATUS) } ] ~
+  \item[ \texttt{CAT\_FGT0F (CI, ROWNO, GI; VALUE, NULFLG; STATUS) } ] ~
   \newline Get the value of a scalar expression, evaluated from a
    specified row. and formatted into a character string using the
-   external display format for the column, parameter or expression. {\tt
-   CI} may be either: a catalogue, selection or index identifier. {\tt
-   GI} may be either: an expression, column, vector column element or
+   external display format for the column, parameter or expression. \texttt{CI} may be either: a catalogue, selection or index identifier. \texttt{GI} may be either: an expression, column, vector column element or
    parameter identifier.
 
 \end{description}
@@ -3451,7 +2911,7 @@ Otherwise they are similar to {\tt CAT\_EGT0<t>} and {\tt CAT\_EGT0F}
 This set of routines provide access to any textual information
 associated with the catalogue\footnote{These routines were not included
 in the original specification for the CAT subroutine interface, as
-described in {\it The Starlink Subroutine Interface for Manipulating
+described in \textit{The Starlink Subroutine Interface for Manipulating
 Catalogues}\/ (StarBase/ACD/3.4)\cite{STARBASE34}; they were added later.}.
 They try to keep access to the textual information as simple as possible.
 The text is accessed one line at a time, with each line corresponding, for
@@ -3459,10 +2919,10 @@ example, to a single FITS COMMENT or HISTORY keyword. No facilities are
 provided to interpret a line. It is assumed that each line will either
 be displayed to the user or copied to another catalogue.
 
-{\tt CAT\_GETXT} returns a single line of text. Subsequent calls to
-{\tt CAT\_GETXT} work sequentially through the textual information,
+\texttt{CAT\_GETXT} returns a single line of text. Subsequent calls to
+\texttt{CAT\_GETXT} work sequentially through the textual information,
 returning the lines in sequence.  The application cannot specify that it
-wants a particular line.  However {\tt CAT\_RSTXT} is provided to `reset'
+wants a particular line.  However \texttt{CAT\_RSTXT} is provided to `reset'
 the sequence for a catalogue, so that the textual information can be
 read through an arbitrary number of times.
 
@@ -3473,26 +2933,26 @@ different catalogue formats, though on output the standard classes
 COMMENT and HISTORY are always available. Appendix~\ref{FORMAT}
 lists the classes supported by individual catalogue formats.
 
-A call to {\tt CAT\_PUTXT} appends a line of textual information to the
+A call to \texttt{CAT\_PUTXT} appends a line of textual information to the
 end of the existing textual information for a catalogue.  The only way
 to add new textual information is by appending it to the end.
 
-In all these routines {\tt CI} must be a catalogue identifier.
+In all these routines \texttt{CI} must be a catalogue identifier.
 
 \begin{description}
 
-  \item[ {\tt CAT\_GETXT (CI; FINISH, CLASS, TEXT; STATUS)} ] ~
+  \item[ \texttt{CAT\_GETXT (CI; FINISH, CLASS, TEXT; STATUS)} ] ~
   \newline Get the next line of textual information from a catalogue.
 
-  \item[ {\tt CAT\_PUTXT (CI, CLASS, TEXT; STATUS)} ] ~
+  \item[ \texttt{CAT\_PUTXT (CI, CLASS, TEXT; STATUS)} ] ~
   \newline Put a line of textual information to a catalogue.
 
-  \item[ {\tt CAT\_RSTXT (CI; STATUS)} ] ~
+  \item[ \texttt{CAT\_RSTXT (CI; STATUS)} ] ~
   \newline Reset the access to the textual information in a given
-   catalogue. A subsequent call to {\tt CAT\_GETXT} would return the
+   catalogue. A subsequent call to \texttt{CAT\_GETXT} would return the
    first line of textual information.
 
-  \item[ {\tt CAT\_SZTXT (CI, ACCESS; LINESZ; STATUS)} ] ~
+  \item[ \texttt{CAT\_SZTXT (CI, ACCESS; LINESZ; STATUS)} ] ~
   \newline Return the maximum permitted size of a line of textual
    information in a catalogue.  The maximum size is determined by the
    format of the catalogue and the access mode (READ or WRITE).
@@ -3503,23 +2963,23 @@ In all these routines {\tt CI} must be a catalogue identifier.
 
 \begin{description}
 
-  \item[ {\tt CAT\_TUNES (CATPRM, VALUE; STATUS) } ] ~
+  \item[ \texttt{CAT\_TUNES (CATPRM, VALUE; STATUS) } ] ~
   \newline Set a CAT tuning parameter. Note that all these parameters
    are of type CHARACTER.
 
-  \item[ {\tt CAT\_TUNEG (CATPRM; VALUE; STATUS) } ] ~
+  \item[ \texttt{CAT\_TUNEG (CATPRM; VALUE; STATUS) } ] ~
   \newline Get a CAT tuning parameter. Note that all these parameters
    are of type CHARACTER.
 
-  \item[ {\tt CAT\_TYFMT (DTYPE, CSIZE; STRING, POSN; STATUS) } ] ~
+  \item[ \texttt{CAT\_TYFMT (DTYPE, CSIZE; STRING, POSN; STATUS) } ] ~
   \newline Construct a character string representation of a CAT
    data type and append it to a character string. This character string
    representation is (deliberately) identical to that used by HDS.
 
-  \item[ {\tt CAT\_SRNG$<$t$>$ (CI, FI, MINRNG, MAXRNG; FIRSTR, LASTR;
+  \item[ \texttt{CAT\_SRNG$<$t$>$ (CI, FI, MINRNG, MAXRNG; FIRSTR, LASTR;
    STATUS) } ] ~
   \newline Get the rows corresponding to a range for a sorted column.
-   This routine is similar to {\tt CAT\_SFND$<$t$>$}, but it returns
+   This routine is similar to \texttt{CAT\_SFND$<$t$>$}, but it returns
    the first and last rows within the specified range, rather than
    generating a selection.
 
@@ -3543,7 +3003,7 @@ parameter need not correspond to the type of the Fortran variable; the
 interface will automatically attempt a type conversion. However,
 depending on the types involved, a conversion may not be possible for
 some values. The matrix of possibilities is shown in
-Table~\ref{CONVMAT}. This matrix is used for {\it all}\, conversions:
+Table~\ref{CONVMAT}. This matrix is used for \textit{all}\, conversions:
 both GET and PUT operations for both columns (or fields) and parameters.
 
 \begin{table}[htbp]
@@ -3566,7 +3026,7 @@ CHAR    & maybe & maybe & maybe & maybe & maybe   & maybe & maybe  &   yes   & m
 \end{center}
 
 \begin{quote}
-{\bf Key:}
+\textbf{Key:}
 
 \begin{description}
 
@@ -3649,9 +3109,9 @@ Null values would be used to represent the missing values. Throughout
 CAT, and the applications that call it, nulls have the single,
 simple meaning that `no value is available for this datum'. It is
 possible to invent schemes where a set of null values are supported,
-each with a subtly different gradation of meaning (see, Roth {\it et
+each with a subtly different gradation of meaning (see, Roth \textit{et
 al.}\cite{ROTH}).  However, such schemes were adjudged un-necessary for
-manipulating astronomical catalogues and  tables, and they are {\it not}\,
+manipulating astronomical catalogues and  tables, and they are \textit{not}\,
 supported.
 
 The treatment of nulls in CAT was designed with the following
@@ -3663,10 +3123,10 @@ assertions about null values in astronomical catalogues in mind:
    values are used to represent null values. Null values are common
    rather than rare,
 
-  \item in general, it is {\it always}\, possible that a genuine datum
+  \item in general, it is \textit{always}\, possible that a genuine datum
    will not be available when any field in a catalogue is being written;
    in general an arithmetic exception, such as $\div$ by zero, is always
-   possible. {\it It is not possible to proscribe exceptions when
+   possible. \textit{It is not possible to proscribe exceptions when
    generating a column},
 
   \item conversely, for some columns, all the values permitted by the
@@ -3712,8 +3172,8 @@ was specified for null values in CAT:
 
   \item if a column does not support nulls, exceptions can still occur
    when its fields are generated (as described above). When an exception
-   occurs a {\bf locum} value is written. The locum value for a column
-   {\it must}\, be specified when a column which does not support nulls
+   occurs a \textbf{locum} value is written. The locum value for a column
+   \textit{must}\, be specified when a column which does not support nulls
    is created.
 
 \end{itemize}
@@ -3753,7 +3213,7 @@ was specified for null values in CAT:
 \end{tabular}
 \end{center} }
 
-{\bf Notes:}
+\textbf{Notes:}
 
 \begin{enumerate}
 
@@ -3780,15 +3240,14 @@ little confusing. It may be summarized as follows:
 
   \item on reading a field (and this is the crux of the matter),
    CAT can differentiate a null from a genuine data value, but
-   it {\it cannot}\, differentiate a locum: {\it once written a locum is
+   it \textit{cannot}\, differentiate a locum: \textit{once written a locum is
    indistinguishable from a genuine datum.}
 
 \end{itemize}
 
 Thus, generating a locum corresponds to CAT inventing data, and in
 theory (and often in practice) will invalidate the contents of the
-column. This invalidation is the reason why the value of a locum {\it
-must}\, be specified, rather than making a default available; a value
+column. This invalidation is the reason why the value of a locum \textit{must}\, be specified, rather than making a default available; a value
 can at least be chosen to minimize the damage.
 
 \subsubsection{Reporting the generation of null and locum values}
@@ -3814,11 +3273,11 @@ the column supports. The possibilities are:
 
 \begin{itemize}
 
-  \item standard, HDS bad value ({\tt CAT\_\_NULLD}),
+  \item standard, HDS bad value (\texttt{CAT\_\_NULLD}),
 
-  \item explicitly specified null value ({\tt CAT\_\_NULLS}),
+  \item explicitly specified null value (\texttt{CAT\_\_NULLS}),
 
-  \item locum ({\tt CAT\_\_LOCUM}).
+  \item locum (\texttt{CAT\_\_LOCUM}).
 
 \end{itemize}
 
@@ -3866,9 +3325,8 @@ more of the fields is null.
   \item A numeric expression containing column names evaluates to
    null if any of the fields are null.
 
-  \item Logical expressions can evaluate to one of three states: {\it
-   true}, {\it false}\, or {\it null}. However, the expression is only
-   satisfied if the value is {\it true}.
+  \item Logical expressions can evaluate to one of three states: \textit{true}, \textit{false}\, or \textit{null}. However, the expression is only
+   satisfied if the value is \textit{true}.
 
   \item A relational operation ($> < =$, etc.) between two columns
    evaluates to null if either or both of the fields is null.
@@ -3879,16 +3337,16 @@ more of the fields is null.
    and juries can manage three-valued logic, it seemed reasonable that
    CAT could.}.  Their truth tables are shown in Table~\ref{TRUTH}.
 
-  \item The parser provides the function {\tt NULL} to detect null
-   values. It returns the logical value {\tt .TRUE.} if its argument is
-   null and {\tt .FALSE.} if its argument is not null.
+  \item The parser provides the function \texttt{NULL} to detect null
+   values. It returns the logical value \texttt{.TRUE.} if its argument is
+   null and \texttt{.FALSE.} if its argument is not null.
 
 \end{enumerate}
 
 \begin{table}[htbp]
 
 \begin{center}
-{\bf AND}
+\textbf{AND}
 \begin{tabular}{cc|ccc}
 \multicolumn{5}{c}{a}  \\
   &     &  T  &  N  &  F  \\ \hline
@@ -3898,7 +3356,7 @@ b &  N  &  N  &  N  &  F  \\
 \end{tabular}
 
 \vspace{5.0 mm}
-{\bf OR}
+\textbf{OR}
 \begin{tabular}{cc|ccc}
 \multicolumn{5}{c}{a}  \\
   &     &  T  &  N  &  F  \\ \hline
@@ -3908,7 +3366,7 @@ b &  N  &  T  &  N  &  N  \\
 \end{tabular}
 
 \vspace{5.0 mm}
-{\bf NOT}
+\textbf{NOT}
 \begin{tabular}{cc|ccc}
   &  T  &  F  \\
 a &  F  &  T  \\
@@ -3922,23 +3380,23 @@ a &  F  &  T  \\
 
 \subsubsection{\label{NULLAPP}Handling nulls in applications}
 
-Normally {\it applications}\, should observe the following rules when
+Normally \textit{applications}\, should observe the following rules when
 manipulating null values. If applications usually follow these rules
 they will all present consistent and predictable behaviour to their
 users. In a perfect world applications would always follow the rules.
-However, I recognize that some {\it ad hoc}\, applications may need to
+However, I recognize that some \textit{ad hoc}\, applications may need to
 behave differently because of some idiosyncrasy of their required
 functionality. Nonetheless, applications should follow the rules unless
 there are very good reasons not to. The recommended rules are:
 
 \begin{enumerate}
 
-  \item {\it applications}\, extracting a single column from a table
+  \item \textit{applications}\, extracting a single column from a table
    (for example, to plot a histogram) should skip (that is, detect, but
    not process) null values. They may, however, count and report the
    number of null values encountered,
 
-  \item {\it applications}\, extracting two or more columns from a
+  \item \textit{applications}\, extracting two or more columns from a
    table (for example, to plot a scatter-gram) should skip (that is,
    detect, but not process) all rows where any of the extracted values
    is null. They may, however, count and report the number of null
@@ -3952,8 +3410,7 @@ there are very good reasons not to. The recommended rules are:
 \subsubsection{Inquiring null values}
 
 An application may determine the null value specified for a column by
-inquiring the value of the EXCEPT attribute using routine {\tt
-CAT\_TIQAC}. The value is forced into type CHARACTER. If it is
+inquiring the value of the EXCEPT attribute using routine \texttt{CAT\_TIQAC}. The value is forced into type CHARACTER. If it is
 impossible to represent the value adequately in a character string then
 it cannot be made accessible to the application.
 
@@ -3985,11 +3442,11 @@ CAT provides both these facilities, as follows:
 \begin{itemize}
 
   \item when the value of a field in an angular column is
-   obtained using {\tt CAT\_EGT0D} or {\tt CAT\_EGT0R} it is
+   obtained using \texttt{CAT\_EGT0D} or \texttt{CAT\_EGT0R} it is
    returned as DOUBLE PRECISION or REAL variable in radians,
 
   \item when the value of a field in an angular column is
-   obtained formatted for display using {\tt CAT\_EGT0F} it is
+   obtained formatted for display using \texttt{CAT\_EGT0F} it is
    returned as a CHARACTER string containing the value expressed in
    hours, degrees, minutes or seconds and optionally formatted as a
    sexagesimal value.
@@ -4011,17 +3468,16 @@ satisfy the following two requirements.
    used often.},
 
   \item The units attribute of the column should be set to
-   `{\tt RADIANS}' followed by an angular format specifier
+   `\texttt{RADIANS}' followed by an angular format specifier
    enclosed in curly brackets (`\{\}'). The simplest forms of this
-   angular format specifier are simply `{\tt HOURS}' and `{\tt
-   DEGREES}' for hours and degrees respectively. Thus, examples of
+   angular format specifier are simply `\texttt{HOURS}' and `\texttt{DEGREES}' for hours and degrees respectively. Thus, examples of
    the UNITS attribute are:
 
   \begin{description}
 
-    \item[{\tt RADIANS\{HOURS\}}] to display the column in hours,
+    \item[\texttt{RADIANS\{HOURS\}}] to display the column in hours,
 
-    \item[{\tt RADIANS\{DEGREES\}}] to display the column in degrees.
+    \item[\texttt{RADIANS\{DEGREES\}}] to display the column in degrees.
 
   \end{description}
 
@@ -4033,13 +3489,12 @@ satisfy the following two requirements.
 If the external display format attribute of the column, EXFMT,
 is explicitly set it should be set to a normal Fortran 77 format
 specifier corresponding to the data type of the column, for
-example `{\tt D16.8}' for a DOUBLE PRECISION column or `{\tt E14.6}'
-for a REAL column\footnote{The external format attribute {\it
-must}\, always be a valid Fortran 77 format specifier because of
+example `\texttt{D16.8}' for a DOUBLE PRECISION column or `\texttt{E14.6}'
+for a REAL column\footnote{The external format attribute \textit{must}\, always be a valid Fortran 77 format specifier because of
 the way that CAT catalogues are represented as FITS tables.}.
 
 When the catalogue is written fields should be written to
-angular columns using {\tt CAT\_PUT0D} or {\tt CAT\_PUT0R} with
+angular columns using \texttt{CAT\_PUT0D} or \texttt{CAT\_PUT0R} with
 the angles expressed in radians.
 
 \subsubsection{Angular format specifiers}
@@ -4048,47 +3503,46 @@ The angular format specifier forms part of the UNITS attribute for an
 angular column. The UNITS attribute for an angular column has the
 form:
 
-\begin{center}
-{\tt RADIANS\{angular format specifier\} }
-\end{center}
+\begin{terminalv}
+RADIANS{angular format specifier}
+\end{terminalv}
 
-The simplest angular format specifiers are `{\tt HOURS}' and
-`{\tt DEGREES}'.
+The simplest angular format specifiers are `\texttt{HOURS}' and
+`\texttt{DEGREES}'.
 
 \begin{description}
 
-  \item[{\tt HOURS}] will cause the angle to be displayed as
+  \item[\texttt{HOURS}] will cause the angle to be displayed as
    hours, minutes and seconds, with the seconds displayed to one
    place of decimals,
 
-  \item[{\tt DEGREES}] will cause the angle to be displayed as
+  \item[\texttt{DEGREES}] will cause the angle to be displayed as
    degrees, minutes and seconds, with the seconds displayed as a
    whole number.
 
 \end{description}
 
 If the angular format specifier is omitted altogether and
-the UNITS attribute simply set to `{\tt RADIANS}' or `{\tt
-RADIANS\{\}}' then the angle will be interpreted exactly as
-though the angular format specifier had been `{\tt DEGREES}'.
+the UNITS attribute simply set to `\texttt{RADIANS}' or `\texttt{RADIANS\{\}}' then the angle will be interpreted exactly as
+though the angular format specifier had been `\texttt{DEGREES}'.
 There are additional simple angular format specifiers for displaying
 angles as minutes or seconds of arc or time to a specified number of
 decimal places:
 
 \begin{description}
 
-  \item[{\tt ARCMIN}{\it .n}] minutes of arc,
+  \item[\texttt{ARCMIN}\textit{.n}] minutes of arc,
 
-  \item[{\tt ARCSEC}{\it .n}] seconds of arc,
+  \item[\texttt{ARCSEC}\textit{.n}] seconds of arc,
 
-  \item[{\tt TIMEMIN}{\it .n}] minutes of time,
+  \item[\texttt{TIMEMIN}\textit{.n}] minutes of time,
 
-  \item[{\tt TIMESEC}{\it .n}] seconds of time.
+  \item[\texttt{TIMESEC}\textit{.n}] seconds of time.
 
 
 \end{description}
 
-{\it .n}\, is the number of decimal places required.  If {\it .n}\, is
+\textit{.n}\, is the number of decimal places required.  If \textit{.n}\, is
 omitted then the value will be displayed as an integer number.  Though
 these angular specifiers can be used to display any angle, obviously
 they are most likely to be useful for small angles.
@@ -4102,57 +3556,57 @@ number of different formats. These specifiers are constructed
 from a selection from amongst the following elements:
 
 \begin{center}
-{\tt I B L + Z H D M S T} .{\it n}
+\texttt{I B L + Z H D M S T} .\textit{n}
 \end{center}
 
 The meaning of each of the individual elements is as follows.
 
 \begin{description}
 
-  \item[{\tt I}] Use the ISO standard separator for expressing
+  \item[\texttt{I}] Use the ISO standard separator for expressing
    times, a colon (`:'), to separate hours or degrees, minutes and
    seconds.
 
-  \item[{\tt B}] Use a single blank space to separate hours or
+  \item[\texttt{B}] Use a single blank space to separate hours or
    degrees, minutes and seconds.
 
-  \item[{\tt L}] Use a letter ({\tt h}, {\tt d}, {\tt m}, or
-   {\tt s}, as appropriate) to separate hours or degrees, minutes
+  \item[\texttt{L}] Use a letter (\texttt{h}, \texttt{d}, \texttt{m}, or
+   \texttt{s}, as appropriate) to separate hours or degrees, minutes
    and seconds.
 
-  \item[{\tt +}] Insert a plus sign (`$+$') before positive angles
+  \item[\texttt{+}] Insert a plus sign (`$+$') before positive angles
    (a minus sign is, of course, always inserted before negative
    angles).
 
-  \item[{\tt Z}] Insert leading zeros before the hours, degrees, minutes
+  \item[\texttt{Z}] Insert leading zeros before the hours, degrees, minutes
    or seconds. Hours, minutes and seconds are assumed to be two-digit
    numbers and degrees three-digit.
 
-  \item[{\tt H}] Express the angle in units of hours.
+  \item[\texttt{H}] Express the angle in units of hours.
 
-  \item[{\tt D}] Express the angle in units of degrees.
+  \item[\texttt{D}] Express the angle in units of degrees.
 
-  \item[{\tt M}] If an {\tt M} occurs when either {\tt H} or {\tt D}
+  \item[\texttt{M}] If an \texttt{M} occurs when either \texttt{H} or \texttt{D}
    is present then it indicates that the hours or degrees are to be
-   subdivided into sexagesimal minutes.  If an {\tt M} occurs when
-   neither {\tt H} nor {\tt D} is present then it indicates that the
+   subdivided into sexagesimal minutes.  If an \texttt{M} occurs when
+   neither \texttt{H} nor \texttt{D} is present then it indicates that the
    units are minutes of either arc or time.
 
-  \item[{\tt S}] If an {\tt S} occurs when an {\tt M} is present then
+  \item[\texttt{S}] If an \texttt{S} occurs when an \texttt{M} is present then
    it indicates that the minutes are to be subdivided into sexagesimal
    seconds (the minutes may be either the actual units or themselves
-   a sexagesimal subdivision of hours or degrees; see {\tt M} above).
-   If an {\tt S} occurs when an {\tt M} is not present then it indicates
+   a sexagesimal subdivision of hours or degrees; see \texttt{M} above).
+   If an \texttt{S} occurs when an \texttt{M} is not present then it indicates
    that the units are seconds of arc or time.
 
-  \item[{\tt T}] In the case where {\tt H} and {\tt D} are both absent
-   and either or both of {\tt M} and {\tt S} are present then {\tt T}
+  \item[\texttt{T}] In the case where \texttt{H} and \texttt{D} are both absent
+   and either or both of \texttt{M} and \texttt{S} are present then \texttt{T}
    indicates that the units are minutes or seconds of time.  If it is
    omitted in this case then the units are minutes or seconds of arc.
-   If either {\tt H} or {\tt D} is present then {\tt T} is ignored.
+   If either \texttt{H} or \texttt{D} is present then \texttt{T} is ignored.
 
-  \item[{\it .n}] Display the least significant unit (seconds,
-   minutes, degrees or hours, as appropriate) to {\it n}\, decimal
+  \item[\textit{.n}] Display the least significant unit (seconds,
+   minutes, degrees or hours, as appropriate) to \textit{n}\, decimal
    places.
 
 \end{description}
@@ -4160,43 +3614,43 @@ The meaning of each of the individual elements is as follows.
 Any of the items may be omitted, down to and including a
 completely blank specifier.
 
-The items can occur in any order, except that {\it .n}\, must
+The items can occur in any order, except that \textit{.n}\, must
 occur last. However, for human readability I recommend that the
 items occur in the order:
 
 \begin{center}
-(any of: {\tt I}, {\tt B}, {\tt L}, {\tt +} or {\tt Z}) ({\tt H}
-or {\tt D}) {\tt M S T} .{\it n}
+(any of: \texttt{I}, \texttt{B}, \texttt{L}, \texttt{+} or \texttt{Z}) (\texttt{H}
+or \texttt{D}) \texttt{M S T} .\textit{n}
 \end{center}
 
 If items are omitted the following defaults apply.
 
 \begin{itemize}
 
-  \item If neither {\tt I}, {\tt B} nor {\tt L} is specified
-   then {\tt I} is assumed.
+  \item If neither \texttt{I}, \texttt{B} nor \texttt{L} is specified
+   then \texttt{I} is assumed.
 
-  \item If {\tt +} is omitted then positive angles are not
+  \item If \texttt{+} is omitted then positive angles are not
    preceded by a `$+$' sign.
 
-  \item If {\tt Z} is omitted then leading zeros are omitted in the
+  \item If \texttt{Z} is omitted then leading zeros are omitted in the
    primary units (hours, degrees, minutes or seconds), but leading zeros
    are always included in any sexagesimal subdivisions.
 
-  \item If none of {\tt H}, {\tt D}, {\tt M} or {\tt S} are specified
-   then {\tt D} is assumed (that is, the default units are degrees).
+  \item If none of \texttt{H}, \texttt{D}, \texttt{M} or \texttt{S} are specified
+   then \texttt{D} is assumed (that is, the default units are degrees).
 
-  \item If {\tt H} or {\tt D} are present but {\tt M} is omitted then
+  \item If \texttt{H} or \texttt{D} are present but \texttt{M} is omitted then
    the hours or degrees are not subdivided into minutes.
 
-  \item If {\tt M} is present but {\tt S} is omitted then the minutes
+  \item If \texttt{M} is present but \texttt{S} is omitted then the minutes
    are not subdivided into seconds.
 
-  \item If {\tt S} is present in addition to {\tt H} or {\tt D} but
-   {\tt M} is absent then {\tt S} is ignored (this case is technically
+  \item If \texttt{S} is present in addition to \texttt{H} or \texttt{D} but
+   \texttt{M} is absent then \texttt{S} is ignored (this case is technically
    illegal).
 
-  \item If {\it .n}\, is omitted then the least significant unit
+  \item If \textit{.n}\, is omitted then the least significant unit
    (seconds, minutes, degrees or hours, as appropriate) is
    displayed as a whole number, without any places of decimals.
 
@@ -4216,26 +3670,26 @@ would represent an angle.
 \begin{center}
 \begin{tabular}{lll}
 Specifier     & Example            & Notes          \\ \hline
-{\tt D}       & {\tt 63}          & Integer degrees \\
-{\tt D.2}     & {\tt 62.86}       & Degrees to two places of decimals \\
-{\tt DM}      & {\tt 62:52}       & Degrees and integer minutes \\
-{\tt DM.2}    & {\tt 62:51.58}    & Degrees and minutes to two places of decimals \\
-{\tt DMS}     & {\tt 62:51:35}    & Degrees, minutes and integer seconds \\
-{\tt DMS.2}   & {\tt 62:51:34.65} & Degrees, minutes and seconds to two places of decimals \\
+\texttt{D}       & \texttt{63}          & Integer degrees \\
+\texttt{D.2}     & \texttt{62.86}       & Degrees to two places of decimals \\
+\texttt{DM}      & \texttt{62:52}       & Degrees and integer minutes \\
+\texttt{DM.2}    & \texttt{62:51.58}    & Degrees and minutes to two places of decimals \\
+\texttt{DMS}     & \texttt{62:51:35}    & Degrees, minutes and integer seconds \\
+\texttt{DMS.2}   & \texttt{62:51:34.65} & Degrees, minutes and seconds to two places of decimals \\
               &                    & \\
-{\tt H}       & {\tt 4}            & Integer hours \\
-{\tt H.2}     & {\tt 4.19}         & Hours to two places of decimals \\
-{\tt HM}      & {\tt 4:11}         & Hours and integer minutes \\
-{\tt HM.2}    & {\tt 4:11.44}      & Hours and minutes to two places of decimals \\
-{\tt HMS}     & {\tt 4:11:26}      & Hours, minutes and integer seconds \\
-{\tt HMS.2}   & {\tt 4:11:26.31}   & Hours, minutes and seconds to two places of decimals \\
+\texttt{H}       & \texttt{4}            & Integer hours \\
+\texttt{H.2}     & \texttt{4.19}         & Hours to two places of decimals \\
+\texttt{HM}      & \texttt{4:11}         & Hours and integer minutes \\
+\texttt{HM.2}    & \texttt{4:11.44}      & Hours and minutes to two places of decimals \\
+\texttt{HMS}     & \texttt{4:11:26}      & Hours, minutes and integer seconds \\
+\texttt{HMS.2}   & \texttt{4:11:26.31}   & Hours, minutes and seconds to two places of decimals \\
               &                    & \\
-{\tt BHMS.2}  & {\tt 4 11 26.31}   & Space character as separator \\
-{\tt LHMS.2}  & {\tt 4h11m26.31s}  & Letter as separator \\
-{\tt ZHMS.2}  & {\tt 04:11:26.31}  & Leading zeros \\
-{\tt +HMS.2}  & {\tt +4:11:26.31}  & Signed value \\
+\texttt{BHMS.2}  & \texttt{4 11 26.31}   & Space character as separator \\
+\texttt{LHMS.2}  & \texttt{4h11m26.31s}  & Letter as separator \\
+\texttt{ZHMS.2}  & \texttt{04:11:26.31}  & Leading zeros \\
+\texttt{+HMS.2}  & \texttt{+4:11:26.31}  & Signed value \\
               &                    & \\
-{\tt L+ZDM.3} & {\tt +062d51.577}  & Letter separator, leading zeros and signed \\
+\texttt{L+ZDM.3} & \texttt{+062d51.577}  & Letter separator, leading zeros and signed \\
 \end{tabular}
 
 \begin{quote}
@@ -4254,26 +3708,26 @@ The examples show how the various specifiers would represent an angle of
 \begin{center}
 \begin{tabular}{lll}
 Specifier   & Example        & Notes          \\ \hline
-{\tt M}     & {\tt 3}        & Integer minutes of arc \\
-{\tt M.3}   & {\tt 3.227}    & Minutes of arc to three places of decimals \\
-{\tt MS}    & {\tt 3:14}     & Minutes and integer seconds of arc \\
-{\tt MS.3}  & {\tt 3:13.600} & Minutes and seconds of arc to three places of decimals \\
-{\tt S}     & {\tt 194}      & Integer seconds of arc \\
-{\tt S.3}   & {\tt 193.600}  & Seconds of arc to three places of decimals \\
+\texttt{M}     & \texttt{3}        & Integer minutes of arc \\
+\texttt{M.3}   & \texttt{3.227}    & Minutes of arc to three places of decimals \\
+\texttt{MS}    & \texttt{3:14}     & Minutes and integer seconds of arc \\
+\texttt{MS.3}  & \texttt{3:13.600} & Minutes and seconds of arc to three places of decimals \\
+\texttt{S}     & \texttt{194}      & Integer seconds of arc \\
+\texttt{S.3}   & \texttt{193.600}  & Seconds of arc to three places of decimals \\
             &                & \\
-{\tt MT}    & {\tt 0}        & Integer minutes of time \\
-{\tt MT.3}  & {\tt 0.215}    & Minutes of time to three places of decimals \\
-{\tt MST}   & {\tt 0:13}     & Minutes and integer seconds of time\\
-{\tt MST.3} & {\tt 0:12.907} & Minutes and seconds of time to three places of decimals \\
-{\tt ST}    & {\tt 13}       & Integer seconds of time \\
-{\tt ST.3}  & {\tt 12.907}   & Seconds of time to three places of decimals \\
+\texttt{MT}    & \texttt{0}        & Integer minutes of time \\
+\texttt{MT.3}  & \texttt{0.215}    & Minutes of time to three places of decimals \\
+\texttt{MST}   & \texttt{0:13}     & Minutes and integer seconds of time\\
+\texttt{MST.3} & \texttt{0:12.907} & Minutes and seconds of time to three places of decimals \\
+\texttt{ST}    & \texttt{13}       & Integer seconds of time \\
+\texttt{ST.3}  & \texttt{12.907}   & Seconds of time to three places of decimals \\
             &                & \\
-{\tt BMS}   & {\tt 3 14}     & Space character as separator \\
-{\tt LMS}   & {\tt 3m14s}    & Letter as separator \\
-{\tt ZMS}   & {\tt 03:14}    & Leading zeros \\
-{\tt +MS}   & {\tt +3:14}    & Signed value \\
+\texttt{BMS}   & \texttt{3 14}     & Space character as separator \\
+\texttt{LMS}   & \texttt{3m14s}    & Letter as separator \\
+\texttt{ZMS}   & \texttt{03:14}    & Leading zeros \\
+\texttt{+MS}   & \texttt{+3:14}    & Signed value \\
             &                & \\
-{\tt L+ZMS} & {\tt +03m14s}  & Letter separator, leading zeros and signed \\
+\texttt{L+ZMS} & \texttt{+03m14s}  & Letter separator, leading zeros and signed \\
 \end{tabular}
 
 \begin{quote}
@@ -4292,8 +3746,8 @@ small angles}
 
 \end{table}
 
-The simple angular format specifiers, `{\tt HOURS}', `{\tt DEGREES}',
-`{\tt ARCMIN}', `{\tt ARCSEC}', `{\tt TIMEMIN}' and `{\tt TIMESEC}'
+The simple angular format specifiers, `\texttt{HOURS}', `\texttt{DEGREES}',
+`\texttt{ARCMIN}', `\texttt{ARCSEC}', `\texttt{TIMEMIN}' and `\texttt{TIMESEC}'
 are just synonyms for particular cases of the
 general specifiers. They are listed, together with the
 equivalent full specification in Table~\ref{SEXAG_SIMPLE}.
@@ -4303,24 +3757,24 @@ equivalent full specification in Table~\ref{SEXAG_SIMPLE}.
 \begin{center}
 \begin{tabular}{lllc}
 Simple Specifier & Equivalent Full Specifier & Example & Notes \\ \hline
-{\tt HOURS}      & {\tt IHMS.1} & {\tt 14:11:26.3} & 1  \\
-{\tt DEGREES}    & {\tt IDMS}   & {\tt 62:51:35}   & 1  \\
+\texttt{HOURS}      & \texttt{IHMS.1} & \texttt{14:11:26.3} & 1  \\
+\texttt{DEGREES}    & \texttt{IDMS}   & \texttt{62:51:35}   & 1  \\
                  &              &                  &    \\
-{\tt ARCMIN}     & {\tt M}      & {\tt 3}          & 2  \\
-{\tt ARCSEC}     & {\tt S}      & {\tt 194}        & 2  \\
-{\tt TIMEMIN}    & {\tt MT}     & {\tt 0}          & 2  \\
-{\tt TIMESEC}    & {\tt ST}     & {\tt 13}         & 2  \\
+\texttt{ARCMIN}     & \texttt{M}      & \texttt{3}          & 2  \\
+\texttt{ARCSEC}     & \texttt{S}      & \texttt{194}        & 2  \\
+\texttt{TIMEMIN}    & \texttt{MT}     & \texttt{0}          & 2  \\
+\texttt{TIMESEC}    & \texttt{ST}     & \texttt{13}         & 2  \\
                  &              &                  &    \\
-{\tt ARCMIN.3}   & {\tt M.3}    & {\tt 3.227}      & 3  \\
-{\tt ARCSEC.3}   & {\tt S.3}    & {\tt 193.600}    & 3  \\
-{\tt TIMEMIN.3}  & {\tt MT.3}   & {\tt 0.215}      & 3  \\
-{\tt TIMESEC.3}  & {\tt ST.3}   & {\tt 12.907}     & 3  \\
+\texttt{ARCMIN.3}   & \texttt{M.3}    & \texttt{3.227}      & 3  \\
+\texttt{ARCSEC.3}   & \texttt{S.3}    & \texttt{193.600}    & 3  \\
+\texttt{TIMEMIN.3}  & \texttt{MT.3}   & \texttt{0.215}      & 3  \\
+\texttt{TIMESEC.3}  & \texttt{ST.3}   & \texttt{12.907}     & 3  \\
 \end{tabular}
 
 \vspace{4mm}
 
 \begin{quote}
-{\bf Notes}
+\textbf{Notes}
 
 \begin{enumerate}
 
@@ -4351,47 +3805,46 @@ Displaying angles in units of hours, degrees, minutes or seconds,
 optionally formatted as sexagesimal values is usually the required
 behaviour. However, occasionally you may want to display angles as
 simple decimal numbers expressed in radians. CAT also provides this
-facility. It can be configured so that {\tt CAT\_EGT0F} returns an
+facility. It can be configured so that \texttt{CAT\_EGT0F} returns an
 angle expressed in radians, written into a CHARACTER string using
 the Fortran 77 external format specifier for the column (defined by
 attribute EXFMT). In this case CAT is treating columns of angles
-just like any other column; {\tt CAT\_EGT0F} simply writes the
+just like any other column; \texttt{CAT\_EGT0F} simply writes the
 value into a CHARACTER string using the external display format
 specifier.
 
 To control whether angles are converted to hours, degrees, minutes or
 seconds and optionally formatted as sexagesimal values or simply written
 as a decimal number in radians you must set a configuration (or
-`tuning') parameter in CAT. This parameter is called `{\tt ANGLE\_LIST}'
-and is set using routine {\tt CAT\_TUNES}. Proceed as follows.
+`tuning') parameter in CAT. This parameter is called `\texttt{ANGLE\_LIST}'
+and is set using routine \texttt{CAT\_TUNES}. Proceed as follows.
 
 \begin{itemize}
 
   \item to configure CAT to return angles as radians:
 
-  \begin{verse}
-   {\tt CALL CAT\_TUNES ('ANGLE\_LIST', 'RADIANS', STATUS)}
-  \end{verse}
+  \begin{terminalv}
+CALL CAT\_TUNES ('ANGLE_LIST', 'RADIANS', STATUS)
+  \end{terminalv}
 
   \item to configure CAT to return angles as hours, degrees, minutes
    or seconds, optionally formatted as sexagesimal values:
 
-  \begin{verse}
-   {\tt CALL CAT\_TUNES ('ANGLE\_LIST', 'SEXAGESIMAL', STATUS)}
-  \end{verse}
+  \begin{terminalv}
+CALL CAT_TUNES ('ANGLE_LIST', 'SEXAGESIMAL', STATUS)
+  \end{terminalv}
 
 \end{itemize}
 
 Once one of these alternatives has been set it will remain in
-effect until another call is made to {\tt CAT\_TUNES} to reset
+effect until another call is made to \texttt{CAT\_TUNES} to reset
 it. The default if the representation is never explicitly set is
 that angles are converted to hours, degrees, minutes or seconds and
 optionally output as sexagesimal values.
 
-You can inquire the current value of tuning parameter `{\tt
-ANGLE\_LIST}' using routine {\tt CAT\_TUNEG}:
+You can inquire the current value of tuning parameter `\texttt{ANGLE\_LIST}' using routine \texttt{CAT\_TUNEG}:
 
-\begin{verbatim}
+\begin{terminalv}
      CHARACTER
     :  TVALUE*75   ! Current value for angle representation.
       .
@@ -4400,10 +3853,10 @@ ANGLE\_LIST}' using routine {\tt CAT\_TUNEG}:
 
 
      CALL CAT_TUNEG ('ANGLE_LIST', TVALUE, STATUS)
-\end{verbatim}
+\end{terminalv}
 
-and {\tt TVALUE} will be returned set to `{\tt RADIANS}' or
-`{\tt SEXAGESIMAL}', as appropriate.
+and \texttt{TVALUE} will be returned set to `\texttt{RADIANS}' or
+`\texttt{SEXAGESIMAL}', as appropriate.
 
 
 \cleardoublepage
@@ -4418,7 +3871,7 @@ routines are listed in alphabetical order.
 \begin{small}
 % -- prologue comments generated by PROLAT -----------------------------
 
-% {\sf Specifications generated from prologues to go here.}
+% \textsf{Specifications generated from prologues to go here.}
 
 % \input{CAT.TEX}
 
@@ -4431,7 +3884,7 @@ routines are listed in alphabetical order.
    \sstdescription{
       Open an existing catalogue; the name of the catalogue is obtained
       from an ADAM parameter.  If an existing catalogue is opened with
-      MODE = {\tt '}WRITE{\tt '} then it is overwritten.
+      MODE = \texttt{'}WRITE\texttt{'} then it is overwritten.
    }
    \sstinvocation{
       CALL CAT\_ASSOC (PCNAME, MODE; CI; STATUS)
@@ -4908,8 +4361,8 @@ routines are listed in alphabetical order.
       }{
          Value to which the expression evaluates for the current row
          buffer.  If the expression evaluates to null the string
-         returned is {\tt '}$<$null$>${\tt '} if VALUE contains six or more characters,
-         otherwise it is {\tt '}?{\tt '}.
+         returned is \texttt{'}$<$null$>$\texttt{'} if VALUE contains six or more characters,
+         otherwise it is \texttt{'}?\texttt{'}.
       }
       \sstsubsection{
          NULFLG  =  LOGICAL (Returned)
@@ -5112,8 +4565,8 @@ routines are listed in alphabetical order.
       }{
          Value to which the expression evaluates for the current row
          buffer.  If the expression evaluates to null the string
-         returned is {\tt '}$<$null$>${\tt '} if VALUE contains six or more characters,
-         otherwise it is {\tt '}?{\tt '}.
+         returned is \texttt{'}$<$null$>$\texttt{'} if VALUE contains six or more characters,
+         otherwise it is \texttt{'}?\texttt{'}.
       }
       \sstsubsection{
          NULFLG  =  LOGICAL (Returned)
@@ -5347,8 +4800,8 @@ routines are listed in alphabetical order.
          DISP  =  CHARACTER$*$($*$) (Given)
       }{
          The disposition of the index.  The possibilities are:
-         {\tt '}TEMP{\tt '}  -  temporary,
-         {\tt '}PERM{\tt '}  -  permanent.
+         \texttt{'}TEMP\texttt{'}  -  temporary,
+         \texttt{'}PERM\texttt{'}  -  permanent.
          Currently only temporary indices are implemented.
       }
       \sstsubsection{
@@ -5757,7 +5210,7 @@ routines are listed in alphabetical order.
          CLASS   =  CHARACTER$*$($*$) (Returned)
       }{
          Class of the textual information.  The standard classes
-         {\tt '}COMMENT{\tt '} and {\tt '}HISTORY{\tt '} are available for all back-ends.
+         \texttt{'}COMMENT\texttt{'} and \texttt{'}HISTORY\texttt{'} are available for all back-ends.
          Individual back-ends may support additional classes.
       }
       \sstsubsection{
@@ -6339,7 +5792,7 @@ routines are listed in alphabetical order.
       \sstsubsection{
          ACCESS  =  CHARACTER$*$($*$) (Given)
       }{
-         Mode in which the text is to be accessed; {\tt '}READ{\tt '} or {\tt '}WRITE{\tt '}.
+         Mode in which the text is to be accessed; \texttt{'}READ\texttt{'} or \texttt{'}WRITE\texttt{'}.
       }
       \sstsubsection{
          LINESZ  =  INTEGER (Returned)
@@ -6574,7 +6027,7 @@ routines are listed in alphabetical order.
    \sstdescription{
       Determine the parent to a component.  That is, the routine is
       give the identifier of a component and it will return the
-      identifier of that component{\tt '}s parent catalogue.
+      identifier of that component\texttt{'}s parent catalogue.
 
       If the routine is given a catalogue identifier it will return
       the null identifier, because catalogues do not have parents.
@@ -6769,21 +6222,21 @@ routines are listed in alphabetical order.
 
       The matrix of possibilities for STATE and MODE is:
 
-      STATE = {\tt '}NEW{\tt '}, then
-        MODE = {\tt '}WRITE{\tt '} is ok
-        and MODE = {\tt '}READ{\tt '} if forbidden.
+      STATE = \texttt{'}NEW\texttt{'}, then
+        MODE = \texttt{'}WRITE\texttt{'} is ok
+        and MODE = \texttt{'}READ\texttt{'} if forbidden.
 
-      STATE = {\tt '}OLD{\tt '} then
-        MODE = {\tt '}WRITE{\tt '} is ok
-        and MODE = {\tt '}READ{\tt '} is ok.
+      STATE = \texttt{'}OLD\texttt{'} then
+        MODE = \texttt{'}WRITE\texttt{'} is ok
+        and MODE = \texttt{'}READ\texttt{'} is ok.
 
       Notes:
 
       $*$ If a catalogue already exists and an attempt is made to open
-        it with STATE = {\tt '}NEW{\tt '}, CAT\_TOPEN will fail with an error.
+        it with STATE = \texttt{'}NEW\texttt{'}, CAT\_TOPEN will fail with an error.
 
-      $*$ If an existing catalogue is opened with STATE = {\tt '}OLD{\tt '} and
-        MODE = {\tt '}WRITE{\tt '} it will be overwritten.
+      $*$ If an existing catalogue is opened with STATE = \texttt{'}OLD\texttt{'} and
+        MODE = \texttt{'}WRITE\texttt{'} it will be overwritten.
    }
    \sstinvocation{
       CALL CAT\_TOPEN (CNAME, STATE, MODE; CI; STATUS)
@@ -6921,7 +6374,7 @@ routines are listed in alphabetical order.
          CATPRM  =  CHARACTER$*$($*$) (Given)
       }{
          Name of the catalogue parameter which is to be got.  Currently
-         the only parameters supported are {\tt '}ANGLE\_LIST{\tt '} and {\tt '}QUIET{\tt '}.
+         the only parameters supported are \texttt{'}ANGLE\_LIST\texttt{'} and \texttt{'}QUIET\texttt{'}.
       }
       \sstsubsection{
          VALUE  =  CHARACTER$*$($*$) (Given)
@@ -6961,7 +6414,7 @@ routines are listed in alphabetical order.
          CATPRM  =  CHARACTER$*$($*$) (Given)
       }{
          Name of the CAT tuning parameter which is to be set.  Currently
-         the tuning parameters supported are {\tt '}ANGLE\_LIST{\tt '} and {\tt '}QUIET{\tt '}.
+         the tuning parameters supported are \texttt{'}ANGLE\_LIST\texttt{'} and \texttt{'}QUIET\texttt{'}.
       }
       \sstsubsection{
          VALUE  =  CHARACTER$*$($*$) (Given)
@@ -6969,13 +6422,13 @@ routines are listed in alphabetical order.
          Value required for the catalogue parameter.
 
          For parameter ANGLE\_LIST the values may be as follows:
-           {\tt '}RADIANS{\tt '}     -  output angles in radians,
-           {\tt '}SEXAGESIMAL{\tt '} -  output angles in hours or degrees, formatted
+           \texttt{'}RADIANS\texttt{'}     -  output angles in radians,
+           \texttt{'}SEXAGESIMAL\texttt{'} -  output angles in hours or degrees, formatted
               as sexagesimal values.
 
          For parameter QUIET the values may be as follows:
-           {\tt '}YES{\tt '} - do not issue informational messages (ie. be quiet),
-           {\tt '}NO{\tt '}  - issue informational messages (ie. not quiet).
+           \texttt{'}YES\texttt{'} - do not issue informational messages (ie. be quiet),
+           \texttt{'}NO\texttt{'}  - issue informational messages (ie. not quiet).
       }
       \sstsubsection{
          STATUS  =  INTEGER (Given and Returned)
@@ -7070,22 +6523,21 @@ routines are listed in alphabetical order.
 \section{\label{EXPR}\xlabel{EXPR}Expression syntax}
 
 This appendix discusses the syntax permitted for expressions passed
-to the expression parser. Expressions are input to CAT as argument {\tt
-EXPR} of subroutine {\tt CAT\_EIDNT} (see Section~\ref{SUBINT}).
+to the expression parser. Expressions are input to CAT as argument \texttt{EXPR} of subroutine \texttt{CAT\_EIDNT} (see Section~\ref{SUBINT}).
 
 Expressions have an algebraic format, and comprise: columns, vector
 column elements, parameters and constants linked by arithmetic
 operators and mathematical functions. For example, suppose that a
-catalogue contained scalar columns called {\tt x}, {\tt y} and {\tt z}
-and parameters called {\tt p} and {\tt q}.  Some valid expressions are:
+catalogue contained scalar columns called \texttt{x}, \texttt{y} and \texttt{z}
+and parameters called \texttt{p} and \texttt{q}.  Some valid expressions are:
 
 \begin{equation}
 \begin{array}{l}
-{\tt x}  \\
-{\tt p}  \\
-{\tt x + p}  \\
-{\tt (x + y + 2) / (p + q)}  \\
-{\tt (2.0*x + y + 3.75*p) + 13.0) / (z + 1.8*q)}
+\texttt{x}  \\
+\texttt{p}  \\
+\texttt{x + p}  \\
+\texttt{(x + y + 2) / (p + q)}  \\
+\texttt{(2.0*x + y + 3.75*p) + 13.0) / (z + 1.8*q)}
 \end{array}
 \end{equation}
 
@@ -7094,16 +6546,16 @@ Thus the following column or parameter names would all be considered
 equivalent:
 
 \begin{verse}
-{\tt HD\_NUMBER} \\
-{\tt HD\_Number} \\
-{\tt hd\_number}
+\texttt{HD\_NUMBER} \\
+\texttt{HD\_Number} \\
+\texttt{hd\_number}
 \end{verse}
 
 Vector column elements occur in expressions with their usual syntax:
 the name of the base column followed by the element number enclosed
 in square brackets. The first element in a vector is numbered one. For
 example, an expression to add two to the fourth element of vector
-{\tt FLUX} would be `{\tt FLUX[4] + 2.0}'.
+\texttt{FLUX} would be `\texttt{FLUX[4] + 2.0}'.
 
 
 \subsection{Details of expressions}
@@ -7111,13 +6563,13 @@ example, an expression to add two to the fourth element of vector
 The arithmetic operators are:
 
 \begin{tabular}{ll}
-{\tt +}  & addition,        \\
-{\tt -}  & subtraction,     \\
-{\tt *}  & multiplication,  \\
-{\tt /}  & division.        \\
+\texttt{+}  & addition,        \\
+\texttt{-}  & subtraction,     \\
+\texttt{*}  & multiplication,  \\
+\texttt{/}  & division.        \\
 \end{tabular}
 
-brackets (`{\tt (}' and `{\tt )}') may be used as required.
+brackets (`\texttt{(}' and `\texttt{)}') may be used as required.
 
 
 \subsection{Mathematical functions provided}
@@ -7206,23 +6658,23 @@ as noted below.
   \item Lower-case letters are treated everywhere as identical to the
    corresponding upper-case letter.
 
-  \item Column and parameter names can be up to {\tt CAT\_\_SZCMP}
+  \item Column and parameter names can be up to \texttt{CAT\_\_SZCMP}
    characters long, and may consist of letters, digits, and underscores,
    except that the first character must not be a digit.
 
   \item Vector elements are supported but with a restricted syntax:
    they may consist of a name followed by an unsigned integer constant
-   subscript enclosed in square brackets, for example {\tt FLUX[4]} or
-   {\tt MAGNITUDE[13]}. The first element of the vector is numbered one.
+   subscript enclosed in square brackets, for example \texttt{FLUX[4]} or
+   \texttt{MAGNITUDE[13]}. The first element of the vector is numbered one.
 
   \item CHARACTER constants may be enclosed in a pair of single or
    double quotes; embedded quotes of the same type may be denoted by
    doubling up on the quote character within the string, for example
    \verb+'DON''T'+ or \verb+"DON""T"+.
 
-  \item LOGICAL constants may be {\tt .TRUE.} or {\tt .FALSE.} but
-   abbreviations of these words are allowed down to {\tt .T.} and
-   {\tt .F.}
+  \item LOGICAL constants may be \texttt{.TRUE.} or \texttt{.FALSE.} but
+   abbreviations of these words are allowed down to \texttt{.T.} and
+   \texttt{.F.}
 
   \item Numerical constants may appear in any valid form for Fortran 77
    (except that embedded spaces are not allowed).  Some additional forms
@@ -7243,30 +6695,30 @@ as noted below.
    three-character abbreviation.  The time may follow with colons separating
    hours:minutes:seconds.  Examples of some valid dates:
   \begin{verse}
-   {\tt 1992-JUL-26 12:34:56}  \\
-   {\tt 92.7.26}  \\
-   {\tt 26/7/92T3:45}
+   \texttt{1992-JUL-26 12:34:56}  \\
+   \texttt{92.7.26}  \\
+   \texttt{26/7/92T3:45}
   \end{verse}
 
   \item Relational operators are supported in both Fortran 77 form
-   (for example {\tt .GE. .NE.}) as well as in the Fortran 90 forms (for
-   example, ${\tt >=}$ ${\tt /=}$ ).
+   (for example \texttt{.GE. .NE.}) as well as in the Fortran 90 forms (for
+   example, $\texttt{>=}$ $\texttt{/=}$ ).
 
-  \item Single-symbol forms for {\tt .AND. .OR. and .NOT.} are provided as
-   an alternative: {\tt \&} ${\tt |}$ {\tt \#} respectively.
+  \item Single-symbol forms for \texttt{.AND. .OR. and .NOT.} are provided as
+   an alternative: \texttt{\&} $\texttt{|}$ \texttt{\#} respectively.
 
   \item The dots may be left off the Fortran 77 forms of the relational
-   operators and the logical operators {\tt .AND.} and {\tt .OR.} where
+   operators and the logical operators \texttt{.AND.} and \texttt{.OR.} where
    spaces or parentheses separate them from names or constants, but the
-   logical constants and the {\tt .NOT.} operator need the enclosing dots
+   logical constants and the \texttt{.NOT.} operator need the enclosing dots
    to distinguish them from other lexical items in all cases.
 
   \item INTEGER division does not result in truncation (as in Fortran)
-   but produces a floating-point result.  The {\tt NINT} or {\tt INT}
+   but produces a floating-point result.  The \texttt{NINT} or \texttt{INT}
    function should be used (as appropriate) if an INTEGER result is
    required.
 
-  \item The functions {\tt MAX} and {\tt MIN} must have exactly two
+  \item The functions \texttt{MAX} and \texttt{MIN} must have exactly two
    arguments.
 
   \item All arithmetic is carried out internally in DOUBLE PRECISION
@@ -7274,7 +6726,7 @@ as noted below.
    the normal expression rules).
 
   \item Exponentiation is performed by log/exp functions, with use of
-   ABS to avoid taking logs of negative arguments, thus {\tt -2**3} will
+   ABS to avoid taking logs of negative arguments, thus \texttt{-2**3} will
    come out as `+8' not `-8'.
 
 \end{enumerate}
@@ -7291,19 +6743,19 @@ numbers denote higher precedence (tighter binding).
 \begin{tabular}{rl}
 Precedence  & Function/operator  \\ \hline
   2 & start/end of expression  \\
-  4 & {\tt (  )}  \\
-  6 & {\tt ,}  \\
-  8 & {\tt .EQV.  .NEQV.}  \\
- 10 & {\tt  .OR.}   ${\tt |}$  \\
- 12 & {\tt .AND.  \&} \\
- 14 & {\tt .NOT.  \#}  \\
- 16 & {\tt .EQ. .GE. .GT. .LE. .LT. .NE.} ${\tt == ~ >= ~ > ~ <= ~ < ~ /=}$ \\
- 18 & {\tt FROM  TO}  \\
- 20 & {\tt  //}  \\
- 22 & {\tt  + -} (binary operators)  \\
- 24 & {\tt  + -} (unary operators)  \\
- 26 & {\tt  * /}  \\
- 28 & {\tt  **}  \\
+  4 & \texttt{(  )}  \\
+  6 & \texttt{,}  \\
+  8 & \texttt{.EQV.  .NEQV.}  \\
+ 10 & \texttt{.OR.}   $\texttt{|}$  \\
+ 12 & \texttt{.AND.  \&} \\
+ 14 & \texttt{.NOT.  \#}  \\
+ 16 & \texttt{.EQ. .GE. .GT. .LE. .LT. .NE.} $\texttt{== ~ >= ~ > ~ <= ~ < ~ /=}$ \\
+ 18 & \texttt{FROM  TO}  \\
+ 20 & \texttt{//}  \\
+ 22 & \texttt{+ -} (binary operators)  \\
+ 24 & \texttt{+ -} (unary operators)  \\
+ 26 & \texttt{* /}  \\
+ 28 & \texttt{**}  \\
  30 & all functions  \\
 \end{tabular}
 \end{center}
@@ -7313,8 +6765,8 @@ Precedence  & Function/operator  \\ \hline
 \end{table}
 
 
-Note that all operators except {\tt **} associate from left to right, but
-{\tt **} and functions associate from right to left.
+Note that all operators except \texttt{**} associate from left to right, but
+\texttt{**} and functions associate from right to left.
 
 
 \newpage
@@ -7328,16 +6780,14 @@ CAT determines the type of a catalogue from the `file type' component
 of the name of the file holding the catalogue. The file types for the
 various formats are included in the descriptions below. If a file name
 is specified without a file type then it is assumed to be a FITS table
-of file type {\tt .FIT}.
+of file type \texttt{.FIT}.
 
 
 \subsection{FITS}
 
-File types: {\tt .FIT  .fit  .FITS  .fits  .GSC  .gsc}
+File types: \texttt{.FIT  .fit  .FITS  .fits  .GSC  .gsc}
 
-Mixed capitalisations, such as {\tt .Fit}, are also supported.  The {\tt
-.GSC} file types are supported in order to allow regions of the HST {\it
-Guide Star Catalog}\, to be accessed.
+Mixed capitalisations, such as \texttt{.Fit}, are also supported.  The \texttt{.GSC} file types are supported in order to allow regions of the HST \textit{Guide Star Catalog}\, to be accessed.
 
 CAT can read both binary and formatted FITS tables. It can write only
 binary FITS tables. It should be able to handle most components of
@@ -7374,11 +6824,11 @@ for a table in the first extension. In cases where the table is located
 in an extension other than the first you may specify the required
 extension by giving its number inside curly brackets after the name
 of the file. For example, if the table occurred in the third extension
-of a FITS file called {\tt perseus.FIT} you would specify:
+of a FITS file called \texttt{perseus.FIT} you would specify:
 
-\begin{verbatim}
+\begin{terminalv}
 perseus.FIT{3}
-\end{verbatim}
+\end{terminalv}
 
 The closing curly bracket is optional. When CAT writes FITS tables
 the table is always written to the first extension.
@@ -7425,9 +6875,9 @@ Write  & COMMENT  & Comment line  \\
 
 \subsection{STL}
 
-File types: {\tt .TXT  .txt}
+File types: \texttt{.TXT  .txt}
 
-Mixed capitalisations, such as {\tt .Txt}, are also supported.
+Mixed capitalisations, such as \texttt{.Txt}, are also supported.
 
 CAT can read and write catalogues in the STL (Small Text List) format.
 Unlike the other formats which CAT can access the STL format is specific
@@ -7439,9 +6889,8 @@ catalogue from a text file containing a private list or standard catalogue.
 In the STL format both the table of values for the catalogue and the
 definitions of its columns, parameters etc. are held in simple ASCII
 text files.  These files may be created and modified with a text editor.
-The information defining the catalogue is called the {\bf description} of
-the catalogue and the file in which it is held is called the {\bf
-description file}.
+The information defining the catalogue is called the \textbf{description} of
+the catalogue and the file in which it is held is called the \textbf{description file}.
 
 When you specify a small text list you give the name of the description
 file.  The table of values comprising the catalogue may either be in the
@@ -7465,7 +6914,7 @@ The CURSA documentation refers to various example files kept in
 directory:
 
 \begin{verse}
-{\tt /star/share/cursa}
+\texttt{/star/share/cursa}
 \end{verse}
 
 As a precaution against the unlikely eventuality that CAT is installed
@@ -7473,7 +6922,7 @@ on your system but CURSA is not, there are copies of these files in
 directory:
 
 \begin{verse}
-{\tt /star/share/cat}
+\texttt{/star/share/cat}
 \end{verse}
 
 The correspondence between items in an STL description and components
@@ -7551,16 +7000,16 @@ Null values are not permitted in the KAPPA variant of the STL format.
 
 \subsection{TST}
 
-File types: {\tt .TAB  .tab}
+File types: \texttt{.TAB  .tab}
 
-Mixed capitalisations, such as {\tt .Tab}, are also supported.
+Mixed capitalisations, such as \texttt{.Tab}, are also supported.
 
 CAT can read and write catalogues in the TST (Tab-Separated Table)
 format.  The TST format is a standard for exchanging catalogue data
 and is commonly used to transfer subsets extracted from remote catalogues
 or archives across the Internet.  It is used by GAIA (see
 \xref{SUN/214}{sun214}{}\cite{SUN214}) and
-\htmladdnormallinkfoot{{\it SkyCat}\/}{http://archive.eso.org/skycat/}.
+\htmladdnormallinkfoot{\textit{SkyCat}\/}{http://archive.eso.org/skycat/}.
 The TST format is described in
 \xref{SSN/75}{ssn75}{}\cite{SSN75}.
 
@@ -7643,12 +7092,12 @@ value is included for the null field.
 \begin{thebibliography}{99}
 
   \bibitem{SUN95} M.J.~Currie and D.S.~Berry, 20 October 2000,
-   \xref{SUN/95.16}{sun95}{}: {\it KAPPA --- Kernel Application Package},
+   \xref{SUN/95.16}{sun95}{}: \textit{KAPPA --- Kernel Application Package},
     Starlink.
 
-  \bibitem{STARBASE34} A.C.~Davenhall, September 1993, {\it The Starlink
+  \bibitem{STARBASE34} A.C.~Davenhall, September 1993, \textit{The Starlink
    Subroutine Interface for Manipulating Catalogues}\/ (StarBase/ACD/3.4).
-   See also A.C.~Davenhall, December 1992, {\it Requirements for a
+   See also A.C.~Davenhall, December 1992, \textit{Requirements for a
    Starlink RDBMS}\/ (StarBase/ACD/2.1).
    These documents were written as part of the project to define
    and implement the CAT subroutine library.  StarBase/ACD/3.4 gives the
@@ -7659,36 +7108,34 @@ value is included for the null field.
    datasets.
 
   \bibitem{SUN190} A.C.~Davenhall, 25 July 2000,
-   \xref{SUN/190.8}{sun190}{}: {\it CURSA --- Catalogue and Table
+   \xref{SUN/190.8}{sun190}{}: \textit{CURSA --- Catalogue and Table
     Manipulation Applications}, Starlink.
 
   \bibitem{SSN75} A.C.~Davenhall, 26 July 2000,
-   \xref{SSN/75.1}{ssn75}{}: {\it Writing Catalogue and Image Servers for
+   \xref{SSN/75.1}{ssn75}{}: \textit{Writing Catalogue and Image Servers for
    GAIA and CURSA}, Starlink.
 
   \bibitem{SUN214} P.W.~Draper and N.~Gray, 16 October 2000,
-   \xref{SUN/214.8}{sun214}{}: {\it GAIA --- Graphical Astronomy and
+   \xref{SUN/214.8}{sun214}{}: \textit{GAIA --- Graphical Astronomy and
    Image Analysis Tool}, Starlink.
 
-  \bibitem{ROTH} M.A. Roth, H.F. Korth and A. Silberschatz, 1989, {\it
-   Acta Informatica}\, {\bf 26}, pp615-642.
+  \bibitem{ROTH} M.A. Roth, H.F. Korth and A. Silberschatz, 1989, \textit{Acta Informatica}\, \textbf{26}, pp615-642.
 
-  \bibitem{RUMBLE} J.R.~Rumble and F.J.~Smith, 1990, {\it Database
+  \bibitem{RUMBLE} J.R.~Rumble and F.J.~Smith, 1990, \textit{Database
    Systems in Science and Engineering}\, (Adam Hilger: Bristol).
 
   \bibitem{SUN111} D.L.~Terrett and P.M.~Allan, 1 February 1993,
-   \xref{SUN/111.2}{sun111}{}: {\it SPT -- Software Porting Tools},
+   \xref{SUN/111.2}{sun111}{}: \textit{SPT -- Software Porting Tools},
    Starlink.
 
-  \bibitem{SGP16} P.T.~Wallace, 23 March 1992, SGP/16.10: {\it
-   Starlink Application Programming Standard}, Starlink.
+  \bibitem{SGP16} P.T.~Wallace, 23 March 1992, SGP/16.10: \textit{Starlink Application Programming Standard}, Starlink.
 
   \bibitem{SUN39} R.F.~Warren-Smith, 28 February 1995,
-   SUN/39.2: {\it PRIMDAT --- Processing of Primitive Numerical Data},
+   SUN/39.2: \textit{PRIMDAT --- Processing of Primitive Numerical Data},
    Starlink.
 
   \bibitem{SUN92} R.F.~Warren-Smith and M.D.~Lawden, 23 February 1999,
-   \xref{SUN/92.11}{sun92}{}: {\it HDS --- Hierarchical Data System},
+   \xref{SUN/92.11}{sun92}{}: \textit{HDS --- Hierarchical Data System},
    Starlink.
 
 \end{thebibliography}
