@@ -4541,7 +4541,7 @@ to handle data from a variety of different instruments.
 
 <component id="sun192">
   <version>1</version>
-  <path>docs/sun/247</path>
+  <path>docs/sun/192</path>
   <description>nu/TPU --- A DEC TPU compatible editor for UNIX</description>
   <abstract><p>
 
@@ -4568,7 +4568,7 @@ to handle data from a variety of different instruments.
 
 <component id="sun197">
   <version>2</version>
-  <path>docs/sun/247</path>
+  <path>docs/sun/197</path>
   <description>GHOSTSCRIPT - PostScript Interpreter/previewer</description>
   <abstract><p>
     This document announces the availability of GHOSTSCRIPT on Starlink.
