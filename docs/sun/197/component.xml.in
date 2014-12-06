@@ -4,7 +4,7 @@
 
 <component id="@PACKAGE@">
   <version>@PACKAGE_VERSION@</version>
-  <path>docs/sun/247</path>
+  <path>docs/sun/197</path>
   <description>GHOSTSCRIPT - PostScript Interpreter/previewer</description>
   <abstract><p>
     This document announces the availability of GHOSTSCRIPT on Starlink.

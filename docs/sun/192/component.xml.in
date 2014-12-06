@@ -4,7 +4,7 @@
 
 <component id="@PACKAGE@">
   <version>@PACKAGE_VERSION@</version>
-  <path>docs/sun/247</path>
+  <path>docs/sun/192</path>
   <description>nu/TPU --- A DEC TPU compatible editor for UNIX</description>
   <abstract><p>
 

@@ -2930,12 +2930,12 @@ $(MANIFESTS)/sun189: \
 
 $(MANIFESTS)/sun192: \
 		$(MANIFESTS)/star2html
-	cd docs/sun/247 \
+	cd docs/sun/192 \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/sun197: \
 		$(MANIFESTS)/star2html
-	cd docs/sun/247 \
+	cd docs/sun/197 \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/sun20: \
