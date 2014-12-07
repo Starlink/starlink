@@ -18,24 +18,24 @@ that lists the contents of an HDS file.}
 \begin{document}
 \scfrontmatter
 
-\section{Introduction}
-One of the most popular features of the ADAM environment is the
-Hierarchical Data System (HDS) (described in SUN/92 and SG/4).   HDS
-enables associated data items to be stored together in a single file and
-in a structured fashion.  HDS is also highly flexible, allowing a myriad
-of ways to organise your data.  So HDS is jolly useful, but it does have
-one drawback---you cannot just type or print an HDS file to see its
-contents---you must run a programme.  Obviously, you (or your friendly
-programmer) could write some code to list a particular structure, but
-this would be inefficient given the number of structures that are
-already in use, let alone the ones to come.  What is required is a
-single utility that lists the contents of an HDS data structure to your
-terminal and, optionally, to a file for printing or documentation. This
-is where {\footnotesize HDSTRACE} comes in handy.
+\section{Introduction} One of the most popular features of the ADAM
+environment is the Hierarchical Data System (HDS) (described in
+\xref{SUN/92}{} and \xref{SG/4}{sg4}{}).  HDS enables associated data
+items to be stored together in a single file and in a structured fashion.
+HDS is also highly flexible, allowing a myriad of ways to organise your data.
+So HDS is jolly useful, but it does have one drawback---you cannot just type
+or print an HDS file to see its contents---you must run a programme.
+Obviously, you (or your friendly programmer) could write some code to
+list a particular structure, but this would be inefficient given the
+number of structures that are already in use, let alone the ones to
+come.  What is required is a single utility that lists the contents of
+an HDS data structure to your terminal and, optionally, to a file for
+printing or documentation. This is where {\footnotesize HDSTRACE}
+comes in handy.
 
 {\footnotesize HDSTRACE} lists recursively the name, data type, and
 values of an HDS structure or object.  The type is bracketed by $<>$ to
-distinguish it from the name (\textit{cf.}\ SGP/38).  Indentation
+distinguish it from the name (\textit{cf.}\ \xref{SGP/38}{sgp38}{}).  Indentation
 delineates structures.  The format of the output is flexible; and more
 importantly, you can now always see the data values---something that was
 often impossible with original version.  You control the formatting by
@@ -161,7 +161,7 @@ $ DEFINE/GROUP ADAM_IFL disk:[abc.xyz] ! The /GROUP may be removed if you only
                                 ! intend to run TRACE from DCL.
 \end{terminalv}
 \normalsize
-SUN/115 tells you how to interpret the interface file; it describes
+\xref{SUN/115}{sun115}{} tells you how to interpret the interface file; it describes
 the meanings and available options of the various keywords, and the use
 of the ADAM\_IFL logical name.  The most likely things that you would
 wish to alter are the values of \emph{default\/} and \emph{vpath}.
@@ -177,7 +177,7 @@ On UNIX you would do something like the following.
                                 # interface-file search path.
 \end{terminalv}
 \normalsize
-SUN/144 has more details of the ADAM\_IFL environmental variable.
+\xref{SUN/144}{sun144}{} has more details of the ADAM\_IFL environmental variable.
 \bigskip
 
 The best way to describe the parameters is to show some examples.
