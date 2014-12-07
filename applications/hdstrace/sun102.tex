@@ -173,12 +173,11 @@ The best way to describe the parameters is to show some examples.
 \section{Examples}
 \label{se:example}
 In the following examples a a UNIX shell is used, but the commands would
-also work from ICL or DCL except where noted.
+also work from ICL except where noted.
 
 \subsection{Getting Started}
-The first HDS file is quite simple.  It is an IMAGE-format file may be
-used in \KAPPA.  Note that on UNIX the HDS file name
-is case sensitive.
+The first HDS file is quite simple.  It is an old IMAGE-format file may
+still be used in \KAPPA.  Note that on UNIX the HDS file name is case sensitive.
 
 \small
 \begin{terminalv}
@@ -527,7 +526,8 @@ would give a full trace of the last object traced.
    Examines the contents of a data-system object
 }{
    \sstdescription{
-      Data files in ADAM are stored in an hierarchical format (HDS).
+      Data files in ADAM are stored in an hierarchical format
+      (\xref{\textsc{HDS}}{sun92}{}).
       This cannot be read by just typing the file at the terminal or
       spooling it to a printer---a special application is required.
       Now rather than writing separate code to read a variety of
@@ -671,7 +671,7 @@ would give a full trace of the last object traced.
    }
    \sstnotes{
       This application allows far more flexibility in layout than
-      earlier applications like \textsc{LS} and the original \textsc{TRACE}, 
+      earlier applications like \textsc{LS} and the original \textsc{TRACE},
       though the order of the attributes of an object has been fixed and
       rearranged for standardisation, particularly for documentation
       purposes.
