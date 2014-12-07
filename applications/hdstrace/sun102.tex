@@ -30,10 +30,9 @@ list a particular structure, but this would be inefficient given the
 number of structures that are already in use, let alone the ones to
 come.  What is required is a single utility that lists the contents of
 an HDS data structure to your terminal and, optionally, to a file for
-printing or documentation. This is where {\footnotesize HDSTRACE}
-comes in handy.
+printing or documentation. This is where \HDSTRACE\ comes in handy.
 
-{\footnotesize HDSTRACE} lists recursively the name, data type, and
+\HDSTRACE\ lists recursively the name, data type, and
 values of an HDS structure or object.  The type is bracketed by $<>$ to
 distinguish it from the name (\textit{cf.}\ \xref{SGP/38}{sgp38}{}).  Indentation
 delineates structures.  The format of the output is flexible; and more
@@ -47,31 +46,29 @@ sensible defaults.
 This document adheres to the normal style, where your input follows
 the \$, \% or $>$ prompts.
 
-\subsection{VMS}
-{\footnotesize HDSTRACE} runs as an {\footnotesize ADAM} task.
-{\footnotesize ADAM} must
+\subsection{UNIX}
+\HDSTRACE\ runs as an \textsc{ADAM} task.  \textsc{ADAM} must
 therefore be initiated directly or indirectly using the \texttt{ADAMSTART}
-or \texttt{ADAM} command before {\footnotesize HDSTRACE} can be run.
+or \texttt{ADAM} command before \HDSTRACE\ can be run.
 
-{\footnotesize HDSTRACE} may be run directly from DCL with the following
-command.
+\HDSTRACE\ may be run directly from the UNIX shell with the
+following command.
 \small
 \begin{terminalv}
-$ HDSTRACE
+% hdstrace
 \end{terminalv}
 \normalsize
 You will be prompted for the HDS object or structure to be traced.
 
 If you wish to trace several files or objects
-it is more efficient to run {\footnotesize HDSTRACE} from ICL.
+it is more efficient to run \HDSTRACE\ from ICL.
 If you are already using ICL just enter
 
 \small
 \begin{terminalv}
 ICL> HDSTRACE
 \end{terminalv}
-If you are in DCL, the following will start both ICL and {\footnotesize
-TRACE}.
+If you are in DCL, the following will start both ICL and \HDSTRACE.
 \begin{terminalv}
 $ ADAM HDSTRACE
 \end{terminalv}
@@ -80,7 +77,7 @@ The command can be abbreviated to HDST and the old command \texttt{TRACE}
 will also work from both VMS and ICL.
 
 \subsection{UNIX}
-{\footnotesize HDSTRACE} may be also run directly from a UNIX shell,
+\HDSTRACE\ may be also run directly from a UNIX shell,
 \small
 \begin{terminalv}
 % hdstrace
@@ -98,7 +95,7 @@ ICL> HELP HDSTRACE
 \normalsize
 Notice that this only available for ICL since there is no global help
 system for Starlink applications.  However, it is possible to access
-the full help on {\footnotesize HDSTRACE} from DCL or the UNIX shell by
+the full help on \HDSTRACE\ from the UNIX shell by
 entering \texttt{??} in response to a prompt for a parameter.
 
 \small
@@ -108,7 +105,7 @@ OBJECT - Object to be examined > ??
 \end{terminalv}
 \normalsize
 \subsection{Parameters}
-All but one of the parameters used by {\footnotesize HDSTRACE} are
+All but one of the parameters used by \HDSTRACE\ are
 normally defaulted.  If you wish to be prompted for all or some of the
 defaulted values give the \texttt{PROMPT} keyword on the command line; you
 can terminate the prompting by entering a \texttt{$\backslash$} at any
@@ -147,7 +144,7 @@ positions are given in the Appendix.
 Beginners can skip over this section.
 
 If you want to alter some of the defaults, or always make
-{\footnotesize HDSTRACE} prompt for a normally defaulted parameter,
+\HDSTRACE\ prompt for a normally defaulted parameter,
 you can have your own version of the interface file.
 To achieve this enter the following on VMS.
 
@@ -189,7 +186,7 @@ also work from ICL or DCL except where noted.
 
 \subsection{Getting Started}
 The first HDS file is quite simple.  It is an IMAGE-format file may be
-used in {\footnotesize KAPPA}.  Note that on UNIX the HDS file name
+used in \KAPPA.  Note that on UNIX the HDS file name
 is case sensitive.
 
 \small
@@ -210,7 +207,7 @@ The first line tells us that the structure's \emph{name}\ is BEQ and its
 \emph{type\/} is IMAGE.  (Note that the structure's name is not
 necessarily the file name.)  The \texttt{<>} delimiters are just a
 convention to differentiate name from type; they are not part of the
-type itself.  The next few lines are indented.  {\footnotesize HDSTRACE}
+type itself.  The next few lines are indented.  \HDSTRACE\
 uses indentation to indicate the position within the hierarchy.  Here
 TITLE, DATA\_ARRAY \textit{etc.}\ are at the top level of the hierarchy
 within the \emph{container file}.  (If they are at the top, why is BEQ
@@ -221,7 +218,7 @@ stored on disc.) The second line shows that the TITLE is a character
 object of length 72, and has a \emph{value\/} of \texttt{'KAPPA - Glitch'}.
 The third line shows an array.  The dimensions follow the name thus
 DATA\_ARRAY has 109 columns and 64 lines.  Since there is insufficient
-room to list the values of 6976 elements, {\footnotesize HDSTRACE} lists
+room to list the values of 6976 elements, \HDSTRACE\ lists
 the first few and last few values separated by an ellipsis to indicate
 that there are missing values.
 
@@ -274,9 +271,8 @@ The observant reader will have noticed an asterisk replacing a numerical
 value in the third line.  This is shorthand for a bad value, and it
 has the added advantage that it is more distinctive.
 
-For inspection of two-dimensional arrays and subsets {\footnotesize KAPPA}
-offers a number of applications such as INSPECT and LOOK which may be
-more convenient.
+For inspection of two-dimensional arrays and subsets \GAIAref\ or
+\xref{LOOK}{sun95}{LOOK} in \KAPPA\ may be more convenient.
 
 If the array was much smaller we could display all the values on a single
 line.
@@ -346,7 +342,7 @@ width and may be altered via Parameter WIDTH.
 \subsection{Structures}
 
 Let us move on to a different example HDS file to demonstrate some of
-the other parameters of {\footnotesize HDSTRACE}.
+the other parameters of \HDSTRACE.
 
 \small
 \begin{terminalv}
@@ -377,9 +373,9 @@ End of Trace.
 
 This HDS file stores the values of global parameters shared by ADAM
 applications.  LUT, GRAPHICS\_DEVICE \textit{etc.}\ are structures, and
-therefore instead of listing values, {\footnotesize HDSTRACE} writes the
+therefore instead of listing values, \HDSTRACE\ writes the
 comment \texttt{\{structure\}}.  Each of these structures contains one
-object, NAMEPTR, which is indented in the trace.  {\footnotesize HDSTRACE} inserts
+object, NAMEPTR, which is indented in the trace.  \HDSTRACE\ inserts
 a blank line after listing the contents at the end of a structure for
 clarity.
 
@@ -416,8 +412,8 @@ End of Trace.
 \end{terminalv}
 \normalsize
 AXIS is an array of structures.  Therefore it has no values and
-{\footnotesize TRACE} puts the comment \texttt{\{array of structures\}}.
-By default {\footnotesize HDSTRACE} only lists the contents of the first
+\HDSTRACE\ puts the comment \texttt{\{array of structures\}}.
+By default \HDSTRACE\ only lists the contents of the first
 element of an array of structures.  To obtain a full trace of arrays of
 structures you must set the Parameter FULL to be true.
 
@@ -453,13 +449,13 @@ End of Trace.
 \subsection{Character Arrays}
 
 In MOIMP there is an array of characters---the NDF FITS extension. If
-{\footnotesize HDSTRACE} cannot accommodate a string in the space
+\HDSTRACE\ cannot accommodate a string in the space
 available it attempts to give the first few characters followed by an
 ellipsis to indicate only a part of the string is reported.  Thus in the
 above trace only part of the first FITS header card is shown.  Part of
 the anti-penultimate header is reported.  The last two lines are blank
 and 'END' and are listed in full.  These truncations are not very
-convenient. {\footnotesize HDSTRACE} provides a mechanism for placing
+convenient. \HDSTRACE\ provides a mechanism for placing
 each character-array element on a new line.
 
 \small
@@ -477,8 +473,8 @@ End of Trace.
 To list the whole array specify \texttt{nlines=all} or give an NLINES with at
 least the number of array elements.  Note the object need not
 necessarily be the array.  Below we trace the MORE extension.\footnote{
-FITSLIST in {\footnotesize KAPPA} offers a more-convenient way of listing the
-FITS headers within NDFs.}
+\xref{FITSLIST}{sun95}{FITSLIST} in \KAPPAref\ offers a more-convenient
+way of listing the FITS headers within NDFs.}
 
 \small
 \begin{terminalv}
@@ -658,7 +654,7 @@ would give a full trace of the last object traced.
          Column indentation of the component's type with respect to
          the current indentation of the component's name.  If the name
          plus dimensions cannot fit in the space provided alignment
-         will be lost, since HDSTRACE insists that there be a gap of at
+         will be lost, since \HDSTRACE\ insists that there be a gap of at
          least two columns.  Note that HDS names can be up to 15
          characters, and the dimension in the format (dim1,dim2,...) is
          abutted to the name. \texttt{[15]}
@@ -671,7 +667,7 @@ would give a full trace of the last object traced.
          NEWLINE is false.  If, however, NEWLINE is true, VALIND is
          ignored and the value is indented by one column with respect
          to the component's name.  If the type cannot fit in the space
-         provided alignment will be lost, since HDSTRACE insists that
+         provided alignment will be lost, since \HDSTRACE\ insists that
          there be a gap of at least two columns.  HDS types can be up
          to 15 characters. \texttt{[15]}
       }
@@ -691,8 +687,8 @@ would give a full trace of the last object traced.
    }
    \sstnotes{
       This application allows far more flexibility in layout than
-      earlier applications like LS and the original TRACE, though the
-      order of the attributes of an object has been fixed and
+      earlier applications like \textsc{LS} and the original \textsc{TRACE}, 
+      though the order of the attributes of an object has been fixed and
       rearranged for standardisation, particularly for documentation
       purposes.
    }
