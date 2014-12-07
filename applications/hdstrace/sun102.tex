@@ -74,7 +74,7 @@ $ ADAM HDSTRACE
 \end{terminalv}
 \normalsize
 The command can be abbreviated to HDST and the old command \texttt{TRACE}
-will also work from both VMS and ICL.
+will also work from both the shell and ICL.
 
 \subsection{UNIX}
 \HDSTRACE\ may be also run directly from a UNIX shell,
@@ -118,14 +118,14 @@ may be entered to elicit help on that parameter.
 Parameters may be given by keyword, \emph{e.g.}\
 \small
 \begin{terminalv}
-$ HDSTRACE OBJECT=MYFILE NLINES=3
+% hdstrace object=myfile nlines=3
 \end{terminalv}
 \normalsize
 or by position, \emph{e.g.}\
 
 \small
 \begin{terminalv}
-$ HDSTRACE MYFILE NO 3
+% hdstrace myfile no 3
 \end{terminalv}
 \normalsize
 where the NO is for the FULL parameter, or by a combination of both
@@ -133,7 +133,7 @@ provided the positional parameters come before any keywords, \emph{e.g.}\
 
 \small
 \begin{terminalv}
-$ HDSTRACE MYFILE NLINES=3
+% hdstrace myfile nlines=3
 \end{terminalv}
 \normalsize
 Full details of the parameters, their defaults and their command-line
@@ -146,24 +146,8 @@ Beginners can skip over this section.
 If you want to alter some of the defaults, or always make
 \HDSTRACE\ prompt for a normally defaulted parameter,
 you can have your own version of the interface file.
-To achieve this enter the following on VMS.
+To achieve this enter the following from the UNIX shell.
 
-\small
-\begin{terminalv}
-$ SET DEFAULT disk:[abc.xyz]     ! Substitute the actual disk and directory
-                                ! where you keep private versions of IFLs
-$ COPY TRACE_DIR:TRACE.IFL *
-$ EDIT TRACE.IFL                 ! Make the changes you wish.
-$ DEFINE/GROUP ADAM_IFL disk:[abc.xyz] ! The /GROUP may be removed if you only
-                                ! intend to run TRACE from DCL.
-\end{terminalv}
-\normalsize
-\xref{SUN/115}{sun115}{} tells you how to interpret the interface file; it describes
-the meanings and available options of the various keywords, and the use
-of the ADAM\_IFL logical name.  The most likely things that you would
-wish to alter are the values of \emph{default\/} and \emph{vpath}.
-
-On UNIX you would do something like the following.
 \small
 \begin{terminalv}
 % cd ~abc/xyz                    # Substitute the actual disk and directory
@@ -174,7 +158,14 @@ On UNIX you would do something like the following.
                                 # interface-file search path.
 \end{terminalv}
 \normalsize
-\xref{SUN/144}{sun144}{} has more details of the ADAM\_IFL environmental variable.
+\xref{SUN/115}{sun115}{} tells you how to interpret the interface
+file; it describes the meanings and available options of the various
+keywords, and the use of the \envvar{ADAM\_IFL} environment variable.
+The most likely things that you would wish to alter are the values of
+\emph{default\/} and \emph{vpath}.
+
+\xref{SUN/144}{sun144}{} has more details of the \envvar{ADAM\_IFL}
+environmental variable.
 \bigskip
 
 The best way to describe the parameters is to show some examples.
@@ -346,7 +337,7 @@ the other parameters of \HDSTRACE.
 
 \small
 \begin{terminalv}
-% hdstrace $ADAM_USER/global valind=18
+% hdstrace $ADAM_USER/GLOBAL valind=18
 
 GLOBAL  <STRUC>
   LUT            <ADAM_PARNAME>     {structure}
@@ -379,13 +370,6 @@ object, NAMEPTR, which is indented in the trace.  \HDSTRACE\ inserts
 a blank line after listing the contents at the end of a structure for
 clarity.
 
-On VMS the command would be
-
-\small
-\begin{terminalv}
-$ HDSTRACE ADAM_USER:GLOBAL VALIND=18
-\end{terminalv}
-\normalsize
 Structures can also be arrays, as in the following example of an NDF.
 
 \small
