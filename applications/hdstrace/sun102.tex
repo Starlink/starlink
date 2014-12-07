@@ -34,7 +34,7 @@ printing or documentation. This is where \HDSTRACE\ comes in handy.
 
 \HDSTRACE\ lists recursively the name, data type, and
 values of an HDS structure or object.  The type is bracketed by $<>$ to
-distinguish it from the name (\textit{cf.}\ \xref{SGP/38}{sgp38}{}).  Indentation
+distinguish it from the name (\emph{cf.}\ \xref{SGP/38}{sgp38}{}).  Indentation
 delineates structures.  The format of the output is flexible; and more
 importantly, you can now always see the data values---something that was
 often impossible with original version.  You control the formatting by
@@ -115,13 +115,13 @@ will be satisfactory or just one or two need changing by specifying them
 on the command line. Prompting does have one advantage in that a \texttt{?}
 may be entered to elicit help on that parameter.
 
-Parameters may be given by keyword, \textit{e.g.}\
+Parameters may be given by keyword, \emph{e.g.}\
 \small
 \begin{terminalv}
 $ HDSTRACE OBJECT=MYFILE NLINES=3
 \end{terminalv}
 \normalsize
-or by position, \textit{e.g.}\
+or by position, \emph{e.g.}\
 
 \small
 \begin{terminalv}
@@ -129,7 +129,7 @@ $ HDSTRACE MYFILE NO 3
 \end{terminalv}
 \normalsize
 where the NO is for the FULL parameter, or by a combination of both
-provided the positional parameters come before any keywords, \textit{e.g.}\
+provided the positional parameters come before any keywords, \emph{e.g.}\
 
 \small
 \begin{terminalv}
@@ -209,7 +209,7 @@ necessarily the file name.)  The \texttt{<>} delimiters are just a
 convention to differentiate name from type; they are not part of the
 type itself.  The next few lines are indented.  \HDSTRACE\
 uses indentation to indicate the position within the hierarchy.  Here
-TITLE, DATA\_ARRAY \textit{etc.}\ are at the top level of the hierarchy
+TITLE, DATA\_ARRAY \emph{etc.}\ are at the top level of the hierarchy
 within the \emph{container file}.  (If they are at the top, why is BEQ
 negatively indented?  BEQ applies to the file as a whole---a kind of
 zeroth level. An analogy is your login directory.  It is at the top of
@@ -372,7 +372,7 @@ End of Trace.
 \normalsize
 
 This HDS file stores the values of global parameters shared by ADAM
-applications.  LUT, GRAPHICS\_DEVICE \textit{etc.}\ are structures, and
+applications.  LUT, GRAPHICS\_DEVICE \emph{etc.}\ are structures, and
 therefore instead of listing values, \HDSTRACE\ writes the
 comment \texttt{\{structure\}}.  Each of these structures contains one
 object, NAMEPTR, which is indented in the trace.  \HDSTRACE\ inserts
