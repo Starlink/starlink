@@ -128,7 +128,7 @@ or by position, \emph{e.g.}\
 % hdstrace myfile no 3
 \end{terminalv}
 \normalsize
-where the NO is for the FULL parameter, or by a combination of both
+where the \texttt{no} is for the FULL parameter, or by a combination of both
 provided the positional parameters come before any keywords, \emph{e.g.}\
 
 \small
@@ -547,8 +547,8 @@ would give a full trace of the last object traced.
          nested structures.
 
       3) $X$ is an \emph{array of structures}.  All elements will be listed
-         if Parameter FULL is set to TRUE; only the first element will
-         be listed when Parameter FULL is set to FALSE (default).
+         if Parameter FULL is set to \texttt{TRUE}; only the first element will
+         be listed when Parameter FULL is set to \texttt{FALSE} (default).
 
       Listings are in the following order: name; dimensions, if any;
       type; and value or comment.  Comments are enclosed in braces.
@@ -588,14 +588,14 @@ would give a full trace of the last object traced.
       \sstsubsection{
          EACHLINE = \_LOGICAL (Read)
       }{
-         If true the elements of a character array will each appear on
+         If \texttt{true} the elements of a character array will each appear on
          a separate line.  Otherwise elements fill the available space
          and may span several lines, paragraph style. \texttt{[FALSE]}
       }
       \sstsubsection{
          FULL = \_LOGICAL (Read)
       }{
-         If true, all the contents of an array of structures will be
+         If \texttt{true}, all the contents of an array of structures will be
          traced, otherwise only the first element is examined. \texttt{[FALSE]}
       }
       \sstsubsection{
@@ -648,8 +648,8 @@ would give a full trace of the last object traced.
       }{
          Column indentation of the component's value(s) with respect to
          the current indentation of the component's type provided
-         NEWLINE is false.  If, however, NEWLINE is true, VALIND is
-         ignored and the value is indented by one column with respect
+         NEWLINE is \texttt{false}.  If, however, NEWLINE is \texttt{true},
+         VALIND is ignored and the value is indented by one column with respect
          to the component's name.  If the type cannot fit in the space
          provided alignment will be lost, since \HDSTRACE\ insists that
          there be a gap of at least two columns.  HDS types can be up
