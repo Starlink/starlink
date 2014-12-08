@@ -180,6 +180,8 @@
 *     16-SEP-2013 (DSB):
 *        Do not clean the data if config parameter "doclean" indicates it has
 *        already been cleaned.
+*     8-DEC-2015 (DSB):
+*        Report fraction of data rejected due to short blocks.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -269,9 +271,12 @@ void smurf_calcqu( int *status ) {
    int maxsize;               /* Max no. of time slices in a block */
    int minsize;               /* Min no. of time slices in a block */
    int nc;                    /* Number of characters written to a string */
+   int nskipped;              /* Number of skipped blocks */
    int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
    int qplace;                /* NDF placeholder for current block's Q image */
+   int skipped;               /* Number of skipped samples */
    int submean;               /* Subtract mean value from each time slice? */
+   int total;                 /* Total number of time salices in sub-array */
    int uplace;                /* NDF placeholder for current block's U image */
    size_t ichunk;             /* Continuous chunk counter */
    size_t idx;                /* Subarray counter */
@@ -581,6 +586,9 @@ void smurf_calcqu( int *status ) {
    I, Q and U image for each such block. The first block starts at the first
    time slice in the smfData. */
             block_start = 0;
+            skipped = 0;
+            nskipped = 0;
+            total = 0;
 
 /* Find the time slice at which the corner bolometers have moved
    a critical distance (given by parameter ARCERROR) from their
@@ -593,6 +601,7 @@ void smurf_calcqu( int *status ) {
 /* Loop round creating I/Q/U images for each block. Count them. */
             iblock = 0;
             while( block_end >= 0 && *status == SAI__OK ) {
+               total += block_end - block_start + 1;
 
 /* Skip very short blocks. */
                if( block_end - block_start > minsize ) {
@@ -645,9 +654,12 @@ void smurf_calcqu( int *status ) {
 
 /* Warn about short blocks. */
                } else {
+                  int blength = block_end - block_start - 1;
+                  skipped += blength;
+                  nskipped++;
                   msgOutiff( MSG__VERB, "", "   Skipping short block of %d "
                              "time slices (parameter MINSIZE=%d).", status,
-                             block_end - block_start - 1, minsize );
+                             blength, minsize );
                }
 
 /* The next block starts at the first time slice following the previous
@@ -666,6 +678,22 @@ void smurf_calcqu( int *status ) {
 /* Free resources */
             oprov = ndgFreeProv( oprov, status );
             fc = astAnnul( fc );
+
+/* Report the fraction of the data that was skipped due to being in a
+   short block. Only do this for the first sub-array as all sub-arrays will
+   be the same. */
+            double perc = 100.0 * (double) skipped / (double) total;
+            if( idx == 0 && perc > 5.0 ) {
+               msgOutf( "", "Warning: %g %% of the data from chunk %zu was "
+                        "skipped because the telescope was moving too "
+                        "fast. Reduce the MINSIZE parameter from its "
+                        "current value of %d samples?", status, perc,
+                        ichunk, minsize );
+
+               int mlength = (double) skipped / nskipped;
+               msgOutf( "", "The mean length of the skipped blocks was %d "
+                        "samples.", status, mlength );
+            }
          }
          config = astAnnul( config );
 
