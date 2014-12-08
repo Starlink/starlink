@@ -53,16 +53,15 @@ a selection of simple example applications.
 
 \newlength{\routineindent}
 \newlength{\routineparboxwidth}
-\providecommand{\noteroutine}[2]{{\small{\bf{#1}}}\nopagebreak\\
+\providecommand{\noteroutine}[2]{{\small{\textbf{#1}}}\nopagebreak\\
                              \hspace*{3em}\st{#2}\\[1.5ex]}
 \providecommand{\noteroutineC}[3]{\small
-                              \settowidth{\routineindent}{\bf{#1( }}
-                              %\setlength{\routineparboxwidth}{\textwidth}
+                              \settowidth{\routineindent}{\textbf{#1( }}
                               \addtolength{\routineparboxwidth}{-\routineindent}
                               \hspace*{\routineindent}
                               \parbox{\routineparboxwidth}
                                      {%\setlength{\parindent}{-\routineindent}
-                                     {\bf{#1#2}}}
+                                     {\textbf{#1#2}}}
                               \nopagebreak\hspace*{3em}\st{#3}\\[1.5ex]
                               \normalsize}
 \providecommand{\argbrk}[0]{\\ }
