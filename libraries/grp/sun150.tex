@@ -1,525 +1,38 @@
-\documentstyle[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt,nolof]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun150.10}
-\newcommand{\stardocnumber}    {150.10}
-\newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {20th October 2012}
-\newcommand{\stardoctitle}     {GRP \\ [1ex]
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {150.10}
+\stardocauthors     {D.S. Berry}
+\stardocdate        {20th October 2012}
+\stardoctitle     {GRP \\ [1ex]
                                 Routines for Managing Groups of Objects}
-\newcommand{\stardocversion}   {Version 3.7}
-\newcommand{\stardocmanual}    {Programmer's Manual}
+\stardocversion     {Version 3.7}
+\stardocmanual      {Programmer's Manual}
+\stardocabstract{
+GRP provides facilities for handling groups of objects which can be described by
+character strings (e.g.\ file names, astronomical objects, numerical values,
+etc). Facilities are provided for storing and retrieving such character strings
+within groups, and for passing groups of character strings between applications
+by means of a text file. It also allows the creation of groups in which each
+element is a modified version of an element in another group.
+}
 % ? End of document identification
 % -----------------------------------------------------------------------------
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\html}[1]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-% Command for displaying routines in routine lists:
-% =================================================
-
-\newcommand{\noteroutine}[3]{{\small \bf {#1}{#2}} \nopagebreak \\
-                             \hspace*{3em} {\em {#3}} \\[1.5ex]}
-\begin{htmlonly}
-  \newcommand{\noteroutine}[3]{
-    \begin{description}
-      \item [{\small \bf {#1}{#2}}] {\em #3}
-    \end{description}
-  }
-\end{htmlonly}
-
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
-
-
+\providecommand{\noteroutine}[3]{{\small \textbf {#1}{#2}} \nopagebreak \\
+                             \hspace*{3em} \emph{{#3}} \\[1.5ex]}
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-
-
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%   ==================
-
-GRP provides facilities for handling groups of objects which can be described by
-character strings (e.g. file names, astronomical objects, numerical values,
-etc). Facilities are provided for storing and retrieving such character strings
-within groups, and for passing groups of character strings between applications
-by means of a text file. It also allows the creation of groups in which each
-element is a modified version of an element in another group.
-
-% ? End of document
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
- \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section {Introduction}
 
@@ -559,15 +72,14 @@ Fortran arrays:
 \item In order to store values in a normal character array, you must assign an
 explicit character string to each element of the array. The GRP package provides
 similar facilities for storing explicit strings, but also provides facilities
-for reading the values to be stored from a text file. This is known as {\em
-indirection}; instead of providing a set of strings to be stored, you provide
+for reading the values to be stored from a text file. This is known as \emph{indirection}; instead of providing a set of strings to be stored, you provide
 the name of a file which contains the strings to to be stored. For instance, if
 you were prompted for a list of data files to be processed, you could then
 respond either with the explicit name of each data file, or with the name of a
 text file containing a list of the names of the data files.
 
 \item \label{ITEM:MOD} An alternative method for specifying values to be stored
-in a group is by modification of the values already stored in {\em another}
+in a group is by modification of the values already stored in \emph{another}
 group. For instance, if values are to be assigned to elements 1 to 3, the actual
 strings stored would be obtained by taking the values stored in elements 1 to 3
 of another group and applying some editing to them. The same editing is used for
@@ -577,56 +89,56 @@ could be to specify a set of output files by describing the editing and the name
 of the corresponding input files. Thus, if a group describing the input files
 contained the three strings:
 
-\small
-\begin{verbatim}
-      OBJ1.DAT
-      OBJ2.DAT
-      OBJ3.DAT
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+OBJ1.DAT
+OBJ2.DAT
+OBJ3.DAT
+\end{terminalv}
+\end{small}
 
 you might specify the output files using a string such as:
 
-\small
-\begin{verbatim}
-      A_*|DAT|TXT|
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+A_*|DAT|TXT|
+\end{terminalv}
+\end{small}
 
 This would cause the addition of the
-prefix ``{\bf A\_}'' and substitution of ``{\bf TXT}'' for ``{\bf DAT}'',
+prefix ``\textbf{A\_}'' and substitution of ``\textbf{TXT}'' for ``\textbf{DAT}'',
 resulting in the output file names:
 
-\small
-\begin{verbatim}
-      A_OBJ1.TXT
-      A_OBJ2.TXT
-      A_OBJ3.TXT
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+A_OBJ1.TXT
+A_OBJ2.TXT
+A_OBJ3.TXT
+\end{terminalv}
+\end{small}
 
 \item In the above example, a group of values was obtained by copying them from
 another group, and then applying some specified editing. This technique of
 editing values can be combined with other ways of specifying the original
 values. For instance, to apply the same editing as above to each of the values
-stored in the text file {\tt OBJECTS.LIS} the following response could be given:
+stored in the text file \texttt{OBJECTS.LIS} the following response could be given:
 
-\small
-\begin{verbatim}
-      A_{^OBJECTS.LIS}|DAT|TXT|
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+ A_{^OBJECTS.LIS}|DAT|TXT|
+\end{terminalv}
+\end{small}
 
 If the same editing is to be applied to a list of literal values typed in
 directly at the keyboard, then a response such as the following could be given:
 
-\small
-\begin{verbatim}
-      A_{OBJ1.DAT,OBJ2.DAT,OBJ3.DAT}|DAT|TXT|
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+A_{OBJ1.DAT,OBJ2.DAT,OBJ3.DAT}|DAT|TXT|
+\end{terminalv}
+\end{small}
 
-\item Groups have dynamic size (i.e. they expand in size as required to make
+\item Groups have dynamic size (i.e.\ they expand in size as required to make
 room for new values), which is often more convenient than the fixed size of an
 array specified in its declaration. Thus if an application wants to process
 many data files, and chooses to store the file names in a GRP group, then no
@@ -644,7 +156,7 @@ which it is to process.
 Duplicate names may also be purged from a group in a single call.
 
 \item GRP stores information about how each value within a group group was
-obtained (i.e. whether it was given explicitly, or by indirection, or by
+obtained (i.e.\ whether it was given explicitly, or by indirection, or by
 modification). The names of indirection files are stored, as are the identifiers
 for groups used as the basis for ``modified'' elements, and all this information
 is available to the calling application.
@@ -674,8 +186,8 @@ prompted again for a set of output file names. Each input file is processed in
 some way (by routine PROC) to produce the corresponding output file. The source
 code that follows is not intended to provide all the information necessary to
 write GRP applications, but simply to give a feeling for the way GRP works:
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
       SUBROUTINE GRP_TEST( STATUS )                             [1]
       IMPLICIT NONE
 
@@ -741,10 +253,10 @@ write GRP applications, but simply to give a feeling for the way GRP works:
       CALL GRP_DELET( IGRP2, STATUS )
 
       END
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
-{\bf Programming notes:}
+\textbf{Programming notes:}
 
 \begin{enumerate}
 
@@ -779,7 +291,7 @@ has the wrong value.
 returned holding an integer value which the GRP package uses to recognise the
 group just created. Initially, there are no names stored in the group. A string
 is stored which should be used to give a description of the type of objects
-stored within the group (in this case the string {\em ``Input files''} is
+stored within the group (in this case the string \emph{``Input files''} is
 used).
 
 \item The user is now prompted for a value for the parameter IN\_FILES, and
@@ -793,8 +305,8 @@ given the value GRP\_\_NOID. This is a special identifier value used to indicate
 a ``null'' group. The names supplied by the user are stored in the group created
 by the previous call to \htmlref{GRP\_NEW}{GRP_NEW}, and the number of names is returned in
 argument SIZE1.
-Note, no permanent association exists between the {\em group}
-identified by IGRP1 and the {\em parameter} IN\_FILES (which is one reason why
+Note, no permanent association exists between the \emph{group}
+identified by IGRP1 and the \emph{parameter} IN\_FILES (which is one reason why
 \htmlref{GRP\_GROUP}{GRP_GROUP} is not called GRP\_ASSOC). The parameter value may be cancelled (for
 instance using PAR\_CANCL) without effecting the contents of the
 group.
@@ -809,7 +321,7 @@ just created. Again the user can give literal files names and/or the names of
 text files holding other file names. Now that there are two groups, it is
 possible to use modification to specify the output files. The identifier for the
 group containing the input files names is given as the second argument of
-\htmlref{GRP\_GROUP}{GRP_GROUP}, telling the GRP system that {\em if} the user specifies output file
+\htmlref{GRP\_GROUP}{GRP_GROUP}, telling the GRP system that \emph{if} the user specifies output file
 names using modification (which may not be the case of course), then the output
 file names are to be derived by modifying the input file names stored in the
 first group.
@@ -850,8 +362,7 @@ context (such as ADAM applications). There is a limited number of groups
 available, and if applications forget to delete the groups they have created,
 then the possibility of exceeding the limit then exists. Note, the groups should
 be deleted even if the application aborts because of an error, so the statement
-labelled 999 (to which a jump is made if an error is detected) comes {\em
-before} the calls to \htmlref{GRP\_DELET}{GRP_DELET}.
+labelled 999 (to which a jump is made if an error is detected) comes \emph{before} the calls to \htmlref{GRP\_DELET}{GRP_DELET}.
 
 \end{enumerate}
 
@@ -863,47 +374,47 @@ illustrate the use of indirection and modification in this context.
 \paragraph {Indirection.}
 When prompted for IN\_FILES the user could reply with the following text:
 
-\small
-\begin{verbatim}
-      IC_1575_RAW, IC_4320_RAW, ^NGC_OBJECTS.LIS
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+IC_1575_RAW, IC_4320_RAW, ^NGC_OBJECTS.LIS
+\end{terminalv}
+\end{small}
 
-This would cause the GRP package to place the two strings {\tt IC\_1575\_RAW}
-and {\tt IC\_4320\-\_RAW} in two elements of the first group and then search
-for a file called {\tt NGC\_OBJECTS.LIS}. If this file contains the following
+This would cause the GRP package to place the two strings \texttt{IC\_1575\_RAW}
+and \texttt{IC\_4320\-\_RAW} in two elements of the first group and then search
+for a file called \texttt{NGC\_OBJECTS.LIS}. If this file contains the following
 two lines of text:
 
-\small
-\begin{verbatim}
-      NGC_5128_RAW, NGC_2534_RAW
-      ^OTHERS.LIS
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+NGC_5128_RAW, NGC_2534_RAW
+^OTHERS.LIS
+\end{terminalv}
+\end{small}
 
-then the strings {\tt NGC\_5128\_RAW} and {\tt NGC\_2534\_RAW} would be added
-to the same group, and a search made for the file {\tt OTHERS.LIS}. If this
+then the strings \texttt{NGC\_5128\_RAW} and \texttt{NGC\_2534\_RAW} would be added
+to the same group, and a search made for the file \texttt{OTHERS.LIS}. If this
 file, in turn, contained the two lines:
 
-\small
-\begin{verbatim}
-      NGC_1947_FLAT
-      NGC_3302_FLAT
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+NGC_1947_FLAT
+NGC_3302_FLAT
+\end{terminalv}
+\end{small}
 
 then the final group would consist of the six strings:
 
-\small
-\begin{verbatim}
-      IC_1575_RAW
-      IC_4320_RAW
-      NGC_5128_RAW
-      NGC_2534_RAW
-      NGC_1947_FLAT
-      NGC_3302_FLAT
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+IC_1575_RAW
+IC_4320_RAW
+NGC_5128_RAW
+NGC_2534_RAW
+NGC_1947_FLAT
+NGC_3302_FLAT
+\end{terminalv}
+\end{small}
 
 This illustrates the use of indirection as a means of specifying the strings to
 be stored in a group, and shows it being combined with the specification of
@@ -913,27 +424,26 @@ Strings stored in a text file can be edited ``on the fly'' before being stored
 in a group. For instance, the user could give the following response to a prompt
 for IN\_FILES:
 
-\small
-\begin{verbatim}
-        ^NGC_OBJECTS.LIS|_RAW|_CAL|
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+^NGC_OBJECTS.LIS|_RAW|_CAL|
+\end{terminalv}
+\end{small}
 
-This would cause the GRP package to read the values stored in text file {\tt
-NGC\_OBJECTS.LIS}, replacing all occurrences of the string ``\_RAW'' with the
-string ``\_CAL''. If the file {\tt NGC\_OBJECTS.LIS} contained the same values
+This would cause the GRP package to read the values stored in text file \texttt{NGC\_OBJECTS.LIS}, replacing all occurrences of the string ``\_RAW'' with the
+string ``\_CAL''. If the file \texttt{NGC\_OBJECTS.LIS} contained the same values
 as before, then the editing would also be applied to the values stored in the
-file {\tt OTHERS.LIS}.
+file \texttt{OTHERS.LIS}.
 
 \paragraph {Modification.}
 As an example of the use of ``modification'', let's suppose that the user
 responds to the prompt for OUT\_FILES with the string:
 
-\small
-\begin{verbatim}
-      A_*2|RAW|FLAT|
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+A_*2|RAW|FLAT|
+\end{terminalv}
+\end{small}
 
 This would cause the application to generate six strings, based on the
 six strings held in the first group (see programming note \ref{ITEM:OUT}).
@@ -945,31 +455,31 @@ the second group.
 names is replaced with the string ``FLAT''. This
 leaves the second group holding the names:
 
-\small
-\begin{verbatim}
-      IC_1575_FLAT
-      IC_4320_FLAT
-      NGC_5128_FLAT
-      NGC_2534_FLAT
-      NGC_1947_FLAT
-      NGC_3302_FLAT
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+IC_1575_FLAT
+IC_4320_FLAT
+NGC_5128_FLAT
+NGC_2534_FLAT
+NGC_1947_FLAT
+NGC_3302_FLAT
+\end{terminalv}
+\end{small}
 
 \item Next, each name is substituted in turn for the ``$*$'' character in the
 string to the left of the first ``$\mid$'' character. Thus each name is prefixed by
 ``A\_'' and suffixed by ``2''. The second group finally holds the names:
 
-\small
-\begin{verbatim}
-      A_IC_1575_FLAT2
-      A_IC_4320_FLAT2
-      A_NGC_5128_FLAT2
-      A_NGC_2534_FLAT2
-      A_NGC_1947_FLAT2
-      A_NGC_3302_FLAT2
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+A_IC_1575_FLAT2
+A_IC_4320_FLAT2
+A_NGC_5128_FLAT2
+A_NGC_2534_FLAT2
+A_NGC_1947_FLAT2
+A_NGC_3302_FLAT2
+\end{terminalv}
+\end{small}
 
 \end{enumerate}
 
@@ -977,14 +487,14 @@ Modification can be combined with indirection and/or the specification of
 literal strings. For instance, the user could have replied to the prompt for
 OUT\_FILES with the string:
 
-\small
-\begin{verbatim}
-      NEW_FILE,A_*2|RAW|FLAT|,^LIST.DAT
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+NEW_FILE,A_*2|RAW|FLAT|,^LIST.DAT
+\end{terminalv}
+\end{small}
 
 This would have caused the second group to contain not only the six names
-described above, but also the additional names {\bf NEW\_FILE} and any names
+described above, but also the additional names \textbf{NEW\_FILE} and any names
 read from the text file LIST.DAT. In this case, the number of output files would
 have exceeded the number of input files and the check described in programming
 note \ref{ITEM:CHK} would fail.
@@ -992,24 +502,24 @@ note \ref{ITEM:CHK} would fail.
 \section{Names}
 
 Each string stored within a group is referred to in the rest of this document as
-a {\em name}. The term is used purely for convenience and is not meant to imply
+a \emph{name}. The term is used purely for convenience and is not meant to imply
 anything about what the strings actually represent. In some cases the strings
-may easily be thought of as {\em names} (for instance, in the example
-in the previous section the strings were the {\em names} of
+may easily be thought of as \emph{names} (for instance, in the example
+in the previous section the strings were the \emph{names} of
 files), but this may not always be so.
 
 The maximum length of a name is given by the symbolic constant GRP\_\_SZNAM
 (which is currently 255). Leading spaces, and spaces within names are
 significant, but trailing spaces are ignored. Completely blank names are
-allowed, and null names (i.e. names of zero length) are treated as blank names.
+allowed, and null names (i.e.\ names of zero length) are treated as blank names.
 
 \subsection{\label{SEC:CASE}Case Sensitivity}
-Names are always {\em stored} in the form in which they are supplied. However,
-when names are {\em retrieved} from a group they will be converted to upper case
+Names are always \emph{stored} in the form in which they are supplied. However,
+when names are \emph{retrieved} from a group they will be converted to upper case
 if the group has been designated as a case insensitive group. When groups are
-first created they are considered to be case sensitive (i.e. names are retrieved
+first created they are considered to be case sensitive (i.e.\ names are retrieved
 from the group in the same form in which they were stored). They can be made
-case {\em in}-sensitive by calling routine \htmlref{GRP\_SETCS}{GRP_SETCS}. Any comparisons involving
+case \emph{in}-sensitive by calling routine \htmlref{GRP\_SETCS}{GRP_SETCS}. Any comparisons involving
 names held in case insensitive groups are performed without reference to case.
 
 \section{Groups and Group Identifiers}
@@ -1047,33 +557,32 @@ delimited by these characters are referred to as ``elements''. If there are no
 delimiters in a group expression, then the group expression consists of a single
 element. For instance, the group expression:
 
-\small
-\begin{verbatim}
-      NEW_FILE,A_*2|RAW|FLAT|,^LIST.DAT
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+NEW_FILE,A_*2|RAW|FLAT|,^LIST.DAT
+\end{terminalv}
+\end{small}
 
-consists of the three elements {\bf NEW\_FILE},
-{\bf A\_$*$2$\mid$RAW$\mid$FLAT$\mid$} and {\bf
-\verb+^+LIST.DAT}. Note, delimiter characters are ignored if they occur within
+consists of the three elements \textbf{NEW\_FILE},
+\textbf{A\_$*$2$\mid$RAW$\mid$FLAT$\mid$} and \textbf{\wedge LIST.DAT}. Note, delimiter characters are ignored if they occur within
 matching ``nesting characters'' (see section \ref{SEC:NEST}). For instance,
 nesting prevents the group expression:
 
-\small
-\begin{verbatim}
-      FLATFIELD(100:200,20:220),OBJECT
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+FLATFIELD(100:200,20:220),OBJECT
+\end{terminalv}
+\end{small}
 
-being split into three elements instead of two (i.e. the first comma does not
+being split into three elements instead of two (i.e.\ the first comma does not
 act as a delimiter because it occurs within a nest formed by matching parentheses).
 
-Each element of a group expression may be a literal name (eg {\bf NEW\_FILE} in
+Each element of a group expression may be a literal name (eg \textbf{NEW\_FILE} in
 the previous example), or an ``indirection element'' or a ``modification
 element''. An indirection element specifies a text file from which further names
-are to be read (eg {\bf \verb+^+LIST.DAT} in the previous example). A
+are to be read (eg \textbf{\wedge LIST.DAT} in the previous example). A
 modification element specifies an existing group of names which are to be used
-as the basis for the new names (eg {\bf A\_$*$2$\mid$RAW$\mid$FLAT$\mid$} in the
+as the basis for the new names (eg \textbf{A\_$*$2$\mid$RAW$\mid$FLAT$\mid$} in the
 previous example). These are described in more detail below.
 
 \subsection{Editing of Names}
@@ -1083,13 +592,13 @@ element or a modification element). These names may be edited before being
 stored in a group by including certain ``editing strings'' within the text of
 the element. The general format of an element with editing strings included is:
 
-\small
-\begin{verbatim}
-      prefix{kernel}suffix|old|new|
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+prefix{kernel}suffix|old|new|
+\end{terminalv}
+\end{small}
 
-The {\em kernel} string can be a single element, or can be a full group
+The \emph{kernel} string can be a single element, or can be a full group
 expression. Processing of the element proceeds as follows:
 
 \begin{enumerate}
@@ -1100,9 +609,9 @@ depending on the exact nature of the kernel. The characters which mark the start
 and end of the kernel are known as the opening and closing kernel delimiters.
 They are usually set to be ``\{'' and ``\}'', but can be changed if needed.
 
-\item Each name is checked to see if it contains the {\em old} string. If it
-does, all occurrences of the {\em old} string are replaced by the {\em new}
-string. The character which delimits the {\em old} and {\em new} strings is
+\item Each name is checked to see if it contains the \emph{old} string. If it
+does, all occurrences of the \emph{old} string are replaced by the \emph{new}
+string. The character which delimits the \emph{old} and \emph{new} strings is
 known as the ``separator'' character and is usually a ``$\mid$'' character,
 but can be
 changed if needed. This substitution will be case sensitive if the group to
@@ -1111,9 +620,8 @@ section \ref{SEC:CASE}). If no substitutions are to be performed then the old
 and new strings, together with the three separator characters, should be
 omitted.
 
-\item The {\em prefix} string is added to the start of each name, and the {\em
-suffix} string is appended to the end of each name. Either or both of these
-strings may be null (i.e. of zero length).
+\item The \emph{prefix} string is added to the start of each name, and the \emph{suffix} string is appended to the end of each name. Either or both of these
+strings may be null (i.e.\ of zero length).
 
 \end{enumerate}
 
@@ -1126,101 +634,98 @@ can contain other nested kernels with their own associated editing strings.
 
 Let's look at some examples:
 
-\small
-\begin{verbatim}
-      A_{TOM,DICK,HARRY}_B
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+A_{TOM,DICK,HARRY}_B
+\end{terminalv}
+\end{small}
 
-This will give rise to the three names {\bf A\_TOM\_B}, {\bf A\_DICK\_B} and
-{\bf A\_HARRY\_B}.
+This will give rise to the three names \textbf{A\_TOM\_B}, \textbf{A\_DICK\_B} and
+\textbf{A\_HARRY\_B}.
 
-\small
-\begin{verbatim}
-      ^FILE.LIS|_OLD|_NEW|
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+^FILE.LIS|_OLD|_NEW|
+\end{terminalv}
+\end{small}
 
-This will read names from the text file {\tt FILE.LIS} (see the description of
-indirection elements below), and replace all occurrences of the string ``{\bf
-\_OLD}'' within the names with the string ``{\bf \_NEW}''.
+This will read names from the text file \texttt{FILE.LIS} (see the description of
+indirection elements below), and replace all occurrences of the string ``\textbf{\_OLD}'' within the names with the string ``\textbf{\_NEW}''.
 
-\small
-\begin{verbatim}
-      WW,{A,B_{ONE,TWO,THREE}|T|Z|,C}KK|_Z|_Y|
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+WW,{A,B_{ONE,TWO,THREE}|T|Z|,C}KK|_Z|_Y|
+\end{terminalv}
+\end{small}
 
 This is a complex example and needs looking at carefully. Looking at it at the
 highest level, it can be thought of as:
 
-\small
-\begin{verbatim}
-      WW,{kernel}KK|_Z|_Y|
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+WW,{kernel}KK|_Z|_Y|
+\end{terminalv}
+\end{small}
 
-where {\tt kernel} is the group expression:
+where \texttt{kernel} is the group expression:
 
-\small
-\begin{verbatim}
-      A,B_{ONE,TWO,THREE}|T|Z|,C
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+A,B_{ONE,TWO,THREE}|T|Z|,C
+\end{terminalv}
+\end{small}
 
 The first and third elements in this inner group expression are simple literal names
-and give rise to the two names {\bf A} and {\bf C}. The second element specifies
-that the three names {\bf ONE}, {\bf TWO} and {\bf THREE} are to be edited by
-replacement of the letter T by the letter Z, and the addition of the prefix {\bf
-B\_}. After editing, these three names become {\bf B\_ONE}, {\bf B\_ZWO} and
-{\bf B\_ZHREE}. So the total group specified by this inner kernel is:
+and give rise to the two names \textbf{A} and \textbf{C}. The second element specifies
+that the three names \textbf{ONE}, \textbf{TWO} and \textbf{THREE} are to be edited by
+replacement of the letter T by the letter Z, and the addition of the prefix \textbf{B\_}. After editing, these three names become \textbf{B\_ONE}, \textbf{B\_ZWO} and
+\textbf{B\_ZHREE}. So the total group specified by this inner kernel is:
 
-\small
-\begin{verbatim}
-      A
-      B_ONE
-      B_ZWO
-      B_ZHREE
-      C
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+A
+B_ONE
+B_ZWO
+B_ZHREE
+C
+\end{terminalv}
+\end{small}
 
 We can now go back and look at the full group expression in the form:
 
-\small
-\begin{verbatim}
-      WW,{kernel}KK|_Z|_Y|
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+WW,{kernel}KK|_Z|_Y|
+\end{terminalv}
+\end{small}
 
-The first element specifies the single name {\bf WW}. The second element
+The first element specifies the single name \textbf{WW}. The second element
 specifies that each of the names arising from the expansion of the inner kernel
-(i.e. the names listed above) should be edited by replacing {\bf \_Z} with {\bf
-\_Y}, and then appending the suffix {\bf KK}. Thus the final group contains:
+(i.e.\ the names listed above) should be edited by replacing \textbf{\_Z} with \textbf{\_Y}, and then appending the suffix \textbf{KK}. Thus the final group contains:
 
-\small
-\begin{verbatim}
-      WW
-      AKK
-      B_ONEKK
-      B_YWOKK
-      B_YHREEKK
-      CKK
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+WW
+AKK
+B_ONEKK
+B_YWOKK
+B_YHREEKK
+CKK
+\end{terminalv}
+\end{small}
 
 \subsection{Indirection Elements}
 An indirection element consists of an ``indirection character'' (usually
-``\verb+^+'' (up arrow) although this can be changed, see section \ref{SEC:CC})
+``\texttt{\wedge}'' (up arrow) although this can be changed, see section \ref{SEC:CC})
 followed by the name of a text file. For instance, the group expression:
 
-\small
-\begin{verbatim}
-      ^raw_data
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+^raw_data
+\end{terminalv}
+\end{small}
 
-would cause GRP to search for a file called \verb+raw_data+.
+would cause GRP to search for a file called \texttt{raw\_data}.
 
 The specified file is read to obtain further names to be added to the group.
 Each line in the file is processed as if it were a separate group expression,
@@ -1230,13 +735,13 @@ indirection, in which a literal name is specified within a text file, which is
 itself specified within an indirection element contained within another text
 file, etc. GRP imposes a limit of 7 levels of indirection, primarily to
 safe-guard against ``run-away'' indirection which happens (for instance) when a
-file specifies {\em itself} within an indirection element.
+file specifies \emph{itself} within an indirection element.
 
 Indirection elements are always considered to be case sensitive, even if the
 group has been designated case insensitive. This is because file names on
 certain operating systems (eg UNIX) are always considered case sensitive, and so
 problems would arise while accessing indirection files if GRP was to consider
-them case {\em in}sensitive.
+them case \emph{in}sensitive.
 
 The file name can contain shell meta-characters (references to
 environment variables for instance) which will be expanded before the
@@ -1250,61 +755,61 @@ group is to be used as the basis for the new names. A special character (usually
 a ``$*$'' character, but this can be changed if required) is used as a token to
 represent all the names in the basis group. Thus:
 
-\small
-\begin{verbatim}
-      *|_DS|_BK|
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+*|_DS|_BK|
+\end{terminalv}
+\end{small}
 
 would cause all the names in the basis group to be modified by replacing the
-string {\bf \_DS} with the string {\bf \_BK}. The basis names can also be
+string \textbf{\_DS} with the string \textbf{\_BK}. The basis names can also be
 modified by the addition of a prefix and suffix. Following the description of
 name editing given above, you may expect the format to be (for instance):
 
-\small
-\begin{verbatim}
-      Hello_{*}_Goodbye
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+Hello_{*}_Goodbye
+\end{terminalv}
+\end{small}
 
 in which the token character takes on the role of the kernel. This does in fact
 work, but in this case the opening and closing kernel delimiters (``\{'' and
 ``\}'') can be omitted because there is no ambiguity about where the kernel
 starts and finishes. Thus a simpler form would be:
 
-\small
-\begin{verbatim}
-      Hello_*_Goodbye
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+Hello_*_Goodbye
+\end{terminalv}
+\end{small}
 
 The addition of a prefix and suffix can be combined with substitution as
 usual. For instance, the element:
 
-\small
-\begin{verbatim}
-      A*B|C|D|
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+A*B|C|D|
+\end{terminalv}
+\end{small}
 
 would cause all occurrences of the letter C within the names of the basis group
 to be replaced with D, followed by the addition of the prefix A and the suffix
 B.
 
-If a ``null'' group is specified as the basis group (i.e. the group identifier
+If a ``null'' group is specified as the basis group (i.e.\ the group identifier
 is given as GRP\_\_NOID), then there are no
 names on which to base the new names and the token character is treated as a
 literal name. That is, if the user gave the group expression
 
-\small
-\begin{verbatim}
-      A_*2|RAW|FLAT|
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+A_*2|RAW|FLAT|
+\end{terminalv}
+\end{small}
 
 and the application had specified a null group as the basis for modification
-elements, the the specified editing would be applied to the {\em literal name}
-``$*$'', resulting in the single literal name ``{\bf A\_$*$2}'' being added to the
+elements, the the specified editing would be applied to the \emph{literal name}
+``$*$'', resulting in the single literal name ``\textbf{A\_$*$2}'' being added to the
 group.
 
 \subsection{\label{SEC:NEST}Nesting Within Group Expressions}
@@ -1312,25 +817,25 @@ group.
 There is sometimes a clash of interests to be resolved when deciding on the best
 choice for the character which delimits elements within a group expression. The
 default delimiter character is the comma, but this character can sometimes be
-useful {\em within} an element, for instance when specifying a set of indices.
+useful \emph{within} an element, for instance when specifying a set of indices.
 For instance, if the user gave the group expression:
 
-\small
-\begin{verbatim}
-      A(1,2),B(3,10)
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+A(1,2),B(3,10)
+\end{terminalv}
+\end{small}
 
 in which each element is a literal name corresponding to an array element, it
 would be wrong to split this up using the commas as delimiters into the four
-strings ``{\bf A(1}'', ``{\bf 2)}'', ``{\bf B(3}'' and ``{\bf 10)}''.
+strings ``\textbf{A(1}'', ``\textbf{2)}'', ``\textbf{B(3}'' and ``\textbf{10)}''.
 
 To get round this particular problem, GRP ignores delimiters which occur within
 matching ``nesting characters''. There are two nesting characters, the ``open
 nest'' character (usually set to ``('') and the ``close nest'' character
 (usually set to ``)''). Thus in the above example, the commas occurring within
 the parentheses would not be treated as delimiters, resulting in the group
-expression being split into the two elements {\bf A(1,2)} and {\bf B(3,10)}. The
+expression being split into the two elements \textbf{A(1,2)} and \textbf{B(3,10)}. The
 characters to use as the opening and closing nest characters may be set by the
 calling application (see section \ref{SEC:CC}).
 
@@ -1348,8 +853,8 @@ prompt for more names. For instance, in the example of section \ref{SEC:EXAMC},
 the user may wish to specify more input file names than will fit on a single
 line. To allow this, the call to \htmlref{GRP\_GROUP}{GRP_GROUP} would be replaced with the
 following:
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 *  Loop round, prompting the user for group expressions
 *  until one is found without a minus sign at the end, or an
 *  error occurs.
@@ -1363,17 +868,17 @@ following:
          CALL PAR_CANCL( 'IN_FILES', STATUS )
 
       END DO
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 The user could then request a further prompt by appending a minus sign to the
 end of the group expression, as follows:
 
-\small
-\begin{verbatim}
-      NEW_FILE,A_*2|RAW|FLAT|,^LIST.DAT-
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+NEW_FILE,A_*2|RAW|FLAT|,^LIST.DAT-
+\end{terminalv}
+\end{small}
 
 The names obtained at each prompt are appended to the end of the group, which
 expands as necessary.
@@ -1382,28 +887,28 @@ Note, if the final element in a group expression is an indirection element, the
 flag character may be placed at the end of the last record in the indicated text
 file. For instance, instead of giving:
 
-\small
-\begin{verbatim}
-      ^LIST.DAT-
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+^LIST.DAT-
+\end{terminalv}
+\end{small}
 
 where the file LIST.DAT contains the single record
 
-\small
-\begin{verbatim}
-      RED,GREEN,BLUE
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+RED,GREEN,BLUE
+\end{terminalv}
+\end{small}
 
 a user could ``hard-wire'' a flag character on to the end of LIST.DAT so that
 it contains:
 
-\small
-\begin{verbatim}
-      RED,GREEN,BLUE-
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+RED,GREEN,BLUE-
+\end{terminalv}
+\end{small}
 
 \subsection{Comments Within Group Expressions}
 It is often useful to mix comments with names, particularly within a text file.
@@ -1412,7 +917,7 @@ file or as an argument) are truncated if a ``comment'' character is found (usual
 can be changed, see section \ref{SEC:CC}). Anything occurring after such a
 character is ignored. In a text file, the comment is assumed to extend from the
 comment character to the end of the line, so a new group expression may be
-given on the next line. Note, blank lines are {\em not} ignored. Each blank line
+given on the next line. Note, blank lines are \emph{not} ignored. Each blank line
 within a text file will result in a blank name being added to the group.
 
 \subsection{Escaping the Special Characters in a Group Expression}
@@ -1425,51 +930,51 @@ with a character within a group expression is ignored if the character is
 preceeded by an escape character. The escape characters themselves are
 not included in the resulting names if they preceed any of the other
 ``special'' control characters. Note, escape characters which do not
-preceed another control character {\em are} included in the resulting
+preceed another control character \emph{are} included in the resulting
 names.
 
 For instance, the group expression:
 
-\small
-\begin{verbatim}
-      * | A
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+* | A
+\end{terminalv}
+\end{small}
 
-would normally result in an error because the ``\verb+|+'' character
+would normally result in an error because the ``\texttt{|}'' character
 would be taken as the start of an incomplete specification for some
 editing to apply to the preceeding text (assuming the application has not
 changed the default editing behaviour). If, in fact, the user wants this
 string to be accepted as a literal string (maybe representing a Unix
-piping operation for instance), then the ``\verb+|+'' should be escaped.
+piping operation for instance), then the ``\texttt{|}'' should be escaped.
 Assuming the application chooses to use the backslash character
-``\verb+\+'' as the escape character, then this can be done by entering
+``\texttt{\textbackslash}'' as the escape character, then this can be done by entering
 the following group expression:
 
-\small
-\begin{verbatim}
-      * \| A
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+* \| A
+\end{terminalv}
+\end{small}
 
-The ``\verb+\+'' character results in the ``\verb+|+'' character being
+The ``\texttt{\textbackslash}'' character results in the ``\texttt{|}'' character being
 treated as part of the required string, rather than as the start of an
 editing specification. The string returned to the application is then
-``\verb+* | A+'' (note, the escape character has been removed). Any
+``\texttt{* | A}'' (note, the escape character has been removed). Any
 escape characters which do not preceed special characters are included
 literaly in the returned string. So, for instance, if the group
 expression was:
 
-\small
-\begin{verbatim}
-      \* \| A
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+\* \| A
+\end{terminalv}
+\end{small}
 
-the string ``\verb+\* | A+'' would be returned to the application.
+the string ``\texttt{\textbackslash * | A}'' would be returned to the application.
 
 All escape characters within a section of a group expression can be
-ignored by using the special strings ``<!!'' and ``!!>'' to mark the
+ignored by using the special strings ``$<$!!'' and ``!!$>$'' to mark the
 start and end of the section.
 
 \subsection{The Order of Names Within a Group}
@@ -1477,45 +982,45 @@ Names are stored within a group in the order in which they are specified in the
 group expression. For instance, if the file F1.DAT contained the following two
 records:
 
-\small
-\begin{verbatim}
-      A,^F2
-      B,C
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+A,^F2
+B,C
+\end{terminalv}
+\end{small}
 
 and the file F2.DAT contained the following three records:
 
-\small
-\begin{verbatim}
-      D
-      E
-      F
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+D
+E
+F
+\end{terminalv}
+\end{small}
 
 then the group expression:
 
-\small
-\begin{verbatim}
-      X,^F1.DAT,Y
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+X,^F1.DAT,Y
+\end{terminalv}
+\end{small}
 
 would result in the names being added to the group in the following order
 
-\small
-\begin{verbatim}
-      X
-      A
-      D
-      E
-      F
-      B
-      C
-      Y
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+ X
+ A
+ D
+ E
+ F
+ B
+ C
+ Y
+\end{terminalv}
+\end{small}
 
 The contents of the two indirection files have been inserted at the position at
 which the corresponding indirection element occurred. Names resulting from the
@@ -1525,28 +1030,28 @@ stored in the same order as the names within the group upon which the
 modification was based. For example, if the above group is used as the basis for
 modification, then the group expression:
 
-\small
-\begin{verbatim}
-      U,*_2,V
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+U,*_2,V
+\end{terminalv}
+\end{small}
 
 would give rise to the group:
 
-\small
-\begin{verbatim}
-      U
-      X_2
-      A_2
-      D_2
-      E_2
-      F_2
-      B_2
-      C_2
-      Y_2
-      V
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+U
+X_2
+A_2
+D_2
+E_2
+F_2
+B_2
+C_2
+Y_2
+V
+\end{terminalv}
+\end{small}
 
 
 \section{Using GRP Routines}
@@ -1559,23 +1064,23 @@ specifications in appendix \ref{APP:SPEC}.
 The GRP package has associated with it various symbolic constants defining such
 things as the required length of various character variables, an invalid GRP
 identifier value, etc. These values consist of a name of up to 5 characters
-prefixed by ``GRP\_\_''  (note the {\em double} underscore), and can be made
+prefixed by ``GRP\_\_''  (note the \emph{double} underscore), and can be made
 available to an application by including the line:
 
-\small
-\begin{verbatim}
-      INCLUDE 'GRP_PAR'
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+INCLUDE 'GRP_PAR'
+\end{terminalv}
+\end{small}
 
 Another set of symbolic constants is made available by the
 statement:
 
-\small
-\begin{verbatim}
-      INCLUDE 'GRP_ERR'
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+INCLUDE 'GRP_ERR'
+\end{terminalv}
+\end{small}
 
 These values have the same format of those contained in GRP\_PAR, but define
 error conditions which can be generated within the GRP package. Applications can
@@ -1588,7 +1093,7 @@ the new group. The group is initially empty but names can be added immediately
 using any of the methods described in section \ref{SEC:ADDN}. The calling
 application must provide a ``type'' for the group when calling \htmlref{GRP\_NEW}{GRP_NEW}. This
 type is not used directly by the GRP system, but is provided as a means for
-applications to differentiate between different {\em types} of groups (for
+applications to differentiate between different \emph{types} of groups (for
 instance, groups holding file names and groups holding names of astronomical
 objects). No restrictions are placed on the strings which can be used for
 group types. The type of a group can be recalled at any time using routine
@@ -1600,14 +1105,14 @@ a previously existing group. \htmlref{GRP\_COPY}{GRP_COPY} creates a new group c
 a subsection of an old group, \htmlref{GRP\_REMOV}{GRP_REMOV} creates a new group containing a copy
 of the whole of an old group, but excluding all occurrences of a given name, and
 \htmlref{GRP\_PURGE}{GRP_PURGE} creates a new group containing a purged copy of the whole of an old
-group (i.e. there are no duplicate entries in the new group). The new groups
+group (i.e.\ there are no duplicate entries in the new group). The new groups
 inherit the type string, control characters and case sensitivity of the old
 groups, but do not inherit any other attributes (such as owner/slave
 relationships - see section \ref {SEC:OWN}).
 
 The routine \htmlref{GRP\_DELET}{GRP_DELET} deletes a group, thus freeing the GRP identifier and the
 internal resources used by the group. As well as deleting the group identified
-by the specified GRP identifier, it also deletes any groups {\em associated}
+by the specified GRP identifier, it also deletes any groups \emph{associated}
 with the specified group (by means of an owner-slave relationship as described
 in section \ref{SEC:OWN}).
 
@@ -1620,10 +1125,10 @@ There are several routines which can be used to store names in a group.
 
 The routine \htmlref{GRP\_PUT}{GRP_PUT} stores a set of names starting at a given index within a
 group. Any previous names with the same indices are over-written, and the group
-is extended as necessary. Note, an application must supply the {\em literal}
+is extended as necessary. Note, an application must supply the \emph{literal}
 names to be stored, as modification and indirection elements cannot be used with
-\htmlref{GRP\_PUT}{GRP_PUT}. For instance, if the string ``\verb+^+LIST.DAT'' was stored in a group
-using \htmlref{GRP\_PUT}{GRP_PUT}, the \verb+^+ character would {\em not} cause names to be read
+\htmlref{GRP\_PUT}{GRP_PUT}. For instance, if the string ``\wedge LIST.DAT'' was stored in a group
+using \htmlref{GRP\_PUT}{GRP_PUT}, the \wedge character would \emph{not} cause names to be read
 from the file LIST.DAT. Instead the string would be stored in the group exactly
 as supplied.
 
@@ -1649,8 +1154,8 @@ The following code fragment shows an example of the use of \htmlref{GRP\_GRPEX}{
 \htmlref{GRP\_PUT}{GRP_PUT}. It is assumed that the text file FRIENDS.LIS exists and contains the
 single record ``FRED,BERT''.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
       INTEGER IGRP, STATUS, SIZE, ADDED
       LOGICAL FLAG
       CHARACTER * ( GRP__SZNAM ) NAMES( 3 )
@@ -1673,44 +1178,43 @@ single record ``FRED,BERT''.
       ...
 
       CALL GRP_PUT( IGRP, 3, NAMES, 2, STATUS )
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 The call to \htmlref{GRP\_NEW}{GRP_NEW} creates a new, empty group. The first call to \htmlref{GRP\_GRPEX}{GRP_GRPEX}
 read the two names from the file FRIENDS.LIS and stores them with the following
 indices:
 
-\small
-\begin{verbatim}
-      1 - FRED
-      2 - BERT
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+1 - FRED
+2 - BERT
+\end{terminalv}
+\end{small}
 
 Both SIZE and ADDED are returned equal to two. The second call to \htmlref{GRP\_GRPEX}{GRP_GRPEX}
-appends the name {\bf HAROLD} to the group, so that the group becomes:
+appends the name \textbf{HAROLD} to the group, so that the group becomes:
 
-\small
-\begin{verbatim}
-      1 - FRED
-      2 - BERT
-      3 - HAROLD
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+1 - FRED
+2 - BERT
+3 - HAROLD
+\end{terminalv}
+\end{small}
 
 SIZE is returned equal to 3 and ADDED equal to 1. The call to \htmlref{GRP\_PUT}{GRP_PUT}
-then stores the name {\bf TOM} at index 2 (over-writing {\bf BERT}), and {\bf
-DICK} at index 3 (over-writing {\bf HAROLD}). The group is then extended and
-{\bf HARRY} is stored at index 4 so that the group becomes:
+then stores the name \textbf{TOM} at index 2 (over-writing \textbf{BERT}), and \textbf{DICK} at index 3 (over-writing \textbf{HAROLD}). The group is then extended and
+\textbf{HARRY} is stored at index 4 so that the group becomes:
 
-\small
-\begin{verbatim}
-      1 - FRED
-      2 - TOM
-      3 - DICK
-      4 - HARRY
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+1 - FRED
+2 - TOM
+3 - DICK
+4 - HARRY
+\end{terminalv}
+\end{small}
 
 \subsection{Retreiving Names from a Group}
 \htmlref{GRP\_GET}{GRP_GET} will retrieve a set of names from a group starting at a given index. An
@@ -1756,7 +1260,7 @@ group which was used as the basis for the modification element (see section
 
 \item [MODIND] - An integer value which is zero unless the name was specified
 using a modification element. Otherwise, it is the index of the name within
-the basis group (i.e. the group identified by the MODGRP attribute) which was
+the basis group (i.e.\ the group identified by the MODGRP attribute) which was
 modified in order to generate the specified name.
 
 \item [DEPTH] - An integer value which is zero unless the name was specified
@@ -1765,23 +1269,23 @@ indirection at which the literal name was specified. For instance, consider the
 case where a prompt
 issued by \htmlref{GRP\_GROUP}{GRP_GROUP} is responded to with the group expression
 
-\small
-\begin{verbatim}
-      ^FILE1.DAT
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+^FILE1.DAT
+\end{terminalv}
+\end{small}
 
-and the file FILE1.DAT contains the single record ``NAME1,\verb+^+FILE2.DAT'',
+and the file FILE1.DAT contains the single record ``NAME1,\wedge FILE2.DAT'',
 and the file FILE2.DAT contained the single record ``NAME2''. The DEPTH
-attribute would have a value of 1 for name {\bf NAME1} indicating that the name
+attribute would have a value of 1 for name \textbf{NAME1} indicating that the name
 was given within a file specified directly within the group expression, and a
-value of 2 for name {\bf NAME2} indicating that the name was given within a file
+value of 2 for name \textbf{NAME2} indicating that the name was given within a file
 which was itself given within another file.
 
 \item [FILE] - A character value which is returned blank unless the name was
 specified using an indirection element. Otherwise, it is the name of the file in
 which the name was literally stored. Thus, in the above example it would be
-FILE1.DAT for name {\bf NAME1} and FILE2.DAT for {\bf NAME2}.
+FILE1.DAT for name \textbf{NAME1} and FILE2.DAT for \textbf{NAME2}.
 
 \item [NAME] - A character value equal to the name itself.
 
@@ -1795,13 +1299,13 @@ results (the input group is left unchanged).
 Names with a specified range of indices can be deleted from a group using
 \htmlref{GRP\_COPY}{GRP_COPY}, as in the following example:
 
-\small
-\begin{verbatim}
-      CALL GRP_COPY( IGRP, 3, 5, .TRUE., ITEMP, STATUS )
-      CALL GRP_DELET( IGRP, STATUS )
-      IGRP = ITEMP
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+CALL GRP_COPY( IGRP, 3, 5, .TRUE., ITEMP, STATUS )
+CALL GRP_DELET( IGRP, STATUS )
+IGRP = ITEMP
+\end{terminalv}
+\end{small}
 
 The call to \htmlref{GRP\_COPY}{GRP_COPY} creates a copy of the group identified by IGRP,
 excluding the names with indices between 3 and 5. The copy is stored in a new
@@ -1835,7 +1339,7 @@ names:
 \item [INDIRECTION] - The character used to indicate that the string which
 follows is not a literal name but is the name of a text file from which further
 names are to be read. The INDIRECTION control character defaults to
-``\verb+^+''.
+``\wedge''.
 
 \item [COMMENT] - The character used to indicate that the remainder of the group
 expression (or record within a text file) is a comment and is to be ignored.
@@ -1884,7 +1388,7 @@ Such escape characters are removed before storing the corresponding
 strings in the returned group (escape character which do not preceed
 another control character are not removed). Escape characters can
 themselves be escaped. By default, the escape character is equal to the
-null character (i.e. escaping is not available by default).
+null character (i.e.\ escaping is not available by default).
 
 \end{description}
 
@@ -1917,21 +1421,21 @@ owner of another, which in turn is the owner of another, and so on. These
 associations are provided for the benefit of the calling application, which can
 impose any meaning it likes on the associations. The only significance of these
 associations within the GRP package is that when a group is deleted (using
-\htmlref{GRP\_DELET}{GRP_DELET}), all other groups in the same ``super-group'' (i.e. all groups which
+\htmlref{GRP\_DELET}{GRP_DELET}), all other groups in the same ``super-group'' (i.e.\ all groups which
 have an association, either directly, or indirectly, with the specified group)
 are also deleted.
 
 An example of the use of these associations is to provide a means of attaching
 supplemental information to a group describing the global properties of the
 group. For instance, consider an application which uses groups to store
-information about spiral galaxies. Group A may contain the names {\bf 1232},
-{\bf 628}, {\bf 5364}, and group B may contain {\bf 81}, {\bf 31}. It may be
+information about spiral galaxies. Group A may contain the names \textbf{1232},
+\textbf{628}, \textbf{5364}, and group B may contain \textbf{81}, \textbf{31}. It may be
 necessary to store supplemental information describing each of these groups, for
 instance the catalogue to which the numbers in groups A and B refer, the
 morphological type, and so. A new group C could be created holding the names
-{\bf NGC} and {\bf ScI}, giving the catalogue and type of the galaxies in group
+\textbf{NGC} and \textbf{ScI}, giving the catalogue and type of the galaxies in group
 A. This group could then be associated with group A. Similarly a group D could
-be created holding the names {\bf Messier} and {\bf Sb}, and associated with
+be created holding the names \textbf{Messier} and \textbf{Sb}, and associated with
 group B.
 
 Four routines are included in the GRP package for handling these
@@ -1940,9 +1444,9 @@ associations;
 \htmlref{GRP\_OWN}{GRP_OWN} returns the
 identifier of the group which owns a specified group,
 \htmlref{GRP\_SLAVE}{GRP_SLAVE} returns the
-identifier of the group which is owned by (i.e. is a slave of) a specified group,
+identifier of the group which is owned by (i.e.\ is a slave of) a specified group,
 and \htmlref{GRP\_HEAD}{GRP_HEAD} returns the
-group at the head of an owner-slave chain. Groups are ``free'' (i.e. are not
+group at the head of an owner-slave chain. Groups are ``free'' (i.e.\ are not
 owned by any other group) when they are created. A group which has had an owner
 established for it can be made free again by calling \htmlref{GRP\_SOWN}{GRP_SOWN} giving a null
 group (GRP\_\_NOID) as the ``owner''. A group may not be owned by more than one
@@ -1964,28 +1468,32 @@ group B.
 To compile and link an ADAM application with the GRP package, the following
 commands should be used (see \xref{SUN/144}{sun144}{}):
 
-\small
-\verb#      % grp_dev#
-\verb#      % alink adamprog.f# `\verb#grp_link_adam#`
-\verb#      % grp_dev remove#
-\normalsize
+\begin{small}
+\begin{terminalv}
+% grp_dev
+% alink adamprog.f `grp_link_adam`
+% grp_dev remove
+\end{terminalv}
+\end{small}
 
-Note the use of {\em opening} apostrophes (`) rather than the more common
+Note the use of \emph{opening} apostrophes (`) rather than the more common
 closing apostrophe ('). To compile and link a stand-alone application with
 the GRP package, the following commands should be used:
 
-\small
-\verb#      % grp_dev#
-\verb#      % f77 prog.f -o prog# `\verb#grp_link#`
-\verb#      % grp_dev remove#
-\normalsize
+\begin{small}
+\begin{terminalv}
+% grp_dev
+% f77 prog.f -o prog `grp_link`
+% grp_dev remove
+\end{terminalv}
+\end{small}
 
-This produces an executable image called {\bf prog}. The \verb+grp_dev+
+This produces an executable image called \textbf{prog}. The \texttt{grp\_dev}
 command creates soft links to the include files GRP\_PAR and GRP\_ERR
-within the current directory. These are removed by the \verb+grp_dev remove+ command.
+within the current directory. These are removed by the \texttt{grp\_dev remove} command.
 
 The ADAM and stand-alone versions of the GRP\_ system differ, in that those
-routines which use ADAM facilities ({\em i.e.}\ those listed in
+routines which use ADAM facilities (\emph{i.e.}\ those listed in
 \ref{SEC:ADAM}) are not available in the stand-alone version.
 
 \appendix
@@ -2204,7 +1712,6 @@ environment}
 
 % Routine descriptions:
 % =====================
-\small
 
 \sstroutine{
    GRP\_ALARM
@@ -2215,7 +1722,7 @@ environment}
       This routine is called internally by the GRP library when a
       significant event happens in the life of a group that is being
       watched as a result of a call to GRP\_WATCH. It is not intended
-      to be called by the user. It{\tt '}s main purpose is to provide a break
+      to be called by the user. It\texttt{'}s main purpose is to provide a break
       point target for debugging the creation and destruction of GRP
       groups.
    }
@@ -2232,7 +1739,7 @@ environment}
       \sstsubsection{
          EVENT = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         This will be {\tt "}CREATE{\tt "} or {\tt "}DELETE{\tt "}.
+         This will be \texttt{"}CREATE\texttt{"} or \texttt{"}DELETE\texttt{"}.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -2328,9 +1835,9 @@ environment}
       cancelled.
 
       This routine also deletes any groups which are related to the
-      supplied group by means of {\tt "}owner-slave{\tt "} relationships
+      supplied group by means of \texttt{"}owner-slave\texttt{"} relationships
       established by calls to \htmlref{GRP\_SOWN}{GRP_SOWN}. All groups in the same
-      {\tt "}owner-slave{\tt "} chain are deleted whether higher up or lower down
+      \texttt{"}owner-slave\texttt{"} chain are deleted whether higher up or lower down
       than the supplied group.
 
       This routine attempts to execute even if STATUS is bad on entry,
@@ -2407,7 +1914,7 @@ environment}
    Returns requested control characters for the specified group
 }{
    \sstdescription{
-      Each group has associated with it several {\tt "}control characters{\tt "}
+      Each group has associated with it several \texttt{"}control characters\texttt{"}
       which are the characters used to indicate various items of syntax
       within a group expression. These control characters can be
       changed at any time by calling \htmlref{GRP\_SETCC}{GRP_SETCC}. This routine returns
@@ -2505,7 +2012,7 @@ environment}
 
       If the last character read from the group expression (or from a
       text file if the last element of the group expression is an
-      indirection element) is equal to the current {\tt "}flag{\tt "} character for
+      indirection element) is equal to the current \texttt{"}flag\texttt{"} character for
       the group IGRP2 (see routine \htmlref{GRP\_SETCC}{GRP_SETCC}), then argument FLAG is
       returned set to .TRUE. Otherwise, it is returned set to .FALSE.
       The calling application can use this flag for any purpose (eg it
@@ -2600,7 +2107,7 @@ environment}
 
       If the last character read from the group expression (or from a
       text file if the last element of the group expression is an
-      indirection element) is equal to the current {\tt "}flag{\tt "} character for
+      indirection element) is equal to the current \texttt{"}flag\texttt{"} character for
       the group IGRP2 (see routine \htmlref{GRP\_SETCC}{GRP_SETCC}), then argument FLAG is
       returned set to true. Otherwise, it is returned set to false. The
       calling application can use this flag for any purpose (eg it may
@@ -2887,7 +2394,7 @@ environment}
          INDEX = INTEGER (Given)
       }{
          An index within the group specified by IGRP.  If the supplied
-         value is outside the bounds of the group, then a {\tt "}null{\tt "} value
+         value is outside the bounds of the group, then a \texttt{"}null\texttt{"} value
          is returned for VALUE as described below, and an error is
          reported.
       }
@@ -2928,7 +2435,7 @@ environment}
          MSG\_OUT).
 
          ALLSIMPLE - A value of 1 is returned if all elements within the
-         group were specified explicitly (i.e. by a literal name rather
+         group were specified explicitly (i.e.\ by a literal name rather
          than by indirection or modification). Otherwise a value of zero
          is returned. The value of the INDEX argument is ignored.
       }
@@ -2985,7 +2492,7 @@ environment}
          COMNT = CHARACTER $*$ ( $*$ ) (Given)
       }{
          A comment line to form the first record in the file. The text
-         is prefixed with the group{\tt '}s current comment character before
+         is prefixed with the group\texttt{'}s current comment character before
          being written to the file.
       }
       \sstsubsection{
@@ -3109,7 +2616,7 @@ environment}
       group (see also routines \htmlref{GRP\_GTYPE}{GRP_GTYPE} and \htmlref{GRP\_PTYPE}{GRP_PTYPE}).
 
       The created group has the default control characters described in
-      routine \htmlref{GRP\_SETCC}{GRP_SETCC}, and has no {\tt "}owner{\tt "} group (see \htmlref{GRP\_OWN}{GRP_OWN}).
+      routine \htmlref{GRP\_SETCC}{GRP_SETCC}, and has no \texttt{"}owner\texttt{"} group (see \htmlref{GRP\_OWN}{GRP_OWN}).
    }
    \sstinvocation{
       CALL GRP\_NEW( TYPE, IGRP, STATUS )
@@ -3142,7 +2649,7 @@ environment}
    group
 }{
    \sstdescription{
-      If the group identified by IGRP1 has had an {\tt "}owner{\tt "} group
+      If the group identified by IGRP1 has had an \texttt{"}owner\texttt{"} group
       established for it by a call to \htmlref{GRP\_SOWN}{GRP_SOWN}, then the identifier of
       the owner group is returned in IGRP2. Otherwise, the value
       GRP\_\_NOID is returned (but no error is reported).
@@ -3258,7 +2765,7 @@ environment}
       of the group. The names can be appended to the end of the group
       by giving INDEX a value of zero or one greater than the current
       size of the group. An error is reported if the names are added
-      beyond the end of the group (i.e.  if adding the names would
+      beyond the end of the group (i.e.\  if adding the names would
       result in a gap within the group for which no names would be
       defined).
    }
@@ -3307,7 +2814,7 @@ environment}
       any previous name stored at the specified index. The name can be
       appended to the end of the group by giving INDEX a value of zero
       or one greater than the current size of the group. An error is
-      reported if the name is added beyond the end of the group (i.e.
+      reported if the name is added beyond the end of the group (i.e.\
       if adding the name would result in a gap within the group for
       which no names would be defined).
    }
@@ -3424,10 +2931,10 @@ environment}
    Sets requested control characters for the specified group
 }{
    \sstdescription{
-      Each group has associated with it several {\tt "}control characters{\tt "}
+      Each group has associated with it several \texttt{"}control characters\texttt{"}
       which are the characters used to indicate various items of syntax
       within a group expression. These characters are listed and
-      described in the {\tt "}Notes{\tt "} section below. The control characters are
+      described in the \texttt{"}Notes\texttt{"} section below. The control characters are
       given default values when the group is created, but can be changed
       at any time by calling this routine.
 
@@ -3440,7 +2947,7 @@ environment}
       CLOSE\_KERNEL.
 
       If a blank value for argument CCLIST is supplied, then the default
-      control characters described in the {\tt "}Notes{\tt "} section are
+      control characters described in the \texttt{"}Notes\texttt{"} section are
       re-established.
 
       An error is reported if any two control characters are the same.
@@ -3487,54 +2994,54 @@ environment}
       \sstitemlist{
 
          \sstitem
-         INDIRECTION: (Default {\tt "}$\wedge${\tt "}) The name given to the character used
+         INDIRECTION: (Default \texttt{"}$\wedge$\texttt{"}) The name given to the character used
          to indicate that an element of a group expression is the name of a
          text file from which further elements should be read.
 
          \sstitem
-         COMMENT: (Default {\tt "}\#{\tt "}) The name given to the character used to
+         COMMENT: (Default \texttt{"}\#\texttt{"}) The name given to the character used to
          introduce comments in group expressions.
 
          \sstitem
-         DELIMITER: (Default {\tt "},{\tt "}) The name given to the character used
+         DELIMITER: (Default \texttt{"},\texttt{"}) The name given to the character used
          to delimit elements within group expressions. Note, delimiters
          within group expressions are ignored if they occur within matched
          nesting characters (see OPEN\_NEST and CLOSE\_NEST below).
 
          \sstitem
-         NAME\_TOKEN: (Default {\tt "}$*${\tt "}) The name given to the character used
+         NAME\_TOKEN: (Default \texttt{"}$*$\texttt{"}) The name given to the character used
          as a token for input names in a modification element.
 
          \sstitem
-         SEPARATOR: (Default {\tt "}$|${\tt "}) The name given to the character used
+         SEPARATOR: (Default \texttt{"}$|$\texttt{"}) The name given to the character used
          to separate the substitution strings within a modification
          element.
 
          \sstitem
-         OPEN\_NEST: (Default {\tt "}({\tt "}) The name given to the character used
-         to open a {\tt "}nest{\tt "} within a group expression. Any delimiter
+         OPEN\_NEST: (Default \texttt{"}(\texttt{"}) The name given to the character used
+         to open a \texttt{"}nest\texttt{"} within a group expression. Any delimiter
          characters occurring within matched nesting characters are ignored.
 
          \sstitem
-         CLOSE\_NEST: (Default {\tt "}){\tt "}) The name given to the character used
-         to close a {\tt "}nest{\tt "} within a group expression.
+         CLOSE\_NEST: (Default \texttt{"})\texttt{"}) The name given to the character used
+         to close a \texttt{"}nest\texttt{"} within a group expression.
 
          \sstitem
-         FLAG: (Default {\tt "}-{\tt "}) The name given to a character which can
+         FLAG: (Default \texttt{"}-\texttt{"}) The name given to a character which can
          be appended to the end of a group expression in order to
-         {\tt "}flag{\tt "} that expression. The interpretation of this flag is left
+         \texttt{"}flag\texttt{"} that expression. The interpretation of this flag is left
          up to the application.
 
          \sstitem
-         OPEN\_KERNEL: (Default {\tt "}\{{\tt "}) The name given to the character used
-         to open a {\tt "}kernel{\tt "} within a group expression.
+         OPEN\_KERNEL: (Default \texttt{"}\{\texttt{"}) The name given to the character used
+         to open a \texttt{"}kernel\texttt{"} within a group expression.
 
          \sstitem
-         CLOSE\_KERNEL: (Default {\tt "}\}{\tt "}) The name given to the character used
-         to close a {\tt "}kernel{\tt "} within a group expression.
+         CLOSE\_KERNEL: (Default \texttt{"}\}\texttt{"}) The name given to the character used
+         to close a \texttt{"}kernel\texttt{"} within a group expression.
 
          \sstitem
-         NULL: (Default {\tt "}\%{\tt "}) The name given to the character which can
+         NULL: (Default \texttt{"}\%\texttt{"}) The name given to the character which can
          be assigned to other control characters to suppress checks for
          those control characters.  If this is changed, any other characters
          currently set to the null character are also changed to the new NULL
@@ -3678,7 +3185,7 @@ environment}
    group
 }{
    \sstdescription{
-      If the group identified by IGRP1 has had a {\tt "}slave{\tt "} group
+      If the group identified by IGRP1 has had a \texttt{"}slave\texttt{"} group
       established for it by a call to GRP\_SOWN, then the identifier of
       the slave group is returned in IGRP2. Otherwise, the value
       GRP\_\_NOID is returned (but no error is reported).
@@ -3712,14 +3219,14 @@ environment}
    Establish one group as the owner of another group
 }{
    \sstdescription{
-      This routine establishes one specified group as {\tt "}owner{\tt "} of
+      This routine establishes one specified group as \texttt{"}owner\texttt{"} of
       another specified group. An error is reported if the group is
       already owned by another group. An error is also reported if the
-      {\tt "}owner{\tt "} group already owns a slave.
+      \texttt{"}owner\texttt{"} group already owns a slave.
 
-      This routine may also be used to cancel an {\tt "}owner-slave{\tt "}
+      This routine may also be used to cancel an \texttt{"}owner-slave\texttt{"}
       relationship, by specifying IGRP2 as GRP\_\_NOID. The group
-      identified by IGRP1 then becomes a {\tt "}free{\tt "} group (i.e. has no
+      identified by IGRP1 then becomes a \texttt{"}free\texttt{"} group (i.e.\ has no
       owner). An error is reported if IGRP1 identifies a group which is
       already free.
    }
@@ -3730,7 +3237,7 @@ environment}
       \sstsubsection{
          IGRP1 = INTEGER (Given)
       }{
-         The identifier of the {\tt "}slave{\tt "} group which is to have an owner
+         The identifier of the \texttt{"}slave\texttt{"} group which is to have an owner
          established for it. An error is reported if an invalid
          identifier is given.
       }
@@ -3762,7 +3269,7 @@ environment}
          the same owner/slave chain, whether higher up or lower down, are
          also deleted. If a group is to be deleted without deleting all
          other related groups, then the group must be established as a
-         {\tt "}free{\tt "} group (i.e. no owner) by calling this routine with IGRP2
+         \texttt{"}free\texttt{"} group (i.e.\ no owner) by calling this routine with IGRP2
          set to GRP\_\_NOID, before calling \htmlref{GRP\_DELET}{GRP_DELET}.
       }
    }
@@ -3839,9 +3346,6 @@ environment}
    }
 }
 
-\normalsize
-
-
 \section{\label{APP:ERRORS}GRP Error Status Values}
 This appendix lists the STATUS values generated within the GRP package. Note,
 STATUS values generated by the packages listed in appendix \ref{APP:PACK} may
@@ -3915,7 +3419,7 @@ The following changes have occurred in the GRP\_ system since version 3.3:
 
 \begin{enumerate}
 \item The GRP\_INFOI routine has a new option to return a flag indicating
-if all elements in a group were supplied literally (i.e. not by
+if all elements in a group were supplied literally (i.e.\ not by
 indirection or modification).
 \end{enumerate}
 
@@ -3959,7 +3463,7 @@ has been increased from 100 to 500.
 
 \item An escape control character can now be defined which allows other
 control characters within a group expression to be treated literally
-(i.e. their usual special meaning is suppressed and they are trated like a
+(i.e.\ their usual special meaning is suppressed and they are trated like a
 normal text character if they are preceeded by an escape character). By
 default, no escape character is defined.
 
@@ -3976,7 +3480,7 @@ The following changes have occurred in the GRP\_ system since version 1.1:
 \item The facility for editing names which was previously restricted to use
 within modification elements, has been made available for use with any form
 of element. See section \ref{SEC:GREXP}.
-\item Null names (i.e. names with zero length) are now accepted and treated as
+\item Null names (i.e.\ names with zero length) are now accepted and treated as
 blank names.
 \end{enumerate}
 
