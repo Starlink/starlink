@@ -1,30 +1,26 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {143.4}
-\newcommand{\stardocauthors}   {P M Allan \\ A J Chipperfield}
-\newcommand{\stardocdate}      {20 July 2001}
-\newcommand{\stardoctitle}     {FIO/RIO \\ [1ex]
+\stardocnumber      {143.4}
+\stardocauthors     {P M Allan \\ A J Chipperfield}
+\stardocdate        {20 July 2001}
+\stardoctitle     {FIO/RIO \\ [1ex]
                                 FORTRAN file I/O routines}
-\newcommand{\stardocversion}   {Version 1.5}
-\newcommand{\stardocmanual}    {Programmer's Manual}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright}
+\stardocversion     {Version 1.5}
+\stardocmanual      {Programmer's Manual}
+\stardocsource      {sun\stardocnumber}
+\stardoccopyright
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
-\newcommand{\stardocabstract}
+\stardocabstract
 {FIO/RIO is a subroutine package that allows a FORTRAN programmer to access
 sequential and direct access data files in a machine independent manner. The
 package consists of stand alone FIO and RIO routines, which can be used
@@ -32,538 +28,19 @@ independently of the Starlink software environment, plus routines to interface
 to the Starlink parameter system.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%      1-FEB-2000 (AJC):
-%        Add Copyright statement in LaTeX
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-\newcommand{\sqt}[1]{`#1'}
-\begin{htmlonly}
-   \newcommand{\sqt}[1]{{\tt{'}}#1{\tt{'}}}
-\end{htmlonly}
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
-
-
-%+
-% Extra sst definitions written by PMA.
-%-
+% ? Document specific \providecommand or \newenvironment commands.
+\providecommand{\sqt}[1]{`#1'}
 
 % Define layout of brief listing sections - Pinched from SUN/33
 
-\newcommand{\noteroutine}[2]{\htmlref{{\small \bf #1}}{#1} \nopagebreak \\
-                             \hspace*{3em} {\em #2} \\[1.5ex]}
+\providecommand{\noteroutine}[2]{\htmlref{{\small \textbf{#1}}}{#1} \nopagebreak \\
+                             \hspace*{3em} \emph{#2} \\[1.5ex]}
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? Latex Copyright Statement
-%  =========================
-\begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
-\end{latexonly}
-% ? End of Latex copyright statement
-
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section{Introduction}
 
@@ -639,7 +116,7 @@ using. The routines that do not use the FIO file descriptors are:
 
 Here is an example of the use of some of these routines.
 
-\begin{verbatim}
+\begin{terminalv}
       ...
 *  Get a unit number.
       CALL FIO_GUNIT( UNIT, STATUS )
@@ -656,7 +133,7 @@ Here is an example of the use of some of these routines.
 *  Return the unit number.
       CALL FIO_PUNIT( UNIT, STATUS )
       ...
-\end{verbatim}
+\end{terminalv}
 
 Consistent use of the FIO\_GUNIT and FIO\_PUNIT routines has reduced the
 likelihood of a clash of unit number between this part of the program and some
@@ -697,7 +174,7 @@ these can be freely mixed, where appropriate.
 
 Here is an example of the use of some of these routines.
 
-\begin{verbatim}
+\begin{terminalv}
       ...
 *  Open a file.
       CALL FIO_OPEN( FILNAM, 'WRITE', 'LIST', 0, FD, STATUS )
@@ -708,7 +185,7 @@ Here is an example of the use of some of these routines.
 *  Close the file.
       CALL FIO_CLOSE( FD, STATUS )
       ...
-\end{verbatim}
+\end{terminalv}
 
 Note that there is no testing for errors in this piece of code since the FIO
 routines follow the normal Starlink convention for error handling and will not
@@ -733,7 +210,7 @@ following routines provide an interface to the ADAM parameter system:
 These routines are typically used to get the name of a file through the ADAM
 parameter system. For instance, the previous example could be re-written as:
 
-\begin{verbatim}
+\begin{terminalv}
       ...
 *  Open a file.
       CALL FIO_ASSOC( PNAME, 'WRITE', 'LIST', 0, FD, STATUS )
@@ -744,24 +221,24 @@ parameter system. For instance, the previous example could be re-written as:
 *  Close the file.
       CALL FIO_CANCL( PNAME, STATUS )
       ...
-\end{verbatim}
+\end{terminalv}
 
 When the call to FIO\_ASSOC is executed, the name of the file will be obtained
 via the parameter system. This may involve prompting the user, but the file
 name could equally well be defaulted from the interface file. The interface
 file might contain something like this:
 
-\begin{verbatim}
-      PARAMETER  FILE
-        TYPE     'FILENAME'
-        VPATH    'PROMPT'
-        PROMPT   'Name of file to be created'
-        PPATH    'CURRENT,DEFAULT'
-        DEFAULT  newfile.dat
-      END PARAMETER
-\end{verbatim}
+\begin{terminalv}
+PARAMETER  FILE
+ TYPE     'FILENAME'
+ VPATH    'PROMPT'
+ PROMPT   'Name of file to be created'
+ PPATH    'CURRENT,DEFAULT'
+ DEFAULT  newfile.dat
+END PARAMETER
+\end{terminalv}
 
-{\bf N.B.} At present, if you specify a file name that contains a directory
+\textbf{N.B.} At present, if you specify a file name that contains a directory
 name in an interface file, then you must use the appropriate (Unix or VMS)
 syntax.
 In the future, FIO may be enhanced to handle environment variables and
@@ -796,7 +273,7 @@ printed will have their first characters interpreted as carriage control
 characters, and implies, but does not state explicitly, that output records that
 are not be be printed will not have their first characters interpreted as
 carriage control characters. Unfortunately, it is rather vague as to what the
-term {\em printing\/} actually means. An additional source of confusion is that
+term \emph{printing\/} actually means. An additional source of confusion is that
 a standard FORTRAN OPEN statement will create files that do cause the first
 character of each record to be interpreted as a carriage control character on
 VMS, but not on Unix. In fact, Unix has no concept of the type of a file, so
@@ -827,7 +304,7 @@ routine on Unix, it will ignore it.
 \section{INCLUDE files}
 \label{include-files}
 
-The include file {\tt FIO\_PAR} defines symbolic names for various constants
+The include file \texttt{FIO\_PAR} defines symbolic names for various constants
 which  may be required by tasks. The most useful constants are FIO\_\_SZMOD,
 which is used to specify the length of the access mode string in calls to
 FIO\_OPEN and RIO\_OPEN, and FIO\_\_SZFNM, which is the maximum allowed length
@@ -836,16 +313,15 @@ of a filename in FIO/RIO.
 If you need to test for explicit status values returned from FIO/RIO
 subroutines, include the statement:
 
-\begin{quote}{\tt
+\begin{terminalv}
       INCLUDE 'FIO\_ERR'
-}
-\end{quote}
+\end{terminalv}
 
 in the program. The return status can then be tested. For example:
 
-\begin{verbatim}
+\begin{terminalv}
       IF( STATUS .EQ. FIO__ERROR ) ...
-\end{verbatim}
+\end{terminalv}
 
 However, there are problems to do with portability when testing return status
 values. These are dealt with in the next section.
@@ -861,10 +337,9 @@ FIO\_SERR and FIO\_REP. FIO\_SERR is the simpler of the two. It takes an IOSTAT
 value as its first argument, returns a corresponding FIO error value in its
 status argument and reports an error. The error report is of the form:
 
-\begin{quote}{\tt
-FIO\_SERR: IOSTAT error $=$ Unit not connected
-}
-\end{quote}
+\begin{terminalv}
+FIO_SERR: IOSTAT error = Unit not connected
+\end{terminalv}
 
 This is fine if all you want to do is translate the IOSTAT value, but the error
 report does not contain any contextual information such as the unit that was
@@ -875,20 +350,21 @@ FIO\_REP sets three message tokens, FNAME, UNIT and IOSTAT and then reports the
 message that it was given. This message can contain references to the message
 tokens to provide a more meaningful error message. For example:
 
-\begin{verbatim}
+\begin{terminalv}
       OPEN( UNIT=UNUM, FILE=FILNAM, STATUS='OLD', IOSTAT=ISTAT )
       CALL FIO_REP( UNUM, FILNAM, ISTAT,
      :  'Error opening file ^FNAME. Status = ^IOSTAT', STATUS )
-\end{verbatim}
+\end{terminalv}
 
 In this case, the error report contains the fact that this error has been
 generated when trying to open a file. To save having to generate an error
 message for every call to FIO\_REP, it is possible to give a blank message,
 which is equivalent to
 
-\begin{verbatim}
-      'Error with file ^FNAME on unit number ^UNIT; IOSTAT = ^IOSTAT'
-\end{verbatim} % verbatim is necessary to get the ^ to come out right.
+\begin{terminalv}
+'Error with file ^FNAME on unit number ^UNIT; IOSTAT = ^IOSTAT'
+\end{terminalv}
+% verbatim is necessary to get the ^ to come out right.
 
 For a given value of IOSTAT, the value of status that is returned by FIO\_REP
 is the same as that returned by FIO\_SERR.
@@ -915,8 +391,7 @@ always turn out to be the case.
 
 On account of these difficulties, FIO/RIO adopts the following strategy:
 
-\begin{quote}{\it
-If the text of an error message in the computer manufacturer's documentation is
+\begin{quote}\emph{If the text of an error message in the computer manufacturer's documentation is
 the same for two different machines, then FIO/RIO will return the same status
 value on those two machines. Otherwise different status values are returned on
 the different machines.
@@ -943,7 +418,7 @@ The strategy of only returning the same error number when the text of the
 message is the same definitely errs on the side of caution. It means that
 programs that are intended to be run on several different machines must often
 test for different error codes, one for each machine type. For example, it is
-quite common to test for {\tt FIO\_\_FILNF} (file not found) on VAX/VMS.
+quite common to test for \texttt{FIO\_\_FILNF} (file not found) on VAX/VMS.
 Unfortunately, there is no error that corresponds sufficiently closely to this
 on SunOS. As well as being very tedious, it means that tests for bad status
 values in application programs probably need to be modified to run on a new
@@ -954,7 +429,7 @@ open a file using the returned string. If the program fails to open the file,
 this might be for one of several reasons. It may be that the file
 does not exist, or that the file exists, but you do not have the right to
 access the file, or that the string typed in is not a valid file name
-(e.g.\ {\tt [PMA\}TEST.DAT} on VMS).
+(e.g.\ \texttt{[PMA\}TEST.DAT} on VMS).
 In all of these situations, you can rely on the error reporting to tell the
 user what has gone wrong, but all the program cares about is that it has
 failed to open the file and that it should re-prompt the user.
@@ -964,17 +439,17 @@ if the value of STATUS is in the class of errors described by the character
 argument.
 Here is an example:
 
-\begin{verbatim}
+\begin{terminalv}
       IF( FIO_TEST( 'OPEN error', STATUS ) ) THEN
          ...
       ENDIF
-\end{verbatim}
+\end{terminalv}
 
 Note that FIO\_TEST is not sensitive to the case of the character string
 given as its first argument. An example of attempting to open a file using
 FORTRAN I/O and then testing to see if this was successful is:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL ERR_MARK
       OPEN( UNIT=UNUM, FILE=FILNAM, STATUS='OLD', IOSTAT=ISTAT )
       CALL FIO_REP( UNUM, FILNAM, ISTAT, ' ', STATUS )
@@ -985,14 +460,14 @@ FORTRAN I/O and then testing to see if this was successful is:
          CALL ERR_ANNUL( STATUS )
       END IF
       CALL ERR_RLSE
-\end{verbatim}
+\end{terminalv}
 
 This example has used a FORTRAN OPEN statement in the application code. It is
 generally better to let FIO handle all file access as this makes for more
 portable code. (It is also less typing.) In this case, the above example would
 be written as:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL ERR_MARK
       CALL FIO_OPEN( FILNAM, 'UPDATE', 'LIST', 0, FD, STATUS )
       IF( FIO_TEST( 'OPEN error', STATUS ) ) THEN
@@ -1001,7 +476,7 @@ be written as:
          CALL ERR_ANNUL( STATUS )
       END IF
       CALL ERR_RLSE
-\end{verbatim}
+\end{terminalv}
 
 A list of all the classes of errors that can be handled in this manner is given
 in appendix~\ref{status-values}. At present, the list of error classes is
@@ -1010,8 +485,7 @@ classes in a future release of FIO/RIO.
 
 \subsection{Note to software developers}
 \begin{quote}
-{\it
-The routines that provide the interface to the ADAM parameter system report
+\emph{The routines that provide the interface to the ADAM parameter system report
 errors by calling the ERR library. All other routines report errors by calling
 the EMS library.}
 \end{quote}
@@ -1026,34 +500,30 @@ the include file is given as an explicit path name. Consequently, the best way
 of naming include files on a Unix system is to use soft links. For example, the
 program contains lines such as:
 
-\begin{quote}{\tt
-      INCLUDE 'SAE\_PAR'
-}
-\end{quote}
+\begin{terminalv}
+      INCLUDE 'SAE_PAR'
+\end{terminalv}
 
 and you create a soft link in your directory with the command:
 
-\begin{quote}{\tt
-\% ln -s /star/include/sae\_par SAE\_PAR
-}
-\end{quote}
+\begin{terminalv}
+% ln -s /star/include/sae_par SAE_PAR
+\end{terminalv}
 
-A shell script called {\tt fio\_dev} is provided to create the appropriate soft
+A shell script called \texttt{fio\_dev} is provided to create the appropriate soft
 links for the FIO library.
 
 To compile and link a program that uses FIO, type:
 
-\begin{quote}{\tt
-\% f77 prog.f -L/star/lib `fio\_link`
-}
-\end{quote}
+\begin{terminalv}
+% f77 prog.f -L/star/lib `fio_link`
+\end{terminalv}
 
 To compile and link an ADAM program that uses FIO, type:
 
-\begin{quote}{\tt
-\% alink prog.f `fio\_link\_adam`
-}
-\end{quote}
+\begin{terminalv}
+% alink prog.f `fio_link_adam`
+\end{terminalv}
 
 \subsection{VMS}
 
@@ -1061,40 +531,35 @@ The current version of FIO/RIO is distributed as a shareable image. Before
 compiling a program that uses any of the FIO include files, or linking any
 program that uses FIO, type
 
-\begin{quote}{\tt
-\$ FIO\_DEV
-}
-\end{quote}
+\begin{terminalv}
+$ FIO_DEV
+\end{terminalv}
 
 The FIO shareable image is included in the STAR\_LINK shareable image library,
 so the preferred method of linking basic FORTRAN programs is:
 
-\begin{quote}{\tt
-\$ LINK progname,STAR\_LINK/OPT
-}
-\end{quote}
+\begin{terminalv}
+$ LINK progname,STAR_LINK/OPT
+\end{terminalv}
 
 To link an ADAM program with FIO, type:
 
-\begin{quote}{\tt
-\$ ALINK progname
-}
-\end{quote}
+\begin{terminalv}
+$ ALINK progname
+\end{terminalv}
 
 The shareable libraries and object libraries are stored in FIO\_DIR, so if you
 need to link explicitly with the shareable library, type:
 
-\begin{quote}{\tt
-\$ LINK progname,FIO\_LINK/OPT
-}
-\end{quote}
+\begin{terminalv}
+$ LINK progname,FIO_LINK/OPT
+\end{terminalv}
 
 or to link with the object library, type:
 
-\begin{quote}{\tt
-\$ LINK progname,FIO\_DIR:FIO/LIB
-}
-\end{quote}
+\begin{terminalv}
+$ LINK progname,FIO\_DIR:FIO/LIB
+\end{terminalv}
 
 Linking with the object library is not recommended as it makes the size of
 executable files larger than using shareable libraries and it will require
@@ -1105,149 +570,91 @@ relinking programs to take advantage of bug fixes or updates.
 \newpage
 \section{Alphabetical List of Routines}
 
-\noteroutine{
-   FIO\_ACTIV
-}{
+\noteroutine{FIO\_ACTIV}{
    Initialise FIO library for ADAM application
 }
-\noteroutine{
-   FIO\_ANNUL
-}{
+\noteroutine{FIO\_ANNUL}{
    Annul a file descriptor and close the file
 }
-\noteroutine{
-   FIO\_ASSOC
-}{
+\noteroutine{FIO\_ASSOC}{
    Create/open a sequential file associated with a parameter
 }
-\noteroutine{
-   FIO\_CANCL
-}{
+\noteroutine{FIO\_CANCL}{
    Close a file and cancel the parameter
 }
-\noteroutine{
-   FIO\_CLOSE
-}{
+\noteroutine{FIO\_CLOSE}{
    Close a sequential file
 }
-\noteroutine{
-   FIO\_DEACT
-}{
+\noteroutine{FIO\_DEACT}{
    Deactivate FIO
 }
-\noteroutine{
-   FIO\_ERASE
-}{
+\noteroutine{FIO\_ERASE}{
    Delete a file
 }
-\noteroutine{
-   FIO\_FNAME
-}{
+\noteroutine{FIO\_FNAME}{
    Get the full file name of a file
 }
-\noteroutine{
-   FIO\_GUNIT
-}{
+\noteroutine{FIO\_GUNIT}{
    Get a unit number
 }
-\noteroutine{
-   FIO\_OPEN
-}{
+\noteroutine{FIO\_OPEN}{
    Create/open a sequential file
 }
-\noteroutine{
-   FIO\_PUNIT
-}{
+\noteroutine{FIO\_PUNIT}{
    Release a unit number
 }
-\noteroutine{
-   FIO\_READ
-}{
+\noteroutine{FIO\_READ}{
    Read sequential record
 }
-\noteroutine{
-   FIO\_READF
-}{
+\noteroutine{FIO\_READF}{
    Fast read sequential record
 }
-\noteroutine{
-   FIO\_REP
-}{
+\noteroutine{FIO\_REP}{
    Report error from FORTRAN I/O statements
 }
-\noteroutine{
-   FIO\_RWIND
-}{
+\noteroutine{FIO\_RWIND}{
    Rewind a sequential file
 }
-\noteroutine{
-   FIO\_SERR
-}{
+\noteroutine{FIO\_SERR}{
    Set error status
 }
-\noteroutine{
-   FIO\_START
-}{
+\noteroutine{FIO\_START}{
    Set up units numbers and open standard I/O streams
 }
-\noteroutine{
-   FIO\_STOP
-}{
+\noteroutine{FIO\_STOP}{
    Close down FIO
 }
-\noteroutine{
-   FIO\_TEST
-}{
+\noteroutine{FIO\_TEST}{
    Test if an FIO status value belongs to a certain class of errors
 }
-\noteroutine{
-   FIO\_UNIT
-}{
+\noteroutine{FIO\_UNIT}{
    Get a unit number given a file descriptor
 }
-\noteroutine{
-   FIO\_WRITE
-}{
+\noteroutine{FIO\_WRITE}{
    Write a sequential record
 }
-\noteroutine{
-   RIO\_ANNUL
-}{
+\noteroutine{RIO\_ANNUL}{
    Annul a file descriptor and close the file
 }
-\noteroutine{
-   RIO\_ASSOC
-}{
+\noteroutine{RIO\_ASSOC}{
    Create/open a direct access file associated with a parameter
 }
-\noteroutine{
-   RIO\_CANCL
-}{
+\noteroutine{RIO\_CANCL}{
    Close a file and cancel the parameter
 }
-\noteroutine{
-   RIO\_CLOSE
-}{
+\noteroutine{RIO\_CLOSE}{
    Close a direct access file
 }
-\noteroutine{
-   RIO\_ERASE
-}{
+\noteroutine{RIO\_ERASE}{
    Delete a file
 }
-\noteroutine{
-   RIO\_OPEN
-}{
+\noteroutine{RIO\_OPEN}{
    Open a direct access file
 }
-\noteroutine{
-   RIO\_READ
-}{
+\noteroutine{RIO\_READ}{
    Read record from direct access file
 }
-\noteroutine{
-   RIO\_WRITE
-}{
+\noteroutine{RIO\_WRITE}{
    Write a record to a direct access file
 }
 
@@ -1257,158 +664,100 @@ relinking programs to take advantage of bug fixes or updates.
 
 \subsection{Simple I/O routines}
 
-\noteroutine{
-   FIO\_ERASE
-}{
+\noteroutine{FIO\_ERASE}{
    Delete a file
 }
-\noteroutine{
-   FIO\_GUNIT
-}{
+\noteroutine{FIO\_GUNIT}{
    Get a unit number
 }
-\noteroutine{
-   FIO\_PUNIT
-}{
+\noteroutine{FIO\_PUNIT}{
    Release a unit number
 }
-\noteroutine{
-   FIO\_REP
-}{
+\noteroutine{FIO\_REP}{
    Report error from FORTRAN I/O statements
 }
-\noteroutine{
-   FIO\_SERR
-}{
+\noteroutine{FIO\_SERR}{
    Set error status
 }
-\noteroutine{
-   FIO\_TEST
-}{
+\noteroutine{FIO\_TEST}{
    Test if an FIO status value belongs to a certain class of errors
 }
-\noteroutine{
-   RIO\_ERASE
-}{
+\noteroutine{RIO\_ERASE}{
    Delete a file
 }
 
 \subsection{Stand alone routines}
 
-\noteroutine{
-   FIO\_CLOSE
-}{
+\noteroutine{FIO\_CLOSE}{
    Close a sequential file
 }
-\noteroutine{
-   FIO\_FNAME
-}{
+\noteroutine{FIO\_FNAME}{
    Get the full file name of a file
 }
-\noteroutine{
-   FIO\_OPEN
-}{
+\noteroutine{FIO\_OPEN}{
    Create/open a sequential file
 }
-\noteroutine{
-   FIO\_READ
-}{
+\noteroutine{FIO\_READ}{
    Read sequential record
 }
-\noteroutine{
-   FIO\_READF
-}{
+\noteroutine{FIO\_READF}{
    Fast read sequential record
 }
-\noteroutine{
-   FIO\_RWIND
-}{
+\noteroutine{FIO\_RWIND}{
    Rewind a sequential file
 }
-\noteroutine{
-   FIO\_UNIT
-}{
+\noteroutine{FIO\_UNIT}{
    Get a unit number given a file descriptor
 }
-\noteroutine{
-   FIO\_WRITE
-}{
+\noteroutine{FIO\_WRITE}{
    Write a sequential record
 }
-\noteroutine{
-   RIO\_CLOSE
-}{
+\noteroutine{RIO\_CLOSE}{
    Close a direct access file
 }
-\noteroutine{
-   RIO\_OPEN
-}{
+\noteroutine{RIO\_OPEN}{
    Open a direct access file
 }
-\noteroutine{
-   RIO\_READ
-}{
+\noteroutine{RIO\_READ}{
    Read record from direct access file
 }
-\noteroutine{
-   RIO\_WRITE
-}{
+\noteroutine{RIO\_WRITE}{
    Write a record to a direct access file
 }
 
 \subsection{ADAM parameter system routines}
 
-\noteroutine{
-   FIO\_ANNUL
-}{
+\noteroutine{FIO\_ANNUL}{
    Annul a file descriptor and close the file
 }
-\noteroutine{
-   FIO\_ASSOC
-}{
+\noteroutine{FIO\_ASSOC}{
    Create/open a sequential file associated with a parameter
 }
-\noteroutine{
-   FIO\_CANCL
-}{
+\noteroutine{FIO\_CANCL}{
    Close a file and cancel the parameter
 }
-\noteroutine{
-   RIO\_ANNUL
-}{
+\noteroutine{RIO\_ANNUL}{
    Annul a file descriptor and close the file
 }
-\noteroutine{
-   RIO\_ASSOC
-}{
+\noteroutine{RIO\_ASSOC}{
    Create/open a direct access file associated with a parameter
 }
-\noteroutine{
-   RIO\_CANCL
-}{
+\noteroutine{RIO\_CANCL}{
    Close a file and cancel the parameter
 }
 
 \subsection{Miscellaneous routines}
 
-\noteroutine{
-   FIO\_ACTIV
-}{
+\noteroutine{FIO\_ACTIV}{
    Initialise FIO library for ADAM application
 }
-\noteroutine{
-   FIO\_DEACT
-}{
+\noteroutine{FIO\_DEACT}{
    Deactivate FIO
 }
-\noteroutine{
-   FIO\_START
-}{
+\noteroutine{FIO\_START}{
    Set up units numbers and open standard I/O streams
 }
-\noteroutine{
-   FIO\_STOP
-}{
+\noteroutine{FIO\_STOP}{
    Close down FIO
 }
 
@@ -1898,14 +1247,14 @@ Linux:       &No trailing spaces added   &FIO\_\_EOF
    }
    \sstexamples{
       \sstexamplesubsection{
-         CALL FIO\_REP( UNIT, {\tt ' '}, IOSTAT, {\tt ' '}, STATUS )
+         CALL FIO\_REP( UNIT, \texttt{' '}, IOSTAT, \texttt{' '}, STATUS )
       }{
          This will inquire the name of the file that is connected to
          UNIT and report an error message containing the unit number
          file name and which error occurred.
       }
       \sstexamplesubsection{
-         CALL FIO\_REP( UNIT, {\tt ' '}, IOSTAT,
+         CALL FIO\_REP( UNIT, \texttt{' '}, IOSTAT,
                 'Failed to open $\wedge$FNAME', STATUS )
       }{
          This example provides an explicit error message containing the
