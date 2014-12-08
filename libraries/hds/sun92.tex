@@ -1,31 +1,27 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardoccopyright
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {92.13}
-\newcommand{\stardocauthors}   {R.F.~Warren-Smith\\ M.D.~Lawden\\
+\stardocnumber      {92.13}
+\stardocauthors   {R.F.~Warren-Smith\\ M.D.~Lawden\\
                                 B.K.~McIlwrath \\ T.~Jenness\\ P.W.~Draper}
-\newcommand{\stardocdate}      {18th April 2008}
-\newcommand{\stardoctitle}     {HDS\\ [\latex{1ex}]
+\stardocdate        {18th April 2008}
+\stardoctitle       {HDS\\ [\latex{1ex}]
                                 Hierarchical Data System}
-\newcommand{\stardocversion}   {Version 5.1}
-\newcommand{\stardocmanual}    {Programmer's Manual}
-\newcommand{\stardocabstract}  {
+\stardocversion     {Version 5.1}
+\stardocmanual      {Programmer's Manual}
+\stardocabstract  {
 HDS is a file-based hierarchical data system designed for the storage
 of a wide variety of information. It is particularly suited to the
 storage of large multi-dimensional arrays (with their ancillary data)
@@ -51,562 +47,20 @@ Starlink software.
 }
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%      1-FEB-2000 (AJC):
-%        Add Copyright statement in LaTeX
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-\newcommand{\hi}[1]{{\tt{#1}}}
-\newcommand{\qt}[1]{``#1''}
-\newcommand{\st}[1]{{\em{#1}}}
-\newcommand{\astar}[0]{{$*$}}
-\newcommand{\mplus}[0]{{$+$}}
-\newcommand{\htmltext}[1]{}
-\begin{htmlonly}
-   \newcommand{\qt}[1]{{\tt{"}}#1{\tt{"}}}
-   \newcommand{\astar}[0]{*}
-   \newcommand{\mplus}[0]{+}
-   \newcommand{\htmltext}[1]{#1}
-\end{htmlonly}
-
-% +
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty
-%     on your TEXINPUTS path (and including the name as part of the
-%     documentstyle declaration).
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-% -
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
-
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%  Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-
-\begin{htmlonly}
-
-%  Re-define \ssttt.
-   \newcommand{\ssttt}{\tt}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}]
-      \begin{description}
-         #2
-      \end{description}
-   }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-   }
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-% .
-
+% ? Document specific \providecommand or \newenvironment commands.
+\providecommand{\hi}[1]{{\texttt{#1}}}
+\providecommand{\qt}[1]{``#1''}
+\providecommand{\st}[1]{{\emph{#1}}}
+\providecommand{\astar}[0]{{$*$}}
+\providecommand{\mplus}[0]{{$+$}}
+\providecommand{\htmltext}[1]{}
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
+\scfrontmatter
 
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? Latex Copyright Statement
-%  =========================
-\begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
-\end{latexonly}
-% ? End of Latex copyright statement
-
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-   \markright{\stardocname}
-   \null\vspace{5mm}
-   \begin {center}
-   \rule{80mm}{0.5mm} \\ [1ex]
-   {\Large\bf \stardoctitle \\ [2.5ex]
-              \stardocversion} \\ [2ex]
-   \rule{80mm}{0.5mm}
-   \end{center}
-   \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-
-\cleardoublepage
-\begin{latexonly}
-   \newpage
-   \markright{\stardocname}
-   \renewcommand{\thepage}{\arabic{page}}
-   \setcounter{page}{1}
-   \null\vspace{5mm}
-   \begin{center}
-   \rule{80mm}{0.5mm}\\[1ex]
-   {\Large\bf \stardoctitle\\[2.5ex]
-              \stardocversion}\\[2ex]
-   \rule{80mm}{0.5mm}
-   \end{center}
-   \vspace{30mm}
-\end{latexonly}
 \section {\xlabel{introduction}INTRODUCTION}
 
 This document is intended for those people who intend to write
@@ -678,8 +132,8 @@ helpful in what follows.
 \put (15,55){\line(0,-1){1}}
 \put (15,53){\line(0,-1){1}}
 \put (15,51){\line(0,-1){1}}
-\put (23,80){\bf Filing System}
-\put (110,80){\bf HDS}
+\put (23,80)\textbf{Filing System}
+\put (110,80)\textbf{HDS}
 \end{picture}
 \end{center}
 \end{figure}
@@ -783,13 +237,12 @@ particular implementation of Fortran you are using. Details of HDS,
 which include information about the properties of the primitive data
 types on the system you are using, may be found in the file:
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 hds_machine
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
+
 
 in the directory \texttt{\$STARLINK\_DIR/help}.
 
@@ -849,20 +302,17 @@ To fix \htmlref{these ideas}{sect:objects}, look at the example
 below. Here we have described a structure of \htmlref{type}{sect:type}
 `NDF' using the following notation to describe each object:
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 NAME[(dimensions)] <TYPE> [value]
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 Note that scalar objects have no dimensions and that each level down
 the hierarchy is indented.
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 DATASET <NDF>
    DATA_ARRAY(512,1024)    <_UBYTE>   0,0,0,1,2,3,255,3,...
    LABEL                   <_CHAR*80> 'This is the data label'
@@ -873,9 +323,8 @@ DATASET <NDF>
       AXIS <AXIS>
          DATA_ARRAY(1024)  <_REAL>    5,10,15.1,20.3,...
          LABEL             <_CHAR*10> 'Axis 2'
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 This example exhibits several of the properties mentioned above:
 
@@ -893,13 +342,11 @@ HDS objects are created, accessed, modified and deleted in programs by
 means of calls to HDS \htmlref{routines}{appendix:alphalist}. The
 routine names have the following structure:
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 <pkg>_<func><qual>
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 where \verb+<pkg>+ is the \qt{package name}, \verb+<func>+ represents
 the function performed by the routine and \verb+<qual>+ is a qualifier
@@ -910,24 +357,22 @@ and PUT routines.
 
 Stand-alone HDS programs will typically have the following structure:
 
-\small
-\begin{quote}
-\begin{verbatim}
-      <declarations>
+\begin{small}
+\begin{terminalv}
+<declarations>
 
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'DAT_ERR'
-      INCLUDE 'CMP_ERR'
+INCLUDE 'SAE_PAR'
+INCLUDE 'DAT_PAR'
+INCLUDE 'DAT_ERR'
+INCLUDE 'CMP_ERR'
 
-      STATUS = SAI__OK
+STATUS = SAI__OK
 
-      <executable statements>
+<executable statements>
 
-      END
-\end{verbatim}
-\end{quote}
-\normalsize
+END
+\end{terminalv}
+\end{small}
 
 Various symbolic names should be used for important constant values in
 HDS programs to make the programs clear, portable and to insulate them
@@ -976,9 +421,8 @@ appropriate include file should be used and the symbolic names (listed
 in Appendix~\ref{appendix:errors}) used in the test. Here is an
 example of how to use these symbols:
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'DAT_ERR'
@@ -1000,18 +444,16 @@ example of how to use these symbols:
       ELSE
          <action on other errors>
       END IF
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 \section{\xlabel{creating_objects}\label{sect:creating}CREATING OBJECTS}
 
 Here is an example showing how to create the NDF structure in
 \S\ref{sect:ndf}.
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       CHARACTER * ( DAT__SZLOC ) NLOC, ALOC, CELL
@@ -1055,9 +497,8 @@ Here is an example showing how to create the NDF structure in
       CALL DAT_ANNUL( NLOC, STATUS )
 
       END
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 The following points should be borne in mind:
 
@@ -1140,9 +581,8 @@ it. This can be done by using the \htmlref{DAT\_PUT}{DAT_PUT} and
 data array in the \htmlref{above example}{sect:creating} with
 values we might do the following:
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
       ...
       BYTE IMVALS( 512, 1024 )
       CHARACTER * ( DAT__SZLOC ) LOC
@@ -1157,9 +597,8 @@ values we might do the following:
       CALL DAT_PUTC( LOC, 0, 0, 'This is the data label', STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
       ...
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 Because this sort of activity occurs quite often, \qt{packaged} access
 routines have been developed and are available to the programmer (see
@@ -1208,10 +647,9 @@ useful precaution.} (described in \xref{SUN/209}{sun209}{}) which is
 defined in the CNF\_PAR include file.  An example will illustrate
 this:
 
-\small
-\begin{quote}
+\begin{small}
 \label{example:mapping}
-\begin{verbatim}
+\begin{terminalv}
       ...
       INCLUDE 'CNF_PAR'
       INTEGER PNTR, EL
@@ -1243,9 +681,8 @@ this:
  1    CONTINUE
 
       END
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 This example illustrates two features of HDS which we haven't already
 mentioned:
@@ -1289,25 +726,22 @@ HDS gives you a choice about how to determine the length of the
 character strings it will map. You may either specify the length you
 want explicitly, \st{e.g:}
 
-\small
-\begin{quote}
-\begin{verbatim}
-      CALL DAT_MAPV( LOC '_CHAR*30', 'READ', PNTR, EL, STATUS )
-\end{verbatim}
-\end{quote}
-\normalsize
+\begin{small}
+\begin{terminalv}
+CALL DAT_MAPV( LOC '_CHAR*30', 'READ', PNTR, EL, STATUS )
+\end{terminalv}
+\end{small}
 
 (in which case HDS would map an array of character strings with each
 string containing 30 characters) or you may leave HDS to decide on the
 length required by omitting the length specification, thus:
 
 \small
-\begin{quote}
-\begin{verbatim}
-      CALL DAT_MAPV( LOC '_CHAR', 'READ', PNTR, EL, STATUS )
-\end{verbatim}
-\end{quote}
-\normalsize
+\begin{small}
+\begin{terminalv}
+CALL DAT_MAPV( LOC '_CHAR', 'READ', PNTR, EL, STATUS )
+\end{terminalv}
+\end{small}
 
 In this latter case, HDS will determine the number of characters
 actually required to format the object's values without loss of
@@ -1328,27 +762,24 @@ must therefore be passed explicitly.
 As an example, suppose we mapped an array of character strings
 specifying that each string should be of length 80 characters, thus:
 
-\small
-\begin{quote}
-\begin{verbatim}
-      CALL DAT_MAPV( LOC, '_CHAR*80', 'READ', PNTR, EL, STATUS )
-\end{verbatim}
-\end{quote}
+\begin{small}
+\begin{terminalv}
+CALL DAT_MAPV( LOC, '_CHAR*80', 'READ', PNTR, EL, STATUS )
+\end{terminalv}
+\end{small}
 \normalsize
 
 This mapped array could be passed to a subroutine for use as follows:
 
-\small
-\begin{quote}
-\begin{verbatim}
-      INCLUDE 'CNF_PAR'
+\begin{small}
+\begin{terminalv}
+INCLUDE 'CNF_PAR'
 
-      ...
+...
 
-      CALL SHOW( EL, %VAL( CNF_PVAL( PNTR ) ), %VAL( CNF_CVAL( 80 ) ) )
-\end{verbatim}
-\end{quote}
-\normalsize
+CALL SHOW( EL, %VAL( CNF_PVAL( PNTR ) ), %VAL( CNF_CVAL( 80 ) ) )
+\end{terminalv}
+\end{small}
 
 The character string length (80) is passed as an additional argument
 (which does not appear in the formal argument list of the SHOW
@@ -1356,16 +787,14 @@ subroutine) using the \qt{\%VAL} facility. The array would then be
 declared for use within this routine as if it were a normal Fortran
 character array, as follows:
 
-\small
-\begin{quote}
-\begin{verbatim}
-      SUBROUTINE SHOW( EL, CARRAY )
-      INTEGER EL
-      CHARACTER * ( * ) CARRAY( EL )
-      ...
-\end{verbatim}
-\end{quote}
-\normalsize
+\begin{small}
+\begin{terminalv}
+SUBROUTINE SHOW( EL, CARRAY )
+INTEGER EL
+CHARACTER * ( * ) CARRAY( EL )
+...
+\end{terminalv}
+\end{small}
 
 Its character string length could then be determined, as usual, by
 using the Fortran intrinsic LEN function within the SHOW routine.
@@ -1375,18 +804,16 @@ the array (leaving HDS to determine the length of the mapped strings)
 then an additional call to \htmlref{DAT\_CLEN}{DAT_CLEN} would be
 required to determine this length, as follows:
 
-\small
-\begin{quote}
-\begin{verbatim}
-      ...
-      INTEGER LENGTH
+\begin{small}
+\begin{terminalv}
+...
+INTEGER LENGTH
 
-      CALL DAT_MAPV( LOC, '_CHAR', 'READ', PNTR, EL, STATUS )
-      CALL DAT_CLEN( LOC, LENGTH, STATUS )
-      CALL SHOW( EL, %VAL( CNF_PVAL( PNTR ) ), %VAL( CNF_CVAL( LENGTH ) ) )
-\end{verbatim}
-\end{quote}
-\normalsize
+CALL DAT_MAPV( LOC, '_CHAR', 'READ', PNTR, EL, STATUS )
+CALL DAT_CLEN( LOC, LENGTH, STATUS )
+CALL SHOW( EL, %VAL( CNF_PVAL( PNTR ) ), %VAL( CNF_CVAL( LENGTH ) ) )
+\end{terminalv}
+\end{small}
 
 If more than one mapped character array is being passed, then the
 length of each must be passed separately by adding it to the end of
@@ -1410,9 +837,8 @@ HDS objects may be individually copied and deleted.  The routines
 recursively copy and erase all levels of the hierarchy below that
 specified in the subroutine call:
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
       ...
       CHARACTER * ( DAT__SZLOC ) OLOC
 
@@ -1424,22 +850,19 @@ specified in the subroutine call:
 
 * Erase the original AXIS structure.
       CALL DAT_ERASE( NLOC, 'AXIS', STATUS )
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 Note that we \htmlref{annulled}{sect:annul} the
 \htmlref{locator}{sect:locators} to the AXIS object before attempting
 to delete it. This whole operation can also be done using
 \htmlref{DAT\_MOVE}{DAT_MOVE}:
 
-\small
-\begin{quote}
-\begin{verbatim}
-      CALL DAT_MOVE( ALOC, OLOC, 'AXISCOPY', STATUS )
-\end{verbatim}
-\end{quote}
-\normalsize
+\begin{small}
+\begin{terminalv}
+CALL DAT_MOVE( ALOC, OLOC, 'AXISCOPY', STATUS )
+\end{terminalv}
+\end{small}
 
 \section{\xlabel{accessing_subsets}SUBSETS OF OBJECTS}
 
@@ -1449,9 +872,8 @@ an array (an example was shown in \S\ref{sect:creating}). The routine
 dimensioned object. This subset can then be treated for most purposes
 as if it were an object in its own right. For example:
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
       ...
       CHARACTER * ( DAT__SZLOC ) SLICE
       INTEGER LOWER( 2 ), UPPER( 2 )
@@ -1465,9 +887,8 @@ as if it were an object in its own right. For example:
 *  Map the subset as a vector.
       CALL DAT_MAPV( SLICE, '_REAL', 'UPDATE', PNTR, EL, STATUS )
       ...
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 In contrast to DAT\_SLICE, \htmlref{DAT\_ALTER}{DAT_ALTER} makes a
 permanent change to a non-scalar object. The object can be made larger
@@ -1514,13 +935,11 @@ Locator validity can be determined by using the routine
 \htmlref{DAT\_VALID}{DAT_VALID}, which returns a logical value of
 .TRUE.\ via its VALID argument if the locator supplied is valid:
 
-\small
-\begin{quote}
-\begin{verbatim}
-      CALL DAT_VALID( LOC, VALID, STATUS )
-\end{verbatim}
-\end{quote}
-\normalsize
+\begin{small}
+\begin{terminalv}
+CALL DAT_VALID( LOC, VALID, STATUS )
+\end{terminalv}
+\end{small}
 
 This is the only HDS routine to which an invalid locator may be passed
 without provoking an error.
@@ -1540,13 +959,11 @@ associated with it are released and made available for re-use. A
 locator is annulled using the routine \htmlref{DAT\_ANNUL}{DAT_ANNUL},
 as follows:
 
-\small
-\begin{quote}
-\begin{verbatim}
-      CALL DAT_ANNUL( LOC, STATUS )
-\end{verbatim}
-\end{quote}
-\normalsize
+\begin{small}
+\begin{terminalv}
+CALL DAT_ANNUL( LOC, STATUS )
+\end{terminalv}
+\end{small}
 
 Note that annulling an invalid locator will produce an error, but this
 will be ignored if the STATUS argument is not set to SAI\_\_OK when
@@ -1565,13 +982,11 @@ may be derived from an existing one by a process called \st{cloning},
 which is performed by the routine \htmlref{DAT\_CLONE}{DAT_CLONE}, as
 follows:
 
-\small
-\begin{quote}
-\begin{verbatim}
-      CALL DAT_CLONE( LOC1, LOC2, STATUS )
-\end{verbatim}
-\end{quote}
-\normalsize
+\begin{small}
+\begin{terminalv}
+CALL DAT_CLONE( LOC1, LOC2, STATUS )
+\end{terminalv}
+\end{small}
 
 This returns a second locator LOC2 which refers to the same data
 object as LOC1.
@@ -1609,13 +1024,11 @@ an HDS container file is called its \st{reference count} and may be
 determined using the \htmlref{DAT\_REFCT}{DAT_REFCT} routine as
 follows:
 
-\small
-\begin{quote}
-\begin{verbatim}
-      CALL DAT_REFCT( LOC, REFCT, STATUS )
-\end{verbatim}
-\end{quote}
-\normalsize
+\begin{small}
+\begin{terminalv}
+CALL DAT_REFCT( LOC, REFCT, STATUS )
+\end{terminalv}
+\end{small}
 
 Here, LOC is a locator associated with any object in the file and the
 reference count is returned via the integer REFCT argument. The file
@@ -1645,14 +1058,12 @@ reference count). This is done by using the
 \htmlref{DAT\_PRMRY}{DAT_PRMRY} routine with its (first) SET argument
 set to .TRUE., thus:
 
-\small
-\begin{quote}
-\begin{verbatim}
-      PRMRY = .TRUE.             ! Promote the locator
-      CALL DAT_PRMRY( .TRUE., LOC, PRMRY, STATUS )
-\end{verbatim}
-\end{quote}
-\normalsize
+\begin{small}
+\begin{terminalv}
+PRMRY = .TRUE.             ! Promote the locator
+CALL DAT_PRMRY( .TRUE., LOC, PRMRY, STATUS )
+\end{terminalv}
+\end{small}
 
 With its first argument set to .FALSE., the same routine may also be
 used to enquire whether a locator is primary or not.
@@ -1663,9 +1074,8 @@ file remains open, so that the object remains accessible. For example,
 consider the following simple routine which returns a locator for a
 named object inside a container file:
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
       SUBROUTINE FINDIT( FILE, LOC, STATUS )
 
       <declarations, etc.>
@@ -1678,9 +1088,8 @@ named object inside a container file:
       CALL DAT_PRMRY( .TRUE., LOC, .TRUE., STATUS )
       CALL DAT_ANNUL( LOCTMP, STATUS )
       END
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 Note how the temporary locator returned by
 \htmlref{HDS\_OPEN}{HDS_OPEN} is \htmlref{annulled}{sect:annul} after
@@ -1698,9 +1107,8 @@ information describing all its attributes (not just its value), and
 these attributes can be obtained by means of enquiry routines. An
 example will illustrate:
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
       ...
       PARAMETER ( MAXCMP = 10 )
       CHARACTER * ( DAT__SZNAM ) NAME( MAXCMP )
@@ -1729,9 +1137,8 @@ example will illustrate:
          CALL DAT_ANNUL( LOC, STATUS )
  1    CONTINUE
       ...
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 Here \htmlref{DAT\_INDEX}{DAT_INDEX} is used to get \htmlref{locators}{sect:locators} to
 objects about which (in principle) we know nothing. This is just like
@@ -1773,9 +1180,8 @@ subroutine calls with one. The naming scheme is based on the
 associated \htmlref{DAT\_ routines}{appendix:datroutines}. An example is
 shown below.
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
       ...
       CHARACTER * 80 DLAB
       INTEGER DIMS( 2 )
@@ -1788,9 +1194,8 @@ shown below.
 *  Get a character string from the LABEL component and store it in DLAB.
       CALL CMP_GET0C( NLOC, 'LABEL', DLAB, STATUS )
       ...
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 \section{\xlabel{tuning_HDS}\label{sect:tuning}TUNING}
 
@@ -1804,7 +1209,7 @@ mechanisms.
 
 \begin{description}
 
-\item[{\bf Environment Variables.}]\mbox{}\\
+\item[\textbf{Environment Variables.}]\mbox{}\\
 By defining appropriate environment variables it is possible to set
 new default values for HDS tuning parameters. The translation of these
 environment variables is picked up when HDS starts up (typically when
@@ -1816,13 +1221,11 @@ values supplied.
 
 For example, the UNIX C~shell environment variable definition:
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 setenv HDS_INALQ 10
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 could be used to increase the default size of all newly created HDS
 files to 10 blocks.\footnote{An HDS block is 512 bytes.}
@@ -1844,20 +1247,18 @@ a tuning parameter setting really is critical, then it should be set
 by the software itself (see below), so as to prohibit outside
 interference.
 
-\item[{\bf Calling \htmlref{HDS\_TUNE}{HDS_TUNE}.}]\mbox{}\\
+\item[\textbf{Calling \htmlref{HDS\_TUNE}{HDS_TUNE}.}]\mbox{}\\
 Tuning parameter values may also be set directly from within an item
 of software by means of calls to the routine HDS\_TUNE. This allows
 programs to over-ride the default settings (or those established
 \st{via} environment variables). To modify the `MAP' tuning parameter,
 for example, the following call might be used:
 
-\small
-\begin{quote}
-\begin{verbatim}
-      CALL HDS_TUNE( 'MAP', 0, STATUS )
-\end{verbatim}
-\end{quote}
-\normalsize
+\begin{small}
+\begin{terminalv}
+CALL HDS_TUNE( 'MAP', 0, STATUS )
+\end{terminalv}
+\end{small}
 
 This would have the effect of disabling file mapping in favour of
 reading and writing as the preferred method of accessing data in
@@ -1938,30 +1339,30 @@ Typically, file mapping has the following plus and minus points:
 
 \begin{itemize}
 
-\item[{\bf \mplus}] It allows large arrays accessed via the HDS mapping
+\item[\textbf{\mplus}] It allows large arrays accessed via the HDS mapping
 routines to be sparsely accessed in an efficient way. In this case,
 only those regions of the array actually accessed will need to be
 read/written, as opposed to reading the entire array just to access a
 small fraction of it. This might be useful, for instance, if a
 1-dimensional profile through a large image were being generated.
 
-\item[{\bf \mplus}] It allows HDS container files to act as \qt{backing store}
+\item[\textbf{\mplus}] It allows HDS container files to act as \qt{backing store}
 for the virtual memory associated with objects accessed via the
 mapping routines. The operating system can then use HDS files, rather
 than its own backing (swap) file, to implement virtual memory
 management. This means that you do not need to have a large system
 backing file available in order to access large datasets.
 
-\item[{\bf \mplus}] For the same reason, temporary objects created with
+\item[\textbf{\mplus}] For the same reason, temporary objects created with
 \htmlref{DAT\_TEMP}{DAT_TEMP} and mapped to provide temporary
 workspace make no additional demand on the system backing file.
 
-\item[{\bf ?}] On some operating systems file mapping may be less
+\item[\textbf{?}] On some operating systems file mapping may be less
 efficient in terms of elapsed time than direct read/write
 operations. Conversely, on some operating systems it may be more
 efficient.
 
-\item[{\bf $-$}] Despite the memory efficiency of file mapping, there may be
+\item[\textbf{$-$}] Despite the memory efficiency of file mapping, there may be
 a significant efficiency penalty when large arrays are mapped to
 provide workspace. This is because the scratch data will often be
 written back to the container file when the array is unmapped (despite
@@ -1974,7 +1375,7 @@ occur even when normal system calls are used to allocate memory
 because file mapping is used implicitly. In this case, HDS's file
 mapping is at no particular disadvantage.
 
-\item[{\bf $-$}] Not all operating systems support file mapping and it
+\item[\textbf{$-$}] Not all operating systems support file mapping and it
 generally requires system-specific programming techniques, making it
 more trouble to implement on a new operating system.
 
@@ -1985,24 +1386,24 @@ disadvantages:
 
 \begin{itemize}
 
-\item[{\bf \mplus?}] On some operating systems it may be more efficient than
+\item[\textbf{\mplus?}] On some operating systems it may be more efficient than
 file mapping in terms of elapsed time in cases where an array of data
 will be accessed in its entirety (the normal situation). This is
 generally not true of UNIX systems, however,
 
-\item[{\bf $-$}] It is an inefficient method of accessing a small subset of
+\item[\textbf{$-$}] It is an inefficient method of accessing a small subset of
 a large array because it requires the entire array to be
 read/written. The solution to this problem is to explicitly access the
 required subset using (\st{e.g.\/}) \htmlref{DAT\_SLICE}{DAT_SLICE},
 although this complicates the software somewhat.
 
-\item[{\bf $-$}] It makes demands on the operating system's backing
+\item[\textbf{$-$}] It makes demands on the operating system's backing
 file which the file mapping technique avoids (see above). As a result,
 there is little point in creating scratch arrays with DAT\_TEMP for
 use as workspace unless file mapping is available (because the system
 backing file will be used anyway).
 
-\item[{\bf ?}] If an object is accessed several times simultaneously using
+\item[\textbf{?}] If an object is accessed several times simultaneously using
 HDS mapping routines, then modifications made via one mapping may not
 be consistently reflected in the other mapping (modifications will
 only be updated in the container file when the object is unmapped, so
@@ -2129,9 +1530,8 @@ instance, if the `MAP' parameter were to be set locally to allow
 sparse access to a large array of data, the following technique might
 be used:
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
       ...
       INTEGER OLDMAP
 
@@ -2149,9 +1549,8 @@ be used:
          CALL HDS_TUNE( 'MAP', OLDMAP, STATUS )
          CALL ERR_END( STATUS )
       END IF
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 Notice how great care has been taken over handling error
 conditions. In a large software system it could prove disastrous if a
@@ -2166,13 +1565,11 @@ Standalone applications which use HDS may be linked by specifying `hds\_link`
 on the compiler command line. Thus, to compile and link a stand-alone
 application called \qt{prog}, the following might be used:
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 f77 prog.f -I$STARLINK_DIR/include -L$STARLINK_DIR/lib `hds_link` -o prog
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 Note the use of the \qt{$-$L} flag to specify the location of the Starlink
 libraries and the backward quote characters which perform command
@@ -2184,24 +1581,20 @@ the normal commands for building ADAM tasks will do this
 automatically. Thus, for instance, an A-task which calls HDS routines
 might be built simply as follows:
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 alink prog.f
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 If you want to compile subroutine source code without linking, you should use
 the \qt{-I} flag as for the standalone example:
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 f77 -c -I$STARLINK_DIR/include subroutine.f
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 \section{ACKNOWLEDGEMENTS}
 
@@ -2233,113 +1626,113 @@ Warren-Smith at RAL.
 \label{appendix:cmproutines}
 \small
 \noindent
-{\bf \htmlref{CMP\_GET0x}{CMP_GET0x}}\st{(loc,name;value,status)} -- Read scalar component\\
-{\bf \htmlref{CMP\_GET1x}{CMP_GET1x}}\st{(loc,name,elx;value,el,status)} -- Read vector component\\
-{\bf \htmlref{CMP\_GETNx}{CMP_GETNx}}\st{(loc,name,ndim,dimx;value,dim,status)} -- Read array component\\
-{\bf \htmlref{CMP\_GETVx}{CMP_GETVx}}\st{(loc,name,elx;value,el,status)} -- Read vectorised component\\
-{\bf \htmlref{CMP\_LEN}{CMP_LEN}}\st{(loc,name;len,status)} -- Enquire component precision\\
-{\bf \htmlref{CMP\_MAPN}{CMP_MAPN}}\st{(loc,name,type,mode,ndim;pntr,dim,status)} -- Map array component\\
-{\bf \htmlref{CMP\_MAPV}{CMP_MAPV}}\st{(loc,name,type,mode;pntr,el,status)} -- Map vectorised component\\
-{\bf \htmlref{CMP\_MOD}{CMP_MOD}}\st{(loc,name,type,ndim,dim;status)} -- Obtain component\\
-{\bf \htmlref{CMP\_MODC}{CMP_MODC}}\st{(loc,name,len,ndim,dim;status)} -- Obtain string component\\
-{\bf \htmlref{CMP\_PRIM}{CMP_PRIM}}\st{(loc,name;reply,status)} -- Enquire component primitive\\
-{\bf \htmlref{CMP\_PUT0x}{CMP_PUT0x}}\st{(loc,name,value;status)} -- Write scalar component\\
-{\bf \htmlref{CMP\_PUT1x}{CMP_PUT1x}}\st{(loc,name,el,value;status)} -- Write vector component\\
-{\bf \htmlref{CMP\_PUTNx}{CMP_PUTNx}}\st{(loc,name,ndim,dimx,value,dim;status)} -- Write array component\\
-{\bf \htmlref{CMP\_PUTVx}{CMP_PUTVx}}\st{(loc,name,el,value;status)} -- Write vectorised component\\
-{\bf \htmlref{CMP\_SHAPE}{CMP_SHAPE}}\st{(loc,name,ndimx;dim,ndim,status)} -- Enquire component shape\\
-{\bf \htmlref{CMP\_SIZE}{CMP_SIZE}}\st{(loc,name;size,status)} -- Enquire component size\\
-{\bf \htmlref{CMP\_STRUC}{CMP_STRUC}}\st{(loc,name;reply,status)} -- Enquire component structure\\
-{\bf \htmlref{CMP\_TYPE}{CMP_TYPE}}\st{(loc,name;type,status)} -- Enquire component type\\
-{\bf \htmlref{CMP\_UNMAP}{CMP_UNMAP}}\st{(loc,name;status)} -- Unmap component\\
+\textbf{\htmlref{CMP\_GET0x}{CMP_GET0x}}\st{(loc,name;value,status)} -- Read scalar component\\
+\textbf{\htmlref{CMP\_GET1x}{CMP_GET1x}}\st{(loc,name,elx;value,el,status)} -- Read vector component\\
+\textbf{\htmlref{CMP\_GETNx}{CMP_GETNx}}\st{(loc,name,ndim,dimx;value,dim,status)} -- Read array component\\
+\textbf{\htmlref{CMP\_GETVx}{CMP_GETVx}}\st{(loc,name,elx;value,el,status)} -- Read vectorised component\\
+\textbf{\htmlref{CMP\_LEN}{CMP_LEN}}\st{(loc,name;len,status)} -- Enquire component precision\\
+\textbf{\htmlref{CMP\_MAPN}{CMP_MAPN}}\st{(loc,name,type,mode,ndim;pntr,dim,status)} -- Map array component\\
+\textbf{\htmlref{CMP\_MAPV}{CMP_MAPV}}\st{(loc,name,type,mode;pntr,el,status)} -- Map vectorised component\\
+\textbf{\htmlref{CMP\_MOD}{CMP_MOD}}\st{(loc,name,type,ndim,dim;status)} -- Obtain component\\
+\textbf{\htmlref{CMP\_MODC}{CMP_MODC}}\st{(loc,name,len,ndim,dim;status)} -- Obtain string component\\
+\textbf{\htmlref{CMP\_PRIM}{CMP_PRIM}}\st{(loc,name;reply,status)} -- Enquire component primitive\\
+\textbf{\htmlref{CMP\_PUT0x}{CMP_PUT0x}}\st{(loc,name,value;status)} -- Write scalar component\\
+\textbf{\htmlref{CMP\_PUT1x}{CMP_PUT1x}}\st{(loc,name,el,value;status)} -- Write vector component\\
+\textbf{\htmlref{CMP\_PUTNx}{CMP_PUTNx}}\st{(loc,name,ndim,dimx,value,dim;status)} -- Write array component\\
+\textbf{\htmlref{CMP\_PUTVx}{CMP_PUTVx}}\st{(loc,name,el,value;status)} -- Write vectorised component\\
+\textbf{\htmlref{CMP\_SHAPE}{CMP_SHAPE}}\st{(loc,name,ndimx;dim,ndim,status)} -- Enquire component shape\\
+\textbf{\htmlref{CMP\_SIZE}{CMP_SIZE}}\st{(loc,name;size,status)} -- Enquire component size\\
+\textbf{\htmlref{CMP\_STRUC}{CMP_STRUC}}\st{(loc,name;reply,status)} -- Enquire component structure\\
+\textbf{\htmlref{CMP\_TYPE}{CMP_TYPE}}\st{(loc,name;type,status)} -- Enquire component type\\
+\textbf{\htmlref{CMP\_UNMAP}{CMP_UNMAP}}\st{(loc,name;status)} -- Unmap component\\
 
 \label{appendix:datroutines}
-{\bf \htmlref{DAT\_ALTER}{DAT_ALTER}}\st{(loc,ndim,dim;status)} -- Alter object size \\
-{\bf \htmlref{DAT\_ANNUL}{DAT_ANNUL}}\st{(loc;status)} -- Annul locator \\
-{\bf \htmlref{DAT\_BASIC}{DAT_BASIC}}\st{(loc,mode;pntr,len,status)} -- Map primitive as basic units \\
-{\bf \htmlref{DAT\_CCOPY}{DAT_CCOPY}}\st{(loc1,loc2,name;loc3,status)} -- Copy one structure level\\
-{\bf \htmlref{DAT\_CCTYP}{DAT_CCTYP}}\st{(size;type)} -- Create type string\\
-{\bf \htmlref{DAT\_CELL}{DAT_CELL}}\st{(loc1,ndim,sub;loc2,status)} -- Locate cell \\
-{\bf \htmlref{DAT\_CLEN}{DAT_CLEN}}\st{(loc;clen,status)} -- Enquire character string length \\
-{\bf \htmlref{DAT\_CLONE}{DAT_CLONE}}\st{(loc1;loc2,status)} -- Clone locator \\
-{\bf \htmlref{DAT\_COERC}{DAT_COERC}}\st{(loc1,ndim;loc2,status)} -- Coerce object shape \\
-{\bf \htmlref{DAT\_COPY}{DAT_COPY}}\st{(loc1,loc2,name;status)} -- Copy object \\
-{\bf \htmlref{DAT\_DREP}{DAT_DREP}}\st{(loc;format,order,status)} -- Obtain primitive data representation information\\
-{\bf \htmlref{DAT\_ERASE}{DAT_ERASE}}\st{(loc,name;status)} -- Erase component \\
-{\bf \htmlref{DAT\_ERMSG}{DAT_ERMSG}}\st{(status;length,msg)} -- Translate error status\\
-{\bf \htmlref{DAT\_FIND}{DAT_FIND}}\st{(loc1,name;loc2,status)} -- Find named component \\
-{\bf \htmlref{DAT\_GET}{DAT_GET}}\st{(loc,type,ndim,dim;value,status)} -- Read primitive \\
-{\bf \htmlref{DAT\_GETx}{DAT_GETx}}\st{(loc,ndim,dim;value,status)} -- Read primitive \\
-{\bf \htmlref{DAT\_GET0x}{DAT_GET0x}}\st{(loc;value,status)} -- Read scalar primitive\\
-{\bf \htmlref{DAT\_GET1x}{DAT_GET1x}}\st{(loc,elx;value,el,status)} -- Read vector primitive\\
-{\bf \htmlref{DAT\_GETNx}{DAT_GETNx}}\st{(loc,ndim,dimx;value,dim,status)} -- Read array primitive\\
-{\bf \htmlref{DAT\_GETVx}{DAT_GETVx}}\st{(loc,elx;value,el,status)} -- Read vectorised primitive\\
-{\bf \htmlref{DAT\_INDEX}{DAT_INDEX}}\st{(loc1,index;loc2,status)} -- Index into component list \\
-{\bf \htmlref{DAT\_LEN}{DAT_LEN}}\st{(loc;len,status)} -- Enquire primitive precision \\
-{\bf \htmlref{DAT\_MAP}{DAT_MAP}}\st{(loc,type,mode,ndim,dim;pntr,status)} -- Map primitive \\
-{\bf \htmlref{DAT\_MAPx}{DAT_MAPx}}\st{(loc,mode,ndim,dim;pntr,status)} -- Map primitive \\
-{\bf \htmlref{DAT\_MAPN}{DAT_MAPN}}\st{(loc,type,mode,ndim;pntr,dim,status)} -- Map array primitive\\
-{\bf \htmlref{DAT\_MAPV}{DAT_MAPV}}\st{(loc,type,mode;pntr,el,status)} -- Map vectorised primitive\\
-{\bf \htmlref{DAT\_MOULD}{DAT_MOULD}}\st{(loc,ndim,dim;status)} -- Alter object shape \\
-{\bf \htmlref{DAT\_MOVE}{DAT_MOVE}}\st{(loc1,loc2,name;status)} -- Move object \\
-{\bf \htmlref{DAT\_MSG}{DAT_MSG}}\st{(token,loc)} -- Assign object name to message token \\
-{\bf \htmlref{DAT\_NAME}{DAT_NAME}}\st{(loc;name,status)} -- Enquire object name \\
-{\bf \htmlref{DAT\_NCOMP}{DAT_NCOMP}}\st{(loc;ncomp,status)} -- Enquire number of components \\
-{\bf \htmlref{DAT\_NEW}{DAT_NEW}}\st{(loc,name,type,ndim,dim;status)} -- Create component \\
-{\bf \htmlref{DAT\_NEW0x}{DAT_NEW0x}}\st{(loc,name;status)} -- Create scalar component\\
-{\bf \htmlref{DAT\_NEW0C}{DAT_NEW0C}}\st{(loc,name,len;status)} -- Create scalar string component\\
-{\bf \htmlref{DAT\_NEW1x}{DAT_NEW1x}}\st{(loc,name,el;status)} -- Create vector component\\
-{\bf \htmlref{DAT\_NEW1C}{DAT_NEW1C}}\st{(loc,name,len,el;status)} -- Create vector string component\\
-{\bf \htmlref{DAT\_NEWC}{DAT_NEWC}}\st{(loc,name,len,ndim,dim;status)} -- Create string component\\
-{\bf \htmlref{DAT\_PAREN}{DAT_PAREN}}\st{(loc1;loc2,status)} -- Find parent \\
-{\bf \htmlref{DAT\_PREC}{DAT_PREC}}\st{(loc;nbyte,status)} -- Enquire storage precision\\
-{\bf \htmlref{DAT\_PRIM}{DAT_PRIM}}\st{(loc;reply,status)} -- Enquire object primitive \\
-{\bf \htmlref{DAT\_PRMRY}{DAT_PRMRY}}\st{(set;loc,prmry,status)} -- Set or enquire
+\textbf{\htmlref{DAT\_ALTER}{DAT_ALTER}}\st{(loc,ndim,dim;status)} -- Alter object size \\
+\textbf{\htmlref{DAT\_ANNUL}{DAT_ANNUL}}\st{(loc;status)} -- Annul locator \\
+\textbf{\htmlref{DAT\_BASIC}{DAT_BASIC}}\st{(loc,mode;pntr,len,status)} -- Map primitive as basic units \\
+\textbf{\htmlref{DAT\_CCOPY}{DAT_CCOPY}}\st{(loc1,loc2,name;loc3,status)} -- Copy one structure level\\
+\textbf{\htmlref{DAT\_CCTYP}{DAT_CCTYP}}\st{(size;type)} -- Create type string\\
+\textbf{\htmlref{DAT\_CELL}{DAT_CELL}}\st{(loc1,ndim,sub;loc2,status)} -- Locate cell \\
+\textbf{\htmlref{DAT\_CLEN}{DAT_CLEN}}\st{(loc;clen,status)} -- Enquire character string length \\
+\textbf{\htmlref{DAT\_CLONE}{DAT_CLONE}}\st{(loc1;loc2,status)} -- Clone locator \\
+\textbf{\htmlref{DAT\_COERC}{DAT_COERC}}\st{(loc1,ndim;loc2,status)} -- Coerce object shape \\
+\textbf{\htmlref{DAT\_COPY}{DAT_COPY}}\st{(loc1,loc2,name;status)} -- Copy object \\
+\textbf{\htmlref{DAT\_DREP}{DAT_DREP}}\st{(loc;format,order,status)} -- Obtain primitive data representation information\\
+\textbf{\htmlref{DAT\_ERASE}{DAT_ERASE}}\st{(loc,name;status)} -- Erase component \\
+\textbf{\htmlref{DAT\_ERMSG}{DAT_ERMSG}}\st{(status;length,msg)} -- Translate error status\\
+\textbf{\htmlref{DAT\_FIND}{DAT_FIND}}\st{(loc1,name;loc2,status)} -- Find named component \\
+\textbf{\htmlref{DAT\_GET}{DAT_GET}}\st{(loc,type,ndim,dim;value,status)} -- Read primitive \\
+\textbf{\htmlref{DAT\_GETx}{DAT_GETx}}\st{(loc,ndim,dim;value,status)} -- Read primitive \\
+\textbf{\htmlref{DAT\_GET0x}{DAT_GET0x}}\st{(loc;value,status)} -- Read scalar primitive\\
+\textbf{\htmlref{DAT\_GET1x}{DAT_GET1x}}\st{(loc,elx;value,el,status)} -- Read vector primitive\\
+\textbf{\htmlref{DAT\_GETNx}{DAT_GETNx}}\st{(loc,ndim,dimx;value,dim,status)} -- Read array primitive\\
+\textbf{\htmlref{DAT\_GETVx}{DAT_GETVx}}\st{(loc,elx;value,el,status)} -- Read vectorised primitive\\
+\textbf{\htmlref{DAT\_INDEX}{DAT_INDEX}}\st{(loc1,index;loc2,status)} -- Index into component list \\
+\textbf{\htmlref{DAT\_LEN}{DAT_LEN}}\st{(loc;len,status)} -- Enquire primitive precision \\
+\textbf{\htmlref{DAT\_MAP}{DAT_MAP}}\st{(loc,type,mode,ndim,dim;pntr,status)} -- Map primitive \\
+\textbf{\htmlref{DAT\_MAPx}{DAT_MAPx}}\st{(loc,mode,ndim,dim;pntr,status)} -- Map primitive \\
+\textbf{\htmlref{DAT\_MAPN}{DAT_MAPN}}\st{(loc,type,mode,ndim;pntr,dim,status)} -- Map array primitive\\
+\textbf{\htmlref{DAT\_MAPV}{DAT_MAPV}}\st{(loc,type,mode;pntr,el,status)} -- Map vectorised primitive\\
+\textbf{\htmlref{DAT\_MOULD}{DAT_MOULD}}\st{(loc,ndim,dim;status)} -- Alter object shape \\
+\textbf{\htmlref{DAT\_MOVE}{DAT_MOVE}}\st{(loc1,loc2,name;status)} -- Move object \\
+\textbf{\htmlref{DAT\_MSG}{DAT_MSG}}\st{(token,loc)} -- Assign object name to message token \\
+\textbf{\htmlref{DAT\_NAME}{DAT_NAME}}\st{(loc;name,status)} -- Enquire object name \\
+\textbf{\htmlref{DAT\_NCOMP}{DAT_NCOMP}}\st{(loc;ncomp,status)} -- Enquire number of components \\
+\textbf{\htmlref{DAT\_NEW}{DAT_NEW}}\st{(loc,name,type,ndim,dim;status)} -- Create component \\
+\textbf{\htmlref{DAT\_NEW0x}{DAT_NEW0x}}\st{(loc,name;status)} -- Create scalar component\\
+\textbf{\htmlref{DAT\_NEW0C}{DAT_NEW0C}}\st{(loc,name,len;status)} -- Create scalar string component\\
+\textbf{\htmlref{DAT\_NEW1x}{DAT_NEW1x}}\st{(loc,name,el;status)} -- Create vector component\\
+\textbf{\htmlref{DAT\_NEW1C}{DAT_NEW1C}}\st{(loc,name,len,el;status)} -- Create vector string component\\
+\textbf{\htmlref{DAT\_NEWC}{DAT_NEWC}}\st{(loc,name,len,ndim,dim;status)} -- Create string component\\
+\textbf{\htmlref{DAT\_PAREN}{DAT_PAREN}}\st{(loc1;loc2,status)} -- Find parent \\
+\textbf{\htmlref{DAT\_PREC}{DAT_PREC}}\st{(loc;nbyte,status)} -- Enquire storage precision\\
+\textbf{\htmlref{DAT\_PRIM}{DAT_PRIM}}\st{(loc;reply,status)} -- Enquire object primitive \\
+\textbf{\htmlref{DAT\_PRMRY}{DAT_PRMRY}}\st{(set;loc,prmry,status)} -- Set or enquire
 primary/secondary locator \\
-{\bf \htmlref{DAT\_PUT}{DAT_PUT}}\st{(loc,type,ndim,dim,value;status)} -- Write primitive \\
-{\bf \htmlref{DAT\_PUTx}{DAT_PUTx}}\st{(loc,ndim,dim,value;status)} -- Write primitive \\
-{\bf \htmlref{DAT\_PUT0x}{DAT_PUT0x}}\st{(loc,value;status)} -- Write scalar primitive\\
-{\bf \htmlref{DAT\_PUT1x}{DAT_PUT1x}}\st{(loc,el,value;status)} -- Write vector primitive\\
-{\bf \htmlref{DAT\_PUTNx}{DAT_PUTNx}}\st{(loc,ndim,dimx,value,dim;status)} -- Write array primitive\\
-{\bf \htmlref{DAT\_PUTVx}{DAT_PUTVx}}\st{(loc,el,value;status)} -- Write vectorised primitive\\
-{\bf \htmlref{DAT\_REF}{DAT_REF}}\st{(loc;ref,lref,status)} -- Obtain reference name for object \\
-{\bf \htmlref{DAT\_REFCT}{DAT_REFCT}}\st{(loc;refct,status)} -- Enquire the reference count for
+\textbf{\htmlref{DAT\_PUT}{DAT_PUT}}\st{(loc,type,ndim,dim,value;status)} -- Write primitive \\
+\textbf{\htmlref{DAT\_PUTx}{DAT_PUTx}}\st{(loc,ndim,dim,value;status)} -- Write primitive \\
+\textbf{\htmlref{DAT\_PUT0x}{DAT_PUT0x}}\st{(loc,value;status)} -- Write scalar primitive\\
+\textbf{\htmlref{DAT\_PUT1x}{DAT_PUT1x}}\st{(loc,el,value;status)} -- Write vector primitive\\
+\textbf{\htmlref{DAT\_PUTNx}{DAT_PUTNx}}\st{(loc,ndim,dimx,value,dim;status)} -- Write array primitive\\
+\textbf{\htmlref{DAT\_PUTVx}{DAT_PUTVx}}\st{(loc,el,value;status)} -- Write vectorised primitive\\
+\textbf{\htmlref{DAT\_REF}{DAT_REF}}\st{(loc;ref,lref,status)} -- Obtain reference name for object \\
+\textbf{\htmlref{DAT\_REFCT}{DAT_REFCT}}\st{(loc;refct,status)} -- Enquire the reference count for
 a container file \\
-{\bf \htmlref{DAT\_RENAM}{DAT_RENAM}}\st{(loc,name;status)} -- Rename object \\
-{\bf \htmlref{DAT\_RESET}{DAT_RESET}}\st{(loc;status)} -- Reset object state \\
-{\bf \htmlref{DAT\_RETYP}{DAT_RETYP}}\st{(loc,type;status)} -- Change object type \\
-{\bf \htmlref{DAT\_SHAPE}{DAT_SHAPE}}\st{(loc,ndimx;dim,ndim,status)} -- Enquire object shape \\
-{\bf \htmlref{DAT\_SIZE}{DAT_SIZE}}\st{(loc;size,status)} -- Enquire object size \\
-{\bf \htmlref{DAT\_SLICE}{DAT_SLICE}}\st{(loc1,ndim,diml,dimu;loc2,status)} -- Locate slice \\
-{\bf \htmlref{DAT\_STATE}{DAT_STATE}}\st{(loc;reply,status)} -- Enquire object state \\
-{\bf \htmlref{DAT\_STRUC}{DAT_STRUC}}\st{(loc;reply,status)} -- Enquire object structure \\
-{\bf \htmlref{DAT\_TEMP}{DAT_TEMP}}\st{(type,ndim,dim;loc,status)} -- Create temporary object \\
-{\bf \htmlref{DAT\_THERE}{DAT_THERE}}\st{(loc,name;reply,status)} -- Enquire component existence \\
-{\bf \htmlref{DAT\_TYPE}{DAT_TYPE}}\st{(loc;type,status)} -- Enquire object type \\
-{\bf \htmlref{DAT\_UNMAP}{DAT_UNMAP}}\st{(loc;status)} -- Unmap object \\
-{\bf \htmlref{DAT\_VALID}{DAT_VALID}}\st{(loc;reply,status)} -- Enquire locator valid \\
-{\bf \htmlref{DAT\_VEC}{DAT_VEC}}\st{(loc1;loc2,status)} -- Vectorise object \\
-{\bf \htmlref{DAT\_WHERE}{DAT_WHERE}}\st{(loc;block,offset,status)} -- Where is primitive data in file? \\
+\textbf{\htmlref{DAT\_RENAM}{DAT_RENAM}}\st{(loc,name;status)} -- Rename object \\
+\textbf{\htmlref{DAT\_RESET}{DAT_RESET}}\st{(loc;status)} -- Reset object state \\
+\textbf{\htmlref{DAT\_RETYP}{DAT_RETYP}}\st{(loc,type;status)} -- Change object type \\
+\textbf{\htmlref{DAT\_SHAPE}{DAT_SHAPE}}\st{(loc,ndimx;dim,ndim,status)} -- Enquire object shape \\
+\textbf{\htmlref{DAT\_SIZE}{DAT_SIZE}}\st{(loc;size,status)} -- Enquire object size \\
+\textbf{\htmlref{DAT\_SLICE}{DAT_SLICE}}\st{(loc1,ndim,diml,dimu;loc2,status)} -- Locate slice \\
+\textbf{\htmlref{DAT\_STATE}{DAT_STATE}}\st{(loc;reply,status)} -- Enquire object state \\
+\textbf{\htmlref{DAT\_STRUC}{DAT_STRUC}}\st{(loc;reply,status)} -- Enquire object structure \\
+\textbf{\htmlref{DAT\_TEMP}{DAT_TEMP}}\st{(type,ndim,dim;loc,status)} -- Create temporary object \\
+\textbf{\htmlref{DAT\_THERE}{DAT_THERE}}\st{(loc,name;reply,status)} -- Enquire component existence \\
+\textbf{\htmlref{DAT\_TYPE}{DAT_TYPE}}\st{(loc;type,status)} -- Enquire object type \\
+\textbf{\htmlref{DAT\_UNMAP}{DAT_UNMAP}}\st{(loc;status)} -- Unmap object \\
+\textbf{\htmlref{DAT\_VALID}{DAT_VALID}}\st{(loc;reply,status)} -- Enquire locator valid \\
+\textbf{\htmlref{DAT\_VEC}{DAT_VEC}}\st{(loc1;loc2,status)} -- Vectorise object \\
+\textbf{\htmlref{DAT\_WHERE}{DAT_WHERE}}\st{(loc;block,offset,status)} -- Where is primitive data in file? \\
 
 \label{appendix:hdsroutines}
-{\bf \htmlref{HDS\_COPY}{HDS_COPY}}\st{(loc,file,name;status)} -- Copy object to container file \\
-{\bf \htmlref{HDS\_ERASE}{HDS_ERASE}}\st{(loc;status)} -- Erase container file \\
-{\bf \htmlref{HDS\_EWILD}{HDS_EWILD}}\st{(iwld,status)} -- End a wild-card search for HDS container
+\textbf{\htmlref{HDS\_COPY}{HDS_COPY}}\st{(loc,file,name;status)} -- Copy object to container file \\
+\textbf{\htmlref{HDS\_ERASE}{HDS_ERASE}}\st{(loc;status)} -- Erase container file \\
+\textbf{\htmlref{HDS\_EWILD}{HDS_EWILD}}\st{(iwld,status)} -- End a wild-card search for HDS container
 files \\
-{\bf \htmlref{HDS\_FLUSH}{HDS_FLUSH}}\st{(group;status)} -- Flush locator group \\
-{\bf \htmlref{HDS\_FREE}{HDS_FREE}}\st{(loc;status)} -- Free container file \\
-{\bf \htmlref{HDS\_GROUP}{HDS_GROUP}}\st{(loc;group,status)} -- Enquire locator group \\
-{\bf \htmlref{HDS\_GTUNE}{HDS_GTUNE}}\st{(param;value,status)} -- Enquire value of tuning parameter \\
-{\bf \htmlref{HDS\_LINK}{HDS_LINK}}\st{(loc,group;status)} -- Link locator group \\
-{\bf \htmlref{HDS\_LOCK}{HDS_LOCK}}\st{(loc;status)} -- Lock container file \\
-{\bf \htmlref{HDS\_NEW}{HDS_NEW}}\st{(file,name,type,ndim,dim;loc,status)} -- Create container file \\
-{\bf \htmlref{HDS\_OPEN}{HDS_OPEN}}\st{(file,mode;loc,status)} -- Open container file \\
-{\bf \htmlref{HDS\_SHOW}{HDS_SHOW}}\st{(topic;status)} -- Show HDS statistics \\
-{\bf \htmlref{HDS\_STATE}{HDS_STATE}}\st{(state,status)} -- Enquire HDS state \\
-{\bf \htmlref{HDS\_STOP}{HDS_STOP}}\st{(status)} -- Close down HDS \\
-{\bf \htmlref{HDS\_TRACE}{HDS_TRACE}}\st{(loc;nlev,path,file,status)} -- Trace object path \\
-{\bf \htmlref{HDS\_TUNE}{HDS_TUNE}}\st{(param,value;status)} -- Set HDS parameter \\
-{\bf \htmlref{HDS\_WILD}{HDS_WILD}}\st{(fspec,mode;iwld,loc,status)} -- Perform a wild-card search
+\textbf{\htmlref{HDS\_FLUSH}{HDS_FLUSH}}\st{(group;status)} -- Flush locator group \\
+\textbf{\htmlref{HDS\_FREE}{HDS_FREE}}\st{(loc;status)} -- Free container file \\
+\textbf{\htmlref{HDS\_GROUP}{HDS_GROUP}}\st{(loc;group,status)} -- Enquire locator group \\
+\textbf{\htmlref{HDS\_GTUNE}{HDS_GTUNE}}\st{(param;value,status)} -- Enquire value of tuning parameter \\
+\textbf{\htmlref{HDS\_LINK}{HDS_LINK}}\st{(loc,group;status)} -- Link locator group \\
+\textbf{\htmlref{HDS\_LOCK}{HDS_LOCK}}\st{(loc;status)} -- Lock container file \\
+\textbf{\htmlref{HDS\_NEW}{HDS_NEW}}\st{(file,name,type,ndim,dim;loc,status)} -- Create container file \\
+\textbf{\htmlref{HDS\_OPEN}{HDS_OPEN}}\st{(file,mode;loc,status)} -- Open container file \\
+\textbf{\htmlref{HDS\_SHOW}{HDS_SHOW}}\st{(topic;status)} -- Show HDS statistics \\
+\textbf{\htmlref{HDS\_STATE}{HDS_STATE}}\st{(state,status)} -- Enquire HDS state \\
+\textbf{\htmlref{HDS\_STOP}{HDS_STOP}}\st{(status)} -- Close down HDS \\
+\textbf{\htmlref{HDS\_TRACE}{HDS_TRACE}}\st{(loc;nlev,path,file,status)} -- Trace object path \\
+\textbf{\htmlref{HDS\_TUNE}{HDS_TUNE}}\st{(param,value;status)} -- Set HDS parameter \\
+\textbf{\htmlref{HDS\_WILD}{HDS_WILD}}\st{(fspec,mode;iwld,loc,status)} -- Perform a wild-card search
 for HDS container files
 \normalsize
 
@@ -6956,51 +6349,51 @@ following tables and described in more detail below.
 \xlabel{table_of_HDS_error_codes}
 \begin{tabular}{|l|l|} \hline
 \st{Symbolic Name} & \st{Meaning}\\ \hline \hline
-{\bf DAT\_\_ACCON} & Access conflict\\
-{\bf DAT\_\_BOUND} & Outside bounds of object\\
-{\bf DAT\_\_COMEX} & Component already exists\\
-{\bf DAT\_\_CONER} & Conversion error\\
-{\bf DAT\_\_DELIN} & Deletion invalid\\
-{\bf DAT\_\_DIMIN} & Dimensions invalid\\
-{\bf DAT\_\_FATAL} & Fatal internal error\\
-{\bf DAT\_\_FILCK} & File locking error\\
-{\bf DAT\_\_FILCL} & File close error\\
-{\bf DAT\_\_FILCR} & File create error\\
-{\bf DAT\_\_FILIN} & File invalid\\
-{\bf DAT\_\_FILMP} & File mapping error\\
-{\bf DAT\_\_FILND} & File not deleted\\
-{\bf DAT\_\_FILNF} & File not found\\
-{\bf DAT\_\_FILNX} & File not extended\\
-{\bf DAT\_\_FILPR} & File protected\\
-{\bf DAT\_\_FILRD} & File read error\\
-{\bf DAT\_\_FILWR} & File write error\\
-{\bf DAT\_\_GRPIN} & Group invalid\\
-{\bf DAT\_\_INCHK} & Integrity check\\
-{\bf DAT\_\_ISMAP} & Data currently mapped\\
-{\bf DAT\_\_LOCIN} & Locator invalid\\
-{\bf DAT\_\_MODIN} & Mode invalid\\
-{\bf DAT\_\_NAMIN} & Name invalid\\
-{\bf DAT\_\_NOMEM} & Insufficient memory available\\
-{\bf DAT\_\_OBJIN} & Object invalid\\
-{\bf DAT\_\_OBJNF} & Object not found\\
-{\bf DAT\_\_PRMAP} & Primitive data mapped\\
-{\bf DAT\_\_SUBIN} & Subscripts invalid\\
-{\bf DAT\_\_TRUNC} & Text truncated\\
-{\bf DAT\_\_TYPIN} & Type invalid\\
-{\bf DAT\_\_UNSET} & Primitive data undefined\\
-{\bf DAT\_\_VERMM} & Version mismatch\\
-{\bf DAT\_\_WLDIN} & Wild-card search context invalid \\
+\textbf{DAT\_\_ACCON} & Access conflict\\
+\textbf{DAT\_\_BOUND} & Outside bounds of object\\
+\textbf{DAT\_\_COMEX} & Component already exists\\
+\textbf{DAT\_\_CONER} & Conversion error\\
+\textbf{DAT\_\_DELIN} & Deletion invalid\\
+\textbf{DAT\_\_DIMIN} & Dimensions invalid\\
+\textbf{DAT\_\_FATAL} & Fatal internal error\\
+\textbf{DAT\_\_FILCK} & File locking error\\
+\textbf{DAT\_\_FILCL} & File close error\\
+\textbf{DAT\_\_FILCR} & File create error\\
+\textbf{DAT\_\_FILIN} & File invalid\\
+\textbf{DAT\_\_FILMP} & File mapping error\\
+\textbf{DAT\_\_FILND} & File not deleted\\
+\textbf{DAT\_\_FILNF} & File not found\\
+\textbf{DAT\_\_FILNX} & File not extended\\
+\textbf{DAT\_\_FILPR} & File protected\\
+\textbf{DAT\_\_FILRD} & File read error\\
+\textbf{DAT\_\_FILWR} & File write error\\
+\textbf{DAT\_\_GRPIN} & Group invalid\\
+\textbf{DAT\_\_INCHK} & Integrity check\\
+\textbf{DAT\_\_ISMAP} & Data currently mapped\\
+\textbf{DAT\_\_LOCIN} & Locator invalid\\
+\textbf{DAT\_\_MODIN} & Mode invalid\\
+\textbf{DAT\_\_NAMIN} & Name invalid\\
+\textbf{DAT\_\_NOMEM} & Insufficient memory available\\
+\textbf{DAT\_\_OBJIN} & Object invalid\\
+\textbf{DAT\_\_OBJNF} & Object not found\\
+\textbf{DAT\_\_PRMAP} & Primitive data mapped\\
+\textbf{DAT\_\_SUBIN} & Subscripts invalid\\
+\textbf{DAT\_\_TRUNC} & Text truncated\\
+\textbf{DAT\_\_TYPIN} & Type invalid\\
+\textbf{DAT\_\_UNSET} & Primitive data undefined\\
+\textbf{DAT\_\_VERMM} & Version mismatch\\
+\textbf{DAT\_\_WLDIN} & Wild-card search context invalid \\
 \hline
 \end{tabular}
 \end{center}
 \begin{center}
 \begin{tabular}{|l|l|} \hline
 \st{Symbolic Name} & \st{Meaning}\\ \hline \hline
-{\bf CMP\_\_DIMIN} & Dimensions invalid\\
-{\bf CMP\_\_FATAL} & Fatal internal error\\
-{\bf CMP\_\_ISMAP} & Data currently mapped\\
-{\bf CMP\_\_NOMAP} & Not mapped\\
-{\bf CMP\_\_TYPIN} & Type invalid\\[2ex]
+\textbf{CMP\_\_DIMIN} & Dimensions invalid\\
+\textbf{CMP\_\_FATAL} & Fatal internal error\\
+\textbf{CMP\_\_ISMAP} & Data currently mapped\\
+\textbf{CMP\_\_NOMAP} & Not mapped\\
+\textbf{CMP\_\_TYPIN} & Type invalid\\[2ex]
 \hline
 \end{tabular}
 \end{center}
@@ -7212,16 +6605,16 @@ remain defined:
 
 \begin{center}
 \begin{tabular}{l}
-{\bf DAT\_\_ACTIV}\\
-{\bf DAT\_\_CONIN}\\
-{\bf DAT\_\_ERACT}\\
-{\bf DAT\_\_EREXH}\\
-{\bf DAT\_\_EXCPA}\\
-{\bf DAT\_\_ISOPN}\\
-{\bf DAT\_\_RELIN}\\
-{\bf DAT\_\_STKOF}\\
-{\bf DAT\_\_UNKPA}\\
-{\bf DAT\_\_WEIRD}
+\textbf{DAT\_\_ACTIV}\\
+\textbf{DAT\_\_CONIN}\\
+\textbf{DAT\_\_ERACT}\\
+\textbf{DAT\_\_EREXH}\\
+\textbf{DAT\_\_EXCPA}\\
+\textbf{DAT\_\_ISOPN}\\
+\textbf{DAT\_\_RELIN}\\
+\textbf{DAT\_\_STKOF}\\
+\textbf{DAT\_\_UNKPA}\\
+\textbf{DAT\_\_WEIRD}
 \end{tabular}
 \end{center}
 
@@ -7263,15 +6656,13 @@ passed to a process running the required shell for expansion before
 use. Thus any shell expression resulting in a valid file name may be
 used, such as:
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 $MY_DIR/datafile
 /reduce/data
 `cat myfilelist`
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 (the precise syntax and capabilities depending on which shell is
 selected). The actual algorithm used for expanding file names is
@@ -7609,13 +7000,11 @@ It is now possible to modify the default tuning profile of HDS by
 means of environment variables, which are read and interpreted by HDS
 at startup (see \S\ref{sect:tuning}). For instance, the definition:
 
-\small
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 setenv HDS_MAP 0
-\end{verbatim}
-\end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 could be used to disable file mapping in favour of I/O in any
 application which uses HDS.
