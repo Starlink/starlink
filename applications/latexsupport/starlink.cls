@@ -20,14 +20,25 @@
 \DeclareOption{twoside}{\twosidetrue}
 \DeclareOption{nolof}{\withloffalse}
 
+% Pass all options not defined above to the classes.
+% (Must be done before process options)
+\ifwithchapters
+   \typeout{..... passing options to report .....}
+   \DeclareOption*{\PassOptionsToClass{\CurrentOption}{report}}
+\else
+   \typeout{........passing options to article......}
+   \DeclareOption*{\PassOptionsToClass{\CurrentOption}{article}}
+\fi
+
+% Process custom options.
 \ProcessOptions\relax
 
 
 \ifwithchapters
-   \LoadClassWithOptions{report}
+   \LoadClass{report}
    \typeout{........Report!...........}
 \else
-   \LoadClassWithOptions{article}
+   \LoadClass{article}
    \typeout{..........Article!..........}
 \fi
 
