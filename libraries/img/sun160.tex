@@ -1,199 +1,54 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardoccopyright
 {Copyright \copyright\ 2000-2003 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {160.6}
-\newcommand{\stardocauthors}   {P.W. Draper \\
+\stardocnumber      {160.6}
+\stardocauthors   {P.W. Draper \\
                                 R.F. Warren-Smith}
-\newcommand{\stardocdate}      {3 March 2003}
-\newcommand{\stardoctitle}     {IMG \\ [1ex]
+\stardocdate        {3 March 2003}
+\stardoctitle     {IMG \\ [1ex]
                                 Simple Image Data Access}
-\newcommand{\stardocversion}   {Version 1.3}
-\newcommand{\stardocmanual}    {Subroutine Library}
-\newcommand{\stardocabstract}  {
+\stardocversion     {Version 1.3}
+\stardocmanual      {Subroutine Library}
+\stardocabstract  {%
 IMG is a subroutine library for accessing astronomical image data and
 associated header information. It is designed to be easy to use and
-understand.}
+understand.
+}
 
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%      1-FEB-2000 (AJC):
-%        Add Copyright statement in LaTeX
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document specific \providecommand or \newenvironment commands.
 % In-line verbatim. Note that special characters within this still need
 % escaping.
-\newcommand{\myverb}[1]{{\texttt{#1}}}
+\providecommand{\myverb}[1]{{\texttt{#1}}}
 %
 %  Notes are:
-\newcommand{\mynote}{The following notes refer to the numbered statements:}
+\providecommand{\mynote}{The following notes refer to the numbered statements:}
 %
 %  Start of code section.
-\newenvironment{code}{\begin{small} \begin{quote}}
-                     {\end{quote} \end{small}}
+\newenvironment{code}{\begin{small}}
+                     {\end{small}}
 
 
 % Latex only sections, subsections etc. Surround these with a latexonly
 % environment.
-\newcommand{\latexonlysection}[1]{\section{#1}}
-\newcommand{\latexonlysubsection}[1]{\subsection{#1}}
-\newcommand{\latexonlysubsubsection}[1]{\subsubsection{#1}}
-\begin{htmlonly}
-   \newcommand{\latexonlysection}[1]{#1}
-   \newcommand{\latexonlysubsection}[1]{#1}
-   \newcommand{\latexonlysubsubsection}[1]{#1}
-\end{htmlonly}
+\providecommand{\latexonlysection}[1]{\section{#1}}
+\providecommand{\latexonlysubsection}[1]{\subsection{#1}}
+\providecommand{\latexonlysubsubsection}[1]{\subsubsection{#1}}
+
+
 
 % Enumeration of notes.
 \newenvironment{enumnotes}
@@ -204,410 +59,17 @@ understand.}
    \end{enumerate}
    \renewcommand{\labelenumi}{\theenumi}
 }
-\begin{htmlonly}
-  \renewenvironment{enumnotes}
-  {
-    \begin{enumerate}
-  }{
-    \end{enumerate}
-  }
-\end{htmlonly}
 
 %  SST quotes.
-\newcommand{\qt}[1]{\texttt{"}#1\texttt{"}}
-\newcommand{\qs}[1]{\texttt{'}#1\texttt{'}}
-
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsubsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
+\providecommand{\qt}[1]{\texttt{"}#1\texttt{"}}
+\providecommand{\qs}[1]{\texttt{'}#1\texttt{'}}
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\begin{center}
-\textsl{\stardocabstract}
-\end{center}
-
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? Latex Copyright Statement
-%  =========================
-\begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
-\end{latexonly}
-% ? End of Latex copyright statement
-
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\begin{latexonly}
-  \markboth{\stardocname}{\stardocname}
-  \vspace{5mm}
-  \begin{center}
-     \rule{80mm}{0.5mm} \\ [1ex]
-     {\Large\bf \stardoctitle \\ [2.5ex]
-                \stardocversion} \\ [2ex]
-     \rule{80mm}{0.5mm}
-  \end{center}
-  \vspace{30mm}
-  \setlength{\parskip}{0mm}
-  \tableofcontents
-  \setlength{\parskip}{\medskipamount}
-  \markboth{\stardocname}{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section{INTRODUCTION}
 This document describes the IMG library and how to use it to access
@@ -633,7 +95,7 @@ the UNIX C-shell. If you want to use IMG from C then you should
 briefly study the earlier sections (which are Fortran specific, but
 nevertheless show the appropriate calling sequences and discuss more
 general issues) and then look at
-\hyperref{this later section}{appendix }{}{IMGCinterface}.
+\slhyperref{this later section}{appendix }{}{IMGCinterface}.
 
 \section{ACCESSING IMAGE DATA \label{USINGIMG}}
 The easiest way to understand IMG is to look at how simple example
@@ -654,7 +116,7 @@ necessary.
 The first example is a complete program. It gets an existing image,
 works out its mean value and then writes it out:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE MEAN( ISTAT )                                [1]
 
 *  Access an input image.
@@ -685,14 +147,14 @@ works out its mean value and then writes it out:
       WRITE( *, * ) 'Mean = ', SUM / REAL( NX * NY )          [8]
 
       END
-\end{verbatim}
+\end{terminalv}
 \end{code}
 
 \mynote
 %\renewcommand{\labelenumi}{\myverb{[\theenumi]}}
 \begin{enumnotes}
 % 1
-\item Programs that use IMG should {\em always} have a main subroutine
+\item Programs that use IMG should \emph{always} have a main subroutine
 with an \myverb{INTEGER} argument. This subroutine should be named
 after the program and be stored in a file with the same name
 (\myverb{mean} and \htmladdnormallink{\myverb{mean.f}}{../../bin/examples/img/mean.f} in this
@@ -700,7 +162,7 @@ case). You should consider this subroutine as a replacement for the
 file that normally has a \myverb{PROGRAM} statement in it.
 
 % 2
-\item The call to \htmlref{\myverb{IMG\_IN}}{IMG_IN_n__x_} gets the input
+\item The call to \htmlref{\myverb{IMG\_IN}}{IMG_IN[n][x]} gets the input
 image. The image is associated with the ``parameter'' \myverb{'IN'}
 which usually means that you will be prompted for the name of an image
 data-file.  The subroutine then returns the size of the image --
@@ -757,13 +219,13 @@ file extension of \myverb{.ifl}). It contains a description of each
 parameter associated with an image.  The following will do
 for this example program:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 interface MEAN
    parameter IN
       prompt 'Input image'
    endparameter
 endinterface
-\end{verbatim}
+\end{terminalv}
 \end{code}
 The main point is that it is necessary to include a \myverb{parameter}
 \ldots \myverb{endparameter} statement for each input or output image.
@@ -776,18 +238,18 @@ Once you have the two files
 and
 \htmladdnormallink{\myverb{mean.ifl}}{../../bin/examples/img/mean.ifl}
 you can compile and run the program by following the instructions
-\hyperref{given elsewhere}{in \S}{}{IMGCOMPILING}.
+\slhyperref{given elsewhere}{in \S}{}{IMGCOMPILING}.
 
-{\bf To recap:} The most important IMG concepts to remember
+\textbf{To recap:} The most important IMG concepts to remember
 from this example are:
 
 \begin{enumerate}
-\item {\em Images are associated with a label known as a ``parameter''.}
+\item \emph{Images are associated with a label known as a ``parameter''.}
 
-\item {\em Image data is accessed by a ``pointer'' that needs to be passed
+\item \emph{Image data is accessed by a ``pointer'' that needs to be passed
            to a subroutine using the \myverb{\%VAL} mechanism.}
 
-\item {\em It is necessary to call \htmlref{\myverb{IMG\_FREE}}{IMG_FREE} to free
+\item \emph{It is necessary to call \htmlref{\myverb{IMG\_FREE}}{IMG_FREE} to free
            images before the program ends.}
 \end{enumerate}
 
@@ -797,7 +259,7 @@ This second example (taken from the program
 in the example directory\latexonly{ - see \S\ref{USINGIMG}}), shows how to
 create a new image and then write values to it:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 
 *  Create a new image.
       CALL IMG_NEW( 'OUT', 416, 578, IP, ISTAT )              [1]
@@ -822,12 +284,12 @@ create a new image and then write values to it:
  1    CONTINUE
       END
 
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
 %1
-\item The call to \htmlref{\myverb{IMG\_NEW}}{IMG_NEW_n__x_} creates the new image dataset
+\item The call to \htmlref{\myverb{IMG\_NEW}}{IMG_NEW[n][x]} creates the new image dataset
 (usually prompting you for a name). The image size in this example is
 416~$\times$~578 pixels.
 
@@ -850,7 +312,7 @@ examples shown here deal with both these cases.
 This snippet of Fortran shows an existing image being accessed so that
 it can be modified in place (that is, without creating a new copy):
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 *  Access an existing image.
       CALL IMG_MOD( 'IN', NX, NY, IP, ISTAT )
 
@@ -859,7 +321,7 @@ it can be modified in place (that is, without creating a new copy):
 
 *  Free the image.
       CALL IMG_FREE( 'IN', ISTAT )
-\end{verbatim}
+\end{terminalv}
 \end{code}
 
 \subsubsection{Modifying a copy of an image}
@@ -870,7 +332,7 @@ A complete program called
 \htmladdnormallink{\myverb{add.f}}{../../bin/examples/img/add.f}
 exists\latexonly{ (see \S\ref{USINGIMG})}.
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 *  Access an existing image.
       CALL IMG_IN( 'IN', NX, NY, IPIN, ISTAT )
 
@@ -882,11 +344,11 @@ exists\latexonly{ (see \S\ref{USINGIMG})}.
 
 *  Free the input and output images.
       CALL IMG_FREE( '*', ISTAT )                             [2]
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
-\item The call to \htmlref{\myverb{IMG\_OUT}}{IMG_OUT_x_} creates a new output image
+\item The call to \htmlref{\myverb{IMG\_OUT}}{IMG_OUT[x]} creates a new output image
 associated with the parameter \myverb{'OUT'} by copying the one
 associated with the parameter \myverb{'IN'}. It returns a pointer
 \myverb{IPOUT} for the output image data.
@@ -903,7 +365,7 @@ important calibration values, but they are also often used to describe
 the history or status of the data. Collections of such data, which are
 not actually part of the image array, are known as ``header''
 information (this name derives from the fact that FITS\footnote{FITS,
-the ``Flexible Image Transport System'' is the {\em de facto} standard
+the ``Flexible Image Transport System'' is the \emph{de facto} standard
 for the interchange of astronomical data.}  stores these values at the
 beginning -- head -- of a file). IMG refers to a single piece of such
 information as a ``header item'' and a separate set of subroutines
@@ -915,12 +377,12 @@ This example (taken from a complete program called
 \latexonly{-- see \S \ref{USINGIMG}}) shows how to read the value of a
 header item from an image associated with the parameter \myverb{'IN'}:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 *  Read the header item.
       CALL HDR_IN( 'IN', ' ', 'OBSERVER', 1, VALUE, ISTAT )
-\end{verbatim}
+\end{terminalv}
 \end{code}
-The call to \htmlref{\myverb{HDR\_IN}}{HDR_IN_x_} specifies the image by using its
+The call to \htmlref{\myverb{HDR\_IN}}{HDR_IN[x]} specifies the image by using its
 parameter name -- \myverb{'IN'} (argument 1). If you have not
 previously accessed this image you will probably be prompted for its
 file name at this point.
@@ -928,7 +390,7 @@ file name at this point.
 The 2nd, blank argument, indicates that an ``ordinary'' FITS header
 item is required (there are other possible ``sources'' of header information
 which are described
-\hyperref{elsewhere}{later -- \S}{}{IMGNAMEDEXTENSIONS}).
+\slhyperref{elsewhere}{later -- \S}{}{IMGNAMEDEXTENSIONS}).
 
 The 3rd argument \myverb{'OBSERVER'} specifies the name of the header
 item required and the 4th argument \myverb{1} indicates that you want
@@ -946,23 +408,23 @@ This example (taken from a complete program
 -- see \S \ref{USINGIMG}}) shows how to write the value of a
 header item to an image associated with the parameter \myverb{'OUT'}:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 *  Write the new header item.
       CALL HDR_OUT( 'OUT', ' ', 'OBSERVER', 'The observer',   [1]
      :              'Fred Bloggs', ISTAT )
 
 *  Free the image.
       CALL IMG_FREE( 'OUT', ISTAT )                           [2]
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
-\item The call to \htmlref{\myverb{HDR\_OUT}}{HDR_OUT_x_} specifies the image by using its
+\item The call to \htmlref{\myverb{HDR\_OUT}}{HDR_OUT[x]} specifies the image by using its
 parameter name -- \myverb{'OUT'} (argument 1). If you have not
 previously accessed this image you will probably be prompted for its
 file name at this point. If you have already accessed the image then
 it should be either an output image or one accessed for modification,
-as you cannot write items to images accessed by \htmlref{\myverb{IMG\_IN}}{IMG_IN_n__x_}.
+as you cannot write items to images accessed by \htmlref{\myverb{IMG\_IN}}{IMG_IN[n][x]}.
 
 The 2nd, blank argument, indicates that an ``ordinary'' FITS header
 item is to be written.
@@ -992,7 +454,7 @@ snippet (from an example called
 \latexonly{-- see \S\ref{USINGIMG}})
 shows you how to create a temporary image for this purpose:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 *  Access the input image.
       CALL IMG_IN( 'IN', NX, NY, IPIN, ISTAT )
       ...
@@ -1001,14 +463,14 @@ shows you how to create a temporary image for this purpose:
       ...
 *  Free all the images (this deletes the temporary image).
       CALL IMG_FREE( '*', ISTAT )                             [2]
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
-\item The call to \htmlref{\myverb{IMG\_TMP}}{IMG_TMP_n__x_} creates a temporary image of
+\item The call to \htmlref{\myverb{IMG\_TMP}}{IMG_TMP[n][x]} creates a temporary image of
 the size you specify (in this case the same size as the input image).
-You will {\em not} be prompted for a file name for a temporary image,
-and {\em no } entry is needed for it in the program's interface file.
+You will \emph{not} be prompted for a file name for a temporary image,
+and \emph{no } entry is needed for it in the program's interface file.
 
 \item The call to \htmlref{\myverb{IMG\_FREE}}{IMG_FREE} will delete the temporary image.
 \end{enumnotes}
@@ -1021,15 +483,15 @@ are almost identical to the normal ones \latexonly{(above)} that assume 2
 dimensions. They differ only in having more or less arguments for the
 dimension sizes. The following illustrates the possibilities:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
       CALL IMG_IN1( 'SPECTRUM', NX, IP, ISTAT )
       CALL IMG_IN2( 'IMAGE', NX, NY, IP, ISTAT )
       CALL IMG_IN3( 'CUBE', NX, NY, NZ, IP, ISTAT )
-\end{verbatim}
+\end{terminalv}
 \end{code}
 Note how the number of dimensions is specified by appending a number
 to the routine name, and how \myverb{IMG\_IN2} is just a synonym for
-\htmlref{\myverb{IMG\_IN}}{IMG_IN_n__x_} (2 dimensions are assumed if you do not say
+\htmlref{\myverb{IMG\_IN}}{IMG_IN[n][x]} (2 dimensions are assumed if you do not say
 otherwise).
 
 As well as accessing input images, there are equivalent routines for
@@ -1037,15 +499,15 @@ performing most other IMG operations on images with between 1 and 3
 dimensions. For instance, the following would create a new
 3-dimensional image:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
       CALL IMG_NEW3( 'CUBE', NX, NY, NZ, IP, ISTAT )
-\end{verbatim}
+\end{terminalv}
 \end{code}
 
 When accessing an existing image with (say) 2 dimensions, you will
 also be able to access an appropriate slice from (say) a 3-dimensional
 image if you specify this when you are prompted for the image name
-(see \hyperref{elsewhere}{\S}{}{IMGREGIONS}).
+(see \slhyperref{elsewhere}{\S}{}{IMGREGIONS}).
 
 \subsubsection{Accessing \label{IMGDIFFERENTDATATYPES} images using different data types}
 IMG also allows access to images using data types other than
@@ -1075,11 +537,11 @@ Character code & Fortran-77 data type      &  Description      \\
 \end{small}
 so among the possibilities are the calls:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
       CALL IMG_IND( 'IMAGE', NX, NY, IP, ISTAT )              [1]
       CALL IMG_INI( 'IMAGE', NX, NY, IP, ISTAT )              [2]
       CALL IMG_INR( 'IMAGE', NX, NY, IP, ISTAT )              [3]
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
@@ -1088,7 +550,7 @@ so among the possibilities are the calls:
 \item Access an image using \myverb{INTEGER}.
 
 \item Access an image using \myverb{REAL}. Note that
-this is a synonym for \htmlref{\myverb{IMG\_IN}}{IMG_IN_n__x_}, since it also gets a 2-D
+this is a synonym for \htmlref{\myverb{IMG\_IN}}{IMG_IN[n][x]}, since it also gets a 2-D
 \myverb{REAL} image.
 \end{enumnotes}
 
@@ -1096,7 +558,7 @@ You should declare the image array in your program to have the
 corresponding Fortran data type, as in the following example that
 accesses and modifies an image using \myverb{INTEGER} format:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 
 *  Access an input image, allowing it to be modified.
       CALL IMG_MODI( 'IN', NX, NY, IP, ISTAT )                [1]
@@ -1119,7 +581,7 @@ accesses and modifies an image using \myverb{INTEGER} format:
  2       CONTINUE
  1    CONTINUE
       END
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
@@ -1134,12 +596,12 @@ use different data types. There are also versions that allow these to
 be mixed with different numbers of data dimensions. Some possibilities
 are:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
       CALL IMG_IN1D( 'SPECTRUM', NX, IP, ISTAT )              [1]
       CALL IMG_MOD2I( 'IMAGE', NX, NY, IP, ISTAT )            [2]
       CALL IMG_NEW3W( 'CUBE', NX, NY, NZ, IP, ISTAT )         [3]
       CALL IMG_IN2R( 'IMAGE', NX, NY, IP, ISTAT )             [4]
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
@@ -1152,7 +614,7 @@ PRECISION}.
 \item This call creates a new 3-D data cube with the word (Fortran
 \myverb{INTEGER*2}) data type.
 
-\item This call is a synonym for \htmlref{\myverb{IMG\_IN}}{IMG_IN_n__x_}, since it gets a 2-D
+\item This call is a synonym for \htmlref{\myverb{IMG\_IN}}{IMG_IN[n][x]}, since it gets a 2-D
 \myverb{REAL} image.
 \end{enumnotes}
 
@@ -1171,7 +633,7 @@ PRIMDAT library (\xref{SUN/39}{sun39}{}).
 IMG can access more than one image at a time using a single subroutine
 call. An example of this is:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 
 *  Declare pointers.
       INTEGER IP( 3 )
@@ -1203,7 +665,7 @@ call. An example of this is:
  2       CONTINUE
  1    CONTINUE
       END
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
@@ -1217,7 +679,7 @@ which should now be an array of size 3.
 % 2
 \item
 The image \myverb{'RAW'} is copied to a new file. This also copies any
-header information, so is usually preferred to using \htmlref{\myverb{IMG\_NEW}}{IMG_NEW_n__x_}.
+header information, so is usually preferred to using \htmlref{\myverb{IMG\_NEW}}{IMG_NEW[n][x]}.
 
 % 3
 \item
@@ -1250,16 +712,16 @@ have different sizes or data types.
 IMG can \latexonly{also} create more than one image using a single
 subroutine call. Some possibilities are:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
       CALL IMG_NEW( 'MODEL1,MODEL2', 1024, 1024, IP, ISTAT )  [1]
       CALL IMG_OUT( 'TEMPLATE', 'OUT1,OUT2', IP, ISTAT )      [2]
       CALL IMG_TMP( 'T1,T2,T3,T4', NX, NY, IP, ISTAT )        [3]
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
 % 1
-\item The call to \htmlref{\myverb{IMG\_NEW}}{IMG_NEW_n__x_} creates two new images with size
+\item The call to \htmlref{\myverb{IMG\_NEW}}{IMG_NEW[n][x]} creates two new images with size
 1024~$\times$~1024. The variable \myverb{IP} should be declared as
 an \myverb{INTEGER} array of size 2.
 
@@ -1292,7 +754,7 @@ probably, your program would crash.
 
 To prevent you being baffled by this pitfall, IMG will normally check
 whether your input images contain any bad values and will issue a
-warning if any are found. Then at least you know {\em why} your
+warning if any are found. Then at least you know \emph{why} your
 program crashed!
 
 You can deal with bad data values in one of two ways. The simplest is
@@ -1307,9 +769,9 @@ the checks that IMG makes. This is done by appending an exclamation
 mark (!) to the parameter name of each affected image. So, for
 instance:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
       CALL IMG_IN( 'BIAS!,FLAT!,RAW!', NX, NY, IP, ISTAT )
-\end{verbatim}
+\end{terminalv}
 \end{code}
 inhibits bad data value checking for all the input images.
 
@@ -1318,7 +780,7 @@ The following example is a version of the
 \S\ref{IMGMEAN})} that shows the sort of changes needed to deal with
 bad data:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE MEAN( ISTAT )
 
 *  Access an input image. Inhibit checks for bad pixels.
@@ -1358,7 +820,7 @@ bad data:
          WRITE( *, * ) 'Error: all data values are bad'
       END IF
       END
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
@@ -1376,7 +838,7 @@ type-dependent and have the form \myverb{VAL\_\_BAD[x]}, where
 \myverb{[x]} is replaced by the character code for the data type
 you're processing. These codes are the same as those used when
 accessing images of different data types -- see
-\hyperref{here}{\S}{}{IMGDIFFERENTDATATYPES}.  So, for instance, with
+\slhyperref{here}{\S}{}{IMGDIFFERENTDATATYPES}.  So, for instance, with
 \myverb{REAL} data you would use \myverb{VAL\_\_BADR}, while with
 \myverb{INTEGER} data you would use \myverb{VAL\_\_BADI}, etc. Before
 compiling a program that includes this file you should execute the
@@ -1394,7 +856,7 @@ If your program accesses more than one input image, you must be
 careful to check each of them. For instance if you were adding two
 images together you'd need to do something like the following:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
       DO 1 I = 1, NX
          IF ( A( I ) .NE. VAL__BADI .AND. B( I ) .NE. VAL__BADI ) THEN
             C( I ) = A( I ) + B( I )
@@ -1402,7 +864,7 @@ images together you'd need to do something like the following:
             C( I ) = VAL__BADI
          END IF
  1    CONTINUE
-\end{verbatim}
+\end{terminalv}
 \end{code}
 
 Where \myverb{A} and \myverb{B} are the ``images'' to be added and
@@ -1440,14 +902,14 @@ Character code & Fortran-77 data type      &  Description      \\
 Since all header item values can be converted to a character
 representation, this is the safest method to access an item of unknown
 type (which is why it is the method used by the ordinary
-\htmlref{\myverb{HDR\_IN}}{HDR_IN_x_} subroutine). Some of the possible calls are:
+\htmlref{\myverb{HDR\_IN}}{HDR_IN[x]} subroutine). Some of the possible calls are:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
      CALL HDR_INR( 'IN', ' ', 'BSCALE', 1, BSCALE, ISTAT )    [1]
      CALL HDR_INI( 'IN', ' ', 'BINNED', 1, IBFACT, ISTAT )    [2]
      CALL HDR_OUTL( 'OUT', ' ', 'CHECKED',                    [3]
      :              'Data checked for C/Rs', .TRUE., ISTAT )
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
@@ -1485,13 +947,13 @@ programs is encouraged. This is better than trusting other programs
 not to modify values that you have set. \myverb{'MYSOURCE'} is used in
 the following examples:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 *  Write a new header item.
       CALL HDR_OUT( 'OUT', 'MYSOURCE', ITEM, ' ', VALUE, ISTAT )
       ...
 *  Read back the value.
       CALL HDR_IN( 'IN', 'MYSOURCE', ITEM, 1, VALUE, ISTAT )
-\end{verbatim}
+\end{terminalv}
 \end{code}
 
 \subsubsection{Accessing header items by index \label{HDRINDEXING}}
@@ -1508,7 +970,7 @@ items. The complete example is called
 \htmladdnormallink{\myverb{hdrlist.f}}
 {../../bin/examples/img/hdrlist.f}\latexonly{ -- see \S \ref{USINGIMG}}.
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 *  See how many header items are available.
       CALL HDR_NUMB( 'IN', ' ', '*', N, ISTAT )            [1]
       DO 1 I = 1, N
@@ -1522,7 +984,7 @@ items. The complete example is called
 *  And write it out.
          WRITE( *, '( 1X, 3A )' ) ITEM ,' = ', VALUE       [4]
  1    CONTINUE
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
@@ -1542,7 +1004,7 @@ item source are not known.
 
 % 3
 \item
-\htmlref{\myverb{HDR\_IN}}{HDR_IN_x_} returns the value of the header item as a
+\htmlref{\myverb{HDR\_IN}}{HDR_IN[x]} returns the value of the header item as a
 character string.
 
 % 4
@@ -1558,9 +1020,9 @@ Strictly, this is limited to the keywords \myverb{COMMENT},
 construct multi-line descriptions of the contents or history of a FITS
 file. To handle this, various of the HDR subroutines are ``FITS
 occurrence aware''. For instance, the fourth argument of the
-\htmlref{\myverb{HDR\_IN}}{HDR_IN_x_} subroutine specifies the
+\htmlref{\myverb{HDR\_IN}}{HDR_IN[x]} subroutine specifies the
 occurrence of the item to be read, and
-\htmlref{\myverb{HDR\_OUT}}{HDR_OUT_x_} will append (rather than
+\htmlref{\myverb{HDR\_OUT}}{HDR_OUT[x]} will append (rather than
 overwriting) items with these special names.
 
 FITS items can also have a comment associated with them (to be read by
@@ -1573,8 +1035,7 @@ ignored.
 
 \subsubsection{Hierarchical header items}
 
-Header items can be stored in hierarchical structures.\footnote{ {\em
-Warning:} you should not write hierarchical FITS header items as this
+Header items can be stored in hierarchical structures.\footnote{ \emph{Warning:} you should not write hierarchical FITS header items as this
 violates the FITS standard (although data from outside sources may
 sometimes contain them).}  What this actually means is that a header
 item can be used as a ``container'' to store other items (which are
@@ -1583,13 +1044,13 @@ period sign in the name to separate their various components. So, for
 instance, if you had a series of values that described a useful region
 on an image you might write these out using something like:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 *  Store the useful region of this image.
       CALL HDR_OUTI( 'OUT', 'MYSOURCE', 'USEFUL.MINX', ' ',IXLOW, ISTAT )
       CALL HDR_OUTI( 'OUT', 'MYSOURCE', 'USEFUL.MAXX', ' ',IXHIGH, ISTAT )
       CALL HDR_OUTI( 'OUT', 'MYSOURCE', 'USEFUL.MINY', ' ',IYLOW, ISTAT )
       CALL HDR_OUTI( 'OUT', 'MYSOURCE', 'USEFUL.MAXY', ' ',IYHIGH, ISTAT )
-\end{verbatim}
+\end{terminalv}
 \end{code}
 The number of sub-components and the level of hierarchy isn't
 restricted, so more elaborate structures are possible (but not
@@ -1599,9 +1060,9 @@ You can examine the header items in an image by using the HDSTRACE program
 (\xref{SUN/102}{sun102}{}). If your image file is called
 \myverb{image} then you would use the command:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 %  hdstrace image.more.mysource
-\end{verbatim}
+\end{terminalv}
 \end{code}
 to see the contents of the source \myverb{'MYSOURCE'}. To list the
 contents of a FITS source the most convenient method is to use the
@@ -1612,9 +1073,9 @@ If you have any hierarchical FITS headers (these were once used
 extensively by UK observatories), then they should look something
 like:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
         ING DETHEAD = 'CCD-RCA2'       /Type of detector head
-\end{verbatim}
+\end{terminalv}
 \end{code}
 when examined by \xref{FITSLIST}{sun95}{FITSLIST}.  To access this
 item using IMG you should call it \myverb{'ING.DETHEAD'}.
@@ -1623,13 +1084,13 @@ program
 \htmladdnormallink{\myverb{hdrread.f}}{../../bin/examples/img/hdrread.f}
 \latexonly{(see \S \ref{USINGIMG})} next:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 % hdrread
 ITEM - Header item > ING.DETHEAD
 IN - Input image > image
 The header item 'ING.DETHEAD' has a value of CCD-RCA2.
 %
-\end{verbatim}
+\end{terminalv}
 \end{code}
 Hierarchical items are processed as normal by the HDR
 \htmlref{indexing
@@ -1655,20 +1116,20 @@ access a square region of an image, you might use (the program running
 here is the \htmlref{\myverb{mean}}{IMGMEAN} example\latexonly{ from
 \S\ref{IMGMEAN}}):
 \begin{code}
-\begin{verbatim}
-   % mean
-   IN - Input image > image(100:200,100:200)
-\end{verbatim}
+\begin{terminalv}
+% mean
+IN - Input image > image(100:200,100:200)
+\end{terminalv}
 \end{code}
 and the square that covers the region from \myverb{100} to
 \myverb{200} pixels in both dimensions will be used. The rest of the image is
 ignored. Another way that you could get a similar effect would be to
 use:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
    % mean
    IN - Input image > image(155~100,375~100)
-\end{verbatim}
+\end{terminalv}
 \end{code}
 which selects a square of side \myverb{100} centred on
 \myverb{155,375}.
@@ -1676,10 +1137,10 @@ which selects a square of side \myverb{100} centred on
 Missing out a ``range'' results in the whole of that dimension being
 used:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
    % mean
    IN - Input image > image(,100:200)
-\end{verbatim}
+\end{terminalv}
 \end{code}
 This uses a rectangle that extends from \myverb{100} to \myverb{200} in the
 second dimension and that spans the whole of the first dimension.
@@ -1687,16 +1148,16 @@ second dimension and that spans the whole of the first dimension.
 If you had a data cube and you wanted to process a plane from it,
 you might use:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
    IN - Input image > cube(,,10)
-\end{verbatim}
+\end{terminalv}
 \end{code}
 This would use the 2-D image stored in the tenth plane of the cube.
 
 If the region of the image that you specify doesn't exist, then the
 program will still be supplied with an image array of the requested
 size, but the ``non-existent'' parts will be set to the bad value (see
-\hyperref{elsewhere}{\S}{}{IMGBADDATA}).  A complete description of
+\slhyperref{elsewhere}{\S}{}{IMGBADDATA}).  A complete description of
 how to use image ``sections'' (as they are called by the NDF library)
 is given in \xref{SUN/33}{sun33}{}.
 
@@ -1709,9 +1170,9 @@ you can use it to give your IMG programs access to several important
 (including IRAF, disk FITS and FIGARO). All you need to do is issue
 the package startup command:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 % convert
-\end{verbatim}
+\end{terminalv}
 \end{code}
 before running your IMG program. It will then be able to access these other
 formats in the same way as its ``native'' NDF format.
@@ -1724,13 +1185,13 @@ them.  So a typical session in which an IRAF data frame is read might
 be (the program is the \htmlref{\myverb{mean}}{IMGMEAN}
 example\latexonly{ from \S\ref{IMGMEAN}}):
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 % convert
 % mean
 IN - Input image > myimage.imh
 Mean = 108.3154
 %
-\end{verbatim}
+\end{terminalv}
 \end{code}
 
 One point of particular relevance to IMG is the transfer of header
@@ -1748,9 +1209,9 @@ CONVERT, then you can define your own conversions. You should consult
 When all else fails, the full power of the NDF library
 (\xref{SUN/33}{sun33}{}) can be made available using the call:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
       CALL IMG_INDF( 'IN', ID, ISTAT )
-\end{verbatim}
+\end{terminalv}
 \end{code}
 This returns an NDF identifier (\myverb{ID}) to your image dataset
 (this shouldn't be confused with the pointers to images which we have
@@ -1762,12 +1223,12 @@ sophisticated ways.  As a very simple example the next program snippet
 shows how to write out the name of an image dataset
 (also see \htmlref{IMG\_NAME}{IMG\_NAME}):
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
       CALL IMG_INDF( 'IN', ID, ISTAT )                        [1]
       CALL NDF_MSG( 'NAME', ID )                              [2]
       CALL MSG_OUT( ' ', 'Name of image = ^NAME', ISTAT )     [3]
       CALL NDF_ANNUL( ID, ISTAT )                             [4]
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
@@ -1794,19 +1255,19 @@ do this once the identifier has been finished with.
 Compiling and linking a simple program is very straight-forward. If
 your program source file is named \myverb{prog.f}, then the commands:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 % star_dev
 % alink prog.f -L/star/lib `img_link_adam`
-\end{verbatim}
+\end{terminalv}
 \end{code}
 will compile the source and link it against IMG (you should replace
 the \myverb{/star} with where your system is installed on non-Starlink
 machines). The final product is an executable called \myverb{prog},
 that you run by typing:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 % prog
-\end{verbatim}
+\end{terminalv}
 \end{code}
 (note the \myverb{\%} is the shell-prompt and should not be typed, and
 the \myverb{``} are grave signs that execute the command
@@ -1814,9 +1275,9 @@ the \myverb{``} are grave signs that execute the command
 modules that are compiled independently then you could use a
 command like:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 % alink prog.f mysub1.o mysub2.o `img_link_adam`
-\end{verbatim}
+\end{terminalv}
 \end{code}
 The \myverb{star\_dev} command only needs to be run once, as it creates
 a permanent soft link for accessing the include file \myverb{SAE\_PAR}.
@@ -1837,7 +1298,7 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
 % Command for displaying routines in routine lists:
 % =================================================
 
-  \newcommand{\noteroutine}[3]{\item {\small\texttt{#1#2}} \nopagebreak \\
+  \providecommand{\noteroutine}[3]{\item {\small\texttt{#1#2}} \nopagebreak \\
                                 \hspace*{3em}\textit{#3} }
   {\small
   \latexonlysubsection{IMG Fortran subroutines}
@@ -3007,12 +2468,12 @@ are that the names of functions change from \myverb{img\_something} or
 \myverb{hdrSomething} and that ``strings'' which are returned or can
 be passed as arrays also have a length argument.
 
-\newcommand{\cnoteroutine}[4]{
-   \item {\small \texttt{#1~#2 #3}} \nopagebreak \\ {\em #4 }
+\providecommand{\cnoteroutine}[4]{
+   \item {\small \texttt{#1~#2 #3}} \nopagebreak \\ \emph{#4 }
 }
 \subsection{IMG C functions}
-\begin{latexonly}
-{\small
+
+\begin{small}
 \begin{description}
   \cnoteroutine{void}{imgCancl}{(char *param, int *status)}
      {Cancel an image/parameter association}
@@ -3041,42 +2502,7 @@ be passed as arrays also have a length argument.
      {(char *param, int nx, [int ny,] [int nz,] TYPE **ip, int *status)}
      {Create a temporary image}
 \end{description}
-}
-\end{latexonly}
-\begin{rawhtml}
-<PRE>
-<A NAME="xref_imgCancl"></A>
-  void <B>imgCancl</B>(char *param, int *status)
-     Cancel an image/parameter association
-<A NAME="xref_imgDelet"></a>
-  void <B>imgDelet</B>(char *param, int *status)
-     Delete an image
-<A NAME="xref_imgFree"></A>
-  void <B>imgFree</B>(char *param, int *status)
-     Free an image
-<A NAME="xref_imgIn[N][X]"></A>
-  void <B>imgIn[N][X]</B>(char *param, int *nx, [int *ny,] [int *nz,] TYPE **ip, int *status)
-     Access an existing image for reading
-<A NAME="xref_imgIndf"></A>
-  void <B>imgIndf</B>(char *param, int *indf, int *status)
-     Obtain an NDF identifier for an image
-<A NAME="xref_imgMod[N][X]"></A>
-  void <B>imgMod[N][X]</B>(char *param, int *nx, [int *ny,] [int nz,] TYPE **ip, int *status)
-     Access an image for modification
-<A NAME="xref_imgNew[N][X]"></A>
-  void <B>imgNew[N][X]</B>(char *param, int nx, [int ny,] [int nz,] TYPE **ip, int *status)
-     Create a new image
-<A NAME="xref_imgName"></A>
-  void <B>imgName</B>(char *param, char *value, int value_length, int *status)
-     Return the image name
-<A NAME="xref_imgOut[X]"></A>
-  void <B>imgOut[X]</B>(char *param1, char *param2, TYPE **ip, int *status)
-     Create an output image
-<A NAME="xref_imgTmp[N][X]"></A>
-  void <B>imgTmp[N][X]</B>(char *param, int nx, [int ny,] [int nz,] TYPE **ip, int *status)
-     Create a temporary image
-</PRE>
-\end{rawhtml}
+\end{small}
 
 Where the parts in \texttt{"[]"} are optional or not always available.
 \texttt{[N]} indicates the number of dimensions of the data you want to access
@@ -3117,7 +2543,7 @@ of the name by one of the following character codes:
 \begin{center}
 \begin{tabular}{||l|l|l||}
 \hline
-Character code {\tt [X]} & C data type (\texttt{TYPE}) &  Description \\
+Character code \texttt{[X]} & C data type (\texttt{TYPE}) &  Description \\
 \hline
  \texttt{F}       & \texttt{float}          &   \\
  \texttt{D}       & \texttt{double}         &  \\
@@ -3135,8 +2561,8 @@ The default data type is \texttt{float} (in which case do not replace
 \texttt{[X]} by anything and set \texttt{TYPE} to \texttt{float}).
 
 \subsection{HDR C functions}
-\begin{latexonly}
-{\small
+
+\begin{small}
 \begin{description}
   \cnoteroutine{void}{hdrCopy}
      {( char *param1, char *xname1, char *param2, char *xname2, int *status )}
@@ -3179,42 +2605,7 @@ The default data type is \texttt{float} (in which case do not replace
        TYPE *value, \\ \hspace*{3em} int *status)}
      {Write a header item}
 \end{description}
-}
-\end{latexonly}
-\begin{rawhtml}
-<PRE>
-<A NAME="xref_hdrDelet"></A>
-  void <B>hdrDelet</B>(char *param, char *xname, char *item, int comp, int *status)
-     Delete a header item
-<A NAME="xref_hdrIn"></A>
-  void <B>hdrIn</B>(char *param, char *xname, char *item, int comp, char *value, int value_length, int *status)
-     Read a character header item
-<A NAME="xref_hdrInc"></A>
-  void <B>hdrInC</B>(char *param, char *xname, char *item, int comp, char *value, int value_length, int *status)
-     Read a character header item
-<A NAME="xref_hdrIn[X]"></A>
-  void <B>hdrIn[X]</B>(char *param, char *xname, char *item, int comp, TYPE *value, int *status)
-     Read a header item
-<A NAME="xref_hdrMod"></A>
-  void <B>hdrMod</B>(char *param, int *status)
-     Open an image allowing modification of any header items
-<A NAME="xref_hdrName"></A>
-  void <B>hdrName</B>(char *param, char *xname, int n, char *item, int item_length, int *status)
-     Return a header item name
-<A NAME="xref_hdrNumb"></A>
-  void <B>hdrNumb</B>(char *param, char *xname, char *item, int *n, int *status)
-     Return a header item count
-<A NAME="xref_hdrOut"></A>
-  void <B>hdrOut</B>(char *param, char *xname, char *item, char *commen, char *value,   int value_length, int *status)
-     Write a character header item
-<A NAME="xref_hdrOutC"></A>
-  void <B>hdrOutc</B>(char *param, char *xname, char *item, char *commen, char *value,   int value_length, int *status)
-     Write a character header item
-<A NAME="xref_hdrOut[X]"></A>
-  void <B>hdrOut[X]</B>(char *param, char *xname, char *item, char *commen, TYPE *value,   int *status)
-     Write a header item
-</PRE>
-\end{rawhtml}
+\end{small}
 \label{HDRCdatatypes}
 Where the \texttt{"[X]"} indicate the data type of the header items.
 The possible values of \texttt{[X]} are:
@@ -3237,9 +2628,9 @@ Character code[X] & C data type (\texttt{TYPE)} &  Description      \\
 \subsection{Examples of using IMG from C}
 \subsubsection{Accessing an existing image}
 This section shows a C version of the \myverb{mean} program from
-\hyperref{elsewhere}{\S}{}{IMGMEAN}.
+\slhyperref{elsewhere}{\S}{}{IMGMEAN}.
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 #include <stdio.h>
 #include "img.h"                                              [1]
 
@@ -3260,7 +2651,7 @@ void mean_(int *istat)                                        [2]
   /*  Free the input image. */
   imgFree( "in", istat );
 }
-\end{verbatim}
+\end{terminalv}
 \end{code}
 
 \mynote
@@ -3273,7 +2664,7 @@ and HDR functions.
 \item As in the Fortran case this program needs to be created as a
 function with an \myverb{int *} argument. This is a replacement for
 the \myverb{main} function. Note that the function is named the same
-as the eventual program {\em except} for the trailing underscore. The
+as the eventual program \emph{except} for the trailing underscore. The
 underscore is required as this function will be called from a Fortran
 subroutine (you should also note that this ``trick'' may not be the
 same from machine to machine, to do this portably you should use the
@@ -3293,7 +2684,7 @@ shows how to create a new image. It also sets all the elements of the
 image to 1.0.
 
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 #include <stdio.h>
 #include "img.h"
 
@@ -3316,14 +2707,14 @@ void flat_(int *istat)
   /*  Free the new image. */
   imgFree( "out", istat );
 }
-\end{verbatim}
+\end{terminalv}
 \end{code}
 
 \subsubsection{Modifying an image}
 This example shows how to access an existing image and modify
 its values.
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
    /* Access an existing image. */
    imgMod( "in", &nx, &ny, &ip, istat );
 
@@ -3336,7 +2727,7 @@ its values.
 
    /* Free the image */
    imgFree( "in", istat );
-\end{verbatim}
+\end{terminalv}
 \end{code}
 
 \subsubsection{Modifying a copy of an image}
@@ -3344,7 +2735,7 @@ This example
 (\htmladdnormallink{\myverb{add.c}}{../../bin/examples/img/add.c})
 copies the input image and then modifies the copy.
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
   /*  Access an existing image */
   imgIn( "in", &nx, &ny, &ptrIn, status );
 
@@ -3362,7 +2753,7 @@ copies the input image and then modifies the copy.
 
   /*  Free the input and output images. */
   imgFree( "*", status );
-\end{verbatim}
+\end{terminalv}
 \end{code}
 
 \subsubsection{Getting images as workspace}
@@ -3374,7 +2765,7 @@ The \xref{HDS}{sun92}{} (SUN/92) manual describes
 why you might consider using temporary images rather than
 ``malloc'd'' memory in your programs.
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
   /*  Access the input image. */
   imgIn( "in", &nx, &ny, &ipin, istat );
 
@@ -3383,26 +2774,26 @@ why you might consider using temporary images rather than
 
   /*  Free all images (this deletes the temporary image). */
   imgFree( "*", istat );
-\end{verbatim}
+\end{terminalv}
 \end{code}
 
 \subsubsection{Using ``images'' which are not 2-dimensional}
 This section just shows some example calls that access spectra and
 data-cubes.
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
    imgIn1( "spectrum", &nx, &ip, istat );
    imgIn3( "cube", &nx, &ny, &nz, &ip, istat );
-\end{verbatim}
+\end{terminalv}
 \end{code}
 
 \subsubsection{Accessing images using different data types}
 So far all the example shown access the image data assuming a type of
 \myverb{float}. IMG can also access data in other useful types. A list
-of these is shown \hyperref{elsewhere}{in \S}{}{IMGCdatatypes}. Among
+of these is shown \slhyperref{elsewhere}{in \S}{}{IMGCdatatypes}. Among
 the possible calls are:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
    double *dPtr;
    imgInD( "image", &nx, &ny, &dPtr, istat );
    float *fPtr;
@@ -3411,17 +2802,17 @@ the possible calls are:
    imgInS( "image", &nx, &ny, &sPtr, istat );
    int *iPtr;
    imgInI( "image", &nx, &ny, &iPtr, istat );
-\end{verbatim}
+\end{terminalv}
 \end{code}
 
 Requirements for data types and dimensionalities can be mixed as in:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
    imgIn1D( 'spectrum', &nx, &ip, istat )
    imgMod2I( 'image', &nx, &ny, &ip, istat )
    imgNew3S( 'cube', &nx, &ny, &nz, ip, istat )
    imgIn2F( 'image', &nx, &ny, &ip, istat )
-\end{verbatim}
+\end{terminalv}
 \end{code}
 
 \subsubsection{Accessing multiple images}
@@ -3429,7 +2820,7 @@ This example
 (\htmladdnormallink{\myverb{proc.c}}{../../bin/examples/img/proc.c})
 shows how IMG can access more than one image per function call:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
    /*  Declare pointers for images. */
    float *ip[3], *ipproc, *ipbias, *ipflat, *ipraw ;              [1]
    int nx, ny, i;
@@ -3450,7 +2841,7 @@ shows how IMG can access more than one image per function call:
 
    /*  Free all the images.*/
    imgFree( "*", istat );
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
@@ -3466,7 +2857,7 @@ the images are guaranteed to be the same shape and data type.
 \subsubsection{Handling ``bad'' data}
 The way that you handle ``bad'' values in your data is similar to that
 used in Fortran, see
-\hyperref{here}{\S}{}{IMGBADDATA},
+\slhyperref{here}{\S}{}{IMGBADDATA},
 however, the bad data values themselves are now defined in the
 \myverb{img.h} file and have names to reflect the C data types.
 \begin{small}
@@ -3495,7 +2886,7 @@ This example
 (\htmladdnormallink{\myverb{hdrread.c}}{../../bin/examples/img/hdrread.c})
 shows how to read the value of a header item.
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 
   /*  Local Variables: */
   char item[] = "OBSERVER";
@@ -3509,7 +2900,7 @@ shows how to read the value of a header item.
 
   /*  Free the image */
   imgFree( "in", istat );
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
@@ -3527,13 +2918,13 @@ This example
 (\htmladdnormallink{\myverb{hdrwrite.c}}{../../bin/examples/img/hdrwrite.c})
 shows how to write a header item to an image.
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
   /*  Write the header item. */
   hdrOut( "out", " ", "OBSERVER", "The observer.", "Fred Bloggs", 0, istat ); [1]
 
   /*  Free the image. */
   imgFree( "out", istat );
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
@@ -3546,17 +2937,17 @@ more significance when dealing with multiple images.
 
 \subsubsection{Accessing header items using different data types}
 All the possible types of header items that can be accessed are
-described \hyperref{here}{in \S}{}{HDRCdatatypes}. Among the
+described \slhyperref{here}{in \S}{}{HDRCdatatypes}. Among the
 possible calls are:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
    float bscale;
    hdrInF( "in", " ", "bscale", 1, &bscale, istat );
    int ibfact;
    hdrInI( "in", " ", "binned", 1, &ibfact, istat );
    #define TRUE 1
    hdrOutL( "out", " ", "checked",  "Data checked for C/Rs", TRUE, istat );
-\end{verbatim}
+\end{terminalv}
 \end{code}
 
 \subsubsection{Accessing header items by index}
@@ -3564,7 +2955,7 @@ This example
 (\htmladdnormallink{\myverb{hdrlist.c}}{../../bin/examples/img/hdrlist.c})
 shows how to access header items by index.
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
   /*  Local Variables: */
   char value[80], item[30];
   int nitem, i;
@@ -3580,7 +2971,7 @@ shows how to access header items by index.
     hdrInC( "in", source, item, 1, value, 80, istat );               [1]
     printf( "%s = %s \n", item, value );
   }
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
@@ -3600,7 +2991,7 @@ not the actual array (as the HDR routines expect to see \texttt{char *}).
 This example shows how to read the same header item from two images
 at the same time.
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
    char RA[2][80];
    char DEC[2][80];
    hdrIn( "IN1,IN2", " ", "RA", 1, (char *) RA, 80, status );         [1]
@@ -3608,7 +2999,7 @@ at the same time.
    printf( "The RA and DEC of IN1 are: %s, %s\n", RA[0], DEC[0] );
    printf( "and the RA and DEC of IN2 are: %s, %s\n", RA[1], DEC[1] );
    imgFree( "*", status );
-\end{verbatim}
+\end{terminalv}
 \end{code}
 \mynote
 \begin{enumnotes}
@@ -3620,27 +3011,27 @@ arrays is passed. This could have been written as
 
 This example shows how to write values to the same header item of two images.
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
    char obstype[2][5] = {"BIAS","FLAT"};
    hdrOut( "BIAS,FLAT", " ", "OBSTYPE", "Type of observation",
            (char *) obstype, 5, istat );
    imgFree( "*", istat );
-\end{verbatim}
+\end{terminalv}
 \end{code}
 
 \subsection{Compiling and linking C programs}
 Compiling and linking a C program is very similar to the methods
 described
-(\hyperref{in the Fortran section}{in \S}{}{IMGCOMPILING}), except
+(\slhyperref{in the Fortran section}{in \S}{}{IMGCOMPILING}), except
 that you must compile the source code before the linking stage.
 
 If your program source file is named \myverb{prog.c}, and it only
 depends on IMG, then the commands:
 \begin{code}
-\begin{verbatim}
+\begin{terminalv}
 % cc -c -I/star/include prog.c
 % alink prog.o -L/star/lib `img_link_adam`
-\end{verbatim}
+\end{terminalv}
 \end{code}
 will compile the source and link the program.
 
@@ -3674,7 +3065,7 @@ FITS headers that contained some initially empty cards.
 \section{Changes in this release (1.3-1)}
 
 A bug that returned all images as the same size, even from different
-calls to \htmlref{\myverb{IMG\_IN}}{IMG_IN_n__x_}, has been fixed.
+calls to \htmlref{\myverb{IMG\_IN}}{IMG_IN[n][x]}, has been fixed.
 
 FITS character strings may now be free-format (i.e.\
 the terminating quote may be before the 20th column of a header card).
