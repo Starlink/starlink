@@ -1,29 +1,25 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardoccopyright
 {Copyright \copyright\ 2009 Science and Technology Facilities Council.}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {261.2}
-\newcommand{\stardocauthors}   {D.S. Berry \& Malcolm J. Currie}
-\newcommand{\stardocdate}      {4th July 2012}
-\newcommand{\stardoctitle}     {IRQ --- Handling of QUALITY in NDFs}
-\newcommand{\stardocversion}   {Version 4.0}
-\newcommand{\stardocmanual}    {User's Guide}
-\newcommand{\stardocabstract}  {
+\stardocnumber      {261.2}
+\stardocauthors     {D.S. Berry \& Malcolm J. Currie}
+\stardocdate        {4th July 2012}
+\stardoctitle       {IRQ --- Handling of QUALITY in NDFs}
+\stardocversion     {Version 4.0}
+\stardocmanual      {User's Guide}
+\stardocabstract  {
 This library is a set of Fortran routines for manipulation of quality
 information within NDFs.  In particular it uses names that will be more
 memorable than bits to assign and set quality attributes of data values
@@ -31,543 +27,28 @@ within an NDF.
 }
 % ? End of document identification
 % -----------------------------------------------------------------------------
+% ? Document specific \providecommand or \newenvironment commands.
+\providecommand{\KAPPA}{{\footnotesize KAPPA}\normalsize}
+\providecommand{\KAPPAref}{\xref{\KAPPA}{sun95}{}}
 
-% +
-%  Name:
-%     sun261.tex
-%
-%  Purpose:
-%     This is a description of the IRQ library
-%
-%  Authors:
-%     MJC: Malcolm J. Currie (STARLINK, RAL)
-%
-%  History:
-%      2009 August 8 (MJC):
-%        Original version, based on the IRAS ID6, updated to modern SUN style.
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-\newcommand{\noteroutine}[2]{\textbf{#1}\hspace*{\fill}\nopagebreak \\
+\providecommand{\noteroutine}[2]{\textbf{#1}\hspace*{\fill}\nopagebreak \\
                              \hspace*{3em}\emph{#2}\hspace*{\fill}\par}
-%\newcommand{\noteroutine}[2]{{\small \bf #1} \\
-%                              \hspace*{3em} {\em #2} \\[1.5ex]}
 
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-\newcommand{\KAPPA}{{\footnotesize KAPPA}\normalsize}
-\newcommand{\KAPPAref}{\xref{\KAPPA}{sun95}{}}
-
-\newcommand{\numcir}[1]{\latexhtml{\mbox{\hspace{3ex}$\bigcirc$\hspace{-1.7ex}{\small #1}}}{\htmlref{Note #1}{NOTE#1}}}
-
-% -----------------------------------------------------------------------------
-
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \goodbreak
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\goodbreak\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\goodbreak\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-      \\
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
-
+\providecommand{\numcir}[1]{\latexhtml{\mbox{\hspace{3ex}$\bigcirc$\hspace{-1.7ex}{\small #1}}}{\htmlref{Note #1}{NOTE#1}}}
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Science \& Technology Facilities Council}\\
-   {\large Starlink Software Collection\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.scitech.ac.uk} \\
-      \htmladdnormallink{Science \& Technology Facilities Council}
-                        {http://www.scitech.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? Latex Copyright Statement
-%  =========================
-\begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
-\end{latexonly}
-% ? End of Latex copyright statement
-
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-
-%  End of "sst.tex" layout definitions.
-% .
-% %Z%%M%   %I%   %E% %U%   %D% %T%
-
-% ? Main text
+\scfrontmatter
 
 \section {\xlabel{SEC:intro}Introduction to QUALITY}
 
 A QUALITY structure is one of the standard components of an NDF
 structure, and is described fully in
 \xref{SUN/33}{sun33}{the_quality_component_in_more_detail}. Briefly,
-if an NDF has a QUALITY component which is in a {\em defined} state,
+if an NDF has a QUALITY component which is in a \emph{defined} state,
 then each pixel within the NDF DATA component has a corresponding
 value in the QUALITY component. Currently, each QUALITY value consists
 of an unsigned byte (\emph{i.e.} 8 bits). In Fortran the
@@ -576,7 +57,7 @@ bit is usually called Bit 7. Within the IRQ package the
 least-significant bit is called Bit 1 and the most-significant bit is
 called Bit 8. Each bit within the QUALITY value can be used to
 indicate if the corresponding pixel in the DATA component holds some
-specific {\em quality}. For instance, Bit 3 of the QUALITY component
+specific \emph{quality}. For instance, Bit 3 of the QUALITY component
 may be used to indicate if any DATA pixels are saturated. A particular
 pixel in the QUALITY component would have Bit 3 set (\emph{i.e.} equal
 to 1) if the corresponding DATA pixel is saturated, or cleared
@@ -607,7 +88,7 @@ IRQ library}
 IRQ provides a system for handling Boolean qualities (\emph{i.e.}
 qualities that are either held or not held by each DATA pixel).  From the
 point of view of an application, each defined quality is identified by a
-{\em quality name} rather than by a bit number. Information about these
+\emph{quality name} rather than by a bit number. Information about these
 quality names is stored in an NDF extension, so that later applications
 can determine which pixels within the NDF hold a given quality (or
 combination of qualities).
@@ -616,12 +97,11 @@ Within IRQ, each defined quality name is usually associated with a bit in
 the QUALITY array, and this bit is set if the corresponding DATA pixels
 are assigned the specified quality. A typical application need know
 nothing about which QUALITY bit is associated with which quality name.
-For instance, if {\em every} pixel in an NDF holds a certain quality (or
-alternatively, if {\em no} pixels hold the quality), then it is not
+For instance, if \emph{every} pixel in an NDF holds a certain quality (or
+alternatively, if \emph{no} pixels hold the quality), then it is not
 necessary to reserve a bit in the QUALITY array to represent the quality.
 Instead, a single Boolean scalar value can be stored with the quality
-name in the NDF extension. This scalar is set to {\tt .TRUE.} if {\em
-all} pixels hold the quality, and {\tt .FALSE.} if {\em no} pixels hold
+name in the NDF extension. This scalar is set to \texttt{.TRUE.} if \emph{all} pixels hold the quality, and \texttt{.FALSE.} if \emph{no} pixels hold
 the quality. In this way, the number of defined quality names can
 sometimes exceed the number of bits in the QUALITY component. The
 handling of such situations is done within IRQ and is completely
@@ -655,7 +135,7 @@ in this section.
 stores them within a specified extension of an NDF. It also assigns a
 specified quality to a sub-set of the pixels with the NDF. In its
 simplest mode, the user provides an NDF, and a string to use as a quality
-name (such as {\tt SATURATED}). If this quality name is not already
+name (such as \texttt{SATURATED}). If this quality name is not already
 defined within the NDF, then it is added to the list of defined quality
 names, together with a user-supplied comment describing the quality. The
 user also provides another NDF to be used as a `mask'. The `bad' pixels
@@ -670,9 +150,9 @@ destroyed, he could proceed as follows.
 above the saturation value to the `bad' value.
 
 \item Run SETQUAL on the original NDF, giving some quality name such as
-{\tt SATURATED}, and specifying the mask created in the previous step. This
+\texttt{SATURATED}, and specifying the mask created in the previous step. This
 leaves the DATA component of the original NDF unchanged, but assigns the
-quality {\tt SATURATED} to all the pixels which correspond to `bad'
+quality \texttt{SATURATED} to all the pixels which correspond to `bad'
 pixels in the mask.
 
 \end{enumerate}
@@ -687,8 +167,7 @@ The \xref{REMQUAL}{sun95}{REMQUAL} application removes quality name
 definitions from an NDF. This may be necessary if there is no room for
 any more quality name definitions within an NDF. In this case the user
 may choose to remove some unimportant quality name definitions to make
-room for new, more-important quality names. REMQUAL can also remove {\em
-all} quality names information from an NDF. This can be useful if for any
+room for new, more-important quality names. REMQUAL can also remove \emph{all} quality names information from an NDF. This can be useful if for any
 reason the quality-name information becomes corrupted.
 
 \subsection{SHOWQUAL}
@@ -707,26 +186,24 @@ data described above, the user may remove some varying background surface
 from his original data, and then want to set pixels which were saturated
 in the original data to the `bad' value . In this case he would run
 QUALTOBAD specifying the background removed NDF as input, and specifying
-a {\em quality expression} of {\tt SATURATED}. This would cause all pixels
-which hold the quality {\tt SATURATED} to be set bad in the output NDF.
+a \emph{quality expression} of \texttt{SATURATED}. This would cause all pixels
+which hold the quality \texttt{SATURATED} to be set bad in the output NDF.
 
 The `quality expression' can be more complex than a single quality
 name. In fact, a quality expression can consist of several quality
 names combined together using the usual operators of Boolean algebra.
-For instance, if the quality expression {\tt
-SATURATED.AND..NOT.(SOURCE\_A .OR. SOURCE\_B)} was given to
+For instance, if the quality expression \texttt{SATURATED.AND..NOT.(SOURCE\_A .OR. SOURCE\_B)} was given to
 QUALTOBAD, then pixels would be set `bad' only if they had the quality
-{\tt SATURATED}, but did not have either of the qualities {\tt
-SOURCE\_A} or {\tt SOURCE\_B}.
+\texttt{SATURATED}, but did not have either of the qualities \texttt{SOURCE\_A} or \texttt{SOURCE\_B}.
 
 \section{Quality Names}
 
 A quality name must contain 15 or fewer characters. Any leading blanks
 are removed from supplied quality names, and they are converted to
 upper case before being stored in the NDF. Quality names may contain
-embedded blanks, but may not contain full-stop ({\tt "."}) characters.
-Certain names are reserved and may not be used. These are {\tt ANY},
-{\tt IRQ\_BAD\_SLOT} and {\tt IRQ\_FREE\_SLOT}.
+embedded blanks, but may not contain full-stop (\texttt{"."}) characters.
+Certain names are reserved and may not be used. These are \texttt{ANY},
+\texttt{IRQ\_BAD\_SLOT} and \texttt{IRQ\_FREE\_SLOT}.
 
 \section{\xlabel{SEC:QEXP}Quality Expressions}
 \label{SEC:QEXP}
@@ -735,31 +212,30 @@ A `Quality Expression' consists of a set of quality names combined
 together using Boolean operators into a legal Boolean expression. See
 \latexhtml{Section~\ref{SEC:QFIND}}{\htmlref{this section}{SEC:QFIND}}
 for a description of the use of quality expressions within IRQ. In the
-following, the symbols {\tt A} and {\tt B} are used to represent two
-qualities. These can be considered as Boolean values; {\tt true} if a
-pixel holds the quality, and {\tt false} otherwise. The supported
+following, the symbols \texttt{A} and \texttt{B} are used to represent two
+qualities. These can be considered as Boolean values; \texttt{true} if a
+pixel holds the quality, and \texttt{false} otherwise. The supported
 Boolean operators are listed below.
 
 \begin {description}
-\item [.AND.] - The expression {\tt (A.AND.B)} is true if and only if
-both {\tt A} and {\tt B} are true.
-\item [.OR.] - The expression {\tt (A.OR.B)} is true if and only if
-either {\tt A} or {\tt B} is true.
+\item [.AND.] - The expression \texttt{(A.AND.B)} is true if and only if
+both \texttt{A} and \texttt{B} are true.
+\item [.OR.] - The expression \texttt{(A.OR.B)} is true if and only if
+either \texttt{A} or \texttt{B} is true.
 \item [.XOR.] - The
-expression {\tt (A.XOR.B)} is true if and only if either {\tt A} is true and {\tt B}
-is false, or {\tt A} is false and {\tt B} is true.
-\item [.EQV.] - The expression {\tt (A.EQV.B)} is true if and only if either {\tt A}
-is true and {\tt B} is true, or A is false and {\tt B} is false.
-\item [.NOT.] - The expression {\tt (.NOT.A)} is true if and only if {\tt A} is
+expression \texttt{(A.XOR.B)} is true if and only if either \texttt{A} is true and \texttt{B}
+is false, or \texttt{A} is false and \texttt{B} is true.
+\item [.EQV.] - The expression \texttt{(A.EQV.B)} is true if and only if either \texttt{A}
+is true and \texttt{B} is true, or A is false and \texttt{B} is false.
+\item [.NOT.] - The expression \texttt{(.NOT.A)} is true if and only if \texttt{A} is
 false.
 \end{description}
-In addition to the above operators, the Boolean constants {\tt
-.FALSE.} and {\tt .TRUE.} can be included within a quality expression.
+In addition to the above operators, the Boolean constants \texttt{.FALSE.} and \texttt{.TRUE.} can be included within a quality expression.
 Expressions may contain several levels of nested parentheses.
 
 The precedence of these operators decreases in the following order;
 .NOT., .AND., .OR., .XOR., .EQV. (the final two have equal
-precedence). In an expression such as {\tt (A.XOR.B.EQV.C.XOR.D)} in
+precedence). In an expression such as \texttt{(A.XOR.B.EQV.C.XOR.D)} in
 which all operators have equal precedence, the evaluation proceeds
 from left to right., \emph{i.e.} the expression is evaluated as
 (((A.XOR.B).EQV.C).XOR.D). If there is any doubt about the order in
@@ -786,13 +262,13 @@ subroutine specifications contained in \latexhtml{Appendix~\ref
 
 The IRQ package has associated with it various symbolic constants.
 These values consist of a name of up to five characters prefixed by
-``IRQ\_\_'' (note the {\em double} underscore), and can be made
+``IRQ\_\_'' (note the \emph{double} underscore), and can be made
 available to an application by including the following line at the
 start of the routines which uses them:
 
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'IRQ_PAR'
-\end{verbatim}
+\end{terminalv}
 
 This assumes that the IRQ library has been installed as part of the
 UNIX Starlink Software Collection.
@@ -803,9 +279,9 @@ The values thus defined are described in the following sections, and
 also in the subroutine specifications. Another set of symbolic
 constants is made available by the statements
 
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'IRQ_ERR'
-\end{verbatim}
+\end{terminalv}
 
 These values have the same format of those contained in IRQ\_PAR, put define
 various error conditions which can be generated within the IRQ package.
@@ -832,10 +308,10 @@ locators (including the cloned NDF identifier) should be annulled by
 calling IRQ\_RLSE. Note, routines \htmlref{IRQ\_ANNUL}{IRQ_ANNUL} and
 \htmlref{IRQ\_CLOSE}{IRQ_CLOSE} play no part in releasing resources used
 for accessing quality name information. These two routines are only used
-for releasing resources used to store {\em compiled quality expressions}
+for releasing resources used to store \emph{compiled quality expressions}
 (see \latexhtml{Section~\ref {SEC:QFIND}}{\htmlref{ a description
 here}{SEC:QFIND}}). IRQ\_RLSE is the only routine which needs
-to be called to release resources used for accessing {\em quality names}.
+to be called to release resources used for accessing \emph{quality names}.
 
 
 \subsection{Using previously initialised NDFs within IRQ}
@@ -845,8 +321,8 @@ holding the quality names information must be found before other IRQ
 routines can be called. Routine \htmlref{IRQ\_FIND}{IRQ_FIND} does this.
 This routine looks through all the NDF extensions until a suitable
 structure is found. If no such structure is found the status value
-{\tt IRQ\_\_NOQNI} is returned. If more than one extension contains such a
-structure, then the status value {\tt IRQ\_\_MULT} is returned. If the routine
+\texttt{IRQ\_\_NOQNI} is returned. If more than one extension contains such a
+structure, then the status value \texttt{IRQ\_\_MULT} is returned. If the routine
 runs successfully, then an array of HDS locators is returned similar to
 the array returned by IRQ\_NEW. Once access to the quality names
 information is no longer required, the resources used by these HDS
@@ -882,21 +358,20 @@ to be provided in which the `bad' pixels define the pixels in the NDF
 DATA component to which the quality is to be assigned. Routine
 \htmlref{IRQ\_SETQL}{IRQ_SETQL} requires a list of pixel indices to be
 provided which defines the pixels in the NDF DATA component to which the
-quality is to be assigned. The quality of the NDF pixels which are {\em
-not} selected is left unchanged. Thus, if an unselected pixel already has
-the specified quality, these routines will not {\em remove} the quality
+quality is to be assigned. The quality of the NDF pixels which are \emph{not} selected is left unchanged. Thus, if an unselected pixel already has
+the specified quality, these routines will not \emph{remove} the quality
 from those pixels.
 
 The routines \htmlref{IRQ\_RESQM}{IRQ_RESQM} and
 \htmlref{IRQ\_RESQL}{IRQ_RESQL}, are complementary to
 \htmlref{IRQ\_SETQM}{IRQ_SETQM} and \htmlref{IRQ\_SETQL}{IRQ_SETQL}.
 Instead of ensuring that the selected pixels hold the specified quality,
-these routines ensure that the selected pixels {\em do not} hold the
+these routines ensure that the selected pixels \emph{do not} hold the
 specified quality. Again, the quality of unselected pixels is left
 unchanged.
 
-Routine \htmlref{IRQ\_SETQ}{IRQ_SETQ} ensures that {\em all} pixels in an
-NDF have a specified quality, and routine IRQ\_RESQ ensures that {\em no}
+Routine \htmlref{IRQ\_SETQ}{IRQ_SETQ} ensures that \emph{all} pixels in an
+NDF have a specified quality, and routine IRQ\_RESQ ensures that \emph{no}
 pixels in an NDF have a specified quality.
 
 The routine \htmlref{IRQ\_CNTQ}{IRQ_CNTQ} will count the number of bits
@@ -924,16 +399,16 @@ If IRQ\_COMP successfully compiles the quality expression, it returns an
 identifier for the compiled quality expression. This identifier is
 actually a pointer to a temporary HDS structure holding information about
 the quality expression. The identifier is passed to
-\htmlref{IRQ\_SBAD}{IRQ_SBAD} which locates all NDF pixels that have
+\htmlref{IRQ\_SBAD}{IRQ_SBADx} which locates all NDF pixels that have
 qualities that satisfy the quality expression. The corresponding pixels
 in an array supplied to IRQ\_SBAD are set `bad'. The other pixels are
-left unchanged. Alternatively, pixels with qualities which {\em do not}
+left unchanged. Alternatively, pixels with qualities which \emph{do not}
 satisfy the quality expression can be set bad in the supplied array.
 Note, the array supplied to IRQ\_SBAD must be the same shape and size as
 the NDF supplied to \htmlref{IRQ\_FIND}{IRQ_FIND} or
 \htmlref{IRQ\_NEW}{IRQ_NEW}. If an NDF section was used, then the array
 supplied to IRQ\_SBAD must be the same shape and size as the NDF section,
-{\em not} the base NDF.
+\emph{not} the base NDF.
 
 Up to ten compiled quality expressions can be active at once. The
 identifiers for each compiled quality expression should be annulled
@@ -955,11 +430,11 @@ including execution of the command ``irq\_link'' on the compiler
 command line. Thus, to compile and link a Fortran application called
 ``prog'', the following might be used:
 
-\small
-\begin{verbatim}
-   % f77 -I$STARLINK_DIR/include prog.f -L$STARLINK_DIR/lib `irq_link` -o prog
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+% f77 -I$STARLINK_DIR/include prog.f -L$STARLINK_DIR/lib `irq_link` -o prog
+\end{terminalv}
+\end{small}
 
 Note the use of backward quote characters, which cause the
 ``irq\_link'' command to be executed and its result substituted into
@@ -968,23 +443,23 @@ the compiler command.
 \subsection{\label{ss:buildingadamapplications}ADAM Applications}
 Users of the \xref{ADAM}{sg4}{} programming environment
 \latex{(SG/4)} should use
-the \xref{{\bf alink}}{sun144}{ADAM_link_scripts} command
+the \xref{\textbf{alink}}{sun144}{ADAM_link_scripts} command
 (\xref{SUN/144}{sun144}{}) to compile and link applications, and can
 access the IRQ\_ library by including execution of the command
-{\tt irq\_link\_adam} on the command line, as follows:
+\texttt{irq\_link\_adam} on the command line, as follows:
 
-\small
-\begin{verbatim}
-   % alink adamprog.f `irq_link_adam`
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+% alink adamprog.f `irq_link_adam`
+\end{terminalv}
+\end{small}
 
-where {\tt adamprog.f} is the Fortran source file for the A-TASK. Again
+where \texttt{adamprog.f} is the Fortran source file for the A-TASK. Again
 note the use of opening apostrophies (`) instead of the more usual
-closing apostrophy (') in the above {\bf alink} command.
+closing apostrophy (') in the above \textbf{alink} command.
 
 To build a program written in C (instead of Fortran), simply name the
-source file {\tt adamprog.c}, instead of {\tt adamprog.f}.
+source file \texttt{adamprog.c}, instead of \texttt{adamprog.f}.
 
 \newpage
 \appendix
@@ -1131,7 +606,7 @@ STATUS~)}
       not reserve a bit in the QUALITY component for the new quality
       name, it mearly established a default value for the quality which
       will be used for all pixels in the NDF if no subsequent call to
-      \htmlref{IRQ\_SETQC}{IRQ_SETQC} is made. Note, the string {\tt ANY}
+      \htmlref{IRQ\_SETQC}{IRQ_SETQC} is made. Note, the string \texttt{ANY}
       cannot be used as a quality name. Also, quality names may not contain
       any full stops.
 
@@ -1159,8 +634,8 @@ STATUS~)}
       \sstsubsection{
          DEFLT = LOGICAL (Given)
       }{
-         If {\tt true}, then by default all pixels are assumed to hold the
-         quality specified by QNAME. If {\tt false}, then it is assumed that
+         If \texttt{true}, then by default all pixels are assumed to hold the
+         quality specified by QNAME. If \texttt{false}, then it is assumed that
          no pixels hold the quality.
       }
       \sstsubsection{
@@ -1214,8 +689,8 @@ STATUS~)}
 }{
    \sstdescription{
       This routine searches for a specified quality name in the quality
-      name specified by LOCS. If it is found, THERE is returned {\tt true}.
-      Otherwise THERE is returned {\tt false}.
+      name specified by LOCS. If it is found, THERE is returned \texttt{true}.
+      Otherwise THERE is returned \texttt{false}.
    }
    \sstinvocation{
       CALL IRQ\_CHKQN( LOCS, QNAME, THERE, STATUS )
@@ -1240,8 +715,8 @@ STATUS~)}
       \sstsubsection{
          THERE = LOGICAL (Returned)
       }{
-         If {\tt true}, then the quality name is defined within the NDF
-         specified by LOCS. If {\tt false}, then the quality name is
+         If \texttt{true}, then the quality name is defined within the NDF
+         specified by LOCS. If \texttt{false}, then the quality name is
          undefined.
       }
       \sstsubsection{
@@ -1412,9 +887,9 @@ STATUS~)}
       \sstsubsection{
          ERRPNT = INTEGER (Returned)
       }{
-         If any of the STATUS values IRQ\_\_BADSY( {\tt "}Unrecognised logical
-         operator or constant{\tt "}), IRQ\_\_MSOPT ( {\tt "}Missing operator{\tt "}) or
-         IRQ\_\_MSOPD ( {\tt "}Missing operand{\tt "}) are returned, then ERRPNT
+         If any of the STATUS values IRQ\_\_BADSY( \texttt{"}Unrecognised logical
+         operator or constant\texttt{"}), IRQ\_\_MSOPT ( \texttt{"}Missing operator\texttt{"}) or
+         IRQ\_\_MSOPD ( \texttt{"}Missing operand\texttt{"}) are returned, then ERRPNT
          returns the offset within the quality expression at which the
          error was detected. Note, the offset refers to the returned
          form of QEXP, not the given form. These will be different if
@@ -1587,8 +1062,8 @@ STATUS~)}
       \sstsubsection{
          FIXBIT = LOGICAL (Returned)
       }{
-         Returned {\tt .TRUE.} if the specified quality name had a fixed bit
-         number on entry to this routine, and {\tt .FALSE.} otherwise.
+         Returned \texttt{.TRUE.} if the specified quality name had a fixed bit
+         number on entry to this routine, and \texttt{.FALSE.} otherwise.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -1631,18 +1106,18 @@ STATUS~)}
       \sstsubsection{
          FIXED = LOGICAL (Returned)
       }{
-         If {\tt true}, then the quality is either held by all pixels, or by
+         If \texttt{true}, then the quality is either held by all pixels, or by
          no pixels. In this case the quality may not have a
-         corresponding bit in the QUALITY component. If {\tt false}, then
+         corresponding bit in the QUALITY component. If \texttt{false}, then
          some pixels have the quality and some do not, as indicated by
          the corresponding bit in the QUALITY component.
       }
       \sstsubsection{
          VALUE = LOGICAL (Returned)
       }{
-         If FIXED is {\tt true}, then VALUE specifies whether all pixels hold
+         If FIXED is \texttt{true}, then VALUE specifies whether all pixels hold
          the quality (VALUE = .TRUE.), or whether no pixels hold the
-         quality (VALUE = .FALSE.). If FIXED is {\tt false}, then VALUE is
+         quality (VALUE = .FALSE.). If FIXED is \texttt{false}, then VALUE is
          indeterminate.
       }
       \sstsubsection{
@@ -1651,7 +1126,7 @@ STATUS~)}
          BIT holds the corresponding bit number in the QUALITY component.
          The least-significant bit is called Bit 1 (not Bit 0). If there
          is no corresponding bit, a value of zero is returned, and FIXED
-         is returned {\tt .TRUE.}.
+         is returned \texttt{.TRUE.}.
       }
       \sstsubsection{
          COMMNT = CHARACTER $*$ ( $*$ ) (Returned)
@@ -1848,18 +1323,18 @@ STATUS~)}
       \sstsubsection{
          FIXED = LOGICAL (Returned)
       }{
-         If {\tt true}, then the quality is either held by all pixels, or by
+         If \texttt{true}, then the quality is either held by all pixels, or by
          no pixels. In this case the quality may not have a
-         corresponding bit in the QUALITY component. If {\tt false}, then
+         corresponding bit in the QUALITY component. If \texttt{false}, then
          some pixels have the quality and some do not, as indicated by
          the corresponding bit in the QUALITY component.
       }
       \sstsubsection{
          VALUE = LOGICAL (Returned)
       }{
-         If FIXED is {\tt true}, then VALUE specifies whether all pixels hold
+         If FIXED is \texttt{true}, then VALUE specifies whether all pixels hold
          the quality (VALUE = .TRUE.), or whether no pixels hold the
-         quality (VALUE = .FALSE.). If FIXED is {\tt false}, then VALUE is
+         quality (VALUE = .FALSE.). If FIXED is \texttt{false}, then VALUE is
          indeterminate.
       }
       \sstsubsection{
@@ -1968,7 +1443,7 @@ STATUS~)}
       \sstsubsection{
          QNAME = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The quality name to remove, or {\tt 'ANY'} if all quality names are
+         The quality name to remove, or \texttt{'ANY'} if all quality names are
          to be removed.
       }
       \sstsubsection{
@@ -2052,8 +1527,8 @@ STATUS~)}
       \sstsubsection{
          LISTED = LOGICAL (Given)
       }{
-         If {\tt true}, then the quality is removed from all pixels included
-         in the list given by LIST.  If {\tt false}, then the quality is
+         If \texttt{true}, then the quality is removed from all pixels included
+         in the list given by LIST.  If \texttt{false}, then the quality is
          removed from all pixels not included in the list given by LIST.
       }
       \sstsubsection{
@@ -2102,7 +1577,7 @@ STATUS~)}
 }{
    \sstdescription{
       The quality specified by QNAME is removed from all NDF pixels
-      which either do (or, if BAD is {\tt false}, do not) correspond to \emph{bad}
+      which either do (or, if BAD is \texttt{false}, do not) correspond to \emph{bad}
       pixels in the input mask array.  The quality of all other pixels
       is left unchanged.  The quality name must be defined in the NDF
       specified by LOCS (LOCS should be obtained either by calling
@@ -2128,8 +1603,8 @@ STATUS~)}
       \sstsubsection{
          BAD = LOGICAL (Given)
       }{
-         If {\tt true}, then the quality is removed from all NDF pixels
-         corresponding to `bad' pixels in the mask.  If {\tt false}, then the
+         If \texttt{true}, then the quality is removed from all NDF pixels
+         corresponding to `bad' pixels in the mask.  If \texttt{false}, then the
          quality is removed from all NDF pixels corresponding to pixels
          which are not `bad' in the mask.
       }
@@ -2239,7 +1714,7 @@ STATUS~)}
       \sstsubsection{
          SET = LOGICAL (Given)
       }{
-         If {\tt true}, then the read-only flag for the quality name will be
+         If \texttt{true}, then the read-only flag for the quality name will be
          set to the value supplied in NEWVAL. Otherwise, the current
          value of the flag will be left unchanged.
       }
@@ -2247,7 +1722,7 @@ STATUS~)}
          NEWVAL = LOGICAL (Given)
       }{
          The new value for the read-only flag. Only accessed if SET is
-         {\tt true}.
+         \texttt{true}.
       }
       \sstsubsection{
          OLDVAL = LOGICAL (Returned)
@@ -2277,9 +1752,9 @@ STATUS~)}
       one dimensional vector. The supplied array VEC must correspond
       pixel-for-pixel with the mapped QUALITY vector.  All pixels
       which hold a QUALITY satisfying the quality expression are
-      found. If HELD is {\tt true}, then the corresponding pixels in VEC are
+      found. If HELD is \texttt{true}, then the corresponding pixels in VEC are
       set to the `bad' value (other pixels are left unaltered).
-      If HELD is {\tt false}, the corresponding pixels in VEC are left as
+      If HELD is \texttt{false}, the corresponding pixels in VEC are left as
       they are, but all the other pixels in VEC are set to the
       `bad' value. ALLBAD and NOBAD indicate if the output VEC
       values are either all bad or all good.
@@ -2301,7 +1776,7 @@ STATUS~)}
       \sstsubsection{
          HELD = LOGICAL (Given)
       }{
-         If {\tt true} then those VEC pixels that hold a quality satisfying
+         If \texttt{true} then those VEC pixels that hold a quality satisfying
          the supplied quality expression are set `bad'. Otherwise, those
          pixels which do not hold such a quality are set `bad'.
       }
@@ -2324,14 +1799,14 @@ STATUS~)}
       \sstsubsection{
          ALLBAD = LOGICAL (Returned)
       }{
-         Returned {\tt true} if all pixels in VEC are returned with `bad'
-         values, and {\tt false} if any returned pixel values are not `bad'.
+         Returned \texttt{true} if all pixels in VEC are returned with `bad'
+         values, and \texttt{false} if any returned pixel values are not `bad'.
       }
       \sstsubsection{
          NOBAD = LOGICAL (Returned)
       }{
-         Returned {\tt true} if no pixels in VEC are returned with `bad'
-         values. It is {\tt false} if any `bad' pixel values are returned.
+         Returned \texttt{true} if no pixels in VEC are returned with `bad'
+         values. It is \texttt{false} if any `bad' pixel values are returned.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -2342,7 +1817,7 @@ STATUS~)}
    \sstnotes{
       \sstitemlist{
          \sstitem
-         There is a routine for each numeric data type: replace {\tt "x"} in
+         There is a routine for each numeric data type: replace \texttt{"x"} in
          the routine name by D, R, I, W, UW, B or UB as appropriate.  The
          VEC array supplied to the routine must have the data type
          specified.
@@ -2397,7 +1872,7 @@ STATUS~)}
 }{
    \sstdescription{
       The quality specified by QNAME is assigned to all pixels included
-      (or, if LISTED is {\tt false}, not included) in the supplied list of
+      (or, if LISTED is \texttt{false}, not included) in the supplied list of
       pixel indices. The quality of other pixels is left unaltered.
       The quality name must be defined in the NDF specified by LOCS
       (LOCS should be obtained either by calling \htmlref{IRQ\_FIND}{IRQ_FIND}
@@ -2496,8 +1971,8 @@ STATUS~)}
       \sstsubsection{
          BAD = LOGICAL (Given)
       }{
-         If {\tt true}, then the quality is assigned to all NDF pixels
-         corresponding to `bad' pixels in the mask.  If {\tt false}, then the
+         If \texttt{true}, then the quality is assigned to all NDF pixels
+         corresponding to `bad' pixels in the mask.  If \texttt{false}, then the
          quality is assigned to all NDF pixels corresponding to pixels
          which are not `bad' in the mask.
       }
@@ -2568,9 +2043,9 @@ STATUS~)}
       \sstsubsection{
          ERRPNT = INTEGER (Returned)
       }{
-         If any of the STATUS values IRQ\_\_BADSY( {\tt "Unrecognised logical
-         operator or constant"}), IRQ\_\_MSOPT ( {\tt "Missing operator"}) or
-         IRQ\_\_MSOPD ( {\tt "Missing operand"}) are returned, then ERRPNT
+         If any of the STATUS values IRQ\_\_BADSY( \texttt{"Unrecognised logical
+         operator or constant"}), IRQ\_\_MSOPT ( \texttt{"Missing operator"}) or
+         IRQ\_\_MSOPD ( \texttt{"Missing operand"}) are returned, then ERRPNT
          returns the offset within the quality expression at which the
          error was detected. Note, the offset refers to the returned
          form of QEXP, not the given form. These will be different if
@@ -2590,95 +2065,92 @@ STATUS~)}
 \section {HDS Data Structures}
 
 The IRQ package uses several different HDS data structures. These are
-described in this appendix. HDS {\em names} are indicated by being
-placed within square brackets ({[} {]}), and HDS {\em types} are
+described in this appendix. HDS \emph{names} are indicated by being
+placed within square brackets ({[} {]}), and HDS \emph{types} are
 indicated by being placed within angled brackets ($<$ $>$).
 
 \subsection{Quality names information stored in an NDF}
 
 Information describing the quality names which are defined within an
-NDF is stored in a structure called {[}{\bf QUALITY\_NAMES}{]}, with
-HDS {\em type} $<${\bf QUALITY\_NAMES}$>$. This structure can be
+NDF is stored in a structure called {[}\textbf{QUALITY\_NAMES}{]}, with
+HDS \emph{type} $<$\textbf{QUALITY\_NAMES}$>$. This structure can be
 stored in any extension within the NDF. The components of this
 structure are shown in \latexhtml{Table~\ref {TAB:QN}}{the table
 below}.
 
 \begin{table}[htb]
 \centering
-\latex{\caption{Components of a $<${\bf QUALITY\_NAMES}$>$ structure}}
-\html{\caption{{\bf 1:} Components of a $<${\bf QUALITY\_NAMES}$>$ structure}}
+\latex{\caption{Components of a $<$\textbf{QUALITY\_NAMES}$>$ structure}}
+\html{\caption{\textbf{1:} Components of a $<$\textbf{QUALITY\_NAMES}$>$ structure}}
 \label{TAB:QN}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf QUAL}{]} & $<${\bf IRQ\_QUAL}$>$ & Vector of quality name definitions\\
-{[}{\bf LAST\_USED}{]} & $<${\bf \_INTEGER}$>$ & Highest used index within
-{[}{\bf QUAL}{]}\\
-{[}{\bf NFREE}{]} & $<${\bf \_INTEGER}$>$ & No. of un-used cells within
-{[}{\bf QUAL}{]}\\
-{[}{\bf FREE}(NFREE){]} & $<${\bf \_INTEGER}$>$ & Vector holding indices of
-un-used cells in {[}{\bf QUAL}{]}\\
+{[}\textbf{QUAL}{]} & $<$\textbf{IRQ\_QUAL}$>$ & Vector of quality name definitions\\
+{[}\textbf{LAST\_USED}{]} & $<$\textbf{\_INTEGER}$>$ & Highest used index within
+{[}\textbf{QUAL}{]}\\
+{[}\textbf{NFREE}{]} & $<$\textbf{\_INTEGER}$>$ & No. of un-used cells within
+{[}\textbf{QUAL}{]}\\
+{[}\textbf{FREE}(NFREE){]} & $<$\textbf{\_INTEGER}$>$ & Vector holding indices of
+un-used cells in {[}\textbf{QUAL}{]}\\
 \hline
 \end{tabular}
 \end{table}
 
-The {[}{\bf QUAL}{]} component is a vector in which each cell is a
+The {[}\textbf{QUAL}{]} component is a vector in which each cell is a
 structure holding various items of information needed to define a
 single quality name. The array has an initial size of 8 but is
 increased if necessary. There will usually be some unused cells within
-{[}{\bf QUAL}{]}, and the other components of the {[}{\bf
-QUALITY\_NAMES}{]} structure listed in \latexhtml{Table~\ref
+{[}\textbf{QUAL}{]}, and the other components of the {[}\textbf{QUALITY\_NAMES}{]} structure listed in \latexhtml{Table~\ref
 {TAB:QN}}{Table~1} are used to locate these unused cells. In
-particular, {[}{\bf FREE}{]} is a vector which holds the indices of
-all unused cells within {[}{\bf QUAL}{]}. These indices may appear in
-any order within in {[}{\bf FREE}{]}.
+particular, {[}\textbf{FREE}{]} is a vector which holds the indices of
+all unused cells within {[}\textbf{QUAL}{]}. These indices may appear in
+any order within in {[}\textbf{FREE}{]}.
 
 The set of five HDS locators returned by routines
 \htmlref{IRQ\_NEW}{IRQ_NEW} and \htmlref{IRQ\_FIND}{IRQ_FIND} include
-locators to each of the four components of the {[}{\bf
-QUALITY\_NAMES}{]} structure, together with a locator for a temporary
-HDS structure holding a single $<${\bf \_INTEGER}$>$ scalar used to
+locators to each of the four components of the {[}\textbf{QUALITY\_NAMES}{]} structure, together with a locator for a temporary
+HDS structure holding a single $<$\textbf{\_INTEGER}$>$ scalar used to
 store the cloned NDF identifier.
 
 The information describing each individual quality name is stored in a single
-cell of the {[}{\bf QUAL}{]} vector. The components within each cell of this
+cell of the {[}\textbf{QUAL}{]} vector. The components within each cell of this
 array are listed in
 \latexhtml{Table~\ref {TAB:QUAL}}{Table~2}.
 
 \begin{table}[htb]
 \centering
-\latex{\caption{Components of a $<${\bf IRQ\_QUAL}$>$ structure}}
-\html{\caption{{\bf 2:} Components of a $<${\bf IRQ\_QUAL}$>$ structure}}
+\latex{\caption{Components of a $<$\textbf{IRQ\_QUAL}$>$ structure}}
+\html{\caption{\textbf{2:} Components of a $<$\textbf{IRQ\_QUAL}$>$ structure}}
 \label{TAB:QUAL}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf NAME}{]} & $<${\bf \_CHAR$\ast$15}$>$ & A quality name (maximum of
+{[}\textbf{NAME}{]} & $<$\textbf{\_CHAR$\ast$15}$>$ & A quality name (maximum of
 \\
-{[}{\bf FIXED}{]} & $<${\bf \_LOGICAL}$>$ & True if all pixels are in the same
+{[}\textbf{FIXED}{]} & $<$\textbf{\_LOGICAL}$>$ & True if all pixels are in the same
 state\\
-{[}{\bf VALUE}{]} & $<${\bf \_LOGICAL}$>$ & The state of all pixels, if fixed\\
-{[}{\bf BIT}{]} & $<${\bf \_INTEGER}$>$ & QUALITY bit used to store this
+{[}\textbf{VALUE}{]} & $<$\textbf{\_LOGICAL}$>$ & The state of all pixels, if fixed\\
+{[}\textbf{BIT}{]} & $<$\textbf{\_INTEGER}$>$ & QUALITY bit used to store this
 quality\\
-{[}{\bf COMMENT}{]} & $<${\bf \_CHAR$\ast$}$>$ & A descriptive comment for the
+{[}\textbf{COMMENT}{]} & $<$\textbf{\_CHAR$\ast$}$>$ & A descriptive comment for the
 quality\\
 \hline
 \end{tabular}
 \end{table}
 
-If {\em all} pixels hold a given quality, or if {\em no} pixels hold
-the quality, then a true value is stored for {[}{\bf FIXED}{]}. A true
-value is stored for {[}{\bf VALUE}{]} if {\em all} pixels hold the
-quality, and a false value if {\em no} pixels hold the quality. In
-either case, {[}{\bf BIT}{]} is ignored since no QUALITY bit needs to
+If \emph{all} pixels hold a given quality, or if \emph{no} pixels hold
+the quality, then a true value is stored for {[}\textbf{FIXED}{]}. A true
+value is stored for {[}\textbf{VALUE}{]} if \emph{all} pixels hold the
+quality, and a false value if \emph{no} pixels hold the quality. In
+either case, {[}\textbf{BIT}{]} is ignored since no QUALITY bit needs to
 be reserved for the quality name, thus allowing more than eight
 quality names to be defined simultaneously.
 
-If some pixels {\em do} hold the quality but some {\em do not}, then a
-false value is stored for {[}{\bf FIXED}{]} and {[}{\bf VALUE}{]} is
+If some pixels \emph{do} hold the quality but some \emph{do not}, then a
+false value is stored for {[}\textbf{FIXED}{]} and {[}\textbf{VALUE}{]} is
 ignored. In this case, a QUALITY bit is reserved to represent the
-quality and its bit number (in the range 1 to 8) is stored in {[}{\bf
-BIT}{]}.
+quality and its bit number (in the range 1 to 8) is stored in {[}\textbf{BIT}{]}.
 
 \subsection{Temporary structures used to hold compiled quality
 expressions} When routine \htmlref{IRQ\_COMP}{IRQ_COMP} is called to
@@ -2687,27 +2159,27 @@ compile a quality expression, the resulting information (known as a
 Up to ten compiled quality expressions can exist simultaneously, each
 being stored in one cell of an array of temporary structures. The
 identifier returned by IRQ\_COMP is just an index within this array.
-Each cell of the array has an HDS {\em name} of {[}{\bf QEXP}{]} and
-an HDS {\em type} of $<${\bf QEXP}$>$, and contains the components
+Each cell of the array has an HDS \emph{name} of {[}\textbf{QEXP}{]} and
+an HDS \emph{type} of $<$\textbf{QEXP}$>$, and contains the components
 listed in \latexhtml{Table~\ref {TAB:QEXP}}{Table 3}.
 
 \begin{table}[htb]
 \centering
-\latex{\caption{Components of a $<${\bf QEXP}$>$ structure}}
-\html{\caption{{\bf 3:} Components of a $<${\bf QEXP}$>$ structure}}
+\latex{\caption{Components of a $<$\textbf{QEXP}$>$ structure}}
+\html{\caption{\textbf{3:} Components of a $<$\textbf{QEXP}$>$ structure}}
 \label{TAB:QEXP}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf MASKS}{]} & $<${\bf \_INTEGER}$>$ & A vector of bit masks\\
-{[}{\bf OPCODE}{]} & $<${\bf \_INTEGER}$>$ & A vector of instruction codes\\
+{[}\textbf{MASKS}{]} & $<$\textbf{\_INTEGER}$>$ & A vector of bit masks\\
+{[}\textbf{OPCODE}{]} & $<$\textbf{\_INTEGER}$>$ & A vector of instruction codes\\
 \hline
 \end{tabular}
 \end{table}
 
-Each bit mask held in {[}{\bf MASKS}{]} specifies a set of QUALITY bits which
+Each bit mask held in {[}\textbf{MASKS}{]} specifies a set of QUALITY bits which
 are to be tested as part of the evaluation of a quality expression performed by
-routine IRQ\_SBAD. The instruction codes held in {[}{\bf OPCODE}{]} represent
+routine IRQ\_SBAD. The instruction codes held in {[}\textbf{OPCODE}{]} represent
 the operations which must be performed on a ``First In - Last Out'' stack in
 order to evaluate a quality expression. The sizes of theses vectors are held in
 common.
@@ -2717,8 +2189,7 @@ common.
 \label{APP:EXAMS}
 \subsection {Adding a new quality name}
 
-This example shows a code fragment which adds the quality name {\tt
-SATURATED} to an NDF and then assigns the quality to all pixels with
+This example shows a code fragment which adds the quality name \texttt{SATURATED} to an NDF and then assigns the quality to all pixels with
 value greater than 10.0. An error is reported if the quality name is
 already in use.
 
@@ -2881,7 +2352,7 @@ since the call to \htmlref{IRQ\_COMP}{IRQ_COMP} updates the expression by
 removing leading blanks, and converting the expression to upper case. An
 access violation would result if a literal string were supplied as an
 argument, instead of a character variable. If either of the quality names
-{\tt SATURATED} or {\tt BACKGROUND} is not defined in the input NDF, then
+\texttt{SATURATED} or \texttt{BACKGROUND} is not defined in the input NDF, then
 an error will be reported by IRQ\_COMP, and the undefined names will be
 returned in the UNDEF array.
 
@@ -2913,75 +2384,75 @@ packages which it calls. In addition it can return the following
 IRQ-specific values.
 
 \begin{description}
-\item {\bf IRQ\_\_BADBT}\\
+\item \textbf{IRQ\_\_BADBT}\\
 Bit value outside range [1,8] supplied.
-\item {\bf IRQ\_\_BADDM}\\
+\item \textbf{IRQ\_\_BADDM}\\
 Incorrect NDF dimensions supplied.
-\item {\bf IRQ\_\_BADNM}\\
+\item \textbf{IRQ\_\_BADNM}\\
 An illegal quality name has been given.
-\item {\bf IRQ\_\_BADQN}\\
+\item \textbf{IRQ\_\_BADQN}\\
 Incomplete QUALITY\_NAMES structure found.
-\item {\bf IRQ\_\_BADSL}\\
+\item \textbf{IRQ\_\_BADSL}\\
 Invalid slot number supplied.
-\item {\bf IRQ\_\_BADST}\\
+\item \textbf{IRQ\_\_BADST}\\
 Incomplete slot structure found.
-\item {\bf IRQ\_\_BADSY}\\
+\item \textbf{IRQ\_\_BADSY}\\
 Unrecognised logical operator or constant in quality expression.
-\item {\bf IRQ\_\_CMPLX}\\
+\item \textbf{IRQ\_\_CMPLX}\\
 Too many symbols in quality expression.
-\item {\bf IRQ\_\_INCOM}\\
+\item \textbf{IRQ\_\_INCOM}\\
 Supplied vector has different size to the NDF
-\item {\bf IRQ\_\_INTER}\\
+\item \textbf{IRQ\_\_INTER}\\
 Internal IRQ error (report to maintainer of IRQ).
-\item {\bf IRQ\_\_INVID}\\
+\item \textbf{IRQ\_\_INVID}\\
 Invalid IRQ identifier supplied.
-\item {\bf IRQ\_\_IVNDF}\\
+\item \textbf{IRQ\_\_IVNDF}\\
 Invalid NDF identifier found.
-\item {\bf IRQ\_\_LSHRT}\\
+\item \textbf{IRQ\_\_LSHRT}\\
 Character variable too short.
-\item {\bf IRQ\_\_MSDOT}\\
+\item \textbf{IRQ\_\_MSDOT}\\
 Missing delimiter "." in quality expression.
-\item {\bf IRQ\_\_MSOPD}\\
+\item \textbf{IRQ\_\_MSOPD}\\
 Missing operand in quality expression.
-\item {\bf IRQ\_\_MSOPT}\\
+\item \textbf{IRQ\_\_MSOPT}\\
 Missing or invalid operator in quality expression.
-\item {\bf IRQ\_\_MSPAR}\\
+\item \textbf{IRQ\_\_MSPAR}\\
 Unpaired parentheses in quality expression.
-\item {\bf IRQ\_\_MULT }\\
+\item \textbf{IRQ\_\_MULT }\\
 More than one structure found holding quality names information.
-\item {\bf IRQ\_\_NOMOR}\\
+\item \textbf{IRQ\_\_NOMOR}\\
 No identifiers left for compiled quality expressions.
-\item {\bf IRQ\_\_NOOPS}\\
+\item \textbf{IRQ\_\_NOOPS}\\
 No operands can be found.
-\item {\bf IRQ\_\_NOQNM}\\
+\item \textbf{IRQ\_\_NOQNM}\\
 A quality name could not be found.
-\item {\bf IRQ\_\_NOQNI}\\
+\item \textbf{IRQ\_\_NOQNI}\\
 No quality names structure found in the NDF.
-\item {\bf IRQ\_\_NOSPA}\\
+\item \textbf{IRQ\_\_NOSPA}\\
 Can't reclaim space in an instruction array.
-\item {\bf IRQ\_\_NOWRT}\\
+\item \textbf{IRQ\_\_NOWRT}\\
 Write access to the NDF is unavailable.
-\item {\bf IRQ\_\_QBAD }\\
+\item \textbf{IRQ\_\_QBAD }\\
 BAD values exists in the QUALITY component.
-\item {\bf IRQ\_\_QEXPL}\\
+\item \textbf{IRQ\_\_QEXPL}\\
 Too many characters in quality expression.
-\item {\bf IRQ\_\_QIEXS}\\
+\item \textbf{IRQ\_\_QIEXS}\\
 Extension already contains a quality names structure.
-\item {\bf IRQ\_\_QNEXS}\\
+\item \textbf{IRQ\_\_QNEXS}\\
 Quality name is already defined.
-\item {\bf IRQ\_\_QLONG}\\
+\item \textbf{IRQ\_\_QLONG}\\
 Quality name too long.
-\item {\bf IRQ\_\_QREFS}\\
+\item \textbf{IRQ\_\_QREFS}\\
 Too many quality names in quality expression.
-\item {\bf IRQ\_\_QUNDF}\\
+\item \textbf{IRQ\_\_QUNDF}\\
 QUALITY component is undefined.
-\item {\bf IRQ\_\_RDONL}\\
+\item \textbf{IRQ\_\_RDONL}\\
 An attempt has been made to remove a read-only quality name.
-\item {\bf IRQ\_\_STKOV}\\
+\item \textbf{IRQ\_\_STKOV}\\
 Evaluation stack overflow.
-\item {\bf IRQ\_\_STKUN}\\
+\item \textbf{IRQ\_\_STKUN}\\
 Evaluation stack underflow.
-\item {\bf IRQ\_\_XBITS}\\
+\item \textbf{IRQ\_\_XBITS}\\
 No bits left in QUALITY component.
 \end{description}
 
