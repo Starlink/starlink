@@ -20,8 +20,9 @@
 *     not reserve a bit in the QUALITY component for the new quality
 *     name, it mearly established a default value for the quality which
 *     will be used for all pixels in the NDF if no subsequent call to
-*     IRQ_SETQC is made. Note, the string ANY cannot be used as a
-*     quality name. Also, quality names may not contain any full stops.
+*     IRQ_SETQL or IRQ_SETQM is made. Note, the string ANY cannot be used
+*     as a quality name. Also, quality names may not contain any full
+*     stops.
 *
 *     An error is reported if only READ access is available to the NDF.
 
