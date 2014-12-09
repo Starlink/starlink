@@ -1,3 +1,4 @@
+\documentclass[11pt,twoside,nolof]{starlink}
 % The document header has a title picture added explicitly in the LaTeX
 % and HTML title pages.
 %
@@ -5,508 +6,37 @@
 % reviewing the document look out for these:
 % \newpage % <<<---
 
-\documentclass[11pt,twoside]{article}
-\usepackage{graphicx}
-\pagestyle{myheadings}
+
+%\usepackage
+
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun194.3}
-\newcommand{\stardocnumber}    {194.3}
-\newcommand{\stardocauthors}   {H.\ Meyerdierks, D.\ Berry, P.\ W.\ Draper, G.\ Privett, M.\ Currie }
-\newcommand{\stardocdate}      {12th October 2005}
-\newcommand{\stardoctitle}     {PDA \\ [\latex{1ex}]
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun194.3}
+\stardocnumber      {194.3}
+\stardocauthors     {H.\ Meyerdierks, D.\ Berry, P.\ W.\ Draper, G.\ Privett, M.\ Currie }
+\stardocdate        {12th October 2005}
+\stardoctitle       {PDA \\ [\latex{1ex}]
                                 Public Domain Algorithms}
-\newcommand{\stardocversion}   {Version 0.5}
-\newcommand{\stardocmanual}    {Programmer's Manual}
+\stardocversion     {Version 0.5}
+\stardocmanual      {Programmer's Manual}
+\startitlepic {\includegraphics[width=2.0in]{sun194_1}}
+\stardocabstract {%
+The PDA library provides numerical algorithm code that can be
+used to replace NAG in open source software.
+}
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\html}[1]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
-
-
+% ? Document specific \providecommand or \newenvironment commands.
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Title figure
-   \begin{center}
-   \includegraphics[width=2.0in]{sun194_1}
-   \end{center}
-
-% ? Heading for abstract if used.
-%   \vspace{10mm}
-%   \begin{center}
-%      {\Large\bf Abstract}
-%   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-   \begin{figure}[h]
-      \includegraphics[width=2.0in]{sun194_1}
-   \end{figure}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-%  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%   ==================
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
- \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 % -----------------------------------------------------------------------------
 \section{\xlabel{introduction}Introduction}
@@ -527,24 +57,24 @@
    provides for both double and single precision, and the routines from
    DIERCKX exist only for single precision.
 
-{\em
-   The hints for migration from NAG to this library are incomplete.
+\emph{The hints for migration from NAG to this library are incomplete.
    Application programmers are encouraged to check these hints and to
    report on their experience in converting applications from NAG to
-   this library.
+   this library.}
 
+\emph{
    NAG is a registered trade mark of The Numerical Algorithms Group. In
-   this document the term ``NAG library'' refers to the
+   this document the term ``\emph{NAG library}'' refers to the
 \htmladdnormallink{NAG Fortran Library}{http://www.nag.co.uk/1h/numeric/FLOLCH}
    and the
 \htmladdnormallink{NAG Graphics Library.}{http://www.nag.co.uk/1h/visual/GLGICH}
-   Terms like ``NAG format'', ``NAG array'', ``weights used for NAG''
+   Terms like ``\emph{NAG format}'', ``\emph{NAG array}'', ``\emph{weights used for NAG'}'
    refer not to any product of The Numerical Algorithms Group, but to
    the data format that Starlink applications use in order to call the
-   NAG library. Similarly, terms like ``NAG code'' refer to Starlink
+   NAG library. Similarly, terms like ``\emph{NAG code}'' refer to Starlink
    application code that calls the NAG library, not to the NAG library
    itself.
-\/}
+}
 
 % -----------------------------------------------------------------------------
 
@@ -608,7 +138,7 @@ module TOMS526 of the TOMS library at NETLIB.
    It cannot be used for commercial purposes without the author's
    written consent.
 
-   {\em Although the code of the PDA library comes from other sources in
+   \emph{Although the code of the PDA library comes from other sources in
    the Public Domain, problems with the routines should in the first
    instance be taken up with Starlink and not the original authors. If
    there are bugs in PDA, then the first assumption must be that they
@@ -670,15 +200,15 @@ module TOMS526 of the TOMS library at NETLIB.
 The surface fitting routines PDA\_DB2INK and PDA\_DB2VAL call a
 routine PDA\_DBVAL2. Originally, PDA\_DBVAL2 called XERROR when a
 problem was encountered. These calls have been commented out. The
-routine now sets variable {\tt IFAIL} appropriately instead. On exit from
-PDA\_DB2INK and PDA\_DB2INK, {\tt STATUS} is set to 1 if the
-{\tt IFAIL} value indicated that a serious fault had occurred.
-{\tt STATUS} must have the
+routine now sets variable \texttt{IFAIL} appropriately instead. On exit from
+PDA\_DB2INK and PDA\_DB2INK, \texttt{STATUS} is set to 1 if the
+\texttt{IFAIL} value indicated that a serious fault had occurred.
+\texttt{STATUS} must have the
 value 0 when the routines are called.
 
 The surface fitting routines PDA\_IDBVIP and PDA\_IDSFFT, together
-with their support routines, have been modified to ensure that {\tt STATUS}
-is set to 1 if the internal error status variable {\tt ISTAT} indicates
+with their support routines, have been modified to ensure that \texttt{STATUS}
+is set to 1 if the internal error status variable \texttt{ISTAT} indicates
 that a problem was encountered.
 
    The major work in adapting the library to Starlink error reporting is
@@ -741,9 +271,9 @@ that a problem was encountered.
    pda\_test.f is a program that calls all user-callable routines in the
    library. The command
 
-\begin{verbatim}
+\begin{terminalv}
    % f77 pda_test.f libpda.a -L/star/lib `ems_link`
-\end{verbatim}
+\end{terminalv}
 
    should succeed. The test consist of the successful linking, and an
    error message indicates that the library is incomplete or has
@@ -752,23 +282,23 @@ that a problem was encountered.
    Erfplot.f can be compiled and linked against PDA and PGPLOT. It
    produced the title graph.
 
-\begin{verbatim}
+\begin{terminalv}
    % f77 Erftest.f libpda.a -L/star/lib `pgplot_link`
    % ./a.out
-\end{verbatim}
+\end{terminalv}
 
    For the FFT routines Ffttest.f can be compiled and linked. It has to
-   be linked with PDA {\em and\/} NAG. Ffttest.f convolves two
+   be linked with PDA \emph{and\/} NAG. Ffttest.f convolves two
    test arrays by multiplying their Fourier transforms. This is done
    using NAG routines, and then using FFTPACK routines, and the
    differences between the results (together with timings) are
    displayed. Timings are averaged over 2000 convolutions. The commands
 
-\begin{verbatim}
+\begin{terminalv}
    % f77 Ffttest.f -L/star/lib -lnag `pda_link`
    % ./a.out > temp
    % diff temp Ffttest.out
-\end{verbatim}
+\end{terminalv}
 
    should indicate whether the FFT routines work properly. The output
    will not be exactly as in the distributed file, since it depends on
@@ -776,26 +306,26 @@ that a problem was encountered.
 
    There are various other test routines included in the PDA distribution:
 \begin{itemize}
-\item {\tt Covartest.f} - Tests PDA\_NSCOR, PDA\_V11 and PDA\_COVMAT.
-\item {\tt E02cbfe.f} - Tests PDA\_CHE2R.
-\item {\tt Lintest.f} - Tests PDA\_LSQR.
-\item {\tt Nonlin2test.f} - Tests PDA\_DQED.
-\item {\tt Nonlintest.f} - Tests PDA\_DNLS1E and PDA\_DENORM.
-\item {\tt Normtest.f} - Tests PDA\_PPND16.
-\item {\tt Randtest.f} - Tests the random number generators.
-\item {\tt Simann.f} - Tests PDA\_SA.
-\item {\tt Sorttest.f} - Tests the sorting routines.
-\item {\tt Subplex.f} - Tests PDA\_SUBPLX.
-\item {\tt Sumsl.f} - Tests PDA\_SUMSL.
-\item {\tt Sf2dtest.f} - Tests PDA\_DB2INK and PDA\_DB2VAL.
-\item {\tt Sf2dtest2.f} - Tests PDA\_IDBVIP and PDA\_IDSFFT.
+\item \texttt{Covartest.f} - Tests PDA\_NSCOR, PDA\_V11 and PDA\_COVMAT.
+\item \texttt{E02cbfe.f} - Tests PDA\_CHE2R.
+\item \texttt{Lintest.f} - Tests PDA\_LSQR.
+\item \texttt{Nonlin2test.f} - Tests PDA\_DQED.
+\item \texttt{Nonlintest.f} - Tests PDA\_DNLS1E and PDA\_DENORM.
+\item \texttt{Normtest.f} - Tests PDA\_PPND16.
+\item \texttt{Randtest.f} - Tests the random number generators.
+\item \texttt{Simann.f} - Tests PDA\_SA.
+\item \texttt{Sorttest.f} - Tests the sorting routines.
+\item \texttt{Subplex.f} - Tests PDA\_SUBPLX.
+\item \texttt{Sumsl.f} - Tests PDA\_SUMSL.
+\item \texttt{Sf2dtest.f} - Tests PDA\_DB2INK and PDA\_DB2VAL.
+\item \texttt{Sf2dtest2.f} - Tests PDA\_IDBVIP and PDA\_IDSFFT.
 \end{itemize}
 
 These test programs can be compiled and linked as follows:
 
-\begin{verbatim}
+\begin{terminalv}
    % f77 -o <prog> <prog>.f -L/star/lib `pda_link`
-\end{verbatim}
+\end{terminalv}
 
 Some of these test programs write results to standard output. For such
 programs the PDA distribution includes a file with name \verb+<prog>.out+
@@ -811,17 +341,17 @@ be compared.
    primarily for Starlink application packages, the link command used is
    most probably `alink'. In that case link as follows:
 
-\begin{verbatim}
+\begin{terminalv}
    % alink a-task.o -L/star/lib `pda_link_adam`
-\end{verbatim}
+\end{terminalv}
 
    The library can equally well be used by ordinary programs:
 
-\begin{verbatim}
+\begin{terminalv}
    % f77 program.f -L/star/lib `pda_link`
-\end{verbatim}
+\end{terminalv}
 
-   The {\tt pda\_link} and {\tt pda\_link\_adam} scripts results in your
+   The \texttt{pda\_link} and \texttt{pda\_link\_adam} scripts results in your
    program being linked with the Starlink Error Message Service
 \xref{(EMS).}{ssn4}{}
    When an error report is to
@@ -831,7 +361,7 @@ be compared.
    If you do not want to link against EMS, then you can provide your own
    replacements for the two EMS routines. Use the following code:
 
-\begin{verbatim}
+\begin{terminalv}
 *  File name might be mymsg.f
 
       SUBROUTINE EMS_SETC( MESSG )
@@ -843,13 +373,13 @@ be compared.
       CHARACTER * ( * ) MNAME, MESSG
       INTEGER STATUS
       END
-\end{verbatim}
+\end{terminalv}
 
    Then link:
 
-\begin{verbatim}
+\begin{terminalv}
    % f77 program.f mymsg.f -L/star/lib -lpda
-\end{verbatim}
+\end{terminalv}
 
    Finally, if your site is not a Starlink site, you can
    customise the library as such to make EMS obsolete. For this you have
@@ -857,7 +387,7 @@ be compared.
 \htmlref{PDA\_XERMSG}{PDA\_XERMSG}
    in the library. The new code should be
 
-\begin{verbatim}
+\begin{terminalv}
 *  File name would be pda_xermsg.f
 
       SUBROUTINE PDA_XERMSG( LIBRAR, SUBROU, MESSG, NERR, LEVEL, STATUS )
@@ -870,16 +400,16 @@ be compared.
       STATUS = 1
 
       END
-\end{verbatim}
+\end{terminalv}
 
    You might also modify the link script pda\_link so that it does not
    refer to ems\_link any more and does not execute any awk command:
 
-\begin{verbatim}
+\begin{terminalv}
 
 #  N.B. the previous line should be blank.
       echo -lpda
-\end{verbatim}
+\end{terminalv}
 
 % -----------------------------------------------------------------------------
 
@@ -992,8 +522,7 @@ be compared.
    successive calls to PDA\_DR2NAG and PDA\_DNAG2R do not leave the
    original data
    unaffected (they are divided by N). This is done to cancel the effect
-   of successive calls of PDA\_DRFFTF and PDA\_DRFFTB which {\em
-   multiplies\/} the original data by N.
+   of successive calls of PDA\_DRFFTF and PDA\_DRFFTB which \emph{multiplies\/} the original data by N.
 
    The real and imaginary coefficients produced by PDA\_DRFFTF are
    numerically larger than the corresponding C06FAF coefficients by a
@@ -1003,10 +532,10 @@ be compared.
    adjacent elements, whereas C06FAF has all the real terms together,
    followed by all the imaginary terms (in reverse order):
 
-\begin{verbatim}
+\begin{terminalv}
    PDA_DRFFTF:  A0,    A1, B1,     A2, B2,     A3, B3,   ...
    C06FAF:      A0,    A1, A2, A3, ...,        ..., B3, B2, B1
-\end{verbatim}
+\end{terminalv}
 
    The zeroth imaginary term (B0) always has the value zero and so is
    not stored in the array. Care has to be taken about the parity of the
@@ -1014,17 +543,17 @@ be compared.
    there are imaginary terms (excluding A0), i.e.\ if N = 10, then the
    coefficients are stored as follows:
 
-\begin{verbatim}
+\begin{terminalv}
    PDA_DRFFTF:  A0, A1, B1, A2, B2, A3, B3, A4, B4, A5
    C06FAF:      A0, A1, A2, A3, A4, A5, B4, B3, B2, B1
-\end{verbatim}
+\end{terminalv}
 
    If N = 9, then the coefficients are stored as follows:
 
-\begin{verbatim}
+\begin{terminalv}
    PDA_DRFFTF:  A0, A1, B1, A2, B2, A3, B3, A4, B4
    C06FAF:      A0, A1, A2, A3, A4, B4, B3, B2, B1
-\end{verbatim}
+\end{terminalv}
 
 %       -----------------------------------------------------------------------
 
@@ -1065,27 +594,27 @@ be compared.
 
 \begin{itemize}
 
-\item{\bf Increase the size of the work array}
+\item\textbf{Increase the size of the work array}
 
    The work array passed to the FFT routine needs to be increased in
    size from N elements (for NAG) to 2*N+15 (for FFTPACK).
 
-\item{\bf Replace call to C06FAF with
+\item\textbf{Replace call to C06FAF with
 \htmlref{PDA\_DRFFTF}{PDA\_RFFTF}}
 
    Replace the call
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION X(N), WORK(N)
       CALL C06FAF( X, N, WORK, IFAIL )
-\end{verbatim}
+\end{terminalv}
 
    with
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION X(N), WORK(2*N+15)
       CALL PDA_DRFFTF( N, X, WORK )
-\end{verbatim}
+\end{terminalv}
 
 \item{\bf\label{faf3}Add calls to
 \htmlref{PDA\_DRFFTI}{PDA\_RFFTI}
@@ -1094,10 +623,10 @@ if necessary}
    The work array supplied to PDA\_DRFFTF needs initialising before calling
    PDA\_DRFFTF. This is done by calling PDA\_DRFFTI:
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION WORK(2*N+15)
       CALL PDA_DRFFTI( N, WORK )
-\end{verbatim}
+\end{terminalv}
 
    There is no need to re-initialise WORK if the value of N has not
    changed since the previous call to PDA\_DRFFTI (and if the contents of the
@@ -1106,7 +635,7 @@ if necessary}
    unnecessarily re-initialised, but it is a good idea to include some
    logic to prevent this.
 
-\item{\bf Convert output (frequency domain) data to NAG format}
+\item\textbf{Convert output (frequency domain) data to NAG format}
 
    Compared to the Fourier coefficients created by NAG, those created
    by FFTPACK are stored in a different order in the output array and
@@ -1116,10 +645,10 @@ if necessary}
 \htmlref{PDA\_DR2NAG}{PDA\_R2NAG}
    routine to convert the FFTPACK results into NAG format.
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION X(N)
       CALL PDA_DR2NAG( N, X )
-\end{verbatim}
+\end{terminalv}
 
    where X is the output from PDA\_DRFFTF. On return, X holds a NAG-style
    Hermitian sequence.
@@ -1141,7 +670,7 @@ if necessary}
 
 \begin{itemize}
 
-\item{\bf Convert input (frequency domain) data to FFTPACK format}
+\item\textbf{Convert input (frequency domain) data to FFTPACK format}
 
    Compared to the Hermitian sequences created by NAG, those created by
    FFTPACK are stored in a different order and are normalised
@@ -1151,52 +680,52 @@ if necessary}
    routine to convert the supplied NAG format data into the
    equivalent FFTPACK format data:
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION X(N)
       CALL PDA_DNAG2R( N, X )
-\end{verbatim}
+\end{terminalv}
 
    where X is the supplied NAG-style data. On return, X holds the
    FFTPACK-style data, ready for use by PDA\_DRFFTB. If this call is made,
    the values returned by PDA\_DRFFTB will have the same normalisation as the
    original data supplied to PDA\_DRFFTF.
 
-\item{\bf Increase the size of the work array}
+\item\textbf{Increase the size of the work array}
 
    The work array passed to the FFT routine needs to be increased in
    size from N elements (for NAG) to 2*N+15 (for FFTPACK).
 
-\item{\bf Replace call to C06FBF and C06GBF with
+\item\textbf{Replace call to C06FBF and C06GBF with
 \htmlref{PDA\_DRFFTB}{PDA\_RFFTB}}
 
    Replace the two calls:
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION X(N), WORK(N)
       CALL C06GBF( X, N, IFAIL )
       CALL C06FBF( X, N, WORK, IFAIL )
-\end{verbatim}
+\end{terminalv}
 
    where X is in NAG format, with
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION X(N), WORK(2*N+15)
       CALL PDA_DRFFTB( N, X, WORK )
-\end{verbatim}
+\end{terminalv}
 
    where X is in FFTPACK format.
 
-\item{\bf Add calls to
+\item\textbf{Add calls to
 \htmlref{PDA\_DRFFTI}{PDA\_RFFTI}
    if necessary}
 
    The work array supplied to PDA\_DRFFTB needs initialising before calling
    PDA\_DRFFTB. This is done by calling PDA\_DRFFTI:
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION WORK(2*N+15)
       CALL PDA_DRFFTI( N, WORK )
-\end{verbatim}
+\end{terminalv}
 
    There is no need to re-initialise WORK if the value of N has not
    changed since the previous call to PDA\_DRFFTI (and if the contents of the
@@ -1220,11 +749,11 @@ if necessary}
 
 %       -----------------------------------------------------------------------
 
-\subsubsection{\xlabel{forward_transforms}Forward transforms}
+\subsubsection{\xlabel{forward_transforms_c06fcf}Forward transforms}
 
 \begin{itemize}
 
-\item{\bf Re-organise the input (spatial domain) data}
+\item\textbf{Re-organise the input (spatial domain) data}
 
    The NAG routine expects real and imaginary parts in separate arrays,
    whereas FFTPACK expects them in the same array, with corresponding
@@ -1234,61 +763,61 @@ if necessary}
    hold the input (and output) data in FFTPACK format. You would convert
    the supplied input data using code such as:
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION X( N ), Y( N ), C( 2*N )
       DO J = 1, N
          I = 2*J
          C( I - 1 ) = X( J )
          C( I ) = Y( J )
       END DO
-\end{verbatim}
+\end{terminalv}
 
    or
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION X( N ), Y( N ), C( 2, N )
       DO J = 1, N
          C( 1, J ) = X( J )
          C( 2, J ) = Y( J )
       END DO
-\end{verbatim}
+\end{terminalv}
 
    where the X and Y arrays hold the supplied data, C is a work array,
    and N is the number of data points.
 
-\item{\bf Increase the size of the work array}
+\item\textbf{Increase the size of the work array}
 
    The work array passed to the FFT routine needs to be increased in
    size from N elements (for NAG) to 4*N+15 (for FFTPACK).
 
-\item{\bf Replace call to C06FCF with
+\item\textbf{Replace call to C06FCF with
 \htmlref{PDA\_DCFFTF}{PDA\_CFFTF}}
 
    Replace the call
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION X(N), Y(N), WORK(N)
       CALL C06FCF( X, Y, N, WORK, IFAIL )
-\end{verbatim}
+\end{terminalv}
 
    with
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION C(2*N), WORK(4*N+15)
       CALL PDA_DCFFTF( N, C, WORK )
-\end{verbatim}
+\end{terminalv}
 
-\item{\bf Add calls to
+\item\textbf{Add calls to
 \htmlref{PDA\_DCFFTI}{PDA\_CFFTI}
    if necessary}
 
    The work array supplied to PDA\_DCFFTF needs initialising before calling
    PDA\_DCFFTF. This is done by calling PDA\_DCFFTI:
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION WORK( 4*N+15 )
       CALL PDA_DCFFTI( N, WORK )
-\end{verbatim}
+\end{terminalv}
 
    There is no need to re-initialise WORK if the value of N has not
    changed since the previous call to PDA\_DCFFTI (and if the contents of the
@@ -1297,7 +826,7 @@ if necessary}
    unnecessarily re-initialised, but it is a good idea to include some
    logic to prevent this.
 
-\item{\bf Convert output (frequency domain) data to NAG format}
+\item\textbf{Convert output (frequency domain) data to NAG format}
 
    The Fourier coefficients created by FFTPACK are stored in a single
    array and are not normalised, whereas NAG stores them in two arrays
@@ -1306,10 +835,10 @@ if necessary}
 \htmlref{PDA\_DC2NAG}{PDA\_C2NAG}
    routine to convert the FFTPACK results into NAG format.
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION X(N), Y(N), C(2*N)
       CALL PDA_DC2NAG( N, C, X, Y )
-\end{verbatim}
+\end{terminalv}
 
    where C is the output from PDA\_DCFFTF, and X and Y hold the corresponding
    real and imaginary coefficients as returned by C06FCF.
@@ -1318,11 +847,11 @@ if necessary}
 
 %       -----------------------------------------------------------------------
 
-\subsubsection{\xlabel{inverse_transforms}Inverse transforms}
+\subsubsection{\xlabel{inverse_transforms_c06fcf}Inverse transforms}
 
 \begin{itemize}
 
-\item{\bf Convert input (frequency domain) data to FFTPACK format}
+\item\textbf{Convert input (frequency domain) data to FFTPACK format}
 
    If you choose not to modify your application to use FFTPACK data
    format throughout, you can instead do all the conversions just
@@ -1332,10 +861,10 @@ if necessary}
 \htmlref{PDA\_DNAG2C}{PDA\_NAG2C}
    routine:
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION X(N), Y(N), C(2*N)
       CALL PDA_DNAG2C( N, X, Y, C )
-\end{verbatim}
+\end{terminalv}
 
    where C is an additional work array used to hold the FFTPACK format
    data, ready for use by PDA\_DCFFTB. X and Y are the supplied frequency
@@ -1343,32 +872,32 @@ if necessary}
    returned by PDA\_DCFFTB will have the same normalisation as the original
    data supplied to PDA\_DCFFTF.
 
-\item{\bf Increase the size of the work array}
+\item\textbf{Increase the size of the work array}
 
    The work array passed to the FFT routine needs to be increased in
    size from N elements (for NAG) to 4*N+15 (for FFTPACK).
 
-\item{\bf Replace call to C06FCF and C06GCF with
+\item\textbf{Replace call to C06FCF and C06GCF with
 \htmlref{PDA\_DCFFTB}{PDA\_CFFTB}}
 
    Using NAG, the inverse transform is usually done by the three calls:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL C06GCF( Y, N, IFAIL )
       CALL C06FCF( X, Y, N, WORK, IFAIL )
       CALL C06GCF( Y, N, IFAIL )
-\end{verbatim}
+\end{terminalv}
 
    These three calls should be replaced by the single call:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL PDA_DCFFTB( N, C, WORK )
-\end{verbatim}
+\end{terminalv}
 
    where C is the array into which the X and Y arrays have been converted
    using the method of the previous section.
 
-\item{\bf Add calls to
+\item\textbf{Add calls to
 \htmlref{PDA\_DCFFTI}{PDA\_CFFTI}
    if necessary}
 
@@ -1377,31 +906,31 @@ if necessary}
    initialised it can be used in multiple calls to PDA\_DCFFTF and
    PDA\_DCFFTB so long as they all have the same value for N.
 
-\item{\bf Re-organise the output (spatial domain) data}
+\item\textbf{Re-organise the output (spatial domain) data}
 
    NAG puts the spatial domain results into two arrays (one real, one
    imaginary), whereas FFTPACK puts them into one. You can either
    modify your application to use the FFTPACK format or convert the
    FFTPACK results into NAG-style results using code such as:
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION X( N ), Y( N ), C( 2*N )
       DO J = 1, N
          I = 2*J
          X( J ) = C( I - 1 )
          Y( J ) = C( I )
       END DO
-\end{verbatim}
+\end{terminalv}
 
    or
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION X( N ), Y( N ), C( 2, N )
       DO J = 1, N
          X( J ) = C( 1, J )
          Y( J ) = C( 2, J )
       END DO
-\end{verbatim}
+\end{terminalv}
 
 \end{itemize}
 
@@ -1429,30 +958,30 @@ if necessary}
 
 %       -----------------------------------------------------------------------
 
-\subsubsection{\xlabel{forward_transforms}Forward transforms}
+\subsubsection{\xlabel{forward_transforms_c06fjf}Forward transforms}
 
 \begin{itemize}
 
-\item{\bf Increase the size of the work array}
+\item\textbf{Increase the size of the work array}
 
    The work array passed to the FFT routine needs to be increased in
    size from 3*MAXDIM elements (for NAG) to 6*MAXDIM+15 (for FFTPACK).
    Here, MAXDIM is the size of the largest array dimension.
 
-\item{\bf Replace call to C06FJF with
+\item\textbf{Replace call to C06FJF with
 \htmlref{PDA\_DNFFTF}{PDA\_NFFTF}}
 
    Replace the call
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION X(N), Y(N), WORK( 3*MAXDIM )
       INTEGER ND( NDIM )
       CALL C06FJF( NDIM, ND, N, X, Y, WORK, LWORK, IFAIL )
-\end{verbatim}
+\end{terminalv}
 
    with
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION X(N), Y(N), WORK( 6*MAXDIM + 15 )
       INTEGER ND( NDIM )
       CALL PDA_DNFFTF( NDIM, ND, X ,Y, WORK, ISTAT )
@@ -1460,38 +989,38 @@ if necessary}
          This means that NDIM was either less than 1 or greater than 20.
          Report a programming error!
       END IF
-\end{verbatim}
+\end{terminalv}
 
 \end{itemize}
 
 %       -----------------------------------------------------------------------
 
-\subsubsection{\xlabel{inverse_transforms}Inverse transforms}
+\subsubsection{\xlabel{inverse_transforms_c06fjf}Inverse transforms}
 
 \begin{itemize}
 
-\item{\bf Increase the size of the work array}
+\item\textbf{Increase the size of the work array}
 
    The work array passed to the FFT routine needs to be increased in
    size from 3*MAXDIM elements (for NAG) to 6*MAXDIM+15 (for FFTPACK).
    Here, MAXDIM is the size of the largest array dimension.
 
-\item{\bf Replace call to C06FJF and C06GCF with
+\item\textbf{Replace call to C06FJF and C06GCF with
 \htmlref{PDA\_DNFFTB}{PDA\_NFFTB}}
 
    Using NAG, the inverse transform is usually done by the three calls:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL C06GCF( Y, N, IFAIL )
       CALL C06FJF( NDIM, ND, N, X, Y, WORK, LWORK, IFAIL )
       CALL C06GCF( Y, N, IFAIL )
-\end{verbatim}
+\end{terminalv}
 
    These three calls should be replaced by the single call:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL PDA_DNFFTB( NDIM, ND, X ,Y, WORK, ISTAT )
-\end{verbatim}
+\end{terminalv}
 
 \end{itemize}
 
@@ -1638,7 +1167,7 @@ Interpolation and Fitting, Splines}
 \htmlref{PDA\_DBINTK}{PDA\_DBINTK}
    with order K = 4. The NAG code would look like
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER M, IFAIL
       DOUBLE PRECISION X(M), Y(M), T(M+4), C(M+4), WRK(6*M+16)
       IFAIL = 1
@@ -1646,7 +1175,7 @@ Interpolation and Fitting, Splines}
       IF ( IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
    While the size of the coefficient vector can be reduced to M for
    PDA\_DBINTK, you now need two work spaces.
@@ -1654,7 +1183,7 @@ Interpolation and Fitting, Splines}
    you have to calculate them in the same way as E01BAF would have done.
    The handling of the status is different.
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER I, K, M, IFAIL
       PARAMETER ( K = 4 )
       DOUBLE PRECISION X(M), Y(M), T(M+K), C(M)
@@ -1671,14 +1200,13 @@ Interpolation and Fitting, Splines}
       IF ( IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
 \subsection{\xlabel{replacing_calls_to_e02baf}\label{m_e02baf}Replacing calls to E02BAF}
 
-{\em
-   PDA\_DEFC has not yet been used anywhere to replace E02BAF. Thus the
+\emph{PDA\_DEFC has not yet been used anywhere to replace E02BAF. Thus the
    migration hints given here may contain errors or may be based on
    misunderstandings.
 \/}
@@ -1688,7 +1216,7 @@ Interpolation and Fitting, Splines}
    with order K = 4. The
    NAG code would look like
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER M, N, IFAIL
       DOUBLE PRECISION X(M), Y(M), W(M), T(N+7), C(N+7), SS
       DOUBLE PRECISION WORK1(M), WORK2( 4*(N+7) )
@@ -1697,7 +1225,7 @@ Interpolation and Fitting, Splines}
       IF ( IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
    Here N+7 is the number of knots. Since the order is 4 (cubic), the
    number of interior knots is then N+7$-$8 = N$-$1. N is the number of
@@ -1723,7 +1251,7 @@ Interpolation and Fitting, Splines}
    returns a diagnostic J, which should have value J = 1 if no error
    occurred.
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER I, J, K, L, M, N, IFAIL
       PARAMETER ( K = 4 )
       PARAMETER ( L = (N+6) * (K+1)  + (N+K+4) * (K+1)
@@ -1743,7 +1271,7 @@ Interpolation and Fitting, Splines}
       IF ( J .NE. 1 .OR. IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -1755,7 +1283,7 @@ Interpolation and Fitting, Splines}
    derivative being zero and the order being K = 4 for a cubic spline.
    The NAG code would look like
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER N, IFAIL
       DOUBLE PRECISION T(N+7), C(N+7), X, S
       IFAIL = 1
@@ -1763,7 +1291,7 @@ Interpolation and Fitting, Splines}
       IF ( IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
    Here N, T and C are the same as in
 \htmlref{E02BAF.}{m_e02baf}
@@ -1782,7 +1310,7 @@ Interpolation and Fitting, Splines}
    PDA\_DBVALU. So if PDA\_DBVALU is called in a DO loop, the statement INVB = 1
    is typically before and outside the loop.
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER INVB, K, N
       PARAMETER ( K = 4 )
       DOUBLE PRECISION T(N+K+3), C(N+3), X, S
@@ -1794,13 +1322,13 @@ Interpolation and Fitting, Splines}
       IF ( IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
 \subsection{\xlabel{replacing_calls_to_e02bcf}Replacing calls to E02BCF}
 
-{\em E02BCF has not yet been replaced anywhere. Thus the
+\emph{E02BCF has not yet been replaced anywhere. Thus the
    migration hints given here may contain errors or may be based on
    misunderstandings.\/}
 
@@ -1811,7 +1339,7 @@ Interpolation and Fitting, Splines}
    the number of derivative to zero. The order is K = 4 for a cubic
    spline. The NAG code would look like
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER LEFT, N, IFAIL
       DOUBLE PRECISION T(N+7), C(N+7), X, S(O:3)
       IFAIL = 1
@@ -1819,7 +1347,7 @@ Interpolation and Fitting, Splines}
       IF ( IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
    Here N, T and C are the same as in
 \htmlref{E02BAF.}{m_e02baf}
@@ -1849,7 +1377,7 @@ Interpolation and Fitting, Splines}
    loop, the IFAIL = 0 statement could be before and outside the DO loop
    as well.
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER INVB, I, K, N
       PARAMETER ( K = 4 )
       DOUBLE PRECISION T(N+K+3), C(N+3), X, S(0:K-1)
@@ -1863,14 +1391,13 @@ Interpolation and Fitting, Splines}
             An error has occurred
          END IF
     1 CONTINUE
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
 \subsection{\xlabel{replacing_calls_to_e02bdf}Replacing calls to E02BDF}
 
-{\em
-   PDA\_DBSQAD has not yet been used anywhere to replace E02BDF. Thus the
+\emph{PDA\_DBSQAD has not yet been used anywhere to replace E02BDF. Thus the
    migration hints given here may contain errors or may be based on
    misunderstandings.
 \/}
@@ -1880,7 +1407,7 @@ Interpolation and Fitting, Splines}
    The NAG code
    would look like
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER N, IFAIL
       DOUBLE PRECISION T(N+7), C(N+7), DEFINT
       IFAIL = 1
@@ -1888,7 +1415,7 @@ Interpolation and Fitting, Splines}
       IF ( IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
    Here N, T and C are the same as in
 \htmlref{E02BAF.}{m_e02baf}
@@ -1907,7 +1434,7 @@ Interpolation and Fitting, Splines}
    on which the spline is defined. For the same interval as in the NAG
    code, the two limiting knots are given to PDA\_DBSQAD.
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER K, N
       PARAMETER ( K = 4 )
       DOUBLE PRECISION T(N+K+3), C(N+3), DEFINT
@@ -1916,7 +1443,7 @@ Interpolation and Fitting, Splines}
       IF ( IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -1956,7 +1483,7 @@ Interpolation and Fitting, Splines}
 
    The NAG code would look like
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER I, M, K, NROWS, IFAIL
       DOUBLE PRECISION X(M), Y(M), W(M)
       DOUBLE PRECISION WORK1(3*M), WORK2( 2*(K+1) )
@@ -1970,7 +1497,7 @@ Interpolation and Fitting, Splines}
       DO 1 I = 1, K+1
          A2(I) = A1(K+1,I)
     1 CONTINUE
-\end{verbatim}
+\end{terminalv}
 
    Here W are the weights proportional to the reciprocal of the standard
    deviation of Y. A1 returns a matrix of Chebyshev coefficients, one
@@ -2003,7 +1530,7 @@ Interpolation and Fitting, Splines}
    evaluated at all given X. Often this may render any further
    evaluation calls obsolete.
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER I, M, K, NDEG, IFAIL1, IFAIL2
       DOUBLE PRECISION X(M), Y(M), W(M), W2(M), R(M)
       DOUBLE PRECISION A3( 3*M + 3*(K+1) )
@@ -2021,7 +1548,7 @@ Interpolation and Fitting, Splines}
          S(I) = 0D0
     2 CONTINUE
       S(K+1) = EPS
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -2032,7 +1559,7 @@ Interpolation and Fitting, Splines}
    The NAG code
    would look like
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER I, K, K2, NROWS, IFAIL
       DOUBLE PRECISION A1(NROWS,K+1)
       DOUBLE PRECISION A2(K2+1), XX, XCAP, P
@@ -2046,7 +1573,7 @@ Interpolation and Fitting, Splines}
       IF ( IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
    Here A1 is the coefficient matrix returned by
 \htmlref{E02ADF,}{m_e02adf}
@@ -2062,7 +1589,7 @@ Interpolation and Fitting, Splines}
    coefficients A3 as returned by
 \htmlref{PDA\_DPOLFT.}{PDA\_DPOLFT}
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER K, K2, IFAIL
       DOUBLE PRECISION A3( 3*M + 3*(K+1) )
       DOUBLE PRECISION XX, P, DUMMY
@@ -2071,7 +1598,7 @@ Interpolation and Fitting, Splines}
       IF ( IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -2107,7 +1634,7 @@ Interpolation and Fitting, Splines}
 
    The old code would look like
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER I, K, K2, NROWS
       DOUBLE PRECISION A1(NROWS,K+1)
       DOUBLE PRECISION A2(K2+1), C(K2+1)
@@ -2115,11 +1642,11 @@ Interpolation and Fitting, Splines}
          A2(I) = A1(K2+1,I)
     1 CONTINUE
       CALL GEN_CHB2NO( K2, MIN(X()), MAX(X()), A2, C )
-\end{verbatim}
+\end{terminalv}
 
    This would be replaced by
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER K, K2, IFAIL
       DOUBLE PRECISION A3( 3*M + 3*(K+1) )
       DOUBLE PRECISION C(K2+1)
@@ -2128,14 +1655,14 @@ Interpolation and Fitting, Splines}
       IF ( IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
    Just in case you are tempted to evaluate the polynomial yourself
    rather than use
 \htmlref{PDA\_DP1VLU,}{PDA\_DP1VLU}
    here is a piece of code to get P = f(XX):
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER I, K2
       DOUBLE PRECISION XX, P
       DOUBLE PRECISION C(K2+1)
@@ -2144,7 +1671,7 @@ Interpolation and Fitting, Splines}
          P = P * XX
          P = P + C(I)
     2 CONTINUE
-\end{verbatim}
+\end{terminalv}
 
 % -----------------------------------------------------------------------------
 \section{\xlabel{two-dimensional_interpolation_and_fitting}Two-dimensional
@@ -2215,7 +1742,7 @@ also appeared to give sensible results.
 
 E02DAF can be replaced with the following code.
 
-\begin{verbatim}
+\begin{terminalv}
 *   Declare variables
       INTEGER ID                      ! Specifies use value not differential
       INTEGER IFAIL                   ! Was the surface successfully created?
@@ -2260,17 +1787,16 @@ E02DAF can be replaced with the following code.
      :                    DVALUE,IFAIL,STATUS)
 
       END IF
-\end{verbatim}
+\end{terminalv}
 
 In the example shown the value of the surface fitted is
-calculated at a point defined by {\tt XD} and {\tt YD}. The
+calculated at a point defined by \texttt{XD} and \texttt{YD}. The
 surface constructed is a 3rd order, polynomial and the value
 returned by PDA\_DB2VAL is the surface value not its differential.
-The example assumes that the array {\tt FV1()} already contains
+The example assumes that the array \texttt{FV1()} already contains
 values for the data at each of the grid points defined in
-arrays {\tt X1} and {\tt Y1}. The size of the work arrays is
-determined by the size of the grid required. The variable {\tt
-DVALUE} contains the interpolated value.
+arrays \texttt{X1} and \texttt{Y1}. The size of the work arrays is
+determined by the size of the grid required. The variable \texttt{DVALUE} contains the interpolated value.
 
 
 \subsection{\xlabel{replacing_calls_to_e02saf}Replacing calls to E02SAF}
@@ -2278,7 +1804,7 @@ DVALUE} contains the interpolated value.
 It has been found in tests that the following code examples adequately
 replace calls to E02SAF.
 
-\begin{verbatim}
+\begin{terminalv}
 *  Local Variables:
       INTEGER  ISTAT                   ! Status
       INTEGER  MD                      ! Mode
@@ -2304,24 +1830,24 @@ replace calls to E02SAF.
 *   Call interpolation subroutine.
       CALL PDA_IDBVIP(MD,NCP,NDP,XD,YD,ZD,NOP,XI,YI,
      :                ZI,IWK,WK,ISTAT,STATUS)
-\end{verbatim}
+\end{terminalv}
 
 In the example shown, the value of the interpolated surface
-at {\tt XI(1),YI(1)} is returned in the variable {\tt ZI(1,1)}.
+at \texttt{XI(1),YI(1)} is returned in the variable \texttt{ZI(1,1)}.
 The surface is constructed using
-co-ordinate information from the arrays of {\tt XD()} and {\tt YD()},
-and surface values contained in the array {\tt ZD()}. The number
-of data points available to define the surface is {\tt NDP}.
+co-ordinate information from the arrays of \texttt{XD()} and \texttt{YD()},
+and surface values contained in the array \texttt{ZD()}. The number
+of data points available to define the surface is \texttt{NDP}.
 
 If several values are required from locations within the
-irregular grid, the mode variable {\tt MD} should for the first
+irregular grid, the mode variable \texttt{MD} should for the first
 point be set to 1 but may subsequently be 2. This
 significantly increases the execution speed. The size of the work
 arrays is determined by the size of the grid required.
 
 Alternatively, the routine PDA\_IDSFFT may be used thus:
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER  ISTAT                   ! Status
       INTEGER  MD                      ! Mode
       INTEGER  NDP                     ! Grid points
@@ -2349,16 +1875,16 @@ Alternatively, the routine PDA\_IDSFFT may be used thus:
             CALL PDA_IDSFFT(MD,NCP,NDP,XD,YD,ZD,
      :                      NXI,NYI,XI,YI,ZI,IWK,
      :                      WK,ISTAT,STATUS)
-\end{verbatim}
+\end{terminalv}
 
 In the example shown the surface is constructed from the irregular grid
-information contained in arrays {\tt XD()/YD()} (location) and
-{\tt ZD()} (surface value). Interpolated values calculated from the
-fitted surface are returned in the {\tt ZI()} array at the co-ordinates
-specified by the data in the {\tt XI()} and {\tt YI()} arrays.
+information contained in arrays \texttt{XD()/YD()} (location) and
+\texttt{ZD()} (surface value). Interpolated values calculated from the
+fitted surface are returned in the \texttt{ZI()} array at the co-ordinates
+specified by the data in the \texttt{XI()} and \texttt{YI()} arrays.
 
 If several values are required from locations within the
-irregular grid, the mode variable {\tt MD} should for the first
+irregular grid, the mode variable \texttt{MD} should for the first
 point be set to 1 but may subsequently be 2. This
 significantly increases the execution speed. The size of the work
 arrays is determined by the size of the grid required.
@@ -2416,7 +1942,7 @@ of the arguments being the same, albeit in a slightly different order.
 
 %    --------------------------------------------------------------------------
 
-\subsection{\xlabel{overview}Overview}
+\subsection{\xlabel{minimisation_overview}Overview}
 
    There are two sorts of minimisation, one is to minimise any old
    function, and one to minimise a sum of squares. The first is more
@@ -2500,7 +2026,7 @@ of the arguments being the same, albeit in a slightly different order.
    is passed in IUSER. The controlling function may also call the merit
    function directly.
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE DOAFIT( ... )
       INTEGER N
       INTEGER IUSER
@@ -2531,7 +2057,7 @@ of the arguments being the same, albeit in a slightly different order.
          FGRAD(I) = ...
     1 CONTINUE
       END
-\end{verbatim}
+\end{terminalv}
 
    PDA\_UNCMND has separate arguments for the guess and the fit result.
    With PDA\_UNCMND the merit function is simpler in that it need not
@@ -2544,7 +2070,7 @@ of the arguments being the same, albeit in a slightly different order.
    MERIT1 does nothing but call MERIT2. In this call the array pointer
    is de-referenced.
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE DOAFIT( ... )
       INTEGER N
       INTEGER IUSER, POINTR
@@ -2581,7 +2107,7 @@ of the arguments being the same, albeit in a slightly different order.
       DOUBLE PRECISION X(N), FVAL
       FVAL = ...
       END
-\end{verbatim}
+\end{terminalv}
 
    An alternative to a common block is to have a subroutine with SAVE
    variables as a reservoir. One routine can call the reservoir routine
@@ -2671,7 +2197,7 @@ of the arguments being the same, albeit in a slightly different order.
 
 %    --------------------------------------------------------------------------
 
-\subsection{\xlabel{overview}Overview}
+\subsection{\xlabel{matrices_overview}Overview}
 
    There is some excess baggage in this field in NAG, since it
    distinguishes approximate from accurate routines. The approximation
@@ -2706,7 +2232,7 @@ of the arguments being the same, albeit in a slightly different order.
 \htmlref{PDA\_DGEDI.}{PDA\_DGEDI}
    The NAG code might look like
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER IA, N, IX, IFAIL
       DOUBLE PRECISION A(IA,N), X(IX,N), WORK(N)
       IFAIL = 1
@@ -2714,7 +2240,7 @@ of the arguments being the same, albeit in a slightly different order.
       IF ( IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
    The SLATEC routines invert the matrix in situ, so A must be copied to
    X first. It is important that PDA\_DGEDI be called only if PDA\_DGEFA
@@ -2723,7 +2249,7 @@ of the arguments being the same, albeit in a slightly different order.
    determines the returned information, 1 chooses inverted matrix but no
    determinant.
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER I, J, IA, N, IX, IFAIL
       INTEGER IPVT(N)
       DOUBLE PRECISION A(IA,N), X(IX,N), WORK(N), DUMMY(2)
@@ -2738,7 +2264,7 @@ of the arguments being the same, albeit in a slightly different order.
       ELSE
          CALL PDA_DGEDI( X, IX, N, IPVT, DUMMY, WORK, 1 )
       END IF
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -2760,7 +2286,7 @@ of the arguments being the same, albeit in a slightly different order.
    all three matrices are square, A is given, B is unity, and X is the
    inverse of A. The NAG code might look like
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER IA, IB, N, M, IX, IFAIL
       DOUBLE PRECISION A(IA,N), B(IB,M), X(IX,M), WORK(N)
       DO 2 J = 1, N
@@ -2776,7 +2302,7 @@ of the arguments being the same, albeit in a slightly different order.
       IF ( IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
    The SLATEC routines invert the matrix in situ, so A must be copied to
    X first. It is important that
@@ -2789,7 +2315,7 @@ of the arguments being the same, albeit in a slightly different order.
    determines the returned information, 1 chooses inverted matrix but no
    determinant.
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER I, J, IA, N, IX, IFAIL
       INTEGER IPVT(N)
       DOUBLE PRECISION A(IA,N), X(IX,N), WORK(N), DUMMY(2)
@@ -2804,7 +2330,7 @@ of the arguments being the same, albeit in a slightly different order.
       ELSE
          CALL PDA_DGEDI( X, IX, N, IPVT, DUMMY, WORK, 1 )
       END IF
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -2888,13 +2414,13 @@ of the arguments being the same, albeit in a slightly different order.
    Sort an array of pointers to access a REAL array in
    descending order.
 
-\item \htmlref{PDA\_RINP}{PDA\_RINP}\\
+\item \htmlref{PDA\_RINP}{PDA_RINPx}\\
    Reorders an array in place using a permutation index.
 
-\item \htmlref{PDA\_SAAC}{PDA\_SAAC}\\
+\item \htmlref{PDA\_SAAC}{PDA_SAACx}\\
    Sorts the columns of a two dimensional array into ascending order.
 
-\item \htmlref{PDA\_SAAR}{PDA\_SAAR}\\
+\item \htmlref{PDA\_SAAR}{PDA_SAARx}\\
    Sorts the rows of a two dimensional array into ascending order.
 
 \end{itemize}
@@ -2928,7 +2454,7 @@ are available in M, IP and the new workspace LINK.
    The error function erf() in NAG is S15AEF. In SLATEC it is replaced
    by PDA\_DERF. The NAG code might look like
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER IFAIL
       DOUBLE PRECISION X, P
       DOUBLE PRECISION S15AEF
@@ -2937,11 +2463,11 @@ are available in M, IP and the new workspace LINK.
       IF ( IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
    The new code would be
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER IFAIL
       DOUBLE PRECISION X, P
       DOUBLE PRECISION PDA_DERF
@@ -2950,7 +2476,7 @@ are available in M, IP and the new workspace LINK.
       IF ( IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
    The complementary error function erfc() in NAG is S15ADF. In SLATEC
    it is replaced by PDA\_DERFC. Migration hints are not yet available,
@@ -2969,14 +2495,14 @@ are available in M, IP and the new workspace LINK.
 
 \end{itemize}
 
-{\em PDA\_DBESJ1 has not yet been used anywhere to replace S17AFF. Thus the
+\emph{PDA\_DBESJ1 has not yet been used anywhere to replace S17AFF. Thus the
    migration hints given here may contain errors or may be based on
    misunderstandings.}
 
    The Bessel function J\_1() in NAG is S17AFF. In SLATEC it is replaced
    by PDA\_DBESJ1. The NAG code might look like
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER IFAIL
       DOUBLE PRECISION X, P
       DOUBLE PRECISION S17AFF
@@ -2985,11 +2511,11 @@ are available in M, IP and the new workspace LINK.
       IF ( IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
    The new code would be
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER IFAIL
       DOUBLE PRECISION X, P
       DOUBLE PRECISION PDA_DBESJ1
@@ -2998,7 +2524,7 @@ are available in M, IP and the new workspace LINK.
       IF ( IFAIL .NE. 0 ) THEN
          An error has occurred
       END IF
-\end{verbatim}
+\end{terminalv}
 
 \section{\xlabel{simple_statistics}Simple Statistics}
 \begin{itemize}
@@ -3026,7 +2552,7 @@ required for the variance array. This is now a full array of values
 rather than a packed array. The following code shows how to convert
 this to the same form as output by the NAG routine:
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
       K = 1
       DO 3 J = 1, N
          DO 4 L = 1, J
@@ -3034,7 +2560,7 @@ this to the same form as output by the NAG routine:
             K = K + 1
  4       CONTINUE
  3    CONTINUE
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 \section{\xlabel{pseudo-random_numbers}Pseudo-Random Numbers}
@@ -3088,7 +2614,7 @@ The routines are:
    not accessible portably in Fortran, and PDA is independent of other
    libraries.  However, the following code has the desired effect.
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER SEED, STATUS, TICKS, PID
       INCLUDE 'PRM_PAR'
 
@@ -3099,7 +2625,7 @@ The routines are:
       SEED = MOD( SEED, 2**28 )
 
       CALL PDA_RNSED( SEED )
-\end{verbatim}
+\end{terminalv}
 
    PSX\_TIME returns the time in units of clock ticks since some
    arbitrary time.  See \xref{SUN/121}{sun121}{} for more details and
@@ -3123,7 +2649,7 @@ The routines are:
    could use the computer's clock to create a random seed (see
    Section~\ref{se:seeding}).
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER SEED
       EXTERNAL PDA_RAND
       REAL PDA_RAND, VALUES( 2 )
@@ -3136,7 +2662,7 @@ The routines are:
 *  and 1.
       VALUE( 1 ) = PDA_RAND( 0.0 )
       VALUE( 2 ) = PDA_RAND( 0.0 )
-\end{verbatim}
+\end{terminalv}
 
    The EXTERNAL statement is recommended, although in many cases it
    will be unnecessary.  To obtain  in the range [$a$,$b$] as
@@ -3155,7 +2681,7 @@ The routines are:
 
 The following code shows the remaining three routines in action.
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER SEED
       EXTERNAL PDA_RNGAM, PDA_RNNOR, PDA_RNPOI
       REAL PDA_RNGAM, PDA_RNNOR, PDA_RNPOI, VALUES( 3 )
@@ -3174,7 +2700,7 @@ The following code shows the remaining three routines in action.
 *  Obtain a random number from a Gamma-function distribution of mean
 *  1.2.
       VALUE( 3 ) = PDA_RNGAM( 1.2 )
-\end{verbatim}
+\end{terminalv}
 
 Apart from the change of data type, calls to G05DDF can be replaced
 with PDA\_RNNOR using the same arguments.  PDA\_RNPOI is in effect a
@@ -3210,7 +2736,7 @@ pseudo-random numbers.
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
 Description:
    Subroutine pda_bispev evaluates on a grid (x(i),y(j)),i=1,...,mx;
    j=1,...,my a bivariate spline s(x,y) of degrees kx and ky, given in
@@ -3293,7 +2819,7 @@ Author :
 
 Latest Update : march 1987
 
-\end{verbatim}
+\end{terminalv}
 
 \sstroutine{
    PDA\_BSPDOC
@@ -3308,7 +2834,7 @@ Latest Update : march 1987
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_BSPDOC
 
 
@@ -3603,7 +3129,7 @@ Latest Update : march 1987
    900723  PURPOSE section revised.  (WRB)
    920501  Reformatted the REFERENCES section.  (WRB)
 ***END PROLOGUE  PDA_BSPDOC
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -3674,7 +3200,7 @@ Latest Update : march 1987
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
 ******************************************************************
 
 subroutine pda_cfftb(n,c,wsave)
@@ -3721,7 +3247,7 @@ c      for j=1,...,n
 
 wsave   contains initialization calculations which must not be
         destroyed between calls of subroutine pda_cfftf or pda_cfftb
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -3740,7 +3266,7 @@ wsave   contains initialization calculations which must not be
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
 ******************************************************************
 
 subroutine pda_cfftf(n,c,wsave)
@@ -3788,7 +3314,7 @@ c      for j=1,...,n
 
 wsave   contains initialization calculations which must not be
         destroyed between calls of subroutine pda_cfftf or pda_cfftb
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -3807,7 +3333,7 @@ wsave   contains initialization calculations which must not be
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
 ******************************************************************
 
 subroutine pda_cffti(n,wsave)
@@ -3830,7 +3356,7 @@ wsave   a work array which must be dimensioned at least 4*n+15
         as long as n remains unchanged. different wsave arrays
         are required for different values of n. the contents of
         wsave must not be changed between calls of pda_cfftf or pda_cfftb.
-\end{verbatim}
+\end{terminalv}
 
 \sstroutine{
    PDA\_CHE2D
@@ -3839,7 +3365,7 @@ wsave   a work array which must be dimensioned at least 4*n+15
 }{
    \sstdescription{
       This routine evaluates a two-dimensional Chebyshev polynomial for
-      one or more arguments.  It uses Clenshaw{\tt '}s recurrence
+      one or more arguments.  It uses Clenshaw\texttt{'}s recurrence
       relationship twice.
    }
    \sstinvocation{
@@ -4044,7 +3570,7 @@ wsave   a work array which must be dimensioned at least 4*n+15
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       subroutine pda_curfit(iopt,m,x,y,w,xb,xe,k,s,nest,n,t,c,fp,
      * wrk,lwrk,iwrk,ier)
 
@@ -4254,7 +3780,7 @@ wsave   a work array which must be dimensioned at least 4*n+15
 
   creation date : may 1979
   latest update : march 1987
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -4273,7 +3799,7 @@ wsave   a work array which must be dimensioned at least 4*n+15
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION FUNCTION PDA_D1MACH (I)
 
 
@@ -4347,7 +3873,7 @@ wsave   a work array which must be dimensioned at least 4*n+15
    950404  If index out of range, return value zero, but return.
            (HME).
 ***END PROLOGUE  PDA_D1MACH
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 \sstroutine{
@@ -4367,7 +3893,7 @@ wsave   a work array which must be dimensioned at least 4*n+15
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DB2INK(X,NX,Y,NY,FCN,LDF,
      :                      KX,KY,TX,TY,BCOEF,
      :                      WORK,IFLAG,STATUS)
@@ -4520,7 +4046,7 @@ C                 PRODUCTS, ACM TRANSACTIONS ON MATHEMATICAL SOFTWARE,
 C                 VOL. 5 (1979), PP. 173-182.
 C***ROUTINES CALLED  DBTPCF,DBKNOT
 C***END PROLOGUE  DB2INK
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 \sstroutine{
@@ -4529,7 +4055,6 @@ C***END PROLOGUE  DB2INK
    Evaluates the piecewise polynomial interpolating
    function constructed by the routine PDA\_DB2INK, or one of its
    partial derivatives.
-
 }{
    \sstdiytopic{
    Origin
@@ -4542,7 +4067,7 @@ C***END PROLOGUE  DB2INK
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
      SUBROUTINE PDA_DB2VAL(XVAL,YVAL,IDX,IDY,TX,TY,
      :                      NX,NY,KX,KY,BCOEF,WORK,
      :                      RVALUE,IFAIL,STATUS)
@@ -4637,7 +4162,7 @@ C***REFERENCES  CARL DE BOOR, A PRACTICAL GUIDE TO SPLINES,
 C                 SPRINGER-VERLAG, NEW YORK, 1978.
 C***ROUTINES CALLED  DINTRV,DBVAL2
 C***END PROLOGUE  DB2VAL
-\end{verbatim}
+\end{terminalv}
 
 %    ---------------------------------------------------------------->
 
@@ -4657,7 +4182,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION FUNCTION PDA_DBESJ1 (X, STATUS)
 
 
@@ -4696,7 +4221,7 @@ C***END PROLOGUE  DB2VAL
            wrong sign for arguments less than 4.0.  (WRB)
    950404  Implement status.  (HME)
 ***END PROLOGUE  PDA_DBESJ1
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -4716,7 +4241,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DBINTK (X, Y, T, N, K, BCOEF, Q, WORK, STATUS)
 
 
@@ -4814,7 +4339,7 @@ C***END PROLOGUE  DB2VAL
    920501  Reformatted the REFERENCES section.  (WRB)
    950403  Implement status.  (HME)
 ***END PROLOGUE  PDA_DBINTK
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -4836,7 +4361,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DBOLS (W, MDW, MROWS, NCOLS, BL, BU, IND, IOPT, X,
      +   RNORM, MODE, RW, IW, STATUS)
 
@@ -5259,7 +4784,7 @@ C***END PROLOGUE  DB2VAL
    920501  Reformatted the REFERENCES section.  (WRB)
    950404  Implement status.  (HME)
 ***END PROLOGUE  PDA_DBOLS
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -5279,7 +4804,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DBSQAD (T, BCOEF, N, K, X1, X2, BQUAD, WORK, STATUS)
 
 
@@ -5342,7 +4867,7 @@ C***END PROLOGUE  DB2VAL
    920501  Reformatted the REFERENCES section.  (WRB)
    950403  Implement status.  (HME)
 ***END PROLOGUE  PDA_DBSQAD
-\end{verbatim}
+\end{terminalv}
 
     ---------------------------------------------------------------->
 
@@ -5363,7 +4888,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION FUNCTION PDA_DBVALU (T, A, N, K, IDERIV, X, INBV,
      +   WORK, STATUS)
 
@@ -5438,7 +4963,7 @@ C***END PROLOGUE  DB2VAL
    920501  Reformatted the REFERENCES section.  (WRB)
    950403  Implement status.  (HME)
 ***END PROLOGUE  PDA_DBVALU
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -5492,7 +5017,7 @@ C***END PROLOGUE  DB2VAL
       SLATEC
    }
 }
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DCOV (FCN, IOPT, M, N, X, FVEC, R, LDR, INFO, WA1,
      +                     WA2, WA3, WA4, STATUS)
 ***BEGIN PROLOGUE  PDA_DCOV
@@ -5648,7 +5173,7 @@ C***END PROLOGUE  DB2VAL
    900510  Fixed an error message.  (RWC)
    970224  Now called PDA_DCOV. (PWD)
 ***END PROLOGUE  DCOV
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -5669,7 +5194,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DEFC (NDATA, XDATA, YDATA, SDDATA, NORD, NBKPT, BKPT,
      +   MDEIN, MDEOUT, COEFF, LW, W, STATUS)
 
@@ -5885,7 +5410,7 @@ C***END PROLOGUE  DB2VAL
    920501  Reformatted the REFERENCES section.  (WRB)
    950403  Implement status.  (HME)
 ***END PROLOGUE  PDA_DEFC
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -5897,7 +5422,7 @@ C***END PROLOGUE  DB2VAL
    \sstdescription{c.f. \htmlref{PDA\_SUMSL.}{PDA\_SUMSL}}
 }
 
-\begin{verbatim}
+\begin{terminalv}
 
       subroutine pda_deflt(alg, iv, liv, lv, v)
 
@@ -5907,7 +5432,7 @@ C***END PROLOGUE  DB2VAL
   ***  alg = 2 means general unconstrained optimization constants.
 
 
-\end{verbatim}
+\end{terminalv}
 
 
 
@@ -5929,7 +5454,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION FUNCTION PDA_DERF (X, STATUS)
 
 
@@ -5966,7 +5491,7 @@ C***END PROLOGUE  DB2VAL
    920618  Removed space from variable name.  (RWC, WRB)
    950425  Implement status.  (HME)
 ***END PROLOGUE  PDA_DERF
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -5986,7 +5511,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       DOUBLE PRECISION FUNCTION PDA_DERFC (X, STATUS)
 
 
@@ -6036,7 +5561,7 @@ C***END PROLOGUE  DB2VAL
    920618  Removed space from variable names.  (RWC, WRB)
    950425  Implement status.  (HME)
 ***END PROLOGUE  PDA_DERFC
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -6053,7 +5578,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DGEDI (A, LDA, N, IPVT, DET, WORK, JOB)
 
 
@@ -6125,7 +5650,7 @@ C***END PROLOGUE  DB2VAL
            (WRB)
    920501  Reformatted the REFERENCES section.  (WRB)
 ***END PROLOGUE  PDA_DGEDI
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -6141,7 +5666,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DGEFA (A, LDA, N, IPVT, INFO)
 
 
@@ -6203,7 +5728,7 @@ C***END PROLOGUE  DB2VAL
            (WRB)
    920501  Reformatted the REFERENCES section.  (WRB)
 ***END PROLOGUE  PDA_DGEFA
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -6224,7 +5749,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DGEFS (A, LDA, N, V, ITASK, IND, WORK, IWORK, STATUS)
 
 
@@ -6334,7 +5859,7 @@ C***END PROLOGUE  DB2VAL
    920501  Reformatted the REFERENCES section.  (WRB)
    950404  Implement status.  (HME)
 ***END PROLOGUE  PDA_DGEFS
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -6390,7 +5915,7 @@ C***END PROLOGUE  DB2VAL
       SLATEC
    }
 }
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DNLS1 (FCN, IOPT, M, N, X, FVEC, FJAC, LDFJAC,
      +                      FTOL, XTOL, GTOL, MAXFEV, EPSFCN, DIAG,
      +                      MODE, FACTOR, NPRINT, INFO, NFEV, NJEV,
@@ -6994,7 +6519,7 @@ C***END PROLOGUE  DB2VAL
    920501  Reformatted the REFERENCES section.  (WRB)
    960916  Renamed PDA_DNLS1 and added STATUS argument. (PWD)
 ***END PROLOGUE  DNLS1
-\end{verbatim}
+\end{terminalv}
 
 \sstroutine{
    PDA\_DNLS1E
@@ -7007,7 +6532,7 @@ C***END PROLOGUE  DB2VAL
       SLATEC
    }
 }
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DNLS1E (FCN, IOPT, M, N, X, FVEC, TOL, NPRINT,
      +                       INFO, IW, WA, LWA,STATUS)
 ***BEGIN PROLOGUE  DNLS1E
@@ -7506,7 +7031,7 @@ C***END PROLOGUE  DB2VAL
    920501  Reformatted the REFERENCES section.  (WRB)
    960918  Renamed PDA_DNLS1E and added STATUS argument (PWD)
 ***END PROLOGUE  DNLS1E
-\end{verbatim}
+\end{terminalv}
 
 \sstroutine{
    PDA\_DP1VLU
@@ -7525,7 +7050,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DP1VLU (L, NDER, X, YFIT, YP, A, STATUS)
 
 
@@ -7588,7 +7113,7 @@ C***END PROLOGUE  DB2VAL
    920501  Reformatted the REFERENCES section.  (WRB)
    950404  Implement status.  (HME)
 ***END PROLOGUE  PDA_DP1VLU
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -7608,7 +7133,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DPCOEF (L, C, TC, A, STATUS)
 
 
@@ -7671,7 +7196,7 @@ C***END PROLOGUE  DB2VAL
    950404  Implement status.  (HME)
    950517  Return immediately if PDA_DP1VLU returns a status.  (HME)
 ***END PROLOGUE  PDA_DPCOEF
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -7692,7 +7217,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DPLINT (N, X, Y, C, STATUS)
 
 
@@ -7739,7 +7264,7 @@ C***END PROLOGUE  DB2VAL
    920501  Reformatted the REFERENCES section.  (WRB)
    950403  Implement status.  (HME)
 ***END PROLOGUE  PDA_DPLINT
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -7757,7 +7282,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DPOLCF (XX, N, X, C, D, WORK)
 
 
@@ -7821,7 +7346,7 @@ C***END PROLOGUE  DB2VAL
    891024  REVISION DATE from Version 3.2
    891214  Prologue converted to Version 4.0 format.  (BAB)
 ***END PROLOGUE  PDA_DPOLCF
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -7841,7 +7366,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DPOLFT (N, X, Y, W, MAXDEG, NDEG, EPS, R, IERR, A,
      +   STATUS)
 
@@ -7974,7 +7499,7 @@ C***END PROLOGUE  DB2VAL
    950404  Implement status.  (HME)
    950517  Return immediately if PDA_DP1VLU returns a status.  (HME)
 ***END PROLOGUE  PDA_DPOLFT
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -7991,7 +7516,7 @@ C***END PROLOGUE  DB2VAL
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DPOLVL (NDER, XX, YFIT, YP, N, X, C, WORK, IERR)
 
 
@@ -8069,7 +7594,7 @@ C***END PROLOGUE  DB2VAL
    891214  Prologue converted to Version 4.0 format.  (BAB)
    920501  Reformatted the REFERENCES section.  (WRB)
 ***END PROLOGUE  PDA_DPOLVL
-\end{verbatim}
+\end{terminalv}
 
 \sstroutine{
    PDA\_DQED
@@ -8082,7 +7607,7 @@ C***END PROLOGUE  DB2VAL
       NETLIB/OPT
    }
 }
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DQED( PDA_DQEDEV, MEQUA, NVARS, MCON, IND, BL, BU,
      :                     X, FJAC, LDFJAC, FNORM, IGO, IOPT, ROPT,
      :                     IWA, WA )
@@ -9100,7 +8625,7 @@ C     DEFINE THE DERIVATIVES AND RESIDUALS FOR THE DATA MODEL.
      REVISED 970224-1230
         Name changed to PDA_DQED from DQED.
      REVISED YYMMDD-HHMM
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -9162,7 +8687,7 @@ C     DEFINE THE DERIVATIVES AND RESIDUALS FOR THE DATA MODEL.
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_DSORT (DX, DY, N, KFLAG, STATUS)
 
 
@@ -9218,7 +8743,7 @@ C     DEFINE THE DERIVATIVES AND RESIDUALS FOR THE DATA MODEL.
            IF-THEN-ELSE-ENDIF.  (RWC, WRB)
    950403  Implement status.  (HME)
 ***END PROLOGUE  PDA_DSORT
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -9237,7 +8762,7 @@ C     DEFINE THE DERIVATIVES AND RESIDUALS FOR THE DATA MODEL.
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       INTEGER FUNCTION PDA_I1MACH (I)
 
 
@@ -9332,7 +8857,7 @@ C     DEFINE THE DERIVATIVES AND RESIDUALS FOR THE DATA MODEL.
    950404  If index out of range, return value zero, but return.
            (HME).
 ***END PROLOGUE  PDA_I1MACH
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 \sstroutine{
@@ -9352,7 +8877,7 @@ C     DEFINE THE DERIVATIVES AND RESIDUALS FOR THE DATA MODEL.
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
 c this subroutine performs bivariate interpolation when the pro-
 c jections of the data points in the x-y plane are irregularly
 c distributed in the plane.
@@ -9406,7 +8931,7 @@ c mended unless there are evidences that dictate otherwise.
 
 c this subroutine calls the idcldp, idlctn, idpdrv, idptip, and
 c idtang subroutines.
-\end{verbatim}
+\end{terminalv}
 
 %    ---------------------------------------------------------------->
 
@@ -9428,7 +8953,7 @@ c idtang subroutines.
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
 c this subroutine performs smooth surface fitting when the pro-
 c jections of the data points in the x-y plane are irregularly
 c distributed in the plane.
@@ -9485,7 +9010,7 @@ c mended unless there are evidences that dictate otherwise.
 
 c this subroutine calls the idcldp, idgrid, idpdrv, idptip, and
 c idtang subroutines.
-\end{verbatim}
+\end{terminalv}
 
 %    ---------------------------------------------------------------->
 
@@ -9548,7 +9073,7 @@ c idtang subroutines.
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       subroutine pda_lmdif(fcn,m,n,x,fvec,ftol,xtol,gtol,maxfev,epsfcn,
      *                 diag,mode,factor,nprint,info,nfev,fjac,ldfjac,
      *                 ipvt,qtf,wa1,wa2,wa3,wa4)
@@ -9734,7 +9259,7 @@ c idtang subroutines.
      burton s. garbow, kenneth e. hillstrom, jorge j. more
 
      **********
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -9751,7 +9276,7 @@ c idtang subroutines.
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       subroutine pda_lmdif1(fcn,m,n,x,fvec,tol,info,iwa,wa,lwa)
 
 
@@ -9854,7 +9379,7 @@ c idtang subroutines.
      burton s. garbow, kenneth e. hillstrom, jorge j. more
 
      **********
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 \sstroutine{
@@ -9869,7 +9394,7 @@ c idtang subroutines.
       NETLIB
    }
 }
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_LSQR  ( M, N, APROD, DAMP, LENIW, LENRW, IW, RW,
      :                       U, V, W, X, SE, ATOL, BTOL, CONLIM, ITNLIM,
      :                       ISTOP, ITN, ANORM, ACOND, RNORM, ARNORM,
@@ -10172,7 +9697,7 @@ c idtang subroutines.
      19 Sep 1996: Peter W. Draper. Removed NOUT argument and renamed
                   PDA_LSQR. PDA routines may not write output.
 -----------------------------------------------------------------------
-\end{verbatim}
+\end{terminalv}
 
 
 \sstroutine{
@@ -10412,7 +9937,7 @@ c idtang subroutines.
       Applied Statistics / Statlib Archive
    }
 }
-\begin{verbatim}
+\begin{terminalv}
      SUBROUTINE PDA_NSCOR( S, N, N2, IER )
 
      algorithm as 177.3, applied statistics, v.31, 161-165, 1982.
@@ -10438,7 +9963,7 @@ c idtang subroutines.
 
    author: royston, j.p
 
-\end{verbatim}
+\end{terminalv}
 
 \sstroutine{
    PDA\_PPND16
@@ -10761,7 +10286,7 @@ c idtang subroutines.
    \sstdescription{
       This is a simple random number generator providing deviates in the
       range 0 to 1, with period of 2$*$$*$26, and to 6 or 7 digits
-      accuracy.  It is based upon Ahrens, Dieter \& Grube{\tt '}s TOMS599
+      accuracy.  It is based upon Ahrens, Dieter \& Grube\texttt{'}s TOMS599
       routines.  Note that there is no STATUS argument for efficiency.
    }
    \sstinvocation{
@@ -10785,14 +10310,14 @@ c idtang subroutines.
       Prior Requirements
    }{
       The initial seed MUST be set using routine PDA\_RNSED (equivalent
-      to NAG{\tt '}s G05CBF).  If it has not, there is no guarantee that
+      to NAG\texttt{'}s G05CBF).  If it has not, there is no guarantee that
       sensible values will be returned from this function.
    }
    \sstdiytopic{
       References
    }{
-      Ahrens, J.H., Dieter, U. \& Grube, A., 1970, {\tt "}Pseudo-random
-        numbers: a new proposal for the choice of multiplicators{\tt "},
+      Ahrens, J.H., Dieter, U. \& Grube, A., 1970, \texttt{"}Pseudo-random
+        numbers: a new proposal for the choice of multiplicators\texttt{"},
         Computing, 6, pp.121--138.
    }
 }
@@ -10812,7 +10337,7 @@ c idtang subroutines.
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
 ******************************************************************
 
 subroutine pda_rfftb(n,r,wsave)
@@ -10869,7 +10394,7 @@ r       for n even and for i = 1,...,n
 
 wsave   contains results which must not be destroyed between
         calls of pda_rfftb or pda_rfftf.
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -10888,7 +10413,7 @@ wsave   contains results which must not be destroyed between
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
 ******************************************************************
 
 subroutine pda_rfftf(n,r,wsave)
@@ -10947,7 +10472,7 @@ r       r(1) = the sum from i=1 to i=n of r(i)
 
 wsave   contains results which must not be destroyed between
         calls of pda_rfftf or pda_rfftb.
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -10966,7 +10491,7 @@ wsave   contains results which must not be destroyed between
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
 ******************************************************************
 
 subroutine pda_rffti(n,wsave)
@@ -10989,10 +10514,10 @@ wsave   a work array which must be dimensioned at least 2*n+15.
         as long as n remains unchanged. different wsave arrays
         are required for different values of n. the contents of
         wsave must not be changed between calls of pda_rfftf or pda_rfftb.
-\end{verbatim}
+\end{terminalv}
 
 \sstroutine{
-   PDA\_RINP[x]
+   PDA\_RINPx
 }{
    Reorder an array in place using a permutation index
 }{
@@ -11034,11 +10559,9 @@ wsave   a work array which must be dimensioned at least 2*n+15.
          \sstitem
          Re-ordering is trivial if two arrays are available.
          \begin{description}
-         {\tt
-              \item DO I = 1, N
-              \item   \hspace{0.5cm} XX( I ) = X( PERM( I ) )
-              \item END DO
-         }
+              \item \texttt{DO I = 1, N}
+              \item   \hspace{0.5cm} \texttt{XX( I ) = X( PERM( I )}
+              \item \texttt{END DO}
          \end{description}
          The XX array contains the sorted values on completion.
 
@@ -11065,7 +10588,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
       This is a simple random-number generator providing deviates in the
       from an exponential distribution, with a period of 2$*$$*$26, and to
       6 or 7 digits accuracy.  It is based upon Ahrens, Dieter \&
-      Grube{\tt '}s TOMS599 routines.
+      Grube\texttt{'}s TOMS599 routines.
    }
    \sstinvocation{
       RESULT = PDA\_RNEXP( X )
@@ -11088,14 +10611,14 @@ wsave   a work array which must be dimensioned at least 2*n+15.
       Prior Requirements
    }{
       The initial seed MUST be set using routine PDA\_RNSED (equivalent
-      to NAG{\tt '}s G05CBF).  If it has not, there is no guarantee that
+      to NAG\texttt{'}s G05CBF).  If it has not, there is no guarantee that
       sensible values will be returned from this function.
    }
    \sstdiytopic{
       References
    }{
-      Ahrens, J.H., \& Dieter, U. 1972, {\tt "}Computer Methods for sampling
-      from the exponential and Normal distributions{\tt "}, Comm. ACM 15(10),
+      Ahrens, J.H., \& Dieter, U. 1972, \texttt{"}Computer Methods for sampling
+      from the exponential and Normal distributions\texttt{"}, Comm. ACM 15(10),
       pp.873--882.
    }
 }
@@ -11107,7 +10630,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
    \sstdescription{
       This is a simple random-number generator providing deviates in the
       from a gamma distribution, with a period of 2$*$$*$26, and to 6 or
-      7 digits accuracy.  It is based upon Ahrens, Dieter \& Grube{\tt '}s
+      7 digits accuracy.  It is based upon Ahrens, Dieter \& Grube\texttt{'}s
       TOMS599 routines.  A value of zero is returned if the argument of
       the gamma function is not positive.
    }
@@ -11133,17 +10656,17 @@ wsave   a work array which must be dimensioned at least 2*n+15.
       Prior Requirements
    }{
       The initial seed MUST be set using routine PDA\_RNSED (equivalent
-      to NAG{\tt '}s G05CBF).  If it has not, there is no guarantee that
+      to NAG\texttt{'}s G05CBF).  If it has not, there is no guarantee that
       sensible values will be returned from this function.
    }
    \sstdiytopic{
       References
    }{
-      Ahrens, J.H., \& Dieter, U. 1982, {\tt "}Generating gamma variates
-        by a modified rejection technique{\tt "}, Comm. ACM 25(1), pp.47--54.
+      Ahrens, J.H., \& Dieter, U. 1982, \texttt{"}Generating gamma variates
+        by a modified rejection technique\texttt{"}, Comm. ACM 25(1), pp.47--54.
         (For A $>$= 1.0, algorithm GD)
-      Ahrens, J.H., \& Dieter, U. 1974, {\tt "}Computer Methods for sampling
-        gamma, Poisson and binomial distributions{\tt "}, Computing. 12),
+      Ahrens, J.H., \& Dieter, U. 1974, \texttt{"}Computer Methods for sampling
+        gamma, Poisson and binomial distributions\texttt{"}, Computing. 12),
         pp.223--246.  (For 0.0 $<$ A $<$ 1.0, adapted algorithm GS)
    }
 }
@@ -11155,7 +10678,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
    \sstdescription{
       This is a simple random-number generator providing deviates in the
       from a Gaussian distribution, with a period of 2$*$$*$26, and to 6 or
-      7 digits accuracy.  It is based upon Ahrens, Dieter \& Grube{\tt '}s
+      7 digits accuracy.  It is based upon Ahrens, Dieter \& Grube\texttt{'}s
       TOMS599 routines.
    }
    \sstinvocation{
@@ -11184,14 +10707,14 @@ wsave   a work array which must be dimensioned at least 2*n+15.
       Prior Requirements
    }{
       The initial seed MUST be set using routine PDA\_RNSED (equivalent
-      to NAG{\tt '}s G05CBF).  If it has not, there is no guarantee that
+      to NAG\texttt{'}s G05CBF).  If it has not, there is no guarantee that
       sensible values will be returned from this function.
    }
    \sstdiytopic{
       References
    }{
-      Ahrens, J.H., \& Dieter, U. 1973, {\tt "}Extensions of Forsythe{\tt '}s
-        Method for Random Sampling from the Normal distribution{\tt "},
+      Ahrens, J.H., \& Dieter, U. 1973, \texttt{"}Extensions of Forsythe\texttt{'}s
+        Method for Random Sampling from the Normal distribution\texttt{"},
         Math. Computing, 27(124), pp.927--937.
    }
 }
@@ -11203,7 +10726,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
    \sstdescription{
       This is a simple random-number generator providing deviates in the
       from a Poisson distribution, with a period of 2$*$$*$26, and to 6 or
-      7 digits accuracy.  It is based upon Ahrens, Dieter \& Grube{\tt '}s
+      7 digits accuracy.  It is based upon Ahrens, Dieter \& Grube\texttt{'}s
       TOMS599 routines.
    }
    \sstinvocation{
@@ -11228,14 +10751,14 @@ wsave   a work array which must be dimensioned at least 2*n+15.
       Prior Requirements
    }{
       The initial seed MUST be set using routine PDA\_RNSED (equivalent
-      to NAG{\tt '}s G05CBF).  If it has not, there is no guarantee that
+      to NAG\texttt{'}s G05CBF).  If it has not, there is no guarantee that
       sensible values will be returned from this function.
    }
    \sstdiytopic{
       References
    }{
-      Ahrens, J.H., \& Dieter, U. 1973, {\tt "}Computer Generation of Poisson
-        Deviates from modified Normal distributions{\tt "}, ACM Trans. Math.
+      Ahrens, J.H., \& Dieter, U. 1973, \texttt{"}Computer Generation of Poisson
+        Deviates from modified Normal distributions\texttt{"}, ACM Trans. Math.
         Software, 8(2), pp.163--179.
    }
 }
@@ -11246,7 +10769,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
 }{
    \sstdescription{
       This sets the initial seed for the simple random-number generator
-      based upon Ahrens, Dieter \& Grube{\tt '}s TOMS599 routines.  The seed
+      based upon Ahrens, Dieter \& Grube\texttt{'}s TOMS599 routines.  The seed
       should be of the form 4$*$K$+$1, where K is a positive integer, and
       less than 2$*$$*$28.  When it is not, the nearest valid seed is used,
       but if this is negative, the seed becomes 2001.
@@ -11264,8 +10787,8 @@ wsave   a work array which must be dimensioned at least 2*n+15.
    \sstdiytopic{
       References
    }{
-      Ahrens, J.H., Dieter, U. \& Grube, A., 1970, {\tt "}Pseudo-random
-        numbers: a new proposal for the choice of multiplicators{\tt "},
+      Ahrens, J.H., Dieter, U. \& Grube, A., 1970, \texttt{"}Pseudo-random
+        numbers: a new proposal for the choice of multiplicators\texttt{"},
         Computing, 6, pp.121--138.
    }
 }
@@ -11290,7 +10813,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_SA(FCN,
      3              N,X,MAX,RT,EPS,NS,NT,NEPS,MAXEVL,LB,UB,C,IPRINT,
      1              ISEED1,ISEED2,T,VM,XOPT,FOPT,NACC,NFCNEV,NOBDS,IER,
@@ -11556,10 +11079,10 @@ wsave   a work array which must be dimensioned at least 2*n+15.
   Modification:
     Use the new STATUS argument for the case that the seeds are out of
     range.  (HME)
-\end{verbatim}
+\end{terminalv}
 
 \sstroutine{
-   PDA\_SAAC[x]
+   PDA\_SAACx
 }{
    Sorts the columns of a two dimensional array into ascending order
 }{
@@ -11631,7 +11154,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
 }
 
 \sstroutine{
-   PDA\_SAAR[x]
+   PDA\_SAARx
 }{
    Sorts the rows of a two dimensional array into ascending order
 }{
@@ -11719,7 +11242,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       subroutine pda_splder(t,n,c,k,nu,x,y,m,wrk,ier)
 
 
@@ -11771,7 +11294,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
     e-mail : Paul.Dierckx@cs.kuleuven.ac.be
 
   latest update : march 1987
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -11787,7 +11310,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       subroutine pda_splev(t,n,c,k,x,y,m,ier)
 
 
@@ -11835,7 +11358,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
     e-mail : Paul.Dierckx@cs.kuleuven.ac.be
 
   latest update : march 1987
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -11852,7 +11375,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       real function pda_splint(t,n,c,k,a,b,wrk)
 
 
@@ -11893,7 +11416,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
     e-mail : Paul.Dierckx@cs.kuleuven.ac.be
 
   latest update : march 1987
-\end{verbatim}
+\end{terminalv}
 
 %    --------------------------------------------------------------------------
 
@@ -11938,7 +11461,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       subroutine pda_subplx (f,n,tol,maxnfe,mode,scale,x,fx,nfe,
      *                   work,iwork,iflag)
 
@@ -12016,7 +11539,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
                    fstop)
             iflag should not be reset between calls to
             pda_subplx.
-\end{verbatim}
+\end{terminalv}
 
 
 
@@ -12047,7 +11570,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       subroutine pda_sumsl(n, d, x, calcf, calcg, iv, liv, lv, v,
      1                  uiparm, urparm, ufparm)
 
@@ -12460,7 +11983,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
 
 
 
-\end{verbatim}
+\end{terminalv}
 
 
 
@@ -12476,7 +11999,7 @@ wsave   a work array which must be dimensioned at least 2*n+15.
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
 Description:
    Given the set of data points (x(i),y(i),z(i)) and the set of positive
    numbers w(i),i=1,...,m, subroutine pda_surfit determines a smooth
@@ -12818,7 +12341,7 @@ Author:
 
 Creation Date : may 1979
    latest update : march 1987
-\end{verbatim}
+\end{terminalv}
 
 
 %    --------------------------------------------------------------------------
@@ -12840,7 +12363,7 @@ Creation Date : may 1979
    }
 }
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE PDA_UNCMND (N,X0,FCN,X,F,INFO,W,LW)
 
 
@@ -12933,7 +12456,7 @@ Creation Date : may 1979
           duplicate information in the INFO argument.  (HME).
 ***ROUTINES CALLED  PDA_OPTDRD, XERROR
 ***END PROLOGUE  PDA_UNCMND
-\end{verbatim}
+\end{terminalv}
 
 \sstroutine{
    PDA\_V11
