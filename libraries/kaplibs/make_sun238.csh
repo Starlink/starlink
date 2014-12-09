@@ -67,23 +67,6 @@ end
 # Copy the sun header to the output tex file.
 cp sun_head.tex sun238.tex
 
-# Add a noteroutine for each documented file
-foreach dir (aif ccg fts ira kpg)
-   cd $dir
-   rm -f notes >& /dev/null
-   ../make_noteroutines.pl > notes
-   grep -q \!\!\! notes
-   if( $status == 0 ) then
-      cat notes
-      exit
-   endif
-   cat notes >> ../sun238.tex
-   cd ..
-end
-
-# Copy the middle section of the fixed text
-cat sun_mid.tex >> sun238.tex
-
 # Add an sstroutine for each Fortran-callable documented file
 foreach dir (aif ccg fts ira kpg)
    cd $dir
