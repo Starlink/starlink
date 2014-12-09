@@ -14,8 +14,9 @@
 
 *  Description:
 *     This routine interrogates the system to find the width and height of the screen
-*     on which it is running.  Should an error occur or the width is
-*     not positive, set to the default of 80 characters by 0 lines.
+*     on which it is running.  Should an error occur, for example when running
+*     without a terminal being available, will default to 80 characters by 0 lines. If
+*     the width is not positive for some reason, 80 characters will be used.
 
 *  Arguments:
 *     WIDTH = INTEGER (Returned)
@@ -23,11 +24,11 @@
 *     HEIGHT = INTEGER (Returned)
 *        The height of the screen in lines. (default 0)
 *     STATUS = INTEGER (Given and Returned)
-*        The global status.
-*        Set to SAI__ERROR if an error occurs..
+*        The global status. Will return the defaults if error
+*        is set on entry. The routine will not set error itself.
 
 *  Notes:
-*     This is the UNIX version.
+*     This is the UNIX version and uses ioctl().
 
 *  Copyright:
 *     Copyright (C) 1998, 2000 Central Laboratory of the Research Councils.
@@ -65,6 +66,8 @@
 *     19-APR-2006 (TIMJ):
 *        Fix compiler warning (ioctl.h should always be included)
 *        to prototype ioctl()
+*     2014-12-09 (TIMJ):
+*        Do not set status to bad on error. Just return the defaults.
 
 *-
 */
@@ -87,19 +90,17 @@ F77_SUBROUTINE(one_scrsz)(INTEGER(width),INTEGER(height),INTEGER(status))
    GENPTR_INTEGER(height)
    GENPTR_INTEGER(status)
 
-	struct winsize s;
+   struct winsize s;
+   *width = 80;
+   *height = 0;
 
-    if ( *status != SAI__OK ) return;
+   if ( *status != SAI__OK ) return;
 
-    if (ioctl (STDOUT_FILENO, TIOCGWINSZ, (char *) &s) < 0) {
-        *status = SAI__ERROR;
-        *height = 80;
-        *width = 0;
-    } else {
-        *status = SAI__OK;
-	    *height = s.ws_row;
-	    *width = s.ws_col;
-    }
+   if (ioctl (STDOUT_FILENO, TIOCGWINSZ, (char *) &s) >= 0) {
+     *status = SAI__OK;
+     *height = s.ws_row;
+     *width = (s.ws_col > 0 ? s.ws_col : *width );
+   }
 
-	return;
+   return;
 }
