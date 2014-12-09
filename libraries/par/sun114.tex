@@ -1,35 +1,33 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
+%% \usepackage        %  Use this one for final production.
+%% \usepackage %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {114.4}
-\newcommand{\stardocauthors}   {Malcolm J. Currie\\
+\stardocnumber      {114.4}
+\stardocauthors   {Malcolm J. Currie\\
                                 Alan J. Chipperfield}
-\newcommand{\stardocdate}      {1999 September 24}
-\newcommand{\stardoctitle}     {PAR \\ [\latex{1ex}]
+\stardocdate        {1999 September 24}
+\stardoctitle       {PAR \\ [\latex{1ex}]
                                 Interface to the ADAM
                                 Parameter System}
-\newcommand{\stardocversion}   {Version 2.3}
-\newcommand{\stardocmanual}    {Programmer's Manual}
-\newcommand{\stardocabstract}  {PAR is a library of Fortran subroutines that
+\stardocversion     {Version 2.3}
+\stardocmanual      {Programmer's Manual}
+\stardocabstract  {PAR is a library of Fortran subroutines that
 provides convenient mechanisms for applications to exchange information with
-the outside world, through input-output channels called {\em parameters\/}.
+the outside world, through input-output channels called \emph{parameters\/}.
 Parameters enable a
 user to control an application's behaviour.  PAR supports numeric,
-character, and logical {\em parameters}, and is currently implemented
+character, and logical \emph{parameters}, and is currently implemented
 only on top of the {\footnotesize ADAM} parameter system.
 \par
 The PAR library permits parameter values to be obtained, without or with
@@ -39,532 +37,27 @@ string, and suggested defaults.
 \par
 This document also introduces a preliminary C interface for the PAR library
 \dash\ this may be subject to change in the light of experience.
-
 }
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\html}[1]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-\newcommand{\dash}{--}
-\newcommand{\listline}{\hspace{1pt}\\}
-\newcommand{\listova}[1]{}
-\newcommand{\listovb}[1]{\textbf{#1}\\}
-\begin{htmlonly}
-  \newcommand{\dash}{-}
-  \newcommand{\listline}{}
-  \newcommand{\listova}[1]{#1}
-  \newcommand{\listovb}[1]{}
-\end{htmlonly}
-
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
-
-
-
+% ? Document specific \providecommand or \newenvironment commands.
+\providecommand{\dash}{--}
+\providecommand{\listline}{\hspace{1pt}\\}
+\providecommand{\listova}[1]{}
+\providecommand{\listovb}[1]{\textbf{#1}\\}
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section{\xlabel{introduction}Introduction}
 
 Consider an application that subtracts four from every element of an
 array.  This has a limited use \dash\ just one invocation.  However, it would
 be more general and far more useful if we could subtract an arbitrary
-value from an arbitrary array.  These arbitrary values are called {\em
-parameters\/} and through them we may qualify the behaviour of an
+value from an arbitrary array.  These arbitrary values are called \emph{parameters\/} and through them we may qualify the behaviour of an
 application.  In a sense they are like input-output channels, though
 instead of using logical-unit numbers they have memorable names.
 
@@ -593,7 +86,7 @@ values, and minimum and maximum permitted values. There is a routine
 that lets an application obtain new values repeatedly through the same
 parameter.  Results may be put into parameters to be used in procedures
 and/or passed on to other applications.  Finally, PAR can inquire the
-{\em state\/} of a parameter.
+\emph{state\/} of a parameter.
 
 This document explains what a parameter is and the states it may reside
 in; it describes the usage of the PAR library with examples, progressing
@@ -602,12 +95,11 @@ linking procedures.  There is a reference section containing full
 details of each subroutine, and classified lists of the routines.
 
 As a consequence of PAR only being implemented using the {\footnotesize
-ADAM} parameter system (SUBPAR), the programmer must also write an {\it
-interface file} for each application.  This controls the behaviour of
+ADAM} parameter system (SUBPAR), the programmer must also write an \textit{interface file} for each application.  This controls the behaviour of
 the parameter, for example, whether it is defaulted or prompted for,
 where a suggested default should be obtained from, what is the default
 value, and where help is found.
-\xref{SUN/115}{sun115}{} \dash\ the {\it Interface Module
+\xref{SUN/115}{sun115}{} \dash\ the \textit{Interface Module
 Reference Manual\/} \dash\ describes the syntax and facilities of interface
 files, and is required reading for those using PAR.  Note that the
 examples in this document assume the {\footnotesize ADAM} implementation.
@@ -633,21 +125,20 @@ conversion automatically.
 \section{\xlabel{parameter_states_}Parameter States} \label{se:states}
 
 A parameter has a number of states.  Initially, a parameter has no
-value, and is said to be in the {\em ground\/} state.  When the
-parameter has been given a value, the parameter moves to the {\em
-active\/} state.  A parameter acquires a value in the first instance by
+value, and is said to be in the \emph{ground\/} state.  When the
+parameter has been given a value, the parameter moves to the \emph{active\/} state.  A parameter acquires a value in the first instance by
 looking for one supplied on the command line.  Failing that, the
 parameter system will attempt to get a value, for example by prompting
 or adopting a fixed or dynamic default.  If an application obtains a
 value from a parameter already in the active state, the existing value
 for that parameter is returned.  To obtain a further value the
-application must first {\em cancel\/} the parameter and move it to the
-{\em cancelled\/} state.  When the application next gets a value for
+application must first \emph{cancel\/} the parameter and move it to the
+\emph{cancelled\/} state.  When the application next gets a value for
 that parameter (within the same invocation), the parameter returns to
 the active state.  When an application completes the parameter returns
 to the ground state. PAR also permits users of your application to enter
-a null value for a parameter (a {\tt !} in the {\footnotesize ADAM}
-parameter system).  This puts the parameter into the {\em null\/} state,
+a null value for a parameter (a \texttt{!} in the {\footnotesize ADAM}
+parameter system).  This puts the parameter into the \emph{null\/} state,
 and can be used to select a special value or control the application in
 a special way.
 
@@ -677,22 +168,21 @@ SAI\_\_OK.
 
 \subsection{\xlabel{getting_a_parameters_value}Getting a Parameter's Value}
 
-The way an application obtains a value from a parameter is to {\it
-get\/} the value.  In simple terms, a get operation is the equivalent of
+The way an application obtains a value from a parameter is to \textit{get\/} the value.  In simple terms, a get operation is the equivalent of
 a Fortran read, though it can do much more.  In this example,
 
-\begin{verbatim}
-          CALL PAR_GET0L( 'FLAG', VALUE, STATUS )
-\end{verbatim}
+\begin{terminalv}
+CALL PAR_GET0L( 'FLAG', VALUE, STATUS )
+\end{terminalv}
 
 gets a logical value from the parameter FLAG and stores it in the
 logical variable VALUE.  The data type is logical because of the L
 suffix in the routine's name.  If VALUE were a character variable, you
 would use a similar routine, but this time with a C suffix as shown below.
 
-\begin{verbatim}
-          CALL PAR_GET0C( 'STRING', VALUE, STATUS )
-\end{verbatim}
+\begin{terminalv}
+CALL PAR_GET0C( 'STRING', VALUE, STATUS )
+\end{terminalv}
 
 There are similar routines for the other primitive data types, each with
 an appropriate suffix: D for double precision, I for integer and R for
@@ -723,15 +213,15 @@ application requires.
 What does the user see?  This will depend on the implementation, but
 suppose the user is prompted for a value.  If you had in your code
 
-\begin{verbatim}
-          CALL PAR_GET0R( 'THRESHOLD', THRESH, STATUS )
-\end{verbatim}
+\begin{terminalv}
+CALL PAR_GET0R( 'THRESHOLD', THRESH, STATUS )
+\end{terminalv}
 
 The user might see
 
-\begin{verbatim}
-    THRESHOLD - Give the intensity threshold >
-\end{verbatim}
+\begin{terminalv}
+THRESHOLD - Give the intensity threshold >
+\end{terminalv}
 
 with the parameter name first, followed by a prompt string briefly
 describing the function of the parameter.  (In the {\footnotesize ADAM}
@@ -741,17 +231,17 @@ itself.)  Suppose the user enters 32768 in response to the above prompt.
 The next time the user ran the application there could be a suggested
 default of the last-used value like this,
 
-\begin{verbatim}
-    THRESHOLD - Give the intensity threshold /32768/ >
-\end{verbatim}
+\begin{terminalv}
+THRESHOLD - Give the intensity threshold /32768/ >
+\end{terminalv}
 
 which could be accepted merely by pressing the return key.
 
 In the {\footnotesize ADAM} implementation the PAR\_GET calls will
 (re-)prompt whenever the user gives too many values or an invalid value.
 Invalid values include supplying a character string where a number is
-required, and being outside the interface file {\em range\/} or
-{\em in\/} constraints.
+required, and being outside the interface file \emph{range\/} or
+\emph{in\/} constraints.
 
 \subsection{\xlabel{getting_an_array_of_values}Getting an Array of Values}
 
@@ -769,13 +259,13 @@ return to the descriptions of the basic PAR\_ routines.
 
 Here is an example to get a vector of real values.
 
-\begin{verbatim}
-          REAL VALUES( 4 )
+\begin{terminalv}
+REAL VALUES( 4 )
 
-              :       :       :
+   :       :       :
 
-          CALL PAR_GET1R( 'HEIGHTS', 4, VALUES, ACTVAL, STATUS )
-\end{verbatim}
+CALL PAR_GET1R( 'HEIGHTS', 4, VALUES, ACTVAL, STATUS )
+\end{terminalv}
 
 It enables all or part of a four-element array to be obtained and
 stored in the real variable VALUES.  ACTVAL is the actual number of
@@ -784,9 +274,9 @@ this routine for the different data types listed earlier.
 
 In the above example the user might enter
 
-\begin{verbatim}
-          [1,2.5D0,3.456]
-\end{verbatim}
+\begin{terminalv}
+[1,2.5D0,3.456]
+\end{terminalv}
 
 where the brackets indicate an array and the commas
 separate the values.\footnote{In the ADAM implementation the user can
@@ -800,25 +290,25 @@ VALUES.  MAXD gives the maximum dimensions of the array.  The array
 itself must be large enough to hold the values.  ACTD receives the
 actual dimensions of the array as specified by the user.
 
-\begin{verbatim}
-          INTEGER VALUES( 3, 2, 2 )
+\begin{terminalv}
+INTEGER VALUES( 3, 2, 2 )
 
-              :       :       :
+   :       :       :
 
-          MAXD( 1 ) = 3
-          MAXD( 2 ) = 2
-          MAXD( 3 ) = 2
-          CALL PAR_GETNI( 'MASK', 3, MAXD, VALUES, ACTD, STATUS )
-\end{verbatim}
+MAXD( 1 ) = 3
+MAXD( 2 ) = 2
+MAXD( 3 ) = 2
+CALL PAR_GETNI( 'MASK', 3, MAXD, VALUES, ACTD, STATUS )
+\end{terminalv}
 
 This routine is unlikely to be in common usage because of the
 impracticality of the user of your application entering more than the
 smallest $n$-dimensional arrays of parameters, and having to know the
 parameter's shape.  To illustrate the former point, in the above
 example the user might enter
-\begin{verbatim}
-          [[[1,2,3],[4,5,6]],[[7,8,9],[10,11,12]]]
-\end{verbatim}
+\begin{terminalv}
+[[[1,2,3],[4,5,6]],[[7,8,9],[10,11,12]]]
+\end{terminalv}
 
 where the nested brackets delimit the dimensions, and the commas
 separate the values within a dimension.  Thus there are three values
@@ -831,13 +321,13 @@ on \dash\ the Fortran order.  Thus, in the example, VALUES(3,1,2) is 9.
 Usually, it will suffice to get a vector of values disregarding
 the dimensionality of the parameter.
 
-\begin{verbatim}
-          REAL VALUES( 12 )
+\begin{terminalv}
+REAL VALUES( 12 )
 
-              :       :       :
+   :       :       :
 
-          CALL PAR_GETVR( 'MASK', 12, VALUES, ACTVAL, STATUS )
-\end{verbatim}
+CALL PAR_GETVR( 'MASK', 12, VALUES, ACTVAL, STATUS )
+\end{terminalv}
 
 This has the same arguments as PAR\_GET1x we saw above, though the actual
 number of array dimensions of the parameter need not be one.
@@ -847,19 +337,19 @@ Below, we obtain two character variables from parameter 'CONSTELLATION'.
 When too few values are supplied to the parameter, PAR\_EXACx
 prompts for the remainder of the values.
 
-\begin{verbatim}
-          CHARACTER * ( 3 ) CONSTE( 2 )
+\begin{terminalv}
+CHARACTER * ( 3 ) CONSTE( 2 )
 
-              :       :       :
+   :       :       :
 
-          CALL PAR_EXACC( 'CONSTELLATION', 2, CONSTE, STATUS )
-\end{verbatim}
+CALL PAR_EXACC( 'CONSTELLATION', 2, CONSTE, STATUS )
+\end{terminalv}
 
 An example of what the user sees is given in Section~\ref{se:avl}.
 
 \subsection{\xlabel{putting_a_parameters_value}Putting a Parameter's Value}
 
-The opposite to {\em get\/} is {\em put}.  Using traditional Fortran
+The opposite to \emph{get\/} is \emph{put}.  Using traditional Fortran
 input-output, the equivalent of putting a value is to write the value to
 a file.  In addition to getting parameter values, PAR can also put
 values into parameters.  Suppose we have an application that computes
@@ -868,11 +358,11 @@ statistics in parameters, so that they may be passed to a later
 application.  Thus we could have a number of puts \dash\ one per statistic.
 Here we just put the standard deviation value in the parameter SIGMA.
 
-\begin{verbatim}
-          CALL PAR_PUT0D( 'SIGMA', STDDEV, STATUS )
-\end{verbatim}
+\begin{terminalv}
+CALL PAR_PUT0D( 'SIGMA', STDDEV, STATUS )
+\end{terminalv}
 
-The value is written to a {\em parameter file\/} associated with the
+The value is written to a \emph{parameter file\/} associated with the
 application.  This file contains not only any values you have put there,
 but also the last-used values of all the parameters of that
 application.\footnote{A parameter file is implementation specific,
@@ -881,18 +371,18 @@ parameter system the parameter file is an HDS file named after the
 application and located in the ADAM\_USER directory. So for an application
 called STATISTICS, the above parameter value could be `read' by a
 parameter in a different application by the user giving the HDS object
-name with an {\tt @} prefix, namely {\tt @ADAM\_USER:STATISTICS.SIGMA}
-for VMS and {\tt @\$ADAM\_USER/statistics.SIGMA} for UNIX.}
+name with an \texttt{@} prefix, namely \texttt{@ADAM\_USER:STATISTICS.SIGMA}
+for VMS and \texttt{@\$ADAM\_USER/statistics.SIGMA} for UNIX.}
 
 If we had the values corresponding to the quartiles and median of a
 data array we could use a routine that handles a one-dimensional array.
-\begin{verbatim}
-          DOUBLE PRECISION QRTILE( 3 )
+\begin{terminalv}
+DOUBLE PRECISION QRTILE( 3 )
 
-              :       :       :
+   :       :       :
 
-          CALL PAR_PUT1D( 'QUARTILES', 3, QRTILE, STATUS )
-\end{verbatim}
+CALL PAR_PUT1D( 'QUARTILES', 3, QRTILE, STATUS )
+\end{terminalv}
 
 When you put an array, the subroutine arguments specify both the
 dimensionality and size of that array, and the size of an `object' into
@@ -927,15 +417,15 @@ since the parameter is in the active state.
 Here is an illustration.  ITER calculations are performed, using
 the value of parameter REJECT.
 
-\begin{verbatim}
-          DO I = 1, ITER
-             CALL PAR_GET0D( 'REJECT', ABC, STATUS )
+\begin{terminalv}
+DO I = 1, ITER
+  CALL PAR_GET0D( 'REJECT', ABC, STATUS )
 
-                 < perform calculation involving variable ABC >
+      < perform calculation involving variable ABC >
 
-             CALL PAR_CANCL( 'REJECT', STATUS )
-          END DO
-\end{verbatim}
+  CALL PAR_CANCL( 'REJECT', STATUS )
+END DO
+\end{terminalv}
 
 \subsection{\xlabel{setting_the_dynamic_prompt}Setting the Dynamic Prompt}
 
@@ -944,10 +434,10 @@ usually originates from the interface file, and hence is fixed.
 However, it is possible to create a prompt string dynamically from
 within the application. For example,
 
-\begin{verbatim}
-          CALL PAR_PROMT( 'OK', 'The file '// NAME( :NC ) /
-         :                / ' is to be erased. OK ?', STATUS )
-\end{verbatim}
+\begin{terminalv}
+ CALL PAR_PROMT( 'OK', 'The file '// NAME( :NC ) /
+:                / ' is to be erased. OK ?', STATUS )
+\end{terminalv}
 
 will change the prompt string for parameter OK, so that the named
 file given by the variable NAME, may be substituted at run time.
@@ -955,37 +445,37 @@ file given by the variable NAME, may be substituted at run time.
 \subsection{\xlabel{setting_the_dynamic_default}Setting the Dynamic Default}
 
 When the parameter system prompts for a parameter, there is usually a
-suggested default given between {\tt / /} delimiters, so that the user
-can just press {\tt <CR>} to use the suggestion, or edit the suggestion.
+suggested default given between \texttt{/ /} delimiters, so that the user
+can just press \texttt{<CR>} to use the suggestion, or edit the suggestion.
 The suggested value can originate from a number of places.  This
-includes from within an application, by setting a {\em dynamic\/}
+includes from within an application, by setting a \emph{dynamic\/}
 default.
 
 In the following example the dynamic default for the scalar parameter
 SHADE depends on the value of variable COLOUR.  If COLOUR is one, the
 dynamic default for parameter SHADE will be $-$1.0, and 0.0 otherwise.
 
-\begin{verbatim}
-    *  Set the default shading (parameter SHADE) depending on the colour.
-          IF ( COLOUR .EQ. 1 ) THEN
-             CALL PAR_DEF0R( 'SHADE', -1.0, STATUS )
-          ELSE
-             CALL PAR_DEF0R( 'SHADE', 0.0, STATUS )
-          END IF
+\begin{terminalv}
+*  Set the default shading (parameter SHADE) depending on the colour.
+     IF ( COLOUR .EQ. 1 ) THEN
+        CALL PAR_DEF0R( 'SHADE', -1.0, STATUS )
+     ELSE
+        CALL PAR_DEF0R( 'SHADE', 0.0, STATUS )
+     END IF
 
-    *  Obtain the shading.
-          CALL PAR_GET0R( 'SHADE', SHADE, STATUS )
-\end{verbatim}
+*  Obtain the shading.
+     CALL PAR_GET0R( 'SHADE', SHADE, STATUS )
+\end{terminalv}
 
 
-Note that in {\footnotesize ADAM} applications the {\em ppath\/} in the
-interface file must begin {\tt DYNAMIC} to ensure that the user of your
+Note that in {\footnotesize ADAM} applications the \emph{ppath\/} in the
+interface file must begin \texttt{DYNAMIC} to ensure that the user of your
 application will be prompted with the dynamic default (see
 \xref{SUN/115}{sun115}{the_ppath_field}).
 
 The {\footnotesize ADAM} parameter system also allows the dynamic
 default to be used as the parameter value without prompting, through
-the interface file {\em vpath\/} (see
+the interface file \emph{vpath\/} (see
 \xref{SUN/115}{sun115}{the_vpath_field}).
 
 
@@ -1000,7 +490,7 @@ It is a common requirement to restrict a parameter's value to a specific
 range, or to be above some lower limit or less than some upper limit.
 For example, the order of a polynomial would have to be positive, but
 less than some maximum value that the polynomial-fitting software can
-handle.  Whilst this can be done using the {\em range\/} field in the
+handle.  Whilst this can be done using the \emph{range\/} field in the
 interface file, PAR offers dynamic control through two
 routines \dash\ PAR\_MAXx to set the maximum value, and PAR\_MINx to set the
 minimum value for the parameter.  Note that there are no logical-type
@@ -1008,20 +498,20 @@ versions of these routines.
 
 Here is an example of setting the minimum value.
 
-\begin{verbatim}
-    *  The number of histogram bins must be positive.
-          CALL PAR_MINI( 'NBINS', 1, STATUS )
-          CALL PAR_GET0I( 'NBINS', NBINS, STATUS )
-\end{verbatim}
+\begin{terminalv}
+*  The number of histogram bins must be positive.
+     CALL PAR_MINI( 'NBINS', 1, STATUS )
+     CALL PAR_GET0I( 'NBINS', NBINS, STATUS )
+\end{terminalv}
 
 We can set an upper limit too.
-\begin{verbatim}
-    *  The number of histogram bins must be in the range 10 to 1000
-    *  inclusive.
-          CALL PAR_MINI( 'NBINS', 10, STATUS )
-          CALL PAR_MAXI( 'NBINS', 1000, STATUS )
-          CALL PAR_GET0I( 'NBINS', NBINS, STATUS )
-\end{verbatim}
+\begin{terminalv}
+*  The number of histogram bins must be in the range 10 to 1000
+*  inclusive.
+     CALL PAR_MINI( 'NBINS', 10, STATUS )
+     CALL PAR_MAXI( 'NBINS', 1000, STATUS )
+     CALL PAR_GET0I( 'NBINS', NBINS, STATUS )
+\end{terminalv}
 
 If the user gives a value outside the legitimate range, an error report
 appears, and the user is prompted for an acceptable value. In the case
@@ -1040,12 +530,12 @@ the minimum and maximum.  So the maximum is always the value immediately
 below the range to be excluded, and the minimum is the value immediately
 above.  In case that is not clear here is an illustration.
 
-\begin{verbatim}
-    *  Choose an integer excluding -1, 0, 1, and 2.
-          CALL PAR_MINI( 'IVALUE', 3, STATUS )
-          CALL PAR_MAXI( 'IVALUE', -2, STATUS )
-          CALL PAR_GET0I( 'IVALUE', NUMBER, STATUS )
-\end{verbatim}
+\begin{terminalv}
+*  Choose an integer excluding -1, 0, 1, and 2.
+     CALL PAR_MINI( 'IVALUE', 3, STATUS )
+     CALL PAR_MAXI( 'IVALUE', -2, STATUS )
+     CALL PAR_GET0I( 'IVALUE', NUMBER, STATUS )
+\end{terminalv}
 
 \subsection{\xlabel{cancelling_dynamic_values}Cancelling Dynamic Values}
 
@@ -1062,26 +552,26 @@ which selects the values to reset.
 In the following example parameter NX is obtained twice, first using a
 range, and then with no maximum limit and a different minimum.
 
-\begin{verbatim}
-    *  Get the integer value between 1 and 360.
-          CALL PAR_MINI( 'NX', 1, STATUS )
-          CALL PAR_MAXI( 'NX', 360, STATUS )
-          CALL PAR_GET0I( 'NX', NX, STATUS )
+\begin{terminalv}
+*  Get the integer value between 1 and 360.
+     CALL PAR_MINI( 'NX', 1, STATUS )
+     CALL PAR_MAXI( 'NX', 360, STATUS )
+     CALL PAR_GET0I( 'NX', NX, STATUS )
 
-    *  Cancel the parameter, as a minimum or maximum value cannot be set
-    *  when the parameter is active, and because we want to obtain
-    *  another value.
-          CALL PAR_CANCL( 'NX', STATUS )
+*  Cancel the parameter, as a minimum or maximum value cannot be set
+*  when the parameter is active, and because we want to obtain
+*  another value.
+     CALL PAR_CANCL( 'NX', STATUS )
 
-    *  Set a new minimum value.
-          CALL PAR_MINI( 'NX', NX, STATUS )
+*  Set a new minimum value.
+     CALL PAR_MINI( 'NX', NX, STATUS )
 
-    *  Cancel the maximum value.
-          CALL PAR_UNSET( 'NX', 'MAX', STATUS )
+*  Cancel the maximum value.
+     CALL PAR_UNSET( 'NX', 'MAX', STATUS )
 
-    *  Obtain a new value, with a new minimum and no maximum.
-          CALL PAR_GET0I( 'NX', NX2, STATUS )
-\end{verbatim}
+*  Obtain a new value, with a new minimum and no maximum.
+     CALL PAR_GET0I( 'NX', NX2, STATUS )
+\end{terminalv}
 
 See Appendix~\ref{ap:ref} for details of the options for the second
 argument.
@@ -1093,9 +583,9 @@ to one of the PAR\_DEF routines will suffice.  However, if you wish to
 no longer have a dynamic default for parameter NX say, you will need to
 make the following call.
 
-\begin{verbatim}
-          CALL PAR_UNSET( 'NX', 'DEFAULT', STATUS )
-\end{verbatim}
+\begin{terminalv}
+CALL PAR_UNSET( 'NX', 'DEFAULT', STATUS )
+\end{terminalv}
 
 \subsection{\xlabel{inquiring_the_state_of_a_parameter}Inquiring the State of a Parameter}
 
@@ -1106,24 +596,24 @@ of the application.  For example, you have an application that loops for
 efficient and easy interactive use, but in a procedure or batch mode you
 want the application to process just one set of data.
 
-\begin{verbatim}
-          INCLUDE 'PAR_PAR'        ! PAR constants
-          INTEGER STATE
+\begin{terminalv}
+INCLUDE 'PAR_PAR'        ! PAR constants
+INTEGER STATE
 
-              :       :       :
+   :       :       :
 
-          CALL PAR_STATE( 'INIT', STATE, STATUS )
+CALL PAR_STATE( 'INIT', STATE, STATUS )
 
-          LOOP = .TRUE.
-          DO WHILE ( LOOP .AND STATUS .EQ. SAI__OK )
-             CALL PAR_GET0R( 'INIT', START, STATUS )
+LOOP = .TRUE.
+DO WHILE ( LOOP .AND STATUS .EQ. SAI__OK )
+  CALL PAR_GET0R( 'INIT', START, STATUS )
 
-                 < perform calculation >
+      < perform calculation >
 
-             LOOP = STATE .NE. PAR__ACTIVE
-             IF ( LOOP ) CALL PAR_CANCL( 'INIT', STATUS )
-          END DO
-\end{verbatim}
+  LOOP = STATE .NE. PAR__ACTIVE
+  IF ( LOOP ) CALL PAR_CANCL( 'INIT', STATUS )
+END DO
+\end{terminalv}
 
 INIT is a parameter required for each calculation.  It is obtained
 within a code loop.  If INIT is specified on the command-line, INIT is
@@ -1141,7 +631,7 @@ PAR\_\_NULL, and are defined in the include file PAR\_ERR.
 
 \subsection{\xlabel{abort}Abort}
 
-PAR\_\_ABORT is returned if a user enters {\tt !!} in response to a
+PAR\_\_ABORT is returned if a user enters \texttt{!!} in response to a
 prompt.  In this event you should ensure that your application exits
 immediately.  In practice this means that a) the user is not be prompted
 for any further parameters, though you do not have to check for an abort
@@ -1151,25 +641,24 @@ There must be a status check before any of the parameter values are
 used, in case they have not been obtained successfully.
 
 For example
-\begin{verbatim}
-          INCLUDE 'PAR_ERR'       ! PAR error constants
+\begin{terminalv}
+    INCLUDE 'PAR_ERR'       ! PAR error constants
 
-              :       :       :
+       :       :       :
 
-          CALL PAR_GET0I( 'STEP', NSTEP, STATUS )
-          CALL PAR_GET1R( 'HEIGHTS', 50, HEITS, NUMHTS, STATUS )
-          CALL PAR_GET0L( 'COLOUR', COLOUR, STATUS )
-          IF ( STATUS .EQ. PAR__ABORT ) THEN
-             < perform any tidying operations >
-             GOTO 999
-          END IF
+    CALL PAR_GET0I( 'STEP', NSTEP, STATUS )
+    CALL PAR_GET1R( 'HEIGHTS', 50, HEITS, NUMHTS, STATUS )
+    CALL PAR_GET0L( 'COLOUR', COLOUR, STATUS )
+    IF ( STATUS .EQ. PAR__ABORT ) THEN
+       < perform any tidying operations >
+       GOTO 999
+    END IF
 
-             < perform calculations >
+      < perform calculations >
 
-      999 CONTINUE
-          END
-
-\end{verbatim}
+999 CONTINUE
+    END
+\end{terminalv}
 performs three parameter get calls, before testing for an
 abort; if an abort status is found, the routine exits.  The status check
 against PAR\_\_ABORT is unusual, and it is included to illustrate the
@@ -1181,7 +670,7 @@ has occurred.
 
 PAR\_\_NULL indicates that no value is available, and may be interpreted
 according to circumstances.  This normally occurs when a user assigns a
-value of {\tt !} to a parameter.
+value of \texttt{!} to a parameter.
 
 Null can be used in a variety of circumstances.  These include to
 end a loop, to indicate that an optional file is not required, and to
@@ -1189,15 +678,15 @@ force a default value to be used.
 
 Here is an example of handling null as a valid value for a parameter.
 
-\begin{verbatim}
-          CALL ERR_MARK
-          CALL PAR_GET0R( 'WEIGHT', WEIGHT, STATUS )
-          IF ( STATUS .EQ. PAR__NULL ) THEN
-             WEIGHT = 1.0
-             CALL ERR_ANNUL( STATUS )
-          END IF
-          CALL ERR_RLSE
-\end{verbatim}
+\begin{terminalv}
+CALL ERR_MARK
+CALL PAR_GET0R( 'WEIGHT', WEIGHT, STATUS )
+IF ( STATUS .EQ. PAR__NULL ) THEN
+  WEIGHT = 1.0
+  CALL ERR_ANNUL( STATUS )
+END IF
+CALL ERR_RLSE
+\end{terminalv}
 
 When the PAR\_GET0R returns with the null status, the variable WEIGHT is
 set to 1.0.  This particular instance has limited value, but the
@@ -1213,33 +702,31 @@ for further details.
 
 Here null ends a loop, say to plot an histogram with different numbers
 of bins.
-\begin{verbatim}
-      100 CONTINUE
-          CALL ERR_MARK
-          CALL PAR_GET0I( 'NBINS', NBIN, STATUS )
-          IF ( STATUS .EQ. PAR__NULL ) THEN
-             CALL ERR_ANNUL( STATUS )
-             CALL ERR_RLSE
-             GOTO 200
-          END IF
-          CALL ERR_RLSE
+\begin{terminalv}
+ 100 CONTINUE
+     CALL ERR_MARK
+     CALL PAR_GET0I( 'NBINS', NBIN, STATUS )
+     IF ( STATUS .EQ. PAR__NULL ) THEN
+        CALL ERR_ANNUL( STATUS )
+        CALL ERR_RLSE
+        GOTO 200
+     END IF
+     CALL ERR_RLSE
 
-              < Perform calculations >
+         < Perform calculations >
 
-          GOTO 100
+     GOTO 100
 
-    *   Come here at the end of the calculations.
-      200 CONTINUE
-
-\end{verbatim}
+*   Come here at the end of the calculations.
+ 200 CONTINUE
+\end{terminalv}
 
 \section{\xlabel{extended_routines}Extended Routines}
 \label{se:extended}
 
 In addition to the basic routines there are some packaged facilities for
 common sequences of calls.  Most deal with dynamic control of acceptable
-values when getting the parameter.  Some are needed because the {\em
-in\/} choices and {\em range\/} limits imposed by the {\footnotesize
+values when getting the parameter.  Some are needed because the \emph{in\/} choices and \emph{range\/} limits imposed by the {\footnotesize
 ADAM} interface module are static, and therefore cannot be adjusted
 depending on the values of other parameters or data.  Note that in the
 extended routines that follow, all call a PAR\_GET$n$x routine which
@@ -1260,95 +747,95 @@ divisible by 3, set the dynamic default to 1, and interpret null to
 mean set the value to 3.  See
 \xref{SUN/104}{sun104}{} for details of the MSG\_ calls.
 
-\begin{verbatim}
-          LOGICAL NOTOK
-          INTEGER VALUE
+\begin{terminalv}
+     LOGICAL NOTOK
+     INTEGER VALUE
 
-              :       :       :
+         :       :       :
 
-    *  Set the dynamic default.
-          CALL PAR_DEF0I( 'NAME', 1, STATUS )
+*  Set the dynamic default.
+     CALL PAR_DEF0I( 'NAME', 1, STATUS )
 
-    *  Start a new error context.
-          CALL ERR_MARK
+*  Start a new error context.
+     CALL ERR_MARK
 
-    *  Loop to obtain the value of the parameter.
-    *  ==========================================
+*  Loop to obtain the value of the parameter.
+*  ==========================================
 
-    *  Initialise NOTOK to start off the loop and indicate that a
-    *  satisfactory value has yet to be obtained.
-          NOTOK = .TRUE.
+*  Initialise NOTOK to start off the loop and indicate that a
+*  satisfactory value has yet to be obtained.
+     NOTOK = .TRUE.
 
-      100 CONTINUE
+ 100 CONTINUE
 
-    *  The loop will keep going as long as a suitable value has not be read
-    *  and there is no error.
-             IF ( .NOT. NOTOK .OR. ( STATUS .NE. SAI__OK ) ) GOTO 120
+*  The loop will keep going as long as a suitable value has not be read
+*  and there is no error.
+        IF ( .NOT. NOTOK .OR. ( STATUS .NE. SAI__OK ) ) GOTO 120
 
-    *  Get a value from the parameter.
-             CALL PAR_GET0I( 'NAME', VALUE, STATUS )
+*  Get a value from the parameter.
+        CALL PAR_GET0I( 'NAME', VALUE, STATUS )
 
-    *  Check for an error before using the value.
-             IF ( STATUS .EQ. SAI__OK ) THEN
+*  Check for an error before using the value.
+        IF ( STATUS .EQ. SAI__OK ) THEN
 
-    *  Test the value against the constraints.  Here it is just to see
-    *  if the value is divisible by 3.  You can replace this expression
-    *  with more complicated constraints.
-                NOTOK = MOD( VALUE, 3 ) .EQ. 0
+*  Test the value against the constraints.  Here it is just to see
+*  if the value is divisible by 3.  You can replace this expression
+*  with more complicated constraints.
+           NOTOK = MOD( VALUE, 3 ) .EQ. 0
 
-    *  The value is not within the constraints, so report as an error,
-    *  including full information using tokens.  You would substitute a
-    *  routine name for fac_xxxxx.
-                IF ( NOTOK ) THEN
-                   STATUS = SAI__ERROR
-                   CALL MSG_SETC( 'PARAM, 'NAME' )
-                   CALL MSG_SETI( 'VALUE', VALUE )
+*  The value is not within the constraints, so report as an error,
+*  including full information using tokens.  You would substitute a
+*  routine name for fac_xxxxx.
+           IF ( NOTOK ) THEN
+              STATUS = SAI__ERROR
+              CALL MSG_SETC( 'PARAM, 'NAME' )
+              CALL MSG_SETI( 'VALUE', VALUE )
 
-                   CALL ERR_REP( 'fac_xxxxx_OUTR',
-         :           '^VALUE is not permitted for ^PARAM.  Please give '/
-         :           /'an integer not exactly divisible by 3.', STATUS )
+              CALL ERR_REP( 'fac_xxxxx_OUTR',
+    :           '^VALUE is not permitted for ^PARAM.  Please give '/
+    :           /'an integer not exactly divisible by 3.', STATUS )
 
-    *  The error is flushed so the user can see it immediately.
-                   CALL ERR_FLUSH( STATUS )
+*  The error is flushed so the user can see it immediately.
+              CALL ERR_FLUSH( STATUS )
 
-    *  Cancel the parameter to enable a retry to get a value satisfying
-    *  the constraint.
-                   CALL PAR_CANCL( 'NAME', STATUS )
-                END IF
+*  Cancel the parameter to enable a retry to get a value satisfying
+*  the constraint.
+              CALL PAR_CANCL( 'NAME', STATUS )
+           END IF
 
-    *  Use the default value following an error.
-             ELSE
+*  Use the default value following an error.
+        ELSE
 
-    *  Annul a null error to prevent an error report about null appearing.
-    *  Create a message informing the user of what has happened.
-                IF ( STATUS .EQ. PAR__NULL ) THEN
-                   CALL ERR_ANNUL( STATUS )
+*  Annul a null error to prevent an error report about null appearing.
+*  Create a message informing the user of what has happened.
+           IF ( STATUS .EQ. PAR__NULL ) THEN
+              CALL ERR_ANNUL( STATUS )
 
-    *  If MSG verbose output is requested, inform the user what has happened.
-    *  You would substitute a routine name for fac_xxxxx.
-                   CALL MSG_SETC( 'PARAM', 'NAME' )
-                   CALL MSG_OUTIF( MSG__VERB, 'fac_xxxxx_DEFA',
-         :           'A value of 3 has been adopted '/
-         :           /'for parameter ^PARAM.', STATUS )
-                END IF
+*  If MSG verbose output is requested, inform the user what has happened.
+*  You would substitute a routine name for fac_xxxxx.
+              CALL MSG_SETC( 'PARAM', 'NAME' )
+              CALL MSG_OUTIF( MSG__VERB, 'fac_xxxxx_DEFA',
+    :           'A value of 3 has been adopted '/
+    :           /'for parameter ^PARAM.', STATUS )
+           END IF
 
-    *  Set the returned value to the special case.
-                VALUE = 3
+*  Set the returned value to the special case.
+           VALUE = 3
 
-    *  Terminate the loop.
-                NOTOK = .FALSE.
-             END IF
+*  Terminate the loop.
+           NOTOK = .FALSE.
+        END IF
 
-    *  Go to the head of the loop.
-             GOTO 100
+*  Go to the head of the loop.
+        GOTO 100
 
-    *  Come here when the loop has been exited.  This includes when
-    *  an error status was returned by the PAR_GET0I routine.
-      120 CONTINUE
+*  Come here when the loop has been exited.  This includes when
+*  an error status was returned by the PAR_GET0I routine.
+ 120 CONTINUE
 
-    *  Release the new error context.
-          CALL ERR_RLSE
-\end{verbatim}
+*  Release the new error context.
+     CALL ERR_RLSE
+\end{terminalv}
 
 To set another constraint you have to modify the logical expression
 for variable NOTOK, and revise the ERR\_REP error report, possibly
@@ -1357,40 +844,40 @@ of permitted values, which is inclusive when VMAX is the larger of
 the two and exclusive when VMAX is less than VMIN.  The constraint
 expression could modified to the following.
 
-\begin{verbatim}
-    *  Check that the value is within the specified include or exclude
-    *  range, and not divisible by 3.
-            IF ( VMIN .GT. VMAX ) THEN
-               NOTOK = ( ( VALUE .LT. VMIN ) .AND. ( VALUE .GT. VMAX ) )
-     :                 .OR. ( MOD( VALUE, 3 ) .EQ. 0 )
-            ELSE
-               NOTOK = ( VALUE .LT. VMIN ) .OR. ( VALUE .GT. VMAX ) .OR.
-     :                 ( MOD( VALUE, 3 ) .NE. 0 )
-            END IF
-\end{verbatim}
+\begin{terminalv}
+*  Check that the value is within the specified include or exclude
+*  range, and not divisible by 3.
+       IF ( VMIN .GT. VMAX ) THEN
+          NOTOK = ( ( VALUE .LT. VMIN ) .AND. ( VALUE .GT. VMAX ) )
+:                 .OR. ( MOD( VALUE, 3 ) .EQ. 0 )
+       ELSE
+          NOTOK = ( VALUE .LT. VMIN ) .OR. ( VALUE .GT. VMAX ) .OR.
+:                 ( MOD( VALUE, 3 ) .NE. 0 )
+       END IF
+\end{terminalv}
 
 and the error report would look something like this
 
-\begin{verbatim}
-    *  The value is not within the constraints, so report as an error,
-    *  including full information using tokens.
-                IF ( NOTOK ) THEN
-                   STATUS = PAR__ERROR
-                   CALL MSG_SETC( 'PARAM', 'NAME' )
-                   CALL MSG_SETI( 'VALUE', VALUE )
-                   CALL MSG_SETI( 'MIN', VMIN )
-                   CALL MSG_SETI( 'MAX', VMAX )
-                   IF ( VMIN .GT. VMAX ) THEN
-                      CALL MSG_SETC( 'XCLD', 'outside' )
-                   ELSE
-                      CALL MSG_SETC( 'XCLD', 'in' )
-                   END IF
+\begin{terminalv}
+*  The value is not within the constraints, so report as an error,
+*  including full information using tokens.
+           IF ( NOTOK ) THEN
+              STATUS = PAR__ERROR
+              CALL MSG_SETC( 'PARAM', 'NAME' )
+              CALL MSG_SETI( 'VALUE', VALUE )
+              CALL MSG_SETI( 'MIN', VMIN )
+              CALL MSG_SETI( 'MAX', VMAX )
+              IF ( VMIN .GT. VMAX ) THEN
+                 CALL MSG_SETC( 'XCLD', 'outside' )
+              ELSE
+                 CALL MSG_SETC( 'XCLD', 'in' )
+              END IF
 
-                   CALL ERR_REP( 'fac_xxxxx_OUTR',
-     :               '^VALUE is not permitted for ^PARAM.  Please give '/
-     :               /'an integer ^XCLD the range ^MIN to ^MAX, and not '/
-     :               /'exactly divisible by 3.', STATUS )
-\end{verbatim}
+              CALL ERR_REP( 'fac_xxxxx_OUTR',
+:               '^VALUE is not permitted for ^PARAM.  Please give '/
+:               /'an integer ^XCLD the range ^MIN to ^MAX, and not '/
+:               /'exactly divisible by 3.', STATUS )
+\end{terminalv}
 
 In practice you would probably define a logical variable outside the loop
 to indicate whether the range was inclusive or exclusive.\footnote{In
@@ -1405,12 +892,12 @@ routines offer.
 \label{se:range}
 
 A parameter value may be forced to lie within a range using a call to
-the generic routine PAR\_GDR0x.  The name is derived from {\em G\/}et
-with a {\em D\/}efault and {\em R\/}ange.  For example,
+the generic routine PAR\_GDR0x.  The name is derived from \emph{G\/}et
+with a \emph{D\/}efault and \emph{R\/}ange.  For example,
 
-\begin{verbatim}
-          CALL PAR_GDR0R( 'SCALE', 1.0, 0.0, 2.0, .FALSE., SCAFAC, STATUS )
-\end{verbatim}
+\begin{terminalv}
+CALL PAR_GDR0R( 'SCALE', 1.0, 0.0, 2.0, .FALSE., SCAFAC, STATUS )
+\end{terminalv}
 
 gets the value for the real parameter SCALE using a dynamic default of
 1.0, stores the value in the variable SCAFAC, and ensures that the value
@@ -1420,11 +907,11 @@ another value. (This applies to all the routines with constraints
 described in Section~\ref{se:extended}.)  Thus the user would see
 something like the following.
 
-\begin{verbatim}
-    SCALE - Scale factor /1.0/ > 3.5
-    !! SUBPAR: 3.5 is greater than the MAXIMUM value 2.
-    SCALE - Scale factor /1.0/ >
-\end{verbatim}
+\begin{terminalv}
+SCALE - Scale factor /1.0/ > 3.5
+!! SUBPAR: 3.5 is greater than the MAXIMUM value 2.
+SCALE - Scale factor /1.0/ >
+\end{terminalv}
 
 The fifth argument (NULL) will normally be false.  When it is true, it
 instructs the PAR routine to return the dynamic-default value whenever a
@@ -1436,12 +923,12 @@ output.
 In the above case if NULL were made .TRUE., and the user entered the null
 symbol whilst in `verbose' mode, the dialogue would be as follows:
 
-\begin{verbatim}
-    SCALE - Scale factor /1.0/ > !
-    !! A value of 1 has been adopted for parameter SCALE.
-\end{verbatim}
+\begin{terminalv}
+SCALE - Scale factor /1.0/ > !
+!! A value of 1 has been adopted for parameter SCALE.
+\end{terminalv}
 
-NULL should only be set true when the dynamic default will {\em always\/} give
+NULL should only be set true when the dynamic default will \emph{always\/} give
 reasonable behaviour in the application.
 
 For all but the last example in Section~\ref{se:extended}, the null flag
@@ -1449,21 +936,21 @@ is set to .FALSE., and will not be mentioned again until then.
 
 Swapping the limits lets you exclude values in the range.  Therefore,
 
-\begin{verbatim}
-          CALL PAR_GDR0R( 'SCALE', 1.0, 2.0, 0.0, .FALSE., SCAFAC, STATUS )
-\end{verbatim}
+\begin{terminalv}
+CALL PAR_GDR0R( 'SCALE', 1.0, 2.0, 0.0, .FALSE., SCAFAC, STATUS )
+\end{terminalv}
 
 would permit a value of 3.5, unlike before, as well as 0.0 and 2.0.
 However, 1.5 would not now be acceptable.
 
-\begin{verbatim}
-    SCALE - Scale factor > 1.5
-    !! SUBPAR: 1.5 is in the excluded MIN/MAX range between 0 and 2.
-    SCALE - Scale factor >
-\end{verbatim}
+\begin{terminalv}
+SCALE - Scale factor > 1.5
+!! SUBPAR: 1.5 is in the excluded MIN/MAX range between 0 and 2.
+SCALE - Scale factor >
+\end{terminalv}
 
 Notice that the suggested default has disappeared.\footnote{This assumes
-that the ppath in the ADAM interface file starts with {\tt 'DYNAMIC'}.}
+that the ppath in the ADAM interface file starts with \texttt{'DYNAMIC'}.}
 This occurred because 1.0 violates the range constraint, and it is a
 feature of the PAR\_ extended routines.  If you do not want a dynamic
 default, set the dynamic-default argument to a value that violates the
@@ -1483,14 +970,14 @@ between limits.  The first permits up to a given number of values to be
 obtained.  We modify the example from the previous section to illustrate
 this routine.
 
-\begin{verbatim}
-          REAL SCAFAC( 10 )
+\begin{terminalv}
+ REAL SCAFAC( 10 )
 
-              :       :       :
+    :       :       :
 
-          CALL PAR_GDRVR( 'SCALE', 10, 0.0, 2.0, .FALSE., SCAFAC,
-         :                NVAL, STATUS )
-\end{verbatim}
+ CALL PAR_GDRVR( 'SCALE', 10, 0.0, 2.0, .FALSE., SCAFAC,
+:                NVAL, STATUS )
+\end{terminalv}
 
 This time up to ten values may be obtained from parameter SCALE, and
 stored in the array SCAFAC.  All the values must lie in the range
@@ -1504,13 +991,13 @@ intensities to define a colour, then the following code would obtain
 exactly three normalised intensities \dash\ one for each colour \dash\ between
 zero and one.
 
-\begin{verbatim}
-    *  Get an RGB colour.  The default is yellow.
-          DEFAUL( 1 ) = 1.0
-          DEFAUL( 2 ) = 1.0
-          DEFAUL( 3 ) = 0.0
-          CALL PAR_GDR1R( 'RGB', 3, DEFAUL, 0.0, 1.0, .FALSE., RGB, STATUS )
-\end{verbatim}
+\begin{terminalv}
+*  Get an RGB colour.  The default is yellow.
+     DEFAUL( 1 ) = 1.0
+     DEFAUL( 2 ) = 1.0
+     DEFAUL( 3 ) = 0.0
+     CALL PAR_GDR1R( 'RGB', 3, DEFAUL, 0.0, 1.0, .FALSE., RGB, STATUS )
+\end{terminalv}
 
 The default must be an array.  Should you not want a dynamic default in
 this case, just set the first element of DEFAUL to be negative or
@@ -1519,15 +1006,15 @@ greater than one.
 From the user's perspective, instructions will be given if additional
 values are required.
 
-\begin{verbatim}
-    RGB - Red, green, and blue intensities /[1.0,1.0,0.0]/ > 1.0,0,0,0.5
-    !! SUBPAR: No more than 3 elements are allowed for parameter RGB.
-    RGB - Red, green, and blue intensities /[1.0,1.0,0.0]/ > 1.0,0.0
-    !! 1 more value is still needed.
-    RGB - Red, green, and blue intensities /[1.0,1.0,0.0]/ > 1.0,0.0,0.0
-    !! SUBPAR: No more than 1 element is allowed for parameter RGB.
-    RGB - Red, green, and blue intensities /[1.0,1.0,0.0]/ > 0.0
-\end{verbatim}
+\begin{terminalv}
+RGB - Red, green, and blue intensities /[1.0,1.0,0.0]/ > 1.0,0,0,0.5
+!! SUBPAR: No more than 3 elements are allowed for parameter RGB.
+RGB - Red, green, and blue intensities /[1.0,1.0,0.0]/ > 1.0,0.0
+!! 1 more value is still needed.
+RGB - Red, green, and blue intensities /[1.0,1.0,0.0]/ > 1.0,0.0,0.0
+!! SUBPAR: No more than 1 element is allowed for parameter RGB.
+RGB - Red, green, and blue intensities /[1.0,1.0,0.0]/ > 0.0
+\end{terminalv}
 
 First the user gives too many values, and is told how many to give.
 Next too few are supplied, so PAR\_GDR1R asks for another.  Again
@@ -1542,31 +1029,31 @@ two-dimensional co-ordinates of a point within a rectangle, whose bounds
 are known.  The following code could obtain the required values, where
 LBND and UBND define the lower and upper co-ordinates of the rectangle.
 
-\begin{verbatim}
-          DOUBLE PRECISION DEFAUL( 2 ), POS( 2 )
-          DOUBLE PRECISION LBND( 2 ), UBND( 2 )
+\begin{terminalv}
+     DOUBLE PRECISION DEFAUL( 2 ), POS( 2 )
+     DOUBLE PRECISION LBND( 2 ), UBND( 2 )
 
-              :       :       :
+         :       :       :
 
-    *  Set the limits of the area in which the point must lie.
-          LBND( 1 ) = 0.0D0
-          UBND( 1 ) = 50.0D0
-          LBND( 2 ) = -20.0D0
-          UBND( 2 ) = 10.0D0
+*  Set the limits of the area in which the point must lie.
+     LBND( 1 ) = 0.0D0
+     UBND( 1 ) = 50.0D0
+     LBND( 2 ) = -20.0D0
+     UBND( 2 ) = 10.0D0
 
-    *  Get the co-ordinates of the point within the rectangle.  There
-    *  is no dynamic default because the default violates the range
-    *  constraint.
-          DEFAUL( 1 ) = -1.0D0
-          CALL PAR_GRM1D( 'POSITION', 2, DEFAUL, LBND, UBND,
-         :                .FALSE., POS, STATUS )
-\end{verbatim}
+*  Get the co-ordinates of the point within the rectangle.  There
+*  is no dynamic default because the default violates the range
+*  constraint.
+     DEFAUL( 1 ) = -1.0D0
+     CALL PAR_GRM1D( 'POSITION', 2, DEFAUL, LBND, UBND,
+    :                .FALSE., POS, STATUS )
+\end{terminalv}
 
 PAR\_GRM1x will inform the user of any value(s) that violate a range,
-and prompts for new values.  The name is derived from {\em G\/}et with
-{\em R\/}anges for {\em M\/}ultiple dimensions.\footnote{In retrospect
-the name probably should have been PAR\_GDM1x for {\em G\/}et with
-{\em D\/}efaults and {\em M\/}ultiple ranges, but the existing name is
+and prompts for new values.  The name is derived from \emph{G\/}et with
+\emph{R\/}anges for \emph{M\/}ultiple dimensions.\footnote{In retrospect
+the name probably should have been PAR\_GDM1x for \emph{G\/}et with
+\emph{D\/}efaults and \emph{M\/}ultiple ranges, but the existing name is
 already in use in applications.}
 
 If you want to constrain each value of an array to its own range, but do
@@ -1580,26 +1067,26 @@ ACTVAL returns the actual number values obtained from parameter
 COMPRESS, and in this example, it is used to set no compression for the
 higher dimensions.
 
-\begin{verbatim}
-    *  Set the acceptable range of values from no compression to compress
-    *  to a single element in a dimension.
-          DO I = 1, NDIM
-             CMPMIN( I ) = 1
-             CMPMAX( I ) = DIMS( I )
-          END DO
+\begin{terminalv}
+*  Set the acceptable range of values from no compression to compress
+*  to a single element in a dimension.
+     DO I = 1, NDIM
+        CMPMIN( I ) = 1
+        CMPMAX( I ) = DIMS( I )
+     END DO
 
-    *  Get the compression factors.
-          CALL PAR_GRMVI( 'COMPRESS', NDIM, CMPMIN, CMPMAX, COMPRS, ACTVAL,
-         :                STATUS )
+*  Get the compression factors.
+     CALL PAR_GRMVI( 'COMPRESS', NDIM, CMPMIN, CMPMAX, COMPRS, ACTVAL,
+    :                STATUS )
 
-    *  Should less values be supplied than the number of dimensions, do
-    *  not compress the higher dimensions.
-          IF ( ACTVAL .LT. NDIM ) THEN
-             DO I = ACTVAL + 1, NDIM
-                COMPRS( I ) = 1
-             END DO
-          END IF
-\end{verbatim}
+*  Should less values be supplied than the number of dimensions, do
+*  not compress the higher dimensions.
+     IF ( ACTVAL .LT. NDIM ) THEN
+        DO I = ACTVAL + 1, NDIM
+           COMPRS( I ) = 1
+        END DO
+     END IF
+\end{terminalv}
 
 \subsection{\xlabel{parity_constraint}Parity Constraint}
 
@@ -1607,16 +1094,16 @@ There are occasions when you need an odd or even integer.  For example,
 the size of a smoothing kernel must be odd.  PAR provides two routines
 with these functions.  Thus,
 
-\begin{verbatim}
-          CALL PAR_GODD( 'BOX', 5, 3, 11, .FALSE., BOXSIZ, STATUS )
-\end{verbatim}
+\begin{terminalv}
+CALL PAR_GODD( 'BOX', 5, 3, 11, .FALSE., BOXSIZ, STATUS )
+\end{terminalv}
 
 obtains an odd integer between 3 and 11 from parameter BOX, and stores
 it in variable BOXSIZ.  The dynamic default is 5.  Similarly,
 
-\begin{verbatim}
-          CALL PAR_GEVEN( 'OFFSET', 2, -2, 10, .FALSE., OFFS, STATUS )
-\end{verbatim}
+\begin{terminalv}
+CALL PAR_GEVEN( 'OFFSET', 2, -2, 10, .FALSE., OFFS, STATUS )
+\end{terminalv}
 gets a even value in the range $-$2 to 10 from parameter OFFSET, with a
 dynamic default of 2.  Zero counts as an even number, and so it would be
 acceptable here.
@@ -1636,17 +1123,17 @@ PAR\_CHOIC permits the user of your application to use an unambiguous
 abbreviation.  However, the unshortened value is returned.  The value is
 also in uppercase, though the list of options need not be so.
 
-\begin{verbatim}
-          CHARACTER * 10 FUNCT, OPTDEF
-          CHARACTER * 72 OPLIST
+\begin{terminalv}
+ CHARACTER * 10 FUNCT, OPTDEF
+ CHARACTER * 72 OPLIST
 
-              :       :       :
+    :       :       :
 
-          OPLIST = 'Exit,Device,Histogram,List,Peep,'/
-         :         /'Region,Save,Slice,Statistics,Value'
-          OPTDEF = 'Region'
-          CALL PAR_CHOIC( 'OPTION', OPTDEF, OPLIST, .FALSE., FUNCT, STATUS )
-\end{verbatim}
+ OPLIST = 'Exit,Device,Histogram,List,Peep,'/
+:         /'Region,Save,Slice,Statistics,Value'
+ OPTDEF = 'Region'
+ CALL PAR_CHOIC( 'OPTION', OPTDEF, OPLIST, .FALSE., FUNCT, STATUS )
+\end{terminalv}
 
 So in the above example there are ten options available for parameter
 OPTION.  The dynamic default is 'Region'.  If you assign the second
@@ -1655,22 +1142,22 @@ instructs PAR\_CHOIC not to set a dynamic default. Note that
 PAR\_CHOIC only returns character values.
 
 This is what the user might see for the above example.
-\begin{verbatim}
-    OPTION - Inspection option /'Region'/ > View
-    !! The choice View is not in the menu.  The options are
-    !     Exit,Device,Histogram,List,Peep,Region,Save,Slice,Statistics,Value.
-    !! Invalid selection for parameter OPTION.
-    OPTION - Inspection option /'Region'/ > S
-    !! The choice S is ambiguous.  The options are
-    !     Exit,Device,Histogram,List,Peep,Region,Save,Slice,Statistics,Value.
-    !! Invalid selection for parameter OPTION.
-    OPTION - Inspection option /'Region'/ > lust
-    Selected the nearest match "LIST" for parameter OPTION.
-\end{verbatim}
+\begin{terminalv}
+OPTION - Inspection option /'Region'/ > View
+!! The choice View is not in the menu.  The options are
+!     Exit,Device,Histogram,List,Peep,Region,Save,Slice,Statistics,Value.
+!! Invalid selection for parameter OPTION.
+OPTION - Inspection option /'Region'/ > S
+!! The choice S is ambiguous.  The options are
+!     Exit,Device,Histogram,List,Peep,Region,Save,Slice,Statistics,Value.
+!! Invalid selection for parameter OPTION.
+OPTION - Inspection option /'Region'/ > lust
+Selected the nearest match "LIST" for parameter OPTION.
+\end{terminalv}
 
 The first value is unacceptable as it is not in the menu.  The second is
 ambiguous because there are several options beginning with an ess. Had
-the user entered {\tt sl} say, the abbreviation would have selected a
+the user entered \texttt{sl} say, the abbreviation would have selected a
 value of 'SLICE'. The final value appears not to be in the list of
 choices, but PAR\_CHOIC allows the user one typing mistake, and so the
 user actually selects option 'LIST'. In this case, a warning message is output
@@ -1690,28 +1177,28 @@ application from which the following extract is taken wants to replace
 certain array values with a constant; this can either be a numeric value
 or set to the bad-pixel value.
 
-\begin{verbatim}
-          CHARACTER * ( VAL__SZR ) CNEWLO, THLDEF
+\begin{terminalv}
+     CHARACTER * ( VAL__SZR ) CNEWLO, THLDEF
 
-              :       :       :
+         :       :       :
 
-    *  Get the replacement value.
-          THLDEF = '0.0'
-          CALL PAR_MIX0R( 'NEWLO', THLDEF, VAL__MINR, VAL__MAXR,
-         :                'Bad', .FALSE., CNEWLO, STATUS )
+*  Get the replacement value.
+     THLDEF = '0.0'
+     CALL PAR_MIX0R( 'NEWLO', THLDEF, VAL__MINR, VAL__MAXR,
+    :                'Bad', .FALSE., CNEWLO, STATUS )
 
-          IF ( STATUS .EQ. SAI__OK ) THEN
+     IF ( STATUS .EQ. SAI__OK ) THEN
 
-    *  It may be the bad-pixel value.
-             IF ( CNEWLO .EQ. 'BAD' ) THEN
-                NEWLO = VAL__BADR
-             ELSE
+*  It may be the bad-pixel value.
+        IF ( CNEWLO .EQ. 'BAD' ) THEN
+           NEWLO = VAL__BADR
+        ELSE
 
-    *  Convert the output numeric string to its numeric value.
-                CALL CHR_CTOR( CNEWLO, NEWLO, STATUS )
-             END IF
-          END IF
-\end{verbatim}
+*  Convert the output numeric string to its numeric value.
+           CALL CHR_CTOR( CNEWLO, NEWLO, STATUS )
+        END IF
+     END IF
+\end{terminalv}
 
 This obtains from parameter NEWLO a value which is either 'BAD' or a
 real value.  The value is returned in variable CNEWLO.  VAL\_\_MINR and
@@ -1733,16 +1220,16 @@ to supply another value.
 
 Here is a more subtle example.  This only has numbers in the menu, but
 it is advantageous when only certain numeric values are acceptable.
-\begin{verbatim}
-    *  Get the plate number.
-          CALL PAR_MIX0I( 'PLATE', ' ', 101, 1500, '5,11,23,47,49',
-         :                .FALSE., CPLATE, STATUS )
-          IF ( STATUS .EQ. SAI__OK )
-         :  CALL CHR_CTOI( CPLATE, PLATNO, STATUS )
-\end{verbatim}
+\begin{terminalv}
+*  Get the plate number.
+     CALL PAR_MIX0I( 'PLATE', ' ', 101, 1500, '5,11,23,47,49',
+    :                .FALSE., CPLATE, STATUS )
+     IF ( STATUS .EQ. SAI__OK )
+    :  CALL CHR_CTOI( CPLATE, PLATNO, STATUS )
+\end{terminalv}
 
 Here PAR\_MIX0I obtains an `integer' that is either 5, 11, 23, 47, 49,
-or in the range 101\dash1500, and returns it in the {\em character\/}
+or in the range 101\dash1500, and returns it in the \emph{character\/}
 variable CPLATE.  CHR\_CTOI converts the string into a true integer
 value, PLATNO.  Since the second argument of PAR\_MIX0I is a blank
 string, there is no dynamic default.  To produce a suggested default,
@@ -1758,16 +1245,16 @@ defined, and has the capability of handling a null status.  Thus the
 following obtains a value from the parameter SWITCH and stores it in the
 variable called POWER.  The dynamic default is .TRUE..
 
-\begin{verbatim}
-           NULL = .FALSE.
-           CALL PAR_GTD0L( 'SWITCH', .TRUE., NULL, POWER, STATUS )
-\end{verbatim}
+\begin{terminalv}
+NULL = .FALSE.
+CALL PAR_GTD0L( 'SWITCH', .TRUE., NULL, POWER, STATUS )
+\end{terminalv}
 
 The third argument is the same as we met in Section~\ref{se:range}. If
 we reverse the polarity of NULL, PAR\_GTD0L will assign the dynamic
 default to POWER whenever the parameter is in the null state, and
 returns with STATUS set to SAI\_\_OK.  To reiterate NULL=.TRUE. should
-only be used when the dynamic default will {\em always\/} give
+only be used when the dynamic default will \emph{always\/} give
 reasonable behaviour in the application.  This is highly likely for a
 logical value.
 
@@ -1782,13 +1269,12 @@ graphics device.
 The values are obtained from such parameters by calling special routines
 within the particular subroutine library that connect to the
 {\footnotesize ADAM} parameter system.  The routines are usually called
-{\it fac}\_ASSOC, where {\it fac\/} is the facility name of the package,
-{\it e.g.}\ NDF\_ASSOC accesses an NDF whose name is found via a
+\textit{fac}\_ASSOC, where \textit{fac\/} is the facility name of the package,
+\textit{e.g.}\ NDF\_ASSOC accesses an NDF whose name is found via a
 parameter, and SGS\_ASSOC obtains the name of an SGS graphics device.
-There are also {\it fac}\_CANCL routines that free other resources
-opened by the corresponding {\it fac}\_ASSOC routine, and therefore you
-should not use PAR\_CANCL to cancel parameters obtained by using an {\it
-fac}\_ASSOC routine. However, it is possible and quite legitimate to
+There are also \textit{fac}\_CANCL routines that free other resources
+opened by the corresponding \textit{fac}\_ASSOC routine, and therefore you
+should not use PAR\_CANCL to cancel parameters obtained by using an \textit{fac}\_ASSOC routine. However, it is possible and quite legitimate to
 call PAR\_PROMT to set a prompt string for this class of parameter, or
 to call PAR\_DEF0C to set the dynamic default, or to find the state of a
 parameter using PAR\_STATE.
@@ -1800,9 +1286,9 @@ parameter using PAR\_STATE.
 To compile and link a UNIX {\footnotesize ADAM} application called prog
 with the PAR library, you should use the following command.
 
-\begin{verbatim}
-    alink prog.f
-\end{verbatim}
+\begin{terminalv}
+% alink prog.f
+\end{terminalv}
 
 \subsection{\xlabel{vms}VMS}
 
@@ -1810,11 +1296,11 @@ PAR is presently only available to {\footnotesize ADAM} programmers.
 Only the normal ADAM startup commands need be issued to access routines
 in the PAR library.  These are
 
-\begin{verbatim}
-     $ ADAMSTART
-     $ ADAMDEV
-     $ PAR_DEV
-\end{verbatim}
+\begin{terminalv}
+$ ADAMSTART
+$ ADAMDEV
+$ PAR_DEV
+\end{terminalv}
 
 and they will ensure that all necessary definitions are made for
 compilation and linking.
@@ -1823,10 +1309,10 @@ PAR is distributed as a shareable image, and it is included in the
 {\footnotesize ADAM} ALINK command.  So to link an {\footnotesize ADAM}
 A-task called PROG you just enter
 
-\begin{verbatim}
-     $ FORTRAN PROG
-     $ ALINK PROG
-\end{verbatim}
+\begin{terminalv}
+$ FORTRAN PROG
+$ ALINK PROG
+\end{terminalv}
 
 \section{\xlabel{acknowledgements}Acknowledgements}
 
@@ -2175,9 +1661,9 @@ All others are passed by pointer.
 Arrays must be passed with the elements stored in the order required by Fortran.
 
 All necessary constants and function prototypes can be defined by:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 #include "par.h"
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 \section{\xlabel{c_interface_function_prototypes}The C Interface Function Prototypes}
 Where \textit{T} is one of d, i, l, r and \textit{TYPE} is the corresponding C
@@ -2465,7 +1951,7 @@ type, the function prototypes are:
          The suggested default value for the parameter.  No default
          will be suggested when DEFAUL is not one of the options defined
          by OPTS.  A status of PAR\_\_AMBIG is returned if the default is
-         ambiguous, {\it i.e.}\ an abbreviation of more than one of the
+         ambiguous, \textit{i.e.}\ an abbreviation of more than one of the
          options.
       }
       \sstsubsection{
@@ -2513,7 +1999,7 @@ type, the function prototypes are:
          \item A match is found when the value equals the full name of an
          option.  This enables an option to be the prefix of another
          item without it being regarded as ambiguous.  For example,
-         {\tt "}10,100,200{\tt "} would be an acceptable list of options.
+         \texttt{"}10,100,200\texttt{"} would be an acceptable list of options.
          \item If there is no exact match, an abbreviation is acceptable.
          A comparison is made of the value with each option for the
          number of characters in the value.  The option that best fits
@@ -2592,7 +2078,7 @@ type, the function prototypes are:
       \item  A match is found when the value equals the full name of an
          option.  This enables an option to be the prefix of another
          item without it being regarded as ambiguous.  For example,
-         {\tt "}10,100,200{\tt "} would be an acceptable list of options.
+         \texttt{"}10,100,200\texttt{"} would be an acceptable list of options.
          \item If there is no exact match, an abbreviation is acceptable.
          A comparison is made of the value with each option for the
          number of characters in the value.  The option that best fits
@@ -2646,7 +2132,7 @@ type, the function prototypes are:
    \sstnotes{
       \sstitemlist{
          \sstitem There is a routine for each of the data types character,
-         double precision, integer, logical, and real: replace {\tt "x"} in the
+         double precision, integer, logical, and real: replace \texttt{"x"} in the
          routine name by C, D, I, L, or R respectively as appropriate.  The
          VALUE argument must have the corresponding data type.
       }
@@ -2697,7 +2183,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types character,
-         double precision, integer, logical, and real: replace {\tt "x"} in the
+         double precision, integer, logical, and real: replace \texttt{"x"} in the
          routine name by C, D, I, L, or R respectively as appropriate.  The
          VALUES argument must have the corresponding data type.
       }
@@ -2758,7 +2244,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types character,
-         double precision, integer, logical, and real: replace {\tt "x"} in the
+         double precision, integer, logical, and real: replace \texttt{"x"} in the
          routine name by C, D, I, L, or R respectively as appropriate.  The
          VALUES argument must have the corresponding data type.
 
@@ -2821,7 +2307,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types character,
-         double precision, integer, logical, and real: replace {\tt "x"} in the
+         double precision, integer, logical, and real: replace \texttt{"x"} in the
          routine name by C, D, I, L, or R respectively as appropriate.  The
          VALUES argument must have the corresponding data type.
 
@@ -2913,7 +2399,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types double precision,
-         integer, and real: replace {\tt "x"} in the routine name by
+         integer, and real: replace \texttt{"x"} in the routine name by
          D, I, or R respectively as appropriate.  The DEFAUL, VMIN,
          VMAX, and VALUE arguments all must have the corresponding
          data type.
@@ -3011,7 +2497,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types double precision,
-         integer, and real: replace {\tt "x"} in the routine name by
+         integer, and real: replace \texttt{"x"} in the routine name by
          D, I, or R respectively as appropriate.  The DEFAUL, VMIN, VMAX,
          and VALUES arguments all must have the corresponding data type.
 
@@ -3089,7 +2575,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types double precision,
-         integer, and real: replace {\tt "x"} in the routine name by D, I, or R
+         integer, and real: replace \texttt{"x"} in the routine name by D, I, or R
          respectively as appropriate.  The VMIN, VMAX, and VALUES arguments
          all must have the corresponding data type.
 
@@ -3139,7 +2625,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types character,
-         double precision, integer, logical, and real: replace {\tt "x"} in the
+         double precision, integer, logical, and real: replace \texttt{"x"} in the
          routine name by C, D, I, L, or R respectively as appropriate.  The
          VALUE argument must have the corresponding data type.
 
@@ -3194,7 +2680,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types character,
-         double precision, integer, logical, and real: replace {\tt "x"} in the
+         double precision, integer, logical, and real: replace \texttt{"x"} in the
          routine name by C, D, I, L, or R respectively as appropriate.  The
          VALUES argument must have the corresponding data type.
 
@@ -3261,7 +2747,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types character,
-         double precision, integer, logical, and real: replace {\tt "x"} in the
+         double precision, integer, logical, and real: replace \texttt{"x"} in the
          routine name by C, D, I, L, or R respectively as appropriate.  The
          VALUES argument must have the corresponding data type.
 
@@ -3280,7 +2766,7 @@ type, the function prototypes are:
 }{
    \sstdescription{
       This routine obtains an array of values from a parameter
-      as if the parameter were vectorized ({\it i.e.}\ regardless of its
+      as if the parameter were vectorized (\textit{i.e.}\ regardless of its
       dimensionality).  If necessary, the values are converted to the
       required type.
    }
@@ -3320,7 +2806,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types character,
-         double precision, integer, logical, and real: replace {\tt "x"} in the
+         double precision, integer, logical, and real: replace \texttt{"x"} in the
          routine name by C, D, I, L, or R respectively as appropriate.  The
          VALUES argument must have the corresponding data type.
 
@@ -3590,7 +3076,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types double precision,
-         integer, and real: replace {\tt "x"} in the routine name by D, I, or R
+         integer, and real: replace \texttt{"x"} in the routine name by D, I, or R
          respectively as appropriate.  The DEFAUL, VMIN, VMAX, and VALUES
          arguments must have the corresponding data type.
 
@@ -3676,7 +3162,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types double precision,
-         integer, and real: replace {\tt "x"} in the routine name by D, I, or R
+         integer, and real: replace \texttt{"x"} in the routine name by D, I, or R
          respectively as appropriate.  The VMIN, VMAX, and VALUES
          arguments must have the corresponding data type.
 
@@ -3783,7 +3269,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types character,
-         integer, real, and double precision: replace {\tt "x"} in the routine
+         integer, real, and double precision: replace \texttt{"x"} in the routine
          name by C, I, R, or D respectively as appropriate.  The VALUE
          argument must have the corresponding data type.  If the parameter
          has a different type, the maximum value will be converted to the
@@ -3844,7 +3330,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types character,
-         integer, real, and double precision: replace {\tt "x"} in the routine
+         integer, real, and double precision: replace \texttt{"x"} in the routine
          name by C, I, R, or D respectively as appropriate.  The VALUE
          argument must have the corresponding data type.  If the parameter
          has a different type, the minimum value will be converted to the
@@ -3904,7 +3390,7 @@ type, the function prototypes are:
          will be suggested when DEFAUL is not numeric within the range
          of acceptable values defined by VMIN and VMAX, and not one of
          the options defined by OPTS.  A status of PAR\_\_AMBIG is
-         returned if the default is ambiguous, {\it i.e.}\ an abbreviation of
+         returned if the default is ambiguous, \textit{i.e.}\ an abbreviation of
          more than one of the options.
       }
       \sstsubsection{
@@ -3969,7 +3455,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types double precision,
-         integer, and real: replace {\tt "x"} in the routine name by D, I, or R
+         integer, and real: replace \texttt{"x"} in the routine name by D, I, or R
          respectively as appropriate.  The VMIN and VMAX arguments must
          have the corresponding data type.
 
@@ -3978,7 +3464,7 @@ type, the function prototypes are:
          value obtained from the parameter.
 
       In the first the value is converted to the data type specified by
-      the {\tt "x"} in the routine name.  If this is successful, the derived
+      the \texttt{"x"} in the routine name.  If this is successful, the derived
       numeric value is compared with the range of acceptable values
       defined by VMIN and VMAX.  A value satisfying these constraints
       is returned in VALUE and the routine exits.
@@ -3987,7 +3473,7 @@ type, the function prototypes are:
       an item in the menu.  This step adheres to the following rules.
          \begin{itemize}
          \item  The value is converted to the data type specified by the
-         {\tt "x"} in the routine name.  If this is successful, the numeric
+         \texttt{"x"} in the routine name.  If this is successful, the numeric
          value is compared with the range of acceptable values defined
          by VMIN and VMAX.  A value satisfying these constraints is
          returned and the matching process terminates.
@@ -3996,7 +3482,7 @@ type, the function prototypes are:
          \item  A match is found when the value equals the full name of an
          option.  This enables an option to be the prefix of another
          item without it being regarded as ambiguous.  For example,
-         {\tt "}10,100,200{\tt "} would be an acceptable list of options.
+         \texttt{"}10,100,200\texttt{"} would be an acceptable list of options.
          \item If there is no exact match, an abbreviation is acceptable.
          A comparison is made of the value with each option for the
          number of characters in the value.  The option that best fits
@@ -4099,7 +3585,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types double precision,
-         integer, and real: replace {\tt "x"} in the routine name by D, I, or R
+         integer, and real: replace \texttt{"x"} in the routine name by D, I, or R
          respectively as appropriate.  The VMIN and VMAX arguments must
          have the corresponding data type.
 
@@ -4108,7 +3594,7 @@ type, the function prototypes are:
          value obtained from the parameter.
 
       In the first the value is converted to the data type specified by
-      the {\tt "x"} in the routine name.  If this is successful, the derived
+      the \texttt{"x"} in the routine name.  If this is successful, the derived
       numeric value is compared with the range of acceptable values
       defined by VMIN and VMAX.  A value satisfying these constraints
       is returned in the VALUES.
@@ -4117,7 +3603,7 @@ type, the function prototypes are:
       an item in the menu.  This step adheres to the following rules.
          \begin{itemize}
          \item  The value is converted to the data type specified by the
-         {\tt "x"} in the routine name.  If this is successful, the numeric
+         \texttt{"x"} in the routine name.  If this is successful, the numeric
          value is compared with the range of acceptable values defined
          by VMIN and VMAX.  A value satisfying these constraints is
          returned and the matching process terminates.
@@ -4126,7 +3612,7 @@ type, the function prototypes are:
          \item  A match is found when the value equals the full name of an
          option.  This enables an option to be the prefix of another
          item without it being regarded as ambiguous.  For example,
-         {\tt "}10,100,200{\tt "} would be an acceptable list of options.
+         \texttt{"}10,100,200\texttt{"} would be an acceptable list of options.
          \item If there is no exact match, an abbreviation is acceptable.
          A comparison is made of the value with each option for the
          number of characters in the value.  The option that best fits
@@ -4212,7 +3698,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types character,
-         double precision, integer, logical, and real: replace {\tt "x"} in the
+         double precision, integer, logical, and real: replace \texttt{"x"} in the
          routine name by C, D, I, L, or R respectively as appropriate.  The
          VALUE argument must have the corresponding data type.
 
@@ -4275,7 +3761,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types character,
-         double precision, integer, logical, and real: replace {\tt "x"} in the
+         double precision, integer, logical, and real: replace \texttt{"x"} in the
          routine name by C, D, I, L, or R respectively as appropriate.  The
          VALUES argument must have the corresponding data type.
 
@@ -4354,7 +3840,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types character,
-         double precision, integer, logical, and real: replace {\tt "x"} in the
+         double precision, integer, logical, and real: replace \texttt{"x"} in the
          routine name by C, D, I, L, or R respectively as appropriate.  The
          VALUES argument must have the corresponding data type.
 
@@ -4381,7 +3867,7 @@ type, the function prototypes are:
 }{
    \sstdescription{
       This routine puts a one-dimensional array of primitive values into
-      a parameter as it if the parameter were vectorized ({\it i.e.}\
+      a parameter as it if the parameter were vectorized (\textit{i.e.}\
       regardless of its actual dimensionality).  If necessary, the
       specified array is converted to the type of the parameter.
    }
@@ -4416,7 +3902,7 @@ type, the function prototypes are:
 
          \sstitem
          There is a routine for each of the data types character,
-         double precision, integer, logical, and real: replace {\tt "x"} in the
+         double precision, integer, logical, and real: replace \texttt{"x"} in the
          routine name by C, D, I, L, or R respectively as appropriate.  The
          VALUES argument must have the corresponding data type.
 
