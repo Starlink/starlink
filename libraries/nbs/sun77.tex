@@ -1,3 +1,4 @@
+\documentclass[twoside,11pt,nolof]{starlink}
 %------------------------------------------------------------------------------
 %+				N B S . T E X
 %
@@ -21,6 +22,7 @@
 %    17-Oct-95 - MJB - version 2.5.5 (2.5.4 never released)
 %    30-Apr-98 - TIMJ- convert Tex to latex2e so that WWW version
 %                      can be generated.
+%    9-Dec-2014 - TIMJ - convert to new Starlink latex class. Remove man.sty
 %
 %  Notes:
 %
@@ -29,21 +31,17 @@
 %-
 %------------------------------------------------------------------------------
 
-
-\documentclass[twoside,11pt]{article}
-\pagestyle{headings}
-
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocnumber}    {77.8}
-\newcommand{\stardocauthors}   {D.J. Allan}
-\newcommand{\stardocdate}      {11 September 1995}
-\newcommand{\stardoctitle}     {NBS \\ [1ex] The Noticeboard System}
-\newcommand{\stardocversion}   {Version 2.5.5}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocmanual}    {Programmer's Manual}
-\newcommand{\stardocabstract}  {This document describes Version 2.5.5 of the Noticeboard System. It
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocnumber      {77.8}
+\stardocauthors     {D.J. Allan}
+\stardocdate        {11 September 1995}
+\stardoctitle       {NBS \\ [1ex] The Noticeboard System}
+\stardocversion     {Version 2.5.5}
+\stardocsource      {sun\stardocnumber}
+\stardocmanual      {Programmer's Manual}
+\stardocabstract  {This document describes Version 2.5.5 of the Noticeboard System. It
 is aimed at programmers interested in or intending to use the system and
 contains all information necessary to use it.
 }
@@ -51,791 +49,20 @@ contains all information necessary to use it.
 
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-
 % -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+% ? Document specific \providecommand or \newenvironment commands.
 
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
-
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-1.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-%   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
-
-%+                              M A N . S T Y
-%
-%  Module name:
-%    MAN.STY
-%
-%  Function:
-%    Default definitions for \LaTeX\ macros used in MAN output
-%
-%  Description:
-%    As much as possible of the output from the MAN automatic manual generator
-%    uses calls to user-alterable macros rather than direct calls to built-in
-%    \LaTeX\ macros. This file contains the default definitions for these
-%    macros.
-%
-%  Language:
-%    \LaTeX
-%
-%  Support:
-%    William Lupton, {AAO}
-%-
-%  History:
-%    16-Nov-88 - WFL - Add definitions to permit hyphenation to work on
-%		 words containing special characters and in teletype fonts.
-%    21-Mar-90 - WFL - Use \makeatletter and \makeatother; tidy
-%    14-Nov-91 - WFL - Add \manroutinebreakitem that inserts a line break
-%	       after any text that appears on the initial line of the paragraph
-%    15-Nov-91 - WFL - Always put \mbox{} after \item to protect against missing
-%	       item text; remove spaces before { and [
-%    20-Aug-92 - WFL - Extra parameter to \manroutine and shunt up existing ones
-%	       (to facilitate use of \label and \ref)
-%    10-Aug-94 - WFL - Cut out "\_" definition (screws up latex2html!); added
-%	       unprocessed item name argument to \mansectionitem
-%    18-Oct-94 - WFL - Decided that changing args to macros is too naughty so
-%	       instead added new \mansectionitemA macro with the extra arg
-%    19-Jul-96 - WFL - replaced hyphenchar with DeclreFontFamily for LaTeX2e
-
-\typeout{Default MAN macros. Released 19th July 1996}
-
-% permit use of @ characters in names
-
-\makeatletter
-
-% permit hyphenation when in teletype font (support 9,10,11,12 point only -
-% could extend), define lccodes for special characters so that the hyphen-
-% ation algorithm is not switched off. Define underscore character to be
-% explicit underscore rather than lots of kerns etc.
-
-%\hyphenchar\nintt=`-\hyphenchar\tentt=`-\hyphenchar\elvtt=`-\hyphenchar\twltt=`-
-% Latex2e - tell cmtt to hyphenate
-\DeclareFontFamily{OT1}{cmtt}{\hyphenchar\font=45}
-
-% \lccode`_=`_\lccode`$=`$
-
-%\renewcommand{\_}{{\tt\char'137}}
-
-%+                      M A N _ I N T R O
-%
-%  Section name:
-%    MAN_INTRO
-%
-%  Function:
-%    Macros used in the .TEX_INTRO file
-%
-%  Description:
-%    There are no such special macros.
-%-
-
-%+                      M A N _ S U M M A R Y
-%
-%  Section name:
-%    MAN_SUMMARY
-%
-%  Function:
-%    Macros used in the .TEX_SUMMARY file
-%
-%  Description:
-%    There is a command to introduce a new section (mansection) and a list-like
-%    environment (mansectionroutines) that handles the list of routines in the
-%    current section. In addition a mansectionitem command can be used instead
-%    of the item command to introduce a new routine in the current section.
-%-
-
-\newcommand{\mansection}[2]{\subsection{#1 --- #2}}
-
+\providecommand{\noteroutine}[3]{\item[\htmlref{#1}{#2}:]\mbox{} #3}
+\providecommand{\mansection}[2]{\subsection{#1 --- #2}}
 \newenvironment{mansectionroutines}{\begin{quote}\begin{description}}%
 {\end{description}\end{quote}}
-
-\newcommand{\mansectionitem}[1]{\item[#1:]\mbox{}}
-
-% This form (which wflman V2.0 generates) passes an un-processed version of the
-% section item name, useful for cross-references
-\newcommand{\mansectionitemA}[2]{\item[#1:]\mbox{}}
-
-%+                      M A N _ D E S C R
-%
-%  Section name:
-%    MAN_DESCR
-%
-%  Function:
-%    Macros used in the .TEX_DESCR file
-%
-%  Description:
-%    There is a command to introduce a new routine (manroutine) and a list-like
-%    environment (manroutinedescription) that handles the list of paragraphs
-%    describing the current routine. In addition a manroutineitem or
-%    manroutinebreakitem command can be used instead of the item command to
-%    introduce a new paragraph for the current routine.
-%
-%    Two-column tables (the ones that can occur anywhere and which are
-%    triggered by "=>" as the second token on a line) are bracketed by a
-%    new environment (mantwocolumntable). Other sorts of table are introduced
-%    by relevant  environments (manparametertable, manfunctiontable and
-%    manvaluetable). The definitions of these environments call various other
-%    user-alterable commands, thus allowing considerable user control over such
-%    tables... (to be filled in when the commands have been written)
-%-
-
-\newcommand{\manrule}{\rule{\textwidth}{0.5mm}}
-
-\newcommand{\manroutine}[3]{\subsection{#1 --- #2}}
-
-\newenvironment{manroutinedescription}{\begin{description}}{\end{description}%
-\manrule}
-
-\newenvironment{mansubparameterdescription}{\begin{description}}%
-{\end{description}}
-
-\newcommand{\manroutineitem}[2]{\item[#1:] #2\mbox{}}
-
-\newcommand{\manroutinebreakitem}[2]{\item[#1:] #2\hfill\\}
-
-% two column tables
-
-\newcommand{\mantwocolumncols}{||l|p{80mm}||}
-
-\newcommand{\mantwocolumntop}{\hline}
-
-\newcommand{\mantwocolumnblank}{\mantwocolumn@ss\mantwocolumn@hl%
-\gdef\mantwocolumn@hl{}\gdef\mantwocolumn@ss{}}
-
-\newcommand{\mantwocolumnbottom}{\mantwocolumn@ss\mantwocolumn@hl}
-
-\newenvironment{mantwocolumntable}{%
-\hspace*{\fill}\vspace*{-\partopsep}%
-\begin{center}%
-\begin{tabular}{\mantwocolumncols}%
-\mantwocolumntop%
-\gdef\mantwocolumn@ss{}\gdef\mantwocolumn@hl{}}%
-{\mantwocolumnbottom%
-\end{tabular}%
-\end{center}}
-
-\newcommand{\mantwocolumnentry}[1]{\mantwocolumn@ss\gdef\mantwocolumn@ss{\\}%
-\gdef\mantwocolumn@hl{\hline}#1 & }
-
-% parameter tables
-
-\newcommand{\manparametercols}{lllp{80mm}}
-
-\newcommand{\manparameterorder}[3]{#1 & #2 & #3 & }
-
-\newcommand{\manparametertop}{}
-
-\newcommand{\manparameterblank}{\gdef\manparameter@hl{}\gdef\manparameter@ss{}}
-
-\newcommand{\manparameterbottom}{}
-
-\newenvironment{manparametertable}{\gdef\manparameter@ss{}%
-\gdef\manparameter@hl{}\hspace*{\fill}\vspace*{-\partopsep}\begin{trivlist}%
-\item[]\begin{tabular}{\manparametercols}\manparametertop}{\manparameterbottom%
-\end{tabular}\end{trivlist}}
-
-\newcommand{\manparameterentry}[3]{\manparameter@ss\gdef\manparameter@ss{\\}%
-\gdef\manparameter@hl{\hline}\manparameterorder{#1}{#2}{#3}}
-
-% return tables
-
-\newcommand{\manreturncols}{lllp{80mm}}
-
-\newcommand{\manreturnorder}[3]{#1 & #2 & #3 & }
-
-\newcommand{\manreturntop}{}
-
-\newcommand{\manreturnblank}{\gdef\manreturn@hl{}\gdef\manreturn@ss{}}
-
-\newcommand{\manreturnbottom}{}
-
-\newenvironment{manreturntable}{\gdef\manreturn@ss{}%
-\gdef\manreturn@hl{}\hspace*{\fill}\vspace*{-\partopsep}\begin{trivlist}%
-\item[]\begin{tabular}{\manreturncols}\manreturntop}{\manreturnbottom%
-\end{tabular}\end{trivlist}}
-
-\newcommand{\manreturnentry}[3]{\manreturn@ss\gdef\manreturn@ss{\\}%
-\gdef\manreturn@hl{\hline}\manreturnorder{#1}{#2}{#3}}
-
-% function tables
-
-\newcommand{\manfunctioncols}{||l|l|p{80mm}||}
-
-\newcommand{\manfunctionorder}[2]{#1 & #2 & }
-
-\newcommand{\manfunctiontop}{\hline}
-
-\newcommand{\manfunctionblank}{\manfunction@ss\manfunction@hl%
-\gdef\manfunction@ss{}\gdef\manfunction@hl{}}
-
-\newcommand{\manfunctionbottom}{\manfunction@ss\manfunction@hl}
-
-\newenvironment{manfunctiontable}{\gdef\manfunction@ss{}\gdef\manfunction@hl{}%
-\hspace*{\fill}\vspace*{-\partopsep}\begin{center}\begin{tabular}%
-{\manfunctioncols}\manfunctiontop}{\manfunctionbottom\end{tabular}\end{center}}
-
-\newcommand{\manfunctionentry}[2]{\manfunction@ss\gdef\manfunction@ss{\\}%
-\gdef\manfunction@hl{\hline}\manfunctionorder{#1}{#2}}
-
-% value tables
-
-\newcommand{\manvaluecols}{||l|l|l|p{80mm}||}
-
-\newcommand{\manvalueorder}[3]{#1 & #2 & #3 & }
-
-\newcommand{\manvaluetop}{\hline}
-
-\newcommand{\manvalueblank}{\manvalue@ss\manvalue@hl\gdef\manvalue@ss{}%
-\gdef\manvalue@hl{}}
-
-\newcommand{\manvaluebottom}{\manvalue@ss\manvalue@hl}
-
-\newenvironment{manvaluetable}{\gdef\manvalue@ss{}\gdef\manvalue@hl{}%
-\hspace*{\fill}\vspace*{-\partopsep}\begin{center}\begin{tabular}%
-{\manvaluecols}\manvaluetop}{\manvaluebottom\end{tabular}\end{center}}
-
-\newcommand{\manvalueentry}[3]{\manvalue@ss\gdef\manvalue@ss{\\}%
-\gdef\manvalue@hl{\hline}\manvalueorder{#1}{#2}{#3}}
-
-% list environments
-
-\newenvironment{manenumerate}{\begin{enumerate}}{\end{enumerate}}
-
-\newcommand{\manenumerateitem}[1]{\item[#1]\mbox{}}
-
-\newenvironment{manitemize}{\begin{itemize}}{\end{itemize}}
-
-\newcommand{\manitemizeitem}{\item\mbox{}}
-
-\newenvironment{mandescription}{\begin{description}\begin{description}}%
-{\end{description}\end{description}}
-
-\newcommand{\mandescriptionitem}[1]{\item[#1]\mbox{}}
-
-% teletype conversion
-
-\newcommand{\mantt}{\tt}
-
-% "semi-verbatim" environment (modified from LaTeX source)
-
-\def\@mansemiverbatim{\trivlist\item[]\if@minipage\else\vskip\parskip\fi%
-\leftskip\@totalleftmargin\rightskip\z@%
-\parindent\z@\parfillskip\@flushglue\parskip\z@%
-\@tempswafalse\def\par{\if@tempswa\hbox{}\fi\@tempswatrue\@@par}%
-\obeylines}
-
-\def\mansemiverbatim{\@mansemiverbatim\frenchspacing\@vobeyspaces}
-
-\let\endmansemiverbatim=\endtrivlist
-
-% forbid use of @ characters in names
-
-\makeatother
-
-
-
-
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\textsc Rutherford Appleton Laboratory} \hfill {\textbf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\textbf \stardocversion \\ [4ex]}
-   {\Huge\textbf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-
+\scfrontmatter
 
 \section {Introduction}
 
@@ -870,7 +97,7 @@ contains all information necessary to use it.
       \section {General Description}
       \subsection {Names and Types} All names and types are converted to
       upper-case and all white space and non-printing characters in them are
-      ignored. Thus `` {\tt William Lupton} '' is regarded as ``{\tt%
+      ignored. Thus `` \texttt{William Lupton} '' is regarded as ``{\tt%
 WILLIAMLUPTON}''. An
       upper limit of 16 characters is imposed on both names and types (the
       limit applies to the length after the removal of white space and
@@ -886,19 +113,19 @@ WILLIAMLUPTON}''. An
       noticeboard system is that a noticeboard is static in structure. Its
       structure must be defined before any values are put into it and once the
       definition is complete no more items can be created. There are a set of
-      routines called {\tt NBS\_DEFINE\_* } and {\tt NBS\_*\_DEFINITION}
+      routines called \texttt{NBS\_DEFINE\_* } and \texttt{NBS\_*\_DEFINITION}
       which allow definition
       of noticeboard contents, saving definitions to and restoring them from
       file (the initial state of a noticeboard is that all items have zero
       length values). Only once the definition phase is complete can the
-      {\tt NBS\_PUT\_*} and {\tt NBS\_GET\_*} routines be used.
+      \texttt{NBS\_PUT\_*} and \texttt{NBS\_GET\_*} routines be used.
 
       The initial reason for this was efficiency. However it is not in fact
       particularly difficult to allow new items to created on the fly without
       compromising efficiency and this restriction should be seen more as a way
       of preventing the noticeboard routines from being used for purposes for
       which they were not designed and for which better tools (such as
-      {\tt HDS}) exist. Note that this ``static'' restriction refers only to
+      \texttt{HDS}) exist. Note that this ``static'' restriction refers only to
       the creation of
       items in the noticeboard. It is always possible to change item shapes and
       values.
@@ -908,26 +135,26 @@ WILLIAMLUPTON}''. An
       or else the definition plus the data. If only the definition is saved
       then each time that the definition is restored
       all items will revert to having zero lengths. However if the data
-      is saved as well the {\tt NBS\_RESTORE\_NOTICEBOARD} routine can be used
+      is saved as well the \texttt{NBS\_RESTORE\_NOTICEBOARD} routine can be used
       to restore both the definition and the data, and a subsequent call
-      to {\tt NBS\_SAVE\_NOTICEBOARD} will update the disc file so that
+      to \texttt{NBS\_SAVE\_NOTICEBOARD} will update the disc file so that
       the next
       time that the noticeboard is restored it will be in the same state
       as when it was saved.
 
-      \subsection {C-callable Version} The {\tt NBS} routines have been %
+      \subsection {C-callable Version} The \texttt{NBS} routines have been %
       implemented to make them easy to use from Fortran, and for this
       reason all character strings are passed as standard Fortran character
-      arguments (address of {\tt VMS} descriptor on {\tt VMS}, character
+      arguments (address of \texttt{VMS} descriptor on \texttt{VMS}, character
       pointer with trailing hidden length argument on most other architectures)
       and all other parameters are passed by reference.
 
       The routines are actually written in C and it
       would be unreasonable and wasteful to force C programmers to build
       descriptors just so that they could be decoded back to the same C strings
-      that they started off as. For this reason, every {\tt NBS} routine %
+      that they started off as. For this reason, every \texttt{NBS} routine %
 (except a few which handle character strings) has an
-      associated {\tt NBC} routine which passes all character parameters %
+      associated \texttt{NBC} routine which passes all character parameters %
 as C
       zero-terminated strings, all input scalar parameters by value and all
       other parameters by reference. See the source of the demonstration
@@ -935,62 +162,62 @@ as C
       of the use of this C-callable version.
 
       \subsection {Portability to UNIX}
-      {\tt NBS} V2.4 was the first version of {\tt NBS} to be fully portable
+      \texttt{NBS} V2.4 was the first version of \texttt{NBS} to be fully portable
       to UNIX -- V2.2 onwards was written portably but had several
       deficiencies and bugs. The shared memory services of UNIX System V
-      are sufficiently close to the {\tt VMS} global section system
+      are sufficiently close to the \texttt{VMS} global section system
       services to require only a small amount of conditionally compiled code
       in the low-level ``create section'' and ``map section'' routines.
       There are however two limitations which may affect users planning
-      to use the software on {\tt UNIX} platforms.
+      to use the software on \texttt{UNIX} platforms.
 
 \begin{itemize}
-\item The first and least serious is that {\tt UNIX} does not permit
+\item The first and least serious is that \texttt{UNIX} does not permit
 a process to have a shared memory segment mapped more than once
-the process's address space. {\tt NBS} has been written to take
+the process's address space. \texttt{NBS} has been written to take
 account of this and will always return the same address in a request
 to map a noticeboard once it is mapped the first time. It does however
 keep a reference count, and will not unmap a noticeboard until this
 drops to zero.
 \item The system identifier (or key) for shared memory sections (and hence
-noticeboards) on {\tt UNIX} is a four byte integer. NBS therefore hashes
+noticeboards) on \texttt{UNIX} is a four byte integer. NBS therefore hashes
 the user supplied name into this integer. The algorithm for doing this
 is much improved in V2.5.5 but it is still not proof against different
 names mapping on to the same key value.
 \end{itemize}
 
-      \subsection {Status Conventions} All the {\tt NBS} routines use {%
+      \subsection {Status Conventions} All the \texttt{NBS} routines use {%
 \tt ADAM} modified
       status conventions in that they will do nothing if status is not {%
 \tt NBS\_\_OK}
       (0) on entry. They can all optionally be called as functions, in which
       case the function value is the same as the returned status value. In
-      all cases where an {\tt NBS} routine is the source of the error, an
+      all cases where an \texttt{NBS} routine is the source of the error, an
       error report will be made using the error and message reporting service.
 
       \subsection {Terminology} These routines use the terminology ``item'' to
       refer to either a structured noticeboard object (ie, one with no values
       but possibly having lower-level objects) or to a primitive noticeboard
       object (ie, one with a shape and with values). The terms
-      ``item identifier'', ``identifier'' or ``{\tt ID}'' refer to ``%
-handles'' (cf {\tt HDS}
+      ``item identifier'', ``identifier'' or ``\texttt{ID}'' refer to ``%
+handles'' (cf \texttt{HDS}
       locators) which allow access to all information pertaining to an item. As
       far as callers are concerned these are just integers. As far as the
       noticeboard system is concerned they are pointers to data structures
       called ``item\_descriptor''s. In the routine specifications they are
-      regarded as integers. A zero {\mantt{ID}} is always an invalid {\mantt{%
+      regarded as integers. A zero {\texttt{ID}} is always an invalid {\texttt{%
 ID}} and all routines
-      will detect an attempt to use a zero {\mantt{ID}}. Similarly all %
+      will detect an attempt to use a zero {\texttt{ID}}. Similarly all %
 routines that
-      return {\mantt{ID}}'s will return zero {\mantt{ID}}'s on failure. Note %
+      return {\texttt{ID}}'s will return zero {\texttt{ID}}'s on failure. Note %
 that there is a danger
-      of an access violation if true garbage {\mantt{ID}}'s are passed. This %
+      of an access violation if true garbage {\texttt{ID}}'s are passed. This %
 is unlikely
       to happen, because of the use of the modified status convention.
 
 %------------------------------------------------------------------------------
 
-\section {Examples of Using the {\tt NBS} Routines}
+\section {Examples of Using the \texttt{NBS} Routines}
 
 This section takes the form of a tutorial. Starting with a listing of a
 noticeboard contents, we present the calls necessary to define that
@@ -999,49 +226,49 @@ access those values.
 
 Suppose that we wish to create and access a simple noticeboard. We will
 use as an example a subset of the noticeboard that is maintained by the
-{\tt AUTOFIB} control software. The notation used is the same as that used by
-the {\tt NBTRACE} (Trace Noticeboard) program (see Section~\ref
+\texttt{AUTOFIB} control software. The notation used is the same as that used by
+the \texttt{NBTRACE} (Trace Noticeboard) program (see Section~\ref
 {NBTRACE --- Trace Noticeboard Contents}) --- each structure entry is of the form:
 
-\begin {verbatim}
-    type name (children)
-\end{verbatim}
+\begin{terminalv}
+type name (children)
+\end{terminalv}
 
 and each primitive entry is of the form:
 
-\begin {verbatim}
-    type name[(maxd) dim1,dim2...] (actb/maxb/mod) val1,val2,...
-\end{verbatim}
+\begin{terminalv}
+type name[(maxd) dim1,dim2...] (actb/maxb/mod) val1,val2,...
+\end{terminalv}
 
 with appropriately indented entries. The shape information is shown only if
-the maximum number of dimensions ({\tt maxd}) is greater than zero. The three
+the maximum number of dimensions (\texttt{maxd}) is greater than zero. The three
 slash-separated numbers are actual number of bytes, maximum number of bytes and
 modified count.
 
-The result of running {\tt NBTRACE} on this noticeboard might be:
+The result of running \texttt{NBTRACE} on this noticeboard might be:
 
-\begin {verbatim}
-    Software version   = 5 (5)
-    Size of section    = 13284 (33e4)
-    Size of definition = 8952 (22f8)
-    Noticeboard owner  = 405 (195)
-    Modified count     = 2 (2)
+\begin{terminalv}
+Software version   = 5 (5)
+Size of section    = 13284 (33e4)
+Size of definition = 8952 (22f8)
+Noticeboard owner  = 405 (195)
+Modified count     = 2 (2)
 
-    NOTICEBOARD AUTOFIB (3)
-        _CHAR            CURRENT_CONFIG         (18/132/2) "current.fib"
-        CURRENT_STATUS   CURRENT_STATUS[(1) 72] (0/4608/0)
-        FIBRE_PARAMETERS FIBRE_PARAMETERS (1)
-            _INTEGER     TRANS_MATRIX[(2) 2,2]  (16/16/2)  1,0,0,1
-\end{verbatim}
+NOTICEBOARD AUTOFIB (3)
+   _CHAR            CURRENT_CONFIG         (18/132/2) "current.fib"
+   CURRENT_STATUS   CURRENT_STATUS[(1) 72] (0/4608/0)
+   FIBRE_PARAMETERS FIBRE_PARAMETERS (1)
+       _INTEGER     TRANS_MATRIX[(2) 2,2]  (16/16/2)  1,0,0,1
+\end{terminalv}
 
 \begin {itemize}
-\item Type and shape have no significance to the {\tt NBS} routines --- the type
+\item Type and shape have no significance to the \texttt{NBS} routines --- the type
 is just a character string and the shape is just a list of numbers. In the
-above, {\tt HDS} primitive type conventions have been used and this allows a
-sensible representation of values. Remember though that it is the {\tt NBTRACE}
-program that is making use of the type information, not the {\tt NBS} routines.
+above, \texttt{HDS} primitive type conventions have been used and this allows a
+sensible representation of values. Remember though that it is the \texttt{NBTRACE}
+program that is making use of the type information, not the \texttt{NBS} routines.
 \item The initial state of an item is that the actual number of bytes and the
-modified count are both zero. {\tt CURRENT\_STATUS} above is in its initial
+modified count are both zero. \texttt{CURRENT\_STATUS} above is in its initial
 state.
 \item It is possible to give an item a shape during the definition phase so an
 item can initially have a non-scalar shape.
@@ -1050,11 +277,10 @@ item in the noticeboard. An ``update'' may be an update of an item's value, its
 shape or its size.
 \item An item's modified count is incremented just before updating an item
 and just afterwards. Thus if it is odd then an item is in the process of
-being updated, and the number of completed updates is {\tt MODIFIED~/~2}. An
+being updated, and the number of completed updates is \texttt{MODIFIED~/~2}. An
 ``update'' may be an update of either an item's value or its shape.
-\item You can use the {\tt NBS\_GET\_UPDATED} routine to determine whether
-a noticeboard or a specific item has been updated since the last call to {\tt
-NBS\_GET\_UPDATED}.
+\item You can use the \texttt{NBS\_GET\_UPDATED} routine to determine whether
+a noticeboard or a specific item has been updated since the last call to \texttt{NBS\_GET\_UPDATED}.
 \end {itemize}
 
 \subsection {Defining the Noticeboard Contents}
@@ -1062,87 +288,87 @@ NBS\_GET\_UPDATED}.
 The following Fortran-like calls will define the contents of the above
 noticeboard and save the definition in a disc file.
 
-\begin {verbatim}
-      INCLUDE   `NBS_ERR'       ! Error code definitions
-      INCLUDE   `SAE_PAR'       ! Error code definitions
+\begin{terminalv}
+INCLUDE   `NBS_ERR'       ! Error code definitions
+INCLUDE   `SAE_PAR'       ! Error code definitions
 
-      INTEGER   STATUS          ! Modified STATUS variable
-      INTEGER   TOPSID          ! Top-level static ID
-      INTEGER   SID             ! General purpose static ID
-      INTEGER   FIBSID          ! FIBRE_PARAMETERS static ID
-      INTEGER   DIMS(2)         ! TRANS_MATRIX dimensions
+INTEGER   STATUS          ! Modified STATUS variable
+INTEGER   TOPSID          ! Top-level static ID
+INTEGER   SID             ! General purpose static ID
+INTEGER   FIBSID          ! FIBRE_PARAMETERS static ID
+INTEGER   DIMS(2)         ! TRANS_MATRIX dimensions
 
-      STATUS = SAI__OK          ! Initially set status to be OK
-\end{verbatim}
+STATUS = SAI__OK          ! Initially set status to be OK
+\end{terminalv}
 
 Begin the noticeboard definition.
 
-\begin {verbatim}
-      NBS_BEGIN_DEFINITION (TOPSID,STATUS)      ! Top-level static ID
-\end{verbatim}
+\begin{terminalv}
+NBS_BEGIN_DEFINITION (TOPSID,STATUS)      ! Top-level static ID
+\end{terminalv}
 
-Define the primitive item {\tt CURRENT\_CONFIG}. This is a character string
+Define the primitive item \texttt{CURRENT\_CONFIG}. This is a character string
 of maximum length 132 bytes. We choose to regard it as a scalar.
 
-\begin {verbatim}
-      NBS_DEFINE_PRIMITIVE (TOPSID,             ! Parent static ID
-                            `CURRENT_CONFIG',   ! Name of item
-                            `_CHAR',            ! Type of item
-                            0,132,              ! Max # dims and bytes
-                            SID,STATUS)         ! Returned static ID
-\end{verbatim}
+\begin{terminalv}
+NBS_DEFINE_PRIMITIVE (TOPSID,             ! Parent static ID
+                      `CURRENT_CONFIG',   ! Name of item
+                      `_CHAR',            ! Type of item
+                      0,132,              ! Max # dims and bytes
+                      SID,STATUS)         ! Returned static ID
+\end{terminalv}
 
-Define the primitive item {\tt CURRENT\_STATUS}. This is a 1D array of 72 64
+Define the primitive item \texttt{CURRENT\_STATUS}. This is a 1D array of 72 64
 byte records.
 
-\begin {verbatim}
-      NBS_DEFINE_PRIMITIVE (TOPSID,             ! Parent static ID
-                            `CURRENT_STATUS',   ! Name of item
-                            `CURRENT_STATUS',   ! Type of item
-                            1,72*64,            ! Max # dims and bytes
-                            SID,STATUS)         ! Returned static ID
+\begin{terminalv}
+NBS_DEFINE_PRIMITIVE (TOPSID,             ! Parent static ID
+                      `CURRENT_STATUS',   ! Name of item
+                      `CURRENT_STATUS',   ! Type of item
+                      1,72*64,            ! Max # dims and bytes
+                      SID,STATUS)         ! Returned static ID
 
-      NBS_DEFINE_SHAPE     (SID,                ! Static ID
-                            1,72,STATUS)        ! Actual # dims and dims
-\end{verbatim}
+NBS_DEFINE_SHAPE     (SID,                ! Static ID
+                      1,72,STATUS)        ! Actual # dims and dims
+\end{terminalv}
 
-Define the structured item {\tt FIBRE\_PARAMETERS}. Structured items cannot
+Define the structured item \texttt{FIBRE\_PARAMETERS}. Structured items cannot
 have shapes or values.
 
-\begin {verbatim}
-      NBS_DEFINE_STRUCTURE (TOPSID,             ! Parent static ID
-                            `FIBRE_PARAMETERS', ! Name of item
-                            `FIBRE_PARAMETERS', ! Type of item
-                            FIBSID,STATUS)      ! Returned static ID
-\end{verbatim}
+\begin{terminalv}
+NBS_DEFINE_STRUCTURE (TOPSID,             ! Parent static ID
+                      `FIBRE_PARAMETERS', ! Name of item
+                      `FIBRE_PARAMETERS', ! Type of item
+                      FIBSID,STATUS)      ! Returned static ID
+\end{terminalv}
 
-Define the lower-level primitive item {\tt TRANS\_MATRIX}. This is a 2D array
+Define the lower-level primitive item \texttt{TRANS\_MATRIX}. This is a 2D array
 of 2 x 2 integers.
 
-\begin {verbatim}
-      NBS_DEFINE_PRIMITIVE (FIBSID,             ! Parent static ID
-                            `TRANS_MATRIX',     ! Name of item
-                            `_INTEGER',         ! Type of item
-                            2,4*4,              ! Max # dims and bytes
-                            SID,STATUS)         ! Returned static ID
-      DIMS(1) = 2
-      DIMS(2) = 2
-      NBS_DEFINE_SHAPE     (SID,                ! Static ID
-                            2,DIMS,STATUS)      ! Actual # dims and dims
-\end{verbatim}
+\begin{terminalv}
+NBS_DEFINE_PRIMITIVE (FIBSID,             ! Parent static ID
+                      `TRANS_MATRIX',     ! Name of item
+                      `_INTEGER',         ! Type of item
+                      2,4*4,              ! Max # dims and bytes
+                      SID,STATUS)         ! Returned static ID
+DIMS(1) = 2
+DIMS(2) = 2
+NBS_DEFINE_SHAPE     (SID,                ! Static ID
+                      2,DIMS,STATUS)      ! Actual # dims and dims
+\end{terminalv}
 
-End the definition, writing to file {\tt AUTOFIB.NBD}.
+End the definition, writing to file \texttt{AUTOFIB.NBD}.
 
-\begin {verbatim}
-      NBS_END_DEFINITION   (`AUTOFIB',          ! Name of noticeboard file
-                            `DEFINITION_SAVE',  ! Write definition to disc
-                            STATUS)
-\end{verbatim}
+\begin{terminalv}
+NBS_END_DEFINITION   (`AUTOFIB',          ! Name of noticeboard file
+                      `DEFINITION_SAVE',  ! Write definition to disc
+                      STATUS)
+\end{terminalv}
 
 \begin {itemize}
 \item All of the routines used during the definition phase are called
-{\tt NBS\_*\_DEFINITION} \\
-or {\tt NBS\_DEFINE\_*}.
+\texttt{NBS\_*\_DEFINITION} \\
+or \texttt{NBS\_DEFINE\_*}.
 \end {itemize}
 
 \subsection {Creating the Noticeboard}
@@ -1156,20 +382,20 @@ Values}), or the noticeboard is being created in memory.
 Restore the noticeboard definition from a file and create the noticeboard
 \ldots
 
-\begin {verbatim}
-      NBS_RESTORE_DEFINITION (`AUTOFIB',            ! Noticeboard name
-                              `AUTOFIB',            ! Name of noticeboard file
-                              STATUS)
-\end{verbatim}
+\begin{terminalv}
+NBS_RESTORE_DEFINITION (`AUTOFIB',            ! Noticeboard name
+                        `AUTOFIB',            ! Name of noticeboard file
+                        STATUS)
+\end{terminalv}
 
-\ldots or, instead of issuing the above {\tt NBS\_END\_DEFINITION} call, issue
+\ldots or, instead of issuing the above \texttt{NBS\_END\_DEFINITION} call, issue
 this one.
 
-\begin {verbatim}
-      NBS_END_DEFINITION     (`AUTOFIB',            ! Noticeboard name
-                              `CREATE_NOTICEBOARD', ! Don't write a file
-                              STATUS)
-\end{verbatim}
+\begin{terminalv}
+NBS_END_DEFINITION     (`AUTOFIB',            ! Noticeboard name
+                        `CREATE_NOTICEBOARD', ! Don't write a file
+                        STATUS)
+\end{terminalv}
 
 \begin {itemize}
 \item Regardless of which method is used, the situation is the same after either
@@ -1187,25 +413,25 @@ Any process that wants to use a noticeboard must map it. This is done in
 precisely the same way by both the noticeboard owner and any other processes
 wishing to use it.
 
-\begin {verbatim}
-      INTEGER   TOPID                           ! Top-level noticeboard ID
-\end{verbatim}
+\begin{terminalv}
+INTEGER   TOPID                           ! Top-level noticeboard ID
+\end{terminalv}
 
 Map (find) the noticeboard.
 
-\begin {verbatim}
-      NBS_FIND_NOTICEBOARD (`AUTOFIB',          ! Noticeboard name
-                            TOPID,STATUS)       ! Top-level ID
-\end{verbatim}
+\begin{terminalv}
+NBS_FIND_NOTICEBOARD (`AUTOFIB',          ! Noticeboard name
+                      TOPID,STATUS)       ! Top-level ID
+\end{terminalv}
 
 \begin {itemize}
-\item This is the first {\tt NBS} routine that a non-owner need call.
+\item This is the first \texttt{NBS} routine that a non-owner need call.
 \item It does no harm to make multiple calls to this routine, but each call will
-map the noticeboard into a new part of virtual memory (on {\tt VMS} only ---
-the {\tt UNIX} version will return the same virtual memory address) and will
-return a different {\tt ID}.
-\item This {\tt TOPID} is {\em not} the same as the {\tt TOPSID} returned by
-the {\tt NBS\_BEGIN\_DEFINITION} routine. Static identifiers are used only
+map the noticeboard into a new part of virtual memory (on \texttt{VMS} only ---
+the \texttt{UNIX} version will return the same virtual memory address) and will
+return a different \texttt{ID}.
+\item This \texttt{TOPID} is \emph{not} the same as the \texttt{TOPSID} returned by
+the \texttt{NBS\_BEGIN\_DEFINITION} routine. Static identifiers are used only
 during the definition phase and we are no longer in this phase.
 \end {itemize}
 
@@ -1213,54 +439,54 @@ during the definition phase and we are no longer in this phase.
 
 We can now put values into primitive items.
 
-\begin {verbatim}
-      INTEGER   CONID                   ! CURRENT_CONFIG ID
-      INTEGER   STAID                   ! CURRENT_STATUS ID
-      INTEGER   FIBID                   ! FIBRE_PARAMETERS ID
-      INTEGER   MATID                   ! COORD_MATRIX ID
+\begin{terminalv}
+INTEGER   CONID                   ! CURRENT_CONFIG ID
+INTEGER   STAID                   ! CURRENT_STATUS ID
+INTEGER   FIBID                   ! FIBRE_PARAMETERS ID
+INTEGER   MATID                   ! COORD_MATRIX ID
 
-      CHARACTER STRING*(*)              ! String to write to CURRENT_CONFIG
-      PARAMETER (STRING=`CURRENT.FIB')
-      INTEGER   MATRIX(2,2)             ! Matrix to write to COORD_MATRIX
-      DATA      MATRIX /1,0,0,1/
-\end{verbatim}
+CHARACTER STRING*(*)              ! String to write to CURRENT_CONFIG
+PARAMETER (STRING=`CURRENT.FIB')
+INTEGER   MATRIX(2,2)             ! Matrix to write to COORD_MATRIX
+DATA      MATRIX /1,0,0,1/
+\end{terminalv}
 
-Get the {\tt ID}s for all the items we want to write to.
+Get the \texttt{ID}s for all the items we want to write to.
 
-\begin {verbatim}
-      NBS_FIND_ITEM (TOPID,`CURRENT_CONFIG  ',CONID,STATUS)
-      NBS_FIND_ITEM (TOPID,`CURRENT_STATUS  ',STAID,STATUS)
-      NBS_FIND_ITEM (TOPID,`FIBRE_PARAMETERS',FIBID,STATUS)
-      NBS_FIND_ITEM (FIBID,`COORD_MATRIX    ',MATID,STATUS)
-\end{verbatim}
+\begin{terminalv}
+NBS_FIND_ITEM (TOPID,`CURRENT_CONFIG  ',CONID,STATUS)
+NBS_FIND_ITEM (TOPID,`CURRENT_STATUS  ',STAID,STATUS)
+NBS_FIND_ITEM (TOPID,`FIBRE_PARAMETERS',FIBID,STATUS)
+NBS_FIND_ITEM (FIBID,`COORD_MATRIX    ',MATID,STATUS)
+\end{terminalv}
 
 Put values to some of them.
 
-\begin {verbatim}
-      NBS_PUT_CVALUE (CONID,0,STRING,STATUS)
-      NBS_PUT_VALUE  (MATID,0,16,MATRIX,STATUS)
-      NBS_PUT_VALUE  (CONID,0,LEN(STRING),%REF(STRING),STATUS)
-\end{verbatim}
+\begin{terminalv}
+NBS_PUT_CVALUE (CONID,0,STRING,STATUS)
+NBS_PUT_VALUE  (MATID,0,16,MATRIX,STATUS)
+NBS_PUT_VALUE  (CONID,0,LEN(STRING),%REF(STRING),STATUS)
+\end{terminalv}
 
 \begin {itemize}
-\item Normally one would get {\tt ID}s for the items of interest just after
+\item Normally one would get \texttt{ID}s for the items of interest just after
 finding the noticeboard. Finding an item involves a search and is relatively
 slow, whereas putting and getting a value is very fast.
-\item The second parameter to {\tt NBS\_PUT\_VALUE} and {\tt NBS\_PUT\_CVALUE}
+\item The second parameter to \texttt{NBS\_PUT\_VALUE} and \texttt{NBS\_PUT\_CVALUE}
 is a byte offset. You
 can use non-zero offsets to put a slice of the data associated with an item.
-The current size of an item's data is the high-water mark of all {\tt PUT}s.
-You can use {\tt NBS\_PUT\_SIZE} explicitly to set the size of an item's data.
-\item Because the {\tt NBS} routines don't use the type information, it is
+The current size of an item's data is the high-water mark of all \texttt{PUT}s.
+You can use \texttt{NBS\_PUT\_SIZE} explicitly to set the size of an item's data.
+\item Because the \texttt{NBS} routines don't use the type information, it is
 necessary to pass all values by reference. In Fortran this is the default
 passing mechanism for all variables except for character strings, hence the
-routine {\tt NBS\_PUT\_CVALUE} to handle this case.
-\item However, on {\tt VMS} {\em only} the {\tt \%REF} function enables the
-user to pass the actual character pointer to {\tt NBS\_PUT\_VALUE}, and supply
+routine \texttt{NBS\_PUT\_CVALUE} to handle this case.
+\item However, on \texttt{VMS} \emph{only} the \texttt{\%REF} function enables the
+user to pass the actual character pointer to \texttt{NBS\_PUT\_VALUE}, and supply
 the length of the character string (or indeed, any other number) as the
 maximum number of bytes to be read.
 \item The noticeboard is now in the same state as in the listing at the start
-of this section. If another process ran {\tt NBTRACE} at this stage, it would get
+of this section. If another process ran \texttt{NBTRACE} at this stage, it would get
 precisely the same output.
 \end {itemize}
 
@@ -1269,46 +495,46 @@ precisely the same output.
 Values can be accessed either by copying to and from the user's buffer or else
 directly to and from the noticeboard. Both methods are illustrated here.
 
-\begin {verbatim}
-      INTEGER   ACTBYTES                ! Actual number of bytes stored
-      INTEGER   POINTER                 ! Pointer to MATRIX data
-      CHARACTER*20  CONF                ! Configuration to be read
-\end{verbatim}
+\begin{terminalv}
+INTEGER   ACTBYTES                ! Actual number of bytes stored
+INTEGER   POINTER                 ! Pointer to MATRIX data
+CHARACTER*20  CONF                ! Configuration to be read
+\end{terminalv}
 
-Get current value of {\tt MATRIX}. We expect the actual number of bytes to
+Get current value of \texttt{MATRIX}. We expect the actual number of bytes to
 be at least 16.
 
-\begin {verbatim}
-      NBS_GET_VALUE (MATID,0,16,MATRIX,ACTBYTES,STATUS)
-      IF (ACTBYTES .LT. 16) THEN
-         panic
-      ENDIF
-\end{verbatim}
+\begin{terminalv}
+NBS_GET_VALUE (MATID,0,16,MATRIX,ACTBYTES,STATUS)
+IF (ACTBYTES .LT. 16) THEN
+  panic
+ENDIF
+\end{terminalv}
 
 Again, reading character strings is slightly different,
 
-\begin {verbatim}
-      NBS_GET_CVALUE (MATID,0,CONF,     ! Use the portable routine
-                     ACTBYTES,STATUS)
-      NBS_GET_VALUE (MATID,0,LEN(CONF), ! or the VMS specific call
-          %REF(CONFIG),ACTBYTES,STATUS) ! using %REF
-\end{verbatim}
+\begin{terminalv}
+NBS_GET_CVALUE (MATID,0,CONF,     ! Use the portable routine
+              ACTBYTES,STATUS)
+NBS_GET_VALUE (MATID,0,LEN(CONF), ! or the VMS specific call
+    %REF(CONFIG),ACTBYTES,STATUS) ! using %REF
+\end{terminalv}
 
 Alternatively get a pointer to the actual data in the noticeboard.
 
-\begin {verbatim}
-      NBS_GET_POINTER (MATID,POINTER,STATUS)
-      MATRIX_OP       (%VAL(POINTER),STATUS)
-\end{verbatim}
+\begin{terminalv}
+NBS_GET_POINTER (MATID,POINTER,STATUS)
+MATRIX_OP       (%VAL(POINTER),STATUS)
+\end{terminalv}
 
 \begin {itemize}
-\item The second parameter to {\tt NBS\_GET\_VALUE} and {\tt NBS\_GET\_CVALUE}
+\item The second parameter to \texttt{NBS\_GET\_VALUE} and \texttt{NBS\_GET\_CVALUE}
 is a byte offset. You can use non-zero offsets to get a slice of the
 data associated with an item.
-\item The length of the string passed into {\tt NBS\_GET\_CVALUE} serves
-the same purpose as the third argument to {\tt NBS\_GET\_VALUE} --- ie. it
+\item The length of the string passed into \texttt{NBS\_GET\_CVALUE} serves
+the same purpose as the third argument to \texttt{NBS\_GET\_VALUE} --- ie. it
 limits the amount of data that can be read.
-\item It is not an {\tt NBS} error if an item contains fewer bytes than are
+\item It is not an \texttt{NBS} error if an item contains fewer bytes than are
 being asked for.
 \item When accessing data directly via pointer, no checks are possible and the
 modified count is not (and could not be) accessed.
@@ -1317,30 +543,30 @@ modified count is not (and could not be) accessed.
 \subsection {Finding out about Items}
 
 There is a complete set of enquiry routines that allow programs that know
-nothing about a noticeboard to navigate through it. {\tt NBTRACE} is just such a
+nothing about a noticeboard to navigate through it. \texttt{NBTRACE} is just such a
 program. A few of these routines are illustrated here.
 
-\begin {verbatim}
-      INCLUDE   `NBS_PAR'               ! Parameter definitions
+\begin{terminalv}
+INCLUDE   `NBS_PAR'               ! Parameter definitions
 
-      CHARACTER NAME*(NBS_K_MAXNAME)    ! Item name
-      CHARACTER TYPE*(NBS_K_MAXTYPE)    ! Item type
-      INTEGER   MAXBYTES                ! Maximum number of bytes
-      INTEGER   ACTBYTES                ! Actual number of bytes
-      INTEGER   MAXDIMS                 ! Maximum number of dimensions
-      INTEGER   DIMS(7)                 ! Actual dimensions
-      INTEGER   ACTDIMS                 ! Actual number of dimensions
+CHARACTER NAME*(NBS_K_MAXNAME)    ! Item name
+CHARACTER TYPE*(NBS_K_MAXTYPE)    ! Item type
+INTEGER   MAXBYTES                ! Maximum number of bytes
+INTEGER   ACTBYTES                ! Actual number of bytes
+INTEGER   MAXDIMS                 ! Maximum number of dimensions
+INTEGER   DIMS(7)                 ! Actual dimensions
+INTEGER   ACTDIMS                 ! Actual number of dimensions
 
-      NBS_GET_NAME  (MATID,NAME,STATUS)
-      NBS_GET_TYPE  (MATID,TYPE,STATUS)
-      NBS_GET_SIZE  (MATID,MAXBYTES,ACTBYTES,STATUS)
-      MAXDIMS = 7                       ! MAXDIMS is a MODIFIED parameter
-      NBS_GET_SHAPE (MATID,MAXDIMS,DIMS,ACTDIMS,STATUS)
-\end{verbatim}
+NBS_GET_NAME  (MATID,NAME,STATUS)
+NBS_GET_TYPE  (MATID,TYPE,STATUS)
+NBS_GET_SIZE  (MATID,MAXBYTES,ACTBYTES,STATUS)
+MAXDIMS = 7                       ! MAXDIMS is a MODIFIED parameter
+NBS_GET_SHAPE (MATID,MAXDIMS,DIMS,ACTDIMS,STATUS)
+\end{terminalv}
 
 \begin {itemize}
 \item Higher-level routines may wish to check consistency between shape, size
-and type. For example, in the above we expect {\tt ACTBYTES} to be 4 (the number
+and type. For example, in the above we expect \texttt{ACTBYTES} to be 4 (the number
 of bytes per pixel) times the product of the dimensions.
 \end {itemize}
 
@@ -1350,59 +576,57 @@ of bytes per pixel) times the product of the dimensions.
 It is possible to save and restore the noticeboard data as well as just the
 definition by using a different option when ending the noticeboard definition.
 
-End the definition, writing it and the noticeboard data to file {\tt
-AUTOFIB.NBD}.
+End the definition, writing it and the noticeboard data to file \texttt{AUTOFIB.NBD}.
 
-\begin {verbatim}
-      NBS_END_DEFINITION   (`AUTOFIB',          ! Name of noticeboard file
-                            `NOTICEBOARD_SAVE', ! Write noticeboard to disc
-                            STATUS)
-\end{verbatim}
+\begin{terminalv}
+NBS_END_DEFINITION   (`AUTOFIB',          ! Name of noticeboard file
+                      `NOTICEBOARD_SAVE', ! Write noticeboard to disc
+                      STATUS)
+\end{terminalv}
 
 Restore the noticeboard definition plus data from a file and create the
 noticeboard.
 
-\begin {verbatim}
-      NBS_RESTORE_NOTICEBOARD (`AUTOFIB',       ! Noticeboard name
-                               `AUTOFIB',       ! Name of noticeboard file
-                               STATUS)
-\end{verbatim}
+\begin{terminalv}
+NBS_RESTORE_NOTICEBOARD (`AUTOFIB',       ! Noticeboard name
+                         `AUTOFIB',       ! Name of noticeboard file
+                         STATUS)
+\end{terminalv}
 
 Map (find) the noticeboard.
 
-\begin {verbatim}
-      NBS_FIND_NOTICEBOARD (`AUTOFIB',          ! Noticeboard name
-                            TOPID,STATUS)       ! Top-level ID
-\end{verbatim}
+\begin{terminalv}
+NBS_FIND_NOTICEBOARD (`AUTOFIB',          ! Noticeboard name
+                      TOPID,STATUS)       ! Top-level ID
+\end{terminalv}
 
-Get the {\tt ID} for an item we want to write to and put its value.
+Get the \texttt{ID} for an item we want to write to and put its value.
 
-\begin {verbatim}
-      NBS_FIND_ITEM (TOPID,`CURRENT_CONFIG',CONID,STATUS)
-      NBS_PUT_CVALUE (CONID,0,STRING,STATUS)
-\end{verbatim}
+\begin{terminalv}
+NBS_FIND_ITEM (TOPID,`CURRENT_CONFIG',CONID,STATUS)
+NBS_PUT_CVALUE (CONID,0,STRING,STATUS)
+\end{terminalv}
 
 Save the noticeboard to disc.
 
-\begin {verbatim}
-      NBS_SAVE_NOTICEBOARD (TOPID,              ! ID of any item on noticeboard
-                            STATUS)
-\end{verbatim}
+\begin{terminalv}
+NBS_SAVE_NOTICEBOARD (TOPID,              ! ID of any item on noticeboard
+                      STATUS)
+\end{terminalv}
 
 \begin {itemize}
-\item {\tt NBS\_RESTORE\_NOTICEBOARD} can be used to restore from a file
+\item \texttt{NBS\_RESTORE\_NOTICEBOARD} can be used to restore from a file
 that contains only a definition as well as from a file that contains a
-definition plus data. However if a file does not contain data the {\tt
-NBS\_\_DATANOTSAVED} warning status is returned --- this indicates that the
+definition plus data. However if a file does not contain data the \texttt{NBS\_\_DATANOTSAVED} warning status is returned --- this indicates that the
 noticeboard has been created but that it is in its initial state.
-\item {\tt NBS\_RESTORE\_DEFINITION} cannot be used to restore from a file
+\item \texttt{NBS\_RESTORE\_DEFINITION} cannot be used to restore from a file
 that contains data in addition to a definition. In cases where both sorts
-of file are to be accessed, use {\tt NBS\_RESTORE\_NOTICEBOARD}.
-\item The implementation of {\tt NBS\_SAVE\_NOTICEBOARD} is inefficient
+of file are to be accessed, use \texttt{NBS\_RESTORE\_NOTICEBOARD}.
+\item The implementation of \texttt{NBS\_SAVE\_NOTICEBOARD} is inefficient
 in that the entire definition plus data is copied to disc. Under operating
 systems that support the mapping of files into virtual memory it could be
 implemented using an ``update section'' call.
-\item {\tt NBS\_SAVE\_NOTICEBOARD} does not create a new version of the
+\item \texttt{NBS\_SAVE\_NOTICEBOARD} does not create a new version of the
 noticeboard definition file; it always overwrites the data in the file from
 which it was restored.
 \end {itemize}
@@ -1416,99 +640,99 @@ noticeboard is not actually deleted until the last process unmaps it.
 
 Find a noticeboard and an item within it.
 
-\begin{verbatim}
-      NBS_FIND_NOTICEBOARD (`AUTOFIB',          ! Noticeboard name
-                            TOPID,STATUS)       ! Top-level ID
-      NBS_FIND_ITEM (TOPID,`CURRENT_CONFIG',CONID,STATUS)
-\end{verbatim}
+\begin{terminalv}
+NBS_FIND_NOTICEBOARD (`AUTOFIB',          ! Noticeboard name
+                      TOPID,STATUS)       ! Top-level ID
+NBS_FIND_ITEM (TOPID,`CURRENT_CONFIG',CONID,STATUS)
+\end{terminalv}
 
 Lose the item and the noticeboard.
 
-\begin{verbatim}
-      NBS_LOSE_ITEM (CONID,`CHECK',STATUS)
-      NBS_LOSE_NOTICEBOARD (TOPID,`CHECK',STATUS)
-\end{verbatim}
+\begin{terminalv}
+NBS_LOSE_ITEM (CONID,`CHECK',STATUS)
+NBS_LOSE_NOTICEBOARD (TOPID,`CHECK',STATUS)
+\end{terminalv}
 
 Alternatively, if you like living dangerously, try this.
 
-\begin{verbatim}
-      NBS_LOSE_NOTICEBOARD (TOPID,`FORCE',STATUS)
-\end{verbatim}
+\begin{terminalv}
+NBS_LOSE_NOTICEBOARD (TOPID,`FORCE',STATUS)
+\end{terminalv}
 
 \begin{itemize}
-\item {\tt FIND} and {\tt LOSE} calls are normally paired. If the {\tt CHECK}
+\item \texttt{FIND} and \texttt{LOSE} calls are normally paired. If the \texttt{CHECK}
 flag is given, you can only lose items and noticeboards for which all derived
-{\tt ID}s have already been lost.
+\texttt{ID}s have already been lost.
 \item If you know that there is no chance that any of a noticeboard's or item's
-derived {\tt ID}s will be used, you can specify the {\tt FORCE} flag. This
+derived \texttt{ID}s will be used, you can specify the \texttt{FORCE} flag. This
 allows the item or noticeboard to be lost regardless of whether any derived
-{\tt ID}s are still in use.
+\texttt{ID}s are still in use.
 \end{itemize}
 
 \section {Compiling and Linking Applications}
 
 \subsection{Compiling}
-On both {\tt VMS} and {\tt UNIX} systems, FORTRAN source code may
-include {\tt NBS} error codes and {\tt NBS} public constants using
-the symbolic names {\tt NBS\_ERR} and {\tt NBS\_PAR} respectively.
-On {\tt VMS} these are logical names and {\tt UNIX} the appropriate
+On both \texttt{VMS} and \texttt{UNIX} systems, FORTRAN source code may
+include \texttt{NBS} error codes and \texttt{NBS} public constants using
+the symbolic names \texttt{NBS\_ERR} and \texttt{NBS\_PAR} respectively.
+On \texttt{VMS} these are logical names and \texttt{UNIX} the appropriate
 symbolic links can be made in your current directory by typing,
 
-\begin {verbatim}
-    nbs_dev
-\end{verbatim}
+\begin{terminalv}
+% nbs_dev
+\end{terminalv}
 
-These links can be deleted using {\tt nbs\_dev remove} if required.
+These links can be deleted using \texttt{nbs\_dev remove} if required.
 
-The error codes are standard {\tt VMS} ones and use facility number 1802. This
+The error codes are standard \texttt{VMS} ones and use facility number 1802. This
 number is one of the ones allocated to the AAO. See Appendix C for a list of
 the symbolic error codes.
 
-\subsection{Linking on {\tt VMS}}
+\subsection{Linking on \texttt{VMS}}
 
-{\tt NBS} can be linked either in a stand-alone or ADAM fashion. The
+\texttt{NBS} can be linked either in a stand-alone or ADAM fashion. The
 approriate link commands are,
 
-\begin {verbatim}
-    LINK program,NBS_LINK/OPT        ! Stand-alone
+\begin{terminalv}
+LINK program,NBS_LINK/OPT        ! Stand-alone
 
-    ALINK program,NBS_LINK/OPT       ! ADAM version
-\end{verbatim}
+ALINK program,NBS_LINK/OPT       ! ADAM version
+\end{terminalv}
 
-The following {\tt LINK} options file is used stand-alone,
+The following \texttt{LINK} options file is used stand-alone,
 
-\begin {verbatim}
-    NBS_IMAGE/SHARE
-\end{verbatim}
+\begin{terminalv}
+NBS_IMAGE/SHARE
+\end{terminalv}
 
-and this one for linking with {\tt ADAM},
+and this one for linking with \texttt{ADAM},
 
-\begin {verbatim}
-    NBS_IMAGE_ADAM/SHARE
-\end{verbatim}
+\begin{terminalv}
+NBS_IMAGE_ADAM/SHARE
+\end{terminalv}
 
 If you are linking in lots of other sub-systems as well, you may need to
-incorporate these lines into your own options file (unfortunately, {\tt LINK}
+incorporate these lines into your own options file (unfortunately, \texttt{LINK}
 options files cannot be nested).
 
-\subsection{Linking on {\tt UNIX}}
+\subsection{Linking on \texttt{UNIX}}
 
-The linking process on UNIX is even simpler than that of {\tt VMS}. To link
+The linking process on UNIX is even simpler than that of \texttt{VMS}. To link
 against the stand-alone version simply append a \verb+`nbs_link`+ to the
 compiler or loader command line.
 
-\begin {verbatim}
-    f77 program.f `nbs_link`
-\end{verbatim}
+\begin{terminalv}
+% f77 program.f `nbs_link`
+\end{terminalv}
 
-Similarly for the {\tt ADAM} version,
+Similarly for the \texttt{ADAM} version,
 
-\begin {verbatim}
-    alink program.f `nbs_link_adam`
-\end{verbatim}
+\begin{terminalv}
+% alink program.f `nbs_link_adam`
+\end{terminalv}
 
 \newpage
-\section {{\tt NBS} Routines Listed by Category}
+\section {\texttt{NBS} Routines Listed by Category}
 
 In this section, routines are listed by category. For each routine there
 is a one-line description of what it does. There is a full alphabetical
@@ -1517,17 +741,17 @@ NBS Routines}.
 
 %------------------------------------------------------------------------------
 %\input {nbs.tex_summary}
-\mansection {{\mantt{NBS\_TUNE}}}{      Routines used to alter global %
+\mansection {{\texttt{NBS\_TUNE}}}{      Routines used to alter global %
 noticeboard system parameters}
 
       Two types of parameters can be altered. The first type is global to a
-      process and not to a noticeboard (they are essentially Fortran {\mantt{%
+      process and not to a noticeboard (they are essentially Fortran {\texttt{%
 COMMON}}
       block or C static variables). The second type is global to a noticeboard
       and are thus shared by all processes accessing that noticeboard. The
-      original {\mantt{NBS\_TUNE}} routine is used to alter parameters of the %
+      original {\texttt{NBS\_TUNE}} routine is used to alter parameters of the %
 first type
-      and the newer {\mantt{NBS\_TUNE\_NOTICEBOARD}} is used to tune %
+      and the newer {\texttt{NBS\_TUNE\_NOTICEBOARD}} is used to tune %
 parameters of the
       second type. When a noticeboard is created, its initial parameter values
       are copied from the current values of the first type.
@@ -1536,21 +760,21 @@ parameters of the
       permits a routine to alter a parameter, use the new value and then
       restore the parameter to its previous value.
 
-      The {\mantt{NBS\_FIND}}, {\mantt{NBS\_GET}} and {\mantt{NBS\_PUT}} %
+      The {\texttt{NBS\_FIND}}, {\texttt{NBS\_GET}} and {\texttt{NBS\_PUT}} %
 routines make rather complicated use of
       these values. For those parameters which are logical flags, they use
-      the {\mantt{OR}} of the value of the first type and the value of the %
+      the {\texttt{OR}} of the value of the first type and the value of the %
 second type.
       For those parameters which are numeric values, they use the value of the
       first type.
 
 \begin{mansectionroutines}
-\mansectionitem {{\mantt{NBS\_TUNE}}}
-      Alter the value of a global parameter
-\mansectionitem {{\mantt{NBS\_TUNE\_NOTICEBOARD}}}
-      Alter the value of a noticeboard-specific global parameter
+\noteroutine{NBS\_TUNE}{NBS_TUNE}
+      {Alter the value of a global parameter}
+\noteroutine{NBS\_TUNE\_NOTICEBOARD}{NBS_TUNE_NOTICEBOARD}
+      {Alter the value of a noticeboard-specific global parameter}
 \end{mansectionroutines}
-\mansection {{\mantt{NBS\_DEFINITION}}}{      Routines used to define the %
+\mansection {{\texttt{NBS\_DEFINITION}}}{      Routines used to define the %
 noticeboard structure}
 
       A private memory area is obtained and item definitions are created in it.
@@ -1560,81 +784,80 @@ noticeboard structure}
       else copied to a noticeboard.
 
 \begin{mansectionroutines}
-\mansectionitem {{\mantt{NBS\_BEGIN\_DEFINITION}}}
-      Begin definition of the contents of a noticeboard
-      and return a static identifier to the top level of the noticeboard
-\mansectionitem {{\mantt{NBS\_DEFINE\_STRUCTURE}}}
-      Define a new entry for a structured item within another structured item
-      and return a static identifier to the new item
-\mansectionitem {{\mantt{NBS\_DEFINE\_PRIMITIVE}}}
-      Define a new entry for a primitive item within another structured item
-      and return a static identifier to the new item
-\mansectionitem {{\mantt{NBS\_DEFINE\_SHAPE}}}
-      Define an initial shape for a primitive item
-\mansectionitem {{\mantt{NBS\_END\_DEFINITION}}}
-      End the definition of a noticeboard
+\noteroutine{NBS\_BEGIN\_DEFINITION}{NBS_BEGIN_DEFINITION}
+      {Begin definition of the contents of a noticeboard
+      and return a static identifier to the top level of the noticeboard}
+\noteroutine{NBS\_DEFINE\_STRUCTURE}{NBS_DEFINE_STRUCTURE}
+      {Define a new entry for a structured item within another structured item
+      and return a static identifier to the new item}
+\noteroutine{NBS\_DEFINE\_PRIMITIVE}{NBS_DEFINE_PRIMITIVE}
+      {Define a new entry for a primitive item within another structured item
+      and return a static identifier to the new item}
+\noteroutine{NBS\_DEFINE\_SHAPE}{NBS_DEFINE_SHAPE}
+      {Define an initial shape for a primitive item}
+\noteroutine{NBS\_END\_DEFINITION}{NBS_END_DEFINITION}
+      {End the definition of a noticeboard
       and then create the noticeboard, save the definition in a file, or save
-      the definition plus data in a file
-\mansectionitem {{\mantt{NBS\_RESTORE\_DEFINITION}}}
-      Restore a noticeboard definition from file
-      and create the noticeboard
-\mansectionitem {{\mantt{NBS\_RESTORE\_NOTICEBOARD}}}
-      Restore a noticeboard definition and data from file
-      and create the noticeboard
-\mansectionitem {{\mantt{NBS\_SAVE\_NOTICEBOARD}}}
-      Save a noticeboard to its noticeboard definition file
+      the definition plus data in a file}
+\noteroutine{NBS\_RESTORE\_DEFINITION}{NBS_RESTORE_DEFINITION}
+      {Restore a noticeboard definition from file
+      and create the noticeboard}
+\noteroutine{NBS\_RESTORE\_NOTICEBOARD}{NBS_RESTORE_NOTICEBOARD}
+      {Restore a noticeboard definition and data from file
+      and create the noticeboard}
+\noteroutine{NBS\_SAVE\_NOTICEBOARD}{NBS_SAVE_NOTICEBOARD}
+      {Save a noticeboard to its noticeboard definition file}
 \end{mansectionroutines}
-\mansection {{\mantt{NBS\_FIND}}}{      Routines that find noticeboards and %
+\mansection {{\texttt{NBS\_FIND}}}{      Routines that find noticeboards and %
 items within noticeboards}
 
       Items can be found either by name or by position. When a noticeboard
       is found a private copy of its item descriptors is made in which all
-      non {\mantt{NIL}} pointers are relocated by the virtual address of the %
+      non {\texttt{NIL}} pointers are relocated by the virtual address of the %
 start of
       the relevant noticeboard. Thus, once a noticeboard has been found, all
       information pertaining to it can in fact be accessed using standard C
       structures.
 
 \begin{mansectionroutines}
-\mansectionitem {{\mantt{NBS\_FIND\_NOTICEBOARD}}}
-      Find a named noticeboard and return an identifier to it
-\mansectionitem {{\mantt{NBS\_FIND\_ITEM}}}
-      Find an item with a specified name contained in a structure
+\noteroutine{NBS\_FIND\_NOTICEBOARD}{NBS_FIND_NOTICEBOARD}
+      {Find a named noticeboard and return an identifier to it}
+\noteroutine{NBS\_FIND\_ITEM}{NBS_FIND_ITEM}
+      {Find an item with a specified name contained in a structure
       associated with a specified identifier and return the located item's
-      {\mantt{ID}}
-\mansectionitem {{\mantt{NBS\_FIND\_NTH\_ITEM}}}
-      Find the Nth item contained in a structure
-      associated with a specified identifier and return the located item's {%
-\mantt{ID}}
+      \texttt{ID}}
+\noteroutine{NBS\_FIND\_NTH\_ITEM}{NBS_FIND_NTH_ITEM}
+      {Find the Nth item contained in a structure
+      associated with a specified identifier and return the located item's \texttt{ID}}
 \end{mansectionroutines}
-\mansection {{\mantt{NBS\_LOSE}}}{      Routines that lose noticeboards and %
+\mansection {{\texttt{NBS\_LOSE}}}{      Routines that lose noticeboards and %
 items within noticeboards}
 
       The noticeboard system maintains counts of how many items have been
-      found using {\mantt{NBS\_FIND\_ITEM}} and {\mantt{NBS\_FIND\_NTH\_ITEM}}%
+      found using {\texttt{NBS\_FIND\_ITEM}} and {\texttt{NBS\_FIND\_NTH\_ITEM}}%
 . The routines in this
       section can be used to indicate that noticeboards and items are no
       longer required. When a noticeboard is no longer required, it is marked
       for deletion. When an item is no longer required, its parent's item
       count is decremented. Normally, noticeboards and items can only be lost
       if the count of items found from them is zero (this is to minimise the
-      chance of using an item {\mantt{ID}} to access a non-existent %
+      chance of using an item {\texttt{ID}} to access a non-existent %
 noticeboard), but
       this can be overridden.
 
 \begin{mansectionroutines}
-\mansectionitem {{\mantt{NBS\_LOSE\_NOTICEBOARD}}}
-      Unmap a specified noticeboard
-\mansectionitem {{\mantt{NBS\_LOSE\_ITEM}}}
-      Declare an intention never again to use a specified item
+\noteroutine{NBS\_LOSE\_NOTICEBOARD}{NBS_LOSE_NOTICEBOARD}
+      {Unmap a specified noticeboard}
+\noteroutine{NBS\_LOSE\_ITEM}{NBS_LOSE_ITEM}
+      {Declare an intention never again to use a specified item}
 \end{mansectionroutines}
-\mansection {{\mantt{NBS\_PUT}}}{      Routines that write information to a %
+\mansection {{\texttt{NBS\_PUT}}}{      Routines that write information to a %
 noticeboard}
 
       This can normally only be done by the owner of the noticeboard. The only
       things which can be written are shape information and data. The item's
       modified count is incremented both before and after each write using the
-      {\mantt{ADD\_INTERLOCKED}} instruction. The noticeboard's modified %
+      {\texttt{ADD\_INTERLOCKED}} instruction. The noticeboard's modified %
 count is
       incremented after each write. These modified counts allow other processes
       to monitor the noticeboard for changes.
@@ -1654,35 +877,35 @@ count is
       values that they were given earlier (they would not be reset to zero).
 
       There are two global parameters which can be altered using the
-      {\mantt{NBS\_TUNE\_NOTICEBOARD}} routine and which affect the behaviour %
+      {\texttt{NBS\_TUNE\_NOTICEBOARD}} routine and which affect the behaviour %
 of these
       routines:
 
-      1. {\mantt{WORLD\_WRITE}} is {\mantt{FALSE}} by default and this %
+      1. {\texttt{WORLD\_WRITE}} is {\texttt{FALSE}} by default and this %
 prevents processes other
-         than the noticeboard's owner from writing to it. If set {\mantt{TRUE}%
+         than the noticeboard's owner from writing to it. If set {\texttt{TRUE}%
 }, this
          process will be allowed to write to the noticeboard even if it does
-         not own it. If set {\mantt{TRUE}} then it is possible for a reader %
+         not own it. If set {\texttt{TRUE}} then it is possible for a reader %
 to read data
          that is currently varying, so only do this if you know what you are
          doing. All processes can always access all noticeboard's directly if
          they do so via pointer --- such access is not affected by the
-         {\mantt{WORLD\_WRITE}} flag.
+         {\texttt{WORLD\_WRITE}} flag.
 
-      2. {\mantt{INCREMENT\_MODIFY}} is {\mantt{TRUE}} by default and this %
+      2. {\texttt{INCREMENT\_MODIFY}} is {\texttt{TRUE}} by default and this %
 causes the item's
          modified count to be incremented before and after the update and the
          noticeboard's modified count to be incremented after the update. If
-         set {\mantt{FALSE}}, neither count is altered. Clearly, if this is %
+         set {\texttt{FALSE}}, neither count is altered. Clearly, if this is %
 done, other
          processes monitoring the modified counts will not realise that
          noticeboard data is changing.
 
       There is also a lower-level routine that must only be used by people who
       really know what they are doing. It increments either the noticeboard
-      modified count or a primitive item's modified count. This {\em must} be
-      called according to the same conventions as are applied in {\mantt{NBS\_%
+      modified count or a primitive item's modified count. This \emph{must} be
+      called according to the same conventions as are applied in {\texttt{NBS\_%
 PUT\_VALUE}}.
       If this is not done, the whole system is subverted.
 
@@ -1694,25 +917,25 @@ PUT\_VALUE}}.
       itself).
 
 \begin{mansectionroutines}
-\mansectionitem {{\mantt{NBS\_PUT\_VALUE}}}
-      Put a byte array into a slice of a primitive item
-      associated with a specified identifier
-\mansectionitem {{\mantt{NBS\_PUT\_CVALUE}}}
-      Put a character string into a slice of a primitive item
-      associated with a specified identifier
-\mansectionitem {{\mantt{NBS\_PUT\_SHAPE}}}
-      Put a new shape to a primitive item
-      associated with a specified identifier
-\mansectionitem {{\mantt{NBS\_PUT\_SIZE}}}
-      Put a new size to a primitive item
-      associated with a specified identifier
-\mansectionitem {{\mantt{NBS\_INC\_MODIFIED}}}
-      Increment the noticeboard modified count or an item modified count
-      depending on whether this is a structured or primitive item
-\mansectionitem {{\mantt{NBS\_PUT\_TRIGGER}}}
-      Specify a routine to be called whenever a primitive item is updated
+\noteroutine{NBS\_PUT\_VALUE}{NBS_PUT_VALUE}
+      {Put a byte array into a slice of a primitive item
+      associated with a specified identifier}
+\noteroutine{NBS\_PUT\_CVALUE}{NBS_PUT_CVALUE}
+      {Put a character string into a slice of a primitive item
+      associated with a specified identifier}
+\noteroutine{NBS\_PUT\_SHAPE}{NBS_PUT_SHAPE}
+      {Put a new shape to a primitive item
+      associated with a specified identifier}
+\noteroutine{NBS\_PUT\_SIZE}{NBS_PUT_SIZE}
+      {Put a new size to a primitive item
+      associated with a specified identifier}
+\noteroutine{NBS\_INC\_MODIFIED}{NBS_INC_MODIFIED}
+      {Increment the noticeboard modified count or an item modified count
+      depending on whether this is a structured or primitive item}
+\noteroutine{NBS\_PUT\_TRIGGER}{NBS_PUT_TRIGGER}
+      {Specify a routine to be called whenever a primitive item is updated}
 \end{mansectionroutines}
-\mansection {{\mantt{NBS\_GET}}}{      Routines that read information from a %
+\mansection {{\texttt{NBS\_GET}}}{      Routines that read information from a %
 noticeboard}
 
       Normally this is a very straightforward operation, but when reading
@@ -1720,68 +943,68 @@ noticeboard}
       the information has not altered it whilst it is being read.
 
       There are three global parameters which can be altered using the
-      {\mantt{NBS\_TUNE\_NOTICEBOARD}} routine and which affect the behaviour %
+      {\texttt{NBS\_TUNE\_NOTICEBOARD}} routine and which affect the behaviour %
 of the
       shape and data reading routines:
 
-      1. {\mantt{CHECK\_MODIFY}} is {\mantt{TRUE}} by default and this means %
+      1. {\texttt{CHECK\_MODIFY}} is {\texttt{TRUE}} by default and this means %
 that the item's
          modified count is checked both before and after reading the data. The
          data is read repeatedly until the value of this count is even and
-         unchanging or until a timeout occurs. If set {\mantt{FALSE}}, no %
+         unchanging or until a timeout occurs. If set {\texttt{FALSE}}, no %
 such checks are
          made and no timeout can occur.
 
-      2. {\mantt{TIMEOUT\_COUNT}} is 100 by default and is the maximum number %
+      2. {\texttt{TIMEOUT\_COUNT}} is 100 by default and is the maximum number %
 of times
          that the data reading will be tried.
 
-      3. {\mantt{TIMEOUT\_INTERVAL}} is 100 by default and is the delay in %
+      3. {\texttt{TIMEOUT\_INTERVAL}} is 100 by default and is the delay in %
 milliseconds
          between tries.
 
 \begin{mansectionroutines}
-\mansectionitem {{\mantt{NBS\_GET\_VALUE}}}
-      Get a byte array from a slice of a primitive item
-      associated with the specified identifier
-\mansectionitem {{\mantt{NBS\_GET\_CVALUE}}}
-      Get a byte array from a slice of a primitive item
+\noteroutine{NBS\_GET\_VALUE}{NBS_GET_VALUE}
+      {Get a byte array from a slice of a primitive item
+      associated with the specified identifier}
+\noteroutine{NBS\_GET\_CVALUE}{NBS_GET_CVALUE}
+      {Get a byte array from a slice of a primitive item
       associated with the specified identifier and
-      store in a character string
-\mansectionitem {{\mantt{NBS\_GET\_SHAPE}}}
-      Get the shape of a primitive item
-      associated with the specified identifier
-\mansectionitem {{\mantt{NBS\_GET\_MODIFIED}}}
-      Get the noticeboard modified count or an item modified count
-      depending on whether this is a structured or primitive item
-\mansectionitem {{\mantt{NBS\_GET\_MODIFIED\_POINTER}}}
-      Get a pointer to the noticeboard modified count or an item modified count
-      depending on whether this is a structured or primitive item
-\mansectionitem {{\mantt{NBS\_GET\_UPDATED}}}
-      Determine whether a primitive item or the noticeboard has been updated
-      since the noticeboard was found or this routine was last called.
-\mansectionitem {{\mantt{NBS\_GET\_POINTER}}}
-      Return a pointer to the first byte of the data of a primitive item
-      associated with the specified identifier
-\mansectionitem {{\mantt{NBS\_GET\_NAME}}}
-      Get the name of an item
-      associated with the specified identifier
-\mansectionitem {{\mantt{NBS\_GET\_TYPE}}}
-      Get the type of an item
-      associated with the specified identifier
-\mansectionitem {{\mantt{NBS\_GET\_SIZE}}}
-      Get the maximum and actual sizes of a primitive item
-      associated with the specified identifier
-\mansectionitem {{\mantt{NBS\_GET\_PRIMITIVE}}}
-      Determine whether or not an item is primitive
-\mansectionitem {{\mantt{NBS\_GET\_PARENT}}}
-      Get the identifier of an item's parent structure
-\mansectionitem {{\mantt{NBS\_GET\_CHILDREN}}}
-      Get the number of children of a structured item
-\mansectionitem {{\mantt{NBS\_GET\_INFO}}}
-      Get general non-character information on a given noticeboard
-\mansectionitem {{\mantt{NBS\_GET\_CINFO}}}
-      Get general character information on a given noticeboard
+      store in a character string}
+\noteroutine{NBS\_GET\_SHAPE}{NBS_GET_SHAPE}
+      {Get the shape of a primitive item
+      associated with the specified identifier}
+\noteroutine{NBS\_GET\_MODIFIED}{NBS_GET_MODIFIED}
+      {Get the noticeboard modified count or an item modified count
+      depending on whether this is a structured or primitive item}
+\noteroutine{NBS\_GET\_MODIFIED\_POINTER}{NBS_GET_MODIFIED_POINTER}
+      {Get a pointer to the noticeboard modified count or an item modified count
+      depending on whether this is a structured or primitive item}
+\noteroutine{NBS\_GET\_UPDATED}{NBS_GET_UPDATED}
+      {Determine whether a primitive item or the noticeboard has been updated
+      since the noticeboard was found or this routine was last called.}
+\noteroutine{NBS\_GET\_POINTER}{NBS_GET_POINTER}
+      {Return a pointer to the first byte of the data of a primitive item
+      associated with the specified identifier}
+\noteroutine{NBS\_GET\_NAME}{NBS_GET_NAME}
+      {Get the name of an item
+      associated with the specified identifier}
+\noteroutine{NBS\_GET\_TYPE}{NBS_GET_TYPE}
+      {Get the type of an item
+      associated with the specified identifier}
+\noteroutine{NBS\_GET\_SIZE}{NBS_GET_SIZE}
+      {Get the maximum and actual sizes of a primitive item
+      associated with the specified identifier}
+\noteroutine{NBS\_GET\_PRIMITIVE}{NBS_GET_PRIMITIVE}
+      {Determine whether or not an item is primitive}
+\noteroutine{NBS\_GET\_PARENT}{NBS_GET_PARENT}
+      {Get the identifier of an item's parent structure}
+\noteroutine{NBS\_GET\_CHILDREN}{NBS_GET_CHILDREN}
+      {Get the number of children of a structured item}
+\noteroutine{NBS\_GET\_INFO}{NBS_GET_INFO}
+      {Get general non-character information on a given noticeboard}
+\noteroutine{NBS\_GET\_CINFO}{NBS_GET_CINFO}
+      {Get general character information on a given noticeboard}
 \end{mansectionroutines}
 %------------------------------------------------------------------------------
 
@@ -1791,7 +1014,7 @@ milliseconds
 Several operations are tested below on all architectures on which NBS has
 been extensively tested. The
 figures given are for a noticeboard with 100 items all at the same level and
-are the {\em lowest} measured values of {\tt CPU} microseconds:
+are the \emph{lowest} measured values of \texttt{CPU} microseconds:
 
 \begin{small}
 \begin {center}
@@ -1818,10 +1041,10 @@ are the {\em lowest} measured values of {\tt CPU} microseconds:
 \end {center}
 \end{small}
 
-These are fairly consistent with the times reported for the {\tt MON} system.
+These are fairly consistent with the times reported for the \texttt{MON} system.
 They are also pretty close to those for V2.2 of the noticeboard system and are
 better in some cases, presumably partly because of the greater use of inline
-code in V2.3.1 onwards. The speed of the {\tt UNIX} machine is particularly
+code in V2.3.1 onwards. The speed of the \texttt{UNIX} machine is particularly
 noticeable on file related operations where the speed up is an order of
 magnitude greater those operations simply involved with moving data around.
 
@@ -1832,26 +1055,26 @@ The following are possible improvements and developments:
 \begin {itemize}
 \item There are no provided exit handlers and if a process crashed in the
 middle of an update then a modified count could get left as an odd number which
-would cause {\tt NBS\_GET\_VALUE} and {\tt NBS\_GET\_SHAPE} to time out.
+would cause \texttt{NBS\_GET\_VALUE} and \texttt{NBS\_GET\_SHAPE} to time out.
 \item There are inefficiencies associated with the definition and creation
 (not the use) of noticeboards with large numbers of sibling items. Definition
 involves linear searches with character comparison through linked lists
 and creation involves very deep recursion.
-\item It has been proposed that tables (rather like {\tt HDS} structure arrays)
+\item It has been proposed that tables (rather like \texttt{HDS} structure arrays)
 should be supported.
 \item It has been proposed that it should be possible to associate ``extra''
 information with noticeboard items. This could be used for holding things like
 units.
-\item The restriction on the names of {\tt UNIX} noticeboards is a
+\item The restriction on the names of \texttt{UNIX} noticeboards is a
 nuisance. Perhaps a global list of names could be maintained, but this
 system may be succeptible to access conflicts on a system with intensive
-use of {\tt NBS}.
+use of \texttt{NBS}.
 \end {itemize}
 
 \subsection{New Features}
 \label{V2.5 New Features}
 The only major new feature in V2.5 is that the noticeboard listing
-program previously named {\tt ln} has been renamed to {\tt nbtrace} and
+program previously named \texttt{ln} has been renamed to \texttt{nbtrace} and
 is now installed during the NBS installation process.
 
 \subsection {Bug Fixes}
@@ -1860,8 +1083,8 @@ Two problems are fixed in V2.5.5. NBS has hitherto allocated the data for
 primitive noticeboard items using exactly the data size supplied in the
 item definition. In V2.5.5 this size is rounded up to a multiple of the
 size of a double precision number. This ensures that items composed of
-types likely to mapped using {\tt NBS\_GET\_POINTER} or
-{\tt nbc\_get\_pointer} will be correctly aligned.
+types likely to mapped using \texttt{NBS\_GET\_POINTER} or
+\texttt{nbc\_get\_pointer} will be correctly aligned.
 
 The second problem concerns the algorithm used to generate UNIX shared
 memory identifiers (4 byte integers) from memory section names. The method
@@ -1875,7 +1098,7 @@ on to different key values.
 
 \appendix
 \newpage
-\section {Description of Individual {\tt NBS} Routines}
+\section {Description of Individual \texttt{NBS} Routines}
 \label {Description of Individual NBS Routines}
 
 These descriptions are taken directly from the code. All of the routines are
@@ -1962,8 +1185,8 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_BADOPTION} \= Illegal parameter name \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_BADOPTION} \= Illegal parameter name \\
 \end{tabbing}
       }
    }
@@ -2046,9 +1269,9 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID} \> NIL ID \\
-\mantt{NBS\_\_BADOPTION} \> Illegal parameter name \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID} \> NIL ID \\
+\texttt{NBS\_\_BADOPTION} \> Illegal parameter name \\
 \end{tabbing}
       }
    }
@@ -2084,12 +1307,12 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID} \> NIL ID \\
-\mantt{NBS\_\_BADOPTION} \> Illegal parameter name \\
-\mantt{NBS\_\_DEFINING  } \> Already defining a noticeboard \\
-\mantt{NBS\_\_INITALLOCFAILED} \> Storage allocation failed \\
-\mantt{NBS\_\_NOMOREROOM} \> Storage area is full up \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID} \> NIL ID \\
+\texttt{NBS\_\_BADOPTION} \> Illegal parameter name \\
+\texttt{NBS\_\_DEFINING  } \> Already defining a noticeboard \\
+\texttt{NBS\_\_INITALLOCFAILED} \> Storage allocation failed \\
+\texttt{NBS\_\_NOMOREROOM} \> Storage area is full up \\
 \end{tabbing}
       }
    }
@@ -2142,11 +1365,11 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NOTDEFINING} \> Not currently defining a noticeboard \\
-\mantt{NBS\_\_NILSID} \> NIL static ID \\
-\mantt{NBS\_\_PRIMITIVE} \> Prospective parent is primitive \\
-\mantt{NBS\_\_NOMOREROOM} \> Storage area is full up \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NOTDEFINING} \> Not currently defining a noticeboard \\
+\texttt{NBS\_\_NILSID} \> NIL static ID \\
+\texttt{NBS\_\_PRIMITIVE} \> Prospective parent is primitive \\
+\texttt{NBS\_\_NOMOREROOM} \> Storage area is full up \\
 \end{tabbing}
       }
    }
@@ -2197,7 +1420,7 @@ written in C and some C-specific terms are used.
       \sstsubsection{
          MAXBYTES = INTEGER (Given)
       }{
-         Maximum number of bytes in this item{\tt '}s value
+         Maximum number of bytes in this item\texttt{'}s value
       }
       \sstsubsection{
          SID = INTEGER (Returned)
@@ -2211,11 +1434,11 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NOTDEFINING} \> Not currently defining a noticeboard \\
-\mantt{NBS\_\_NILSID} \> NIL static ID \\
-\mantt{NBS\_\_PRIMITIVE } \> Prospective parent is primitive \\
-\mantt{NBS\_\_NOMOREROOM} \> Storage area is full up \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NOTDEFINING} \> Not currently defining a noticeboard \\
+\texttt{NBS\_\_NILSID} \> NIL static ID \\
+\texttt{NBS\_\_PRIMITIVE } \> Prospective parent is primitive \\
+\texttt{NBS\_\_NOMOREROOM} \> Storage area is full up \\
 \end{tabbing}
       }
    }
@@ -2257,11 +1480,11 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NOTDEFINING} \> Not currently defining a noticeboard \\
-\mantt{NBS\_\_NILSID	   } \> NIL static ID \\
-\mantt{NBS\_\_PRIMITIVE } \> Prospective parent is primitive \\
-\mantt{NBS\_\_TOOMANYDIMS} \> Too many dimensions \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NOTDEFINING} \> Not currently defining a noticeboard \\
+\texttt{NBS\_\_NILSID	   } \> NIL static ID \\
+\texttt{NBS\_\_PRIMITIVE } \> Prospective parent is primitive \\
+\texttt{NBS\_\_TOOMANYDIMS} \> Too many dimensions \\
 \end{tabbing}
       }
    }
@@ -2284,7 +1507,7 @@ written in C and some C-specific terms are used.
       If the option parameter indicates, write the definition and optionally
       the data to a file (a default file extension of .NBD is applied). \\
       Otherwise, create the noticeboard, copy the definition to it, write the
-      calling process{\tt '} id to the global section to denote ownership and mark
+      calling process\texttt{'} id to the global section to denote ownership and mark
       the noticeboard as being valid. \\
       De-allocate the memory area used to amass the noticeboard definition and
       note that we are no longer defining a noticeboard. \\
@@ -2329,14 +1552,14 @@ written in C and some C-specific terms are used.
       }{
             The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NOTDEFINING} \> Not currently defining a noticeboard \\
-\mantt{NBS\_\_CANTOPEN  } \> Can't create the definition file \\
-\mantt{NBS\_\_CANTWRITE } \> Can't write the definition file \\
-\mantt{NBS\_\_SECTIONEXISTED} \> Noticeboard of this name already \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NOTDEFINING} \> Not currently defining a noticeboard \\
+\texttt{NBS\_\_CANTOPEN  } \> Can't create the definition file \\
+\texttt{NBS\_\_CANTWRITE } \> Can't write the definition file \\
+\texttt{NBS\_\_SECTIONEXISTED} \> Noticeboard of this name already \\
                           \> existed. \\
  \> \\
-\mantt{SS\$\_*} \> System service codes from \mantt{SYS\$CRMPSC} \\
+\texttt{SS\$\_*} \> System service codes from \texttt{SYS\$CRMPSC} \\
 \end{tabbing}
       }
    }
@@ -2352,7 +1575,7 @@ written in C and some C-specific terms are used.
       Check that the data part was not saved to the file. \\
       Create the noticeboard. \\
       Read the definition part of the file into the noticeboard. \\
-      Write the calling process{\tt '} id to the noticeboard to denote ownership and
+      Write the calling process\texttt{'} id to the noticeboard to denote ownership and
       mark the noticeboard as being valid. \\
       Close the file.
 
@@ -2380,16 +1603,16 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_CANTOPEN  } \> Can't create the definition file \\
-\mantt{NBS\_\_DATASAVED } \> Noticeboard data was saved to the \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_CANTOPEN  } \> Can't create the definition file \\
+\texttt{NBS\_\_DATASAVED } \> Noticeboard data was saved to the \\
       \> definition file --- cannot restore only defn \\
-\mantt{NBS\_\_CANTREAD  } \> Can't read the definition file \\
-\mantt{NBS\_\_BADVERSION} \> Wrong version in definition file \\
-\mantt{NBS\_\_SECTIONEXISTED} \> Noticeboard of this name already \\
+\texttt{NBS\_\_CANTREAD  } \> Can't read the definition file \\
+\texttt{NBS\_\_BADVERSION} \> Wrong version in definition file \\
+\texttt{NBS\_\_SECTIONEXISTED} \> Noticeboard of this name already \\
                           \> existed. \\
  \> \\
-\mantt{SS\$\_*} \> System service codes from \mantt{SYS\$CRMPSC} \\
+\texttt{SS\$\_*} \> System service codes from \texttt{SYS\$CRMPSC} \\
 \end{tabbing}
       }
    }
@@ -2410,7 +1633,7 @@ written in C and some C-specific terms are used.
       Open the file and determine the noticeboard size. \\
       Create the noticeboard. \\
       Read the file into the noticeboard. \\
-      Write the calling process{\tt '} id to the noticeboard to denote ownership and
+      Write the calling process\texttt{'} id to the noticeboard to denote ownership and
       mark the noticeboard as being valid. \\
       Close the file. \\
       If the file only contained the definition and not the noticeboard,
@@ -2439,17 +1662,17 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_CANTOPEN  } \> Can't create the definition file \\
-\mantt{NBS\_\_CANTREAD  } \> Can't read the definition file \\
-\mantt{NBS\_\_BADVERSION} \> Wrong version in definition file \\
-\mantt{NBS\_\_SECTIONEXISTED} \> Noticeboard of this name already \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_CANTOPEN  } \> Can't create the definition file \\
+\texttt{NBS\_\_CANTREAD  } \> Can't read the definition file \\
+\texttt{NBS\_\_BADVERSION} \> Wrong version in definition file \\
+\texttt{NBS\_\_SECTIONEXISTED} \> Noticeboard of this name already \\
                           \> existed. \\
-\mantt{NBS\_\_DATANOTSAVED} \> Noticeboard data not saved to the \\
+\texttt{NBS\_\_DATANOTSAVED} \> Noticeboard data not saved to the \\
 			    \> definition file, so not restored \\
  \> \\
-\mantt{SS\$\_*} \> System service codes from \mantt{SYS\$CRMPSC} or \\
- \> \mantt{SYS\$DELTVA} (VMS only).
+\texttt{SS\$\_*} \> System service codes from \texttt{SYS\$CRMPSC} or \\
+ \> \texttt{SYS\$DELTVA} (VMS only).
 \end{tabbing}
       }
    }
@@ -2488,11 +1711,11 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	   } \> NIL ID \\
-\mantt{NBS\_\_CANTOPEN  } \> Can't open the definition file \\
-\mantt{NBS\_\_NOTOWNER  } \> Caller does not own the noticeboard \\
-\mantt{NBS\_\_DATANOTRESTORED} \> Noticeboard data was not restored \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	   } \> NIL ID \\
+\texttt{NBS\_\_CANTOPEN  } \> Can't open the definition file \\
+\texttt{NBS\_\_NOTOWNER  } \> Caller does not own the noticeboard \\
+\texttt{NBS\_\_DATANOTRESTORED} \> Noticeboard data was not restored \\
 			     \> from the definition file (so can't save it) \\
 \end{tabbing}
       }
@@ -2517,8 +1740,8 @@ written in C and some C-specific terms are used.
       the entire definition. \\
       Copy the definition part to this memory and relocate it so that all
       pointers are once again virtual memory addresses. \\
-      Get the process{\tt '} id for future checking against the owner{\tt '}s process id. \\
-      If this is the owner process and it hasn{\tt '}t already been done, unmap the
+      Get the process\texttt{'} id for future checking against the owner\texttt{'}s process id. \\
+      If this is the owner process and it hasn\texttt{'}t already been done, unmap the
       copy mapped earlier.
 
       Note that it is somewhat wasteful to build a complete copy of the
@@ -2548,14 +1771,14 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_SECTIONNOTFOUND} \> No section called NAME existed \\
-\mantt{NBS\_\_TIMEOUT   } \> Timeout awaiting valid noticeboard \\
-\mantt{NBS\_\_NOMOREROOM} \> Failed to allocate private memory area \\
-\mantt{NBS\_\_BADVERSION} \> Wrong version in noticeboard \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_SECTIONNOTFOUND} \> No section called NAME existed \\
+\texttt{NBS\_\_TIMEOUT   } \> Timeout awaiting valid noticeboard \\
+\texttt{NBS\_\_NOMOREROOM} \> Failed to allocate private memory area \\
+\texttt{NBS\_\_BADVERSION} \> Wrong version in noticeboard \\
  \> \\
-\mantt{SS\$\_*} \> System service codes from \mantt{SYS\$CRMPSC} or \\
- \> \mantt{SYS\$DELTVA} (VMS only).
+\texttt{SS\$\_*} \> System service codes from \texttt{SYS\$CRMPSC} or \\
+ \> \texttt{SYS\$DELTVA} (VMS only).
 \end{tabbing}
       }
    }
@@ -2564,13 +1787,13 @@ written in C and some C-specific terms are used.
    NBS\_FIND\_ITEM
 }{
    Find an item with a specified name contained in a structure
-   associated with a specified identifier and return the located item{\tt '}s
+   associated with a specified identifier and return the located item\texttt{'}s
    ID
 }{
    \sstdescription{
       Check that the environment ID is not NIL and does not pertain to a
       primitive item. \\
-      Search for an item of the required name (don{\tt '}t assume that they are in
+      Search for an item of the required name (don\texttt{'}t assume that they are in
       any particular order).
 
       The searching is performed using a binary search. This means that
@@ -2602,10 +1825,10 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_PRIMITIVE	 } \> Parent is primitive \\
-\mantt{NBS\_\_ITEMNOTFOUND} \> No item of this name exists \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_PRIMITIVE	 } \> Parent is primitive \\
+\texttt{NBS\_\_ITEMNOTFOUND} \> No item of this name exists \\
 \end{tabbing}
       }
    }
@@ -2614,7 +1837,7 @@ written in C and some C-specific terms are used.
    NBS\_FIND\_NTH\_ITEM
 }{
    Find the Nth item contained in a structure
-   associated with a specified identifier and return the located item{\tt '}s ID
+   associated with a specified identifier and return the located item\texttt{'}s ID
 }{
    \sstdescription{
       Check that the environment ID is not NIL and does not pertain to a
@@ -2645,10 +1868,10 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_PRIMITIVE	 } \> Parent is primitive \\
-\mantt{NBS\_\_ITEMNOTFOUND} \> No item of this name exists \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_PRIMITIVE	 } \> Parent is primitive \\
+\texttt{NBS\_\_ITEMNOTFOUND} \> No item of this name exists \\
 \end{tabbing}
       }
    }
@@ -2661,7 +1884,7 @@ written in C and some C-specific terms are used.
    \sstdescription{
       Check that the ID is indeed a top-level one. \\
       Check that no items are currently derived from the top level of the
-      noticeboard (not if the {\tt "}FORCE{\tt "} option is specified). \\
+      noticeboard (not if the \texttt{"}FORCE\texttt{"} option is specified). \\
       Unmap the noticeboard. \\
       Free the local copy of the noticeboard definition.
 
@@ -2699,13 +1922,13 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_NOTTOPLEVEL } \> ID is not a top-level identifier \\
-\mantt{NBS\_\_HASIDS	 } \> Noticeboard has identifiers derived \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_NOTTOPLEVEL } \> ID is not a top-level identifier \\
+\texttt{NBS\_\_HASIDS	 } \> Noticeboard has identifiers derived \\
 				  \> from it \\
  \> \\
-\mantt{SS\$\_*} \> System service codes from \mantt{SYS\$DELTVA} (VMS only). \\
+\texttt{SS\$\_*} \> System service codes from \texttt{SYS\$DELTVA} (VMS only). \\
 \end{tabbing}
       }
    }
@@ -2717,10 +1940,10 @@ written in C and some C-specific terms are used.
 }{
    \sstdescription{
       Check that the ID is not a top-level one. \\
-      Check that at least one item is derived from this item{\tt '}s parent. \\
+      Check that at least one item is derived from this item\texttt{'}s parent. \\
       Check that no items are currently derived from this item (not if the
-      {\tt "}FORCE{\tt "} option is specified). \\
-      Decrement the parent{\tt '}s count of derived items.
+      \texttt{"}FORCE\texttt{"} option is specified). \\
+      Decrement the parent\texttt{'}s count of derived items.
 
       Calls to this routine should match calls to NBS\_FIND\_ITEM /
       NBS\_FIND\_NTH\_ITEM. After calling it, this identifier should not
@@ -2756,15 +1979,15 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_NOTTOPLEVEL } \> ID is not a top-level identifier \\
-\mantt{NBS\_\_NEVERFOUND  } \> Item was never found (or more items \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_NOTTOPLEVEL } \> ID is not a top-level identifier \\
+\texttt{NBS\_\_NEVERFOUND  } \> Item was never found (or more items \\
  \> have been lost than were found) \\
-\mantt{NBS\_\_HASIDS	 } \> Noticeboard has identifiers derived \\
+\texttt{NBS\_\_HASIDS	 } \> Noticeboard has identifiers derived \\
 				     \> from it \\
  \> \\
-\mantt{SS\$\_*} \> System service codes from \mantt{SYS\$DELTVA} (VMS only).
+\texttt{SS\$\_*} \> System service codes from \texttt{SYS\$DELTVA} (VMS only).
 \end{tabbing}
       }
    }
@@ -2781,10 +2004,10 @@ written in C and some C-specific terms are used.
       Check that the offset into the data is not negative. \\
       Check that the item is large enough to accept all of the supplied
       values. \\
-      Increment the item{\tt '}s modified count. \\
+      Increment the item\texttt{'}s modified count. \\
       Update the item size (maintain a high-water mark). \\
       Copy the values to the noticeboard. \\
-      Increment the item{\tt '}s modified count again. \\
+      Increment the item\texttt{'}s modified count again. \\
       Increment the noticeboard modified count.
 
       The item and noticeboard modified counts will not be incremented if
@@ -2826,12 +2049,12 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_NOTPRIMITIVE} \> Item is not primitive \\
-\mantt{NBS\_\_NOTOWNER 	 } \> Caller does not own the noticeboard \\
-\mantt{NBS\_\_BADOFFSET	 } \> Negative offset specified \\
-\mantt{NBS\_\_TOOMANYBYTES} \> Not room to put all the data \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_NOTPRIMITIVE} \> Item is not primitive \\
+\texttt{NBS\_\_NOTOWNER 	 } \> Caller does not own the noticeboard \\
+\texttt{NBS\_\_BADOFFSET	 } \> Negative offset specified \\
+\texttt{NBS\_\_TOOMANYBYTES} \> Not room to put all the data \\
 \end{tabbing}
       }
    }
@@ -2876,12 +2099,12 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_NOTPRIMITIVE} \> Item is not primitive \\
-\mantt{NBS\_\_NOTOWNER 	 } \> Caller does not own the noticeboard \\
-\mantt{NBS\_\_BADOFFSET	 } \> Negative offset specified \\
-\mantt{NBS\_\_TOOMANYBYTES} \> Not room to put all the data \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_NOTPRIMITIVE} \> Item is not primitive \\
+\texttt{NBS\_\_NOTOWNER 	 } \> Caller does not own the noticeboard \\
+\texttt{NBS\_\_BADOFFSET	 } \> Negative offset specified \\
+\texttt{NBS\_\_TOOMANYBYTES} \> Not room to put all the data \\
 \end{tabbing}
       }
    }
@@ -2932,11 +2155,11 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_NOTPRIMITIVE} \> Item is not primitive \\
-\mantt{NBS\_\_NOTOWNER 	 } \> Caller does not own the noticeboard \\
-\mantt{NBS\_\_TOOMANYDIMS } \> NDIMS is greater than item max dims \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_NOTPRIMITIVE} \> Item is not primitive \\
+\texttt{NBS\_\_NOTOWNER 	 } \> Caller does not own the noticeboard \\
+\texttt{NBS\_\_TOOMANYDIMS } \> NDIMS is greater than item max dims \\
 \end{tabbing}
       }
    }
@@ -2951,9 +2174,9 @@ written in C and some C-specific terms are used.
       Check that the ID is not NIL and that it pertains to a primitive item. \\
       Check that the caller owns the noticeboard (or WORLD\_WRITE is TRUE). \\
       Check that the item is large enough to be the proposed size. \\
-      Increment the item{\tt '}s modified count. \\
-      Update the internal record of the item{\tt '}s size. \\
-      Increment the item{\tt '}s modified count again. \\
+      Increment the item\texttt{'}s modified count. \\
+      Update the internal record of the item\texttt{'}s size. \\
+      Increment the item\texttt{'}s modified count again. \\
       Increment the noticeboard modified count.
 
       The item and noticeboard modified counts will not be incremented if
@@ -2978,11 +2201,11 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_NOTPRIMITIVE} \> Item is not primitive \\
-\mantt{NBS\_\_NOTOWNER 	 } \> Caller does not own the noticeboard \\
-\mantt{NBS\_\_TOOMANYBYTES} \> NBYTES is greater than item size \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_NOTPRIMITIVE} \> Item is not primitive \\
+\texttt{NBS\_\_NOTOWNER 	 } \> Caller does not own the noticeboard \\
+\texttt{NBS\_\_TOOMANYBYTES} \> NBYTES is greater than item size \\
 \end{tabbing}
       }
    }
@@ -2997,10 +2220,10 @@ written in C and some C-specific terms are used.
       Check that the ID is not NIL. \\
       Check that the caller owns the noticeboard (or WORLD\_WRITE is TRUE). \\
       If the item is structured increment the noticeboard modified count. \\
-      If the item is primitive increment the item{\tt '}s modified count.
+      If the item is primitive increment the item\texttt{'}s modified count.
 
       Note that this is a very dangerous routine when called on behalf of
-      primitive items. Calls to it {\em must} be paired. Any reader of an item
+      primitive items. Calls to it \emph{must} be paired. Any reader of an item
       will time out if the modified count for the item being read is an odd
       number.
    }
@@ -3018,9 +2241,9 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_NOTOWNER 	 } \> Caller does not own the noticeboard \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_NOTOWNER 	 } \> Caller does not own the noticeboard \\
 \end{tabbing}
       }
    }
@@ -3035,7 +2258,7 @@ written in C and some C-specific terms are used.
       Check that the caller owns the noticeboard (or WORLD\_WRITE is TRUE). \\
       Copy the address of the routine to be called on item update.
 
-      In this context {\tt "}update{\tt "} means any change to the item{\tt '}s shape, data, size
+      In this context \texttt{"}update\texttt{"} means any change to the item\texttt{'}s shape, data, size
       or modified count. The supplied routine is called with the following
       calling sequence:
 
@@ -3066,9 +2289,9 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_NOTOWNER 	 } \> Caller does not own the noticeboard \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_NOTOWNER 	 } \> Caller does not own the noticeboard \\
 \end{tabbing}
       }
    }
@@ -3087,7 +2310,7 @@ written in C and some C-specific terms are used.
       XXX \= \kill
         \> \{ \\
         \> Read the modified count for this item. \\
-        \> Copy as many bytes as there is room for in the user{\tt '}s buffer
+        \> Copy as many bytes as there is room for in the user\texttt{'}s buffer
            from the noticeboard starting \\
         \> at the specified offset and return the actual number of bytes
            in the item. \\
@@ -3098,10 +2321,10 @@ written in C and some C-specific terms are used.
                       were being read).
       \end {tabbing}
 
-      If CHECK\_MODIFY is FALSE, the item{\tt '}s modified count is not checked
+      If CHECK\_MODIFY is FALSE, the item\texttt{'}s modified count is not checked
       at all and a timeout cannot occur.
 
-      If the specified offset is greater than the current size of the item{\tt '}s
+      If the specified offset is greater than the current size of the item\texttt{'}s
       data, no error status will be returned and no data will be copied, but
       the returned number of bytes (ACTBYTES) will be less than the offset
       (OFFSET) and this case should always be checked for.
@@ -3123,30 +2346,30 @@ written in C and some C-specific terms are used.
       \sstsubsection{
          MAXBYTES = INTEGER (Given)
       }{
-         Size in bytes of the user{\tt '}s buffer.
+         Size in bytes of the user\texttt{'}s buffer.
       }
       \sstsubsection{
          BYTE\_ARRAY = BYTE($*$) (Returned)
       }{
-         User{\tt '}s buffer into which bytes will be got.
+         User\texttt{'}s buffer into which bytes will be got.
       }
       \sstsubsection{
          ACTBYTES = INTEGER (Returned)
       }{
          Actual number of values associated with the item. This may be
          greater than OFFSET $+$ MAXBYTES but no more than MAXBYTES bytes
-         will be copied into the user{\tt '}s buffer.
+         will be copied into the user\texttt{'}s buffer.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and returned)
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_NOTPRIMITIVE} \> Item is not primitive \\
-\mantt{NBS\_\_BADOFFSET	 } \> Negative offset specified \\
-\mantt{NBS\_\_TIMEOUT	 } \> Timeout awaiting valid data \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_NOTPRIMITIVE} \> Item is not primitive \\
+\texttt{NBS\_\_BADOFFSET	 } \> Negative offset specified \\
+\texttt{NBS\_\_TIMEOUT	 } \> Timeout awaiting valid data \\
 \end{tabbing}
       }
    }
@@ -3187,18 +2410,18 @@ written in C and some C-specific terms are used.
       }{
          Actual number of values associated with the item. This may be
          greater than OFFSET $+$ LEN(STRING) but no more than LEN(STRING) bytes
-         will be copied into the user{\tt '}s buffer.
+         will be copied into the user\texttt{'}s buffer.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and returned)
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_NOTPRIMITIVE} \> Item is not primitive \\
-\mantt{NBS\_\_BADOFFSET	 } \> Negative offset specified \\
-\mantt{NBS\_\_TIMEOUT	 } \> Timeout awaiting valid data \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_NOTPRIMITIVE} \> Item is not primitive \\
+\texttt{NBS\_\_BADOFFSET	 } \> Negative offset specified \\
+\texttt{NBS\_\_TIMEOUT	 } \> Timeout awaiting valid data \\
 \end{tabbing}
       }
    }
@@ -3225,7 +2448,7 @@ written in C and some C-specific terms are used.
       XXX \= \kill
         \> \{ \\
              \> Read the modified count for this item. \\
-             \> Copy as many dimensions as there is room for in the user{\tt '}s
+             \> Copy as many dimensions as there is room for in the user\texttt{'}s
                 buffer from the noticeboard and \\
              \> return the actual number of dimensions in the item. \\
              \> Read the modified count for this item once more. \\
@@ -3235,7 +2458,7 @@ written in C and some C-specific terms are used.
                       were being read).
       \end {tabbing}
 
-      If CHECK\_MODIFY is FALSE, the item{\tt '}s modified count is not checked
+      If CHECK\_MODIFY is FALSE, the item\texttt{'}s modified count is not checked
       at all and a timeout cannot occur.
 
       Note also that the MAXDIMS parameter to this routine is a MODIFIED
@@ -3271,29 +2494,29 @@ written in C and some C-specific terms are used.
       \sstsubsection{
          MAXBYTES = INTEGER (Given)
       }{
-         Size in bytes of the user{\tt '}s buffer.
+         Size in bytes of the user\texttt{'}s buffer.
       }
       \sstsubsection{
          BYTE\_ARRAY = BYTE($*$) (Returned)
       }{
-         User{\tt '}s buffer into which bytes will be got.
+         User\texttt{'}s buffer into which bytes will be got.
       }
       \sstsubsection{
          ACTBYTES = INTEGER (Returned)
       }{
          Actual number of values associated with the item. This may be
          greater than OFFSET $+$ MAXBYTES but no more than MAXBYTES bytes
-         will be copied into the user{\tt '}s buffer.
+         will be copied into the user\texttt{'}s buffer.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and returned)
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_NOTPRIMITIVE} \> Item is not primitive \\
-\mantt{NBS\_\_TIMEOUT	 } \> Timeout awaiting valid data \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_NOTPRIMITIVE} \> Item is not primitive \\
+\texttt{NBS\_\_TIMEOUT	 } \> Timeout awaiting valid data \\
 \end{tabbing}
       }
    }
@@ -3307,7 +2530,7 @@ written in C and some C-specific terms are used.
    \sstdescription{
       Check that the ID is not NIL. \\
       If the item is structured get the noticeboard modified count. \\
-      If the item is primitive get the item{\tt '}s modified count.
+      If the item is primitive get the item\texttt{'}s modified count.
 
       For structured items, this value is incremented each time an item in the
       noticeboard is updated.
@@ -3317,7 +2540,7 @@ written in C and some C-specific terms are used.
       being updated. The total number of updates to this item is half the
       value of the modified count.
 
-      An {\tt "}update{\tt "} is an update of an item{\tt '}s value, shape or size.
+      An \texttt{"}update\texttt{"} is an update of an item\texttt{'}s value, shape or size.
 
       Note that when item data is accessed directly via pointer then the
       modified count is not updated unless this is done explicitly using the
@@ -3335,15 +2558,15 @@ written in C and some C-specific terms are used.
       \sstsubsection{
          MODIFIED = INTEGER (Returned)
       }{
-         The current value of the noticeboard or item{\tt '}s modified count.
+         The current value of the noticeboard or item\texttt{'}s modified count.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and returned)
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
 \end{tabbing}
       }
    }
@@ -3357,7 +2580,7 @@ written in C and some C-specific terms are used.
    \sstdescription{
       Check that the ID is not NIL. \\
       If the item is structured get the noticeboard modified count. \\
-      If the item is primitive get the item{\tt '}s modified count. \\
+      If the item is primitive get the item\texttt{'}s modified count. \\
       Return a pointer to the appropriate modified count.
 
       For structured items, this value is incremented each time an item in the
@@ -3368,7 +2591,7 @@ written in C and some C-specific terms are used.
       being updated. The total number of updates to this item is half the
       value of the modified count.
 
-      An {\tt "}update{\tt "} is an update of an item{\tt '}s value, shape or size.
+      An \texttt{"}update\texttt{"} is an update of an item\texttt{'}s value, shape or size.
 
       Note that when item data is accessed directly via pointer then the
       modified count is not updated unless this is done explicitly using the
@@ -3387,15 +2610,15 @@ written in C and some C-specific terms are used.
       \sstsubsection{
          POINTER = INTEGER (Returned)
       }{
-         The address of the item{\tt '}s modified count.
+         The address of the item\texttt{'}s modified count.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and returned)
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
 \end{tabbing}
       }
    }
@@ -3409,7 +2632,7 @@ written in C and some C-specific terms are used.
    \sstdescription{
       Check that the ID is not NIL. \\
       If the item is structured get the noticeboard modified count. \\
-      If the item is primitive get the item{\tt '}s modified count. \\
+      If the item is primitive get the item\texttt{'}s modified count. \\
       Return TRUE (1) if the modified count is greater than the count the last
       time that this routine was called. \\
       Return FALSE (0) otherwise. \\
@@ -3438,8 +2661,8 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
 \end{tabbing}
       }
    }
@@ -3452,7 +2675,7 @@ written in C and some C-specific terms are used.
 }{
    \sstdescription{
       Check that the ID is not NIL and that it pertains to a primitive item. \\
-      Return the address of the start of the item{\tt '}s noticeboard data.
+      Return the address of the start of the item\texttt{'}s noticeboard data.
    }
    \sstinvocation{
       (Int) = NBS\_GET\_POINTER (ID,POINTER,STATUS)
@@ -3467,16 +2690,16 @@ written in C and some C-specific terms are used.
       \sstsubsection{
          POINTER = INTEGER (Returned)
       }{
-         The address of the first byte of this item{\tt '}s noticeboard data.
+         The address of the first byte of this item\texttt{'}s noticeboard data.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and returned)
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_NOTPRIMITIVE} \> Item is not primitive \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_NOTPRIMITIVE} \> Item is not primitive \\
 \end{tabbing}
       }
    }
@@ -3488,7 +2711,7 @@ written in C and some C-specific terms are used.
 }{
    \sstdescription{
       Check that the ID is not NIL. \\
-      Return the item{\tt '}s name.
+      Return the item\texttt{'}s name.
    }
    \sstinvocation{
       (Int) = NBS\_GET\_NAME (ID,NAME,STATUS)
@@ -3502,15 +2725,15 @@ written in C and some C-specific terms are used.
       \sstsubsection{
          NAME = CHARACTER$*$($*$) (Returned)
       }{
-         The item{\tt '}s name.
+         The item\texttt{'}s name.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and returned)
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
 \end{tabbing}
       }
    }
@@ -3522,7 +2745,7 @@ written in C and some C-specific terms are used.
 }{
    \sstdescription{
       Check that the ID is not NIL. \\
-      Return the item{\tt '}s type.
+      Return the item\texttt{'}s type.
    }
    \sstinvocation{
       (Int) = NBS\_GET\_TYPE (ID,TYPE,STATUS)
@@ -3536,15 +2759,15 @@ written in C and some C-specific terms are used.
       \sstsubsection{
          TYPE = CHARACTER$*$($*$) (Returned)
       }{
-         The item{\tt '}s type.
+         The item\texttt{'}s type.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and returned)
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
 \end{tabbing}
       }
    }
@@ -3557,7 +2780,7 @@ written in C and some C-specific terms are used.
 }{
    \sstdescription{
       Check that the ID is not NIL and that it pertains to a primitive item. \\
-      Return the maximum and actual sizes of the item{\tt '}s noticeboard data.
+      Return the maximum and actual sizes of the item\texttt{'}s noticeboard data.
    }
    \sstinvocation{
       (Int) = NBS\_GET\_SIZE (ID,MAXBYTES,ACTBYTES,STATUS)
@@ -3583,9 +2806,9 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_NOPRIMITIVE } \> Item is not primitive \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_NOPRIMITIVE } \> Item is not primitive \\
 \end{tabbing}
       }
    }
@@ -3625,8 +2848,8 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
 \end{tabbing}
       }
    }
@@ -3634,11 +2857,11 @@ written in C and some C-specific terms are used.
 \sstroutine{
    NBS\_GET\_PARENT
 }{
-   Get the identifier of an item{\tt '}s parent structure
+   Get the identifier of an item\texttt{'}s parent structure
 }{
    \sstdescription{
       Check that the ID is not NIL. \\
-      Return the identifier of the item{\tt '}s parent.
+      Return the identifier of the item\texttt{'}s parent.
 
       If the item has no parent (ie, if it pertains to a noticeboard), then a
       zero ID will be returned.
@@ -3655,7 +2878,7 @@ written in C and some C-specific terms are used.
       \sstsubsection{
          PARENT = INTEGER (Returned)
       }{
-         Identifier of item{\tt '}s parent. If the item has no parent then
+         Identifier of item\texttt{'}s parent. If the item has no parent then
          a NIL ID will be returned.
       }
       \sstsubsection{
@@ -3663,8 +2886,8 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
 \end{tabbing}
       }
    }
@@ -3697,9 +2920,9 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_PRIMITIVE	 } \> Parent is primitive \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_PRIMITIVE	 } \> Parent is primitive \\
 \end{tabbing}
       }
    }
@@ -3745,7 +2968,7 @@ written in C and some C-specific terms are used.
       \sstsubsection{
          VALUE = Depends on NAME (Returned)
       }{
-         The item{\tt '}s value. Declared as pointer to integer, but may be
+         The item\texttt{'}s value. Declared as pointer to integer, but may be
          coerced to pointer to real.
       }
       \sstsubsection{
@@ -3753,9 +2976,9 @@ written in C and some C-specific terms are used.
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_BADOPTION	 } \> Illegal item name \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_BADOPTION	 } \> Illegal item name \\
 \end{tabbing}
       }
    }
@@ -3798,16 +3021,16 @@ written in C and some C-specific terms are used.
       \sstsubsection{
          VALUE = CHARACTER$*$($*$) (Returned)
       }{
-         The item{\tt '}s value.
+         The item\texttt{'}s value.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and returned)
       }{
          The global status. Possible return values are,
 \begin{tabbing}
-\mantt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
-\mantt{NBS\_\_NILID	 } \> NIL ID \\
-\mantt{NBS\_\_BADOPTION	 } \> Illegal item name \\
+\texttt{NBS\_\_XXXXXXXXXXXXXXXXXXX} \= \kill
+\texttt{NBS\_\_NILID	 } \> NIL ID \\
+\texttt{NBS\_\_BADOPTION	 } \> Illegal item name \\
 \end{tabbing}
       }
    }
@@ -3824,12 +3047,11 @@ written in C and some C-specific terms are used.
 %------------------------------------------------------------------------------
 
 \newpage
-\section {{\tt NBS} Error Codes}
+\section {\texttt{NBS} Error Codes}
 
-This is edited from the source file that is processed by the {\tt MESSAGE}
-utility and the (slightly modified) {\tt ADAM} {\tt ERRGEN} utility to generate
-the C ({\tt NBS\_DIR:\-NBS\_ERR.H}) and Fortran ({\tt
-NBS\_DIR:\-NBS\_ERR.INC}) versions of the error code {\tt INCLUDE} files.
+This is edited from the source file that is processed by the \texttt{MESSAGE}
+utility and the (slightly modified) \texttt{ADAM} \texttt{ERRGEN} utility to generate
+the C (\texttt{NBS\_DIR:\-NBS\_ERR.H}) and Fortran (\texttt{NBS\_DIR:\-NBS\_ERR.INC}) versions of the error code \texttt{INCLUDE} files.
 
 \begin {center}
 \begin {tabular}{||l|l|p{80mm}||}
@@ -3846,8 +3068,8 @@ Warning         & \tt TOOMANYDIMS       & More dimensions than maximum allowed \
 \hline
 Error           & \tt DEFINING          & Currently defining noticeboard contents \\
                 & \tt NOTDEFINING       & Not currently defining noticeboard contents \\
-                & \tt NILSID            & {\tt NIL} static {\tt ID} \\
-                & \tt NILID             & {\tt NIL} item {\tt ID} \\
+                & \tt NILSID            & \texttt{NIL} static \texttt{ID} \\
+                & \tt NILID             & \texttt{NIL} item \texttt{ID} \\
                 & \tt PRIMITIVE         & Item is primitive \\
                 & \tt NOTPRIMITIVE      & Item is not primitive \\
                 & \tt ITEMNOTFOUND      & Item does not exist \\
@@ -3865,7 +3087,7 @@ Error           & \tt DEFINING          & Currently defining noticeboard content
 		& \tt NEVERFOUND	& Parent has no items derived from it --- cannot lose it \\
 \hline
 Fatal           & \tt INITALLOCFAILED   & Couldn't initialise storage allocator \\
-                & \tt NOMOREROOM        & Couldn't get memory --- increase {\tt MAX\_\-DEFN\_\-SIZE} if when defining \\
+                & \tt NOMOREROOM        & Couldn't get memory --- increase \texttt{MAX\_\-DEFN\_\-SIZE} if when defining \\
                 & \tt BADVERSION        & Noticeboard or definition file had wrong version \\
                 & \tt IMPOSSIBLE        & Something impossible happened --- system error \\
 \hline
@@ -3877,170 +3099,169 @@ Fatal           & \tt INITALLOCFAILED   & Couldn't initialise storage allocator 
 \label {Demonstration Programs}
 
 Several demonstration programs are shipped with the system and are described
-here (it is assumed that the symbol ``{\tt program}'' has been set up to run the
-program {\tt program}). All of these programs are written in C.
+here (it is assumed that the symbol ``\texttt{program}'' has been set up to run the
+program \texttt{program}). All of these programs are written in C.
 
-\subsection {{\tt NBTRACE} --- Trace Noticeboard Contents}
+\subsection {\texttt{NBTRACE} --- Trace Noticeboard Contents}
 \label {NBTRACE --- Trace Noticeboard Contents}
 
-{\tt NBTRACE} lists the contents of a noticeboard definition file or of an active
+\texttt{NBTRACE} lists the contents of a noticeboard definition file or of an active
 noticeboard.
 
-The name of the definition file (assumed extension {\tt .NBD}) or of a
+The name of the definition file (assumed extension \texttt{.NBD}) or of a
 noticeboard item can be given as a command line parameter and will be prompted
 for if it is not given. The program first attempts to find the noticeboard and
 if that fails (because the noticeboard doesn't exist) it attempts to restore
 the noticeboard from the definition file. Then it locates the specified item
 and lists it and all items below it. VMS-style wild cards can be used. Thus
 
-\begin{verbatim}
-    $ nbtrace gct.ifl.enq*
-\end{verbatim}
+\begin{terminalv}
+$ nbtrace gct.ifl.enq*
+\end{terminalv}
 
 might result in the following
 
-\begin{verbatim}
-    Noticeboard data not restored because it was not saved
-    STRUC    IFL (140)
-       _CHAR    ENQ_DEV_DESCR   (0/132/0)
-       _CHAR    ENQ_DEV_TYPE    (0/132/0)
-       _CHAR    ENQ_VER_DATE    (0/132/0)
-       _CHAR    ENQ_VER_NUM     (0/132/0)
-\end{verbatim}
+\begin{terminalv}
+Noticeboard data not restored because it was not saved
+STRUC    IFL (140)
+  _CHAR    ENQ_DEV_DESCR   (0/132/0)
+  _CHAR    ENQ_DEV_TYPE    (0/132/0)
+  _CHAR    ENQ_VER_DATE    (0/132/0)
+  _CHAR    ENQ_VER_NUM     (0/132/0)
+\end{terminalv}
 
 and
 
-\begin{verbatim}
-    $ nbtrace gct.fits.*.x
-\end{verbatim}
+\begin{terminalv}
+$ nbtrace gct.fits.*.x
+\end{terminalv}
 
 is a useful trick to suppress listing of lower level items (on the assumption
-that none of them are called {\tt X}).
+that none of them are called \texttt{X}).
 
-\begin{verbatim}
-    Noticeboard data not restored because it was not saved
-    STRUC   FITS (15)
-       DRT_STRUCT   ALT_OBS (3)
-       DRT_STRUCT   COMMENT (2)
-       DRT_STRUCT   HAEND (3)
-       DRT_STRUCT   HASTART (3)
-       DRT_STRUCT   INSTRUME (3)
-       DRT_STRUCT   LAT_OBS (3)
-       DRT_STRUCT   LONG_OBS (3)
-       DRT_STRUCT   OBJECT (3)
-       DRT_STRUCT   ORIGIN (3)
-       DRT_STRUCT   RUN (3)
-       DRT_STRUCT   SPEED (3)
-       DRT_STRUCT   UTDATE (3)
-       DRT_STRUCT   WINDOW (3)
-       DRT_STRUCT   ZDEND (3)
-       DRT_STRUCT   ZDSTART (3)
-\end{verbatim}
+\begin{terminalv}
+Noticeboard data not restored because it was not saved
+STRUC   FITS (15)
+  DRT_STRUCT   ALT_OBS (3)
+  DRT_STRUCT   COMMENT (2)
+  DRT_STRUCT   HAEND (3)
+  DRT_STRUCT   HASTART (3)
+  DRT_STRUCT   INSTRUME (3)
+  DRT_STRUCT   LAT_OBS (3)
+  DRT_STRUCT   LONG_OBS (3)
+  DRT_STRUCT   OBJECT (3)
+  DRT_STRUCT   ORIGIN (3)
+  DRT_STRUCT   RUN (3)
+  DRT_STRUCT   SPEED (3)
+  DRT_STRUCT   UTDATE (3)
+  DRT_STRUCT   WINDOW (3)
+  DRT_STRUCT   ZDEND (3)
+  DRT_STRUCT   ZDSTART (3)
+\end{terminalv}
 
 When no item name is given, general information about the noticeboard's size
 and owner is given, as in
 
-\begin {verbatim}
-    $ nbtrace words
-    Software version   = 5 (5)
-    Size of section    = 1080 (438)
-    Size of definition = 1080 (438)
-    Noticeboard owner  = 2959 (b8f)
-    Modified count     = 0 (0)
+\begin{terminalv}
+$ nbtrace words
+Software version   = 5 (5)
+Size of section    = 1080 (438)
+Size of definition = 1080 (438)
+Noticeboard owner  = 2959 (b8f)
+Modified count     = 0 (0)
 
-    NOTICEBOARD WORDS (9)
-       WORD     BROWN   (0/0/0)
-       WORD     DOG     (0/0/0)
-       WORD     FOX     (0/0/0)
-       WORD     JUMPS   (0/0/0)
-       WORD     LAZY    (0/0/0)
-       WORD     OVER    (0/0/0)
-       WORD     QUICK   (0/0/0)
-       WORD     THE     (0/0/0)
-       WORD     THE     (0/0/0)
-\end{verbatim}
+NOTICEBOARD WORDS (9)
+  WORD     BROWN   (0/0/0)
+  WORD     DOG     (0/0/0)
+  WORD     FOX     (0/0/0)
+  WORD     JUMPS   (0/0/0)
+  WORD     LAZY    (0/0/0)
+  WORD     OVER    (0/0/0)
+  WORD     QUICK   (0/0/0)
+  WORD     THE     (0/0/0)
+  WORD     THE     (0/0/0)
+\end{terminalv}
 
-\subsection {{\tt TIME} --- Time Noticeboard Operations}
+\subsection {\texttt{TIME} --- Time Noticeboard Operations}
 
-{\tt TIME} times various noticeboard operations. It produced the timings listed
+\texttt{TIME} times various noticeboard operations. It produced the timings listed
 in Section~\ref {Routine Timings}.
 
 The user chooses how many items the noticeboard should contain, which item
-should be used for timing {\tt NBS\_FIND\_ITEM}, how many iterations to perform
-and the values of the {\tt INC\-RE\-MENT\_\-MOD\-IFY} and {\tt
-CHECK\_\-MOD\-IFY} flags. The program produces a report in {\tt TIME.LIS}. For
+should be used for timing \texttt{NBS\_FIND\_ITEM}, how many iterations to perform
+and the values of the \texttt{INC\-RE\-MENT\_\-MOD\-IFY} and \texttt{CHECK\_\-MOD\-IFY} flags. The program produces a report in \texttt{TIME.LIS}. For
 example:
 
-\begin {verbatim}
-    Noticeboard system timing program at Thu Mar 31 17:49:00 1988
-    -------------------------------------------------------------
+\begin{terminalv}
+Noticeboard system timing program at Thu Mar 31 17:49:00 1988
+-------------------------------------------------------------
 
-    Number of iterations   = 10000
-    Number of items        = 100
-    Item used for searches = 100
-    Increment modify flag  = 1
-    Check modify flag      = 1
+Number of iterations   = 10000
+Number of items        = 100
+Item used for searches = 100
+Increment modify flag  = 1
+Check modify flag      = 1
 
-    Test 0, define, save and find noticeboard
-            cpu microseconds = 2330000
+Test 0, define, save and find noticeboard
+       cpu microseconds = 2330000
 
-    Test 1, scalar assignment
-            cpu microseconds per iteration = 3
+Test 1, scalar assignment
+       cpu microseconds per iteration = 3
 
-    Test 2, put scalar
-            cpu microseconds per iteration = 124
+Test 2, put scalar
+       cpu microseconds per iteration = 124
 
-    Test 3, get scalar
-            cpu microseconds per iteration = 90
-    .
-    .
-\end{verbatim}
+Test 3, get scalar
+       cpu microseconds per iteration = 90
+.
+.
+\end{terminalv}
 
-\subsection {{\tt EXERCISE} --- Exercise Noticeboard Routines}
+\subsection {\texttt{EXERCISE} --- Exercise Noticeboard Routines}
 
-{\tt EXERCISE} calls all {\tt NBS} routines and triggers all reasonable
-errors. It produces a report in {\tt EXERCISE.LIS} in which any unexpected
+\texttt{EXERCISE} calls all \texttt{NBS} routines and triggers all reasonable
+errors. It produces a report in \texttt{EXERCISE.LIS} in which any unexpected
 results have an asterisk in the first column. The total error count is reported
 at the bottom and this should always be zero. If it is non-zero there could
-be a resource-related problem (or even a bug in the {\tt NBS} routines).
+be a resource-related problem (or even a bug in the \texttt{NBS} routines).
 For example:
 
-\begin {verbatim}
-    Noticeboard system exercise program at Thu Mar 31 10:28:55 1988
-    ---------------------------------------------------------------
+\begin{terminalv}
+Noticeboard system exercise program at Thu Mar 31 10:28:55 1988
+---------------------------------------------------------------
 
-    NBS_TUNE
-    --------
-     nbs_tune max_defn_size: ok
-     nbs_tune of doesnt_exist: illegal parameter / item name
+NBS_TUNE
+--------
+nbs_tune max_defn_size: ok
+nbs_tune of doesnt_exist: illegal parameter / item name
 
-    NBS_DEFINE_* errors
-    -------------------
-     nbs_define_structure: not currently defining noticeboard contents
-     .
-     .
+NBS_DEFINE_* errors
+-------------------
+nbs_define_structure: not currently defining noticeboard contents
+.
+.
 
-    NBS_PUT
-    -------
-     nbs_get_primitive: NIL item ID
-     nbs_get_parent: NIL item ID
-     nbs_get_children: NIL item ID
-     nbs_get_children: item is primitive
-     nbs_get_info: NIL item ID
-     nbs_get_info: illegal parameter / item name
+NBS_PUT
+-------
+nbs_get_primitive: NIL item ID
+nbs_get_parent: NIL item ID
+nbs_get_children: NIL item ID
+nbs_get_children: item is primitive
+nbs_get_info: NIL item ID
+nbs_get_info: illegal parameter / item name
 
-    Error count = 0
-    ----------------
-\end{verbatim}
+Error count = 0
+----------------
+\end{terminalv}
 
-\subsection {{\tt WORDS} --- Generate Tree-structured Noticeboard}
+\subsection {\texttt{WORDS} --- Generate Tree-structured Noticeboard}
 
-{\tt WORDS} generates a tree-structured noticeboard with one item for each
+\texttt{WORDS} generates a tree-structured noticeboard with one item for each
 word found in a file provided by the user. The user also specifies a ``cluster
 size'', which is a measure of how deep the tree is (the tree has about
 $\log_{2} ($cluster size$)$ levels). Once the noticeboard has been created
 the user can type in words and is told whether they appeared in the file.
-Exit with \verb|^Z|. The example given for {\tt NBTRACE} is of a noticeboard
-created using {\tt WORDS}.
+Exit with \texttt{\wedge Z}. The example given for \texttt{NBTRACE} is of a noticeboard
+created using \texttt{WORDS}.
 
 \end {document}
