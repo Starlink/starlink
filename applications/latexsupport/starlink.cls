@@ -16,9 +16,14 @@
 \newif\ifwithlof
 \withloftrue
 
+% If no abstract
+\newif\ifwithabs
+\withabstrue
+
 \DeclareOption{chapters}{\withchapterstrue}
 \DeclareOption{twoside}{\twosidetrue}
 \DeclareOption{nolof}{\withloffalse}
+\DeclareOption{noabs}{\withabsfalse}
 
 % Pass all options not defined above to the classes.
 % (Must be done before process options)
@@ -152,8 +157,8 @@
 \stardoccopyright{}
 \stardocnumber{}
 \stardoctitle{}
-\stardocversion{}
-\stardocmanual{}
+\stardocversion{\ }
+\stardocmanual{\ }
 \stardocabstract{}
 \stardocauthors{}
 \startitlepic{}

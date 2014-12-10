@@ -219,6 +219,7 @@
 
 %% Set up the abstract
 \renewcommand{\Abstract}{
+  \ifwithabs
     \ifwithchapters
         \chapter*{}
         \typeout{....AbstractChapter...}
@@ -227,6 +228,7 @@
      \fi
      \section*{Abstract}
      \thestardocabstract{}%
+  \fi
 }
 
 
