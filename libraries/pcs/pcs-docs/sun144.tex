@@ -1,29 +1,24 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardoccopyright
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {144.15}
-\newcommand{\stardocauthors}   {A J Chipperfield}
-\newcommand{\stardocdate}      {17 August 2001}
-\newcommand{\stardoctitle}     {ADAM}
-\newcommand{\stardocversion}   {Unix Version 4.0}
-\newcommand{\stardocmanual}    {}
-\newcommand{\stardocabstract}  {
+\stardocnumber      {144.15}
+\stardocauthors     {A J Chipperfield}
+\stardocdate        {17 August 2001}
+\stardoctitle       {ADAM}
+\stardocversion     {Unix Version 4.0}
+\stardocabstract  {
 This document describes the use of the Starlink Software Environment, ADAM,
 on Unix. It is primarily of use to programmers but the early sections contain
 information useful to any user.
@@ -33,266 +28,16 @@ programming and that the Starlink software is installed in the standard way.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
 
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%      1-FEB-2000 (AJC):
-%        Add Copyright statement in LaTeX
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-\newcommand{\ROEURL}{http://www.roe.ac.uk/}
-\newcommand{\IRAFURL}{http://www.starlink.ac.uk/iraf/web/iraf-homepage.html}
+% ? Document specific \providecommand or \newenvironment commands.
+\providecommand{\ROEURL}{http://www.roe.ac.uk/}
+\providecommand{\IRAFURL}{http://www.starlink.ac.uk/iraf/web/iraf-homepage.html}
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
+\scfrontmatter
 
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? Latex Copyright Statement
-%  =========================
-\begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
-\end{latexonly}
-% ? End of Latex copyright statement
-
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
 
 % ? Main text
 
@@ -317,7 +62,7 @@ to behave differently from A-tasks and are known as I-tasks,
 Programs written for the Starlink Software Environment may be run directly
 from a Unix shell or from a variety of other user-interfaces including
 the original ADAM user-interface,
-\xref{ICL}{sg5}{abstract}\latex{ (see SG/5)},
+\xref{ICL}{sg5}{abstract} (see SG/5),
 and
 \htmladdnormallink{IRAF}{\IRAFURL}
 cl (see
@@ -343,11 +88,11 @@ for the package will tell you how to start it up and run its applications.
 
 Stand-alone ADAM programs are run from the shell in the same way as any Unix
 program by typing:
-\small
+\begin{small}
 \begin{quote}
 \texttt{\% \textit{program\_name}}
 \end{quote}
-\normalsize
+\end{small}
 where \texttt{\% \textit{program\_name}} may be a full pathname.
 
 The Interface File, which defines the program's parameters, is usually in the
@@ -363,7 +108,7 @@ made to the monolithic executable and an individual Interface File for the task
 provided. The link can then be executed as if it were a simple program.
 (This is all usually set up by
 \xref{package startup
-scripts}{ssn64}{shell_package_startup_scripts}\latex{-- see SSN/46}.)
+scripts}{ssn64}{shell_package_startup_scripts} -- see SSN/46.)
 
 When running tasks directly from a shell, the normal Unix rules for the
 use of meta-characters on the command line will apply -- these sometimes
@@ -395,15 +140,15 @@ A file extension of \texttt{.icl} is assumed if no extension is specified.
 All filenames must appear after any ICL options.
 \end{description}
 Examples:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 % icl
-\end{verbatim} \end{quote}
+\end{terminalv}
 This will be the normal invocation. Only defined ICL login files
 will be loaded before the ICL prompt is output.
 
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 % icl -io test_io comfile1 comfile2
-\end{verbatim} \end{quote}
+\end{terminalv}
 which would set the value of the ICL option \texttt{-io} to \texttt{test\_io}
 and the ICL command files \texttt{comfile1.icl} and \texttt{comfile2.icl}
 would be automatically loaded into ICL (after any defined ICL login files)
@@ -435,7 +180,7 @@ inserted as the  input line. It can then be edited in the normal way.
 
 See
 \htmlref{Filename Completion}{filename_completion}
-\latex{ (Section \ref{filename_completion})} for the effect of these
+(Section \ref{filename_completion}) for the effect of these
 characters if there is already some input on the line.
 
 \subsection{\label{filename_completion}Filename completion}
@@ -467,8 +212,8 @@ For example, suppose the default for filename truncation (\texttt{.sdf}) is in
 use and the  current directory contains two files \texttt{file.dat} and
 \texttt{file.sdf}.
 The dialogue might go as follows (\verb!<>! indicates typing by the user):
-\small
-\begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 Give NDF name > <x><TAB>
 No match.[beep]
 Give NDF name > <f><TAB>
@@ -479,8 +224,9 @@ Give NDF name > file.<s><TAB>
 Give NDF name > file <Return>
 Give auxiliary data file name > <file.d><TAB>
 Give auxiliary data file name > file.dat <Return>
-\end{verbatim} \end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
+
 (The last four lines would appear as two lines on the terminal, the second and
 fourth overwriting the first and third respectively.)
 
@@ -509,7 +255,7 @@ for information on ICL exception handling).
 When any ADAM application, or
 \xref{ICL}{sg5}{},
 is run, a directory known as the
-{\bf ADAM\_USER} directory is used to hold various automatically-created files.
+\textbf{ADAM\_USER} directory is used to hold various automatically-created files.
 These are: program parameter files, the global parameter file (GLOBAL.sdf)
 and task identifying files (used by the ADAM inter-task message system).
 The directory is also used by the
@@ -537,7 +283,7 @@ Fortran-callable routine, the source file must be presented to the link script.
 Note that the complete set of C interfaces for the Starlink libraries
 is not yet available so it may not be possible to write your program entirely
 in C without the aid of something like the
-\xref{CNF package}{sun209}{}\latex{ (see SUN/209)}.
+\xref{CNF package}{sun209} (see SUN/209).
 
 To compile and link ADAM programs, it is necessary to add \texttt{/star/bin} to
 your PATH environment variable. This is done if you have `sourced'
@@ -549,25 +295,25 @@ All public include files, such as \texttt{\textit{pkg}\_par} and
 
 The filenames of the Fortran include files are in lower case but they should
 be specified in the program in the standard Starlink way. That is, for example:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 INCLUDE 'SAE_PAR'
 INCLUDE 'PAR_ERR'
-\end{verbatim} \end{quote}
+\end{terminalv}
 Links are then set up to the public include files in \texttt{/star/include}
 using the appropriate \textit{pkg}\_dev script.
 For example:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 % par_dev
-\end{verbatim} \end{quote}
+\end{terminalv}
 creates links \texttt{PAR\_PAR} and \texttt{PAR\_ERR} to
 \texttt{/star/include/par\_par} and \texttt{/star/include/par\_err}
 respectively.
 (\texttt{SAE\_PAR} is defined by \texttt{star\_dev}.)
 
 For C programs, includes take the normal form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 #include "par_err.h"
-\end{verbatim} \end{quote}
+\end{terminalv}
 (\texttt{-I/star/include} is included in the
 \htmlref{link scripts}{link_scripts}).
 
@@ -651,7 +397,7 @@ from VMS, for example.
 \subsection{\xlabel{monoliths}\label{ADAM_monoliths}Monoliths}
 The top-level routine for Unix A-task monoliths should be of the form:
 \begin{small}
-\begin{verbatim}
+\begin{terminalv}
           SUBROUTINE TEST( STATUS )
           INCLUDE 'SAE_PAR'
           INCLUDE 'PAR_PAR'
@@ -674,16 +420,16 @@ The top-level routine for Unix A-task monoliths should be of the form:
             CALL TEST3(STATUS)
           END IF
           END
-\end{verbatim}
+\end{terminalv}
 \end{small}
 
 To run such a monolith from a Unix shell, link the required action name to the
 monolith, then execute the linkname (possibly via an alias). For example:
 
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 % ln -s $KAPPA_DIR/kappa add
 % add
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 Separate Interface Files are required for each action run from the shell
 -- a monolithic Interface File is required for monoliths run from ICL.
@@ -698,13 +444,13 @@ found in
 Interface File entries specifying help libraries may be given as standard
 pathnames \textit{e.g.}:
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 helplib /star/help/kappa/kappa.shl
-\end{verbatim}
+\end{terminalv}
 or
-\begin{verbatim}
+\begin{terminalv}
 help %/star/help/kappa/kappa ADD Parameters IN1
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 Note that the file extension \texttt{.shl} is optional.
 
@@ -760,28 +506,8 @@ SSN/64 & A.J.Chipperfield & ADAM -- Organization of Application Packages.
 \end{tabular}
 \end{latexonly}
 
-\begin{htmlonly}
-M.D.Lawden : \xref{SG/4}{sg4}{}
--- ADAM - The Starlink Software Environment.\\
-J.A.Bailey : \xref{SG/5}{sg4}{}
--- ICL - The Interactive Command Language for ADAM.\\
-Jo Murray : \xref{SUN/101}{sun101}{}
--- Introduction to ADAM Programming.\\
-P.T.Wallace : \xref{SUN/124}{sun124}{}
--- HELP - Interactive Help System.\\
-B.D.Kelly : \xref{SUN/134}{sun134}{}
--- ADAM - Guide to Writing Instrumentation Tasks.\\
-P.M.Allan : \xref{SUN/171}{sun171}{}
--- MAG - Access to Magnetic Tapes.\\
-P.M.Allan : \xref{SUN/209}{sun209}{}
--- CNF and F77 - Mixed Language Programming.\\
-A.J.Chipperfield : \xref{SUN/217}{sun217}{}
--- Running Starlink Programs from IRAF CL.\\
-P.C.T.Rees : \xref{SSN/4}{ssn4}{}
--- EMS - Error Message Service.\\
-A.J.Chipperfield : \xref{SSN/64}{ssn64}{}
--- ADAM - Organization of Application Packages.
-\end{htmlonly}
+
+
 
 Key:
 \begin{tabular}{ll}
@@ -793,9 +519,9 @@ SUN & Starlink User Note.
 \section{\xlabel{document_changes}Document Changes}
 \subsection{SUN/144.13}
 The sections on the
-\htmlref{use}{link_scripts}\latex{ (Section \ref{link_scripts})}
+\htmlref{use}{link_scripts} (Section \ref{link_scripts})
 and
-\htmlref{details}{link_det}\latex{ (Appendix \ref{link_det})}
+\htmlref{details}{link_det} (Appendix \ref{link_det})
 of the ADAM link scripts, \texttt{alink} and \texttt{ilink}, have been modified
 to reflect some changes designed to allow easy switching between static and
 dynamic linking with the Starlink libraries.
@@ -818,7 +544,7 @@ example program, derived from
 \xref{SUN/101}{sun101}{},
 on the Sun.
 
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 % source /star/etc/login
 %
 % ls
@@ -902,8 +628,7 @@ repdim2.sdf     GLOBAL.sdf
 example.sdf   repdim2.f     repdim2.ifl
 repdim2       repdim2.ifc   repdim2.o
 %
-
-\end{verbatim} \end{quote}
+\end{terminalv}
 Note that whether or not the file repdim2.o is retained depends upon the
 compiler used.
 
@@ -927,7 +652,7 @@ During installation (as part of the DTASK library in the
 package), the actual compile/link command within \texttt{alink/ilink} is edited
 depending upon the platform and setting of various environment variables.
 The template command is:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 F77 $FFLAGS -o $EXENAME \
 $XDBX \
 /star/lib/dtask_main.o \
@@ -940,16 +665,16 @@ $ARGS \
 `dtask_link_adam` \
 $ALINK_FLAGS2 \
 Additional system libraries
-\end{verbatim} \end{quote}
+\end{terminalv}
 Notes:
 \begin{itemize}
 \item F77 is replaced by whatever the FC environment variable is when
 \texttt{alink/ilink} is installed.
 \item Any C source files specified will be compiled separately and linked in
 the above Fortran command.  The C compiler command used will be of the form:
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 % CC -c $CFLAGS $CARGS -I/star/include
-\end{verbatim} \end{quote}
+\end{terminalv}
 where:
 \begin{description}
 \item[\texttt{CC}] is replaced by the CC environment variable when
@@ -968,9 +693,9 @@ must be included at the start of the command line.
 is given.
 \item \texttt{\$ALINK\_FLAGS1} may be set to determine the type of linking
 required. For instance:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 % setenv ALINK_FLAGS1 -L/star/share
-\end{verbatim} \end{quote}
+\end{terminalv}
 would cause the linker to find the Starlink
 shared libraries (on platforms where they are installed), thus producing a
 dynamically linked executable.
@@ -1146,9 +871,9 @@ variables. The variables are:
 these may be set to specify ICL command files to be obeyed,
 in the above order, by ICL before the ICL prompt appears.
 A default file extension of \texttt{.icl} is assumed. For example:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 % setenv ICL_LOGIN ~/myprocs
-\end{verbatim} \end{quote}
+\end{terminalv}
 will cause file \texttt{myprocs.icl} in the user's home directory to be loaded
 as ICL starts up.
 
@@ -1157,14 +882,14 @@ ICL\_LOGIN\_SYS and ICL\_LOGIN\_LOCAL should be reserved for system use.
 describes how they are used at Starlink sites.
 \item[EDITOR] If set, this will override the ICL default editor (vi).
 For example:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 % setenv EDITOR tpu
-\end{verbatim} \end{quote}
+\end{terminalv}
 \item[ICL\_HELPFILE] If set, this will override the default search path for the
 ICL helpfile. The default search path is:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 ../help/icl/iclhelp.shl
-\end{verbatim} \end{quote}
+\end{terminalv}
 relative to each of the directories on the user's PATH.
 
 This process for finding the default helpfile only operates if the default

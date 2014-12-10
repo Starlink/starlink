@@ -1,30 +1,25 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardoccopyright
 {Copyright \copyright\ 2002 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {115.3}
-\newcommand{\stardocauthors}   {A J Chipperfield, B D Kelly, S L Wright}
-\newcommand{\stardocdate}      {3 September 2002}
-\newcommand{\stardoctitle}     {ADAM\\[2ex]
+\stardocnumber      {115.3}
+\stardocauthors     {A J Chipperfield, B D Kelly, S L Wright}
+\stardocdate        {3 September 2002}
+\stardoctitle     {ADAM\\[2ex]
                                 Interface Module Reference Manual}
-\newcommand{\stardocversion}   {}
-\newcommand{\stardocmanual}    {Programmer's Manual}
-\newcommand{\stardocabstract}  {
+\stardocmanual      {Programmer's Manual}
+\stardocabstract  {
 ADAM Interface Modules provide an interface between ADAM application programs
 and the rest of the system.
 \\
@@ -37,265 +32,13 @@ Readers requiring an introduction to Interface Modules should read
 % ? End of document identification
 
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%      1-FEB-2000 (AJC):
-%        Add Copyright statement in LaTeX
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document specific \providecommand or \newenvironment commands.
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? Latex Copyright Statement
-%  =========================
-\begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
-\end{latexonly}
-% ? End of Latex copyright statement
-
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 % ? Main text
 
@@ -310,7 +53,7 @@ should read \xref{SG/4}{sg4}{} first.
 
 For the purpose of the examples it is assumed that a user interface
 similar to ICL, the Interactive Command Language, is being used.
-Note that the actual use of keywords, prompts, {\em etc.}\ is
+Note that the actual use of keywords, prompts, \emph{etc.}\ is
 determined by the user interface, which may or may not support the
 various features.
 
@@ -330,7 +73,7 @@ later.
 
 \subsection{Description\xlabel{description}}
 
-The {\em Interface Module}\/ is a collection of information which acts as a
+The \emph{Interface Module}\/ is a collection of information which acts as a
 go-between for the application program on one hand, and the rest of the
 system on the other. It acts as an interface (hence the name) between
 the program and system so that neither has to know any details about
@@ -356,24 +99,24 @@ program is being developed, the information making up the Interface
 Module is normally put into an ordinary text file, where it can be
 easily inspected and edited.
 The file should have the same name as the program, but with a file
-extension of {\bf .ifl}.
+extension of \textbf{.ifl}.
 
 When the system interface for a program has become relatively stable, the
 Interface Module can be saved in compiled form --
 this leads to a more efficient running of the system.
 The compiled form has the same name as the source file, but a file extension of
-{\bf .ifc}.
+\textbf{.ifc}.
 
-Strictly speaking, the source file is the {\em Interface File} although that
+Strictly speaking, the source file is the \emph{Interface File} although that
 term is often used to mean either source or compiled forms of the
 Interface Module.
 
-The program {\bf compifl} is provided to compile an Interface File.
+The program \textbf{compifl} is provided to compile an Interface File.
 Perform the usual startup procedure for ADAM program development
 then type:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 compifl filename
-\end{verbatim} \end{quote}
+\end{terminalv}
 in response to the command language prompt.
 \texttt{filename} may optionally include the \texttt{.ifl} extension.
 \texttt{filename.ifl} will be compiled into \texttt{filename.ifc}.
@@ -388,7 +131,7 @@ The program will accept either source or compiled form of the Interface Module.
 
 By default, the program will look for its Interface Module in the directory
 where the executable file was found. It looks firstly for a compiled file,
-\texttt{name.ifc} (where {\em name} is the name of the program's executable
+\texttt{name.ifc} (where \emph{name} is the name of the program's executable
 file); if that is not found, it looks for a source file, \texttt{name.ifl}
 
 This behaviour can be altered by defining a list of directories in which
@@ -400,21 +143,20 @@ The process is fully described in Appendix \ref{searchpath}.
 
 \subsubsection{Single Program}
 
-An Interface File for a single program consists of a number of {\em
-Specification Fields} contained between INTERFACE and ENDINTERFACE
+An Interface File for a single program consists of a number of \emph{Specification Fields} contained between INTERFACE and ENDINTERFACE
 statements.
 There are four possible types of
 Specification Field under ADAM\footnote{Excluding the unused Program
-Specification ref. Appendix \ref{program}}, the {\em Parameter
-Specification}\/, the {\em Help Library Specification}\/, the {\em Message
-Specification}\/ and the {\em Action Specification}.
+Specification ref. Appendix \ref{program}}, the \emph{Parameter
+Specification}\/, the \emph{Help Library Specification}\/, the \emph{Message
+Specification}\/ and the \emph{Action Specification}.
 They are all optional (depending upon the application).
 
 Specification Fields may consist of a number of subfields as shown in the
 example below.
-{\em Examples in this document will use `.' to represent possible lines not
+\emph{Examples in this document will use `.' to represent possible lines not
 shown.}
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 INTERFACE programname
    HELPLIB     HELP_TOP_LEVEL_SPEC
         .
@@ -436,7 +178,7 @@ INTERFACE programname
    ENDMESSAGE
       .
 ENDINTERFACE
-\end{verbatim} \end{quote}
+\end{terminalv}
 \texttt{programname} is a character string giving the name of the Interface
 Module.
 It must be the same as the name of the program and unique in any given ADAM
@@ -445,13 +187,13 @@ system.
 
 \subsubsection{Monoliths}
 For efficiency, a group of related programs can all be
-linked into a single executable file called a {\em monolith} (see
+linked into a single executable file called a \emph{monolith} (see
 \xref{SG/4}{sg4}{}).
 If the monolith is to be run from ICL, the individual Interface Files must
 be concatenated into a single file for the whole monolith and the monolithic
 Interface File must have the same filename as the executable file.
 The structure of a monolithic Interface File is as follows:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 MONOLITH monname
    INTERFACE programname_1
       .
@@ -462,8 +204,8 @@ MONOLITH monname
       .
    ENDINTERFACE
 ENDMONOLITH
-\end{verbatim} \end{quote}
-where \texttt{programname\_1}, \texttt{programname\_2}, {\em etc.}\ are the names of
+\end{terminalv}
+where \texttt{programname\_1}, \texttt{programname\_2}, \emph{etc.}\ are the names of
 the individual programs. They must comply with the rules for action names
 (see Appendix \ref{names}).
 
@@ -474,18 +216,18 @@ Interface Modules are used.
 Details of Interface File parsing are given in Appendix \ref{parsing}, but the
 following points should be sufficient for now.
 \begin{itemize}
-\item The file is interpreted as a sequence of {\em tokens}, usually separated
+\item The file is interpreted as a sequence of \emph{tokens}, usually separated
 by comma, space or newline.
 \item Tokens may be:
 \begin{itemize}
 \item reserved words
 \item constants (number, character, logical or !)
-\item names ({\em i.e.}\ everything else).
+\item names (\emph{i.e.}\ everything else).
 \end {itemize}
 \item A character constant is a string of characters enclosed in single quotes.
-Where a token may be a character constant, a name ({\em i.e.}\ a
+Where a token may be a character constant, a name (\emph{i.e.}\ a
 single-token, unquoted string) or even a reserved word is usually also allowed.
-The term {\em character string} is used in this document where this situation
+The term \emph{character string} is used in this document where this situation
 pertains.
 An exception to this is where the token represents a parameter value (a
 default value, for example) -- then character constants must be enclosed in
@@ -503,7 +245,7 @@ for Interface Files.
 \section{Parameter Storage and the CURRENT Value\xlabel{parameter_storage}
 \label{current}}
 
-Each ADAM application program has zero or more {\em program parameters}.
+Each ADAM application program has zero or more \emph{program parameters}.
 A program parameter is a value which the program gets
 from the `outside world', or which the program wishes to make available
 outside itself. The value may be a primitive value (scalar or array) or a file
@@ -524,10 +266,10 @@ For parameters of a standard HDS type, it is assumed to be the name of an HDS
 object of a suitable type and the storage type of the parameter is effectively
 the type of the named object.
 
-The stored value of a parameter is known as the {\em current value}. It will
+The stored value of a parameter is known as the \emph{current value}. It will
 normally\footnote{The exception is `internal' parameters (see Section
 \ref{vpath}) which are stored in memory.} be in an HDS file known as the
-{\em parameter file}.
+\emph{parameter file}.
 A component of the right type, size and shape is created to hold the given
 parameter value -- there is a special structure to hold values which are names.
 Each program or monolith has its own parameter file which is retained between
@@ -549,17 +291,17 @@ external means, the ICL SETPAR command, for example.
 
 \subsection{Introduction\xlabel{introduction2}}
 
-Each program parameter must have a {\em Parameter Specification} in the
+Each program parameter must have a \emph{Parameter Specification} in the
 Interface File. The Parameter Specification is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 PARAMETER parametername
    parfieldname fieldvalue(s)
          .
 ENDPARAMETER
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{parametername} is a character string giving the program parameter
 name which is used in the program (in a call to DAT\_ASSOC or
-PAR\_GETnx {\em etc.}). Case is not significant in parameter names.
+PAR\_GETnx \emph{etc.}). Case is not significant in parameter names.
 For a discussion of valid parameter names, see Appendix \ref{names}.
 
 The possible subfields in the Parameter Specification are described in detail
@@ -630,7 +372,7 @@ HELPKEY & Source of multi-line parameter help information & \\
 
 This field specifies the type of the parameter.
 This field is used by the system to determine the type of storage to be
-used for the parameter and its default values, {\em etc}.
+used for the parameter and its default values, \emph{etc}.
 If a primitive value of a different type is supplied,
 it will be converted to the specified type for storage if possible.
 If conversion is not possible, an error is reported.
@@ -639,26 +381,26 @@ It is important to distinguish between the type of the parameter and the type
 of the value to be obtained from it by the program.
 
 The field is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 TYPE datatype
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{datatype} is a character string giving the required type of the
 parameter.
 \texttt{datatype} may be:
 \begin{itemize}
-\item A `standard' HDS primitive type ({\em i.e.}\ \_INTEGER, \_REAL, \_DOUBLE, \_LOGICAL,
+\item A `standard' HDS primitive type (\emph{i.e.}\ \_INTEGER, \_REAL, \_DOUBLE, \_LOGICAL,
 \_CHAR).
 \item LITERAL -- formerly used to specify that the parameter is of type \_CHAR
 and to force the parameter system to accept unquoted character strings as
 character values rather than HDS object names.
 This is now the standard behaviour for parameters of type \_CHAR so datatype
 LITERAL is no longer required.
-\item A `user-defined' type (IMAGE, SPECTRUM {\em etc.}).
+\item A `user-defined' type (IMAGE, SPECTRUM \emph{etc.}).
 \item UNIV -- used by convention when the parameter type is unimportant.
 Actually this is treated the same as other `user-defined' types.
 Parameter storage corresponding with the type of the value given will be
 created.
-\item A `facility-recommended' type (TAPE for MAG, FILENAME for FIO {\em etc.}).
+\item A `facility-recommended' type (TAPE for MAG, FILENAME for FIO \emph{etc.}).
 These are used by convention -- actually any user-defined type will do.
 \end{itemize}
 If the TYPE field is omitted, type UNIV is assumed.
@@ -673,7 +415,7 @@ Interface File or as parameter values at run time.
 \item The dimensionality of parameters is not declared in the
 Interface File, but is defined by the value given at run time.
 The given dimensionality must be acceptable to the program
-({\em e.g.}\ when it does a call to PAR\_GETnx).
+(\emph{e.g.}\ when it does a call to PAR\_GETnx).
 \item The PAR\_GETnx/\_PUTnx routines only GET/PUT values of the
 standard HDS types --
 other types have to be handled by calls to the appropriate facility\_ASSOC
@@ -692,7 +434,7 @@ It has three parameters:
 \item[LIMITS] an integer array of limiting values.
 \end{description}
 The Interface File might be:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 INTERFACE DISP
    .
    PARAMETER IMAGE
@@ -712,53 +454,52 @@ INTERFACE DISP
    ENDPARAMETER
       .
 ENDINTERFACE
-\end{verbatim} \end{quote}
+\end{terminalv}
 If the user specified a value of \texttt{[1.2,511.8,255.6,512.1]}
-for the LIMITS array, {\em i.e.}\ a \_REAL array where type \_INTEGER is
+for the LIMITS array, \emph{i.e.}\ a \_REAL array where type \_INTEGER is
 specified for the parameter, the system knows that this is a valid
-conversion and can perform it for the user ({\em i.e.}\ \texttt{[1,511,255,512]}
+conversion and can perform it for the user (\emph{i.e.}\ \texttt{[1,511,255,512]}
 is stored).
 
 Similarly, the program could try to obtain a \_REAL array from the
 parameter storage (by calling PAR\_GET1R)\@. In that case, the array would be
 converted back to \_REAL although the numbers supplied by the user would have
-been truncated ({\em i.e.}\ \texttt{[1.0,511.0,255.0,512.0]} would be supplied
+been truncated (\emph{i.e.}\ \texttt{[1.0,511.0,255.0,512.0]} would be supplied
 to the program).
 
 \subsection{The PTYPE Field\xlabel{the_ptype_field}}
 
-Most parameters are associated with values of one type or another, {\em e.g.}\
-primitive data types, or data-system objects. These are known as {\em normal
+Most parameters are associated with values of one type or another, \emph{e.g.}\
+primitive data types, or data-system objects. These are known as \emph{normal
 parameters}.
 
 However, there is a class of parameters which are intimately associated with
-some type of device ({\em e.g.}\ a magnetic tape drive, or a graphics terminal).
-These are known as {\em device parameters}.
+some type of device (\emph{e.g.}\ a magnetic tape drive, or a graphics terminal).
+These are known as \emph{device parameters}.
 Device parameters are typically used in calls such as GKS\_ASSOC.
 A parameter is defined as a device parameter by the PTYPE field.
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 PTYPE  parameter-type
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{parameter-type} is a character string which can currently only be
 DEVICE.
 
 The precise type of the device can be indicated by the TYPE field.
 The specification for parameter DISPLAY in our example above would then be:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 PARAMETER DISPLAY
       .
    PTYPE DEVICE
    TYPE GRAPHICS
       .
 ENDPARAMETER
-\end{verbatim} \end{quote}
+\end{terminalv}
 The value of a device parameter is
 a name which can be translated to define the device to be used.
 For details of possible values, see the appropriate facility description,
-SGS, GKS, FIO {\em etc}.
+SGS, GKS, FIO \emph{etc}.
 
-{\em
-Currently PTYPE is not used by the system -- only the TYPE is of significance
+\emph{Currently PTYPE is not used by the system -- only the TYPE is of significance
 and there anything other than a standard HDS type will have the same effect.}
 
 \subsection{The ACCESS Field\xlabel{the_access_field}}
@@ -771,12 +512,12 @@ DAT\_ASSOC.
 Note that the field has no effect for facilities such as NDF, FIO and GKS
 which only use the parameter system to get the name of a file or device which
 is accessed by other means. The access mode applies to the parameter itself,
-not to any file or device, {\em etc.}\ that the parameter refers to.
+not to any file or device, \emph{etc.}\ that the parameter refers to.
 
 The field has the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 ACCESS mode
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{mode} is a character string which may be:
 \begin{description}
 \item[READ] which gives read access.
@@ -793,7 +534,7 @@ If the ACCESS field is omitted, UPDATE is assumed.
 
 \subsubsection*{Example}
 The access fields for the parameters in our DISP example could be:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 INTERFACE DISP
    .
    PARAMETER IMAGE
@@ -816,11 +557,11 @@ INTERFACE DISP
    ENDPARAMETER
       .
 ENDINTERFACE
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 \subsection{The POSITION Field\xlabel{the_position_field}}
 
-Defines the {\em parameter position} on the command line at which values for
+Defines the \emph{parameter position} on the command line at which values for
 this parameter may be given.
 
 There are a limited number (See Appendix \ref{consts}) of
@@ -834,9 +575,9 @@ individual action NEEDS list (see the ACTION specification, Section
 \ref{action}).
 
 The field is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 POSITION n
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{n} is an integer constant which specifies the allocated position.
 
 If the POSITION field is omitted, no command line position is allocated to this
@@ -844,7 +585,7 @@ parameter.
 
 \subsubsection*{Example}
 Again taking our DISP example, if the positions were specified as follows:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 INTERFACE DISP
          .
    PARAMETER IMAGE
@@ -864,11 +605,11 @@ INTERFACE DISP
    ENDPARAMETER
       .
 ENDINTERFACE
-\end{verbatim} \end{quote}
+\end{terminalv}
 and the user gives the command:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 disp iue.image.swp2099 ikon [1,511,255,512]
-\end{verbatim} \end{quote}
+\end{terminalv}
 Then the HDS object \texttt{iue.image.swp2099} would be associated with parameter
 IMAGE, XWINDOWS would be used as the DISPLAY and LIMITS would take the value
 \texttt{[1,511,255,512]}.
@@ -882,9 +623,9 @@ parameter in prompts and error messages. Case is not significant in keywords --
 they are always displayed in upper case.
 
 The field is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 KEYWORD  name
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{name} is a valid keyword\footnote{See Appendix \ref{names} for a
 discussion of valid keyword names.}.
 
@@ -902,10 +643,10 @@ use the parameter name as the keyword.
 \subsubsection*{Example}
 If the names of the parameters in the DISP example were changed,
 the user's view could be preserved by specifying keywords as follows
-({\em Note: the example is not intended as an
+(\emph{Note: the example is not intended as an
 illustration of common practice -- it is only to illustrate the
 principle}\/):
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 INTERFACE DISP
    .
    PARAMETER P1
@@ -928,18 +669,18 @@ INTERFACE DISP
    ENDPARAMETER
       .
 ENDINTERFACE
-\end{verbatim} \end{quote}
+\end{terminalv}
 The user could then specify:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 disp display=ikon image=iue.image.swp2099 limits=[1,511,255,512]
-\end{verbatim} \end{quote}
+\end{terminalv}
 Note that keyword-style parameter specifiers are ignored in calculating
-{\em position}.
+\emph{position}.
 Therefore, with the above Interface File, the same effect would be produced
 by the command:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 disp display=ikon iue.image.swp2099 limits=[1,511,255,512]
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 \subsubsection*{Logical Keywords}
 If a parameter is of type \_LOGICAL, its keyword alone may be used on
@@ -959,14 +700,14 @@ and
 \subsection{The DEFAULT Field
 \xlabel{the_default_field}\label{default}}
 
-This field is used to specify a {\em static default} value for a parameter.
+This field is used to specify a \emph{static default} value for a parameter.
 The static default value is one of the options available to be used as the
 parameter value.
 
 The field is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 DEFAULT default_value
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{default\_value} may be:
 \begin{itemize}
 \item A constant (number, character or logical).
@@ -984,11 +725,11 @@ and the value specified must be appropriate for the specified type.
 A character constant (quoted string) may be given as \texttt{default\_value}
 for a non-primitive type -- the string within the quotes will be used as the
 `name' when required. This can be useful if non-standard strings are to be
-given as defaults ({\em e.g.}\ lists for the GRP facility handling parameters
+given as defaults (\emph{e.g.}\ lists for the GRP facility handling parameters
 declared as TYPE NDF).
 
 \subsubsection*{Example}
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 INTERFACE DISP
       .
    PARAMETER IMAGE
@@ -1012,7 +753,7 @@ INTERFACE DISP
    ENDPARAMETER
       .
 ENDINTERFACE
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 \subsection{The ASSOCIATION Field
 \xlabel{the_association_field}\label{association}}
@@ -1030,9 +771,9 @@ can obtain parameter values from an association, but do not write
 parameters on completion.
 
 The field is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 ASSOCIATION  association-specification
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{association-specification} is a character string consisting of two
 parts -- an association operator followed by a parameter specifier.
 
@@ -1043,14 +784,14 @@ Sections \ref{vpath} and \ref{ppath}) but will not be updated by it.
 \item \texttt{ ->} The associated parameter will be set to the value of the
 program parameter if:
 \begin{itemize}
-\item The program has ended successfully, {\em i.e.}\ STATUS = SAI\_\_OK.
+\item The program has ended successfully, \emph{i.e.}\ STATUS = SAI\_\_OK.
 \item The program parameter has a value and has not been cancelled.
 \item The program is an A-task or A-task monolith.
 \end{itemize}
 \item \texttt{<->} combines \texttt{<-} and \texttt{->}.
 \end{itemize}
 
-Currently, only {\em global} parameters may be associated with program
+Currently, only \emph{global} parameters may be associated with program
 parameters  -- they are stored in the GLOBAL data structure and provide a
 common pool of parameter values for programs in an integrated system.
 Global parameters can be created by the association write
@@ -1061,13 +802,13 @@ an error will occur if two programs attempt to update the GLOBAL data
 structure simultaneously.
 
 The specifier of a global parameter is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 GLOBAL.parameter_name
-\end{verbatim} \end{quote}
+\end{terminalv}
 If the ASSOCIATION field is omitted, no association is made.
 
 \subsubsection*{Example}
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 INTERFACE DISP
    .
    PARAMETER IMAGE
@@ -1077,7 +818,7 @@ INTERFACE DISP
    ENDPARAMETER
       .
 ENDINTERFACE
-\end{verbatim} \end{quote}
+\end{terminalv}
 This gives the parameter DISP.IMAGE read and write access to the global
 parameter GLOBAL.\-IMAGE.
 
@@ -1095,12 +836,12 @@ The VPATH field is the means whereby this
 order of searching for parameter values is specified.
 
 The field is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 VPATH  value-resolution-path
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{value-resolution-path} is a character string which gives a path
 used for searching for a parameter value.
-It consists of a set of {\em path specifiers}. If there are two or more
+It consists of a set of \emph{path specifiers}. If there are two or more
 path specifiers, they must be separated by commas and the string must be
 enclosed in single quotes.
 
@@ -1118,7 +859,7 @@ PAR\_DEFnx or DAT\_DEF specifying the required values.
 \item[PROMPT]  Prompt the user and obtain a value. (See also Section
 \ref{ppath}, The PPATH Field.)
 There is an implied PROMPT at the end of every VPATH.
-{\em Note that PROMPT will always give a result to the program, even if it is
+\emph{Note that PROMPT will always give a result to the program, even if it is
 a bad status, therefore PROMPT only makes sense as the last thing on the path.}
 \item[NOPROMPT] Give up trying to get a value and return status PAR\_\_NULL.
 This only makes sense as the last specifier in the path and will prevent a
@@ -1151,7 +892,7 @@ If the VPATH field is omitted, VPATH PROMPT is assumed.
 
 \subsubsection*{Example}
 Suppose the parameters of DISP are specified as follows:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 INTERFACE DISP
    .
    PARAMETER IMAGE
@@ -1173,12 +914,12 @@ INTERFACE DISP
    ENDPARAMETER
       .
 ENDINTERFACE
-\end{verbatim} \end{quote}
+\end{terminalv}
 Then, if the user just types:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 disp
-\end{verbatim} \end{quote}
-({\em i.e.}\ does not give any parameter values), the following actions occur:
+\end{terminalv}
+(\emph{i.e.}\ does not give any parameter values), the following actions occur:
 
 When the program asks for the value of the IMAGE parameter, no value has
 been given so the first part of the VPATH specification is extracted (GLOBAL).
@@ -1207,13 +948,13 @@ for any required parameters which have not already been given values.
 See also Section \ref{ppath} for the effect of RESET on prompts.
 \end{description}
 For example, assuming the Interface File above,
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 disp prompt
-\end{verbatim} \end{quote}
+\end{terminalv}
 causes all parameters to be prompted for, irrespective of VPATH.
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 disp reset
-\end{verbatim} \end{quote}
+\end{terminalv}
 causes the system to ignore `CURRENT' in the VPATH for parameter DISPLAY,
 and use the DEFAULT value.
 
@@ -1245,9 +986,9 @@ another value unless the parameter had VPATH INTERNAL, in which case status
 SUBPAR\_\_OUTRANGE is returned.
 
 The field is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 RANGE min, max
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{min} and \texttt{max} are two character or number
 constants specifying the minimum and maximum values for the parameter -- the
 values must be convertible to the type of the parameter.
@@ -1256,14 +997,14 @@ If \texttt{min > max}, the value must not lie between them. The values themselve
 are always acceptable.
 
 \subsubsection*{Example}
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 PARAMETER EXPONENT
       .
    TYPE _REAL
    RANGE 0.001, 1000.0
       .
 ENDPARAMETER
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 \subsection{The IN Field\xlabel{the_in_field}}
 
@@ -1285,9 +1026,9 @@ another value unless the parameter had VPATH INTERNAL, in which case status
 SUBPAR\_\_OUTRANGE is returned.
 
 The field is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 IN set-of-values
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{set-of-values} consists of a list of character or number
 constants specifying the valid values for the parameter.
 The specified values must all be convertible to the type of the parameter.
@@ -1296,14 +1037,14 @@ any required string which corresponds with a reserved word must be enclosed in
 quotes.
 
 \subsubsection*{Example}
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 PARAMETER FILTER
       .
    TYPE '_CHAR'
    IN 'R', 'I', 'J'
       .
 ENDPARAMETER
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 \subsection{The PROMPT Field\xlabel{the_prompt_field}}
 
@@ -1312,16 +1053,16 @@ of the prompt string is actually a function of the user interface.
 The effect with ICL, SMSICL, DCL and Unix shells is described here.}.
 
 The field is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 PROMPT  text
-\end{verbatim} \end{quote}
-where text is a character string ({\em n.b. it must be enclosed in quotes
+\end{terminalv}
+where text is a character string (\emph{n.b. it must be enclosed in quotes
 if it consists of more than one token}\/).
 
 If the PROMPT field is omitted, the parameter keyword is used as the prompt.
 
 \subsubsection*{Example}
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 INTERFACE DISP
    .
    PARAMETER IMAGE
@@ -1338,19 +1079,19 @@ INTERFACE DISP
    ENDPARAMETER
       .
 ENDINTERFACE
-\end{verbatim} \end{quote}
+\end{terminalv}
 Suppose that the user has given the command:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 disp image=iue.image.swp2099
-\end{verbatim} \end{quote}
+\end{terminalv}
 The program will take the specified value as the value of the IMAGE parameter.
 When it requires the DISPLAY parameter value, none has been specified on
 the command line so, as the VPATH field specifies that the user is
 to be prompted for a value, the system generates a prompt line such
 as:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 DISPLAY - Image display device >
-\end{verbatim} \end{quote}
+\end{terminalv}
 to which the user has to reply with a suitable value. (The prompt may
 also have a suggested value for the parameter, obtained via the PPATH
 field, see below).
@@ -1358,7 +1099,7 @@ field, see below).
 \subsection{The PPATH Field
 \xlabel{the_ppath_field}\label{ppath}}
 
-This field specifies a path used for searching for a {\em suggested value}
+This field specifies a path used for searching for a \emph{suggested value}
 \footnote{Use of the suggested value is actually a function of the user
 interface.
 The effect with ICL, SMSICL, DCL and Unix shells is described here.}.
@@ -1370,11 +1111,11 @@ terminal input buffer where it can be edited with the normal line editing
 commands.
 
 The field is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 PPATH  value-resolution-path
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{value-resolution-path} is a character string
-consisting of a set of {\em path specifiers}. If there are two or more
+consisting of a set of \emph{path specifiers}. If there are two or more
 path specifiers, they must be separated by commas and the string must be
 enclosed in single quotes.
 
@@ -1403,7 +1144,7 @@ If the PPATH field is omitted, or fails to give a value,
 \texttt{'DYNAMIC,DEFAULT'} is used.
 If this fails to give a value, there is no suggested value.
 \subsubsection*{Example}
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 INTERFACE DISP
    .
    PARAMETER IMAGE
@@ -1429,7 +1170,7 @@ INTERFACE DISP
    ENDPARAMETER
       .
 ENDINTERFACE
-\end{verbatim} \end{quote}
+\end{terminalv}
 Assuming that:
 \begin{enumerate}
 \item There is no current value for IMAGE.
@@ -1437,17 +1178,17 @@ Assuming that:
 \item The program has not specified a dynamic default for LIMITS.
 \end{enumerate}
 Then, with the above Interface File, if the user just types:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 disp
-\end{verbatim} \end{quote}
-({\em i.e.}\ does not give any parameter values), and the VPATH field
+\end{terminalv}
+(\emph{i.e.}\ does not give any parameter values), and the VPATH field
 results in the user being prompted, the three prompts would be something like:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 IMAGE - Image to be displayed /@IUE.IMAGE.SWPTEST/ >
 DISPLAY - Image display device /@XWINDOWS/ >
 LIMITS - Pixel limits /[1,511,255,512]/ >
-\end{verbatim} \end{quote}
-{\em Note the `@' in the suggested values is inserted by the system to avoid
+\end{terminalv}
+\emph{Note the `@' in the suggested values is inserted by the system to avoid
 ambiguity between names and character strings.}
 
 \subsubsection*{Run-time Modification of PPATH Action}
@@ -1466,10 +1207,10 @@ It is also possible to force ACCEPT for individual parameters by putting
 
 If there is no suggested value, the prompt will be issued anyway.
 \end{description}
-{\em E.g.}\ with the Interface File above, the command:
-\begin{quote} \begin{verbatim}
+\emph{E.g.}\ with the Interface File above, the command:
+\begin{terminalv}
 disp reset accept
-\end{verbatim} \end{quote}
+\end{terminalv}
 will cause the static default value, rather than the current value,
 to be used as the suggested value for IMAGE, and that value to be used as the
 parameter value without prompting.
@@ -1477,21 +1218,21 @@ parameter value without prompting.
 \subsection{The HELPKEY Field\xlabel{the_helpkey_field}}
 
 This field is used to specify a help file and a module within it at which
-{\em multi-line} help text for the parameter may be found\footnote{
+\emph{multi-line} help text for the parameter may be found\footnote{
 The precise effect of the HELPKEY field will depend upon the user interface
 in use.
 The effect with ICL, SMSICL, DCL and Unix shells is described here.}.
-Text read from a help file is known as {\em multi-line} help although it could
+Text read from a help file is known as \emph{multi-line} help although it could
 in fact be only one line.
 
 The field is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 helpkey help_specifier
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{help\_specifier} is a character string of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 filename key1 key2 etc...
-\end{verbatim} \end{quote}
+\end{terminalv}
 specifying that the text to be displayed may be found in the help file
 \texttt{filename} and the module defined by \texttt{ key1 key2 etc...} (but see
 also the HELPLIB Specification, Section \ref{helplib}).
@@ -1500,9 +1241,9 @@ see Appendix \ref{help}.
 
 \texttt{help\_specifier}  may also be \texttt{*} or \texttt{'*'}, in which case a
 default value of:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 interface_name PARAMETERS parameter_name
-\end{verbatim} \end{quote}
+\end{terminalv}
 will be used, where \texttt{interface\_name} is the name specified in the
 current INTERFACE field.
 (Use of this default implies that there is an associated HELPLIB Specification.)
@@ -1517,7 +1258,7 @@ will be re-prompted for the parameter value immediately (except from SMSICL).
 
 \subsubsection*{Example}
 The previous example is therefore better written:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 INTERFACE DISP
    .
    PARAMETER IMAGE
@@ -1534,28 +1275,28 @@ INTERFACE DISP
    ENDPARAMETER
       .
 ENDINTERFACE
-\end{verbatim} \end{quote}
+\end{terminalv}
 
-\subsection{The HELP Field\xlabel{the_help_field}}
+\subsection{The HELP Field\xlabel{the_parameter_help_field}}
 
 This field is used to specify some help text for a parameter\footnote{
 The precise effect of the HELP field will depend upon the user interface in use.
 The effect with ICL, SMSICL, DCL and Unix shells is described here.}.
 
 This field is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 HELP help-specifier
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{help-specifier} is a character string giving help information about
 the parameter, it may be either a single line of text to be displayed
-({\em single-line help}) or a string of the form:
-\begin{quote} \begin{verbatim}
+(\emph{single-line help}) or a string of the form:
+\begin{terminalv}
 %filename key1 key2 etc...
-\end{verbatim} \end{quote}
+\end{terminalv}
 specifying that multi-line help may be found in the help file
 \texttt{filename} and the module defined by \texttt{ key1 key2 etc...}
 
-{\em Note that the preferred way of specifying multi-line help
+\emph{Note that the preferred way of specifying multi-line help
 is using the HELPKEY field and that single-line help is not generally
 considered very useful.}
 
@@ -1572,7 +1313,7 @@ if multi-line help is output the user will
 be left in the help system and prompted for further topics.
 
 \subsubsection*{Example}
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 INTERFACE DISP
    .
    PARAMETER IMAGE
@@ -1589,7 +1330,7 @@ INTERFACE DISP
    ENDPARAMETER
       .
 ENDINTERFACE
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 \section{The HELPLIB Specification\xlabel{the_helplib_specification}
 \label{helplib}}
@@ -1599,9 +1340,9 @@ HELPKEY fields until another HELPLIB specification is found. The specification
 may appear anywhere in an Interface File.
 
 The field is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 HELPLIB help_top_level_spec
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{help\_top\_level\_spec} is a character string to be inserted (with an
 intervening space) in front of any string specified in subsequent HELPKEY
 fields as the Interface File is parsed --
@@ -1610,9 +1351,9 @@ effect of an earlier HELPLIB field.
 
 Thus, assuming that the help file for the program DISP is
 DISP\_DIR:DISP and that help text for each parameter is held in subtopic
-{\em parameter-name} of subtopic PARAMETERS of topic DISP, then
+\emph{parameter-name} of subtopic PARAMETERS of topic DISP, then
 the Interface File for program DISP could be:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 INTERFACE DISP
 # Specify the top level of help
    HELPLIB 'DISP_DIR:DISP DISP PARAMETERS'
@@ -1639,8 +1380,8 @@ INTERFACE DISP
    ENDPARAMETER
       .
 ENDINTERFACE
-\end{verbatim} \end{quote}
-{\em Note that the use of multiple HELPLIB fields here is purely to show the
+\end{terminalv}
+\emph{Note that the use of multiple HELPLIB fields here is purely to show the
 effects -- there would normally be only one HELPLIB specification in
 an Interface File.}
 
@@ -1653,28 +1394,28 @@ to text supplied by the program in the call to the MSG or ERR routine.
 Each of the Message Parameter names used in the program can have
 a Message Specification in the Interface File. The Message Specification
 is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 MESSAGE parametername
   TEXT  string
 ENDMESSAGE
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{parametername} is a character string specifying the Message
 Parameter name which is used in the call to an ERR or MSG subroutine.
 The name must be different from any other Program or Message Parameter name
 specified for the program.
 
 \texttt{sting} may by anything acceptable to the ERR or MSG routine
-({\em i.e.}\ it may include tokens {\em etc.}).
+(\emph{i.e.}\ it may include tokens \emph{etc.}).
 
 If the Message Specification for a given Message Parameter is omitted, the
 text specified in the MSG or ERR routine will be used.
 
 \subsubsection*{Example}
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 MESSAGE APP_OUTMESS
    TEXT 'Calculated value is ^VALUE'
 ENDMESSAGE
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 \section{The ACTION Specification\xlabel{the_action_specification}
 \label{action}}
@@ -1684,20 +1425,20 @@ The concept of ACTION is specific to instrumentation tasks (see
 The task is capable of obeying or cancelling a number of distinct commands
 known as actions.
 It does this, for example, in response to the ICL command:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 SEND taskname context actionname parameter_list
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{context} is \texttt{OBEY} or \texttt{CANCEL}.
 
 Actions have to be declared in the Interface File, following the parameter
 declarations. The Action Specification is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 ACTION actionname
    fieldname fieldvalue
    context specifications
       .
 ENDACTION
-\end{verbatim} \end{quote}
+\end{terminalv}
 Where \texttt{actionname} is a character string specifying a valid action name.
 The same rules should be applied to action names as are applied to parameter
 names (see Appendix \ref{names}).
@@ -1708,13 +1449,13 @@ names (see Appendix \ref{names}).
 The Context Specifications allow command-line parameter positions to be
 allocated differently for different actions and contexts of the task.
 The Context Specification is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
    context
       NEEDS parametername_1
       NEEDS parametername_2
        .
    ENDcontext
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{context} is \texttt{OBEY} or \texttt{CANCEL}.
 
 The order of the NEEDS fields within the Context Specification defines
@@ -1725,7 +1466,7 @@ If no NEEDS list is specified, positions will default to those specified
 in the Parameter Specification.
 
 \subsubsection*{Example}
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 ACTION FIRST
    OBEY
       NEEDS PAR1
@@ -1736,12 +1477,12 @@ ACTION FIRST
       NEEDS PAR2
    ENDCANCEL
 ENDACTION
-\end{verbatim} \end{quote}
+\end{terminalv}
 For historical reasons, NEEDS specifications can have RANGE or IN constraints
 but these have no effect.
 
 \subsubsection*{Example}
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 ACTION GET_FILTER
    OBEY
       NEEDS FILTER IN 'R', 'I', 'J'
@@ -1749,7 +1490,7 @@ ACTION GET_FILTER
    ENDOBEY
       .
 ENDACTION
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 \subsection{The Action KEYWORD Field\xlabel{the_action_keyword_field}}
 
@@ -1757,15 +1498,15 @@ This field specifies the name by which the action is known to
 the person running the I-task.
 
 The field is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 KEYWORD  name
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{name} is a character string specifying a valid keyword.
 The same rules should be applied to action keywords as are applied to parameter
 keywords (see Appendix \ref{names}).
 
 \subsubsection*{Example}
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 INTERFACE FILTASK
       .
    ACTION GET_FILTER
@@ -1778,12 +1519,12 @@ INTERFACE FILTASK
    ENDACTION
       .
 ENDINTERFACE
-\end{verbatim} \end{quote}
+\end{terminalv}
 This field is used to specify the word that the user uses to communicate
 with a particular action. Thus the user could specify:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 ICL> send filtask obey find_filter
-\end{verbatim} \end{quote}
+\end{terminalv}
 As can be seen, this completes the separation between the program's
 view of actions and the user's view of them. It is possible for the
 programmer to re-write the program using completely different action
@@ -1795,19 +1536,19 @@ action KEYWORD fields.
 If the KEYWORD field is not specified for an action, then the system will
 use the action name as the keyword.
 
-\subsection{The HELP Field\xlabel{the_help_field}}
+\subsection{The HELP Field\xlabel{the_action_help_field}}
 
 This field is used to specify some help text for an action. No current
 user interfaces make use of this.
 
 The field is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 HELP help-text
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{help-text} is a character string giving help information about the
 action.
 \subsubsection*{Example}
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 ACTION GET_FILTER
    KEYWORD FIND_FILTER
    HELP 'This causes the filter to be selected'
@@ -1817,17 +1558,17 @@ ACTION GET_FILTER
    ENDOBEY
       .
 ENDACTION
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 \section{ENTRIES FOR MENUS\xlabel{entries_for_menus}}
 
 There are two fields which are provided for possible future
 menu-style user interfaces. These can be used in both ACTION and
 PARAMETER specifications and are:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 MENU menuname
 MENUCOORDS xcoord,ycoord
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{menuname} is a character string specifying the name to be shown on
 the screen, and \texttt{XCOORD} and \texttt{YCOORD} are integers giving the
 coordinates for the position of the menu name.
@@ -1840,9 +1581,9 @@ These quantities are not used by the parameter system, but merely stored.
 \label{parsing}}
 
 Interface File parsing is case-insensitive, the file is
-interpreted as a sequence of {\em tokens}, where a token is a sequence of
+interpreted as a sequence of \emph{tokens}, where a token is a sequence of
 characters which are either all alphanumeric (with \texttt{.;:+-()\_[]"'<>} being
-honorary alphanumerics) or all non-alphanumeric ({\em i.e.}\ anything other
+honorary alphanumerics) or all non-alphanumeric (\emph{i.e.}\ anything other
 than alphanumeric and `white').
 Tokens are thus terminated by anything of the opposite class or by a `white'
 character.
@@ -1851,11 +1592,11 @@ non-printable.
 Apart from their role as delimiters, `white' characters are not significant.
 
 The one exception to this is that, as a special case, a token may be a
-quoted string, {\em i.e.}\ a character string consisting of a set of characters
+quoted string, \emph{i.e.}\ a character string consisting of a set of characters
 enclosed in single quotes.
 The first quote must be the first
 character of the token and the token is terminated by the next isolated
-({\em i.e.}\ not \texttt{''}) quote or the end of line.
+(\emph{i.e.}\ not \texttt{''}) quote or the end of line.
 Thus two consecutive quotes in a quoted string will be interpreted as a single
 quote to be contained in the string.
 
@@ -1924,11 +1665,11 @@ complicated.
 It is affected by Interface File parsing, the parameter system, HDS and the
 particular user interface in use.
 Appendix \ref{consts} gives the maximum lengths allowed and, to avoid problems,
-it is recommended that names begin with a letter and continue with {\em true}
+it is recommended that names begin with a letter and continue with \emph{true}
 alphanumeric characters or underscore.
 
 Parameter, action and keyword names are converted to upper case for storage.
-If they are displayed, in prompts or error messages {\em etc.}, they will
+If they are displayed, in prompts or error messages \emph{etc.}, they will
 appear in upper case.
 
 \subsection{Error Reporting\xlabel{error_reporting}}
@@ -1951,13 +1692,13 @@ incomplete and result in some unexpected defaults being used.
 \newpage
 
 \section{Interface Module Search Path, ADAM\_IFL
-\xlabel{interface_module_search_path}\label{searchpath}}
+\xlabel{interface_module_search_path_and_adam_ifl}\label{searchpath}}
 
 \subsection{Introduction\xlabel{introduction3}}
 
 By default, ADAM application programs  attempt to find their Interface Module
-in the directory containing the executable file. A compiled ({\bf .ifc}) file
-will be used in preference to a source ({\bf .ifl}) file.
+in the directory containing the executable file. A compiled (\textbf{.ifc}) file
+will be used in preference to a source (\textbf{.ifl}) file.
 To allow users to have different versions of the Interface Module for a given
 program without having multiple copies of the executable file, a search path
 mechanism has been implemented.
@@ -1979,7 +1720,7 @@ If environment variable ADAM\_IFL is defined, it is
 assumed to specify a search path as a list of directory names separated by
 semi-colons.
 Each directory in turn is searched for a file with the same name
-as the program and with extension {\bf .ifc} or, failing that, {\bf .ifl}.
+as the program and with extension \textbf{.ifc} or, failing that, \textbf{.ifl}.
 If such a file is found, it is used as the Interface Module.
 
 \subsection{Implementation for VAX VMS\xlabel{implementation_for_vax_vms}}
@@ -1996,7 +1737,7 @@ character), in a call to LIB\$FIND\_FILE.
 If such a file is found, the type is checked and, if the type is not .IFC
 or .IFL, the routine continues searching until no more files matching
 the specification are found.
-{\em Note that a .IFC file will be found before a .IFL file in any given
+\emph{Note that a .IFC file will be found before a .IFL file in any given
 directory.}
 
 Notes:
@@ -2061,7 +1802,7 @@ it is more efficient to specify the correct size if possible.)
 
 If you do not want to be prompted for the parameter, the simplest way is
 to use the DEFAULT field.
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 PARAMETER parametername
       .
    ACCESS WRITE
@@ -2069,7 +1810,7 @@ PARAMETER parametername
    DEFAULT value
       .
 ENDPARAMETER
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{value} is a primitive value of an appropriate type. Again the
 size does not matter (apart from efficiency), it will be changed if
 necessary.
@@ -2088,7 +1829,7 @@ may be used.
 If the given filename has extension \texttt{.shl}, Portable HELP is used:
 if no file extension, or \texttt{.hlb}, is specified,
 the system will first look for a file with the given filename and extension
-{\bf .shl}.
+\textbf{.shl}.
 If the file is found it will be used with the Portable Help System.
 In all other cases, the VMS help system is used.
 
@@ -2096,7 +1837,7 @@ In the interests of allowing the same Interface Modules to work on both VMS
 and Unix, both systems will handle names starting with (or wholly) environment
 variables (logical names) in either system's style.
 
-{\em E.g.}
+\emph{E.g.}
 \begin{quote}
 \texttt{\$environment\_variable/relative\_pathname}\/
 \end{quote}
@@ -2112,7 +1853,7 @@ or
 The common blocks used in ADAM application programs to hold information read
 from the Interface Module and required by the parameter system, impose certain
 limits on the size and number of parameters names, defaults and constraints
-{\em etc.} Further constraints are imposed by workspace requirements for the
+\emph{etc.} Further constraints are imposed by workspace requirements for the
 Interface File parsing system.
 
 Current values for important limits are published here, together with
@@ -2197,16 +1938,16 @@ when the user invokes this Interface Module.
 It is still accepted by the system but has no effect.
 
 The field is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 PROGRAM progname
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{progname} is a character string (or reserved word) which is
 the name of the executable image without the '.EXE' file extension.
 
 \subsubsection*{Example}
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 PROGRAM 'DECONV'
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 \subsubsection{The EPATH field}
 This field specification provided the search path for locating the
@@ -2215,33 +1956,33 @@ found.
 It is still accepted by the system but has no effect.
 
 The field is of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 EPATH dpath
-\end{verbatim} \end{quote}
+\end{terminalv}
 where \texttt{dpath} is a character constant listing the order of search through
 subdirectories. The directory specifications in the path are separated
 by semi-colons. A null path indicates the current directory. Note that
 logical names must end with a colon.
 
 \subsubsection*{Example}
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 EPATH 'DISK$USER1:[SLW.JUNK];SAI_LAPPLIC:'
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 \subsection{The RPATH field\xlabel{the_rpath_field}}
 
 This field provided a search path for data system object names.
 It is no longer accepted by the system.
 The field specifier was of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 RPATH resolution-path
-\end{verbatim} \end{quote}
+\end{terminalv}
 where resolution-path was a character string giving a list of resolution path
 specifiers separated by semi-colons.
 Each specifier was a data-system object name.
 
 \subsubsection*{Example}
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 INTERFACE DISP
       .
    PARAMETER DISPLAY
@@ -2251,7 +1992,7 @@ INTERFACE DISP
    ENDPARAMETER
       .
 ENDINTERFACE
-\end{verbatim} \end{quote}
+\end{terminalv}
 Then if the parameter DISPLAY was given the value ARGS, the system
 attempted to use the object TEMP.DEVICES.ARGS then, failing that
 SAI\_USER:DEVICES.ARGS and so on.
@@ -2283,8 +2024,8 @@ The ACCEPT keyword now only affects parameters for which a prompt would
 otherwise have been issued.
 Parameters may also now be forced to ACCEPT by the \texttt{keyword=$\backslash$} parameter
 specifier or by typing `\texttt{$\backslash$}' in response to a prompt.
-\item[Suggested Values] The term {\em prompt value} has been replaced by
-{\em suggested value} which is now the preferred term.
+\item[Suggested Values] The term \emph{prompt value} has been replaced by
+\emph{suggested value} which is now the preferred term.
 \item[Help Files] Appendix \ref{help} has been added to give details of the
 filenames which may be given with the HELP, HELPKEY and HELPLIB fields.
 \item[Output Parameters] Appendix \ref{output} has been altered to describe
