@@ -1,492 +1,20 @@
-\documentstyle[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt]{starlink}
+
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {171.1}
-\newcommand{\stardocauthors}   {P.M. Allan \\
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {171.1}
+\stardocauthors   {P.M. Allan \\
                                 A.J. Chipperfield}
-\newcommand{\stardocdate}      {12 November 1996}
-\newcommand{\stardoctitle}     {MAG \\ [\latex{1ex}]
+\stardocdate        {12 November 1996}
+\stardoctitle       {MAG \\ [\latex{1ex}]
                                 Access to magnetic tapes}
-\newcommand{\stardocversion}   {Version 2.0}
-\newcommand{\stardocmanual}    {Programmer's Manual}
-% ? End of document identification
-
-% -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\html}[1]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-\newcommand{\dash}{--}
-\begin{htmlonly}
-  \newcommand{\dash}{-}
-\end{htmlonly}
-
-% Latex only section.
-\newcommand{\latexonlysection}[1]{\section{#1}}
-\begin{htmlonly}
-   \newcommand{\latexonlysection}[1]{#1}
-\end{htmlonly}
-
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
-
-
-
-% ? End of document specific commands
-% -----------------------------------------------------------------------------
-%  Title Page.
-%  ===========
-\renewcommand{\thepage}{\roman{page}}
-\begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
+\stardocversion     {Version 2.0}
+\stardocmanual      {Programmer's Manual}
+\stardocabstract {%
 The MAG subroutine library allows a programmer to write portable programs
 which access data stored on magnetic tapes.
 
@@ -500,36 +28,34 @@ for DEC Alphas running OSF/1. Historically it has been supported for DEC
 Ultrix and for SunOS and may still work for them.
 
 The library is also available for VAX/VMS systems.
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
- \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
+}
+% ? End of document identification
 
-%  \Introduction page
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+% -----------------------------------------------------------------------------
+% ? Document specific \providecommand or \newenvironment commands.
+\providecommand{\dash}{--}
+
+\providecommand{\noteroutine}[3]{\htmlref{\textbf{#1}}{#1}\textbf{#2}\hspace*{\fill}\nopagebreak \\
+                             \hspace*{3em}\emph{#3}\hspace*{\fill}\par}
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\begin{document}
+\scfrontmatter
 
 \section{\xlabel{introduction}Introduction}
 
 It is often the case that astronomical data are transported from the data
-acquisition site (telescope, satellite ground station, {\em etc.}) to the
+acquisition site (telescope, satellite ground station, \emph{etc.}) to the
 astronomer's home institution via magnetic tape. The data on such tapes can be
 in a variety of formats. The purpose of the MAG package is to allow
 programmers to write applications programs that can access the raw data on the
 tapes. MAG provides a means of processing magnetic tapes that is independent of
 the type of computer on which the software is running and the type of tape
 drive that is being used. MAG does no interpretation of the data format. It
-deals in tape blocks and knows nothing about FITS, VMS BACKUP, tar, {\em etc.}
+deals in tape blocks and knows nothing about FITS, VMS BACKUP, tar, \emph{etc.}
 
 By using the MAG routines, a program can read and write tapes, position the
 tape (both in absolute terms and relative to the current position) and can
@@ -548,7 +74,7 @@ when using the MAG package.
 This document describes mainly the version of MAG available on Unix machines
 but differences for the earlier
 \htmlref{MAG on VAX/VMS}{vax}
-are also described\latex{ (in Appendix \ref{vax})}.
+are also described (in Appendix \ref{vax}).
 
 The operations which can be performed on tapes using the MAG package
 include:
@@ -592,17 +118,17 @@ and so get the names of the tape drives by means of environment program
 parameters. The application refers to a tape device using a Device Parameter,
 which is associated (via the Parameter System and Command Language and a data
 file known as the
-\htmlref{{\bf device dataset}}{dataset_intro}) with the actual tape drive.
+\htmlref{\textbf{device dataset}}{dataset_intro}) with the actual tape drive.
 The device dataset is also used to preserve
 \htmlref{position information}{positions}
 for the tape between application
-invocations\latex{ (see Sections \ref{positions} and \ref{dataset_intro})}.
+invocations (see Sections \ref{positions} and \ref{dataset_intro}).
 
 We can see how the association is made by looking at the basic structure of
 an application which reads from a tape:
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
       INCLUDE 'SAE_PAR'          ! Define SAI__OK
 
       INTEGER STATUS             ! Status value
@@ -627,8 +153,8 @@ an application which reads from a tape:
       ENDIF
 
       ..
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 The MAG\_ASSOC call gets a value for the specified parameter (TAPE).
 The given value should be the name by which the device is usually known
@@ -643,17 +169,17 @@ seen in the MAG\_REW call (which rewinds the tape).
 
 The interface file for the above application could contain:
 
-\small
-\begin{verbatim}
-      PARAMETER TAPE
-        TYPE    'TAPE'
-        VPATH   'PROMPT'
-        PROMPT  'Tape Deck'
-        PPATH   'CURRENT,DEFAULT'
-        DEFAULT /dev/nrmt0l
-      ENDPARAMETER
-\end{verbatim}
-\normalsize
+\begin{small}
+\begin{terminalv}
+PARAMETER TAPE
+  TYPE    'TAPE'
+  VPATH   'PROMPT'
+  PROMPT  'Tape Deck'
+  PPATH   'CURRENT,DEFAULT'
+  DEFAULT /dev/nrmt0l
+ENDPARAMETER
+\end{terminalv}
+\end{small}
 
 When the application has finished with the tape, it uses MAG\_CANCL
 to close the device, cancel the device parameter value and
@@ -698,33 +224,33 @@ Sun and an Alpha. The situation is even worse with REAL or DOUBLE PRECISION
 values.
 
 Writing example:
-\small
-\begin{verbatim}
-      INTEGER STATUS              !Inherited status
-      INTEGER MT                  !Tape descriptor
-      INTEGER ACTVAL              !Number of bytes written/read
-      INTEGER BUFFER(100)         !Record buffer
-      INTEGER INTSIZE
-      PARAMETER ( INTSIZE=4)      !Number of bytes/integer
+\begin{small}
+\begin{terminalv}
+INTEGER STATUS              !Inherited status
+INTEGER MT                  !Tape descriptor
+INTEGER ACTVAL              !Number of bytes written/read
+INTEGER BUFFER(100)         !Record buffer
+INTEGER INTSIZE
+PARAMETER ( INTSIZE=4)      !Number of bytes/integer
 
-      DO I = 1, 50
-         BUFFER( I ) = I
-      ENDDO
+DO I = 1, 50
+  BUFFER( I ) = I
+ENDDO
 
-      CALL MAG_WRITE( MT, 50*INTSIZE, BUFFER, ACTVAL, STATUS )
-      ...
-\end{verbatim}
-\normalsize
+CALL MAG_WRITE( MT, 50*INTSIZE, BUFFER, ACTVAL, STATUS )
+...
+\end{terminalv}
+\end{small}
 and the corresponding read could be:
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
       CALL MAG_READ( MT, 100*INTSIZE, BUFFER, ACTVAL, STATUS )
 
       WRITE( *, 10) (BUFFER(I),I=1,ACTVAL/INTSIZE)
 10    FORMAT( 10I4 )
          ...
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 \section{\xlabel{absolute_tape_positions}\label{positions}Absolute tape positions}
 Often, the data need to be read from or written to some position along
@@ -754,24 +280,24 @@ out the absolute position.
 This is best demonstrated by an example. Suppose an application wishes
 to refer to absolute file positions:
 
-\small
-\begin{verbatim}
-      ..
+\begin{small}
+\begin{terminalv}
+..
 
-      INTEGER FILE                 ! File number
-      LOGICAL START                ! Whether at start of file
-      INTEGER BLOCK                ! Block number
+INTEGER FILE                 ! File number
+LOGICAL START                ! Whether at start of file
+INTEGER BLOCK                ! Block number
 
-      ..
+..
 
-      FILE = 2
-      START = .TRUE.
-      BLOCK = 1
-      CALL MAG_MOVE(MT, FILE, START, BLOCK, STATUS)
+FILE = 2
+START = .TRUE.
+BLOCK = 1
+CALL MAG_MOVE(MT, FILE, START, BLOCK, STATUS)
 
-      ..
-\end{verbatim}
-\normalsize
+..
+\end{terminalv}
+\end{small}
 
 The MAG\_MOVE routine requires absolute tape positions, thus if the
 application is running in an environment which remembers tape positions,
@@ -782,7 +308,7 @@ The call to MAG\_MOVE then moves the tape to the file number indicated by
 FILE (2nd argument).
 The third argument (set to .TRUE.) indicates that the block number
 (4th argument) is to be counted from the start of the file.
-A value {\bf .FALSE.\ } implies that the block numbering is from the end of the
+A value \textbf{.FALSE.\ } implies that the block numbering is from the end of the
 file (as if the tape were being read in reverse). That is: block number 1,
 from the end of the file, positions the tape between the the last block of
 the file and the end-of-file mark. This is not the position from which the
@@ -790,15 +316,15 @@ program can read the last block of data.
 
 At any time, the tape position can be enquired by, for example:
 
-\small
-\begin{verbatim}
-      ..
+\begin{small}
+\begin{terminalv}
+..
 
-      CALL MAG_POS(MT, FILE, START, BLOCK, STATUS)
+CALL MAG_POS(MT, FILE, START, BLOCK, STATUS)
 
-      ..
-\end{verbatim}
-\normalsize
+..
+\end{terminalv}
+\end{small}
 
 where the returned values (FILE, START and BLOCK) correspond to the
 MAG\_MOVE call. The values of these returned arguments are used to
@@ -810,15 +336,15 @@ NOTE that this system is likely to be subverted if devices which automatically
 reposition the tape on opening or closing are used.
 
 \section{\xlabel{device_datasets}\label{device_datasets}Device Datasets}
-\subsection{\xlabel{introduction_to_device_datasets}\xlabel{device_datasets}\label{dataset_intro}Introduction to Device Datasets}
+\subsection{\xlabel{introduction_to_device_datasets}\label{dataset_intro}Introduction to Device Datasets}
 MAG\_ASSOC and the other environment-level subroutines which have a
 parameter name as an argument, look for information about each of the user's
 tape devices in an
-\xref{HDS}{sun92}{abstract}\latex{\footnote{Hierarchical Data System
-(see SUN/92)}} file, known as the {\bf user's device dataset} or USRDEVDATA,
-which is normally file {\tt USRDEVDATA.sdf} in the user's
+\xref{HDS}{sun92}{abstract}\footnote{Hierarchical Data System
+(see SUN/92)} file, known as the \textbf{user's device dataset} or USRDEVDATA,
+which is normally file \texttt{USRDEVDATA.sdf} in the user's
 \xref{ADAM\_USER}{sun144}{ADAM_USER_directory}
-directory\latex{ (see SUN/144)}.
+directory (see SUN/144).
 This may be overridden by setting the required filename in environment
 variable USRDEVDATA. If the file does not exist, it will be created.
 
@@ -830,13 +356,13 @@ system name of the device to be associated with it and to retain the absolute
 tape position between runs.
 
 If the user's name for the device is the same as the normal system name
-({\tt /dev/rmt0h}, for example), the whole structure can be created by default.
+(\texttt{/dev/rmt0h}, for example), the whole structure can be created by default.
 However it is possible to create structures associating a user's `pet' name
 for a device with its system name.
 
 \begin{figure}[htbp]
 \caption{\label{usrdevdata}The Structure of a Device Dataset}
-
+\setlength{\unitlength}{1mm}
 \begin{center}
 \begin{picture}(135,140)
 \thicklines
@@ -903,23 +429,23 @@ for a device with its system name.
 
 \subsection{\xlabel{defining_a_pet_name_for_a}\xlabel{tapecreate}\label{tapecreate}Defining a `Pet' Name for a
 Tape Device}
-The command {\bf tapecreate} may be used to create or alter a device dataset.
+The command \textbf{tapecreate} may be used to create or alter a device dataset.
 The system manager can use it to set up a system-wide device dataset
 containing entries for every device on the system. Users may also use it to
 create private user device datasets specifying their own names for devices.
 However, it is more usual to use the system name for the device and rely on
-automatic creation of device datasets by MAG\_ASSOC {\em etc.}
+automatic creation of device datasets by MAG\_ASSOC \emph{etc.}
 
 For each required tape drive, an entry should be created in the file
-{\em e.g.} :
-\small \begin{quote}
-\begin{verbatim}
+\emph{e.g.} :
+\begin{small}
+\begin{terminalv}
 tapecreate dat /dev/rmt0h ~/adam/USRDEVDATA
 tapecreate datn /dev/nrtm0h ~/adam/USRDEVDATA
-\end{verbatim}
-\end{quote} \normalsize
+\end{terminalv}
+\end{small}
 
-{\bf tapecreate} is a
+\textbf{tapecreate} is a
 \xref{Starlink Software Environment}{sg4}{}
 program with parameters as follows:
 
@@ -935,41 +461,41 @@ system device name when the device is opened for use.
 
 The third parameter (DEVDATASET) is the name of the HDS file to be created or
 updated (without the {\tt.sdf} extension) \dash\ it defaults to
-{\tt devdataset} if not supplied on the command line.
-If the file does not exist, {\bf tapecreate} will create it.
+\texttt{devdataset} if not supplied on the command line.
+If the file does not exist, \textbf{tapecreate} will create it.
 
 \subsection{\xlabel{runtime_creation_of_device_dataset_entries}Runtime Creation of Device Dataset Entries}
 If no suitably named structure exists in USRDEVDATA when the
 subroutine is called, an attempt is made to create it by copying the relevant
-entry from a {\bf system-wide device dataset}.
+entry from a \textbf{system-wide device dataset}.
 If the system-wide device dataset does not exist or no structure with the
 required name exists in it, a structure will be created in USRDEVDATA with
 the required name and assuming that the system name for the device is the same
 (in lower case).
 
 By default, the system-wide device dataset
-is sought by looking for {\bf ../etc/devdataset.sdf} relative to each
+is sought by looking for \textbf{../etc/devdataset.sdf} relative to each
 directory on the user's PATH. However, an alternative file search path may be
 specified as a list of file pathnames, separated by `:', in environment
 variable DEVDATASET. (See Appendix \ref{vax} for filenames on VAX/VMS.)
 
 This indirection of names between the user's name for a device and the
 system device name, intended to assist portability, has proved confusing,
-so system-wide device datasets (traditionally {\tt /star/etc/devdataset.sdf})
+so system-wide device datasets (traditionally \texttt{/star/etc/devdataset.sdf})
 are being phased out \dash\ the normal procedure will be to refer to the device
 by its system name.
 
-Note that {\tt /star/etc/devdataset.sdf} will still be required by programs
+Note that \texttt{/star/etc/devdataset.sdf} will still be required by programs
 linked with versions of MAG earlier than 2.0 if an appropriate structure does
 not exist in the user's device dataset. Furthermore, filenames will be
-\htmlref{different on VAX/VMS}{vax}\latex{ (see Appendix \ref{vax})}.
+\htmlref{different on VAX/VMS}{vax} (see Appendix \ref{vax}).
 
 \subsection{\xlabel{saving_the_absolute_tape_position}Saving the Absolute Tape Position}
 MAG\_ASSOC will read USRDEVDATA to determine which physical device to use, and
 will copy the absolute tape position into the MAG common block.
 To operate this system correctly, the tape must be mounted using MAG\_MOUNT
 and the tape descriptor must be annulled using MAG\_CANCL or MAG\_ANNUL at the
-end of each task invocation with the tape in a known position ({\em i.e.}\ it knew
+end of each task invocation with the tape in a known position (\emph{i.e.}\ it knew
 where it was to start with and was able to keep track of its movements).
 MAG\_MOUNT will initialize the tape dataset to FILE=1, START=.TRUE., BLOCK=1
 and MAG\_DISM will `undefine' the entries (as will the creation of an entry
@@ -987,7 +513,7 @@ to execute whatever the import status.
 
 If an error is detected during execution, an error message may be reported
 (but not output) using the \xref{ERR}{sun104}{err_error_reporting_system}
-system \latex{ (see SUN/104)}, and an appropriate STATUS value set.
+system (see SUN/104), and an appropriate STATUS value set.
 Exceptions to this are the routines like MAG\_ASSOC which obtain a device name
 via a parameter value. Errors in specifying the device name are reported
 immediately and the user prompted for another value.
@@ -998,19 +524,19 @@ detected. Therefore, testing for explicit status values can result in
 non-portable code. If, in spite of this warning, it is required to test for
 explicit status values returned from MAG subroutines, include the statement:
 
-\small
-\begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 INCLUDE 'MAG_ERR'
-\end{verbatim} \end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 in the program. The status can then be tested by, for example:
 
-\small
-\begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 IF( STATUS .EQ. MAG__EOV ) RETURN
-\end{verbatim} \end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 If an error status is to be ignored, the error message stack should be
 cleared and STATUS reset by calling subroutine
@@ -1022,75 +548,77 @@ the OK status value, SAI\_\_OK, amongst other things) and the MAG INCLUDE file
 MAG\_ERR (which defines the
 \htmlref{MAG error codes}{mag_errors} may be set up in the current
 working directory by obeying:
-\small
-\begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % star_dev
 % mag_dev
-\end{verbatim} \end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
+
 Fortran statements of the form:
-\small
-\begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 INCLUDE 'SAE_PAR'
 INCLUDE 'MAG_ERR'
-\end{verbatim} \end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 may then be used.
 
 To link a program for use in the Starlink Software Environment,
-the {\tt mag\_\-link\_\-adam} script is used.
+the \texttt{mag\_\-link\_\-adam} script is used.
 
-\small
-\begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % alink task.f `mag_link_adam`
-\end{verbatim} \end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
-For a stand-alone program, use the {\tt mag\_\-link} script.
+For a stand-alone program, use the \texttt{mag\_\-link} script.
 For example:
-\small
-\begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % f77 -o prog prog.f -L/star/lib `mag_link`.
-\end{verbatim} \end{quote}
-\normalsize
+\end{terminalv}
+\end{small}
 
 \begin{thebibliography}{9}
-\bibitem{sg4} M D Lawden, {\it ADAM \dash\ The Starlink Software Environment},
+\bibitem{sg4} M D Lawden, \textit{ADAM \dash\ The Starlink Software Environment},
 \xref{Starlink Guide 4}{sg4}{}.
-\bibitem{sun92} R F Warren-Smith \& M D Lawden, {\it HDS \dash\ Hierarchical Data
+\bibitem{sun92} R F Warren-Smith \& M D Lawden, \textit{HDS \dash\ Hierarchical Data
 System}, \xref{Starlink User Note 92}{sun92}{}.
-\bibitem{sun144} A J Chipperfield, {\it ADAM \dash\ Unix Version},
+\bibitem{sun144} A J Chipperfield, \textit{ADAM \dash\ Unix Version},
 \xref{Starlink User Note 144}{sun144}{}
-\bibitem{sun104} P C T Rees \& A J Chipperfield, {\it MERS (MSG and ERR )
+\bibitem{sun104} P C T Rees \& A J Chipperfield, \textit{MERS (MSG and ERR )
 \dash\ Message and Error Reporting Systems},
 \xref{Starlink User Note 104}{sun104}{}
 \end{thebibliography}
 
 \appendix
 
-\begin{latexonly}
-\latexonlysection{\xlabel{alphabetical_list_of_routines}Alphabetical List of Routines}
-MAG\_ALOC --   Allocate tape device \\
-MAG\_ANNUL --   Annul tape descriptor, releasing any associated tape drive \\
-MAG\_ASSOC --   Open a tape device defined by a parameter and return a descriptor \\
-MAG\_CANCL --   Close a tape device defined by a parameter\\
-MAG\_CLOSE --   Close a tape device, given a descriptor \\
-MAG\_DEACT --   Annul all tape descriptors \\
-MAG\_DEAL --   De-allocate a tape device \\
-MAG\_DISM --   Dismount tape from drive \\
-MAG\_JEOV --   Jump over an EOV condition (2 consecutive tape marks) \\
-MAG\_JUMP --   Skip a specified number of physical blocks \\
-MAG\_MOVE --   Move to a specified file and block on tape \\
-MAG\_OPEN --   Open a tape device \\
-MAG\_POS --   Enquire current tape file/block positions \\
-MAG\_READ --   Read a block from tape \\
-MAG\_REW --   Rewind tape \\
-MAG\_SET --   Set current tape file/block positions \\
-MAG\_SKIP --   Skip a specified number of tape marks \\
-MAG\_STOP --   Cancel all tape devices \\
-MAG\_WRITE --   Write a block to tape \\
-MAG\_WTM --   Write tape mark
-\end{latexonly}
+
+\section{\xlabel{alphabetical_list_of_routines}Alphabetical List of Routines}
+
+\noteroutine{MAG\_ALOC}{(PARAM, STATUS)}{Allocate tape device}
+\noteroutine{MAG\_ANNUL}{(TD, STATUS)}{Annul tape descriptor, releasing any associated tape drive}
+\noteroutine{MAG\_ASSOC}{(PARAM, MODE, TD, STATUS)}{Open a tape device defined by a parameter and return a descriptor}
+\noteroutine{MAG\_CANCL}{(PARAM, STATUS)}{Close a tape device defined by a parameter}
+\noteroutine{MAG\_CLOSE}{(TD, STATUS)}{Close a tape device, given a descriptor}
+\noteroutine{MAG\_DEACT}{(STATUS)}{Annul all tape descriptors}
+\noteroutine{MAG\_DEAL}{(PARAM, STATUS)}{De-allocate a tape device}
+\noteroutine{MAG\_DISM}{(PARAM, UNLOAD, STATUS)}{Dismount tape from drive}
+\noteroutine{MAG\_JEOV}{(TD, STATUS)}{Jump over an EOV condition (2 consecutive tape marks)}
+\noteroutine{MAG\_JUMP}{(TD, NBLOCK, STATUS)}{Skip a specified number of physical blocks}
+\noteroutine{MAG\_MOUNT}{(PARAM, MODE, STATUS)}{Mount tape on drive}
+\noteroutine{MAG\_MOVE}{(TD, FILE, START, BLOCK, STATUS)}{Move to a specified file and block on tape}
+\noteroutine{MAG\_OPEN}{(DEVICE, MODE, TD, STATUS)}{Open a tape device}
+\noteroutine{MAG\_POS}{(TD, FILE, START, BLOCK, MOVED, STATUS)}{Enquire current tape file/block positions}
+\noteroutine{MAG\_READ}{(TD, MAXVAL, VALUES, ACTVAL, STATUS)}{Read a block from tape}
+\noteroutine{MAG\_REW}{(TD, STATUS)}{Rewind tape}
+\noteroutine{MAG\_SET}{(TD, FILE, START, BLOCK, STATUS)}{Set current tape file/block positions}
+\noteroutine{MAG\_SKIP}{(TD, NTM, STATUS)}{Skip a specified number of tape marks}
+\noteroutine{MAG\_STOP}{( STATUS )}{Cancel all tape devices}
+\noteroutine{MAG\_WRITE}{(TD, NVAL, VALUES, ACTVAL, STATUS)}{Write a block to tape}
+\noteroutine{MAG\_WTM}{(TD, STATUS)}{Write tape mark}
 
 \newpage
 \section{\xlabel{routine_descriptions}Routine Descriptions}
@@ -1423,7 +951,7 @@ MAG\_WTM --   Write tape mark
       initialise the entry for the drive in the user's device dataset
       (USRDEVDATA).
       If the mount fails, the device entry will
-      be cancelled ({\em i.e.}\ set to unknown position) unless the failure
+      be cancelled (\emph{i.e.}\ set to unknown position) unless the failure
       was MAG\_\_DVMNT (device already mounted), in which case it will
       be unaltered.
    }
@@ -1490,7 +1018,7 @@ MAG\_WTM --   Write tape mark
       }{
          Expression specifying the block number within the file at
          which the tape is to be positioned. Note that when START
-         is false {\em i.e.}\ BLOCK is relative to the end of the file, its
+         is false \emph{i.e.}\ BLOCK is relative to the end of the file, its
          value is what would be expected if the tape were being read
          backwards. This means that in order to position the tape to
          read the last block in the file, BLOCK must be set to 2 and
@@ -1958,14 +1486,14 @@ running the TAPEMOUNT task (which calls MAG\_MOUNT) from DCL in the top-level
 process. For example:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       $ ADAMSTART
       $ ALL MKB
       %DCL-I-ALLOC, _RLSVS2$MKB300: allocated
       $ TAPEMOUNT MUC0 READ
       %MOUNT-I-MOUNTED,  mounted on _RLSVS2$MKB300:
       $ ICL
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The parameters of TAPEMOUNT are:
@@ -1977,11 +1505,11 @@ The parameters of TAPEMOUNT are:
 When the user has finished with the tape, it may be dismounted using the
 TAPEDISM task (which calls MAG\_DISM).
 
-{\em E.g.}
+\emph{E.g.}
 \small
-\begin{verbatim}
+\begin{terminalv}
       $ TAPEDISM MKB3000 NOUNLOAD
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The parameters of TAPEDISM are:
@@ -2005,20 +1533,19 @@ in the link command.
 
 For example:
 
-\begin{quote}{\tt
-\$ ALINK task,ADAM\_LIB:MAGLINK/OPT
-}
-\end{quote}
+\begin{terminalv}
+$ ALINK task,ADAM\_LIB:MAGLINK/OPT
+\end{terminalv}
 
 \section{\xlabel{changes_from_previous_versions}Changes from Previous Versions}
 \subsection{\xlabel{changes_to_device_datasets}Changes to Device Datasets}
-Prior to version 2.0, the user's device dataset, {\tt USRDEVDATA.sdf} was
+Prior to version 2.0, the user's device dataset, \texttt{USRDEVDATA.sdf} was
 created in the current directory and the system-wide device dataset was assumed
-to be {\tt /star/etc/devdataset.sdf}.
+to be \texttt{/star/etc/devdataset.sdf}.
 
 The users device dataset may now be defined by environment variable USRDEVDATA
-and will default to {\tt USRDEVDATA.sdf} in the user's
-\xref{ADAM\_USER directory}{sun144}{ADAM_USER_directory}\latex{ (see SUN/144)}.
+and will default to \texttt{USRDEVDATA.sdf} in the user's
+\xref{ADAM\_USER directory}{sun144}{ADAM_USER_directory} (see SUN/144).
 
 System-wide device datasets are not necessary for Version 2.0 onwards but
 should be retained until all programs using MAG have been re-linked.
@@ -2029,7 +1556,7 @@ The system will now assume that user and system names for devices are the
 same if no appropriate device dataset entry can be found.
 
 For more details on the above, see the description of
-\htmlref{device datasets}{device_datasets}\latex{ (Section \ref{device_datasets})}.
+\htmlref{device datasets}{device_datasets} (Section \ref{device_datasets}).
 
 \subsection{\xlabel{update_mode}UPDATE Mode}
 Tape devices can now be opened with access mode `UPDATE' (read and write),
