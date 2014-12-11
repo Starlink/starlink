@@ -132,3 +132,7 @@ world-stamp
 *.idv
 *.lg
 *.xref
+sun*.out
+sc*.out
+ssn*.out
+sgp*.out
