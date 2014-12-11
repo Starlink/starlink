@@ -1,4 +1,5 @@
 /aif/conly-files
+/aif/notes
 /ccg/conly-files
 /fts/conly-files
 /ira/conly-files
@@ -65,12 +66,13 @@
 /ccg/ccg_wtm2.f
 /ccg/ccg_wtm3.f
 /ccg/ccg_wtm4.f
+/ccg/notes
 /fts/fts1_chva.f
 /fts/fts1_gkeyx.f
 /fts/fts1_ukeyx.f
 /fts/fts1_wkeyx.f
-/irq/irq1_sbad1.f
-/irq/irq_sbad.f
+/fts/notes
+/ira/notes
 /kpg/kpg1_ainb.f
 /kpg/kpg1_aind.f
 /kpg/kpg1_aker.f
@@ -206,6 +208,7 @@
 /kpg/kpg1_vasv.f
 /kpg/kpg1_wmod.f
 /kpg/kpg1_xyzw.f
+/kpg/notes
 /kaplibs_noadam_test
 /kaplibs_test
 /sun238.pdf
