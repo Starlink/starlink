@@ -1,24 +1,19 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink Cookbook}
-\newcommand{\stardocinitials}  {SC}
-\newcommand{\stardocsource}    {sc4.4}
-\newcommand{\stardocnumber}    {4.4}
-\newcommand{\stardocauthors}   {Malcolm J. Currie}
-\newcommand{\stardocdate}      {2006 November 26}
-\newcommand{\stardoctitle}     {C-shell Cookbook}
-\newcommand{\stardocversion}   {Version 1.3}
-\newcommand{\stardocmanual}    {}
-\newcommand{\stardocabstract}  {
+\stardoccategory    {Starlink Cookbook}
+\stardocinitials    {SC}
+\stardocsource      {sc4.4}
+\stardocnumber      {4.4}
+\stardocauthors     {Malcolm J. Currie}
+\stardocdate        {2006 November 26}
+\stardoctitle       {C-shell Cookbook}
+\stardocversion     {Version 1.3}
+\stardocabstract  {
 This cookbook describes the fundamentals of writing scripts using
 the UNIX C shell.  It shows how to combine Starlink and private applications
 with shell commands and constructs to create powerful and time-saving
@@ -36,696 +31,126 @@ loops.  There is also a glossary.}
 
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sc.tex
-%
-%  Purpose:
-%     Template for Starlink Cookbook (SC) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     16-JUN-1997 (BLY):
-%        Original, based on SUN/SG templates.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%      1-FEB-2000 (AJC):
-%        Add Copyright statement in LaTeX
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
 % -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % from the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
+% ? Document-specific \providecommand or \newenvironment commands.
 
 % Also define the html equivalents.
 
 % degrees symbol
-\newcommand{\dgs}{\hbox{$^\circ$}}
-%\begin{htmlonly}
-%   \newcommand{\dgs}{{\rawhtml &deg;}}
-%\end{htmlonly}
+\providecommand{\dgs}{\hbox{$^\circ$}}
+%
+
 
 % arcminute symbol
-\newcommand{\arcm}{\hbox{$^\prime$}}
-%\begin{htmlonly}
-%   \newcommand{\arcm}{{\rawhtml &acute;}}
-%\end{htmlonly}
+\providecommand{\arcm}{\hbox{$^\prime$}}
+%
+
 
 % arcsec symbol
-\newcommand{\arcsec}{\arcm\hskip -0.1em\arcm}
-%\begin{htmlonly}
-%   \newcommand{\arcsec}{{\rawhtml &quot;}}
-%\end{htmlonly}
+\providecommand{\arcsec}{\arcm\hskip -0.1em\arcm}
+%
+
 
 % hours symbol
-\newcommand{\hr}{\hbox{$^{\rm h}$}}
-\begin{htmlonly}
-   \newcommand{\hr}{~hours}
-\end{htmlonly}
+\providecommand{\hr}{\hbox{$^{\rm h}$}}
+
+
 
 % minutes symbol
-\newcommand{\mn}{\hbox{$^{\rm m}$}}
-\begin{htmlonly}
-   \newcommand{\mn}{~minutes}
-\end{htmlonly}
+\providecommand{\mn}{\hbox{$^{\rm m}$}}
+
+
 
 % seconds symbol
-\newcommand{\scn}{\hbox{$^{\rm s}$}}
-\begin{htmlonly}
-   \newcommand{\scn}{~seconds}
-\end{htmlonly}
+\providecommand{\scn}{\hbox{$^{\rm s}$}}
+
+
 
 % decimal-minutes symbol
-\newcommand{\um}{\hskip-0.3em\hbox{$^{\rm m}$}\hskip-0.08em}
-%\begin{htmlonly}
-%   \newcommand{\um}{\mn}
-%\end{htmlonly}
+\providecommand{\um}{\hskip-0.3em\hbox{$^{\rm m}$}\hskip-0.08em}
+%
+
 
 % decimal-degree symbol
-\newcommand{\udeg}{\hskip-0.3em\dgs\hskip-0.08em}
-%\begin{htmlonly}
-%   \newcommand{\udeg}{{\rawhtml &deg;}}
-%\end{htmlonly}
+\providecommand{\udeg}{\hskip-0.3em\dgs\hskip-0.08em}
+%
+
 
 % decimal-second symbol
-\newcommand{\us}{\hskip-0.27em\hbox{$^{\rm s}$}\hskip-0.06em}
-\begin{htmlonly}
-    \newcommand{\us}{\scn}
-\end{htmlonly}
+\providecommand{\us}{\hskip-0.27em\hbox{$^{\rm s}$}\hskip-0.06em}
+
+
 
 % decimal-arcminute symbol
-\newcommand{\uarcm}{\hskip-0.28em\arcm\hskip-0.04em}
-%\begin{htmlonly}
-%   \newcommand{\uarcm}{{\rawhtml &acute;}}
-%\end{htmlonly}
+\providecommand{\uarcm}{\hskip-0.28em\arcm\hskip-0.04em}
+%
+
 
 % decimal-arcsecond symbol
-\newcommand{\uarcs}{\hskip-0.27em\arcsec\hskip-0.02em}
-%\begin{htmlonly}
-%   \newcommand{\uarcs}{{\rawhtml &quot;}}
-%\end{htmlonly}
+\providecommand{\uarcs}{\hskip-0.27em\arcsec\hskip-0.02em}
+%
+
 
 % centre an asterisk
-\newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
+\providecommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
 
 % conditional text
-\newcommand{\latexelsehtml}[2]{#1}
-\begin{htmlonly}
-  \newcommand{\latexelsehtml}[2]{#2}
-\end{htmlonly}
+\providecommand{\latexelsehtml}[2]{#1}
+
+
 
 \hyphenation{which-ever}
 
 % Lines for breaking up Appendices A and B.
-\newcommand{\jrule}{\noindent\rule{\textwidth}{0.45mm}}
-\newcommand{\krule}{\vspace*{-1.5ex}
+\providecommand{\jrule}{\noindent\rule{\textwidth}{0.45mm}}
+\providecommand{\krule}{\vspace*{-1.5ex}
                     \item [\rm \rule{\textwidth}{0.15mm}]}
 
 % Shorthands for hypertext links.
 % -------------------------------
-\newcommand{\AGIref}{\xref{AGI}{sun48}{}}
-\newcommand{\ARDref}{\xref{ARD}{sun183}{}}
-\newcommand{\ASTERIXref}{\xref{{\footnotesize ASTERIX}}{sun98}{}}
-\newcommand{\CCDPACKref}{\xref{{\footnotesize CCDPACK}}{sun139}{}}
-\newcommand{\CGSDRref}{\xref{{\footnotesize CGS4DR}}{sun27}{}}
-\newcommand{\CONVERTref}{\xref{{\footnotesize CONVERT}}{sun55}{}}
-\newcommand{\CURSAref}{\xref{{\footnotesize CURSA}}{sun190}{}}
-\newcommand{\ECHOMOPref}{\xref{{\footnotesize ECHOMOP}}{sun152}{}}
-\newcommand{\ESPref}{\xref{{\footnotesize ESP}}{sun180}{}}
-\newcommand{\Figaroref}{\xref{{\footnotesize FIGARO}}{sun86}{}}
-\newcommand{\FITSref}{\htmladdnormallink{FITS}{http://fits.gsfc.nasa.gov/fits\_{}home.html}}
-\newcommand{\GKSref}{\xref{GKS}{sun83}{}}
-\newcommand{\GWMref}{\xref{GWM}{sun130}{}}
-\newcommand{\HDSref}{\xref{HDS}{sun92}{}}
-\newcommand{\HDSTRACEref}{\xref{{\footnotesize HDSTRACE}\normalsize}{sun102}{}}
-\newcommand{\ICLref}{\xref{{\footnotesize ICL}}{sg5}{}}
-\newcommand{\IDIref}{\xref{IDI}{sun65}{}}
-\newcommand{\IRCAMPACKref}{\xref{{\footnotesize IRCAMPACK}}{sun177}{}}
-\newcommand{\IRAFref}{\htmladdnormallink{{\footnotesize IRAF}}{http://iraf.noao.edu/iraf-homepage.html}}
-\newcommand{\IRASref}{\xref{{\footnotesize IRAS90}}{sun163}{}}
-\newcommand{\JCMTDRref}{\xref{{\footnotesize JCMTDR}}{sun132}{}}
-\newcommand{\KAPPAref}{\xref{{\footnotesize KAPPA}}{sun95}{}}
-\newcommand{\NDFref}[1]{\xref{#1}{sun33}{}}
-\newcommand{\PDAref}{\xref{PDA}{sun194}{}}
-\newcommand{\PGPLOTref}{\htmladdnormallink{PGPLOT}{http://astro.caltech.edu/\~{}tjp/pgplot/}}
-\newcommand{\PHOTOMref}{\xref{{\footnotesize PHOTOM}}{sun45}{}}
-\newcommand{\PISAref}{\xref{{\footnotesize PISA}}{sun109}{}}
-\newcommand{\PONGOref}{\xref{{\footnotesize PONGO}}{sun137}{}}
-\newcommand{\PSMERGEref}{\xref{{\footnotesize PSMERGE}}{sun164}{}}
-\newcommand{\SGSref}{\xref{SGS}{sun85}{}}
-\newcommand{\SPECDREref}{\xref{{\footnotesize SPECDRE}}{sun140}{}}
-\newcommand{\TSPref}{\xref{{\footnotesize TSP}}{sun66}{}}
-\newcommand{\TWODSPECref}{\xref{{\footnotesize TWODSPEC}}{sun16}{}}
+\providecommand{\AGIref}{\xref{AGI}{sun48}{}}
+\providecommand{\ARDref}{\xref{ARD}{sun183}{}}
+\providecommand{\ASTERIXref}{\xref{{\footnotesize ASTERIX}}{sun98}{}}
+\providecommand{\CCDPACKref}{\xref{{\footnotesize CCDPACK}}{sun139}{}}
+\providecommand{\CGSDRref}{\xref{{\footnotesize CGS4DR}}{sun27}{}}
+\providecommand{\CONVERTref}{\xref{{\footnotesize CONVERT}}{sun55}{}}
+\providecommand{\CURSAref}{\xref{{\footnotesize CURSA}}{sun190}{}}
+\providecommand{\ECHOMOPref}{\xref{{\footnotesize ECHOMOP}}{sun152}{}}
+\providecommand{\ESPref}{\xref{{\footnotesize ESP}}{sun180}{}}
+\providecommand{\Figaroref}{\xref{{\footnotesize FIGARO}}{sun86}{}}
+\providecommand{\FITSref}{\htmladdnormallink{FITS}{http://fits.gsfc.nasa.gov/fits\_{}home.html}}
+\providecommand{\GKSref}{\xref{GKS}{sun83}{}}
+\providecommand{\GWMref}{\xref{GWM}{sun130}{}}
+\providecommand{\HDSref}{\xref{HDS}{sun92}{}}
+\providecommand{\HDSTRACEref}{\xref{{\footnotesize HDSTRACE}\normalsize}{sun102}{}}
+\providecommand{\ICLref}{\xref{{\footnotesize ICL}}{sg5}{}}
+\providecommand{\IDIref}{\xref{IDI}{sun65}{}}
+\providecommand{\IRCAMPACKref}{\xref{{\footnotesize IRCAMPACK}}{sun177}{}}
+\providecommand{\IRAFref}{\htmladdnormallink{{\footnotesize IRAF}}{http://iraf.noao.edu/iraf-homepage.html}}
+\providecommand{\IRASref}{\xref{{\footnotesize IRAS90}}{sun163}{}}
+\providecommand{\JCMTDRref}{\xref{{\footnotesize JCMTDR}}{sun132}{}}
+\providecommand{\KAPPAref}{\xref{{\footnotesize KAPPA}}{sun95}{}}
+\providecommand{\NDFref}[1]{\xref{#1}{sun33}{}}
+\providecommand{\PDAref}{\xref{PDA}{sun194}{}}
+\providecommand{\PGPLOTref}{\htmladdnormallink{PGPLOT}{http://astro.caltech.edu/\~{}tjp/pgplot/}}
+\providecommand{\PHOTOMref}{\xref{{\footnotesize PHOTOM}}{sun45}{}}
+\providecommand{\PISAref}{\xref{{\footnotesize PISA}}{sun109}{}}
+\providecommand{\PONGOref}{\xref{{\footnotesize PONGO}}{sun137}{}}
+\providecommand{\PSMERGEref}{\xref{{\footnotesize PSMERGE}}{sun164}{}}
+\providecommand{\SGSref}{\xref{SGS}{sun85}{}}
+\providecommand{\SPECDREref}{\xref{{\footnotesize SPECDRE}}{sun140}{}}
+\providecommand{\TSPref}{\xref{{\footnotesize TSP}}{sun66}{}}
+\providecommand{\TWODSPECref}{\xref{{\footnotesize TWODSPEC}}{sun16}{}}
 
 % ? End of document-specific commands
 %------------------------------------------------------------------------------
 
-% SST definitions
-% ---------------
-
-% +
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commands.
-
-%  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty
-%     on your TEXINPUTS path (and including the name as part of the
-%     documentstyle declaration).
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-%     MJC: Malcolm J. Currie (STARLINK)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     1995 October 4 (MJC):
-%        Added goodbreaks and pagebreak[3] in various places to improve
-%        pages breaking before headings, not immediately after.
-%        Corrected banner width.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-% -
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-4.9pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\pagebreak[3] \item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\sloppy \item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \goodbreak
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the output results parameters section (for an application).
-\newcommand{\sstresparameters}[1]{
-   \goodbreak
-   \item[Results Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the graphics style parameters section (for an application).
-\newcommand{\sstgraphparameters}[1]{
-   \goodbreak
-   \item[Graphics-style Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \goodbreak
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-%\newcommand{\sstexamplesubsection}[2]{\sloppy
-%\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
-\newcommand{\sstexamplesubsection}[2]{\sloppy \item{\ssttt #1} \mbox{} \\ #2 }
-
-%  Define the format of a long-example subsection in the examples section.
-%\newcommand{\sstlongexamplesubsection}[3]{\sloppy
-%\item[\ssttt \hspace{-0.5em}#1] {\ssttt #2} \mbox{} \\ #3}
-\newcommand{\sstlongexamplesubsection}[3]{\sloppy \item{\ssttt #1} {\ssttt #2} \mbox{} \\ #3}
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\pagebreak[3] \item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\goodbreak \item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \pagebreak[3] \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Specify a variant of the itemize environment where the top separation
-%  is reduced.  It is needed because a \vspace is ignored in the
-%  \sstitemlist command.
-\newenvironment{sstitemize}{%
-  \vspace{-4.3ex}\begin{itemize}}{\end{itemize}}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{sstitemize}
-     #1
-  \end{sstitemize}
-}
-
-%  Format a list of items while in paragraph mode, and where there
-%  is a heading, thus the negative vertical space is not needed.
-\newcommand{\ssthitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%  Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  Re-define \ssttt.
-   \newcommand{\ssttt}{\tt}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\htmlref{\item[Usage:]}{ap:usage} \mbox{} \\ {\ssttt #1}}
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \htmlref{\item[Parameters:]}{se:param}
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstresparameters
-   \newcommand{\sstresparameters}[1]{
-      \htmlref{\item[Results Parameters:]}{se:parout}
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \htmlref{\item[Examples:]}{ap:example}
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}]
-      \begin{description}
-         #2
-      \end{description}
-   }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-   }
-\end{htmlonly}
-
-%  End of sst.tex layout definitions.
-%.
-% End of SST definitions
-% ----------------------
 
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
+\scfrontmatter
 \thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-%  \htmladdimg{sc4_cover.gif}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%   ==================
-\stardocabstract
-
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-%  \markright{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-% \newpage
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
 
 % The main text begins here.
 % -----------------------------------------------------------------------------
@@ -735,13 +160,13 @@ loops.  There is also a glossary.}
 Scripting is a powerful and time-saving tool for performing repetitive
 jobs, creating data-processing pipelines, and encapsulating useful
 recipes.  A script is a text file containing a set of
-\htmlref{{\sf shell}}{sc4_gl_she} commands and constructs that perform
-a routine task.  The former can include UNIX commands like {\bf mv},
-{\bf cd}, {\bf awk}, {\bf sed}; other scripts; and private and
+\htmlref{\textsf{shell}}{sc4_gl_she} commands and constructs that perform
+a routine task.  The former can include UNIX commands like \textbf{mv},
+\textbf{cd}, \textbf{awk}, \textbf{sed}; other scripts; and private and
 Starlink applications.  You can create and modify scripts with a text
 editor.
 
-Although UNIX purists recommend the Bourne or {\bf bash} shell for
+Although UNIX purists recommend the Bourne or \textbf{bash} shell for
 scripts and indeed some consider \htmladdnormallink{C-shell
 programming
 harmful}{http://www.unix.org.ua/orelly/unix/upt/ch47_02.htm}, many
@@ -753,12 +178,12 @@ perl}}{http://www.perl.com/} and
 survey of Starlink users placed C-shell scripting near the head of
 required cookbooks.  In addition most Starlink commands are available
 as C-shell aliases.  This cookbook applies to both the C-shell {\bf
-csh} and its variants like the tc-shell {\bf tcsh}.
+csh} and its variants like the tc-shell \textbf{tcsh}.
 
 This manual illustrates some relevant techniques for creating C-shell
 scripts that combine Starlink software to improve your productivity,
 without you having to read a UNIX manual.  It aims to give practical and
-reassuring examples to at least get you started.  It does {\em not\/}
+reassuring examples to at least get you started.  It does \emph{not\/}
 offer a comprehensive description of C-shell syntax and facilities.
 
 This is not like other cookbooks in the Starlink series as the
@@ -771,14 +196,14 @@ find the desired ingredient.
 The author welcomes your comments.  If you have ``How do I do \ldots
 in the C-shell'' type questions, or suggestions for further recipes
 and ingredients, please contact the Starlink Software Librarian
-({\tt{starlink@jiscmail.ac.uk}}) or the author ({\tt{mjc@star.rl.ac.uk}}), so that
+({\texttt{starlink@jiscmail.ac.uk}}) or the author ({\texttt{mjc@star.rl.ac.uk}}), so that
 important techniques omitted from this version may be included in future
 editions.
 
 \section{Further Reading}
 
 If you want a comprehensive description of C-shell syntax and
-facilities; check the {\bf man} pages for {\bf csh}.  Books
+facilities; check the \textbf{man} pages for \textbf{csh}.  Books
 exclusively on the C-shell are not as commonplace as you might expect;
 one such is {\sl Teach Yourself the Unix C shell in 14 days} by David
 Ennis \& James C. Armstrong (SAMS Publishing, Indianapolis, 1994).
@@ -788,8 +213,8 @@ aspects; in many the examples are sparse.  One that bucks the trend is
 {\sl UNIX Shells by Example} by Ellie Quigley (Prentice-Hall, New
 Jersey, 1997).  This has numerous examples, where the function of each
 line is explained.  C-shell is included, and there are chapters on the
-tools of the trade like {\bf awk} and \htmlref{regular
-expressions}{sc4_gl_reg_exp}.  The chapter entitled {\it Shell
+tools of the trade like \textbf{awk} and \htmlref{regular
+expressions}{sc4_gl_reg_exp}.  The chapter entitled \textit{Shell
 Programming\/} in {\sl UNIX for VMS Users\/} by Philip E. Bourne
 (Digital Press, 1990) is well worth a read, especially for those of
 you who developed command procedures in Starlink's VMS era, and want
@@ -816,17 +241,17 @@ script}{sc4_se_running}, \htmlref{Some simple examples}{sc4_se_simple},
 
 \section{Conventions}
 \begin{tabular}{lp{120mm}}
-{\tt verbatim}   &  Commands you enter, filenames, parameters values
+\texttt{verbatim}   &  Commands you enter, filenames, parameters values
                     you supply to scripts or tasks appear in teletype
                     fount. \\
-{\bf command}    &  The names of UNIX or Starlink commands appear
+\textbf{command}    &  The names of UNIX or Starlink commands appear
                     in bold. \\
-{\sf term}       &  Special terms explained in the glossary appear
+\textsf{term}       &  Special terms explained in the glossary appear
                     in the sans-serif fount. \\
 \end{tabular}
 
-Commands to be entered from the terminal are prefixed with a {\tt \%}
-prompt string.  You should not type the {\tt \%}.
+Commands to be entered from the terminal are prefixed with a \texttt{\%}
+prompt string.  You should not type the \texttt{\%}.
 
 \newpage
 \section{\xlabel{sc4_se_running}Running a script\label{sc4_se_running}}
@@ -838,20 +263,20 @@ then actually invoke the script using one of three ways.
 
 \subsection{\xlabel{sc4_se_cshselect}Shell selection\label{sc4_se_cshselect}}
 
-The {\em first line\/} of your script tells UNIX which shell you want
+The \emph{first line\/} of your script tells UNIX which shell you want
 to use.  The following selects the C-shell.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      #!/bin/csh
-\end{verbatim}
-\normalsize
-Somewhat perversely, the {\tt \#} is actually the comment character.
+\end{terminalv}
+\end{small}
+Somewhat perversely, the \texttt{\#} is actually the comment character.
 That's UNIX for you.  However, its presence alone starting the first
 line will normally be sufficient to run a script in the C shell.
 
 Most of the examples in this document are script excerpts, and so do not
-include the \mbox{\tt \#!/bin/csh}.
+include the \mbox{\texttt{\#!/bin/csh}}.
 
 \subsection{\xlabel{sc4_se_executable}Making a script executable
 \label{sc4_se_executable}}
@@ -860,13 +285,13 @@ If you want to run your script by name or with an \htmlref{{\sf
 alias}}{sc4_gl_alias}\latex{ (see below)}, you must make your
 script executable like this
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % chmod +x myscript
-\end{verbatim}
-\normalsize
-where {\tt myscript} is your C-shell script. \latexelsehtml{Remember}{Note}
-that the {\tt \%} is a convention for the shell prompt; you do not type
+\end{terminalv}
+\end{small}
+where \texttt{myscript} is your C-shell script. \latexelsehtml{Remember}{Note}
+that the \texttt{\%} is a convention for the shell prompt; you do not type
 it yourself.  You can edit the script without having to make the file
 executable again.
 
@@ -876,59 +301,59 @@ executable again.
 Once your script has execute privilege, thereafter you can
 run it like this:
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % ./myscript
-\end{verbatim}
-\normalsize
-or if it is situated in directory {\tt /home/user1/dro/bin} say
+\end{terminalv}
+\end{small}
+or if it is situated in directory \texttt{/home/user1/dro/bin} say
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % /home/user1/dro/bin/myscript
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 would execute your script.  This is long-winded if you want to run the
 the script frequently.  To omit the directory \htmlref{{\sf
-path}}{sc4_gl_path} you need to add the current ({\tt{.}}) or better,
+path}}{sc4_gl_path} you need to add the current ({\texttt{.}}) or better,
 the specific directory to your PATH
-\htmlref{{\sf environment variable}}{sc4_gl_env}.
+\htmlref{\textsf{environment variable}}{sc4_gl_env}.
 
 
 \subsection{\xlabel{sc4_se_aliases}Using aliases to run a script
 \label{sc4_se_aliases}}
 
-The second method is to define an \htmlref{{\sf alias}}{sc4_gl_alias}.
+The second method is to define an \htmlref{\textsf{alias}}{sc4_gl_alias}.
 An alias is a shorthand for a long command to save typing.
 So in fact this method is just a variant of executing a script by name.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % alias myscript /home/user1/dro/bin/myscript
-\end{verbatim}
-\normalsize
-Thereafter you would only enter {\tt myscript} to run your script. Now
-this alias only applies to your \htmlref{{\sf current
-process}}{sc4_gl_cur}. Even child \htmlref{{\sf processes}}{sc4_gl_pro}
+\end{terminalv}
+\end{small}
+Thereafter you would only enter \texttt{myscript} to run your script. Now
+this alias only applies to your \htmlref{\textsf{current
+process}}{sc4_gl_cur}. Even child \htmlref{\textsf{processes}}{sc4_gl_pro}
 derived from the current process will not inherit the alias.  The way
 to make an alias global, so each new C-shell process recognises the
-alias, is to define the alias in your {\tt \$HOME/.cshrc} file.  This
+alias, is to define the alias in your \texttt{\$HOME/.cshrc} file.  This
 file in your login directory defines the `environment' for each
 C-shell process.
 
-Here is a simple {\tt{.cshrc}} file.  It sets some global variables:
-{\tt noclobber} prevents accidentally overwriting an existing file and
-{\tt history} sets the number of previous commands you can recall.  It
+Here is a simple {\texttt{.cshrc}} file.  It sets some global variables:
+\texttt{noclobber} prevents accidentally overwriting an existing file and
+\texttt{history} sets the number of previous commands you can recall.  It
 defines three aliases.  The first lets you browse through a
-directory listing.  The second reformats the output from {\bf df}
+directory listing.  The second reformats the output from \textbf{df}
 on Digital UNIX so that lines do not wrap.  The third lists the largest
-20 files in a directory.  Finally {\tt .cshrc} runs the script
-{\tt /star/etc/cshrc} to define Starlink aliases (the {\bf source}
+20 files in a directory.  Finally \texttt{.cshrc} runs the script
+\texttt{/star/etc/cshrc} to define Starlink aliases (the \textbf{source}
 command is explained \latexelsehtml{in
 Section~\ref{sc4_se_source}).}{\htmlref{here}{sc4_se_source}).}
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set noclobber
      set history = 50
      alias dsd 'ls -l \!* | more'
@@ -936,98 +361,98 @@ Section~\ref{sc4_se_source}).}{\htmlref{here}{sc4_se_source}).}
       '{printf("\"%-20.20s%9.8s%9.8s%9.8s%9.8s %s\\n\",'$1,$2,$3,$4,$5,$6)}' "'"
      alias big20 'ls -l | sort -k 5 | tail -n 20'
      source /star/etc/cshrc
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 \subsection{\xlabel{sc4_se_unalias}Removing aliases
 \label{sc4_se_unalias}}
 
 There are two methods.  One is permanent; the other overrides an alias
 for a single command.  To remove an alias permanently use the {\tt
-unalias} command.  This accepts {\tt *?[~]}
-\htmlref{\sf wildcards}{sc4_gl_wild} to \htmlref{{\sf match}}{sc4_gl_match} the
+unalias} command.  This accepts \texttt{*?[~]}
+\htmlref{\textsf{wildcards}}{sc4_gl_wild} to \htmlref{\textsf{match}}{sc4_gl_match} the
 defined aliases.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
                              # Removes aliases called:
      % unalias myscript      # myscript
      % unalias kap_*         # kap_ followed by zero or more characters
      % unalias compres?      # compres followed by a single character
      % unalias [f-hz][2-5]   # One of f, g, h, or z then an integer
                              # between 2 and 5 inclusive
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 To override an alias, precede the alias with backslash.  So suppose you
 have an alias to prevent you accidently removing a file as shown below.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % alias rm rm -i
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 In a script where you know that you want to remove a file, you don't
 want the script to seek confirmation.  So suppose you want to delete
-file {\tt myfile}, then you would have a line like
+file \texttt{myfile}, then you would have a line like
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      \rm myfile
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 in your script.
 
 
 \subsection{\xlabel{sc4_se_source}Executing a script in the current process
 \label{sc4_se_source}}
 
-The final option is to {\bf source} your script so that it runs in the
-\htmlref{{\sf current process}}{sc4_gl_cur}.  The benefit of this technique is
+The final option is to \textbf{source} your script so that it runs in the
+\htmlref{\textsf{current process}}{sc4_gl_cur}.  The benefit of this technique is
 that any aliases defined in the current process will be known to your
 script.  For example,
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % source myscript
-\end{verbatim}
-\normalsize
-runs {\tt myscript}.  Any aliases created in {\tt myscript} will be
+\end{terminalv}
+\end{small}
+runs \texttt{myscript}.  Any aliases created in \texttt{myscript} will be
 available to the current process, unlike invocation by name.
 To save typing you can define an alias to source a script.  See the next
 section on package aliases for an example.
 
 \subsection{\xlabel{sc4_se_package}Package aliases\label{sc4_se_package}}
 
-While convenient, the creation of aliases in your {\tt .cshrc} file
-does have a drawback: if you define many aliases in the {\tt .cshrc}
-file, it will decelerate \htmlref{{\sf process}}{sc4_gl_pro} activation.
+While convenient, the creation of aliases in your \texttt{.cshrc} file
+does have a drawback: if you define many aliases in the \texttt{.cshrc}
+file, it will decelerate \htmlref{\textsf{process}}{sc4_gl_pro} activation.
 One way around that is to define a few aliases that run other scripts,
 each of which in turn define many related aliases.  Thus you only
 create the definitions when they are required.  This is how most
 Starlink packages define their commands.  Here is an example.  Suppose
 you had a package or a set of related commands called COSMIC installed
-in directory {\tt /home/user2/dro/cosmic}, you would first place the
-following line in your {\tt .cshrc} file.
+in directory \texttt{/home/user2/dro/cosmic}, you would first place the
+following line in your \texttt{.cshrc} file.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      alias cosmic `source /home/user2/dro/cosmic/cosmic.csh`
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 The left quotes mean execute the command between them.  So when you
 enter
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % cosmic
-\end{verbatim}
-\normalsize
-the script {\tt /home/user2/dro/cosmic/cosmic.csh} is run.  This file
+\end{terminalv}
+\end{small}
+the script \texttt{/home/user2/dro/cosmic/cosmic.csh} is run.  This file
 might look like the following.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      #!/bin/csh
      alias abund /home/user2/dro/cosmic/abundance
      alias filter `source /home/user1/abc/bin/garbage.csh`
@@ -1035,8 +460,8 @@ might look like the following.
      alias radial /home/user2/drmoan/noddy/radial
      alias seeing $KAPPA_DIR/psf isize=21 psf=psf21
      alias zcol kcorr bands=UJR noevol
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 \newpage
 \section{\xlabel{sc4_se_simple}Some simple examples\label{sc4_se_simple}}
@@ -1044,59 +469,59 @@ might look like the following.
 Let's start with a few elementary scripts to show that script writing
 isn't difficult, and to illustrate some syntax and constructs.
 
-Suppose that we have an editor such as {\bf jed} which retains a copy
-of the previous version of a file by appending {\tt $\sim$} to the
+Suppose that we have an editor such as \textbf{jed} which retains a copy
+of the previous version of a file by appending \texttt{$\sim$} to the
 filename.  If at some time we realise that we really want the former
 version and to erase the new one we could have a script called
-{\tt restore} that would perform the operation for an arbitrary file.
+\texttt{restore} that would perform the operation for an arbitrary file.
 It might look something like this.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      #!/bin/csh
      rm $1
      mv $1~ $1
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 The first line demands that the C-shell be used.
-The {\tt \$1} represents the first argument supplied on the command line.
+The \texttt{\$1} represents the first argument supplied on the command line.
 (There is more on this in
 \latexelsehtml{Section~\ref{sc4_se_arguments}.)}{\htmlref{Script
 arguments and other special variables}{sc4_se_arguments}.)}
-If the command {\tt restore} runs the script, then entering
+If the command \texttt{restore} runs the script, then entering
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % restore splat.f
-\end{verbatim}
-\normalsize
-would remove {\tt splat.f} and replace it with {\tt splat.f$\sim$}.
+\end{terminalv}
+\end{small}
+would remove \texttt{splat.f} and replace it with \texttt{splat.f$\sim$}.
 
 The above script makes some assumptions.  First it does not check
 whether or not the files exist.  Let's correct that.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      #!/bin/csh
      if ( -e $1 && -e $1~ ) then
         rm $1
         mv $1~ $1
      endif
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
-Here we have introduced the {\bf if...then...endif} construct.  When
+Here we have introduced the \textbf{if...then...endif} construct.  When
 the expression inside the parentheses is true, the following statements
-are executed until there is an {\bf else} or {\bf endif} statement.
-In this case {\tt -e \$1 \&\& -e \$1~} is true only when both files exist.
-The {\tt -e} is one of eight {\sf file operators} for such things as
-file access and type, and {\tt \&\&} is a logical AND.
+are executed until there is an \textbf{else} or \textbf{endif} statement.
+In this case \texttt{-e \$1 \&\& -e \$1~} is true only when both files exist.
+The \texttt{-e} is one of eight \textsf{file operators} for such things as
+file access and type, and \texttt{\&\&} is a logical AND.
 
-The second assumption in {\tt restore} is that you'll always remember
+The second assumption in \texttt{restore} is that you'll always remember
 to supply a file name.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      #!/bin/csh
      if ( $#argv == 0 ) then
         echo Error: no file name supplied
@@ -1104,18 +529,18 @@ to supply a file name.
         rm $1
         mv $1~ $1
      endif
-\end{verbatim}
-\normalsize
-The script now reports an error message ~\mbox{{\tt Error:~no file name
-supplied}} if you forget the argument.  {\tt \$\#argv} is the number of
-arguments supplied on the command line.  Also notice the {\bf else if}
-construct.  The {\tt ==} tests for equality.
+\end{terminalv}
+\end{small}
+The script now reports an error message ~\mbox{\texttt{Error:~no file name
+supplied}} if you forget the argument.  \texttt{\$\#argv} is the number of
+arguments supplied on the command line.  Also notice the \textbf{else if}
+construct.  The \texttt{==} tests for equality.
 
 Instead of an error message you could make the script prompt for a
 filename.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      #!/bin/csh
      if ( $#argv == 0 ) then
         echo -n "The file to restore >"
@@ -1134,16 +559,16 @@ filename.
            echo Error: $file~ does not exist
         endif
      endif
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 When the number of arguments is zero, this script issues the prompt
-{\tt The file to restore >}.  The {\tt echo -n} prevents a skip to a
+\texttt{The file to restore >}.  The \texttt{echo -n} prevents a skip to a
 new line, and so allows you to enter your response after the prompt
-string.  {\tt set file \$<} equates your response to a \htmlref{{\sf shell
-variable}}{sc4_gl_she_var} called {\tt file}.  If on the other hand you gave the
-filename on the command line {\tt set file = \$1} assigns that name to
-variable {\tt file}.  When we come to use the variable in other commands
+string.  \texttt{set file \$<} equates your response to a \htmlref{\textsf{shell
+variable}}{sc4_gl_she_var} called \texttt{file}.  If on the other hand you gave the
+filename on the command line \texttt{set file = \$1} assigns that name to
+variable \texttt{file}.  When we come to use the variable in other commands
 it is prefixed with a dollar, meaning ``the value of the variable''.
 Finally, the script now tells you which file or files are missing.
 Notice how the variable value can be included in the error message.
@@ -1151,7 +576,7 @@ Notice how the variable value can be included in the error message.
 For your private scripts you need not be as rigorous as this, and in
 many cases the simplest script suffices.  If you intend to use a script
 frequently and/or sharing with colleagues, it's worth making a little
-extra effort such as adding commentary.  Comments will help {\em you\/}
+extra effort such as adding commentary.  Comments will help \emph{you\/}
 remember what a lengthy script does after you've not run it for a while.
 It might seem tedious at the time, but you will thank yourself when you
 come to run it after a long interval.  Comment lines begin with {\tt
@@ -1169,10 +594,10 @@ arithmetic by using certain applications in your script (see
 You don't need to declare the data type explicitly; the type is
 determined when you assign a value to a variable.
 
-Variables are only defined in the \htmlref{{\sf current
-process}}{sc4_gl_cur}.  If you want global variables, {\it i.e.}\ ones
+Variables are only defined in the \htmlref{\textsf{current
+process}}{sc4_gl_cur}.  If you want global variables, \textit{i.e.}\ ones
 that are available to all processes, you should assign them in your
-{\tt .cshrc} file.
+\texttt{.cshrc} file.
 
 Variable names comprise up to 20 letters, digits, and underscores;
 and should begin with a letter or underscore.
@@ -1180,58 +605,58 @@ and should begin with a letter or underscore.
 \subsection{\xlabel{sc4_se_assign_scalar}Assigning scalar values
 \label{sc4_se_assign_scalar}}
 
-You assign a value to a variable using the {\bf set} command.
+You assign a value to a variable using the \textbf{set} command.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set colour = blue
      set title = "Chiaroscuro 1997"
      set caption = "The most distant quasar observed is at redshift "
      set flux_100 = 1.2345E-09
      set n = 42
      set _90 = -1
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 The first four examples assign strings, and the last two assign integer
-values.  Yes the value of {\tt flux\_100} is not a real number.
-Multi-word strings should be enclosed in {\tt "} quotes.  The spaces
+values.  Yes the value of \texttt{flux\_100} is not a real number.
+Multi-word strings should be enclosed in \texttt{"} quotes.  The spaces
 around the equals sign are necessary.
 
-You can also remove variables with the {\bf unset} command.  This
-accepts {\tt *?[~]} \htmlref{\sf wildcards}{sc4_gl_wild} to
-\htmlref{{\sf match}}{sc4_gl_match} the names of the
+You can also remove variables with the \textbf{unset} command.  This
+accepts \texttt{*?[~]} \htmlref{\textsf{wildcards}}{sc4_gl_wild} to
+\htmlref{\textsf{match}}{sc4_gl_match} the names of the
 \htmlref{shell variables}{sc4_se_variables}.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      unset colour
      unset iso_*             # iso_ followed by zero or more characters
      unset flux_1??          # flux_1 followed by any pair of characters
      unset [nx-z][0-9]*      # One of n, x, y, or z then an integer followed
                              # by zero or more characters
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 
 \subsection{\xlabel{sc4_se_assign_array}Assigning arrays
 \label{sc4-se:assign_array}}
 
-The {\bf set} command is again used but the elements are space-separated
+The \textbf{set} command is again used but the elements are space-separated
 lists enclosed by parentheses.  Somewhat surprisingly for a shell that
 mimics C, array elements start at 1, like Fortran.
 Here are some illustrations.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set colours = (blue yellow green red pink)
      set label = ("Count rate" Frequency "Integration time (sec)")
      set prime = (2 3 5 7 11 13 17 19 23)
-\end{verbatim}
-\normalsize
-The first element of {\tt colours} is {\tt "blue"}, the second is {\tt
-"yellow"} and so on.  Multi-word elements must be in {\tt "} quotes.  So
-the first element of {\tt label} is {\tt "Count rate"}, and the second
-is {\tt "Frequency"}.  The seventh element of {\tt prime} is {\tt 17}.
+\end{terminalv}
+\end{small}
+The first element of \texttt{colours} is \texttt{"blue"}, the second is {\tt
+"yellow"} and so on.  Multi-word elements must be in \texttt{"} quotes.  So
+the first element of \texttt{label} is \texttt{"Count rate"}, and the second
+is \texttt{"Frequency"}.  The seventh element of \texttt{prime} is \texttt{17}.
 
 \subsection{\xlabel{sc4_se_values}Using the values of variables
 \label{sc4_se_values}}
@@ -1239,38 +664,38 @@ is {\tt "Frequency"}.  The seventh element of {\tt prime} is {\tt 17}.
 To obtain the value of a variable, you prefix the variable's name with
 the dollar sign.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set count = 333
      echo Number of runs is $count
-\end{verbatim}
-\normalsize
-would write ~{\tt Number of runs is 333}~ to \htmlref{{\sf standard
+\end{terminalv}
+\end{small}
+would write ~\texttt{Number of runs is 333}~ to \htmlref{\textsf{standard
 output}}{sc4_gl_std_out}.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set caption = "The most distant quasar observed is at redshift "
      set z = 5.1
      echo $caption$z
-\end{verbatim}
-\normalsize
-This will echo ~{\tt The most distant quasar observed is at redshift 5.1}.
+\end{terminalv}
+\end{small}
+This will echo ~\texttt{The most distant quasar observed is at redshift 5.1}.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      if ( $n > 10 ) then
         mem2d niter=$n out=deconv
         display style="'title=Result of deconvolution after $n iterations'" accept
      endif
-\end{verbatim}
-\normalsize
-This tests whether the value of variable {\tt n} is greater than ten, and
-if it is, executes the statement within the {\bf if\ldots endif}
+\end{terminalv}
+\end{small}
+This tests whether the value of variable \texttt{n} is greater than ten, and
+if it is, executes the statement within the \textbf{if\ldots endif}
 structure.  The value is also passed into an integer parameter of the
-application \xref{{\bf mem2d}}{sun95}{MEM2D}; and a string parameter of application
-\xref{{\bf display}}{sun95}{DISPLAY}, so if {\tt n} were forty, the resultant value would
-be {\tt "Result of deconvolution after 40 iterations"}.
+application \xref{\textbf{mem2d}}{sun95}{MEM2D}; and a string parameter of application
+\xref{\textbf{display}}{sun95}{DISPLAY}, so if \texttt{n} were forty, the resultant value would
+be \texttt{"Result of deconvolution after 40 iterations"}.
 
 Arithmetic, logical and string operations are presented in
 \latexelsehtml{Sections~\ref{sc4_se_csharith} and \ref{sc4_se_string_proc}.
@@ -1279,44 +704,44 @@ Arithmetic, logical and string operations are presented in
 \htmlref{String Processing}{sc4_se_string_proc}.}
 
 The values of array elements are selected by appending the element
-index in brackets.  This would echo to \htmlref{{\sf standard
-output}}{sc4_gl_std_out} the string ~{\tt Starting search at
+index in brackets.  This would echo to \htmlref{\textsf{standard
+output}}{sc4_gl_std_out} the string ~\texttt{Starting search at
 co-ordinates x=300, y=256.}
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set coords = (300 256)
      echo "Starting search at co-ordinates x=$coords[1], y=$coords[2]."
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 The following illustrates use of a text array to specify the
 annotations of a plot created with application
-\xref{{\bf linplot}}{sun95}{LINPLOT}.
-\small
-\begin{verbatim}
+\xref{\textbf{linplot}}{sun95}{LINPLOT}.
+\begin{small}
+\begin{terminalv}
      set labels = ("Elapsed time" Flux "Light curve of 3C273")
      linplot style="'title=$labels[3],Label(1)=$labels[1],Label(2)=$labels[2]'"
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 \medskip
 There are some shorthands for specifying subsets of an array.  The best
 way to describe them is through some examples.
-All the values assume {\tt set prime = (2 3 5 7 11 13 17 19 23)}.
+All the values assume \texttt{set prime = (2 3 5 7 11 13 17 19 23)}.
 
 \begin{center}
 \begin{tabular}{lp{80mm}l}
 Syntax            & Meaning                    & Value \\ \hline
 \\
-{\tt \$\#prime}   & Number of elements of variable {\tt prime} & {\tt 9} \\
-{\tt \$prime[*]}  & All elements of variable {\tt prime} & {\tt 2 3 5 7 11 13
+\texttt{\$\#prime}   & Number of elements of variable \texttt{prime} & \texttt{9} \\
+\texttt{\$prime[*]}  & All elements of variable \texttt{prime} & \texttt{2 3 5 7 11 13
                                                            17 19 23} \\
-{\tt \$prime[\$]} & The last element of variable {\tt prime} & {\tt 23} \\
-{\tt \$prime[3-5]} & The third to fifth elements of variable {\tt prime} &
-                                                           {\tt 5 7 11} \\
-{\tt \$prime[8-]} & The eighth to last elements of variable {\tt prime} &
-                                                           {\tt 21 23} \\
+\texttt{\$prime[\$]} & The last element of variable \texttt{prime} & \texttt{23} \\
+\texttt{\$prime[3-5]} & The third to fifth elements of variable \texttt{prime} &
+                                                           \texttt{5 7 11} \\
+\texttt{\$prime[8-]} & The eighth to last elements of variable \texttt{prime} &
+                                                           \texttt{21 23} \\
 \\ \hline
 \end{tabular}
 \end{center}
@@ -1324,23 +749,23 @@ Syntax            & Meaning                    & Value \\ \hline
 
 Here we bring some of these ingredients together.  Suppose we are
 experimenting trying to find the most suitable reddish background
-({\tt{palnum=0}}) colour for image display using the
-\xref{{\bf palentry}}{sun95}{PALENTRY} command
-from \KAPPAref\@.  The script below loops using a {\bf while...end}
+({\texttt{palnum=0}}) colour for image display using the
+\xref{\textbf{palentry}}{sun95}{PALENTRY} command
+from \KAPPAref\@.  The script below loops using a \textbf{while...end}
 construct: all the commands inside the construct are repeated until the
-condition following the {\bf while} is satisfied.  That might seem a
-little odd here as we appear to repeat the same commands {\em ad
+condition following the \textbf{while} is satisfied.  That might seem a
+little odd here as we appear to repeat the same commands \emph{ad
 infinitum} because the number of colours is fixed.  That doesn't happen
-because of the C-shell {\bf shift} command.  It discards the first
+because of the C-shell \textbf{shift} command.  It discards the first
 element of an array and reduces the indices of the remaining elements by
-one, so the original {\tt \$colours[2]} becomes {\tt \$colours[1]} and
+one, so the original \texttt{\$colours[2]} becomes \texttt{\$colours[1]} and
 so on.  This means that the chosen background colour is always {\tt
-\$colours[1]}.  The {\bf shift} also decrements the number of colours by
+\$colours[1]}.  The \textbf{shift} also decrements the number of colours by
 one.  So the script changes the background colour and pauses for five
 seconds for you to consider the aesthetics.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set colours = (red coral hotpink salmon brown sienna tan)
      while ( $#colours > 0 )
         echo "Trying $colours[1]"
@@ -1348,16 +773,16 @@ seconds for you to consider the aesthetics.
         sleep 5
         shift colours
      end
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 
 \subsection{\xlabel{sc4_se_spec_char}Special characters
 \label{sc4_se_spec_char}}
 
 The shell has a number of special characters otherwise known as
-\htmlref{{\sf metacharacters}}{sc4_gl_met}.  These include
-\htmlref{{\sf wildcard}}{sc4_gl_wild} characters such as {\tt *?[~]},
+\htmlref{\textsf{metacharacters}}{sc4_gl_met}.  These include
+\htmlref{\textsf{wildcard}}{sc4_gl_wild} characters such as \texttt{*?[~]},
 single and double quotes, parentheses, and the \verb+\+ line
 continuation.
 
@@ -1365,29 +790,29 @@ If you assign a value to a variable or application parameter which
 includes one or more of these metacharacters, you need to switch off
 the special meanings.  This operation is called escaping.
 Single characters may be escaped with a backslash.  For multiple
-occurrences single quotes {\tt '~'} will pass the enclosed text
-verbatim.  Double quotes {\tt "~"} do the same as single quotes except
-that {\tt \$}, \verb+\+, and left quote {\tt `} retain their special
+occurrences single quotes \texttt{'~'} will pass the enclosed text
+verbatim.  Double quotes \texttt{"~"} do the same as single quotes except
+that \texttt{\$}, \verb+\+, and left quote \texttt{`} retain their special
 meaning.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      setlabel label=\"Syrtis Major\" \\
      set metacharacters = '[]()/&><%$|#`@''"'
      stats europa'(200:299,~120)'
      stats europa"(200:299,~$y)"
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 In the first example the double quotes are part of parameter PLTITL
 (needed because of the embedded space) so are escaped individually.  On
 its own \verb+\+ means continue a line, but for Starlink tasks it is
-shorthand for the {\tt accept} keyword.  So we have to tell the shell to
+shorthand for the \texttt{accept} keyword.  So we have to tell the shell to
 treat the backslash literally by preceding it with backslash!
 
-In the last pair of examples an \xref{{\sf NDF section}}{sun95}{se_ndfsect}
+In the last pair of examples an \xref{\textsf{NDF section}}{sun95}{se_ndfsect}
 \latex{(see SUN/95's chapter called ``NDF Sections'')}
 is specified.  As the last contains a variable value to be
-substituted, the {\tt \$} retains its normal special meaning but the
+substituted, the \texttt{\$} retains its normal special meaning but the
 parentheses are escaped by surrounding the section in double quotes.
 
 \newpage
@@ -1397,20 +822,20 @@ Some scripts might have parameters that cannot be defaulted, and so
 if their values are not given on the command line, the script
 needs to prompt for them.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      echo -n "Give the smoothing size"
      set size = $<
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 This will prompt for the parameter and store the entered value into
-\htmlref{shell variable}{sc4_se_variables} {\tt size}.
+\htmlref{shell variable}{sc4_se_variables} \texttt{size}.
 
 \subsection{\xlabel{sc4_se_arguments}Script arguments and other special
 variables\label{sc4_se_arguments}}
 
 The C-shell has some special forms of variable.  We have seen some
-already: the {\tt \$<} for prompting, and how to specify array
+already: the \texttt{\$<} for prompting, and how to specify array
 elements.  The remainder largely concern command-line arguments.
 Here they are tabulated.
 
@@ -1418,27 +843,27 @@ Here they are tabulated.
 \begin{tabular}{lp{90mm}}
 Syntax            & Meaning \\ \hline
 \\
-{\tt \$\{0\}}     & The name of the script being run \\
-{\tt \$?name}     & Returns {\tt 1} if the variable {\tt name} is
-                    defined, or {\tt 0} if it is not defined \\
-{\tt \$n}         & The value of the {\tt n}$^{\rm th}$ argument passed
+\texttt{\$\{0\}}     & The name of the script being run \\
+\texttt{\$?name}     & Returns \texttt{1} if the variable \texttt{name} is
+                    defined, or \texttt{0} if it is not defined \\
+\texttt{\$n}         & The value of the \texttt{n}$^{\rm th}$ argument passed
                     to the script \\
-{\tt \$argv[n]}   & The value of the {\tt n}$^{\rm th}$ argument passed
+\texttt{\$argv[n]}   & The value of the \texttt{n}$^{\rm th}$ argument passed
                     to the script \\
-{\tt \$\#argv}    & The number of arguments passed to the script \\
-{\tt \$*}         & All the arguments supplied to the script \\
-{\tt \$\$}        & \htmlref{{\sf Process identification number}}{sc4_gl_pid}
+\texttt{\$\#argv}    & The number of arguments passed to the script \\
+\texttt{\$*}         & All the arguments supplied to the script \\
+\texttt{\$\$}        & \htmlref{\textsf{Process identification number}}{sc4_gl_pid}
                     (useful for making temporary files with unique names) \\
 \\ \hline
 \end{tabular}
 \end{center}
 Thus inside a script, any command-line arguments are accessed as
-\htmlref{shell variables}{sc4_se_variables} {\tt \$1}, {\tt \$2} \ldots {\tt \$\#argv}.
+\htmlref{shell variables}{sc4_se_variables} \texttt{\$1}, \texttt{\$2} \ldots \texttt{\$\#argv}.
 There is no practical limit to the number of arguments you can supply.
 
-Let's look at a few examples.  Below is a script {\tt argex.csh}.
-\small
-\begin{verbatim}
+Let's look at a few examples.  Below is a script \texttt{argex.csh}.
+\begin{small}
+\begin{terminalv}
      #! /bin/csh
      echo ${0}
      echo "Number of arguments is $#argv"
@@ -1446,24 +871,24 @@ Let's look at a few examples.  Below is a script {\tt argex.csh}.
      echo $argv[2-3]
      echo $argv[$]
      exit
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 Then we run it with four arguments.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % argex.csh "hello world" 42 3.14159 "(300:400,~100)"
      argex.csh
      Number of arguments is 4
      42
      42 3.14159
      (300:400,~100)
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 Note that you must enclose any argument passed to a script that contains
-a space or shell \htmlref{{\sf metacharacter}}{sc4_gl_met} in double quotes ({\tt{"}}).
+a space or shell \htmlref{\textsf{metacharacter}}{sc4_gl_met} in double quotes ({\texttt{"}}).
 
-You can see an example using {\tt \$*} to process a list of files
+You can see an example using \texttt{\$*} to process a list of files
 \latexelsehtml{in Section~\ref{sc4_se_wildcard_lists}.
 }{\htmlref{here}{sc4_se_wildcard_lists}.}  There are other examples of script
 arguments in \latexelsehtml{Section~\ref{sc4_se_unix_options}.
@@ -1479,14 +904,14 @@ argv}.  The most useful other ones are listed below.
 \begin{tabular}{lp{100mm}}
 Shell variable & Meaning \\ \hline
 \\
-{\tt cwd}      & Current working directory \\
-{\tt home}     & Home directory \\
-{\tt path}     & List of directories in which to search for commands \\
-{\tt status}   & The status returned by the last command, where {\tt 0}
+\texttt{cwd}      & Current working directory \\
+\texttt{home}     & Home directory \\
+\texttt{path}     & List of directories in which to search for commands \\
+\texttt{status}   & The status returned by the last command, where \texttt{0}
                  means a successful completion, and a positive integer
                  indicates an error, the higher the value, the higher
                  the severity. \\
-{\tt user}     & Username \\
+\texttt{user}     & Username \\
 \\ \hline
 \end{tabular}
 \end{center}
@@ -1494,16 +919,16 @@ Shell variable & Meaning \\ \hline
 So if you wanted to include details of the user and directory at the
 head of some data-processing log you might write this in your script.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % echo "Processed by:        $user" > logfile
      % echo "Directory processed: $path" >> logfile
-\end{verbatim}
-\normalsize
-This writes a heading into file {\tt logfile} saying who ran the
+\end{terminalv}
+\end{small}
+This writes a heading into file \texttt{logfile} saying who ran the
 script, and then appends details of the directory in which processing
-occurred. Note the different \htmlref{{\sf metacharacters}}{sc4_gl_met},
-namely {\tt >} redirects the output to a file, and {\tt >>} appends to
+occurred. Note the different \htmlref{\textsf{metacharacters}}{sc4_gl_met},
+namely \texttt{>} redirects the output to a file, and \texttt{>>} appends to
 an existing file.
 
 \newpage
@@ -1527,48 +952,48 @@ dynamic text files}{sc4_se_reading_files}.}
 The script must recognise the package commands.  The options for
 enabling this are described below.  Then you can run Starlink
 applications from the C-shell script by just issuing the commands as if
-you were prompted.  You do {\em not} prefix them with any special
-character, like the {\tt \%} used throughout this manual.
+you were prompted.  You do \emph{not} prefix them with any special
+character, like the \texttt{\%} used throughout this manual.
 
 If you already have the commands defined in your current shell, you
-can {\bf source} your script so that it runs in that shell, rather than
-in a child \htmlref{{\sf process}}{sc4_gl_pro} derived from it.  For instance,
+can \textbf{source} your script so that it runs in that shell, rather than
+in a child \htmlref{\textsf{process}}{sc4_gl_pro} derived from it.  For instance,
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % source myscript test
-\end{verbatim}
-\normalsize
-will run the script called {\tt myscript} with argument {\tt test} using
+\end{terminalv}
+\end{small}
+will run the script called \texttt{myscript} with argument \texttt{test} using
 the current shell environment; any package definitions currently
 defined will be known to your script.  This method is only suitable
 for quick one-off jobs, as it does rely on the definition aliases being
 present.
 
 The recommended way is to invoke the startup scripts, such as {\tt
-kappa}, {\tt ccdpack} within the script.  The script will take a
+kappa}, \texttt{ccdpack} within the script.  The script will take a
 little longer to run because of these extra scripts, but it will be
 self-contained.  To prevent the package startup message appearing you
-could temporarily redefine {\bf echo} as shown here.
+could temporarily redefine \textbf{echo} as shown here.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      alias echo "echo > /dev/null"
      kappa
      ccdpack
      unalias echo
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 In traditional UNIX style there is a third option: you could add the
 various directories containing the executables to your PATH
-\htmlref{{\sf environment variable}}{sc4_gl_env}, however this will not
+\htmlref{\textsf{environment variable}}{sc4_gl_env}, however this will not
 pick up the synonym commands.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      setenv PATH $PATH:/home/user1/dro/bin:/home/user2/drmoan/noddy
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 As most of the examples in this document are script excerpts, and for
 reasons of brevity, most do not define the package commands explicitly.
 
@@ -1580,12 +1005,12 @@ If you run simultaneously more than one shell script executing
 Starlink applications, or run such a script in the background while
 you continue an interactive session, you may notice some strange
 behaviour with parameters.   Starlink applications uses files in
-the directory {\tt \$ADAM\_USER} to store parameter values.  If you don't
+the directory \texttt{\$ADAM\_USER} to store parameter values.  If you don't
 tell your script or interactive session where this is located,
 tasks will use the same directory.  To prevent sharing of the
 parameter files use the following tip.
 
-\begin{verbatim}
+\begin{terminalv}
      #!/bin/csh
      mkdir /user1/dro/vela/junk_$$
      setenv ADAM_USER /user1/dro/vela/junk_$$
@@ -1594,17 +1019,17 @@ parameter files use the following tip.
 
      \rm -r /user1/dro/vela/junk_$$
      # end of script
-\end{verbatim}
-This creates a temporary directory ({\tt /user1/dro/vela/junk\_\$\$})
-and redefines {\tt \$ADAM\_USER} to point to it.  Both exist only while the
+\end{terminalv}
+This creates a temporary directory (\texttt{/user1/dro/vela/junk\_\$\$})
+and redefines \texttt{\$ADAM\_USER} to point to it.  Both exist only while the
 script runs.  The \$\$ substitutes the process identification number
 and so makes a unique name.  The backslash in \verb+\rm+ overrides
-any alias {\tt rm}.
+any alias \texttt{rm}.
 
 If you are executing graphics tasks which use the \xref{graphics
 database}{sun95}{se_agitate}, you may also need to redefine {\tt
 \$AGI\_USER} to another directory.  Usually, it is satisfactory to
-equate {\tt \$AGI\_USER} to the {\tt \$ADAM\_USER} directory.
+equate \texttt{\$AGI\_USER} to the \texttt{\$ADAM\_USER} directory.
 
 \subsection{\xlabel{sc4_se_exit_status}How to test whether or not a
 Starlink task has failed}\label{sc4_se_exit_status}
@@ -1615,14 +1040,14 @@ want the script to continue, unless an error is sometimes expected and
 your shell script can take appropriate action.  Either way you want a
 test that the application has succeeded.
 
-If you set the ADAM\_EXIT \htmlref{{\sf environment
-variable}}{sc4_gl_env} to {\tt 1} in your script before calling
-Starlink applications then the {\tt status} variable after each task,
+If you set the ADAM\_EXIT \htmlref{\textsf{environment
+variable}}{sc4_gl_env} to \texttt{1} in your script before calling
+Starlink applications then the \texttt{status} variable after each task,
 will indicate whether or not the task has failed, where 1 means
 failure and 0 success.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      setenv ADAM_EXIT 1
          .    .    .
          .    .    .
@@ -1633,16 +1058,16 @@ failure and 0 success.
      stats $KAPPA_DIR/comwest > /dev/null
      echo $status
      0
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
-The NDF allsky is absent from the current directory, so {\bf stats}
-fails, reflected in the value of {\tt status}, whereas
+The NDF allsky is absent from the current directory, so \textbf{stats}
+fails, reflected in the value of \texttt{status}, whereas
 \$KAPPA\_DIR/comwest does exist.
 
 Here's an example in action.
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      setenv ADAM_EXIT 1
          .    .    .
          .    .    .
@@ -1660,19 +1085,19 @@ Here's an example in action.
          .    .    .
      tidy:
      \rm ${ndfgen}.sdf
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 The script first switches on the ADAM\_EXIT facility.  A little later
-you create an NDF represented by {\tt \$ndfgen} and then compare it with
-the input NDF {\tt \$ndfin} using \xref{{\bf normalize}}{sun95}{NORMALIZE}.
+you create an NDF represented by \texttt{\$ndfgen} and then compare it with
+the input NDF \texttt{\$ndfin} using \xref{\textbf{normalize}}{sun95}{NORMALIZE}.
 If the task fails, you issue an error message and move to a block of
 code, normally near the end of the script, where various cleaning
 operations occur.  In this case it removes the generated NDF.
 
-When {\bf normalize} terminates successfully, the script accesses the
-\htmlref{{\sf output parameters}}{sc4_gl_opar} for later processing
-with \xref{{\bf parget}}{sun95}{PARGET}.  This is explained in
+When \textbf{normalize} terminates successfully, the script accesses the
+\htmlref{\textsf{output parameters}}{sc4_gl_opar} for later processing
+with \xref{\textbf{parget}}{sun95}{PARGET}.  This is explained in
 \begin{htmlonly}
 \htmlonly{\htmlref{Passing information between Starlink applications}{sc4_se_info_parameter}.}
 \end{htmlonly}
@@ -1684,32 +1109,32 @@ Starlink applications\label{sc4_se_passing_info}}
 
 In scripts you will often want to take some result produced or
 calculated by one application, and to pass that information to another.
-Two techniques are available: \htmlref{{\sf piping}}{sc4_gl_pipe} or
-\htmlref{{\sf output parameters}}{sc4_gl_opar}.
+Two techniques are available: \htmlref{\textsf{piping}}{sc4_gl_pipe} or
+\htmlref{\textsf{output parameters}}{sc4_gl_opar}.
 
 \subsection{\xlabel{sc4_se_info_parse}Parsing text output
 \label{sc4_se_info_parse}}
 
 If the first task prints the required value, it is possible to use one
-or more of {\bf grep}, {\bf sed}, and {\bf awk} to locate and isolate
+or more of \textbf{grep}, \textbf{sed}, and \textbf{awk} to locate and isolate
 the value.  For example, to obtain the mean value of a data array you
 could have the following lines in your script.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set dummy = `stats accept | grep "Pixel mean"`
      set mean = $dummy[4]
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
-The {\tt accept} keyword tells \xref{{\bf stats}}{sun95}{STATS} to use
+The \texttt{accept} keyword tells \xref{\textbf{stats}}{sun95}{STATS} to use
 the current values for any parameters for which it would otherwise
-prompt you.  The back quotes ({\tt `~`} are important.  They tell the
+prompt you.  The back quotes (\texttt{`~`} are important.  They tell the
 shell to execute the expression they enclose, in this case \mbox{{\tt
 stats accept | grep "Pixel mean"}}, and assign the result to variable
-{\tt dummy}. So the \KAPPAref\normalsize\ {\bf stats} task is run on
-the current dataset, and the output is passed to {\bf grep} which
-searches for the line containing the string {\tt Pixel mean}, and the
+\texttt{dummy}. So the \KAPPAref\normalsize\ \textbf{stats} task is run on
+the current dataset, and the output is passed to \textbf{grep} which
+searches for the line containing the string \texttt{Pixel mean}, and the
 mean value.  When you equate a variable to a multi-word string not
 enclosed in quotes---words being separated by spaces---the variable
 becomes an array, whose elements are each assigned to a word.  So in
@@ -1717,7 +1142,7 @@ this case the fourth word or element is the mean value.
 
 Besides being inelegant, this method demands that the format and
 text of the output be fixed.  So it should be avoided where the
-first task writes results to \htmlref{{\sf output
+first task writes results to \htmlref{\textsf{output
 parameters}}{sc4_gl_opar}.
 
 \subsection{\xlabel{sc4_se_info_parameter}Via Parameters
@@ -1725,39 +1150,39 @@ parameters}}{sc4_gl_opar}.
 
 There is a more-robust technique for passing information between
 Starlink applications; it does not rely on the formatting of the
-output. Where an application writes \htmlref{{\sf output
+output. Where an application writes \htmlref{\textsf{output
 parameters}}{sc4_gl_opar} (otherwise called results parameters), you
-may use the \xref{{\bf parget}}{sun95}{PARGET} command of \KAPPAref\
-to write to \htmlref{{\sf standard output}}{sc4_gl_std_out} the value
+may use the \xref{\textbf{parget}}{sun95}{PARGET} command of \KAPPAref\
+to write to \htmlref{\textsf{standard output}}{sc4_gl_std_out} the value
 or values associated with a parameter for a named application. In a
 script we want to assign the value to a \htmlref{shell
 variable}{sc4_se_variables}.  Let's see how that compares with
 obtaining the same mean value as before.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      stats accept > /dev/null
      set average = `parget mean stats`
-\end{verbatim}
-\normalsize
-This runs \xref{{\bf stats}}{sun95}{STATS}, but redirects the output
+\end{terminalv}
+\end{small}
+This runs \xref{\textbf{stats}}{sun95}{STATS}, but redirects the output
 to the null device as the output is not wanted.  However, this does
 not prevent the output parameter called MEAN from being assigned the
-mean value.  {\bf parget} retrieves this value, which is then assigned
-to variable {\tt average}.  Note that {\bf parget} retrieves parameter
+mean value.  \textbf{parget} retrieves this value, which is then assigned
+to variable \texttt{average}.  Note that \textbf{parget} retrieves parameter
 values for the last invocation of the task.  Thus if you wanted the
-standard deviation too, you would only need to issue the {\bf stats}
+standard deviation too, you would only need to issue the \textbf{stats}
 command once (as shown below).
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      stats \\ > /dev/null
      histpeak use=a sfact=0 device=! accept > /dev/null
      set mean = `parget mean stats`
      set stdev = `parget sigma`
      set kurtosis = `parget kurt histpeak`
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 The kurtosis is obtained via the KURT output parameter of the \xref{{\bf
 histpeak}}{sun180}{HISTPEAK} command of \ESPref.
 
@@ -1767,61 +1192,61 @@ histpeak}}{sun180}{HISTPEAK} command of \ESPref.
 \subsection{\xlabel{sc4_se_integer}Integer\label{sc4_se_integer}}
 
 You may include integer arithmetic in your scripts.  First you must
-assign a value to each variable used with the {\bf set} command.
+assign a value to each variable used with the \textbf{set} command.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set count = 1
      set data = (10 24 30 17)
      set exception = -999
      set list
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 Notice that arrays are defined as spaced-separated values in
-parentheses.  So {\tt \$data[3]} is 30.  You can also set a variable
-to a null value, such as {\tt list} above, so that the variable is
+parentheses.  So \texttt{\$data[3]} is 30.  You can also set a variable
+to a null value, such as \texttt{list} above, so that the variable is
 ready to be assigned to an expression.
 
 To perform arithmetic the expression is prefixed with the special {\tt
 @} character like this.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      @ count = $count + 1
      @ count++
-\end{verbatim}
-\normalsize
-Both of these add one to the value of {\tt count}.  Note that the space
-following the {\tt @} and around the {\tt =} and {\tt +} operator are
+\end{terminalv}
+\end{small}
+Both of these add one to the value of \texttt{count}.  Note that the space
+following the \texttt{@} and around the \texttt{=} and \texttt{+} operator are
 needed.  Likewise the examples below both subtract one from the value of
-{\tt count}.
+\texttt{count}.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
     @ count = $count - 1
     @ count--
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 There are several other operators, the most important ones are
 illustrated below.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      @ ratio = $count / 5
      @ octrem = $data[2] % 8
      @ numelement = $i * $j
-\end{verbatim}
-\normalsize
-The first divides the value of {\tt count} by 5, rounding down, so
-if {\tt count} was 11, {\tt ratio} would be 2.  The second assigns
-the remainder of the second element of the array called {\tt data}
-after division by 8.  So if {\tt data[2]} is 30, {\tt octrem} would be
-set to 6.  Finally {\tt numelement} is equated to the product of
-variables {\tt i} and {\tt j}.
+\end{terminalv}
+\end{small}
+The first divides the value of \texttt{count} by 5, rounding down, so
+if \texttt{count} was 11, \texttt{ratio} would be 2.  The second assigns
+the remainder of the second element of the array called \texttt{data}
+after division by 8.  So if \texttt{data[2]} is 30, \texttt{octrem} would be
+set to 6.  Finally \texttt{numelement} is equated to the product of
+variables \texttt{i} and \texttt{j}.
 
-The precedence order is {\tt * / \%}~~ followed by {\tt + -}.  If
+The precedence order is \texttt{* / \%}~~ followed by \texttt{+ -}.  If
 you are in doubt, use parentheses to achieve the desired order.
 
 \newpage
@@ -1829,20 +1254,20 @@ you are in doubt, use parentheses to achieve the desired order.
 
 As variables are either integers or strings, you have to find an
 alternative route to have logical variables in your script.  One way is
-to define string values {\tt "true"} and {\tt "false"} (or uppercase
+to define string values \texttt{"true"} and \texttt{"false"} (or uppercase
 equivalents) and test for these.  For instance, this checks the value of
-variable {\tt smooth};  when it is true the current dataset is Gaussian
+variable \texttt{smooth};  when it is true the current dataset is Gaussian
 smoothed.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      if ( $smooth == "true" ) then
         gausmooth \\
      end
-\end{verbatim}
-\normalsize
-Remember that UNIX is case sensitive, so for instance, {\tt TRUE} and
-{\tt true} are not the same.
+\end{terminalv}
+\end{small}
+Remember that UNIX is case sensitive, so for instance, \texttt{TRUE} and
+\texttt{true} are not the same.
 
 Another popular way is to use an integer, which is assigned to 0 for
 a false value, and 1 for
@@ -1851,18 +1276,17 @@ a false value, and 1 for
 true.  Indeed this is the way logical expressions are evaluated by the
 shell.  For instance in the following logical expression
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      @ x = ($n < 5 || 20 <= $n)
      @ y = ( !($n < 5 || 20 <= $n) )
-\end{verbatim}
-\normalsize
-\normalsize
-variable {\tt x} is {\tt 0} (false) when {\tt n} lies between 5 and 19
-inclusive, but is {\tt 1} (true) otherwise.  Variable {\tt y} is the
-negation of {\tt x}.  Note the parentheses surrounding the logical
-expressions; they are needed when an expression contains {\tt >}, {\tt
-<}, {\tt |}, or {\tt \&}.  A list of the comparison operators is given
+\end{terminalv}
+\end{small}
+variable \texttt{x} is \texttt{0} (false) when \texttt{n} lies between 5 and 19
+inclusive, but is \texttt{1} (true) otherwise.  Variable \texttt{y} is the
+negation of \texttt{x}.  Note the parentheses surrounding the logical
+expressions; they are needed when an expression contains \texttt{>}, {\tt
+<}, \texttt{|}, or \texttt{\&}.  A list of the comparison operators is given
 in the table \latexelsehtml{to the right}{below}.
 \smallskip
 
@@ -1877,37 +1301,37 @@ Here are a few more examples.
 \multicolumn{2}{c}{Comparison operators} \\ \hline
 Operator & Meaning \\ \hline
 \vspace*{-\medskipamount} \\
-{\tt ==} & Equal to \\
-{\tt !}  & Boolean NOT \\
-{\tt !=} & Not equal \\
-{\tt \&\&} & Boolean AND \\
-{\tt ||} & Boolean OR \\
-{\tt >} & Greater than \\
-{\tt <} & Less than \\
-{\tt >=} & Greater or equal to \\
-{\tt <=} & Less than or equal to \\
+\texttt{==} & Equal to \\
+\texttt{!}  & Boolean NOT \\
+\texttt{!=} & Not equal \\
+\texttt{\&\&} & Boolean AND \\
+\texttt{||} & Boolean OR \\
+\texttt{>} & Greater than \\
+\texttt{<} & Less than \\
+\texttt{>=} & Greater or equal to \\
+\texttt{<=} & Less than or equal to \\
 \vspace*{-\medskipamount} \\ \hline
 \end{tabular}
 \end{minipage}
 \vspace*{1mm}
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      @ flag = ( $name != "abc" )
      @ integrate = ( $flux[4] > 20 && $band != 5 )
      @ finish = ( $finish && ( $count > $number || $flag == 0 ) )
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
-The additional parentheses in the expression for {\tt finish} indicate
+The additional parentheses in the expression for \texttt{finish} indicate
 the evaluation order starting from the innermost parentheses.
 
 Observant readers will have noticed there are no comparisons involving
 floating-point numbers.  Although you can do some limited string comparison,
-another means is needed.  One such is to use the {\bf bc} calculator.
+another means is needed.  One such is to use the \textbf{bc} calculator.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      @ bound = `echo "if ( $lower > -0.5 && $upper < 0.5 ) 1" | bc`
 
      set current = 1.234*10^03
@@ -1920,20 +1344,20 @@ another means is needed.  One such is to use the {\bf bc} calculator.
          <statements when $asp is less than or equal to 1.1>
      end
 
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
-The {\tt{"}} quoted if statement involving the desired conditional
-statements is passed to bc.  If {\bf bc} evaluates the statement true,
+The {\texttt{"}} quoted if statement involving the desired conditional
+statements is passed to bc.  If \textbf{bc} evaluates the statement true,
 it returns the 1, which is equivalent to true in C-shell.  Note since
-the \htmlref{{\sf piping}}{sc4_gl_pipe} into {\bf bc} is a command,
+the \htmlref{\textsf{piping}}{sc4_gl_pipe} into \textbf{bc} is a command,
 the whole assignment is enclosed in backquotes.  In the first example
-above, the parentheses are not required, as the {\tt >} and {\tt <}
+above, the parentheses are not required, as the \texttt{>} and \texttt{<}
 are part of a string, not operators, as far as the shell is concerned.
 The other two examples show this technique in the context of a loop
 control and an if \ldots then block.
 
-Note {\bf bc} uses an arbitrary and controllable precision (\emph{cf.}
+Note \textbf{bc} uses an arbitrary and controllable precision (\emph{cf.}
 the length and scale attributes).  Be aware it also uses a
 \xref{non-standard syntax for scientific
 notation}{sc16}{sc16_writingcsh}, as seen defining variable {\tt
@@ -1948,49 +1372,49 @@ Operators}{sc4_se_file_operators}} for details.
 \subsection{\xlabel{sc4_se_real}Floating Point\label{sc4_se_real}}
 
 The shell cannot perform non-integer arithmetic.  Thus you need to
-employ some other utility.  The standard UNIX {\bf bc}
+employ some other utility.  The standard UNIX \textbf{bc}
 arbitrary-precision calculator is one.  You can also define
-an algebraic calculator with \htmladdnormallink{{\bf awk} or
-{\bf gawk}}{http://home3.inet.tele.dk/frda/src/calc_tip.html} as shown
+an algebraic calculator with \htmladdnormallink{\textbf{awk} or
+\textbf{gawk}}{http://home3.inet.tele.dk/frda/src/calc_tip.html} as shown
 below.
 
-small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      alias acalc '       awk "BEGIN{ print \!* }" '
 
      set z = `acalc (sqrt(3.2)+exp(5.4))*4.1/5.2`
      set circle_area = `acalc atan2(0,-1)*${rad}*${rad}`
-\end{verbatim}
-\normalsize
-It is inadvisable to name the alias {\tt calc} for reasons that will
+\end{terminalv}
+\end{small}
+It is inadvisable to name the alias \texttt{calc} for reasons that will
 soon be evident.  Note that in expressions you don't escape the
-multiplication sign and the expression is {\em not} in {\tt{"}} quotes.
+multiplication sign and the expression is \emph{not} in {\texttt{"}} quotes.
 The small set of about ten mathemetical functions available in {\bf
 awk}, including arctangent shown above that evaluates $\pi$, limits
 what you can achieve.  Another option is the {\KAPPAref} \xref{{\bf
-calc}}{sun95}{CALC} command.  {\bf calc} has most of the Fortran
+calc}}{sun95}{CALC} command.  \textbf{calc} has most of the Fortran
 intrinsic functions available.  For the remainder of this section, we
-shall just deal with {\bf calc}.
+shall just deal with \textbf{calc}.
 
-The {\bf calc} tool evaluates Fortran-like expressions, sending the
-result to \htmlref{{\sf standard output}}{sc4_gl_std_out}.  So suppose
+The \textbf{calc} tool evaluates Fortran-like expressions, sending the
+result to \htmlref{\textsf{standard output}}{sc4_gl_std_out}.  So suppose
 that we wish to add two real values.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set a = 5.4321
      set b = 1.2345
      set c = `calc $a+$b`
-\end{verbatim}
-\normalsize
-The variable {\tt c} takes the value of adding variables {\tt a} and
-{\tt b}.  Note the back quotes that cause {\bf calc} to be executed.
+\end{terminalv}
+\end{small}
+The variable \texttt{c} takes the value of adding variables \texttt{a} and
+\texttt{b}.  Note the back quotes that cause \textbf{calc} to be executed.
 
 This is fine if you know that the values will always be positive.
-However, {\bf calc} will object if there are adjacent mathematical
-operators, such as {\tt +-} as would happen if {\tt b} were negative.
-So surround variables in parentheses, remembering that the {\tt (~)} are
-\htmlref{{\sf metacharacters}}{sc4_gl_met}.
+However, \textbf{calc} will object if there are adjacent mathematical
+operators, such as \texttt{+-} as would happen if \texttt{b} were negative.
+So surround variables in parentheses, remembering that the \texttt{(~)} are
+\htmlref{\textsf{metacharacters}}{sc4_gl_met}.
 \latexelsehtml{See Section~\ref{sc4_se_spec_char}}{Click
 \htmlref{here}{sc4_se_spec_char}} for more details.
 
@@ -1998,47 +1422,47 @@ Let's redo the first example along with a few more to illustrate the
 recommended syntax.  This time we'll specify the expression by parameter
 name rather than position.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set a = 5.4321
      set b = -1.2345
      set c = `calc exp="($a)+($b)"`                     # c = 4.1976
      set d = `calc exp="'( $a - 0.5 * ($b) ) / 100 '"`  # d = 0.0481485
      set e = `calc exp="(($a)+($b))**3"`                # e = 296.2874
      set f = `calc exp="'($a + ($b)) ** 3'"`            # f = e
-\end{verbatim}
-\normalsize
-Don't be intimidated by the surfeit of quotes.  The {\tt "~"} are needed
+\end{terminalv}
+\end{small}
+Don't be intimidated by the surfeit of quotes.  The \texttt{"~"} are needed
 because we want the dollar to retain its variable-substitution meaning.
 If the expression contains embedded spaces (usually for clarity) it
 should be enclosed in single quotes as shown in the assignment to
-variable {\tt f}.  So in general the recipe for using {\bf calc} is
+variable \texttt{f}.  So in general the recipe for using \textbf{calc} is
 
-\verb#     set #{\em variable} \verb#= `calc exp="'#{\em expression}\verb#'"`#
+\verb#     set #\emph{variable} \verb#= `calc exp="'#\emph{expression}\verb#'"`#
 
 Don't try to escape all the metacharacters individually because it can
 soon become very messy, error prone, and hard to follow.
 \medskip
 
 The default precision is single precision.  If you need more
-significant figures then append {\tt prec=\_double} to the {\bf calc}
-command line.  The special symbol {\tt pi} has the value of $\pi$.  So
+significant figures then append \texttt{prec=\_double} to the \textbf{calc}
+command line.  The special symbol \texttt{pi} has the value of $\pi$.  So
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set arc = 0.541209
      set darc = `calc exp=$arc*180.0/pi prec=_double`
-\end{verbatim}
-\normalsize
-converts an angle 0.541209 radians (stored in {\tt arc}) to degrees
+\end{terminalv}
+\end{small}
+converts an angle 0.541209 radians (stored in \texttt{arc}) to degrees
 using double-precision arithmetic.
 
 It is sometimes easier to assemble the expression in another variable.
 Here's another recipe which demonstrates this approach.  Suppose that you
-want to find the average median value for a series of \NDFref{{\sf NDF}s}.
+want to find the average median value for a series of \NDFref{\textsf{NDF}s}.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      # Estimates the median of each sky frame and subtracts it from that image
 
      # Enable KAPPA commands.  Initialise variables.
@@ -2084,16 +1508,16 @@ want to find the average median value for a series of \NDFref{{\sf NDF}s}.
 
      # Evaluate the expression and report the result.
      echo "Average median is "`calc $expr`
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 The script builds an expression to evaluate the average of the median
 values.  So the first time it has to write the left parenthesis and
-first median value into string variable {\tt expr}, but otherwise each
+first median value into string variable \texttt{expr}, but otherwise each
 new value is appended to the expression.  Once all the medians are
 evaluated, the remainder of the expression, including division by the
 number of NDFs is appended.  Finally, the expression is evaluated using
-\xref{{\bf calc}}{sun95}{CALC}.  If you want to learn more about the
-\mbox{\tt set median = `parget median histat`} command
+\xref{\textbf{calc}}{sun95}{CALC}.  If you want to learn more about the
+\mbox{\texttt{set median = `parget median histat`}} command
 \latexelsehtml{see Section~\ref{sc4_se_info_parameter}.}{click \htmlref{here}{sc4_se_info_parameter}.}
 
 \subsection{\xlabel{sc4_se_intrinsic}Intrinsic Functions
@@ -2103,42 +1527,42 @@ If you want to include intrinsic functions, such as logarithms and
 trigonometric functions in your calculations, or perhaps you need some
 function for an integer expression that is not supplied by the
 C-shell, such as finding the maximum or the absolute value,
-\xref{{\bf calc}}{sun95}{CALC} may be the solution.  It offers the
+\xref{\textbf{calc}}{sun95}{CALC} may be the solution.  It offers the
 28 functions tabulated below.
 
 Here are a few examples.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set a = 5
      set b = (3 4 6 -2)
      set c = `calc exp="'min( $a, $b[1], $b[2], $b[3] )'"`
      set d = `calc exp="'dim( $b[4], $a ) + dim( $b[3], $a )'"`
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 The first expression finds the minimum of the four integers, namely
-{\tt 3} and assigns it to variable {\tt c}.  The second expression
-sums two positive differences: {\tt 0} and {\tt 1} respectively.
+\texttt{3} and assigns it to variable \texttt{c}.  The second expression
+sums two positive differences: \texttt{0} and \texttt{1} respectively.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set mag = `calc exp="'-2.5 * LOG10( $counts )'"`
      set separation = `calc exp="atand2(35.3,$dist)"`
      echo The nearest index is `calc exp="nint($x+0.5)"`
-\end{verbatim}
-\normalsize
-Variable {\tt mag} is the magnitude derived from the flux
-stored in variable {\tt counts}.  {\tt separation} is assigned
+\end{terminalv}
+\end{small}
+Variable \texttt{mag} is the magnitude derived from the flux
+stored in variable \texttt{counts}.  \texttt{separation} is assigned
 the inverse tangent of 35.3 divided by the value of variable
-{\tt dist} measured between $-$180 and 180 degrees.
+\texttt{dist} measured between $-$180 and 180 degrees.
 
 \bigskip
 
 \newpage
 \begin{center}
 \begin{tabular}{lcl} \hline
-%\latex{{\em Function} & \begin{tabular}{c}Number of \\ arguments \end{tabular} & Description \\}
-{\em Function} & Number of arguments & Description \\
+%\latex{\emph{Function} & \begin{tabular}{c}Number of \\ arguments \end{tabular} & Description \\}
+\emph{Function} & Number of arguments & Description \\
 \hline
 \\
 SQRT & 1 & square root: $\sqrt{\mbox{arg}}$ \\
@@ -2170,12 +1594,12 @@ ACOSD* & 1 & inverse cosine function: $\cos ^{-1}(\mbox{arg})$ \\
 ATAND* & 1 & inverse tangent function: $\tan ^{-1}(\mbox{arg})$ \\
 ATAN2D* & 2 & inverse tangent function: $\tan ^{-1}(\mbox{arg1/arg2})$ \\
 \multicolumn{1}{r}{} &
-\multicolumn{2}{l}{\footnotesize *Function does not support {\em integer}
+\multicolumn{2}{l}{\footnotesize *Function does not support \emph{integer}
 arithmetic.}\\
 \\ \hline
 \end{tabular}
 \end{center}
-The intrinsic functions recognised by {\bf calc} (adapted from SUN/61).
+The intrinsic functions recognised by \textbf{calc} (adapted from SUN/61).
 The angular arguments/results of the trigonometric functions are in
 radians, except those suffixed with a D, which are in degrees.
 \label{sc4_table:intrinsics}
@@ -2185,15 +1609,15 @@ radians, except those suffixed with a D, which are in degrees.
 \label{sc4_se_string_proc}}
 
 The C-shell has no string-manipulation tools.  Instead we mostly use
-the {\bf echo} command and {\bf awk} utility.  The latter has its own
-language for text processing and you can write {\bf awk} scripts to
+the \textbf{echo} command and \textbf{awk} utility.  The latter has its own
+language for text processing and you can write \textbf{awk} scripts to
 perform complex processing, normally from files.  There are even books
-devoted to {\bf awk} such as the succinctly titled {\sl sed \& awk} by
+devoted to \textbf{awk} such as the succinctly titled {\sl sed \& awk} by
 Dale Dougherty (O'Reilly \& Associates, 1990).  Naturally enough a
 detailed description is far beyond the scope of this cookbook.
 
-Other relevant tools include {\bf cut}, {\bf paste}, {\bf grep} and
-{\bf sed}.  The last two and {\bf awk} gain much of their power from
+Other relevant tools include \textbf{cut}, \textbf{paste}, \textbf{grep} and
+\textbf{sed}.  The last two and \textbf{awk} gain much of their power from
 \htmlref{regular expressions}{sc4_gl_reg_exp}.  A regular expression
 is a pattern of characters used to match the same characters in a
 search through text.  The pattern can include special characters to
@@ -2204,8 +1628,8 @@ manipulate text, learning about regular expressions is time well
 spent.
 
 Here we present a few one-line recipes.  They can be included inline,
-but for clarity the values derived via {\bf awk} are assigned to
-variables using the {\bf set} command.  Note that these may not be the
+but for clarity the values derived via \textbf{awk} are assigned to
+variables using the \textbf{set} command.  Note that these may not be the
 most concise way of achieving the desired results.
 
 \subsection{\xlabel{sc4_se_string_conc}String concatenation
@@ -2213,58 +1637,58 @@ most concise way of achieving the desired results.
 
 To concatenate strings, you merely abut them.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set catal = "NGC "
      set number = 2345
      set object = "Processing $catal$number."
-\end{verbatim}
-\normalsize
-So {\tt object} is assigned to {\tt "Processing NGC 2345."}.
+\end{terminalv}
+\end{small}
+So \texttt{object} is assigned to \texttt{"Processing NGC 2345."}.
 Note that spaces must be enclosed in quotes.  If you want to embed
 variable substitutions, these should be double quotes as above.
 
 On occasions the variable name is ambiguous.  Then you have to break up
-the string.  Suppose you want {\tt text} to be {\tt "File cde1 is not
+the string.  Suppose you want \texttt{text} to be \texttt{"File cde1 is not
 abc"}.  You can either make two abutted strings or encase the variable
 name in braces (\verb+{+~\verb+}+), as shown below.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set name1 = abc
      set name = cde
      set text = "File $name""1 is not $name1"     # These two assignments
      set text = "File ${name}1 is not $name1"     # are equivalent.
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 Here are some other examples of string concatenation.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      echo 'CIRCLE ( '$centre[1]', '$centre[2]', 20 )' > $file1".ard"
      gausmooth in=$root"$suffix" out=${root}_sm accept
      linplot ../arc/near_arc"($lbnd":"$ubnd)"
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 \newpage
 \subsection{\xlabel{sc4_se_string_length}Obtain the length of a string
 \label{sc4_se_string_length}}
 
-This requires either the {\bf wc} command in an
+This requires either the \textbf{wc} command in an
 \htmlref{expression}{sc4_se_csharith}\latex{ (see
-Section~\ref{sc4_se_csharith})}, or the {\bf awk} function {\bf length}.
+Section~\ref{sc4_se_csharith})}, or the \textbf{awk} function \textbf{length}.
 Here we determine the number of characters
-in variable {\tt object} using both recipes.
+in variable \texttt{object} using both recipes.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set object = "Processing NGC 2345"
      set nchar = `echo $object | awk '{print length($0)}'`      # = 19
      @ nchar = `echo $object | wc -c` - 1
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 If the variable is an array, you can either obtain the length of the
 whole array or just an element.  For the whole the number of
@@ -2272,24 +1696,24 @@ characters is the length of a space-separated list of the elements.
 The double quotes are delimiters; they are not part of the string so
 are not counted.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set places = ( Jupiter "Eagle Nebula" "Gamma quadrant" )
      set nchara = `echo $places | awk '{print length($0)}'`     # = 35
      set nchar1 = `echo $places[1] | awk '{print length($0)}'`  # =  7
      set nchar2 = `echo $places[2] | awk '{print length($0)}'`  # = 12
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 \subsection{\xlabel{sc4_se_string_substr}Find the position of a
 substring\label{sc4_se_string_substr}}
 
-This requires the {\bf awk} function {\bf index}.  This returns zero if
+This requires the \textbf{awk} function \textbf{index}.  This returns zero if
 the string could not be located.  Note that comparisons are case
 sensitive.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set catal = "NGC "
      set number = 2345
      set object = "Processing $catal$number."
@@ -2302,8 +1726,8 @@ sensitive.
      set cpos1 = `echo $places[1] | awk '{print index($0,"Owl")}'`  # =  0
      set cpos2 = `echo $places[2] | awk '{print index($0,"ebu")}'`  # =  8
      set cpos3 = `echo $places[3] | awk '{print index($0,"rant")}'` # = 11
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 An array of strings is treated as a space-separated list of the elements.
 The double quotes are delimiters; they are not part of the string so
 are not counted.
@@ -2312,13 +1736,13 @@ are not counted.
 \subsection{\xlabel{sc4_se_string_ex_substr}Extracting a substring
 \label{sc4_se_string_ex_substr}}
 
-One method uses the {\bf awk} function {\bf substr}($s$,$c$,$n$).  This
+One method uses the \textbf{awk} function \textbf{substr}($s$,$c$,$n$).  This
 returns the substring from string $s$ starting from character position
 $c$ up to a maximum length of $n$ characters.  If $n$ is not supplied,
 the rest of the string from $c$ is returned.  Let's see it in action.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set caption = "Processing NGC 2345."
      set object = `echo $caption | awk '{print substr($0,12,8)}'` # = "NGC 2345"
      set objec_ = `echo $caption | awk '{print substr($0,16)}'`   # = "2345."
@@ -2326,19 +1750,19 @@ the rest of the string from $c$ is returned.  Let's see it in action.
      set places = ( Jupiter "Eagle Nebula" "Gamma quadrant" )
      set oba = `echo $places | awk '{print substr($0,28,4)}'` # = "quad"
      set ob1 = `echo $places[3] | awk '{print substr($0,7)}'` # = "quadrant"
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 An array of strings is treated as a space-separated list of the elements.
 The double quotes are delimiters; they are not part of the string so
 are not counted.
 
-Another method uses the UNIX {\bf cut} command.  It too can specify a
+Another method uses the UNIX \textbf{cut} command.  It too can specify a
 range or ranges of characters.  It can also extract fields separated
 by nominated characters.  Here are some examples using the same values
-for the array {\tt places}
+for the array \texttt{places}
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set cut1 = `echo $places | cut -d ' ' -f1,3`  # = "Jupiter Nebula"
      set cut2 = `echo $places[3] | cut -d a -f2`   # = "mm"
      set cut3 = `echo $places | cut -c3,11`        # = "pg"
@@ -2346,26 +1770,26 @@ for the array {\tt places}
      set cut5 = `cut -d ' ' -f1,3-5 table.dat`     # Extracts fields 1,3,4,5
                                                    # from file table.dat
 
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
-The {\tt -d} qualifier specifies the delimiter between associated data
+The \texttt{-d} qualifier specifies the delimiter between associated data
 (otherwise called fields).  Note the the space delimiter must be quoted.
-The {\tt -f} qualifier selects the fields.  You can also select
-character columns with the {\tt -c} qualifier.  Both {\tt -c} and
-{\tt -f} can comprise a comma-separated list of individual values and/or
+The \texttt{-f} qualifier selects the fields.  You can also select
+character columns with the \texttt{-c} qualifier.  Both \texttt{-c} and
+\texttt{-f} can comprise a comma-separated list of individual values and/or
 ranges of values separated by a hyphen.  As you might expect,
-{\bf cut} can take its input from files too.
+\textbf{cut} can take its input from files too.
 
 
 \subsection{\xlabel{sc4_se_string_split}Split a string into an
 array\label{sc4_se_string_split}}
 
-The {\bf awk} function {\bf split}($s$,$a$,{\em sep}) splits a string
-$s$ into an {\bf awk} array $a$ using the delimiter {\em sep}.
+The \textbf{awk} function \textbf{split}($s$,$a$,\emph{sep}) splits a string
+$s$ into an \textbf{awk} array $a$ using the delimiter \emph{sep}.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set time = 12:34:56
      set hr = `echo $time | awk '{split($0,a,":"); print a[1]}'` # = 12
      set sec = `echo $time | awk '{split($0,a,":"); print a[3]}'` # = 56
@@ -2374,42 +1798,42 @@ $s$ into an {\bf awk} array $a$ using the delimiter {\em sep}.
      set hms = `echo $time | awk '{split($0,a,":"); print a[1], a[2], a[3]}'`
      set hms = `echo $time | awk '{split($0,a,":"); for (i=1; i<=3; i++) print a[i]}'`
      set hms = `echo $time | awk 'BEGIN{FS=":"}{for (i=1; i<=NF; i++) print $i}'`
-\end{verbatim}
-\normalsize
-Variable {\tt hms} is an array so {\tt hms[2]} is {\tt 34}.
+\end{terminalv}
+\end{small}
+Variable \texttt{hms} is an array so \texttt{hms[2]} is \texttt{34}.
 The last three statements are equivalent, but the last two more
 convenient for longer arrays.  In the second you can specify the start
 index and number of elements to print.  If, however, the number of
 values can vary and you want all of them to become array elements,
 then use the final recipe; here you specify the field separator with
-awk's {\tt FS} built-in variable, and the number of values with the
-{\tt NF} built-in variable.
+awk's \texttt{FS} built-in variable, and the number of values with the
+\texttt{NF} built-in variable.
 
 \subsection{\xlabel{sc4_se_string_case}Changing case
 \label{sc4_se_string_case}}
 
-Some implementations of {\bf awk} offer functions to change case.
+Some implementations of \textbf{awk} offer functions to change case.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set text = "Eta-Aquarid shower"
      set utext = `echo $text | awk '{print toupper($0)}'` # = "ETA-AQUARID SHOWER"
      set ltext = `echo $text | awk '{print tolower($0)}'` # = "eta-aquarid shower"
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 
 \subsection{\xlabel{sc4_se_string_sub}String substitution
 \label{sc4_se_string_sub}}
 
-Some implementations of {\bf awk} offer substitution functions {\bf
-gsub}($e$,$s$) and {\bf sub}($e$,$s$).  The latter substitutes the $s$
-for the first match with the \htmlref{{\sf regular
+Some implementations of \textbf{awk} offer substitution functions {\bf
+gsub}($e$,$s$) and \textbf{sub}($e$,$s$).  The latter substitutes the $s$
+for the first match with the \htmlref{\textsf{regular
 expression}}{sc4_gl_reg_exp} $e$ in our supplied text.  The former
 replaces every occurrence.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set text = "Eta-Aquarid shower"
      # = "Eta-Aquarid stream"
      set text = `echo $text | awk '{sub("shower","stream"); print $0}'`
@@ -2423,24 +1847,24 @@ replaces every occurrence.
      set name = "Abell 3158"
      set catalogue = `echo $name | awk '{sub("[0-9]+",""); print $0}'`  # = Abell
      set short = `echo $name | awk '{gsub("[b-z]",""); print $0}'`      # = "A 3158"
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
-There is also {\bf sed}.
-\small
-\begin{verbatim}
+There is also \textbf{sed}.
+\begin{small}
+\begin{terminalv}
      set text = `echo $text | sed 's/shower/stream/'`
-\end{verbatim}
-\normalsize
-is equivalent to the first {\bf awk} example above.  Similarly you could
+\end{terminalv}
+\end{small}
+is equivalent to the first \textbf{awk} example above.  Similarly you could
 replace all occurrences.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set text1 = `echo $text | sed 's/a[a-z]/x/g'`
-\end{verbatim}
-\normalsize
-is equivalent to the second example.  The final {\tt g} requests that the
+\end{terminalv}
+\end{small}
+is equivalent to the second example.  The final \texttt{g} requests that the
 substitution is applied to all occurrences.
 
 \subsection{\xlabel{sc4_se_form_print}Formatted Printing
@@ -2451,14 +1875,14 @@ its calculations will often need presentation, often in tabular form
 or some aligned output, either for human readability or to be read by
 some other software.
 
-The UNIX command {\bf printf} permits formatted output.  It is
+The UNIX command \textbf{printf} permits formatted output.  It is
 analogous to the C function of the same name.  The syntax is
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      printf "<format string>" <space-separated argument list of variables>
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 \begin{minipage}{73mm}
 The format string may contain text, conversion codes, and interpreted
@@ -2467,37 +1891,36 @@ sequences.
 The conversion codes appear in the same order as the arguments
 they correspond to.  A conversion code has the form
 
-\small
-\begin{verbatim}
-     %[flag][width][.][precision]code
-\end{verbatim}
-\normalsize
-\normalsize
+\begin{small}
+\begin{terminalv}
+%[flag][width][.][precision]code
+\end{terminalv}
+\end{small}
 
 where the items in brackets are optional.
 \begin{itemize}
 \item
-The {\em code} determines how the output is is converted for printing.
+The \emph{code} determines how the output is is converted for printing.
 The most commonly used appear in the upper table.
 \item
-The {\em width} is a positive integer giving the minimum field width.
+The \emph{width} is a positive integer giving the minimum field width.
 A value requiring more characters than the width is still written in
 full.  A datum needing few characters than the width is right
-justified, unless the flag is {\tt -}.  {\tt *} substitutes the next
+justified, unless the flag is \texttt{-}.  \texttt{*} substitutes the next
 variable in the argument list, allowing the width to be programmable.
 \item
-The {\em precision} specifies the number of decimal places for
+The \emph{precision} specifies the number of decimal places for
 floating point; for strings it sets the maximum number of characters
-to print.  Again {\tt *} substitutes the next variable in the argument
+to print.  Again \texttt{*} substitutes the next variable in the argument
 list, whose value should be a positive integer.
 \item
-The {\em flag} provides additional format control.  The main functions
+The \emph{flag} provides additional format control.  The main functions
 are listed in the lower table.
 \end{itemize}
 
 The interpreted sequences include:\\
-{\tt \verb+\+n} for a new line, {\tt \verb+\+"} for a double quote,
-{\tt \verb+\%+} for a percentage sign, and {\tt \verb+\\+} for a backslash.
+\texttt{\textbackslash n} for a new line, \texttt{\textbackslash "} for a double quote,
+\texttt{\textbackslash\%} for a percentage sign, and \texttt{\textbackslash\textbackslash} for a backslash.
 
 \end{minipage}
 \ \hfill \
@@ -2508,20 +1931,20 @@ The interpreted sequences include:\\
 \multicolumn{2}{c}{Format codes} \\ \hline
 Code & Interpretation \\ \hline
 \vspace*{-\medskipamount} \\
-{\tt c} & single character \\
-{\tt s} & string \\
+\texttt{c} & single character \\
+\texttt{s} & string \\
 \\
-{\tt d}, {\tt i} & signed integer \\
-{\tt o} & integer written as unsigned octal \\
-{\tt x}, {\tt X} & integer written as unsigned hexadecimal, the
+\texttt{d}, \texttt{i} & signed integer \\
+\texttt{o} & integer written as unsigned octal \\
+\texttt{x}, \texttt{X} & integer written as unsigned hexadecimal, the
            latter using uppercase notation \\
 \\
-{\tt e}, {\tt E} & floating point in exponent form {\tt m.nnnnne$\pm$xx}
-                       or {\tt m.nnnnnE$\pm$xx} respectively \\
-{\tt f} & floating point in {\tt mmm.nnnn} format\\
-{\tt g} & uses whichever format of {\tt d}, {\tt e}, or {\tt f}
+\texttt{e}, \texttt{E} & floating point in exponent form \texttt{m.nnnnne$\pm$xx}
+                       or \texttt{m.nnnnnE$\pm$xx} respectively \\
+\texttt{f} & floating point in \texttt{mmm.nnnn} format\\
+\texttt{g} & uses whichever format of \texttt{d}, \texttt{e}, or \texttt{f}
           is shortest \\
-{\tt G} & uses whichever format of {\tt d}, {\tt E}, or {\tt f}
+\texttt{G} & uses whichever format of \texttt{d}, \texttt{E}, or \texttt{f}
           is shortest \\
 \vspace*{-\medskipamount} \\ \hline
 \end{tabular}
@@ -2532,13 +1955,13 @@ Code & Interpretation \\ \hline
 \multicolumn{2}{c}{Flags} \\ \hline
 Code & Purpose \\ \hline
 \vspace*{-\medskipamount} \\
-{\tt -} & left justify \\
-{\tt +} & begin a signed number with a {\tt +} or {\tt -} \\
+\texttt{-} & left justify \\
+\texttt{+} & begin a signed number with a \texttt{+} or \texttt{-} \\
 blank & Add a space before a signed number that does not begin with a
-          {\tt +} or {\tt -} \\
-{\tt 0} & pad a number on the left with zeroes \\
-{\tt \#} & use a decimal point for the floating-point conversions, and
-do not remove trailing zeroes for {\tt g} and {\tt G} codes \\
+          \texttt{+} or \texttt{-} \\
+\texttt{0} & pad a number on the left with zeroes \\
+\texttt{\#} & use a decimal point for the floating-point conversions, and
+do not remove trailing zeroes for \texttt{g} and \texttt{G} codes \\
 \vspace*{-\medskipamount} \\ \hline
 \end{tabular}
 
@@ -2546,12 +1969,12 @@ do not remove trailing zeroes for {\tt g} and {\tt G} codes \\
 \vspace*{2mm}
 
 If that's computer gobbledygook here are some examples to make it
-clearer.  The result of follows each {\bf printf} command, unless it
+clearer.  The result of follows each \textbf{printf} command, unless it
 is assigned to a variable through the set mechanism.  The commentary
-after the {\tt \#} is neither part of the output nor should it be
+after the \texttt{\#} is neither part of the output nor should it be
 entered to replicate the examples.  Let us start with some integer values.
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set int = 1234
      set nint = -999
      printf "%8i\n" $int            # 8-character field, right justified
@@ -2562,11 +1985,11 @@ entered to replicate the examples.  Let us start with some integer values.
         +1234
      printf "%08i\n" $int
      00001234
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 Now we turn to some floating-point examples.
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set c = 299972.458
      printf "%f %g %e\n" $c $c $c           # The three main codes
      299972.458000 299972 2.999725e+05
@@ -2574,11 +1997,11 @@ Now we turn to some floating-point examples.
      299972.46 3e+05 +3.00e+05
      printf "%12.2f %.2G %+.2E\n" $c $c $c  # Show the effect of some flags,
         299972.46 3.0E+05 +3.00E+05         # a width, and E and G codes
-\end{verbatim}
-\normalsize
-Finally we have some character examples of {\bf printf}.
-\small
-\begin{verbatim}
+\end{terminalv}
+\end{small}
+Finally we have some character examples of \textbf{printf}.
+\begin{small}
+\begin{terminalv}
      set system = Wavelength
      set confid = 95
      set ndf = m31
@@ -2604,8 +2027,8 @@ Finally we have some character examples of {\bf printf}.
         set heading = $heading `printf "%8s  " $k`  # absence of \n.
      end
      echo `printf "%s\n" $heading
-   \end{verbatim}
-\normalsize
+   \end{terminalv}
+\end{small}
 
 Note that there are different implementations.  While you can check
 your system's man pages that the desired feature is present, a better
@@ -2619,12 +2042,12 @@ way is to experiment on the command line.
 \label{sc4_se_filename_ext}}
 
 Occasionally you'll want to work with parts of a filename, such as the
-path or the file type.  The C-shell provides {\sf filename modifiers}
+path or the file type.  The C-shell provides \textsf{filename modifiers}
 that select the various portions.  A couple are shown in the example
 below.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set type = $1:e
      set name = $1:r
      if ( $type == "bdf" ) then
@@ -2634,13 +2057,13 @@ below.
      else
         hdstrace @'"$1"'
      endif
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
-Suppose the first argument of a script, {\tt \$1}, is a filename called
-galaxy.bdf.  The value of variable {\tt type} is {\tt bdf} and {\tt
-name} equates to {\tt galaxy} because of the presence of the filename
-modifiers {\tt :e} and {\tt :r}.  The rest of the script uses the
+Suppose the first argument of a script, \texttt{\$1}, is a filename called
+galaxy.bdf.  The value of variable \texttt{type} is \texttt{bdf} and {\tt
+name} equates to \texttt{galaxy} because of the presence of the filename
+modifiers \texttt{:e} and \texttt{:r}.  The rest of the script uses the
 file type to control the processing, in this case to provide a listing
 of the contents of a data file using the \HDSTRACEref\normalsize\ utility.
 
@@ -2651,15 +2074,15 @@ presented in the table below.
 \begin{center}
 \begin{tabular}{lp{62mm}l}
 Modifier & Value returned & Value for filename \\
- & & {\tt /star/bin/kappa/comwest.sdf} \\ \hline
+ & & \texttt{/star/bin/kappa/comwest.sdf} \\ \hline
 \\
-{\bf :e} & Portion of the filename following a full stop; if the filename does
-not contain a full stop, it returns a null string & {\tt sdf} \\
-{\bf :r} & Portion of the filename preceding a full stop; if there is no full stop
-present, it returns the complete filename & {\tt comwest} \\
-{\bf :h} & The path of the filename (mnemonic: h for head) & {\tt /star/bin/kappa} \\
-{\bf :t} & The tail of the file specification, excluding the path &
-                                         {\tt comwest.sdf} \\
+\textbf{:e} & Portion of the filename following a full stop; if the filename does
+not contain a full stop, it returns a null string & \texttt{sdf} \\
+\textbf{:r} & Portion of the filename preceding a full stop; if there is no full stop
+present, it returns the complete filename & \texttt{comwest} \\
+\textbf{:h} & The path of the filename (mnemonic: h for head) & \texttt{/star/bin/kappa} \\
+\textbf{:t} & The tail of the file specification, excluding the path &
+                                         \texttt{comwest.sdf} \\
 \\ \hline
 \end{tabular}
 \end{center}
@@ -2671,47 +2094,47 @@ present, it returns the complete filename & {\tt comwest} \\
 
 One of the most common things you'll want to do, having devised
 a data-processing path, is to apply those operations to a series
-of data files.   For this you need a {\bf foreach...end} construct.
+of data files.   For this you need a \textbf{foreach...end} construct.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      convert               # Only need be invoked once per process
      foreach file (*.fit)
         stats $file
      end
-\end{verbatim}
-\normalsize
-This takes all the \htmlref{{\sf FITS}}{sc4_gl_fits} files in the
+\end{terminalv}
+\end{small}
+This takes all the \htmlref{\textsf{FITS}}{sc4_gl_fits} files in the
 current directory and computes the statistics for them using the
-\xref{{\bf stats}}{sun95}{STATS} command from \KAPPAref\normalsize\@.  {\tt file}
-is a \htmlref{{\sf shell variable}}{sc4_gl_she_var}.  Each time in the
-loop {\tt file} is assigned to the name of the next file of the list
-between the parentheses.  The {\tt *} is the familiar
-\htmlref{{\sf wildcard}}{sc4_gl_wild} which
+\xref{\textbf{stats}}{sun95}{STATS} command from \KAPPAref\normalsize\@.  \texttt{file}
+is a \htmlref{\textsf{shell variable}}{sc4_gl_she_var}.  Each time in the
+loop \texttt{file} is assigned to the name of the next file of the list
+between the parentheses.  The \texttt{*} is the familiar
+\htmlref{\textsf{wildcard}}{sc4_gl_wild} which
 matches any string.  Remember when you want to use the shell
-variable's value you prefix it with a {\tt \$}.  Thus {\tt
+variable's value you prefix it with a \texttt{\$}.  Thus {\tt
 \$file} is the filename.
 
 \subsubsection{\xlabel{sc4_se_series_ndfs}NDFs\label{sc4_se_series_ndfs}}
 
-Some data formats like the \NDFref{{\sf NDF}} demand that only the file
-name ({\em i.e.}\ what appears before the last dot) be given in
+Some data formats like the \NDFref{\textsf{NDF}} demand that only the file
+name (\emph{i.e.}\ what appears before the last dot) be given in
 commands.  To achieve this you must first strip off the remainder (the
-file extension or type) with the {\tt :r} {\sf file modifier}.
+file extension or type) with the \texttt{:r} \textsf{file modifier}.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      foreach file (*.sdf)
         histogram $file:r accept
      end
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
-This processes all the {\sf \HDSref} files in the current directory
+This processes all the \textsf{\HDSref} files in the current directory
 and calculates an histogram for each of them using the
-\xref{{\bf histogram}}{sun95}{HISTOGRAM} command from
+\xref{\textbf{histogram}}{sun95}{HISTOGRAM} command from
 \KAPPAref\normalsize\@.  It
-assumes that the files are NDFs.  The {\tt :r}
+assumes that the files are NDFs.  The \texttt{:r}
 instructs the shell to remove the file extension (the part of the name
 following the the rightmost full stop).  If we didn't do this, the {\bf
 histogram} task would try to find NDFs called SDF within each of the
@@ -2721,35 +2144,35 @@ HDS files.
 \label{sc4_se_wildcard_lists}}
 
 You can give a list of files separated by spaces, each of which can
-include the various UNIX \htmlref{{\sf wildcards}}{sc4_gl_wild}.  Thus
-the code below would report the name of each \NDFref{{\sf NDF}} and
+include the various UNIX \htmlref{\textsf{wildcards}}{sc4_gl_wild}.  Thus
+the code below would report the name of each \NDFref{\textsf{NDF}} and
 its standard deviation. The NDFs are called `Z' followed by a single
 character, ccd1, ccd2, ccd3, and spot.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      foreach file (Z?.sdf ccd[1-3].sdf spot.sdf)
         echo "NDF:" $file:r"; sigma: "`stats $file:r | grep "Standard deviation"`
      end
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
-{\bf echo} writes to \htmlref{{\sf standard output}}{sc4_gl_std_out},
+\textbf{echo} writes to \htmlref{\textsf{standard output}}{sc4_gl_std_out},
 so you can write text including values of \htmlref{shell
 variables}{sc4_se_variables} to the screen or redirect it to a file.
-Thus the output produced by \xref{{\bf stats}}{sun95}{STATS} is
-\htmlref{{\sf piped}}{sc4_gl_pipe} (the {\tt |} is the \htmlref{{\sf
-pipe}}{sc4_gl_pipe}) into the UNIX {\bf grep} utility to search for
-the string {\tt "Standard deviation"}.  The {\tt `~~`} invokes the
+Thus the output produced by \xref{\textbf{stats}}{sun95}{STATS} is
+\htmlref{\textsf{piped}}{sc4_gl_pipe} (the \texttt{|} is the \htmlref{{\sf
+pipe}}{sc4_gl_pipe}) into the UNIX \textbf{grep} utility to search for
+the string \texttt{"Standard deviation"}.  The \texttt{`~~`} invokes the
 command, and the resulting standard deviation is substituted.
 \medskip
 
 You might just want to provide an arbitrary list of NDFs as arguments to
-a generic script.  Suppose you had a script called {\tt splotem}, and
-you have made it executable with \mbox{\tt chmod +x splotem}.
+a generic script.  Suppose you had a script called \texttt{splotem}, and
+you have made it executable with \mbox{\texttt{chmod +x splotem}}.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      #!/bin/csh
      figaro                 # Only need be invoked once per process
      foreach file ($*)
@@ -2757,41 +2180,41 @@ you have made it executable with \mbox{\tt chmod +x splotem}.
            splot $file:r accept
         endif
      end
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
-Notice the {\tt -e} file-comparison operator.  It tests whether the
+Notice the \texttt{-e} file-comparison operator.  It tests whether the
 file exists or not.  (\latexelsehtml{Section~\ref{sc4_se_file_operators}
 has a}{Click \htmlref{here}{sc4_se_file_operators} for a} full list of
 the file operators.) To plot a series of spectra stored in NDFs, you
 just invoke it something like this.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % ./splotem myndf.sdf arc[a-z].sdf hd[0-9]*.sdf
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 See the glossary for a list of the available
-\htmlref{{\sf wildcards}}{sc4_gl_wild} such as the {\tt [a-z]} in the
+\htmlref{\textsf{wildcards}}{sc4_gl_wild} such as the \texttt{[a-z]} in the
 above example.
 
 \subsubsection{\xlabel{sc4_se_wildcard_nosdf}Exclude the .sdf for NDFs
 \label{sc4_se_wildcard_nosdf}}
 
-In the \latexelsehtml{{\tt splotem} example from the previous
+In the \latexelsehtml{\texttt{splotem} example from the previous
 section}{\htmlref{splotem example}{sc4_se_wildcard_lists}} the list of
-\NDFref{{\sf NDF}s} on the command line required the inclusion of
-the {\tt .sdf} file extension.  Having to supply the {\tt .sdf} for an
+\NDFref{\textsf{NDF}s} on the command line required the inclusion of
+the \texttt{.sdf} file extension.  Having to supply the \texttt{.sdf} for an
 NDF is abnormal.  For reasons of familiarity and ease of use, you
 probably want your relevant scripts to accept a list of NDF names and
 to append the file extension automatically before the list is passed to
-{\bf foreach}.  \latexelsehtml{So let's modify the
+\textbf{foreach}.  \latexelsehtml{So let's modify the
 previous example to do this.}{Here is an example.  It is a modified
-version of the {\tt splotem} script.}
+version of the \texttt{splotem} script.}
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      #!/bin/csh
      figaro                 # Only need be invoked once per process
 
@@ -2809,29 +2232,29 @@ version of the {\tt splotem} script.}
            splot $file:r accept
         endif
      end
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 This loops through all the arguments and appends the {\sf
-\HDSref}-file extension to them by using a work array {\tt ndfs}.  The
-{\bf set} defines a value for a \htmlref{{\sf shell
-variable}}{sc4_gl_she_var}; don't forget the spaces around the {\tt =}.
-{\tt ndfs[*]} means all the elements of variable {\tt ndfs}.  The loop
-adds elements to {\tt ndfs} which is initialised without a value.
-Note the necessary parentheses around the expression {\tt (\$ndfs[*]
+\HDSref}-file extension to them by using a work array \texttt{ndfs}.  The
+\textbf{set} defines a value for a \htmlref{\textsf{shell
+variable}}{sc4_gl_she_var}; don't forget the spaces around the \texttt{=}.
+\texttt{ndfs[*]} means all the elements of variable \texttt{ndfs}.  The loop
+adds elements to \texttt{ndfs} which is initialised without a value.
+Note the necessary parentheses around the expression \texttt{(\$ndfs[*]
 \$argv[i]".sdf")}.
 
 On the command line the wildcards have to be passed verbatim, because
-the shell will try to match with files than don't have the {\tt .sdf}
+the shell will try to match with files than don't have the \texttt{.sdf}
 file extension.  Thus you must protect the wildcards with quotes.
 It's a nuisance, but the advantages of wildcards more than compensate.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % ./splotem myndf 'arc[a-z]' 'hd[0-9]*'
      % ./noise myndf 'ccd[a-z]'
-\end{verbatim}
-\normalsize
-If you forget to write the {\tt '~'}, you'll receive a ~{\tt No match}
+\end{terminalv}
+\end{small}
+If you forget to write the \texttt{'~'}, you'll receive a ~\texttt{No match}
 error.
 
 \subsubsection{\xlabel{sc4_se_display_series}Examine a series of NDFs
@@ -2840,25 +2263,25 @@ error.
 A common need is to browse through several datasets, perhaps to locate
 a specific one, or to determine which are acceptable for further
 processing.  The following presents images of a series of \NDFref{{\sf
-NDF}s} using the \xref{{\bf display}}{sun95}{DISPLAY} task of
+NDF}s} using the \xref{\textbf{display}}{sun95}{DISPLAY} task of
 \KAPPAref\@.  The title of each plot tells you which NDF is currently
 displayed.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      foreach file (*.sdf)
         display $file:r axes style="'title==$file:r'" accept
         sleep 5
      end
-\end{verbatim}
-\normalsize
-{\bf sleep} pauses the \htmlref{{\sf process}}{sc4_gl_pro} for a given
+\end{terminalv}
+\end{small}
+\textbf{sleep} pauses the \htmlref{\textsf{process}}{sc4_gl_pro} for a given
 number of seconds, allowing you to view each image.  If this is too
 inflexible you could add a prompt so the script displays the image
 once you press the return key.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set nfiles = `ls *.sdf | wc -w`
      set i = 1
      foreach file (*.sdf)
@@ -2873,15 +2296,15 @@ once you press the return key.
            @ i++
         endif
      end
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 The first lines shows a quick way of counting the number of files. It
-uses {\bf ls} to expand the \htmlref{{\sf wildcards}}{sc4_gl_wild}, then
-the command {\bf wc} to count the number of words.  The back quotes
+uses \textbf{ls} to expand the \htmlref{\textsf{wildcards}}{sc4_gl_wild}, then
+the command \textbf{wc} to count the number of words.  The back quotes
 cause the instruction between them to be run and the values generated
-to be assigned to variable {\tt nfiles}.
+to be assigned to variable \texttt{nfiles}.
 
-You can substitute another visualisation command for {\bf display}
+You can substitute another visualisation command for \textbf{display}
 as appropriate.  You can also use the graphics database to plot more
 than one image on the screen or to hardcopy.  The script {\tt
 \$KAPPA\_DIR/multiplot.csh} does the latter.
@@ -2891,7 +2314,7 @@ than one image on the screen or to hardcopy.  The script {\tt
 
 \latex{Thus far the examples have not created a new file.} When you
 want to create an output file, you need a name for it.  This could be an
-explicit name, one derived from the \htmlref{{\sf process identification
+explicit name, one derived from the \htmlref{\textsf{process identification
 number}}{sc4_gl_pid}, one
 generated by some counter, or from the input filename.  Here we deal
 with all but the trivial first case.
@@ -2903,38 +2326,38 @@ To help identify datasets and to indicate the processing steps used to
 generate them, their names are often created by appending suffices to
 the original file name.  This is illustrated below.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      foreach file (*.sdf)
         set ndf = $file:r
         block in=$ndf out=$ndf"_sm" accept
      end
-\end{verbatim}
-\normalsize
-This uses \xref{{\bf block}}{sun95}{BLOCK} from \KAPPAref\normalsize\ to perform
-block smoothing on a series of \NDFref{{\sf NDF}s}, creating new NDFs,
+\end{terminalv}
+\end{small}
+This uses \xref{\textbf{block}}{sun95}{BLOCK} from \KAPPAref\normalsize\ to perform
+block smoothing on a series of \NDFref{\textsf{NDF}s}, creating new NDFs,
 each of which takes the name of the corresponding input NDF with a
-{\tt \_sm} suffix.  The {\bf accept} keyword accepts the suggested
+\texttt{\_sm} suffix.  The \textbf{accept} keyword accepts the suggested
 defaults for parameters that would otherwise be prompted.  We use the
-{\bf set} to assign the NDF name to variable {\tt ndf} for clarity.
+\textbf{set} to assign the NDF name to variable \texttt{ndf} for clarity.
 
 \subsubsection{\xlabel{sc4_se_append_counter}Appending a counter to the input
 filename\label{sc4_se_append_counter}}
 
 If a counter is preferred, this example
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set count = 1
      foreach file (*.sdf)
         set ndf = $file:r
         @ count = $count + 1
         block in=$ndf out=smooth$count accept
      end
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 would behave as the previous one except that the output NDFs would be
-called {\tt smooth1}, {\tt smooth2} and so on.
+called \texttt{smooth1}, \texttt{smooth2} and so on.
 
 \subsubsection{\xlabel{sc4_se_filename_substitution}Appending to the input
 filename\label{sc4_se_filename_substitution}}
@@ -2943,23 +2366,23 @@ Whilst appending a suffix after each data-processing stage is
 feasible, it can generate some long names, which are tedious to
 handle.  Instead you might want to replace part of the input name with
 a new string.  The following creates another \htmlref{shell
-variable}{sc4_se_variables}, {\tt ndfout} by replacing the string {\tt
-\_flat} from the input NDF name with {\tt \_sm}.  The script
-\htmlref{{\sf pipes}}{sc4_gl_pipe} the input name into the {\bf sed}
+variable}{sc4_se_variables}, \texttt{ndfout} by replacing the string {\tt
+\_flat} from the input NDF name with \texttt{\_sm}.  The script
+\htmlref{\textsf{pipes}}{sc4_gl_pipe} the input name into the \textbf{sed}
 editor which performs the substitution.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      foreach file (*_flat.sdf)
         set ndf = $file:r
         set ndfout = `echo $ndf | sed 's#_flat#_sm#'`
         block in=$ndf out=$ndfout accept
      end
-\end{verbatim}
-\normalsize
-The {\tt \#} is a delimiter for the strings being substituted; it
+\end{terminalv}
+\end{small}
+The \texttt{\#} is a delimiter for the strings being substituted; it
 should be a character that is not present in the strings being
-altered.  Notice the {\tt ` `} quotes in the assignment of {\tt
+altered.  Notice the \texttt{` `} quotes in the assignment of {\tt
 ndfout}.  These instruct the shell to process the expression
 immediately, rather than treating it as a literal string.  This is how
 you can put values output from UNIX commands and other applications into
@@ -2970,13 +2393,13 @@ shell variables.
 
 \begin{minipage}{62mm}
 There is a special class of C-shell operator that lets you test the
-properties of a file.  A {\sf file operator} is used in comparison
-expressions of the form \mbox{\tt if (file\_operator file) then}.
+properties of a file.  A \textsf{file operator} is used in comparison
+expressions of the form \mbox{\texttt{if (file\_operator file) then}}.
 A list of file operators is tabulated \latexelsehtml{to the right}{below}.
 \medskip
 
 The most common usage is to test for a file's existence.  The following
-only runs {\bf cleanup} if the first argument is an existing file.
+only runs \textbf{cleanup} if the first argument is an existing file.
 
 \vspace*{9mm}
 \end{minipage}
@@ -2988,34 +2411,34 @@ only runs {\bf cleanup} if the first argument is an existing file.
 \multicolumn{2}{c}{File operators} \\ \hline
 Operator & True if: \\ \hline
 \\
-{\tt -d} & file is a directory \\
-{\tt -e} & file exists \\
-{\tt -f} & file is ordinary \\
-{\tt -o} & you are the owner of the file \\
-{\tt -r} & file is readable by you \\
-{\tt -w} & file is writable by you \\
-{\tt -x} & file is executable by you \\
-{\tt -z} & file is empty \\
+\texttt{-d} & file is a directory \\
+\texttt{-e} & file exists \\
+\texttt{-f} & file is ordinary \\
+\texttt{-o} & you are the owner of the file \\
+\texttt{-r} & file is readable by you \\
+\texttt{-w} & file is writable by you \\
+\texttt{-x} & file is executable by you \\
+\texttt{-z} & file is empty \\
 \\ \hline
 \end{tabular}
 \end{minipage}
 \vspace*{-8mm}
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      # Check that the file given by the first
      # argument exists before attempting to
      # use it.
      if ( -e $1 ) then
         cleanup $1
      endif
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 Here are some other examples.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      # Remove any empty directories.
      if ( -d $file && -z $file ) then
         rmdir $file
@@ -3024,7 +2447,8 @@ Here are some other examples.
      else if ( $file:e == "csh" && -f $file ) then
         chmod +x $file
      endif
-\end{verbatim}
+\end{terminalv}
+\end{small}
 
 \newpage
 \subsection{\xlabel{sc4_se_create_textfiles}Creating text files
@@ -3033,50 +2457,50 @@ Here are some other examples.
 A frequent feature of scripts is redirecting the output from tasks to a
 text file.  For instance,
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      hdstrace $file:r > $file:r.lis
      fitshead $fits > $$.tmp
-\end{verbatim}
-\normalsize
-directs the output of the \xref{{\bf hdstrace}}{sun102}{} and {\bf
+\end{terminalv}
+\end{small}
+directs the output of the \xref{\textbf{hdstrace}}{sun102}{} and {\bf
 fitshead} to text files. The name of the first is generated from the
-name of the file whose contents are being listed, so for {\sf \HDSref}
-file {\tt cosmic.sdf} the trace is stored in {\tt cosmic.lis}.  In the
-second case, the \htmlref{{\sf process identification
+name of the file whose contents are being listed, so for \textsf{\HDSref}
+file \texttt{cosmic.sdf} the trace is stored in \texttt{cosmic.lis}.  In the
+second case, the \htmlref{\textsf{process identification
 number}}{sc4_gl_pro} is the name of the text file.  You can include
 this special variable to generate the names of temporary files.  (The
-{\tt :r} is described \latexelsehtml{in
+\texttt{:r} is described \latexelsehtml{in
 Section~\ref{sc4_se_filename_ext}.)}{\htmlref{here}{sc4_se_filename_ext}.)}
 
 If you intend to write more than once to a file you should first create
-the file with the {\bf touch} command, and then append output to the file.
+the file with the \textbf{touch} command, and then append output to the file.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      touch logfile.lis
      foreach file (*.sdf)
         echo "FITS headers for $file:r:"  >> logfile.lis
         fitslist $file:r >> logfile.lis
         echo " "
      end
-\end{verbatim}
-\normalsize
-Here we list \htmlref{{\sf FITS}}{sc4_gl_fits} headers from a series of \NDFref{{\sf NDF}s}
-to file {\tt logfile.lis}.  There is a heading including the dataset
+\end{terminalv}
+\end{small}
+Here we list \htmlref{\textsf{FITS}}{sc4_gl_fits} headers from a series of \NDFref{\textsf{NDF}s}
+to file \texttt{logfile.lis}.  There is a heading including the dataset
 name and blank line between each set of headers.  Notice this time
-we use {\tt >>} to append.  If you try to redirect with {\tt >}
+we use \texttt{>>} to append.  If you try to redirect with \texttt{>}
 to an existing file you'll receive an error message whenever you have
-the {\tt noclobber} variable set.  {\tt >!} redirects regardless
-of {\tt noclobber}.
+the \texttt{noclobber} variable set.  \texttt{>!} redirects regardless
+of \texttt{noclobber}.
 \bigskip\medskip
 
 There is an alternative---write the text file as part of the script.
 This is often a better way for longer files.  It utilises
-the {\bf cat} command to create the file.
+the \textbf{cat} command to create the file.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
    cat >! catpair_par.lis   <<EOF
    ${refndf}.txt
    ${compndf}.TXT
@@ -3089,20 +2513,20 @@ the {\bf cat} command to create the file.
    $distance
    `echo $time | awk '{print substr($0,1,5)}'`
    EOF
-\end{verbatim}
-\normalsize
-The above writes the text between the two {\tt EOF}s to file {\tt
-catpair\_par.lis}.  Note the second {\tt EOF} must begin in column 1.
-You can choose the delimiting words; common ones are {\tt EOF}, {\tt
-FOO}.  Remember the {\tt >!} demands that the file be written
+\end{terminalv}
+\end{small}
+The above writes the text between the two \texttt{EOF}s to file {\tt
+catpair\_par.lis}.  Note the second \texttt{EOF} must begin in column 1.
+You can choose the delimiting words; common ones are \texttt{EOF}, {\tt
+FOO}.  Remember the \texttt{>!} demands that the file be written
 regardless of whether the file already exists.
 
-A handy feature is that you can embed \htmlref{{\sf shell
-variables}}{sc4_gl_she_var}, such as {\tt refndf} and {\tt distance}
+A handy feature is that you can embed \htmlref{\textsf{shell
+variables}}{sc4_gl_she_var}, such as \texttt{refndf} and \texttt{distance}
 in the example.  You can also include commands between left quotes
-({\tt `~`}); the commands are evaluated before the file is written.
-However, should you want the special characters {\tt \$}, \verb+\+,
-and {\tt `~`} to be treated literally insert a \verb+\+ before the
+(\texttt{`~`}); the commands are evaluated before the file is written.
+However, should you want the special characters \texttt{\$}, \verb+\+,
+and \texttt{`~`} to be treated literally insert a \verb+\+ before the
 delimiting word or a \verb+\+ before each special character.
 
 \subsubsection{\xlabel{sc4_se_write_script}Writing a script within a
@@ -3115,8 +2539,8 @@ You can also write files within this second script, provided you choose
 different words to delimit the file contents.  Here's an example which
 combines both of these techniques.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
    cat >! /tmp/${user}_batch_${runno}.csh    <<EOF
    #!/bin/csh
 
@@ -3136,15 +2560,15 @@ combines both of these techniques.
    exit
    EOF
    chmod +x  /tmp/${user}_batch_${runno}.csh
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 This excerpt writes a script in the temporary directory.  The
-temporary script's filename includes our username ({\tt \$user}) and
-some run number stored in variable {\tt runno}.  The temporary script
+temporary script's filename includes our username (\texttt{\$user}) and
+some run number stored in variable \texttt{runno}.  The temporary script
 begins with the standard comment indicating that it's a C-shell
 script.  The script's first action is to write a three-line data file.
-Note the different delimiter, {\tt EOD}.  This data file is created
+Note the different delimiter, \texttt{EOD}.  This data file is created
 only when the temporary script is run.  As we want the time and date
 information at run time to be written to the data file, the command
 substitution backquotes are both escaped with a \verb+\+.  In
@@ -3156,24 +2580,24 @@ forget to give it execute permission.
 \subsection{\xlabel{sc4_se_read_lines}Reading lines from a text file\label{sc4_se_read_lines}}
 
 There is no simple file reading facility in the C-shell.  So we call
-upon {\bf awk} again.
+upon \textbf{awk} again.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set file = `awk '{print $0}' sources.lis`
-\end{verbatim}
-\normalsize
-Variable {\tt file} is a space-delineated array of the lines in file
-{\tt sources.lis}.  More useful is to extract a line at a time.
+\end{terminalv}
+\end{small}
+Variable \texttt{file} is a space-delineated array of the lines in file
+\texttt{sources.lis}.  More useful is to extract a line at a time.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set text = `awk -v ln=$j '{if (NR==ln) print $0}' sources.lis`
-\end{verbatim}
-\normalsize
-where \htmlref{{\sf shell variable}}{sc4_gl_she} {\tt j} is a positive
+\end{terminalv}
+\end{small}
+where \htmlref{\textsf{shell variable}}{sc4_gl_she} \texttt{j} is a positive
 integer and no more than the number of lines in the file, returns the $j$th
-line in variable {\tt text}.
+line in variable \texttt{text}.
 
 \newpage
 \subsection{\xlabel{sc4_se_read_table}Reading tabular
@@ -3183,97 +2607,97 @@ When reading data into your script from a text file you will often
 require to extract columns of data, determine the number of lines
 extracted, and sometimes the number columns and selecting columns by
 heading name.  The shell does not offer file reading commands, so we
-fall back heavily on our friend {\bf awk}.
+fall back heavily on our friend \textbf{awk}.
 
 \subsubsection{\xlabel{sc4_se_find_nf}Finding the number of fields\label{sc4_se_find_nf}}
 
 The simple recipe is
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set ncol = `awk '{if (FNR==1) print NF}' fornax.dat`
-\end{verbatim}
-\normalsize
-where {\tt FNR} is the number of the records read.  {\tt NF} is the number of
+\end{terminalv}
+\end{small}
+where \texttt{FNR} is the number of the records read.  \texttt{NF} is the number of
 space-separated fields in that record.  If another character delimits
-the columns, this can be set by assigning the {\tt FS} variable without
-reading any of the records in the file (because of the {\tt BEGIN}
-pattern or through the {\tt -F} option).
-\small
-\begin{verbatim}
+the columns, this can be set by assigning the \texttt{FS} variable without
+reading any of the records in the file (because of the \texttt{BEGIN}
+pattern or through the \texttt{-F} option).
+\begin{small}
+\begin{terminalv}
     set nlines = `wc fornax.dat`
 
     set ncol = `awk 'BEGIN { FS = ":" }{if (FNR==1) print NF}' fornax.dat`
     set ncol = `awk -F: '{if (FNR==1) print NF}' fornax.dat`
-\end{verbatim}
-\normalsize
-{\tt FNR}, {\tt NF}, and {\tt FS} are called {\em built-in variables}.
+\end{terminalv}
+\end{small}
+\texttt{FNR}, \texttt{NF}, and \texttt{FS} are called \emph{built-in variables}.
 
 There may be a header line or some schema before the actual data, you
 can obtain the field count from the last line.
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set ncol = `awk -v nl=$nlines[1] '{if (FNR==nl) print NF}' fornax.dat`
-\end{verbatim}
-\normalsize
-First we obtain the number of lines in the file using {\bf wc} stored
-in {\tt \$lines[1]}.  This shell variable is passed into {\bf awk}, as
-variable {\tt nl}, through the {\tt -v} option.
+\end{terminalv}
+\end{small}
+First we obtain the number of lines in the file using \textbf{wc} stored
+in \texttt{\$lines[1]}.  This shell variable is passed into \textbf{awk}, as
+variable \texttt{nl}, through the \texttt{-v} option.
 
 If you know the comment line begins with a hash (or can be recognised
-by some other \htmlref{{\sf regular expression}}{sc4_gl_reg_exp}) you
+by some other \htmlref{\textsf{regular expression}}{sc4_gl_reg_exp}) you
 can do something like this.
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set ncol = `awk -v i=0 '{if ($0 !~ /^#/) i++; if (i==1) print NF}' fornax.dat`
-\end{verbatim}
-\normalsize
-Here we initialise {\bf awk} variable {\tt i}.  Then we test the record {\tt
-\$0} does not match a line starting with {\tt \#} and increment {\tt i},
+\end{terminalv}
+\end{small}
+Here we initialise \textbf{awk} variable \texttt{i}.  Then we test the record {\tt
+\$0} does not match a line starting with \texttt{\#} and increment \texttt{i},
 and only print the number of fields for the first such occurrence.
 
 
 \subsubsection{Extracting columns}
 
 For a simple case without any comments.
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set col1 = `awk '{print $1}' fornax.dat`
-\end{verbatim}
-\normalsize
-Variable {\tt col1} is an array of the values of the first column.  If
+\end{terminalv}
+\end{small}
+Variable \texttt{col1} is an array of the values of the first column.  If
 you want an arbitrary column
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set col$j = `awk -v cn=$j '{print $cn}' fornax.dat`
-\end{verbatim}
-\normalsize
-where \htmlref{{\sf shell variable}}{sc4_gl_she} {\tt j} is a positive
+\end{terminalv}
+\end{small}
+where \htmlref{\textsf{shell variable}}{sc4_gl_she} \texttt{j} is a positive
 integer and no more than the \htmlref{number of
 columns}{sc4_se_find_nf}, returns the $j$th column in the shell array
-{\tt col}$j$.
+\texttt{col}$j$.
 
-If there are comment lines to ignore, say beginning with {\tt \#} or
-{\tt *}, the following excludes those from the array of values.
-\small
-\begin{verbatim}
+If there are comment lines to ignore, say beginning with \texttt{\#} or
+\texttt{*}, the following excludes those from the array of values.
+\begin{small}
+\begin{terminalv}
      set col$j = `awk -v cn=$j '$0!~/^[#*]/ {print $cn}' fornax.dat`
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 or you may want to exclude lines with alphabetic characters.
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set col2 = `awk '$0!~/[A-DF-Za-df-z]/ {print $2}' fornax.dat`
-\end{verbatim}
-\normalsize
-Notice that {\tt E} and {\tt e} are omitted to allow for exponents.
+\end{terminalv}
+\end{small}
+Notice that \texttt{E} and \texttt{e} are omitted to allow for exponents.
 
 \subsubsection{Selecting a range}
 
-{\bf awk} lets you select the lines to extract through boolean
+\textbf{awk} lets you select the lines to extract through boolean
 expressions, that includes involving the column data themselves, or
-line numbers through {\tt NR}.
-\small
-\begin{verbatim}
+line numbers through \texttt{NR}.
+\begin{small}
+\begin{terminalv}
      set col$j = `awk -v cn=$j '$2 > 0.579 {print $cn}' fornax.dat`
      set col$j = `awk -v cn=$j '$2>0.579 && $2<1.0 {print $cn}' fornax.dat`
      set col4 = `awk  'sqrt($1*$1+$2*$2) > 1 {print $4};' fornax.dat`
@@ -3281,19 +2705,19 @@ line numbers through {\tt NR}.
      set col2 = `awk '$0!~/-999/ {print $2}' fornax.dat`
 
      set nrow = $#col2.
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 The first example only includes those values in column 2 that exceed
 0.579.  The second further restricts the values to be no greater than 1.0.
 The third case involves the square-root of the sum of the squares of
 the first two columns.  The fourth omits the sixth to tenth rows.
-The fifth example tests for the absence of a null value, {\tt -999}.
+The fifth example tests for the absence of a null value, \texttt{-999}.
 
-You can find out how many values were extracted through {\tt \$\#}{\em
+You can find out how many values were extracted through \texttt{\$\#}{\em
 var}, such as in the final line above.
 
 You have the standard \htmlref{relational and boolean operators}{sc4_tab_comp_oper}
-available, as well as {\tt $\sim$} and {\tt !$\sim$} for match and does not match
+available, as well as \texttt{$\sim$} and \texttt{!$\sim$} for match and does not match
 respectively.  These last two con involve \htmlref{regular expressions}{sc4_gl_reg_exp}
 giving powerful selection tools.
 
@@ -3301,33 +2725,33 @@ giving powerful selection tools.
 
 Suppose your text file has a heading line listing the names of the
 columns.
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
     set name = Vmag
     set cn = `awk -v col=$name '{if (NR==1) {for(i=1;i<=NF;\
               i++) {if ($i==col) {print i; break}}}}' fornax.dat`
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 That looks complicated, so let's go through it step by step.  We
-supply the required column name {\tt name} into the {\bf awk} variable
-{\tt col} through to {\tt -v} command-line option.  For the first
-record {\tt NR==1}, we loop through all the fields ({\tt NF} starting
-at the first, and if the current column name ({\tt \$i}) equals the
+supply the required column name \texttt{name} into the \textbf{awk} variable
+\texttt{col} through to \texttt{-v} command-line option.  For the first
+record \texttt{NR==1}, we loop through all the fields (\texttt{NF} starting
+at the first, and if the current column name (\texttt{\$i}) equals the
 requested name, the column number is printed and we break from the
 loop.  If the field is not present, the result is null.  The extra
-braces associate commands in the same {\bf for} or {\bf if} block. Note that
-unlike C-shell, in {\bf awk} the line break can only appear
+braces associate commands in the same \textbf{for} or \textbf{if} block. Note that
+unlike C-shell, in \textbf{awk} the line break can only appear
 immediately after a semicolon or brace.
 
-The above can be improved upon using the {\tt toupper} function to avoid
+The above can be improved upon using the \texttt{toupper} function to avoid
 case sensitivity.
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
     set name = Vmag
     set cn = `awk -v col=$name '{if (NR==1) {for(i=1;i<=NF;\
               i++) {if (toupper($i)==toupper(col)) {print i; break}}}}' fornax.dat`
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 Or you could attempt to \htmlref{match}{sc4_gl_match} a
 \htmlref{regular expression}{sc4_gl_reg_exp}.
 
@@ -3337,8 +2761,8 @@ Or you could attempt to \htmlref{match}{sc4_gl_match} a
 You can also read from a text file created dynamically from within
 your script.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      ./doubleword < mynovel.txt
 
      myprog <<BAR
@@ -3354,37 +2778,37 @@ your script.
 
                    Save $$$ if you buy now.
      foo
-\end{verbatim}
-\normalsize
-Command {\tt ./doubleword} reads its \htmlref{{\sf standard
-input}}{sc4_gl_std_out} from the file {\tt mynovel.txt}.  The {\tt
-<<}{\em word\/} obtains the input data from the script file itself
-until there is line beginning {\em word}.  You may also include
-variables and commands to execute as the {\tt \$},
-\verb+\+, and {\tt `~`} retain their special meaning.  If you want these
+\end{terminalv}
+\end{small}
+Command \texttt{./doubleword} reads its \htmlref{\textsf{standard
+input}}{sc4_gl_std_out} from the file \texttt{mynovel.txt}.  The {\tt
+<<}\emph{word\/} obtains the input data from the script file itself
+until there is line beginning \emph{word}.  You may also include
+variables and commands to execute as the \texttt{\$},
+\verb+\+, and \texttt{`~`} retain their special meaning.  If you want these
 characters to be treated literally, say to prevent substitution, insert
-a \verb+\+ before the delimiting {\em word}.  The command {\tt myprog}
-reads from the script, substituting the value of variable {\tt nstars}
+a \verb+\+ before the delimiting \emph{word}.  The command \texttt{myprog}
+reads from the script, substituting the value of variable \texttt{nstars}
 in the second line, and the number of lines in file {\tt
 brightnesses.txt} in the third line.
 
-The technical term for such files are {\em here documents}.
+The technical term for such files are \emph{here documents}.
 
 \subsection{\xlabel{sc4_se_junk_output}Discarding text output
 \label{sc4_se_junk_output}}
 
 The output from some routines is often unwanted in scripts.  In these
-cases redirect the \htmlref{{\sf standard output}}{sc4_gl_std_out} to a
+cases redirect the \htmlref{\textsf{standard output}}{sc4_gl_std_out} to a
 null file.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      correlate in1=frame1 in2=frame2 out=framec > /dev/null
-\end{verbatim}
-\normalsize
-Here the text output from the task {\bf correlate} is disposed of to
-the {\tt /dev/null} file.  Messages from Starlink tasks and usually
-Fortran channel 6 write to {\sf standard output}.
+\end{terminalv}
+\end{small}
+Here the text output from the task \textbf{correlate} is disposed of to
+the \texttt{/dev/null} file.  Messages from Starlink tasks and usually
+Fortran channel 6 write to \textsf{standard output}.
 
 \newpage
 \subsection{\xlabel{sc4_se_dataset_attributes}Obtaining dataset
@@ -3394,9 +2818,9 @@ When writing a data-processing pipeline connecting several applications
 you will often need to know some attribute of the data file, such as
 its number of dimensions, its shape, whether or not it may contain bad
 pixels, a variance array or a specified extension.  The way to
-access these data is with \xref{{\bf ndftrace}}{sun95}{NDFTRACE} from
-\KAPPAref\ and \xref{{\bf parget}}{sun95}{PARGET} commands.
-{\bf ndftrace} inquires the data, and {\bf parget} communicates the
+access these data is with \xref{\textbf{ndftrace}}{sun95}{NDFTRACE} from
+\KAPPAref\ and \xref{\textbf{parget}}{sun95}{PARGET} commands.
+\textbf{ndftrace} inquires the data, and \textbf{parget} communicates the
 information to a \htmlref{shell variable}{sc4_se_variables}.
 
 \subsubsection{\xlabel{sc4_se_dataset_shape}Obtaining dataset shape
@@ -3406,8 +2830,8 @@ Suppose that you want to process all the two-dimensional \NDFref{{\sf
 NDF}s} in a directory.  You would write something like this in your
 script.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      foreach file (*.sdf)
         ndftrace $file:r > /dev/null
         set nodims = `parget ndim ndftrace`
@@ -3415,55 +2839,55 @@ script.
            <perform the processing of the two-dimensional datasets>
         endif
      end
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
-Note although called \xref{{\bf ndftrace}}{sun95}{NDFTRACE}, this
+Note although called \xref{\textbf{ndftrace}}{sun95}{NDFTRACE}, this
 function can determine the properties of foreign data formats through
 the automatic conversion system (\xref{SUN/55}{sun55}{},
 \xref{SSN/20}{ssn20}{}).  Of course, other formats do not have all the
 facilities of an NDF.
 
-If you want the dimensions of a \htmlref{{\sf FITS}}{sc4_gl_fits} file
+If you want the dimensions of a \htmlref{\textsf{FITS}}{sc4_gl_fits} file
 supplied as the first argument you need this ingredient.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      ndftrace $1 > /dev/null
      set dims = `parget dims ndftrace`
-\end{verbatim}
-\normalsize
-Then {\tt dims[$i$]} will contain the size of the $i^{\rm th}$
+\end{terminalv}
+\end{small}
+Then \texttt{dims[$i$]} will contain the size of the $i^{\rm th}$
 dimension.  Similarly
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      ndftrace $1 > /dev/null
      set lbnd = `parget lbound ndftrace`
      set ubnd = `parget ubound`
-\end{verbatim}
-\normalsize
-will assign the pixel bounds to arrays {\tt lbnd} and {\tt ubnd}.
+\end{terminalv}
+\end{small}
+will assign the pixel bounds to arrays \texttt{lbnd} and \texttt{ubnd}.
 
 \subsubsection{\xlabel{sc4_se_dataset_atlist}Available attributes
 \label{sc4_se_dataset_atlist}}
 
 Below is a complete list of the results parameters from
-\xref{{\bf ndftrace}}{sun95}{NDFTRACE}.  If the parameter is an array,
+\xref{\textbf{ndftrace}}{sun95}{NDFTRACE}.  If the parameter is an array,
 it will have one element per dimension of the data array (given by
 parameter NDIM); except for EXTNAM and EXTTYPE where there is one
 element per extension (given by parameter NEXTN). Several of the axis
-parameters are only set if the {\bf ndftrace} input keyword {\tt
+parameters are only set if the \textbf{ndftrace} input keyword {\tt
 fullaxis} is set (not the default).  To obtain, say, the data type of
 the axis centres of the current dataset, the code would look like
 this.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      ndftrace fullaxis accept > dev/null
      set axtype = `parget atype ndftrace`
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 \newpage
 \begin{center}
@@ -3472,29 +2896,29 @@ Name & Array? & Meaning \\ \hline
 \\
 AEND & Yes & The axis upper extents of the NDF.  For non-monotonic axes,
              zero is used.  See parameter AMONO.  This is not assigned if
-             AXIS is {\tt FALSE}. \\
+             AXIS is \texttt{FALSE}. \\
 AFORM & Yes & The storage forms of the axis centres of the NDF.  This is
-              only written when parameter FULLAXIS is {\tt TRUE} and AXIS
-              is {\tt TRUE}. \\
+              only written when parameter FULLAXIS is \texttt{TRUE} and AXIS
+              is \texttt{TRUE}. \\
 ALABEL & Yes & The axis labels of the NDF.  This is not assigned if AXIS is
-               {\tt FALSE}. \\
-AMONO & Yes &  These are {\tt TRUE} when the axis centres are monotonic, and {\tt FALSE}
-               otherwise.  This is not assigned if AXIS is {\tt FALSE}. \\
+               \texttt{FALSE}. \\
+AMONO & Yes &  These are \texttt{TRUE} when the axis centres are monotonic, and \texttt{FALSE}
+               otherwise.  This is not assigned if AXIS is \texttt{FALSE}. \\
 ANORM & Yes &  The axis normalisation flags of the NDF.  This is only written
-               when FULLAXIS is {\tt TRUE} and AXIS is {\tt TRUE}. \\
+               when FULLAXIS is \texttt{TRUE} and AXIS is \texttt{TRUE}. \\
 ASTART & Yes &  The axis lower extents of the NDF.  For non-monotonic axes,
                 zero is used.  See parameter AMONO.  This is not assigned if
-                AXIS is {\tt FALSE}. \\
+                AXIS is \texttt{FALSE}. \\
 ATYPE & Yes & The data types of the axis centres of the NDF.  This is only
-              written when FULLAXIS is {\tt TRUE} and AXIS is {\tt TRUE}. \\
+              written when FULLAXIS is \texttt{TRUE} and AXIS is \texttt{TRUE}. \\
 AUNITS & Yes & The axis units of the NDF.  This is not assigned if AXIS is
-               {\tt FALSE}. \\
+               \texttt{FALSE}. \\
 AVARIANCE & Yes & Whether or not there are axis variance arrays present in the
-                  NDF.  This is only written when FULLAXIS is {\tt TRUE} and AXIS is
-                  {\tt TRUE}.\\
+                  NDF.  This is only written when FULLAXIS is \texttt{TRUE} and AXIS is
+                  \texttt{TRUE}.\\
 AXIS & & Whether or not the NDF has an axis system. \\
-BAD & & If {\tt TRUE}, the NDF's data array may contain bad values. \\
-BADBITS & & The BADBITS mask.  This is only valid when QUALITY is {\tt TRUE}. \\
+BAD & & If \texttt{TRUE}, the NDF's data array may contain bad values. \\
+BADBITS & & The BADBITS mask.  This is only valid when QUALITY is \texttt{TRUE}. \\
 CURRENT & &  The integer Frame index of the current co-ordinate Frame
              in the WCS component. \\
 DIMS & Yes & The dimensions of the NDF. \\
@@ -3539,7 +2963,7 @@ LBOUND & Yes & The lower bounds of the NDF. \\
 NDIM & & The number of dimensions of the NDF. \\
 NEXTN & & The number of extensions in the NDF. \\
 NFRAME & & The number of WCS domains described by FDIM, FDOMAIN and
-            FTITLE. Set to zero if WCS is {\tt FALSE}. \\
+            FTITLE. Set to zero if WCS is \texttt{FALSE}. \\
 QUALITY & & Whether or not the NDF contains a QUALITY array. \\
 TITLE & & The title of the NDF. \\
 TYPE & & The data type of the NDF's data array. \\
@@ -3549,8 +2973,8 @@ VARIANCE & & Whether or not the NDF contains a VARIANCE array. \\
 WCS & & Whether or not the NDF has any WCS co-ordinate Frames, over and
         above the default GRID, PIXEL and AXIS Frames. \\
 WIDTH & Yes & Whether or not there are axis width arrays present in
-              the NDF.  This is only written when FULLAXIS is {\tt TRUE} and AXIS is
-              {\tt TRUE}. \\
+              the NDF.  This is only written when FULLAXIS is \texttt{TRUE} and AXIS is
+              \texttt{TRUE}. \\
 \\ \hline
 \end{tabular}
 \end{center}
@@ -3562,10 +2986,10 @@ variance/quality/axis/history information?\label{sc4_se_dataset_variance}}
 Suppose you have an application which demands that variance information
 be present, say for optimal extraction of spectra, you could test for
 the existence of a variance array in your \htmlref{{\sf
-FITS}}{sc4_gl_fits} file called {\tt dataset.fit} like this.
+FITS}}{sc4_gl_fits} file called \texttt{dataset.fit} like this.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      #  Enable automatic conversion
      convert         # Needs to be invoked only once per process
 
@@ -3577,25 +3001,25 @@ FITS}}{sc4_gl_fits} file called {\tt dataset.fit} like this.
      else
         <process the dataset>
      endif
-\end{verbatim}
-\normalsize
-The logical results parameters have values {\tt TRUE} or {\tt FALSE}\@.
+\end{terminalv}
+\end{small}
+The logical results parameters have values \texttt{TRUE} or \texttt{FALSE}\@.
 You merely substitute another component such as quality or axis in the
-\xref{{\bf parget}}{sun95}{PARGET} command to test for the presence of
+\xref{\textbf{parget}}{sun95}{PARGET} command to test for the presence of
 these components.
 
 \subsubsection{\xlabel{sc4_se_dataset_badpix}Testing for bad pixels
 \label{sc4_se_dataset_badpix}}
 
 Imagine you have an application which could not process bad pixels.
-You could test whether a dataset {\em might\/} contain bad pixels, and
+You could test whether a dataset \emph{might\/} contain bad pixels, and
 run some pre-processing task to remove them first.  This attribute
-could be inquired via \xref{{\bf ndftrace}}{sun95}{NDFTRACE}.  If you
+could be inquired via \xref{\textbf{ndftrace}}{sun95}{NDFTRACE}.  If you
 need to know whether or not any were actually present, you should run
-\xref{{\bf setbad}}{sun95}{SETBAD} from \KAPPAref\ first.
+\xref{\textbf{setbad}}{sun95}{SETBAD} from \KAPPAref\ first.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      setbad $file
      ndftrace $file > /dev/null
      set badpix = `parget bad ndftrace`
@@ -3609,13 +3033,13 @@ need to know whether or not any were actually present, you should run
      tidy:
      <tidy any temporary files, windows etc.>
      exit
-\end{verbatim}
-\normalsize
-Here we also introduce the {\bf goto} command---yes there really is
-one.  It is usually reserved for exiting ({\tt goto exit}), or, as here,
+\end{terminalv}
+\end{small}
+Here we also introduce the \textbf{goto} command---yes there really is
+one.  It is usually reserved for exiting (\texttt{goto exit}), or, as here,
 moving to a named label.  This lets us skip over some code, and move
 directly to the closedown tidying operations.  Notice the colon
-terminating the label itself, and that it is absent from the {\bf goto}
+terminating the label itself, and that it is absent from the \textbf{goto}
 command.
 
 \newpage
@@ -3626,10 +3050,10 @@ One recipe for testing for a spectrum is to look at the axis labels.
 (whereas a modern approach might use WCS information). Here is a
 longer example showing how this might be implemented.
 Suppose the name of the dataset being probed is stored in variable
-{\tt ndf}.
+\texttt{ndf}.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      # Get the full attributes.
      ndftrace $ndf fullaxis accept > /dev/null
 
@@ -3678,52 +3102,52 @@ Suppose the name of the dataset being probed is stored in variable
            sfit spectrum=$file order=2 output=$file"_fit accept
         end if
      endif
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 \newpage
 \subsection{\xlabel{sc4_se_FITS_headers}FITS Headers\label{sc4_se_FITS_headers}}
 
-Associated with \htmlref{{\sf FITS}}{sc4_gl_fits} files and many
-\NDFref{{\sf NDF}s} is header information stored in 80-character
+Associated with \htmlref{\textsf{FITS}}{sc4_gl_fits} files and many
+\NDFref{\textsf{NDF}s} is header information stored in 80-character
 `cards'.  It is possible to use these ancillary data in your script.
 Each non-comment header has a keyword, by which you can reference it;
 a value; and usually a comment.  \KAPPAref\ from V0.10 has a few
-commands for processing {\sf FITS} header information described in the
+commands for processing \textsf{FITS} header information described in the
 following sections.
 
 \subsubsection{Testing for the existence of a FITS header value}
 
 Suppose that you wanted to determine whether an NDF called image123
-contains an AIRMASS keyword in its \htmlref{{\sf FITS}}{sc4_gl_fits}
+contains an AIRMASS keyword in its \htmlref{\textsf{FITS}}{sc4_gl_fits}
 headers (stored in the FITS extension).
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set airpres = `fitsexist image123 airmass`
      if ( $airpres == "TRUE" ) then
         <access AIRMASS FITS header>
      endif
-\end{verbatim}
-\normalsize
-Variable {\tt airpres} would be assigned {\tt "TRUE"} when the AIRMASS
-card was present, and {\tt "FALSE"} otherwise.  Remember that the
-{\tt `~`} quotes cause the enclosed command to be executed.
+\end{terminalv}
+\end{small}
+Variable \texttt{airpres} would be assigned \texttt{"TRUE"} when the AIRMASS
+card was present, and \texttt{"FALSE"} otherwise.  Remember that the
+\texttt{`~`} quotes cause the enclosed command to be executed.
 
 \subsubsection{Reading a FITS header value}
 
 Once we know the named header exists, we can then assign its value
 to a \htmlref{shell variable}{sc4_se_variables}.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set airpres = `fitsexist image123 airmass`
      if ( $airpres == "TRUE" ) then
         set airmass = `fitsval image123 airmass`
         echo "The airmass for image123 is $airmass."
      endif
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 \subsubsection{Writing or modifying a FITS header value}
 
@@ -3732,70 +3156,70 @@ just before the END card), or revise the value and/or comment of existing
 headers.  As we know the header AIRMASS exists in image123, the
 following revises the value and comment of the AIRMASS header.
 It also writes a new header called FILTER immediately preceding the
-AIRMASS card assigning it value {\tt B} and comment {\tt Waveband}.
+AIRMASS card assigning it value \texttt{B} and comment \texttt{Waveband}.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      fitswrite image123 airmass value=1.062 comment=\"Corrected airmass\"
      fitswrite image123 filter position=airmass value=B comment=Waveband
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
-As we want the \htmlref{{\sf metacharacters}}{sc4_gl_met} {\tt "} to be
+As we want the \htmlref{\textsf{metacharacters}}{sc4_gl_met} \texttt{"} to be
 treated literally, each is preceded by a backslash.
 
 \subsection{\xlabel{sc4_se_other_objects}Accessing other objects
 \label{sc4_se_other_objects}}
 
 You can manipulate data objects in \HDSref\ files, such as components
-of an \NDFref{{\sf NDF}'s} extension.  There are several Starlink
+of an \NDFref{\textsf{NDF}'s} extension.  There are several Starlink
 applications for this purpose including the \Figaroref\ commands
-\xref{{\bf copobj}}{sun86}{COPOBJ},
-\xref{{\bf creobj}}{sun86}{CREOBJ}, \xref{{\bf delobj}}{sun86}{DELOBJ},
-\xref{{\bf renobj}}{sun86}{RENOBJ}, \xref{{\bf setobj}}{sun86}{SETOBJ}; and
-the \KAPPAref\ commands \xref{{\bf setext}}{sun95}{SETEXT}, and
-\xref{{\bf erase}}{sun95}{ERASE}.
+\xref{\textbf{copobj}}{sun86}{COPOBJ},
+\xref{\textbf{creobj}}{sun86}{CREOBJ}, \xref{\textbf{delobj}}{sun86}{DELOBJ},
+\xref{\textbf{renobj}}{sun86}{RENOBJ}, \xref{\textbf{setobj}}{sun86}{SETOBJ}; and
+the \KAPPAref\ commands \xref{\textbf{setext}}{sun95}{SETEXT}, and
+\xref{\textbf{erase}}{sun95}{ERASE}.
 
 For example, if you wanted to obtain the value of the EPOCH object
 from an extension called IRAS\_ASTROMETRY in an NDF called lmc,
 you could do it like this.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set year = `setext lmc xname=iras_astrometry option=get \
                  cname=epoch noloop`
-\end{verbatim}
-\normalsize
-The {\tt noloop} prevents prompting for another extension-editing
+\end{terminalv}
+\end{small}
+The \texttt{noloop} prevents prompting for another extension-editing
 operation.  The single backslash is the line continuation.
 
 \subsection{\xlabel{sc4_se_NDF_section}Defining NDF sections with
 variables\label{sc4_se_NDF_section}}
 
 If you want to define a subset or superset of a dataset, most Starlink
-applications recognise \xref{{\sf NDF sections}}{sun95}{se_ndfsect}
+applications recognise \xref{\textsf{NDF sections}}{sun95}{se_ndfsect}
 \latex{(see SUN/95's chapter called ``NDF Sections'')}
 appended after the name.
 
 A na\"{\i}ve approach might expect the following to work
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set lbnd = 50
      set ubnd = 120
      linplot $KAPPA_DIR/spectrum"($lbnd:$ubnd)"
      display $KAPPA_DIR/comwest"($lbnd:$ubnd",$lbnd~$ubnd)"
-\end{verbatim}
-\normalsize
-however, they generate the ~~{\tt Bad : modifier in \$ (\$).}~ error.
+\end{terminalv}
+\end{small}
+however, they generate the ~~\texttt{Bad : modifier in \$ (\$).}~ error.
 That's because it is stupidly looking for a \htmlref{filename
-modifier}{sc4_se_filename_ext} {\tt :\$}\latex{ (see
+modifier}{sc4_se_filename_ext} \texttt{:\$}\latex{ (see
 Section~\ref{sc4_se_filename_ext})}.
 
 Instead here are some recipes that work.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set lbnd = 50
      set ubnd = 120
      set lrange = "101:150"
@@ -3806,8 +3230,8 @@ Instead here are some recipes that work.
      histogram hale-bopp.fit'('$lbnd':'$ubnd','$lbnd':'$ubnd')'
      ndfcopy $file1.imh"("$lbnd":"$ubnd","$lrange")" $work"1"
      splot hd102456'('$ubnd~60')'
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 An easy-to-remember formula is to enclose the parentheses and colons
 in quotes.
 
@@ -3815,10 +3239,10 @@ in quotes.
 \section{\xlabel{sc4_se_loop_times}Loop a specified number of times
 \label{sc4_se_loop_times}}
 Suppose that you want to loop a specified number of times.  For this
-you need a {\bf while} statement, as in this example.
+you need a \textbf{while} statement, as in this example.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      set count = 1
      set tempin = myndf
      set box = 23
@@ -3829,54 +3253,54 @@ you need a {\bf while} statement, as in this example.
         set tempin = myndf_sm4
         @ count = $count + 1
      end
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 This performs four block smoothing operations, with a decreasing box
-size, on a \NDFref{{\sf NDF}} called myndf, the final result being
-stored in the NDF called myndf\_sm4.  The {\bf while} statement tests
+size, on a \NDFref{\textsf{NDF}} called myndf, the final result being
+stored in the NDF called myndf\_sm4.  The \textbf{while} statement tests
 a conditional statement and loops if it is true.  So here it loops
-whenever the value of {\tt count} is less than 5.
+whenever the value of \texttt{count} is less than 5.
 \latexelsehtml{For a list of the available operators
-see Section~\ref{sc4_se_integer} or the {\bf man}
+see Section~\ref{sc4_se_integer} or the \textbf{man}
 pages.}{Click \htmlref{here}{sc4_se_integer} to see examples of other
 operators.}
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % man csh
      /Expressions
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 The box size for the smoothing is evaluated in an expression
-\mbox{\tt @ box = \$box - \$count * 2}.  Note the space between the
-{\tt @} and the variable, and the spaces around the {\tt =}.  Thus
+\mbox{\texttt{@ box = \$box - \$count * 2}}.  Note the space between the
+\texttt{@} and the variable, and the spaces around the \texttt{=}.  Thus
 the box sizes will be 21, 17, 11, 3.  Further details are
 \latexelsehtml{in
 Section~\ref{sc4_se_integer}.}{\htmlref{here}{sc4_se_integer}.}
-You should also give the variable a value with {\bf set} before
+You should also give the variable a value with \textbf{set} before
 assigning it an expression.  Another expression increments the counter
-{\tt count}.  The NDF called tempndf is overwritten for each smooth
-using the standard UNIX command {\bf mv}.
+\texttt{count}.  The NDF called tempndf is overwritten for each smooth
+using the standard UNIX command \textbf{mv}.
 
 \newpage
 \section{\xlabel{sc4_se_unix_options}UNIX-style options
 \label{sc4_se_unix_options}}
 
-If you want other arguments, or a UNIX-like set of {\em options\/}
-for specifying arguments with defaults, you'll need to use {\bf switch}
-and {\bf shift} statements, rather than the simple {\bf while} loop.
+If you want other arguments, or a UNIX-like set of \emph{options\/}
+for specifying arguments with defaults, you'll need to use \textbf{switch}
+and \textbf{shift} statements, rather than the simple \textbf{while} loop.
 
 Suppose that we want to obtain photometric details of a galaxy, known
-to be the brightest object in a series of \NDFref{{\sf NDF}s}.  Before
+to be the brightest object in a series of \NDFref{\textsf{NDF}s}.  Before
 that's possible we must first measure the background in each image.
 To reduce contamination that could bias the determination of the sky
 we mask the region containing the galaxy.  Here we obtain the values
 for the shape, orientation, and the names of the NDFs, and assign them
 to \htmlref{shell variables}{sc4_se_variables}.  There are also default values.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      #  Initialise some shell variables, including the default shape
      #  and orientation.
      set major = 82
@@ -3920,54 +3344,54 @@ to \htmlref{shell variables}{sc4_se_variables}.  There are also default values.
      # Loop through the remaining arguments, assuming that these are NDFs.
      foreach file ($ndfs[*])
         :      :      :
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 Some defaults are defined so that if the argument is not present,
 there is a suitable value.  So for instance, the ellipse orientation
-is 152\dgs\ unless there is a \mbox{{\tt -o} {\em
+is 152\dgs\ unless there is a \mbox{\texttt{-o} {\em
 orientation-value\/}} on the command line when invoking the script.
 
-The {\bf switch} looks for specific arguments.  If the first argument
-matches one of the allowed cases: {\tt -a}, {\tt -b}, {\tt -o}, or any
-string ({\tt{*}}) in that order, the script jumps to that case, and
-follows the commands there until it encounters the {\bf breaksw}, and
-then the script moves to the {\bf endsw} statement.  You may be
+The \textbf{switch} looks for specific arguments.  If the first argument
+matches one of the allowed cases: \texttt{-a}, \texttt{-b}, \texttt{-o}, or any
+string ({\texttt{*}}) in that order, the script jumps to that case, and
+follows the commands there until it encounters the \textbf{breaksw}, and
+then the script moves to the \textbf{endsw} statement.  You may be
 wondering why only the first element of the arguments is tested against
-the cases.  This is where the {\bf shift} statement comes in.  This
+the cases.  This is where the \textbf{shift} statement comes in.  This
 decrements the element indices of an array by one, so that {\tt
-\$argv[1]} is lost, {\tt \$argv[2]} becomes {\tt \$argv[1]}, {\tt
-\$argv[3]} becomes {\tt \$argv[2]} and so on.  If we look at the
-{\tt -a} case.  The arguments are shifted, so that the first argument
+\$argv[1]} is lost, \texttt{\$argv[2]} becomes \texttt{\$argv[1]}, {\tt
+\$argv[3]} becomes \texttt{\$argv[2]} and so on.  If we look at the
+\texttt{-a} case.  The arguments are shifted, so that the first argument
 is now the value of the semi-major axis.  This in turn is shifted out
-of the arguments.  The \htmlref{{\tt *} case}{sc4_se_arguments} does
-the equivalent of the earlier {\bf while} loop \latex{(see
+of the arguments.  The \htmlref{\texttt{*} case}{sc4_se_arguments} does
+the equivalent of the earlier \textbf{while} loop \latex{(see
 Section~\ref{sc4_se_arguments})} as it appends the NDF filenames.  The
-{\tt [1-]} means the first element until the last.
+\texttt{[1-]} means the first element until the last.
 
 To actually perform the masking we could write an \htmlref{{\sf
 ARD}}{sc4_gl_ard} ellipse shape using the variables, and
-\htmlref{{\sf pipe}}{sc4_gl_pipe} it into a
-file, in this case {\tt biggal.ard}.
+\htmlref{\textsf{pipe}}{sc4_gl_pipe} it into a
+file, in this case \texttt{biggal.ard}.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      echo 'ELLIPSE( '$centre[1]', '$centre[2]', '$major', '$minor', '$orient' )' \
           > biggal.ard
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 On the command line we could enter
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % galmask -o 145 -a 78.4 myndf 'ccd*o'
-\end{verbatim}
-\normalsize
-if the script was called {\tt galmask}.  This would set the semi-major
+\end{terminalv}
+\end{small}
+if the script was called \texttt{galmask}.  This would set the semi-major
 axis to 78.4 pixels, the orientation to 145\dgs, leaving the
 semi-minor axis at its default of 44 pixels.  It would operate on
-the NDF called myndf and those whose names began with {\tt ccd} and
-ended with {\tt o}.
+the NDF called myndf and those whose names began with \texttt{ccd} and
+ended with \texttt{o}.
 
 There is a \htmlref{related example}{sc4_se_long1} \latex{in
 Section~\ref{sc4_se_long1}} where the ellipse axis lengths and
@@ -3976,7 +3400,7 @@ replace that recipe's first two lines, if we wanted to alter the
 spatial parameters for the brighter galaxy to see which gives best
 results.
 
-In {\tt \$KAPPA\_DIR/multiplot.csh} you can find a complete example.
+In \texttt{\$KAPPA\_DIR/multiplot.csh} you can find a complete example.
 For a series of NDFs, this produces a grid of displayed images with
 axes and titles, prints them to a nominated device, once each page is
 full.  You can modify it for other operations, where a single page of
@@ -3990,27 +3414,27 @@ together with \PSMERGEref\latex{ (SUN/164)}.
 \htmlref{Earlier}{sc4_se_running} \latex{in
 Section~\ref{sc4_se_running}} a number of ways to run a
 script were presented.  There is yet another, which makes debugging
-easier.  If you invoke the script with the {\bf csh} command you can
-specify none or one or more options.  The {\bf command} takes the form
+easier.  If you invoke the script with the \textbf{csh} command you can
+specify none or one or more options.  The \textbf{command} takes the form
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % csh [options] script
-\end{verbatim}
-\normalsize
-where {\tt script} is the file.  There is a choice of two debugging
+\end{terminalv}
+\end{small}
+where \texttt{script} is the file.  There is a choice of two debugging
 options.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % csh -x myscript
      % csh -v myscript
-\end{verbatim}
-\normalsize
-The {\bf x} option echoes the command lines after variable substitution,
-and the {\bf v} option echoes the command lines before variable
-substitution.  The {\bf v} is normally used to identify the line at
-which the script is failing, and the {\bf x} option helps to locate
+\end{terminalv}
+\end{small}
+The \textbf{x} option echoes the command lines after variable substitution,
+and the \textbf{v} option echoes the command lines before variable
+substitution.  The \textbf{v} is normally used to identify the line at
+which the script is failing, and the \textbf{x} option helps to locate
 errors in variable substitution.  As these options can produce lots of
 output flashing past your eyes, it is often sensible to redirect the
 output to a file to be examined at a comfortable pace.
@@ -4018,23 +3442,23 @@ output to a file to be examined at a comfortable pace.
 If you prefer, you can run the script in the normal way by putting the
 option into the first comment line.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      #!/bin/csh -x
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 \section{\xlabel{sc4_se_break_in}Breaking-in
 \label{sc4_se_break_in}}
 
 Sometimes you will realise you have made a mistake after starting a
 script, and therefore want to stop it to save time or damage.  You can
-break-in using {\tt CTRL/C} (hitting C while depressing the CTRL key),
+break-in using \texttt{CTRL/C} (hitting C while depressing the CTRL key),
 but doing this can leave unwanted intermediate files, graphics
 windows, and other mess.  However, if you have
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      onintr label
 
      <the main body of the script>
@@ -4043,18 +3467,18 @@ windows, and other mess.  However, if you have
      <perform housekeeping>
 
      exit
-\end{verbatim}
-\normalsize
-near the head and tail of your script, whenever {\tt CTRL/C} is
+\end{terminalv}
+\end{small}
+near the head and tail of your script, whenever \texttt{CTRL/C} is
 detected, the script will go to the specified label.  There you can
 close down the script in a controlled fashion, removing the garbage.  If
-you want to prevent {\tt CTRL/C} interrupts, you should include the line
+you want to prevent \texttt{CTRL/C} interrupts, you should include the line
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      % onintr -
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 instead.
 
 \newpage
@@ -4068,15 +3492,15 @@ seen earlier into lengthier scripts.  So far there is only one.
 \label{sc4_se_long1}}
 
 The following script fits a surface to the background in a series of
-\NDFref{{\sf NDF}s}.
+\NDFref{\textsf{NDF}s}.
 First two bright galaxies are to be excluded from the fitting process by
 being \xref{masked using an ARD region}{sun95}{se_ardwork}\latex{ (see
 SUN/95, ``Doing it the ARD way'')}.  It is known that the brighter
 galaxy is the brightest object in the field and the relative
 displacement of the two galaxies is constant.
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
      # Loop through the remaining arguments, assuming that these are NDFs.
      foreach file ($ndfs[1-])
 
@@ -4120,20 +3544,20 @@ displacement of the two galaxies is constant.
      end
 
      exit
-\end{verbatim}
-\normalsize
-\xref{{\bf parget}}{sun95}{PARGET} obtains the $x$-$y$ co-ordinates of
-the maximum value in each NDF, and these are stored in variable {\tt centre}.
-Since there are two values, {\tt centre} is an array.  The value of
-the first element {\tt \$centre[1]} is the $x$ co-ordinate from
-\xref{{\bf stats}}{sun95}{STATS}, and the second {\tt \$centre[2]} is
+\end{terminalv}
+\end{small}
+\xref{\textbf{parget}}{sun95}{PARGET} obtains the $x$-$y$ co-ordinates of
+the maximum value in each NDF, and these are stored in variable \texttt{centre}.
+Since there are two values, \texttt{centre} is an array.  The value of
+the first element \texttt{\$centre[1]} is the $x$ co-ordinate from
+\xref{\textbf{stats}}{sun95}{STATS}, and the second \texttt{\$centre[2]} is
 the $y$ co-ordinate.  These values are placed in an \htmlref{{\sf
-ARD}}{sc4_gl_ard} expression and output to {\tt \$file".ard"}.
-\xref{{\bf calc}}{sun95}{CALC} applies the offset between the galaxies.  The
+ARD}}{sc4_gl_ard} expression and output to \texttt{\$file".ard"}.
+\xref{\textbf{calc}}{sun95}{CALC} applies the offset between the galaxies.  The
 second ARD expression is appended to the same text file.  \xref{{\bf
 ardmask}}{sun95}{ARDMASK} then masks the galaxies, \xref{{\bf
 surfit}}{sun95}{SURFIT} performs the background fit, and subtracts it from the
-original NDF.  The intermediate files are removed.  The {\bf exit}
+original NDF.  The intermediate files are removed.  The \textbf{exit}
 command meaning exit the script is implied at the end of the file, so it
 can usually be omitted.  You might want to call it to leave the script,
 when some error is encountered.
@@ -4174,7 +3598,7 @@ see the example of \htmlref{UNIX-style options}{sc4_se_unix_options}
 \item {\bf\label{sc4_gl_env}Environment variable}\\
       A global variable to define the characteristics of a UNIX
       environment such as the terminal type or home directory.  It is
-      defined with the {\bf setenv} command.  By convention, environment
+      defined with the \textbf{setenv} command.  By convention, environment
       variables appear in uppercase.  Environment variables are often
       used to refer to a directory or to tune software.
 
@@ -4186,7 +3610,7 @@ see the example of \htmlref{UNIX-style options}{sc4_se_unix_options}
 \item {\bf\label{sc4_gl_filmod}File modifier}\\
       Syntax for specifying a part of a filename.  They appear following
       a filename and have the form colon followed by a letter.  For
-      example, {\tt :t} excludes the path.
+      example, \texttt{:t} excludes the path.
 
 \item {\bf\label{sc4_gl_fits}FITS}\\
       Flexible Image Transport System (\FITSref).  The most commonly used
@@ -4248,7 +3672,7 @@ see the example of \htmlref{UNIX-style options}{sc4_se_unix_options}
       Mechanism by which the \htmlref{standard output}{sc4_gl_std_out}
       of one programme is passed to the \htmlref{standard
       input}{sc4_gl_std_inp} of another.  It allows sophisticated tools
-      to be made from simple commands.  The {\tt |} character
+      to be made from simple commands.  The \texttt{|} character
       represents the pipe.
 
 \item {\bf\label{sc4_gl_pro}Process}\\
@@ -4263,18 +3687,18 @@ see the example of \htmlref{UNIX-style options}{sc4_se_unix_options}
       characters in a search.  They usually include \htmlref{special
       characters}{sc4_gl_met}, which represent things other than
       themselves, to refine the search.  Regular expressions empower
-      utilities like {\bf grep}, {\bf sed} and {\bf awk}.  Although
+      utilities like \textbf{grep}, \textbf{sed} and \textbf{awk}.  Although
       similar to shell \htmlref{wildcards}{sc4_gl_wild} there are
       differences, so be careful.
 
 %      \begin{tabular}{lp{100mm}}
 %      Regular expression & Meaning \\ \hline
-%      {\tt .} & Any single character  \\
-%      {\tt *} & Zero or more characters \\
+%      \texttt{.} & Any single character  \\
+%      \texttt{*} & Zero or more characters \\
 %      \verb+^+ & Matches only if the string is at the beginning of
 %                 a line \\
-%      {\tt [~]} & \\
-%      {\tt \$} & End of line \\
+%      \texttt{[~]} & \\
+%      \texttt{\$} & End of line \\
 %      \\ \hline
 %      \end{tabular}
 
@@ -4324,14 +3748,14 @@ see the example of \htmlref{UNIX-style options}{sc4_se_unix_options}
 
       \begin{tabular}{lp{100mm}}
       Wildcard expression & Matches \\ \hline
-      {\tt *} & Zero or more characters \\
-      {\tt ?} & Exactly one character \\
-      {\tt [xyz]} & One character in the set {\tt x}, {\tt y}, or {\tt z} \\
-      {\tt [a-m]} & One character in the range from {\tt a} to {\tt m} \\
-      {\tt [A-Za-z]} & All alphabetic characters \\
-      {\tt [0-9]} & All numeric characters \\
-      {\tt \{alpha,beta,a,b\}} & A set of options, {\tt alpha}, {\tt beta}, {\tt a}, or {\tt b} \\
-      {\tt \{aa,bb[1-3]\}} & {\tt aa}, {\tt bb1}, {\tt bb2}, or {\tt bb3} \\
+      \texttt{*} & Zero or more characters \\
+      \texttt{?} & Exactly one character \\
+      \texttt{[xyz]} & One character in the set \texttt{x}, \texttt{y}, or \texttt{z} \\
+      \texttt{[a-m]} & One character in the range from \texttt{a} to \texttt{m} \\
+      \texttt{[A-Za-z]} & All alphabetic characters \\
+      \texttt{[0-9]} & All numeric characters \\
+      \texttt{\{alpha,beta,a,b\}} & A set of options, \texttt{alpha}, \texttt{beta}, \texttt{a}, or \texttt{b} \\
+      \texttt{\{aa,bb[1-3]\}} & \texttt{aa}, \texttt{bb1}, \texttt{bb2}, or \texttt{bb3} \\
       \\ \hline
       \end{tabular}
 
