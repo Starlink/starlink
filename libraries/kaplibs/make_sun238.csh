@@ -85,7 +85,7 @@ foreach dir (aif ccg fts ira kpg)
 end
 
 # Add an sstroutine for each C-callable documented KPG file
-echo '\newpage' >> sun238.tex
+echo '\\newpage' >> sun238.tex
 echo '\section{C-only Routine Descriptions}' >> sun238.tex
 
 foreach dir (kpg)
