@@ -172,7 +172,7 @@ The way an application obtains a value from a parameter is to \textit{get\/} the
 a Fortran read, though it can do much more.  In this example,
 
 \begin{terminalv}
-CALL PAR_GET0L( 'FLAG', VALUE, STATUS )
+      CALL PAR_GET0L( 'FLAG', VALUE, STATUS )
 \end{terminalv}
 
 gets a logical value from the parameter FLAG and stores it in the
@@ -181,7 +181,7 @@ suffix in the routine's name.  If VALUE were a character variable, you
 would use a similar routine, but this time with a C suffix as shown below.
 
 \begin{terminalv}
-CALL PAR_GET0C( 'STRING', VALUE, STATUS )
+      CALL PAR_GET0C( 'STRING', VALUE, STATUS )
 \end{terminalv}
 
 There are similar routines for the other primitive data types, each with
@@ -214,7 +214,7 @@ What does the user see?  This will depend on the implementation, but
 suppose the user is prompted for a value.  If you had in your code
 
 \begin{terminalv}
-CALL PAR_GET0R( 'THRESHOLD', THRESH, STATUS )
+      CALL PAR_GET0R( 'THRESHOLD', THRESH, STATUS )
 \end{terminalv}
 
 The user might see
@@ -260,11 +260,11 @@ return to the descriptions of the basic PAR\_ routines.
 Here is an example to get a vector of real values.
 
 \begin{terminalv}
-REAL VALUES( 4 )
+      REAL VALUES( 4 )
 
-   :       :       :
+          :       :       :
 
-CALL PAR_GET1R( 'HEIGHTS', 4, VALUES, ACTVAL, STATUS )
+      CALL PAR_GET1R( 'HEIGHTS', 4, VALUES, ACTVAL, STATUS )
 \end{terminalv}
 
 It enables all or part of a four-element array to be obtained and
@@ -291,14 +291,14 @@ itself must be large enough to hold the values.  ACTD receives the
 actual dimensions of the array as specified by the user.
 
 \begin{terminalv}
-INTEGER VALUES( 3, 2, 2 )
+      INTEGER VALUES( 3, 2, 2 )
 
-   :       :       :
+          :       :       :
 
-MAXD( 1 ) = 3
-MAXD( 2 ) = 2
-MAXD( 3 ) = 2
-CALL PAR_GETNI( 'MASK', 3, MAXD, VALUES, ACTD, STATUS )
+      MAXD( 1 ) = 3
+      MAXD( 2 ) = 2
+      MAXD( 3 ) = 2
+      CALL PAR_GETNI( 'MASK', 3, MAXD, VALUES, ACTD, STATUS )
 \end{terminalv}
 
 This routine is unlikely to be in common usage because of the
@@ -322,11 +322,11 @@ Usually, it will suffice to get a vector of values disregarding
 the dimensionality of the parameter.
 
 \begin{terminalv}
-REAL VALUES( 12 )
+      REAL VALUES( 12 )
 
-   :       :       :
+          :       :       :
 
-CALL PAR_GETVR( 'MASK', 12, VALUES, ACTVAL, STATUS )
+      CALL PAR_GETVR( 'MASK', 12, VALUES, ACTVAL, STATUS )
 \end{terminalv}
 
 This has the same arguments as PAR\_GET1x we saw above, though the actual
@@ -338,11 +338,11 @@ When too few values are supplied to the parameter, PAR\_EXACx
 prompts for the remainder of the values.
 
 \begin{terminalv}
-CHARACTER * ( 3 ) CONSTE( 2 )
+      CHARACTER * ( 3 ) CONSTE( 2 )
 
-   :       :       :
+          :       :       :
 
-CALL PAR_EXACC( 'CONSTELLATION', 2, CONSTE, STATUS )
+      CALL PAR_EXACC( 'CONSTELLATION', 2, CONSTE, STATUS )
 \end{terminalv}
 
 An example of what the user sees is given in Section~\ref{se:avl}.
@@ -359,7 +359,7 @@ application.  Thus we could have a number of puts \dash\ one per statistic.
 Here we just put the standard deviation value in the parameter SIGMA.
 
 \begin{terminalv}
-CALL PAR_PUT0D( 'SIGMA', STDDEV, STATUS )
+      CALL PAR_PUT0D( 'SIGMA', STDDEV, STATUS )
 \end{terminalv}
 
 The value is written to a \emph{parameter file\/} associated with the
@@ -377,11 +377,11 @@ for VMS and \texttt{@\$ADAM\_USER/statistics.SIGMA} for UNIX.}
 If we had the values corresponding to the quartiles and median of a
 data array we could use a routine that handles a one-dimensional array.
 \begin{terminalv}
-DOUBLE PRECISION QRTILE( 3 )
+      DOUBLE PRECISION QRTILE( 3 )
 
-   :       :       :
+          :       :       :
 
-CALL PAR_PUT1D( 'QUARTILES', 3, QRTILE, STATUS )
+      CALL PAR_PUT1D( 'QUARTILES', 3, QRTILE, STATUS )
 \end{terminalv}
 
 When you put an array, the subroutine arguments specify both the
@@ -418,13 +418,13 @@ Here is an illustration.  ITER calculations are performed, using
 the value of parameter REJECT.
 
 \begin{terminalv}
-DO I = 1, ITER
-  CALL PAR_GET0D( 'REJECT', ABC, STATUS )
+      DO I = 1, ITER
+         CALL PAR_GET0D( 'REJECT', ABC, STATUS )
 
-      < perform calculation involving variable ABC >
+            < perform calculation involving variable ABC >
 
-  CALL PAR_CANCL( 'REJECT', STATUS )
-END DO
+         CALL PAR_CANCL( 'REJECT', STATUS )
+      END DO
 \end{terminalv}
 
 \subsection{\xlabel{setting_the_dynamic_prompt}Setting the Dynamic Prompt}
@@ -435,8 +435,8 @@ However, it is possible to create a prompt string dynamically from
 within the application. For example,
 
 \begin{terminalv}
- CALL PAR_PROMT( 'OK', 'The file '// NAME( :NC ) /
-:                / ' is to be erased. OK ?', STATUS )
+       CALL PAR_PROMT( 'OK', 'The file '// NAME( :NC ) /
+      :                / ' is to be erased. OK ?', STATUS )
 \end{terminalv}
 
 will change the prompt string for parameter OK, so that the named
@@ -457,14 +457,14 @@ dynamic default for parameter SHADE will be $-$1.0, and 0.0 otherwise.
 
 \begin{terminalv}
 *  Set the default shading (parameter SHADE) depending on the colour.
-     IF ( COLOUR .EQ. 1 ) THEN
-        CALL PAR_DEF0R( 'SHADE', -1.0, STATUS )
-     ELSE
-        CALL PAR_DEF0R( 'SHADE', 0.0, STATUS )
-     END IF
+      IF ( COLOUR .EQ. 1 ) THEN
+         CALL PAR_DEF0R( 'SHADE', -1.0, STATUS )
+      ELSE
+         CALL PAR_DEF0R( 'SHADE', 0.0, STATUS )
+      END IF
 
 *  Obtain the shading.
-     CALL PAR_GET0R( 'SHADE', SHADE, STATUS )
+      CALL PAR_GET0R( 'SHADE', SHADE, STATUS )
 \end{terminalv}
 
 
@@ -500,17 +500,17 @@ Here is an example of setting the minimum value.
 
 \begin{terminalv}
 *  The number of histogram bins must be positive.
-     CALL PAR_MINI( 'NBINS', 1, STATUS )
-     CALL PAR_GET0I( 'NBINS', NBINS, STATUS )
+      CALL PAR_MINI( 'NBINS', 1, STATUS )
+      CALL PAR_GET0I( 'NBINS', NBINS, STATUS )
 \end{terminalv}
 
 We can set an upper limit too.
 \begin{terminalv}
 *  The number of histogram bins must be in the range 10 to 1000
 *  inclusive.
-     CALL PAR_MINI( 'NBINS', 10, STATUS )
-     CALL PAR_MAXI( 'NBINS', 1000, STATUS )
-     CALL PAR_GET0I( 'NBINS', NBINS, STATUS )
+      CALL PAR_MINI( 'NBINS', 10, STATUS )
+      CALL PAR_MAXI( 'NBINS', 1000, STATUS )
+      CALL PAR_GET0I( 'NBINS', NBINS, STATUS )
 \end{terminalv}
 
 If the user gives a value outside the legitimate range, an error report
@@ -532,9 +532,9 @@ above.  In case that is not clear here is an illustration.
 
 \begin{terminalv}
 *  Choose an integer excluding -1, 0, 1, and 2.
-     CALL PAR_MINI( 'IVALUE', 3, STATUS )
-     CALL PAR_MAXI( 'IVALUE', -2, STATUS )
-     CALL PAR_GET0I( 'IVALUE', NUMBER, STATUS )
+      CALL PAR_MINI( 'IVALUE', 3, STATUS )
+      CALL PAR_MAXI( 'IVALUE', -2, STATUS )
+      CALL PAR_GET0I( 'IVALUE', NUMBER, STATUS )
 \end{terminalv}
 
 \subsection{\xlabel{cancelling_dynamic_values}Cancelling Dynamic Values}
@@ -554,23 +554,23 @@ range, and then with no maximum limit and a different minimum.
 
 \begin{terminalv}
 *  Get the integer value between 1 and 360.
-     CALL PAR_MINI( 'NX', 1, STATUS )
-     CALL PAR_MAXI( 'NX', 360, STATUS )
-     CALL PAR_GET0I( 'NX', NX, STATUS )
+      CALL PAR_MINI( 'NX', 1, STATUS )
+      CALL PAR_MAXI( 'NX', 360, STATUS )
+      CALL PAR_GET0I( 'NX', NX, STATUS )
 
 *  Cancel the parameter, as a minimum or maximum value cannot be set
 *  when the parameter is active, and because we want to obtain
 *  another value.
-     CALL PAR_CANCL( 'NX', STATUS )
+      CALL PAR_CANCL( 'NX', STATUS )
 
 *  Set a new minimum value.
-     CALL PAR_MINI( 'NX', NX, STATUS )
+      CALL PAR_MINI( 'NX', NX, STATUS )
 
 *  Cancel the maximum value.
-     CALL PAR_UNSET( 'NX', 'MAX', STATUS )
+      CALL PAR_UNSET( 'NX', 'MAX', STATUS )
 
 *  Obtain a new value, with a new minimum and no maximum.
-     CALL PAR_GET0I( 'NX', NX2, STATUS )
+      CALL PAR_GET0I( 'NX', NX2, STATUS )
 \end{terminalv}
 
 See Appendix~\ref{ap:ref} for details of the options for the second
@@ -597,22 +597,22 @@ efficient and easy interactive use, but in a procedure or batch mode you
 want the application to process just one set of data.
 
 \begin{terminalv}
-INCLUDE 'PAR_PAR'        ! PAR constants
-INTEGER STATE
+      INCLUDE 'PAR_PAR'        ! PAR constants
+      INTEGER STATE
 
-   :       :       :
+          :       :       :
 
-CALL PAR_STATE( 'INIT', STATE, STATUS )
+      CALL PAR_STATE( 'INIT', STATE, STATUS )
 
-LOOP = .TRUE.
-DO WHILE ( LOOP .AND STATUS .EQ. SAI__OK )
-  CALL PAR_GET0R( 'INIT', START, STATUS )
+      LOOP = .TRUE.
+      DO WHILE ( LOOP .AND STATUS .EQ. SAI__OK )
+         CALL PAR_GET0R( 'INIT', START, STATUS )
 
-      < perform calculation >
+            < perform calculation >
 
-  LOOP = STATE .NE. PAR__ACTIVE
-  IF ( LOOP ) CALL PAR_CANCL( 'INIT', STATUS )
-END DO
+         LOOP = STATE .NE. PAR__ACTIVE
+         IF ( LOOP ) CALL PAR_CANCL( 'INIT', STATUS )
+      END DO
 \end{terminalv}
 
 INIT is a parameter required for each calculation.  It is obtained
@@ -642,22 +642,22 @@ used, in case they have not been obtained successfully.
 
 For example
 \begin{terminalv}
-    INCLUDE 'PAR_ERR'       ! PAR error constants
+      INCLUDE 'PAR_ERR'       ! PAR error constants
 
-       :       :       :
+          :       :       :
 
-    CALL PAR_GET0I( 'STEP', NSTEP, STATUS )
-    CALL PAR_GET1R( 'HEIGHTS', 50, HEITS, NUMHTS, STATUS )
-    CALL PAR_GET0L( 'COLOUR', COLOUR, STATUS )
-    IF ( STATUS .EQ. PAR__ABORT ) THEN
-       < perform any tidying operations >
-       GOTO 999
-    END IF
+      CALL PAR_GET0I( 'STEP', NSTEP, STATUS )
+      CALL PAR_GET1R( 'HEIGHTS', 50, HEITS, NUMHTS, STATUS )
+      CALL PAR_GET0L( 'COLOUR', COLOUR, STATUS )
+      IF ( STATUS .EQ. PAR__ABORT ) THEN
+         < perform any tidying operations >
+         GOTO 999
+      END IF
 
       < perform calculations >
 
-999 CONTINUE
-    END
+  999 CONTINUE
+      END
 \end{terminalv}
 performs three parameter get calls, before testing for an
 abort; if an abort status is found, the routine exits.  The status check
@@ -679,13 +679,13 @@ force a default value to be used.
 Here is an example of handling null as a valid value for a parameter.
 
 \begin{terminalv}
-CALL ERR_MARK
-CALL PAR_GET0R( 'WEIGHT', WEIGHT, STATUS )
-IF ( STATUS .EQ. PAR__NULL ) THEN
-  WEIGHT = 1.0
-  CALL ERR_ANNUL( STATUS )
-END IF
-CALL ERR_RLSE
+      CALL ERR_MARK
+      CALL PAR_GET0R( 'WEIGHT', WEIGHT, STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         WEIGHT = 1.0
+         CALL ERR_ANNUL( STATUS )
+      END IF
+      CALL ERR_RLSE
 \end{terminalv}
 
 When the PAR\_GET0R returns with the null status, the variable WEIGHT is
@@ -703,22 +703,22 @@ for further details.
 Here null ends a loop, say to plot an histogram with different numbers
 of bins.
 \begin{terminalv}
- 100 CONTINUE
-     CALL ERR_MARK
-     CALL PAR_GET0I( 'NBINS', NBIN, STATUS )
-     IF ( STATUS .EQ. PAR__NULL ) THEN
-        CALL ERR_ANNUL( STATUS )
-        CALL ERR_RLSE
-        GOTO 200
-     END IF
-     CALL ERR_RLSE
+  100 CONTINUE
+      CALL ERR_MARK
+      CALL PAR_GET0I( 'NBINS', NBIN, STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         CALL ERR_RLSE
+         GOTO 200
+      END IF
+      CALL ERR_RLSE
 
-         < Perform calculations >
+          < Perform calculations >
 
-     GOTO 100
+      GOTO 100
 
 *   Come here at the end of the calculations.
- 200 CONTINUE
+  200 CONTINUE
 \end{terminalv}
 
 \section{\xlabel{extended_routines}Extended Routines}
@@ -748,93 +748,93 @@ mean set the value to 3.  See
 \xref{SUN/104}{sun104}{} for details of the MSG\_ calls.
 
 \begin{terminalv}
-     LOGICAL NOTOK
-     INTEGER VALUE
+      LOGICAL NOTOK
+      INTEGER VALUE
 
-         :       :       :
+          :       :       :
 
 *  Set the dynamic default.
-     CALL PAR_DEF0I( 'NAME', 1, STATUS )
+      CALL PAR_DEF0I( 'NAME', 1, STATUS )
 
 *  Start a new error context.
-     CALL ERR_MARK
+      CALL ERR_MARK
 
 *  Loop to obtain the value of the parameter.
 *  ==========================================
 
 *  Initialise NOTOK to start off the loop and indicate that a
 *  satisfactory value has yet to be obtained.
-     NOTOK = .TRUE.
+      NOTOK = .TRUE.
 
- 100 CONTINUE
+  100 CONTINUE
 
 *  The loop will keep going as long as a suitable value has not be read
 *  and there is no error.
-        IF ( .NOT. NOTOK .OR. ( STATUS .NE. SAI__OK ) ) GOTO 120
+         IF ( .NOT. NOTOK .OR. ( STATUS .NE. SAI__OK ) ) GOTO 120
 
 *  Get a value from the parameter.
-        CALL PAR_GET0I( 'NAME', VALUE, STATUS )
+         CALL PAR_GET0I( 'NAME', VALUE, STATUS )
 
 *  Check for an error before using the value.
-        IF ( STATUS .EQ. SAI__OK ) THEN
+         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Test the value against the constraints.  Here it is just to see
 *  if the value is divisible by 3.  You can replace this expression
 *  with more complicated constraints.
-           NOTOK = MOD( VALUE, 3 ) .EQ. 0
+            NOTOK = MOD( VALUE, 3 ) .EQ. 0
 
 *  The value is not within the constraints, so report as an error,
 *  including full information using tokens.  You would substitute a
 *  routine name for fac_xxxxx.
-           IF ( NOTOK ) THEN
-              STATUS = SAI__ERROR
-              CALL MSG_SETC( 'PARAM, 'NAME' )
-              CALL MSG_SETI( 'VALUE', VALUE )
+            IF ( NOTOK ) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETC( 'PARAM, 'NAME' )
+               CALL MSG_SETI( 'VALUE', VALUE )
 
-              CALL ERR_REP( 'fac_xxxxx_OUTR',
-    :           '^VALUE is not permitted for ^PARAM.  Please give '/
-    :           /'an integer not exactly divisible by 3.', STATUS )
+               CALL ERR_REP( 'fac_xxxxx_OUTR',
+    :            '^VALUE is not permitted for ^PARAM.  Please give '/
+    :            /'an integer not exactly divisible by 3.', STATUS )
 
 *  The error is flushed so the user can see it immediately.
-              CALL ERR_FLUSH( STATUS )
+               CALL ERR_FLUSH( STATUS )
 
 *  Cancel the parameter to enable a retry to get a value satisfying
 *  the constraint.
-              CALL PAR_CANCL( 'NAME', STATUS )
-           END IF
+               CALL PAR_CANCL( 'NAME', STATUS )
+            END IF
 
 *  Use the default value following an error.
-        ELSE
+         ELSE
 
 *  Annul a null error to prevent an error report about null appearing.
 *  Create a message informing the user of what has happened.
-           IF ( STATUS .EQ. PAR__NULL ) THEN
-              CALL ERR_ANNUL( STATUS )
+            IF ( STATUS .EQ. PAR__NULL ) THEN
+               CALL ERR_ANNUL( STATUS )
 
 *  If MSG verbose output is requested, inform the user what has happened.
 *  You would substitute a routine name for fac_xxxxx.
-              CALL MSG_SETC( 'PARAM', 'NAME' )
-              CALL MSG_OUTIF( MSG__VERB, 'fac_xxxxx_DEFA',
-    :           'A value of 3 has been adopted '/
-    :           /'for parameter ^PARAM.', STATUS )
-           END IF
+               CALL MSG_SETC( 'PARAM', 'NAME' )
+               CALL MSG_OUTIF( MSG__VERB, 'fac_xxxxx_DEFA',
+    :            'A value of 3 has been adopted '/
+    :            /'for parameter ^PARAM.', STATUS )
+            END IF
 
 *  Set the returned value to the special case.
-           VALUE = 3
+            VALUE = 3
 
 *  Terminate the loop.
-           NOTOK = .FALSE.
-        END IF
+            NOTOK = .FALSE.
+         END IF
 
 *  Go to the head of the loop.
-        GOTO 100
+         GOTO 100
 
 *  Come here when the loop has been exited.  This includes when
 *  an error status was returned by the PAR_GET0I routine.
- 120 CONTINUE
+  120 CONTINUE
 
 *  Release the new error context.
-     CALL ERR_RLSE
+      CALL ERR_RLSE
 \end{terminalv}
 
 To set another constraint you have to modify the logical expression
@@ -847,13 +847,13 @@ expression could modified to the following.
 \begin{terminalv}
 *  Check that the value is within the specified include or exclude
 *  range, and not divisible by 3.
-       IF ( VMIN .GT. VMAX ) THEN
-          NOTOK = ( ( VALUE .LT. VMIN ) .AND. ( VALUE .GT. VMAX ) )
-:                 .OR. ( MOD( VALUE, 3 ) .EQ. 0 )
-       ELSE
-          NOTOK = ( VALUE .LT. VMIN ) .OR. ( VALUE .GT. VMAX ) .OR.
-:                 ( MOD( VALUE, 3 ) .NE. 0 )
-       END IF
+      IF ( VMIN .GT. VMAX ) THEN
+         NOTOK = ( ( VALUE .LT. VMIN ) .AND. ( VALUE .GT. VMAX ) )
+     :           .OR. ( MOD( VALUE, 3 ) .EQ. 0 )
+      ELSE
+         NOTOK = ( VALUE .LT. VMIN ) .OR. ( VALUE .GT. VMAX ) .OR.
+:                ( MOD( VALUE, 3 ) .NE. 0 )
+      END IF
 \end{terminalv}
 
 and the error report would look something like this
@@ -861,22 +861,22 @@ and the error report would look something like this
 \begin{terminalv}
 *  The value is not within the constraints, so report as an error,
 *  including full information using tokens.
-           IF ( NOTOK ) THEN
-              STATUS = PAR__ERROR
-              CALL MSG_SETC( 'PARAM', 'NAME' )
-              CALL MSG_SETI( 'VALUE', VALUE )
-              CALL MSG_SETI( 'MIN', VMIN )
-              CALL MSG_SETI( 'MAX', VMAX )
-              IF ( VMIN .GT. VMAX ) THEN
-                 CALL MSG_SETC( 'XCLD', 'outside' )
-              ELSE
-                 CALL MSG_SETC( 'XCLD', 'in' )
-              END IF
+            IF ( NOTOK ) THEN
+               STATUS = PAR__ERROR
+               CALL MSG_SETC( 'PARAM', 'NAME' )
+               CALL MSG_SETI( 'VALUE', VALUE )
+               CALL MSG_SETI( 'MIN', VMIN )
+               CALL MSG_SETI( 'MAX', VMAX )
+               IF ( VMIN .GT. VMAX ) THEN
+                  CALL MSG_SETC( 'XCLD', 'outside' )
+               ELSE
+                  CALL MSG_SETC( 'XCLD', 'in' )
+               END IF
 
-              CALL ERR_REP( 'fac_xxxxx_OUTR',
-:               '^VALUE is not permitted for ^PARAM.  Please give '/
-:               /'an integer ^XCLD the range ^MIN to ^MAX, and not '/
-:               /'exactly divisible by 3.', STATUS )
+               CALL ERR_REP( 'fac_xxxxx_OUTR',
+     :           '^VALUE is not permitted for ^PARAM.  Please give '/
+     :           /'an integer ^XCLD the range ^MIN to ^MAX, and not '/
+     :           /'exactly divisible by 3.', STATUS )
 \end{terminalv}
 
 In practice you would probably define a logical variable outside the loop
@@ -896,7 +896,7 @@ the generic routine PAR\_GDR0x.  The name is derived from \emph{G\/}et
 with a \emph{D\/}efault and \emph{R\/}ange.  For example,
 
 \begin{terminalv}
-CALL PAR_GDR0R( 'SCALE', 1.0, 0.0, 2.0, .FALSE., SCAFAC, STATUS )
+      CALL PAR_GDR0R( 'SCALE', 1.0, 0.0, 2.0, .FALSE., SCAFAC, STATUS )
 \end{terminalv}
 
 gets the value for the real parameter SCALE using a dynamic default of
@@ -937,7 +937,7 @@ is set to .FALSE., and will not be mentioned again until then.
 Swapping the limits lets you exclude values in the range.  Therefore,
 
 \begin{terminalv}
-CALL PAR_GDR0R( 'SCALE', 1.0, 2.0, 0.0, .FALSE., SCAFAC, STATUS )
+      CALL PAR_GDR0R( 'SCALE', 1.0, 2.0, 0.0, .FALSE., SCAFAC, STATUS )
 \end{terminalv}
 
 would permit a value of 3.5, unlike before, as well as 0.0 and 2.0.
@@ -971,12 +971,12 @@ obtained.  We modify the example from the previous section to illustrate
 this routine.
 
 \begin{terminalv}
- REAL SCAFAC( 10 )
+      REAL SCAFAC( 10 )
 
-    :       :       :
+          :       :       :
 
- CALL PAR_GDRVR( 'SCALE', 10, 0.0, 2.0, .FALSE., SCAFAC,
-:                NVAL, STATUS )
+      CALL PAR_GDRVR( 'SCALE', 10, 0.0, 2.0, .FALSE., SCAFAC,
+     :                NVAL, STATUS )
 \end{terminalv}
 
 This time up to ten values may be obtained from parameter SCALE, and
@@ -993,10 +993,10 @@ zero and one.
 
 \begin{terminalv}
 *  Get an RGB colour.  The default is yellow.
-     DEFAUL( 1 ) = 1.0
-     DEFAUL( 2 ) = 1.0
-     DEFAUL( 3 ) = 0.0
-     CALL PAR_GDR1R( 'RGB', 3, DEFAUL, 0.0, 1.0, .FALSE., RGB, STATUS )
+      DEFAUL( 1 ) = 1.0
+      DEFAUL( 2 ) = 1.0
+      DEFAUL( 3 ) = 0.0
+      CALL PAR_GDR1R( 'RGB', 3, DEFAUL, 0.0, 1.0, .FALSE., RGB, STATUS )
 \end{terminalv}
 
 The default must be an array.  Should you not want a dynamic default in
@@ -1030,23 +1030,23 @@ are known.  The following code could obtain the required values, where
 LBND and UBND define the lower and upper co-ordinates of the rectangle.
 
 \begin{terminalv}
-     DOUBLE PRECISION DEFAUL( 2 ), POS( 2 )
-     DOUBLE PRECISION LBND( 2 ), UBND( 2 )
+      DOUBLE PRECISION DEFAUL( 2 ), POS( 2 )
+      DOUBLE PRECISION LBND( 2 ), UBND( 2 )
 
-         :       :       :
+          :       :       :
 
 *  Set the limits of the area in which the point must lie.
-     LBND( 1 ) = 0.0D0
-     UBND( 1 ) = 50.0D0
-     LBND( 2 ) = -20.0D0
-     UBND( 2 ) = 10.0D0
+      LBND( 1 ) = 0.0D0
+      UBND( 1 ) = 50.0D0
+      LBND( 2 ) = -20.0D0
+      UBND( 2 ) = 10.0D0
 
 *  Get the co-ordinates of the point within the rectangle.  There
 *  is no dynamic default because the default violates the range
 *  constraint.
-     DEFAUL( 1 ) = -1.0D0
-     CALL PAR_GRM1D( 'POSITION', 2, DEFAUL, LBND, UBND,
-    :                .FALSE., POS, STATUS )
+      DEFAUL( 1 ) = -1.0D0
+      CALL PAR_GRM1D( 'POSITION', 2, DEFAUL, LBND, UBND,
+     :                .FALSE., POS, STATUS )
 \end{terminalv}
 
 PAR\_GRM1x will inform the user of any value(s) that violate a range,
@@ -1070,22 +1070,22 @@ higher dimensions.
 \begin{terminalv}
 *  Set the acceptable range of values from no compression to compress
 *  to a single element in a dimension.
-     DO I = 1, NDIM
-        CMPMIN( I ) = 1
-        CMPMAX( I ) = DIMS( I )
-     END DO
+      DO I = 1, NDIM
+         CMPMIN( I ) = 1
+         CMPMAX( I ) = DIMS( I )
+      END DO
 
 *  Get the compression factors.
-     CALL PAR_GRMVI( 'COMPRESS', NDIM, CMPMIN, CMPMAX, COMPRS, ACTVAL,
-    :                STATUS )
+      CALL PAR_GRMVI( 'COMPRESS', NDIM, CMPMIN, CMPMAX, COMPRS, ACTVAL,
+     :                STATUS )
 
 *  Should less values be supplied than the number of dimensions, do
 *  not compress the higher dimensions.
-     IF ( ACTVAL .LT. NDIM ) THEN
-        DO I = ACTVAL + 1, NDIM
-           COMPRS( I ) = 1
-        END DO
-     END IF
+      IF ( ACTVAL .LT. NDIM ) THEN
+         DO I = ACTVAL + 1, NDIM
+            COMPRS( I ) = 1
+         END DO
+      END IF
 \end{terminalv}
 
 \subsection{\xlabel{parity_constraint}Parity Constraint}
@@ -1095,14 +1095,14 @@ the size of a smoothing kernel must be odd.  PAR provides two routines
 with these functions.  Thus,
 
 \begin{terminalv}
-CALL PAR_GODD( 'BOX', 5, 3, 11, .FALSE., BOXSIZ, STATUS )
+      CALL PAR_GODD( 'BOX', 5, 3, 11, .FALSE., BOXSIZ, STATUS )
 \end{terminalv}
 
 obtains an odd integer between 3 and 11 from parameter BOX, and stores
 it in variable BOXSIZ.  The dynamic default is 5.  Similarly,
 
 \begin{terminalv}
-CALL PAR_GEVEN( 'OFFSET', 2, -2, 10, .FALSE., OFFS, STATUS )
+      CALL PAR_GEVEN( 'OFFSET', 2, -2, 10, .FALSE., OFFS, STATUS )
 \end{terminalv}
 gets a even value in the range $-$2 to 10 from parameter OFFSET, with a
 dynamic default of 2.  Zero counts as an even number, and so it would be
@@ -1124,15 +1124,15 @@ abbreviation.  However, the unshortened value is returned.  The value is
 also in uppercase, though the list of options need not be so.
 
 \begin{terminalv}
- CHARACTER * 10 FUNCT, OPTDEF
- CHARACTER * 72 OPLIST
+      CHARACTER * 10 FUNCT, OPTDEF
+      CHARACTER * 72 OPLIST
 
-    :       :       :
+          :       :       :
 
- OPLIST = 'Exit,Device,Histogram,List,Peep,'/
-:         /'Region,Save,Slice,Statistics,Value'
- OPTDEF = 'Region'
- CALL PAR_CHOIC( 'OPTION', OPTDEF, OPLIST, .FALSE., FUNCT, STATUS )
+      OPLIST = 'Exit,Device,Histogram,List,Peep,'/
+     :         /'Region,Save,Slice,Statistics,Value'
+      OPTDEF = 'Region'
+      CALL PAR_CHOIC( 'OPTION', OPTDEF, OPLIST, .FALSE., FUNCT, STATUS )
 \end{terminalv}
 
 So in the above example there are ten options available for parameter
@@ -1178,26 +1178,26 @@ certain array values with a constant; this can either be a numeric value
 or set to the bad-pixel value.
 
 \begin{terminalv}
-     CHARACTER * ( VAL__SZR ) CNEWLO, THLDEF
+      CHARACTER * ( VAL__SZR ) CNEWLO, THLDEF
 
-         :       :       :
+          :       :       :
 
 *  Get the replacement value.
-     THLDEF = '0.0'
-     CALL PAR_MIX0R( 'NEWLO', THLDEF, VAL__MINR, VAL__MAXR,
-    :                'Bad', .FALSE., CNEWLO, STATUS )
+      THLDEF = '0.0'
+      CALL PAR_MIX0R( 'NEWLO', THLDEF, VAL__MINR, VAL__MAXR,
+     :                'Bad', .FALSE., CNEWLO, STATUS )
 
-     IF ( STATUS .EQ. SAI__OK ) THEN
+      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  It may be the bad-pixel value.
-        IF ( CNEWLO .EQ. 'BAD' ) THEN
-           NEWLO = VAL__BADR
-        ELSE
+         IF ( CNEWLO .EQ. 'BAD' ) THEN
+            NEWLO = VAL__BADR
+         ELSE
 
 *  Convert the output numeric string to its numeric value.
-           CALL CHR_CTOR( CNEWLO, NEWLO, STATUS )
-        END IF
-     END IF
+            CALL CHR_CTOR( CNEWLO, NEWLO, STATUS )
+         END IF
+      END IF
 \end{terminalv}
 
 This obtains from parameter NEWLO a value which is either 'BAD' or a
@@ -1222,10 +1222,10 @@ Here is a more subtle example.  This only has numbers in the menu, but
 it is advantageous when only certain numeric values are acceptable.
 \begin{terminalv}
 *  Get the plate number.
-     CALL PAR_MIX0I( 'PLATE', ' ', 101, 1500, '5,11,23,47,49',
-    :                .FALSE., CPLATE, STATUS )
-     IF ( STATUS .EQ. SAI__OK )
-    :  CALL CHR_CTOI( CPLATE, PLATNO, STATUS )
+      CALL PAR_MIX0I( 'PLATE', ' ', 101, 1500, '5,11,23,47,49',
+     :                .FALSE., CPLATE, STATUS )
+      IF ( STATUS .EQ. SAI__OK )
+     :  CALL CHR_CTOI( CPLATE, PLATNO, STATUS )
 \end{terminalv}
 
 Here PAR\_MIX0I obtains an `integer' that is either 5, 11, 23, 47, 49,
@@ -1246,8 +1246,8 @@ following obtains a value from the parameter SWITCH and stores it in the
 variable called POWER.  The dynamic default is .TRUE..
 
 \begin{terminalv}
-NULL = .FALSE.
-CALL PAR_GTD0L( 'SWITCH', .TRUE., NULL, POWER, STATUS )
+      NULL = .FALSE.
+      CALL PAR_GTD0L( 'SWITCH', .TRUE., NULL, POWER, STATUS )
 \end{terminalv}
 
 The third argument is the same as we met in Section~\ref{se:range}. If
