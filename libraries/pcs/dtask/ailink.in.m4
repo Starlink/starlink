@@ -23,12 +23,7 @@ ifelse(__SCRIPTNAME, alink,
 # Arguments:
 #       __SCRIPTNAME[[]]_opts are:
 #          -xdbx or --xdbx: Must be the first argument if it is used.
-#            Its effect is to add a -g option to the compile/link command,
-#            create a dummy source file for dtask_main, the top-level routine
-#            of an ADAM task and to prevent the deletion of the otherwise
-#            temporary dtask_applic files. This overcomes some problems using
-#            xdbx and ups on Suns and may be helpful in other cases where
-#            debuggers are used.
+#            Its effect is to add a -g option to the compile/link command.
 #
 #          --verbose: echoes the generated compiler line at the end
 #
@@ -59,7 +54,7 @@ ifelse(__SCRIPTNAME, alink,
 #       Copyright (C) 1991-1995 Science & Engineering Research Council.
 #       Copyright (C) 1996-1999, 2004 Central Laboratory of the Research Council.
 #       Copyright (C) 2006 Particle Physics & Engineering Research Council.
-#       Copyright (C) 2008 Science and Technology Facilities Council.
+#       Copyright (C) 2008-2014 Science and Technology Facilities Council.
 #       All Rights Reserved.
 #
 #  Licence:
@@ -158,8 +153,9 @@ ifelse(__SCRIPTNAME, alink,
 #        1-AUG-2004 (NG):
 #          For subsequent modifications, see the CVS commit notes for
 #          successive revisions.
-#          Check for -dylib_file as a linker option (OS X). Has an argument which
-#          should also be gathered and not used for the program name.
+#        14-JAN-2008 (PWD):
+#          Check for -dylib_file as a linker option (OS X). Has an argument
+#          which should also be gathered and not used for the program name.
 #-
 
 # Strip off `our' options from the beginning of the list of arguments
@@ -523,14 +519,17 @@ then
     extra_mode_args='-all-static'
 fi
 
-linkextraflags=
 if $includedebug
 then
     $verbose && echo "Including debugging support in dtask_main.f"
-    linkextraflags="$linkextraflags -g"
-    sed -e s#PROGNAME#$PROGNAME# $staretcdir/dtask_main.txt \
-           >dtask_main.f
+    star_fcflags="$star_fcflags -g"
 fi
+
+# Compile dtask_main.f.
+cmpdtask="$LIBTOOL --mode=compile @FC@ @FCFLAGS@ $extra_mode_args $star_fcflags \
+        -c ${star_libdir}/dtask_main.f"
+$verbose && echo $cmpdtask
+eval $cmpdtask
 
 # Compile dtask_applic.f
 ## We substitute in the values of @STAR_FCFLAGS@ and @STAR_LDFLAGS@ here.
@@ -545,8 +544,7 @@ eval $cmpdtask
 
 linkcmd="$LIBTOOL --mode=link @FC@ @FCFLAGS@ $star_fcflags $extra_mode_args $star_ldflags \
         -o $EXENAME \
-        $linkextraflags \
-        ${star_libdir}/dtask_main.o \
+        dtask_main.o \
         dtask_applic.lo \
         ${star_libdir}/starMemInit.o \
         $ARGS \
@@ -584,8 +582,8 @@ then
 else
     # Don't remove dtask_applic.{o,lo} since this will prevent running
     # 'make check' in this directory.
-    $verbose && echo "rm -f dtask_applic.f dtask_wrap.c dtask_wrap.o"
-    rm -f dtask_applic.f dtask_wrap.c dtask_wrap.o
+    $verbose && echo "rm -f dtask_applic.f dtask_wrap.c dtask_wrap.o dtask_main.o dtask_main.lo"
+    rm -f dtask_applic.f dtask_wrap.c dtask_wrap.o dtask_main.o dtask_main.lo
 fi
 
 # pass on the exit status of the link command

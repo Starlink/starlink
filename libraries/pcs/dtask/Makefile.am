@@ -16,8 +16,6 @@ AM_FCFLAGS = -I../subpar -I../messys -I../adam
 include_HEADERS = $(PUBLIC_INCLUDES)
 include_MESSAGES = ACT_ERR act_err.h DTASK_ERR dtask_err.h
 
-dist_staretc_DATA = dtask_main.txt
-
 PUBLIC_INCLUDES = DTASK_PAR
 
 PRIVATE_INCLUDES = DTASK_CMN DTASK_SYS
@@ -46,13 +44,12 @@ MAINTAINERCLEANFILES =  alink.in ilink.in
 
 BUILT_SOURCES = $(include_MESSAGES)
 
-# The alink and ilink scripts require a dtask_main.o file in $(libdir).
-# Build and install this, taking care to include it in the manifest file, too.
-dtask_main.o: dtask_main.f
-install-exec-local: dtask_main.o
+# The alink and ilink scripts require a dtask_main.f file in $(libdir).
+# Install this, taking care to include it in the manifest file, too.
+install-exec-local: dtask_main.f
 	$(mkdir_p) $(DESTDIR)$(libdir)
-	$(INSTALL_PROGRAM) dtask_main.o $(DESTDIR)$(libdir)
-	$(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(libdir)/dtask_main.o" || :
+	$(INSTALL_PROGRAM) dtask_main.f $(DESTDIR)$(libdir)
+	$(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(libdir)/dtask_main.f" || :
 
 # Files alink.in and ilink.in depend on the values of the $(prefix)
 # variable, and so must be substituted at `make' time, rather than
