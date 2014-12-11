@@ -1,3 +1,4 @@
+\documentclass[twoside,11pt,nolof]{starlink}
 %
 % The CCD Photometric Calibration Cookbook
 %
@@ -6,34 +7,28 @@
 % A.C. Davenhall (Edinburgh), 22/4/99.
 %
 
-\documentclass[twoside,11pt]{article}
-
 % ? Specify used packages
-\usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink Cookbook}
-\newcommand{\stardocinitials}  {SC}
-\newcommand{\stardocsource}    {sc\stardocnumber}
-\newcommand{\stardoccopyright} {Copyright \copyright\ 2001 Council for the
+\stardoccategory    {Starlink Cookbook}
+\stardocinitials    {SC}
+\stardocsource      {sc\stardocnumber}
+\stardoccopyright {Copyright \copyright\ 2001 Council for the
 Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {6.4}
-\newcommand{\stardocauthors}   {J.~Palmer \& A.C.~Davenhall}
-\newcommand{\stardocdate}      {31st August 2001}
-\newcommand{\stardoctitle}     {The CCD Photometric Calibration Cookbook}
-\newcommand{\stardocabstract}
+\stardocnumber      {6.4}
+\stardocauthors     {J.~Palmer \& A.C.~Davenhall}
+\stardocdate        {31st August 2001}
+\stardoctitle       {The CCD Photometric Calibration Cookbook}
+\stardocabstract
 {This cookbook presents simple recipes for the photometric calibration
 of CCD frames.  Using these recipes you can calibrate the brightness
 of objects measured in CCD frames into magnitudes in standard
-photometric systems, such as the Johnson-Morgan {\it UBV}\, system.
+photometric systems, such as the Johnson-Morgan \textit{UBV}\, system.
 The recipes use standard software available at all Starlink sites.
 
 The topics covered include: selecting standard stars, measuring
@@ -52,7 +47,7 @@ with the aim of providing advice on the actual calibration of observations.
 \latex{\vspace{5mm}}
 
 \begin{center}
-{\bf Who Should Read this Cookbook?}
+\textbf{Who Should Read this Cookbook?}
 \end{center}
 
 This cookbook is aimed firmly at people who are new to astronomical
@@ -68,235 +63,13 @@ it is usually necessary to use bespoke software tailored to the
 observing programme and photometric system you are using.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sc.tex
-%
-%  Purpose:
-%     Template for Starlink Cookbook (SC) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%
-%  History:
-%     16-JUN-1997 (BLY):
-%        Original, based on SUN/SG templates.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % from the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
+% ? Document-specific \providecommand or \newenvironment commands.
 % ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-%      \stardocversion\\
-%      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
+\scfrontmatter
 
 \latex{\subsection*{Revision history}}
 \html{\section*{Revision history}}
@@ -319,48 +92,21 @@ observing programme and photometric system you are using.}
 
 \end{enumerate}
 
-\vspace*{\fill}
-\stardoccopyright
-
-\cleardoublepage
-\begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
-
-   \newpage
-   \listoffigures
-   \listoftables
-
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-
 \section{\xlabel{INTRO}\label{INTRO}Introduction}
 
 \begin{quote}
-For the {\bf photographical magnitudes} much work has been done at
+For the \textbf{photographical magnitudes} much work has been done at
 Harvard College.  In the Cape photographic Dm data about such magnitudes
 are contained for all the stars south of declination $-19^{\circ}$,
 down to about 9.5, together with a great mass of fainter ones.
 
 The difficulty of reducing all these magnitudes to one and the same
-{\it homogeneous}\, and {\it rational}\, scale has however, not been
+\textit{homogeneous}\, and \textit{rational}\, scale has however, not been
 altogether overcome.
 
-\begin{latexonly}
-{\it Plan of Selected Areas},    \raggedleft \\
+\textit{Plan of Selected Areas},    \raggedleft \\
 J.C.~Kapteyn, 1906.              \raggedleft
-\end{latexonly}
-\begin{htmlonly}
-{\it Plan of Selected Areas}, \\
-J.C.~Kapteyn, 1906.
-\end{htmlonly}
+
 \end{quote}
 
 Nearly a century has passed since Prof.~Kapteyn made this remark and
@@ -437,7 +183,7 @@ variations and cosmic-ray events, before they can be photometrically
 calibrated.  These corrections are usually referred to as `CCD data
 reduction' and should be carried out before you attempt the photometric
 calibration.  CCD data reduction is not described in this cookbook, but is
-covered in the companion document \xref{SC/5: {\it The 2-D CCD Data
+covered in the companion document \xref{SC/5: \textit{The 2-D CCD Data
 Reduction Cookbook}}{sc5}{}\/\cite{SC5}, which is a good introduction.
 It is not considered further here.
 
@@ -449,15 +195,14 @@ photometry.  For a gentle introduction to the use of CCDs in photometry,
 try some of the articles in `amateur' astronomy magazines, such as the
 one by Kaitchuck, Henden and Truax\cite{KAITCHUCK94}.
 
-A good, detailed introduction is {\it Astronomical Photometry}\, by Henden
-and Kaitchuck\cite{HENDEN90}.  The similarly titled {\it Astronomical
+A good, detailed introduction is \textit{Astronomical Photometry}\, by Henden
+and Kaitchuck\cite{HENDEN90}.  The similarly titled \textit{Astronomical
 Photometry --- A Guide}\, by Sterken and Manfroid\cite{STERKEN92} is a
 much more technical and rigorous treatment.  Another useful and detailed
-text is Strai\v{z}ys' {\it Multicolor Stellar Photometry}\/\cite{STRAIZYS92}.
-There are also a number of good articles in the conference proceedings {\it
-Astronomical CCD Observing and Reduction Techniques}\/\cite{HOWELL92}.
+text is Strai\v{z}ys' \textit{Multicolor Stellar Photometry}\/\cite{STRAIZYS92}.
+There are also a number of good articles in the conference proceedings \textit{Astronomical CCD Observing and Reduction Techniques}\/\cite{HOWELL92}.
 
-The chapter `Photoelectric Reductions' by Hardie in {\it Astronomical
+The chapter `Photoelectric Reductions' by Hardie in \textit{Astronomical
 Techniques}\/\cite{HARDIE62} is a classic treatment of the reduction of
 photometric observations.  However, it predates the introduction of CCD
 detectors and seems a little dated now.
@@ -468,7 +213,7 @@ detectors and seems a little dated now.
 The following typographic conventions are used in this cookbook.
 
 \begin{quote}
-{\tt Anything that is to be typed into a computer program via the keyboard,
+\texttt{Anything that is to be typed into a computer program via the keyboard,
 or output from one via the screen, is indicated by a `typewriter' font
 like this.}
 \end{quote}
@@ -476,22 +221,22 @@ like this.}
 Lines that are to be typed into the computer are shown beginning with a
 {\tt{\%}} sign, for example:
 
-\begin{quote}
-{\tt \% photom}
-\end{quote}
+\begin{terminalv}
+% photom
+\end{terminalv}
 
-The {\tt{\%}} indicates the Unix `shell prompt' and should not be
+The \texttt{\%} indicates the Unix `shell prompt' and should not be
 typed in.  However:
 
 \begin{quote}
-{\sf items appearing in graphical windows, such as those used by GAIA
+\textsf{items appearing in graphical windows, such as those used by GAIA
 or xcatview, are shown in a sans serif font like this.}
 \end{quote}
 
 Finally:
 
 \begin{quote}
-{\bf items of particular importance are shown in bold and indented
+\textbf{items of particular importance are shown in bold and indented
 paragraphs like this one.}
 \end{quote}
 
@@ -500,9 +245,9 @@ Asides and points of interest are usually shown as footnotes.
 
 % - Part I ------------------------------------------------------------
 \cleardoublepage
-\markboth{\stardocname}{\stardocname}
+
 \part{Background Material}
-\markboth{\stardocname}{\stardocname}
+
 \section{\xlabel{INTRO_BACK}\label{INTRO_BACK}Introduction}
 
 This section briefly gives some background information about
@@ -525,7 +270,7 @@ and go straight to the recipes in Part II.
 This section recapitulates some of the basic concepts and equations
 of radiation theory.  Further details can be found in any standard
 introductory textbook on astrophysics.  One such classic text is
-Uns\"{o}ld's {\it The New Cosmos}\/\cite{UNSOLD67}.  However, there are
+Uns\"{o}ld's \textit{The New Cosmos}\/\cite{UNSOLD67}.  However, there are
 numerous suitable textbooks.  Assume some radiation passing
 through a surface and consider an element of the surface of area $dA$
 (Figure~\ref{INTENSITY}).  Some of the radiation will leave the surface
@@ -537,7 +282,7 @@ frequency range $[ \nu, \nu+d\nu ]$ in a time $dt$ will be:
 dE_{\nu} = I_{\nu} \cos \theta\: dA\, d\nu\, d\omega\, dt
 \end{equation}
 
-where $I_\nu$ is the {\bf specific intensity} of radiation at the
+where $I_\nu$ is the \textbf{specific intensity} of radiation at the
 frequency $\nu$ in the direction of the solid angle, with dimensions
 of ${\rm W~m^{-2}~Hz^{-1}~sr^{-1}}$.
 
@@ -552,7 +297,7 @@ of ${\rm W~m^{-2}~Hz^{-1}~sr^{-1}}$.
    \end{quote}
 \end{figure}
 
-The intensity including {\it all} possible frequencies, the {\bf total
+The intensity including \textit{all} possible frequencies, the \textbf{total
 intensity} $I$, can be obtained by integrating over all frequencies:
 
 \begin{equation}
@@ -560,21 +305,20 @@ I= \int_{0}^{\infty}I_\nu\,d\nu
 \end{equation}
 
 From an observational point of view we are generally more interested in
-the energy flux or {\bf flux} ($L_\nu, L$) and the {\bf flux density}
+the energy flux or \textbf{flux} ($L_\nu, L$) and the \textbf{flux density}
 ($F_\nu, F$)\footnote{You should be aware - and beware - that different
 authors define the terms flux density, flux and intensity differently,
 and they are sometimes used interchangeably!}. Flux density gives the
 power of the radiation per unit area and hence has dimensions of ${\rm
 W~m^{-2}~Hz^{-1}}$ or ${\rm W~m^{-2}}$. Observed flux densities are
 usually extremely small and therefore (especially in radio astronomy)
-flux densities are often expressed in units of the {\bf Jansky}
+flux densities are often expressed in units of the \textbf{Jansky}
 (Jy), where 1~Jy $= 10^{-26}~{\rm W~m^{-2}~Hz^{-1}}$.
 
 If we consider a star as the source of radiation, then the flux
 emitted by the star into a solid angle $\omega$ is $L=\omega r^2~F$,
 where $F$ is the flux density observed at a distance $r$ from the
-star (it is also usual to refer to the total flux from a star as the {\bf
-luminosity}, $L$). If the star radiates isotropically then
+star (it is also usual to refer to the total flux from a star as the \textbf{luminosity}, $L$). If the star radiates isotropically then
 radiation at a distance $r$ will be distributed evenly on a spherical
 surface of area $4\pi r^2$ and hence we get the relationship:
 
@@ -583,22 +327,22 @@ L = 4 \pi r^2~F
 \end{equation}
 
 The situation is slightly more complicated for an extended luminous
-object such as a nebula or galaxy. The {\bf surface brightness} is
+object such as a nebula or galaxy. The \textbf{surface brightness} is
 defined as the flux density per unit solid angle. The geometry of the
 situation results in the interesting fact that the observed surface
-brightness is {\it independent} of the distance of the observer from
+brightness is \textit{independent} of the distance of the observer from
 the extended source. This slightly counter-intuitive phenomenon can be
 understood by realising that although the flux density arriving from a
-{\it unit} area is inversely proportional to the distance to the observer,
+\textit{unit} area is inversely proportional to the distance to the observer,
 the area on the surface of the source enclosed by a unit solid angle at
-the observer is {\it directly} proportional to the square of the
+the observer is \textit{directly} proportional to the square of the
 distance. Thus the two effects cancel each other out.
 
 
 \section{\xlabel{MAGNITUDES}\label{MAGNITUDES}Magnitudes}
 
 Traditionally in optical astronomy the brightness of stars is measured
-in {\bf magnitudes}.  This system has its origins in classical
+in \textbf{magnitudes}.  This system has its origins in classical
 antiquity.  In 120 BC Hipparchus classified naked-eye stars into
 six groups or magnitudes, with the first class comprising the brightest
 stars and the sixth the faintest.  The scale was based on the
@@ -613,7 +357,7 @@ but more nearly logarithmic. In 1856 Norman Pogson defined the modern
 magnitude scale in a way which corresponded closely to the historical
 subjective classifications.  He defined the ratio between two brightness
 classes $n$ and $n+1$ as $\sqrt[5]{100} \simeq 2.512$.  If we define an
-arbitrary `standard' flux density $F_0$, then the {\bf apparent
+arbitrary `standard' flux density $F_0$, then the \textbf{apparent
 magnitude}, $m$, of any source with an observed flux density $F$ is
 defined by:
 
@@ -631,7 +375,7 @@ m_1 - m_2 = -2.5 \log \frac{F_1}{F_2}
 
 The system discussed so far is reliant on flux density which is a
 function of distance from the star, and so says nothing of the
-intrinsic brightness of the star itself. The {\bf absolute magnitude},
+intrinsic brightness of the star itself. The \textbf{absolute magnitude},
 $M$, is defined as the apparent magnitude of a star that would be
 observed at a distance from it of 10 parsec\footnote{Strictly speaking
 this is the apparent magnitude which would be observed in the absence
@@ -690,23 +434,22 @@ sensitive to blue light.
 
 The first estimates of stellar magnitudes were made either using the
 unaided eye or later by direct observation through a telescope.
-Magnitudes estimated in this way are referred to as {\bf visual
+Magnitudes estimated in this way are referred to as \textbf{visual
 magnitudes}, $m_{v}$\footnote{The last major catalogues compiled using
-magnitudes estimated by direct observation are the great {\it
-Durchmusterungen}\, produced in the late nineteenth and early twentieth
-centuries: the {\it Bonner Durchmusterung}, the {\it Bonner S\"{u}dliche
-Durchmusterung}\, and the {\it Cordoba Durchmusterung}.  However, the
+magnitudes estimated by direct observation are the great \textit{Durchmusterungen}\, produced in the late nineteenth and early twentieth
+centuries: the \textit{Bonner Durchmusterung}, the \textit{Bonner S\"{u}dliche
+Durchmusterung}\, and the \textit{Cordoba Durchmusterung}.  However, the
 visual system is still in use, particularly for variable-star work.
 The various extensive archives of variable-star data consist largely of
 visual observations, mostly contributed by amateurs.}.  The sensitivity
 of the human eye peaks at a wavelength of around 5500\AA.
 
-The {\bf bolometric magnitude}, $m_{bol}$, is the notional magnitude
-measured across {\it all}\, wavelengths.  Clearly the bolometric magnitude
+The \textbf{bolometric magnitude}, $m_{bol}$, is the notional magnitude
+measured across \textit{all}\, wavelengths.  Clearly the bolometric magnitude
 cannot be measured directly, because of absorption in the terrestrial
 atmosphere (see Section~\ref{AIRMASS}) and the practical difficulties
 of constructing a detector which will respond to a sufficiently wide
-range of wavelengths.  The {\bf bolometric correction} is the difference
+range of wavelengths.  The \textbf{bolometric correction} is the difference
 between $m_{v}$ and $m_{bol}$:
 
 \begin{equation}
@@ -724,8 +467,7 @@ non-thermally in the X-ray or radio regions of the spectrum.
 Schmidt-Kaler\cite{SCHMIDTKALER82} gives tables of stellar bolometric
 corrections.
 
-Another type of magnitude which is sometimes encountered is the {\bf
-photographic magnitude}, $m_{pg}$.  Photographic magnitudes were
+Another type of magnitude which is sometimes encountered is the \textbf{photographic magnitude}, $m_{pg}$.  Photographic magnitudes were
 determined from the brightness of star images recorded on photographic
 plates and thus are determined by the wavelength sensitivity of the
 photographic plate.  Early photographic plates were relatively more
@@ -736,7 +478,7 @@ combination of more modern emulsions and filters it is, of course,
 possible to expose plates which are sensitive to different wave-bands.
 
 However, modern photometric systems are defined for photoelectric,
-or latterly, CCD detectors.  In modern usage a {\bf photometric system}
+or latterly, CCD detectors.  In modern usage a \textbf{photometric system}
 comprises a set of discrete wave-bands, each with a known sensitivity
 to incident radiation.  The sensitivity is defined by the detectors
 and filters used.  Additionally a set of primary standard stars are
@@ -766,18 +508,18 @@ are summarised below.
 
 \begin{description}
 
-  \item[Johnson-Morgan {\it UBV}\, System] The Johnson-Morgan {\it UBV}\,
+  \item[Johnson-Morgan \textit{UBV}\, System] The Johnson-Morgan \textit{UBV}\,
    wide-band system\cite{JOHNSON51, JOHNSON53} is easily the most widely
    used photometric system.  It was originally introduced in the early
-   1950s.  The longer wavelength {\it R}\, and {\it I}\, bands were added
+   1950s.  The longer wavelength \textit{R}\, and \textit{I}\, bands were added
    later\cite{JOHNSON65}.  Table~\ref{PHOTODET} includes the basic details
    of the Johnson-Morgan system and Figure~\ref{UBV} shows the general
    form of the filter transmission curves.  Tabulations of these curves
    are given by Jaschek and Jaschek\cite{JASCHEK87}.
 
   \begin{quote}
-   {\bf The Johnson-Morgan $R$\, and $I$\, bands should not be confused
-   with the similar, and similarly named, bands in the Cousins {\it VRI}\,
+   \textbf{The Johnson-Morgan $R$\, and $I$\, bands should not be confused
+   with the similar, and similarly named, bands in the Cousins \textit{VRI}\,
    system\cite{COUSINS76, COUSINS78}.  The Cousins $V$\, band
    (complemented by $U$\, and $B$) is identical to the Johnson-Morgan
    system.  However, the Cousins $R$\, and $I$\, bands respectively have
@@ -787,10 +529,10 @@ are summarised below.
    Strai\v{z}ys\cite{STRAIZYS92}, pp294-296 and pp309-312.}
   \end{quote}
 
-   The zero points of the {\it UBV}\, system are chosen so that for a star
+   The zero points of the \textit{UBV}\, system are chosen so that for a star
    of spectral type A0 which is unaffected by interstellar reddening (see
    Appendix~\ref{INTERSTELLAR}) $U = B = V$.  Despite its ubiquity the
-   {\it UBV}\, system has some disadvantages.  In particular, the short
+   \textit{UBV}\, system has some disadvantages.  In particular, the short
    wavelength  cutoff of the $U$\, filter is partly defined by the
    terrestrial atmosphere rather than the detector or filter.  Thus, the
    cutoff (and hence the observed magnitudes) can vary with altitude,
@@ -830,8 +572,7 @@ are summarised below.
 
   \begin{quote}
   \caption[Details of common photometric systems.]{Details
-   of common photometric systems.  The values are taken from {\it
-   Astrophysical Quantities}\/\cite{AQ3}, except those for the $JHKLM$
+   of common photometric systems.  The values are taken from \textit{Astrophysical Quantities}\/\cite{AQ3}, except those for the $JHKLM$
    system which are taken from Sterken and Manfroid\cite{STERKEN92} and
    those for the $L^{\prime}$ band which are from the
   \htmladdnormallink{UKIRT on-line documentation}
@@ -843,7 +584,7 @@ are summarised below.
 
   \begin{figure}[htbp]
      \centering
-     \includegraphics[totalheight=4.5in,angle=270]{sc6_ubv}
+     \includegraphics[width=\textwidth]{sc6_ubv}
      \begin{quote}
      \caption{Relative transmission profiles of the $UBVRI$ filters.
       The transmission maxima have been normalized
@@ -852,7 +593,7 @@ are summarised below.
   \end{figure}
 
   \item[Str\"{o}mgren System] Another widely used system is the Str\"{o}mgren
-   intermediate-band {\it uvby}\, system\cite{STROMGREM63, STROMGREM66}.  The
+   intermediate-band \textit{uvby}\, system\cite{STROMGREM63, STROMGREM66}.  The
    details of this system are included in Table~\ref{PHOTODET}.  Filter
    transmission curves for the Str\"{o}mgren system are given by Jaschek and
    Jaschek\cite{JASCHEK87}.  Str\"{o}mgren $y$ magnitudes are well-correlated
@@ -876,8 +617,8 @@ are summarised below.
    altitude.  Consequently, great care must be exercised in inter-comparing
    $JHKLM$ observations made at different observatories.
    Table~\ref{IRSYS} summarises some of the more common $JHKLM$ systems.
-   For further details see Bersanelli {\it et al.}\/\cite{BERSANELLI91},
-   Bouchet{\it et al.}\/\cite{BOUCHET91} and Strai\v{z}ys\cite{STRAIZYS92},
+   For further details see Bersanelli \textit{et al.}\/\cite{BERSANELLI91},
+   Bouchet\textit{et al.}\/\cite{BOUCHET91} and Strai\v{z}ys\cite{STRAIZYS92},
    pp292-307.  Leggett\cite{LEGGETT92} gives details of the transformations
    between the various infrared systems.  Simons and Tokunaga\cite{SIMONS01}
    have recently reported an attempt to standardise infrared photometric
@@ -892,27 +633,26 @@ are summarised below.
    SAAO    & South African Astron. Obs.   & $JHKL$  & Glass\cite{GLASS74} \\
            &                              & $JHKL$  & Carter\cite{CARTER84, CARTER90} \\
    ESO     & European Southern Obs.       & $JHKLM$ & Wamsteker\cite{WAMSTEKER81} \\
-           &                              & $JHKL$  & Engels {\it et al.}\/\cite{ENGELS81} \\
+           &                              & $JHKL$  & Engels \textit{et al.}\/\cite{ENGELS81} \\
    AAO     & Anglo-Australian Obs.        & $JHKL^{\prime}$ & Allen and Cragg\cite{ALLEN83} \\
    MSO     & Mount Stromlo Obs.           & $JHK$   & Jones and Hyland\cite{JONES82} \\
-   CIT     & California Inst. Technol.    & $JHK$   & Frogel {\it et al.}\/\cite{FROGEL78} \\
-           &                              & $JHKL$  & Elias {\it et al.}\/\cite{ELIAS82, ELIAS83} \\
-   UNAM    & Univ. Autonoma de Mexico     & $JHKL^{\prime} M$ & Tapia {\it et al.}\/\cite{TAPIA86} \\
+   CIT     & California Inst. Technol.    & $JHK$   & Frogel \textit{et al.}\/\cite{FROGEL78} \\
+           &                              & $JHKL$  & Elias \textit{et al.}\/\cite{ELIAS82, ELIAS83} \\
+   UNAM    & Univ. Autonoma de Mexico     & $JHKL^{\prime} M$ & Tapia \textit{et al.}\/\cite{TAPIA86} \\
    UKIRT   & Joint Astron. Centre, Hawaii & $JHK$   & Casali and Hawarden\cite{CASALI92} \\
   \end{tabular}
   \end{center}
 
   \begin{quote}
-  \caption[Common {\it JHKLM} systems]{Common
-   {\it JHKLM} systems.  Adapted from Bersanelli {\it
-   et al.}\/\cite{BERSANELLI91}
+  \caption[Common \textit{JHKLM} systems]{Common
+   \textit{JHKLM} systems.  Adapted from Bersanelli \textit{et al.}\/\cite{BERSANELLI91}
   \label{IRSYS} }
   \end{quote}
 
   \end{table}
 
    As for the original Johnson-Morgan system, the zero point of the
-   {\it JHKLM} system is defined so that an unreddened A0 star has the
+   \textit{JHKLM} system is defined so that an unreddened A0 star has the
    same magnitude in all colours: $J = H = K = L = M (= U = B = V)$.
    The standard star used is Vega ($\alpha$ Lyr\ae ).
 
@@ -927,13 +667,12 @@ available.
 \subsection{Colour indices}
 
 A photometric system with more than one band is formally called a
-{\bf multi-colour system} (though in practice most photometric systems
-are multi-colour).  For any multi-colour system a series of {\bf
-colour indices}, or colloquially {\bf colours}, can be defined.  A
+\textbf{multi-colour system} (though in practice most photometric systems
+are multi-colour).  For any multi-colour system a series of \textbf{colour indices}, or colloquially \textbf{colours}, can be defined.  A
 colour index is simply the difference between the magnitude of a given
-object in any two bands.  For example, in the {\it UBV}\, system the
+object in any two bands.  For example, in the \textit{UBV}\, system the
 $B - V$\, index is simply the $V$\, magnitude subtracted from the $B$\,
-magnitude\footnote{{\it En passant}, for stars $B - V$\, is primarily
+magnitude\footnote{\textit{En passant}, for stars $B - V$\, is primarily
 related to temperature (and hence spectral class) while $U - B$\, is a
 more complex function of both luminosity and temperature.}.  Multi-colour
 photometry is usually published as a single magnitude and a set of
@@ -953,9 +692,9 @@ system.  However, the original passbands can never be reproduced
 precisely, even if the original instrumentation is simply copied and
 similar filters are purchased from the same manufacturers.  The system
 in which the new instrumentation actually observes is called its
-{\bf natural} or {\bf instrumental} system.  In this cookbook the
+\textbf{natural} or \textbf{instrumental} system.  In this cookbook the
 standard system to which a given instrumental system approximates is
-called the {\bf target} standard system.  Usually considerable effort
+called the \textbf{target} standard system.  Usually considerable effort
 is expended to make the instrumental system  match the target standard
 system as closely as possible\footnote{Clearly, instrumentation will be
 designed so that the combination of detector and filters matches the
@@ -1026,12 +765,12 @@ form.
    Some suitable catalogues of secondary standards are:
    Johnson and Morgan\cite{JOHNSON53},
    Landolt\cite{LANDOLT73, LANDOLT83, LANDOLT83B, LANDOLT92},
-   Christian {\it et al.}\/\cite{CHRISTIAN85},
+   Christian \textit{et al.}\/\cite{CHRISTIAN85},
    Graham\cite{GRAHAM82} and
-   Menzies {\it et al.}\/\cite{MENZIES89, MENZIES91}.
+   Menzies \textit{et al.}\/\cite{MENZIES89, MENZIES91}.
    Landolt's catalogues are, perhaps, the most useful.
 
-%  {\sf compilation by Boyle????}
+%  \textsf{compilation by Boyle????}
 
   \item[Str\"{o}mgren system] For catalogues of standards in the Str\"{o}mgren
    system see Gr\o nbech and Olsen\cite{GRONBECH77}, Gr\o nbech, Olsen and
@@ -1053,15 +792,15 @@ ftp.  This collection includes most of Landolt's catalogues.  The
 details are:
 
 \begin{tabular}{ll}
-Anonymous ftp to: & {\tt ftp.roe.ac.uk}        \\
-Directory:        & {\tt /pub/acd/catalogues}  \\
-File:             & {\tt photostandards.tar.Z} \\
+Anonymous ftp to: & \texttt{ftp.roe.ac.uk}        \\
+Directory:        & \texttt{/pub/acd/catalogues}  \\
+File:             & \texttt{photostandards.tar.Z} \\
 \end{tabular}
 
-Remember to reply {\tt anonymous} when prompted for a username and
+Remember to reply \texttt{anonymous} when prompted for a username and
 to give your e-mail address as the password.  You should use ftp in
-binary mode.  {\tt photostandards.tar.Z} is a compressed tar file
-and should be de-compressed with {\tt uncompress} (sic).  See
+binary mode.  \texttt{photostandards.tar.Z} is a compressed tar file
+and should be de-compressed with \texttt{uncompress} (sic).  See
 Section~\ref{STANDARDS_RECIP} for more details.
 
 Other sources of computer-readable versions of catalogues of photometric
@@ -1074,19 +813,19 @@ the CDS and ADC may be contacted as follows.
 \begin{description}
 
   \item[CDS] URL:
-  \htmladdnormallink{ {\tt http://cdsweb.u-strasbg.fr/CDS.html} }
+  \htmladdnormallink{ \texttt{http://cdsweb.u-strasbg.fr/CDS.html} }
    {http://cdsweb.u-strasbg.fr/CDS.html}
 
-   Electronic mail: {\tt question@simbad.u-strasbg.fr}
+   Electronic mail: \texttt{question@simbad.u-strasbg.fr}
 
    Postal address: Centre de Donn\'{e}es astronomiques de
    Strasbourg, Observatoire de Strasbourg, 11, rue de l'Universit\'{e},
    67000 Strasbourg, France.
 
-  \item[ADC]  URL: \htmladdnormallink{ {\tt http://adc.gsfc.nasa.gov/} }
+  \item[ADC]  URL: \htmladdnormallink{ \texttt{http://adc.gsfc.nasa.gov/} }
    {http://adc.gsfc.nasa.gov/}
 
-   Electronic mail: {\tt request@nssdca.gsfc.nasa.gov}
+   Electronic mail: \texttt{request@nssdca.gsfc.nasa.gov}
 
    Postal address: World Data Center A for Rockets and
    Satellites, NASA, Goddard Space Flight Center, Code 633,
@@ -1098,14 +837,14 @@ the CDS and ADC may be contacted as follows.
 \section{\xlabel{AIRMASS}\label{AIRMASS}Atmospheric Extinction and Air Mass}
 
 An effect which must be corrected when calibrating instrumental
-magnitudes is the {\bf atmospheric extinction} or the dimming of
+magnitudes is the \textbf{atmospheric extinction} or the dimming of
 starlight by the terrestrial atmosphere.  The longer the path length
 the starlight traverses through the atmosphere the more it is
 dimmed.  Thus, a star close to the horizon will be dimmed more than one
 close to the zenith, and the observed brightness of a given star will
 change throughout a night, as its zenith distance varies.
 
-The path length through the atmosphere is known as the {\bf air mass}.
+The path length through the atmosphere is known as the \textbf{air mass}.
 Consider an observation through the blanket of the atmosphere around
 the curved surface of the Earth. At any particular wavelength, $\lambda$,
 we can relate $m_0(\lambda)$, the magnitude of the observed object
@@ -1116,7 +855,7 @@ object at the surface of the earth, by:
 m(\lambda) = m_0(\lambda)  + \kappa(\lambda)X(z)
 \end{equation}
 
-where $X(z)$ is the air mass, $\kappa(\lambda)$ is the {\bf extinction
+where $X(z)$ is the air mass, $\kappa(\lambda)$ is the \textbf{extinction
 coefficient} at wavelength $\lambda$ and $z$ is the zenith distance (the
 angular distance of the object from the zenith at the time of observation).
 $X$ is defined as the number of times the quantity of air seen along the
@@ -1142,9 +881,9 @@ X= \sec z \left( 1 - 0.0012 (\sec^2 z-1) \right) .
 \end{equation}
 
 \begin{quote}
-{\bf Both these equations imply the use of $z_t$, the {\it true}\, zenith
-angle, that is, the zenith angle to the observed object {\it in the
-absence of the atmosphere} as opposed to the {\it apparent}\, zenith
+\textbf{Both these equations imply the use of $z_t$, the \textit{true}\, zenith
+angle, that is, the zenith angle to the observed object \textit{in the
+absence of the atmosphere} as opposed to the \textit{apparent}\, zenith
 angle $z_a$ affected by refraction effects.}
 \end{quote}
 
@@ -1188,7 +927,7 @@ than red.
 
 \begin{figure}[htbp]
    \centering
-   \includegraphics[totalheight=4.5in,angle=270]{sc6_airmass}
+   \includegraphics[width=\textwidth]{sc6_airmass}
    \begin{quote}
    \caption{How to determine atmospheric extinction coefficients by
     plotting apparent magnitudes against air mass throughout the night
@@ -1213,7 +952,7 @@ spectrum.
 The terrestrial atmosphere is largely opaque at most infrared wavelengths
 longer than 1$\mu$m, largely due to absorption by water vapour and
 carbon dioxide.  However, there are a series of wavelength ranges or
-{\bf windows} where the atmosphere is mostly transparent (see
+\textbf{windows} where the atmosphere is mostly transparent (see
 Figure~\ref{IRWINDOWS}).  Ground-based infrared observations must be
 made in these windows.  Each window corresponds to a band in the $JHKLM$
 system (see Section~\ref{PHOTOSYS}) and the corresponding band and window
@@ -1325,7 +1064,7 @@ programme objects.
 Often modern observatories will have software which allows approximate
 `rough and ready' reductions to be carried out in near real time, thus
 allowing instrumental magnitudes to be computed for the standard stars
-{\it pari passu}\, the continuing observations.  This facility is extremely
+\textit{pari passu}\, the continuing observations.  This facility is extremely
 useful because it allows the atmospheric extinction to be monitored as the
 night progresses.  However, reductions carried out during the observing
 session are only approximate.  They are useful for monitoring the
@@ -1333,7 +1072,7 @@ atmospheric extinction, but are not the most accurate results
 obtainable from the observations.
 
 \begin{quote}
-{\bf You should always reduce your data after the observing session
+\textbf{You should always reduce your data after the observing session
 has finished, starting from the full set of observations.}
 \end{quote}
 
@@ -1349,7 +1088,7 @@ it is perfectly feasible to carry out photometry to an accuracy of 0.01
 magnitude without resorting to any special tricks.
 
 \begin{quote}
-{\bf It is prudent to keep a note of the Right Ascension, Declination and
+\textbf{It is prudent to keep a note of the Right Ascension, Declination and
 UT or sidereal time of each observation (for both standard stars and
 programme objects) as it is made.  Usually (though not always) the air
 mass or zenith distance will be calculated automatically and added to the
@@ -1365,7 +1104,7 @@ calculating the zenith distance.)}
 Instrumental Magnitudes}
 
 The first step to producing a set of calibrated magnitudes for your
-list of programme objects is to measure the {\bf instrumental
+list of programme objects is to measure the \textbf{instrumental
 magnitudes} of the programme objects and standard stars recorded in
 your CCD frames.  Instrumental magnitudes are usually measured relative
 to the sky background in each CCD frame.  Prior to measuring the
@@ -1374,7 +1113,7 @@ removed from the CCD frames.  Typically you will need to de-bias and
 flat-field the frames and remove the effects of bad pixels (possibly
 including whole bad rows and columns) and cosmic-ray events.  The
 CCDPACK package (see \xref{SUN/139}{sun139}{}\cite{SUN139}) is available
-for this task.  The cookbook \xref{SC/5: {\it The 2-D CCD Data Reduction
+for this task.  The cookbook \xref{SC/5: \textit{The 2-D CCD Data Reduction
 Cookbook}}{sc5}{}\/\cite{SC5} gives a set of recipes for removing
 instrumental effects and is a good introduction to the topic.  The support
 staff at the observatory where your observations were made should be able
@@ -1384,7 +1123,7 @@ you were using.
 Once the CCD frames have been corrected for instrumental effects they
 are ready to be used to measure instrumental magnitudes.  There are
 two classes of techniques for measuring instrumental magnitudes in
-widespread use: {\bf aperture photometry} and {\bf point-spread-function
+widespread use: \textbf{aperture photometry} and \textbf{point-spread-function
 fitting}.  There are numerous variations on each technique, but the
 essentials of the two methods are as follows.
 
@@ -1493,7 +1232,7 @@ fitting technique are very different the definition of the instrumental
 magnitude is the same.
 
 \begin{quote}
-{\bf It is often a good idea to set the arbitrary constant, $A$, to a
+\textbf{It is often a good idea to set the arbitrary constant, $A$, to a
 silly value (say 30) so that the instrumental magnitudes have very
 different values from the corresponding calibrated magnitudes and
 hence the two are unlikely to be inadvertently confused.}
@@ -1511,10 +1250,9 @@ Magnitudes}
 
 The purpose of calibrating instrumental magnitudes is to convert them
 into magnitudes in the target standard photometric system.  To fix
-ideas, think of the target system as being the Johnson-Morgan {\it
-UBV}\, system.  You can think of the calibrated magnitudes as the
+ideas, think of the target system as being the Johnson-Morgan \textit{UBV}\, system.  You can think of the calibrated magnitudes as the
 magnitudes which would be recorded by a detector which perfectly
-matched the standard {\it UBV}\, system and was operating above the
+matched the standard \textit{UBV}\, system and was operating above the
 terrestrial atmosphere.  The magnitudes and colours recorded by such
 a detector still do not correspond to the intrinsic colours of the
 object observed because of the effects of interstellar material in-between
@@ -1555,7 +1293,7 @@ performing the calibration:
 In the first case the detectors and filters used have been chosen
 carefully to match the responses of the target standard system as
 closely as possible.  Thus, for example, the transmission profiles of
-an instrumental {\it UBVRI}\, system would be similar to those for the
+an instrumental \textit{UBVRI}\, system would be similar to those for the
 standard system shown in Figure~\ref{UBV}.  Often the instrumental
 system will closely match the corresponding standard one (and
 considerable effort and attention will have been expended at the
@@ -1563,7 +1301,7 @@ observatory providing the instrumentation to ensure that this is the
 case).  Staff at the observatory should be able to advise on how
 well matched the systems are.  Other useful sources of information
 are handbooks, World Wide Web pages, newsletters and instrument manuals
-issued by the observatory.  \xref{SG/10: {\it Preparing to
+issued by the observatory.  \xref{SG/10: \textit{Preparing to
 Observe}}{sg10}{}\/\cite{SG10} includes a list of URLs for the Web pages
 of the observatories usually used by British astronomers.
 
@@ -1670,11 +1408,10 @@ least) the following caveats should be borne in mind.
    from night to night\footnote{Obviously the atmospheric extinction
    depends on the prevailing atmospheric conditions.  An unusual example
    of variation caused by atmospheric conditions is the disruption
-   following the eruption of Mount Pinatubo, as described by Forbes {\it
-   et al.}\/\cite{FORBES95}.}.  Hence:
+   following the eruption of Mount Pinatubo, as described by Forbes \textit{et al.}\/\cite{FORBES95}.}.  Hence:
 
   \begin{quote}
-   {\bf observations of standard stars should only be used to calibrate
+   \textbf{observations of standard stars should only be used to calibrate
    observations of programme objects made on the same night.}
   \end{quote}
 
@@ -1720,10 +1457,9 @@ the instrumental magnitude in the corresponding band in a manner similar
 to Equation~\ref{CALIBEQN}.  However, an additional term is added
 corresponding to a colour index determined from an adjacent band.  This
 term compensates for the mismatch between the instrumental and standard
-systems.  For example, for the Johnson-Morgan {\it UBV}\, system the
+systems.  For example, for the Johnson-Morgan \textit{UBV}\, system the
 calibration formul\ae\ are:
 
-\begin{latexonly}
   \begin{eqnarray}
    U & = & U_{\rm inst} - A_{u} + Z_{u} + C_{u} ( U - B ) + \kappa_{u} X
      \nonumber  \\
@@ -1732,25 +1468,6 @@ calibration formul\ae\ are:
    V & = & V_{\rm inst} - A_{v} + Z_{v} + C_{v} ( B - V ) + \kappa_{v} X
      \nonumber
   \end{eqnarray}
-\end{latexonly}
-\begin{htmlonly}
-
-  \begin{equation}
-   U & = & U_{\rm inst} - A_{u} + Z_{u} + C_{u} ( U - B ) + \kappa_{u} X
-     \nonumber
-  \end{equation}
-
-  \begin{equation}
-   B & = & B_{\rm inst} - A_{b} + Z_{b} + C_{b} ( B - V ) + \kappa_{b} X
-     \label{COLOUREQN}
-  \end{equation}
-
-  \begin{equation}
-   V & = & V_{\rm inst} - A_{v} + Z_{v} + C_{v} ( B - V ) + \kappa_{v} X
-     \nonumber
-  \end{equation}
-
-\end{htmlonly}
 
 where:
 
@@ -1816,16 +1533,16 @@ Often bespoke software is used for reducing photometric observations with
 colour corrections, partly because the colour correction terms used will
 depend on the bands that were observed.  There is no recipe for
 calibration with colour corrections in this cookbook.  Further
-discussions are given by Massey {\it et al.}\/\cite{MASSEY89},
-Da~Costa\cite{DACOSTA90}, Harris {\it et al.}\/\cite{HARRIS81} and
+discussions are given by Massey \textit{et al.}\/\cite{MASSEY89},
+Da~Costa\cite{DACOSTA90}, Harris \textit{et al.}\/\cite{HARRIS81} and
 Stetson and Harris\cite{STETSON88}.
 
 
 % - Part II -----------------------------------------------------------
 \cleardoublepage
-\markboth{\stardocname}{\stardocname}
+
 \part{The Recipes}
-\markboth{\stardocname}{\stardocname}
+
 \section{\xlabel{INTRO_RECIP}\label{INTRO_RECIP}Introduction}
 
 This part of the cookbook provides a set of simple recipes for
@@ -1902,12 +1619,12 @@ of the paper copies of catalogues and this technique must still be used
 if a computer-readable version of the catalogue is not available.
 However, this recipe uses the catalogue and table manipulation package
 CURSA (see \xref{SUN/190}{sun190}{}\cite{SUN190}) to search the
-Landolt (1992)\cite{LANDOLT92} catalogue of {\it UBV}\, standards.
+Landolt (1992)\cite{LANDOLT92} catalogue of \textit{UBV}\, standards.
 Numerous catalogues of standards are available and Section~\ref{CATS}
 gives some of the details.
 
 \begin{quote}
-{\bf Irrespective of whether you are using the paper or computer
+\textbf{Irrespective of whether you are using the paper or computer
 readable version of a catalogue it is always advisable to read the
 paper or other notes which accompany the it.  This documentation will
 typically contain important information about the limitations,
@@ -1923,9 +1640,9 @@ in order to use it effectively.}
    ftp.  The details are as follows.
 
   \begin{tabular}{ll}
-   Anonymous ftp to: & {\tt ftp.roe.ac.uk}        \\
-   Directory:        & {\tt /pub/acd/catalogues}  \\
-   File:             & {\tt photostandards.tar.Z} \\
+   Anonymous ftp to: & \texttt{ftp.roe.ac.uk}        \\
+   Directory:        & \texttt{/pub/acd/catalogues}  \\
+   File:             & \texttt{photostandards.tar.Z} \\
   \end{tabular}
 
    The file is a compressed tar archive; remember to use ftp in binary
@@ -1936,55 +1653,55 @@ in order to use it effectively.}
 
     \item To start ftp type:
 
-\begin{verbatim}
+\begin{terminalv}
 %  ftp  ftp.roe.ac.uk
-\end{verbatim}
+\end{terminalv}
 
-     Reply `{\tt anonymous}' to the {\tt Name} prompt and give your
+     Reply `\texttt{anonymous}' to the \texttt{Name} prompt and give your
      electronic mail address as the password.  Then type:
 
-\begin{verbatim}
+\begin{terminalv}
 ftp>  cd /pub/acd/catalogues
 ftp>  binary
 ftp>  get photostandards.tar.Z
-\end{verbatim}
+\end{terminalv}
 
      (Note that messages from the ftp commands have been omitted and
      `\verb-ftp>-' is the ftp prompt rather than something that you
-     type in.)  Once the file has been retrieved type `{\tt quit}' to
-     leave ftp.  The file {\tt photostandards.tar.Z} should have been
-     created in your current directory.  Note the use of the {\tt binary}
+     type in.)  Once the file has been retrieved type `\texttt{quit}' to
+     leave ftp.  The file \texttt{photostandards.tar.Z} should have been
+     created in your current directory.  Note the use of the \texttt{binary}
      command to set ftp to the appropriate mode for retrieving non-text
      files.  If you encounter problems with ftp then seek assistance from
      your site manager in the first instance.  There is now a veritable
      plethora of books about using computer communications networks.
      However, one which gives a good description of the ftp utility is
-     {\it The Whole Internet User's Guide and Catalog} by Krol\cite{KROL93}.
+     \textit{The Whole Internet User's Guide and Catalog} by Krol\cite{KROL93}.
 
-    \item File {\tt photostandards.tar.Z} is a compressed tar archive.
+    \item File \texttt{photostandards.tar.Z} is a compressed tar archive.
      It must be decompressed before it can be used.  Type:
 
-\begin{verbatim}
+\begin{terminalv}
 %  uncompress  photostandards.tar.Z
-\end{verbatim}
+\end{terminalv}
 
     \item To extract all the files in the archive type:
 
-\begin{verbatim}
+\begin{terminalv}
 %  tar  xvf  photostandards.tar
-\end{verbatim}
+\end{terminalv}
 
-     Subdirectory {\tt photostandards} should be created in your current
-     directory.  File {\tt photostandards/0CATALOGUES.LIS} gives details
+     Subdirectory \texttt{photostandards} should be created in your current
+     directory.  File \texttt{photostandards/0CATALOGUES.LIS} gives details
      of the catalogues available.  The Landolt (1992) catalogue is file:
 
-    \begin{quote}
-     {\tt photostandards/ii183/ii183.TXT}
-    \end{quote}
+\begin{terminalv}
+photostandards/ii183/ii183.TXT
+\end{terminalv}
 
      The name of the subdirectory refers to the numbering of the
      catalogue by the CDS.  The catalogue is in the CURSA Small Text List
-     (STL) format for which the file type is {\tt .TXT} (or {\tt .txt}).
+     (STL) format for which the file type is \texttt{.TXT} (or \texttt{.txt}).
 
     \item Finally, move a copy of the catalogue to a convenient directory
      and make this directory your current directory.
@@ -1993,47 +1710,45 @@ ftp>  get photostandards.tar.Z
 
   \item Start CURSA.  Simply type:
 
-\begin{verbatim}
+\begin{terminalv}
 %  cursa
-\end{verbatim}
+\end{terminalv}
 
    A message similar to the following should appear.
 
-\begin{verbatim}
+\begin{terminalv}
 
    CURSA commands are now available -- (Version 6.3)
 
-\end{verbatim}
+\end{terminalv}
 
-  \item The CURSA applications include {\tt xcatview} a GUI-based
+  \item The CURSA applications include \texttt{xcatview} a GUI-based
    catalogue browser which can be used to select standard stars that
    match your criteria.  To start it, ensure that your terminal is
    configured to receive X-output, then type:
 
-\begin{verbatim}
+\begin{terminalv}
 %  xcatview  &
-\end{verbatim}
+\end{terminalv}
 
-   (The `{\tt \&}' merely makes {\tt xcatview} run as a detached process
+   (The `\texttt{\&}' merely makes \texttt{xcatview} run as a detached process
    so you can, if you so desire, continue to issue Unix commands from the
    command line.)  A window similar to Figure~\ref{XCATVIEW1} should
-   appear.  Use the {\sf Select Catalogue} window to open catalogue {\tt
-   ii183.TXT}.  The {\sf Open Catalogue} window is similar to the
+   appear.  Use the \textsf{Select Catalogue} window to open catalogue \texttt{ii183.TXT}.  The \textsf{Open Catalogue} window is similar to the
    file-selectors often found in GUI-based applications and if you have
    used similar ones you should not have any difficulty using it.
-   However, in case of difficulty, click on the {\sf Help} button for
-   assistance.  The catalogue should open and the appearance of {\tt
-   xcatview} should be similar to Figure~\ref{XCATVIEW2}.
+   However, in case of difficulty, click on the \textsf{Help} button for
+   assistance.  The catalogue should open and the appearance of \texttt{xcatview} should be similar to Figure~\ref{XCATVIEW2}.
 
-   You can, if you wish, use the various functions in {\tt xcatview}
-   to browse the catalogue.  Note that all the windows in {\tt xcatview}
-   contain a {\sf Help} button which can be clicked for assistance.
+   You can, if you wish, use the various functions in \texttt{xcatview}
+   to browse the catalogue.  Note that all the windows in \texttt{xcatview}
+   contain a \textsf{Help} button which can be clicked for assistance.
 
   \begin{figure}[htbp]
      \centering
      \includegraphics[totalheight=3.25in]{sc6_xcatview1}
      \begin{quote}
-     \caption{Starting up the CURSA catalogue browser {\tt xcatview}
+     \caption{Starting up the CURSA catalogue browser \texttt{xcatview}
      \label{XCATVIEW1} }
      \end{quote}
   \end{figure}
@@ -2042,7 +1757,7 @@ ftp>  get photostandards.tar.Z
      \centering
      \includegraphics[totalheight=3.25in]{sc6_xcatview2}
      \begin{quote}
-     \caption{{\tt xcatview} displaying a catalogue
+     \caption{\texttt{xcatview} displaying a catalogue
      \label{XCATVIEW2} }
      \end{quote}
   \end{figure}
@@ -2050,23 +1765,23 @@ ftp>  get photostandards.tar.Z
   \item In CURSA (and similar systems) each column in the catalogue has
    a name which is unique within the catalogue and you use this name
    to refer to the column.  The names of the columns are shown at the
-   top of the {\tt xcatview} main display area (see
+   top of the \texttt{xcatview} main display area (see
    Figure~\ref{XCATVIEW2}).  Alternatively, you can list all the column
-   names by clicking on the {\sf Listing} menu in the bar at the top of
-   the {\tt xcatview} window and choosing the {\sf Show summary of
+   names by clicking on the \textsf{Listing} menu in the bar at the top of
+   the \texttt{xcatview} window and choosing the \textsf{Show summary of
    columns} option.
 
    In CURSA you can calculate new columns `on the fly' by specifying
    algebraic expressions involving existing columns.  Thus, if you
-   had columns called {\tt X} and {\tt Y} you could specify ${\tt X +
+   had columns called \texttt{X} and \texttt{Y} you could specify $\texttt{X +
    Y}$.  The actual details are not germane here.  However, an
    important consequence which you should be aware of is that column
    names themselves cannot contain arithmetic operators (because such
    names would be ambiguous).  Thus, the obvious names for colours such
    as $B - V$\, and $U - B$\, are invalid.  The usual convention is to
-   replace the minus sign with an underscore (`{\tt \_}'), so the
-   column names become {\tt B\_V} and {\tt U\_B}.  The columns in
-   catalogue {\tt ii183.TXT} follow this convention.
+   replace the minus sign with an underscore (`\texttt{\_}'), so the
+   column names become \texttt{B\_V} and \texttt{U\_B}.  The columns in
+   catalogue \texttt{ii183.TXT} follow this convention.
 
   \item The next step is to select the stars which match the required
    criteria.  Suppose that standard stars were required which met the
@@ -2088,30 +1803,29 @@ ftp>  get photostandards.tar.Z
    Landolt's discussion of the catalogue\cite{LANDOLT92} that stars with
    multiple observations make better standards.
 
-   To generate a selection click on the {\sf Selection} button in the
-   bar at the top of the {\tt xcatview} window and choose the {\sf
-   Create a new selection} option.  A new window will appear allowing
+   To generate a selection click on the \textsf{Selection} button in the
+   bar at the top of the \texttt{xcatview} window and choose the \textsf{Create a new selection} option.  A new window will appear allowing
    you to specify the required selection.  Enter:
 
-  \begin{verse}
-   \verb-V > 12.0 AND V < 15.0-
-  \end{verse}
+\begin{terminalv}
+V > 12.0 AND V < 15.0
+\end{terminalv}
 
-   and click on the {\sf OK} button.  This operation selects stars in
+   and click on the \textsf{OK} button.  This operation selects stars in
    the magnitude range $12 < V < 15$.  Repeat the procedure to further
    refine the selection by limiting the range of colours, Right Ascension
    and number of observations.  The selections to enter are:
 
-  \begin{verse}
-   \verb-B_V > 0.5 AND B_V < 1.5-         \\
-   \verb-RA > 15:00:00 AND RA < 20:00:00- \\
-   \verb-OBS >= 7-
-  \end{verse}
+\begin{terminalv}
+B_V > 0.5 AND B_V < 1.5
+RA > 15:00:00 AND RA < 20:00:00
+OBS >= 7
+\end{terminalv}
 
   \begin{quote}
-   {\bf Note that in order to indicate that the Right Ascension is being
+   \textbf{Note that in order to indicate that the Right Ascension is being
    specified as sexagesimal hours the value is entered unsigned and with
-   a colon (`{\tt :}') to separate the minutes and seconds.  CURSA
+   a colon (`\texttt{:}') to separate the minutes and seconds.  CURSA
    interprets an unsigned sexagesimal value in this format as hours.  A
    signed sexagesimal value is similarly interpreted as degrees.  Thus
    positive angles in sexagesimal degrees must be preceded by a plus sign.
@@ -2120,7 +1834,7 @@ ftp>  get photostandards.tar.Z
 
    Alternatively, if you prefer, you can generate the required selection
    in one go by entering all the criteria in a single selection, with
-   the individual elements separated by `{\tt AND}'.  However, it is
+   the individual elements separated by `\texttt{AND}'.  However, it is
    probably easier to make typing mistakes this way.  Whichever way the
    selections are specified you should finally select 24 standard stars.
 
@@ -2130,20 +1844,19 @@ ftp>  get photostandards.tar.Z
    corresponding columns plus the star name and coordinates.  The names
    of the required columns are:
 
-  \begin{verse}
-   {\tt NAME  \\
-   RA         \\
-   DEC        \\
-   V          \\
-   B\_V       \\
-   U\_B}
-  \end{verse}
+\begin{terminalv}
+NAME
+RA
+DEC
+V
+B_V
+U_B}
+\end{terminalv}
 
-   Click on the {\sf Listing} button in the bar at the top of the {\tt
-   xcatview} window and choose the {\sf Choose the columns to be listed}
+   Click on the \textsf{Listing} button in the bar at the top of the \texttt{xcatview} window and choose the \textsf{Choose the columns to be listed}
    option.  A new window appears which allows you to choose the
    required columns.  Use it to select the above set of columns.  Click
-   on the {\sf Help} button in case of difficulties and on {\sf OK}
+   on the \textsf{Help} button in case of difficulties and on \textsf{OK}
    when you have selected the required columns.  Subsequently, only the
    chosen columns will be listed on the screen, written to output
    catalogues \emph{etc}.
@@ -2152,47 +1865,46 @@ ftp>  get photostandards.tar.Z
    that you can refer to it again (you will need the catalogue magnitudes
    when you come to calibrate your own photometry; the recipe in
    Section~\ref{CALIBRATE_RECIP} is an example of this process).
-   Click on the {\sf File} button in the bar at the top of the {\tt
-   xcatview} window and choose the {\sf Save as catalogue} option.  A
+   Click on the \textsf{File} button in the bar at the top of the \texttt{xcatview} window and choose the \textsf{Save as catalogue} option.  A
    new window will appear.  Enter the required file name, perhaps:
 
-  \begin{verse}
-   {\tt mystandards.TXT}
-  \end{verse}
+\begin{terminalv}
+mystandards.TXT
+\end{terminalv}
 
    Note that CURSA uses the file type to recognise the format in which
    the catalogue is to be written.  The most appropriate format for
    these small lists is the Small Text List (STL) format, for which the
-   corresponding file type is `{\tt .TXT}' or `{\tt .txt}'.  Also set
-   the {\sf Columns} button to {\sf current list} (otherwise all the
-   columns in the catalogue will be written).  Then click on the {\sf OK}
-   button.  A catalogue called {\tt mystandards.TXT} containing the
+   corresponding file type is `\texttt{.TXT}' or `\texttt{.txt}'.  Also set
+   the \textsf{Columns} button to \textsf{current list} (otherwise all the
+   columns in the catalogue will be written).  Then click on the \textsf{OK}
+   button.  A catalogue called \texttt{mystandards.TXT} containing the
    selected standard stars should be written in your current directory.
 
   \item It is probably useful to also save the selected stars as a
-   text file.  Click on the {\sf File} button in the bar at the top of
-   the {\tt xcatview} window and choose the {\sf Save as text file}
+   text file.  Click on the \textsf{File} button in the bar at the top of
+   the \texttt{xcatview} window and choose the \textsf{Save as text file}
    option.  Enter the required file name, perhaps:
 
-  \begin{verse}
-   {\tt mystandards.lis}
-  \end{verse}
+\begin{terminalv}
+mystandards.lis
+\end{terminalv}
 
-   set the other options as required and click on the {\sf OK} button.
-   File {\tt mystandards.lis} will be written in your current directory.
+   set the other options as required and click on the \textsf{OK} button.
+   File \texttt{mystandards.lis} will be written in your current directory.
    It is suitable for printing out, editing \emph{etc}.
 
   \item You now have a preliminary list of standard stars.  The final
    step is to check the visibility of each star at the location and
    date of your observing run.  A number of utilities are available to
-   assist with this process.  The document \xref{SG/10: {\it Preparing
+   assist with this process.  The document \xref{SG/10: \textit{Preparing
    to Observe}}{sg10}{}\/\cite{SG10} summarises what is available.  One
    alternative is OBSERVE (see \xref{SUN/146}{sun146}{}\cite{SUN146}).
    To run it simply type:
 
-\begin{verbatim}
+\begin{terminalv}
 %  observe
-\end{verbatim}
+\end{terminalv}
 
    and enter the required details.  A series of plots and graphs are
    generated.  You can use this output to arrive at a final list of
@@ -2216,7 +1928,7 @@ Section~\ref{MEASURE_INSTR}.
 The starting point is a CCD frame which has been processed to remove
 instrumental effects.  This process typically includes: removing
 cosmic-ray events and other blemishes, de-biasing and flat-fielding.  It
-is described in \xref{SC/5: {\it The 2-D CCD Data Reduction
+is described in \xref{SC/5: \textit{The 2-D CCD Data Reduction
 Cookbook}}{sc5}{}\/\cite{SC5} and in \xref{SUN/139}{sun139}{}\cite{SUN139},
 the manual for the CCDPACK package, and is not considered further here.
 SC/5 is a good introduction.  PHOTOM can be used interactively, or can be
@@ -2225,9 +1937,9 @@ aperture photometry.  It is used interactively in this recipe.
 
 The example CCD frame used in this recipe is available as file:
 
-\begin{verse}
-{\tt /star/examples/sc6/ccdframe.sdf}
-\end{verse}
+\begin{terminalv}
+/star/examples/sc6/ccdframe.sdf
+\end{terminalv}
 
 If you intend to work through the recipe using this file you should make
 a copy of it in your current directory.  Alternatively, you may prefer
@@ -2237,7 +1949,7 @@ to use a CCD frame of your own.
 
   \item First the image containing the stars must be displayed using
    software which PHOTOM can interact with.  Application
-   \xref{{\tt display}}{sun95}{DISPLAY}
+   \xref{\texttt{display}}{sun95}{DISPLAY}
    in KAPPA (see \xref{SUN/95}{sun95}{}\cite{SUN95}) is
    ideal\footnote{Strictly speaking you must use display software
    which accesses the Starlink graphics database (see
@@ -2245,59 +1957,58 @@ to use a CCD frame of your own.
    be aware of the graphics database and certainly do not need to know
    anything about it.  It is simply a mechanism which allows different
    applications to co-operate in using the same plot.}.  It is best to
-   create the display window using the {\tt xmake} utility because in this
+   create the display window using the \texttt{xmake} utility because in this
    way you can define the display to have an overlay plane, thus allowing
    the graphics output by PHOTOM to be cleared without destroying the
    displayed image. So, start the display with a command like:
 
-\begin{verbatim}
-     % xmake xwindows -overlay -ovcolour blue
-\end{verbatim}
+\begin{terminalv}
+% xmake xwindows -overlay -ovcolour blue
+\end{terminalv}
 
   \item Now display the data with KAPPA
-   \xref{{\tt display}}{sun95}{DISPLAY} using {\tt xwindows} as the
+   \xref{\texttt{display}}{sun95}{DISPLAY} using \texttt{xwindows} as the
    display device.  Briefly, type:
 
-\begin{verbatim}
-     % kappa
-\end{verbatim}
+\begin{terminalv}
+% kappa
+\end{terminalv}
 
    to load the KAPPA package.  Then issue the following commands:
 
-\begin{verbatim}
-     % lutneg
-     DEVICE - Name of display device > xwindows
-     % display
-     IN - NDF to be displayed > ccdframe
-     DEVICE - Name of display device > xwindows
-     MODE - Method to define the scaling limits /'SCALE'/ > FAINT
-     Data will be scaled from 200 to 2666.
-\end{verbatim}
+\begin{terminalv}
+% lutneg
+DEVICE - Name of display device > xwindows
+% display
+IN - NDF to be displayed > ccdframe
+DEVICE - Name of display device > xwindows
+MODE - Method to define the scaling limits /'SCALE'/ > FAINT
+Data will be scaled from 200 to 2666.
+\end{terminalv}
 
-   \xref{{\tt lutneg}}{sun95}{LUTNEG} sets up a negative grey-scale colour
-   table\footnote{An image displayed with the {\tt lutneg} colour table
+   \xref{\texttt{lutneg}}{sun95}{LUTNEG} sets up a negative grey-scale colour
+   table\footnote{An image displayed with the \texttt{lutneg} colour table
    mimics the appearance of a conventional astronomical photographic plate:
    stars appear as dark spots on a light background.  Various other colour
-   tables are available in KAPPA.  For example, {\tt lutgrey} sets up a
+   tables are available in KAPPA.  For example, \texttt{lutgrey} sets up a
    positive grey-scale (light stars against a dark background) and
-   {\tt lutheat} sets up a pseudo-heat sequence.}.  {\tt display} displays
+   \texttt{lutheat} sets up a pseudo-heat sequence.}.  \texttt{display} displays
    the image, which should appear as a grey-scale plot.  Note that the
-   input file name is (and must be) specified without the `{\tt .sdf}'
+   input file name is (and must be) specified without the `\texttt{.sdf}'
    file type.
 
-  \item Next, start up PHOTOM by typing {\tt photomstart} to enable its
-   commands and \xref{{\tt photom}}{sun45}{PHOTOM} to start.  You will be
+  \item Next, start up PHOTOM by typing \texttt{photomstart} to enable its
+   commands and \xref{\texttt{photom}}{sun45}{PHOTOM} to start.  You will be
    asked for the name of a data frame.  Again the file name must be
    specified without the file type.  The default name for the output file
-   written by PHOTOM is {\tt photom.dat}.  If this file exists, an error
+   written by PHOTOM is \texttt{photom.dat}.  If this file exists, an error
    message will appear and you will be prompted for an alternate name.
    The sequence of commands and responses should be something like the
    following:
 
 {\samepage
-\begin{quote}
 \begin{small}
-\begin{verbatim}
+\begin{terminalv}
 % photomstart
 
    PHOTOM applications are now available -- (Version 1.5-0)
@@ -2307,17 +2018,15 @@ IN - NDF containing input image > ccdframe
 Commands are - Annulus, Centroid, End, File, Help, Ishape, Measure,
                Nshape, Options, Photons, Sky, Values
 COMMAND - PHOTOM /'Values'/ >
-\end{verbatim}
+\end{terminalv}
 \end{small}
-\end{quote}
 }
 
   \item If you hit \verb+<RETURN>+ here you will get a list of the default
    values that are set for PHOTOM at present. The result will be like:
 
-\begin{quote}
 \begin{small}
-\begin{verbatim}
+\begin{terminalv}
 COMMAND - PHOTOM /'Values'/ >
 
  Semim           =   5.0
@@ -2340,15 +2049,13 @@ COMMAND - PHOTOM /'Values'/ >
  Errors from sky variance
 
 COMMAND - PHOTOM /'Values'/ >
-\end{verbatim}
+\end{terminalv}
 \end{small}
-\end{quote}
 
-   You can use {\tt Help} to find out what the options are:
+   You can use \texttt{Help} to find out what the options are:
 
-\begin{quote}
 \begin{small}
-\begin{verbatim}
+\begin{terminalv}
 COMMAND - PHOTOM /'Values'/ > help
 Commands are - Annulus, Centroid, End, File, Help, Ishape, Measure,
                Nshape, Options, Photons, Sky, Values
@@ -2365,9 +2072,8 @@ Photons  - Select error estimate - photon statistics, sky or data variance
 Sky      - Select sky estimator - mean, mean within 2 sigma, mode or user given
 Values   - Output current parameter values
 COMMAND - PHOTOM /'Values'/ >
-\end{verbatim}
+\end{terminalv}
 \end{small}
-\end{quote}
 
    Some of these choices toggle between values.  The way these options
    work is that when the appropriate command is issued the chosen
@@ -2379,7 +2085,7 @@ COMMAND - PHOTOM /'Values'/ >
   \item The next step is to set some parameters which define the
    apertures which will be used and various related items.  Initially
    a circular aperture will be used, with the sky background measured
-   in an annulus around it.  You should toggle the {\tt Annulus} command
+   in an annulus around it.  You should toggle the \texttt{Annulus} command
    until a concentric aperture is selected.
 
    Now you will need to choose some suitable values for the measuring
@@ -2389,16 +2095,16 @@ COMMAND - PHOTOM /'Values'/ >
    should not be so big that it includes too many surrounding objects.
 
   \begin{quote}
-   {\bf How big does the radius of the measuring aperture need to be, and
+   \textbf{How big does the radius of the measuring aperture need to be, and
    how much bigger should the background annulus around it be? There is
    no hard and fast answer: it depends on the plate scale of the image,
    how crowded the field is and whether the programme objects are stars
    or extended objects.  If the aperture is too small then a fraction
    of the light from the object being measured will fall outside the
    aperture and not be detected, thus leading to an underestimate of
-   the brightness of the object.
+   the brightness of the object.}
 
-   If your programme objects are stars and all your CCD frames have the
+   \textbf{If your programme objects are stars and all your CCD frames have the
    same point-spread function (that is, the seeing remained the same
    whilst all the frames were acquired) then the choice of aperture is
    not too critical.  All the objects measured, both programme stars and
@@ -2407,17 +2113,17 @@ COMMAND - PHOTOM /'Values'/ >
    brightness is simply calibrated out when the instrumental magnitudes are
    converted to magnitudes in a standard system.  In this case quite a
    small aperture can be used in order to minimise statistical errors
-   in the background and contamination by faint stars.
+   in the background and contamination by faint stars.}
 
-   The situation is rather different if the programme objects are
+   \textbf{The situation is rather different if the programme objects are
    extended objects.  Here the programme objects will have a different
    intensity profile to the standard stars and hence for a given
    aperture size a different fraction of the total light will be lost.
    Thus it is important to determine the total magnitudes for both
    standard stars and programme objects and a larger aperture is
-   appropriate.
+   appropriate.}
 
-   An aperture radius of about twenty seconds of arc is often a
+   \textbf{An aperture radius of about twenty seconds of arc is often a
    reasonable starting point.}
   \end{quote}
 
@@ -2429,13 +2135,13 @@ COMMAND - PHOTOM /'Values'/ >
   \item Next set the size of the measurement aperture:
 
 {\samepage
-\begin{verbatim}
-     COMMAND - PHOTOM /'Values'/ > n
-     SEMIM - Semi-major axis /5/ > 8
-     ECCEN - Eccentricity /0/ >
-     ANGLE - Orientation /0/ >
-     COMMAND - PHOTOM /'Values'/ >
-\end{verbatim}
+\begin{terminalv}
+COMMAND - PHOTOM /'Values'/ > n
+SEMIM - Semi-major axis /5/ > 8
+ECCEN - Eccentricity /0/ >
+ANGLE - Orientation /0/ >
+COMMAND - PHOTOM /'Values'/ >
+\end{terminalv}
 }
 
    Notice a couple of things here:
@@ -2456,42 +2162,41 @@ COMMAND - PHOTOM /'Values'/ >
 
    Now set the other required values:
 
-\begin{verbatim}
-     COMMAND - PHOTOM /'Values'/ > o
-     INNER - Inner annular radius /1.4/ > 1.3
-     OUTER - Outer annular radius /2/ > 2.1
-     PADU - Photons per ADU /1/ >
-     SKYMAG - Magnitude of sky /50/ > 30
-     BIASLE - Bias level ( data units ) /0/ >
-     SATURE - Saturation level ( data units ) /1.7E38/ >
-     COMMAND - PHOTOM /'Values'/ >
-\end{verbatim}
+\begin{terminalv}
+COMMAND - PHOTOM /'Values'/ > o
+INNER - Inner annular radius /1.4/ > 1.3
+OUTER - Outer annular radius /2/ > 2.1
+PADU - Photons per ADU /1/ >
+SKYMAG - Magnitude of sky /50/ > 30
+BIASLE - Bias level ( data units ) /0/ >
+SATURE - Saturation level ( data units ) /1.7E38/ >
+COMMAND - PHOTOM /'Values'/ >
+\end{terminalv}
 
    A few more things to note:
 
   \begin{itemize}
 
-    \item the annulus measurements are entered as {\it multiples} of the
+    \item the annulus measurements are entered as \textit{multiples} of the
      measurement aperture,
 
-    \item {\tt SKYMAG} is essentially the arbitrary constant $A$\,
+    \item \texttt{SKYMAG} is essentially the arbitrary constant $A$\,
      which appears in equations~\ref{INSTREQN}, \ref{CALIBEQN} and
      \ref{COLOUREQN}.  It is usually sensible to set it to an
      improbable value, such as 30 (as used here) so that the
      instrumental magnitudes measured by PHOTOM are not inadvertently
      confused with calibrated magnitudes.  Conversely, if the absolute
      value of the sky background is known and used then the instrumental
-     magnitudes will {\it approximate}\, to calibrated magnitudes,
+     magnitudes will \textit{approximate}\, to calibrated magnitudes,
      albeit without atmospheric extinction and colour corrections,
 
-    \item other values, such as {\tt PADU} and {\tt BIASLE} will be
+    \item other values, such as \texttt{PADU} and \texttt{BIASLE} will be
      specific to the data.
 
   \end{itemize}
 
   \item PHOTOM is now set up ready to measure stars and sky background.
-   Type {\tt m} and when prompted for the display device use {\tt
-   xoverlay}.  The text boxes that appear towards the bottom of the
+   Type \texttt{m} and when prompted for the display device use \texttt{xoverlay}.  The text boxes that appear towards the bottom of the
    display refer to the corresponding mouse buttons.  Proceed as
    follows.
 
@@ -2504,7 +2209,7 @@ COMMAND - PHOTOM /'Values'/ >
      to measure.
 
     \item To finish, click on the right mouse button or enter 0 from
-     the keyboard and you will return to the PHOTOM `{\tt COMMAND}'
+     the keyboard and you will return to the PHOTOM `\texttt{COMMAND}'
      prompt.
 
   \end{enumerate}
@@ -2515,7 +2220,7 @@ COMMAND - PHOTOM /'Values'/ >
    PHOTOM):
 
 {\samepage
-\begin{verbatim}
+\begin{terminalv}
 COMMAND - PHOTOM /'Values'/ > m
 DEVICE - Display device /@xwindows/ > xoverlay
 Select operation according to screen menu
@@ -2533,7 +2238,7 @@ Right hand box - Press right hand mouse button
     4    81.58    65.64   17.059    0.003    489.962 150087.483
     5   362.25    66.61   18.209    0.005    491.481  52030.981
 COMMAND - PHOTOM /'Values'/ >
-\end{verbatim}
+\end{terminalv}
 }
 
    If you are working through the recipe the actual values you obtain
@@ -2570,10 +2275,10 @@ COMMAND - PHOTOM /'Values'/ >
 
   \begin{enumerate}
 
-    \item Type {\tt a} to toggle the {\tt Annulus} choice.  The message
-     `{\tt Interactive aperture in use}' should be displayed.
+    \item Type \texttt{a} to toggle the \texttt{Annulus} choice.  The message
+     `\texttt{Interactive aperture in use}' should be displayed.
 
-    \item Type {\tt m}
+    \item Type \texttt{m}
 
     \item Move the cursor to a blank patch of sky.  Usually the patch
      chosen will be close to the object to be measured.  Click on the
@@ -2612,7 +2317,7 @@ COMMAND - PHOTOM /'Values'/ >
 
   \newpage
   \item This recipe has shown the interactive use of PHOTOM.  PHOTOM also
-   contains an application called \xref{{\tt autophotom}}{sun45}{AUTOPHOTOM}
+   contains an application called \xref{\texttt{autophotom}}{sun45}{AUTOPHOTOM}
    which allows PHOTOM to be used non-interactively (see
    \xref{SUN/45}{sun45}{}\cite{SUN45} for details).
 
@@ -2632,7 +2337,7 @@ instrumental magnitudes are discussed in Section~\ref{MEASURE_INSTR}.
 The starting point is a CCD frame which has been processed to remove
 instrumental effects.  This process typically includes: removing
 cosmic-ray events and other blemishes, de-biasing and flat-fielding.  It
-is described in \xref{SC/5: {\it The 2-D CCD Data Reduction
+is described in \xref{SC/5: \textit{The 2-D CCD Data Reduction
 Cookbook}}{sc5}{}\/\cite{SC5} and in \xref{SUN/139}{sun139}{}\cite{SUN139},
 the manual for the CCDPACK package, and is not considered further here.
 SC/5 is a good introduction.
@@ -2641,16 +2346,16 @@ GAIA is a powerful and flexible windows-based application for
 displaying and measuring two-dimensional images.  In principle the
 current recipe is very similar to the previous one which used PHOTOM (see
 Section~\ref{PHOTOM_RECIP})\footnote{Indeed, technically GAIA is acting
-as a `front-end' to the PHOTOM application {\tt autophotom}.  However, as
+as a `front-end' to the PHOTOM application \texttt{autophotom}.  However, as
 a user you will not normally be concerned with these details.}.
 However, unlike the PHOTOM recipe, in GAIA the image display and
 photometry are integrated into a single easy-to-use application.
 
 The example CCD frame used in this recipe is available as file:
 
-\begin{verse}
-{\tt /star/examples/sc6/ccdframe.sdf}
-\end{verse}
+\begin{terminalv}
+/star/examples/sc6/ccdframe.sdf
+\end{terminalv}
 
 If you intend to work through the recipe using this file you should make
 a copy of it in your current directory.  Alternatively, you may prefer
@@ -2660,37 +2365,35 @@ to use a CCD frame of your own.
 
   \item To start GAIA type:
 
-\begin{verbatim}
-     % gaia
-\end{verbatim}
+\begin{terminalv}
+% gaia
+\end{terminalv}
 
-   Load the appropriate image by clicking the {\sf File} menu,
-   selecting {\sf Open\ldots} and using the file-picker panel displayed.
+   Load the appropriate image by clicking the \textsf{File} menu,
+   selecting \textsf{Open\ldots} and using the file-picker panel displayed.
 
-  \item Now set the display colours.  For example, click on the {\sf
-   View} menu and select the {\sf Colors\ldots} option.  A dialogue box
+  \item Now set the display colours.  For example, click on the \textsf{View} menu and select the \textsf{Colors\ldots} option.  A dialogue box
    will appear.  Set:
 
   \begin{itemize}
 
-    \item the colour scale algorithm to {\sf Linear},
+    \item the colour scale algorithm to \textsf{Linear},
 
-    \item the colormap to {\sf ramp},
+    \item the colormap to \textsf{ramp},
 
-    \item the intensity to {\sf neg}.
+    \item the intensity to \textsf{neg}.
 
   \end{itemize}
 
-   Then click on the {\sf Close} button.
+   Then click on the \textsf{Close} button.
 
-   Set the limits of the colour table by specifying the {\sf Low} and
-   {\sf High} values in the {\sf Object} panel at the top centre of the
+   Set the limits of the colour table by specifying the \textsf{Low} and
+   \textsf{High} values in the \textsf{Object} panel at the top centre of the
    main window.  If you are using the example frame suitable values are
    200 and 2700 respectively.
 
-   Finally, you might want to set the magnification.  Click on the {\sf
-   View} menu and select {\sf Magnification}.  For the example frame
-   the value {\sf 2x} is suitable.  The display should now look something
+   Finally, you might want to set the magnification.  Click on the \textsf{View} menu and select \textsf{Magnification}.  For the example frame
+   the value \textsf{2x} is suitable.  The display should now look something
    like Figure~\ref{g1}.
 
   \begin{figure}[htbp]
@@ -2703,25 +2406,25 @@ to use a CCD frame of your own.
   \end{figure}
 
   \item You can now proceed to measure instrumental magnitudes.  Click on
-   the {\sf Image Analysis} menu on the menu-bar along the top of the main
-   window.  Choose the {\sf Aperture photometry} item.  Two further items
-   will be presented: {\sf Results in magnitudes\ldots} and {\sf Results
-   in data counts\ldots}.  Choose the former, {\sf Results in
+   the \textsf{Image Analysis} menu on the menu-bar along the top of the main
+   window.  Choose the \textsf{Aperture photometry} item.  Two further items
+   will be presented: \textsf{Results in magnitudes\ldots} and \textsf{Results
+   in data counts\ldots}.  Choose the former, \textsf{Results in
    magnitudes\ldots}.  (Both these options allow you to perform aperture
    photometry.  The former displays the results in magnitudes, the second
-   in counts.)  An {\sf Aperture photometry -- magnitudes} dialogue box
+   in counts.)  An \textsf{Aperture photometry -- magnitudes} dialogue box
    (see Figure~\ref{g2}) will be displayed.  You can drag this dialogue box
    off the display panel if necessary.
 
-   As in the previous recipe for PHOTOM, you should set the {\sf Frame zero
+   As in the previous recipe for PHOTOM, you should set the \textsf{Frame zero
    point (mags)} to an improbable value, typically 30, so that the
    instrumental magnitudes are not inadvertently confused with calibrated
    ones.
 
   \begin{quote}
-   {\bf This is a good time to mention on-line help.  Clicking the
-   {\sf Help} menu in the bar at the top of the photometry dialogue box,
-   followed by {\sf On Window\ldots} will bring up a window with a pretty
+   \textbf{This is a good time to mention on-line help.  Clicking the
+   \textsf{Help} menu in the bar at the top of the photometry dialogue box,
+   followed by \textsf{On Window\ldots} will bring up a window with a pretty
    comprehensive description of how to use the aperture-photometry
    facilities.}
   \end{quote}
@@ -2731,7 +2434,7 @@ to use a CCD frame of your own.
 
   \begin{enumerate}
 
-     \item Click the {\sf Define object aperture} button.
+     \item Click the \textsf{Define object aperture} button.
 
      \item Place your cursor on the image over the star that you wish
       to measure.
@@ -2742,16 +2445,16 @@ to use a CCD frame of your own.
 
      \item Release the mouse button.
 
-     \item Click the {\sf Calculate results} button.
+     \item Click the \textsf{Calculate results} button.
 
-     \item Inspect the {\sf Current object details} (displayed in the
+     \item Inspect the \textsf{Current object details} (displayed in the
       upper-middle portion of the dialogue box) and view the instrumental
       magnitude of the star.
 
   \end{enumerate}
 
    You can change things like the inner and outer radii of the annulus for
-   measuring the sky background by moving the sliders in the {\sf Aperture
+   measuring the sky background by moving the sliders in the \textsf{Aperture
    Photometry -- magnitudes} dialogue box.  Apertures are drawn around
    stars as they are measured.
 
@@ -2759,26 +2462,26 @@ to use a CCD frame of your own.
      \centering
      \includegraphics[totalheight=5.5in]{sc6_gaia2}
      \begin{quote}
-     \caption{The GAIA {\sf Aperture photometry -- magnitudes} dialogue box
+     \caption{The GAIA \textsf{Aperture photometry -- magnitudes} dialogue box
      \label{g2} }
      \end{quote}
   \end{figure}
 
-  \item Clicking on the {\sf Options} menu in the bar at the top of the
-   {\sf Aperture photometry -- magnitudes} dialogue box will allow you to
+  \item Clicking on the \textsf{Options} menu in the bar at the top of the
+   \textsf{Aperture photometry -- magnitudes} dialogue box will allow you to
    alter settings by using `push buttons' that are labelled:
 
   \begin{itemize}
 
-     \item {\sf Use annular sky regions}
+     \item \textsf{Use annular sky regions}
 
-     \item {\sf Use circular apertures}
+     \item \textsf{Use circular apertures}
 
-     \item {\sf Keep apertures same size}
+     \item \textsf{Keep apertures same size}
 
   \end{itemize}
 
-   By de-selecting the first button here ({\sf Use annular sky
+   By de-selecting the first button here (\textsf{Use annular sky
    regions}), you can use interactive apertures to measure the sky
    background, and by de-selecting the second you can use ellipses
    instead of circles.  Because GAIA is acting as a `front-end' to
@@ -2786,9 +2489,9 @@ to use a CCD frame of your own.
    be set in GAIA.
 
   \begin{quote}
-   {\bf There is a nice feature in GAIA that is of use when deciding how
-   big to make the aperture radius. By Clicking on the {\sf View} menu
-   in the main window and selecting the {\sf Slice\ldots} option it is
+   \textbf{There is a nice feature in GAIA that is of use when deciding how
+   big to make the aperture radius. By Clicking on the \textsf{View} menu
+   in the main window and selecting the \textsf{Slice\ldots} option it is
    possible to obtain a `cut' or `slice' across any star image on-the-fly
    (see Figure~\ref{g6}).  This option can usefully be used to estimate
    how far out from the star useful signal exists.}
@@ -2798,23 +2501,23 @@ to use a CCD frame of your own.
      \centering
      \includegraphics[totalheight=3.25in]{sc6_gaia3}
      \begin{quote}
-     \caption[A GAIA `{\sf Slice}' display panel]
-      {A GAIA `{\sf Slice}' display panel showing a slice through an object
+     \caption[A GAIA `\textsf{Slice}' display panel]
+      {A GAIA `\textsf{Slice}' display panel showing a slice through an object
      \label{g6} }
      \end{quote}
   \end{figure}
 
-  \item If you click on the {\sf Parameters} button in the {\sf Aperture
+  \item If you click on the \textsf{Parameters} button in the \textsf{Aperture
    photometry -- magnitudes} dialogue box the appearance of the box
    changes to resemble Figure~\ref{g5}.  You can now set various
    parameters, such as the Photon data per unit, image bias level, default
    sky level \emph{etc}.
 
   \begin{quote}
-   {\bf By default the statistic used to estimate the sky background is
+   \textbf{By default the statistic used to estimate the sky background is
    the mean.  Usually it is preferable to use the mode because it is
    less affected by contamination due to faint stars.  To select the mode
-   click on the {\sf Sky estimator:} button and select the mode (see
+   click on the \textsf{Sky estimator:} button and select the mode (see
    Figure~\ref{g5}).
    }
   \end{quote}
@@ -2823,20 +2526,20 @@ to use a CCD frame of your own.
      \centering
      \includegraphics[totalheight=5.5in]{sc6_gaia4}
      \begin{quote}
-     \caption[Setting parameters in the {\sf Aperture photometry --
+     \caption[Setting parameters in the \textsf{Aperture photometry --
       magnitudes} dialogue box]
-      {The GAIA {\sf Aperture photometry -- magnitudes} dialogue box with
+      {The GAIA \textsf{Aperture photometry -- magnitudes} dialogue box with
       the options to set parameters selected
      \label{g5} }
      \end{quote}
   \end{figure}
 
   \item You should measure all the stars that you are interested in
-   the current frame.  (Click on the {\sf Aperture} button prior to
+   the current frame.  (Click on the \textsf{Aperture} button prior to
    resuming measuring, if necessary.)  When the job is done, click on the
-   {\sf File} menu in the menu-bar along the top of the {\sf Aperture
-   photometry -- magnitudes} dialogue box ({\it not}\, the one in the
-   main GAIA window) and select {\sf Save measurements\ldots} to save the
+   \textsf{File} menu in the menu-bar along the top of the \textsf{Aperture
+   photometry -- magnitudes} dialogue box (\textit{not}\, the one in the
+   main GAIA window) and select \textsf{Save measurements\ldots} to save the
    results in a file of your choice.  The instrumental magnitudes are
    listed in this file.
 
@@ -2893,7 +2596,7 @@ within 0.01 magnitude.
   \end{description}
 
    In both cases, if you do not have the air mass then the zenith distance
-   can be substituted instead.  Note that it is the {\it observed}\/
+   can be substituted instead.  Note that it is the \textit{observed}\/
    zenith distance, that is, as affected by atmospheric refraction, which
    is required.  You obtain these various items of information as follows.
 
@@ -2971,9 +2674,9 @@ within 0.01 magnitude.
      Figure~\ref{PHOTOSTDCAT} shows an example catalogue compiled from
      this list.  This example is available as file:
 
-    \begin{verse}
-     {\tt /star/examples/cursa/photostandards.TXT}
-    \end{verse}
+\begin{terminalv}
+/star/examples/cursa/photostandards.TXT
+\end{terminalv}
 
      Note that the example catalogue does not contain all the columns
      in Table~\ref{PHOTOSTDTBL}.  The catalogue is in the CURSA STL
@@ -2984,23 +2687,23 @@ within 0.01 magnitude.
 
     \begin{itemize}
 
-      \item lines beginning with an exclamation mark (`{\tt !}') are
+      \item lines beginning with an exclamation mark (`\texttt{!}') are
        comments,
 
       \item blank lines are ignored,
 
       \item in CURSA each column in a table has a unique name within
        the table and you use this name to refer to the column.  The
-       lines beginning with `{\tt C}' define the columns in the table.
-       The word immediately following the `{\tt C}' is the name of the
+       lines beginning with `\texttt{C}' define the columns in the table.
+       The word immediately following the `\texttt{C}' is the name of the
        column, the next item is its data type and the following one its
        sequence number in the table of values.  Thus in
        Figure~\ref{PHOTOSTDCAT} the first column is a character string
-       called {\tt NAME}, the second column a double-precision number
-       called {\tt MCAT} \emph{etc},
+       called \texttt{NAME}, the second column a double-precision number
+       called \texttt{MCAT} \emph{etc},
 
       \item the table of values itself occurs immediately following the
-       `{\tt BEGINTABLE}' line.
+       `\texttt{BEGINTABLE}' line.
 
     \end{itemize}
 
@@ -3011,15 +2714,14 @@ within 0.01 magnitude.
      flags.  All five columns are included in the example.  If supplied, the
      star name is listed in the table of residuals produced when the fit is
      made.  Often being able to identify each standard star will be useful
-     to you.  The `include in the fit' flag column is of data type {\tt
-     LOGICAL} and determines whether each star is included in the fit or
+     to you.  The `include in the fit' flag column is of data type \texttt{LOGICAL} and determines whether each star is included in the fit or
      not.  To include or exclude a given star in the fit you simply edit
      the STL format catalogue and toggle the value of the flag for the
-     star to `{\tt T}' (or `{\tt TRUE}') or `{\tt F'} (or `{\tt FALSE}') to
+     star to `\texttt{T}' (or `\texttt{TRUE}') or `\texttt{F'} (or `\texttt{FALSE}') to
      include or exclude it as appropriate.  This procedure is much less
      troublesome and error-prone than deleting and reinserting stars from
-     the catalogue.  Initially set the flags for all the stars to `{\tt T}'
-     (or `{\tt TRUE}') so that they are all included in the fit.  In the
+     the catalogue.  Initially set the flags for all the stars to `\texttt{T}'
+     (or `\texttt{TRUE}') so that they are all included in the fit.  In the
      example all the stars are included in the fit except 99Z367 (the
      penultimate one in the list).  This star is excluded as an illustration.
      When preparing your own catalogues you will usually initially include all
@@ -3027,7 +2729,7 @@ within 0.01 magnitude.
 
 \begin{figure}[htbp]
 
-\begin{verbatim}
+\begin{terminalv}
 !+
 ! Example catalogue of photometric standards.
 !
@@ -3060,7 +2762,7 @@ BEGINTABLE
  95Z301  10.527  17.16  1.32  T
  99Z367  10.618  17.23  1.15  F
  96Z737  10.982  17.67  1.81  T
-\end{verbatim}
+\end{terminalv}
 
 \begin{quote}
 \caption{Example of a catalogue of photometric standard stars
@@ -3079,7 +2781,7 @@ BEGINTABLE
      zenith distances in this form.
 
     \begin{quote}
-     {\bf Though both the columns of star names and `include in the fit'
+     \textbf{Though both the columns of star names and `include in the fit'
      flags are optional their use is strongly recommended.}
     \end{quote}
 
@@ -3088,7 +2790,7 @@ BEGINTABLE
      from the prompts in the CURSA applications.
 
     \begin{quote}
-     {\bf A useful trick is to enter the observations in the table in
+     \textbf{A useful trick is to enter the observations in the table in
      chronological order of observation.  Then, when the residuals are
      computed they also will be listed in order of observation,
      making it easy to spot any systematic trends during the night.}
@@ -3108,9 +2810,9 @@ BEGINTABLE
      example catalogue of programme objects.  This example is available as
      file:
 
-    \begin{verse}
-     {\tt /star/examples/cursa/photoprog.TXT}
-    \end{verse}
+\begin{terminalv}
+/star/examples/cursa/photoprog.TXT
+\end{terminalv}
 
      As an illustration this catalogue contains columns of both the air mass
      and the observed zenith distance.  It does not need to contain both,
@@ -3119,7 +2821,7 @@ BEGINTABLE
 
 \begin{figure}[htbp]
 
-\begin{verbatim}
+\begin{terminalv}
 !+
 ! Example catalogue of photometric programme objects.
 !
@@ -3141,7 +2843,7 @@ BEGINTABLE
  17.87  1.04  15:28
  17.42  1.05  18:20
  17.26  1.91  58:27
-\end{verbatim}
+\end{terminalv}
 
 \begin{quote}
 \caption{Example of a catalogue of photometric programme objects
@@ -3169,44 +2871,44 @@ BEGINTABLE
   \item Once you have prepared the input catalogues you are ready to
    start CURSA.  Simply type:
 
-\begin{verbatim}
+\begin{terminalv}
 %  cursa
-\end{verbatim}
+\end{terminalv}
 
    A message similar to the following should appear.
 
-\begin{verbatim}
+\begin{terminalv}
 
    CURSA commands are now available -- (Version 6.3)
 
-\end{verbatim}
+\end{terminalv}
 
   \item The next stage is to use the standard stars to define the
    transformation between instrumental and catalogue magnitudes.
    If your table of standard stars contains air masses (as in the
    example) then simply type:
 
-\begin{verbatim}
+\begin{terminalv}
 %  catphotomfit
-\end{verbatim}
+\end{terminalv}
 
    Conversely, if the catalogue of standard stars contains observed
    zenith distances then type:
 
-\begin{verbatim}
+\begin{terminalv}
 %  catphotomfit  zenithdist=true
-\end{verbatim}
+\end{terminalv}
 
    In both cases you will be prompted for various column names.  If
    you have used the same column names as the example in
    Figure~\ref{PHOTOSTDCAT} you will be able to hit return in response
-   to the prompts.  \xref{{\tt catphotomfit}}{sun190}{CATPHOTOMFIT}
+   to the prompts.  \xref{\texttt{catphotomfit}}{sun190}{CATPHOTOMFIT}
    then displays some details of the fit, writes a file of transformation
    coefficients and terminates.
 
 \begin{figure}[htbp]
 
-\begin{verbatim}
+\begin{terminalv}
 
 Coefficients determined successfully from fitting 13 stars:
 
@@ -3235,21 +2937,20 @@ no.                    mass     Mag.    calc.  observe residual
 Standard deviation of the residuals:
    Fitted stars:  0.005       (13 points).
    All stars:     0.006       (14 points).
-\end{verbatim}
+\end{terminalv}
 
 \begin{quote}
-\caption{Example output from {\tt catphotomfit}
+\caption{Example output from \texttt{catphotomfit}
 \label{PHOTOFITOUT} }
 \end{quote}
 
 \end{figure}
 
-   Figure~\ref{PHOTOFITOUT} shows the output displayed by {\tt
-   catphotomfit}.  The transformation coefficients are self-explanatory.
+   Figure~\ref{PHOTOFITOUT} shows the output displayed by \texttt{catphotomfit}.  The transformation coefficients are self-explanatory.
    The minimum residual vector length is a measure of the goodness of the
    fit.  The table of residuals is also mostly self-explanatory.  The column
-   of star names will be absent if parameter {\tt NAME} was specified as
-   `{\tt NONE}'.  A `{\tt Y}' in the `Fit' column indicates that the star
+   of star names will be absent if parameter \texttt{NAME} was specified as
+   `\texttt{NONE}'.  A `\texttt{Y}' in the `Fit' column indicates that the star
    was included in the fit.  The residuals are defined in the sense:
 
   \begin{equation}
@@ -3269,9 +2970,8 @@ Standard deviation of the residuals:
    bar is scaled according to the absolute size of the residual for the
    star.  The scaling is such that the largest absolute residual amongst
    the stars included in the fit is ten asterisks long.  Stars which are
-   included in the fit are shown as a row of asterisks (`{\tt *}').  Stars
-   which are excluded from the fit are shown as a row of dashes (`{\tt
-   -}').  Because excluded stars will often have larger residuals than the
+   included in the fit are shown as a row of asterisks (`\texttt{*}').  Stars
+   which are excluded from the fit are shown as a row of dashes (`\texttt{-}').  Because excluded stars will often have larger residuals than the
    included stars, for excluded stars with residuals larger than the
    largest included residual a right chevron (`\verb->-') is shown beyond
    the last dash (thus forming an arrow).
@@ -3280,8 +2980,8 @@ Standard deviation of the residuals:
    residuals which you will want to exclude from the fit.  (Aberrant
    results for individual stars can be caused by various effects, including
    passing clouds.)  Edit the table of standard stars and toggle the
-   `include in the fit' flag for the star to be excluded to `{\tt F}'
-   (or `{\tt FALSE}').  Then re-run {\tt catphotomfit}.  Repeat this
+   `include in the fit' flag for the star to be excluded to `\texttt{F}'
+   (or `\texttt{FALSE}').  Then re-run \texttt{catphotomfit}.  Repeat this
    process until you get a satisfactory fit.  Note that as you exclude
    new stars you may well wish to experiment with re-instating ones
    excluded previously.
@@ -3289,30 +2989,29 @@ Standard deviation of the residuals:
    In the example data no additional stars really need excluding.
    However, you might like to experiment with re-instating the
    penultimate star, 99Z367 (edit the table of standards and toggle the
-   `include in the fit' flag for 99Z367 to `{\tt T}', or `{\tt TRUE}').
+   `include in the fit' flag for 99Z367 to `\texttt{T}', or `\texttt{TRUE}').
 
   \item The final stage is to use the file of transformation
-   coefficients written by your final, satisfactory, run of {\tt
-   catphotomfit} to calibrate the instrumental magnitudes for the
+   coefficients written by your final, satisfactory, run of \texttt{catphotomfit} to calibrate the instrumental magnitudes for the
    programme objects.  If your table of programme objects contains air
    masses (the example contains both air masses and zenith distances)
    then simply type:
 
-\begin{verbatim}
+\begin{terminalv}
 %  catphotomtrn
-\end{verbatim}
+\end{terminalv}
 
    Conversely, if the catalogue of standard stars contains observed
    zenith distances then type:
 
-\begin{verbatim}
+\begin{terminalv}
 %  catphotomtrn  zenithdist=true
-\end{verbatim}
+\end{terminalv}
 
-   In both cases \xref{{\tt catphotomtrn}}{sun190}{CATPHOTOMTRN} will
+   In both cases \xref{\texttt{catphotomtrn}}{sun190}{CATPHOTOMTRN} will
    prompt you for various items.  When prompted for the name of the
    output catalogue it is probably best to give a name ending in the file
-   type `{\tt .TXT}' or `{\tt .txt}' so that the table is written in the
+   type `\texttt{.TXT}' or `\texttt{.txt}' so that the table is written in the
    STL format.  If you have used the same column names as the example in
    Figure~\ref{PHOTOPRGCAT} the you will be able to hit return in response
    to the prompts.
@@ -3322,21 +3021,21 @@ Standard deviation of the residuals:
    programme objects, will be written.  If you specified the STL
    format for this table it will be a simple text file and you will
    be able to examine it with a text editor or Unix commands such
-   as {\tt more} or {\tt cat}.  It can also be examined with the
-   CURSA catalogue browser {\tt xcatview} (see
-   Section~\ref{STANDARDS_RECIP} for an example using {\tt xcatview}),
+   as \texttt{more} or \texttt{cat}.  It can also be examined with the
+   CURSA catalogue browser \texttt{xcatview} (see
+   Section~\ref{STANDARDS_RECIP} for an example using \texttt{xcatview}),
    though this is probably overkill for a small table of programme
    objects.  Figure~\ref{PHOTOPRGOUT} shows an output catalogue written
-   in the STL format by {\tt catphotomtrn}.  In this catalogue the
-   calibrated magnitudes are column {\tt MCAT}.  Column {\tt MCAT},
+   in the STL format by \texttt{catphotomtrn}.  In this catalogue the
+   calibrated magnitudes are column \texttt{MCAT}.  Column \texttt{MCAT},
    and the other columns, are defined in the lines beginning with a
-   `{\tt C}' or `{\tt :}' in the upper half of the figure.  The values
-   for {\tt MCAT} are the rightmost column in the table beneath the
-   `{\tt BEGINTABLE}' line.
+   `\texttt{C}' or `\texttt{:}' in the upper half of the figure.  The values
+   for \texttt{MCAT} are the rightmost column in the table beneath the
+   `\texttt{BEGINTABLE}' line.
 
 \begin{figure}[htbp]
 
-\begin{verbatim}
+\begin{terminalv}
 !+
 !  Catalogue: photocalib
 !
@@ -3368,11 +3067,11 @@ BEGINTABLE
  17.870    1.040     0.2699442576D+00   11.255
  17.420    1.050     0.3199770295D+00   10.804
  17.260    1.910     0.1020144948D+01   10.571
-\end{verbatim}
+\end{terminalv}
 
 \begin{quote}
 \caption{Example catalogue of calibrated magnitudes written by
-{\tt catphotomtrn}
+\texttt{catphotomtrn}
 \label{PHOTOPRGOUT} }
 \end{quote}
 
@@ -3397,23 +3096,19 @@ However, correction for interstellar effects is usually considered part of
 the astrophysical analysis of observations rather than part of their data
 reduction.  Hence it is only mentioned here briefly in an appendix.
 
-%  The next paragraph exists in two version - one for latex and one
-%  for hypertext, so that the maths in the footnote is processed
-%  correctly for hypertext.
-\begin{latexonly}
 The main components of the ISM are gas and dust.  Interstellar gas will
 tend to absorb (and re-radiate in a different wave-band) and dust will
 scatter the stellar radiation. These effective losses are known
-collectively as {\bf extinction}. Unfortunately, generally extinction is
+collectively as \textbf{extinction}. Unfortunately, generally extinction is
 not uniform across the whole spectrum.  The observed magnitude
 ($m_{obs}(\lambda)$) at some wavelength, $\lambda$, of a star will be
 the sum of its intrinsic magnitude ($m_{int}(\lambda)$) and some
-extinction factor ($A(\lambda , position)$) known as the {\bf total
+extinction factor ($A(\lambda , position)$) known as the \textbf{total
 absorption}\footnote{Total absorption in, say, the $V$-band would usually
-be written as ${A_V}$\, and known as the {\it visual extinction}.} which is
+be written as ${A_V}$\, and known as the \textit{visual extinction}.} which is
 dependent on both the wavelength of observation and the position of the
 star (which determines how much ISM is traversed by the observed light).
-Now $A$\, can be written as the product of an {\bf absorption coefficient},
+Now $A$\, can be written as the product of an \textbf{absorption coefficient},
 $\kappa_a(\lambda)$, which is a function only of wavelength and a
 factor which is dependent only on the quantity of the ISM along the
 line of sight. We can define a function:
@@ -3423,37 +3118,13 @@ line of sight. We can define a function:
    {\rm \AA)}}
 \end{equation}
 
-\end{latexonly}
-\begin{htmlonly}
-The main components of the ISM are gas and dust.  Interstellar gas will
-tend to absorb (and re-radiate in a different wave-band) and dust will
-scatter the stellar radiation. These effective losses are known
-collectively as {\bf extinction}. Unfortunately, generally extinction is
-not uniform across the whole spectrum.  The observed magnitude
-($m_{obs}(\lambda)$) at some wavelength, $\lambda$, of a star will be the
-sum of its intrinsic magnitude ($m_{int}(\lambda)$) and some extinction
-factor ($A(\lambda , position)$) known as the {\bf total
-absorption}\footnote{Total absorption in, say, the V-band would usually be
-written as \begin{rawhtml}A<sub>V</sub> \end{rawhtml}and known as the
-{\it visual extinction}.} which is dependent on both
-the wavelength of observation and the position of the star (which
-determines how much ISM is traversed by the observed light). Now $A$\,
-can be written as the product of an {\bf absorption coefficient},
-$\kappa_a(\lambda)$, which is a function only of wavelength and a
-factor which is dependent only on the quantity of the ISM along the
-line of sight. We can define a function:
-\begin{equation}
- \zeta (\lambda) = \frac{\kappa_a (\lambda)}{\kappa_a (\lambda=5500{\rm
-\AA})}
-\end{equation}
-\end{htmlonly}
 %  End of section in two versions.
 %
 
-This equation is the {\bf interstellar absorption law} and is normalized at
+This equation is the \textbf{interstellar absorption law} and is normalized at
 5500\AA~ (that is, in the centre of the `visible').  Shorter wavelength
 light is affected more than longer wavelengths, so it is often also
-referred to as the {\bf reddening curve}. Now we can write an extinction
+referred to as the \textbf{reddening curve}. Now we can write an extinction
 correction:
 
 \begin{equation}
@@ -3472,7 +3143,7 @@ distribution of the absorbing medium in the Galaxy, and
 maps\cite{NECKEL66, NECKEL80} showing the amount of absorption as a
 function of Galactic longitude and latitude ($l$, $b$) and distance
 are available.  The reddening curve $\zeta(\lambda)$\, when plotted
-against $(1/\lambda)$\, is pretty linear across the {\it UBVRI}\,
+against $(1/\lambda)$\, is pretty linear across the \textit{UBVRI}\,
 bands\cite{SCHILD77}. It is therefore relatively easy to correct any
 observed magnitude for the effects of interstellar extinction.
 
@@ -3497,7 +3168,7 @@ distance will be included in the auxiliary information stored in the
 data file for each observation.  Again, different observatories use
 different data formats and different keywords\footnote{In this context,
 a keyword is simply the name of each datum or item of information.  For
-example, the keyword for the air mass might be `{\tt AIRMASS}'.}.
+example, the keyword for the air mass might be `\texttt{AIRMASS}'.}.
 
 \subsection{Information required}
 
@@ -3544,7 +3215,7 @@ be recorded in your observations and it might be necessary to calculate
 it from whatever information is available about the time of your
 observations.  Most standard textbooks on spherical astronomy give
 further details of calculating the zenith distance and converting
-between time systems (see, for example, {\it Spherical Astronomy}\, by
+between time systems (see, for example, \textit{Spherical Astronomy}\, by
 Green\cite{GREEN85}).  Another useful source of information is the
 explanation and notes for the SLALIB positional-astronomy subroutine
 library (see \xref{SUN/67}{sun67}{}\cite{SUN67}).
@@ -3556,7 +3227,7 @@ Telescope (JKT) on La Palma.  In this case both the air mass and the
 zenith distance are included and hence there is no need to calculate
 them.  The keywords used at the Anglo-Australian Observatory are
 available via the World Wide Web (at URL
-\htmladdnormallink{ {\tt http://www.aao.gov.au/local/www/tjf/fits.html} }
+\htmladdnormallink{ \texttt{http://www.aao.gov.au/local/www/tjf/fits.html} }
 {http://www.aao.gov.au/local/www/tjf/fits.html}).  The appropriate
 instrument and observatory manuals should document the keywords used
 in a given dataset.  In case of difficulty staff at the observatory
@@ -3567,14 +3238,14 @@ where the dataset was acquired should be able to advise.
 \begin{center}
 \begin{tabular}{ll}
 Keyword        &  Description               \\  \hline
-{\tt AIRMASS}  &  air mass                  \\
-{\tt ZENDIST}  &  zenith distance (degrees) \\
-{\tt TIMSTART} &  start time of exposure    \\
-{\tt TIMEND}   &  end time of exposure      \\
-{\tt RA}       &  Right Ascension of the object \\
-{\tt DEC}      &  Declination of the object \\
-{\tt EQUINOX}  &  equinox of coordinate system  \\
-{\tt DATE-OBS} &  date of the observation   \\
+\texttt{AIRMASS}  &  air mass                  \\
+\texttt{ZENDIST}  &  zenith distance (degrees) \\
+\texttt{TIMSTART} &  start time of exposure    \\
+\texttt{TIMEND}   &  end time of exposure      \\
+\texttt{RA}       &  Right Ascension of the object \\
+\texttt{DEC}      &  Declination of the object \\
+\texttt{EQUINOX}  &  equinox of coordinate system  \\
+\texttt{DATE-OBS} &  date of the observation   \\
 \end{tabular}
 \end{center}
 
@@ -3607,29 +3278,29 @@ the formats mentioned below (and others) using the CONVERT package
    \xref{SUN/33}{sun33}{}\cite{SUN33}) which itself is a special case
    of Starlink's Hierarchical Data System (HDS; see
    \xref{SUN/92}{sun92}{}\cite{SUN92}).  HDS files, including NDF
-   ones, usually have file type `{\tt .sdf}'.  In this case, the file name
-   specified to applications, such as those in KAPPA, {\it must\/} omit
-   the `{\tt .sdf}' file type.
+   ones, usually have file type `\texttt{.sdf}'.  In this case, the file name
+   specified to applications, such as those in KAPPA, \textit{must\/} omit
+   the `\texttt{.sdf}' file type.
 
    If the observations were originally formatted as FITS files (see
    below) prior to being converted to the NDF format then all the
    FITS keywords are preserved in an extension to the NDF file and
    usually this extension will contain any information about the
-   air mass \emph{etc}.  Application \xref{{\tt fitslist}}{sun95}{FITSLIST}
+   air mass \emph{etc}.  Application \xref{\texttt{fitslist}}{sun95}{FITSLIST}
    in KAPPA (see \xref{SUN/95}{sun95}{}\cite{SUN95}) will list the FITS
    extension of an NDF.  Briefly, if you have not previously started
-   KAPPA type {\tt kappa}.  Then type
-   \xref{{\tt fitslist}}{sun95}{FITSLIST}~{\it filename}
+   KAPPA type \texttt{kappa}.  Then type
+   \xref{\texttt{fitslist}}{sun95}{FITSLIST}~\textit{filename}
    (remembering to omit the file type).
 
    If you know the name of the required keyword then you can use the
-   Unix command {\tt grep} to extract just the required line from the
-   output produced by {\tt fitslist}.  For example, if the required keyword
-   was `{\tt AIRMASS}' you would type:
+   Unix command \texttt{grep} to extract just the required line from the
+   output produced by \texttt{fitslist}.  For example, if the required keyword
+   was `\texttt{AIRMASS}' you would type:
 
   \begin{description}
 
-    \item[{\tt \% ~fitslist}~{\it filename\/}] {\tt $|$ grep -i AIRMASS}
+    \item[\texttt{\% ~fitslist}~\textit{filename\/}] \texttt{$|$ grep -i AIRMASS}
 
   \end{description}
 
@@ -3637,60 +3308,58 @@ the formats mentioned below (and others) using the CONVERT package
    is worth reading the FITS comments to see if they give any useful
    information.
 
-   You can examine the entire contents of an HDS file using {\tt hdstrace}
+   You can examine the entire contents of an HDS file using \texttt{hdstrace}
    (see \xref{SUN/102}{sun102}{}\cite{SUN102}).  This option will be
    useful if the file is not an NDF which was created from a
    FITS file.  Simply type
-   \xref{{\tt hdstrace}}{sun102}{HDSTRACE}~{\it filename} (again
-   remembering to omit the file type).  {\tt hdstrace} is a flexible
+   \xref{\texttt{hdstrace}}{sun102}{HDSTRACE}~\textit{filename} (again
+   remembering to omit the file type).  \texttt{hdstrace} is a flexible
    utility and you should refer to SUN/102 for a full description.
 
   \item[FITS files] The FITS\footnote{The original FITS format was
-   proposed by Wells {\it et al.}\/\cite{WELLS81} in 1981.  However, it
+   proposed by Wells \textit{et al.}\/\cite{WELLS81} in 1981.  However, it
    has been developed and enhanced over the years.  The FITS
    standard is now maintained and documented by the FITS Support Office
    of the Astrophysics Data Facility at the NASA Goddard Space Flight
-   Center (see URL: \htmladdnormallink{ {\tt
-   http://fits.gsfc.nasa.gov/fits\_home.html} }
+   Center (see URL: \htmladdnormallink{ \texttt{http://fits.gsfc.nasa.gov/fits\_home.html} }
    {http://fits.gsfc.nasa.gov/fits_home.html}).
    Though FITS is basically an astronomical format it is sometimes
    mentioned in books about standard image formats.  See, for example,
-   {\it Graphics File Formats}\, by Kay and Levine\cite{KAY95}.} (Flexible
+   \textit{Graphics File Formats}\, by Kay and Levine\cite{KAY95}.} (Flexible
    Image Transport System) format is in widespread use in astronomy.  The
    original observations which you brought away from the observatory after
    your observing run are perhaps most likely to be in this format.
 
-   Application \xref{{\tt fitshead}}{sun95}{FITSHEAD} in KAPPA (see
+   Application \xref{\texttt{fitshead}}{sun95}{FITSHEAD} in KAPPA (see
    \xref{SUN/95}{sun95}{}\cite{SUN95}) will list all the header
    information, including the keywords, in a FITS file.  Briefly, if you
-   have not previously started KAPPA type {\tt kappa}.  Then type {\tt
-   fitshead}~{\it filename}.  Alternatively, and perhaps even more
+   have not previously started KAPPA type \texttt{kappa}.  Then type \texttt{fitshead}~\textit{filename}.  Alternatively, and perhaps even more
    simply, the header information can be displayed using Unix command
-   {\tt more}.  The resulting display is perfectly readable, though
+   \texttt{more}.  The resulting display is perfectly readable, though
    perhaps not very \ae sthetic.  This technique works best with a
    window which is eighty characters wide.
 
    A description of the FITS format is beyond the scope of this note.
    However, briefly, a FITS file comprises a primary dataset and
-   optionally one or more extensions.  {\tt fitshead} allows you to access
+   optionally one or more extensions.  \texttt{fitshead} allows you to access
    the header information for the primary dataset and all the
    extensions.  Conversely, often only the primary header information
-   can be conveniently accessed with {\tt more}.
+   can be conveniently accessed with \texttt{more}.
 
   \item[Figaro DST files] Figaro DST files are another special case
    of the Starlink HDS format and can be examined with
-   \xref{{\tt hdstrace}}{sun102}{}.  See above for details.  The air
+   \xref{\texttt{hdstrace}}{sun102}{}.  See above for details.  The air
    mass, zenith distance and similar information are most likely to be
-   found in the {\tt .FITS} or {\tt .OBS} structures.
+   found in the \texttt{.FITS} or \texttt{.OBS} structures.
 
   \item[IRAF files] A given IRAF (Image Reduction Analysis Facility)
-   dataset is comprised of two files.  One file has type `{\tt .pix}',
-   the other `{\tt .imh}'.  The {\tt .pix} file contains the `bulk
+   dataset is comprised of two files.  One file has type `\texttt{.pix}',
+   the other `\texttt{.imh}'.  The \texttt{.pix} file contains the `bulk
    data' for the dataset; the array comprising the two-dimensional
-   image in the case of CCD photometry.  The {\tt .imh} file contains
+   image in the case of CCD photometry.  The \texttt{.imh} file contains
    all the header information.  It is a simple text file and the
    keywords have a similar format to FITS keywords.  It can be listed
-   using standard Unix commands such as {\tt more} or {\tt cat}.
+   using standard Unix commands such as \texttt{more} or \texttt{cat}.
 
 \end{description}
 
@@ -3719,288 +3388,276 @@ Any mistakes are, of course, our own.
 \addcontentsline{toc}{section}{References}
 \begin{thebibliography}{99}
 
-  \bibitem{AQ3} C.W.~Allen, 1973, {\it Astrophysical Quantities},
+  \bibitem{AQ3} C.W.~Allen, 1973, \textit{Astrophysical Quantities},
    third edition (Athlone Press: London).
 
-  \bibitem{ALLEN75} D.A.~Allen, 1975, {\it Infrared -- the New
+  \bibitem{ALLEN75} D.A.~Allen, 1975, \textit{Infrared -- the New
    Astronomy}\, (Keith Reid: Shaldon, Devon).
 
-  \bibitem{ALLEN83} D.A.~Allen and T.A.~Cragg, 1983, {\it Mon. Not. R.
-   Astron. Soc}, {\bf 203}, pp777-783.
+  \bibitem{ALLEN83} D.A.~Allen and T.A.~Cragg, 1983, \textit{Mon. Not. R.
+   Astron. Soc}, \textbf{203}, pp777-783.
 
   \bibitem{BERSANELLI91} M.~Bersanelli, P.~Bouchet and R.~Falomo, 1991,
-   {\it Astron. Astrophys}, {\bf 252}, pp854-860.
+   \textit{Astron. Astrophys}, \textbf{252}, pp854-860.
 
   \bibitem{BOUCHET91} P.~Bouchet, J.~Manfroid and F.X.~Schmider, 1991,
-   {\it Astron. Astrophys. Suppl}, {\bf 91}, pp409-424.
+   \textit{Astron. Astrophys. Suppl}, \textbf{91}, pp409-424.
 
   \bibitem{CARTER84} B.S.~Carter, 1984, M.Sc. Thesis, University of
    Cape Town.
 
-  \bibitem{CARTER90} B.S.~Carter, 1990, {\it Mon. Not. R. Astron. Soc},
-   {\bf 242}, pp1-5.
+  \bibitem{CARTER90} B.S.~Carter, 1990, \textit{Mon. Not. R. Astron. Soc},
+   \textbf{242}, pp1-5.
 
-  \bibitem{CASALI92} M.M.~Casali and T.J.~Hawarden, 1992, {\it The
-   JCMT -- UKIRT Newsletter}, No. {\bf 4}, pp33-35.
+  \bibitem{CASALI92} M.M.~Casali and T.J.~Hawarden, 1992, \textit{The
+   JCMT -- UKIRT Newsletter}, No. \textbf{4}, pp33-35.
 
   \bibitem{CHRISTIAN85} C.A.~Christian, M.~Adams, J.V.~Barnes,
-   H.~Butcher, D.S.~Hayes, J.R.~Mould and M.~Siegel, 1985, {\it Publ.
-   Astron. Soc. Pacific}, {\bf 97}, pp363-372.
+   H.~Butcher, D.S.~Hayes, J.R.~Mould and M.~Siegel, 1985, \textit{Publ.
+   Astron. Soc. Pacific}, \textbf{97}, pp363-372.
 
   \bibitem{SUN102} M.J.~Currie, 1998, \xref{SUN/102.4}{sun102}{}:
-   {\it HDSTRACE --- Listing HDS Data Files}\, (Starlink).
+   \textit{HDSTRACE --- Listing HDS Data Files}\, (Starlink).
 
   \bibitem{SUN95} M.J.~Currie and D.S.~Berry, 2000,
-   \xref{SUN/95.16}{sun95}{}: {\it KAPPA --- Kernel Application Package}\,
+   \xref{SUN/95.16}{sun95}{}: \textit{KAPPA --- Kernel Application Package}\,
    (Starlink).
 
   \bibitem{SUN55} M.J.~Currie, G.J.Privett, A.J.Chipperfield, D.S.~Berry
-   and A.C.~Davenhall, 2000, \xref{SUN/55.14}{sun55}{}: {\it  CONVERT ---
+   and A.C.~Davenhall, 2000, \xref{SUN/55.14}{sun55}{}: \textit{CONVERT ---
    A Format-conversion Package}\, (Starlink).
 
-  \bibitem{COUSINS76} A.W.J.~Cousins, 1976, {\it Mem. R. Astron. Soc},
-   {\bf 81}, pp25-36.
+  \bibitem{COUSINS76} A.W.J.~Cousins, 1976, \textit{Mem. R. Astron. Soc},
+   \textbf{81}, pp25-36.
 
-  \bibitem{COUSINS78} A.W.J.~Cousins, 1978, {\it Mon. Notes Astron. Soc.
-   South. Africa}, {\bf 37} pp8-10.
+  \bibitem{COUSINS78} A.W.J.~Cousins, 1978, \textit{Mon. Notes Astron. Soc.
+   South. Africa}, \textbf{37} pp8-10.
 
-  \bibitem{DACOSTA90} G.S.~DaCosta, 1990, {\it CCDs in Astronomy},
-   Astronomical Society of the Pacific Conference Series {\bf 8},
+  \bibitem{DACOSTA90} G.S.~DaCosta, 1990, \textit{CCDs in Astronomy},
+   Astronomical Society of the Pacific Conference Series \textbf{8},
    pp326-334.
 
   \bibitem{SUN190} A.C.~Davenhall, 2001, \xref{SUN/190.9}{sun190}{}:
-   {\it CURSA --- Catalogue and Table Manipulation Applications}\,
+   \textit{CURSA --- Catalogue and Table Manipulation Applications}\,
    (Starlink).
 
   \bibitem{SC17} A.C.~Davenhall and P.W.~Draper, 2001,
-   \xref{SC/17.1}{sc17}{}: {\it The GAIA Cookbook}\, (Starlink).
+   \xref{SC/17.1}{sc17}{}: \textit{The GAIA Cookbook}\, (Starlink).
 
   \bibitem{SC5} A.C.~Davenhall, G.J.~Privett and M.B.~Taylor, 2001,
-   \xref{SC/5.3}{sc5}{}: {\it The 2-D CCD Data Reduction Cookbook}\,
+   \xref{SC/5.3}{sc5}{}: \textit{The 2-D CCD Data Reduction Cookbook}\,
    (Starlink).
 
   \bibitem{SUN139} P.W.~Draper, M.B.~Taylor and A.~Allan, 2000,
-   \xref{SUN/139.13}{sun139}{}: {\it CCDPACK --- CCD data reduction package}\,
+   \xref{SUN/139.13}{sun139}{}: \textit{CCDPACK --- CCD data reduction package}\,
    (Starlink).
 
   \bibitem{SUN214} P.W.~Draper and N.~Gray, 2000,
-   \xref{SUN/214.8}{sun214}{}: {\it GAIA --- Graphical Astronomy and Image
+   \xref{SUN/214.8}{sun214}{}: \textit{GAIA --- Graphical Astronomy and Image
    Analysis Tool}\, (Starlink).
 
   \bibitem{SUN48} N.~Eaton and B.K.~McIlwrath, 2000,
-   \xref{SUN/48.8}{sun48}{}: {\it AGI --- Applications Graphics Interface:
+   \xref{SUN/48.8}{sun48}{}: \textit{AGI --- Applications Graphics Interface:
    A Subroutine Library for Accessing the Graphics Database}\, (Starlink).
 
   \bibitem{SUN45} N.~Eaton, P.W.~Draper and A.~Allan, 1999,
-   \xref{SUN/45.10}{sun45}{}: {\it PHOTOM --- An Aperture Photometry
+   \xref{SUN/45.10}{sun45}{}: \textit{PHOTOM --- An Aperture Photometry
    Package }\, (Starlink).
 
   \bibitem{SUN42} N.~Eaton and G.J.~Privett, 1996, \xref{SUN/42.5}{sun42}{}:
-   {\it DAOPHOT --- Stellar Photometry Package}\, (Starlink).
+   \textit{DAOPHOT --- Stellar Photometry Package}\, (Starlink).
 
   \bibitem{ELIAS83} J.H.~Elias, J.A.~Frogel, A.R.~Hyland and T.J.~Jones,
-   1983, {\it Astron. J}, {\bf 88}, pp1027-1030.
+   1983, \textit{Astron. J}, \textbf{88}, pp1027-1030.
 
   \bibitem{ELIAS82} J.H.~Elias, J.A.~Frogel, K.~Matthews and G.~Neugebauer,
-   1982, {\it Astron. J}, {\bf 87} pp1029-1034 and erratum on p1893.
+   1982, \textit{Astron. J}, \textbf{87} pp1029-1034 and erratum on p1893.
 
   \bibitem{ENGELS81} D.~Engels, W.A.~Sherwood, W.~Wamsteker and
-   G.V.~Shultz, 1981, {\it Astron. Astrophys. Suppl}, {\bf 45}, pp5-9.
+   G.V.~Shultz, 1981, \textit{Astron. Astrophys. Suppl}, \textbf{45}, pp5-9.
 
   \bibitem{FORBES95} M.C.~Forbes, T.~Banks, D.J.~Sullivan, R.J.~Dodd,
-   A.C.~Gilmore and P.M.~Kilmartin, 1995, {\it The Observatory},
-   {\bf 115}, No. 1124, pp29-30.
+   A.C.~Gilmore and P.M.~Kilmartin, 1995, \textit{The Observatory},
+   \textbf{115}, No. 1124, pp29-30.
 
   \bibitem{FROGEL78} J.A.~Frogel, S.E.~Persson, M.~Aaronson and
-   K.~Matthews, 1978, {\it Astrophys. J}, {\bf 220}, pp75-97.
+   K.~Matthews, 1978, \textit{Astrophys. J}, \textbf{220}, pp75-97.
 
-  \bibitem{GLASS74} I.S.~Glass, 1974, {\it Mon. Notes Astron. Soc.
-   South. Africa}, {\bf 33}, pp53-58 and errata on p71.
+  \bibitem{GLASS74} I.S.~Glass, 1974, \textit{Mon. Notes Astron. Soc.
+   South. Africa}, \textbf{33}, pp53-58 and errata on p71.
 
-  \bibitem{GRAHAM82} S.A.~Graham, 1982, {\it Publ. Astron.
-   Soc. Pacific}, {\bf 94}, pp244-265.
+  \bibitem{GRAHAM82} S.A.~Graham, 1982, \textit{Publ. Astron.
+   Soc. Pacific}, \textbf{94}, pp244-265.
 
-  \bibitem{GREEN85} R.M.~Green, 1985, {\it Spherical Astronomy}\,
+  \bibitem{GREEN85} R.M.~Green, 1985, \textit{Spherical Astronomy}\,
    (Cambridge University Press: Cambridge).
 
-  \bibitem{GOLAY74} M.~Golay, 1974, {\it Introduction to Astronomical
+  \bibitem{GOLAY74} M.~Golay, 1974, \textit{Introduction to Astronomical
    Photometry}\, (D. Reidel: Dordrecht).
 
   \bibitem{GRONBECH76} B.~Gr\o nbech, E.H.~Olsen and B.~Str\"{o}mgren,
-   1976, {\it Astron. Astrophys. Suppl}, {\bf 26} pp155-176.
+   1976, \textit{Astron. Astrophys. Suppl}, \textbf{26} pp155-176.
 
-  \bibitem{GRONBECH77} B.~Gr\o nbech and E.H.~Olsen, 1977, {\it
-   Astron. Astrophys. Suppl}, {\bf 25}, pp213-270.
+  \bibitem{GRONBECH77} B.~Gr\o nbech and E.H.~Olsen, 1977, \textit{Astron. Astrophys. Suppl}, \textbf{25}, pp213-270.
 
   \bibitem{HARDIE62} R.H.~Hardie, 1962, `Photoelectric Reductions',
-   Chapter 8 of {\it Astronomical Techniques}, W.A.~Hiltner (Ed), {\it
-   Stars and Stellar Systems}, {\bf II}\, (University of Chicago Press:
+   Chapter 8 of \textit{Astronomical Techniques}, W.A.~Hiltner (Ed), \textit{Stars and Stellar Systems}, \textbf{II}\, (University of Chicago Press:
    Chicago), pp178-208.
 
   \bibitem{HARRIS81} W.E.~Harris, W.P.~Fitzgerald and B.C.~Reed, 1981,
-   {\it Publ. Astron. Soc. Pacific}, {\bf 93}, pp507-517.
+   \textit{Publ. Astron. Soc. Pacific}, \textbf{93}, pp507-517.
 
-  \bibitem{HEARNSHAW91} J.B.~Hearnshaw, 1991, {\it Southern Stars},
-   {\bf 34}, pp33-44.
+  \bibitem{HEARNSHAW91} J.B.~Hearnshaw, 1991, \textit{Southern Stars},
+   \textbf{34}, pp33-44.
 
-  \bibitem{HENDEN90} A.A.~Henden and R.H.~Kaitchuck, 1990, {\it
-   Astronomical Photometry}\, (Willmann-Bell: Richmond, Virginia).
+  \bibitem{HENDEN90} A.A.~Henden and R.H.~Kaitchuck, 1990, \textit{Astronomical Photometry}\, (Willmann-Bell: Richmond, Virginia).
    Originally published in 1982.
 
-  \bibitem{HOWELL92} S.B.~Howell (Ed), 1992, {\it Astronomical CCD
+  \bibitem{HOWELL92} S.B.~Howell (Ed), 1992, \textit{Astronomical CCD
    Observing and Reduction Techniques}, Astronomical Society of the
-   Pacific Conference Series {\bf 23}.
+   Pacific Conference Series \textbf{23}.
 
-  \bibitem{JASCHEK87} C.~Jaschek and M.~Jaschek, 1987, {\it The
+  \bibitem{JASCHEK87} C.~Jaschek and M.~Jaschek, 1987, \textit{The
   Classification of Stars}\, (Cambridge University Press: Cambridge).
 
-  \bibitem{JOHNSON64} H.L.~Johnson, 1964, {\it Boletin de los
-   Observatorios Tonantzintla y Tacubaya}, {\bf 3}, pp305-324.
+  \bibitem{JOHNSON64} H.L.~Johnson, 1964, \textit{Boletin de los
+   Observatorios Tonantzintla y Tacubaya}, \textbf{3}, pp305-324.
 
-  \bibitem{JOHNSON65} H.L.~Johnson, 1965, {\it Comm. Lunar. Planet.
-   Lab}, No. 53 (Univ. Arizona) {\bf 3}, pp73-77.
+  \bibitem{JOHNSON65} H.L.~Johnson, 1965, \textit{Comm. Lunar. Planet.
+   Lab}, No. 53 (Univ. Arizona) \textbf{3}, pp73-77.
 
-  \bibitem{JOHNSON51} H.L.~Johnson and W.W.~Morgan, 1951, {\it
-   Astrophys. J}, {\bf 114}, pp522-543.
+  \bibitem{JOHNSON51} H.L.~Johnson and W.W.~Morgan, 1951, \textit{Astrophys. J}, \textbf{114}, pp522-543.
 
-  \bibitem{JOHNSON53} H.L.~Johnson and W.W.~Morgan, 1953, {\it
-   Astrophys. J}, {\bf 117}, pp313-352.
+  \bibitem{JOHNSON53} H.L.~Johnson and W.W.~Morgan, 1953, \textit{Astrophys. J}, \textbf{117}, pp313-352.
 
-  \bibitem{JONES82} T.J.~Jones and A.R.~Hyland, 1982, {\it Mon. Not. R.
-   Astron. Soc}, {\bf 200}, pp509-520.
+  \bibitem{JONES82} T.J.~Jones and A.R.~Hyland, 1982, \textit{Mon. Not. R.
+   Astron. Soc}, \textbf{200}, pp509-520.
 
   \bibitem{KAITCHUCK94} R.H.~Kaitchuck, A.A.~Henden and R.~Truax,
-   1994, `Photometry in the Digital Age', {\it CCD Astronomy}, {\bf 1},
+   1994, `Photometry in the Digital Age', \textit{CCD Astronomy}, \textbf{1},
    No. 3, pp20-23.
 
-  \bibitem{KAY95} D.C.~Kay and J.R.~Levine, 1995, {\it Graphics File
+  \bibitem{KAY95} D.C.~Kay and J.R.~Levine, 1995, \textit{Graphics File
    Formats}, second edition
   \newline (Windcrest/McGraw-Hill: New York).  See in particular
    Chapter 18, pp235-244.
 
-  \bibitem{KROL93} E.~Krol, 1992, {\it The Whole Internet User's Guide
+  \bibitem{KROL93} E.~Krol, 1992, \textit{The Whole Internet User's Guide
    and Catalog}\, (O'Reilly and Associates Inc, Sebastopol, California).
 
-  \bibitem{LAMLA82} E.~Lamla, 1982, in {\it Landolt-B\"{o}rnstein,
+  \bibitem{LAMLA82} E.~Lamla, 1982, in \textit{Landolt-B\"{o}rnstein,
    Zahlenwerte und Funktionen aus Naturwissenschaften und Technik},
-   K.~Schaifers and H.H.~Voigt (Eds), {\bf VI/2b}, Astronomie und
+   K.~Schaifers and H.H.~Voigt (Eds), \textbf{VI/2b}, Astronomie und
    Astrophysik (Springer-Verlag: Berlin).
 
-  \bibitem{LANDOLT73} A.U.~Landolt, 1973, {\it Astron. J}, {\bf 78},
+  \bibitem{LANDOLT73} A.U.~Landolt, 1973, \textit{Astron. J}, \textbf{78},
    pp959-981.
 %  (also Contribution of the Louisiana State University Observatory No. 87).
 
-  \bibitem{LANDOLT83} A.U.~Landolt, 1983, {\it Astron. J}, {\bf 88},
+  \bibitem{LANDOLT83} A.U.~Landolt, 1983, \textit{Astron. J}, \textbf{88},
    pp439-460.
 %  (also Contribution of the Louisiana State University Observatory No. 174).
 
-  \bibitem{LANDOLT83B} A.U.~Landolt, 1983, {\it Astron. J}, {\bf 88},
+  \bibitem{LANDOLT83B} A.U.~Landolt, 1983, \textit{Astron. J}, \textbf{88},
    pp853-866.  Note that the stars listed in this paper are not
    necessarily suitable as general-purpose photometric standards and
    care  should be exercised before using them as such.  See the
    discussion in the paper for details.
 %  (also Contribution of the Louisiana State University Observatory No. 178).
 
-  \bibitem{LANDOLT92} A.U.~Landolt, 1992, {\it Astron. J}, {\bf 104},
+  \bibitem{LANDOLT92} A.U.~Landolt, 1992, \textit{Astron. J}, \textbf{104},
    pp340-371.
 %  (also Contribution of the Louisiana State University Observatory No. 230).
 
-  \bibitem{LEGGETT92} S.K.~Leggett, 1992, {\it Astrophys. J. Suppl}, {\bf
-   82}, pp351-394.  In particular see pp357-358 for a discussion of
+  \bibitem{LEGGETT92} S.K.~Leggett, 1992, \textit{Astrophys. J. Suppl}, \textbf{82}, pp351-394.  In particular see pp357-358 for a discussion of
    photometric systems and the Appendix on pp391-393 for details of the
    transformations between them.
 
   \bibitem{MASSEY89} P.~Massey, C.D.~Garmany, M.~Silkey and
-   K.~DeGioia-Eastwood, 1989, {\it Astron. J}, {\bf 97}, pp107-130.
+   K.~DeGioia-Eastwood, 1989, \textit{Astron. J}, \textbf{97}, pp107-130.
 
-  \bibitem{MCLEAN97} I.S.~McLean, 1997, {\it Electronic Imaging in
+  \bibitem{MCLEAN97} I.S.~McLean, 1997, \textit{Electronic Imaging in
    Astronomy -- Detectors and Instrumentation}\, (Wiley: Chichester and
    New York).  Published in association with Praxis in the Wiley-Praxis
    series in Astronomy and Astrophysics.
 
   \bibitem{MENZIES89} J.W.~Menzies, R.M.~Barfield, A.W.J.~Cousins and
-   J.D.~Laing, 1989, SAAO Circular number {\bf 13}.
+   J.D.~Laing, 1989, SAAO Circular number \textbf{13}.
 
   \bibitem{MENZIES91} J.W.~Menzies, F.~Marang, J.D.~Laing, I.M.~Coulson
-   and C.A.~Engelbrecht, 1991, {\it Mon. Not. Roy. Astron. Soc.},
-   {\bf 248}, pp642-652.
+   and C.A.~Engelbrecht, 1991, \textit{Mon. Not. Roy. Astron. Soc.},
+   \textbf{248}, pp642-652.
 
-  \bibitem{NECKEL66} Th.~Neckel, 1966, {\it Z. f\"{u}r Astrophs}, {\bf
-   63}, pp221-241.
+  \bibitem{NECKEL66} Th.~Neckel, 1966, \textit{Z. f\"{u}r Astrophs}, \textbf{63}, pp221-241.
 
-  \bibitem{NECKEL80} Th. Neckel and G. Klare, 1980, {\it Astron.
-   Astrophys. Suppl}, {\bf 42}, pp251-281.
+  \bibitem{NECKEL80} Th. Neckel and G. Klare, 1980, \textit{Astron.
+   Astrophys. Suppl}, \textbf{42}, pp251-281.
 
   \bibitem{SUN146} J.~Osborne, J.K.~Ashley and G.J.~Privett, 1996,
-   \xref{SUN/146.3}{sun146}{}: {\it OBSERVE --- Check Star Observability}\,
+   \xref{SUN/146.3}{sun146}{}: \textit{OBSERVE --- Check Star Observability}\,
    (Starlink).
 
-  \bibitem{SUN141} A.J.~Penny, 1995, SUN/141.2: {\it STARMAN --- A
+  \bibitem{SUN141} A.J.~Penny, 1995, SUN/141.2: \textit{STARMAN --- A
    Stellar Photometry and Image/Table Handling Package}\, (Starlink).
 
-  \bibitem{SG10} G.J.~Privett, 1998, \xref{SG/10.2}{sg10}{}: {\it
-   Preparing to Observe}\, (Starlink).
+  \bibitem{SG10} G.J.~Privett, 1998, \xref{SG/10.2}{sg10}{}: \textit{Preparing to Observe}\, (Starlink).
 
-  \bibitem{SCHILD77} R.E.~Schild, 1977, {\it Astron. J}, {\bf 82},
+  \bibitem{SCHILD77} R.E.~Schild, 1977, \textit{Astron. J}, \textbf{82},
    pp337-344.
 
-  \bibitem{SCHMIDTKALER82} Th.~Schmidt-Kaler, 1982, in {\it
-   Landolt-B\"{o}rnstein, Zahlenwerte und Funktionen aus
+  \bibitem{SCHMIDTKALER82} Th.~Schmidt-Kaler, 1982, in \textit{Landolt-B\"{o}rnstein, Zahlenwerte und Funktionen aus
    Naturwissenschaften und Technik}, K.~Schaifers and H.H.~Voigt (Eds),
-   {\bf VI/2c}, Astronomie und Astrophysik (Springer-Verlag: Berlin), p45.
+   \textbf{VI/2c}, Astronomie und Astrophysik (Springer-Verlag: Berlin), p45.
 
   \bibitem{SIMONS01} D. A. Simons and A. Tokunaga, 2002,
-   {\it Publ. Astron. Soc. Pacific}, \textbf{114}, 169
+   \textit{Publ. Astron. Soc. Pacific}, \textbf{114}, 169
 
-  \bibitem{STERKEN92} Chr.~Sterken and J.~Manfroid, 1992, {\it
-   Astronomical Photometry --- A Guide}\, (Kluwer Academic Publishers:
+  \bibitem{STERKEN92} Chr.~Sterken and J.~Manfroid, 1992, \textit{Astronomical Photometry --- A Guide}\, (Kluwer Academic Publishers:
    Dordrecht).
 
-  \bibitem{STETSON87} P.B.~Stetson, 1987, {\it Publ. Astron.
-   Soc. Pacific}, {\bf 99}, pp191-222.
+  \bibitem{STETSON87} P.B.~Stetson, 1987, \textit{Publ. Astron.
+   Soc. Pacific}, \textbf{99}, pp191-222.
 
-  \bibitem{STETSON88} P.B.~Stetson and W.E.~Harris, 1988, {\it
-   Astron. J}, {\bf 96}, pp909-975.
+  \bibitem{STETSON88} P.B.~Stetson and W.E.~Harris, 1988, \textit{Astron. J}, \textbf{96}, pp909-975.
 
-  \bibitem{STRAIZYS92} V.~Strai\v{z}ys, 1992, {\it Multicolor
-   Stellar Photometry}, Pachart Astronomy and Astrophysics Series {\bf 15}
+  \bibitem{STRAIZYS92} V.~Strai\v{z}ys, 1992, \textit{Multicolor
+   Stellar Photometry}, Pachart Astronomy and Astrophysics Series \textbf{15}
    (Pachart: Tucson).
 
-  \bibitem{STROMGREM63} B. Str\"{o}mgren, 1963, {\it Q. J. Roy. Astron.
-   Soc.}, {\bf 4}, pp8-36.
+  \bibitem{STROMGREM63} B. Str\"{o}mgren, 1963, \textit{Q. J. Roy. Astron.
+   Soc.}, \textbf{4}, pp8-36.
 
-  \bibitem{STROMGREM66} B. Str\"{o}mgren, 1966, {\it Annu. Rev. Astron.
-   Astrophys}\, (Annual Reviews Inc: Palo Alto, California), {\bf 4},
+  \bibitem{STROMGREM66} B. Str\"{o}mgren, 1966, \textit{Annu. Rev. Astron.
+   Astrophys}\, (Annual Reviews Inc: Palo Alto, California), \textbf{4},
    pp433-472.
 
-  \bibitem{TAPIA86} M.~Tapia, L.~Neri and M.~Roth, 1986, {\it Rev.
-   Mexicana Astron. Astrofisica}, {\bf 13}, pp115-118.
+  \bibitem{TAPIA86} M.~Tapia, L.~Neri and M.~Roth, 1986, \textit{Rev.
+   Mexicana Astron. Astrofisica}, \textbf{13}, pp115-118.
 
-  \bibitem{UNSOLD67} A.~Uns\"{o}ld, 1967, {\it The New Cosmos}
+  \bibitem{UNSOLD67} A.~Uns\"{o}ld, 1967, \textit{The New Cosmos}
    (Longmans and Springer-Verlag: New York), translated by W.H.~McCrea.
-   Originally published in German as {\it Der neue Kosmos}.
+   Originally published in German as \textit{Der neue Kosmos}.
 
-  \bibitem{SUN67} P.T.~Wallace, 2000, \xref{SUN/67.51}{sun67}{}: {\it
-   SLALIB --- Positional Astronomy Library}\, (Starlink).
+  \bibitem{SUN67} P.T.~Wallace, 2000, \xref{SUN/67.51}{sun67}{}: \textit{SLALIB --- Positional Astronomy Library}\, (Starlink).
 
-  \bibitem{WAMSTEKER81} W.~Wamsteker, 1981, {\it Astron. Astrophys},
-   {\bf 97}, pp329-333.
+  \bibitem{WAMSTEKER81} W.~Wamsteker, 1981, \textit{Astron. Astrophys},
+   \textbf{97}, pp329-333.
 
   \bibitem{SUN33} R.F.~Warren-Smith, 2000, \xref{SUN/33.7}{sun33}{}:
-   {\it NDF --- Routines for Accessing the Extensible N-Dimensional Data
+   \textit{NDF --- Routines for Accessing the Extensible N-Dimensional Data
    Format}\, (Starlink).
 
   \bibitem{SUN92} R.F.~Warren-Smith and M.D.~Lawden, 1999,
-   \xref{SUN/92.11}{sun92}{}: {\it HDS --- Hierarchical Data System}\,
+   \xref{SUN/92.11}{sun92}{}: \textit{HDS --- Hierarchical Data System}\,
    (Starlink).
 
   \bibitem{WELLS81} D.C.~Wells, E.W.~Greisen and R.H.~Harten, 1981,
-   {\it Astron. Astrophys. Suppl}, {\bf 44}, pp363-370.
+   \textit{Astron. Astrophys. Suppl}, \textbf{44}, pp363-370.
 
-  \bibitem{YOUNG67} A.T.~Young and W.M.~Irvine, 1967, {\it Astron.
-   J}, {\bf 72}, pp945-950.
+  \bibitem{YOUNG67} A.T.~Young and W.M.~Irvine, 1967, \textit{Astron.
+   J}, \textbf{72}, pp945-950.
 
-  \bibitem{ZOMBECK90} M.V.~Zombeck, 1990, {\it Handbook of Space
+  \bibitem{ZOMBECK90} M.V.~Zombeck, 1990, \textit{Handbook of Space
    Astronomy and Astrophysics}\, (Cambridge University press: Cambridge).
 
 
