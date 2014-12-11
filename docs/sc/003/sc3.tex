@@ -1,311 +1,40 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt]{starlink}
 
 % ? Specify used packages
-\usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
 
-\pagestyle{myheadings}
+
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink Cookbook}
-\newcommand{\stardocinitials}  {SC}
-\newcommand{\stardocsource}    {sc\stardocnumber}
-\newcommand{\stardoccopyright}
+\stardoccategory    {Starlink Cookbook}
+\stardocinitials    {SC}
+\stardocsource      {sc\stardocnumber}
+\stardoccopyright
 {Copyright \copyright\ 2000, 2003 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {3.2-0} %%VERSION%%
-\newcommand{\stardocauthors}   {Martin Clayton}
-\newcommand{\stardocdate}      {10 July 2003}
-\newcommand{\stardoctitle}     {Echelle Data Reduction Cookbook}
-%\newcommand{\stardocversion}   {[software-version]}
-%\newcommand{\stardocmanual}    {[manual-type]}
-%\newcommand{\stardocabstract}  {[Text of abstract]}
-% ? End of document identification
-% -----------------------------------------------------------------------------
+\stardocnumber      {3.2-0} %%VERSION%%
+\stardocauthors     {Martin Clayton}
+\stardocdate        {10 July 2003}
+\stardoctitle       {Echelle Data Reduction Cookbook}
 
-% +
-%  Name:
-%     sc.tex
-%
-%  Purpose:
-%     Template for Starlink Cookbook (SC) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     16-JUN-1997 (BLY):
-%        Original, based on SUN/SG templates.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%      1-FEB-2000 (AJC):
-%        Add Copyright statement in LaTeX
-%     {Add further history here}
-%
-% -
+%% The vspace is a bit of a hack to deal with the fact that
+%% the Starlink class inserts space for manual type and software
+%% version even if they are not defined
+\startitlepic{
+\vspace{-20mm}
+\includegraphics[height=120mm]{sc3_cover}
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
+A collapsed Echelle spectrum
 }
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % from the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
-
-\newcommand{\scspec}[2]{#1}
-\begin{htmlonly}
-\newcommand{\scspec}[2]{#2}
-\end{htmlonly}
-
-% Location of echelle help pages
-%{\catcode`\~=12 \gdef\EchelleHomePage{http://www.star.ucl.ac.uk/~mjc/echelle}}
-\newcommand{\EchelleHomePage}{http://www.starlink.ac.uk/echomop/echelle/}
-
-% ? End of document-specific commands
-% -----------------------------------------------------------------------------
-%  Title Page.
-%  ===========
-\renewcommand{\thepage}{\roman{page}}
-\begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\latex{
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   %{\LARGE\textbf{\stardocversion \\ [4ex]}}
-   %{\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-   \begin{center}
-   \includegraphics[height=120mm]{sc3_cover}
-
-   A collapsed Echelle spectrum
-   \end{center}
-% ? End of picture
-
-%% ? Heading for abstract if used.
-%   \vspace{10mm}
-%   \begin{center}
-%      {\Large\textbf{Abstract}}
-%   \end{center}
-%% ? End of heading for abstract.
-}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-%  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-%\stardocabstract
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? Latex Copyright Statement
-%  =========================
-\begin{latexonly}
-   \newpage
-   \vspace*{\fill}
-   \stardoccopyright
-\end{latexonly}
-% ? End of Latex copyright statement
-
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-
-\markboth{Introduction}{\stardocname}
-
+\stardocabstract{
 This document is the first version of the Starlink Echelle Data
 Reduction Cookbook.  It contains scripts and procedures developed by
 regular or heavy users of the existing software packages.  These scripts
-are generally of two types; {\em templates} which readers may be able to
-modify to suit their particular needs and {\em utilities} which carry out
+are generally of two types; \emph{templates} which readers may be able to
+modify to suit their particular needs and \emph{utilities} which carry out
 a particular common task and can probably be used `off-the-shelf'.
 
 In the nature of this subject the recipes given are quite strongly tied
@@ -315,52 +44,72 @@ be used with \htmladdnormallink{IRAF}
 {http://www.starlink.ac.uk/iraf/web/} and with
 \htmladdnormallink{Starlink}{http://www.starlink.ac.uk/}
 \xref{software}{sun1}{}.
+}
+
+% ? End of document identification
+% -----------------------------------------------------------------------------
+% ? Document-specific \providecommand or \newenvironment commands.
+
+\providecommand{\scspec}[2]{#1}
+
+% Location of echelle help pages
+%{\catcode`\~=12 \gdef\EchelleHomePage{http://www.star.ucl.ac.uk/~mjc/echelle}}
+\providecommand{\EchelleHomePage}{http://www.starlink.ac.uk/echomop/echelle/}
+
+% ? End of document-specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\begin{document}
+\scfrontmatter
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\xlabel{summary_of_scripts}Summary of the Available Scripts }
+\subsection*{\xlabel{summary_of_scripts}Summary of the Available Scripts }
 
 The scripts included are the following:
 
 \begin{quote}
 \begin{description}
 
-\item [\htmlref{{\bf MEANARC }}{se_meanarc}]
+\item [\htmlref{\textbf{MEANARC }}{se_meanarc}]
       takes the weighted mean wavelength scale from
       two \'{e}chelle arcs and applies it to an object spectrum.
       The weighting scheme is based on the times of the observations.
 
-\item [\htmlref{{\bf ECHTRACT}}{se_echtract}]
+\item [\htmlref{\textbf{ECHTRACT}}{se_echtract}]
       takes a `collapsed' \'{e}chelle spectrum ({\it{e.g.}}
       from ECHOMOP) and produces a series of NDF files each
       containing a single order of the spectrum.
 
-\item [\htmlref{{\bf STACKGEN}}{se_stackgen}]
+\item [\htmlref{\textbf{STACKGEN}}{se_stackgen}]
       takes a collapsed \'{e}chelle spectrum and reads
       the orders into a \xref{DIPSO}{sun50}{} stack.
 
-\item [\htmlref{{\bf TRACEPOLY \& ARCPOLY}}{se_tracepoly}]
+\item [\htmlref{\textbf{TRACEPOLY \& ARCPOLY}}{se_tracepoly}]
       TRACEPOLY extracts the trace fit curve parameters from an ECHOMOP
       reduction structure file and lists them.
       ARCPOLY similarly extracts the polynomials describing the
       wavelength scales and lists them.
 
-\item [\htmlref{{\bf Automated ECHOMOP reduction}}{se_automated_echomop}]
+\item [\htmlref{\textbf{Automated ECHOMOP reduction}}{se_automated_echomop}]
       takes the raw CCD data from an
       observing run and manages the CCD processing as well as running
       ECHOMOP\@.  Scripts for doing each of the sub-tasks involved
       are provided.
 
-\item [\htmlref{{\bf ECHIMDIVIDE}}{se_echimdivide}]
+\item [\htmlref{\textbf{ECHIMDIVIDE}}{se_echimdivide}]
       (IRAF) normalises and applies a flat field to an \'{e}chelle
       image on an order-by-order basis.
 
-\item [\htmlref{{\bf ECHMKV}}{se_echmkv}]
+\item [\htmlref{\textbf{ECHMKV}}{se_echmkv}]
       (IRAF) extracts orders from a wavelength-calibrated
       \'{e}chelle spectrum and converts to velocity at a specified
       wavelength, each order is output to a separate file.
 
-\item [\htmlref{{\bf ECHTRIM}}{se_echtrim}]
+\item [\htmlref{\textbf{ECHTRIM}}{se_echtrim}]
       (IRAF) trims the orders of a collapsed \'{e}chelle
       spectrum (in IRAF format) according to limits in a file provided.
 
@@ -371,20 +120,19 @@ Although the scripts are each for a specific purpose, you may well find that
 the task addressed closely matches your objective.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\xlabel{general_notes}General Notes on the Scripts }
+\subsection*{\xlabel{general_notes}General Notes on the Scripts }
 
 In this document each of the scripts is described in outline.
 
 At Starlink sites you should find copies of the complete scripts in the
 directory
 
-\begin{verbatim}
-   /star/examples/sc3/
-\end{verbatim}
+\begin{terminalv}
+/star/examples/sc3/
+\end{terminalv}
 
-\begin{htmlonly}
-Complete copies of the scripts are included at the end of this document.
-\end{htmlonly}
+
+
 
 Some of the scripts are available in different flavours.  For example
 the \verb+stackgen+ script is available in two versions \scspec{--}{-}
@@ -397,16 +145,16 @@ I've commented them in places where they might be adapted to other
 purposes.
 The scripts may seem a little long as they contain many comments
 \scspec{--}{-} this is to aid those wishing to make use of them as
-{\em templates} for their own work.
+\emph{templates} for their own work.
 
 The C shell is used for most of the Starlink scripts and IRAF cl for the
 IRAF scripts.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\xlabel{please_contribute}Please Contribute }
+\subsection*{\xlabel{please_contribute}Please Contribute }
 
-To be {\em really} useful this cookbook should contain as many of the
+To be \emph{really} useful this cookbook should contain as many of the
 tools and tricks used by \'{e}chelle workers as possible.
 If you have a handy script, or are aware of one, please contribute it by
 contacting the author.
@@ -420,14 +168,14 @@ light.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\label{se_other_sources}\xlabel{other_information}Other Sources of
          Information}
-\markboth{Other Sources of Information}{\stardocname}
+
 
 This cookbook complements the Starlink \xref{{\sl Introduction to Echelle
 Spectroscopy} (Starlink document SG/9)}{sg9}{} which is a good first read for
 those new to \'{e}chelle work.
 
 A significant part of the process of successful spectrum extraction
-is the preliminary handling of the \htmlref{CCD}{gl_ccd} data frames.
+is the preliminary handling of the CCD data frames.
 Those planning to use
 %
 %The next two lines are set up to get the footnote in the right place.
@@ -435,13 +183,13 @@ Those planning to use
 {http://www.starlink.ac.uk/iraf/web/}\scspec{\footnote{IRAF
 documents can be found in your IRAF installation; you
 do not need to get them from Tucson or a mirror.  Check with your manager for
-details.}}{{\bf (All IRAF-related hyperlinks in this document are to the
+details.}}{\textbf{(All IRAF-related hyperlinks in this document are to the
 UK-based Starlink IRAF mirror except \htmladdnormallink{this one}
 {http://iraf.noao.edu/} which goes to the Tucson site.)}} should consult
 \htmladdnormallink{{\sl A User's Guide to CCD Reductions with IRAF}}
 {ftp://ftp.starlink.ac.uk/pub/iraf/iraf/docs/ccduser2.ps.Z} (UGCRI) by Philip Massey.
-UGCRI is quite a good document for {\em any} user of CCD data, even those
-planning to use {\em e.g.} \xref{CCDPACK}{sun139}{} or
+UGCRI is quite a good document for \emph{any} user of CCD data, even those
+planning to use \emph{e.g.} \xref{CCDPACK}{sun139}{} or
 \xref{FIGARO}{sun86}{}, to do the preparation.
 
 IRAF users should look at the two documents for \'{e}chelle data reduction
@@ -456,8 +204,7 @@ data.  There is also a hypertext tutorial for DOECSLIT at
 
 \begin{itemize}
 
-\item \htmladdnormallink{{\tt
-      http://www.starlink.ac.uk/iraf/web/tutorials/doecslit/doecslit.html}}
+\item \htmladdnormallink{\texttt{http://www.starlink.ac.uk/iraf/web/tutorials/doecslit/doecslit.html}}
       {http://www.starlink.ac.uk/iraf/web/tutorials/doecslit/doecslit.html}
 
 \end{itemize}
@@ -495,7 +242,7 @@ reports, comments and news is maintained at
 
 \begin{itemize}
 
-\item \scspec{{\tt http://www.star.ucl.ac.uk/\symbol{126}mjc/echelle/}}
+\item \scspec{\texttt{http://www.star.ucl.ac.uk/\symbol{126}mjc/echelle/}}
       {\htmladdnormallink{\verb+http://www.star.ucl.ac.uk/~mjc/echelle/+}
       {http://www.star.ucl.ac.uk/~mjc/echelle/}}
 
@@ -507,7 +254,7 @@ All the scripts included here are available in source form.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\label{se_acknowledgements}\xlabel{acknowledgements}Acknowledgements }
-\markboth{Acknowledgements}{\stardocname}
+
 
 Thanks are due to Andrew Collier Cameron who has been the principal
 contributor of scripts using ECHOMOP and FIGARO on which
@@ -531,7 +278,7 @@ reduction structure files.
 \section{\label{se_starlink}\xlabel{starlink}Starlink}
 
 \subsection{\label{se_meanarc}\xlabel{MEANARC}MEANARC}
-\markboth{MEANARC}{\stardocname}
+
 
 \begin{figure}[h]
 \begin{center}
@@ -552,13 +299,13 @@ and apply the scaling to the object spectra.}
 
 \begin{description}
 
-\item [{\bf Purpose:}] \mbox{} \\
+\item [\textbf{Purpose:}] \mbox{} \\
      Pastes the average of two arc wavelength scales onto a spectrum.
 
-\item [{\bf Language:}] \mbox{} \\
+\item [\textbf{Language:}] \mbox{} \\
      Perl script.
 
-\item [{\bf Description:}] \mbox{} \\
+\item [\textbf{Description:}] \mbox{} \\
      A common data reduction task is to apply the wavelength calibration
      based an arc lamp spectrum to an object frame or several object
      frames.  It is often the case that we have two arc lamp exposures which
@@ -601,16 +348,16 @@ and apply the scaling to the object spectra.}
 
 \begin{description}
 
-\item {\bf OUTPUT} is the wavelength scale produced.
-\item {\bf ARC1}   is the wavelength scale of ARC1.
-\item {\bf ARC2}   is the wavelength scale of ARC2.
+\item \textbf{OUTPUT} is the wavelength scale produced.
+\item \textbf{ARC1}   is the wavelength scale of ARC1.
+\item \textbf{ARC2}   is the wavelength scale of ARC2.
 \item $T_{ARC1}$  is the MJD for ARC1.
 \item $T_{ARC2}$  is the MJD for ARC2.
 \item $T_{OBJ}$   is the MJD for the object.
 
 \end{description}
 
-\item [{\bf Usage:}] \mbox{} \\
+\item [\textbf{Usage:}] \mbox{} \\
      You can simply invoke this script with no arguments and you
      will be prompted for the required information.  Alternatively,
      you can supply the arguments on the command line.  For example,
@@ -618,21 +365,21 @@ and apply the scaling to the object spectra.}
      by the arc exposures \verb+arc1+ and \verb+arc2+ this would be a
      suitable way to invoke the script:
 
-\begin{verbatim}
+\begin{terminalv}
    % meanarc arc1 arc2 obj1 obj2
-\end{verbatim}
+\end{terminalv}
 
      If supplied, command-line arguments must be in this order:
 
 \begin{enumerate}
 
-\item {\bf First Arc.}
+\item \textbf{First Arc.}
       Name of the first arc frame file.
 
-\item {\bf Second Arc.}
+\item \textbf{Second Arc.}
       Name of the second arc frame file.
 
-\item {\bf List of object frames.}
+\item \textbf{List of object frames.}
       Names of the files to which the calibration should be applied.
       You can supply as many names as you like, separated by spaces.
       If you are prompted for a list of objects, then you should
@@ -642,21 +389,19 @@ and apply the scaling to the object spectra.}
 
      Missing command-line arguments are prompted for.
 
-\item [{\bf Source code:}] \mbox{} \\
+\item [\textbf{Source code:}] \mbox{} \\
 \begin{latexonly}
 In a standard Starlink installation the source code for MEANARC can be found
 in the file:
-\begin{verbatim}
+\begin{terminalv}
    /star/examples/sc3/meanarc
-\end{verbatim}
+\end{terminalv}
 \end{latexonly}
-\begin{htmlonly}
-      The script source code is available
-      \htmlref{{\bf here}}{se_meanarc_source}.
-\end{htmlonly}
+
+
 
 \newpage
-\item [{\bf Notes:}] \mbox{}
+\item [\textbf{Notes:}] \mbox{}
 \begin{enumerate}
 
 \item FIGARO V5.0-0 or higher is required.
@@ -680,7 +425,7 @@ in the file:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \subsection{\label{se_echtract}\xlabel{ECHTRACT}ECHTRACT}
-\markboth{ECHTRACT}{\stardocname}
+
 
 \begin{figure}[h]
 \begin{center}
@@ -701,14 +446,14 @@ some cosmic-ray contamination.}
 
 \begin{description}
 
-\item [{\bf Purpose:}] \mbox{} \\
+\item [\textbf{Purpose:}] \mbox{} \\
      Script to extract orders from a reduced \'{e}chelle image to
      individual NDF files suitable for reading into \xref{DIPSO}{sun50}{}.
 
-\item [{\bf Language:}] \mbox{} \\
+\item [\textbf{Language:}] \mbox{} \\
      C shell script.
 
-\item [{\bf Description:}] \mbox{} \\
+\item [\textbf{Description:}] \mbox{} \\
      This script performs a common task; slicing out individual orders
      from a collapsed, extracted \'{e}chelle image.  In a collapsed \'{e}chelle
      image each row of the 2-D image is a single order from the
@@ -721,8 +466,8 @@ some cosmic-ray contamination.}
      by DIPSO, \xref{FIGARO}{sun86}{} and so on.
 
      The input image should be one output from \xref{ECHOMOP}{sun152}{}
-     (produced using \xref{{\tt ech\_result}}{sun152}{ech_result} or
-     \xref{{\tt echmenu} Option 14}{sun152}{option14}) or FIGARO
+     (produced using \xref{\texttt{ech\_result}}{sun152}{ech_result} or
+     \xref{\texttt{echmenu} Option 14}{sun152}{option14}) or FIGARO
      \xref{ECHARC}{sun86}{ECHARC}, or one which consists of a
      2-dimensional image where each order occupies a single line of the
      image.
@@ -767,40 +512,40 @@ some cosmic-ray contamination.}
      \verb+.MORE.ECHELLE.DATA_ARRAY+, then edit the appropriate line
      in the script to:
 
-\begin{verbatim}
+\begin{terminalv}
    set FLUXDATA = '.MORE.ECHELLE.DATA_ARRAY';
-\end{verbatim}
+\end{terminalv}
 
      Be sure to include the leading `.' or the extension will not be
      found.
 
-\item [{\bf Usage:}] \mbox{} \\
+\item [\textbf{Usage:}] \mbox{} \\
      You can simply invoke this script with no arguments and you
      will be prompted for the required information.  Alternatively,
      you can supply the arguments on the command line.  For example,
      if you have a collapsed \'{e}chelle spectrum \verb+extobj.sdf+ which
      contains 42 orders and you want each order to be stored in an NDF
-     called {\tt extord\_nn.sdf}, where \verb+nn+ is the number of the
+     called \texttt{extord\_nn.sdf}, where \verb+nn+ is the number of the
      order, invoke the script thus:
 
-\begin{verbatim}
+\begin{terminalv}
    % echtract extobj 1 42 extord
-\end{verbatim}
+\end{terminalv}
 
      If supplied, command-line arguments must be in this order:
 
 \begin{enumerate}
 
-\item {\bf Input image.}
+\item \textbf{Input image.}
       Name of the image containing the \'{e}chelle orders.
 
-\item {\bf Number of first order.}
+\item \textbf{Number of first order.}
       Number of the first \'{e}chelle order to be extracted.
 
-\item {\bf Number of last order.}
+\item \textbf{Number of last order.}
       Number of the last \'{e}chelle order to be extracted.
 
-\item {\bf Output root.}
+\item \textbf{Output root.}
       Root name for output images, e.g. a value \verb+ech+ will
       lead to output files \verb+ech_01.sdf+, \verb+ech_02.sdf+
       and so on.
@@ -809,30 +554,22 @@ some cosmic-ray contamination.}
 
      Missing command-line arguments are prompted for.
 
-\item [{\bf Source code:}] \mbox{} \\
+\item [\textbf{Source code:}] \mbox{} \\
 \begin{latexonly}
 In a standard Starlink installation the source code for ECHTRACT can be found
 in the:
 \begin{itemize}
 
-\item {\tt /star/examples/sc3/echtract\_echomop} for ECHOMOP data.
+\item \texttt{/star/examples/sc3/echtract\_echomop} for ECHOMOP data.
 
-\item {\tt /star/examples/sc3/echtract\_echarc} for FIGARO ECHARC data.
+\item \texttt{/star/examples/sc3/echtract\_echarc} for FIGARO ECHARC data.
 
 \end{itemize}
 \end{latexonly}
-\begin{htmlonly}
-      Script source code available:
-\begin{itemize}
 
-\item For \htmlref{{\bf ECHOMOP data}}{se_echtract_echomop_source}.
 
-\item For FIGARO \htmlref{{\bf ECHARC data}}{se_echtract_echarc_source}.
 
-\end{itemize}
-\end{htmlonly}
-
-\item [{\bf Notes:}] \mbox{}
+\item [\textbf{Notes:}] \mbox{}
 \begin{enumerate}
 \item \xref{FIGARO}{sun86}{} V5.0-0 or higher is required.
 
@@ -854,9 +591,9 @@ in the:
 
 \item By default, the flux array is assumed to be in the main
 
-\begin{verbatim}
+\begin{terminalv}
    .DATA_ARRAY
-\end{verbatim}
+\end{terminalv}
 
        of the input file.  Use HDSTRACE to check this.
 
@@ -866,11 +603,11 @@ in the:
       get rid of the login/setup messages) if you have already done a
       Starlink login, setup for FIGARO and for KAPPA.  Edit out the
       lines as indicated in the script then, to use this script, you
-      {\bf must} source it.  For example:
+      \textbf{must} source it.  For example:
 
-\begin{verbatim}
+\begin{terminalv}
    % source echtract extobj 1 42 extord
-\end{verbatim}
+\end{terminalv}
 \end{enumerate}
 \end{description}
 
@@ -878,7 +615,7 @@ in the:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \subsection{\label{se_stackgen}\xlabel{STACKGEN}STACKGEN}
-\markboth{STACKGEN}{\stardocname}
+
 
 \begin{figure}[h]
 \begin{center}
@@ -898,14 +635,14 @@ signal level with increasing wavelength.}
 \end{figure}
 
 \begin{description}
-\item [{\bf Purpose:}] \mbox{} \\
+\item [\textbf{Purpose:}] \mbox{} \\
      Script to generate a \xref{DIPSO}{sun50}{} stack containing orders
      from a collapsed \'{e}chelle image.
 
-\item [{\bf Language:}] \mbox{} \\
+\item [\textbf{Language:}] \mbox{} \\
      C shell script.
 
-\item [{\bf Description:}] \mbox{} \\
+\item [\textbf{Description:}] \mbox{} \\
      This script converts an \xref{NDF}{sun33}{}
      containing a collapsed \'{e}chelle spectrum into a DIPSO stack where each
      stack entry holds one order from the echellogram.  In a collapsed
@@ -920,8 +657,8 @@ signal level with increasing wavelength.}
      The intermediate NDFs are then deleted.
 
      The input image should be one output from \xref{ECHOMOP}{sun152}{}
-     (produced using \xref{{\tt ech\_result}}{sun152}{ech_result} or
-     \xref{{\tt echmenu} Option 14}{sun152}{option14}) or FIGARO
+     (produced using \xref{\texttt{ech\_result}}{sun152}{ech_result} or
+     \xref{\texttt{echmenu} Option 14}{sun152}{option14}) or FIGARO
      \xref{ECHARC}{sun86}{ECHARC}, or one which consists of a
      2-dimensional image where each order occupies a single line of the
      image.
@@ -960,78 +697,70 @@ signal level with increasing wavelength.}
      \verb+.MORE.ECHELLE.DATA_ARRAY+, then edit the appropriate line
      in the script to:
 
-\begin{verbatim}
+\begin{terminalv}
    set FLUXDATA = '.MORE.ECHELLE.DATA_ARRAY';
-\end{verbatim}
+\end{terminalv}
 
      Be sure to include the leading `.' or the extension will not be
      found.
 
-\item [{\bf Usage:}] \mbox{} \\
+\item [\textbf{Usage:}] \mbox{} \\
      You can simply invoke this script with no arguments and you
      will be prompted for the required information.  Alternatively,
      you can supply the arguments on the command line.  For example,
      if you have a collapsed \'{e}chelle spectrum \verb+extobj.sdf+ which
      contains 42 orders and you want the stack to be called
-     {\tt ech\_STK.sdf}, which you can then read in DIPSO with the
+     \texttt{ech\_STK.sdf}, which you can then read in DIPSO with the
      command:
 
-\begin{verbatim}
+\begin{terminalv}
    > restore ech
-\end{verbatim}
+\end{terminalv}
 
      invoke the script thus:
 
-\begin{verbatim}
+\begin{terminalv}
    % stackgen extobj 1 42 ech
-\end{verbatim}
+\end{terminalv}
 
      If supplied, command-line arguments must be in this order:
 
 \begin{enumerate}
 
-\item {\bf Input image.}
+\item \textbf{Input image.}
       Name of the image containing the \'{e}chelle orders.
 
-\item {\bf Number of first order.}
+\item \textbf{Number of first order.}
       Number of the first \'{e}chelle order to be extracted.
 
-\item {\bf Number of last order.}
+\item \textbf{Number of last order.}
       Number of the last \'{e}chelle order to be extracted.
 
-\item {\bf Output stack.}
+\item \textbf{Output stack.}
       Root name for output stack, e.g. a value \verb+ech+ will
-      lead to output DIPSO stack {\tt ech\_STK.sdf}.  This is also used
+      lead to output DIPSO stack \texttt{ech\_STK.sdf}.  This is also used
       as the root name for the temporary single-order NDFs.
 
 \end{enumerate}
 
      Missing command-line arguments are prompted for.
 
-\item [{\bf Source code:}] \mbox{} \\
+\item [\textbf{Source code:}] \mbox{} \\
 \begin{latexonly}
 In a standard Starlink installation the source code for STACKGEN can be found
 in the:
 \begin{itemize}
 
-\item {\tt /star/examples/sc3/stackgen\_echomop} for ECHOMOP data.
+\item \texttt{/star/examples/sc3/stackgen\_echomop} for ECHOMOP data.
 
-\item {\tt /star/examples/sc3/stackgen\_echarc} for FIGARO ECHARC data.
+\item \texttt{/star/examples/sc3/stackgen\_echarc} for FIGARO ECHARC data.
 
 \end{itemize}
 \end{latexonly}
-\begin{htmlonly}
-      Script source code available:
-\begin{itemize}
 
-\item For \htmlref{{\bf ECHOMOP data}}{se_stackgen_echomop_source}.
 
-\item For FIGARO \htmlref{{\bf ECHARC data}}{se_stackgen_echarc_source}.
 
-\end{itemize}
-\end{htmlonly}
-
-\item [{\bf Notes:}] \mbox{}
+\item [\textbf{Notes:}] \mbox{}
 \begin{enumerate}
 
 \item \xref{FIGARO}{sun86}{} V5.0-0 or higher is required.
@@ -1054,9 +783,9 @@ in the:
 
 \item By default, the flux array is assumed to be in the main
 
-\begin{verbatim}
+\begin{terminalv}
    .DATA_ARRAY
-\end{verbatim}
+\end{terminalv}
 
       of the input file.  Use HDSTRACE to check this.
 
@@ -1066,12 +795,12 @@ in the:
       reduce the script set up time (and get rid of the login/setup
       messages) if you have already done a Starlink login, setup for
       FIGARO, KAPPA, and DIPSO.  Edit out the lines as indicated
-      in the script then, to use this script, you {\bf must} source it.
+      in the script then, to use this script, you \textbf{must} source it.
       For example:
 
-\begin{verbatim}
+\begin{terminalv}
    % source stackgen extobj 1 42 ech
-\end{verbatim}
+\end{terminalv}
 \end{enumerate}
 \end{description}
 
@@ -1079,7 +808,7 @@ in the:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \subsection{\label{se_tracepoly}\xlabel{TRACEPOLY}TRACEPOLY \& ARCPOLY}
-\markboth{TRACEPOLY \& ARCPOLY}{\stardocname}
+
 
 \begin{figure}[h]
 \begin{center}
@@ -1097,22 +826,22 @@ could be listed using the TRACEPOLY script.}
 
 \begin{description}
 
-\item [{\bf Purpose:}] \mbox{} \\
+\item [\textbf{Purpose:}] \mbox{} \\
      TRACEPOLY is a script to extract trace polynomial coefficients from an
      \xref{ECHOMOP}{sun152}{} data reduction structure file.
      ARCPOLY is a similar script which extracts wavelength polynomial
      coefficients from an \xref{ECHOMOP}{sun152}{} data reduction structure
      file.
 
-\item [{\bf Language:}] \mbox{} \\
+\item [\textbf{Language:}] \mbox{} \\
      C shell script.
 
-\item [{\bf Description:}] \mbox{} \\
+\item [\textbf{Description:}] \mbox{} \\
      TRACEPOLY uses the Starlink \xref{HDSTRACE}{sun102}{} utility to
      look for the object
-\begin{verbatim}
+\begin{terminalv}
    <file>.MORE.ECHELLE.TRC_POLY
-\end{verbatim}
+\end{terminalv}
      in the ECHOMOP reduction structure file \verb+<file>.sdf+ which holds
      the coefficients of order trace polynomials as determined by
      the ECHOMOP task \xref{{\tt{ech\_trace}}}{sun152}{ech_trace}.
@@ -1121,19 +850,19 @@ could be listed using the TRACEPOLY script.}
      can be modified to display other information from ECHOMOP
      reduction structures.  An example of this is ARCPOLY which looks
      for the object
-\begin{verbatim}
+\begin{terminalv}
    <file>.MORE.ECHELLE.W_POLY
-\end{verbatim}
+\end{terminalv}
      which holds the wavelength-scale polynomials for the reduction.
 
-\item [{\bf Usage:}] \mbox{} \\
+\item [\textbf{Usage:}] \mbox{} \\
      You can simply invoke the scripts with no arguments and you
      will be prompted for the required information.  Alternatively,
      you can supply the arguments on the command line.  For example:
 
-\begin{verbatim}
+\begin{terminalv}
    % tracepoly rdf68 4 7
-\end{verbatim}
+\end{terminalv}
 
      will display the first seven polynomial coefficients for order 4
      of the data in the reduction structure file \verb+rdf68.sdf+.
@@ -1142,13 +871,13 @@ could be listed using the TRACEPOLY script.}
 
 \begin{enumerate}
 
-\item {\bf Reduction structure.}
+\item \textbf{Reduction structure.}
       Name of the ECHOMOP reduction structure file.
 
-\item {\bf Number of the order.}
+\item \textbf{Number of the order.}
       Number of the order trace or wavelength scale to be displayed.
 
-\item {\bf Maximum coefficients.}  (Default value 8.)
+\item \textbf{Maximum coefficients.}  (Default value 8.)
       Number of polynomial coefficients to be displayed.
 
 \end{enumerate}
@@ -1157,26 +886,22 @@ could be listed using the TRACEPOLY script.}
      will be prompted for if not given on the command line.\\
      Argument  3   defaults to the value 8 if not given on the command line.
 
-\item [{\bf Source code:}] \mbox{} \\
+\item [\textbf{Source code:}] \mbox{} \\
 \begin{latexonly}
 In a standard Starlink installation the source codes for TRACEPOLY and
 ARCPOLY can be found in the files:
-\begin{verbatim}
+\begin{terminalv}
    /star/examples/sc3/tracepoly
-\end{verbatim}
+\end{terminalv}
 
 and
 
-\begin{verbatim}
+\begin{terminalv}
    /star/examples/sc3/arcpoly
-\end{verbatim}
+\end{terminalv}
 \end{latexonly}
-\begin{htmlonly}
-      The TRACEPOLY script source code is available
-      \htmlref{{\bf here}}{se_tracepoly_source}.
-      The ARCPOLY script source code is also
-      \htmlref{{\bf available}}{se_arcpoly_source}.
-\end{htmlonly}
+
+
 
 \end{description}
 
@@ -1184,7 +909,7 @@ and
 \newpage
 \subsection{\label{se_automated_echomop}\xlabel{automated_echomop}Automated
             ECHOMOP reductions}
-\markboth{Automated ECHOMOP reductions}{\stardocname}
+
 
 This family of scripts can be used to manage the automatic reduction of
 \'{e}chelle data based upon a single template reduction
@@ -1193,39 +918,39 @@ performed manually.  The scripts are as follows:
 \begin{quote}
 \begin{description}
 
-\item [\htmlref{{\bf PREPRUN1}}{se_preprun}]
+\item [\htmlref{\textbf{PREPRUN1}}{se_preprun}]
       Driver script for an automated reduction run.
       Prompts for details of the dataset.
 
-\item [\htmlref{{\bf PREPRUN2}}{se_preprun}]
+\item [\htmlref{\textbf{PREPRUN2}}{se_preprun}]
       Driver script for an automated reduction run.
       Should be edited to contain details of the dataset.
 
-\item [\htmlref{{\bf PREPBIAS}}{se_prepbias}]
+\item [\htmlref{\textbf{PREPBIAS}}{se_prepbias}]
       A bias frame is created using \xref{FIGARO}{sun86}{}
       \xref{MEDSKY}{sun86}{MEDSKY} to produce the median of the input
       images.
 
-\item [\htmlref{{\bf PREPFLAT}}{se_prepflat}]
+\item [\htmlref{\textbf{PREPFLAT}}{se_prepflat}]
       Uses the bias frame produced by PREPBIAS and a series
       of input images to create a flat field using FIGARO MEDSKY.
       Rotates the images (if needed) to give horizontal orders.
 
-\item [\htmlref{{\bf PREPARCS}}{se_preparcs}]
+\item [\htmlref{\textbf{PREPARCS}}{se_preparcs}]
       Uses the bias frame produced by PREPBIAS and the flat field
       from PREPFLAT to prepare the input arc images for ECHOMOP\@.
       Images clipped and rotated.
 
-\item [\htmlref{{\bf PREPOBJS}}{se_prepobjs}]
+\item [\htmlref{\textbf{PREPOBJS}}{se_prepobjs}]
       Uses the bias frame produced by PREPBIAS and the flat field
       from PREPFLAT to prepare the input object images for ECHOMOP\@.
       Images clipped and rotated.
 
-\item [\htmlref{{\bf ECHRDARC}}{se_echrdarc}]
+\item [\htmlref{\textbf{ECHRDARC}}{se_echrdarc}]
       Extracts the arc spectra using an appropriate object
       image to determine channels.
 
-\item [\htmlref{{\bf ECHRDUCE}}{se_echrduce}]
+\item [\htmlref{\textbf{ECHRDUCE}}{se_echrduce}]
       Extracts the object spectra.
 
 \end{description}
@@ -1233,7 +958,7 @@ performed manually.  The scripts are as follows:
 
 The PREPBIAS, PREPFLAT, PREPARCS and PREPOBJS scripts use FIGARO commands to
 prepare the raw CCD image frames for use by ECHOMOP\@.
-By default, these scripts {\bf do not} perform {\bf rotation} of the images.
+By default, these scripts \textbf{do not} perform \textbf{rotation} of the images.
 ECHOMOP requires that the orders of the spectrum should run roughly parallel
 to the rows of the image ({\it{i.e.}} horizontally).
 If your input frames contain \'{e}chelle spectra with the dispersion running
@@ -1253,8 +978,8 @@ should edit to contain the details of the dataset.
 PREPRUN2 is a template for this purpose.
 
 In use, at least a single object and arc should be reduced manually using
-{\tt echmenu} to ensure that correct general parameters are used to
-build an ECHOMOP {\em reduction file} which can be re-used in subsequent
+\texttt{echmenu} to ensure that correct general parameters are used to
+build an ECHOMOP \emph{reduction file} which can be re-used in subsequent
 reductions.  The scripts ECHRDARC and ECHRDUCE should be edited to
 reflect the sequence of operations required for your particular data.
 
@@ -1269,40 +994,37 @@ data before trying to `pipeline' process it.  Even if you are confident of
 successful automated reduction, you will still have to review the results
 carefully.
 
-In the scripts included, the \xref{{\tt echmenu}}{sun152}{ECHMENU} option
+In the scripts included, the \xref{\texttt{echmenu}}{sun152}{ECHMENU} option
 sequence:
 
 \begin{quote}
 \begin{description}
 
-\item [4.2 \xref{{\tt ech\_object}}{sun152}{ech_spatial}]
+\item [4.2 \xref{\texttt{ech\_object}}{sun152}{ech_spatial}]
       Get the object channel.
 
-\item [22 \xref{{\tt ech\_mdlbck}}{sun152}{ech_mdlbck}]
+\item [22 \xref{\texttt{ech\_mdlbck}}{sun152}{ech_mdlbck}]
       Model the background as scattered light.
 
-\item [7 \xref{{\tt ech\_profile}}{sun152}{ech_profile}]
+\item [7 \xref{\texttt{ech\_profile}}{sun152}{ech_profile}]
       Model the object profile.
 
-\item [8 \xref{{\tt ech\_extrct}}{sun152}{ech_extrct}]
+\item [8 \xref{\texttt{ech\_extrct}}{sun152}{ech_extrct}]
       Extract the orders.
 
-\item [14 \xref{{\tt ech\_result}}{sun152}{ech_result}]
+\item [14 \xref{\texttt{ech\_result}}{sun152}{ech_result}]
       Write the results to an output NDF\@.
 
 \item [EXIT]
-      Exit {\tt echmenu}.
+      Exit \texttt{echmenu}.
 
 \end{description}
 \end{quote}
 
 is executed.  See \xref{SUN/152}{sun152}{} for details of ECHOMOP reductions.
-The EXIT option {\bf must} be included otherwise {\tt
-echmenu} will revert to interactive mode when the sequence of options is
-completed.  The reduction sequence is specified via the parameter {\tt
-tune\_automate}\@.  Other parameters, {\it{e.g.}} which extraction object
-to output (parameter {\tt result\_type}), are also given in the {\tt
-echmenu} command line.  As the above sequence does not perform order tracing,
+The EXIT option \textbf{must} be included otherwise \texttt{echmenu} will revert to interactive mode when the sequence of options is
+completed.  The reduction sequence is specified via the parameter \texttt{tune\_automate}\@.  Other parameters, {\it{e.g.}} which extraction object
+to output (parameter \texttt{result\_type}), are also given in the \texttt{echmenu} command line.  As the above sequence does not perform order tracing,
 the order trace polynomials must be provided in the manually-prepared
 reduction structure file.  This is an example of an automated reduction
 sequence where one aspect of the reduction \scspec{--}{-} the order tracing
@@ -1313,7 +1035,7 @@ automatic reductions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{\label{se_preprun}\xlabel{preprun}PREPRUN1 \& PREPRUN2
                \scspec{--}{-} Set up automated run}
-\markboth{PREPRUN}{\stardocname}
+
 
 These are example master driver scripts for an automated run.
 
@@ -1338,13 +1060,13 @@ Here is the prologue for PREPRUN2:
 
 \begin{description}
 
-\item [{\bf Purpose:}] \mbox{} \\
+\item [\textbf{Purpose:}] \mbox{} \\
      Driver script to set up for an automated \'{e}chelle data reduction run.
 
-\item [{\bf Language:}] \mbox{} \\
+\item [\textbf{Language:}] \mbox{} \\
      C shell script.
 
-\item [{\bf Description:}] \mbox{} \\
+\item [\textbf{Description:}] \mbox{} \\
      This script can be used to coordinate the relatively complex
      series of operations required for reducing a large number of
      similar \'{e}chelle spectrograms.  Before using the script, you
@@ -1391,7 +1113,7 @@ Here is the prologue for PREPRUN2:
      frame.
      Arc frames \verb+ar_+`file' are similarly created.
 
-\item [{\bf Usage:}] \mbox{} \\
+\item [\textbf{Usage:}] \mbox{} \\
      You need to know the true detection area of the CCD used to acquire
      your data \scspec{--}{-} if you don't, display an image with
      \xref{FIGARO}{sun86}{} \xref{IMAGE}{sun86}{IMAGE} and
@@ -1426,23 +1148,20 @@ Here is the prologue for PREPRUN2:
      See comments in the script for details.  Example values
      have been given for some of these items.
 
-\item [{\bf Source code:}] \mbox{} \\
+\item [\textbf{Source code:}] \mbox{} \\
 \begin{latexonly}
 In a standard Starlink installation the source code for the PREPRUN scripts
 can be found in these files:
 \begin{itemize}
 
-\item {\tt /star/examples/sc3/preprun1}.
+\item \texttt{/star/examples/sc3/preprun1}.
 
-\item {\tt /star/examples/sc3/preprun2}.
+\item \texttt{/star/examples/sc3/preprun2}.
 
 \end{itemize}
 \end{latexonly}
-\begin{htmlonly}
-      The script source codes for
-      \htmlref{{\bf preprun1}}{se_preprun1_source} and
-      \htmlref{{\bf preprun2}}{se_preprun2_source} are available.
-\end{htmlonly}
+
+
 
 \end{description}
 
@@ -1450,66 +1169,64 @@ can be found in these files:
 \newpage
 \subsubsection{\label{se_prepbias}\xlabel{prepbias}PREPBIAS
                \scspec{--}{-} Prepare bias frame}
-\markboth{PREPBIAS}{\stardocname}
+
 
 \begin{description}
 
-\item [{\bf Purpose:}] \mbox{} \\
+\item [\textbf{Purpose:}] \mbox{} \\
      Script to prepare a single biasframe from a series of frames.
 
-\item [{\bf Language:}] \mbox{} \\
+\item [\textbf{Language:}] \mbox{} \\
      C shell script.
 
-\item [{\bf Description:}] \mbox{} \\
+\item [\textbf{Description:}] \mbox{} \\
      This script produces a single median image from a series of
      `raw' CCD bias frames.  The median bias frame is created using
      \xref{FIGARO}{sun86}{} \xref{MEDSKY}{sun86}{MEDSKY}.  The output
      image is called \verb+biasframe+, this can be altered by editing
      the appropriate line in the script.
 
-\item [{\bf Usage:}] \mbox{} \\
+\item [\textbf{Usage:}] \mbox{} \\
      This script can simply be invoked from the shell; in this case
      the script will prompt for a list of the input bias images.
      Alternatively, the list of bias frames can be supplied on the
      command line, for example:
 
-\begin{verbatim}
+\begin{terminalv}
    % prepbias run0800 run0801 run0802 run0856 run0857 run0858
-\end{verbatim}
+\end{terminalv}
 
      If wildcarding facilities are available in your shell, you can use
      them to simplify the command line, for example, the above would
      become:
 
-\begin{verbatim}
+\begin{terminalv}
    % prepbias run080[012] run085[678]
-\end{verbatim}
+\end{terminalv}
 
      in the C shell.  This wildcarding facility is available when the
      script prompts for a list of input images.
 
-\item [{\bf Source code:}] \mbox{} \\
+\item [\textbf{Source code:}] \mbox{} \\
 \begin{latexonly}
 In a standard Starlink installation the source code for PREPBIAS can be found
 in the file:
-\begin{verbatim}
+\begin{terminalv}
    /star/examples/sc3/prepbias
-\end{verbatim}
+\end{terminalv}
 \end{latexonly}
-\begin{htmlonly}
-      The script source code is available
-      \htmlref{{\bf here}}{se_prepbias_source}.
-\end{htmlonly}
 
-\item [{\bf Notes:}] \mbox{}
+
+
+\item [\textbf{Notes:}] \mbox{}
 \begin{enumerate}
 
 \item If needed, the input parameters can be input at the command
       line thus:
 
-\begin{verbatim}
+\begin{terminalv}
    % nohup prepbias filename [filename...] &
-\end{verbatim}
+\end{terminalv}
 
       the \verb+nohup+ command will ensure that the script continues
       to run even when you have logged off the system.  The \verb+&+ at
@@ -1537,18 +1254,18 @@ in the file:
 \newpage
 \subsubsection{\label{se_prepflat}\xlabel{prepflat}PREPFLAT
                \scspec{--}{-} Prepare Flat-field frame}
-\markboth{PREPFLAT}{\stardocname}
+
 
 \begin{description}
 
-\item [{\bf Purpose:}] \mbox{} \\
+\item [\textbf{Purpose:}] \mbox{} \\
      Script to prepare a median flat-field for use by
      \xref{ECHOMOP}{sun152}{}.
 
-\item [{\bf Language:}] \mbox{} \\
+\item [\textbf{Language:}] \mbox{} \\
      C shell script.
 
-\item [{\bf Description:}] \mbox{} \\
+\item [\textbf{Description:}] \mbox{} \\
      This script takes a list of `raw' CCD flat-field frames and
      produces a single median flat-field image suitable for use as
      the FFIELD file in ECHOMOP.
@@ -1571,23 +1288,23 @@ in the file:
 
      The median flat-field is calculated using FIGARO MEDSKY.
 
-\item [{\bf Usage:}] \mbox{} \\
+\item [\textbf{Usage:}] \mbox{} \\
      This script can simply be invoked from the shell; in this case
      the script will prompt for a list of the input flat-field images.
      Alternatively, the list of frames can be supplied on the
      command line, for example:
 
-\begin{verbatim}
+\begin{terminalv}
    % prepflat run0800 run0801 run0802 run0856 run0857 run0858
-\end{verbatim}
+\end{terminalv}
 
      If wildcarding facilities are available in your shell, you can use
      them to simplify the command line, for example, the above would
      become:
 
-\begin{verbatim}
+\begin{terminalv}
    % prepflat run080[012] run085[678]
-\end{verbatim}
+\end{terminalv}
 
      in the C shell.  This wildcarding facility is available when the
      script prompts for a list of input images.
@@ -1598,27 +1315,25 @@ in the file:
      to be used for debiasing are required.  Use of these variables is
      summarised below.
 
-\item [{\bf Source code:}] \mbox{} \\
+\item [\textbf{Source code:}] \mbox{} \\
 \begin{latexonly}
 In a standard Starlink installation the source code for PREPFLAT can be found
 in the file:
-\begin{verbatim}
+\begin{terminalv}
    /star/examples/sc3/prepflat
-\end{verbatim}
+\end{terminalv}
 \end{latexonly}
-\begin{htmlonly}
-      The script source code is available
-      \htmlref{{\bf here}}{se_prepflat_source}.
-\end{htmlonly}
 
-\item [{\bf Notes:}] \mbox{}
+
+
+\item [\textbf{Notes:}] \mbox{}
 \begin{enumerate}
 \item If needed, the input parameters can be input at the command
       line thus:
 
-\begin{verbatim}
+\begin{terminalv}
    % nohup prepflat filename [filename...] &
-\end{verbatim}
+\end{terminalv}
 
       the \verb+nohup+ command will ensure that the script continues
       to run even when you have logged off the system.  The \verb+&+ at
@@ -1673,7 +1388,7 @@ in the file:
       You can alter the name of this file, see comments in the
       script.
 
-\item The input frames are {\bf not} rotated by this script.  You may
+\item The input frames are \textbf{not} rotated by this script.  You may
       have images in which the orders run roughly vertically,
       in which case you should uncomment the line using FIGARO
       \xref{IROT90}{sun86}{IROT90} as in the script.  Approximately
@@ -1694,18 +1409,18 @@ in the file:
 \newpage
 \subsubsection{\label{se_preparcs}\xlabel{preparcs}PREPARCS
                 \scspec{--}{-} Prepare arc frames}
-\markboth{PREPARCS}{\stardocname}
+
 
 \begin{description}
 
-\item [{\bf Purpose:}] \mbox{} \\
+\item [\textbf{Purpose:}] \mbox{} \\
      Script to prepare a set of arc frames for use by
      \xref{ECHOMOP}{sun152}{}.
 
-\item [{\bf Language:}] \mbox{} \\
+\item [\textbf{Language:}] \mbox{} \\
      C shell script.
 
-\item [{\bf Description:}] \mbox{} \\
+\item [\textbf{Description:}] \mbox{} \\
      This script takes a list of `raw' CCD arc-lamp frames and performs
      the basic CCD data processing steps of bias subtraction and trimming
      on the images.  Bias subtraction removes the zero-point bias
@@ -1720,23 +1435,23 @@ in the file:
      The script produces a series of files \verb+a_+`file' where `file'
      is the name of the source frame.
 
-\item [{\bf Usage:}] \mbox{} \\
+\item [\textbf{Usage:}] \mbox{} \\
      This script can simply be invoked from the shell; in this case
      the script will prompt for a list of the input arc-lamp images.
      Alternatively, the list of frames can be supplied on the
      command line, for example:
 
-\begin{verbatim}
+\begin{terminalv}
    % preparcs run0800 run0801 run0802 run0856 run0857 run0858
-\end{verbatim}
+\end{terminalv}
 
      If wildcarding facilities are available in your shell, you can use
      them to simplify the command line, for example, the above would
      become:
 
-\begin{verbatim}
+\begin{terminalv}
    % preparcs run080[012] run085[678]
-\end{verbatim}
+\end{terminalv}
 
      in the C shell.  This wildcarding facility is available when the
      script prompts for a list of input images.
@@ -1747,28 +1462,26 @@ in the file:
      to be used for debiasing are required.  Use of these variables is
      summarised below.
 
-\item [{\bf Source code:}] \mbox{} \\
+\item [\textbf{Source code:}] \mbox{} \\
 \begin{latexonly}
 In a standard Starlink installation the source code for PREPARCS can be found
 in the file:
-\begin{verbatim}
+\begin{terminalv}
    /star/examples/sc3/preparcs
-\end{verbatim}
+\end{terminalv}
 \end{latexonly}
-\begin{htmlonly}
-      The script source code is available
-      \htmlref{{\bf here}}{se_preparcs_source}.
-\end{htmlonly}
 
-\item [{\bf Notes:}] \mbox{}
+
+
+\item [\textbf{Notes:}] \mbox{}
 \begin{enumerate}
 
 \item If needed, the input parameters can be input at the command
       line thus:
 
-\begin{verbatim}
+\begin{terminalv}
    % nohup preparcs filename [filename...] &
-\end{verbatim}
+\end{terminalv}
 
       the \verb+nohup+ command will ensure that the script continues
       to run even when you have logged off the system.  The \verb+&+ at
@@ -1823,7 +1536,7 @@ in the file:
       You can alter the name of this file, see comments in the
       script.
 
-\item The input frames are {\bf not} rotated by this script.  You may
+\item The input frames are \textbf{not} rotated by this script.  You may
       have images in which the orders run roughly vertically,
       in which case you should uncomment the line using FIGARO
       \xref{IROT90}{sun86}{IROT90} as indicated in the script.
@@ -1841,18 +1554,18 @@ in the file:
 \newpage
 \subsubsection{\label{se_prepobjs}\xlabel{prepobjs}PREPOBJS
                 \scspec{--}{-} Prepare object frames}
-\markboth{PREPOBJS}{\stardocname}
+
 
 \begin{description}
 
-\item [{\bf Purpose:}] \mbox{} \\
+\item [\textbf{Purpose:}] \mbox{} \\
      Script to prepare a set of object frames for use by
      \xref{ECHOMOP}{sun152}{}.
 
-\item [{\bf Language:}] \mbox{} \\
+\item [\textbf{Language:}] \mbox{} \\
      C shell script.
 
-\item [{\bf Description:}] \mbox{} \\
+\item [\textbf{Description:}] \mbox{} \\
      This script takes a list of `raw' CCD object frames and performs
      the basic CCD data processing steps of bias subtraction and trimming
      on the images.  Bias subtraction removes the zero-point bias
@@ -1867,23 +1580,23 @@ in the file:
      The script produces a series of files \verb+o_file+ where
      \verb+file+ is the name of the source frame.
 
-\item [{\bf Usage:}] \mbox{} \\
+\item [\textbf{Usage:}] \mbox{} \\
      This script can simply be invoked from the shell; in this case
      the script will prompt for a list of the input object images.
      Alternatively, the list of frames can be supplied on the
      command line, for example:
 
-\begin{verbatim}
+\begin{terminalv}
    % prepobjs run0800 run0801 run0802 run0856 run0857 run0858
-\end{verbatim}
+\end{terminalv}
 
      If wildcarding facilities are available in your shell, you can use
      them to simplify the command line, for example, the above would
      become:
 
-\begin{verbatim}
+\begin{terminalv}
    % prepobjs run080[012] run085[678]
-\end{verbatim}
+\end{terminalv}
 
      in the C shell.  This wildcarding facility is available when the
      script prompts for a list of input images.
@@ -1894,28 +1607,26 @@ in the file:
      to be used for debiasing are required.  Use of these variables is
      summarised below.
 
-\item [{\bf Source code:}] \mbox{} \\
+\item [\textbf{Source code:}] \mbox{} \\
 \begin{latexonly}
 In a standard Starlink installation the source code for PREPOBJS can be found
 in the file:
-\begin{verbatim}
+\begin{terminalv}
    /star/examples/sc3/prepobjs
-\end{verbatim}
+\end{terminalv}
 \end{latexonly}
-\begin{htmlonly}
-      The script source code is available
-      \htmlref{{\bf here}}{se_prepobjs_source}.
-\end{htmlonly}
 
-\item [{\bf Notes:}] \mbox{}
+
+
+\item [\textbf{Notes:}] \mbox{}
 \begin{enumerate}
 
 \item If needed, the input parameters can be input at the command
       line thus:
 
-\begin{verbatim}
+\begin{terminalv}
    % nohup prepobjs filename [filename...] &
-\end{verbatim}
+\end{terminalv}
 
       the \verb+nohup+ command will ensure that the script continues
       to run even when you have logged off the system.  The \verb+&+ at
@@ -1969,7 +1680,7 @@ in the file:
       You can alter the name of this file, see comments in the
       script.
 
-\item The input frames are {\bf not} rotated by this script.  You may
+\item The input frames are \textbf{not} rotated by this script.  You may
       have images in which the orders run roughly vertically,
       in which case you should uncomment the line using FIGARO
       \xref{IROT90}{sun86}{IROT90} as indicated in the script.
@@ -1987,17 +1698,17 @@ in the file:
 \newpage
 \subsubsection{\label{se_echrdarc}\xlabel{echrdarc}ECHRDARC
                 \scspec{--}{-} Reduce arc frames}
-\markboth{ECHRDARC}{\stardocname}
+
 
 \begin{description}
 
-\item [{\bf Purpose:}] \mbox{} \\
+\item [\textbf{Purpose:}] \mbox{} \\
      Script to reduce an arc frame with \xref{ECHOMOP}{sun152}{}.
 
-\item [{\bf Language:}] \mbox{} \\
+\item [\textbf{Language:}] \mbox{} \\
      C shell script.
 
-\item [{\bf Description:}] \mbox{} \\
+\item [\textbf{Description:}] \mbox{} \\
      This script reduces a wavelength-scale reference arc frame using
      ECHOMOP.  An object or flat-field frame to be used for order
      profiling must be available.  (You could use an arc frame
@@ -2009,16 +1720,16 @@ in the file:
      The output file is named \verb+ar_ArcFile+ where \verb+ArcFile+ is
      the name of the input arc frame.
 
-\item [{\bf Usage:}] \mbox{} \\
+\item [\textbf{Usage:}] \mbox{} \\
      This script can simply be invoked from the shell; in this case
      the script will prompt for the arc frame to be processed and the
      object frame to be used for order profiling.
      Alternatively, the input frame names can be supplied on the
      command line, for example:
 
-\begin{verbatim}
+\begin{terminalv}
    % echrdarc arc004 obj012
-\end{verbatim}
+\end{terminalv}
 
      In practice, invocation from your shell is unlikely to be a good
      method of using this script as 3 environment variables defining
@@ -2030,38 +1741,36 @@ in the file:
 
 \begin{enumerate}
 
-\item {\bf Arc Frame.}
+\item \textbf{Arc Frame.}
       Name of the Arc frame to be processed.
 
-\item {\bf Object Frame.}
+\item \textbf{Object Frame.}
       Name of the Object frame to be processed.
 
 \end{enumerate}
 
      Missing command-line arguments are prompted for.
 
-\item [{\bf Source code:}] \mbox{} \\
+\item [\textbf{Source code:}] \mbox{} \\
 \begin{latexonly}
 In a standard Starlink installation the source code for ECHRDARC can be found
 in the file:
-\begin{verbatim}
+\begin{terminalv}
    /star/examples/sc3/echrdarc
-\end{verbatim}
+\end{terminalv}
 \end{latexonly}
-\begin{htmlonly}
-      The script source code is available
-      \htmlref{{\bf here}}{se_echrdarc_source}.
-\end{htmlonly}
 
-\item [{\bf Notes:}] \mbox{}
+
+
+\item [\textbf{Notes:}] \mbox{}
 \begin{enumerate}
 
 \item If needed, the input parameters can be input at the command
       line thus:
 
-\begin{verbatim}
+\begin{terminalv}
    % nohup echrdarc arcfilename objectfilename &
-\end{verbatim}
+\end{terminalv}
 
       the \verb+nohup+ command will ensure that the script continues
       to run even when you have logged off the system.  The \verb+&+ at
@@ -2113,39 +1822,39 @@ in the file:
 \newpage
 \subsubsection{\label{se_echrduce}\xlabel{echrduce}ECHRDUCE
                 \scspec{--}{-} Reduce object frames}
-\markboth{ECHRDUCE}{\stardocname}
+
 
 \begin{description}
 
-\item [{\bf Purpose:}] \mbox{} \\
+\item [\textbf{Purpose:}] \mbox{} \\
      Script to reduce a set of object frames with \xref{ECHOMOP}{sun152}{}.
 
-\item [{\bf Language:}] \mbox{} \\
+\item [\textbf{Language:}] \mbox{} \\
      C shell script.
 
-\item [{\bf Description:}] \mbox{} \\
+\item [\textbf{Description:}] \mbox{} \\
      This script reduces a series of object frames using ECHOMOP.
 
      The output files are named \verb+ob_File+ where \verb+File+ is the
      name of the input object frame.
 
-\item [{\bf Usage:}] \mbox{} \\
+\item [\textbf{Usage:}] \mbox{} \\
      This script can simply be invoked from the shell; in this case
      the script will prompt for a list of object frames to be processed
      Alternatively, the input frame names can be supplied on the
      command line, for example:
 
-\begin{verbatim}
+\begin{terminalv}
    % echrduce run0800 run0801 run0802 run0856 run0857 run0858
-\end{verbatim}
+\end{terminalv}
 
      If wildcarding facilities are available in your shell, you can use
      them to simplify the command line, for example, the above would
      become:
 
-\begin{verbatim}
+\begin{terminalv}
    % echrduce run080[012] run085[678]
-\end{verbatim}
+\end{terminalv}
 
      in the C shell.  This wildcarding facility is available when the
      script prompts for a list of input images.
@@ -2160,35 +1869,33 @@ in the file:
 
 \begin{enumerate}
 
-\item {\bf List of files.}
+\item \textbf{List of files.}
       List of files to be processed.
 
 \end{enumerate}
 
      Missing command-line arguments are prompted for.
 
-\item [{\bf Source code:}] \mbox{} \\
+\item [\textbf{Source code:}] \mbox{} \\
 \begin{latexonly}
 In a standard Starlink installation the source code for ECHRDUCE can be found
 in the file:
-\begin{verbatim}
+\begin{terminalv}
    /star/examples/sc3/echrduce
-\end{verbatim}
+\end{terminalv}
 \end{latexonly}
-\begin{htmlonly}
-      The script source code is available
-      \htmlref{{\bf here}}{se_echrduce_source}.
-\end{htmlonly}
 
-\item [{\bf Notes:}] \mbox{}
+
+
+\item [\textbf{Notes:}] \mbox{}
 \begin{enumerate}
 
 \item If needed, the input parameters can be input at the command
       line thus:
 
-\begin{verbatim}
+\begin{terminalv}
    % nohup echrduce filename [filename...] &
-\end{verbatim}
+\end{terminalv}
 
       the \verb+nohup+ command will ensure that the script continues
       to run even when you have logged off the system.  The \verb+&+ at
@@ -2240,7 +1947,7 @@ in the file:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \section{\label{se_iraf}\xlabel{iraf}IRAF}
-\markboth{IRAF}{\stardocname}
+
 
 These scripts are designed for use with data processed using the
 \htmladdnormallink{IRAF}{http://www.starlink.ac.uk/iraf/web/iraf-homepage.html}
@@ -2254,15 +1961,15 @@ for other actions.
 
 \begin{description}
 
-\item [{\bf Purpose:}] \mbox{} \\
+\item [\textbf{Purpose:}] \mbox{} \\
      Script to divide a series of extracted \'{e}chelle spectra by an
      extracted flat-field and then rescale to the original means of
      the spectra.
 
-\item [{\bf Language:}] \mbox{} \\
+\item [\textbf{Language:}] \mbox{} \\
      IRAF cl script.
 
-\item [{\bf Description:}] \mbox{} \\
+\item [\textbf{Description:}] \mbox{} \\
      This script is for removing the blaze function of an extracted
      \'{e}chelle spectrum.  In this particular case an extracted flat-field
      spectrum is used to divide-out the blaze function.
@@ -2277,7 +1984,7 @@ for other actions.
      rescaling the image by a single factor, the order-to-order blaze
      corrections are retained.
 
-\item [{\bf Usage:}] \mbox{} \\
+\item [\textbf{Usage:}] \mbox{} \\
      The \verb+flat+ parameter is the name of an extracted flat field.
 
      The \verb+input+ and \verb+output+ lists of spectra may be the same.
@@ -2290,40 +1997,38 @@ for other actions.
 
 \item Interactively type:
 
-\begin{verbatim}
+\begin{terminalv}
    cl> task echimdivide=home$echimdivide.cl
-\end{verbatim}
+\end{terminalv}
 
 \item Or, in your login.cl or loginuser.cl place the following
       before the keep:
 
-\begin{verbatim}
+\begin{terminalv}
    task echimdivide = home$echimdivide.cl
-\end{verbatim}
+\end{terminalv}
 
 \item Run the task by typing:
 
-\begin{verbatim}
+\begin{terminalv}
    cl> echimdivide
-\end{verbatim}
+\end{terminalv}
 
       You will be prompted
       to enter values for the parameters. Alternatively, set values
       using the parameter editor and then run the task.
 \end{enumerate}
 
-\item [{\bf Source code:}] \mbox{} \\
+\item [\textbf{Source code:}] \mbox{} \\
 \begin{latexonly}
 In a standard Starlink installation the source code for ECHIMDIVIDE can be
 found in the file:
-\begin{verbatim}
+\begin{terminalv}
    /star/examples/sc3/echimdivide.cl
-\end{verbatim}
+\end{terminalv}
 \end{latexonly}
-\begin{htmlonly}
-      The script source code is available
-      \htmlref{{\bf here}}{se_echimdivide_source}.
-\end{htmlonly}
+
+
 
 \end{description}
 
@@ -2333,14 +2038,14 @@ found in the file:
 
 \begin{description}
 
-\item [{\bf Purpose:}] \mbox{} \\
+\item [\textbf{Purpose:}] \mbox{} \\
      Script to extract orders from a dispersion-calibrated \'{e}chelle
      spectrum and convert to velocity at the specified wavelength.
 
-\item [{\bf Language:}] \mbox{} \\
+\item [\textbf{Language:}] \mbox{} \\
      IRAF cl script.
 
-\item [{\bf Description:}] \mbox{} \\
+\item [\textbf{Description:}] \mbox{} \\
      The problem:  One has \'{e}chelle data with a series of lines,
      say Lyman series lines, which one wants to compare or combine
      in velocity space; that is the center of each line is zero velocity
@@ -2354,7 +2059,7 @@ found in the file:
      This script is useful for comparing sets of lines at different
      wavelengths, for example, Lyman lines.
 
-\item [{\bf Usage:}] \mbox{} \\
+\item [\textbf{Usage:}] \mbox{} \\
      The \verb+input+ parameter is the name of a multiorder \'{e}chelle
      spectrum.
 
@@ -2374,42 +2079,40 @@ found in the file:
 
 \item Interactively, load the onedspec package and type:
 
-\begin{verbatim}
+\begin{terminalv}
    on> task echmkv=home$echmkv.cl
-\end{verbatim}
+\end{terminalv}
 
 \item Or, in your login.cl or loginuser.cl place the following
       before the `keep':
 
-\begin{verbatim}
+\begin{terminalv}
    task echmkv=home$echmkv.cl
-\end{verbatim}
+\end{terminalv}
 
 \item Run the task by typing:
 
-\begin{verbatim}
+\begin{terminalv}
    cl> echmkv
-\end{verbatim}
+\end{terminalv}
 
       You will be prompted
       to enter values for the parameters. Alternatively, set values
       using the parameter editor and then run the task.
 \end{enumerate}
 
-\item [{\bf Source code:}] \mbox{} \\
+\item [\textbf{Source code:}] \mbox{} \\
 \begin{latexonly}
 In a standard Starlink installation the source code for ECHMKV can be found
 in the file:
-\begin{verbatim}
+\begin{terminalv}
    /star/examples/sc3/echmkv.cl
-\end{verbatim}
+\end{terminalv}
 \end{latexonly}
-\begin{htmlonly}
-      The script source code is available
-      \htmlref{{\bf here}}{se_echmkv_source}.
-\end{htmlonly}
 
-\item [{\bf Notes:}] \mbox{}
+
+
+\item [\textbf{Notes:}] \mbox{}
 \begin{enumerate}
 \item This works in all versions of IRAF V2.10.
 
@@ -2451,13 +2154,13 @@ spectrum.
 
 \begin{description}
 
-\item [{\bf Purpose:}] \mbox{} \\
+\item [\textbf{Purpose:}] \mbox{} \\
      Script to trim individual \'{e}chelle orders.
 
-\item [{\bf Language:}] \mbox{} \\
+\item [\textbf{Language:}] \mbox{} \\
      IRAF cl script.
 
-\item [{\bf Description:}] \mbox{} \\
+\item [\textbf{Description:}] \mbox{} \\
      When the orders of a collapsed echellogram are merged it is
      often the case that regions of overlap between two adjacent
      orders have quite different signal levels.  This can be for
@@ -2478,7 +2181,7 @@ spectrum.
      images can be processed at the same time by specifying a list
      of input images.
 
-\item [{\bf Usage:}] \mbox{} \\
+\item [\textbf{Usage:}] \mbox{} \\
      The \verb+input+ parameter is a list of IRAF \'{e}chelle format images.
 
      The \verb+orders+ parameter is a text file containing lines with order
@@ -2499,41 +2202,38 @@ spectrum.
 
 \item Interactively, load the \'{e}chelle package and type:
 
-\begin{verbatim}
+\begin{terminalv}
    ec> task echtrim=home$echtrim.cl
-\end{verbatim}
+\end{terminalv}
 
 \item Or, in your login.cl or loginuser.cl place the following before
       the `keep':
 
-\begin{verbatim}
+\begin{terminalv}
    task echtrim=home$echtrim.cl
-\end{verbatim}
+\end{terminalv}
 
 \item Run the task by typing:
 
-\begin{verbatim}
+\begin{terminalv}
    cl> echtrim
-\end{verbatim}
+\end{terminalv}
 
       You will be prompted
       to enter values for the parameters. Alternatively, set values
       using the parameter editor and then run the task.
 \end{enumerate}
 
-\item [{\bf Source code:}] \mbox{} \\
+\item [\textbf{Source code:}] \mbox{} \\
 \begin{latexonly}
 In a standard Starlink installation the source code for ECHTRIM can be found
 in the file \texttt{/star/examples/sc3/echtrim.cl}.
 \end{latexonly}
-\begin{htmlonly}
-      The script source code is available
-      \htmlref{{\bf here}}{se_echtrim_source}.
-      %\htmladdnormallink{here}{echtrim.cl}.
-\end{htmlonly}
+
+
 
 \newpage
-\item [{\bf Notes:}] \mbox{}
+\item [\textbf{Notes:}] \mbox{}
 \begin{enumerate}
 
 \item This works with IRAF V2.10.2 through V2.10.4.
@@ -2543,8 +2243,8 @@ in the file \texttt{/star/examples/sc3/echtrim.cl}.
 
 \end{enumerate}
 
-\item [{\bf Example:}] \mbox{} \vspace*{-11pt}
-\begin{verbatim}
+\item [\textbf{Example:}] \mbox{} \vspace*{-11pt}
+\begin{terminalv}
   ec> imhead test.ec l-
   test.ec[512,10][real]: Artificial Echelle Spectrum
   ec> type sec.dat
@@ -2564,22 +2264,17 @@ in the file \texttt{/star/examples/sc3/echtrim.cl}.
   test.ec[401:500,5](5)  -->  test1.ec[*,5](5)
   test.ec[101:300,6](6)  -->  test1.ec[*,6](6)
   test.ec[101:400,7](7)  -->  test1.ec[*,7](7)
-\end{verbatim}
+\end{terminalv}
 \end{description}
 
 \section{\label{se_sourcecode}\xlabel{source_code}Script source code}
-\markboth{Script source code}{\stardocname}
+
 
 The complete set of scripts is available in the file
 \texttt{sc\stardocnumber -scripts.tar}
 
-\begin{htmlonly}
-% Magic: the file sc3-scripts.tex (generated by the Makefile) is in
-% the same directory as sc3.tex, but sc3.tex is processed in a
-% _subdirectory_, so we have to refer to sc3-scripts.tex in the parent
-% directory.
-\input{../sc3-scripts.tex}
-\end{htmlonly}
+
+
 
 
 %\typeout{  }
