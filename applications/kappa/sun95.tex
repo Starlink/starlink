@@ -15,7 +15,7 @@
 \stardocsource    {sun95.41}
 \stardocnumber    {95.41}
 \stardocauthors   {Malcolm J. Currie \& David S. Berry}
-\stardocdate      {2014 September 24}
+\stardocdate      {2014 December 11}
 \stardoctitle     {KAPPA --- Kernel Application Package}
 \stardocversion   {2.2}
 \stardocmanual    {User's Guide}
@@ -34990,7 +34990,7 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
       \sstexamplesubsection{
          mlinplot rcw3\_b1 lnindx=* style="+width(curve)=4" \
       }{
-         As the previous example, but now the the rows are drawn in
+         As the previous example, but now the rows are drawn in the
          current line colour.
       }
       \sstexamplesubsection{
@@ -46853,7 +46853,7 @@ KAPPA: \htmlref{REGRID}{REGRID},
       \sstsubsection{
          CONSERVE = \_LOGICAL (Read)
       }{
-         If set TRUE, then the output pixel values will be scaled in
+         If set \texttt{TRUE}, then the output pixel values will be scaled in
          such a way as to preserve the total data value in a feature on
          the sky. The scaling factor is the ratio of the output pixel
          size to the input pixel size. This ratio is evaluated once for
@@ -46986,9 +46986,9 @@ KAPPA: \htmlref{REGRID}{REGRID},
          PIXSCALE = LITERAL (Read)
       }{
          The PIXSCALE parameter is only used if Parameter MODE is set
-         to \texttt{"PixelScale"}.  It should be supplied holding the
-         required new pixel scales.  In this context, a pixel scale
-         for a WCS axis is the increment in WCS axis value caused by a
+         to \texttt{"PixelScale"}.  It should be supplied as a comma-separated
+         list of the required new pixel scales.  In this context, a pixel
+         scale for a WCS axis is the increment in WCS axis value caused by a
          movement of one pixel along the WCS axis, and are measured at
          the first pixel in the array.  The suggested default value
          are the current pixel scales.  If no value has been supplied

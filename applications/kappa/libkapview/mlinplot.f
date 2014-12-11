@@ -426,7 +426,7 @@
 *        to the next invocation, but not the temporary widening of the
 *        lines.
 *     mlinplot rcw3_b1 lnindx=* style="+width(curve)=4" \
-*        As the previous example, but now the the rows are drawn in
+*        As the previous example, but now the rows are drawn in the
 *        current line colour.
 *     mlinplot rcw3_b1 absaxs=2 lnindx="20:25,30,31" \
 *        Plot columns 20, 21, 22, 23, 24, 25, 30 and 31 of the

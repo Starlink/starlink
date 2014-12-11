@@ -59,23 +59,23 @@
 *        factor by which each dimension will be distorted to produce the
 *        output NDF.  A factor greater than one is a stretch and less
 *        than one is a squash.  If no value has been supplied for
-*        parameter AXIS, the number of values supplied for FACTORS must
+*        Parameter AXIS, the number of values supplied for FACTORS must
 *        be the same as the number of pixel axes in the NDF.  If a
-*        non-null value has been supplied for parameter AXIS, then
+*        non-null value has been supplied for Parameter AXIS, then
 *        only a single value should be supplied for FACTORS and that
-*        value will be used to distort the axis indicated by parameter
+*        value will be used to distort the axis indicated by Parameter
 *        AXIS.
 *     IN = NDF (Read)
 *        The NDF to be squashed or stretched.
 *     LBOUND( ) = _INTEGER (Read)
 *        This parameter is only used if MODE="Bounds".  It specifies the
 *        lower pixel-index values of the output NDF.  If no value has
-*        been supplied for parameter AXIS, the number of values supplied
+*        been supplied for Parameter AXIS, the number of values supplied
 *        for LBOUND must be the same as the number of pixel axes in the
-*        NDF.  If a non-null value has been supplied for parameter AXIS,
+*        NDF.  If a non-null value has been supplied for Parameter AXIS,
 *        then only a single value should be supplied for LBOUND and the
 *        supplied value will be used as the new lower bounds on the axis
-*        indicated by parameter AXIS.  If null (!) is given, the lower
+*        indicated by Parameter AXIS.  If null (!) is given, the lower
 *        pixel bounds of the input NDF will be used.
 *     METHOD = LITERAL (Read)
 *        The interpolation method used to perform the one-dimensional
@@ -130,19 +130,19 @@
 *     OUT = NDF (Write)
 *        The squashed or stretched NDF.
 *     PIXSCALE = LITERAL (Read)
-*        The PIXSCALE parameter is only used if parameter MODE is set to
-*        "PixelScale".  It should be supplied holding the required new
-*        pixel scales.  In this context, a pixel scale for a WCS axis is
-*        the increment in WCS axis value caused by a movement of one
-*        pixel along the WCS axis, and are measured at the first pixel
-*        in the array.  The suggested default value are the current
-*        pixel scales.  If no value has been supplied for parameter
-*        AXIS, the number of values supplied for PIXSCALE must be the
-*        same as the number of WCS axes in the NDF.  If a non-null value
-*        has been supplied for parameter AXIS, then only a single value
-*        should be supplied for PIXSCALE and that value will be used as
-*        the new pixel scale on the WCS axis indicated by parameter
-*        AXIS.
+*        The PIXSCALE parameter is only used if Parameter MODE is set to
+*        "PixelScale".  It should be supplied as a comma-separated list
+*        of the required new pixel scales.  In this context, a pixel
+*        scale for a WCS axis is the increment in WCS axis value caused
+*        by a movement of one pixel along the WCS axis, and are measured
+*        at the first pixel in the array.  The suggested default value
+*        are the current pixel scales.  If no value has been supplied
+*        for Parameter AXIS, the number of values supplied for PIXSCALE
+*        must be the same as the number of WCS axes in the NDF.  If a
+*        non-null value has been supplied for Parameter AXIS, then only
+*        a single value should be supplied for PIXSCALE and that value
+*        will be used as the new pixel scale on the WCS axis indicated
+*        by Parameter AXIS.
 *     PARAMS( ) = _DOUBLE (Read)
 *        Parameters required to control the resampling scheme.  One or
 *        more values may be required to specify the exact resampling
@@ -154,12 +154,12 @@
 *     UBOUND( ) = _INTEGER (Read)
 *        This parameter is only used if MODE="Bounds".  It specifies the
 *        upper pixel-index values of the output NDF.  If no value has
-*        been supplied for parameter AXIS, the number of values supplied
+*        been supplied for Parameter AXIS, the number of values supplied
 *        for UBOUND must be the same as the number of pixel axes in the
-*        NDF.  If a non-null value has been supplied for parameter AXIS,
+*        NDF.  If a non-null value has been supplied for Parameter AXIS,
 *        then only a single value should be supplied for UBOUND and the
 *        supplied value will be used as the new upper bounds on the axis
-*        indicated by parameter AXIS.  If null (!) is given, the upper
+*        indicated by Parameter AXIS.  If null (!) is given, the upper
 *        pixel bounds of the input NDF will be used.
 
 *  Examples:
