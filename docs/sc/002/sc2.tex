@@ -1,3 +1,4 @@
+\documentclass[twoside,11pt]{starlink}
 %+
 % SC/2  The DX Cookbook
 %
@@ -6,32 +7,27 @@
 % Copyright 1997  Starlink, CCLRC.
 %-
 
-\documentclass[twoside,11pt]{article}
-
 % ? Specify used packages
-\usepackage{graphicx}        %  Use this one for final production.
-
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
 
-\pagestyle{myheadings}
+
 \newcounter{swapfoot}
 
-%
 % Set the DX version number.
 
-\newcommand{\DXversion}{3.1~}
+\providecommand{\DXversion}{3.1~}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink Cookbook}
-\newcommand{\stardocinitials}  {SC}
-\newcommand{\stardocsource}    {sc\stardocnumber}
-\newcommand{\stardocnumber}    {2.3}
-\newcommand{\stardocauthors}   {A.C.~Davenhall}
-\newcommand{\stardocdate}      {1st October 1997}
-\newcommand{\stardoctitle}     {The DX Cookbook}
-\newcommand{\stardocabstract}  {IBM DX (Data Explorer) is the
+\stardoccategory    {Starlink Cookbook}
+\stardocinitials    {SC}
+\stardocsource      {sc\stardocnumber}
+\stardocnumber      {2.3}
+\stardocauthors     {A.C.~Davenhall}
+\stardocdate        {1st October 1997}
+\stardoctitle       {The DX Cookbook}
+\stardoccopyright {\copyright 1997 Starlink, CCLRC}
+\stardocabstract  {IBM DX (Data Explorer) is the
 data-visualisation package recommended by Starlink, particularly for
 the visualisation of three-dimensional scalar and vector data. This
 cookbook provides a set of simple recipes for performing common
@@ -48,238 +44,13 @@ This edition of the cookbook applies to Version \DXversion of DX.}
 
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-%============================================================================
-%
-%  Commands and environments used to produce module documentation in the
-%  same style as the DX User Reference document.
-
-% \input{sx_coms.tex}
-
-%===========================================================================
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % from the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
+% ? Document-specific \providecommand or \newenvironment commands.
 % ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-%      \stardocversion\\
-%      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New part for abstract if used.
-
-%  Note this is different from most documents where a section is used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%   ==================
-\stardocabstract
-
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
-
-   \newpage
-   \listoftables
-   \listoffigures
-
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-
-\vspace{2.5cm}
+\scfrontmatter
 
 \latex{\subsection*{Revision history}}
 \html{\section*{Revision history}}
@@ -295,12 +66,8 @@ This edition of the cookbook applies to Version \DXversion of DX.}
 
 \end{enumerate}
 
-\vspace{2.5cm}
-\copyright \underline{1997} Starlink, CCLRC
-
 \cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+
 
 \section{\xlabel{INTRO}Introduction}
 
@@ -319,7 +86,7 @@ your requirements. This edition of the cookbook applies to Version
 \DXversion of DX.
 
 Like any technical subject, scientific visualisation has its own
-collection of specialised jargon and techniques. SG/8 \xref{{\it An
+collection of specialised jargon and techniques. SG/8 \xref{\textit{An
 Introduction to Visualisation Software for Astronomy}}{sg8}{}\cite{SG8}
 gives an overview and introduction to scientific visualisation relevant
 to astronomy. If you are already familiar with visualisation techniques
@@ -346,15 +113,15 @@ and end by generating an image). These assemblages are known as
 several examples of these networks; see, for example,
 Figure~\ref{SIMPLE}. Though DX networks superficially resemble flow
 charts, it is important to realise that they are quite different. The
-lines in a DX network show the flow of {\it data}\, through the system,
-{\it not}\, the flow of {\it control}\, as the network
+lines in a DX network show the flow of \textit{data}\, through the system,
+\textit{not}\, the flow of \textit{control}\, as the network
 executes\footnote{If you are familiar with the Yourdon-de Marco
 Structured Systems Analysis technique, or other similar methods, you
 will recognise that DX networks are very similar to the data flow
 diagrams used in these techniques.}. Obviously, once you have created a
 network with the visual programing editor it can be saved to disk as a
 file and subsequently reloaded; it is not necessary to create a network
-{\it ab initio}\, each time you use DX. The recipes in this cookbook
+\textit{ab initio}\, each time you use DX. The recipes in this cookbook
 concentrate exclusively on using the visual programming editor to generate
 networks.
 
@@ -384,10 +151,10 @@ will also be available automatically. Where appropriate this cookbook
 refers to the enhancements as well as basic DX.
 
 The use of DX on Starlink systems, and the Starlink enhancements, are
-documented in SUN/203 \xref{{\it DX --- IBM Data Explorer for Data
+documented in SUN/203 \xref{\textit{DX --- IBM Data Explorer for Data
 Visualisation}}{sun203}{}\cite{SUN203}. There are also various manuals
 provided with DX (see  Table~1 of SUN/203 for a list). In particular the
-{\it QuickStart Guide}\cite{QUICKS} gives a further set of tutorials for
+\textit{QuickStart Guide}\cite{QUICKS} gives a further set of tutorials for
 generating common visualisations.
 
 
@@ -414,15 +181,15 @@ in the visual programming editor are only partly visible.}.
 To start DX, ensure that your display is configured to receive X-output
 and then simply type:
 
-\begin{quote}
-{\tt dx}
-\end{quote}
+\begin{terminalv}
+% dx
+\end{terminalv}
 
 The following message should appear on your command terminal:
 
-\begin{quote}
-{\tt Starting DX user interface}
-\end{quote}
+\begin{terminalv}
+Starting DX user interface
+\end{terminalv}
 
 and a new window (technically the canvas for the DX visual programming
 editor) should appear. If DX fails to start properly then consult your
@@ -438,15 +205,15 @@ It is possible to start DX without the Starlink enhancements, SX. Again
 ensure that your terminal is configured to receive X-output. Then
 type:
 
-\begin{quote}
-{\tt unalias ~~ dx}
-\end{quote}
+\begin{terminalv}
+% unalias   dx
+\end{terminalv}
 
 Followed by:
 
-\begin{quote}
-{\tt dx}
-\end{quote}
+\begin{terminalv}
+% dx
+\end{terminalv}
 
 DX should now start, as above, but the Starlink enhancements will not
 be available.
@@ -456,25 +223,25 @@ be available.
 If you have disabled the Starlink enhancements, SX, then you can
 re-instate them by typing:
 
-\begin{quote}
-{\tt alias dx tcsh -c '"source \$SX\_DIR/dx.csh"'}
-\end{quote}
+\begin{terminalv}
+% alias dx tcsh -c '"source $SX_DIR/dx.csh"'
+\end{terminalv}
 
 Then start DX as normal: ensure that your terminal is configured to
 receive X-output and type:
 
-\begin{quote}
-{\tt dx}
-\end{quote}
+\begin{terminalv}
+% dx
+\end{terminalv}
 
 DX should now start with the Starlink enhancements available.
 
 
 % - Part I ------------------------------------------------------------
 \cleardoublepage
-\markboth{\stardocname}{\stardocname}
+
 \part{Simple Recipes}
-\markboth{\stardocname}{\stardocname}
+
 \section{\xlabel{INTRO_RECIP}Introduction}
 
 This section presents a set of recipes for performing common operations
@@ -506,14 +273,14 @@ Copies of the recipe networks, data files, example programs and other
 files referred to in this section can be found on Starlink systems
 in directory:
 
-\begin{quote}
-{\tt /star/examples/sc2}
-\end{quote}
+\begin{terminalv}
+/star/examples/sc2
+\end{terminalv}
 
 and on non-Starlink systems in directory:
-\begin{quote}
-{\tt \$STARLINK\_DIR/examples/sc2}
-\end{quote}
+\begin{terminalv}
+$STARLINK_DIR/examples/sc2
+\end{terminalv}
 
 The most convenient way to access these files is probably to copy them
 into your current directory before attempting to read them or load
@@ -522,10 +289,10 @@ of the files are available in your current directory.
 
 \subsection{Further examples}
 
-The IBM Manual {\it QuickStart Guide}\cite{QUICKS} provided with DX contains
+The IBM Manual \textit{QuickStart Guide}\cite{QUICKS} provided with DX contains
 numerous further example networks and an extensive discussion of
 importing data files into DX. All the example networks described in the
-{\it QuickStart Guide}\, are included with the release of DX.
+\textit{QuickStart Guide}\, are included with the release of DX.
 
 
 \newpage
@@ -534,13 +301,13 @@ importing data files into DX. All the example networks described in the
 This recipe introduces the basic use of DX. It covers creating and
 running a simple DX network. Only the very minimum set of features needed
 to create and run a network are mentioned; there are many features and
-facilities which are omitted. See the {\it QuickStart Guide}\cite{QUICKS}
+facilities which are omitted. See the \textit{QuickStart Guide}\cite{QUICKS}
 and other IBM DX manuals for further details (the IBM manuals are listed
 in Table 1 of \xref{SUN/203}{sun203}{}\cite{SUN203}). The best way to use
 this recipe is probably to have a terminal on which you can run DX to
 hand and to work through the recipe trying the various points.
 
-{\it Unless otherwise noted, throughout this cookbook `click' means click
+\textit{Unless otherwise noted, throughout this cookbook `click' means click
 on the leftmost mouse button.}
 
 \begin{enumerate}
@@ -548,15 +315,15 @@ on the leftmost mouse button.}
   \item To start DX (see also Section~\ref{START}, above), ensure that
    your display is configured to receive X-output and then simply type:
 
-  \begin{quote}
-   {\tt dx}
-  \end{quote}
+\begin{terminalv}
+% dx
+\end{terminalv}
 
    The following message should appear on your command terminal:
 
-  \begin{quote}
-   {\tt Starting DX user interface}
-  \end{quote}
+\begin{terminalv}
+Starting DX user interface
+\end{terminalv}
 
    and a new window similar to Figure~\ref{VPE} should appear.
 
@@ -684,7 +451,7 @@ on the leftmost mouse button.}
 
   \begin{enumerate}
 
-    \item click on the {\it input}\, tab and hold down the leftmost
+    \item click on the \textit{input}\, tab and hold down the leftmost
      mouse button,
 
     \item move the cursor to a blank portion of the canvas,
@@ -735,7 +502,7 @@ on the leftmost mouse button.}
 
     \item type in the new value,
 
-    \item hit return ({\it do not forget this step}),
+    \item hit return (\textit{do not forget this step}),
 
     \item after you have hit return DX will display the value that you
      have entered, inside the box, in double quotation marks,
@@ -832,15 +599,15 @@ on the leftmost mouse button.}
      selection. Click on this box and enter:
 
     \begin{quote}
-     {\tt \$STARLINK\_DIR/examples/sc2}
+     \texttt{\$STARLINK\_DIR/examples/sc2}
     \end{quote}
 
      A list of networks should appear in the `Files' box on the right
      hand side of the window. By convention DX networks have file type
-     `{\tt .net}'.
+     `\texttt{.net}'.
 
-    \item Click on file `{\tt simple.net}' in this box. The full file
-     name and directory specification of the {\tt simple} network should
+    \item Click on file `\texttt{simple.net}' in this box. The full file
+     name and directory specification of the \texttt{simple} network should
      now appear in the `Selection' window.
 
     \item Click on the `OK' button. The `Open\ldots' window closes and
@@ -874,7 +641,7 @@ on the leftmost mouse button.}
 Running a DX network to generate a visualisation comprises three stages:
 specifying the input (particularly the file to be read), running the
 network and examining the result. This example describes how to execute
-the {\tt simple} network loaded in the previous section. It will be used
+the \texttt{simple} network loaded in the previous section. It will be used
 to view an example data file, supplied with the cookbook, which contains
 a data cube of a simple Gaussian. This data cube is a `field' in the
 context of DX; see Section~\ref{OUTLINE} for an explanation of this
@@ -887,28 +654,27 @@ term.
 
   \begin{enumerate}
 
-    \item Set input `name' to: {\tt \$STARLINK\_DIR/examples/sc2/field.general}
+    \item Set input `name' to: \texttt{\$STARLINK\_DIR/examples/sc2/field.general}
 
      This file is the DX `header' file describing the data file.
      Files written by an external program and imported into DX are
      described by a separate header file. See Sections~\ref{IMP_GRID}
      and \ref{IMP_PART} for details. Note that it is the name of the
-     header file, {\it not}\, the data file, which is given here. If
+     header file, \textit{not}\, the data file, which is given here. If
      the header file is in your current directory then the directory
      specification can be omitted.
 
-    \item Set input `variable' to: {\tt Gaussian}
+    \item Set input `variable' to: \texttt{Gaussian}
 
      This input specifies which field within the data file is to be
-     read. In the current example the field is called `{\tt Gaussian}'.
+     read. In the current example the field is called `\texttt{Gaussian}'.
      Again see Sections~\ref{IMP_GRID} and \ref{IMP_PART} for details.
 
-    \item Set input `format' to: {\tt general}
+    \item Set input `format' to: \texttt{general}
 
-     Here `{\tt general}' means that the data file has been written by
+     Here `\texttt{general}' means that the data file has been written by
      an external program and is described by a separate header file.
-     The only other option which you are likely to encounter is `{\tt
-     dx}' for a native DX format file.
+     The only other option which you are likely to encounter is `\texttt{dx}' for a native DX format file.
 
     \item When all the values have been set correctly simply click on
      the `OK' button.
@@ -963,24 +729,23 @@ The program to generate the data file is listed in Figure~\ref{FIELD.F}.
 
   \item The DX header file for this data file is shown in
    Figure~\ref{FIELD.GENERAL}. These header files have file type
-   `{\tt .general}'. Thus the present example is called `{\tt
-   field.general}'.
+   `\texttt{.general}'. Thus the present example is called `\texttt{field.general}'.
 
   \begin{figure}[htbp]
 
-  \begin{center}
-  \begin{tabular}{l}
-   {\tt file=field.lis}       \\
-   {\tt format=text}               \\
-   {\tt grid=50x50x50}             \\
-   {\tt majority=row}              \\
-   {\tt interleaving=field}        \\
-   {\tt field=Gaussian, Sloping}   \\
-   {\tt structure=scalar, scalar}  \\
-   {\tt type=float, float}         \\
-   {\tt dependency=positions, positions} \\
-  \end{tabular}
-  \end{center}
+\begin{quote}
+\begin{terminalv}
+file=field.lis
+format=text
+grid=50x50x50
+majority=row
+interleaving=field
+field=Gaussian, Sloping
+structure=scalar, scalar
+type=float, float
+dependency=positions, positions
+\end{terminalv}
+\end{quote}
 
   \caption[Header file for gridded data.]{Header file for gridded data.
   \label{FIELD.GENERAL} }
@@ -1016,26 +781,25 @@ The program to generate the data file is listed in Figure~\ref{FIELD.F}.
      intertwined. Each record in the file contains a value for a
      position in the first field and a value for the corresponding
      position in the second field (see Figures~\ref{GRID_DATA} and
-     \ref{FIELD.F}). `{\tt interleaving=field}' specifies this
+     \ref{FIELD.F}). `\texttt{interleaving=field}' specifies this
      sort of interleaving.
 
     \begin{figure}[htbp]
 
     \begin{center}
     \begin{tabular}{l}
-     {\tt 0.15655673~~~~~~~~0.25655673} \\
-     {\tt 0.16572675~~~~~~~~0.26572675}  \\
-     {\tt 0.17514088~~~~~~~~0.27514088}  \\
-     {\tt 0.18476781~~~~~~~~0.28476781}  \\
-     {\tt 0.19457102~~~~~~~~0.29457102}  \\
-     {\tt 0.20450866~~~~~~~~0.30450866}  \\
-     {\tt ~~~~~$\vdots$~~~~~~~~~~~~~~~~~$\vdots$}  \\
+     \texttt{0.15655673~~~~~~~~0.25655673} \\
+     \texttt{0.16572675~~~~~~~~0.26572675}  \\
+     \texttt{0.17514088~~~~~~~~0.27514088}  \\
+     \texttt{0.18476781~~~~~~~~0.28476781}  \\
+     \texttt{0.19457102~~~~~~~~0.29457102}  \\
+     \texttt{0.20450866~~~~~~~~0.30450866}  \\
+     \texttt{~~~~~$\vdots$~~~~~~~~~~~~~~~~~$\vdots$}  \\
     \end{tabular}
     \end{center}
 
     \begin{quote}
-    \caption[File {\tt field.lis}.]{The first few records of file {\tt
-     field.lis} (written by program {\tt field.f},
+    \caption[File \texttt{field.lis}.]{The first few records of file \texttt{field.lis} (written by program \texttt{field.f},
      Figure~\ref{FIELD.F}). The first column is values for the simple
      Gaussian data cube, the second column values for the Gaussian
      superimposed on a sloping background. \label{GRID_DATA} }
@@ -1062,12 +826,12 @@ The program to generate the data file is listed in Figure~\ref{FIELD.F}.
   \end{description}
 
    A full description of all the possible keywords is given in
-   Section~4.3 {\it Header File Syntax: Keyword Statements}\, of the
-   IBM {\it QuickStart Guide}\cite{QUICKS}.
+   Section~4.3 \textit{Header File Syntax: Keyword Statements}\, of the
+   IBM \textit{QuickStart Guide}\cite{QUICKS}.
 
   \item Once a suitable description file has been been created the data
    can be imported into DX by including the `Import' module in your
-   network. Note that it is the name of the description file, {\it not}\,
+   network. Note that it is the name of the description file, \textit{not}\,
    the name of the data file which must be supplied to `Import'.
 
 \end{enumerate}
@@ -1079,29 +843,29 @@ The program to generate the data file is listed in Figure~\ref{FIELD.F}.
   \item DX includes `Data Prompter', a windows-based application for
    interactively creating the header file for a data set. However, often
    it is no easier to use than creating the header file with an editor.
-   Section 4.4 {\it Data Prompter}, of the {\it QuickStart
+   Section 4.4 \textit{Data Prompter}, of the \textit{QuickStart
    Guide}\cite{QUICKS} gives details.
 
   \latex{\newpage}
   \item Unformatted binary files can also be imported using the same
-   header file mechanism. The {\tt format} keyword should be set to
-   `{\tt binary}'. Binary files written with a C program can be
+   header file mechanism. The \texttt{format} keyword should be set to
+   `\texttt{binary}'. Binary files written with a C program can be
    imported directly. However, unfortunately, binary files  written with
    a Fortran program contain record-control bytes which must be
    removed prior to importing the file. The Starlink extensions to DX
-   include {\tt SXUnfort} for this purpose; see
+   include \texttt{SXUnfort} for this purpose; see
    \xref{SUN/203}{sun203}{}\cite{SUN203} for details. Of course, an
    unformatted file written on a Digital alpha will differ from the
    corresponding file written on a Sun because of the different byte
    order of the machines. It is possible to input an unformatted file
    written on a Sun into DX running on a Digital alpha, or vice versa, by
-   using the `{\tt msb}' and `{\tt lsb}' modifiers to the {\tt format}
+   using the `\texttt{msb}' and `\texttt{lsb}' modifiers to the \texttt{format}
    keyword\footnote{Strictly speaking it should be possible to input any
    unformatted file written in IEEE floating point format, irrespective
    of the type of machine that it was written on. Note, however, that
    Digital VAXen and IBM mainframes do not use IEEE floating point format.}.
-   See Section~4.3 {\it Header File Syntax: Keyword Statements}\, of the
-   IBM {\it QuickStart Guide}\cite{QUICKS} for details.
+   See Section~4.3 \textit{Header File Syntax: Keyword Statements}\, of the
+   IBM \textit{QuickStart Guide}\cite{QUICKS} for details.
 
   \item It is also possible to import files in the Starlink NDF format
    (and other common astronomical formats, such as FITS images or Figaro
@@ -1111,7 +875,7 @@ The program to generate the data file is listed in Figure~\ref{FIELD.F}.
 
 \begin{figure}[htbp]
 
-\begin{verbatim}
+\begin{terminalv}
       PROGRAM FIELD
       IMPLICIT NONE
 *    Generate two data cubes.  One contains a Gaussian function, the
@@ -1154,10 +918,9 @@ The program to generate the data file is listed in Figure~\ref{FIELD.F}.
       CLOSE(UNIT=10)
 
       END
-\end{verbatim}
+\end{terminalv}
 
-\caption[Program {\tt field.f} to write gridded data.]{Program {\tt
-field.f} to write gridded data. \label{FIELD.F} }
+\caption[Program \texttt{field.f} to write gridded data.]{Program \texttt{field.f} to write gridded data. \label{FIELD.F} }
 
 \end{figure}
 
@@ -1184,21 +947,20 @@ in Figure~\ref{PARTICLE.F}.
 
   \item The DX header file for this data file is shown in
    Figure~\ref{PARTICLE.GENERAL}. These header files have file type
-   `{\tt .general}'. Thus the present example is called `{\tt
-   particle.general}'.
+   `\texttt{.general}'. Thus the present example is called `\texttt{particle.general}'.
 
   \begin{figure}[htbp]
 
-  \begin{center}
-  \begin{tabular}{l}
-   {\tt file=particle.lis}   \\
-   {\tt points=10000}        \\
-   {\tt format=text}         \\
-   {\tt field=locations, Intensity}  \\
-   {\tt structure=3-vector, scalar}  \\
-   {\tt interleaving=field}  \\
-  \end{tabular}
-  \end{center}
+  \begin{quote}
+\begin{terminalv}
+file=particle.lis
+points=10000
+format=text
+field=locations, Intensity
+structure=3-vector, scalar
+interleaving=field
+\end{terminalv}
+  \end{quote}
 
   \caption[Header file for particle data.]{Header file for particle
    data. \label{PARTICLE.GENERAL} }
@@ -1234,31 +996,31 @@ in Figure~\ref{PARTICLE.F}.
     \item[interleaving] specifies how the various data items within
      the file are intertwined. In the present case each record in the
      file contains the position and data value for a single particle
-     (see Figure~\ref{PARTICLE.F}). `{\tt interleaving=field}'
+     (see Figure~\ref{PARTICLE.F}). `\texttt{interleaving=field}'
      specifies this sort of interleaving.
 
   \end{description}
 
    A full description of all the possible keywords is given in
-   Section~4.3 {\it Header File Syntax: Keyword Statements}\, of the
-   IBM {\it QuickStart Guide}\cite{QUICKS}.
+   Section~4.3 \textit{Header File Syntax: Keyword Statements}\, of the
+   IBM \textit{QuickStart Guide}\cite{QUICKS}.
 
   \newpage
   \item Once a suitable description file has been been created the data
    can be imported into DX by including the `Import' module in your
-   network. Note that it is the name of the description file, {\it not}\,
+   network. Note that it is the name of the description file, \textit{not}\,
    the name of the data file which must be supplied to `Import'.
 
 \end{enumerate}
 
 \subsection{Variations}
 
-See the notes for variations of {\it Importing Gridded Data},
+See the notes for variations of \textit{Importing Gridded Data},
 Section~\ref{IMP_GRID}, above.
 
 \begin{figure}[htbp]
 
-\begin{verbatim}
+\begin{terminalv}
       PROGRAM PARTICLE
       IMPLICIT NONE
 *    Generate a particle dataset, with the individual particles tracing
@@ -1302,10 +1064,9 @@ Section~\ref{IMP_GRID}, above.
       CLOSE(UNIT=10)
 
       END
-\end{verbatim}
+\end{terminalv}
 
-\caption[Program {\tt particle.f} to write particle data.]{Program {\tt
-particle.f} to write particle data. \label{PARTICLE.F} }
+\caption[Program \texttt{particle.f} to write particle data.]{Program \texttt{particle.f} to write particle data. \label{PARTICLE.F} }
 
 \end{figure}
 
@@ -1315,8 +1076,8 @@ particle.f} to write particle data. \label{PARTICLE.F} }
 
 
 \begin{tabular}{ll}
-file:               & {\tt histogram.net} \\
-example data files: & {\tt field.general}, {\tt particle.general} \\
+file:               & \texttt{histogram.net} \\
+example data files: & \texttt{field.general}, \texttt{particle.general} \\
 \end{tabular}
 
 This network plots a histogram of the data values in a data set (strictly
@@ -1373,7 +1134,7 @@ with the graph.
 \subsection{Alternatives}
 
 If your data are in Starlink NDF format then an alternative way to
-generate a histogram is to use command \xref{{\tt HIST}}{sun86}{HIST} in
+generate a histogram is to use command \xref{\texttt{HIST}}{sun86}{HIST} in
 Figaro (see \xref{SUN/86}{sun86}{}\cite{SUN86}).  This option will work
 for $n$-dimensional gridded data.
 
@@ -1383,8 +1144,8 @@ for $n$-dimensional gridded data.
 
 
 \begin{tabular}{ll}
-file:              & {\tt slice.net}     \\
-example data file: & {\tt field.general} \\
+file:              & \texttt{slice.net}     \\
+example data file: & \texttt{field.general} \\
 \end{tabular}
 
 This network displays a two-dimensional slice through a data cube,
@@ -1439,12 +1200,12 @@ bounding box and extracted slice.
 \subsection{Alternatives}
 
 If your data are in Starlink NDF format then an alternative way to
-plot a slice is to use command \xref{{\tt DISPLAY}}{sun95}{DISPLAY} in KAPPA
+plot a slice is to use command \xref{\texttt{DISPLAY}}{sun95}{DISPLAY} in KAPPA
 (see \xref{SUN/95}{sun95}{}\cite{SUN95}).  You simply specify the required
 slice, for example:
 
 \begin{quote}
-{\tt DISPLAY~{\it ndf\_file}(,,21)}
+\texttt{DISPLAY~\textit{ndf\_file}(,,21)}
 \end{quote}
 
 plots the twenty-first slice in the third axis.
@@ -1454,8 +1215,8 @@ plots the twenty-first slice in the third axis.
 
 
 \begin{tabular}{ll}
-file:              & {\tt autoslice.net} \\
-example data file: & {\tt field.general} \\
+file:              & \texttt{autoslice.net} \\
+example data file: & \texttt{field.general} \\
 \end{tabular}
 
 This network is a modification of the network for displaying a
@@ -1509,9 +1270,9 @@ to display a sequence of slices in a data cube. \label{ASLICNETF} }
 
 \subsection{Notes}
 
-This network is identical to network {\tt slice.net} for displaying
+This network is identical to network \texttt{slice.net} for displaying
 a single slice except that the right-hand of the two `Integer' modules
-in {\tt slice.net}, which specified the requested slice, has been
+in \texttt{slice.net}, which specified the requested slice, has been
 replaced with the `Sequencer' module.
 
 
@@ -1520,8 +1281,8 @@ replaced with the `Sequencer' module.
 
 
 \begin{tabular}{ll}
-file:              & {\tt isosurface.net} \\
-example data file: & {\tt field.general}  \\
+file:              & \texttt{isosurface.net} \\
+example data file: & \texttt{field.general}  \\
 \end{tabular}
 
 This network displays an iso-surface\footnote{An iso-surface is the
@@ -1557,8 +1318,7 @@ display an iso-surface in a data cube. \label{ISOSURFNETF} }
   \item To specify the value for the iso-surface double-click on the
    `Scalar' module at the top of the network and enter the required
    value.  If you have no knowledge of the range of values in the
-   cube, and hence no idea of suitable value, use network {\tt
-   histogram.net} (see Section~\ref{HISTNET}) to find the minimum,
+   cube, and hence no idea of suitable value, use network \texttt{histogram.net} (see Section~\ref{HISTNET}) to find the minimum,
    maximum and distribution of values in the data.
 
 \end{itemize}
@@ -1575,8 +1335,8 @@ Module `ShowBox' extracts the bounding box of the data cube.
 
 
 \begin{tabular}{ll}
-file:              & {\tt particle.net}     \\
-example data file: & {\tt particle.general} \\
+file:              & \texttt{particle.net}     \\
+example data file: & \texttt{particle.general} \\
 \end{tabular}
 
 This network displays three-dimensional particle data. Each point is
@@ -1619,9 +1379,9 @@ to display three-dimensional particle dataset. \label{PARTNETF} }
 
 % - Part II -----------------------------------------------------------
 \cleardoublepage
-\markboth{\stardocname}{\stardocname}
+
 \part{Extended Recipes}
-\markboth{\stardocname}{\stardocname}
+
 \section{\xlabel{INTRO_EXTEND}Introduction}
 
 This section presents two extended recipes or case studies of using
@@ -1643,14 +1403,14 @@ follow the `Basic Use of DX' recipe (see Section~\ref{BASIC}).
 Like the simple networks in Part I, the networks and data files referred
 to in this section can be found on Starlink systems in directory:
 
-\begin{quote}
-{\tt /star/examples/sc2}
-\end{quote}
+\begin{terminalv}
+/star/examples/sc2
+\end{terminalv}
 
 and on non-Starlink systems in directory:
-\begin{quote}
-{\tt \$STARLINK\_DIR/examples/sc2}
-\end{quote}
+\begin{terminalv}
+$STARLINK_DIR/examples/sc2
+\end{terminalv}
 
 The most convenient way to access these files is probably to copy them
 into your current directory before attempting to read them or load
@@ -1669,13 +1429,13 @@ The example used here is an observation of emission from the C$^{18}$O ~
 ${\rm J} = 2 \rightarrow 1$ transition in L1689B, a dense core within
 the molecular cloud Lynds Dark Nebula 1689.  The data cube comprises a
 grid of 7 by 7 points on the sky, with a spectrum of 153 channels at each
-position.  The example data are available as file {\tt l1689b.sdf}.
+position.  The example data are available as file \texttt{l1689b.sdf}.
 JCMT heterodyne observations are usually reduced using the SPECX package
 (see \xref{SUN/17}{sun17}{}\cite{SUN17}) and the example data are in the
 native SPECX data format.  In SPECX terminology a collection of spectra
 on a grid of points on the sky is a called a `map'.
 
-{\it The data for L1689B have kindly been made available in advance of
+\textit{The data for L1689B have kindly been made available in advance of
 publication; they may not be published without the express, written
 permission of the observers (see Section~\ref{ACK} for details).}
 
@@ -1683,31 +1443,30 @@ permission of the observers (see Section~\ref{ACK} for details).}
 
   \item The first stage to importing a SPECX map is to convert it to a
    simple data cube in the standard Starlink \xref{NDF}{sun33}{}
-   format.  Application {\tt specx2ndf} in the CONVERT package
+   format.  Application \texttt{specx2ndf} in the CONVERT package
    (see \xref{SUN/55}{sun55}{}\cite{SUN55}) performs this task.
    Proceed as follows.  First type:
 
-  \begin{quote}
-   {\tt convert}
-  \end{quote}
+\begin{terminalv}
+% convert
+\end{terminalv}
 
    to make the CONVERT applications available.  Then type:
 
-  \begin{quote}
-   {\tt specx2ndf ~ l1689b ~ l1689bndf}
-  \end{quote}
+\begin{terminalv}
+% specx2ndf  l1689b  l1689bndf
+\end{terminalv}
 
    Note that though the input SPECX map and output NDF are respectively
-   held in files called {\tt l1689b.sdf} and {\tt l1689bndf.sdf}
-   they are specified to application {\tt specx2ndf} without the `{\tt
-   .sdf}' file type.
+   held in files called \texttt{l1689b.sdf} and \texttt{l1689bndf.sdf}
+   they are specified to application \texttt{specx2ndf} without the `\texttt{.sdf}' file type.
 
    When displaying SPECX maps it is conventional to represent the
    spectral axis as a series of radial velocities computed for the
    rest wavelength of the line being observed and corrected to a
-   kinematical local standard of rest.  By default {\tt specx2ndf}
+   kinematical local standard of rest.  By default \texttt{specx2ndf}
    generates the spectral axis in this fashion and this is how it will
-   be computed in the above example.  However, {\tt specx2ndf} allows
+   be computed in the above example.  However, \texttt{specx2ndf} allows
    some flexibility in how the spectral axis is represented; see
    \xref{the appropriate section of SUN/55}{sun55}{SPECX2NDF} for
    details of the alternatives available.
@@ -1718,47 +1477,47 @@ permission of the observers (see Section~\ref{ACK} for details).}
    processing package KAPPA (see \xref{SUN/95}{sun95}{}\cite{SUN95}).
    For example, type:
 
-  \begin{quote}
-   {\tt kappa}
-  \end{quote}
+\begin{terminalv}
+% kappa
+\end{terminalv}
 
    to make the KAPPA applications available.  Then type:
 
-  \begin{quote}
-   {\tt hislist ~ l1689bndf}
-  \end{quote}
+\begin{terminalv}
+% hislist  l1689bndf
+\end{terminalv}
 
-   Again the file name is specified without the `{\tt .sdf}' file type.
+   Again the file name is specified without the `\texttt{.sdf}' file type.
    This application lists the history information describing the
    processing which has been performed on the data.  The history
-   information appended by {\tt specx2ndf} includes details of the way
+   information appended by \texttt{specx2ndf} includes details of the way
    in which the spectral axis was computed.  It is also possible to
-   inspect the structure of the data set using {\tt hdstrace}.  Simply
+   inspect the structure of the data set using \texttt{hdstrace}.  Simply
    type:
 
-  \begin{quote}
-   {\tt hdstrace ~ l1689bndf}
-  \end{quote}
+\begin{terminalv}
+% hdstrace  l1689bndf
+\end{terminalv}
 
-   As usual the file name is specified without the `{\tt .sdf}' file type.
+   As usual the file name is specified without the `\texttt{.sdf}' file type.
    This facility is useful because it lists the value of much of the
-   auxiliary information contained in the data set.  {\tt hdstrace}
+   auxiliary information contained in the data set.  \texttt{hdstrace}
    is documented in \xref{SUN/102}{sun102}{}\cite{SUN102}.  In addition
-   {\tt hdstrace} will also work on the original SPECX map.
+   \texttt{hdstrace} will also work on the original SPECX map.
 
   \item The next step is to convert the NDF format file into a file
    in the `native' DX format, which DX can read.  This operation
    could be performed `on the fly' as DX reads the file.  However, it
    is simpler to convert the file in a separate operation prior to
    invoking DX.  The conversion is performed using application
-   \xref{{\tt ndf2dx}}{sun203}{NDF2DX}, which is part of SX, the
+   \xref{\texttt{ndf2dx}}{sun203}{NDF2DX}, which is part of SX, the
    Starlink enhancements to DX (see \xref{SUN/203}{sun203}{}\cite{SUN203}).
-   By convention files in the native DX format have file type `{\tt .dx}'.
+   By convention files in the native DX format have file type `\texttt{.dx}'.
    To convert the entire data cube simply type:
 
-  \begin{quote}
-   {\tt \$SX\_DIR/ndf2dx ~ l1689bndf ~ l1689ball.dx}
-  \end{quote}
+\begin{terminalv}
+% $SX_DIR/ndf2dx  l1689bndf  l1689ball.dx
+\end{terminalv}
 
    Note that though the file type is not specified for the input NDF
    file, it should be given for the output native DX format file.
@@ -1771,25 +1530,24 @@ permission of the observers (see Section~\ref{ACK} for details).}
    range of velocity channels.  For example, to convert a subset
    corresponding to channels 65 through to 85 type:
 
-  \begin{quote}
-   {\tt \$SX\_DIR/ndf2dx ~ 'l1689bndf(65:85,,)' ~ l1689bsub.dx}
-  \end{quote}
+\begin{terminalv}
+% $SX_DIR/ndf2dx  'l1689bndf(65:85,,)'  l1689bsub.dx
+\end{terminalv}
 
    The syntax to specify a subset of an NDF is to give the bounds of
    the required region inside parentheses after the file name.
    Unfortunately however, by default the Unix shell will attempt to
    interpret these parentheses.  Thus, in the above example the input
    file name and NDF subset are enclosed in single quotes in order to
-   prevent this behaviour and ensure they are passed correctly to {\tt
-   ndf2dx}.  The use of `escape mechanisms'  of this sort to prevent the
+   prevent this behaviour and ensure they are passed correctly to \texttt{ndf2dx}.  The use of `escape mechanisms'  of this sort to prevent the
    premature interpretation of special characters sent to Starlink
    applications is discussed in \xref{SC/4}{sc4}{sc4_se_spec_char}\cite{SC4}.
 
   \item Figure~\ref{JCMTSLICE} shows a DX network to display a sequence
    of slices through a JCMT map.  Each slice corresponds to the grid
    of points seen on the sky at a given radial velocity.  The network
-   is available as files {\tt jcmtslice.net} and {\tt jcmtslice.cfg}
-   ({\tt jcmtslice.net} is the basic network and {\tt jcmtslice.cfg} is
+   is available as files \texttt{jcmtslice.net} and \texttt{jcmtslice.cfg}
+   (\texttt{jcmtslice.net} is the basic network and \texttt{jcmtslice.cfg} is
    a `configuration file' which controls some aspects of its behaviour).
    Start DX (as described in Section~\ref{START}).  Then proceed as
    follows.
@@ -1810,14 +1568,12 @@ permission of the observers (see Section~\ref{ACK} for details).}
   \begin{enumerate}
 
     \item Load the network.  Select the `Open Program' option from the
-     `File' menu of the main DX window.  Select file {\tt
-     jcmtslice.net}.  The network should now load and appear in the
+     `File' menu of the main DX window.  Select file \texttt{jcmtslice.net}.  The network should now load and appear in the
      main window.  See Section~\ref{BASIC} for further details.
 
     \item Select the `Open All Control Panels' option from the `Windows'
      menu of the main DX window.  Set the required file name and
-     number of slices.  (In the current example these are {\tt
-     l1689bsub.dx} and 20 respectively.)  Close the `Control Panel'
+     number of slices.  (In the current example these are \texttt{l1689bsub.dx} and 20 respectively.)  Close the `Control Panel'
      window.
 
     \item Execute the network once.  Once the network has executed you
@@ -1835,22 +1591,21 @@ permission of the observers (see Section~\ref{ACK} for details).}
    The network includes a `scale bar' showing how the colour displayed
    for each pixel in each slice corresponds to the value of the pixel.
    In this example the value of each pixel is the radio `brightness
-   temperature' in $^{\circ}$Kelvin.
+   temperature' in kelvin.
 
   \item Figure~\ref{JCMTSURFACE} shows a network for displaying an
    iso-surface\footnote{An iso-surface is the analogue in
    three-dimensional gridded data of a single contour in two-dimensional
    gridded data. That is, it is a surface defined by some constant value
    of the dependent variable.} in a JCMT data cube.  This network is
-   available as files {\tt jcmtsurface.net} and {\tt jcmtsurface.cfg}
-   (again {\tt jcmtsurface.net} is the basic network and {\tt
-   jcmtsurface.cfg} is a configuration file).
+   available as files \texttt{jcmtsurface.net} and \texttt{jcmtsurface.cfg}
+   (again \texttt{jcmtsurface.net} is the basic network and \texttt{jcmtsurface.cfg} is a configuration file).
 
   \begin{figure}[htbp]
 
   \begin{center}
   \leavevmode
-  \includegraphics[width=450pt]{sc2_jcmtsurface}
+  \includegraphics[height=450pt,angle=90]{sc2_jcmtsurface}
   \end{center}
 
   \caption[Network to display an iso-surface in a JCMT data cube.]
@@ -1877,10 +1632,10 @@ permission of the observers (see Section~\ref{ACK} for details).}
     \item Select the `Open All Control Panels' option from the `Windows'
      menu of the main DX window.  Set the axis units, file name
      and iso-surface value.  In the current example suitable
-     values of these quantities are: normalised, {\tt l1689bsub.dx} and
+     values of these quantities are: normalised, \texttt{l1689bsub.dx} and
      3.5 respectively.
      The contour (or iso-surface) value is specified as a radio
-     `brightness temperature' in $^{\circ}$Kelvin.  Close the `Control
+     `brightness temperature' in kelvin.  Close the `Control
      Panel' window.
 
     \item Execute the network once.  Once the network has executed you
@@ -1893,8 +1648,8 @@ permission of the observers (see Section~\ref{ACK} for details).}
     \item Use the various settings of the `Mode' option in the `View
      Control' window to pan, zoom and rotate the display in order to
      examine the iso-surface.  These options are described in Section
-     2.3 {\it Controlling the Appearance of an Object: the Image
-     Window}\, of the IBM {\it QuickStart Guide}\cite{QUICKS}.
+     2.3 \textit{Controlling the Appearance of an Object: the Image
+     Window}\, of the IBM \textit{QuickStart Guide}\cite{QUICKS}.
 
   \end{enumerate}
 
@@ -1906,13 +1661,13 @@ permission of the observers (see Section~\ref{ACK} for details).}
 
 This recipe shows how to import and display a data cube observed with the
 \htmladdnormallink{ROSAT}{http://heasarc.gsfc.nasa.gov/0/docs/rosat/rosat3.html}
-X-ray astronomy satellite ({\it R\"{o}ntgensatellit}).  ROSAT data come
+X-ray astronomy satellite (\textit{R\"{o}ntgensatellit}).  ROSAT data come
 in a number of different formats.  The example used here is an Asterix
 binned dataset of the irregular galaxy M82 (NGC 3034).  This format is
 used by the Asterix package (see \xref{SUN/98}{sun98}{}\cite{SUN98}).
 The data cube comprises a grid of 216 by 216 points on the sky, with a
 spectrum of 22 points at each position.  The example data are available
-as file {\tt m82ast.sdf}.  The procedure for importing and displaying these
+as file \texttt{m82ast.sdf}.  The procedure for importing and displaying these
 data is very similar to the corresponding procedure for JCMT data
 described in Section~\ref{JCMT}.
 
@@ -1920,28 +1675,28 @@ described in Section~\ref{JCMT}.
 
   \item The first stage to importing an Asterix binned dataset is to
    convert it to a simple data cube in the standard Starlink
-   \xref{NDF}{sun33}{} format.  Application {\tt ast2ndf} in the CONVERT
+   \xref{NDF}{sun33}{} format.  Application \texttt{ast2ndf} in the CONVERT
    package (see \xref{SUN/55}{sun55}{}\cite{SUN55}) performs this task.
    Proceed as follows.  First type:
 
-  \begin{quote}
-   {\tt convert}
-  \end{quote}
+\begin{terminalv}
+% convert
+\end{terminalv}
 
    to make the CONVERT applications available.  Then type:
 
-  \begin{quote}
-   {\tt ast2ndf ~ m82ast ~ m82ndf}
-  \end{quote}
+\begin{terminalv}
+% ast2ndf   m82ast  m82ndf
+\end{terminalv}
 
    Note that though the input Asterix binned dataset and output NDF are
    respectively
-   held in files called {\tt m82ast.sdf} and {\tt m82ndf.sdf} they are
-   specified to application {\tt ast2ndf} without the `{\tt .sdf}' file
+   held in files called \texttt{m82ast.sdf} and \texttt{m82ndf.sdf} they are
+   specified to application \texttt{ast2ndf} without the `\texttt{.sdf}' file
    type.
 
    It is also worth noting that an Asterix binned dataset is itself
-   almost a standard Starlink NDF.  {\tt ast2ndf} merely makes the
+   almost a standard Starlink NDF.  \texttt{ast2ndf} merely makes the
    data format completely standard and rearranges the order of the
    axes.
 
@@ -1950,17 +1705,17 @@ described in Section~\ref{JCMT}.
    applications can be used to process and display it.  For example, it
    can be accessed with the image processing applications in KAPPA (see
    \xref{SUN/95}{sun95}{}\cite{SUN95}).  It is also possible to inspect
-   the structure of the data set using {\tt hdstrace}.  Simply type:
+   the structure of the data set using \texttt{hdstrace}.  Simply type:
 
-  \begin{quote}
-   {\tt hdstrace ~ m82ndf}
-  \end{quote}
+\begin{terminalv}
+% hdstrace  m82ndf
+\end{terminalv}
 
-   Again the file name is specified without the `{\tt .sdf}' file type.
+   Again the file name is specified without the `\texttt{.sdf}' file type.
    This facility is useful because it lists the value of much of the
-   auxiliary information contained in the data set.  {\tt hdstrace}
+   auxiliary information contained in the data set.  \texttt{hdstrace}
    is documented in \xref{SUN/102}{sun102}{}\cite{SUN102}.  In addition,
-   {\tt hdstrace} and many other standard Starlink applications, will
+   \texttt{hdstrace} and many other standard Starlink applications, will
    also work on the original Asterix binned dataset.
 
   \item The next step is to convert the NDF format file into a file
@@ -1968,14 +1723,14 @@ described in Section~\ref{JCMT}.
    could be performed `on the fly' as DX reads the file.  However, it
    is simpler to convert the file in a separate operation prior to
    invoking DX.  The conversion is performed using application
-   \xref{{\tt ndf2dx}}{sun203}{NDF2DX}, which is part of SX, the
+   \xref{\texttt{ndf2dx}}{sun203}{NDF2DX}, which is part of SX, the
    Starlink enhancements to DX (see \xref{SUN/203}{sun203}{}\cite{SUN203}).
-   By convention files in the native DX format have file type `{\tt .dx}'.
+   By convention files in the native DX format have file type `\texttt{.dx}'.
    To convert the entire data cube simply type:
 
-  \begin{quote}
-   {\tt \$SX\_DIR/ndf2dx ~ m82ndf ~ m82.dx}
-  \end{quote}
+\begin{terminalv}
+% $SX_DIR/ndf2dx  m82ndf  m82.dx
+\end{terminalv}
 
    Note that though the file type is not specified for the input NDF
    file, it should be given for the output native DX format file.
@@ -1988,21 +1743,20 @@ described in Section~\ref{JCMT}.
    range of energy steps.  For example, to convert a subset
    corresponding to steps 5 through to 15 type:
 
-  \begin{quote}
-   {\tt \$SX\_DIR/ndf2dx ~ 'm82ndf(5:15,,)' ~ m82sub.dx ~ axes=no}
-  \end{quote}
+\begin{terminalv}
+% $SX_DIR/ndf2dx  'm82ndf(5:15,,)'  m82sub.dx  axes=no
+\end{terminalv}
 
    The syntax to specify a subset of an NDF is to give the bounds of
    the required region inside parentheses after the file name.
    Unfortunately however, by default the Unix shell will attempt to
    interpret these parentheses.  Thus, in the above example the input
    file name and NDF subset are enclosed in single quotes in order to
-   prevent this behaviour and ensure they are passed correctly to {\tt
-   ndf2dx}.  The use of `escape mechanisms'  of this sort to prevent the
+   prevent this behaviour and ensure they are passed correctly to \texttt{ndf2dx}.  The use of `escape mechanisms'  of this sort to prevent the
    premature interpretation of special characters sent to Starlink
    applications is discussed in \xref{SC/4}{sc4}{sc4_se_spec_char}\cite{SC4}.
 
-   The {\tt axes=no} option causes {\tt ndf2dx} to ignore any axis
+   The \texttt{axes=no} option causes \texttt{ndf2dx} to ignore any axis
    information present in the input dataset and write the output DX file
    with axes consisting of simple pixel numbers.  This option may or
    may not be appropriate depending on the details of your data.
@@ -2011,8 +1765,8 @@ described in Section~\ref{JCMT}.
   \item Figure~\ref{ROSATSLICE} shows a DX network to display a sequence
    of slices through a ROSAT data cube Each slice corresponds to the
    grid of points seen on the sky at a given radial velocity.  The network
-   is available as files {\tt rosatslice.net} and {\tt rosatslice.cfg}
-   ({\tt rosatslice.net} is the basic network and {\tt rosatslice.cfg} is
+   is available as files \texttt{rosatslice.net} and \texttt{rosatslice.cfg}
+   (\texttt{rosatslice.net} is the basic network and \texttt{rosatslice.cfg} is
    a `configuration file' which controls some aspects of its behaviour).
    Start DX (as described in Section~\ref{START}).  Then proceed as
    follows.
@@ -2033,13 +1787,12 @@ described in Section~\ref{JCMT}.
   \begin{enumerate}
 
     \item Load the network.  Select the `Open Program' option from the
-     `File' menu of the main DX window.  Select file {\tt
-     rosatslice.net}.  The network should now load and appear in the
+     `File' menu of the main DX window.  Select file \texttt{rosatslice.net}.  The network should now load and appear in the
      main window.  See Section~\ref{BASIC} for further details.
 
     \item Select the `Open All Control Panels' option from the `Windows'
      menu of the main DX window.  Set the required file name and
-     number of slices.  (In the current example these are {\tt m82sub.dx}
+     number of slices.  (In the current example these are \texttt{m82sub.dx}
      and 10 respectively.)  Close the `Control Panel' window.
 
     \item Execute the network once.  Once the network has executed you
@@ -2070,9 +1823,9 @@ described in Section~\ref{JCMT}.
 
 % - Part III ----------------------------------------------------------
 \cleardoublepage
-\markboth{\stardocname}{\stardocname}
+
 \part{The DX Data Model}
-\markboth{\stardocname}{\stardocname}
+
 \section{\xlabel{INTRO_DATMOD}Introduction}
 
 DX has a powerful and flexible data model capable of representing many
@@ -2087,25 +1840,24 @@ planning to make a significant amount of use of DX.
 
 \subsection{Further reading}
 
-The DX data model is fully described in Chapter~2 {\it Introduction
-to Visualization}, especially Section 2.1, and Chapter~3 {\it Understanding
-the Data Model}\, of the IBM {\it User's Guide}\cite{USERG}.
+The DX data model is fully described in Chapter~2 \textit{Introduction
+to Visualization}, especially Section 2.1, and Chapter~3 \textit{Understanding
+the Data Model}\, of the IBM \textit{User's Guide}\cite{USERG}.
 
 
 \section{\xlabel{BLUFFER}\label{BLUFFER}Summary}
 
 
 In DX the basic entity used to represent a data cube or a particle (or
-catalogue) dataset is called a {\bf field} (this usage is similar to the
+catalogue) dataset is called a \textbf{field} (this usage is similar to the
 use of the term `field' in physics, for example, `velocity field', but
 is different from the usual use in computing). Each field consists of a
-set of {\bf components}; arrays holding the {\bf positions} of the data
-points and a {\bf data} array containing the dependent variable. The
+set of \textbf{components}; arrays holding the \textbf{positions} of the data
+points and a \textbf{data} array containing the dependent variable. The
 data array may contain either scalar or vector data. For particle (or
 catalogue) data, where the positions of the points are not related to
 each other, the field need only contain the positions and data
-components. However, for gridded data there is an additional {\bf
-connections} array which defines the relation between neighbouring
+components. However, for gridded data there is an additional \textbf{connections} array which defines the relation between neighbouring
 points in the grid and controls how interpolation is performed.
 
 In DX gridded data may be either position dependent or connection
@@ -2168,14 +1920,13 @@ the usual data types are available: integer, real, double precision,
 complex etc. The dependent quantity may be a scalar (such as temperature,
 pressure or energy) or a vector (such as velocity or momentum).
 
-The fundamental entity in the DX data model is an {\bf object}. Data
+The fundamental entity in the DX data model is an \textbf{object}. Data
 are represented by the same set of objects both when they are resident
 in memory when DX is running and when they are stored in native format
 disk files\footnote{It is also, of course, possible to input files
 written in a wide variety of other formats; see Sections~\ref{IMP_GRID}
 and \ref{IMP_PART} for some examples.}. There are several sorts of objects.
-For the present purposes the most important type of object is the {\bf
-field}; usually each separate dataset will be represented as a single
+For the present purposes the most important type of object is the \textbf{field}; usually each separate dataset will be represented as a single
 field\footnote{This usage of the term `field' corresponds to its usual
 meaning in physics rather than in computing. For example, a DX field may
 represent a three-dimensional grid holding a set of samples of the
@@ -2185,8 +1936,8 @@ allocated to the storage of a particular data item. Anyone used to the
 computing terminology should particularly beware of this different
 usage.}.
 
-A field consists of an arbitrary number of {\bf components} and each
-component itself has a number of {\bf attributes}. This hierarchy is
+A field consists of an arbitrary number of \textbf{components} and each
+component itself has a number of \textbf{attributes}. This hierarchy is
 illustrated in Figure~\ref{DXITEMS}.
 
 \begin{figure}[htbp]
@@ -2194,22 +1945,22 @@ illustrated in Figure~\ref{DXITEMS}.
 \begin{center}
 
 \begin{tabular}{l}
-{\tt field     } \\
-{\tt ~~component 1   } \\
-{\tt ~~~~attribute 1 } \\
-{\tt ~~~~attribute 2 } \\
-{\tt ~~~~~~~~~.      } \\
-{\tt ~~~~~~~~~.      } \\
+\texttt{field     } \\
+\texttt{~~component 1   } \\
+\texttt{~~~~attribute 1 } \\
+\texttt{~~~~attribute 2 } \\
+\texttt{~~~~~~~~~.      } \\
+\texttt{~~~~~~~~~.      } \\
     \\
-{\tt ~~component 2   } \\
-{\tt ~~~~attribute 1 } \\
-{\tt ~~~~attribute 2 } \\
-{\tt ~~~~~~~~~.      } \\
-{\tt ~~~~~~~~~.      } \\
+\texttt{~~component 2   } \\
+\texttt{~~~~attribute 1 } \\
+\texttt{~~~~attribute 2 } \\
+\texttt{~~~~~~~~~.      } \\
+\texttt{~~~~~~~~~.      } \\
    \\
-{\tt ~~component 3   } \\
-{\tt ~~~~~~~.        } \\
-{\tt ~~~~~~~.        } \\
+\texttt{~~component 3   } \\
+\texttt{~~~~~~~.        } \\
+\texttt{~~~~~~~.        } \\
 \end{tabular}
 \end{center}
 
@@ -2251,14 +2002,13 @@ box         &            & bounding box for positions in the field \\
 
   \item[Positions] The position component is an array\footnote{Strictly
    speaking this array, and other arrays in components, are themselves
-   DX objects of type {\bf array}. However, this complication is not
+   DX objects of type \textbf{array}. However, this complication is not
    important to the present discussion and it is adequate to think of
    the component as simply an array of numbers.} defining a
    position for every datum in the dataset. If the field contains
    unconnected particle data then the array will be a simple list
    with a position for each datum. If the field contains a regular
-   grid the positions can be represented more compactly as a {\bf
-   regular} or {\bf product} array; essentially just the origin, size
+   grid the positions can be represented more compactly as a \textbf{regular} or \textbf{product} array; essentially just the origin, size
    and increment of the grid are stored.
 
   \item[Data] The data component is an array storing the dependent
@@ -2281,7 +2031,7 @@ box         &            & bounding box for positions in the field \\
 
 \subsection{Attributes}
 
-Components can have {\bf attributes} associated with them. Attributes
+Components can have \textbf{attributes} associated with them. Attributes
 are additional items of information describing some aspect of the
 component. For example, the dependency attribute, `dep', identifies
 another component on which the component depends; the `data' component
@@ -2309,7 +2059,7 @@ connected, listed in the order that they are to be connected.
 You will not normally need to be concerned with the full details of the
 connections component. For a regular grid it can be created
 automatically when the data are imported into DX and represented
-compactly using a {\bf path} or {\bf mesh} array.
+compactly using a \textbf{path} or \textbf{mesh} array.
 
 Fields representing particle or catalogue data where there are no
 logical connections between elements in the positions component will
@@ -2378,48 +2128,48 @@ a draft version of the document.
    case of Starlink documents the document code (for example SC/4.1
    or SUN/17.6) forms part of the title.
 
-  \bibitem{QUICKS} {\it IBM Visualization Data Explorer: QuickStart
+  \bibitem{QUICKS} \textit{IBM Visualization Data Explorer: QuickStart
    Guide}, Second Edition, 1995, document reference number:
    SC34-3262-01.
 
-  \bibitem{USERG} {\it IBM Visualization Data Explorer: User's Guide},
+  \bibitem{USERG} \textit{IBM Visualization Data Explorer: User's Guide},
    Sixth Edition, 1995, document reference number: SC38-0496-05.
 
   \bibitem{SC4} \xref{SC/4.1}{sc4}{}:
-   {\it C-shell Cookbook}\, by M.J.~Currie, 2 May 1997 (Starlink).
+   \textit{C-shell Cookbook}\, by M.J.~Currie, 2 May 1997 (Starlink).
 
   \bibitem{SG8} \xref{SG/8.2}{sg8}{}:
-   {\it An Introduction to Visualisation Software for Astronomy}\,
+   \textit{An Introduction to Visualisation Software for Astronomy}\,
    by A.C.~Davenhall, 4 March 1997 (Starlink).
 
   \bibitem{SUN17} \xref{SUN/17.6}{sun17}{}:
-   {\it SPECX -- A Millimetre Wave Spectral Reduction Package}\, by
+   \textit{SPECX -- A Millimetre Wave Spectral Reduction Package}\, by
    R.M.~Prestage, H.~Meyerdierks and    J.F.~Lightfoot, 13 January 1995
    (Starlink).
 
   \bibitem{SUN55} \xref{SUN/55.6}{sun55}{}:
-   {\it CONVERT -- A Format-conversion Package}\, by M.J.~Currie,
+   \textit{CONVERT -- A Format-conversion Package}\, by M.J.~Currie,
    G.J.~Privett and A.J.~Chipperfield, 7 December 1995 (Starlink).
 
   \bibitem{SUN86} \xref{SUN/86.12}{sun86}{}:
-   {\it FIGARO -- A General Data Reduction System}\, by K.~Shortridge,
+   \textit{FIGARO -- A General Data Reduction System}\, by K.~Shortridge,
    H.~Meyerdierks, M.J.~Currie and M.J.~Clayton, 26 September 1996
    (Starlink).
 
   \bibitem{SUN95} \xref{SUN/95.9}{sun95}{}:
-   {\it KAPPA -- Kernel Application Package}\, by M.J.~Currie,
+   \textit{KAPPA -- Kernel Application Package}\, by M.J.~Currie,
    9 December 1995 (Starlink).
 
   \bibitem{SUN98} \xref{SUN/98.6}{sun98}{}:
-   {\it ASTERIX -- X-ray Data Processing System}\,
+   \textit{ASTERIX -- X-ray Data Processing System}\,
    D.J.~Allan and R.J.~Vallance, 13 May 1995 (Starlink).
 
   \bibitem{SUN102} \xref{SUN/102.3}{sun102}{}:
-   {\it HDSTRACE -- Listing HDS Data Files}\, by M.J.~Currie,
+   \textit{HDSTRACE -- Listing HDS Data Files}\, by M.J.~Currie,
    14 February 1994 (Starlink).
 
   \bibitem{SUN203} \xref{SUN/203.3}{sun203}{}:
-   {\it DX -- IBM Data Explorer for Data Visualisation}\, by D.S.~Berry,
+   \textit{DX -- IBM Data Explorer for Data Visualisation}\, by D.S.~Berry,
    G.J.~Privett and A.C.~Davenhall, 15 September 1997 (Starlink).
 
 \end{thebibliography}
