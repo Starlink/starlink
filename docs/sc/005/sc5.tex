@@ -1,3 +1,4 @@
+\documentclass[twoside,11pt]{starlink}
 %
 % The 2-D CCD Data Reduction Cookbook
 %
@@ -6,30 +7,27 @@
 % A.C. Davenhall (Edinburgh), 16/8/01.
 %
 
-\documentclass[twoside,11pt]{article}
 
 % ? Specify used packages
-\usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
 
-\pagestyle{myheadings}
+
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink Cookbook}
-\newcommand{\stardocinitials}  {SC}
-\newcommand{\stardocsource}    {sc\stardocnumber}
-\newcommand{\stardoccopyright} {Copyright \copyright\ 2001 Council for the
+\stardoccategory    {Starlink Cookbook}
+\stardocinitials    {SC}
+\stardocsource      {sc\stardocnumber}
+\stardoccopyright {Copyright \copyright\ 2001 Council for the
 Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {5.3}
-\newcommand{\stardocauthors}   {A.C.~Davenhall, G.J.~Privett \& M.B.~Taylor}
-\newcommand{\stardocdate}      {16th August 2001}
-\newcommand{\stardoctitle}     {The 2-D CCD Data Reduction Cookbook}
-\newcommand{\stardocabstract}
+\stardocnumber      {5.3}
+\stardocauthors     {A.C.~Davenhall, G.J.~Privett \& M.B.~Taylor}
+\stardocdate        {16th August 2001}
+\stardoctitle       {The 2-D CCD Data Reduction Cookbook}
+\stardocabstract
 {This cookbook presents simple recipes and scripts for reducing direct
 images acquired with optical CCD detectors.  Using these recipes and
 scripts you can correct un-processed images obtained from CCDs for
@@ -54,7 +52,7 @@ infrared wavelengths.
 \latex{\vspace{5mm}}
 
 \begin{center}
-{\bf Who Should Read this Cookbook?}
+\textbf{Who Should Read this Cookbook?}
 \end{center}
 
 This cookbook is aimed firmly at people who are new to reducing CCD
@@ -63,234 +61,13 @@ reduce (perhaps for the first time) or be planning to observe with a
 CCD camera.  No prior knowledge of CCD data reduction is assumed.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sc.tex
-%
-%  Purpose:
-%     Template for Starlink Cookbook (SC) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%
-%  History:
-%     16-JUN-1997 (BLY):
-%        Original, based on SUN/SG templates.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % from the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
+% ? Document-specific \providecommand or \newenvironment commands.
 % ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\vspace{3cm}
+\scfrontmatter
 
 \latex{\subsection*{Revision history}}
 \html{\section*{Revision history}}
@@ -310,28 +87,6 @@ CCD camera.  No prior knowledge of CCD data reduction is assumed.}
 
 \end{enumerate}
 
-\vspace*{\fill}
-\stardoccopyright
-
-\cleardoublepage
-\begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
-
-   \newpage
-   \listoffigures
-   \listoftables
-
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-
 \section{\xlabel{INTRO}\label{INTRO}Introduction}
 
 \begin{center}
@@ -345,17 +100,13 @@ A heap of broken images
 
 \begin{latexonly}
 \begin{quote}
-{\it The Waste Land},  \raggedleft \\
+\textit{The Waste Land},  \raggedleft \\
 T.S.~Eliot, 1922.      \raggedleft
 \end{quote}
 \end{latexonly}
 
-\begin{htmlonly}
-\begin{quote}
-{\it The Waste Land}, \\
-T.S.~Eliot, 1922.
-\end{quote}
-\end{htmlonly}
+
+
 
 Two-dimensional optical CCDs (Charge-Couple Devices) and the infrared
 arrays which are their close kin are now the type of detectors usually
@@ -415,7 +166,7 @@ a nebula or galaxy).  However, for other sorts of programme you will need
 to calibrate the arbitrary brightness of objects in the image into a known
 photometric system.  This calibration (which can be quite involved) is
 beyond the scope of this cookbook, but is covered in the companion document
-\xref{SC/6: {\it The CCD Photometric Calibration Cookbook}}{sc6}{}\/\cite{SC6}.
+\xref{SC/6: \textit{The CCD Photometric Calibration Cookbook}}{sc6}{}\/\cite{SC6}.
 It is not considered further here.
 
 
@@ -424,34 +175,33 @@ It is not considered further here.
 The literature on the use of CCDs in astronomy is extensive.  However,
 there are several articles and books which provide convenient and accessible
 introductions.  The articles by Newberry\cite{NEWBERRY95A, NEWBERRY95B,
-NEWBERRY96} in the amateur astronomy magazine {\it CCD Astronomy}\, are a
+NEWBERRY96} in the amateur astronomy magazine \textit{CCD Astronomy}\, are a
 straightforward, accessible and readable introduction to CCD data reduction
-techniques.  The documentation included on the CD-ROM {\it Astronomical
+techniques.  The documentation included on the CD-ROM \textit{Astronomical
 Images}\, by Jaffe\cite{JAFFE98} includes a useful introduction to the
 instrumental effects present in CCD images and the data reduction techniques
-used to correct them (document {\it Reducing CCD Images}\/ in file {\tt
-reduce.ccd}).  Both Newberry's and Jaffe's articles are good starting
+used to correct them (document \textit{Reducing CCD Images}\/ in file \texttt{reduce.ccd}).  Both Newberry's and Jaffe's articles are good starting
 points for beginners.
 
-McLean's {\it Electronic and Computer-Aided Astronomy}\/\cite{MCLEAN89}
-and the more recent {\it Electronic Imaging in Astronomy}\/\cite{MCLEAN97}
+McLean's \textit{Electronic and Computer-Aided Astronomy}\/\cite{MCLEAN89}
+and the more recent \textit{Electronic Imaging in Astronomy}\/\cite{MCLEAN97}
 are, their titles notwithstanding, mostly about the construction and use of
-CCD instruments and, in the latter case, infrared arrays.  {\it Electronic
+CCD instruments and, in the latter case, infrared arrays.  \textit{Electronic
 Imaging in Astronomy}\/ is a particularly thorough, modern introduction to
 the subject.
 
-Another useful book is {\it CCD Astronomy}\/ by Buil\cite{BUIL91}.  The
-conference proceedings {\it Astronomical CCD Observing and Reduction
+Another useful book is \textit{CCD Astronomy}\/ by Buil\cite{BUIL91}.  The
+conference proceedings \textit{Astronomical CCD Observing and Reduction
 Techniques}\/\cite{HOWELL92} contains several useful papers.  In
-particular, the contribution `CCD Data: the {\it Good}, the {\it Bad},
-and the {\it Ugly}' by Massey and Jacoby\cite{MASSEY92} is an excellent
+particular, the contribution `CCD Data: the \textit{Good}, the \textit{Bad},
+and the \textit{Ugly}' by Massey and Jacoby\cite{MASSEY92} is an excellent
 introduction to the acquisition, processing and evaluation of CCD data.
 It is probably most useful if read before your observing trip.  Brief
-descriptions of CCD techniques are included in Walker's {\it Astronomical
-Observations}\/\cite{WALKER87}, pp300-307 and in {\it Astrophysical
+descriptions of CCD techniques are included in Walker's \textit{Astronomical
+Observations}\/\cite{WALKER87}, pp300-307 and in \textit{Astrophysical
 Techniques}\/\cite{KITCHIN98}, pp20-30 by Kitchin.
 
-{\it A User's Guide to CCD Reductions with IRAF}\/\cite{MASSEY97}
+\textit{A User's Guide to CCD Reductions with IRAF}\/\cite{MASSEY97}
 describes the reduction of CCD data.  It is particularly concerned with
 reducing observations using the IRAF software environment (see
 \xref{SG/12}{sg12}{}\/\cite{SG12}).  However, many of the techniques
@@ -465,7 +215,7 @@ The Department of Physics at the University of Oregon provides a useful
 on-line introduction to the construction and use of CCDs at URL:
 
 \begin{quote}
-\htmladdnormallink{ {\tt http://zebu.uoregon.edu/ccd.html}}
+\htmladdnormallink{ \texttt{http://zebu.uoregon.edu/ccd.html}}
 {http://zebu.uoregon.edu/ccd.html}
 \end{quote}
 
@@ -477,30 +227,30 @@ these differences if you read any non-astronomical literature about CCDs.
 
 \section{\xlabel{TYPO}\label{TYPO}Typographic Conventions}
 
-Technical terms are shown in a {\bf bold font like this} the first
+Technical terms are shown in a \textbf{bold font like this} the first
 time that they are used.  Also:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 Anything that is to be typed into a computer program via the keyboard,
 or output from one via the screen, is indicated by a `typewriter' or
 `courier' font like this.
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 However:
 
 \begin{quote}
-{\sf items appearing in graphical windows, such as those used by GAIA
+\textsf{items appearing in graphical windows, such as those used by GAIA
 or xreduce, are shown in a sans serif font like this.}
 \end{quote}
 
 
 % - Part I ------------------------------------------------------------
 \cleardoublepage
-\markboth{\stardocname}{\stardocname}
+
 \part{Background Material}
-\markboth{\stardocname}{\stardocname}
+
 \section{\xlabel{WHAT}\label{WHAT}Overview of CCD Detectors}
 
 Before the introduction of photography to astronomy the only way of
@@ -518,7 +268,7 @@ were basically threefold:
 
 \begin{itemize}
 
-  \item unlike the eye they were an {\bf integrating detector}: fainter
+  \item unlike the eye they were an \textbf{integrating detector}: fainter
    objects could be detected by making longer exposures to accumulate
    more light,
 
@@ -532,18 +282,18 @@ were basically threefold:
 Nonetheless there were problems with photographic plates: they had only
 a limited dynamic range and their response to the brightness of the
 illuminating light was non-linear, leading to persistent calibration
-problems.  In the middle years of the twentieth century {\bf photoelectric
+problems.  In the middle years of the twentieth century \textbf{photoelectric
 photometers} were developed: electronic devices which were more sensitive,
 accurate, linear and had a wider dynamic range than the photographic
 plate.  However, they were not imaging devices: they merely produced a
 single output corresponding to the brightness of one point on the sky.
 
-In many ways CCDs ({\bf Charge-Couple Devices}) combine the advantages
+In many ways CCDs (\textbf{Charge-Couple Devices}) combine the advantages
 of both photographic plates and photoelectric photometers, though their
 principles of operation are very different from either.  They have a high
 sensitivity, linear response, large dynamic range and are imaging devices
 which record a picture of the region of sky being viewed.  (Imaging devices
-are sometimes called, perhaps somewhat grandiloquently, {\bf panoramic
+are sometimes called, perhaps somewhat grandiloquently, \textbf{panoramic
 detectors}.)
 
 The CCD was invented in 1969 by W.S.~Boyle and G.E.~Smith of the Bell
@@ -569,7 +319,7 @@ near infrared wavelengths.
 A CCD is best described as a semiconductor chip, one face of which is
 sensitive to light (see Figure~\ref{CCDLUP}).  The light sensitive face is
 rectangular in shape and subdivided into a grid of discrete rectangular
-areas (picture elements or {\bf pixels}) each about 10-30 micron across.
+areas (picture elements or \textbf{pixels}) each about 10-30 micron across.
 The CCD is placed in the focal plane of a telescope so the the
 light-sensitive surface is illuminated and an image of the field of sky
 being viewed forms on it.  The arrival of a photon on a pixel generates a
@@ -598,17 +348,16 @@ clocking circuits, an amplifier and a fast analogue-to-digital converter
 light that has fallen onto each pixel by examining the amount of charge it
 has stored up.  Thus, the charge which has accumulated in each pixel is
 converted into a number.  This number is in arbitrary `units' of so-called
-`{\bf analogue data units}' (ADUs); that is, it is not yet calibrated into
-physical units.  The {\bf ADC factor} is the constant of proportionality
+`\textbf{analogue data units}' (ADUs); that is, it is not yet calibrated into
+physical units.  The \textbf{ADC factor} is the constant of proportionality
 to convert ADUs into the amount of charge (expressed as a number of
 electrons) stored in each pixel.  This factor is needed during the data
 reduction and is usually included in the documentation for the instrument.
 The chip will usually be placed in an insulating flask and cooled (often
 with liquid nitrogen) to reduce the noise level and there will be the usual
 appurtenances of astronomical instruments: shutters, filter wheels
-\emph{etc}.  The whole instrument is often referred to as a {\bf CCD camera}.
-Other synonyms sometimes encountered are {\bf area photometer}, {\bf
-panoramic photometer} or {\bf array photometer}.
+\emph{etc}.  The whole instrument is often referred to as a \textbf{CCD camera}.
+Other synonyms sometimes encountered are \textbf{area photometer}, \textbf{panoramic photometer} or \textbf{array photometer}.
 
 The electronics controlling the CCD chip are interfaced to a computer
 which in turn controls them.  Thus, the images observed by the CCD are
@@ -621,7 +370,7 @@ images that you observed.
 \subsection{\label{ADDIS}Advantages and disadvantages of CCDs}
 
 The principal advantages of CCDs are their sensitivity, dynamic range
-and linearity.  The sensitivity, or {\bf quantum efficiency}, is simply
+and linearity.  The sensitivity, or \textbf{quantum efficiency}, is simply
 the fraction of photons incident on the chip which are detected.
 It is common for CCDs to achieve a quantum efficiency of about 80\%.
 Compare this figure with only a few percent for even sensitised
@@ -646,8 +395,7 @@ response to blue and ultra-violet light.
    \end{quote}
 \end{figure}
 
-CCDs are sensitive to a wide range of light levels: a typical {\bf
-dynamic range} (that is, the ratio of the brightest accurately detectable
+CCDs are sensitive to a wide range of light levels: a typical \textbf{dynamic range} (that is, the ratio of the brightest accurately detectable
 signal to the faintest) is about $10^{5}$, corresponding to a range of
 about 14.5 magnitudes.  The corresponding figures for a photographic plate
 are a range of less than about 1000 corresponding to 7.5 magnitudes.
@@ -661,7 +409,7 @@ consequently can image only a small region of sky.  Typical sizes are
 1.0 to 7.5 cm across, much smaller than photographic plates.  There is
 a practical limit to the size of CCDs because of the time required to read
 them out.  Thus, in order to image a large area of sky it is usual to
-place several chips in a grid (or {\bf mosaic}) in the focal plane rather
+place several chips in a grid (or \textbf{mosaic}) in the focal plane rather
 than fabricating a single enormous chip.  The large CCD in the foreground
 in Figure~\ref{CCDLUP} is actually a mosaic of eight chips.
 
@@ -670,7 +418,7 @@ in Figure~\ref{CCDLUP} is actually a mosaic of eight chips.
 In images observed close to the optical axis of a well-designed telescope
 an angular displacement on the sky is simply proportional to a linear
 displacement in position in the focal plane.  The constant of
-proportionality is usually called the {\bf plate scale} (a name which
+proportionality is usually called the \textbf{plate scale} (a name which
 betrays its origin in photographic techniques) and is traditionally
 quoted in units of seconds of arc / mm.  That is:
 
@@ -735,19 +483,17 @@ individual CCDs.  However it may be important if a grid of chips is used.
 The raw images returned by a CCD contain a number of instrumental
 effects which must be removed before the image can be used for scientific
 purposes.  This section summarises some of these effects.  It is largely
-based on the document {\it Reducing CCD Images}\/ (file {\tt reduce.ccd})
-included on the CD-ROM {\it Astronomical Images}\, by Jaffe\cite{JAFFE98}.
+based on the document \textit{Reducing CCD Images}\/ (file \texttt{reduce.ccd})
+included on the CD-ROM \textit{Astronomical Images}\, by Jaffe\cite{JAFFE98}.
 The instrumental effects are usually corrected by taking various sorts
 of calibration frames in addition to the images of the astronomical objects
-observed.  In this cookbook the objects observed will be called {\bf
-target objects} and the observations of them correspondingly called {\bf
-target images} or {\bf target frames}.
+observed.  In this cookbook the objects observed will be called \textbf{target objects} and the observations of them correspondingly called \textbf{target images} or \textbf{target frames}.
 
 \subsection{Bad pixels}
 
 Some of the pixels making up the light sensitive grid may be faulty and
 return signals which are grossly inaccurate.  Such pixels are often
-referred to as being `hot', `cold' or `{\bf bad}'.  Because of the way that
+referred to as being `hot', `cold' or `\textbf{bad}'.  Because of the way that
 CCDs are read-out, in some circumstances a bad pixel will contaminate
 all the pixels in its row or column in the grid, leading to entire
 bad rows or columns.  Fabrication techniques have improved markedly in
@@ -762,7 +508,7 @@ from neighbouring pixels.
 \subsection{\label{BIAS_1}Read-out signal; bias}
 
 Usually the amplifier which boosts the signal prior to its digitisation
-by the ADC will also generate an offset, false signal or {\bf bias}, which
+by the ADC will also generate an offset, false signal or \textbf{bias}, which
 is imposed in addition to the real signal generated by the illuminating
 light (there are sound reasons for doing this).  This bias varies slightly
 with position on the chip, can vary slowly with time (though this is
@@ -776,8 +522,8 @@ and correcting the bias.
    a way that the images generated contain regions (usually two narrow
    strips on either side of the chip) that are created by reading out the
    CCD without sampling any of its stored charge (see
-   Figure~\ref{BIAS_STRIPS}). These regions are called {\bf bias strips}
-   or {\bf overscan pixels}.  The values of pixels within these strips
+   Figure~\ref{BIAS_STRIPS}). These regions are called \textbf{bias strips}
+   or \textbf{overscan pixels}.  The values of pixels within these strips
    consist only of the bias and its noise.  Usually for each row in the
    image the pixels in the corresponding row of the bias strips are
    averaged and the resulting value is subtracted from all the pixels in
@@ -787,7 +533,7 @@ and correcting the bias.
   \item[Bias frames] Here the entire CCD array is read-out without sampling
    any stored charge (that is, no light is incident on the detector) so
    that any small scale structure in the noise is detected and can
-   subsequently be corrected for.  Such frames are called {\bf bias frames}.
+   subsequently be corrected for.  Such frames are called \textbf{bias frames}.
    In practice bias frames are acquired by taking short exposures with
    the shutter closed before or after each night of observing.  Typically
    in order to reduce read-out noise several frames are taken and averaged.
@@ -848,7 +594,7 @@ over which the response is linear.
 
 Another effect which is sometimes present is an offset from zero that is
 generated thermally within the CCD, even when no light is present.  This
-offset is termed the {\bf dark current} because it is present whether the
+offset is termed the \textbf{dark current} because it is present whether the
 shutter is open or closed.  It varies somewhat from pixel to pixel and
 slowly with time (as long as the chip is kept at a constant temperature).
 It is usually minimised by cooling the CCD to the temperature of liquid
@@ -871,9 +617,9 @@ pixels can be calibrated by imaging an evenly illuminated source, such as
 the twilight sky, and examining the variation in values recorded.  Once this
 calibration is known, astronomical images of the sky can be corrected to
 the values they would have had if all the pixels had been uniformly
-sensitive.  This correction is known as {\bf flat fielding}
+sensitive.  This correction is known as \textbf{flat fielding}
 and images of evenly illuminated sources, such as the twilight sky, are
-known as {\bf flat fields}.  The pixel-to-pixel sensitivity variations
+known as \textbf{flat fields}.  The pixel-to-pixel sensitivity variations
 change with wavelength, so the flat fields should always be acquired
 using the same filter as the observations of the target objects.
 The flat fielding procedure also corrects for several other effects:
@@ -888,15 +634,14 @@ The flat fielding procedure also corrects for several other effects:
     the same on all exposures with the same filter, but obviously
     differ from filter to filter, and can differ from time to time,
 
-  \item {\bf vignetting}, the dimming of objects observed towards the edge
+  \item \textbf{vignetting}, the dimming of objects observed towards the edge
    of the telescope field of view.  Vignetting is caused by various
    out-of-focus obstructions in the light path, such as the support for the
    secondary mirror.
 
 \end{itemize}
 
-Two types of flat fields are usually used: {\bf dome flats} and {\bf
-sky flats}.  Brief details are as follows.
+Two types of flat fields are usually used: \textbf{dome flats} and \textbf{sky flats}.  Brief details are as follows.
 
 \begin{description}
 
@@ -970,7 +715,7 @@ In the case of observations made through a narrow filter, or where the
 incident light contains a strong component at a single wavelength,
 multiple reflections within the CCD chip, or the filters in front of it,
 can cause wave-like patterns across the image.  These patterns are
-called {\bf fringes}.  The precise pattern depends strongly on the
+called \textbf{fringes}.  The precise pattern depends strongly on the
 exact wavelength of the illuminating light.  Consequently, correcting for
 fringing requires a flat field whose wavelength corresponds closely to that
 of the image.
@@ -987,13 +732,13 @@ region of night sky containing no objects or, alternatively, remove all
 the contaminating objects from data frames which otherwise contain large
 areas of night sky.  These frames should then be combined to give complete
 spatial coverage and to reduce the noise contribution.  The resulting
-{\bf fringe-frame} should be scaled to the fringes present in the data
-frame (after normalisation) and {\it subtracted}.
+\textbf{fringe-frame} should be scaled to the fringes present in the data
+frame (after normalisation) and \textit{subtracted}.
 
 \subsection{Cosmic-ray events}
 
 Astronomers usually refer to spurious signals in CCD frames caused by
-ionising radiation as {\bf cosmic-ray hits} or {\bf cosmic-ray events}.
+ionising radiation as \textbf{cosmic-ray hits} or \textbf{cosmic-ray events}.
 However, these terms are slightly misleading as the ionising events are
 as likely to be due to background terrestrial radiation as cosmic-rays.
 When a cosmic-ray particle hits a CCD pixel it causes an increase in
@@ -1011,7 +756,7 @@ aberrantly large values.
 
 \subsection{Photon noise}
 
-The final, irreducible, source of noise is the {\bf photon noise} due to
+The final, irreducible, source of noise is the \textbf{photon noise} due to
 the poissonian nature of counting photons.  The error in the signal is
 proportional to the square root of the signal.
 
@@ -1074,7 +819,7 @@ CCDPACK, KAPPA and Figaro there are various other Starlink packages which
 are relevant to some aspects of CCD data reduction and CCD photometry.
 The various packages available, their uses and their inter-relations,
 are conveniently summarised in the `Road-Map for CCD
-Photometry'\cite{DAVENHALL98} which has appeared in the {\it Starlink
+Photometry'\cite{DAVENHALL98} which has appeared in the \textit{Starlink
 Bulletin}.
 
 The IRAF software environment includes the powerful and extensive package
@@ -1084,10 +829,10 @@ documented in:
 
 \begin{itemize}
 
-  \item {\it User's Guide to the CCDRED Package}\/ by
+  \item \textit{User's Guide to the CCDRED Package}\/ by
    F.~Valdes\cite{VALDES90_1},
 
-  \item {\it The IRAF CCD Reduction Package -- CCDRED}\/ by
+  \item \textit{The IRAF CCD Reduction Package -- CCDRED}\/ by
    F.~Valdes\cite{VALDES90_2}.
 
 \end{itemize}
@@ -1096,13 +841,13 @@ Additional useful material may be found in:
 
 \begin{itemize}
 
-  \item {\it A User's Guide to CCD Reductions with IRAF}\/ by
+  \item \textit{A User's Guide to CCD Reductions with IRAF}\/ by
    P.~Massey\cite{MASSEY97},
 
-  \item {\it Rectifying and Registering Images Using IRAF}\/ by
+  \item \textit{Rectifying and Registering Images Using IRAF}\/ by
    L.A.~Wells\cite{WELLS94_1},
 
-  \item {\it Cleaning Images of Bad Pixels and Cosmic Rays Using IRAF}\/
+  \item \textit{Cleaning Images of Bad Pixels and Cosmic Rays Using IRAF}\/
    by L.A.Wells and D.J.~Bell\cite{WELLS94_2}.
 
 \end{itemize}
@@ -1110,7 +855,7 @@ Additional useful material may be found in:
 The early stages of reducing spectra recorded with CCD detectors are
 similar to those for direct images, though the later stages differ.  There
 is a thorough and accessible introduction to reducing spectroscopic data
-in the cookbook \xref{SC/7}{sc7}{}: {\it Simple Spectroscopy
+in the cookbook \xref{SC/7}{sc7}{}: \textit{Simple Spectroscopy
 Reductions}\/\cite{SC7}.
 
 \subsection{\label{FORMAT}Data formats}
@@ -1142,14 +887,14 @@ astronomical data can import files in the FITS format.
 \subsubsection{\xlabel{FITS}FITS}
 
 The original FITS (Flexible Image Transport System) format was proposed by
-Wells {\it et al.}\/\cite{WELLS81} in 1981.  However, it has been developed
+Wells \textit{et al.}\/\cite{WELLS81} in 1981.  However, it has been developed
 and enhanced over the years.  The FITS standard is now maintained and
 documented by the FITS Support Office of the Astrophysics Data Facility at
 the NASA Goddard Space Flight Center (see URL:  \newline
-\htmladdnormallink{ {\tt http://fits.gsfc.nasa.gov/fits\_home.html}}
+\htmladdnormallink{ \texttt{http://fits.gsfc.nasa.gov/fits\_home.html}}
 {http://fits.gsfc.nasa.gov/fits_home.html}).  Though FITS is
 basically an astronomical format it is sometimes mentioned in books about
-standard image formats.  See, for example, {\it Graphics File Formats}\, by
+standard image formats.  See, for example, \textit{Graphics File Formats}\, by
 Kay and Levine\cite{KAY95}.  The development of the FITS standard since
 its inception has recently been reviewed by Wells\cite{WELLS00}.
 
@@ -1169,7 +914,7 @@ CCD or whatever) and header information describing and annotating it.
 Typical header information for an observation might be the instrument and
 telescope used, the date and time of observation, details of the
 instrumental set up \emph{etc}.  In the jargon of computer science such
-header information is often called {\bf metadata}, though this term is
+header information is often called \textbf{metadata}, though this term is
 rarely used in astronomy.
 
 A given record may contain header information or data but not both.  A
@@ -1189,8 +934,8 @@ of FITS header records: keywords and comments.
 
   \item[Keywords] A keyword record consists of a named keyword, an
    equals sign, the value of the keyword and optionally a comment.  For
-   example, in the figure the keyword {\tt SIMPLE} has the value `{\tt T}'
-   (for true in this instance) and the keyword {\tt BITPIX} has the value
+   example, in the figure the keyword \texttt{SIMPLE} has the value `\texttt{T}'
+   (for true in this instance) and the keyword \texttt{BITPIX} has the value
    8.  There are some additional rules about the position and length of
    these items, but they are not important here.  Keywords are the principal
    mechanism used to associate auxiliary information with a dataset.
@@ -1199,8 +944,7 @@ of FITS header records: keywords and comments.
    need.  The keywords in the figure are mandatory (their meanings are not
    important here).  Others, if present have a specified meaning.
 
-  \item[Comment] A comment header record starts with the string `{\tt
-   COMMENT}' and the rest of the record consists of free text which is
+  \item[Comment] A comment header record starts with the string `\texttt{COMMENT}' and the rest of the record consists of free text which is
    intended to be read by a human.  Typically it is used to annotate the
    dataset.
 
@@ -1208,7 +952,8 @@ of FITS header records: keywords and comments.
 
 \begin{figure}[htbp]
 
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 SIMPLE  =                    T / file does conform to FITS standard
 BITPIX  =                    8 / number of bits per data pixel
 NAXIS   =                    0 / number of data axes
@@ -1218,8 +963,8 @@ COMMENT   Astrophysics Supplement Series v44/p363, v44/p371, v73/p359, v73/p365.
 COMMENT   Contact the NASA Science Office of Standards and Technology for the
 COMMENT   FITS Definition document #100 and other FITS information.
 END
-\end{verbatim}
-
+\end{terminalv}
+\end{small}
 \begin{quote}
 \caption[A minimal FITS file header]{A minimal header for a FITS
 file.  The example is atypical in that it is for a FITS file which
@@ -1231,10 +976,10 @@ contains no data array
 
 A consequence of the header information always being ASCII characters
 and some always occurring at the start of the file is that it is possible
-to examine it with the Unix command {\tt more}.  The resulting display is
+to examine it with the Unix command \texttt{more}.  The resulting display is
 perfectly readable, though perhaps not very \ae sthetic.  This technique
 works best with a window which is eighty characters wide.  A disadvantage
-of using {\tt more} is that it is usually not practical to examine any
+of using \texttt{more} is that it is usually not practical to examine any
 header information which does not occur at the start of the file.  Most
 data reduction packages have more sophisticated means for examining FITS
 header information: see, for example, the recipe in Section~\ref{CONVERSION}
@@ -1249,7 +994,7 @@ years, the bias and pixel-to-pixel sensitivity variations found in raw
 CCD images are not small effects.  This section briefly illustrates the
 effects and shows the improvement which careful calibration can yield.
 The images used here were generated by Matthew~Trewhella using the WIRO CCD
-operating in the {\it K}\/ band in the near infrared.  The images are all of
+operating in the \textit{K}\/ band in the near infrared.  The images are all of
 \latex{128$\times$128}
 \html{128x128}
 pixels and were taken as part of a project to mosaic the M51 galaxy
@@ -1260,7 +1005,7 @@ all reduced, aligned and stacked using CCDPACK.
    \centering
    \includegraphics[totalheight=3.5in]{sc5_m51_raw}
    \begin{quote}
-   \caption{A raw WIRO {\it K}\/ band image of part of M51
+   \caption{A raw WIRO \textit{K}\/ band image of part of M51
    \label{M51_RAW} }
    \end{quote}
 \end{figure}
@@ -1303,7 +1048,7 @@ flats and biases were used to construct this mosaic.
    \centering
    \includegraphics[totalheight=4in]{sc5_m51_mosaic}
    \begin{quote}
-   \caption{The final WIRO {\it K}\/ band mosaic of M51 and NGC 5194
+   \caption{The final WIRO \textit{K}\/ band mosaic of M51 and NGC 5194
    \label{M51_MOSAIC} }
    \end{quote}
 \end{figure}
@@ -1314,8 +1059,7 @@ flats and biases were used to construct this mosaic.
 This section summarises the differences between reducing data acquired
 with arrays sensitive to infrared (IR) wavelengths and those acquired
 with conventional CCDs.  The purpose here is not to describe the principles
-of the construction and operation of infrared arrays; see McLean's {\it
-Electronic Imaging in Astronomy}\/\cite{MCLEAN97}, especially Chapters 8
+of the construction and operation of infrared arrays; see McLean's \textit{Electronic Imaging in Astronomy}\/\cite{MCLEAN97}, especially Chapters 8
 and 9 (pp195-263) for a thorough introduction to these topics.  Infrared
 cameras were introduced into astronomy in the mid to late 1980s.  The
 instruments are more technically demanding to construct than optical
@@ -1336,7 +1080,7 @@ at other observatories may differ somewhat.
 
   \item[Observing modes] In practice infrared arrays saturate very
    quickly.  Consequently they are read-out very frequently in order to
-   produce a stack of frames (or {\bf co-adds}) which are subsequently
+   produce a stack of frames (or \textbf{co-adds}) which are subsequently
    added.  You will not necessarily see the individual frames: they
    may be co-added before you receive them, either by bespoke circuitry
    in the instrument or by the instrument control software.
@@ -1347,7 +1091,7 @@ at other observatories may differ somewhat.
    dominant contribution from the sky background to be estimated and
    and subtracted.  This effect is usually achieved by oscillating some
    component of the optical system, often the telescope secondary mirror.
-   See {\it Electronic Imaging in Astronomy}\/\cite{MCLEAN97}, pp201-203
+   See \textit{Electronic Imaging in Astronomy}\/\cite{MCLEAN97}, pp201-203
    for further details.  Chopping and nodding were the usual modes of
    operation with earlier single-element photometers, but are less common
    with modern array detectors.
@@ -1372,16 +1116,16 @@ at other observatories may differ somewhat.
    blurred image of the telescope reflected off the dome because the
    telescope glows at these wavelengths.
 
-   In order to generate the flat field a series of {\bf jittered} frames
-   will be acquired.  Here {\bf jittering} means slightly shifting the
+   In order to generate the flat field a series of \textbf{jittered} frames
+   will be acquired.  Here \textbf{jittering} means slightly shifting the
    position of the telescope between exposures, typically by about ten
    seconds of arc\footnote{The jitter offset may be larger, depending on
    the array size and target characteristics.  For example, the UFTI
    instrument on UKIRT can have an offset of up to forty-five seconds of
    arc.}.  At least three frames are required.  The region of sky observed
    may be either offset from the target object and contain only field stars
-   (a {\bf sky flat}) or be centred on the object and have background sky
-   and field stars around the periphery of the frame (a {\bf self flat}).
+   (a \textbf{sky flat}) or be centred on the object and have background sky
+   and field stars around the periphery of the frame (a \textbf{self flat}).
    The dark current is subtracted from the individual frames, which are
    then combined by computing the median or clipped median for each
    corresponding pixel.  The median for some pixels may still be biased by
@@ -1447,15 +1191,15 @@ effects which do not scale, so it is better to ensure that the exposures
 are of the same duration.
 
 For some further details see
-\xref{Section 6.3, {\it IR data reduction}}{sun139}{IRreduction},
+\xref{Section 6.3, \textit{IR data reduction}}{sun139}{IRreduction},
 of \xref{SUN/139}{sun139}{}\/\cite{SUN139}.
 
 
 % - Part II ----------------------------------------------------------
 \cleardoublepage
-\markboth{\stardocname}{\stardocname}
+
 \part{The Recipes}
-\markboth{\stardocname}{\stardocname}
+
 \section{\xlabel{SUMEX}\label{SUMEX}Introduction}
 
 This part of the cookbook provides a set of simple recipes for reducing
@@ -1500,13 +1244,13 @@ of these recipes consists of a set of numbered steps which you can follow
 and example data are provided with the cookbook so that you can work through
 them yourself.  On Starlink systems these example data are kept in directory:
 
-\begin{quote}
-{\tt /star/examples/sc5/data}
-\end{quote}
+\begin{terminalv}
+/star/examples/sc5/data
+\end{terminalv}
 
-These data are {\it R}\/ band images of the spiral galaxy NGC 2336
+These data are \textit{R}\/ band images of the spiral galaxy NGC 2336
 obtained with the Jacobus Kapteyn Telescope (JKT) on La Palma.  They were
-obtained from the CD-ROM {\it Astronomical Images}\, by
+obtained from the CD-ROM \textit{Astronomical Images}\, by
 Jaffe\cite{JAFFE98}.  However, the same data are publicly available from
 the ING (Isaac Newton Group) data archive maintained at the
 \htmladdnormallink{Institute of Astronomy}{http://www.ast.cam.ac.uk/},
@@ -1514,16 +1258,15 @@ the ING (Isaac Newton Group) data archive maintained at the
 See URL:
 
 \begin{quote}
-\htmladdnormallink{ {\tt http://archive.ast.cam.ac.uk/}}
-{http://archive.ast.cam.ac.uk/}
+\url{http://archive.ast.cam.ac.uk/}
 \end{quote}
 
 For technical reasons there are some differences in the arrangement of the
 FITS headers in the archive and CD-ROM versions of the files but both
 contain identical astronomical information.
 
-The final two recipes, {\it Reading FITS Files from Tape}\/
-(Section~\ref{READING}) and {\it Handling Large Images}\/
+The final two recipes, \textit{Reading FITS Files from Tape}\/
+(Section~\ref{READING}) and \textit{Handling Large Images}\/
 (Section~\ref{LARGE}) are rather different.  They contain material
 which could not be presented conveniently as a set of numbered steps
 which you can follow, but rather are given as a set of hints and tips.
@@ -1536,12 +1279,12 @@ ESP (see \xref{SUN/190}{sun180}{}\/\cite{SUN180}).
 These items should all be available at all Starlink sites.  If you have
 any difficulty in accessing them then see your site manager in the first
 instance.  In all cases on-line hypertext versions of the manuals are
-available via the command {\tt showme}.  For example, to display the
+available via the command \texttt{showme}.  For example, to display the
 CCDPACK manual, SUN/139, you would simply type:
 
-\begin{quote}
-{\tt showme sun139}
-\end{quote}
+\begin{terminalv}
+% showme sun139
+\end{terminalv}
 
 IRAF examples equivalent to the recipes for displaying images
 (Section~\ref{DISPLAY}) and calculating statistics (Section~\ref{STATISTICS})
@@ -1562,32 +1305,32 @@ copy of the example data provided with the cookbook.  Proceed as follows.
 
 \begin{enumerate}
 
-  \item Create a new subdirectory, perhaps called {\tt sc5}, in some
+  \item Create a new subdirectory, perhaps called \texttt{sc5}, in some
    convenient location and make it your current directory:
 
-  \begin{quote}
-   {\tt mkdir sc5 \\
-   cd sc5}
-  \end{quote}
+\begin{terminalv}
+% mkdir sc5
+% cd sc5
+\end{terminalv}
 
   \item Copy the example data files into this subdirectory:
 
-  \begin{quote}
-   {\tt cp -r /star/examples/sc5/data .}
-  \end{quote}
+\begin{terminalv}
+% cp -r /star/examples/sc5/data .
+\end{terminalv}
 
    Note that the data files are kept in various subdirectories of
-   {\tt /star/examples/sc5/data} and a recursive copy (the `{\tt -r}'
+   \texttt{/star/examples/sc5/data} and a recursive copy (the `\texttt{-r}'
    option) is used to preserve this structure.  Each subdirectory contains
    a different type of file, as follows:
 
   \begin{description}
 
-    \item[{\tt bias~~~}] -- bias frames,
+    \item[\texttt{bias~~~}] -- bias frames,
 
-    \item[{\tt flats~~}] -- flat fields,
+    \item[\texttt{flats~~}] -- flat fields,
 
-    \item[{\tt targets}] -- images of target astronomical objects.
+    \item[\texttt{targets}] -- images of target astronomical objects.
 
   \end{description}
 
@@ -1597,25 +1340,27 @@ copy of the example data provided with the cookbook.  Proceed as follows.
 \end{enumerate}
 
 As an alternative to using the data supplied with the cookbook you could
-use data of your own.  Suitable data are available on the CD-ROM {\it
-Astronomical Images}\/\cite{JAFFE98} or from the
+use data of your own.  Suitable data are available on the CD-ROM \textit{Astronomical Images}\/\cite{JAFFE98} or from the
 \htmladdnormallink{ING data archive}{http://archive.ast.cam.ac.uk/}.
 However, if you substitute your own data you will need to ensure that you
 know the extent of any bias strips on the CCD frames and similar
-auxiliary information.  For data from {\it Astronomical Images}\/ these
-details are given in file {\tt descript.ccd} included on the CD-ROM.
+auxiliary information.  For data from \textit{Astronomical Images}\/ these
+details are given in file \texttt{descript.ccd} included on the CD-ROM.
 
 
 \newpage
 \section{\xlabel{CONVERSION}\label{CONVERSION}Importing Data}
 
-% Note that this section describes KAPPA FITSDIN rather than CONVERT
-% FITS2NDF because the latter aborts when presented with an ING nearly-FITS
-% file.  The underlying problem is with the ING file rather than FITS2NDF.
-% It may be possible to switch to using FITS2NDF when it has been enhanced
-% to handle ING nearly-FITS files.
-%
-% ACD, 11/5/99.
+\begin{quote}
+\emph{
+Note that this section describes KAPPA FITSDIN rather than CONVERT
+FITS2NDF because at the time of writing the latter aborts when presented with an ING nearly-FITS
+file.  The underlying problem is with the ING file rather than FITS2NDF.
+It may be possible to switch to using FITS2NDF when it has been enhanced
+to handle ING nearly-FITS files.
+}
+ACD, 11/5/99.
+\end{quote}
 
 The CCD images that you plan to reduce may be available as FITS files
 (see Section~\ref{FORMAT}) which are already resident on magnetic disk,
@@ -1635,29 +1380,30 @@ proceed as follows.
   \item First you must start the KAPPA package (see
    \xref{SUN/95}{sun95}{}\/\cite{SUN95}).  Simply type:
 
-  \begin{quote}
-   {\tt kappa}
-  \end{quote}
+\begin{terminalv}
+% kappa
+\end{terminalv}
 
   \item Move to the subdirectory containing the astronomical images:
 
-  \begin{quote}
-   {\tt cd targets}
-  \end{quote}
+\begin{terminalv}
+% cd targets
+\end{terminalv}
 
   \item You can list the header records in a FITS file using KAPPA
-   application \xref{{\tt fitshead}}{sun95}{FITSHEAD}.  Type:
+   application \xref{\texttt{fitshead}}{sun95}{FITSHEAD}.  Type:
 
-  \begin{quote}
-   {\tt fitshead ngc2336\_r\_1.fit}
-  \end{quote}
+\begin{terminalv}
+% fitshead ngc2336_r_1.fit
+\end{terminalv}
 
    The header records will be listed to the terminal.  This output should
    look similar to Figure~\ref{FITSKEYS}.
 
   \begin{figure}[htbp]
 
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 SIMPLE  =                    T
 BITPIX  =                   16
 NAXIS   =                    2
@@ -1684,56 +1430,55 @@ DEC     = '+80:16:26.0'                 /Declination of the source
         .
         .
         .
-\end{verbatim}
-
+\end{terminalv}
+\end{small}
   \begin{quote}
-  \caption{The first few FITS header records for file {\tt ngc2336\_r\_1.fit}
+  \caption{The first few FITS header records for file \texttt{ngc2336\_r\_1.fit}
   \label{FITSKEYS} }
   \end{quote}
 
   \end{figure}
 
   \item A FITS file can be converted to the NDF format using KAPPA
-   application \xref{{\tt fitsdin}}{sun95}{FITSDIN}.  Type:
+   application \xref{\texttt{fitsdin}}{sun95}{FITSDIN}.  Type:
 
-  \begin{quote}
-   {\tt fitsdin ngc2336\_r\_1.fit ngc2336\_r\_1 fmtcnv=yes}
-  \end{quote}
+\begin{terminalv}
+% fitsdin ngc2336_r_1.fit ngc2336_r_1 fmtcnv=yes
+\end{terminalv}
 
-   The option {\tt fmtcnv=yes} specifies that INTEGER data arrays in the
+   The option \texttt{fmtcnv=yes} specifies that INTEGER data arrays in the
    input files will be converted to REAL arrays in the output NDF files.
    The keywords in the FITS file will be listed to the terminal and NDF
-   file {\tt ngc2336\_r\_1.sdf} should be created in your current
+   file \texttt{ngc2336\_r\_1.sdf} should be created in your current
    directory.
 
-  \item You can examine the contents of this file using the {\tt hdstrace}
+  \item You can examine the contents of this file using the \texttt{hdstrace}
    utility.  Simply type:
 
-  \begin{quote}
-   {\tt hdstrace ngc2336\_r\_1}
-  \end{quote}
+\begin{terminalv}
+% hdstrace ngc2336_r_1
+\end{terminalv}
 
-   (note that the `{\tt .sdf}' file-type should be omitted).  {\tt
-   hdstrace} is fully documented in \xref{SUN/102}{sun102}{}\/\cite{SUN102}.
+   (note that the `\texttt{.sdf}' file-extension can be omitted).  \texttt{hdstrace} is fully documented in \xref{SUN/102}{sun102}{}\/\cite{SUN102}.
 
   \item Now convert the remaining files.  Type:
 
-  \begin{quote}
-   {\tt fitsdin ngc2336\_r\_2.fit ngc2336\_r\_2 fmtcnv=yes  \\
-   cd ../flats  \\
-   fitsdin files='*.fit' auto fmtcnv=yes  \\
-   cd ../bias   \\
-   fitsdin files='*.fit' auto fmtcnv=yes}
-  \end{quote}
+\begin{terminalv}
+% fitsdin ngc2336_r_2.fit ngc2336_r_2 fmtcnv=yes
+% cd ../flats
+% fitsdin files='*.fit' auto fmtcnv=yes
+% cd ../bias
+% fitsdin files='*.fit' auto fmtcnv=yes
+\end{terminalv}
 
-   Note the use of the asterisk (`{\tt *}') as a wild card: all the files
-   in the directory with names ending in `{\tt .fit}' are converted without
+   Note the use of the asterisk (`\texttt{*}') as a wild card: all the files
+   in the directory with names ending in `\texttt{.fit}' are converted without
    having to explicitly specify their file names.  The file specification
-   `{\tt *.fit}' is enclosed in quotes to ensure that the asterisk is
-   passed to {\tt fitsdin} rather than being trapped and interpreted by the
+   `\texttt{*.fit}' is enclosed in quotes to ensure that the asterisk is
+   passed to \texttt{fitsdin} rather than being trapped and interpreted by the
    Unix shell.  The use of Starlink applications from Unix shell scripts is
    discussed further in \xref{SC/4:
-   {\it C-shell Cookbook}\/}{sc4}{}\cite{SC4}.  The {\tt auto} option
+   \textit{C-shell Cookbook}\/}{sc4}{}\cite{SC4}.  The \texttt{auto} option
    specifies that the output file name is to be constructed automatically
    from the input file name.
 
@@ -1757,20 +1502,20 @@ recipe.  Proceed as follows.
 
 \begin{enumerate}
 
-  \item Move to subdirectory {\tt targets}.
+  \item Move to subdirectory \texttt{targets}.
 
   \item Start GAIA by typing:
 
-  \begin{quote}
-   {\tt gaia \&}
-  \end{quote}
+\begin{terminalv}
+% gaia &
+\end{terminalv}
 
-   The ampersand (`{\tt \&}') is, of course, simply to run GAIA as a
+   The ampersand (`\texttt{\&}') is, of course, simply to run GAIA as a
    detached process, so that you can continue to issue Unix commands
    from the command line.  The GAIA window should appear.  Load file
-   {\tt ngc2336\_r\_2.sdf} by clicking the {\sf File} menu (rightmost
+   \texttt{ngc2336\_r\_2.sdf} by clicking the \textsf{File} menu (rightmost
    of the options in the menu bar at the top of the window), selecting
-   {\sf Open\ldots} and using the file-picker which appears to choose
+   \textsf{Open\ldots} and using the file-picker which appears to choose
    the appropriate file.
 
   \item The file should open, but the main display window will probably
@@ -1780,15 +1525,14 @@ recipe.  Proceed as follows.
 
   \begin{enumerate}
 
-    \item click the {\sf Auto Cut:} button for {\sf 90\%} (in the bottom
+    \item click the \textsf{Auto Cut:} button for \textsf{90\%} (in the bottom
      right of the control panel in the centre top of the window),
 
-    \item click the {\sf View} menu (second left in the menu bar at the
-     top of the window), select {\sf Magnification} and set it to {\sf
-     1/2x},
+    \item click the \textsf{View} menu (second left in the menu bar at the
+     top of the window), select \textsf{Magnification} and set it to \textsf{1/2x},
 
-    \item click {\sf View} again, select {\sf Colors\ldots} (sic) and choose
-     the {\sf heat} colour table.
+    \item click \textsf{View} again, select \textsf{Colors\ldots} (sic) and choose
+     the \textsf{heat} colour table.
 
   \end{enumerate}
 
@@ -1799,7 +1543,7 @@ recipe.  Proceed as follows.
      \includegraphics[totalheight=6in]{sc5_gaia}
      \begin{quote}
      \caption[An unprocessed image of NGC 2336 displayed with GAIA]{An
-      unprocessed {\it R}\/ band image of NGC 2336 displayed with GAIA.
+      unprocessed \textit{R}\/ band image of NGC 2336 displayed with GAIA.
       The apparently asymmetric positioning of the image in the GAIA
       windows is caused by the bias strips along some of the edges of
       the CCD frame which appear black in this plot
@@ -1808,13 +1552,12 @@ recipe.  Proceed as follows.
   \end{figure}
 
   \item GAIA has many other functions and options and you may want to spend
-   a while exploring some of them.  On-line help is available from the {\sf
-   Help} menu at the extreme right of the menu bar at the top of the window.
+   a while exploring some of them.  On-line help is available from the \textsf{Help} menu at the extreme right of the menu bar at the top of the window.
    Similarly, you might also like to examine the other target image and
    the flat field and bias frames included in the example.
 
-  \item When you have finished close GAIA by clicking on the {\sf File}
-   menu and choosing the {\sf Exit} option.
+  \item When you have finished close GAIA by clicking on the \textsf{File}
+   menu and choosing the \textsf{Exit} option.
 
 \end{enumerate}
 
@@ -1834,70 +1577,72 @@ which provide this facility.  Proceed as follows.
    Section~\ref{CONVERSION}),    move to the subdirectory containing the
    target astronomical images and type:
 
-  \begin{quote}
-   {\tt stats ngc2336\_r\_2}
-  \end{quote}
+\begin{terminalv}
+% stats ngc2336_r_2
+\end{terminalv}
 
    The following information should be displayed:
 
-  \begin{verbatim}
-   Pixel statistics for the NDF structure /acdscratch/sc5/targets/ngc2336_r_2
+\begin{small}
+\begin{terminalv}
+Pixel statistics for the NDF structure /acdscratch/sc5/targets/ngc2336_r_2
 
-      Title                     : N2366 R
-      NDF array analysed        : DATA
+   Title                     : N2366 R
+   NDF array analysed        : DATA
 
-         Pixel sum              : 1.6012529E9
-         Pixel mean             : 1267.44
-         Standard deviation     : 279.5582
-         Minimum pixel value    : 166
-            At pixel            : (1, 547)
-            Co-ordinate         : (0.5, 546.5)
-         Maximum pixel value    : 50963
-            At pixel            : (1023, 146)
-            Co-ordinate         : (1022.5, 145.5)
-         Total number of pixels : 1263376
-         Number of pixels used  : 1263376 (100.0%)
-\end{verbatim}
+      Pixel sum              : 1.6012529E9
+      Pixel mean             : 1267.44
+      Standard deviation     : 279.5582
+      Minimum pixel value    : 166
+         At pixel            : (1, 547)
+         Co-ordinate         : (0.5, 546.5)
+      Maximum pixel value    : 50963
+         At pixel            : (1023, 146)
+         Co-ordinate         : (1022.5, 145.5)
+      Total number of pixels : 1263376
+      Number of pixels used  : 1263376 (100.0%)
+\end{terminalv}
+\end{small}
 
   \item The statistics can also be written to a log file.  Type:
 
-  \begin{quote}
-   {\tt stats ngc2336\_r\_2 logfile=ngc2336\_r\_2.log}
-  \end{quote}
+\begin{terminalv}
+% stats ngc2336_r_2 logfile=ngc2336_r_2.log
+\end{terminalv}
 
-   Text file {\tt ngc2336\_r\_2.log} will be created containing a copy
+   Text file \texttt{ngc2336\_r\_2.log} will be created containing a copy
    of the output.
 
-  \item {\tt stats} has a `$\kappa$-sigma clipping' option which allows
+  \item \texttt{stats} has a `$\kappa$-sigma clipping' option which allows
    outlying values, such as star images, to be rejected when computing
-   the statistics.  If a clipping level is given, {\tt stats} will
+   the statistics.  If a clipping level is given, \texttt{stats} will
    compute statistics using all the available pixels, reject all those
    pixels whose values lie outside $\kappa$ standard deviations of the mean
    and then re-evaluate the statistics.  An array of up to five clipping
    levels may be given, which are applied sequentially.  For example,
    to reject values outside two standard deviations type:
 
-  \begin{quote}
-   {\tt stats ngc2336\_r\_2 clip=2}
-  \end{quote}
+\begin{terminalv}
+% stats ngc2336_r_2 clip=2
+\end{terminalv}
 
    The statistics will again be displayed, but this time the clipping
    will have been applied before they were computed.
 
-  \item Often the information generated by {\tt stats} will be adequate.
-   However, application {\tt histpeak}  in the ESP package (see
+  \item Often the information generated by \texttt{stats} will be adequate.
+   However, application \texttt{histpeak}  in the ESP package (see
    \xref{SUN/180}{sun180}{}\/\cite{SUN180}) gives further details.  To
    load ESP type:
 
-  \begin{quote}
-   {\tt esp}
-  \end{quote}
+\begin{terminalv}
+% esp
+\end{terminalv}
 
-   then type {\tt histpeak} and respond to the prompts:
+   then type \texttt{histpeak} and respond to the prompts:
 
-  \begin{quote}
-  \begin{verbatim}
-histpeak
+\begin{small}
+\begin{terminalv}
+% histpeak
 
 ESP HISTPEAK running.
 
@@ -1913,12 +1658,13 @@ USE - Use the whole image or an ARD file /'w'/ >
 SFACT - Smoothing width you wish to use /0/ >
 
 DEVICE - Display device code or name /@xwindows/ >
-\end{verbatim}
-  \end{quote}
+\end{terminalv}
+\end{small}
 
    Output similar to the following should be produced:
 
-  \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 HISTPEAK Results: /acdscratch/sc5/targets/ngc2336_r_2
 
 Pixels (used):            1263376     Pixels (bad):                0
@@ -1940,12 +1686,13 @@ Radius request:                 0     Radius actual:               0
 Contents of the most occupied histogram bin:
 Unsmoothed:             21104.000     Smoothed:            21104.000
 Interpolated:           12126.075
-\end{verbatim}
+\end{terminalv}
+\end{small}
 
    and a plot similar to Figure~\ref{HISTPEAK} should appear.  For the
    purpose of determining the sky background level it is probably best
-   to use either {\tt histpeak} or {\tt stats} with the clipping option.
-   Also note that the {\tt histpeak} pre-amble contains the dimensions and
+   to use either \texttt{histpeak} or \texttt{stats} with the clipping option.
+   Also note that the \texttt{histpeak} pre-amble contains the dimensions and
    bounds of the image.
 
 \end{enumerate}
@@ -1954,7 +1701,7 @@ Interpolated:           12126.075
    \centering
    \includegraphics[totalheight=4in]{sc5_histpeak}
    \begin{quote}
-   \caption{Example of histogram produced by {\tt histpeak}
+   \caption{Example of histogram produced by \texttt{histpeak}
    \label{HISTPEAK} }
    \end{quote}
 \end{figure}
@@ -1965,32 +1712,32 @@ Interpolated:           12126.075
 Instrumental Effects}
 
 This recipe is a simple example of reducing CCD data.  It uses the
-{\tt xreduce} easy-to-use GUI (Graphical User Interface) to the CCDPACK
-package (see \xref{SUN/139}{sun139}{}\/\cite{SUN139}).  {\tt xreduce}
+\texttt{xreduce} easy-to-use GUI (Graphical User Interface) to the CCDPACK
+package (see \xref{SUN/139}{sun139}{}\/\cite{SUN139}).  \texttt{xreduce}
 makes the reduction of CCD observations very straightforward.  Using
-{\tt xreduce} you can follow various routes to reduce your data.  However,
+\texttt{xreduce} you can follow various routes to reduce your data.  However,
 most of them are fairly similar and involve the following steps:
 
 \begin{enumerate}
 
-  \item set up the package (probably using both the {\sf General Options}
-   and {\sf CCD Characteristics} windows; see Figure~\ref{XREDUCE}),
+  \item set up the package (probably using both the \textsf{General Options}
+   and \textsf{CCD Characteristics} windows; see Figure~\ref{XREDUCE}),
 
   \item identify the various frames, and types of frames, which are to
-   be processed (probably using one of the {\sf Manual Organization} or
-   {\sf Using FITS Headers} windows),
+   be processed (probably using one of the \textsf{Manual Organization} or
+   \textsf{Using FITS Headers} windows),
 
   \item specify how the data are to be de-biassed (which is done in the
-   {\sf Setup and Run} window; your choice will be restricted to options
+   \textsf{Setup and Run} window; your choice will be restricted to options
    which are valid for the given data).
 
 \end{enumerate}
 
 The recipe given here corresponds to one simple route through the data
 reduction.
-{\tt xreduce} is described further in \xref{SUN/139}{sun139}{}, especially
-Section~4, {\it How to reduce your data now}.  Some additional illustrated
-examples have appeared in the {\it Starlink Bulletin}\/\cite{DRAPER95}.
+\texttt{xreduce} is described further in \xref{SUN/139}{sun139}{}, especially
+Section~4, \textit{How to reduce your data now}.  Some additional illustrated
+examples have appeared in the \textit{Starlink Bulletin}\/\cite{DRAPER95}.
 
 If you have not already set up for working through the recipes then
 you should do so now.  The procedure is described in Section~\ref{START}.
@@ -2001,22 +1748,21 @@ Then proceed as follows.
   \item Move to the directory to which you have copied the example data.
    Then type:
 
-  \begin{quote}
-   {\tt ccdpack \\
-   xreduce ~ \&}
-  \end{quote}
+\begin{terminalv}
+% ccdpack
+% xreduce &
+\end{terminalv}
 
-   The first command starts CCDPACK, the second starts the {\tt xreduce}
-   GUI.  The ampersand (`{\tt \&}') runs {\tt xreduce} as a detached
+   The first command starts CCDPACK, the second starts the \texttt{xreduce}
+   GUI.  The ampersand (`\texttt{\&}') runs \texttt{xreduce} as a detached
    process, so that you can continue to issue Unix commands from the
    terminal window.
 
-   The main {\tt xreduce} window should appear, as shown in
+   The main \texttt{xreduce} window should appear, as shown in
    Figure~\ref{XREDUCE}.  Extensive on-line help information is available
-   from most of the {\tt xreduce} windows, to the extent that it is
-   virtually an `interactive cookbook' in itself.  Simply click on the {\sf
-   Help} menu in the top right of the window.  Several options are available:
-   for assistance on using the current window choose the {\sf On Window}
+   from most of the \texttt{xreduce} windows, to the extent that it is
+   virtually an `interactive cookbook' in itself.  Simply click on the \textsf{Help} menu in the top right of the window.  Several options are available:
+   for assistance on using the current window choose the \textsf{On Window}
    option.  The help information is presented as hypertext displayed with
    a Web browser (Netscape by default).
 
@@ -2024,35 +1770,33 @@ Then proceed as follows.
      \centering
       \includegraphics[totalheight=5in]{sc5_xreduce}
       \begin{quote}
-      \caption{Main window for the {\tt xreduce} GUI
+      \caption{Main window for the \texttt{xreduce} GUI
       \label{XREDUCE} }
       \end{quote}
   \end{figure}
 
-   The underlying purpose of {\tt xreduce} is to gather sufficient details
+   The underlying purpose of \texttt{xreduce} is to gather sufficient details
    of your data to define how they are to be reduced.  Basically it needs
    to know: which of the CCDPACK options you plan to use, a few details
    about your CCD frames (such as the extents of any bias strips) and the
    names and directory specifications of each of your various types of
    data frames (bias frames, flat fields, target frames \emph{etc}).  In
-   order to make specifying the details of the CCD frames easier {\tt
-   xreduce} has a list of commonly-used chips which you can choose from.
+   order to make specifying the details of the CCD frames easier \texttt{xreduce} has a list of commonly-used chips which you can choose from.
    If the instrument that you used is not included in this list then you
    can enter the requisite details manually.
 
-  \item Click on the {\sf Options} menu (rightmost of the two options in
+  \item Click on the \textsf{Options} menu (rightmost of the two options in
    the top left corner of the window: see Figure~\ref{XREDUCE}) and
-   choose the {\sf Set detector\ldots} option.  A window similar to
+   choose the \textsf{Set detector\ldots} option.  A window similar to
    Figure~\ref{SETDETECTOR} should appear.  This window lists the various
-   CCD detectors known to {\tt xreduce}.  Click on the entry {\tt
-   TEK4STANDARD.DAT} (as shown) which was the detector used to acquire the
+   CCD detectors known to \texttt{xreduce}.  Click on the entry \texttt{TEK4STANDARD.DAT} (as shown) which was the detector used to acquire the
    example data.
 
   \begin{figure}[htbp]
      \centering
       \includegraphics[totalheight=3in]{sc5_setdetector}
       \begin{quote}
-      \caption{CCD detectors known to {\tt xreduce}
+      \caption{CCD detectors known to \texttt{xreduce}
       \label{SETDETECTOR} }
       \end{quote}
   \end{figure}
@@ -2060,41 +1804,41 @@ Then proceed as follows.
    Figure~\ref{SETDETECTOR} shows the window as it is created by default.
    A useful trick is to expand it horizontally so that the file names and
    descriptions are more easily visible.  Some of the CCD descriptions
-   end in `{\tt (setup)}' and others in `{\tt (table)}'.  {\tt xreduce}
+   end in `\texttt{(setup)}' and others in `\texttt{(table)}'.  \texttt{xreduce}
    knows more about the former than the latter.  The option chosen here
-   ends in `{\tt (setup)}', so full details are available.
+   ends in `\texttt{(setup)}', so full details are available.
 
-   Once you have selected the detector click on the {\sf OK} button.
+   Once you have selected the detector click on the \textsf{OK} button.
 
   \item Next you need to set the configuration options.  Click on the
-   {\sf General Options} button in the main window.  For the example
-   data all the defaults are acceptable, so simply click on the {\sf OK}
+   \textsf{General Options} button in the main window.  For the example
+   data all the defaults are acceptable, so simply click on the \textsf{OK}
    button.
 
-   Now click on the {\sf CCD Characteristics} button in the main window.
-   Again the defaults are acceptable, so click on {\sf OK}.
+   Now click on the \textsf{CCD Characteristics} button in the main window.
+   Again the defaults are acceptable, so click on \textsf{OK}.
 
   \item You need to specify the types of files (bias frames, flat fields,
    target objects, \emph{etc}) present in your data and the name and
    directory specification of each file of each type.  You specify these
-   details using the buttons in the {\sf Data Import} section of the
+   details using the buttons in the \textsf{Data Import} section of the
    main window.
 
-   Click on the {\sf Manual Organization} button and a window similar to
+   Click on the \textsf{Manual Organization} button and a window similar to
    Figure~\ref{ORGANISENDFS} should appear.  The example data comprise
    only bias frames, flat fields and images of target objects, so click
-   the three corresponding buttons in the list of {\sf Frame types
+   the three corresponding buttons in the list of \textsf{Frame types
    present:} in the top half of the window.  Ensure that these three
    are the only data types for which the buttons are set.
 
    The defaults can be accepted for the other options in the lower half
-   of the window.  Simply click the {\sf OK} button.
+   of the window.  Simply click the \textsf{OK} button.
 
   \begin{figure}[htbp]
      \centering
       \includegraphics[totalheight=5in]{sc5_organisendfs}
       \begin{quote}
-      \caption{{\tt xreduce} window to specify the types of file present
+      \caption{\texttt{xreduce} window to specify the types of file present
       \label{ORGANISENDFS} }
       \end{quote}
   \end{figure}
@@ -2106,59 +1850,58 @@ Then proceed as follows.
 
   \begin{enumerate}
 
-    \item Click the {\sf TARGET} button in the row towards the top left
+    \item Click the \textsf{TARGET} button in the row towards the top left
      of the window.
 
-    \item In the {\sf Directories:} box (on the left side of the window)
-     double-click on the {\tt targets} subdirectory.  This directory
+    \item In the \textsf{Directories:} box (on the left side of the window)
+     double-click on the \texttt{targets} subdirectory.  This directory
      should become the current directory and the two target frames should
-     appear in the {\sf Files in directory:} box.
+     appear in the \textsf{Files in directory:} box.
 
-    \item Click on the {\sf Add all} button and the files should appear
-     in the {\sf Files selected:} box (on the right side of the window).
+    \item Click on the \textsf{Add all} button and the files should appear
+     in the \textsf{Files selected:} box (on the right side of the window).
 
   \end{enumerate}
 
    Repeat the procedure for the flat field and bias frames by clicking
-   on the {\sf FLAT} and {\sf BIAS} buttons (in the row towards the top
+   on the \textsf{FLAT} and \textsf{BIAS} buttons (in the row towards the top
    left of the window) respectively and proceeding as before.  The flat
-   fields are in subdirectory {\tt flats} and the bias frames in {\tt
-   bias}.
+   fields are in subdirectory \texttt{flats} and the bias frames in \texttt{bias}.
 
   \begin{figure}[htbp]
      \centering
       \includegraphics[totalheight=3in]{sc5_organisendftypes}
       \begin{quote}
-      \caption{{\tt xreduce} window to specify the files to be reduced
+      \caption{\texttt{xreduce} window to specify the files to be reduced
       \label{ORGANISENDFTYPES} }
       \end{quote}
   \end{figure}
 
    Once you have specified the files for the three types of frame click
-   the {\sf OK} button.  A window should appear briefly showing the message:
+   the \textsf{OK} button.  A window should appear briefly showing the message:
 
   \begin{quote}
-   {\sf Setting data descriptions, please wait}
+   \textsf{Setting data descriptions, please wait}
   \end{quote}
 
-   and you will be returned to the {\tt xreduce} main window.
+   and you will be returned to the \texttt{xreduce} main window.
 
-  \item Now click the {\sf Setup and Run} button.  A window should appear
+  \item Now click the \textsf{Setup and Run} button.  A window should appear
    briefly showing the message:
 
   \begin{quote}
-   {\sf checking possible debiassing methods please wait}
+   \textsf{checking possible debiassing methods please wait}
   \end{quote}
 
    and then be replaced by a window similar to Figure~\ref{PERFORMREDUCTION}.
    For the example data all the defaults can be accepted, so just click the
-   {\sf OK} button.
+   \textsf{OK} button.
 
   \begin{figure}[htbp]
      \centering
       \includegraphics[totalheight=3in]{sc5_performreduction}
       \begin{quote}
-      \caption{{\tt xreduce} window to specify the reduction options
+      \caption{\texttt{xreduce} window to specify the reduction options
       \label{PERFORMREDUCTION} }
       \end{quote}
   \end{figure}
@@ -2166,60 +1909,59 @@ Then proceed as follows.
   \item A window showing the message:
 
   \begin{quote}
-   {\sf performing reduction scheduling please wait}
+   \textsf{performing reduction scheduling please wait}
   \end{quote}
 
    should appear briefly and be replaced by one saying:
 
   \begin{quote}
-   {\sf Reduction started.  The output will be logged in file
+   \textsf{Reduction started.  The output will be logged in file
    "xreduce.log".}
   \end{quote}
 
-   Click on the {\sf OK} button.
+   Click on the \textsf{OK} button.
 
   \item A further window showing the progress of the reductions appears.
    From this point the reductions proceed autonomously.  You can
    either watch their progress by leaving the window running or close it
-   by clicking the {\sf Exit} button.  You will be asked for confirmation
-   and then be returned to the main window.  Click on the {\sf Exit} button
-   (at the bottom of the window, towards the left) to close down {\tt
-   xreduce}: again you will be asked for confirmation.
+   by clicking the \textsf{Exit} button.  You will be asked for confirmation
+   and then be returned to the main window.  Click on the \textsf{Exit} button
+   (at the bottom of the window, towards the left) to close down \texttt{xreduce}: again you will be asked for confirmation.
 
   \item Various files have been created during the reduction process.
    The new files in the top level data directory are:
 
   \begin{center}
   \begin{tabular}{ll}
-   {\tt CCDPACK.LOG}          & CCDPACK log file \\
-   {\tt MASTER\_BIAS.sdf}     & master bias frame \\
-   {\tt MASTER\_FLATNONE.sdf} & master flat field frame \\
-   {\tt xreduce.csh}          & {\tt xreduce} reduction script \\
-   {\tt xreduce.log}          & {\tt xreduce} log file \\
+   \texttt{CCDPACK.LOG}          & CCDPACK log file \\
+   \texttt{MASTER\_BIAS.sdf}     & master bias frame \\
+   \texttt{MASTER\_FLATNONE.sdf} & master flat field frame \\
+   \texttt{xreduce.csh}          & \texttt{xreduce} reduction script \\
+   \texttt{xreduce.log}          & \texttt{xreduce} log file \\
   \end{tabular}
   \end{center}
 
-   Some files have also been created in the {\tt targets} subdirectory:
+   Some files have also been created in the \texttt{targets} subdirectory:
 
-  \begin{quote}
-   {\tt ngc2336\_r\_1\_db.sdf \\
-   ngc2336\_r\_2\_db.sdf}
-  \end{quote}
+\begin{terminalv}
+ngc2336_r_1_db.sdf
+ngc2336_r_2_db.sdf
+\end{terminalv}
 
    are the de-biassed target images and:
 
-  \begin{quote}
-   {\tt ngc2336\_r\_1\_db\_fl.sdf \\
-   ngc2336\_r\_2\_db\_fl.sdf}
-  \end{quote}
+\begin{terminalv}
+ngc2336_r_1_db_fl.sdf
+ngc2336_r_2_db_fl.sdf
+\end{terminalv}
 
    are the de-biassed, flat fielded images: the final product of the
    data reduction.  They can be examined, for example, with GAIA.  Type:
-  \begin{quote}
-   {\tt gaia ~ targets/ngc2336\_r\_2\_db\_fl.sdf ~ \&}
-  \end{quote}
+\begin{terminalv}
+% gaia  targets/ngc2336_r_2_db_fl.sdf &
+\end{terminalv}
 
-   After setting the {\sf Auto Cut} level, {\sf Magnification} and colour
+   After setting the \textsf{Auto Cut} level, \textsf{Magnification} and colour
    table (see the recipe in Section~\ref{DISPLAY}) the image should look
    something like Figure~\ref{GAIAREDUCE}.
 
@@ -2239,11 +1981,11 @@ Then proceed as follows.
    prior to trying the next recipe.  Return to the top level data
    directory and type:
 
-  \begin{quote}
-   {\tt delete\_xreduce\_files.csh}
-  \end{quote}
+\begin{terminalv}
+% delete_xreduce_files.csh
+\end{terminalv}
 
-   Note that script {\tt xreduce.csh} is not deleted because it is
+   Note that script \texttt{xreduce.csh} is not deleted because it is
    interesting to compare it with the commands issued in the following
    recipe.
 
@@ -2271,35 +2013,34 @@ Figure~\ref{ROUTES} shows typical data reduction routes for CCDPACK.
 \end{figure}
 
 Using CCDPACK from the command line is less intuitive than using the
-{\tt xreduce} GUI introduced in the previous recipe (see
+\texttt{xreduce} GUI introduced in the previous recipe (see
 Section~\ref{SIMPLE_SOLUTION}).  However, it is more flexible and,
 perhaps, gives greater insight into the data reduction process.  If you
-have worked through the previous recipe {\tt xreduce} will have produced
-the Unix shell-script {\tt xreduce.csh} which actually performed the
+have worked through the previous recipe \texttt{xreduce} will have produced
+the Unix shell-script \texttt{xreduce.csh} which actually performed the
 reductions.  This file contains a sequence of CCDPACK commands.  You
 might find it interesting to print out a copy and `compare and contrast'
 it with the commands issued interactively in the current recipe.
 
 If you have not already set up for working through the recipes then
 you should do so now.  The procedure is described in Section~\ref{START}.
-If you have tried the previous recipe using {\tt xreduce}
+If you have tried the previous recipe using \texttt{xreduce}
 (Section~\ref{SIMPLE_SOLUTION}) then you should ensure that the
-intermediate and reduced files are deleted by running script {\tt
-delete\_xreduce\_files.csh}.  Then proceed as follows.
+intermediate and reduced files are deleted by running script \texttt{delete\_xreduce\_files.csh}.  Then proceed as follows.
 
 \begin{enumerate}
 
   \item Move to the directory to which you have copied the example data.
    If you have not already started CCDPACK then type:
 
-  \begin{quote}
-   {\tt ccdpack}
-  \end{quote}
+\begin{terminalv}
+% ccdpack
+\end{terminalv}
 
-   to start it .  Various on-line help is available.  Typing {\tt ccdwww} or
-   {\tt showme~sun139} will cause a hypertext version of
+   to start it .  Various on-line help is available.  Typing \texttt{ccdwww} or
+   \texttt{showme~sun139} will cause a hypertext version of
    \xref{SUN/139}{sun139}{} to be displayed using a Web browser (Netscape
-   by default).  Typing {\tt ccdhelp}  invokes an hierarchical help
+   by default).  Typing \texttt{ccdhelp}  invokes an hierarchical help
    system in the Unix command window.
 
   \item The first step in using CCDPACK is to enter the details of the
@@ -2308,51 +2049,50 @@ delete\_xreduce\_files.csh}.  Then proceed as follows.
    extent of the image region on the CCD chip), the ADC factor \emph{etc}.
    Type:
 
-  \begin{quote}
-   {\tt ccdsetup adc=0.75 saturation=61440 rnoise=6.1 bounds='[11,40]' \\
-    \hspace*{3mm} extent='[51,1074,1,1024]' accept}
-  \end{quote}
+\begin{terminalv}
+% ccdsetup adc=0.75 saturation=61440 rnoise=6.1 bounds='[11,40]' \
+    extent='[51,1074,1,1024]' accept
+\end{terminalv}
 
    Here the ADC factor is being set to 0.75, columns 11 to 40 are being
    used as a bias strip and the image proper comprises columns 51 to
-   1074 and rows 1 top 1024.  Note how the ranges for the {\tt bounds}
-   and {\tt extent} are specified inside single quotation marks in
-   order to prevent the square brackets (`{\tt [}' and `{\tt ]}')
+   1074 and rows 1 top 1024.  Note how the ranges for the \texttt{bounds}
+   and \texttt{extent} are specified inside single quotation marks in
+   order to prevent the square brackets (`\texttt{[}' and `\texttt{]}')
    used to define the ranges from being interpreted by the Unix shell.
    The use of such `special characters' is described in \xref{SC/4:
-   {\it C-shell Cookbook}\/}{sc4}{}\cite{SC4}.  The {\tt accept} option
-   causes {\tt ccdsetup} to accept default values rather than issue
+   \textit{C-shell Cookbook}\/}{sc4}{}\cite{SC4}.  The \texttt{accept} option
+   causes \texttt{ccdsetup} to accept default values rather than issue
    additional prompts.
 
   \item The next step is to make a single, `master' bias frame from the
    various individual bias frames that are available.  Type:
 
-  \begin{quote}
-   {\tt makebias in='bias/*' out=master\_bias zero=true accept}
-  \end{quote}
+\begin{terminalv}
+% makebias in='bias/*' out=master_bias zero=true accept
+\end{terminalv}
 
    The points to note here are:
 
   \begin{itemize}
 
-    \item the input files are specified as {\tt 'bias/*'}.  Here the
-     asterisk (`{\tt *}') is being used as a `wild card' and all the
-     files in subdirectory {\tt bias} will be read.  Again note the
+    \item the input files are specified as \texttt{'bias/*'}.  Here the
+     asterisk (`\texttt{*}') is being used as a `wild card' and all the
+     files in subdirectory \texttt{bias} will be read.  Again note the
      use of single quotes to prevent `special characters' from being
      interpreted by the Unix shell,
 
-    \item the master bias frame will be written to file {\tt
-     master\_bias.sdf} in the current directory,
+    \item the master bias frame will be written to file \texttt{master\_bias.sdf} in the current directory,
 
-    \item the option {\tt zero=true} specifies that the mean values of
+    \item the option \texttt{zero=true} specifies that the mean values of
      the pixels in the input images are to be adjusted to zero prior
      to combining them.  This option is the preferred method and normal
      default.  However, it can only be used if the CCD chip has bias
-     strips which were specified using {\tt ccdsetup}.  If your data
-     do not have bias strips you will need to set {\tt zero=false}.
+     strips which were specified using \texttt{ccdsetup}.  If your data
+     do not have bias strips you will need to set \texttt{zero=false}.
      See \xref{SUN/139}{sun139}{} for further details,
 
-    \item again the {\tt accept} option is used to suppress additional
+    \item again the \texttt{accept} option is used to suppress additional
      prompts.
 
   \end{itemize}
@@ -2361,45 +2101,44 @@ delete\_xreduce\_files.csh}.  Then proceed as follows.
    to your flat field and target image frames.  First consider the
    flat field frames.  Type:
 
-  \begin{quote}
-   {\tt debias in='flats/sky*' out='*\_deb' bias=master\_bias accept}
-  \end{quote}
+\begin{terminalv}
+% debias in='flats/sky*' out='*_deb' bias=master_bias accept
+\end{terminalv}
 
    Some points to note here are:
 
   \begin{itemize}
 
     \item the asterisk is again being used as a `wild card'.  The input
-     flat fields will be all the files in subdirectory {\tt flats} with
-     file names beginning in `{\tt sky}',
+     flat fields will be all the files in subdirectory \texttt{flats} with
+     file names beginning in `\texttt{sky}',
 
     \item output de-biassed flat fields will be created in the same
      subdirectory as the input ones and with the same basic file name,
-     but with `{\tt \_deb}' appended.  That is, the following files will
+     but with `\texttt{\_deb}' appended.  That is, the following files will
      be created:
 
-    \begin{quote}
-     {\tt flats/sky\_r\_6\_deb.sdf \\
-     flats/sky\_r\_7\_deb.sdf}
-    \end{quote}
+\begin{terminalv}
+flats/sky_r_6_deb.sdf
+flats/sky_r_7_deb.sdf
+\end{terminalv}
 
   \end{itemize}
 
    Now repeat the procedure to de-bias the target images:
 
-  \begin{quote}
-   {\tt debias in='targets/ngc2336*' out='*\_deb' bias=master\_bias
-   accept}
-  \end{quote}
+\begin{terminalv}
+% debias in='targets/ngc2336*' out='*_deb' bias=master_bias accept
+\end{terminalv}
 
    If you have a non-zeroed master bias frame or you are using only bias
    strips rather than bias frames then you need to specify different
-   options for {\tt debias}.  Section~\ref{ADDOPT} introduces some of the
+   options for \texttt{debias}.  Section~\ref{ADDOPT} introduces some of the
    alternatives.
 
   \item The next step is to combine the individual de-biassed flat fields
    to create a single `master' flat field.  CCDPACK provides application
-   {\tt makeflat} for this purpose.  The algorithm used by {\tt makeflat}
+   \texttt{makeflat} for this purpose.  The algorithm used by \texttt{makeflat}
    ensures that the master flat field it creates contains the minimum
    possible contribution from spurious sources, such as stars still faintly
    visible in twilight flats, by comparing each flat field with a smoothed
@@ -2408,44 +2147,43 @@ delete\_xreduce\_files.csh}.  Then proceed as follows.
    that flat field frames of different exposures are combined using an
    appropriate weight when the `median stacking' option is used.
 
-   To invoke {\tt makeflat} simply type:
+   To invoke \texttt{makeflat} simply type:
 
-  \begin{quote}
-   {\tt makeflat in='flats/*\_deb' out=master\_flat accept}
-  \end{quote}
+\begin{terminalv}
+% makeflat in='flats/*_deb' out=master_flat accept
+\end{terminalv}
 
-   Here the de-biassed flat fields in subdirectory {\tt flats} are being
+   Here the de-biassed flat fields in subdirectory \texttt{flats} are being
    used as input and the master flat field created will be saved as
-   file {\tt master\_flat.sdf} in the current directory.
+   file \texttt{master\_flat.sdf} in the current directory.
 
   \item The final stage is to use the master flat field to make a flat
    field correction to the target images.  Type:
 
-  \begin{quote}
-   {\tt flatcor~in='targets/ngc2336*\_deb'~out='*\_flt'~flat=master\_flat
-   accept}
-  \end{quote}
+\begin{terminalv}
+% flatcor in='targets/ngc2336*_deb' out='*_flt' flat=master_flat accept
+\end{terminalv}
 
    The input files are the two de-biassed target images in subdirectory
-   {\tt targets}.  The flat fielded images will be created in the same
-   directory and with the same basic file names but with `{\tt \_flt}'
+   \texttt{targets}.  The flat fielded images will be created in the same
+   directory and with the same basic file names but with `\texttt{\_flt}'
    appended.  That is, the following two files will be created:
 
-  \begin{quote}
-   {\tt targets/ngc2336\_r\_1\_deb\_flt.sdf \\
-   targets/ngc2336\_r\_2\_deb\_flt.sdf}
-  \end{quote}
+\begin{terminalv}
+targets/ngc2336_r_1_deb_flt.sdf
+targets/ngc2336_r_2_deb_flt.sdf
+\end{terminalv}
 
    These images should be a true representation of the brightness
    distribution in the region of sky observed (subject to the constraints
    of atmospheric seeing and instrumental resolution, of course).  The
    images can, for example, be displayed with GAIA.  Type:
 
-  \begin{quote}
-   {\tt gaia targets/ngc2336\_r\_2\_deb\_flt.sdf \&}
-  \end{quote}
+\begin{terminalv}
+% gaia targets/ngc2336_r_2_deb_flt.sdf &
+\end{terminalv}
 
-   After setting the {\sf Auto Cut} level, {\sf Magnification} and colour
+   After setting the \textsf{Auto Cut} level, \textsf{Magnification} and colour
    table (see the recipe in Section~\ref{DISPLAY}) the reduced image should
    appear similar to the ones in the previous recipe (see
    Figure~\ref{GAIAREDUCE}).
@@ -2453,9 +2191,9 @@ delete\_xreduce\_files.csh}.  Then proceed as follows.
   \item You can delete the intermediate files at this point if you wish.
    Return to the top level data directory and type:
 
-  \begin{quote}
-   {\tt delete\_clfiles.csh}
-  \end{quote}
+\begin{terminalv}
+% delete_clfiles.csh
+\end{terminalv}
 
    Note that the two reduced images are not deleted because they are used
    in the next recipe.
@@ -2481,33 +2219,32 @@ The observatory where your data were acquired may provide an ARD file for
 the instrument that you used.  However, if one is not available it is
 straightforward to create one.  There are several ways of doing so.
 Perhaps the simplest is to plot the image with GAIA.  The defective region
-can then be specified with the {\sf Image regions\ldots} option and saved
+can then be specified with the \textsf{Image regions\ldots} option and saved
 as an ARD file.  Another method is to plot the image using application
-\xref{{\tt display}}{sun95}{DISPLAY} in KAPPA and then use
-\xref{{\tt ardgen}}{sun95}{ARDGEN} to identify the bad regions.
-\xref{Section~14.1.1, {\it Doing it the ARD Way}}{sun95}{se_ardwork}, of
+\xref{\texttt{display}}{sun95}{DISPLAY} in KAPPA and then use
+\xref{\texttt{ardgen}}{sun95}{ARDGEN} to identify the bad regions.
+\xref{Section~14.1.1, \textit{Doing it the ARD Way}}{sun95}{se_ardwork}, of
 \xref{SUN/95}{sun95}{} gives an example of the procedure.  Alternatively,
 ARD files can be created with a simple text editor.
 
-Once you have created an ARD file you specify it as a mask for {\tt
-ccdsetup}.  In this context a {\bf mask} is simply a set of defective
+Once you have created an ARD file you specify it as a mask for \texttt{ccdsetup}.  In this context a \textbf{mask} is simply a set of defective
 pixels in the image.  For example:
 
-\begin{quote}
-{\tt ccdsetup~adc=1.5 bounds='[2,10,400,416]'~extent='[11,399,1,576]' \\
- \hspace*{3mm} mask=badpix.ard}
-\end{quote}
+\begin{terminalv}
+% ccdsetup adc=1.5 bounds='[2,10,400,416]' extent='[11,399,1,576]' \
+    mask=badpix.ard
+\end{terminalv}
 
-where {\tt badpix.ard} is the ARD file.  Once you have specified the
-ARD file to {\tt ccdsetup} all subsequent stages in the data reduction
+where \texttt{badpix.ard} is the ARD file.  Once you have specified the
+ARD file to \texttt{ccdsetup} all subsequent stages in the data reduction
 will automatically ignore all the image regions identified as containing
 bad pixels.  This approach can save you a lot of time later.
 
 For infrared images a different approach is common; use application
-\xref{{\tt thresh}}{sun95}{THRESH} in KAPPA to directly identify
+\xref{\texttt{thresh}}{sun95}{THRESH} in KAPPA to directly identify
 pixels with aberrant values and mark them as `bad', without the
 intermediate stage of an ARD file.  KAPPA applications
-\xref{{\tt stats}}{sun95}{STATS} or \xref{{\tt histat}}{sun95}{HISTAT}
+\xref{\texttt{stats}}{sun95}{STATS} or \xref{\texttt{histat}}{sun95}{HISTAT}
 can be used to find suitable thresholds.
 
 \subsubsection{De-biassing options}
@@ -2517,38 +2254,38 @@ bias frame.  Various other options are available.
 
 \begin{description}
 
-  \item[Non-zeroed MAKEBIAS frame] To subtract a non-zeroed {\tt
-   master\_bias} frame type:
+  \item[Non-zeroed MAKEBIAS frame] To subtract a non-zeroed \texttt{master\_bias} frame type:
 
-  \begin{quote}
-   {\tt debias~in='targets/ngc2336*'~out='*\_deb'~bias=master\_bias
-   offset=false}
-  \end{quote}
+\begin{small}
+\begin{terminalv}
+% debias in='targets/ngc2336*' out='*_deb' bias=master_bias offset=false
+\end{terminalv}
+\end{small}
 
-   As before, file {\tt master\_bias.sdf} in the current directory is
-   subtracted from all the files with names beginning in `{\tt ngc2336}'
-   in subdirectory {\tt targets}.  The option {\tt offset=false}
+   As before, file \texttt{master\_bias.sdf} in the current directory is
+   subtracted from all the files with names beginning in `\texttt{ngc2336}'
+   in subdirectory \texttt{targets}.  The option \texttt{offset=false}
    specifies that the master bias frame has not been zeroed.
 
   \item[No bias frames available] If you do not have bias frames, but do
    have images with bias strips, it is still possible for CCDPACK to
-   approximately de-bias the images.  In this case, {\tt debias} will
+   approximately de-bias the images.  In this case, \texttt{debias} will
    estimate values of the bias for each pixel of the image on the basis of
    information taken from the bias strips. For many purposes this approach
-   will work very well.  The options for {\tt debias} are slightly
+   will work very well.  The options for \texttt{debias} are slightly
    different because no master bias frame is specified:
 
-  \begin{quote}
-   {\tt debias in='targets/ngc2336*' out='*\_deb'}
-  \end{quote}
+\begin{terminalv}
+% debias in='targets/ngc2336*' out='*_deb'
+\end{terminalv}
 
-  \item[More about {\tt debias}] In most cases {\tt debias} will change
+  \item[More about \texttt{debias}] In most cases \texttt{debias} will change
    the size of the images because it removes the bias strips (compare
    Figures~\ref{GAIA} and \ref{GAIAREDUCE}).  Once the frames have
    been de-biassed they serve no further purpose and merely increase
    the size of the files.
 
-   {\tt debias} has a number of additional features which are beyond the
+   \texttt{debias} has a number of additional features which are beyond the
    scope of this cookbook, including:
 
   \begin{itemize}
@@ -2565,45 +2302,44 @@ bias frame.  Various other options are available.
 
 \end{description}
 
-\subsubsection{Dark current subtraction; {\tt makecal} and {\tt calcor}}
+\subsubsection{Dark current subtraction; \texttt{makecal} and \texttt{calcor}}
 
 Though the correction for dark current is usually insignificant, there
 can be circumstances where it is not and it is necessary to correct for
 it (see Section~\ref{EASY}).  In particular, it is often significant
 for arrays operating at infrared wavelengths.  The correction is usually
-made using {\bf dark frames}: images taken with the shutter closed but of
+made using \textbf{dark frames}: images taken with the shutter closed but of
 the same length as your normal exposures.  These frames are used to create
 a master calibration frame.
 
-{\tt makecal} can be used to combine a number of calibration frames
-(assumed to be stored in subdirectory `{\tt darks}'):
+\texttt{makecal} can be used to combine a number of calibration frames
+(assumed to be stored in subdirectory `\texttt{darks}'):
 
-\begin{quote}
-{\tt makecal in='darks/*' expose=1 out=master\_dark}
-\end{quote}
+\begin{terminalv}
+makecal in='darks/*' expose=1 out=master_dark
+\end{terminalv}
 
 Correcting the data for the dark current is performed by the application
-{\tt calcor}, which subtracts a scaled calibration frame from a list of
+\texttt{calcor}, which subtracts a scaled calibration frame from a list of
 target frames:
 
-\begin{quote}
-{\tt calcor in='targets/ngc2336' out='*\_dark' cal=master\_dark
-expose=1}
-\end{quote}
+\begin{terminalv}
+% calcor in='targets/ngc2336' out='*_dark' cal=master_dark expose=1
+\end{terminalv}
 
 This command will generate a series of dark current subtracted files that
-have names ending in `{\tt \_dark}'.
+have names ending in `\texttt{\_dark}'.
 
 The correction is slightly more complicated if your calibration frames
 are not the same exposure length as your normal exposures: the
-\xref{{\it Flash or dark calibration}}{sun139}{flashordark}\/ section
+\xref{\textit{Flash or dark calibration}}{sun139}{flashordark}\/ section
 of \xref{SUN/139}{sun139}{}\/\cite{SUN139} gives the details.
 
 \subsubsection{Large-scale structure in dome flats}
 
 Dome flats which are not evenly illuminated may show large-scale structure
 which must be removed.  This correction can be made by modelling the
-structure using \xref{{\tt fitsurface}}{sun95}{FITSURFACE} in KAPPA
+structure using \xref{\texttt{fitsurface}}{sun95}{FITSURFACE} in KAPPA
 and then subtracting the resulting fitted surface from the flat field.
 
 
@@ -2628,7 +2364,7 @@ different it is possible to locate and remove the hits.
 
 In addition to combining images of the same patch of sky, a related
 technique is to combine images of partly overlapping regions of sky in
-order to build up a {\bf mosaic}\footnote{Note that the term `mosaic'
+order to build up a \textbf{mosaic}\footnote{Note that the term `mosaic'
 is used in two similar but different ways in connection with CCD
 instruments.  One usage is to denote images of a region of sky larger
 than the CCD camera's field of view which have been constructed by
@@ -2651,8 +2387,7 @@ That is, corresponding pixels in two images will not be viewing exactly
 the same area of sky.  Such misalignments are inevitable if images taken
 on different nights are being combined and will occur to some lesser
 extent even if consecutive images are being combined.  In other
-circumstances the frames may be deliberately offset slightly (or {\bf
-jittered}) in order to compensate for the CCD pixels under-sampling the
+circumstances the frames may be deliberately offset slightly (or \textbf{jittered}) in order to compensate for the CCD pixels under-sampling the
 image or to reduce the effect of flat field errors.  Before misaligned
 images can be combined they need to be lined-up.  Conceptually, they are
 aligned by using stars (and other objects) in the frames as fiducial marks.
@@ -2669,7 +2404,7 @@ have rather more noise associated with it than a part of the final image
 to which twenty input images contributed.  This effect is often
 particularly noticeable around the edges of mosaics or combined images.
 
-CCDPACK has various facilities for aligning (or {\bf registering}) and
+CCDPACK has various facilities for aligning (or \textbf{registering}) and
 combining images: they are illustrated in Figure~\ref{REGROUTES}.  Which
 route is appropriate depends basically on how badly the images are
 misaligned and how crowded the fields being imaged are (that is, how
@@ -2690,10 +2425,10 @@ In this recipe a simple $x,y$ transformation is applied to align the
 two reduced images produced in the previous recipe.  Consequently
 the following two files should be available:
 
-\begin{quote}
-{\tt ngc2336\_r\_1\_deb\_flt.sdf \\
-ngc2336\_r\_2\_deb\_flt.sdf}
-\end{quote}
+\begin{terminalv}
+ngc2336_r_1_deb_flt.sdf
+ngc2336_r_2_deb_flt.sdf
+\end{terminalv}
 
 Then proceed as follows.
 
@@ -2701,62 +2436,61 @@ Then proceed as follows.
 
   \item First find all the objects in each of the two images.  Type:
 
-  \begin{quote}
-   {\tt findobj in='targets/*\_flt' outlist='*.find' accept}
-  \end{quote}
+\begin{terminalv}
+% findobj in='targets/*_flt' outlist='*.find' accept
+\end{terminalv}
 
    The lists of objects found in each frame will be written to files
    in the same directory with names derived from the corresponding input
-   frame and file type `{\tt .find}'.  These files are simple text files
+   frame and file type `\texttt{.find}'.  These files are simple text files
    and, if you wish, you can examine them with Unix commands such as
-   {\tt more}.
+   \texttt{more}.
 
   \item The next steps are to identify corresponding objects in the two
    images, calculate the offset between the images and transform the
    input images so that they align.  Type:
 
-  \begin{quote}
-   {\tt findoff inlist='targets/*\_flt' outlist='*.off' error=3
-   accept  \\
-   register inlist='targets/*\_flt' fittype=1 \\
-   tranndf  in='targets/*\_flt' out='*\_reg'}
-  \end{quote}
+\begin{terminalv}
+% findoff inlist='targets/*_flt' outlist='*.off' error=3 accept
+% register inlist='targets/*_flt' fittype=1
+% tranndf  in='targets/*_flt' out='*_reg'
+\end{terminalv}
 
    Two transformed, registered images are created, called:
 
-  \begin{quote}
-   {\tt ngc2336\_r\_1\_deb\_flt\_reg.sdf \\
-   ngc2336\_r\_2\_deb\_flt\_reg.sdf}
-  \end{quote}
+\begin{terminalv}
+ngc2336_r_1_de\_flt_reg.sdf
+ngc2336_r_2_deb_flt_reg.sdf
+\end{terminalv}
 
    This sequence of steps should work correctly with the example data.
-   However, with other data {\tt findobj} or {\tt findoff} may sometimes
+   However, with other data \texttt{findobj} or \texttt{findoff} may sometimes
    fail because they find an insufficient number of stars which are common
    to the two datasets.  In this case the transformation must be defined
-   manually using {\tt pairndf}; see \xref{SUN/139}{sun139}{mosaicing}
+   manually using \texttt{pairndf}; see \xref{SUN/139}{sun139}{mosaicing}
    for further details.
 
   \item The final step is to combine these aligned images into a single
    master (or mosaic).  Type:
 
-  \begin{quote}
-   {\tt makemos in='targets/*\_reg' out=targets/mosaic scale zero}
-  \end{quote}
+\begin{terminalv}
+% makemos in='targets/*_reg' out=targets/mosaic scale zero
+\end{terminalv}
 
-   All the images in subdirectory {\tt targets} with names ending in
-   `{\tt \_reg}' are combined into a single image called {\tt mosaic.sdf}.
-   The {\tt scale} and {\tt zero} options ensure that {\tt makemos}
+   All the images in subdirectory \texttt{targets} with names ending in
+   `\texttt{\_reg}' are combined into a single image called \texttt{mosaic.sdf}.
+   The \texttt{scale} and \texttt{zero} options ensure that \texttt{makemos}
    correctly handles images of different exposure time, air mass and
    atmospheric transparency.  The application will run somewhat faster if
-   {\tt scale} and {\tt zero} are omitted, but if they are given it should
+   \texttt{scale} and \texttt{zero} are omitted, but if they are given it should
    produce sensible output from almost any input images.
 
-   For (UKIRT) infrared data the {\tt scale} option does not work well.
+   For (UKIRT) infrared data the \texttt{scale} option does not work well.
    As the frames being combined are usually nearly contemporaneous and have
-   the same integration time it is better to omit {\tt scale} and just use
-   the {\tt zero} option.
+   the same integration time it is better to omit \texttt{scale} and just use
+   the \texttt{zero} option.
 
-   By default {\tt makemos} combines images using a method known as `median
+   By default \texttt{makemos} combines images using a method known as `median
    stacking'.  This technique involves extracting all the input pixel
    values that contribute to an output image pixel and sorting them into
    rank order.  The median value is computed from this sorted list and
@@ -2768,9 +2502,9 @@ Then proceed as follows.
   \item The combined image can be displayed in the usual fashion with
    GAIA.  Type:
 
-  \begin{quote}
-   {\tt gaia targets/mosaic.sdf \&}
-  \end{quote}
+\begin{terminalv}
+% gaia targets/mosaic.sdf &
+\end{terminalv}
 
    Because it was created from just two input images the improvement in
    signal to noise over the individual images is modest.
@@ -2778,9 +2512,9 @@ Then proceed as follows.
   \item Finally, to delete the intermediate files created by the recipe
    move to the top level data directory and type:
 
-  \begin{quote}
-   {\tt delete\_combine\_files.csh}
-  \end{quote}
+\begin{terminalv}
+% delete_combine_files.csh
+\end{terminalv}
 
 \end{enumerate}
 
@@ -2802,7 +2536,7 @@ your site manager should be able to advise.  The next step is to physically
 load the tape into the drive; again see your site manager for details.
 
 The simplest way to read the files from tape is to use application
-\xref{{\tt fitsin}}{sun95}{FITSIN} in KAPPA.  It is fully documented in
+\xref{\texttt{fitsin}}{sun95}{FITSIN} in KAPPA.  It is fully documented in
 \xref{SUN/95}{sun95}{}\/\cite{SUN95}.  However, briefly, each FITS
 file is converted to a disk file in the Starlink NDF ($n$-dimensional
 Data Format; see \xref{SUN/33}{sun33}{}\cite{SUN33}) format.  The NDF
@@ -2811,33 +2545,33 @@ other Starlink applications.  The details are not particularly germane
 here, but all the auxiliary information in the original FITS keywords
 is preserved in the `FITS' extension to the NDF.
 
-You need to start KAPPA prior to running {\tt fitsin}.  Simply type:
+You need to start KAPPA prior to running \texttt{fitsin}.  Simply type:
 
-\begin{quote}
-{\tt kappa}
-\end{quote}
+\begin{terminalv}
+% kappa
+\end{terminalv}
 
 \begin{description}
 
-  \item[First example] One example of using {\tt fitsin} might be:
+  \item[First example] One example of using \texttt{fitsin} might be:
 
-  \begin{quote}
-   {\tt fitsin mt=/dev/rmt/1n file='[2-4,9]' auto prefix=ccd nofmtcnv}
-  \end{quote}
+\begin{terminalv}
+% fitsin mt=/dev/rmt/1n file='[2-4,9]' auto prefix=ccd nofmtcnv
+\end{terminalv}
 
    Some points to note here are:
 
   \begin{itemize}
 
-    \item files will be read from device {\tt /dev/rmt/1n},
+    \item files will be read from device \texttt{/dev/rmt/1n},
 
     \item only files 2, 3, 4, and 9 will be read (files occur sequentially
      on the tape, the first file is numbered 1, the second 2 \emph{etc}),
 
-    \item NDF files will be created called `{\tt ccd2.sdf}',
-     `{\tt ccd3.sdf}', `{\tt ccd4.sdf}' and `{\tt ccd9.sdf}',
+    \item NDF files will be created called `\texttt{ccd2.sdf}',
+     `\texttt{ccd3.sdf}', `\texttt{ccd4.sdf}' and `\texttt{ccd9.sdf}',
 
-    \item the {\tt nofmtcnv} option specifies that data type conversion
+    \item the \texttt{nofmtcnv} option specifies that data type conversion
      is not required: the NDF files will be created with the same data
      types (REAL, INTEGER or whatever) as the original FITS files.
 
@@ -2846,39 +2580,39 @@ You need to start KAPPA prior to running {\tt fitsin}.  Simply type:
   \item[Second example] Another example might be:
 
   \begin{quote}
-   {\tt fitsin mt=\$TAPE files='*' auto prefix=ccd fmtcnv logfile=jkt.log}
+   \texttt{fitsin mt=\$TAPE files='*' auto prefix=ccd fmtcnv logfile=jkt.log}
   \end{quote}
 
    Points to note here are:
 
   \begin{itemize}
 
-    \item prior to running the command, Unix shell variable {\tt TAPE}
+    \item prior to running the command, Unix shell variable \texttt{TAPE}
      should have been set to the name of the tape drive,
 
-    \item {\tt files='*'} indicates that all the files on the tape are
+    \item \texttt{files='*'} indicates that all the files on the tape are
      to be read: here the asterisk is being used a `wild-card',
 
-    \item the NDF files created will have the prefix `{\tt ccd}',
+    \item the NDF files created will have the prefix `\texttt{ccd}',
 
     \item a record of the headers and the names of the output files are
-     written to the text file {\tt jkt.log},
+     written to the text file \texttt{jkt.log},
 
-    \item the {\tt fmtcnv} option specifies that INTEGER data arrays
+    \item the \texttt{fmtcnv} option specifies that INTEGER data arrays
      in the input files will be converted to REAL arrays in the output
      NDF files.  Standard keywords in the FITS file can be used to supply
      a zero point and scale factor for this conversion.
 
-     Note that `{\tt nofmtcnv}' is equivalent to and inter-changeable with
-     `{\tt fmtcnv=false}' or `{\tt fmtcnv=no}' and similarly `{\tt fmtcnv}',
-     `{\tt fmtcnv=true}' and `{\tt fmtcnv=yes}' are equivalent.
+     Note that `\texttt{nofmtcnv}' is equivalent to and inter-changeable with
+     `\texttt{fmtcnv=false}' or `\texttt{fmtcnv=no}' and similarly `\texttt{fmtcnv}',
+     `\texttt{fmtcnv=true}' and `\texttt{fmtcnv=yes}' are equivalent.
 
   \end{itemize}
 
 \end{description}
 
 If you experience problems reading FITS tapes then Section 17.10,
-\xref{{\it I've Got This FITS Tape}}{sun95}{se_fitsunixtape},
+\xref{\textit{I've Got This FITS Tape}}{sun95}{se_fitsunixtape},
 of \xref{SUN/95}{sun95}{}\/\cite{SUN95} may contain some useful hints.
 
 
@@ -2916,7 +2650,7 @@ in most cases (at the time of writing) do;
 for cases in-between it depends very much on the details.
 
 The `size' of a data reduction problem is some ill-defined
-function of, {\it inter alia:}
+function of, \textit{inter alia:}
 
 \begin{itemize}
 
@@ -2942,7 +2676,7 @@ a data reduction process are as follows.
 
   \item[Memory:] a computer has a fixed amount of real memory (RAM;
    Random Access Memory),
-   and also a part of the disk called {\bf swap space}
+   and also a part of the disk called \textbf{swap space}
    which serves as an overflow if running processes need
    more memory than the available RAM.
    If there is insufficient real memory + swap space to run the
@@ -3041,14 +2775,13 @@ but the following are good common-sense rules of thumb.
    for large images.
    Scripts can be written to remove files as they go along,
    or appropriate options of the applications can be used
-   (for example, {\tt keepin=false} in CCDPACK's {\tt debias} and {\tt
-   flatcor}).
+   (for example, \texttt{keepin=false} in CCDPACK's \texttt{debias} and \texttt{flatcor}).
    When thinking about disk space requirements,
    remember that large temporary files can be created by
    some of the applications.
-   These files have names like {\tt t123.sdf} and are created in the
-   directory pointed to by the environment variable {\tt HDS\_SCRATCH},
-   or in the current directory if {\tt HDS\_SCRATCH} is not defined.
+   These files have names like \texttt{t123.sdf} and are created in the
+   directory pointed to by the environment variable \texttt{HDS\_SCRATCH},
+   or in the current directory if \texttt{HDS\_SCRATCH} is not defined.
 
   \item[Discuss with your system manager and/or other users:] if your job
    could have a serious effect on the system's performance it might be
@@ -3058,19 +2791,19 @@ but the following are good common-sense rules of thumb.
   \item[Run at off-peak times:] if you can run your job at a time when few
    or no other processes are running on the machine in question it will
    run faster and inconvenience other users less.
-   The Unix {\tt at} command can be used to start a job at a given time, or
+   The Unix \texttt{at} command can be used to start a job at a given time, or
    there may be other queuing software installed at your site.
 
-  \item[Be {\tt nice} to other processes:] on Unix the commands {\tt nice}
-   or {\tt renice} should be used when running CPU-intensive jobs on
+  \item[Be \texttt{nice} to other processes:] on Unix the commands \texttt{nice}
+   or \texttt{renice} should be used when running CPU-intensive jobs on
    multi-user machines.
    In the C shell typing:
 
-  \begin{quote}
-   {\tt nice +18 reduce\_script}
-  \end{quote}
+\begin{terminalv}
+% nice +18 reduce_script
+\end{terminalv}
 
-   would run the script {\tt reduce\_script} at a `niceness' of 18.
+   would run the script \texttt{reduce\_script} at a `niceness' of 18.
    This setting means that the job will be less aggressive in requesting
    CPU time, thus making it run slower, but causing less disruption to
    other processes (presumably ones with more moderate requirements).
@@ -3079,13 +2812,13 @@ but the following are good common-sense rules of thumb.
    Ask your system manager for more details; there may be locally
    recommended values for certain kinds of job.
    Note however that the only resource usage this affects is CPU time,
-   so that even a maximally {\tt nice}d job can cause major disruption.
+   so that even a maximally \texttt{nice}d job can cause major disruption.
 
   \item[Keep an eye on the job:] if your job might push the system to its
    limits, especially if you have not run one of similar size before,
    it is a good idea to monitor its progress, for instance to check that
    the system's swap space or file system is not filling up
-   (using, for example, {\tt top} and {\tt df} respectively).
+   (using, for example, \texttt{top} and \texttt{df} respectively).
 
 \end{description}
 
@@ -3108,7 +2841,7 @@ CCDPACK applications scales with frame size.
 \begin{table}[ht]
 \newlength{\zwidth}
 \settowidth{\zwidth}{0}
-\newcommand{\zsp}{\hspace*{\zwidth}}
+\providecommand{\zsp}{\hspace*{\zwidth}}
 \begin{center}
 \begin{tabular}{l|*{4}{c}|}
 \cline{2-5}
@@ -3119,17 +2852,17 @@ CCDPACK applications scales with frame size.
          & \multicolumn{1}{p{4.5em}|}{\centering Mask}
          & \multicolumn{1}{p{4.5em}|}{\centering No mask} \\
 \hline
- \multicolumn{1}{|l|}{{\tt debias} (with bias frame)}
+ \multicolumn{1}{|l|}{\texttt{debias} (with bias frame)}
     & 8.25     &  6.0\zsp  &  7.25    &  5.0\zsp    \\
- \multicolumn{1}{|l|}{\tt flatcor}
+ \multicolumn{1}{|l|}{\texttt{flatcor}}
     & 5.5\zsp  &  5.5\zsp  &  2.75    &  2.75   \\
- \multicolumn{1}{|l|}{\tt makeflat}
+ \multicolumn{1}{|l|}{\texttt{makeflat}}
     & 4.5\zsp  &  4.5\zsp  &  2.75    &  2.75   \\
- \multicolumn{1}{|l|}{\tt makebias}
+ \multicolumn{1}{|l|}{\texttt{makebias}}
     & 3.0\zsp  &  3.0\zsp  &  3.0\zsp & 3.0\zsp \\
- \multicolumn{1}{|l|}{\tt tranndf}
+ \multicolumn{1}{|l|}{\texttt{tranndf}}
     & 2.75     &  2.75     &   2.75   &  2.75   \\
- \multicolumn{1}{|l|}{{\tt ardmask} (KAPPA)}
+ \multicolumn{1}{|l|}{\texttt{ardmask} (KAPPA)}
     &          &  4.0\zsp  &          &  4.0\zsp  \\
 \hline
 \end{tabular}
@@ -3142,7 +2875,7 @@ The memory usage of most CCDPACK applications scales with the number
 of pixels per image.
 This table gives the number of (4 byte) words required per pixel when
 the calculations are being done at \_REAL (4 byte) precision.
-So, for example, {\tt debias}sing a 4000$\times$4000 frame with variances
+So, for example, \texttt{debias}sing a 4000$\times$4000 frame with variances
 and a bad pixel mask at \_REAL precision requires around
 $4000 \times 4000 \times 8.25 \times 4$ bytes $\approx$ 500\,Mbyte.
 The values in this table are meant only as a rough indication;
@@ -3157,20 +2890,20 @@ Briefly, the heaviest users of resources are:
 
 \begin{description}
 
-  \item[memory:] {\tt debias}; then {\tt makebias}, {\tt flatcor},
-   {\tt makeflat} and {\tt tranndf},
+  \item[memory:] \texttt{debias}; then \texttt{makebias}, \texttt{flatcor},
+   \texttt{makeflat} and \texttt{tranndf},
 
-  \item[CPU time:] {\tt makemos} (normalisation); then {\tt tranndf}.
-   Sometimes {\tt findoff},
+  \item[CPU time:] \texttt{makemos} (normalisation); then \texttt{tranndf}.
+   Sometimes \texttt{findoff},
 
-  \item[I/O:] {\tt debias}; then {\tt makeflat}, {\tt makemos}
+  \item[I/O:] \texttt{debias}; then \texttt{makeflat}, \texttt{makemos}
    (normalisation).
 
 \end{description}
 
 Elapsed time for a data reduction sequence will usually be dominated by
-{\tt debias} or the normalisation part of {\tt makemos}, or under some
-circumstances {\tt findoff}.
+\texttt{debias} or the normalisation part of \texttt{makemos}, or under some
+circumstances \texttt{findoff}.
 More detail is given for some of these in the next section.
 
 \subsection{\xlabel{LARGE-SPECIFIC}Specific tips}
@@ -3178,21 +2911,21 @@ More detail is given for some of these in the next section.
 The following tricks are applicable when using several of the
 Starlink applications.
 To use some of the commands in the examples you will need to start KAPPA
-(see \xref{SUN/95}{sun95}{}\/\cite{SUN95}) by typing {\tt kappa} at the
+(see \xref{SUN/95}{sun95}{}\/\cite{SUN95}) by typing \texttt{kappa} at the
 C shell prompt.
 These commands
-(\xref{{\tt erase}}{sun95}{ERASE},
-\xref{{\tt ndftrace}}{sun95}{NDFTRACE},
-\xref{{\tt parget}}{sun95}{PARGET},
-\xref{{\tt settype}}{sun95}{SETTYPE},
-\xref{{\tt ndfcopy}}{sun95}{NDFCOPY},
-\xref{{\tt paste}}{sun95}{PASTE},
-\xref{{\tt ardmask}}{sun95}{ARDMASK},
-\xref{{\tt compave}}{sun95}{COMPAVE},
-\xref{{\tt compadd}}{sun95}{COMPADD} and
-\xref{{\tt compick}}{sun95}{COMPICK})
+(\xref{\texttt{erase}}{sun95}{ERASE},
+\xref{\texttt{ndftrace}}{sun95}{NDFTRACE},
+\xref{\texttt{parget}}{sun95}{PARGET},
+\xref{\texttt{settype}}{sun95}{SETTYPE},
+\xref{\texttt{ndfcopy}}{sun95}{NDFCOPY},
+\xref{\texttt{paste}}{sun95}{PASTE},
+\xref{\texttt{ardmask}}{sun95}{ARDMASK},
+\xref{\texttt{compave}}{sun95}{COMPAVE},
+\xref{\texttt{compadd}}{sun95}{COMPADD} and
+\xref{\texttt{compick}}{sun95}{COMPICK})
 are described fully in \xref{SUN/95}{sun95}{}; but by way of a quick
-explanation, the {\tt ndftrace}, {\tt parget} pair tells you one thing
+explanation, the \texttt{ndftrace}, \texttt{parget} pair tells you one thing
 about the NDF being queried.
 
 \begin{description}
@@ -3203,23 +2936,23 @@ about the NDF being queried.
    Often it is not required, or if it is can be satisfactorily estimated
    from the data themselves.
    If you do not need it, then do not generate and/or propagate it.
-   To omit the variance set parameter {\tt genvar=false} either in
-   {\tt ccdsetup} or in {\tt debias} and {\tt makebias}.
+   To omit the variance set parameter \texttt{genvar=false} either in
+   \texttt{ccdsetup} or in \texttt{debias} and \texttt{makebias}.
    If you wish to remove the VARIANCE component from a frame which
-   already contains it, you can use the KAPPA command {\tt erase}:
+   already contains it, you can use the KAPPA command \texttt{erase}:
 
-  \begin{quote}
-  \begin{verbatim}
-ndftrace frame quiet
-parget variance ndftrace
+\begin{small}
+\begin{terminalv}
+% ndftrace frame quiet
+% parget variance ndftrace
 TRUE
-erase frame.variance
+% erase frame.variance
 OK - The HDS object FRAME.VARIANCE is to be erased. OK ? /NO/ > yes
-ndftrace frame quiet
-parget variance ndftrace
+% ndftrace frame quiet
+% parget variance ndftrace
 FALSE
-\end{verbatim}
-  \end{quote}
+\end{terminalv}
+\end{small}
 
   \item[Use an appropriate data type:] possible data types for storage of
    the pixel values in NDFs are:
@@ -3236,25 +2969,25 @@ FALSE
 
    The type \_WORD is usually sufficient for storage of most
    of the intermediate NDFs required in a data reduction sequence
-   (the exception is {\tt makeflat} which always generates a master flat
+   (the exception is \texttt{makeflat} which always generates a master flat
    field of type \_REAL or \_DOUBLE).
    If your data type is \_INTEGER, \_REAL or \_DOUBLE therefore
    it can be worth reducing it to one of the smaller types.
-   The KAPPA programs {\tt ndftrace} and {\tt settype} can be used to
+   The KAPPA programs \texttt{ndftrace} and \texttt{settype} can be used to
    determine and modify respectively the type of data in an NDF, as in this
    example:
 
-  \begin{quote}
-  \begin{verbatim}
-ndftrace frame quiet
-parget type ndftrace
+\begin{small}
+\begin{terminalv}
+% ndftrace frame quiet
+% parget type ndftrace
 _REAL
-settype frame _WORD
-ndftrace frame quiet
-parget type ndftrace
+% settype frame _WORD
+% ndftrace frame quiet
+% parget type ndftrace
 _WORD
-\end{verbatim}
-  \end{quote}
+\end{terminalv}
+\end{small}
 
    Reducing the size of the data type may increase or reduce the CPU time
    requirements of the program, but should reduce the memory and I/O
@@ -3264,42 +2997,42 @@ _WORD
 
   \item[Compact NDFs:] sometimes applications generate or modify NDFs to
    contain additional empty space; you can tell if this is the case by
-   examining the file using {\tt ndftrace} to work out the approximate size
-   it should be and comparing this with the size shown by {\tt ls}.
+   examining the file using \texttt{ndftrace} to work out the approximate size
+   it should be and comparing this with the size shown by \texttt{ls}.
    If disk space is very tight, and you do not want to delete files, such
-   oversized NDFs can be compacted using the KAPPA application {\tt ndfcopy}.
+   oversized NDFs can be compacted using the KAPPA application \texttt{ndfcopy}.
    For example, using the file of reduced data type created above:
 
-  \begin{quote}
-  \begin{verbatim}
-ls -s frame.sdf
+\begin{small}
+\begin{terminalv}
+% ls -s frame.sdf
 2047 frame.sdf
-ndfcopy frame compacted_frame
-ls -s compacted_frame.sdf
+% ndfcopy frame compacted_frame
+% ls -s compacted_frame.sdf
 1027 compacted_frame.sdf
-mv compacted_frame.sdf frame.sdf
-\end{verbatim}
-  \end{quote}
+% mv compacted_frame.sdf frame.sdf
+\end{terminalv}
+\end{small}
 
   \item[Treat images in sections:] when faced with really large images, the
    only way to process them may be by breaking them up into sections.
    This can be done using \xref{NDF sections}{sun95}{se_ndfsect}
    as described in \xref{SUN/95}{sun95}{}\/\cite{SUN95}, for example:
 
-  \begin{quote}
-  \begin{verbatim}
-flatcor in=huge"(:,:4000)" flat=master_flat"(:,:4000)" out=bottom
-flatcor in=huge"(:,4001:)" flat=master_flat"(:,4001:)" out=top
-paste bottom top out=huge_flatcor
-\end{verbatim}
-  \end{quote}
+\begin{small}
+\begin{terminalv}
+% flatcor in=huge"(:,:4000)" flat=master_flat"(:,:4000)" out=bottom
+% flatcor in=huge"(:,4001:)" flat=master_flat"(:,4001:)" out=top
+% paste bottom top out=huge_flatcor
+\end{terminalv}
+\end{small}
 
   \item[Reduce image resolution:] in the event that image resolution is
    better than required, the size of the frames can be reduced by using one
    of the KAPPA applications
-  \xref{{\tt compave}}{sun95}{COMPAVE},
-  \xref{{\tt compadd}}{sun95}{COMPADD} or
-  \xref{{\tt compick}}{sun95}{COMPICK}.
+  \xref{\texttt{compave}}{sun95}{COMPAVE},
+  \xref{\texttt{compadd}}{sun95}{COMPADD} or
+  \xref{\texttt{compick}}{sun95}{COMPICK}.
    If the averaged pixels are still small enough to under-sample the
    image point spread function this approach will be ok; otherwise it is
    rather a waste of good data, but may be useful for taking a quick look
@@ -3312,43 +3045,42 @@ notes about each one.
 
 \begin{description}
 
-  \item[{\tt debias}:] {\tt debias} is the heaviest user of memory and so
+  \item[\texttt{debias}:] \texttt{debias} is the heaviest user of memory and so
    is where problems are most likely to arise.
    The following suggestions are possible ways of limiting the resources
    used:
 
   \begin{description}
 
-    \item[Masking:] if the {\tt mask} parameter is set (to the name of an
+    \item[Masking:] if the \texttt{mask} parameter is set (to the name of an
      image or ARD file) then more memory is required.
      It can therefore be more efficient to apply the mask explicitly elsewhere
      in the reduction sequence, for example, to the bias frame prior to
      de-biassing:
 
-    \begin{quote}
-    \begin{verbatim}
-ardmask in=master_bias out=masked_bias ardfile=mask.dat
-debias in="data?" out="debias_*" bias=masked_bias \
+\begin{small}
+\begin{terminalv}
+% ardmask in=master_bias out=masked_bias ardfile=mask.dat
+% debias in="data?" out="debias_*" bias=masked_bias \
          getmask=FALSE
-\end{verbatim}
-    \end{quote}
+\end{terminalv}
+\end{small}
 
      instead of:
 
-    \begin{quote}
-    \begin{verbatim}
-debias in="data?" out="debias_*" bias=master_bias \
+\begin{small}
+\begin{terminalv}
+% debias in="data?" out="debias_*" bias=master_bias \
          getmask=TRUE mask=mask.dat
-\end{verbatim}
-    \end{quote}
+\end{terminalv}
+\end{small}
 
     \item[Variances:] using variances will also have a big impact on the
-     requirements of {\tt debias}, and so should be avoided (using {\tt
-     genvar=false}) if possible.
+     requirements of \texttt{debias}, and so should be avoided (using \texttt{genvar=false}) if possible.
 
     \item[Bias frames:] de-biassing using the bias strips rather than
      a master bias frame (see Sections~\ref{BIAS_1} and \ref{ADDOPT})
-     reduces the work done by {\tt debias} and also makes it unnecessary
+     reduces the work done by \texttt{debias} and also makes it unnecessary
      to process the bias frames at all.
      This technique will lead to inferior de-biassing, but can represent
      significant savings, and using frames from modern CCDs may give quite
@@ -3356,50 +3088,47 @@ debias in="data?" out="debias_*" bias=master_bias \
 
   \end{description}
 
-  \item[{\tt makemos}:] the normalisation part of {\tt makemos}, if performed,
+  \item[\texttt{makemos}:] the normalisation part of \texttt{makemos}, if performed,
    is usually the most CPU intensive part of the data reduction process,
    although this depends on how numerous and how large the regions of overlap
    between frames are.
    The process should therefore be omitted if it is not required.
-   Normalisation is performed only if one or both of the parameters {\tt
-   scale} and {\tt zero} is {\tt true} (both default to {\tt false}):
-   set {\tt scale=true} only if multiplicative corrections might be required
+   Normalisation is performed only if one or both of the parameters \texttt{scale} and \texttt{zero} is \texttt{true} (both default to \texttt{false}):
+   set \texttt{scale=true} only if multiplicative corrections might be required
    (for example, if the individual input images have differing exposure times)
-   and set {\tt zero=true} only if additive corrections might be required
+   and set \texttt{zero=true} only if additive corrections might be required
    (for example, if the images have different background levels).
    If it must be performed, the following measures may decrease execution
    time, possibly at the expense of accuracy:
 
   \begin{itemize}
 
-    \item if {\tt scale} but not {\tt zero} is being used and the images
-     have variance information then set {\tt cmpvar=false},
+    \item if \texttt{scale} but not \texttt{zero} is being used and the images
+     have variance information then set \texttt{cmpvar=false},
 
     \item if there are many multiply-overlapping frames then set the
-     parameter {\tt optov} (optimum number of overlaps) to a small number
+     parameter \texttt{optov} (optimum number of overlaps) to a small number
      (such as one),
 
     \item the normalisation is usually an iterative process, so it is
-     possible to tweak the parameters controlling the iteration ({\tt
-     maxit}, {\tt tols}, {\tt tolz}).
+     possible to tweak the parameters controlling the iteration (\texttt{maxit}, \texttt{tols}, \texttt{tolz}).
 
   \end{itemize}
 
-  \item[{\tt findoff}:] this application uses one of two algorithms to match
+  \item[\texttt{findoff}:] this application uses one of two algorithms to match
    objects between frames for determining their relative offset.
    The first algorithm scales as $n^2$ (where $n$ is the number of objects
-   found by {\tt findobj}), but if this fails it normally falls back on a
+   found by \texttt{findobj}), but if this fails it normally falls back on a
    more reliable algorithm which scales as $n^3 \ln n$.
-   In this case, and if there are many objects, {\tt findoff} can be very
+   In this case, and if there are many objects, \texttt{findoff} can be very
    slow indeed and come to dominate the whole reduction process.
    Failure of the fast algorithm is also more likely when there are
    very many objects.
    For both these reasons it can be a good idea to limit the number of
-   objects found by {\tt findobj} -- a few tens of objects in the overlap
+   objects found by \texttt{findobj} -- a few tens of objects in the overlap
    region is about right.
-   You can control the number of objects found by by modifying the {\tt
-   minpix} parameter: the higher this threshold is set the fewer
-   objects {\tt findobj} will identify in the image.
+   You can control the number of objects found by by modifying the \texttt{minpix} parameter: the higher this threshold is set the fewer
+   objects \texttt{findobj} will identify in the image.
 
 \end{description}
 
@@ -3409,9 +3138,9 @@ More detailed information on each of these applications can be found in
 
 % - Part III ---------------------------------------------------------
 \cleardoublepage
-\markboth{\stardocname}{\stardocname}
+
 \part{The Scripts}
-\markboth{\stardocname}{\stardocname}
+
 \section{\xlabel{SUMSC}\label{SUMSC}Introduction}
 
 This part of the cookbook provides a set of scripts to assist with
@@ -3426,7 +3155,7 @@ However, they do provide additional useful functionality.  Also, they
 have been deliberately kept simple and commented in order to make it
 easy for you to  modify them for your own purposes.  The use of Starlink
 applications from shell scripts is discussed further in \xref{SC/4:
-{\it C-shell Cookbook}\/}{sc4}{}\cite{SC4}.
+\textit{C-shell Cookbook}\/}{sc4}{}\cite{SC4}.
 
 The scripts available are:
 
@@ -3446,13 +3175,13 @@ The scripts available are:
 
 On Starlink systems the scripts are kept in directory:
 
-\begin{quote}
-{\tt /star/examples/sc5/scripts}
-\end{quote}
+\begin{terminalv}
+/star/examples/sc5/scripts
+\end{terminalv}
 
 You should copy the scripts to your current directory before using them.
 The examples included in the following descriptions of the scripts
-assume that your current directory is the subdirectory {\tt targets}
+assume that your current directory is the subdirectory \texttt{targets}
 of the example data directory used in the recipes in the previous part
 of the document and that you have worked through the previous recipes
 for reducing CCD observations (Sections~\ref{CONVERSION} to \ref{COMBTARG}).
@@ -3462,7 +3191,7 @@ The current collection of scripts is not comprehensive.  If you have a
 script which you think could usefully be included in this document then
 please contribute it.  Similarly, suggestions for additional scripts which
 we could provide are welcome.  In both cases contact the Starlink Software
-Librarian (e-mail {\tt starlink@jiscmail.ac.uk}) in the first instance.  New
+Librarian (e-mail \texttt{starlink@jiscmail.ac.uk}) in the first instance.  New
 versions of the cookbook including additional scripts will be issued from
 time to time.
 
@@ -3470,11 +3199,11 @@ time to time.
 \newpage
 \section{\xlabel{CHANGETYPE}\label{CHANGETYPE}Convert to a New Data Format}
 
-Script {\tt changetype.csh} converts one or more input files to a new
+Script \texttt{changetype.csh} converts one or more input files to a new
 data format.  The formats available include: NDF, FITS and IRAF OIF:
 see \xref{SUN/55}{sun55}{}\/\cite{SUN55} for a full list.  The actual
 format conversion is carried out by \xref{KAPPA}{sun95}{} application
-\xref{{\tt ndfcopy}}{sun95}{NDFCOPY} and most of the rest of the script is
+\xref{\texttt{ndfcopy}}{sun95}{NDFCOPY} and most of the rest of the script is
 concerned with checking that the file names are valid and generating
 suitable input and output names.  You give the script a list of one or more
 input files and the output file type required.
@@ -3485,76 +3214,74 @@ input files and the output file type required.
 
   \item To convert a single file to the GIF image display format type:
 
-  \begin{quote}
-   {\tt changetype.csh ngc2336\_r\_2.sdf gif}
-  \end{quote}
+\begin{terminalv}
+% changetype.csh ngc2336_r_2.sdf gif
+\end{terminalv}
 
-   File {\tt ngc2336\_r\_2.gif} will be generated.  It can be displayed
-   with, for example, the {\tt xv} utility.  (If you do display the image
-   with {\tt xv} it will appear mostly black because the dynamic range
+   File \texttt{ngc2336\_r\_2.gif} will be generated.  It can be displayed
+   with, for example, the \texttt{xv} utility.  (If you do display the image
+   with \texttt{xv} it will appear mostly black because the dynamic range
    is dominated by a few very bright pixels.  Use the histogram
    equalisation option to show more details.)
 
   \item As a second, and perhaps more useful, example, to convert all the
    NDF files in the directory to FITS type:
 
-  \begin{quote}
-   {\tt changetype.csh '*.sdf' fit}
-  \end{quote}
+\begin{terminalv}
+% changetype.csh '*.sdf' fit
+\end{terminalv}
 
 \end{enumerate}
 
-\begin{htmlonly}
-\subsection*{\htmladdnormallink{Script source code.}{changetype.lis}}
-\end{htmlonly}
+
+
 
 
 \newpage
 \section{\xlabel{CLIPIM}\label{CLIPIM}Clip an Image}
 
-Script {\tt clipim.csh} `clips' an image.  That is, the image is
+Script \texttt{clipim.csh} `clips' an image.  That is, the image is
 displayed, you choose a sub-image with the cursor and this selected
 region is saved as a separate file.  The script uses the \xref{KAPPA}{sun95}{}
-applications \xref{{\tt greyplot}}{sun95}{GREYPLOT},
-\xref{{\tt cursor}}{sun95}{CURSOR} and \xref{{\tt ndfcopy}}{sun95}{NDFCOPY}.
+applications \xref{\texttt{greyplot}}{sun95}{GREYPLOT},
+\xref{\texttt{cursor}}{sun95}{CURSOR} and \xref{\texttt{ndfcopy}}{sun95}{NDFCOPY}.
 
 \subsection*{Example}
 
-To clip the file {\tt ngc2336\_r\_2.sdf} type:
+To clip the file \texttt{ngc2336\_r\_2.sdf} type:
 
-\begin{quote}
-{\tt clipim.csh ngc2336\_r\_2.sdf ngc2336\_small.sdf}
-\end{quote}
+\begin{terminalv}
+% clipim.csh ngc2336_r_2.sdf ngc2336_small.sdf}
+\end{terminalv}
 
-The clipped image will be saved in file {\tt ngc2336\_small.sdf}.  Note
-that to avoid ambiguity the `{\tt .sdf}' file type must be included in
+The clipped image will be saved in file \texttt{ngc2336\_small.sdf}.  Note
+that to avoid ambiguity the `\texttt{.sdf}' file type must be included in
 the file name here.  Also note that you must follow the instructions
 carefully if the script is to work correctly.
 
-\begin{htmlonly}
-\subsection*{\htmladdnormallink{Script source code.}{clipim.lis}}
-\end{htmlonly}
+
+
 
 
 \newpage
 \section{\xlabel{DOAPP}\label{DOAPP}Process Compressed Files}
 
-Script {\tt doapp.csh} allows you to apply an application to a series
+Script \texttt{doapp.csh} allows you to apply an application to a series
 of compressed files.  It is useful if disk space is scarce.  The files
-are assumed to have been compressed with the Unix utility {\tt compress}.
+are assumed to have been compressed with the Unix utility \texttt{compress}.
 Each file is, in turn, decompressed, processed and recompressed.  In the
-script provided application \xref{{\tt histpeak}}{sun180}{SESSION1} in
+script provided application \xref{\texttt{histpeak}}{sun180}{SESSION1} in
 \xref{ESP}{sun180}{} is used to determine the median value of the image and
 this value is output to a text file.  This effect is achieved by writing
-{\tt histpeak}'s output to a temporary file and then using the Unix
-utilities {\tt grep} and {\tt awk} to extract the details required.
+\texttt{histpeak}'s output to a temporary file and then using the Unix
+utilities \texttt{grep} and \texttt{awk} to extract the details required.
 
-It is relatively straightforward to change {\tt doapp.csh} to perform
-some other processing.  For example, script {\tt dostats.csh} is a
+It is relatively straightforward to change \texttt{doapp.csh} to perform
+some other processing.  For example, script \texttt{dostats.csh} is a
 modified version which uses \xref{KAPPA}{sun95}{} application
-\xref{{\tt stats}}{sun95}{STATS} to find the mean of each image.
-Using the Unix command {\tt diff} on scripts {\tt doapp.csh} and
-{\tt dostats.csh} will show the lines that need to be changed to
+\xref{\texttt{stats}}{sun95}{STATS} to find the mean of each image.
+Using the Unix command \texttt{diff} on scripts \texttt{doapp.csh} and
+\texttt{dostats.csh} will show the lines that need to be changed to
 produce a modified script which performs some other processing.
 
 The input for either script consists of the names of one or more files to
@@ -3568,63 +3295,52 @@ file.
   \item Before giving an example of using the script it is necessary
    to create some compressed files for it to work on.  Type:
 
-  \begin{quote}
-   {\tt compress *.sdf}
-  \end{quote}
+\begin{terminalv}
+% compress *.sdf
+\end{terminalv}
 
    The compressed files retain their original name but have the additional
-   file type `{\tt .Z}'.
+   file type `\texttt{.Z}'.
 
   \item To examine a single file type:
 
-  \begin{quote}
-   {\tt doapp.csh ngc2336\_r\_2.sdf.Z result.txt}
-  \end{quote}
+\begin{terminalv}
+% doapp.csh ngc2336_r_2.sdf.Z result.txt
+\end{terminalv}
 
-   File {\tt ngc2336\_r\_2.sdf.Z} will be decompressed, examined, and
-   recompressed.  The result will be written to file {\tt result.txt}.
+   File \texttt{ngc2336\_r\_2.sdf.Z} will be decompressed, examined, and
+   recompressed.  The result will be written to file \texttt{result.txt}.
 
   \item Alternatively, all the compressed files can be processed.  Type:
 
-  \begin{quote}
-   {\tt doapp.csh '*.Z' results.txt}
-  \end{quote}
+\begin{terminalv}
+% doapp.csh '*.Z' results.txt
+\end{terminalv}
 
-   Here the results are written to file {\tt results.txt}.
+   Here the results are written to file \texttt{results.txt}.
 
-  \item The use of {\tt dostats.csh} is similar.  Type:
+  \item The use of \texttt{dostats.csh} is similar.  Type:
 
-  \begin{quote}
-   {\tt dostats.csh '*.Z' stats.txt}
-  \end{quote}
+\begin{terminalv}
+% dostats.csh '*.Z' stats.txt
+\end{terminalv}
 
-   and the results will be written to file {\tt stats.txt}.
+   and the results will be written to file \texttt{stats.txt}.
 
   \item For the purpose of this example you will probably want to
    decompress the files once you have finished.  Type:
 
-  \begin{quote}
-   {\tt uncompress *.Z}
-  \end{quote}
+\begin{terminalv}
+% uncompress *.Z
+\end{terminalv}
 
    Obviously you would omit this stage if you were using the scripts
    `for real' and disk space was scarce.
 
 \end{enumerate}
 
-\begin{htmlonly}
 
-\subsection*{Script source code}
 
-\begin{itemize}
-
-  \item \htmladdnormallink{{\tt doapp.csh}}{doapp.lis},
-
-  \item \htmladdnormallink{{\tt dostats.csh}}{dostats.lis}.
-
-\end{itemize}
-
-\end{htmlonly}
 
 
 \newpage
@@ -3633,13 +3349,13 @@ file.
 Often you will want to know the value of a given FITS keyword for each
 of a set of FITS files. It is straightforward to find the value of a
 keyword for a single file, but doing so manually can be tedious if have
-dozens (or hundreds) of files.  Script {\tt fitsinfo.csh} addresses this
+dozens (or hundreds) of files.  Script \texttt{fitsinfo.csh} addresses this
 problem and gives the value of a named keyword for each of a set of FITS
 files.
 
 Each FITS file is examined in turn and  \xref{KAPPA}{sun95}{} application
-\xref{{\tt fitslist}}{sun95}{FITSLIST} is used to list the contents of
-the header cards to a text file.  The Unix utility {\tt grep} is then
+\xref{\texttt{fitslist}}{sun95}{FITSLIST} is used to list the contents of
+the header cards to a text file.  The Unix utility \texttt{grep} is then
 used to extract the line for the required keyword from the file and
 this line is appended to the output file.
 
@@ -3649,18 +3365,17 @@ output file in which the results are to be written.
 
 \subsection*{Example}
 
-To find the value of keyword {\tt EQUINOX} for all the FITS files in
+To find the value of keyword \texttt{EQUINOX} for all the FITS files in
 the current directory type:
 
-\begin{quote}
-{\tt fitsinfo.csh '*.fit' EQUINOX fitsdetails.txt}
-\end{quote}
+\begin{terminalv}
+% fitsinfo.csh '*.fit' EQUINOX fitsdetails.txt
+\end{terminalv}
 
-The values found are written to file {\tt fitsdetails.txt}.
+The values found are written to file \texttt{fitsdetails.txt}.
 
-\begin{htmlonly}
-\subsection*{\htmladdnormallink{Script source code.}{fitsinfo.lis}}
-\end{htmlonly}
+
+
 
 
 \newpage
@@ -3670,11 +3385,11 @@ A common problem with astronomical images is that  a few pixels at the
 centre of a bright star or galaxy will dominate the dynamic range of
 the image.  If the range of intensities displayed is simply set from
 the dynamic range the faint details close to the sky background will not
-be visible.  Script {\tt scaledisp.csh} addresses this problem and
+be visible.  Script \texttt{scaledisp.csh} addresses this problem and
 determines a range of intensities to be plotted which are closer to the
 background.
 
-it uses \xref{{\tt histpeak}}{sun180}{SESSION1} in \xref{ESP}{sun180}{}
+it uses \xref{\texttt{histpeak}}{sun180}{SESSION1} in \xref{ESP}{sun180}{}
 to determine the sky background level and a measure of its variation.
 The measure used is the mean absolute deviation, $\alpha$, defined as:
 
@@ -3685,9 +3400,9 @@ The measure used is the mean absolute deviation, $\alpha$, defined as:
 $\alpha$ is more robust than the more familiar standard deviation
 (because it is less sensitive to outlying values).  It is also usually
 smaller.  The image is plotted using KAPPA application
-\xref{{\tt display}}{sun95}{DISPLAY}.
+\xref{\texttt{display}}{sun95}{DISPLAY}.
 
-Script {\tt saodisp.csh} is similar to {\tt scaledisp.csh}, but uses
+Script \texttt{saodisp.csh} is similar to \texttt{scaledisp.csh}, but uses
 the image display program SAOIMAGE (see
 \xref{SUN/166}{sun166}{}\/\cite{SUN166}).
 
@@ -3701,37 +3416,26 @@ background.
 
 \begin{enumerate}
 
-  \item To display a scaled image with KAPPA's {\tt display} type:
+  \item To display a scaled image with KAPPA's \texttt{display} type:
 
-  \begin{quote}
-   {\tt scaledisp.csh ngc2336\_r\_2.sdf 1 ~ 5}
-  \end{quote}
+\begin{terminalv}
+% scaledisp.csh ngc2336_r_2.sdf 1  5
+\end{terminalv}
 
-   File {\tt ngc2336\_r\_2.sdf} is displayed.  The minimum intensity is
+   File \texttt{ngc2336\_r\_2.sdf} is displayed.  The minimum intensity is
    $1 \times \alpha$ below the sky background level and the maximum
    intensity is $5 \times \alpha$ above it.
 
-  \item To display the same image with SAOIMAGE and similar scaling type:
+  \item To display the same image with \xref{SAOIMAGE}{sc15}{sc15_saoimage} and similar scaling type:
 
-  \begin{quote}
-   {\tt saodisp.csh ngc2336\_r\_2.sdf 1 ~ 5}
-  \end{quote}
+\begin{terminalv}
+% saodisp.csh ngc2336_r_2.sdf 1  5
+\end{terminalv}
 
 \end{enumerate}
 
-\begin{htmlonly}
 
-\subsection*{Script source code}
 
-\begin{itemize}
-
-  \item \htmladdnormallink{{\tt scaledisp.csh}}{scaledisp.lis},
-
-  \item \htmladdnormallink{{\tt saodisp.csh}}{saodisp.lis}.
-
-\end{itemize}
-
-\end{htmlonly}
 
 
 \newpage
@@ -3747,7 +3451,7 @@ CCDPACK manual.
 Thanks are due to Mr~I.~Morgan, Mr~Gareth~Leyshon and Dr~Steve~Eales for
 providing a number of scripts and to Dr~Gerry~Luppino of the Hawaii IFA
 for allowing us to use Figure~\ref{CCDLUP}.  The data from Walter~Jaffe's
-CD-ROM {\it Astronomical Images}\, are used with the permission of the
+CD-ROM \textit{Astronomical Images}\, are used with the permission of the
 author and publisher.  Karen Moran kindly unearthed the contact details
 for Twin Press.
 
@@ -3764,160 +3468,156 @@ Any mistakes, of course, are our own.
 \addcontentsline{toc}{section}{References}
 \begin{thebibliography}{99}
 
-  \bibitem{SUN183} D.S.~Berry, 1996, \xref{SUN/183.3}{sun183}{}: {\it
-   ARD --- A Textual Language for Describing Regions within a Data Array}\,
+  \bibitem{SUN183} D.S.~Berry, 1996, \xref{SUN/183.3}{sun183}{}: \textit{ARD --- A Textual Language for Describing Regions within a Data Array}\,
    (Starlink).
 
-  \bibitem{BUIL91} C.~Buil, 1991, {\it CCD Astronomy -- Construction
+  \bibitem{BUIL91} C.~Buil, 1991, \textit{CCD Astronomy -- Construction
    and Use of an Astronomical CCD Camera}\, (Willmann-Bell: Richmond,
    Virginia).  Translated by E.~and~B.~Davoust.  Originally published
-   in French as {\it Astronomie CCD, Construction et Utilisation des
+   in French as \textit{Astronomie CCD, Construction et Utilisation des
    Cameras CCD en Astronomie Amateur}\, in 1989.
 
-  \bibitem{SC7} M.J.~Clayton, 1998, \xref{SC/7.2}{sc7}{}: {\it Simple
+  \bibitem{SC7} M.J.~Clayton, 1998, \xref{SC/7.2}{sc7}{}: \textit{Simple
    Spectroscopy Reductions}\, (Starlink).
 
-  \bibitem{SC4} M.J.~Currie, 1998, \xref{SC/4.2}{sc4}{} {\it C-shell
+  \bibitem{SC4} M.J.~Currie, 1998, \xref{SC/4.2}{sc4}{} \textit{C-shell
    Cookbook}\, (Starlink).
 
   \bibitem{SUN102} M.J.~Currie, 1998, \xref{SUN/102.4}{sun102}{}:
-   {\it HDSTRACE --- Listing HDS Data Files}\, (Starlink).
+   \textit{HDSTRACE --- Listing HDS Data Files}\, (Starlink).
 
   \bibitem{SUN95} M.J.~Currie and D.S.~Berry, 2000,
-   \xref{SUN/95.16}{sun95}{}: {\it KAPPA --- Kernel Application Package}\,
+   \xref{SUN/95.16}{sun95}{}: \textit{KAPPA --- Kernel Application Package}\,
    (Starlink).
 
   \bibitem{SUN55} M.J.~Currie, G.J.Privett, A.J.Chipperfield,
-   D.S.~Berry and A.C.~Davenhall, 2000, \xref{SUN/55.14}{sun55}{}: {\it
-   CONVERT --- A Format-conversion Package}\, (Starlink).
+   D.S.~Berry and A.C.~Davenhall, 2000, \xref{SUN/55.14}{sun55}{}: \textit{CONVERT --- A Format-conversion Package}\, (Starlink).
 
   \bibitem{DAVENHALL98} A.C.~Davenhall, 1998,
-  \htmladdnormallink{{\it Starlink Bulletin}}
+  \htmladdnormallink{\textit{Starlink Bulletin}}
    {http://www.starlink.ac.uk//bulletin.html},
-   No. {\bf 20}, pp17-19.  In the first instance see your site manager
-   for back issues of the {\it Starlink Bulletin}.  Alternatively, a
+   No. \textbf{20}, pp17-19.  In the first instance see your site manager
+   for back issues of the \textit{Starlink Bulletin}.  Alternatively, a
    version of this article is available by anonymous ftp from Edinburgh.
-   The details are: ftp site {\tt ftp.roe.ac.uk}, directory {\tt
-   /pub/acd/misc}, file {\tt roadmap.ps}.  The file is in PostScript
+   The details are: ftp site \texttt{ftp.roe.ac.uk}, directory \texttt{/pub/acd/misc}, file \texttt{roadmap.ps}.  The file is in PostScript
    format.
 
   \bibitem{DRAPER95} P.W.~Draper, 1995,
-  \htmladdnormallink{{\it Starlink Bulletin}}
+  \htmladdnormallink{\textit{Starlink Bulletin}}
    {http://www.starlink.ac.uk//bulletin.html},
-   No. {\bf 16}, pp6-7.  In the first instance see your site manager
-   for back issues of the {\it Starlink Bulletin}.
+   No. \textbf{16}, pp6-7.  In the first instance see your site manager
+   for back issues of the \textit{Starlink Bulletin}.
 
   \bibitem{SUN139} P.W.~Draper, M.B.~Taylor and A.~Allan, 2000,
-   \xref{SUN/139.13}{sun139}{}: {\it CCDPACK --- CCD Data Reduction
+   \xref{SUN/139.13}{sun139}{}: \textit{CCDPACK --- CCD Data Reduction
    Package}\, (Starlink).
 
   \bibitem{SUN214} P.W.~Draper and N.~Gray, 2000,
-   \xref{SUN/214.8}{sun214}{}: {\it GAIA --- Graphical Astronomy and Image
+   \xref{SUN/214.8}{sun214}{}: \textit{GAIA --- Graphical Astronomy and Image
    Analysis Tool}\, (Starlink).
 
   \bibitem{SUN180} N.~Gray, M.B.~Taylor and G.J.~Privett, 2000,
-   \xref{SUN/180.5}{sun180}{}: {\it ESP --- Extended Surface Photometry}\,
+   \xref{SUN/180.5}{sun180}{}: \textit{ESP --- Extended Surface Photometry}\,
    (Starlink).
 
-  \bibitem{HOWELL92} S.B.~Howell (ed), 1992, {\it Astronomical CCD
+  \bibitem{HOWELL92} S.B.~Howell (ed), 1992, \textit{Astronomical CCD
    Observing and Reduction Techniques}, Astronomical Society of the
-   Pacific Conference Series, {\bf 23}.
+   Pacific Conference Series, \textbf{23}.
 
-  \bibitem{JAFFE98} W.~Jaffe, 1998, {\it Astronomical Images}\,
+  \bibitem{JAFFE98} W.~Jaffe, 1998, \textit{Astronomical Images}\,
    (Twin Press: Vledder) CD-ROM.  To contact Twin Press send an electronic
-   mail message to G.~Kiers ({\tt gkiers@twinpress.nl}).
-% \latex{See URL: {\tt http://www.twinpress.nl/index.htm}}
+   mail message to G.~Kiers (\texttt{gkiers@twinpress.nl}).
+% \latex{See URL: \texttt{http://www.twinpress.nl/index.htm}}
 
-  \bibitem{KAY95} D.C.~Kay and J.R.~Levine, 1995, {\it Graphics File
+  \bibitem{KAY95} D.C.~Kay and J.R.~Levine, 1995, \textit{Graphics File
    Formats}, second edition
   \newline (Windcrest/McGraw-Hill: New York).  See in particular
    Chapter 18, pp235-244.
 
-  \bibitem{KITCHIN98} C.R.~Kitchin, 1998, {\it Astrophysical Techniques},
+  \bibitem{KITCHIN98} C.R.~Kitchin, 1998, \textit{Astrophysical Techniques},
    third edition (Institute of Physics: Bristol and Philadelphia).
    First edition published in 1984.
 
   \bibitem{MASSEY92} P.~Massey and G.H.~Jacoby, 1992, in Howell
-   {\it op. cit.}\/ (\cite{HOWELL92}), pp240-257.
+   \textit{op. cit.}\/ (\cite{HOWELL92}), pp240-257.
 
-  \bibitem{MASSEY97} P.~Massey, 1997, {\it A User's Guide to CCD
+  \bibitem{MASSEY97} P.~Massey, 1997, \textit{A User's Guide to CCD
    Reductions with IRAF}\, (National Optical Astronomy Observatories:
-   Tucson).  See \xref{SG/12}{sg12}{} {\it op. cit.}\/ (\cite{SG12}) for
-   details of obtaining IRAF manuals.  Retrieve file {\tt ccduser3.ps.Z}
+   Tucson).  See \xref{SG/12}{sg12}{} \textit{op. cit.}\/ (\cite{SG12}) for
+   details of obtaining IRAF manuals.  Retrieve file \texttt{ccduser3.ps.Z}
 
-  \bibitem{MCLEAN89} I.S.~McLean, 1989, {\it Electronic and Computer-Aided
+  \bibitem{MCLEAN89} I.S.~McLean, 1989, \textit{Electronic and Computer-Aided
    Astronomy -- From Eyes to Electronic Sensors}\, (Ellis Horwood:
    Chichester).
 
-  \bibitem{MCLEAN97} I.S.~McLean, 1997, {\it Electronic Imaging in
+  \bibitem{MCLEAN97} I.S.~McLean, 1997, \textit{Electronic Imaging in
    Astronomy -- Detectors and Instrumentation}\, (Wiley: Chichester and
    New York).  Published in association with Praxis in the Wiley-Praxis
    series in Astronomy and Astrophysics.
 
   \bibitem{SUN166} R.~Morris and G.J.~ Privett, 1996,
-   \xref{SUN/166.4}{sun166}{}: {\it SAOIMAGE --- Astronomical Image
+   \xref{SUN/166.4}{sun166}{}: \textit{SAOIMAGE --- Astronomical Image
    Display}\, (Starlink).
 
   \bibitem{SG12} R.~Morris, G.J.~Privett and A.C.~Davenhall, 1999,
-   \xref{SG/12.2}{sg12}{}: {\it IRAF --- Image Reduction Analysis Facility}\,
+   \xref{SG/12.2}{sg12}{}: \textit{IRAF --- Image Reduction Analysis Facility}\,
    (Starlink).
 
-  \bibitem{NEWBERRY95A} M.V.~Newberry, 1995, {\it CCD Astronomy},
-   {\bf 2}, No. 1, pp18-21.
+  \bibitem{NEWBERRY95A} M.V.~Newberry, 1995, \textit{CCD Astronomy},
+   \textbf{2}, No. 1, pp18-21.
 
-  \bibitem{NEWBERRY95B} M.V.~Newberry, 1995, {\it CCD Astronomy},
-   {\bf 2}, No. 3, pp12-14.
+  \bibitem{NEWBERRY95B} M.V.~Newberry, 1995, \textit{CCD Astronomy},
+   \textbf{2}, No. 3, pp12-14.
 
-  \bibitem{NEWBERRY96} M.V.~Newberry, 1996, {\it CCD Astronomy},
-   {\bf 3}, No. 1, pp18-21.
+  \bibitem{NEWBERRY96} M.V.~Newberry, 1996, \textit{CCD Astronomy},
+   \textbf{3}, No. 1, pp18-21.
 
   \bibitem{SC6} J.~Palmer and A.C.~Davenhall, 2001, \xref{SC/6.4}{sc6}{}:
-   {\it The CCD Photometric Calibration Cookbook}\, (Starlink).
+   \textit{The CCD Photometric Calibration Cookbook}\, (Starlink).
 
   \bibitem{SUN86} K.T.~Shortridge, H.~Meyerdierks, M.J.~Currie,
    M.J.~Clayton, J.~Lockley, A.C.~Charles, A.C.~Davenhall, M.B.~Taylor,
    T.~Ash, T.~Wilkins, D.~Axon, J.~Palmer and A.~Holloway,
-   2001, \xref{SUN/86.18}{sun86}{}: {\it FIGARO --- A General Data
+   2001, \xref{SUN/86.18}{sun86}{}: \textit{FIGARO --- A General Data
    Reduction System}\, (Starlink).
 
-  \bibitem{VALDES90_1} F.~Valdes, 1990, {\it User's Guide to the CCDRED
+  \bibitem{VALDES90_1} F.~Valdes, 1990, \textit{User's Guide to the CCDRED
    Package}\, (National Optical Astronomy Observatories: Tucson).  See
-   \xref{SG/12}{sg12}{} {\it op. cit.}\/ (\cite{SG12}) for details of
-   obtaining IRAF manuals.  Retrieve file {\tt ccdguide.ps.Z}
+   \xref{SG/12}{sg12}{} \textit{op. cit.}\/ (\cite{SG12}) for details of
+   obtaining IRAF manuals.  Retrieve file \texttt{ccdguide.ps.Z}
 
-  \bibitem{VALDES90_2} F.~Valdes, 1990, {\it The IRAF CCD Reduction
+  \bibitem{VALDES90_2} F.~Valdes, 1990, \textit{The IRAF CCD Reduction
    Package -- CCDRED}\, (National Optical Astronomy Observatories: Tucson).
-   See \xref{SG/12}{sg12}{} {\it op. cit.}\/ (\cite{SG12}) for details of
-   obtaining IRAF manuals.  Retrieve file {\tt ccdred.ps.Z}
+   See \xref{SG/12}{sg12}{} \textit{op. cit.}\/ (\cite{SG12}) for details of
+   obtaining IRAF manuals.  Retrieve file \texttt{ccdred.ps.Z}
 
-  \bibitem{WALKER87} G.~Walker, 1987, {\it Astronomical Observations
+  \bibitem{WALKER87} G.~Walker, 1987, \textit{Astronomical Observations
    -- An Optical Perspective}\, (Cambridge University Press: Cambridge).
 
-  \bibitem{SUN33} R.F.~Warren-Smith, 2000, \xref{SUN/33.7}{sun33}{}: {\it
-   NDF --- Routines for Accessing the Extensible N-Dimensional Data
+  \bibitem{SUN33} R.F.~Warren-Smith, 2000, \xref{SUN/33.7}{sun33}{}: \textit{NDF --- Routines for Accessing the Extensible N-Dimensional Data
    Format}\, (Starlink).
 
   \bibitem{SUN92} R.F.~Warren-Smith and M.D.~Lawden, 1999,
-   \xref{SUN/92.11}{sun92}{}: {\it HDS --- Hierarchical Data System}\,
+   \xref{SUN/92.11}{sun92}{}: \textit{HDS --- Hierarchical Data System}\,
    (Starlink).
 
   \bibitem{WELLS81} D.C.~Wells, E.W.~Greisen and R.H.~Harten, 1981,
-   {\it Astron. Astrophys. Suppl}, {\bf 44}, pp363-370.
+   \textit{Astron. Astrophys. Suppl}, \textbf{44}, pp363-370.
 
-  \bibitem{WELLS00} D.C.~Wells, 2000, in {\it Information Handling in
+  \bibitem{WELLS00} D.C.~Wells, 2000, in \textit{Information Handling in
    Astronomy}, ed. A.~Heck (Kluwer: Dordrecht), Astrophysics and Space
-   Science Library, {\bf 250}, pp65-72.
+   Science Library, \textbf{250}, pp65-72.
 
-  \bibitem{WELLS94_1} L.A.~Wells, 1994, {\it Rectifying and Registering
+  \bibitem{WELLS94_1} L.A.~Wells, 1994, \textit{Rectifying and Registering
    Images Using IRAF}\, (National Optical Astronomy Observatories: Tucson).
-   See \xref{SG/12}{sg12}{} {\it op. cit.}\/ (\cite{SG12}) for details of
-   obtaining IRAF manuals.  Retrieve file {\tt reg.ps.Z}
+   See \xref{SG/12}{sg12}{} \textit{op. cit.}\/ (\cite{SG12}) for details of
+   obtaining IRAF manuals.  Retrieve file \texttt{reg.ps.Z}
 
-  \bibitem{WELLS94_2} L.A.~Wells and D.J.~Bell, 1994, {\it Cleaning
+  \bibitem{WELLS94_2} L.A.~Wells and D.J.~Bell, 1994, \textit{Cleaning
    Images of Bad Pixels and Cosmic Rays Using IRAF}\, (National Optical
-   Astronomy Observatories: Tucson).  See \xref{SG/12}{sg12}{} {\it op.
+   Astronomy Observatories: Tucson).  See \xref{SG/12}{sg12}{} \textit{op.
    cit.}\/ (\cite{SG12}) for details of obtaining IRAF manuals.  Retrieve
-   file {\tt clean.ps.Z}
+   file \texttt{clean.ps.Z}
 
 \end{thebibliography}
 
