@@ -133,9 +133,16 @@
 *        the noise values have already been calculated, rather than relying on
 *        knowledge of when this will be the case.
 *     2014-01-24 (DSB):
-*        dat->noi_boxsize should be set to the number of times each NOI value is 
-*        duplicated. For box type 2 each time slice has a different NOI value and 
+*        dat->noi_boxsize should be set to the number of times each NOI value is
+*        duplicated. For box type 2 each time slice has a different NOI value and
 *        so dat.noi_boxsize should be 1 in this case.
+*     2014-12-11 (DSB):
+*        Ensure that the NOI model has no bad values. Also ensure
+*        that there are none of the initial unity values (stored by
+*        smf_model_create) left. This can happen, for instance, if
+*        boxes of samples are flagged (e.g. by COM) on the ifrst
+*        iteration. These unity values can then be treated literally
+*        if the flags are later cleared.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -390,6 +397,10 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
               }
 
             var = astFree( var );
+
+            /* Set dat->noi_boxsize to the number of times each NOI value is
+               duplicated. This is used to determine the degree of
+               compression that can be used when exporting the NOI model. */
             dat->noi_boxsize = ntslice;
           }
 
@@ -544,6 +555,10 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
               }
 
               var = astFree( var );
+
+              /* Set dat->noi_boxsize to the number of times each NOI value is
+                 duplicated. This is used to determine the degree of
+                 compression that can be used when exporting the NOI model. */
               dat->noi_boxsize = boxsize;
             }
 
@@ -559,9 +574,31 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                pdata->operation = 2;
                thrAddJob( wf, 0, pdata, smf1_calcmodel_noi, 0, NULL, status );
             }
+            thrWait( wf, status );
+
+            /* Set dat->noi_boxsize to the number of times each NOI value is
+               duplicated. This is used to determine the degree of
+               compression that can be used when exporting the NOI model. */
+            dat->noi_boxsize = 1;
+
+          }
+
+          /* Ensure that there are no BAD values in the NOI model. Also
+             ensure that none of the initial unity values are left (this
+             may be the case for isntance if an entire block has been
+             flagged as bad (e.g. by the common-mode). We replace bad
+             values and unity values with the mean noise level in the
+             bolometer. */
+          for( iw = 0; iw < nw; iw++ ) {
+             pdata = job_data + iw;
+             pdata->qua_data = qua_data;
+             pdata->model_data = model_data;
+             pdata->res_data = res_data;
+             pdata->box = boxsize;
+             pdata->operation = 3;
+             thrAddJob( wf, 0, pdata, smf1_calcmodel_noi, 0, NULL, status );
           }
           thrWait( wf, status );
-          dat->noi_boxsize = 1;
 
         /* Report an error if the number of samples for each bolometer in
            the NOI model is not 1 or "ntslice". */
@@ -684,6 +721,9 @@ static void smf1_calcmodel_noi( void *job_data_ptr, int *status ) {
    dim_t itime;
    double *pm;
    double *pr;
+   double mean;
+   double sum;
+   dim_t nsum;
    size_t ibase;
    smf_qual_t *pq;
 
@@ -742,7 +782,8 @@ static void smf1_calcmodel_noi( void *job_data_ptr, int *status ) {
          ibase += pdata->bstride;
       }
 
-   } else if( pdata->operation ==2  ) {
+/* Set the noise to the variance of the neighbouring residuals. */
+   } else if( pdata->operation == 2  ) {
       ibase = pdata->b1*pdata->bstride;
       for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++ ) {
          pq = pdata->qua_data + ibase;
@@ -754,6 +795,60 @@ static void smf1_calcmodel_noi( void *job_data_ptr, int *status ) {
          }
          ibase += pdata->bstride;
       }
+
+/* Replace bad values and unity values with the mean noise value in each
+   bolometer. */
+   } else if( pdata->operation == 3 ) {
+
+/* Loop round all bolos to be processed by this thread, maintaining the
+   index of the first time slice for the current bolo. */
+      ibase = pdata->b1*pdata->bstride;
+      for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++ ) {
+
+/* Get a pointer to the first quality value for the current bolo, and
+   check that the whole bolometer has not been flagged as bad. */
+         pq = pdata->qua_data + ibase;
+         if( !( *pq & SMF__Q_BADB ) ) {
+
+/* This operation is only used in cases where the NOI model has the same
+   shape and size as the residuals. Get a pointer to the first NOI value
+   for the current bolometer. */
+            pm = pdata->model_data + ibase;
+
+/* Loop round all time slices, foring the sums needed to calculate the
+   mean of the non-bad, non-unity noise values. */
+            sum = 0.0;
+            nsum = 0;
+            for( itime = 0; itime < pdata->ntslice; itime++ ) {
+
+/* If the noise value is usable, increment the sums */
+               if( *pm > 0 && *pm != VAL__BADD && *pm != 1.0 ) {
+                  sum += *pm;
+                  nsum++;
+               }
+
+/* Point to the next NOI value. */
+               pm += pdata->tstride;
+            }
+
+/* If any bad or unity noise values were found, replace them with the
+   mean noise value. */
+            if( nsum < pdata->ntslice && nsum > 0 ) {
+               mean = sum/nsum;
+               for( itime = 0; itime < pdata->ntslice; itime++ ) {
+                  if( *pm < 0 || *pm == VAL__BADD || *pm == 1.0 ) {
+                     *pm = mean;
+                  }
+                  pm += pdata->tstride;
+               }
+            }
+         }
+
+/* Increment the index of the first value associated with the next
+   bolometer. */
+         ibase += pdata->bstride;
+      }
+
 
    } else {
       *status = SAI__ERROR;
