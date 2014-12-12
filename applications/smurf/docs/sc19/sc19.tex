@@ -1,7 +1,4 @@
-\documentclass[twoside,11pt]{article}
-
-\usepackage{graphicx}
-\pagestyle{myheadings}
+\documentclass[twoside,11pt]{starlink}
 
 % +
 %  Name:
@@ -31,6 +28,8 @@
 %        New sc2clean interface.
 %    2010-09-16 (DSB):
 %        Update to describe new step finder and spike finder.
+%     2014-12-12 (TIMJ):
+%        Switch to starlink class file
 %     {Add further history here}
 %
 % -
@@ -38,42 +37,20 @@
 % ------------------------------------------------------------------------
 
 
-% Add any \newcommand or \newenvironment commands here
-
-%% Upright micron (code stolen from http://www.superstrate.net/useful/useful.html)
-\DeclareFontFamily{U}{euc}{}% I chose euc because the chart is called Euler cursive
-\DeclareFontShape{U}{euc}{m}{n}{<-6>eurm5<6-8>eurm7<8->eurm10}{}%
-\DeclareSymbolFont{AMSc}{U}{euc}{m}{n} % I chose AMSc because AMSa and AMSb are defined in the amsfonts-package
-\DeclareMathSymbol{\umu}{\mathord}{AMSc}{"16}
-
-\newcommand{\about}{$\sim$}
-\newcommand{\eg}{{\it e.g.}}
-\newcommand{\ie}{{\it i.e.}}
-\newcommand{\micron}{\mbox{\,${\umu}$m}}            % microns
-\newcommand{\arcmin}{{$^\prime$}}
-\newcommand{\degr}{\mbox{\,$^\circ$}}               % degrees sign
-
-% ------------------------------------------------------------------------
-
-
-
-% ------------------------------------------------------------------------
-
-
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink Cookbook}
-\newcommand{\stardocinitials}  {SC}
-\newcommand{\stardocsource}    {sc\stardocnumber}
-\newcommand{\stardoccopyright}
+\stardoccategory    {Starlink Cookbook}
+\stardocinitials    {SC}
+\stardocsource      {sc\stardocnumber}
+\stardoccopyright
 {Copyright \copyright\ 2009-2010 University of British Columbia \\
  Copyright \copyright\ 2009-2010 Science \& Technology Facilities Council}
-\newcommand{\stardocnumber}    {19.3}
-\newcommand{\stardocauthors}   {Edward Chapin, Jessica Dempsey, Tim Jenness, Douglas Scott, Holly Thomas \& Remo Tilanus}
-\newcommand{\stardocdate}      {3 August 2010}
-\newcommand{\stardoctitle}     {The SCUBA-2 SRO Data Reduction Cookbook}
-\newcommand{\stardocversion}   {1.1}
-\newcommand{\stardocmanual}    {\ }
-\newcommand{\stardocabstract}  {
+\stardocnumber      {19.3}
+\stardocauthors     {Edward Chapin, Jessica Dempsey, Tim Jenness, Douglas Scott, Holly Thomas \& Remo Tilanus}
+\stardocdate        {3 August 2010}
+\stardoctitle       {The SCUBA-2 SRO Data Reduction Cookbook}
+\stardocversion     {1.1}
+\startitlepic{\includegraphics[scale=0.3]{sc19_logo}}
+\stardocabstract  {
 
   This cookbook provides a short introduction to \starlink\ facilities,
   especially \smurf, the Sub-Millimetre User Reduction Facility, for
@@ -86,449 +63,205 @@
   For information on SCUBA-2 data reduction since SRO, please
   see \xref{SC/21}{sc21}{}.}
 
-% ? End of document identification
-% +
-%  Name:
-%     sc.tex
-%
-%  Purpose:
-%     Template for Starlink Cookbook (SC) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     16-JUN-1997 (BLY):
-%        Original, based on SUN/SG templates.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%      1-FEB-2000 (AJC):
-%        Add Copyright statement in LaTeX
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
 % -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+% ? Document specific \providecommand or \newenvironment commands.
 
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
+%% Upright micron (code stolen from http://www.superstrate.net/useful/useful.html)
+\DeclareFontFamily{U}{euc}{}% I chose euc because the chart is called Euler cursive
+\DeclareFontShape{U}{euc}{m}{n}{<-6>eurm5<6-8>eurm7<8->eurm10}{}%
+\DeclareSymbolFont{AMSc}{U}{euc}{m}{n} % I chose AMSc because AMSa and AMSb are defined in the amsfonts-package
+\DeclareMathSymbol{\umu}{\mathord}{AMSc}{"16}
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+\providecommand{\about}{$\sim$}
+\providecommand{\eg}{\textit{e.g.}}
+\providecommand{\ie}{\textit{i.e.}}
+\providecommand{\micron}{\mbox{\,${\umu}$m}}            % microns
+\providecommand{\arcmin}{{$^\prime$}}
+\providecommand{\degr}{\mbox{\,$^\circ$}}               % degrees sign
 
 % A new environment for quoting verbatim
 % Environment for indenting and using a small font.
 \newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
 
-\newcommand{\text}[1]{{\small \texttt{#1}}}
+\providecommand{\text}[1]{{\small \texttt{#1}}}
 
 % Typographical shortcuts
-\newcommand{\fcfbe}{$\mathrm{FCF_{beamequiv}}$}
-\newcommand{\fcfb}{$\mathrm{FCF_{beam}}$}
-\newcommand{\fcfa}{$\mathrm{FCF_{arcsec}}$}
+\providecommand{\fcfbe}{$\mathrm{FCF_{beamequiv}}$}
+\providecommand{\fcfb}{$\mathrm{FCF_{beam}}$}
+\providecommand{\fcfa}{$\mathrm{FCF_{arcsec}}$}
 
 % SCUBA reference
-%\newcommand{\scuba}{\htmladdnormallink{SCUBA}{http://www.jach.hawaii.edu/JCMT/}}
+%\providecommand{\scuba}{\htmladdnormallink{SCUBA}{http://www.jach.hawaii.edu/JCMT/}}
 
 
 % Starlink Package names
-\newcommand{\starlink}{\htmladdnormallink{Starlink}{http://starlink.jach.hawaii.edu}}
+\providecommand{\starlink}{\htmladdnormallink{Starlink}{http://starlink.jach.hawaii.edu}}
 
 % set up some common package names
-\newcommand{\Kappa}{\xref{\textsc{Kappa}}{sun95}{}}
-\newcommand{\cupid}{\xref{\textsc{Cupid}}{sun255}{}}
-\newcommand{\Figaro}{\xref{\textsc{Figaro}}{sun86}{}}
-\newcommand{\gaia}{\xref{\textsc{Gaia}}{sun214}{}}
-\newcommand{\convert}{\xref{\textsc{Convert}}{sun55}{}}
-\newcommand{\fluxes}{\xref{\textsc{Fluxes}}{sun213}{}}
-\newcommand{\ccdpack}{\xref{\textsc{Ccdpack}}{sun139}{}}
-\newcommand{\Iras}{\xref{\textsc{Iras90}}{sun163}{}}
-\newcommand{\ndf}{\xref{NDF}{sun33}{}}
-\newcommand{\agi}{\xref{AGI}{sun48}{}}
-\newcommand{\surf}{\xref{\textsc{Surf}}{sun216}{}}
-\newcommand{\Specdre}{\xref{\textsc{Specdre}}{sun140}{}}
-\newcommand{\jcmtdr}{\xref{\textsc{JCMTdr}}{sun132}{}}
-\newcommand{\nod}{\textsc{nod2}}
-\newcommand{\ESP}{\xref{ESP}{sun180}{}}
-\newcommand{\GKS}{\xref{GKS}{sun83}{}}
-\newcommand{\oracdr}{\xref{\textsc{orac-dr}}{sun231}{}}
-\newcommand{\picard}{\xref{\textsc{Picard}}{sun231}{}}
-\newcommand{\smurf}{\xref{\textsc{Smurf}}{sun258}{}}
-\newcommand{\photom}{\xref{\textsc{Photom}}{sun45}{}}
-\newcommand{\topcat}{\htmladdnormallink{\textsc{Topcat}}{http://www.starlink.ac.uk/topcat}}
-\newcommand{\ssds}{\xref{\textsc{Starlink Standard Data Structures}}{sgp38}{}}
+\providecommand{\Kappa}{\xref{\textsc{Kappa}}{sun95}{}}
+\providecommand{\cupid}{\xref{\textsc{Cupid}}{sun255}{}}
+\providecommand{\Figaro}{\xref{\textsc{Figaro}}{sun86}{}}
+\providecommand{\gaia}{\xref{\textsc{Gaia}}{sun214}{}}
+\providecommand{\convert}{\xref{\textsc{Convert}}{sun55}{}}
+\providecommand{\fluxes}{\xref{\textsc{Fluxes}}{sun213}{}}
+\providecommand{\ccdpack}{\xref{\textsc{Ccdpack}}{sun139}{}}
+\providecommand{\Iras}{\xref{\textsc{Iras90}}{sun163}{}}
+\providecommand{\ndf}{\xref{NDF}{sun33}{}}
+\providecommand{\agi}{\xref{AGI}{sun48}{}}
+\providecommand{\surf}{\xref{\textsc{Surf}}{sun216}{}}
+\providecommand{\Specdre}{\xref{\textsc{Specdre}}{sun140}{}}
+\providecommand{\jcmtdr}{\xref{\textsc{JCMTdr}}{sun132}{}}
+\providecommand{\nod}{\textsc{nod2}}
+\providecommand{\ESP}{\xref{ESP}{sun180}{}}
+\providecommand{\GKS}{\xref{GKS}{sun83}{}}
+\providecommand{\oracdr}{\xref{\textsc{orac-dr}}{sun231}{}}
+\providecommand{\picard}{\xref{\textsc{Picard}}{sun231}{}}
+\providecommand{\smurf}{\xref{\textsc{Smurf}}{sun258}{}}
+\providecommand{\photom}{\xref{\textsc{Photom}}{sun45}{}}
+\providecommand{\topcat}{\htmladdnormallink{\textsc{Topcat}}{http://www.starlink.ac.uk/topcat}}
+\providecommand{\ssds}{\xref{\textsc{Starlink Standard Data Structures}}{sgp38}{}}
 
 % DR recipe names
-\newcommand{\drrecipe}[1]{\texttt{#1}}
+\providecommand{\drrecipe}[1]{\texttt{#1}}
 
 % Application tasks
-\newcommand{\task}[1]{\textsf{#1}}
+\providecommand{\task}[1]{\textsf{#1}}
 
 % ADAM parameters
-\newcommand{\param}[1]{\texttt{#1}}
+\providecommand{\param}[1]{\texttt{#1}}
 
 % SMURF tasks
-\newcommand{\copyflat}{\xref{\task{copyflat}}{sun258}{COPYFLAT}}
-\newcommand{\calcflat}{\xref{\task{calcflat}}{sun258}{CALCFLAT}}
-\newcommand{\calcnoise}{\xref{\task{calcnoise}}{sun258}{CALCNOISE}}
-\newcommand{\concat}{\xref{\task{sc2concat}}{sun258}{SC2CONCAT}}
-\newcommand{\fft}{\xref{\task{sc2fft}}{sun258}{SC2FFT}}
-\newcommand{\clean}{\xref{\task{sc2clean}}{sun258}{SC2CLEAN}}
-\newcommand{\flatfield}{\xref{\task{flatfield}}{sun258}{FLATFIELD}}
-\newcommand{\makemap}{\xref{\task{makemap}}{sun258}{MAKEMAP}}
-\newcommand{\smurfhelp}{\xref{\task{smurfhelp}}{sun258}{SMURFHELP}}
-\newcommand{\jcmtstate}{\xref{\task{jcmtstate2cat}}{sun258}{JCMTSTATE2CAT}}
-\newcommand{\smurfsun}{\xref{\textbf{SUN/258}}{sun258}{}}
+\providecommand{\copyflat}{\xref{\task{copyflat}}{sun258}{COPYFLAT}}
+\providecommand{\calcflat}{\xref{\task{calcflat}}{sun258}{CALCFLAT}}
+\providecommand{\calcnoise}{\xref{\task{calcnoise}}{sun258}{CALCNOISE}}
+\providecommand{\concat}{\xref{\task{sc2concat}}{sun258}{SC2CONCAT}}
+\providecommand{\fft}{\xref{\task{sc2fft}}{sun258}{SC2FFT}}
+\providecommand{\clean}{\xref{\task{sc2clean}}{sun258}{SC2CLEAN}}
+\providecommand{\flatfield}{\xref{\task{flatfield}}{sun258}{FLATFIELD}}
+\providecommand{\makemap}{\xref{\task{makemap}}{sun258}{MAKEMAP}}
+\providecommand{\smurfhelp}{\xref{\task{smurfhelp}}{sun258}{SMURFHELP}}
+\providecommand{\jcmtstate}{\xref{\task{jcmtstate2cat}}{sun258}{JCMTSTATE2CAT}}
+\providecommand{\smurfsun}{\xref{\textbf{SUN/258}}{sun258}{}}
 
 % Non surf tasks
 
 % KAPPA
-\newcommand{\qualtobad}{\xref{\task{qualtobad}}{sun95}{QUALTOBAD}}
-\newcommand{\showqual}{\xref{\task{showqual}}{sun95}{SHOWQUAL}}
-\newcommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
-\newcommand{\aperadd}{\xref{\task{aperadd}}{sun95}{APERADD}}
-\newcommand{\linplot}{\xref{\task{linplot}}{sun95}{LINPLOT}}
-\newcommand{\mlinplot}{\xref{\task{mlinplot}}{sun95}{MLINPLOT}}
-\newcommand{\drawsig}{\xref{\task{drawsig}}{sun95}{DRAWSIG}}
-\newcommand{\centroid}{\xref{\task{centroid}}{sun95}{CENTROID}}
-\newcommand{\hislist}{\xref{\task{hislist}}{sun95}{HISLIST}}
-\newcommand{\globals}{\xref{\task{globals}}{sun95}{GLOBALS}}
-\newcommand{\setaxis}{\xref{\task{setaxis}}{sun95}{SETAXIS}}
-\newcommand{\kstest}{\xref{\task{kstest}}{sun95}{KSTEST}}
-\newcommand{\stats}{\xref{\task{stats}}{sun95}{STATS}}
-\newcommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
-\newcommand{\setbb}{\xref{\task{setbb}}{sun95}{SETBB}}
-\newcommand{\beamfit}{\xref{\task{beamfit}}{sun95}{BEAMFIT}}
-\newcommand{\autophotom}{\xref{\task{autophotom}}{sun45}{AUTOPHOTOM}}
+\providecommand{\qualtobad}{\xref{\task{qualtobad}}{sun95}{QUALTOBAD}}
+\providecommand{\showqual}{\xref{\task{showqual}}{sun95}{SHOWQUAL}}
+\providecommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
+\providecommand{\aperadd}{\xref{\task{aperadd}}{sun95}{APERADD}}
+\providecommand{\linplot}{\xref{\task{linplot}}{sun95}{LINPLOT}}
+\providecommand{\mlinplot}{\xref{\task{mlinplot}}{sun95}{MLINPLOT}}
+\providecommand{\drawsig}{\xref{\task{drawsig}}{sun95}{DRAWSIG}}
+\providecommand{\centroid}{\xref{\task{centroid}}{sun95}{CENTROID}}
+\providecommand{\hislist}{\xref{\task{hislist}}{sun95}{HISLIST}}
+\providecommand{\globals}{\xref{\task{globals}}{sun95}{GLOBALS}}
+\providecommand{\setaxis}{\xref{\task{setaxis}}{sun95}{SETAXIS}}
+\providecommand{\kstest}{\xref{\task{kstest}}{sun95}{KSTEST}}
+\providecommand{\stats}{\xref{\task{stats}}{sun95}{STATS}}
+\providecommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
+\providecommand{\setbb}{\xref{\task{setbb}}{sun95}{SETBB}}
+\providecommand{\beamfit}{\xref{\task{beamfit}}{sun95}{BEAMFIT}}
+\providecommand{\autophotom}{\xref{\task{autophotom}}{sun45}{AUTOPHOTOM}}
 
-\newcommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
-\newcommand{\fitsedit}{\xref{\task{fitsedit}}{sun95}{FITSEDIT}}
+\providecommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
+\providecommand{\fitsedit}{\xref{\task{fitsedit}}{sun95}{FITSEDIT}}
 
-\newcommand{\setvar}{\xref{\task{setvar}}{sun95}{SETVAR}}
-\newcommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
-\newcommand{\gdset}{\xref{\task{gdset}}{sun95}{GDSET}}
-\newcommand{\idset}{\xref{\task{idset}}{sun95}{IDSET}}
-\newcommand{\ovset}{\xref{\task{ovset}}{sun95}{OVSET}}
-\newcommand{\gdnames}{\xref{\task{gdnames}}{sun95}{GDNAMES}}
-\newcommand{\gdclear}{\xref{\task{gdclear}}{sun95}{GDCLEAR}}
-\newcommand{\cursor}{\xref{\task{cursor}}{sun95}{CURSOR}}
-\newcommand{\flip}{\xref{\task{flip}}{sun95}{FLIP}}
-\newcommand{\cadd}{\xref{\task{cadd}}{sun95}{CADD}}
+\providecommand{\setvar}{\xref{\task{setvar}}{sun95}{SETVAR}}
+\providecommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
+\providecommand{\gdset}{\xref{\task{gdset}}{sun95}{GDSET}}
+\providecommand{\idset}{\xref{\task{idset}}{sun95}{IDSET}}
+\providecommand{\ovset}{\xref{\task{ovset}}{sun95}{OVSET}}
+\providecommand{\gdnames}{\xref{\task{gdnames}}{sun95}{GDNAMES}}
+\providecommand{\gdclear}{\xref{\task{gdclear}}{sun95}{GDCLEAR}}
+\providecommand{\cursor}{\xref{\task{cursor}}{sun95}{CURSOR}}
+\providecommand{\flip}{\xref{\task{flip}}{sun95}{FLIP}}
+\providecommand{\cadd}{\xref{\task{cadd}}{sun95}{CADD}}
 
-\newcommand{\cdiv}{\xref{\task{cdiv}}{sun95}{CDIV}}
-\newcommand{\Div}{\xref{\task{div}}{sun95}{DIV}}
-\newcommand{\cmult}{\xref{\task{cmult}}{sun95}{CMULT}}
-\newcommand{\mult}{\xref{\task{mult}}{sun95}{MULT}}
-\newcommand{\add}{\xref{\task{add}}{sun95}{ADD}}
-\newcommand{\sub}{\xref{\task{sub}}{sun95}{SUB}}
-\newcommand{\csub}{\xref{\task{csub}}{sun95}{CSUB}}
-\newcommand{\psf}{\xref{\task{psf}}{sun95}{PSF}}
+\providecommand{\cdiv}{\xref{\task{cdiv}}{sun95}{CDIV}}
+\providecommand{\Div}{\xref{\task{div}}{sun95}{DIV}}
+\providecommand{\cmult}{\xref{\task{cmult}}{sun95}{CMULT}}
+\providecommand{\mult}{\xref{\task{mult}}{sun95}{MULT}}
+\providecommand{\add}{\xref{\task{add}}{sun95}{ADD}}
+\providecommand{\sub}{\xref{\task{sub}}{sun95}{SUB}}
+\providecommand{\csub}{\xref{\task{csub}}{sun95}{CSUB}}
+\providecommand{\psf}{\xref{\task{psf}}{sun95}{PSF}}
 
-\newcommand{\glitch}{\xref{\task{glitch}}{sun95}{GLITCH}}
-\newcommand{\setunits}{\xref{\task{setunits}}{sun95}{SETUNITS}}
-\newcommand{\fitstext}{\xref{\task{fitstext}}{sun95}{FITSTEXT}}
-\newcommand{\fitsmod}{\xref{\task{fitsmod}}{sun95}{FITSMOD}}
-\newcommand{\fitshead}{\xref{\task{fitshead}}{sun95}{FITSHEAD}}
-\newcommand{\lutbgyrw}{\xref{\task{lutbgyrw}}{sun95}{LUTBGYRW}}
-\newcommand{\contour}{\xref{\task{contour}}{sun95}{CONTOUR}}
-\newcommand{\contover}{\xref{\task{contover}}{sun95}{CONTOVER}}
+\providecommand{\glitch}{\xref{\task{glitch}}{sun95}{GLITCH}}
+\providecommand{\setunits}{\xref{\task{setunits}}{sun95}{SETUNITS}}
+\providecommand{\fitstext}{\xref{\task{fitstext}}{sun95}{FITSTEXT}}
+\providecommand{\fitsmod}{\xref{\task{fitsmod}}{sun95}{FITSMOD}}
+\providecommand{\fitshead}{\xref{\task{fitshead}}{sun95}{FITSHEAD}}
+\providecommand{\lutbgyrw}{\xref{\task{lutbgyrw}}{sun95}{LUTBGYRW}}
+\providecommand{\contour}{\xref{\task{contour}}{sun95}{CONTOUR}}
+\providecommand{\contover}{\xref{\task{contover}}{sun95}{CONTOVER}}
 
-\newcommand{\turbocont}{\xref{\task{turbocont}}{sun95}{TURBOCONT}}
-\newcommand{\mosaic}{\xref{\task{mosaic}}{sun95}{MOSAIC}}
-\newcommand{\pixdupe}{\xref{\task{pixdupe}}{sun95}{PIXDUPE}}
-\newcommand{\rotate}{\xref{\task{rotate}}{sun95}{ROTATE}}
-\newcommand{\setbound}{\xref{\task{setbound}}{sun95}{SETBOUND}}
-\newcommand{\slide}{\xref{\task{slide}}{sun95}{SLIDE}}
-\newcommand{\gausmooth}{\xref{\task{gausmooth}}{sun95}{GAUSMOOTH}}
-\newcommand{\median}{\xref{\task{median}}{sun95}{MEDIAN}}
+\providecommand{\turbocont}{\xref{\task{turbocont}}{sun95}{TURBOCONT}}
+\providecommand{\mosaic}{\xref{\task{mosaic}}{sun95}{MOSAIC}}
+\providecommand{\pixdupe}{\xref{\task{pixdupe}}{sun95}{PIXDUPE}}
+\providecommand{\rotate}{\xref{\task{rotate}}{sun95}{ROTATE}}
+\providecommand{\setbound}{\xref{\task{setbound}}{sun95}{SETBOUND}}
+\providecommand{\slide}{\xref{\task{slide}}{sun95}{SLIDE}}
+\providecommand{\gausmooth}{\xref{\task{gausmooth}}{sun95}{GAUSMOOTH}}
+\providecommand{\median}{\xref{\task{median}}{sun95}{MEDIAN}}
 
-\newcommand{\memd}{\xref{\task{mem2d}}{sun95}{MEM2D}}
-\newcommand{\axlabel}{\xref{\task{axlabel}}{sun95}{AXLABEL}}
-\newcommand{\axunits}{\xref{\task{axunits}}{sun95}{AXUNITS}}
-\newcommand{\setlabel}{\xref{\task{setlabel}}{sun95}{SETLABEL}}
-\newcommand{\settitle}{\xref{\task{settitle}}{sun95}{SETTITLE}}
-\newcommand{\histogram}{\xref{\task{histogram}}{sun95}{HISTOGRAM}}
-\newcommand{\normalize}{\xref{\task{normalize}}{sun95}{NORMALIZE}}
+\providecommand{\memd}{\xref{\task{mem2d}}{sun95}{MEM2D}}
+\providecommand{\axlabel}{\xref{\task{axlabel}}{sun95}{AXLABEL}}
+\providecommand{\axunits}{\xref{\task{axunits}}{sun95}{AXUNITS}}
+\providecommand{\setlabel}{\xref{\task{setlabel}}{sun95}{SETLABEL}}
+\providecommand{\settitle}{\xref{\task{settitle}}{sun95}{SETTITLE}}
+\providecommand{\histogram}{\xref{\task{histogram}}{sun95}{HISTOGRAM}}
+\providecommand{\normalize}{\xref{\task{normalize}}{sun95}{NORMALIZE}}
 
-\newcommand{\ndftrace}{\xref{\task{ndftrace}}{sun95}{NDFTRACE}}
-\newcommand{\fitsval}{\xref{\task{fitsval}}{sun95}{NDFTRACE}}
+\providecommand{\ndftrace}{\xref{\task{ndftrace}}{sun95}{NDFTRACE}}
+\providecommand{\fitsval}{\xref{\task{fitsval}}{sun95}{NDFTRACE}}
 
-\newcommand{\makesnr}{\xref{\task{makesnr}}{sun95}{MAKESNR}}
-\newcommand{\wcsmosaic}{\xref{\task{wcsmosaic}}{sun95}{WCSMOSAIC}}
-\newcommand{\mfittrend}{\xref{\task{mfittrend}}{sun95}{MFITTREND}}
+\providecommand{\makesnr}{\xref{\task{makesnr}}{sun95}{MAKESNR}}
+\providecommand{\wcsmosaic}{\xref{\task{wcsmosaic}}{sun95}{WCSMOSAIC}}
+\providecommand{\mfittrend}{\xref{\task{mfittrend}}{sun95}{MFITTREND}}
 
 % Convert
-\newcommand{\ndffits}{\xref{\task{ndf2fits}}{sun55}{NDF2FITS}}
-\newcommand{\ndfascii}{\xref{\task{ndf2ascii}}{sun55}{NDF2ASCII}}
+\providecommand{\ndffits}{\xref{\task{ndf2fits}}{sun55}{NDF2FITS}}
+\providecommand{\ndfascii}{\xref{\task{ndf2ascii}}{sun55}{NDF2ASCII}}
 
 % FIGARO
-\newcommand{\wdfits}{\xref{\task{wdfits}}{sun86}{WDFITS}}
-\newcommand{\istat}{\xref{\task{istat}}{sun86}{ISTAT}}
-\newcommand{\delobj}{\xref{\task{delobj}}{sun86}{DELOBJ}}
-\newcommand{\copobj}{\xref{\task{copobj}}{sun86}{COPOBJ}}
-\newcommand{\image}{\xref{\task{image}}{sun86}{IMAGE}}
-\newcommand{\bclean}{\xref{\task{bclean}}{sun86}{BCLEAN}}
-\newcommand{\ystract}{\xref{\task{ystract}}{sun86}{YSTRACT}}
-\newcommand{\sclean}{\xref{\task{sclean}}{sun86}{SCLEAN}}
+\providecommand{\wdfits}{\xref{\task{wdfits}}{sun86}{WDFITS}}
+\providecommand{\istat}{\xref{\task{istat}}{sun86}{ISTAT}}
+\providecommand{\delobj}{\xref{\task{delobj}}{sun86}{DELOBJ}}
+\providecommand{\copobj}{\xref{\task{copobj}}{sun86}{COPOBJ}}
+\providecommand{\image}{\xref{\task{image}}{sun86}{IMAGE}}
+\providecommand{\bclean}{\xref{\task{bclean}}{sun86}{BCLEAN}}
+\providecommand{\ystract}{\xref{\task{ystract}}{sun86}{YSTRACT}}
+\providecommand{\sclean}{\xref{\task{sclean}}{sun86}{SCLEAN}}
 
 % CCDPACK
-\newcommand{\makemos}{\xref{\task{makemos}}{sun139}{MAKEMOS}}
+\providecommand{\makemos}{\xref{\task{makemos}}{sun139}{MAKEMOS}}
 
 % IRAS90
-\newcommand{\skypos}{\xref{\task{skypos}}{sun163}{SKYPOS}}
-\newcommand{\skygrid}{\xref{\task{skygrid}}{sun163}{SKYGRID}}
-\newcommand{\skyphot}{\xref{\task{skyphot}}{sun163}{SKYPHOT}}
+\providecommand{\skypos}{\xref{\task{skypos}}{sun163}{SKYPOS}}
+\providecommand{\skygrid}{\xref{\task{skygrid}}{sun163}{SKYGRID}}
+\providecommand{\skyphot}{\xref{\task{skyphot}}{sun163}{SKYPHOT}}
 
 % CUPID
-\newcommand{\findback}{\xref{\task{findback}}{sun255}{FINDBACK}}
+\providecommand{\findback}{\xref{\task{findback}}{sun255}{FINDBACK}}
 
 % Misc
-\newcommand{\hdstrace}{\xref{\task{hdstrace}}{sun102}{}}
-\newcommand{\psmerge}{\xref{\task{psmerge}}{sun164}{}}
-\newcommand{\fitgauss}{\xref{\task{fitgauss}}{sun140}{FITGAUSS}}
-\newcommand{\gaufit}{\xref{\task{gaufit}}{sun180}{GAUFIT}}
+\providecommand{\hdstrace}{\xref{\task{hdstrace}}{sun102}{}}
+\providecommand{\psmerge}{\xref{\task{psmerge}}{sun164}{}}
+\providecommand{\fitgauss}{\xref{\task{fitgauss}}{sun140}{FITGAUSS}}
+\providecommand{\gaufit}{\xref{\task{gaufit}}{sun180}{GAUFIT}}
 
 % JAC
 
-\newcommand{\Coulson}{\htmladdnormallink{Coulson}{http://www.jach.hawaii.edu/JACdocs/JCMT/SCD/SN/003/ }}
-
-% Special HTML versions of commands
-\begin{htmlonly}
-\renewcommand{\micron}{\begin{rawhtml}&mu;m\end{rawhtml}}
-\end{htmlonly}
-
+\providecommand{\Coulson}{\htmladdnormallink{Coulson}{http://www.jach.hawaii.edu/JACdocs/JCMT/SCD/SN/003/ }}
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
+\scfrontmatter
 
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   \textsc{University of British Columbia \&} \hfill \textbf{\stardocname}\\
-   {\textsc{Science \& Technology Facilities Council}}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-\begin{center}
-\hspace{1.3in}\includegraphics[scale=0.3]{sc19_logo}
-\end{center}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-\includegraphics[width=2.0in]{sc19_logo}
-% ? End of picture
-
-   \begin{rawhtml} <P> {\sl  \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} } </P> <H3> \end{rawhtml}
-      \htmladdnormallink{University of British Columbia}
-                        {http://www.ubc.ca} \\
-      \htmladdnormallink{Science \& Technology Facilities Council}
-                        {http://www.scitech.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? Latex Copyright Statement
-%  =========================
-\begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
-\end{latexonly}
-% ? End of Latex copyright statement
-
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
 
 \section{\xlabel{introduction}Introduction}
 \label{sec:intro}
@@ -544,14 +277,14 @@ with the basic facilities for analysing and visualising data using
 and \gaia \cite{gaia}. Obviously, \starlink\ must be installed on your
 system, and \starlink\ aliases and environment variables must be
 defined before attempting any of the examples in this document.  This
-guide is {\em not} aimed at users of the polarimeter (POL-2) or
+guide is \emph{not} aimed at users of the polarimeter (POL-2) or
 Fourier transform spectrometer (FTS-2).
 
 A brief description of raw SCUBA-2 data is given in
 Section~\ref{sec:data}. Section~\ref{sec:visual} demonstrates how to
 visualise SCUBA-2 data, interspersed with some simple worked examples
 of interactive data-reduction techniques. The end goal of this section
-is {\em not} to produce a final science-grade map, rather to give the
+is \emph{not} to produce a final science-grade map, rather to give the
 user a feel for the types of artefacts and data reduction steps
 required to make a useful image. The best way to make an image from
 SCUBA-2 data is to use the Dynamic Iterative Map-Maker (DIMM). This
@@ -566,11 +299,9 @@ Note that a number of the examples in this document use real data that
 are distributed with this \starlink\ release. The small Uranus example
 is distributed as part of SMURF and can be found in:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 $STARLINK_DIR/share/smurf/s4a20091214_00015_000*.sdf
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The more detailed examples use larger data sets which, because of
 their size, can be downloaded separately via the URL
@@ -583,8 +314,7 @@ To gain access to \smurf\ tasks (the data reduction package for
 SCUBA-2) before proceeding with the examples in this document first
 type:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % smurf
 
 
@@ -595,8 +325,7 @@ type:
         Type 'showme sc19' to view the SCUBA-2 map-making cookbook.
 
 
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 %
 
 For a more detailed description refer to the comprehensive Starlink
@@ -614,8 +343,8 @@ frames such as darks or flatfield ramps. For example, observation 15
 on 2009-12-14 of Uranus produced the following 16 files with the
 450\micron\ array that was operational at the time (s4a):
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 -rw-r--r-- 1 echapin software  5976576 Jan 17 08:01 s4a20091214_00015_0001.sdf
 -rw-r--r-- 1 echapin software 34945536 Jan 17 08:01 s4a20091214_00015_0002.sdf
 -rw-r--r-- 1 echapin software 34945536 Jan 17 08:01 s4a20091214_00015_0003.sdf
@@ -632,8 +361,8 @@ on 2009-12-14 of Uranus produced the following 16 files with the
 -rw-r--r-- 1 echapin software 34945536 Jan 17 08:02 s4a20091214_00015_0014.sdf
 -rw-r--r-- 1 echapin software 11778560 Jan 17 08:02 s4a20091214_00015_0015.sdf
 -rw-r--r-- 1 echapin software  5977600 Jan 17 08:02 s4a20091214_00015_0016.sdf
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 The fifth column gives the file sizes in bytes, and shows that the
 first and last files, which were dark observations, have nearly
@@ -661,11 +390,9 @@ calculated dynamically from the flatfield ramps bracketing each
 science observation. The DIMM will always use a flatfield ramp if
 available. For example, use the command
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % flatfield 's4a20091214_00015_*.sdf' '*_flat'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 %
 to produce flat-fielded versions of the files that contain bolometer
 data taken during the scan across Uranus, with the dark observations
@@ -685,7 +412,7 @@ internally by default.
 In this section several procedures are described for looking at
 SCUBA-2 data, as well as basic data reduction steps that can be run
 separately. Working through these examples will illustrate some of the
-features of SCUBA-2 data, but will {\em not} result in a science-grade
+features of SCUBA-2 data, but will \emph{not} result in a science-grade
 image at the end. If you are interested only in making the best
 possible map with minimal effort proceed to Section~\ref{sec:maps}.
 
@@ -697,11 +424,9 @@ data into single files. The \smurf\ task \concat\ can be used for this
 operation. For example, assuming the following files are in the
 current working directory,
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % sc2concat 's4a20091214_00015_00??.sdf' './*_con'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 combines all of the files associated with observation 15 for the s4a
 array into a single file called
@@ -722,11 +447,9 @@ state information) is stored in the \texttt{MORE.SMURF.JCMTSTATE}
 extension of a data file. The \smurf\ task \jcmtstate\ will convert
 this information into a simple ASCII tab separated table:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % jcmtstate2cat s4a20091214_00015_0002_con.sdf > state.tst
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \begin{figure}
 \begin{center}
@@ -750,11 +473,9 @@ header information.
 This catalogue can be loaded into \topcat\ for plotting, making sure
 that \topcat\ is told that the TST format is to be used for reading.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % topcat -f tst state.tst
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 An example plot of the scan pattern for this observation generated by
 \topcat\ can be seen in Fig.~\ref{fig:topcat}. All the time varying
@@ -843,11 +564,9 @@ A simple and quick map can be made from a data cube using the \smurf\
 \makemap\ task. The following will produce a map directly from the raw
 concatenated data by re-gridding it into a pixelated map:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makemap s4a20091214_00015_0002_con.sdf uranus method=rebin
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The \makemap\ task automatically scales the bounds of the image to
 encompass all of the data. The output map here is called
@@ -889,12 +608,10 @@ The following will remove a 0th-order polynomial (the mean) from each
 bolometer time stream, storing the cleaned data in a file called
 `clean.sdf':
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % sc2clean s4a20091214_00015_0002_con.sdf clean \
      config="order=0"
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \begin{figure}
 \begin{center}
@@ -920,12 +637,10 @@ Fig.~\ref{fig:array_mean}. In these cases there have been large level
 changes, or `DC Steps', during data acquisition. These can
 be identified and repaired using some extra parameters to \clean:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % sc2clean s4a20091214_00015_0002_con.sdf clean2 \
    config='"order=0,dcfitbox=30,dcthresh=25,dcsmooth=50"'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 In addition to removing the mean as in the previous example, the extra
 parameters starting with `dc' instruct \clean\ to smooth the data with
@@ -958,12 +673,10 @@ for CONFIG using the standard group notation (`myconfig.lis' in the
 following example; the leading `\verb|^|' is necessary, but it is not
 part of the file name):
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % sc2clean s4a20091214_00015_0002_con.sdf clean2 \
    config=^myconfig.lis
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 An example config file containing the default values for each item
 can be found in \\ \texttt{\${SMURF\_DIR}/smurf\_sc2clean.def}.
@@ -980,7 +693,7 @@ shows 1 in every 5 frames), and click the `On' button next to
 `Looping'. Finally, click `Start', and an animation of the data cube
 will be shown in the main \gaia\ window. The dominant signal is a
 gradual variation in the average value of all of the bolometers in
-unison. This {\em common-mode} signal is produced through a
+unison. This \emph{common-mode} signal is produced through a
 combination of SCUBA-2 fridge temperature variations, sky noise,
 telescope motion, and other drifts in the individual bolometers. At
 times it is also (just barely) possible to see Uranus itself as the
@@ -1011,8 +724,7 @@ filtered using a single call to \clean.
 \end{center}
 \end{figure}
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % sc2clean 's4a20091214_00015_000?.sdf' clean3 \
    config=^${STARLINK_DIR}/share/smurf/sc19_clean3.lis
 
@@ -1020,14 +732,12 @@ Processing data from instrument 'SCUBA-2' for object 'URANUS' from the
 following observation  :
   20091214 #15 scan
 
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Here the text file, \texttt{sc19\_clean3.lis}, contains the following
 configuration options:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 order=0
 dcfitbox=30
 dcthresh=25
@@ -1035,8 +745,7 @@ dcsmooth=50
 fillgaps=1
 apod=<undef>
 filt_edgehigh=0.5
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 As in the early examples, the first four parameters cause \clean\ to
 remove the mean bolometer values, and repair DC steps. Next, the
@@ -1067,8 +776,7 @@ high-pass filtering by overriding the `filt\_edgehigh' parameter
 explicitly, since the goal now is to see what the full bolometer noise
 power spectrum looks like.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 
 % sc2clean 's4a20091214_00015_000?.sdf' clean4 \
    config="'^${STARLINK_DIR}/share/smurf/sc19_clean3.lis,filt_edgehigh=0'"
@@ -1086,8 +794,7 @@ following observation  :
 Found 1 continuous chunk
 SC2FFT: power spectrum requested so setting POLAR=TRUE
 
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 While there is a \starlink\ standard format for storing complex values
 as described in \cite{ssds}, \fft\ uses its own local format that
@@ -1104,11 +811,9 @@ that the 3rd axis of the cube is the array of squared Fourier
 amplitudes for each bolometer, and ignore the phases (i.e.~we observe
 only the 1st elements along the 4th axis):
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % gaia 'pspec(,,,1)'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 It is then possible to click on each bolometer to display its power
 spectrum. Once the `Spectral plot' window has been spawned, it will
@@ -1142,8 +847,8 @@ and each bit can reflect a different condition. For example, the
 following will indicate the number of samples flagged by \clean\ when
 producing `clean4.sdf' in the previous example:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % kappa
 
 
@@ -1162,8 +867,8 @@ producing `clean4.sdf' in the previous example:
   BADDA           (bit 1) - "Set iff a sample is flagged by the DA" (4416000)
   BADBOL          (bit 2) - "Set iff all data from bolo to be ignored" (4476000)
   DCJUMP          (bit 3) - "Set iff a DC jump is present" (6924)
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 The `count' supplied to \showqual\ indicates that the total number of
 occurrences of each Quality flag in the data should be counted and
@@ -1172,7 +877,7 @@ flagged `\texttt{BADDA}' by the flatfielding algorithm or by the data
 acquisition (DA) system itself based on the array setup. Since each
 bolometer produced 12000 samples, this corresponds to 4416000/12000
 $=$ 368 bolometers that were not operational (out of 1280). The
-`\texttt{BADBOL}' flag is used by \smurf\ to flag {\em every} sample
+`\texttt{BADBOL}' flag is used by \smurf\ to flag \emph{every} sample
 of a bolometer that is not being used. In this case the number of
 flags is 4476000 which corresponds to 373 bolometers. In other words,
 cleaning turned off an additional 5 bolometers. Finally,
@@ -1186,25 +891,20 @@ wish to see the data that were flagged you can use the \Kappa\
 \setbb\ command to enable a particular flag or turn them all off (so
 that they can be seen in \gaia).
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setbb clean4 0
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 will disable quality and make visible all the underlying data. Using a
 value of 255 will turn all bits back on and so any non-zero quality will be
 treated as bad data.
 
 Additionally, the \Kappa\ task \qualtobad\ may be used to permanently
-convert samples with given quality bits to a {\em magic\/} or {\em
-  invalid\/} value. For example:
+convert samples with given quality bits to a \emph{magic\/} or \emph{invalid\/} value. For example:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % qualtobad clean4 badmasked DCJUMP
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 %
 will set all of the samples flagged with quality \texttt{DCJUMP} to the
 magic value. When `badmasked.sdf' is subsequently viewed with \gaia, none
@@ -1231,8 +931,8 @@ or the config files themselves. A local copy can be made and altered
 if desired. The following command invokes the DIMM to produce the
 image shown in Fig.~\ref{fig:itermap} with 2\,arcsec pixels:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % makemap '$STARLINK_DIR/share/smurf/s4a20091214_00015_000?.sdf' uranus 2 \
 method=iterate config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
@@ -1295,9 +995,8 @@ smf_iteratemap: Calculate time-stream model components
 smf_iteratemap: Rebin residual to estimate MAP
 smf_iteratemap: *** CHISQUARED = 1.15486085552371 for filegroup 1
 
-
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 This excerpt shows the initial output of the DIMM. Note that the basic
 dimensions of the data being processed are listed near the start of
@@ -1328,8 +1027,8 @@ stops sooner if the change in \texttt{CHISQUARED} is less then
 0.001. In this case, it reaches this stopping criterion after 5
 iterations:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 smf_iteratemap: Iteration 5 / 5 ---------------
 smf_iteratemap: Calculate time-stream model components
 smf_iteratemap: Rebin residual to estimate MAP
@@ -1348,8 +1047,8 @@ Total samples available for map:   10010475, 65.17% of max (834.206 bolos)
 smf_iteratemap: ****** Completed in 5 iterations
 smf_iteratemap: ****** Solution CONVERGED
 Total samples available from all chunks: 10010475 (834.206 bolos)
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 Note that compared to the initial report, the total number of samples
 with good QUALITY (\texttt{Total samples available for map}) has
@@ -1376,8 +1075,7 @@ provided with \smurf\ are derived from
 \texttt{\$STARLINK\_DIR/share/smurf/dimmconfig.lis}, and we show the
 relevant excerpt here:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 # Model components/order (comma separated list in brackets)
 # Note: components specified AFTER 'ast' will not be calculated for the
 # first time until the second iteration.
@@ -1392,16 +1090,14 @@ relevant excerpt here:
 #  pln = remove plane from each time slice
 
 modelorder = (com,gai,ext,flt,ast,noi)
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
-By default, the final values of these fitted models are {\em not}
+By default, the final values of these fitted models are \emph{not}
 written to files. However, this can be modified by setting
 \texttt{exportndf} in the configuration file to the list of models
 that you wish to view:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 # Specify a value of 1 or 0 to export all or none of the components
 # You can also specify an array of components to export using the same
 # format as modelorder. Note that you can specify additional
@@ -1414,22 +1110,19 @@ that you wish to view:
 # written to model components with different dimensions.
 
 exportndf = (com,gai,ast,flt,res,noi,qua)
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 If we make a local copy of \texttt{dimmconfig.lis}, add the above
 \texttt{exportndf} line, and re-run the iterative map-maker with this
 modified configuration, it now produces several new files at the end:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 s4a20091214_00015_0002_con_ast.sdf
 s4a20091214_00015_0002_con_com.sdf
 s4a20091214_00015_0002_con_gai.sdf
 s4a20091214_00015_0002_con_flt.sdf
 s4a20091214_00015_0002_con_res.sdf
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Note that the quality and variance for the data are stored as the
 VARIANCE and QUALITY components within the residual file NDF.
@@ -1737,8 +1430,7 @@ calibrators, the FCFs and NEFDs have been calculated as follows:
   An example of a \picard\ parameter file (used for reduction of the
   850\micron\ calibrators) is shown here:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 [SCUBA2_FCFNEFD]
 APERTURE_RADIUS=30.0
 AUTOPHOTOM=1
@@ -1752,8 +1444,7 @@ FLUX_850.ALPHAORI=0.629
 FLUX_850.TWHYDRAE=1.37
 FLUX_850.V883ORI=1.34
 LOGFILE=1
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \item {It then uses the above procedure to calculate the three
   alternative FCF values described below.}
@@ -1883,21 +1574,17 @@ the Spring of 2010.
 First, assuming the data are in the current directory, we produce a
 map using the specialized \texttt{dimmconfig\_blank\_field}:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makemap s4a20100313_00029_00\*.sdf map450 method=iterate \
 config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 For comparison, we also make a map using the default configuration:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makemap s4a20100313_00029_00\*.sdf map450_default method=iterate \
 config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Both of the maps are shown in Fig.~\ref{fig:cosmomap}. Clearly the
 specialized configuration yields a flatter map, although the white
@@ -1956,22 +1643,18 @@ effective shape of a point-source in this background-subtracted map.
 Before applying the filter to our cosmology data, we first look at the
 effect it has on the map of Uranus from Fig.~\ref{fig:itermap}. We
 create a simple parameter file called \texttt{smooth.ini},
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 [SCUBA2_MATCHED_FILTER]
 SMOOTH_FWHM = 15
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 %
 where \texttt{SMOOTH\_FWHM = 15} indicates that the background should
 be estimated by first smoothing the map and PSF with a 15\,arcsec FWHM
 Gaussian. Next, the recipe is executed as follows:
 %
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % picard -recpars smooth.ini SCUBA2_MATCHED_FILTER uranus.sdf
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 %
 The output of this operation is a smoothed image called
 \texttt{uranus\_mf.sdf}. By default, the recipe automatically
@@ -2009,11 +1692,9 @@ densities, which results in an increased noise level.
 Now that we know what this procedure does to a bright point source, we
 proceed to filter the map of MS0451:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % picard -recpars smooth.ini SCUBA2_MATCHED_FILTER map450.sdf
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The smoothed map, \texttt{map450\_mf.sdf}, is shown next to Uranus in
 Fig.~\ref{fig:cosmo_filt}. As hoped, this map has most of the
@@ -2024,11 +1705,9 @@ Finally, how should we find sources? The filtered map also contains a
 VARIANCE component, so it is easy to produce a S/N map using the \Kappa\
 task \makesnr:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makesnr map450_mf map450_mf_snr
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The resulting map, \texttt{map450\_mf\_snr}, is shown in
 Fig.~\ref{fig:cosmo_snr}. Compared to Fig.~\ref{fig:cosmo_filt} the
@@ -2049,7 +1728,7 @@ A basic procedure for identifying sources would be to locate peaks
 above some threshold S/N. However, as a word of caution, even after
 all of these steps the noise may not be perfectly well-behaved. In
 this example we do not expect any real astronomical source, so the S/N
-map {\em should\/} have a brightness distribution that resembles a
+map \emph{should\/} have a brightness distribution that resembles a
 Gaussian with standard deviation $\sigma=1$ and mean zero. We perform
 this comparison for the central $100 \times 100$ pixels of the S/N map
 in Fig.~\ref{fig:cosmo_snrcompare}, well away from any edge
@@ -2101,7 +1780,7 @@ PIs should consider undertaking:
   independent maps. Are the highest S/N peaks detected in each of
   them?
 
-\item Use {\em jackknife} tests to verify the estimated noise levels,
+\item Use \emph{jackknife} tests to verify the estimated noise levels,
   i.e.~produce two maps from independent portions of the data and
   difference them (e.g., using the \Kappa\ task \sub). This will
   remove any astronomical signal, but increase the noise by a factor
@@ -2109,8 +1788,8 @@ PIs should consider undertaking:
   (where the noise should hopefully be uniform) roughly $\sqrt{2}$
   larger than the noise estimated for either of the original maps?
 
-\item How many {\em negative} peaks above a given S/N are there
-  compared to the {\em positive} peaks?
+\item How many \emph{negative} peaks above a given S/N are there
+  compared to the \emph{positive} peaks?
 
 \end{itemize}
 
@@ -2139,15 +1818,13 @@ When running the DIMM we select the default configuration file
 \texttt{dimmconfig.lis}; the individual parameters of which are
 described in Section~\ref{sec:maps}.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makemap '$STARLINK_DIR/share/smurf/s8d20100216_00022_000?.sdf' Orion22 \
 method=iterate config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
 % makemap '$STARLINK_DIR/share/smurf/s8d20100216_00023_000?.sdf' Orion23 \
 method=iterate config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \begin{figure}
 \begin{center}
@@ -2189,47 +1866,39 @@ parameter \param{FINDBACK\_BOX}.  The modified parameter file
 \findback\ and the \findback\ box size to 30 pixels or 120\,arcsec
 when using 4\,arcsec pixels:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 [REMOVE_BACKGROUND]
 BACKGROUND_FITMETHOD = findback
 FINDBACK_BOX = 30
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Caution is advised when selecting the box size, with a smaller box
 giving a flatter background but at the expense of source flux. This is
 of particular importance to extended sources where the recovery of
 faint emission is paramount.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % picard -recpars params.ini REMOVE_BACKGROUND Orion22.sdf
 % picard -recpars params.ini REMOVE_BACKGROUND Orion23.sdf
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The background subtracted maps are shown on the bottom row of
 Fig.~\ref{fig:orionmakemap} where both the bowling and uneven
 background have been significantly improved. Before we combine the
 maps we will first crop them to their originally requested size using
 the \picard\ recipe \drrecipe{CROP\_JCMT\_IMAGES}.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % picard CROP_JCMT_IMAGES Orion22_back.sdf
 % picard CROP_JCMT_IMAGES Orion23_back.sdf
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 These cropped maps are then coadded using \drrecipe{MOSAIC\_JCMT\_IMAGES}. This
 example utilises the default parameters where \wcsmosaic\ with variance
 weighting is used for the mosaicking method although it can be
 configured to use \makemos\ or to use a different \wcsmosaic\ method.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % picard MOSAIC_JCMT_IMAGES Orion2*_back_crop.sdf
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The key advantage to using the \picard\ recipe over standalone
 \Kappa\ commands is that the exposure time image is also propagated
@@ -2260,12 +1929,10 @@ filename.
 The simpler method is to make a map from all of the data at once using
 \texttt{dimmconfig\_bright\_extended.lis}:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makemap "$STARLINK_DIR/share/smurf/s8d20100216_00022_0002[23].sdf" Orion \
 method=iterate config=^$STARLINK_DIR/share/smurf/dimmconfig_bright_extended.lis
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The large-scale noise and negative bowling is compensated for using a
 S/N-based zero mask during map-making. Everywhere the signal is below
@@ -2308,11 +1975,9 @@ In this first basic example, we just want to clean up some data enough
 to be able to see whether the bolometers have been flat-fielded
 correctly, and more-or-less exhibit the same behaviour over time:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 sc2clean $FILES clean config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Here \texttt{\$FILES} can just be a single file from a subarray, or a
 subset, e.g. \texttt{s8a20110417\_00051\_0003.sdf} (the first file
@@ -2347,12 +2012,10 @@ amplitudes vary.
 Another very useful option is to remove the common signal observed by
 all of the bolometers. This may be accomplished by
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 sc2clean $FILES clean \
    config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,compreprocess=1"'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The residual of this signal will exhibit second-order time-varying
 correlated signals across the focal plane. Usually these are not very
@@ -2364,24 +2027,22 @@ noise by low-pass filtering the result. This can again be accomplished
 by simply adding a filter command in the \texttt{config} parameter,
 which in this case low-pass filters with a cutoff at 10\,Hz:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 sc2clean $FILES clean \
    config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,compreprocess=1,filt_edgelow=10"'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 Finally, in some cases you might just want to fit and remove
 polynomial baselines from the bolometers (by default only the mean is
 removed). This example will remove a line, but you can increase the
 value of \texttt{order} to remove higher-order polynomials
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 sc2clean $FILES clean \
    config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,order=1"'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \subsection{\label{caldata}Looking at calibration data}
 
@@ -2398,20 +2059,16 @@ the science data files as well) through \calcnoise\ (the NEP map for
 the subarray will be stored in the \texttt{.MORE.SMURF.NEP} extension
 of the output NDF \texttt{s8a\_noise.sdf}):
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 calcnoise s8a20110417_00051_0001 s8a_noise method=! power=!
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The sky flats can be used to calculate responsivity images using
 \calcflat:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 calcflat s8a20110417_00051_0002 s8a_flat method=! resp=s8a_resp respmask
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The resulting \texttt{s8a\_flat.sdf} contains a data cube of the data used
 to fit the responsivity (stacking several heater ramps together -- it
@@ -2492,8 +2149,7 @@ array that prevented the use of bolometers around the edge.
 
 A listing of the observation directory shows the following:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
  6956 s8d20100223_00017_0001.sdf
 34140 s8d20100223_00017_0002.sdf
 34140 s8d20100223_00017_0003.sdf
@@ -2501,8 +2157,7 @@ A listing of the observation directory shows the following:
 34140 s8d20100223_00017_0005.sdf
 34140 s8d20100223_00017_0006.sdf
  6956 s8d20100223_00017_0007.sdf
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 As explained in the main section of the manual, the first and last
 files typically are `dark' or `flatfield ramp' observations. The
@@ -2510,12 +2165,10 @@ remaining files can all be concatenated without resulting in too large
 a data set (which for science observations often will not be true
 unfortunately).
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % cp (raw data dir)/*.sdf .
 % sc2concat in=s8d\*.sdf out=sc17_con
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \subsection{\xlabel{Tracking}Telescope tracking}
 \label{sec:tracking}
@@ -2523,12 +2176,10 @@ unfortunately).
 A first inspection can be made of the tracking of the telescope by
 inspecting the JCMT state structure in the headers:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % jcmtstate2cat sc17_con > sc17_con.cat
 % topcat -f tst sc17_con.cat
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Select a 2-D image panel and the columns \texttt{x = TCS\_TR\_AC1, y =
 TCS\_TR\_AC2} to show the actual tracking on the sky.  Each point
@@ -2601,16 +2252,14 @@ relatively compact sources it should be safe to remove a first order
 baseline to also account for a monotonic drift component in the time
 series.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % cat my_sc2clean_bsl.def
 order=1
 dcfitbox = 0
 spikethresh = 0
 
 % sc2clean sc17_con sc17_conbsl config=^my_sc2clean_bsl.def
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Collapsing the time-series cube again now results in a mean in a range
 of $-$3.0e-13 to 2.4e-13 as shown in Fig.~\ref{fig:conbslcollapse}. A
@@ -2667,8 +2316,7 @@ configuration file:\footnote{(These parameters are explained in
   \smurfsun\ (or run \texttt{`smurfhelp makemap config'} or
   \texttt{`smurfhelp sc2clean config'}).}
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % cat my_sc2clean.def
 order = 1
 dcfitbox = 30
@@ -2682,8 +2330,7 @@ spikebox = 50
 noiseclip = 4.0
 
 % sc2clean sc17_con sc17_concln config=^my_sc2clean.def
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The results were that \clean\ left the time series of the top two
 plots in Fig.~\ref{fig:timeseries} unchanged, i.e.\ the common-mode
@@ -2738,16 +2385,14 @@ analysis of point-source fields, but be aware that the DIMM
 in general will leave significantly more `baseline' systematics in the
 time-series.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 (csh)
 set file = sc17_conbsl
 echo "Subtract time-series block median"
 block estimator=median in=${file} out=${file}_block \
       wlim=0 box='[1,1,200]'
 sub ${file} ${file}_block ${file}_subblk
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 A block-size of 200 corresponds to 1 sec of data, which can be related
 to a spatial size through the maximum scanning speed
@@ -2792,12 +2437,10 @@ One can attempt to further identify problematic bolometers by,
 for example, calculating the rms of each time series, but that falls outside
 the scope of this document:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 collapse ${file}_block ${file}_block_rms estimator=rms \
          axis=3 variance=false wlim=0.0
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \subsubsection{\xlabel{method2}Method 2}
 \label{sec:method2}
@@ -2862,8 +2505,8 @@ it has been left out.
 latter one would want to run the DIMM with all its features
 enabled.}
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 ^$STARLINK_DIR/share/smurf/dimmconfig_bright_compact.lis
 
 numiter = 3                        # Just run a few iterations
@@ -2874,8 +2517,8 @@ com.gain_box = 600000              # Single gain map for whole spectrum
 order = 0                          # Allow for DC level adjustments
 dclimcorr = 0                      # No correlated step detection/correction
 com.notfirst=0                     # Make sure that COM is run before FLT
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 The above file exports all relevant models. It produces a moderately
 smoothed common mode time series and a single gain component for the
@@ -2928,14 +2571,12 @@ mode and not for the subsequent gridding into a map.}
 For a further analysis one can also e.g.\ collapse the common-mode
 subtracted cube over the time-series to calculate the median and rms:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % collapse ${file}_astres ${file}_astres_median estimator=median \
            axis=3 variance=false wlim=0.0
 % collapse ${file}_astres ${file}_astres_rms estimator=rms \
            axis=3 variance=false wlim=0.0
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The median \textsl{signal} ranges from $-$33e-04 to 30e-04, with 582
 bolometers falling within a range of $-$5e-04 to 5e-04. The median
@@ -2957,8 +2598,7 @@ Fig.~\ref{fig:masks} summarize this information.
 \end{center}
 \end{figure}
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % thresh ${file}_gain'(,,~1)' temp \
          thrlo=0.75 thrhi=1.25 newlo=0.0 newhi=2.0
 % thresh temp ${file}_gainmsk \
@@ -2971,8 +2611,7 @@ Fig.~\ref{fig:masks} summarize this information.
          thrlo=0 thrhi=6e-03 newlo=-1.0 newhi=1.0
 % thresh temp ${file}_astres_rmsmsk \
          thrlo=6e-03 thrhi=0 newlo=0 newhi=0
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The three maps have a significant subset of `flagged' bolometers in
 common.  An inspection of the common-mode subtracted data \texttt{(\_astres)}
@@ -3033,8 +2672,8 @@ CRL\,618.
 \subsection{\xlabel{script}Sample Common-mode script}
 \label{sec:script}
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 (csh)
 echo "Remove linear baseline for easy comparison displays"
 sc2clean sc17_con sc17_conbsl config=^my_sc2clean_bsl.def
@@ -3098,8 +2737,8 @@ histat ${file}_con_gai'(,,1)'
 set median = `parget median histat | head -1`
 cdiv  ${file}_con_gai'(,,1)' $median ${file}_gain
 \rm temp?.sdf >& /dev/null
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 \newpage
 \section{Notes on Shared Risk Observing}
