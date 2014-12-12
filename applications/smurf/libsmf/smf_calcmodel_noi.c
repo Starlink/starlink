@@ -835,6 +835,7 @@ static void smf1_calcmodel_noi( void *job_data_ptr, int *status ) {
    mean noise value. */
             if( nsum < pdata->ntslice && nsum > 0 ) {
                mean = sum/nsum;
+               pm = pdata->model_data + ibase;
                for( itime = 0; itime < pdata->ntslice; itime++ ) {
                   if( *pm < 0 || *pm == VAL__BADD || *pm == 1.0 ) {
                      *pm = mean;
