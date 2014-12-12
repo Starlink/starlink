@@ -1,23 +1,22 @@
-\documentclass[11pt,twoside]{article}
-\usepackage{graphicx}
+\documentclass[11pt,twoside]{starlink}
 
-\pagestyle{myheadings}
+\usepackage{amsmath}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun213.4}
-\newcommand{\stardocnumber}    {213.4}
-\newcommand{\stardocauthors}   {G. Privett, T. Jenness, H. Matthews, V. Barnard}
-\newcommand{\stardocdate}      {10 August 2012}
-\newcommand{\stardoctitle}     {FLUXES\\[1ex]
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun213.4}
+\stardocnumber      {213.4}
+\stardocauthors     {G. Privett, T. Jenness, H. Matthews, V. Barnard}
+\stardocdate        {10 August 2012}
+\stardoctitle     {FLUXES\\[1ex]
                                 JCMT Position and Flux Density Calibration}
-\newcommand{\stardocversion}   {Version 1.1}
-\newcommand{\stardocmanual}    {User's Manual}
-\newcommand{\stardocabstract}  {
-FLUXES calculates approximate {\bf topocentric positions} of the planets and also
-{\bf integrated flux densities} of five of them at several wavelengths.
+\stardocversion     {Version 1.1}
+\stardocmanual      {User's Manual}
+\stardocabstract  {
+FLUXES calculates approximate \textbf{topocentric positions} of the planets and also
+\textbf{integrated flux densities} of five of them at several wavelengths.
 These provide calibration information at the effective frequencies and
 beam-sizes employed by the UKT14 and SCUBA receivers on the
 JCMT telescope based on Mauna Kea, Hawaii.
@@ -28,258 +27,13 @@ This allows you to obtain planetary positions and flux levels quickly.
 % ? End of document identification
 
 % -----------------------------------------------------------------------------
-
-\newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
-
-
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document specific \providecommand or \newenvironment commands.
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section{Introduction}
 \xlabel{INTRODUCTION}
@@ -327,7 +81,7 @@ text files:
 The information in the files was supplied by the observatory.
 The differences mainly reflect changes in detector/telescope hardware.
 
-The program selects the appropriate {\tt{.dat}} file to use, based on the date
+The program selects the appropriate \texttt{.dat} file to use, based on the date
 you specify.
 The calculated temperature has an rms error of about 0.13K (negligible).
 
@@ -341,58 +95,50 @@ only accurate to around $\pm5$\%.
 
 To run FLUXES or FLUXNOW, type its name (in lower case) after the prompt:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % fluxes
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The program first asks you what output you want to generate:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 JCMT FLUXES
 
 POS - Do you require planetary data? (Y/N) /YES/ > Y
 FLU - Do you require flux data?      (Y/N) /YES/ > Y
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 In the above example I opted to see both sets of output data.
-If you were only interested in the planetary positions, reply ``{\tt{N}}''
+If you were only interested in the planetary positions, reply ``\texttt{N}''
 to the second prompt.
-(Prompts asking for a {\tt{Y/N}} answer can also be answered using
-{\tt{true/false}} or {\tt{t/f}} or {\tt{y/n}} --
+(Prompts asking for a \texttt{Y/N} answer can also be answered using
+\texttt{true/false} or \texttt{t/f} or \texttt{y/n} --
 case is not significant.)
 
 Next, indicate where you want the information displayed or stored:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 SCREEN - Display output to terminal? (Y/N) /YES/ > Y
 OFL - Store output in a file?        (Y/N) /NO/ > Y
 OUTFILE - Name of output file /'fluxes.dat'/ >
 
 Data will be written to file: /home/user1/gjp/flux/fluxes.dat
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
-If you reply ``{\tt{N}}'' to the OFL prompt, the next lines shown won't appear.
+If you reply ``\texttt{N}'' to the OFL prompt, the next lines shown won't appear.
 
 Next, you are asked to specify the time and date for which the information
 should be derived.
-If you set the value of NOW to {\tt{Y}}, the current date
+If you set the value of NOW to \texttt{Y}, the current date
 and time are automatically obtained from your computer.
 Otherwise, you must specify the time and date yourself, as appears below:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 NOW - Use todays date/time? (Y/N) /YES/ > N
 
 DATE - UT DATE (DD MM YY) /'12 09 96'/ > 16 09 96
 TIME - UT TIME (HH MM SS) /'12 00 00'/ > 08 45 00
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Since you might only require flux and positional information for one planet,
 you are given the option of selecting it by specifying a value for the
@@ -403,8 +149,8 @@ The information requested is then output to the screen and/or to the file
 (depending on the values you gave the parameters SCREEN and OFL).
 An example of the output generated is:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 Planetary Submillimetre Fluxes for the JCMT
 
 UT:  11:25:55       UT Date:18-Sep-1996     HST: 1:25:55
@@ -423,13 +169,11 @@ URANUS  20 12 44.5684 -0.0008   -20 33 32.2338  -0.0001   19.189787   5.468
 NEPTUNE 19 47 41.0764 -0.0004   -20 39 32.1751  -0.0001   29.655347  10.395
 PLUTO   16  4 56.5905  0.0008   - 7 52 56.4430  -0.0005   30.327917  13.375
 MOON    15 54 32.2690  0.7373   -16 17 35.4393  -0.0368    0.002580  13.375
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
-\newpage
-
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 Mars
 South pole is Earth-facing; Inclination Angle =  73.30 degrees
 Semi-diameter =  2.31 arcsecs    Solid angle =  3.95E-10 sterads
@@ -444,9 +188,8 @@ micron     (GHz)    (GHz)    (Jy)     (Jy)          (K)          (arcsecs)
   600     483.0    51.0    564.65    526.27    210.9 +-  0.0       10.2
   450     677.0    30.0   1093.57    954.64    212.5 +-  0.0        7.3
   350     866.0    30.0   1761.21   1414.15    213.7 +-  0.0        5.7
-\end{verbatim}
-\end{myquote}
-
+\end{terminalv}
+\end{small}
 and so on....
 
 If you encounter problems, please ask your system manager to consult
@@ -479,20 +222,20 @@ Historically, FLUXES was developed for use with the bolometer UKT14.
 For each of the presently available UKT14 filters the brightness temperature
 and total flux density of the planet is calculated, along with the flux density
 visible to a 65mm aperture (the standard detector width) -- shown in the
-tables under the heading {\tt{Flux in beam}}.
+tables under the heading \texttt{Flux in beam}.
 The latter is calculated from the beam width given in the final column -- if
 you have reason to believe that the beam width is different, or you have used a
 different aperture, you will have to re-do the calculation.
 
 The planetary brightness temperatures used are obtained from the measurements
-of Griffin et al. (1986, {\tt{Icarus}}, 65, 244), Orton et al.
-(1986, {\tt{Icarus}}, 67, 289),
-and Griffin \& Orton (1993, {\tt{Icarus}}, 105, 537). The errors in brightness
+of Griffin et al. (1986, \textit{Icarus}, 65, 244), Orton et al.
+(1986, \textit{Icarus}, 67, 289),
+and Griffin \& Orton (1993, \textit{Icarus}, 105, 537). The errors in brightness
 temperatures are the rms internal errors of the observations.
 
-From MJD 46040 until MJD 50000 ({\em{i.e.}}\ JD 2450000.5, corresponding to 1995
+From MJD 46040 until MJD 50000 (\emph{i.e.}\ JD 2450000.5, corresponding to 1995
 October 10), FLUXES uses $\lambda350\mu$m Martian brightness temperatures
-$T_b$ derived from the model described by Wright (1976, {\tt{Ap.J.}}, 210, 250).
+$T_b$ derived from the model described by Wright (1976, \textit{Ap.J.}, 210, 250).
 This uses an adjusted model of the thermal
 behaviour of Mars' surface and geometric factors to predict the flux received at
 the Earth and the whole-disk brightness temperature at 40-day intervals. The
@@ -507,13 +250,13 @@ E.L., 2007 arXiv:astro-ph/0703640). This reproduces
 82\%\ of the $T_b$ values in Table~6 of Wright (1976) exactly (where they are
 rounded to the nearest Kelvin), while the other 18\%\ differ by only $\pm1$~K.
 A low-precision formula by Van Flandern and Pulkinnen,
-(1979, {\tt{Ap.J.Supp.}}, 41, 391)
+(1979, \textit{Ap.J.Supp.}, 41, 391)
 was used to compute the geometric factors (Mars-Sun
 distance $R$, Martian declinations of the Sun and the Earth $D_S$ and $D_E$,
 and the difference in Martian right ascensions between the Earth and the Sun
 $A_S - A_E$) far into the future.
 
-\begin{figure}
+\begin{figure}[t]
 \includegraphics[angle=-90,width=\textwidth]{sun213_fig1}
 \vspace*{-0.5cm}
 \caption{Martian brightness temperatures}
@@ -533,7 +276,7 @@ dotted below, where the solid horizontal line is 0~K~T$_b$ difference.
 Over the interval for which
 both the original Wright model and the simplified model are valid, the
 differences in brightness temperatures have an rms error of 0.13~K
-({\em i.e.}\ negligible) after removing a constant offset of -2.56~K, assumed
+(\emph{i.e.}\ negligible) after removing a constant offset of -2.56~K, assumed
 due to the microwave background.
 
 \section{Using FLUXNOW}
@@ -544,17 +287,15 @@ due to the microwave background.
 FLUXNOW is a script that calls the program FLUXES in such a way that
 the results for the current date and time are returned to you without
 further input.  For your convenience, the information generated is
-placed in a file called {\tt{fluxes.dat}} in your current directory.
+placed in a file called \texttt{fluxes.dat} in your current directory.
 If a file of that name already exists, the information is appended to
 the existing file.  Note that, as with FLUXES, the FLUXNOW command
 which runs the script should be typed at the UNIX prompt in lower case,
 as given below:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % fluxnow
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \section{Acknowledgements}
 \xlabel{ACKNOWLEDGEMENTS}
@@ -578,51 +319,44 @@ Most of what follows is likely to be of interest to site system managers only
 and may be skipped by the rest of us.
 
 The FLUXES/FLUXNOW code and associated files are supplied as a compressed
-tar file: {\tt{fluxes.tar.Z}}.  To install FLUXES/FLUXNOW the file must be
+tar file: \texttt{fluxes.tar.Z}.  To install FLUXES/FLUXNOW the file must be
 uncompressed and the contents extracted to a suitable directory.  On
-Starlink systems, this would normally be directory {\tt{/star/fluxes}}. The
+Starlink systems, this would normally be directory \texttt{/star/fluxes}. The
 operation is:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % cd /star/fluxes           (or some directory you specify)
 % zcat /tmp/fluxes.tar.Z | tar xvf -
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 You must then set an environment variable to identify the type of operating
 system you are using. The example given below shows the value of
-{\tt{SYSTEM}} needed to create a Solaris version of the software. The values
+\texttt{SYSTEM} needed to create a Solaris version of the software. The values
 required for other Starlink supported systems may be found in the files
-{\tt{mk}} and {\tt{makefile}}.
+\texttt{mk} and \texttt{makefile}.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv SYSTEM sun4_Solaris
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 The UNIX `make' facility may then be employed to generate FLUXES in the
 current directory, clean up after itself and move the run time system
 to the directory from which it will normally be run.  Note that you must
-set the environmental variable {\tt{INSTALL}} to reflect the directory
+set the environmental variable \texttt{INSTALL} to reflect the directory
 above that in which you want FLUXES and FLUXNOW to be installed. On
-most Starlink system this will be directory {\tt{/star}}:
+most Starlink system this will be directory \texttt{/star}:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv INSTALL /star
 % ./mk build
 % ./mk clean strip
 % ./mk install
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Once this is done you can make FLUXES and FLUXNOW available to you
 by inserting:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 if ( -e /star/bin/fluxes/fluxes) then
    alias fluxes /star/bin/fluxes/fluxes.csh
    alias fluxnow /star/bin/fluxes/fluxnow.csh
@@ -630,17 +364,16 @@ else
    alias fluxes cat /star/etc/not_installed
    alias fluxnow cat /star/etc/not_installed
 endif
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
-into your {\tt{/star/etc/cshrc}} file.  The example given assumes that
+into your \texttt{/star/etc/cshrc} file.  The example given assumes that
 you have chosen to have the FLUXES executable installed in directory
-{\tt{/star/bin/fluxes}}.  Obviously you will need to change this if you
+\texttt{/star/bin/fluxes}.  Obviously you will need to change this if you
 have placed it elsewhere.   On Starlink systems, the
-{\tt{/star/etc/cshrc}} file is already set up to run FLUXES.
+\texttt{/star/etc/cshrc} file is already set up to run FLUXES.
 
-In addition, the environmental variable {\tt{FLUXES\_DIR}} in {\tt{fluxes.csh}}
-and {\tt{fluxnow.csh}} must be set to name of the directory where the FLUXES
+In addition, the environmental variable \texttt{FLUXES\_DIR} in \texttt{fluxes.csh}
+and \texttt{fluxnow.csh} must be set to name of the directory where the FLUXES
 executable resides.  The Starlink installations of FLUXES have this set
 automatically during installation.
 
@@ -688,14 +421,12 @@ or, if running from perl, the par\_get routine supplied as part of the
 Here is an example, running FLUXES from the command-line with
 no output except via the parameter system
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % fluxes pos=no flu=yes screen=no ofl=no now filter=850 apass=no \
        planet=uranus msg_filter=quiet
 % parget f_total fluxes
 72.4569
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Note how MSG\_FILTER was used to turn off default messages, and
 that the FILTER and PLANET were selected explcitly. Also, useful
@@ -723,7 +454,7 @@ In this section we will discuss the actual calculations performed by FLUXES to p
 \item{Topocentric and Geocentric R.A. and Dec positions, distances and airmass are calculated}
 \item{The solid angle subtended by the planet is calculated}
 \item{The brightness temperature at 350$\mu$m (857 GHz), $T_{b_{857}}$,  is calculated by linear interpolation from 40-day interval values, from either Wright's original model or the rotating cratered asteroid model, depending upon the date (see section \ref{sec:planet})}
-\item{The brightness temperature at 3.3mm (90 GHz), $T_{b_{90}}$, is calculated following the simple relation given by Ulich (1981, {\tt{A.J.}}, 86, 1619)}
+\item{The brightness temperature at 3.3mm (90 GHz), $T_{b_{90}}$, is calculated following the simple relation given by Ulich (1981, \textit{A.J.}, 86, 1619)}
 \item{A logarithmic interpolation between $T_{b_{857}}$ and $T_{b_{90}}$ calculates the brightness temperature for each filter wavelength}
 \item{The brightness temperature is converted to integrated and beam-corrected flux densities.}
 \end{itemize}
@@ -757,31 +488,31 @@ The geometry for the calculations of positions and distances to the requested pl
 \label{fig:geom}
 \end{figure}
 
-The topocentric vector of a planet, $\bf{V_t}$, or the geocentric vector of the planet, $\bf{V_g}$, are calculated with reference to the geocentric vector of the Sun, $\bf{VSG}$, the heliocentric vector of the planet, $\bf{VSP}$, and the geocentric vector of the observer, $\bf{VGO}$.  Also used by the current version of FLUXES are the geocentric vector to the Moon, $\bf{VGM}$, the vector from the Sun to the Earth-Moon barycentre, $\bf{VSE}$, and the knowledge that the geocentric vector of the Earth-Moon barycentre is given by ($0.012150581 \times \bf{VGM}$).
+The topocentric vector of a planet, $\boldsymbol{V_{t}}$, or the geocentric vector of the planet, $\boldsymbol{V_{g}}$, are calculated with reference to the geocentric vector of the Sun, $\boldsymbol{VSG}$, the heliocentric vector of the planet, $\boldsymbol{VSP}$, and the geocentric vector of the observer, $\boldsymbol{VGO}$.  Also used by the current version of FLUXES are the geocentric vector to the Moon, $\boldsymbol{VGM}$, the vector from the Sun to the Earth-Moon barycentre, $\boldsymbol{VSE}$, and the knowledge that the geocentric vector of the Earth-Moon barycentre is given by ($0.012150581 \times \boldsymbol{VGM}$).
 
 When the directions of these vectors are as shown in Figure \ref{fig:geom}, the geocentric position and velocity vector of the planet is given by
 
 \begin{displaymath}
-\bf{V_g} = - \bf{VSG} + \bf{VSP}
+\boldsymbol{V_{g}} = - \boldsymbol{VSG} + \boldsymbol{VSP}
 \end{displaymath}
 
-where the geocentric vector of the Sun, $\bf{VSG}$, may be given as
+where the geocentric vector of the Sun, $\boldsymbol{VSG}$, may be given as
 
 \begin{displaymath}
-{\bf{VSG}} = {\bf{VSE}} - 0.01215081 ({\bf{VGM}}).
+\boldsymbol{VSG} = \boldsymbol{VSE} - 0.01215081 (\boldsymbol{VGM}).
 \end{displaymath}
 
 Similarly, the topocentric position and velocity vector of the planet is given by
 
 \begin{eqnarray*}
-\bf{V_t} & = & \bf{V_g} - \bf{VGO}\\
-& = & \bf{VSP} - \bf{VSG} - \bf{VGO}\\
-& = & {\bf{VSP}} - ({\bf{VSE}} - 0.012150581 ({\bf{VGM}})) - {\bf{VGO}}
+\boldsymbol{V_t} & = & \boldsymbol{V_g} - \boldsymbol{VGO}\\
+& = & \boldsymbol{VSP} - \boldsymbol{VSG} - \boldsymbol{VGO}\\
+& = & \boldsymbol{VSP} - (\boldsymbol{VSE} - 0.012150581 (\boldsymbol{VGM})) - \boldsymbol{VGO}
 \end{eqnarray*}
 
 All these vector quantities must be precessed to the appropriate date. The prime symbol ($\prime$) will be used in the following equations to indicate precessed positions.
 
-Once the necessary vector is known, the actual distance is calculated as the square root of the summed square of each component, e.g.
+Once the necessary vector is known, the actual distance is calculated as the square root of the summed square of each component, e.g.,
 
 \begin{displaymath}
 d_g = \sqrt{{{{V^\prime}_{g_x}}^2} + {{{V^\prime}_{g_y}}^2} + {{{V^\prime}_{g_z}}^2}}
@@ -805,7 +536,7 @@ where ${V^\prime}_{g_{\dot{x}}}$ is the (uncorrected) velocity vector component 
 \xlabel{solidangle}
 \label{sec:solidangle}
 
-Several calculations in this section make use of two references in particular; planetary information is mainly taken from the ``Report of the IAU working group on cartographic coordinates and rotational elements of the planets and satellites'', which is periodically updated and published online and in {\tt{Celestial Mechanics and Dynamical Astronomy}}.  Precession formulae come from Lieske (1979, {\tt{A \& A}}, 73, 282).
+Several calculations in this section make use of two references in particular; planetary information is mainly taken from the ``Report of the IAU working group on cartographic coordinates and rotational elements of the planets and satellites'', which is periodically updated and published online and in \emph{Celestial Mechanics and Dynamical Astronomy}.  Precession formulae come from Lieske (1979, \textit{A \& A}, 73, 282).
 
 To calculate the solid angle of the planet in question it is necessary to take account of the ellipticity of the planet, via the direction of its North Pole.  The coordinates of the pole, $RA_{pole}$ and $Dec_{pole}$ are calculated directly from the IAU report formulae for the date given and then precessed according to Lieske's spherical coordinate formulae.  If using J2000.0 for the polar coordinates, the precession parameters $\zeta_A$, $z_A$ and $\theta_A$ (see Lieske's Fig. 1) are defined in arcseconds as
 
@@ -881,9 +612,9 @@ where $d_g$ is the geocentric distance of the planet from the Earth as calculate
 \xlabel{marsbright}
 \label{sec:marsbright}
 
-For Mars, the brightness temperature at each filter wavelength is calculated via a logarithmic interpolation between brightness temperatures at 350$mu$m (857 GHz), $T_{b_{857}}$, and another at 3.3mm (90 GHz), $T_{b_{90}}$.  The first of these is generated from one of two models both from Wright's work, the results of which are held as an array in FLUXES.  In the array, values for $T_{b_{857}}$ are given at 40-day intervals, and so a linear interpolation is performed to ascertain a value for the given date.
+For Mars, the brightness temperature at each filter wavelength is calculated via a logarithmic interpolation between brightness temperatures at 350$\mu$m (857 GHz), $T_{b_{857}}$, and another at 3.3mm (90 GHz), $T_{b_{90}}$.  The first of these is generated from one of two models both from Wright's work, the results of which are held as an array in FLUXES.  In the array, values for $T_{b_{857}}$ are given at 40-day intervals, and so a linear interpolation is performed to ascertain a value for the given date.
 
-The 3.3mm point is calculated from the relation given by Ulich (1981, {\tt{A.J.}}, 86, 1619):
+The 3.3mm point is calculated from the relation given by Ulich (1981, \textit{A.J.}, 86, 1619):
 
 \begin{displaymath}
 T_{b_{90}} = \frac{206.8}{\sqrt{1.524/d_{hel_{Mars}}}}
@@ -931,6 +662,6 @@ The implication of the flat-disk assumption for the planet is that the observed 
 {\theta_{obs_\nu}}^2 = {\theta_{beam_\nu}}^2 + \frac{\ln 2}{2}\ {(2 D_{semi})}^2
 \end{displaymath}
 
-for $2 D_{semi} < \theta_{beam_\nu}$, as discussed originally by Baars (1973, {\tt{IEEE trans.\ on Antennas and Propogation}}, 21, 461).
+for $2 D_{semi} < \theta_{beam_\nu}$, as discussed originally by Baars (1973, \emph{IEEE trans.\ on Antennas and Propogation}, 21, 461).
 
 \end{document}
