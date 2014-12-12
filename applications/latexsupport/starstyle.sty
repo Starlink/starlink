@@ -365,4 +365,5 @@
 
 
 %problems with _ in labels (e.g. in xrefs)
-\renewcommand{\_}{\string_}
+\let\oldunderscore\_
+\renewcommand{\_}{\ifmmode \oldunderscore \else \string_\fi}
