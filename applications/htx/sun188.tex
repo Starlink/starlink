@@ -1,522 +1,18 @@
-\documentstyle[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt,nolof]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocnumber}    {188.6}
-\newcommand{\stardocsource}    {sun188.6}
-\newcommand{\stardocauthors}   {R.F.~Warren-Smith \& P.W~Draper}
-\newcommand{\stardocdate}      {20th January 2010}
-\newcommand{\stardoctitle}     {HTX\\[1ex]
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocnumber      {188.6}
+\stardocsource      {sun188.6}
+\stardocauthors     {R.F.~Warren-Smith \& P.W~Draper}
+\stardocdate        {20th January 2010}
+\stardoctitle     {HTX\\[1ex]
                                 Hypertext Cross-Reference Utilities}
-\newcommand{\stardocversion}   {Version 1.3-1}
-\newcommand{\stardocmanual}    {User's Manual}
-% ? End of document identification
-% -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
-\newcommand{\cgiurl}{http://hoohoo.ncsa.uiuc.edu/cgi/overview.html}
-\newcommand{\HTMLurl}{http://www.w3.org/hypertext/WWW/MarkUp/MarkUp.html}
-\newcommand{\latextohtmlurl}{http://cbl.leeds.ac.uk/nikos/tex2html/doc/latex2html/latex2html.html}
-\newcommand{\netscapeurl}{http://home.netscape.com/}
-\newcommand{\psurl}{http://www.cs.indiana.edu/docproject/programming/postscript/postscript.html}
-\newcommand{\urlurl}{http://www.w3.org/hypertext/WWW/Addressing/URL/Overview.html}
-\newcommand{\wwwurl}{http://www.w3.org/hypertext/WWW/}
-
-\newcommand{\cgiref}[1]{\htmladdnormallink{#1}{\cgiurl}}
-\newcommand{\HTMLref}[1]{\htmladdnormallink{#1}{\HTMLurl}}
-\newcommand{\latextohtmlref}[1]{\htmladdnormallink{#1}{\latextohtmlurl}}
-\newcommand{\netscaperef}[1]{\htmladdnormallink{#1}{\netscapeurl}}
-\newcommand{\psref}[1]{\htmladdnormallink{#1}{\psurl}}
-\newcommand{\urlref}[1]{\htmladdnormallink{#1}{\urlurl}}
-\newcommand{\wwwref}[1]{\htmladdnormallink{#1}{\wwwurl}}
-
-\newcommand{\HTXref}[1]{\htmlref{#1}{sect:HTX}}
-\newcommand{\latexref}[1]{\xref{#1}{sun9}{}}
-\newcommand{\linkerref}[1]{\htmlref{#1}{hlink}}
-\newcommand{\indexref}[1]{\htmlref{#1}{sect:indexfiles}}
-\newcommand{\docref}[1]{\htmlref{#1}{sect:hypertextdocuments}}
-\newcommand{\dirref}[1]{\htmlref{#1}{sect:documentdirectories}}
-\newcommand{\libref}[1]{\htmlref{#1}{sect:documentlibraries}}
-\newcommand{\labref}[1]{\htmlref{#1}{sect:targetlabels}}
-\newcommand{\remref}[1]{\htmlref{#1}{sect:remotedocuments}}
-\newcommand{\servref}[1]{\htmlref{#1}{sect:remoteservers}}
-\newcommand{\findmeref}[1]{\htmlref{#1}{findme}}
-\newcommand{\showmeref}[1]{\htmlref{#1}{showme}}
-
-\newcommand{\hi}[1]{{\tt{#1}}}
-\newcommand{\qt}[1]{``#1''}
-\newcommand{\st}[1]{{\em{#1}}}
-\begin{htmlonly}
-   \newcommand{\qt}[1]{{\tt{"}}#1{\tt{"}}}
-\end{htmlonly}
-
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty
-%     on your TEXINPUTS path (and including the name as part of the
-%     documentstyle declaration).
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-% -
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-
-\begin{htmlonly}
-
-%  Re-define \ssttt.
-   \newcommand{\ssttt}{\tt}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}]
-      \begin{description}
-         #2
-      \end{description}
-   }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-   }
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-
-% ? End of document specific commands
-% -----------------------------------------------------------------------------
-%  Title Page.
-%  ===========
-\renewcommand{\thepage}{\roman{page}}
-\begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%   ==================
+\stardocversion     {Version 1.3-1}
+\stardocmanual      {User's Manual}
+\stardocabstract {%
 This document describes a set of ``Hypertext Cross-Reference
 Utilities'' (HTX) which are designed to help maintain large
 documentation sets whose constituent \docref{documents} are written
@@ -539,49 +35,52 @@ hypertext documentation, those who write it, and those who maintain
 it, especially those who \xref{write and maintain Starlink
 documentation}{sgp28}{}. Software developers may also be interested in
 the possibilities for hypertext help that HTX provides.
-
-
-% ? End of document abstract
+}
+% ? End of document identification
 % -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\begin{latexonly}
-   \newpage
-   \markright{\stardocname}
-   \null\vspace{5mm}
-   \begin {center}
-   \rule{80mm}{0.5mm} \\ [1ex]
-   {\Large\bf \stardoctitle \\ [2.5ex]
-              \stardocversion} \\ [2ex]
-   \rule{80mm}{0.5mm}
-   \end{center}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
+% ? Document specific \providecommand or \newenvironment commands.
+
+\providecommand{\cgiurl}{http://hoohoo.ncsa.uiuc.edu/cgi/overview.html}
+\providecommand{\HTMLurl}{http://www.w3.org/hypertext/WWW/MarkUp/MarkUp.html}
+\providecommand{\latextohtmlurl}{http://cbl.leeds.ac.uk/nikos/tex2html/doc/latex2html/latex2html.html}
+\providecommand{\netscapeurl}{http://home.netscape.com/}
+\providecommand{\psurl}{http://www.cs.indiana.edu/docproject/programming/postscript/postscript.html}
+\providecommand{\urlurl}{http://www.w3.org/hypertext/WWW/Addressing/URL/Overview.html}
+\providecommand{\wwwurl}{http://www.w3.org/hypertext/WWW/}
+
+\providecommand{\cgiref}[1]{\htmladdnormallink{#1}{\cgiurl}}
+\providecommand{\HTMLref}[1]{\htmladdnormallink{#1}{\HTMLurl}}
+\providecommand{\latextohtmlref}[1]{\htmladdnormallink{#1}{\latextohtmlurl}}
+\providecommand{\netscaperef}[1]{\htmladdnormallink{#1}{\netscapeurl}}
+\providecommand{\psref}[1]{\htmladdnormallink{#1}{\psurl}}
+\providecommand{\urlref}[1]{\htmladdnormallink{#1}{\urlurl}}
+\providecommand{\wwwref}[1]{\htmladdnormallink{#1}{\wwwurl}}
+
+\providecommand{\HTXref}[1]{\htmlref{#1}{sect:HTX}}
+\providecommand{\latexref}[1]{\xref{#1}{sun9}{}}
+\providecommand{\linkerref}[1]{\htmlref{#1}{hlink}}
+\providecommand{\indexref}[1]{\htmlref{#1}{sect:indexfiles}}
+\providecommand{\docref}[1]{\htmlref{#1}{sect:hypertextdocuments}}
+\providecommand{\dirref}[1]{\htmlref{#1}{sect:documentdirectories}}
+\providecommand{\libref}[1]{\htmlref{#1}{sect:documentlibraries}}
+\providecommand{\labref}[1]{\htmlref{#1}{sect:targetlabels}}
+\providecommand{\remref}[1]{\htmlref{#1}{sect:remotedocuments}}
+\providecommand{\servref}[1]{\htmlref{#1}{sect:remoteservers}}
+\providecommand{\findmeref}[1]{\htmlref{#1}{findme}}
+\providecommand{\showmeref}[1]{\htmlref{#1}{showme}}
+
+\providecommand{\hi}[1]{{\texttt{#1}}}
+\providecommand{\qt}[1]{``#1''}
+\providecommand{\st}[1]{{\emph{#1}}}
+
+\providecommand{\latextohtml}{\textbf{LaTeX}{2}\texttt{HTML}}
+
+% ? End of document specific commands
 % -----------------------------------------------------------------------------
-%  Introduction page.
-%  =================
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-\begin{latexonly}
-   \newpage
-   \markright{\stardocname}
-   \renewcommand{\thepage}{\arabic{page}}
-   \setcounter{page}{1}
-   \null\vspace{5mm}
-   \begin{center}
-   \rule{80mm}{0.5mm}\\[1ex]
-   {\Large\bf \stardoctitle\\[2.5ex]
-              \stardocversion}\\[2ex]
-   \rule{80mm}{0.5mm}
-   \end{center}
-   \vspace{30mm}
-\end{latexonly}
+%  Title Page.
+%  ===========
+\begin{document}
+\scfrontmatter
 
 \section{\xlabel{introduction}INTRODUCTION}
 
@@ -625,7 +124,7 @@ is used here.
 
 \subsection{\xlabel{why_are_cross_references_a_problem}Why are Cross-References a Problem?}
 
-The hyper-links that join different \HTMLref{HTML} pages {\bf within}
+The hyper-links that join different \HTMLref{HTML} pages \textbf{within}
 \docref{hypertext documents} are normally defined by the document's
 author.  These are an internal matter -- if the document structure
 changes, the author can change the internal links accordingly.  If
@@ -701,11 +200,11 @@ therefore be to collect all the HTML files comprising each document
 together into a directory (or directory tree) and to give the (top
 level) directory a distinctive name such as:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 design-study.htx
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 The \qt{design-study} part of this is the document name by which it
 will be known to other authors, and the \qt{.htx} part identifies it to
@@ -752,30 +251,30 @@ will not attempt to link (\st{i.e.}\ modify) those other
 documents. The search path is specified as a colon-separated list of
 directories via the \hi{HTX\_PATH} environment variable, for instance:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 setenv HTX_PATH $HOME/mydocs:/docman/newdocs:/docman/olddocs
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 This search path is used by all HTX commands when they need to find
 documents for which no explicit location has been given.  Note that if
 two documents with the same name occur at different points on your
-\hi{HTX\_PATH}, only the {\bf first} one will be used.
+\hi{HTX\_PATH}, only the \textbf{first} one will be used.
 
 You can set \hi{HTX\_PATH} to search anywhere you like, but if you do not
 specify it yourself, it defaults to:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 $INSTALL/docs:$INSTALL/help:$INSTALL/starjava/docs:\
 $STARLINK/docs:$STARLINK/help:$STARLINK/starjava/docs
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 where \hi{INSTALL} in turn defaults to \hi{\$HOME/star} and
 \hi{STARLINK} defaults to \hi{/star}. The values of these environment
-variables are evaluated {\bf when the HTX software is installed} (not
+variables are evaluated \textbf{when the HTX software is installed} (not
 when you later make use of it). By default, therefore, HTX will search
 for the standard set of Starlink documents and on-line hypertext help,
 plus any others you may have installed locally under your own user
@@ -805,11 +304,11 @@ as:\footnote{Any other HTML anchor parameters may also be present and
 the double quotes are optional if the enclosed characters are all
 alphanumeric.}
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 <A NAME="xref_conclusions">any text</A>
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 In plain HTML, this makes \qt{any text} a potential destination for a
 hypertext link, to which any other piece of HTML may refer.
@@ -846,11 +345,11 @@ use an \HTMLref{HTML} anchor, this time with the \hi{HREF} parameter,
 in a form similar to the following:\footnote{Again, any other HTML
 anchor parameters may also be present.}
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 <A HREF="/star/docs/sun188.htx/node33.html#xref_appendix">any text</A>
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 This is, of course, the standard HTML method of forming a hypertext
 link to another location identified by the \urlref{\st{Uniform
@@ -865,20 +364,20 @@ then be repaired when the cross-reference target changes, by
 appropriately editing new values into the fields that are no longer
 valid. The key components of the URL that HTX recognises are:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 /sun188.htx/
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 which identifies the name of the document being referenced (in this
 case \qt{sun188}, \st{i.e.}\ this document), and:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 #xref_appendix
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 where \qt{\#xref\_} is a flag that identifies this
 as an HTX cross-reference and \qt{appendix} is the
@@ -892,11 +391,11 @@ Because HTX can repair URL fields that are wrong, it is quite
 acceptable to omit everything inessential and to strip the URL down to
 just:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 <A HREF="/sun109.htx/#xref_conclusions">any text</A>
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 However, entering a full URL (or at least a guess at it) is often a
 good idea to start with, as it means the cross-reference may still
@@ -906,11 +405,11 @@ work even if someone forgets to link your document.
 
 \HTXref{HTX} recognises a \labref{cross-reference target} with the form:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 <A NAME="xref_">any text</A>
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 (\st{i.e.}\ with a blank label) as a special case, to be used to
 identify the ``top'' page of a \docref{hypertext document}. This
@@ -920,22 +419,22 @@ document is requested and no particular part of it is specified.
 Any other document can refer to this label, using an anchor with the
 form:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 <A HREF="/any_where/docname.htx/any_file.html#xref_">any text</A>
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 but its inclusion as a cross-reference target in the referenced
 document is optional. If it is omitted, HTX will assume that the top
 \HTMLref{HTML} page in a document is named after the document
 itself. That is, it will use a \urlref{URL} such as:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 /some_where/docname.htx/docname.html#xref_
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 If your document does not follow this convention, then you should
 include a cross-reference target with a blank label at the start of
@@ -954,11 +453,11 @@ Linking hypertext documents is straightforward. Simply go to the
 directory containing the document collection (the \libref{document
 library}) and use the command:
 
-\begin{quote}
+\begin{small}
 \linkerref{\hi{hlink}}
-\end{quote}
+\end{small}
 
-{\bf WARNING: this will modify your documents. If you are worried
+\textbf{WARNING: this will modify your documents. If you are worried
 about this, then make a backup first.}
 
 The \hi{hlink} command will display some informational messages as it
@@ -977,15 +476,15 @@ If the documents you want to link reside in more than one document
 library, then simply list the library directories on the command line,
 as follows:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 hlink dir1 dir2 dir3
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 Remember that any other local documents that you refer to (but do not
 actually want to modify) should reside in libraries that appear on
-your \hyperref{\hi{HTX\_PATH} search path}{\hi{HTX\_PATH} search path (see
+your \slhyperref{\hi{HTX\_PATH} search path}{\hi{HTX\_PATH} search path (see
 \S}{)}{sect:searchpath}. If they do not, they will be regarded as
 \remref{remote documents} and the URLs generated for them will invoke
 a \servref{remote document server}
@@ -1017,46 +516,46 @@ To export an HTX \labref{cross-reference label} from a \LaTeX{}
 document that is to be converted into hypertext, the following would
 be used:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 \xlabel{label}
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 which results in the HTML anchor:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 <A NAME=xref_label>?</A>
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 where \qt{?} is some invisible character that simply serves to mark
 the position to which links should point. Note that the name of the
 label chosen should be unique within a \mbox{\LaTeX} document and must
-only contain alphanumeric characters (or be \hyperref{blank}{blank --
+only contain alphanumeric characters (or be \slhyperref{blank}{blank --
 see \S}{}{sect:entiredocuments}).
 
 To insert a cross-reference to the target above into another document,
 you would use:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 \xref{any text}{docname}{label}
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 which results in the HTML anchor:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 <A HREF="http://www.starlink.ac.uk/cgi-bin/htxserver/docname.html?xref_label">any text</A>
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 This contains an initial guess at the required URL (a document stored on the
 RAL service), which will be recognised and
-\hyperref{modified as necessary}{modified as necessary (see \S}{)}{sect:referringtotargets} when the
+\slhyperref{modified as necessary}{modified as necessary (see \S}{)}{sect:referringtotargets} when the
 document is linked.
 
 \section{\label{sect:howlinkingworks}\xlabel{how_linking_works}HOW HTX LINKING WORKS}
@@ -1086,7 +585,7 @@ normally only re-generated when a document changes.
 
 In addition to cross-reference information, index files also contain
 details of the title of each HTML page in the document and an
-indication of which is the \hyperref{\qt{top} page}{\qt{top} page (see
+indication of which is the \slhyperref{\qt{top} page}{\qt{top} page (see
 \S}{)}{sect:entiredocuments}. This information is used by other HTX
 utilities to perform \htmlref{documentation
 searches}{sect:searchingfordocuments}, \st{etc.}
@@ -1108,7 +607,7 @@ cross-references that may no longer be valid, they will all need to be
 re-linked.
 
 A further search is then made of the libraries that appear on the
-\hyperref{\hi{HTX\_PATH} search path}{\hi{HTX\_PATH} search path (see
+\slhyperref{\hi{HTX\_PATH} search path}{\hi{HTX\_PATH} search path (see
 \S}{)}{sect:searchpath}. If any of the documents that needs re-linking
 refers to a document on this path, then the latter document's
 \indexref{index file} is searched to identify the \HTMLref{HTML} file
@@ -1151,7 +650,7 @@ see a complete set of documentation.
 
 The linker regards a document as remote if it is referenced by one of
 the documents it is linking, but it cannot find it either in the
-\libref{document libraries} being linked or on the \hyperref{\hi{HTX\_PATH}
+\libref{document libraries} being linked or on the \slhyperref{\hi{HTX\_PATH}
 search path}{\hi{HTX\_PATH} search path (see \S}{)}{sect:searchpath}.
 
 Note that the HTX linker will not look up a document on a remote
@@ -1214,16 +713,16 @@ To re-link a particular document, or set of documents, from scratch,
 their \indexref{index files} may simply be removed, using a command
 such as:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 rm *.htx/htx.index
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 The \linkerref{linker} will then re-generate these indices and
 consider the affected documents to have changed. They, and all other
 documents that refer to them, will then be re-linked as
-necessary. Alternatively, to re-link {\bf all} documents from scratch
+necessary. Alternatively, to re-link \textbf{all} documents from scratch
 in this way, the \hi{-a} flag may be given on the \hi{hlink} command
 line.
 
@@ -1267,11 +766,11 @@ generate a reference to a remote document server in place of a link to
 the local document. The \urlref{URL} it generates in this case takes
 the form:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 $HTX_SERVER/docname.htx/some_file.html?xref_label
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 That is, it replaces any directory path at the start of the URL with
 the URL of a remote document server, obtained by translating the
@@ -1285,11 +784,11 @@ document server you like (for instance, one that you write
 yourself). However, if you do not specify one explicitly, the default
 is to use the Starlink HTX document server at RAL, whose URL is:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 http://www.starlink.ac.uk/cgi-bin/htxserver
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 Once a document has been linked, the choice of server is fixed, until
 it is linked again.
@@ -1324,11 +823,11 @@ The simplest form of \htmlref{document}{sect:hypertextdocuments}
 access is provided by the \showmeref{\hi{showme}} command, which
 simply displays the document you name. For instance:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 showme sun188
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 would display the \htmlref{\qt{top} page}{sect:entiredocuments} of the
 document called \xref{\qt{sun188}}{sun188}{} (\st{i.e.}\ the one you
@@ -1342,26 +841,26 @@ browser}{sect:specifyingabrowser} to use, if required
 \latex{(see \S\ref{sect:specifyingabrowser})}.
 
 If you do not give any directory information, \hi{showme} will search
-for the document using the \hyperref{\hi{HTX\_PATH} search
+for the document using the \slhyperref{\hi{HTX\_PATH} search
 path}{\hi{HTX\_PATH} search path (see \S}{)}{sect:searchpath}, but you
 can specify explicitly where the document is if you prefer, as in:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 showme ~/mydocs/galaxy_survey
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 If \hi{showme} cannot find the document locally, it will try and fetch
 it from the \htmlref{remote document server}{sect:remoteservers}
 instead\latex{(see \S\ref{sect:remoteservers})}.
 You can suppress this behavior using the \hi{-l} switch if you prefer:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 showme -l document
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 in which case failure to find the document locally will simply result
 in an error. You can also specify that a remote copy of the document
@@ -1377,11 +876,11 @@ the \htmlref{cross-reference labels}{sect:targetlabels} they
 contain\latex{(see \S\ref{sect:targetlabels})}.
 To do this, you simply add the label as an extra argument. Thus:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 showme sun188 hlink
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 will display the description of the \htmlref{\hi{hlink}}{hlink}
 command in \xref{this document}{sun188}{}.
@@ -1407,11 +906,11 @@ keyword.
 Keyword searching is performed using the \findmeref{\hi{findme}}
 command, which is simply illustrated:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 findme HTX
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 This command will search your documentation set for the string
 \qt{HTX} and will then display a list of the documents found using
@@ -1436,20 +935,20 @@ detailed will be the list of results it generates, with individual
 performing progressively deeper searches can be observed if you ask
 for information on something a little more obscure, like:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 findme findme
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 which makes \hi{findme} search for information on itself, or even
 something very obscure, like:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 findme HTX_PATH
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 which will (probably) only be found in the body of the text of this
 document.
@@ -1463,7 +962,7 @@ documents}{sect:hypertextdocuments}:
 
 \begin{enumerate}
 
-\item \label{sect:searchname}{\bf The document name (-n
+\item \label{sect:searchname}\textbf{The document name (-n
 switch)}\mbox{}\\ This is given by the name of the
 \htmlref{directory}{sect:documentdirectories} that contains the
 document\latex{(see \S\ref{sect:documentdirectories})}.
@@ -1473,7 +972,7 @@ a directory called \qt{sun188.htx}. The name of a document may
 indicate what category of information it contains and is very quick
 and easy to search.
 
-\item \label{sect:searchtitle}{\bf The document title (-t
+\item \label{sect:searchtitle}\textbf{The document title (-t
 switch)}\mbox{}\\ This is extracted from the \htmlref{\qt{top} HTML
 page}{sect:entiredocuments} of a document
 \latex{(see \S\ref{sect:entiredocuments})}.
@@ -1482,7 +981,7 @@ and consists of the text that appears between the \hi{$<$TITLE$>$} and
 title of a document is obviously a good place to search for important
 topics and this can be done quite quickly.
 
-\item \label{sect:searchheading}{\bf The document's page headings (-h
+\item \label{sect:searchheading}\textbf{The document's page headings (-h
 switch)}\mbox{}\\ These are extracted in the same way as the document
 title (above), but from all the other HTML pages in the document,
 excluding the \qt{top} page. If you have
@@ -1496,7 +995,7 @@ be done without a serious time penalty because \htmlref{HTX}{sect:HTX}
 caches this information in a document's \htmlref{index
 file}{sect:indexfiles}\latex{(see \S\ref{sect:indexfiles})}.
 
-\item \label{sect:searchline}{\bf The lines of text in the document (-l switch)}\mbox{}\\
+\item \label{sect:searchline}\textbf{The lines of text in the document (-l switch)}\mbox{}\\
 These consist of the contents of all the HTML files in the document
 (including all their \HTMLref{HTML} tags, \urlref{URLs},
 \st{etc}). This is the ultimate place to search for information, but
@@ -1518,28 +1017,28 @@ switches is used, then \st{only} the specified categories of
 information will be searched, and this will be done in a single pass
 through all the documents. For instance:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 findme -n sun
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 will cause only the document names to be searched (for the string
 \qt{sun}), while:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 findme -t sun
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 would search only the document titles, and:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 findme -t -h sun
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 would search both the titles and page headings in a single pass.
 
@@ -1549,7 +1048,7 @@ By default, the \findmeref{\hi{findme}} command will search your
 entire documentation set, consisting of all the
 \htmlref{documents}{sect:hypertextdocuments}
 found on the
-\hyperref{\hi{HTX\_PATH} search path}
+\slhyperref{\hi{HTX\_PATH} search path}
 {\hi{HTX\_PATH} search path (see \S}{)}{sect:searchpath}
 \footnote{It will also include the names and titles of documents found in
 \htmlref{catalogue files}{sect:cataloguefiles}
@@ -1558,11 +1057,11 @@ found on the
 However, you can restrict the search to specific documents by listing
 them after the keyword you are searching for, thus:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 findme targets sun188
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 would find information about \qt{targets} in this document. This is
 often a useful way of finding reference information once you are
@@ -1641,11 +1140,11 @@ may want your software to handle the display of help information
 yourself. You can do this by using the \hi{-n} switch on the
 \hi{showme} command, thus:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 showme -n help_document subject_label
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 This prevents \hi{showme} from displaying the document. Instead, it
 simply writes the \urlref{URL} for the part of the document you
@@ -1660,11 +1159,11 @@ If you have used the \showmeref{\hi{showme}} command to obtain a
 this might be to save it and pass it back to \hi{showme} later on,
 using the \hi{-u} option for displaying a document by URL:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 showme -u url
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 Of course, the URL you give need not have come from \hi{showme} in the
 first place -- any URL that your \htmlref{WWW
@@ -1673,11 +1172,11 @@ browser}{sect:usingwwwbrowsers} can handle would be acceptable.
 You can also supply the name of a local file using the \hi{-f} switch,
 thus:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 showme -f filename
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 Because you can give relative file names to \hi{showme}, this is often
 an easier way of viewing a file interactively than typing its full
@@ -1695,11 +1194,11 @@ software to implement \htmlref{document
 searches}{sect:searchingfordocuments} with a user interface of your
 own design. This is done by using the \hi{-html} switch, as follows:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 findme -html -q keyword
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 This switch prevents \hi{findme} from displaying its list of results
 via a \htmlref{WWW browser}{sect:usingwwwbrowsers}, and it instead
@@ -1711,7 +1210,7 @@ document and this allows it to be embedded in any other HTML context
 where it may be needed.
 
 An example of this might be a WWW forms interface for
-performing local document searches. Typically, a {\em Common Gateway
+performing local document searches. Typically, a \emph{Common Gateway
 Interface} (\cgiref{CGI}) script would be written to be invoked by
 your \wwwref{WWW} server and perform the search, generating a page of
 HTML as its output. Such a script could invoke the \hi{findme} command
@@ -1745,19 +1244,19 @@ library}{sect:documentlibraries}. Each line of the file should contain
 an entry consisting of three fields separated by white space, in the
 form:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 docname docfile title_text
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 where:
 
 \begin{itemize}
-\item {\bf docname} is the name by which the document is to be known
-\item {\bf docfile} is the name of the file containing the document, given
+\item \textbf{docname} is the name by which the document is to be known
+\item \textbf{docfile} is the name of the file containing the document, given
 relative to the document library directory
-\item {\bf title\_text} is the document's title, which may contain
+\item \textbf{title\_text} is the document's title, which may contain
 further white space
 \end{itemize}
 
@@ -1774,14 +1273,14 @@ example) their titles from the files provided. To help overcome this,
 you would describe these documents in a \htmlref{catalogue
 file}{sect:cataloguefiles}, perhaps along the following lines:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 review doc1.ps A Review of Documentation Systems
 intro doc2.dvi Introduction to Hypertext
 writing writing.ps How to Communicate Effectively
 ...
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 Note that the document name and file name need not match.  This file
 introduces the listed documents to the \hi{findme} command, tells it
@@ -1794,9 +1293,8 @@ decode the document format to obtain these).
 \subsection{\xlabel{how_catalogue_files_are_searched}How Catalogue Files are Searched}
 
 Documents listed in \htmlref{HTX}{sect:HTX} \htmlref{catalogue
-files}{sect:cataloguefiles} are added into the documentation set {\bf
-after} all hypertext documents have first been found using the
-\hyperref{\hi{HTX\_PATH} search path}{\hi{HTX\_PATH} search path (see
+files}{sect:cataloguefiles} are added into the documentation set \textbf{after} all hypertext documents have first been found using the
+\slhyperref{\hi{HTX\_PATH} search path}{\hi{HTX\_PATH} search path (see
 \S}{)}{sect:searchpath}.  If a document is found in hypertext form, it
 occludes any subsequence occurrence of a document with the same name
 in a catalogue file. This means that if you convert an \qt{old}
@@ -1883,7 +1381,7 @@ whatever form it happens to be stored.
          An optional space-separated list of the documents to be
          searched. If this is omitted, then the complete set of
          hypertext documents will be searched, as found on the
-         \hyperref{\hi{HTX\_PATH} search path.}{\hi{HTX\_PATH} search
+         \slhyperref{\hi{HTX\_PATH} search path.}{\hi{HTX\_PATH} search
          path (see \S}{).}{sect:searchpath} Any further documents
          described in \htmlref{catalogue
          files}{sect:cataloguefiles} \latex{(\S\ref{sect:cataloguefiles})}
@@ -2300,7 +1798,7 @@ hypertext (\qt{.htx}) documents.
          hlink -d
       }{
          Re-links all documents in the current directory after first checking
-         the modification dates of {\bf all} the \qt{.html} files they contain
+         the modification dates of \textbf{all} the \qt{.html} files they contain
          to determine which documents have changed since the last re-link.
       }
       \sstexamplesubsection{
@@ -2362,7 +1860,7 @@ hypertext (\qt{.htx}) documents.
       }{
          The name of the document. If no directory information is supplied,
          the document will be located using the
-         \hyperref{\hi{HTX\_PATH} search path}{\hi{HTX\_PATH} search
+         \slhyperref{\hi{HTX\_PATH} search path}{\hi{HTX\_PATH} search
          path (see \S}{)}{sect:searchpath}. If directory information is
          given, no search will be performed. In either case, a
          \qt{.htx} extension to the document name is optional.
@@ -2564,11 +2062,11 @@ environment variable. Thus, if you normally use the command \qt{mozilla} to
 invoke your browser (and also have \qt{firefox} installed), you could put the
 following into your \hi{.login} file:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 setenv HTX_BROWSER mozilla
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 Note that this command should not be an alias (\st{e.g.}\ if you
 normally use the C~shell).
