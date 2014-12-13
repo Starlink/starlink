@@ -31,10 +31,10 @@
 
    This cookbook provides a short introduction to Starlink facilities,
    especially \textsc{Smurf}, the Sub-Millimetre User Reduction
-   Facility and \textsc{Kappa}, the Kernel Application Package, for reducing, displaying, 
+   Facility and \textsc{Kappa}, the Kernel Application Package, for reducing, displaying,
    and analysing ACSIS data.
    In particular, this cookbook illustrates the various steps required to reduce the data;
-   and gives an overview of the ORAC-DR pipeline which carries out many of these 
+   and gives an overview of the ORAC-DR pipeline which carries out many of these
    steps using a single command. Specialised pipeline recipes are discussed.}
 
 % ? End of document identification
@@ -611,7 +611,7 @@ reduce and visualise their data using \starlink\ packages.
 
 This guide covers the following:
 \begin{itemize}
-\itemsep0em 
+\itemsep0em
 \item \cref{Chapter}{sec:intro}{Chapter 1} -- Computer resources you'll need before getting started.
 \item \cref{Chapter}{sec:starlink}{Chapter 2} -- Starlink basics -- tools for exploring your data.
 \item \cref{Chapter}{sec:het}{Chapter 3}  -- Heterodyne observing at the JCMT.
@@ -629,7 +629,7 @@ In this cookbook the following styles are followed:
 \begin{itemize}[noitemsep,nolistsep]
 \item \texttt{\%}  represents the command-line prompt.
 \item Command line examples are shown in \texttt{\color{MidnightBlue}{navy typewriter font.}}
-\item The names of \gaia\ commands or windows appear in \textbf{bold}. 
+\item The names of \gaia\ commands or windows appear in \textbf{bold}.
 \item Useful tips of reminders are given in outlined boxes.
 \end{itemize}
 
@@ -640,7 +640,7 @@ This manual utilises software from the \starlink\ package;
 \picard\ \cite{picard}. Starlink software must be installed on your system, and Starlink aliases
 and environment variables must be defined before attempting any ACSIS data reduction. You can download Starlink from \xref{the Starlink webpage}{\starlink}{}.
 
-Below is a brief summary of the packages used in this cookbook and how to initialise them. Note that all the example commands are shown with a UNIX shell. 
+Below is a brief summary of the packages used in this cookbook and how to initialise them. Note that all the example commands are shown with a UNIX shell.
 
 \begin{table}[h!]
 \begin{tabular}{p{1.7cm}|p{7.4cm}|p{2.9cm}|p{2.2cm}}
@@ -684,7 +684,7 @@ You have three options for processing your data:
 The pipeline approach works well if your project is suited to using one of the
 standard recipes, and if you have a lot of data to process. Performing
 each step by hand allows more fine-tuned control of certain
-processing and analysis steps, although some fine tuning is available in the pipeline via recipe parameters (see \cref{Section}{sec:recpars}{Recipe parameters}). 
+processing and analysis steps, although some fine tuning is available in the pipeline via recipe parameters (see \cref{Section}{sec:recpars}{Recipe parameters}).
 
 Once you have determined you optimal parameters you can pass them to the
 pipeline or a script. Chapters~5 and 6 discuss the manual approach. To use the science pipeline, skip
@@ -699,7 +699,7 @@ While you have the option of running the pipeline yourself, you can find pipelin
 \label{sec:format}
 Starlink routines run on HDS files (Hierarchical Data System) which normally have a .sdf extension (Starlink Data File). HDS files can describe a multitude of formats. The most common HDS format you will encounter is the NDF (N-Dimensional Data Format). This is the standard file format for storing data which represent N-dimensional arrays of numbers, such as spectra, images, etc. The parameter files discussed in Section \ref{sec:hdstrace} are also HDS format.
 
-Raw data retrieved from the JCMT Science Archive comes in FITS format. For information on converting between FITS and NDF see \cref{Appendix}{app:convert}{Converting file formats}. 
+Raw data retrieved from the JCMT Science Archive comes in FITS format. For information on converting between FITS and NDF see \cref{Appendix}{app:convert}{Converting file formats}.
 
 \subsection{\xlabel{adam}How to find the current parameter values}
 \label{sec:hdstrace}
@@ -797,7 +797,7 @@ use the \fitsval\ command instead, e.g.
 % hdstrace file nlines=3
 \end{verbatim}
 \end{myquote}}
-Otherwise to see all the lines and information that is available in each extension use \param{nlines=all}. The example below displays all the system temperature values and pipes the result to `less' to make viewing easier. 
+Otherwise to see all the lines and information that is available in each extension use \param{nlines=all}. The example below displays all the system temperature values and pipes the result to `less' to make viewing easier.
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
 % hdstrace file.MORE.ACSIS.TSYS nlines=all | less
@@ -831,7 +831,7 @@ If you are presented with a data file you may wish to see what commands have bee
 \begin{minipage}[t]{0.12\linewidth}
 \textbf{hislist}
 \end{minipage}
-\begin{minipage}[t]{0.85\linewidth}The \Kappa\ command \hislist\ will return the history records of the NDF. 
+\begin{minipage}[t]{0.85\linewidth}The \Kappa\ command \hislist\ will return the history records of the NDF.
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
 % hislist myfile brief
@@ -844,18 +844,18 @@ Including the \param{brief} option returns a simple list of the commands. Omitti
 \textbf{provshow}
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}
-The \Kappa\ command \task{provshow} displays the details of the NDFs that were used in the creation of the given file. It includes both immediate parents and older ancestor NDFs. 
+The \Kappa\ command \task{provshow} displays the details of the NDFs that were used in the creation of the given file. It includes both immediate parents and older ancestor NDFs.
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
 % provshow file
 \end{verbatim}
 \end{myquote}}
-\end{minipage}   
+\end{minipage}
 \vspace{0.7cm}\\
 
 \subsection{\xlabel{ndfsections}How to examine, process or extract a subset of your data}
 \label{sec:ndfsections}
-For all Starlink commands you can specify a sub-section of your data on which to run an application. You do this by appending the NDF name with the bounds of the section to be  processed. This may be on the command line or in response to a prompt. 
+For all Starlink commands you can specify a sub-section of your data on which to run an application. You do this by appending the NDF name with the bounds of the section to be  processed. This may be on the command line or in response to a prompt.
 
 The example below runs \stats\ on a sub-cube within your original cube. This sub-cube is defined by bounds given for each axis. The upper and lower bounds for each axis are separated by a colon, while the axes themselves are separated by a comma. Note that the use of quotes is necessary on a UNIX shell command line but not in response to a prompt.
 {\color{MidnightBlue}\begin{myquote}
@@ -872,7 +872,7 @@ To define your bounds in FK5 coordinates use the following format.
 \end{verbatim}
 \end{myquote}}
 
-To write a section of your data into a new file (called newcube in the example below) use \ndfcopy\ with bounds. 
+To write a section of your data into a new file (called newcube in the example below) use \ndfcopy\ with bounds.
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
 % ndfcopy `cube(10.5:10.0,0.0:0.25,-25:25)' newcube title="l=10.5 sub-section"
@@ -891,7 +891,7 @@ You can also define a region as a number of pixels from a given origin. The exam
 \begin{center}
 \begin{fmpage}{0.95\linewidth}
 \vspace{0.1cm}
-TIP: To help identify your sub-region in pixel coordinates, open your file in \gaia\ and change the built-in coordinates to PIXEL via \gaiathing{Image-Analysis} $>$ \gaiathing{Change coordinate} $>$ \gaiathing{Build-in coordinates}. 
+TIP: To help identify your sub-region in pixel coordinates, open your file in \gaia\ and change the built-in coordinates to PIXEL via \gaiathing{Image-Analysis} $>$ \gaiathing{Change coordinate} $>$ \gaiathing{Build-in coordinates}.
 \end{fmpage}
 \end{center}
 \end{latexonly}
@@ -935,7 +935,7 @@ Run routines with prompts & You can run any routine with the option
 \section{\xlabel{het_overview}JCMT Heterodyne Observing}
 \label{sec:het}
 \subsection{\xlabel{specline}Spectral-line Observing}
-Submillimetre instruments use heterodyne techniques to observe spectral lines at high resolution. Heterodyne receivers take a weak incoming signal and mix it with a reference frequency known as the local oscillator (LO). This results in a signal of lower (intermediate) frequency (IF) which can be amplified and more easily sampled. JCMT receivers have an IF of 4\,GHz. This mixing produces two frequencies for each value of the LO ($\nu_{sky} = \nu_{LO}\pm\nu_{IF}$) which are known as the upper sideband (USB) and lower sideband (LSB). 
+Submillimetre instruments use heterodyne techniques to observe spectral lines at high resolution. Heterodyne receivers take a weak incoming signal and mix it with a reference frequency known as the local oscillator (LO). This results in a signal of lower (intermediate) frequency (IF) which can be amplified and more easily sampled. JCMT receivers have an IF of 4\,GHz. This mixing produces two frequencies for each value of the LO ($\nu_{sky} = \nu_{LO}\pm\nu_{IF}$) which are known as the upper sideband (USB) and lower sideband (LSB).
 
 In a single sideband receiver one of these is suppressed. Double sideband receivers have the two frequencies superimposed.
 
@@ -949,15 +949,15 @@ where the terms are as follows:
 
 \item $t$ is the total integration time (time spent integrating on the source and the reference position).
 
-\item $\kappa$ is the telescope specific backend degradation factor. 
+\item $\kappa$ is the telescope specific backend degradation factor.
 
 \item The factor of 2 is required for  position-switch or beam-switch observations where half the time is spend off source at the reference position. It may be omitted for frequency switched observations.
 
 \item $T_{sys}$ is the  system temperature in kelvins and describes the total noise of the system. It includes contributions from the background sky temperature, the Earth's atmosphere, ground spillover picked up by the side lobes and the noise from the the receiver itself (known as $T_{rec}$).  $T_{rec}$ can be determined by measuring the effects on $T_{sys}$ when looking at hot and  cold loads, where the cold load is black-body source.
-\item $T^*_{A}(rms)$ is the rms value of the noise observed in the spectrum in kelvins. 
+\item $T^*_{A}(rms)$ is the rms value of the noise observed in the spectrum in kelvins.
 \end{itemize}
 
- 
+
 \begin{latexonly}
 \begin{center}
 \begin{fmpage}{0.95\linewidth}
@@ -975,7 +975,7 @@ TIP: Both $T_{sys}$ and $T_{rec}$ are stored in the raw data files. This informa
 \subsection{\xlabel{rxa}Heterodyne Instruments}
 \label{sec:instruments}
 
-The heterodyne instruments described below are those operational on the JCMT in 2014; they have both been in active service for many years and comprise the bulk of archived JCMT heterodyne data. For information on previous instruments see the JCMT web pages.  
+The heterodyne instruments described below are those operational on the JCMT in 2014; they have both been in active service for many years and comprise the bulk of archived JCMT heterodyne data. For information on previous instruments see the JCMT web pages.
 
 \subsubsection{RxA Frontend}
 Receiver A (RxA) is a single-element double-sideband receiver. It operates in the A-band between 211 and 276 GHz. In addition to stare observations, the most common observing mode for RxA is raster mapping.
@@ -992,7 +992,7 @@ RxA&19.7$''$&0.69 & 0.80\\
 \end{table}
 
 \subsubsection{\xlabel{harp}HARP Frontend}
-The Heterodyne Receiver Array Programme (HARP) is a 16 receptor array arranged on a 4$\times$4 grid \cite{harp}. It operates in the B-band between 325 and 375 GHz. The receptors are adjacent on the focal plane but separated on the sky by 30 arcsecs (or approximately twice the beamwidth). The footprint of the full array is 2 arcmins. Note that not all receptors are operational; historically between 12 and 15 receptors have been available at any given time. The tracking receptor is chosen to be the best performing of the four internal (2$\times$2) receptors in the grid. 
+The Heterodyne Receiver Array Programme (HARP) is a 16 receptor array arranged on a 4$\times$4 grid \cite{harp}. It operates in the B-band between 325 and 375 GHz. The receptors are adjacent on the focal plane but separated on the sky by 30 arcsecs (or approximately twice the beamwidth). The footprint of the full array is 2 arcmins. Note that not all receptors are operational; historically between 12 and 15 receptors have been available at any given time. The tracking receptor is chosen to be the best performing of the four internal (2$\times$2) receptors in the grid.
 
 You can find the number of the tracking receptor and the number of working receptors in the FITS header values REFRECEP and N\_MIX respectively.
 
@@ -1045,7 +1045,7 @@ Since 2005, the backend for heterodyne instruments has been the Auto-Correlation
 \end{tabular}
 \end{center}
 \end{table}
-There are a number of special configurations available with ACSIS. These make use of multiple sub-bands to cover lines at different frequencies.  You can find the sub-system number for a given observation by the FITS header SUBSYSNR. 
+There are a number of special configurations available with ACSIS. These make use of multiple sub-bands to cover lines at different frequencies.  You can find the sub-system number for a given observation by the FITS header SUBSYSNR.
 
 You will find each subsystem number corresponds to a different molecule or transition (given by the FITS headers MOLECULE and TRANSITI). the most common pairings are C$^{18}$O\,(3-2)/$^{13}$CO\,(3-2) and DCN\,(5-4)/HCN\,(4-3)  for HARP, and SiO\,(60-50)/SO\,(43-34) for RxA.
 
@@ -1069,14 +1069,14 @@ You will find each subsystem number corresponds to a different molecule or trans
 \textbf{Stare}
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}
-A stare, or sample, observation is as simple as it sounds. When you open reduced cubes of stare observations in \gaia\ you will see a map consisting of one pixel for each receptor (just one in the case of RxA). The left-hand panel of Figure \ref{fig:harpmodes} shows a stare observation opened in \gaia. You can also view the central spectrum using \linplot\ (see \cref{Appendix}{app:display}{Viewing your data with KAPPA}) or \splat. 
+A stare, or sample, observation is as simple as it sounds. When you open reduced cubes of stare observations in \gaia\ you will see a map consisting of one pixel for each receptor (just one in the case of RxA). The left-hand panel of Figure \ref{fig:harpmodes} shows a stare observation opened in \gaia. You can also view the central spectrum using \linplot\ (see \cref{Appendix}{app:display}{Viewing your data with KAPPA}) or \splat.
 \end{minipage}
 \vspace{0.7cm}\\
 \begin{minipage}[t]{0.14\linewidth}
 \textbf{Jiggle}
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}
-A jiggle map is a common HARP observing mode. They are designed to fill in 30$''$ spacing between the HARP receptors resulting in a 2$'\times$2$'$ map. This is achieved by 'jiggling' the secondary mirror in a 4$\times$4 or 5$\times$5 pattern to give a HARP4 or HARP5 map respectively.   The HARP4 pattern has a 7$''$.5 pixels while the HARP5 has 6$''$ pixels, slightly under- and over-sampling compared with Nyquist. The central panel of Figure \ref{fig:harpmodes} shows a HARP5 jiggle pattern.  
+A jiggle map is a common HARP observing mode. They are designed to fill in 30$''$ spacing between the HARP receptors resulting in a 2$'\times$2$'$ map. This is achieved by 'jiggling' the secondary mirror in a 4$\times$4 or 5$\times$5 pattern to give a HARP4 or HARP5 map respectively.   The HARP4 pattern has a 7$''$.5 pixels while the HARP5 has 6$''$ pixels, slightly under- and over-sampling compared with Nyquist. The central panel of Figure \ref{fig:harpmodes} shows a HARP5 jiggle pattern.
 
 Each of these patterns can be pixel-centered, where the target coordinates fall on one of the central 4 pixels, or map-centered where the target coordinates lie at the centre of the map between the 4 central pixels. See Figure \ref{fig:jiggle} for an illustration of the different jiggle patterns. Although designed for HARP this mode can be used with the single element receivers. The right-hand panel of Figure \ref{fig:harpmodes} shows a HARP raster map.
 \end{minipage}
@@ -1093,7 +1093,7 @@ Raster mapping, or scan mapping, is designed for mapping large areas with maximu
 \textbf{Position-switch}
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}
-In position-switch (PSSW) mode, the whole telescope moves off source and on to the reference position. This allows a large offset to the reference position, useful in busy environments such as the Galactic Plane. The main disadvantage is that it takes a longer time resulting in less-accurate sky subtraction. 
+In position-switch (PSSW) mode, the whole telescope moves off source and on to the reference position. This allows a large offset to the reference position, useful in busy environments such as the Galactic Plane. The main disadvantage is that it takes a longer time resulting in less-accurate sky subtraction.
 \end{minipage}
 \vspace{0.7cm}\\
 \begin{minipage}[t]{0.14\linewidth}
@@ -1107,7 +1107,7 @@ In beam-switch (BSW) mode, the secondary chops onto the reference position. This
 \textbf{Frequency-switch}
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}
-In frequency-switch (FSW) mode the telescope does not move but the centre of the spectral band is shifted to a line free region of the spectrum. It is very efficient with no off-source time and can be useful  when no emission-free reference position can be found. 
+In frequency-switch (FSW) mode the telescope does not move but the centre of the spectral band is shifted to a line free region of the spectrum. It is very efficient with no off-source time and can be useful  when no emission-free reference position can be found.
 \end{minipage}
 
 
@@ -1125,11 +1125,11 @@ In frequency-switch (FSW) mode the telescope does not move but the centre of the
 \label{sec:raw}
 
 \subsection{\xlabel{format}Data Format}
-Raw ACSIS data follow this naming convention: 
+Raw ACSIS data follow this naming convention:
 
 aUTDATE\_OBSNUMBER\_SUBSYSTEM\_SUBSCAN
 
-For example, a20131115\_00055\_03\_0001.sdf. The first `a' represents ACSIS. The UT date and observation number (OBSNUM) serve as an identifier for any given night of observing. ACSIS observations may include up to four frequency settings given by the different subsystems (00-03), while long observations may require multiple subscans to avoid a file size $>$512\,GB. 
+For example, a20131115\_00055\_03\_0001.sdf. The first `a' represents ACSIS. The UT date and observation number (OBSNUM) serve as an identifier for any given night of observing. ACSIS observations may include up to four frequency settings given by the different subsystems (00-03), while long observations may require multiple subscans to avoid a file size $>$512\,GB.
 
 
 
@@ -1144,7 +1144,7 @@ Use the \starlink\ application \gaia\ to visualise your raw data. The is initiat
 \end{verbatim}
 \end{myquote}}
 
-Loading a file in \textsc{Gaia} produces two windows (see \cref{Figure}{fig:rawgaia}{the first figure below}). The main window shows a map of the HARP receptors (along the $x$-axis; note the 16 pixels) for a given sample of the observation (time on the $y$-axis). You can track the performance of an individual receptor by following a column from bottom to top to check its consistency. In \cref{Figure}{fig:rawgaia}{the first figure below} H04 is dead for the whole observation. The spectrum for a receptor at one of the time slices can be seen by clicking on the pixel. This will bring up a third window  -- the \gaiathing{Spectral plot} (see \cref{Figure}{fig:gaia2}{the second figure below}). This spectrum will be replaced when you click on a different pixel. 
+Loading a file in \textsc{Gaia} produces two windows (see \cref{Figure}{fig:rawgaia}{the first figure below}). The main window shows a map of the HARP receptors (along the $x$-axis; note the 16 pixels) for a given sample of the observation (time on the $y$-axis). You can track the performance of an individual receptor by following a column from bottom to top to check its consistency. In \cref{Figure}{fig:rawgaia}{the first figure below} H04 is dead for the whole observation. The spectrum for a receptor at one of the time slices can be seen by clicking on the pixel. This will bring up a third window  -- the \gaiathing{Spectral plot} (see \cref{Figure}{fig:gaia2}{the second figure below}). This spectrum will be replaced when you click on a different pixel.
 
 You can change the way the data is displayed in the \gaiathing{Display image sections of a cube} window by changing the \gaiathing{Axis}. Selecting Axis number two will display spectra against time while Axis number three gives spectra against receptors. You can scroll through your data by moving the \gaiathing{Index of plane} slider.
 
@@ -1155,8 +1155,8 @@ You can change the way the data is displayed in the \gaiathing{Display image sec
   The \gaiathing{Spectral plot} window displaying its time-varying
   signal, appears automatically once a pixel is clicked in the main window.
   The vertical red line indicates the time slice that is currently selected
-  in the \gaiathing{Display image sections of a cube} window. This can be 
-  dragged across the spectrum to scroll through the spectra. Examine exposure 
+  in the \gaiathing{Display image sections of a cube} window. This can be
+  dragged across the spectrum to scroll through the spectra. Examine exposure
   time map etc in ancillary arrays.}
 
 A second way to scroll through your spectrum is to click and drag the vertical red bar on the \gaiathing{Spectral plot} window. As you do so array shown in the main window will automatically update.
@@ -1196,23 +1196,23 @@ To convert your raw time-series cubes with spectral channel number, receptor ind
 
 
 \subsection{\xlabel{makecube}Running Makecube}
-The \smurf\ application used for regridding your raw data is  \makecube. 
+The \smurf\ application used for regridding your raw data is  \makecube.
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
 % makecube in=a20070505_00041_01_0001.sdf out=cube auto
 
-Processing data from instrument 'HARP' for object 'W49' from the following 
-observation  :                    
-   20070505 #41 grid/pssw                                                                                      
+Processing data from instrument 'HARP' for object 'W49' from the following
+observation  :
+   20070505 #41 grid/pssw
 
    Projection parameters used:
-      CRPIX1 = 0              
-      CRPIX2 = 0              
+      CRPIX1 = 0
+      CRPIX2 = 0
       CRVAL1 = 287.555875 ( RA = 19:10:13.410 )
       CRVAL2 = 9.10386111111111 ( Dec = 9:06:13.90 )
-      CDELT1 = -0.00166666666666667 ( -6 arcsec )   
-      CDELT2 = 0.00166666666666667 ( 6 arcsec )     
-      CROTA2 = 0                                    
+      CDELT1 = -0.00166666666666667 ( -6 arcsec )
+      CDELT2 = 0.00166666666666667 ( 6 arcsec )
+      CROTA2 = 0
 
    Output cube pixel bounds: ( -8:11, -8:11, -1024:1023 )
    Output cube WCS bounds:
@@ -1243,7 +1243,7 @@ You can supply \makecube\ with an ASCII file containing a list of all the raw fi
 When you pass an ASCII file to \makecube\ (and any \starlink\ command) you should prefix the filename with an up-caret (\,\^\,).
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
-% makecube in=^filelist.txt 
+% makecube in=^filelist.txt
 \end{verbatim}
 \end{myquote}}
 
@@ -1261,14 +1261,14 @@ Alternatively you can use wild cards. The example below reads in all the raw fil
 To save disk space and processing time you can specify the region of the spectra to be processed with  \param{specbounds}. If you know your line lies close to 0 km/s you may chose to process only the central 100 km/s as in the example below.
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
-%  makecube rawfile specbounds=\"-50.0 50.0\" 
+%  makecube rawfile specbounds=\"-50.0 50.0\"
 \end{verbatim}
 \end{myquote}}
 
 \subsubsection{Masking receptors}
-When combining several maps with masked bad receptors one can use the \param{badmask} parameter of \makecube. This option determines the way in which bad pixels are propagated from input to output. The best that produces the best map is  \param{badmask=and} which uses all the data so an output pixel will be bad only if all the input pixels that contribute to it are bad. this generates an output map with the lowest noise and fewest bad pixels. However, for large datasets the memory requirements may be excessive. 
+When combining several maps with masked bad receptors one can use the \param{badmask} parameter of \makecube. This option determines the way in which bad pixels are propagated from input to output. The best that produces the best map is  \param{badmask=and} which uses all the data so an output pixel will be bad only if all the input pixels that contribute to it are bad. this generates an output map with the lowest noise and fewest bad pixels. However, for large datasets the memory requirements may be excessive.
 
-Alternatives are  \param{badmask=or} (default) and \param{badmask=first}. \param{Or} means that an output pixel will be bad if any of the input pixels that contribute to it are bad and is the default.  \param{First} means that the decisions on which pixels will be flagged as bad will be made with the first input spectrum while the rest are ignored. 
+Alternatives are  \param{badmask=or} (default) and \param{badmask=first}. \param{Or} means that an output pixel will be bad if any of the input pixels that contribute to it are bad and is the default.  \param{First} means that the decisions on which pixels will be flagged as bad will be made with the first input spectrum while the rest are ignored.
 
 \subsubsection{Including/excluding receptors}
 To make a cube with only certain receptors you can use the  \param{detectors} option on the command line. This allows you to either include or exclude specific receptors without the need for masking. The  example below makes a map using all receptors except H04 and H11.
@@ -1297,7 +1297,7 @@ You can use the \param{ref} option to define an NDF which is used to define an o
 
 If you do not supply a reference file \makecube\ will revert to the \param{autogrid} option.
 
-If  \param{autogrid=true}, the output grid is determined automatically so that as many data samples as possible fall close to the centre of pixels in the output cube. 
+If  \param{autogrid=true}, the output grid is determined automatically so that as many data samples as possible fall close to the centre of pixels in the output cube.
 
 If \param{autogrid=false} REFLON/REFLAT are set to the first pointing BASE position, CROTA is set to the MAP\_PA value in the FITS header (converted to the requested sky co-ordinate system), PIXSIZE is set to 6 arcseconds, and REFPIX1/REFPIX2 are both set to zero. See \smurfsun\ for a full description of each of these parameters.
 
@@ -1311,7 +1311,7 @@ There are several regridding options available to you through the \makecube\ com
 \end{verbatim}
 \end{myquote}}
 
-The default method is \param{Nearest} which assigns the input pixel completely to the nearest output pixel. This is the fastest method available but is not optimal. In particular it may result in blank pixels in HARP maps due to missing receptors (see Figure \ref{fig:spread}). 
+The default method is \param{Nearest} which assigns the input pixel completely to the nearest output pixel. This is the fastest method available but is not optimal. In particular it may result in blank pixels in HARP maps due to missing receptors (see Figure \ref{fig:spread}).
 
 %If \param{spread=nearest} you can supply a value for the \param{badmask} option. This determines the way in which bad pixels are propagated from input to output. The default is \param{badmask=AND} which uses all data and results in the best map ,however it requires considerable memory so the alternatives are FIRST and OR. See \smurfsun\ for more details.
 
@@ -1345,7 +1345,7 @@ The output variance values are based on the spread of input data values contribu
 \textbf{Tsys}
 \end{minipage}
 \begin{minipage}[t]{0.8\linewidth}
-The output variance values are based on the system noise temperature values supplied in the input NDFs. Since each input spectrum is characterised by a single Tsys value, each output spectrum will have a constant Variance value (i.e. all channels in an output spectrum will have the same variance value). [Default]. 
+The output variance values are based on the system noise temperature values supplied in the input NDFs. Since each input spectrum is characterised by a single Tsys value, each output spectrum will have a constant Variance value (i.e. all channels in an output spectrum will have the same variance value). [Default].
 \end{minipage}
 \vspace{0.7cm}\\
 \begin{minipage}[t]{0.12\linewidth}
@@ -1357,16 +1357,16 @@ The output variance values are based on the system noise temperature values supp
 \end{center}
 
 \subsubsection{Sparse grid}
-If one has observed a number of offset positions which are not on a regular grid or are widely spaced, it is of little use to make a normal cube with \makecube, which then would have a large size and which would be mostly empty. Then one can use the \makecube\ parameter  \param{sparse}. When \param{sparse=true} a one-dimensional array is created which stacks spectra in the order in which they were observed (from left to right when viewed with \gaia). 
+If one has observed a number of offset positions which are not on a regular grid or are widely spaced, it is of little use to make a normal cube with \makecube, which then would have a large size and which would be mostly empty. Then one can use the \makecube\ parameter  \param{sparse}. When \param{sparse=true} a one-dimensional array is created which stacks spectra in the order in which they were observed (from left to right when viewed with \gaia).
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
-% smurfhelp makecube param sparse 
+% smurfhelp makecube param sparse
 \end{verbatim}
 \end{myquote}}
 This is generates a one-dimensional array where spectra are displayed by \gaia\ in the order where they were observed (from left to right).
 
 \subsubsection{Creating a catalogue of receptor positions}
-You can use the option \param{outcat} to generate a catalogue of the spatial potions of the receptors used to make your final cube. The label associated with each row in the catalogue is the detector name. The detector positions in the catalogue are ordered as follows: all the positions for the first input NDF come first, followed by those for the second input NDF, etc. Within the group of positions associated with a single input NDF, the positions for the first time slice come first, followed by the positions for the second time slice, etc. 
+You can use the option \param{outcat} to generate a catalogue of the spatial potions of the receptors used to make your final cube. The label associated with each row in the catalogue is the detector name. The detector positions in the catalogue are ordered as follows: all the positions for the first input NDF come first, followed by those for the second input NDF, etc. Within the group of positions associated with a single input NDF, the positions for the first time slice come first, followed by the positions for the second time slice, etc.
 
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
@@ -1374,7 +1374,7 @@ You can use the option \param{outcat} to generate a catalogue of the spatial pot
 \end{verbatim}
 \end{myquote}}
 
-The catalogue produced will be in FITS format. In the example above a file called cat.FIT is created. When viewing your map with \gaia\ this catalogue can be overlaid to identify the receptors contributing to each pixel (see Figure \ref{fig:makecube-outcat}). 
+The catalogue produced will be in FITS format. In the example above a file called cat.FIT is created. When viewing your map with \gaia\ this catalogue can be overlaid to identify the receptors contributing to each pixel (see Figure \ref{fig:makecube-outcat}).
 
 \myfig{sc20_makecube-outcat}{[h!]}{width=1\linewidth}{fig:makecube-outcat}{Displaying receptor positions in \gaia.}{
  The receptor positions overlaid on a regridded cube of a HARP stare observation. This is viewed in \gaia\ by selecting Data-Servers $>$ Local Catalogs and selecting your \param{outcat} filename (here \param{cat.FITS}). Notice that dead receptors are excluded from the list.}
@@ -1396,7 +1396,7 @@ Frequency or velocity smoothing is performed using \Kappa:\block. It uses a rect
 \end{verbatim}
 \end{myquote}}
 
-Two-dimensional NDFs can also be smoothed using \gausmooth. This smooths using a symmetrical Gaussian point spread function (PSF) of specified width(s) and orientation. Each output pixel is the PSF-weighted mean of the input pixels within the filter box. 
+Two-dimensional NDFs can also be smoothed using \gausmooth. This smooths using a symmetrical Gaussian point spread function (PSF) of specified width(s) and orientation. Each output pixel is the PSF-weighted mean of the input pixels within the filter box.
 
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
@@ -1406,7 +1406,7 @@ Two-dimensional NDFs can also be smoothed using \gausmooth. This smooths using a
 Note that the \param{fwhm} option is given in the number of pixels. For example, to smooth a map with 4$''$ pixels by a 12$''$ Gaussian you would set \param{fwhm=3}.
 
 \subsection{Removing a baseline}
-Baselines should be removed using \Kappa:\mfittrend. This routine can fit polynomials up to order 15,  or cubic splines, to each spectrum in your cube. You can specify the ranges to fit via the \param{ranges} parameter, or you can allow them to be determined automatically (\param{auto}). 
+Baselines should be removed using \Kappa:\mfittrend. This routine can fit polynomials up to order 15,  or cubic splines, to each spectrum in your cube. You can specify the ranges to fit via the \param{ranges} parameter, or you can allow them to be determined automatically (\param{auto}).
 
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
@@ -1414,7 +1414,7 @@ Baselines should be removed using \Kappa:\mfittrend. This routine can fit polyno
 \end{verbatim}
 \end{myquote}}
 
-If using automatic range determination you should set the \param{numbin} option. This is the number of bins in which to compress the trend line. A single line or average may be noisy so binning is used to improve the signal-to-noise in order to enhance features which should be masked. 
+If using automatic range determination you should set the \param{numbin} option. This is the number of bins in which to compress the trend line. A single line or average may be noisy so binning is used to improve the signal-to-noise in order to enhance features which should be masked.
 
 Ideally the bin size should match your line width to get maximum single to noise between the emission and the background. Be aware that bins that are too big can dilute weaker features. Likewise, bins that are too small will get noisy at the edges of broad lines. We recommend you experiment with the bin size to find the best fit for your data.
 
@@ -1463,7 +1463,7 @@ These steps give a more in depth way of determining the baselines and mimic the 
 \end{enumerate}
 
 \textbf{What about findback?}\\*
-The \cupid\ routine \findback\ offers an alternative for background subtraction however there are more limitations. It applies spatial filtering to remove structure with a size scale less than a specified box size. Within each box the values are replaced by the minimum of the input values. The data are then filtered again and this time replaced with the maximum in each box. 
+The \cupid\ routine \findback\ offers an alternative for background subtraction however there are more limitations. It applies spatial filtering to remove structure with a size scale less than a specified box size. Within each box the values are replaced by the minimum of the input values. The data are then filtered again and this time replaced with the maximum in each box.
 
 Using \findback\ results in a baseline trend that hugs the lower limit of the noise and can contain sharp edges. These problems can be mitigated but extra steps are required. See \cupidsun\ for more details.
 
@@ -1547,7 +1547,7 @@ You can use the \Kappa\ command \cmult\ to multiply any NDF by a constant.
 
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
-% cmult in=harpcube 0.63 out=harpcube_Tmb 
+% cmult in=harpcube 0.63 out=harpcube_Tmb
 \end{verbatim}
 \end{myquote}}
 
@@ -1576,8 +1576,8 @@ Alternatively, to resample your data onto smaller pixels you should use the \Kap
 Remember you can check your current pixel size and channel spacing with \ndftrace\ (see \cref{Section}{sec:fitslist}{How can I view the metadata?}).
 
 \subsection{\xlabel{mosaic}Mosaicking cubes}
-\label{sec:mosaic} 
-If you pass raw files covering different regions of the sky to \makecube\ it will automatically mosaic them together. This can be heavy work for your processor so you may wish to make individual cubes and combine them during post-processing. To coadd multiple reduced maps you should use \wcsmosaic. 
+\label{sec:mosaic}
+If you pass raw files covering different regions of the sky to \makecube\ it will automatically mosaic them together. This can be heavy work for your processor so you may wish to make individual cubes and combine them during post-processing. To coadd multiple reduced maps you should use \wcsmosaic.
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
 % wcsmosaic in=^maplist out=mosaic lbnd=! ubnd=! variance
@@ -1604,7 +1604,7 @@ TIP: Take care not to combine data separated on the sky as \wcsmosaic\ will atte
 \begin{center}
 \begin{fmpage}{0.95\linewidth}
 \vspace{0.1cm}
-TIP: You can also use the \picard\ recipe MOSAIC\_JCMT\_IMAGES. This will correctly combine all NDF extensions. See \cref{Appendix}{app:picard}{Picard} for details. 
+TIP: You can also use the \picard\ recipe MOSAIC\_JCMT\_IMAGES. This will correctly combine all NDF extensions. See \cref{Appendix}{app:picard}{Picard} for details.
 \end{fmpage}
 \end{center}
 \end{latexonly}
@@ -1692,7 +1692,7 @@ In \gaia\ go to \gaiathing{Image-analysis$>$Image regions}.
 
 \hspace{0.1cm}
 \begin{minipage}[c]{0.23\linewidth}
-Select the shape of the ARD region you wish to define and drag it on your map by holding the mouse button down, dragging the shape out, then releasing the button. 
+Select the shape of the ARD region you wish to define and drag it on your map by holding the mouse button down, dragging the shape out, then releasing the button.
 \end{minipage}
 \hspace{0.2cm}
 \begin{minipage}[c]{0.72\linewidth}
@@ -1737,11 +1737,11 @@ In the \gaiathing{Image regions} window go to \gaiathing{File$>$Save ARD descrip
 \subsection{\xlabel{holes}Filling holes in your map}
 \label{sec:holes}
 
-You may come across empty pixels in your map due to dead receptors or receptors which have failed quality assurance in the pipeline. The second half of 2013 in particular had only 12 working receptors for HARP.   
+You may come across empty pixels in your map due to dead receptors or receptors which have failed quality assurance in the pipeline. The second half of 2013 in particular had only 12 working receptors for HARP.
 
 You can fill these holes using \Kappa:\fillbad. This replaces the bad values with a smooth function derived from neighbouring values, derived by iterating to a solution of Laplace's equation.
 
-The default values for \fillbad\ will fill the holes but smooths by 5 pixels along each axis. If you prefer not to smooth in the spectral axis, set the parameter \param{size} to [s,s,0] where s is the scale length in pixels.  The zero means do not smooth along the third axis. 
+The default values for \fillbad\ will fill the holes but smooths by 5 pixels along each axis. If you prefer not to smooth in the spectral axis, set the parameter \param{size} to [s,s,0] where s is the scale length in pixels.  The zero means do not smooth along the third axis.
 
 The scale length should have a value about half the size of the largest region of bad data to be replaced.  Since the largest bad regions apart from the cube peripheries are two pixels across, a size of 1 is appropriate.
 {\color{MidnightBlue}\begin{myquote}
@@ -1784,7 +1784,7 @@ distribution with more ease. Again the \param{comp=err} option is
 used.
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
-% histogram mosaic comp=err range=! numbin=200 
+% histogram mosaic comp=err range=! numbin=200
 \end{verbatim}
 \end{myquote}}
 The output is shown in \cref{Figure}{fig:noihisto}{the graphic below}. An alternative to setting the number of bins via the \param{numbin} parameter is to set the width of each bin using the \param{width} parameter.
@@ -1857,7 +1857,7 @@ For offset coordinates you will need to set the system \param{skyrefis} to origi
 
 %
 %\subsection{\xlabel{despike}Despiking}
-%Interference spikes are sometimes found in ACSIS data. Spikes should be quite conspicuous in the data cube as they occur at the same frequency throughout the observed cube and at (almost) uniform intensity. It is probably best to eliminate spikes in your data cube from the raw time-series, i.e. before running \makecube\ or any other processing on your data. 
+%Interference spikes are sometimes found in ACSIS data. Spikes should be quite conspicuous in the data cube as they occur at the same frequency throughout the observed cube and at (almost) uniform intensity. It is probably best to eliminate spikes in your data cube from the raw time-series, i.e. before running \makecube\ or any other processing on your data.
 %
 %If you suspect you have a spike in your data Appendix \ref{app:spike} describes the procedure for identifying the position of the spike and masking it out.
 %
@@ -1927,20 +1927,20 @@ The \cupid\ application \findclumps\ can be used to generate a clump catalogue. 
 \end{verbatim}
 \end{myquote}}
 
- The shape option allows \findclumps\ to create and STC-S description (polygonal or elliptical) for each clump found. These are added as extra columns to the output catalogue. 
+ The shape option allows \findclumps\ to create and STC-S description (polygonal or elliptical) for each clump found. These are added as extra columns to the output catalogue.
 \vspace{0.7cm}\\
 \begin{minipage}[t]{0.12\linewidth}
 \textbf{Polygon}
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}
-Each polygon will have, at most, 15 vertices. For two-dimensional data the polygon is a fit to the clump's outer boundary (the region containing all good data values). For three-dimensional data the spatial footprint of each clump is determined by rejecting the least significant 10\% of spatial pixels, where ``significance'' is measured by the number of spectral channels that contribute to the spatial pixel. The polygon is then a fit to the outer boundary of the remaining spatial pixels. 
+Each polygon will have, at most, 15 vertices. For two-dimensional data the polygon is a fit to the clump's outer boundary (the region containing all good data values). For three-dimensional data the spatial footprint of each clump is determined by rejecting the least significant 10\% of spatial pixels, where ``significance'' is measured by the number of spectral channels that contribute to the spatial pixel. The polygon is then a fit to the outer boundary of the remaining spatial pixels.
 \end{minipage}
 \vspace{0.7cm}\\
 \begin{minipage}[t]{0.12\linewidth}
 \textbf{Ellipse}
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}
-All data values in the clump are projected onto the spatial plane and ``size'' of the collapsed clump at four different position angles -- all separated by 45$^\circ$ -- is found. The ellipse that generates the same sizes at the four position angles is then found and used as the clump shape. 
+All data values in the clump are projected onto the spatial plane and ``size'' of the collapsed clump at four different position angles -- all separated by 45$^\circ$ -- is found. The ellipse that generates the same sizes at the four position angles is then found and used as the clump shape.
 \end{minipage}
 \vspace{0.7cm}\\
 You can plot the clump outlines over an image using \gaia. See Section \ref{sec:plotclumps} for instructions.
@@ -2011,7 +2011,7 @@ You can also input or edit the contour levels manually in the \gaiathing{Levels}
 
 \myfig{sc20_contouring2}{[h!]}{width=0.4\linewidth}{fig:gaia_contour2}{Formatting contours with \gaia.}{Formatting contours with \gaia.}
 
-\item Click the \gaiathing{Draw Contours} button to make the contours appear over your map in the main window. If you are contouring over a cube you can scroll through the velocity axis whilst the contours remain fixed on top.  
+\item Click the \gaiathing{Draw Contours} button to make the contours appear over your map in the main window. If you are contouring over a cube you can scroll through the velocity axis whilst the contours remain fixed on top.
 
 \myfig{sc20_contouring6}{[h!]}{width=0.6\linewidth}{fig:gaia_contour3}{Contoured map in \gaia.}{Contoured map in \gaia.}
 
@@ -2032,7 +2032,7 @@ You can also input or edit the contour levels manually in the \gaiathing{Levels}
 
 \myfig{sc20_plotclumps3}{[h!]}{width=0.5\linewidth}{fig:gaia_clumps2}{Catalogue window in \gaia.}{Catalogue window in \gaia.}
 
-\item In the \gaiathing{Import CUPID catalogue} window, select a file with the \gaiathing{Choose file}... button. For polygon shapes tick the STC shape box. You can change the RA/Dec coordinates from Cen1/Cen2, which give the central position of the clumps, to Peak1/Peak2 which give the position of the peak within them. 
+\item In the \gaiathing{Import CUPID catalogue} window, select a file with the \gaiathing{Choose file}... button. For polygon shapes tick the STC shape box. You can change the RA/Dec coordinates from Cen1/Cen2, which give the central position of the clumps, to Peak1/Peak2 which give the position of the peak within them.
 
 \item A catalogue window for your FITS file will appear listing all the sources and their positions and extents.
 
@@ -2073,7 +2073,7 @@ You can also input or edit the contour levels manually in the \gaiathing{Levels}
 
 \item Select the Collapse tab in the \gaiathing{Display image regions of a cube} window.
 
-\item Check the  \gaiathing{Show limits on plot} button to interactively select your collapse region.  You can click and drag the edges of these limit lines in the \gaiathing{Spectral plot} window. Position these around the region you wish to collapse over. 
+\item Check the  \gaiathing{Show limits on plot} button to interactively select your collapse region.  You can click and drag the edges of these limit lines in the \gaiathing{Spectral plot} window. Position these around the region you wish to collapse over.
 
 \item Select the collapse method  via the \gaiathing{Combination method} drop-down list (Integ is selected in the example below).
 
@@ -2092,16 +2092,16 @@ You can also input or edit the contour levels manually in the \gaiathing{Levels}
 
 \myfig{sc20_gaia-3dvolume2}{[h!]}{width=0.6\linewidth}{fig:gaia_3d2}{Three-dimensional visualisation in \gaia.}{Three-dimensional visualisation in \gaia.}
 
-\item Include axes labelling, the image plane and other features using the check boxes on the side bar. 
+\item Include axes labelling, the image plane and other features using the check boxes on the side bar.
 \end{enumerate}
 
 
 \newpage
 \section{\xlabel{pipeline}The ACSIS Pipeline}
 \label{sec:pipe}
-The ORAC-DR pipeline (\cite{oracdr}) is an generic automated data reduction pipeline that can process your raw JCMT data and return advanced data products: baselined single observation cubes, mosaicked and coadded cubes, moments map and clump catalogues.  
+The ORAC-DR pipeline (\cite{oracdr}) is an generic automated data reduction pipeline that can process your raw JCMT data and return advanced data products: baselined single observation cubes, mosaicked and coadded cubes, moments map and clump catalogues.
 
-It has advanced algorithms for the common routines such as baseline subtraction. The data processing is performed using standard \Kappa\ and \smurf\ routines, the main ones of which have been described in previous chapters. 
+It has advanced algorithms for the common routines such as baseline subtraction. The data processing is performed using standard \Kappa\ and \smurf\ routines, the main ones of which have been described in previous chapters.
 
 \subsection{\xlabel{recipes}Recipes and primitives}
 \label{sec:recipes}
@@ -2133,11 +2133,11 @@ GRADIENT &Typically one moderately wide line is expected, for which the center v
 \subsection{\xlabel{recipes}The process}
 You can follow this commentary via the flow chart in Figure \ref{fig:pipeline}.
 
-Two notations are used in the following list:\\ 
+Two notations are used in the following list:\\
 \textbullet\ \textbf{a\_cube} to mean the regridded cube of a single observation. \\
 \textbullet\ \textbf{g\_cube} to mean the group cube which is a coadd of all the \textbf{a\_cube} file s.
 
-Note that the pipeline will coadd data into a group file whenever it encounters observations with identical LO frequencies, base positions and bandwidths. 
+Note that the pipeline will coadd data into a group file whenever it encounters observations with identical LO frequencies, base positions and bandwidths.
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
@@ -2149,12 +2149,12 @@ Note that the pipeline will coadd data into a group file whenever it encounters 
 
 \item   The DC-level offset between corresponding sub-band observations is determined using the median of all the spectra.  The DC offset is then subtracted from the sub-band spectra, and the resulting sub-band spectra are mosaicked together to form single time-series cube.
 
-\item   The data are thresholded by trimming the noisy ends of the band. The spectra are collapsed along the receptor using the `sigma' estimator to form a single spectrum. A constant value background is then fit to the resulting spectrum. The fitting regions are used to determine where the spectrum gets noisier (i.e. higher RMS values in the RMS spectrum). These high-noise regions are then trimmed from the ends in the frequency axis. 
+\item   The data are thresholded by trimming the noisy ends of the band. The spectra are collapsed along the receptor using the `sigma' estimator to form a single spectrum. A constant value background is then fit to the resulting spectrum. The fitting regions are used to determine where the spectrum gets noisier (i.e. higher RMS values in the RMS spectrum). These high-noise regions are then trimmed from the ends in the frequency axis.
 %but still specify percentage - why??
 
 \item  Quality assurance checks are run on the raw cubes. See Appendix \ref{app:qa} for a description of the checks performed. Any time-slices failing any of the these checks gets flagged as bad and are not included in the group coadd that follows.
 
-\item  Once all the raw observations have undergone the initial processing, the \textbf{a\_cube} files are combined to form a \textbf{g\_cube}. 
+\item  Once all the raw observations have undergone the initial processing, the \textbf{a\_cube} files are combined to form a \textbf{g\_cube}.
 
 \item  The \textbf{g\_cube} is smoothed by an amount specified by the particular science recipe being used. See Section \ref{sec:recipes} for details on the different recipes.
 
@@ -2234,7 +2234,7 @@ Notice the two values given for the  \param{PIXEL\_SCALE} option. This means tha
 \label{sec:qa}
 There is a set of quality assurance (QA) parameters that are applied by default when you run the pipeline. These are found in the text file \param{\$ORAC\_DATA\_CAL/qa.ini}.
 
-You can set your own QA parameters by creating a local \textit{.ini} file (called myqa.ini in the following examples). You can then call this local QA file via \param{-calib qaparams=myqa.ini} when starting the pipeline. 
+You can set your own QA parameters by creating a local \textit{.ini} file (called myqa.ini in the following examples). You can then call this local QA file via \param{-calib qaparams=myqa.ini} when starting the pipeline.
 
 The example below illustrates the format of this QA file and highlights some of the main parameters you may consider tweaking.
 
@@ -2280,9 +2280,9 @@ See Appendix \ref{app:qa} for a description of all available QA parameters.
 
 \subsection{Specifying bad receptors (recommended)}
 \label{sec:badrec}
-If certain receptors are known to be bad for the full length of an observations (e.g. dead receptors), processing time can be reduced by not having the pipeline attempt to reduce that data. 
+If certain receptors are known to be bad for the full length of an observations (e.g. dead receptors), processing time can be reduced by not having the pipeline attempt to reduce that data.
 
-Information regarding bad receptors is stored in a master text file called \param{index.bad\_receptors}, located in your \param{ORAC\_DATA\_CAL} directory. This files lists dates and the corresponding receptors which are not operational. By default, when the pipeline runs it searches this file and discards the appropriate receptors. However, this master list is grossly  incomplete so you should select another method for specifying bad receptors. 
+Information regarding bad receptors is stored in a master text file called \param{index.bad\_receptors}, located in your \param{ORAC\_DATA\_CAL} directory. This files lists dates and the corresponding receptors which are not operational. By default, when the pipeline runs it searches this file and discards the appropriate receptors. However, this master list is grossly  incomplete so you should select another method for specifying bad receptors.
 
 We recommend using the \param{index} option, called via \param{-calib bad\_receptors=index} when starting the pipeline. This creates an index file called \param{index.bad\_receptors\_qa} in your \param{ORAC\_DATA\_OUT} directory, where any bad receptors identified during your reductions are indexed. This file is appended each time you run the pipeline and in this way you build up your own independent list.
 
@@ -2311,7 +2311,7 @@ list& A colon-separated list of receptor names can be supplied. E.g. \param{-cal
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
-\item Initialise the pipeline software. 
+\item Initialise the pipeline software.
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
 % oracdr_acsis -cwd
@@ -2322,7 +2322,7 @@ list& A colon-separated list of receptor names can be supplied. E.g. \param{-cal
 ensure the data is read from, and written to, the right place. Many are
 set automatically when the pipeline is initialised but others must be
 set manually. Details of the optional variables are given in
-\pipelinesun\ but you should specify  where to find the raw data and where to write any files that are created. 
+\pipelinesun\ but you should specify  where to find the raw data and where to write any files that are created.
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
 % setenv ORAC_DATA_IN <path to raw data>
@@ -2338,7 +2338,7 @@ If you wish to keep the intermediate files produced by the pipeline you should a
 % setenv ORAC_KEEP 1
 \end{verbatim}
 \end{myquote}}
-However, this still excludes oractemp files. To retain these set 
+However, this still excludes oractemp files. To retain these set
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
 % setenv ORAC_KEEP temp
@@ -2439,7 +2439,7 @@ Note, there is a recipe parameter CHUNKSIZE which adjusts the maximum tile size.
 \texttt{rmshi}& High-frequency noise.\\
 \hline
 \multicolumn{2}{l}{\textbf{Extra files kept with ORAC\_KEEP = 1}}\\
-\hline 
+\hline
 \texttt{em001}& Ends of the frequency axis have been trimmed off.\\
 \texttt{thr001}& Time-series data with large spikes removed.\\
 \texttt{ts001}& Time-sorted time-series data.\\
@@ -2496,9 +2496,9 @@ into master group files.
 Berry~D.~S., 2013, \textit{CUPID. Version 2.0}, \xref{Starlink User Note 255}{sun255}{}
 
 \bibitem{harp}
-Buckle, J.~V., Hills, R.~E., Smith, H., et al., 2009, 
+Buckle, J.~V., Hills, R.~E., Smith, H., et al., 2009,
 \textit{HARP/ACSIS: a submillimetre spectral imaging system on the James Clerk Maxwell Telescope},
-MNRAS, 399, 1026 
+MNRAS, 399, 1026
 
 \bibitem{oracdr}
 Cavanagh~B., Jenness~T., Economou~F., Currie~M.~J., 2008,
@@ -2566,7 +2566,7 @@ This recipe coadd the given files into a single map while correctly handling the
 \item MAKEMOS\_SIGMAS: Sigma-clipping threshold if MAKEMOS\_METHOD = sigmas. [4]
 \item MASK\_LOWVAR: Flag to indicate that pixels with anomalously-low variances should be removed before mosaicking. [0]
 \item WCSMOSAIC\_METHOD: \wcsmosaic\ and \wcsalign\ pixel-spreading method. [nearest]
-\item WCSMOSAIC\_PARAMS: additional parameters that may be specified with \wcsmosaic. 
+\item WCSMOSAIC\_PARAMS: additional parameters that may be specified with \wcsmosaic.
 \end{itemize}
 
 \textbf{Running PICARD recipes}\\
@@ -2678,7 +2678,7 @@ You may wish to write a script to process your data rather than running each tas
 #!/bin/csh -f
 source /star/etc/login >& /dev/null
 source /star/etc/cshrc >& /dev/null
-kappa >& /dev/null 
+kappa >& /dev/null
 \end{verbatim}
 \end{myquote}
 
@@ -2710,7 +2710,7 @@ Described by Williams et al (1994, ApJ 428, 693). This algorithm works by first 
  Based on an algorithm developed by Kim Reinhold at JAC. See SUN/255 for more information on this algorithm. The edges of the clumps are first found by searching for peaks within a set of 1D profiles running through the data, and then following the wings of each peak down to the noise level or to a local minimum. A mask is thus produced in which the edges of the clumps are marked. These edges however tend to be quite noisy, and so need to be cleaned up before further use. This is done using a pair of cellular automata which first dilate the edge regions and then erode them. The volume between the edges are then filled with an index value associated with the peak position. Another cellular automata is used to removed noise from the filled clumps.
 \\\\
 \textbf{FellWalker}\\
-Based on an algorithm which walks up hill along the line of greatest gradient until a significant peak is reached. It then assigns all pixels visited along the route to the clump associated with the peak. Such a walk is performed for every pixel in the data array which is above a specified background level. 
+Based on an algorithm which walks up hill along the line of greatest gradient until a significant peak is reached. It then assigns all pixels visited along the route to the clump associated with the peak. Such a walk is performed for every pixel in the data array which is above a specified background level.
 \\\\
 See \cupidsun\ for more information on \findclumps\ and a full list of the configuration options for each algorithm.
 
@@ -2791,7 +2791,7 @@ Depending on your default settings you may get a map like the one below.
 
 \myfig{sc20_display1}{[h!]}{width=0.475\linewidth}{fig:display1}{First attempt at displaying an integrated map with \Kappa:\display.}{First attempt at displaying an integrated map with \Kappa:\display.}
 
-\item Re-draw calling a style file and changing the scaling. 
+\item Re-draw calling a style file and changing the scaling.
 \begin{myquote}
 \begin{verbatim}
 % display integ.sdf axes style=^style.dat mode=scale low=0 high=100
@@ -2951,7 +2951,7 @@ and $b=0.15^\circ$. Each spectra has a range of 0 to 40 km/s.  The \param{specst
 \begin{myquote}
 \begin{verbatim}
 % contour smoothsub.sdf noaxes noclear nokey ncont=5 mode=free \
-  heights="[40,80,120,160,200]" pens='"width=3.0,colour=red"' 
+  heights="[40,80,120,160,200]" pens='"width=3.0,colour=red"'
 \end{verbatim}
 \end{myquote}
 \myfig{sc20_display8}{[h!]}{width=0.8\linewidth}{fig:display8}{Displaying two super-imposed spectra with \Kappa:\display.}{Displaying two super-imposed spectra with \Kappa:\display.}
@@ -3073,7 +3073,7 @@ CUBE\_MAXSIZE& Controls the maximum size of the reduced cube.\\
 \hline
 CHUNKSIZE& Sets the maximum sized chunk used to form the group spectral cube.\\
 \hline
-TILE& A true value (1) performs tiling of the spectral cube so as to restrict the 
+TILE& A true value (1) performs tiling of the spectral cube so as to restrict the
 data-processing resource requirements.  Such tiled cubes abut each other in pixel co-ordinates
 and may be pasted together to form the complete spectral cube. \\
 \hline
