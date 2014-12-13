@@ -1013,7 +1013,7 @@ HARP&14$''$ &0.63& 0.88\\
 
 \begin{figure}[b!]
 \begin{center}
-\includegraphics[width=0.7\linewidth]{acsis_front_sm}
+\includegraphics[width=0.7\linewidth]{sc20_acsis_front_sm}
 \caption[Front view of ACSIS at the JCMT]{Front view of ACSIS at the JCMT. Although designed to work with HARP, ACSIS can be used with any JCMT heterodyne receiver.}
 \label{fig:acsis}
 \end{center}
@@ -1051,9 +1051,9 @@ You will find each subsystem number corresponds to a different molecule or trans
 
 \begin{figure}[t!]
 \begin{center}
-\includegraphics[width=5.2cm, height=5.2cm]{stare}
-\includegraphics[width=5.2cm, height=5.2cm]{jiggle}
-\includegraphics[width=5.2cm, height=5.2cm]{raster}
+\includegraphics[width=5.2cm, height=5.2cm]{sc20_stare}
+\includegraphics[width=5.2cm, height=5.2cm]{sc20_jiggle}
+\includegraphics[width=5.2cm, height=5.2cm]{sc20_raster}
 \caption[Stare, jiggle and raster observing modes]{(Left) Stare mode with HARP. (Centre) Jiggle mapping with HARP. (Right) Raster mapping with HARP.}
 \label{fig:harpmodes}
 \end{center}
@@ -1113,7 +1113,7 @@ In frequency-switch (FSW) mode the telescope does not move but the centre of the
 
 \begin{figure}[b!]
 \begin{center}
-\includegraphics[width=0.8\linewidth]{sc20-jiggles}
+\includegraphics[width=0.8\linewidth]{sc20_jiggles}
 \caption[HARP4 and HARP5 jiggle patterns]{Top row: HARP4 jiggle patterns produce a map of 16$\times$16 pixels each of 7$''$.5. Bottom row: HARP5 jiggle patterns produce a map of 20$\times$20 pixels each of 6$''$. }
 \label{fig:jiggle}
 \end{center}
@@ -1185,9 +1185,9 @@ Note that the numbering for the 16 receptors here is 1--16; this is in contrast 
 
 For jiggle maps, where the receptors do not cover multiple sky positions, bad receptors can be identified in the reduced cubes. For raster maps, however, bad receptors are most easily identified in the time-series data. Once you have opened your raw cube in \gaia\ it is useful to select the second axis (receptor) which gives spectral dispersion along the $x$-axis and time along the $y$-axis. You can use the cube control panel to step through each receptor looking for bad spectra (see Figures \ref{fig:maskreceptor} and \ref{fig:maskreceptor2}).
 
-\myfig{sc20-maskreceptor}{[h!]}{width=1\linewidth}{fig:maskreceptor}{Identifying bad receptors in the raw data.}{The left hand \gaia\ window shows the raw data before masking. Clicking on a pixel will show the spectra. The spectra shown is from receptor H01 at step 18 (see circled Y value). To mask this receptor in time from step 18 to 33 -- at which point the bad baselines disappear -- use \chpix. The right hand \gaia\ window shows the raw data after masking where the time range in question is now blank.}
+\myfig{sc20_maskreceptor}{[h!]}{width=1\linewidth}{fig:maskreceptor}{Identifying bad receptors in the raw data.}{The left hand \gaia\ window shows the raw data before masking. Clicking on a pixel will show the spectra. The spectra shown is from receptor H01 at step 18 (see circled Y value). To mask this receptor in time from step 18 to 33 -- at which point the bad baselines disappear -- use \chpix. The right hand \gaia\ window shows the raw data after masking where the time range in question is now blank.}
 
-\myfig{sc20-badreceptor2}{[h!]}{width=0.9\linewidth}{fig:maskreceptor2}{Identifying bad receptors in the raw data: second method.}{In this example, the second axis (receptor number) has been selected. Use the arrows outlined in red on the \gaiathing{Index of plane} bar to scroll through the receptors. Here you can see receptor 13 (see circled \gaiathing{Index of plane} value) which goes noisy two-thirds the way through the observation.}
+\myfig{sc20_badreceptor2}{[h!]}{width=0.9\linewidth}{fig:maskreceptor2}{Identifying bad receptors in the raw data: second method.}{In this example, the second axis (receptor number) has been selected. Use the arrows outlined in red on the \gaiathing{Index of plane} bar to scroll through the receptors. Here you can see receptor 13 (see circled \gaiathing{Index of plane} value) which goes noisy two-thirds the way through the observation.}
 
 \clearpage
 \section{\xlabel{reduce}Regridding your Data}
@@ -1231,7 +1231,7 @@ You can visualise your map by opening it with \gaia\ -- see Figure \ref{fig:gaia
 
 \begin{figure}[t!]
 \begin{center}
-\includegraphics[width=0.65\linewidth]{makecubeout}
+\includegraphics[width=0.65\linewidth]{sc20_makecubeout}
 \label{fig:gaiareduced}
 \caption[A regridded cube produced with \makecube.]{The regridded cube displayed with \gaia. The 5$\times$5 jiggle pattern is evident in the map as is the missing receptor in the top left corner. The smaller window shows the spectrum for the pixel selected by the blue cross on the map. }
 \end{center}
@@ -1320,9 +1320,9 @@ We recommend you select one of the other methods available which spread the emis
 
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[width=5.2cm, height=5.2cm]{sc20-nearest.eps}
-\includegraphics[width=5.2cm, height=5.2cm]{sc20-gauss.eps}
-\includegraphics[width=5.2cm, height=5.2cm]{sc20-sincsinc.eps}
+\includegraphics[width=5.2cm, height=5.2cm]{sc20_nearest.eps}
+\includegraphics[width=5.2cm, height=5.2cm]{sc20_gauss.eps}
+\includegraphics[width=5.2cm, height=5.2cm]{sc20_sincsinc.eps}
 \label{fig:spread}
 \caption[Options for the \makecube\ parameter `spread']{Raster map regridded with \makecube\ and \param{spread = nearest} (left), \param{Gauss} (centre) and \param{SincSinc} (right). Blank pixels are coloured blue. You can see the Nearest option has resulted in multiple blank pixels throughout the map.}
 \end{center}
@@ -1376,7 +1376,7 @@ You can use the option \param{outcat} to generate a catalogue of the spatial pot
 
 The catalogue produced will be in FITS format. In the example above a file called cat.FIT is created. When viewing your map with \gaia\ this catalogue can be overlaid to identify the receptors contributing to each pixel (see Figure \ref{fig:makecube-outcat}). 
 
-\myfig{makecube-outcat}{[h!]}{width=1\linewidth}{fig:makecube-outcat}{Displaying receptor positions in \gaia.}{
+\myfig{sc20_makecube-outcat}{[h!]}{width=1\linewidth}{fig:makecube-outcat}{Displaying receptor positions in \gaia.}{
  The receptor positions overlaid on a regridded cube of a HARP stare observation. This is viewed in \gaia\ by selecting Data-Servers $>$ Local Catalogs and selecting your \param{outcat} filename (here \param{cat.FITS}). Notice that dead receptors are excluded from the list.}
 
 \subsubsection{Tile dimensions}
@@ -1685,7 +1685,7 @@ In \gaia\ go to \gaiathing{Image-analysis$>$Image regions}.
 \hspace{0.2cm}
 \begin{minipage}[c]{0.72\linewidth}
 \centering
-\includegraphics[width=0.98\textwidth]{sc20-ard7.eps}
+\includegraphics[width=0.98\textwidth]{sc20_ard7.eps}
 \end{minipage}
 
 \vspace{0.5cm}
@@ -1697,7 +1697,7 @@ Select the shape of the ARD region you wish to define and drag it on your map by
 \hspace{0.2cm}
 \begin{minipage}[c]{0.72\linewidth}
 \centering
-\includegraphics[width=0.98\textwidth]{sc20-ard3.eps}
+\includegraphics[width=0.98\textwidth]{sc20_ard3.eps}
 \vspace{0.2cm}
 \end{minipage}
 
@@ -1711,7 +1711,7 @@ In the \gaiathing{Image regions} window go to \gaiathing{File$>$Save ARD descrip
 \hspace{0.2cm}
 \begin{minipage}[c]{0.72\linewidth}
 \centering
-\includegraphics[width=0.98\textwidth]{sc20-ard4.eps}
+\includegraphics[width=0.98\textwidth]{sc20_ard4.eps}
 \vspace{0.2cm}
 \end{minipage}
 
@@ -1725,9 +1725,9 @@ In the \gaiathing{Image regions} window go to \gaiathing{File$>$Save ARD descrip
 
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[height=7cm]{sc20-ard5.eps}
+\includegraphics[height=7cm]{sc20_ard5.eps}
 \hspace{0.3cm}
-\includegraphics[height=7cm]{sc20-ard6.eps}
+\includegraphics[height=7cm]{sc20_ard6.eps}
 \caption[Cropping a region of a 2D map.]{(Left) After applying the ARD mask, the cropped region is still surrounded by blank pixels. (Right) The blank pixels have been trimmed using \ndfcopy\ with the \param{trimbad} option.}
 \label{fig:crop}
 \end{center}
@@ -1751,7 +1751,7 @@ The scale length should have a value about half the size of the largest region o
 \end{myquote}}
 \cref{Figure}{fig:fillholes}{The figure below} shows an initial map with holes and the final filled map.
 
-\myfigduo{sc20-holeyharp}{sc20-polyfillaharp}{[h!]}{width=0.48\linewidth}{fig:fillholes}{0.5mm}{Filling holes in your HARP map with \fillbad.}{Filling holes in your HARP map with \fillbad. Compare the original map (left) to the filled map (right).}
+\myfigduo{sc20_holeyharp}{sc20_polyfillaharp}{[h!]}{width=0.48\linewidth}{fig:fillholes}{0.5mm}{Filling holes in your HARP map with \fillbad.}{Filling holes in your HARP map with \fillbad. Compare the original map (left) to the filled map (right).}
 
 
 \subsection{\xlabel{noise}Checking the noise}
@@ -1789,7 +1789,7 @@ used.
 \end{myquote}}
 The output is shown in \cref{Figure}{fig:noihisto}{the graphic below}. An alternative to setting the number of bins via the \param{numbin} parameter is to set the width of each bin using the \param{width} parameter.
 
-\myfig{sc20-noihisto1}{[h!]}{width=0.6\linewidth}{fig:noihisto}{A histogram of the error component.}{The error component plotted with \histogram.}
+\myfig{sc20_noihisto1}{[h!]}{width=0.6\linewidth}{fig:noihisto}{A histogram of the error component.}{The error component plotted with \histogram.}
 
 It is also useful to view the noise map itself. \cref{Figure}{fig:noisemap}{The figure below} shows how to select the error component in \gaia. Other options available from the \gaiathing{Select NDF in container file} window include the exposure time, the effective time and, if \param{spread=nearest} when running \makecube, the system temperature. To return to your main image select the top level and click the \gaiathing{Data} button.
 
@@ -1807,7 +1807,7 @@ TIP: You can write out the error component into a new file using \ndfcopy. \text
 \end{htmlonly}
 
 
-\myfig{sc20-noimap}{[h!]}{width=0.6\linewidth}{fig:noisemap}{The noise map of a mosaic of tiles.}{The noise map of a mosaic of tiles taken in differing weather conditions.}
+\myfig{sc20_noimap}{[h!]}{width=0.6\linewidth}{fig:noisemap}{The noise map of a mosaic of tiles.}{The noise map of a mosaic of tiles taken in differing weather conditions.}
 
 
 \clearpage
@@ -1914,7 +1914,7 @@ This grid of channel maps is filled from left to right, and bottom to top. It ca
 Channel maps can also be created using \gaia. See \cref{Section}{sec:gaiachannel}{Channel maps} for instructions.
 
 
-\myfig{chanmap}{[h!]}{width=0.8\linewidth}{fig:chanmap}{Displaying a channel map with \gaia.}{Displaying a channel map with \gaia.}
+\myfig{sc20_chanmap}{[h!]}{width=0.8\linewidth}{fig:chanmap}{Displaying a channel map with \gaia.}{Displaying a channel map with \gaia.}
 
 \subsection{\xlabel{clumpfinding}Clump finding}
 \label{sec:clumpfind}
@@ -1946,7 +1946,7 @@ All data values in the clump are projected onto the spatial plane and ``size'' o
 You can plot the clump outlines over an image using \gaia. See Section \ref{sec:plotclumps} for instructions.
 
 \vspace{0.7cm}
-\myfig{sc20-clumps}{[h!]}{width=0.7\linewidth}{fig:clumps2}{A velocity slice of the result of 3D clump finding viewed with \gaia.}{A velocity slice of the result of 3D clump finding viewed with \gaia. This output NDF contains boundaries of the clumps with the value reflecting the number of pixels contained within that clump.}
+\myfig{sc20_clumps}{[h!]}{width=0.7\linewidth}{fig:clumps2}{A velocity slice of the result of 3D clump finding viewed with \gaia.}{A velocity slice of the result of 3D clump finding viewed with \gaia. This output NDF contains boundaries of the clumps with the value reflecting the number of pixels contained within that clump.}
 
 
 \clearpage
@@ -2028,19 +2028,19 @@ You can also input or edit the contour levels manually in the \gaiathing{Levels}
 
 \item Select \gaiathing{Image-Analysis$>$Positions$>$Import CUPID catalogue} from the menu bar across the top of the main window. Note that for two-dimensional catalogues an alternative route is to select \gaiathing{Data-Servers$>$Local catalogs}. In this case you can skip Step 3.
 
-\myfig{sc20-plotclumps2b}{[h!]}{width=0.5\linewidth}{fig:gaia_clumps1}{Importing a \cupid\ catalogue  with \gaia.}{Importing a \cupid\ catalogue with \gaia.}
+\myfig{sc20_plotclumps2b}{[h!]}{width=0.5\linewidth}{fig:gaia_clumps1}{Importing a \cupid\ catalogue  with \gaia.}{Importing a \cupid\ catalogue with \gaia.}
 
-\myfig{sc20-plotclumps3}{[h!]}{width=0.5\linewidth}{fig:gaia_clumps2}{Catalogue window in \gaia.}{Catalogue window in \gaia.}
+\myfig{sc20_plotclumps3}{[h!]}{width=0.5\linewidth}{fig:gaia_clumps2}{Catalogue window in \gaia.}{Catalogue window in \gaia.}
 
 \item In the \gaiathing{Import CUPID catalogue} window, select a file with the \gaiathing{Choose file}... button. For polygon shapes tick the STC shape box. You can change the RA/Dec coordinates from Cen1/Cen2, which give the central position of the clumps, to Peak1/Peak2 which give the position of the peak within them. 
 
 \item A catalogue window for your FITS file will appear listing all the sources and their positions and extents.
 
-\myfig{sc20-plotclumps5}{[h!]}{width=0.42\linewidth}{fig:gaia_clumps3}{Catalogue window in \gaia.}{Catalogue window in \gaia.}
+\myfig{sc20_plotclumps5}{[h!]}{width=0.42\linewidth}{fig:gaia_clumps3}{Catalogue window in \gaia.}{Catalogue window in \gaia.}
 
 \item Outlines of your clumps, or symbols at the peak positions,  will be automatically overlaid on your map. If this does not happen, click the \gaiathing{Plot} button on the catalogue window. When you click on a clump from the catalogue list the outline of that clump will appear in bold on your map.
 
-\myfig{sc20-plotclumps6}{[h!]}{width=0.6\linewidth}{fig:gaia_clumps4}{Clumps outlined overlaid on integrated map in \gaia.}{Clumps outlined overlaid on integrated map in \gaia.}
+\myfig{sc20_plotclumps6}{[h!]}{width=0.6\linewidth}{fig:gaia_clumps4}{Clumps outlined overlaid on integrated map in \gaia.}{Clumps outlined overlaid on integrated map in \gaia.}
 
 \item If you are displaying a three-dimensional catalogue over a cube, it will only display clumps which include data from the current slice. The clumps shown will update as you move through the cube.
 
@@ -2090,7 +2090,7 @@ You can also input or edit the contour levels manually in the \gaiathing{Levels}
 
 \item Click and drag the image display to change the orientation in the \gaiathing{Volume render} window.
 
-\myfig{sc20-gaia-3dvolume2}{[h!]}{width=0.6\linewidth}{fig:gaia_3d2}{Three-dimensional visualisation in \gaia.}{Three-dimensional visualisation in \gaia.}
+\myfig{sc20_gaia-3dvolume2}{[h!]}{width=0.6\linewidth}{fig:gaia_3d2}{Three-dimensional visualisation in \gaia.}{Three-dimensional visualisation in \gaia.}
 
 \item Include axes labelling, the image plane and other features using the check boxes on the side bar. 
 \end{enumerate}
@@ -2180,7 +2180,7 @@ Note that the pipeline will coadd data into a group file whenever it encounters 
 \setlength{\intextsep}{10.0pt plus 1.0pt minus 2.0pt}
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[width=0.55\linewidth]{pipeline}
+\includegraphics[width=0.55\linewidth]{sc20_pipeline}
 \label{fig:pipeline}
 \caption[Flow chart of the ORAC-DR ACSIS pipeline process.]{Flow chart of the process employed by the ORAC-DR ACSIS pipeline. The prefix and suffix of the file created at each stage is shown to the left of the process box. Note that suffix `a' refers to an individual observation while `g' refers to a group (or coadded) file.}
 \end{center}
@@ -2690,7 +2690,7 @@ Regrid vs resample vs rebin
 
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[width=0.8\linewidth]{sc20-regrid}
+\includegraphics[width=0.8\linewidth]{sc20_regrid}
 \label{fig:regrid}
 \caption{Regridding vs resampling.}
 \end{center}
@@ -2789,7 +2789,7 @@ Ensure white is entry 0 and black in entry 1.
 \end{myquote}
 Depending on your default settings you may get a map like the one below.
 
-\myfig{sc20-display1}{[h!]}{width=0.475\linewidth}{fig:display1}{First attempt at displaying an integrated map with \Kappa:\display.}{First attempt at displaying an integrated map with \Kappa:\display.}
+\myfig{sc20_display1}{[h!]}{width=0.475\linewidth}{fig:display1}{First attempt at displaying an integrated map with \Kappa:\display.}{First attempt at displaying an integrated map with \Kappa:\display.}
 
 \item Re-draw calling a style file and changing the scaling. 
 \begin{myquote}
@@ -2798,7 +2798,7 @@ Depending on your default settings you may get a map like the one below.
 \end{verbatim}
 \end{myquote}
 
-\myfig{sc20-display2}{[h!]}{width=0.475\linewidth}{fig:display2}{Displaying an integrated map with \Kappa:\display\ using a style file.}{Displaying an integrated map with \Kappa:\display\ using a style file to format the plotting attributes.}
+\myfig{sc20_display2}{[h!]}{width=0.475\linewidth}{fig:display2}{Displaying an integrated map with \Kappa:\display\ using a style file.}{Displaying an integrated map with \Kappa:\display\ using a style file to format the plotting attributes.}
 
 Below is a copy of the style file (style.dat) used to make \cref{Figure}{fig:display2}{the figure above}.
 
@@ -2829,7 +2829,7 @@ textlabgap(2)=0.01
 \end{myquote}
 
 
-\myfig{sc20-display9}{[h!]}{width=0.47\linewidth}{fig:display9}{Reversing the colour scale in \Kappa:\display.}{Reversing the colour scale in \Kappa:\display.}
+\myfig{sc20_display9}{[h!]}{width=0.47\linewidth}{fig:display9}{Reversing the colour scale in \Kappa:\display.}{Reversing the colour scale in \Kappa:\display.}
 
 \item There are a number of colour palettes available in Starlink. You can find them in the /star/bin/kappa/ directory.
 \begin{myquote}
@@ -2847,7 +2847,7 @@ You can create your own colour scheme using the \Kappa\ routine \lutedit. See  t
   lut=/star/bin/kappa/random3_lut.sdf
 \end{verbatim}
 \end{myquote}
-\myfig{sc20-display10}{[h!]}{width=0.5\linewidth}{fig:display10}{Displaying an integrated map in colour with \Kappa:\display.}{Displaying an integrated map in colour with \Kappa:\display.}
+\myfig{sc20_display10}{[h!]}{width=0.5\linewidth}{fig:display10}{Displaying an integrated map in colour with \Kappa:\display.}{Displaying an integrated map in colour with \Kappa:\display.}
 
 
 \end{itemize}
@@ -2861,7 +2861,7 @@ You can create your own colour scheme using the \Kappa\ routine \lutedit. See  t
 \end{verbatim}
 \end{myquote}
 
-\myfig{sc20-display3}{[h!]}{width=0.55\linewidth}{fig:display3}{Displaying a spectrum with \Kappa:\display.}{Displaying a spectrum with \Kappa:\display.}
+\myfig{sc20_display3}{[h!]}{width=0.55\linewidth}{fig:display3}{Displaying a spectrum with \Kappa:\display.}{Displaying a spectrum with \Kappa:\display.}
 
 \item Re-plot, but this time only show the velocity range 10 to 35 km/s. You can do it this way:
 \begin{myquote}
@@ -2882,7 +2882,7 @@ In the example above, the additional option \param{lmode} is included. This sets
 %\newpage
 %\end{latexonly}
 
-\myfig{sc20-display4}{[h!]}{width=0.55\linewidth}{fig:display4}{Displaying a zoomed-in spectrum with \Kappa:\display.}{Displaying a zoomed-in spectrum with \Kappa:\display.}
+\myfig{sc20_display4}{[h!]}{width=0.55\linewidth}{fig:display4}{Displaying a zoomed-in spectrum with \Kappa:\display.}{Displaying a zoomed-in spectrum with \Kappa:\display.}
 
 \item To plot a second spectra over this one, re-call \display\ but with the \param{noclear} option to keep the original plot underneath. The formatting defaults to the last time \linplot\ was run, but with the one-off temporary change of setting the colour of the line to red. The plus sign means the change will not be remembered next time \linplot\ is run.
 \begin{myquote}
@@ -2892,7 +2892,7 @@ In the example above, the additional option \param{lmode} is included. This sets
 \end{verbatim}
 \end{myquote}
 \end{itemize}
-\myfig{sc20-display5}{[h!]}{width=0.55\linewidth}{fig:display5}{Displaying two super-imposed spectra with \Kappa:\display.}{Displaying two super-imposed spectra with \Kappa:\display.}
+\myfig{sc20_display5}{[h!]}{width=0.55\linewidth}{fig:display5}{Displaying two super-imposed spectra with \Kappa:\display.}{Displaying two super-imposed spectra with \Kappa:\display.}
 
 \subsubsection{Plotting a grid of spectra}
 \begin{itemize}
@@ -2907,7 +2907,7 @@ In the example above, the additional option \param{lmode} is included. This sets
 
 This example plots a grid of 4$\times$4 pixels around $l=61.06^\circ$ and $b=0.15^\circ$. Each spectra has a range of 0 to 40 km/s.  The \param{specstyle} option allows you to format the spectal axes inside the main plot. The formatting options are the usual plotting attributes.
 \end{itemize}
-\myfig{sc20-clinplot}{[h!]}{width=0.55\linewidth}{fig:display6}{Displaying a grid of spectra with \clinplot.}{Displaying a grid of spectra with \clinplot.}
+\myfig{sc20_clinplot}{[h!]}{width=0.55\linewidth}{fig:display6}{Displaying a grid of spectra with \clinplot.}{Displaying a grid of spectra with \clinplot.}
 
 
 \subsubsection{Plotting two images side by side}
@@ -2930,7 +2930,7 @@ This example plots a grid of 4$\times$4 pixels around $l=61.06^\circ$ and $b=0.1
 % display integ axes style=^style.dat mode=scale low=0 high=100
 \end{verbatim}
 \end{myquote}
-%\myfig{sc20-display6}{[h!]}{width=0.6\linewidth}{fig:display6}{Displaying two super-imposed spectra with \Kappa:\display.}{Displaying two super-imposed spectra with \Kappa:\display.}
+%\myfig{sc20_display6}{[h!]}{width=0.6\linewidth}{fig:display6}{Displaying two super-imposed spectra with \Kappa:\display.}{Displaying two super-imposed spectra with \Kappa:\display.}
 
 \item Select the second frame.
 \begin{myquote}
@@ -2944,7 +2944,7 @@ This example plots a grid of 4$\times$4 pixels around $l=61.06^\circ$ and $b=0.1
 % display subinteg axes style=^style.dat mode=scale low=0 high=100
 \end{verbatim}
 \end{myquote}
-\myfig{sc20-display7}{[h!]}{width=0.8\linewidth}{fig:display7}{Displaying two super-imposed spectra with \Kappa:\display.}{Displaying two super-imposed spectra with \Kappa:\display.}
+\myfig{sc20_display7}{[h!]}{width=0.8\linewidth}{fig:display7}{Displaying two super-imposed spectra with \Kappa:\display.}{Displaying two super-imposed spectra with \Kappa:\display.}
 
 \item Still in the second frame, plot contours over the map from a smoothed version of subinteg.sdf.
 \begin{myquote}
@@ -2953,7 +2953,7 @@ This example plots a grid of 4$\times$4 pixels around $l=61.06^\circ$ and $b=0.1
   heights="[40,80,120,160,200]" pens='"width=3.0,colour=red"' 
 \end{verbatim}
 \end{myquote}
-\myfig{sc20-display8}{[h!]}{width=0.8\linewidth}{fig:display8}{Displaying two super-imposed spectra with \Kappa:\display.}{Displaying two super-imposed spectra with \Kappa:\display.}
+\myfig{sc20_display8}{[h!]}{width=0.8\linewidth}{fig:display8}{Displaying two super-imposed spectra with \Kappa:\display.}{Displaying two super-imposed spectra with \Kappa:\display.}
 \end{itemize}
 
 
