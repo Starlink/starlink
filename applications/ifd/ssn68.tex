@@ -1,28 +1,25 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
 
-\pagestyle{myheadings}
+
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink System Note}
-\newcommand{\stardocinitials}  {SSN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
+\stardoccategory    {Starlink System Note}
+\stardocinitials    {SSN}
+\stardocsource      {sun\stardocnumber}
 
 % Variable part
-\newcommand{\stardocnumber}    {68.3}
-\newcommand{\stardocauthors}   {A J Chipperfield}
-\newcommand{\stardocdate}      {17 December 1997}
-\newcommand{\stardoctitle}     {IFD\\[1ex]
+\stardocnumber      {68.3}
+\stardocauthors     {A J Chipperfield}
+\stardocdate        {17 December 1997}
+\stardoctitle     {IFD\\[1ex]
                                 Interface Definition Files}
-\newcommand{\stardocversion}   {1.2}
-\newcommand{\stardocmanual}    {}
-\newcommand{\stardocabstract}  {Interface Definition Files (IFDs) provide a
+\stardocversion     {1.2}
+\stardocabstract  {Interface Definition Files (IFDs) provide a
 generic method of defining the interface between Starlink
 (\xref{ADAM}{sg4}{}) applications
 and various software environments.  Software is described which enables
@@ -31,310 +28,30 @@ Starlink or
 \htmladdnormallink{IRAF}{\IRAFURL} environments.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     ssn.tex
-%
-%  Purpose:
-%     Template for Starlink system Note (SSN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\textbf{LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-\newcommand{\IRAFURL}{http://www.starlink.ac.uk/iraf/web/iraf-homepage.html}
-\newcommand{\TCLURL}{http://sunscript.sun.com/tcltext.html}
-\newcommand{\dash}{--}
-\newcommand{\tab}{\>}
+% ? Document specific \providecommand or \newenvironment commands.
+\providecommand{\IRAFURL}{http://www.starlink.ac.uk/iraf/web/iraf-homepage.html}
+\providecommand{\TCLURL}{http://sunscript.sun.com/tcltext.html}
+\providecommand{\dash}{--}
+\providecommand{\tab}{\>}
 
 % Reset \{ to and \} tt font for LaTeX
-\newcommand{\setlbrace}{\renewcommand{\{}{{\tt\symbol{123}}}}
-\newcommand{\setrbrace}{\renewcommand{\}}{{\tt\symbol{125}}}}
+\providecommand{\setlbrace}{\renewcommand{\{}{\texttt{\symbol{123}}}}
+\providecommand{\setrbrace}{\renewcommand{\}}{\texttt{\symbol{125}}}}
 \latex{\setlbrace\setrbrace}
 
-\begin{htmlonly}
-  \newcommand{\dash}{-}
-  \newcommand{\tab}{   }
-\end{htmlonly}
-% +
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2HTML. The contents of this file should be included in the
-%     source prior to any statements that make use of the SST commands.
-
-%  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty
-%     on your TEXINPUTS path (and including the name as part of the
-%     documentstyle declaration).
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-% -
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\newfont{\ssttt}{cmtt10 scaled 1095}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\tt #1}}
-
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
 %  Format the Effects section.
-\newcommand{\ssteffects}[1]{
-   \item[Effects:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
+\providecommand{\ssteffects}[1]{
+  \item[Effects:] \mbox{} \\
+  \vspace{-5ex}
+  \begin{description}
+     #1
+  \end{description}
 }
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  For entering None in the arguments list
-\newcommand{\sstargsnone}[0]{\item[{\rm None}]}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%%  Format the examples section.
-%\newcommand{\sstexamples}[1]{
-%   \item[Examples:] \mbox{} \\
-%   \vspace{-3.5ex}
-%   \begin{description}
-%      #1
-%   \end{description}
-%}
-
-%  SSN/68 special Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{}
-      #1
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-
-%  Original Define the format of a subsection in the examples section.
-%\newcommand{\sstexamplesubsection}[2]{\sloppy
-%\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
 
 %  SSN/68 special Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]
-{   \vspace{-5ex}
+% Since this differs from the standard SST scheme we give it a new name
+\providecommand{\ssttabbedexamplesubsection}[2]
+{   \vspace{0ex}
 \begin{quote} \texttt{\begin{tabbing}
 xxx\=xxx\=\kill
 #1
@@ -342,257 +59,14 @@ xxx\=xxx\=\kill
 \end{quote}
 #2}
 
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+\newcommand{\sstargsnone}[0]{\item[{\rm None}]}
 
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%  Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  Re-define \ssttt.
-   \newcommand{\ssttt}{\tt}
-
-%  \sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  \sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  \sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  \ssteffects
-   \newcommand{\ssteffects}[1]{
-      \item[Effects:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  Original \sstexamplesubsection
-%   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
-
-%  SSN/68 special \sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[] {\ssttt #1} \\ \item[#2]}
-
-%  \sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}]
-      \begin{description}
-         #2
-      \end{description}
-   }
-
-%  \sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-   }
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-% .
-% @(#)sst.tex   1.4   95/06/06 11:46:41   95/06/06 11:49:58
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \latexonlytoc
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 % ? Main text
 
@@ -623,7 +97,7 @@ IFD file given an ADAM Interface File is also described.
 Suppose a Starlink application package, PKG, contains two monoliths,
 pkg\_exe1, containing actions act1 and act2, and pkg\_exe2, containing actions
 act3 and act4. The IFD would have the basic form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
     package pkg {
     #  Comments
        executable pkg_exe1 {
@@ -659,7 +133,7 @@ act3 and act4. The IFD would have the basic form:
           }
        }
     }
-\end{verbatim} \end{quote}
+\end{terminalv}
 where `\texttt{...}' represents omitted lines.
 
 This is interpreted by
@@ -698,8 +172,7 @@ everything required in producing the environment-specific files.
 Sections}
 The IFD may contain sections to be included or excluded depending upon the
 environment for which it is being processed.
-\begin{quote} {\tt
-\textit{environment}: \{ \textit{code} \}\\
+\begin{quote} \texttt{\textit{environment}: \{ \textit{code} \}\\
 \textit{environment}! \{ \textit{code} \}
 } \end{quote}
 The separator `\texttt{:}' causes the code to be processed, and `\texttt{!}'
@@ -717,12 +190,10 @@ running.
 \end{description}
 
 For example with,
-\begin{quote} {\tt
-star: \{ \textit{code} \}
+\begin{quote} \texttt{star: \{ \textit{code} \}
 } \end{quote}
 \texttt{\textit{code}} will only be processed by \texttt{ifd2star}, and with
-\begin{quote} {\tt
-star,iraf! \{ \textit{code} \}
+\begin{quote} \texttt{star,iraf! \{ \textit{code} \}
 } \end{quote}
 \texttt{\textit{code}} will not be processed by either \texttt{ifd2star} or
 \texttt{ifd2iraf}.
@@ -731,9 +202,9 @@ star,iraf! \{ \textit{code} \}
 Interface files}
 For existing packages a basic IFD can be produced by running the
 \texttt{ifl2ifd} script on the \texttt{.ifl} file(s) of the package.
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 % ifl2ifd kappa_mon
-\end{verbatim} \end{quote}
+\end{terminalv}
 Will produce IFD \texttt{kappa\_mon.ifd} from interface file
 \texttt{kappa\_mon.ifl}.
 
@@ -771,7 +242,7 @@ a default value would be useful for IRAF.
 \item Commands which form part of the package but are not just simple
 invocations of the applications must be defined.
 \item Any
-\htmlref{Comments}{comment}
+Comments
 or
 \htmlref{displays}{display}
 required in the package definition files must be defined.
@@ -867,7 +338,7 @@ included in the IFD and the \textbf{Tcl} script \texttt{ifd2irafifl} used to
 create the special interface files (no other files are produced).
 
 For example, with the IFD:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 package pkg {
   irafifl! { executable pkg_exe1 {
    ...
@@ -886,7 +357,7 @@ package pkg {
       ...
    }
 }
-\end{verbatim} \end{quote}
+\end{terminalv}
 The command:
 \begin{quote}
 \texttt{\% ifd2irafifl \textit{package}}
@@ -909,7 +380,8 @@ the package description (\textit{i.e.}\ after \texttt{package \textit{name}
 \{}).
 They are all optional and will be ignored for environments for which they are
 not relevant.
-\begin{quote} \begin{verbatim}
+\begin{small}
+\begin{terminalv}
 version 1.0              # Specifies a package version number
 
 exepath {$PKGNAME_DIR}   # specifies the directory containing executable
@@ -933,26 +405,26 @@ for line. There may be more that one display in an IFD.
 defhelp topic entry [library]  # Help on topic may be found in library
                                # (default Current(helplib)) section
                                # defined by entry
-\end{verbatim} \end{quote}
-
+\end{terminalv}
+\end{small}
 \subsection{\xlabel{additional_action_keywords}\label{add_act}Additional
 Action Keywords}
 The following are examples of the additional keywords which may appear within
 the action description (\textit{i.e.}\ after \texttt{action \textit{name} \{}).
 They are all optional and will be ignored for environments for which they are
 not relevant.
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 alias {acto(ne) act1 act_1} # possible aliases
 
 helplib {$EXAMPLE1_HELP}    # New helplib if required.
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 \subsection{\xlabel{parameter_definition_keywords}Parameter Definition Keywords}
 \subsubsection{\xlabel{general}General}
 Within the parameter description
 (\textit{i.e.}\ after \texttt{parameter \textit{name} \{}), The following
 keywords may appear (example arguments are given):
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 access READ
 association <->GLOBAL.COORD_SYSTEM
 default {two words}
@@ -969,7 +441,7 @@ repeated
 size *
 type _REAL
 vpath GLOBAL DEFAULT
-\end{verbatim} \end{quote}
+\end{terminalv}
 They are all optional and will be ignored for environments for which they are
 not relevant. There is an obvious correspondence between most of these
 keywords and the parameter definition fields of an ADAM interface file as
@@ -1063,21 +535,21 @@ is provided to define commands for the command language in use (ICL, CL
 \textit{etc.}) which will do various generic things as follows:
 \begin{itemize}
 \item Define a command which will display a message to the user.
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
   command task1 {
     print {task1 has been renamed to task2}
   }
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 \item Define a command which will obey a command in the underlying shell.
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
   command cleanup {
     obey {rm *.tmp}
   }
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 \item Define a command to run an action with set parameters
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
   command fitsexist {
     task fitsmod { taskinherit ndf
                    taskinherit keyword
@@ -1085,7 +557,7 @@ is provided to define commands for the command language in use (ICL, CL
                    taskparam mode=interface
              }
   }
-\end{verbatim} \end{quote}
+\end{terminalv}
 The \texttt{taskinherit} subcommand gives the names of parameters of the
 command whose values will be inherited by the action named in the
 \texttt{task} subcommand.
@@ -1093,9 +565,9 @@ The \texttt{taskparam} subcommand gives the name and fixed value of the other
 parameters to be passed to the action.
 The code above will result in command \texttt{fitsexist} being defined with
 two parameters, \texttt{ndf} and \texttt{keyword} so that obeying
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 fitsexist comwest simple
-\end{verbatim} \end{quote}
+\end{terminalv}
 is equivalent to obeying \texttt{fitsmod} with:
 parameter \texttt{ndf} set to \texttt{comwest};
 parameter \texttt{keyword} set to \texttt{simple};
@@ -1109,11 +581,11 @@ append anything following the \texttt{fitsexist} command to the
 \texttt{taskinherit} keyword has no effect.
 \item Define an obsolete command \dash\ if it is obeyed, the message is
 displayed.
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
   command oldcommand {
     obsolete {Command oldcommand is obsolete - use newcommand}
   }
-\end{verbatim} \end{quote}
+\end{terminalv}
 \end{itemize}
 
 Note that in addition to the subcommand \texttt{print}, \texttt{obey}
@@ -1127,7 +599,7 @@ They are ignored if that file is not being produced.
 
 For example:
 
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 # Output to the package.icl file.
   icl {
 \{ This is an ICL comment - NOTE that the brace must be escaped
@@ -1153,7 +625,7 @@ load file
 # Set an IRAF environment variable for the package
 set FIGARO_AXES=true
   }
-\end{verbatim} \end{quote}
+\end{terminalv}
 
 \newpage
 \section{\xlabel{details_of_ifd_file_keywords}\label{keywords}Details of IFD
@@ -1180,7 +652,7 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          access READ
       }{
          Specifies READ access for the parameter.
@@ -1188,7 +660,7 @@ File Keywords}
    }
    \ssteffects{
       \sstsubsection{ADAM:}
-         {The appropriate {\ssttt access} field is written to the Interface
+         {The appropriate \texttt{access} field is written to the Interface
           Files.}
       \sstsubsection{IRAF:}
          {For file type parameters there is currently no action. For other
@@ -1224,18 +696,18 @@ File Keywords}
    }
    \sstdiytopic{Subcommands}{
       The following keywords are defined within an \texttt{action} definition:
-      \htmlref{{\ssttt alias}}{alias},
-      \htmlref{{\ssttt parameter}}{parameter}.
+      \htmlref{\texttt{alias}}{alias},
+      \htmlref{\texttt{parameter}}{parameter}.
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          action add \{\\
          \tab parameter in \{\\
          \tab \tab \dots\\
          \tab \}\\
          \}
       }{
-         Defines the action {\ssttt add} with parameter {\ssttt in}.
+         Defines the action \texttt{add} with parameter \texttt{in}.
       }
    }
    \ssteffects{
@@ -1252,7 +724,7 @@ File Keywords}
    \sstdescription{
       By default a command with the same name as the action will be defined to
       invoke each action and, if a
-      \htmlref{{\ssttt prefix}}{prefix}
+      \htmlref{\texttt{prefix}}{prefix}
       is defined, a command name with the given prefix will also be defined.
 
       The \texttt{alias} command allows a list of additional command names to be
@@ -1278,11 +750,11 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          alias \{ acto(ne) act1 \}
       }{
-         Defines {\ssttt acto}, {\ssttt acton} and  {\ssttt act1} as
-         aliases for {\ssttt actone}.
+         Defines \texttt{acto}, \texttt{acton} and  \texttt{act1} as
+         aliases for \texttt{actone}.
       }
    }
    \ssteffects{
@@ -1314,14 +786,14 @@ File Keywords}
 
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          association <->GLOBAL.DEVICE
       }{
          GLOBAL.DEVICE may be used as a source for the value or suggested
          value of the current parameter, and will be updated with the
          current value of the parameter if the application ends successfully.
       }
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          association <-GLOBAL.DEVICE
       }{
          GLOBAL.DEVICE may be used as a source for the value or suggested
@@ -1331,7 +803,7 @@ File Keywords}
    }
    \ssteffects{
       \sstsubsection{ADAM:}
-         {The appropriate {\ssttt association} field is written to the
+         {The appropriate \texttt{association} field is written to the
           Interface Files.}
       \sstsubsection{IRAF:}{None.}
    }
@@ -1359,7 +831,7 @@ File Keywords}
 
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          cl \{ \# Set an IRAF environment variable\\
          \tab set FIGARO\_AXES=true \}
       }{
@@ -1402,15 +874,15 @@ File Keywords}
    }
    \sstdiytopic{Subcommands}{
       The following keywords are defined within a \texttt{command} definition:\\
-      \htmlref{{\ssttt alias}}{alias} \dash\ define aliases for the new
+      \htmlref{\texttt{alias}}{alias} \dash\ define aliases for the new
       command\\
-      \htmlref{{\ssttt print}}{print} \dash\ print a message\\
-      \htmlref{{\ssttt obey}}{obey} \dash\ obey a shell command\\
-      \htmlref{{\ssttt task}}{task} \dash\ run an action with given parameters\\
-      \htmlref{{\ssttt obsolete}}{obsolete} \dash\ define an obsolete command.
+      \htmlref{\texttt{print}}{print} \dash\ print a message\\
+      \htmlref{\texttt{obey}}{obey} \dash\ obey a shell command\\
+      \htmlref{\texttt{task}}{task} \dash\ run an action with given parameters\\
+      \htmlref{\texttt{obsolete}}{obsolete} \dash\ define an obsolete command.
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          command  abc \{\\
          \tab alias def \\
          \tab task xyz \{ taskparam par=3.0 \}\\
@@ -1448,7 +920,7 @@ File Keywords}
 
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          csh \{ \# Define the help library\\
          \tab setenv KAPPA\_HELP INSTALL\_HELP/kappa \}
       }{
@@ -1484,29 +956,29 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          default y
       }{
          Specifies TRUE as the default for a LOGICAL parameter.
       }
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          default 1.0 10.0
       }{
          Specifies vector [1.0,10.0] as the default.
       }
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          default \{a b\}
       }{
-         Specifies the string {\ssttt "a b"} as the default.
+         Specifies the string \texttt{"a b"} as the default.
       }
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          default a b
       }{
-         Specifies the array {\ssttt ["a", "b"]} as the default.
+         Specifies the array \texttt{["a", "b"]} as the default.
       }
    }
    \ssteffects{
-      \sstsubsection{ADAM:}{As specified \dash\ output to the {\ssttt .ifl}
+      \sstsubsection{ADAM:}{As specified \dash\ output to the \texttt{.ifl}
                             files.}
       \sstsubsection{IRAF:}{The value is used as the initial default value in
                             the \texttt{.par} file. For primitive data types,
@@ -1525,7 +997,7 @@ File Keywords}
       a topic assuming a hierarchical help system such as
 \xref{Starlink HLP}{sun124}{}
       and the currently defined help library (see
-\htmlref{{\ssttt helplib}}{helplib}).
+\htmlref{\texttt{helplib}}{helplib}).
       Currently \texttt{defhelp} is only used in defining help when running
       from ICL.
       The location of help on the applications is defined automatically
@@ -1548,13 +1020,13 @@ File Keywords}
          on the specified topic will be found.
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          defhelp data\_structures data\_structures
       }{
          Help on  `data\_structures' is found in subtopic
          `data\_structures' of the current help library.
       }
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          defhelp kappa 0
       }{
          Help on `kappa' is found in the top level of the current help library.
@@ -1589,7 +1061,7 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          display \{\\
    Welcome to the package\\
    \hspace*{2cm}Version 1.1-1\\
@@ -1627,7 +1099,7 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
        dynamic yes
       }{
        Forces the parameter to be classed as dynamic.
@@ -1672,10 +1144,10 @@ File Keywords}
       }
    \sstdiytopic{Subcommands}{
       The following keyword is defined within an \texttt{executable} definition:
-      \htmlref{{\ssttt action}}{action}.
+      \htmlref{\texttt{action}}{action}.
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          executable kappa\_mon \{ ... \}
       }{
          Define the executable image kappa\_mon.
@@ -1683,10 +1155,10 @@ File Keywords}
    }
    \ssteffects{
       \sstsubsection{ADAM:}{Opens the monolithic interface file and changes
-          the executable image referred to in the {\ssttt .icl} and
-          {\ssttt .csh} files.}
-      \sstsubsection{IRAF:}{Opens the {\ssttt .tcl} file and changes the
-          executable image referred to in the {\ssttt .cl} file.}
+          the executable image referred to in the \texttt{.icl} and
+          \texttt{.csh} files.}
+      \sstsubsection{IRAF:}{Opens the \texttt{.tcl} file and changes the
+          executable image referred to in the \texttt{.cl} file.}
    }
 }
 
@@ -1715,14 +1187,14 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          exepath \{ \$KAPPA\_DIR \}
       }{
          will result in the directory defined by environment variable
          KAPPA\_DIR being used \dash\ for package KAPPA, this is the same
          as the default.
       }
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          exepath /home/adam4/ajc/kappa
       }{
          will result in directory /home/adam4/ajc/kappa being used.
@@ -1756,19 +1228,19 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          help \{ The number of values (between 1 and 10) \}
       }{
          Specifies the text to be displayed if parameter help is requested.
       }
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          help \{ \%\$KAPPA\_DIR ADD PARAMETERS IN1 \}
       }{
          Specifies the module in which parameter help is to be found.
       }
    }
    \ssteffects{
-      \sstsubsection{ADAM:}{Produces an Interface File {\ssttt help} field.}
+      \sstsubsection{ADAM:}{Produces an Interface File \texttt{help} field.}
       \sstsubsection{IRAF:}{None.}
    }
 }
@@ -1794,20 +1266,20 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          helpkey \{ \$KAPPA\_HELP PARAMETERS ADD IN1 \}
       }{
          Specifies the hierarchy within the help file \$KAPPA\_HELP at which
          help on the parameter is found.
       }
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          helpkey *
       }{
          Specifies the default module for help on the parameter.
       }
    }
    \ssteffects{
-      \sstsubsection{ADAM:}{Produces an Interface File {\ssttt helpkey} field.}
+      \sstsubsection{ADAM:}{Produces an Interface File \texttt{helpkey} field.}
       \sstsubsection{IRAF:}{None.}
    }
 }
@@ -1837,7 +1309,7 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          helplib \$KAPPA\_HELP
       }{
          will result in the file defined by environment variable KAPPA\_HELP
@@ -1856,7 +1328,7 @@ File Keywords}
    Lines for output to the \texttt{.icl} file
 }{
    \sstdescription{
-      Specifies lines of text to be output to the {\ssttt .icl} file.
+      Specifies lines of text to be output to the \texttt{.icl} file.
    }
    \sstinvocation{
       icl \{ \textit{text} \}
@@ -1870,7 +1342,7 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          icl \{ $\backslash$\{ Define a command to print "Hello"\\
          \tab defstring welcome print "hello" \}
       }{
@@ -1905,15 +1377,15 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          in { Red White Blue }
       }{
-         The acceptable values are: {\ssttt Red}, {\ssttt White} or
-         {\ssttt Blue}.
+         The acceptable values are: \texttt{Red}, \texttt{White} or
+         \texttt{Blue}.
       }
    }
    \ssteffects{
-      \sstsubsection{ADAM:}{Produces an Interface File {\ssttt in} field.}
+      \sstsubsection{ADAM:}{Produces an Interface File \texttt{in} field.}
       \sstsubsection{IRAF:}{None.}
    }
 }
@@ -1940,7 +1412,7 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          parameter x\\
          \tab keyword y\\
          \tab \ldots\\
@@ -1980,13 +1452,13 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          command abc \{\\
          \tab obey \{ date \}\\
          \}
       }{
-         The command {\ssttt date} will be obeyed by the underlying
-         shell if command {\ssttt abc} is obeyed.
+         The command \texttt{date} will be obeyed by the underlying
+         shell if command \texttt{abc} is obeyed.
       }
    }
    \ssteffects{
@@ -2022,12 +1494,12 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          command abc \{\\
          \tab obsolete \{ Command abc is obsolete - use xyz instead \}\\
          \}
       }{
-         The given message will be displayed if command {\ssttt abc} is
+         The given message will be displayed if command \texttt{abc} is
          obeyed.
       }
    }
@@ -2057,7 +1529,7 @@ File Keywords}
       \sstargsnone
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          parameter INFILE \{\\
          \tab type FILE\\
          \tab access READ\\
@@ -2103,20 +1575,20 @@ File Keywords}
    }
    \sstdiytopic{Subcommands}{
       The following keywords are defined within a \texttt{package} definition:
-      \htmlref{{\ssttt executable}}{executable},
-      \htmlref{{\ssttt version}}{version},
-      \htmlref{{\ssttt exepath}}{exepath},
-      \htmlref{{\ssttt helplib}}{helplib},
-      \htmlref{{\ssttt prefix}}{prefix},
-      \htmlref{{\ssttt display}}{display},
-      \htmlref{{\ssttt defhelp}}{defhelp},
-      \htmlref{{\ssttt command}}{command},
-      \htmlref{{\ssttt icl}}{icl},
-      \htmlref{{\ssttt csh}}{csh},
-      \htmlref{{\ssttt sh}}{sh}.
+      \htmlref{\texttt{executable}}{executable},
+      \htmlref{\texttt{version}}{version},
+      \htmlref{\texttt{exepath}}{exepath},
+      \htmlref{\texttt{helplib}}{helplib},
+      \htmlref{\texttt{prefix}}{prefix},
+      \htmlref{\texttt{display}}{display},
+      \htmlref{\texttt{defhelp}}{defhelp},
+      \htmlref{\texttt{command}}{command},
+      \htmlref{\texttt{icl}}{icl},
+      \htmlref{\texttt{csh}}{csh},
+      \htmlref{\texttt{sh}}{sh}.
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          package kappa \{\\
          \tab executable kappa\_mon \{\\
          \tab \tab ...\\
@@ -2127,8 +1599,8 @@ File Keywords}
       }
    }
    \ssteffects{
-      \sstsubsection{ADAM:}{Opens the {\ssttt .icl} and {\ssttt .csh} files.}
-      \sstsubsection{IRAF:}{Opens the {\ssttt .cl} file.}
+      \sstsubsection{ADAM:}{Opens the \texttt{.icl} and \texttt{.csh} files.}
+      \sstsubsection{IRAF:}{Opens the \texttt{.cl} file.}
    }
 }
 
@@ -2158,39 +1630,39 @@ File Keywords}
    }
    \sstdiytopic{Subcommands}{
       The following keywords are defined within a \texttt{parameter} definition:
-      \htmlref{{\ssttt position}}{position},
-      \htmlref{{\ssttt type}}{type},
-      \htmlref{{\ssttt size}}{size},
-      \htmlref{{\ssttt access}}{access},
-      \htmlref{{\ssttt outputpar}}{outputpar},
-      \htmlref{{\ssttt vpath}}{vpath},
-      \htmlref{{\ssttt ppath}}{ppath},
-      \htmlref{{\ssttt association}}{association},
-      \htmlref{{\ssttt prompt}}{prompt},
-      \htmlref{{\ssttt default}}{default},
-      \htmlref{{\ssttt in}}{in},
-      \htmlref{{\ssttt range}}{range},
-      \htmlref{{\ssttt help}}{help},
-      \htmlref{{\ssttt helpkey}}{helpkey},
-      \htmlref{{\ssttt repeated}}{repeated},
-      \htmlref{{\ssttt dynamic}}{dynamic}.
-      \htmlref{{\ssttt keyword}}{keyword}.
+      \htmlref{\texttt{position}}{position},
+      \htmlref{\texttt{type}}{type},
+      \htmlref{\texttt{size}}{size},
+      \htmlref{\texttt{access}}{access},
+      \htmlref{\texttt{outputpar}}{outputpar},
+      \htmlref{\texttt{vpath}}{vpath},
+      \htmlref{\texttt{ppath}}{ppath},
+      \htmlref{\texttt{association}}{association},
+      \htmlref{\texttt{prompt}}{prompt},
+      \htmlref{\texttt{default}}{default},
+      \htmlref{\texttt{in}}{in},
+      \htmlref{\texttt{range}}{range},
+      \htmlref{\texttt{help}}{help},
+      \htmlref{\texttt{helpkey}}{helpkey},
+      \htmlref{\texttt{repeated}}{repeated},
+      \htmlref{\texttt{dynamic}}{dynamic}.
+      \htmlref{\texttt{keyword}}{keyword}.
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          parameter par1 \{\\
          \tab position 1\\
          \tab type \_REAL\\
          \tab ...\\
          \}
       }{
-         Defines parameter {\ssttt par1}.
+         Defines parameter \texttt{par1}.
       }
    }
    \ssteffects{
-      \sstsubsection{ADAM:}{As specified \dash\ output to the {\ssttt .ifl}
+      \sstsubsection{ADAM:}{As specified \dash\ output to the \texttt{.ifl}
                             files.}
-      \sstsubsection{IRAF:}{As specified \dash\ output to the {\ssttt .par}
+      \sstsubsection{IRAF:}{As specified \dash\ output to the \texttt{.par}
                             file.}
    }
 }
@@ -2214,7 +1686,7 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          action act1\\
          \tab parameter x\\
          \tab \tab position 2\\
@@ -2233,7 +1705,7 @@ File Keywords}
       }
    }
    \ssteffects{
-      \sstsubsection{ADAM:}{Produces an Interface File {\ssttt position} field.}
+      \sstsubsection{ADAM:}{Produces an Interface File \texttt{position} field.}
       \sstsubsection{IRAF:}{Positional parameters are listed first, in the
           correct order, in the \texttt{.par} file.}
    }
@@ -2266,7 +1738,7 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          ppath GLOBAL DEFAULT
       }{
          If the associated GLOBAL parameter is not set, use the static
@@ -2303,7 +1775,7 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          prefix kap
       }{
          `kap' will be used as the optional command name prefix.
@@ -2337,12 +1809,12 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          command abc \{\\
          \tab print \{ The XXX application is not available for IRAF. \}\\
          \}
       }{
-         The specified text will be displayed if the command {\ssttt abc}
+         The specified text will be displayed if the command \texttt{abc}
          is obeyed.
       }
    }
@@ -2375,7 +1847,7 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          prompt \{ Type a REAL number \}
       }{
          If a value for the parameter is required from the user, a prompt
@@ -2384,10 +1856,10 @@ File Keywords}
    }
    \ssteffects{
       \sstsubsection{ADAM:}
-         {The appropriate {\ssttt prompt} field is written to the Interface
+         {The appropriate \texttt{prompt} field is written to the Interface
           Files.}
       \sstsubsection{IRAF:}
-         {The appropriate {\ssttt prompt} field is written to the \texttt{.par}
+         {The appropriate \texttt{prompt} field is written to the \texttt{.par}
           file.}
    }
 }
@@ -2418,20 +1890,20 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          range 1 10
       }{
          The value must lie between 1 and 10 inclusive.
       }
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          range A Z
       }{
          The value must lie between A and Z inclusive.
       }
    }
    \ssteffects{
-      \sstsubsection{ADAM:}{Produces an Interface File {\ssttt range} field.}
-      \sstsubsection{IRAF:}{Set min and max values in the {\ssttt .par} file.}
+      \sstsubsection{ADAM:}{Produces an Interface File \texttt{range} field.}
+      \sstsubsection{IRAF:}{Set min and max values in the \texttt{.par} file.}
    }
 }
 
@@ -2451,7 +1923,7 @@ File Keywords}
       \sstargsnone
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          parameter INFILE \{\\
          \tab type FILE\\
          \tab access READ\\
@@ -2490,7 +1962,7 @@ File Keywords}
 
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          sh \{ \# Define the help library\\
          \tab KAPPA\_HELP=INSTALL\_HELP/kappa; export KAPPA\_HELP \\
          \}
@@ -2511,7 +1983,7 @@ File Keywords}
    Define the size of the parameter
 }{
    \sstdescription{
-      The parameter size may be given as any string (usually {\ssttt *}).
+      The parameter size may be given as any string (usually \texttt{*}).
       The actual value is not used but some systems needs to know
       if the parameter is a vector or array.
    }
@@ -2526,12 +1998,12 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          size *
       }{
          Specifies that the parameter takes an array value.
       }
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          size 2
       }{
          Specifies that the parameter takes an array value.
@@ -2570,12 +2042,12 @@ File Keywords}
          \textit{description}
       }{
          A list of parameter definitions using the
-         \htmlref{{\ssttt taskparam}}{taskparam} and
-         \htmlref{{\ssttt taskinherit}}{taskinherit} keywords.
+         \htmlref{\texttt{taskparam}}{taskparam} and
+         \htmlref{\texttt{taskinherit}}{taskinherit} keywords.
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          command abc \{\\
          \tab task xyz \{\\
          \tab \tab taskparam \{method=list\}\\
@@ -2583,26 +2055,26 @@ File Keywords}
          \tab \tab taskinherit ndf\\
          \}
       }{
-         Obeying command {\ssttt abc filename} will be equivalent to obeying
-         command {\ssttt xyz} with parameters {\ssttt method} and
-         {\ssttt value} set as specified and parameter {\ssttt ndf} set to
-         {\ssttt filename}.
+         Obeying command \texttt{abc filename} will be equivalent to obeying
+         command \texttt{xyz} with parameters \texttt{method} and
+         \texttt{value} set as specified and parameter \texttt{ndf} set to
+         \texttt{filename}.
       }
    }
    \ssteffects{
       \sstsubsection{ADAM:}
          {The appropriate command definitions are written to the \texttt{.icl}
-          and \texttt{.csh} files. Note that the {\ssttt taskinherit} keyword
+          and \texttt{.csh} files. Note that the \texttt{taskinherit} keyword
           has no effect. Anything following the primary command invocation
           will be appended to the invocation of the named action,
           following the fixed parameters.}
       \sstsubsection{IRAF:}{A CL procedure is created and a command defined in
           the package \texttt{.cl} file to run it. The procedure will have
           parameters as defined by any
-          \htmlref{{\ssttt taskinherit}}{taskinherit}
+          \htmlref{\texttt{taskinherit}}{taskinherit}
           keywords and will invoke the named action with the inherited
           parameter values followed by the fixed parameters, all in
-          {\ssttt keyword=value} form.
+          \texttt{keyword=value} form.
       }
    }
 }
@@ -2629,14 +2101,14 @@ File Keywords}
       }
    }
    \sstexamples{
-      See \htmlref{{\ssttt task}}{task} example.
+      See \htmlref{\texttt{task}}{task} example.
    }
    \ssteffects{
       \sstsubsection{ADAM:}{None \dash\ anything following the command name
          on the command line will be added, verbatim, to the action
          invocation.}
       \sstsubsection{IRAF:}
-         {The created task procedure (see \htmlref{{\ssttt task}}{task})
+         {The created task procedure (see \htmlref{\texttt{task}}{task})
          has a parameter with the given name which is inherited by the
          secondary command.}
    }
@@ -2666,7 +2138,7 @@ File Keywords}
       }
    }
    \sstexamples{
-      See \htmlref{{\ssttt task}}{task} example.
+      See \htmlref{\texttt{task}}{task} example.
    }
    \ssteffects{
       \sstsubsection{ADAM:}
@@ -2674,7 +2146,7 @@ File Keywords}
           the \texttt{.icl} and \texttt{.csh} files.}
       \sstsubsection{IRAF:}
          {The parameter specification is added to the command line in
-          the created task procedure (see \htmlref{{\ssttt task}}{task})
+          the created task procedure (see \htmlref{\texttt{task}}{task})
           which invokes the action.}
    }
 }
@@ -2701,20 +2173,20 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          type \_REAL
       }{
          Specified type \_REAL for the parameter.
       }
    }
    \ssteffects{
-      \sstsubsection{ADAM:}{As specified \dash\ output to the {\ssttt .ifl}
+      \sstsubsection{ADAM:}{As specified \dash\ output to the \texttt{.ifl}
                             files.}
       \sstsubsection{IRAF:}{ Scalar \_CHAR, LITERAL, \_DOUBLE, \_INTEGER,
          \_REAL and \_LOGICAL types become string, string, real, integer, real
          and boolean respectively. Vectors and arrays are defined as type
          struct (see the
-\htmlref{{\ssttt size}}{size}
+\htmlref{\texttt{size}}{size}
          keyword). All other types are treated as filenames.}
    }
 }
@@ -2740,7 +2212,7 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          version V2.1-1
       }{
          Specifies version 2.1-1
@@ -2784,7 +2256,7 @@ File Keywords}
       }
    }
    \sstexamples{
-      \sstexamplesubsection{
+      \ssttabbedexamplesubsection{
          vpath CURRENT DEFAULT
       }{
          If there is no current value, use the static default.
@@ -2792,7 +2264,7 @@ File Keywords}
    }
    \ssteffects{
       \sstsubsection{ADAM:}
-         {The appropriate {\ssttt vpath} field is written to the Interface
+         {The appropriate \texttt{vpath} field is written to the Interface
           Files.}
       \sstsubsection{IRAF:}{In the absence of a
 \htmlref{\texttt{repeated}}{repeated} or
