@@ -606,7 +606,7 @@
 \label{sec:intro}
 
 \subsection{\xlabel{using_guide}This cookbook}
-This coookbook is designed to instruct ACSIS users on the best ways to
+This cookbook is designed to instruct ACSIS users on the best ways to
 reduce and visualise their data using \starlink\ packages.
 
 This guide covers the following:
@@ -684,7 +684,7 @@ You have three options for processing your data:
 The pipeline approach works well if your project is suited to using one of the
 standard recipes, and if you have a lot of data to process. Performing
 each step by hand allows more fine-tuned control of certain
-processing and analysis steps, athough some fine tuning is available in the piepline via recipe parameters (see \cref{Section}{sec:recpars}{Recipe parameters}). 
+processing and analysis steps, although some fine tuning is available in the pipeline via recipe parameters (see \cref{Section}{sec:recpars}{Recipe parameters}). 
 
 Once you have determined you optimal parameters you can pass them to the
 pipeline or a script. Chapters~5 and 6 discuss the manual approach. To use the science pipeline, skip
@@ -707,7 +707,7 @@ A directory called \texttt{adam} is created in your home-space by default when y
 
 You can specify a different location for the \texttt{adam} directory by setting the environment variable \texttt{ADAM\_USER} to be the path to your alternative location. This is useful when running more than one reduction to avoid interference or access clashes.
 
-To see the ADAM parameters, run \hdstrace\ on any of the paramter files. For example, to see which parameters were used and the results from last time you ran \stats, you can type the following from  anywhere on your system:
+To see the ADAM parameters, run \hdstrace\ on any of the parameter files. For example, to see which parameters were used and the results from last time you ran \stats, you can type the following from  anywhere on your system:
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
 % hdstrace ~/adam/stats
@@ -865,7 +865,7 @@ The example below runs \stats\ on a sub-cube within your original cube. This sub
 \end{myquote}}
 The bounds are given in the coordinates of the data (Galactic for Axes 1 and 2 and velocity for Axis 3). You can find the number and names of the axes along with the pixel bounds of your data file by running \ndftrace. In the example above the ranges are 10.5$^\circ$ to 10$^\circ$ in Longitude (note the range goes from left to right), 0$^\circ$ to 0.25$^\circ$ in Latitude, and -25 to +25 km/s in velocity. In the velocity axes one pixel is one channel. To leave an axis untouched simply include the comma but do not specify any bounds.
 
-To define your bounds in FK5 coordaintes use the following format.
+To define your bounds in FK5 coordinates use the following format.
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
 % stats `cube(22h18m:22h32m,05d:05d30m,)'
@@ -1157,7 +1157,7 @@ You can change the way the data is displayed in the \gaiathing{Display image sec
   The vertical red line indicates the time slice that is currently selected
   in the \gaiathing{Display image sections of a cube} window. This can be 
   dragged across the spectrum to scroll through the spectra. Examine exposure 
-  time map etc in ancilliary arrays.}
+  time map etc in ancillary arrays.}
 
 A second way to scroll through your spectrum is to click and drag the vertical red bar on the \gaiathing{Spectral plot} window. As you do so array shown in the main window will automatically update.
 
@@ -1238,9 +1238,9 @@ You can visualise your map by opening it with \gaia\ -- see Figure \ref{fig:gaia
 \end{figure}
 
 \subsubsection{Reducing multiple observations}
-You can supply \makecube\ with an ACSII file containing a list of all the raw files you want reduced. These filenames should include the full path if they are not in the local directory.
+You can supply \makecube\ with an ASCII file containing a list of all the raw files you want reduced. These filenames should include the full path if they are not in the local directory.
 
-When you pass an ACSII file to \makecube\ (and any \starlink\ command) you should prefix the filename with an up-caret (\,\^\,).
+When you pass an ASCII file to \makecube\ (and any \starlink\ command) you should prefix the filename with an up-caret (\,\^\,).
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
 % makecube in=^filelist.txt 
@@ -1469,7 +1469,7 @@ Using \findback\ results in a baseline trend that hugs the lower limit of the no
 
 \subsection{Collapsing your map}
 
-An integrated intensity map can be created by collapsing your cube along the frequency/velocity axis using  \Kappa:\collapse. For each output pixel, all input pixels between the specified bounds are collapsed and combined using one of a selection of estimators. Amoungst others, the estimators include the mean, integrated value, maximum value, the mean weighted by the variance, RMS value and total value. See \kappasun\ for a full list.
+An integrated intensity map can be created by collapsing your cube along the frequency/velocity axis using  \Kappa:\collapse. For each output pixel, all input pixels between the specified bounds are collapsed and combined using one of a selection of estimators. Amongst others, the estimators include the mean, integrated value, maximum value, the mean weighted by the variance, RMS value and total value. See \kappasun\ for a full list.
 
 The example below includes the options \param{low} and \param{high} which can be specified to limit the range over which the cube is collapsed on the given axis (in this case from -5\,km/s to +10\,km/s). The \param{variance} flag indicates the variance array should be used to define weights and generate an output variance. The option \param{wlim} sets the fraction of pixels that must be `good' in the collapse range for a valid output pixel to be generated. You may find you need to reduce the value for \param{wlim} below its default of 0.3 for some data.
 
@@ -2119,7 +2119,7 @@ A summary of the recipes is given below.
 \hline
 \textbf{RECIPE} & \textbf{DESCRIPTION OF EMISSION} & \textbf{BASELINE METHOD} \\
 \hline
-NARRLOWLINE & One of more narrow lines are expected across the band. Select this recipe if the expected lines are less than about 20 channels wide.& Smoothing: \newline spatial = 5$\times$5 pixels \newline frequency = 10 channels\\
+NARROWLINE & One of more narrow lines are expected across the band. Select this recipe if the expected lines are less than about 20 channels wide.& Smoothing: \newline spatial = 5$\times$5 pixels \newline frequency = 10 channels\\
 \hline
 BROADLINE &This recipe is designed for wide lines that extend over a large fraction of the band. The line is typically too weak to see in a single observation so a pre-determined baseline window and linear baselines are used.  &Uses the outer 10\% of each end of the spectra to fit a single-order polynomial.  \\
 \hline
@@ -2698,7 +2698,7 @@ Regrid vs resample vs rebin
 
 
 \newpage
-\subsection{\xlabel{clumpfind}Clump finding Algoithms}
+\subsection{\xlabel{clumpfind}Clump finding Algorithms}
 \label{app:clumpfind}
 
 \textbf{GaussClumps}\\Based on the algorithm described by Stutski \& Gusten (1990, ApJ 356, 513). This algorithm proceeds by fitting a Gaussian profile to the brightest peak in the data. It then subtracts the fit from the data and iterates, fitting a new ellipse to the brightest peak in the residuals. This continues until the integrated data sum in the fitted Gaussians reaches the integrated data sum in the input array, or a series of consecutive fits are made which have peak values below a given multiple of the noise level. Each fitted ellipse is taken to be a single clump and is added to the output catalogue. In this algorithm, clumps may overlap. Any input variance component is used to scale the weight associated with each pixel value when performing the Gaussian fit. The most significant configuration parameters for this algorithm are: \param{GaussClumps.FwhmBeam} and \param{GaussClumps.VeloRes} which determine the minimum clump size.
@@ -2905,7 +2905,8 @@ In the example above, the additional option \param{lmode} is included. This sets
 \end{verbatim}
 \end{myquote}
 
-This example plots a grid of 4$\times$4 pixels around $l=61.06^\circ$ and $b=0.15^\circ$. Each spectra has a range of 0 to 40 km/s.  The \param{specstyle} option allows you to format the spectal axes inside the main plot. The formatting options are the usual plotting attributes.
+This example plots a grid of 4$\times$4 pixels around $l=61.06^\circ$
+and $b=0.15^\circ$. Each spectra has a range of 0 to 40 km/s.  The \param{specstyle} option allows you to format the spectral axes inside the main plot. The formatting options are the usual plotting attributes.
 \end{itemize}
 %\myfig{sc20_clinplot}{[h!]}{width=0.55\linewidth}{fig:display6}{Displaying a grid of spectra with \clinplot.}{Displaying a grid of spectra with \clinplot.}
 
@@ -2987,13 +2988,13 @@ This example plots a grid of 4$\times$4 pixels around $l=61.06^\circ$ and $b=0.1
 \begin{center}
 \begin{fmpage}{0.95\linewidth}
 \vspace{0.1cm}
-TIP: You can abbreviate any of the command-line options so long as the application can distinguish it from the other options. E.g. \param{mode=histogram} can be abbraviated all the way to \param{mode=h}.
+TIP: You can abbreviate any of the command-line options so long as the application can distinguish it from the other options. E.g. \param{mode=histogram} can be abbreviated all the way to \param{mode=h}.
 \end{fmpage}
 \end{center}
 \end{latexonly}
 
 \begin{htmlonly}
-\textbf{TIP: You can abbreviate any of the command-line options so long as the application can distinguish itfrom the other options. E.g. \param{mode=histogram} can be abbraviated all the way to \param{mode=h}.\\*\\*}
+\textbf{TIP: You can abbreviate any of the command-line options so long as the application can distinguish it from the other options. E.g. \param{mode=histogram} can be abbreviated all the way to \param{mode=h}.\\*\\*}
 \end{htmlonly}
 
 
@@ -3227,7 +3228,7 @@ affected spectra.\\
 \newpage
 \subsection{\xlabel{qa}Quality Assurance Parameters}
 \label{app:qa}
-Quality assurance parameters ars upplied via the command line option \param{-cal qaparams=<qa.ini>}. For an example QA parameters file see \cref{Section}{sec:qa}{Setting quality assurance parameters}.
+Quality assurance parameters are supplied via the command line option \param{-cal qaparams=<qa.ini>}. For an example QA parameters file see \cref{Section}{sec:qa}{Setting quality assurance parameters}.
 \begin{table}[h!]
 %\begin{small}
 \begin{tabular}{|p{4.0cm}|p{11.0cm}|}
