@@ -629,7 +629,7 @@ In this cookbook the following styles are followed:
 \begin{itemize}[noitemsep,nolistsep]
 \item \texttt{\%}  represents the command-line prompt.
 \item Command line examples are shown in \texttt{\color{MidnightBlue}{navy typewriter font.}}
-\item The names of \gaia\ commands or windows appear in \textbf{bold}.
+\item The names of \gaia\ commands or windows appear in \gaiathing{like this}.
 \item Useful tips of reminders are given in outlined boxes.
 \end{itemize}
 
@@ -677,7 +677,7 @@ a UNIX shell.
 \hline
 \textsc{Picard} & \textsc{Picard} uses a similar pipeline system as \oracdr\ but
                   for the post-processing of reduced data. While mainly implemented
-                  for SCUBA-2 data, there are a few recipes that are heterodyne 
+                  for SCUBA-2 data, there are a few recipes that are heterodyne
                   compatible. See \cref{Appendix}{app:picard}{Picard} for more details
                   and a description of available recipes.
                 & \texttt{\%\,picard RECIPE $<$files$>$} & \picardsun\ \\
@@ -821,6 +821,7 @@ from the names returned in a terminal when running application.
 
 \subsection{How can I view the metadata?}
 \label{sec:fitslist}
+
 There are two \Kappa\ tasks which are extremely useful for examining
 your metadata: \fitslist\ and \ndftrace, which can be used to view the
 FITS headers and properties, such as dimensions, of the data
@@ -987,8 +988,8 @@ To define your bounds in FK5 coordinates use the following format.
 \end{verbatim}
 \end{myquote}}
 
-To write a section of your data into a new file (called newcube in the
-example below) use \ndfcopy\ with bounds.
+To write a section of your data into a new file (called
+\file{newcube.sdf} in the example below) use \ndfcopy\ with bounds.
 {\color{MidnightBlue}\begin{myquote}
 \begin{verbatim}
 % ndfcopy `cube(10.5:10.0,0.0:0.25,-25:25)' newcube title="l=10.5 sub-section"
@@ -1166,8 +1167,8 @@ is chosen to be the best performing of the four internal (2$\times$2)
 receptors in the grid.
 
 You can find the number of the tracking receptor and the number of
-working receptors in the FITS header values REFRECEP and N\_MIX
-respectively.
+working receptors in the FITS header values \param{REFRECEP} and
+\param{N\_MIX} respectively.
 
 In addition to stare observations with the tracking receptor, the most
 common observing modes for HARP are jiggles and raster maps. These
@@ -1235,11 +1236,11 @@ ones. Visit the JCMT web pages for a full list.
 There are a number of special configurations available with ACSIS.
 These make use of multiple sub-bands to cover lines at different
 frequencies.  You can find the sub-system number for a given
-observation by the FITS header SUBSYSNR.
+observation by the FITS header \param{SUBSYSNR}.
 
 You will find each subsystem number corresponds to a different
-molecule or transition (given by the FITS headers MOLECULE and
-TRANSITI). the most common pairings are
+molecule or transition (given by the FITS headers \param{MOLECULE} and
+\param{TRANSITI}). the most common pairings are
 C$^{18}$O\,(3-2)/$^{13}$CO\,(3-2) and DCN\,(5-4)/HCN\,(4-3) for HARP,
 and SiO\,(60-50)/SO\,(43-34) for RxA.
 
@@ -1365,7 +1366,7 @@ Raw ACSIS data follow this naming convention:
 
 aUTDATE\_OBSNUMBER\_SUBSYSTEM\_SUBSCAN
 
-For example, a20131115\_00055\_03\_0001.sdf. The first `a' represents
+For example, \file{a20131115\_00055\_03\_0001.sdf}. The first `a' represents
 ACSIS. The UT date and observation number (OBSNUM) serve as an
 identifier for any given night of observing. ACSIS observations may
 include up to four frequency settings given by the different
@@ -1654,7 +1655,7 @@ so that as many data samples as possible fall close to the centre of
 pixels in the output cube.
 
 If \param{autogrid=false} REFLON/REFLAT are set to the first pointing
-BASE position, CROTA is set to the MAP\_PA value in the FITS header
+BASE position, CROTA is set to the \param{MAP\_PA} value in the FITS header
 (converted to the requested sky co-ordinate system), PIXSIZE is set to
 6 arcseconds, and REFPIX1/REFPIX2 are both set to zero. See \smurfsun\
 for a full description of each of these parameters.
@@ -1785,7 +1786,7 @@ etc.
 \end{myquote}}
 
 The catalogue produced will be in FITS format. In the example above a
-file called cat.FIT is created. When viewing your map with \gaia\ this
+file called \file{cat.FIT} is created. When viewing your map with \gaia\ this
 catalogue can be overlaid to identify the receptors contributing to
 each pixel (see Figure \ref{fig:makecube-outcat}).
 
@@ -1793,7 +1794,7 @@ each pixel (see Figure \ref{fig:makecube-outcat}).
   The receptor positions overlaid on a regridded cube of a HARP stare
   observation. This is viewed in \gaia\ by selecting Data-Servers $>$
   Local Catalogs and selecting your \param{outcat} filename (here
-  \param{cat.FITS}). Notice that dead receptors are excluded from the
+  \file{cat.FITS}). Notice that dead receptors are excluded from the
   list.}
 
 \subsubsection{Tile dimensions}
@@ -2942,7 +2943,7 @@ Two notations are used in the following list:\\
 \textbullet\ \textbf{a\_cube} to mean the regridded cube of a single
 observation. \\
 \textbullet\ \textbf{g\_cube} to mean the group cube which is a coadd
-of all the \textbf{a\_cube} file s.
+of all the \textbf{a\_cube} files.
 
 Note that the pipeline will coadd data into a group file whenever it
 encounters observations with identical LO frequencies, base positions
@@ -3042,9 +3043,9 @@ while `g' refers to a group (or coadded) file.}
 
 \subsection{Checking and changing the science recipe}
 \label{sec:changerecipe}
-You can find out which recipe is set in the data header via the RECIPE
-keyword in the FITS header of any of your raw files.  You can use
-either of the options below:
+You can find out which recipe is set in the data header via the
+\param{RECIPE} keyword in the FITS header of any of your raw files.
+You can use either of the options below:
 \begin{myquote}
 \begin{verbatim}
 % fitsval s8a20120725_00045_0003 RECIPE
@@ -3063,8 +3064,8 @@ one on the command line when starting \oracdr. For example:
 \subsection{Setting recipe parameters (optional)}
 \label{sec:recpars}
 
-You can tailor the recipe parameters by supplying a \textit{.ini} file
-(called myparams.ini in the following example). This file contains the
+You can tailor the recipe parameters by supplying a \file{.ini} file
+(called \file{myparams.ini} in the following example). This file contains the
 recipe name (which must match the one assigned to your data, wither
 from the header or any different one specified on the command line)
 followed by the options you wish to specify in the following format:
@@ -3097,7 +3098,7 @@ by default when you run the pipeline. These are found in the text file
 \param{\$ORAC\_DATA\_CAL/qa.ini}.
 
 You can set your own QA parameters by creating a local \textit{.ini}
-file (called myqa.ini in the following examples). You can then call
+file (called \file{myqa.ini} in the following examples). You can then call
 this local QA file via \param{-calib qaparams=myqa.ini} when starting
 the pipeline.
 
@@ -3132,7 +3133,7 @@ taken by RxA or RxW, \param{GOODRECEP} must be set to 1.
 
 The example file below sets up a different set of parameters for two
 transitions of CO. Any QA parameters not explicitly set will revert to
-those specified in the default \texttt{qa.ini} file.
+those specified in the default \file{qa.ini} file.
 
 \begin{center}
 \vspace{0.2cm}
@@ -3163,7 +3164,7 @@ observations (e.g. dead receptors), processing time can be reduced by
 not having the pipeline attempt to reduce that data.
 
 Information regarding bad receptors is stored in a master text file
-called \param{index.bad\_receptors}, located in your
+called \file{index.bad\_receptors}, located in your
 \param{ORAC\_DATA\_CAL} directory. This files lists dates and the
 corresponding receptors which are not operational. By default, when
 the pipeline runs it searches this file and discards the appropriate
@@ -3172,7 +3173,7 @@ should select another method for specifying bad receptors.
 
 We recommend using the \param{index} option, called via \param{-calib
 bad\_receptors=index} when starting the pipeline. This creates an
-index file called \param{index.bad\_receptors\_qa} in your
+index file called \file{index.bad\_receptors\_qa} in your
 \param{ORAC\_DATA\_OUT} directory, where any bad receptors identified
 during your reductions are indexed. This file is appended each time
 you run the pipeline and in this way you build up your own independent
@@ -3188,12 +3189,11 @@ bad-receptor information in both
 
 \textbf{bad\_receptors} & \textbf{Description} \\
 \hline
-masterorindex & Use both the master \param{index.bad\_receptors} and pipeline-generated
-                \param{index.bad\_receptors\_qa} files [Default].\\
-master        & Use the master index.bad\_receptors file in \param{\$ORAC\_DATA\_CAL}. \\
-index         & Use the \param{index.bad\_receptors\_qa} index file in
+masterorindex & Use both the master \file{index.bad\_receptors} and pipeline-generated
+                \file{index.bad\_receptors\_qa} files [Default].\\
+master        & Use the master \file{index.bad\_receptors} file in \param{\$ORAC\_DATA\_CAL}. \\
+index         & Use the \file{index.bad\_receptors\_qa} index file in
                 \param{\$ORAC\_DATA\_OUT} as generated by the pipeline. \\
-
 file          & Reads a file called \param{bad\_receptors.lis}, which
                 contains a  space-separated list of receptor names in the
                 first line. This file must be located in \param{\$ORAC\_DATA\_OUT}.
@@ -3281,7 +3281,7 @@ options and their descriptions see \oracdrsun.
                      file name (relative to current directory, or the full
                      path) of an ASCII text file containing a list of all
                      observation files to be reduced, one file per line. \\
-%-ut               & UT date of observations (defaults to current yyyymmdd). \\
+%-ut               & UT date of observations (defaults to current \emph{yyyymmdd}). \\
 \hline
 \multicolumn{2}{l}{\textbf{Looping}} \\
 \hline
@@ -3303,14 +3303,15 @@ options and their descriptions see \oracdrsun.
 -calib   & Under the calibration flag you can specify QA parameters by including
            \param{qaparams=<myqa.ini>} and bad receptors via
            \param{bad\_receptors=index}.\\
--recpars & Allows you to provide recipe parameters as a \textit{.ini} file.  \\
+-recpars & Allows you to provide recipe parameters as a \file{.ini} file.  \\
 \hline
 \multicolumn{2}{l}{\textbf{Logs/Display}} \\
 \hline
 -nodisplay & Shorten processing times by turning off all graphical output. \\
 -log sxfh  & Send log to a screen (s), an xwindow (x), file (f) or html (h). The
-             logfile (f) has the name .oracdr\_NNNN.log where NNNN is the current
-             process ID. Only include the options you want. This defaults to xf.\\
+             logfile (f) has the name \file{.oracdr\_}$NNNN$\file{.log} where
+             $NNNN$ is the current process ID. Only include the options you want.
+             This defaults to \param{xf}.\\
 \hline
 \end{tabular}
 \label{tab:pipe-options}
@@ -3325,7 +3326,7 @@ those data will be included in the group co-add using inverse variance
 weighting.
 
 Files created from individual observations are prefixed with
-\texttt{a}, while group (co-added) maps are prefixed with \texttt{ga}.
+\file{a}, while group (co-added) maps are prefixed with \file{ga}.
 \cref{Table}{tab:pipe-out}{the table below} describes the files
 created. In addition PNG images are made of the reduced files at a
 variety of resolutions.
@@ -3366,32 +3367,32 @@ single reduced cube.
 \hline
 \multicolumn{2}{l}{\textbf{Default Files}}\\
 \hline
-\texttt{cube001}    & Baselined cube \\
-\texttt{integ}      & Integrated intensity image \\
-\texttt{rimg}       & Representative image (same as integ file). Used to form
-                      rimg PNG.\\
-\texttt{sp001}      & Spectrum taken from position of peak intensity in the
-                      integ file \\
-\texttt{rsp}        & Representative spectrum (same as sp001). Used to form
-                      rsp PNG.\\
-\texttt{iwc}        & Intensity weighted coordinate image\\
-\texttt{noise}      & Noise map\\
-\texttt{reduced00n} & Final trimmed, baselined cube of the n$^{th}$ tile. There may
-                      be a few of these as large maps will be split into tiles of
-                      512\,MB.\\
-\texttt{rmslo}      & Low-frequency noise \\
-\texttt{rmshi}      & High-frequency noise \\
+\file{cube001}    & Baselined cube \\
+\file{integ}      & Integrated intensity image \\
+\file{rimg}       & Representative image (same as integ file). Used to form
+                    rimg PNG.\\
+\file{sp001}      & Spectrum taken from position of peak intensity in the
+                    integ file \\
+\file{rsp}        & Representative spectrum (same as sp001). Used to form
+                    rsp PNG.\\
+\file{iwc}        & Intensity weighted coordinate image\\
+\file{noise}      & Noise map\\
+\file{reduced00n} & Final trimmed, baselined cube of the $n^{th}$ tile. There may
+                    be a few of these as large maps will be split into tiles of
+                    512\,MB.\\
+\file{rmslo}      & Low-frequency noise \\
+\file{rmshi}      & High-frequency noise \\
 \hline
 \multicolumn{2}{l}{\textbf{Extra files kept with ORAC\_KEEP = 1}}\\
 \hline
-\texttt{em001}     & Ends of the frequency axis have been trimmed off.\\
-\texttt{thr001}    & Time-series data with large spikes removed.\\
-\texttt{ts001}     & Time-sorted time-series data.\\
-\texttt{tss001}    & Time-series data with median DC signal removed.  \\
-\texttt{blmask001} & Baseline mask cube. Regions of emission have been
-                     masked out. \\
-\texttt{bl001}     & Baselined cube.\\
-\texttt{linteg00n} & Integrated intensity image formed around the n$^{th}$ line. \\
+\file{em001}      & Ends of the frequency axis have been trimmed off.\\
+\file{thr001}     & Time-series data with large spikes removed.\\
+\file{ts001}      & Time-sorted time-series data.\\
+\file{tss001}     & Time-series data with median DC signal removed.  \\
+\file{blmask001}  & Baseline mask cube. Regions of emission have been
+                    masked out. \\
+\file{bl001}      & Baselined cube.\\
+\file{linteg00n}  & Integrated intensity image formed around the n$^{th}$ line. \\
 \hline
 \end{tabular}
 \label{tab:pipe-out}
@@ -3550,13 +3551,13 @@ The example below illustrates most of them.
 \end{myquote}}
 
 \begin{itemize}
-\item The recipe parameters are listed in a file called params.ini. It
-is called by the \param{recpars} option. This file is the same .ini
-format used by the ORAC-DR pipeline (see
+\item The recipe parameters are listed in a file called \file{params.ini}.
+It is called by the \param{recpars} option. This file has the same
+\file{.ini} format used by the ORAC-DR pipeline (see
 \cref{Section}{sec:recpars}{Setting recipe parameters}).
 \item The recipe name need to be in upper-case.
 \item If you need to supply multiple files you can do so by listing
-them in a file (myfilelist.lis in this example) and running cat on it.
+them in a file (\file{myfilelist.lis} in this example) and running cat on it.
 The input file must be in the current directory, or a directory
 defined by the environment variable \param{ORAC\_DATA\_IN}. Note the
 back-quotes.
