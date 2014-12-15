@@ -1,15 +1,14 @@
-\documentclass[twoside]{article}
-\pagestyle{myheadings}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User's Guide}
-\newcommand{\stardocinitials}  {SUG}
-\newcommand{\stardocsource}    {sug}
-\newcommand{\stardocauthors}   {M D Lawden}
-\newcommand{\stardocdate}      {17 October 1997}
-\newcommand{\stardoctitle}     {STARLINK USER'S GUIDE}
-\newcommand{\stardocabstract}{
+\stardoccategory    {Starlink User's Guide}
+\stardocinitials    {SUG}
+\stardocsource      {sug}
+\stardocauthors     {M D Lawden}
+\stardocdate        {17 October 1997}
+\stardoctitle       {STARLINK USER'S GUIDE}
+\stardocabstract{
 This is a general introduction to the Starlink Project for new users.
 You should also read the local guide for your site before attempting
 to use Starlink computers.  This will tell you how to access your local
@@ -21,226 +20,13 @@ software.
 
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-\markright{SUG}
-\setlength{\textwidth}{100mm}
-\setlength{\textheight}{154mm}
-\setlength{\topmargin}{-0mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document specific \providecommand or \newenvironment commands.
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   {\small CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf SUG}}\\
-   {Particle Physics \& Astronomy Research Council}\\
-   {Starlink Project\\}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\LARGE\bf  STARLINK USER'S GUIDE}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%   ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markright{SUG}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section{Quickstart}
 
@@ -252,33 +38,33 @@ Every Starlink site has its own web pages, but there is a central page that
 you can use as a starting point.
 It's address (URL) is:
 \begin{quote}
-\htmladdnormallink{\bf http://www.starlink.ac.uk/}{http://www.starlink.ac.uk/}
+\url{http://www.starlink.ac.uk/}
 \end{quote}
-You can get to {\bf your own site's pages} by following the links:
+You can get to \textbf{your own site's pages} by following the links:
 \begin{quote}
-\htmladdnormallink{\bf Sites}{http://www.starlink.ac.uk/sites.html},
-{\bf Site-Code}
+\htmladdnormallink{\textbf{Sites}}{http://www.starlink.ac.uk/sites.html},
+\textbf{Site-Code}
 \end{quote}
 where ``Site-Code" is the 3-letter code next to your site name
 (see \htmlref{Appendix A}{AppendixA}).
 
-If you want to find out about {\bf Starlink software}, follow the
+If you want to find out about \textbf{Starlink software}, follow the
 \begin{quote}
-\htmladdnormallink{\bf What it does}
+\htmladdnormallink{\textbf{What it does}}
 {http://www.starlink.ac.uk/star/docs/sun1.htx/sun1.html}
 \end{quote}
-link (under {\em Software}).
+link (under \emph{Software}).
 If you know the name of the software you want, try the
 \begin{quote}
-\htmladdnormallink{\bf List of items}
+\htmladdnormallink{\textbf{List of items}}
 {http://www.starlink.ac.uk/softalpha.html}
 \end{quote}
 link in the same column.
 Scroll down to find the name -- appropriate links follow.
 
-If you want to search {\bf Starlink documents}, follow the
+If you want to search \textbf{Starlink documents}, follow the
 \begin{quote}
-\htmladdnormallink{\bf Documentation}
+\htmladdnormallink{\textbf{Documentation}}
 {http://www.starlink.ac.uk/docs.html}
 \end{quote}
 link (top line of links).
@@ -288,47 +74,47 @@ Look for documents with codes starting with SC, SG, and SUN -- this is the
 user's stuff.
 If you are interested in a particular topic, try the
 \begin{quote}
-\htmladdnormallink{\bf Software names}
+\htmladdnormallink{\textbf{Software names}}
 {http://www.starlink.ac.uk/cgi-bin/ssilist/ssilist} {\rm or}
-\htmladdnormallink{\bf Topics}
+\htmladdnormallink{\textbf{Topics}}
 {http://www.starlink.ac.uk/cgi-bin/htxfinder}
 \end{quote}
-links (under {\em Search}).
-For example, under {\em Topics}\/ you could enter the keyword
-{\em Fourier}\/ and find out where the stuff on Fourier transforms is kept.
+links (under \emph{Search}).
+For example, under \emph{Topics}\/ you could enter the keyword
+\emph{Fourier}\/ and find out where the stuff on Fourier transforms is kept.
 If you want a paper copy of a Starlink document, ask your Site Manager.
 
-If you want to find out about other {\bf Starlink users}, try the
+If you want to find out about other \textbf{Starlink users}, try the
 \begin{quote}
-\htmladdnormallink{\bf People}{http://www.starlink.ac.uk/people.html}
+\htmladdnormallink{\textbf{People}}{http://www.starlink.ac.uk/people.html}
 \end{quote}
 link.
-This takes you to the {\em Starlink People}\/ page which has links to lots of
+This takes you to the \emph{Starlink People}\/ page which has links to lots of
 information about Starlink staff and users.
 If you just want to find someone's e-mail address, use the Unix command:
 \begin{quote}
-{\bf \% email} {\it surname}
+\textbf{\% email} \textit{surname}
 \end{quote}
-If you want to know {\bf what is going on}, try the links in the {\em News}\/
+If you want to know \textbf{what is going on}, try the links in the \emph{News}\/
 column.
 The
 \begin{quote}
-\htmladdnormallink{\bf New products}
+\htmladdnormallink{\textbf{New products}}
 {http://www.starlink.ac.uk/\~{}cac/publicity/new_products.html}
 \end{quote}
 link describes the latest software and document releases.
 The
 \begin{quote}
-\htmladdnormallink{\bf Bulletin}{http://www.starlink.ac.uk/bulletin.html}
+\htmladdnormallink{\textbf{Bulletin}}{http://www.starlink.ac.uk/bulletin.html}
 \end{quote}
 link takes you to our Newsletter, which may not be as up-to-date as the other
 links but is a better ``read."
 Finally, the
 \begin{quote}
-\htmladdnormallink{\bf FAQ}
+\htmladdnormallink{\textbf{FAQ}}
 {http://www.starlink.ac.uk/\~{}cac/publicity/starlink_faq.html}
 \end{quote}
-link (in the {\em Project}\/ column) takes you to a list of frequently asked
+link (in the \emph{Project}\/ column) takes you to a list of frequently asked
 questions about Starlink.
 
 The above links will get you up-to-speed fast.
@@ -373,17 +159,17 @@ interface between the users and the Project.
 There are various committees which look after things:
 
 \begin{description}
-\item [ACP] -- {\em Astronomical Computing Panel.}\\
+\item [ACP] -- \emph{Astronomical Computing Panel.}\\
 This oversees all astronomical computing (except supercomputing),
 including Starlink.
-\item [SLUG] -- {\em Starlink Local User Groups.}\\
+\item [SLUG] -- \emph{Starlink Local User Groups.}\\
 Individual sites may hold meetings at which any user may comment on its
 operation and policies.
 At least one of these meetings each year is attended by Starlink Project staff.
 If you feel strongly about something, go along to your SLUG and make your
 views known.
 Meeting dates are advertised locally.
-\item [SSG] -- {\em Software Strategy Groups.}\\
+\item [SSG] -- \emph{Software Strategy Groups.}\\
 These provide specialist information to the Project on software matters.
 The seven existing groups (1997) cover:
 \begin{quote}
@@ -410,14 +196,14 @@ Starlink's computer hardware can be regarded as a set of nodes (groups of
 computers) linked by a communications network.
 Current details of Starlink sites, managers, chairmen, postal and network
 addresses, staff, committees, and so on, are stored in file
-{\tt /star/\-admin/\-whoswho}.
+\texttt{/star/\-admin/\-whoswho}.
 A brief list of sites is also given in
 \htmlref{Appendix A}{AppendixA}.
 \newpage
 
 \section{User Registration}
 
-If you want to use Starlink, get a {\em User Application Form}\/ from the
+If you want to use Starlink, get a \emph{User Application Form}\/ from the
 Manager of the site you want to use, complete it, and return it to the Manager.
 Provisional authorisation will normally be granted immediately by the Site
 Manager, but this will be formally vetted by the Project Scientist.
@@ -428,7 +214,7 @@ Each site has its own document distribution policy, but as a start
 you should get this guide, a local guide, and an introduction to Unix
 (\xref{SUN/145}{sun145}{});
 add whatever else you need from your site's local document library --
-{\em please read them!}
+\emph{please read them!}
 
 Your local guide tells you what resources are available and how to login to
 the computers, and the Unix introduction tells you how to create, edit,
@@ -450,8 +236,8 @@ Starlink policy is to make all such information completely open to inspection.
 It is held on computers solely to enable users to be supported and resources
 to be managed efficiently.
 The most important files containing personal data are the local
-{\tt usernames.lis} and {\tt users.lis} files stored at each site,
-usually in directory {\tt /star/local/admin}.
+\texttt{usernames.lis} and \texttt{users.lis} files stored at each site,
+usually in directory \texttt{/star/local/admin}.
 Please inform your Site Manager if any information stored about you is
 incorrect or needs to be modified, and please tell him or her when you leave
 or move site!
@@ -460,7 +246,7 @@ or move site!
 
 \section{Using Starlink Computers}
 
-Do {\em not}\/ share your username and password with anyone else, and make
+Do \emph{not}\/ share your username and password with anyone else, and make
 passwords non-obvious -- computer networks are vulnerable to criminals called
 (in the UK at least) hackers.
 If you tell someone your password for what you believe at the time is a
@@ -478,18 +264,18 @@ with the Unix guide
 In particular:
 
 \begin{itemize}
-\item know how to use the {\tt man} command to find information on Unix
+\item know how to use the \texttt{man} command to find information on Unix
 commands.
 \item know how to display and print text files, such as those referred to in
 this guide (you must consult your local guide for information about this
 as printing techniques are locally determined).
-\item know how to use an e-mail system ({\tt pine} is recommended), and login
+\item know how to use an e-mail system (\texttt{pine} is recommended), and login
 frequently to check for messages.
-People's e-mail addresses are specified in file {\tt /star/admin/unixnames}.
+People's e-mail addresses are specified in file \texttt{/star/admin/unixnames}.
 \end{itemize}
 
 Please report suspected errors in Starlink documents and software to your Site
-Manager and to the Starlink Software Librarian {\tt starlink@jiscmail.ac.uk}).
+Manager and to the Starlink Software Librarian \texttt{starlink@jiscmail.ac.uk}).
 Please give sufficient detail in software bug reports to enable another person
 to understand and reproduce the bug.
 
@@ -506,9 +292,9 @@ There are three main sources:
 
 \item [On-line information] --
 This may be more up-to-date than paper documents, and the computer can help
-you search it (by using the {\tt findme} command, as described later).
+you search it (by using the \texttt{findme} command, as described later).
 Most Starlink documents is available in this form.
-Unix has an on-line manual which can be examined with the {\tt man} command.
+Unix has an on-line manual which can be examined with the \texttt{man} command.
 The World Wide Web is the easiest way to search for information about
 Starlink; see below.
 
@@ -538,50 +324,34 @@ Starlink publishes its
 \htmladdnormallink{documents}{http://www.starlink.ac.uk/docscode.html}
 in the following series:
 
-\begin{latexonly}
-{\small
+\begin{small}
 \begin{tabbing}
 xx\=MUDxx\=- Starlink General Papersxxx\=LUNxx\=x\kill
-\>{\bf SC}\>-- Starlink Cookbooks\\
-\>{\bf SG}\>-- Starlink Guides\\
-\>{\bf SUN}\>-- Starlink User Notes     \>{\bf LUN}\>-- Local User Notes\\
-\>{\bf SGP}\>-- Starlink General Papers \>{\bf LGP}\>-- Local General Papers\\
-\>{\bf SSN}\>-- Starlink System Notes   \>{\bf LSN}\>-- Local System Notes\\
+\>\textbf{SC}\>-- Starlink Cookbooks\\
+\>\textbf{SG}\>-- Starlink Guides\\
+\>\textbf{SUN}\>-- Starlink User Notes     \>\textbf{LUN}\>-- Local User Notes\\
+\>\textbf{SGP}\>-- Starlink General Papers \>\textbf{LGP}\>-- Local General Papers\\
+\>\textbf{SSN}\>-- Starlink System Notes   \>\textbf{LSN}\>-- Local System Notes\\
 \\
-\>{\bf MUD}\>-- Miscellaneous User Documents
+\>\textbf{MUD}\>-- Miscellaneous User Documents
 \end{tabbing}
-}
-\end{latexonly}
+\end{small}
 
-\begin{htmlonly}
-\begin{tabular}{llll}
-{\bf SC}   & -- Starlink Cookbooks      &           & \\
-{\bf SG}   & -- Starlink Guides         &           & \\
-{\bf SUN}  & -- Starlink User Notes     & {\bf LUN} & -- Local User Notes\\
-{\bf SGP}  & -- Starlink General Papers & {\bf LGP} & -- Local General Papers\\
-{\bf SSN}  & -- Starlink System Notes   & {\bf LSN} & -- Local System Notes\\
-\\
-{\bf MUD}  & -- Miscellaneous User Documents &     &
-\end{tabular}
-\smallskip
-\end{htmlonly}
-
-
-{\em Starlink}\/ documents are Project-wide and are available at every site.
-{\em Local}\/ documents are issued by individual sites and contain information
+\emph{Starlink}\/ documents are Project-wide and are available at every site.
+\emph{Local}\/ documents are issued by individual sites and contain information
 of local relevance; they are not normally available away from their site of
 issue.
 
 \begin{itemize}
-\item {\em Cookbooks}\/ provide step-by-step instructions on how to use a
+\item \emph{Cookbooks}\/ provide step-by-step instructions on how to use a
  particular program or package to perform specific tasks.
-\item {\em Guides}\/ provide tutorial information on large or complex software
+\item \emph{Guides}\/ provide tutorial information on large or complex software
  items.
-\item {\em User Notes}\/ describe in detail how to use a particular program,
+\item \emph{User Notes}\/ describe in detail how to use a particular program,
  package, or subroutine library.
-\item {\em General Papers}\/ contain a wide variety of material concerning the
+\item \emph{General Papers}\/ contain a wide variety of material concerning the
  development and management of Starlink.
-\item {\em System Notes}\/ describe system software, and give implementation and
+\item \emph{System Notes}\/ describe system software, and give implementation and
  installation details for applications software.
 \end{itemize}
 
@@ -627,13 +397,13 @@ Starlink recommends \LaTeX\ for document production
 (\xref{SGP/28}{sgp28}{}).
 Anyone may contribute documents to the Starlink series, but if you produce one,
 please use the standard templates held in files such as
-{\tt /star/docs/sun.tex}.
+\texttt{/star/docs/sun.tex}.
 This makes life much easier for Starlink staff as it will give your document
 a standard style.
 The Project reserves the right to make minor corrections and stylistic changes
 to submitted documents in order to achieve uniform standards.
-When revising documents you {\em must}, therefore, start from the released
-version stored in directory {\tt /star/docs} rather than from your own copy.
+When revising documents you \emph{must}, therefore, start from the released
+version stored in directory \texttt{/star/docs} rather than from your own copy.
 
 \subsection{World Wide Web}
 
@@ -647,47 +417,47 @@ The
 \htmladdnormallink{central Starlink home page}{http://www.starlink.ac.uk/}
 is installed at RAL and has the following address (URL):
 \begin{quote}
-{\tt http://www.starlink.ac.uk/}
+\texttt{http://www.starlink.ac.uk/}
 \end{quote}
 You should be able to find information quite easily by following obvious
 links.
-Look at the links under {\em News}\/ to find out about new
+Look at the links under \emph{News}\/ to find out about new
 Project developments.
 You can go to pages provided by other Starlink sites by following the
-{\em \htmladdnormallink{Sites}{http://www.starlink.ac.uk/sites.html}}\/ link.
+\emph{\htmladdnormallink{Sites}{http://www.starlink.ac.uk/sites.html}}\/ link.
 You should also explore the
-{\em \htmladdnormallink{Documentation}
+\emph{\htmladdnormallink{Documentation}
 {http://www.starlink.ac.uk/docs.html}}\/
 link as this provides access to the Starlink documentation set through
-several different types of index, and also the links under {\em Software}\/
+several different types of index, and also the links under \emph{Software}\/
 which give you access to lots of information about Starlink software.
 
 Get to know your way around your local site's web pages as these are likely to
 be the most relevant to your needs.
 However, check Starlink's central web pages (as described above) for the
 latest releases of software and documents (the
-{\em \htmladdnormallink{New products}
+\emph{\htmladdnormallink{New products}
 {http://www.starlink.ac.uk/\~{}cac/publicity/new_products.html}}\/
 link)
 because these may be more up-to-date than your local versions.
 
 \subsection{On-line files}
 
-Starlink documents are stored in directory {\tt /star/docs}.
-The files have obvious names ({\tt sun1.tex} stores the text for SUN/1, and so
+Starlink documents are stored in directory \texttt{/star/docs}.
+The files have obvious names (\texttt{sun1.tex} stores the text for SUN/1, and so
 on).
 However, they are in \LaTeX\ format, so they are not suitable for reading
 directly.
 You can copy the files and use \LaTeX\ to produce a readable version
 (\xref{SUN/9}{sun9}{}),
 or you can look at the version on our World Wide Web (follow the
-{\em \htmladdnormallink{Documentation}
+\emph{\htmladdnormallink{Documentation}
 {http://www.starlink.ac.uk/docs.html}}\/
 link).
 
 Many Starlink software packages have their own on-line help system, and also
 may have pages under the
-{\em \htmladdnormallink{List of items}
+\emph{\htmladdnormallink{List of items}
 {http://www.starlink.ac.uk/softalpha.html}}\/
 link on the Starlink home page.
 
@@ -739,56 +509,55 @@ Utilities are provided to help you find things and keep in touch:
 \begin{description}
 \item [showme] -- simply displays the document you name, for example:
  \begin{quote}
- {\tt \% showme sun188}
+ \texttt{\% showme sun188}
  \end{quote}
  will display the top page of the document
  (\xref{SUN/188}{sun188}{})
- which describes {\bf showme} and {\bf findme}.
+ which describes \textbf{showme} and \textbf{findme}.
 \item [findme] -- performs keyword searching of Starlink documentation,
  for example, if you were interested in analysing CCD data:
  \begin{quote}
- {\tt \% findme CCD}
+ \texttt{\% findme CCD}
  \end{quote}
  will search for the word ``CCD" in document titles, and produce links in a
  web browser to the documents found.
 \item [docfind] -- searches Starlink document indexes for keywords you supply,
  for example:
  \begin{quote}
- {\tt \% docfind tape}
+ \texttt{\% docfind tape}
  \end{quote}
  It is fairly crude and limited as it only looks at titles and keywords.
 \item [email] -- searches for a person's e-mail address, for example:
  \begin{quote}
- {\tt \% email Smith}
+ \texttt{\% email Smith}
  \end{quote}
  It searches Starlink's user lists first, then a world-wide list (usually
  somewhat out-of-date).
  A search for a more general class of astronomer is available at\\
- \htmladdnormallink{http://www.ast.cam.ac.uk/astrosearch.html}
- {http://www.ast.cam.ac.uk/astrosearch.html}.
+ \url{http://www.ast.cam.ac.uk/astrosearch.html}.
 \item [news] -- activates the on-line News system.
  It tells you about the latest software releases, jobs, and other happenings.
 \end{description}
 
-You can also use the {\tt grep} command to examine files for a given text
+You can also use the \texttt{grep} command to examine files for a given text
 string and display all the lines found to contain it.
 As an example, suppose you want to find documents describing programs for
 handling magnetic tapes.
 You can search the document and subject indexes for the string `tape' with the
 command:
 {\small
-\begin{verbatim}
+\begin{terminalv}
     % grep -i tape /star/docs/docs_lis /star/docs/subject_lis
-\end{verbatim}
+\end{terminalv}
 }
 This command can also be used to find a person's username:
 {\small
-\begin{verbatim}
+\begin{terminalv}
     % grep -i Smith /star/admin/unixnames
-\end{verbatim}
+\end{terminalv}
 }
 You can then e-mail messages to this username.
-({\bf email} is a better way of finding people's e-mail addresses.)
+(\textbf{email} is a better way of finding people's e-mail addresses.)
 
 \newpage
 
@@ -810,17 +579,17 @@ sections it is possible to transfer several thousand Kbyte per hour.
 
 \section{Software}
 
-The {\em Starlink Software Collection}\/ (SSC) is a set of packages, utilities,
+The \emph{Starlink Software Collection}\/ (SSC) is a set of packages, utilities,
 subroutine libraries, and infrastructure which is useful to astronomers.
 It is managed by the Starlink Software Librarian (Martin Bly) at RAL.
-It is called a {\em Collection}\/ rather than a {\em Package}\/ or
-{\em System}\/ because it consists of over a hundred {\em software items}\/
+It is called a \emph{Collection}\/ rather than a \emph{Package}\/ or
+\emph{System}\/ because it consists of over a hundred \emph{software items}\/
 which are largely autonomous.
 
 The Collection is installed at every Starlink site.
 It is also available on CD from the Starlink Software Librarian, or via
 the World Wide Web on the
-{\em \htmladdnormallink{Starlink Software Store}
+\emph{\htmladdnormallink{Starlink Software Store}
 {http://www.starlink.ac.uk/cgi-store/storetop}}.
 Starlink software runs on three different platforms: SUN/Solaris,
 Alpha/Digital Unix, PC/Linux.
@@ -852,7 +621,7 @@ Some reported bugs take a long time to fix, although others can be cured
 and the updated software released within a day or two.
 Where the original author is available, response can be very rapid.
 
-Starlink recognises the need for a {\em Software Environment}\/ into which its
+Starlink recognises the need for a \emph{Software Environment}\/ into which its
 applications software can be integrated.
 The principle is to provide a standard user interface (for example a command
 language or GUI) and programmer interface (subroutine libraries), and to allow
@@ -867,14 +636,13 @@ The standard Starlink environment is described in
 and most Starlink applications run within it.
 
 A new software service for users was introduced in 1997.
-This is the {\em Quick}\/ programming service (described on the web at URL
-\htmladdnormallink{http://www.starlink.ac.uk/quick/}
-{http://www.starlink.ac.uk/quick/}).
+This is the \emph{Quick}\/ programming service (described on the web at URL
+\url{http://www.starlink.ac.uk/quick/}.
 It is meant for software problems which a Starlink programmer can solve in
 about a day (or less).
 If you have such a problem, send it by e-mail to:
 \begin{quote}
-{\tt quick@star.rl.ac.uk}
+\texttt{quick@star.rl.ac.uk}
 \end{quote}
 
 \newpage
@@ -887,15 +655,15 @@ Starlink in your publications.
 This will help Starlink get the resources it needs to help you.
 In particular:
 \begin{itemize}
-\item Cite Starlink software by name ({\em e.g.}\/ FIGARO, KAPPA) at
+\item Cite Starlink software by name (\emph{e.g.}\/ FIGARO, KAPPA) at
 appropriate points in your text, with references to the authors or a citation
 of the appropriate Starlink User Notes.
 \item In your acknowledgements, add the sentence: ``We acknowledge the support
-[software, data analysis facilities, {\em etc.}\/ as appropriate] provided
+[software, data analysis facilities, \emph{etc.}\/ as appropriate] provided
 by the Starlink Project which is run by CCLRC on behalf of PPARC."
-\item Include Starlink User Notes, {\em etc.}\/ in your reference list, using
+\item Include Starlink User Notes, \emph{etc.}\/ in your reference list, using
 the format:\\
-{\em Author, A.N., 1997, Starlink User Note 123, Rutherford Appleton
+\emph{Author, A.N., 1997, Starlink User Note 123, Rutherford Appleton
 Laboratory.}
 \end{itemize}
 
@@ -913,7 +681,7 @@ this way, with your Site Chairman.
 \item  if your complaint is still unresolved, take it up with the Starlink
 Project Manager at RAL, with correspondence copied to the Chairman of the
 Astronomical Computing Panel (to find names and addresses, look in file
-{\tt /star/admin/whoswho}).
+\texttt{/star/admin/whoswho}).
 
 \end{itemize}
 
@@ -927,7 +695,7 @@ that have been used since the Project began.
 
 \section {\label{AppendixA}Starlink Sites}
 
-Up-to-date site information is kept in {\tt /star/\-admin/\-whoswho}.
+Up-to-date site information is kept in \texttt{/star/\-admin/\-whoswho}.
 This includes the names of Site Managers and Site Chairmen, with their e-mail
 addresses.
 
@@ -936,46 +704,46 @@ below:
 \begin{center}
 \begin{tabular}{|l|l|}
 \hline
-{\bf Site Code} & {\bf Site Name} \\
+\textbf{Site Code} & \textbf{Site Name} \\
 \hline
 \hline
  ARM & Armagh Observatory\\
  BEL & Queen's University of Belfast\\
-     & {\em Pure \& Applied Physics Dept}\\
+     & \emph{Pure \& Applied Physics Dept}\\
 \hline
  BIR & Birmingham University\\
-     & {\em School of Physics \& Space Research}\\
+     & \emph{School of Physics \& Space Research}\\
 \hline
  BRI & Bristol University\\
-     & {\em Physics Dept}\\
+     & \emph{Physics Dept}\\
 \hline
  CAM & Cambridge: Institute of Astronomy\\
      & Cambridge: Royal Greenwich Observatory\\
  MRA & Cambridge: {\small Mullard Radio Astronomy Observatory}\\
 \hline
  CAR & University of Wales College of Cardiff\\
-     & {\em Physics \& Astronomy Dept}\\
+     & \emph{Physics \& Astronomy Dept}\\
 \hline
  DUR & Durham University \\
-     & {\em Physics Dept}\\
+     & \emph{Physics Dept}\\
 \hline
  EDI & Royal Observatory Edinburgh\\
      & Edinburgh University \\
-     & {\em Institute for Astronomy}\\
+     & \emph{Institute for Astronomy}\\
 \hline
  GLA & Glasgow University \\
-     & {\em Physics \& Astronomy Dept}\\
+     & \emph{Physics \& Astronomy Dept}\\
 \hline
  HAT & Hertfordshire University, Hatfield \\
-     & {\em Physical Sciences Dept}\\
+     & \emph{Physical Sciences Dept}\\
 \hline
  IMP & Imperial College, London \\
-     & {\em Physics Dept}\\
+     & \emph{Physics Dept}\\
 \hline
  JOD & Nuffield Radio Astronomy Lab, Jodrell Bank\\
 \hline
  KEE & Keele University \\
-     & {\em Physics Dept}\\
+     & \emph{Physics Dept}\\
 \hline
 \end{tabular}
 \end{center}
@@ -985,53 +753,53 @@ below:
 \begin{center}
 \begin{tabular}{|l|l|}
 \hline
-{\bf Site Code} & {\bf Site Name} \\
+\textbf{Site Code} & \textbf{Site Name} \\
 \hline
 \hline
  KEN & Kent University \\
-     & {\em Electronic Engineering Lab}\\
+     & \emph{Electronic Engineering Lab}\\
 \hline
  LEE & Leeds University \\
-     & {\em Physics \& Astronomy Dept}\\
+     & \emph{Physics \& Astronomy Dept}\\
 \hline
  LEI & Leicester University \\
-     & {\em Physics \& Astronomy Dept}\\
+     & \emph{Physics \& Astronomy Dept}\\
 \hline
  LJM & Liverpool John Moores University \\
-     & {\em School of Electrical Engineering, Electronics} \\
-     & {\em \& Physics}\\
+     & \emph{School of Electrical Engineering, Electronics} \\
+     & \emph{\& Physics}\\
 \hline
  MAN & Manchester University \\
-     & {\em Astronomy Dept}\\
+     & \emph{Astronomy Dept}\\
 \hline
  OXF & Oxford University \\
-     & {\em Astrophysics Dept}\\
+     & \emph{Astrophysics Dept}\\
 \hline
  PRE & Central Lancashire University, Preston \\
-     & {\em Centre for Astrophysics}\\
+     & \emph{Centre for Astrophysics}\\
 \hline
  QMW & Queen Mary \& Westfield College, London \\
-     & {\em Physics Dept and School of Mathematical Sciences}\\
+     & \emph{Physics Dept and School of Mathematical Sciences}\\
 \hline
  PRO & Rutherford Appleton Laboratory \\
-     & {\em Project Management}\\
+     & \emph{Project Management}\\
  RAL & Rutherford Appleton Laboratory \\
-     & {\em SSD, Astrophysics Division}\\
+     & \emph{SSD, Astrophysics Division}\\
 \hline
  SHE & Sheffield University \\
-     & {\em Physics Dept}\\
+     & \emph{Physics Dept}\\
 \hline
  STA & St Andrews University \\
-     & {\em School of Physics \& Astronomy}\\
+     & \emph{School of Physics \& Astronomy}\\
 \hline
  SOU & Southampton University \\
-     & {\em Physics Dept}\\
+     & \emph{Physics Dept}\\
 \hline
  SUS & Sussex University \\
-     & {\em Astronomy Centre}\\
+     & \emph{Astronomy Centre}\\
 \hline
  UCL & University College London \\
-     & {\em Physics \& Astronomy Dept}\\
+     & \emph{Physics \& Astronomy Dept}\\
 \hline
 \end{tabular}
 \end{center}
@@ -1042,46 +810,44 @@ below:
 Do you know how to:
 \begin{itemize}
 \item Browse Starlink information easily?\\
-\hspace*{10mm} {\em (Access
+\hspace*{10mm} \emph{(Access
                \htmladdnormallink{Starlink World Wide Web}
                                  {http://www.starlink.ac.uk/} at\\
 \hspace*{10mm} http://www.starlink.ac.uk/)}
 \item Get help?\\
-\hspace*{10mm} {\em (Ask your Site Manager)}
+\hspace*{10mm} \emph{(Ask your Site Manager)}
 \item Login and logout?\\
-\hspace*{10mm} {\em (\xref{SUN/145}{sun145}{} \& Local Guide)}
+\hspace*{10mm} \emph{(\xref{SUN/145}{sun145}{} \& Local Guide)}
 \item Interpret directory and file names?\\
-\hspace*{10mm} {\em (\xref{SUN/145}{sun145}{})}
+\hspace*{10mm} \emph{(\xref{SUN/145}{sun145}{})}
 \item Find information on a Unix Command?\\
-\hspace*{10mm} {\em (\% man command)}
+\hspace*{10mm} \emph{(\% man command)}
 \item Change your password?\\
-\hspace*{10mm} {\em (\% yppasswd or nispasswd -- ask your Site Manager)}
+\hspace*{10mm} \emph{(\% yppasswd or nispasswd -- ask your Site Manager)}
 \item Send and receive mail and purge your mail file?\\
-\hspace*{10mm} {\em (\% pine)}
+\hspace*{10mm} \emph{(\% pine)}
 \item Find a person's username?\\
-\hspace*{10mm} {\em (\% email surname)}
+\hspace*{10mm} \emph{(\% email surname)}
 \item Find a username's owner?\\
-\hspace*{10mm} {\em (\% grep username /star/\-admin/\-unixnames)}
+\hspace*{10mm} \emph{(\% grep username /star/\-admin/\-unixnames)}
 \item Examine a file?\\
-\hspace*{10mm} {\em (\% more filename)}
+\hspace*{10mm} \emph{(\% more filename)}
 \item Print a file?\\
-\hspace*{10mm} {\em (Ask your Site Manager, or look in your Local Guide)}
+\hspace*{10mm} \emph{(Ask your Site Manager, or look in your Local Guide)}
 \item Get a copy of a document?\\
-\hspace*{10mm} {\em (Get a copy from your local document store)}
+\hspace*{10mm} \emph{(Get a copy from your local document store)}
 \item Find a document about a Starlink software item?\\
-\hspace*{10mm} {\em (\htmladdnormallink{http://www.starlink.ac.uk/docs.html}
-{http://www.starlink.ac.uk/docs.html})}
+\hspace*{10mm} \emph{(\url{http://www.starlink.ac.uk/docs.html})}
 \item Find out about the latest software and documentation releases?\\
 \hspace*{10mm}
-{\em (http://www.starlink.ac.uk/\~{}cac/publicity/new\_products.html)}
+\emph{(http://www.starlink.ac.uk/\~{}cac/publicity/new\_products.html)}
 \item Find out about Starlink personnel, sites, and committees?\\
-\hspace*{10mm} {\em (Look at /star/\-admin/\-whoswho)}
+\hspace*{10mm} \emph{(Look at /star/\-admin/\-whoswho)}
 \item Find out about a specific topic?\\
-\hspace*{10mm} {\em (\htmladdnormallink{http://www.starlink.ac.uk/cgi-bin/htxfinder}
-{http://www.starlink.ac.uk/cgi-bin/htxfinder})}
+\hspace*{10mm} \emph{(\url{http://www.starlink.ac.uk/cgi-bin/htxfinder})}
 \item Guard your files against loss?\\
-\hspace*{10mm} {\em (Use the tar utility to write to tape)}
+\hspace*{10mm} \emph{(Use the tar utility to write to tape)}
 \item Report an error in Starlink software or documentation?\\
-\hspace*{10mm} {\em (Send a mail message to starlink@jiscmail.ac.uk)}
+\hspace*{10mm} \emph{(Send a mail message to starlink@jiscmail.ac.uk)}
 \end{itemize}
 \end{document}
