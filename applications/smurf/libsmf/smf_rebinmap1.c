@@ -138,6 +138,9 @@
 *     2014-5-15 (DSB):
 *        Check for bad and negative bolometer variance values, as well as
 *        zero values.
+*     2014-12-15 (DSB):
+*        Do not attempt to run surplus threads when making a map from very 
+*        few bolometers (smaller than the number of threads).
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -381,7 +384,10 @@ void smf_rebinmap1( ThrWorkForce *wf, smfData *data, smfData *variance, int *lut
 
   /* Find how many bolos to process in each worker thread. */
   bolostep = nbolo/nw;
-  if ( bolostep == 0 ) bolostep = 1;
+  if ( bolostep == 0 ) {
+    bolostep = 1;
+    nw = nbolo;
+  }
 
   /* Allocate job data for threads, and store the range of bolos to be
      processed by each one. Ensure that the last thread picks up any
