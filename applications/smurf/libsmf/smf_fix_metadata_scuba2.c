@@ -614,7 +614,7 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     if (strcmp(obsid, "scuba2_00071_20121004T153603") == 0 ) {
       int subscan;
       smf_getfitsi( hdr, "NSUBSCAN", &subscan, status );
-      if (subscan == 64 || subscan == 65) {
+      if (subscan == 3 ){
         size_t nframes = hdr->nframes;
         JCMTState * curstate;
         size_t i;
