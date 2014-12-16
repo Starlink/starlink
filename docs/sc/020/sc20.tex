@@ -64,7 +64,7 @@
 \textbf{HDS}& Hierarchical Data System\\
 \textbf{JCMT}& James Clerk Maxwell Telescope\\
 \textbf{LSB}& Lower sideband\\
-\textbf{NDF}& Extensible N-Dimensional Data Format\\
+\textbf{NDF}& Extensible $N$-Dimensional Data Format\\
 \textbf{HARP}& Heterodyne Array Receiver Programme\\
 \textbf{QA}& Quality Assurance\\
 \textbf{RxA}& Receiver A\\
@@ -138,9 +138,9 @@ a UNIX shell.
             NDF. Other formats include IRAF, FITS, and ASCII.
           & \texttt{\%\,convert} & \texttt{\%\,conhelp} \newline \convertsun\ \\
 \hline
-\cupid\ & CUPID is a package of commands that allows the
-          identification and analysis of clumps of emission within 1-, 2- or
-          3-dimensional data arrays & \texttt{\%\,cupid}
+\cupid\ & CUPID is a package of commands that allows the identification
+          and analysis of clumps of emission within one-, two- or
+          three-dimensional data arrays & \texttt{\%\,cupid}
         & \texttt{\%\,cupidhelp} \newline \cupidsun\ \\
 \hline
 \oracdr\ & The \oracdr\ Data Reduction Pipeline \cite{oracdr} is an
@@ -161,8 +161,8 @@ a UNIX shell.
 \hline
 \gaia\ & \gaia\ is an interactive image and data-cube display and
          analysis tool. It incorporates tools such as source detection,
-         3-dimensional visualisation, clump visualisation, photometry, and the
-         ability to query and overlay on-line or local catalogues.
+         three -dimensional visualisation, clump visualisation, photometry,
+         and the ability to query and overlay on-line or local catalogues.
        & \texttt{\%\,gaia} & \gaiasun\ \gaiasc\ \\
 \hline
 \splat\ & \splat\ is a graphical spectral-analysis tool. It can also
@@ -212,7 +212,7 @@ Starlink routines run on HDS files (Hierarchical Data System) which
 normally have a \file{.sdf} extension (Starlink Data File). HDS files can
 describe a multitude of formats. The most common HDS format you will
 encounter is the NDF ($N$-Dimensional Data Format). This is the standard
-file format for storing data which represent N-dimensional arrays of
+file format for storing data which represent $N$-dimensional arrays of
 numbers, such as spectra, images, etc. The parameter files discussed
 in Section \ref{sec:hdstrace} are also HDS format.
 
@@ -706,8 +706,8 @@ with Nyquist. The central panel of Figure \ref{fig:harpmodes} shows a
 HARP5 jiggle pattern.
 
 Each of these patterns can be pixel-centered, where the target
-coordinates fall on one of the central 4 pixels, or map-centered where
-the target coordinates lie at the centre of the map between the 4
+coordinates fall on one of the central four pixels, or map-centered where
+the target coordinates lie at the centre of the map between the four
 central pixels. See Figure \ref{fig:jiggle} for an illustration of the
 different jiggle patterns. Although designed for HARP this mode can be
 used with the single-element receivers. The right-hand panel of Figure
@@ -895,7 +895,7 @@ spectra (see Figures \ref{fig:maskreceptor} and
   In this example, the second axis (receptor number) has been
   selected. Use the arrows outlined in red on the \gaiathing{Index of
   plane} bar to scroll through the receptors. Here you can see
-  receptor 13 (see circled \gaiathing{Index of plane} value) which
+  Receptor 13 (see circled \gaiathing{Index of plane} value) which
   goes noisy two-thirds the way through the observation.}
 
 \clearpage
@@ -911,9 +911,9 @@ introduce the various parameters with which to tailor your reduction.
 
 
 \section{\xlabel{makecube}Running Makecube}
-The \smurf\ application used for regridding your raw data is  \makecube.
+The \smurf\ application used for regridding your raw data is \makecube.
 \begin{terminalv}
-% makecube in=a20070505_00041_01_0001.sdf out=cube auto
+% makecube in=a20070505_00041_01_0001.sdf out=cube autogrid
 
 Processing data from instrument 'HARP' for object 'W49' from the following
 observation  :
@@ -935,7 +935,7 @@ observation  :
         Radio velocity (LSB): -443.8134 -> 464.2568 km/s
 \end{terminalv}
 
-The \param{autogrid} option (just defined by \param{auto}) allows the
+The \param{autogrid} option allows the
 software to determine the optimal projection parameters for
 regridding. This is fine for stares and jiggles but is not so good for
 rasters. See Section \ref{sec:gridding} for more discussion.
@@ -1003,14 +1003,14 @@ line lies close to 0 km/s you may chose to process only the central
 
 When combining several maps with masked bad receptors one can use the
 \param{badmask} parameter of \makecube. This option determines the way
-in which bad pixels are propagated from input to output. The best that
-produces the best map is \param{badmask=and} which uses all the data
+in which bad pixels are propagated from input to output. The one that
+produces the best map is \param{badmask=and}, which uses all the data
 so an output pixel will be bad only if all the input pixels that
-contribute to it are bad. this generates an output map with the lowest
+contribute to it are bad. This generates an output map with the lowest
 noise and fewest bad pixels. However, for large datasets the memory
 requirements may be excessive.
 
-Alternatives are \param{badmask=or} (default) and
+Other options are \param{badmask=or} (default) and
 \param{badmask=first}. \param{Or} means that an output pixel will be
 bad if any of the input pixels that contribute to it are bad and is
 the default.  \param{First} means that the decisions on which pixels
@@ -1038,8 +1038,8 @@ receptor-to-receptor flat-field.
 \subsection{Defining an output grid}
 \label{sec:outputgrid}
 You can use the \param{ref} option to define an NDF which is used to
-define an output grid. This NDF can even be in two-dimensions even
-though your data may be in three-dimensions.
+define an output grid. This NDF can even be in two dimensions even
+though your data may be in three dimensions.
 \begin{terminalv}
 % makecube in=rawfile ref=myreffile
 \end{terminalv}
@@ -1051,11 +1051,12 @@ If \param{autogrid=true}, the output grid is determined automatically
 so that as many data samples as possible fall close to the centre of
 pixels in the output cube.
 
-If \param{autogrid=false} REFLON/REFLAT are set to the first pointing
-BASE position, CROTA is set to the \param{MAP\_PA} value in the FITS header
-(converted to the requested sky co-ordinate system), PIXSIZE is set to
-6 arcseconds, and REFPIX1/REFPIX2 are both set to zero. See \smurfsun\
-for a full description of each of these parameters.
+If \param{autogrid=false} \param{REFLON} and \param{REFLAT} are set to
+the first pointing BASE position, \param{CROTA2} is set to the
+\param{MAP\_PA} value in the FITS header (converted to the requested
+sky co-ordinate system), PIXSIZE is set to 6 arcseconds, and
+\param{REFPIX1} and \param{REFPIX2} are both set to zero. See
+\smurfsun\ for a full description of each of these parameters.
 
 \subsection{Data regridding options}
 \label{sec:gridding}
@@ -1122,7 +1123,7 @@ values contributing to each output pixel. Note that this option is not
 available if parameter \param{sparse} is set \param{true}. If the
 \param{badmask} value is \param{or} or \param{first}, then a single
 variance value will be produced for each output spectrum. However,
-when \param{badmask} is \param{and} an independent variance value is
+when \param{badmask} is \param{and}, an independent variance value is
 calculated for each channel in each output spectrum.
 \end{minipage}
 \vspace{0.7cm}\\
@@ -1133,7 +1134,7 @@ calculated for each channel in each output spectrum.
 The output variance values are based on the system noise temperature
 values supplied in the input NDFs. Since each input spectrum is
 characterised by a single Tsys value, each output spectrum will have a
-constant Variance value (i.e. all channels in an output spectrum will
+constant variance value (i.e. all channels in an output spectrum will
 have the same variance value). [Default].
 \end{minipage}
 \vspace{0.7cm}\\
@@ -1170,7 +1171,7 @@ the positions for the first input NDF come first, followed by those
 for the second input NDF, etc. Within the group of positions
 associated with a single input NDF, the positions for the first time
 slice come first, followed by the positions for the second time slice,
-etc.
+and so on.
 
 \begin{terminalv}
 % makecube in=rawfiles outcat=cat
@@ -1207,7 +1208,7 @@ uses a rectangular box filter with each output pixel either the mean
 or the median of the input pixels within the filter box. The box size
 can be set to 1 for dimensions which do not require smoothing. In the
 example below the spatial pixels remain untouched while the velocity
-axis is smoothed using a box of 5 channels.
+axis is smoothed using a box of five channels.
 \begin{terminalv}
 % block in=mycube out=rebinnedcube box="[1,1,5]"
 \end{terminalv}
@@ -1230,7 +1231,7 @@ Baselines should be removed using \Kappa:\mfittrend. This routine can
 fit polynomials up to order 15, or cubic splines, to each spectrum in
 your cube. You can specify the ranges to fit via the \param{ranges}
 parameter, or you can allow them to be determined automatically
-(\param{auto}).
+(\param{auto}), say if the number of observations is large.
 
 \begin{terminalv}
 % mfittrend in=cube ranges=\"-50 -10 80 160\" order=1 axis=3 out=baselinedcube
@@ -1239,7 +1240,7 @@ parameter, or you can allow them to be determined automatically
 If using automatic range determination you should set the
 \param{numbin} option. This is the number of bins in which to compress
 the trend line. A single line or average may be noisy so binning is
-used to improve the signal-to-noise in order to enhance features which
+used to improve the signal-to-noise in order to enhance features that
 should be masked.
 
 Ideally the bin size should match your line width to get maximum
@@ -1257,15 +1258,15 @@ again clipped etc. By default this will clip at 2, 2, 2.5 and
 3\,$\sigma$ successively but you may wish to experiment with your own
 clip levels. The \param{clip} option is only used when
 \param{auto=true}.
-\\*\\*
-\textbf{Advanced method}\\*
+
+\subsection{Advanced method}
 These steps give a more in depth way of determining the baselines and
 mimic the the pipeline.
 
 \begin{enumerate}[label=(\arabic*)]
 \item Perform a \block\ smooth on your reduced cube. Here the
-smoothing is quite aggressive with a box filter of 5 pixels along the
-spatial axes and 15 pixels along the frequency axis. This is to really
+smoothing is quite aggressive with a box filter of five pixels along the
+spatial axes and fifteen pixels along the frequency axis. This is to really
 pull out all emission features. You can tweak these to suit your data,
 e.g a narrower box might be needed if you have very narrow lines.
 \begin{terminalv}
@@ -1323,7 +1324,7 @@ See \kappasun\ for a full list.
 
 The example below includes the options \param{low} and \param{high}
 which can be specified to limit the range over which the cube is
-collapsed on the given axis (in this case from -5\,km/s to +10\,km/s).
+collapsed on the given axis (in this case from $-5$\,km/s to $+10$\,km/s).
 The \param{variance} flag indicates the variance array should be used
 to define weights and generate an output variance. The option
 \param{wlim} sets the fraction of pixels that must be `good' in the
@@ -1378,10 +1379,11 @@ regions set to 1.
 \subsection{Moments Maps}
 
 You can use \collapse\ to generate the moments maps by selecting the
-appropriate \param{estimator} option -- Integrated value (Integ) for
-the integrated map (0th moment), Intensity-weighted co-ordinate (Iwc)
-to get the velocity field (1st moment), or Intensity-weighted
-dispersion (Iwd) to get the velocity dispersion (2nd moment).
+appropriate \param{estimator} option -- Integrated value
+(\param{Integ}) for the integrated map (zeroth moment),
+Intensity-weighted co-ordinate (\param{Iwc}) to get the velocity field
+(first moment), or Intensity-weighted dispersion (\param{Iwd}) to get the
+velocity dispersion (second moment).
 
 \begin{tip}
 TIP: You can also use the \picard\ recipe CREATE\_MOMENTS\_MAPS. See
@@ -1612,7 +1614,7 @@ The blank pixels have been trimmed using \ndfcopy\ with the
 
 You may come across empty pixels in your map due to dead receptors or
 receptors which have failed quality assurance in the pipeline. The
-second half of 2013 in particular had only 12 working receptors for
+second half of 2013 in particular had only twelve working receptors for
 HARP.
 
 You can fill these holes using \Kappa:\fillbad. This replaces the bad
