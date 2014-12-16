@@ -268,7 +268,8 @@ instance of \task{stats} is printed to the screen.
 % parget mean stats
 \end{terminalv}
 
-\textbf{Extracting a value for scripting:}\\
+\subsection{Extracting a value for scripting}
+
 \parget\ is designed to make life easier when passing values between
 shell scripts. In the C-shell scripting example below, the median
 value from \task{histat} is assigned to the variable med.
@@ -1291,7 +1292,8 @@ lower-order polynomial. This time fit the full range by setting
 \end{terminalv}
 \end{enumerate}
 
-\textbf{What about findback?}\\*
+\subsection{What about \findback?}
+
 The \cupid\ routine \findback\ offers an alternative for background
 subtraction however there are more limitations. It applies spatial
 filtering to remove structure with a size scale less than a specified
@@ -1330,8 +1332,9 @@ for some data.
 \end{terminalv}
 If you do not know the axis name you can give the number instead
 (1=RA, 2=Dec, 3=vrad).
-\\*\\*
-\textbf{Advanced method}\\*
+
+\subsection{Advanced method}
+
 These steps mimic the pipeline and show the procedure for generating
 an integrated map collapsed only over regions with emission greater
 than 3\,$\sigma$.
@@ -1504,8 +1507,9 @@ An alternative method is to use \ndfcopy\ while defining the section
 of the map or cube you wish to extract as an output cube. See
 \cref{Section}{sec:ndfsections}{How to examine, process or extract a
 subset of your data}.
-\vspace{3mm}\\
-\textbf{Supplying a template}\\*
+
+\subsection{Supplying a template}
+
 If you wish to extract only a region which overlaps with an existing
 file you have, e.g. from a different observing campaign or telescope,
 you can also use \ndfcopy\ but with the \param{like} option.
@@ -1658,8 +1662,8 @@ Remember the mean or median values will give you the noise when
 using the error component.
 \end{tip}
 
-\vspace{3mm}
-\textbf{Visualising the noise}\\
+\subsection{Visualising the noise}
+
 You can plot the noise or error component of your map using the
 \textsc{Kappa} command \histogram. This allows you to visualise the
 distribution with more ease. Again the \param{comp=err} option is
@@ -2568,8 +2572,8 @@ TIP: Even if just a single observation is processed, a group file is
 created so long as the observation passes the QA check.
 \end{tip}
 
+\subsection{Why have multiple reduced files been generated?}
 
-\textbf{Why have multiple reduced files been generated?}\\*
 You will find the pipeline splits large reduced cubes (e.g. from
 raster maps) into smaller tiles of $<$512\,MB. This is to save on
 computer memory. It does this from the central position outwards so
