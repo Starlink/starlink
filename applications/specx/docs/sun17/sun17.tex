@@ -1,4 +1,4 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 %+
 %  Name:
@@ -23,287 +23,43 @@
 %-
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
+%% \usepackage        %  Use this one for final production.
+%% \usepackage %  Use this one for drafting.
 % ? End of specify used packages
 
-\pagestyle{myheadings}
+
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {17.8}
-\newcommand{\stardocauthors}   {R.\,M.\,Prestage, H.\,Meyerdierks,
-J.\,F.\,Lightfoot, \\ T.\,Jenness, R.\,P.\,J.\,Tilanus, R.\,Padman}
-\newcommand{\stardocdate}      {11 July 2000}
-\newcommand{\stardoctitle}     {SPECX --- A Millimetre Wave Spectral Reduction
-Package}
-\newcommand{\stardocversion}   {6.7-7}
-\newcommand{\stardocmanual}    {Users' Manual}
-\newcommand{\stardocabstract}  {SPECX is a general purpose mm and submm
+\stardocnumber      {17.8}
+\stardocauthors   {R.\,M.\,Prestage, H.\,Meyerdierks,
+                              J.\,F.\,Lightfoot, \\ T.\,Jenness, R.\,P.\,J.\,Tilanus, R.\,Padman}
+\stardocdate        {11 July 2000}
+\stardoctitle     {SPECX --- A Millimetre Wave Spectral Reduction Package}
+\stardocversion     {6.7-7}
+\stardocmanual      {Users' Manual}
+\stardocabstract  {SPECX is a general purpose mm and submm
 spectral line data reduction system. This document provides an overview
 of the JAC/Starlink version of SPECX. See MUD/070 for a full manual to
 SPECX.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
 
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
 % -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
-% Environment for indenting and using a small font.
-\newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
-
-\newcommand{\text}[1]{{\small \tt #1}}
-
+% ? Document specific \providecommand or \newenvironment commands.
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section {Introduction}
 
@@ -380,7 +136,7 @@ users.
 SPECX is intended primarily for the analysis of JCMT data and can read such
 data directly from the \xref{GSD}{sun229}{} files produced at the telescope.  In the VMS
 version there are also facilities for reading data from a range of other
-important mm-wave telescopes, {\em e.g.} Onsala, FCRAO, UMASS CO survey,
+important mm-wave telescopes, \emph{e.g.} Onsala, FCRAO, UMASS CO survey,
 IRAM-FITS, JCMT RxG, NRAO 8-beam (see the SPECX user manual for details).
 Spectra and maps can be output as FITS files, Starlink NDFs, or ASCII files
 for reading into other packages.
@@ -391,22 +147,17 @@ no longer discuss the VMS Version 6.2.
 \section {Getting started}
 
 SPECX is made available by typing:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % specxstart
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 and started by typing:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % specx
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 The program will display the current version number and
 a brief informational message, then the SPECX prompt ({\tt>>}) will appear.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
             --------------------------------------------
               Specx v6.7-6 (UNIX) ---- 15 December 1999
                    Copyright (C)  R.Padman & PPARC
@@ -417,41 +168,36 @@ a brief informational message, then the SPECX prompt ({\tt>>}) will appear.
         .
         .
 >>
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Commands may then be entered to read and process data.
 SPECX commands consist of one or more keywords, separated
 by hyphens. Minimum matching is applied to each keyword
 individually. A full list of all valid SPECX commands
-may be found by entering {\tt show-commands}, with a carriage return
+may be found by entering \texttt{show-commands}, with a carriage return
 in response to the resulting prompt. On-line help is available
-using the command {\tt help}. However, the on-line help is mainly a copy
+using the command \texttt{help}. However, the on-line help is mainly a copy
 from the VMS VERSION 6.3. There are some added topics on the UNIX version.
 
-A shell command may be executed by preceding it with a {\tt \$}, {\em e.g.}
+A shell command may be executed by preceding it with a \texttt{\$}, \emph{e.g.}
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 >> $ls
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 % $
 
 The tab and blank characters, `,', `\verb+\+' and `;' are SPECX delimiters;
 to pass these to the shell the entire string must be enclosed in single
-inverted commas, {\em e.g.}
+inverted commas, \emph{e.g.}
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 >> '$ls -l scan*.dat'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 % $
 
-The {\tt exit} or \texttt{quit} commands are the normal method of returning to
+The \texttt{exit} or \texttt{quit} commands are the normal method of returning to
 the shell.  SPECX can also be suspended in the usual way with Control-Z and
-later resumed with the shell command {\tt fg}.
+later resumed with the shell command \texttt{fg}.
 
 In some situations SPECX has to be given an end-of-file character. On
 VMS this was Control-Z. On UNIX it is Control-D. As of V6.7-1 Control-C
@@ -461,11 +207,11 @@ can be used to abort a command in progress.
 \section {SPECX files and directories}
 
 SPECX uses and produces a variety of files. For graphics,
-intermediate plot files (called {\tt PLOT.}nnn) are produced in the
+intermediate plot files (called \texttt{PLOT.}nnn) are produced in the
 current working directory.
 
 SPECX uses Starlink PGPLOT for graphics and thus will produce data files for
-plots sent to some graphics devices ({\em e.g.} {\tt gks74.ps}.N for a
+plots sent to some graphics devices (\emph{e.g.} \texttt{gks74.ps}.N for a
 PostScript printer). These are created in the current default directory. They
 are not submitted to any printer and are not deleted. SPECX does not even
 report the exact name of the file when it is created. The user has to keep
@@ -473,7 +219,7 @@ score of these files and send them to printers as desired.
 
 There is an option (defaulted true) in SPECX which allows dumping of the
 current status of the program after each command is executed. This is saved in
-the file {\tt specx.dmp} in the current default directory. If this file does
+the file \texttt{specx.dmp} in the current default directory. If this file does
 not exist when SPECX is started for the first time, it will be created. If it
 is subsequently deleted (or SPECX is started from a different directory), the
 package will restart with default initialisation; otherwise SPECX will be
@@ -484,12 +230,12 @@ re-started will all flags as previously set, data files opened, and so on.
 
 New users should read the introductory chapters of the SPECX manual,
 which give explanations and examples of basic techniques. There is a
-test procedure in {\tt \$SYS\_SPECX/test.spx} and the data files
+test procedure in \texttt{\$SYS\_SPECX/test.spx} and the data files
 necessary are in the same directory. However, this procedure is not
-commented at all. User are advised to compare it with {\tt demo.spx},
+commented at all. User are advised to compare it with \texttt{demo.spx},
 which is a copy from the VMS version and will probably not work, but has
 comments as to the meaning of the commands.
-{\tt vms\_demo.spx} demonstrates the reading of JCMT data,
+\texttt{vms\_demo.spx} demonstrates the reading of JCMT data,
 the fitting of baselines and Gaussian to spectra, and shows how to make
 and display a data cube.
 
@@ -506,8 +252,7 @@ mainly an option for a local but site-wide version with EXTRNLn
 routines. Assuming that you are a Starlink site manager you would
 proceed as follows
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % cd /star/sources/specx                       # 1
 % setenv INSTALL /star
 % ./mk deinstall
@@ -526,22 +271,19 @@ proceed as follows
 
 % cd /star/local/etc                           # 5
 {Modify files login and cshrc to reflect that SPECX is in /star/local}
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \begin{itemize}
-\item[1] De-install the existing package from {\tt /star/bin/specx} and
-   {\tt /star/help/specx}. After this step the existing package will
-   still be in its built form in {\tt /star/specx}.
-\item[2] Move (or copy with {\tt cp -pr}) the built system to the local
+\item[1] De-install the existing package from \texttt{/star/bin/specx} and
+   \texttt{/star/help/specx}. After this step the existing package will
+   still be in its built form in \texttt{/star/specx}.
+\item[2] Move (or copy with \texttt{cp -pr}) the built system to the local
    Starlink tree. You can use any directory.
 \item[3] Generate your own version of the ``external'' library. You have
-   to carefully inspect the {\tt makefile} and amend it. Also check {\tt
-   makefile}s in sister directories like {\tt ../fitting} to see how
+   to carefully inspect the \texttt{makefile} and amend it. Also check \texttt{makefile}s in sister directories like \texttt{../fitting} to see how
    include files are handled.
-\item[4] Re-build and install SPECX. Installation goes into {\tt
-   /star/local/bin/specx} and {\tt /star/\-local/help/specx}. You can use
-   something else instead of {\tt /star/local}.
+\item[4] Re-build and install SPECX. Installation goes into \texttt{/star/local/bin/specx} and \texttt{/star/\-local/help/specx}. You can use
+   something else instead of \texttt{/star/local}.
 \item[5] Amend the Starlink login files to reflect the different place
    for the SPECX installation.
 \end{itemize}
@@ -549,8 +291,8 @@ proceed as follows
 In order to re-build SPECX you need a number of Starlink libraries and
 include files in their usual place. Non-Starlink sites may or may not
 have been issued with these libraries. As indicators, you can check
-whether you have {\tt /star/lib/libhds*}, {\tt /star/include/dat\_par}
-and {\tt /star/figaro/lib/libfit.a}.
+whether you have \texttt{/star/lib/libhds*}, \texttt{/star/include/dat\_par}
+and \texttt{/star/figaro/lib/libfit.a}.
 
 
 \section{\xlabel{data_formats_in_and_data_migration_to_the_unix_version}Data
@@ -572,78 +314,76 @@ Data currently held on a VMS file system can be carried across to UNIX
 as detailed below. Note that the way back may not be possible, or at
 least difficult.
 \begin{itemize}
-\item {\bf GSD files:}
+\item \textbf{GSD files:}
     Data in \xref{GSD}{sun229}{} format can be copied binary. One way is the
-    UNIX {\tt cp} command if both disks are mounted by the UNIX machine.
-    Another way is {\tt ftp} in binary mode. Then use {\tt
-    READ-GSD-DATA} in the usual way.
+    UNIX \texttt{cp} command if both disks are mounted by the UNIX machine.
+    Another way is \texttt{ftp} in binary mode. Then use \texttt{READ-GSD-DATA} in the usual way.
 
     For going back from UNIX to VMS similar problems may arise as with
     disk-FITS files (see below).
 
-\item {\bf Disk-FITS files:}
+\item \textbf{Disk-FITS files:}
     These must be written with IBM byte order (swap order
     on Digital machines). They can then be copied binary. One way is the
-    UNIX {\tt cp} command if both disks are mounted by the UNIX machine.
-    Another way is {\tt ftp} in binary mode.
+    UNIX \texttt{cp} command if both disks are mounted by the UNIX machine.
+    Another way is \texttt{ftp} in binary mode.
 
     This works between UNIX machines and from VMS to UNIX. If disk-FITS
     files are moved from UNIX to VMS, it may be necessary to make them
-    files of fixed record length 2880 byte. {\tt cp} is thus unsuitable.
-    {\tt ftp} in binary mode will create the right sort of file with the
+    files of fixed record length 2880 byte. \texttt{cp} is thus unsuitable.
+    \texttt{ftp} in binary mode will create the right sort of file with the
     wrong record length of 512 byte. You can either rectify this with
     some VMS command, or use a more tolerant disk-FITS reader under VMS.
 
-\item {\bf Spectral data VERSION 2 and 3:}
+\item \textbf{Spectral data VERSION 2 and 3:}
     These are VMS binary formats. Take a
     binary copy to the destination machine. The VMS Versions SPECX 6.2
     and 6.3 can use it straight away, of course. For SPECX 6.6 the file
     has to be imported (converted into a VERSION 4.1 file) with the
-    command {\tt CONVERT-VAX-FILE}. This keeps the existing file (say
-    {\tt file.dat}) and creates an new file ({\tt file.sdf}).
+    command \texttt{CONVERT-VAX-FILE}. This keeps the existing file (say
+    \texttt{file.dat}) and creates an new file (\texttt{file.sdf}).
 
-\item {\bf Spectral data Version 4.0 and 4.1:}
+\item \textbf{Spectral data Version 4.0 and 4.1:}
     These are portable binary formats
     based on HDS. Just take a binary copy to the destination machine
-    (UNIX {\tt cp} or {\tt ftp} in binary mode). The file can be used straight
+    (UNIX \texttt{cp} or \texttt{ftp} in binary mode). The file can be used straight
     away. Optionally you can convert it to the native flavour of the HDS
-    format on the destination machine. Use the command {\tt native} in the
+    format on the destination machine. Use the command \texttt{native} in the
     KAPPA package. This should speed up data access somewhat.
 
     Version 4.0 or 4.1 spectral data cannot be imported back into SPECX
     6.2 or 6.3.
 
-\item {\bf Map files Version 2 and 3:}
+\item \textbf{Map files Version 2 and 3:}
     These are VMS binary formats. Take a binary
     copy to the destination machine. The VMS Versions SPECX 6.2 and 6.3
     can use it straight away, of course. For SPECX 6.6 the file has to
     be imported (converted into a Version-4.1 file) with the command
-    {\tt CONVERT-VAX-MAP}. This keeps the existing file (say {\tt
-    file.map}) and creates an new file ({\tt file\_map.sdf}).
+    \texttt{CONVERT-VAX-MAP}. This keeps the existing file (say \texttt{file.map}) and creates an new file (\texttt{file\_map.sdf}).
 
-\item {\bf Map files Version 4.0:}
+\item \textbf{Map files Version 4.0:}
     These are ``local'' binary formats written only by
     the beta-test version of SPECX 6.4. ``Local'' means they can only be
     read by the same type of machine that wrote them, either a Sun4
     workstation or an Alpha workstation. These files can be converted to
-    format Version 4.1 with {\tt CONVERT-VAX-MAP}. In spite of the name of the
+    format Version 4.1 with \texttt{CONVERT-VAX-MAP}. In spite of the name of the
     command, the file will be assumed to have been written by the same
     UNIX machine that the command is run on. The existing file (say
-    {\tt file.map}) is kept and a new file ({\tt file\_map.sdf}) created.
+    \texttt{file.map}) is kept and a new file (\texttt{file\_map.sdf}) created.
 
     Version-4.0 map files cannot be imported back into SPECX 6.2 or 6.3.
 
-\item {\bf Map files Version 4.1:}
+\item \textbf{Map files Version 4.1:}
     This is a portable binary format based on HDS.
-    Just take a binary copy to the destination machine (UNIX {\tt cp} or
-    {\tt ftp} in binary mode). The file can be used straight away.
+    Just take a binary copy to the destination machine (UNIX \texttt{cp} or
+    \texttt{ftp} in binary mode). The file can be used straight away.
     Optionally you can convert it to the native flavour of the HDS
-    format on the destination machine. Use the command {\tt native} in the
+    format on the destination machine. Use the command \texttt{native} in the
     KAPPA package. This should speed up data access somewhat.
 
     Version 4.1 map files cannot be imported back into SPECX 6.2 or 6.3.
 
-\item {\bf Map files Version 4.2:}
+\item \textbf{Map files Version 4.2:}
     This is also a portable binary format based on HDS. The structures
 have been rearranged somewhat from V4.1 to improve storage efficiency
 and to try to prevent corruption of the file if specx crashes. Version-4.1
@@ -651,7 +391,7 @@ map files are automatically converted to V4.2.
 
 \end{itemize}
 
-Dump files and the {\tt mapplane.tmp} files are not portable. Care has to
+Dump files and the \texttt{mapplane.tmp} files are not portable. Care has to
 be taken when the same file space is used with different machines,
 because SPECX may not run properly on one machine while there is a SPECX
 dump in the working directory that was written by another machine.
@@ -753,11 +493,9 @@ The changes include:
 
 \item A new variable has been added which gives access to the max and min
      values used for greyscale plots. The new symbol is MAPLIMITS(2), e.g.,
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 >> print maplimits(1)
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
    would print the minimum value used for the last greyscale.
      This is sometimes useful from scripts.
@@ -1048,23 +786,20 @@ Let us take a specific example. We have a RxB3i spectrum which is centred on CS
 GHz. In order to look at absolute "rest frame" frequencies, we set the display
 frame to be that of the source itself:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 >> set-velocity-frame
 Output in different vel frame? (Y/N) [Y]
 Velocity frame? (TELLuric, LSR, HELIocentric, GEOcentric) [TELL] LSR
 Velocity law definition? (OPTical, RADio, RELativistic) [RAD] RAD
 Velocity in new frame? (km/s) [  20.0] vlsr
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 (see Fig 1). (There is a predefined variable "vlsr" equated to the actual value
 for the current spectrum, so we can quote this in response to the last query
 rather than looking up the actual value.)
 
 For an AOSC spectrum, we would now regrid to a linear scale (see next section
 for more details on this). Then we go ahead and change the sideband:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 >> change-sideband
 Local oscillator frequency not defined...
 Current sideband? (U/L) [L] L
@@ -1074,16 +809,13 @@ First i.f.? (GHz) [ 1.500000] 1.5
    Don't forget to SET-LINE-REST-FREQ to set the
    frequency of the line you wanted to look at -
    the old line will appear at large velocities!
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 As suggested, change the reference frequency to CO 3-2:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 >> set-line-rest-freq
 Receiver # 1  Line rest frequency? (GHz) [  0.000000] 345.795989
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \sloppypar{If we have done all this correctly we now get the absolute frequency plot
 shown below (Fig 2). A macro has been provided to do all this -- just type
@@ -1107,8 +839,7 @@ frequencies (as will be shown in a moment).
 To correct the frequency scale for AOSC data in particular, I have written a
 small macro, FRQFIX.SPX, which is kept in the "standard" command-files
 directory. It is invoked by the symbol LINEARIZE-AOSC-FREQ:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 >> linearize-aosc-freq
 FRQFIX> Linearization turned off - reset it? (Y/N) [Y] Y
 OK, setting freq coefficients
@@ -1117,8 +848,7 @@ FRQFIX> Regrid to uniform sampling? (Y/N) [Y] Y
 First and last useful channels in input:           1        2038
 Linearization has now been turned off!
 Reset if another spectrum needs correcting
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 This macro in fact \emph{also} removes the 3-MHz offset from \texttt{F\_CEN},
 instead adding it into the zero-order term of the correction polynomial, which
@@ -1204,15 +934,15 @@ velocity of 20km/s in the direction of 18h,+30d(B1900), and differs slightly
 from the most modern determinations of the solar motion.
 
 Pat has recently altered the SLALIB routine \texttt{SLA\_RVLSR} to provide a
-better estimate of the {\em dynamical} solar motion --- i.e., the motion of
+better estimate of the \emph{dynamical} solar motion --- i.e., the motion of
 the Sun with respect to the appropriate circular orbit around the galactic
 centre.  This also makes \texttt{SLA\_RVLSR} consistent with the routine
 \texttt{SLA\_RVGALC}, but unfortunately there is now a velocity difference of
 up to $\pm 3$km/s between the velocities calculated by \texttt{SLA\_RVLSR} and
-those used by radio astronomers (and SPECX). I propose {\em not} to implement
+those used by radio astronomers (and SPECX). I propose \emph{not} to implement
 this new definition in SPECX, as I suspect it will only cause confusion if
 Orion starts to come out with "an lsr velocity" of 6km/s. Pat Wallace's
-program \xref{RV}{sun78}{}, which is included in the JCMT utilities, {\em is}
+program \xref{RV}{sun78}{}, which is included in the JCMT utilities, \emph{is}
 based on the SLALIB routines, but the older version is being retained to
 prevent undue confusion arising as a result of the change in the SLALIB
 routines.
@@ -1383,17 +1113,13 @@ channels can be interpolated over with smoothing commands such as HANN,
 SMOOTH, CONVOLVE, BIN etc.
 
 You can determine the current setting of the bad channel value by doing:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 >> print badpix_value
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 and if you don't like it, you can change it by doing:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 >> badpix_value = -100
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 for example. The one place where bad channels in spectra are not handled
 well is in spectra in a map cube  --- fewest problems will result if you
 smooth over such bad channels before ADDing to the map, or choose a value
@@ -1458,11 +1184,9 @@ that it is unlikely to be correct unless the display frame is the one
 in which the source is at rest. Since you *may* have observed with
 (say) the LSR velocity not equal to that of the source itself, I can't
 protect you from this. But in most cases it will be sufficient to do
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 >> SET-VELOCITY-FRAME yes lsr radio vlsr
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 That is, choose a velocity reference frame which is defined as having
 velocity offset with respect to the standard of rest the same as that
 of the source itself (modify as appropriate for heliocentric,
