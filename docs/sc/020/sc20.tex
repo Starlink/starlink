@@ -23,7 +23,7 @@
       command. Specialised pipeline recipes are discussed.}
 
 % Definitions
-\newcommand{\lutedit}{\xref{\task{lutedit}}{sun95}{LUTEDIT}}
+\providecommand{\lutedit}{\xref{\task{lutedit}}{sun95}{LUTEDIT}}
 
 % degrees symbol
 %\usepackage{siunitx}
@@ -54,7 +54,6 @@
 
 \begin{table}[h!]
 \begin{tabular}{ll}
-
 \textbf{ACSIS}& Auto-Correlation Spectrometer and Imaging System\\
 \textbf{ARD}& ASCII Region Definition\\
 \textbf{CADC}& Canadian Astronomy Data Centre\\
@@ -103,9 +102,9 @@ This guide covers the following:
 In this cookbook the following styles are followed:
 \begin{itemize}[noitemsep,nolistsep]
 \item \texttt{\%}  represents the command-line prompt.
-\item Command line examples are shown in \texttt{\color{MidnightBlue}{navy typewriter font.}}
+\item Command-line examples are shown in \texttt{\color{MidnightBlue}{navy typewriter font.}}
 \item The names of \gaia\ commands or windows appear in \gaiathing{like this}.
-\item Useful tips of reminders are given in outlined boxes.
+\item Useful tips or reminders are given in outlined boxes.
 \end{itemize}
 
 \subsection{\xlabel{software}Before you start: Starlink software}
@@ -116,10 +115,10 @@ This manual utilises software from the \starlink\ package; \smurf\
 \picard\ \cite{picard}. Starlink software must be installed on your
 system, and Starlink aliases and environment variables must be defined
 before attempting any ACSIS data reduction. You can download Starlink
-from \xref{the Starlink webpage}{\starlink}{}.
+from  \htmladdnormallink{the Starlink webpage}{http://starlink.jach.hawaii.edu}.
 
 Below is a brief summary of the packages used in this cookbook and how
-to initialise them. Note that all the example commands are shown with
+to initialise them. Note that all the example commands are shown within
 a UNIX shell.
 
 \begin{table}[h!]
@@ -131,7 +130,7 @@ a UNIX shell.
           \makecube\ that will process raw ACSIS data into spectral cubes.
         &  \texttt{\%\,smurf} & \texttt{\%\,smurfhelp} \newline \smurfsun\\
 \hline
-\Kappa\ & A general purpose applications package with commands for
+\Kappa\ & A general-purpose applications package with commands for
           processing, visualising, and manipulating NDFs. & \texttt{\%\,kappa}
         & \texttt{\%\,kaphelp} \newline \kappasun\ \\
 \hline
@@ -154,7 +153,7 @@ a UNIX shell.
                   for the post-processing of reduced data. While mainly implemented
                   for SCUBA-2 data, there are a few recipes that are heterodyne
                   compatible. See \cref{Appendix}{app:picard}{Picard} for more details
-                  and a description of available recipes.
+                  and a description of the available recipes.
                 & \texttt{\%\,picard RECIPE $<$files$>$} & \picardsun\ \\
 \hline
 \multicolumn{4}{l}{}\\
@@ -162,7 +161,7 @@ a UNIX shell.
 \hline
 \gaia\ & \gaia\ is an interactive image and data-cube display and
          analysis tool. It incorporates tools such as source detection,
-         3-dimensional visualisation, clump visualisation, photometry and the
+         3-dimensional visualisation, clump visualisation, photometry, and the
          ability to query and overlay on-line or local catalogues.
        & \texttt{\%\,gaia} & \gaiasun\ \gaiasc\ \\
 \hline
@@ -210,9 +209,9 @@ JSA before it becomes public by following the instructions in
 \label{sec:format}
 
 Starlink routines run on HDS files (Hierarchical Data System) which
-normally have a .sdf extension (Starlink Data File). HDS files can
+normally have a \file{.sdf} extension (Starlink Data File). HDS files can
 describe a multitude of formats. The most common HDS format you will
-encounter is the NDF (N-Dimensional Data Format). This is the standard
+encounter is the NDF ($N$-Dimensional Data Format). This is the standard
 file format for storing data which represent N-dimensional arrays of
 numbers, such as spectra, images, etc. The parameter files discussed
 in Section \ref{sec:hdstrace} are also HDS format.
@@ -288,7 +287,7 @@ be accessed using the array index in parentheses.
 
 In addition to running \task{hdstrace} on the ADAM file, you can find
 a list of all parameter names that can be returned with \parget\ in
-the \xref{\textsc{Kappa} manual}{sun95}{} under `Results parameters'
+the \xref{\textsc{Kappa} manual}{sun95}{} under `Results Parameters'
 for the command in question. Note that these names may be different
 from the names returned in a terminal when running application.
 
@@ -312,7 +311,7 @@ opacity. In the example below, just the object name is extracted.
 \begin{terminalv}
 % fitslist file | grep OBJECT
 \end{terminalv}
-Likewise, if you know the name of the parameter you want to view you can
+Likewise, if you know the name of the keyword you want to view you can
 use the \fitsval\ command instead, e.g.
 \begin{terminalv}
 % fitsval file OBJECT
@@ -325,7 +324,7 @@ use the \fitsval\ command instead, e.g.
 \begin{minipage}[t]{0.85\linewidth}
 \task{ndftrace} displays the attributes of the NDF data structure.
 This will tell you, for example, the units of the data, pixel bounds,
-dimensions and axis assignations.
+dimensions, world coordinates, and axis assignations.
 \begin{terminalv}
 % ndftrace map fullframe fullwcs
 \end{terminalv}
@@ -362,7 +361,7 @@ Full details of \ndftrace\ and \fitslist\ can be found in the
 found in the \xref{\textsc{hdstrace} manual}{sun102}{}.
 
 \begin{tip}
-The `.sdf' extension on filenames is not required when running Starlink commands.
+The \file{.sdf} extension on filenames is not required when running Starlink commands.
 \end{tip}
 
 
@@ -405,16 +404,16 @@ immediate parents and older ancestor NDFs.
 \label{sec:ndfsections}
 
 For all Starlink commands you can specify a sub-section of your data
-on which to run an application. You do this by appending the NDF name
-with the bounds of the section to be processed. This may be on the
-command line or in response to a prompt.
+on which to run an application. You do this by appending the bounds of
+the section to be processed the NDF name. This may be on the command
+line or in response to a prompt.
 
 The example below runs \stats\ on a sub-cube within your original
 cube. This sub-cube is defined by bounds given for each axis. The
 upper and lower bounds for each axis are separated by a colon, while
 the axes themselves are separated by a comma. Note that the use of
-quotes is necessary on a UNIX shell command line but not in response
-to a prompt.
+quotes is necessary on a UNIX shell command line, but not in response
+to a prompt or in many other scripting languages.
 
 \begin{terminalv}
 % stats `cube(10.5:10.0,0.0:0.25,-25:25)'
@@ -436,7 +435,7 @@ To define your bounds in FK5 coordinates use the following format.
 To write a section of your data into a new file (called
 \file{newcube.sdf} in the example below) use \ndfcopy\ with bounds.
 \begin{terminalv}
-% ndfcopy `cube(10.5:10.0,0.0:0.25,-25:25)' newcube title="l=10.5 sub-section"
+% ndfcopy `cube(10.5:10.0,0.0:0.25,-25:25)' newcube title='"l=10.5 sub-section"'
 \end{terminalv}
 Here the option \param{title} defines a title for the new cube which
 replaces the title derived from the original.
@@ -452,7 +451,7 @@ the position $l=10^\circ$, $b=0^\circ$.
 To help identify your sub-region in pixel coordinates, open your
 file in \gaia\ and change the built-in coordinates to PIXEL via
 \gaiathing{Image-Analysis} $>$ \gaiathing{Change coordinate} $>$
-\gaiathing{Build-in coordinates}.
+\gaiathing{Built-in coordinates}.
 \end{tip}
 
 
@@ -540,9 +539,9 @@ spectrum in kelvins. \end{itemize}
 
 \begin{tip}
 Both $T_{sys}$ and $T_{rec}$ are stored in the raw data files.
-This information is stored in the .MORE.ACSIS.TRX extension and can be
-viewed using \hdstrace\ (see \cref{Section}{sec:fitslist}{How can I
-view the metadata?}).
+This information is stored in the .MORE.ACSIS.TSYS and .MORE.ACSIS.TRX
+extensions respectively, and can be viewed using \hdstrace\ (see
+\cref{Section}{sec:fitslist}{How can I view the metadata?}).
 \end{tip}
 
 
@@ -574,7 +573,7 @@ RxA&19.7$\arcsec$&0.69 & 0.80\\
 
 \subsubsection{\xlabel{harp}HARP Frontend}
 
-The Heterodyne Receiver Array Programme (HARP) is a 16 receptor array
+The Heterodyne Receiver Array Programme (HARP) is a 16-receptor array
 arranged on a 4$\times$4 grid \cite{harp}. It operates in the B-band
 between 325 and 375 GHz. The receptors are adjacent on the focal plane
 but separated on the sky by 30 arcsecs (or approximately twice the
@@ -711,7 +710,7 @@ coordinates fall on one of the central 4 pixels, or map-centered where
 the target coordinates lie at the centre of the map between the 4
 central pixels. See Figure \ref{fig:jiggle} for an illustration of the
 different jiggle patterns. Although designed for HARP this mode can be
-used with the single element receivers. The right-hand panel of Figure
+used with the single-element receivers. The right-hand panel of Figure
 \ref{fig:harpmodes} shows a HARP raster map.
 \end{minipage}
 \vspace{0.7cm}\\
@@ -837,7 +836,7 @@ your data by moving the \gaiathing{Index of plane} slider.
   The vertical red line indicates the time slice that is currently selected
   in the \gaiathing{Display image sections of a cube} window. This can be
   dragged across the spectrum to scroll through the spectra. Examine exposure
-  time map etc in ancillary arrays.}
+  time map etc. in ancillary arrays.}
 
 A second way to scroll through your spectrum is to click and drag the
 vertical red bar on the \gaiathing{Spectral plot} window. As you do so
@@ -865,7 +864,7 @@ for non-contiguous receptor numbers.
 % chpix in=raw out=raw_masked section="',7:8,'" newval=bad
 \end{terminalv}
 You can also mask a subset of the time stream for a particular
-receptor. The example below masks out time steps 18 to 33 for receptor
+receptor. The example below masks out time Steps 18 to 33 for receptor
 H01. See Figure \ref{fig:maskreceptor} for instructions on how to
 identify the affected time range.
 \begin{terminalv}
@@ -887,7 +886,7 @@ spectra (see Figures \ref{fig:maskreceptor} and
 \myfig{sc20_maskreceptor}{[h!]}{width=1\linewidth}{fig:maskreceptor}{Identifying bad receptors in the raw data.}{
   The left hand \gaia\ window shows the raw data before masking.
   Clicking on a pixel will show the spectra. The spectra shown is from
-  receptor H01 at step 18 (see circled Y value). To mask this receptor
+  receptor H01 at Step 18 (see circled $Y$ value). To mask this receptor
   in time from step 18 to 33 -- at which point the bad baselines
   disappear -- use \chpix. The right hand \gaia\ window shows the raw
   data after masking where the time range in question is now blank.}
