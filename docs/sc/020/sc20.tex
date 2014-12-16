@@ -76,10 +76,10 @@
 \end{table}
 
 
-\section{\xlabel{introduction}Introduction}
+\chapter{\xlabel{introduction}Introduction}
 \label{sec:intro}
 
-\subsection{\xlabel{using_guide}This cookbook}
+\section{\xlabel{using_guide}This cookbook}
 This cookbook is designed to instruct ACSIS users on the best ways to
 reduce and visualise their data using \starlink\ packages.
 
@@ -107,7 +107,7 @@ In this cookbook the following styles are followed:
 \item Useful tips or reminders are given in outlined boxes.
 \end{itemize}
 
-\subsection{\xlabel{software}Before you start: Starlink software}
+\section{\xlabel{software}Before you start: Starlink software}
 
 This manual utilises software from the \starlink\ package; \smurf\
 \cite{smurf}, \Kappa\ \cite{kappa}, \gaia\ \cite{gaia}, \oracdr\
@@ -172,7 +172,7 @@ a UNIX shell.
 \end{tabular}
 \end{table}
 
-\subsection{\xlabel{software}Options for Reducing you Data}
+\section{\xlabel{software}Options for Reducing you Data}
 
 You have three options for processing your data:
 \\\\
@@ -202,10 +202,10 @@ JSA before it becomes public by following the instructions in
 \cref{Chapter}{sec:runpipe}{The ACSIS Pipeline}.
 
 \newpage
-\section{\xlabel{starlink}Good to know: Starlink}
+\chapter{\xlabel{starlink}Good to know: Starlink}
 \label{sec:starlink}
 
-\subsection{File format}
+\section{File format}
 \label{sec:format}
 
 Starlink routines run on HDS files (Hierarchical Data System) which
@@ -220,7 +220,7 @@ Raw data retrieved from the JCMT Science Archive comes in FITS format.
 For information on converting between FITS and NDF see
 \cref{Appendix}{app:convert}{Converting file formats}.
 
-\subsection{\xlabel{adam}How to find the current parameter values}
+\section{\xlabel{adam}How to find the current parameter values}
 \label{sec:hdstrace}
 
 A directory called \texttt{adam} is created in your home-space by
@@ -291,7 +291,7 @@ the \xref{\textsc{Kappa} manual}{sun95}{} under `Results Parameters'
 for the command in question. Note that these names may be different
 from the names returned in a terminal when running application.
 
-\subsection{How can I view the metadata?}
+\section{How can I view the metadata?}
 \label{sec:fitslist}
 
 There are two \Kappa\ tasks which are extremely useful for examining
@@ -365,7 +365,7 @@ The \file{.sdf} extension on filenames is not required when running Starlink com
 \end{tip}
 
 
-\subsection{What has already been done to the data?}
+\section{What has already been done to the data?}
 
 If you are presented with a data file you may wish to see what
 commands have been run on it and, in the case of a coadded cube, which
@@ -400,7 +400,7 @@ immediate parents and older ancestor NDFs.
 \end{minipage}
 \vspace{0.7cm}\\
 
-\subsection{\xlabel{ndfsections}How to examine, process or extract a subset of your data}
+\section{\xlabel{ndfsections}How to examine, process or extract a subset of your data}
 \label{sec:ndfsections}
 
 For all Starlink commands you can specify a sub-section of your data
@@ -456,7 +456,7 @@ file in \gaia\ and change the built-in coordinates to PIXEL via
 
 
 \newpage
-\subsection{\xlabel{help}How to get help}
+\section{\xlabel{help}How to get help}
 \label{sec:help}
 \begin{table}[h!]
 \begin{tabular}{p{2.3cm}|p{7.3cm}|p{5cm}}
@@ -487,10 +487,10 @@ Run routines with prompts & You can run any routine with the option
 
 
 \clearpage
-\section{\xlabel{het_overview}JCMT Heterodyne Observing}
+\chapter{\xlabel{het_overview}JCMT Heterodyne Observing}
 \label{sec:het}
 
-\subsection{\xlabel{specline}Spectral-line Observing}
+\section{\xlabel{specline}Spectral-line Observing}
 
 Submillimetre instruments use heterodyne techniques to observe
 spectral lines at high resolution. Heterodyne receivers take a weak
@@ -545,7 +545,7 @@ extensions respectively, and can be viewed using \hdstrace\ (see
 \end{tip}
 
 
-\subsection{\xlabel{rxa}Heterodyne Instruments}
+\section{\xlabel{rxa}Heterodyne Instruments}
 \label{sec:instruments}
 
 The heterodyne instruments described below are those operational on
@@ -553,7 +553,7 @@ the JCMT in 2014; they have both been in active service for many years
 and comprise the bulk of archived JCMT heterodyne data. For
 information on previous instruments see the JCMT web pages.
 
-\subsubsection{RxA Frontend}
+\subsection{RxA Frontend}
 
 Receiver A (RxA) is a single-element double-sideband receiver. It
 operates in the A-band between 211 and 276 GHz. In addition to stare
@@ -571,7 +571,7 @@ RxA&19.7$\arcsec$&0.69 & 0.80\\
 \end{center}
 \end{table}
 
-\subsubsection{\xlabel{harp}HARP Frontend}
+\subsection{\xlabel{harp}HARP Frontend}
 
 The Heterodyne Receiver Array Programme (HARP) is a 16-receptor array
 arranged on a 4$\times$4 grid \cite{harp}. It operates in the B-band
@@ -618,7 +618,7 @@ JCMT heterodyne receiver.}
 \end{figure}
 
 
-\subsubsection{ACSIS Backend}
+\subsection{ACSIS Backend}
 
 Since 2005, the backend for heterodyne instruments has been the
 Auto-Correlation Spectrometer and Imaging System known simply as ACSIS
@@ -674,10 +674,10 @@ with HARP.}
 \end{figure}
 
 
-\subsection{\xlabel{obsmodes}Observing Modes}
+\section{\xlabel{obsmodes}Observing Modes}
 \label{sec:obsmodes}
 
-\subsubsection{On-source}
+\subsection{On-source}
 
 \begin{minipage}[t]{0.14\linewidth}
 \textbf{Stare}
@@ -729,7 +729,7 @@ to give a `basket-weave' pair of maps. Each one of the pair will
 appear as an individual observation.
 \end{minipage}
 
-\subsubsection{Reference}
+\subsection{Reference}
 \begin{minipage}[t]{0.14\linewidth}
 \textbf{Position-switch}
 \end{minipage}
@@ -775,10 +775,10 @@ of 6$\arcsec$. }
 
 \clearpage
 
-\section{\xlabel{data_files}Raw ACSIS Data}
+\chapter{\xlabel{data_files}Raw ACSIS Data}
 \label{sec:raw}
 
-\subsection{\xlabel{format}Data Format}
+\section{\xlabel{format}Data Format}
 Raw ACSIS data follow this naming convention:
 
 aUTDATE\_OBSNUMBER\_SUBSYSTEM\_SUBSCAN
@@ -792,7 +792,7 @@ subscans to avoid a file size $>$512\,GB.
 
 
 
-\subsection{\xlabel{visualise}Visualising raw data}
+\section{\xlabel{visualise}Visualising raw data}
 \label{sec:exam}
 
 Use the \starlink\ application \gaia\ to visualise your raw data. The
@@ -849,7 +849,7 @@ buttons on the sidebar in the main window.
 See the \xref{\textsc{Gaia} manual}{sun214}{} for full
 details.\latex{\footnote{\texttt{http://docs.jach.hawaii.edu/star/sun214.htx/sun214.html}}}
 
-\subsection{\xlabel{makecube}Identifying and Masking Bad Data}
+\section{\xlabel{makecube}Identifying and Masking Bad Data}
 \label{sec:badrecs}
 
 You can mask bad receptors in the time-series data with the \Kappa\
@@ -899,7 +899,7 @@ spectra (see Figures \ref{fig:maskreceptor} and
   goes noisy two-thirds the way through the observation.}
 
 \clearpage
-\section{\xlabel{reduce}Regridding your Data}
+\chapter{\xlabel{reduce}Regridding your Data}
 \label{sec:reduce}
 
 To convert your raw time-series cubes with spectral channel number,
@@ -910,7 +910,7 @@ of processing data using \makecube, discuss what to look out for and
 introduce the various parameters with which to tailor your reduction.
 
 
-\subsection{\xlabel{makecube}Running Makecube}
+\section{\xlabel{makecube}Running Makecube}
 The \smurf\ application used for regridding your raw data is  \makecube.
 \begin{terminalv}
 % makecube in=a20070505_00041_01_0001.sdf out=cube auto
@@ -968,7 +968,7 @@ the map. }
 \end{center}
 \end{figure}
 
-\subsubsection{Reducing multiple observations}
+\subsection{Reducing multiple observations}
 
 You can supply \makecube\ with an ASCII file containing a list of all
 the raw files you want reduced. These filenames should include the
@@ -987,9 +987,9 @@ the raw files for observation 10.
 \end{terminalv}
 
 
-\subsection{Makecube Options}
+\section{Makecube Options}
 
-\subsubsection{Specifying spectral bounds}
+\subsection{Specifying spectral bounds}
 
 To save disk space and processing time you can specify the region of
 the spectra to be processed with \param{specbounds}. If you know your
@@ -999,7 +999,7 @@ line lies close to 0 km/s you may chose to process only the central
 %  makecube rawfile specbounds=\"-50.0 50.0\"
 \end{terminalv}
 
-\subsubsection{Masking receptors}
+\subsection{Masking receptors}
 
 When combining several maps with masked bad receptors one can use the
 \param{badmask} parameter of \makecube. This option determines the way
@@ -1017,7 +1017,7 @@ the default.  \param{First} means that the decisions on which pixels
 will be flagged as bad will be made with the first input spectrum
 while the rest are ignored.
 
-\subsubsection{Including/excluding receptors}
+\subsection{Including/excluding receptors}
 
 To make a cube with only certain receptors you can use the
 \param{detectors} option on the command line. This allows you to
@@ -1035,7 +1035,7 @@ receptor-to-receptor flat-field.
 \end{terminalv}
 
 
-\subsubsection{Defining an output grid}
+\subsection{Defining an output grid}
 \label{sec:outputgrid}
 You can use the \param{ref} option to define an NDF which is used to
 define an output grid. This NDF can even be in two-dimensions even
@@ -1057,7 +1057,7 @@ BASE position, CROTA is set to the \param{MAP\_PA} value in the FITS header
 6 arcseconds, and REFPIX1/REFPIX2 are both set to zero. See \smurfsun\
 for a full description of each of these parameters.
 
-\subsubsection{Data regridding options}
+\subsection{Data regridding options}
 \label{sec:gridding}
 
 There are several regridding options available to you through the
@@ -1105,7 +1105,7 @@ blank pixels throughout the map.}
 \end{figure}
 
 
-\subsubsection{Generating a variance map}
+\subsection{Generating a variance map}
 
 The option \param{genvar} can be used to generate a variance array for
 your cube. This is important if you are adding multiple maps with
@@ -1145,7 +1145,7 @@ have the same variance value). [Default].
 \end{minipage}
 \end{center}
 
-\subsubsection{Sparse grid}
+\subsection{Sparse grid}
 
 If one has observed a number of offset positions which are not on a
 regular grid or are widely spaced, it is of little use to make a
@@ -1160,7 +1160,7 @@ created which stacks spectra in the order in which they were observed
 This is generates a one-dimensional array where spectra are displayed by
 \gaia\ in the order where they were observed (from left to right).
 
-\subsubsection{Creating a catalogue of receptor positions}
+\subsection{Creating a catalogue of receptor positions}
 
 You can use the option \param{outcat} to generate a catalogue of the
 spatial potions of the receptors used to make your final cube. The
@@ -1188,7 +1188,7 @@ each pixel (see Figure \ref{fig:makecube-outcat}).
   \file{cat.FITS}). Notice that dead receptors are excluded from the
   list.}
 
-\subsubsection{Tile dimensions}
+\subsection{Tile dimensions}
 
 You can set the maximum tile size in pixels with the \param{tiledims}
 option. This allows you to break a large raster map into smaller tiles
@@ -1197,10 +1197,10 @@ data to allow for future coadding.
 
 
 \clearpage
-\section{\xlabel{analyse}Analysing your Cube}
+\chapter{\xlabel{analyse}Analysing your Cube}
 \label{sec:analyse}
 
-\subsection{Smoothing your data}
+\section{Smoothing your data}
 
 Frequency or velocity smoothing is performed using \Kappa:\block. It
 uses a rectangular box filter with each output pixel either the mean
@@ -1224,7 +1224,7 @@ Note that the \param{fwhm} option is given in the number of pixels.
 For example, to smooth a map with 4$\arcsec$ pixels by a 12$\arcsec$ Gaussian
 you would set \param{fwhm=3}.
 
-\subsection{Removing a baseline}
+\section{Removing a baseline}
 
 Baselines should be removed using \Kappa:\mfittrend. This routine can
 fit polynomials up to order 15, or cubic splines, to each spectrum in
@@ -1311,7 +1311,7 @@ of the noise and can contain sharp edges. These problems can be
 mitigated but extra steps are required. See \cupidsun\ for more
 details.
 
-\subsection{Collapsing your map}
+\section{Collapsing your map}
 
 An integrated intensity map can be created by collapsing your cube
 along the frequency/velocity axis using \Kappa:\collapse. For each
@@ -1375,7 +1375,7 @@ regions set to 1.
 \end{terminalv}
 \end{enumerate}
 
-\subsubsection{Moments Maps}
+\subsection{Moments Maps}
 
 You can use \collapse\ to generate the moments maps by selecting the
 appropriate \param{estimator} option -- Integrated value (Integ) for
@@ -1390,7 +1390,7 @@ the advanced method outlined above.
 \end{tip}
 
 
-\subsection{\xlabel{rebin}Main beam conversion}
+\section{\xlabel{rebin}Main beam conversion}
 \label{sec:mult}
 
 Your cube will come out of \makecube\, and the pipeline, in units of
@@ -1408,7 +1408,7 @@ You can use the \Kappa\ command \cmult\ to multiply any NDF by a constant.
 % cmult in=harpcube 0.63 out=harpcube_Tmb
 \end{terminalv}
 
-\subsection{\xlabel{rebin}Changing the pixel size}
+\section{\xlabel{rebin}Changing the pixel size}
 \label{sec:rebin}
 
 You may want to regrid your data onto larger pixels, for instance to
@@ -1441,7 +1441,7 @@ Remember you can check your current pixel size and channel spacing
 with \ndftrace\ (see \cref{Section}{sec:fitslist}{How can I view the
 metadata?}).
 
-\subsection{\xlabel{mosaic}Mosaicking cubes}
+\section{\xlabel{mosaic}Mosaicking cubes}
 \label{sec:mosaic}
 If you pass raw files covering different regions of the sky to
 \makecube\ it will automatically mosaic them together. This can be
@@ -1474,7 +1474,7 @@ will correctly combine all NDF extensions. See
 \end{tip}
 
 
-\subsection{\xlabel{Crop}Cropping your map}
+\section{\xlabel{Crop}Cropping your map}
 \label{sec:collapse}
 
 Cropping an ACSIS map can be fiddly. The simplest way is to create an
@@ -1607,7 +1607,7 @@ The blank pixels have been trimmed using \ndfcopy\ with the
 \end{figure}
 
 
-\subsection{\xlabel{holes}Filling holes in your map}
+\section{\xlabel{holes}Filling holes in your map}
 \label{sec:holes}
 
 You may come across empty pixels in your map due to dead receptors or
@@ -1640,7 +1640,7 @@ with holes and the final filled map.
   map (left) to the filled map (right).}
 
 
-\subsection{\xlabel{noise}Checking the noise}
+\section{\xlabel{noise}Checking the noise}
 \label{sec:noise}
 
 You can use \Kappa:\stats\ to check the noise in your map. It will
@@ -1702,10 +1702,10 @@ TIP: You can write out the error component into a new file using
 
 
 \clearpage
-\section{\xlabel{advanced}Advanced Analysis}
+\chapter{\xlabel{advanced}Advanced Analysis}
 \label{sec:advanced}
 
-\subsection{\xlabel{coords}Changing coordinate frames}
+\section{\xlabel{coords}Changing coordinate frames}
 
 Coordinate systems of regridded Starlink files are described by the
 world coordinate system, (WCS). There are a number of basic coordinate
@@ -1761,7 +1761,7 @@ convert the offset units to arcseconds instead of radians.
 \end{terminalv}
 
 %
-%\subsection{\xlabel{despike}Despiking}
+%\section{\xlabel{despike}Despiking}
 
 %Interference spikes are sometimes found in ACSIS data. Spikes should
 %be quite conspicuous in the data cube as they occur at the same
@@ -1774,7 +1774,7 @@ convert the offset units to arcseconds instead of radians.
 %data Appendix \ref{app:spike} describes the procedure for identifying
 %the position of the spike and masking it out. %
 
-\subsection{\xlabel{hybrid}Hybrid Data}
+\section{\xlabel{hybrid}Hybrid Data}
 
 To merge two hybrid observations first do \wcsalign\ on both files.
 \begin{terminalv}
@@ -1795,7 +1795,7 @@ These can then be merged using \wcsmosaic.
 You should check the final spectra to make sure there is no noise bump
 in the middle where they overlap.
 
-\subsection{\xlabel{pv}Position-velocity diagram}
+\section{\xlabel{pv}Position-velocity diagram}
 
 You can create a position-velocity map by collapsing over the skylat
 axis of a reduced cube. Use the \Kappa\ command \collapse\ with
@@ -1806,7 +1806,7 @@ collapse in=reduced.sdf axis=skylat estimator=sum out=pv
 \end{terminalv}
 You can view your pv map with  \gaia\ or \display.
 
-\subsection{\xlabel{channel}Creating channel maps}
+\section{\xlabel{channel}Creating channel maps}
 \label{sec:channel}
 
 The \Kappa\ application \chanmap\ creates a two-dimensional channel
@@ -1834,7 +1834,7 @@ Channel maps can also be created using \gaia. See
 \myfig{sc20_chanmap}{[h!]}{width=0.8\linewidth}{fig:chanmap}{
    Displaying a channel map with \gaia.}{Displaying a channel map with \gaia.}
 
-\subsection{\xlabel{clumpfinding}Clump finding}
+\section{\xlabel{clumpfinding}Clump finding}
 \label{sec:clumpfind}
 
 The \cupid\ application \findclumps\ can be used to generate a clump
@@ -1895,10 +1895,10 @@ You can plot the clump outlines over an image using \gaia. See Section
 
 
 \clearpage
-\section{\xlabel{gaia}Using GAIA}
+\chapter{\xlabel{gaia}Using GAIA}
 \label{sec:gaia}
 
-\subsection{Removing a baseline with GAIA}
+\section{Removing a baseline with GAIA}
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 \item Select the spectrum you want to use as your template for the entire cube.
@@ -1919,7 +1919,7 @@ edges of these limit lines in the \gaiathing{Spectral plot} window.
 \myfig{sc20_gaia_baseline}{[h!]}{width=0.9\linewidth}{fig:gaiabaseline}{
   Removing a baseline with \gaia.}{Removing a baseline with \gaia.}
 
-\subsection{Creating channel maps with GAIA}
+\section{Creating channel maps with GAIA}
 \label{sec:gaiachannel}
 
 You can display channel maps in \gaia\ by selecting the region of a
@@ -1954,7 +1954,7 @@ display grid.
 \end{enumerate}
 
 
-\subsection{Contouring with GAIA}
+\section{Contouring with GAIA}
 \begin{enumerate}[label=(\textbf{\arabic*})]
 \item  Open the map you wish to contour over.
 
@@ -1995,7 +1995,7 @@ appearance. Open as many new contouring windows as necessary.
 
 \end{enumerate}
 
-\subsection{Overlaying clumps and catalogues with GAIA}
+\section{Overlaying clumps and catalogues with GAIA}
 \label{sec:plotclumps}
 
 \gaia\ can display two- or three-dimensional clump catalogues that
@@ -2049,7 +2049,7 @@ The clumps shown will update as you move through the cube.
 
 \end{enumerate}
 
-\subsection{Displaying average spectrum with GAIA}
+\section{Displaying average spectrum with GAIA}
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 \item Select the \gaiathing{Spectrum} tab in the \gaiathing{Display
@@ -2079,7 +2079,7 @@ averaged spectra gives a much clearer profile of the source.
 
 \end{enumerate}
 
-\subsection{Collapsing your cube with GAIA}
+\section{Collapsing your cube with GAIA}
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
@@ -2106,7 +2106,7 @@ to show your collapse image.
 \myfig{sc20_gaia_collapse}{[h!]}{width=0.9\linewidth}{fig:gaia_collapse}{
   Collapsing your cube using \gaia.}{Collapsing your cube using \gaia.}
 
-\subsection{3D visualisation with GAIA}
+\section{3D visualisation with GAIA}
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 \item Select \gaiathing{View$>$3D Visualisation$>$Iso
@@ -2130,7 +2130,7 @@ the check boxes on the side bar.
 
 
 \newpage
-\section{\xlabel{pipeline}The ACSIS Pipeline}
+\chapter{\xlabel{pipeline}The ACSIS Pipeline}
 \label{sec:pipe}
 
 The ORAC-DR pipeline (\cite{oracdr}) is an generic automated data
@@ -2143,7 +2143,7 @@ subtraction. The data processing is performed using standard \Kappa\
 and \smurf\ routines, the main ones of which have been described in
 previous chapters.
 
-\subsection{\xlabel{recipes}Recipes and primitives}
+\section{\xlabel{recipes}Recipes and primitives}
 \label{sec:recipes}
 
 Reduction recipes in ORAC-DR consist of a series of stand-alone
@@ -2193,7 +2193,7 @@ Smoothing: \newline spatial = 3$\times$3 pixels \newline frequency =
 \end{tabular}
 \end{table}
 
-\subsection{\xlabel{recipes}The process}
+\section{\xlabel{recipes}The process}
 You can follow this commentary via the flow chart in Figure \ref{fig:pipeline}.
 
 Two notations are used in the following list:\\
@@ -2295,10 +2295,10 @@ while `g' refers to a group (or coadded) file.}
 \setlength{\textfloatsep}{20pt plus 1.0pt minus 2.0pt}
 
 \clearpage
-\section{\xlabel{running_pl}Running the pipeline}
+\chapter{\xlabel{running_pl}Running the pipeline}
 \label{sec:runpipe}
 
-\subsection{Checking and changing the science recipe}
+\section{Checking and changing the science recipe}
 \label{sec:changerecipe}
 You can find out which recipe is set in the data header via the
 \param{RECIPE} keyword in the FITS header of any of your raw files.
@@ -2314,7 +2314,7 @@ one on the command line when starting \oracdr. For example:
 % oracdr -file mylist -loop file -log x REDUCE_SCIENCE_GRADIENT
 \end{terminalv}
 
-\subsection{Setting recipe parameters (optional)}
+\section{Setting recipe parameters (optional)}
 \label{sec:recpars}
 
 You can tailor the recipe parameters by supplying a \file{.ini} file
@@ -2343,7 +2343,7 @@ pixel scales. See Appendix \ref{app:params} for a full list of recipe
 parameters.
 
 
-\subsection{Setting quality assurance parameters (optional)}
+\section{Setting quality assurance parameters (optional)}
 \label{sec:qa}
 
 There is a set of quality assurance (QA) parameters that are applied
@@ -2409,7 +2409,7 @@ GOODRECEP=1
 See Appendix \ref{app:qa} for a description of all available QA parameters.
 
 
-\subsection{Specifying bad receptors (recommended)}
+\section{Specifying bad receptors (recommended)}
 \label{sec:badrec}
 
 If certain receptors are known to be bad for the full length of an
@@ -2462,7 +2462,7 @@ flag.]{\small The options available for the \param{-calib
 bad\_receptors} flag when running the pipeline.}
 \end{table}
 
-\subsection{\xlabel{running_pl}Starting the pipeline}
+\section{\xlabel{running_pl}Starting the pipeline}
 \label{sec:runpl}
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
@@ -2562,7 +2562,7 @@ options and their descriptions see \oracdrsun.
 \caption{\small The options available on the command line when running the ORAC-DR pipeline from outside the JAC.}
 \end{table}
 
-\subsection{\xlabel{pl_output}Pipeline output}
+\section{\xlabel{pl_output}Pipeline output}
 
 The pipeline will produce a group file for each object being
 processed. If the pipeline is given data from multiple nights, all
@@ -2635,7 +2635,7 @@ single reduced cube.
 \end{table}
 
 
-\subsection{\xlabel{cadc}Getting your data from CADC}
+\section{\xlabel{cadc}Getting your data from CADC}
 
 The JCMT Science Archive is hosted by The Canadian Astronomy Data
 Centre (CADC). Both raw data and data processed by the science pipeline
@@ -2720,9 +2720,8 @@ PIpeline for Combining and Analyzing Reduced Data},
 
 \newpage
 \appendix
-\section[Appendices]{Appendix}
 
-\subsection{PICARD}
+\chapter{PICARD}
 \label{app:picard}
 There are two \picard\ recipes which can be used with ACSIS data:
 
@@ -2810,10 +2809,10 @@ files are expected but do not appear in your working directory.
 \end{tip}
 
 \newpage
-\subsection{\xlabel{convert}Converting file formats}
+\chapter{\xlabel{convert}Converting file formats}
 \label{app:convert}
 
-\subsubsection{\xlabel{convert}Converting a FITS file to NDF}
+\section{\xlabel{convert}Converting a FITS file to NDF}
 
 A FITS file can be converted to NDF using the \starlink\
 package \convert. Note that the \file{.sdf} file extension NDF may
@@ -2846,7 +2845,7 @@ to attach to your new NDF, a command like the following will do that.
 array components DATA, VARIANCE, and QUALITY through the \param{EXTABLE} file,
 avoiding the \ndfcopy\ and possible \setvar\ steps.
 
-\subsubsection{Converting an NDF file to FITS}
+\section{Converting an NDF file to FITS}
 The \convert\ package can also be used to convert an NDF file to FITS format.
 
 \begin{terminalv}
@@ -2856,7 +2855,7 @@ The \convert\ package can also be used to convert an NDF file to FITS format.
 
 
 \newpage
-\subsection{\xlabel{script}Scripting your reduction}
+\chapter{\xlabel{script}Scripting your reduction}
 \label{app:script}
 You may wish to write a script to process your data rather than
 running each task independently. In this case your script should start
@@ -2870,7 +2869,7 @@ kappa >& /dev/null
 
 
 %\newpage
-\subsection{\xlabel{regrid}Regridding vs resampling}
+\chapter{\xlabel{regrid}Regridding vs resampling}
 \label{app:regrid}
 Regrid vs resample vs rebin
 
@@ -2884,7 +2883,7 @@ Regrid vs resample vs rebin
 
 
 \newpage
-\subsection{\xlabel{clumpfind}Clump finding Algorithms}
+\chapter{\xlabel{clumpfind}Clump finding Algorithms}
 \label{app:clumpfind}
 
 \textbf{GaussClumps}\\Based on the algorithm described by Stutski \&
@@ -2935,7 +2934,7 @@ the configuration options for each algorithm.
 
 
 \newpage
-\subsection{\xlabel{display}Viewing your data with KAPPA}
+\chapter{\xlabel{display}Viewing your data with KAPPA}
 \label{app:display}
 
 This appendix offers a few examples of creating different types of
@@ -2948,7 +2947,7 @@ in the same way.  For full details of all the formatting options as
 well as setting up your graphics device, see the `Plotting Styles and
 Attributes' section in the \xref{\textsc{Kappa} manual}{sun95}{}.
 
-\subsubsection{Setting up xwindows}
+\section{Setting up xwindows}
 \begin{itemize}
 \item Clear my graphics window and reset default values.
 \begin{terminalv}
@@ -2975,7 +2974,7 @@ Ensure white is entry 0 and black in entry 1.
 \end{terminalv}
 \end{itemize}
 
-\subsubsection{Format axes}
+\section{Format axes}
 \begin{itemize}
 \item Use \wcsattrib\ to set how your axes should be formatted. Here
 the format of the first and second axes is set to two decimal places
@@ -2997,7 +2996,7 @@ units to $0^h00^m00^s$ and Dec. units to $00'00''$.
 
 \newpage
 
-\subsubsection{Plotting a two-dimensional image}
+\section{Plotting a two-dimensional image}
 
 \begin{itemize}
 \item Display map.sdf. Do draw axes and a border, but do not draw a
@@ -3075,7 +3074,7 @@ details.
 
 \end{itemize}
 
-\subsubsection{Plotting spectra}
+\section{Plotting spectra}
 
 \begin{itemize}
 \item Plot the spectra from cube.sdf at the position
@@ -3126,7 +3125,7 @@ The plus sign means the change will not be remembered next time
   Displaying two super-imposed spectra with \Kappa:\display.}{
   Displaying two super-imposed spectra with \Kappa:\display.}
 
-\subsubsection{Plotting a grid of spectra}
+\section{Plotting a grid of spectra}
 \begin{itemize}
 \item To plot multiple spectra from a cube you can use \clinplot.
 
@@ -3146,7 +3145,7 @@ attributes.
 %\clinplot.}
 
 
-\subsubsection{Plotting two images side by side}
+\section{Plotting two images side by side}
 
 \begin{itemize}
 \item Create a 2$\times$1 grid of frames.
@@ -3189,7 +3188,7 @@ super-imposed spectra with \Kappa:\display.}
 \end{itemize}
 
 
-\subsubsection{Selecting a different graphics device}
+\section{Selecting a different graphics device}
 
 \begin{itemize}
 \item You can view all available graphics devices with \param{gdnames}.
@@ -3226,7 +3225,7 @@ application can distinguish it from the other options. E.g.
 
 
 \newpage
-\subsection{\xlabel{params}Recipe Parameters}
+\chapter{\xlabel{params}Recipe Parameters}
 \label{app:params}
 
 The recipes REDUCE\_SCIENCE\_GRADIENT and REDUCE\_SCIENCE\_NARROWLINE
@@ -3369,7 +3368,7 @@ HIGHFREQ\_RINGING\_MIN\_SPECTRA & Minimum number of good spectra for ringing fil
 
 
 \newpage
-\subsection{\xlabel{qa}Quality Assurance Parameters}
+\chapter{\xlabel{qa}Quality Assurance Parameters}
 \label{app:qa}
 Quality assurance parameters are supplied via the command line option
 \param{-cal qaparams=<qa.ini>}. For an example QA parameters file see
