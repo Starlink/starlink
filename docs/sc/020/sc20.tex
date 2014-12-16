@@ -219,14 +219,14 @@ To see the ADAM parameters, run \hdstrace\ on any of the parameter
 files. For example, to see which parameters were used and the results
 from last time you ran \stats, you can type the following from
 anywhere on your system:
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+
+\begin{terminalv}
 % hdstrace ~/adam/stats
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
+
 This will report the following
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 STATS  <STRUC>
    ADAM_DYNDEF    <DEFAULTS>      {structure}
    COMP           <_CHAR*132>     'DATA'
@@ -239,7 +239,7 @@ STATS  <STRUC>
    SIGMA          <_DOUBLE>       0.72429928153974
     ..               ..                 ..
     ..               ..                 ..
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 \vspace{0.3cm}
 You can see \stats\ was run on the data array with ordered statistics
@@ -247,11 +247,9 @@ as well as the resulting values. Any of the parameters returned by
 running \hdstrace\ on an ADAM file can be extracted using the command
 \task{parget}. In the example below, the mean value from the last
 instance of \task{stats} is printed to the screen.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % parget mean stats
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 \textbf{Extracting a value for scripting:}\\
 \parget\ is designed to make life easier when passing values between
@@ -291,18 +289,14 @@ for any NDF (raw or reduced). This extensive list includes dates \&
 times, source name, observation type, band width, number of channels,
 receptor information, exposure time, start and end elevation and
 opacity. In the example below, just the object name is extracted.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % fitslist file | grep OBJECT
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 Likewise, if you know the name of the parameter you want to view you can
 use the \fitsval\ command instead, e.g.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % fitsval file OBJECT
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 \end{minipage}
 \vspace{0.7cm}\\
 \begin{minipage}[t]{0.12\linewidth}
@@ -312,12 +306,9 @@ use the \fitsval\ command instead, e.g.
 \task{ndftrace} displays the attributes of the NDF data structure.
 This will tell you, for example, the units of the data, pixel bounds,
 dimensions and axis assignations.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ndftrace map fullframe fullwcs
-
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 \end{minipage}
 
 \begin{minipage}[t]{0.12\linewidth}
@@ -329,20 +320,16 @@ dimensions and axis assignations.
 structure of a time-series cube, including the pixel origin of the
 data structure. To show just the first $x$ lines of values for each
 parameter include the option \param{nlines=x} on the command line:
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % hdstrace file nlines=3
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 Otherwise to see all the lines and information that is available in
 each extension use \param{nlines=all}. The example below displays all
 the system temperature values and pipes the result to `less' to make
 viewing easier.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % hdstrace file.MORE.ACSIS.TSYS nlines=all | less
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 \end{minipage}
 \vspace{0.4cm}
 
@@ -354,14 +341,9 @@ Full details of \ndftrace\ and \fitslist\ can be found in the
 \xref{\textsc{Kappa} manual}{sun95}{}. Details on \hdstrace\ can be
 found in the \xref{\textsc{hdstrace} manual}{sun102}{}.
 
-\begin{latexonly}
-\begin{center}
-\begin{fmpage}{0.95\linewidth}
-\vspace{0.1cm}
-TIP: The `.sdf' extension on filenames is not required when running Starlink commands.
-\end{fmpage}
-\end{center}
-\end{latexonly}
+\begin{tip}
+The `.sdf' extension on filenames is not required when running Starlink commands.
+\end{tip}
 
 
 \subsection{What has already been done to the data?}
@@ -374,11 +356,9 @@ data went into it. Two \Kappa\ commands can help you with this:
 \textbf{hislist}
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}The \Kappa\ command \hislist\ will return the history records of the NDF.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % hislist myfile brief
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 Including the \param{brief} option returns a simple list of the
 commands. Omitting this will include the text associated with each
 command and can be useful for finding out what parameters were used in
@@ -395,11 +375,9 @@ step is also reported.
 The \Kappa\ command \task{provshow} displays the details of the NDFs
 that were used in the creation of the given file. It includes both
 immediate parents and older ancestor NDFs.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % provshow file
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 \end{minipage}
 \vspace{0.7cm}\\
 
@@ -418,11 +396,9 @@ the axes themselves are separated by a comma. Note that the use of
 quotes is necessary on a UNIX shell command line but not in response
 to a prompt.
 
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % stats `cube(10.5:10.0,0.0:0.25,-25:25)'
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 The bounds are given in the coordinates of the data (Galactic for Axes
 1 and 2 and velocity for Axis 3). You can find the number and names of
 the axes along with the pixel bounds of your data file by running
@@ -433,30 +409,24 @@ velocity. In the velocity axes one pixel is one channel. To leave an
 axis untouched simply include the comma but do not specify any bounds.
 
 To define your bounds in FK5 coordinates use the following format.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % stats `cube(22h18m:22h32m,05d:05d30m,)'
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 To write a section of your data into a new file (called
 \file{newcube.sdf} in the example below) use \ndfcopy\ with bounds.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ndfcopy `cube(10.5:10.0,0.0:0.25,-25:25)' newcube title="l=10.5 sub-section"
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 Here the option \param{title} defines a title for the new cube which
 replaces the title derived from the original.
 
 You can also define a region as a number of pixels from a given
 origin. The example below extracts a 25$\times$25 pixels cube around
 the position $l=10^\circ$, $b=0^\circ$.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ndfcopy `cube(10.0~25:0.0~25,)' newcube
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 \begin{latexonly}
 \begin{center}
@@ -821,11 +791,9 @@ subscans to avoid a file size $>$512\,GB.
 Use the \starlink\ application \gaia\ to visualise your raw data. The
 is initiated by:
 
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % gaia rawfile
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 Loading a file in \textsc{Gaia} produces two windows (see
 \cref{Figure}{fig:rawgaia}{the first figure below}). The main window
@@ -885,20 +853,16 @@ being referred to; here the first (spectra) and third (time) axes are
 unchanged so no range is defined. You will have to repeat the command
 for non-contiguous receptor numbers.
 
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % chpix in=raw out=raw_masked section="',7:8,'" newval=bad
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 You can also mask a subset of the time stream for a particular
 receptor. The example below masks out time steps 18 to 33 for receptor
 H01. See Figure \ref{fig:maskreceptor} for instructions on how to
 identify the affected time range.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % chpix in=raw out=raw_masked section="',1:1,18:33'" newval=bad
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 Note that the numbering for the 16 receptors here is 1--16; this is in
 contrast to 0--15 that you will encounter with the pipeline.
 
@@ -941,8 +905,7 @@ introduce the various parameters with which to tailor your reduction.
 
 \subsection{\xlabel{makecube}Running Makecube}
 The \smurf\ application used for regridding your raw data is  \makecube.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makecube in=a20070505_00041_01_0001.sdf out=cube auto
 
 Processing data from instrument 'HARP' for object 'W49' from the following
@@ -963,8 +926,7 @@ observation  :
         Right ascension: 19:10:09.156 -> 19:10:17.259
         Declination: 9:05:16.90 -> 9:07:16.90
         Radio velocity (LSB): -443.8134 -> 464.2568 km/s
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 The \param{autogrid} option (just defined by \param{auto}) allows the
 software to determine the optimal projection parameters for
@@ -1007,19 +969,15 @@ full path if they are not in the local directory.
 
 When you pass an ASCII file to \makecube\ (and any \starlink\ command)
 you should prefix the filename with an up-caret (\,\^\,).
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makecube in=^filelist.txt
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 Alternatively you can use wild cards. The example below reads in all
 the raw files for observation 10.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makecube in=rawdata/a20140101_00010\*
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 
 \subsection{Makecube Options}
@@ -1030,11 +988,9 @@ To save disk space and processing time you can specify the region of
 the spectra to be processed with \param{specbounds}. If you know your
 line lies close to 0 km/s you may chose to process only the central
 100 km/s as in the example below.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 %  makecube rawfile specbounds=\"-50.0 50.0\"
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 \subsubsection{Masking receptors}
 
@@ -1061,19 +1017,15 @@ To make a cube with only certain receptors you can use the
 either include or exclude specific receptors without the need for
 masking. The example below makes a map using all receptors except H04
 and H11.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makecube in=rawfile autogrid out=map detectors=`"-H04,H11"'
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 This alternative example makes a map using only receptor H10. Maps
 made with single receptors may be used to evaluate the
 receptor-to-receptor flat-field.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makecube in=rawfile autogrid out=map detectors=`"H10"'
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 
 \subsubsection{Defining an output grid}
@@ -1081,11 +1033,9 @@ receptor-to-receptor flat-field.
 You can use the \param{ref} option to define an NDF which is used to
 define an output grid. This NDF can even be in two-dimensions even
 though your data may be in three-dimensions.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makecube in=rawfile ref=myreffile
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 If you do not supply a reference file \makecube\ will revert to the
 \param{autogrid} option.
@@ -1106,11 +1056,9 @@ for a full description of each of these parameters.
 There are several regridding options available to you through the
 \makecube\ command. These are specified with the \param{spread}
 parameter on the command line. E.g.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makecube in=rawfile spread=sincsinc params="[6,9]"
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 The default method is \param{Nearest} which assigns the input pixel
 completely to the nearest output pixel. This is the fastest method
@@ -1199,11 +1147,9 @@ which would be mostly empty. Then one can use the \makecube\ parameter
 \param{sparse}. When \param{sparse=true} a one-dimensional array is
 created which stacks spectra in the order in which they were observed
 (from left to right when viewed with \gaia).
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % smurfhelp makecube param sparse
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 This is generates a one-dimensional array where spectra are displayed by
 \gaia\ in the order where they were observed (from left to right).
 
@@ -1219,11 +1165,9 @@ associated with a single input NDF, the positions for the first time
 slice come first, followed by the positions for the second time slice,
 etc.
 
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % makecube in=rawfiles outcat=cat
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 The catalogue produced will be in FITS format. In the example above a
 file called \file{cat.FIT} is created. When viewing your map with \gaia\ this
@@ -1257,22 +1201,18 @@ or the median of the input pixels within the filter box. The box size
 can be set to 1 for dimensions which do not require smoothing. In the
 example below the spatial pixels remain untouched while the velocity
 axis is smoothed using a box of 5 channels.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % block in=mycube out=rebinnedcube box="[1,1,5]"
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 Two-dimensional NDFs can also be smoothed using \gausmooth. This
 smooths using a symmetrical Gaussian point spread function (PSF) of
 specified width(s) and orientation. Each output pixel is the
 PSF-weighted mean of the input pixels within the filter box.
 
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % gausmooth in=mymap out=smoothedmap fwhm=3
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 Note that the \param{fwhm} option is given in the number of pixels.
 For example, to smooth a map with 4$''$ pixels by a 12$''$ Gaussian
 you would set \param{fwhm=3}.
@@ -1285,11 +1225,9 @@ your cube. You can specify the ranges to fit via the \param{ranges}
 parameter, or you can allow them to be determined automatically
 (\param{auto}).
 
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % mfittrend in=cube ranges=\"-50 -10 80 160\" order=1 axis=3 out=baselinedcube
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 If using automatic range determination you should set the
 \param{numbin} option. This is the number of bins in which to compress
@@ -1323,44 +1261,34 @@ smoothing is quite aggressive with a box filter of 5 pixels along the
 spatial axes and 15 pixels along the frequency axis. This is to really
 pull out all emission features. You can tweak these to suit your data,
 e.g a narrower box might be needed if you have very narrow lines.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % block in=cube out=temp1 box="[5,5,15]" estimator=mean
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 \item Perform \mfittrend\ on your smoothed cube with a high-order
 polynomial and automatic range determination.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % mfittrend in=temp1 out=temp2 axis=3 order=3 auto method=single \
   variance subtract=false mask=blmask
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 \item Add the baseline mask to your original unsmoothed cube.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % add in1=cube in2=blmask out=temp3
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 \item Perform \mfittrend\ on your masked unsmoothed cube with a
 lower-order polynomial. This time fit the full range by setting
 \param{auto=false}.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % mfittrend in=temp3 out=temp4 axis=3 order=1 auto=false ranges=\! \
   method=single variance=true subtract=false
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 \item Subtract the baseline from the original unsmoothed cube.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % sub in1=cube in2=temp4 out=baselinedcube
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 \end{enumerate}
 
 \textbf{What about findback?}\\*
@@ -1396,12 +1324,10 @@ collapse range for a valid output pixel to be generated. You may find
 you need to reduce the value for \param{wlim} below its default of 0.3
 for some data.
 
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % collapse in=cube axis=vrad estimator=integ variance=true low=-5.0 high=10.0 \
   wlim=0.5 out=integmap
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 If you do not know the axis name you can give the number instead
 (1=RA, 2=Dec, 3=vrad).
 \\*\\*
@@ -1415,41 +1341,31 @@ than 3\,$\sigma$.
 Specify the 3\,$\sigma$ limit in your configuration file. See Section
 \ref{sec:clumpfind} for more details on clump-finding and Section
 \ref{sec:noise} for how to determine your RMS.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % findclumps in=cube rms=<medianrms> config=^myconfig.dat \
   method=clumpfind out=temp1 outcat=mycat deconv=no
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 \item Divide the map by itself to create a clump mask that has clump
 regions set to 1.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % div in1=temp1 in2=temp1 out=temp2
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 \item Set the bad data to zero using \Kappa:\nomagic.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % nomagic in=temp2 out=temp3 repval=0
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 \item Multiply your reduced cube by the clump mask.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % mult in1=cube in2=temp3 out=maskedcube
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 \item Collapse your masked reduced cube.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % collapse in=maskedcube out=integ estimator=integ wlim=0.1 variance
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 \end{enumerate}
 
 \subsubsection{Moments Maps}
@@ -1487,11 +1403,9 @@ and historical numbers.
 
 You can use the \Kappa\ command \cmult\ to multiply any NDF by a constant.
 
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % cmult in=harpcube 0.63 out=harpcube_Tmb
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 \subsection{\xlabel{rebin}Changing the pixel size}
 \label{sec:rebin}
@@ -1501,11 +1415,9 @@ allow direct comparison with data from other observatories. In the
 example below a JCMT map is regridded and aligned to match a Herschel
 map. See Appendix \ref{app:convert} for instructions on converting
 your FITS file to NDF format.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsalign in=jcmtmap out=regridmap lbnd=! ubnd=! ref=herschelmap rebin conserve=f
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 Alternatively, to resample your data onto smaller pixels you should
 use the \Kappa\ command \sqorst. In the example below 'map' has a
@@ -1513,20 +1425,16 @@ pixel size of 8$''$, while `resamplemap' has a pixel size of 4$''$ --
 the number of pixels has been doubled by applying a factor of 2 to the
 spatial axes. A factor of 1 was applied to the frequency (third) axis
 leaving it unchanged.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % sqorst in=map out=resamplemap factors="[2,2,1]" conserve
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 \param{mode=factors} is the default setting so it was not specified in
 the example above. The example below however, uses
 \param{mode=pixelscale} to define a pixel size for the third axis;
 here the spectra are rebinned into 2\,km/s channels.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % sqorst in=map out=resamplemap mode=pixelscale pixscale=2 axis=3
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 Remember you can check your current pixel size and channel spacing
 with \ndftrace\ (see \cref{Section}{sec:fitslist}{How can I view the
@@ -1540,11 +1448,9 @@ heavy work for your processor so you may wish to make individual cubes
 and combine them during post-processing. To coadd multiple reduced
 maps you should use \wcsmosaic.
 
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsmosaic in=^maplist out=mosaic lbnd=! ubnd=! variance
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 By selecting the lower bound (\param{lbnd}) and upper bound
 (\param{ubnd}) to be default (!) you are including all of the input
 tiles. You can change these if you want to only mosaic a sub-region of
@@ -1591,30 +1497,24 @@ both two- and three-dimensional data.
 \gaia. See Figure \ref{fig:ardmask} for an illustrated guide.
 
 \item Trim off the third axis from your mask using \ndfcopy.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ndfcopy mask trim trimwcs
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 \item Apply the saved ARD mask to your map. Setting
 \param{inside=false} will mask the pixels outside rather than inside
 your mask. The masked pixels will appear blank when you open it with
 \gaia; see the left-hand panel of Figure \ref{fig:crop}.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ardmask map inside=false ard=ardmask.txt out=maskmap
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 \item Trim off the blank pixels using \ndfcopy\ with the
 \param{trimbad} option. This leaves just your selected region; see the
 right-hand panel of Figure \ref{fig:crop}.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ndfcopy maskmap trimbad
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 \end{enumerate}
 
 An alternative method is to use \ndfcopy\ while defining the section
@@ -1626,11 +1526,9 @@ subset of your data}.
 If you wish to extract only a region which overlaps with an existing
 file you have, e.g. from a different observing campaign or telescope,
 you can also use \ndfcopy\ but with the \param{like} option.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ndfcopy in_full out_cropped like=map2 likewcs
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 The shape of the file supplied by \param{like} will determine the
 shape of the output file. This shape can be in either pixel indices or
 the current WCS Frame. If the WCS Frame is required, include the
@@ -1638,7 +1536,6 @@ parameter \param{likewcs} to the command line otherwise it can be
 omitted.
 
 
-\begin{latexonly}
 \begin{figure}[ht!]
 \begin{center}
 \begin{fmpage}{0.99\linewidth}
@@ -1653,11 +1550,9 @@ Open your map with \gaia.
 \end{minipage}
 \hspace{0.2cm}
 \begin{minipage}[c]{0.72\linewidth}
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % gaia map
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 \end{minipage}
 
 \vspace{0.5cm}
@@ -1707,7 +1602,6 @@ ARD description} to save your ARD mask for later use.
 region using \gaia.}
 \label{fig:ardmask}
 \end{figure}
-\end{latexonly}
 
 
 \begin{figure}[h!]
@@ -1745,11 +1639,9 @@ The scale length should have a value about half the size of the
 largest region of bad data to be replaced.  Since the largest bad
 regions apart from the cube peripheries are two pixels across, a size
 of 1 is appropriate.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % fillbad in=holeymap out=filledmap  size="[1,1,0]"
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 \cref{Figure}{fig:fillholes}{The figure below} shows an initial map
 with holes and the final filled map.
 
@@ -1770,11 +1662,9 @@ root of the Variance component (hereafter referred to as the error
 component\footnote{No such component exists in the NDF.}) although
 bright emission will still increase your noise. You can select the
 error component with \param{comp=err} on the command line.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % stats file comp=err order
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 Including the option \param{order} allows the ordered statistics such
 as the median and percentiles to be reported. Note that percentile
 options will need to be specified via the \param{percentiles}
@@ -1796,11 +1686,9 @@ You can plot the noise or error component of your map using the
 \textsc{Kappa} command \histogram. This allows you to visualise the
 distribution with more ease. Again the \param{comp=err} option is
 used.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % histogram mosaic comp=err range=! numbin=200
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 The output is shown in \cref{Figure}{fig:noihisto}{the graphic below}.
 An alternative to setting the number of bins via the \param{numbin}
 parameter is to set the width of each bin using the \param{width}
@@ -1863,46 +1751,36 @@ the first two axes of the frame having sky coordinates and the third
 axis having dual side-band spectral units. You can check this with
 \ndftrace:
 
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ndftrace file.sdf | grep Domain
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 You can change the attributes of a cube using \wcsattrib. To change
 the SkyFrame coordinate system set the \param{system} attribute.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsattrib file.sdf set system galactic
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 To change between velocity and frequency you also use the
 \param{system} attribute. For SKY-DSBSPECTRUM the software knows which
 axis is being referred to based on the option you supply (the third in
 this case).
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsattrib file.sdf set system freq
 % wcsattrib file.sdf set system vrad
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 Once a cube has been collapsed and is two-dimensional its frame
 becomes SKY. If you need to change frames manually use \wcsframe.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsframe file sky
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 For offset coordinates you will need to set the system
 \param{skyrefis} to origin. The final two lines in the example below
 convert the offset units to arcseconds instead of radians.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsattrib file.sdf set skyrefis origin
 % wcsattrib file set 'format(1)' 's.*'
 % wcsattrib file set 'format(2)' 's.*'
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 %
 %\subsection{\xlabel{despike}Despiking}
@@ -1921,27 +1799,21 @@ convert the offset units to arcseconds instead of radians.
 \subsection{\xlabel{hybrid}Hybrid Data}
 
 To merge two hybrid observations first do \wcsalign\ on both files.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsalign in="'rawfile_01.sdf,rawfile_02.sdf'" insitu lbnd=! ubnd=! ref=!
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 Next trim each sub-system to remove noisy ends of the spectra in the
 overlap region. You can get the pixel bounds from \ndftrace\ (here
 1024). The example below trims 35 channels from the `left' of
 rawfile\_01 and 24 channels from the `right' of rawfile\_02.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ndfcopy in='rawfile1_01(35:1024,,)'
 % ndfcopy in='rawfile_02(0:1000,,)'
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 These can then be merged using \wcsmosaic.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsmosaic in='"rawfile1,rawfile2"' out=rawfile12 lbnd=! method=nearest accept
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 You should check the final spectra to make sure there is no noise bump
 in the middle where they overlap.
 
@@ -1951,11 +1823,9 @@ You can create a position-velocity map by collapsing over the skylat
 axis of a reduced cube. Use the \Kappa\ command \collapse\ with
 \param{axis=skylat}:
 
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 collapse in=reduced.sdf axis=skylat estimator=sum out=pv
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 You can view your pv map with  \gaia\ or \display.
 
 \subsection{\xlabel{channel}Creating channel maps}
@@ -1969,19 +1839,15 @@ ranges. The arrangement of the resulting panels is determined by the
 shape parameter. The collapsed slices are tiled with no margins to
 form the final image.
 
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % chanmap in=cube axis=3 low=-10 high=5 nchan=6 shape=3 estimator=mean
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 This grid of channel maps is filled from left to right, and bottom to
 top. It can be viewed with \gaia\ (see Figure \ref{fig:chanmap}) or
 with \display.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % display chanmap mode=faint noaxes lut=/star/bin/kappa/smooth3_lut.sdf
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 Channel maps can also be created using \gaia. See
 \cref{Section}{sec:gaiachannel}{Channel maps} for instructions.
@@ -2004,12 +1870,10 @@ and as a NDF pixel mask showing the clump boundaries (see Figure
 \ref{fig:clumps2}). See Appendix \ref{app:clumpfind} for descriptions
 of the various algorithms.
 
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % findclumps in=map.sdf out=clumpmap.sdf outcat=clumps.FIT logfile=clumps.log \
   config=^myconfig.dat method=clumpfind rms=0.2 shape=polygon
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 The shape option allows \findclumps\ to create and STC-S description
 (polygonal or elliptical) for each clump found. These are added as
@@ -2438,7 +2302,7 @@ new \textbf{g\_cube}.
 \item Return to step 8.
 \end{enumerate}
 
-\setlength{\intextsep}{10.0pt plus 1.0pt minus 2.0pt}
+%\setlength{\intextsep}{10.0pt plus 1.0pt minus 2.0pt}
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=0.55\linewidth]{sc20_pipeline}
@@ -2461,20 +2325,16 @@ while `g' refers to a group (or coadded) file.}
 You can find out which recipe is set in the data header via the
 \param{RECIPE} keyword in the FITS header of any of your raw files.
 You can use either of the options below:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % fitsval s8a20120725_00045_0003 RECIPE
 % fitslist s8a20120725_00045_0003 | grep RECIPE
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 You can override the recipe set in the FITS header by listing any different
 one on the command line when starting \oracdr. For example:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % oracdr -file mylist -loop file -log x REDUCE_SCIENCE_GRADIENT
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \subsection{Setting recipe parameters (optional)}
 \label{sec:recpars}
@@ -2487,7 +2347,7 @@ followed by the options you wish to specify in the following format:
 
 \vspace{0.2cm}
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 [REDUCE_SCIENCE_NARROWLINE]
 MOMENTS_LOWER_VELOCITY = -30.0
 MOMENTS_UPPER_VELOCITY = 155.0
@@ -2496,7 +2356,7 @@ SPREAD_METHOD = gauss
 SPREAD_WIDTH = 9
 SPREAD_FWHM_OR_ZERO = 6
 REBIN = 2
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 Notice the two values given for the \param{PIXEL\_SCALE} option. This
@@ -2522,7 +2382,7 @@ highlights some of the main parameters you may consider tweaking.
 
 \vspace{0.2cm}
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 [default]
 BADPIX_MAP=0.1
 GOODRECEP=8
@@ -2531,7 +2391,7 @@ FLAGTSYSBAD=0.5
 TSYSMAX=550
 TSYSVAR=1.0
 RMSVAR_RCP=0.5
- \end{verbatim}
+ \end{terminalv}
 \end{quote}
 The text in the square brackets describes the data to which the QA
 parameters should be applied. This is followed by the QA parameters
@@ -2553,7 +2413,7 @@ those specified in the default \file{qa.ini} file.
 \begin{center}
 \vspace{0.2cm}
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 [C18O32]
 RES_CHAN=10
 VELRES=1.0
@@ -2564,7 +2424,7 @@ RES_CHAN=10
 VELRES=0.5
 TSYSBAD=550
 GOODRECEP=1
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 \end{center}
 
@@ -2630,11 +2490,9 @@ bad\_receptors} flag when running the pipeline.}
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
 \item Initialise the pipeline software.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % oracdr_acsis -cwd
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 \item Define environment variables to ensure the data is read from,
 and written to, the right place. Many are set automatically when the
@@ -2642,12 +2500,10 @@ pipeline is initialised but others must be set manually. Details of
 the optional variables are given in \pipelinesun\ but you should
 specify where to find the raw data and where to write any files that
 are created.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv ORAC_DATA_IN <path to raw data>
 % setenv ORAC_DATA_OUT <where you want reduced data to go>
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 If you are supplying a text file listing the raw data
 \param{\$ORAC\_DATA\_IN} should be the location of this file. If
@@ -2656,28 +2512,23 @@ location.
 
 If you wish to keep the intermediate files produced by the pipeline
 you should also set \param{ORAC\_KEEP}.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv ORAC_KEEP 1
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 However, this still excludes oractemp files. To retain these set
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv ORAC_KEEP temp
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 
 \item Now you are ready to run the pipeline. In this example, the
 recipe name on the end ensures that all data being processed using
 REDUCE\_SCIENCE\_NARROWLINE.
 
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % oracdr -files list.txt -loop file -batch -log xf -calib qaparams=myqa.ini \
-  bad_receptors=index -recpars mypar.ini -nodisplay REDUCE_SCIENCE_NARROWLINE
-\end{verbatim}
-\end{myquote}}
+  bad_receptors=index -recpars mypar.ini -nodisplay
+REDUCE_SCIENCE_NARROWLINE
+\end{terminalv}
 \end{enumerate}
 
 Below is a list of commonly used command line options when running the
@@ -2764,11 +2615,9 @@ computer memory. It does this from the central position outwards so
 you may find some of the smaller edge tiles are strange, often narrow,
 rectangles. These tiles can be pasted together with the \Kappa\
 command paste but beware of the final file size. E.g.
-{\color{MidnightBlue}\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % paste ga20140601_15_1_reduced\*.sdf tiledmap
-\end{verbatim}
-\end{myquote}}
+\end{terminalv}
 Note, there is a recipe parameter CHUNKSIZE which adjusts the maximum
 tile size. If you make it larger than 512 it is possible to generate a
 single reduced cube.
@@ -2957,9 +2806,9 @@ with \wcsmosaic.
 \textbf{Running PICARD recipes}\\
 There are a number of options available when running \picard\ recipes.
 The example below illustrates most of them.
-{\color{MidnightBlue}\begin{myquote}
+\begin{terminalv}
 \texttt{\% picard -recpars params.ini MOSAIC\_JCMT\_IMAGES \`{}cat myfilelist.lis\`{} -log sfx}
-\end{myquote}}
+\end{terminalv}
 
 \begin{itemize}
 \item The recipe parameters are listed in a file called \file{params.ini}.
@@ -3020,12 +2869,10 @@ A FITS file can be converted to NDF using the \starlink\
 package \convert. Note that the \file{.sdf} file extension NDF may
 be omitted to save typing.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % convert
 % fits2ndf file.fits file.sdf
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Unless your FITS file is from a recognised source, \fitstondf\ puts the
 various FITS extensions into NDF extensions called FITS\_EXT\_$<n>$,
@@ -3034,20 +2881,16 @@ located in the top-level MORE component of the NDF. If one of these is
 the array you want---it should be an NDF too---it will be easier to
 handle if you copy out of the NDF extension to its own NDF.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ndfcopy in=file.more.fits_ext_1 out=file_data
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 If there is a variance array stored in another extension that you want
 to attach to your new NDF, a command like the following will do that.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setvar ndf=file_data from=file.more.fits_ext_2
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \task{fits2ndf} does offer a way of mapping FITS extensions to familiar NDF
 array components DATA, VARIANCE, and QUALITY through the \param{EXTABLE} file,
@@ -3056,12 +2899,10 @@ avoiding the \ndfcopy\ and possible \setvar\ steps.
 \subsubsection{Converting an NDF file to FITS}
 The \convert\ package can also be used to convert an NDF file to FITS format.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % convert
 % ndf2fits file file.fits
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 
 \newpage
@@ -3070,14 +2911,12 @@ The \convert\ package can also be used to convert an NDF file to FITS format.
 You may wish to write a script to process your data rather than
 running each task independently. In this case your script should start
 with:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 #!/bin/csh -f
 source /star/etc/login >& /dev/null
 source /star/etc/cshrc >& /dev/null
 kappa >& /dev/null
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 
 %\newpage
@@ -3162,38 +3001,28 @@ Attributes' section in the \xref{\textsc{Kappa} manual}{sun95}{}.
 \subsubsection{Setting up xwindows}
 \begin{itemize}
 \item Clear my graphics window and reset default values.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % gdclear
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 \item Set my display device to xwindows.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % gdset xw
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 \item Create an xwindow of the desired dimensions.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % xmake -width 1500 -height 1000 xwindows
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 \item To create a display window which plots black on a white
 background, change the order of black and white in the palette list
 for your graphics device. Check this using \gdstate.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % gdstate
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Ensure white is entry 0 and black in entry 1.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % palentry 0 White
 % palentry 1 Black
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 \end{itemize}
 
 \subsubsection{Format axes}
@@ -3202,26 +3031,21 @@ Ensure white is entry 0 and black in entry 1.
 the format of the first and second axes is set to two decimal places
 for Galactic coordinates. Find out more about the format option under
 \wcsattrib\ in the \xref{\textsc{Kappa} manual}{sun95}{}.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsattrib map set format"(1)" .2
 % wcsattrib map set format"(2)" .2
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \item For FK5 coordinates you can use the same method to set exactly
 how the coordinates should be displayed. The example below sets R.A.
 units to $0^h00^m00^s$ and Dec. units to $00'00''$.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % wcsattrib fk5map set format"(1)" ghms
 % wcsattrib fk5map set format"(2)" gdms
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 \end{itemize}
-\begin{latexonly}
+
 \newpage
-\end{latexonly}
 
 \subsubsection{Plotting a two-dimensional image}
 
@@ -3229,11 +3053,9 @@ units to $0^h00^m00^s$ and Dec. units to $00'00''$.
 \item Display map.sdf. Do draw axes and a border, but do not draw a
 title or a grid. The default cut parameters for \param{mode=scale}
 include all the data.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % display map border axes style='"drawtitle=0,grid=0"' mode=scale
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 Depending on your default settings you may get a map like the one below.
 
 \myfig{sc20_display1}{[h!]}{width=0.475\linewidth}{fig:display1}{
@@ -3241,11 +3063,9 @@ Depending on your default settings you may get a map like the one below.
   First attempt at displaying an integrated map with \Kappa:\display.}
 
 \item Re-draw calling a style file and changing the scaling.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % display integ.sdf axes style=^style.dat mode=scale low=0 high=100
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \myfig{sc20_display2}{[h!]}{width=0.475\linewidth}{fig:display2}{
   Displaying an integrated map with \Kappa:\display\ using a style file.}{
@@ -3256,7 +3076,7 @@ Below is a copy of the style file (style.dat) used to make
 \cref{Figure}{fig:display2}{the figure above}.
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 border=1
 tickall=1
 majticklen=0.01
@@ -3270,16 +3090,14 @@ size(textlab)=1.5
 nogrid=1
 textlabgap(1)=0.01
 textlabgap(2)=0.01
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 \item Make the colour scale negative and then replot.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % lutneg
 % display integ.sdf axes style=^style.dat mode=scale low=0 high=100
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \myfig{sc20_display9}{[h!]}{width=0.47\linewidth}{fig:display9}{
   Reversing the colour scale in \Kappa:\display.}{
@@ -3287,11 +3105,9 @@ textlabgap(2)=0.01
 
 \item There are a number of colour palettes available in Starlink. You
 can find them in the /star/bin/kappa/ directory.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % ls /star/bin/kappa/*lut.sdf
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 You can create your own colour scheme using the \Kappa\ routine
 \lutedit. See the \xref{\textsc{Kappa} manual}{sun95}{} for more
@@ -3299,12 +3115,10 @@ details.
 
 \item Replot in colour by selecting one of these palettes via the
 \param{lut} option.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % display integ.sdf axes style=^style.dat mode=scale low=0 high=100 \
   lut=/star/bin/kappa/random3_lut.sdf
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 \myfig{sc20_display10}{[h!]}{width=0.5\linewidth}{fig:display10}{
   Displaying an integrated map in colour with \Kappa:\display.}{
   Displaying an integrated map in colour with \Kappa:\display.}
@@ -3317,11 +3131,9 @@ details.
 \item Plot the spectra from cube.sdf at the position
 $l$=60.87$^\circ$, $b$=0.18$^\circ$. Use existing style.dat except
 override the text label size which is too big for these axes labels.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % linplot "cube(60.87,0.18,)" style="'^style.dat,size(textlab)=1'"
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \myfig{sc20_display3}{[h!]}{width=0.55\linewidth}{fig:display3}{
   Displaying a spectrum with \Kappa:\display.}{
@@ -3329,19 +3141,15 @@ override the text label size which is too big for these axes labels.
 
 \item Re-plot, but this time only show the velocity range 10 to 35
 km/s. You can do it this way:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % linplot "cube(60.87,0.18,-10:50)"  style="'^style.dat,size(textlab)=1'" \
   mode=histogram
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 or using \param{xleft} and \param{xright}.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % linplot "cube(60.87,0.18,10:35)"  style="'^style.dat,size(textlab)=1'" \
   mode=histogram xleft=10 xright=35 lmode='"Extend,15,15"'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 In the example above, the additional option \param{lmode} is included.
 This sets how the upper and lower limits for the y-axis are defined.
 This example expands the minimum and maxiumum values by 15\% of the
@@ -3358,12 +3166,10 @@ The formatting defaults to the last time \linplot\ was run, but with
 the one-off temporary change of setting the colour of the line to red.
 The plus sign means the change will not be remembered next time
 \linplot\ is run.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % linplot "cube2(60.87,0.18,-10:50)" mode=hist style="+colour(line)=red" \
   noclear
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 \end{itemize}
 
 \myfig{sc20_display5}{[h!]}{width=0.55\linewidth}{fig:display5}{
@@ -3374,12 +3180,10 @@ The plus sign means the change will not be remembered next time
 \begin{itemize}
 \item To plot multiple spectra from a cube you can use \clinplot.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % clinplot "cube(61.06~4,0.15~4,0:40)" nokey style=^style.dat \
   specstyle="'colour(textlab)=black,colour(numlab)=black'"
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 This example plots a grid of 4$\times$4 pixels around $l=61.06^\circ$
 and $b=0.15^\circ$. Each spectra has a range of 0 to 40 km/s.  The
@@ -3396,51 +3200,39 @@ attributes.
 
 \begin{itemize}
 \item Create a 2$\times$1 grid of frames.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % picgrid 2 1
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 \item Select the first frame.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % picsel 1
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 \item Display integ.sdf in the first frame.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % display integ axes style=^style.dat mode=scale low=0 high=100
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 %\myfig{sc20_display6}{[h!]}{width=0.6\linewidth}{fig:display6}{
 %  Displaying two super-imposed spectra with \Kappa:\display.}{
 %  Displaying two super-imposed spectra with \Kappa:\display.}
 
 \item Select the second frame.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % picsel 2
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 \item Display subinteg.sdf, a cut-out of integ.sdf, in the second frame.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % display subinteg axes style=^style.dat mode=scale low=0 high=100
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 \myfig{sc20_display7}{[h!]}{width=0.8\linewidth}{fig:display7}{Displaying
 two super-imposed spectra with \Kappa:\display.}{Displaying two
 super-imposed spectra with \Kappa:\display.}
 
 \item Still in the second frame, plot contours over the map from a smoothed version of subinteg.sdf.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % contour smoothsub.sdf noaxes noclear nokey ncont=5 mode=free \
   heights="[40,80,120,160,200]" pens='"width=3.0,colour=red"'
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 \myfig{sc20_display8}{[h!]}{width=0.8\linewidth}{fig:display8}{
   Displaying two super-imposed spectra with \Kappa:\display.}{
   Displaying two super-imposed spectra with \Kappa:\display.}
@@ -3451,11 +3243,9 @@ super-imposed spectra with \Kappa:\display.}
 
 \begin{itemize}
 \item You can view all available graphics devices with \param{gdnames}.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % gdnames
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \item Instead of using \param{gdset} to define a new graphics device
 for all your applications, you can add the \param{device} option to
