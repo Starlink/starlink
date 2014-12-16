@@ -25,6 +25,26 @@
 % Definitions
 \newcommand{\lutedit}{\xref{\task{lutedit}}{sun95}{LUTEDIT}}
 
+% degrees symbol
+%\usepackage{siunitx}
+\ifpdf
+\newcommand{\dgs}{\si{\degree}}%$^{\circ}$}
+\else
+\newcommand{\dgs}{\HCode{&deg}}
+\fi
+
+% arcminute symbol
+\providecommand{\arcm}{\si{\arcminute}}%\hbox{$^{\prime$}}}
+
+% arcsec symbol
+\providecommand{\arcsec}{\si{\arcsecond}}%\arcm\hspace{-0.1em}\arcm}
+
+% decimal-degree symbol
+\providecommand{\udeg}{\hspace{-0.3em}\dgs\hspace{-0.08em}}
+
+% decimal-arcsecond symbol
+\providecommand{\uarcs}{\hspace{-0.27em}\arcsec\hspace{-0.07em}}
+
 
 \begin{document}
 \scfrontmatter
@@ -546,7 +566,7 @@ mapping.
 \hline
 Receiver &FWHM & $\eta_{MB}$ & $\eta_{fss}$\\
 \hline
-RxA&19.7$''$&0.69 & 0.80\\
+RxA&19.7$\arcsec$&0.69 & 0.80\\
 \hline
 \end{tabular}
 \end{center}
@@ -581,7 +601,7 @@ below}.
 \hline
 Receiver &FWHM & $\eta_{MB}$ & $\eta_{fss}$\\
 \hline
-HARP&14$''$ &0.63& 0.88\\
+HARP&14$\arcsec$ &0.63& 0.88\\
 \hline
 \end{tabular}
 \end{center}
@@ -678,11 +698,11 @@ with KAPPA}) or \splat.
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}
 A jiggle map is a common HARP observing mode. They are designed to
-fill in 30$''$ spacing between the HARP receptors resulting in a
-2$'\times$2$'$ map. This is achieved by 'jiggling' the secondary
+fill in 30$\arcsec$ spacing between the HARP receptors resulting in a
+2$'\times$2$\arcm$ map. This is achieved by 'jiggling' the secondary
 mirror in a 4$\times$4 or 5$\times$5 pattern to give a HARP4 or HARP5
-map respectively.  The HARP4 pattern has a 7$''$.5 pixels while the
-HARP5 has 6$''$ pixels, slightly under- and over-sampling compared
+map respectively.  The HARP4 pattern has a 7.$\uarcs$5 pixels while the
+HARP5 has 6$\arcsec$ pixels, slightly under- and over-sampling compared
 with Nyquist. The central panel of Figure \ref{fig:harpmodes} shows a
 HARP5 jiggle pattern.
 
@@ -702,8 +722,8 @@ used with the single element receivers. The right-hand panel of Figure
 Raster mapping, or scan mapping, is designed for mapping large areas
 with maximum efficiency. The telescope continuously takes data while
 scanning across the source. When HARP is used for raster mapping the
-array is rotated 14$^\circ$.04 to the direction of the scan in order
-to give a fully sampled map with 7$''$.3 pixels. This will result in
+array is rotated 14.$\udeg$04 to the direction of the scan in order
+to give a fully sampled map with 7.$\uarcs$3 pixels. This will result in
 jagged edges to your reduced map which you may wish to trim. It is
 common when using HARP to repeat the map scanning along the other axis
 to give a `basket-weave' pair of maps. Each one of the pair will
@@ -729,7 +749,7 @@ in less-accurate sky subtraction.
 In beam-switch (BSW) mode, the secondary chops onto the reference
 position. This results in fast and accurate sky subtraction but it is
 limited to targets which have a blank reference position within
-180$''$ (the maximum chop distance of the SMU).
+180$\arcsec$ (the maximum chop distance of the SMU).
 \end{minipage}
 \vspace{0.7cm}\\
 \begin{minipage}[t]{0.14\linewidth}
@@ -747,9 +767,9 @@ useful when no emission-free reference position can be found.
 \begin{center}
 \includegraphics[width=0.8\linewidth]{sc20_jiggles}
 \caption[HARP4 and HARP5 jiggle patterns]{Top row: HARP4 jiggle
-patterns produce a map of 16$\times$16 pixels each of 7$''$.5. Bottom
+patterns produce a map of 16$\times$16 pixels each of 7.$\uarcs$5. Bottom
 row: HARP5 jiggle patterns produce a map of 20$\times$20 pixels each
-of 6$''$. }
+of 6$\arcsec$. }
 \label{fig:jiggle}
 \end{center}
 \end{figure}
@@ -1202,7 +1222,7 @@ PSF-weighted mean of the input pixels within the filter box.
 % gausmooth in=mymap out=smoothedmap fwhm=3
 \end{terminalv}
 Note that the \param{fwhm} option is given in the number of pixels.
-For example, to smooth a map with 4$''$ pixels by a 12$''$ Gaussian
+For example, to smooth a map with 4$\arcsec$ pixels by a 12$\arcsec$ Gaussian
 you would set \param{fwhm=3}.
 
 \subsection{Removing a baseline}
@@ -1403,7 +1423,7 @@ your FITS file to NDF format.
 
 Alternatively, to resample your data onto smaller pixels you should
 use the \Kappa\ command \sqorst. In the example below 'map' has a
-pixel size of 8$''$, while `resamplemap' has a pixel size of 4$''$ --
+pixel size of 8$\arcsec$, while `resamplemap' has a pixel size of 4$\arcsec$ --
 the number of pixels has been doubled by applying a factor of 2 to the
 spatial axes. A factor of 1 was applied to the frequency (third) axis
 leaving it unchanged.
@@ -3060,7 +3080,7 @@ details.
 
 \begin{itemize}
 \item Plot the spectra from cube.sdf at the position
-$l$=60.87$^\circ$, $b$=0.18$^\circ$. Use existing style.dat except
+$l$=60.$\udeg$87, $b$=0.$\udeg$18. Use existing \file{style.dat} except
 override the text label size which is too big for these axes labels.
 \begin{terminalv}
 % linplot "cube(60.87,0.18,)" style="'^style.dat,size(textlab)=1'"
@@ -3116,8 +3136,8 @@ The plus sign means the change will not be remembered next time
   specstyle="'colour(textlab)=black,colour(numlab)=black'"
 \end{terminalv}
 
-This example plots a grid of 4$\times$4 pixels around $l=61.06^\circ$
-and $b=0.15^\circ$. Each spectra has a range of 0 to 40 km/s.  The
+This example plots a grid of 4$\times$4 pixels around $l=61.$\udeg$06
+and $b=0.$\udeg$15. Each spectra has a range of 0 to 40 km/s.  The
 \param{specstyle} option allows you to format the spectral axes inside
 the main plot. The formatting options are the usual plotting
 attributes.
