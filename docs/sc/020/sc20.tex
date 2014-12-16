@@ -428,17 +428,12 @@ the position $l=10^\circ$, $b=0^\circ$.
 % ndfcopy `cube(10.0~25:0.0~25,)' newcube
 \end{terminalv}
 
-\begin{latexonly}
-\begin{center}
-\begin{fmpage}{0.95\linewidth}
-\vspace{0.1cm}
-TIP: To help identify your sub-region in pixel coordinates, open your
+\begin{tip}
+To help identify your sub-region in pixel coordinates, open your
 file in \gaia\ and change the built-in coordinates to PIXEL via
 \gaiathing{Image-Analysis} $>$ \gaiathing{Change coordinate} $>$
 \gaiathing{Build-in coordinates}.
-\end{fmpage}
-\end{center}
-\end{latexonly}
+\end{tip}
 
 
 \newpage
@@ -523,18 +518,11 @@ cold load is black-body source.
 spectrum in kelvins. \end{itemize}
 
 
-\begin{latexonly}
-\begin{center}
-\begin{fmpage}{0.95\linewidth}
-\vspace{0.1cm}
-TIP: Both $T_{sys}$ and $T_{rec}$ are stored in the raw data files.
+\begin{tip}
+Both $T_{sys}$ and $T_{rec}$ are stored in the raw data files.
 This information is stored in the .MORE.ACSIS.TRX extension and can be
 viewed using \hdstrace\ (see \cref{Section}{sec:fitslist}{How can I
 view the metadata?}).
-\end{fmpage}
-\end{center}
-\end{latexonly}
-
 \end{tip}
 
 
@@ -1376,17 +1364,11 @@ the integrated map (0th moment), Intensity-weighted co-ordinate (Iwc)
 to get the velocity field (1st moment), or Intensity-weighted
 dispersion (Iwd) to get the velocity dispersion (2nd moment).
 
-\begin{latexonly}
-\begin{center}
-\begin{fmpage}{0.95\linewidth}
-\vspace{0.1cm}
+\begin{tip}
 TIP: You can also use the \picard\ recipe CREATE\_MOMENTS\_MAPS. See
 \cref{Appendix}{app:picard}{Picard} for details. This recipe follows
 the advanced method outlined above.
-\end{fmpage}
-\end{center}
-\end{latexonly}
-
+\end{tip}
 
 
 \subsection{\xlabel{rebin}Main beam conversion}
@@ -1460,29 +1442,17 @@ between a group of neighbouring output ones (the default is
 \param{SincSinc}).
 
 
-\begin{latexonly}
-\begin{center}
-\begin{fmpage}{0.95\linewidth}
-\vspace{0.1cm}
-TIP: Take care not to combine data separated on the sky as \wcsmosaic\
+\begin{tip}
+Take care not to combine data separated on the sky as \wcsmosaic\
 will attempt to create a vast cube that encompasses all the input
 files until it runs out of resources.
-\end{fmpage}
-\end{center}
-\end{latexonly}
+\end{tip}
 
-
-\begin{latexonly}
-\begin{center}
-\begin{fmpage}{0.95\linewidth}
-\vspace{0.1cm}
-TIP: You can also use the \picard\ recipe MOSAIC\_JCMT\_IMAGES. This
+\begin{tip}
+You can also use the \picard\ recipe MOSAIC\_JCMT\_IMAGES. This
 will correctly combine all NDF extensions. See
 \cref{Appendix}{app:picard}{Picard} for details.
-\end{fmpage}
-\end{center}
-\end{latexonly}
-
+\end{tip}
 
 
 \subsection{\xlabel{Crop}Cropping your map}
@@ -1669,16 +1639,11 @@ Including the option \param{order} allows the ordered statistics such
 as the median and percentiles to be reported. Note that percentile
 options will need to be specified via the \param{percentiles}
 parameter.
-\begin{latexonly}
-\begin{center}
-\begin{fmpage}{0.95\linewidth}
-\vspace{0.1cm}
-TIP: Remember the mean or median values will give you the noise when
-using the error component.
-\end{fmpage}
-\end{center}
-\end{latexonly}
 
+\begin{tip}
+Remember the mean or median values will give you the noise when
+using the error component.
+\end{tip}
 
 \vspace{3mm}
 \textbf{Visualising the noise}\\
@@ -1706,16 +1671,10 @@ time, the effective time and, if \param{spread=nearest} when running
 \makecube, the system temperature. To return to your main image select
 the top level and click the \gaiathing{Data} button.
 
-\begin{latexonly}
-\begin{center}
-\begin{fmpage}{0.95\linewidth}
-\vspace{0.1cm}
+\begin{tip}
 TIP: You can write out the error component into a new file using
 \ndfcopy. \texttt{\% ndfcopy map comp=err noisemap}
-\end{fmpage}
-\end{center}
-\end{latexonly}
-
+\end{tip}
 
 
 \myfig{sc20_noimap}{[h!]}{width=0.6\linewidth}{fig:noisemap}{
@@ -2597,15 +2556,10 @@ Files created from individual observations are prefixed with
 created. In addition PNG images are made of the reduced files at a
 variety of resolutions.
 
-\begin{latexonly}
-\begin{center}
-\begin{fmpage}{0.95\linewidth}
-\vspace{0.1cm}
+\begin{tip}
 TIP: Even if just a single observation is processed, a group file is
 created so long as the observation passes the QA check.
-\end{fmpage}
-\end{center}
-\end{latexonly}
+\end{tip}
 
 
 \textbf{Why have multiple reduced files been generated?}\\*
@@ -2826,38 +2780,15 @@ whether the log file should be written to the screen [\texttt{s}], a
 file [\texttt{f}] or an x-window [\texttt{x}].
 \end{itemize}
 
-\begin{latexonly}
-\begin{center}
-\begin{fmpage}{0.95\linewidth}
-\vspace{0.1cm}
+\begin{tip}
 TIP: The .sdf extension on filenames is required by \textsc{Picard}.
-\end{fmpage}
-\end{center}
-\end{latexonly}
+\end{tip}
 
-\begin{htmlonly}
-\textbf{TIP: The .sdf extension on filenames is required by PICARD.\\*\\*}
-\end{htmlonly}
-
-
-\begin{latexonly}
-\begin{center}
-\begin{fmpage}{0.95\linewidth}
-\vspace{0.1cm}
-TIP: If the environment variable \envvar{ORAC\_DATA\_OUT} is defined, any files
+\begin{tip}
+If the environment variable \envvar{ORAC\_DATA\_OUT} is defined, any files
 created by \textsc{Picard} will be written in that location. Check there if new
 files are expected but do not appear in your working directory.
-\end{fmpage}
-\end{center}
-\end{latexonly}
-
-\begin{htmlonly}
-\textbf{TIP: If the environment variable \envvar{ORAC\_DATA\_OUT} is defined,
-any files created by PICARD will be written in that location. Check
-there if new files are expected but do not appear in your working
-directory.\\*\\*}
-\end{htmlonly}
-
+\end{tip}
 
 \newpage
 \subsection{\xlabel{convert}Converting file formats}
@@ -3254,36 +3185,25 @@ output goes to a PostScript file called myplot.ps. The option pscol\_l
 specifies landscape mode with colour. Setting a name for your output
 PostScript file is optional; if left unset it will default to
 pgplot.ps.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % linplot "cube(60.85,0.18,-10:50)" mode=hist device="pscol_l;myplot.ps"
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \item If you want to combine the results of several applications into
 a single plot, you need to specify an encapsulated PostScript device,
 e.g. epsf\_l. Once you have run all the application you can stack your
 list of PostScript files to produce a single file.
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % psmerge plot*.ps > final.ps
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 \end{itemize}
 
-
-\begin{latexonly}
-\begin{center}
-\begin{fmpage}{0.95\linewidth}
-\vspace{0.1cm}
-TIP: You can abbreviate any of the command-line options so long as the
+\begin{tip}
+You can abbreviate any of the command-line options so long as the
 application can distinguish it from the other options. E.g.
 \param{mode=histogram} can be abbreviated all the way to
 \param{mode=h}.
-\end{fmpage}
-\end{center}
-\end{latexonly}
-
+\end{tip}
 
 
 \newpage
@@ -3427,7 +3347,6 @@ HIGHFREQ\_RINGING\_MIN\_SPECTRA & Minimum number of good spectra for ringing fil
 \end{tabular}
 \end{small}
 \end{table}
-\end{latexonly}
 
 
 \newpage
