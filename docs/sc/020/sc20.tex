@@ -244,7 +244,6 @@ anywhere on your system:
 \end{terminalv}
 
 This will report the following
-\begin{quote}
 \begin{terminalv}
 STATS  <STRUC>
    ADAM_DYNDEF    <DEFAULTS>      {structure}
@@ -259,7 +258,6 @@ STATS  <STRUC>
     ..               ..                 ..
     ..               ..                 ..
 \end{terminalv}
-\end{quote}
 \vspace{0.3cm}
 You can see \stats\ was run on the data array with ordered statistics
 as well as the resulting values. Any of the parameters returned by
@@ -2326,7 +2324,6 @@ from the header or any different one specified on the command line)
 followed by the options you wish to specify in the following format:
 
 \vspace{0.2cm}
-\begin{quote}
 \begin{terminalv}
 [REDUCE_SCIENCE_NARROWLINE]
 MOMENTS_LOWER_VELOCITY = -30.0
@@ -2337,7 +2334,6 @@ SPREAD_WIDTH = 9
 SPREAD_FWHM_OR_ZERO = 6
 REBIN = 2
 \end{terminalv}
-\end{quote}
 
 Notice the two values given for the \param{PIXEL\_SCALE} option. This
 means that two maps will be produced, one at each of the specified
@@ -2361,7 +2357,6 @@ The example below illustrates the format of this QA file and
 highlights some of the main parameters you may consider tweaking.
 
 \vspace{0.2cm}
-\begin{quote}
 \begin{terminalv}
 [default]
 BADPIX_MAP=0.1
@@ -2371,8 +2366,7 @@ FLAGTSYSBAD=0.5
 TSYSMAX=550
 TSYSVAR=1.0
 RMSVAR_RCP=0.5
- \end{terminalv}
-\end{quote}
+\end{terminalv}
 The text in the square brackets describes the data to which the QA
 parameters should be applied. This is followed by the QA parameters
 and their values.
@@ -2392,7 +2386,6 @@ those specified in the default \file{qa.ini} file.
 
 \begin{center}
 \vspace{0.2cm}
-\begin{quote}
 \begin{terminalv}
 [C18O32]
 RES_CHAN=10
@@ -2405,7 +2398,6 @@ VELRES=0.5
 TSYSBAD=550
 GOODRECEP=1
 \end{terminalv}
-\end{quote}
 \end{center}
 
 See Appendix \ref{app:qa} for a description of all available QA parameters.
@@ -3026,7 +3018,6 @@ Depending on your default settings you may get a map like the one below.
 Below is a copy of the style file (style.dat) used to make
 \cref{Figure}{fig:display2}{the figure above}.
 
-\begin{quote}
 \begin{terminalv}
 border=1
 tickall=1
@@ -3042,7 +3033,6 @@ nogrid=1
 textlabgap(1)=0.01
 textlabgap(2)=0.01
 \end{terminalv}
-\end{quote}
 
 \item Make the colour scale negative and then replot.
 \begin{terminalv}
