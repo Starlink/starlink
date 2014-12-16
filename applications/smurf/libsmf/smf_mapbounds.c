@@ -179,6 +179,8 @@
 *        Report an error if either axis of the map spans more than 20000 pixels.
 *     2014-11-04 (DSB):
 *        Fix memory leak (ac1list and ac2list not being freed).
+*     2014-12-16 (DSB):
+*        Do not assume the first subscan will always be usable.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -248,6 +250,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   double dubnd[ 2 ];    /* Floating point upper bounds for output map */
   AstMapping *fast_map = NULL; /* Mapping from tracking to absolute map coords */
   smfFile *file = NULL;        /* SCUBA2 data file information */
+  int first;                   /* Is this the first good subscan ? */
   AstFitsChan *fitschan = NULL;/* Fits channels to construct WCS header */
   AstFrameSet *fs = NULL;      /* A general purpose FrameSet pointer */
   smfHead *hdr = NULL;         /* Pointer to data header this time slice */
@@ -315,6 +318,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   astBegin;
 
   /* Loop over all files in the Grp */
+  first = 1;
   for( i=1; i<=size; i++, box++ ) {
 
     /* Initialise the spatial bounds of section of the the output cube that is
@@ -450,8 +454,10 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
         continue;
       }
 
-      /* If we are dealing with the first file, create the output SkyFrame. */
-      if( i == 1 ) {
+      /* If we are dealing with the first good file, create the output
+         SkyFrame. */
+      if( first ) {
+        first = 0;
 
         /* Create output SkyFrame if it has not come from a reference */
         if ( oskyframe == NULL ) {
