@@ -1,235 +1,23 @@
-\documentstyle[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt,nolof,noabs]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink System Note}
-\newcommand{\stardocinitials}  {SSN}
-\newcommand{\stardocsource}    {ssn\stardocnumber}
-\newcommand{\stardocnumber}    {21.2}
-\newcommand{\stardocauthors}   {M J Bly}
-\newcommand{\stardocdate}      {9 April 1996}
-\newcommand{\stardoctitle}     {STARX --- X Library linking}
-% \newcommand{\stardocabstract}  {[Text of abstract]}
+\stardoccategory    {Starlink System Note}
+\stardocinitials    {SSN}
+\stardocsource      {ssn\stardocnumber}
+\stardocnumber      {21.2}
+\stardocauthors     {M J Bly}
+\stardocdate        {9 April 1996}
+\stardoctitle       {STARX --- X Library linking}
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\html}[1]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document specific \providecommand or \newenvironment commands.
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-% \renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Large\bf \stardoctitle}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-%  \vspace{10mm}
-%  \begin{center}
-%     {\Large\bf Abstract}
-%  \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \newcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-% \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-% \stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-% \newpage
-%  \begin{latexonly}
-%  \setlength{\parskip}{0mm}
-%  \latexonlytoc
-%  \setlength{\parskip}{\medskipamount}
-%  \markright{\stardocname}
-% \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-% \newpage
-% \renewcommand{\thepage}{\arabic{page}}
-% \setcounter{page}{1}
+\scfrontmatter
 
 \section{Introduction}
 
@@ -288,51 +76,51 @@ necessary, library aliases.
 
 \subsection{Link Script}
 
-The link script {\tt starX\_link} simply takes the form of an {\tt echo}
+The link script \texttt{starX\_link} simply takes the form of an \texttt{echo}
 command with a string of required libraries.  The default version is
 this:
 
-\begin{quote}{\tt
-echo -lX11}
-\end{quote}
+\begin{terminalv}
+% echo -lX11
+\end{terminalv}
 
 which is all that is necessary for DEC Alpha/Digital Unix and Sun Sparc/SunOS4
 systems.
 
 For Solaris 2.5, the script is this:
 
-\begin{quote}{\tt
-echo -lXext -lX11 -lstarXext -lstarX11}
-\end{quote}
+\begin{terminalv}
+% echo -lXext -lX11 -lstarXext -lstarX11
+\end{terminalv}
 
-The last two, {\tt  -lstarXext} and {\tt -lstarX11} are the alias names for
-the two X libraries that need to appear twice, {\tt -lXext} and {\tt -lX11}.
+The last two, \texttt{-lstarXext} and \texttt{-lstarX11} are the alias names for
+the two X libraries that need to appear twice, \texttt{-lXext} and \texttt{-lX11}.
 
 For Linux on Intel ix86 systems, the script is this:
 
-\begin{quote}{\tt
-echo -L/usr/X11/lib -lX11}
-\end{quote}
+\begin{terminalv}
+% echo -L/usr/X11/lib -lX11
+\end{terminalv}
 
 \subsection{Library Aliases}
 
 The alias names for the libraries are provided by soft links to the
-actual libraries.  These are created in the {\tt /star/lib} directory
-(static library) and {\tt /star/share} directory (shared libraries).
+actual libraries.  These are created in the \texttt{/star/lib} directory
+(static library) and \texttt{/star/share} directory (shared libraries).
 
 For Solaris 2.4, the links created are:
 
-\begin{verbatim}
-    /star/lib/libstarX11.a -> /usr/openwin/lib/libX11.a
-    /star/lib/libstarXext.a -> /usr/openwin/lib/libXext.a
-    /star/share/libstarX11.so -> /usr/openwin/lib/libX11.so
-    /star/share/libstarXext.so -> /usr/openwin/lib/libXext.so
-\end{verbatim}
+\begin{terminalv}
+/star/lib/libstarX11.a -> /usr/openwin/lib/libX11.a
+/star/lib/libstarXext.a -> /usr/openwin/lib/libXext.a
+/star/share/libstarX11.so -> /usr/openwin/lib/libX11.so
+/star/share/libstarXext.so -> /usr/openwin/lib/libXext.so
+\end{terminalv}
 
 The default is to soft link to the Openwindows libraries, though other X
 libraries may be used (if installed) by changing the definition of
-{\tt XLIBS\_PATH}.  This should be done by setting the environment variable
-in the {\tt mk} script and NOT by changing the default in the {\tt makefile}.
+\texttt{XLIBS\_PATH}.  This should be done by setting the environment variable
+in the \texttt{mk} script and NOT by changing the default in the \texttt{makefile}.
 
 There are no library alias requirements for the other USSC supported systems.
 
@@ -342,16 +130,16 @@ Linking with the X libraries is typically done in conjunction with linking
 with one or more of the Starlink Environment graphics packages.  Where this
 is the case, users will not need to take any action to use the new
 linking system, since the graphics systems have been modified to call
-the new {\tt starX\_link} script where appropriate.
+the new \texttt{starX\_link} script where appropriate.
 
 Where a program needs to link with just the X libraries, a command of
 this form should be used:
 
-\begin{quote}{\tt
-cc myprog.c -o myprog -L/star/lib `starX\_link` ....}
-\end{quote}
+\begin{terminalv}
+% cc myprog.c -o myprog -L/star/lib `starX_link` ....
+\end{terminalv}
 
-The {\tt -L/star/lib `starX\_link`} section pulls in the X libraries in
+The \texttt{-L/star/lib `starX\_link`} section pulls in the X libraries in
 the correct manner for the system.
 
 \end{document}
