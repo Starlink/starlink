@@ -2124,7 +2124,7 @@ averaged spectra gives a much clearer profile of the source.
 
 \myfigduo{sc20_gaia_avgspec2}{sc20_gaia_avgspec3}{[h!]}{width=0.48\linewidth}
    {fig:gaia_avgspec2}{0.5mm}{
-   Example of averaged spectra.}{(Left) Average of the spectra within 
+   Example of averaged spectra.}{(Left) Average of the spectra within
    the blue circle in the figure above. (Right) Single spectrum from the
    centre of the blue circle above.}
 
@@ -2780,33 +2780,36 @@ PIpeline for Combining and Analyzing Reduced Data},
 \label{app:picard}
 There are two \picard\ recipes which can be used with ACSIS data:
 
-\textbf{CREATE\_MOMENTS\_MAP}\\
+\section{CREATE\_MOMENTS\_MAP}
+
 This recipe is used to create a moments maps from a cube. It smooths
-the cube in frequency and spatial extents, then uses the Clumpfind
+the cube in frequency and spatial extents, then uses the ClumpFind
 algorithm to find clumps of emission. Everything in the cube not found
 in a clump is masked out, then the masked cube is collapsed to form
 the moments map.
 \\\\
 \textbf{Recipe options:}
 \begin{itemize}
-\item MOMENTS:  Which moments maps to create (integ/iwc/itd) [integ]
+\item MOMENTS:  Which moments maps to create (\param{integ}/\param{iwc}/\param{itd})
+\param{[integ]}
 
 \item MOMENTS\_LOWER: An optional lower velocity in km/s, below which
-no data will be used when creating the moments map.[undef]
+no data will be used when creating the moments map.  \param{[undef]}
 
 \item MOMENTS\_UPPER: An optional upper velocity in km/s, above which
-no data will be used when creating the moments map.[undef]
+no data will be used when creating the moments map. \param{[undef]}
 
 \item MOMENTS\_SNR: Whether or not to do clump detection on an
 signal-to-noise cube instead of the signal cube. Enabling this is
-useful for data taken in varying conditions. [0]
+useful for data taken in varying conditions. \param{[0]}
 \end{itemize}
 
-\textbf{MOSAIC\_JCMT\_IMAGES}\\
+\section{MOSAIC\_JCMT\_IMAGES}
+
 This recipe coadd the given files into a single map while correctly
 handling the exposure time FITS header and other NDF components. The
 maps are combined using inverse-variance weighting and the output
-variance is derived from the input variances. You can chose either
+variance is derived from the input variances. You can choose either
 \wcsmosaic\ or a combination of \wcsalign\ and the \ccdpack\
 application \makemos\ to mosaic the images.
 \\\\
