@@ -1646,9 +1646,9 @@ You can fill these holes using \Kappa:\fillbad. This replaces the bad
 values with a smooth function derived from neighbouring values,
 derived by iterating to a solution of Laplace's equation.
 
-The default values for \fillbad\ will fill the holes but smooths by 5
+The default values for \fillbad\ will fill the holes but smooths by five
 pixels along each axis. If you prefer not to smooth in the spectral
-axis, set the parameter \param{size} to [s,s,0] where s is the scale
+axis, set the parameter \param{size} to [$s$,$s$,0] where $s$ is the scale
 length in pixels.  The zero means do not smooth along the third axis.
 
 The scale length should have a value about half the size of the
@@ -1675,7 +1675,7 @@ You can use \Kappa:\stats\ to check the noise in your map. It will
 report the statistics for all pixels so be aware that noisy edges and
 strong signal will contribute to the standard deviation. You can
 mitigate this by trimming any noisy edges and by examining the square
-root of the Variance component (hereafter referred to as the error
+root of the VARIANCE component (hereafter referred to as the error
 component\footnote{No such component exists in the NDF.}) although
 bright emission will still increase your noise. You can select the
 error component with \param{comp=err} on the command line.
@@ -1720,7 +1720,10 @@ the top level and click the \gaiathing{Data} button.
 
 \begin{tip}
 TIP: You can write out the error component into a new file using
-\ndfcopy. \texttt{\% ndfcopy map comp=err noisemap}
+\ndfcopy.
+\begin{terminalv}
+% ndfcopy map comp=err noisemap
+\end{terminalv}
 \end{tip}
 
 
@@ -1840,7 +1843,7 @@ You can view your pv map with  \gaia\ or \display.
 The \Kappa\ application \chanmap\ creates a two-dimensional channel
 map from a cube. It collapses along the nominated axis (with many of
 the same parameters as \collapse). The number of channels to create is
-given by \textit{nchan} and these are divided evenly between your
+given by \param{nchan} and these are divided evenly between your
 ranges. The arrangement of the resulting panels is determined by the
 shape parameter. The collapsed slices are tiled with no margins to
 form the final image.
@@ -1868,8 +1871,8 @@ Channel maps can also be created using \gaia. See
 The \cupid\ application \findclumps\ can be used to generate a clump
 catalogue. It identifies clumps of emission in one-, two- or
 three-dimensional NDFs. You can select from the clump-finding
-algorithms FellWalker, Gaussclumps, ClumpFind or Reinhold . You must
-supply a configuration file which lists the options for which ever
+algorithms FellWalker, GaussClumps, ClumpFind or Reinhold. You must
+supply a configuration file which lists the options for whichever
 algorithm you chose (see the \xref{\textsc{cupid} manual}{sun255}{}
 for a full list). The result is returned as a catalogue in a text file
 and as a NDF pixel mask showing the clump boundaries (see Figure
@@ -1915,10 +1918,10 @@ You can plot the clump outlines over an image using \gaia. See Section
 
 \vspace{0.7cm}
 \myfig{sc20_clumps}{[h!]}{width=0.7\linewidth}{fig:clumps2}{
-  A velocity slice of the result of 3D clump finding viewed with
-  \gaia.}{A velocity slice of the result of 3D clump finding viewed
-  with \gaia. This output NDF contains boundaries of the clumps with
-  the value reflecting the number of pixels contained within that
+  A velocity slice of the result of three-dimensional clump finding viewed
+  with \gaia.}{A velocity slice of the result of three-dimensional clump
+  finding viewed with \gaia. This output NDF contains boundaries of the
+  clumps with the value reflecting the number of pixels contained within that
   clump.}
 
 
@@ -2239,7 +2242,7 @@ and bandwidths.
 
 \item The raw data is copied to the local directory. Typically,
 sub-systems are treated as individual and separate observations by
-ORAC-DR except for hybrid mode observations.
+ORAC-DR except for hybrid-mode observations.
 
 \item Because data acquisition is asynchronous, time slices are not
 necessarily written in sequential order. The next step sort the
@@ -2306,7 +2309,7 @@ for each observation.
 \item The baseline-subtracted \textbf{a\_cubes} are combined to make a
 new \textbf{g\_cube}.
 
-\item Return to step 8.
+\item Return to Step 8.
 \end{enumerate}
 
 %\setlength{\intextsep}{10.0pt plus 1.0pt minus 2.0pt}
@@ -2348,7 +2351,7 @@ one on the command line when starting \oracdr. For example:
 
 You can tailor the recipe parameters by supplying a \file{.ini} file
 (called \file{myparams.ini} in the following example). This file contains the
-recipe name (which must match the one assigned to your data, wither
+recipe name (which must match the one assigned to your data, whether
 from the header or any different one specified on the command line)
 followed by the options you wish to specify in the following format:
 
@@ -2370,10 +2373,10 @@ pixel scales. See Appendix \ref{app:params} for a full list of recipe
 parameters.
 
 
-\section{Setting quality assurance parameters (optional)}
+\section{Setting quality-assurance parameters (optional)}
 \label{sec:qa}
 
-There is a set of quality assurance (QA) parameters that are applied
+There is a set of quality-assurance (QA) parameters that are applied
 by default when you run the pipeline. These are found in the text file
 \param{\$ORAC\_DATA\_CAL/qa.ini}.
 
@@ -2441,7 +2444,7 @@ not having the pipeline attempt to reduce that data.
 
 Information regarding bad receptors is stored in a master text file
 called \file{index.bad\_receptors}, located in your
-\param{ORAC\_DATA\_CAL} directory. This files lists dates and the
+\param{ORAC\_DATA\_CAL} directory. This file lists dates and the
 corresponding receptors which are not operational. By default, when
 the pipeline runs it searches this file and discards the appropriate
 receptors. However, this master list is grossly incomplete so you
@@ -2473,7 +2476,7 @@ index         & Use the \file{index.bad\_receptors\_qa} index file in
 file          & Reads a file called \param{bad\_receptors.lis}, which
                 contains a  space-separated list of receptor names in the
                 first line. This file must be located in \param{\$ORAC\_DATA\_OUT}.
-                E.g. \param{-calib bad\_receptors=bad\_receptors.lis}.\\
+                For instance, \param{-calib bad\_receptors=bad\_receptors.lis}.\\
 list          & A colon-separated list of receptor names can be supplied. E.g.
                 \param{-calib bad\_receptors=H01:H06}. You can append any of the other
                 options to the end of your list. E.g. \param{-calib bad\_receptors=H14:index}\\
@@ -2559,26 +2562,27 @@ options and their descriptions see \oracdrsun.
 \hline
 \multicolumn{2}{l}{\textbf{Group processing}} \\
 \hline
--batch    & Delays group processing until the individual files have been reduced.  \\
-%-skip    & Allow the data detection loop to skip missing observations.  \\
--onegroup & Forces all the observations into the same group. Useful if
-            building up a map from rasters with different target coordinates
-            or from different dates.  \\
+\param{-batch}    & Delays group processing until the individual files have been reduced.  \\
+%\param{-skip}    & Allow the data detection loop to skip missing observations.  \\
+\param{-onegroup} & Forces all the observations into the same group. Useful if
+                    building up a map from rasters with different target coordinates
+                    or from different dates.  \\
 \hline
 \multicolumn{2}{l}{\textbf{Supplying parameter files}} \\
 \hline
--calib   & Under the calibration flag you can specify QA parameters by including
-           \param{qaparams=<myqa.ini>} and bad receptors via
-           \param{bad\_receptors=index}.\\
+\param{-calib}    & Under the calibration flag you can specify QA parameters by including
+                    \param{qaparams=<myqa.ini>} and bad receptors via
+                    \param{bad\_receptors=index}.\\
 -recpars & Allows you to provide recipe parameters as a \file{.ini} file.  \\
 \hline
 \multicolumn{2}{l}{\textbf{Logs/Display}} \\
 \hline
--nodisplay & Shorten processing times by turning off all graphical output. \\
--log sxfh  & Send log to a screen (s), an xwindow (x), file (f) or html (h). The
-             logfile (f) has the name \file{.oracdr\_}$NNNN$\file{.log} where
-             $NNNN$ is the current process ID. Only include the options you want.
-             This defaults to \param{xf}.\\
+\param{-nodisplay} & Shorten processing times by turning off all graphical output. \\
+\param{-log sxfh}  & Send log to a screen (\param{s}), an xwindow (\param{x}), file
+                     (\param{f}) or html (\param{h}). The logfile
+                     (\param{f}) has the name \file{.oracdr\_}$NNNN$\file{.log} where
+                     $NNNN$ is the current process ID. Only include the options you want.
+                     This defaults to \param{xf}.\\
 \hline
 \end{tabular}
 \label{tab:pipe-options}
@@ -2610,7 +2614,7 @@ raster maps) into smaller tiles of $<$512\,MB. This is to save on
 computer memory. It does this from the central position outwards so
 you may find some of the smaller edge tiles are strange, often narrow,
 rectangles. These tiles can be pasted together with the \Kappa\
-command paste but beware of the final file size. E.g.
+command paste but beware of the final file size. For example,
 \begin{terminalv}
 % paste ga20140601_15_1_reduced\*.sdf tiledmap
 \end{terminalv}
@@ -2625,30 +2629,31 @@ single reduced cube.
 \hline
 \file{cube001}    & Baselined cube \\
 \file{integ}      & Integrated intensity image \\
-\file{rimg}       & Representative image (same as integ file). Used to form
-                    rimg PNG.\\
+\file{rimg}       & Representative image (same as \file{integ} file), used to form
+                    rimg PNG \\
 \file{sp001}      & Spectrum taken from position of peak intensity in the
                     integ file \\
-\file{rsp}        & Representative spectrum (same as sp001). Used to form
-                    rsp PNG.\\
-\file{iwc}        & Intensity weighted coordinate image\\
-\file{noise}      & Noise map\\
-\file{reduced00n} & Final trimmed, baselined cube of the $n^{th}$ tile. There may
-                    be a few of these as large maps will be split into tiles of
-                    512\,MB.\\
+\file{rsp}        & Representative spectrum (same as \file{sp001}), used to form
+                    rsp PNG \\
+\file{iwc}        & Intensity weighted coordinate image \\
+\file{noise}      & Noise map \\
+\file{reduced00n} & Final trimmed, baselined cube of the $n^\textnormal{th}$ tile.
+                    There may be a few of these as large maps will be split into
+                    tiles of 512\,MB. \\
 \file{rmslo}      & Low-frequency noise \\
 \file{rmshi}      & High-frequency noise \\
 \hline
 \multicolumn{2}{l}{\textbf{Extra files kept with ORAC\_KEEP = 1}}\\
 \hline
-\file{em001}      & Ends of the frequency axis have been trimmed off.\\
-\file{thr001}     & Time-series data with large spikes removed.\\
-\file{ts001}      & Time-sorted time-series data.\\
-\file{tss001}     & Time-series data with median DC signal removed.  \\
+\file{em001}      & Ends of the frequency axis have been trimmed off \\
+\file{thr001}     & Time-series data with large spikes removed \\
+\file{ts001}      & Time-sorted time-series data \\
+\file{tss001}     & Time-series data with median DC signal removed \\
 \file{blmask001}  & Baseline mask cube. Regions of emission have been
                     masked out. \\
-\file{bl001}      & Baselined cube.\\
-\file{linteg00n}  & Integrated intensity image formed around the n$^{th}$ line. \\
+\file{bl001}      & Baselined cube \\
+\file{linteg00n}  & Integrated intensity image formed around the
+                    $n^\textnormal{th}$ line. \\
 \hline
 \end{tabular}
 \label{tab:pipe-out}
@@ -2783,26 +2788,27 @@ application \makemos\ to mosaic the images.
 \item MOSAIC\_EACH: Flag to indicate whether the data should be
 mosaicked by individual object or combined into a single output file.
 \item MOSAIC\_TASK: Name of mosaicking task to use, \wcsmosaic\ or
-\makemos. [wcsmosaic]
+\makemos. \param{[wcsmosaic]}
 \item MAKEMOS\_METHOD: Image combination method for \makemos, may be
-median (default), mean or sigmas. See \xref{\textsc{ccdpack}
+\param{median} (default), \param{mean} or \param{sigmas}. See \xref{\textsc{ccdpack}
 manual}{sun139}{} for advice on choosing a method.
 \item MAKEMOS\_SIGMAS: Sigma-clipping threshold if MAKEMOS\_METHOD =
-sigmas. [4]
+sigmas. \param{[4]}
 \item MASK\_LOWVAR: Flag to indicate that pixels with anomalously-low
-variances should be removed before mosaicking. [0]
+variances should be removed before mosaicking. \param{[0]}
 \item WCSMOSAIC\_METHOD: \wcsmosaic\ and \wcsalign\ pixel-spreading
-method. [nearest]
+method. \param{[nearest]}
 \item WCSMOSAIC\_PARAMS: additional parameters that may be specified
 with \wcsmosaic.
 
 \end{itemize}
 
-\textbf{Running PICARD recipes}\\
+\section{Running PICARD recipes}
+
 There are a number of options available when running \picard\ recipes.
 The example below illustrates most of them.
 \begin{terminalv}
-\texttt{\% picard -recpars params.ini MOSAIC\_JCMT\_IMAGES \`{}cat myfilelist.lis\`{} -log sfx}
+% picard -recpars params.ini MOSAIC_JCMT_IMAGES `cat myfilelist.lis` -log sfx
 \end{terminalv}
 
 \begin{itemize}
@@ -2810,19 +2816,19 @@ The example below illustrates most of them.
 It is called by the \param{recpars} option. This file has the same
 \file{.ini} format used by the ORAC-DR pipeline (see
 \cref{Section}{sec:recpars}{Setting recipe parameters}).
-\item The recipe name need to be in upper-case.
+\item The recipe name need to be in uppercase.
 \item If you need to supply multiple files you can do so by listing
 them in a file (\file{myfilelist.lis} in this example) and running cat on it.
 The input file must be in the current directory, or a directory
 defined by the environment variable \param{ORAC\_DATA\_IN}. Note the
 back-quotes.
 \item Like the ORAC-DR pipeline, the \param{-log} option specifies
-whether the log file should be written to the screen [\texttt{s}], a
-file [\texttt{f}] or an x-window [\texttt{x}].
+whether the log file should be written to the screen [\param{s}], a
+file [\param{f}] or an x-window [\param{x}].
 \end{itemize}
 
 \begin{tip}
-TIP: The .sdf extension on filenames is required by \textsc{Picard}.
+TIP: The \file{.sdf} extension on filenames is required by \textsc{Picard}.
 \end{tip}
 
 \begin{tip}
@@ -2869,6 +2875,7 @@ array components DATA, VARIANCE, and QUALITY through the \param{EXTABLE} file,
 avoiding the \ndfcopy\ and possible \setvar\ steps.
 
 \section{Converting an NDF file to FITS}
+
 The \convert\ package can also be used to convert an NDF file to FITS format.
 
 \begin{terminalv}
@@ -2933,10 +2940,11 @@ this algorithm, clumps never overlap. Clumps which touch an edge of
 the data array are not included in the final list of clumps.
 \\\\
 \textbf{Reinhold}\\
-Based on an algorithm developed by Kim Reinhold at JAC. See SUN/255
-for more information on this algorithm. The edges of the clumps are
-first found by searching for peaks within a set of 1D profiles running
-through the data, and then following the wings of each peak down to
+Based on an algorithm developed by Kim Reinhold at JAC. See
+\cupidsun\ for more information on this algorithm. The edges of the
+clumps  are first found by searching for peaks within a set of
+one-dimensional profiles running through the data, and then following
+the wings of each peak down to
 the noise level or to a local minimum. A mask is thus produced in
 which the edges of the clumps are marked. These edges however tend to
 be quite noisy, and so need to be cleaned up before further use. This
@@ -3001,8 +3009,8 @@ Ensure white is entry 0 and black in entry 1.
 \begin{itemize}
 \item Use \wcsattrib\ to set how your axes should be formatted. Here
 the format of the first and second axes is set to two decimal places
-for Galactic coordinates. Find out more about the format option under
-\wcsattrib\ in the \xref{\textsc{Kappa} manual}{sun95}{}.
+for Galactic coordinates. Find out more about the \att{Format} attribute
+under \wcsattrib\ in the \xref{\textsc{Kappa} manual}{sun95}{}.
 \begin{terminalv}
 % wcsattrib map set format"(1)" .2
 % wcsattrib map set format"(2)" .2
@@ -3044,7 +3052,7 @@ Depending on your default settings you may get a map like the one below.
   Displaying an integrated map with \Kappa:\display\ using a style file
   to format the plotting attributes.}
 
-Below is a copy of the style file (style.dat) used to make
+Below is a copy of the style file (\file{style.dat}) used to make
 \cref{Figure}{fig:display2}{the figure above}.
 
 \begin{terminalv}
