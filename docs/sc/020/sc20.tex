@@ -1471,6 +1471,21 @@ options available to you describing how to divide an input pixel
 between a group of neighbouring output ones (the default is
 \param{SincSinc}).
 
+Note that by default \wcsmosaic\ aligns reduced cubes along the
+spectral using the heliocentric standard of rest, even if all the
+cubes to be tessellated have a different and common standard of rest,
+as would be the case for cubes created by the \oracdr\ pipeline, which
+uses the kinematic local standard of rest.  If you want to align using
+a non-heliocentric standard of rest, you should set the
+\att{AlignStdOfRest} attribute for your NDFs before running \wcsmosaic.
+The following example sets the alignment to the kinematic LSR.
+
+\begin{terminalv}
+% wcsattrib <list_of_separate_cubes> set AlignStdOfRest LSRK
+\end{terminalv}
+
+where $<$list\_of\_separate\_cubes$>$ is group of cubes specified
+as a comma-separated list or as one per line in a text file.
 
 \begin{tip}
 Take care not to combine data separated on the sky as \wcsmosaic\
@@ -1484,7 +1499,7 @@ will correctly combine all NDF extensions. See
 \cref{Appendix}{app:picard}{Picard} for details.
 \end{tip}
 
-
+\newpage
 \section{\xlabel{Crop}Cropping your map}
 \label{sec:collapse}
 
