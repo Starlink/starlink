@@ -2723,9 +2723,12 @@ into master group files.
 \begin{thebibliography}{}
 \addcontentsline{toc}{section}{References}
 
-
 \bibitem{cupid}
 Berry~D.~S., 2013, \textit{CUPID. Version 2.0}, \xref{Starlink User Note 255}{sun255}{}
+
+\bibitem{fellwalker}
+Berry~D.~S., 2015, \htmladdnormallink{\textit{FellWalker -- a Clump Identification
+Algorithm}}{http://arxiv.org/abs/1411.6267}
 
 \bibitem{harp}
 Buckle, J.~V., Hills, R.~E., Smith, H., et al., 2009,
@@ -2979,11 +2982,11 @@ filled with an index value associated with the peak position. Another
 cellular automata is used to removed noise from the filled clumps.
 \\\\
 \textbf{FellWalker}\\
-Based on an algorithm which walks up hill along the line of greatest
-gradient until a significant peak is reached. It then assigns all
-pixels visited along the route to the clump associated with the peak.
+David Berry devised an algorithm which walks up hills along the line
+of greatest gradient until a significant peak is reached. It then
+assigns all pixels visited along the route to the clump associated with the peak.
 Such a walk is performed for every pixel in the data array which is
-above a specified background level.
+above a specified background level.  It is described in Berry (2015).
 \\\\
 See \cupidsun\ for more information on \findclumps\ and a full list of
 the configuration options for each algorithm.
