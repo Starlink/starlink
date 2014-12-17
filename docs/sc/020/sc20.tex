@@ -563,6 +563,9 @@ the JCMT in 2014; they have both been in active service for many years
 and comprise the bulk of archived JCMT heterodyne data. For
 information on previous instruments see the JCMT web pages.
 
+In the following $\eta_\textnormal{MB}$ is the main-beam efficiency and
+$\eta_\textnormal{fss}$ is the forward spillover and scattering efficiency.
+
 \subsection{RxA Frontend}
 
 Receiver A (RxA) is a single-element double-sideband receiver. It
@@ -573,7 +576,7 @@ mapping.
 \begin{center}
 \begin{tabular}{|p{1.5cm}|p{1.2cm}|p{0.8cm}|p{0.8cm}|}
 \hline
-Receiver &FWHM & $\eta_{MB}$ & $\eta_{fss}$\\
+Receiver &FWHM & $\eta_\textnormal{MB}$ & $\eta_\textnormal{fss}$\\
 \hline
 RxA&19.7$\arcsec$&0.69 & 0.80\\
 \hline
@@ -608,7 +611,7 @@ below}.
 \begin{center}
 \begin{tabular}{|p{1.5cm}|p{1.2cm}|p{0.8cm}|p{0.8cm}|}
 \hline
-Receiver &FWHM & $\eta_{MB}$ & $\eta_{fss}$\\
+Receiver &FWHM & $\eta_\textnormal{MB}$ & $\eta_\textnormal{fss}$\\
 \hline
 HARP&14$\arcsec$ &0.63& 0.88\\
 \hline
@@ -1403,9 +1406,9 @@ the advanced method outlined above.
 
 Your cube will come out of \makecube\, and the pipeline, in units of
 $T_A^*$. To convert this to main beam temperature, $T_{MB}$ multiply
-your cube by the main beam efficiency, $\eta_{MB}$. Alternatively, to
+your cube by the main-beam efficiency, $\eta_\textnormal{MB}$. Alternatively, to
 convert to receiver temperature, $T_{rec}$, multiply by the forward
-scattering and spillover efficiency, $\eta_{fss}$.  See
+scattering and spillover efficiency, $\eta_\textnormal{fss}$.  See
 \cref{Section}{sec:instruments}{Heterodyne instruments} for efficiency
 values for RxA and HARP, and the JCMT webpages for further information
 and historical numbers.
