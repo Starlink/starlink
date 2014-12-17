@@ -3190,19 +3190,23 @@ The plus sign means the change will not be remembered next time
 \item To plot multiple spectra from a cube you can use \clinplot.
 
 \begin{terminalv}
-% clinplot "cube(61.06~4,0.15~4,0:40)" nokey style=^style.dat \
-  specstyle="'colour(textlab)=black,colour(numlab)=black'"
+% clinplot "cube(61.06~5,0.15~4,10.:30.)" nokey style=^style.dat reflabel \
+  specstyle="'colour(textlab)=red,colour(numlab)=red'" mode=hist
 \end{terminalv}
 
-This example plots a grid of 4$\times$4 pixels around $l=61.$\udeg$06
-and $b=0.$\udeg$15. Each spectra has a range of 0 to 40 km/s.  The
+This example plots a grid of 5$\times$4 pixels around $l=61.$\udeg$06
+and $b=0.$\udeg$15. Each spectrum has a range of 10 to 30 km/s.  Note
+the decimal points are necessary for the spectral limits, otherwise
+the spectrum would extend from pixel coordinates 10 to 30.  The
 \param{specstyle} option allows you to format the spectral axes inside
 the main plot. The formatting options are the usual plotting
-attributes.
+attributes.  The flag \param{reflabel} annotates the interior spectral
+axes.
+
 \end{itemize}
-%\myfig{sc20_clinplot}{[h!]}{width=0.55\linewidth}{fig:display6}{Displaying
-%a grid of spectra with \clinplot.}{Displaying a grid of spectra with
-%\clinplot.}
+\myfig{sc20_clinplot.eps}{[h!]}{width=0.9\linewidth}{fig:display6}{Displaying
+a grid of spectra with \clinplot.}{Displaying a grid of spectra with
+\clinplot.}
 
 
 \section{Plotting two images side by side}
