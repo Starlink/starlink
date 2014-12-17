@@ -1821,10 +1821,30 @@ rawfile\_01 and 24 channels from the `right' of rawfile\_02.
 \end{terminalv}
 These can then be merged using \wcsmosaic.
 \begin{terminalv}
-% wcsmosaic in='"rawfile1,rawfile2"' out=rawfile12 lbnd=! method=nearest accept
+% wcsmosaic in='"rawfile_01,rawfile_02"' out=rawfile12 lbnd=! method=nearest accept
 \end{terminalv}
 You should check the final spectra to make sure there is no noise bump
 in the middle where they overlap.
+
+Another technique to locate the noisy edges is apply \collapse\ to all
+the spectra in an observation using the \param{estimator=sigma}
+option then smooth.  The composite formed will show a smooth noise profile,
+increasing dramatically at its end.  The trim limits can be estimated
+manually, or a linear trend fit with \mfittrend\ will return the bounds
+of the flat low-noise portion of the spectrum in its \param{aranges}
+parameter.
+
+\begin{terminalv}
+% collapse in=rawfile_01 out=profile axis=spec wlim=0.0 estimator=sigma trim
+% block in=profile out=profile_sm box=25
+% mfittrend in=profile_sm out=junk axis=1 method=region auto order=0
+% parget aranges mfittrend
+\end{terminalv}
+
+In the example above, \parget\ should return just one pair of pixel
+coordinates, which can then form part of an NDF section to extract the
+non-noisy part of rawfile\_01 using \ndfcopy. If there is more than one
+range you want to use the lowest and highest values.
 
 \section{\xlabel{pv}Position-velocity diagram}
 
