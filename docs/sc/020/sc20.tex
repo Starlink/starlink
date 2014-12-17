@@ -1761,20 +1761,20 @@ axis having dual side-band spectral units. You can check this with
 \ndftrace:
 
 \begin{terminalv}
-% ndftrace file.sdf | grep Domain
+% ndftrace file | grep Domain
 \end{terminalv}
 You can change the attributes of a cube using \wcsattrib. To change
-the SkyFrame coordinate system set the \param{system} attribute.
+the SkyFrame coordinate system set the \att{System} attribute.
 \begin{terminalv}
-% wcsattrib file.sdf set system galactic
+% wcsattrib file set system galactic
 \end{terminalv}
 To change between velocity and frequency you also use the
-\param{system} attribute. For SKY-DSBSPECTRUM the software knows which
+\att{System} attribute. For SKY-DSBSPECTRUM the software knows which
 axis is being referred to based on the option you supply (the third in
 this case).
 \begin{terminalv}
-% wcsattrib file.sdf set system freq
-% wcsattrib file.sdf set system vrad
+% wcsattrib file set system freq
+% wcsattrib file set system vrad
 \end{terminalv}
 Once a cube has been collapsed and is two-dimensional its frame
 becomes SKY. If you need to change frames manually use \wcsframe.
@@ -1786,7 +1786,7 @@ For offset coordinates you will need to set the system
 \param{skyrefis} to origin. The final two lines in the example below
 convert the offset units to arcseconds instead of radians.
 \begin{terminalv}
-% wcsattrib file.sdf set skyrefis origin
+% wcsattrib file set skyrefis origin
 % wcsattrib file set 'format(1)' 's.*'
 % wcsattrib file set 'format(2)' 's.*'
 \end{terminalv}
@@ -1855,7 +1855,7 @@ This grid of channel maps is filled from left to right, and bottom to
 top. It can be viewed with \gaia\ (see Figure \ref{fig:chanmap}) or
 with \display.
 \begin{terminalv}
-% display chanmap mode=faint noaxes lut=/star/bin/kappa/smooth3_lut.sdf
+% display chanmap mode=faint noaxes lut=/star/bin/kappa/smooth3_lutf
 \end{terminalv}
 
 Channel maps can also be created using \gaia. See
@@ -1880,7 +1880,7 @@ and as a NDF pixel mask showing the clump boundaries (see Figure
 of the various algorithms.
 
 \begin{terminalv}
-% findclumps in=map.sdf out=clumpmap.sdf outcat=clumps.FIT logfile=clumps.log \
+% findclumps in=map out=clumpmap outcat=clumps.FIT logfile=clumps.log \
   config=^myconfig.dat method=clumpfind rms=0.2 shape=polygon
 \end{terminalv}
 
@@ -3095,7 +3095,7 @@ details.
 \param{lut} option.
 \begin{terminalv}
 % display integ.sdf axes style=^style.dat mode=scale low=0 high=100 \
-  lut=/star/bin/kappa/random3_lut.sdf
+  lut=/star/bin/kappa/random3_lut
 \end{terminalv}
 \myfig{sc20_display10}{[h!]}{width=0.5\linewidth}{fig:display10}{
   Displaying an integrated map in colour with \Kappa:\display.}{
