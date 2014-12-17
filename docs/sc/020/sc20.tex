@@ -1425,8 +1425,8 @@ You can use the \Kappa\ command \cmult\ to multiply any NDF by a constant.
 You may want to regrid your data onto larger pixels, for instance to
 allow direct comparison with data from other observatories. In the
 example below a JCMT map is regridded and aligned to match a Herschel
-map. See Appendix \ref{app:convert} for instructions on converting
-your FITS file to NDF format.
+map. See \cref{Appendix}{app:convert}{Converting file formats} for
+instructions on converting your FITS file to NDF format.
 \begin{terminalv}
 % wcsalign in=jcmtmap out=regridmap lbnd=! ubnd=! ref=herschelmap rebin conserve=f
 \end{terminalv}
@@ -1625,15 +1625,15 @@ region using \gaia.}
 \includegraphics[height=7cm]{sc20_ard5.eps}
 \hspace{0.3cm}
 \includegraphics[height=7cm]{sc20_ard6.eps}
-\caption[Cropping a region of a 2D map.]{(Left) After applying the ARD
-mask, the cropped region is still surrounded by blank pixels. (Right)
+\caption[Cropping a region of a two-dimensional map.]{(Left) After
+applying the ARD mask, the cropped region is still surrounded by blank pixels. (Right)
 The blank pixels have been trimmed using \ndfcopy\ with the
 \param{trimbad} option.}
 \label{fig:crop}
 \end{center}
 \end{figure}
 
-
+\newpage
 \section{\xlabel{holes}Filling holes in your map}
 \label{sec:holes}
 
@@ -1656,15 +1656,16 @@ largest region of bad data to be replaced.  Since the largest bad
 regions apart from the cube peripheries are two pixels across, a size
 of 1 is appropriate.
 \begin{terminalv}
-% fillbad in=holeymap out=filledmap  size="[1,1,0]"
+% fillbad in=holeymap out=filledmap size="[1,1,0]"
 \end{terminalv}
 \cref{Figure}{fig:fillholes}{The figure below} shows an initial map
 with holes and the final filled map.
 
-\myfigduo{sc20_holeyharp}{sc20_polyfillaharp}{[h!]}{width=0.48\linewidth}{
-  fig:fillholes}{0.5mm}{Filling holes in your HARP map with \fillbad.}{
-  Filling holes in your HARP map with \fillbad. Compare the original
-  map (left) to the filled map (right).}
+\myfigduo{sc20_holeyharp}{sc20_polyfillaharp}{[ht!]}{
+  width=0.48\linewidth}{fig:fillholes}{0.5mm}{Filling holes in your
+  HARP map with \fillbad.}{Filling holes in your HARP map with
+  \fillbad. Compare the original map (left) to the filled map (right).
+  A blue pixel indicates an undefined spectrum.}
 
 
 \section{\xlabel{noise}Checking the noise}
@@ -2057,7 +2058,7 @@ Peak1/Peak2 which give the position of the peak within them.
 \item A catalogue window for your FITS file will appear listing all
 the sources and their positions and extents.
 
-\myfig{sc20_plotclumps5}{[h!]}{width=0.42\linewidth}{fig:gaia_clumps3}{
+\myfig{sc20_plotclumps5}{[h!]}{width=0.5\linewidth}{fig:gaia_clumps3}{
   Catalogue window in \gaia.}{Catalogue window in \gaia.}
 
 \item Outlines of your clumps, or symbols at the peak positions, will
@@ -2092,17 +2093,18 @@ below).
   Displaying an average spectrum with \gaia.}{Displaying an average spectrum
   with \gaia.}
 
-\myfigduo{sc20_gaia_avgspec2}{sc20_gaia_avgspec3}{[h!]}{width=0.48\linewidth}{
-   fig:gaia_avgspec2}{0.5mm}{Example of averaged spectra.}{
-   (Left) Average of the spectra within the blue circle in the figure
-   above. (Right) Single spectrum from the centre of the blue circle
-   above.}
-
 \item Draw the shape on your map by clicking and dragging the mouse.
 The \gaiathing{Spectral plot} window will automatically update to show
-your combined spectrum. You can re-position and re-size your shape at
-any time. You can see from Figure \ref{fig:gaia_avgspec2} that the
+your combined spectrum. You can re-position and resize your shape at
+any time. You can see from \cref{Figure}{fig:gaia_avgspec2} that the
 averaged spectra gives a much clearer profile of the source.
+
+\myfigduo{sc20_gaia_avgspec2}{sc20_gaia_avgspec3}{[h!]}{width=0.48\linewidth}
+   {fig:gaia_avgspec2}{0.5mm}{
+   Example of averaged spectra.}{(Left) Average of the spectra within 
+   the blue circle in the figure above. (Right) Single spectrum from the
+   centre of the blue circle above.}
+
 
 \end{enumerate}
 
@@ -2833,7 +2835,7 @@ files are expected but do not appear in your working directory.
 \chapter{\xlabel{convert}Converting file formats}
 \label{app:convert}
 
-\section{\xlabel{convert}Converting a FITS file to NDF}
+\section{Converting a FITS file to NDF}
 
 A FITS file can be converted to NDF using the \starlink\
 package \convert. Note that the \file{.sdf} file extension NDF may
