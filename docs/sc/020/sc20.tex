@@ -1875,7 +1875,7 @@ This grid of channel maps is filled from left to right, and bottom to
 top. It can be viewed with \gaia\ (see Figure \ref{fig:chanmap}) or
 with \display.
 \begin{terminalv}
-% display chanmap mode=faint noaxes lut=/star/bin/kappa/smooth3_lutf
+% display chanmap mode=faint noaxes lut=$STARLINK_DIR/bin/kappa/smooth3_lut
 \end{terminalv}
 
 Channel maps can also be created using \gaia. See
@@ -2907,13 +2907,14 @@ The \convert\ package can also be used to convert an NDF file to FITS format.
 \newpage
 \chapter{\xlabel{script}Scripting your reduction}
 \label{app:script}
+
 You may wish to write a script to process your data rather than
 running each task independently. In this case your script should start
 with:
 \begin{terminalv}
 #!/bin/csh -f
-source /star/etc/login >& /dev/null
-source /star/etc/cshrc >& /dev/null
+source $STARLINK_DIR/etc/login >& /dev/null
+source $STARLINK_DIR/etc/cshrc >& /dev/null
 kappa >& /dev/null
 \end{terminalv}
 
@@ -3102,9 +3103,9 @@ textlabgap(2)=0.01
   Reversing the colour scale in \Kappa:\display.}
 
 \item There are a number of colour palettes available in Starlink. You
-can find them in the /star/bin/kappa/ directory.
+can find them in the \file{\$STARLINK\_DIR//bin/kappa/} directory.
 \begin{terminalv}
-% ls /star/bin/kappa/*lut.sdf
+% ls $STARLINK_DIR/bin/kappa/*lut.sdf
 \end{terminalv}
 
 You can create your own colour scheme using the \Kappa\ routine
@@ -3115,7 +3116,7 @@ details.
 \param{lut} option.
 \begin{terminalv}
 % display integ.sdf axes style=^style.dat mode=scale low=0 high=100 \
-  lut=/star/bin/kappa/random3_lut
+  lut=$STARLINK_DIR/bin/kappa/random3_lut
 \end{terminalv}
 \myfig{sc20_display10}{[h!]}{width=0.5\linewidth}{fig:display10}{
   Displaying an integrated map in colour with \Kappa:\display.}{
