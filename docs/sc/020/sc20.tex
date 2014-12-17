@@ -2539,10 +2539,14 @@ you should also set \param{ORAC\_KEEP}.
 \begin{terminalv}
 % setenv ORAC_KEEP 1
 \end{terminalv}
-However, this still excludes oractemp files. To retain these set
+However, this still excludes temporary files made during a recipe step,
+whose names have the \file{oractemp} prefix.  To retain these set
 \begin{terminalv}
 % setenv ORAC_KEEP temp
 \end{terminalv}
+
+Retention of temporary and intermediate will require plenty of storage,
+but it can be invaluable during debugging.
 
 \item Now you are ready to run the pipeline. In this example, the
 recipe name on the end ensures that all data being processed using
