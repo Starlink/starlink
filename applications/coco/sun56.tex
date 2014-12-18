@@ -1,248 +1,32 @@
-\documentstyle[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt,nolof,noabs]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {56.10}
-\newcommand{\stardocauthors}   {P T Wallace}
-\newcommand{\stardocdate}      {21st June 1995}
-\newcommand{\stardoctitle}     {COCO --- Conversion of Celestial Coordinates}
-\newcommand{\stardocversion}   {v2.2-3}
-\newcommand{\stardocmanual}    {User Guide}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {56.10}
+\stardocauthors     {P T Wallace}
+\stardocdate        {21st June 1995}
+\stardoctitle       {COCO --- Conversion of Celestial Coordinates}
+\stardocversion     {v2.2-3}
+\stardocmanual      {User Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
+% ? Document specific \providecommand or \newenvironment commands.
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
+\providecommand{\radec}  {$[\alpha,\delta\,]$}
 
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+\providecommand{\qt}[1]{``{\texttt{#1}}''}
 
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
-\newcommand{\radec}  {$[\alpha,\delta\,]$}
-
-\newcommand{\qt}[1]{``{\tt{#1}}''}
-\begin{htmlonly}
-   \newcommand{\qt}[1]{{\tt{"#1"}}}
-\end{htmlonly}
-
-\newcommand{\fstring}[1]{\hbox{\hspace{0.05em}{\qt{#1}}\hspace{0.05em}}}
+\providecommand{\fstring}[1]{\hbox{\hspace{0.05em}{\qt{#1}}\hspace{0.05em}}}
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-%  \vspace{10mm}
-%  \begin{center}
-%     {\Large\bf Abstract}
-%  \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \newcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-% \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%   ==================
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
- \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 %------------------------------------------------------------------------------
 
@@ -269,7 +53,7 @@ is meaningful.
 
 The input/output arrangements of COCO are flexible, to allow
 a variety of operating styles -- interactive, input from a file,
-report to a file, batch, {\it etc}.
+report to a file, batch, \textit{etc}.
 Also, in addition to the report which is produced, the results of the
 conversions are also available in a raw form, to a fixed resolution
 and free from extraneous formatting; this file is intended
@@ -288,24 +72,24 @@ conversion can be done using COCO.
 \section{Operating Instructions}
 To run COCO interactively, on either VAX/VMS platforms or
 the Sun SPARCstation and DECstation Unix-based platforms, simply type:
-\begin{verbatim}
+\begin{terminalv}
       COCO
-\end{verbatim}
+\end{terminalv}
 The program then accepts commands and outputs appropriate replies.
 
 \goodbreak
 The primary commands are as follows:
-\begin{verbatim}
+\begin{terminalv}
    Command                     Function
 
      I p    specify input coordinate system (p defined below)
      O p    specify output coordinate system (       "       )
   <coords>  perform conversion  (or = to repeat last coordinates)
      E      exit
-\end{verbatim}
-where the parameter {\tt p}, specifying the coordinate system, is
+\end{terminalv}
+where the parameter \texttt{p}, specifying the coordinate system, is
 as follows:
-\begin{verbatim}
+\begin{terminalv}
      4 [eq] [ep]     equatorial, FK4 (barycentric)
      B [eq] [ep]     like FK4 but without E-terms (barycentric)
      5 [eq] [ep]     equatorial, FK5 (barycentric)
@@ -315,13 +99,13 @@ as follows:
 
      eq = equinox, e.g. 1950 (optional B or J prefix)
      ep = epoch, e.g. 1984.53 or 1983 2 26.4
-\end{verbatim}
+\end{terminalv}
 Coordinates type 4 and B default to equinox B1950. Coordinates type 5 default
 to equinox J2000. In all three of these coordinate systems the epoch defaults
 to the equinox. For coordinate type G the epoch defaults to B1950.
 
 The following commands are also available:
-\begin{verbatim}
+\begin{terminalv}
    Command                     Function
 
      F         specify RA mode: x = H for hours, D for degrees
@@ -331,7 +115,7 @@ The following commands are also available:
      H         list the commands
      R x       select report resolution:  x = H, M or L
                                         (high,medium,low)
-\end{verbatim}
+\end{terminalv}
 
 Input is free-format, with spaces separating the fields (comma is
 also acceptable as a field separator within coordinates).
@@ -362,11 +146,11 @@ a QSO position measured from a plate taken in mid-1976 and
 using reference stars from the B1950.0 SAO catalogue to coordinates
 in the new J2000.0 system.
 The following commands could be used:
-\begin{verbatim}
+\begin{terminalv}
   I 4 1950 1976.5        * input system is FK4 B1950; epoch is 1976.5
   O 5                    * output system is FK5 J2000
   12 43 25.3 +32 15 29   * measured 1950 position; no proper motion
-\end{verbatim}
+\end{terminalv}
 
 Some additional operating modes are described in a later section.
 
@@ -406,13 +190,13 @@ deflection assume that the source is distant.
 In particular, COCO is not suitable for predicting apparent places
 for the Sun.
 \item COCO is not intended for the conversion of catalogue data,
-and reports positions only; updated proper motions {\it etc.}\
+and reports positions only; updated proper motions \textit{etc.}\
 are not reported.
 Full conversion of catalogue data is best done by writing
-{\it ad hoc}\, programs, using the subprograms in the SLALIB
+\textit{ad hoc}\, programs, using the subprograms in the SLALIB
 library (see SUN/67).
 \item COCO accepts both commands and data from up to two
-sources, called the {\it primary}\, and {\it secondary}\ input files.
+sources, called the \textit{primary}\, and \textit{secondary}\ input files.
 To switch to a secondary input file called STARS.DAT, for
 example, would require the command /STARS.DAT.
 (The switch command itself is available only from the primary input file.)
@@ -425,7 +209,7 @@ could be the list of stars and the primary file a series of pairs of
 commands, each pair specifying a new epoch and then switching again
 to the secondary file to process all the stars anew.
 \item All of COCO's coordinate systems except for geocentric apparent
-are barycentric, {\it i.e.}\ unaffected by parallax.
+are barycentric, \textit{i.e.}\ unaffected by parallax.
 Mean places which include displacements
 due to parallax can be handled by working
 via the intermediary of geocentric
@@ -452,7 +236,7 @@ given date:
 \section{Input Formats}
 
 The input and output coordinate systems require, variously,
-{\it equinoxes}\, and {\it epochs}. The timescale is TDB, which
+\textit{equinoxes}\, and \textit{epochs}. The timescale is TDB, which
 for most uses of COCO can be regarded as the same as UTC.
 
 Equinoxes are Besselian or Julian epochs.
@@ -467,7 +251,7 @@ or as year,month,day in the Gregorian calendar.
 Valid examples are J1984.3296 and 1985~2~13.2439.
 Calendar dates have to have valid years and months, but a days
 value outside the
-conventional range is permissible ({\it e.g.}~1992~12~32)
+conventional range is permissible (\textit{e.g.}~1992~12~32)
 
 In the mean \radec\ systems, the equinox defines the coordinate
 system while the epoch defines the date of observation.
@@ -480,13 +264,13 @@ Each input coordinate system has its own data format, as follows.
 \subsection{The three sorts of Mean RA,Dec}
 
 For $\alpha$ in hours the following formats are accepted:
-\begin{verbatim}
+\begin{terminalv}
         RA     Dec        PM       Px    RV
        h m s  d ' "  [s/y  "/y     ["   [km/s]]]
  or    h m s  d '
  or    h m    d '
  or    h      d
-\end{verbatim}
+\end{terminalv}
 
 The first two, four, five, or six numeric fields, representing
 $\alpha$ and $\delta$,
@@ -528,10 +312,10 @@ parallax is not zero, the \radec\ is barycentric -- see Section~2, Note~6.)
 
 For $\alpha$ in degrees (selected by the command ``F~D"), the
 following format is accepted:
-\begin{verbatim}
+\begin{terminalv}
         RA     Dec
         d       d
-\end{verbatim}
+\end{terminalv}
 
 Both numbers are required.  There is provision for neither sexagesimal
 notation nor proper motion.
@@ -539,39 +323,39 @@ notation nor proper motion.
 \subsection{Geocentric Apparent}
 
 For $\alpha$ in hours the following formats are accepted:
-\begin{verbatim}
+\begin{terminalv}
         RA     Dec
        h m s  d ' "
  or    h m s  d '
  or    h m    d '
-\end{verbatim}
+\end{terminalv}
 
 Four, five, or six numbers are required.
 
 For $\alpha$ in degrees (selected by the command ``F~D"), the
 following format is accepted:
-\begin{verbatim}
+\begin{terminalv}
         RA     Dec
         d       d
-\end{verbatim}
+\end{terminalv}
 
 Both numbers are required.
 
 \subsection{Ecliptic}
 
-\begin{verbatim}
+\begin{terminalv}
        lambda  beta
           d      d
-\end{verbatim}
+\end{terminalv}
 
 Both numbers are required.
 
 \subsection{Galactic}
 
-\begin{verbatim}
+\begin{terminalv}
        L2   B2
         d    d
-\end{verbatim}
+\end{terminalv}
 
 Both numbers are required.
 
@@ -582,9 +366,9 @@ invoke COCO
 both have optional parameters which
 allow the sources and destinations of the main input and
 output streams to be defined:
-\begin{verbatim}
+\begin{terminalv}
       COCO   [input]  [report]  [output]
-\end{verbatim}
+\end{terminalv}
 
 In the case of interactive operation, both input and report
 are assigned to the terminal.
@@ -599,16 +383,16 @@ of modes of use, both interactive and batch.
 More direct control of COCO may be desirable on occasion.
 
 Under VMS, it is permissible to invoke the COCO executable program
-by first assigning the logical names {\tt FOR0nn} to the required
+by first assigning the logical names \texttt{FOR0nn} to the required
 files:
-\begin{verbatim}
+\begin{terminalv}
      FOR011      output     raw output for redirection
      FOR012      output     echo of input
      FOR013      output     report (including error warnings)
      FOR015      input      commands and data
      FOR016      output     prompts
      FOR017      output     error warnings
-\end{verbatim}
+\end{terminalv}
 
 (In addition, I/O unit 14 is used internally to read secondary
 files.)
@@ -619,7 +403,7 @@ the commands included in the batch command procedure itself,
 with no output file, and with the results to appear in the
 printed log.
 This could be accomplished by submitting the following command procedure:
-\begin{verbatim}
+\begin{terminalv}
       $  ASSIGN/USER_MODE NL:         FOR011  ! raw output
       $  ASSIGN/USER_MODE SYS_$OUTPUT FOR012  ! echo of input
       $  ASSIGN/USER_MODE SYS_$OUTPUT FOR013  ! report
@@ -635,18 +419,18 @@ This could be accomplished by submitting the following command procedure:
       14 39 36.087 -60 50 07.14   -0.49486 +0.6960   0.752 -22.2
 
       E
-\end{verbatim}
+\end{terminalv}
 
 On the Unix platforms, the COCO executable may be invoked by means of
 the following shell command:
 
-\begin{verbatim}
+\begin{terminalv}
       coco.x terml output echo report input prompts errors
-\end{verbatim}
+\end{terminalv}
 
 The seven command-line parameters, all of which must be present,
 are, respectively, the string identifying the terminal (perhaps
-obtained by using the command {\tt set terml = `tty`}) and the
+obtained by using the command \texttt{set terml = `tty`}) and the
 six filenames.
 
 \section{Acknowledgments}
