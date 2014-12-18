@@ -1,279 +1,85 @@
-\documentstyle[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt,nolof,noabs]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {195.1}
-\newcommand{\stardocauthors}   {G R Mellor}
-\newcommand{\stardocdate}      {26 September 1995}
-\newcommand{\stardoctitle}     {NEWS\\ [\latex{2ex}]
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {195.1}
+\stardocauthors     {G R Mellor}
+\stardocdate        {26 September 1995}
+\stardoctitle       {NEWS\\ [\latex{2ex}]
                                 Starlink Online Information System}
 
 % ? End of document identification
 
 % -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\html}[1]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document specific \providecommand or \newenvironment commands.
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
+\scfrontmatter
 
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle}
-   \end{center}
-   \vspace{5mm}
-
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \newcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-\end{htmlonly}
-
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
- \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
 
 \section{Introduction\xlabel{introduction}}
 
-The {\tt news} command provides access to recent topics of interest for
+The \texttt{news} command provides access to recent topics of interest for
 Starlink users.  There are items on the latest Starlink software
 releases, relevant jobs and other happenings within the astronomical
-community.  Users are encouraged to regularly browse the {\tt news}
+community.  Users are encouraged to regularly browse the \texttt{news}
 system to keep abreast of the latest developments within the
 community.
 
-\section{Using {\tt news}\xlabel{using_news}}
+\section{Using \texttt{news}\xlabel{using_news}}
 
-In its simplest form, {\tt news} can be invoked by simply typing {\tt
-news}.  A list of titles of {\tt news} items will be displayed in
+In its simplest form, \texttt{news} can be invoked by simply typing \texttt{news}.
+ A list of titles of \texttt{news} items will be displayed in
 reverse chronological order, together with their submission dates.  The
 user will be prompted to select an item to read.  Any substring of the
 title will be sufficient to display that topic.  If the substring is not
 unique, then all the relevant topics will be sequentially displayed.
-The topic can be paged through using {\tt $<$RETURN$>$} or quit  at any
-point by typing {\tt q}.  Some items have subtopics and these can be
+The topic can be paged through using \texttt{$<$RETURN$>$} or quit  at any
+point by typing \texttt{q}.  Some items have subtopics and these can be
 individually displayed after reading the main item.
 
-Invoking {\tt news} with the {\tt -t} option will cause the news items
+Invoking \texttt{news} with the \texttt{-t} option will cause the news items
 to be listed alphabetically by title, rather than chronologically.  If
 you wish to bypass the topic listing and read a topic immediately,
-then it is possible to type {\tt news} {\it $<$ title $>$}.
+then it is possible to type \texttt{news} \textit{$<$ title $>$}.
 
-News items can be printed by typing {\tt p} or exported to a disk
-file by typing {\tt e}. {\tt news -h} will give a brief help description.
+News items can be printed by typing \texttt{p} or exported to a disk
+file by typing \texttt{e}. \texttt{news -h} will give a brief help description.
 
 \subsection{New news items\xlabel{new_news_items}}
 
-{\tt news -n} will give a listing of all {\tt news} items posted since
+\texttt{news -n} will give a listing of all \texttt{news} items posted since
 your last login.  This should be configured by your Site Manager to run
 automatically during the system login procedure but you can include
-this in your own {\tt .login} file if necessary.
+this in your own \texttt{.login} file if necessary.
 
 \section{Submitting a News item\xlabel{submitting_a_news_item}}
 
-{\tt news} is a quick and effective way of your information reaching
+\texttt{news} is a quick and effective way of your information reaching
 the whole UK astronomical community as it is available at all Starlink
 sites.
 
 Items should be submitted via your Site Manager who will forward it on
-to the Starlink Project team for dissemination. {\tt news} items should
+to the Starlink Project team for dissemination. \texttt{news} items should
 usually appear within 24 hours at all sites.
 
-{\tt news} items follow a simple format and you are asked to ensure that
+\texttt{news} items follow a simple format and you are asked to ensure that
 your submitted items conform to this standard:
 
 \begin{itemize}
 
 \item Line One should contain a numeral ``1'' followed by a space and then
-the title of the {\tt news} item.
+the title of the \texttt{news} item.
 
 \item Line Two should contain a right-justified expiry statement,
-giving the expiry date for the item, of the form: {\tt Expires: date}.
-The right-justification should use spaces, not {\tt <TAB>} characters.
+giving the expiry date for the item, of the form: \texttt{Expires: date}.
+The right-justification should use spaces, not \texttt{<TAB>} characters.
 
 \item The body of the text should not exceed column 75 ---
 the news items are usually posted on Usenet.
@@ -284,15 +90,15 @@ in column one of the text apart from the first line.
 \item Subtopics should commence with a numeral ``2'' in column one followed
 by a title.
 
-\item Only two levels of news are readable by the {\tt news} program.
+\item Only two levels of news are readable by the \texttt{news} program.
 
 \end{itemize}
 
 \subsection{Example news item\xlabel{example_news_item}}
 
 
-\begin{quote}\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 
 1 An Example News Item
                                                          Expires: 10/7/95
@@ -311,7 +117,7 @@ All text after this point is included in the subtopic...
 
 ...with its text in here.
 
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 \end{document}
