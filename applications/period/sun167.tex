@@ -994,4 +994,420 @@ suggestions regarding significance estimates.
 \rf{Schwarzenberg-Czerny, A., 1991. {\em Mon. Not. R. astr. Soc.}, {\bf 253}, 198.}
 \rf{Stellingwerf, R.~F., 1978. {\em Astrophys. J.}, {\bf 224}, 953.}
 
+\clearpage
+\appendix
+
+
+\section{History}
+
+{\noindent This appendix lists all of the changes made to the PERIOD
+package and the release dates of\newline the various versions.}
+\vspace{10mm}
+
+
+
+\begin{verbatim}
+
+   DATE       Author            Comments
+
+1992 July 10   VSD       VERSION 1.0 released to Robert Smith (Sussex),
+                         Mark O'Dell (Sussex) and Erik Kuulkers (Amsterdam).
+
+                         *** VERSION 1.0 ***
+
+1992 July 21   VSD       This history file added to the package.
+1992 July 21   VSD       PERIOD_SCARGLE modified to output EFFM instead of
+                         PROB and JMAX. This enables PEAKS to calculate te
+                         false alarm probability of any peak in the
+                         periodogram.
+1992 July 21   VSD       PERIOD_PERIOD modified to cope with changes in
+                         PERIOD_SCARGLE and calculate the false alarm
+                         probability of any peak selected in PEAKS.
+                         Also included a trap for invalid values of the
+                         loop gain in CLEAN (greater than 0 and less than 2).
+1992 July 21   VSD       PERIOD_INPUT modified to prevent crashes if the
+                         input file contains two contiguous x-axis points
+                         with the same or decreasing values.
+1992 July 21   VSD       PERIOD_DOC extended by adding a recipe.
+
+\end{verbatim}
+
+
+
+\newpage
+
+
+\begin{verbatim}
+
+   DATE       Author            Comments
+
+1992 July 21   VSD       PERIOD_MAIN, _CLEAN, _DETREND, _FIT, _FOLD, _FT,
+                         _INPUT, _NOISE, _PERIOD, _PHASE, _POLYFIT and
+                         _STATUS modified in order to handle 10000 data or
+                         frequency points and 40 data files containing 20
+                         columns. This ensures a page file quota of no more
+                         than 34000 is required to run PERIOD.
+1992 July 21   VSD       PERIOD_LOG, _READFREE, _STATUS modified by setting
+                         large loop variables in data or parameter
+                         declarations.
+1992 July 21   VSD       Included a MAXCOL parameter in PERIOD_MAIN and
+                         PERIOD_INPUT in order to cut down array sizes.
+                         Also set size of MAXANT to MXROW in order to
+                         ensure that only the maximum number of permitted
+                         rows are loaded.
+1992 July 21   VSD       PERIOD_COM:PERIOD_MAIL.COM added in order to make
+                         e-mailing new versions of PERIOD easier.
+1992 July 21   VSD       VERSION 1.1 of PERIOD released to incorporate the
+                         above changes. Copy given to Mark O'Dell (Sussex).
+
+                         *** VERSION 1.1 ***
+
+1992 July 29   VSD       PERIOD_SCARGLE modified to remove calculation of
+                         false alarm probability from subroutine.
+1992 July 29   VSD       PEAKS in PERIOD_PERIOD modified to include a more
+                         rigorous calculation of the SCARGLE false alarm
+                         probability using an analytical expression for the
+                         number of independent frequencies.
+1992 July 30   VSD       NWK parameter, specifying sizes of the workspace
+                         arrays in PERIOD_PERIOD and PERIOD_SCARGLE, reduced
+                         from MXROW*100 to MXROW*16 in order to cut down on
+                         memory usage.
+1992 July 30   VSD       PERIOD_MOMENT modified to remove redundant skew and
+                         kurtosis calculations.
+1992 Aug 6     VSD       PERIOD_DOC.TEX split into two documents -- a user
+                         document (PERIOD_USER.TEX -- LUN 2.1) and a system
+                         document (PERIOD_SYSTEM.TEX -- LSN 1.1).
+1992 Aug 7     VSD       PERIOD_INTRO modified to give my address as RGO
+                         La Palma and my e-mail account as CAVAD::VSD.
+1992 Aug 17    VSD       PERIOD_USER.TEX largely rewritten in order to make
+                         document clearer and more comprehensive.
+1992 Aug 17    VSD       Sampling interval in MEM option of PERIOD_PERIOD
+                         now output in PEAKS instead of in MEM.
+
+\end{verbatim}
+
+
+\newpage
+
+
+\begin{verbatim}
+   DATE       Author            Comments
+
+1992 Aug 17    VSD       Dimension of NWK in PERIOD_PERIOD changed from 16
+                         to 27. This is because the maximum possible workspace
+                         usage (assuming 10000 data points and 10000 frequency
+                         steps) in PERIOD_SCARGLE is 262144.
+1992 Aug 17    VSD       VERSION 1.2 of PERIOD released to incorporate the
+                         above changes. Installed on SUSTAR as local
+                         STARLINK software. Copy sent to Erik Kuulkers
+                         (Amsterdam).
+
+                         *** VERSION 1.2 ***
+
+1992 Sept 24  VSD       Annoying information written to screen when running
+                        PLT removed from PERIOD_PLT.
+1993 Mar 3    VSD       Now at ING, not Sussex! PERIOD_PDM and PERIOD_FTEST
+                        subroutines added for the new Phase Dispersion
+                        Minimization (PDM) option.
+1993 Mar 3    VSD       PERIOD_PERIOD extensively modified to cope with the
+                        new PDM option. The two major changes are the
+                        inclusion of the code to call PERIOD_PDM (which
+                        calculates the PDM statistic) and PEAKS, which now
+                        does an F-test to determine the significance of a
+                        PDM minimum by calling PERIOD_FTEST.
+1993 Mar 3    VSD       Error check on zero period added to PERIOD_FAKE,
+                        PERIOD_FIT, PERIOD_PHASE and PERIOD_SINE.
+1993 Mar 4    VSD       Reduced the size of the INFILEARRAY string in
+                        PERIOD_PERIOD by shortening 'Frequency' to 'Freq'.
+1993 Mar 4    VSD       Adapted PERIOD_SYSTEM.TEX (LSN 1.2) and
+                        PERIOD_USER.TEX (LUN 2.2) to incorporate
+                        new PDM option and other changes to
+                        bring the documentation into line with the
+                        STARLINK release.
+1993 Mar 4    VSD       New e-mail address, version number and date
+                        added to PERIOD_INTRO.
+1993 Mar 4    VSD       PERIOD_COMPILE, PERIOD_LIBRARY, PERIOD_MAIL
+                        all modified to include the new PERIOD_PDM and
+                        PERIOD_FTEST subroutines.
+1993 Mar 4    VSD       VERSION 2.0 of PERIOD released to incorporate
+                        the above changes. Installed on ING Vax and
+                        copies sent to STARLINK (RLVAD::STAR), Sussex
+                        (SUSTAR::SYSTEM) and Amsterdam
+                        (PSI\%IBERPAC.DWINGELOO::UVAA01::ERIK)
+
+                         *** VERSION 2.0 ***
+
+\end{verbatim}
+
+
+\newpage
+
+
+\begin{verbatim}
+   DATE       Author            Comments
+
+1993 Mar 16    VSD       Bug in FOLD option found by Martin Still (Sussex).
+                         Traced to PROMPT_ZEROPT parameter not setting
+                         ZEROPT parameter correctly. Modified PERIOD_FIT and
+                         PERIOD_PHASE subroutines accordingly (by removing
+                         the PROMPT_ZEROPT parameter completely).
+1993 Mar 17    VSD       Included an on-line help option. A new subroutine,
+                         PERIOD_HELP, reads a set of help files contained
+                         in the new PERIOD subdirectory PERIOD_HLP. The help
+                         files are named according to the convention:
+                         PERIOD_'COMMAND'.HLP. PERIOD_MAIN and
+                         PERIOD_PERIOD have been modified accordingly,
+                         as have the various command procedures and
+                         documents (LSN 1.3 and LUN 2.3).
+1993 Mar 17    VSD       Minor changes made to PERIOD_INPUT to reduce
+                         references made to RUBY.
+1993 Mar 17    VSD       TYPE replaced by WRITE in PERIOD_INPUT and
+                         PERIOD_STATUS to conform to standard F77.
+1993 Mar 17    VSD       Bug in PERIOD_LOG which prevented the opening
+                         of an old log file fixed.
+1993 Mar 17    VSD       VERSION 3.0 of PERIOD released to incorporate
+                         the above changes. Installed on ING Vax and
+                         copies sent to STARLINK (RLVAD::STAR), Sussex
+                         (SUSTAR::SYSTEM) and Amsterdam
+                         (PSI\%IBERPAC.DWINGELOO::UVAA01::ERIK)
+                         This was the first version to be released on STARLINK.
+
+                         *** VERSION 3.0 ***
+
+1993 Jul 5    VSD        Included line number as diagnostic of corrupted
+                         x-axis data in PERIOD_INPUT (in response to request
+                         from Margaret Penston, RGO).
+1993 Aug 21   VSD        Bug in PERIOD_PHASE found by Martin Still (Sussex).
+                         When folding data using binning on a number of files
+                         the folded data is all placed into a single
+                         (incorrect) slot. Problem traced to the use of
+                         the COUNTER variable for two different tasks
+                         (slot number and data array elements). Changed
+                         the data array variable to BINCOUNT. Checked all
+                         PERIOD subroutines for a similar error and nothing
+                         found.
+1993 Aug 2    VSD        Bug in PERIOD_CLEAN found (and corrected) by
+                         Christian Knigge (Oxford). When processing a number
+                         of files using CLEAN the first periodogram is
+                         calculated correctly, but subsequent files are
+
+\end{verbatim}
+
+
+\newpage
+
+
+\begin{verbatim}
+   DATE       Author            Comments
+
+                         wrongly processed, as are files processed if CLEAN
+                         is run twice without exiting PERIOD. Problem traced
+                         to the C array which is now initialised on each
+                         call to PERIOD_CLEAN. Checked all PERIOD_PERIOD
+                         subroutines for a similar error and nothing
+                         found.
+1993 Aug 22    VSD       PERIOD_CLEAN made more robust by checking the
+                         HWHM calculated by PERIOD_HWHM is not zero before
+                         calling PERIOD_FILLB -- this used to cause a crash.
+1993 Aug 22    VSD       PEAKS in PERIOD_PERIOD now checks that different
+                         numbers are specified for the periodogram and
+                         time-series. Also now quits if a 0 is entered for
+                         the slot number (this did not work properly before).
+1993 Aug 22    VSD       Bug in CHAOS option of PERIOD_FAKE did not reset
+                         the initial value parameter if processing more
+                         than one slot. Problem remedied by introducing
+                         a new parameter -- INITVAL.
+1993 Aug 22    VSD       PERIOD_DETREND made more robust by removing the
+                         PERIOD_POLYFIT subroutine and calling PERIOD_LSQUAR
+                         directly from PERIOD_DETREND. Program now outputs
+                         the chi-squared value of the polynomial fit. Also
+                         rewrote PERIOD_POLY to handle polynomials of order
+                         up to 20 (the previous limit was 12) and removed
+                         the redundant subroutine PERIOD_DPOLY. Updated the
+                         command procedures in PERIOD_COM by removing any
+                         reference to PERIOD_POLYFIT, which has now been
+                         deleted from the PERIOD_FOR subdirectory.
+1993 Aug 22    VSD       Bug found in DETREND -- the polynomial fit was
+                         divided and not subtracted from the time-series.
+                         Have modified PERIOD_DETREND accordingly.
+1993 Aug 22    VSD       Added my INTERNET e-mail address to PERIOD_INTRO
+                         and incremented the date and version number (3.1).
+1993 Aug 27    VSD       Removed string length significance limits from
+                         PEAKS in PERIOD_PERIOD since misleading (the
+                         theoretical minimum only applied to an
+                         evenly-spaced sinusoid). Followed comment by
+                         Christian Knigge (Oxford).
+1993 Aug 27    VSD       Corrected reduced chi-squared values in the CHISQ
+                         option of PERIOD_PERIOD and PERIOD_FIT by dividing
+                         by the number of points minus the number of free
+                         parameters (=3 in PERIOD_SINFIT). Previously, the
+                         chi-squared value was only divided by the number
+                         of points. Bug spotted by Christian Knigge (Oxford).
+
+\end{verbatim}
+
+
+\newpage
+
+
+\begin{verbatim}
+   DATE       Author            Comments
+
+1993 Aug 27    VSD       Removed chi-squared value of polynomial fit from
+                         PERIOD_DETREND and replaced with simple RMS
+                         calculation. VERSION 3.1 never released.
+
+                         *** VERSION 3.1 ***
+
+1993 Nov 13   VSD       Removed CHAOS option from PERIOD_PERIOD since it is
+                        of no use in its present form. Modified PERIOD_HELP
+                        and various .COM files and deleted the .HLP file to
+                        reflect this change.
+1993 Nov 13   VSD       Removed MEM option from PERIOD_PERIOD since it is
+                        of no use in its present form. Modified PERIOD_HELP
+                        and various .COM files and deleted the .HLP file to
+                        reflect this change. Removed the now redundant
+                        subroutines PERIOD_EVLMEM, PERIOD_MEMCOF and
+                        PERIOD_MDIAN1 from the PERIOD_FOR directory and
+                        placed them in the PERIOD_DEV directory.
+1993 Nov 13   VSD       Minor bug in PERIOD_NOISE discovered. Removed the
+                        option which allows one to add Poissonian noise
+                        to the data since it incorrectly just added the
+                        SQRT of the data value.
+1993 Nov 13   VSD       Removed PERIOD_FTEST from the PERIOD_FOR directory
+                        and placed in PERIOD_DEV directory. This routine
+                        is now redundant since significances are calculated
+                        in PERIOD_PERIOD using a Fisher test (see below).
+1993 Nov 14   VSD       Major changes to PERIOD_PERIOD in order to include
+                        significance estimate for each periodogram. Removed
+                        the estimates from PEAKS (which were all incorrect),
+                        added an extra option SIG and modified each of the
+                        6 remaining PERIOD finding options in order to
+                        perform a Fisher randomisation test. Also included
+                        new INFO parameter in PERIOD_FT, PERIOD_SCARGLE
+                        and PERIOD_CLEAN.
+1993 Nov 14   VSD       Modified PERIOD_INTRO to reflect new version, date
+                        and removed request for acknowledgments.
+1993 Nov 14   VSD       Modified PERIOD_DETREND and PERIOD_POLY by setting
+                        maximum polynomial order from 20 to 10 (since this
+                        was causing underflow errors).
+1993 Nov 14   VSD       Changed variable type of SEED in PERIOD_NOISE from
+                        REAL to INTEGER, since this caused a crash.
+1993 Nov 14   VSD       Changed check of minimum number of points in
+                        PERIOD_SINFIT from .LT. 3 to .LE. 3 since this
+                        caused a crash.
+1993 Nov 18   VSD       Updated all the .HLP files to reflect the above
+                        changes and included a new file for the SIG option.
+
+\end{verbatim}
+
+
+\newpage
+
+
+\begin{verbatim}
+   DATE       Author            Comments
+
+
+1993 Nov 18    VSD       Restructured PERIOD subdirectories. Now only 4
+                         subdirectories -- .FOR, .HLP, .DOC and .SYS. The
+                         first three directories contain the fortran source
+                         code, help files and user documents (as before). The
+                         .SYS directory contains the executable image and the
+                         command procedures for initialising and making the
+                         PERIOD package.
+1993 Nov 18    VSD       Restructured the command procedures. There are now
+                         only two: PERIOD_START.COM and PERIOD_MAKE.COM
+                         (which calls PERIOD_MAKE.OPT). This is to bring it
+                         more into line with STARLINK standard.
+                         PERIOD_START.COM now defines the new directories
+                         and defines a new logical PERIOD_DISK.
+                         PERIOD_MAKE.COM compiles, creates and fills the
+                         object library, links and then deletes the object
+                         files and object library.
+1993 Nov 18    VSD       To bring into line with STARLINK, the PERIOD
+                         initialisation command is now PERIODSTART (and not
+                         PERIOD_START).
+1994 Jan 15    VSD       Included a new subroutine PERIOD_CASE which converts
+                         strings from lower to upper case. Replaces calls
+                         to the VAX/VMS specific STR\$UPCASE.
+1994 Jan 24    VSD       Modified PERIOD_STRING and PERIOD_SINFIT so as not
+                         to crash when presented with windowed data. All
+                         PERIOD_PERIOD options can now either cope with
+                         windowed data or else report an error.
+1994 Jan 25    VSD       Changes made to PERIOD_DOC files. This file
+                         converted to \LaTeX\ and renamed PERIOD_HISTORY.TEX.
+                         PERIOD_SYSTEM.TEX renamed to SSN167.TEX and
+                         rewritten to reflect above changes. SUN167.TEX also
+                         rewritten to reflect above changes. PERIOD_USER.TEX
+                         (the old Sussex LUN) deleted.
+1994 Jan 26    VSD       Changes made to PERIOD_INPUT so that if it finds
+                         x-axis data which is not in ascending order, it
+                         prompts users for whether they would like to sort
+                         it or not. If they do, it sorts the data using
+                         PERIOD_SHELLSORT. If not, it aborts as before.
+                         Follows suggestions by Ed Zuiderwijk (RGO).
+1994 Feb 1     VSD       Following extensive testing, VERSION 4.0 of PERIOD
+                         released to incorporate the above changes.
+                         Installed on ING Vax and copies sent to STARLINK
+                         (RLVAD::STAR) and Amsterdam (ERIK@astro.uva.nl).
+
+                         *** VERSION 4.0 ***
+
+\end{verbatim}
+
+
+\newpage
+
+
+\begin{verbatim}
+   DATE       Author            Comments
+
+1995 June 15  GJP       PERIOD Version 4.0 ported to UNIX.
+                        Functionality remains the same as version 4.0
+                        Now requires an environmental variable to
+                        find the help files. SUN167 and SSN25 re-written
+                        dropping references to VMS.
+1995 Sept 26  GJP       Added the OGIP reading option and modified
+                        the documents accordingly. SSN167 becomes SSN25.
+1995 Oct  12  GJP       Modified SUN167, SSN25 and PERIOD_HISTORY
+                        to be compatible with star2html so that WWW
+                        versions can be created by latex2html. Also,
+                        removed conversion of input files names to upper
+                        case. Submitted to STARLINK.
+1995 Dec  15  BLY       Removed dependencies on XANADU versions on PLT and
+                        FITSIO by a) providing xanlib.a and plt.dhf for
+                        supported systems, b) using Starlink version of
+                        FITSIO.  Makefile and documents modified accordingly.
+                        Hypertext versions of documents created.
+                        Starlink Release.
+
+                        *** VERSION 4.1 ***
+
+1997 Mar  10  GJP       PERIOD 4.1 ported to LINUX.
+                        QDP PLT routine replaced by PGPLOT with some
+                        small loss of interactive plotting capability.
+                        Slightly clearer error messages in some routines,
+                        modified help files and a minor VAXism in
+                        period_output was fixed. A number of routines have
+                        been changed to ensure that the variables used
+                        are preinitialised to zero.
+
+1997 May  07  BLY       Modified period_poly.f to use integer powers not
+                        double precision powers when raising X to higher
+                        powers since X can be negative.  Old method caused
+                        core dump on Digital Unix.
+
+                        *** VERSION 4.2 ***
+
+                        *** VERSION 5.0 ***
+
+2001 Dec  12  KPD       PERIOD implemented in Double Precision.
+                        Dynamic array allocation/deallocation introduced
+                        for the majority of the input, output and work
+                        arrays.
+
+
+\end{verbatim}
+
 \end{document}
