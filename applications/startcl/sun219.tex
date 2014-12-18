@@ -1,18 +1,17 @@
-\documentstyle[twoside,11pt]{article}
-\pagestyle{myheadings}
+\documentclass[twoside,11pt,nolof]{starlink}
+
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {219.1}
-\newcommand{\stardocauthors}   {M.\, J.\, Bly}
-\newcommand{\stardocdate}      {5 June 1997}
-\newcommand{\stardoctitle}     {The GWM Xdisplay Widget}
-\newcommand{\stardocversion}   {[software-version]}
-\newcommand{\stardocmanual}    {User's Guide}
-\newcommand{\stardocabstract}  {%
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {219.1}
+\stardocauthors     {M.\, J.\, Bly}
+\stardocdate        {5 June 1997}
+\stardoctitle       {The GWM Xdisplay Widget}
+\stardocmanual      {User's Guide}
+\stardocabstract  {%
 The GWM Xdisplay widget is a Tcl/Tk-based replacement for the standard GWM
 Xdisplay manager.  It provides several facilities not available in the
 standard display manager, including manipulation of the colour table of the
@@ -22,226 +21,13 @@ to print files of various formats.
 % ? End of document identification
 
 % -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\html}[1]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document specific \providecommand or \newenvironment commands.
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-%  {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-%     \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \newcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
- \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section{\label{introduction}\xlabel{introduction}Introduction}
 
@@ -290,19 +76,19 @@ generate a display `xwindows' can use the TCL/GWM widget if it is available.
 
 A typical TCL/GWM widget might be generated thus:
 
-\begin{quote}
-{\tt \% xmake -colours 128 xwindows}
-\end{quote}
+\begin{terminalv}
+% xmake -colours 128 xwindows
+\end{terminalv}
 
-where {\tt{\%}} is the shell prompt.  This will generate a widget with
-128 colours allocated called {\tt{xwindows}}
+where \texttt{\%} is the shell prompt.  This will generate a widget with
+128 colours allocated called {\texttt{xwindows}}
 
-If you need an overlay plane ({\em{e.g.}}\/ to plot contour maps over images)
-you can use the {\tt{-overlay}} switch:
+If you need an overlay plane ({\emph{e.g.}}\/ to plot contour maps over images)
+you can use the {\texttt{-overlay}} switch:
 
-\begin{quote}
-{\tt \% xmake -colours 128 -overlay xwindows}
-\end{quote}
+\begin{terminalv}
+% xmake -colours 128 -overlay xwindows
+\end{terminalv}
 
 A full list of the TCL/GWM widget command switches is given in
 \xref{SUN/186}{sun186}{gwm_widget}.
@@ -320,28 +106,28 @@ In order across the bottom, the buttons are:
 
 \begin{description}
 
-\item[{\tt{Exit}}] Press this and the widget will exit.
+\item[{\texttt{Exit}}] Press this and the widget will exit.
 
-\item[{\tt{Colours}}] Displays the {\sf{Gwm Colours}} dialog box that
+\item[{\texttt{Colours}}] Displays the {\sf{Gwm Colours}} dialog box that
 allows you to manipulate the colours on the plotting surface of the
 widget, including the foreground, background, overlay and crosshair
 cursor.
 
-\item[{\tt{Clear}}] Wipes the plotting surface clean.
+\item[{\texttt{Clear}}] Wipes the plotting surface clean.
 
-\item[{\tt{Clear Overlay}}] Wipes the overlay surface clean.  This button is
+\item[{\texttt{Clear Overlay}}] Wipes the overlay surface clean.  This button is
 only present if you start the TCL/GWM widget with an overlay.
 
-\item[{\tt{Capture}}] Displays the {\sf{Gwm JPEG}} dialog box that
+\item[{\texttt{Capture}}] Displays the {\sf{Gwm JPEG}} dialog box that
 allows you to dump the current plot to a JPEG file.
 
-\item[{\tt{Print}}] Displays the {\sf{Gwm Print}} dialog box that
+\item[{\texttt{Print}}] Displays the {\sf{Gwm Print}} dialog box that
 allows you to dump the current plot to a print file in a number of
 formats, including PostScript.
 
-\item[{\tt{Crosshair}}] Toggles the appearance of the crosshair cursor.
+\item[{\texttt{Crosshair}}] Toggles the appearance of the crosshair cursor.
 
-\item[{\tt{Help}}] Displays the help text.  The help text is
+\item[{\texttt{Help}}] Displays the help text.  The help text is
 essentially the same information provided in this document.
 
 \end{description}
@@ -359,22 +145,22 @@ colour or pixel value to alter by selecting the appropriate button.
 
 \begin{description}
 
-\item[{\tt{Background:}}] Colour (pixel value) 0 -- this is the
+\item[{\texttt{Background:}}] Colour (pixel value) 0 -- this is the
 background colour of the plotting surface.
 
-\item[{\tt{Foreground:}}] Colour (pixel value) 1 -- this is the
+\item[{\texttt{Foreground:}}] Colour (pixel value) 1 -- this is the
 foreground colour of the plotting surface.
 
-\item[{\tt{Other:}}] This option toggles the {\tt{Pixel~value}} slider which
+\item[{\texttt{Other:}}] This option toggles the {\texttt{Pixel~value}} slider which
 enables you to select any of the colours or pixel values to change,
 including 0 (background), 1 (foreground) and the overlay (if you have
 one enabled).
 
-\item[{\tt{Overlay:}}] If you have generated a TCL/GWM widget with an
+\item[{\texttt{Overlay:}}] If you have generated a TCL/GWM widget with an
 overlay for plotting contours on an image, you can change the colour
-used for the overlay by selecting the {\tt{Overlay}} button.
+used for the overlay by selecting the {\texttt{Overlay}} button.
 
-\item[{\tt{Crosshair:}}] This button allows you to modify the colour
+\item[{\texttt{Crosshair:}}] This button allows you to modify the colour
 used to display the crosshair cursor.  You don't have to have the
 crosshair cursor enabled to set the colour.
 
@@ -384,9 +170,9 @@ crosshair cursor enabled to set the colour.
 
 \begin{description}
 
-\item[{\tt{OK:}}] Closes the {\sf{Gwm Colours}} dialogue box.
+\item[{\texttt{OK:}}] Closes the {\sf{Gwm Colours}} dialogue box.
 
-\item[{\tt{Help:}}] Displays this help text.
+\item[{\texttt{Help:}}] Displays this help text.
 
 \end{description}
 
@@ -394,10 +180,10 @@ crosshair cursor enabled to set the colour.
 
 \begin{description}
 
-\item[{\tt{Pixel~value:}}] When you have the {\tt{Other}} button selected,
+\item[{\texttt{Pixel~value:}}] When you have the {\texttt{Other}} button selected,
 this slider selects which colour or pixel value is to be modified.
 
-\item[{\tt{Red, Green, Blue:}}] These control the intensity of the red,
+\item[{\texttt{Red, Green, Blue:}}] These control the intensity of the red,
 green and blue colour for any given colour (pixel value) previously
 selected.
 
@@ -420,7 +206,7 @@ image quality.
 
 \begin{description}
 
-\item[{\tt{Image quality:}}] Selects the quality of the image produced
+\item[{\texttt{Image quality:}}] Selects the quality of the image produced
 in the JPEG compression.  You can vary the quality from 50\% to 95\% with
 95\% being the highest quality and therefore largest file.
 
@@ -430,7 +216,7 @@ in the JPEG compression.  You can vary the quality from 50\% to 95\% with
 
 \begin{description}
 
-\item[{\tt{Progressive:}}] A `progressive' image is an image that, when
+\item[{\texttt{Progressive:}}] A `progressive' image is an image that, when
 loaded by a JPEG viewing program, will be displayed in increasing
 quality as the viewer program reads more of the file.  This is the
 option to select if the JPEG image is to be used on the World Wide
@@ -442,9 +228,9 @@ Web.
 
 \begin{description}
 
-\item[{\tt{Filename:}}] You should type in the name of the file you
+\item[{\texttt{Filename:}}] You should type in the name of the file you
 want to dump into, including the file extension if you want one.  JPEG
-files traditionally have the extension {\tt{.jpg}} but this widget does NOT
+files traditionally have the extension {\texttt{.jpg}} but this widget does NOT
 supply any default extension.
 
 \end{description}
@@ -453,23 +239,23 @@ supply any default extension.
 
 \begin{description}
 
-\item[{\tt{OK:}}] Start the dump.  When the dump is complete, the
+\item[{\texttt{OK:}}] Start the dump.  When the dump is complete, the
 {\sf{Gwm JPEG}} dialog box exits and control is returned to the GWM/TCL
 widget.
 
-\item[{\tt{Cancel:}}] Abandons the {\sf{Gwm JPEG}} dialog without
+\item[{\texttt{Cancel:}}] Abandons the {\sf{Gwm JPEG}} dialog without
 dumping to file.
 
-\item[{\tt{Help:}}] Displays the help text.
+\item[{\texttt{Help:}}] Displays the help text.
 
 \end{description}
 
 \end{description}
 
-The {\tt{Filename}} is the only entry you must fill in, there is no
+The {\texttt{Filename}} is the only entry you must fill in, there is no
 default filename for the dump.
 
-When you have chosen and entered a filename, select the {\tt{OK}} button to
+When you have chosen and entered a filename, select the {\texttt{OK}} button to
 capture the plot and complete the dump to JPEG file.
 
 \subsection{\label{printing_the_display}\xlabel{printing_the_display}Printing the display}
@@ -484,7 +270,7 @@ later on an appropriate printer.
 
 \begin{description}
 
-\item[{\tt{Format:}}] The format menu gives a choice of various print
+\item[{\texttt{Format:}}] The format menu gives a choice of various print
 formats: B/W (greyscale) and colour PostScript,  B/W (greyscale) and colour
 Encapsulated PostScript, and HP InkJet.
 
@@ -494,7 +280,7 @@ Encapsulated PostScript, and HP InkJet.
 
 \begin{description}
 
-\item[{\tt{As Window: / Colour:}}] The two checkbuttons control the
+\item[{\texttt{As Window: / Colour:}}] The two checkbuttons control the
 background colour of the image as printed.  You can chose either the
 background colour of the image on the plotting surface, or define the
 colour yourself using the `Colour:' checkbutton, and selecting the
@@ -507,12 +293,12 @@ colour.
 
 \begin{description}
 
-\item[{\tt{Filename:}}] You can choose the filename to which the print
+\item[{\texttt{Filename:}}] You can choose the filename to which the print
 image is dumped.  There is no default file extension for any of the
 Formats -- you have complete control of the full filename.  The
-convention is that standard PostScript files are given a {\tt{.ps}}
-extension and Encapsulated PostScript files are given a {\tt{.eps}}
-extension.  HP InkJet dump files may be given a {\tt{.dat}} extension.
+convention is that standard PostScript files are given a {\texttt{.ps}}
+extension and Encapsulated PostScript files are given a {\texttt{.eps}}
+extension.  HP InkJet dump files may be given a {\texttt{.dat}} extension.
 
 \end{description}
 
@@ -520,22 +306,22 @@ extension.  HP InkJet dump files may be given a {\tt{.dat}} extension.
 
 \begin{description}
 
-\item[{\tt{OK:}}] Activates the print action and closes the {\sf{Gwm
+\item[{\texttt{OK:}}] Activates the print action and closes the {\sf{Gwm
 Print}} dialogue box.
 
-\item[{\tt{Cancel:}}] Exits from the {\sf{Gwm Print}} dialog box
+\item[{\texttt{Cancel:}}] Exits from the {\sf{Gwm Print}} dialog box
 without creating a print file.
 
-\item[{\tt{Help:}}] Displays the help text.
+\item[{\texttt{Help:}}] Displays the help text.
 
 \end{description}
 
 \end{description}
 
 To create a print file, select a format, background colour and filename,
-then select the {\tt{OK}} button.  The dump will be started and the control
+then select the {\texttt{OK}} button.  The dump will be started and the control
 returned to the TCL/GWM widget.  While the print is being captured, the
-{\tt{Capture}} and {\tt{Print}} buttons on the TCL/GWM widget are greyed
+{\texttt{Capture}} and {\texttt{Print}} buttons on the TCL/GWM widget are greyed
 out, indicating that the functions are unavailable.  When the print capture
 and dump has completed, the buttons return to normal and it is then OK to
 send more plotting commands to the widget.
@@ -549,31 +335,31 @@ Xdisplay manager when specifying the size of the plotting surface.
 
 The standard GWM Xdisplay manager creates a plotting surface with a boarder
 round it either of the default size (780 by 512 pixels), or governed by the
-{\tt{-geometry}} command line switch.  The command:
+{\texttt{-geometry}} command line switch.  The command:
 
-\begin{quote}
-{\tt \% xmake -geometry 900x600 -colours 64 xwindows}
-\end{quote}
+\begin{terminalv}
+% xmake -geometry 900x600 -colours 64 xwindows
+\end{terminalv}
 
 will generate a 64 colour window 900 by 600 pixels in size called xwindows.
 
-The TCL/GWM widget takes any {\tt{-geometry}} command line switch information
+The TCL/GWM widget takes any {\texttt{-geometry}} command line switch information
 to use as the size of the entire widget, and packs the buttons and scrollbars
 round the largest plotting surface it can create inside the size of widget
 defined.
 
 To create a plotting surface 900 by 600 pixels you should use the
-{\tt{-height}} and {\tt{-width}} command line switches.  The command:
+{\texttt{-height}} and {\texttt{-width}} command line switches.  The command:
 
-\begin{quote}
-{\tt \% xmake -height 600 -width 900 -colours 64 xwindows}
-\end{quote}
+\begin{terminalv}
+% xmake -height 600 -width 900 -colours 64 xwindows
+\end{terminalv}
 
 will create a widget with a plotting surface 900 by 600 with the buttons
 and scroll bars packed round the plotting surface.
 
 You should note that the standard GWM Xdisplay manager does not understand the
-{\tt{-height}} and {\tt{-width}} command line switches and will generate an
+{\texttt{-height}} and {\texttt{-width}} command line switches and will generate an
 error message.
 
 \subsection{\label{x_resources}\xlabel{x_resources}X resources}
@@ -586,8 +372,7 @@ The following example shows definitions that will create a plotting
 surface of 850 by 600 pixels with 64 colours and with foreground and
 background colours set to green and black.
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 !
 ! GWM
 !   standard set
@@ -602,10 +387,9 @@ background colours set to green and black.
 *Gwm*Height: 600
 *Gwm*Width: 850
 !
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
-Defaults set in the {\tt{.Xdefaults}} file will be overridden by any
+Defaults set in the {\texttt{.Xdefaults}} file will be overridden by any
 command line switches or by applications generating their own `xwindows'
 displays with specific size, colour and other options.
 
