@@ -1,18 +1,17 @@
-\documentstyle[twoside,11pt]{article}
-\pagestyle{myheadings}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {186.3}
-\newcommand{\stardocauthors}   {D.\,L.\,Terrett}
-\newcommand{\stardocdate}      {3 March 1999}
-\newcommand{\stardoctitle}     {STARTCL --- Starlink Extensions to Tcl \& Tk}
-\newcommand{\stardocversion}   {version 1.3}
-\newcommand{\stardocmanual}    {User's Guide}
-\newcommand{\stardocabstract}  {%
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {186.3}
+\stardocauthors     {D.\,L.\,Terrett}
+\stardocdate        {3 March 1999}
+\stardoctitle       {STARTCL --- Starlink Extensions to Tcl \& Tk}
+\stardocversion     {version 1.3}
+\stardocmanual      {User's Guide}
+\stardocabstract  {%
 The STARTCL package is a set of extensions to the \TclTk\ language to
 enable \Tcl\ and \Tk\ applications to display Starlink graphics inside widgets
 embedded in the application, send and receive ADAM messages and access
@@ -24,239 +23,26 @@ interfaces for Starlink applications in \TclTk .
 % ? End of document identification
 
 % -----------------------------------------------------------------------------
+% ? Document specific \providecommand or \newenvironment commands.
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\html}[1]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
-\newcommand{\option}[3]{\par
-Name: {\bf{#1}} \\
-Class: {\bf{#2}} \\
-Command-Line Switch: {\bf{#3}} }
+\providecommand{\option}[3]{\par
+Name: {\textbf{#1}} \\
+Class: {\textbf{#2}} \\
+Command-Line Switch: {\textbf{#3}} }
 
 \newenvironment{rquote}{\begin{quote}\raggedright}{\end{quote}}
 \newenvironment{tquote}{\begin{quote}\raggedright}{\end{quote}}
 
-\newcommand{\Tcl}{{\sf{Tcl}}}
-\newcommand{\Tk}{{\sf{Tk}}}
-\newcommand{\TclTk}{{\sf{Tcl/Tk}}}
+\providecommand{\Tcl}{{\textsf{Tcl}}}
+\providecommand{\Tk}{{\textsf{Tk}}}
+\providecommand{\TclTk}{{\textsf{Tcl/Tk}}}
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \newcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
- \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section{\label{introduction}\xlabel{introduction}Introduction}
 
@@ -280,7 +66,7 @@ graphics window server and a ``gwm'' canvas item.
 \end{itemize}
 
 \begin{quote}
-{\em The message system and notice board extensions are both based on work
+\emph{The message system and notice board extensions are both based on work
 done by Dennis Kelly of the
 \htmladdnormallink{Royal Observatory Edinburgh}{http://www.roe.ac.uk/}.  }
 \end{quote}
@@ -296,7 +82,8 @@ The Starlink extensions can be built into a \Tcl\ or \Tk\ application
 by including one or more of the following functions in
 {\tt{tclAppInit.c}} or {\tt{tkAppInit.c}}.
 
-\[\begin{tabular}{|l|l|l|l|}
+\begin{center}
+\begin{tabular}{|l|l|l|l|}
 \hline
 Extension &Function &include file &object module\\
 \hline
@@ -304,7 +91,8 @@ Adam &\tt Tcladam\_Init(interp) &\tt tclAdam.h &\tt tclAdam.o\\
 Gwm &\tt Tkgwm\_Init(interp) &\tt tkGwm.h &\tt tkGwm.o\\
 Nbs &\tt Tclnbs\_Init(interp) &\tt tclNbs.h &\tt tclNbs.o\\
 \hline
-\end{tabular}\]
+\end{tabular}
+\end{center}
 
 where {\tt{interp}} is a pointer to a {\tt{Tcl\_Interp}}. All three functions
 return a \Tcl\ status value. The application should then be linked with the
@@ -313,10 +101,10 @@ specified object module all of which can be found in {\tt{/star/lib}}.
 Alternatively,
 the Adam and Gwm extensions can be loaded at run time into
 the standard interpreters with {\tt{load}} commands of the form:
-\begin{quote}{\tt
-load /star/lib/libtclAdam.so tclAdam\\
+\begin{terminalv}
+load /star/lib/libtclAdam.so tclAdam
 load /star/lib/libtkGwm.so tkGwm
-}\end{quote}
+\end{terminalv}
 
 The disadvantages of this method is the need to supply a path name for
 the shareable library which makes the script dependent on the location
@@ -355,72 +143,72 @@ The {\bf{gwm}} command creates a new \Tcl\ command whose name is
 operations on the widget. It has the following general form:
 
 \begin{quote}
-{\bf gwm} {\em pathName option ?arg arg...?}
+\textbf{gwm} \emph{pathName option ?arg arg...?}
 \end{quote}
 
 {\em{Option}} and {\em{args}} determine the exact behaviour of the command.
 
 The following widget commands are possible for gwm widgets:
 
-{\em pathName {\bf cget} option}
+\emph{pathName \textbf{cget} option}
 \begin{rquote}
-Returns the current value of the configuration option given by {\em option}.
-{\em option} may have any of the values accepted by the gwm command.
+Returns the current value of the configuration option given by \emph{option}.
+\emph{option} may have any of the values accepted by the gwm command.
 \end{rquote}
 
-{\em pathName {\bf clear}}
+\emph{pathName \textbf{clear}}
 \begin{rquote}
 Clear the picture in the widget by setting the entire window to pixel
 value zero.
 \end{rquote}
 
-{\em pathName {\bf configure} ?option? ?value option value...?}
+\emph{pathName \textbf{configure} ?option? ?value option value...?}
 \begin{rquote}
 Query or modify the configuration options of the widget.
 If no {\em{option}} is specified, returns a list describing all of
 the available options for {\em{pathName}} (see {\bf{Tk\_ConfigureInfo}} for
-information on the format of this list).  If {\em option} is specified
-with no {\em value}, then the command returns a list describing the
+information on the format of this list).  If \emph{option} is specified
+with no \emph{value}, then the command returns a list describing the
 one named option (this list will be identical to the corresponding
-sublist of the value returned if no {\em option} is specified).  If
-one or more {\em option-value} pairs are specified, then the command
+sublist of the value returned if no \emph{option} is specified).  If
+one or more \emph{option-value} pairs are specified, then the command
 modifies the given widget option(s) to have the given value(s);  in
 this case the command returns an empty string.
-{\em Option} may have any of the values accepted by the {\bf gwm}
+\emph{Option} may have any of the values accepted by the \textbf{gwm}
 command.
 \end{rquote}
 
-{\em pathName {\bf get colour} index}
+\emph{pathName \textbf{get colour} index}
 \begin{rquote}
-Returns the colour of colour table entry {\em index} as a text string in
-format \hbox{\em \#RRRRGGGGBBBBB}. {\em Index} -1 returns the
+Returns the colour of colour table entry \emph{index} as a text string in
+format \hbox{\emph{\#RRRRGGGGBBBBB}}. \emph{Index} -1 returns the
 colour of the overlay.
 \end{rquote}
 
-{\em pathName {\bf ovclear}}
+\emph{pathName \textbf{ovclear}}
 \begin{rquote}
 Clear the overlay.
 \end{rquote}
 
-{\em pathName {\bf print} filename}
+\emph{pathName \textbf{print} filename}
 \begin{rquote}
-Write the contents of the widget to {\em filename} in the format specified
-by the {\em printformat} option. This command returns as soon as the printing
+Write the contents of the widget to \emph{filename} in the format specified
+by the \emph{printformat} option. This command returns as soon as the printing
 has started; the generation of the file continues whenever the \Tcl\ interpreter
 is idle. When the printing is complete, the global variable specified by the
-{\em printvar} option is set to 1.
+\emph{printvar} option is set to 1.
 \end{rquote}
 
-{\em pathName {\bf set colour} index colour}
+\emph{pathName \textbf{set colour} index colour}
 \begin{rquote}
-Set the colour of colour table index {\em index} to {em colour}. {\em Index}
+Set the colour of colour table index \emph{index} to {em colour}. \emph{Index}
 -1 sets the colour of the overlay plane.
 \end{rquote}
 
-{\em pathName {\bf set crosshair} x\_position y\_position}
+\emph{pathName \textbf{set crosshair} x\_position y\_position}
 \begin{rquote}
 Sets the XY position of the crosshair.
-The values may be in any of the forms acceptable to {\bf Tk\_GetPixels}.
+The values may be in any of the forms acceptable to \textbf{Tk\_GetPixels}.
 \end{rquote}
 
 \subsubsection{Printing}
@@ -434,13 +222,12 @@ file is then carried out whenever the \Tcl\ interpreter is idle enabling the
 application to continue to respond to X events while the printing is in
 progress.
 Completion of the printing process is signaled by a global \Tcl\ variable
-({\bf gwm\_printvar} by default) being set to 1.
+(\textbf{gwm\_printvar} by default) being set to 1.
 
 The simplest way to detect completion is to wait for the value of the
 variable to change. {\em{e.g.}}:
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 global gwm_printvar
 set gwm_printvar 0
 if [catch {.gwm print plot.ps}] {
@@ -448,14 +235,12 @@ if [catch {.gwm print plot.ps}] {
 } else {
    tkwait variable gwm_printvar
 }
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 An alternative approach is to set a trace on the variable so that a
 procedure is invoked when the print completes. {\em{e.g.}}:
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 proc done {name1 name2 opt} {
     trace vdelete gwm_printvar w done
 }
@@ -467,8 +252,7 @@ if [catch {.gwm print plot.ps}] {
 } else {
     trace variable gwm_printvar w done
 }
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 In this example the trace routine merely deletes itself but any other
 processing can be done here.
@@ -501,7 +285,7 @@ Specifies the colour of the crosshair.
 \option{cursor}{Cursor}{-cursor}
 \begin{rquote}
 Specifies the mouse cursor to be used for the widget.
-The value may have any of the forms acceptable to {\bf Tk\_GetCursor}.
+The value may have any of the forms acceptable to \textbf{Tk\_GetCursor}.
 \end{rquote}
 
 \option{foreground}{Foreground}{-foreground {\rm or} -fg}
@@ -521,7 +305,7 @@ to ``xwindows''.
 \option{height}{Height}{-height}
 \begin{rquote}
 Specifies the width of the gwm widget. The value is in any of the forms
-acceptable to {\bf Tk\_GetPixels}. Changing this option after the widget
+acceptable to \textbf{Tk\_GetPixels}. Changing this option after the widget
 has been created has no effect. Defaults to 512 pixels.
 \end{rquote}
 
@@ -561,8 +345,8 @@ has been created has no effect. Defaults to ``no''.
 
 \option{paperWidth}{PaperWidth}{-paperwidth}
 \begin{rquote}
-Specifies the maximum width of the plot created by the {\bf print} command.
-The value is in any of the forms acceptable to {\bf Tk\_GetPixels}. The
+Specifies the maximum width of the plot created by the \textbf{print} command.
+The value is in any of the forms acceptable to \textbf{Tk\_GetPixels}. The
 plot will be the largest size possible that will fit on the paper (after
 rotation through 90 degrees if necessary) with the same aspect ratio
 as the gwm window. Defaults to 180mm (a little less than the width of an
@@ -571,7 +355,7 @@ A4 page).
 
 \option{paperHeight}{PaperHeight}{-paperheight}
 \begin{rquote}
-Specifies the maximum height of the plot in the same way as {\bf paperWidth}.
+Specifies the maximum height of the plot in the same way as \textbf{paperWidth}.
 Defaults to 250mm (a little less than the height of an A4 page).
 \end{rquote}
 
@@ -583,7 +367,7 @@ value zero is plotted in the background colour. Defaults to White.
 
 \option{printFormat}{PrintFormat}{-printformat}
 \begin{rquote}
-Specifies the format of the file produced by the {\bf print} command. Valid
+Specifies the format of the file produced by the \textbf{print} command. Valid
 values are:
 \begin{description}
 \item[ps postscript] Monochrome PostScript.
@@ -598,7 +382,7 @@ values are:
 \option{printVariable}{PrintVariable}{-printvariable}
 \begin{rquote}
 Specifies the name of the global variable that is set when a print command
-has completed. The default is {\bf gwm\_printvar}.
+has completed. The default is \textbf{gwm\_printvar}.
 \end{rquote}
 
 \option{takeFocus}{TakeFocus}{-takefocus}
@@ -609,14 +393,14 @@ See the options man page for a description of this option.
 \option{width}{Width}{-width}
 \begin{rquote}
 Specifies the width of the gwm widget. The value is in any of the forms
-acceptable to {\bf Tk\_GetPixels}. Changing this option after the widget
+acceptable to \textbf{Tk\_GetPixels}. Changing this option after the widget
 has been created has no effect.
 \end{rquote}
 
 \option{xOffset}{XOffset}{-xoffset}
 \begin{rquote}
 Specifies by how much the picture is offset from the left hand edge of the
-window. The value is in any of the forms acceptable to {\bf Tk\_GetPixels}.
+window. The value is in any of the forms acceptable to \textbf{Tk\_GetPixels}.
 Positive values shift the picture to the right and negative values shift the
 picture to the right. The default is zero.
 \end{rquote}
@@ -624,7 +408,7 @@ picture to the right. The default is zero.
 \option{xOvOffset}{XOvOffset}{-xovoffset}
 \begin{rquote}
 Specifies by how much the overlay is offset from the left hand edge of the
-window. The value is in any of the forms acceptable to {\bf Tk\_GetPixels}.
+window. The value is in any of the forms acceptable to \textbf{Tk\_GetPixels}.
 Positive values shift the picture to the right and negative values shift the
 picture to the right. The default is zero.
 \end{rquote}
@@ -632,7 +416,7 @@ picture to the right. The default is zero.
 \option{yOffset}{YOffset}{-yoffset}
 \begin{rquote}
 Specifies by how much the picture is offset from the top edge of the
-window. The value is in any of the forms acceptable to {\bf Tk\_GetPixels}.
+window. The value is in any of the forms acceptable to \textbf{Tk\_GetPixels}.
 Positive values shift the picture to down the screen and negative values
 shift the picture to up the screen. The default is zero.
 \end{rquote}
@@ -640,7 +424,7 @@ shift the picture to up the screen. The default is zero.
 \option{yOvOffset}{YOvOffset}{-yovoffset}
 \begin{rquote}
 Specifies by how much the overlay is offset from the top edge of the
-window. The value is in any of the forms acceptable to {\bf Tk\_GetPixels}.
+window. The value is in any of the forms acceptable to \textbf{Tk\_GetPixels}.
 Positive values shift the picture to down the screen and negative values
 shift the picture to up the screen. The default is zero.
 \end{rquote}
@@ -648,10 +432,10 @@ shift the picture to up the screen. The default is zero.
 \subsubsection{Colourmaps}
 
 A gwm widget always uses the colourmap of its parent window; if there
-are insufficient colourmap entries left (less than {\bf minColours})
+are insufficient colourmap entries left (less than \textbf{minColours})
 the creation of the widget will fail. In these circumstances, a gwm
 widget can still be created by creating a frame or top level widget
-with a new colourmap (with the {\bf -colormap new} option) and using
+with a new colourmap (with the \textbf{-colormap new} option) and using
 this as the parent of the gwm widget\footnote{Some existing graphics
 programs may attempt to write to the wrong colourmap when used with a
 gwm widget packed into a frame with a new colourmap and generate an X
@@ -661,10 +445,9 @@ software will correct this problem}.
 In the case of a frame with a new colourmap it is also necessary to inform
 the window manager so that the correct colourmap is installed when the
 frame receives the input focus with:
-\begin{tquote}{\tt
-wm colormapwindows [winfo toplevel \$w] \$w
+\begin{tquote}\texttt{wm colormapwindows [winfo toplevel \$w] \$w
 }\end{tquote}
-where {\tt w} has been set to the name of the new frame widget.
+where \texttt{w} has been set to the name of the new frame widget.
 
 The same technique can be used to create a gwm widget with a visual type
 other than the default for the screen being used.
@@ -674,47 +457,47 @@ other than the default for the screen being used.
 A number of \Tk\ procedures can be found in {\tt{/star/lib/startcl}} that may
 be useful when using gwm widgets either directly or as examples that can be
 modified to suit particular purposes. To use them directly, append
-{\tt /star/lib/startcl} to the global variable {\bf auto\_path}, {\em{e.g.}}:
+\texttt{/star/lib/startcl} to the global variable \textbf{auto\_path}, {\em{e.g.}}:
 
-\begin{tquote}{\tt
-lappend auto\_path /star/lib/startcl
-}\end{tquote}
+\begin{terminalv}
+lappend auto_path /star/lib/startcl
+\end{terminalv}
 
-These procedures make use of a global array called {\bf gwm\_priv}.
+These procedures make use of a global array called \textbf{gwm\_priv}.
 
-{\bf gwm\_colourDialog} {\em w gwm exit}
+\textbf{gwm\_colourDialog} \emph{w gwm exit}
 \begin{rquote}
 Creates a modeless dialog box with controls for modifying the colours of
 a gwm widget.
 
 \begin{description}
-\item[{\em w}] A name to be used for the top level widget of the dialog box.
-\item[{\em gwm}] The name of the gwm widget to be manipulated.
-\item[{\em c}] The control used to pop up the dialog box. This control will
+\item[\emph{w}] A name to be used for the top level widget of the dialog box.
+\item[\emph{gwm}] The name of the gwm widget to be manipulated.
+\item[\emph{c}] The control used to pop up the dialog box. This control will
 be disabled when the dialog box is popped up and re-enabled when it is
 dismissed.
 
 \end{description}
 \end{rquote}
 
-{\bf gwm\_gwmWithScroll} {\em w args}
+\textbf{gwm\_gwmWithScroll} \emph{w args}
 \begin{rquote}
 Returns a gwm widget with scroll bars for scrolling the window (and  overlay
 plane if there is one).
 \begin{description}
-\item[{\em w}] A name to be used for the frame widget that contains the gwm
+\item[\emph{w}] A name to be used for the frame widget that contains the gwm
 widget and the scroll bars.
-\item[{\em args}] Additional arguments to the gwm widget creation command.
+\item[\emph{args}] Additional arguments to the gwm widget creation command.
 \end{description}
 \end{rquote}
 
-{\bf gwm\_printDialog} {\em w gwm}
+\textbf{gwm\_printDialog} \emph{w gwm}
 \begin{rquote}
 Creates a modal dialog box containing controls for printing a gwm widget.
 \begin{description}
-\item[{\em w}] A name to be used for the top level widget of the dialog box.
-\item[{\em gwm}] The name of the gwm widget to be printed.
-\item[{\em c}] The control used to pop up the dialog box. This control will
+\item[\emph{w}] A name to be used for the top level widget of the dialog box.
+\item[\emph{gwm}] The name of the gwm widget to be printed.
+\item[\emph{c}] The control used to pop up the dialog box. This control will
 be disabled when the print starts and re-enabled when it completes.
 \end{description}
 \end{rquote}
@@ -728,15 +511,14 @@ over the gwm window.  A listing of this script can be found in
 appendix~\ref{example_gwm_server_script}.
 
 Arguments for the gwm widget creation command can be supplied on the command
-line (except {\bf -name} which is interpreted as an {\bf awish} option; use
-{\bf -gwmname instead}).
+line (except \textbf{-name} which is interpreted as an \textbf{awish} option; use
+\textbf{-gwmname instead}).
 
 To use your own gwm server by default whenever a gwm server
 is created (either with the xmake command or automatically by a
 graphics program), copy {\tt{/star/bin/startcl/gwmXrefresh}} to a
 directory in your {\tt{PATH}} that is positioned before
-{\tt{/star/bin/startcl}} and edit line 13 so that the variable {\tt
-gwmscript} is set to the location of suitable script that creates a gwm
+{\tt{/star/bin/startcl}} and edit line 13 so that the variable \texttt{gwmscript} is set to the location of suitable script that creates a gwm
 widget.
 
 \subsection{\label{gwm_canvas_item}\xlabel{gwm_canvas_item}GWM Canvas item}
@@ -765,66 +547,66 @@ that enable the user to interact with graphics in a much wider variety of
 ways than is possible though GKS or IDI alone. However, any drawing done
 by an external program will overwrite any existing canvas items until the
 window is redrawn by Tk; the easiest way to force the window to be redrawn
-is to use the canvas {\tt raise} or {\tt lower} commands (for example, to
+is to use the canvas \texttt{raise} or \texttt{lower} commands (for example, to
 ``lower'' the gwm canvas item so that it is underneath all  other items).
 
 Gwm items are created with widget commands of the following form:
 
 \begin{quote}
-{\em pathName} create gwm {\em x y option value option value ...}
+\emph{pathName} create gwm \emph{x y option value option value ...}
 \end{quote}
 
-The arguments {\em x} and {\em y} give the coordinates of the item's
+The arguments \emph{x} and \emph{y} give the coordinates of the item's
 top left hand corner. After the coordinates there may be any number of
-{\em option}-{\em value} pairs, each of which sets one of the
-configuration options of the item. The same {\em option}-{\em value}
+\emph{option}-\emph{value} pairs, each of which sets one of the
+configuration options of the item. The same \emph{option}-\emph{value}
 pairs may be used in itemconfigure widget commands to change the item's
 configuration. The following options are supported for gwm items:
 
-{\bf -background} {\em colour}\\
-{\bf -bg} {\em colour}
+\textbf{-background} \emph{colour}\\
+\textbf{-bg} \emph{colour}
 
 \begin{rquote}
 Specifies the background colour (colour table entry 0) of the gwm window.
 Defaults to Black.
 \end{rquote}
 
-{\bf -colours} {\em number}
+\textbf{-colours} \emph{number}
 \begin{rquote}
 Specifies the number of colours that the gwm window will attempt to allocate
 for its colour table. Setting this option after the item has been created
 has no effect. Defaults to 64.
 \end{rquote}
 
-{\bf -command} {\em number}
+\textbf{-command} \emph{number}
 \begin{rquote}
 Specifies the name of the command that is created to clear (erase the picture
 in) the item and modify the colour table. If no value is specified, no
 command will be created. Changing this option after the item has been created
 has no effect.
-\begin{quote}{\tt
-{\em command} clear
-}\end{quote}
+\begin{quote}
+\texttt{\emph{command} clear}
+\end{quote}
 clears the item.
-\begin{quote}{\tt
-{\em command} set colour {\em n} {\em colour}
-}\end{quote}
-sets colour table entry {\em n} to {\em colour}.
-\begin{quote}{\tt
-{\em command} get colour {\em n}
-}\end{quote}
-returns the colour stored in colour table entry {\em n}.
+\begin{quote}
+\texttt{\emph{command} set colour \emph{n} \emph{colour}}
+\end{quote}
+sets colour table entry \emph{n} to \emph{colour}.
+\begin{quote}
+\texttt{\emph{command} get colour \emph{n}}
+\end{quote}
+returns the colour stored in colour table entry \emph{n}.
 \end{rquote}
 
-{\bf -foreground} {\em colour}\\
-{\bf -fg} {\em colour}
+\textbf{-foreground} \emph{colour}\\
+\textbf{-fg} \emph{colour}
 \begin{rquote}
 Specifies the foreground colour (colour table entry 1) of the gwm window.
 Defaults to White.
 \end{rquote}
 
-{\bf -gwmname} {\em name}\\
-{\bf -name} {\em name}
+\textbf{-gwmname} \emph{name}\\
+\textbf{-name} \emph{name}
 \begin{rquote}
 Specifies the name of the gwm window. Setting
 this option after the item has been created has no effect. The gwm name
@@ -832,14 +614,14 @@ is the name used by graphics programs to connect to the window. Defaults
 to ``xwindows''.
 \end{rquote}
 
-{\bf -height} {\em height}
+\textbf{-height} \emph{height}
 \begin{rquote}
 Specifies the width of the gwm item. The value is in any of the forms
-acceptable to {\bf Tk\_GetPixels}. Changing this option after the item
+acceptable to \textbf{Tk\_GetPixels}. Changing this option after the item
 has been created has no effect. Defaults to 512 pixels.
 \end{rquote}
 
-{\bf -mincolours} {\em number}
+\textbf{-mincolours} \emph{number}
 \begin{rquote}
 Specifies the minimum number of colours that the gwm window should allocate
 for its colour table. If fewer than this number of colours are available,
@@ -847,46 +629,46 @@ the creation of the item will fail. Changing this option after the item
 has been created has no effect. Defaults to 2.
 \end{rquote}
 
-% {\bf -ovcolour} {\em colour}
+% \textbf{-ovcolour} \emph{colour}
 % \begin{rquote}
-% Specifies the overlay colour of the gwm window. Ignored if {\bf -overlay}
+% Specifies the overlay colour of the gwm window. Ignored if \textbf{-overlay}
 % is false.  Defaults to White.
 % \end{rquote}
 %
-% {\bf -overlay} {\em boolean}
+% \textbf{-overlay} \emph{boolean}
 % \begin{rquote}
 % Specifies whether the gwm window will have
 % an overlay plane.  Changing this option after the item
 % has been created has no effect. Defaults to ``no''.
 % \end{rquote}
 
-{\bf -tags} {\em taglist}
+\textbf{-tags} \emph{taglist}
 \begin{rquote}
-Specifies a set of tags to apply to the item. {\em Taglist} consists
+Specifies a set of tags to apply to the item. \emph{Taglist} consists
 of a list of tag names, which replace any existing tags for the item.
-{\em Taglist} may be an empty list.
+\emph{Taglist} may be an empty list.
 \end{rquote}
 
-{\bf -width} {\em width}
+\textbf{-width} \emph{width}
 \begin{rquote}
 Specifies the width of the gwm item. The value is in any of the forms
-acceptable to {\bf Tk\_GetPixels}. Changing this option after the item
+acceptable to \textbf{Tk\_GetPixels}. Changing this option after the item
 has been created has no effect.
 \end{rquote}
 
-% {\bf -xovoffset} {\em offset}
+% \textbf{-xovoffset} \emph{offset}
 % \begin{rquote}
 % Specifies by how much the overlay is offset from the left hand edge of the
-% item. The value is in any of the forms acceptable to {\bf Tk\_GetPixels}.
+% item. The value is in any of the forms acceptable to \textbf{Tk\_GetPixels}.
 % Positive values shift the picture to the right and negative values shift the
 % picture to the right. The default is zero.
 % \end{rquote}
 %
 %
-% {\bf -yovoffset} {\em offset}
+% \textbf{-yovoffset} \emph{offset}
 % \begin{rquote}
 % Specifies by how much the overlay is offset from the top edge of the
-% item. The value is in any of the forms acceptable to {\bf Tk\_GetPixels}.
+% item. The value is in any of the forms acceptable to \textbf{Tk\_GetPixels}.
 % Positive values shift the picture to down the screen and negative values
 % shift the picture up the screen. The default is zero.
 % \end{rquote}
@@ -904,7 +686,7 @@ low-level commands are described in
 appendix~\ref{low_level_adam_message_system_commands}.
 
 \begin{quote}
-{\em Some of the features of Adam tasks described here appeared in release
+\emph{Some of the features of Adam tasks described here appeared in release
 3.1 and so you must ensure that any tasks to be used with \Tcl\ have been
 linked with Adam 3.1 or later.}
 \end{quote}
@@ -922,73 +704,68 @@ of the more complicated behavour of instrument control tasks.
 \subsubsection{The OBEY message}
 
 An adam task supports one or more commands, normally referred to as
-{\em actions}, ({\em{e.g.}} the KAPPA task supports ``add'', ``cadd'',
+\emph{actions}, ({\em{e.g.}} the KAPPA task supports ``add'', ``cadd'',
 ``stats'' etc.) and is instructed to execute one of them by sending it
 an ``OBEY'' message. The message contains the action name ({\em{e.g.}} ``add'')
 and a command line which can contain parameter values and any of the
 keywords that modify the behaviour of the parameter system ({\em{e.g.}}
 ``in1=test accept''). If the task recognises the action
 name\footnote{Tasks that contain only one command ignore the action
-name and execute the command regardless} it responds with an {\tt
-actstart} message; the message name field of the message will be the
-action name and the status field will be {\tt DTASK\_\_ACTSTART}. The
+name and execute the command regardless} it responds with an \texttt{actstart} message; the message name field of the message will be the
+action name and the status field will be \texttt{DTASK\_\_ACTSTART}. The
 task then starts executing the command.
 
 In the simplest possible case, where the action writes no text and does
 not need to prompt for any parameter values, the task completes the action
-and sends an {\tt endmsg} message to the command language. The message name
+and sends an \texttt{endmsg} message to the command language. The message name
 is again the action name
-and the status will be {\tt DTASK\_\_ACTCOMPLETE}. The task is now ready to
+and the status will be \texttt{DTASK\_\_ACTCOMPLETE}. The task is now ready to
 execute another action.
 
 If, as usually happens, the task does want to display some text, it will send
-one or more {\tt inform} messages; the text to display will be in the {\em
-value} field of the message. Note that the message system makes no distinction
+one or more \texttt{inform} messages; the text to display will be in the \emph{value} field of the message. Note that the message system makes no distinction
 between text and error reports, however, the adam error reporting system
 always prefixes the first line of an error message with two exclamation marks
 and subsequent lines with a single exclamation mark. If the task needs
-a value for a parameter it will send a {\tt paramreq} message; the {\em value}
+a value for a parameter it will send a \texttt{paramreq} message; the \emph{value}
 field will contain the parameter name, prompt, default
-value etc.. The command language must reply with a {\tt paramrep} message
-with the new parameter value in the {\em value} field.
+value etc.. The command language must reply with a \texttt{paramrep} message
+with the new parameter value in the \emph{value} field.
 
 The only other message that a task might send as a result of an ``OBEY'' is
-a {\tt sync} message; the purpose of this message is to instruct the command
+a \texttt{sync} message; the purpose of this message is to instruct the command
 language to ensure that all output has been actually written to the screen
 for the user to read---for example, instructions on how to perform some
 interaction with a graphics device. In the context of a GUI, where updates
 to the screen are performed asynchronously whenever the GUI process is idle,
-the message probably has no useful function. However, a {\tt synchrep}
-message must be sent to acknowledge the {\tt sync} message (the adamtask
+the message probably has no useful function. However, a \texttt{synchrep}
+message must be sent to acknowledge the \texttt{sync} message (the adamtask
 library described below does this automatically).
 
-If an error occurs during the execution of a command, the {\em status} field
-of the final {\tt endmsg} message will be the final exit status of the action;
-ie.\ something other than {\tt DTASK\_\_ACTCOMPLETE}. If the action cannot even
+If an error occurs during the execution of a command, the \emph{status} field
+of the final \texttt{endmsg} message will be the final exit status of the action;
+ie.\ something other than \texttt{DTASK\_\_ACTCOMPLETE}. If the action cannot even
 be started (if, for example, the action name isn't recognised) there will be
-no {\tt actstart} message and the {\tt actcomplete} message will contain an
-error status (eg. {\tt SUBPAR\_\_NOACT}).
+no \texttt{actstart} message and the \texttt{actcomplete} message will contain an
+error status (eg. \texttt{SUBPAR\_\_NOACT}).
 
 \subsubsection{The SET message}
 
-To set a parameter, you send a ``SET'' message with the message {\em
-name} set to the parameter name in the form {\em action}{\tt{:}}{\em
-parameter} (eg.  stats:ndf) and the value field to the desired
-parameter value. The task will respond with a {\tt setresponse} message
-with a status field set to {\tt SAI\_\_OK} if the parameter was
-sucessfully set.  If not, it will send one of more {\tt inform}
-messages containing error messages followed by a {\tt setresponse}
-message with a status other than {\tt SAI\_\_OK} (for example, {\tt
-SUBPAR\_\_NOPAR} if the parameter didn't exist). When the task executes
+To set a parameter, you send a ``SET'' message with the message \emph{name} set to the parameter name in the form \emph{action}{\tt{:}}\emph{parameter} (eg.  stats:ndf) and the value field to the desired
+parameter value. The task will respond with a \texttt{setresponse} message
+with a status field set to \texttt{SAI\_\_OK} if the parameter was
+sucessfully set.  If not, it will send one of more \texttt{inform}
+messages containing error messages followed by a \texttt{setresponse}
+message with a status other than \texttt{SAI\_\_OK} (for example, \texttt{SUBPAR\_\_NOPAR} if the parameter didn't exist). When the task executes
 the coresponding action it will behave exactly as if the parameter had
 been set with a command line argument in the ``OBEY'' message.
 
 \subsubsection{The GET message}
 
 To get a parameter value, send a ``GET'' message with the parameter in the
-message {\tt name} field; the task will respond with a {\tt getresponse}
-message with the {\tt name} set to the parameter name and with the
-parameter's value in the {\tt value} field. Errors are handled in the same
+message \texttt{name} field; the task will respond with a \texttt{getresponse}
+message with the \texttt{name} set to the parameter name and with the
+parameter's value in the \texttt{value} field. Errors are handled in the same
 way as for a ``SET''. The ``GET'' message is only really useful if the task
 is running with its type set to ``I'', otherwise all of an actions parameters
 are annulled (set to have no value) when an action completes.
@@ -998,16 +775,15 @@ are annulled (set to have no value) when an action completes.
 A ``CONTROL'' message instructs a task to perform one of the pre-defined
 actions that all Adam tasks support. There are two control actions recognised:
 \begin{description}
-\item[{\tt default}] instructs the task to
+\item[\texttt{default}] instructs the task to
 change to a new default directory. The value field of the message should
-be set to the new directory. The task will respond with a {\tt
-controlresponse} message with the value field set to the new directory.
+be set to the new directory. The task will respond with a \texttt{controlresponse} message with the value field set to the new directory.
 If a ``CONTROL'' message with the action set to ``default'' has a blank value
-field the value field in the {\tt setresponse} message will be set to the
+field the value field in the \texttt{setresponse} message will be set to the
 current default directory.
-\item[{\tt par\_reset}] sets all of the tasks parameters to the
+\item[\texttt{par\_reset}] sets all of the tasks parameters to the
 state they were in when the task was first loaded. The task responds with
-a {\tt controlresponse} message.
+a \texttt{controlresponse} message.
 \end{description}
 
 \subsubsection{The CANCEL message}
@@ -1020,11 +796,11 @@ actions.
 The interface is loaded by reading the file
 {\tt{/star/lib/startcl/adamtask.tcl}} with the tcl command:
 
-\begin{tquote}{\tt
+\begin{terminalv}
 source /star/lib/startcl/adamtask.tcl
-}\end{tquote}
+\end{terminalv}
 
-This defines a procedure called {\tt adamtask} which starts an Adam
+This defines a procedure called \texttt{adamtask} which starts an Adam
 task. It takes two arguments: a name to be used to refer to the task in later
 \Tcl\ commands, and, optionally, the name of the executable file to run.
 if the second argument is omitted, the name must be the name, as known to the
@@ -1034,23 +810,22 @@ creates a new \Tcl\ command with the same name as the task which can then be
 used to communicate with the task.
 
 For example:
-\begin{tquote}{\tt
-adamtask kappa /star/bin/kappa/kappa\_mon
-}\end{tquote}
-will start the KAPPA monolith and create a \Tcl\ command called {\bf kappa}
+\begin{terminalv}
+adamtask kappa /star/bin/kappa/kappa_mon
+\end{terminalv}
+will start the KAPPA monolith and create a \Tcl\ command called \textbf{kappa}
 which can be used to send messages to the task.
 The first argument to this new command is the type of Adam message to
-send to the task and is one of {\tt set}, {\tt get}, {\tt obey}, {\tt
-cancel}, {\tt paramreply} or {\tt syncrep}.
+send to the task and is one of \texttt{set}, \texttt{get}, \texttt{obey}, \texttt{cancel}, \texttt{paramreply} or \texttt{syncrep}.
 
-The format of the command to send a task an {\bf obey} message is:
-\begin{quote}{\tt
+The format of the command to send a task an \textbf{obey} message is:
+\begin{terminalv}
 <taskname> obey <action> <command-line>
-}\end{quote}
+\end{terminalv}
 So, for example, we can instruct KAPPA to execute the add command with:
-\begin{tquote}{\tt
+\begin{terminalv}
 kappa obey add "in1=image1 in2=image2 out=result"
-}\end{tquote}
+\end{terminalv}
 However, we don't receive any notification of when the obey has
 completed.
 
@@ -1059,22 +834,23 @@ task is specified by additional arguments consisting of a message type
 with a hyphen prepended followed by a \Tcl\ command to be executed when the
 message is received. The command is executed in global scope in the same
 way as widget and X event bindings. So, for example:
-\begin{tquote}{\tt
-kappa obey add "in1=image1 in2=image2 out=result" $\backslash$\\
-\hspace*{2em}-endmsg \{puts "add finished"\}
-}\end{tquote}
+\begin{terminalv}
+kappa obey add "in1=image1 in2=image2 out=result" \
+    -endmsg {puts "add finished"}
+\end{terminalv}
 Will print ``add finished'' on the terminal when the obey has completed.
 
 The various fields in the message can be inserted in the command to be
 executed wherever the percent character appears (similar to the
 substitutions performed when widget bindings are invoked). For example:
-\begin{tquote}{\tt
-kappa obey stats "ndf=result" -inform \{puts \%V\}
-}\end{tquote}
+\begin{terminalv}
+kappa obey stats "ndf=result" -inform {puts %V}
+\end{terminalv}
 will print the messages output by the stats command on the terminal.
 The following tokens are recognised for all message
 types:
-\[\begin{tabular}{|c|l|}\hline
+\begin{center}
+\begin{tabular}{|c|l|}\hline
 token &replaced by\\
 \hline
 \tt\%C &Message context\\
@@ -1087,11 +863,13 @@ token &replaced by\\
 \tt\%R &Reply Token\\
 \tt\%\% &\%\\
 \hline
-\end{tabular}\]
-In the case of a {\bf paramreq} message the value is in the form of a
+\end{tabular}
+\end{center}
+In the case of a \textbf{paramreq} message the value is in the form of a
 \Tcl\ list and the following tokens are replaced by the appropriate element
 of the list:
-\[\begin{tabular}{|c|l|}\hline
+\begin{center}
+\begin{tabular}{|c|l|}\hline
 token &replaced by\\
 \hline
 \tt\%n &parameter name\\
@@ -1100,28 +878,28 @@ token &replaced by\\
 \tt\%h &help text\\
 \tt\%e &error message\\
 \hline
-\end{tabular}\]
+\end{tabular}
+\end{center}
 
 Dealing with a paramreq message is more complicated than any other
 message type because it demands that a reply is sent to the task before it
-will continue. The format of the command to send a {\bf paramreply} message is:
-\begin{quote}{\tt
+will continue. The format of the command to send a \textbf{paramreply} message is:
+\begin{terminalv}
 <task-name> paramreply <reply-token> <reply>
-}\end{quote}
-The {\tt <reply-token>} parameter is used by the
+\end{terminalv}
+The \texttt{<reply-token>} parameter is used by the
 message system to route the message back to the task that made the
-parameter request and can be extracted from the {\bf paramreq} message.
+parameter request and can be extracted from the \textbf{paramreq} message.
 
 About the simplest example is:
-\begin{tquote}{\tt
-kappa obey cadd "in=image1 out=result" $\backslash$\\
-\hspace*{2em}-paramreq \{kappa paramreply \%R !\}
-}\end{tquote}
+\begin{terminalv}
+kappa obey cadd "in=image1 out=result" \
+    -paramreq {kappa paramreply %R !}
+\end{terminalv}
 This will reply with ``!'' whenever any parameter is prompted for. A
 more realistic example is:
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 proc prompt {task reptok param string default} {
 #+
 # Handles a prompt request from a task.
@@ -1148,51 +926,49 @@ proc prompt {task reptok param string default} {
 }
 kappa obey cadd "in=image1 out=result" \
     -paramreq {kappa prompt %T %R %n %p %d}
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
-Default handlers are provided for {\bf paramreq}, {\bf inform} and {\bf sync}
-messages. The handler for {\bf paramreq} messages is the one listed above. The
-handler for {\bf inform} messages creates a dialog box (one for each task)
+Default handlers are provided for \textbf{paramreq}, \textbf{inform} and \textbf{sync}
+messages. The handler for \textbf{paramreq} messages is the one listed above. The
+handler for \textbf{inform} messages creates a dialog box (one for each task)
 containing a scrolling text widget and inserts the message into it. These
 ensure that, by default, important messages are not ignored; they are
 adequate during
-development but for production systems bespoke {\bf inform} message handlers
-will almost certainly be required. The handler for {\bf sync} messages
-calls the \Tcl\ {\bf update} command and then sends a {\bf syncrep} message to
+development but for production systems bespoke \textbf{inform} message handlers
+will almost certainly be required. The handler for \textbf{sync} messages
+calls the \Tcl\ \textbf{update} command and then sends a \textbf{syncrep} message to
 the task.
 
 If you want to ignore a message type then specify an empty string as
 the handler procedure. For example:
-\begin{tquote}{\tt
+\begin{terminalv}
 kappa obey stats "ndf=result logfile=stats.log" -inform ""
-}\end{tquote}
+\end{terminalv}
 will run ``stats'' and log the output to a file instead of displaying them.
 
 The format of the remaining command options that send messages to a task are:
 \begin{description}
-\item[cancel] {\em action command-line}
-\item[set] {\em parameter-name parameter-value}
-\item[get] {\em parameter-name}
+\item[cancel] \emph{action command-line}
+\item[set] \emph{parameter-name parameter-value}
+\item[get] \emph{parameter-name}
 \end{description}
 
 There are some additional command options that don't actually send any messages
 to the task:
 
 \begin{description}
-\item [{\bf kill}] kills the adam task (provided that the task was loaded
-by the {\tt adamtask} procedure) and deletes the task procedure.
-\item [{\bf forget}] deletes the task procedure and removes the task from
+\item [\textbf{kill}] kills the adam task (provided that the task was loaded
+by the \texttt{adamtask} procedure) and deletes the task procedure.
+\item [\textbf{forget}] deletes the task procedure and removes the task from
 the list of known tasks so that it doesn't get killed when the \Tcl\ application
 exits.
-\item [{\bf path}]  returns 1
+\item [\textbf{path}]  returns 1
 if a message system path to the task has been established and 0 if it hasn't.
 This can be used to wait for a task to be loaded before sending it any
 messages. For example:
 
-\begin{quote}
-\begin{verbatim}
-adamtask kappa /star/bin/kappa/kappa\_mon
+\begin{terminalv}
+adamtask kappa /star/bin/kappa/kappa_mon
 set count 0
 while {[kappa path] == 0} {
     after 100
@@ -1203,8 +979,7 @@ while {[kappa path] == 0} {
        kappa kill
     }
 }
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 loads KAPPA and tries 100 times at 100 millisecond intervals to establish
 a message system path.
@@ -1214,20 +989,20 @@ All the task commands return immediately the appropriate message has been
 sent; they do not wait for the task to acknowledge the receipt of the
 message. The following code illustrates how to wait for an action (in
 this case an obey) to be completed:
-\begin{tquote}{\tt
-kappa obey stats -endmsg \{set done 1\}\\
+\begin{terminalv}
+kappa obey stats -endmsg {set done 1}
 tkwait variable done
-}\end{tquote}
+\end{terminalv}
 Note that the set command is executed in global scope so in this case there
-is no need to declare {\bf done} to be global. If {\bf done} were to be
+is no need to declare \textbf{done} to be global. If \textbf{done} were to be
 set in a procedure as in:
-\begin{tquote}{\tt
-procedure setdone \{\} \{\\
-\hspace*{2em}global done\\
-\hspace*{2em}set done 1\\
-\}\\
+\begin{terminalv}
+procedure setdone {} {
+     global done
+     set done 1
+}
 kappa obey stats -endmsg setdone
-}\end{tquote}
+\end{terminalv}
 then a global command is required. While the tkwait command is waiting,
 widget and X event bindings can still be triggered and adam messages
 received.
@@ -1237,15 +1012,15 @@ acknowledgement there is a risk of filling up the buffers in the message
 system and causing the system to deadlock. In order to avoid this
 happening you should:
 \begin{itemize}
-\item Call {\bf update idletasks} to give the \Tcl\ application the chance
+\item Call \textbf{update idletasks} to give the \Tcl\ application the chance
 to respond to incoming adam messages.
 \item Use the mechanism described above to wait for acknowledgement
 messages whenever the task is expected to respond promptly.
 \item Use the command associated with the receipt of the acknowledgement to
-send the next message. For example, a series of {\bf obey} messages can
+send the next message. For example, a series of \textbf{obey} messages can
 be `chained'
-together by send each obey in response to the {\bf endmsg} message from the
-previous {\bf obey}.
+together by send each obey in response to the \textbf{endmsg} message from the
+previous \textbf{obey}.
 \end{itemize}
 
 \section{\label{noticeboard_extension}\xlabel{noticeboard_extension}Noticeboard Extension}
@@ -1260,19 +1035,19 @@ interface to the noticeboard system and the way it interprets the data
 value are:
 
 \begin{description}
-\item[{\tt \_INTEGER}] 4 byte signed integers.
-\item[{\tt \_REAL}] 4 byte floating point numbers.
-\item[{\tt \_DOUBLE}] 8 byte floating point numbers.
-\item[{\tt \_LOGICAL}] 4 byte logical values where zero is FALSE and any
+\item[\texttt{\_INTEGER}] 4 byte signed integers.
+\item[\texttt{\_REAL}] 4 byte floating point numbers.
+\item[\texttt{\_DOUBLE}] 8 byte floating point numbers.
+\item[\texttt{\_LOGICAL}] 4 byte logical values where zero is FALSE and any
 other value is TRUE.
-\item[{\tt \_CHAR}] A character string.
+\item[\texttt{\_CHAR}] A character string.
 \end{description}
 
-The notice board extension defines one new command {\bf nbs}.
-The {\bf nbs} command can be used to read nbs notice board items with:
-\begin{tquote}{\tt
-nbs get <nbs\_name>
-}\end{tquote}
+The notice board extension defines one new command \textbf{nbs}.
+The \textbf{nbs} command can be used to read nbs notice board items with:
+\begin{terminalv}
+nbs get <nbs_name>
+\end{terminalv}
 which returns the values stored in the specified nbs item. If the type of the
 item is one of \_INTEGER, \_REAL, \_DOUBLE or \_LOGICAL the values stored in
 noticeboard are formatted into a list of integer, float or logical values as
@@ -1280,62 +1055,61 @@ appropriate. If the item is of any other type the entire item is simply
 returned as a string with no interpretation.
 
 Notice board items can be written with:
-\begin{tquote}{\tt
-nbs put <nbs\_name> <value>
-}\end{tquote}
-where {\tt <nbs\_name>} is a fully qualified nbs item name and {\tt
-<values>} is the values to be written.
-The format of {\tt <values>} depends on the type of the nbs item; if it
+\begin{terminalv}
+nbs put <nbs_name> <value>
+\end{terminalv}
+where \texttt{<nbs\_name>} is a fully qualified nbs item name and \texttt{<values>} is the values to be written.
+The format of \texttt{<values>} depends on the type of the nbs item; if it
 is \_INTEGER, \_REAL, \_DOUBLE or \_LOGICAL, it must be a list of values of
 that can be converted to the appropriate type by the usual rules and of
 exactly the correct length to fill the item. If the type is \_CHAR it must
 by a string, no longer than the length of the item; the string will be padded
 with blanks to the correct length before being written to the noticeboard. If
-the item has any other type {\tt <value>} must be a string of exactly the same
+the item has any other type \texttt{<value>} must be a string of exactly the same
 length of the item.
 
 The command:
-\begin{tquote}{\tt
-nbs info <nbs\_name>
-}\end{tquote}
+\begin{terminalv}
+nbs info <nbs_name>
+\end{terminalv}
 returns a list of information about the nbs item. The first element of the list
 which indicates whether the item is a primitive item (1) or a structure item
 (0). If it is a structure item the remaining elements of the list are the names
 of the children of the item. If it is a primitive item the remaining elements
 are:
-\begin{description}
-\item[1] The type.
-\item[2] The length.
-\item[3] A list of the dimensions.
-\end{description}
+\begin{enumerate}
+\item The type.
+\item The length.
+\item A list of the dimensions.
+\end{enumerate}
 
 Noticeboard items can also be ``monitored''; at some specified time
 interval the
 value stored in the item is copied into a \Tcl\ variable, again using the
 standard type conversions.
-\begin{tquote}{\tt
-nbs monitor <nbs\_name> <variable>
-}\end{tquote}
-adds {\tt <nbs\_name>} to the list of NBS items to be monitored and
-associates it with the global \Tcl\ variable {\tt <variable>}.
-\begin{tquote}{\tt
+\begin{terminalv}
+nbs monitor <nbs_name> <variable>
+\end{terminalv}
+adds \texttt{<nbs\_name>} to the list of NBS items to be monitored and
+associates it with the global \Tcl\ variable \texttt{<variable>}.
+\begin{terminalv}
 nbs start <interval>
-}\end{tquote}
+\end{terminalv}
 starts monitoring all the NBS items in the list with the interval between
-checks set to {\tt <interval>} milliseconds.
+checks set to \texttt{<interval>} milliseconds.
 
-\begin{tquote}{\tt
+\begin{terminalv}
 nbs stop
-}\end{tquote}
+\end{terminalv}
 stops the monitoring process and
-\begin{tquote}{\tt
+\begin{terminalv}
 nbs clear
-}\end{tquote}
+\end{terminalv}
 empties the list of nbs items being monitored.
 
-\begin{tquote}{\tt
+\begin{terminalv}
 nbs monitor
-}\end{tquote}
+\end{terminalv}
 returns a list of all the noticeboard items currently being monitored.
 Each element of the list consists of a two element list giving the
 notice board item name and the name of the corresponding \Tcl\ variable name.
@@ -1347,8 +1121,7 @@ Examples are given in appendix~\ref{noticeboard_examples}.
 \section{\label{example_gwm_server_script}\xlabel{example_gwm_server_script}Example gwm server script}
 
 \begin{small}
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 #!/star/bin/awish
 #
 # gwm.tcl
@@ -1474,8 +1247,7 @@ proc showPointer {x y} {
     pack .position.x .position.y
 }
 # End of script - enter event loop...
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 \end{small}
 
 \newpage
@@ -1483,8 +1255,8 @@ proc showPointer {x y} {
 
 \subsection{\label{listing_notice_board_contents}\xlabel{listing_notice_board_contents}Listing a noticeboard contents}
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 proc showNbs {item} {
 #+
 # Lists the names and values of all the children of the noticeboard
@@ -1501,72 +1273,66 @@ proc showNbs {item} {
         }
     }
 }
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
 \newpage
 \section{\label{low_level_adam_message_system_commands}\xlabel{low_level_adam_message_system_commands}Low Level ADAM Message System Commands}
 
 The command:
 
-\begin{tquote}{\tt
-adam\_start {\em name}
-}\end{tquote}
+\begin{tquote}
+\texttt{adam\_start \emph{name}}
+\end{tquote}
 
-initialises the Adam message system and registers {\em name} as the task
+initialises the Adam message system and registers \emph{name} as the task
 name and creates the following additional commands:
 
 \begin{itemize}
 
-\item {\bf adam\_path \em name}
+\item \textbf{adam\_path \em name}
 
-Returns 1 if a path to {\em name} exists and 0 if it doesn't.
+Returns 1 if a path to \emph{name} exists and 0 if it doesn't.
 
-\item {\bf adam\_receive }
+\item \textbf{adam\_receive }
 
 Receives an Adam message and returns a list who's
 elements are:
-\begin{quote}{\em
-command task msg\_name path messid msg\_status msg\_value
+\begin{quote}\emph{command task msg\_name path messid msg\_status msg\_value
 }\end{quote}
-where {\em command} is one of:
-\begin{tquote}{\tt
-actstart paramreq paramrep inform sync syncrep trigger startmsg
+where \emph{command} is one of:
+\begin{tquote}\texttt{actstart paramreq paramrep inform sync syncrep trigger startmsg
 endmsg getresponse setresponse controlresponse
 }\end{tquote}
-If {\em command} is {\tt paramreq} then {\tt msg\_value} is a list who's
+If \emph{command} is \texttt{paramreq} then \texttt{msg\_value} is a list who's
 elements are:
-\begin{quote}{\em
-parameter\_name prompt\_string default\_value help\_text error\_message
+\begin{quote}\emph{parameter\_name prompt\_string default\_value help\_text error\_message
 }\end{quote}
-Note that if there is no message available {\bf adam\_receive} will wait
+Note that if there is no message available \textbf{adam\_receive} will wait
 until a message arrives.
 
-\item {\bf adam\_send {\em task msg\_name context msg\_value} }
+\item \textbf{adam\_send \emph{task msg\_name context msg\_value} }
 
-Sends a message to a task starting a new transaction. {\em context}
+Sends a message to a task starting a new transaction. \emph{context}
 must be one of:
 
-\begin{tquote}{\tt
-get set obey cancel control
+\begin{tquote}\texttt{get set obey cancel control
 }\end{tquote}
-{\bf adam\_send} returns a list who's elements are the path and messid of
+\textbf{adam\_send} returns a list who's elements are the path and messid of
 the new transaction.
 
-\item {\bf adam\_reply {\em path messid msg\_status msg\_name msg\_value}}
+\item \textbf{adam\_reply \emph{path messid msg\_status msg\_name msg\_value}}
 
-Sends a message on the transaction specified by {\em path} and
-{\em{messid}}.  Valid values for {\em msg\_status} are:
+Sends a message on the transaction specified by \emph{path} and
+{\em{messid}}.  Valid values for \emph{msg\_status} are:
 
-\begin{tquote}{\tt
-actstart actcomplete paramrep paramreq inform sync syncrep trigger
+\begin{tquote}\texttt{actstart actcomplete paramrep paramreq inform sync syncrep trigger
 }\end{tquote}
 
-\item {\bf adam\_getreply {\em timeout path messid}}
+\item \textbf{adam\_getreply \emph{timeout path messid}}
 
 Waits for an adam message to arrive on the given path and messid and
-returns a list whose elements are the same as the list returned by {\bf
-adam\_receive}.
+returns a list whose elements are the same as the list returned by \textbf{adam\_receive}.
 
 \end{itemize}
 
