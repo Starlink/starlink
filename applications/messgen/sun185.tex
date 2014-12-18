@@ -1,20 +1,18 @@
-\documentstyle[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt,nolof]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {185.2}
-\newcommand{\stardocauthors}   {A J Chipperfield \\
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {185.2}
+\stardocauthors   {A J Chipperfield \\
                                 B K McIlwrath}
-\newcommand{\stardocdate}      {4 November 1994}
-\newcommand{\stardoctitle}     {MESSGEN\\ [\latex{2ex}]
+\stardocdate        {4 November 1994}
+\stardoctitle       {MESSGEN\\ [\latex{2ex}]
                                 Starlink Facility Error Message Generation}
-\newcommand{\stardocversion}   {Version 1.2}
-\newcommand{\stardocmanual}    {}
-\newcommand{\stardocabstract}  {This document describes the Starlink
+\stardocversion     {Version 1.2}
+\stardocabstract  {This document describes the Starlink
 MESSGEN program which creates files
 required for proper operation of the system for associating messages with
 Starlink facility status values on UNIX platforms. It should be read by
@@ -24,227 +22,14 @@ The utility program CREMSG is also described. It can be used to produce
 source files for MESSGEN.}
 
 % ? End of document identification
-
 % -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document specific \providecommand or \newenvironment commands.
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
- \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section {\xlabel{introduction}Introduction}
 The Starlink MESSGEN facility is a system devised and written by Brian
@@ -253,7 +38,7 @@ values on UNIX systems.
 This feature is available with the VAX/VMS error system and has proved useful.
 
 MESSGEN can create a Fortran INCLUDE file and a C header file defining
-symbolic names for the status values and a {\em facility message file}
+symbolic names for the status values and a \emph{facility message file}
 which is used by the
 \xref{Starlink Error Message Service (EMS)}{ssn4}{} to associate
 messages with the status values.
@@ -264,11 +49,11 @@ error INCLUDE file.
 
 \section{\xlabel{messgen_source_files}MESSGEN Source Files}
 The starting point for the Starlink MESSGEN facility is a source file
-conventionally named {\em facility}{\bf \_err.msg}. The format is very
+conventionally named \emph{facility}\textbf{\_err.msg}. The format is very
 similar to that for the VAX/VMS MESSAGE facility. This is most easily
 described by an example:
 \begin{small}
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
 .TITLE          PAR             ADAM/SSE parameter routines
 .FACILITY       PAR,190/PREFIX=PAR__
 .IDENT          'Version 0.5'
@@ -284,7 +69,7 @@ NULL            <Null parameter value>
 ABORT           <Parameter request aborted>
 
 .END
-\end{verbatim} \end{quote}
+\end{terminalv}
 \end{small}
 Notes:
 \begin{enumerate}
@@ -327,22 +112,22 @@ will ensure that the same error values are generated.
 \section{\xlabel{running_messgen}Running MESSGEN}
 To produce the required files from MESSGEN source files, on UNIX, type:
 \begin{quote}
-\verb!% messgen -[cfFev]! {\em files}
+\verb!% messgen -[cfFev]! \emph{files}
 \end{quote}
-where {\em files} may be any number of MESSGEN source files and the options
+where \emph{files} may be any number of MESSGEN source files and the options
  may be one or more of:
 \begin{quote}
 \begin{description}
-\item[-c] Generate a C header file ({\em facility}\_err.h).
-\item[-f] Generate a Fortran INCLUDE file ({\em facility}\_err).
+\item[-c] Generate a C header file (\emph{facility}\_err.h).
+\item[-f] Generate a Fortran INCLUDE file (\emph{facility}\_err).
 \item[-F] As for option -f, but with an uppercased output filename
-          ({\em FACILITY}\_ERR).
-\item[-e] Generate a facility message file (fac\_{\em facnum}\_err).
+          (\emph{FACILITY}\_ERR).
+\item[-e] Generate a facility message file (fac\_\emph{facnum}\_err).
 \item[-v] Output diagnostic information.
-\item[-V] Output the names of generated files to {\tt stdout}.
+\item[-V] Output the names of generated files to \texttt{stdout}.
 \end{description}
-where {\em facility} is the facility name, {\em e.g.}\ PAR, and {\em facnum} is
-the facility number, {\em e.g.}\ 190 for PAR.
+where \emph{facility} is the facility name, \emph{e.g.}\ PAR, and \emph{facnum} is
+the facility number, \emph{e.g.}\ 190 for PAR.
 \end{quote}
 
 \section{\xlabel{running_cremsg}Running CREMSG}
@@ -350,7 +135,7 @@ If a MESSGEN source file is not available but there is an existing,
 standard-format Fortran error INCLUDE file, program CREMSG can create a MESSGEN
 source file from it. Standard-format means that the error numbers are defined
 by statements of the form:
-\begin{quote} \begin{verbatim}
+\begin{terminalv}
       INTEGER PAR__NOUSR
       PARAMETER ( PAR__NOUSR = 146703139 )
 *   No user available for input
@@ -360,21 +145,21 @@ by statements of the form:
 *   Parameter does not exist
 
     ... etc ...
-\end{verbatim} \end{quote}
-{\em i.e.} the format produced by the VAX/VMS MESSAGE/ERRGEN system.
+\end{terminalv}
+\emph{i.e.} the format produced by the VAX/VMS MESSAGE/ERRGEN system.
 
 To produce the corresponding MESSGEN source file, type:
 \begin{quote}
-\verb!% cremsg [-v]! {\em filename}
+\verb!% cremsg [-v]! \emph{filename}
 \end{quote}
-where {\em filename} is the name of the INCLUDE file and option \verb!-v! may
+where \emph{filename} is the name of the INCLUDE file and option \verb!-v! may
 be used to obtain diagnostic information.
 
 Notes:
 \begin{enumerate}
-\item The file produced will be named {\em fac}{\bf \_err.msg} file, where
-{\em fac} is the lower case of the facility name determined from the error
-idents in the INCLUDE file ({\bf par} in the above example). This will not
+\item The file produced will be named \emph{fac}\textbf{\_err.msg} file, where
+\emph{fac} is the lower case of the facility name determined from the error
+idents in the INCLUDE file (\textbf{par} in the above example). This will not
 always give the correct name.
 \item The .TITLE directive produced will contain only the facility name. It
 may be desirable to add a short description by hand.
@@ -386,12 +171,12 @@ between each sequence.
 
 \section{\xlabel{using_the_facility_message_files}Using the Facility Message Files}
 Normally the facility message file for each Starlink library will be installed
-in {\bf /star/help} when the library is installed. It is recommended that the
+in \textbf{/star/help} when the library is installed. It is recommended that the
 message file and error include files are included in the source tar file rather
-than building them from the MESSGEN source file during the {\bf make build}.
+than building them from the MESSGEN source file during the \textbf{make build}.
 This will avoid an unnecessary dependency.
 
-The internal EMS source file {\bf ems1\_fcerr.c} contains C code for obtaining
+The internal EMS source file \textbf{ems1\_fcerr.c} contains C code for obtaining
 the message given the status value -- this may be copied by other systems
 requiring to do the same job on UNIX platforms but note that the system is not
 fully portable and Starlink reserve the right to alter it.
