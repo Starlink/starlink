@@ -12,6 +12,7 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 AC_PROG_MAKE_SET
+AC_PATH_XTRA
 
 dnl    Do not check for an existing OpenGL if requested.
 AC_ARG_ENABLE([opengl-check], [  --enable-opengl-check    check for existing OpenGL],
@@ -23,7 +24,6 @@ dnl    will not build anything (its purpose is to provide 3D
 dnl    software rendering on platforms without hardware support).
 if test "$opengl_check" = "yes"; then
    sinclude(mdl_have_opengl.m4)
-   AC_PATH_XTRA
    MDL_HAVE_OPENGL
 else
    have_GL=no
