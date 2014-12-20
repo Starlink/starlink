@@ -1,16 +1,15 @@
-\documentstyle[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt,nolof]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {111.2}
-\newcommand{\stardocauthors}   {D L Terrett\\P M Allan}
-\newcommand{\stardocdate}      {1 February 1993}
-\newcommand{\stardoctitle}     {SPT --- Software Porting Tools}
-\newcommand{\stardocabstract}  {
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {111.2}
+\stardocauthors     {D L Terrett\\P M Allan}
+\stardocdate        {1 February 1993}
+\stardoctitle       {SPT --- Software Porting Tools}
+\stardocabstract  {
 SPT is an inhomogeneous set of
 software tools designed to assist in the
 conversion of code from one operating system to another (principally from
@@ -19,222 +18,13 @@ VMS to UNIX and vice-versa, and between different flavours of UNIX).
 % ? End of document identification
 
 % -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\html}[1]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document specific \providecommand or \newenvironment commands.
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \newcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
- \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section{Introduction\xlabel{introduction}}
 
@@ -257,13 +47,13 @@ providing a machine-independent way of writing INCLUDE statements.
 
 \subsection{On UNIX}
 
-The programs are stored in {\tt /star/bin} so all that is required is
-that {\tt /star/bin} is in your PATH. This is normally done when you log in.
+The programs are stored in \texttt{/star/bin} so all that is required is
+that \texttt{/star/bin} is in your PATH. This is normally done when you log in.
 \subsection{On VMS}
 The tools must be defined as foreign DCL commands with the command:
-\begin{quote}
-{\tt \$ SPT}
-\end{quote}
+\begin{terminalv}
+$ SPT
+\end{terminalv}
 Note that softlink is only available on Unix. Its effect is achieved on VMS by
 the use of logical names.
 
@@ -282,110 +72,104 @@ behaviour).
 include statement processed. This file can be used as a starting point for a
 make file.
 
-\item Insert a statement to include {\tt dat\_par} and {\tt par\_par} after
-every occurrence of the include file {\tt sae\_par}. This compensates for an
-incompatibility  between {\tt sae\_par} on VMS and on UNIX.
+\item Insert a statement to include \texttt{dat\_par} and \texttt{par\_par} after
+every occurrence of the include file \texttt{sae\_par}. This compensates for an
+incompatibility  between \texttt{sae\_par} on VMS and on UNIX.
 
 \end{itemize}
 
 The substitution of include file names is driven by a ``substitution
 file'' which lists the VMS file specifications and their equivalent UNIX
 file names, one pair per line. For example the file might contain:
-\begin{quote}
-{\tt PARS.FOR pars\\
-INCLIB(COMMON) commons}
-\end{quote}
+\begin{terminalv}
+PARS.FOR pars
+INCLIB(COMMON) commons
+\end{terminalv}
 and an example of the source code to be converted might be:
-\begin{quote}
-{\tt
-      INCLUDE 'PARS.FOR'\\
-      INCLUDE 'INCLIB(COMMON)'}
-\end{quote}
+\begin{terminalv}
+      INCLUDE 'PARS.FOR'
+      INCLUDE 'INCLIB(COMMON)'
+\end{terminalv}
 which, after processing, would be changed to:
-\begin{quote}
-{\tt
-      INCLUDE 'pars'\\
-      INCLUDE 'commons'}
-\end{quote}
+\begin{terminalv}
+      INCLUDE 'pars'
+      INCLUDE 'commons'
+\end{terminalv}
 The case of the VMS file specification is ignored when trying to find a
 match and spaces are ignored in the file specification in the INCLUDE
 statement.
 
 If a match for an include file specification is not found then the name
 is folded to lower case and a prefix prepended; the default prefix is
-{\tt /star/include/} but this can be changed with the {\tt -p} command line
+\texttt{/star/include/} but this can be changed with the \texttt{-p} command line
 option. So in the above example:
-\begin{quote}
-{\tt
-       INCLUDE 'FRED'}
-\end{quote}
+\begin{terminalv}
+INCLUDE 'FRED'
+\end{terminalv}
 would be converted to:
-\begin{quote}
-{\tt
-      INCLUDE '/star/include/fred'}
-\end{quote}
+\begin{terminalv}
+INCLUDE '/star/include/fred'
+\end{terminalv}
 As a result of this,
 when converting programs that use Starlink libraries, the substitution file
 need only specify any ``program-specific'' include files; references to
 Starlink include files will all be converted automatically. If the
 program does not use Starlink libraries, then the prefix can be suppressed
-entirely by specifying the {\tt -p} option with an empty string.
+entirely by specifying the \texttt{-p} option with an empty string.
 
 The program will not recognise INCLUDE statements that are continued
 on to a new line.
 
 The command:
-\begin{quote}
-{\tt forconv}
-\end{quote}
+\begin{terminalv}
+forconv
+\end{terminalv}
 Will read from the standard input stream and write to the standard output
-stream, and will use {\tt include.sub} as the name of the substitution file.
+stream, and will use \texttt{include.sub} as the name of the substitution file.
 The program's behaviour can be modified with the following UNIX-style
 command options:
 \begin{description}
 
-\item[{\tt -i}{\em filename}] Read from {\em filename} instead of the
-standard input stream. Note that there is no space between the {\tt i}
+\item[\texttt{-i}\emph{filename}] Read from \emph{filename} instead of the
+standard input stream. Note that there is no space between the \texttt{i}
 and the file name in this or any other command options.
 
-\item[{\tt -o}{\em filename}] Write to {\em filename} instead of the
+\item[\texttt{-o}\emph{filename}] Write to \emph{filename} instead of the
 standard output stream.
 
-\item[{\tt -s}{\em filename}] Use {\em filename} as the substitution file.
+\item[\texttt{-s}\emph{filename}] Use \emph{filename} as the substitution file.
 
-\item[{\tt -m}{\em filename}] Generate a skeleton make file. If {\em
-filename} is omitted a file called {\tt makefile} will be written.
+\item[\texttt{-m}\emph{filename}] Generate a skeleton make file. If \emph{filename} is omitted a file called \texttt{makefile} will be written.
 
-\item[{\tt -b}{\em name}] Use {\em name} as the target in the dependency
-rules written to the make file. In the absence of {\tt -b} the name {\tt
-module} is used.
+\item[\texttt{-b}\emph{name}] Use \emph{name} as the target in the dependency
+rules written to the make file. In the absence of \texttt{-b} the name \texttt{module} is used.
 
-\item[{\tt -p}{\em prefix}] Use {\em prefix} as the string to be inserted
+\item[\texttt{-p}\emph{prefix}] Use \emph{prefix} as the string to be inserted
 before all file specifications that did not match a file specification
-in the substitution file. The default prefix is {\tt /star/include/};
-{\tt -p} on its own specifies no prefix.
+in the substitution file. The default prefix is \texttt{/star/include/};
+\texttt{-p} on its own specifies no prefix.
 
-\item[{\tt -h}] Add
-\begin{quote}
-{\tt INCLUDE '/star/include/dat\_par'}
-\end{quote}
-after every occurrence of {\tt '/star/include/sae\_par'}. This
+\item[\texttt{-h}] Add
+\begin{terminalv}
+INCLUDE '/star/include/dat_par'
+\end{terminalv}
+after every occurrence of \texttt{'/star/include/sae\_par'}. This
 compensates for an incompatibility between the standard Starlink include
-file {\tt sae\_par} on VMS and on
-UNIX and is required if the program being converted uses any {\tt DAT\_\_}
+file \texttt{sae\_par} on VMS and on
+UNIX and is required if the program being converted uses any \texttt{DAT\_\_}
 constants.
 
-\item[{\tt -j}] Add
-\begin{quote}
-{\tt INCLUDE '/star/include/par\_par'}
-\end{quote}
-after every occurrence of {\tt '/star/include/sae\_par'}. This
+\item[\texttt{-j}] Add
+\begin{terminalv}
+INCLUDE '/star/include/par_par'
+\end{terminalv}
+after every occurrence of \texttt{'/star/include/sae\_par'}. This
 compensates for an incompatibility between the standard Starlink include
-file {\tt sae\_par} on VMS and on
-UNIX and is required if the program being converted uses any {\tt PAR\_\_}
+file \texttt{sae\_par} on VMS and on
+UNIX and is required if the program being converted uses any \texttt{PAR\_\_}
 constants.
 
-\item[{\tt -q}] Suppress all informational messages. By default the
+\item[\texttt{-q}] Suppress all informational messages. By default the
 program writes a message to the standard error stream each time it
 process an INCLUDE statement.
 
@@ -403,14 +187,12 @@ Unix.
 Starlink Fortran programs frequently make use of INCLUDE files to define
 symbolic constants or common blocks. When the INCLUDE file is one supplied by
 Starlink, a logical name is defined on VMS to point to the file. For example,
-the logical name {\tt SAE\_PAR} points to the file {\tt
-LIB\_COMMON\_DIR:SAE\_PAR.FOR}. This means that the file can be included in a
+the logical name \texttt{SAE\_PAR} points to the file \texttt{LIB\_COMMON\_DIR:SAE\_PAR.FOR}. This means that the file can be included in a
 Fortran program with the statement:
 
-\begin{quote}{\tt
-INCLUDE 'SAE\_PAR'
-}
-\end{quote}
+\begin{terminalv}
+INCLUDE 'SAE_PAR'
+\end{terminalv}
 
 There is no need to refer to the location of the file, just to its name. This
 makes the program more portable than referring to the explicit file.
@@ -420,10 +202,9 @@ the use of soft links. A soft link looks like a file in a directory, but is
 actually just a pointer to another file. To use a soft link to refer to the
 INCLUDE file in the above example, you would type:
 
-\begin{quote}{\tt
-\% ln -s /star/include/sae\_par SAE\_PAR
-}
-\end{quote}
+\begin{terminalv}
+% ln -s /star/include/sae_par SAE_PAR
+\end{terminalv}
 
 This command should be executed in the same directory as the source of the
 Fortran program. If you are working on Fortran programs in different
@@ -440,19 +221,17 @@ links to files. The purpose of writing it was to automate the setting up of
 soft links that point to standard Starlink Fortran include files.  Rather than
 having programs contain lines like:
 
-\begin{quote}{\tt
-INCLUDE '/star/include/sae\_par'
-}
-\end{quote}
+\begin{terminalv}
+INCLUDE '/star/include/sae_par'
+\end{terminalv}
 
 they will contain lines like:
 
-\begin{quote}{\tt
-INCLUDE 'SAE\_PAR'
-}
-\end{quote}
+\begin{terminalv}
+INCLUDE 'SAE_PAR'
+\end{terminalv}
 
-and a soft link to the file {\tt /star/include/sae\_par} will be created in the
+and a soft link to the file \texttt{/star/include/sae\_par} will be created in the
 directory containing the source code. This makes the source code more portable;
 it may well run on Unix and VMS systems with no changes.
 
@@ -460,9 +239,9 @@ Before compiling a program on a Unix system, the soft links to the include
 files should be created. This need only be done once as the soft links are
 permanent. For the above example, you would type:
 
-\begin{quote}
-{\tt \% softlink /star/include/sae\_par upper}
-\end{quote}
+\begin{terminalv}
+% softlink /star/include/sae_par upper
+\end{terminalv}
 
 Note that the name of the file being pointed to must match the name of the file
 in the Fortran INCLUDE statement for softlink to be effective. If the names are
@@ -472,42 +251,39 @@ different, then you should either set up the soft link by hand, or use FORCONV.
 
 Softlink accepts three arguments. Only the first one is mandatory. This
 specifies the full path name of the file that the soft link will point to.
-An example is {\tt /star/include/sae\_par}.
+An example is \texttt{/star/include/sae\_par}.
 
 The second (optional) argument specifies whether the name of the soft link is
 in upper or lower case. If it is omitted (or given as the null string), then
 the name of the soft link matches exactly the name of the file that it points
-to. The value of the argument can be one of `{\tt lower}', `{\tt upper}', `{\tt
-both}', `{\tt all}' or `{\tt remove}'. A value of `{\tt lower}' specifies that
-the name of the soft link will be in lower case and a value of `{\tt upper}'
+to. The value of the argument can be one of `\texttt{lower}', `\texttt{upper}', `\texttt{both}', `\texttt{all}' or `\texttt{remove}'. A value of `\texttt{lower}' specifies that
+the name of the soft link will be in lower case and a value of `\texttt{upper}'
 specifies that the name of the soft link will be in upper case. A value of
-`{\tt both}' specifies that two soft links are to be created, one in lower case
-and one in upper case. A value of `{\tt all}' specifies that links will be
+`\texttt{both}' specifies that two soft links are to be created, one in lower case
+and one in upper case. A value of `\texttt{all}' specifies that links will be
 created in lower case, upper case and with the same name as the file that it is
 pointing to if that is not purely lower case or upper case. If the argument is
-`{\tt remove}', then all the soft links are removed. The script checks to see
+`\texttt{remove}', then all the soft links are removed. The script checks to see
 that it is only removing soft links and not files of the same name.
 
 The third argument is normally absent. If it is present, then the script does
 not execute any commands to create soft links, but writes those command to the
 file named by the third argument. For example, the command
 
-\begin{quote}{\tt
-\% softlink /star/include/par\_par all fred
-}
-\end{quote}
+\begin{terminalv}
+% softlink /star/include/par_par all fred
+\end{terminalv}
 
-will create a file called {\tt fred} containing the lines:
+will create a file called \texttt{fred} containing the lines:
 
-\begin{quote}{\tt
-ln -s /star/include/par\_par par\_par \\
-ln -s /star/include/par\_par PAR\_PAR
-}
-\end{quote}
+\begin{terminalv}
+ln -s /star/include/par_par par_par
+ln -s /star/include/par_par PAR_PAR
+\end{terminalv}
 
 If the output file already exists, then the commands are appended to the file
 so that a set of link commands can be built up. If the name of the output file
-is {\tt mfile}, then the commands are output in a form suitable for inclusion
+is \texttt{mfile}, then the commands are output in a form suitable for inclusion
 in a make file. In particular, the first character of each line is a tab
 character.
 
@@ -516,54 +292,51 @@ character.
 When writing programs that call Starlink libraries, you will find yourself
 setting up the same soft links over and over again. To ease this process, shell
 scripts are provided to define the soft links for all of the Starlink
-subroutine libraries. The scripts are called {\it lib}{\tt\_dev}, e.g.\ to set
+subroutine libraries. The scripts are called \textit{lib}{\tt\_dev}, e.g.\ to set
 up the soft links needed when writing a program that calls FIO, just type:
 
-\begin{quote}{\tt
-\% fio\_dev
-}
-\end{quote}
+\begin{terminalv}
+% fio_dev
+\end{terminalv}
 
 The soft links can be removed by typing:
 
-\begin{quote}{\tt
-\% fio\_dev remove
-}
-\end{quote}
+\begin{terminalv}
+% fio_dev remove
+\end{terminalv}
 
 The scripts provide fewer functions than the softlink script. All links are
-created in upper case and the only option is {\tt remove}, which does not check
+created in upper case and the only option is \texttt{remove}, which does not check
 to see that the names referred to are soft link rather than files. To offset
-these restrictions, the {\it lib}{\tt\_dev} scripts run faster than they would
+these restrictions, the \textit{lib}{\tt\_dev} scripts run faster than they would
 if they provided all the features of softlink. The list of scripts is as
 follows:
 
-\begin{tabbing}
-XXXXXXXXXXXX \= \kill
-\underline{Package} \> \underline{Script} \\ \\
-AGI \> agi\_dev \\
-ARY \> ary\_dev \\
-CHR \> chr\_dev \\
-EMS \> ems\_dev \\
-ERR \> err\_dev \\
-FIO \> fio\_dev \\
-GKS \> gks\_dev \\
-GNS \> gns\_dev \\
-GRP \> grp\_dev \\
-GWM \> gwm\_dev \\
-HDS \> hds\_dev \\
-IDI \> idi\_dev \\
-NDF \> ndf\_dev \\
-PAR \> par\_dev \\
-PRIMDAT \> prm\_dev \\
-PSX \> psx\_dev \\
-REF \> ref\_dev \\
-SGS \> sgs\_dev \\
-TRANSFORM \> trn\_dev
-\end{tabbing}
+\begin{tabular}{ll}
+\underline{Package} & \underline{Script} \\
+& \\
+AGI & agi\_dev \\
+ARY & ary\_dev \\
+CHR & chr\_dev \\
+EMS & ems\_dev \\
+ERR & err\_dev \\
+FIO & fio\_dev \\
+GKS & gks\_dev \\
+GNS & gns\_dev \\
+GRP & grp\_dev \\
+GWM & gwm\_dev \\
+HDS & hds\_dev \\
+IDI & idi\_dev \\
+NDF & ndf\_dev \\
+PAR & par\_dev \\
+PRIMDAT & prm\_dev \\
+PSX & psx\_dev \\
+REF & ref\_dev \\
+SGS & sgs\_dev \\
+TRANSFORM & trn\_dev
+\end{tabular}
 
-There are also scripts {\tt star\_dev}, which creates the soft links to {\tt
-SAE\_PAR}, and {\tt adam\_dev}, which creates the soft links needed when
+There are also scripts \texttt{star\_dev}, which creates the soft links to \texttt{SAE\_PAR}, and \texttt{adam\_dev}, which creates the soft links needed when
 writing programs that call the internals of ADAM.
 
 \end{document}
