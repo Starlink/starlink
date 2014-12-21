@@ -1,25 +1,21 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink System Note}
-\newcommand{\stardocinitials}  {SSN}
-\newcommand{\stardocsource}    {ssn\stardocnumber}
+\stardoccategory    {Starlink System Note}
+\stardocinitials    {SSN}
+\stardocsource      {ssn\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {73.2 (draft)}
-\newcommand{\stardocauthors}   {Mark Taylor}
-\newcommand{\stardocdate}      {13 August 2001}
-\newcommand{\stardoctitle}     {EXTREME --- Handling extreme data sets}
-\newcommand{\stardocabstract}  {
+\stardocnumber      {73.2 (draft)}
+\stardocauthors     {Mark Taylor}
+\stardocdate        {13 August 2001}
+\stardoctitle       {EXTREME --- Handling extreme data sets}
+\stardocabstract  {
 This package provides some utilities, background documentation,
 and associated files
 for adapting the Starlink Software Collection, and software which uses it,
@@ -38,527 +34,25 @@ software in other contexts.
 }
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     ssn.tex
-%
-%  Purpose:
-%     Template for Starlink System Note (SSN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%     MBT: Mark B. Taylor (Starlink)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%     17-JAN-1999 (MBT):
-%        Instantiated as SSN/73.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
+% ? Document specific \providecommand or \newenvironment commands.
 
 % Private macro definitions.
 
-\newcommand{\xroutine}[1]{\htmlref{{\tt #1}}{#1}}
-\newcommand{\xdofilter}[1]{\htmlref{{\tt do-#1}}{do-xxx}}
-\newcommand{\file}[1]{{\tt #1}}
-\newcommand{\routine}[1]{{\tt #1}}
-\newcommand{\dofilter}[1]{{\tt do-#1}}
-\newcommand{\cc}[1]{{\tt #1}}
-\newcommand{\ditem}[1]{\item[#1]\mbox{}\\}
-\newenvironment{squote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
-\newcommand{\igap}{\html{\begin{quote}\end{quote}}}
-
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \newpage
-   \label{#1}
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-   \begin{description}
-      {\ssttt \item #1}
-   \end{description}
-}
-% \newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-% \\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\sloppy \item[Invocation:]\hspace{0.4em}{\tt #1}}
-%\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy \item{\ssttt #1} \mbox{} \\ #2 }
-%\newcommand{\sstexamplesubsection}[2]{\sloppy
-%\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-%\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[#1:] \mbox{} \\[1.3ex] #2}
-%\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-%\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-
+\providecommand{\xroutine}[1]{\htmlref{\texttt{#1}}{#1}}
+\providecommand{\xdofilter}[1]{\htmlref{\texttt{do-#1}}{do-xxx}}
+\providecommand{\file}[1]{\texttt{#1}}
+\providecommand{\routine}[1]{\texttt{#1}}
+\providecommand{\dofilter}[1]{\texttt{do-#1}}
+\providecommand{\cc}[1]{\texttt{#1}}
+\providecommand{\ditem}[1]{\item[#1]\mbox{}\\}
+\newenvironment{squote}{\begin{small}}{\end{small}}
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Large\textbf{\stardoctitle}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-
+\scfrontmatter
 
 
 % ? Main text
@@ -601,11 +95,11 @@ You can tell if your Solaris kernel is 64-bit
 by using the \file{isainfo -v} command; on a 64-bit system the
 following response will be given
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % isainfo -v
 64-bit sparcv9 applications
 32-bit sparc applications
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 
 User code will run up against similar problems to those faced by
@@ -719,7 +213,7 @@ have enough bits to hold sufficiently large numbers.
 Because of the difficulty of distinguishing, in any automatic fashion,
 variables which may
 need to hold big numbers from those which will not,
-the recommended approach is to change the type of {\em all\/}
+the recommended approach is to change the type of \emph{all\/}
 integer variables to a 64-bit type in 64-bit environments.
 There are undesirable consequences of this,
 the main one being that
@@ -783,7 +277,7 @@ in affected source files to provide the declaration of the CNF\_PVAL function.
 The main pitfall of making these modifications is
 wrapping the argument of a \%VAL in a CNF\_PVAL call when it ought
 not to be so wrapped.
-CNF\_PVAL should {\em only\/} be applied to registered pointers.
+CNF\_PVAL should \emph{only\/} be applied to registered pointers.
 If your Fortran code uses pointers which are got from C without
 being registered with CNF, you'll need to address this in the C code
 as described in \xref{SUN/209}{sun209}{pointers}.
@@ -799,11 +293,12 @@ or a small integer, then it should be left alone.
 
 The program \xroutine{inscnf}, and the corresponding driver script
 \xdofilter{inscnf}, is supplied for inserting CNF\_PVALs
-in the right places.  It wraps {\em all\/} arguments of \%VAL
+in the right places.  It wraps \emph{all\/} arguments of \%VAL
 in calls to CNF\_PVAL, but emits warnings for those which look like
 they may not be pointers.
 It is described further in
-\latexhtml{appendix \ref{sec:commands}}{\htmlref{the appendix}{inscnf}}.
+appendix \ref{sec:commands}.
+
 
 \subsection{Enlarging integer type in Fortran 77\label{sec:fint}}
 
@@ -843,7 +338,6 @@ If a program uses an external library which is not part of the USSC,
 then either the library will have to be converted in the same way,
 or the affected calls will have to be written using
 variables specially declared as the normal INTEGER type.
-\html{\begin{squote}\end{squote}}
 %
 \ditem{Literal integer constants as arguments}
 If there are any calls to functions or subroutines in the converted
@@ -856,18 +350,18 @@ The recommended method for doing this is to use a variable for the
 purpose, which may be assigned using a PARAMETER statement.
 Thus
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
       CALL SUB( 5, STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 must be changed to something like
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
       INTEGER * 8 INT__5
       PARAMETER ( INT__5 = 5 )
         ...
       CALL SUB( INT__5, STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 Other methods of getting around this are possible,
 for instance using statement functions.
@@ -876,7 +370,7 @@ integer constants, and \file{EXT\_DEC} and \file{EXT\_DEF},
 which define statement functions in the same way as the
 \xref{PRIMDAT}{sun39}{} package, are provided with the EXTREME
 package by way of example of alternative strategies.
-\html{\begin{squote}\end{squote}}
+
 %
 \ditem{Intrinsic functions}
 Calls to standard Fortran intrinsic functions should take care of themselves,
@@ -903,7 +397,6 @@ intrinsic functions which return integer regardless of the type of
 the argument (LEN, INDEX), the return value will have to be converted to
 the correct type as if it were an integer literal,
 by assigning to an intermediate variable or using a statement function.
-\html{\begin{squote}\end{squote}}
 %
 \ditem{Storage association}
 The Fortran 77 standard does not state how much storage is used by
@@ -932,11 +425,11 @@ is not free to move it around (the start of a COMMON block is
 always aligned to the largest boundary, 64 bits).
 Thus the following code:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
       REAL        XX, YY
       INTEGER * 8 IX, IY
       COMMON /BLOCK/ XX, IX, YY, IY
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 which would align everything (happily) on 32-bit boundaries if IX, IY
 were INTEGER*4s, will be forced to align the 64-bit IX on a 32-bit
@@ -945,7 +438,6 @@ The compilers will warn about this behaviour.
 I believe that the result will be slower, rather than incorrect,
 executables,
 but such occurrences should ideally be fixed.
-\html{\begin{squote}\end{squote}}
 %
 \ditem{IMPLICIT variable declarations}
 It is highly desirable in Fortran, and usual in Starlink code, to use
@@ -959,7 +451,7 @@ but to make the job easier for
 the makefile in editing the source code, it is better to place
 an ``IMPLICIT NONE'' statement in every source code module, and
 make explicit INTEGER*8 declarations for all integers.
-\html{\begin{squote}\end{squote}}
+
 %
 \ditem{I/O return values}
 A few Fortran I/O statements have specifiers which require the name
@@ -970,15 +462,15 @@ Particular compilers often provide a whole lot more, but these
 should hopefully not be much used in Starlink code.
 So there may be a problem with a statement like
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
       CLOSE( UNIT = 99, IOSTAT = STVAL )
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 if the variable STVAL is now declared INTEGER*8 rather than INTEGER.
 Of the supported systems, Tru64 and Solaris seem to handle
 INTEGER*8 variables used for this purpose without complaint.
 Linux with g77 0.5.24 may fail to compile although (a) it seems to
-be OK if you compile with {\tt -O}, and (b) this is reportedly
+be OK if you compile with \texttt{-O}, and (b) this is reportedly
 fixed at g77 0.5.25.  So it's probably all right to leave these cases.
 %
 \end{description}
@@ -988,7 +480,7 @@ The program \xroutine{frepint}, and the corresponding driver script
 INTEGER declarations to INTEGER*8.
 Details of which of the above constructs it fixes, and which it
 warns about, are given in
-\latexhtml{appendix \ref{sec:commands}}{\htmlref{the appendix}{frepint}}.
+appendix \ref{sec:commands}.
 
 
 \subsection{Enlarging integer type in C\label{sec:cint}}
@@ -1022,11 +514,11 @@ the corresponding formal argument in the declaration
 before passing it by value.
 Hence the following code
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 int add( int a, int b );
 INT_BIG i, j;
 add( i, j );
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 is correct whatever integral type \cc{INT\_BIG} is defined as,
 since \cc{i} and \cc{j} are converted to type \cc{int}
@@ -1069,18 +561,18 @@ different idea of the length of the object being pointed to
 it will write to the wrong amount of memory, possibly overwriting
 other data.  Consider this function:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
    void zero( int *a ) {
       *a = 0;
    }
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 and this code:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
    INT_BIG x;
    zero( &x );
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 If \cc{INT\_BIG} is a 64 bit type and \cc{int} is 32 bits
 then only half the bits in the variable \cc{x} will be zeroed by this call.
@@ -1136,7 +628,6 @@ to use \cc{INT\_BIG}
 before code which uses them (although for C code calling C libraries
 this is not so necessary as with Fortran when functions are pre-declared
 using header files).
-\html{\begin{squote}\end{squote}}
 %
 \ditem{Blocks of source code not to be converted}
 It may not be a good idea to do \cc{INT\_BIG} conversion to
@@ -1144,7 +635,6 @@ large bodies of non-Starlink code used by the USSC; Perl and Tcl
 spring to mind.
 If there is function-level access to these packages,
 some recoding may be required as above.
-\html{\begin{squote}\end{squote}}
 %
 \ditem{The C standard library}
 The functions of the C standard library are no different from any
@@ -1159,7 +649,7 @@ The only exceptions in the standard library are as follows:
 \ditem{\cc{frexp}}
 The second argument of the mathematical function \cc{frexp} is declared
 \cc{int *}, so a pointer to \cc{int} and not to \cc{INT\_BIG} must be passed.
-\html{\begin{squote}\end{squote}}
+
 %
 \ditem{\cc{bsearch}, \cc{qsort}}
 Both these functions take as arguments a comparison function
@@ -1168,14 +658,12 @@ i.e.\ a function rerturning \cc{int}.
 Although the calls to \cc{bsearch} and \cc{qsort} do not need to be
 modified therefore, the function passed to them must be of the right
 type, and not modified to be of type \cc{INT\_BIG (*)(void *, void *)}.
-\html{\begin{squote}\end{squote}}
 %
 \ditem{\cc{signal}}
 The second argument of \cc{signal} is declared as \cc{void (*)(int)}.
 Calls to \cc{signal} do not need to be modified, but functions
 passed to it ought to be declared
 functions of \cc{int} and not of \cc{INT\_BIG}.
-\html{\begin{squote}\end{squote}}
 %
 \ditem{\cc{printf}, \cc{scanf}}
 The functions which use format strings and variable argument lists,
@@ -1214,32 +702,32 @@ In the case of \cc{int~*} arguments, intermediate variables have to be used.
 Here is an example.  If after simple substitution of \cc{INT\_BIG} for
 \cc{int} a piece of code reads:
 \begin{squote}
-\begin{verbatim}
-   extern INT_BIG triple( INT_BIG x );
-   INT_BIG i, j;
-   char c;
-   scanf( "%i %c", &i, &c );
-   j = triple( i );
-   printf( "Integer tripled is %i; Character is '%c'\n", j, c );
-\end{verbatim}
+\begin{terminalv}
+extern INT_BIG triple( INT_BIG x );
+INT_BIG i, j;
+char c;
+scanf( "%i %c", &i, &c );
+j = triple( i );
+printf( "Integer tripled is %i; Character is '%c'\n", j, c );
+\end{terminalv}
 \end{squote}
 then the \cc{scanf} call must be replaced by something like this:
 \begin{squote}
-\begin{verbatim}
-   {
-      long tmp;
-      scanf( "%li %c", &tmp, &c );
-      i = tmp;
-   }
-\end{verbatim}
+\begin{terminalv}
+{
+  long tmp;
+  scanf( "%li %c", &tmp, &c );
+  i = tmp;
+}
+\end{terminalv}
 \end{squote}
 and the \cc{printf} call by something like this:
 \begin{squote}
-\begin{verbatim}
-   printf( "Integer tripled is %li; Character is '%c'\n", (long) j, c );
-\end{verbatim}
+\begin{terminalv}
+printf( "Integer tripled is %li; Character is '%c'\n", (long) j, c );
+\end{terminalv}
 \end{squote}
-\html{\begin{squote}\end{squote}}
+
 %
 \ditem{Other external libraries}
 If your code links to any other external libraries
@@ -1264,7 +752,6 @@ defined in the system header file \file{limits.h},
 an \cc{INT\_BIG} should be compared against one of the corresponding
 macros \cc{INT\_BIG\_MAX} etc.
 These macros are defined in the header file \file{extreme.h}.
-\html{\begin{squote}\end{squote}}
 %
 \ditem{Implicit int declarations}
 There are several places in C (macros and typedefs apart)
@@ -1272,22 +759,22 @@ in which an identifier can be declared
 as an \cc{int} without the \cc{int} reserved word appearing.
 For example, in the code:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 sub( x ) {
    static y;
    signed z;
 }
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 the symbols \cc{sub}, \cc{x}, \cc{y} and \cc{z} all have type \cc{int}
 so that the converted code should read
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 INT_BIG sub( INT_BIG x ) {
    static INT_BIG y;
    signed INT_BIG z;
 }
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 %
 \ditem{int used for Fortran LOGICAL}
@@ -1310,7 +797,7 @@ implicitly of type \cc{int},
 and warns about constructs which might need further attention.
 Full details of which of the above constructs it fixes, and which it
 warns about, are given in
-\latexhtml{appendix \ref{sec:commands}}{\htmlref{the appendix}{crepint}}.
+appendix \ref{sec:commands}.
 
 A construction which \routine{crepint} misses altogether is finding
 implicit declarations in function prototypes, which are implicitly
@@ -1318,33 +805,33 @@ of type \cc{int}.
 These can be spotted by suitable use of the C compilers.
 Given a file \file{sub.c} which reads:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 sub( x ) {
    return x;
 }
-\end{verbatim}
+\end{terminalv}
 \end{squote}
-then running gcc with the {\tt -Wimplicit} flag generates warnings for
+then running gcc with the \texttt{-Wimplicit} flag generates warnings for
 such declarations:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % gcc -fsyntax-only -Wimplicit-function-declaration -Wstrict-prototypes sub.c
 sub.c:1: warning: return-type defaults to `int'
 sub.c:1: warning: function declaration isn't a prototype
-\end{verbatim}
+\end{terminalv}
 \end{squote}
-The {\tt -proto} flag of Tru64 Unix's C compiler is a little more
+The \texttt{-proto} flag of Tru64 Unix's C compiler is a little more
 effort to use, but produces more concise output.  Running
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % cc -protois -noobject sub.c
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 will produce a file called \file{sub.H} which reads:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 extern int sub(int x);
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 Occurrences of \cc{int} in the output file \file{sub.H} should be
 changed to read \cc{INT\_BIG} wherever the function is declared or
@@ -1352,17 +839,17 @@ defined in the source code (typically in a source file and maybe a
 header file), so that \file{sub.c} should
 end up reading:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 INT_BIG sub( INT_BIG x ) {
    return x;
 }
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 By running
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % cc -protois -noobject -DINT_BIG=long *.c
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 and attending to any \cc{int} declarations in the resulting \file{.H} files,
 it should be possible to find any offending implicit declarations.
@@ -1411,11 +898,11 @@ substitution to the fortran source files as it extracts them from the
 tar archive where they are stored.
 The recommended code for this is:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 sed "s/^[ \t]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr] *\* *8/      $(INTEGER8)/"
-\end{verbatim}
+\end{terminalv}
 \end{squote}
-which should be applied only when {\tt test \$(INTEGER8)} is true.
+which should be applied only when \texttt{test \$(INTEGER8)} is true.
 Note that this changes nothing except variable declarations;
 in particular it will not modify references to INTEGER*8 type in IMPLICIT
 statements.
@@ -1450,7 +937,7 @@ for this purpose.
 The following gives the relevant parts of a basic \file{mk}
 file by way of example:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
    ...
 #  Supported Systems:
 #     The following systems are currently supported and may be
@@ -1526,9 +1013,9 @@ file by way of example:
             CFLAGS='-DINT_BIG=int'
             INTEGER8='INTEGER    '
                ...
-\end{verbatim}
+\end{terminalv}
 \end{squote}
-Note the `{\tt -xarch=v9}' addition to the sun4\_Solaris\_64 CFLAGS
+Note the `\texttt{-xarch=v9}' addition to the sun4\_Solaris\_64 CFLAGS
 and FFLAGS variables,
 which instructs the compiler to compile for a 64-bit system.
 Tru64 Unix C compiles for 64 bit executables by default, so needs no
@@ -1536,15 +1023,15 @@ extra flags.
 
 It may also be desirable to add the lines:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
             SOURCE_VARIANT='alpha_OSF1'
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 and
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
             SOURCE_VARIANT='sun4_Solaris'
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 to the alpha\_OSF1\_64 and sun4\_Solaris\_64 stanzas respectively,
 if the same
@@ -1556,7 +1043,7 @@ and additional copies of the system-dependent files must be supplied.
 The relevant parts of a suitable matching \file{makefile} would look
 something like this:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 #  Default values for macros for compiling C and Fortran source code.
 
 CFLAGS = -O -DINT_BIG=int
@@ -1606,24 +1093,24 @@ $(PLATFORM_F) dummy_target2:
 #  into the date stamp file.
    ...
         @ echo '   INTEGER8: $(INTEGER8)'     >>$(DATE_STAMP)
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 Lists of files for extraction from the source archive may have to
 be split into Fortran and non-Fortran sublists since the code for
 extracting them will now differ.
 For instance it might be convenient to replace assignments like this:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 PUBLIC_INCLUDES = $(PKG_NAME)_par $(PKG_NAME)_err $(PKG_NAME).h
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 with something like the following:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 PUBLIC_F_INCLUDES = $(PKG_NAME)_par $(PKG_NAME)_err
 PUBLIC_C_INCLUDES = $(PKG_NAME).h
 PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 so that the lists of Fortran and C files can appear as targets of
 separate extraction rules, as in the example above.
@@ -1638,7 +1125,7 @@ to the source files so modified.
 
 Files may be extracted from the source archive(s) in more places than
 one in the makefile - in particular, for some reason lost in the
-mists of time the {\tt do\_test} target
+mists of time the \texttt{do\_test} target
 usually extracts required files from the source archives explicitly
 rather than relying on a dependency.
 It will be necessary to identify all such places
@@ -1651,11 +1138,11 @@ their way out of the source archive,
 the copies of the files in the build directory may not be the same
 as the files in the source archive, and so files cannot in general
 be transferred between the build directory and source archive
-simply using {\tt tar}.
+simply using \texttt{tar}.
 This means that in general the source archive cannot be rebuilt
 from the files in the build directory.
 This may well break private, non-standard targets inserted into the
-makefile by the package developer (commonly called {\tt archive}),
+makefile by the package developer (commonly called \texttt{archive}),
 and effectively means that it is not possible to tweak package source
 code in the build directory prior to re-exporting it.
 
@@ -1677,14 +1164,14 @@ The details of their operation are given in \ref{sec:commands}.
 
 To start up the EXTREME package, type
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % extreme
 
    EXTREME commands are now available -- Version 0.1-0
-\end{verbatim}
+\end{terminalv}
 \end{squote}
-(if the {\tt extreme} alias is not set up,
-try {\tt source /star/bin/extreme/extreme.csh}).
+(if the \texttt{extreme} alias is not set up,
+try \texttt{source /star/bin/extreme/extreme.csh}).
 This makes the tools provided by this package available.
 
 One tool is provided for each of the source code conversion
@@ -1706,13 +1193,13 @@ Where no change needs to be made, the input is written with no changes
 to the output.  This means that the \file{diff} command can be used
 to see what changes the filters make, by doing something like:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % frepint file.f | diff file.f -
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 which might give a result like:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 94c94
 <       INTEGER STATUS             ! Global status
 ---
@@ -1723,7 +1210,7 @@ which might give a result like:
 ---
 >       INTEGER * 8 I              ! Loop variable
 >       INTEGER * 8 INDF           ! NDF identifier
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 
 Each of the filters, as well as making changes,
@@ -1734,27 +1221,27 @@ the questionable construct occurs.
 Such comment lines contain the name of the filter followed by a colon
 and explanatory text, so given the file \file{watcher.c}:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
    int watcher( int mins ) {
       printf( "Only %i minutes till coffee break\n", mins );
    }
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 \xroutine{crepint} will do the following:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % crepint watcher.c >fixed/watcher.c
 crepint: Format string has %[cdiouxX*] (comment inserted)
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 and the resulting file \file{fixed/watcher.c} will look like this:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 INT_BIG watcher( INT_BIG mins ) {
 /* crepint: Format string has %[cdiouxX*]                                */
    printf( "Only %i minutes till coffee break\n", mins );
 }
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 which can then be fixed by hand as described in
 section \ref{sec:cint}.
@@ -1820,7 +1307,7 @@ For each of its command line arguments it runs \xroutine{inscnf} and
 Finally it writes a short summary of the run.
 An excerpt of its output might look like this:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % do-inscnf *.f *.gen
 astimp.f:              2 x Last arg %VAL in FTS1_GKEYD
 import.f:                  Integer %VAL arg in CCD1_IMFIT?
@@ -1829,7 +1316,7 @@ import.f:                  Last arg %VAL in CCD1_IMFIT
 71 new dependencies on include file 'CNF_PAR'.
 71/483 modified files written in ./inscnf.changed.
 Logfile is ./inscnf.log.
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 
 The other driver scripts, \dofilter{crepint} and \dofilter{frepint},
@@ -1838,9 +1325,9 @@ same way as \dofilter{inscnf}.
 
 The driver script may occasionally throw out a comment like this:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 ndf1_pshdt.f:              Possible error in modifications?
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 which indicates that there seems to be a difference between
 the output of the filter and the input plus the expected changes.
@@ -1851,12 +1338,12 @@ to get an idea what the problem may have been.
 The above warning was emitted by \xdofilter{frepint}; investigate
 as follows:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % cmp-frepint ndf1_pshdt.f
  *** Edit error near line 69?:
  CALL NDF1_SPLDT( STR, 1, LEN( STR ), ' ', -10, F, L, NFIELD, STATUS )
  CALL NDF1_SPLDT( STR, 1, LEN( STR ), ' ', - 10, F, L, NFIELD, STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 from which it is clear that the culprit is some harmlessly inserted
 whitespace.
@@ -1865,7 +1352,7 @@ deal in a cavalier fashion with formatting, so the source
 lines may not look very much like the original copies and the line number
 reporting may not be accurate, but the message
 should be sufficient to locate the problem.
-Such ``{\tt Possible error in modifications?}''
+Such ``\texttt{Possible error in modifications?}''
 warnings ought to be infrequent, and may often not be indicative
 of a real problem, but it is as well to investigate them.
 
@@ -1895,21 +1382,21 @@ Identify all C source files and all Fortran source files
  Browser}{http://capc23.ast.cam.ac.uk/cgi-bin/scb}
 can be useful for this).
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % tar xf package_source.tar
 % echo >ffiles *.f *.gen pkg1_par pkg1_err
 % echo >cfiles *.c *.h
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 %
 \item
 Start up the EXTREME package
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % extreme
 
    EXTREME commands are now available -- Version 0.1-0
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 %
 \item
@@ -1917,28 +1404,28 @@ Run \xdofilter{inscnf} on Fortran files
 to wrap \%VAL arguments in CNF\_PVAL calls,
 if this has not already been done.
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % do-inscnf `cat ffiles`
 pkg1_sub.f:                Constant %VAL arg in PKG1_ADD?
 5 new dependencies on include file 'CNF_PAR'.
 5/25 modified files written in ./inscnf.changed.
 Logfile is ./inscnf.log.
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 %
 \item
 Check CNF\_PVAL insertions which generated warnings,
 and remove them if they wrap arguments which are not registered pointers.
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % vi inscnf.changed/pkg1_sub.f
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 %
 \item
 Rebuild source archive, rebuild package, and test.
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % mkdir retar
 % cd retar
 % tar xf ../package_source.tar
@@ -1947,19 +1434,18 @@ Rebuild source archive, rebuild package, and test.
 % cd ..
 % rm -r retar inscnf.changed
    ...
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 %
 \item
 Ensure that you have 64-bit copies of all the Starlink libraries on which the
 package depends (these are not required for making the changes, but
 will be needed for building and testing the modified package).
-\html{\begin{squote}\end{squote}}
 \item
 Run \xdofilter{frepint} on Fortran files to replace INTEGER declarations
 by INTEGER~*~8.
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % tar xf package_source.tar `cat ffiles`
 % do-frepint `cat ffiles`
 pgk1_mult.f:               INTEGER*2 declaration not changed
@@ -1968,7 +1454,7 @@ pkg1_misc.f:               Nowhere to declare INT__'s in module PKG1_MISC
 
 22/25 modified files written in ./frepint.changed.
 Logfile is ./frepint.log
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 %
 \item
@@ -1982,7 +1468,7 @@ be inserted into the module in question and
 explicit declarations made for all the variables used.
 If this is impractical, the only essential change is to make sure that
 all the implicit INTEGER variables are explicitly declared as INTEGER~*~8.
-Note it is {\it not\/} sufficient to make an
+Note it is \textit{not\/} sufficient to make an
 IMPLICIT~INTEGER*8~(I\latexhtml{$-$}{-}N)
 declaration, since the resulting declarations would not be edited
 at build time by
@@ -2009,7 +1495,7 @@ statement).  In this case you will have to insert the lines yourself,
 but running \routine{frepint} will tell you what it would have inserted,
 so that you can paste it in by hand.
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % frepint pkg1_misc.f >/dev/null
 frepint: Nowhere to declare INT__'s in module PGK1_MISC
 
@@ -2018,7 +1504,7 @@ frepint: Nowhere to declare INT__'s in module PGK1_MISC
       INTEGER * 8 INT__12
       PARAMETER ( INT__0 = 0 )
       PARAMETER ( INT__12 = 12 )
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 %
 \end{description}
@@ -2028,31 +1514,28 @@ If there is any tricky storage association involving integers,
 such as use of COMMON or EQUIVALENCE, or a formal argument of
 different type to an actual argument, you may need to recode this.
 Hopefully such things should be few and far between.
-\html{\begin{squote}\end{squote}}
 %
 \item
 If the package calls any unconverted libraries
 (e.g. non-standard intrinsic functions), change the types of
 actual arguments in affected calls back to INTEGER.
-\html{\begin{squote}\end{squote}}
 %
 \item
 It is now possible, though not normally worth the effort,
 to change any private INTEGER*8 variables back to INTEGERs
 for efficiency or other reasons.
-\html{\begin{squote}\end{squote}}
 %
 \item
 Prepare for C source conversion: ensure that all functions are
 properly declared using ANSI C-style formal argument type declarations.
 If you think this may not be the case, compiler warnings may be of help.
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % gcc -fsyntax-only -Wimplicit-function-declaration -Wstrict-prototypes *.c
 tmp.c:160: warning: implicit declaration of function `pipe'
 % man pipe
     ...
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 %
 \item
@@ -2060,13 +1543,12 @@ Make sure that communication with Fortran routines is done properly
 using CNF as described in \xref{SUN/209}{sun209}{}.
 In particular it is important to use the \xref{TRAIL}{sun209}{TRAIL}
 macro for passing character string lengths.
-\html{\begin{squote}\end{squote}}
 %
 \item
 Run \xdofilter{crepint} on C files to replace references to \cc{int} type
 by \cc{INT\_BIG}.
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % tar xf package_source.tar `cat cfiles`
 % do-crepint `cat cfiles`
 input.c:               2 x Format string implies int * (comment inserted)
@@ -2078,7 +1560,7 @@ toplevel.c:                Type of argc not changed from int
 
 8/8 modified files written in ./crepint.changed.
 Logfile is ./crepint.log.
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 %
 \item
@@ -2109,10 +1591,10 @@ You can see which calls are made to the functions declared in a header file
 by removing the include directive and checking compiler warnings,
 something like:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % grep -v '<unistd.h>' toplevel.c >tmp.c
 % gcc -fsyntax-only -Wimplicit-function-declaration tmp.c
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 \end{description}
 %
@@ -2120,9 +1602,9 @@ something like:
 Check that you've attended to all the Format string warnings and removed
 the flagging comments.
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % grep 'crepint:' crepint.changed/*
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 %
 \item
@@ -2130,28 +1612,27 @@ Have a look for implicit function or argument declarations
 and replace them by explicit \cc{INT\_BIG} declarations.
 Certain flags of \file{gcc} can be used to pick this up:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % gcc -fsyntax-only -Wimplicit-int -Wstrict-prototypes *.c
-\end{verbatim}
+\end{terminalv}
 \end{squote}
-or the {\tt -proto} flag of the Tru64 Unix C compiler:
+or the \texttt{-proto} flag of the Tru64 Unix C compiler:
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % cc -noobject -protois -DINT_BIG=long crepint.changed/*.c
 % grep '[^a-z]int[^a-z]' *.H
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 %
 \item
 It is now possible, though not normally worth the effort,
 to change any private \cc{INT\_BIG} variables back to \cc{int}s
 for efficiency or other reasons.
-\html{\begin{squote}\end{squote}}
 %
 \item
 Rebuild the source archive.
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % mkdir retar
 % cd retar
 % tar xf ../package_source.tar
@@ -2160,58 +1641,55 @@ Rebuild the source archive.
 % tar cf ../package_source.tar *
 % cd ..
 % rm -r retar frepint.changed crepint.changed
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 %
 \item
 Use \xroutine{extmk} to make the necessary modifications to the \file{mk} file.
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % mv mk mk.orig
 % extmk < mk.orig > mk
 % chmod 755 mk
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 %
 \item
 If \routine{extmk} generated any warnings, edit the \file{mk} file by
 hand accordingly.
-\html{\begin{squote}\end{squote}}
 %
 \item
 If there are platform-dependent files in the package you must either add
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
       SOURCE_VARIANT='alpha_OSF1'
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 and
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
       SOURCE_VARIANT='sun4_Solaris'
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 to the new alpha\_OSF1\_64 and sun4\_Solaris\_64 stanzas of the \file{mk} file
 respectively, or generate new platform-dependent files for the
 two new platforms.
-\html{\begin{squote}\end{squote}}
 %
 \item
 Use \xroutine{extmakefile} to make some of the necessary modifications
 to the \file{makefile}, and check the changes made.
 \begin{squote}
-\begin{verbatim}
+\begin{terminalv}
 % mv makefile makefile.orig
 % extmakefile < makefile.orig >makefile
 % diff makefile.orig makefile
-\end{verbatim}
+\end{terminalv}
 \end{squote}
 %
 \item
 If \routine{extmakefile} indicated that it failed to make any of the
 changes that it wanted to, insert the relevant bits of code by hand
 with reference to section \ref{sec:makefile}.
-\html{\begin{squote}\end{squote}}
 %
 \item
 Edit the \file{makefile} by hand to make the rest of the necessary changes
@@ -2235,7 +1713,6 @@ Fix, or remove, any private archive-type targets which have been broken
 by the fact that source files in the build directory are no longer
 original copies.
 \end{itemize}
-\html{\begin{squote}\end{squote}}
 %
 \item
 Export the source, and build the package.
@@ -2249,13 +1726,11 @@ If there are compilation errors or new warnings fix them.
 In general, sun4\_Solaris\_64 is more sensitive to problems than
 alpha\_OSF1\_64, since the sizes of \cc{long} and pointers are
 actually different between the 32-bit and 64-bit compilations.
-\html{\begin{squote}\end{squote}}
 %
 \item Test!
 Bear in mind that
 the changes may have broken the package on the old platforms
 as well as the new ones.
-\html{\begin{squote}\end{squote}}
 %
 \end{enumerate}
 
@@ -2272,31 +1747,31 @@ as well as the new ones.
 }{
    \sstdescription{
       This program is a filter which takes C source code and replaces
-      occurrences of the type specifier `int{\tt '} by the identifier
-      `INT\_BIG{\tt '}.  This identifier can then be assigned a preprocessor
+      occurrences of the type specifier `int\texttt{'} by the identifier
+      `INT\_BIG\texttt{'}.  This identifier can then be assigned a preprocessor
       value of a suitable integral type (int or long) either using an
       include file or with a -DINT\_BIG=(type) flag on the C compiler
       command line.
 
-      It{\tt '}s not quite as simple as replacing every semantically significant
-      occurrence of the `int{\tt '} identifier; `short int{\tt '} and `long int{\tt '} type
+      It\texttt{'}s not quite as simple as replacing every semantically significant
+      occurrence of the `int\texttt{'} identifier; `short int\texttt{'} and `long int\texttt{'} type
       specifiers will be left alone.
 
-      If a use of int appears to be declaring a symbol called `main{\tt '} or
-      `argc{\tt '}, then this will be left alone too, and a warning written
+      If a use of int appears to be declaring a symbol called `main\texttt{'} or
+      `argc\texttt{'}, then this will be left alone too, and a warning written
       to standard error to the effect that it is not being changed.
 
       Additionally, references to the $<$limits.h$>$ macros INT\_MAX, INT\_MIN
       and UINT\_MAX are replaced by INT\_BIG\_MAX, INT\_BIG\_MIN and
       UINT\_BIG\_MAX respectively.  If any of these substitutions are
-      made, then a line `\#include {\tt "}extreme.h{\tt "}{\tt '} is added after the
-      `\#include $<$limits.h$>${\tt '} line which is presumably in the file.
+      made, then a line `\#include \texttt{"}extreme.h\texttt{"}\texttt{'} is added after the
+      `\#include $<$limits.h$>$\texttt{'} line which is presumably in the file.
       If $<$limits.h$>$ is not included in the input file, a warning is
       written to standard error.
 
       Explicit declarations which are implicitly of type int will have
-      an INT\_BIG token inserted - for instance `static x, y;{\tt '} will be
-      changed to `static INT\_BIG x, y;{\tt '}.
+      an INT\_BIG token inserted - for instance `static x, y;\texttt{'} will be
+      changed to `static INT\_BIG x, y;\texttt{'}.
 
       The program will write a warning on standard error for certain
       constructions in the code which are likely to cause trouble after
@@ -2341,7 +1816,7 @@ as well as the new ones.
       In the case of potentially dangerous format strings, for
       convenience a comment is inserted in the output code on the line
       before the function call is made.  The comment will contain the
-      character string `crepint: {\tt '}.  The warning to standard error
+      character string `crepint: \texttt{'}.  The warning to standard error
       notes that the comment line has been inserted.
 
       The following constructions are also likely to cause trouble, but
@@ -2352,8 +1827,8 @@ as well as the new ones.
             Use of functions without prototypes.  If header files are
               omitted or old style function declarations are used then the
               ANSI C machinery for doing type conversion at function call
-              time will not work.  Gcc{\tt '}s `-Wstrict-prototypes{\tt '} and
-              `-Wimplicit-function-declaration{\tt '} flags are useful for this.
+              time will not work.  Gcc\texttt{'}s `-Wstrict-prototypes\texttt{'} and
+              `-Wimplicit-function-declaration\texttt{'} flags are useful for this.
 
          \sstitem
             Implicit declarations, which are implicitly of type int.
@@ -2361,8 +1836,8 @@ as well as the new ones.
               or type qualifiers, it is implicitly of type int, and so
               should become delcared as INT\_BIG.  This program does not
               find these.  Such implicit declarations (only?) occur in
-              function declarations.  The Tru64 Unix C compiler{\tt '}s `-protois{\tt '}
-              flag or gcc{\tt '}s `-Wimplicit-int{\tt '} flag are useful for identifying
+              function declarations.  The Tru64 Unix C compiler\texttt{'}s `-protois\texttt{'}
+              flag or gcc\texttt{'}s `-Wimplicit-int\texttt{'} flag are useful for identifying
               these.
 
       }
@@ -2371,7 +1846,7 @@ as well as the new ones.
 
       No changes are made to comment lines so that, for instance, the
       Synopsis stanza of function prologues will not have formal argument
-      types changed from `int{\tt '} to `INT\_BIG{\tt '}.
+      types changed from `int\texttt{'} to `INT\_BIG\texttt{'}.
 
       Source code which makes sufficiently inventive use of the C
       will stand a good chance of confusing this program.
@@ -2395,7 +1870,7 @@ as well as the new ones.
    \sstdescription{
       This program is a filter which takes FORTRAN 77 source code
       and modifies it so that INTEGER declarations are rewritten as
-      `INTEGER $*$ 8{\tt '}.  It also attempts to warn if there are usages which
+      `INTEGER $*$ 8\texttt{'}.  It also attempts to warn if there are usages which
       might cause trouble given this change.
 
       Additionally, if there appear to be actual arguments to subroutines
@@ -2434,7 +1909,7 @@ as well as the new ones.
 
       No changes are made to comment lines so that, for instance, the
       Arguments stanza of subroutine prologues will not have argument
-      types modified from `INTEGER{\tt '} to `INTEGER $*$ 8{\tt '}.
+      types modified from `INTEGER\texttt{'} to `INTEGER $*$ 8\texttt{'}.
 
       No change is made to references to INTEGER type in IMPLICIT
       statements.
@@ -2474,7 +1949,7 @@ as well as the new ones.
       otherwise it is an array.
 
       It will also not identify an INTEGER-type expression as such unless
-      it is a single integer literal; for instance the expression `3 $*$ 5{\tt '}
+      it is a single integer literal; for instance the expression `3 $*$ 5\texttt{'}
       as actual argument of a subroutine/function ought to be retyped,
       but will not be spotted.
 
@@ -2511,7 +1986,7 @@ as well as the new ones.
       Additionally, for each program unit in which a call to CNF\_PVAL
       has been made, an attempt is made to insert a line like
 
-         INCLUDE {\tt '}CNF\_PAR{\tt '}        ! For CNF\_PVAL function
+         INCLUDE \texttt{'}CNF\_PAR\texttt{'}        ! For CNF\_PVAL function
 
       This is inserted after the last INCLUDE line which already exists
       in the program unit.  If there are no INCLUDE lines there, this
@@ -2522,7 +1997,7 @@ as well as the new ones.
       more than 72 characters long are avoided (unless they were there
       in the first place).
 
-      Characters {\tt '}$\backslash$r{\tt '} (carriage return) and {\tt '}$\backslash$t{\tt '} (tab) might possibly
+      Characters \texttt{'}$\backslash$r\texttt{'} (carriage return) and \texttt{'}$\backslash$t\texttt{'} (tab) might possibly
       cause erroneous line breaking - if any are encountered a warning
       is given (these should not be in the source really).
       Code using columns 73-80 of the source cards for comments is
@@ -2609,8 +2084,8 @@ as well as the new ones.
       The only change which might be required which this script does not
       make is to set values for the SOURCE\_VARIANT variable.  Depending
       on how the system-specific compilation is going to be done, it
-      may be desirable to add SOURCE\_VARIANT={\tt '}alpha\_OSF1{\tt '} in the new
-      alpha\_OSF1\_64 stanza, and SOURCE\_VARIANT={\tt '}sun4\_Solaris{\tt '} in the
+      may be desirable to add SOURCE\_VARIANT=\texttt{'}alpha\_OSF1\texttt{'} in the new
+      alpha\_OSF1\_64 stanza, and SOURCE\_VARIANT=\texttt{'}sun4\_Solaris\texttt{'} in the
       new sun4\_Solaris\_64 stanza.  If required, this must be done by hand.
 
       This script is not extremely intelligent - unless the mk file
@@ -2640,10 +2115,10 @@ as well as the new ones.
       \sstitemlist{
 
          \sstitem
-            Add {\tt '} -DINT\_BIG=int{\tt '} to the default CFLAGS macro
+            Add \texttt{'} -DINT\_BIG=int\texttt{'} to the default CFLAGS macro
 
          \sstitem
-            Add {\tt '}INTEGER8 = INTEGER{\tt '} default macro setting
+            Add \texttt{'}INTEGER8 = INTEGER\texttt{'} default macro setting
 
          \sstitem
             Add definition of the REPLACE\_INTEGER8 macro
@@ -2663,7 +2138,7 @@ as well as the new ones.
       splitting files between Fortran and non-Fortran ones, so that the
       non-Fortran files can be extracted using the old rule, but the
       Fortran files can be extracted using the new rule inserted by this
-      script (the dummy target {\tt '}\$(FORTRAN\_FILES){\tt '} is written as a
+      script (the dummy target \texttt{'}\$(FORTRAN\_FILES)\texttt{'} is written as a
       placeholder for such files).  This may require splitting up
       existing macros, for instance splitting PRIVATE\_INCLUDES into
       PRIVATE\_C\_INCLUDES and PRIVATE\_F\_INCLUDES.
@@ -2687,8 +2162,8 @@ as well as the new ones.
    \sstdescription{
       This script checks an original source code file against a version
       of it run through the one of the source code filter programs in
-      the EXTREME package.  It should be invoked under the name `cmp-xxx{\tt '}
-      to check the effects of the filter `xxx{\tt '}.
+      the EXTREME package.  It should be invoked under the name `cmp-xxx\texttt{'}
+      to check the effects of the filter `xxx\texttt{'}.
 
       The available filters xxx are:
       \sstitemlist{
@@ -2741,7 +2216,7 @@ as well as the new ones.
    \sstdescription{
       This is a driver script to run one of the filter programs in
       the EXTREME package which modifies source code.  It should be
-      invoked under the name `do-xxx{\tt '} to run the filter `xxx{\tt '}.
+      invoked under the name `do-xxx\texttt{'} to run the filter `xxx\texttt{'}.
 
       The available filters xxx are:
       \sstitemlist{
@@ -2775,12 +2250,12 @@ as well as the new ones.
               summarised to standard output.
 
          \sstitem
-            Checks that the input file and output file don{\tt '}t look different
+            Checks that the input file and output file don\texttt{'}t look different
               in any unexpected ways, and writes a warning if they do.
 
          \sstitem
             For Fortran files, checks that no lines have been extended
-              beyond 72 characters (this should not be possible, it{\tt '}s just
+              beyond 72 characters (this should not be possible, it\texttt{'}s just
               an extra precaution).
 
       }
