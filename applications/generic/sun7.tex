@@ -1,155 +1,40 @@
-\documentclass[twoside,11pt]{article}
-\pagestyle{myheadings}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun7.5}
-\newcommand{\stardocnumber}    {7.5}
-\newcommand{\stardocauthors}   {S M Beard \\ P M Allan\\ Malcolm J. Currie\\ Peter W. Draper}
-\newcommand{\stardocdate}      {2006 May 8}
-\newcommand{\stardoctitle}     {GENERIC --- A Utility for Preprocessing Generic
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun7.5}
+\stardocnumber      {7.5}
+\stardocauthors     {S M Beard \\ P M Allan\\ Malcolm J. Currie\\ Peter W. Draper}
+\stardocdate        {2006 May 8}
+\stardoctitle     {GENERIC --- A Utility for Preprocessing Generic
 				\\ Fortran and C Subroutines}
-\newcommand{\stardocversion}   {1.2}
-\newcommand{\stardocmanual}    {User's Guide}
-
-%------------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
+\stardocversion     {1.2}
+\stardocmanual      {User's Guide}
+\stardocabstract   {%
+\GENERIC\ is tool for Fortran 77 and C developers to create type-specific
+code from a generic source that includes tokens for type-dependent
+elements.  This saves effort supporting multiple versions of the
+source code.
 }
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
+%------------------------------------------------------------------------------
+% ? Document-specific \providecommand or \newenvironment commands.
 
 % Shorthands for hypertext links.
 % -------------------------------
-\newcommand{\ASTERIX}{{\footnotesize ASTERIX}\normalsize}
-\newcommand{\ASTERIXref}{\xref{\ASTERIX}{sun98}{}}
-\newcommand{\GENERIC}{{\footnotesize GENERIC}\normalsize}
-\newcommand{\HDS}{{\footnotesize HDS}\normalsize}
-\newcommand{\HDSref}{\xref{\HDS}{sun92}{}~}
-\newcommand{\PRIMDAT}{{\footnotesize PRIMDAT}\normalsize}
-\newcommand{\PRIMDATref}{\xref{\PRIMDAT}{sun39}{}~}
+\providecommand{\ASTERIX}{{\footnotesize ASTERIX}\normalsize}
+\providecommand{\ASTERIXref}{\xref{\ASTERIX}{sun98}{}}
+\providecommand{\GENERIC}{{\footnotesize GENERIC}\normalsize}
+\providecommand{\HDS}{{\footnotesize HDS}\normalsize}
+\providecommand{\HDSref}{\xref{\HDS}{sun92}{}~}
+\providecommand{\PRIMDAT}{{\footnotesize PRIMDAT}\normalsize}
+\providecommand{\PRIMDATref}{\xref{\PRIMDAT}{sun39}{}~}
 
 %------------------------------------------------------------------------------
-% Add any \newcommand or \newenvironment commands here
+% Add any \providecommand or \newenvironment commands here
 
 % conditional text
-\newcommand{\latexelsehtml}[2]{#1}
-\begin{htmlonly}
-  \newcommand{\latexelsehtml}[2]{#2}
-\end{htmlonly}
+\providecommand{\latexelsehtml}[2]{#1}
 
 %------------------------------------------------------------------------------
 
@@ -158,113 +43,8 @@
 
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-%  \htmladdimg{sun95_cover.gif}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \newcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%   ==================
-\GENERIC\ is tool for Fortran 77 and C developers to create type-specific
-code from a generic source that includes tokens for type-dependent
-elements.  This saves effort supporting multiple versions of the
-source code.
-
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
-%  \markright{\stardocname}
- \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-% \newpage
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 % The main text begins here.
 % -----------------------------------------------------------------------------
@@ -290,16 +70,16 @@ One might want a different version of the routine for initializing
 a double precision array, an integer array and a real array.
 The following subroutines would need to be written:
 
-\begin{verbatim}
+\begin{terminalv}
       ZEROD( N, DARR )   Zero every element in a DOUBLE PRECISION array
       ZEROI( N, IARR )   Zero every element in an INTEGER array
       ZEROR( N, RARR )   Zero every element in a REAL array
-\end{verbatim}
+\end{terminalv}
 
 The integer routine might contain the following code (in a file
-called {\tt zeroi.f}):
+called \texttt{zeroi.f}):
 
-\begin{verbatim}
+\begin{terminalv}
           SUBROUTINE ZEROI( N, ARRAY )
     *+
     *  Name:
@@ -332,7 +112,7 @@ called {\tt zeroi.f}):
              ARRAY( I ) = 0
           END DO
           END
-\end{verbatim}
+\end{terminalv}
 
 The REAL and DOUBLE PRECISION versions of the routine would have to be
 written in a similar way, and this obviously involves a lot of
@@ -350,9 +130,9 @@ If any changes become necessary, only this one master routine needs
 to be edited.
 
 To use the \GENERIC\ utility, the routine listed above is replaced by
-the following (in a file called {\tt zero.gen}):
+the following (in a file called \texttt{zero.gen}):
 
-\begin{verbatim}
+\begin{terminalv}
           SUBROUTINE ZERO<T>( N, ARRAY )
     *+
     *  Name:
@@ -385,7 +165,7 @@ the following (in a file called {\tt zero.gen}):
              ARRAY( I ) = 0<CONST>
           END DO
           END
-\end{verbatim}
+\end{terminalv}
 
 This is a ``generic routine.''
 Other examples of generic routines include the DAT\_ routines in
@@ -399,7 +179,7 @@ of a given type.
 In the above example, the tokens would be replaced
 as follows.
 
-\begin{verbatim}
+\begin{terminalv}
        Token       Double precision    Integer       Real
                    replacement         replacement   replacement
 
@@ -407,14 +187,13 @@ as follows.
        <TYPE>      DOUBLE PRECISION    INTEGER       REAL
        <COMM>      DOUBLE PRECISION    INTEGER       REAL
        <CONST>     .0D0                (blank)       .0E0
-\end{verbatim}
+\end{terminalv}
 
 The types are generated by issuing the following command.
 
-\begin{quote}{\tt
-\% generic -t dir zero.gen
-}
-\end{quote}
+\begin{terminalv}
+% generic -t dir zero.gen
+\end{terminalv}
 
 More details on the use of the \GENERIC\ utility, and a full list of
 tokens and types, are given in the rest of this document.
@@ -423,108 +202,108 @@ tokens and types, are given in the rest of this document.
 
 To use \GENERIC\ for C routines follow the recipe described below. Note that
 in this case we use the C preprocessor to create the necessary code, not the
-{\tt generic} program. Clearly there are many ways to do this task, what is
+\texttt{generic} program. Clearly there are many ways to do this task, what is
 presented here is just a standardized method tuned for working with Starlink
 libraries.
 
 First create your generic code routines. These actually go into an include
-file that is conventionally named with extension {\tt .cgen}. There are several
+file that is conventionally named with extension \texttt{.cgen}. There are several
 macros defined for use when defining generic functions.
 
 \begin{itemize}
-\item {\tt CGEN\_BAD}
-\item {\tt CGEN\_FUNCTION}
-\item {\tt CGEN\_HDS\_TYPE}
-\item {\tt CGEN\_MAX}
-\item {\tt CGEN\_MIN}
-\item {\tt CGEN\_PRM\_TYPE}
-\item {\tt CGEN\_TYPE}
+\item \texttt{CGEN\_BAD}
+\item \texttt{CGEN\_FUNCTION}
+\item \texttt{CGEN\_HDS\_TYPE}
+\item \texttt{CGEN\_MAX}
+\item \texttt{CGEN\_MIN}
+\item \texttt{CGEN\_PRM\_TYPE}
+\item \texttt{CGEN\_TYPE}
 \end{itemize}
 
-You need to use {\tt CGEN\_FUNCTION} as part of the normal function
+You need to use \texttt{CGEN\_FUNCTION} as part of the normal function
 declaration so that generic forms of the function name can be generated on
 inclusion. Each routine in a generic include file should start:
 
-\begin{verbatim}
-    return_type CGEN_FUNCTION(function_name) ( arg decs )
-\end{verbatim}
+\begin{terminalv}
+return_type CGEN_FUNCTION(function_name) ( arg decs )
+\end{terminalv}
 
-So a routine called {\tt kpg1\_bad} that returned an int and accepted a
-{\tt CGEN\_CTYPE} pointer, called {\tt value}, would be defined as:
+So a routine called \texttt{kpg1\_bad} that returned an int and accepted a
+\texttt{CGEN\_CTYPE} pointer, called \texttt{value}, would be defined as:
 
-\begin{verbatim}
+\begin{terminalv}
     int CGEN_FUNCTION(kpg1_bad) (CGEN_CTYPE *value) {
         if ( value[0] == CGEN_BAD ) {
            return 1;
         }
         return 0;
     }
-\end{verbatim}
+\end{terminalv}
 
 with the trivial job of testing the first element of an array against the BAD
 value constant.
 
-The value of {\tt CGEN\_TYPE} will be set to the C type, that is
-{\tt double}, {\tt float}, {\tt int}, {\tt short int},
-{\tt unsigned short int}, {\tt char} and {\tt unsigned char}, as
+The value of \texttt{CGEN\_TYPE} will be set to the C type, that is
+\texttt{double}, \texttt{float}, \texttt{int}, \texttt{short int},
+\texttt{unsigned short int}, \texttt{char} and \texttt{unsigned char}, as
 appropriate.
 
-The value of {\tt CGEN\_BAD} will be set to one of the \PRIMDAT\ constants
-{\tt VAL\_\_BADD},
-{\tt VAL\_\_BADR},
-{\tt VAL\_\_BADI},
-{\tt VAL\_\_BADW},
-{\tt VAL\_\_BADUW},
-{\tt VAL\_\_BADB} or
-{\tt VAL\_\_BADUB}
-as appropriate, and the value of {\tt CGEN\_HDS\_TYPE} will be set to the HDS
+The value of \texttt{CGEN\_BAD} will be set to one of the \PRIMDAT\ constants
+\texttt{VAL\_\_BADD},
+\texttt{VAL\_\_BADR},
+\texttt{VAL\_\_BADI},
+\texttt{VAL\_\_BADW},
+\texttt{VAL\_\_BADUW},
+\texttt{VAL\_\_BADB} or
+\texttt{VAL\_\_BADUB}
+as appropriate, and the value of \texttt{CGEN\_HDS\_TYPE} will be set to the HDS
 type, one of
-{\tt \_DOUBLE},
-{\tt \_REAL},
-{\tt \_INTEGER},
-{\tt \_WORD},
-{\tt \_UWORD},
-{\tt \_BYTE} or
-{\tt \_UBYTE}.
+\texttt{\_DOUBLE},
+\texttt{\_REAL},
+\texttt{\_INTEGER},
+\texttt{\_WORD},
+\texttt{\_UWORD},
+\texttt{\_BYTE} or
+\texttt{\_UBYTE}.
 
 Now create a C file to includes the generic code. The include file is included
 once for each of the data types you want to support (this file can also
 contain related non-generic code).  To do this define the macro
-{\tt CGEN\_CODE\_TYPE} to be one of the values:
+\texttt{CGEN\_CODE\_TYPE} to be one of the values:
 
-\begin{verbatim}
+\begin{terminalv}
     CGEN_DOUBLE_TYPE, CGEN_FLOAT_TYPE, CGEN_INT_TYPE, CGEN_WORD_TYPE,
     CGEN_UWORD_TYPE, CGEN_BYTE_TYPE, CGEN_UBYTE_TYPE
-\end{verbatim}
+\end{terminalv}
 
-which selects the data type. Then include the file {\tt cgeneric\_defs.h}
-followed by your generic include file, (called {\tt mygenerics.cgen} in the
+which selects the data type. Then include the file \texttt{cgeneric\_defs.h}
+followed by your generic include file, (called \texttt{mygenerics.cgen} in the
 following example):
 
-\begin{verbatim}
-    #include <prm_par.h>
-    #include <cgeneric.h>
+\begin{terminalv}
+#include <prm_par.h>
+#include <cgeneric.h>
 
-    #define CGEN_CODE_TYPE CGEN_DOUBLE_TYPE
-    #include "cgeneric_defs.h"
-    #include "mygenerics.cgen"
-    #undef CGEN_CODE_TYPE
+#define CGEN_CODE_TYPE CGEN_DOUBLE_TYPE
+#include "cgeneric_defs.h"
+#include "mygenerics.cgen"
+#undef CGEN_CODE_TYPE
 
-    #define CGEN_CODE_TYPE CGEN_INT_TYPE
-    #include "cgeneric_defs.h"
-    #include "mygenerics.cgen"
-    #undef CGEN_CODE_TYPE
-\end{verbatim}
+#define CGEN_CODE_TYPE CGEN_INT_TYPE
+#include "cgeneric_defs.h"
+#include "mygenerics.cgen"
+#undef CGEN_CODE_TYPE
+\end{terminalv}
 
-when compiled this will generate code for {\tt double precision}
-and {\tt integer} versions of the generic functions defined in
-{\tt mygeneric.cgen}.
+when compiled this will generate code for \texttt{double precision}
+and \texttt{integer} versions of the generic functions defined in
+\texttt{mygeneric.cgen}.
 
 When you want to call the generic forms of a function, the name you supply to
-the {\tt CGEN\_FUNCTION} macro has one of character codes {\tt D}, {\tt F},
-{\tt I}, {\tt W}, {\tt UW},  {\tt B}, and {\tt UB} appended.  So for our
-example {\tt kpg1\_bad}, we have the two functions {\tt kpg1\_badD} and
-{\tt kpg1\_badI}.
+the \texttt{CGEN\_FUNCTION} macro has one of character codes \texttt{D}, \texttt{F},
+\texttt{I}, \texttt{W}, \texttt{UW},  \texttt{B}, and \texttt{UB} appended.  So for our
+example \texttt{kpg1\_bad}, we have the two functions \texttt{kpg1\_badD} and
+\texttt{kpg1\_badI}.
 
 See the comments in the include files for descriptions of the other macros.
 
@@ -538,27 +317,27 @@ The following tokens are recognised by the \GENERIC\ utility:
 \settowidth{\numlen}{000000000000}
 \settowidth{\labelsep}{000}
 
-\begin{list}{}{\setlength{\labelwidth}{\numlen}\setlength{\leftmargin}{\numlen}
+\begin{list}{}{%\setlength{\labelwidth}{\numlen}%\setlength{\leftmargin}{\numlen}
 \addtolength{\leftmargin}{\labelsep}}
 
-\item[{\tt $<$T$>$}] To be replaced by a single character representation
+\item[\texttt{$<$T$>$}] To be replaced by a single character representation
 of the specified type.
 
-\item[{\tt $<$TYPE$>$}] To be replaced by the string used to declare variables
+\item[\texttt{$<$TYPE$>$}] To be replaced by the string used to declare variables
 of the specified type when they are passed as arguments to
 the subroutine.
 
-\item[{\tt $<$LTYPE$>$}] To be replaced by the string used to declare variables
+\item[\texttt{$<$LTYPE$>$}] To be replaced by the string used to declare variables
 of the specified type when they are defined as local variables
 in the subroutine.
 
-\item[{\tt $<$CONST$>$}] To be replaced by the string appended to numeric
+\item[\texttt{$<$CONST$>$}] To be replaced by the string appended to numeric
 constants of the specified type.
 
-\item[{\tt $<$HTYPE$>$}] To be replaced by the \HDSref\ name for the specified
+\item[\texttt{$<$HTYPE$>$}] To be replaced by the \HDSref\ name for the specified
 type.
 
-\item[{\tt $<$COMM$>$}] To be replaced by a comment describing the specified type
+\item[\texttt{$<$COMM$>$}] To be replaced by a comment describing the specified type
 in plain English.
 
 \end{list}
@@ -572,12 +351,12 @@ at the end of this document.
 \subsection{The ASTERIX Tokens}
 
 As well as the kernel tokens, there are an additional set of
-tokens which will be translated if the {\tt -a} option is specified
+tokens which will be translated if the \texttt{-a} option is specified
 with the \GENERIC\ command (see below).
 
 These tokens are available to allow \GENERIC\ to process existing
 \ASTERIXref\ software (SUN/98) which uses them.
-They are {\em not}\ recommended for use by new software.
+They are \emph{not}\ recommended for use by new software.
 A list of the \ASTERIX\ tokens is given in
 \latexelsehtml{Appendix~\ref{ap_a}}{the
 \htmlref{token translations}{ap_a}}.
@@ -598,8 +377,8 @@ making local character variables CHARACTER*200.
 
 It is possible to override this default character size
 if it is unsuitable.  You can define the environment4 variable
-GENERIC\_CHASIZ or you can use the {\tt -c} flag on the
-{\bf generic} command.
+GENERIC\_CHASIZ or you can use the \texttt{-c} flag on the
+\textbf{generic} command.
 
 \subsection{The Fortran Maximum Record Length}
 
@@ -613,7 +392,7 @@ in column 6 of the next line.
 It is recommended that source lines in generic routines be kept
 well below 72 characters in length to prevent this from happening.
 
-{\bf NOTE:}~{\it Comment lines (~{\rm i.e.} those beginning `C', `c', `D', `d'
+\textbf{NOTE:}~\textit{Comment lines (~{\rm i.e.} those beginning `C', `c', `D', `d'
 or `*') which are longer than 72 characters are unaltered by \GENERIC.
 So are lines of code with an in-line comment (~\emph{i.e.} those containing
 a ``!'' character).}
@@ -626,134 +405,125 @@ strings.  However, this seems not to have proven a problem in practice.
 
 The \GENERIC\ utility is executed by typing the following command:
 
-\begin{quote}{\tt
-\% generic [-t <types>] [-a] [-c <chasiz>] [-s] [-sc <char>] [-u] [-x] \\
+\begin{terminalv}
+% generic [-t <types>] [-a] [-c <chasiz>] [-s] [-sc <char>] [-u] [-x]
            file1 [file2...]}
-\end{quote}
+\end{terminalv}
 
 Arguments in square brackets are optional and items in angle brackets are
 descriptive terms for the actual string that would be given.  The simplest form
-of the {\bf generic} command is:
+of the \textbf{generic} command is:
 
-\begin{quote}{\tt
-\% generic prog.gen
-}
-\end{quote}
+\begin{terminalv}
+% generic prog.gen
+\end{terminalv}
 
-which will produce a file called {\tt prog.f} containing routines for
+which will produce a file called \texttt{prog.f} containing routines for
 all of the supported data types.  Likewise for C
 
-\begin{quote}{\tt
-\% generic prog.cgen
-}
-\end{quote}
-will create a file {\tt prog.c}.
+\begin{terminalv}
+% generic prog.cgen
+\end{terminalv}
+will create a file \texttt{prog.c}.
 
-A softlink called {\bf fgeneric} is also provided to avoid a clash
+A softlink called \textbf{fgeneric} is also provided to avoid a clash
 with the IRAF generic preprocessor.
 
-All generic input Fortran files must have a suffix of {\tt .gen}, or
-{\tt .g\verb+<types>+} where \verb+<types>+ is a list of data types
-(see option {\tt -t} below for a list).  The latter was introduced to
+All generic input Fortran files must have a suffix of \texttt{.gen}, or
+\texttt{.g}\verb+<types>+ where \verb+<types>+ is a list of data types
+(see option \texttt{-t} below for a list).  The latter was introduced to
 simplify building using GNU tools, and is the recommended naming
-convention.  For C files the file extension should be {\tt .cgen}.
+convention.  For C files the file extension should be \texttt{.cgen}.
 
 You can specify multiple input files explicitly or with wild cards.
-All output Fortran files have a suffix of {\tt .f}, and output C files
-have suffix {\tt .c}.
+All output Fortran files have a suffix of \texttt{.f}, and output C files
+have suffix \texttt{.c}.
 
-The {\bf generic} command accepts the following command-line options.
+The \textbf{generic} command accepts the following command-line options.
 
 \begin{description}
 
 \item[-t] This must be followed by a list of the data types to be
-processed. The list should be separated from the {\tt -t} by a space,
-and should consist of one or more of the letters {\tt a, b, B, c, d, i, l,
+processed. The list should be separated from the \texttt{-t} by a space,
+and should consist of one or more of the letters \texttt{a, b, B, c, d, i, l,
 n, r, w or W}.  The letters have the following meanings:
 \begin{center}
 \begin{tabular}{ll}
-{\tt a} & all data types \\
-{\tt b} & BYTE \\
-{\tt B} & unsigned BYTE \\
-{\tt c} & CHARACTER \\
-{\tt d} & DOUBLE PRECISION \\
-{\tt i} & INTEGER \\
-{\tt l} & LOGICAL \\
-{\tt n} & all numeric types (\emph{i.e.} everything except CHARACTER and LOGICAL)\\
-{\tt r} & REAL \\
-{\tt w} & WORD (\emph{i.e.} INTEGER*2) \\
-{\tt W} & unsigned WORD \\
+\texttt{a} & all data types \\
+\texttt{b} & BYTE \\
+\texttt{B} & unsigned BYTE \\
+\texttt{c} & CHARACTER \\
+\texttt{d} & DOUBLE PRECISION \\
+\texttt{i} & INTEGER \\
+\texttt{l} & LOGICAL \\
+\texttt{n} & all numeric types (\emph{i.e.} everything except CHARACTER and LOGICAL)\\
+\texttt{r} & REAL \\
+\texttt{w} & WORD (\emph{i.e.} INTEGER*2) \\
+\texttt{W} & unsigned WORD \\
 \end{tabular}
 \end{center}
 
 For example, to generate routines for all of the standard Fortran numeric data
 types, type the command:
 
-\begin{quote}{\tt
-\% generic -t dir prog.gen
-}
-\end{quote}
+\begin{terminalv}
+% generic -t dir prog.gen
+\end{terminalv}
 
-(Using {\tt n} instead of {\tt dir} would generate byte and word versions as
+(Using \texttt{n} instead of \texttt{dir} would generate byte and word versions as
 well.)
 
 \item[-c] This should be followed by a space and then an integer
 giving the value of the local character size required.  The default
 value is 200. This value can be specified by the environment variable
-{\tt GENERIC\_CHASIZ}.  If {\tt GENERIC\_CHASIZ} is defined and the
-{\tt -c} argument is present, the {\tt -c} argument takes precedence.
+\texttt{GENERIC\_CHASIZ}.  If \texttt{GENERIC\_CHASIZ} is defined and the
+\texttt{-c} argument is present, the \texttt{-c} argument takes precedence.
 
 \item[-s] Generate the output in separate files for each data type
 with the single character type specifier appended to the base name of
 the file.  The default is to generate one output file for each input
-file.  For example, if the input file is {\tt sub1.gen} and the {\tt
--t} flag is set to {\tt dir}, then specifying the {\tt -s} flag will
-cause output files called {\tt sub1d.f}, {\tt sub1i.f} and {\tt
-sub1r.f} to be generated.  This option is provided as it is usual on
+file.  For example, if the input file is \texttt{sub1.gen} and the \texttt{-t} flag is set to \texttt{dir}, then specifying the \texttt{-s} flag will
+cause output files called \texttt{sub1d.f}, \texttt{sub1i.f} and \texttt{sub1r.f} to be generated.  This option is provided as it is usual on
 Unix systems to have all Fortran routines in separate source files.
 
 \item[-sc] This flag allows the user to specify one or more characters
 that will be used to separate the base file name from the appended
 character when generating separate output files for each data type.
-The {\tt -sc} should be followed by a space and then the character(s)
+The \texttt{-sc} should be followed by a space and then the character(s)
 to be used as the separator.  For example, the command:
 
-\begin{quote}{\tt
-\% generic -t dir -sc \_ func2.gen
-}
-\end{quote}
+\begin{terminalv}
+% generic -t dir -sc _ func2.gen
+\end{terminalv}
 
-will generate files called {\tt func2\_d.f}, {\tt func2\_i.f} and {\tt
-func2\_r.f}.  If the {\tt -sc} flag is given, then the {\tt -s} flag can be
+will generate files called \texttt{func2\_d.f}, \texttt{func2\_i.f} and \texttt{func2\_r.f}.  If the \texttt{-sc} flag is given, then the \texttt{-s} flag can be
 omitted.
 
 \item[-a] This will cause the \ASTERIX\ tokens to be interpreted as well as the
 standard ones.  Its use is deprecated.
 
-\item[-u]  The B and W types substitute {\tt ub} and {\tt uw} tokens
+\item[-u]  The B and W types substitute \texttt{ub} and \texttt{uw} tokens
 respectively in the code and in generated filenames.  This is for
 compability with the original VMS version when most generic routines were
-developed.  However, note that the {\tt -t} values of BW should still be
+developed.  However, note that the \texttt{-t} values of BW should still be
 used to obtain unsigned byte and unsigned-word instantiations.
 
-\item[-x]  Removes the last {\tt x} from the file name before generating the
+\item[-x]  Removes the last \texttt{x} from the file name before generating the
 names of the output files.  This is provided for compatability
-with early generic files in the VMS era files that had a final {\tt x} in the
+with early generic files in the VMS era files that had a final \texttt{x} in the
 name to indicate where the token would be replaced in the
-instantiated files.  In modern usage the trailing {\tt x} is absent, and
+instantiated files.  In modern usage the trailing \texttt{x} is absent, and
 this option is not required.
 
 \end{description}
 
 It is possible to specify the list of data types to be processed and the local
-character size by setting environment variables {\tt GENERIC\_TYPES} and {\tt
-GENERIC\_CHASIZ}, \emph{e.g.}
+character size by setting environment variables \texttt{GENERIC\_TYPES} and \texttt{GENERIC\_CHASIZ}, \emph{e.g.}
 
-\begin{quote}{\tt
-\% setenv GENERIC\_TYPES cdilr \\
-\% setenv GENERIC\_CHASIZ 300
-}
-\end{quote}
+\begin{terminalv}
+% setenv GENERIC_TYPES cdilr
+% setenv GENERIC_CHASIZ 300
+\end{terminalv}
 
 \section{Data Type Conversions---the DCV Routines}
 
@@ -774,10 +544,9 @@ DCV\_\verb+<T1>TO<T2>+ converts data type \verb+<T1>+ into \verb+<T2>+.
 The functions which can be are defined using Fortran statement
 functions in a file which may be included in a program by
 
-\begin{quote}{\tt
-INCLUDE 'DCV\_FUN'
-}
-\end{quote}
+\begin{terminalv}
+INCLUDE 'DCV_FUN'
+\end{terminalv}
 
 which should come after any data type definitions, but before
 any DATA initialisation or executable code.
@@ -785,27 +554,24 @@ In the standard prologue of SGP/16, it should go in the
 ``Internal References'' section.
 
 Conversions which cannot be defined as statement functions are
-provided as external functions in an object library ({\tt
-/star/lib/dcv.a} on a Starlink system).  Programs requiring these
+provided as external functions in an object library (\texttt{/star/lib/dcv.a} on a Starlink system).  Programs requiring these
 functions should be compiled
 
-\begin{quote}{\tt
-\% f77 prog.f -L/star/lib `dcv\_link`
-}
-\end{quote}
+\begin{terminalv}
+% f77 prog.f -L/star/lib `dcv_link`
+\end{terminalv}
 
 on Unix.
 
 The types of these functions can be declared in a program by including
 
-\begin{quote}{\tt
-INCLUDE 'DCV\_EXT'
-}
-\end{quote}
+\begin{terminalv}
+INCLUDE 'DCV_EXT'
+\end{terminalv}
 
 (in the ``External References'' section of the standard prologue).
 
-{\bf NOTE:}~{\it Statement functions are considerably faster than external
+\textbf{NOTE:}~\emph{Statement functions are considerably faster than external
 functions, so programs which use the common conversions defined in `DCV\_FUN'
 will execute a lot faster.}
 
@@ -823,7 +589,7 @@ As an example, a generic subroutine for finding the mean of the data
 contained in an array, where the array is of varying type but the mean is
 always REAL, might look like the following routine.
 
-\begin{verbatim}
+\begin{terminalv}
           SUBROUTINE MEAN<T>( N, ARRAY, MEAN )
     *+
     *  Name:
@@ -874,11 +640,11 @@ always REAL, might look like the following routine.
           MEAN = DCV_<T>TOR( SUM ) / REAL( N )
 
           END
-\end{verbatim}
+\end{terminalv}
 
 In the above example, for the INTEGER version of the routine for
-instance, the {\tt DCV\_ITOR(~SUM~)} statement will be converted to
-{\tt REAL(~SUM~)} by the statement function in {\tt DCV\_FUN}.
+instance, the \texttt{DCV\_ITOR(~SUM~)} statement will be converted to
+\texttt{REAL(~SUM~)} by the statement function in \texttt{DCV\_FUN}.
 
 \subsection{Range Checking}
 
@@ -892,17 +658,16 @@ are available for this purpose, which give the allowed range for type
 \verb+<T>+ (\emph{e.g.} $-128$ to $+127$ for a BYTE).
 These by may included in a program using the following line.
 
-\begin{quote}{\tt
-INCLUDE 'DCV\_PAR'
-}
-\end{quote}
+\begin{terminalv}
+INCLUDE 'DCV_PAR'
+\end{terminalv}
 
 (in the ``Global Parameters'' section of the standard prologue).
 
 Here is an example of the use of these parameters (for instance
 converting an INTEGER to another type).
 
-\begin{verbatim}
+\begin{terminalv}
     *             "
     *     (standard prologue)
     *             "
@@ -935,7 +700,7 @@ converting an INTEGER to another type).
           END IF
                   "
                   "
-\end{verbatim}
+\end{terminalv}
 
 Note that ranges are only provided for numeric data types.
 
@@ -962,30 +727,30 @@ are made.
 \hline
 TOKEN  & SUBSTITUTE  & COMMENT \\
 \\
-$<$T$>$       & {\tt "B"}       &{\em Subroutine name extension} \\
-$<$TYPE$>$    & {\tt "BYTE"}    &{\em Argument type definition} \\
-$<$LTYPE$>$   & {\tt "BYTE"}    &{\em Local type definition} \\
-$<$CONST$>$   & {\tt " "}       &{\em String to be appended to constant} \\
-$<$HTYPE$>$   & {\tt "\_BYTE"}  &{\em \HDSref\ type} \\
-$<$COMM$>$    & {\tt "BYTE"}    &{\em Comment describing type} \\
+$<$T$>$       & \texttt{"B"}       &\emph{Subroutine name extension} \\
+$<$TYPE$>$    & \texttt{"BYTE"}    &\emph{Argument type definition} \\
+$<$LTYPE$>$   & \texttt{"BYTE"}    &\emph{Local type definition} \\
+$<$CONST$>$   & \texttt{" "}       &\emph{String to be appended to constant} \\
+$<$HTYPE$>$   & \texttt{"\_BYTE"}  &\emph{\HDSref\ type} \\
+$<$COMM$>$    & \texttt{"BYTE"}    &\emph{Comment describing type} \\
 \end{tabular}
 
 \begin{tabular}{lll}
-\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified):} \\
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when \texttt{-a} is specified):} \\
 %byteasterix
 \hline
 TOKEN  &SUBSTITUTE  & COMMENT \\
 \\
-$<$CONV$>$    & {\tt " "} &{\em BYTE to REAL conversion} \\
-$<$EXT$>$     & {\tt " "} &{\em BYTE to REAL conversion extension} \\
-$<$BRAK$>$    & {\tt " "} &{\em Brackets for BYTE to REAL conversion} \\
-$<$ICONV$>$   & {\tt " "} &{\em BYTE to INTEGER conversion} \\
-$<$IEXT$>$    & {\tt " "} &{\em BYTE to INTEGER conversion extension} \\
-$<$IBRAK$>$   & {\tt " "} &{\em Brackets for BYTE to INTEGER conversion} \\
-$<$REV$>$     & {\tt " "} &{\em REAL to BYTE conversion} \\
-$<$RVBRAK$>$  & {\tt " "} &{\em Brackets for REAL to BYTE conversion} \\
-$<$IREV$>$    & {\tt " "} &{\em INTEGER to BYTE conversion} \\
-$<$IRVBRAK$>$ & {\tt " "} &{\em Brackets for INTEGER to BYTE conversion} \\
+$<$CONV$>$    & \texttt{" "} &\emph{BYTE to REAL conversion} \\
+$<$EXT$>$     & \texttt{" "} &\emph{BYTE to REAL conversion extension} \\
+$<$BRAK$>$    & \texttt{" "} &\emph{Brackets for BYTE to REAL conversion} \\
+$<$ICONV$>$   & \texttt{" "} &\emph{BYTE to INTEGER conversion} \\
+$<$IEXT$>$    & \texttt{" "} &\emph{BYTE to INTEGER conversion extension} \\
+$<$IBRAK$>$   & \texttt{" "} &\emph{Brackets for BYTE to INTEGER conversion} \\
+$<$REV$>$     & \texttt{" "} &\emph{REAL to BYTE conversion} \\
+$<$RVBRAK$>$  & \texttt{" "} &\emph{Brackets for REAL to BYTE conversion} \\
+$<$IREV$>$    & \texttt{" "} &\emph{INTEGER to BYTE conversion} \\
+$<$IRVBRAK$>$ & \texttt{" "} &\emph{Brackets for INTEGER to BYTE conversion} \\
 \end{tabular}
 \end{quote}
 
@@ -998,30 +763,30 @@ substitutions are made.
 \hline
 TOKEN     &SUBSTITUTE     &COMMENT \\
 \\
-$<$T$>$       &{\tt "UB"}     &{\em Subroutine name extension} \\
-$<$TYPE$>$    &{\tt "BYTE"}   &{\em Argument type definition} \\
-$<$LTYPE$>$   &{\tt "BYTE"}   &{\em Local type definition} \\
-$<$CONST$>$   &{\tt " "}      &{\em String to be appended to constant}\\
-$<$HTYPE$>$   &{\tt "\_UBYTE"}  &{\em \HDS\ type} \\
-$<$COMM$>$    &{\tt "UNSIGNED BYTE"} &{\em Comment describing type} \\
+$<$T$>$       &\texttt{"UB"}     &\emph{Subroutine name extension} \\
+$<$TYPE$>$    &\texttt{"BYTE"}   &\emph{Argument type definition} \\
+$<$LTYPE$>$   &\texttt{"BYTE"}   &\emph{Local type definition} \\
+$<$CONST$>$   &\texttt{" "}      &\emph{String to be appended to constant}\\
+$<$HTYPE$>$   &\texttt{"\_UBYTE"}  &\emph{\HDS\ type} \\
+$<$COMM$>$    &\texttt{"UNSIGNED BYTE"} &\emph{Comment describing type} \\
 \end{tabular}
 
 %usbyteasterix
 \begin{tabular}{lll}
-\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified):} \\
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when \texttt{-a} is specified):} \\
 \hline
 TOKEN     &SUBSTITUTE     &COMMENT \\
 \\
-$<$CONV$>$  &{\tt "REAL("} &{\em UNSIGNED BYTE to REAL conversion} \\
-$<$EXT$>$   &{\tt "ZEXT("} &{\em UNSIGNED BYTE to REAL conversion extension}\\
-$<$BRAK$>$  &{\tt "))"} &{\em Brackets for UNSIGNED BYTE to REAL conversion}\\
-$<$ICONV$>$ &{\tt "INT("}  &{\em UNSIGNED BYTE to INTEGER conversion} \\
-$<$IEXT$>$  &{\tt "ZEXT("} &{\em UNSIGNED BYTE to INTEGER conversion extension}\\
-$<$IBRAK$>$   &{\tt "))"}    &{\em Brackets for UNSIGNED BYTE to INTEGER conversion}\\
-$<$REV$>$     &{\tt "NINT("} &{\em REAL to UNSIGNED BYTE conversion} \\
-$<$RVBRAK$>$  &{\tt ")"}     &{\em Brackets for REAL to UNSIGNED BYTE conversion} \\
-$<$IREV$>$    &{\tt " "} &{\em INTEGER to UNSIGNED BYTE conversion} \\
-$<$IRVBRAK$>$ &{\tt " "} &{\em Brackets for INTEGER to UNSIGNED BYTE conversion}\\
+$<$CONV$>$  &\texttt{"REAL("} &\emph{UNSIGNED BYTE to REAL conversion} \\
+$<$EXT$>$   &\texttt{"ZEXT("} &\emph{UNSIGNED BYTE to REAL conversion extension}\\
+$<$BRAK$>$  &\texttt{"))"} &\emph{Brackets for UNSIGNED BYTE to REAL conversion}\\
+$<$ICONV$>$ &\texttt{"INT("}  &\emph{UNSIGNED BYTE to INTEGER conversion} \\
+$<$IEXT$>$  &\texttt{"ZEXT("} &\emph{UNSIGNED BYTE to INTEGER conversion extension}\\
+$<$IBRAK$>$   &\texttt{"))"}    &\emph{Brackets for UNSIGNED BYTE to INTEGER conversion}\\
+$<$REV$>$     &\texttt{"NINT("} &\emph{REAL to UNSIGNED BYTE conversion} \\
+$<$RVBRAK$>$  &\texttt{")"}     &\emph{Brackets for REAL to UNSIGNED BYTE conversion} \\
+$<$IREV$>$    &\texttt{" "} &\emph{INTEGER to UNSIGNED BYTE conversion} \\
+$<$IRVBRAK$>$ &\texttt{" "} &\emph{Brackets for INTEGER to UNSIGNED BYTE conversion}\\
 \end{tabular}
 \end{quote}
 
@@ -1034,30 +799,30 @@ substitutions are made.
 \hline
 TOKEN      &SUBSTITUTE     & COMMENT \\
 \\
-$<$T$>$     &{\tt "C"}             &{\em Subroutine name extension} \\
-$<$TYPE$>$  &{\tt "CHARACTER*(*)"} &{\em Argument type definition} \\
-$<$LTYPE$>$ &{\tt "CHARACTER*$<$CHASIZ$>$"} &{\em Local type definition (CHASIZ = 200 by default)} \\
-$<$CONST$>$ &{\tt "?"}            &{\em String to be appended to constant} \\
-$<$HTYPE$>$ &{\tt "\_CHAR"}       &{\em \HDS\ type} \\
-$<$COMM$>$  &{\tt "CHARACTER"}    &{\em Comment describing type} \\
+$<$T$>$     &\texttt{"C"}             &\emph{Subroutine name extension} \\
+$<$TYPE$>$  &\texttt{"CHARACTER*(*)"} &\emph{Argument type definition} \\
+$<$LTYPE$>$ &\texttt{"CHARACTER*$<$CHASIZ$>$"} &\emph{Local type definition (CHASIZ = 200 by default)} \\
+$<$CONST$>$ &\texttt{"?"}            &\emph{String to be appended to constant} \\
+$<$HTYPE$>$ &\texttt{"\_CHAR"}       &\emph{\HDS\ type} \\
+$<$COMM$>$  &\texttt{"CHARACTER"}    &\emph{Comment describing type} \\
 \end{tabular}
 
 %charasterix
 \begin{tabular}{lll}
-\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified):} \\
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when \texttt{-a} is specified):} \\
 \hline
 TOKEN      &SUBSTITUTE     & COMMENT \\
 \\
-$<$CONV$>$  &{\tt "?"} &{\em CHARACTER to REAL conversion}\\
-$<$EXT$>$   &{\tt "?"} &{\em CHARACTER to REAL conversion extension}\\
-$<$BRAK$>$  &{\tt "?"} &{\em Brackets for CHARACTER to REAL conversion}\\
-$<$ICONV$>$ &{\tt "?"} &{\em CHARACTER to INTEGER conversion}\\
-$<$IEXT$>$  &{\tt "?"} &{\em CHARACTER to INTEGER conversion extension}\\
-$<$IBRAK$>$ &{\tt "?"} &{\em Brackets for CHARACTER to INTEGER conversion} \\
-$<$REV$>$   &{\tt "?"} &{\em REAL to CHARACTER conversion} \\
-$<$RVBRAK$>$ &{\tt "?"} &{\em Brackets for REAL to CHARACTER conversion}\\
-$<$IREV$>$  &{\tt "?"} &{\em INTEGER to CHARACTER conversion}\\
-$<$IRVBRAK$>$ &{\tt "?"} &{\em Brackets for INTEGER to CHARACTER conversion} \\
+$<$CONV$>$  &\texttt{"?"} &\emph{CHARACTER to REAL conversion}\\
+$<$EXT$>$   &\texttt{"?"} &\emph{CHARACTER to REAL conversion extension}\\
+$<$BRAK$>$  &\texttt{"?"} &\emph{Brackets for CHARACTER to REAL conversion}\\
+$<$ICONV$>$ &\texttt{"?"} &\emph{CHARACTER to INTEGER conversion}\\
+$<$IEXT$>$  &\texttt{"?"} &\emph{CHARACTER to INTEGER conversion extension}\\
+$<$IBRAK$>$ &\texttt{"?"} &\emph{Brackets for CHARACTER to INTEGER conversion} \\
+$<$REV$>$   &\texttt{"?"} &\emph{REAL to CHARACTER conversion} \\
+$<$RVBRAK$>$ &\texttt{"?"} &\emph{Brackets for REAL to CHARACTER conversion}\\
+$<$IREV$>$  &\texttt{"?"} &\emph{INTEGER to CHARACTER conversion}\\
+$<$IRVBRAK$>$ &\texttt{"?"} &\emph{Brackets for INTEGER to CHARACTER conversion} \\
 \end{tabular}
 \end{quote}
 
@@ -1070,30 +835,30 @@ substitutions are made.
 \hline
 TOKEN     &SUBSTITUTE  &COMMENT \\
 \\
-$<$T$>$     &{\tt "D"}               &{\em Subroutine name extension}\\
-$<$TYPE$>$  &{\tt "DOUBLE PRECISION"}&{\em Argument type definition}\\
-$<$LTYPE$>$ &{\tt "DOUBLE PRECISION"}&{\em Local type definition}\\
-$<$CONST$>$ &{\tt ".0D0"}            &{\em String to be appended to constant} \\
-$<$HTYPE$>$ &{\tt "\_DOUBLE"}        &{\em \HDS\ type}\\
-$<$COMM$>$  &{\tt "DOUBLE PRECISION"}&{\em Comment describing type}\\
+$<$T$>$     &\texttt{"D"}               &\emph{Subroutine name extension}\\
+$<$TYPE$>$  &\texttt{"DOUBLE PRECISION"}&\emph{Argument type definition}\\
+$<$LTYPE$>$ &\texttt{"DOUBLE PRECISION"}&\emph{Local type definition}\\
+$<$CONST$>$ &\texttt{".0D0"}            &\emph{String to be appended to constant} \\
+$<$HTYPE$>$ &\texttt{"\_DOUBLE"}        &\emph{\HDS\ type}\\
+$<$COMM$>$  &\texttt{"DOUBLE PRECISION"}&\emph{Comment describing type}\\
 \end{tabular}
 
 %dpasterix
 \begin{tabular}{lll}
-\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified):}\\
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when \texttt{-a} is specified):}\\
 \hline
 TOKEN  &SUBSTITUTE  &COMMENT \\
 \\
-$<$CONV$>$ &{\tt "SNGL("} &{\em DOUBLE PRECISION to REAL conversion}\\
-$<$EXT$>$  &{\tt " "}     &{\em DOUBLE PRECISION to REAL conversion extension}\\
-$<$BRAK$>$ &{\tt ")"}     &{\em Brackets for DOUBLE PRECISION to REAL conversion}\\
-$<$ICONV$>$ &{\tt "NINT("} &{\em DOUBLE PRECISION to INTEGER conversion}\\
-$<$IEXT$>$  &{\tt " "}   &{\em DOUBLE PRECISION to INTEGER conversion extension}\\
-$<$IBRAK$>$ &{\tt ")"} &{\em Brackets for DOUBLE PRECISION to INTEGER conversion}\\
-$<$REV$>$   &{\tt "DBLE("} &{\em REAL to DOUBLE PRECISION conversion}\\
-$<$RVBRAK$>$ &{\tt ")"}    &{\em Brackets for REAL to DOUBLE PRECISION conversion}\\
-$<$IREV$>$  &{\tt "DBLE("} &{\em INTEGER to DOUBLE PRECISION conversion}\\
-$<$IRVBRAK$>$ &{\tt ")"} &{\em Brackets for INTEGER to DOUBLE PRECISION conversion}\\
+$<$CONV$>$ &\texttt{"SNGL("} &\emph{DOUBLE PRECISION to REAL conversion}\\
+$<$EXT$>$  &\texttt{" "}     &\emph{DOUBLE PRECISION to REAL conversion extension}\\
+$<$BRAK$>$ &\texttt{")"}     &\emph{Brackets for DOUBLE PRECISION to REAL conversion}\\
+$<$ICONV$>$ &\texttt{"NINT("} &\emph{DOUBLE PRECISION to INTEGER conversion}\\
+$<$IEXT$>$  &\texttt{" "}   &\emph{DOUBLE PRECISION to INTEGER conversion extension}\\
+$<$IBRAK$>$ &\texttt{")"} &\emph{Brackets for DOUBLE PRECISION to INTEGER conversion}\\
+$<$REV$>$   &\texttt{"DBLE("} &\emph{REAL to DOUBLE PRECISION conversion}\\
+$<$RVBRAK$>$ &\texttt{")"}    &\emph{Brackets for REAL to DOUBLE PRECISION conversion}\\
+$<$IREV$>$  &\texttt{"DBLE("} &\emph{INTEGER to DOUBLE PRECISION conversion}\\
+$<$IRVBRAK$>$ &\texttt{")"} &\emph{Brackets for INTEGER to DOUBLE PRECISION conversion}\\
 \end{tabular}
 \end{quote}
 
@@ -1106,30 +871,30 @@ are made.
 \hline
 TOKEN  &SUBSTITUTE   &COMMENT\\
 \\
-$<$T$>$     &{\tt "I"}         &{\em Subroutine name extension}\\
-$<$TYPE$>$  &{\tt "INTEGER"}   &{\em Argument type definition}\\
-$<$LTYPE$>$ &{\tt "INTEGER"}   &{\em Local type definition}\\
-$<$CONST$>$ &{\tt " "}         &{\em String to be appended to constant}\\
-$<$HTYPE$>$ &{\tt "\_INTEGER"} &{\em \HDS\ type}\\
-$<$COMM$>$  &{\tt "INTEGER"}   &{\em Comment describing type}\\
+$<$T$>$     &\texttt{"I"}         &\emph{Subroutine name extension}\\
+$<$TYPE$>$  &\texttt{"INTEGER"}   &\emph{Argument type definition}\\
+$<$LTYPE$>$ &\texttt{"INTEGER"}   &\emph{Local type definition}\\
+$<$CONST$>$ &\texttt{" "}         &\emph{String to be appended to constant}\\
+$<$HTYPE$>$ &\texttt{"\_INTEGER"} &\emph{\HDS\ type}\\
+$<$COMM$>$  &\texttt{"INTEGER"}   &\emph{Comment describing type}\\
 \end{tabular}
 
 %intasterix
 \begin{tabular}{lll}
-\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified).}\\
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when \texttt{-a} is specified).}\\
 \hline
 TOKEN  &SUBSTITUTE   &COMMENT\\
 \\
-$<$CONV$>$     &{\tt "REAL("} &{\em INTEGER to REAL conversion}\\
-$<$EXT$>$      &{\tt " "}   &{\em INTEGER to REAL conversion extension}\\
-$<$BRAK$>$     &{\tt ")"}     &{\em Brackets for INTEGER to REAL conversion}\\
-$<$ICONV$>$    &{\tt " "}     &{\em INTEGER to INTEGER conversion}\\
-$<$IEXT$>$     &{\tt " "}     &{\em INTEGER to INTEGER conversion extension}\\
-$<$IBRAK$>$    &{\tt " "}     &{\em Brackets for INTEGER to INTEGER conversion}\\
-$<$REV$>$      &{\tt "NINT("} &{\em REAL to INTEGER conversion}\\
-$<$RVBRAK$>$   &{\tt ")"}     &{\em Brackets for REAL to INTEGER conversion}\\
-$<$IREV$>$     &{\tt " "}     &{\em INTEGER to INTEGER conversion}\\
-$<$IRVBRAK$>$  &{\tt " "}     &{\em Brackets for INTEGER to INTEGER
+$<$CONV$>$     &\texttt{"REAL("} &\emph{INTEGER to REAL conversion}\\
+$<$EXT$>$      &\texttt{" "}   &\emph{INTEGER to REAL conversion extension}\\
+$<$BRAK$>$     &\texttt{")"}     &\emph{Brackets for INTEGER to REAL conversion}\\
+$<$ICONV$>$    &\texttt{" "}     &\emph{INTEGER to INTEGER conversion}\\
+$<$IEXT$>$     &\texttt{" "}     &\emph{INTEGER to INTEGER conversion extension}\\
+$<$IBRAK$>$    &\texttt{" "}     &\emph{Brackets for INTEGER to INTEGER conversion}\\
+$<$REV$>$      &\texttt{"NINT("} &\emph{REAL to INTEGER conversion}\\
+$<$RVBRAK$>$   &\texttt{")"}     &\emph{Brackets for REAL to INTEGER conversion}\\
+$<$IREV$>$     &\texttt{" "}     &\emph{INTEGER to INTEGER conversion}\\
+$<$IRVBRAK$>$  &\texttt{" "}     &\emph{Brackets for INTEGER to INTEGER
 conversion}\\
 \end{tabular}
 \end{quote}
@@ -1143,30 +908,30 @@ are made.
 \hline
 TOKEN      &SUBSTITUTE      &COMMENT \\
 \\
-$<$T$>$        &{\tt "L"}         &{\em Subroutine name extension}\\
-$<$TYPE$>$     &{\tt "LOGICAL"}   &{\em Argument type definition}\\
-$<$LTYPE$>$    &{\tt "LOGICAL"}   &{\em Local type definition}\\
-$<$CONST$>$    &{\tt " "}         &{\em String to be appended to constant}\\
-$<$HTYPE$>$    &{\tt "\_LOGICAL"} &{\em \HDS\ type}\\
-$<$COMM$>$     &{\tt "LOGICAL"}   &{\em Comment describing type}\\
+$<$T$>$        &\texttt{"L"}         &\emph{Subroutine name extension}\\
+$<$TYPE$>$     &\texttt{"LOGICAL"}   &\emph{Argument type definition}\\
+$<$LTYPE$>$    &\texttt{"LOGICAL"}   &\emph{Local type definition}\\
+$<$CONST$>$    &\texttt{" "}         &\emph{String to be appended to constant}\\
+$<$HTYPE$>$    &\texttt{"\_LOGICAL"} &\emph{\HDS\ type}\\
+$<$COMM$>$     &\texttt{"LOGICAL"}   &\emph{Comment describing type}\\
 \end{tabular}
 
 %logasterix
 \begin{tabular}{lll}
-\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified).}\\
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when \texttt{-a} is specified).}\\
 \hline
 TOKEN      &SUBSTITUTE      &COMMENT\\
 \\
-$<$CONV$>$     &{\tt "?"} &{\em LOGICAL to REAL conversion}\\
-$<$EXT$>$      &{\tt "?"} &{\em LOGICAL to REAL conversion extension}\\
-$<$BRAK$>$     &{\tt "?"} &{\em Brackets for LOGICAL to REAL conversion}\\
-$<$ICONV$>$    &{\tt "?"} &{\em LOGICAL to INTEGER conversion}\\
-$<$IEXT$>$     &{\tt "?"} &{\em LOGICAL to INTEGER conversion extension}\\
-$<$IBRAK$>$    &{\tt "?"} &{\em Brackets for LOGICAL to INTEGER conversion}\\
-$<$REV$>$      &{\tt "?"} &{\em REAL to LOGICAL conversion}\\
-$<$RVBRAK$>$   &{\tt "?"} &{\em Brackets for REAL to LOGICAL conversion}\\
-$<$IREV$>$     &{\tt "?"} &{\em INTEGER to LOGICAL conversion}\\
-$<$IRVBRAK$>$  &{\tt "?"} &{\em Brackets for INTEGER to LOGICAL conversion}\\
+$<$CONV$>$     &\texttt{"?"} &\emph{LOGICAL to REAL conversion}\\
+$<$EXT$>$      &\texttt{"?"} &\emph{LOGICAL to REAL conversion extension}\\
+$<$BRAK$>$     &\texttt{"?"} &\emph{Brackets for LOGICAL to REAL conversion}\\
+$<$ICONV$>$    &\texttt{"?"} &\emph{LOGICAL to INTEGER conversion}\\
+$<$IEXT$>$     &\texttt{"?"} &\emph{LOGICAL to INTEGER conversion extension}\\
+$<$IBRAK$>$    &\texttt{"?"} &\emph{Brackets for LOGICAL to INTEGER conversion}\\
+$<$REV$>$      &\texttt{"?"} &\emph{REAL to LOGICAL conversion}\\
+$<$RVBRAK$>$   &\texttt{"?"} &\emph{Brackets for REAL to LOGICAL conversion}\\
+$<$IREV$>$     &\texttt{"?"} &\emph{INTEGER to LOGICAL conversion}\\
+$<$IRVBRAK$>$  &\texttt{"?"} &\emph{Brackets for INTEGER to LOGICAL conversion}\\
 \end{tabular}
 \end{quote}
 
@@ -1179,30 +944,30 @@ are made.
 \hline
 TOKEN      &SUBSTITUTE      &COMMENT\\
 \\
-$<$T$>$     &{\tt "R"}     &{\em Subroutine name extension}\\
-$<$TYPE$>$  &{\tt "REAL"}  &{\em Argument type definition}\\
-$<$LTYPE$>$ &{\tt "REAL"}  &{\em Local type definition}\\
-$<$CONST$>$ &{\tt ".0E0"}  &{\em String to be appended to constant}\\
-$<$HTYPE$>$ &{\tt "\_REAL"} &{\em \HDS\ type}\\
-$<$COMM$>$  &{\tt "REAL"}  &{\em Comment describing type}\\
+$<$T$>$     &\texttt{"R"}     &\emph{Subroutine name extension}\\
+$<$TYPE$>$  &\texttt{"REAL"}  &\emph{Argument type definition}\\
+$<$LTYPE$>$ &\texttt{"REAL"}  &\emph{Local type definition}\\
+$<$CONST$>$ &\texttt{".0E0"}  &\emph{String to be appended to constant}\\
+$<$HTYPE$>$ &\texttt{"\_REAL"} &\emph{\HDS\ type}\\
+$<$COMM$>$  &\texttt{"REAL"}  &\emph{Comment describing type}\\
 \end{tabular}
 
 \begin{tabular}{lll}
 %realasterix
-\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified).}\\
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when \texttt{-a} is specified).}\\
 \hline
 TOKEN      &SUBSTITUTE      &COMMENT\\
 \\
-$<$CONV$>$     &{\tt " "}     &{\em REAL to REAL conversion}\\
-$<$EXT$>$      &{\tt " "}     &{\em REAL to REAL conversion extension}\\
-$<$BRAK$>$     &{\tt " "}  &{\em Brackets for REAL to REAL conversion}\\
-$<$ICONV$>$    &{\tt "NINT("} &{\em REAL to INTEGER conversion}\\
-$<$IEXT$>$     &{\tt " "}  &{\em REAL to INTEGER conversion extension}\\
-$<$IBRAK$>$    &{\tt ")"} &{\em Brackets for REAL to INTEGER conversion}\\
-$<$REV$>$      &{\tt " "}     &{\em REAL to REAL conversion}\\
-$<$RVBRAK$>$   &{\tt " "}   &{\em Brackets for REAL to REAL conversion}\\
-$<$IREV$>$     &{\tt "REAL("} &{\em INTEGER to REAL conversion}\\
-$<$IRVBRAK$>$  &{\tt ")"} &{\em Brackets for INTEGER to REAL conversion}\\
+$<$CONV$>$     &\texttt{" "}     &\emph{REAL to REAL conversion}\\
+$<$EXT$>$      &\texttt{" "}     &\emph{REAL to REAL conversion extension}\\
+$<$BRAK$>$     &\texttt{" "}  &\emph{Brackets for REAL to REAL conversion}\\
+$<$ICONV$>$    &\texttt{"NINT("} &\emph{REAL to INTEGER conversion}\\
+$<$IEXT$>$     &\texttt{" "}  &\emph{REAL to INTEGER conversion extension}\\
+$<$IBRAK$>$    &\texttt{")"} &\emph{Brackets for REAL to INTEGER conversion}\\
+$<$REV$>$      &\texttt{" "}     &\emph{REAL to REAL conversion}\\
+$<$RVBRAK$>$   &\texttt{" "}   &\emph{Brackets for REAL to REAL conversion}\\
+$<$IREV$>$     &\texttt{"REAL("} &\emph{INTEGER to REAL conversion}\\
+$<$IRVBRAK$>$  &\texttt{")"} &\emph{Brackets for INTEGER to REAL conversion}\\
 \end{tabular}
 \end{quote}
 
@@ -1215,30 +980,30 @@ are made.
 \hline
 TOKEN      &SUBSTITUTE     &COMMENT\\
 \\
-$<$T$>$     &{\tt "W"}         &{\em Subroutine name extension}\\
-$<$TYPE$>$  &{\tt "INTEGER*2"} &{\em Argument type definition}\\
-$<$LTYPE$>$ &{\tt "INTEGER*2"} &{\em Local type definition}\\
-$<$CONST$>$ &{\tt " "}         &{\em String to be appended to constant}\\
-$<$HTYPE$>$ &{\tt "\_WORD"}    &{\em \HDS\ type}\\
-$<$COMM$>$  &{\tt "WORD"}      &{\em Comment describing type}\\
+$<$T$>$     &\texttt{"W"}         &\emph{Subroutine name extension}\\
+$<$TYPE$>$  &\texttt{"INTEGER*2"} &\emph{Argument type definition}\\
+$<$LTYPE$>$ &\texttt{"INTEGER*2"} &\emph{Local type definition}\\
+$<$CONST$>$ &\texttt{" "}         &\emph{String to be appended to constant}\\
+$<$HTYPE$>$ &\texttt{"\_WORD"}    &\emph{\HDS\ type}\\
+$<$COMM$>$  &\texttt{"WORD"}      &\emph{Comment describing type}\\
 \end{tabular}
 
 %wordasterix
 \begin{tabular}{lll}
-\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified).}\\
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when \texttt{-a} is specified).}\\
 \hline
 TOKEN      &SUBSTITUTE      &COMMENT\\
 \\
-$<$CONV$>$     &{\tt "REAL("} &{\em WORD to REAL conversion}\\
-$<$EXT$>$      &{\tt " "}     &{\em WORD to REAL conversion extension}\\
-$<$BRAK$>$     &{\tt ")"}   &{\em Brackets for WORD to REAL conversion}\\
-$<$ICONV$>$    &{\tt " "}     &{\em WORD to INTEGER conversion}\\
-$<$IEXT$>$     &{\tt " "}   &{\em WORD to INTEGER conversion extension}\\
-$<$IBRAK$>$    &{\tt " "} &{\em Brackets for WORD to INTEGER conversion}\\
-$<$REV$>$      &{\tt "NINT("} &{\em REAL to WORD conversion}\\
-$<$RVBRAK$>$   &{\tt ")"}  &{\em Brackets for REAL to WORD conversion}\\
-$<$IREV$>$     &{\tt " "}     &{\em INTEGER to WORD conversion}\\
-$<$IRVBRAK$>$  &{\tt " "} &{\em Brackets for INTEGER to WORD conversion}\\
+$<$CONV$>$     &\texttt{"REAL("} &\emph{WORD to REAL conversion}\\
+$<$EXT$>$      &\texttt{" "}     &\emph{WORD to REAL conversion extension}\\
+$<$BRAK$>$     &\texttt{")"}   &\emph{Brackets for WORD to REAL conversion}\\
+$<$ICONV$>$    &\texttt{" "}     &\emph{WORD to INTEGER conversion}\\
+$<$IEXT$>$     &\texttt{" "}   &\emph{WORD to INTEGER conversion extension}\\
+$<$IBRAK$>$    &\texttt{" "} &\emph{Brackets for WORD to INTEGER conversion}\\
+$<$REV$>$      &\texttt{"NINT("} &\emph{REAL to WORD conversion}\\
+$<$RVBRAK$>$   &\texttt{")"}  &\emph{Brackets for REAL to WORD conversion}\\
+$<$IREV$>$     &\texttt{" "}     &\emph{INTEGER to WORD conversion}\\
+$<$IRVBRAK$>$  &\texttt{" "} &\emph{Brackets for INTEGER to WORD conversion}\\
 \end{tabular}
 \end{quote}
 
@@ -1251,30 +1016,30 @@ substitutions are made.
 \hline
 TOKEN      &SUBSTITUTE     &COMMENT\\
 \\
-$<$T$>$     &{\tt "UW"}            &{\em Subroutine name extension}\\
-$<$TYPE$>$  &{\tt "INTEGER*2"}     &{\em Argument type definition}\\
-$<$LTYPE$>$ &{\tt "INTEGER*2"}     &{\em Local type definition}\\
-$<$CONST$>$ &{\tt " "}         &{\em String to be appended to constant}\\
-$<$HTYPE$>$ &{\tt "\_UWORD"}       &{\em \HDS\ type}\\
-$<$COMM$>$  &{\tt "UNSIGNED WORD"} &{\em Comment describing type}\\
+$<$T$>$     &\texttt{"UW"}            &\emph{Subroutine name extension}\\
+$<$TYPE$>$  &\texttt{"INTEGER*2"}     &\emph{Argument type definition}\\
+$<$LTYPE$>$ &\texttt{"INTEGER*2"}     &\emph{Local type definition}\\
+$<$CONST$>$ &\texttt{" "}         &\emph{String to be appended to constant}\\
+$<$HTYPE$>$ &\texttt{"\_UWORD"}       &\emph{\HDS\ type}\\
+$<$COMM$>$  &\texttt{"UNSIGNED WORD"} &\emph{Comment describing type}\\
 \end{tabular}
 
 \begin{tabular}{lll}
 %uswordasterix
-\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified).}\\
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when \texttt{-a} is specified).}\\
 \hline
 TOKEN      &SUBSTITUTE      &COMMENT\\
 \\
-$<$CONV$>$     &{\tt "REAL("} &{\em UNSIGNED WORD to REAL conversion}\\
-$<$EXT$>$      &{\tt "ZEXT("} &{\em UNSIGNED WORD to REAL conversion extension}\\
-$<$BRAK$>$     &{\tt "))"}    &{\em Brackets for UNSIGNED WORD to REAL conversion}\\
-$<$ICONV$>$    &{\tt " "}     &{\em UNSIGNED WORD to INTEGER conversion}\\
-$<$IEXT$>$     &{\tt "ZEXT("} &{\em UNSIGNED WORD to INTEGER conversion extension}\\
-$<$IBRAK$>$    &{\tt ")"}     &{\em Brackets for UNSIGNED WORD to INTEGER conversion}\\
-$<$REV$>$      &{\tt "NINT("} &{\em REAL to UNSIGNED WORD conversion}\\
-$<$RVBRAK$>$   &{\tt ")"}     &{\em Brackets for REAL to UNSIGNED WORD conversion}\\
-$<$IREV$>$     &{\tt " "}     &{\em INTEGER to UNSIGNED WORD conversion}\\
-$<$IRVBRAK$>$  &{\tt " "}     &{\em Brackets for INTEGER to UNSIGNED WORD conversion}\\
+$<$CONV$>$     &\texttt{"REAL("} &\emph{UNSIGNED WORD to REAL conversion}\\
+$<$EXT$>$      &\texttt{"ZEXT("} &\emph{UNSIGNED WORD to REAL conversion extension}\\
+$<$BRAK$>$     &\texttt{"))"}    &\emph{Brackets for UNSIGNED WORD to REAL conversion}\\
+$<$ICONV$>$    &\texttt{" "}     &\emph{UNSIGNED WORD to INTEGER conversion}\\
+$<$IEXT$>$     &\texttt{"ZEXT("} &\emph{UNSIGNED WORD to INTEGER conversion extension}\\
+$<$IBRAK$>$    &\texttt{")"}     &\emph{Brackets for UNSIGNED WORD to INTEGER conversion}\\
+$<$REV$>$      &\texttt{"NINT("} &\emph{REAL to UNSIGNED WORD conversion}\\
+$<$RVBRAK$>$   &\texttt{")"}     &\emph{Brackets for REAL to UNSIGNED WORD conversion}\\
+$<$IREV$>$     &\texttt{" "}     &\emph{INTEGER to UNSIGNED WORD conversion}\\
+$<$IRVBRAK$>$  &\texttt{" "}     &\emph{Brackets for INTEGER to UNSIGNED WORD conversion}\\
 \end{tabular}
 \end{quote}
 
@@ -1291,7 +1056,7 @@ The following conversions are defined as in-line statement functions in
 manual as legal conversions).
 \begin{quote}
 \begin{tabular}{lll}
-{\bf Function name} & \bf {Conversion} \\
+\textbf{Function name} & \bf {Conversion} \\
 \hline
 DCV\_BTOB   &BYTE to BYTE \\
 DCV\_UBTOUB &UNSIGNED BYTE to UNSIGNED BYTE \\
@@ -1332,7 +1097,7 @@ Starlink supported systems will make the conversions successfully :-
 
 \begin{quote}
 \begin{tabular}{lll}
-{\bf Function name}      &{\bf Conversion} \\
+\textbf{Function name}      &\textbf{Conversion} \\
 \hline
 DCV\_UBTOB &UNSIGNED BYTE to BYTE          &*** \\
 DCV\_DTOB  &DOUBLE PRECISION to BYTE       &*** \\
@@ -1356,7 +1121,7 @@ functions in the DCV object library :-
 
 \begin{quote}
 \begin{tabular}{ll}
-{\bf Function name}     &{\bf Conversion}\\
+\textbf{Function name}     &\textbf{Conversion}\\
 \hline
 DCV\_BTOUB  &BYTE to UNSIGNED BYTE \\
 DCV\_DTOUB  &DOUBLE PRECISION to UNSIGNED BYTE \\
