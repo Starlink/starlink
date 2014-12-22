@@ -1,31 +1,26 @@
-\documentclass[twoside,11pt]{report}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink Guide}
-\newcommand{\stardocinitials}  {SG}
-\newcommand{\stardocsource}    {sg\stardocnumber}
+\stardoccategory    {Starlink Guide}
+\stardocinitials    {SG}
+\stardocsource      {sg\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {5.2}
-\newcommand{\stardocauthors}   {J A Bailey\footnote{Anglo-Australian
-Observatory}\\A J Chipperfield}
-\newcommand{\stardocdate}      {9th June 1998}
-\newcommand{\stardoctitle}     {ICL\\[2.5ex]
+\stardocnumber      {5.2}
+\stardocauthors   {J A Bailey\footnote{Anglo-Australian Observatory}\\A J Chipperfield}
+\stardocdate        {9th June 1998}
+\stardoctitle     {ICL\\[2.5ex]
                                 The Interactive Command Language\\
                                 for ADAM}
-\newcommand{\stardocversion}   {Version 1.5-6}
-\newcommand{\stardocmanual}    {User's Guide}
+\stardocversion     {Version 1.5-6}
+\stardocmanual      {User's Guide}
 
-\newcommand{\stardocabstract}  {ICL is a language designed to provide
+\stardocabstract  {ICL is a language designed to provide
 a programmable user interface to an astronomical data reduction or data
 acquisition system.
 It is the primary user interface for the ADAM software environment.
@@ -34,264 +29,19 @@ This document is a re-formatted version of SG/5.1 -- the text has not changed.
 For information on ICL for Unix, ICL help is more reliable.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sg.tex
-%
-%  Purpose:
-%     Template for Starlink Guide (SG) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
 % -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document specific \providecommand or \newenvironment commands.
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \thispagestyle{empty}
-  \cleardoublepage
-  \setcounter{page}{1}
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \latexonlytoc
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-  \newpage
-  \thispagestyle{empty}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\markboth{\stardocname}{\stardocname}
-\setcounter{page}{1}
+\scfrontmatter
 
    \part{Introduction to ICL}
-   \markboth{\stardocname}{\stardocname}
-   \chapter{\xlabel{introduction}Introduction}
-   \section{\xlabel{what_is_icl}What is ICL?}
+   
+   \section{\xlabel{icl_introduction}Introduction}
+   \subsection{\xlabel{what_is_icl}What is ICL?}
 The Interactive Command Language (ICL) is a language designed to provide
 a programmable user interface to an astronomical data reduction or data
 acquisition system.
@@ -301,14 +51,14 @@ with ADAM is described in Part II.
 ICL is in some ways similar to a high level programming
 language such as Fortran or Pascal, but it has some important differences.
    \begin{itemize}
-   \item It is a {\em command} language. One of its main uses is to enable
+   \item It is a \emph{command} language. One of its main uses is to enable
 the typing of commands with few restrictions on the possible command format
 For example ICL can be used to run the FIGARO data reduction system and
 it is possible to type FIGARO commands in
 exactly the same format as was previously used from DCL.
-   \item It is an {\em interactive} language. ICL provides a complete
+   \item It is an \emph{interactive} language. ICL provides a complete
 environment for entering, editing and debugging programs, rather than
-relying on external editors, linkers {\em etc.}
+relying on external editors, linkers \emph{etc.}
    \item ICL can be used as a programming language, but it is
 intended for writing relatively simple and straightforward programs.
 It's requirements are different from those of most modern programming languages,
@@ -316,7 +66,7 @@ which are designed for the needs of big software projects such as writing
 operating systems or controlling missiles. ICL is designed to make simple
 programs easy to write.
    \end{itemize}
-   \section{\xlabel{icl_documentation}ICL Documentation}
+   \subsection{\xlabel{icl_documentation}ICL Documentation}
 This users' guide provides
 an introduction to ICL for beginners, and should provide the information
 needed to get started with it. The various appendices give further details
@@ -326,22 +76,22 @@ ICL also provides an on-line help system. Simply type HELP and a
 list of topics will be displayed (it works in exactly the same way as
 the DCL help system).
 
-\section{\xlabel{icl_and_fortran}ICL and FORTRAN}
+\subsection{\xlabel{icl_and_fortran}ICL and FORTRAN}
 The reader of this manual is assumed to be familiar with programming in
 FORTRAN, and the manual will compare ICL features with the corresponding
 features of FORTRAN where appropriate.
 
-\section{\xlabel{history_and_support}History and Support}
+\subsection{\xlabel{history_and_support}History and Support}
 ICL was written by Jeremy Bailey, working at the Anglo-Australian Observatory
 and subsequently at the Joint Astronomy Centre, Hilo.
 Responsibility for support has now passed to the ADAM Support Group, part of
 the Science and Engineering Research Council's Starlink Project at the
 Rutherford Appleton Laboratory.
 
-\chapter{\xlabel{getting_started}Getting Started}
-\section{\xlabel{direct_mode}Direct Mode}
-In this chapter we describe how to run ICL in direct mode and use its
-variables, expressions {\em etc.} which enable us to use the VAX as a very
+\section{\xlabel{getting_started}Getting Started}
+\subsection{\xlabel{direct_mode}Direct Mode}
+In this section we describe how to run ICL in direct mode and use its
+variables, expressions \emph{etc.} which enable us to use the VAX as a very
 expensive electronic calculator. In direct mode we type in commands
 and they are executed immediately. The alternative to direct mode is the
 use of procedures, in which the commands are entered into a procedure,
@@ -350,7 +100,7 @@ and subsequently executed by running the procedure.
 ICL is started up by using the command ICL. After a short delay ICL will
 respond by displaying any startup messages which have been set, followed by
 the prompt \verb+ICL>+, meaning it is now ready to accept a command.
-\begin{verbatim}
+\begin{terminalv}
     $ ICL
 
       Interactive Command Language   -   Version 1.5-6
@@ -358,8 +108,8 @@ the prompt \verb+ICL>+, meaning it is now ready to accept a command.
       - Type HELP [command] for help on ICL and its commands
 
     ICL>
-\end{verbatim}
-\section{\xlabel{entering_commands}Entering Commands}
+\end{terminalv}
+\subsection{\xlabel{entering_commands}Entering Commands}
 When entering commands in ICL all the normal command line editing facilities
 available in DCL may be used. The Up arrow or CTRL/B key may be used to recall
 previous commands and the Down arrow key will step to the next command. Any
@@ -368,37 +118,37 @@ command back to the start of the ICL session may be recalled.
 A command may take more than one line. A tilde \verb+~+ symbol at the end
 of a line is used to indicate that the command continues on the next line.
 
-\section{\xlabel{the_immediate_statement}The Immediate Statement}
+\subsection{\xlabel{the_immediate_statement}The Immediate Statement}
 The first ICL statement we will introduce is the immediate statement. This
 is used to make ICL do simple calculations. It simply consists of an
 equals sign (\verb+=+) followed by an expression, and causes the value of
 the expression to be printed on the terminal.
-\begin{verbatim}
+\begin{terminalv}
     ICL> = 1 + 2 + 3
              6
     ICL> = SQRT(2)
     1.414214
     ICL>
-\end{verbatim}
+\end{terminalv}
 
 ICL arithmetic expressions are very similar to expressions in FORTRAN, and
 will be discussed in more detail later.
-\section{\xlabel{the_assignment_statement}The Assignment Statement}
+\subsection{\xlabel{the_assignment_statement}The Assignment Statement}
 The other commonly used statement is the assignment statement, which is
 exactly the same as the FORTRAN assignment statement, and is used to
 assign a value to a variable.
-\begin{verbatim}
+\begin{terminalv}
     ICL> PI = 3.1415926
     ICL> = 2 * pi
     6.283185
     ICL>
-\end{verbatim}
+\end{terminalv}
 Note that the case of letters doesn't matter. PI and pi are the same variable.
-\section{\xlabel{expressions}Expressions}
-Expressions are built up by operating on {\em values} using {\em operators}.
-The values can be represented by either {\em constants} or {\em variables} or
-can be the result of a {\em function} operating on another expression.
-\subsection{\xlabel{values}Values}
+\subsection{\xlabel{expressions}Expressions}
+Expressions are built up by operating on \emph{values} using \emph{operators}.
+The values can be represented by either \emph{constants} or \emph{variables} or
+can be the result of a \emph{function} operating on another expression.
+\subsubsection{\xlabel{values}Values}
 ICL operates on values of four different types:
 \begin{itemize}
 \item Integer
@@ -410,7 +160,7 @@ The integer, real and logical types are the same as their FORTRAN equivalents
 (the ICL real type is strictly equivalent to FORTRAN's double precision being
 stored with about 16 decimal digits of precision. The String type represents
 strings of characters and is similar to the FORTRAN CHARACTER*n type.
-\subsection{\xlabel{constants}Constants}
+\subsubsection{\xlabel{constants}Constants}
 Values of all four types can be represented by appropriate constants.
 Integer and real constants are represented by numbers written in the
 same formats that are accepted in FORTRAN. Integer constants may also
@@ -427,7 +177,7 @@ one place in ICL where the case of letters is significant.
 
 Some examples of constants:
 
-\begin{verbatim}
+\begin{terminalv}
     Real          1.234E-5       3.14159
 
     Integer       123      %B100110     %O377      %Xffff
@@ -435,20 +185,20 @@ Some examples of constants:
     Logical       TRUE     FALSE
 
     String        'This is a string'     "So is this"      ''
-\end{verbatim}
+\end{terminalv}
 
 The last example defines a string of zero length (valid in ICL but not in
 FORTRAN).
-\subsection{\xlabel{variables}Variables}
+\subsubsection{\xlabel{variables}Variables}
 Variables in ICL are represented by names composed of characters which
 may be letters, digits or the underscore character ( \verb+_+ ). The first
 character must be a letter. The first 15 characters of a variable name
-are significant ({\em i.e.} two variable names which are the same in the
+are significant (\emph{i.e.} two variable names which are the same in the
 first 15 characters, but differ in subsequent characters refer to the
 same variable).
 
 An important difference between ICL and FORTRAN is in the handling
-of variable {\em types}. In FORTRAN each variable name has a unique type
+of variable \emph{types}. In FORTRAN each variable name has a unique type
 associated with it, which is either derived implicitly from the first
 letter of the name, or is explicitly specified in a declaration.
 
@@ -456,12 +206,12 @@ In ICL names do not have types, only values have types. A variables gains
 a type when it is assigned a value. This type can change when a new value
 is assigned to it. Thus we can have the following sequence of assignments
 making the variable X an integer, real, logical and string in sequence.
-\begin{verbatim}
+\begin{terminalv}
     ICL> X = 123
     ICL> X = 123.456
     ICL> X = TRUE
     ICL> X = 'String'
-\end{verbatim}
+\end{terminalv}
 This approach to variable types means we do not have to declare the
 variables we use which helps to keep programs
 simple.\footnote{The disadvantage is that ICL cannot usually spot cases
@@ -469,10 +219,10 @@ where we accidentally mistype the name of a variable, as can languages which
 enforce declaration of variables (such as FORTRAN with the IMPLICIT NONE
 directive). This is not thought to be a serious problem for the relatively
 simple programs for which ICL is intended.}
-\subsection{\xlabel{operators}Operators}
+\subsubsection{\xlabel{operators}Operators}
 The operators which are used to build up expressions are listed in the following
 table.
-\begin{verbatim}
+\begin{terminalv}
 Priority
 
    1 (highest)              **
@@ -480,15 +230,15 @@ Priority
    3                        +   -
    4                        =   >   <   >=  <=  <>  :
    5 (lowest)               NOT   AND   OR   &
-\end{verbatim}
+\end{terminalv}
 The order of evaluation of expressions is determined by the priority
 of the operators. The rules are the same as those in FORTRAN\footnote
 {But different from those in Pascal} with arithmetic operators having
 the highest priority, and logical operators the lowest. This means that
 a condition such as \( 0 < X+Y \leq 1 \) can be expressed in ICL as follows
-\begin{verbatim}
+\begin{terminalv}
     X+Y > 0  AND  X+Y <= 1
-\end{verbatim}
+\end{terminalv}
 without requiring any parentheses.
 In general however, it is good practice
 to use parentheses to clarify any situation in which the order of evaluation
@@ -506,7 +256,7 @@ a numeric value).
 The operator \& performs string concatenation -- operands with numeric values
 will be converted to strings. The : operator is used for
 formatting numbers into character strings as described below.
-\subsection{\xlabel{functions}Functions}
+\subsubsection{\xlabel{functions}Functions}
 ICL provides a variety of standard functions. Functions are written in
 exactly the same way in ICL as in FORTRAN, and all the standard FORTRAN
 77 generic functions which are relevant to the ICL data types are
@@ -514,7 +264,7 @@ provided in ICL with the
  same names as in FORTRAN. Thus SIN, COS, TAN,
 ASIN, ACOS, ATAN, ATAN2, LOG, LOG10, EXP, SQRT and ABS are all valid
 functions. A more complete list of functions is given in Appendix A.
-\section{\xlabel{formatting_numbers_for_output}Formatting Numbers For Output}
+\subsection{\xlabel{formatting_numbers_for_output}Formatting Numbers For Output}
 While FORTRAN regards formatting of numbers for output as part of an
 output operation, ICL performs formatting using an operator (:), which
 produces a string result from a numeric operand. Thus if I is an integer
@@ -522,11 +272,11 @@ variable the expression \verb+I:5+ has as its value the string which is
 produced by converting I with a field width of 5 characters. Thus it
 is equivalent to an I5 format in FORTRAN. Similarly if X is a real
 variable the expression \verb+X:10:4+ produces the value of X formatted
-in a FORTRAN F10.4 format ({\em i.e.} a field width of 10 characters, and
+in a FORTRAN F10.4 format (\emph{i.e.} a field width of 10 characters, and
 four decimal places). The ICL formatting is not precisely equivalent
 to the FORTRAN form because ICL will extend the field width if a number
 is too large to fit in the requested width.
-\begin{verbatim}
+\begin{terminalv}
     ICL> = 1.234567:5:2
      1.23
     ICL> = 12.34567:5:2
@@ -535,7 +285,7 @@ is too large to fit in the requested width.
     123.46
     ICL> = 123456.7:5:2
     123456.70
-\end{verbatim}
+\end{terminalv}
 Integers can also be formatted in binary, octal, decimal or hexadecimal formats
 using the functions BIN, OCT, DEC and HEX. These have the form
 \verb+HEX(X,n,m)+ which would return a string of n characters containing
@@ -543,26 +293,26 @@ the number X with m significant digits. n and m may be omitted in which case
 they default to the number of digits needed to represent a full 32 bit word.
 Using these forms together with constants in various bases, ICL can be used to
 perform conversions between various bases.
-\begin{verbatim}
+\begin{terminalv}
     ICL> = %Xffff
           65535
     ICL> = hex(65535)
      0000FFFF
     ICL> = OCT(%XFF,5,5)
     00377
-\end{verbatim}
-\section{\xlabel{commands}Commands}
+\end{terminalv}
+\subsection{\xlabel{commands}Commands}
 We have now met two of the three statement types available in direct mode,
 the immediate and assignment statements. We now introduce the third and
 most important one, the command. Commands are used for three purposes.
 \begin{itemize}
 \item To provide features of the ICL system itself --- These are
-commands such as PRINT, EDIT, LIST {\em etc.}
+commands such as PRINT, EDIT, LIST \emph{etc.}
 \item To call procedures written in ICL.
 \item To provide the commands of the system ICL is being used
 to run --- In this case ADAM.
 \end{itemize}
-\subsection{\xlabel{command_format}Command Format}
+\subsubsection{\xlabel{command_format}Command Format}
 An ICL command consists of a command name,
 which is formed using exactly the same rules as we described earlier for
 variable names, followed by optionally, one or more parameters.
@@ -581,7 +331,7 @@ into which it will return a value. The other two forms both pass a string.
 
 We can illustrate these various cases by using the PRINT command, which
 prints its parameters on the terminal.
-\begin{verbatim}
+\begin{terminalv}
     ICL> X=1.234
     ICL> PRINT (X)
     1.23400
@@ -589,24 +339,24 @@ prints its parameters on the terminal.
     HELLO
     ICL> PRINT HELLO
     HELLO
-\end{verbatim}
+\end{terminalv}
 In most cases therefore we do not need to use the quoted form of string parameters
 because the simpler form will work. We need the quoted form of strings for those
 cases in which we need to include a left parenthesis, or spaces in the string.
 Here is an example with several parameters.
-\begin{verbatim}
+\begin{terminalv}
     ICL> X=2
     ICL> PRINT The Square Root of (X) is (SQRT(X))
     The Square Root of          2 is 1.414214
-\end{verbatim}
+\end{terminalv}
 What is happening here is that, since spaces are parameter separators,
 \verb+'The'+, \verb+'Square'+, \verb+'Root'+ and \verb+'of'+ are all
 received by PRINT as independent parameters. However PRINT simply concatenates
 all its parameters, with a space between each pair, and thus the result is the string
 just as we typed it. Many other ICL commands which accept strings work in this
-way. This means that strings with {\em single} spaces do not usually need quotes
+way. This means that strings with \emph{single} spaces do not usually need quotes
 when used as command parameters.
-\subsection{\xlabel{summary_of_rules_for_command_parameters}Summary of Rules for Command Parameters}
+\subsubsection{\xlabel{summary_of_rules_for_command_parameters}Summary of Rules for Command Parameters\label{parameter_rules}}
 The rules for specifying command parameters can be summarized as follows.
 \begin{itemize}
 \item To pass the value of an expression (which might be just a single
@@ -620,77 +370,77 @@ placing it in quotes.
 FORTRAN programmers may find it useful to note that the parenthesized form
 of the command parameters is exactly equivalent to the normal FORTRAN method
 of passing parameters to a subroutine. Thus the ICL command
-\begin{verbatim}
+\begin{terminalv}
     COMMAND (A) (B) (C)
-\end{verbatim}
+\end{terminalv}
 is equivalent to the FORTRAN
-\begin{verbatim}
+\begin{terminalv}
     CALL COMMAND (A, B, C)
-\end{verbatim}
-{\em Any} parameter can always be passed in this way. The other forms of parameter
+\end{terminalv}
+\emph{Any} parameter can always be passed in this way. The other forms of parameter
 simply provide a convenient way of handling the common case of passing
 a string constant.
 
 These rules may appear somewhat confusing specified in this way, but what
 they achieve is to allow us to type many familiar commands in the way
 we are used to. Thus the following are valid ICL commands:
-\begin{verbatim}
+\begin{terminalv}
     ICL> $DIR/SIZE/DATE/SINCE=TODAY
 
     ICL> SPLOT MYSPECT LOW=10 HIGH=100 \
-\end{verbatim}
+\end{terminalv}
 
 
-\chapter{\xlabel{icl_procedures}ICL Procedures}
+\section{\xlabel{icl_procedures}ICL Procedures\label{icl_procedures}}
 An ICL Procedure is essentially the equivalent of a Subroutine in FORTRAN.
 It allows us to write a sequence of ICL statements which can be run with
 a single command. The procedure may have a number of parameters which are
 used to pass values to the procedure, and return values from it.
-\section{\xlabel{direct_entry_of_procedures}Direct Entry of Procedures}
+\subsection{\xlabel{direct_entry_of_procedures}Direct Entry of Procedures}
 To enter an ICL procedure we type a PROC command which specifies the name
 of the procedure, and the names of any of its parameters. ICL then returns
 a new prompt using the name of the procedure rather than \verb+ICL>+ to show
 that we are in procedure entry mode. The statements that make up the procedure
 are then entered, followed by an \verb+END PROC+ or \verb+ENDPROC+ to mark the
 end of the procedure.
-\begin{verbatim}
+\begin{terminalv}
     ICL> PROC SQUARE_ROOT X
     SQUARE_ROOT> {  An ICL procedure to print the square root of a number  }
     SQUARE_ROOT> PRINT The Square Root of (X) is (SQRT(X))
     SQUARE_ROOT> END PROC
     ICL>
-\end{verbatim}
+\end{terminalv}
 The line beginning with \{ is a comment which will be ignored by ICL when
 executing the procedure. The closing \} is not necessary but looks neater.
-\section{\xlabel{running_a_procedure}Running a Procedure}
+\subsection{\xlabel{running_a_procedure}Running a Procedure}
 To run the procedure we have entered we use the command format described
 earlier, using the procedure name as the command, and adding any parameters
 required.
-\begin{verbatim}
+\begin{terminalv}
     ICL> SQUARE_ROOT (2)
     The Square Root of         2 is 1.414214
-\end{verbatim}
+\end{terminalv}
 But we can also specify the parameter without parentheses:
-\begin{verbatim}
+\begin{terminalv}
     ICL> SQUARE_ROOT 2
     The Square Root of 2 is  1.414214
-\end{verbatim}
+\end{terminalv}
 What has happened here is that instead of the numeric value 2, we have
 passed the string '2' as the parameter. However, the SQRT function requires
 a numeric argument, so converts this string to a number. Thus, the free
 approach to type conversion, means that in many cases the rules for command
-parameters described in the previous chapter can be relaxed.
-\begin{verbatim}
+parameters described in the Section~\ref{parameter_rules} can be relaxed.
+\begin{terminalv}
     ICL> Y=3
     ICL> SQUARE_ROOT Y
     The Square Root of Y is  1.732051
-\end{verbatim}
+\end{terminalv}
 In this case the parameter passed was the string 'Y', but once again this
 was converted to a numeric value for the SQRT function.
-\section{\xlabel{listing_procedures}Listing Procedures}
+\subsection{\xlabel{listing_procedures}Listing Procedures}
 The LIST command can be used to list a procedure on the terminal. Just type
 LIST followed by the name of the procedure you want to list.
-\begin{verbatim}
+\begin{terminalv}
     ICL> LIST SQUARE_ROOT
 
 
@@ -700,25 +450,25 @@ LIST followed by the name of the procedure you want to list.
         END PROC
 
     ICL>
-\end{verbatim}
+\end{terminalv}
 To find the names of all the current procedures use the command PROCS.
-\begin{verbatim}
+\begin{terminalv}
     ICL> PROCS
 
     SQUARE_ROOT
 
     ICL>
-\end{verbatim}
-\section{\xlabel{editing_procedures}Editing Procedures}
+\end{terminalv}
+\subsection{\xlabel{editing_procedures}Editing Procedures}
 Entering procedures directly is fine for very simple procedures, but for
 anything more complex it is likely that some mistakes will be made in
 entering the procedures. When this happens it will be necessary to
-{\em edit} the procedure. Editing is accomplished from within ICL using
+\emph{edit} the procedure. Editing is accomplished from within ICL using
 standard editors.
 For example the command
-\begin{verbatim}
+\begin{terminalv}
     ICL> EDIT SQUARE_ROOT
-\end{verbatim}
+\end{terminalv}
 would be used to edit the SQUARE\_ROOT procedure. By default the TPU editor
 is used. It is also possible to select the EDT or LSE editors using the
 SET EDITOR command. All these editors are described in DEC's documentation.
@@ -738,12 +488,12 @@ it is recommended that procedures be entered originally using direct entry.
 The advantage is that during direct entry, any errors will be detected immediately.
 Thus if we mistype the PRINT line in the above example we get the following
 error message:
-\begin{verbatim}
+\begin{terminalv}
     SQUARE_ROOT> PRINT The Square Root of (X is (SQRT(X))
     PRINT The Square Root of (X is (SQRT(X))
                                 ^
     Right parenthesis expected
-\end{verbatim}
+\end{terminalv}
 The error message consists of the line in which the error was detected. A
 pointer which indicates where in the line ICL had got to when it found
 something was wrong, and a message indicating what was wrong. In this case
@@ -754,53 +504,53 @@ to correct the line and reenter it. If the same error occurred during
 procedure entry using an editor, the error message would only be generated
 at the time of exit from the editing session, and it would be necessary to
 EDIT the procedure again to correct it.
-\section{\xlabel{direct_commands_during_procedure_entry}Direct Commands During Procedure Entry}
+\subsection{\xlabel{direct_commands_during_procedure_entry}Direct Commands During Procedure Entry}
 It is sometimes useful to have a command directly executed while entering
 a procedure. When using the direct entry method this can be done by
 prefixing the command with a \% character. For example:
-\begin{verbatim}
+\begin{terminalv}
     ICL> PROC SQUARE_ROOT X
     SQUARE_ROOT> %HELP
-\end{verbatim}
+\end{terminalv}
 would give us on-line help information we might need to complete the
 procedure. If the \% was omitted the HELP command would be included as
 part of the procedure.
-\section{\xlabel{saving_and_loading_procedures}Saving and Loading Procedures}
+\subsection{\xlabel{saving_and_loading_procedures}Saving and Loading Procedures}
 Procedures created in the above way will only exist for the duration of
 an ICL session. If we need to keep them longer they need to be saved in
 a disk file. This is achieved by means of the SAVE command. To save our
 SQUARE\_ROOT procedure on disk we would use:
-\begin{verbatim}
+\begin{terminalv}
     ICL> SAVE SQUARE_ROOT
-\end{verbatim}
+\end{terminalv}
 To load it again, probably in a subsequent ICL session we would use
 the LOAD command.
-\begin{verbatim}
+\begin{terminalv}
     ICL> LOAD SQUARE_ROOT
-\end{verbatim}
+\end{terminalv}
 The SAVE command causes the procedure to be saved in a file with
 name SQUARE\_ROOT.ICL in the current default directory. LOAD will load
 the procedure from the same file, also in the default directory. With
 LOAD however it is possible to specify an alternative directory if
 required:
-\begin{verbatim}
+\begin{terminalv}
     ICL> LOAD DISK$USER:[ABC]SQUARE_ROOT
-\end{verbatim}
+\end{terminalv}
 If you have many procedures you may not want to save and load them all
 individually. It is possible to save all the current procedures using
 the command:
-\begin{verbatim}
+\begin{terminalv}
     ICL> SAVE ALL
-\end{verbatim}
+\end{terminalv}
 This saves all the current procedures in a single file with the name SAVE.ICL.
 These procedures may then be reloaded by the command:
-\begin{verbatim}
+\begin{terminalv}
     ICL> LOAD SAVE
-\end{verbatim}
+\end{terminalv}
 The SAVE ALL command is rarely used however, because this command is
 executed automatically whenever you exit from ICL. This ensures that ICL
 procedures do not get accidentally lost because you forget to save them.
-\section{\xlabel{control_structures}Control Structures}
+\subsection{\xlabel{control_structures}Control Structures}
 The ICL control structures provide a means of controlling the flow of
 execution within a procedure. Unlike the statements we have met so far
 these can only be used within a procedure and are not accepted in direct mode.
@@ -809,10 +559,10 @@ There are two types of control structure:
 \item The IF or conditional structure.
 \item The LOOP structure.
 \end{itemize}
-\subsection{\xlabel{the_if_structure}The IF structure}
+\subsubsection{\xlabel{the_if_structure}The IF structure}
 The IF structure is essentially the same as the block IF of FORTRAN. It
 has the following general form:
-\begin{verbatim}
+\begin{terminalv}
     IF expression
         statements
     ELSE IF expression
@@ -822,7 +572,7 @@ has the following general form:
     ELSE
         statements
     END IF
-\end{verbatim}
+\end{terminalv}
 The expressions (which must give logical values) are evaluated in turn until
 one is found to be true, and the following statements are then executed.
 If none of the expressions
@@ -831,14 +581,14 @@ are true the statements following ELSE are executed.
 Every IF structure must begin with IF and end with END IF (or ENDIF). The
 ELSE IF (ELSEIF) and ELSE clauses are optional, so the simplest IF structure
 would have the form:
-\begin{verbatim}
+\begin{terminalv}
     IF expression
         statements
     ENDIF
-\end{verbatim}
+\end{terminalv}
 The following example illustrates the use of the IF structure, and shows how
 one IF structure may be nested within another.
-\begin{verbatim}
+\begin{terminalv}
     PROC QUADRATIC A,B,C
 
     {  A Procedure to find the roots of the quadratic equation  }
@@ -863,19 +613,19 @@ one IF structure may be nested within another.
         ENDIF
       ENDIF
     END PROC
-\end{verbatim}
-\subsection{\xlabel{the_loop_structure}The LOOP Structure}
+\end{terminalv}
+\subsubsection{\xlabel{the_loop_structure}The LOOP Structure}
 The LOOP structure is used to repeatedly execute a group of statements. It has
 three different forms, the simplest being as follows:
-\begin{verbatim}
+\begin{terminalv}
     LOOP
         statements
     END LOOP
-\end{verbatim}
+\end{terminalv}
 This form sets up an infinite loop, but an additional statement, BREAK, may
 be used to terminate the loop. BREAK would, of course, normally have to
 be inside an IF structure.
-\begin{verbatim}
+\begin{terminalv}
     PROC COUNT
         {  A procedure to print the numbers from 1 to 10  }
         I = 1
@@ -887,51 +637,51 @@ be inside an IF structure.
             ENDIF
         ENDLOOP
     ENDPROC
-\end{verbatim}
+\end{terminalv}
 As it is frequently required to loop over a sequential range of numbers in
 this way, a special form of the LOOP statement is provided for this purpose.
 It has the following form:
-\begin{verbatim}
+\begin{terminalv}
     LOOP FOR variable = expression1 TO expression2 [ STEP expression3 ]
         statements
     END LOOP
-\end{verbatim}
+\end{terminalv}
 This form is essentially equivalent to the DO loop in FORTRAN. The expressions
 specifying the range of values for the control variable are rounded to the
 nearest integer so that the variable always has integer values. Using this
 form of the LOOP statement we can simplify the previous example as
 follows:
-\begin{verbatim}
+\begin{terminalv}
     PROC COUNT
         {  A procedure to print the numbers from 1 to 10  }
         LOOP FOR I = 1 TO 10
             PRINT (I)
         ENDLOOP
     ENDPROC
-\end{verbatim}
+\end{terminalv}
 Note that there is an optional STEP clause in the LOOP FOR statement. If
 this is not specified a STEP of 1 is assumed. The STEP clause can be used
 to specify a different value. A step of -1 must be specified to get a loop
 which counts down from a high value to a lower value. For example:
-\begin{verbatim}
+\begin{terminalv}
     LOOP FOR I = 10 TO 1 STEP -1
-\end{verbatim}
+\end{terminalv}
 will count down from 10 to 1.
 
 The third form of the LOOP structure allows the setting up of loops which
 terminate on any general condition. It has the form:
-\begin{verbatim}
+\begin{terminalv}
     LOOP WHILE expression
         statements
     END LOOP
-\end{verbatim}
+\end{terminalv}
 The expression is evaluated each time round the loop, and if it has the logical
 value TRUE the statements which form the body of the loop are executed. If
 it has the value FALSE execution continues with the statement following
 END LOOP.
 
 Using this form we can write yet another version of the COUNT procedure:
-\begin{verbatim}
+\begin{terminalv}
     PROC COUNT
         {  A procedure to print the numbers from 1 to 10  }
         I = 1
@@ -940,29 +690,29 @@ Using this form we can write yet another version of the COUNT procedure:
             I = I+1
         ENDLOOP
     ENDPROC
-\end{verbatim}
+\end{terminalv}
 In the above case the LOOP WHILE form is more complicated than the LOOP FOR
 form. However LOOP WHILE can be used to express more general forms of loop
 where the termination condition is something derived inside the loop. An
 example is a program which prompts the user for an answer to a question
-({\em e.g.} yes or no) and has to keep repeating the prompt until a valid
+(\emph{e.g.} yes or no) and has to keep repeating the prompt until a valid
 answer is received.
-\begin{verbatim}
+\begin{terminalv}
     FINISHED = FALSE
     LOOP WHILE NOT FINISHED
         INPUT Enter YES or NO:  (ANSWER)
         FINISHED = ANSWER = 'YES' OR ANSWER = 'NO'
     END LOOP
-\end{verbatim}
+\end{terminalv}
 
-\section{\xlabel{prompting_for_procedure_parameters}Prompting for Procedure Parameters}
+\subsection{\xlabel{prompting_for_procedure_parameters}Prompting for Procedure Parameters}
 Normally a procedure will not be obeyed unless the required number of
 parameters is provided -- the TOOFEWPARS exception is signalled.
 However, this check can be switched off using the NOCHECKPARS command. Then
 the procedure will be executed with the parameter being undefined.
 This fact can be used to write a procedure which will prompt for an undefined
-parameter, {\em e.g.}:
-\begin{quote} \begin{verbatim}
+parameter, \emph{e.g.}:
+\begin{terminalv}
 PROC SQUARE_ROOT X
 { An ICL procedure to print the square root of a number,   }
 { prompting if the number is not given on the command line }
@@ -971,26 +721,26 @@ PROC SQUARE_ROOT X
   ENDIF
   PRINT The Square Root of (X) is (SQRT(X))
 END PROC
-\end{verbatim} \end{quote}
-{\em Note that only trailing parameters may be omitted}
+\end{terminalv}
+\emph{Note that only trailing parameters may be omitted}
 
-\section{\xlabel{variables_in_procedures}Variables in Procedures}
+\subsection{\xlabel{variables_in_procedures}Variables in Procedures}
 Any variable used within a procedure is completely distinct from a variable of
 the same name used outside the procedure, or within a different procedure, as
 can be seen in the following example:
 
-\begin{verbatim}
-    ICL> X = 1
-    ICL> PROC FRED
-    FRED> X = 1.2345
-    FRED> =X
-    FRED> END PROC
-    ICL> FRED
-    1.2345
-    ICL> =X
-            1
-    ICL>
-\end{verbatim}
+\begin{terminalv}
+ICL> X = 1
+ICL> PROC FRED
+FRED> X = 1.2345
+FRED> =X
+FRED> END PROC
+ICL> FRED
+1.2345
+ICL> =X
+       1
+ICL>
+\end{terminalv}
 When we run the procedure FRED we get the value of the variable X in the
 procedure. Then typing =X gives the value of X outside the procedure which
 has remained unchanged during execution of the procedure. This feature has the
@@ -1007,22 +757,22 @@ VARIABLE.
 
 The command VARS is used to list all the variables of a procedure.
 It has one parameter, which is the name of the procedure. If the parameter
-is omitted, then the outer level variables, {\em i.e.} those that are not part
+is omitted, then the outer level variables, \emph{i.e.} those that are not part
 of any procedure are listed. Thus in the previous example:
-\begin{verbatim}
+\begin{terminalv}
     ICL> VARS FRED
                      X  REAL     1.23450E+00
     ICL> VARS
                      X  INTEGER          1
     ICL>
-\end{verbatim}
+\end{terminalv}
 VARIABLE is a function whose result is the value of a given variable in
 a given procedure:
-\begin{verbatim}
+\begin{terminalv}
     ICL> = VARIABLE(FRED,X)
     1.234500
     ICL>
-\end{verbatim}
+\end{terminalv}
 and thus allows a variable belonging to a procedure to be accessed outside
 that procedure.
 
@@ -1030,31 +780,31 @@ Note that the variables belonging to a procedure continue to exist after
 a procedure finishes execution, and if the procedure is executed a second time,
 they will retain their values from the first time through the procedure.
 
-\section{\xlabel{tracing_procedure_execution}Tracing Procedure Execution}
+\subsection{\xlabel{tracing_procedure_execution}Tracing Procedure Execution}
 The commands SET TRACE and SET NOTRACE switch ICL in and out of trace mode.
 When in trace mode each statement executed will be listed on the terminal.
 Trace mode is very useful for debugging procedures. The commands can either be
 issued from direct mode to turn on tracing for the entire execution of a
 procedure, or inserted in the procedure itself, making it possible to trace
 just part of its execution.
-\section{\xlabel{running_icl_as_a_batch_job}Running ICL as a Batch Job}
+\subsection{\xlabel{running_icl_as_a_batch_job}Running ICL as a Batch Job\label{running_as_batch_job}}
 It is sometimes useful to run one or more ICL procedures as a batch job.
 It is quite easy to set this up using a parameter with the ICL command to
 specify a file from which commands will be taken.
-\begin{verbatim}
+\begin{terminalv}
     $ ICL filename
-\end{verbatim}
+\end{terminalv}
 This form of the command is equivalent to typing ICL and then typing
-\begin{verbatim}
+\begin{terminalv}
     ICL> LOAD filename
-\end{verbatim}
+\end{terminalv}
 Note, that as mentioned earlier, a LOAD file may include direct commands
 as well as procedures. In order to create a Batch job we must set up a file
 which contains all the procedures we want, a command (or commands) to run them
 and an EXIT command to terminate the job. Here is the file for a simple
 Batch job to print a table of Square roots using our earlier example
 procedure.
-\begin{verbatim}
+\begin{terminalv}
 
     PROC SQUARE_ROOT X
     {  An ICL procedure to print the square root of a number   }
@@ -1079,7 +829,7 @@ procedure.
 
     EXIT
 
-\end{verbatim}
+\end{terminalv}
 This file can be generated using the EDIT command from DCL. If the
 procedures have already been tested from ICL, it is convenient to use
 a SAVE ALL command (or exit from ICL) to save them, and then edit the
@@ -1087,40 +837,40 @@ SAVE.ICL file adding the additional direct commands.
 Supposing this file is called TABLE.ICL. To create a batch job we also
 need a command file, which we could call TABLE.COM which would contain
 the following:
-\begin{verbatim}
+\begin{terminalv}
 
     $ ICL TABLE
     $ EXIT
 
-\end{verbatim}
+\end{terminalv}
 It might also need to contain a SET DEF command to set the appropriate
 directory, or a directory specification on the TABLE file name if it is
 not in the top level directory.
 
 To submit the job to the batch queue the following command is used
-\begin{verbatim}
+\begin{terminalv}
 
     $ SUBMIT/KEEP TABLE
 
-\end{verbatim}
+\end{terminalv}
 The /KEEP qualifier specifies that the output file for the batch job is
 to be kept. This file will appear as TABLE.LOG in the top level directory
 and will contain the output from the batch job. A /OUTPUT qualifier
 can be used to specify a different file name or directory for it.
 
-\chapter{\xlabel{inputoutput}Input/Output}
+\section{\xlabel{inputoutput}Input/Output}
 
-\section{\xlabel{terminal_io}Terminal I/O}
+\subsection{\xlabel{terminal_io}Terminal I/O}
 
 We have already met the PRINT command for output to the terminal. The analogous
 commands for terminal input are called INPUT, INPUTR, INPUTI and INPUTL.
 INPUT reads a line of text from the terminal into a string variable and
 has the form:
-\begin{verbatim}
+\begin{terminalv}
 
    ICL> INPUT Enter your name>  (name)
 
-\end{verbatim}
+\end{terminalv}
 The last parameter must specify a variable in which the input will be returned
 and must therefore be in parentheses. The earlier parameters form a prompt
 string.
@@ -1128,37 +878,37 @@ string.
 INPUTR, INPUTI and INPUTL are used to input real, integer or logical values.
 A single line of text may be used to supply values for more than one variables
 so these commands have the form:
-\begin{verbatim}
+\begin{terminalv}
 
    ICL> INPUTR  Prompt  (X)  (Y)  (Z)
 
-\end{verbatim}
+\end{terminalv}
 Only the first parameter is used to provide the prompt string, so if it
 has spaces in it the string must be enclosed in quotes.
 
 INPUTL will accept values of TRUE, FALSE, YES and NO in either upper or
 lower case, as well as abbreviations.
 
-\section{\xlabel{text_file_io}Text File I/O}
+\subsection{\xlabel{text_file_io}Text File I/O}
 
 ICL can also read and write text files. In order to access files they must
 first be opened using one of the commands CREATE, OPEN or APPEND.
-\begin{verbatim}
+\begin{terminalv}
 
     CREATE MYFILE
 
-\end{verbatim}
+\end{terminalv}
 will create a file called MYFILE and open it for output. MYFILE is the name
 used within ICL for the file. The file will appear in your default VMS
 directory as MYFILE.DAT.
 
 The VMS file name may be specified explicitly by adding a second parameter
 to the CREATE, OPEN or APPEND command.
-\begin{verbatim}
+\begin{terminalv}
 
     OPEN  INFILE  DISK$DATA:[ABC]FOR008.DAT
 
-\end{verbatim}
+\end{terminalv}
 opens an existing file for input and the file is known internally as INFILE.
 
 The APPEND command opens an existing file for output. Anything written to
@@ -1181,7 +931,7 @@ The following example uses these procedures to read an input file containing
 three real numbers in free format, and output the same numbers as a formatted
 table.
 
-\begin{verbatim}
+\begin{terminalv}
     PROC REFORMAT
 
     {  Open input file and create output file  }
@@ -1198,14 +948,14 @@ table.
 
     END PROC
 
-\end{verbatim}
+\end{terminalv}
 
 Note that no specific test for completion of the loop is included. When an end
 of file condition is detected on the input file the procedure will exit and
 return to the ICL$>$ prompt with an appropriate message. \footnote{A tidier
 exit can be arranged by using an exception handler for the EOF exception.}
 
-\section{\xlabel{screen_mode}Screen Mode}
+\subsection{\xlabel{screen_mode}Screen Mode}
 
 ICL's screen mode allows more control over the terminal screen than is possible
 in the normal mode. It also allows more control over the use of the keyboard.
@@ -1217,11 +967,11 @@ Screen mode is selected by the SET SCREEN command. In screen mode the terminal
 screen is divided into an upper fixed region and a lower scrolling region.
 The size of the scrolling region may be specified by an optional parameter
 to SET SCREEN.
-\begin{verbatim}
+\begin{terminalv}
 
     ICL> SET SCREEN 10
 
-\end{verbatim}
+\end{terminalv}
 will select 10 lines of scrolling region. The size of the scrolling region
 can be changed by further SET SCREEN commands. SET NOSCREEN is used to leave
 screen mode and return to normal mode.
@@ -1234,11 +984,11 @@ terminals) may be used to move through the text. Any output since screen
 mode was started is available in this way.
 
 To write to the fixed part of the screen the command LOCATE is used.
-\begin{verbatim}
+\begin{terminalv}
 
     LOCATE 6 10   This text will be written starting at Row 6 Column 10
 
-\end{verbatim}
+\end{terminalv}
 The first two parameters specify the row and column at which the text will
 start. The remaining parameters form the text to be written.
 
@@ -1251,18 +1001,18 @@ gives normal text.
 
 The CLEAR command is used to clear all or part of the fixed region of the
 screen. For example:
-\begin{verbatim}
+\begin{terminalv}
     CLEAR 6 10
-\end{verbatim}
+\end{terminalv}
 clears lines 6 to 10 of the screen.
 
-\section{\xlabel{keyboard_facilities_in_screen_mode}Keyboard Facilities in Screen Mode}
+\subsection{\xlabel{keyboard_facilities_in_screen_mode}Keyboard Facilities in Screen Mode}
 
 The KEY command may be used to define an equivalence string for any key
 on the keyboard. For example:
-\begin{verbatim}
+\begin{terminalv}
     KEY  PF1  PROCS#
-\end{verbatim}
+\end{terminalv}
 defines the PF1 key so as to issue the PROCS command. The \# character is
 used to indicate a Return character in the equivalence string.
 
@@ -1290,7 +1040,7 @@ is the ASCII value for ASCII characters, or a number between 256 and 511
 for keypad and function keys. The KEYVAL function may be used to obtain
 the value from the key name.
 
-\begin{verbatim}
+\begin{terminalv}
 
 {  Trap ENTER and LEFT and RIGHT arrow keys  }
 
@@ -1313,40 +1063,40 @@ the value from the key name.
 
     END LOOP
 
-\end{verbatim}
+\end{terminalv}
 
 The command
-\begin{verbatim}
+\begin{terminalv}
 
  KEYOFF keyname
 
-\end{verbatim}
+\end{terminalv}
  may be used to turn off trapping of a key.
 
 
-\chapter{\xlabel{access_to_dcl}Access to DCL}
+\section{\xlabel{access_to_dcl}Access to DCL}
 When working from ICL it is frequently useful to be able to access features of
 Digital's command language DCL.
 Typical operations we may want to do include listing directories, copying
 files, allocating tape drives and mounting tapes.
 
-\section{\xlabel{the_command}The \$\ Command}
+\subsection{\xlabel{the_command}The \$\ Command}
 The command \$ allows any DCL command to be issued from inside ICL. It's
 form is simply:
-\begin{verbatim}
+\begin{terminalv}
 
     $ dcl_command
 
-\end{verbatim}
+\end{terminalv}
 where dcl\_command is any command we could issue from the DCL \$ prompt.
 For example:
 
-\begin{verbatim}
+\begin{terminalv}
 
     $ COPY *.DST DATADIR:*.DST
     $ RUN MYPROGRAM
 
-\end{verbatim}
+\end{terminalv}
 There is one restriction --- we must use a complete DCL command. We couldn't
 for example, just type \$ COPY and let DCL prompt us for the two file
 specifications as we could from the DCL \$ prompt. Apart from this any
@@ -1355,24 +1105,24 @@ command acceptable to DCL can be issued in this way.
 `DCL' may be used as an alternative to the \$ command. Thus the
 above example could also have been written as:
 
-\begin{verbatim}
+\begin{terminalv}
 
     DCL COPY *.DST DATADIR:*.DST
     DCL RUN MYPROGRAM
 
-\end{verbatim}
+\end{terminalv}
 
-\section{\xlabel{the_spawn_command}The SPAWN Command}
+\subsection{\xlabel{the_spawn_command}The SPAWN Command}
 There is also a way round the restriction mentioned above. This is to
 use the command SPAWN rather than the \$ command. For example:
 
-\begin{verbatim}
+\begin{terminalv}
 
     ICL> SPAWN COPY
     _From: *.DST
     _To: DATADIR:*.DST
 
-\end{verbatim}
+\end{terminalv}
 in which case we get the From: and To: prompts just as we do in normal DCL.
 The disadvantage of SPAWN is that it is normally much slower. This is because
 SPAWN creates a new subprocess to issue each command, whereas DCL creates
@@ -1382,7 +1132,7 @@ SPAWN has another use --- by just typing SPAWN we can get a DCL \$ prompt
 from which a series of DCL commands can be executed. LOGOUT is then used
 to return control to ICL.
 
-\section{\xlabel{changing_the_default_directory}Changing the Default Directory}
+\subsection{\xlabel{changing_the_default_directory}Changing the Default Directory}
 It might seem that the above facilities provide all we need. Unfortunately
 things are not that simple. The problem is that VMS only provides the facility
 to issue a DCL command in a subprocess, not in the process we are actually
@@ -1402,9 +1152,9 @@ both the process running ICL and the DCL subprocess (if one exists). The
 format for specifying the directory is exactly the same as that accepted
 by the DCL SET DEFAULT command.
 
-\section{\xlabel{allocating_and_mounting_tape_drives}Allocating and Mounting Tape Drives}
+\subsection{\xlabel{allocating_and_mounting_tape_drives}Allocating and Mounting Tape Drives}
 Similar problems occur when allocating and mounting tape drives.
-\$ ALLOCATE will allocate the device to the DCL subprocess. This {\em may}
+\$ ALLOCATE will allocate the device to the DCL subprocess. This \emph{may}
 be what you want, for example, if you are going to use another DCL
 command (such as BACKUP) to read or write the tape. However if the tape
 is to be processed using a FIGARO command it must be allocated to the
@@ -1429,7 +1179,7 @@ not provide the many qualifiers of the DCL command. There are several
 additional optional parameters for some of these commands. ALLOC may
 specify a generic name, and the name of the device actually allocated
 will be returned in the optional second parameter.
-\begin{verbatim}
+\begin{terminalv}
 
     ICL> ALL MT
     _MTA0: Allocated
@@ -1438,27 +1188,27 @@ will be returned in the optional second parameter.
     ICL> =DEVICE
     _MTA1:
 
-\end{verbatim}
+\end{terminalv}
 DISMOUNT has an optional parameter which is used to specify that the
 tape be dismounted without unloading.
-\begin{verbatim}
+\begin{terminalv}
 
     ICL> DISMOU MTA1 NOUNLOAD
 
-\end{verbatim}
+\end{terminalv}
 
-\chapter{\xlabel{errors_and_exceptions}Errors and Exceptions}
+\section{\xlabel{errors_and_exceptions}Errors and Exceptions}
 
-\section{\xlabel{icl_exceptions}ICL Exceptions}
+\subsection{\xlabel{icl_exceptions}ICL Exceptions}
 
 Error conditions and other unexpected events are referred to as Exceptions
 in ICL. When such a condition is detected in direct mode a message is
 output. For example, if we enter a statement which results in an error
-\begin{verbatim}
+\begin{terminalv}
     ICL> =SQRT(-1)
     SQUROONEG   Square Root of Negative Number
     ICL>
-\end{verbatim}
+\end{terminalv}
 
 We get a message consisting of the name of the exception (SQUROONEG) and
 a description of the nature of the exception. A full list of ICL
@@ -1466,30 +1216,30 @@ exceptions is given in appendix C.
 
 If the error occurs within a procedure the message contains a little
 more information. As an example, if we use our square root procedure of
-chapter 3 with an invalid value we get the following messages:
-\begin{verbatim}
+Section~\ref{running_as_batch_job} with an invalid value we get the following messages:
+\begin{terminalv}
     ICL> SQUARE_ROOT (-1)
     SQUROONEG   Square Root of Negative Number
     In Procedure: SQUARE_ROOT
     At Statement: PRINT  The Square Root of (X) is (SQRT(X))
     ICL>
-\end{verbatim}
+\end{terminalv}
 
 If one procedure is called by another, the second procedure will also
 be listed in the error message. If we run the following procedure
 
-\begin{verbatim}
+\begin{terminalv}
     PROC TABLE
     {  Print a table of Square roots from 5 down to -5  }
        LOOP FOR I = 5 TO -5 STEP -1
          SQUARE_ROOT (I)
        END LOOP
     END PROC
-\end{verbatim}
+\end{terminalv}
 
 we get
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> TABLE
     The Square Root of 5 is 2.236068
     The Square Root of 4 is 2
@@ -1502,17 +1252,17 @@ we get
     At Statement: PRINT  The Square Root of (X) is (SQRT(X))
     Called by: TABLE
     ICL>
-\end{verbatim}
+\end{terminalv}
 
-\section{\xlabel{exception_handlers}Exception Handlers}
+\subsection{\xlabel{exception_handlers}Exception Handlers}
 
 It is often useful to be able to modify the default behaviour on an
 error condition. We may not want to output an error message and return
 to the ICL$>$ prompt, but rather to handle the condition in some other way.
-This can be done by writing an {\em exception handler}. Here is an
+This can be done by writing an \emph{exception handler}. Here is an
 example of an exception handler in the SQUARE\_ROOT procedure.
 
-\begin{verbatim}
+\begin{terminalv}
     PROC SQUARE_ROOT X
     {  An ICL procedure to print the square root of a number   }
       PRINT The Square Root of (X) is (SQRT(X))
@@ -1524,11 +1274,11 @@ example of an exception handler in the SQUARE\_ROOT procedure.
       END EXCEPTION
 
     END PROC
-\end{verbatim}
+\end{terminalv}
 
 Now running the TABLE procedure gives
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> TABLE
     The Square Root of 5 is 2.236068
     The Square Root of 4 is 2
@@ -1542,7 +1292,7 @@ Now running the TABLE procedure gives
     The Square Root of -4 is 2i
     The Square Root of -5 is 2.236068i
     ICL>
-\end{verbatim}
+\end{terminalv}
 The Exception handler has two effects. First the code contained in the
 exception handler is executed when the exception occurs. Second, the procedure
 exits normally to its caller (in this case TABLE) rather than aborting
@@ -1560,7 +1310,7 @@ exception occurred, but could be in a procedure further up in the chain of
 calls. In our example we could put an exception handler for SQUROONEG in
 TABLE rather than in SQUARE\_ROOT.
 
-\begin{verbatim}
+\begin{terminalv}
     PROC TABLE
     {  Print a table of Square roots from 5 down to -5  }
        LOOP FOR I = 5 TO -5 STEP -1
@@ -1571,11 +1321,11 @@ TABLE rather than in SQUARE\_ROOT.
           PRINT 'Can''t handle negative numbers - TABLE Aborting'
        END EXCEPTION
     END PROC
-\end{verbatim}
+\end{terminalv}
 
 giving:
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> TABLE
     The Square Root of 5 is 2.236068
     The Square Root of 4 is 2
@@ -1585,16 +1335,16 @@ giving:
     The Square Root of 0 is 0
     Can't handle negative numbers - TABLE aborting
     ICL>
-\end{verbatim}
+\end{terminalv}
 
 Below is an example of a pair of procedures which use an exception handler
 for floating point overflow in order to locate the largest floating point
 number allowed on the system. Starting with a value of 1 this is multiplied
 by 10 repeatedly until floating point overflow occurs. The highest value
 found in this way is then multiplied by 1.1 repeatedly until overflow occurs.
-Then by 1.01 {\em etc.}
+Then by 1.01 \emph{etc.}
 
-\begin{verbatim}
+\begin{terminalv}
     PROC LARGE  START, FAC, L
 
     { Return in L the largest floating point number before        }
@@ -1625,11 +1375,11 @@ Then by 1.01 {\em etc.}
 
       PRINT  The largest floating point number allowed is (L)
     END PROC
-\end{verbatim}
+\end{terminalv}
 
 
 
-\section{\xlabel{keyboard_aborts}Keyboard Aborts}
+\subsection{\xlabel{keyboard_aborts}Keyboard Aborts}
 
 One exception which is commonly encountered is that which results when
 a Control-C is entered on the terminal. This results in the exception
@@ -1638,16 +1388,16 @@ return ICL to direct mode. However, an exception handler for CTRLC may
 be added to a procedure to modify the behaviour when a control-C is
 typed.
 
-\section{\xlabel{signal_command}SIGNAL command}
+\subsection{\xlabel{signal_command}SIGNAL command}
 
 The exceptions described up to now have all been generated internally by the
 ICL system, or in the case of CTRLC are initiated by the user. It is also
 possible for ICL procedures to generate exceptions, which may be used to
 indicate error conditions. This is done by using the SIGNAL command. This
 has the form
-\begin{verbatim}
+\begin{terminalv}
     SIGNAL  name  text
-\end{verbatim}
+\end{terminalv}
 where name is the name of the exception, and text is the message text
 associated with the exception. The exception name may be any valid ICL
 identifier. Exceptions generated by SIGNAL work in exactly the same way
@@ -1659,7 +1409,7 @@ One use of the SIGNAL command is as a means of escaping from deeply nested
 loops. The BREAK statement can be used to exit from a single loop but is
 not applicable if two or more loops are nested. In these cases the following
 structure could be used
-\begin{verbatim}
+\begin{terminalv}
     LOOP
       LOOP
         LOOP
@@ -1674,38 +1424,38 @@ structure could be used
 
     EXCEPTION ESCAPE
     END EXCEPTION
-\end{verbatim}
+\end{terminalv}
 
 where the exception handler again contains no statements, but simply exists
 to cause normal procedure exit, rather than an error message when the
 exception is signalled.
 
-\chapter{\xlabel{extending_icl}Extending ICL}
+\section{\xlabel{extending_icl}Extending ICL}
 
 If you use ICL frequently you will find it convenient to define your own
 commands. We have already met one way of defining new commands. This is
-to write an ICL procedure as described in Chapter 3. There are several other
-ways of defining new commands which are described in this chapter. If you
+to write an ICL procedure as described in Section~\ref{icl_procedures}. There are several other
+ways of defining new commands which are described in this section. If you
 have many commands which you want to use frequently it is convenient to
 put these into a login file which will be automatically loaded each time
 ICL is started up.
 
-\section{\xlabel{login_files}Login files}
+\subsection{\xlabel{login_files}Login files}
 
 An ICL login file works in exactly the same way as your DCL LOGIN.COM file. ICL
 uses the logical name ICL\_LOGIN to locate your login file so if you create a
 file called LOGIN.ICL in your top level directory you can use use the following
 DCL DEFINE command (which you should put in your DCL LOGIN.COM file).
-\begin{verbatim}
+\begin{terminalv}
    $ DEFINE ICL_LOGIN DISK$USER:[ABC]LOGIN.ICL
-\end{verbatim}
+\end{terminalv}
 where DISK\$USER:$[$ABC$]$ needs to be replaced by the actual directory used.
 
 This file will then be loaded automatically whenever you start up ICL and
 can include procedures, definitions of commands, or indeed, any valid ICL
 commands. Below is an example of a login file which illustrates some of
 the facilities which may be used.
-\begin{verbatim}
+\begin{terminalv}
 
     {  ICL  Login File  }
 
@@ -1729,9 +1479,9 @@ the facilities which may be used.
     PRINT   Starting ICL at (TIME()) on (DATE())
     PRINT
 
-\end{verbatim}
+\end{terminalv}
 
-\section{\xlabel{the_defstring_command}The DEFSTRING Command}
+\subsection{\xlabel{the_defstring_command}The DEFSTRING Command}
 
 The first entry in the file defines the DCL TYPE command so that it is
 accessible directly from ICL without having to do enter DCL TYPE. This is
@@ -1741,7 +1491,7 @@ DCL TYPE. The notation T(YPE) specifies possible abbreviations for the
 TYPE command, indicating that we could actually use T, TY or TYP instead
 of TYPE in full.
 
-\section{\xlabel{hidden_procedures}Hidden Procedures}
+\subsection{\xlabel{hidden_procedures}Hidden Procedures}
 
 The definition of the EDIT command is done in a different way. Since EDIT
 is used within ICL to edit procedures, if we just used DEFSTRING to define
@@ -1756,7 +1506,7 @@ procedure is being edited, and the command \#EDIT (name) is issued. The \#
 character forces the internal definition of EDIT to be used, rather than
 the definition currently being defined.
 
-The procedure is written as a {\em hidden} procedure, indicated by the word
+The procedure is written as a \emph{hidden} procedure, indicated by the word
 HIDDEN preceding PROC. A hidden procedure works in exactly the same way
 as a normal procedure, but it does not appear in the listing of procedures
 produced by a PROCS statement, nor can it be edited, deleted or saved. It
@@ -1764,7 +1514,7 @@ is convenient to make all procedures in your login file hidden procedures
 so that they do not clutter your directory of procedures, and cannot be
 accidentally deleted.
 
-\section{\xlabel{the_defproc_command}The DEFPROC Command}
+\subsection{\xlabel{the_defproc_command}The DEFPROC Command}
 
 If you have many procedures of this type you may not wish to include them
 in full in your login file, because this will require them all to be compiled
@@ -1774,9 +1524,9 @@ but with the procedures only being compiled when they are required. For
 example if the EDIT procedure described above was put in the source file
 EDIT.ICL we could put the following DEFPROC command in the login file.
 
-\begin{verbatim}
+\begin{terminalv}
     DEFPROC ED(IT) EDIT.ICL
-\end{verbatim}
+\end{terminalv}
 
 This command specifies that the command EDIT (with minimum abbreviation
 ED) is to run the procedure EDIT in source file EDIT.ICL.
@@ -1784,7 +1534,7 @@ ED) is to run the procedure EDIT in source file EDIT.ICL.
 The procedure will not be loaded and compiled until the first time the
 EDIT command is issued.
 
-\section{\xlabel{defining_additional_help_topics}Defining Additional Help Topics}
+\subsection{\xlabel{defining_additional_help_topics}Defining Additional Help Topics}
 
 ICL includes a HELP command which provides on line documentation on ICL
 itself. Using the DEFHELP command it is possible to extend the facility
@@ -1793,17 +1543,17 @@ you need to create a help library in the normal format used by the VMS
 help system. This is described in the VAX/VMS documentation for the librarian
 utility. You can then specify topics from this library which will be
 available using the ICL HELP command using a command of the form
-\begin{verbatim}
+\begin{terminalv}
     DEFHELP  EDIT  LIBRARY.HLB
-\end{verbatim}
+\end{terminalv}
 This will cause a
-\begin{verbatim}
+\begin{terminalv}
     HELP EDIT
-\end{verbatim}
+\end{terminalv}
 command to return the information on EDIT in help library LIBRARY.HLB rather
 than in the standard ICL library.
 
-\section{\xlabel{other_ways_of_defining_commands}Other Ways of Defining Commands}
+\subsection{\xlabel{other_ways_of_defining_commands}Other Ways of Defining Commands}
 
 The DEFUSER command allows an ICL command to be defined to call a FORTRAN
 subroutine. In order to make this work you have to link the subroutine into
@@ -1818,11 +1568,11 @@ the next section.
 
 \cleardoublepage
 \part{ICL and ADAM}
-   \markboth{\stardocname}{\stardocname}
+   
 
-\chapter{\xlabel{introduction_to_adam}Introduction to ADAM}
+\section{\xlabel{introduction_to_adam}Introduction to ADAM}
 
-\section{\xlabel{what_is_adam}What is ADAM?}
+\subsection{\xlabel{what_is_adam}What is ADAM?}
 
 ADAM (Astronomical Data Acquisition Monitor) consists of a number of facilities
 which can be combined in a toolkit approach to support a range of software,
@@ -1833,7 +1583,7 @@ other following well defined protocols.
 (On VMS, each task is a separate VMS process.)
 Tasks are written using a standard set of subroutine libraries which provide
 the ADAM facilities.
-ADAM is often termed a {\em software environment} as, in a completely ADAM
+ADAM is often termed a \emph{software environment} as, in a completely ADAM
 system, it is what the user's application code `sees' around itself.
 
 ADAM was originally developed by the Royal Greenwich Observatory to run on the
@@ -1849,12 +1599,12 @@ by Starlink as its standard environment for data reduction.
 Responsibility for support of ADAM now rests with the ADAM Support Group,
 which is part of the Starlink project.
 
-There are several references in the following chapters to Starlink User Notes
+There are several references in the following sections to Starlink User Notes
 (SUNs), Starlink System Notes (SSNs) and Starlink Guides (SGs).
 On Starlink systems they will be found in a directory with logical name
 DOCSDIR. Your site manager should be able to provide hardcopies.
 
-\section{\xlabel{the_role_of_the_command_language}The Role of the Command Language}
+\subsection{\xlabel{the_role_of_the_command_language}The Role of the Command Language}
 The command language was originally conceived as playing a key role
 in the ADAM system by providing the only user interface to the system.
 However, other user interfaces to ADAM have been developed, so users of
@@ -1883,9 +1633,9 @@ output and command input. The command language is not normally involved,
 though it is always possible to use the command language to control
 a U-task, which is equivalent in this respect to any other ADAM task.
 
-\chapter{\xlabel{using_adam_for_data_reduction}Using ADAM for Data Reduction}
+\section{\xlabel{using_adam_for_data_reduction}Using ADAM for Data Reduction}
 
-\section{\xlabel{atasks}A-tasks}
+\subsection{\xlabel{atasks}A-tasks}
 
 When ADAM is used for data reduction, ICL is used to communicate with one
 or more A-tasks or application tasks which contain the data reduction programs.
@@ -1901,10 +1651,10 @@ The least recently used task is always selected
 for killing when the limit is exceeded. This process is known as task caching
 and such tasks are referred to as cached tasks.
 
-\section{\xlabel{monoliths}Monoliths}
+\subsection{\xlabel{monoliths}Monoliths}
 
 To avoid frequent loading and killing of tasks, large data reduction packages
-are normally organized as {\em Monoliths} or M-tasks. A monolith is a single
+are normally organized as \emph{Monoliths} or M-tasks. A monolith is a single
 task which contains a large number of independent programs which would
 otherwise be separate A-tasks. Thus a monolith will have many commands
 associated with it, whereas an A-task only has a single command. The
@@ -1912,25 +1662,25 @@ monolith will be loaded when the first command is issued and then any
 of the other monolith commands may be issued without requiring the task
 to be reloaded.
 
-\section{\xlabel{running_kappa}Running KAPPA}
+\subsection{\xlabel{running_kappa}Running KAPPA}
 
 An example of an ADAM monolith is the Starlink Kernel Applications Package
 (KAPPA). KAPPA is described in more detail in the Starlink document SUN/95.
 To run KAPPA type:
 
-\begin{verbatim}
+\begin{terminalv}
     $ ADAM KAPPA
-\end{verbatim}
+\end{terminalv}
 
 This is actually a convenient way of combining the commands\footnote{
 In fact, any ICL command may be specified in place of KAPPA in the ADAM
 command.}:
 
-\begin{verbatim}
+\begin{terminalv}
     $ ADAMSTART
     $ ICL
     ICL> KAPPA
-\end{verbatim}
+\end{terminalv}
 
 To run any ADAM task from ICL it is necessary to have obeyed the command
 ADAMSTART in DCL before running ICL.
@@ -1940,7 +1690,7 @@ already been obeyed, although it wouldn't matter if it did.
 
 When the command KAPPA is obeyed in ICL, you will see
 
-\begin{verbatim}
+\begin{terminalv}
      Help key KAPPA redefined
 
      --    Initialized for KAPPA   --
@@ -1948,7 +1698,7 @@ When the command KAPPA is obeyed in ICL, you will see
 
         Type HELP KAPPA or KAPHELP for KAPPA help
     ICL>
-\end{verbatim}
+\end{terminalv}
 
 The KAPPA command causes all the individual commands of the KAPPA monolith
 to be defined and then outputs its initialization message. It does not cause
@@ -1960,14 +1710,14 @@ then be prompted for all the required parameters. For example, to use the
 ADD command which adds two images just type ADD and the following dialogue
 will result
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> ADD
     Loading KAPPA_DIR:KAPPA into 0591KAPPA
     IN1 - First input NDF> IM1
     IN2 - Second input NDF> IM2
     OUT - Output NDF> SUM
     ICL>
-\end{verbatim}
+\end{terminalv}
 
 The above command causes the images contained in HDS data files IM1.SDF
 and IM2.SDF to be added and the result placed in a new file called SUM.SDF.
@@ -1976,15 +1726,15 @@ Since this is the first KAPPA command the monolith needs to be loaded, and a
 loading message\footnote{These loading messages can be turned off by the SET
 NOMESSAGES command, if desired} is output which tells us the name of the task
 being created, in this case 0591KAPPA\footnote{The name is prefixed with a
-number ({\em e.g.} 0591) to make a unique process name, so that there is no conflict
+number (\emph{e.g.} 0591) to make a unique process name, so that there is no conflict
 between your version of KAPPA, and another version run at the same time by
 another user}.
 
 Each parameter prompt consists of three parts, the name of the
-parameter ({\em e.g.} IN1), a brief description (First input NDF\footnote{
-`NDF' stands for {\em Extensible N-Dimensional Data Format}. For more
+parameter (\emph{e.g.} IN1), a brief description (First input NDF\footnote{
+`NDF' stands for \emph{Extensible N-Dimensional Data Format}. For more
 information see Section \ref{accdat}.}), and in some
-cases a {\em suggested} value enclosed between / characters.
+cases a \emph{suggested} value enclosed between / characters.
 
 When responding to a parameter prompt the user has several options.
 \begin{itemize}
@@ -2011,31 +1761,31 @@ see SUN/115.}).
 If the parameters of a command are known they can be placed on the command
 line itself. Thus the above example would become:
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> ADD IM1 IM2 SUM
-\end{verbatim}
+\end{terminalv}
 
 In this example it is important to get the parameters in the right order.
 If we are not sure about the order of the parameters, but know their names
 we can specify the parameters by name on the command line.
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> ADD OUT=SUM IN1=IM1 IN2=IM2 TITLE='Sum of 2 Images'
-\end{verbatim}
+\end{terminalv}
 
 TITLE is an example of a parameter which can only be specified using the
-`{\em name}\/=' syntax as it has not been allocated a position in the order of
+`\emph{name}\/=' syntax as it has not been allocated a position in the order of
 parameters.
 If TITLE is not specified, a default value will be used.
 
-\section{\xlabel{adam_parameter_format}ADAM Parameter Format}
+\subsection{\xlabel{adam_parameter_format}ADAM Parameter Format}
 
 ADAM task parameters can be of a number of different types as follows:
 
 \begin{itemize}
 
 \item Numbers --- These can be Integer, Real or Double Precision and are
-entered in the usual format ({\em e.g.} as in FORTRAN)
+entered in the usual format (\emph{e.g.} as in FORTRAN)
 
 \item Strings --- These are represented in the usual ICL formats. Quotation
 marks may be omitted where there is no ambiguity. In the above example they
@@ -2048,26 +1798,26 @@ prompt.
 YES, NO, T, F, Y or N, regardless of case.
 
 \item Arrays --- arrays of any of the above items may be represented by
-a list of values enclosed in square brackets, {\em e.g.} [1, 2, 3].
-Two dimensional arrays may be represented as [ [1, 2], [3, 4] ] {\em etc.}
+a list of values enclosed in square brackets, \emph{e.g.} [1, 2, 3].
+Two dimensional arrays may be represented as [ [1, 2], [3, 4] ] \emph{etc.}
 The outer brackets may be omitted when responding to a prompt.
 
 \item Names --- These are the names of HDS (hierarchical data system) objects
-or files, or the names of devices (graphics devices, tape drives {\em etc.}).
+or files, or the names of devices (graphics devices, tape drives \emph{etc.}).
 Normally these names can be typed directly as MTA0, ARGS etc, but there
 are a few cases of ambiguity.
 These cases can be resolved by prefixing the name with an @ character.
 For example, if it is required to specify an HDS container file with a name
 different from that of the object it contains, or with a specific generation
 number, the file specification can be enclosed in quotes
-({\em e.g.} \verb+"data.sdf;3"+).
+(\emph{e.g.} \verb+"data.sdf;3"+).
 However, this would be interpreted as a character string unless prefixed with
 @.
 Suggested values in prompts are always displayed prefixed with @.
 
 \end{itemize}
 
-\section{\xlabel{kappa_from_procedures}KAPPA from Procedures}
+\subsection{\xlabel{kappa_from_procedures}KAPPA from Procedures}
 
 ICL becomes particularly useful when a series of KAPPA operations are to
 be performed on a sequence of files. We can then use an ICL procedure for
@@ -2076,30 +1826,30 @@ or expression to specify at least one of the parameter names. This is
 perfectly acceptable provided the expression is placed in parentheses so
 that it will be evaluated and not treated as a string. A frequent occurrence
 is that we want to process a sequence of files which have names such as
-RUN1, RUN2, RUN3 {\em etc.} ICL therefore provides a function SNAME to generate
+RUN1, RUN2, RUN3 \emph{etc.} ICL therefore provides a function SNAME to generate
 such sequential names
 \footnote{Note that for reasons explained in Section \ref{retval}, strings
 defining names to be used as ADAM task parameters are generally prefixed with
 @.}.
 It has the form:
-\begin{verbatim}
+\begin{terminalv}
     SNAME(string,n,m)
-\end{verbatim}
+\end{terminalv}
 
 and produces a name which is the concatenation of the string with the integer
 n. An optional third parameter m specifies a minimum number of digits for
 the numeric part of the name, leading zeros are inserted if necessary to
 produce at least m digits.
-\begin{verbatim}
+\begin{terminalv}
     SNAME('@RUN',3)      has the value   '@RUN3'
     SNAME('@IPCS',17,3)  has the value   '@IPCS017'
-\end{verbatim}
+\end{terminalv}
 The latter example being the format of name produced directly by the IPCS
 observing software at the AAT. Using this way of specifying the name it
 is easy to write an ICL procedure to add a whole series of images together
 using the KAPPA ADD command.
 
-\begin{verbatim}
+\begin{terminalv}
     PROC KADD
 
     {   Add images RUN1 to RUN20 to form SUM  }
@@ -2111,20 +1861,20 @@ using the KAPPA ADD command.
        END LOOP
 
     END PROC
-\end{verbatim}
+\end{terminalv}
 
-\section{\xlabel{error_reports}Error Reports}
+\subsection{\xlabel{error_reports}Error Reports}
 In the event of an error occurring in the task, error reports will be
 displayed. For example:
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> ADD
     Loading KAPPA_DIR:KAPPA into 0591KAPPA
     IN1 - First input NDF > !
     !! Null NDF structure specified for the IN1 parameter
     !  ADD: Error adding two NDF data structures
     ADAMERR   %PAR, Null parameter value
-\end{verbatim}
+\end{terminalv}
 
 The first two messages are issued by the task. Such messages will usually
 indicate which ADAM subsystem or routine generated them by a prefix (ADD:
@@ -2136,9 +1886,9 @@ ADAMERR is the name of an ICL exception -- the \%PAR following ADAMERR tells
 us that the PAR subsystem within ADAM generated the bad status value.
 
 
-\chapter{\xlabel{writing_adam_tasks}Writing ADAM tasks}
+\section{\xlabel{writing_adam_tasks}Writing ADAM tasks\label{writing_adam_tasks}}
 
-\section{\xlabel{introduction}Introduction}
+\subsection{\xlabel{writing_adam_tasks_introduction}Introduction}
 
 It is easy to write your own ADAM A-tasks which can be run from ICL in the
 same way as the KAPPA programs. This is the easiest way of allowing ICL
@@ -2149,7 +1899,7 @@ A detailed discussion of writing A-tasks can be found in SG/4 and SUN/101.
 Here is a simple example of an ADAM A-task. Its source code consists of
 the FORTRAN source file MYTASK.FOR containing the following:
 
-\begin{verbatim}
+\begin{terminalv}
     SUBROUTINE MYTASK(STATUS)
     IMPLICIT NONE
     INTEGER STATUS
@@ -2157,7 +1907,7 @@ the FORTRAN source file MYTASK.FOR containing the following:
     CALL MSG_OUT(' ','Hello',STATUS)
 
     END
-\end{verbatim}
+\end{terminalv}
 The example task consisted essentially of just one statement --- the call
 of MSG\_OUT. This routine is part of a subroutine library which is provided
 for outputting information to the terminal. The MSG\_ routines should always
@@ -2169,33 +1919,33 @@ information on the parameters of the task. Our task doesn't have any parameters
 so its interface file is fairly simple. It consists of the following in
 the file MYTASK.IFL.
 
-\begin{verbatim}
+\begin{terminalv}
     INTERFACE MYTASK
     ENDINTERFACE
-\end{verbatim}
+\end{terminalv}
 
-\section{\xlabel{compiling_and_linking}Compiling and Linking}
+\subsection{\xlabel{compiling_and_linking}Compiling and Linking}
 
 Before compiling and linking ADAM tasks we need to run the command ADAM\_DEV
 which sets up appropriate definitions. This in turn requires
 that the command ADAMSTART has been run.
 
-\begin{verbatim}
+\begin{terminalv}
     $ ADAMSTART
     $ ADAM_DEV
-\end{verbatim}
+\end{terminalv}
 
 The task can then be compiled and linked using the following commands:
 
-\begin{verbatim}
+\begin{terminalv}
     $ FOR MYTASK
     $ ALINK MYTASK
-\end{verbatim}
+\end{terminalv}
 
 To run the task start up ICL and define a command to run the task using
 the ICL DEFINE command.
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> DEFINE  TEST  MYTASK
     ICL> TEST
     Loading MYTASK into 03BCMYTASK
@@ -2203,7 +1953,7 @@ the ICL DEFINE command.
     ICL> TEST
     Hello
     ICL>
-\end{verbatim}
+\end{terminalv}
 The DEFINE command defines the command TEST to run the A-task MYTASK. For
 this to work, MYTASK has to be in the default directory. If it were somewhere
 else a directory specification could be included on MYTASK in the DEFINE
@@ -2212,12 +1962,12 @@ command.
 TEST then causes the task to be loaded and executed. Typing TEST again causes
 it to be executed a second time, but this time it doesn't have to be loaded.
 
-\section{\xlabel{tasks_with_parameters}Tasks with Parameters}
+\subsection{\xlabel{tasks_with_parameters}Tasks with Parameters}
 
 The following is an example of a task with a parameter. This task calculates
 the square of a number and outputs its value on the terminal.
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE SQUARE(STATUS)
       INTEGER STATUS
       REAL R,RR
@@ -2227,7 +1977,7 @@ the square of a number and outputs its value on the terminal.
       CALL MSG_SETR('RSQUARED',RR)
       CALL MSG_OUT(' ','The Square of ^RVAL is ^RSQUARED',STATUS)
       END
-\end{verbatim}
+\end{terminalv}
 
 This program uses the subroutine PAR\_GET0R to get the value of the parameter
 VALUE (there are similar routines for other types). Output of the numbers
@@ -2236,7 +1986,7 @@ RSQUARED which are then inserted into the MSG\_OUT output string using
 the \verb$^RVAL$ notation. The interface file for this example is given
 below.
 
-\begin{verbatim}
+\begin{terminalv}
   INTERFACE SQUARE
 
     PARAMETER VALUE
@@ -2248,11 +1998,11 @@ below.
     ENDPARAMETER
 
   ENDINTERFACE
-\end{verbatim}
+\end{terminalv}
 
 The interface file has an entry for the parameter VALUE. The TYPE field
 specifies the type of the parameter. The underscore prefix on '\_REAL'
-identifies it as a {\em primitive} type ({\em i.e.} a simple number or string,
+identifies it as a \emph{primitive} type (\emph{i.e.} a simple number or string,
 rather than an HDS structure or Device name). The position field specifies
 the position that the parameter is expected in if it appears on the command
 line.
@@ -2260,7 +2010,7 @@ line.
 The VPATH entry specifies how the parameter value is to be obtained if it
 not found on the command line. In this case it is to be prompted for. The
 PPATH entry specifies how the default value that appears in the parameter
-prompt is to be obtained. In this case the CURRENT value ({\em i.e.} the value
+prompt is to be obtained. In this case the CURRENT value (\emph{i.e.} the value
 the parameter had at the end of the last execution of the command) is used.
 The PROMPT field gives the prompt string to be used.
 
@@ -2269,7 +2019,7 @@ Interface files are described in more detail in SUN/115.
 To run this example we would compile and link it as described above and
 then use the following ICL commands:
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> DEFINE SQUARE SQUARE
     ICL> SQUARE 12
     Loading SQUARE into 03BCSQUARE
@@ -2280,9 +2030,9 @@ then use the following ICL commands:
     VALUE - Number to be squared /0.173205E+01/ > 7
     The Square of 7 is 49
     ICL>
-\end{verbatim}
+\end{terminalv}
 
-\section{\xlabel{status_and_error_handling}STATUS and error handling}
+\subsection{\xlabel{status_and_error_handling}STATUS and error handling}
 
 Most ADAM subroutines have an integer parameter called STATUS. STATUS has a
 success value (SAI\_\_OK) which each routine will return if it completes
@@ -2307,7 +2057,7 @@ It is important, however, to take care that code that does not consist of
 calls to ADAM routines does not get executed after an error has occurred.
 For this reason our SQUARE example would be better written as:
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE SQUARE(STATUS)
       INTEGER STATUS
       INCLUDE 'SAE_PAR'  ! This provides the ADAM status codes
@@ -2320,7 +2070,7 @@ For this reason our SQUARE example would be better written as:
          CALL MSG_OUT(' ','The Square of ^RVAL is ^RSQUARED',STATUS)
       ENDIF
       END
-\end{verbatim}
+\end{terminalv}
 
 This ensures that if the STATUS from PAR\_GET0R is bad the rest of the routine
 is not executed with an undefined value of R. It is actually not necessary
@@ -2330,7 +2080,7 @@ bad.
 More sophisticated error handling can be provided by using routines in the
 ERR\_ package. These facilities are fully described in SUN/104.
 
-\section{\xlabel{returning_values_to_icl}Returning values to ICL}
+\subsection{\xlabel{returning_values_to_icl}Returning values to ICL}
 \label{retval}
 We have already seen how ICL can be used to supply values for ADAM task
 parameters. It is also possible for ADAM tasks to return values to ICL.
@@ -2338,7 +2088,7 @@ The following modified version of SQUARE does not output its result on the
 terminal, but returns it to the parameter VALUE using a call to the routine
 PAR\_PUT0R which is analogous to PAR\_GET0R.
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE SQUARE(STATUS)
       INTEGER STATUS
       REAL R,RR
@@ -2348,18 +2098,18 @@ PAR\_PUT0R which is analogous to PAR\_GET0R.
          CALL PAR_PUT0R('VALUE',RR,STATUS)
       ENDIF
       END
-\end{verbatim}
+\end{terminalv}
 
 We could run this from ICL as follows (having done a DEFINE SQUARE SQUARE)
 to define the command:
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> X=5
     ICL> SQUARE (X)
     ICL> =X
     25
     ICL>
-\end{verbatim}
+\end{terminalv}
 
 In order for the ADAM task to return a value to ICL we must use a variable
 for the parameter and place it on the command line. The variable name must
@@ -2373,14 +2123,14 @@ In such cases, the supplied name cannot be replaced by some other name so,
 to indicate that they may not be replaced, name values in variables must be
 preceded by @.
 
-\section{\xlabel{graphics_with_adam_}Graphics with ADAM}
+\subsection{\xlabel{graphics_with_adam_}Graphics with ADAM}
 
 All graphics in ADAM is based on the use of the GKS graphics system. Most
 users, however, will not use the GKS routines directly but will use a
 higher level package such as SGS, NCAR or PGPLOT. The following example
 uses SGS to draw a circle on a selected graphics device.
 (SGS is described in SUN/85, and its use within ADAM in SUN/113.)
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE CIRCLE(STATUS)
       IMPLICIT NONE
       INTEGER STATUS
@@ -2407,11 +2157,11 @@ uses SGS to draw a circle on a selected graphics device.
       CALL SGS_DEACT(STATUS)
 
       END
-\end{verbatim}
+\end{terminalv}
 
 The interface file for this example is as follows:
 
-\begin{verbatim}
+\begin{terminalv}
 INTERFACE CIRCLE
 
    PARAMETER RADIUS
@@ -2431,7 +2181,7 @@ INTERFACE CIRCLE
    ENDPARAMETER
 
 ENDINTERFACE
-\end{verbatim}
+\end{terminalv}
 
 When SGS is used from ADAM no calls to SGS\_OPEN and SGS\_CLOSE are made.
 Instead the routines SGS\_ASSOC and SGS\_ANNUL are used. SGS\_ASSOC makes
@@ -2443,32 +2193,32 @@ possible values 'READ', 'WRITE' and 'UPDATE'.
 
 There are a number of similar pairs of \_ASSOC and \_CANCL routines in ADAM
 which work in similar ways. MAG\_ASSOC and MAG\_CANCL are used to handle
-magnetic tape devices, FIO\_ASSOC and FIO\_CANCL to handle file I/O {\em etc.}
+magnetic tape devices, FIO\_ASSOC and FIO\_CANCL to handle file I/O \emph{etc.}
 Many of them also have an \_ANNUL subroutine which frees the associated
 resource but does not cancel the associated ADAM parameter.
 
 To run CIRCLE from ICL we could either use:
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> CIRCLE  0.3  ARGS1
-\end{verbatim}
+\end{terminalv}
 
 or let it prompt for the parameters:
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> CIRCLE
     RADIUS - Radius of Circle /0.300000E+00/ > 0.2
     DEVICE - Graphics Device /@ARGS1/ > PRINTRONIX
     ICL> $ PRINT/NOFEED PRINTRONIX.BIT
     ICL>
-\end{verbatim}
+\end{terminalv}
 
 In the latter case the default values of the parameters are the values from the
 previous time (a result of using PPATH CURRENT). With a hard copy graphics
 device such as PRINTRONIX, a file is created which must then be sent to
 the device with a DCL PRINT command.
 
-\section{\xlabel{accessing_data}Accessing Data}
+\subsection{\xlabel{accessing_data}Accessing Data}
 \label{accdat}
 The basic means of storing and accessing data for ADAM is the Hierarchical
 Data System (HDS). SUN/92 describes this system
@@ -2479,7 +2229,7 @@ themselves be structures containing further components.
 
 To simplify the exchange of data between different applications packages,
 Starlink have released a set of standards for representing data within HDS.
-This is the {\em Extensible N-Dimensional Data Format} (NDF) -- it is
+This is the \emph{Extensible N-Dimensional Data Format} (NDF) -- it is
 described in SGP/38. A library of subroutines (the NDF library, described in
 SUN/33) is provided for accessing these standard structures and will generally
 be used when writing applications.
@@ -2488,7 +2238,7 @@ Below is a simple example that calculates the mean value of the data in
 an NDF. For such data files the data will be found in a component
 of the file, called .DATA.
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE MEAN(STATUS)
       IMPLICIT NONE
       INTEGER STATUS
@@ -2537,7 +2287,7 @@ of the file, called .DATA.
       MEAN = MEAN / NELM
       END
 
-\end{verbatim}
+\end{terminalv}
 
 There are a number of points to note about this example:
 \begin{itemize}
@@ -2566,7 +2316,7 @@ unmap the mapped data array. For more information on NDF contexts see SUN/33.
 \end{itemize}
 The interface file for this example could be as follows:
 
-\begin{verbatim}
+\begin{terminalv}
 INTERFACE MEAN
 
    PARAMETER INPUT
@@ -2578,22 +2328,22 @@ INTERFACE MEAN
    ENDPARAMETER
 
 ENDINTERFACE
-\end{verbatim}
+\end{terminalv}
 
 The above example shows how to handle the case where an NDF file is used
 for input. Where output to an NDF file is involved it is usually necessary
 to create a new HDS file when the application runs. This can be achieved
 using routine NDF\_CREAT or NDF\_CREP. For details of their usage, see SUN/33.
 
-\chapter{\xlabel{adam_as_a_data_aquisition_environment}ADAM as a Data Acquisition Environment}
+\section{\xlabel{adam_as_a_data_aquisition_environment}ADAM as a Data Acquisition Environment}
 
-\section{\xlabel{instrumentation_tasks}Instrumentation Tasks}
+\subsection{\xlabel{instrumentation_tasks}Instrumentation Tasks}
 When used for data acquisition, ICL is used to control one or more
 `instrumentation tasks' (I-tasks).
 A I-task is used to control an individual instrument or other hardware
 component of the system.
 An I-task can respond to a number of different commands
-(referred to as {\em Actions}) rather than the single command of an A-task;
+(referred to as \emph{Actions}) rather than the single command of an A-task;
 they also have the ability to perform two or more actions concurrently.
 
 Multiple I-tasks may be involved when several instruments
@@ -2605,13 +2355,13 @@ the operator.
 
 Instrumentation tasks are fully described in SUN/134.
 
-\section{\xlabel{dtasks_and_ctasks}D-tasks and C-tasks}
+\subsection{\xlabel{dtasks_and_ctasks}D-tasks and C-tasks}
 Instrumentation tasks combine the functions of Device (D) task and Control
 (C or CD) tasks which were used with ADAM V1.
 These old-style tasks are now considered `unfashionable' but they continue to
 work with ICL and it will be some time before they are replaced in all systems.
 
-\section{\xlabel{task_loading}Task Loading}
+\subsection{\xlabel{task_loading}Task Loading}
 
 In a data acquisition situation the task caching scheme described in the
 previous section is usually inappropriate. We don't want tasks to be killed
@@ -2633,7 +2383,7 @@ completion.
 
 \end{description}
 
-\section{\xlabel{killing_tasks}Killing Tasks}
+\subsection{\xlabel{killing_tasks}Killing Tasks}
 
 Uncached tasks remain loaded until explicitly killed, or until the creating
 process is logged out. They remain loaded when ICL exits. Thus it is possible
@@ -2651,31 +2401,31 @@ Tasks are killed using the KILL or KILLW commands.
 
 \end{description}
 
-\section{\xlabel{the_adam_message_system}The ADAM message system}
+\subsection{\xlabel{the_adam_message_system}The ADAM message system}
 
 Communication between ADAM tasks, and between ICL and tasks, makes use of
 the ADAM message system. The message system is involved in the communication
-between ICL and A-tasks described in the last chapter, but in this case
+between ICL and A-tasks described in the last section (\S\ref{writing_adam_tasks}), but in this case
 its details are largely hidden from the user. In the data acquisition case
 the use of the message system by the command language is usually more explicit.
 
 ICL can send four types of messages to tasks, which are distinguished by
-a {\em context} which is one of GET, SET, OBEY or CANCEL.
+a \emph{context} which is one of GET, SET, OBEY or CANCEL.
 
 The ICL command to send a message to a task is SEND.
 
-\section{\xlabel{an_example}An Example}
+\subsection{\xlabel{an_example}An Example}
 
 As an example we will consider a I-task called PHOTOM which controls a simple
 optical photometer. The photometer includes a filter wheel with five positions.
 
-\subsection{\xlabel{the_itask_interface_file}The I-task Interface File}
+\subsubsection{\xlabel{the_itask_interface_file}The I-task Interface File}
 
 The I-task has a parameter FILTER\_DEMAND which specifies the required filter
 and an action FILTER which moves the filter wheel to the required position.
 These are specified in the interface file for the task as follows:
 
-\begin{verbatim}
+\begin{terminalv}
     PARAMETER FILTER_DEMAND
       TYPE '_CHAR'
       VPATH 'INTERNAL'
@@ -2689,7 +2439,7 @@ These are specified in the interface file for the task as follows:
       CANCEL
       ENDCANCEL
     ENDACTION
-\end{verbatim}
+\end{terminalv}
 
 Many I-task parameters have VPATH specified as 'INTERNAL' --
 this means that the parameter value is stored in memory for speed of access.
@@ -2702,11 +2452,11 @@ cancelled, and that they OBEY action needs the parameter FILTER\_DEMAND which
 may be specified as the first (only) parameter on the command line.
 
 
-\subsection{\xlabel{running_photom}Running PHOTOM}
+\subsubsection{\xlabel{running_photom}Running PHOTOM}
 
 The I-task could be used as follows:
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> LOADW PHOTOM
     Loading PHOTOM into PHOTOM
     ICL> SEND PHOTOM SET FILTER_DEMAND V
@@ -2714,88 +2464,88 @@ The I-task could be used as follows:
     V
     ICL> SEND PHOTOM OBEY FILTER
     ICL>
-\end{verbatim}
+\end{terminalv}
 
 The last command starts the FILTER action but does not wait for it to complete.
 ICL can accept and execute other commands while the filter wheel is moving
 to its position. When the action finally completes the I-task returns a
 completion message to ICL which will be output on the terminal.
 
-\begin{verbatim}
+\begin{terminalv}
     ICL>
     "obey" FILTER - action complete
-\end{verbatim}
+\end{terminalv}
 
-\subsection{\xlabel{supplying_parameters_in_the_obey_message}Supplying Parameters in the Obey Message}
+\subsubsection{\xlabel{supplying_parameters_in_the_obey_message}Supplying Parameters in the Obey Message}
 
 A parameter in the NEEDS list for an action may be supplied along with the
 OBEY message rather than set independently with a SET message. Thus we
 can use:
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> SEND PHOTOM OBEY FILTER B
-\end{verbatim}
+\end{terminalv}
 
-\subsection{\xlabel{cancelling_actions}Cancelling Actions}
+\subsubsection{\xlabel{cancelling_actions}Cancelling Actions}
 
 The CANCEL context enables us to cancel the FILTER action before it has
 completed by issuing the following command:
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> SEND PHOTOM CANCEL FILTER
-\end{verbatim}
+\end{terminalv}
 
-\subsection{\xlabel{missing_parameters}Missing Parameters}
+\subsubsection{\xlabel{missing_parameters}Missing Parameters}
 
 If we try to start the FILTER action without specifying a value for the
 FILTER\_DEMAND parameter (either by SEND SET or by specifying it on the
 command line), the parameter system will attempt to get a value in the
-same way that it does for A-tasks ({\em but note that `INTERNAL' parameters
+same way that it does for A-tasks (\emph{but note that `INTERNAL' parameters
 will not be prompted for -- a pseudo VPATH of `DYNAMIC,DEFAULT' is used and
 there is no implied PROMPT at the end.})
 Therefore, as there is no DEFAULT value specified for FILTER\_DEMAND, and
 assuming that no dynamic default value is specified by the program, the
 null response is assumed.
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> SEND PHOTOM OBEY FILTER
     Bad status returned from task, meaning is :-
     ICL>
     %PAR-I-NULL, Null parameter value
     ICL>
-\end{verbatim}
+\end{terminalv}
 
 Note that old-style D-tasks always had parameters defined as 'INTERNAL'
 and could not prompt for missing parameters anyway.
 
-\subsection{\xlabel{the_get_command}The GET command}
+\subsubsection{\xlabel{the_get_command}The GET command}
 
 A SEND PHOTOM GET command causes the parameter value to be output on the
 terminal. It is often more useful to put the value into an ICL variable.
 This can be accomplished using the GET command.
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> GET PHOTOM FILTER_DEMAND (F)
     ICL> =F
     B
     ICL>
-\end{verbatim}
+\end{terminalv}
 
-\subsection{\xlabel{the_obeyw_command}The OBEYW command}
+\subsubsection{\xlabel{the_obeyw_command}The OBEYW command}
 
 It is often more convenient to let ICL wait for an action to complete rather than
 have it proceed concurrently with other ICL commands. The OBEYW command
 is used for this purpose.
 
-\begin{verbatim}
+\begin{terminalv}
     ICL> OBEYW PHOTOM FILTER I
     ICL>
-\end{verbatim}
+\end{terminalv}
 
 The OBEYW command waits until the action has completed before the ICL$>$
 prompt reappears and more commands may be entered.
 
-\section{\xlabel{multiple_concurrent_actions}Multiple Concurrent Actions}
+\subsubsection{\xlabel{multiple_concurrent_actions}Multiple Concurrent Actions}
 
 I-tasks have the ability to perform more than one action concurrently.
 ICL includes two commands which enable actions to be performed concurrently
@@ -2804,7 +2554,7 @@ I-task has another action APERTURE which moves the aperture wheel to
 a required position. The following is a procedure which would allow the
 filter and aperture wheels to be moved simultaneously.
 
-\begin{verbatim}
+\begin{terminalv}
     PROC SETUP  F  A
 
 {  move filter to position F and aperture to position A  }
@@ -2820,16 +2570,16 @@ filter and aperture wheels to be moved simultaneously.
       ENDOBEY (P2) (M2)
 
     END PROC
-\end{verbatim}
+\end{terminalv}
 
-STARTOBEY starts an action and returns the {\em path} and {\em message
+STARTOBEY starts an action and returns the \emph{path} and \emph{message
 identifier}, which together uniquely identify a given invocation of an action,
 into two ICL variables. ENDOBEY can then be used to wait for the completion
 of such an action. The above procedure will therefore exit only when both
 actions are complete.
 
 \appendix
-\chapter{\xlabel{icl_functions}ICL Functions}
+\section{\xlabel{icl_functions}ICL Functions}
 
 Where the type is given as `Real or Integer' the type of the result is the
 same as the type of the argument.
@@ -3043,9 +2793,9 @@ VARIABLE(proc,X) & Any & Returns value of variable X of procedure proc\\
 \end{center}
 
 
-\chapter{\xlabel{icl_commands}ICL Commands}
+\section{\xlabel{icl_commands}ICL Commands}
 
-\section{\xlabel{alloc}ALLOC}
+\subsection{\xlabel{alloc}ALLOC}
 
 
 
@@ -3073,12 +2823,12 @@ VARIABLE(proc,X) & Any & Returns value of variable X of procedure proc\\
 
   ALLOC may be abbreviated to ALL
 
-{\em e.g. }
-\begin{verbatim}
+\emph{e.g. }
+\begin{terminalv}
     ALLOC MT (DEVICE) (STATUS)
-\end{verbatim}
+\end{terminalv}
 
-\section{\xlabel{ALOAD}ALOAD\label{ALOAD}}
+\subsection{\xlabel{ALOAD}ALOAD\label{ALOAD}}
 
 
     ALOAD \hspace{.5cm} exename \hspace{.5cm} [taskname]
@@ -3095,7 +2845,7 @@ VARIABLE(proc,X) & Any & Returns value of variable X of procedure proc\\
 
 \end{description}
 
-\section{\xlabel{APPEND}APPEND\label{APPEND}}
+\subsection{\xlabel{APPEND}APPEND\label{APPEND}}
 
    APPEND \hspace{.5cm} intname \hspace{.5cm} [filename]
 
@@ -3114,7 +2864,7 @@ VARIABLE(proc,X) & Any & Returns value of variable X of procedure proc\\
 
 
 
-\section{\xlabel{CHECKTASK}CHECKTASK\label{CHECKTASK}}
+\subsection{\xlabel{CHECKTASK}CHECKTASK\label{CHECKTASK}}
 
    CHECKTASK \hspace{.5cm} taskname \hspace{.5cm} (loaded)
 
@@ -3129,15 +2879,14 @@ VARIABLE(proc,X) & Any & Returns value of variable X of procedure proc\\
 
 \end{description}
 
-\section{\xlabel{CLEAR}CLEAR\label{CLEAR}}
+\subsection{\xlabel{CLEAR}CLEAR\label{CLEAR}}
 
    CLEAR \hspace{.5cm} first \hspace{.5cm} last
 
-In screen mode the range of lines on the screen between {\it first} and {\it
-last}
+In screen mode the range of lines on the screen between \textit{first} and \textit{last}
 are cleared.
 
-\section{\xlabel{CLOSE}CLOSE\label{CLOSE}}
+\subsection{\xlabel{CLOSE}CLOSE\label{CLOSE}}
 
    CLOSE \hspace{.5cm} intname
 
@@ -3150,7 +2899,7 @@ are cleared.
 \end{description}
 
 
-\section{\xlabel{CREATE}CREATE\label{CREATE}}
+\subsection{\xlabel{CREATE}CREATE\label{CREATE}}
 
    CREATE \hspace{.5cm} intname \hspace{.5cm} [filename]
 
@@ -3166,7 +2915,7 @@ are cleared.
 
 \end{description}
 
-\section{\xlabel{CREATEGLOBAL}CREATEGLOBAL\label{CREATEGLOBAL}}
+\subsection{\xlabel{CREATEGLOBAL}CREATEGLOBAL\label{CREATEGLOBAL}}
 
    CREATEGLOBAL \hspace{.5cm} parname \hspace{.5cm} type
 
@@ -3183,7 +2932,7 @@ are cleared.
 
 \end{description}
 
-\section{\xlabel{DCL}\$\ (DCL)\label{DCL}}
+\subsection{\xlabel{DCL}\$\ (DCL)\label{DCL}}
 
    \$ command
 
@@ -3196,14 +2945,14 @@ are cleared.
 
  Because the commands are executed in the DCL subprocess rather than in the
  process running ICL, some commands may not have the expected effect.
- {\em e.g.} \$ SET DEF will set the default directory for the subprocess but not
+ \emph{e.g.} \$ SET DEF will set the default directory for the subprocess but not
  for the process running ICL. Use the ICL DEFAULT (DEF) command instead.
  Furthermore, \$ ALLOCATE will allocate a device to the subprocess and not to
  the process running ICL. Use the ICL command ALLOC for this purpose.
 
  Control-C may be used to abort a DCL command running in the subprocess.
 
-\section{\xlabel{DEALLOC}DEALLOC\label{DEALLOC}}
+\subsection{\xlabel{DEALLOC}DEALLOC\label{DEALLOC}}
 
    DEALLOC \hspace{.5cm} dev
 
@@ -3211,7 +2960,7 @@ are cleared.
 
  DEALLOC may be abbreviated to DEALL.
 
-\section{\xlabel{DEFAULT}DEFAULT\label{DEFAULT}}
+\subsection{\xlabel{DEFAULT}DEFAULT\label{DEFAULT}}
 
    DEFAULT \hspace{.5cm} directory
 
@@ -3225,15 +2974,15 @@ are cleared.
 
  DEFAULT may be abbreviated to DEF.
 
-{\em e.g.}
-\begin{verbatim}
+\emph{e.g.}
+\begin{terminalv}
 
     DEF [-]
     DEF DISK$DATA:[ABC.DATA]
 
-\end{verbatim}
+\end{terminalv}
 
-\section{\xlabel{DEFHELP}DEFHELP\label{DEFHELP}}
+\subsection{\xlabel{DEFHELP}DEFHELP\label{DEFHELP}}
 
    DEFHELP \hspace{.5cm} name \hspace{.5cm} help\_library \hspace{.5cm}
 [topic...]
@@ -3248,20 +2997,20 @@ are cleared.
  \item[help\_library] - The Help library to be used.
 
  \item[topic...] - An optional list of keywords specifying the path within
-{\em help\_library} to the required information. If omitted, {\em topic}
-defaults to {\em name}.
+\emph{help\_library} to the required information. If omitted, \emph{topic}
+defaults to \emph{name}.
 
 \end{description}
 
-After {\em name} has been defined in this way
-\begin{verbatim}
+After \emph{name} has been defined in this way
+\begin{terminalv}
 
   ICL> HELP name
 
-\end{verbatim}
-will return the {\em topic}  information in {\em help\_library}.
+\end{terminalv}
+will return the \emph{topic}  information in \emph{help\_library}.
 
-\section{\xlabel{DEFINE}DEFINE\label{DEFINE}}
+\subsection{\xlabel{DEFINE}DEFINE\label{DEFINE}}
 
    DEFINE \hspace{.5cm} command \hspace{.5cm} taskname \hspace{.5cm} [action]
 
@@ -3280,17 +3029,17 @@ will return the {\em topic}  information in {\em help\_library}.
 
 \end{description}
 Once a command has been defined then
-\begin{verbatim}
+\begin{terminalv}
     ICL> command . . .
-\end{verbatim}
+\end{terminalv}
 is equivalent to typing
-\begin{verbatim}
+\begin{terminalv}
     ICL> OBEYW taskname action . . .
-\end{verbatim}
+\end{terminalv}
 with any parameters of command being appended to the OBEYW as the VALUE
 string sent to the task.
 
-\section{\xlabel{DEFPROC}DEFPROC\label{DEFPROC}}
+\subsection{\xlabel{DEFPROC}DEFPROC\label{DEFPROC}}
 
    DEFPROC \hspace{.5cm} command \hspace{.5cm} file \hspace{.5cm} [procedure]
 
@@ -3309,11 +3058,11 @@ string sent to the task.
 
 \end{description}
 
-When {\em command} is issued, file.ICL is loaded and compiled (if it is
+When \emph{command} is issued, file.ICL is loaded and compiled (if it is
 not already loaded) and the procedure is called. Any parameters specified
 with the original command are passed to the procedure.
 
-\section{\xlabel{DEFSHARE}DEFSHARE\label{DEFSHARE}}
+\subsection{\xlabel{DEFSHARE}DEFSHARE\label{DEFSHARE}}
 
    DEFSHARE \hspace{.5cm} command \hspace{.5cm} image \hspace{.5cm} [action]
 
@@ -3333,19 +3082,19 @@ with the original command are passed to the procedure.
 
 \end{description}
 Once a command has been defined with DEFSHARE then
-\begin{verbatim}
+\begin{terminalv}
     ICL> command . . .
-\end{verbatim}
+\end{terminalv}
 is equivalent to typing
-\begin{verbatim}
+\begin{terminalv}
     ICL> OBEYW taskname action . . .
-\end{verbatim}
+\end{terminalv}
 with any parameters of command being appended to the OBEYW as the VALUE
 string sent to the task. The task must be linked into a shareable image
 monolith rather than a normal executable task.
 
 
-\section{\xlabel{DEFSTRING}DEFSTRING\label{DEFSTRING}}
+\subsection{\xlabel{DEFSTRING}DEFSTRING\label{DEFSTRING}}
 
    DEFSTRING \hspace{.5cm} command \hspace{.5cm} equivalence\_string
 
@@ -3363,7 +3112,7 @@ monolith rather than a normal executable task.
 Issuing the command is equivalent to typing the equivalence string. Any
 parameters of the command are appended to the equivalence string.
 
-\section{\xlabel{DEFTASK}DEFTASK\label{DEFTASK}}
+\subsection{\xlabel{DEFTASK}DEFTASK\label{DEFTASK}}
 
    DEFTASK \hspace{.5cm} command \hspace{.5cm} [taskname]
 
@@ -3380,18 +3129,18 @@ parameters of the command are appended to the equivalence string.
 
 \end{description}
 Once a command has been defined using DEFTASK then
-\begin{verbatim}
+\begin{terminalv}
     ICL> command . . .
-\end{verbatim}
+\end{terminalv}
 is equivalent to typing
-\begin{verbatim}
+\begin{terminalv}
     ICL> SEND action . . .
-\end{verbatim}
+\end{terminalv}
 the parameters of command must supply the CONTEXT (GET, SET, OBEY, CANCEL)
 and the parameter or action name to be sent to the task.
 
 
-\section{\xlabel{DEFUSER}DEFUSER\label{DEFUSER}}
+\subsection{\xlabel{DEFUSER}DEFUSER\label{DEFUSER}}
 
    DEFUSER \hspace{.5cm} command \hspace{.5cm} image \hspace{.5cm} [routine]
 
@@ -3416,19 +3165,19 @@ and the parameter or action name to be sent to the task.
  will receive the ICL command line parameter string. The string is received as
  typed, except for the substitution of bracketed expressions.
 
- Typing {\em command} causes the shareable image to be activated dynamically
+ Typing \emph{command} causes the shareable image to be activated dynamically
  (if it is not already loaded), and the subroutine to be called. The
  subroutine can return an error message to ICL by signalling a VMS condition.
  This will result in the ICL exception USERERR. The exception text will
  contain the message associated with the VMS status returned.
 
-\section{\xlabel{DELETE}DELETE\label{DELETE}}
+\subsection{\xlabel{DELETE}DELETE\label{DELETE}}
 
    DELETE \hspace{.5cm} proc
 
  Delete procedure proc from the procedure table.
 
-\section{\xlabel{DISMOUNT}DISMOUNT\label{DISMOUNT}}
+\subsection{\xlabel{DISMOUNT}DISMOUNT\label{DISMOUNT}}
 
    DISMOUNT \hspace{.5cm} dev \hspace{.5cm} [ NOUNLOAD ]
 
@@ -3438,15 +3187,15 @@ and the parameter or action name to be sent to the task.
 
  DISMOUNT may be abbreviated to DISMOU
 
-\section{\xlabel{DUMPTASK}DUMPTASK\label{DUMPTASK}}
+\subsection{\xlabel{DUMPTASK}DUMPTASK\label{DUMPTASK}}
 
    DUMPTASK \hspace{.5cm}  taskname
 
-This command causes the ADAM task of name {\em taskname} to output a
+This command causes the ADAM task of name \emph{taskname} to output a
 stack dump on the terminal from which it was loaded. For this command
 to be effective, the task must include a call to DTASK\_SETDUMP(STATUS).
 
-\section{\xlabel{EDIT}EDIT\label{EDIT}}
+\subsection{\xlabel{EDIT}EDIT\label{EDIT}}
 
    EDIT \hspace{.5cm} proc
 
@@ -3457,11 +3206,11 @@ to be effective, the task must include a call to DTASK\_SETDUMP(STATUS).
  the TPU editor is used. The editor may be changed to EDT or LSE
  using the SET EDITOR command.
 
- To edit a {\em file} use the command:
+ To edit a \emph{file} use the command:
 
     DCL EDIT filename
 
-\section{\xlabel{ENDOBEY}ENDOBEY\label{ENDOBEY}}
+\subsection{\xlabel{ENDOBEY}ENDOBEY\label{ENDOBEY}}
 
    ENDOBEY \hspace{.5cm} (path) \hspace{.5cm} (messid)
 
@@ -3475,14 +3224,14 @@ to be effective, the task must include a call to DTASK\_SETDUMP(STATUS).
 
 \end{description}
 
-\section{\xlabel{EXIT}EXIT\label{EXIT}}
+\subsection{\xlabel{EXIT}EXIT\label{EXIT}}
 
    EXIT
 
  EXIT from ICL and return control to DCL. On exiting from ICL a
  copy of all the current procedures is saved in the file SAVE.ICL
 
-\section{\xlabel{GET}GET\label{GET}}
+\subsection{\xlabel{GET}GET\label{GET}}
 
    GET \hspace{.5cm} taskname \hspace{.5cm} parameter \hspace{.5cm} (variable)
 
@@ -3499,7 +3248,7 @@ to be effective, the task must include a call to DTASK\_SETDUMP(STATUS).
 \end{description}
 
 
-\section{\xlabel{GETGLOBAL}GETGLOBAL\label{GETGLOBAL}}
+\subsection{\xlabel{GETGLOBAL}GETGLOBAL\label{GETGLOBAL}}
 
    GETGLOBAL \hspace{.5cm}  parameter \hspace{.5cm} (variable)
 
@@ -3513,7 +3262,7 @@ Get the value of a ADAM global parameter
 
 \end{description}
 
-\section{\xlabel{GETNBS}GETNBS\label{GETNBS}}
+\subsection{\xlabel{GETNBS}GETNBS\label{GETNBS}}
 
    GETNBS \hspace{.5cm}  nbsname \hspace{.5cm} (variable)
 
@@ -3528,18 +3277,18 @@ Get the value of a noticeboard item
 \end{description}
 
 The noticeboard name must correspond to a primitive item with one of the
-standard HDS types ({\em e.g.} \_INTEGER).
+standard HDS types (\emph{e.g.} \_INTEGER).
 A dot notation is used to specify structure
-components ({\em e.g.} NOTICEBOARD.ITEM1.ITEM2). If the primitive item is an array
+components (\emph{e.g.} NOTICEBOARD.ITEM1.ITEM2). If the primitive item is an array
 only the first component is accessed.
 
 
-\section{\xlabel{GETPAR}GETPAR\label{GETPAR}}
+\subsection{\xlabel{GETPAR}GETPAR\label{GETPAR}}
 
    GETPAR \hspace{.5cm} command \hspace{.5cm} parameter \hspace{.5cm} (variable)
 
 Get the value of a parameter from the task's parameter file.
-This will only be relevant for parameters which are not {\em internal}.
+This will only be relevant for parameters which are not \emph{internal}.
 
 \begin{description}
 
@@ -3553,7 +3302,7 @@ This will only be relevant for parameters which are not {\em internal}.
 
 \end{description}
 
-\section{\xlabel{HELP}HELP\label{HELP}}
+\subsection{\xlabel{HELP}HELP\label{HELP}}
 
    HELP \hspace{.5cm} [topic...]
 
@@ -3564,11 +3313,11 @@ This will only be relevant for parameters which are not {\em internal}.
 
 \item[topic...]  - An optional list of keywords specifying the path within the
 help library to the required information.
-The first keyword may be the {\em name} specified in a DEFHELP command.
+The first keyword may be the \emph{name} specified in a DEFHELP command.
 
 \end{description}
 
-\section{\xlabel{INPUT}INPUT\label{INPUT}}
+\subsection{\xlabel{INPUT}INPUT\label{INPUT}}
 
    INPUT \hspace{.5cm} [prompt] \hspace{.5cm}  (string)
 
@@ -3582,7 +3331,7 @@ The first keyword may be the {\em name} specified in a DEFHELP command.
 \end{description}
 
 
-\section{\xlabel{INPUTI}INPUTI\label{INPUTI}}
+\subsection{\xlabel{INPUTI}INPUTI\label{INPUTI}}
 
 
     INPUTI \hspace{.5cm} prompt \hspace{.5cm} (i) \hspace{.5cm} (j)  ....
@@ -3597,7 +3346,7 @@ The first keyword may be the {\em name} specified in a DEFHELP command.
 
 \end{description}
 
-\section{\xlabel{INPUTL}INPUTL\label{INPUTL}}
+\subsection{\xlabel{INPUTL}INPUTL\label{INPUTL}}
 
 
     INPUTL \hspace{.5cm} prompt \hspace{.5cm} (l) \hspace{.5cm} (m)  ....
@@ -3615,7 +3364,7 @@ The logical values may be input as YES, NO, TRUE, FALSE or any
 abbreviation of these, in either upper or lower case.
 
 
-\section{\xlabel{INPUTR}INPUTR\label{INPUTR}}
+\subsection{\xlabel{INPUTR}INPUTR\label{INPUTR}}
 
     INPUTR \hspace{.5cm} prompt \hspace{.5cm} (x) \hspace{.5cm} (y)  ....
 
@@ -3629,7 +3378,7 @@ abbreviation of these, in either upper or lower case.
 
 \end{description}
 
-\section{\xlabel{KEY}KEY\label{KEY}}
+\subsection{\xlabel{KEY}KEY\label{KEY}}
 
     KEY  \hspace{.5cm} keyname \hspace{.5cm} equivalence\_string
 
@@ -3649,7 +3398,7 @@ The KEY command may be used at any time but the definition is only
 effective when screen mode is in use (however, the first SET SCREEN call
 in a session clears all key definitions).
 
-\section{\xlabel{KEYTRAP}KEYTRAP\label{KEYTRAP}}
+\subsection{\xlabel{KEYTRAP}KEYTRAP\label{KEYTRAP}}
 
     KEYTRAP  \hspace{.5cm} keyname
 
@@ -3666,7 +3415,7 @@ effective when screen mode is in use (however, the first SET SCREEN call
 in a session clears all key definitions). The INKEY function is used to test
 for the pressing of a trapped key.
 
-\section{\xlabel{KEYUSER}KEYUSER\label{KEYUSER}}
+\subsection{\xlabel{KEYUSER}KEYUSER\label{KEYUSER}}
 
     KEYUSER  \hspace{.5cm} keyname  \hspace{.5cm} image \hspace{.5cm} routine
 
@@ -3689,7 +3438,7 @@ in a session clears all key definitions). KEYUSER causes the specified routine
 to be called at AST level immediately the key is pressed. If necessary the
 shareable image is activated dynamically
 
-\section{\xlabel{KILL}KILL\label{KILL}}
+\subsection{\xlabel{KILL}KILL\label{KILL}}
 
     KILL \hspace{.5cm} taskname
 
@@ -3701,13 +3450,13 @@ shareable image is activated dynamically
 
 \end{description}
 
-\section{\xlabel{KILLDCL}KILLDCL\label{KILLDCL}}
+\subsection{\xlabel{KILLDCL}KILLDCL\label{KILLDCL}}
 
     KILLDCL
 
  Kill the DCL subprocess
 
-\section{\xlabel{KILLW}KILLW\label{KILLW}}
+\subsection{\xlabel{KILLW}KILLW\label{KILLW}}
 
     KILLW \hspace{.5cm} taskname
 
@@ -3719,13 +3468,13 @@ shareable image is activated dynamically
 
 \end{description}
 
-\section{\xlabel{LIST}LIST\label{LIST}}
+\subsection{\xlabel{LIST}LIST\label{LIST}}
 
     LIST \hspace{.5cm} proc
 
  List procedure `proc' on the terminal
 
-\section{\xlabel{LOAD}LOAD\label{LOAD}}
+\subsection{\xlabel{LOAD}LOAD\label{LOAD}}
 
     LOAD  file
 
@@ -3733,7 +3482,7 @@ shareable image is activated dynamically
 
  `file' may specify a procedure previously saved using the SAVE command.
 
-\section{\xlabel{LOADD}LOADD\label{LOADD}}
+\subsection{\xlabel{LOADD}LOADD\label{LOADD}}
 
 
     LOADD \hspace{.5cm} exename \hspace{.5cm} [taskname] \hspace{.5cm} [priority]
@@ -3753,7 +3502,7 @@ shareable image is activated dynamically
 
 \end{description}
 
-\section{\xlabel{LOADW}LOADW\label{LOADW}}
+\subsection{\xlabel{LOADW}LOADW\label{LOADW}}
 
 
     LOADW \hspace{.5cm} exename \hspace{.5cm} [taskname]
@@ -3770,7 +3519,7 @@ shareable image is activated dynamically
 
 \end{description}
 
-\section{\xlabel{MOUNT}MOUNT\label{MOUNT}}
+\subsection{\xlabel{MOUNT}MOUNT\label{MOUNT}}
 
     MOUNT \hspace{.5cm} dev \hspace{.5cm} [ (status) ]
 
@@ -3783,7 +3532,7 @@ shareable image is activated dynamically
 
  MOUNT may be abbreviated to MOU.
 
-\section{\xlabel{NOREP}NOREP\label{NOREP}}
+\subsection{\xlabel{NOREP}NOREP\label{NOREP}}
 
    NOREP
 
@@ -3791,7 +3540,7 @@ Turn off reporting. Reporting is turned on by the REPORT command.
 
 
 
-\section{\xlabel{OBEYW}OBEYW\label{OBEYW}}
+\subsection{\xlabel{OBEYW}OBEYW\label{OBEYW}}
 
     OBEYW \hspace{.5cm} taskname \hspace{.5cm} action  . . .
 
@@ -3808,7 +3557,7 @@ Turn off reporting. Reporting is turned on by the REPORT command.
 
 \end{description}
 
-\section{\xlabel{OPEN}OPEN\label{OPEN}}
+\subsection{\xlabel{OPEN}OPEN\label{OPEN}}
 
    OPEN \hspace{.5cm} intname \hspace{.5cm} [filename]
 
@@ -3824,19 +3573,19 @@ Turn off reporting. Reporting is turned on by the REPORT command.
 
 \end{description}
 
-\section{\xlabel{PRINT}PRINT\label{PRINT}}
+\subsection{\xlabel{PRINT}PRINT\label{PRINT}}
 
     PRINT  \hspace{.5cm}  p1 \hspace{.5cm} p2  ....
 
  The parameters of PRINT are concatenated and printed on the terminal.
 
-\section{\xlabel{PROCS}PROCS\label{PROCS}}
+\subsection{\xlabel{PROCS}PROCS\label{PROCS}}
 
     PROCS
 
  List the names of all current procedures.
 
-\section{\xlabel{PUTNBS}PUTNBS\label{PUTNBS}}
+\subsection{\xlabel{PUTNBS}PUTNBS\label{PUTNBS}}
 
    PUTNBS \hspace{.5cm}  nbsname \hspace{.5cm} value
 
@@ -3851,13 +3600,13 @@ Write the value of a noticeboard item
 \end{description}
 
 The noticeboard name must correspond to a primitive item with one of the
-standard HDS types ({\em e.g.} \_INTEGER).
+standard HDS types (\emph{e.g.} \_INTEGER).
 A dot notation is used to specify structure
-components ({\em e.g.} NOTICEBOARD.ITEM1.ITEM2).
+components (\emph{e.g.} NOTICEBOARD.ITEM1.ITEM2).
 If the primitive item is an array, only the first component is accessed.
 
 
-\section{\xlabel{READ}READ\label{READ}}
+\subsection{\xlabel{READ}READ\label{READ}}
 
    READ \hspace{.5cm} intname \hspace{.5cm}  (string)
 
@@ -3872,7 +3621,7 @@ If the primitive item is an array, only the first component is accessed.
 \end{description}
 
 
-\section{\xlabel{READI}READI\label{READI}}
+\subsection{\xlabel{READI}READI\label{READI}}
 
 
     READI \hspace{.5cm} intname \hspace{.5cm} (i) \hspace{.5cm} (j)  ....
@@ -3888,7 +3637,7 @@ If the primitive item is an array, only the first component is accessed.
 
 \end{description}
 
-\section{\xlabel{READL}READL\label{READL}}
+\subsection{\xlabel{READL}READL\label{READL}}
 
 
     READL \hspace{.5cm} prompt \hspace{.5cm} (l) \hspace{.5cm} (m)  ....
@@ -3907,7 +3656,7 @@ The logical values may be input as YES, NO, TRUE, FALSE or any
 abbreviation of these, in either upper or lower case.
 
 
-\section{\xlabel{READR}READR\label{READR}}
+\subsection{\xlabel{READR}READR\label{READR}}
 
     READR \hspace{.5cm} intname \hspace{.5cm} (x) \hspace{.5cm} (y)  ....
 
@@ -3923,7 +3672,7 @@ abbreviation of these, in either upper or lower case.
 \end{description}
 
 
-\section{\xlabel{REPFILE}REPFILE\label{REPFILE}}
+\subsection{\xlabel{REPFILE}REPFILE\label{REPFILE}}
 
     REPFILE \hspace{.5cm} [logfile] \hspace{.5cm} [DTNS]
 
@@ -3942,12 +3691,12 @@ DTNS is case independent.
 
 \end{description}
 
-\section{\xlabel{REPORT}REPORT\label{REPORT}}
+\subsection{\xlabel{REPORT}REPORT\label{REPORT}}
 
     REPORT \hspace{.5cm} [logfile]
 
 Turn on reporting. After reporting has been turned on, a log of input/output and
-ADAM message system traffic is written to the file specified by {\it logfile}.
+ADAM message system traffic is written to the file specified by \textit{logfile}.
 If the parameter is omitted the logical name ADAM\_LOGFILE is used.
 If the file already exists, the log is appended to it.
 
@@ -3959,7 +3708,7 @@ by ADAMSTART to run this task from DCL.
 The command NOREP turns off reporting.
 
 
-\section{\xlabel{SAVE}SAVE\label{SAVE}}
+\subsection{\xlabel{SAVE}SAVE\label{SAVE}}
 
    SAVE \hspace{.5cm} proc
 
@@ -3971,7 +3720,7 @@ The command NOREP turns off reporting.
 
  Procedures save in this way may be reloaded using LOAD.
 
-\section{\xlabel{SAVEINPUT}SAVEINPUT\label{SAVEINPUT}}
+\subsection{\xlabel{SAVEINPUT}SAVEINPUT\label{SAVEINPUT}}
 
    SAVEINPUT \hspace{.5cm} lines \hspace{.5cm} filename
 
@@ -3980,7 +3729,7 @@ lines to be saved, and `filename' is the file in which they are saved. If
 `filename' is omitted it defaults to SAVEINPUT.ICL in the default directory.
 If `lines' is omitted the entire input buffer is saved.
 
-\section{\xlabel{SEND}SEND\label{SEND}}
+\subsection{\xlabel{SEND}SEND\label{SEND}}
 
     SEND \hspace{.5cm} taskname \hspace{.5cm} context \hspace{.5cm} . . .
 
@@ -4019,25 +3768,25 @@ necessary.
 \end{description}
 \end{description}
 OBEY, SET and GET contexts may be used with A-task monoliths.
-In that case, {\em action} is replaced by {\em atask} and {\em parameter}
-by {\em atask:parameter} where {\em atask} is the name of
+In that case, \emph{action} is replaced by \emph{atask} and \emph{parameter}
+by \emph{atask:parameter} where \emph{atask} is the name of
 the individual A-task within the monolith.
 \end{description}
 
 
-\section{\xlabel{SET}SET\label{SET}}
+\subsection{\xlabel{SET}SET\label{SET}}
 
 The SET command is used to control various features of the state of ICL.
 
-\subsection{\xlabel{SET_ATTRIBUTES}SET ATTRIBUTES\label{SET_ATTRIBUTES}}
+\subsubsection{\xlabel{SET_ATTRIBUTES}SET ATTRIBUTES\label{SET_ATTRIBUTES}}
 
    SET ATTRIBUTES \hspace{.5cm} attributes
 
-Sets the attributes for text written with the LOCATE command. {\it attributes}
+Sets the attributes for text written with the LOCATE command. \textit{attributes}
 is a string containing any combination of the letters D (double size),
 B (bold), R (Reverse video), U (underlined) and F (flashing).
 
-\subsection{\xlabel{SET_AUTOLOAD}SET AUTOLOAD, SET NOAUTOLOAD\label{SET_AUTOLOAD}}
+\subsubsection{\xlabel{SET_AUTOLOAD}SET AUTOLOAD, SET NOAUTOLOAD\label{SET_AUTOLOAD}}
 
    SET AUTOLOAD
 
@@ -4048,7 +3797,7 @@ ICL's default is AUTOLOAD.
 If AUTOLOAD is not selected, tasks must be loaded explicitly with command
 ALOAD or LOADW.
 
-\subsection{\xlabel{SET_CHECKPARS}SET CHECKPARS, SET NOCHECKPARS\label{SET_CHECKPARS}}
+\subsubsection{\xlabel{SET_CHECKPARS}SET CHECKPARS, SET NOCHECKPARS\label{SET_CHECKPARS}}
 
    SET CHECKPARS
 
@@ -4059,28 +3808,28 @@ ICL's default is CHECKPARS -- in that case a procedure will not be executed
 unless the correct number of parameters is supplied. NOCHECKPARS allows
 the procedure to use the UNDEFINED function to test if the parameter was
 supplied and prompt if not.
-{\em Note that only trailing parameters may be omitted.}
+\emph{Note that only trailing parameters may be omitted.}
 
-\subsection{\xlabel{SET_EDITOR}SET EDITOR\label{SET_EDITOR}}
+\subsubsection{\xlabel{SET_EDITOR}SET EDITOR\label{SET_EDITOR}}
 
    SET EDITOR \hspace{.5cm} name
 
-Sets the editor to be used for editing of ICL procedures. {\em name}
+Sets the editor to be used for editing of ICL procedures. \emph{name}
 must be one of TPU, EDT or LSE. (LSE may not be available on all systems).
 The default editor is TPU.
 
-\subsection{\xlabel{SET_HELPFILE}SET HELPFILE\label{SET_HELPFILE}}
+\subsubsection{\xlabel{SET_HELPFILE}SET HELPFILE\label{SET_HELPFILE}}
 
    SET HELPFILE library
 
 Specifies a help library to be used by the ICL HELP system for topics other
 than those specified by a DEFHELP command. The library specification
-{\em library} should include a directory specification.
+\emph{library} should include a directory specification.
 
 The default help library is ICLDIR:ICLHELP.
 
 
-\subsection{\xlabel{SET_MESSAGES}SET MESSAGES, SET NOMESSAGES\label{SET_MESSAGES}}
+\subsubsection{\xlabel{SET_MESSAGES}SET MESSAGES, SET NOMESSAGES\label{SET_MESSAGES}}
 
    SET MESSAGES
 
@@ -4089,7 +3838,7 @@ The default help library is ICLDIR:ICLHELP.
 These commands control whether or not loading messages are output when
 ADAM tasks are loaded. By default loading messages are output.
 
-\subsection{\xlabel{SET_PRECISION}SET PRECISION\label{SET_PRECISION}}
+\subsubsection{\xlabel{SET_PRECISION}SET PRECISION\label{SET_PRECISION}}
 
    SET PRECISION \hspace{.5cm} digits
 
@@ -4097,14 +3846,14 @@ Set the number of decimal digits precision for unformatted conversions
 of real values to strings. The default value is 6 and may be set to any
 value between 1 and 16.
 
-\subsection{\xlabel{SET_PROMPT}SET PROMPT\label{SET_PROMPT}}
+\subsubsection{\xlabel{SET_PROMPT}SET PROMPT\label{SET_PROMPT}}
 
    SET PROMPT \hspace{.5cm} string
 
 This command can be used to specify a prompt string to replace the
 default ICL$>$ prompt.
 
-\subsection{\xlabel{SET_SAVE}SET SAVE, SET NOSAVE\label{SET_SAVE}}
+\subsubsection{\xlabel{SET_SAVE}SET SAVE, SET NOSAVE\label{SET_SAVE}}
 
    SET SAVE
 
@@ -4114,7 +3863,7 @@ This command controls whether ICL procedures are saved in a SAVE.ICL file
 when ICL exits. By default a SAVE.ICL file is created if there are any
 procedures to save.
 
-\subsection{\xlabel{SET_SCREEN}SET SCREEN, SET NOSCREEN\label{SET_SCREEN}}
+\subsubsection{\xlabel{SET_SCREEN}SET SCREEN, SET NOSCREEN\label{SET_SCREEN}}
 
    SET SCREEN n
 
@@ -4124,7 +3873,7 @@ These commands select screen I/O mode or normal I/O mode. On the SET SCREEN
 mode the parameter n specifies the number of lines in the scrolling region.
 If n is omitted eight lines of scrolling region are allocated.
 
-\subsection{\xlabel{SET_TRACE}SET TRACE, SET NOTRACE\label{SET_TRACE}}
+\subsubsection{\xlabel{SET_TRACE}SET TRACE, SET NOTRACE\label{SET_TRACE}}
 
    SET TRACE
 
@@ -4136,7 +3885,7 @@ output on the terminal before execution.
 
 
 
-\section{\xlabel{SETGLOBAL}SETGLOBAL\label{SETGLOBAL}}
+\subsection{\xlabel{SETGLOBAL}SETGLOBAL\label{SETGLOBAL}}
 
    SETGLOBAL \hspace{.5cm}  parameter \hspace{.5cm} value
 
@@ -4155,12 +3904,12 @@ This is usually OK but could give problems with \_LOGICAL parameters.
 The CREATEGLOBAL command can be used to create global parameter storage of a
 specific type.
 
-\section{\xlabel{SETPAR}SETPAR\label{SETPAR}}
+\subsection{\xlabel{SETPAR}SETPAR\label{SETPAR}}
 
    SETPAR \hspace{.5cm} command \hspace{.5cm} parameter \hspace{.5cm} value
 
 Set the value of a parameter into the task's parameter file.
-This will only be relevant for parameters which are not {\em internal}.
+This will only be relevant for parameters which are not \emph{internal}.
 
 \begin{description}
 
@@ -4181,7 +3930,7 @@ subsequent execution of the command.
 Note that if the task is loaded, it will probably have its parameter file open
 and locked against ICL writing into it.
 
-\section{\xlabel{SIGNAL}SIGNAL\label{SIGNAL}}
+\subsection{\xlabel{SIGNAL}SIGNAL\label{SIGNAL}}
 
    SIGNAL \hspace{.5cm} name  \hspace{.5cm} [text]
 
@@ -4200,7 +3949,7 @@ for the exception. Otherwise a message will be output, and control will
 return to direct mode.
 
 
-\section{\xlabel{SPAWN}SPAWN\label{SPAWN}}
+\subsection{\xlabel{SPAWN}SPAWN\label{SPAWN}}
 
     SPAWN \hspace{.5cm}  [ dcl\_command ]
 
@@ -4216,7 +3965,7 @@ return to direct mode.
  their parameters, for example, whereas commands issued using DCL will not.
 
 
-\section{\xlabel{STARTOBEY}STARTOBEY\label{STARTOBEY}}
+\subsection{\xlabel{STARTOBEY}STARTOBEY\label{STARTOBEY}}
 
    STARTOBEY \hspace{.5cm} (path) \hspace{.5cm} (messid) \hspace{.5cm} task
 \hspace{.5cm} action \hspace{.5cm} value
@@ -4240,35 +3989,35 @@ return to direct mode.
 
 \end{description}
 
-\section{\xlabel{TASKS}TASKS\label{TASKS}}
+\subsection{\xlabel{TASKS}TASKS\label{TASKS}}
 
    TASKS
 
  List all loaded ADAM tasks.
 
-\section{\xlabel{VARS}VARS\label{VARS}}
+\subsection{\xlabel{VARS}VARS\label{VARS}}
 
    VARS \hspace{.5cm} [ proc ]
 
  Lists the variables of procedure `proc' with their current types and
  values. VARS with no parameters lists the variables at direct mode.
 
-\section{\xlabel{WAIT}WAIT\label{WAIT}}
+\subsection{\xlabel{WAIT}WAIT\label{WAIT}}
 
     WAIT  interval
 
-Wait for a specified {\it interval} expressed in seconds.
+Wait for a specified \textit{interval} expressed in seconds.
 
-\section{\xlabel{WRITE}WRITE\label{WRITE}}
+\subsection{\xlabel{WRITE}WRITE\label{WRITE}}
 
     WRITE  intname \hspace{.5cm}  p2 \hspace{.5cm} p3  ....
 
  The parameters of WRITE are concatenated and written to the text file
-of name {\it intname}. This file must have been previously opened with an
+of name \textit{intname}. This file must have been previously opened with an
 APPEND or CREATE command.
 
 
-\chapter{\xlabel{icl_exceptions}ICL Exceptions}
+\section{\xlabel{icl_exceptions_appendix}ICL Exceptions}
 \begin{center}
 \begin{tabular}{ll}
 \\
@@ -4324,7 +4073,7 @@ NBSERR  &  Error in GETNBS or PUTNBS. \\
 \\
 OPENERR  &  Error opening text file. \\
 \\
-OPNOTLOG  &  Operands of a logical operator (AND, OR {\em etc.}) are \\
+OPNOTLOG  &  Operands of a logical operator (AND, OR \emph{etc.}) are \\
    &  not logical values.  \\
 \\
 OPNOTNUM  &  Operands of a formatting operation (:) are not  \\
@@ -4357,7 +4106,7 @@ name & description \\
 \\
 TOOMANYPARS  &  Too many parameters for a procedure or command. \\
 \\
-UNDEFVAR  &  Attempt to use an undefined variable --- {\em i.e.} one \\
+UNDEFVAR  &  Attempt to use an undefined variable --- \emph{i.e.} one \\
   & that has not yet had a value assigned.  \\
 \\
 UNDEXP  &  Undefined Exponentiation.  \\
@@ -4373,23 +4122,23 @@ WRITERR  &  Error writing to text file. \\
 \end{tabular}
 \end{center}
 
-\chapter{\xlabel{icl_syntax}ICL Syntax}
+\section{\xlabel{icl_syntax}ICL Syntax}
 The following gives a formal definition of the syntax of ICL.
 Note that there are in effect two levels to the ICL Syntax. One
 level describes how statements (strictly simple\_statements as defined
 below) are built up, while a second level
 describes how statements (normally one per line) are combined to form
-control structures and procedures. The definitions of {\em if\_block},
-{\em loop\_block} and {\em procedure} below form the second level syntax,
+control structures and procedures. The definitions of \emph{if\_block},
+\emph{loop\_block} and \emph{procedure} below form the second level syntax,
 and in these cases items on different lines in the definition, must
 appear on separate lines. The notation is as follows.
 \begin{itemize}
 
 \item Lower case words denote non terminal symbols of the grammar.
-{\em i.e.} symbols which are defined in terms of other symbols.
+\emph{i.e.} symbols which are defined in terms of other symbols.
 
 \item Upper case words or other characters are terminal symbols.
-{\em i.e.} the basic lexical elements out of which the language is built.
+\emph{i.e.} the basic lexical elements out of which the language is built.
 
 \item The construction  \verb+a | b+ denotes a choice between two options.
 
@@ -4404,7 +4153,7 @@ identifiers, or numbers. Spaces may be used as separators in parameter
 lists. layout is currently restricted to one statement per line. Thus the
 end of line character is effectively a statement separator.
 
-\begin{verbatim}
+\begin{terminalv}
 
 letter  =   any of the letters A to Z or a to z
 
@@ -4523,6 +4272,6 @@ procedure  =  PROC identifier [  identifier  { [,]  identifier }  ]
                 END EXCEPTION }
               END PROC
 
-\end{verbatim}
+\end{terminalv}
 
 \end{document}
