@@ -1,34 +1,30 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardoccopyright
 {Copyright \copyright\ 2000-2004 Council for the Central Laboratory of the
 Research Councils \newline\
 Copyright \copyright\ 2008-2009 Science and Technology Facilities Council}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {199.12}
-\newcommand{\stardocauthors}   {P W Draper\\
+\stardocnumber      {199.12}
+\stardocauthors   {P W Draper\\
                                 A J Chipperfield\\
                                 M D Lawden}
-\newcommand{\stardocdate}      {26 January 2009}
-\newcommand{\stardoctitle}     {Star2HTML\\[1ex]
+\stardocdate        {26 January 2009}
+\stardoctitle     {Star2HTML\\[1ex]
                                 Converting Starlink Documents to Hypertext}
-\newcommand{\stardocversion}   {Version 1.6}
-\newcommand{\stardocmanual}    {User's Manual}
-\newcommand{\stardocabstract}{
+\stardocversion     {Version 1.6}
+\stardocmanual      {User's Manual}
+\stardocabstract{
 Star2HTML lets you write (or convert) a
 \xref{Starlink document}{sug}{}
  so that you can create two versions of it from a single source file.
@@ -48,276 +44,32 @@ This document explains these new facilities, and gives advice on good
 practice and on how to deal with some specific formatting problems when
 converting a document to hypertext.
 You are assumed to be familiar with \LaTeX.
-}
+
+\emph{The advice in this document, in particular that found in
+  Section~\ref{common_problems}, covers the \latextohtml-based
+  document conversion system and not the more modern
+  \texttt{tex4ht}-based system.}  }
 % ? End of document identification
 % -----------------------------------------------------------------------------
+% ? Document specific \providecommand or \newenvironment commands.
+\providecommand{\dash}{--}
 
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.1p7 and
-%        Star2HTML version 1.6.
-%     {Add further history here}
-%
-% -
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with Star2HTML.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process, in this case raw
-%  TeX and some command redefinitions that we only want when using LaTeX).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
+\providecommand{\HTMLURL}{http://www.w3.org/hypertext/WWW/MarkUp/MarkUp.html}
+\providecommand{\LtoHURL}{http://www.tex.ac.uk/tex-archive/support/latex2html/}
+\providecommand{\LtoHManURL}{http://astro.dur.ac.uk/~{}pdraper/latex2html/manual2002/}
+\providecommand{\supportURL}{http://astro.dur.ac.uk/\~{}pdraper/star2html/star2html.html}
 
 %  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+\providecommand{\latextohtml}{\LaTeX2\texttt{HTML}}
 
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
 
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-
-%  End of latexonly comment section -- do not remove.
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-\newcommand{\dash}{--}
-\begin{htmlonly}
-  \newcommand{\dash}{-}
-\end{htmlonly}
-\newcommand{\HTMLURL}{http://www.w3.org/hypertext/WWW/MarkUp/MarkUp.html}
-\newcommand{\LtoHURL}{http://www.tex.ac.uk/tex-archive/support/latex2html/}
-\newcommand{\LtoHManURL}{http://astro.dur.ac.uk/~{}pdraper/latex2html/manual2002/}
-\newcommand{\supportURL}{http://astro.dur.ac.uk/\~{}pdraper/star2html/star2html.html}
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
-                        {http://www.scitech.ac.uk} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.scitech.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? LateX Copyright Statement
-%  =========================
-\begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
-\end{latexonly}
-% ? End of Latex copyright statement
-
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section{\xlabel{introduction}Introduction}
 
@@ -338,9 +90,9 @@ version (when processed by \LaTeX) and a hypertext version (when processed by
 Copy one of the Starlink template documents into a working directory:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 # cp $STARLINK_DIR/share/sun.tex .
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 This file is a skeleton \LaTeX\ source file and will give your document a
@@ -349,11 +101,11 @@ standard style and extra hypertext facilities.
 Get a paper copy to look at (or use \texttt{xdvi} if you prefer):
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 # latex sun
 # dvips sun
 # lpr -P1 sun.ps
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 You've produced a Starlink User Note!
@@ -364,9 +116,9 @@ You've got a paper version of the document.
 Now use Star2HTML to produce a hypertext version:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 # star2html sun
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 A lot of alarming messages, dots, and general gobbledygook appear on your
@@ -381,9 +133,9 @@ same source file (\texttt{sun.tex}).
 Now use a web browser to look at the hypertext version:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 # showme ./sun
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 Compare the two versions.
@@ -493,11 +245,11 @@ described in detail below.
 The sections of the template you need to change are contained between comments
 like:
 
-\begin{quote}
-\verb+% ? Section description+\\
-\ldots\\
-\verb+% ? End of section description+
-\end{quote}
+\begin{terminalv}
+% ? Section description
+...
+% ? End of section description
+\end{terminalv}
 
 Some just indicate where you should put any special commands required by
 your document, others contain sections of code which should be commented
@@ -517,9 +269,9 @@ The section headings to look for are:
 
 \begin{quote}
 Any \LaTeX\ extension packages which are used in your document should
-be listed here in a {\tt \\usepackage} command like:
+be listed here in a \texttt{\\usepackage} command like:
 \begin{quote}
-\verb+\usepackage{graphicx}+
+%\verb+\usepackage+
 \end{quote}
 The section contains commented out commands for the commonly-used
 \verb+graphicx+ package \dash\ don't forget to use the \texttt{draft} option of
@@ -554,30 +306,30 @@ being described (like \texttt{Version 1.1-2}).
  and will be given the title \emph{Abstract}.
  If you don't want to supply an abstract, delete this line, and also delete
  the other sections which are used to create abstracts:
-\begin{quote}
-\verb#% ? Heading for abstract if used#\\
-\ldots\\
-\verb#% ? End of heading for abstract#
-\end{quote}
+\begin{terminalv}
+% ? Heading for abstract if used
+...
+% ? End of heading for abstract
+\end{terminalv}
  and
-\begin{quote}
-\verb#% ? New section for abstract if used#\\
-\ldots\\
-\verb#% ? End of new section for abstract#
-\end{quote}
+\begin{terminalv}
+% ? New section for abstract if used
+...
+% ? End of new section for abstract
+\end{terminalv}
  and
-\begin{quote}
-\verb#% ? Document Abstract. (if used)#\\
-\ldots\\
-\verb#% ? End of document abstract#
-\end{quote}
+\begin{terminalv}
+% ? Document Abstract. (if used)
+...
+% ? End of document abstract
+\end{terminalv}
 One point to note is that if you want to include a paragraph break in your
 abstract, you must use the \verb+\par+ command rather than just leaving a
 blank line in the text.
 \end{itemize}
 \end{quote}
 
-\verb+% ? Document specific \newcommand or \newenvironment commands+
+\verb+% ? Document specific \providecommand or \newenvironment commands+
 
 \begin{quote}
 Use this section to add any extra definitions that you want to use in the body
@@ -586,10 +338,10 @@ Most documents don't have anything added to this section, but some
 ({\em{e.g.}}\ SUN/95) define a large number of new commands here.
 Just leave this section alone if you don't want to add anything to it.
 \end{quote}
-\begin{verbatim}
+\begin{terminalv}
 % ? Add picture here if required for the LaTeX version
 % ? Add picture here if required for the hypertext version
-\end{verbatim}
+\end{terminalv}
 \begin{quote}
 Use these sections to add any pictures that you want to display on the front
 page of your document.
@@ -629,9 +381,9 @@ and unstructured.
 
 If your document uses the standard macros defined for the Simple
 Software Tools (SST) package on VMS, then you should add the command:
-\begin{quote}
-\verb+\+\verb+input{/star/share/sst}+
-\end{quote}
+\begin{terminalv}
+\input{/star/share/sst}
+\end{terminalv}
 to the ``Document specific \ldots commands'' section of the template.
 The new definitions are a direct replacement for the old macros and should not
 cause any problems for existing documents unless you have modified the old
@@ -663,11 +415,9 @@ in hypertext).
 If you want to use some descriptive text for the link instead of the button
 (or if you want to add a new internal link), use the command:
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 \htmlref{text}{label}
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 \texttt{text} is the text that will be highlighted as the link (it will also
 appear in the paper version of your document as ordinary text).
@@ -677,21 +427,21 @@ the \verb#\label# command.
 For example, the source code for the heading of the current top-level section
 might be:
 
-\begin{quote}
-\verb+\section{\label{adding_links}Adding links}+
-\end{quote}
+\begin{terminalv}
+\section{\label{adding_links}Adding links}
+\end{terminalv}
 
 You could then create a link to this section by a reference like:
 
-\begin{quote}
-\verb+... refer to the \htmlref{Adding links}{adding_links} section.+
-\end{quote}
+\begin{terminalv}
+... refer to the \htmlref{Adding links}{adding_links} section.
+\end{terminalv}
 
 This will appear in both versions as:
 
-\begin{quote}
-\ldots refer to the Adding links section.
-\end{quote}
+\begin{terminalv}
+... refer to the Adding links section.
+\end{terminalv}
 
 but in the hypertext version, ``Adding links'' is indicated as a link.
 When activated, it will take the reader to that section.
@@ -701,11 +451,9 @@ description.
 If a reference is made to a routine, say PISAPLOT, in the main text, a link
 to the full description of the routine can be made by:
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 \htmlref{PISAPLOT}{PISAPLOT}
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 The word ``PISAPLOT'' will appear in both versions, but in the hypertext version
 it will be a link to the description of the routine.
@@ -714,11 +462,9 @@ it will be a link to the description of the routine.
 
 To add a link to an external web page, use the command:
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 \htmladdnormallink{text}{URL}
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 \texttt{text} will appear in both versions, but in the hypertext version it
 will be a link to the web page with the specified
@@ -728,11 +474,9 @@ will be a link to the web page with the specified
 To add the URL as a footnote in the paper version, use the following command
 instead:
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 \htmladdnormallinkfoot{text}{URL}
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 \subsection{\xlabel{links_between_starlink_documents}Links between Starlink documents}
 
@@ -742,20 +486,16 @@ Similarly, the Star2HTML command \verb#\xlabel# allows hypertext links to be
 set up from other Starlink documents to your document.
 Its format is:
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 \xlabel{label}
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 Other documents can create a link to it by using \verb+\xref+.
 The format of \verb+\xref+ is:
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 \xref{text}{doc}{label}
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 \texttt{text} will appear in both versions, but in the hypertext version it
 will be a link to the place labelled \texttt{label} (with \verb+\xlabel+) in
@@ -772,11 +512,9 @@ In this case, the name of the label can be the same in both commands since
 
 You can create a link to any Starlink document by a command like:
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 \xref{SUN/x}{sunx}{}
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 This link will take you to the beginning of the document as the templates
 contain an \verb#\xlabel# with a blank label on the title page of the document.
@@ -793,13 +531,11 @@ resolution.
 Thus, if your document contains links to other Starlink documents, you
 can convert, link it locally, and view it by:
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 # star2html sunx
 # hlink
 # showme ./sunx
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 The Starlink hypertext linker, \texttt{hlink}, is more fully described in
 \xref{SUN/188}{sun188}{}.
@@ -819,18 +555,16 @@ words separated by underscore.
 
 For example, the subsection you are now reading has been labelled as follows:
 
-\begin{quote}
-\verb+\subsection{\xlabel{labelling_sections}Labelling sections}+
-\end{quote}
+\begin{terminalv}
+\subsection{\xlabel{labelling_sections}Labelling sections}
+\end{terminalv}
 
 and other documents can create a link to it by using \verb+\xref+ as in:
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 See SUN/199 for more on
 \xref{labelling sections}{sun199}{labelling_sections}.
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 You can use the \texttt{xlabel} command from the Unix shell to ensure that your
 document has the recommended \verb+\xlabel+'s for each section and subsection.
@@ -859,18 +593,9 @@ you can include links to routine descriptions in other documents which have
 used the SST macros.
 
 For example:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 \xref{CHR\_LEN}{sun40}{CHR_LEN} finds the used length of a string.
-\end{verbatim}
-\end{quote}
-\begin{htmlonly}
-would produce:
-\begin{quote}
-\xref{CHR\_LEN}{sun40}{CHR_LEN} finds the used length of a string.
-\end{quote}
-\end{htmlonly}
-
+\end{terminalv}
 
 \section{\xlabel{adapting_to_the_media}\label{conditional_text}Adapting to the media}
 
@@ -924,40 +649,14 @@ If you want to have a section that only appears in the paper version
 of your document, then your document preamble must define new commands
 to replace the \LaTeX\ sectioning commands, for example:
 
-\begin{latexonly}
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 % Latex only sections, subsections etc.
 % Use these in a latexonly environment.
-\newcommand{\latexonlysection}[1]{\section{#1}}
-\newcommand{\latexonlysubsection}[1]{\subsection{#1}}
-\newcommand{\latexonlysubsubsection}[1]{\subsubsection{#1}}
-\begin{htmlonly}
-   \newcommand{\latexonlysection}[1]{#1}
-   \newcommand{\latexonlysubsection}[1]{#1}
-   \newcommand{\latexonlysubsubsection}[1]{#1}
-\end{htmlonly}
-\end{verbatim}
-\end{quote}
-\end{latexonly}
-%  Repeat for HTML version (begin/end htmlonly cause problems).
-\begin{rawhtml}
-<P>
-<BLOCKQUOTE>
-<PRE>
-% Latex only sections, subsections etc.
-% Use these in a latexonly environment.
-\newcommand{\latexonlysection}[1]{\section{#1}}
-\newcommand{\latexonlysubsection}[1]{\subsection{#1}}
-\newcommand{\latexonlysubsubsection}[1]{\subsubsection{#1}}
-<TT>\begin</TT><TT>{htmlonly}</TT>
-   \newcommand{\latexonlysection}[1]{#1}
-   \newcommand{\latexonlysubsection}[1]{#1}
-   \newcommand{\latexonlysubsubsection}[1]{#1}
-<TT>\end</TT><TT>{htmlonly}</TT>
-</PRE>
-</BLOCKQUOTE>
-\end{rawhtml}
+\providecommand{\latexonlysection}[1]{\section{#1}}
+\providecommand{\latexonlysubsection}[1]{\subsection{#1}}
+\providecommand{\latexonlysubsubsection}[1]{\subsubsection{#1}}
+
+\end{terminalv}
 
 You must then use these new commands instead of the normal sectioning
 commands, for example:
@@ -1003,29 +702,21 @@ missing parts in your hypertext version.
 The only thing to do is to use \LaTeX\ equivalents of the \TeX\ commands.
 
 For example use:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 \newfont{\ssttt}{cmtt10 scaled 1095}
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 instead of:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 \font\ssttt=cmtt10 scaled 1095
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 or
-\begin{quote}
-\begin{verbatim}
-\newcommand{\_}{\texttt\symbol{95}}
-\end{verbatim}
-\end{quote}
+\begin{terminalv}
+\providecommand{\_}{\texttt\symbol{95}}
+\end{terminalv}
 instead of:
-\begin{quote}
-\begin{verbatim}
-\newcommand{\_}{\tt\char'137}
-\end{verbatim}
-\end{quote}
+\begin{terminalv}
+\providecommand{\_}{\tt\char'137}
+\end{terminalv}
 and so on.
 
 \subsubsection{Parboxes}
@@ -1048,67 +739,49 @@ Use the \verb#tabular# environment instead.
 \subsubsection{\xlabel{suppressing_blank_lines}Unwanted blank lines}
 
 Consider the source text:
-\begin{quote}
-{\tt
-Some text\\
-\verb+\latex{for latex readers.}+\\
-\verb+\html{HTML readers.}+
-}
-\end{quote}
+\begin{terminalv}
+Some text
+\latex{for latex readers.}
+\html{HTML readers.}
+\end{terminalv}
 You'd expect the generated text to look like:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 Some text for latex readers.
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 in the paper version, and
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 Some text for HTML readers.
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 in the hypertext version.
 However, the hypertext version comes out like:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 Some text
 
 for HTML readers.
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 because the \verb+\latex+ line is replaced by a blank line and
 consequently ends up as a paragraph break.
 To get around this you must include some text on the \verb+\latex+ line,
 as in:
-\begin{quote}
-{\tt
-Some text
-\verb+\latex{for latex readers.} \html{for HTML readers.}+
-}
-\end{quote}
+\begin{terminalv}
+Some text \latex{for latex readers.} \html{for HTML readers.}
+\end{terminalv}
 Or you could get the same effect using the \verb+\latexhtml+ command:
-\begin{quote}
-{\tt
-Some text
-\verb+\latexhtml{for latex readers.}{for HTML readers.}+
-}
-\end{quote}
+\begin{terminalv}
+Some text \latexhtml{for latex readers.}{for HTML readers.}
+\end{terminalv}
 
 
 \subsubsection{Tildas in URLs}
 
 To get a tilda into a URL, use:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 \htmladdnormallink{My home page at RAL}{http://star.rl.ac.uk/\~{}me}
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 instead of:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 \htmladdnormallink{My home page at RAL}{http://star.rl.ac.uk/~me}
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 which just throws away the tilda.
 
 \subsection{\xlabel{using_the_htmladdimg_command_to_replace_figures}Using the {\texttt{htmladdimg}} command to replace figures}
@@ -1116,11 +789,9 @@ which just throws away the tilda.
 The \verb+\htmladdimg+ command is used to display an image stored in an
 external file.
 Its form is:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 \htmladdimg{<URL>}
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 where the \texttt{URL} is the hypertext address of the image (probably just
 the name of an \texttt{image.gif} file in the default directory).
 
@@ -1128,45 +799,22 @@ It is tempting to use this command to replace existing figures with better
 colour graphics.
 However, you cannot use this command inside a \texttt{figure} environment.
 Instead, you should use something like:
-%begin{latexonly}
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 \begin{latexonly}
   \begin{figure}
     \label{This figure}
-\end{verbatim}
+\end{terminalv}
 \hspace{3cm}\textit{body of figure}
-\begin{verbatim}
+\begin{terminalv}
     \caption{Latex eps version}
   \end{figure}
 \end{latexonly}
-\begin{htmlonly}
-  \label{This figure}
-  \htmladdimg{figure_replacement.gif}
-  Figure: HTML replacement
-\end{htmlonly}
-\end{verbatim}
+
+
+\end{terminalv}
 \end{quote}
-%end{latexonly}
-%  Repeat for HTML version (begin/end htmlonly cause problems).
-\begin{rawhtml}
-<BLOCKQUOTE>
-<PRE>
-<TT>\begin</TT>{latexonly}
-  \begin{figure}
-    \label{This figure}
-        <I>body of figure</I>
-   \caption{Latex eps version}
-  \end{figure}
-<TT>\end</TT>{latexonly}
-<TT>\begin</TT>{htmlonly}
-    \label{This figure}
-    <TT>\htmladdimg</TT>{figure_replacement.gif}
-    Figure: HTML replacement
-<TT>\end</TT>{htmlonly}
-</PRE>
-</BLOCKQUOTE>
-\end{rawhtml}
+
 However, you will not get a figure number in the caption.
 
 \subsection{\xlabel{hints_from_the_starlink_software_librarian}Hints from the Starlink Software Librarian}
@@ -1247,24 +895,8 @@ Lamport, Leslie & & \LaTeX\ User's Guide \& Reference Manual,\\
 \end {tabular}
 \end{latexonly}
 
-\begin{htmlonly}
-Charles, A.C. : \xref{SC/9}{sc9}{} :
- \LaTeX\ cookbook.\\
-Lawden, M.D. : \xref{SGP/28}{sgp28}{} :
- How to write good documents for Starlink.\\
-Lawden, M.D. : \xref{SGP/50}{sgp50}{} :
- Starlink document styles.\\
-Charles, Anne : \xref{SUN/9}{sun9}{} :
- \LaTeX\ - A Document Preparation System.\\
-Warren-Smith, R.F. : \xref{SUN/188}{sun188}{} :
- HTX - Hypertext Cross-Reference Utilities.\\
-Bly, M.J. : \xref{SUN/201}{sun201}{} :
-\latextohtml\ - \LaTeX\ to HTML Conversion.\\
-Drakos, Nikos : MUD/152 :
- A \LaTeX\ to HTML Translator.\\
-Lamport, Leslie : A Document Preparation System.
- \LaTeX\ User's Guide \& Reference Manual, 2nd ed, Addison-Wesley, 1994.
-\end{htmlonly}
+
+
 
 \appendix
 
@@ -1275,20 +907,18 @@ The \texttt{star2html} command sets up a Starlink-specific environment before
 calling \latextohtml\ to produce a hypertext version of a Starlink document.
 A typical invocation, is simply:
 
-\begin{quote}
-\texttt{\# star2html sun199}
-\end{quote}
+\begin{terminalv}
+# star2html sun199
+\end{terminalv}
 
 However, there are some optional switches which you might find useful.
 The full format of the command is:
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 # star2html [-a author(s)] [-aux] [-c copyright_statement]
             [-d document_date] [-m email_address] [-s 0|1]
             [-obsolete] [-t title] [arguments for LaTeX2HTML] document
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 The switches (all of which are optional) have the following meanings:
 
@@ -1526,26 +1156,26 @@ included in the document prologue, not in the text. Now if you have
 not made any other changes to differentiate your on-line and paper
 documents, then you should be able to convert it.
 
-If you have added customized \verb#\newcommands# to your document then
+If you have added customized \verb#\providecommands# to your document then
 you will also need to change any commands that look like:
-\begin{quote}
-\verb!\newcommand{\mycommand}{this version is only for LaTeX}!\\
-\verb!\begin!\verb!{htmlonly}!\\
-\enspace\enspace\hspace*{2em}\verb!\renewcommand{\mycommand}{this version is only for LaTeX2HTML}!\\
-\verb!\end!\verb!{htmlonly}!
-\end{quote}
+\begin{terminalv}
+\providecommand{\mycommand}{this version is only for LaTeX}
+\begin{htmlonly}
+    \renewcommand{\mycommand}{this version is only for LaTeX2HTML}
+\end{htmlonly}
+\end{terminalv}
 to:
-\begin{quote}
-\verb!\newcommand{\mycommand}{this version is only for LaTeX}!\\
-\verb!\begin!\verb!{htmlonly}!\\
-\enspace\enspace\hspace*{2em}\verb!\newcommand{\mycommand}{this version is only for LaTeX2HTML}!\\
-\verb!\end!\verb!{htmlonly}!
-\end{quote}
+\begin{terminalv}
+\providecommand{\mycommand}{this version is only for LaTeX}
+\begin{htmlonly}
+    \providecommand{\mycommand}{this version is only for LaTeX2HTML}
+\end{htmlonly}
+\end{terminalv}
 This is especially important if you have any section control commands
-in the redefinitions (\verb#\newcommand# and \verb#\renewcommand# are
+in the redefinitions (\verb#\providecommand# and \verb#\renewcommand# are
 now dealt with at different stages in the conversion process). In
 general if your \verb#\renewcommand# is just a replacement command then
-you should now use \verb#\newcommand#.
+you should now use \verb#\providecommand#.
 
 If your document is very customized and you do not want to change the whole
 prologue, or the effort seems too great, then try the following sequence of
@@ -1559,42 +1189,32 @@ changes:
       and \verb#%#\verb#\begin{rawtex}# to \verb#%#\verb#begin{latexonly}#.
 \item Move your \verb#sst.tex# definitions into the prologue.
 \item Change any \verb#\renewcommands# in \verb#htmlonly# environments
-      to \verb#\newcommands# (this includes the SST definitions).
+      to \verb#\providecommands# (this includes the SST definitions).
 \item Change any \verb#\latexonly{}# commands to \verb#\latex{}#
 (leave your \verb#latexonly# environments as they are).
 \item Modify the font declaration in the SST definitions to:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
   \latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-  \html{\newcommand{\ssttt}{\tt}}
-\end{verbatim}
-\end{quote}
+  \html{\providecommand{\ssttt}{\tt}}
+\end{terminalv}
 Removing any other such definitions and adding a command:
-\begin{quote}
-\begin{verbatim}
-  \newcommand{\html}[1]{}
-\end{verbatim}
-\end{quote}
+\begin{terminalv}
+  \providecommand{\html}[1]{}
+\end{terminalv}
 To the standard part of the prologue.
 \item An additional space issue means you also need to change:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
   \stardoccategory \stardocnumber \\
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 to:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
   \stardoccategory\ \stardocnumber \\
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 \item And finally add the following definition to the standard part of
       the prologue.
-\begin{quote}
-\begin{verbatim}
- \newcommand{\latexhtml}[2]{#1}
-\end{verbatim}
-\end{quote}
+\begin{terminalv}
+ \providecommand{\latexhtml}[2]{#1}
+\end{terminalv}
 \end{itemize}
 If all this doesn't work then you'll have to do the conversion properly.
 
@@ -1639,7 +1259,7 @@ features of these changes are:
 \item Maths formulae are more carefully translated (\textit{e.g.}
       plain text is used whenever possible, HTML superscript and
       subscript are also used).
-\item \verb#\newcommands# can now be more complex (\textit{i.e.} can
+\item \verb#\providecommands# can now be more complex (\textit{i.e.} can
       include other newcommands). This means existing documents can be
       translated with less effort.
 \item The HTML produced is generally much cleaner (redundant \verb#<P>#'s
