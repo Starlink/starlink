@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_calc_csofit ( const smfData * adata, AstKeyMap* extpars, double **tau,
-*                       size_t *nframes, int *status );
+*                       dim_t *nframes, int *status );
 
 *  Arguments:
 *     adata = const smfData * (Given)
@@ -26,7 +26,7 @@
 *        Pointer to array of double to receive the tau data.
 *        Will be malloced by this routine and should be freed
 *        by the caller.
-*     nframes = size_t * (Returned)
+*     nframes = dim_t * (Returned)
 *        Number of elements in "wvmtau" array.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -94,7 +94,7 @@
 
 
 void smf_calc_csofit( const smfData * data, AstKeyMap* extpars, double **tau,
-                      size_t *nframes, int *status ) {
+                      dim_t *nframes, int *status ) {
 
   JCMTState *allState = NULL;       /* JCMTSTATE information */
   const char * csofit_entry = NULL; /* location of fit file from config file */

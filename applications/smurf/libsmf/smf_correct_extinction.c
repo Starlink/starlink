@@ -435,7 +435,7 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausr
 
   if (*status == SAI__OK && tausrc == SMF__TAUSRC_CSOFIT) {
     /* Calculate the fit but we can use the same cache that WVM uses */
-    size_t nframes = 0;
+    dim_t nframes = 0;
     smf_calc_csofit( data, extpars, &wvmtau, &nframes, status );
     smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
     msgOutiff( MSG__QUIET, "", "Using CSO fits for extinction correction of ^FILE",
@@ -501,7 +501,7 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausr
       /* at this point we either have WVM data handled or we still think we are AUTO.
          Do a CSO FIT check */
       if (tausrc == SMF__TAUSRC_AUTO && *status == SAI__OK) {
-        size_t nframes = 0;
+        dim_t nframes = 0;
         smf_calc_csofit( data, extpars, &wvmtau, &nframes, status );
         if (*status == SAI__OK) {
           smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
