@@ -1,247 +1,31 @@
-\documentclass[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt,nolof,noabs]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {53.3}
-\newcommand{\stardocauthors}   {Marion Fisher\\
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {53.3}
+\stardocauthors   {Marion Fisher\\
                                 William Lupton\\
                                 Anne Charles}
-\newcommand{\stardocdate}      {01 October 1996}
-\newcommand{\stardoctitle}     {ECHWIND --- UCL Echelle Spectrograph\\
+\stardocdate        {01 October 1996}
+\stardoctitle     {ECHWIND --- UCL Echelle Spectrograph\\
                                 Observation Planning Program}
-\newcommand{\stardocversion}   {Version 3.0}
-\newcommand{\stardocmanual}    {User Guide}
-%\newcommand{\stardocabstract}  {[Text of abstract]}
+\stardocversion     {Version 3.0}
+\stardocmanual      {User Guide}
 % ? End of document identification
 
 % -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document specific \providecommand or \newenvironment commands.
+\providecommand{\coude}{coud\'{e}}
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
+\scfrontmatter
 
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-%  \vspace{10mm}
-%  \begin{center}
-%     {\Large\bf Abstract}
-%  \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-% \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-%\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
- \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-%------------------------------------------------------------------------------
-% Add any \newcommand or \newenvironment commands here
-%------------------------------------------------------------------------------
-\newcommand{\coude}{coud\'{e}}
 
 \section{Introduction}
 
@@ -272,32 +56,32 @@ the program in section~\ref{Detailed Description}.
 
 To run echwind, type:
 
-\begin{verbatim}
-      % echwind
-\end{verbatim}
+\begin{terminalv}
+% echwind
+\end{terminalv}
 
 This sets up any necessary environment variables, and runs the program. A
 PGPLOT window will pop up, and you will be prompted for the following
 items:
 
-\begin{verbatim}
-      CONFIG - Instrument configuration?  /UES/31/LONG/ >
-      DETLIST - File containing user detector list?  >
-      DETSYSTEM - File containing system detector list?  /detectors.dat/ >
-      Detector (TEK, EEV6, EEV9, EEV-THIN, LORAL or xx,yy in mm)? > tek
-      ANGWAVE - Slit angle offset or wavelength?  >
-      WAVE - Central wavelength?  >
-      LINES - File containing line list?  > ${ECHWIND_HOME}balmer.dat
-      Graphics device/type (? to see list, default /NULL): /xwin
-\end{verbatim}
+\begin{terminalv}
+CONFIG - Instrument configuration?  /UES/31/LONG/ >
+DETLIST - File containing user detector list?  >
+DETSYSTEM - File containing system detector list?  /detectors.dat/ >
+Detector (TEK, EEV6, EEV9, EEV-THIN, LORAL or xx,yy in mm)? > tek
+ANGWAVE - Slit angle offset or wavelength?  >
+WAVE - Central wavelength?  >
+LINES - File containing line list?  > ${ECHWIND_HOME}balmer.dat
+Graphics device/type (? to see list, default /NULL): /xwin
+\end{terminalv}
 
 The above example shows echwind set up for UES with the 31 echelle and the
 TEK chip, with Balmer lines plotted on the echellogram. If you press
 \verb+<CR>+ after the lines prompt, no lines will be plotted.
 
-For the 'Graphic device/type' answer {\tt /xwin} or whatever is appropriate
+For the 'Graphic device/type' answer \texttt{/xwin} or whatever is appropriate
 for your terminal. Normally you should choose a terminal device type. Device
-types which are output only, such as {\tt /ps}, will result in a plot file being
+types which are output only, such as \texttt{/ps}, will result in a plot file being
 created for the parameters which you have chosen,
 then the program will exit immediately.
 
@@ -332,12 +116,12 @@ The instruments currently supported are UES and UCLES, the default being
 UES with the 31 echelle. Configurations are specified at the CONFIG prompt
 as follows:
 
-\begin{verbatim}
-      UES/31/LONG
-      UES/79/LONG
-      UCLES/31/LONG
-      UCLES/79/LONG
-\end{verbatim}
+\begin{terminalv}
+UES/31/LONG
+UES/79/LONG
+UCLES/31/LONG
+UCLES/79/LONG
+\end{terminalv}
 
 You can change the echelle grating from within the program by selecting the
 ``New ECHELLE'' menu option. This simply switches between the 31 lines/mm and
@@ -358,23 +142,23 @@ than giving the name.
 
 The prompt for the detector name includes the list of supported detectors
 (provided that it is not too long). Your system manager can set up a
-system-wide list in the {\tt \$ECHWIND\_HOME} directory.
-The default file for the system-wide detector list is {\tt detectors.dat}.
+system-wide list in the \texttt{\$ECHWIND\_HOME} directory.
+The default file for the system-wide detector list is \texttt{detectors.dat}.
 In addition you can specify your own private list on
 startup by answering the DETLIST prompt.
 
-The list is read from a text file with a default file extension of {\tt .dat}.
+The list is read from a text file with a default file extension of \texttt{.dat}.
 The file format is very simple: each line
 consists of the detector name in single quotes (like a Fortran CHARACTER
 constant) followed by the detector X and Y sizes in mm, separated by a
 comma. For example, this is the default system-wide detector list for UES:
-\begin{verbatim}
-      'TEK'           24.5,24.5
-      'EEV6'          27.9,25.9
-      'EEV9'          46.1,23.0
-      'EEV-THIN'      55.3,27.6
-      'LORAL'         30.7,30.7
-\end{verbatim}
+\begin{terminalv}
+'TEK'           24.5,24.5
+'EEV6'          27.9,25.9
+'EEV9'          46.1,23.0
+'EEV-THIN'      55.3,27.6
+'LORAL'         30.7,30.7
+\end{terminalv}
 If a detector name appears both in the system-wide list and in your
 user-supplied list then your definition of it is used rather than the
 system-wide one.
@@ -400,7 +184,7 @@ slit angle is reported.
 
 Alternatively, if you specify a value that is less than or equal to 1000,
 it is assumed that you are providing a value in degrees for the slit angle
-offset. {\em Note that there is currently a problem here and the reported
+offset. \emph{Note that there is currently a problem here and the reported
 slit angle offsets do not correspond to actual behaviour. Consequently, you
 should specify only wavelengths at the ANGWAVE prompt or at the ``New
 ANGLE'' menu option.}
@@ -425,17 +209,17 @@ filename at the LINES prompt. The lines will be plotted in the correct
 positions on the echellogram, in white where they appear within the free
 spectral range and in grey where they do not. Each line has the specified
 text string plotted near to it. By default this file has an extension of
-{\tt .dat}.
+\texttt{.dat}.
 
 The file format is very simple: each line
 consists of the wavelength in Angstroms followed by the associated text in
 single quotes (like a Fortran CHARACTER constant), as in
-\begin{verbatim}
-      6562.80 'A'
-      4861.32 'B'
-      4340.46 'C'
-      4101.73 'D'
-\end{verbatim}
+\begin{terminalv}
+6562.80 'A'
+4861.32 'B'
+4340.46 'C'
+4101.73 'D'
+\end{terminalv}
 
 You can select a new line list from within the program by selecting the ``Mark
 LINES'' menu option, which prompts you for a new line list. These lines will
@@ -445,39 +229,39 @@ plotted. The only way to delete plotted lines is to restart echwind.
 The line list file will be looked for in the local directory or in the explicit
 directory given. Alternatively, you may prefix the file name with
 \verb+${ECHWIND_HOME}+. The release provides two lines list files in the
-\verb+${ECHWIND_HOME}+ directory. They are {\tt balmer.dat} and
-{\tt lines.dat} which are specified by
+\verb+${ECHWIND_HOME}+ directory. They are \texttt{balmer.dat} and
+\texttt{lines.dat} which are specified by
 \verb+${ECHWIND_HOME}balmer.dat+
 and \verb+${ECHWIND_HOME}lines.dat+ respectively.
 
 The contents of \verb+${ECHWIND_HOME}balmer.dat+ are as follows:
 
-\begin{verbatim}
-      6562.80 'A'
-      4861.32 'B'
-      4340.46 'C'
-      4101.73 'D'
-      3970.07 'E'
-      3889.05 'F'
-      3835.38 'G'
-      3797.90 'H'
-      3770.63 'I'
-      3750.15 'J'
-\end{verbatim}
+\begin{terminalv}
+6562.80 'A'
+4861.32 'B'
+4340.46 'C'
+4101.73 'D'
+3970.07 'E'
+3889.05 'F'
+3835.38 'G'
+3797.90 'H'
+3770.63 'I'
+3750.15 'J'
+\end{terminalv}
 
 The contents of \verb+${ECHWIND_HOME}lines.dat+ are as follows:
 
-\begin{verbatim}
-      4861.3198 'Hb'
-      4340.4678 'Hg'
-      5889.9512 'D2'
-      5895.9243 'D1'
-      3302.368  'U2'
-      3302.978  'U1'
-      4226.728  'CaI'
-      3933.663  'CaII K'
-      3968.468  'CaII H'
-\end{verbatim}
+\begin{terminalv}
+4861.3198 'Hb'
+4340.4678 'Hg'
+5889.9512 'D2'
+5895.9243 'D1'
+3302.368  'U2'
+3302.978  'U1'
+4226.728  'CaI'
+3933.663  'CaII K'
+3968.468  'CaII H'
+\end{terminalv}
 
 \subsection{Marking Detector Positions: Mark BOX, Delete BOX, Clear BOXES}
 
@@ -509,20 +293,20 @@ Text files (which are ASCII files with a default file extension of
 subsequent operations.
 
 The text file is of the form
-\begin{verbatim}
- ECHWIND V3.0
+\begin{terminalv}
+ECHWIND V3.0
 
-   Instrument: UES
-   Echelle: 31
-   Camera: LONG
-   No. of prisms:            3
-   Detector length:    40.67613
-   Maximum wavelength:    4545.881      in order no:          126
-   Minimum wavelength:    3634.631      in order no:          156
-   Central Wavelength:    4013.619      in order no:          142
-        Theta        Gamma    prism (mm)   slit angle
-       1.490        0.007       -0.40        0.050
-\end{verbatim}
+  Instrument: UES
+  Echelle: 31
+  Camera: LONG
+  No. of prisms:            3
+  Detector length:    40.67613
+  Maximum wavelength:    4545.881      in order no:          126
+  Minimum wavelength:    3634.631      in order no:          156
+  Central Wavelength:    4013.619      in order no:          142
+       Theta        Gamma    prism (mm)   slit angle
+      1.490        0.007       -0.40        0.050
+\end{terminalv}
 
 \subsection{Doing Nothing}
 
