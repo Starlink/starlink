@@ -1,4 +1,4 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt]{starlink}
 %
 % CATREMOTE - a Tool for Querying Remote Catalogues.
 %
@@ -8,51 +8,30 @@
 %
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
 
-% Define commands for displaying angles as sexagesimal hours and minutes
-% or degrees and minutes.
-
-\newcommand{\tmin}   {\mbox{$^{\rm m}\!\!.$}}
-\newcommand{\hm}[3] {$#1^{\rm h}\,#2\tmin#3$}
-\newcommand{\dm}[2] {$#1^{\circ}\,#2\raisebox{-0.5ex}{$^{'}$}$}
-\newcommand{\arcmin} {\raisebox{-0.5ex}{$^{'}$} }
-
-\newcommand{\arcsec} {$\hspace{-0.05em}\raisebox{-0.5ex}
-                     {$^{'\hspace{-0.1em}'}$}
-                     \hspace{-0.7em}.\hspace{-0.05em}$}
-\newcommand{\tsec}   {\mbox{$^{\rm s}\!\!.$}}
-\newcommand{\hms}[4] {$#1^{\rm h}\,#2^{\rm m}\,#3\tsec#4$}
-\newcommand{\dms}[4] {$#1^{\circ}\,#2\raisebox{-0.5ex}{$^{'}$}\,#3\arcsec#4$}
-
-% -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink System Note}
-\newcommand{\stardocinitials}  {SSN}
-\newcommand{\stardocsource}    {ssn\stardocnumber}
-\newcommand{\stardoccopyright}
+\stardoccategory    {Starlink System Note}
+\stardocinitials    {SSN}
+\stardocsource      {ssn\stardocnumber}
+\stardoccopyright
 {Copyright \copyright\ 2001 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {76.2}
-\newcommand{\stardocauthors}   {A.C.~Davenhall}
-\newcommand{\stardocdate}      {24 May 2001}
-\newcommand{\stardoctitle}     {CATREMOTE --- a Tool for Querying Remote
-Catalogues}
-\newcommand{\stardocabstract}
-{{\tt catremote} is a tool for querying remote astronomical catalogues,
+\stardocnumber      {76.2}
+\stardocauthors     {A.C.~Davenhall}
+\stardocdate        {24 May 2001}
+\stardoctitle     {CATREMOTE --- a Tool for Querying Remote Catalogues}
+\stardocabstract
+{\texttt{catremote} is a tool for querying remote astronomical catalogues,
 databases and archives via the Internet.  It allows remote catalogues
 to be queried and the resulting table to be saved as a local file.  It also
-provides a number of related auxiliary functions.  {\tt catremote} can
+provides a number of related auxiliary functions.  \texttt{catremote} can
 be used interactively.  However, it is more likely to be incorporated in
-a script or GUI.  This document describes the use of {\tt catremote} in
+a script or GUI.  This document describes the use of \texttt{catremote} in
 sufficient detail to allow a programmer to use it in a script or GUI that
 he is developing.
 
@@ -61,536 +40,68 @@ he is developing.
 \end{latexonly}
 
 \begin{center}
-{\bf Who Should Read this Document?}
+\textbf{Who Should Read this Document?}
 \end{center}
 
 This document is aimed primarily at programmers who wish to incorporate
-{\tt catremote} in a script or GUI that they are developing.  It may also
-be useful to users who wish to simply run {\tt catremote} interactively,
+\texttt{catremote} in a script or GUI that they are developing.  It may also
+be useful to users who wish to simply run \texttt{catremote} interactively,
 particularly if they wish to make use of all its facilities.  A simple
-introduction to {\tt catremote}, which is more suitable for new users,
+introduction to \texttt{catremote}, which is more suitable for new users,
 is included in \xref{SUN/190}{sun190}{}.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
+% ? Document specific \providecommand or \newenvironment commands.
 
-% +
-%  Name:
-%     ssn.tex
-%
-%  Purpose:
-%     Template for Starlink System Note (SSN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%      1-FEB-2000 (AJC):
-%        Add Copyright statement in LaTeX
-%     {Add further history here}
-%
-% -
+% Define commands for displaying angles as sexagesimal hours and minutes
+% or degrees and minutes.
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
+\providecommand{\tmin}   {\mbox{$^{\rm m}\!\!.$}}
+\providecommand{\hm}[3] {$#1^{\rm h}\,#2\tmin#3$}
+\providecommand{\dm}[2] {$#1^{\circ}\,#2\raisebox{-0.5ex}{$^{'}$}$}
+\providecommand{\arcmin} {\raisebox{-0.5ex}{$^{'}$} }
 
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+\providecommand{\arcsec} {$\hspace{-0.05em}\raisebox{-0.5ex}
+                     {$^{'\hspace{-0.1em}'}$}
+                     \hspace{-0.7em}.\hspace{-0.05em}$}
+\providecommand{\tsec}   {\mbox{$^{\rm s}\!\!.$}}
+\providecommand{\hms}[4] {$#1^{\rm h}\,#2^{\rm m}\,#3\tsec#4$}
+\providecommand{\dms}[4] {$#1^{\circ}\,#2\raisebox{-0.5ex}{$^{'}$}\,#3\arcsec#4$}
 
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-% \input{/star/docs/sst.tex}
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
+\providecommand{\catremote}{\htmlref{\texttt{catremote}}{CATREMOTE}}
+\providecommand{\geturl}{\htmlref{\texttt{geturl}}{GETURL}}
 
 % ? End of document specific commands
+
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
+\scfrontmatter
 
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Large\textbf{\stardoctitle}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\begin{latexonly}
-\begin{center}
-{\Large\bf Quick Reference}
-\end{center}
-\end{latexonly}
-
-\begin{htmlonly}
-\section*{Quick Reference}
-\end{htmlonly}
-
-\subsection*{Modes of operation}
+\section*{Modes of operation}
 
 \begin{center}
 \begin{tabular}{rl}
 Mode          &  Description \\ \hline
-{\tt list}    & list the databases currently available \\
-{\tt details} & show details of a named database \\
-{\tt query}   & submit a query to a remote database and retrieve the results \\
-{\tt name}    & resolve an object name into coordinates \\
-{\tt help}    & list the modes available \\
+\texttt{list}    & list the databases currently available \\
+\texttt{details} & show details of a named database \\
+\texttt{query}   & submit a query to a remote database and retrieve the results \\
+\texttt{name}    & resolve an object name into coordinates \\
+\texttt{help}    & list the modes available \\
 \end{tabular}
 \end{center}
 
-\subsection*{Command-line arguments for the various modes}
+\section*{Command-line arguments for the various modes}
 
 \begin{center}
 \begin{tabular}{ll}
-{\tt catremote list}    & {\it server-type} \\
-{\tt catremote details} & {\it db-name} \\
-{\tt catremote query}   & {\it db-name $\alpha$ $\delta$ radius
+\texttt{catremote list}    & \textit{server-type} \\
+\texttt{catremote details} & \textit{db-name} \\
+\texttt{catremote query}   & \textit{db-name $\alpha$ $\delta$ radius
     additional-condition} \\
-{\tt catremote name}    & {\it db-name object-name} \\
-{\tt catremote help}    & \\
+\texttt{catremote name}    & \textit{db-name object-name} \\
+\texttt{catremote help}    & \\
 \end{tabular}
 \end{center}
 
@@ -598,42 +109,42 @@ The individual arguments are as follows.
 
 \begin{description}
 
-  \item[{\it server-type}\/] Type of server to be listed; one of:
-   {\tt all}, {\tt catalog}, {\tt archive}, {\tt namesvr}, {\tt imagesvr}
-   or {\tt local} (optional).
+  \item[\textit{server-type}\/] Type of server to be listed; one of:
+   \texttt{all}, \texttt{catalog}, \texttt{archive}, \texttt{namesvr}, \texttt{imagesvr}
+   or \texttt{local} (optional).
 
-  \item[{\it db-name}\/] Name of the database to be queried.
+  \item[\textit{db-name}\/] Name of the database to be queried.
 
   \item[$\alpha$\/] Central Right Ascension of the query.  The value
    should be for equinox J2000 and given in sexagesimal hours with
-   a colon (`{\tt :}') as the separator.
+   a colon (`\texttt{:}') as the separator.
 
   \item[$\delta$\/] Central Declination of the query.  The value
    should be for equinox J2000 and given in sexagesimal degrees with
-   a colon (`{\tt :}') as the separator.  Southern Declinations are
+   a colon (`\texttt{:}') as the separator.  Southern Declinations are
    negative.
 
-  \item[{\it radius}\/] Radius of the query in minutes of arc.
+  \item[\textit{radius}\/] Radius of the query in minutes of arc.
 
-  \item[{\it additional-condition}\/] Any additional condition applied
+  \item[\textit{additional-condition}\/] Any additional condition applied
    to the query (optional).
 
-  \item[{\it object-name}\/] The name of an astronmical objects whose
+  \item[\textit{object-name}\/] The name of an astronmical objects whose
    coordinates are to be found.  Give the name without embedded spaces
    and in either case (upper or lower).
 
 \end{description}
 
-\subsection*{Environment variables}
+\section*{Environment variables}
 
 \begin{center}
 \begin{tabular}{rcl}
 Variable                & Default   &  Description \\ \hline
-{\tt CATREM\_URLREADER} &      & Program to submit query \\
-{\tt CATREM\_CONFIG}    &      & URL of configuration file \\
-{\tt CATREM\_MAXOBJ}    & 1000 & Maximum number of objects in results
+\texttt{CATREM\_URLREADER} &      & Program to submit query \\
+\texttt{CATREM\_CONFIG}    &      & URL of configuration file \\
+\texttt{CATREM\_MAXOBJ}    & 1000 & Maximum number of objects in results
 table \\
-{\tt CATREM\_ECHOURL}   & no   & Echo URL sent to remote server? \\
+\texttt{CATREM\_ECHOURL}   & no   & Echo URL sent to remote server? \\
 \end{tabular}
 \end{center}
 
@@ -644,23 +155,20 @@ table \\
 A hypertext version of this document is available.  To access it on
 Starlink systems type:
 
-\begin{quote}
-{\tt showme ~ ssn76}
-\end{quote}
+\begin{terminalv}
+% showme  ssn76
+\end{terminalv}
 
 On non-Starlink systems access URL:
 
 \begin{quote}
-\htmladdnormallink{
-{\tt http://www.starlink.ac.uk/docs/ssn76.htx/ssn76.html}}
-{http://www.starlink.ac.uk/docs/ssn75.htx/ssn76.html}
+\url{http://www.starlink.ac.uk/docs/ssn76.htx/ssn76.html}
 \end{quote}
 
 \section*{Obtaining assistance}
 
-{\tt catremote} is part of the CURSA package for manipulating astronomical
-catalogues and tables.  Reports of bugs in CURSA, including {\tt
-catremote}, should always be sent to username {\tt starlink@jiscmail.ac.uk}.
+\catremote\ is part of the CURSA package for manipulating astronomical
+catalogues and tables.  Reports of bugs in CURSA, including \catremote, should always be sent to username \texttt{starlink@jiscmail.ac.uk}.
 However, you are welcome to contact me for advice and assistance; details
 of how to do so are given below.
 
@@ -672,7 +180,7 @@ Edinburgh, EH9 3HJ, United Kingdom.  \\
 
 % \vspace{4mm}
 
-Electronic mail: {\tt acd@roe.ac.uk}
+Electronic mail: \texttt{acd@roe.ac.uk}
 
 % \vspace{4mm}
 
@@ -682,10 +190,7 @@ from within the United Kingdom: &    0131-668-8416 \\
 from overseas:                  & +44-131-668-8416 \\
 \end{tabular}
 
-% ? Latex Copyright Statement
 
- \vspace*{\fill}
- \stardoccopyright
 
 \newpage
 \section*{Revision history}
@@ -697,41 +202,26 @@ from overseas:                  & +44-131-668-8416 \\
 \end{enumerate}
 
 \cleardoublepage
-\begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
 
-%   \newpage
-   \listoffigures
-   \listoftables
-
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
 
 \section{\xlabel{INTRO}\label{INTRO}Introduction}
 
-{\tt catremote} is a tool for querying remote astronomical catalogues,
+\catremote\ is a tool for querying remote astronomical catalogues,
 databases and archives via the Internet.  It allows remote catalogues
 to be queried and the resulting table to be saved as a local file.  It
 also provides a number of related auxiliary functions.
 
-{\tt catremote} can be used interactively.  However, it is more likely
+\catremote\ can be used interactively.  However, it is more likely
 to be incorporated in a script or GUI.  This document describes the use
-of {\tt catremote} in sufficient detail to allow a programmer to use it
+of \catremote\ in sufficient detail to allow a programmer to use it
 in a script or GUI which he is developing.  Additionally the document may
-be useful to users who simply wish to run {\tt catremote} interactively,
-particularly if they wish to make use of all its facilities.  {\it There
-is a simple introduction to the use of {\tt catremote} in
+be useful to users who simply wish to run \catremote\ interactively,
+particularly if they wish to make use of all its facilities.  \textit{There
+is a simple introduction to the use of \catremote\ in
 \xref{SUN/190}{sun190}{}\cite{SUN190} which may be more suitable for new
 users than the present document.}
 
-{\tt catremote} is part of the astronomical catalogue and table
+\catremote\ is part of the astronomical catalogue and table
 manipulation package CURSA (see \xref{SUN/190}{sun190}{}\cite{SUN190}).
 It is written in Perl and uses the `ACL format' (discussed briefly below)
 to access remote catalogues and databases.   A variety of remote
@@ -741,16 +231,16 @@ instance see SUN/190 for details of what is available.
 
 \section{\xlabel{ACL}\label{ACL}The ACL Format}
 
-{\tt catremote} uses the ACL format developed by Allan~Brighton and
+\catremote\ uses the ACL format developed by Allan~Brighton and
 colleagues at ESO to access remote catalogues and databases.  The ACL
 format is fully documented in \xref{SSN/75}{ssn75}{}\cite{SSN75}.  The
 following brief description merely gives sufficient details to allow the
-operation of {\tt catremote} to be understood.
+operation of \catremote\ to be understood.
 
 The ACL format is implemented using the Hyper-Text Transfer Protocol (HTTP)
-developed as part of the World Wide Web.  {\tt catremote} querying a
+developed as part of the World Wide Web.  \catremote\ querying a
 remote database is an example of a `client-server architecture', with
-{\tt catremote} acting as the client and the remote database, or more
+\catremote\ acting as the client and the remote database, or more
 exactly the program which accesses it, as the server.  In the ACL format
 a so-called `configuration file' mediates the interaction between client
 and server.  This configuration file comprises a list of one or more
@@ -760,8 +250,8 @@ archives, name servers, \emph{etc}\/ (Table~\ref{SERVTYPES}, below, lists
 all the possibilities).  Consequently, in this document the
 generic term `database' is used to denote each entry.
 
-{\tt catremote} accesses a given configuration file and the databases
-which this file contains are the ones that {\tt catremote} currently
+\catremote\ accesses a given configuration file and the databases
+which this file contains are the ones that \catremote\ currently
 knows about.
 
 The configuration file lists various details for each database, such as:
@@ -769,67 +259,65 @@ the URL to access it, the type of database it is (its so-called
 `server type': catalogue, image server, name server \emph{etc}\/), the
 type of queries supported, \emph{etc}.  Most of these details are not
 germane here.  However, one item which is important is the so-called
-`{\tt short\_name}' or simply `name' of the database.  This quantity
+`\texttt{short\_name}' or simply `name' of the database.  This quantity
 is used to identify the database, for example you would supply it
-in response to a prompt from {\tt catremote}.  It is a short character
+in response to a prompt from \catremote.  It is a short character
 string (without embedded spaces) and conventionally it has the form:
 
 \begin{quote}
-{\it database}{\tt @}{\it institution}
+\textit{database}\texttt{@}\textit{institution}
 \end{quote}
 
-where {\it database}\, is an abbreviation for the database and {\it
-institution}\, a standardised abbreviation for the institution where the
-on-line version is located.  By convention {\it institution}\/ has three
+where \textit{database}\, is an abbreviation for the database and \textit{institution}\, a standardised abbreviation for the institution where the
+on-line version is located.  By convention \textit{institution}\/ has three
 or four characters.  For example, the usual name of the version of the
 \htmladdnormallinkfoot{USNO}{http://www.nofs.navy.mil/}
-PMM astrometric catalogue maintained by ESO is {\tt usno@eso}.
+PMM astrometric catalogue maintained by ESO is \texttt{usno@eso}.
 
 
 \section{\xlabel{SYSREQ}\label{SYSREQ}System Requirements and Getting
 Started}
 
-{\tt catremote} is available for all the versions of Unix supported by
+\catremote\ is available for all the versions of Unix supported by
 Starlink: Compaq Alpha/Tru64, Sun/Solaris and PC/Linux.  It may well work
 on other versions of Unix, but is not supported on them.
 
-{\tt catremote} is a simple Perl script (see, for example,
+\catremote\ is a simple Perl script (see, for example,
 \xref{SUN/193}{sun193}{}\cite{SUN193}) and hence Perl must be
 available on your system before you can run it.  It was developed using
-Perl~5.  On Starlink systems {\tt catremote} is located in file:
+Perl~5.  On Starlink systems \catremote\ is located in file:
 
-\begin{quote}
-{\tt /star/bin/cursa/catremote}
-\end{quote}
+\begin{terminalv}
+/star/bin/cursa/catremote
+\end{terminalv}
 
-On non-Starlink systems a release of {\tt catremote} includes a copy
+On non-Starlink systems a release of \catremote\ includes a copy
 of the script and this document.  On such systems you may need to edit
-the first line of {\tt catremote} to pick up Perl from wherever on your
+the first line of \catremote\ to pick up Perl from wherever on your
 system it is located.
 
-The purpose of {\tt catremote} is to query remote catalogues via the
+The purpose of \catremote\ is to query remote catalogues via the
 Internet.  The ACL format that it uses for this purpose itself uses the
-World Wide Web Hyper-Text Transfer Protocol (HTTP).  Consequently, {\tt
-catremote} will only run on computers connected to the Internet and
+World Wide Web Hyper-Text Transfer Protocol (HTTP).  Consequently, \catremote\ will only run on computers connected to the Internet and
 configured to run Web browsers.
 
-Though {\tt catremote} assembles the queries and writes the resulting
+Though \catremote\ assembles the queries and writes the resulting
 tables of selected objects, it runs a separate utility program to submit
 the query to the server and retrieve the results.  A number of alternative
 utility programs can be used for this purpose, including the C program
-{\tt geturl} which is supplied with {\tt catremote} and is the default on
+\geturl\ which is supplied with \catremote\ and is the default on
 Starlink systems.  The various alternatives are described in
-Section~\ref{WEBPROG}.  The Unix environment variable {\tt CATREM\_URLREADER}
+Section~\ref{WEBPROG}.  The Unix environment variable \texttt{CATREM\_URLREADER}
 (below) specifies which utility program is to be used and must be set
-before {\tt catremote} is invoked.
+before \catremote\ is invoked.
 
 
 \section{\xlabel{ENVIR}\label{ENVIR}Environment Variables}
 
-{\tt catremote} takes some input from Unix shell environment variables
+\catremote\ takes some input from Unix shell environment variables
 and these variables can be used to control its behaviour.  Some of the
 variables are optional, but others are mandatory and must be set before
-{\tt catremote} is invoked.  The variables used are listed in
+\catremote\ is invoked.  The variables used are listed in
 Table~\ref{ENVARS} and described briefly below.
 
 \begin{table}[htbp]
@@ -837,16 +325,16 @@ Table~\ref{ENVARS} and described briefly below.
 \begin{center}
 \begin{tabular}{rcl}
 Variable                & Default   &  Description \\ \hline
-{\tt CATREM\_URLREADER} &      & Program to submit query \\
-{\tt CATREM\_CONFIG}    &      & URL of configuration file \\
-{\tt CATREM\_MAXOBJ}    & 1000 & Maximum number of objects in results table \\
-{\tt CATREM\_ECHOURL}   & no   & Echo URL sent to remote server? \\
+\texttt{CATREM\_URLREADER} &      & Program to submit query \\
+\texttt{CATREM\_CONFIG}    &      & URL of configuration file \\
+\texttt{CATREM\_MAXOBJ}    & 1000 & Maximum number of objects in results table \\
+\texttt{CATREM\_ECHOURL}   & no   & Echo URL sent to remote server? \\
 \end{tabular}
 \end{center}
 
 \begin{quote}
-\caption[Environment variables used by {\tt catremote}]{Environment
-variables used by {\tt catremote}.  The variables for which no default
+\caption[Environment variables used by catremote]{Environment
+variables used by \texttt{catremote}.  The variables for which no default
 is given are mandatory
 \label{ENVARS} }
 \end{quote}
@@ -855,46 +343,46 @@ is given are mandatory
 
 \begin{description}
 
-  \item[{\tt CATREM\_URLREADER}] {\tt catremote} uses a separate program
+  \item[\texttt{CATREM\_URLREADER}] \catremote\ uses a separate program
    to submit the URL constituting a query to the server and return the
    table of results.  The options available are described in
    Section~\ref{WEBPROG}.
 
-  \item[{\tt CATREM\_CONFIG}] specifies the configuration file to be used.
+  \item[\texttt{CATREM\_CONFIG}] specifies the configuration file to be used.
    It should be set to either the URL (for a remote file) or the local
    file name, including a directory specification (for a local file).
    Configuration files are described in \xref{SSN/75}{ssn75}{}\cite{SSN75}.
    The default configuration file used by CURSA is at URL:
 
   \begin{quote}
-   {\tt http://dev.starlink.ac.uk/\~{}pwd/catremote/cursa.cfg}
+\url{http://dev.starlink.ac.uk/\~pwd/catremote/cursa.cfg}
   \end{quote}
 
-  \item[{\tt CATREM\_MAXOBJ}] is the maximum number of objects which the
+  \item[\texttt{CATREM\_MAXOBJ}] is the maximum number of objects which the
    returned table is allowed to contain.
 
-  \item[{\tt CATREM\_ECHOURL}] Controls whether the URL representing the
+  \item[\texttt{CATREM\_ECHOURL}] Controls whether the URL representing the
    query submitted to the remote server is also displayed to the user.
-   The default is `{\tt no}'; to see the URL set {\tt CATREM\_ECHOURL} to
-   `{\tt yes}'.  Seeing the URL is potentially useful when debugging
+   The default is `\texttt{no}'; to see the URL set \texttt{CATREM\_ECHOURL} to
+   `\texttt{yes}'.  Seeing the URL is potentially useful when debugging
    configuration files and servers but is not usually required for
    normal operation.
 
 \end{description}
 
 These environment variables are set up automatically when CURSA is started.
-However, if {\tt catremote} is being used outside CURSA they need to be
+However, if \catremote\ is being used outside CURSA they need to be
 set up manually.
 Figure~\ref{SETENVAR} shows an example script for this purpose.  On
 Starlink systems it is available as file:
 
-\begin{quote}
-{\tt /star/share/cursa/cursacatremote-setup.csh}
-\end{quote}
+\begin{terminalv}
+/star/share/cursa/cursacatremote-setup.csh
+\end{terminalv}
 
 \begin{figure}[htbp]
 \latex{\begin{small}}
-\begin{verbatim}
+\begin{terminalv}
 #! /bin/csh -f
 #+
 # catremote-setup.csh
@@ -939,11 +427,11 @@ setenv  CATREM_ECHOURL no
 #  command line option because the latter does not work on alphas).
 
 setenv CLASSPATH /home/acd/starbase/cursa/catremote:/usr/lib/netscape/java/classes
-\end{verbatim}
+\end{terminalv}
 \latex{\end{small}}
 
 \begin{quote}
-\caption{Example shell script to set up {\tt catremote} environment
+\caption{Example shell script to set up \texttt{catremote} environment
 variables  \label{SETENVAR} }
 \end{quote}
 
@@ -952,33 +440,33 @@ variables  \label{SETENVAR} }
 
 \section{\xlabel{FUNC}\label{FUNC}The Functionality of catremote}
 
-The purpose of {\tt catremote} is to query remote astronomical databases.
+The purpose of \catremote\ is to query remote astronomical databases.
 It has a number of separate functions to realise this purpose, and each
 function corresponds to a mode of the program.  The mode to be used is
-specified when {\tt catremote} is run.  The various modes are listed in
-Table~\ref{MODES} and described briefly below.  Running {\tt catremote} to
+specified when \catremote\ is run.  The various modes are listed in
+Table~\ref{MODES} and described briefly below.  Running \catremote\ to
 invoke the various modes is described in detail in Section~\ref{RUN},
 below.
 
 \begin{description}
 
-  \item[{\tt list}] list all the databases which are currently available.
+  \item[\texttt{list}] list all the databases which are currently available.
 
-  \item[{\tt details}] show details of a named database.
+  \item[\texttt{details}] show details of a named database.
 
-  \item[{\tt query}] submit a query to a named database and retrieve the
+  \item[\texttt{query}] submit a query to a named database and retrieve the
    results.  The basic type of query supported is the `cone search' or
    `circular area search' which returns all the objects found in a given
    circular area of sky.  This area is specified by its central Right
    Ascension and Declination and angular radius.  The objects returned are
    formatted as a catalogue and written to a local file.
 
-  \item[{\tt name}] submit a name of an astronomical object to a remote
+  \item[\texttt{name}] submit a name of an astronomical object to a remote
    name-resolver database.  If the name-resolver finds this name in its
    database then the Right Ascension and Declination of the object are
    returned and displayed.
 
-  \item[{\tt help}] list the modes available.
+  \item[\texttt{help}] list the modes available.
 
 \end{description}
 
@@ -987,15 +475,15 @@ below.
 \begin{center}
 \begin{tabular}{rl}
 Mode          &  Description \\ \hline
-{\tt list}    & list the databases currently available \\
-{\tt details} & show details of a named database \\
-{\tt query}   & submit a query to a remote database and retrieve the results \\
-{\tt name}    & resolve an object name into coordinates \\
-{\tt help}    & list the modes available \\
+\texttt{list}    & list the databases currently available \\
+\texttt{details} & show details of a named database \\
+\texttt{query}   & submit a query to a remote database and retrieve the results \\
+\texttt{name}    & resolve an object name into coordinates \\
+\texttt{help}    & list the modes available \\
 \end{tabular}
 \end{center}
 
-\caption{The modes of {\tt catremote}
+\caption{The modes of \texttt{catremote}
 \label{MODES} }
 
 \end{table}
@@ -1003,56 +491,56 @@ Mode          &  Description \\ \hline
 
 \section{\xlabel{RUN}\label{RUN}Running catremote}
 
-{\tt catremote} is invoked by simply typing:
+\catremote\ is invoked by simply typing:
 
-\begin{quote}
-{\tt catremote}
-\end{quote}
+\begin{terminalv}
+% catremote
+\end{terminalv}
 
 Arguments may be supplied on the command line or prompted for.  Obviously,
-if {\tt catremote} is being invoked from a script the arguments will
+if \catremote\ is being invoked from a script the arguments will
 usually be supplied on the command line.
 
 The first command-line argument is the mode of operation.  The permitted
 values are listed in Table~\ref{MODES}.  The mode can only be specified on
-the command line.  If it is omitted then `{\tt help}' mode is assumed.
+the command line.  If it is omitted then `\texttt{help}' mode is assumed.
 
 The subsequent arguments required depend on the mode chosen and are
 summarised in Table~\ref{ARGS}.  Command line arguments are identified
 by position.  They may optionally be omitted, starting at the right.
 Omitted arguments will usually be prompted for.  Exceptions are the
-{\it server-type}\/ in {\tt list} mode, any {\it additional-condition}\/
-in {\tt query} mode and the mode itself (see below).  For each mode the
+\textit{server-type}\/ in \texttt{list} mode, any \textit{additional-condition}\/
+in \texttt{query} mode and the mode itself (see below).  For each mode the
 input required and output produced is described below.
 
 \begin{table}[htbp]
 
 \begin{center}
 \begin{tabular}{ll}
-{\tt catremote list}    & {\it server-type} \\
-{\tt catremote details} & {\it db-name} \\
-{\tt catremote query}   & {\it db-name $\alpha$ $\delta$ radius
+\texttt{catremote list}    & \textit{server-type} \\
+\texttt{catremote details} & \textit{db-name} \\
+\texttt{catremote query}   & \textit{db-name $\alpha$ $\delta$ radius
     additional-condition} \\
-{\tt catremote name}    & {\it db-name object-name} \\
-{\tt catremote help}    & \\
+\texttt{catremote name}    & \textit{db-name object-name} \\
+\texttt{catremote help}    & \\
 \end{tabular}
 \end{center}
 
-\caption{Arguments for the various modes of {\tt catremote}
+\caption{Arguments for the various modes of \texttt{catremote}
 \label{ARGS} }
 
 \end{table}
 
-\subsection{{\tt list} mode}
+\subsection{\texttt{list} mode}
 
 \begin{description}
 
-  \item[Input] {\tt list} mode has a single optional argument, the
-   {\it server-type}.  The values permitted are listed in
+  \item[Input] \texttt{list} mode has a single optional argument, the
+   \textit{server-type}.  The values permitted are listed in
    Table~\ref{SERVTYPES} (and \xref{SSN/75}{ssn75}{}\cite{SSN75} gives
-   more details of the individual types).  {\tt catremote} lists all the
+   more details of the individual types).  \catremote\ lists all the
    databases in the current configuration file which match the given
-   {\it server-type}.  If the argument is omitted then `{\tt all}' is
+   \textit{server-type}.  If the argument is omitted then `\texttt{all}' is
    assumed (that is, all the databases in the configuration file are
    listed).
 
@@ -1061,13 +549,13 @@ input required and output produced is described below.
 \begin{center}
 \begin{tabular}{rl}
 Server type     & Description \\ \hline
-{\tt all}       & all types of server \\
-{\tt catalog}   & simple catalogue \\
-{\tt archive}   & archive \\
-{\tt namesvr}   & name server \\
-{\tt imagesvr}  & image server \\
-{\tt local}     & local file \\
-{\tt directory} & link to another configuration file \\
+\texttt{all}       & all types of server \\
+\texttt{catalog}   & simple catalogue \\
+\texttt{archive}   & archive \\
+\texttt{namesvr}   & name server \\
+\texttt{imagesvr}  & image server \\
+\texttt{local}     & local file \\
+\texttt{directory} & link to another configuration file \\
 \end{tabular}
 \end{center}
 
@@ -1079,23 +567,22 @@ Server type     & Description \\ \hline
    the specified server type are listed, one per line.  Typical output
    might look something like:
 
-  \begin{quote}
-   \verb+usno@eso  catalog  USNO at ESO+ \\
-   \verb+gsc@lei  catalog  Guide Star Catalog at LEDAS+ \\
-   \verb+simbad_ns@eso  namesvr  SIMBAD Names+
-  \end{quote}
+  \begin{terminalv}
+usno@eso  catalog  USNO at ESO
+gsc@lei  catalog  Guide Star Catalog at LEDAS
+simbad_ns@eso  namesvr  SIMBAD Names
+  \end{terminalv}
 
    For each database, the first item is its name, the second its server
    type and the rest of the line gives a short description.
 
 \end{description}
 
-\subsection{{\tt details} mode}
+\subsection{\texttt{details} mode}
 
 \begin{description}
 
-  \item[Input] {\tt details} mode has a single input argument, {\it
-   db-name}\/; the name of the database for which the details are to be
+  \item[Input] \texttt{details} mode has a single input argument, \textit{db-name}\/; the name of the database for which the details are to be
    shown (see Section~\ref{ACL}).  This database must be included in the
    current configuration file.
 
@@ -1103,84 +590,82 @@ Server type     & Description \\ \hline
    database, listed one per line:
 
   \begin{tabular}{ll}
-   {\tt short\_name:}  & name of the database \\
-   {\tt serv\_type:}   & server type of the database (see
+   \texttt{short\_name:}  & name of the database \\
+   \texttt{serv\_type:}   & server type of the database (see
                          Table~\ref{SERVTYPES}) \\
-   {\tt long\_name:}   & a short description of the database \\
-   {\tt url:}          & URL of the database server \\
-   {\tt search\_cols:} & columns on which range searches are supported \\
-   {\tt help:}         & URL of help page for the database \\
+   \texttt{long\_name:}   & a short description of the database \\
+   \texttt{url:}          & URL of the database server \\
+   \texttt{search\_cols:} & columns on which range searches are supported \\
+   \texttt{help:}         & URL of help page for the database \\
   \end{tabular}
 
    See \xref{SSN/75}{ssn75}{}\cite{SSN75} for a description of each item.
 
 \end{description}
 
-\subsection{{\tt query} mode}
+\subsection{\texttt{query} mode}
 
 \begin{description}
 
-  \item[Input] {\tt query} mode has the arguments described below.  Any
+  \item[Input] \texttt{query} mode has the arguments described below.  Any
    arguments which are omitted will be prompted for, with the exception of
-   {\it additional-condition}.  Thus, if an {\it additional-condition}\/
+   \textit{additional-condition}.  Thus, if an \textit{additional-condition}\/
    is specified then all the arguments must be included on the command line.
 
   \begin{description}
 
-    \item[{\it db-name}\/] Name of the database to be queried (see
+    \item[\textit{db-name}\/] Name of the database to be queried (see
      Section~\ref{ACL}).
 
     \item[$\alpha$\/] Central Right Ascension of the query.  The value
      should be for equinox J2000 and given in sexagesimal hours with
-     a colon (`{\tt :}') as the separator.
+     a colon (`\texttt{:}') as the separator.
 
     \item[$\delta$\/] Central Declination of the query.  The value
      should be for equinox J2000 and given in sexagesimal degrees with
-     a colon (`{\tt :}') as the separator.  Southern Declinations are
+     a colon (`\texttt{:}') as the separator.  Southern Declinations are
      negative.
 
-    \item[{\it radius}\/] Radius of the query in minutes of arc.
+    \item[\textit{radius}\/] Radius of the query in minutes of arc.
 
-    \item[{\it additional-condition}\/] Any additional condition applied
+    \item[\textit{additional-condition}\/] Any additional condition applied
      to the query.  Databases vary in which, if any, additional queries
-     they support.  Three forms of {\it additional-condition}\/ are
+     they support.  Three forms of \textit{additional-condition}\/ are
      accepted.  The first is:
 
     \begin{quote}
-     {\it column-name=minimum-value,maximum-value}
+     \textit{column-name=minimum-value,maximum-value}
     \end{quote}
 
-     and objects will only be selected if their value for column {\it
-     column-name}\/ lies between {\it minimum-value}\/ and {\it
-     maximum-value}.  The second is:
+     and objects will only be selected if their value for column \textit{column-name}\/ lies between \textit{minimum-value}\/ and \textit{maximum-value}.  The second is:
 
     \begin{quote}
-     {\it minimum-magnitude,maximum-magnitude}
+     \textit{minimum-magnitude,maximum-magnitude}
     \end{quote}
 
      here the range is assumed to be a magnitude and no column name is
      specified (remember that magnitudes increase the `wrong way round'
-     so that {\it minimum-magnitude}\/ corresponds to the brightest
+     so that \textit{minimum-magnitude}\/ corresponds to the brightest
      object).  The third is:
 
     \begin{quote}
-     {\it maximum-magnitude}
+     \textit{maximum-magnitude}
     \end{quote}
 
      which is again assumed to be a magnitude and only objects brighter
-     than {\it maximum-magnitude}\/ are selected.  For completeness, the
-     relationship between the forms of {\it additional-condition}\/ and
+     than \textit{maximum-magnitude}\/ are selected.  For completeness, the
+     relationship between the forms of \textit{additional-condition}\/ and
      the `query tokens' for the database specified in the configuration
      file (as described in \xref{SSN/75}{ssn75}{}\cite{SSN75}) is that
-     {\it additional-condition}\/ replaces the tokens as follows:
+     \textit{additional-condition}\/ replaces the tokens as follows:
 
     \begin{center}
     \begin{tabular}{rll}
              & Form                                & replaces token \\ \hline
-     first:  & {\it column-name=minimum-value,maximum-value} & {\tt \%cond} \\
-     second: & {\it minimum-magnitude,maximum-magnitude}     & {\tt \%m1},
-                                                               {\tt \%m2} \\
-     third:  & {\it maximum-magnitude}                       & {\tt \%m}  \\
+     first:  & \textit{column-name=minimum-value,maximum-value} & \texttt{\%cond} \\
+     second: & \textit{minimum-magnitude,maximum-magnitude}     & \texttt{\%m1},
+                                                               \texttt{\%m2} \\
+     third:  & \textit{maximum-magnitude}                       & \texttt{\%m}  \\
     \end{tabular}
     \end{center}
 
@@ -1190,44 +675,42 @@ Server type     & Description \\ \hline
    Tab-Separated Table (TST) format in the current directory.  The TST
    format is described in \xref{SSN/75}{ssn75}{}\cite{SSN75}.  The name
    of the catalogue file is derived automatically from the name of the
-   database and the central Right Ascension and Declination.  {\tt
-   catremote} displays a line showing the name of the file created,
+   database and the central Right Ascension and Declination.  \catremote\ displays a line showing the name of the file created,
    for example:
 
-  \begin{quote}
-   \verb+!(Info.) Catalogue usno_eso_101500_303000.tab written successfully.+
-  \end{quote}
+  \begin{terminalv}
+!(Info.) Catalogue usno_eso_101500_303000.tab written successfully.
+  \end{terminalv}
 
    If the catalogue contained no objects which satisfied the query
-   {\tt catremote} will report:
+   \catremote\ will report:
 
-  \begin{quote}
-   \verb+! Failure: no objects found in the region specified.+
-  \end{quote}
+  \begin{terminalv}
+! Failure: no objects found in the region specified.
+  \end{terminalv}
 
 \end{description}
 
-\subsection{{\tt name} mode}
+\subsection{\texttt{name} mode}
 
 \begin{description}
 
-  \item[Input] {\tt name} mode has the following two arguments.  If they
+  \item[Input] \texttt{name} mode has the following two arguments.  If they
    are omitted then they will be prompted for.
 
   \begin{description}
 
-    \item[{\it db-name}\/] The name of the name resolver database which
-     is to be queried (see Section~\ref{ACL}).  The usual choice is {\tt
-     simbad\_ns@eso}, the SIMBAD name resolver provided by ESO using the
+    \item[\textit{db-name}\/] The name of the name resolver database which
+     is to be queried (see Section~\ref{ACL}).  The usual choice is \texttt{simbad\_ns@eso}, the SIMBAD name resolver provided by ESO using the
      \htmladdnormallinkfoot{SIMBAD}{http://simbad.u-strasbg.fr/Simbad}
      integrated database maintained by the
      \htmladdnormallink{Centre de Donn\'{e}es astronomiques de Strasbourg}
      {http://cdsweb.u-strasbg.fr/CDS.html} (CDS).
 
-    \item[{\it object-name}] The name of an astronomical object which is
+    \item[\textit{object-name}] The name of an astronomical object which is
      to be resolved.  It should be entered without embedded spaces.  The
      case of letters (upper or lower) is not usually significant.  That
-     is, case is not significant for {\tt simbad\_ns@eso} and probably
+     is, case is not significant for \texttt{simbad\_ns@eso} and probably
      will not be significant for other name resolvers.
 
   \end{description}
@@ -1236,22 +719,22 @@ Server type     & Description \\ \hline
    successfully looks it up and finds coordinates for it, then they are
    displayed, for example:
 
-  \begin{quote}
-   \verb=Right Ascension: +10:47:50= \\
-   \verb=Declination: +12:34:57=
-  \end{quote}
+  \begin{terminalv}
+Right Ascension: +10:47:50
+Declination: +12:34:57
+  \end{terminalv}
 
    The Right Ascension is in sexagesimal hours, the Declination in
    sexagesimal degrees and both are for equinox J2000.  If the name
-   could not be resolved then {\tt catremote} reports:
+   could not be resolved then \catremote\ reports:
 
-  \begin{quote}
-   \verb=! Failure: unable to resolve object name.=
-  \end{quote}
+  \begin{terminalv}
+! Failure: unable to resolve object name.
+  \end{terminalv}
 
 \end{description}
 
-\subsection{{\tt help} mode}
+\subsection{\texttt{help} mode}
 
 \begin{description}
 
@@ -1265,50 +748,49 @@ Server type     & Description \\ \hline
 
 \section{\xlabel{I_EXAMPLES}\label{I_EXAMPLES}Interactive Examples}
 
-This section gives some examples of using {\tt catremote} interactively.
+This section gives some examples of using \catremote\ interactively.
 All the arguments are given on the command line.  However, if they are
 omitted then arguments other than the first (the mode) will usually be
 prompted for.
 
 \begin{enumerate}
 
-  \item List the various modes in which {\tt catremote} may be used.
+  \item List the various modes in which \catremote\ may be used.
    Type either of:
 
-  \begin{quote}
-   {\tt catremote} \\
-   {\tt catremote help}
-  \end{quote}
+  \begin{terminalv}
+% catremote
+% catremote help
+  \end{terminalv}
 
   \item List all the databases in the current configuration file:
 
-  \begin{quote}
-   {\tt catremote list}
-  \end{quote}
+  \begin{terminalv}
+% catremote list
+  \end{terminalv}
 
   \item List all the name servers (that is, databases of server type
-   `{\tt namesvr}') in the current configuration file:
+   `\texttt{namesvr}') in the current configuration file:
 
-  \begin{quote}
-   {\tt catremote list namesvr}
-  \end{quote}
+  \begin{terminalv}
+% catremote list namesvr
+  \end{terminalv}
 
   \item Show details of the USNO PMM astrometric catalogue:
 
-  \begin{quote}
-   {\tt catremote details usno@eso}
-  \end{quote}
+  \begin{terminalv}
+% catremote details usno@eso
+  \end{terminalv}
 
   \item Find all the objects in the USNO PMM which lie within ten
    minutes of arc of Right Ascension \hms{12}{15}{00}{0} and
    Declination \dms{30}{30}{00}{0} (J2000):
 
-  \begin{quote}
-   {\tt catremote query usno@eso 12:15:00 30:30:00 10}
-  \end{quote}
+  \begin{terminalv}
+% catremote query usno@eso 12:15:00 30:30:00 10
+  \end{terminalv}
 
-   The objects selected will be saved as a catalogue called {\tt
-   usno\_eso\_121500\_303000.tab} created in your current directory.
+   The objects selected will be saved as a catalogue called \texttt{usno\_eso\_121500\_303000.tab} created in your current directory.
    This catalogue will be written in the Tab-Separated Table (TST)
    format.
 
@@ -1317,15 +799,15 @@ prompted for.
    Declination \dms{30}{30}{00}{0} (J2000) which also lie in the
    magnitude range 14 to 16:
 
-  \begin{quote}
-   {\tt catremote query usno@eso 12:15:00 30:30:00 10 14,16}
-  \end{quote}
+  \begin{terminalv}
+% catremote query usno@eso 12:15:00 30:30:00 10 14,16
+  \end{terminalv}
 
   \item Find the equatorial coordinates of the galaxy NGC 3379:
 
-  \begin{quote}
-   {\tt catremote name simbad\_ns@eso ngc3379}
-  \end{quote}
+  \begin{terminalv}
+% catremote name simbad_ns@eso ngc3379
+  \end{terminalv}
 
    The coordinates returned are for equinox J2000.
 
@@ -1334,129 +816,171 @@ prompted for.
 
 \section{\xlabel{S_EXAMPLES}\label{S_EXAMPLES}Scripting Examples}
 
-Some complete examples which illustrate the use of {\tt catremote} in
+Some complete examples which illustrate the use of \catremote\ in
 scripts are available.  They are written in the tcl scripting
 language\footnote{Tcl is described by its author, John~Ousterhout, in his
-{\it Tcl and the Tk Toolkit}\/\cite{OUSTERHOUT94}; see also
+\textit{Tcl and the Tk Toolkit}\/\cite{OUSTERHOUT94}; see also
 \xref{SUN/200}{sun200}{}\cite{SUN200}.} and on Starlink systems are in
 directory:
 
-\begin{center}
-{\tt /star/share/cursa}
-\end{center}
+\begin{terminalv}
+/star/share/cursa
+\end{terminalv}
 
 The scripts provided are:
 
 \begin{description}
 
-  \item[{\tt listavaildb.tcl}] list the databases currently available,
+  \item[\texttt{listavaildb.tcl}] list the databases currently available,
 
-  \item[{\tt querycat.tcl}] query a remote catalogue,
+  \item[\texttt{querycat.tcl}] query a remote catalogue,
 
-  \item[{\tt resolvename.tcl}] find the coordinates of a named object.
+  \item[\texttt{resolvename.tcl}] find the coordinates of a named object.
 
 \end{description}
 
 On Starlink systems the scripts should simply run without requiring any
 modifications.  On non-Starlink systems you may need to edit them to
-change the specified location of both the tcl interpreter and the {\tt
-catremote} utility.  In all cases the former is the first line of the
+change the specified location of both the tcl interpreter and the \catremote\ utility.  In all cases the former is the first line of the
 script and the latter the first executable line after the introductory
 comments.  Sufficient comments should be included to document the use of
-{\tt catremote} in each script.
+\catremote\ in each script.
 
-The utility {\tt findcoords} (see \xref{SUN/240}{sun240}{}\cite{SUN240})
-is a simple wrap-around for the name-resolver function of {\tt catremote}.
-It can serve as an example of invoking {\tt catremote} from a Perl script.
+The utility \texttt{findcoords} (see \xref{SUN/240}{sun240}{}\cite{SUN240})
+is a simple wrap-around for the name-resolver function of \catremote.
+It can serve as an example of invoking \catremote\ from a Perl script.
 On Starlink systems the source is available in file:
 
-\begin{center}
-{\tt /star/bin/findcoords}
-\end{center}
+\begin{terminalv}
+/star/bin/findcoords
+\end{terminalv}
 
 
 \section{\xlabel{WEBPROG}\label{WEBPROG}Remote Access Utility}
 
-{\tt catremote} runs a separate utility program to submit the URL
+\catremote\ runs a separate utility program to submit the URL
 representing the query of a remote catalogue and retrieve the results.
-The utility to be used is not hard-wired into {\tt catremote}, but rather
-is specified using environment variable {\tt CATREM\_URLREADER} (see
+The utility to be used is not hard-wired into \catremote, but rather
+is specified using environment variable \texttt{CATREM\_URLREADER} (see
 Section~\ref{ENVIR}).  Several options are available:
 
 \begin{itemize}
 
-  \item {\tt geturl}, a C program supplied with {\tt catremote},
+  \item \geturl, a C program supplied with \catremote,
 
-  \item {\tt UrlReader}, a Java program also supplied with {\tt catremote},
+  \item \texttt{UrlReader}, a Java program also supplied with \catremote,
 
-  \item the \htmladdnormallinkfoot{{\tt lynx}}{http://lynx.browser.org/}
+  \item the \htmladdnormallinkfoot{\texttt{lynx}}{http://lynx.browser.org/}
    command-line browser,
 
-  \item the {\tt wget} URL-retrieval tool.
+  \item the \texttt{wget} URL-retrieval tool.
 
 \end{itemize}
 
-{\tt geturl} is the default on Starlink systems.  It is reasonably fast, as
-are {\tt lynx} and and {\tt wget}, though {\tt UrlReader} seems somewhat
+\geturl\ is the default on Starlink systems.  It is reasonably fast, as
+are \texttt{lynx} and and \texttt{wget}, though \texttt{UrlReader} seems somewhat
 slower.  Brief details of using the various options follow.
 
 \begin{description}
 
-  \item[{\tt geturl}] specify:
+  \item[\geturl] specify:
 
-  \begin{quote}
-   {\tt setenv ~ CATREM\_URLREADER ~ "/star/bin/cursa/geturl"}
-  \end{quote}
+  \begin{terminalv}
+% setenv CATREM_URLREADER "/star/bin/cursa/geturl"
+  \end{terminalv}
 
-  \item[{\tt UrlReader}] specify:
+  \item[\texttt{UrlReader}] specify:
 
-  \begin{quote}
-   {\tt setenv ~ CATREM\_URLREADER ~ "java  UrlReader"}
-  \end{quote}
+  \begin{terminalv}
+% setenv CATREM_URLREADER  "java  UrlReader"
+  \end{terminalv}
 
-   It is also necessary to set the java environment variable {\tt CLASSPATH}
-   so that {\tt UrlReader} is picked up in addition to the standard Java
+   It is also necessary to set the java environment variable \texttt{CLASSPATH}
+   so that \texttt{UrlReader} is picked up in addition to the standard Java
    classes.  For example, I might set:
 
-  \begin{center}
-   {\small \tt setenv~CLASSPATH~/star/bin/cursa:/usr/lib/netscape/java/classes}
-  \end{center}
+  \begin{terminalv}
+% setenv CLASSPATH /star/bin/cursa:/usr/lib/netscape/java/classes
+  \end{terminalv}
 
-   Note that it is necessary to specify the location of {\tt UrlReader}
-   using {\tt CLASSPATH} rather than the corresponding Java command-line
+   Note that it is necessary to specify the location of \texttt{UrlReader}
+   using \texttt{CLASSPATH} rather than the corresponding Java command-line
    option    because the latter appears not to work on Compaq Alpha/Tru64.
 
-  \item[{\tt lynx}] specify:
+  \item[\texttt{lynx}] specify:
 
-  \begin{quote}
-   {\tt setenv ~ CATREM\_URLREADER ~ "lynx -source"}
-  \end{quote}
+  \begin{terminalv}
+% setenv  CATREM_URLREADER  "lynx -source"
+  \end{terminalv}
 
-  \item[{\tt wget}] specify:
+  \item[\texttt{wget}] specify:
 
-  \begin{quote}
-   {\tt setenv ~ CATREM\_URLREADER ~ "wget -q -O -"}
-  \end{quote}
+  \begin{terminalv}
+% setenv  CATREM_URLREADER  "wget -q -O -"
+  \end{terminalv}
 
-   {\tt wget} is distributed as part of RedHat Linux systems and will
+   \texttt{wget} is distributed as part of RedHat Linux systems and will
    probably only be available as part of such systems.  On these systems
    an on-line manual can be accessed by typing:
 
-  \begin{quote}
-   {\tt info ~ wget}
-  \end{quote}
+  \begin{terminalv}
+% info  wget
+  \end{terminalv}
 
 \end{description}
 
 
-\begin{htmlonly}
+
+
+
+
+% \newpage
+\addcontentsline{toc}{section}{Acknowledgements}
+\section*{Acknowledgements}
+
+I am grateful to Allan~Brighton, Martin~Bly, Peter~Draper, Horst~Meyerdierks
+and Mike~Read for either advice or comments on the draft version of the
+document. Any mistakes, of course, are my own.
+
+
+% References ----------------------------------------------------------
+
+% \section{References}
+
+% \input{refs.tex}
+% \newpage
+\addcontentsline{toc}{section}{References}
+\begin{thebibliography}{99}
+
+  \bibitem{SUN193} M.J.~Bly, 16 June 1999,
+   \xref{SUN/193.4}{sun193}{}: \textit{PERL ---  Practical Extraction and
+   Report Language}, Starlink.
+
+  \bibitem{SUN200} M.J.~Bly, 13 October 2000,
+   \xref{SUN/200.3}{sun200}{}: \textit{TCLSYS --- TCL, TK and EXPECT
+   utilities}, Starlink.
+
+  \bibitem{SSN75} A.C.~Davenhall, 26 July 2000,
+   \xref{SSN/75.1}{ssn75}{}: \textit{Writing Catalogue and Image Servers for
+   GAIA and CURSA}, Starlink.
+
+  \bibitem{SUN190} A.C.~Davenhall, 14 May 2001,
+   \xref{SUN/190.9}{sun190}{}: \textit{CURSA --- Catalogue and Table
+   Manipulation Applications}, Starlink.
+
+  \bibitem{SUN240} A.C.~Davenhall, 29 May 2001,
+   \xref{SUN/240.1}{sun240}{}: \textit{FINDCOORDS --- Finding the Coordinates
+   of a Named Object}, Starlink.
+
+  \bibitem{OUSTERHOUT94} J.K.Ousterhout, 1994, \textit{Tcl and the Tk
+   Toolkit}\/ (Addison-Wesley: Reading, Massachusetts).
+
+\end{thebibliography}
+
+% ---------------------------------------------------------------------
+\appendix
 \section{Detailed Description of Applications}
 
-This section gives detailed descriptions of {\tt catremote} and {\tt
-geturl}.
-
-% \input{ssn76help.tex}
-%------------------------------------------------------------------------------
 \newpage
 \sstroutine{
    CATREMOTE
@@ -1503,8 +1027,8 @@ geturl}.
 
        catremote help
 
-      The individual arguments are described in the `Arguments{\tt '} section.
-      If the mode is omitted then  {\tt '}help{\tt '} mode is assumed.
+      The individual arguments are described in the `Arguments\texttt{'} section.
+      If the mode is omitted then  \texttt{'}help\texttt{'} mode is assumed.
 
       In addition to the command-line arguments, catremote takes some
       input from Unix shell environment variables and these variables can
@@ -1530,13 +1054,13 @@ geturl}.
          catremote list namesvr
       }{
          List all the name servers (that is, databases of server type
-         {\tt '}namesvr{\tt '}) in the current configuration file.
+         \texttt{'}namesvr\texttt{'}) in the current configuration file.
       }
       \sstexamplesubsection{
          catremote details usno@eso
       }{
          Show details of the USNO PMM astrometric catalogue (whose name
-         is {\tt '}usno@eso{\tt '}).
+         is \texttt{'}usno@eso\texttt{'}).
       }
       \sstexamplesubsection{
          catremote query usno@eso 12:15:00 30:30:00 10
@@ -1557,7 +1081,7 @@ geturl}.
          Declination 30:30:00.0 (sexagesimal degrees, both J2000) which
          also lie in the magnitude range 14 to 16.
       }
-      \sstexamplesubsection{
+     \sstexamplesubsection{
          catremote name simbad\_ns@eso ngc3379
       }{
          Find the equatorial coordinates of the galaxy NGC 3379.  The
@@ -1588,12 +1112,13 @@ geturl}.
       CATREM\_ECHOURL (read)
          This environment controls whether the URL representing the query
          submitted to the remote catalogue is also displayed to the user.
-         The default is {\tt '}no{\tt '}; to see the URL set CATREM\_ECHOURL to {\tt '}yes{\tt '}.
+         The default is \texttt{'}no\texttt{'}; to see the URL set CATREM\_ECHOURL to \texttt{'}yes\texttt{'}.
          Seeing the URL is potentially useful when debugging configuration
          files and remote catalogue servers but is not usually required
          for normal operation.
    }
 }
+
 \newpage
 \sstroutine{
    GETURL
@@ -1637,55 +1162,7 @@ geturl}.
       }
    }
 }
-%------------------------------------------------------------------------------
 
-\end{htmlonly}
-
-
-% \newpage
-\addcontentsline{toc}{section}{Acknowledgements}
-\section*{Acknowledgements}
-
-I am grateful to Allan~Brighton, Martin~Bly, Peter~Draper, Horst~Meyerdierks
-and Mike~Read for either advice or comments on the draft version of the
-document. Any mistakes, of course, are my own.
-
-
-% References ----------------------------------------------------------
-
-% \section{References}
-
-% \input{refs.tex}
-% \newpage
-\addcontentsline{toc}{section}{References}
-\begin{thebibliography}{99}
-
-  \bibitem{SUN193} M.J.~Bly, 16 June 1999,
-   \xref{SUN/193.4}{sun193}{}: {\it PERL ---  Practical Extraction and
-   Report Language}, Starlink.
-
-  \bibitem{SUN200} M.J.~Bly, 13 October 2000,
-   \xref{SUN/200.3}{sun200}{}: {\it TCLSYS --- TCL, TK and EXPECT
-   utilities}, Starlink.
-
-  \bibitem{SSN75} A.C.~Davenhall, 26 July 2000,
-   \xref{SSN/75.1}{ssn75}{}: {\it Writing Catalogue and Image Servers for
-   GAIA and CURSA}, Starlink.
-
-  \bibitem{SUN190} A.C.~Davenhall, 14 May 2001,
-   \xref{SUN/190.9}{sun190}{}: {\it CURSA --- Catalogue and Table
-   Manipulation Applications}, Starlink.
-
-  \bibitem{SUN240} A.C.~Davenhall, 29 May 2001,
-   \xref{SUN/240.1}{sun240}{}: {\it FINDCOORDS --- Finding the Coordinates
-   of a Named Object}, Starlink.
-
-  \bibitem{OUSTERHOUT94} J.K.Ousterhout, 1994, {\it Tcl and the Tk
-   Toolkit}\/ (Addison-Wesley: Reading, Massachusetts).
-
-\end{thebibliography}
-
-% ---------------------------------------------------------------------
 
 \typeout{  }
 \typeout{*****************************************************}
