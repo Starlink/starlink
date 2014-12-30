@@ -1,795 +1,268 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % ? Specify used packages
-\usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\usepackage{lscape}
-\usepackage{amsmath}
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink System Note}
-\newcommand{\stardocinitials}  {SSN}
-\newcommand{\stardocsource}    {ssn\stardocnumber}
+\stardoccategory    {Starlink System Note}
+\stardocinitials    {SSN}
+\stardocsource      {ssn\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {72.2}
-\newcommand{\stardocauthors}   {Tim Jenness, John F.\ Lightfoot\\
+\stardocnumber      {72.2}
+\stardocauthors   {Tim Jenness, John F.\ Lightfoot\\
                                 Joint Astronomy Centre, Hilo, Hawaii}
-\newcommand{\stardocdate}      {10 July 2000}
-\newcommand{\stardoctitle}     {SURF Programming Interface}
-\newcommand{\stardocabstract}  {This document describes the SURF programming
+\stardocdate        {10 July 2000}
+\stardoctitle       {SURF Programming Interface}
+\startitlepic{\includegraphics[width=2.0in]{ssn72_logo}}
+\stardocabstract  {This document describes the SURF programming
 interface. Including the library API, instructions on how to build
 a SURF task, the SURF file format and instructions on how to write
 a SURF import task.}
 
+% ? End of document identification
+% -----------------------------------------------------------------------------
+% ? Document specific \providecommand or \newenvironment commands.
+
 % Environment for indenting and using a small font.
 \newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
 
-\newcommand{\mytext}[1]{{\small \tt #1}}
+\providecommand{\mytext}[1]{{\small \texttt{#1}}}
 
 % set up some common package names
 
-\newcommand{\Kappa}{\xref{{\sc{Kappa}}}{sun95}{}}
+\providecommand{\Kappa}{\xref{{\sc{Kappa}}}{sun95}{}}
 
-\newcommand{\Figaro}{\xref{{\sc{Figaro}}}{sun86}{}}
+\providecommand{\Figaro}{\xref{{\sc{Figaro}}}{sun86}{}}
 
-\newcommand{\gaia}{\xref{{\sc{Gaia}}}{sun214}{}}
+\providecommand{\gaia}{\xref{{\sc{Gaia}}}{sun214}{}}
 
-\newcommand{\convert}{\xref{{\sc{Convert}}}{sun55}{}}
+\providecommand{\convert}{\xref{{\sc{Convert}}}{sun55}{}}
 
-\newcommand{\fluxes}{\xref{{\sc{Fluxes}}}{sun213}{}}
+\providecommand{\fluxes}{\xref{{\sc{Fluxes}}}{sun213}{}}
 
-\newcommand{\Iras}{\xref{{\sc{Iras90}}}{sun163}{}}
+\providecommand{\Iras}{\xref{{\sc{Iras90}}}{sun163}{}}
 
-\newcommand{\ndf}{\xref{NDF}{sun33}{}}
+\providecommand{\ndf}{\xref{NDF}{sun33}{}}
 
-\newcommand{\hds}{\xref{HDS}{sun92}{}}
+\providecommand{\hds}{\xref{HDS}{sun92}{}}
 
-\newcommand{\agi}{\xref{AGI}{sun48}{}}
+\providecommand{\agi}{\xref{AGI}{sun48}{}}
 
-\newcommand{\ESP}{\xref{ESP}{sun180}{}}
+\providecommand{\ESP}{\xref{ESP}{sun180}{}}
 
-\newcommand{\specx}{\xref{{\sc{Specx}}}{sc8}{}}
+\providecommand{\specx}{\xref{{\sc{Specx}}}{sc8}{}}
 
-\newcommand{\polpack}{\xref{{\sc{Polpack}}}{sun223}{}}
+\providecommand{\polpack}{\xref{{\sc{Polpack}}}{sun223}{}}
 
-\newcommand{\ccdpack}{\xref{CCDPACK}{sun139}{}}
+\providecommand{\ccdpack}{\xref{CCDPACK}{sun139}{}}
 
-\newcommand{\cursa}{\xref{{\sc{Cursa}}}{sun190}{}}
+\providecommand{\cursa}{\xref{{\sc{Cursa}}}{sun190}{}}
 
-\newcommand{\surfref}{\xref{{\scusoft}}{sun216}{}}
+\providecommand{\surfref}{\xref{{\scusoft}}{sun216}{}}
 
 % Application tasks
-\newcommand{\task}[1]{{\sf #1}}
+\providecommand{\task}[1]{\textsf{#1}}
 
 % ADAM parameters
-\newcommand{\param}[1]{{\tt #1}}
+\providecommand{\param}[1]{\texttt{#1}}
 
 
 % Common tasks
-\newcommand{\renoise}{\xref{\task{reduce\_noise}}{sun216}{REDUCE_NOISE}}
+\providecommand{\renoise}{\xref{\task{reduce\_noise}}{sun216}{REDUCE_NOISE}}
 
-\newcommand{\rebin}{\xref{\task{rebin}}{sun216}{REBIN}}
+\providecommand{\rebin}{\xref{\task{rebin}}{sun216}{REBIN}}
 
-\newcommand{\bolrebin}{\xref{\task{bolrebin}}{sun216}{BOLREBIN}}
+\providecommand{\bolrebin}{\xref{\task{bolrebin}}{sun216}{BOLREBIN}}
 
-\newcommand{\intrebin}{\xref{\task{intrebin}}{sun216}{INTREBIN}}
+\providecommand{\intrebin}{\xref{\task{intrebin}}{sun216}{INTREBIN}}
 
-\newcommand{\calcsky}{\xref{\task{calcsky}}{sun216}{CALCSKY}}
+\providecommand{\calcsky}{\xref{\task{calcsky}}{sun216}{CALCSKY}}
 
-\newcommand{\chgqual}{\xref{\task{change\_quality}}{sun216}{CHANGE_QUALITY}}
+\providecommand{\chgqual}{\xref{\task{change\_quality}}{sun216}{CHANGE_QUALITY}}
 
-\newcommand{\chgflat}{\xref{\task{change\_flat}}{sun216}{CHANGE_FLAT}}
+\providecommand{\chgflat}{\xref{\task{change\_flat}}{sun216}{CHANGE_FLAT}}
 
-\newcommand{\chgpnt}{\xref{\task{change\_pointing}}{sun216}{CHANGE_POINTING}}
+\providecommand{\chgpnt}{\xref{\task{change\_pointing}}{sun216}{CHANGE_POINTING}}
 
-\newcommand{\chgdata}{\xref{\task{change\_data}}{sun216}{CHANGE_DATA}}
+\providecommand{\chgdata}{\xref{\task{change\_data}}{sun216}{CHANGE_DATA}}
 
-\newcommand{\resw}{\xref{\task{reduce\_switch}}{sun216}{REDUCE_SWITCH}}
+\providecommand{\resw}{\xref{\task{reduce\_switch}}{sun216}{REDUCE_SWITCH}}
 
-\newcommand{\flatf}{\xref{\task{flatfield}}{sun216}{FLATFIELD}}
+\providecommand{\flatf}{\xref{\task{flatfield}}{sun216}{FLATFIELD}}
 
-\newcommand{\skydip}{\xref{\task{skydip}}{sun216}{SKYDIP}}
+\providecommand{\skydip}{\xref{\task{skydip}}{sun216}{SKYDIP}}
 
-\newcommand{\scuphot}{\xref{\task{scuphot}}{sun216}{SCUPHOT}}
+\providecommand{\scuphot}{\xref{\task{scuphot}}{sun216}{SCUPHOT}}
 
-\newcommand{\ext}{\xref{\task{extinction}}{sun216}{EXTINCTION}}
+\providecommand{\ext}{\xref{\task{extinction}}{sun216}{EXTINCTION}}
 
-\newcommand{\scuquick}{\xref{\task{scuquick}}{sun216}{SCUQUICK}}
+\providecommand{\scuquick}{\xref{\task{scuquick}}{sun216}{SCUQUICK}}
 
-\newcommand{\scuhelp}{\xref{\task{scuhelp}}{sun216}{SCUHELP}}
+\providecommand{\scuhelp}{\xref{\task{scuhelp}}{sun216}{SCUHELP}}
 
-\newcommand{\remsky}{\xref{\task{remsky}}{sun216}{REMSKY}}
+\providecommand{\remsky}{\xref{\task{remsky}}{sun216}{REMSKY}}
 
-\newcommand{\scuover}{\xref{\task{scuover}}{sun216}{SCUOVER}}
+\providecommand{\scuover}{\xref{\task{scuover}}{sun216}{SCUOVER}}
 
-\newcommand{\extdata}{\xref{\task{extract\_data}}{sun216}{EXTRACT_DATA}}
+\providecommand{\extdata}{\xref{\task{extract\_data}}{sun216}{EXTRACT_DATA}}
 
-\newcommand{\sculog}{\xref{\task{sculog}}{sun216}{SCULOG}}
+\providecommand{\sculog}{\xref{\task{sculog}}{sun216}{SCULOG}}
 
-\newcommand{\scucat}{\xref{\task{scucat}}{sun216}{SCUCAT}}
+\providecommand{\scucat}{\xref{\task{scucat}}{sun216}{SCUCAT}}
 
-\newcommand{\photsum}{\xref{\task{photsum}}{sun216}{PHOTSUM}}
+\providecommand{\photsum}{\xref{\task{photsum}}{sun216}{PHOTSUM}}
 
-\newcommand{\mapsum}{\xref{\task{mapsum}}{sun216}{MAPSUM}}
+\providecommand{\mapsum}{\xref{\task{mapsum}}{sun216}{MAPSUM}}
 
-\newcommand{\skysum}{\xref{\task{skysum}}{sun216}{SKYSUM}}
+\providecommand{\skysum}{\xref{\task{skysum}}{sun216}{SKYSUM}}
 
-\newcommand{\pointsum}{\xref{\task{pointsum}}{sun216}{POINTSUM}}
+\providecommand{\pointsum}{\xref{\task{pointsum}}{sun216}{POINTSUM}}
 
-\newcommand{\qdraw}{\xref{\task{qdraw}}{sun216}{QDRAW}}
+\providecommand{\qdraw}{\xref{\task{qdraw}}{sun216}{QDRAW}}
 
-\newcommand{\sigclip}{\xref{\task{sigclip}}{sun216}{SIGCLIP}}
+\providecommand{\sigclip}{\xref{\task{sigclip}}{sun216}{SIGCLIP}}
 
-\newcommand{\restore}{\xref{\task{restore}}{sun216}{RESTORE}}
+\providecommand{\restore}{\xref{\task{restore}}{sun216}{RESTORE}}
 
-\newcommand{\sdip}{\xref{\task{sdip}}{sun216}{SDIP}}
+\providecommand{\sdip}{\xref{\task{sdip}}{sun216}{SDIP}}
 
-\newcommand{\scupa}{\xref{\task{scupa}}{sun216}{SCUPA}}
+\providecommand{\scupa}{\xref{\task{scupa}}{sun216}{SCUPA}}
 
-\newcommand{\obssum}{\xref{\task{obssum}}{sun216}{OBSSUM}}
+\providecommand{\obssum}{\xref{\task{obssum}}{sun216}{OBSSUM}}
 
-\newcommand{\despike}{\xref{\task{despike}}{sun216}{DESPIKE}}
+\providecommand{\despike}{\xref{\task{despike}}{sun216}{DESPIKE}}
 
-\newcommand{\despikeb}{\xref{\task{despike2}}{sun216}{DESPIKE2}}
+\providecommand{\despikeb}{\xref{\task{despike2}}{sun216}{DESPIKE2}}
 
-\newcommand{\extflat}{\xref{\task{extract\_flat}}{sun216}{EXTRACT_FLAT}}
+\providecommand{\extflat}{\xref{\task{extract\_flat}}{sun216}{EXTRACT_FLAT}}
 
-\newcommand{\scushift}{\xref{\task{scushift}}{sun216}{SCUSHIFT}}
+\providecommand{\scushift}{\xref{\task{scushift}}{sun216}{SCUSHIFT}}
 
-\newcommand{\scuclip}{\xref{\task{scuclip}}{sun216}{SCUCLIP}}
+\providecommand{\scuclip}{\xref{\task{scuclip}}{sun216}{SCUCLIP}}
 
-\newcommand{\scanrlb}{\xref{\task{scan\_rlb}}{sun216}{SCAN_RLB}}
+\providecommand{\scanrlb}{\xref{\task{scan\_rlb}}{sun216}{SCAN_RLB}}
 
-\newcommand{\dspbol}{\xref{\task{dspbol}}{sun216}{DSPBOL}}
+\providecommand{\dspbol}{\xref{\task{dspbol}}{sun216}{DSPBOL}}
 
-\newcommand{\pltbol}{\xref{\task{pltbol}}{sun216}{PLTBOL}}
+\providecommand{\pltbol}{\xref{\task{pltbol}}{sun216}{PLTBOL}}
 
-\newcommand{\rlinplot}{\xref{\task{rlinplot}}{sun216}{RLINPLOT}}
+\providecommand{\rlinplot}{\xref{\task{rlinplot}}{sun216}{RLINPLOT}}
 
-\newcommand{\scuplot}{\xref{\task{scuplot}}{sun216}{SCUPLOT}}
+\providecommand{\scuplot}{\xref{\task{scuplot}}{sun216}{SCUPLOT}}
 
-\newcommand{\remdbm}{\xref{\task{remdbm}}{sun216}{REMDBM}}
+\providecommand{\remdbm}{\xref{\task{remdbm}}{sun216}{REMDBM}}
 
-\newcommand{\scumakewt}{\xref{\task{scumakewt}}{sun216}{SCUMAKEWT}}
+\providecommand{\scumakewt}{\xref{\task{scumakewt}}{sun216}{SCUMAKEWT}}
 
-\newcommand{\chgnacent}{\xref{\task{change\_nacentre}}{sun216}{CHANGE_NACENTRE}}
+\providecommand{\chgnacent}{\xref{\task{change\_nacentre}}{sun216}{CHANGE_NACENTRE}}
 
-\newcommand{\scunoise}{\xref{\task{scunoise}}{sun216}{SCUNOISE}}
+\providecommand{\scunoise}{\xref{\task{scunoise}}{sun216}{SCUNOISE}}
 
-\newcommand{\setbolwt}{\xref{\task{setbolwt}}{sun216}{SETBOLWT}}
+\providecommand{\setbolwt}{\xref{\task{setbolwt}}{sun216}{SETBOLWT}}
 
-\newcommand{\adddbm}{\xref{\task{add\_dbm}}{sun216}{ADD_DBM}}
+\providecommand{\adddbm}{\xref{\task{add\_dbm}}{sun216}{ADD_DBM}}
 
-\newcommand{\remip}{\xref{\task{remip}}{sun216}{REMIP}}
+\providecommand{\remip}{\xref{\task{remip}}{sun216}{REMIP}}
 
-\newcommand{\scusetenv}{\xref{\task{scusetenv}}{sun216}{SCUSETENV}}
+\providecommand{\scusetenv}{\xref{\task{scusetenv}}{sun216}{SCUSETENV}}
 
 
 % Non surf tasks
 
-\newcommand{\fillbad}{\xref{\task{fillbad}}{sun95}{FILLBAD}}
+\providecommand{\fillbad}{\xref{\task{fillbad}}{sun95}{FILLBAD}}
 
-\newcommand{\ndftrace}{\xref{\task{ndftrace}}{sun95}{NDFTRACE}}
+\providecommand{\ndftrace}{\xref{\task{ndftrace}}{sun95}{NDFTRACE}}
 
-\newcommand{\glitch}{\xref{\task{glitch}}{sun95}{GLITCH}}
+\providecommand{\glitch}{\xref{\task{glitch}}{sun95}{GLITCH}}
 
-\newcommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
+\providecommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
 
-\newcommand{\linplot}{\xref{\task{linplot}}{sun95}{LINPLOT}}
+\providecommand{\linplot}{\xref{\task{linplot}}{sun95}{LINPLOT}}
 
-\newcommand{\mlinplot}{\xref{\task{mlinplot}}{sun95}{MLINPLOT}}
+\providecommand{\mlinplot}{\xref{\task{mlinplot}}{sun95}{MLINPLOT}}
 
-\newcommand{\drawsig}{\xref{\task{drawsig}}{sun95}{DRAWSIG}}
+\providecommand{\drawsig}{\xref{\task{drawsig}}{sun95}{DRAWSIG}}
 
-\newcommand{\centroid}{\xref{\task{centroid}}{sun95}{CENTROID}}
+\providecommand{\centroid}{\xref{\task{centroid}}{sun95}{CENTROID}}
 
-\newcommand{\setaxis}{\xref{\task{setaxis}}{sun95}{SETAXIS}}
+\providecommand{\setaxis}{\xref{\task{setaxis}}{sun95}{SETAXIS}}
 
-\newcommand{\kstest}{\xref{\task{kstest}}{sun95}{KSTEST}}
+\providecommand{\kstest}{\xref{\task{kstest}}{sun95}{KSTEST}}
 
-\newcommand{\stats}{\xref{\task{stats}}{sun95}{STATS}}
+\providecommand{\stats}{\xref{\task{stats}}{sun95}{STATS}}
 
-\newcommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
+\providecommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
 
-\newcommand{\setbb}{\xref{\task{setbb}}{sun95}{SETBB}}
+\providecommand{\setbb}{\xref{\task{setbb}}{sun95}{SETBB}}
 
-\newcommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
+\providecommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
 
-\newcommand{\fourier}{\xref{\task{fourier}}{sun95}{FOURIER}}
+\providecommand{\fourier}{\xref{\task{fourier}}{sun95}{FOURIER}}
 
-\newcommand{\hislist}{\xref{\task{hislist}}{sun95}{HISLIST}}
+\providecommand{\hislist}{\xref{\task{hislist}}{sun95}{HISLIST}}
 
-\newcommand{\ndffits}{\xref{\task{ndf2fits}}{sun55}{NDF2FITS}}
+\providecommand{\ndffits}{\xref{\task{ndf2fits}}{sun55}{NDF2FITS}}
 
-\newcommand{\cadd}{\xref{\task{cadd}}{sun95}{CADD}}
+\providecommand{\cadd}{\xref{\task{cadd}}{sun95}{CADD}}
 
-\newcommand{\hdstrace}{\xref{\task{hdstrace}}{sun102}{}}
+\providecommand{\hdstrace}{\xref{\task{hdstrace}}{sun102}{}}
 
-\newcommand{\psmerge}{\xref{\task{psmerge}}{sun164}{}}
+\providecommand{\psmerge}{\xref{\task{psmerge}}{sun164}{}}
 
-\newcommand{\wdfits}{\xref{\task{wdfits}}{sun86}{WDFITS}}
+\providecommand{\wdfits}{\xref{\task{wdfits}}{sun86}{WDFITS}}
 
-\newcommand{\delobj}{\xref{\task{delobj}}{sun86}{DELOBJ}}
+\providecommand{\delobj}{\xref{\task{delobj}}{sun86}{DELOBJ}}
 
-\newcommand{\sclean}{\xref{\task{sclean}}{sun86}{SCLEAN}}
+\providecommand{\sclean}{\xref{\task{sclean}}{sun86}{SCLEAN}}
 
-\newcommand{\setvar}{\xref{\task{setvar}}{sun95}{SETVAR}}
+\providecommand{\setvar}{\xref{\task{setvar}}{sun95}{SETVAR}}
 
-\newcommand{\wcsalign}{\xref{\task{wcsalign}}{sun95}{WCSALIGN}}
+\providecommand{\wcsalign}{\xref{\task{wcsalign}}{sun95}{WCSALIGN}}
 
-\newcommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
+\providecommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
 
-\newcommand{\manic}{\xref{\task{manic}}{sun95}{MANIC}}
+\providecommand{\manic}{\xref{\task{manic}}{sun95}{MANIC}}
 
-\newcommand{\cdiv}{\xref{\task{cdiv}}{sun95}{CDIV}}
+\providecommand{\cdiv}{\xref{\task{cdiv}}{sun95}{CDIV}}
 
-\newcommand{\sub}{\xref{\task{sub}}{sun95}{SUB}}
+\providecommand{\sub}{\xref{\task{sub}}{sun95}{SUB}}
 
-\newcommand{\cursor}{\xref{\task{cursor}}{sun95}{CURSOR}}
+\providecommand{\cursor}{\xref{\task{cursor}}{sun95}{CURSOR}}
 
-\newcommand{\gdset}{\xref{\task{gdset}}{sun95}{GDSET}}
+\providecommand{\gdset}{\xref{\task{gdset}}{sun95}{GDSET}}
 
-\newcommand{\image}{\xref{\task{image}}{sun86}{IMAGE}}
+\providecommand{\image}{\xref{\task{image}}{sun86}{IMAGE}}
 
-\newcommand{\gaufit}{\xref{\task{gaufit}}{sun180}{GAUFIT}}
+\providecommand{\gaufit}{\xref{\task{gaufit}}{sun180}{GAUFIT}}
 
-\newcommand{\makemos}{\xref{\task{makemos}}{sun139}{MAKEMOS}}
+\providecommand{\makemos}{\xref{\task{makemos}}{sun139}{MAKEMOS}}
 
-\newcommand{\polimp}{\xref{\task{polimp}}{sun223}{POLIMP}}
+\providecommand{\polimp}{\xref{\task{polimp}}{sun223}{POLIMP}}
 
-\newcommand{\polcal}{\xref{\task{polcal}}{sun223}{POLCAL}}
+\providecommand{\polcal}{\xref{\task{polcal}}{sun223}{POLCAL}}
 
-\newcommand{\polbin}{\xref{\task{polbin}}{sun223}{POLBIN}}
+\providecommand{\polbin}{\xref{\task{polbin}}{sun223}{POLBIN}}
 
-\newcommand{\polvec}{\xref{\task{polvec}}{sun223}{POLVEC}}
+\providecommand{\polvec}{\xref{\task{polvec}}{sun223}{POLVEC}}
 
-\newcommand{\polplot}{\xref{\task{polplot}}{sun223}{POLPLOT}}
+\providecommand{\polplot}{\xref{\task{polplot}}{sun223}{POLPLOT}}
 
-\newcommand{\catselect}{\xref{\task{catselect}}{sun190}{}}
+\providecommand{\catselect}{\xref{\task{catselect}}{sun190}{}}
 
 % General commands
-\newcommand{\scusoft}          {{\sc Surf}}
+\providecommand{\scusoft}          {\textsc{Surf}}
 
-\newcommand{\mmicron}           {$\mu$m}
-
-
-% ? End of document identification
-% -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     ssn72.tex
-%
-%  Purpose:
-%     SURF (see SUN/216) programming interface documentation
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%     TIMJ: Tim Jenness (JAC, Hawaii)
-%
-%  History:
-%     $Log$
-%     Revision 1.5  2000/07/10 23:55:13  timj
-%     Correctly update the document release number and date
-%
-%     Revision 1.4  2000/05/11 19:43:47  timj
-%     Include some minor mods made by Martin Bly for the Starlink release.
-%
-%     Revision 1.3  1999/11/06 02:18:33  timj
-%     Fix use of amstex.
-%
-%     Revision 1.2  1999/11/05 23:12:56  timj
-%     Release V1.5-0
-%
-%     Revision 1.1  1999/08/19 03:52:10  timj
-%     First draft.
-%     09-AUG-1999 (TIMJ):
-%        Convert template to SURF API document. Write complete document.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-
-
-%     {Add further history here}
-
-%  Copyright:
-%     Copyright (C) 1996-1998 Central Laboratory of the Research Councils
-%     Copyright (C) 1999 Particle Physics and Astronomy Research Council
-
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-1.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
-
-
-
-
+\providecommand{\mmicron}           {$\mu$m}
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Large\textbf{\stardoctitle}}
-   \end{center}
-   \vspace{5mm}
-
-\begin{center}
-\includegraphics[width=2.0in]{ssn72_logo}
-\end{center}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-\includegraphics[width=2.0in]{ssn72_logo}
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 %%%%%%%%%%%%%%%% S T A R T   H E R E %%%%%%%%%%%%%%%%%%%%%%%%%%
 % ? Main text
@@ -815,8 +288,8 @@ variances, quality flags, non-linear axes and arbritrary extensions.
 SCUBA raw data (i.e.\ data in the format expected by the \scusoft\ task
 \resw) has the following general layout:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 STRUCT  <NDF>
 
    MORE           <EXT>           {structure}
@@ -831,8 +304,8 @@ STRUCT  <NDF>
 
    DATA_ARRAY(5,130,900)  <_REAL>   0.0102353,1.9114159E-6,0.0184784,
                                     ... 1.7097691E-5,0.01525085,1.841503E-5,0
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 It is a very simple NDF format with a single \texttt{DATA\_ARRAY} and
 four extensions. The extensions are described in section \ref{scu:ext}.
 The \texttt{DATA\_ARRAY} is three dimensional with the following meanings:
@@ -873,8 +346,8 @@ data array), axes, history reporting, a title and units.
 
 Here is an example of the \resw\ output for a Mars pointing observation:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 O10  <NDF>
 
    DATA_ARRAY(37,32)  <_REAL>     -0.003304771,0.0002364833,0.00320935,
@@ -957,8 +430,8 @@ O10  <NDF>
    UNITS          <_CHAR*5>       'Volts'
 
 End of Trace.
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 The data arrays are now 2 dimensional, corresponding to the bolometer number
 and time axis. The axis information is written so that the integration number
@@ -968,8 +441,8 @@ created to hold the relative beam weights; for maps these are always set to 0,1,
 A photometry observation is slightly different from a map observation in that
 the output data array is now 3 dimensional rather than 2:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 O107  <NDF>
 
    MORE           <EXT>           {structure}
@@ -1050,8 +523,8 @@ O107  <NDF>
    UNITS          <_CHAR*5>       'Volts'
 
 End of Trace.
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 The 3rd dimension corresponds to beam position. In most cases only beam 2 is
 used (the middle beam) but for two or three  bolometer chopping the 1st and
@@ -1079,6 +552,7 @@ a subset of the full SCUBA headers. For a jiggle map these are listed
 in table \ref{tab:jigfits}.
 
 \begin{table}
+\renewcommand{\arraystretch}{1.0}
 \begin{myquote}
 \begin{tabular}{ll}
 OBJECT & Name of object \\
@@ -1142,8 +616,8 @@ The \texttt{SCUBA} extension contains information on the instrument and the
 structure of the data array. It has the following format (output of
 \hdstrace):
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 SCUBA          <SCUBA_ST>      {structure}
    BOL_CALB(16,9)  <_REAL>        1.286,0.9311,0.9499,1.002,0.9585,
                                   ... 1.054,1.065,1.045,1,1,1,1,1,1,0
@@ -1168,8 +642,8 @@ SCUBA          <SCUBA_ST>      {structure}
    ISTART         <_INTEGER>      0
    NPIX           <_INTEGER>      0
    POINTER        <_INTEGER>      0
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 The first 5 entries are simply the flatfield information (see Appendix
 \ref{app:ff} for an example flatfield file). The shape of the arrays
@@ -1277,8 +751,8 @@ The \texttt{SCUCD} extension contains information on telescope movements.
 It is slightly different for JIGGLE (MAP and PHOTOM) and SCAN observations.
 For a JIGGLE observation it has the following format:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 STRUCT.MORE.SCUCD  <SCUCD_ST>
 
    JIGL_X(64)     <_REAL>         -2.6883,-5.3457,-8.033999,-13.3797,
@@ -1291,13 +765,13 @@ STRUCT.MORE.SCUCD  <SCUCD_ST>
                                   ... 5.6639924748021,5.6623806283313
    RA1            <_REAL>         0
    RA2            <_REAL>         0
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 and for a SCAN observation:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 STRUCT.MORE.SCUCD  <SCUCD_ST>
 
    JIGL_X         <_REAL>         0
@@ -1313,8 +787,8 @@ STRUCT.MORE.SCUCD  <SCUCD_ST>
    RA2(1,5,1,1)   <_REAL>         21.16466,21.16197,21.16755,21.1638,
                                   21.16747
    WPLATE         <_REAL>         0
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 The full description of these entries follows:
 
@@ -1541,15 +1015,15 @@ jiggle map).
 
 \begin{description}
 
-\item{{\bf chopping}} The secondary mirror is continuously moved on and off
+\item{\textbf{chopping}} The secondary mirror is continuously moved on and off
 source at approximately 7~Hz in order to remove the sky to zeroth order. This
 is done in addition to standard jiggling.
 
-\item{{\bf demodulation}} Removal of the chop signal by the transputers.
+\item{\textbf{demodulation}} Removal of the chop signal by the transputers.
 At this time, the raw data can not be accessed, only the demodulated data are
 stored.
 
-\item{{\bf exposure}} An exposure is the result from a complete set of
+\item{\textbf{exposure}} An exposure is the result from a complete set of
 switches. For example, in a JIGGLE/MAP or PHOTOM observation where the
 telescope is nodding the source between left and right beams, the data from
 each nod position is a switch and the reduced result `left switch' - `right
@@ -1557,7 +1031,7 @@ switch' say, is an exposure. In a SCAN/MAP observation there is no beam
 switching so, in this case, an exposure is the same as a switch.
 
 
-\item{{\bf integration}} An integration means different things for different
+\item{\textbf{integration}} An integration means different things for different
 observations.
 
 For one of the mapping modes it means the data from one fully-sampled coverage
@@ -1576,26 +1050,26 @@ For a SKYDIP observation, an integration is the data from a single revolution
 of the sector chopper in front of the cryostat window.
 
 
-\item{{\bf jiggle}} In order to sample an image fully the secondary mirror
+\item{\textbf{jiggle}} In order to sample an image fully the secondary mirror
 is moved once a second (whilst chopping) to move the position of the array on
 the sky; this is called `jiggling.'  There are a  complete set of jiggle
 positions for each integration. A PHOTOM observation can also jiggle in order
 to correct for seeing effects.
 
-\item{{\bf measurement}} A measurement is a group of integrations. Most MAP or
+\item{\textbf{measurement}} A measurement is a group of integrations. Most MAP or
 PHOTOM observations will consist of only one measurement.
 
 A FOCUS or ALIGN observation consists of five measurements (one for each
 secondary mirror position). A SKYDIP observation consists of one measurement
 at each elevation.
 
-\item{{\bf nod}} In order to correct for atmospheric variation the telescope
+\item{\textbf{nod}} In order to correct for atmospheric variation the telescope
 is moved off-source in each exposure so that sky can be measured.
 
-\item{{\bf ODF}} The observation definition file (ODF) is a file containing a
+\item{\textbf{ODF}} The observation definition file (ODF) is a file containing a
 list of instructions for an observation with SCUBA.
 
-\item{{\bf sub-instrument}} SCUBA contains bolometer arrays and photometric
+\item{\textbf{sub-instrument}} SCUBA contains bolometer arrays and photometric
 pixels that can operate at several wavelengths simultaneously. Each of these
 is called a sub-instrument. They are:
 
@@ -1608,12 +1082,12 @@ is called a sub-instrument. They are:
 \end{itemize}
 
 
-\item{{\bf switch}} The switch is the fundamental unit of data-taking in an
+\item{\textbf{switch}} The switch is the fundamental unit of data-taking in an
 observation. For example in a JIGGLE/MAP or PHOTOM observation each chunk of
 jiggle positions measured with the object in the beam of a telescope is a
 switch. Each scan across the source in a SCAN/MAP observation is also a switch.
 
-\item{{\bf tau ($\tau$)}} Submillimetre extinction is measured using the
+\item{\textbf{tau ($\tau$)}} Submillimetre extinction is measured using the
 zenith optical depth, tau or $\tau$, this is a measure of the amount of water
 vapour present in the atmosphere. For a tau, $\tau$ at a given airmass, $A$,
 the attenuation due to the atmosphere is given as e$^{-A \tau}$. Note that tau
@@ -1672,8 +1146,7 @@ more information on the setting of the version number in the monolith.
 
 \begin{figure}
 \begin{center}
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 surf ---- src                          Top level surf_* and IFL files
       |
       |-- surflib                      surflib source code
@@ -1699,8 +1172,7 @@ surf ---- src                          Top level surf_* and IFL files
                      |-- sc11          Mapping cookbook
                      |
                      |-- sc11_mini     mini mapping cookbook
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 \end{center}
 \caption{Directory layout of SURF development system. CVS directories are not
 shown.}
@@ -1856,8 +1328,8 @@ different for different observing modes.
 
 This is a typical SKYDIP FITS header:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 ACCEPT  = 'NO      '           / accept update; PROMPT, YES or NO
 ALIGN_AX= 'not used'           / Alignment measurements in X or Y axis
 ALIGN_SH=                   -1 / Distance between successive alignment offsets (
@@ -2029,8 +1501,8 @@ WAVE_3  =                    0 / Wavelength of map (microns)
 WAVE_4  =                    0 / Wavelength of map (microns)
 WAVE_5  =                    0 / Wavelength of map (microns)
 END
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 \subsection{Jiggle map}
 
@@ -2039,8 +1511,8 @@ apparent RA and Dec of the source at two different times. These are specified
 as \texttt{LON}G and \texttt{LAT} for \texttt{MJD1} and \texttt{LONG2} and
 \texttt{LAT2} for \texttt{MJD2}):
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 ACCEPT  = 'not used'           / accept update; PROMPT, YES or NO
 ALIGN_AX= 'not used'           / Alignment measurements in X or Y axis
 ALIGN_SH=                   -1 / Distance between successive alignment offsets (
@@ -2212,15 +1684,15 @@ WAVE_3  =                    0 / Wavelength of map (microns)
 WAVE_4  =                    0 / Wavelength of map (microns)
 WAVE_5  =                    0 / Wavelength of map (microns)
 END
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 \subsection{Photometry}
 
 This is a photometry header:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 ACCEPT  = 'not used'           / accept update; PROMPT, YES or NO
 ALIGN_AX= 'not used'           / Alignment measurements in X or Y axis
 ALIGN_SH=                   -1 / Distance between successive alignment offsets (
@@ -2392,8 +1864,7 @@ WAVE_3  =                   -1 / Wavelength of map (microns)
 WAVE_4  =                   -1 / Wavelength of map (microns)
 WAVE_5  =                   -1 / Wavelength of map (microns)
 END
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \subsection{Scan Map}
 
@@ -2403,8 +1874,7 @@ This is a scan map FITS header. Note the presence of \texttt{MAP\_HGHT},
 \texttt{RA1}, \texttt{RA2}, \texttt{DEC1} and \texttt{DEC2} arrays in the
 \texttt{SCUCD} extension.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 ACCEPT  = 'not used'           / accept update; PROMPT, YES or NO
 ALIGN_AX= 'not used'           / Alignment measurements in X or Y axis
 ALIGN_SH=                   -1 / Distance between successive alignment offsets (
@@ -2576,8 +2046,8 @@ WAVE_3  =                    0 / Wavelength of map (microns)
 WAVE_4  =                    0 / Wavelength of map (microns)
 WAVE_5  =                    0 / Wavelength of map (microns)
 END
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 
 \begin{landscape}
@@ -2585,9 +2055,8 @@ END
 
 This is the flatfield file used for SCUBA at the time of writing:
 
-
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 proc SET_BOLS
 { flat field data file written by SCUDR
 { Mon Jun 16 17:20:00 1997
@@ -2735,8 +2204,8 @@ proc SET_BOLS
  SETBOL G6  P2000     0.1000E+03  0.2375E+01  0.1000E+01 -0.1447E+00  0.1735E+02  0.1374E+02  0  69.7901157407  71 NUL
  SETBOL I13 P2000_DC  0.0000E+00  0.0000E+00  0.1000E+01  0.0000E+00  0.0000E+00  0.0000E+00  0   0.0000000000   0 NUL
 end proc
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 \end{landscape}
 
 \section{The DREAM2SURF import task}
@@ -2744,8 +2213,8 @@ end proc
 This section lists the complete source code for the \texttt{dream2surf} import
 task. This is an example of an import task for JIGGLE map type observations.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
       SUBROUTINE DREAM2SURF ( STATUS )
 *+
 *  Name:
@@ -3625,8 +3094,8 @@ task. This is an example of an import task for JIGGLE map type observations.
       CALL NDF_END(STATUS)
 
       END
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 \section{Library APIs}
 
