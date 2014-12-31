@@ -1,600 +1,48 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % ? Specify used packages
-\usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {STARLINK User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
+\stardoccategory    {STARLINK User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {237.4}
-\newcommand{\stardocauthors}   {A.~Allan \& Malcolm J. Currie}
-\newcommand{\stardocdate}      {2010 September 7}
-\newcommand{\stardoctitle}     {DATACUBE --- An IFS datacube manipulation package}
-\newcommand{\stardocversion}   {Version 1.3}
-\newcommand{\stardocmanual}    {User's Manual}
-\newcommand{\stardocabstract}  {
-\htmlref{DATACUBE}{DATACUBE} is a package which includes the IFU Data Product Cookbook (\xref{SC/16}{sc16}{}), and a collection of example shell scripts for IFS data cube manipulation.
+\stardocnumber      {237.4}
+\stardocauthors     {A.~Allan \& Malcolm J. Currie}
+\stardocdate        {2010 September 7}
+\stardoctitle       {DATACUBE --- An IFS datacube manipulation package}
+\stardocversion     {Version 1.3}
+\stardocmanual      {User's Manual}
+\startitlepic{\includegraphics[width=0.9\textwidth]{sun237_cover}}
+\stardocabstract  {
+\DATACUBE\ is a package which includes the IFU Data Product Cookbook (\xref{SC/16}{sc16}{}), and a collection of example shell scripts for IFS data cube manipulation.
 }
 
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sc.tex
-%
-%  Purpose:
-%     Template for Starlink Cookbook (SC) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%
-%  History:
-%     16-JUN-1997 (BLY):
-%        Original, based on SUN/SG templates.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newenvironment{latexonly}{}{}
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Provide CSS support.
-\newcommand{\htmlsetstyle}[3][]{}
-\newcommand{\htmladdtostyle}[3][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-%\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-%\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% Figure environment. Defined for latex2html. #1 is postscript file
-% #2 the qualifiers, #3 the gif file, #4 the label, #5 the caption.
-\newcommand{\myfig} [5] {
-  \begin{figure}
-    \centering\includegraphics[#2]{#1}
-    \typeout{#1 inserted on page \arabic{page}}
-    \caption{\label{#4}#5}
-  \end{figure}
-  }
-\begin{htmlonly}
-  \newcommand{\myfig}[5]{
-    \label{#4} \htmladdimg{#3}\\
-    Figure: #5\\
-    }
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
-% an environment for references (for the SST sstdiytopic command).
-\newenvironment{refs}{\vspace{-4ex} % normally 3ex
-                      \begin{list}{}{\setlength{\topsep}{0mm}
-                                     \setlength{\partopsep}{0mm}
-                                     \setlength{\itemsep}{0mm}
-                                     \setlength{\parsep}{0mm}
-                                     \setlength{\leftmargin}{1.5em}
-                                     \setlength{\itemindent}{-\leftmargin}
-                                     \setlength{\labelsep}{0mm}
-                                     \setlength{\labelwidth}{0mm}}
-                                 }{\end{list}}
-
+% ? Document specific \providecommand or \newenvironment commands.
 
 % Shorthands for hypertext links.
 % -------------------------------
 
-\newcommand{\DATACUBE}{{\footnotesize DATACUBE}\normalsize}
-\newcommand{\FIGARO}{{\footnotesize FIGARO}\normalsize}
-\newcommand{\FIGAROref}{\xref{\FIGARO}{sun86}{}}
-\newcommand{\KAPPA}{{\footnotesize KAPPA}\normalsize}
-\newcommand{\KAPPAref}{\xref{\KAPPA}{sun95}{}}
-
-% +
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty
-%     on your TEXINPUTS path (and including the name as part of the
-%     documentstyle declaration).
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-% -
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\newfont{\ssttt}{cmtt10 scaled 1095}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
-
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode, and where there
-%  is a heading, thus the negative vertical space is not needed.
-\newcommand{\ssthitemlist}[1]{
-  \mbox{} \\
-  \vspace{-8.0ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%  Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  Re-define \ssttt.
-   \newcommand{\ssttt}{\tt}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}]
-      \begin{description}
-         #2
-      \end{description}
-   }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-
-%  sstitemlist
-   \newcommand{\ssthitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-   }
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-% .
-% @(#)sst.tex   1.4   95/06/06 11:46:41   96/07/05 10:28:17
+\providecommand{\DATACUBE}{{\footnotesize DATACUBE}\normalsize}
+\providecommand{\FIGARO}{{\footnotesize FIGARO}\normalsize}
+\providecommand{\FIGAROref}{\xref{\FIGARO}{sun86}{}}
+\providecommand{\KAPPA}{{\footnotesize KAPPA}\normalsize}
+\providecommand{\KAPPAref}{\xref{\KAPPA}{sun95}{}}
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
+\scfrontmatter
 
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename}
-   \begin{center}
-   \includegraphics[scale=0.6]{sun237_cover}
-   \end{center}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{5mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-   \htmladdimg{sun237_cover.png}
-
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \newcommand{\latexonlytoc}[0]{}
-%  \htmladdtonavigation{\htmlref{\htmladdimg{sc15_cover.gif}}
-%        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
 %  ===========================================
- \newpage
- \vspace{3cm}
-
  \subsection*{Revision history}
 
  \begin{enumerate}
@@ -609,28 +57,11 @@
 
  \end{enumerate}
 
- \vspace{10cm}
- \copyright \underline{1999-2005} Starlink, CCLRC
-
- \cleardoublepage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-
-   \newpage
-   \listoffigures
-   %\listoftables
-
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
- \end{latexonly}
-% ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 
 \cleardoublepage
 \newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+
 
 % The main text begins here.
 % -----------------------------------------------------------------------------
@@ -646,28 +77,28 @@ features using the cursor.
 \DATACUBE\ provides facilities:
 \begin{itemize}
 \item to view a `white-light' image of the whole and/or part of the
-      spectral range (\htmlref{{\bf squash}}{squash},
-      \htmlref{{\bf passband}}{passband});
+      spectral range (\htmlref{\textbf{squash}}{squash},
+      \htmlref{\textbf{passband}}{passband});
 \item to view a grid of channel maps of defined spectral width
-      (\htmlref{{\bf step}}{step});
-\item to extract individual spectra (\htmlref{{\bf ripper}}{ripper});
+      (\htmlref{\textbf{step}}{step});
+\item to extract individual spectra (\htmlref{\textbf{ripper}}{ripper});
 \item to extract an arbitrary position-spectral slice
-      (\htmlref{{\bf pvslice}}{pvslice});
-\item to compare spectra (\htmlref{{\bf compare}}{compare},
-      \htmlref{{\bf stacker}}{stacker});
+      (\htmlref{\textbf{pvslice}}{pvslice});
+\item to compare spectra (\htmlref{\textbf{compare}}{compare},
+      \htmlref{\textbf{stacker}}{stacker});
 \item to average and compare groups of spectra
-      (\htmlref{{\bf multistack}}{multistack});
+      (\htmlref{\textbf{multistack}}{multistack});
 \item to plot a grid of spectra with spatial averaging
-      (\htmlref{{\bf gridspec}}{gridspec});
+      (\htmlref{\textbf{gridspec}}{gridspec});
 \item to build a velocity map from an emission line by line
-      fitting (\htmlref{{\bf velmap}}{velmap}), or by intensity-weighted
-      moments (\htmlref{{\bf velmoment}}{velmoment}), or by selecting
+      fitting (\htmlref{\textbf{velmap}}{velmap}), or by intensity-weighted
+      moments (\htmlref{\textbf{velmoment}}{velmoment}), or by selecting
       a cube's voxels using the values of another velocity map
-      as spectral co-ordinates (\htmlref{{\bf mapbyvel}}{mapbyvel});
+      as spectral co-ordinates (\htmlref{\textbf{mapbyvel}}{mapbyvel});
 \item to build an emission-line strength map
-      (\htmlref{{\bf peakmap}}{peakmap}); and
+      (\htmlref{\textbf{peakmap}}{peakmap}); and
 \item to plot multiple spectra from a cube overlaying fitted baselines
-      and spectral feature mask (\htmlref{{\bf trendview}}{trendview}).
+      and spectral feature mask (\htmlref{\textbf{trendview}}{trendview}).
 \end{itemize}
 
 The backbone of the \DATACUBE\ Package is the \xref{IFU Data Product
@@ -678,7 +109,7 @@ useful applications to manipulate and analyse cubes.
 The C-Shell approach was a deliberate design decision which was made
 for two main reasons: first, due to the still developing nature of
 the field it is difficult to pin down exactly visualisation tasks will
-be necessary, and the choice of {\tt csh} means that the existing
+be necessary, and the choice of \texttt{csh} means that the existing
 scripts can be easily modified by the end user to do exactly the job
 required; second, after examining the Starlink Software Collection
 (SSC) it was realised that a great deal of the functionality required
@@ -687,7 +118,7 @@ re-invent the wheel by re-coding large chunks of software.
 
 Some tasks once mature can, and should, be re-coded in FORTRAN or C,
 mainly for the speed and memory advantages that this will bring. For
-instance the \htmlref{{\bf velmap}}{velmap} script as implemented is
+instance the \htmlref{\textbf{velmap}}{velmap} script as implemented is
 rather slow and memory intensive, it seems likely that this will be
 the first candidate to be re-coded in a lower-level language.
 
@@ -704,37 +135,40 @@ detailing their use can be found in \xref{SC/16}{sc16}{}.
 I would welcome comments, criticisms, contributions and corrections to
 the package once people start to figure out what they want to do with
 this sort of data.  Comments can be sent either to the authors at
-\htmladdnormallink{{\tt aa@astro.ex.ac.uk}}{mailto:aa@astro.ex.ac.uk} or
-\htmladdnormallink{{\tt mjc@star.rl.ac.uk}}{mailto:mjc@star.rl.ac.uk} or
+\htmladdnormallink{\texttt{aa@astro.ex.ac.uk}}{mailto:aa@astro.ex.ac.uk} or
+\htmladdnormallink{\texttt{mjc@star.rl.ac.uk}}{mailto:mjc@star.rl.ac.uk} or
 to the Starlink software librarian
-\htmladdnormallink{{\tt starlink@jiscmail.ac.uk}}{mailto:starlink@jiscmail.ac.uk}.
+\htmladdnormallink{\texttt{starlink@jiscmail.ac.uk}}{mailto:starlink@jiscmail.ac.uk}.
 
 \section{\xlabel{sun237_starting}Setting up the applications\label{sun237_starting}}
 
-After sourcing the Starlink {\tt /star/etc/login} and {\tt
-/star/etc/cshrc} files the {\tt datacube} command will make the
+After sourcing the Starlink \texttt{/star/etc/login} and \texttt{/star/etc/cshrc} files the \texttt{datacube} command will make the
 datacube package scripts available to you, the following
 message (or one much like it!) should appear
 
-\small\begin{verbatim}
-   % datacube
+\begin{small}
+\begin{terminalv}
+% datacube
 
-      DATACUBE applications are now available -- (Version 1.2)
-       Support is available by e-mailing starlink@jiscmail.ac.uk
+  DATACUBE applications are now available -- (Version 1.2)
+   Support is available by e-mailing starlink@jiscmail.ac.uk
 
-           Type cubehelp for help on DATACUBE commands.
-      Type 'showme sun237' to browse the hypertext documentation
-      or 'showme sc16' to consult the IFU data product cookbook.
+       Type cubehelp for help on DATACUBE commands.
+  Type 'showme sun237' to browse the hypertext documentation
+  or 'showme sc16' to consult the IFU data product cookbook.
 
-   %
-\end{verbatim}\normalsize
+%
+\end{terminalv}
+\end{small}
 
 at this point you can test whether the datacube package has been
 correctly installed by typing
 
-\small\begin{verbatim}
-   % datacube_test
-\end{verbatim}\normalsize
+\begin{small}
+\begin{terminalv}
+% datacube_test
+\end{terminalv}
+\end{small}
 
 which will run the test script for the package. If the script does not
 run correctly you should consult your Starlink system administrator.
@@ -743,21 +177,23 @@ It should be noted that there are a great many useful applications
 available in other Starlink packages that will assist you in dealing
 with your IFU data (see \xref{SC/16}{sc16}{} for details), so you may,
 at the very minimum, wish to setup the \xref{KAPPA}{sun95}{}
-applications with the {\tt kappa} command
+applications with the \texttt{kappa} command
 
-\small\begin{verbatim}
-   % kappa
+\begin{small}
+\begin{terminalv}
+% kappa
 
-        KAPPA commands are now available -- (Version 1.12)
+    KAPPA commands are now available -- (Version 1.12)
 
-        Type kaphelp for help on KAPPA commands.
-        Type 'showme sun95' to browse the hypertext documentation.
+    Type kaphelp for help on KAPPA commands.
+    Type 'showme sun95' to browse the hypertext documentation.
 
-        NOTE, several applications have had major changes made to their
-        parameter lists. See the 'Release Notes' section of SUN/95 for
-        details.
-   %
-\end{verbatim}\normalsize
+    NOTE, several applications have had major changes made to their
+    parameter lists. See the 'Release Notes' section of SUN/95 for
+    details.
+%
+\end{terminalv}
+\end{small}
 
 \section*{\xlabel{sun237_acks}Acknowledgments\label{sun237_acks}}
 
@@ -799,7 +235,7 @@ co-operation and contributions.
    }{
       \ssthitemlist{
          \sstitem
-         {\bf{\tt{-i}}} {\em filename}\\
+         {\bf{\tt{-i}}} \emph{filename}\\
            The script will use this as its input file, the specified file should
            be a three-dimensional NDF.  By default the script will prompt for the
            input file.
@@ -840,15 +276,15 @@ co-operation and contributions.
       \ssthitemlist{
 
          \sstitem
-         {\bf{\tt{-b}}} {\em string}\\
+         {\bf{\tt{-b}}} \emph{string}\\
            The number of spectra to block average along the $X$ and $Y$ axes
            respectively.  This should be a comma-separated list or a single
            number; the latter case applies the same compression factor to
            both spatial axes.  The numbers must be positive integers.
-           {\tt [2]}
+           \texttt{[2]}
 
          \sstitem
-         {\bf{\tt{-i}}} {\em filename}\\
+         {\bf{\tt{-i}}} \emph{filename}\\
            The script will use this as its input file, the specified file should
            be a three-dimensional NDF.  By default the script will prompt for the
            input file.
@@ -856,10 +292,10 @@ co-operation and contributions.
          \sstitem
          {\bf{\tt{-z}}}\\
            The script will automatically prompt to select a region to zoom
-           before prompting for the region of interest.  {\tt [TRUE]}\\
+           before prompting for the region of interest.  \texttt{[TRUE]}\\
          {\bf{\tt{+z}}}\\
            The program will not prompt for a zoom before requesting the region
-           of interest. {\tt [FALSE]}
+           of interest. \texttt{[FALSE]}
       }
    }
    \sstnotes{
@@ -918,21 +354,21 @@ co-operation and contributions.
    }{
       \ssthitemlist{
          \sstitem
-         {\bf{\tt{-i}}} {\em filename}\\
+         {\bf{\tt{-i}}} \emph{filename}\\
            A three-dimensional NDF with spatial axes and a third velocity axis
            By default the script will prompt for the input cube.
 
          \sstitem
-         {\bf{\tt{-m}}} {\em filename}\\
+         {\bf{\tt{-m}}} \emph{filename}\\
            The name of a two-dimensional velocity map, where the data values
            are velocities.  It should have the same spatial co-ordinates as
            the supplied cube.  Such a map can be created using
-           \htmlref{{\bf velmap}}{velmap} or \xref{KAPPA:COLLAPSE}{sun95}{COLLAPSE}
+           \htmlref{\textbf{velmap}}{velmap} or \xref{KAPPA:COLLAPSE}{sun95}{COLLAPSE}
            with the Iwc or Comax estimators.  By default the script will
            prompt for the input cube.
 
          \sstitem
-         {\bf{\tt{-o}}} {\em filename}\\
+         {\bf{\tt{-o}}} \emph{filename}\\
             The filename for the output NDF velocity map.
       }
    }
@@ -985,30 +421,30 @@ co-operation and contributions.
    }{
       \ssthitemlist{
          \sstitem
-         {\bf{\tt{-g}}} {\em number}\\
+         {\bf{\tt{-g}}} \emph{number}\\
            The number of spectra in a group.
 
          \sstitem
-         {\bf{\tt{-i}}} {\em filename}\\
+         {\bf{\tt{-i}}} \emph{filename}\\
            The script will use this as its input file, the specified file should
            be a three-dimensional NDF.  By default the script will prompt for the
            input file.
 
          \sstitem
-         {\bf{\tt{-n}}} {\em number}\\
+         {\bf{\tt{-n}}} \emph{number}\\
            The number of groups to extract.
 
          \sstitem
-         {\bf{\tt{-o}}} {\em number}\\
+         {\bf{\tt{-o}}} \emph{number}\\
            Offset between the spectra in the stack.
 
          \sstitem
          {\bf{\tt{-z}}}\\
            The script will automatically prompt to select a region to zoom
-           before prompting for the region of interest.  {\tt [TRUE]}\\
+           before prompting for the region of interest.  \texttt{[TRUE]}\\
          {\bf{\tt{+z}}}\\
            The program will not prompt for a zoom before requesting the region
-           of interest. {\tt [FALSE]}
+           of interest. \texttt{[FALSE]}
       }
    }
    \sstimplementationstatus{
@@ -1039,23 +475,23 @@ co-operation and contributions.
    }{
       \ssthitemlist{
          \sstitem
-         {\bf{\tt{-i}}} {\em filename}\\
+         {\bf{\tt{-i}}} \emph{filename}\\
            The script will use this as its input file, the specified file should
            be a three-dimensional NDF.  By default the script will prompt for the
            input file.
 
          \sstitem
-         {\bf{\tt{-o}}} {\em filename}\\
+         {\bf{\tt{-o}}} \emph{filename}\\
            An output two-dimensional NDF of the passband image.  By default the
            output will be displayed only.
 
          \sstitem
          {\bf{\tt{-z}}}\\
            The script will automatically prompt to select a region to
-           zoom before prompting for the region of interest.  {\tt [TRUE]}\\
+           zoom before prompting for the region of interest.  \texttt{[TRUE]}\\
          {\bf{\tt{+z}}}\\
            The program will not prompt for a zoom before requesting the region
-           of interest. {\tt [FALSE]}
+           of interest. \texttt{[FALSE]}
       }
    }
    \sstimplementationstatus{
@@ -1079,16 +515,16 @@ co-operation and contributions.
       consider the fit to be good enough, the script will attempt to perform
       similar fits to all spectra within the cube, building a two-dimensional
       NDF image of the strength of the line.  These will use the same initial
-      parameters as the reference spectrum, unless option {\tt -a} is selected.
-      You may view this image drawn with a key (option {\tt -d}), and overlay a
-      contour plot (with a key) of the white-light image (option {\tt -c}).
+      parameters as the reference spectrum, unless option \texttt{-a} is selected.
+      You may view this image drawn with a key (option \texttt{-d}), and overlay a
+      contour plot (with a key) of the white-light image (option \texttt{-c}).
 
       If you do not force the fit to be considered `good' by using the
-      {\tt -f} command-line option, the script will offer the opportunity to
+      \texttt{-f} command-line option, the script will offer the opportunity to
       manually refit the spectral feature for individual pixels, such as those
       that were unsuccessfully fitted by the automatic procedure.  In this case,
       the line-strength map will be plotted and replotted after the new fit,
-      regardless of the {\tt -p} option.
+      regardless of the \texttt{-p} option.
    }
    \sstusage{
       peakmap [-a] [-c number] [-ci index] [-f] [-i filename] [-l logfile] \goodbreak
@@ -1104,21 +540,21 @@ co-operation and contributions.
            just the initial reference fit.  A re-fit will change the initial
            parameter guesses for subsequent fits, so it is recommended that you
            note the co-ordinates of spectra to re-fit and tackle these
-           individually in the final manual re-fit stage.  {\tt [FALSE]}
+           individually in the final manual re-fit stage.  \texttt{[FALSE]}
 
          \sstitem
-         {\bf{\tt{-c}}} {\em number}\\
+         {\bf{\tt{-c}}} \emph{number}\\
            Number of contours in the white-light image.    Set to fewer
-           than 1 means no contours are overlaid.  {\tt [15]}
+           than 1 means no contours are overlaid.  \texttt{[15]}
 
          \sstitem
-         {\bf{\tt{-ci}}} {\em index}\\
+         {\bf{\tt{-ci}}} \emph{index}\\
            The palette colour index of the contours.  It should be an
-           integer in the range {\tt 0} to {\tt 15}.  It is best to choose
+           integer in the range \texttt{0} to \texttt{15}.  It is best to choose
            an index corresponding to white, or black or another dark colour
            to make the contours stand out from other elements of the plot.
-           {\tt 0} is the background colour. \xref{KAPPA:GDSTATE}{sun95}{GDSTATE}
-           will list the current palette colours.  {\tt [0]}
+           \texttt{0} is the background colour. \xref{KAPPA:GDSTATE}{sun95}{GDSTATE}
+           will list the current palette colours.  \texttt{[0]}
 
          \sstitem
          {\bf{\tt{-f}}}\\
@@ -1126,16 +562,16 @@ co-operation and contributions.
            the line.  This is a dangerous option; if the fit is poor, or
            unobtainable the script may terminate abruptly if it is forced to
            accept the fit.  This will additionally suppress manual re-fitting
-           of bad pixels at the end of the run of the script.  {\tt [FALSE]}
+           of bad pixels at the end of the run of the script.  \texttt{[FALSE]}
 
          \sstitem
-         {\bf{\tt{-i}}} {\em filename}\\
+         {\bf{\tt{-i}}} \emph{filename}\\
            The script will use this as its input file, the specified file should
            be a three-dimensional NDF.  By default the script will prompt for the
            input file.
 
          \sstitem
-         {\bf{\tt{-l}}} {\em filename}\\
+         {\bf{\tt{-l}}} \emph{filename}\\
            The name of an text log file containing the fitted Gaussian
            coefficients for each spatial pixel.  The file is written as a
            Starlink Small Text List (STL) described in
@@ -1147,27 +583,27 @@ co-operation and contributions.
            and integrated flux, each with its fitting error.
 
          \sstitem
-         {\bf{\tt{-o}}} {\em filename}\\
+         {\bf{\tt{-o}}} \emph{filename}\\
            The filename for the output NDF of the line-strength map.
 
          \sstitem
          {\bf{\tt{-p}}}\\
            The script will plot the final image map to the current display
            as well as saving it to an NDF file.  Additionally, it will overplot
-           the white-light image as a contour map for comparison. {\tt [FALSE]}
+           the white-light image as a contour map for comparison. \texttt{[FALSE]}
 
          \sstitem
          {\bf{\tt{-v}}}\\
            The script will generate a \xref{VARIANCE}{sun95}{ap_NDFformat} array
-           from the line fits and attach it to the peak-intensity-map NDF. {\tt [FALSE]}
+           from the line fits and attach it to the peak-intensity-map NDF. \texttt{[FALSE]}
 
          \sstitem
          {\bf{\tt{-z}}}\\
            The script will automatically prompt to select a region to
-           zoom before prompting for the region of interest.  {\tt [TRUE]}\\
+           zoom before prompting for the region of interest.  \texttt{[TRUE]}\\
          {\bf{\tt{+z}}}\\
            The script will not prompt for a zoom before requesting the region
-           of interest.  {\tt [FALSE]}
+           of interest.  \texttt{[FALSE]}
       }
    }
    \sstnotes{
@@ -1179,12 +615,12 @@ co-operation and contributions.
 
          \sstitem
          \xref{CURSA:CATCOPY}{sun190}{COPY} may be used to convert the STL
-         log file (see the {\tt -l} option) to FITS format for analysis with the
+         log file (see the \texttt{-l} option) to FITS format for analysis with the
          likes of \xref{TOPCAT}{sun253}{}, provided the STL has
-         the {\tt .txt} file extension.  If you want just the tabulated data for
+         the \texttt{.txt} file extension.  If you want just the tabulated data for
          your own favourite tool, the schema can be easily removed manually,
-         or with {\bf sed} excluding the lines up to and including the line beginning
-         {\tt BEGINTABLE}.
+         or with \textbf{sed} excluding the lines up to and including the line beginning
+         \texttt{BEGINTABLE}.
 
       }
    }
@@ -1219,31 +655,31 @@ co-operation and contributions.
       Command-line Arguments
    }{
       \ssthitemlist{
-         \sstitem {\bf{\tt{-ci}}} {\em index}\\
+         \sstitem {\bf{\tt{-ci}}} \emph{index}\\
            The colour or colour index of the annotations on the left-hand
            display indicating the spatial location of the slice.  An index
            should be a positive integer no more than 15, normally 2 or 3 to
            stand out from other elements of the plot.  If absent the
-           annotations will appear in red. {\tt []}
+           annotations will appear in red. \texttt{[]}
 
          \sstitem
-         {\bf{\tt{-i}}} {\em filename}\\
+         {\bf{\tt{-i}}} \emph{filename}\\
            The name of an existing three-dimensional (RA,Dec,vel) cube.
            The script will prompt for the input file if not supplied on
            the command line.
 
          \sstitem
-         {\bf{\tt{-o}}} {\em filename}\\
+         {\bf{\tt{-o}}} \emph{filename}\\
            The name of the NDF in which to store the velocity-position
            slice.  The script will prompt for this NDF if it is not
            supplied via this option.
 
          \sstitem
-         {\bf{\tt{-p}}} {\em plane}\\
+         {\bf{\tt{-p}}} \emph{plane}\\
            Velocity or pixel index of the plane to display to enable cursor
            selection of the slice end points.  To specify a velocity
            supply a floating-point value such as 2.0; for an index supply
-           an integer.  {\tt [0]}
+           an integer.  \texttt{[0]}
 
       }
    }
@@ -1268,10 +704,10 @@ co-operation and contributions.
          \sstitem
          The WCS in the returned NDF is somewhat complex; it has a
          degenerate pixel axis and a degenerate WCS axis. These could be
-         removed using {\tt ndfcopy trim}, but this would result in a WCS
+         removed using \texttt{ndfcopy trim}, but this would result in a WCS
          with no inverse transformation (from current to pixel), which gives
          problems when displaying it, \emph{etc.} Alternatively, the AXIS frame
-         can be used by doing {\tt wcsframe frame=axis}.
+         can be used by doing \texttt{wcsframe frame=axis}.
 
          \sstitem
          To avoid modification of the input cube, the script creates a
@@ -1290,7 +726,7 @@ co-operation and contributions.
 
          \sstitem
          The label for the spatial (first) axis in the slice plot is
-         {\tt "Offset from start"}.
+         \texttt{"Offset from start"}.
       }
    }
    \sstdiytopic{
@@ -1325,19 +761,19 @@ co-operation and contributions.
    }{
       \ssthitemlist{
          \sstitem
-         {\bf{\tt{-i}}} {\em filename}\\
+         {\bf{\tt{-i}}} \emph{filename}\\
            be a three-dimensional NDF.  By default the script will prompt for the
            input file.
 
          \sstitem
-         {\bf{\tt{-o}}} {\em filename}\\
+         {\bf{\tt{-o}}} \emph{filename}\\
            The filename for the output spectrum.  By default the script will
            prompt for the name of the output file.
 
          \sstitem
          {\bf{\tt{-p}}}\\
            The script will plot the extracted spectrum to the current display
-           as well as saving it to an NDF file. {\tt [FALSE]}
+           as well as saving it to an NDF file. \texttt{[FALSE]}
       }
    }
    \sstimplementationstatus{
@@ -1364,27 +800,27 @@ co-operation and contributions.
    }{
       \ssthitemlist{
          \sstitem
-         {\bf{\tt{-i}}} {\em filename}\\
+         {\bf{\tt{-i}}} \emph{filename}\\
            The script will use this as its input file, the specified file should
            be a three-dimensional NDF, by default the script will prompt for the
            input file.
 
          \sstitem
-         {\bf{\tt{-l}}} {\em number}\\
+         {\bf{\tt{-l}}} \emph{number}\\
            Lower spectral-axis bound of the region of interest.
 
          \sstitem
-         {\bf{\tt{-o}}} {\em filename}\\
+         {\bf{\tt{-o}}} \emph{filename}\\
            The filename for the output white-light or passband image.  By default
            the script will prompt for the name of the output file.
 
          \sstitem
          {\bf{\tt{-p}}}\\
            The script will plot the extracted image to the current display
-           as well as saving it to an NDF file. {\tt [FALSE]}
+           as well as saving it to an NDF file. \texttt{[FALSE]}
 
          \sstitem
-         {\bf{\tt{-u}}} {\em number}\\
+         {\bf{\tt{-u}}} \emph{number}\\
            Upper spectral-axis bound of the region of interest.
       }
    }
@@ -1415,26 +851,26 @@ co-operation and contributions.
    }{
       \ssthitemlist{
          \sstitem
-         {\bf{\tt{-i}}} {\em filename}\\
+         {\bf{\tt{-i}}} \emph{filename}\\
            The script will use this as its input file, the specified file should
            be a three-dimensional NDF.   By default the script will prompt for
            the input file.
 
          \sstitem
-         {\bf{\tt{-n}}} {\em number}\\
+         {\bf{\tt{-n}}} \emph{number}\\
            Number of spectra to extract.
 
          \sstitem
-         {\bf{\tt{-o}}} {\em number}\\
+         {\bf{\tt{-o}}} \emph{number}\\
            Offset between the spectra in the stack.
 
          \sstitem
          {\bf{\tt{-z}}}\\
            The script will automatically prompt the user to select a region to
-           zoom before prompting for the region of interest. {\tt [TRUE]}\\
+           zoom before prompting for the region of interest. \texttt{[TRUE]}\\
          {\bf{\tt{+z}}}\\
            The program will not prompt for a zoom before requesting the region
-           of interest. {\tt [FALSE]}
+           of interest. \texttt{[FALSE]}
       }
    }
    \sstimplementationstatus{
@@ -1462,26 +898,26 @@ co-operation and contributions.
    }{
       \ssthitemlist{
          \sstitem
-         {\bf{\tt{-i}}} {\em filename}\\
+         {\bf{\tt{-i}}} \emph{filename}\\
            The script will use this as its input file, the specified file should
            be a three-dimensional NDF.  By default the script will prompt for the
           input file.
 
          \sstitem
-         {\bf{\tt{-l}}} {\em number}\\
+         {\bf{\tt{-l}}} \emph{number}\\
            Lower spectral-axis bound of the region of interest.
 
          \sstitem
          {\bf{\tt{-p}}}\\
            The script will plot the extracted images to the current display
-           as well as saving it to an NDF file. {\tt [FALSE]}
+           as well as saving it to an NDF file. \texttt{[FALSE]}
 
          \sstitem
-         {\bf{\tt{-s}}} {\em number}\\
+         {\bf{\tt{-s}}} \emph{number}\\
            Spectral-axis step size for each passband chunk.
 
          \sstitem
-         {\bf{\tt{-u}}} {\em number}\\
+         {\bf{\tt{-u}}} \emph{number}\\
            Upper spectral-axis bound of the region of interest.
       }
    }
@@ -1525,10 +961,10 @@ co-operation and contributions.
       \ssthitemlist{
          \sstitem
          {\bf{\tt{-d}}}\\
-            The device name.  {\tt [xwindows]}
+            The device name.  \texttt{[xwindows]}
 
         \sstitem
-        {\bf{\tt{-i}}} {\em filename}\\
+        {\bf{\tt{-i}}} \emph{filename}\\
            The name of the raw dataset.  The specified file should be a
            three-dimensional NDF.  By default the script will prompt for
            the input file.  A section may be defined to home in either
@@ -1540,7 +976,7 @@ co-operation and contributions.
           other words the data-value level at which to draw the mask.  Its
           purpose is improve mask visibility; and to narrow the y plotting
           range, hence see the residuals between the raw data the fitted
-          trends more clearly.  {\tt [0]}
+          trends more clearly.  \texttt{[0]}
 
        \sstitem
        {\bf{\tt{-r}}}\\
@@ -1548,14 +984,14 @@ co-operation and contributions.
 
        \sstitem
        {\bf{\tt{-s}}}\\
-          The file suffix appended to the baseline and mask file names. {\tt [""]}
+          The file suffix appended to the baseline and mask file names. \texttt{[""]}
 
        \sstitem
-       {\bf{\tt{-y}}} {\em ytop[,ybot]}\\
+       {\bf{\tt{-y}}} \emph{ytop[,ybot]}\\
           A comma-separated list giving the upper and lower data-value limits
           of every spectrum plot in either order.  A positive lower limit
-          will be ignored if the offset ({\tt -o}) is not positive too or when
-          residuals are to be plotted ({\tt -r}).  A single value is deemed to
+          will be ignored if the offset (\texttt{-o}) is not positive too or when
+          residuals are to be plotted (\texttt{-r}).  A single value is deemed to
           be the upper limit, and the lower limit is defaulted.
 
           If this option is not specified, the limits derive from the
@@ -1566,10 +1002,10 @@ co-operation and contributions.
           to be plotted.
 
           When the lower limit requires a default, it is set to negative
-          one twentieth of the upper limit if there is no ({\tt -o}) offset
+          one twentieth of the upper limit if there is no (\texttt{-o}) offset
           applied to the mask, otherwise it is the offset level minus a
           twentieth of the range between the upper limit and the offset.
-          {\tt []}
+          \texttt{[]}
       }
    }
    \sstexamples{
@@ -1597,7 +1033,7 @@ co-operation and contributions.
          Plots the spectra in NDFs ac9\_trim, ac9\_trim\_bsl\_o4, and
          ac9\_trim\_msk\_o4 between data values derived automatically
          percentiles in ac9\_trim, with the mask line drawn at value
-         {\tt 7}.
+         \texttt{7}.
       }
       \sstexamplesubsection{
          trendview -i ac9\_trim"(2$\sim$10,4$\sim$8,)" -r -y -3,8
@@ -1613,11 +1049,11 @@ co-operation and contributions.
 
          \sstitem
 
-         The raw data is given by the {\tt -i} argument; the fitted
+         The raw data is given by the \texttt{-i} argument; the fitted
 	 trends or baselines is called $<$filename$>$\_bsl$<$suffix$>$;
          and the mask is called $<$filename$>$\_msk$<$suffix$>$, where
-         $<$filename$>$ is value of the {\tt -i} option without any section
-         or file extension and $<$suffix$>$ is the value of option {\tt -s}.
+         $<$filename$>$ is value of the \texttt{-i} option without any section
+         or file extension and $<$suffix$>$ is the value of option \texttt{-s}.
 
          \sstitem
          No key is plotted and the margins are narrow to maximise the
@@ -1650,7 +1086,7 @@ co-operation and contributions.
          \sstitem
          A large display area is recommended if the screen is used
          for display, for instance, \\
-         \mbox{~~~~~~~}{\tt xmake xwindows -width 1200 -height 900} \\
+         \mbox{~~~~~~~}\texttt{xmake xwindows -width 1200 -height 900} \\
          that mostly fills the screen.  The actual width and and height
          in pixels will depend on your screen's dimensions.
 
@@ -1658,7 +1094,7 @@ co-operation and contributions.
          four loci for the hardwired colours.  This should be of
          mid-intensity so that the light and dark curves will both be
          visible.  For example,\\
-         \mbox{~~~~~~~}{\tt palentry 0 steelblue}\\
+         \mbox{~~~~~~~}\texttt{palentry 0 steelblue}\\
          will do this for the original colour scheme.
       }
    }
@@ -1680,16 +1116,16 @@ co-operation and contributions.
       consider the fit to be good enough, the script will attempt to perform
       similar fits to all spectra within the cube, building a two-dimensional
       NDF image of the velocity of the line.  These will use the same initial
-      parameters as the reference spectrum, unless option {\tt -a} is selected.
-      You may view this image drawn with a key (option {\tt -d}), and overlay a
-      contour plot (with a key) of the white-light image (option {\tt -c}).
+      parameters as the reference spectrum, unless option \texttt{-a} is selected.
+      You may view this image drawn with a key (option \texttt{-d}), and overlay a
+      contour plot (with a key) of the white-light image (option \texttt{-c}).
 
-      If you do not force the fit to be considered `good' by using the {\tt -f}
+      If you do not force the fit to be considered `good' by using the \texttt{-f}
       command-line option, the script will offer the opportunity to manually
       refit the spectral feature for individual pixels, such as those that
       were unsuccessfully fitted by the automatic procedure.  In this case
       the velocity map will be plotted and replotted after the new fit,
-      regardless of the {\tt -p} option.
+      regardless of the \texttt{-p} option.
    }
    \sstusage{
       velmap [-a] [-c number] [-ci index] [-f] [-i filename] [-l filename] \goodbreak
@@ -1705,21 +1141,21 @@ co-operation and contributions.
            just the initial reference fit.  A re-fit will change the initial
            parameter guesses for subsequent fits, so it is recommended that you
            note the co-ordinates of spectra to re-fit and tackle these
-           individually in the final manual re-fit stage.  {\tt [FALSE]}
+           individually in the final manual re-fit stage.  \texttt{[FALSE]}
 
          \sstitem
-         {\bf{\tt{-c}}} {\em number}\\
+         {\bf{\tt{-c}}} \emph{number}\\
            Number of contours in the white-light image.  Set to fewer
-           than 1 means no contours are overlaid.  {\tt [15]}
+           than 1 means no contours are overlaid.  \texttt{[15]}
 
          \sstitem
-         {\bf{\tt{-ci}}} {\em index}\\
+         {\bf{\tt{-ci}}} \emph{index}\\
            The palette colour index of the contours.  It should be an
-           integer in the range {\tt 0} to {\tt 15}.  It is best to choose
+           integer in the range \texttt{0} to \texttt{15}.  It is best to choose
            an index corresponding to white, or black or another dark colour
            to make the contours stand out from other elements of the plot.
-           {\tt 0} is the background colour. \xref{KAPPA:GDSTATE}{sun95}{GDSTATE}
-           will list the current palette colours.  {\tt [0]}
+           \texttt{0} is the background colour. \xref{KAPPA:GDSTATE}{sun95}{GDSTATE}
+           will list the current palette colours.  \texttt{[0]}
 
          \sstitem
          {\bf{\tt{-f}}}\\
@@ -1727,16 +1163,16 @@ co-operation and contributions.
            the line.  This is a dangerous option; if the fit is poor, or
            unobtainable the script may terminate abruptly if it is forced to
            accept the fit.  Additionally this will supress manual re-fitting
-           of bad pixels at the end of the run of the script.  {\tt [FALSE]}
+           of bad pixels at the end of the run of the script.  \texttt{[FALSE]}
 
          \sstitem
-         {\bf{\tt{-i}}} {\em filename}\\
+         {\bf{\tt{-i}}} \emph{filename}\\
            The script will use this as its input file, the specified file should
            be a three-dimensional NDF.  By default the script will prompt for the
            input file.
 
          \sstitem
-         {\bf{\tt{-l}}} {\em filename}\\
+         {\bf{\tt{-l}}} \emph{filename}\\
            The name of an text log file containing the fitted Gaussian
            coefficients for each spatial pixel.  The file is written as a
            Starlink Small Text List (STL) described in
@@ -1748,7 +1184,7 @@ co-operation and contributions.
            and integrated flux, each with its fitting error.
 
          \sstitem
-         {\bf{\tt{-o}}} {\em filename}\\
+         {\bf{\tt{-o}}} \emph{filename}\\
            The filename for the output NDF of the velocity map.
 
          \sstitem
@@ -1756,35 +1192,35 @@ co-operation and contributions.
            The script will plot the final image map to the current display
            as well as saving it to an NDF file.  It will additionally overplot
            the white-light image as a contour map for comparison.
-           {\tt [FALSE]}
+           \texttt{[FALSE]}
 
          \sstitem
-         {\bf{\tt{-r}}} {\em number}\\
+         {\bf{\tt{-r}}} \emph{number}\\
            Rest-frame spectral unit of the line being fitted.
 
          \sstitem
-         {\bf{\tt{-s}}} {\em system}
+         {\bf{\tt{-s}}} \emph{system}
            The co-ordinate system for velocities.  Allowed values are:\\
            \begin{description}
-           \item[{\tt "VRAD"}] -- radio velocity;
-           \item[{\tt "VOPT"}] -- optical velocity;
-           \item[{\tt "ZOPT"}] -- redshift; and
-           \item[{\tt "VELO"}] -- relativistic velocity.
+           \item[\texttt{"VRAD"}] -- radio velocity;
+           \item[\texttt{"VOPT"}] -- optical velocity;
+           \item[\texttt{"ZOPT"}] -- redshift; and
+           \item[\texttt{"VELO"}] -- relativistic velocity.
            \end{description}
-           If you supply any other value, the default is used.  {\tt ["VOPT"]}
+           If you supply any other value, the default is used.  \texttt{["VOPT"]}
 
          \sstitem
          {\bf{\tt{-v}}}\\
            The script will generate a variance array from the line fits and
-           attach it to the velocity-map NDF.  {\tt [FALSE]}
+           attach it to the velocity-map NDF.  \texttt{[FALSE]}
 
          \sstitem
          {\bf{\tt{-z}}}\\
            The script will automatically prompt to select a region to
-           zoom before prompting for the region of interest. {\tt [TRUE]}\\
+           zoom before prompting for the region of interest. \texttt{[TRUE]}\\
          {\bf{\tt{+z}}}\\
            The script will not prompt for a zoom before requesting the region
-           of interest. {\tt [FALSE]}
+           of interest. \texttt{[FALSE]}
       }
    }
    \sstnotes{
@@ -1798,12 +1234,12 @@ co-operation and contributions.
 
          \sstitem
          \xref{CURSA:CATCOPY}{sun190}{COPY} may be used to convert the STL
-         log file (see the {\tt -l} option) to FITS format for analysis with the
+         log file (see the \texttt{-l} option) to FITS format for analysis with the
          likes of \xref{TOPCAT}{sun253}{}, provided the STL has
-         the {\tt .txt} file extension.  If you want just the tabulated data for
+         the \texttt{.txt} file extension.  If you want just the tabulated data for
          your own favourite tool, the schema can be easily removed manually,
-         or with {\bf sed} excluding the lines up to and including the line beginning
-         {\tt BEGINTABLE}.
+         or with \textbf{sed} excluding the lines up to and including the line beginning
+         \texttt{BEGINTABLE}.
 
       }
    }
@@ -1834,8 +1270,8 @@ co-operation and contributions.
       The script then derives the intensity weighted co-ordinate of
       each spatially averaged spectrum, and converts the data units
       into a velocity.  You may view this image drawn with a key
-      (option {\tt -d}), and overlay a contour plot of the white-light image
-      (option {\tt -c}).
+      (option \texttt{-d}), and overlay a contour plot of the white-light image
+      (option \texttt{-c}).
    }
    \sstusage{
       velmoment [-b string] [-c number] [-ci index] [-i filename] [-o filename]\goodbreak
@@ -1846,29 +1282,29 @@ co-operation and contributions.
    }{
       \ssthitemlist{
          \sstitem
-         {\bf{\tt{-b}}} {\em string}\\
+         {\bf{\tt{-b}}} \emph{string}\\
            The number of spectra to block average along the $X$ and $Y$ axes
            respectively.  This should be a comma-separated list or a single
            number; the latter case applies the same compression factor to
            both spatial axes.  The numbers must be positive integers.
-          {\tt [1]}
+          \texttt{[1]}
 
          \sstitem
-         {\bf{\tt{-c}}} {\em number}\\
+         {\bf{\tt{-c}}} \emph{number}\\
            Number of contours in the white-light image.  Set to fewer
-           than one means no contours are overlaid.  {\tt [15]}
+           than one means no contours are overlaid.  \texttt{[15]}
 
          \sstitem
-         {\bf{\tt{-ci}}} {\em index}\\
+         {\bf{\tt{-ci}}} \emph{index}\\
            The palette colour index of the contours.  It should be an
-           integer in the range {\tt 0} to {\tt 15}.  It is best to choose
+           integer in the range \texttt{0} to \texttt{15}.  It is best to choose
            an index corresponding to white, or black or another dark colour
            to make the contours stand out from other elements of the plot.
-           {\tt 0} is the background colour. \xref{KAPPA:GDSTATE}{sun95}{GDSTATE}
-           will list the current palette colours.  {\tt [0]}
+           \texttt{0} is the background colour. \xref{KAPPA:GDSTATE}{sun95}{GDSTATE}
+           will list the current palette colours.  \texttt{[0]}
 
          \sstitem
-         {\bf{\tt{-i}}} {\em filename}\\
+         {\bf{\tt{-i}}} \emph{filename}\\
            The script will use this as its input file, the specified file
            should be a three-dimensional NDF.  By default the script will
            prompt for the input file.  If there are multiple spectral lines
@@ -1877,7 +1313,7 @@ co-operation and contributions.
            its environs.
 
          \sstitem
-         {\bf{\tt{-o}}} {\em filename}\\
+         {\bf{\tt{-o}}} \emph{filename}\\
            The filename for the output NDF of the velocity map.
 
          \sstitem
@@ -1885,30 +1321,30 @@ co-operation and contributions.
            The script will plot the final image map to the current display
            as well as saving it to an NDF file.  Additionally it will over-
            plot the white-light image as a contour map for comparison.
-           {\tt [FALSE]}
+           \texttt{[FALSE]}
 
          \sstitem
-         {\bf{\tt{-r}}} {\em number}\\
+         {\bf{\tt{-r}}} \emph{number}\\
            Rest-frame spectral unit of the line being fitted.
 
          \sstitem
-         {\bf{\tt{-s}}} {\em system}\\
+         {\bf{\tt{-s}}} \emph{system}\\
            The co-ordinate system for velocities.  Allowed values are:
            \begin{description}
-           \item[{\tt "VRAD"}] -- radio velocity;
-           \item[{\tt "VOPT"}] -- optical velocity;
-           \item[{\tt "ZOPT"}] -- redshift; and
-           \item[{\tt "VELO"}] -- relativistic velocity.
+           \item[\texttt{"VRAD"}] -- radio velocity;
+           \item[\texttt{"VOPT"}] -- optical velocity;
+           \item[\texttt{"ZOPT"}] -- redshift; and
+           \item[\texttt{"VELO"}] -- relativistic velocity.
            \end{description}
-           If you supply any other value, the default is used.  {\tt ["VOPT"]}
+           If you supply any other value, the default is used.  \texttt{["VOPT"]}
 
          \sstitem
          {\bf{\tt{-z}}}\\
            The script will automatically prompt to select a region to zoom
-           before prompting for the region of interest.  {\tt [TRUE]}\\
+           before prompting for the region of interest.  \texttt{[TRUE]}\\
          {\bf{\tt{+z}}}\\
            The program will not prompt for a zoom before requesting the region
-           of interest. {\tt [FALSE]}
+           of interest. \texttt{[FALSE]}
       }
    }
    \sstnotes{
@@ -1956,11 +1392,11 @@ co-operation and contributions.
 The following new scripts have been added:
 
 \begin{description}
-   \item [\htmlref{{\bf gridspec}}{gridspec}] \mbox{}
+   \item [\htmlref{\textbf{gridspec}}{gridspec}] \mbox{}
        Averages groups of spatially neighbouring spectra of a
        three-dimensional IFU NDF and then plots these averaged spectra
        in a grid.
-   \item [\htmlref{{\bf velmoment}}{velmoment}] \mbox{}
+   \item [\htmlref{\textbf{velmoment}}{velmoment}] \mbox{}
        Builds a velocity map from the collapsed intensity-weighted
        spectral co-ordinates.  It supports spatial compression.
 \end{description}
@@ -1970,32 +1406,32 @@ The following applications have been modified:
 
 \begin{itemize}
 
-\item \htmlref{{\bf compare}}{compare} has a {\tt -i} option for the
+\item \htmlref{\textbf{compare}}{compare} has a \texttt{-i} option for the
 input filename for non-interactive scripting.
 
-\item \htmlref{{\bf multistack}}{multistack} and
-\htmlref{{\bf stacker}}{stacker} plot ordinate limits now always
+\item \htmlref{\textbf{multistack}}{multistack} and
+\htmlref{\textbf{stacker}}{stacker} plot ordinate limits now always
 make visible all the spectra, regardless of the chosen offset.
 
-\item \htmlref{{\bf passband}}{passband} does not dump WCS mappings
+\item \htmlref{\textbf{passband}}{passband} does not dump WCS mappings
 in \xref{NDFCOPY}{sun95}{NDFCOPY}.  Ensured that the plots of spectra
-use the axis co-ordinate system.  Removed unused {\tt -r} option.
+use the axis co-ordinate system.  Removed unused \texttt{-r} option.
 
-\item \htmlref{{\bf peakmap}}{peakmap} now has {\tt -c} option to
+\item \htmlref{\textbf{peakmap}}{peakmap} now has \texttt{-c} option to
 specify the number of contour levels to plot.
 
-\item \htmlref{{\bf step}}{step} now plots the image slices in an
+\item \htmlref{\textbf{step}}{step} now plots the image slices in an
 optimally shaped grid rather than full size in quick succession, and
 thereby permits comparison of the slices.
 
-\item \htmlref{{\bf velmap}}{velmap} generalised the transformation of the
+\item \htmlref{\textbf{velmap}}{velmap} generalised the transformation of the
 measured line displacements from the rest-frame co-ordinate in the
 current spectral system into one of four velocity measurements using
 WCSTRAN.  Added a SpecFrame to achieve this functionality for
 UK data-cube files.  Also recognises the
 \xref{SKY-DSBSPECTRUM Domain}{sun95}{se_domains}.
 
-Added the {\tt -s} option to define the co-ordinate system of the
+Added the \texttt{-s} option to define the co-ordinate system of the
 derived velocities.  Ensured that the plots of spectra use the axis
 co-ordinate system.  The script inquires the WCS for the rest-frame
 frequency to avoid unnecessary prompting.
@@ -2003,8 +1439,8 @@ frequency to avoid unnecessary prompting.
 Changed lower percentile for display from 15 to 2.  Use spectrum
 colour table.  Added a velocity key.
 
-Additional {\tt -c} option to specify the number of contours; this may
-be zero to prevent contours be overlaid.  Added {\tt -ci} option to
+Additional \texttt{-c} option to specify the number of contours; this may
+be zero to prevent contours be overlaid.  Added \texttt{-ci} option to
 specify the colour index of contours.
 
 \end{itemize}
@@ -2015,10 +1451,10 @@ specify the colour index of contours.
 
 \item The package applications COPYAXIS, GETBOUND, and PUTAXIS have
 been withdrawn.  The scripts that invoked these now call
-\xref{KAPPA:SETAXIS}{sun95}{SETAXIS} ({\tt setaxis ndf=?~like=?})
+\xref{KAPPA:SETAXIS}{sun95}{SETAXIS} (\texttt{setaxis ndf=?~like=?})
 \xref{KAPPA:NDFTRACE}{sun95}{NDFTRACE} (access FLBND and FUBND output
 parameters), and \xref{SETAXIS in WCS mode}{sun95}{SETAXIS}
-({\tt setaxis ndf=?~dim=?~mode=wcs comp=Centre} for each dimension)
+(\texttt{setaxis ndf=?~dim=?~mode=wcs comp=Centre} for each dimension)
 respectively.
 
 \item The scripts have been generalised to spectral co-ordinate
@@ -2040,10 +1476,10 @@ avoidance of :r, aligned output, command-line rubbish disposal,
 and tab removal.
 
 \item Accepts .sdf extension and/or NDF sections to be supplied
-through new internal routine {\tt checkndf.csh}.
+through new internal routine \texttt{checkndf.csh}.
 
 \item Shortened many scripts through use of internal routine
-{\tt getcurpos.csh} to obtain and mark cursor positions.
+\texttt{getcurpos.csh} to obtain and mark cursor positions.
 
 \end{itemize}
 
@@ -2054,7 +1490,7 @@ through new internal routine {\tt checkndf.csh}.
 The following new script has been added:
 
 \begin{description}
-   \item [\htmlref{{\bf trendview}}{trendview}] \mbox{}
+   \item [\htmlref{\textbf{trendview}}{trendview}] \mbox{}
      Plots multiple spectra from a cube overlaying fitted trends and
      spectral-feature mask.  It enables assessment of baseline
      subtraction and feature masking.
@@ -2065,13 +1501,13 @@ The following applications have been modified:
 
 \begin{itemize}
 
-\item \htmlref{{\bf peakmap}}{peakmap} now has  a {\tt -a} option to
+\item \htmlref{\textbf{peakmap}}{peakmap} now has  a \texttt{-a} option to
 inspect and approve the fit at each spatial pixel.  There is also a
-{\tt -l} option to log the Gaussian fit parameters and their errors in
+\texttt{-l} option to log the Gaussian fit parameters and their errors in
 a \xref{Small Text List}{sun190}{} file.
 
 It inteprets a non-positive number of contours to mean no contour
-overlay required.  There is a new {\tt -ci} option to specify the
+overlay required.  There is a new \texttt{-ci} option to specify the
 colour index of contours.
 
 It permits case-insensitive responses to prompts except where a
@@ -2081,9 +1517,9 @@ A bug has been fixed that caused the peak-height error to be stored
 within the output NDF 's \xref{VARIANCE}{sun95}{apndf:variance}
 component, instead of the actual variances.
 
-\item \htmlref{{\bf velmap}}{velmap} now has a {\tt -a} option to
+\item \htmlref{\textbf{velmap}}{velmap} now has a \texttt{-a} option to
 inpsect and approve the fit at each spatial pixel. There is also a
-{\tt -l} option to log the Gaussian fit parameters and their errors in
+\texttt{-l} option to log the Gaussian fit parameters and their errors in
 a Small Text List file.
 
 It permits case-insensitive responses to prompts except where a
@@ -2107,14 +1543,14 @@ Frames is disentangled enabling DSBSPECTRUM data to be used.
 The following new scripts have been added:
 
 \begin{description}
-   \item [\htmlref{{\bf mapbyvel}}{mapbyvel}] \mbox{}
+   \item [\htmlref{\textbf{mapbyvel}}{mapbyvel}] \mbox{}
      Form a new image from a cube's voxels using all the data
      values of a supplied image as the $Z$ co-ordinate in the cube.
      The supplied image must span the same $X$-$Y$ region as the cube.
      In practice the cube has RA, Dec, velocity axes and the input
      image is a velocity map.
 
-   \item [\htmlref{{\bf pvslice}}{pvslice}] \mbox{}
+   \item [\htmlref{\textbf{pvslice}}{pvslice}] \mbox{}
      Extracts and displays position-velocity slice from a
      (RA,Dec,vel) cube.  The slice need not be parallel to either
      spatial pixel axis, and it is defined using the graphics
@@ -2126,15 +1562,15 @@ The following applications have been modified:
 
 \begin{itemize}
 
-\item Internal script {\bf checkndf}---used in all of the public
+\item Internal script \textbf{checkndf}---used in all of the public
 scripts---now has new options:
 
 \begin{itemize}
-\item {\tt -d} to set the required dimensionality, 2 or 3, where
+\item \texttt{-d} to set the required dimensionality, 2 or 3, where
 previously only cubes where tested;
-\item {\tt -p} to set the prompt string for the required NDF (that may
+\item \texttt{-p} to set the prompt string for the required NDF (that may
 include spaces);
-\item {\tt -q} (for quiet) to prevent the reporting of the filename and its
+\item \texttt{-q} (for quiet) to prevent the reporting of the filename and its
 vital statistics.
 \end{itemize}
 
