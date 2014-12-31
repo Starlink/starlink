@@ -1,7 +1,4 @@
-\documentclass[twoside,11pt]{article}
-
-\usepackage{graphicx}
-\pagestyle{myheadings}
+\documentclass[twoside,11pt,noabs]{starlink}
 
 % +
 %  Name:
@@ -38,493 +35,218 @@
 % ------------------------------------------------------------------------
 
 
-% Add any \newcommand or \newenvironment commands here
-\newcommand{\about}{$\sim$}
-\newcommand{\eg}{{\it e.g.}}
-\newcommand{\ie}{{\it i.e.}}
-\newcommand{\mic}{\mbox{\,${\mu}$m}}               % microns
-\newcommand{\arcmin}{{$^\prime$}}
-\newcommand{\degr}{\mbox{\,$^\circ$}}               % degrees sign
-% ------------------------------------------------------------------------
-
-
-
-% ------------------------------------------------------------------------
-
-
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink Cookbook}
-\newcommand{\stardocinitials}  {SC}
-\newcommand{\stardocsource}    {sc\stardocnumber}
-\newcommand{\stardocnumber}    {11.2}
-\newcommand{\stardocauthors}   {G. Sandell, N. Jessop, T. Jenness \\
+\stardoccategory    {Starlink Cookbook}
+\stardocinitials    {SC}
+\stardocsource      {sc\stardocnumber}
+\stardocnumber      {11.2}
+\stardocauthors   {G. Sandell, N. Jessop, T. Jenness \\
 Joint Astronomy Centre, Hilo, Hawaii}
-\newcommand{\stardocdate}      {29th October 2001}
-\newcommand{\stardoctitle}     {The SCUBA map reduction cookbook}
-\newcommand{\stardocversion}   {\ }
-\newcommand{\stardocmanual}    {\ }
-\newcommand{\stardocabstract}  {[Text of abstract]}
+\stardocdate        {29th October 2001}
+\stardoctitle       {The SCUBA map reduction cookbook}
+\startitlepic{\includegraphics[width=2.0in]{sc11_logo}}
 % ? End of document identification
 
-% A new environment for quoting verbatim
-% Environment for indenting and using a small font.
-\newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
+% ------------------------------------------------------------------------
+% ? Document specific \providecommand or \newenvironment commands.
 
+\providecommand{\about}{$\sim$}
+\providecommand{\eg}{\textit{e.g.}}
+\providecommand{\ie}{\textit{i.e.}}
+\providecommand{\mic}{\mbox{\,${\mu}$m}}               % microns
+\providecommand{\arcmin}{{$^\prime$}}
+\providecommand{\degr}{\mbox{\,$^\circ$}}               % degrees sign
 
-
-\newcommand{\text}[1]{{\small \texttt{#1}}}
+\providecommand{\text}[1]{{\small \texttt{#1}}}
 
 % SCUBA reference
-\newcommand{\scuba}{\htmladdnormallink{SCUBA}{http://www.jach.hawaii.edu/JCMT/}}
+\providecommand{\scuba}{\htmladdnormallink{SCUBA}{http://www.jach.hawaii.edu/JCMT/}}
 
 
 % Starlink Package names
-\newcommand{\starlink}{\htmladdnormallink{Starlink}{http://www.starlink.ac.uk/}}
+\providecommand{\starlink}{\htmladdnormallink{Starlink}{http://www.starlink.ac.uk/}}
 
 
 % set up some common package names
-\newcommand{\Kappa}{\xref{\textsc{Kappa}}{sun95}{}}
-\newcommand{\Figaro}{\xref{\textsc{Figaro}}{sun86}{}}
-\newcommand{\gaia}{\xref{\textsc{Gaia}}{sun214}{}}
-\newcommand{\convert}{\xref{\textsc{Convert}}{sun55}{}}
-\newcommand{\fluxes}{\xref{\textsc{Fluxes}}{sun213}{}}
-\newcommand{\ccdpack}{\xref{\textsc{Ccdpack}}{sun139}{}}
-\newcommand{\Iras}{\xref{\textsc{Iras90}}{sun163}{}}
-\newcommand{\ndf}{\xref{NDF}{sun33}{}}
-\newcommand{\agi}{\xref{AGI}{sun48}{}}
-\newcommand{\surf}{\xref{\textsc{Surf}}{sun216}{}}
-\newcommand{\Specdre}{\xref{\textsc{Specdre}}{sun140}{}}
-\newcommand{\jcmtdr}{\xref{\textsc{JCMTdr}}{sun132}{}}
-\newcommand{\nod}{\textsc{nod2}}
-\newcommand{\ESP}{\xref{ESP}{sun180}{}}
-\newcommand{\GKS}{\xref{GKS}{sun83}{}}
-\newcommand{\oracdr}{\xref{\textsc{orac-dr}}{sun231}{}}
+\providecommand{\Kappa}{\xref{\textsc{Kappa}}{sun95}{}}
+\providecommand{\Figaro}{\xref{\textsc{Figaro}}{sun86}{}}
+\providecommand{\gaia}{\xref{\textsc{Gaia}}{sun214}{}}
+\providecommand{\convert}{\xref{\textsc{Convert}}{sun55}{}}
+\providecommand{\fluxes}{\xref{\textsc{Fluxes}}{sun213}{}}
+\providecommand{\ccdpack}{\xref{\textsc{Ccdpack}}{sun139}{}}
+\providecommand{\Iras}{\xref{\textsc{Iras90}}{sun163}{}}
+\providecommand{\ndf}{\xref{NDF}{sun33}{}}
+\providecommand{\agi}{\xref{AGI}{sun48}{}}
+\providecommand{\surf}{\xref{\textsc{Surf}}{sun216}{}}
+\providecommand{\Specdre}{\xref{\textsc{Specdre}}{sun140}{}}
+\providecommand{\jcmtdr}{\xref{\textsc{JCMTdr}}{sun132}{}}
+\providecommand{\nod}{\textsc{nod2}}
+\providecommand{\ESP}{\xref{ESP}{sun180}{}}
+\providecommand{\GKS}{\xref{GKS}{sun83}{}}
+\providecommand{\oracdr}{\xref{\textsc{orac-dr}}{sun231}{}}
 
 % Application tasks
-\newcommand{\task}[1]{\textsf{#1}}
+\providecommand{\task}[1]{\textsf{#1}}
 
 % ADAM parameters
-\newcommand{\param}[1]{\texttt{#1}}
+\providecommand{\param}[1]{\texttt{#1}}
 
 % SURF tasks
-\newcommand{\rebin}{\xref{\task{rebin}}{sun216}{REBIN}}
-\newcommand{\remdbm}{\xref{\task{remdbm}}{sun216}{REMDBM}}
-\newcommand{\bolrebin}{\xref{\task{bolrebin}}{sun216}{BOLREBIN}}
-\newcommand{\intrebin}{\xref{\task{intrebin}}{sun216}{INTREBIN}}
-\newcommand{\calcsky}{\xref{\task{calcsky}}{sun216}{CALCSKY}}
-\newcommand{\chgqual}{\xref{\task{change\_\-qua\-lity}}{sun216}{CHANGE_QUALITY}}
+\providecommand{\rebin}{\xref{\task{rebin}}{sun216}{REBIN}}
+\providecommand{\remdbm}{\xref{\task{remdbm}}{sun216}{REMDBM}}
+\providecommand{\bolrebin}{\xref{\task{bolrebin}}{sun216}{BOLREBIN}}
+\providecommand{\intrebin}{\xref{\task{intrebin}}{sun216}{INTREBIN}}
+\providecommand{\calcsky}{\xref{\task{calcsky}}{sun216}{CALCSKY}}
+\providecommand{\chgqual}{\xref{\task{change\_\-qua\-lity}}{sun216}{CHANGE_QUALITY}}
 
 
-\newcommand{\chgflat}{\xref{\task{change\_flat}}{sun216}{CHANGE_FLAT}}
-\newcommand{\chgpnt}{\xref{\task{change\_pointing}}{sun216}{CHANGE_POINTING}}
+\providecommand{\chgflat}{\xref{\task{change\_flat}}{sun216}{CHANGE_FLAT}}
+\providecommand{\chgpnt}{\xref{\task{change\_pointing}}{sun216}{CHANGE_POINTING}}
 
 
-\newcommand{\chgdata}{\xref{\task{change\_data}}{sun216}{CHANGE_DATA}}
-\newcommand{\desp}{\xref{\task{despike}}{sun216}{DESPIKE}}
-%\newcommand{\desp2}{\xref{\task{despike2}}{sun216}{DESPIKE2}}
-\newcommand{\dspbol}{\xref{\task{dspbol}}{sun216}{DSPBOL}}
-\newcommand{\resw}{\xref{\task{reduce\_switch}}{sun216}{REDUCE_SWITCH}}
+\providecommand{\chgdata}{\xref{\task{change\_data}}{sun216}{CHANGE_DATA}}
+\providecommand{\desp}{\xref{\task{despike}}{sun216}{DESPIKE}}
+%\providecommand{\desp2}{\xref{\task{despike2}}{sun216}{DESPIKE2}}
+\providecommand{\dspbol}{\xref{\task{dspbol}}{sun216}{DSPBOL}}
+\providecommand{\resw}{\xref{\task{reduce\_switch}}{sun216}{REDUCE_SWITCH}}
 
 
-\newcommand{\flatf}{\xref{\task{flatfield}}{sun216}{FLATFIELD}}
-\newcommand{\skydip}{\xref{\task{skydip}}{sun216}{SKYDIP}}
+\providecommand{\flatf}{\xref{\task{flatfield}}{sun216}{FLATFIELD}}
+\providecommand{\skydip}{\xref{\task{skydip}}{sun216}{SKYDIP}}
 
-\newcommand{\scuphot}{\xref{\task{scuphot}}{sun216}{SCUPHOT}}
-\newcommand{\scanrlb}{\xref{\task{scan\_rlb}}{sun216}{SCAN_RLB}}
-\newcommand{\ext}{\xref{\task{extinction}}{sun216}{EXTINCTION}}
-\newcommand{\scuquick}{\xref{\task{scuquick}}{sun216}{SCUQUICK}}
-\newcommand{\scuhelp}{\xref{\task{scuhelp}}{sun216}{SCUHELP}}
-\newcommand{\remsky}{\xref{\task{remsky}}{sun216}{REMSKY}}
-\newcommand{\scuover}{\xref{\task{scuover}}{sun216}{SCUOVER}}
-\newcommand{\extdata}{\xref{\task{extract\_data}}{sun216}{EXTRACT_DATA}}
+\providecommand{\scuphot}{\xref{\task{scuphot}}{sun216}{SCUPHOT}}
+\providecommand{\scanrlb}{\xref{\task{scan\_rlb}}{sun216}{SCAN_RLB}}
+\providecommand{\ext}{\xref{\task{extinction}}{sun216}{EXTINCTION}}
+\providecommand{\scuquick}{\xref{\task{scuquick}}{sun216}{SCUQUICK}}
+\providecommand{\scuhelp}{\xref{\task{scuhelp}}{sun216}{SCUHELP}}
+\providecommand{\remsky}{\xref{\task{remsky}}{sun216}{REMSKY}}
+\providecommand{\scuover}{\xref{\task{scuover}}{sun216}{SCUOVER}}
+\providecommand{\extdata}{\xref{\task{extract\_data}}{sun216}{EXTRACT_DATA}}
 
 
-\newcommand{\sculog}{\xref{\task{sculog}}{sun216}{SCULOG}}
-\newcommand{\scuplot}{\xref{\task{scuplot}}{sun216}{SCUPLOT}}
-\newcommand{\scucat}{\xref{\task{scucat}}{sun216}{SCUCAT}}
-\newcommand{\photsum}{\xref{\task{photsum}}{sun216}{PHOTSUM}}
-\newcommand{\mapsum}{\xref{\task{mapsum}}{sun216}{MAPSUM}}
-\newcommand{\pointsum}{\xref{\task{pointsum}}{sun216}{POINTSUM}}
-\newcommand{\qdraw}{\xref{\task{qdraw}}{sun216}{QDRAW}}
-\newcommand{\sigclip}{\xref{\task{sigclip}}{sun216}{SIGCLIP}}
-\newcommand{\restore}{\xref{\task{restore}}{sun216}{RESTORE}}
-\newcommand{\sdip}{\xref{\task{sdip}}{sun216}{SDIP}}
-\newcommand{\scuclip}{\xref{\task{scuclip}}{sun216}{SCUCLIP}}
-\newcommand{\scupa}{\xref{\task{scupa}}{sun216}{SCUPA}}
-\newcommand{\scunoise}{\xref{\task{scunoise}}{sun216}{SCUNOISE}}
-\newcommand{\obssum}{\xref{\task{obssum}}{sun216}{OBSSUM}}
+\providecommand{\sculog}{\xref{\task{sculog}}{sun216}{SCULOG}}
+\providecommand{\scuplot}{\xref{\task{scuplot}}{sun216}{SCUPLOT}}
+\providecommand{\scucat}{\xref{\task{scucat}}{sun216}{SCUCAT}}
+\providecommand{\photsum}{\xref{\task{photsum}}{sun216}{PHOTSUM}}
+\providecommand{\mapsum}{\xref{\task{mapsum}}{sun216}{MAPSUM}}
+\providecommand{\pointsum}{\xref{\task{pointsum}}{sun216}{POINTSUM}}
+\providecommand{\qdraw}{\xref{\task{qdraw}}{sun216}{QDRAW}}
+\providecommand{\sigclip}{\xref{\task{sigclip}}{sun216}{SIGCLIP}}
+\providecommand{\restore}{\xref{\task{restore}}{sun216}{RESTORE}}
+\providecommand{\sdip}{\xref{\task{sdip}}{sun216}{SDIP}}
+\providecommand{\scuclip}{\xref{\task{scuclip}}{sun216}{SCUCLIP}}
+\providecommand{\scupa}{\xref{\task{scupa}}{sun216}{SCUPA}}
+\providecommand{\scunoise}{\xref{\task{scunoise}}{sun216}{SCUNOISE}}
+\providecommand{\obssum}{\xref{\task{obssum}}{sun216}{OBSSUM}}
 
 % Non surf tasks
 
 % KAPPA
-\newcommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
-\newcommand{\aperadd}{\xref{\task{aperadd}}{sun95}{APERADD}}
-\newcommand{\linplot}{\xref{\task{linplot}}{sun95}{LINPLOT}}
-\newcommand{\mlinplot}{\xref{\task{mlinplot}}{sun95}{MLINPLOT}}
-\newcommand{\drawsig}{\xref{\task{drawsig}}{sun95}{DRAWSIG}}
-\newcommand{\centroid}{\xref{\task{centroid}}{sun95}{CENTROID}}
-\newcommand{\hislist}{\xref{\task{hislist}}{sun95}{HISLIST}}
-\newcommand{\globals}{\xref{\task{globals}}{sun95}{GLOBALS}}
-\newcommand{\setaxis}{\xref{\task{setaxis}}{sun95}{SETAXIS}}
-\newcommand{\kstest}{\xref{\task{kstest}}{sun95}{KSTEST}}
-\newcommand{\stats}{\xref{\task{stats}}{sun95}{STATS}}
-\newcommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
-\newcommand{\setbb}{\xref{\task{setbb}}{sun95}{SETBB}}
+\providecommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
+\providecommand{\aperadd}{\xref{\task{aperadd}}{sun95}{APERADD}}
+\providecommand{\linplot}{\xref{\task{linplot}}{sun95}{LINPLOT}}
+\providecommand{\mlinplot}{\xref{\task{mlinplot}}{sun95}{MLINPLOT}}
+\providecommand{\drawsig}{\xref{\task{drawsig}}{sun95}{DRAWSIG}}
+\providecommand{\centroid}{\xref{\task{centroid}}{sun95}{CENTROID}}
+\providecommand{\hislist}{\xref{\task{hislist}}{sun95}{HISLIST}}
+\providecommand{\globals}{\xref{\task{globals}}{sun95}{GLOBALS}}
+\providecommand{\setaxis}{\xref{\task{setaxis}}{sun95}{SETAXIS}}
+\providecommand{\kstest}{\xref{\task{kstest}}{sun95}{KSTEST}}
+\providecommand{\stats}{\xref{\task{stats}}{sun95}{STATS}}
+\providecommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
+\providecommand{\setbb}{\xref{\task{setbb}}{sun95}{SETBB}}
 
-\newcommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
-\newcommand{\fitsedit}{\xref{\task{fitsedit}}{sun95}{FITSEDIT}}
+\providecommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
+\providecommand{\fitsedit}{\xref{\task{fitsedit}}{sun95}{FITSEDIT}}
 
-\newcommand{\setvar}{\xref{\task{setvar}}{sun95}{SETVAR}}
-\newcommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
-\newcommand{\gdset}{\xref{\task{gdset}}{sun95}{GDSET}}
-\newcommand{\idset}{\xref{\task{idset}}{sun95}{IDSET}}
-\newcommand{\ovset}{\xref{\task{ovset}}{sun95}{OVSET}}
-\newcommand{\gdnames}{\xref{\task{gdnames}}{sun95}{GDNAMES}}
-\newcommand{\gdclear}{\xref{\task{gdclear}}{sun95}{GDCLEAR}}
-\newcommand{\cursor}{\xref{\task{cursor}}{sun95}{CURSOR}}
-\newcommand{\flip}{\xref{\task{flip}}{sun95}{FLIP}}
-\newcommand{\cadd}{\xref{\task{cadd}}{sun95}{CADD}}
+\providecommand{\setvar}{\xref{\task{setvar}}{sun95}{SETVAR}}
+\providecommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
+\providecommand{\gdset}{\xref{\task{gdset}}{sun95}{GDSET}}
+\providecommand{\idset}{\xref{\task{idset}}{sun95}{IDSET}}
+\providecommand{\ovset}{\xref{\task{ovset}}{sun95}{OVSET}}
+\providecommand{\gdnames}{\xref{\task{gdnames}}{sun95}{GDNAMES}}
+\providecommand{\gdclear}{\xref{\task{gdclear}}{sun95}{GDCLEAR}}
+\providecommand{\cursor}{\xref{\task{cursor}}{sun95}{CURSOR}}
+\providecommand{\flip}{\xref{\task{flip}}{sun95}{FLIP}}
+\providecommand{\cadd}{\xref{\task{cadd}}{sun95}{CADD}}
 
-\newcommand{\cdiv}{\xref{\task{cdiv}}{sun95}{CDIV}}
-\newcommand{\Div}{\xref{\task{div}}{sun95}{DIV}}
-\newcommand{\cmult}{\xref{\task{cmult}}{sun95}{CMULT}}
-\newcommand{\mult}{\xref{\task{mult}}{sun95}{MULT}}
-\newcommand{\add}{\xref{\task{add}}{sun95}{ADD}}
-\newcommand{\sub}{\xref{\task{sub}}{sun95}{SUB}}
-\newcommand{\csub}{\xref{\task{csub}}{sun95}{CSUB}}
-\newcommand{\psf}{\xref{\task{psf}}{sun95}{PSF}}
+\providecommand{\cdiv}{\xref{\task{cdiv}}{sun95}{CDIV}}
+\providecommand{\Div}{\xref{\task{div}}{sun95}{DIV}}
+\providecommand{\cmult}{\xref{\task{cmult}}{sun95}{CMULT}}
+\providecommand{\mult}{\xref{\task{mult}}{sun95}{MULT}}
+\providecommand{\add}{\xref{\task{add}}{sun95}{ADD}}
+\providecommand{\sub}{\xref{\task{sub}}{sun95}{SUB}}
+\providecommand{\csub}{\xref{\task{csub}}{sun95}{CSUB}}
+\providecommand{\psf}{\xref{\task{psf}}{sun95}{PSF}}
 
-\newcommand{\glitch}{\xref{\task{glitch}}{sun95}{GLITCH}}
-\newcommand{\setunits}{\xref{\task{setunits}}{sun95}{SETUNITS}}
-\newcommand{\fitstext}{\xref{\task{fitstext}}{sun95}{FITSTEXT}}
-\newcommand{\fitsmod}{\xref{\task{fitsmod}}{sun95}{FITSMOD}}
-\newcommand{\fitshead}{\xref{\task{fitshead}}{sun95}{FITSHEAD}}
-\newcommand{\lutbgyrw}{\xref{\task{lutbgyrw}}{sun95}{LUTBGYRW}}
-\newcommand{\contour}{\xref{\task{contour}}{sun95}{CONTOUR}}
-\newcommand{\contover}{\xref{\task{contover}}{sun95}{CONTOVER}}
+\providecommand{\glitch}{\xref{\task{glitch}}{sun95}{GLITCH}}
+\providecommand{\setunits}{\xref{\task{setunits}}{sun95}{SETUNITS}}
+\providecommand{\fitstext}{\xref{\task{fitstext}}{sun95}{FITSTEXT}}
+\providecommand{\fitsmod}{\xref{\task{fitsmod}}{sun95}{FITSMOD}}
+\providecommand{\fitshead}{\xref{\task{fitshead}}{sun95}{FITSHEAD}}
+\providecommand{\lutbgyrw}{\xref{\task{lutbgyrw}}{sun95}{LUTBGYRW}}
+\providecommand{\contour}{\xref{\task{contour}}{sun95}{CONTOUR}}
+\providecommand{\contover}{\xref{\task{contover}}{sun95}{CONTOVER}}
 
-\newcommand{\turbocont}{\xref{\task{turbocont}}{sun95}{TURBOCONT}}
-\newcommand{\mosaic}{\xref{\task{mosaic}}{sun95}{MOSAIC}}
-\newcommand{\pixdupe}{\xref{\task{pixdupe}}{sun95}{PIXDUPE}}
-\newcommand{\rotate}{\xref{\task{rotate}}{sun95}{ROTATE}}
-\newcommand{\setbound}{\xref{\task{setbound}}{sun95}{SETBOUND}}
-\newcommand{\slide}{\xref{\task{slide}}{sun95}{SLIDE}}
-\newcommand{\gausmooth}{\xref{\task{gausmooth}}{sun95}{GAUSMOOTH}}
-\newcommand{\median}{\xref{\task{median}}{sun95}{MEDIAN}}
+\providecommand{\turbocont}{\xref{\task{turbocont}}{sun95}{TURBOCONT}}
+\providecommand{\mosaic}{\xref{\task{mosaic}}{sun95}{MOSAIC}}
+\providecommand{\pixdupe}{\xref{\task{pixdupe}}{sun95}{PIXDUPE}}
+\providecommand{\rotate}{\xref{\task{rotate}}{sun95}{ROTATE}}
+\providecommand{\setbound}{\xref{\task{setbound}}{sun95}{SETBOUND}}
+\providecommand{\slide}{\xref{\task{slide}}{sun95}{SLIDE}}
+\providecommand{\gausmooth}{\xref{\task{gausmooth}}{sun95}{GAUSMOOTH}}
+\providecommand{\median}{\xref{\task{median}}{sun95}{MEDIAN}}
 
-\newcommand{\memd}{\xref{\task{mem2d}}{sun95}{MEM2D}}
-\newcommand{\axlabel}{\xref{\task{axlabel}}{sun95}{AXLABEL}}
-\newcommand{\axunits}{\xref{\task{axunits}}{sun95}{AXUNITS}}
-\newcommand{\setlabel}{\xref{\task{setlabel}}{sun95}{SETLABEL}}
-\newcommand{\settitle}{\xref{\task{settitle}}{sun95}{SETTITLE}}
-\newcommand{\histogram}{\xref{\task{histogram}}{sun95}{HISTOGRAM}}
-\newcommand{\normalize}{\xref{\task{normalize}}{sun95}{NORMALIZE}}
+\providecommand{\memd}{\xref{\task{mem2d}}{sun95}{MEM2D}}
+\providecommand{\axlabel}{\xref{\task{axlabel}}{sun95}{AXLABEL}}
+\providecommand{\axunits}{\xref{\task{axunits}}{sun95}{AXUNITS}}
+\providecommand{\setlabel}{\xref{\task{setlabel}}{sun95}{SETLABEL}}
+\providecommand{\settitle}{\xref{\task{settitle}}{sun95}{SETTITLE}}
+\providecommand{\histogram}{\xref{\task{histogram}}{sun95}{HISTOGRAM}}
+\providecommand{\normalize}{\xref{\task{normalize}}{sun95}{NORMALIZE}}
 
 % Convert
-\newcommand{\ndffits}{\xref{\task{ndf2fits}}{sun55}{NDF2FITS}}
-\newcommand{\ndfascii}{\xref{\task{ndf2ascii}}{sun55}{NDF2ASCII}}
+\providecommand{\ndffits}{\xref{\task{ndf2fits}}{sun55}{NDF2FITS}}
+\providecommand{\ndfascii}{\xref{\task{ndf2ascii}}{sun55}{NDF2ASCII}}
 
 % FIGARO
-\newcommand{\wdfits}{\xref{\task{wdfits}}{sun86}{WDFITS}}
-\newcommand{\istat}{\xref{\task{istat}}{sun86}{ISTAT}}
-\newcommand{\delobj}{\xref{\task{delobj}}{sun86}{DELOBJ}}
-\newcommand{\copobj}{\xref{\task{copobj}}{sun86}{COPOBJ}}
-\newcommand{\image}{\xref{\task{image}}{sun86}{IMAGE}}
-\newcommand{\bclean}{\xref{\task{bclean}}{sun86}{BCLEAN}}
-\newcommand{\ystract}{\xref{\task{ystract}}{sun86}{YSTRACT}}
-\newcommand{\sclean}{\xref{\task{sclean}}{sun86}{SCLEAN}}
+\providecommand{\wdfits}{\xref{\task{wdfits}}{sun86}{WDFITS}}
+\providecommand{\istat}{\xref{\task{istat}}{sun86}{ISTAT}}
+\providecommand{\delobj}{\xref{\task{delobj}}{sun86}{DELOBJ}}
+\providecommand{\copobj}{\xref{\task{copobj}}{sun86}{COPOBJ}}
+\providecommand{\image}{\xref{\task{image}}{sun86}{IMAGE}}
+\providecommand{\bclean}{\xref{\task{bclean}}{sun86}{BCLEAN}}
+\providecommand{\ystract}{\xref{\task{ystract}}{sun86}{YSTRACT}}
+\providecommand{\sclean}{\xref{\task{sclean}}{sun86}{SCLEAN}}
 
 % CCDPACK
-\newcommand{\makemos}{\xref{\task{makemos}}{sun139}{MAKEMOS}}
+\providecommand{\makemos}{\xref{\task{makemos}}{sun139}{MAKEMOS}}
 
 % IRAS90
-\newcommand{\skypos}{\xref{\task{skypos}}{sun163}{SKYPOS}}
-\newcommand{\skygrid}{\xref{\task{skygrid}}{sun163}{SKYGRID}}
-\newcommand{\skyphot}{\xref{\task{skyphot}}{sun163}{SKYPHOT}}
+\providecommand{\skypos}{\xref{\task{skypos}}{sun163}{SKYPOS}}
+\providecommand{\skygrid}{\xref{\task{skygrid}}{sun163}{SKYGRID}}
+\providecommand{\skyphot}{\xref{\task{skyphot}}{sun163}{SKYPHOT}}
 
 
 % Misc
-\newcommand{\hdstrace}{\xref{\task{hdstrace}}{sun102}{}}
-\newcommand{\psmerge}{\xref{\task{psmerge}}{sun164}{}}
-\newcommand{\fitgauss}{\xref{\task{fitgauss}}{sun140}{FITGAUSS}}
-\newcommand{\gaufit}{\xref{\task{gaufit}}{sun180}{GAUFIT}}
+\providecommand{\hdstrace}{\xref{\task{hdstrace}}{sun102}{}}
+\providecommand{\psmerge}{\xref{\task{psmerge}}{sun164}{}}
+\providecommand{\fitgauss}{\xref{\task{fitgauss}}{sun140}{FITGAUSS}}
+\providecommand{\gaufit}{\xref{\task{gaufit}}{sun180}{GAUFIT}}
 
 % JAC
 
-\newcommand{\Archibald}{\htmladdnormallink{Archibald}{http://adsabs.harvard.edu/abs/2002MNRAS.336....1A} }
-\newcommand{\Coulson}{\htmladdnormallink{Coulson}{http://www.jach.hawaii.edu/JACdocs/JCMT/SCD/SN/003/ }}
+\providecommand{\Archibald}{\htmladdnormallink{Archibald}{http://adsabs.harvard.edu/abs/2002MNRAS.336....1A} }
+\providecommand{\Coulson}{\htmladdnormallink{Coulson}{http://www.jach.hawaii.edu/JACdocs/JCMT/SCD/SN/003/ }}
 
-
-% +
-%  Name:
-%     sc.tex
-%
-%  Purpose:
-%     Template for Starlink Cookbook (SC) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     16-JUN-1997 (BLY):
-%        Original, based on SUN/SG templates.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -------------------------------------------------------------------------
-
-
-%  Hypertext definitions.
-%  ======================
-% These are used by the LaTeX2HTML translator in conjunction with
-% star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout
-%    <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos
-%  <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML
-%  documentation
-%  should be consulted about all commands (and the environments
-%  defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% ------------------------------------------------------------------------
-
-
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using
-%  Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -------------------------------------------------------------------------
-
-
-% ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
 % -------------------------------------------------------------------------
 
 
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\textsc Rutherford Appleton Laboratory} \hfill {\textbf
-\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\textbf \stardocversion \\ [4ex]}
-   {\Huge\textbf  \stardocmanual}
-   \end{center}
-%   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-\begin{center}
-\includegraphics[width=2.0in]{sc11_logo}
-\end{center}
-% ? End of picture
-
-% ? Heading for abstract if used.
-%   \vspace{10mm}
-%   \begin{center}
-%      {\Large\textbf Abstract}
-%   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-\includegraphics[width=2.0in]{sc11_logo}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research
-Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to
-%  this point in the document (this should always go before the
-%  abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-%  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% ------------------------------------------------------------------------
-
-
-% ? Document Abstract. (if used)
-%  ==================
-%\stardocabstract
-% ? End of document abstract
-% ------------------------------------------------------------------------
-
-
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -------------------------------------------------------------------------
-
-
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-
+\scfrontmatter
 
 \section{\xlabel{introduction}Introduction}
 
@@ -556,17 +278,15 @@ reduce your data, we will deal with it first. If you are at the
 telescope log into \texttt{mamo} (if you are working on another machine just
 \texttt{ssh mamo}), and then type:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % oracdr_scuba
 % oracdr
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \begin{figure}
 \begin{center}
 \includegraphics[width=5.5in]{sc11_fig1}
-\caption{The \texttt{Xoracdr} gui for \textsc{orac-dr}.
+\caption[The \texttt{Xoracdr} gui for \textsc{orac-dr}.]{The \texttt{Xoracdr} gui for \textsc{orac-dr}.
   All the information needed to start
   the data reduction (ie. where the data is, what instrument is being used,
   what ut date) is prompted for.}
@@ -577,11 +297,9 @@ telescope log into \texttt{mamo} (if you are working on another machine just
 If you are at your home institution or at the JAC, you should use the
 new x-windows gui. Simply type:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 %xoracdr
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 and the interface shown in Figure \ \ref{fig:xoracdr} should pop-up.
 Fill in the appropriate date, the location of the raw data files (see
@@ -609,9 +327,8 @@ these by typing ``\texttt{ls \$ORAC\_DIR/recipes/SCUBA}'' (if the environment
 variable is not set type ``\texttt{oracdr\_scuba}'').  The jiggle map recipe
 reads,
 
-\begin{myquote}
-\begin{verbatim}
-
+\begin{small}
+\begin{terminalv}
 =head1 NAME
 
 SCUBA_JIGMAP - Standard reduction for jiggle map data
@@ -648,16 +365,14 @@ _CALIBRATE_DATA_
 _REBIN_GROUP_ PIXEL_SIZE=1.0 REBIN_METHOD=LINEAR
 
 _DELETE_TEMP_FILES_ KEEP=_reb,_ext,_sky,_cal
-
-
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 while the scan map recipe reads (omitting the verbose header
 information),
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 _PRE_PROCESS_
 
 _FLAT_FIELD_
@@ -682,9 +397,8 @@ _REBIN_EM2_GROUP_ PIXEL_SIZE=3.0 REBIN_METHOD=GAUSSIAN
 # Need to make sure that the _rlb file is kept for the
 # sky removal and that the _sky file is kept for the group processing.
 _DELETE_TEMP_FILES_ KEEP=_rlb,_sky,_reb
-
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 Both read surprisingly like English, each line in the recipes is a
 step to be done in the data processing (or in the \oracdr\ parlance
@@ -724,14 +438,12 @@ routines to reduce the data.
 First log in on a unix workstation and create a directory where
 you want to store your reduced data. Next type
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % surf
 % kappa
 % figaro
 % convert
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 This starts up the \scuba\ software and the main \starlink\ packages
 needed for the data reduction.
@@ -752,11 +464,9 @@ of February 1998.  As of now data obtained on for example the evening
 shift of February 15 are stored on the UNIX disk in
 
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 /jcmtarchive/19980215
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 and copied to Hilo the following day, where they reside in a protected
 UNIX directory. If you are a visiting astronomer, it may be wise to
@@ -774,13 +484,11 @@ local directory called \texttt{/home/user/scubadata}. To start the
 data reduction you will therefore need to set up some environmental
 variables and get a listing of your data.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv DATADIR /home/user/scubadata
 % setenv SCUBA_PREFIX yyyymmdd
 % setenv HDS_SCRATCH /tmp
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Here \texttt{yyyy} stands for the year, \texttt{mm} is the month (as a
 numeral) and \texttt{dd} is the UT date for the night you want to reduce,
@@ -793,11 +501,9 @@ written by \starlink\ applications.
 You are now ready for creating a log of all maps obtained during the
 night by typing:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % mapsum -all -demod > Dec8.maps
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Here the summary information about all the maps in our directory is piped into
 a text file, which we called \texttt{Dec8.maps}.  You can choose any name you
@@ -831,8 +537,8 @@ steps with the script \texttt{scuquick}, i.e.\ \texttt{scuquick
 that you can see what is involved.  First we execute \resw, and \flatf
 :
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % reduce_switch
 IN - Name of input file containing demodulated data > 86
 SURF: Opening 19971208_dem_0086
@@ -846,8 +552,8 @@ IN - Name of input file /@o86/ > i86
 SURF: run 86 was a MAP observation of IRC+10216
 OUT - Name of output file /'i86_flat'/ >
 SURF: applying flatfield from lwswphot.dat
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 Next we want to correct for the atmospheric attenuation of the signal.
 At present there are two measures of the atmosphere's opacity -
@@ -877,7 +583,7 @@ Which you use is certainly open to debate; the skydips may well have
 the advantage of being made at the same azimuth as your source, but
 the $\tau_{\rm CSO}$ is measured more regularly (every ten minutes or
 so).  The preferred method used at the JAC is to fit a polynomial to
-the $\tau_{\rm CSO}$ data, and convert the value from {\it the fit} to
+the $\tau_{\rm CSO}$ data, and convert the value from \textit{the fit} to
 opacity at 450 and 850, these fits are regularly made and available at
 \htmladdnormallink{the JCMT's calibration web page}
 {http://www.jach.hawaii.edu/JACpublic/JCMT/Continuum_observing/SCUBA/astronomy/calibration/fitscover.html}
@@ -891,9 +597,8 @@ dominate. We therefore adopt a value $\tau_{\rm 850}=0.185$ for this
 observation. The extinction correction is applied by running \ext\ on
 the flatfielded data.
 
-\begin{myquote}
-\begin{verbatim}
-
+\begin{small}
+\begin{terminalv}
 %extinction
 IN - Name of NDF containing demodulated data /@i86_flat/ > i86_flat
 SURF: run 86 was a MAP observation with JIGGLE sampling of object
@@ -915,19 +620,19 @@ SECOND_TAU - Second zenith sky opacity measured /0.185/ >
 SECOND_LST - Sidereal time of second opacity measurement; hh mm ss.ss
 /'0.0'/ >
 OUT - Name of output NDF /'i86_lon_ext'/ >
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 Note that \ext\ allows you to supply two values of opacity measured at
 different times if you want -- in this case we have bypassed this
 option.  This is also where the long wavelength array gets separated
 from the short wavelength one.  When we want the short wavelength data
-we have to run \ext\ again and choose {\it short} as the $\rm
+we have to run \ext\ again and choose \textit{short} as the $\rm
 SUB\_INSTRUMENT$.  Our data are now extinction corrected, but still in
 instrumental units (Volts).  In order to have a feeling for the true
 signal and noise level in our data, we therefore need to apply a
 scaling factor, FCF (Flux Calibration Factor), that converts the
-instrumental units to {\it Jy/beam} or {\it Jy/$arcsec^2$}.
+instrumental units to \textit{Jy/beam} or \textit{Jy/$arcsec^2$}.
 Calibration is discussed in detail in Section \ \ref{Calibration}.
 For just a quick look we ignore the intricacies of calibration and use
 nominal FCSs, which for the current filters (850~W \& 450~W) is 220
@@ -938,23 +643,21 @@ appropriate.  To scale our extinction corrected data we use the
 \Kappa\ command \cmult.
 
 
-
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 %cmult
 IN - Input NDF data structure /@i86_lon_ext/ >
 SCALAR - Multiplication constant > 280
 OUT - Output NDF > i86_lon_cal
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 Here we gave the calibrated data set the extension \texttt{\_cal}.
 Now we are ready to convert our extinction corrected and calibrated
 data onto a spatial grid using the \surf\ task \rebin.
 
-
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 %rebin
 REBIN_METHOD - Rebinning method to be used /'LINEAR'/ >
 OUT_COORDS - Coordinate sys of output map; PL,AZ,NA,RB,RJ,RD or GA
@@ -988,16 +691,14 @@ WTFN_REGRID: Beginning regrid process
 WTFN_REGRID: Entering second rebin phase (T = 0.03516951 seconds)
 WTFN_REGRID: Entering third rebin phase (T = 0.1326885 seconds)
 WTFN_REGRID: Regrid complete. Elapsed time = 0.1400405 seconds
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 The resulting map can be viewed with \Kappa's \display
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % display axes clear i86_lon_reb
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 or by using \texttt{Gaia}.  The resulting map does not look
 particularly nice, because we have not yet blanked out any noisy
@@ -1013,7 +714,8 @@ Bolometers}
 \begin{figure}
 \begin{center}
 \includegraphics[width=5.4in]{sc11_fig2}
-\caption{The extinction corrected data of IRC$+$10216 without
+\caption[The extinction corrected data of IRC$+$10216 without
+despiking and sky removal.]{The extinction corrected data of IRC$+$10216 without
 despiking and sky removal.  In this image the bolometers are on the
 x-axis and the y-axis is time. A strong signal is seen in the central
 bolometer (19) throughout the jiggle cycle, while neighboring
@@ -1046,13 +748,11 @@ these bolometers to bad we plot the bolometers with \mlinplot\ to
 check that these bolometers are indeed noisy in our map.
 
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % mlinplot i86_lon_ext absaxs=2 lnindx='21:32'
 YLIMIT - Vertical display limits /[-0.002588027,0.09385466]/ >
 DEVICE - Name of display device /@xwindows/ >
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 In the above example the bolometers 21 -- 32 are plotted as a function
 of integration time (Fig.\  \ref{fig:mlin}).  Bolometer 23 is indeed the
@@ -1077,7 +777,7 @@ bolometer.
 \begin{figure}
 \begin{center}
 \includegraphics[width=\textwidth]{sc11_fig3}
-\caption{Using \mlinplot\ to display a set of bolometers as a function
+\caption[Identifying noisy bolometers with \mlinplot.]{Using \mlinplot\ to display a set of bolometers as a function
 of time is a good way to identify noisy bolometers.  From this
 plot we can see that bolometers 22 -- 24 are noisier than the rest of
 the sample.  Note that bolometers 25 and 26, which are in the first
@@ -1092,9 +792,8 @@ the dip in signal at the beginning of integration 2.}
 \end{center}
 \end{figure}
 
-
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % change_quality "'i86_lon_ext{b23}'"
 SURF: run 86 was a MAP observation of IRC+10216
 SURF: file has data for 37 bolometers, measured at 192 positions.
@@ -1102,9 +801,8 @@ SURF: file has data for 37 bolometers, measured at 192 positions.
 measurements.
 BAD_QUALITY - Set quality to bad? (No will set quality to good) /YES/
 >
-\end{verbatim}
-\end{myquote}
-
+\end{terminalv}
+\end{small}
 
 \subsection{\xlabel{Initial_Sky_Noise_Removal}Initial sky noise
 removal \label{Initial_Sky_Noise_Removal}}
@@ -1119,9 +817,8 @@ centrally symmetric source, we take the second ring, r2, of bolometers
 using the median option to avoid spikes that may be present in the
 data.
 
-
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
  % remsky
 IN - Name of input file containing demodulated map data
 /@o86_lon_ext/ >
@@ -1134,18 +831,16 @@ SURF: Using 12 sky bolometers
 MODE - Sky removal mode /'median'/ >
 Sky noise: 0.000602097 (192 points)
 Adding mean background level back onto data (value=0.0003676229)
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 Note that the default behavior of this routine is to add the mean bolometer
 signal back in to data (this may not be what you wish to do) if it's not then
 type:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % remsky add=false
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 
 \subsection{\xlabel{InitDespiking}Initial Despiking}
@@ -1153,8 +848,8 @@ type:
 Let us now remove the worst spikes by using the \surf\ task \scuclip\
 to take out any spikes exceeding 5 sigma.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % scuclip
 IN - Name of input file containing demodulated map data
 /@i86_lon_sky/ >
@@ -1163,8 +858,8 @@ IRC+10216
 OUT - Name of output file /'i86_lon_clip'/ >
 NSIGMA - How many sigma to despike bolometers /5/ >
 SURF: Removed 3 spikes
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 \scuclip\ removed 3 spikes in the data, which will do for the moment.
 
@@ -1189,15 +884,13 @@ any source emission) is to convert the map into Az/El (assuming we
 chopped in Az) so that we can identify bolometers at the edge of the
 array, which are not affected by the chop nor by any source emission.
 We regrid the extinction corrected data with the \surf\ task
-\rebin, setting the parameter $\rm OUT\_COORDS$ to {\it az}.  In the
+\rebin, setting the parameter $\rm OUT\_COORDS$ to \textit{az}.  In the
 example below we use the same data set on IRC$+$10216 as we used
 before.  We plot the map immediately with \display\ using the option
-{\it faint} and overlay the bolometer array using \scuover\ (use {\it
-noname} if you want the bolometers as numbers).
+\textit{faint} and overlay the bolometer array using \scuover\ (use \textit{noname} if you want the bolometers as numbers).
 
-
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % display axes clear
 IN - NDF to be displayed /@i86_lon_reb/ >
 DEVICE - Name of display device /@epsfcol_p/ > xwindows
@@ -1209,8 +902,8 @@ Current picture has name: DATA, comment: KAPPA_DISPLAY.
 Using /home/sandell/dec8/i86_lon_reb as the input NDF.
 SURF: file contains data for 4 exposure(s) in 3 integration(s) in 1
 measurement(s)
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 IRC$+$10216 is extended at 850$\mu$m, because of its large CO
 envelope, and we therefore want to use edge pixels away from the chop
@@ -1222,9 +915,8 @@ data, we notice that the background level added back to the map was
 lower than when we used ring 2, which therefore picks up some of the
 faint extended emission surrounding IRC$+$10216.
 
-
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
  % remsky
 IN - Name of input file containing demodulated map data
 /@o86_lon_sky/ > o86_lon
@@ -1239,14 +931,13 @@ SURF: Using 6 sky bolometers
 MODE - Sky removal mode /'median'/ >
 Sky noise: 0.0005996103 (192 points)
 Adding mean background level back onto data (value=6.3598651E-5)
-\end{verbatim}
-\end{myquote}
-
+\end{terminalv}
+\end{small}
 
 \begin{figure}
 \begin{center}
 \includegraphics[width=\textwidth]{sc11_fig4}
-\caption{This image of IRC+10216 has been regridded in Az/el and
+\caption[Az/el image overlaid with bolometer array.]{This image of IRC+10216 has been regridded in Az/el and
 overlaid with the bolometer array in order to allow us to identify
 bolometers for sky noise removal. For any extended source we want to
 avoid bolometers in the chop direction, and we therefore choose
@@ -1274,12 +965,9 @@ each bolometer to give an estimate of the sky variation, which is put
 into the file extension \texttt{.more.reds.sky}, which can be examined
 with e.g.\ \linplot, e.g.,
 
-
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % linplot i86_lon_cal.more.reds.sky device=xwindows
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 shows the computed sky noise variations for the scan 86, that we will
 re-analyze below (Fig.\ \ref{fig:sky}).
@@ -1288,15 +976,14 @@ re-analyze below (Fig.\ \ref{fig:sky}).
 \begin{figure}
 \begin{center}
 \includegraphics[width=4.0in]{sc11_fig5}
-\caption{This plot shows the mean sky variations in scan 86 as computed
+\caption[This plot shows the mean sky variations in scan 86 as computed
+by \calcsky\ as a function of time.]{This plot shows the mean sky variations in scan 86 as computed
 by \calcsky\ as a function of time.  Therefore x = 65 corresponds to
 start of integration 2 in Fig \ref{fig:mlin}. We can see that it has
 clearly picked up the strong sky variations that occur in the beginning
 of integration 2 and continued during part of integration 2.  Since
 this is a calibrated image, we can see that the sky variations are
 extremely strong, and would easily mask a faint source.}
-
-
 \label{fig:sky}
 \end{center}
 \end{figure}
@@ -1315,7 +1002,7 @@ computed by \calcsky.
 kept the chop position fixed. For extended sources it is therefore an
 advantage to chop in a fixed ra/dec frame. One can also use \calcsky\
 for a spherically symmetric source like IRC$+$10216 even for a chop
-throw of 60'', but then one should use {\it az} option for the $\rm
+throw of 60'', but then one should use \textit{az} option for the $\rm
 OUT\_COORDS$.  \calcsky\ also includes the option to account for the
 chop throw and direction, and it should therefore work even when we
 chop differently on extended emission from one map to the next.
@@ -1331,9 +1018,8 @@ with \remsky. When we now run \remsky\ it will not ask for sky
 bolometers, but will use the sky extension stored in the header to
 remove sky noise variations.
 
-
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % calcsky
 OUT_COORDS - Coordinate sys for sky determination /'RJ'/ >
 SURF: output coordinates are FK5 J2000.0
@@ -1361,8 +1047,8 @@ SURF: run 86 was a MAP observation with JIGGLE sampling of object
 IRC+10216
 OUT - Name of output file /'i86_lon_sky'/ > i86_lon_sky
 REMSKY: Using SKY extension to determine sky contribution
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 The sky noise we see in our jiggle maps is due to changes in the sky
 emission between nods of the telescope.  For unstable sky conditions
@@ -1393,9 +1079,8 @@ the safe side, i.e.\ to make sure that we do not clip the source, we
 set the central bolometer to bad before we start and reset it back to
 good afterwards using \chgqual.
 
-
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % change_quality 'i86_lon_sky{b19}'
 SURF: run 86 was a MAP observation of IRC+10216
 SURF: file has data for 37 bolometers, measured at 192 positions.
@@ -1418,8 +1103,8 @@ SURF: file has data for 37 bolometers, measured at 192 positions.
 measurements.
 BAD_QUALITY - Set quality to bad? (No will set quality to good) /YES/
 > no
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 Compared to our first 5 sigma we now found 10 additional spikes.  We
 could probably have used 3 sigma, but with a small data set it is
@@ -1442,16 +1127,16 @@ For short maps on strong or extended objects we therefore mostly end
 up doing manual despiking.  We can either use the interactive shell
 script \dspbol\ or the \Figaro\ routine \sclean.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % sclean
 IMAGE - (IMage) Name of image to be cleaned /o86_lon_sky/ >
 o86_lon_sky
 OUTPUT - (OUTput) Name of resulting image /o86_lon_clip/ >
 o86_lon_clip
 IDEV - Device for image display /'xwindows'/ >
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 which will give you an image similar to Fig.\  \ref{fig:clean}.
 \sclean\ is an interactive application and if you select the xwindow,
@@ -1486,7 +1171,7 @@ occurred over the map. Since we have only dealt with a single map so
 far, we omit the calibration stage and proceed to correct for pointing
 drifts. To do this we reduce the closest pointing observations before
 and after the map in the same way as we reduced our map, but with
-minimal despiking and regridding the pointing map in {\it az}.  These
+minimal despiking and regridding the pointing map in \textit{az}.  These
 pointing errors we find have to be negated in the task \chgpnt. For
 scan 86 I find one pointing done on the star itself before the map
 (\#81), and none afterwards. The final pointing errors of \# 81 are
@@ -1501,8 +1186,8 @@ of cheating, because we derive pointing from the same objects that we
 are supposed to correct the pointing for, but here we do it only to
 illustrate how pointing corrections are done.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % change_pointing
 IN - Name of input file containing demodulated map data
 /@i86_lon_sky/ > i86_lon_clip
@@ -1525,8 +1210,8 @@ POINT_DEL - The elevation pointing correction to be added (arcsec) >
 -0.12
 POINT_LST - The sidereal time of the pointing offset (hh mm ss.ss)
 /!/ >
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 We can now run the sky noise corrected, despiked, and pointing corrected data
 through \rebin\ to obtain our final map \textit{i86\_lon\_reb}.  Looking at
@@ -1565,7 +1250,7 @@ to bad for all maps, but in some cases we have still left bolometers
 with 1.5 - 2 times the average noise level.  For all maps the chop
 throw was 120" in Azimuth.  Note that if you chop on the array this
 despiking technique will not work very well, unless you use a fixed
-chop angle, or regrid in {\it az} which works very well for a point
+chop angle, or regrid in \textit{az} which works very well for a point
 source or a centrally condensed spherically symmetric source. To make
 the reduction easier, and to enable us to go back and redo the
 despiking, we make a small ASCII file for the maps, which includes the
@@ -1574,15 +1259,15 @@ without applying pointing corrections because the pointing errors are
 negligible.  Neither do we apply weighting, because we will need
 despiked maps in order to compute the weights.  In this example we
 call the file \texttt{hl.inp}.  The first line in this file is
-\texttt{hl39\_lon\_sky 1 0 0}, where {\it hl39\_lon\_sky} is the file
+\texttt{hl39\_lon\_sky 1 0 0}, where \textit{hl39\_lon\_sky} is the file
 name and 1 is the weight.  The two zeros that follow the weight are
 the pointing shifts in the coordinate frame that the data are rebinned
-to, which in this case {\it RJ}. Since HL~Tau is a point source with
+to, which in this case \textit{RJ}. Since HL~Tau is a point source with
 negligible extended emission one could equally well have rebinned the
-whole data set in {\it az}. We are now ready to try \desp.
+whole data set in \textit{az}. We are now ready to try \desp.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % despike noloop
 OUT_COORDS - Coordinate sys of output map; PL,AZ,NA,RB,RJ,RD or GA
 /'RJ'/ >
@@ -1615,15 +1300,14 @@ SURF: 196 spikes detected in file hl42_lon_sky
 OUT - Name of despiked data file /'hl39_lon_dsp'/ >
 ...........................
 OUT - Name of despiked data file /'hl42_lon_dsp'/ >
-\end{verbatim}
-\end{myquote}
-
+\end{terminalv}
+\end{small}
 
 
 \begin{figure}
 \begin{center}
 \includegraphics[width=4in]{sc11_fig7}
-\caption{These are the first 2000 data points analyzed by \desp. The
+\caption[First 2000 data points analyzed by \desp.]{These are the first 2000 data points analyzed by \desp. The
 observed data are plotted in green, median in black and the Hanning
 smoothed 3--$\sigma$ envelope is plotted in red. Any data points
 outside this limit will be flagged as bad.}
@@ -1669,14 +1353,12 @@ good enough.
 Now we can form the final co-add of the data very easily, since we
 have already computed the weights and position shifts that we need to
 get the best S/N and sharpest image from our data.  The only thing we
-need to do is to change the file extensions from {\it sky} to {\it
-dsp}, the name we used for despiked data files.  We rename the input
+need to do is to change the file extensions from \textit{sky} to \textit{dsp}, the name we used for despiked data files.  We rename the input
 file to \texttt{hl.dsp} in case we would like to redo the despiking.
 We now run this file through \rebin, i.e.,
 
-
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % rebin noloop
 REBIN_METHOD - Rebinning method to be used /'LINEAR'/ >
 SURF: Initializing LINEAR weighting functions
@@ -1720,8 +1402,8 @@ WTFN_REGRID: Beginning regrid process
 WTFN_REGRID: Entering second rebin phase (T = 3.113513 seconds)
 WTFN_REGRID: Entering third rebin phase (T = 14.55025 seconds)
 WTFN_REGRID: Regrid complete. Elapsed time = 15.23921 seconds
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 We now have our final co-added map, which is almost as good as it
 can get from the data we had available.
@@ -1824,8 +1506,8 @@ for the rest of your map. To find out which section is which, display
 your rebinned map and then use \scuover. To produce the image in Fig.\
 \ref{fig:moon} we typed:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 %display 20000721_0023_lon_reb
 DEVICE - Name of display device /@xwindow/ >
 MODE - Method to define the scaling limits /'SCALE'/ >
@@ -1838,8 +1520,8 @@ Alignment has occurred within the AXIS Domain.
 NDF - Image to display bolometers over /@20000721_0023_lon_reb/ >
 SURF: file contains data for 21 exposure(s) in 1 integration(s) in 1
 measurement(s)
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 One can see that the scan map started at the top right of the map (a
 scan map of the moon's limb) and took 11 `sweeps' or exposures to
@@ -1848,8 +1530,8 @@ started and ended off source.  Therefore when one wishes to remove the
 baselines (remembering that one now has to go back 2 or 3 steps to do
 this) from this image the best method would be:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % scan_rlb
 IN - Name of input file containing demodulated data
 /@20000721_0023_lon_ext/ >
@@ -1862,8 +1544,8 @@ METHOD - Method to use for baseline removal /'LINEAR'/ > section
 RLB - Remove fitted baseline from output data /YES/ >
 SECTION - Please enter a section (including {}) > [{e1}{e9}{e10}{e11}]
 REMOVE_DC_OFFSET_SECTION: Processing integration 1
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 Its obvious with a source like the moon when you are on and off source
 and because the moon fills most of the image, the data were
@@ -1883,8 +1565,8 @@ much easier to go back to noisy sub-maps and redo the baselines.
 
 \begin{figure}
 \begin{center}
-\includegraphics[angle=-90,width=\textwidth]{sc11_fig8}
-\caption{An example of a scanmap of the moon's limb. The SCUBA
+\includegraphics[width=\textwidth]{sc11_fig8}
+\caption[An example scanmap of the moon's limb.]{An example of a scanmap of the moon's limb. The SCUBA
 array's position at the beginning of the observation is shown.  In
 total it took 11 `sweeps' or exposures to map the area requested.}
 
@@ -1910,12 +1592,11 @@ a function of time. Several maps can be co-added.
 
 
 Below we test \calcsky\ on a small scan map, taken with a 20'' chop
-in RA.  The map file, {\it rn14\_lon\_dsp} has already been baseline
+in RA.  The map file, \textit{rn14\_lon\_dsp} has already been baseline
 subtracted, pointing corrected, calibrated and despiked.
 
-
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % calcsky
 OUT_COORDS - Coordinate sys for sky determination /'RJ'/ >
 SURF: output coordinates are FK5 J2000.0
@@ -1937,8 +1618,8 @@ SURF Input data: (name, weight, dx, dy)
 
 BOXSZ - Size of smoothing box (seconds) /2/ >
 MODEL - File containing source model /!/ >
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 We can now examine the sky variations with \linplot. There seems to be
 clear systematic variations as a function of time, but the maximum
@@ -1950,8 +1631,8 @@ However, we can easily check how much we gain in noise performance if
 we remove the sky noise from the data.  We therefore run \remsky\ on
 the same data file that we processed with \calcsky.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % remsky
 IN - Name of input file containing demodulated map data
 /@rn14_lon_reb(280:340,90:300)/ > rn14_lon_rlb
@@ -1959,8 +1640,8 @@ SURF: run 14 was a MAP observation with RASTER sampling of object
 RNO1b
 OUT - Name of output file /'rn14_lon_sky'/ >
 REMSKY: Using SKY extension to determine sky contribution
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 In this case the gain was rather marginal. The despiked data file gave
 an rms noise of 70 mJy/beam after running it through \rebin\, while the
@@ -1981,7 +1662,7 @@ can do a second iteration by using the sky corrected sub--maps to
 create a new improved map, which can be used as an even better model
 for \calcsky.
 
-{\it From here onwards the rest of the reduction differs depending on
+\emph{From here onwards the rest of the reduction differs depending on
 the scan map mode.}
 
 \subsection{\xlabel{Conventional_scan_maps}Conventional scan maps}
@@ -1994,8 +1675,8 @@ forming region.  In this case we accept the default for the chop
 throw, but if the restored map looks poor, it is most likely because
 the chop throw deviates from the nominal value.
 
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % restore
 IN - Name of input file containing demodulated data /@n39_lon_rlb/ >
 SURF: run 39 was a MAP observation of object NGC7538
@@ -2010,8 +1691,8 @@ SCULIB_2POS_DECONV : no data for exp 8 in int 1, meas 1
  ..........
 2POS_DECONV: Processing exposure 7 of integration 2
 SCULIB_2POS_DECONV : no data for exp 8 in int 2, meas 1
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 Once this is done, we can apply pointing corrections to remove any
 pointing drifts we had during the duration of the map.  If the map is
@@ -2044,17 +1725,16 @@ because in that case \rebin\ will choose its own map center, which is
 not equal to the center pixel of the map. The end result will be a
 garbled map.  To make it easy to identify the map sets we need for
 \remdbm\ one can give the calibrated, noise weighted and co-added maps
-names like : {\it m30ra.sdf, m44ra.sdf, m30dec.sdf, m44dec.sdf etc.},
+names like : \textit{m30ra.sdf, m44ra.sdf, m30dec.sdf, m44dec.sdf etc.},
 not because the tasks need it, but it easier for book keeping
 purposes.  These maps also have to be corrected for pointing drifts
 but they should not be restored.  The maps are still dual beam maps
 and each source in the map should show up as a positive and a negative
 feature in the image.  Fig.\ \ref{fig:dual} shows the first sub--map
-of RNO1b, i.e.\ scan {\it rn14\_lon\_sky}, which we used to test
+of RNO1b, i.e.\ scan \textit{rn14\_lon\_sky}, which we used to test
 \calcsky\ in Section \ref{scan_maps_calcsky}.  It has now run through
 \rebin\ and given a size 384 $\times$ 384 with a pixel size of 1''.
-Since this map was taken with a 20'' chop in RA, we called it {\it
-ra20.sdf}.  We should have made the map slightly bigger, because the
+Since this map was taken with a 20'' chop in RA, we called it \textit{ra20.sdf}.  We should have made the map slightly bigger, because the
 maps with 30'' and 65'' chops will cover a larger area.  Note that
 this map was taken at a time when the recommended chop throws were
 20'', 30'', and 65'', now the recommended minimum set is 30'', 44''
@@ -2066,7 +1746,8 @@ frequencies.
 \begin{figure}
 \begin{center}
 \includegraphics[width=\textwidth]{sc11_fig9}
-\caption{An example of the first map in a series of 6 maps taken
+\caption[An example of the first map in a series of 6 maps taken
+with the ``Emerson2'' mapping technique.]{An example of the first map in a series of 6 maps taken
 with the ``Emerson2'' mapping technique. This is a calibrated map
 with a 20" chop in RA, which is converted to RJ with \rebin\, but
 still unrestored. We can see the positive and the negative features
@@ -2079,14 +1760,13 @@ in the map, and a few noise spikes at the edges of the map. }
 Once we have all maps pointing corrected and co-added to the same
 pixel size and dimension, we can run \remdbm\, which converts the maps
 into our final image.  In the example below I take the six sub--maps
-of RNO1b and convert them into a map called {\it rno1b\_lon\_reb}
+of RNO1b and convert them into a map called \textit{rno1b\_lon\_reb}
 using \remdbm.  We specify the name of the final map with the parameter
 \texttt{out}, and a provide the task with a listing of the files, see
 below:
 
-
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 % remdbm ra20 ra30 ra65 dec20 dec30 dec65 -out=rno1b_lon_reb
 Perl/ADAM messaging is present. Good
 Starting monoliths...Done
@@ -2110,12 +1790,11 @@ Doing inverse transformation
 
 Result stored in rno1b_lon_reb
 ADAM exited
-
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 \remdbm\ also accepts wild--cards and we could therefore have listed
-the files as {\it ra* dec*} and it would have picked up the whole set
+the files as \textit{ra* dec*} and it would have picked up the whole set
 of six maps.  Neither do we have to give it chop throw or chop
 direction.  It will extract that information from the FITS--header.
 The task can restore a single map file, but even two maps in
@@ -2137,7 +1816,7 @@ final, baseline subtracted map is shown in Fig.\ \ref{fig:final}.
 \begin{figure}
 \begin{center}
 \includegraphics[width=\textwidth]{sc11_fig10}
-\caption{Our final ``Emerson2'' scan maps of RNO 1b. The map has a
+\caption[Our final ``Emerson2'' scan maps of RNO 1b.]{Our final ``Emerson2'' scan maps of RNO 1b. The map has a
 little bit of negative residuals in the scans that went over the
 strongest part of the map (edge of the map at p.a. $\sim$ 30 and 210
 degrees), indicating that the baseline removal was not perfect, but it
@@ -2153,7 +1832,7 @@ published version of the map, see Sandell and Weintraub \cite{Sandell01}.}
 \begin{figure}
 \begin{center}
 \includegraphics[width=\textwidth]{sc11_fig11}
-\caption{Upper panel: Logarithmic contour plots of Uranus beam maps
+\caption[Beam maps]{Upper panel: Logarithmic contour plots of Uranus beam maps
 overlaid on grayscale.  At 850 $\mu$m we plot ten contours starting
 from 0.25\% of the peak intensity, while the 450 $\mu$m beam map goes
 from 1\% of the peak intensity.  One can see a diffraction like ring
@@ -2218,7 +1897,7 @@ taken in stable night time conditions during three nights in late May,
 bad bolometers and corrected each map for pointing drifts. There are
 slight calibration differences from night to night, but for this
 purpose the difference is negligible. The final coadded beam maps were
-rebinned in {\it az} and are shown in Fig.\ \ref{fig:beams}.
+rebinned in \textit{az} and are shown in Fig.\ \ref{fig:beams}.
 
 A quick way to diagnose that the beam profile looks reasonable is to
 use \Kappa's \psf.  The task \psf\ fits a radial profile, $ A \times
@@ -2231,9 +1910,8 @@ plus inner and outer error lobes) and \psf\ therefore overestimates the
 Half Power Beam Width (HPBW). If we specify \texttt{norm=no} \psf\ will
 also return the fitted peak value of the source.
 
-
-\begin{myquote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
  % psf norm=no
 IN - NDF containing star images /@u120_lon_reb/ >
 INCAT - Positions list containing star positions /@coords/ > !
@@ -2245,8 +1923,8 @@ DEVICE - Name of graphics device /@xwindow/ >
    FWHM seeing = 14.72    arcsec
    Gamma =  2.153
    Peak value = 0.2477
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
+\end{small}
 
 \begin{figure}
 \begin{center}
@@ -2321,20 +1999,20 @@ sources.  If you end up with, for example, IRC$+$10216 and IRAS 16293$-$2422
 or Mars near perhelion as your only calibrators during your run, you are in
 trouble.  You may be able to use a large aperture to recover all the flux and
 use the ratios between different apertures derived for a point source.  But,
-you may as well bite the bullet and calibrate in {\it Jy/beam}.
+you may as well bite the bullet and calibrate in \textit{Jy/beam}.
 
 
 
-\subsection{\xlabel{beam_profiles} Calibrating maps in {\it Jy/beam}
+\subsection{\xlabel{beam} Calibrating maps in \textit{Jy/beam}
 \label{beam}}
 
 If your images show a lot of structure, you will need to calibrate
-your maps in {\it Jy/beam}.  This is true for most observations of
+your maps in \textit{Jy/beam}.  This is true for most observations of
 dark and molecular clouds, young supernovae, protostars or young stars
 and even for nearby galaxies.  However, if you are only dealing with
 faint point sources and low S/N maps, you probably need to integrate
 over the map.  If this is the case, it does not matter whether you
-calibrate in {\it Jy/beam} or {\it Jy/aperture}, both methods will
+calibrate in \textit{Jy/beam} or \textit{Jy/aperture}, both methods will
 give the same result.  Since \starlink\ packages do not deal with
 Jy/beam, it may appear more complicated to integrate over an image
 calibrated in Jy/beam, but the only difference is that one needs to
@@ -2345,10 +2023,10 @@ simply $ 1.134 \times \theta_A^2$.  Radio astronomical reduction
 packages of course do this normalization automatically.  Since the
 JCMT beam is not a simple Gaussian beam, we need to account for the
 error beam, which is equivalent to having an FCF which varies with
-aperture, when we calibrate in {\it Jy/aperture}.  We discuss how this
+aperture, when we calibrate in \textit{Jy/aperture}.  We discuss how this
 is done towards the end of this section.
 
-To calibrate in {\it Jy/beam} we have to know the beam size.  Ideally
+To calibrate in \textit{Jy/beam} we have to know the beam size.  Ideally
 we would derive both the flux density conversion factor and the beam
 size, $\theta_A$, from planet observations. If there are no planets
 available, we can use one of the secondary calibrators. To determine
@@ -2356,7 +2034,7 @@ the beam size at 850 $\mu$m it is usually sufficient to make a weighted
 average from our pointing observations during the run, if we don't have
 a planet observation or a point like secondary calibrator, but for 450
 $\mu$m we need a planet or a secondary calibrator.  All JCMT secondary
-calibrators are directly calibrated in {\it Jy/beam}. In this case the
+calibrators are directly calibrated in \textit{Jy/beam}. In this case the
 FCF is simply the quoted flux divided by the peak signal of the
 source.
 
@@ -2371,7 +2049,7 @@ tot}$ divided by the coupling of the planet to the beam, given by:
 is
 \begin{equation} x = \frac{W}{1.2 \times \theta_A}.  \end{equation}
 
-The FCF, in {\it Jy/beam/V} is therefore
+The FCF, in \textit{Jy/beam/V} is therefore
 
 \begin{equation} FCF(Jy/{\rm beam}/V) = S_{\rm beam}/V_{\rm peak}
 \end{equation}
@@ -2385,9 +2063,9 @@ If we do the same for our jiggle maps of Uranus with a 60'' chop throw,
 we derive FCF = 245.2 Jy/beam/V, i.e.\  a map with a 60'' chop throw is
 $\sim$ 10\% more efficient than one with a 120'' chop throw. Even
 though Jenness et al.\ (\cite{Jenness01}) found no difference in FCF as
-a function of chop throw when calibrating in {\it Jy/aperture} we find
+a function of chop throw when calibrating in \textit{Jy/aperture} we find
 that the difference is now smaller than compared to when calibrating in
-{\it Jy/beam} but still noticeable. For a 40'' aperture the difference
+\textit{Jy/beam} but still noticeable. For a 40'' aperture the difference
 is 6\%.
 
 \subsubsection{Using secondary calibrators}
@@ -2400,9 +2078,9 @@ may want to fit a gaussian to the source to get a more accurate measure
 of the peak signal.
 
 \subsubsection{How do we extract information from a map calibrated in
-{\it Jy/beam}}
+\textit{Jy/beam}}
 
-Analyzing maps calibrated in {\it Jy/beam} is easy; especially if we
+Analyzing maps calibrated in \textit{Jy/beam} is easy; especially if we
 want to deduce flux densities for point sources or compact sources even
 when the source is embedded in a cloud with strong extended emission.
 For a point source the peak flux of the source is the same as the total
@@ -2438,8 +2116,8 @@ To find integrated intensities over large areas is more complicated,
 because now we need to correct for the error beam pickup, which now
 depends on the area we integrate over.  This is equivalent to the
 varying the FCF as a function of aperture that one has to account for
-if the map is calibrated in {\it Jy/pixel}, but with the map
-calibrated in {\it Jy/beam} it is much easier to separate compact
+if the map is calibrated in \textit{Jy/pixel}, but with the map
+calibrated in \textit{Jy/beam} it is much easier to separate compact
 sources and extended emission.  To determine the excess emission from
 the error beam, we again have to go back to our beam map.  If we
 calibrate our 850 $\mu$m map in Jy/beam and then integrate over 120''
@@ -2485,10 +2163,10 @@ manual. In this case you probably lack the \starlink\ initialization
 in
 your \texttt{.cshrc} and \texttt{.login} files. Type
 
-\begin{myquote} \begin{verbatim}
+\begin{terminalv}
 % source /star/etc/login
 % source /star/etc/cshrc
-\end{verbatim} \end{myquote}
+\end{terminalv}
 
 and you should be able to initialize \surf\ and \Kappa. The \starlink\
 initialization scripts should be placed in your \texttt{.cshrc} and
@@ -2496,17 +2174,13 @@ initialization scripts should be placed in your \texttt{.cshrc} and
 regularly:
 
 i.e.\ in your \texttt{.login} file put the line:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 if (-e /star/etc/login) source /star/etc/login
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 and in  your \texttt{.cshrc} file put the line:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 if (-e /star/etc/cshrc) source /star/etc/cshrc
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 See, for example, \xref{SUN/212}{sun212}{} \cite{sun212}  for more
 information on using and installing \starlink\ software.
@@ -2544,10 +2218,10 @@ example below we plot the final NGC\,7129 image using the bgyrw color
 table,
 which resides in \$KAPPA\_DIR as bgyrw\_lut
 
-\begin{myquote} \begin{verbatim}
+\begin{terminalv}
 % display axes clear n7129_lon lut=$KAPPA_DIR/bgyrw device=epsfcol_p \
     mode=scale
-\end{verbatim} \end{myquote}
+\end{terminalv}
 
 This produces a color postscript file gks74.ps.n. A list of valid
 devices
@@ -2575,26 +2249,26 @@ Interface Library}
 Jenness~T., Lightfoot~J.~F., 1997, \textit{SURF -- SCUBA User
 Reduction Facility},
 \xref{Starlink User Note 216}{sun216}{} (see also the SURF homepage:
-\htmladdnormallink{http://www.jach.hawaii.edu/jcmt\_sw/scuba/surf/}{http://www.jach.hawaii.edu/jcmt_sw/scuba/surf/})
+\url{http://www.jach.hawaii.edu/jcmt_sw/scuba/surf/})
 
 
 \bibitem{sun212}
-Bly~M.~J., 2000, {\it Starlink  Software CD-ROMs Spring 2000 User's
+Bly~M.~J., 2000, \textit{Starlink  Software CD-ROMs Spring 2000 User's
 Guide}
 \xref{Starlink  Software CD-ROMs Spring 2000 User's Guide}{sun212}{}
 
 
 \bibitem{kappa}
-Currie~M.~J., 1997, {\it KAPPA --- Kernel Application Package},
+Currie~M.~J., 1997, \textit{KAPPA --- Kernel Application Package},
 \xref{Starlink User Note 95}{sun95}{}
 
 \bibitem{figaro}
 Shortridge~K., Meyerdierks~H., Currie~M.~J., Clayton~M.,
-{\it FIGARO -- A general data reduction system},
+\textit{FIGARO -- A general data reduction system},
 \xref{Starlink User Note 86}{sun86}{}
 
 \bibitem{gaia}
-Draper~P.~W., 1997, {\it GAIA -- Graphical Astronomy and Image
+Draper~P.~W., 1997, \textit{GAIA -- Graphical Astronomy and Image
 Analysis Tool},
 \xref{Starlink User Note 214}{sun214}{}
 
@@ -2612,7 +2286,7 @@ Duncan,~W.~D., SCUBA project documentation, SCU/WDD/31.1/1093
 Emerson, D.T., Klein, U., \& Haslam, C.G.T., 1979, A\&A, 76, 92
 
 \bibitem{convert}
-Currie~M.~J., Privett~G.~J., Chipperfield~A.~J., 1995 {\it CONVERT --
+Currie~M.~J., Privett~G.~J., Chipperfield~A.~J., 1995 \textit{CONVERT --
 A format-conversion package}, \xref{Starlink User Note 55}{sun55}{}
 
 \bibitem{Archibald2002}
@@ -2620,7 +2294,7 @@ Archibald, E.\ et al.\ 2002, MNRAS, 336, 1
 
 \bibitem{Coulson}
 Coulson, I., 2001 { Scuba Jiggle Maps},
-{\htmladdnormallink{http://www.jach.hawaii.edu/JACdocs/JCMT/SCD/SN/003}{http://www.jach.hawaii.edu/JACdocs/JCMT/SCD/SN/003}}
+\url{http://www.jach.hawaii.edu/JACdocs/JCMT/SCD/SN/003}
 
 \bibitem{Hogherheijde00}
 Hogherheijde, M.R., Sandell, G., 2000, ApJ, 534, 880
