@@ -1,640 +1,87 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt]{starlink}
 
 % ? Specify used packages
-\usepackage{graphicx}        %  Use this one for final production.
-\usepackage[english]{babel}
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {223.7}
-\newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {17th December 2012}
-\newcommand{\stardoctitle}     {POLPACK}
-\newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
-\newcommand{\stardocversion}   {Version 3.2-0}
-\newcommand{\stardocmanual}    {Users' Manual}
-\newcommand{\stardocabstract}  {POLPACK is a package of applications for
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {223.7}
+\stardocauthors     {D.S. Berry \& T.M. Gledhill }
+\stardocdate        {17th December 2012}
+\stardoctitle       {POLPACK \\
+                            An Imaging Polarimetry Reduction Package}
+\stardocversion     {Version 3.2-0}
+\stardocmanual      {Users' Manual}
+\startitlepic {\includegraphics[clip,scale=1.0]{sun223_figures/fig}}
+\stardocabstract  {POLPACK is a package of applications for
 reducing imaging polarimetry or spectropolarimetry data. They cover
 registration, sky subtraction, calculation of Stokes parameters, and
-display of vector maps.}
+display of vector maps.
 
-% ? End of document identification
-% -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
-
-% Includes a gif version of a figure, centred within a table, with a caption.
-\newcommand{\htmlfig}[3]{
-   \label{#1}
-   \begin{rawhtml} <CENTER><TABLE NOSAVE > \end{rawhtml}
-   \begin{rawhtml} <TR ALIGN=CENTER VALIGN=CENTER NOSAVE> \end{rawhtml}
-   \begin{rawhtml} <TD NOSAVE><DT><IMG SRC=" \end{rawhtml}
-   #2
-   \begin{rawhtml} " NOSAVE ></DT></TD></TR> \end{rawhtml}
-   \begin{rawhtml} <CAPTION ALIGN=BOTTOM><FONT SIZE=+1><BR><BR><B> \end{rawhtml}
-   #3
-   \begin{rawhtml} </B><BR><BR><BR><BR></FONT></CAPTION></TABLE></CENTER> \end{rawhtml}
-}
-
-% centre an asterisk
-\newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
-\begin{htmlonly}
-\newcommand{\lsk}{*}
-\end{htmlonly}
-
-% Environment for indenting and using a small font.
-\newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
-
-% In-line typed text, buttons and menu items.
-\newcommand{\butt}[1]{{\small \bf \tt #1}}
-\newcommand{\menu}[1]{{\small \bf \em #1}}
-\newcommand{\wlab}[1]{{\small \bf #1}}
-\newcommand{\text}[1]{{\small \tt #1}}
-
-% Quick routine descriptions
-\newcommand{\quickdes}[3]{
-                         \parbox{1.1in}{\bf #1}
-                         \parbox{4.4in}{\raggedright #2 \dotfill}
-                         \parbox{0.6in}{\pageref{#3}}
-                         \vspace*{0.2in}}
-
-% Quotes for SST.
-\newcommand{\qt}[1]{{\tt "}#1{\tt "}}
-\newcommand{\qs}[1]{{\tt '}#1{\tt '}}
-\begin{htmlonly}
-   \newcommand{\qt}[1]{ {\tt{"}}#1{\tt{"}} }
-   \newcommand{\qs}[1]{ {\tt{'}}#1{\tt{'}} }
-\end{htmlonly}
-
-% Routines with descriptions in the appendix.
-\newcommand{\routine}[1]{{\sc #1}}
-\newcommand{\xroutine}[1]{\htmlref{{\sc #1}}{#1}}
-
-% Latex only sections, subsections etc. Surround these with a latexonly
-% environment.
-\newcommand{\latexonlysection}[1]{\section{#1}}
-\newcommand{\latexonlysubsection}[1]{\subsection{#1}}
-\newcommand{\latexonlysubsubsection}[1]{\subsubsection{#1}}
-\begin{htmlonly}
-   \newcommand{\latexonlysection}[1]{#1}
-   \newcommand{\latexonlysubsection}[1]{#1}
-   \newcommand{\latexonlysubsubsection}[1]{#1}
-\end{htmlonly}
-
-% degrees symbol
-\newcommand{\dgs}{\hbox{$^\circ$}}
-\begin{htmlonly}
-   \newcommand{\dgs}{ degrees}
-\end{htmlonly}
-
-\newcommand{\dash}{--}
-\begin{htmlonly}
-   \newcommand{\dash}{-}
-\end{htmlonly}
-\newcommand{\STARURL}{http://www.starlink.ac.uk}
-\newcommand{\TCLURL}{http://www.scriptics.com/}
-\newcommand{\IRAFURL}{http://www.starlink.ac.uk/iraf/web/iraf-homepage.html}
-\newcommand{\STORE}{http://www.starlink.ac.uk/cgi-bin/storetop}
-
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \newpage
-   \goodbreak
-   \label{#1}
-   \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
-
-
-
-% ? End of document specific commands
-% -----------------------------------------------------------------------------
-%  Title Page.
-%  ===========
-\renewcommand{\thepage}{\roman{page}}
-\begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-   \begin{center}
-   \includegraphics[clip,scale=1.0]{sun223_figures/fig}
-   \end{center}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{5mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-   \htmlfig{map2}{fig.png}{The above polarization map shows
-   850 micron dust grain emission in the cloud core W3. The map shows large
-   scale magnetic fields in this region of high-mass star-formation. The
-   data were obtained with the SCUBA polarimeter on the James Clerk Maxwell
-   Telescope  (operated by the Joint Astronomy Centre in Hawaii), and
-   reduced using SURF and POLPACK.}
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-
-% Caption for front cover picture.
-\begin{latexonly}
-\newpage
-\begin{center}
-\vspace*{3in}
-\parbox{5in}{
-{\large
 \emph{The polarization map on the front cover shows 850 $\mu$m dust grain
 emission in the cloud core W3. The map shows large scale magnetic fields
 in this region of high-mass star-formation. The data were obtained with
 the SCUBA polarimeter on the James Clerk Maxwell Telescope  (operated by
 the Joint Astronomy Centre in Hawaii), and reduced using SURF and POLPACK.
-}}}
-\end{center}
-\end{latexonly}
+}
+}
 
-% ? End of document abstract
+% ? End of document identification
 % -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+% ? Document specific \providecommand or \newenvironment commands.
+
+% centre an asterisk
+\providecommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
+
+% Environment for indenting and using a small font.
+\newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
+
+% In-line typed text, buttons and menu items.
+\providecommand{\butt}[1]{{\small \bf \tt #1}}
+\providecommand{\menu}[1]{{\small \bf \em #1}}
+\providecommand{\wlab}[1]{{\small \bf #1}}
+\providecommand{\text}[1]{{\small \tt #1}}
+
+% Quick routine descriptions
+\providecommand{\quickdes}[3]{
+                         \parbox{1.1in}{\textbf{#1}}
+                         \parbox{4.4in}{\raggedright #2 \dotfill}
+                         \parbox{0.6in}{\pageref{#3}}
+                         \vspace*{0.2in}}
+
+% Quotes for SST.
+\providecommand{\qt}[1]{\texttt{"}#1\texttt{"}}
+\providecommand{\qs}[1]{\texttt{'}#1\texttt{'}}
+
+
+
+% Routines with descriptions in the appendix.
+\providecommand{\routine}[1]{\textsc{#1}}
+\providecommand{\xroutine}[1]{\htmlref{\textsc{#1}}{#1}}
+
+% degrees symbol
+\providecommand{\dgs}{\hbox{$^\circ$}}
+
+\providecommand{\dash}{--}
+
+
+\providecommand{\STARURL}{http://www.starlink.ac.uk}
+\providecommand{\TCLURL}{http://www.scriptics.com/}
+\providecommand{\IRAFURL}{http://www.starlink.ac.uk/iraf/web/iraf-homepage.html}
+\providecommand{\STORE}{http://www.starlink.ac.uk/cgi-bin/storetop}
+
+\providecommand{\latexonlysection}[1]{\section{#1}}
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\begin{document}
+\scfrontmatter
 
 \section{\xlabel{introduction}Introduction}
 POLPACK is a package of applications for mapping the linear or circular
@@ -649,7 +96,7 @@ format used by most Starlink software, and is described fully in
 \xref{SUN/33}{sun33}{}. However, other astronomical data formats may also
 be processed using transparent on-the-fly data conversion facilities
 provided by the NDF subroutine library, and the CONVERT package. The use of
-these facilities is described \hyperref{here}{in section }{}{SEC:CONVERT},
+these facilities is described \slhyperref{here}{in section }{}{SEC:CONVERT},
 and more fully in \xref{SUN/55}{sun55}{}.
 
 The facilities provided by POLPACK include:
@@ -669,7 +116,7 @@ corrections such as flat-fielding, de-biassing, \emph{etc}. Such corrections
 should be applied to the data before using POLPACK, so that POLPACK can
 assume that pixel values are proportional to the combined intensity of
 sky and object. Further comments on these corrections can be found
-\hyperref{here}{in section }{}{SEC:CCDPACK}.
+\slhyperref{here}{in section }{}{SEC:CCDPACK}.
 
 Slightly different facilities are available when using single-beam or
 dual-beam data, as described in the following sections\footnote{It is
@@ -739,7 +186,7 @@ take account of any differences in the exposure times between raw frames,
 and any difference in the sensitivity of the two channels of the
 dual-beam polarimeter. They rely on redundancy in the supplied data, and
 require a specific set of analyser positions to be used (described
-\hyperref{here}{in section }{} {SEC:DETCOR}) when obtaining the data.
+\slhyperref{here}{in section }{} {SEC:DETCOR}) when obtaining the data.
 
 \end{itemize}
 
@@ -751,7 +198,7 @@ dual-beam polarimeter is described by Scarrott et al. (\emph{Mon. Not. R.
 astr. Soc.} (1983) \textbf{204}, 1163 - 1177).
 
 Single waveband polarimetry is described here but the principles can be
-extended to imaging spectropolarimetry (see \hyperref{here}{section }{}{SEC:SPEC}).
+extended to imaging spectropolarimetry (see \slhyperref{here}{section }{}{SEC:SPEC}).
 
 \subsection{The Polarimeter}
 A dual-beam polarimeter suitable for measuring linear polarization usually
@@ -765,11 +212,9 @@ contains the following optical components:
 \end{enumerate}
 
 The light collected by the telescope passes through these components in
-the order listed (see \latex{Figure~\ref{fig:optical}} \html{the next figure}
-). Each component is described more fully below.
+the order listed (see Figure~\ref{fig:optical}).
+Each component is described more fully below.
 
-\begin{latexonly}
-  \vspace{2mm}
   \begin{figure}[htb]
   \begin{center}
   \includegraphics[clip,scale=0.5]{sun223_figures/optical}
@@ -777,12 +222,6 @@ the order listed (see \latex{Figure~\ref{fig:optical}} \html{the next figure}
   \label{fig:optical}
   \end{center}
   \end{figure}
-\end{latexonly}
-
-\begin{htmlonly}
-\htmlfig{fig:optical}{optical.png}{The main optical components in a
-typical dual-beam imaging polarimeter.}
-\end{htmlonly}
 
 The heart of the polarimeter is the \emph{analyser}, which splits incoming
 partially plane polarized light up into two beams; one (called the
@@ -802,14 +241,13 @@ both images representing the same area of the sky. A \emph{masking system}
 is used to prevent any overlap between the two images. In some
 instruments this takes the form of a series of parallel, equally spaced
 bars in the focal plane of the telescope (see
-\latex{Figure~\ref{fig:grids}} \html{the next figure}). In
+Figure~\ref{fig:grids}). In
 this case, the instrument is designed so that the displacement between
 the two images formed by the $O$ and $E$ rays is perpendicular to the
 bars, and equal in size to the width of a bar. Thus, the two images form
 two inter-leaving sets of bars. There are several other systems (such as
 a mask containing only a single aperture), but the principle is the same.
 
-\begin{latexonly}
   \begin{figure}[p]
   \begin{center}
   \includegraphics[clip,scale=0.8]{sun223_figures/grids}
@@ -817,12 +255,6 @@ a mask containing only a single aperture), but the principle is the same.
   \label{fig:grids}
   \end{center}
   \end{figure}
-\end{latexonly}
-
-\begin{htmlonly}
-\htmlfig{fig:grids}{grids.png}{An example of a masking system used in
-a dual-beam imaging polarimeter.}
-\end{htmlonly}
 
 If the incoming light is only partially polarized, then at least two
 exposures are required to estimate both the degree and the orientation of
@@ -847,7 +279,7 @@ this direction.
 \subsection{\label{SEC:OBS}\xlabel{theobservationalprocedure}The Observational Procedure}
 At least two exposures are required to estimate the degree and
 orientation of the polarization, taken with half-wave plate positions of
-0\dgs\ and 22.5\dgs\ (see \hyperref{here}{appendix }{}{APP:POL}). For ease
+0\dgs\ and 22.5\dgs\ (see \slhyperref{here}{appendix }{}{APP:POL}). For ease
 of reference, these exposures are referred to here as $T_{0}$ and
 $T_{22.5}$. The $O$ and $E$ ray images in $T_{0}$ measure the intensities
 parallel and perpendicular to the reference direction. $T_{22.5}$ has an
@@ -861,8 +293,7 @@ $T_{67.5}$). These provide some redundancy in the data and enable
 internal consistency checks to be made during the data reduction stage.
 
 These exposures are denoted by the letter $T$ to indicate that they are
-\emph{target} exposures. In addition to these target exposures, some {\em
-flat-field} exposures are also required. These are used to correct for
+\emph{target} exposures. In addition to these target exposures, some \emph{flat-field} exposures are also required. These are used to correct for
 any spatial variation in the sensitivity of the system, and consist of
 exposures of a photometrically flat surface. Ideally, the flat-field
 source should be unpolarized. However, if the additional target exposures
@@ -876,7 +307,7 @@ For this reason, it is common practice to take one or more flat-field
 exposures at each half-wave plate position, and stack them together into a
 single master flat-field (although it is not strictly necessary to use
 different half-wave plate positions). Further discussion of the flat-fielding
-procedure is given \hyperref{here}{in section }{}{SEC:DETCOR}.
+procedure is given \slhyperref{here}{in section }{}{SEC:DETCOR}.
 
 \subsection{\label{SEC:DBRED}\xlabel{thedatareduction}The Data Reduction}
 Several steps are involved in the production of a polarization map from
@@ -919,36 +350,29 @@ then the different mean values in the flat-field will result in an
 apparent difference in sensitivity between the two channels of the
 polarimeter (known as the ``F-factor''). Such a difference in sensitivity
 can be corrected for when calculating the polarization if the additional
-target exposures \hyperref{$T_{45}$ and $T_{67.5}$}{$T_{45}$ and
+target exposures \slhyperref{$T_{45}$ and $T_{67.5}$}{$T_{45}$ and
 $T_{67.5}$ (see section }{)}{SEC:OBS} are available.
 
 \emph{Note, the same flat-field should be used to flat-field all target
 exposures, irrespective of half-wave plate position.}
 
 A mathematical description of the flat-fielding and F-factor corrections
-is given \hyperref{here}{in appendix }{}{APP:FFCOR}.
+is given \slhyperref{here}{in appendix }{}{APP:FFCOR}.
 
-\subsubsection{Extraction of the $O$ and $E$ Ray Images}
+\subsubsection{Extraction of the \emph{O} and \emph{E} Ray Images}
 Each exposure contains two images of the same area of the sky: the $O$
 and the $E$ ray images. Once any detector corrections have been applied,
 these images need to be identified and extracted into two separate arrays for
 further processing.
 
-\begin{latexonly}
   \vspace{5mm}
   \begin{figure}[htbp]
   \begin{center}
   \includegraphics[clip,scale=0.5]{sun223_figures/extract}
-  \caption{Extraction of the $O$ and $E$ ray images.}
+  \caption{Extraction of the \emph{O} and \emph{E} ray images.}
   \label{fig:extract}
   \end{center}
   \end{figure}
-\end{latexonly}
-
-\begin{htmlonly}
-\htmlfig{fig:extract}{extract.png}{
-Extraction of the $O$ and $E$ ray images.}
-\end{htmlonly}
 
 \subsubsection{Image Alignment}
 The arrays holding the extracted $O$ and $E$ ray images now need to be
@@ -968,7 +392,7 @@ being studied. Since $I$, $Q$ and $U$ all have the same units, this
 description is generally easier to use than the more obvious description
 given by the degree of polarization and the orientation of the plane of
 polarization. The mathematical connection between the Stokes parameters
-and the sky-subtracted intensities is described \hyperref{here}{in
+and the sky-subtracted intensities is described \slhyperref{here}{in
 appendix }{}{APP:POL}. The output from this stage of the reduction process
 is a \emph{Stokes vector} (\emph{i.e.} a set of $I$, $Q$ and $U$ values) for each
 measured pixel on the sky.
@@ -1037,7 +461,7 @@ single-beam polarimetry. It explains words and concepts used later, and
 defines the data model used by POLPACK.
 
 Single waveband polarimetry is described here but the principles can be
-extended to imaging spectropolarimetry (see \hyperref{here}{section }{}{SEC:SPEC}).
+extended to imaging spectropolarimetry (see \slhyperref{here}{section }{}{SEC:SPEC}).
 
 \subsection{\label{SEC:SBPOLARIM}The Polarimeter}
 An exposure from a single-beam polarimeter consists of an image of the sky
@@ -1076,9 +500,8 @@ that the axis of the half-wave plate bisects the angle between the planes
 of polarization in the incoming and outgoing light.
 
 This form of polarimeter is shown diagrammatically in
-\latex{Figure~\ref{fig:singopt}.} \html{the next figure:}
+Figure~\ref{fig:singopt}.
 
-\begin{latexonly}
   \vspace{2mm}
   \begin{figure}[htb]
   \begin{center}
@@ -1087,11 +510,6 @@ This form of polarimeter is shown diagrammatically in
   \label{fig:singopt}
   \end{center}
   \end{figure}
-\end{latexonly}
-
-\begin{htmlonly}
-\htmlfig{fig:singopt}{singopt.png}{The main optical components in a typical single-beam imaging polarimeter.}
-\end{htmlonly}
 
 \end{enumerate}
 
@@ -1118,10 +536,8 @@ is $WPLATE$, then the \emph{effective analyser position} is given by:
 
 This is the angle from the reference direction to a hypothetical analyser
 which would give the same effect as the combination of the fixed analyser
-and half-wave plate (see \latex{Figure~\ref{fig:effan}}
-\html{the next figure}).
+and half-wave plate (see Figure~\ref{fig:effan}).
 
-\begin{latexonly}
   \begin{figure}[htpb]
   \begin{center}
   \includegraphics[clip,scale=0.5]{sun223_figures/effan}
@@ -1130,12 +546,6 @@ and half-wave plate (see \latex{Figure~\ref{fig:effan}}
   \label{fig:effan}
   \end{center}
   \end{figure}
-\end{latexonly}
-
-\begin{htmlonly}
-\htmlfig{fig:effan}{effan.png}{
-The effective analyser position for a rotating half-wave plate.}
-\end{htmlonly}
 
 The recorded intensity for an analyser position (or effective analyser
 position) of $\phi$ will be:
@@ -1197,10 +607,10 @@ positions are required to estimate the degree and orientation of the
 polarization. However, if you can, you should take some extra analyser
 positions. Not only does this reduce the noise, but it also allows
 consistency checks to be performed, since the recorded intensity should
-be a \hyperref{sinusoidal function}{sinusoidal function (see equation }
+be a \slhyperref{sinusoidal function}{sinusoidal function (see equation }
 {)}{EQN:IREC} of analyser or half-wave plate position. POLPACK provides
 facilities to reject data values which are more than a given distance from
-the best fitting sine curve (\hyperref{more details here}{see appendix }{}
+the best fitting sine curve (\slhyperref{more details here}{see appendix }{}
 {APP:SNGBM}).
 
 \subsection{The Data Reduction}
@@ -1209,7 +619,7 @@ dual-beam data. The basic differences are that each target exposure
 contains only a single image of the sky, instead of the two images
 produced by a dual-beam polarimeter, and that rotation between images is
 allowed. The various steps involved are
-summarised below. For more details \hyperref{go here}{see section }
+summarised below. For more details \slhyperref{go here}{see section }
 {}{SEC:DBRED}. Details of how POLPACK can be used to implement these
 ideas in practice are given in later sections of this document.
 
@@ -1244,9 +654,8 @@ This section gives a detailed description of the steps involved in using
 POLPACK to produce a vector map from single-beam or dual-beam polarimetry
 or spectropolarimetry data. It is assumed that the data conforms to the model outlined in one
 of the two previous sections. An over-view of the data reduction process
-is given in \latex{Figure~\ref{fig:dataflow}.} \html{the next figure:}
+is given in Figure~\ref{fig:dataflow}.
 
-\begin{latexonly}
   \begin{figure}[htpb]
   \begin{center}
   \includegraphics[clip,scale=0.7]{sun223_figures/dataflow}
@@ -1255,12 +664,6 @@ is given in \latex{Figure~\ref{fig:dataflow}.} \html{the next figure:}
   \label{fig:dataflow}
   \end{center}
   \end{figure}
-\end{latexonly}
-
-\begin{htmlonly}
-\htmlfig{fig:dataflow}{dataflow.png}{
-The main steps in the production of a polarization map.}
-\end{htmlonly}
 
 All POLPACK applications use standard Starlink subroutine libraries for
 accessing parameters, producing graphics, reporting errors, \emph{etc}. They
@@ -1294,17 +697,15 @@ you have two options:
 
 \item You can convert your data files into NDF format explicitly at the
 beginning, and use the NDF versions there-after. The \xref{CONVERT}{sun55}{}
-package \latex{(see SUN/55)} provides facilities for converting to and
+package (see SUN/55) provides facilities for converting to and
 from most common astronomical data formats. For instance, if your data is
 in the form of a set of FITS files, you could use commands similar to the
 following to convert them into NDFs:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % convert
 % fits2ndf "*.fit" "*"
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Note that the \texttt{\%} represents the C-shell prompt and should not be typed.
 The first command initialises the commands required to use the CONVERT
@@ -1323,11 +724,9 @@ directly without you needing to do any explicit data conversion. All you
 need to do to enable these facilities is to initialise the CONVERT
 package using the single command:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % convert
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 If you adopt this approach, you may still see references to ``NDFs''
 appearing on the screen. There is usually no significance in the use of
@@ -1344,15 +743,12 @@ axes into the required order. If your data is one dimensional
 (\emph{i.e.} has no spatial coverage) then you can use PERMAXES as
 follows to add two spatial axes each covering a single pixel:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % permaxes in="data-1d(,1,1)" out=data-3d perm="[2,3,1]"
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
-where {\tt data-1d.sdf} is the 1-dimensional input file, and {\tt
-data-3d.sdf} is the 3-dimensional output file. The section specifier
-``{\tt (,1,1)}'' indicates that {\tt data-1d} should be treated as if it
+where \texttt{data-1d.sdf} is the 1-dimensional input file, and \texttt{data-3d.sdf} is the 3-dimensional output file. The section specifier
+``\texttt{(,1,1)}'' indicates that \texttt{data-1d} should be treated as if it
 had 2 extra trailing axes each spanning a single pixel. PERMAXES then
 rearranges the axes so that the spectral axis (previously axis 1) becomes
 the last axis (axis 3). Of course, since there is no spatial coverage,
@@ -1367,7 +763,7 @@ data for any known instrumental effects such as non-linearity, variation
 of sensitivity across the detector, zero point offsets, \emph{etc.}, before
 proceeding to use POLPACK. The details will obviously depend on your
 detector, but if you are using a CCD camera, then the \xref{CCDPACK}{sun139}{}
-package \latex{(see SUN/139)} will usually be able to perform these corrections.
+package (see SUN/139) will usually be able to perform these corrections.
 
 If you are using dual-beam data, and target exposures are available at
 half-wave plate positions of
@@ -1394,7 +790,7 @@ $E$ ray channels. If the \emph{same} flat-field is used for all target
 exposures, then this difference in sensitivity will be constant and can
 be removed while calculating the Stokes parameters (provided you have
 target exposures at half-wave plate positions of 0, 22.5, 45 and 67.5
-degrees). \hyperref{Go here for}{Appendix }{ contains}{APP:FFCOR} a
+degrees). \slhyperref{Go here for}{Appendix }{ contains}{APP:FFCOR} a
 mathematical description of the flat-fielding process for dual-beam data,
 and the corrections applied by POLPACK when calculating the Stokes parameters.
 
@@ -1428,22 +824,20 @@ If you are using single-beam data, there is an option to estimate the
 variances associated with the input data while calculating the Stokes
 vectors.
 This enables variances to be found for the Stokes vectors even if your
-input data has no usable variance information. \hyperref{Go here}{See section }
+input data has no usable variance information. \slhyperref{Go here}{See section }
 {}{APP:SNGBM} for details.
 
 \subsection{\label{SEC:START}\xlabel{startup}Starting up POLPACK}
 
 The applications within POLPACK are made available from the C shell using the
 command:
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % polpack
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 This command must be issued before attempting to use any POLPACK
 applications. POLPACK is also available from the \xref{ICL}{sg5}{}
-\latex{(see SG/5)} command language, and the IRAF cl.
+(see SG/5) command language, and the IRAF cl.
 
 \subsection{\label{SEC:IMPORT}Importing Header Information}
 POLPACK needs to know certain items of header information about each of
@@ -1466,17 +860,15 @@ You tell POLIMP where to find each required item of information by
 supplying it with a ``control table''. This is a text file containing a
 line for each item of information to be imported into the POLPACK
 extension. Each such item has a name by which other POLPACK applications
-refer to it (these are described \hyperref{here}{in
+refer to it (these are described \slhyperref{here}{in
 appendix }{}{APP:POLEXT}). As well as the name of a POLPACK extension
 item, each line of the control table should contain a description of where to
 obtained the corresponding value. This description is given in terms of
 FITS keywords. For instance, the line
 
-\begin{myquote}
-\begin{verbatim}
-   WPLATE HWPANG
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+WPLATE HWPANG
+\end{terminalv}
 
 tells POLIMP to find the value of the FITS keyword \verb+HWPANG+ and
 store it as item ``WPLATE'' in the POLPACK extension (this is the
@@ -1499,12 +891,10 @@ convention. When used in this way, each FITS keyword must be ``declared''
 earlier in the control table. This declaration tells POLIMP what sort of
 data values the keyword can take. For instance:
 
-\begin{myquote}
-\begin{verbatim}
-   _REAL  ROTA
-   ANGROT 57.29578*ROTA
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+_REAL  ROTA
+ANGROT 57.29578*ROTA
+\end{terminalv}
 
 converts the value of the FITS keyword \verb+ROTA+ from radians to
 degrees, and assigns the result to the item ANGROT.
@@ -1541,16 +931,14 @@ in NDF format, you can also use the \xref{\texttt{hdstrace}}{sun102}{}
 command to list the contents of the NDF extension. For instance, to check
 the contents of the POLPACK extension in the NDF \verb+partproc.sdf+, do:
 
-\begin{myquote}
-\begin{verbatim}
-   % hdstrace partproc.more.polpack
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+% hdstrace partproc.more.polpack
+\end{terminalv}
 
 \subsection{Reference Directions}
 The reference direction within each image is recorded by adding a new
 co-ordinate Frame to the World Co-ordinate System (WCS) information
-stored with the image (see \hyperref{here}{section }{}{SEC:WCS}). The new
+stored with the image (see \slhyperref{here}{section }{}{SEC:WCS}). The new
 Frame has the Domain name \verb+POLANAL+,
 and its first axis is parallel to the reference direction. This Frame
 will be updated by any POLPACK application which produces a change in the
@@ -1635,7 +1023,6 @@ This may take a significant length of time depending on your hardware,
 and the size and number of your images. A window displays the progress
 being made during this phase.
 
-\begin{latexonly}
   \begin{figure}[htpb]
   \begin{center}
   \includegraphics[clip,scale=0.85]{sun223_figures/polka}
@@ -1644,12 +1031,6 @@ being made during this phase.
   \label{fig:polka}
   \end{center}
   \end{figure}
-\end{latexonly}
-
-\begin{htmlonly}
-\htmlfig{fig:polka}{polka.png}{
-The Graphical User Interface presented by POLKA.}
-\end{htmlonly}
 
 Once complete, a 3D cube is created in which the x-y plane corresponds to
 pixel positions within the extracted, aligned intensity images. Each
@@ -1661,7 +1042,7 @@ addition, the separate aligned, sky-subtracted intensity images on which
 the Stokes parameters were based may be saved once the processing is
 complete.
 
-The reference direction (see \hyperref{this section}{section }
+The reference direction (see \slhyperref{this section}{section }
 {}{SEC:SBPOLARIM}) for the Stokes vectors in the output cube will
 not in general be the same as the reference direction in the input
 intensity images. The output reference direction is chosen as follows:
@@ -1672,7 +1053,7 @@ which describes a celestial co-ordinate system such as RA/DEC, galactic
 longitude/latitude, \emph{etc.}, then the reference direction in the output cube
 will be north within the same celestial co-ordinate system.
 Instructions on setting up such WCS information is available
-\hyperref{here}{in section }{}{SEC:WCS}.
+\slhyperref{here}{in section }{}{SEC:WCS}.
 
 \item If the input data does not contain WCS information for a celestial
 co-ordinate system, then the reference direction will be the second pixel
@@ -1689,7 +1070,7 @@ Of these, the most important will usually be:
 \begin{description}
 \item [IN]	- A list of the input target frames. These should have been
 calibrated and imported. The list may be supplied in several forms
-(described \hyperref{here}{in section }{}{SEC:GRPEXP}).
+(described \slhyperref{here}{in section }{}{SEC:GRPEXP}).
 \item [MODE]	- Indicates what sort of polarization you are measuring. It
 can be ``CIRCULAR'' or ``LINEAR''.
 \item [OUT]	- If you have single-beam, or non-polarimetric data, this
@@ -1760,7 +1141,7 @@ the plane of polarization, in degrees.
 \end{quote}
 
 For circular polarimetry, the Q and U columns are replaced by a single V
-column. If variance information is available (see \hyperref{here}{section
+column. If variance information is available (see \slhyperref{here}{section
 } {}{SEC:CCDPACK}) then columns are also produced holding the standard
 deviations associated with each of the above quantities (except X, Y and
 Z). Each pixel in the x-y plane of the supplied cube produces one or more
@@ -1798,10 +1179,10 @@ previously displayed picture.
 
 In addition, the catalogues produced by POLBIN and POLVEC can be examined
 and interactively edited using the polarimetry toolbox within
-\xref{GAIA}{sun214}{} \latex{(SUN/214)}.
+\xref{GAIA}{sun214}{} (SUN/214).
 
 Since the polarization parameters are stored in a catalogue, the
-\xref{CURSA}{sun190}{} package \latex{(see SUN/190)} can be used to
+\xref{CURSA}{sun190}{} package (see SUN/190) can be used to
 examine and manipulate them. One particularly useful facility within
 CURSA is the \xref{CATSELECT}{sun190}{SELECT} application, which
 allows rows within a catalogue to be selected on the basis of an
@@ -1810,12 +1191,10 @@ create a new catalogue called \verb+selcat.FIT+ which contains all the
 vectors from \verb+bincat.FIT+ for which the polarization is less than
 30\% and has a standard deviation less than 5\%:
 
-\begin{myquote}
-\begin{verbatim}
-   % cursa
-   % catselect catin=bincat catout=selcat norejcat seltyp=e "expr='p<30 & dp<5'"
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+% cursa
+% catselect catin=bincat catout=selcat norejcat seltyp=e "expr='p<30 & dp<5'"
+\end{terminalv}
 
 The \xref{XCATVIEW}{sun190}{XVIEW} application allows you to examine the
 data in a catalogue, using a Graphical User Interface to control the
@@ -1836,11 +1215,9 @@ to display a spatial vector map would involve the following steps:
 \item Convert the 3D NDF in file \verb+cube.sdf+ containing Stokes vectors
 (created by POLKA) into a catalogue stored in file \verb+cat.FIT+:
 
-\begin{myquote}
-\begin{verbatim}
-   % polvec cube cat
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+% polvec cube cat
+\end{terminalv}
 
 \item Bin the catalogue to reduce the noise and decrease the density
 of vectors in the final map. The bins used in this example are 8 by
@@ -1849,61 +1226,49 @@ the x-y plane of the Stokes parameter NDF \verb+cube.sdf+), and the
 Stokes parameters are combined using a median. The binned catalogue is
 stored in file \verb+bincat.FIT+:
 
-\begin{myquote}
-\begin{verbatim}
-   % polbin cat bincat 8 method=med
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+% polbin cat bincat 8 method=med
+\end{terminalv}
 
 \item Create a new catalogue (in file \verb+selcat.FIT+) containing just
 the vectors with polarizations of less than 50\% and standard deviations of
 less than 5\%:
 
-\begin{myquote}
-\begin{verbatim}
-   % cursa
-   % catselect catin=bincat catout=selcat norejcat seltyp=e "expr='p<50 & dp<5'"
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+% cursa
+% catselect catin=bincat catout=selcat norejcat seltyp=e "expr='p<50 & dp<5'"
+\end{terminalv}
 
 \item \label{STEP:DEVICE} Start up KAPPA, and then select the graphics
 device and the image display device (both are set to an X windows display
 in this example):
-\begin{myquote}
-\begin{verbatim}
-   % kappa
-   % gdset xwindows
-   % idset xwindows
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+% kappa
+% gdset xwindows
+% idset xwindows
+\end{terminalv}
 
 \item Clear the screen:
-\begin{myquote}
-\begin{verbatim}
-   % gdclear
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+% gdclear
+\end{terminalv}
 
 \item \label{STEP:PICDEF} Create a ``picture'' to contain a grey-scale display of the total
 intensity. A picture is an area of the screen in which subsequent graphics
 will appear. The one we create here is centred on the screen and occupies
 three quarters of its height and width. This leaves a border available
 for annotation round the display:
-\begin{myquote}
-\begin{verbatim}
-   % picdef mode=cc fraction=0.75
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+% picdef mode=cc fraction=0.75
+\end{terminalv}
 
 \item \label{STEP:DISPLAY} Display the total intensity image contained in the bottom plane of
 the Stokes vector cube, and ensure it is displayed with the standard
 monochrome colour table:
-\begin{myquote}
-\begin{verbatim}
-   % display "cube(,,1)" mode=per percentiles="[5,95]"
-   % lutgrey
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+% display "cube(,,1)" mode=per percentiles="[5,95]"
+% lutgrey
+\end{terminalv}
 
 \item \label{STEP:PICLIST} Re-select the ``base picture''. This is a
 picture which corresponds to the whole screen. We need to do this because
@@ -1913,22 +1278,18 @@ created by PICDEF above which contains the grey-scale image. We want the
 key produced by POLPLOT to appear outside this picture. We therefore need
 to select the base picture so that POLPLOT has room for the key within
 the current picture:
-\begin{myquote}
-\begin{verbatim}
-   % piclist picnum=1
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+% piclist picnum=1
+\end{terminalv}
 
 \item \label{STEP:POLPLOT} Display the vector map, retaining the existing picture so that the
 vectors appear in alignment with the previously displayed total intensity
 image. The vectors are drawn in blue. A default scale will be used for the
 vectors, but this can be over-ridden if necessary by specifying a value for
 parameter \htmlref{VSCALE}{POLPLOT}:
-\begin{myquote}
-\begin{verbatim}
-   % polplot selcat noclear "style='colour(vect)=blue'"
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+% polplot selcat noclear "style='colour(vect)=blue'"
+\end{terminalv}
 
 \end{enumerate}
 
@@ -1942,11 +1303,9 @@ first and second axes of input cube. For instance, to restrict the
 display to X pixel co-ordinates 50 to 100, and Y pixel co-ordinates 300
 to 380, do:
 
-\begin{myquote}
-\begin{verbatim}
-   % display "cube(50:100,300:380,1)" mode=per percentiles="[5,95]"
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+% display "cube(50:100,300:380,1)" mode=per percentiles="[5,95]"
+\end{terminalv}
 
 \item If you do not want the vectors to be overlaid on a total
 intensity image, then omit steps \ref{STEP:PICDEF} and
@@ -1956,11 +1315,9 @@ POLPLOT command line in step \ref{STEP:POLPLOT}.
 \item If you want the vectors overlaid on a contour map instead of a
 grey-scale image, replace step \ref{STEP:DISPLAY} with:
 
-\begin{myquote}
-\begin{verbatim}
-   % contour "cube(,,1)" mode=per percentiles="[90,93,96,99]" noaxes nokey
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+% contour "cube(,,1)" mode=per percentiles="[90,93,96,99]" noaxes nokey
+\end{terminalv}
 
 \item If you want your output in the form of a PostScript file, there is
 an extra step. This is because graphics applications such as DISPLAY,
@@ -1976,16 +1333,14 @@ added to the end of the file name is always one higher than in any
 existing files.}. To produce a contour map with overlaid vectors, replace
 steps \ref{STEP:DISPLAY} and \ref{STEP:POLPLOT} with:
 
-\begin{myquote}
-\begin{verbatim}
-   % rm gks74.ps*
-   % contour "cube(,,1)" mode=per percentiles="[90,93,96,99]" noaxes nokey
-   % mv gks74.ps.1 contour.ps
-   % polplot selcat noclear
-   % mv gks74.ps.1 polplot.ps
-   % psmerge polplot.ps contour.ps > total.ps
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+% rm gks74.ps*
+% contour "cube(,,1)" mode=per percentiles="[90,93,96,99]" noaxes nokey
+% mv gks74.ps.1 contour.ps
+% polplot selcat noclear
+% mv gks74.ps.1 polplot.ps
+% psmerge polplot.ps contour.ps > total.ps
+\end{terminalv}
 
 Note, CONTOUR produces two PostScript files (\verb+gks74.ps+ and
 \verb+gks74.ps.1+). Make sure you use \verb+gks74.ps.1+\footnote{If you are
@@ -2049,17 +1404,15 @@ has no spatial coverage (\emph{i.e.} covers only a single pixel in the
 x-y plane). Before using LINPLOT you need to create an NDF containing the
 data to be plotted. To do this, use \htmlref{POLIMAGE}{POLIMAGE}. As an
 example, to plot polarization against wavelength at ( x=1.5, y=2.5 ) for
-the data in catalogue {\tt mycat.FIT}, do:
+the data in catalogue \texttt{mycat.FIT}, do:
 
-\begin{myquote}
-\begin{verbatim}
-   % polimage in=mycat out=pdata coldat=p colvar="dp*dp" box="[5,5,3\]"
-   % linplot ndf="pdata(2,3,)" errbar
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+% polimage in=mycat out=pdata coldat=p colvar="dp*dp" box="[5,5,3\]"
+% linplot ndf="pdata(2,3,)" errbar
+\end{terminalv}
 
-POLIMAGE creates the file {\tt pdata.sdf} which is a 3D NDF containing
-the values from the ``P'' column in {\tt mycat.FIT}. The VARIANCE
+POLIMAGE creates the file \texttt{pdata.sdf} which is a 3D NDF containing
+the values from the ``P'' column in \texttt{mycat.FIT}. The VARIANCE
 component of the NDF is filled with the square of the values in the
 ``DP'' column (do not supply a value for parameter COLVAR if the
 catalogue does not contain a suitable error column). The values assigned
@@ -2083,31 +1436,25 @@ Information describing all POLPACK commands is available in several forms:
 \begin{itemize}
 \item As simple text in the command-line window. Type:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % polhelp
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 Additional arguments may be given indicating the subject on which help is
 required. For instance:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % polhelp polka parameters
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 will enter the help library at the point containing information on the
 parameters available for application POLKA.
 
 \item As hypertext in a separate browser window. Type:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % showme sun223
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 \item In response to prompts issued by applications for parameter values.
 Entering a single question mark will display help on the parameter being
@@ -2150,8 +1497,8 @@ parameters later.
 \item Add an RA/DEC calibration to one of the aligned images
 created by POLKA (it doesn't really matter which one). This will usually
 require you to know the RA and DEC of at least two features in the image.
-See \hyperref{here}{appendix }{}{APP:GAIA} for a simple description of how
-to use \xref{GAIA}{sun214}{} \latex{(SUN/214)} to do this.
+See \slhyperref{here}{appendix }{}{APP:GAIA} for a simple description of how
+to use \xref{GAIA}{sun214}{} (SUN/214) to do this.
 
 \item Create a cube of Stokes vectors using \htmlref{POLCAL}{POLCAL}. Any
 WCS information is copied from the first input image (given for parameter IN)
@@ -2194,7 +1541,7 @@ ecliptic co-ordinates referred to the B1983.4 equinox.
 If you are using KAPPA V0.13 or later, and have an image containing a
 calibration in a suitable celestial co-ordinate system, then you can plot
 the polarization vectors in alignment with the image. If you follow the
-procedure described \hyperref{here}{in section }{}{SEC:DISP}, then the
+procedure described \slhyperref{here}{in section }{}{SEC:DISP}, then the
 vectors will be aligned automatically with the image. One niggle to watch
 out for is that both DISPLAY and POLPLOT draw annotated axes, potentially
 resulting in a bit of a mess! You should normally disable the production of
@@ -2213,7 +1560,7 @@ internally by POLPACK, rather than by the shell).
 POLPACK is written for the \xref{Starlink software environment}{sg5}{},
 but may also be run from the \htmladdnormallink{IRAF}{\IRAFURL} cl,
 reading and writing IRAF \texttt{.imh} image files using the `on-the-fly'
-data-conversion facilities described \hyperref{here} {in section }{}
+data-conversion facilities described \slhyperref{here} {in section }{}
 {SEC:CONVERT}.
 
 Assuming that all the \htmlref{required software}{required_software}
@@ -2221,11 +1568,9 @@ has been installed in the \xref{recommended way}{sun217}
 {installing_the_starlink_software} and IRAF initialised as usual, the
 POLPACK may be loaded at the cl prompt by:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 cl> polpack
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 the menu of commands will be displayed as for normal IRAF packages and
 applications are invoked and help obtained in the normal way. However,
@@ -2260,7 +1605,7 @@ general guidance on running Starlink applications from IRAF cl is given in
 way Starlink packages are set up for use with IRAF, and some technical
 detail about how the system works is in \xref{SSN/35}{ssn35}{}.
 
-\subsection{Required Software}
+\subsection{Required Software\label{required_software}}
 To run POLPACK applications from IRAF cl you will require the following
 Starlink software items in addition to POLPACK:
 
@@ -2288,11 +1633,11 @@ installation of Starlink software.
 
 More details on this, including how to obtain and install the software are in
 \xref{SUN/217}{sun217}{installing_the_starlink_software}
-\latex{ Appendix A}.
+Appendix A.
 
 \section{\label{SEC:GRPEXP}\xlabel{groupexpressions}Group Expressions}
 Several of the POLPACK applications have parameters which are described
-\latex{in appendix \ref{APP:DESCRIPTION}} as being associated with
+in appendix \ref{APP:DESCRIPTION} as being associated with
 \emph{groups} (or \emph{lists}) of objects. For instance, the
 \htmlref{POLKA}{POLKA} parameter ``IN'' specifies a group of input data
 files, and the \htmlref{POLPLOT}{POLPLOT} parameter ``STYLE'' specifies a
@@ -2322,7 +1667,7 @@ sign.
 
 Certain classes of objects have additional features, for
 instance if the objects are the names of data files, then wild-card characters
-are allowed in the supplied values (see \hyperref{here}{section }{}{SEC:NDF})
+are allowed in the supplied values (see \slhyperref{here}{section }{}{SEC:NDF})
 
 \subsection{\label{SEC:IND}Indirection}
 It is sometimes convenient to store the strings specifying the objects to
@@ -2338,12 +1683,10 @@ particular, a text file may contain references to other text files. If
 the file
 \verb+style.dat+ contained the following two lines:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 grid=1,colour(grid)=red,border=1
 colour(border)=red,^labels.dat
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 then the strings \verb+grid=1+, \verb+colour(grid)=red+, \verb+border=1+
 and \verb+colour(border)=red+ would be returned to the
@@ -2395,7 +1738,7 @@ representing existing data files, not data files which are to be created
 by the application.
 
 If an HDS container file\footnote{HDS container files can usually be
-identified by the fact they have a file type of {\tt .sdf}. They can be
+identified by the fact they have a file type of \texttt{.sdf}. They can be
 used to store one or more standard Starlink NDF structures.} is supplied
 which contains two or more NDF structures, then each NDF within the
 container file is processed as a separate image. NDFs which are contained
@@ -2421,66 +1764,52 @@ therefore contain the 16 output NDFs in components \verb+I1+ to \verb+I16+.
 \item If an application asks for a group of input data files, the following
 are all possible responses:
 
-\begin{myquote}
-\begin{verbatim}
-  b1,b2,b3,b4
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+b1,b2,b3,b4
+\end{terminalv}
 \vspace{-3mm}
 
 This means ``Use the NDFs stored in files \verb+b1.sdf+, \verb+b2.sdf+,
 \verb+b3.sdf+ and \verb+b4.sdf+''. If automatic format conversion is being
-used (see \hyperref{here}{section }{}{SEC:CONVERT}), then an example such
+used (see \slhyperref{here}{section }{}{SEC:CONVERT}), then an example such
 as:
 
-\begin{myquote}
-\begin{verbatim}
-  b1.fit,b2.fit,b3.fit,b4.fit
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+b1.fit,b2.fit,b3.fit,b4.fit
+\end{terminalv}
 
 is also legal, and reads the corresponding FITS files.
 
-\begin{myquote}
-\begin{verbatim}
-  cena_b1-
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+cena_b1-
+\end{terminalv}
 \vspace{-3mm}
 
 This means ``Use \verb+cena_b1.sdf+ and then (because of the minus sign
 at the end) ask the user for more data files''.
 
-\begin{myquote}
-\begin{verbatim}
-  *
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+*
+\end{terminalv}
 \vspace{-3mm}
 This means ``Use all accessible data files in the current directory''.
 
-\begin{myquote}
-\begin{verbatim}
-  hh1_b1s*_ds
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+hh1_b1s*_ds
+\end{terminalv}
 \vspace{-3mm}
 This means ``Use \verb+hh1_b1s1_ds.sdf+, \verb+hh1_b1s2_ds.sdf+, \emph{etc}''.
 
-\begin{myquote}
-\begin{verbatim}
-  ^files.lis
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+^files.lis
+\end{terminalv}
 \vspace{-3mm}
 This means ``Read the names of data files from the text file
 \verb+files.lis+.''
 
-\begin{myquote}
-\begin{verbatim}
-  ../data/*
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+../data/*
+\end{terminalv}
 \vspace{-3mm}
 This means ``Use all accessible data files contained in the directory
 \verb+../data+''.
@@ -2488,37 +1817,29 @@ This means ``Use all accessible data files contained in the directory
 \item If an application asks for a group of output data files, the following
 are possible responses:
 
-\begin{myquote}
-\begin{verbatim}
-  file1,file2,file3
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+file1,file2,file3
+\end{terminalv}
 \vspace{-3mm}
 This means ``Create \verb+file1.sdf+, \verb+file2.sdf+ and \verb+file3.sdf+''.
 
-\begin{myquote}
-\begin{verbatim}
-  ^out.dat
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+^out.dat
+\end{terminalv}
 \vspace{-3mm}
 This means ``Read the names of the output data files from
 text file \verb+out.dat+''.
 
-\begin{myquote}
-\begin{verbatim}
-  *_ds
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+*_ds
+\end{terminalv}
 \vspace{-3mm}
 This means ``Append the string ``\_ds'' to the end of all
                       the input data file names.
 
-\begin{myquote}
-\begin{verbatim}
-  ../bk/*|_ds|_bk|
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+../bk/*|_ds|_bk|
+\end{terminalv}
 \vspace{-3mm}
 This means ``Substitute the string ``\_bk'' for all  occurrences of the string
 ``\_ds'' in the  input data file names, and put the files in
@@ -2532,47 +1853,39 @@ be specified by  their X and Y pixel indices, then the pixels (10,11),
 
 \begin{enumerate}
 \item
-\begin{myquote}
-\begin{verbatim}
-  10,11,21,-10,0,0
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+10,11,21,-10,0,0
+\end{terminalv}
 \vspace{3mm}
 This gives the indices as a comma separated list.
 \vspace{3mm}
 
 \item
-\begin{myquote}
-\begin{verbatim}
-  10,11-
-  21,-10-
-  0,0
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+10,11-
+21,-10-
+0,0
+\end{terminalv}
 \vspace{3mm}
 Ending each line with a minus  sign causes the user to be re-prompted for more
 values.
 \vspace{3mm}
 
 \item
-\begin{myquote}
-\begin{verbatim}
-  ^pixels.dat
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+^pixels.dat
+\end{terminalv}
 \vspace{3mm}
 The file \verb+pixels.dat+ is read. The file could contain the  following four
 lines:
 
 \item
-\begin{myquote}
-\begin{verbatim}
-  #  Approximate star centres.
-  10,11
-  21,-10
-  0,0
-\end{verbatim}
-\end{myquote}
+\begin{terminalv}
+#  Approximate star centres.
+10,11
+21,-10
+0,0
+\end{terminalv}
 \end{enumerate}
 
 \section{\label{SEC:TROUBLE}\xlabel{troubleshooting}Trouble-shooting}
@@ -2592,10 +1905,10 @@ other co-ordinate systems, and so failure to copy this information will
 mean that the output catalogue cannot be aligned with other images.
 
 \item [``\texttt{Command not found}''] - Have you started up POLPACK
-as described \hyperref{here}{in section }{}{SEC:START}?
+as described \slhyperref{here}{in section }{}{SEC:START}?
 
 \item [``POLIMP will not accept my IRAF/FITS/\emph{etc.} data files''] - Have
-you started up the CONVERT package has described \hyperref{here}{in section }
+you started up the CONVERT package has described \slhyperref{here}{in section }
 {}{SEC:CONVERT}?
 
 \item [``\texttt{Rendezvous file has disappeared!}''] - If this message
@@ -2615,11 +1928,9 @@ nearly full, or if your quote has been exceeded. If so, you can specify a
 different directory by setting HDS\_SCRATCH to hold the required directory
 path. For instance,
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv HDS_SCRATCH /scratch5a/dsb/temp
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 would cause POLKA to put its intermediate files in \texttt{/scratch5a/dsb/temp}.
 
@@ -2637,11 +1948,9 @@ fail to appear using POLKA under Digital UNIX V4. If you have a copy of
 \texttt{netscape V3} you could use it instead by setting HTX\_BROWSER to
 its path:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv HTX_BROWSER /usr/local/bin/netscape.v3
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 replacing the example path with the correct path for your machine.
 
@@ -2657,11 +1966,9 @@ image display area is created. If this causes a private colour map to be
 used, then you could disable the automatic creation of the hypertext
 browser by setting STARTHELP to a false value when running POLKA:
 
-\begin{myquote}
-\begin{verbatim}
+\begin{terminalv}
 % polka starthelp=no
-\end{verbatim}
-\end{myquote}
+\end{terminalv}
 
 This need only be done once. Subsequent invocations of POLKA will use the
 same value for STARTHELP until a new value is specified on the command
@@ -2701,45 +2008,42 @@ addition, the following Starlink packages have been used: POLPACK,} ...
 \newpage
 \appendix
 \section{ \label{APP:DESCRIPTION}Description of the POLPACK applications}
-\begin{latexonly}
-\latexonlysubsection{Alphabetic list of POLPACK routines.}
+
+\subsection{Alphabetic list of POLPACK routines.}
 %
 % set up a mini table of contents for this section pointing into next section.
 %
-\quickdes{POLBIN}{Bins a catalogue containing Stokes vectors.}{ POLBIN }
+\quickdes{POLBIN}{Bins a catalogue containing Stokes vectors.}{POLBIN}
 
-\quickdes{POLCAL}{Calculates Stokes vectors from a set of aligned intensity images.}{ POLCAL }
+\quickdes{POLCAL}{Calculates Stokes vectors from a set of aligned intensity images.}{POLCAL}
 
-\quickdes{POLEXP}{Exports POLPACK information within an NDF to a FITS extension.}{ POLEXP }
+\quickdes{POLEXP}{Exports POLPACK information within an NDF to a FITS extension.}{POLEXP}
 
-\quickdes{POLEXT}{Sets explicit values in the POLPACK extension.}{ POLEXT }
+\quickdes{POLEXT}{Sets explicit values in the POLPACK extension.}{POLEXT}
 
 \quickdes{POLIMP}{Imports POLPACK information into an NDF from a FITS
-extension.}{ POLEXP }
+extension.}{POLEXP}
 
-\quickdes{POLHELP}{Displays textual help information for POLPACK.}{
-POLHELP }
+\quickdes{POLHELP}{Displays textual help information for POLPACK.}{POLHELP}
 
-\quickdes{POLIMAGE}{Converts a catalogue into an NDF.}{ POLIMAGE }
+\quickdes{POLIMAGE}{Converts a catalogue into an NDF.}{POLIMAGE}
 
 \quickdes{POLKA}{An X-based GUI which converts raw photometric images
-into Stokes vectors.}{ POLKA }
+into Stokes vectors.}{POLKA}
 
 \quickdes{POLPLOT}{Displays polarization vectors supplied in a
-catalogue.}{ POLPLOT }
+catalogue.}{POLPLOT}
 
 \quickdes{POLROTREF}{Rotates the reference direction for a pair of Q and
-U images.}{ POLROTREF }
+U images.}{POLROTREF}
 
 \quickdes{POLSIM}{Produces intensity images corresponding to given Stokes
-vectors.}{ POLSIM }
+vectors.}{POLSIM}
 
-\quickdes{POLSTACK}{Stack a set of intensity images.}{ POLSTACK }
+\quickdes{POLSTACK}{Stack a set of intensity images.}{POLSTACK}
 
 \quickdes{POLVEC}{Converts a Stokes vector cube into a catalogue of
-polarization vectors.}{ POLVEC }
-
-\end{latexonly}
+polarization vectors.}{POLVEC}
 
 \subsection{Complete routine descriptions \label{descriptions}}
 
@@ -2781,7 +2085,7 @@ for NDF applications.
          BOX( 2 ) = \_REAL (Read)
       }{
          The x and y bin sizes. These values refer to the coordinate Frame
-         defined by columns {\tt "}X{\tt "} and {\tt "}Y{\tt "} and will usually be in units of pixels.
+         defined by columns \texttt{"}X\texttt{"} and \texttt{"}Y\texttt{"} and will usually be in units of pixels.
          This parameter is not accessed if parameter INTEGRATE is TRUE.
          Parameter ZBOX specifies binning along the frequency axis when
          dealing with spectropolarimeter data.
@@ -2853,7 +2157,7 @@ for NDF applications.
          SIGMAS = \_REAL (Read)
       }{
          Number of standard deviations to reject data at. Only used if
-         METHOD is set to {\tt "}SIGMA{\tt "}. [4.0]
+         METHOD is set to \texttt{"}SIGMA\texttt{"}. [4.0]
       }
       \sstsubsection{
          ZBOX = \_REAL (Read)
@@ -2868,8 +2172,8 @@ for NDF applications.
       \sstexamplesubsection{
          polbin intab outtab 4
       }{
-         Bins the Stokes parameters in catalogue {\tt "}intab.FIT{\tt "} and produces
-         catalogue {\tt "}outtab.FIT{\tt "} containing binned Stokes parameters and
+         Bins the Stokes parameters in catalogue \texttt{"}intab.FIT\texttt{"} and produces
+         catalogue \texttt{"}outtab.FIT\texttt{"} containing binned Stokes parameters and
          corresponding polarization parameters. Each bin measures 4 pixels
          along both the X and Y axes, and has a value based on the median
          of the corresponding input Stokes values.
@@ -2963,7 +2267,7 @@ for NDF applications.
          If FALSE they are processed as single-beam data. If a null (!)
          value is supplied, the dual-beam algorithm is used if all the input
          images contain a legal value for the RAY item in the POLPACK
-         extension (i.e. either {\tt "}E{\tt "} or {\tt "}O{\tt "}). Otherwise, the single-beam
+         extension (i.e. either \texttt{"}E\texttt{"} or \texttt{"}O\texttt{"}). Otherwise, the single-beam
          algorithm is used. It is possible to process dual-beam data using
          the single-beam algorithm, so DUALBEAM may be set to FALSE even
          if the input images hold dual-beam data. However, the opposite
@@ -2999,7 +2303,7 @@ for NDF applications.
       }{
          A group specifying the names of the input intensity images or
          cubes. This may take the form of a comma separated list, or any of
-         the other forms described in the help on {\tt "}Group Expressions{\tt "}. Read
+         the other forms described in the help on \texttt{"}Group Expressions\texttt{"}. Read
          access only is required unless the SETVAR parameter is assigned a
          TRUE value.
       }
@@ -3073,7 +2377,7 @@ for NDF applications.
          gives the mode of operation; CIRCULAR for measuring circular
          polarization, or LINEAR for measuring linear polarization. In
          circular mode, the only legal values for the POLPACK extension
-         item {\tt "}WPLATE{\tt "} are 0.0 and 45.0. Currently, the single-beam algorithm
+         item \texttt{"}WPLATE\texttt{"} are 0.0 and 45.0. Currently, the single-beam algorithm
          can only perform linear polarimetry. [LINEAR]
       }
       \sstsubsection{
@@ -3090,19 +2394,19 @@ for NDF applications.
          SKYSUP = \_REAL (Read)
       }{
          This parameter is only accessed by the dual-beam algorithm. It is
-         a positive {\tt "}sky noise suppression factor{\tt "} used to control the
+         a positive \texttt{"}sky noise suppression factor\texttt{"} used to control the
          effects of sky noise when pairs of input images are
          inter-compared to determine their relative scale-factor. It is
          intended to prevent the resulting scale-factor estimate being
-         biased by the many similar values present in the {\tt "}sky
-         background{\tt "} of typical astronomical data.  SKYSUP controls an
+         biased by the many similar values present in the \texttt{"}sky
+         background\texttt{"} of typical astronomical data.  SKYSUP controls an
          algorithm which reduces the weight given to data where there
          is a high density of points with the same value, in order to
          suppress this effect.
 
          A SKYSUP value of unity can often be effective, but a value
          set by the approximate ratio of sky pixels to useful object
-         pixels (i.e. those containing non-sky signal) in a {\tt "}typical{\tt "}
+         pixels (i.e. those containing non-sky signal) in a \texttt{"}typical\texttt{"}
          image will usually be better. The precise value
          is not critical. A value of zero disables the sky noise
          suppression algorithm completely. The default value for SKYSUP
@@ -3237,17 +2541,17 @@ for NDF applications.
    }
    \sstexamples{
       \sstexamplesubsection{
-         polcal {\tt "}$*$\_O,$*$\_E{\tt "} stokes
+         polcal \texttt{"}$*$\_O,$*$\_E\texttt{"} stokes
       }{
          This example uses all images in the current directory which have
-         file names ending with either {\tt "}\_O{\tt "} or {\tt "}\_E{\tt "}, and stores the
-         corresponding I, Q and U values in the 3d cube {\tt "}stokes{\tt "}. These
+         file names ending with either \texttt{"}\_O\texttt{"} or \texttt{"}\_E\texttt{"}, and stores the
+         corresponding I, Q and U values in the 3d cube \texttt{"}stokes\texttt{"}. These
          images contain dual-beam data (indicated by the presence of the
          RAY item in the POLPACK extension), and so the dual-beam
          algorithm is used.
       }
       \sstexamplesubsection{
-         polcal {\tt "}$*$\_O,$*$\_E{\tt "} stokes nodualbeam
+         polcal \texttt{"}$*$\_O,$*$\_E\texttt{"} stokes nodualbeam
       }{
          As above, but the data is processed as if it were single-beam data.
       }
@@ -3258,8 +2562,8 @@ for NDF applications.
          \sstitem
          An item named STOKES is added to the POLPACK extension. It is a
          character string identifying the quantity stored in each plane of
-         the cube. For linear polarimetry, it is set to {\tt "}IQU{\tt "}, and for
-         circular polarimetry it is set to {\tt "}IV{\tt "}.
+         the cube. For linear polarimetry, it is set to \texttt{"}IQU\texttt{"}, and for
+         circular polarimetry it is set to \texttt{"}IV\texttt{"}.
 
          \sstitem
          The reference direction for the Stokes vectors and polarization
@@ -3391,7 +2695,7 @@ for NDF applications.
       provided (0, 22.5, 45 and 67.5 degrees) then a correction is
       made for any difference in sensitivity of the two channels (such
       as can be caused by the use of polarized flat-field for
-      instance). This correction is known as the {\tt "}F-factor{\tt "} and is
+      instance). This correction is known as the \texttt{"}F-factor\texttt{"} and is
       based on the redundancy provided by using four half-wave plate
       positions. If images with the required half-wave plate positions
       are not provided, then it is assumed that the two channels are
@@ -3439,7 +2743,7 @@ for NDF applications.
       }{
          A group of data files. This may take the form of a comma separated
          list of file names, or any of the other forms described in the help
-         on {\tt "}Group Expressions{\tt "}.
+         on \texttt{"}Group Expressions\texttt{"}.
       }
       \sstsubsection{
          NAMELIST = LITERAL (Read)
@@ -3461,7 +2765,7 @@ for NDF applications.
          polexp in=$\wedge$names.lis
       }{
          This example processes the NDFs listed in the text file
-         {\tt "}names.lis{\tt "}. The information stored in the POLPACK extension of
+         \texttt{"}names.lis\texttt{"}. The information stored in the POLPACK extension of
          each is exported to the FITS extension.
       }
    }
@@ -3608,8 +2912,8 @@ for NDF applications.
          when processing dual-beam data to associate O and E ray images.
          They are ignored when processing single-beam data. The supplied
          group may take the form of a comma separated list of identifiers,
-         or any of the other forms described in the help on {\tt "}Group
-         Expressions{\tt "}. A separate, non-blank identifier should be
+         or any of the other forms described in the help on \texttt{"}Group
+         Expressions\texttt{"}. A separate, non-blank identifier should be
          supplied for each data file specified by parameter IN, in the
          same order as the data files. If a null (!) value is supplied,
          then any existing IMGID values in the POLPACK extensions are
@@ -3621,7 +2925,7 @@ for NDF applications.
       }{
          A group of data files. This may take the form of a comma separated
          list of file names, or any of the other forms described in the help
-         on {\tt "}Group Expressions{\tt "}.
+         on \texttt{"}Group Expressions\texttt{"}.
       }
       \sstsubsection{
          NAMELIST = LITERAL (Read)
@@ -3646,7 +2950,7 @@ for NDF applications.
          not use this parameter if your data is from a single-beam
          polarimeter, or if the O and E ray images have not yet been
          extracted into separate images. If used, the supplied value must
-         be either {\tt "}O{\tt "} or {\tt "}E{\tt "}. The same value is stored in all supplied
+         be either \texttt{"}O\texttt{"} or \texttt{"}E\texttt{"}. The same value is stored in all supplied
          data files. If a null (!) value is supplied, any existing RAY
          values are left unchanged, but no new ones are added. [!]
       }
@@ -3754,14 +3058,14 @@ for NDF applications.
          polext in=cube
       }{
          Displays the contents of the POLPACK extension of data file
-         {\tt "}cube{\tt "}, leaving the values unchanged.
+         \texttt{"}cube\texttt{"}, leaving the values unchanged.
       }
       \sstexamplesubsection{
          polext in=$\wedge$files\_0.txt wplate=0 filter=V angrot=45
       }{
          This example processes all the data files listed in the text file
-         {\tt "}files\_0.txt{\tt "}, setting WPLATE to zero and ANGROT to 45. FILTER
-         is set to {\tt "}V\_0.0{\tt "}, and IMGID values are set to the name of the data
+         \texttt{"}files\_0.txt\texttt{"}, setting WPLATE to zero and ANGROT to 45. FILTER
+         is set to \texttt{"}V\_0.0\texttt{"}, and IMGID values are set to the name of the data
          file.
       }
    }
@@ -3799,22 +3103,22 @@ for NDF applications.
       \sstsubsection{
          TOPIC = LITERAL (Read)
       }{
-         Topic for which help is to be given. [{\tt "} {\tt "}]
+         Topic for which help is to be given. [\texttt{"} \texttt{"}]
       }
       \sstsubsection{
          SUBTOPIC = LITERAL (Read)
       }{
-         Subtopic for which help is to be given. [{\tt "} {\tt "}]
+         Subtopic for which help is to be given. [\texttt{"} \texttt{"}]
       }
       \sstsubsection{
          SUBSUBTOPIC = LITERAL (Read)
       }{
-         Subsubtopic for which help is to be given. [{\tt "} {\tt "}]
+         Subsubtopic for which help is to be given. [\texttt{"} \texttt{"}]
       }
       \sstsubsection{
          SUBSUBSUBTOPIC = LITERAL (Read)
       }{
-         Subsubsubtopic for which help is to be given. [{\tt "} {\tt "}]
+         Subsubsubtopic for which help is to be given. [\texttt{"} \texttt{"}]
       }
    }
    \sstdiytopic{
@@ -3827,13 +3131,13 @@ for NDF applications.
 
          \sstitem
             enter a topic and/or subtopic name(s) to display the help for
-               that topic or subtopic, so for example, {\tt "}polka parameters dpi{\tt "}
+               that topic or subtopic, so for example, \texttt{"}polka parameters dpi\texttt{"}
                gives help on DPI, which is a subtopic of Parameters, which
                in turn is a subtopic of \htmlref{POLKA}{POLKA};
 
          \sstitem
-            press the RETURN key to see more text at a {\tt "}Press RETURN to
-               continue ...{\tt "} request;
+            press the RETURN key to see more text at a \texttt{"}Press RETURN to
+               continue ...\texttt{"} request;
 
          \sstitem
             press the RETURN key at topic and subtopic prompts to move up
@@ -3845,12 +3149,12 @@ for NDF applications.
                response to any prompt will terminate the help session;
 
          \sstitem
-            enter a question mark {\tt "}?{\tt "} to redisplay the text for the current
+            enter a question mark \texttt{"}?\texttt{"} to redisplay the text for the current
                topic, including the list of topic or subtopic names; or
 
          \sstitem
-            enter an ellipsis {\tt "}...{\tt "} to display all the text below the
-               current point in the hierarchy.  For example, {\tt "}POLKA...{\tt "}
+            enter an ellipsis \texttt{"}...\texttt{"} to display all the text below the
+               current point in the hierarchy.  For example, \texttt{"}POLKA...\texttt{"}
                displays information on the \htmlref{POLKA}{POLKA} topic as well as
                information on all the subtopics under POLKA.
 
@@ -3861,16 +3165,16 @@ for NDF applications.
       \sstitemlist{
 
          \sstitem
-            Just give the first few characters, \emph{e.g.} {\tt "}PARA{\tt "} for
+            Just give the first few characters, \emph{e.g.} \texttt{"}PARA\texttt{"} for
                Parameters.
 
          \sstitem
             Some topics are composed of several words separated by
                underscores.  Each word of the keyword may be abbreviated,
-               \emph{e.g.} {\tt "}Colour\_Set{\tt "} can be shortened to {\tt "}C\_S{\tt "}.
+               \emph{e.g.} \texttt{"}Colour\_Set\texttt{"} can be shortened to \texttt{"}C\_S\texttt{"}.
 
          \sstitem
-            The characters {\tt "}\%{\tt "} and {\tt "}$*${\tt "} act as wild-cards, where the
+            The characters \texttt{"}\%\texttt{"} and \texttt{"}$*$\texttt{"} act as wild-cards, where the
                percent sign matches any single character, and asterisk
                matches any sequence of characters.  Thus to display
                information on all available topics, type an asterisk in
@@ -3957,7 +3261,7 @@ for NDF applications.
          If a null (!) value is supplied, no VARIANCE component is created.
          An arbitrary algebraic combination of columns may be used by
          supplying a CURSA expression instead of a single column name.
-         For instance, supplying the string {\tt "}DP$*$$*$2{\tt "} causes the square of
+         For instance, supplying the string \texttt{"}DP$*$$*$2\texttt{"} causes the square of
          the values in column DP to be used. See SUN/190 for details of the
          syntax of these expressions. [!]
       }
@@ -3985,7 +3289,7 @@ for NDF applications.
          The name of the catalogue column which gives the coordinate
          of each data value along a third axis. If a null (!) value is
          supplied the output NDF will be 2-dimensional. The dynamic default
-         is {\tt "}Z{\tt "} if the catalogue contains a column named {\tt "}Z{\tt "}, and is null
+         is \texttt{"}Z\texttt{"} if the catalogue contains a column named \texttt{"}Z\texttt{"}, and is null
          (!) otherwise. See COLX for further details. []
       }
       \sstsubsection{
@@ -4043,7 +3347,7 @@ for NDF applications.
          SIGMAS = \_REAL (Read)
       }{
          Number of standard deviations to reject data at. Only used if
-         METHOD is set to {\tt "}SIGMA{\tt "}. Only accessed if parameter SHAPE is
+         METHOD is set to \texttt{"}SIGMA\texttt{"}. Only accessed if parameter SHAPE is
          TRUE. [4.0]
       }
    }
@@ -4051,16 +3355,16 @@ for NDF applications.
       \sstexamplesubsection{
          polimage incat outimg p
       }{
-         Creates a 2-D NDF called {\tt "}outimg{\tt "} containing the values of column
-         P in the catalogue {\tt "}incat.FIT{\tt "}. The catalogue values are binned
+         Creates a 2-D NDF called \texttt{"}outimg\texttt{"} containing the values of column
+         P in the catalogue \texttt{"}incat.FIT\texttt{"}. The catalogue values are binned
          into a 2-D grid of pixels using the spatial positions given in
-         the columns {\tt "}X{\tt "} and {\tt "}Y{\tt "}.
+         the columns \texttt{"}X\texttt{"} and \texttt{"}Y\texttt{"}.
       }
       \sstexamplesubsection{
          polimage incat outimg p noshape
       }{
-         Creates a 1-D NDF called {\tt "}outimg{\tt "} containing the values of column
-         P in the catalogue {\tt "}incat.FIT{\tt "}. The number of pixels in the output
+         Creates a 1-D NDF called \texttt{"}outimg\texttt{"} containing the values of column
+         P in the catalogue \texttt{"}incat.FIT\texttt{"}. The number of pixels in the output
          is equal to the number of rows in the catalogue, and the catalogue
          values are copied into the output in the order in which they occur
          in the catalogue.
@@ -4097,12 +3401,12 @@ for NDF applications.
       processing them with POLPACK. It records the values of various items
       of information required by POLPACK (half-wave plate position, filter,
       \emph{etc.}). These values can either be supplied explicitly or can be copied
-      ({\tt "}imported{\tt "}) from FITS keywords stored in the files. Such keywords
+      (\texttt{"}imported\texttt{"}) from FITS keywords stored in the files. Such keywords
       may, for instance, be provided by the instrument/telescope control
       systems. The specified values are stored in the POLPACK extensions
       of the supplied data files for use
 
-      The import is controlled by a {\tt "}table{\tt "} which specifies how FITS
+      The import is controlled by a \texttt{"}table\texttt{"} which specifies how FITS
       keyword values should be used to create the corresponding POLPACK
       extension items. Each extension item may be assigned a specified
       constant value, the value of a specified FITS keyword, or the value
@@ -4125,7 +3429,7 @@ for NDF applications.
       }{
          A group of data files. This may take the form of a comma separated
          list of file names, or any of the other forms described in the help
-         on {\tt "}Group Expressions{\tt "}.
+         on \texttt{"}Group Expressions\texttt{"}.
       }
       \sstsubsection{
          NAMELIST = LITERAL (Read)
@@ -4165,7 +3469,7 @@ for NDF applications.
 \end{tabular}
 \end{quote}
 
-         See the topic {\tt "}Table Format{\tt "} for information on how
+         See the topic \texttt{"}Table Format\texttt{"} for information on how
          to create translation tables.
 
          Note, the \texttt{ANGROT} value is not stored explicitly as a
@@ -4176,7 +3480,7 @@ for NDF applications.
    }
    \sstexamples{
       \sstexamplesubsection{
-         polimp in={\tt '}$*${\tt '} table=mytable.dat
+         polimp in=\texttt{'}$*$\texttt{'} table=mytable.dat
       }{
          This example processes all the data files in the current directory
          using the import control table mytable.dat.
@@ -4185,7 +3489,7 @@ for NDF applications.
          polimp in=$\wedge$names.lis
       }{
          This example processes the data files listed in the text file
-         {\tt "}names.lis{\tt "} using the default control table appropriate for
+         \texttt{"}names.lis\texttt{"} using the default control table appropriate for
          partially processed data which has previously been exported using
          \htmlref{POLEXP}{POLEXP}.
       }
@@ -4199,7 +3503,7 @@ for NDF applications.
 
          \sstitem
          A new Frame is added to the WCS component of each NDF and is given the
-         Domain {\tt "}POLANAL{\tt "}. This Frame is formed by rotating the grid co-ordinate
+         Domain \texttt{"}POLANAL\texttt{"}. This Frame is formed by rotating the grid co-ordinate
          Frame so that the first axis is parallel to the analyser axis. The
          angle of rotation is given by the ANGROT value and defaults to zero
          if ANGROT is not specified in the control table. As of POLPACK V2.0,
@@ -4253,7 +3557,7 @@ for NDF applications.
 
       In addition to using the values of FITS keywords directly, it is also
       possible to use arbitrary functions of one or more keywords. To do
-      this, each keyword used in the function must first be {\tt "}declared{\tt "} so
+      this, each keyword used in the function must first be \texttt{"}declared\texttt{"} so
       that a data type may be associated with it. This is done by including
       lines with the following form in the control table prior to the
       function reference:
@@ -4264,7 +3568,7 @@ for NDF applications.
 \end{tabular}
 \end{quote}
 
-      Here {\tt "}Data-type{\tt "} must be one of \_INTEGER, \_REAL, \_DOUBLE, \_WORD, \_BYTE,
+      Here \texttt{"}Data-type\texttt{"} must be one of \_INTEGER, \_REAL, \_DOUBLE, \_WORD, \_BYTE,
       \_CHAR. So for instance if you wanted to assign a value to the WPLATE
       extension item, the orientation of the half-wave plate in degrees, from
       the FITS keyword HWP which gives the required value in radians, you
@@ -4303,7 +3607,7 @@ for NDF applications.
       In the second special form, the name of the destination extension item
       is given as usual followed by a FITS-keyword which supplies the string
       to be translated. This is then followed by statements which translate
-      an {\tt "}input{\tt "} string into an {\tt "}output{\tt "} string. So for instance if you
+      an \texttt{"}input\texttt{"} string into an \texttt{"}output\texttt{"} string. So for instance if you
       were doing circular polarimetry, and wanted to translate quarter
       wave-plate positions to the equivalent strings recognised by POLPACK
       you might use something like:
@@ -4316,17 +3620,17 @@ for NDF applications.
 \end{quote}
 
       This compares the value of the FITS keyword POLPLATE with the strings
-      on the left hand sides of the equals signs ({\tt "}48.0{\tt "} and
-      {\tt "}138.0{\tt "}). If a match is found, it assigns the value from
-      the right hand side of the equals sign ({\tt "}0.0{\tt "} or
-      {\tt "}45.0{\tt "}) to the WPLATE component in the POLPACK extension.
-      An error is reported if no match is found. The {\tt "}-{\tt "}
+      on the left hand sides of the equals signs (\texttt{"}48.0\texttt{"} and
+      \texttt{"}138.0\texttt{"}). If a match is found, it assigns the value from
+      the right hand side of the equals sign (\texttt{"}0.0\texttt{"} or
+      \texttt{"}45.0\texttt{"}) to the WPLATE component in the POLPACK extension.
+      An error is reported if no match is found. The \texttt{"}-\texttt{"}
       sign at the end of the first line indicates that the list continues
       on the next line. If the strings being compared both represent
       numerical values, the comparison will be performed between their
       numerical values. This means, for instance, that all the following
-      strings will be considered equal {\tt "}45.0{\tt "}, {\tt "}45{\tt "},
-      {\tt "}45D0{\tt "}, {\tt "}+45.0E0{\tt "}. If either of the strings
+      strings will be considered equal \texttt{"}45.0\texttt{"}, \texttt{"}45\texttt{"},
+      \texttt{"}45D0\texttt{"}, \texttt{"}+45.0E0\texttt{"}. If either of the strings
       are not numerical, then the comparison is performed between their
       textual values (case insensitive).
 
@@ -4359,7 +3663,7 @@ for NDF applications.
 \end{tabular}
 \end{quote}
 
-      performs the checks for {\tt "}U band{\tt "}, etc, on the total
+      performs the checks for \texttt{"}U band\texttt{"}, etc, on the total
       concatenated
       string, rather than on the value of keyword MYFITS. The two
       strings included in a replacement specification may themselves be
@@ -4397,13 +3701,13 @@ for NDF applications.
       this does not exist either, then RAY is left undefined.
 
       Logical data types are restricted to a single keyword whose value
-      must be {\tt "}YES{\tt "}, {\tt "}TRUE{\tt "}, {\tt "}T{\tt "}, {\tt "}Y{\tt "} for TRUE or {\tt "}NO{\tt "}, {\tt "}FALSE{\tt "}, {\tt "}N{\tt "},
-      {\tt "}F{\tt "}.
+      must be \texttt{"}YES\texttt{"}, \texttt{"}TRUE\texttt{"}, \texttt{"}T\texttt{"}, \texttt{"}Y\texttt{"} for TRUE or \texttt{"}NO\texttt{"}, \texttt{"}FALSE\texttt{"}, \texttt{"}N\texttt{"},
+      \texttt{"}F\texttt{"}.
 
       Fields in the table may be separated by commas instead of spaces if
       desired. Comments may be placed anywhere and should start with the
-      characters {\tt "}\#{\tt "} or {\tt "}!{\tt "}. Continuation onto
-      a new line is indicated by use of {\tt "}-{\tt "}.
+      characters \texttt{"}\#\texttt{"} or \texttt{"}!\texttt{"}. Continuation onto
+      a new line is indicated by use of \texttt{"}-\texttt{"}.
    }
    \sstdiytopic{
       Copyright
@@ -4469,12 +3773,12 @@ for NDF applications.
       DPI parameter described below.
 
       A step-by-step tutorial on the use of the GUI is available within the
-      {\tt "}Help{\tt "} menu at the right hand end of the menu bar (see also the STARTHELP
+      \texttt{"}Help\texttt{"} menu at the right hand end of the menu bar (see also the STARTHELP
       parameter).
 
       Various options controlling the behaviour of the GUI can be set on the
       command line by assigning values to the parameters listed below.
-      Alternatively, most of them can be set using the {\tt "}Options{\tt "} menu in the
+      Alternatively, most of them can be set using the \texttt{"}Options\texttt{"} menu in the
       menu bar at the top of the GUI. If not supplied on the command line,
       these parameters usually adopt the values they had on the previous
       invocation of POLKA. The values shown in square brackets in the parameter
@@ -4509,9 +3813,9 @@ for NDF applications.
          small or large. For this reason, an explicit value may be supplied
          using this parameter. If a null (!) value is supplied, then the
          DPI value returned by the X server is used. This parameter may
-         also be used to adjust the size of the GUI to the user{\tt '}s
+         also be used to adjust the size of the GUI to the user\texttt{'}s
          preference, even if the DPI value returned by the X server is correct.
-         Note, this value cannot be set from the GUI{\tt '}s {\tt "}Options{\tt "} menu. [!]
+         Note, this value cannot be set from the GUI\texttt{'}s \texttt{"}Options\texttt{"} menu. [!]
       }
       \sstsubsection{
          DUALBEAM = \_LOGICAL (Read)
@@ -4520,11 +3824,11 @@ for NDF applications.
          dual-beam mode, producing two output images for each input image.
          Otherwise, it will operate in single-beam mode, with one output
          image being produced for each input image. In single-beam mode,
-         the output image is notionally referred to as the {\tt "}O-ray{\tt "} image,
+         the output image is notionally referred to as the \texttt{"}O-ray\texttt{"} image,
          and all the GUI controls related to the E-ray areas are disabled.
          This parameter is only used when processing polarimeter data
-         (see parameter POL). It{\tt '}s value cannot be set from the
-         {\tt "}Options{\tt "} menu within the GUI. [TRUE]
+         (see parameter POL). It\texttt{'}s value cannot be set from the
+         \texttt{"}Options\texttt{"} menu within the GUI. [TRUE]
       }
       \sstsubsection{
          FITTYPE = \_INTEGER (Update)
@@ -4575,11 +3879,11 @@ for NDF applications.
          LOGFILE = LITERAL (Read)
       }{
          The name of a log file to which will be written all the messages
-         generated by the applications activated by the GUI. If {\tt "}stdout{\tt "}
+         generated by the applications activated by the GUI. If \texttt{"}stdout\texttt{"}
          is supplied, then the messages will be directed to standard
          output (usually the screen). If a null (!) value is supplied, then
          no log file will be created. Note, this parameter cannot be set
-         from the GUI{\tt '}s {\tt "}Options{\tt "} menu. [!]
+         from the GUI\texttt{'}s \texttt{"}Options\texttt{"} menu. [!]
       }
       \sstsubsection{
          OEFITTYPE = \_INTEGER (Update)
@@ -4595,8 +3899,8 @@ for NDF applications.
          A group specifying the names of the output intensity images to
          create in single-beam mode, or when processing non-polarimeter
          data (see parameters DUALBEAM and POL). The specified names should
-         correspond one-for-one to the input images. See the help on {\tt "}Group
-         Expressions{\tt "} for information on the allowed formats for this list.
+         correspond one-for-one to the input images. See the help on \texttt{"}Group
+         Expressions\texttt{"} for information on the allowed formats for this list.
          Any asterisk within the supplied string is replaced in turn by
          each of the input image names. If a null (!) value is given, then
          the intensity images are not saved. Note, the output images cannot
@@ -4607,8 +3911,8 @@ for NDF applications.
       }{
          A group specifying the names of the E-ray output intensity images to
          create in dual-beam mode (see parameter DUALBEAM). These should
-         correspond one-for-one to the input images. See the help on {\tt "}Group
-         Expressions{\tt "} for information on the allowed formats for this list.
+         correspond one-for-one to the input images. See the help on \texttt{"}Group
+         Expressions\texttt{"} for information on the allowed formats for this list.
          Any asterisk within the supplied string is replaced in turn by
          each of the input image names. If a null (!) value is given, then
          the E-ray intensity images are not saved. Note, the output images
@@ -4619,8 +3923,8 @@ for NDF applications.
       }{
          A group specifying the names of the O-ray output intensity images to
          create in dual-beam mode (see parameter DUALBEAM). These should
-         correspond one-for-one to the input images. See the help on {\tt "}Group
-         Expressions{\tt "} for information on the allowed formats for this list.
+         correspond one-for-one to the input images. See the help on \texttt{"}Group
+         Expressions\texttt{"} for information on the allowed formats for this list.
          Any asterisk within the supplied string is replaced in turn by
          each of the input image names. If a null (!) value is given, then
          the E-ray intensity images are not saved. Note, the output images
@@ -4742,7 +4046,7 @@ for NDF applications.
          created with the GUI, displaying the tutorial page of the POLKA
          on-line help documentation. Otherwise, the browser is only created
          if the user accesses the on-line help information explicitly
-         from within the GUI by using the {\tt "}Help{\tt "} menu or the F1 key on
+         from within the GUI by using the \texttt{"}Help\texttt{"} menu or the F1 key on
          the keyboard. [TRUE]
       }
       \sstsubsection{
@@ -4751,14 +4055,14 @@ for NDF applications.
          If a TRUE value is supplied, then information describing the
          currently displayed image, current options values, \emph{etc.}, will be
          displayed in a box underneath the displayed image. The contents
-         of this box can be selected using the {\tt "}Options{\tt "} menu in the GUI.
+         of this box can be selected using the \texttt{"}Options\texttt{"} menu in the GUI.
          [TRUE]
       }
       \sstsubsection{
          VIEW = LITERAL (Update)
       }{
          This controls how images are placed within the image display
-         area of the GUI when a new image is selected using the {\tt "}Images{\tt "}
+         area of the GUI when a new image is selected using the \texttt{"}Images\texttt{"}
          menu. It may take one of the following values:
          \sstitemlist{
 
@@ -4791,21 +4095,21 @@ for NDF applications.
    }
    \sstexamples{
       \sstexamplesubsection{
-         polka {\tt '}im1,im2,im3,im4{\tt '} cube out\_o=! out\_e=!
+         polka \texttt{'}im1,im2,im3,im4\texttt{'} cube out\_o=! out\_e=!
       }{
          This example aligns and extracts the O and E ray areas from the
-         four images {\tt '}im1{\tt '} to {\tt '}im4{\tt '}, subtracts a sky background from each
+         four images \texttt{'}im1\texttt{'} to \texttt{'}im4\texttt{'}, subtracts a sky background from each
          (estimated from areas within the object frames), and stores the
-         corresponding Stokes vectors in {\tt '}cube{\tt '}. The aligned intensity
+         corresponding Stokes vectors in \texttt{'}cube\texttt{'}. The aligned intensity
          images are not saved.
       }
       \sstexamplesubsection{
          polka $\wedge$in.lis out=$\wedge$out.lis out\_s=! dualbeam=no skyframes=$\wedge$sky.lis reset
       }{
          This example uses single-beam mode. It reads the names of input
-         images from the text file {\tt '}in.lis{\tt '}, subtracts the sky frames
-         read from the text file {\tt '}sky.lis{\tt '}, aligns them and stores
-         them in the images named in the text file {\tt '}out.lis{\tt '}. All
+         images from the text file \texttt{'}in.lis\texttt{'}, subtracts the sky frames
+         read from the text file \texttt{'}sky.lis\texttt{'}, aligns them and stores
+         them in the images named in the text file \texttt{'}out.lis\texttt{'}. All
          other parameters are reset to their initial default values listed
          in the parameter descriptions above. No Stokes vectors are
          produced.
@@ -4827,7 +4131,7 @@ for NDF applications.
 
             \sstitem
               RAY -- A string identifying which of the two rays the image
-              contains. This will be either {\tt "}O{\tt "} or {\tt "}E{\tt "}. This is only written in
+              contains. This will be either \texttt{"}O\texttt{"} or \texttt{"}E\texttt{"}. This is only written in
               dual-beam mode (see parameter DUALBEAM).
 
             \sstitem
@@ -4856,7 +4160,7 @@ for NDF applications.
          Intermediate files created during the execution of POLKA are stored
          in a separate directory created each time POLKA is run, and deleted
          when POLKA exits. The directory will have a name of the form
-         {\tt "}polka\_temp\_$<$nnn$>${\tt "} where $<$nnn$>$ is some number. This directory will be
+         \texttt{"}polka\_temp\_$<$nnn$>$\texttt{"} where $<$nnn$>$ is some number. This directory will be
          created within the directory specified by the HDS\_SCRATCH environment
          variable. If HDS\_SCRATCH is not defined then it will be created within
          the current directory.
@@ -4957,7 +4261,7 @@ for NDF applications.
       }{
          The name of the catalogue column holding the orientation of each
          vector. The values are considered to be in units of degrees unless
-         the UNITS attribute of the column has the value {\tt "}Radians{\tt "} (case
+         the UNITS attribute of the column has the value \texttt{"}Radians\texttt{"} (case
          insensitive).  The angles are assumed to be measured anti-clockwise
          from the reference direction specified in the catalogue. A list
          of available column names is displayed if a non-existent column name
@@ -4975,7 +4279,7 @@ for NDF applications.
       }{
          The name of the catalogue column which gives the position of each
          vector along the first axis. A list of available column names is
-         displayed if a non-existent column name is given. See the {\tt "}Notes{\tt "}
+         displayed if a non-existent column name is given. See the \texttt{"}Notes\texttt{"}
          section below for further details of how these positions are
          interpreted. [X]
       }
@@ -4984,7 +4288,7 @@ for NDF applications.
       }{
          The name of the catalogue column which gives the position of each
          vector along the second axis. A list of available column names is
-         displayed if a non-existent column name is given. See the {\tt "}Notes{\tt "}
+         displayed if a non-existent column name is given. See the \texttt{"}Notes\texttt{"}
          section below for further details of how these positions are
          interpreted. [Y]
       }
@@ -4995,7 +4299,7 @@ for NDF applications.
          vector along a third axis. A list of available column names is
          displayed if a non-existent column name is given. A null (!)
          value should be supplied if no third axis is to be used. The dynamic
-         default is {\tt '}Z{\tt '} if the catalogue contains a Z column, and null
+         default is \texttt{'}Z\texttt{'} if the catalogue contains a Z column, and null
          (!) otherwise. See also parameter ZAXVAL. []
       }
       \sstsubsection{
@@ -5006,11 +4310,11 @@ for NDF applications.
       \sstsubsection{
          EPOCH = \_DOUBLE (Read)
       }{
-         If a {\tt "}Sky Co-ordinate System{\tt "} specification is supplied (using
+         If a \texttt{"}Sky Co-ordinate System\texttt{"} specification is supplied (using
          parameter FRAME) for a celestial co-ordinate system, then an epoch
          value is needed to qualify it. This is the epoch at which the
          supplied sky positions were determined. It should be given as a
-         decimal years value, with or without decimal places  ({\tt "}1996.8{\tt "} for
+         decimal years value, with or without decimal places  (\texttt{"}1996.8\texttt{"} for
          example). Such values are interpreted as a Besselian epoch if less
          than 1984.0 and as a Julian epoch otherwise.
       }
@@ -5035,7 +4339,7 @@ for NDF applications.
 
             \sstitem
             A domain name such as SKY, AXIS, PIXEL, etc. The two
-            {\tt "}pseudo-domains{\tt "} WORLD and DATA may be supplied and will be
+            \texttt{"}pseudo-domains\texttt{"} WORLD and DATA may be supplied and will be
             translated into PIXEL and AXIS respectively, so long as the WCS
             FrameSet in the catalogue does not contain Frames with these domains.
 
@@ -5044,8 +4348,8 @@ for NDF applications.
             the WCS component.
 
             \sstitem
-            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) (see
-            section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95). [!]
+            A \texttt{"}Sky Co-ordinate System\texttt{"} (SCS) value such as EQUAT(J2000) (see
+            section \texttt{"}Sky Co-ordinate Systems\texttt{"} in SUN/95). [!]
          }
       }
       \sstsubsection{
@@ -5066,7 +4370,7 @@ for NDF applications.
             \sstitem
                END -- the vectors are drawn ending at the corresponding
                pixel coordinates.
-            [{\tt "}Centre{\tt "}]
+            [\texttt{"}Centre\texttt{"}]
          }
       }
       \sstsubsection{
@@ -5097,7 +4401,7 @@ for NDF applications.
 
          A comma-separated list of strings should be given in which each
          string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
+         preceded by an up-arrow character \texttt{"}$\wedge$\texttt{"}. Such text files should
          contain further comma-separated lists which will be read and
          interpreted in the same manner. Attribute settings are applied in
          the order in which they occur within the list, with later settings
@@ -5110,25 +4414,25 @@ for NDF applications.
          where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
          the value to assign to the attribute. Default values will be
          used for any unspecified attributes. All attributes will be
-         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
-         Attributes{\tt "} in SUN/95 for a description of the available
+         defaulted if a null value (!) is supplied. See section \texttt{"}Plotting
+         Attributes\texttt{"} in SUN/95 for a description of the available
          attributes. Any unrecognised attributes are ignored (no error is
          reported).
 
          By default the key starts with two lines of text, the first
-         being {\tt "}Vector scale:{\tt "} and the second giving a numerical value
+         being \texttt{"}Vector scale:\texttt{"} and the second giving a numerical value
          for the scale in units per centimetre. These two lines may be
          replaced by assigning alternative text to the Title attribute
          using this parameter. If no text is required, either assign a
          blank value for Title, or set the DrawTitle attribute to zero.
 
-         The appearance of the text in the key is controlled using {\tt "}String{\tt "}
+         The appearance of the text in the key is controlled using \texttt{"}String\texttt{"}
          attributes (e.g. COLOUR(STRINGS), FONT(STRINGS), etc - the synonym
          TEXT can be used in place of STRINGS). Note, the Size attribute
          specifies the size of key text relative to the size of the numerical
          labels on the vector map axes. Thus a value of 2.0 for Size will
          result in text which is twice the size of the numerical axis labels.
-         The appearance of the example vector is controlled using {\tt "}Curve{\tt "}
+         The appearance of the example vector is controlled using \texttt{"}Curve\texttt{"}
          attributes (e.g. COLOUR(CURVES), etc - the synonym VECTOR can be
          used in place of CURVES). The numerical scale value is formatted as
          an axis 1 value (using attributes FORMAT(1), DIGITS(1), etc - the
@@ -5186,7 +4490,7 @@ for NDF applications.
 
          A comma-separated list of strings should be given in which each
          string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
+         preceded by an up-arrow character \texttt{"}$\wedge$\texttt{"}. Such text files should
          contain further comma-separated lists which will be read and
          interpreted in the same manner. Attribute settings are applied in
          the order in which they occur within the list, with later settings
@@ -5199,8 +4503,8 @@ for NDF applications.
          where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
          the value to assign to the attribute. Default values will be
          used for any unspecified attributes. All attributes will be
-         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
-         Attributes{\tt "} in SUN/95 for a description of the available
+         defaulted if a null value (!) is supplied. See section \texttt{"}Plotting
+         Attributes\texttt{"} in SUN/95 for a description of the available
          attributes. Any unrecognised attributes are ignored (no error is
          reported).
 
@@ -5233,7 +4537,7 @@ for NDF applications.
          the value should be given in the units specified in that frame
          (angstroms, nanometres, etc.). If the wavelength axis has not been
          calibrated, the value will probably need to be supplied in units
-         of pixels. Entering a colon ({\tt "}:{\tt "}) for the parameter will result in
+         of pixels. Entering a colon (\texttt{"}:\texttt{"}) for the parameter will result in
          a description of the current coordinate Frame being shown. This may
          help to determine the units in which a value is expected. The
          value actually used is the closest available value within the
@@ -5261,7 +4565,7 @@ for NDF applications.
          polplot poltab
       }{
          Produces a vector map on the current graphics device with
-         vectors defined in the FITS binary table {\tt "}poltab{\tt "}. The magnitudes
+         vectors defined in the FITS binary table \texttt{"}poltab\texttt{"}. The magnitudes
          are taken from column P, the orientations from column ANG and
          the coordinates of each vector from columns X and Y.
       }
@@ -5284,7 +4588,7 @@ for NDF applications.
 \end{tabular}
 \end{quote}
 
-         then the title is set to {\tt "}My favourite colours{\tt "}; a grid is drawn
+         then the title is set to \texttt{"}My favourite colours\texttt{"}; a grid is drawn
          across the plot instead of tick marks around the edge; the border,
          grid and vectors are drawn in green, blue and red respectively,
          and slightly thicker lines are used to draw the border.
@@ -5308,12 +4612,12 @@ for NDF applications.
 
          \sstitem
          The columns specified by parameters COLX and COLY should hold
-         coordinates in the {\tt "}Base Frame{\tt "} of the WCS information stored as
+         coordinates in the \texttt{"}Base Frame\texttt{"} of the WCS information stored as
          an AST FrameSet (see SUN/210) in the supplied catalogue. If the
          catalogue has been produced by one of the POLPACK application polvec
          or polbin, then the Base Frame will be pixel co-ordinates within the
          aligned intensity images, and these will be stored in columns with
-         names {\tt "}X{\tt "} and {\tt "}Y{\tt "}. If the catalogue was not created by POLPACK, it
+         names \texttt{"}X\texttt{"} and \texttt{"}Y\texttt{"}. If the catalogue was not created by POLPACK, it
          may have no usable WCS information, in which case the supplied
          positions are mapped linearly onto the screen. There is one
          exception to this; if the columns have names RA and DEC then they
@@ -5440,7 +4744,7 @@ for NDF applications.
       }{
          A group specifying the names of the input intensity NDFs. This
          may take the form of a comma separated list, or any of the other
-         forms described in the help on {\tt "}Group Expressions{\tt "}. These images
+         forms described in the help on \texttt{"}Group Expressions\texttt{"}. These images
          must be aligned pixel-for-pixel with the Stokes vectors given by
          CUBE.
       }
@@ -5458,15 +4762,15 @@ for NDF applications.
    }
    \sstexamples{
       \sstexamplesubsection{
-         polsim cube {\tt "}$*$\_A{\tt "} {\tt "}$*$\_sim{\tt "}
+         polsim cube \texttt{"}$*$\_A\texttt{"} \texttt{"}$*$\_sim\texttt{"}
       }{
          A set of intensity images is created holding analysed intensities
-         derived from the Stokes vectors in file {\tt "}cube{\tt "}. Each output image
+         derived from the Stokes vectors in file \texttt{"}cube\texttt{"}. Each output image
          inherits the pixel positions and analyser properties from a
          specified input intensity image. All images in the current
-         directory which have file names ending with {\tt "}\_A{\tt "} are used as the
+         directory which have file names ending with \texttt{"}\_A\texttt{"} are used as the
          input template images, and the output images containing
-         simulated intensity values have the same names, but with {\tt "}\_sim{\tt "}
+         simulated intensity values have the same names, but with \texttt{"}\_sim\texttt{"}
          appended.
       }
    }
@@ -5554,7 +4858,7 @@ for NDF applications.
       }{
          A group specifying the names of the input intensity images or cubes.
          This may take the form of a comma separated list, or any of the other
-         forms described in the help on {\tt "}Group Expressions{\tt "}. These images
+         forms described in the help on \texttt{"}Group Expressions\texttt{"}. These images
          must be aligned pixel-for-pixel.
       }
       \sstsubsection{
@@ -5601,11 +4905,11 @@ for NDF applications.
    }
    \sstexamples{
       \sstexamplesubsection{
-         polstack {\tt "}$*$\_A{\tt "} {\tt "}bin$*${\tt "} 10
+         polstack \texttt{"}$*$\_A\texttt{"} \texttt{"}bin$*$\texttt{"} 10
       }{
-         The intensity images specified by {\tt "}$*$\_A{\tt "} are binned into a set
+         The intensity images specified by \texttt{"}$*$\_A\texttt{"} are binned into a set
          of intensity images each covering a range of 10 degrees of
-         analysis angle. These output images are called {\tt "}bin1{\tt "}, {\tt "}bin2{\tt "},
+         analysis angle. These output images are called \texttt{"}bin1\texttt{"}, \texttt{"}bin2\texttt{"},
          etc.
       }
    }
@@ -5740,10 +5044,10 @@ for NDF applications.
          coordinates and any other known coordinate Frames will be stored in
          the catalogue in textual form, as an AST FrameSet (see SUN/210).
 
-         The storage format of the catalogue is determined by the {\tt "}file
-         type{\tt "} specified with the file name. If no file type is supplied,
+         The storage format of the catalogue is determined by the \texttt{"}file
+         type\texttt{"} specified with the file name. If no file type is supplied,
          the catalogue will be stored in the form of a FITS binary table
-         with file extension {\tt "}.FIT{\tt "}. Other possibilities are described in
+         with file extension \texttt{"}.FIT\texttt{"}. Other possibilities are described in
          SUN/190.
       }
       \sstsubsection{
@@ -5819,7 +5123,7 @@ for NDF applications.
          SIGMAS = \_REAL (Read)
       }{
          Number of standard deviations to reject data at. Only used if
-         METHOD is set to {\tt "}SIGMA{\tt "}. [4.0]
+         METHOD is set to \texttt{"}SIGMA\texttt{"}. [4.0]
       }
       \sstsubsection{
          U = NDF (Write)
@@ -5905,10 +5209,10 @@ for NDF applications.
          comparison takes place. If a non-null value is supplied, the
          version of the installed package is not displayed.
 
-         The supplied string should be in the format {\tt "}V$<$ddd$>$.$<$ddd$>$-$<$ddd$>$,
-         where {\tt "}$<$ddd$>${\tt "} represents a set of digits. The leading {\tt "}V{\tt "} can be
+         The supplied string should be in the format \texttt{"}V$<$ddd$>$.$<$ddd$>$-$<$ddd$>$,
+         where \texttt{"}$<$ddd$>$\texttt{"} represents a set of digits. The leading \texttt{"}V\texttt{"} can be
          omitted, as can any number of trailing fields (missing trailing
-         fields default to zero). {\tt [!]}
+         fields default to zero). \texttt{[!]}
       }
       \sstsubsection{
          RESULT = INTEGER (Write)
@@ -5941,13 +5245,13 @@ for NDF applications.
          Displays the version number of the installed package.
       }
       \sstexamplesubsection{
-         polversion compare={\tt "}V2.3{\tt "}
+         polversion compare=\texttt{"}V2.3\texttt{"}
       }{
          Compares the version of the installed package with the version
-         {\tt "}V2.3{\tt "}, and sets the RESULT parameter appropriately. For
-         instance, if the installed package was {\tt "}V2.2{\tt "} then RESULT
-         would be set to -1. If the installed package was {\tt "}V2.3{\tt "},
-         RESULT would be set to 0. If the installed package was {\tt "}V2.4{\tt "}
+         \texttt{"}V2.3\texttt{"}, and sets the RESULT parameter appropriately. For
+         instance, if the installed package was \texttt{"}V2.2\texttt{"} then RESULT
+         would be set to -1. If the installed package was \texttt{"}V2.3\texttt{"},
+         RESULT would be set to 0. If the installed package was \texttt{"}V2.4\texttt{"}
          RESULT would be set to $+$1.
       }
    }
@@ -5955,10 +5259,10 @@ for NDF applications.
       \sstitemlist{
 
          \sstitem
-         The package version number is obtained from the {\tt "}version{\tt "} file
-         in the directory containing the package{\tt '}s installed executable files.
-         This file is created when the package is installed using the {\tt "}mk
-         install{\tt "} command. An error will be reported if this file cannot be
+         The package version number is obtained from the \texttt{"}version\texttt{"} file
+         in the directory containing the package\texttt{'}s installed executable files.
+         This file is created when the package is installed using the \texttt{"}mk
+         install\texttt{"} command. An error will be reported if this file cannot be
          found.
       }
    }
@@ -5970,7 +5274,7 @@ for NDF applications.
 }
 
 \newpage
-\markboth{\stardocname}{\stardocname}
+
 \section{\label{APP:POL}\xlabel{calculatingthepolarization}Calculating the Polarization for Dual-beam Data}
 This section gives a mathematical description of the calculation of the
 degree and orientation of the polarization for dual-beam data, based on
@@ -6098,7 +5402,7 @@ E and F-factor corrections in mathematical terms.
 Let the intensity in the $O$ and $E$ beams transmitted by the analyser be
 $I_{o}(\alpha)$ and $I_{e}(\alpha)$, where $\alpha$ is the effective
 analyser angle (\emph{i.e.} twice the half-wave plate rotation angle).
-\hyperref{Malus' law}{Malus' law (see appendix }{)}{APP:POL} gives:
+\slhyperref{Malus' law}{Malus' law (see appendix }{)}{APP:POL} gives:
 
 \begin{myquote}
 \begin{eqnarray*}
@@ -6290,17 +5594,17 @@ their exposure factors, and another estimate of the F factor.
 
 \section{\label{APP:GAIA}\xlabel{gaia}Using GAIA to Create an RA/DEC Calibration}
 This section gives a very brief and simple outline of how to add an RA/DEC
-calibration to a 2-dimensional image using \xref{GAIA}{sun214}{} \latex{(see
-SUN/214)}.
+calibration to a 2-dimensional image using \xref{GAIA}{sun214}{} (see
+SUN/214).
 
 \begin{enumerate}
 
 \item Start up GAIA, including the name of the NDF containing the image
 on the command line. For instance,
 
-\begin{verbatim}
-   % gaia fred
-\end{verbatim}
+\begin{terminalv}
+% gaia fred
+\end{terminalv}
 
 will start up GAIA, displaying the image in file \texttt{fred.sdf}. If you
 are using non-NDF images, include the file type (\emph{e.g.} ``\texttt{fred.fit}'').
@@ -6308,10 +5612,8 @@ are using non-NDF images, include the file type (\emph{e.g.} ``\texttt{fred.fit}
 \item Press the \emph{Image-Analysis} menu button. Select the
 \emph{Astrometry calibration} item from the displayed menu, then select
 \emph{Fits to star positions} from the next menu. This should display the
-dialogue box shown in \latex{Figure~\ref{fig:gaia1}.} \html{the next figure:}
+dialogue box shown in Figure~\ref{fig:gaia1}.
 
-\begin{latexonly}
-  \vspace{2mm}
   \begin{figure}[htb]
   \begin{center}
   \includegraphics[clip,scale=0.5]{sun223_figures/gaia1}
@@ -6319,12 +5621,6 @@ dialogue box shown in \latex{Figure~\ref{fig:gaia1}.} \html{the next figure:}
   \label{fig:gaia1}
   \end{center}
   \end{figure}
-\end{latexonly}
-
-\begin{htmlonly}
-\htmlfig{fig:gaia1}{gaia1.png}{
-The main GAIA dialogue box used to create an RA/DEC calibration.}
-\end{htmlonly}
 
 \item Indicate the co-ordinate system in which your feature positions are
 expressed. Do this by specifying suitable values using the \emph{co-ordinate
@@ -6335,10 +5631,8 @@ defaults to B1950 for FK4 positions, and J2000 for FK5 positions.
 \item Press the \emph{New} button, to indicate that you want to add some
 new positions to the (currently empty) list of reference positions. This
 should produce the dialogue box shown in
-\latex{Figure~\ref{fig:gaia2}.} \html{the next figure:}
+Figure~\ref{fig:gaia2}.
 
-\begin{latexonly}
-  \vspace{2mm}
   \begin{figure}[htb]
   \begin{center}
   \includegraphics[clip,scale=0.5]{sun223_figures/gaia2}
@@ -6346,15 +5640,9 @@ should produce the dialogue box shown in
   \label{fig:gaia2}
   \end{center}
   \end{figure}
-\end{latexonly}
-
-\begin{htmlonly}
-\htmlfig{fig:gaia2}{gaia2.png}{
-The GAIA dialogue box used to give a new reference position.}
-\end{htmlonly}
 
 \item Now press the \emph{Pick object...} button. This will create the
-dialogue box shown in \latex{Figure~\ref{fig:gaia3}.} \html{the next figure.}
+dialogue box shown in Figure~\ref{fig:gaia3}.
 The upper black box displays a section of the main image centred on the position
 of the cursor. Position the cursor in the main GAIA window over a feature
 (usually a star) for which you know the RA/DEC. This star should appear
@@ -6367,8 +5655,6 @@ mouse button. The pixel co-ordinates at the centre of the feature are
 displayed in the \emph{Image X:} and \emph{Image Y:} fields within the
 object picker dialogue box
 
-\begin{latexonly}
-  \vspace{2mm}
   \begin{figure}[htb]
   \begin{center}
   \includegraphics[clip,scale=0.5]{sun223_figures/gaia3}
@@ -6376,12 +5662,6 @@ object picker dialogue box
   \label{fig:gaia3}
   \end{center}
   \end{figure}
-\end{latexonly}
-
-\begin{htmlonly}
-\htmlfig{fig:gaia3}{gaia3.png}{
-The GAIA object picker dialogue box.}
-\end{htmlonly}
 
 \item Raise the dialogue box shown in Figure~\ref{fig:gaia2}. You should
 find that the pixel co-ordinates of the star have been copied into the
@@ -6522,48 +5802,39 @@ allows variances for the output Stokes vectors to be created, and also
 allows the iterative rejection of bad data. This option can be used by
 setting POLCAL parameter WEIGHTS to 3. The technique is described in the
 following pseudo-code, and is illustrated diagrammatically in
-\latex{Figure~\ref{fig:varest}:} \html{the next figure:}
+Figure~\ref{fig:varest}:
 
-\begin{verbatim}
-    1    Fill the variance image with the value 1.0
-    2    Calculate Stokes vectors
-    3    Set ITER = 0
-    4    While ( not converged and ITER < MAXIT ) do...
-    5       Reduce the noise in the Stokes vectors
-    6       Calculate expected intensity values implied by the smoothed
-            I, Q and U values
-    7       Find the squared residuals between these intensity estimates
-            and the observed intensity values
-    8       Find the mean squared residual at each pixel position
-    9       Smooth the image holding these mean squared residual values
-    10      Copy this smoothed image to the current variance image
-    11      Copy the input intensity values, excluding values for which
-            the squared residual found above is too large
-    12      Calculate I, Q and U again using only the copied input values,
-            and the current variance image
-    13      Set ITER = ITER + 1
-    14   End do
-    15   Reject any Stokes vectors corresponding to pixel with few good
-         input intensity values.
-\end{verbatim}
+\begin{terminalv}
+1    Fill the variance image with the value 1.0
+2    Calculate Stokes vectors
+3    Set ITER = 0
+4    While ( not converged and ITER < MAXIT ) do...
+5       Reduce the noise in the Stokes vectors
+6       Calculate expected intensity values implied by the smoothed
+          I, Q and U values
+7       Find the squared residuals between these intensity estimates
+          and the observed intensity values
+8       Find the mean squared residual at each pixel position
+9       Smooth the image holding these mean squared residual values
+10      Copy this smoothed image to the current variance image
+11      Copy the input intensity values, excluding values for which
+          the squared residual found above is too large
+12      Calculate I, Q and U again using only the copied input values,
+          and the current variance image
+13      Set ITER = ITER + 1
+14   End do
+15   Reject any Stokes vectors corresponding to pixel with few good
+       input intensity values.
+\end{terminalv}
 
-\begin{latexonly}
-  \vspace{2mm}
   \begin{figure}[htbp]
   \begin{center}
   \includegraphics[clip,scale=0.9]{sun223_figures/varest}
-  \caption{The estimation of input variances. The observed and expected
+  \caption[The estimation of input variances.]{The estimation of input variances. The observed and expected
            intensity images are combined to form a single variance image.}
   \label{fig:varest}
   \end{center}
   \end{figure}
-\end{latexonly}
-
-\begin{htmlonly}
-\htmlfig{fig:varest}{varest.png}{
-The estimation of input variances. The observed and expected
-intensity images are combined to form a single variance image.}
-\end{htmlonly}
 
 Each step in this process is described further below:
 
@@ -6643,29 +5914,19 @@ mean of the values within a box centred on the pixel. The smoothing
 performed by POLCAL is not done in this way. Instead, a quadratic surface
 is fitted to the data in the box, and the value of the fitted surface at
 the central pixel is taken as the smoothed pixel value. This method is
-illustrated in \latex{Figure~\ref{fig:quadfit}.} \html{the next figure:}
+illustrated in Figure~\ref{fig:quadfit}.
 
-\begin{latexonly}
-  \vspace{2mm}
   \begin{figure}[htbp]
   \begin{center}
   \includegraphics[clip,scale=0.75]{sun223_figures/quadfit}
-  \caption{A 1-dimensional representation of the smoothing performed by
+  \caption[A 1-D representation of the smoothing performed in
+  single-beam mode.]{A 1-dimensional representation of the smoothing performed by
            POLCAL in single-beam mode. In this example, each pixel is
            replaced by the value of a quadratic surface fitted to the
            nearest 5 data values.}
   \label{fig:quadfit}
   \end{center}
   \end{figure}
-\end{latexonly}
-
-\begin{htmlonly}
-\htmlfig{fig:quadfit}{quadfit.png}{
-A 1-dimensional representation of the smoothing performed by
-POLCAL in single-beam mode. In this example, each pixel is
-replaced by the value of a quadratic surface fitted to the
-nearest 5 data values.}
-\end{htmlonly}
 
 \item Equation \ref{EQN:IEXP} is used to calculate the intensity
 values which would be expected on the basis of the smoothed Stokes vectors.
@@ -6785,7 +6046,7 @@ Figure~\ref{fig:polext} lists the items which may be stored in the
 POLPACK extension within a data file. The \htmlref{POLEXP}{POLEXP} and
 \htmlref{POLIMP}{POLIMP} applications may be used to transfer these items
 to and from a set of corresponding FITS keywords. \htmlref{POLEXT}{POLEXT}
-can be used to set them to explicit values (see \hyperref{here}{section }
+can be used to set them to explicit values (see \slhyperref{here}{section }
 {}{SEC:IMPORT}). The contents of the POLPACK extension within an NDF may be
 examined using POLEXT or the \xref{\texttt{hdstrace}}{sun102}{} command.
 
@@ -6799,8 +6060,6 @@ is read by an earlier version of POLPACK, a default value of zero will be
 adopted for the missing ANGROT extension item (\emph{i.e.} it will be
 assumed that the reference direction is parallel to the first image axis).
 
-
-\begin{latexonly}
   \begin{figure}[htbp]
   \begin{center}
   \includegraphics[clip,scale=0.75]{sun223_figures/polext}
@@ -6808,12 +6067,6 @@ assumed that the reference direction is parallel to the first image axis).
   \label{fig:polext}
   \end{center}
   \end{figure}
-\end{latexonly}
-
-\begin{htmlonly}
-\htmlfig{fig:polext}{polext.png}{
-The allowed items within the POLPACK extension.}
-\end{htmlonly}
 
 \section{\label{APP:HISTORY}History}
 This section describes the major changes introduced at each release of
@@ -6886,7 +6139,7 @@ interactive use.
 
 \item Two new hidden commands POLWRTCL and POLRDCL have been added to
 transfer catalogue data to and from the polarimetry toolbox within
-\xref{GAIA}{sun214}{} \latex{(SUN/214)}. These commands are not
+\xref{GAIA}{sun214}{} (SUN/214). These commands are not
 designed for interactive use.
 
 \item POLIMP has a new parameter called ABORT which can be set TRUE
@@ -6905,7 +6158,7 @@ vectors for a grid of bins determined by the BOX parameter, as before.
 
 \item Two new hidden commands POLWRTCL and POLRDTCL have been added to
 transfer catalogue data to and from the polarimetry toolbox within
-\xref{GAIA}{sun214}{} \latex{(SUN/214)}. These commands are not
+\xref{GAIA}{sun214}{} (SUN/214). These commands are not
 designed for interactive use.
 \end{itemize}
 
@@ -7143,33 +6396,42 @@ used to specify the widths of the margins left for axis annotation around
 the vector map.
 \end{itemize}
 
-\newpage
 \begin{latexonly}
-\quickdes{POLBIN}{Bins a catalogue containing Stokes vectors.}{ POLBIN }
 
-\quickdes{POLCAL}{Calculates Stokes vectors from a set of aligned intensity images.}{ POLCAL }
+\cleardoublepage
 
-\quickdes{POLEXP}{Exports POLPACK information within an NDF to a FITS extension.}{ POLEXP }
+\latexonlysection{Backpage alphabetic listing}
 
-\quickdes{POLEXT}{Sets explicit values in the POLPACK extension.}{ POLEXT }
+%
+% set up a mini table of contents for the back pages of document.
+%
 
-\quickdes{POLIMP}{Imports POLPACK information into an NDF from a FITS extension.}{ POLEXP }
+\quickdes{POLBIN}{Bins a catalogue containing Stokes vectors.}{POLBIN}
 
-\quickdes{POLHELP}{Displays textual help information for POLPACK.}{ POLHELP }
+\quickdes{POLCAL}{Calculates Stokes vectors from a set of aligned intensity images.}{POLCAL}
 
-\quickdes{POLIMAGE}{Converts a catalogue into an NDF.}{ POLIMAGE }
+\quickdes{POLEXP}{Exports POLPACK information within an NDF to a FITS extension.}{POLEXP}
 
-\quickdes{POLKA}{An X-based GUI which converts raw photometric images into Stokes vectors.}{ POLKA }
+\quickdes{POLEXT}{Sets explicit values in the POLPACK extension.}{POLEXT}
 
-\quickdes{POLPLOT}{Displays polarization vectors supplied in a catalogue.}{ POLPLOT }
+\quickdes{POLIMP}{Imports POLPACK information into an NDF from a FITS extension.}{POLEXP}
 
-\quickdes{POLROTREF}{Rotates the reference direction for a pair of Q and U images.}{ POLROTREF }
+\quickdes{POLHELP}{Displays textual help information for POLPACK.}{POLHELP}
 
-\quickdes{POLSIM}{Produces intensity images corresponding to given Stokes vectors.}{ POLSIM }
+\quickdes{POLIMAGE}{Converts a catalogue into an NDF.}{POLIMAGE}
 
-\quickdes{POLSTACK}{Stack a set of intensity images.}{ POLSTACK }
+\quickdes{POLKA}{An X-based GUI which converts raw photometric images into Stokes vectors.}{POLKA}
 
-\quickdes{POLVEC}{Converts a Stokes vector cube into a catalogue of polarization vectors.}{ POLVEC }
+\quickdes{POLPLOT}{Displays polarization vectors supplied in a catalogue.}{POLPLOT}
+
+\quickdes{POLROTREF}{Rotates the reference direction for a pair of Q and U images.}{POLROTREF}
+
+\quickdes{POLSIM}{Produces intensity images corresponding to given Stokes vectors.}{POLSIM}
+
+\quickdes{POLSTACK}{Stack a set of intensity images.}{POLSTACK}
+
+\quickdes{POLVEC}{Converts a Stokes vector cube into a catalogue of polarization vectors.}{POLVEC}
+
 \end{latexonly}
 
 \end{document}
