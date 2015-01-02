@@ -1,12 +1,7 @@
-\documentclass[nolof,twoside,11pt]{starlink}
+\documentclass[twoside,11pt]{starlink}
 
 % ? Specify used packages
-%\usepackage        %  Use this one for final production.
-%% \usepackage %  Use this one for drafting.
-%\usepackage  %  Ensure sensible hyphenation (esp. linux)
 % ? End of specify used packages
-
-
 
 % -----------------------------------------------------------------------------
 % ? Document identification
@@ -43,57 +38,6 @@ programs.
 
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%     {Add further history here}
-%
-% -
-
-\stardocname  {\stardocinitials /\stardocnumber}
-
-%\setlength{\textwidth}{160mm}
-%\setlength{\textheight}{230mm}
-%\setlength{\topmargin}{-2mm}
-%\setlength{\oddsidemargin}{0mm}
-%\setlength{\evensidemargin}{0mm}
-%\setlength{\parindent}{0mm}
-%\setlength{\parskip}{\medskipamount}
-%\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \providecommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
 % ? Document specific \providecommand or \newenvironment commands.
 
 % Size of \tt text - looks better smaller in LaTeX but not HTML.
@@ -103,25 +47,25 @@ programs.
 \newenvironment{myquote}{\begin{quote}}{\end{quote}}
 
 % In-line typed text, buttons and menu items.
-\providecommand{\butt}[1]{{\ttsize \bf \tt #1}}
-\providecommand{\menu}[1]{{\ttsize \bf \em #1}}
-\providecommand{\wlab}[1]{{\ttsize \bf #1}}
+\providecommand{\butt}[1]{{\ttsize \textbf{\texttt{#1}}}}
+\providecommand{\menu}[1]{{\ttsize \textbf{\emph{#1}}}}
+\providecommand{\wlab}[1]{{\ttsize \textbf{#1}}}
 \renewcommand{\text}[1]{\texttt{#1}}
 
 % Quick routine descriptions
 \providecommand{\quickdes}[3]{
-                         \parbox{1.1in}{\bf #1}
+                         \parbox{1.1in}{\textbf{#1}}
                          \parbox{4.4in}{\raggedright #2 \dotfill}
                          \parbox{0.6in}{\pageref{#3}}
                          \vspace*{0.2in}}
 
 % Quotes for SST.
-\providecommand{\qt}[1]{{\tt "}#1{\tt "}}
-\providecommand{\qs}[1]{{\tt '}#1{\tt '}}
+\providecommand{\qt}[1]{\texttt{"}#1\texttt{"}}
+\providecommand{\qs}[1]{\texttt{'}#1\texttt{'}}
 
 % Routines with descriptions in the appendix.
-\providecommand{\routine}[1]{{\sc #1}}
-\providecommand{\xroutine}[1]{\htmlref{{\sc #1}}{#1}}
+\providecommand{\routine}[1]{\textsc{#1}}
+\providecommand{\xroutine}[1]{\htmlref{\textsc{#1}}{#1}}
 
 % Reference to a section of this document.
 \providecommand{\secref}[2]{\latexhtml{Section \ref{#1} ``#2''}{``\htmlref{#2}{#1}''}}
@@ -129,10 +73,6 @@ programs.
 % Latex only sections, subsections etc. Surround these with a latexonly
 % environment.
 \providecommand{\latexonlysection}[1]{\section{#1}}
-\providecommand{\latexonlysubsection}[1]{\subsection{#1}}
-\providecommand{\latexonlysubsubsection}[1]{\subsubsection{#1}}
-
-
 
 % Figure environment. Defined for latex2html. #1 is postscript file
 % #2 the qualifiers, #3 the gif file, #4 the label, #5 the caption.
@@ -144,46 +84,12 @@ programs.
   \end{figure}
   }
 
-
-
-%+
-%  Name:
-%.
-
-
-
-
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
 \begin{document}
 \scfrontmatter
-
-
-%  ==========================
-
-
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    %\setlength{\parskip}{0mm}
-    
-    %\setlength{\parskip}{\medskipamount}
-    
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-
 
 \section{\xlabel{introduction}Introduction}
 
@@ -1434,7 +1340,7 @@ Normally if you have no bias frames then your data should already be
 debiassed (this is typically an observing option), in this case unless
 you want to remove defective pixels (\htmlref{ARD}{datamasks} files can
 be easily generated from a glitch file as it has a PIXEL keyword
-\latexonly{ -- see \S\ref{datamasks}}),
+ -- see \S\ref{datamasks}),
 and/or generate error estimates for your data (the \xref{PHOTOM
 -- SUN/45}{sun45}{} package can make use of these), you can miss out
 the debiassing stage. If you want to pass your data through \xroutine{DEBIAS} use
@@ -4973,8 +4879,7 @@ values are expected to be present, it is very difficult to perform
 better than the median, and this is the normal default.
 
 \newpage
-\begin{latexonly}
-\latexonlysubsection{Alphabetic list of CCDPACK routines.}
+\subsection{Alphabetic list of CCDPACK routines.}
 %
 % set up a mini table of contents for this section pointing into next section.
 %
@@ -5082,7 +4987,6 @@ better than the median, and this is the normal default.
 \quickdes{WCSREG}{Aligns images using multiple coordinate systems.}{WCSREG}
 
 \quickdes{XREDUCE}{Starts the automated CCD data reduction GUI.}{XREDUCE}
-\end{latexonly}
 
 \subsection{Complete routine descriptions \label{descriptions}}
 
@@ -19208,7 +19112,7 @@ This is a major update to CCDPACK.
        \end{itemize}
     The following script is affected:
        \begin{itemize}
-       \item \xroutine{CCDEXERCISE}
+       \item \textsc{CCDEXERCISE}
        \end{itemize}
 
     \item
@@ -19646,4 +19550,3 @@ This is a major update to CCDPACK.
 
 \end{document}
 
-% $Id$
