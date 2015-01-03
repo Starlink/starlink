@@ -1,148 +1,28 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt]{starlink}
 
 % ? Specify used packages
-\usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
-
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun137.7}
-\newcommand{\stardocnumber}    {137.7}
-\newcommand{\stardocauthors}   {Paul Harrison, Paul Rees, \\
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun137.7}
+\stardocnumber      {137.7}
+\stardocauthors   {Paul Harrison, Paul Rees, \\
                                 Peter Draper, Alasdair Allan }
-\newcommand{\stardocdate}      {27 March 2008}
-\newcommand{\stardoctitle}     {PONGO\\[\latex{2ex}]
-   A Set of Applications for Interactive Data Plotting \\[\latex{2ex}]
-   Version 2.0-2}
-\newcommand{\stardocversion}   {2.0-3}
-\newcommand{\stardocmanual}    {User's Manual}
-\newcommand{\stardocabstract}  {PONGO is a suite of commands for
+\stardocdate        {27 March 2008}
+\stardoctitle       {PONGO ---
+   A Set of Applications for Interactive Data Plotting}
+\stardocversion     {2.0-3}
+\stardocmanual      {User's Manual}
+\startitlepic{\includegraphics[width=0.5\textwidth]{sun137_cover}}
+\stardocabstract  {PONGO is a suite of commands for
 interactively plotting data stored in text files.}
 
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document specific \providecommand or \newenvironment commands.
 
 % Definition of 'starheadings' page style
 % Note the use of ##1 for parameter of \def\sectionmark inside the
@@ -153,412 +33,34 @@ interactively plotting data stored in text files.}
 
 \raggedbottom
 \sloppy
-\newcommand{\eg}{{\em e.g.\ }}
-\newcommand{\ie}{{\em i.e.\ }}
-\newcommand{\etc}{{\em etc.}}
-
-\newcommand{\halfpfig} [4] {
-  \begin{figure}[htbp]
-    \setlength{\unitlength}{1in}
-    \centering\includegraphics[clip,width=#4]{#1}
-    \typeout{#1 inserted on page \arabic{page}}
-    \caption{#2}
-    \label{#2}
-  \end{figure}
-}
-\begin{htmlonly}
-   \newcommand{\halfpfig}[4]{
-      \htmladdimg{#3}\\
-      Figure: \label{#2} #2
-   }
-\end{htmlonly}
+\providecommand{\eg}{\emph{e.g.\ }}
+\providecommand{\ie}{\emph{i.e.\ }}
+\providecommand{\etc}{\emph{etc.}}
 
 % Column label definitions.
-\newcommand{\xcol}{{\sf XCOL}}
-\newcommand{\excol}{{\sf EXCOL}}
-\newcommand{\ycol}{{\sf YCOL}}
-\newcommand{\eycol}{{\sf EYCOL}}
-\newcommand{\zcol}{{\sf ZCOL}}
-\newcommand{\symcol}{{\sf SYMCOL}}
-\newcommand{\labcol}{{\sf LABCOL}}
+\providecommand{\xcol}{\textsf{XCOL}}
+\providecommand{\excol}{\textsf{EXCOL}}
+\providecommand{\ycol}{\textsf{YCOL}}
+\providecommand{\eycol}{\textsf{EYCOL}}
+\providecommand{\zcol}{\textsf{ZCOL}}
+\providecommand{\symcol}{\textsf{SYMCOL}}
+\providecommand{\labcol}{\textsf{LABCOL}}
 
 % Types for various entities.
-\newcommand{\pnam}[1]{{\tt #1}}
-\newcommand{\cnam}[1]{{\tt #1}}
+\providecommand{\pnam}[1]{\texttt{#1}}
+\providecommand{\cnam}[1]{\texttt{#1}}
 
 % Internal cross-reference to labels (uses text description, ignored
 % by Latex).
-\newcommand{\iref} [1]{\htmlref{#1}{#1}}
-\newcommand{\iiref}[2]{\htmlref{#1}{#2}}
-
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
-
-
+\providecommand{\iref} [1]{\htmlref{#1}{#1}}
+\providecommand{\iiref}[2]{\htmlref{#1}{#2}}
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Large\bf  \stardoctitle \\ [3.0ex]}
-   \setlength{\unitlength}{1in}
-   \centering \includegraphics[width=100mm]{sun137_cover}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-%   \vspace{10mm}
-%   \begin{center}
-%      {\Large\bf Abstract}
-%   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-
-   \htmladdimg{main.png}
-
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-%  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-%\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
- \cleardoublepage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
- \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-\newpage
+\scfrontmatter
 
 \section{Introduction}
 
@@ -583,9 +85,9 @@ Some highlights of PONGO are:
   \item the ability to read in positions of Right Ascension and
     Declination in the format
     \begin{quote}
-\begin{verbatim}
-   HH:MM:SS.SSS   +DD:MM:SS.SSS
-\end{verbatim}
+\begin{terminalv}
+HH:MM:SS.SSS   +DD:MM:SS.SSS
+\end{terminalv}
     \end{quote}
   \end{itemize}
 \item Plots of astronomical positional data can be made in one of several
@@ -638,11 +140,9 @@ languages.
 \subsection{An ICL example}
 
 In order to start PONGO you must first start ICL. This may be done by typing:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 % pongo
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 at C-shell the prompt. Or alternatively by starting ICL then using the
 \verb+pongo+ command.
 
@@ -650,11 +150,9 @@ In any PONGO session the first action is to open the plotting device.
 This is done by typing\footnote{ If you have already used PONGO then
 you should also issue the \cnam{\iref{RESETPONGO}} command immediately
 after \cnam{\iref{BEGPLOT}}.}:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL> begplot xw
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 Where `\verb+xw+' should be replaced by the name of the plotting device you
 are intending to use.  Note that once you have begun a PONGO session
@@ -671,41 +169,31 @@ not possible at this time to use an environment variable for accessing
 formatted files. The actual file is
 \texttt{\$PONGO\_EXAMPLES/tutorial.dat}:
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 PONGO> readf data=(TUTORIAL_DATA) xcol=1 ycol=3 all
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 Plotting limits are set up using the range of the data by the command:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 PONGO> dlimits
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 Axes for the plot may be drawn using:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 PONGO> boxframe
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 and finally the points may be plotted as asterisk-like symbols and the axes
 labelled with:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 PONGO> points 3
 PONGO> label 'X axis' 'Y axis' 'Plot Title'
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 Note that the data values are remembered by PONGO and the plot you have
 just created may be erased and recreated by typing:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 PONGO> advance
 PONGO> boxframe
 PONGO> points
 PONGO> label
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 To close a device and end a PONGO plot the command
 \cnam{\iref{ENDPLOT}} should be used.  This is important if you are
 going to switch to another set of applications such as
@@ -719,40 +207,30 @@ In order to start PONGO you must first start CL and load the
 
 In any PONGO session the first action is to open the plotting device.
 This is done by typing\footnote{ If you have already used PONGO then
-you should also issue the \cnam{\iref{resetpongo}} command immediately
-after \cnam{\iref{begplot}}.}:
-\begin{quote}
-\begin{verbatim}
+you should also issue the \cnam{\iref{RESETPONGO}} command immediately
+after \cnam{\iref{BEGPLOT}}.}:
+\begin{terminalv}
 po> begplot xw
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 Where `\verb+xw+' should be replaced by the name of the plotting device you
 are intending to use. The data may then be read using the command:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 po> readf data=pongoexamples$tutorial.dat xcol=1 ycol=3 all=yes
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 Plotting limits are set up using the range of the data by the command:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 po> dlimits
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 Axes for the plot may be drawn using:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 po> boxframe
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 and finally the points may be plotted as asterisk-like symbols and the axes
 labelled with:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 po> points 3
 po> label "X axis" "Y axis" "Plot Title"
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 To close a device and end a PONGO plot the command:
 \cnam{\iref{ENDPLOT}} should be used.
 
@@ -980,11 +458,9 @@ It is possible to give each column in a file a symbolic name that can be used
 to reference the column when reading the file and can be automatically
 transferred to the appropriate axis label on the plot.
 To do this, the first line of the file should be of the form:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 !$label 1$label 2$label 3$
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 where there are as many labels, each delimited by a \verb+$+, as there are
 columns.
 Care should be taken to ensure that there is no leading white space in the
@@ -993,14 +469,12 @@ white space elsewhere.
 Any padding that is required to make the column labels line up with the data
 columns should be achieved with multiple dollar signs,
 \eg:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 !$RA$$$$Declination$
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 When specifying the column on the command line, \eg \cnam{YCOL Dec},
 it is permissible to abbreviate the string to a minimum match.
-However, {\em the match is case-sensitive.}
+However, \emph{the match is case-sensitive.}
 
 
 \subsection{Comments}
@@ -1027,7 +501,7 @@ character is put at the start of the line or not.
 
 It is possible to read data stored in an astronomical coordinate
 format (\ie \verb+HH:MM:SS.SSS+ and \verb+DD:MM:SS.SSS+) into PONGO.
-The data is stored internally in {\em radians}: in this conversion any data
+The data is stored internally in \emph{radians}: in this conversion any data
 read into \xcol\ is assumed to be a Right Ascension (\ie of the first
 form above) and any data read into \ycol\ is assumed to be a
 Declination (\ie of the second form above).
@@ -1126,7 +600,7 @@ PONGO is capable of plotting astronomical coordinate data in one of several
 `projections' are true projections onto a plane, but are geometries that have
 other properties -- \eg the equal area property where areas are preserved in
 the transformation from the celestial sphere to a two dimensional plot).
-{\em Table \ref{proj_tab}} lists the geometries available in PONGO.
+\emph{Table \ref{proj_tab}} lists the geometries available in PONGO.
 
 All the main point plotting commands will work in any of the available
 geometries.
@@ -1181,20 +655,18 @@ Repeating complex sequences of PONGO commands by hand can become
 boring and is likely to lead to many mistakes (particularly on those
 occasions when you want to create a hardcopy and cannot even see the
 current state). The way to get around these problems is to use the
-abilities of the ICL or CL command languages to create {\em
-procedures}.
+abilities of the ICL or CL command languages to create \emph{procedures}.
 
 The following two sections show extremely simple examples of how to
 start doing this in both languages. To get further you'll need to
 consult the appropriate documentation, \xref{SG/5}{sg5}{} in the case
-of ICL and the ``{\em CL Programmer's Manual}'' and
-``{\em An Introductory User's Guide to IRAF Scripts}'' for CL.
+of ICL and the ``\emph{CL Programmer's Manual}'' and
+``\emph{An Introductory User's Guide to IRAF Scripts}'' for CL.
 
 \subsection{A simple ICL procedure}
 
 A simple procedure that reproduces the tutorial example looks like:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 proc icltest file
    begplot xw
    readf data=(file) xcol=1 ycol=3 all reset
@@ -1204,58 +676,46 @@ proc icltest file
    label 'X axis' 'Y axis' 'PLOT TITLE'
    endplot
 endproc
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 If you enter this text into a file say called \verb+icltest.icl+ and use
 the following commands from ICL:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL > load icltest
 ICL > icltest (TUTORIAL_DATA)
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 The data from the tutorial example will be plotted as before. One
 immediate advantage of this method is that we can now plot data from
 columns 1 and 3 of any file.
 
 If the contents of the procedure are wrong or need a slight
 modification then you can edit the procedure from ICL. Try the command:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL > edit icltest
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 This puts you into an editor and you can modify the procedure. (If you
 haven't set an environment variable EDITOR or used the ICL command
 \verb+set editor+, you'll find yourself in \verb+vi+. To exit from this
 type the command \verb+:q+ and now use the \verb+set editor+
 command.) If you made a modification to the procedure this can be
 viewed using the command:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL > list icltest
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 All the currently available procedures are shown using the command:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL > procs
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 If you do modify a procedure from ICL use the:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL > save icltest
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 command to write out your changes (you should use the name of your procedure
 instead of \verb+icltest+).
 
 \subsection{A simple CL procedure}
 
 A simple CL procedure that reproduces the tutorial example looks like:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 procedure cltest (datafile)
 string datafile
 begin
@@ -1267,16 +727,13 @@ begin
    label ("X axis", "Y axis", "PLOT TITLE")
    endplot
 end
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 If you enter this text into a file say called \verb+cltest.cl+ and use
 the following commands from CL.
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 po> task cltest = cltest.cl
 po> cltest pongoexamples$tutorial.dat
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 The data from the tutorial example will be plotted as before. One
 immediate advantange of this method is that we can now plot data from
 columns 1 and 3 of any file.
@@ -1295,21 +752,17 @@ found in the directories \verb+$PONGO_EXAMPLES+  and
 
 The ICL procedures will prompt for a graphics device and should be
 invoked from the \verb+ICL>+ prompt using the ICL command \verb+load+, \eg:
-\begin {quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL> load $PONGO_EXAMPLES/ppdotdiag
-\end{verbatim}
-\end {quote}
+\end{terminalv}
 and their execution can be followed if the ICL command \verb+set trace+ has
 previously been executed.
 
 The CL procedures are defined as tasks by the \verb+pongo+ command and
 can be run by just typing their name \ie:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 po> ppdotdiag
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 Note that some of the examples involve the colour representation of lines,
 which may be difficult to see on a greyscale device (\eg on a monochrome
@@ -1321,7 +774,7 @@ example procedures.
 
 \subsubsection{Spectrum}
 
-This procedure produces {\em Figure \ref{SPECTRUM}}, a plot of a
+This procedure produces \emph{Figure \ref{fig:SPECTRUM}}, a plot of a
 low resolution
 IUE spectrum extracted by \xref{IUEDR (SUN/37)}{sun37}{} and written using the
 IUEDR command \verb+OUTSPEC SPECTYPE=2+.
@@ -1333,64 +786,62 @@ fluxes to the affected wavelength samples.
 These can be detected and discarded using the \pnam{SELCOND} parameter of
 the \cnam{\iref{READF}} command: \eg
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 PONGO> readf (SWP_DATA) selcond="Flux > 0.0" noall
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 In this example PONGO draws a polyline across all missing data flagged by
 IUEDR.
 
-\halfpfig{sun137_fig1}{SPECTRUM}{spectrum.png}{6in}
+\myfig{sun137_fig1}{[htpb]}{width=0.9\textwidth}{fig:SPECTRUM}{SPECTRUM example.}{SPECTRUM example.}
 \newpage
 
 
 \subsubsection{Errors}
 
-The procedure \verb+ERRORS+ was used to plot {\em Figure
-\ref{ERRORS}}.  This example demonstrates plotting simple error
+The procedure \verb+ERRORS+ was used to plot \emph{Figure
+\ref{fig:ERRORS}}.  This example demonstrates plotting simple error
 bars using PONGO (the \cnam{\iref{ERRORBAR}} command) and also
 performing simple statistics on the data (the \cnam{\iref{FITLINE}}
 and \cnam{\iref{FITCURVE}} commands).  Note that a summary of the
 statistics is reported for each fit to the data.
 
-\halfpfig{sun137_fig2}{ERRORS}{errors.png}{6in}
+\myfig{sun137_fig2}{[htbp]}{width=0.9\textwidth}{fig:ERRORS}{ERRORS example.}{ERRORS example.}
 \newpage
 
 
 \subsubsection{Histogram}
 
 The procedure \verb+HISTOGRAM+ (\verb+histogramtest+ from CL) was used to
-plot {\em Figure \ref{HISTOGRAM}}, which illustrates the plotting
+plot \emph{Figure \ref{fig:HISTOGRAM}}, which illustrates the plotting
 of histograms with PONGO (the \cnam{\iref{PLOTHIST}} command).  This
 procedure also illustrates how the drawing of the box around the plot
 can be controlled using the \cnam{\iref{BOXFRAME}} command.
 
-\halfpfig{sun137_fig3}{HISTOGRAM}{histogram.png}{6in}
+\myfig{sun137_fig3}{[htbp]}{width=0.9\textwidth}{fig:HISTOGRAM}{HISTOGRAM example.}{HISTOGRAM example.}
 \newpage
 
 
 \subsubsection{Ppdotdiag}
 
-This procedure produces {\em Figure \ref{PPDOTDIAG}}, a period
+This procedure produces \emph{Figure \ref{fig:PPDOTDIAG}}, a period
 versus period derivative diagram for pulsars.  Note the use of a
 column within the data file to set the symbol number of each plotted
 point, and the use of the \verb+PONGO_NDATA+ global parameter for
 making a title containing the number of points that have been read in
 (in CL this uses the output parameter \verb+readf.ndata+)
 
-\halfpfig{sun137_fig4}{PPDOTDIAG}{ppdotdiag.png}{6in}
+\myfig{sun137_fig4}{[htbp]}{width=0.9\textwidth}{fig:PPDOTDIAG}{PPDOTDIAG example.}{PPDOTDIAG example.}
 \newpage
 
 
 \subsubsection{Ellipses}
 
 The procedure \verb+ELLIPSES+ (\verb+ellipsetest+ from CL) was used to plot
-{\em Figure \ref{ELLIPSES}}, which illustrates the use of the
+\emph{Figure \ref{fig:ELLIPSES}}, which illustrates the use of the
 \cnam{\iref{ELLIPSES}} command for plotting error ellipses.
 
-\halfpfig{sun137_fig5}{ELLIPSES}{ellipses.png}{6.5in}
+\myfig{sun137_fig5}{[htbp]}{width=\textwidth}{fig:ELLIPSES}{ELLIPSES example.}{ELLIPSES example.}
 \newpage
 
 
@@ -1399,9 +850,9 @@ The procedure \verb+ELLIPSES+ (\verb+ellipsetest+ from CL) was used to plot
 This procedure illustrates some of the different `geometries'
 available in PONGO.  It plots four different views of the distribution
 of a selection of the known pulsars in Right Ascension and Declination
-to produce {\em Figure \ref{PROJECTIONS}}.
+to produce \emph{Figure \ref{fig:PROJECTIONS}}.
 
-\halfpfig{sun137_fig6}{PROJECTIONS}{projections.png}{6in}
+\myfig{sun137_fig6}{[htbp]}{width=0.9\textwidth}{fig:PROJECTIONS}{PROJECTIONS example.}{PROJECTIONS example.}
 \newpage
 
 \subsubsection{Radec}
@@ -1409,10 +860,11 @@ to produce {\em Figure \ref{PROJECTIONS}}.
 This procedure shows how the \cnam{\iref{BOXFRAME}} command can be
 used to draw labels in \verb+HH MM SS.S+ \& \verb+DD MM SS.S+
 format.
-The output from it is shown in {\em Figure \ref{RADEC}}.
+The output from it is shown in \emph{Figure \ref{fig:RADEC}}.
 The objects are some of the pulsars from
-{\em Figures \ref{PROJECTIONS}} and {\em \ref{PPDOTDIAG}}.
-\halfpfig{sun137_fig7}{RADEC}{radec.png}{6in}
+\emph{Figures \ref{fig:PROJECTIONS}} and \emph{\ref{fig:PPDOTDIAG}}.
+
+\myfig{sun137_fig7}{[htbp]}{width=0.9\textwidth}{fig:RADEC}{RADEC example.}{RADEC example.}
 \newpage
 
 \subsubsection{Vector}
@@ -1422,7 +874,7 @@ bright stars. The stars are selected to have proper motions in
 RA greater than 0.5 arcseconds and the distances shown correspond to
 100000 years of travel.
 
-\halfpfig{sun137_fig9}{VECTOR}{vector.png}{6in}
+\myfig{sun137_fig9}{[htbp]}{width=0.9\textwidth}{fig:VECTOR}{VECTOR example.}{VECTOR example.}
 \newpage
 
 \subsubsection{Interactive}
@@ -1432,8 +884,7 @@ experience with the \cnam{\iref{CURSE}} application.  This can be done
 using the procedure \verb+INTERACTIVE+.  The procedure will plot a
 graph and then invoke the \cnam{\iref{CURSE}} application, resulting
 in the following instructions being printed on the screen:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 CURSE cursor options:
    Q - Quit.
    D - Draw to the cursor position.
@@ -1447,8 +898,7 @@ CURSE cursor options:
    V - Move to the cursor position.
    X - Get the cursor position.
    Z - Zoom the plotting limits.
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 where the letter signifies the key that is to be pressed on the keyboard to
 achieve the desired effect.
 
@@ -1471,19 +921,15 @@ pulsars.
 These values can be used to plot points whose sizes are inversely proportional
 to distance (\ie the closer pulsars are larger) by first taking the reciprocal
 of the \zcol\ area with the \cnam{\iref{CCMATH}} command:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 PONGO> CCMATH Z=1/(Z+0.1)
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 and then the points plotted with the command:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 PONGO> SIZEPLOT
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 Note here that a small positive value has been added to the distance data
-(\ie {\tt Z+0.1}) to avoid very large symbols for nearby pulsars.
+(\ie \texttt{Z+0.1}) to avoid very large symbols for nearby pulsars.
 
 
 \newpage
@@ -1496,7 +942,7 @@ database}{sun48}{}.  Here, the image display has been done using the
 used for all the line drawing (note this example is not available
 under CL).
 
-\halfpfig{sun137_fig8}{AGI}{agi.png}{7in}
+\myfig{sun137_fig8}{[htbp]}{width=\textwidth}{fig:AGI}{AGI example.}{AGI example.}
 \newpage
 
 
@@ -1519,7 +965,7 @@ can store plotting information for later use and retrieve plotting information
 stored by previous applications.
 To use AGI to good effect requires familiarity with some nomenclature.
 
-AGI divides the plotting surface up into {\bf pictures}, where a picture
+AGI divides the plotting surface up into \textbf{pictures}, where a picture
 represents a rectangular area on the display surface.
 AGI stores coordinate information for each picture it creates on a graphics
 device in its database.
@@ -1527,21 +973,21 @@ AGI pictures are independent of the graphics package used to plot the data
 (where supported; \ie SGS, IDI or PGPLOT), but they do depend explicitly upon
 the graphics device used to plot the data.
 AGI stores each picture in its database, grouped by the graphics device (or
-{\bf workstation} in Starlink graphics terminology) upon which the picture was
+\textbf{workstation} in Starlink graphics terminology) upon which the picture was
 created, and each is stored sequentially in the order in which they were
 created.
 AGI pictures are given a name which indicates their use:
-a {\bf BASE} picture refers to the whole plotting surface and the name is
+a \textbf{BASE} picture refers to the whole plotting surface and the name is
 reserved only for this use;
-a {\bf FRAME} picture refers to a picture which contains other pictures;
-and a {\bf DATA} picture refers to a picture which contains a plot of the data.
+a \textbf{FRAME} picture refers to a picture which contains other pictures;
+and a \textbf{DATA} picture refers to a picture which contains a plot of the data.
 AGI also stores a label for each picture: a short character string which
 can be used by an application to uniquely identify a picture.
 Finally, AGI can store a one-line comment for each picture in the database to
 describe its use.
 
-PONGO uses the definitions of {\bf world coordinates}, {\bf window},
-{\bf device coordinates} and {\bf viewport} used by the
+PONGO uses the definitions of \textbf{world coordinates}, \textbf{window},
+\textbf{device coordinates} and \textbf{viewport} used by the
 \xref{PGPLOT graphics package (SUN/15)}{sun15}{} upon which it is based.
 Here, a PONGO plot represents a window of given size in the data or world
 coordinates the you're working in.
@@ -1562,11 +1008,9 @@ to AGI DATA pictures and again are stored as such by AGI.
 
 By default, when \cnam{\iref{BEGPLOT}} (or \cnam{\iref{DEVICE}}) is used to
 begin a new PONGO plotting session; \eg:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL> begplot xw
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 PONGO will open the device and use the AGI BASE picture for that device, unless
 there is a more recent picture.
 In the case of a more recent picture, a FRAME picture will be created with the
@@ -1593,36 +1037,30 @@ As an example, PONGO can be used to annotate images displayed using
 \xref{KAPPA}{sun95}{}.  First, KAPPA will be used to set the image
 display device and to clear the AGI database for the device (\ie a
 tidy start):
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL> kappa
 ICL> idset xw
 ICL> idclear
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 It is necessary to first define the viewport the image is to be plotted within
 using PONGO in order to assure that there is enough room around the image for
 the annotation (remember, the annotation of PONGO graphs normally lies outside
 the viewport):
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL> pongo
 ICL> begplot xw
 PONGO> vstand
 PONGO> endplot
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 Then use \xref{KAPPA}{sun95}{DISPLAY} to display the
 image\footnote{The image actually displayed is defined, in this case,
 by the ICL variable \texttt{DOR\_DATA}. This is set to the value
 \texttt{\$PONGO\_EXAMPLES/dor} when PONGO is started.}:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL> picdata
 ICL> display (DOR_DATA) mode=perc percentiles=[3,99.9]
 ICL> lutheat
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 Here, \xref{KAPPA PICDATA}{sun95}{PICDATA} is used to select the last
 defined AGI DATA picture, which is a DATA picture created by PONGO
 with enough space around it to annotate the plot. You could also use
@@ -1634,14 +1072,12 @@ entire plotting surface; and finally the PONGO DATA picture, referring
 the area of the plotting surface within which the image is displayed.
 
 Now PONGO may be used to annotate the plot:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL> begplot xw overlay noclear
 PONGO> boxframe bcinst bcinst
 PONGO> label "X-axis pixel" "Y-axis pixel" "KAPPA image"
 PONGO> endplot
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 The image has been displayed by \xref{KAPPA}{sun95}{} and then the
 axes drawn and annotated using PONGO.  In this case, the annotation
 represents the pixel number in each of the axes of the image.  A more
@@ -1653,44 +1089,32 @@ PONGO, via \xref{AGI}{sun48}{}, is provided in \S\ref{exam_sect}.
 \subsection{Getting help in ICL}
 
 When in ICL, on-line help on PONGO may be examined using the command:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL> help pongo
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 This will provide a brief description of the package and how to begin and end a
 PONGO plotting session.
 Once the PONGO commands have been made available within ICL, \ie by typing
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 %  pongo
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 at the C-shell prompt or:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL> pongo
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 at the \verb+ICL>+ prompt, on-line help on any PONGO command may be examined
 using the command:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL> help <pongo command>
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 The command:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL> help pongo
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 will produce a brief introduction to PONGO, and the command:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL> help introduction
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 will produce a more detailed introduction to PONGO and how to get
 started.  These help commands are also available at the \verb+PONGO>+
 prompt.  A classified list of PONGO applications (\cnam{HELP
@@ -1711,20 +1135,16 @@ the Starlink Software support mailing list (starlink@jiscmail.ac.uk).
 \subsection{\cnam{BEGPLOT} or \cnam{DEVICE} does not work in ICL}
 
 If the error message:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 TOOFEWPARS   Not enough procedure parameters
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 is returned after the \cnam{\iref{BEGPLOT}} or \cnam{\iref{ENDPLOT}}
 commands have been invoked, the reason is that another application
 package or ICL procedure has switched parameter checking on within ICL
 \xref{(SG/5)}{sg5}{}.  The problem is simply overcome by typing the command:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL> set nocheckpars
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 The PONGO commands will then work correctly.
 
 \subsection{\cnam{READF} cannot find a column label}
@@ -1732,24 +1152,20 @@ The PONGO commands will then work correctly.
 If a column label is used with the \cnam{\iref{READF}} command instead
 of the column number (see \S\ref{data_sect}) and \cnam{\iref{READF}}
 fails, \eg:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 PONGO> readf myfile.dat xcol=1 ycol=3 zcol="ZCOL"
 File: /disk/scratch/jbloggs/plots/myfile.dat
 XCOL - 1 is column number 1.
 YCOL - 3 is column number 3.
 !! ZCOL incorrectly specified as ZCOL.
 !  READF: Data could not be read.
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 then either the data file does not have column labels or the incorrect
 column label has been used.
-It is of particular significance here that the column labels are {\em
-case-sensitive}.
+It is of particular significance here that the column labels are \emph{case-sensitive}.
 In fact, JBLOGGS found that the column label for his \zcol\ data was
 \pnam{Zcol}:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 PONGO> readf myfile.dat xcol=1 ycol=3 zcol="Zcol"
 File: /disk/scratch/jbloggs/plots/myfile.dat
 XCOL - 1 is column number 1.
@@ -1761,8 +1177,7 @@ LABCOL - 0 is column number 0.
 SYMCOL - 0 is column number 0.
 42 data points read.
 PONGO>
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 
 \subsection{Strange behaviour of \cnam{DLIMITS}}
@@ -1782,23 +1197,19 @@ assumed to be the number required).
 Although advantageous, it is possible for the internal data areas to get into a
 mess with this arrangement.
 If this seems to have happened then the command:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 PONGO> clear data
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 should be used to clear all the data areas.
 
 
 \subsection{Error messages from \cnam{SHOWPONGO} in ICL}
 
 The commands \cnam{\iref{SHOWPONGO}} may sometimes deliver the error messages
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 !! Object 'PONGO_<param>' not found.
 !! DAT_FIND: Error finding a named component in an HDS structure.
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 when invoked (\verb+<param>+ refers to a PONGO parameter name in this
 context).
 The reason is simply that no global parameter of that name currently exists.
@@ -1864,8 +1275,7 @@ occasionally cause problems for specific types of use. One way in
 which you can actually plot more positions than this, is by reading in
 the data in chunks (of 5000 points) and plotting these. The following
 ICL procedure shows one way in which you might do this:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 proc superplot file, x1, x2, y1, y2, n
   begplot xwindows xmin=(x1) xmax=(x2) ymin=(y1) ymax=(y2)
   limits (x1) (x2) (y1) (y2)
@@ -1878,16 +1288,13 @@ proc superplot file, x1, x2, y1, y2, n
   end loop
   endplot
 end proc
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 This would then be invoked as in (assuming the procedure was kept in a
 file \verb+superplot.icl+):
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ICL > load superplot.icl
 ICL > superplot mygalaxies.dat -3 3 -3 3 10
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 Which would plot $50000$ positions stored in the file \verb+mygalaxies.dat+.
 
 \section{References}
@@ -2026,7 +1433,7 @@ a different set of abbreviations).
 \item [\iref{WNAD}] -- Adjust the viewport so that the X and Y scales are the
                        same.
 \item [\iref{WORLD}] -- Set the world coordinates for the plot.
-\item [\iref{WRITE(I)}{WRITEI}] -- Write information to an output file.
+\item [\iiref{WRITE(I)}{WRITEI}] -- Write information to an output file.
 \item [\iref{WTEXT}] -- Draw a text string on the plot.
 \item [\iiref{XC(OLUMN)}{XCOLUMN}] -- Specify the column containing the
                                       X-axis data.
@@ -2092,10 +1499,10 @@ normally defaulted are not shown in the usage section.
 
 The full parameter descriptions include default behaviour; \ie what
 value is taken if a parameter value is not given on the command line.
-For simple cases, this behaviour is described in {\bf[} {\em square
+For simple cases, this behaviour is described in {\bf[} \emph{square
 brackets} {\bf]}; for more complicated behaviour, a full description
-is provided.  An empty set of square brackets, \ie {\bf []}, indicates
-that a parameter value {\em must} be specified on the command line.
+is provided.  An empty set of square brackets, \ie \textbf{[]}, indicates
+that a parameter value \emph{must} be specified on the command line.
 
 Commands that are described as ICL procedures can only take
 parameters on the command-line. These should be given as single
@@ -2180,12 +1587,12 @@ when they are specified on the command-line).
       }{
          The projection that has been used to plot the data. This is
          explained in more detail in the section on projections. Allowed
-         values: {\tt "}NONE{\tt "}, {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "}, {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "},
-         {\tt "}MERCATOR{\tt "}, and {\tt "}STG{\tt "}.
+         values: \texttt{"}NONE\texttt{"}, \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"}, \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"},
+         \texttt{"}MERCATOR\texttt{"}, and \texttt{"}STG\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_PROJECTN is used. If
-         PONGO\_PROJECTN is not defined, the default value {\tt "}NONE{\tt "} is
+         PONGO\_PROJECTN is not defined, the default value \texttt{"}NONE\texttt{"} is
          used.
       }
       \sstsubsection{
@@ -2193,22 +1600,22 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie  the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_RACENTRE is used. If
-         PONGO\_RACENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_RACENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
       \sstsubsection{
          DECCENTRE = \_CHAR (Read)
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_DECCENTRE is used. If
-         PONGO\_DECCENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_DECCENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
    }
 }
@@ -2319,12 +1726,12 @@ when they are specified on the command-line).
       }{
          The geometry that is to be used to plot the arc.  This is
          explained in detail in the section on projections.  Allowed
-         values: {\tt "}NONE{\tt "}, {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "}, {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "},
-         {\tt "}MERCATOR{\tt "} and {\tt "}STG{\tt "}.
+         values: \texttt{"}NONE\texttt{"}, \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"}, \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"},
+         \texttt{"}MERCATOR\texttt{"} and \texttt{"}STG\texttt{"}.
 
          This parameter is not specified on the command line. If no
          value is specified on the command line, the current value is
-         used. If there is no current value, a default value {\tt "}NONE{\tt "} is
+         used. If there is no current value, a default value \texttt{"}NONE\texttt{"} is
          used.
       }
       \sstsubsection{
@@ -2332,22 +1739,22 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_RACENTRE is used. If
-         PONGO\_RACENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_RACENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
       \sstsubsection{
          DECCENTRE = \_CHAR (Read)
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_DECCENTRE is used. If
-         PONGO\_DECCENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_DECCENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
       \sstsubsection{
          ERSCALE = \_REAL (Read and Write)
@@ -2407,18 +1814,18 @@ when they are specified on the command-line).
       \sstsubsection{
          ACTION = \_CHAR (Read)
       }{
-         The type of binning be used for the averaging. If {\tt "}X{\tt "}, the
-         data are divided into NBIN bins over the X range.  If {\tt "}N{\tt "},
+         The type of binning be used for the averaging. If \texttt{"}X\texttt{"}, the
+         data are divided into NBIN bins over the X range.  If \texttt{"}N\texttt{"},
          bins of varying widths with each containing NBIN data points
          are formed.
 
-         [The value will be prompted for. It has the default {\tt "}X{\tt "}.]
+         [The value will be prompted for. It has the default \texttt{"}X\texttt{"}.]
       }
       \sstsubsection{
          NBIN = \_INTEGER (Read)
       }{
          Depending upon the value of ACTION, either the number of bins
-         (ACTION={\tt "}X{\tt "}), or the number of points per bin (ACTION={\tt "}N{\tt "}).
+         (ACTION=\texttt{"}X\texttt{"}), or the number of points per bin (ACTION=\texttt{"}N\texttt{"}).
 
          [The value will be prompted for. It has the default 10.]
       }
@@ -2453,7 +1860,7 @@ when they are specified on the command-line).
       the creation of a new base picture.
 
       If a picture created by a run of a previous application is made
-      (using either the {\tt "}current{\tt "} picture or selecting using a known
+      (using either the \texttt{"}current\texttt{"} picture or selecting using a known
       picture label see parameter ACTION) then it is possible to
       overlay new graphics (such as annotations, lines \etc) using the
       same coordinate system (see the OVERLAY parameter).
@@ -2475,13 +1882,13 @@ when they are specified on the command-line).
       \sstsubsection{
          ACTION = \_CHAR (Read and Write)
       }{
-         If {\tt '}B{\tt '}, the plotting device will be cleared and the whole of
-         its plotting surface used. If equal to {\tt '}C{\tt '}, the current picture
-         will be used and a PGPLOT viewport created inside it. If {\tt '}L{\tt '}
+         If \texttt{'}B\texttt{'}, the plotting device will be cleared and the whole of
+         its plotting surface used. If equal to \texttt{'}C\texttt{'}, the current picture
+         will be used and a PGPLOT viewport created inside it. If \texttt{'}L\texttt{'}
          then a previously labelled picture (set using KAPPA:PICLABEL)
          can be selected. Once set, this parameter will retain its value
          in subsequent invocations of BEGPLOT.
-         [{\tt '}C{\tt '}]
+         [\texttt{'}C\texttt{'}]
       }
       \sstsubsection{
          CHEIGHT = \_REAL (Write)
@@ -2517,7 +1924,7 @@ when they are specified on the command-line).
          If ACTION=L is selected then the name of the AGI picture to be
          selected is given by this parameter. AGI pictures can be labelled
          using the KAPPA application \xref{PICLABEL}{sun95}{PICLABEL}.
-         [{\tt '}{\tt '}]
+         [\texttt{'}\texttt{'}]
       }
       \sstsubsection{
          OVERLAY = \_LOGICAL (Read)
@@ -2616,55 +2023,55 @@ when they are specified on the command-line).
          \sstitemlist{
 
             \sstitem
-               {\tt "}A{\tt "} -- Draw an axis (the X axis is the horizontal line
+               \texttt{"}A\texttt{"} -- Draw an axis (the X axis is the horizontal line
                Y=0, the Y axis is the vertical line X=0).
 
             \sstitem
-               {\tt "}B{\tt "} -- Draw the bottom (X) or left (Y) edge of the frame.
+               \texttt{"}B\texttt{"} -- Draw the bottom (X) or left (Y) edge of the frame.
 
             \sstitem
-               {\tt "}C{\tt "} -- Draw the top (X) or right (Y) edge of the frame.
+               \texttt{"}C\texttt{"} -- Draw the top (X) or right (Y) edge of the frame.
 
             \sstitem
-               {\tt "}G{\tt "} -- Draw a grid of vertical (X) or horizontal (Y)
+               \texttt{"}G\texttt{"} -- Draw a grid of vertical (X) or horizontal (Y)
                lines.
 
             \sstitem
-               {\tt "}I{\tt "} -- Invert the tick-marks (\ie draw them outside the
+               \texttt{"}I\texttt{"} -- Invert the tick-marks (\ie draw them outside the
                viewport instead of inside).
 
             \sstitem
-               {\tt "}L{\tt "} -- Label the axis logarithmically (see below).
+               \texttt{"}L\texttt{"} -- Label the axis logarithmically (see below).
 
             \sstitem
-               {\tt "}N{\tt "} -- Write numeric labels in the conventional location
+               \texttt{"}N\texttt{"} -- Write numeric labels in the conventional location
                below the viewport (X) or to the left of the viewport (Y).
 
             \sstitem
-               {\tt "}P{\tt "} -- Extend (project) major tick-marks outside the box
+               \texttt{"}P\texttt{"} -- Extend (project) major tick-marks outside the box
                (ignored if option I is specified).
 
             \sstitem
-               {\tt "}M{\tt "} -- Write numeric labels in the unconventional location
+               \texttt{"}M\texttt{"} -- Write numeric labels in the unconventional location
                above the viewport (X) or to the right of the viewport (Y).
 
             \sstitem
-               {\tt "}T{\tt "} -- Draw major tick-marks at the major coordinate
+               \texttt{"}T\texttt{"} -- Draw major tick-marks at the major coordinate
                interval.
 
             \sstitem
-               {\tt "}S{\tt "} -- Draw minor tick-marks (sub-ticks).
+               \texttt{"}S\texttt{"} -- Draw minor tick-marks (sub-ticks).
 
             \sstitem
-               {\tt "}V{\tt "} -- Orient numeric labels vertically (this is only
+               \texttt{"}V\texttt{"} -- Orient numeric labels vertically (this is only
                applicable to Y -- the default is to write Y-axis labels
                parallel to the axis).
 
             \sstitem
-               {\tt "}1{\tt "} -- Force decimal labelling.
+               \texttt{"}1\texttt{"} -- Force decimal labelling.
 
             \sstitem
-               {\tt "}2{\tt "} -- Force exponential labelling.
+               \texttt{"}2\texttt{"} -- Force exponential labelling.
 
          }
          A set of special letters control the plotting of RA and DEC
@@ -2673,21 +2080,21 @@ when they are specified on the command-line).
          \sstitemlist{
 
             \sstitem
-               {\tt "}Z{\tt "} for (DD) HH MM SS.S time labelling
+               \texttt{"}Z\texttt{"} for (DD) HH MM SS.S time labelling
 
             \sstitem
-               {\tt "}H{\tt "} means superscript numbers with d, h, m, \& s  symbols
+               \texttt{"}H\texttt{"} means superscript numbers with d, h, m, \& s  symbols
 
             \sstitem
-               {\tt "}D{\tt "} means superscript numbers with    o, {\tt '}, \& {\tt '}{\tt '} symbols
+               \texttt{"}D\texttt{"} means superscript numbers with    o, \texttt{'}, \& \texttt{'}\texttt{'} symbols
 
             \sstitem
-               {\tt "}F{\tt "} causes the first label (left- or bottom-most) to
+               \texttt{"}F\texttt{"} causes the first label (left- or bottom-most) to
                      be omitted. Useful for sub-panels that abut each other.
                      Care is needed because first label carries sign as well.
 
             \sstitem
-               {\tt "}O{\tt "} means omit leading zeros in numbers $<$ 10
+               \texttt{"}O\texttt{"} means omit leading zeros in numbers $<$ 10
                      \eg  3h 3m 1.2s rather than 03h 03m 01.2s  Useful
                      to help save space on X-axes. The day field does not
                      use this facility.
@@ -2698,7 +2105,7 @@ when they are specified on the command-line).
          radians, and the DEGTOR command from degrees to radians).
 
          [The global parameter PONGO\_XOPT is used. If PONGO\_XOPT is not
-         defined, the default value {\tt "}BCNST{\tt "} is used.]
+         defined, the default value \texttt{"}BCNST\texttt{"} is used.]
       }
       \sstsubsection{
          YOPT = \_CHAR (Read and Write)
@@ -2708,7 +2115,7 @@ when they are specified on the command-line).
          the parameter XOPT.
 
          [The global parameter PONGO\_YOPT is used.  If PONGO\_YOPT is not
-         defined, the default value {\tt "}BCNST{\tt "} is used.]
+         defined, the default value \texttt{"}BCNST\texttt{"} is used.]
       }
       \sstsubsection{
          XTIC = \_REAL (Read and Write)
@@ -2759,14 +2166,14 @@ when they are specified on the command-line).
          It is possible to draw RA and DEC axes using this routine. To
          do this read in your X and Y data in radians (this is the
          default if your data are stored in the HH:MM:SS.SSS,
-         DD:MM:SS.SSS formats) and then set the {\tt "}Z{\tt "} character in the
+         DD:MM:SS.SSS formats) and then set the \texttt{"}Z\texttt{"} character in the
          XOPT and YOPT parameters. A good combination of options are:
          \begin{description}
             \item \texttt{XOPT='BCNSTZHG' YOPT='BCNSTZDG'}
          \end{description}
          For more about this (in particular how the interval options are
          set) see the PGPLOT documentation about PGTBOX. Note that the
-         {\tt "}Y{\tt "} option is always set and that the Y axis values are
+         \texttt{"}Y\texttt{"} option is always set and that the Y axis values are
          converted into pseudo arc seconds.
    }
 }
@@ -2789,19 +2196,19 @@ when they are specified on the command-line).
       \sstitemlist{
 
          \sstitem
-            {\tt "}X{\tt "} -- the \xcol\ data area,
+            \texttt{"}X\texttt{"} -- the \xcol\ data area,
 
          \sstitem
-            {\tt "}Y{\tt "} -- the \ycol\ data area,
+            \texttt{"}Y\texttt{"} -- the \ycol\ data area,
 
          \sstitem
-            {\tt "}Z{\tt "} -- the \zcol\ data area,
+            \texttt{"}Z\texttt{"} -- the \zcol\ data area,
 
          \sstitem
-            {\tt "}EX{\tt "} -- the \excol\ error area,
+            \texttt{"}EX\texttt{"} -- the \excol\ error area,
 
          \sstitem
-            {\tt "}EY{\tt "} -- the \eycol\ error area.
+            \texttt{"}EY\texttt{"} -- the \eycol\ error area.
       }
    }
    \sstusage{
@@ -2814,7 +2221,7 @@ when they are specified on the command-line).
          The transformation to perform on the contents of the \xcol\ data
          area.
 
-         [{\tt "}X -- \ie will cause the contents of the data area to remain
+         [\texttt{"}X -- \ie will cause the contents of the data area to remain
          unchanged.]
       }
       \sstsubsection{
@@ -2823,7 +2230,7 @@ when they are specified on the command-line).
          The transformation to perform on contents of the \ycol\ data
          area.
 
-         [{\tt "}Y{\tt "} -- \ie will cause the contents of the data area to remain
+         [\texttt{"}Y\texttt{"} -- \ie will cause the contents of the data area to remain
          unchanged.]
       }
       \sstsubsection{
@@ -2832,7 +2239,7 @@ when they are specified on the command-line).
          The transformation to perform on contents of the \zcol\ data
          area.
 
-         [{\tt "}Z{\tt "} -- \ie will cause the contents of the data area to remain
+         [\texttt{"}Z\texttt{"} -- \ie will cause the contents of the data area to remain
          unchanged.]
       }
       \sstsubsection{
@@ -2841,7 +2248,7 @@ when they are specified on the command-line).
          The transformation to perform on contents of the \excol\ data
          area.
 
-         [{\tt "}EX{\tt "} -- \ie will cause the contents of the data area to
+         [\texttt{"}EX\texttt{"} -- \ie will cause the contents of the data area to
          remain unchanged.]
       }
       \sstsubsection{
@@ -2850,7 +2257,7 @@ when they are specified on the command-line).
          The transformation to perform on contents of the \eycol\ data
          area.
 
-         [{\tt "}EY{\tt "} -- \ie will cause the contents of the data area to
+         [\texttt{"}EY\texttt{"} -- \ie will cause the contents of the data area to
          remain unchanged.]
       }
    }
@@ -3182,7 +2589,7 @@ when they are specified on the command-line).
       should be used to take the logarithm of the data columns in
       preference to doing it with \cnam{\iref{CCMATH}}, because it can deal with the
       associated error values consistently. It automatically adds the
-      {\tt "}L{\tt "} option to the PONGO\_XOPT or PONGO\_YOPT global parameters, as
+      \texttt{"}L\texttt{"} option to the PONGO\_XOPT or PONGO\_YOPT global parameters, as
       appropriate.
    }
    \sstusage{
@@ -3198,13 +2605,13 @@ when they are specified on the command-line).
          \sstitemlist{
 
             \sstitem
-               {\tt "}X{\tt "} -- \xcol,
+               \texttt{"}X\texttt{"} -- \xcol,
 
             \sstitem
-               {\tt "}Y{\tt "} -- \ycol,
+               \texttt{"}Y\texttt{"} -- \ycol,
 
             \sstitem
-               {\tt "}Z{\tt "} -- \zcol.
+               \texttt{"}Z\texttt{"} -- \zcol.
 
          }
          [The value will be prompted for.]
@@ -3213,14 +2620,14 @@ when they are specified on the command-line).
          XOPT = \_CHAR (Write)
       }{
          The PGPLOT X-axis options string.  The global parameter will be
-         updated to include the PGPLOT {\tt "}L{\tt "} axis option at the start.
+         updated to include the PGPLOT \texttt{"}L\texttt{"} axis option at the start.
          This option means that logarithmic style axis labels and tick
          marks will be plotted. The \cnam{\iref{READF}} command will automatically
-         remove any {\tt "}L{\tt "} characters at the start of this string since it
+         remove any \texttt{"}L\texttt{"} characters at the start of this string since it
          assumes that they have been put there by CLOG, and fresh data
          read in will not be logarithmic. If data are naturally
-         logarithmic, the {\tt "}L{\tt "} should be placed other than at the start
-         of the string to make an {\tt "}L{\tt "} option that will not be modified
+         logarithmic, the \texttt{"}L\texttt{"} should be placed other than at the start
+         of the string to make an \texttt{"}L\texttt{"} option that will not be modified
          by PONGO.
 
          It is not intended that this parameter be set by you when
@@ -3249,7 +2656,7 @@ when they are specified on the command-line).
    \sstdescription{
       Straight line segments are drawn between the data points in the
       \xcol\ and \xcol\ data areas. This may not be used with projections
-      other than {\tt "}NONE{\tt "}
+      other than \texttt{"}NONE\texttt{"}
 
       This command is a synonym for \cnam{\iref{GPOINTS} C}.
    }
@@ -3276,7 +2683,7 @@ when they are specified on the command-line).
 
          \sstitem
             D -- DRAW
-            A line is drawn from the PGPLOT {\tt "}current position{\tt "} to  the
+            A line is drawn from the PGPLOT \texttt{"}current position\texttt{"} to  the
             cursor position. This position is also written to the
             internal label list.
 
@@ -3296,7 +2703,7 @@ when they are specified on the command-line).
             L -- LABEL
             Write a label directly onto the plot. The application
             uses up to two points which define the angle at which the
-            label is to be drawn. Once {\tt "}L{\tt "} has been
+            label is to be drawn. Once \texttt{"}L\texttt{"} has been
             pressed, you are
             given the option to add another point in the standard
             PGPLOT fashion (c.f. the PGPLOT routine PGNCURSE); \ie:
@@ -3312,7 +2719,7 @@ when they are specified on the command-line).
             \sstitem
                   X -- finish
          }
-            On pressing the {\tt "}X{\tt "} key, a label is prompted for. If only
+            On pressing the \texttt{"}X\texttt{"} key, a label is prompted for. If only
             one point is supplied, the label is plotted horizontally.
 
          \sstitem
@@ -3352,7 +2759,7 @@ when they are specified on the command-line).
 
          \sstitem
             V -- MOVE
-            The PGPLOT {\tt "}current position{\tt "} will be set to the cursor
+            The PGPLOT \texttt{"}current position\texttt{"} will be set to the cursor
             position. This position is also written to the internal
             label list.
 
@@ -3418,7 +2825,7 @@ when they are specified on the command-line).
          XCURSE = \_REAL (Write)
       }{
          The X-axis position of the last graphics cursor hit when using
-         the {\tt "}X{\tt "} option.
+         the \texttt{"}X\texttt{"} option.
 
          The value is written to the PONGO\_XCURSE global parameter.
       }
@@ -3426,7 +2833,7 @@ when they are specified on the command-line).
          YCURSE = \_REAL (Write)
       }{
          The Y-axis position of the last graphics cursor hit when using
-         the {\tt "}X{\tt "} option.
+         the \texttt{"}X\texttt{"} option.
 
          The value is written to the PONGO\_YCURSE global parameter.
       }
@@ -3471,12 +2878,12 @@ when they are specified on the command-line).
       }{
          The projection that has been used to plot the data.  This is
          explained in more detail in the section on projections.
-         Allowed values: {\tt "}NONE{\tt "}, {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "}, {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "},
-         {\tt "}MERCATOR{\tt "} and {\tt "}STG{\tt "}.
+         Allowed values: \texttt{"}NONE\texttt{"}, \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"}, \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"},
+         \texttt{"}MERCATOR\texttt{"} and \texttt{"}STG\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_PROJECTN is used. If
-         PONGO\_PROJECTN is not defined, the default value {\tt "}NONE{\tt "} is
+         PONGO\_PROJECTN is not defined, the default value \texttt{"}NONE\texttt{"} is
          used.
       }
       \sstsubsection{
@@ -3484,22 +2891,22 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_RACENTRE is used. If
-         PONGO\_RACENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_RACENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
       \sstsubsection{
          DECCENTRE = \_CHAR (Read)
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_DECCENTRE is used. If
-         PONGO\_DECCENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_DECCENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
    }
 }
@@ -3560,7 +2967,7 @@ when they are specified on the command-line).
       the creation of a new base picture.
 
       If a picture created by a run of a previous application is made
-      (using either the {\tt "}current{\tt "} picture or selecting
+      (using either the \texttt{"}current\texttt{"} picture or selecting
       using a known picture label see parameter ACTION) then it is
       possible to overlay new graphics (such as annotations, lines
       \etc) using the same coordinate system (see the OVERLAY
@@ -3582,13 +2989,13 @@ when they are specified on the command-line).
       \sstsubsection{
          ACTION = \_CHAR (Read and Write)
       }{
-         If {\tt '}B{\tt '}, the plotting device will be cleared and the whole of
-         its plotting surface used. If equal to {\tt '}C{\tt '}, the current picture
-         will be used and a PGPLOT viewport created inside it. If {\tt '}L{\tt '}
+         If \texttt{'}B\texttt{'}, the plotting device will be cleared and the whole of
+         its plotting surface used. If equal to \texttt{'}C\texttt{'}, the current picture
+         will be used and a PGPLOT viewport created inside it. If \texttt{'}L\texttt{'}
          then a previously labelled picture (set using KAPPA:PICLABEL)
          can be selected. Once set, this parameter will retain its value
          in subsequent invocations of \cnam{\iref{BEGPLOT}}.
-         [{\tt '}C{\tt '}]
+         [\texttt{'}C\texttt{'}]
       }
       \sstsubsection{
          CHEIGHT = \_REAL (Write)
@@ -3624,7 +3031,7 @@ when they are specified on the command-line).
          If ACTION=L is selected then the name of the AGI picture to be
          selected is given by this parameter. AGI pictures can be labelled
          using the KAPPA application \xref{PICLABEL}{sun95}{PICLABEL}.
-         [{\tt '}{\tt '}]
+         [\texttt{'}\texttt{'}]
       }
       \sstsubsection{
          OVERLAY = \_LOGICAL (Read)
@@ -3721,11 +3128,11 @@ when they are specified on the command-line).
       }{
          The geometry to be used for plotting the data.  This is
          explained in more detail in the section on projections.
-         Allowed values: {\tt "}NONE{\tt "}, {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "}, {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "},
-         {\tt "}MERCATOR{\tt "} and {\tt "}STG{\tt "}.
+         Allowed values: \texttt{"}NONE\texttt{"}, \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"}, \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"},
+         \texttt{"}MERCATOR\texttt{"} and \texttt{"}STG\texttt{"}.
 
          [The value of the global parameter PONGO\_PROJECTN is used. If
-         PONGO\_PROJECTN is not defined, the default value {\tt "}NONE{\tt "} is
+         PONGO\_PROJECTN is not defined, the default value \texttt{"}NONE\texttt{"} is
          used.]
       }
       \sstsubsection{
@@ -3733,20 +3140,20 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          [The value of the global parameter PONGO\_RACENTRE is used. If
-         PONGO\_RACENTRE is not defined, the default value {\tt "}0{\tt "} is used.]
+         PONGO\_RACENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.]
       }
       \sstsubsection{
          DECCENTRE = \_CHAR (Read and Write)
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          [The value of the global parameter PONGO\_DECCENTRE is used. If
-         PONGO\_DECCENTRE is not defined, the default value {\tt "}0{\tt "} is used.]
+         PONGO\_DECCENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.]
       }
       \sstsubsection{
          ERSCALE = \_REAL (Read)
@@ -3794,13 +3201,13 @@ when they are specified on the command-line).
       }{
          The geometry that is to be used for plotting. This is
          explained in more detail in the section on projections.
-         Allowed values: {\tt "}NONE{\tt "}, {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "}, {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "},
-         {\tt "}MERCATOR{\tt "} and {\tt "}STG{\tt "}.This parameter is only
+         Allowed values: \texttt{"}NONE\texttt{"}, \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"}, \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"},
+         \texttt{"}MERCATOR\texttt{"} and \texttt{"}STG\texttt{"}.This parameter is only
          relevant when marking points.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_PROJECTN is used. If
-         PONGO\_PROJECTN is not defined, the default value {\tt "}NONE{\tt "} is
+         PONGO\_PROJECTN is not defined, the default value \texttt{"}NONE\texttt{"} is
          used.
       }
       \sstsubsection{
@@ -3808,22 +3215,22 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_RACENTRE is used. If
-         PONGO\_RACENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_RACENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
       \sstsubsection{
          DECCENTRE = \_CHAR (Read)
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_DECENTRE is used. If
-         PONGO\_DECCENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_DECCENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
    }
 }
@@ -3856,11 +3263,11 @@ when they are specified on the command-line).
       }{
          The geometry to be used for plotting the polygon.  This is
          explained in more detail in the section on projections.
-         Allowed values: {\tt "}NONE{\tt "}, {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "}, {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "},
-         {\tt "}MERCATOR{\tt "} and {\tt "}STG{\tt "}.
+         Allowed values: \texttt{"}NONE\texttt{"}, \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"}, \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"},
+         \texttt{"}MERCATOR\texttt{"} and \texttt{"}STG\texttt{"}.
 
          [The value of the global parameter PONGO\_PROJECTN is used. If
-         PONGO\_PROJECTN is not defined, the default value {\tt "}NONE{\tt "} is
+         PONGO\_PROJECTN is not defined, the default value \texttt{"}NONE\texttt{"} is
          used.]
       }
       \sstsubsection{
@@ -3868,20 +3275,20 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          [The value of the global parameter PONGO\_RACENTRE is used. If
-         PONGO\_RACENTRE is not defined, the default value {\tt "}0{\tt "} is used.]
+         PONGO\_RACENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.]
       }
       \sstsubsection{
          DECCENTRE = \_CHAR (Read)
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          [The value of the global parameter PONGO\_DECCENTRE is used. If
-         PONGO\_DECCENTRE is not defined, the default value {\tt "}0{\tt "} is used.]
+         PONGO\_DECCENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.]
       }
    }
    \sstexamples{
@@ -3892,7 +3299,7 @@ when they are specified on the command-line).
          polygon is filled or shaded using the current fill-hatch styles.
       }
       \sstexamplesubsection{
-         drawpoly projection=aitoff deccentre={\tt "}12:00:00{\tt "}
+         drawpoly projection=aitoff deccentre=\texttt{"}12:00:00\texttt{"}
       }{
          This draws a single polygon on the current graphics display. The
          polygon is filled or shaded using the current fill-hatch styles
@@ -4001,8 +3408,8 @@ when they are specified on the command-line).
       }{
          A comment for the AGI database entry for the plot that has
          just been completed. Any comment will be prefixed with the
-         string {\tt "}PONGO:{\tt "}.
-         [{\tt "}Final viewport{\tt "}]
+         string \texttt{"}PONGO:\texttt{"}.
+         [\texttt{"}Final viewport\texttt{"}]
       }
    }
 }
@@ -4046,7 +3453,7 @@ when they are specified on the command-line).
       \sstsubsection{
          ACTION = \_CHAR (Read)
       }{
-         {\tt "}X{\tt "} or {\tt "}Y{\tt "} depending upon which set
+         \texttt{"}X\texttt{"} or \texttt{"}Y\texttt{"} depending upon which set
          of error bars is to be
          drawn.
 
@@ -4143,7 +3550,7 @@ when they are specified on the command-line).
          The column number (counting from 1), or the symbolic name of a
          column, from which the X-axis error data are read by the
          \cnam{\iref{READF}}
-         command. The value {\tt "}0{\tt "} means {\tt "}do not read these data{\tt "}. []
+         command. The value \texttt{"}0\texttt{"} means \texttt{"}do not read these data\texttt{"}. []
       }
    }
 }
@@ -4195,7 +3602,7 @@ when they are specified on the command-line).
          The column number (counting from 1), or the symbolic name of a
          column, from which the Y-axis error data are read by the
           \cnam{\iref{READF}}
-         command. The value {\tt "}0{\tt "} means {\tt "}do not read these data{\tt "}. []
+         command. The value \texttt{"}0\texttt{"} means \texttt{"}do not read these data\texttt{"}. []
       }
    }
 }
@@ -4282,7 +3689,7 @@ when they are specified on the command-line).
          ACTION = \_CHAR (Read and Write)
       }{
          Type of curve to be fitted. Currently this action must be
-         {\tt "}POLY{\tt "} or {\tt "}SPLINE{\tt "}
+         \texttt{"}POLY\texttt{"} or \texttt{"}SPLINE\texttt{"}
 
          If the parameter is not specified on the command line, it will
          be prompted for.
@@ -4319,7 +3726,7 @@ when they are specified on the command-line).
       \sstsubsection{
          POLYCOEF[10] = \_DOUBLE (Write)
       }{
-         If ACTION is {\tt "}POLY{\tt "}, the polynomial coefficients resulting
+         If ACTION is \texttt{"}POLY\texttt{"}, the polynomial coefficients resulting
          from the fit are written to this parameter.
 
          The value of this parameter is written to the global parameter
@@ -4338,7 +3745,7 @@ when they are specified on the command-line).
       \sstsubsection{
          SMOOTH = \_REAL (Read)
       }{
-         Only used if ACTION is {\tt "}SPLINE{\tt "}. This factor determines the
+         Only used if ACTION is \texttt{"}SPLINE\texttt{"}. This factor determines the
          tradeoff between the closeness and smoothness of the spline
          fit. It should be a real number greater than 0.0. Normally this
          is dynamically defaulted to a number equal to the number of
@@ -4350,7 +3757,7 @@ when they are specified on the command-line).
       }{
          The name of a file to contain the coefficients and knot
          positions from the spline fit -- used when ACTION is
-         {\tt "}SPLINE{\tt "}. This file can be used by the PLOTFUN command to
+         \texttt{"}SPLINE\texttt{"}. This file can be used by the PLOTFUN command to
          redraw the fit.
 
          [The value of the global parameter PONGO\_SPLINEF is used. If
@@ -4518,9 +3925,9 @@ when they are specified on the command-line).
       \sstsubsection{
          ACTION = \_CHAR (Read)
       }{
-         The method of specifying the data point in question. If {\tt "}N{\tt "},
+         The method of specifying the data point in question. If \texttt{"}N\texttt{"},
          interpret the VALUE parameter as specifying the index number
-         of that point. If {\tt "}C{\tt "},  the VALUE parameter is used to try to
+         of that point. If \texttt{"}C\texttt{"},  the VALUE parameter is used to try to
          match the \labcol\ entry for a point.
 
          [The value is prompted for.]
@@ -4577,10 +3984,10 @@ when they are specified on the command-line).
 \newpage
    \sstexamples{
       \sstexamplesubsection{
-         PONGO$>$ GETPOINT C {\tt '}3C45{\tt '} X=(XP) Y=(YP)
+         PONGO$>$ GETPOINT C \texttt{'}3C45\texttt{'} X=(XP) Y=(YP)
       }{
          This will return the X and Y coordinates of the data point
-         that has the label {\tt '}3C45{\tt '}, if it exists, to the ICL variables
+         that has the label \texttt{'}3C45\texttt{'}, if it exists, to the ICL variables
          XP and YP.
       }
    }
@@ -4603,17 +4010,17 @@ when they are specified on the command-line).
       \sstsubsection{
          ACTION = \_CHAR (Read)
       }{
-         The type of plot to produce. This can be {\tt "}C{\tt "}, {\tt "}P{\tt "} or {\tt "}S{\tt "},
+         The type of plot to produce. This can be \texttt{"}C\texttt{"}, \texttt{"}P\texttt{"} or \texttt{"}S\texttt{"},
          with the following meanings:
 
          \sstitemlist{
 
             \sstitem
-            {\tt "}C{\tt "} (connect) -- This action simply draws straight line
+            \texttt{"}C\texttt{"} (connect) -- This action simply draws straight line
             segments between the data points.
 
             \sstitem
-            {\tt "}P{\tt "} (points) -- Draw a symbol at each of the data points. The
+            \texttt{"}P\texttt{"} (points) -- Draw a symbol at each of the data points. The
             symbol type that is used to mark each point is determined in
             one of 3 ways:
 
@@ -4641,7 +4048,7 @@ when they are specified on the command-line).
          refers to the standard PGPLOT symbols.
 
             \sstitem
-            {\tt "}S{\tt "} (sizeplot) -- This action uses the values stored in the
+            \texttt{"}S\texttt{"} (sizeplot) -- This action uses the values stored in the
             \zcol\ data area to determine the size of the plotted symbol.
             The value of each entry in the \zcol\ data area is effectively
             used as an argument to a \cnam{\iref{CHANGE} CHEIGHT} command before each
@@ -4668,7 +4075,7 @@ when they are specified on the command-line).
          SCALE = \_REAL (Read and Write)
       }{
          The scale factor used to multiply the \zcol\ data values to get
-         a reasonable range of symbol sizes when ACTION={\tt "}S{\tt "}.
+         a reasonable range of symbol sizes when ACTION=\texttt{"}S\texttt{"}.
 
          If no value is specified on the command line, the current
          value is used. The current value is initially set to 1.0.
@@ -4678,12 +4085,12 @@ when they are specified on the command-line).
       }{
          Specifies the geometry that is to be used to plot the data.
          This is explained in more detail in the section on
-         projections.  Allowed values: {\tt "}NONE{\tt "}, {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "},
-         {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "}, {\tt "}MERCATOR{\tt "} and {\tt "}STG{\tt "}.
+         projections.  Allowed values: \texttt{"}NONE\texttt{"}, \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"},
+         \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"}, \texttt{"}MERCATOR\texttt{"} and \texttt{"}STG\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_PROJECTN is used. If
-         PONGO\_PROJECTN is not defined, the default value {\tt "}NONE{\tt "} is
+         PONGO\_PROJECTN is not defined, the default value \texttt{"}NONE\texttt{"} is
          used.
       }
       \sstsubsection{
@@ -4691,22 +4098,22 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_RACENTRE is used. If
-         PONGO\_RACENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_RACENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
       \sstsubsection{
          DECCENTRE = \_CHAR (Read)
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_DECCENTRE is used. If
-         PONGO\_DECCENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_DECCENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
    }
 }
@@ -4783,12 +4190,12 @@ when they are specified on the command-line).
       }{
          The geometry to be used to plot the grid.  This is explained
          in more detail in the section on projections.  Allowed values:
-         {\tt "}NONE{\tt "}, {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "}, {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "}, {\tt "}MERCATOR{\tt "} and
-         {\tt "}STG{\tt "}.
+         \texttt{"}NONE\texttt{"}, \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"}, \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"}, \texttt{"}MERCATOR\texttt{"} and
+         \texttt{"}STG\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_PROJECTN is used. If
-         PONGO\_PROJECTN is not defined, the default value {\tt "}NONE{\tt "} is
+         PONGO\_PROJECTN is not defined, the default value \texttt{"}NONE\texttt{"} is
          used.
       }
       \sstsubsection{
@@ -4796,22 +4203,22 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
           This parameter is not specified on the command line. The
           value of the global parameter PONGO\_RACENTRE is used. If
-          PONGO\_RACENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+          PONGO\_RACENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
       \sstsubsection{
          DECCENTRE = \_LITERAL (Read)
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_DECCENTRE is used. If
-         PONGO\_DECCENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_DECCENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
    }
    \sstnotes{
@@ -4888,12 +4295,12 @@ when they are specified on the command-line).
       }{
          The geometry to be used to plot the great circle.  This is
          explained in more detail in the section on projections.
-         Allowed values: {\tt "}NONE{\tt "}, {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "}, {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "},
-         {\tt "}MERCATOR{\tt "} and {\tt "}STG{\tt "}.
+         Allowed values: \texttt{"}NONE\texttt{"}, \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"}, \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"},
+         \texttt{"}MERCATOR\texttt{"} and \texttt{"}STG\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_PROJECTN is used. If
-         PONGO\_PROJECTN is not defined, the default value {\tt "}NONE{\tt "} is
+         PONGO\_PROJECTN is not defined, the default value \texttt{"}NONE\texttt{"} is
          used.
       }
       \sstsubsection{
@@ -4901,22 +4308,22 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_RACENTRE is used. If
-         PONGO\_RACENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_RACENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
       \sstsubsection{
          DECCENTRE = \_CHAR (Read)
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_DECCENTRE is used. If
-         PONGO\_DECCENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_DECCENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
    }
 }
@@ -4981,7 +4388,7 @@ when they are specified on the command-line).
       \sstsubsection{
          FILL = \_LOGICAL (Read)
       }{
-         When ACTION is {\tt "}H{\tt "} this parameter controls whether the
+         When ACTION is \texttt{"}H\texttt{"} this parameter controls whether the
          histogram will be drawn filled with the current fill, colour
          and hatching styles.
          [FALSE]
@@ -5109,8 +4516,8 @@ when they are specified on the command-line).
       }{
          The column number (counting from 1), or the symbolic name of a
          column, from which the symbolic name for each data point is
-         read by the \cnam{\iref{READF}} command. The value {\tt "}0{\tt "} means {\tt "}do not read
-         these data{\tt "}. []
+         read by the \cnam{\iref{READF}} command. The value \texttt{"}0\texttt{"} means \texttt{"}do not read
+         these data\texttt{"}. []
       }
    }
 }
@@ -5137,7 +4544,7 @@ when they are specified on the command-line).
          is TRUE the value is taken from the column heading in the
          data file, otherwise the value of the global parameter
          PONGO\_XLABEL is used. If PONGO\_XLABEL is not defined, the
-         value {\tt "} {\tt "} is used.
+         value \texttt{"} \texttt{"} is used.
       }
       \sstsubsection{
          YLABEL = \_CHAR (Read and Write)
@@ -5148,7 +4555,7 @@ when they are specified on the command-line).
          is TRUE the value is taken from the column heading in the
          data file, otherwise the value of the global parameter
          PONGO\_YLABEL is used. If PONGO\_YLABEL is not defined, the
-         value {\tt "} {\tt "} is used.
+         value \texttt{"} \texttt{"} is used.
       }
       \sstsubsection{
          TITLE = \_CHAR (Read and Write)
@@ -5156,7 +4563,7 @@ when they are specified on the command-line).
          The plot title.
 
          [The value of the global parameter PONGO\_TITLE is used. If
-         PONGO\_TITLE is not defined, the value {\tt "} {\tt "} is used.]
+         PONGO\_TITLE is not defined, the value \texttt{"} \texttt{"} is used.]
       }
       \sstsubsection{
          COLUMNS = \_LOGICAL (Read)
@@ -5215,11 +4622,11 @@ when they are specified on the command-line).
       }{
          The geometry to be used for plotting the data.  This is
          explained in more detail in the section on projections.
-         Allowed values: {\tt "}NONE{\tt "}, {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "}, {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "},
-         {\tt "}MERCATOR{\tt "} and {\tt "}STG{\tt "}.
+         Allowed values: \texttt{"}NONE\texttt{"}, \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"}, \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"},
+         \texttt{"}MERCATOR\texttt{"} and \texttt{"}STG\texttt{"}.
 
          [The value of the global parameter PONGO\_PROJECTN is used. If
-         PONGO\_PROJECTN is not defined, the default value {\tt "}NONE{\tt "} is
+         PONGO\_PROJECTN is not defined, the default value \texttt{"}NONE\texttt{"} is
          used.]
       }
       \sstsubsection{
@@ -5227,20 +4634,20 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          [The value of the global parameter PONGO\_RACENTRE is used. If
-         PONGO\_RACENTRE is not defined, the default value {\tt "}0{\tt "} is used.]
+         PONGO\_RACENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.]
       }
       \sstsubsection{
          DECCENTRE = \_CHAR (Read and Write)
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          [The value of the global parameter PONGO\_DECCENTRE is used. If
-         PONGO\_DECCENTRE is not defined, the default value {\tt "}0{\tt "} is used.]
+         PONGO\_DECCENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.]
       }
    }
 }
@@ -5348,12 +4755,12 @@ when they are specified on the command-line).
       }{
          The geometry that is to be used for plotting. This is
          explained in more detail in the section on projections.
-         Allowed values: {\tt "}NONE{\tt "}, {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "}, {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "},
-         {\tt "}MERCATOR{\tt "} and {\tt "}STG{\tt "}.
+         Allowed values: \texttt{"}NONE\texttt{"}, \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"}, \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"},
+         \texttt{"}MERCATOR\texttt{"} and \texttt{"}STG\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_PROJECTN is used. If
-         PONGO\_PROJECTN is not defined, the default value {\tt "}NONE{\tt "} is
+         PONGO\_PROJECTN is not defined, the default value \texttt{"}NONE\texttt{"} is
          used.
       }
       \sstsubsection{
@@ -5361,22 +4768,22 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_RACENTRE is used. If
-         PONGO\_RACENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_RACENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
       \sstsubsection{
          DECCENTRE = \_CHAR (Read)
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_DECENTRE is used. If
-         PONGO\_DECCENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_DECCENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
    }
    \sstnotes{
@@ -5420,13 +4827,13 @@ when they are specified on the command-line).
       }{
          The geometry that is to be used for plotting. This is
          explained in more detail in the section on projections.
-         Allowed values: {\tt "}NONE{\tt "}, {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "}, {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "},
-         {\tt "}MERCATOR{\tt "} and {\tt "}STG{\tt "}.This parameter is only
+         Allowed values: \texttt{"}NONE\texttt{"}, \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"}, \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"},
+         \texttt{"}MERCATOR\texttt{"} and \texttt{"}STG\texttt{"}.This parameter is only
          relevant when marking points.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_PROJECTN is used. If
-         PONGO\_PROJECTN is not defined, the default value {\tt "}NONE{\tt "} is
+         PONGO\_PROJECTN is not defined, the default value \texttt{"}NONE\texttt{"} is
          used.
       }
       \sstsubsection{
@@ -5434,22 +4841,22 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_RACENTRE is used. If
-         PONGO\_RACENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_RACENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
       \sstsubsection{
          DECCENTRE = \_CHAR (Read)
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_DECENTRE is used. If
-         PONGO\_DECCENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_DECCENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
    }
 }
@@ -5478,23 +4885,23 @@ when they are specified on the command-line).
          \sstitemlist{
 
             \sstitem
-               {\tt "}T{\tt "} -- The top edge.
+               \texttt{"}T\texttt{"} -- The top edge.
 
             \sstitem
-               {\tt "}B{\tt "} -- The bottom edge.
+               \texttt{"}B\texttt{"} -- The bottom edge.
 
             \sstitem
-               {\tt "}L{\tt "} -- The left-hand edge.
+               \texttt{"}L\texttt{"} -- The left-hand edge.
 
             \sstitem
-               {\tt "}R{\tt "} -- The right-hand edge.
+               \texttt{"}R\texttt{"} -- The right-hand edge.
 
             \sstitem
-               {\tt "}LV{\tt "} -- The left-hand edge, but with the string written
+               \texttt{"}LV\texttt{"} -- The left-hand edge, but with the string written
                vertically.
 
             \sstitem
-               {\tt "}RV{\tt "} -- The right-hand edge, but with the string written
+               \texttt{"}RV\texttt{"} -- The right-hand edge, but with the string written
                vertically.
 
          }
@@ -5627,8 +5034,8 @@ when they are specified on the command-line).
       }{
          The column number (counting from 1), or the symbolic name of a
          column, from which the PGPLOT symbol code for each data point
-         is read by the \cnam{\iref{READF}} command. The value {\tt "}0{\tt "} means {\tt "}do not read
-         these data{\tt "}. []
+         is read by the \cnam{\iref{READF}} command. The value \texttt{"}0\texttt{"} means \texttt{"}do not read
+         these data\texttt{"}. []
       }
    }
 }
@@ -5732,15 +5139,15 @@ when they are specified on the command-line).
          \sstitemlist{
 
             \sstitem
-               {\tt "}FUNC{\tt "} -- Use a Fortran-like expression to define the
+               \texttt{"}FUNC\texttt{"} -- Use a Fortran-like expression to define the
                function.
 
             \sstitem
-               {\tt "}POLY{\tt "} -- Use a set of polynomial coefficients to define
+               \texttt{"}POLY\texttt{"} -- Use a set of polynomial coefficients to define
                the function.
 
             \sstitem
-               {\tt "}SPLINE{\tt "} -- Use a set of spline coefficients from the file
+               \texttt{"}SPLINE\texttt{"} -- Use a set of spline coefficients from the file
                SPLINEFILE to define the function.
 
          }
@@ -5780,14 +5187,14 @@ when they are specified on the command-line).
       \sstsubsection{
          NPOLY = \_INTEGER (Read and Write)
       }{
-         The order of the polynomial: used when ACTION is {\tt "}POLY{\tt "}.
+         The order of the polynomial: used when ACTION is \texttt{"}POLY\texttt{"}.
 
          [The value of the global parameter PONGO\_NPOLY is used.]
       }
       \sstsubsection{
          POLYCOEF = \_DOUBLE (Read)
       }{
-         A list of polynomial coefficients: used when ACTION is {\tt "}POLY{\tt "}.
+         A list of polynomial coefficients: used when ACTION is \texttt{"}POLY\texttt{"}.
 
          [The value of the global parameter PONGO\_POLYCOEF is used.]
       }
@@ -5805,7 +5212,7 @@ when they are specified on the command-line).
       }{
          The name of the file containing the coefficients and knot
          positions from a previous spline fit -- used when ACTION is
-         {\tt "}SPLINE{\tt "}.
+         \texttt{"}SPLINE\texttt{"}.
 
          [The value of the global parameter PONGO\_SPLINEF is used. If
          PONGO\_SPLINEF is not defined, the value is prompted for.]
@@ -5841,14 +5248,14 @@ when they are specified on the command-line).
          \sstitemlist{
 
             \sstitem
-            {\tt "}H{\tt "} -- If the data in the \xcol\ data area are
+            \texttt{"}H\texttt{"} -- If the data in the \xcol\ data area are
             not binned, they
             can be binned and then plotted.  It is possible to plot
             several histograms with different bin sizes from the same data
             in \xcol\ because the data are unaffected by PLOTHIST.
 
             \sstitem
-            {\tt "}B{\tt "} -- If the data have already been binned, this mode will
+            \texttt{"}B\texttt{"} -- If the data have already been binned, this mode will
             plot a histogram using the \xcol\ and \ycol\ data areas. The \ycol\
             data area should specify the bin edges and the \ycol\ data area
             should contain their respective frequencies.
@@ -5859,7 +5266,7 @@ when they are specified on the command-line).
       \sstsubsection{
          BINMIN = \_REAL (Read and Write)
       }{
-         When ACTION is {\tt "}H{\tt "}, this parameter specifies the lower limit
+         When ACTION is \texttt{"}H\texttt{"}, this parameter specifies the lower limit
          of the binning.
 
          If no value is specified on the command line, the current
@@ -5869,7 +5276,7 @@ when they are specified on the command-line).
       \sstsubsection{
          BINMAX = \_REAL (Read and Write)
       }{
-         When ACTION is {\tt "}H{\tt "}, this parameter specifies the upper limit of
+         When ACTION is \texttt{"}H\texttt{"}, this parameter specifies the upper limit of
          the binning.
 
          If no value is specified on the command line, the current
@@ -5879,7 +5286,7 @@ when they are specified on the command-line).
       \sstsubsection{
          FILL = \_LOGICAL (Read)
       }{
-         When ACTION is {\tt "}H{\tt "} this parameter controls whether the
+         When ACTION is \texttt{"}H\texttt{"} this parameter controls whether the
          histogram will be drawn filled with the current fill, colour
          and hatching styles.
          [FALSE]
@@ -5887,7 +5294,7 @@ when they are specified on the command-line).
       \sstsubsection{
          NBIN = \_INTEGER (Read and Write)
       }{
-         When ACTION is {\tt "}H{\tt "}, this parameter specifies the number of
+         When ACTION is \texttt{"}H\texttt{"}, this parameter specifies the number of
          equally sized bins to be drawn between the limits of the
          histogram.
 
@@ -5897,7 +5304,7 @@ when they are specified on the command-line).
       \sstsubsection{
          AUTOSCALE = \_LOGICAL (Read and Write)
       }{
-         When ACTION is {\tt "}H{\tt "} this parameter specifies whether PGPLOT
+         When ACTION is \texttt{"}H\texttt{"} this parameter specifies whether PGPLOT
          auto-scaling is used to determine the plotting limits. If
          FALSE, the limits defined by the bins of the histogram
          determine the plotting limits. Here, the plotting limits must
@@ -5911,7 +5318,7 @@ when they are specified on the command-line).
       \sstsubsection{
          CENTRE = \_LOGICAL (Read)
       }{
-         When ACTION is {\tt "}B{\tt "}, this parameter specifies whether the
+         When ACTION is \texttt{"}B\texttt{"}, this parameter specifies whether the
          values in the \xcol\ data area denote the centre of each bin
          (when TRUE) or its lower edge (when FALSE).
          [FALSE]
@@ -5974,12 +5381,12 @@ when they are specified on the command-line).
       }{
          Specifies the geometry that is to be used to plot the data.
          This is explained in more detail in the section on
-         projections.  Allowed values: {\tt "}NONE{\tt "}, {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "},
-         {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "}, {\tt "}MERCATOR{\tt "} and {\tt "}STG{\tt "}.
+         projections.  Allowed values: \texttt{"}NONE\texttt{"}, \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"},
+         \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"}, \texttt{"}MERCATOR\texttt{"} and \texttt{"}STG\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_PROJECTN is used. If
-         PONGO\_PROJECTN is not defined, the default value {\tt "}NONE{\tt "} is
+         PONGO\_PROJECTN is not defined, the default value \texttt{"}NONE\texttt{"} is
          used.
       }
       \sstsubsection{
@@ -5987,22 +5394,22 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_RACENTRE is used. If
-         PONGO\_RACENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_RACENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
       \sstsubsection{
          DECCENTRE = \_CHAR (Read)
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_DECCENTRE is used. If
-         PONGO\_DECCENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_DECCENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
    }
 }
@@ -6027,13 +5434,13 @@ when they are specified on the command-line).
          \sstitemlist{
 
             \sstitem
-            {\tt "}M{\tt "} -- move to,
+            \texttt{"}M\texttt{"} -- move to,
 
             \sstitem
-            {\tt "}D{\tt "} -- draw line to,
+            \texttt{"}D\texttt{"} -- draw line to,
 
             \sstitem
-            {\tt "}K{\tt "} -- mark.
+            \texttt{"}K\texttt{"} -- mark.
 
          }
          [The value is prompted for.]
@@ -6065,13 +5472,13 @@ when they are specified on the command-line).
       }{
          The geometry that is to be used for plotting. This is
          explained in more detail in the section on projections.
-         Allowed values: {\tt "}NONE{\tt "}, {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "}, {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "},
-         {\tt "}MERCATOR{\tt "} and {\tt "}STG{\tt "}.This parameter is only
+         Allowed values: \texttt{"}NONE\texttt{"}, \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"}, \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"},
+         \texttt{"}MERCATOR\texttt{"} and \texttt{"}STG\texttt{"}.This parameter is only
          relevant when marking points.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_PROJECTN is used. If
-         PONGO\_PROJECTN is not defined, the default value {\tt "}NONE{\tt "} is
+         PONGO\_PROJECTN is not defined, the default value \texttt{"}NONE\texttt{"} is
          used.
       }
       \sstsubsection{
@@ -6079,22 +5486,22 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_RACENTRE is used. If
-         PONGO\_RACENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_RACENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
       \sstsubsection{
          DECCENTRE = \_CHAR (Read)
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_DECENTRE is used. If
-         PONGO\_DECCENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_DECCENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
    }
    \sstnotes{
@@ -6214,12 +5621,12 @@ when they are specified on the command-line).
          PROJECTION = \_CHAR (Read)
       }{
          The geometry used to plot the data.  This is explained in more
-         detail in the section on projections.  Allowed values: {\tt "}NONE{\tt "},
-         {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "}, {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "}, {\tt "}MERCATOR{\tt "} and {\tt "}STG{\tt "}.
+         detail in the section on projections.  Allowed values: \texttt{"}NONE\texttt{"},
+         \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"}, \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"}, \texttt{"}MERCATOR\texttt{"} and \texttt{"}STG\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_PROJECTN is used. If
-         PONGO\_PROJECTN is not defined, the default value {\tt "}NONE{\tt "} is
+         PONGO\_PROJECTN is not defined, the default value \texttt{"}NONE\texttt{"} is
          used.
       }
       \sstsubsection{
@@ -6227,22 +5634,22 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_RACENTRE is used. If
-         PONGO\_RACENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_RACENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
       \sstsubsection{
          DECCENTRE = \_CHAR (Read)
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_DECCENTRE is used. If
-         PONGO\_DECCENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_DECCENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
    }
 }
@@ -6344,7 +5751,7 @@ when they are specified on the command-line).
          The character must appear in the first column of a comment.
 
          If the value is not specified on the command line, the current
-         value is used. The current value is initially set to {\tt "}!{\tt "}.
+         value is used. The current value is initially set to \texttt{"}!\texttt{"}.
       }
       \sstsubsection{
          SOFTCOM = \_CHAR (Read and Write)
@@ -6355,101 +5762,101 @@ when they are specified on the command-line).
          comment.
 
          If the value is not specified on the command line, the current
-         value is used. The current value is initially set to {\tt "}!{\tt "}.
+         value is used. The current value is initially set to \texttt{"}!\texttt{"}.
       }
       \sstsubsection{
          XCOL = \_CHAR (Read and Write)
       }{
          The column number (counting from 1), or the symbolic name of a
-         column, from which the X-axis data are read. The value {\tt "}0{\tt "}
-         means {\tt "}do not read these data{\tt "}.
+         column, from which the X-axis data are read. The value \texttt{"}0\texttt{"}
+         means \texttt{"}do not read these data\texttt{"}.
 
          If the value is not specified on the command line, the value
          of the global parameter PONGO\_XCOL is used. If PONGO\_XCOL is
          not defined, the current value is used. The current value is
-         initially set to {\tt "}0{\tt "}.
+         initially set to \texttt{"}0\texttt{"}.
       }
       \sstsubsection{
          YCOL = \_CHAR (Read and Write)
       }{
          The column number (counting from 1), or the symbolic name of a
-         column, from which the Y-axis data are read. The value {\tt "}0{\tt "}
-         means {\tt "}do not read these data{\tt "}.
+         column, from which the Y-axis data are read. The value \texttt{"}0\texttt{"}
+         means \texttt{"}do not read these data\texttt{"}.
 
          If the value is not specified on the command line, the value
          of the global parameter PONGO\_YCOL is used. If PONGO\_YCOL is
          not defined, the current value is used. The current value is
-         initially set to {\tt "}0{\tt "}.
+         initially set to \texttt{"}0\texttt{"}.
       }
       \sstsubsection{
          ZCOL = \_CHAR (Read and Write)
       }{
          The column number (counting from 1), or the symbolic name of a
-         column, from which the Z-axis data are read. The value {\tt "}0{\tt "}
-         means {\tt "}do not read these data{\tt "}.
+         column, from which the Z-axis data are read. The value \texttt{"}0\texttt{"}
+         means \texttt{"}do not read these data\texttt{"}.
 
          If the value is not specified on the command line, the value
          of the global parameter PONGO\_ZCOL is used. If PONGO\_ZCOL is
          not defined, the current value is used. The current value is
-         initially set to {\tt "}0{\tt "}.
+         initially set to \texttt{"}0\texttt{"}.
       }
       \sstsubsection{
          EXCOL = \_CHAR (Read and Write)
       }{
          The column number (counting from 1), or the symbolic name of a
          column, from which the X-axis error data are read. The value
-         {\tt "}0{\tt "} means {\tt "}do not read these data{\tt "}.
+         \texttt{"}0\texttt{"} means \texttt{"}do not read these data\texttt{"}.
 
          If the value is not specified on the command line, the value
          of the global parameter PONGO\_EXCOL is used. If PONGO\_EXCOL
          is not defined, the current value is used. The current value
-         is initially set to {\tt "}0{\tt "}.
+         is initially set to \texttt{"}0\texttt{"}.
       }
       \sstsubsection{
          EYCOL = \_CHAR (Read and Write)
       }{
          The column number (counting from 1), or the symbolic name of a
          column, from which the Y-axis error data are read. The value
-         {\tt "}0{\tt "} means {\tt "}do not read these data{\tt "}.
+         \texttt{"}0\texttt{"} means \texttt{"}do not read these data\texttt{"}.
 
          If the value is not specified on the command line, the value
          of the global parameter PONGO\_EYCOL is used.  If PONGO\_EYCOL
          is not defined, the current value is used. The current value
-         is initially set to {\tt "}0{\tt "}.
+         is initially set to \texttt{"}0\texttt{"}.
       }
       \sstsubsection{
          LABCOL = \_CHAR (Read and Write)
       }{
          The column number (counting from 1), or the symbolic name of a
          column, from which the symbolic name for each data point is
-         read. The value {\tt "}0{\tt "} means {\tt "}do not read these data{\tt "}.
+         read. The value \texttt{"}0\texttt{"} means \texttt{"}do not read these data\texttt{"}.
 
          If the value is not specified on the command line, the value
          of the global parameter PONGO\_LABCOL is used. If PONGO\_LABCOL
          is not defined, the current value is used. The current value
-         is initially set to {\tt "}0{\tt "}.
+         is initially set to \texttt{"}0\texttt{"}.
       }
       \sstsubsection{
          SYMCOL = \_CHAR (Read and Write)
       }{
          The column number (counting from 1), or the symbolic name of a
          column, from which the PGPLOT symbol code for each data point
-         is read. The value {\tt "}0{\tt "} means {\tt "}do not read these data{\tt "}.
+         is read. The value \texttt{"}0\texttt{"} means \texttt{"}do not read these data\texttt{"}.
 
          If the value is not specified on the command line, the value
          of the global parameter PONGO\_SYMCOL is used. If PONGO\_SYMCOL
          is not defined, the current value is used. The current value
-         is initially set to {\tt "}0{\tt "}.
+         is initially set to \texttt{"}0\texttt{"}.
       }
       \sstsubsection{
          DELIM = \_CHAR (Read and Write)
       }{
          The character string interpreted as a column delimiter when
          reading the data file. For example, this can be used to read
-         LATEX format tables by setting DELIM={\tt "}\&{\tt "}.
+         LATEX format tables by setting DELIM=\texttt{"}\&\texttt{"}.
 
          If the value is not specified on the command line, the current
-         value is used. The current value is initially set to {\tt "} {\tt "}.
+         value is used. The current value is initially set to \texttt{"} \texttt{"}.
       }
       \sstsubsection{
          FROM = \_INTEGER (Read and Write)
@@ -6494,19 +5901,19 @@ when they are specified on the command-line).
 
             \sstitemlist{
 
-               \sstitem {\tt "}={\tt "} -- equals;
-               \sstitem {\tt "}\#{\tt "} -- not equal;
-               \sstitem {\tt "}$>${\tt "} -- greater than;
-               \sstitem {\tt "}$<${\tt "} -- less than;
-               \sstitem {\tt "}CE{\tt "} -- equal to string;
-               \sstitem {\tt "}C\#{\tt "} -- not equal to string;
-               \sstitem {\tt "}RA{\tt "} -- in the range VAL1 to VAL2;
-               \sstitem {\tt "}LI{\tt "} -- select if in the following list of values;
-               \sstitem {\tt "}EX{\tt "} -- exclude if in the following list of values;
-               \sstitem {\tt "}IN{\tt "} -- select if the substring is contained within the
+               \sstitem \texttt{"}=\texttt{"} -- equals;
+               \sstitem \texttt{"}\#\texttt{"} -- not equal;
+               \sstitem \texttt{"}$>$\texttt{"} -- greater than;
+               \sstitem \texttt{"}$<$\texttt{"} -- less than;
+               \sstitem \texttt{"}CE\texttt{"} -- equal to string;
+               \sstitem \texttt{"}C\#\texttt{"} -- not equal to string;
+               \sstitem \texttt{"}RA\texttt{"} -- in the range VAL1 to VAL2;
+               \sstitem \texttt{"}LI\texttt{"} -- select if in the following list of values;
+               \sstitem \texttt{"}EX\texttt{"} -- exclude if in the following list of values;
+               \sstitem \texttt{"}IN\texttt{"} -- select if the substring is contained within the
                value;
-               \sstitem {\tt "}A$>${\tt "} -- absolute value greater than;
-               \sstitem {\tt "}A$<${\tt "} -- absolute value less than.
+               \sstitem \texttt{"}A$>$\texttt{"} -- absolute value greater than;
+               \sstitem \texttt{"}A$<$\texttt{"} -- absolute value less than.
             }
 
             \sstitem
@@ -6517,7 +5924,7 @@ when they are specified on the command-line).
          \end{quote}
 
          Note that there must be white space around the selection
-         criterion. A value of {\tt "}0{\tt "} means {\tt "}read everything{\tt "}.
+         criterion. A value of \texttt{"}0\texttt{"} means \texttt{"}read everything\texttt{"}.
 
          [The value is prompted for.]
       }
@@ -6530,16 +5937,16 @@ when they are specified on the command-line).
          application.
 
          \cnam{READF }updates the value of the global parameters PONGO\_XOPT.
-         The application will automatically remove any {\tt "}L{\tt "} characters
+         The application will automatically remove any \texttt{"}L\texttt{"} characters
          at the start of the options string, because it is assumed
          that they have been inserted by the \cnam{\iref{CLOG}} application -- any
          new data will not have had logarithms taken.  If data are
-         given in logarithmic form, the {\tt "}L{\tt "} character should be
+         given in logarithmic form, the \texttt{"}L\texttt{"} character should be
          inserted into the options strings anywhere except at the
          start.
 
          [The value of the global parameter PONGO\_XOPT is used. If
-         PONGO\_XOPT is not defined, the default value {\tt "}BCNST{\tt "} is used.]
+         PONGO\_XOPT is not defined, the default value \texttt{"}BCNST\texttt{"} is used.]
       }
       \sstsubsection{
          YOPT = \_CHAR (Read and Write)
@@ -6550,16 +5957,16 @@ when they are specified on the command-line).
          application.
 
          \cnam{READF} updates the value of the global parameters PONGO\_YOPT.
-         The application will automatically remove any {\tt "}L{\tt "} characters
+         The application will automatically remove any \texttt{"}L\texttt{"} characters
          at the start of the options string, because it is assumed
          that they have been inserted by the \cnam{CLOG} application -- any
          new data will not have had logarithms taken.  If data are
-         given in logarithmic form, the {\tt "}L{\tt "} character should be
+         given in logarithmic form, the \texttt{"}L\texttt{"} character should be
          inserted into the options strings anywhere except at the
          start.
 
          [The value of the global parameter PONGO\_YOPT is used. If
-         PONGO\_XOPT is not defined, the default value {\tt "}BCNST{\tt "} is used.]
+         PONGO\_XOPT is not defined, the default value \texttt{"}BCNST\texttt{"} is used.]
       }
       \sstsubsection{
          ERSCALE = \_REAL (Read)
@@ -6589,7 +5996,7 @@ when they are specified on the command-line).
       \sstsubsection{
          QUICK = \_LOGICAL (Read and Write)
       }{
-         If TRUE, a {\tt "}quick mode{\tt "} read is performed. This mode can only
+         If TRUE, a \texttt{"}quick mode\texttt{"} read is performed. This mode can only
          be used on files which exclusively contain numeric data. This
          parameter can over-ride the action of the LABCOL  and SELCOND
          parameters.
@@ -6670,8 +6077,8 @@ when they are specified on the command-line).
       }{
          The geometry that is to be used. This is explained in more
          detail in the section on projections. Allowed values:
-         {\tt "}NONE{\tt "}, {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "}, {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "}, {\tt "}MERCATOR{\tt "}
-         and {\tt "}STG{\tt "}.
+         \texttt{"}NONE\texttt{"}, \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"}, \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"}, \texttt{"}MERCATOR\texttt{"}
+         and \texttt{"}STG\texttt{"}.
 
          This parameter must be specified on the command line. It
          sets the value of the global parameter PONGO\_PROJECTN.
@@ -6681,7 +6088,7 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter sets the value of the PONGO\_RACENTRE global
          variable.
@@ -6691,7 +6098,7 @@ when they are specified on the command-line).
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter sets the value of the PONGO\_DECCENTRE global
          variable.
@@ -6761,12 +6168,12 @@ when they are specified on the command-line).
       }{
          Specifies the geometry that is to be used to plot the data.
          This is explained in more detail in the section on
-         projections.  Allowed values: {\tt "}NONE{\tt "}, {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "},
-         {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "}, {\tt "}MERCATOR{\tt "} and {\tt "}STG{\tt "}.
+         projections.  Allowed values: \texttt{"}NONE\texttt{"}, \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"},
+         \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"}, \texttt{"}MERCATOR\texttt{"} and \texttt{"}STG\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_PROJECTN is used. If
-         PONGO\_PROJECTN is not defined, the default value {\tt "}NONE{\tt "} is
+         PONGO\_PROJECTN is not defined, the default value \texttt{"}NONE\texttt{"} is
          used.
       }
       \sstsubsection{
@@ -6774,22 +6181,22 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_RACENTRE is used. If
-         PONGO\_RACENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_RACENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
       \sstsubsection{
          DECCENTRE = \_CHAR (Read)
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          This parameter is not specified on the command line. The value
          of the global parameter PONGO\_DECCENTRE is used. If
-         PONGO\_DECCENTRE is not defined, the default value {\tt "}0{\tt "} is used.
+         PONGO\_DECCENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.
       }
    }
 }
@@ -6813,8 +6220,8 @@ when they are specified on the command-line).
       }{
          The column number (counting from 1), or the symbolic name of a
          column, from which the PGPLOT symbol code for each data point
-         is read by the \cnam{\iref{READF}} command. The value {\tt "}0{\tt "} means {\tt "}do not read
-         these data{\tt "}. []
+         is read by the \cnam{\iref{READF}} command. The value \texttt{"}0\texttt{"} means \texttt{"}do not read
+         these data\texttt{"}. []
       }
    }
 }
@@ -6920,23 +6327,23 @@ when they are specified on the command-line).
          \sstitemlist{
 
             \sstitem
-               {\tt "}STANDARD{\tt "} -- The viewport is set to the standard PGPLOT
+               \texttt{"}STANDARD\texttt{"} -- The viewport is set to the standard PGPLOT
                viewport.
 
             \sstitem
-               {\tt "}ADJUST{\tt "} -- The viewport is adjusted so that the scales
+               \texttt{"}ADJUST\texttt{"} -- The viewport is adjusted so that the scales
                along the X and Y axes are the same number of world
                coordinate units per unit length. The newly created
                viewport fits within the old viewport.
 
             \sstitem
-               {\tt "}NDC{\tt "} -- The viewport is set by specifying its extent in
+               \texttt{"}NDC\texttt{"} -- The viewport is set by specifying its extent in
                the X and Y directions in terms of normalised device
                coordinates (\ie coordinates that run from 0 to 1 along
                the horizontal and vertical directions).
 
             \sstitem
-               {\tt "}INCHES{\tt "} -- The viewport is set by specifying its extent
+               \texttt{"}INCHES\texttt{"} -- The viewport is set by specifying its extent
                in the X and Y directions in terms of inches.
 
          }
@@ -7315,19 +6722,19 @@ when they are specified on the command-line).
          \sstitemlist{
 
             \sstitem
-               {\tt "}DATA{\tt "} -- The limits are calculated from the data limits,
+               \texttt{"}DATA\texttt{"} -- The limits are calculated from the data limits,
                with a small border added.
 
             \sstitem
-               {\tt "}DATA0{\tt "} -- The limits are calculated as for DATA, but the
+               \texttt{"}DATA0\texttt{"} -- The limits are calculated as for DATA, but the
                origin is included as one of the data points.
 
             \sstitem
-               {\tt "}GIVEN{\tt "} -- The limits specified on the command line are
+               \texttt{"}GIVEN\texttt{"} -- The limits specified on the command line are
                used.
 
             \sstitem
-               {\tt "}RECALL{\tt "} -- The coordinates are recalled from a previous
+               \texttt{"}RECALL\texttt{"} -- The coordinates are recalled from a previous
                plot using the AGI database.
 
          }
@@ -7339,7 +6746,7 @@ when they are specified on the command-line).
          The world coordinate of the left-hand edge of the plot.
 
          The application will determine the value if ACTION is one of
-         {\tt "}DATA{\tt "}, {\tt "}DATA0{\tt "} or {\tt "}RECALL{\tt "}. If ACTION={\tt "}GIVEN{\tt "} and no value is
+         \texttt{"}DATA\texttt{"}, \texttt{"}DATA0\texttt{"} or \texttt{"}RECALL\texttt{"}. If ACTION=\texttt{"}GIVEN\texttt{"} and no value is
          specified on the command line, the value of the global
          parameter PONGO\_XMIN is used.
       }
@@ -7349,7 +6756,7 @@ when they are specified on the command-line).
          The world coordinate of the right-hand edge of the plot.
 
          The application will determine the value if ACTION is one of
-         {\tt "}DATA{\tt "}, {\tt "}DATA0{\tt "} or {\tt "}RECALL{\tt "}. If ACTION={\tt "}GIVEN{\tt "} and no value is
+         \texttt{"}DATA\texttt{"}, \texttt{"}DATA0\texttt{"} or \texttt{"}RECALL\texttt{"}. If ACTION=\texttt{"}GIVEN\texttt{"} and no value is
          specified on the command line, the value of the global
          parameter PONGO\_XMAX is used.
       }
@@ -7359,7 +6766,7 @@ when they are specified on the command-line).
          The world coordinate of the lower edge of the plot.
 
          The application will determine the value if ACTION is one of
-         {\tt "}DATA{\tt "}, {\tt "}DATA0{\tt "} or {\tt "}RECALL{\tt "}. If ACTION={\tt "}GIVEN{\tt "} and no value is
+         \texttt{"}DATA\texttt{"}, \texttt{"}DATA0\texttt{"} or \texttt{"}RECALL\texttt{"}. If ACTION=\texttt{"}GIVEN\texttt{"} and no value is
          specified on the command line, the value of the global
          parameter PONGO\_YMIN is used.
       }
@@ -7369,7 +6776,7 @@ when they are specified on the command-line).
          The world coordinate of the upper edge of the plot.
 
          The application will determine the value if ACTION is one of
-         {\tt "}DATA{\tt "}, {\tt "}DATA0{\tt "} or {\tt "}RECALL{\tt "}. If ACTION={\tt "}GIVEN{\tt "} and no value is
+         \texttt{"}DATA\texttt{"}, \texttt{"}DATA0\texttt{"} or \texttt{"}RECALL\texttt{"}. If ACTION=\texttt{"}GIVEN\texttt{"} and no value is
          specified on the command line, the value of the global
          parameter PONGO\_YMAX is used.
       }
@@ -7378,18 +6785,18 @@ when they are specified on the command-line).
       }{
          The AGI label of the picture to be recalled.
 
-         [If ACTION={\tt "}RECALL{\tt "}, the value is prompted for.]
+         [If ACTION=\texttt{"}RECALL\texttt{"}, the value is prompted for.]
       }
       \sstsubsection{
          PROJECTION = \_CHAR (Read and Write)
       }{
          The geometry to be used for plotting the data.  This is
          explained in more detail in the section on projections.
-         Allowed values: {\tt "}NONE{\tt "}, {\tt "}TAN{\tt "}, {\tt "}SIN{\tt "}, {\tt "}ARC{\tt "}, {\tt "}GLS{\tt "}, {\tt "}AITOFF{\tt "},
-         {\tt "}MERCATOR{\tt "} and {\tt "}STG{\tt "}.
+         Allowed values: \texttt{"}NONE\texttt{"}, \texttt{"}TAN\texttt{"}, \texttt{"}SIN\texttt{"}, \texttt{"}ARC\texttt{"}, \texttt{"}GLS\texttt{"}, \texttt{"}AITOFF\texttt{"},
+         \texttt{"}MERCATOR\texttt{"} and \texttt{"}STG\texttt{"}.
 
          [The value of the global parameter PONGO\_PROJECTN is used. If
-         PONGO\_PROJECTN is not defined, the default value {\tt "}NONE{\tt "} is
+         PONGO\_PROJECTN is not defined, the default value \texttt{"}NONE\texttt{"} is
          used.]
       }
       \sstsubsection{
@@ -7397,27 +6804,27 @@ when they are specified on the command-line).
       }{
          The centre of the projection in RA (\ie the angle must be
          specified as hh:mm:ss.sss). This parameter is only required for
-         PROJECTION values other than {\tt "}NONE{\tt "}.
+         PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          [The value of the global parameter PONGO\_RACENTRE is used. If
-         PONGO\_RACENTRE is not defined, the default value {\tt "}0{\tt "} is used.]
+         PONGO\_RACENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.]
       }
       \sstsubsection{
          DECCENTRE = \_CHAR (Read and Write)
       }{
          The centre of the projection in declination (\ie the angle
          must be specified as dd:mm:ss.sss). This parameter is only
-         required for PROJECTION values other than {\tt "}NONE{\tt "}.
+         required for PROJECTION values other than \texttt{"}NONE\texttt{"}.
 
          [The value of the global parameter PONGO\_DECCENTRE is used. If
-         PONGO\_DECCENTRE is not defined, the default value {\tt "}0{\tt "} is used.]
+         PONGO\_DECCENTRE is not defined, the default value \texttt{"}0\texttt{"} is used.]
       }
       \sstsubsection{
          ERSCALE = \_REAL (Read)
       }{
          The scale factor to be applied to the \excol\ and \eycol\ data when
          determining the limits of the world co-ordinates.  ERSCALE is
-         used only when ACTION = {\tt "}DATA{\tt "} or {\tt "}DATA0{\tt "}.
+         used only when ACTION = \texttt{"}DATA\texttt{"} or \texttt{"}DATA0\texttt{"}.
          [The value of the global parameter PONGO\_ERSCALE is used. If
          PONGO\_ERSCALE is not defined, the default value 1.0 is used.]
       }
@@ -7445,13 +6852,13 @@ when they are specified on the command-line).
          \sstitemlist{
 
             \sstitem
-               {\tt "}LABLST{\tt "} -- Write the internal list of labels out.
+               \texttt{"}LABLST\texttt{"} -- Write the internal list of labels out.
 
             \sstitem
-               {\tt "}DATA{\tt "} -- Write out selected data.
+               \texttt{"}DATA\texttt{"} -- Write out selected data.
 
             \sstitem
-               {\tt "}AGIPIC{\tt "} -- Write the label, name and comment for the
+               \texttt{"}AGIPIC\texttt{"} -- Write the label, name and comment for the
                current AGI picture to the AGI database.
 
          }
@@ -7470,7 +6877,7 @@ when they are specified on the command-line).
          The Fortran FORMAT to be used.
 
          If the value is not specified on the command line, the current
-         value is used. The current value is initially set to {\tt "}G25.16{\tt "}.
+         value is used. The current value is initially set to \texttt{"}G25.16\texttt{"}.
       }
       \sstsubsection{
          AGINAME = \_CHAR (Read and Write)
@@ -7480,16 +6887,16 @@ when they are specified on the command-line).
          \sstitemlist{
 
             \sstitem
-               {\tt "}DATA{\tt "} -- Used to indicate that the AGI picture contains
+               \texttt{"}DATA\texttt{"} -- Used to indicate that the AGI picture contains
                the representation of data in some graphical form (\ie a
                graph).
 
             \sstitem
-               {\tt "}FRAME{\tt "} -- Used to indicate that the AGI picture contains
-               a group of other plots (\ie several {\tt "}DATA{\tt "} pictures).
+               \texttt{"}FRAME\texttt{"} -- Used to indicate that the AGI picture contains
+               a group of other plots (\ie several \texttt{"}DATA\texttt{"} pictures).
 
          }
-         [{\tt "}DATA{\tt "}]
+         [\texttt{"}DATA\texttt{"}]
       }
       \sstsubsection{
          AGICOMMENT = \_CHAR (Read and Write)
@@ -7497,7 +6904,7 @@ when they are specified on the command-line).
          The AGI comment for the current picture.
 
          If the value is not specified on the command line, the current
-         value is used. The current value is set to {\tt "}User viewport{\tt "}.
+         value is used. The current value is set to \texttt{"}User viewport\texttt{"}.
       }
       \sstsubsection{
          AGILABEL = \_CHAR (Read and Write)
@@ -7559,15 +6966,15 @@ when they are specified on the command-line).
          \sstitemlist{
 
             \sstitem
-               {\tt "}P{\tt "} -- Use PGPTEXT which allows the position,
+               \texttt{"}P\texttt{"} -- Use PGPTEXT which allows the position,
                justification and angle of the text to be specified.
 
             \sstitem
-               {\tt "}M{\tt "} -- Use PGMTEXT which allows the text to be written
+               \texttt{"}M\texttt{"} -- Use PGMTEXT which allows the text to be written
                relative to the viewport.
 
             \sstitem
-               {\tt "}S{\tt "} -- Use PGTEXT which allows only simple (x,y)
+               \texttt{"}S\texttt{"} -- Use PGTEXT which allows only simple (x,y)
                positioning of the text.
 
          }
@@ -7576,8 +6983,8 @@ when they are specified on the command-line).
       \sstsubsection{
          XPOS = \_REAL (Read and Write)
       }{
-         If ACTION is {\tt "}P{\tt "} or {\tt "}S{\tt "}, the X coordinate of the text.  With
-         the {\tt "}M{\tt "} action, this parameter specifies the number of
+         If ACTION is \texttt{"}P\texttt{"} or \texttt{"}S\texttt{"}, the X coordinate of the text.  With
+         the \texttt{"}M\texttt{"} action, this parameter specifies the number of
          character heights from the viewport where the text is to be
          plotted (negative values are allowed).
 
@@ -7586,8 +6993,8 @@ when they are specified on the command-line).
       \sstsubsection{
          YPOS = \_REAL (Read and Write)
       }{
-         If ACTION is {\tt "}P{\tt "} or {\tt "}S{\tt "}, the Y coordinate of the text.  With
-         the {\tt "}M{\tt "} action, this parameter specifies the fraction along
+         If ACTION is \texttt{"}P\texttt{"} or \texttt{"}S\texttt{"}, the Y coordinate of the text.  With
+         the \texttt{"}M\texttt{"} action, this parameter specifies the fraction along
          the edge where the text is to be plotted.
 
          [The value is prompted for.]
@@ -7603,33 +7010,33 @@ when they are specified on the command-line).
       \sstsubsection{
          SIDE = \_CHAR (Read and Write)
       }{
-         If ACTION={\tt "}M{\tt "}, the side of the viewport where the text is to
+         If ACTION=\texttt{"}M\texttt{"}, the side of the viewport where the text is to
          plotted. This may be one of the following:
          \sstitemlist{
 
             \sstitem
-               {\tt "}T{\tt "} -- The top edge.
+               \texttt{"}T\texttt{"} -- The top edge.
 
             \sstitem
-               {\tt "}B{\tt "} -- The bottom edge.
+               \texttt{"}B\texttt{"} -- The bottom edge.
 
             \sstitem
-               {\tt "}L{\tt "} -- The left-hand edge.
+               \texttt{"}L\texttt{"} -- The left-hand edge.
 
             \sstitem
-               {\tt "}R{\tt "} -- The right-hand edge.
+               \texttt{"}R\texttt{"} -- The right-hand edge.
 
             \sstitem
-               {\tt "}LV{\tt "} -- The left-hand edge, but with the string written
+               \texttt{"}LV\texttt{"} -- The left-hand edge, but with the string written
                vertically.
 
             \sstitem
-               {\tt "}RV{\tt "} -- The right-hand edge, but with the string written
+               \texttt{"}RV\texttt{"} -- The right-hand edge, but with the string written
                vertically.
 
          }
          If the value is not specified on the command line, the current
-         value is used. The current value is initially set to {\tt "}T{\tt "}.
+         value is used. The current value is initially set to \texttt{"}T\texttt{"}.
       }
       \sstsubsection{
          JUSTIFICATION = \_REAL (Read and Write)
@@ -7646,7 +7053,7 @@ when they are specified on the command-line).
       \sstsubsection{
          ANGLE = \_REAL (Read and Write)
       }{
-         If ACTION={\tt "}P{\tt "}, the angle relative to the horizontal at which
+         If ACTION=\texttt{"}P\texttt{"}, the angle relative to the horizontal at which
          the text string is to be plotted.
 
          If the value is not specified on the command line, the current
@@ -7674,7 +7081,7 @@ when they are specified on the command-line).
       }{
          The column number (counting from 1), or the symbolic name of a
          column, from which the X-axis data are read by the \cnam{\iref{READF}}
-         command. The value {\tt "}0{\tt "} means {\tt "}do not read these data{\tt "}. []
+         command. The value \texttt{"}0\texttt{"} means \texttt{"}do not read these data\texttt{"}. []
       }
    }
 }
@@ -7798,8 +7205,8 @@ when they are specified on the command-line).
          YCOL = \_CHAR (Read and Write)
       }{
          The column number (counting from 1), or the symbolic name of a
-         column, from which the Y-axis data are read. The value {\tt "}0{\tt "}
-         means {\tt "}do not read these data{\tt "}. []
+         column, from which the Y-axis data are read. The value \texttt{"}0\texttt{"}
+         means \texttt{"}do not read these data\texttt{"}. []
       }
    }
 }
@@ -7924,8 +7331,8 @@ when they are specified on the command-line).
          ZCOL = \_CHAR (Read and Write)
       }{
          The column number (counting from 1), or the symbolic name of a
-         column, from which the Z-axis data are read. The value {\tt "}0{\tt "}
-         means {\tt "}do not read these data{\tt "}. []
+         column, from which the Z-axis data are read. The value \texttt{"}0\texttt{"}
+         means \texttt{"}do not read these data\texttt{"}. []
       }
    }
 }
@@ -8026,8 +7433,8 @@ The most important difference at the command level is that once
 \xcol\ \etc\ have been set up, the data must be input explicitly using the
 \cnam{\iref{READF}} command, where MONGO would read the data in each time that a
 command that needs them is executed.
-{\em Table \ref{mongo_same_tab}} is a list of the commands that work as
-expected (with the above proviso) and {\em Table \ref{mongo_diff_tab}} gives a
+\emph{Table \ref{mongo_same_tab}} is a list of the commands that work as
+expected (with the above proviso) and \emph{Table \ref{mongo_diff_tab}} gives a
 list of the closest equivalents to MONGO commands.
 
 {\small
@@ -8075,11 +7482,9 @@ devices. To display on an X device the usual way of referring to a
 window is by the name \verb+xw+. This is as used thoughout this
 document. If you need to change the size of this window then use the
 command (from the shell after closing the existing window):
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 % xmake xwindows -width xxx -height xxx
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 You should not change the size of an X window after it is created.
 The X window is created using the GWM services which you can read
 more about in \xref{SUN/130}{sun130}{} (which, for instance, describes
@@ -8138,13 +7543,13 @@ Other changes of note are:
 longer needed when using an ICL variable to store the file name. This
 is INCOMPATIBLE with previous behaviour and any scripts using the `@'
 form will need changing, i.e. lines with statements like:
-\begin{verbatim}
-     READF DATA=('@'&FILE)
-\end{verbatim}
+\begin{terminalv}
+READF DATA=('@'&FILE)
+\end{terminalv}
   Should be changed to:
-\begin{verbatim}
-     READF DATA=(FILE)
-\end{verbatim}
+\begin{terminalv}
+READF DATA=(FILE)
+\end{terminalv}
 
 \item An example has been added to the panic section to show how
 PONGO can be used to plot more than 5000 points at a time (5000 is
@@ -8244,9 +7649,9 @@ command \cnam{\iref{READF}} already does this for you if the
 positions are in \verb+HH:MM:SS+, \verb+DD:MM:SS+ format, or the
 \cnam{\iref{DEGTOR}} command will convert
 columns from degrees to radians) and then use a command like:
-\begin{verbatim}
-   ICL> BOXFRAME XOPT='BCNSTZHG' YOPT='BCNSTZDG'
-\end{verbatim}
+\begin{terminalv}
+ICL> BOXFRAME XOPT='BCNSTZHG' YOPT='BCNSTZDG'
+\end{terminalv}
 This now uses the \xref{PGPLOT}{sun15}{} routine
 \xref{PGTBOX}{sun15}{PGTBOX}.
 \cnam{\iref{BOXFRAME}} has also been modified to allow the use of the "1" and "2"
