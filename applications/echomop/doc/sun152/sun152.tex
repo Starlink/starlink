@@ -1,8 +1,6 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt]{starlink}
 
 % ? Specify used packages
- \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
 
 \pagestyle{myheadings}
@@ -10,21 +8,21 @@
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright}
+\stardoccategory  {Starlink User Note}
+\stardocinitials  {SUN}
+\stardocsource    {sun\stardocnumber}
+\stardoccopyright
 {Copyright \copyright\ 2003 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {152.4}
-\newcommand{\stardocauthors}   {Dave Mills, John Webb \& Martin Clayton}
-\newcommand{\stardocdate}      {2003 July 14}
-\newcommand{\stardoctitle}     {ECHOMOP---Echelle Data Reduction Package}
-\newcommand{\stardocversion}   {Version 3.3-7} %%VERSION%%
-\newcommand{\stardocmanual}    {Users' Manual}
-\newcommand{\stardocabstract}  {
-{\sc echomop} provides facilities for the extraction of spectra from 2-D data
+\stardocnumber    {152.4}
+\stardocauthors   {Dave Mills, John Webb \& Martin Clayton}
+\stardocdate      {2003 July 14}
+\stardoctitle     {ECHOMOP---Echelle Data Reduction Package}
+\stardocversion   {Version 3.3-7} %%VERSION%%
+\stardocmanual    {Users' Manual}
+\stardocabstract  {%
+\textsc{echomop} provides facilities for the extraction of spectra from 2-D data
 frames.  These data can be single-order spectra, or multi-order \'{e}chelle
 spectra.
 
@@ -36,159 +34,16 @@ Features include; robust and flexible order tracing,
 optimal extraction, support for variance arrays,
 and 2-D distortion fitting and extraction.
 }
+\startitlepic{\includegraphics[height=60mm]{sun152_cover}}
 % ? End of document identification
 % -----------------------------------------------------------------------------
+% ? Document specific \providecommand or \newenvironment commands.
 
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%      1-FEB-2000 (AJC):
-%        Add Copyright statement in LaTeX
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
-\newcommand{\mlabel}[1]{\xlabel{#1}\label{#1}}
+\providecommand{\mlabel}[1]{\xlabel{#1}\label{#1}}
 
 \setcounter{tocdepth}{2}
 \setcounter{secnumdepth}{3}
 \renewcommand{\floatpagefraction}{0.8}
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-
 
 %begin{latexonly}
 % To generate the index, invoke as
@@ -204,16 +59,16 @@ and 2-D distortion fitting and extraction.
 \fi
 
 
-\newcommand{\sunspec}[2]{#1}
+\providecommand{\sunspec}[2]{#1}
 
 % \cmdname{blah_blah} formats command names, and accepts underscores
-\newcommand{\cmdname}{\begingroup \catcode`\_=12 \realcmdname}
-\newcommand{\realcmdname}[1]{\endgroup\texttt{#1}}
+\providecommand{\cmdname}{\begingroup \catcode`\_=12 \realcmdname}
+\providecommand{\realcmdname}[1]{\endgroup\texttt{#1}}
 
-\newcommand{\myindex}[1]{\index{#1}}
-\newcommand{\indexcmdname}[1]{\index{#1@\protect\cmdname{#1}}}
+\providecommand{\myindex}[1]{\index{#1}}
+\providecommand{\indexcmdname}[1]{\index{#1@\protect\cmdname{#1}}}
 
-\newcommand{\echtask}[4]{
+\providecommand{\echtask}[4]{
    \goodbreak
    \rule{\textwidth}{0.5mm}
    \vspace{-7ex}
@@ -227,43 +82,42 @@ and 2-D distortion fitting and extraction.
    \parbox[t]{\sstcaptionlength}{\center{\Large #4}}
    \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #3}}}
    \label{#1}\label{#2}
-   \markboth{#3}{\stardocname}
    \uppercase{\myindex{#2@\protect\cmdname{#2}}}
 }
 
-\newcommand{\echparameter}[4]
+\providecommand{\echparameter}[4]
 {
 \item [#1 = #3] \mbox{}\label{par_#2}\indexcmdname{#2}\\
 #4
 }
 
-\newcommand{\echpars}[1]{
+\providecommand{\echpars}[1]{
 {\bf Parameters:\vspace*{6pt}\\}
     #1
 }
 
-\newcommand{\epar}[3]
+\providecommand{\epar}[3]
 {
     \hspace*{5mm}\makebox[50mm][l]{\bf #1} #2 (p~\pageref{par_#3}.)\\
 }
 
-\newcommand{\lepar}[3]
+\providecommand{\lepar}[3]
 {
     \hspace*{5mm}\makebox[50mm][l]{\bf #1} #2 (p~\pageref{par_#3}.)
 }
 
-\newcommand{\echredobj}[1]{
+\providecommand{\echredobj}[1]{
 {\bf Reduction File Objects:\vspace*{6pt}\\}
       \hspace*{5mm}\makebox[50mm][l]{Object}\makebox[25mm][l]{Type}{Access}\\
       #1
 }
 
-\newcommand{\eobj}[3]
+\providecommand{\eobj}[3]
 {
     \hspace*{5mm}\makebox[50mm][l]{\bf #1}\makebox[25mm][l]{\tt #2}{\tt #3}\\
 }
 
-\newcommand{\leobj}[3]
+\providecommand{\leobj}[3]
 {
     \hspace*{5mm}\makebox[50mm][l]{\bf #1}\makebox[25mm][l]{\tt #2}{\tt #3}
 }
@@ -272,49 +126,48 @@ and 2-D distortion fitting and extraction.
 
 % HTML versions
 \begin{htmlonly}
-\newcommand{\sunspec}[2]{#2}
+\providecommand{\sunspec}[2]{#2}
 
-\newcommand{\cmdname}[1]{#1}
-\newcommand{\myindex}[1]{}
-\newcommand{\indexcmdname}[1]{}
+\providecommand{\cmdname}[1]{#1}
+\providecommand{\myindex}[1]{}
+\providecommand{\indexcmdname}[1]{}
 
-\newcommand{\echtask}[4]
+\providecommand{\echtask}[4]
 {
   \subsection{\xlabel{#1}\xlabel{#2}\label{#1}\label{#2}#3---#4}
-  \markboth{#3}{\stardocname}
 }
 
-\newcommand{\echparameter}[4]
+\providecommand{\echparameter}[4]
 {
   \subsection{\xlabel{par_#2}\label{par_#2}{\bf #1}}
   {\bf Type: #3}\\
 #4
 }
 
-\newcommand{\echpars}[1]{
+\providecommand{\echpars}[1]{
 {\bf Parameters:}
 \begin{itemize}
 #1
 \end{itemize}
 }
 
-\newcommand{\epar}[3]
+\providecommand{\epar}[3]
 {\item \htmlref{{\bf #1}}{par_#3} - #2}
 
-\newcommand{\lepar}[3]
+\providecommand{\lepar}[3]
 {\item \htmlref{{\bf #1}}{par_#3} - #2}
 
-\newcommand{\echredobj}[1]{
+\providecommand{\echredobj}[1]{
 {\bf Reduction File Objects:}
 \begin{itemize}
 #1
 \end{itemize}
 }
 
-\newcommand{\eobj}[3]
+\providecommand{\eobj}[3]
 {\item {\bf #1} - {\it type:} #2, {\it access:} #3.}
 
-\newcommand{\leobj}[3]
+\providecommand{\leobj}[3]
 {\item {\bf #1} - {\it type:} #2, {\it access:} #3.}
 \end{htmlonly}
 
@@ -468,127 +321,12 @@ and 2-D distortion fitting and extraction.
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-\centering\includegraphics[height=60mm]{sun152_cover}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? Latex Copyright Statement
-%  =========================
-\begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
-\end{latexonly}
-% ? End of Latex copyright statement
-
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 % ? Main text
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\mlabel{introduction}INTRODUCTION}
-\markboth{INTRODUCTION}{\stardocname}
 
 {\sc echomop} provides a set of tasks to expedite the reduction of \'{e}chelle
 spectra data frames.  The options available range from full-scale
@@ -704,9 +442,9 @@ You can obtain an on-line introduction to the use of {\sc echomop},
 after you have setup {\sc echomop} as described in
 section~\ref{getting_started}, by typing the command
 
-\begin{verbatim}
-   % ech_demo -graphics-device-
-\end{verbatim}
+\begin{terminalv}
+% ech_demo -graphics-device-
+\end{terminalv}
 
 where {\tt -graphics-device-} is available for plotting the graphs
 during the reduction ({\it{e.g.,}} \texttt{xw}). \myindex{Demonstration}
@@ -716,16 +454,15 @@ a simple reduction from the start to the production of an extracted,
 wavelength-calibrated spectrum.  The text of the demonstration is also
 available for printing in the file
 
-\begin{verbatim}
-   $ECHOMOP_DEMO/ech_demo.txt
-\end{verbatim}
+\begin{terminalv}
+$ECHOMOP_DEMO/ech_demo.txt
+\end{terminalv}
 %$% dollar matching hack
 for those who prefer to read from a paper copy whilst running the demo.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\mlabel{using_echomop}USING ECHOMOP}
-\markboth{USING {\sc echomop}}{\stardocname}
 \myindex{Starting up}
 
 {\sc echomop} may be used in a variety of ways depending upon your expertise.
@@ -741,15 +478,15 @@ reduction}{standard_steps}}.
 
 {\sc echomop} is prepared for use from the shell by typing the command:
 
-\begin{verbatim}
-   % echomop
-\end{verbatim}
+\begin{terminalv}
+% echomop
+\end{terminalv}
 
 To start a reduction type:
 
-\begin{verbatim}
-   % echmenu
-\end{verbatim}
+\begin{terminalv}
+% echmenu
+\end{terminalv}
 
 at the command-line prompt.
 
@@ -783,9 +520,9 @@ this file will be opened, otherwise the package will create a new file
 using the name provided.  The name of the file may also be provided on the
 command line, {\it{e.g.}}:
 
-\begin{verbatim}
-   % echmenu ech_rdctn=filename
-\end{verbatim}
+\begin{terminalv}
+% echmenu ech_rdctn=filename
+\end{terminalv}
 
 Once the reduction-database has been opened, the main menu is
 presented.  This menu consists of all the major steps in the reduction
@@ -795,15 +532,15 @@ of}  An option is selected by typing its number followed by carriage
 return.  Some options may also be selected by entering a keyword (or its
 first character) followed by carriage return, {\it{e.g.}},
 
-\begin{verbatim}
-   PLOT
-\end{verbatim}
+\begin{terminalv}
+PLOT
+\end{terminalv}
 
 or
 
-\begin{verbatim}
-   P
-\end{verbatim}
+\begin{terminalv}
+P
+\end{terminalv}
 
 would select the graph plotting utility.  Some options consist of sets of
 different tasks which usually need to be run together.  It is possible to
@@ -843,16 +580,16 @@ this case the parameter will not be prompted for.
 
 Graphics display is controlled by the parameter:
 
-\begin{verbatim}
-   soft=/device/
-\end{verbatim}
+\begin{terminalv}
+soft=/device/
+\end{terminalv}
 
 The \xref{{\sc figaro}}{sun86}{} \xref{SOFT}{sun86}{SOFT} command
 
 \myindex{FIGARO!SOFT}
-\begin{verbatim}
-   % soft options
-\end{verbatim}
+\begin{terminalv}
+% soft options
+\end{terminalv}
 
 may be used to get a list of available graphics devices.
 
@@ -864,16 +601,16 @@ such facilities are not required.
 \myindex{Graphics!hardcopy}
 Hardcopy graphics is directed to {\tt /device/} using the parameter:
 
-\begin{verbatim}
-   hard=/device/
-\end{verbatim}
+\begin{terminalv}
+hard=/device/
+\end{terminalv}
 
 and enabled (in preference to on-screen graphics) using the hidden
 parameter \texttt{HARDCOPY} when starting {\sc echomop} tasks, {\it{e.g.}}:
 
-\begin{verbatim}
-   % echmenu hardcopy=y /any-other-parameters/
-\end{verbatim}
+\begin{terminalv}
+% echmenu hardcopy=y /any-other-parameters/
+\end{terminalv}
 
 
 \subsection{\mlabel{image_display}Image Display}
@@ -887,9 +624,9 @@ orientated as {\sc echomop} expects (See \sunspec{\S\ref{orientation}}
 If an imaging graphics display is available then you can use the
 DISPLAY command-line parameter when invoking {\sc echomop} tasks, {\em e.g}:
 
-\begin{verbatim}
-  % echmenu display=yes /other-parameters/
-\end{verbatim}
+\begin{terminalv}
+% echmenu display=yes /other-parameters/
+\end{terminalv}
 
 The image display will automatically be used to:
 \myindex{Image display!use by monolith}
@@ -977,9 +714,9 @@ To run a particular step you can:
 
 \item type the task name at the command line, {\it{e.g.}}:
 
-\begin{verbatim}
-   % ech_linloc
-\end{verbatim}
+\begin{terminalv}
+% ech_linloc
+\end{terminalv}
 
 \end{itemize}
 
@@ -989,9 +726,9 @@ To run a particular step you can:
    selecting single order/all order operation is different.  Individual
    tasks which can operate on single orders all utilise the parameter:
 
-\begin{verbatim}
-   IDX_NUM_ORDERS
-\end{verbatim}
+\begin{terminalv}
+IDX_NUM_ORDERS
+\end{terminalv}
 
    with which you should specify the number of the order to process, or a
    zero to indicate that all orders are to be processed in turn.}
@@ -1137,7 +874,7 @@ and parameters values when prompted.
          (\htmlref{{\tt{ech\_fitfwhm}}}{ech_fitfwhm}).}
 
    \item {12.2 --- Calculate wavelength scale
-         (\htmlref{{\tt{ech\_wscale}}}{ech_wscale}).}
+         (\htmlref{{\tt{ech\_wscale}}}{ech_fit_wscale}).}
 
    \myindex{Scrunch!object}
    \item {12.3 --- Scrunch extracted object orders
@@ -1179,9 +916,9 @@ functions which are automatically invoked. For example Option 12 consists
 of 4 sub-options. The ECHMENU program allows the selection of any sub-option
 directly, {\it{e.g.}}:
 
-\begin{verbatim}
-   12.3
-\end{verbatim}
+\begin{terminalv}
+12.3
+\end{terminalv}
 
 would select Option~12.3 (Scrunch extracted object order) explicitly.
 
@@ -1320,7 +1057,6 @@ The following algorithmic optimizations will be used:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\mlabel{tasks_options}ECHOMOP TASKS \& ECHMENU OPTIONS}
-\markboth{{\sc echomop} TASKS \& ECHMENU OPTIONS }{\stardocname}
 \mlabel{echomop_options}
 \myindex{Standard reduction!sequence}
 \myindex{Main menu!monolith}
@@ -1349,9 +1085,9 @@ ECHMENU menu re-appears.
 The stand-alone HELP browser \texttt{echhelp} can be invoked from the shell
 or the hypertext version of the text can be accessed using
 
-\begin{verbatim}
-   % echwww
-\end{verbatim}
+\begin{terminalv}
+% echwww
+\end{terminalv}
 
 
 \echtask{option1}{ech_locate}{1:{\tt ech\_locate}}{Start a Reduction}
@@ -1438,9 +1174,9 @@ The slope as calculated by the program may be overridden manually
 using the \xref{{\sc figaro}}{sun86}{} \xref{SETOBJ}{sun86}{SETOBJ} command:
 \myindex{FIGARO!SETOBJ command}
 
-\begin{verbatim}
-   % setobj object=-rdctn-file-name-.MORE.ECHELLE.ORDER_SLOPE value=n.nnnn
-\end{verbatim}
+\begin{terminalv}
+% setobj object=-rdctn-file-name-.MORE.ECHELLE.ORDER_SLOPE value=n.nnnn
+\end{terminalv}
 
 
 \item \mlabel{ech_count} {1.4} (\texttt{ech\_count})
@@ -3337,9 +3073,9 @@ to use coincidence checking to enhance cosmic-ray detection. The script
 {\tt decos\_many} will take list of input frames and perform this checking,
 and flags the cosmic-ray pixels in each frame.  To use it type:
 
-\begin{verbatim}
-   % $ECHOMOP_EXEC/decos_many
-\end{verbatim}
+\begin{terminalv}
+% $ECHOMOP_EXEC/decos_many
+\end{terminalv}
 
 \echpars{
 \epar{INPTIM}{Frame to extract data from.}{INPTIM}
@@ -3613,9 +3349,9 @@ IDX\_NUM\_ORDERS}\@.
 which you should set to the number of the order to process, or to zero to
 indicate that all orders are to be processed in turn. {\it{e.g.}}:
 
-\begin{verbatim}
-   % ech_trace idx_num_orders=4
-\end{verbatim}
+\begin{terminalv}
+% ech_trace idx_num_orders=4
+\end{terminalv}
 
 would just trace order number 4.
 
@@ -3872,9 +3608,9 @@ without leaving and re-starting the ECHMENU shell task.
 
 The command is prompted for with:
 
-\begin{verbatim}
-   - System_$ /''/ >
-\end{verbatim}
+\begin{terminalv}
+- System_$ /''/ >
+\end{terminalv}
 
 you should then enter a command.  If more than one command is
 required then the \verb+csh+ command should be given to initiate a fully
@@ -3892,9 +3628,9 @@ monolith already has the {\sc echomop} parameter file open.
 System commands can also be entered directly at the Option: prompt by
 making the first character a {\tt \$}. Thus:
 
-\begin{verbatim}
-   $ls
-\end{verbatim}
+\begin{terminalv}
+$ls
+\end{terminalv}
 
 would execute the system `directory' command, and return to the main menu.
 
@@ -3937,13 +3673,11 @@ followed by carriage return.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\mlabel{parameters}PARAMETERS}
-\markboth{PARAMETERS}{\stardocname}
 
 This is a complete list of all the parameters used by {\sc echomop} tasks.
 
 \sunspec{\begin{description}}{}
 
-\markboth{PARAMETERS: A}{\stardocname}
 \echparameter{ARC}{ARC}{
  \_CHAR
 }{
@@ -4101,15 +3835,14 @@ This is a complete list of all the parameters used by {\sc echomop} tasks.
 \sunspec{
  ${\rm constant} + ax + bx^{2} + cx^{3}$.
 }{
-\begin{verbatim}
-   constant + ax + bx squared + cx cubed
-\end{verbatim}
+\begin{terminalv}
+constant + ax + bx squared + cx cubed
+\end{terminalv}
 }
 
  Initial suggested value: \texttt{7}.
 }
 
-\markboth{PARAMETERS: C}{\stardocname}
 \echparameter{CENTRAL\_ONUM}{CENTRAL_ONUM}{
  \_INTEGER
 }{
@@ -4130,7 +3863,6 @@ This is a complete list of all the parameters used by {\sc echomop} tasks.
  or by flag values.
 }
 
-\markboth{PARAMETERS: D}{\stardocname}
 \echparameter{DECIMG}{DECIMG}{
  \_CHAR
 }{
@@ -4224,7 +3956,6 @@ This is a complete list of all the parameters used by {\sc echomop} tasks.
  \end{quote}
 }
 
-\markboth{PARAMETERS: F}{\stardocname}
 \echparameter{FFIELD}{FFIELD}{
  \_CHAR
 }{
@@ -4287,7 +4018,6 @@ This is a complete list of all the parameters used by {\sc echomop} tasks.
  identical bad row and/or column features.
 }
 
-\markboth{PARAMETERS: H}{\stardocname}
 \echparameter{HARD}{HARD}{
  \_CHAR
 }{
@@ -4316,7 +4046,6 @@ This is a complete list of all the parameters used by {\sc echomop} tasks.
  Angstroms but may be changed by supplying an appropriate \texttt{.ARC} file.
 }
 
-\markboth{PARAMETERS: I}{\stardocname}
 \echparameter{IDX\_NREF\_FRAME}{IDX_NREF_FRAME}{
  \_INTEGER
 }{
@@ -4385,7 +4114,6 @@ This is a complete list of all the parameters used by {\sc echomop} tasks.
  multiple data frames are perfectly registered).
 }
 
-\markboth{PARAMETERS: L}{\stardocname}
 \echparameter{LOW\_WAVE}{LOW_WAVE}{
  \_REAL
 }{
@@ -4411,7 +4139,6 @@ This is a complete list of all the parameters used by {\sc echomop} tasks.
  list.
 }
 
-\markboth{PARAMETERS: M}{\stardocname}
 \echparameter{MIN\_DISPERSION}{MIN_DISPERSION}{
  \_REAL
 }{
@@ -4485,7 +4212,6 @@ This is a complete list of all the parameters used by {\sc echomop} tasks.
  contain a full 2-D image array and associated errors if appropriate.
 }
 
-\markboth{PARAMETERS: P}{\stardocname}
 \echparameter{PFL\_INTERACT}{PFL_INTERACT}{
  \_LOGICAL
 }{
@@ -4535,7 +4261,6 @@ This is a complete list of all the parameters used by {\sc echomop} tasks.
  recorded by the detector.
 }
 
-\markboth{PARAMETERS: R}{\stardocname}
 \echparameter{RBNOBJ}{RBNOBJ}{
  \_CHAR
 }{
@@ -4596,7 +4321,6 @@ This is a complete list of all the parameters used by {\sc echomop} tasks.
  The default is \texttt{EXTOBJ}.
 }
 
-\markboth{PARAMETERS: S}{\stardocname}
 \echparameter{SCRUNCH\_TYPE}{SCRUNCH_TYPE}{
  \_CHAR
 }{
@@ -4689,7 +4413,6 @@ This is a complete list of all the parameters used by {\sc echomop} tasks.
 }
 
 
-\markboth{PARAMETERS: T}{\stardocname}
 \echparameter{TRACE\_MODE}{TRACE_MODE}{
  \_CHAR
 }{
@@ -5427,7 +5150,7 @@ This is a complete list of all the parameters used by {\sc echomop} tasks.
  Higher values are tried automatically by the program if no solution
  can be found.  The number of neighbours considered is increased
  monotonically until it reaches the maximum of
- \htmlref{{\tt TUNE\_IDMDLT}}{par_TUNE_IDMULT}, when the
+ \htmlref{{\tt TUNE\_IDMDLT}}{par_TUNE_IDMDLT}, when the
  program gives up.
 
  The default value is \texttt{3}.
@@ -6245,14 +5968,12 @@ This is a complete list of all the parameters used by {\sc echomop} tasks.
  Number of vertical image zones.
 }
 
-\markboth{PARAMETERS: U}{\stardocname}
 \echparameter{USE\_MEDIAN}{USE_MEDIAN}{
  \_LOGICAL
 }{
  \texttt{YES} if median is to be used.
 }
 
-\markboth{PARAMETERS: W}{\stardocname}
 \echparameter{WAVFIT}{WAVFIT}{
  \_CHAR
 }{
@@ -6295,7 +6016,6 @@ This is a complete list of all the parameters used by {\sc echomop} tasks.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\mlabel{automatic_reductions}AUTOMATIC REDUCTIONS}
-\markboth{AUTOMATIC REDUCTIONS}{\stardocname}
 \myindex{Automation}
 
 The main reduction processes may optionally be performed
@@ -6331,7 +6051,7 @@ The following parameters are used to control the tasks:
 
 \item Arc line candidate location
 
-\item Arc line identification (\htmlref{{\tt{TUNE\_AUTOID=YES}}}{TUNE_AUTOID})
+\item Arc line identification (\tt{TUNE\_AUTOID=YES})
 \indexcmdname{TUNE_AUTOID}
 
 \item Wavelength polynomial fitting
@@ -6373,7 +6093,6 @@ values are provided if unattended operation is intended.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\mlabel{cloning}USING PRIOR REDUCTIONS---CLONING}
-\markboth{Cloning}{\stardocname}
 \myindex{Cloning}
 \myindex{Using data from previous reduction}
 \myindex{Reduction database!cloning}
@@ -6425,7 +6144,6 @@ should be used:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\mlabel{tips}ECHOMOP TIPS}
-\markboth{{\sc echomop} TIPS}{\stardocname}
 
 \subsection{\mlabel{multi_object_spectra}Multi-Object Spectra}
 \myindex{Multi-object frames}
@@ -6454,12 +6172,12 @@ following point needs to be remembered:
       such as the example below (for object 2), for the remaining objects:
 
 \indexcmdname{ECH_IDWAVE}
-\begin{verbatim}
-   % ech_idwave idx_num_orders=2 auto_id=yes arc_type=$ARCDIRS/THAR.ARC \
-              ech_ftrdb=$ARCDIRS/THAR \
-              /other parameter settings/ \
-              min_wave=3250.0 max_wave=3295.0
-\end{verbatim}
+\begin{terminalv}
+% ech_idwave idx_num_orders=2 auto_id=yes arc_type=$ARCDIRS/THAR.ARC \
+           ech_ftrdb=$ARCDIRS/THAR \
+           /other parameter settings/ \
+           min_wave=3250.0 max_wave=3295.0
+\end{terminalv}
 
 \end{itemize}
 
@@ -6570,9 +6288,9 @@ adjudges are actually due to bright sky emission lines.
 \myindex{Multiple object frames}
 \myindex{Cosmic rays!coincidence checking}
 
-\begin{verbatim}
-   % $ECHOMOP_EXEC/decos_many
-\end{verbatim}
+\begin{terminalv}
+% $ECHOMOP_EXEC/decos_many
+\end{terminalv}
 
 provides this facility and should be the preferred method when multiple
 frames are available. The procedure calculates a median image and then
@@ -6632,9 +6350,9 @@ standards) to combat this problem is being planned.
 
 A limited set of high resolution tables are provided. Type:
 
-\begin{verbatim}
-   % ls $ECHOMOP_DATA/*.tab
-\end{verbatim}
+\begin{terminalv}
+% ls $ECHOMOP_DATA/*.tab
+\end{terminalv}
 
 to see which ones. These tables may be used with the
 \xref{{\sc figaro}}{sun86}{} flux calibration programs
@@ -6747,10 +6465,10 @@ This is done by entering the values in the
 following manner (\xref{SETOBJ}{sun86}{SETOBJ} is a
 \xref{{\sc figaro}}{sun86}{} command):
 
-\begin{verbatim}
-   % setobj object=rdctn-database.OBS_DATE value="dd/mm/yy"
-   % setobj object=rdctn-database.OBS_UTTIME value="hh:mm:ss"
-\end{verbatim}
+\begin{terminalv}
+% setobj object=rdctn-database.OBS_DATE value="dd/mm/yy"
+% setobj object=rdctn-database.OBS_UTTIME value="hh:mm:ss"
+\end{terminalv}
 
 If these values are not provided a warning message will be printed,
 otherwise the applied correction will be shown.
@@ -6758,7 +6476,6 @@ otherwise the applied correction will be shown.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\mlabel{input_files}INPUT DATA FILES}
-\markboth{INPUT DATA FILES}{\stardocname}
 \myindex{Input data files}
 
 {\sc echomop} performs most of its data access via Starlink subroutine
@@ -6807,9 +6524,9 @@ The input data frames should be in \xref{NDF}{sun33}{} format.
 The data themselves being stored in a 2-dimensional array accessible via
 the path:
 
-\begin{verbatim}
-   /filename/.DATA.DATA_ARRARY
-\end{verbatim}
+\begin{terminalv}
+/filename/.DATA.DATA_ARRARY
+\end{terminalv}
 
 This capability may be useful when a foreign data format has been
 translated into an \xref{NDF}{sun33}{}, but with non-standard object
@@ -6825,17 +6542,17 @@ reduction file.  Much of the information stored is on a per-order basis.
 For data frames with many orders the disk usage may be substantially
 reduced by the following:
 
-\begin{verbatim}
-   % cp $ECHOMOP_SOURCE/ECH_COMPACT.DEF ECH_RDCTN.DEF
-\end{verbatim}
+\begin{terminalv}
+% cp $ECHOMOP_SOURCE/ECH_COMPACT.DEF ECH_RDCTN.DEF
+\end{terminalv}
 
 and:
 
-\begin{verbatim}
-   % source $ECHOMOP_EXEC/echomop.csh      (UNIX)
+\begin{terminalv}
+% source $ECHOMOP_EXEC/echomop.csh      (UNIX)
 
-   ICL> LOAD ECHOMOP_EXEC:ECHOMOP           (ICL)
-\end{verbatim}
+ICL> LOAD ECHOMOP_EXEC:ECHOMOP           (ICL)
+\end{terminalv}
 
 This must be done before any reductions are embarked upon as it will not
 save any space retroactively on reductions  already in progress.
@@ -6860,12 +6577,12 @@ extension and will be looked for in the directory pointed to by ARCDIRS.
 
 The format of arc line lists is as follows:
 
-\begin{verbatim}
-   !  comment lines starting with a !
-   nnnn.mmm   iii.jj    text
-   nnnn.mmm   iii.jj    text
-   nnnn.mmm   iii.jj    text
-\end{verbatim}
+\begin{terminalv}
+ !  comment lines starting with a !
+    nnnn.mmm   iii.jj    text
+    nnnn.mmm   iii.jj    text
+    nnnn.mmm   iii.jj    text
+\end{terminalv}
 
 where:
 
@@ -6882,9 +6599,9 @@ where:
 In addition a special comment line is recognised which allows the units
 of wavelength to be specified:
 
-\begin{verbatim}
-   !WAVELENGTH_UNITS=some-unit-specifier
-\end{verbatim}
+\begin{terminalv}
+!WAVELENGTH_UNITS=some-unit-specifier
+\end{terminalv}
 
 The default units are Angstroms.  The units string is only used for output
 messages.  Future {\sc echomop} releases may support greater use of the
@@ -6906,9 +6623,9 @@ reference names into actual object paths within datafiles.
 For instance; the object referred to as OBS\_LINES internally is
 actually stored in the reduction file in the following object:
 
-\begin{verbatim}
-   MORE.ECHELLE.WAVE_FIT_1D.OBS_LINES[tune_mxrfln,num_orders]
-\end{verbatim}
+\begin{terminalv}
+MORE.ECHELLE.WAVE_FIT_1D.OBS_LINES[tune_mxrfln,num_orders]
+\end{terminalv}
 
 All such objects can be renamed in the reduction file by altering their
 specified paths.
@@ -6993,7 +6710,6 @@ A detailed description of the steps required is available in the
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\mlabel{output_files}OUTPUT DATA FILES}
-\markboth{OUTPUT DATA FILES}{\stardocname}
 \myindex{Output files}
 \myindex{Saving results}
 
@@ -7041,7 +6757,6 @@ See \xref{SUN/102}{sun102}{} for more details.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\mlabel{echarc_imp_exp}FIGARO ECHARC IMPORT/EXPORT}
-\markboth{{\sc figaro} ECHARC IMPORT/EXPORT}{\stardocname}
 \myindex{FIGARO!ECHARC}
 
 In order to provide backward compatibility with the extensive line
@@ -7074,7 +6789,6 @@ even if no lines are identified before ECHARC is run.
 \newpage
 \appendix
 \section{\mlabel{notes_for_observers}NOTES FOR OBSERVERS}
-\markboth{NOTES FOR OBSERVERS}{\stardocname}
 \myindex{Observing Hints}
 
 The reduction of spectra collected using the modern CCD and IPCS detectors
@@ -7155,11 +6869,11 @@ used to subtract the bias if necessary.
 For example:
 \myindex{KAPPA!CSUB}
 \myindex{FIGARO!ICSUB}
-\begin{verbatim}
-   % csub /inframe/ /nnn/ /outframe/    (KAPPA)
+\begin{terminalv}
+% csub /inframe/ /nnn/ /outframe/    (KAPPA)
 
-   % icsub /inframe/ /nnn/ /outframe/  (FIGARO)
-\end{verbatim}
+% icsub /inframe/ /nnn/ /outframe/  (FIGARO)
+\end{terminalv}
 
 will subtract bias {\tt /nnn/} from data {\tt /inframe/} and put the
 resulting data in {\tt /outframe/}\@.
@@ -7297,9 +7011,9 @@ paths of the orders across the frame then:
       processed all together to provide a more reliable cosmic-ray
       rejection. The command procedure:
 
-\begin{verbatim}
-   % $ECHOMOP_SOURCE/decos_many
-\end{verbatim}
+\begin{terminalv}
+% $ECHOMOP_SOURCE/decos_many
+\end{terminalv}
 
       \myindex{Exposure duration}
       provides this facility and should be the preferred method when
@@ -7315,7 +7029,6 @@ paths of the orders across the frame then:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \section{\mlabel{hints}PROBLEM HINTS}
-\markboth{PROBLEM HINTS}{\stardocname}
 
 \subsection{\mlabel{needs_rotating} Needs Rotating}
 \myindex{Frame!rotation}
@@ -7433,9 +7146,9 @@ usually cause problems if its value is left at zero.
 In extreme cases you can set the slope manually using the
 \xref{{\sc figaro}}{sun86}{} command \xref{SETOBJ}{sun86}{SETOBJ}:
 
-\begin{verbatim}
-   % setobj object=-reduction-file-.MORE.ECHELLE.ORDER_SLOPE value=nn.nn
-\end{verbatim}
+\begin{terminalv}
+% setobj object=-reduction-file-.MORE.ECHELLE.ORDER_SLOPE value=nn.nn
+\end{terminalv}
 
 where {\tt nn.nn} is the increase in y coordinate per X-pixel increment.
 
@@ -7495,9 +7208,9 @@ peak.  You may either adjust the parameter (probably increasing it),
 or directly specify a value for the trace width using
 \xref{{\sc figaro} SETOBJ}{sun86}{SETOBJ}:
 
-\begin{verbatim}
-   % setobj object=-rdctn-file-.MORE.ECHELLE.TRACE_WIDTH value=nn
-\end{verbatim}
+\begin{terminalv}
+ % setobj object=-rdctn-file-.MORE.ECHELLE.TRACE_WIDTH value=nn
+\end{terminalv}
 
 where {\tt nn} is the approximate width in pixels.
 
@@ -7509,9 +7222,9 @@ cause is that an inadvertent database creation has been performed which
 has resulted in an incomplete copy of the database.  Check the database
 files using
 
-\begin{verbatim}
-   % ls -arc-list-type-.sdf
-\end{verbatim}
+\begin{terminalv}
+% ls -arc-list-type-.sdf
+\end{terminalv}
 
 and delete/rename any partial files.
 
@@ -7715,9 +7428,9 @@ probable cause is due to the directory where the file creation is to be
 performed being protected against write access, or does not exist at
 all. Type:
 
-\begin{verbatim}
-   % ls -l /name/of/directory
-\end{verbatim}
+\begin{terminalv}
+% ls -l /name/of/directory
+\end{terminalv}
 
 to verify that the file exists, and to see what access rights the
 current directory has.
@@ -7727,9 +7440,9 @@ the required access rights  then the most probable cause is the
 exhaustion of system resources required, most notably disk space.
 Type:
 
-\begin{verbatim}
-   % quota
-\end{verbatim}
+\begin{terminalv}
+% quota
+\end{terminalv}
 
 to see if you have run out of space.
 
@@ -7762,9 +7475,9 @@ The program is unable to obtain UPDATE access to an object in the
 reduction database.  This is probably due to the file being
 protected against write access. Type:
 
-\begin{verbatim}
-   % ls -l /name/of/directory
-\end{verbatim}
+\begin{terminalv}
+% ls -l /name/of/directory
+\end{terminalv}
 
 to check the file protection mask.
 
@@ -7779,7 +7492,6 @@ where you have full access to it before proceeding.
 \section{\mlabel{release_notes}RELEASE NOTES}
 
 \subsection{VERSION 3.3-0}
-\markboth{RELEASE NOTES: V3.3-0}{\stardocname}
 
 These notes formed a NEWS item at the time of release of version 3.3-0,
 they describe the many changes from the previous, v3.2-0, release.
@@ -7802,9 +7514,9 @@ they describe the many changes from the previous, v3.2-0, release.
    echelle data.  For example, to output a stack called
    \texttt{ECHOMOP\_STK.sdf} containing the extracted object orders:
 
-\begin{verbatim}
-   % ech_result result_format=stack result_type=extobj stack=ECHOMOP
-\end{verbatim}
+\begin{terminalv}
+% ech_result result_format=stack result_type=extobj stack=ECHOMOP
+\end{terminalv}
 
    See the on-line HELP for more details.
 \item When writing an ASCII file in Option 14 the name of the file can
@@ -7852,7 +7564,7 @@ they describe the many changes from the previous, v3.2-0, release.
 \begin{itemize}
 \item When changing between arc-line databases there is no longer
    a prompt to choose between old and new values of
-   \htmlref{{\tt{TUNE\_WCAL\_INDEX}}}{par_TUNE_WCAL_INDEX}.
+   \tt{TUNE\_WCAL\_INDEX}.
    This was a bug which would cause the program to crash if the user
    guessed `new' as the response to the prompt.
 \item A memory management problem causing a crash if the abort `!'
@@ -7891,7 +7603,6 @@ they describe the many changes from the previous, v3.2-0, release.
 \end{itemize}
 
 \subsection{VERSION 3.2-0}
-\markboth{RELEASE NOTES: V3.2-0}{\stardocname}
 
 These notes formed a NEWS item at the time of release of version 3.2-0, they
 describe the many changes from the previous, v3.1-0, release.
@@ -7964,7 +7675,7 @@ describe the many changes from the previous, v3.1-0, release.
    \htmlref{{\tt{TUNE\_AUTLOC}}}{par_TUNE_AUTLOC} (\texttt{YES}) was
    incorrect and has been changed to \texttt{NO}.
 \item The advertised default value of
-   \htmlref{{\tt{TUNE\_NPOLY}}}{par_TUNE_NPOLY}
+   \htmlref{{\tt{TRC\_NPOLY}}}{par_TRC_NPOLY}
    (7) was incorrect and has been changed to 4.
 \item The default value of \htmlref{{\tt{TUNE\_ARCHIVE}}}{par_TUNE_ARCHIVE}
    has been changed to \texttt{NO}.
