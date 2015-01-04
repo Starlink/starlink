@@ -1,286 +1,38 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt]{starlink}
 
 % ? Specify used packages
-\usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
-
-\pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink Cookbook}
-\newcommand{\stardocinitials}  {SC}
-\newcommand{\stardocsource}    {sc\stardocnumber}
-\newcommand{\stardoccopyright}
+\stardoccategory    {Starlink Cookbook}
+\stardocinitials    {SC}
+\stardocsource      {sc\stardocnumber}
+\stardoccopyright
 {Copyright \copyright\ 1997 Council for the Central Laboratory of the Research C
 ouncils}
-\newcommand{\stardocnumber}    {9.1}
-\newcommand{\stardocauthors}   {M D Lawden\\
+\stardocnumber      {9.1}
+\stardocauthors   {M D Lawden\\
                                 Anne Charles}
-\newcommand{\stardocdate}      {14 May 1997}
-\newcommand{\stardoctitle}     {\LaTeX\ Cookbook}
-\newcommand{\stardocabstract}  {This cookbook shows some examples of
+\stardocdate        {14 May 1997}
+\stardoctitle       {\LaTeX\ Cookbook}
+\stardocabstract  {This cookbook shows some examples of
 \LaTeX\ in action and should help you to
 get to know how to use \LaTeX\ effectively.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sc.tex
-%
-%  Purpose:
-%     Template for Starlink Cookbook (SC) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     16-JUN-1997 (BLY):
-%        Original, based on SUN/SG templates.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%      1-FEB-2000 (AJC):
-%        Add Copyright statement in LaTeX
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-\newcommand{\radec}{$[\alpha,\delta\,]$}
-\newcommand{\mhadec}{$[-h,\delta\,]$}
-\newcommand{\azel}{$[A,E\,]$}
+% ? Document specific \providecommand or \newenvironment commands.
+\providecommand{\radec}{$[\alpha,\delta\,]$}
+\providecommand{\mhadec}{$[-h,\delta\,]$}
+\providecommand{\azel}{$[A,E\,]$}
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
+\scfrontmatter
 
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Large\bf \stardoctitle}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-%      \stardocversion\\
-%      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? Latex Copyright Statement
-%  =========================
-\begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
-\end{latexonly}
-% ? End of Latex copyright statement
-
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-    \tableofcontents
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
- \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
 
 \section{Introduction\xlabel{introduction}}
 
@@ -308,7 +60,7 @@ in the document source in /star/docs to see how it was done.
 
 \section {Document structure\xlabel{document_structure}}
 
-\begin{verbatim}
+\begin{terminalv}
 \section  {Introduction}
      <text>
 \section{The Starlink Project}
@@ -346,7 +98,7 @@ in the document source in /star/docs to see how it was done.
      <text>
 \section{Inventory}
      <text>
-\end{verbatim}
+\end{terminalv}
 
 \newpage
 
@@ -362,8 +114,8 @@ in the document source in /star/docs to see how it was done.
 
 \section{Font size and type\xlabel{font_size_and_type}}
 
-\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 You can use a large number of different sizes and types of font.
 This is the one you get by default.
 
@@ -412,8 +164,8 @@ This is the one you get by default.
 \vspace{10mm}
 
 The full selection of fonts available is illustrated in \xref{SUN/93}{sun93}{}.
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{small}
 
 \newpage
 
@@ -475,7 +227,7 @@ The full selection of fonts available is illustrated in \xref{SUN/93}{sun93}{}.
 \section{Lists\xlabel{lists}}
 
 \footnotesize
-\begin{verbatim}
+\begin{terminalv}
 Starlink staff:
 \begin{itemize}
   \item manage the project.
@@ -530,7 +282,7 @@ This is an invitation to input one of the following:
 with an optional argument list.
 In cases 1 and 2 a search is carried out for the executable image file or
 procedure file.
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \newpage
@@ -598,26 +350,32 @@ procedure file.
 
 \section{Displays\xlabel{displays}}
 
-\small
-
-\verb+There are three main areas of help information: CAR\_HELP for information+\\
-\verb+about the CAR routines; CAT\_HELP for information about the catalogues and +\\
-\verb+SCAR\_HELP for general information.+\\
-\verb+\begin{verbatim}+\\
-\hspace*{10mm}\verb+ICL> CAR_HELP+\\
-\hspace*{10mm}\verb+SCAR COMMANDS Subtopic? CAR_SEARCH+\\
-\verb+\end{verbatim}+\\
-\verb+You would find information about the CAR\_SEARCH procedure.+\\
-\verb+\begin{verbatim}+\\
-\hspace*{10mm}\verb+ICL> CAT_HELP+\\
-\hspace*{10mm}\verb+Topic? $Summary+\\
-\verb+\end{verbatim}+\\
-\verb+The catalogues are summarised in this help library.+\\
-\verb+The acronym for the IRAS point source catalogue is IRPS.+\\
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
+There are three main areas of help information: CAR\_HELP for information
+about the CAR routines; CAT\_HELP for information about the catalogues and
+SCAR\_HELP for general information.
+\end{terminalv}
+\verb+\begin{terminalv}+
+\begin{terminalv}
+ICL> CAR_HELP
+SCAR COMMANDS Subtopic? CAR_SEARCH
+\end{terminalv}
+\verb+\end{terminalv}+
+\begin{terminalv}
+You would find information about the CAR\_SEARCH procedure.
+\end{terminalv}
+\verb+\begin{terminalv}+
+\begin{terminalv}
+ICL> CAT_HELP
+Topic? $Summary
+\end{terminalv}
+\verb+\end{terminalv}+
+\begin{terminalv}
+The catalogues are summarised in this help library.
+The acronym for the IRAS point source catalogue is IRPS.
 
 ******************************************************************************
-
 
 The parameters\footnote{By the way, this is how to insert a footnote} before
 the `;' are input parameters; those after are output parameters.
@@ -632,9 +390,7 @@ component\\
 component\\
 \textbf{CMP\_LEN}\emph{(loc,name;len,status)} --- Enquire component precision\\
 
-
 ******************************************************************************
-
 
 These are the catalogues online at RAL, (R = Access restricted):
 \begin{quote}
@@ -647,9 +403,8 @@ These are the catalogues online at RAL, (R = Access restricted):
     \item [CSIS] -- CHART CSI 1979 Version.
   \end{description}
 \end{quote}
-\end{verbatim}
-
-\normalsize
+\end{terminalv}
+\end{small}
 
 \newpage
 
@@ -660,15 +415,15 @@ These are the catalogues online at RAL, (R = Access restricted):
 There are three main areas of help information: CAR\_HELP for information
 about the CAR routines; CAT\_HELP for information about the catalogues and
 SCAR\_HELP for general information.
-\begin{verbatim}
-    ICL> CAR_HELP
-    SCAR COMMANDS Subtopic? CAR_SEARCH
-\end{verbatim}
+\begin{terminalv}
+ICL> CAR_HELP
+SCAR COMMANDS Subtopic? CAR_SEARCH
+\end{terminalv}
 You would find information about the CAR\_SEARCH procedure.
-\begin{verbatim}
-    ICL> CAT_HELP
-    Topic? $Summary
-\end{verbatim}
+\begin{terminalv}
+ICL> CAT_HELP
+Topic? $Summary
+\end{terminalv}
 The catalogues are summarised in this help library.
 The acronym for the IRAS point source catalogue is IRPS.
 
@@ -704,8 +459,8 @@ These are the catalogues online at RAL, (R = Access restricted):
 
 \newpage
 
-\footnotesize
-\begin{verbatim}
+\begin{footnotesize}
+\begin{terminalv}
 The error status code symbol is constructed by concatenating the string
 `ERR\_' with an error code.
 The error codes and their meanings are listed below:
@@ -763,8 +518,8 @@ statistical analysis on the selected fields(s).
     \end{description}
   \end{description}
 \end{description}
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{footnotesize}
 
 \newpage
 
@@ -834,7 +589,7 @@ statistical analysis on the seclected fields(s).
 \section{Routine specifications\xlabel{routine_specifications}}
 
 \small
-\begin{verbatim}
+\begin{terminalv}
 This appendix documents the INTERIM routines in alphabetical order.\\
 \rule{\textwidth}{0.3mm}
 {\Large \textbf{ADDSCR} \hfill Add Descriptor Item \hfill \textbf{ADDSCR}}
@@ -885,7 +640,7 @@ This appendix documents the INTERIM routines in alphabetical order.\\
   \end{tabbing}
 \end{description}
 \goodbreak
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \newpage
@@ -949,7 +704,7 @@ This appendix documents the INTERIM routines in alphabetical order.\\
 
 \section{Mathematics\xlabel{mathematics}}
 
-\begin{verbatim}
+\begin{terminalv}
 The optional globular cluster is generated using a King (1962)
 star density law
 \begin{equation}
@@ -989,7 +744,7 @@ be calculated
   B=\frac {\pi( (X-(\frac{IXEXT}{2}-1))^{2} +
   (Y-\frac{IYEXT}{2})^{2} )^{\frac{1}{2}}} {A}
 \end{displaymath}
-\end{verbatim}
+\end{terminalv}
 
 \newpage
 
@@ -1039,7 +794,7 @@ be calculated
 
 \newpage
 
-\begin{verbatim}
+\begin{terminalv}
 An AR model is of the form
 \begin{equation}
   X_{i}=\sum_{j=1}^{M} A_{j}X_{i-j}+E_{i}
@@ -1063,7 +818,7 @@ Every pixel (X,Y) in the image frame is multiplied by SIN(B)/B where
   B=\frac {\pi( (X-(\frac{IXEXT}{2}-1))^{2} +
   (Y-\frac{IYEXT}{2})^{2} )^{\frac{1}{2}}} {A}
 \end{displaymath}
-\end{verbatim}
+\end{terminalv}
 
 \newpage
 
@@ -1098,7 +853,7 @@ Every pixel (X,Y) in the image frame is multiplied by SIN(B)/B where
 
 \section{Tabbing\xlabel{tabbing}}
 
-\begin{verbatim}
+\begin{terminalv}
 \begin{quote}
   \begin{tabbing}
     ROUTINExxx\=ERRxFMTBADxx\==x8xxxx\=\kill
@@ -1134,7 +889,7 @@ Every pixel (X,Y) in the image frame is multiplied by SIN(B)/B where
   \emph{name}\>\emph{dtype}\>\>\emph{dimens}\>\emph{ndims}\>\emph{pointer}
     \>\textbf{WRIMAG}\\
 \end{tabbing}
-\end{verbatim}
+\end{terminalv}
 
 \newpage
 
@@ -1181,7 +936,7 @@ Every pixel (X,Y) in the image frame is multiplied by SIN(B)/B where
 \newpage
 
 \small
-\begin{verbatim}
+\begin{terminalv}
 The following qualifiers are recognized:
 
 \begin{list}{}{\settowidth{\labelwidth}{\texttt{-f}\emph{filename}}
@@ -1232,7 +987,7 @@ The following qualifiers are recognized:
   \item[0235--44--6951] PAD line V21/V23.
   \item[0235--44--6952] PAD line V22/V22bis.
 \end{list}
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \newpage
@@ -1296,7 +1051,8 @@ The following qualifiers are recognized:
 
 \section{Tables\xlabel{tables}}
 
-\begin{verbatim}
+\begin{footnotesize}
+\begin{terminalv}
 \begin{table}
   \begin{center}
     \begin{tabular}{||c|c|c||} \hline
@@ -1317,19 +1073,20 @@ The following qualifiers are recognized:
   \begin{center}
     \begin{tabular}{||l|l|l||}
       \hline
-      Primitive data type	& VAX FORTRAN type		& HDS type \\
+      Primitive data type& VAX FORTRAN type	& HDS type \\
       \hline
-      Integer			& \texttt{ INTEGER}			& \texttt{ `\_INTEGER'} \\
-      Single floating point	& \texttt{ REAL}			& \texttt{ `\_REAL'} \\
-      Double floating point	& \texttt{ DOUBLE PRECISION}	& \texttt{ `\_DOUBLE'} \\
-      Logical			& \texttt{ LOGICAL}			& \texttt{ `\_LOGICAL'} \\
-      Character		& \texttt{ CHARACTER[*n]}		& \texttt{ `\_CHAR[*n]'} \\
+      Integer			& \texttt{ INTEGER}	& \texttt{ `\_INTEGER'} \\
+      Single floating point	& \texttt{ REAL}	& \texttt{ `\_REAL'} \\
+      Double floating point& \texttt{ DOUBLE PRECISION} & \texttt{ `\_DOUBLE'} \\
+      Logical	& \texttt{ LOGICAL}		& \texttt{ `\_LOGICAL'} \\
+      Character	& \texttt{ CHARACTER[*n]}	& \texttt{ `\_CHAR[*n]'} \\
       \hline
     \end{tabular}
     \caption{Standard Primitive Data Types}
   \end{center}
 \end{table}
-\end{verbatim}
+\end{terminalv}
+\end{footnotesize}
 
 \newpage
 
@@ -1372,7 +1129,8 @@ The following qualifiers are recognized:
 
 \newpage
 
-\begin{verbatim}
+\begin{footnotesize}
+\begin{terminalv}
 \begin{table}
   \begin{center}
     \begin{tabular}{|ll|ll|} \hline
@@ -1397,15 +1155,16 @@ The following qualifiers are recognized:
     Handling of numerical errors and \emph{bad value} propagation are
     incorporated.\\
     \\
-    VEC & Arithmetic, mathematical functions and type conversion on {\em
-    vectorised arrays}, allowing more efficient processing of large numbers of
+    VEC & Arithmetic, mathematical functions and type conversion on \emph{vectorised arrays},
+          allowing more efficient processing of large numbers of
     data.
     Handling of numerical errors and \emph{bad value} propagation are
     incorporated.\\
     \\
   \end{tabular}
 \end{center}
-\end{verbatim}
+\end{terminalv}
+\end{footnotesize}
 
 \newpage
 
@@ -1437,8 +1196,7 @@ The following qualifiers are recognized:
     Handling of numerical errors and \emph{bad value} propagation are
     incorporated.\\
     \\
-    VEC & Arithmetic, mathematical functions and type conversion on {\em
-    vectorised arrays}, allowing more efficient processing of large numbers of
+    VEC & Arithmetic, mathematical functions and type conversion on \emph{vectorised arrays}, allowing more efficient processing of large numbers of
     data.
     Handling of numerical errors and \emph{bad value} propagation are
     incorporated.\\
@@ -1450,8 +1208,8 @@ The following qualifiers are recognized:
 
 \section{Figures\xlabel{figures}}
 
-\small
-\begin{verbatim}
+\begin{footnotesize}
+\begin{terminalv}
 \begin{figure}
   \begin{center}
     \begin{picture}(142,80)
@@ -1504,15 +1262,16 @@ The following qualifiers are recognized:
     \label{functional_analysis_of_interim_routine}
   \end{center}
 \end{figure}
-\end{verbatim}
-\normalsize
+\end{terminalv}
+\end{footnotesize}
 
 \newpage
 
 \begin{center}
   \textbf{\LaTeX\ OUTPUT}
 \end{center}
-
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
 \begin{figure}[h]
   \begin{center}
     \begin{picture}(142,80)
@@ -1570,7 +1329,7 @@ The following qualifiers are recognized:
 
 \small
 
-\begin{verbatim}
+\begin{terminalv}
 \begin{figure}
   \begin{center}
     \begin{picture}(70,50)
@@ -1624,7 +1383,7 @@ The following qualifiers are recognized:
     \label{data_flow_in_the_editing_process}
   \end{center}
 \end{figure}
-\end{verbatim}
+\end{terminalv}
 
 \normalsize
 
@@ -1690,7 +1449,7 @@ The following qualifiers are recognized:
 
 \newpage
 
-\begin{verbatim}
+\begin{terminalv}
 \begin{figure}
   \begin{center}
     \begin{picture}(150,90)
@@ -1731,7 +1490,7 @@ The following qualifiers are recognized:
     \label{the_relationship_between_VMS_and_HDS}
   \end{center}
 \end{figure}
-\end{verbatim}
+\end{terminalv}
 
 \newpage
 
@@ -1782,7 +1541,7 @@ The following qualifiers are recognized:
 
 \newpage
 
-\begin{verbatim}
+\begin{terminalv}
 \begin{figure}
   \begin{center}
     \begin{picture}(130,43)
@@ -1824,7 +1583,7 @@ The following qualifiers are recognized:
     \label{diagrams_of_structure_objects}
   \end{center}
 \end{figure}
-\end{verbatim}
+\end{terminalv}
 
 \newpage
 
@@ -1877,7 +1636,7 @@ The following qualifiers are recognized:
 \newpage
 
 \small
-\begin{verbatim}
+\begin{terminalv}
 \begin{figure}
   \begin{center}
     \begin{picture}(110,35)
@@ -1927,7 +1686,7 @@ The following qualifiers are recognized:
     \label{structure_of_a_record_control_label}
   \end{center}
 \end{figure}
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \newpage
@@ -1989,11 +1748,11 @@ The following qualifiers are recognized:
 \newpage
 
 \scriptsize
-\begin{verbatim}
+\begin{terminalv}
         Put this before the `begin{document}' command:
-\newcommand {\radec}   {$[\alpha,\delta\,]$}
-\newcommand {\mhadec}  {$[-h,\delta\,]$}
-\newcommand {\azel}    {$[A,E\,]$}
+\providecommand {\radec}   {$[\alpha,\delta\,]$}
+\providecommand {\mhadec}  {$[-h,\delta\,]$}
+\providecommand {\azel}    {$[A,E\,]$}
 
         Put this in the main body of your text:
 \begin{figure}
@@ -2058,7 +1817,7 @@ The following qualifiers are recognized:
   to azimuth and elevation \azel.  The others are all minor.
 \end{figure}
 
-\end{verbatim}
+\end{terminalv}
 
 \normalsize
 
@@ -2129,9 +1888,8 @@ The following qualifiers are recognized:
 
 \newpage
 
-\scriptsize
-
-\begin{verbatim}
+\begin{scriptsize}
+\begin{terminalv}
 \begin{figure}
   \begin{small}
     \begin{center}
@@ -2200,9 +1958,8 @@ coordinates).  Pick one of each and follow the flow downwards.  The sequences do
   tracking coordinates have only to be executed once per new target, but all the transformations
   from that level down have to be performed at the full pointing rate.
 \end{figure}
-\end{verbatim}
-
-\normalsize
+\end{terminalv}
+\end{scriptsize}
 
 \newpage
 
@@ -2279,7 +2036,7 @@ coordinates).  Pick one of each and follow the flow downwards.  The sequences do
 \newpage
 
 \scriptsize
-\begin{verbatim}
+\begin{terminalv}
 \begin{center}
   \begin{picture}(120,100)
     \put(60,50){\oval(100,80)}
@@ -2345,7 +2102,7 @@ coordinates).  Pick one of each and follow the flow downwards.  The sequences do
     \put(77,72){\line(0,-1){2}}
   \end{picture}
 \end{center}
-\end{verbatim}
+\end{terminalv}
 
 \normalsize
 
