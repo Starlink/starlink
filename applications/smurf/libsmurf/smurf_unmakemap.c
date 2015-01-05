@@ -34,6 +34,15 @@
 *     is the values in the NDF "Data" array.
 
 *  ADAM Parameters:
+*     ALIGNSYS = _LOGICAL (Read)
+*          If TRUE, then the spatial positions of the template time series
+*          data are aligned with the supplied sky map in the current
+*          co-ordinate system of the map,  Otherwise, they are aligned in
+*          the ICRS co-ordinate system. For instance, if the current
+*          co-ordinate system in the sky map is AZEL, then setting ALIGNSYS
+*          to TRUE will result in the template data being aligned in AZEL
+*          directly, disregarding the fact that a given AZEL will correspond
+*          to different positions on the sky at different times. [FALSE]
 *     ANGROT = _DOUBLE (Read)
 *          The angle from the focal plane X axis to the fixed analyser, in
 *          degrees. Measured positive in the same sense as rotation from focal
@@ -170,6 +179,8 @@
 *        Added parameters PASIGN, PAOFF and ANGROT.
 *     20-SEP-2013 (DSB):
 *        Added ADAM parameter HARMONIC.
+*     5-JAN-2015 (DSB):
+*        Added ADAM parameter ALIGNSYS.
 
 *  Copyright:
 *     Copyright (C) 2011 Science and Technology Facilities Council.
@@ -258,6 +269,7 @@ void smurf_unmakemap( int *status ) {
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double params[ 4 ];        /* astResample parameters */
    double sigma;              /* Standard deviation of noise to add to output */
+   int alignsys;              /* Align data in the map's system? */
    int flag;                  /* Was the group expression flagged? */
    int harmonic;              /* The requested harmonic */
    int ifile;                 /* Input file index */
@@ -323,6 +335,12 @@ void smurf_unmakemap( int *status ) {
               !strcmp( astGetC( skyfrm, "SkyRefIs" ), "Origin" ) ) ? 1 : 0;
    abskyfrm = astCopy( skyfrm );
    astClear( abskyfrm, "SkyRefIs" );
+
+/* If the ALIGNSYS parameter is TRUE then we align the raw data with the
+   map in the current system of the map, rather than the default ICRS. */
+   parGet0l( "ALIGNSYS", &alignsys, status );
+   if( alignsys ) astSetC( abskyfrm, "AlignSystem", astGetC( abskyfrm,
+                                                             "System" ) );
 
 /* Get the Mapping from the Sky Frame to grid axis in the iput map. */
    skymap = astGetMapping( wcsin, AST__CURRENT, AST__BASE );

@@ -5755,6 +5755,15 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter alignsys {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath CURRENT
+                prompt {Align data in the spatial co-ordinate system of the map?}
+                default FALSE
+                helpkey *
+            }
+
             parameter angrot {
                 type _DOUBLE
                 vpath DEFAULT
