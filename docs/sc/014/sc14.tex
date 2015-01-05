@@ -1,3 +1,4 @@
+\documentclass[twoside,11pt]{starlink}
 %
 % An Introduction to Fibre Spectroscopy.
 %
@@ -6,28 +7,24 @@
 % A.C. Davenhall (Edinburgh), 7/5/98.
 %
 
-\documentclass[twoside,11pt]{article}
-
 % ? Specify used packages
-\usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
 
-\pagestyle{myheadings}
+
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink Cookbook}
-\newcommand{\stardocinitials}  {SC}
-\newcommand{\stardocsource}    {sc\stardocnumber}
+\stardoccategory    {Starlink Cookbook}
+\stardocinitials    {SC}
+\stardocsource      {sc\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {14.2}
-\newcommand{\stardocauthors}   {A.C.~Davenhall}
-\newcommand{\stardocdate}      {11th June 1999}
-\newcommand{\stardoctitle}     {The Fibre Spectroscopy Cookbook}
-\newcommand{\stardocabstract}
+\stardocnumber      {14.2}
+\stardocauthors     {A.C.~Davenhall}
+\stardocdate        {11th June 1999}
+\stardoctitle       {The Fibre Spectroscopy Cookbook}
+\stardocabstract
 {This cookbook is an introduction to fibre spectroscopy and, in
 particular, the techniques and software available for reducing fibre
 spectroscopy observations.  It covers the principal common-user
@@ -39,7 +36,7 @@ it does contain some worked examples.
 \latex{\vspace{5mm}}
 
 \begin{center}
-{\bf Who Should Read this Cookbook?}
+\textbf{Who Should Read this Cookbook?}
 \end{center}
 
 This cookbook is aimed firmly at people who are new to fibre
@@ -49,236 +46,14 @@ have a set of fibre spectroscopy observations to reduce (perhaps observed
 by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sc.tex
-%
-%  Purpose:
-%     Template for Starlink Cookbook (SC) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%
-%  History:
-%     16-JUN-1997 (BLY):
-%        Original, based on SUN/SG templates.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document specific \providecommand or \newenvironment commands.
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
+\scfrontmatter
 
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-%      \stardocversion\\
-%      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\vspace{3cm}
 
 \latex{\subsection*{Revision history}}
 \html{\section*{Revision history}}
@@ -292,29 +67,9 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 
 \end{enumerate}
 
-\vspace{10cm}
-\copyright \underline{1999} Starlink, CCLRC
-
-\cleardoublepage
-\begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
-
-   \newpage
-   \listoffigures
-   \listoftables
-
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-
-
 \cleardoublepage
 \newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+
 
 \section{\xlabel{INTRO}\label{INTRO}Introduction}
 
@@ -322,14 +77,9 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 Now Argus had a hundred eyes in his head and never went to sleep with
 more than two at a time, so that he kept watch of Io constantly.
 
-\begin{latexonly}
-{\it The Age of Fable},    \raggedleft \\
+\emph{The Age of Fable},    \raggedleft \\
 Thomas~Bulfinch, 1855.     \raggedleft
-\end{latexonly}
-\begin{htmlonly}
-{\it The Age of Fable}, \\
-Thomas~Bulfinch, 1855.
-\end{htmlonly}
+
 \end{quote}
 
 This cookbook is an introduction to and overview of fibre spectroscopy
@@ -393,7 +143,7 @@ out at wavelengths ranging from the ultra-violet ($\sim 3500$\AA) to
 the infrared ($\sim 2.3$ micron).
 
 The first fibre-fed astronomical spectrograph was Medusa, built by
-Hill {\it et al.}\/\cite{HILL80} at the Steward observatory and first
+Hill \textit{et al.}\/\cite{HILL80} at the Steward observatory and first
 used in 1979.  Since then many instruments have been built;
 Parry\cite{PARRY97} gives a list and the early development of the
 subject (up to 1988) has been reviewed by Hill\cite{HILL88}.  Several
@@ -454,7 +204,7 @@ so that you can try the examples for yourself.
 
 Fibre-fed spectrographs are a relatively recent innovation and are
 rarely described in textbooks on astronomical instrumentation.  However,
-they are mentioned briefly in {\it Astronomical Observations}\, by
+they are mentioned briefly in \textit{Astronomical Observations}\, by
 Walker\cite{WALKER87}, pp167-169 and pp115-116.
 
 There have been a number of conferences in whole or part about fibre
@@ -463,19 +213,19 @@ include the following:
 
 \begin{itemize}
 
-  \item {\it Fiber Optics in Astronomy I}\/\cite{BARDEN88} (1988),
+  \item \textit{Fiber Optics in Astronomy I}\/\cite{BARDEN88} (1988),
 
-  \item {\it Fiber Optics in Astronomy II}\/\cite{GRAY93} (1993),
+  \item \textit{Fiber Optics in Astronomy II}\/\cite{GRAY93} (1993),
 
-  \item {\it Wide Field Spectroscopy and the Distant
+  \item \textit{Wide Field Spectroscopy and the Distant
    Universe}\/\cite{MADDOX95} (1995),
 
-  \item {\it Fiber Optics in Astronomical Applications}\/\cite{BARDEN95}
+  \item \textit{Fiber Optics in Astronomical Applications}\/\cite{BARDEN95}
    (1995),
 
-  \item {\it Wide-Field Spectroscopy}\/\cite{KONTIZAS97} (1997),
+  \item \textit{Wide-Field Spectroscopy}\/\cite{KONTIZAS97} (1997),
 
-  \item {\it Fiber Optics in Astronomy III}\/\cite{ARRIBAS98} (1998).
+  \item \textit{Fiber Optics in Astronomy III}\/\cite{ARRIBAS98} (1998).
 
 \end{itemize}
 
@@ -487,7 +237,7 @@ subsequently operated; it is possible to see them developing over a number
 of years.
 
 In general the more recent proceedings are the most useful.  In
-particular, {\it Wide-Field Spectroscopy}\, and {\it Fiber Optics in
+particular, \textit{Wide-Field Spectroscopy}\, and \textit{Fiber Optics in
 Astronomy III}\, include excellent reviews by Parry\cite{PARRY97,
 PARRY98}, which are strongly recommended.
 
@@ -497,12 +247,12 @@ Heacox and Connes\cite{HEACOX92} and Nelson\cite{NELSON88}.  Of course,
 the major uses of optical fibres are outside astronomy.  For an
 accessible introduction to these wider uses see
 \htmladdnormallink{Hecht's}{http://www.sff.net/people/Jeff.Hecht/}
-\htmladdnormallink{{\it Understanding Fiber Optics}}
+\htmladdnormallink{\textit{Understanding Fiber Optics}}
 {http://www.sff.net/people/jeff.hecht/UFO.html}\/\cite{HECHT98}
 and for the
 \htmladdnormallink{history}{http://www.sff.net/people/Jeff.Hecht/history.html}
 of the subject see his
-\htmladdnormallink{{\it City of Light}}
+\htmladdnormallink{\textit{City of Light}}
 {http://www.sff.net/people/Jeff.Hecht/City.html}\/\cite{HECHT99}.
 If you do read any non-astronomical literature about optical fibres
 you should be aware that various different types are available, only
@@ -521,30 +271,28 @@ manuals, conference proceedings \emph{etc}.
 
 \section{\xlabel{TYPO}\label{TYPO}Typographic Conventions}
 
-Technical terms are shown in a {\bf bold font like this} the first
+Technical terms are shown in a \textbf{bold font like this} the first
 time that they are used.  Also:
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 Anything that is to be typed into a computer program via the keyboard,
 or output from one via the screen, is indicated by a `typewriter' or
 `courier' font like this.
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 However:
 
 \begin{quote}
-{\sf items appearing in graphical windows, such as those used by 2dFDR,
+\textsf{items appearing in graphical windows, such as those used by 2dFDR,
 are shown in a sans serif font like this.}
 \end{quote}
 
 
 % - Part I ------------------------------------------------------------
 \cleardoublepage
-\markboth{\stardocname}{\stardocname}
+
 \part{Background Material}
-\markboth{\stardocname}{\stardocname}
+
 \section{\xlabel{SPECTR}\label{SPECTR}Fibre-fed Spectrographs}
 
 Figure~\ref{SLITSPR1} shows a (very) schematic diagram of a traditional
@@ -553,7 +301,7 @@ observing only one object at a time.  Typically, a flat opaque plate is
 placed in the field of view of the telescope, perpendicular to the optical
 axis.  The star-field being observed is imaged on this plate.  The plate
 contains a long, thin slit and the telescope pointing is adjusted until
-the object being observed (the {\bf target object}) is imaged on the
+the object being observed (the \textbf{target object}) is imaged on the
 centre of this slit.  Light from the target object passes through the
 slit, into the spectrograph where it is dispersed (almost invariably by
 a diffraction grating) and thence it is re-imaged on a two-dimensional
@@ -569,11 +317,9 @@ columns see dispersed light from the night sky adjacent to the object.
 
 \begin{figure}[htbp]
    \centering
-   \includegraphics[totalheight=4in]{sc14_spectrograph}
-   \begin{quote}
+   \includegraphics[width=\textwidth]{sc14_spectrograph}
    \caption{Schematic of a traditional astronomical slit spectrograph
    \label{SLITSPR1} }
-   \end{quote}
 \end{figure}
 
 Such an instrument is not making full use of the imaging capabilities of
@@ -598,11 +344,9 @@ the operation of a fibre-fed spectrograph is as simple as that.
 \begin{figure}[htbp]
    \centering
    \includegraphics[totalheight=4in]{sc14_bundle}
-   \begin{quote}
    \caption[Fibre bundle for a fibre-fed spectrograph]{Fibre bundle
     for a fibre-fed spectrograph (from Parry\cite{PARRY97, PARRY98})
    \label{BUNDLE} }
-   \end{quote}
 \end{figure}
 
 There are, of course, a number of caveats and complications.  Firstly,
@@ -619,8 +363,8 @@ simultaneously for large numbers of target objects, with the possible number
 of targets corresponding roughly to the number of fibres (though some
 fibres must be reserved for guiding and measuring the sky background).
 Every technique has its own jargon, and in fibre spectroscopy the number
-of spectra simultaneously observable is known as the {\bf multiplex
-advantage} or {\bf multiplex gain}, though it is simply the approximate
+of spectra simultaneously observable is known as the \textbf{multiplex
+advantage} or \textbf{multiplex gain}, though it is simply the approximate
 number of fibres.  The multiplex advantage (or number of fibres) is not
 the sole criterion for assessing the usefulness of a fibre spectrograph.
 Clearly, a fibre-fed system can only be used to its full advantage if
@@ -637,7 +381,7 @@ spectrograph entrance slit and emit it effectively unchanged.  However,
 inevitably, there is some loss and degradation of the signal.  In
 particular, fibres output a beam with a smaller focal ratio than the
 input beam (that is, one which is `faster').  This phenomenon is known
-as {\bf focal-ratio degradation} (FRD).  The effects of FRD can be
+as \textbf{focal-ratio degradation} (FRD).  The effects of FRD can be
 minimised by careful design of the optical system.  Similarly, various
 types of fibres are available which operate over a range of wavelengths
 from the near ultraviolet to the near infra-red.  The construction and
@@ -652,8 +396,8 @@ views a new field.  Indeed, positioning the fibres with sufficient
 accuracy is the greatest technical problem of fibre spectroscopy.
 
 Broadly three different types of system have been used to position
-fibres: {\bf plug-plate} systems, {\bf auto-fib type} systems and
-{\bf MX-type} systems.  (Auto-fib and MX were early fibre spectrographs.)
+fibres: \textbf{plug-plate} systems, \textbf{auto-fib type} systems and
+\textbf{MX-type} systems.  (Auto-fib and MX were early fibre spectrographs.)
 In a plug-plate system an opaque plate is placed in the focal surface
 of the telescope, with holes drilled in the plate at the
 positions of the target objects and fibres attached to the holes.
@@ -690,8 +434,8 @@ two-dimensional CCD.  Various instrumental effects are present in the
 raw images read from the CCD and these must be removed or allowed for.
 These effects include: bad pixels, bias in the electronics, dark current
 and cosmic-ray\footnote{Astronomers usually refer to spurious signals
-in CCD frames caused by ionising radiation as {\bf cosmic-ray hits} or
-{\bf cosmic-ray events}.  However, these terms are slightly misleading
+in CCD frames caused by ionising radiation as \textbf{cosmic-ray hits} or
+\textbf{cosmic-ray events}.  However, these terms are slightly misleading
 as the ionising events are as likely to be due to background
 terrestrial radiation as cosmic-rays.} and dust particles.  There are
 several introductory documents describing these effects and the techniques
@@ -700,9 +444,9 @@ removing instrumental effects see:
 
 \begin{itemize}
 
-  \item SC/5: {\it The 2-D CCD Data Reduction Cookbook}\/\cite{SC5},
+  \item SC/5: \textit{The 2-D CCD Data Reduction Cookbook}\/\cite{SC5},
 
-  \item {\it A User's Guide to CCD Reductions with IRAF}\/\cite{MASSEY97}
+  \item \textit{A User's Guide to CCD Reductions with IRAF}\/\cite{MASSEY97}
    (see Section~\ref{IRAF}, below, for a discussion of the IRAF data
    reduction environment).
 
@@ -720,13 +464,13 @@ calibration of spectroscopic data are:
 
 \begin{itemize}
 
-  \item \xref{SC/7}{sc7}{}: {\it Simple Spectroscopy
+  \item \xref{SC/7}{sc7}{}: \textit{Simple Spectroscopy
    Reductions}\/\cite{SC7},
 
-  \item {\it A User's Guide to Reducing Slit Spectra with
+  \item \textit{A User's Guide to Reducing Slit Spectra with
    IRAF}\/\cite{MASSEY92},
 
-  \item {\it Guide to the Slit Spectra Reduction Task
+  \item \textit{Guide to the Slit Spectra Reduction Task
    DOSLIT}\/\cite{VALDES92B}.
 
 \end{itemize}
@@ -734,7 +478,7 @@ calibration of spectroscopic data are:
 These documents describe slit spectroscopy but are mostly also
 applicable to fibre spectroscopy.  Though they describe particular
 software packages, they are still worth reading even if you do not
-intend to use the package described; the {\it techniques}\, used are
+intend to use the package described; the \textit{techniques}\, used are
 largely independent of the packages and thus the descriptions are still
 useful.  \xref{SC/7}{sc7}{} is a particularly readable and informative
 document.  Note that it is usually not feasible to flux-calibrate
@@ -765,7 +509,7 @@ These points are discussed individually below.
 \subsection{Bookkeeping}
 
 The most obvious addition to traditional spectroscopic techniques
-required for fibre spectroscopy is the additional {\bf bookkeeping}
+required for fibre spectroscopy is the additional \textbf{bookkeeping}
 needed to keep track of which fibre was targeted on which object (and
 consequently which object each spectrum was obtained from).  It is
 important that this information is kept track of carefully, otherwise
@@ -780,7 +524,6 @@ yourself.
 \begin{figure}[htbp]
    \centering
    \includegraphics[totalheight=5in]{sc14_objframe}
-   \begin{quote}
    \caption[CCD frame of target object spectra acquired with
     WYFFOS/AUTOFIB2]{CCD frame containing spectra of target objects
     observed with the WYFFOS/AUTOFIB2 fibre spectrograph on the WHT.
@@ -798,10 +541,9 @@ yourself.
     the spectra, but are spurious signals caused by cosmic ray events.
     The objects observed here are low redshift galaxies ($z < 0.2$\/) of
     the sort which are thought to be responsible for the Ly$\alpha$
-    absorption lines observed in QSO spectra (see Bowen {\it et
+    absorption lines observed in QSO spectra (see Bowen \textit{et
     al.}\/\cite{BOWEN98})
    \label{OBJFRAME} }
-   \end{quote}
 \end{figure}
 
 Figure~\ref{OBJFRAME} shows a CCD frame obtained with the WYFFOS/AUTOFIB2
@@ -809,8 +551,7 @@ fibre spectrograph.  Most fibre spectrographs produce frames of broadly
 similar appearance.  The series of horizontal lines are the individual
 spectra obtained through the various fibres.  In order to extract each
 spectrum from the image it is necessary to define its spatial extent (or
-{\bf aperture}, {\bf software aperture} or, in this cookbook, {\bf
-footprint}) on the CCD frame.  There are really three aspects to defining
+\textbf{aperture}, \textbf{software aperture} or, in this cookbook, \textbf{footprint}) on the CCD frame.  There are really three aspects to defining
 the footprint of each spectrum: locating its position, defining the shape
 parallel to the dispersion direction and defining the shape perpendicular
 to the dispersion direction.  The need to locate the position is obvious.
@@ -830,11 +571,11 @@ The remaining two aspects are described below.
 
    In order to define the shape along the dispersion direction a locus
    of points along the middle of the spectrum is defined over its whole
-   length.  This process is called {\bf tracing} the spectrum and the
-   locus is called the {\bf trace} of the spectrum.
+   length.  This process is called \textbf{tracing} the spectrum and the
+   locus is called the \textbf{trace} of the spectrum.
 
   \item[Shape perpendicular to the dispersion direction] Figure
-   \ref{SPSLICE} shows a row of pixels (or {\bf slice}) extracted from
+   \ref{SPSLICE} shows a row of pixels (or \textbf{slice}) extracted from
    the CCD frame.  The slice is centred on a spectrum and aligned
    perpendicular to the dispersion direction.  The peak in the plot is
    the spectrum and the flat outer regions the ambient background signal
@@ -861,13 +602,11 @@ The remaining two aspects are described below.
 \begin{figure}[htbp]
    \centering
    \includegraphics[totalheight=4in]{sc14_spslice}
-   \begin{quote}
    \caption[A slice across a spectrum]{A slice across a spectrum.
     The plot shows a row of about twenty-eight pixels centred on
     the spectrum and aligned perpendicular to the dispersion
     direction
    \label{SPSLICE} }
-   \end{quote}
 \end{figure}
 
 The description up to this point is equally applicable to extracting
@@ -881,7 +620,7 @@ However, the essential difference for fibre spectroscopy data is that
 instead of a single spectrum to be extracted there is a whole set of
 more-or-less parallel spectra to be extracted (recall
 Figure~\ref{OBJFRAME}).  Defining the footprints of the set of spectra
-on the CCD frame is called {\bf tramlining} (because of the resemblance
+on the CCD frame is called \textbf{tramlining} (because of the resemblance
 of the spectra to a set of tramlines).
 
 In principle the tramlining could be carried out on the object
@@ -891,7 +630,7 @@ all the spectra are well-defined along their entire length.  Sometimes
 special frames are acquired for this purpose.  Alternatively, flat
 field frames (see below) are usually suitable.  It is usually
 acceptable to apply the footprints defined from one frame (say a flat
-field) to another frame (say a target object or arc frame) {\it as long
+field) to another frame (say a target object or arc frame) \textit{as long
 as the instrumental configuration remains unchanged}.
 
 \subsection{Extraction}
@@ -906,7 +645,7 @@ The simplest way to determine the intensity at each point along the
 spectrum is simply to average all the points across the width of
 the spectrum (that is, perpendicular to the dispersion direction),
 again using the the width determined during the tramlining.  A more
-sophisticated technique is {\bf optimal extraction} which gives high
+sophisticated technique is \textbf{optimal extraction} which gives high
 weight to high signal-to-noise pixels close to the centre of the
 spectrum and lower weight to lower signal-to-noise pixels close to the
 edge (see Figure~\ref{SPSLICE}).  Optimal extraction offers significant
@@ -933,19 +672,19 @@ Important sources of losses are typically the throughput of the fibres
 and vignetting in the telescope and they are removed by flat fielding
 (see Section~\ref{FLAT}, below).  However, the intensity of the scattered
 light does not scale in this fashion and therefore it must be identified
-and treated separately.  For example in {\tt dofibers} (see
+and treated separately.  For example in \texttt{dofibers} (see
 Section~\ref{DOFIBERS}) it is estimated from the signal recorded in parts
 of the detector which are outside the footprints of the spectra.
 
 \subsection{\label{FLAT}Flat fielding}
 
-{\bf Flat field} corrections are made in order to allow for simple
+\textbf{Flat field} corrections are made in order to allow for simple
 multiplicative effects in the data.  In fibre spectroscopy such effects
 include:
 
 \begin{itemize}
 
-  \item the {\bf instrumental signature} (small-scale variations in the
+  \item the \textbf{instrumental signature} (small-scale variations in the
    throughput of the instrument optics),
 
   \item throughput losses in the fibres (which usually vary between
@@ -1003,7 +742,7 @@ Each extracted spectrum consists of a list of the intensity at a series
 of positions along the central locus of spectrum.  Because the spectra
 are usually both bent and misaligned with the CCD grid these positions
 will not generally correspond precisely to the positions of pixels in
-the CCD.  However, they are in {\it units}\, of pixel positions.  The
+the CCD.  However, they are in \textit{units}\, of pixel positions.  The
 next step is to convert the positions into genuine wavelengths,
 typically in \AA ngstr\"{o}m.
 
@@ -1030,7 +769,7 @@ exposed both before and after target object frames and the results averaged
 in order to reduce systematic effects.  However, spectrographs mounted on
 a Nasmyth platform or the dome floor are usually extremely stable and in
 these cases fewer arc frames may be adequate.  Applying the wavelength
-calibration to the target spectra is often called making the {\bf dispersion
+calibration to the target spectra is often called making the \textbf{dispersion
 correction}.  Wavelength calibration is discussed further in \xref{SC/7,
 Section 4.7}{sc7}{wavelength_calibration}.
 
@@ -1050,7 +789,7 @@ Gilmore\cite{WYSE92} give a detailed and thorough description of the
 sources of error and discuss how to correct for them.  The following
 discussion is largely based on this paper, though it is still well
 worth reading the original.  Another useful and detailed description
-is given by Watson {\it et al.}\/\cite{WATSON98}.
+is given by Watson \textit{et al.}\/\cite{WATSON98}.
 
 Consider a spectrum corrected for scattered light, flat fielded and
 wavelength calibrated, as described above.  The resulting spectrum is
@@ -1080,7 +819,7 @@ spectra similar to the Sun (the zodiacal light is, of course, just
 sunlight reflected off interplanetary dust).  The aurora and atmospheric
 emission have primarily (but not exclusively) emission spectra.  Emission
 and absorption lines originating in the terrestrial atmosphere are often
-called {\bf telluric lines}.  Wyse and Gilmore\cite{WYSE92} give summary
+called \textbf{telluric lines}.  Wyse and Gilmore\cite{WYSE92} give summary
 details of the atmospheric emission and Chamberlain\cite{CHAMBERLAIN61}
 gives a thorough description.  However, the upshot is that atmospheric
 emission is more important in the red than the blue, with the OH (Meinel)
@@ -1111,8 +850,8 @@ for it than for other instruments with smaller fields of view.
 \subsubsection{\label{SKYCORRPROC}Correction procedure}
 
 This section considers the procedures for correcting for sky emission.
-Two techniques are in common use: {\bf simultaneous sky exposure} and
-{\bf separate sky frames}.  In both cases the target object spectra
+Two techniques are in common use: \textbf{simultaneous sky exposure} and
+\textbf{separate sky frames}.  In both cases the target object spectra
 should previously have been corrected for instrumental scattered light
 and flat fielded.
 
@@ -1192,7 +931,7 @@ the simultaneous sky exposure technique is usually preferable.
 \subsubsection{Other techniques}
 
 Various more complicated techniques have been proposed, for example
-by Lissandrini {\it et al.}\/\cite{LISS94} or Watson {\it et
+by Lissandrini \textit{et al.}\/\cite{LISS94} or Watson \textit{et
 al.}\/\cite{WATSON98}, though these are not usually in routine use.
 
 
@@ -1218,8 +957,8 @@ proceedings listed in Section~\ref{FURTHER}.  In the following
 descriptions only the most recent of the references is given.  The three
 instruments each have their own data reduction software, which is
 also described.  In the cases of WYFFOS/AUTOFIB2 and FLAIR this
-software is based on the IRAF package {\tt dofibers}.  Additional sections
-describe {\tt dofibers} and the underlying IRAF environment.
+software is based on the IRAF package \texttt{dofibers}.  Additional sections
+describe \texttt{dofibers} and the underlying IRAF environment.
 
 \begin{table}[htbp]
 
@@ -1233,9 +972,7 @@ FLAIR           & UKST 1.2m & 390           & 2000    & 90   \\
 \end{tabular}
 \end{center}
 
-\begin{quote}
 \caption{Common-user fibre-fed spectrographs \label{FIB_INSTR} }
-\end{quote}
 
 \end{table}
 
@@ -1260,11 +997,9 @@ the next observation.
 \begin{figure}[htbp]
    \centering
    \includegraphics[totalheight=6in]{sc14_2df}
-   \begin{quote}
    \caption[Schematic diagram of the 2dF assembly]{Schematic diagram of
     the 2dF assembly (from Cannon\cite{CANNON97})
    \label{2DF_SCHEMATIC} }
-   \end{quote}
 \end{figure}
 
 The 2dF has been described by Cannon\cite{CANNON97} and a user
@@ -1272,8 +1007,7 @@ guide is available\cite{BAILEY97}.  Further information can be found
 on the Anglo-Australian Observatory (AAO)'s Web pages at URL:
 
 \begin{quote}
-\htmladdnormallink{ {\tt http://www.aao.gov.au/2df} }
-  {http://www.aao.gov.au/2df}
+\url{http://www.aao.gov.au/2df}
 \end{quote}
 
 including a hypertext version of the manual and a postscript version
@@ -1288,7 +1022,7 @@ tram-line mapping of the spectra from individual fibres on the CCD and
 their extraction, arc identification, wavelength calibration, fibre
 throughput calibration and sky subtraction.  The 2dF data reduction
 software is comprehensively documented in the
-\htmladdnormallink{ {\it 2dF User Manual}\/}
+\htmladdnormallink{ \textit{2dF User Manual}\/}
 {http://www.aao.gov.au/2df/manual.html}\cite{BAILEY97}.
 The software is mostly written in Fortran and uses various Starlink
 subroutine libraries.  It is controlled from an easy-to-use graphical
@@ -1301,50 +1035,47 @@ not familiar with the ftp utility then seek assistance from your site
 manager.  The details are as follows.
 
 \begin{tabular}{lll}
-ftp site:  & {\tt ftp.aao.gov.au}       & \\
-directory: & {\tt /pub/2df}             & \\
-files:     & {\tt 2dfdr\_alpha.tar.Z}   & Digital/Alpha version \\
-           & {\tt 2dfdr\_solaris.tar.Z} & Sun/Solaris version   \\
-           & {\tt sample\_data.tar.Z}   & sample data           \\
+ftp site:  & \texttt{ftp.aao.gov.au}       & \\
+directory: & \texttt{/pub/2df}             & \\
+files:     & \texttt{2dfdr\_alpha.tar.Z}   & Digital/Alpha version \\
+           & \texttt{2dfdr\_solaris.tar.Z} & Sun/Solaris version   \\
+           & \texttt{sample\_data.tar.Z}   & sample data           \\
 \end{tabular}
 
-The files are compressed tar archives.  Remember to set ftp to {\tt binary}
+The files are compressed tar archives.  Remember to set ftp to \texttt{binary}
 mode prior to retrieving copies.  Decompress the files using Unix command
-{\tt uncompress} (sic).  2dFDR requires some 25Mb of disk space and
+\texttt{uncompress} (sic).  2dFDR requires some 25Mb of disk space and
 sample data needs a further 40Mb.  Twice this amount is required if
 both the extracted files and the tar archives are to be resident on
-disk simultaneously.  See the {\tt README} files included in the archives
+disk simultaneously.  See the \texttt{README} files included in the archives
 for further details.  Section~\ref{2DF} is an example of installing 2dFDR
 and using it to reduce sample data.
 
 2dF data files are stored using the standard Starlink NDF ($n$-dimensional
 Data Format; see \xref{SUN/33}{sun33}{}\cite{SUN33}) format.  They
 can be converted to the widely-used standard FITS\footnote{The
-original FITS format was proposed by Wells {\it et al.}\/\cite{WELLS81}
+original FITS format was proposed by Wells \textit{et al.}\/\cite{WELLS81}
 in 1981.  However, it has been developed and enhanced over the years.
 The FITS standard is now maintained and documented by the FITS Support
 Office of the Astrophysics Data Facility at the NASA Goddard Space
-Flight Center (see URL: \htmladdnormallink{ {\tt
-http://www.gsfc.nasa.gov/astro/fits/fits\_home.html}}
+Flight Center (see URL: \htmladdnormallink{ \texttt{http://www.gsfc.nasa.gov/astro/fits/fits\_home.html}}
 {http://www.gsfc.nasa.gov/astro/fits/fits\_home.html}).
 Though FITS is basically an astronomical format it is sometimes
 mentioned in books about standard image formats.  See, for example,
-{\it Graphics File Formats}\, by Kay and Levine\cite{KAY95}.}
+\textit{Graphics File Formats}\, by Kay and Levine\cite{KAY95}.}
 (Flexible Image Transport System) format using the Starlink CONVERT
-package (see \xref{SUN/55}{sun55}{}\cite{SUN55}).  Use application {\tt
-ndf2fits} with the {\tt proexts} (propagate extensions) option.  The
+package (see \xref{SUN/55}{sun55}{}\cite{SUN55}).  Use application \texttt{ndf2fits} with the \texttt{proexts} (propagate extensions) option.  The
 auxiliary information in the NDF giving details of the individual
 fibres is appended to the FITS files as a binary-table extension.  This
 binary table can be accessed using the catalogue and table manipulation
 package CURSA (see \xref{SUN/190}{sun190}{}\cite{SUN190}).  2dF FITS files
 can be converted back to the original NDF format using the CONVERT
-application {\tt fits2ndf}.
+application \texttt{fits2ndf}.
 
-2dF data can also be successfully reduced using the IRAF package {\tt
-dofibers} (see Section~\ref{DOFIBERS}).  The AAO Web pages include
-some tips on \htmladdnormallink{using {\tt dofibers} with 2dF data}
-{http://www.phys.unsw.edu.au/\~{}mjd/2df/}.  You are likely to need to
-increase parameter {\tt min\_lenuserarea} before using IRAF with 2dF
+2dF data can also be successfully reduced using the IRAF package \texttt{dofibers} (see Section~\ref{DOFIBERS}).  The AAO Web pages include
+some tips on \htmladdnormallink{using \texttt{dofibers} with 2dF data}
+{http://www.phys.unsw.edu.au/~mjd/2df/}.  You are likely to need to
+increase parameter \texttt{min\_lenuserarea} before using IRAF with 2dF
 data; see Section~\ref{IRAFIBSP} for details.
 
 \subsection{\label{WYFFOS_I}WYFFOS/AUTOFIB2}
@@ -1365,39 +1096,36 @@ further information is available on the Instituto de Astrofisica de
 Canarias' Web pages at URL:
 
 \begin{quote}
-\htmladdnormallink{ {\tt http://www.ing.iac.es} }{http://www.ing.iac.es}
+\url{http://www.ing.iac.es}
 \end{quote}
 
 including a hypertext user manual.
 
 \subsubsection{\label{WYFFOS_S}Software}
 
-WYFFOS/AUTOFIB2 data are reduced using {\tt wyf\_red}, a special-purpose
+WYFFOS/AUTOFIB2 data are reduced using \texttt{wyf\_red}, a special-purpose
 IRAF script written by Jim~Lewis.  This script uses the IRAF application
-{\tt dofibers} (see Section~\ref{DOFIBERS}, below) and other IRAF
-applications.  Unlike the basic {\tt dofibers} it will automatically
+\texttt{dofibers} (see Section~\ref{DOFIBERS}, below) and other IRAF
+applications.  Unlike the basic \texttt{dofibers} it will automatically
 perform the routine CCD processing (bad pixel removal, flat-fielding,
-debaising \emph{etc}).  {\tt wyf\_red} will also handle wavelength calibration
+debaising \emph{etc}).  \texttt{wyf\_red} will also handle wavelength calibration
 and sky subtraction.
 
-A comprehensive manual for {\tt wyf\_red}, the {\it WYFFOS Data
+A comprehensive manual for \texttt{wyf\_red}, the \textit{WYFFOS Data
 Reduction Manual}\/\cite{LEWIS96}, is available.  Copies of the software
 and manual can be downloaded from the WYFFOS/AUTOFIB2 section of the
 IAC Web pages.
 
 WYFFOS/AUTOFIB2 data are exported as FITS files.  Prior to using
-{\tt wyf\_red} they must be converted to the IRAF format using the
-IRAF command {\tt rfits}.  Note however that the IRAF parameter {\tt
-min\_lenuserarea} must be increased in order to accommodate WYFFOS
-headers.  This change {\it must}\, be made before running {\tt rfits}
-to import the files.  See Section~\ref{IRAFIBSP}, below and the {\it
-Getting Started}\, section of the  {\tt wyf\_red} manual for details.
+\texttt{wyf\_red} they must be converted to the IRAF format using the
+IRAF command \texttt{rfits}.  Note however that the IRAF parameter \texttt{min\_lenuserarea} must be increased in order to accommodate WYFFOS
+headers.  This change \textit{must}\, be made before running \texttt{rfits}
+to import the files.  See Section~\ref{IRAFIBSP}, below and the \textit{Getting Started}\, section of the  \texttt{wyf\_red} manual for details.
 
 There is no example of reducing WYFFOS/AUTOFIB2 data in the present
 cookbook.  However, the examples of reducing Hydra (Section~\ref{HYDRA})
 and FLAIR (Section~\ref{FLAIR}) data with IRAF are sufficiently similar
-(because they also use {\tt dofibers} or the closely related {\tt
-dohydra}) that it is worthwhile trying them before attempting to reduce
+(because they also use \texttt{dofibers} or the closely related \texttt{dohydra}) that it is worthwhile trying them before attempting to reduce
 WYFFOS/AUTOFIB2 data.
 
 \subsection{\label{FLAIR_I}FLAIR}
@@ -1426,8 +1154,7 @@ FLAIR has been described by Parker\cite{PARKER97A} and further information
 is available on the AAO's Web pages at URL:
 
 \begin{quote}
-\htmladdnormallink{ {\tt http://www.aao.gov.au/astro/flair.html} }
-{http://www.aao.gov.au/astro/flair.html}
+\url{http://www.aao.gov.au/astro/flair.html}
 \end{quote}
 
 including a hypertext user manual.
@@ -1435,40 +1162,39 @@ including a hypertext user manual.
 \subsubsection{\label{FLAIR_S}Software}
 
 FLAIR data are reduced using a set of IRAF scripts based
-around the IRAF application {\tt dofibers} (see Section~\ref{DOFIBERS}).
+around the IRAF application \texttt{dofibers} (see Section~\ref{DOFIBERS}).
 Before running the FLAIR scripts the CCD frames must be corrected for
 instrumental effects (allowing for bad pixels, flat-fielding, debiasing
 \emph{etc}).  These operations are also most conveniently done with IRAF.
 
-A manual for reducing FLAIR observations is available: {\it FLAIR Data
-Reduction with IRAF}\/\cite{DRINK96}.  Another useful document is {\it A
+A manual for reducing FLAIR observations is available: \textit{FLAIR Data
+Reduction with IRAF}\/\cite{DRINK96}.  Another useful document is \textit{A
 User's Guide to CCD Reductions with IRAF}\/\cite{MASSEY92}.  Copies of the
 FLAIR software and the manual can be downloaded from the FLAIR section on
 the AAO Web pages (see Section~\ref{FLAIR_I}).  Alternatively, they be
 retrieved by anonymous ftp.  The details are as follows:
 
 \begin{tabular}{lll}
-ftp site:  & {\tt ftp.aao.gov.au}   & \\
-directory: & {\tt /pub/flair}       & \\
-files:     & {\tt README}           & instructions             \\
-           & {\tt flair.tar.Z}      & FLAIR IRAF scripts       \\
-           & {\tt flair\_iraf.ps.Z} & user manual (postscript) \\
+ftp site:  & \texttt{ftp.aao.gov.au}   & \\
+directory: & \texttt{/pub/flair}       & \\
+files:     & \texttt{README}           & instructions             \\
+           & \texttt{flair.tar.Z}      & FLAIR IRAF scripts       \\
+           & \texttt{flair\_iraf.ps.Z} & user manual (postscript) \\
 \end{tabular}
 
-Files {\tt flair.tar.Z} and {\tt flair\_iraf.ps.Z} are compressed.
-Remember to set ftp {\tt binary} mode prior to retrieving them.
-Decompress the files using Unix command {\tt uncompress} (sic).  See
-file {\tt README} for details of installing the IRAF scripts.
+Files \texttt{flair.tar.Z} and \texttt{flair\_iraf.ps.Z} are compressed.
+Remember to set ftp \texttt{binary} mode prior to retrieving them.
+Decompress the files using Unix command \texttt{uncompress} (sic).  See
+file \texttt{README} for details of installing the IRAF scripts.
 
 FLAIR data are usually exported as FITS files and then converted to
-the IRAF format using the IRAF command {\tt rfits}.  Note, however,
-that as for WYFFOS/AUTOFIB2, the IRAF parameter {\tt min\_lenuserarea}
-must be increased {\it before}\, importing the data in order to
+the IRAF format using the IRAF command \texttt{rfits}.  Note, however,
+that as for WYFFOS/AUTOFIB2, the IRAF parameter \texttt{min\_lenuserarea}
+must be increased \textit{before}\, importing the data in order to
 accommodate the FLAIR headers.  See Section~\ref{IRAFIBSP}, below and the
-{\it Setup}\, section of the FLAIR II data reduction manual for details.
+\textit{Setup}\, section of the FLAIR II data reduction manual for details.
 
-Section~\ref{FLAIR} is an example of reducing FLAIR observations with {\tt
-dofibers}.  FLAIR data can also be reduced using the Starlink packages
+Section~\ref{FLAIR} is an example of reducing FLAIR observations with \texttt{dofibers}.  FLAIR data can also be reduced using the Starlink packages
 Figaro (see \xref{SUN/86}{sun86}{}\cite{SUN86}),
 CCDPACK (see \xref{SUN/139}{sun139}{}\cite{SUN139}) and
 KAPPA (see \xref{SUN/95}{sun95}{}\cite{SUN95}),
@@ -1476,27 +1202,26 @@ though this is unusual.
 
 \subsection{Additional software}
 
-The WYFFOS/AUTOFIB2 and FLAIR software is based on the package {\tt
-dofibers} which itself runs under the IRAF environment.  These items
+The WYFFOS/AUTOFIB2 and FLAIR software is based on the package \texttt{dofibers} which itself runs under the IRAF environment.  These items
 are briefly described below.
 
 \subsubsection{\label{DOFIBERS}dofibers}
 
-{\tt dofibers} is a general-purpose IRAF application written by
+\texttt{dofibers} is a general-purpose IRAF application written by
 Francisco~Valdes for reducing fibre spectroscopy observations and
 is not tied to any particular instrument.  It provides facilities for
 the extraction, flat-fielding, fibre throughput correction, wavelength
 calibration and sky subtraction of fibre spectra.  It is an IRAF
 command language script which invokes other IRAF applications.
 
-{\tt dofibers} is the usual method of reducing FLAIR observations and
+\texttt{dofibers} is the usual method of reducing FLAIR observations and
 has been used successfully to reduce 2dF data.  The reduction procedures
-for WYFFOS/AUTOFIB2 are based on {\tt dofibers} but it cannot be used
+for WYFFOS/AUTOFIB2 are based on \texttt{dofibers} but it cannot be used
 directly in this case because in WYFFOS/AUTOFIB2 the fibre ends are
 positioned in three parallel rows in the spectrograph slit rather than
-the single row expected by {\tt dofibers}.
+the single row expected by \texttt{dofibers}.
 
-{\tt dofibers} is documented in the {\it Guide to the Multifiber
+\texttt{dofibers} is documented in the \textit{Guide to the Multifiber
 Reduction Task DOFIBERS}\/\cite{VALDES92A}.  Both the software and manual
 are available as part of IRAF (see the following section).
 
@@ -1514,25 +1239,24 @@ spectroscopic data, additional packages are loaded to augment the
 core system.
 
 Software for processing most sorts of astronomical data is available
-for the IRAF environment.  For example, {\tt dofibers}, the
+for the IRAF environment.  For example, \texttt{dofibers}, the
 general-purpose package for processing fibre spectroscopy data
 discussed in Section~\ref{DOFIBERS}, runs as part of IRAF.  Similarly,
 the special-purpose packages for reducing WYFFOS/AUTOFIB2 and FLAIR
 data (see Section~\ref{WYFFOS_S} and \ref{FLAIR_S} respectively),
-which themselves use {\tt dofibers}, are optional IRAF packages.
+which themselves use \texttt{dofibers}, are optional IRAF packages.
 
 The use of IRAF on Starlink systems is described in
-\xref{SG/12: {\it An Introduction to IRAF}}{sg12}{}\/\cite{SG12}.
+\xref{SG/12: \textit{An Introduction to IRAF}}{sg12}{}\/\cite{SG12}.
 If you are not familiar with IRAF this document is a convenient
-introduction.  Another useful document is {\it A Beginner's Guide to
+introduction.  Another useful document is \textit{A Beginner's Guide to
 Using IRAF}\/\cite{BARNES93}.  SG/12 includes details of how to obtain
 copies of IRAF manuals.  IRAF is a complex and in some ways
 non-intuitive system and it is well worth taking the time and trouble
 to learn the basics of its operation before attempting a complicated
-data-reduction task.  The {\it Beginner's Guide}\, is an accessible and
+data-reduction task.  The \textit{Beginner's Guide}\, is an accessible and
 thorough document and is a good place to start.  Even if you are already
-familiar with IRAF it is still worthwhile having a look at the {\it
-Beginner's Guide}\, because it may well still contain useful information
+familiar with IRAF it is still worthwhile having a look at the \textit{Beginner's Guide}\, because it may well still contain useful information
 which is new to you.  IRAF is installed at most Starlink sites.
 If it is not installed at your site and you wish to obtain a copy then
 SG/12 contains some useful notes.  However, you will probably need to
@@ -1545,38 +1269,34 @@ usually have large headers (because of all the bookkeeping associated
 with the individual fibres) and this is the case with files generated
 by the 2dF, WYFFOS/AUTOFIB2 and FLAIR.  The headers generated by these
 instruments are larger than IRAF accommodates by default when it reads
-FITS files.  Thus, it is necessary to reset the parameter {\tt
-min\_lenuserarea}, which specifies the maximum header size, prior
+FITS files.  Thus, it is necessary to reset the parameter \texttt{min\_lenuserarea}, which specifies the maximum header size, prior
 to importing the FITS files.  Table~\ref{MINLENUSERAREA} gives the
 minimum required value for each instrument (larger values may, of
-course, be used).  The simplest way to reset {\tt min\_lenuserarea} is
+course, be used).  The simplest way to reset \texttt{min\_lenuserarea} is
 to use the IRAF customisation login file supplied with
 \xref{SG/12}{sg12}{}\/\cite{SG12}.  In this case the parameter is set
 to an appropriate value when IRAF starts.  Alternatively, you can reset
 the value manually from the IRAF command line.  For example, for
 WYFFOS/AUTOFIB2 you would type:
 
-\begin{quote}
-{\tt reset min\_lenuserarea ~ = ~ 300000}
-\end{quote}
+\begin{terminalv}
+reset min_lenuserarea  =  300000
+\end{terminalv}
 
 \begin{table}[htbp]
 
 \begin{center}
 \begin{tabular}{lc}
-Instrument      & {\tt min\_lenuserarea} \\ \hline
+Instrument      & \texttt{min\_lenuserarea} \\ \hline
 2dF             & 128,000 \\
 WYFFOS/AUTOFIB2 & 300,000 \\
 FLAIR           &  40,000 \\
 \end{tabular}
 \end{center}
 
-\begin{quote}
-\caption[Values of IRAF parameter {\tt min\_lenuserarea} for fibre
-spectrographs]{Minimum permitted values of IRAF parameter {\tt
-min\_lenuserarea} for use with fibre spectrographs
+\caption[Values of IRAF parameter \texttt{min\_lenuserarea} for fibre
+spectrographs]{Minimum permitted values of IRAF parameter \texttt{min\_lenuserarea} for use with fibre spectrographs
 \label{MINLENUSERAREA} }
-\end{quote}
 
 \end{table}
 
@@ -1611,7 +1331,7 @@ databases, such as
 for Galactic objects or
 \htmladdnormallink{NED}{http://nedwww.ipac.caltech.edu/}
 for external galaxies\footnote{see URL:
-\htmladdnormallink{ {\tt http://www.starlink.ac.uk/archives/}}
+\htmladdnormallink{ \texttt{http://www.starlink.ac.uk/archives/}}
 {http://www.starlink.ac.uk/archives/}} then you can
 use the coordinates that they give for your objects.  You should be aware,
 however, that these databases contain heterogeneous information obtained
@@ -1634,13 +1354,12 @@ progress and data are added as they become available.  Further details
 of the catalogues and instructions on how to extract lists of target
 objects can be found on the Web pages of the
 \htmladdnormallink{Astronomy Survey Unit}
-{http://www.ast.cam.ac.uk/\~{}mike/casu/} at the
+{http://www.ast.cam.ac.uk/~mike/casu/} at the
 \htmladdnormallink{Institute of Astronomy}{http://www.ast.cam.ac.uk/},
 Cambridge.  See URL:
 
 \begin{quote}
-\htmladdnormallink{ {\tt http://www.ast.cam.ac.uk/\~{}mike/casu/apm/apm.html}}
-{http://www.ast.cam.ac.uk/\~{}mike/casu/apm/apm.html}
+\url{http://www.ast.cam.ac.uk/~mike/casu/apm/apm.html}
 \end{quote}
 
 Currently SuperCOSMOS is scanning the J, R and I UKST surveys.  The South
@@ -1660,8 +1379,7 @@ procedures follows.
    can be accessed from the SuperCOSMOS Web pages at URL:
 
   \begin{quote}
-  \htmladdnormallink{ {\tt http://www.roe.ac.uk/cosmos/scosmos.html}}
-   {http://www.roe.ac.uk/cosmos/scosmos.html}
+\url{http://www.roe.ac.uk/cosmos/scosmos.html}
   \end{quote}
 
    You should retrieve the catalogue of objects found in your region
@@ -1672,20 +1390,17 @@ procedures follows.
    catalogue from URL:
 
   \begin{quote}
-  \htmladdnormallink{ {\tt http://www.roe.ac.uk/ukstu/ukst.html}}
-   {http://www.roe.ac.uk/ukstu/ukst.html}
+\url{http://www.roe.ac.uk/ukstu/ukst.html}
   \end{quote}
 
    Once you have identified a plate you can arrange for it to be measured
    by SuperCOSMOS.  Details are available at URL:
 
   \begin{quote}
-  \htmladdnormallink{ {\tt http://www.roe.ac.uk/cosmos/applic.html}}
-   {http://www.roe.ac.uk/cosmos/applic.html}
+\url{http://www.roe.ac.uk/cosmos/applic.html}
   \end{quote}
 
-   For further information send an e-mail message to username {\tt
-   hmg@roe.ac.uk}.  You should specify that the list of objects
+   For further information send an e-mail message to username \texttt{hmg@roe.ac.uk}.  You should specify that the list of objects
    detected (the `IAM data file' in SuperCOSMOS jargon) is to be
    returned to you formatted as a FITS table.  Usually there will be
    a delay of a couple of weeks before your plate is scanned.
@@ -1700,7 +1415,7 @@ procedures follows.
    formatted as a CURSA STL list (which is simply an easy-to-prepare
    text file; see SUN/190 for details).  Then find the objects in the
    SuperCOSMOS data file with similar coordinates using CURSA application
-   {\tt catpair}.  The output catalogue generated by {\tt catpair} will
+   \texttt{catpair}.  The output catalogue generated by \texttt{catpair} will
    include the accurate coordinates determined by SuperCOSMOS.
 
 \end{enumerate}
@@ -1746,7 +1461,7 @@ allowing light from a different object to pass into the spectrograph
 and form spectra on the detector.  The engineering problem of
 configuring the slits to be in the correct positions to pass light
 from the target objects is usually solved by preparing a separate
-plate (or {\bf mask}) for each field observed.  The required slits are
+plate (or \textbf{mask}) for each field observed.  The required slits are
 simply drilled in the appropriate positions.  This approach is
 analogous to preparing a plug plate in fibre spectroscopy.
 
@@ -1765,8 +1480,8 @@ multi-slit spectrograph might typically have a field of view of
 2$^{\circ}$ diameter field of the 2dF.  Also, in order to avoid
 overlapping spectra the number of spectra which can be simultaneously
 recorded is usually limited to tens rather than hundreds (although
-Allington-Smith {\it et al.}\/\cite{ALLINGTON97} quote the
-{\it theoretical maximum}\, multiplex advantage of the GMOS
+Allington-Smith \textit{et al.}\/\cite{ALLINGTON97} quote the
+\textit{theoretical maximum}\, multiplex advantage of the GMOS
 multi-slit spectrographs being built for the Gemini telescopes as 600.
 Of course, this maximum value will not be attainable in most fields).
 The necessity of avoiding overlapping spectra can also limit the
@@ -1779,9 +1494,9 @@ platform.
 
 % - Part II -----------------------------------------------------------
 \cleardoublepage
-\markboth{\stardocname}{\stardocname}
+
 \part{Worked Examples}
-\markboth{\stardocname}{\stardocname}
+
 \section{\xlabel{INTRO_EX}\label{INTRO_EX}Introduction}
 
 This part of the cookbook provides a set of worked examples of reducing
@@ -1813,23 +1528,23 @@ to install the software.
 Copies of the data files used in the examples are provided so that you can
 work through them yourself.  On Starlink systems they are kept in directory:
 
-\begin{quote}
-{\tt /star/examples/sc14}
-\end{quote}
+\begin{terminalv}
+/star/examples/sc14
+\end{terminalv}
 
 Alternatively they can be retrieved by anonymous ftp from Edinburgh.
 The details are as follows:
 
 \begin{tabular}{ll}
-site:     & {\tt ftp.roe.ac.uk} \\
-directory & {\tt /pub/acd/misc} \\
-file      & {\tt sc14.tar.Z}    \\
+site:     & \texttt{ftp.roe.ac.uk} \\
+directory & \texttt{/pub/acd/misc} \\
+file      & \texttt{sc14.tar.Z}    \\
 \end{tabular}
 
-Reply {\tt anonymous} to the `{\tt Name}' prompt and give your e-mail
+Reply \texttt{anonymous} to the `\texttt{Name}' prompt and give your e-mail
 address for the password.  Set ftp to binary mode before retrieving the
 file.  The file is a compressed tar archive and should be decompressed
-with the Unix command {\tt uncompress} (sic).
+with the Unix command \texttt{uncompress} (sic).
 
 In order to work through the examples you should use a display capable
 of receiving X-output (typically an X-terminal or a workstation console).
@@ -1847,12 +1562,11 @@ details.
 \section{\xlabel{HYDRA}\label{HYDRA}Reducing Hydra Data Using IRAF}
 
 Hydra is a fibre spectrograph available at the Kitt Peak National
-Observatory (KPNO), Tucson (see, for example, Barden {\it et
+Observatory (KPNO), Tucson (see, for example, Barden \textit{et
 al.}\/\cite{BARDEN93}).  Observations acquired with it are usually
-reduced using the IRAF task {\tt dohydra}.  {\tt dohydra} is very
-similar to the IRAF task {\tt dofibers} which is used to reduce
-FLAIR and WYFFOS/AUTOFIB2 data.  A worked example of using {\tt
-dohydra} is available as part of the IRAF documentation.  This example
+reduced using the IRAF task \texttt{dohydra}.  \texttt{dohydra} is very
+similar to the IRAF task \texttt{dofibers} which is used to reduce
+FLAIR and WYFFOS/AUTOFIB2 data.  A worked example of using \texttt{dohydra} is available as part of the IRAF documentation.  This example
 is similar to, though simpler and easier than, the example of reducing
 FLAIR data given in Section~\ref{FLAIR}, below.  Thus, it is sensible to
 work through the Hydra example before trying the FLAIR one, even though
@@ -1860,17 +1574,15 @@ you are unlikely to observe with Hydra.
 
 Before trying the Hydra (or FLAIR) example you should already be familiar
 with the rudiments of IRAF and have an `IRAF directory' prepared which
-you will use for running IRAF.  If you are not {\it au fait}\, with
+you will use for running IRAF.  If you are not \textit{au fait}\, with
 IRAF then you must familiarise yourself with it before proceeding;
-\xref{SG/12: {\it An Introduction to IRAF}}{sg12}{}\/\cite{SG12}
+\xref{SG/12: \textit{An Introduction to IRAF}}{sg12}{}\/\cite{SG12}
 is a convenient starting point.
 
-The {\tt dohydra} tutorial is available at URL:
+The \texttt{dohydra} tutorial is available at URL:
 
 \begin{quote}
-\htmladdnormallink{ {\tt
-http://www.starlink.ac.uk/iraf/web/tutorials/dohydra/dohydra.html}}
-{http://www.starlink.ac.uk/iraf/web/tutorials/dohydra/dohydra.html}
+\url{http://www.starlink.ac.uk/iraf/web/tutorials/dohydra/dohydra.html}
 \end{quote}
 
 You can simply follow the instructions given and there is no need to
@@ -1882,27 +1594,27 @@ you should be aware of.
   \item The sequence of IRAF packages to load given in the tutorial
    is slightly incorrect.  The correct sequence is:
 
-  \begin{quote}
-   {\tt noao \\
-   imred     \\
-   hydra}
-  \end{quote}
+\begin{terminalv}
+noao
+imred
+hydra
+\end{terminalv}
 
   \item An IRAF script is provided with the present cookbook to
-   automatically set all the {\tt dohydra} parameters recommended in
+   automatically set all the \texttt{dohydra} parameters recommended in
    the tutorial.  It is available as file:
 
-  \begin{quote}
-   {\tt /star/examples/sc14/hydra/hydrasetup.cl}
-  \end{quote}
+\begin{terminalv}
+/star/examples/sc14/hydra/hydrasetup.cl}
+\end{terminalv}
 
    You should make a copy of this file in your IRAF home directory.
    Then from the IRAF command line type:
 
-  \begin{quote}
-   {\tt task ~ \$hydrasetup=home\$hydrasetup.cl \\
-   hydrasetup}
-  \end{quote}
+\begin{terminalv}
+task  $hydrasetup=home$hydrasetup.cl
+hydrasetup
+\end{terminalv}
 
    For information the script echoes the values that it sets to the
    IRAF command line.
@@ -1916,7 +1628,7 @@ you should be aware of.
 FLAIR observations are usually reduced using IRAF (see
 Section~\ref{FLAIR_S}) and this example is a simple demonstration
 of the procedure.  The reduction of FLAIR data is documented
-in the manual {\it FLAIR Data Reduction with
+in the manual \textit{FLAIR Data Reduction with
 IRAF}\/\cite{DRINK96}.  The present example gives all the steps
 involved in a simple reduction but nonetheless you will find it
 useful to have a copy of the manual to hand as you work through
@@ -1924,9 +1636,9 @@ it for further explanation of each step and future reference.
 
 The example assumes that you are familiar with the rudiments
 of IRAF and already have an `IRAF directory' prepared which
-you will use for running IRAF.  If you are not {\it au fait}\, with
+you will use for running IRAF.  If you are not \textit{au fait}\, with
 IRAF then you must familiarise yourself with it before proceeding;
-\xref{SG/12: {\it An Introduction to IRAF}}{sg12}{}\/\cite{SG12}
+\xref{SG/12: \textit{An Introduction to IRAF}}{sg12}{}\/\cite{SG12}
 is a convenient starting point.  Reducing FLAIR observations with
 IRAF is similar to, but more complicated than, reducing Hydra
 observations, which was described in the previous example
@@ -1944,18 +1656,18 @@ to illustrate the reduction procedure, which is as follows.
 
   \item Make your IRAF directory your current directory.  All
    the files used in the example are available in directory
-   {\tt /star/examples/sc14/flair}.  Copy these files to your
+   \texttt{/star/examples/sc14/flair}.  Copy these files to your
    IRAF directory:
 
-  \begin{quote}
-   {\tt cp ~ /star/examples/sc14/flair/* ~ .}
-  \end{quote}
+\begin{terminalv}
+cp  /star/examples/sc14/flair/* .
+\end{terminalv}
 
    The various files will be introduced as they are required.
-   However, they are all listed in file {\tt 0FLAIR.LIS}.
+   However, they are all listed in file \texttt{0FLAIR.LIS}.
 
   \item Start IRAF.  See \xref{SG/12}{sg12}{} for further
-   details.  You should use the customisation file {\tt \newline
+   details.  You should use the customisation file \texttt{\newline
    loginuser.cl} provided with SG/12 to ensure that IRAF
    is configured correctly to handle the large headers in
    FLAIR files (if you do not use this customisation file you
@@ -1965,14 +1677,14 @@ to illustrate the reduction procedure, which is as follows.
   \item Load all the various IRAF packages and sub-packages
    which are required.  Type:
 
-  \begin{quote}
-   {\tt noao \\
-   imred     \\
-   ccdred    \\
-   specred   \\
-   astutil   \\
-   flair}
-  \end{quote}
+\begin{terminalv}
+noao
+imred
+ccdred
+specred
+astutil
+flair
+\end{terminalv}
 
    If any of the packages are not found then the most likely
    explanation is that they are not installed at your site;
@@ -1983,26 +1695,24 @@ to illustrate the reduction procedure, which is as follows.
   \item Several IRAF tasks have to be run in order to reduce
    FLAIR data and for most of them `hidden' parameters have
    to be set.  The FLAIR manual\cite{DRINK96} gives the
-   necessary details.  However, for convenience, the script {\tt
-   flairsetup.cl} is provided with the example.  It simply sets
+   necessary details.  However, for convenience, the script \texttt{flairsetup.cl} is provided with the example.  It simply sets
    all the required values.  It is correct for the example
    data and can simply be used unaltered.  However, if you wish
    to use it with your own data there are couple of items which
    may need to be changed.  Section~\ref{FLAIR_SETUP} gives the
    details.  To define and run the script simply type:
 
-  \begin{quote}
-   {\tt task ~ \$flairsetup=home\$flairsetup.cl \\
-   flairsetup}
-  \end{quote}
+\begin{terminalv}
+task  $flairsetup=home$flairsetup.cl
+flairsetup
+\end{terminalv}
 
    For information the script echoes the values that it sets
    to the IRAF command line.
 
-  \item FLAIR data are provided as FITS files, of file-type {\tt
-   .fts}.  They must be converted to the IRAF OIF format.
+  \item FLAIR data are provided as FITS files, of file-type \texttt{.fts}.  They must be converted to the IRAF OIF format.
    Rather than specifying all the file names individually they
-   have previously been listed in file {\tt fits.lis} provided
+   have previously been listed in file \texttt{fits.lis} provided
    with the example (you might like to examine this file and
    check that it is just a list of file names).  The procedure
    for making the conversion differs slightly depending on
@@ -2012,15 +1722,15 @@ to illustrate the reduction procedure, which is as follows.
 
     \item[IRAF version 2.10]: ~
 
-    \begin{quote}
-     {\tt rfits ~ @fits.lis ~ 1 ~ rawflair}
-    \end{quote}
+\begin{terminalv}
+rfits ~ @fits.lis  1  rawflair
+\end{terminalv}
 
     \item[IRAF version 2.11]: ~
 
-    \begin{quote}
-     {\tt rfits ~ @fits.lis ~ 0 ~ rawflair}
-    \end{quote}
+\begin{terminalv}
+rfits  @fits.lis  0  rawflair
+\end{terminalv}
 
   \end{description}
 
@@ -2031,16 +1741,15 @@ to illustrate the reduction procedure, which is as follows.
    observing log.  However, if necessary it can be extracted
    from the data files themselves.  Type:
 
-  \begin{quote}
-   {\tt imhead ~ rawflair*.imh ~ > ~ heads.txt}
-  \end{quote}
+\begin{terminalv}
+imhead  rawflair*.imh  >  heads.txt
+\end{terminalv}
 
-   Here task {\tt imhead} extracts the header information and the IRAF {\tt
-   cl} Unix-like output redirection mechanism is used to write it to file
-   {\tt heads.txt}.  The contents of this file should be:
+   Here task \texttt{imhead} extracts the header information and the IRAF \texttt{cl} Unix-like output redirection mechanism is used to write it to file
+   \texttt{heads.txt}.  The contents of this file should be:
 
-\begin{quote}
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 rawflair0001.imh[420,578][short]: Bias
 rawflair0002.imh[420,578][short]: Hg-Cd
 rawflair0003.imh[420,578][short]: F454-1
@@ -2065,116 +1774,111 @@ rawflair0021.imh[420,578][short]: Bias
 rawflair0022.imh[420,578][short]: Bias
 rawflair0023.imh[420,578][short]: Bias
 rawflair0024.imh[420,578][short]: Bias
-\end{verbatim}
-\end{quote}
+\end{terminalv}
+\end{small}
 
-   A copy of the output is also provided in file {\tt
-   flairheads.txt} for comparison.  It is obvious from this
+   A copy of the output is also provided in file \texttt{flairheads.txt} for comparison.  It is obvious from this
    output which file contains which sort of observation.
 
   \item The header information in the raw FLAIR data contain some oddities
    which must be fixed-up before the data can be processed with IRAF.  The
-   utility {\tt fixhead} is provided as part of the FLAIR software for
+   utility \texttt{fixhead} is provided as part of the FLAIR software for
    this purpose.  Type:
 
-  \begin{quote}
-   {\tt fixhead ~ rawflair*.imh}
-  \end{quote}
+\begin{terminalv}
+fixhead  rawflair*.imh
+\end{terminalv}
 
-   The corrected data are written to images called {\tt flair101}
-   to {\tt flair124} and the original images are deleted.
+   The corrected data are written to images called \texttt{flair101}
+   to \texttt{flair124} and the original images are deleted.
 
   \item The next step is to combine the various bias frames into
    a single `master' bias frame.  In IRAF bias frames are usually
    called `zeroes' (because they have zero exposure).  Rather
    than typing in the names of all the bias frames a list has
-   been prepared in file {\tt zero.lis}.  The master bias frame
-   will simply be called {\tt zero}.  Type:
+   been prepared in file \texttt{zero.lis}.  The master bias frame
+   will simply be called \texttt{zero}.  Type:
 
-  \begin{quote}
-   {\tt zerocombine.output="zero"  \\
-   zerocombine ~ @zero.lis}
-  \end{quote}
+\begin{terminalv}
+zerocombine.output="zero"
+zerocombine  @zero.lis
+\end{terminalv}
 
-  \item The flat fields must be similarly combined using {\tt
-   flatcombine}.  Again there is a list of flat fields in file {\tt
-   flat.lis} and the master flat field will be called {\tt flat}.
+  \item The flat fields must be similarly combined using \texttt{flatcombine}.  Again there is a list of flat fields in file \texttt{flat.lis} and the master flat field will be called \texttt{flat}.
    Type:
 
-  \begin{quote}
-   {\tt flatcombine.output="flat"  \\
-   flatcombine ~ @flat.lis}
-  \end{quote}
+\begin{terminalv}
+flatcombine.output="flat"
+flatcombine  @flat.lis
+\end{terminalv}
 
   \item The arc and object frames are now corrected using the bias
    frames.  Type:
 
-  \begin{quote}
-   {\tt ccdproc.zero="zero"  \\
-   ccdproc ~ @ccdproc.lis}
-  \end{quote}
+\begin{terminalv}
+ccdproc.zero="zero"
+ccdproc  @ccdproc.lis
+\end{terminalv}
 
-   As usual, the arc and object frames are listed in file {\tt
-   ccdproc.lis}.  The flat field frame, {\tt flat}, should be similarly
+   As usual, the arc and object frames are listed in file \texttt{ccdproc.lis}.  The flat field frame, \texttt{flat}, should be similarly
    corrected.  Type:
 
-  \begin{quote}
-   {\tt ccdproc ~ flat}
-  \end{quote}
+\begin{terminalv}
+ccdproc  flat
+\end{terminalv}
 
   \item In the example there are two arc frames containing a
-   rubidium arc (images {\tt flair108} and {\tt flair109})
+   rubidium arc (images \texttt{flair108} and \texttt{flair109})
    and two containing a mercury-cadmium arc (images
-   {\tt flair110} and {\tt flair111}).  The spectra used in this example
+   \texttt{flair110} and \texttt{flair111}).  The spectra used in this example
    cover only a relatively narrow wavelength range and thus contain
    only a few lines.  Consequently the two types of arc must
    ultimately be added in order to provide enough lines for
    wavelength calibration.  However, prior to this step the
-   arcs of the same type are combined using {\tt combine}
+   arcs of the same type are combined using \texttt{combine}
    which detects and rejects cosmic-ray events in the images.
    Type:
 
-  \begin{quote}
-   {\tt combine ~ flair108,flair109 ~ rb \\
-   combine ~ flair110,flair111 ~ hgcd    \\
-   imarith ~ rb + hgcd ~ arc}
-  \end{quote}
+\begin{terminalv}
+combine  flair108,flair109  rb
+combine  flair110,flair111  hgcd
+imarith  rb + hgcd  arc
+\end{terminalv}
 
-   The final master arc frame is called {\tt arc}.
+   The final master arc frame is called \texttt{arc}.
 
   \item The five image frames must be similarly combined.  Incidentally, the
    reasons for taking five separate image frames rather than one long
    exposure are twofold: firstly to avoid possible saturation of the CCD by
    bright objects and secondly to allow cosmic-ray events to be detected and
    removed (each cosmic-ray event will be present in only one image).  Again
-   a list of object frames is included as file {\tt obj.lis}.  Type:
+   a list of object frames is included as file \texttt{obj.lis}.  Type:
 
-  \begin{quote}
-   {\tt combine ~ @obj.lis ~ obj}
-  \end{quote}
+\begin{terminalv}
+combine  @obj.lis  obj
+\end{terminalv}
 
-   The master object frame is simply called {\tt obj}.
+   The master object frame is simply called \texttt{obj}.
 
-  \item The next stage is to prepare an {\bf aperture
+  \item The next stage is to prepare an \textbf{aperture
    identification file}.  This file ties together the apertures
    in the image frame, the fibres and the object (or sky)
    which each fibre was pointing at.
 
    For FLAIR data an aperture identification file can be
    created automatically from the log file produced when the
-   fibres were positioned.  This log file is usually called {\tt
-   af.log}.  Simply type:
+   fibres were positioned.  This log file is usually called \texttt{af.log}.  Simply type:
 
-  \begin{quote}
-   {\tt reformat ~ af.log ~ apid.txt}
-  \end{quote}
+\begin{terminalv}
+reformat  af.log  apid.txt
+\end{terminalv}
 
-   where {\tt apid.txt} is the new aperture identification file.
+   where \texttt{apid.txt} is the new aperture identification file.
    Alternatively the file can be created from scratch using a text editor
    and your notes on positioning the fibres.  However you create the file
    you need to be familiar with its format and contents for subsequent
    operations.  Figure~\ref{APID} shows the first few lines of a typical
-   file.  The lines beginning with a hash-character (`{\tt \#}') are comments
+   file.  The lines beginning with a hash-character (`\texttt{\#}') are comments
    and can be ignored.  Each remaining line corresponds to one fibre and
    there is one line for every fibre in the instrument.  The three items on
    each line are, from left to right:
@@ -2213,10 +1917,8 @@ rawflair0024.imh[420,578][short]: Bias
 
   \end{description}
 
-  \begin{figure}[htbp]
-
-  \begin{quote}
-  \begin{verbatim}
+\begin{figure}[htbp]
+\begin{terminalv}
 #
 # Summary of AutoFred fibre placement.  Date 06/29/98  Time 16:2
 # Field 454. For F/88 Smartt et al
@@ -2236,68 +1938,60 @@ rawflair0024.imh[420,578][short]: Bias
 10 1 18
    .
    .
-\end{verbatim}
+\end{terminalv}
+\caption{Example FLAIR aperture identification file\label{APID} }
+\end{figure}
 
-  \caption{Example FLAIR aperture identification file
-  \label{APID} }
-  \end{quote}
-
-  \end{figure}
-
-   You should print out a copy of file {\tt apid.txt} to assist
+   You should print out a copy of file \texttt{apid.txt} to assist
    in identifying the spectra in the next step.  You might find it
    convenient to underline or otherwise highlight the fibres which
    are pointing at target objects or sky.
 
   \item Wavelength-calibrated, sky-subtracted one-dimensional spectra
-   can now be extracted from the combined image frame {\tt obj} using
-   {\tt dofibers}.  This process is highly interactive.  Because there
+   can now be extracted from the combined image frame \texttt{obj} using
+   \texttt{dofibers}.  This process is highly interactive.  Because there
    are multiple spectra in the frame some operations need to be done
    repeatedly, once per spectrum.  Typically you will process the first
    one interactively to set the necessary parameters and then process
    the rest automatically.  IRAF has features to facilitate this sort
    of operation.  Some prompts can be answered with any of:
-   `{\tt yes}', `{\tt no}', `{\tt YES}' or `{\tt NO}'.  The lower
+   `\texttt{yes}', `\texttt{no}', `\texttt{YES}' or `\texttt{NO}'.  The lower
    case replies apply only to the current query.  The upper case
-   replies apply to all similar queries.  To start {\tt dofibers} type:
+   replies apply to all similar queries.  To start \texttt{dofibers} type:
 
-  \begin{quote}
-   {\tt dofibers.apref="flat" \\
-   dofibers.throughput="flat" \\
-   dofibers.arcs1="arc"       \\
-   dofibers ~ obj}
-  \end{quote}
+\begin{terminalv}
+dofibers.apref="flat"
+dofibers.throughput="flat"
+dofibers.arcs1="arc" 
+dofibers  obj
+\end{terminalv}
 
-   Note that the master flat field frame ({\tt flat}) is being used to
+   Note that the master flat field frame (\texttt{flat}) is being used to
    define the apertures and for the throughput corrections.  The following
    messages and prompts appear:
 
-  \begin{quote}
-   {\tt Set reference apertures for flat  \\
-   Resize apertures for flat?  (yes):     \\
-   Edit apertures for flat?  (yes): }
-  \end{quote}
+\begin{terminalv}
+Set reference apertures for flat
+Resize apertures for flat?  (yes):
+Edit apertures for flat?  (yes):
+\end{terminalv}
 
   \begin{figure}[htbp]
      \centering
      \includegraphics[totalheight=4in]{sc14_flair_tram}
-     \begin{quote}
      \caption{Slice through FLAIR tramlines perpendicular to the
       dispersion direction
      \label{FLAIR_TRAM} }
-     \end{quote}
   \end{figure}
 
-   Reply {\tt yes} to the prompts or just hit return.  A plot similar
+   Reply \texttt{yes} to the prompts or just hit return.  A plot similar
    to Figure~\ref{FLAIR_TRAM} should appear.  It shows a slice through
-   the tramlines frame perpendicular to the dispersion direction.  {\tt
-   dofibers} has attempted to identify the spectra but it will
+   the tramlines frame perpendicular to the dispersion direction.  \texttt{dofibers} has attempted to identify the spectra but it will
    undoubtedly have made some mistakes which you will need to correct.
    You need to ensure that each genuine spectrum (object or sky) is
    correctly identified and no blanked off spectra are identified by
    mistake.  You do this by comparing the identifications shown in the
-   plot with the entries in the aperture identification file, {\tt
-   apid.txt} and changing the identifications in the plot until they
+   plot with the entries in the aperture identification file, \texttt{apid.txt} and changing the identifications in the plot until they
    agree with the file.  The following points might be useful.
 
   \begin{itemize}
@@ -2314,7 +2008,7 @@ rawflair0024.imh[420,578][short]: Bias
      is plotted here.  Hence do not expect sky fibres to show a weaker
      signal than target object fibres.
 
-    \item For the example data it so happens that {\tt dofibers} makes
+    \item For the example data it so happens that \texttt{dofibers} makes
      several misidentifications in the first few fibres.  In this case
      it is less confusing to start with the highest numbered fibres
      and work down, rather than vice versa.
@@ -2323,9 +2017,8 @@ rawflair0024.imh[420,578][short]: Bias
 
    You interact with the plot by positioning the cursor and issuing
    one or two character commands from the keyboard.  Help information
-   about the commands available can be obtained by typing {\tt
-   <shift>?}, followed by hitting the space bar a few times to work
-   through it and finally {\tt q} to return to the interactive session.
+   about the commands available can be obtained by typing \texttt{<shift>?}, followed by hitting the space bar a few times to work
+   through it and finally \texttt{q} to return to the interactive session.
    However, a few of the most useful commands are summarised below.
 
   \begin{description}
@@ -2334,22 +2027,22 @@ rawflair0024.imh[420,578][short]: Bias
 
     \begin{description}
 
-      \item[{\tt w~j}] resize the plot, setting the left edge at the
+      \item[\texttt{w~j}] resize the plot, setting the left edge at the
        current cursor position,
 
-      \item[{\tt w~k}] resize the plot, setting the right at the
+      \item[\texttt{w~k}] resize the plot, setting the right at the
        current cursor position,
 
-      \item[{\tt w~t}] resize the plot, setting the top at the
+      \item[\texttt{w~t}] resize the plot, setting the top at the
        current cursor position,
 
-      \item[{\tt w~b}] resize the plot, setting the bottom at the
+      \item[\texttt{w~b}] resize the plot, setting the bottom at the
        current cursor position,
 
-      \item[{\tt w~a}] resize the plot, auto-scaling it to show all
+      \item[\texttt{w~a}] resize the plot, auto-scaling it to show all
        the data,
 
-      \item[{\tt r}] redraw the plot.
+      \item[\texttt{r}] redraw the plot.
 
     \end{description}
 
@@ -2357,12 +2050,12 @@ rawflair0024.imh[420,578][short]: Bias
 
     \begin{description}
 
-      \item[{\tt d}] delete the spectrum nearest to the cursor,
+      \item[\texttt{d}] delete the spectrum nearest to the cursor,
 
-      \item[{\tt i}] renumber the spectrum nearest to the cursor;
+      \item[\texttt{i}] renumber the spectrum nearest to the cursor;
        you will be prompted to enter the new number,
 
-      \item[{\tt q}] quit.
+      \item[\texttt{q}] quit.
 
     \end{description}
 
@@ -2370,49 +2063,47 @@ rawflair0024.imh[420,578][short]: Bias
 
    Once you have finally got the numbered spectra to agree with the
    entries in the aperture identification file (which will take some
-   time!) type {\tt q} to quit this stage and proceed to the next.
+   time!) type \texttt{q} to quit this stage and proceed to the next.
 
-  \item Next {\tt dofibers} traces the positions along the dispersion
+  \item Next \texttt{dofibers} traces the positions along the dispersion
    axis:
 
-  \begin{quote}
-   {\tt Fit traced positions for flat interactively?  (yes); \\
-   Fit curve to aperture 2 of flat interactively  (yes):}
-  \end{quote}
+\begin{terminalv}
+Fit traced positions for flat interactively?  (yes);
+Fit curve to aperture 2 of flat interactively  (yes):
+\end{terminalv}
 
   \begin{figure}[htbp]
      \centering
      \includegraphics[totalheight=4in]{sc14_flair_trace}
-     \begin{quote}
      \caption{Trace along a FLAIR spectrum
      \label{FLAIR_TRACE} }
-     \end{quote}
   \end{figure}
 
    A plot similar to Figure~\ref{FLAIR_TRACE} appears.  For the example
-   data you can simply accept the fit and type {\tt q} and proceed to
+   data you can simply accept the fit and type \texttt{q} and proceed to
    the next step.  However, for other data you might want to edit the
-   fit.  {\tt dofibers} then prompts:
+   fit.  \texttt{dofibers} then prompts:
 
-  \begin{quote}
-   {\tt Fit curve to aperture 3 of flat interactively  (yes):}
-  \end{quote}
+\begin{terminalv}
+Fit curve to aperture 3 of flat interactively  (yes):
+\end{terminalv}
 
-   Reply {\tt NO} (in upper case) so that the trace is applied to all
+   Reply \texttt{NO} (in upper case) so that the trace is applied to all
    subsequent spectra.
 
   \item The next step is to wavelength-calibrate the spectra.  The
    following messages appear:
 
-  \begin{quote}
-   {\tt Create response function flatflatapid.t.ms \\
-   Extract flat field flat  \\
-   Extract throughput image flat  \\
-   Correct flat field to throughput image  \\
-   Create the normalized response flatflatapid.t.ms  \\
-   Extract arc reference image arc  \\
-   Determine dispersion solution for arc}
-  \end{quote}
+\begin{terminalv}
+Create response function flatflatapid.t.ms
+Extract flat field flat
+Extract throughput image flat
+Correct flat field to throughput image
+Create the normalized response flatflatapid.t.ms
+Extract arc reference image arc
+Determine dispersion solution for arc
+\end{terminalv}
 
    A plot similar to Figure~\ref{FLAIR_WAVE} is drawn.  You may need
    to adjust the plot limits to make your plot appear similar to
@@ -2430,31 +2121,29 @@ rawflair0024.imh[420,578][short]: Bias
   \begin{figure}[htbp]
      \centering
      \includegraphics[totalheight=4in]{sc14_flair_wave}
-     \begin{quote}
      \caption{FLAIR line identification for wavelength calibration
      \label{FLAIR_WAVE} }
-     \end{quote}
   \end{figure}
 
   \begin{enumerate}
 
     \item Identify each line by placing the cursor over it and
-     typing {\tt m}.  You will then be prompted to enter the
+     typing \texttt{m}.  You will then be prompted to enter the
      appropriate wavelength in \AA.
 
-    \item When you have identified all the lines type {\tt f} to
+    \item When you have identified all the lines type \texttt{f} to
      perform a fit.
 
     \item By default a third-order fit is used.  To change the order
-     type {\tt :order} followed by the required order.  A second
-     order fit is adequate for the example data.  Type {\tt f} again
+     type \texttt{:order} followed by the required order.  A second
+     order fit is adequate for the example data.  Type \texttt{f} again
      to re-fit the points with the new order.
 
-    \item Finally, when you are happy with the fit type {\tt q}.
+    \item Finally, when you are happy with the fit type \texttt{q}.
 
   \end{enumerate}
 
-   {\tt dofibers} makes a preliminary wavelength calibration using the
+   \texttt{dofibers} makes a preliminary wavelength calibration using the
    lines you have given, attempts to find further lines and displays
    all the additional lines it has found.  You are then invited to inspect
    and amend these additional identifications.  For the example data
@@ -2463,35 +2152,34 @@ rawflair0024.imh[420,578][short]: Bias
 
   \begin{description}
 
-    \item[{\tt z}] zoom on chosen line,
+    \item[\texttt{z}] zoom on chosen line,
 
-    \item[{\tt n}] plot the next line,
+    \item[\texttt{n}] plot the next line,
 
-    \item[{\tt d}] delete line,
+    \item[\texttt{d}] delete line,
 
-    \item[{\tt q}] quit.
+    \item[\texttt{q}] quit.
 
   \end{description}
 
   \begin{figure}[htbp]
      \centering
      \includegraphics[totalheight=4in]{sc14_flair_sky}
-     \begin{quote}
      \caption{FLAIR sky spectra
      \label{FLAIR_SKY} }
-     \end{quote}
   \end{figure}
 
    You will then be prompted:
 
-  \begin{quote}
-   {\tt Fit dispersion function interactively? (no|yes|NO|YES) (NO):}
-  \end{quote}
+\begin{terminalv}
+Fit dispersion function interactively? (no|yes|NO|YES) (NO):
+\end{terminalv}
 
-   Reply {\tt NO}.  {\tt dofibers} should display a list of line
+   Reply \texttt{NO}.  \texttt{dofibers} should display a list of line
    identifications and residuals:
 
-  \begin{verbatim}
+\begin{footnotesize}
+  \begin{terminalv}
 arcapid.t.ms - Ap 28    4/4     4/4       -1.08       -1.45  -3.5E-4 2.1E-11
 arcapid.t.ms - Ap 23    4/4     4/4       0.269       0.361  8.66E-5 8.0E-11
 arcapid.t.ms - Ap 10    3/4     3/3       0.963         1.3  3.09E-4 3.9E-12
@@ -2503,86 +2191,84 @@ arcapid.t.ms - Ap 91    4/4     4/4      -0.789       -1.06  -2.6E-4 2.3E-12
 arcapid.t.ms - Ap 92    4/4     4/4       -1.02       -1.37  -3.3E-4 6.7E-11
 Dispersion correct arc arcapid.t.ms: w1 = 3893.338768145233, w2 = 4729.910906658071, dw =
 1.323690092583605, nw = 633
-\end{verbatim}
+\end{terminalv}
+\end{footnotesize}
 
    and prompt:
 
-  \begin{quote}
-   {\tt Change wavelength coordinate assignments? (yes|no|NO):}
-  \end{quote}
+\begin{terminalv}
+Change wavelength coordinate assignments? (yes|no|NO):
+\end{terminalv}
 
-   Again reply {\tt NO}.
+   Again reply \texttt{NO}.
 
   \item A further series of messages will appear:
 
-  \begin{quote}
-   {\tt Extract object spectrum obj  \\
-   Assign arc spectra for obj  \\
-   Dispersion correct obj  \\
-   Sky subtract obj:  skybeams=0  \\
-   Edit the sky spectra? (yes):}
-  \end{quote}
+\begin{terminalv}
+Extract object spectrum obj
+Assign arc spectra for obj
+Dispersion correct obj
+Sky subtract obj:  skybeams=0
+Edit the sky spectra? (yes):
+\end{terminalv}
 
-   Reply {\tt yes} and finally a plot of all the sky spectra will be
+   Reply \texttt{yes} and finally a plot of all the sky spectra will be
    drawn, similar to Figure~\ref{FLAIR_SKY}.  Again you may need to adjust
    the axes to reproduce the plot shown.  You should delete any sky spectra
    which appear to deviate from the norm.  In the example data no sky spectra
    need to be deleted.  However, the procedure to delete a spectrum is to
-   position the cursor over it and type {\tt d}.  Once you are happy with
-   the remaining spectra type {\tt q} to quit.  You will be prompted for the
+   position the cursor over it and type \texttt{d}.  Once you are happy with
+   the remaining spectra type \texttt{q} to quit.  You will be prompted for the
    technique to be used to combine the sky spectra:
 
-  \begin{quote}
-   {\tt Sky rejection option (none|minmax|avsigclip) (none):}
-  \end{quote}
+\begin{terminalv}
+Sky rejection option (none|minmax|avsigclip) (none):
+\end{terminalv}
 
-   reply {\tt avsigclip}.  {\tt dofibers} then terminates.
+   reply \texttt{avsigclip}.  \texttt{dofibers} then terminates.
 
   \item Sky-subtracted, wavelength-calibrated spectra have now been
-   computed and are stored in IRAF image {\tt obj.ms} (`{\tt .ms}' for
+   computed and are stored in IRAF image \texttt{obj.ms} (`\texttt{.ms}' for
    multiple spectra).  To plot them type:
 
-  \begin{quote}
-   {\tt splot ~ obj.ms}
-  \end{quote}
+\begin{terminalv}
+splot  obj.ms
+\end{terminalv}
 
    You will be prompted:
 
-  \begin{quote}
-   {\tt Image line/aperture to plot (0:) (1):}
-  \end{quote}
+\begin{terminalv}
+Image line/aperture to plot (0:) (1):
+\end{terminalv}
 
    A plot similar to Figure~\ref{FLAIR_OBJECT} should appear.
-   The axis ranges are adjusted in the usual way.  Use {\tt )} and
-   {\tt (} to step through the spectra (forwards and backwards
+   The axis ranges are adjusted in the usual way.  Use \texttt{)} and
+   \texttt{(} to step through the spectra (forwards and backwards
    respectively).  When you have finished inspecting the spectra type
-   {\tt q} to quit.
+   \texttt{q} to quit.
 
   \begin{figure}[htbp]
      \centering
      \includegraphics[totalheight=4in]{sc14_flair_object}
-     \begin{quote}
      \caption{FLAIR sky-subtracted, wavelength-calibrated object
       spectrum
      \label{FLAIR_OBJECT} }
-     \end{quote}
   \end{figure}
 
 \end{enumerate}
 
 \subsection{\label{FLAIR_SETUP}Setup file customisation}
 
-The FLAIR setup script {\tt flairsetup.cl}, is, of course, just
+The FLAIR setup script \texttt{flairsetup.cl}, is, of course, just
 a simple text file which can be listed or edited from the Unix
 shell.  In order to use the file with your own data there are
 a couple of items which may need to be changed.
 
-You should set the items {\tt combine.rdnoise} and {\tt
-dofibers.readnoise} to the readout noise of the CCD chip.  The value
+You should set the items \texttt{combine.rdnoise} and \texttt{dofibers.readnoise} to the readout noise of the CCD chip.  The value
 can be obtained from the FLAIR Web pages.
 
 You may also need to alter the extents of the bias and trim
-regions ({\tt ccdproc.biassec} and {\tt ccdproc.trimsec}
+regions (\texttt{ccdproc.biassec} and \texttt{ccdproc.trimsec}
 respectively).  If you are unsure about the appropriate values
 then the FLAIR support staff should be able to advise.
 
@@ -2596,7 +2282,7 @@ specifically for the reduction of 2dF data and it is the usual way to
 reduce these data.  The example works through a complete simple
 reduction but nonetheless only shows a few of the features of the
 2dFDR package.  For a full description you should see the
-\htmladdnormallink{{\it 2dF User Manual}\/}
+\htmladdnormallink{\textit{2dF User Manual}\/}
 {http://www.aao.gov.au/2df/manual.html}\cite{BAILEY97}.  You need a
 colour display to use 2dFDR.
 
@@ -2627,23 +2313,22 @@ The procedure to use 2dFDR is as follows.
 
    All that is required to install 2dFDR is to simply extract the
    files from the tar archive.  Similarly the example data are just
-   extracted from the archive.  For further details see file {\tt
-   README} included with each tar archive.
+   extracted from the archive.  For further details see file \texttt{README} included with each tar archive.
 
   \item Prior to using 2dFDR you should set the environment variable
-   {\tt DRCONTROL\_DIR} to the name of the directory where you have
+   \texttt{DRCONTROL\_DIR} to the name of the directory where you have
    copied the files.  For example, if I had put the files in directory
-   {\tt /home/acd/2dfdr} I would type:
+   \texttt{/home/acd/2dfdr} I would type:
 
-  \begin{quote}
-   {\tt setenv ~ DRCONTROL\_DIR ~ /home/acd/2dfdr}
-  \end{quote}
+\begin{terminalv}
+setenv  DRCONTROL_DIR  /home/acd/2dfdr
+\end{terminalv}
 
    To set up for running 2dFDR type:
 
-  \begin{quote}
-   {\tt source ~ \$DRCONTROL\_DIR/2dfdr\_setup}
-  \end{quote}
+\begin{terminalv}
+source  $DRCONTROL_DIR/2dfdr_setup
+\end{terminalv}
 
   \item 2dFDR requires a large number of the colours on your display.
    Before starting it you should shut down any other applications which
@@ -2654,156 +2339,140 @@ The procedure to use 2dFDR is as follows.
   \item Make the directory where you have copied the example data
    your current directory.  Then type:
 
-  \begin{quote}
-   {\tt drcontrol ~ \&}
-  \end{quote}
+\begin{terminalv}
+drcontrol &
+\end{terminalv}
 
-   (The `{\tt \&}' is, of course, simply to run {\tt drcontrol} as a
+   (The `\texttt{\&}' is, of course, simply to run \texttt{drcontrol} as a
    detached process.)  A series of windows should appear.
 
-  \item Find the main window, which is called {\sf 2dF Data Reduction}.
+  \item Find the main window, which is called \textsf{2dF Data Reduction}.
    It is shown in Figure~\ref{2DF_DATA_REDUCTION}.
 
   \begin{figure}[htbp]
      \centering
      \includegraphics[totalheight=3.5in]{sc14_2df_data_reduction}
-     \begin{quote}
      \caption{2dFDR main window
      \label{2DF_DATA_REDUCTION} }
-     \end{quote}
   \end{figure}
 
-  \item Click on the {\sf Commands} menu (the rightmost of the three
+  \item Click on the \textsf{Commands} menu (the rightmost of the three
    items in the menu bar in the top left of the window) and
-   select the {\sf Find Fibres\ldots} option.  A window similar to
+   select the \textsf{Find Fibres\ldots} option.  A window similar to
    Figure~\ref{2DF_FIND_FIBRES} should appear.  You need to select a
    file to be used to locate the position of the fibres.  Click on
-   file {\tt 29jan0033.sdf} (which is a flat field and consequently
-   suitable).  Then click the {\sf OK} button.  A stream of processing
+   file \texttt{29jan0033.sdf} (which is a flat field and consequently
+   suitable).  Then click the \textsf{OK} button.  A stream of processing
    information should be displayed in the terminal window from which
-   you are running {\tt drcontrol} and the main window.
+   you are running \texttt{drcontrol} and the main window.
 
   \begin{figure}[htbp]
      \centering
      \includegraphics[totalheight=3in]{sc14_2df_find_fibres}
-     \begin{quote}
      \caption{2dFDR window to choose the file to locate the fibre
       positions
      \label{2DF_FIND_FIBRES} }
-     \end{quote}
   \end{figure}
 
   \item A plot similar to Figure~\ref{2DF_DIAGNOSTIC_PLOT} should
-   appear in the window labelled {\sf DRPLOT1 - Diagnostic Plots}.
+   appear in the window labelled \textsf{DRPLOT1 - Diagnostic Plots}.
    2dFDR should find all 200 fibres and their positions should match the
    overlays down the middle of the plot (ignore the edges at this
-   point because the rotation is not yet fitted).  Click on the {\sf
-   Quit} button in the {\sf DRPLOT1 - Diagnostic Plots} window.  File
-   {\tt fibposa1.dat} should be created in the example data directory.
+   point because the rotation is not yet fitted).  Click on the \textsf{Quit} button in the \textsf{DRPLOT1 - Diagnostic Plots} window.  File
+   \texttt{fibposa1.dat} should be created in the example data directory.
 
   \begin{figure}[htbp]
      \centering
      \includegraphics[totalheight=4in]{sc14_2df_diagnostic_plot}
-     \begin{quote}
      \caption{2dFDR initial fibre positions
      \label{2DF_DIAGNOSTIC_PLOT} }
-     \end{quote}
   \end{figure}
 
   \item Move back to the main window (Figure~\ref{2DF_DATA_REDUCTION}).
-   Click on the {\sf Setup} button (in the {\sf Auto Reduction} box
-   towards the top right of the window).  The {\sf Setup Automatic
+   Click on the \textsf{Setup} button (in the \textsf{Auto Reduction} box
+   towards the top right of the window).  The \textsf{Setup Automatic
    Reduction} window should appear, as shown in
-   Figure~\ref{2DF_SETUP_AUTOMATIC}.  Simply click on the {\sf OK}
-   button.  Further output should be displayed in the {\tt drcontrol}
+   Figure~\ref{2DF_SETUP_AUTOMATIC}.  Simply click on the \textsf{OK}
+   button.  Further output should be displayed in the \texttt{drcontrol}
    terminal window.
 
   \begin{figure}[htbp]
      \centering
      \includegraphics[totalheight=2in]{sc14_2df_setup_automatic}
-     \begin{quote}
      \caption{Window to setup 2dFDR for automatic reduction
      \label{2DF_SETUP_AUTOMATIC} }
-     \end{quote}
   \end{figure}
 
   \item Again move back to the main window
-   (Figure~\ref{2DF_DATA_REDUCTION}).  Click on the {\sf Start}
-   button (in the {\sf Auto Reduction} box).  2dFDR will process for a
+   (Figure~\ref{2DF_DATA_REDUCTION}).  Click on the \textsf{Start}
+   button (in the \textsf{Auto Reduction} box).  2dFDR will process for a
    few minutes and a whole stream of output will be displayed in the
-   {\tt drcontrol} terminal window and the main window.
+   \texttt{drcontrol} terminal window and the main window.
 
   \item Still in the main window (Figure~\ref{2DF_DATA_REDUCTION})
-   click on the {\sf Commands} menu again and this time choose the
-   {\sf Combine Reduced Runs\ldots} option.  A window similar to
+   click on the \textsf{Commands} menu again and this time choose the
+   \textsf{Combine Reduced Runs\ldots} option.  A window similar to
    Figure~\ref{2DF_COMBINE_RUNS} should appear.  For the purposes of
-   the example you should combine files {\tt 29jan0034.sdf},
-   {\tt 29jan0035.sdf} and {\tt 29jan0036.sdf}.  These files contain
+   the example you should combine files \texttt{29jan0034.sdf},
+   \texttt{29jan0035.sdf} and \texttt{29jan0036.sdf}.  These files contain
    object frames and by combining them cosmic-ray events can be
    removed.
 
   \begin{figure}[htbp]
      \centering
      \includegraphics[totalheight=4in]{sc14_2df_combine_runs}
-     \begin{quote}
      \caption{2dFDR window to combine reduced runs
      \label{2DF_COMBINE_RUNS} }
-     \end{quote}
   \end{figure}
 
-   First click on file {\tt 29jan0034.sdf} in the {\sf Files:} box and
-   then click on the {\sf $>$ADD$>$} button.  The file name (with a
-   complete directory specification) should appear in the {\sf Files
+   First click on file \texttt{29jan0034.sdf} in the \textsf{Files:} box and
+   then click on the \textsf{$>$ADD$>$} button.  The file name (with a
+   complete directory specification) should appear in the \textsf{Files
    to be Combined} box  on the right hand side of the window.  Repeat
-   the procedure for files {\tt 29jan0035.sdf} and {\tt 29jan0036.sdf}.
+   the procedure for files \texttt{29jan0035.sdf} and \texttt{29jan0036.sdf}.
    When you are finished the appearance of the window should be similar
    to Figure~\ref{2DF_COMBINE_RUNS}.  If you add the wrong file by
-   mistake then simply click on the {\sf REMOVE} button.  When you have
-   assembled the correct list of files click on the {\sf OK} button.
-   Further output will be displayed in the {\tt drcontrol} terminal window.
+   mistake then simply click on the \textsf{REMOVE} button.  When you have
+   assembled the correct list of files click on the \textsf{OK} button.
+   Further output will be displayed in the \texttt{drcontrol} terminal window.
 
   \item When the processing finishes the reduction is complete.  Move
    to the main window (Figure~\ref{2DF_DATA_REDUCTION}) and close
-   2dFDR by clicking on the {\sf File} menu (the leftmost item in the
-   menu bar at the top of the screen) and choosing the {\sf Exit}
+   2dFDR by clicking on the \textsf{File} menu (the leftmost item in the
+   menu bar at the top of the screen) and choosing the \textsf{Exit}
    option.
 
-  \item The reduced spectra are stored in file {\tt
-   combined\_frames.sdf}.  This file is a two-dimensional array, with one
+  \item The reduced spectra are stored in file \texttt{combined\_frames.sdf}.  This file is a two-dimensional array, with one
    axis corresponding to the fibre number (ranging from 1 to 200) and the
    other to wavelength.
 
    The individual spectra can be plotted, for example, with Figaro
    (see \xref{SUN/86}{sun86}{}\cite{SUN86}).  Type:
 
-  \begin{quote}
-   {\tt figaro}
-  \end{quote}
+\begin{terminalv}
+figaro
+\end{terminalv}
 
    To start Figaro.  Then type:
 
-  \begin{quote}
-   {\tt soft ~ xw \\
-   splot ~ combined\_frames$\backslash$(,90$\backslash$) ~
-    autoscale=yes ~ soft=xw}
-  \end{quote}
+\begin{terminalv}
+soft xw
+splot combined_frames\(,90\) autoscale=yes soft=xw
+\end{terminalv}
 
    As is usual for Starlink software, the file name is specified without
-   the {\tt .sdf} file type.  Also note how the backslash (`$\backslash$')
+   the \texttt{.sdf} file type.  Also note how the backslash (`$\backslash$')
    is used to prevent the brackets being interpreted by the Unix shell
    (the use of Starlink applications from the Unix shell is discussed
-   further in \xref{SC/4: {\it C-shell Cookbook}}{sc4}{}\/\cite{SC4}).
-   Simply hit return in response to the additional prompts from {\tt
-   splot}.  Here spectrum number 90 is being displayed.  A plot similar
+   further in \xref{SC/4: \textit{C-shell Cookbook}}{sc4}{}\/\cite{SC4}).
+   Simply hit return in response to the additional prompts from \texttt{splot}.  Here spectrum number 90 is being displayed.  A plot similar
    to Figure~\ref{2DF_SPLOT} should appear.
 
   \begin{figure}[htbp]
      \centering
      \includegraphics[totalheight=3.6in]{sc14_2df_splot}
-     \begin{quote}
      \caption{2dFDR reduced galaxy spectrum
      \label{2DF_SPLOT} }
-     \end{quote}
   \end{figure}
 
 \end{enumerate}
@@ -2844,189 +2513,185 @@ Any mistakes, of course, are my own.
    J.~Webster, E.~Atad, S.~Beard, R.~Bennett, M.~Ellis, P.~Hastings,
    P.~Williams, T.~Bond, D.~Crampton, T.~Davidge, M.~Fletcher,
    B.~Leckie, C.~Morbey, R.~Murowinski, S.~Roberts, L.~Saddlemyer,
-   J.~Sebesta, J.~Stilburn and K.~Szeto, 1997, in Kontizas {\it et al.
+   J.~Sebesta, J.~Stilburn and K.~Szeto, 1997, in Kontizas \textit{et al.
    op. cit.}\/ (\cite{KONTIZAS97}), pp73-79.
 
   \bibitem{ARRIBAS98} S.~Arribas, E.~Mediavilla and F.G.~Watson (eds),
-   1998, {\it Fiber Optics in Astronomy III}, Astronomical Society of
-   the Pacific Conference Series, {\bf 152}.
+   1998, \textit{Fiber Optics in Astronomy III}, Astronomical Society of
+   the Pacific Conference Series, \textbf{152}.
 
-  \bibitem{BAILEY97} J.A.~Bailey and K.~Glazebrook, 1997, {\it 2dF
+  \bibitem{BAILEY97} J.A.~Bailey and K.~Glazebrook, 1997, \textit{2dF
    User Manual}\, (Anglo-Australian Observatory: Sydney).
 
-  \bibitem{BARDEN88} S.C.~Barden (ed), 1988, {\it Fiber Optics in
+  \bibitem{BARDEN88} S.C.~Barden (ed), 1988, \textit{Fiber Optics in
    Astronomy}, Astronomical Society of the Pacific Conference Series,
-   {\bf 3}.
+   \textbf{3}.
 
-  \bibitem{BARDEN95} S.C.~Barden (ed), 1995, {\it Fiber Optics in
-   Astronomical Applications}, Proc. SPIE, {\bf 2476}.
+  \bibitem{BARDEN95} S.C.~Barden (ed), 1995, \textit{Fiber Optics in
+   Astronomical Applications}, Proc. SPIE, \textbf{2476}.
 
-  \bibitem{BARDEN98} S.C.~Barden 1998, in Arribas {\it et al. op. cit.}\/
+  \bibitem{BARDEN98} S.C.~Barden 1998, in Arribas \textit{et al. op. cit.}\/
    (\cite{ARRIBAS98}), pp14-19.
 
   \bibitem{BARDEN93} S.C.~Barden, T.~Armandroff, P.~Massey, L.~Groves,
-   A.C.~Rudeen, D.~Vaughnn and G.~Muller, 1993, in Gray {\it op. cit.}\/
+   A.C.~Rudeen, D.~Vaughnn and G.~Muller, 1993, in Gray \textit{op. cit.}\/
    (\cite{GRAY93}), pp185-202.
 
-  \bibitem{BARNES93} J.~Barnes, 1993, {\it A Beginner's Guide to
+  \bibitem{BARNES93} J.~Barnes, 1993, \textit{A Beginner's Guide to
    Using IRAF}\, (National Optical Astronomy Observatories: Tucson).
-   See \xref{SG/12}{sg12}{} {\it op. cit.}\/ (\cite{SG12}) for details of
+   See \xref{SG/12}{sg12}{} \textit{op. cit.}\/ (\cite{SG12}) for details of
    obtaining IRAF manuals.
 
   \bibitem{BOWEN98} D.V.~Bowen, M.~Pettini and B.J.~Boyle, 1998,
-   {\it Mon. Not. R. Astron. Soc}, {\bf 297}, pp239-250.
+   \textit{Mon. Not. R. Astron. Soc}, \textbf{297}, pp239-250.
 
-  \bibitem{CANNON97} R.D.~Cannon, 1997, in Kontizas {\it et al.
+  \bibitem{CANNON97} R.D.~Cannon, 1997, in Kontizas \textit{et al.
    op. cit.}\/ (\cite{KONTIZAS97}), pp33-40.
 
-  \bibitem{CHAMBERLAIN61} J.W.~Chamberlain, 1961, {\it Physics of the
-   Aurora and Airflow}, International Geophysics Series, {\bf 2},
+  \bibitem{CHAMBERLAIN61} J.W.~Chamberlain, 1961, \textit{Physics of the
+   Aurora and Airflow}, International Geophysics Series, \textbf{2},
    (Academic Press: New York).
 
-  \bibitem{CHU97} Y.~Chu, 1997, in Kontizas {\it et al. op. cit.}\/
+  \bibitem{CHU97} Y.~Chu, 1997, in Kontizas \textit{et al. op. cit.}\/
    (\cite{KONTIZAS97}), pp67-72.
 
-  \bibitem{SC7} M.J.~Clayton, 1998, \xref{SC/7.2}{sc7}{}: {\it Simple
+  \bibitem{SC7} M.J.~Clayton, 1998, \xref{SC/7.2}{sc7}{}: \textit{Simple
    Spectroscopy Reductions}\, (Starlink).
 
   \bibitem{SUN95} M.J.~Currie and D.S.~Berry, 1998, \xref{SUN/95.13}{sun95}{}:
-   {\it KAPPA -- Kernel Application Package}\, (Starlink).
+   \textit{KAPPA -- Kernel Application Package}\, (Starlink).
 
-  \bibitem{SC4} M.J.~Currie, 1998, \xref{SC/4.2}{sc4}{}: {\it C-shell
+  \bibitem{SC4} M.J.~Currie, 1998, \xref{SC/4.2}{sc4}{}: \textit{C-shell
    Cookbook}\, (Starlink).
 
   \bibitem{SUN55} M.J.~Currie, G.J.~Privett, A.J.~Chipperfield,
    D.S.~Berry and A.C.~Davenhall, 1998, \xref{SUN/55.10}{sun55}{}:
-   {\it CONVERT -- A Format-conversion Package}\, (Starlink).
+   \textit{CONVERT -- A Format-conversion Package}\, (Starlink).
 
   \bibitem{SUN190} A.C.~Davenhall, 1998, \xref{SUN/190.6}{sun190}{}:
-   {\it CURSA -- Catalogue and Table Manipulation Applications}\, (Starlink).
+   \textit{CURSA -- Catalogue and Table Manipulation Applications}\, (Starlink).
 
   \bibitem{SC5} A.C.~Davenhall, G.J.~Privett and M.B.~Taylor, 1999,
-   \xref{SC/5.2}{sc5}{}: {\it The 2-D CCD Data Reduction Cookbook}\,
+   \xref{SC/5.2}{sc5}{}: \textit{The 2-D CCD Data Reduction Cookbook}\,
    (Starlink).
 
-  \bibitem{SUN139} P.W.~Draper, 1998, \xref{SUN/139.9}{sun139}{}: {\it
-   CCDPACK -- CCD Data Reduction Package}\, (Starlink).
+  \bibitem{SUN139} P.W.~Draper, 1998, \xref{SUN/139.9}{sun139}{}: \textit{CCDPACK -- CCD Data Reduction Package}\, (Starlink).
 
-  \bibitem{DRINK96} M.~Drinkwater and B.~Holman, 1996, {\it FLAIR Data
+  \bibitem{DRINK96} M.~Drinkwater and B.~Holman, 1996, \textit{FLAIR Data
    Reduction with IRAF}\, (Anglo-Australian Observatory: Sydney).
 
-  \bibitem{GRAY93} P.M.~Gray (ed), 1993, {\it Fiber Optics in Astronomy
+  \bibitem{GRAY93} P.M.~Gray (ed), 1993, \textit{Fiber Optics in Astronomy
    II}, Astronomical Society of the Pacific Conference Series,
-   {\bf 37}.
+   \textbf{37}.
 
-  \bibitem{HEACOX92} W.D.~Heacox and P.~Connes, 1992, {\it Astron.
-   Astrophys. Rev}, {\bf 3}, pp169-199.
+  \bibitem{HEACOX92} W.D.~Heacox and P.~Connes, 1992, \textit{Astron.
+   Astrophys. Rev}, \textbf{3}, pp169-199.
 
   \bibitem{HECHT98} J.Hecht, 1998,
-   \htmladdnormallink{{\it Understanding Fiber Optics}}
+   \htmladdnormallink{\textit{Understanding Fiber Optics}}
    {http://www.sff.net/people/jeff.hecht/UFO.html},
    (Prentice Hall: Saddle River, New Jersey).
 
   \bibitem{HECHT99} J.Hecht, 1999,
-   \htmladdnormallink{{\it City of Light}}
+   \htmladdnormallink{\textit{City of Light}}
    {http://www.sff.net/people/Jeff.Hecht/City.html},
    (Oxford University Press: Oxford).
 
-  \bibitem{HILL88} J.M.~Hill, 1988, in Barden {\it op. cit.}\/
+  \bibitem{HILL88} J.M.~Hill, 1988, in Barden \textit{op. cit.}\/
    (\cite{BARDEN88}), pp77-92.
 
   \bibitem{HILL80} J.M.~Hill, J.R.P.~Angel, J.S.~Scott, D.~Lindley and
-   P.~Hintzen, 1980, {\it  Astrophys. J. Lett}, {\bf 242}, ppL69-L72.
+   P.~Hintzen, 1980, \textit{Astrophys. J. Lett}, \textbf{242}, ppL69-L72.
 
-  \bibitem{KAY95} D.C.~Kay and J.R.~Levine, 1995, {\it Graphics File
+  \bibitem{KAY95} D.C.~Kay and J.R.~Levine, 1995, \textit{Graphics File
    Formats}, second edition
   \newline (Windcrest/McGraw-Hill: New York).  See in particular
    Chapter 18, pp235-244.
 
   \bibitem{KONTIZAS97} E.~Kontizas, M.~Kontizas, D.H.~Morgan and
-   G.P.~Vettolani (eds), 1997, {\it Wide-Field Spectroscopy}\,
+   G.P.~Vettolani (eds), 1997, \textit{Wide-Field Spectroscopy}\,
    (Kluwer Academic Publishers: Dordrecht).
 
-  \bibitem{LEWIS96} J.R.~Lewis, 1996, {\it WYFFOS Data Reduction
+  \bibitem{LEWIS96} J.R.~Lewis, 1996, \textit{WYFFOS Data Reduction
    Manual}\, (Royal Greenwich Observatory: Cambridge).
 
   \bibitem{LISS94} C.~Lissandrini, S.~Cristiani and F.~La~Franca,
-   1994, {\it  Publ. Astron. Soc. Pacific}, {\bf 106}, pp1157-1164.
+   1994, \textit{Publ. Astron. Soc. Pacific}, \textbf{106}, pp1157-1164.
 
   \bibitem{MADDOX95} S.J.~Maddox and A.~Arag\'{o}n-Salamanca (eds),
-   1995, {\it Wide Field Spectroscopy and the Distant Universe},
+   1995, \textit{Wide Field Spectroscopy and the Distant Universe},
    the 35th Herstmonceux Conference (World Scientific: Singapore).
 
-  \bibitem{MASSEY97} P.~Massey, 1997, {\it A User's Guide to CCD
+  \bibitem{MASSEY97} P.~Massey, 1997, \textit{A User's Guide to CCD
    Reductions with IRAF}\, (National Optical Astronomy Observatories:
-   Tucson).  See \xref{SG/12}{sg12}{} {\it op. cit.}\/ (\cite{SG12})
+   Tucson).  See \xref{SG/12}{sg12}{} \textit{op. cit.}\/ (\cite{SG12})
    for details of obtaining IRAF manuals.
 
-  \bibitem{MASSEY92} P.~Massey, F.~Valdes and J.~Barnes, 1992, {\it
-   A User's Guide to Reducing Slit Spectra with IRAF}\, (National
+  \bibitem{MASSEY92} P.~Massey, F.~Valdes and J.~Barnes, 1992, \textit{A User's Guide to Reducing Slit Spectra with IRAF}\, (National
    Optical Astronomy Observatories: Tucson).  See \xref{SG/12}{sg12}{}
-   {\it op. cit.}\/ (\cite{SG12}) for details of obtaining IRAF manuals.
+   \textit{op. cit.}\/ (\cite{SG12}) for details of obtaining IRAF manuals.
 
   \bibitem{SG12} R.~Morris, G.J.~ Privett and A.C.~Davenhall, 1998,
-   \xref{SG/12.1}{sg12}{}: {\it IRAF -- Image Reduction Analysis Facility}\,
+   \xref{SG/12.1}{sg12}{}: \textit{IRAF -- Image Reduction Analysis Facility}\,
    (Starlink).
 
   \bibitem{SUN166} R.~Morris and G.J.~ Privett, 1966,
-   \xref{SUN/166.4}{sun166}{}: {\it SAOIMAGE -- Astronomical Image Display}\,
+   \xref{SUN/166.4}{sun166}{}: \textit{SAOIMAGE -- Astronomical Image Display}\,
    (Starlink).
 
-  \bibitem{NELSON88} G.W.~Nelson, 1988, in Barden {\it op. cit.}\/
+  \bibitem{NELSON88} G.W.~Nelson, 1988, in Barden \textit{op. cit.}\/
    (\cite{BARDEN88}), pp2-22.
 
-  \bibitem{PARKER97A} Q.A.~Parker, 1997, in Kontizas {\it et al. op.
+  \bibitem{PARKER97A} Q.A.~Parker, 1997, in Kontizas \textit{et al. op.
    cit.}\/ (\cite{KONTIZAS97}), pp25-31.
 
-  \bibitem{PARKER97B} Q.A.~Parker and M.~Hartley, 1997, in Kontizas {\it
-   et al. op. cit.}\/ (\cite{KONTIZAS97}), pp17-23.
+  \bibitem{PARKER97B} Q.A.~Parker and M.~Hartley, 1997, in Kontizas \textit{et al. op. cit.}\/ (\cite{KONTIZAS97}), pp17-23.
 
   \bibitem{PARKER98} Q.A.~Parker, F.G.~Watson and S.~Miziarski, 1998, in
-   Arribas {\it et al. op. cit.}\/ (\cite{ARRIBAS98}), pp80-91.
+   Arribas \textit{et al. op. cit.}\/ (\cite{ARRIBAS98}), pp80-91.
 
-  \bibitem{PARRY97} I.R.~Parry, 1997, in Kontizas {\it et al. op. cit.}\/
+  \bibitem{PARRY97} I.R.~Parry, 1997, in Kontizas \textit{et al. op. cit.}\/
    (\cite{KONTIZAS97}), pp3-16.
 
-  \bibitem{PARRY98} I.R.~Parry, 1998, in Arribas {\it et al. op. cit.}\/
+  \bibitem{PARRY98} I.R.~Parry, 1998, in Arribas \textit{et al. op. cit.}\/
    (\cite{ARRIBAS98}), pp3-13.
 
-  \bibitem{PARRY90} I.R.~Parry and E.~Carrasco, 1990, in {\it
-   Instrumentation in Astronomy VII}, Proc. SPIE, {\bf 1235} pp702-708.
+  \bibitem{PARRY90} I.R.~Parry and E.~Carrasco, 1990, in \textit{Instrumentation in Astronomy VII}, Proc. SPIE, \textbf{1235} pp702-708.
 
   \bibitem{SUN86} K.T.~Shortridge, H.~Meyerdierks, M.J.~Currie,
    M.J.~Clayton, J.~Lockley, A.C.~Charles, A.C.~Davenhall and M.B.~Taylor,
-   1998, \xref{SUN/86.16}{sun86}{}: {\it FIGARO -- A General Data
+   1998, \xref{SUN/86.16}{sun86}{}: \textit{FIGARO -- A General Data
    Reduction System}\, (Starlink).
 
-  \bibitem{VALDES92A} F.~Valdes, 1992, {\it Guide to the Multifiber
+  \bibitem{VALDES92A} F.~Valdes, 1992, \textit{Guide to the Multifiber
    Reduction Task DOFIBERS}\, (National Optical Astronomy
-   Observatories: Tucson).  See \xref{SG/12}{sg12}{} {\it op. cit.}\/
+   Observatories: Tucson).  See \xref{SG/12}{sg12}{} \textit{op. cit.}\/
    (\cite{SG12}) for details of obtaining IRAF manuals.
 
-  \bibitem{VALDES92B} F.~Valdes, 1992, {\it Guide to the Slit Spectra
+  \bibitem{VALDES92B} F.~Valdes, 1992, \textit{Guide to the Slit Spectra
    Reduction Task DOSLIT}\, (National Optical Astronomy Observatories:
-   Tucson).  See \xref{SG/12}{sg12}{} {\it op. cit.}\/ (\cite{SG12}) for
+   Tucson).  See \xref{SG/12}{sg12}{} \textit{op. cit.}\/ (\cite{SG12}) for
    details of obtaining IRAF manuals.
 
-  \bibitem{WALKER87} G.~Walker, 1987, {\it Astronomical Observations
+  \bibitem{WALKER87} G.~Walker, 1987, \textit{Astronomical Observations
    -- An Optical Perspective}\, (Cambridge University Press: Cambridge).
 
   \bibitem{SUN33} R.F.~Warren-Smith, 1998, \xref{SUN/33.6}{sun33}{}:
-   {\it NDF -- Routines for Accessing the Extensible N-Dimensional Data
+   \textit{NDF -- Routines for Accessing the Extensible N-Dimensional Data
    Format}\, (Starlink).
 
   \bibitem{WATSON95} F.G.~Watson, 1995, in Maddox and Arag\'{o}n-Salamanca
-   {\it op. cit.}\/ (\cite{MADDOX95}), pp25-32.
+   \textit{op. cit.}\/ (\cite{MADDOX95}), pp25-32.
 
   \bibitem{WATSON98} F.G.~Watson, A.R.~Offer, I.J.~Lewis, J.A.~Bailey
-   and K.~Glazebrook, 1998, in Arribas {\it et al. op. cit.}\/
+   and K.~Glazebrook, 1998, in Arribas \textit{et al. op. cit.}\/
    (\cite{ARRIBAS98}), pp50-59.
 
   \bibitem{WELLS81} D.C.~Wells, E.W.~Greisen, and R.H.~Harten, 1981,
-   {\it Astron. Astrophys. Suppl}, {\bf 44}, pp363-370.
+   \textit{Astron. Astrophys. Suppl}, \textbf{44}, pp363-370.
 
-  \bibitem{WYSE92} F.G.~Wyse and G.~Gilmore, 1992, {\it Mon. Not. R.
-   Astron. Soc}, {\bf 257}, pp1-10.
+  \bibitem{WYSE92} F.G.~Wyse and G.~Gilmore, 1992, \textit{Mon. Not. R.
+   Astron. Soc}, \textbf{257}, pp1-10.
 
 \end{thebibliography}
 
