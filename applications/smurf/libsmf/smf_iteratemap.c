@@ -2438,7 +2438,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                    from skyloop (as indicated by numiter being 1), we
                    always defer this until after the full map has been
                    made from all chunks.  */
-                if( quit == -1 && numiter > 1 ) {
+                if( quit == -1 && abs( numiter ) > 1 ) {
                    smf_filter_mapchange( wf, &dat, ast_filt_diff, status );
                 }
              }
