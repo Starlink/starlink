@@ -1,9 +1,6 @@
-\documentclass[twoside]{article}
+\documentclass[twoside,nolof]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
-\usepackage{makeidx}
 \makeindex
 % ? End of specify used packages
 
@@ -17,26 +14,19 @@
 %
 % *****************************************************************************
 
-\pagestyle{myheadings}
-
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\previousdocnumber}{1.23}
-\newcommand{\previousdocdate}  {5 August 2003}
-\newcommand{\previousdoc}      {SUN/\previousdocnumber , \previousdocdate}
-\newcommand{\stardocnumber}    {1.24}
-\newcommand{\stardocauthors}   {\latexonlysmall{ed. S.\, E.\, Rankin}}
-\newcommand{\stardocdate}      {\latexonlysmall{5 August 2003}}
-\newcommand{\stardoctitle}     {STARLINK\\Software Collection}
-\newcommand{\stardocversion}   {[software-version]}
-\newcommand{\stardocmanual}    {[manual-type]}
-\newcommand{\stardocabstract}  {%
+\stardocnumber      {1.24}
+\stardocauthors     {ed. S.\, E.\, Rankin}
+\stardocdate        {5 August 2003}
+\stardoctitle       {STARLINK\\Software Collection}
+\stardocabstract  {%
 The Starlink Software Collection is a set of software which is managed
 and distributed by the Starlink Project.  Some of the software was
 written by members of the Project, but some of it comes from outside
@@ -77,259 +67,24 @@ name.
 
 % ? End of document identification
 % -----------------------------------------------------------------------------
+% ? Document specific \providecommand or \newenvironment commands.
 
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%     {Add further history here}
-%
-% -
+\providecommand{\previousdocnumber}{1.23}
+\providecommand{\previousdocdate}  {5 August 2003}
+\providecommand{\previousdoc}      {SUN/\previousdocnumber , \previousdocdate}
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{100mm}
-\setlength{\textheight}{154mm}
-\setlength{\topmargin}{0mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
+\providecommand{\radec}{$[\alpha,\delta\,]$}
 
 %  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+\providecommand{\latextohtml}{\LaTeX2\texttt{HTML}}
 
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
-\newcommand{\latexonlysmall}{\small}
-\begin{htmlonly}
-   \newcommand{\latexonlysmall}{}
-\end{htmlonly}
-
-\newcommand{\radec}{$[\alpha,\delta\,]$}
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {Particle Physics \& Astronomy Research Council}\\
-   {Starlink Project\\}
-   {\stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-%  {\LARGE\bf \stardocversion \\ [4ex]}
-%  {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      \textbf{Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-%     \stardocversion\\
-%     \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 % ? Main text
 
@@ -502,13 +257,13 @@ with the data array, even other NDFs.
 \item[\mbox{}]\mbox{}
 \begin{description}
 \item [\htmlref{AIPS}{item_AIPS}]
---- Image processing \hfill {\em Not distributed}
+--- Image processing \hfill \emph{Not distributed}
 \item [\htmlref{IDL}{item_IDL}]
---- Interactive data language \hfill {\em Not distributed}
+--- Interactive data language \hfill \emph{Not distributed}
 \item [\htmlref{IRAF}{item_IRAF}]
 --- Image reduction and analysis facility
 \item [\htmlref{MIDAS}{item_MIDAS}]
---- Munich image data analysis \hfill {\em Not distributed}
+--- Munich image data analysis \hfill \emph{Not distributed}
 \item [\htmlref{XANADU}{item_XANADU}]
 --- GSFC software system
 \item [\htmlref{STARJAVA}{item_STARJAVA}]
@@ -521,7 +276,7 @@ with the data array, even other NDFs.
 
 \label{item_AIPS}
 \item
-[\htmladdnormallink{AIPS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#AIPS}]
+[AIPS]
 \index{AIPS} \hfill
 \xref{SUN/207}{sun207}{}.
 MUD/101
@@ -550,10 +305,10 @@ intensity to denote integral brightness.
 
 \label{item_IDL}
 \item
-[\htmladdnormallink{IDL}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#IDL}]
+[IDL]
 \index{IDL} \hfill MUD/29,30,31,161
 
-{\bf Explore and manipulate data using a comprehensive set of tools.}
+\textbf{Explore and manipulate data using a comprehensive set of tools.}
 
 The Interactive Data Language (IDL) is proprietary package, written by Dave
 Stern of Research Systems Inc, Denver,
@@ -576,12 +331,12 @@ more complex procedures as required.
 
 \label{item_IRAF}
 \item
-[\htmladdnormallink{IRAF}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#IRAF}]
+[IRAF]
 \index{IRAF} \hfill
 \xref{SUN/179}{sun179}{}.
 MUD/104,105,154,156,157
 
-{\bf Reduce and analyse data -- general purpose.}
+\textbf{Reduce and analyse data -- general purpose.}
 
 The Image Reduction and Analysis Facility (IRAF) was developed by the
 National Optical Astronomical Observatory (Kitt Peak),
@@ -645,10 +400,10 @@ native IRAF applications.
 
 \label{item_MIDAS}
 \item
-[\htmladdnormallink{MIDAS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#MIDAS}]
+[MIDAS]
 \index{MIDAS} \mbox{}
 
-{\bf Reduce and analyse optical astronomy data within a basic image
+\textbf{Reduce and analyse optical astronomy data within a basic image
 processing environment.}
 
 The Munich Image Data Analysis System (MIDAS) was developed by the Image
@@ -681,7 +436,8 @@ field photometry, object search and classification, fitting and modeling of
 data, astrometry, and statistical analysis.
 
 \label{item_STARJAVA}
-\item [\htmladdnormallink{STARJAVA}{http://www.starlink.ac.uk/java/java.htm}]
+\item
+[STARJAVA]
 \index{STARJAVA} \hfill
 \xref{SUN/251}{sun251}{}
 
@@ -695,8 +451,7 @@ You can view a section of a proposed International Virtual Observatory
 Alliance Data Model, including HDX, NDX and Table data structures with
 the WCS astrometry library at:
 
-\htmladdnormallink{\texttt{http://www.starlink.ac.uk/java/java.htm}}
-{\texttt{http://www.starlink.ac.uk/java/java.htm}}
+\url{http://www.starlink.ac.uk/java/java.htm}
 
 The Starlink Java Software (STARJAVA) has had numerous changes and
 additions. STARJAVA can now be considered as a separate entity from
@@ -790,17 +545,16 @@ It also appears in the DOCS package and can be seen with the command
 STARJAVA is not available under Tru64 Unix.
 \label{item_XANADU}
 \item
-[\htmladdnormallink{XANADU}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#XANADU}]
+[XANADU]
 \index{XANADU} \mbox{}
 
-{\bf Analyse spectra, timing, and images of X-ray astronomical data
+\textbf{Analyse spectra, timing, and images of X-ray astronomical data
 obtained from multiple missions.}
 
 It was obtained from GSFC.
 Its home page is:
 
-\htmladdnormallink{http://heasarc.gsfc.nasa.gov/docs/xanadu/xanadu.html}
-{http://heasarc.gsfc.nasa.gov/docs/xanadu/xanadu.html}.
+\url{http://heasarc.gsfc.nasa.gov/docs/xanadu/xanadu.html}.
 
 Its principal components are:
 
@@ -809,7 +563,7 @@ Its principal components are:
 \label{item_XSPEC}
 \item [XSPEC]\index{XSPEC}\index{XANADU!XSPEC} \mbox{}
 
-{\bf Fit X-ray spectra -- command-driven, interactive.}
+\textbf{Fit X-ray spectra -- command-driven, interactive.}
 
 It is detector-independent, so it can be used for any spectrometer.
 It has been used to analyze data from HEAO-1 A2, Einstein Observatory, EXOSAT,
@@ -862,7 +616,7 @@ files and/or adding new calls and relinking XIMAGE.
 \label{item_XRONOS}
 \item [XRONOS]\index{XRONOS}\index{XANADU!XRONOS} \mbox{}
 
-{\bf Analyse timing -- general purpose.}
+\textbf{Analyse timing -- general purpose.}
 
 Although designed mostly for X-ray astronomy, it is basically detector
 and wavelength-independent.
@@ -890,11 +644,11 @@ Database System.
 XANADU also contains native versions of:
 
 \begin{itemize}
-\item {\bf PGPLOT} \index{XANADU!PGPLOT} \index{PGPLOT}
+\item \textbf{PGPLOT} \index{XANADU!PGPLOT} \index{PGPLOT}
 --- High-level graphics.
-\item {\bf QDP} \index{XANADU!QDP} \index{QDP}
+\item \textbf{QDP} \index{XANADU!QDP} \index{QDP}
 --- Data plotter.
-\item {\bf FITSIO} \index{XANADU!FITSIO} \index{FITSIO}
+\item \textbf{FITSIO} \index{XANADU!FITSIO} \index{FITSIO}
 --- FITS I/O on disk.
 \end{itemize}
 
@@ -920,7 +674,7 @@ Of these, PGPLOT and FITSIO are also distributed independently by Starlink.
 
 \label{item_ORAC-DR}
 \item
-[\htmladdnormallink{ORAC-DR}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#ORAC-DR}]
+[ORAC-DR]
 \index{ORAC-DR} \hfill
 \xref{SUN/230}{sun230}{},\xref{SUN/231}{sun231}{},\xref{SUN/232}{sun232}{},
 \xref{SUN/246}{sun246}{}
@@ -938,7 +692,7 @@ a known observation pattern at the telescopes.  The headers data of
 each dataset is read to discover which data processing recipe to apply to
 it.  The data reduction is performed by tasks from other Starlink packages
 such as \htmlref{KAPPA}{item_KAPPA},
-\htmlref{CCDPACK}{item_CCDPACK}, \htmlref{SCUBA}{item_SCUBA},
+\htmlref{CCDPACK}{item_CCDPACK}, \htmlref{SURF}{item_SURF},
 \htmlref{POLPACK}{item_POLPACK} and \htmlref{PHOTOM}{item_PHOTOM}.
 It can also use \htmlref{GAIA}{item_GAIA} for image display.
 
@@ -987,7 +741,7 @@ It can also use \htmlref{GAIA}{item_GAIA} for image display.
 
 \label{item_ATOOLS}
 \item
-[\htmladdnormallink{ATOOLS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#ATOOLS}]
+[ATOOLS]
 \index{ATOOLS} \hfill
 % \xref{SUN/NNN}{sunNNN}{}
 
@@ -1001,7 +755,7 @@ library. ATOOLS thus provides a high-level interface to the AST library.
 
 \label{item_CCDPACK}
 \item
-[\htmladdnormallink{CCDPACK}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#CCDPACK}]
+[CCDPACK]
 \index{CCDPACK} \hfill
 \xref{SUN/139}{sun139}{}
 
@@ -1070,12 +824,12 @@ The CCDPACK package my be run from the IRAF CL.
 
 \label{item_DAOPHOT}
 \item
-[\htmladdnormallink{DAOPHOT}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#DAOPHOT}]
+[DAOPHOT]
 \index{DAOPHOT} \hfill
 \xref{SUN/42}{sun42}{}.
 MUD/9,10
 
-{\bf Stellar photometry of crowded fields.}
+\textbf{Stellar photometry of crowded fields.}
 
 It does the following tasks:
 \begin{itemize}
@@ -1093,7 +847,7 @@ Starlink packages.
 
 \label{item_ESP}
 \item
-[\htmladdnormallink{ESP}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#ESP}]
+[ESP]
 \index{ESP} \hfill
 \xref{SUN/180}{sun180}{}
 
@@ -1129,7 +883,7 @@ using keyword descriptions in text files.
 
 \label{item_EXTRACTOR}
 \item
-[\htmladdnormallink{EXTRACTOR}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#EXTRACTOR}]
+[EXTRACTOR]
 \index{EXTRACTOR} \hfill
 \xref{SUN/226}{sun226}{}
 
@@ -1147,7 +901,7 @@ accepts images in NDF format and uses the AST library for astrometry.
 
 \label{item_GAIA}
 \item
-[\htmladdnormallink{GAIA}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#GAIA}]
+[GAIA]
 \index{GAIA} \hfill
 \xref{SUN/214}{sun214}{}
 
@@ -1204,7 +958,7 @@ The GAIA package may be run from the IRAF CL.
 
 \label{item_KAPPA}
 \item
-[\htmladdnormallink{KAPPA}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#KAPPA}]
+[KAPPA]
 \index{KAPPA} \hfill
 \xref{SUN/95}{sun95}{}
 
@@ -1313,7 +1067,7 @@ The KAPPA package may also be run from the IRAF CL.
 
 \label{item_KAPRH}
 \item
-[\htmladdnormallink{KAPRH}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#KAPRH}]
+[KAPRH]
 \index{KAPRH} \hfill
 \xref{SUN/239}{sun239}{}
 
@@ -1334,11 +1088,11 @@ KAPRH contains the following retired KAPPA commands:
 as well as a help command: \texttt{KRHHELP}.
 \label{item_PHOTOM}
 \item
-[\htmladdnormallink{PHOTOM}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#PHOTOM}]
+[PHOTOM]
 \index{PHOTOM} \hfill
 \xref{SUN/45}{sun45}{}
 
-{\bf Aperture photometry.}
+\textbf{Aperture photometry.}
 
 It has two basic operating modes:
 \begin{itemize}
@@ -1361,11 +1115,11 @@ resizing apertures.
 
 \label{item_PISA}
 \item
-[\htmladdnormallink{PISA}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#PISA}]
+[PISA]
 \index{PISA} \hfill
 \xref{SUN/109}{sun109}{}
 
-{\bf Locate and parameterize objects in a 2-d image.}
+\textbf{Locate and parameterize objects in a 2-d image.}
 
 The Position, Intensity, and Shape Analysis package (PISA) is applicable in
 most areas of astronomy where direct imaging is required.
@@ -1383,12 +1137,12 @@ In crowded regions it can deblend overlapping sources.
 
 \label{item_SAOIMAGE}
 \item
-[\htmladdnormallink{SAOIMAGE}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#SAOIMAGE}]
+[SAOIMAGE]
 \index{SAOIMAGE} \hfill
 \xref{SUN/166}{sun166}{}.
 MUD/140
 
-{\bf Display astronomical images.}
+\textbf{Display astronomical images.}
 
 You can manipulate images in a number of ways, see the changes applied, and
 when you are happy with the result, print it on a Postscript printer.
@@ -1430,7 +1184,7 @@ the region around it can be displayed and constantly updated.}
 
 \label{item_STARMAN}
 \item
-[\htmladdnormallink{STARMAN}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#STARMAN}]
+[STARMAN]
 \index{STARMAN} \hfill
 \xref{SUN/141}{sun141}{}
 
@@ -1493,13 +1247,13 @@ transforming, etc..
 \newpage   %% paging
 \label{item_SX}
 \item
-[\htmladdnormallink{SX}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#SX}]
+[SX]
 \index{SX}\index{DX} \hfill
 \xref{SC/2}{sc2}{},
 \xref{SG/8}{sg8}{},
 \xref{SUN/203}{sun203}{}
 
-{\bf Enhancements to DX.}
+\textbf{Enhancements to DX.}
 
 DX (Data Explorer) is a scientific data visualisation and analysis package
 marketed by IBM.
@@ -1551,7 +1305,7 @@ They:
 
 \label{item_DATACUBE}
 \item
-[\htmladdnormallink{DATACUBE}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#DATACUBE}]
+[DATACUBE]
 \index{DATACUBE} \hfill
 \xref{SUN/237}{sun237}{}, \xref{SC/16}{sc16}{}
 
@@ -1572,11 +1326,11 @@ IFU data analysis is discussed in detail in the cookbook
 \newpage   %% paging
 \label{item_DIPSO}
 \item
-[\htmladdnormallink{DIPSO}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#DIPSO}]
+[DIPSO]
 \index{DIPSO} \hfill
 \xref{SUN/50}{sun50}{}
 
-{\bf Analyse and visualise spectroscopic data.}
+\textbf{Analyse and visualise spectroscopic data.}
 
 A powerful and versatile package, specifically tailored to the requirements of
 modern astronomical research.
@@ -1616,11 +1370,11 @@ The following operations are available:
 
 \label{item_ECHOMOP}
 \item
-[\htmladdnormallink{ECHOMOP}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#ECHOMOP}]
+[ECHOMOP]
 \index{ECHOMOP} \hfill
 \xref{SUN/152}{sun152}{}
 
-{\bf Reduce \'{e}chelle spectra data frames.}
+\textbf{Reduce \'{e}chelle spectra data frames.}
 
 Options range from full-scale automated reduction to step-by-step
 order-by-order manually assisted processing.
@@ -1651,7 +1405,7 @@ It can:
 \end{itemize}
 
 \label{item_FIGARO} \item
-[\htmladdnormallink{FIGARO}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#FIGARO}]
+[FIGARO]
 \index{FIGARO} \hfill
 \xref{SUN/86}{sun86}{}.
 MUD/12,13,14
@@ -1769,7 +1523,7 @@ and TWODSPEC programs are not yet available under the IRAF CL.
 \newpage   %% paging
 \label{item_NDPROGS}
 \item
-[\htmladdnormallink{NDPROGS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#NDPROGS}]
+[NDPROGS]
 \index{NDPROGS} \hfill
 \xref{SUN/19}{sun19}{}
 
@@ -1826,12 +1580,12 @@ accessibility of the package.
 
 \label{item_PERIOD}
 \item
-[\htmladdnormallink{PERIOD}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#PERIOD}]
+[PERIOD]
 \index{PERIOD} \hfill
 \xref{SUN/167}{sun167}{}.
 \xref{SSN/25}{ssn25}{}
 
-{\bf Search for periodicities in data.}
+\textbf{Search for periodicities in data.}
 
 It is menu-driven.
 You can:
@@ -1885,7 +1639,7 @@ In PERIOD, the Fisher randomisation method, one of the best, is employed.
 
 \label{item_POLMAP}
 \item
-[\htmladdnormallink{POLMAP}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#POLMAP}]
+[POLMAP]
 \index{POLMAP} \hfill
 \xref{SUN/204}{sun204}{}
 
@@ -1913,7 +1667,7 @@ read and write TSP polarization spectrum format files.
 
 \label{item_POLPACK}
 \item
-[\htmladdnormallink{POLPACK}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#POLPACK}]
+[POLPACK]
 \index{POLPACK} \hfill
 \xref{SUN/223}{sun223}{}
 
@@ -1952,7 +1706,7 @@ and require a specific set of analyser positions to be used.
 
 \label{item_TSP}
 \item
-[\htmladdnormallink{TSP}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#TSP}]
+[TSP]
 \index{TSP} \hfill
 \xref{SUN/66}{sun66}{}
 
@@ -2009,7 +1763,7 @@ photometry package at the AAT.
 
 \label{item_CATPAC}
 \item
-[\htmladdnormallink{CATPAC}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#CATPAC}]
+[CATPAC]
 \index{CATPAC} \hfill
 \xref{SUN/120}{sun120}{}
 
@@ -2033,7 +1787,7 @@ CATPAC was designed as a replacement for SCA but is being superseded by
 
 \label{item_CURSA}
 \item
-[\htmladdnormallink{CURSA}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#CURSA}]
+[CURSA]
 \index{CURSA} \hfill
 \xref{SUN/190}{sun190}{}
 
@@ -2082,7 +1836,7 @@ Catalogues in the STL format are simple Ascii text files.
 
 \label{item_ASTERIX}
 \item
-[\htmladdnormallink{ASTERIX}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#ASTERIX}]
+[ASTERIX]
 \index{ASTERIX} \hfill
 \xref{SUN/98}{sun98}{}.
 MUD/4
@@ -2098,8 +1852,8 @@ program.  It may remain as a legacy package at UK Starlink sites.
 Continued `best efforts' support may be provided by the Space Research
 group at the University of Birmingham for the recent development
 version.  This may be found on the \htmladdnormallink{Asterix
-Home Page}{http://www.sr.bham.ac.uk/asterix/} \latex{(see
-\texttt{http://www.sr.bham.ac.uk/asterix/})}.  No support will be provided
+Home Page}{http://www.sr.bham.ac.uk/asterix/} (see
+\url{http://www.sr.bham.ac.uk/asterix/}).  No support will be provided
 for the Starlink version.  \normalfont
 
 Many of its programs are general purpose and are capable of analysing
@@ -2145,7 +1899,7 @@ The commands may be classified as follows:
 
 \label{item_SPECX}
 \item
-[\htmladdnormallink{SPECX}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#SPECX}]
+[SPECX]
 \index{SPECX} \hfill
 \xref{SUN/17}{sun17}{}.
 MUD/69,70
@@ -2220,7 +1974,7 @@ and write spectra and maps to Ascii files for input into other packages.
 
 \label{item_CGS4DR}
 \item
-[\htmladdnormallink{CGS4DR}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#CGS4DR}]
+[CGS4DR]
 \index{CGS4DR} \hfill
 \xref{SUN/27}{sun27}{}
 
@@ -2254,11 +2008,11 @@ It can:
 \begin{itemize}
 \item Allow a wide variety of data reduction configurations.
 \item Interlace oversampled data frames.
-\item Reduce known {\sc bias}, {\sc dark}, {\sc flat}, {\sc arc}, {\sc object}
-and {\sc sky} frames.
-\item Wavelength calibrate via suitable {\sc arc} lines.
-\item Flux calibrate via a suitable {\sc standard}.
-\item Remove the {\sc sky}, residual sky OH-lines ($\lambda <$ 2.3 $\mu$m)
+\item Reduce known \textsc{bias}, \textsc{dark}, \textsc{flat}, \textsc{arc}, \textsc{object}
+and \textsc{sky} frames.
+\item Wavelength calibrate via suitable \textsc{arc} lines.
+\item Flux calibrate via a suitable \textsc{standard}.
+\item Remove the \textsc{sky}, residual sky OH-lines ($\lambda <$ 2.3 $\mu$m)
   and thermal emission ($\lambda \geq$ 2.3 $\mu$m) from data.
 \item Add data into groups for improved signal-to-noise.
 \item Extract and de-ripple a spectrum.
@@ -2269,11 +2023,11 @@ and {\sc sky} frames.
 
 \label{item_FLUXES}
 \item
-[\htmladdnormallink{FLUXES}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#FLUXES}]
+[FLUXES]
 \index{FLUXES} \hfill
 \xref{SUN/213}{sun213}{}
 
-{\bf Calculate accurate topocentric positions of the planets, and also
+\textbf{Calculate accurate topocentric positions of the planets, and also
 integrated flux densities of five of them at a number of wavelengths, for the
 \htmladdnormallink{JCMT telescope}{http://www.jach.hawaii.edu/JCMT/home.html}
 on Mauna Kea, Hawaii.}
@@ -2301,7 +2055,7 @@ planets.
 
 \label{item_IRAS90}
 \item
-[\htmladdnormallink{IRAS90}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#IRAS90}]
+[IRAS90]
 \index{IRAS90} \hfill
 \xref{SUN/82}{sun82}{},
 \xref{161}{sun161}{},
@@ -2336,7 +2090,7 @@ search for and examine an object at a given position.
 
 \label{item_IRCAMDR}
 \item
-[\htmladdnormallink{IRCAMDR}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#IRCAMDR}]
+[IRCAMDR]
 \index{IRCAMDR} \hfill
 \xref{SUN/41}{sun41}{}
 
@@ -2371,7 +2125,7 @@ pixel removal.
 
 \label{item_IRCAMPACK}
 \item
-[\htmladdnormallink{IRCAMPACK}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#IRCAMPACK}]
+[IRCAMPACK]
 \index{IRCAMPACK} \hfill
 \xref{SUN/177}{sun177}{}
 
@@ -2394,7 +2148,7 @@ IRCAM data files.
 
 \label{item_IUEDR}
 \item
-[\htmladdnormallink{IUEDR}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#IUEDR}]
+[IUEDR]
 \index{IUEDR} \hfill
 \xref{SG/3}{sg3}{},
 \xref{7}{sg7}{}.
@@ -2454,7 +2208,7 @@ by TRAK.
 
 \label{item_JCMTDR}
 \item
-[\htmladdnormallink{JCMTDR}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#JCMTDR}]
+[JCMTDR]
 \index{JCMTDR} \hfill
 \xref{SC/1}{sc1}{}.
 \xref{SUN/132}{sun132}{}
@@ -2493,7 +2247,7 @@ structure will be inaccessible.
 
 \label{item_REPACK}
 \item
-[\htmladdnormallink{REPACK}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#REPACK}]
+[REPACK]
 \index{REPACK} \hfill
 \xref{SUN/208}{sun208}{}
 
@@ -2530,7 +2284,7 @@ datasets such as images and light-curves.
 
 \label{item_SURF}
 \item
-[\htmladdnormallink{SURF}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#SURF}]
+[SURF]
 \index{SURF} \hfill
 \xref{SC/10}{sc10}{},
 \xref{11}{sc11}{}.
@@ -2557,7 +2311,7 @@ The facilities provided by SURF include:
 
 \label{item_WFCPACK}
 \item
-[\htmladdnormallink{WFCPACK}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#WFCPACK}]
+[WFCPACK]
 \index{WFCPACK} \hfill
 \xref{SUN/62}{sun62}{}
 
@@ -2582,7 +2336,7 @@ operations, such as extracting background subtracted lightcurves.
 
 \label{item_XRT}
 \item
-[\htmladdnormallink{XRT}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#XRT}]
+[XRT]
 \index{XRT} \hfill
 % \xref{SUN/NNN}{sunNNN}{}
 
@@ -2616,7 +2370,7 @@ so that some of the tools used in examples may be no longer available.
 
 \label{item_CONVERT}
 \item
-[\htmladdnormallink{CONVERT}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#CONVERT}]
+[CONVERT]
 \index{CONVERT} \hfill
 \xref{SUN/55}{sun55}{}
 
@@ -2661,7 +2415,7 @@ The following formats can only be handled by the VMS version:
 \item [\htmlref{ASURV}{item_ASURV}]
 --- Astronomical survival statistics
 \item [\htmlref{MAPLE}{item_MAPLE}]
---- Mathematical manipulation \hfill {\em Not distributed}
+--- Mathematical manipulation \hfill \emph{Not distributed}
 \end{description}
 \end{description}
 \rule{\textwidth}{0.5mm}
@@ -2670,12 +2424,12 @@ The following formats can only be handled by the VMS version:
 
 \label{item_ASURV}
 \item
-[\htmladdnormallink{ASURV}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#ASURV}]
+[ASURV]
 \index{ASURV} \hfill
 \xref{SUN/13}{sun13}{}.
 MUD/5,6
 
-{\bf Analyse statistically astronomical data with upper limits.}
+\textbf{Analyse statistically astronomical data with upper limits.}
 
 Observational astronomers frequently encounter the situation where they
 observe a particular property of a previously defined sample of objects,
@@ -2700,13 +2454,13 @@ assumptions.
 
 \label{item_MAPLE}
 \item
-[\htmladdnormallink{MAPLE}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#MAPLE}]
+[MAPLE]
 \index{MAPLE} \hfill
 \xref{SUN/107}{sun107}{}.
 \xref{SGP/47}{sgp47}{}.
 MUD/52,137-139,144,145
 
-{\bf Interactive symbolic algebra computation.}
+\textbf{Interactive symbolic algebra computation.}
 
 It can perform hundreds of algebraic functions for use at all mathematical
 levels, and can provide solutions to many types of problem:
@@ -2744,7 +2498,7 @@ It is marketed by WATCOM, Waterloo, Ontario, CANADA.
 \item[\mbox{}]\mbox{}
 \begin{description}
 \item [\htmlref{MONGO}{item_MONGO}]
---- Interactive data plotting \hfill {\em Not distributed}
+--- Interactive data plotting \hfill \emph{Not distributed}
 \item [\htmlref{PONGO}{item_PONGO}]
 --- Interactive data plotting
 \item [\htmlref{SM}{item_SM}] --- Interactive data plotting
@@ -2756,12 +2510,12 @@ It is marketed by WATCOM, Waterloo, Ontario, CANADA.
 
 \label{item_MONGO}
 \item
-[\htmladdnormallink{MONGO}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#MONGO}]
+[MONGO]
 \index{MONGO} \hfill
 \xref{SUN/64}{sun64}{}.
 MUD/54
 
-{\bf Plot data interactively.}
+\textbf{Plot data interactively.}
 
 You can build up a complicated diagram, including graphics, text, axes, and
 so on, and then create publishable quality output.
@@ -2770,11 +2524,11 @@ In general, it has been superseded by
 
 \label{item_PONGO}
 \item
-[\htmladdnormallink{PONGO}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#PONGO}]
+[PONGO]
 \index{PONGO} \hfill
 \xref{SUN/137}{sun137}{}
 
-{\bf Plot data interactively.}
+\textbf{Plot data interactively.}
 
 It is like
 \htmlref{MONGO}{item_MONGO}, but uses
@@ -2815,10 +2569,10 @@ The PONGO package may be run from the IRAF CL.
 
 \label{item_SM}
 \item
-[\htmladdnormallink{SM}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#SM}]
+[SM]
 \index{SM} \hfill MUD/159,160
 
-{\bf Draw graphs and plots interactively.}
+\textbf{Draw graphs and plots interactively.}
 
 It has some image handling capability, but works mostly with vectors.
 It can:
@@ -2878,11 +2632,11 @@ a plot routine for reuse.
 
 \label{item_ASTROM}
 \item
-[\htmladdnormallink{ASTROM}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#ASTROM}]
+[ASTROM]
 \index{ASTROM} \hfill
 \xref{SUN/5}{sun5}{}
 
-{\bf Basic astrometry -- simple plate reduction.}
+\textbf{Basic astrometry -- simple plate reduction.}
 
 It is designed to allow the non-specialist
 to get good results with a minimum of trouble and esoteric knowledge.
@@ -2892,7 +2646,7 @@ coordinate transformation and fitting operations required, displays a synopsis
 report on your terminal, and prepares a detailed report for printing.
 
 \label{item_AUTOASTROM}
-\item [\htmladdnormallink{AUTOASTROM}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#AUTOASTROM}]
+[AUTOASTROM]
 \index{AUTOASTROM} \hfill
 \xref{SUN/251}{sun251}{}
 
@@ -2938,7 +2692,7 @@ astrometric facilities of ASTROM, autoastrom will:
 \end{itemize}
 \label{item_CHART}
 \item
-[\htmladdnormallink{CHART}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#CHART}]
+[CHART]
 \index{CHART} \hfill
 \xref{SUN/32}{sun32}{}
 
@@ -2975,11 +2729,11 @@ within CHART if necessary.
 
 \label{item_COCO}
 \item
-[\htmladdnormallink{COCO}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#COCO}]
+[COCO]
 \index{COCO} \hfill
 \xref{SUN/56}{sun56}{}
 
-{\bf Convert star coordinates from one system to another.}
+\textbf{Convert star coordinates from one system to another.}
 
 Both the improved IAU system, post-1976, and the old pre-1976 system are
 supported.
@@ -3012,11 +2766,11 @@ conversion can be done using COCO.
 
 \label{item_ECHWIND}
 \item
-[\htmladdnormallink{ECHWIND}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#ECHWIND}]
+[ECHWIND]
 \index{ECHWIND} \hfill
 \xref{SUN/53}{sun53}{}
 
-{\bf Plan observations with either the Utrecht \'{e}chelle spectrograph
+\textbf{Plan observations with either the Utrecht \'{e}chelle spectrograph
 (UES) or the UCL coud\'{e} \'{e}chelle spectrograph (UCLES).}
 
 It can be run at your home institution, when preparing an observing
@@ -3039,7 +2793,7 @@ of observations where multiple overlapping wavelength ranges are required.
 You can also save the current detector position in a text file.
 
 \label{item_FINDCOORDS}
-\item [\htmladdnormallink{FINDCOORDS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#FINDCOORDS}]
+[FINDCOORDS]
 \index{FINDCOORDS} \hfill
 \xref{SUN/240}{sun240}{}
 
@@ -3050,17 +2804,17 @@ look up its equatorial coordinates.  You simply enter the name of the object
 and its coordinates are displayed.  Type:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 findcoords  object-name
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 For example:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 findcoords  ngc3379
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 If the name is recognised then the equatorial coordinates of the object will
@@ -3077,7 +2831,7 @@ though the latter's dictionary of names is very extensive.
 
 \label{item_HDSTOOLS}
 \item
-[\htmladdnormallink{HDSTOOLS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#HDSTOOLS}]
+[HDSTOOLS]
 \index{HDSTOOLS} \hfill
 \xref{SUN/245}{sun245}{}
 
@@ -3109,11 +2863,11 @@ The following tools are available:
 \end{itemize}
 \label{item_HDSTRACE}
 \item
-[\htmladdnormallink{HDSTRACE}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#HDSTRACE}]
+[HDSTRACE]
 \index{HDSTRACE} \hfill
 \xref{SUN/102}{sun102}{}
 
-{\bf List the contents of an HDS data structure.}
+\textbf{List the contents of an HDS data structure.}
 
 The Hierarchical Data System
 (\htmlref{HDS}{item_HDS})
@@ -3123,7 +2877,7 @@ in a single file, but in a structured fashion.
 
 \label{item_NAOS}
 \item
-[\htmladdnormallink{NAOS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#NAOS}]
+[NAOS]
 \index{NAOS} \hfill
 \xref{SUN/235}{sun235}{}
 
@@ -3141,11 +2895,11 @@ your home institution prior to travelling to La Palma to observe with NAOMI.
 
 \label{item_OBSERVE}
 \item
-[\htmladdnormallink{OBSERVE}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#OBSERVE}]
+[OBSERVE]
 \index{OBSERVE} \hfill
 \xref{SUN/146}{sun146}{}
 
-{\bf Show the observability of a star through the year from a given geographical
+\textbf{Show the observability of a star through the year from a given geographical
 location.}
 
 It generates a plot that shows, for a complete year the:
@@ -3159,11 +2913,11 @@ It generates a plot that shows, for a complete year the:
 
 \label{item_RV}
 \item
-[\htmladdnormallink{RV}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#RV}]
+[RV]
 \index{RV} \hfill
 \xref{SUN/78}{sun78}{}
 
-{\bf List the components, in a given direction, of the observer's velocity on a
+\textbf{List the components, in a given direction, of the observer's velocity on a
 given date.}
 
 This allows an observed radial velocity to be referred to an appropriate
@@ -3185,21 +2939,21 @@ later printing.
 
 \label{item_SKYCAL}
 \item
-[\htmladdnormallink{SKYCAL}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#SKYCAL}]
+[SKYCAL]
 \index{SKYCAL} \hfill
 \xref{SUN/187}{sun187}{}.
 MUD/158
 
-{\bf Almanac and calculator -- interactive.}
+\textbf{Almanac and calculator -- interactive.}
 
 This consists of two programs:
 
 \begin{itemize}
-\item {\bf SKYCALC} \index{SKYCAL!SKYCALC} -- an `Interactive Almanac.'
+\item \textbf{SKYCALC} \index{SKYCAL!SKYCALC} -- an `Interactive Almanac.'
 It helps you plan and execute observing runs, and allows easy calculation of
 airmasses, twilight, lunar interference, coordinate transformations and such
 -- nearly everything except the weather.
-\item {\bf SKYCALENDAR} \index{SKYCAL!SKYCALENDAR} \index{SKYCALENDAR} --
+\item \textbf{SKYCALENDAR} \index{SKYCAL!SKYCALENDAR} \index{SKYCALENDAR} --
 a `Nighttime Astronomical Calendar' to calculate and print astronomical
 calendars.
 \end{itemize}
@@ -3249,7 +3003,7 @@ You can also specify your own.
 
 \label{item_DOCFIND}
 \item
-[\htmladdnormallink{DOCFIND}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#DOCFIND}]
+[DOCFIND]
 \index{DOCFIND} \hfill
 \xref{SUN/38}{sun38}{}
 
@@ -3267,7 +3021,7 @@ utility.
 
 \label{item_EMAIL}
 \item
-[\htmladdnormallink{EMAIL}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#EMAIL}]
+[EMAIL]
 \index{EMAIL} \hfill
 \xref{SUN/182}{sun182}{}
 
@@ -3278,12 +3032,12 @@ Guide for usernames and sitenames.
 
 \label{item_FORUM}
 \item
-[\htmladdnormallink{FORUM}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#FORUM}]
+[FORUM]
 \index{FORUM} \hfill
 \xref{SUN/205}{sun205}{}.
 \xref{SSN/33}{ssn33}{}
 
-{\bf Starlink's conferencing software.}
+\textbf{Starlink's conferencing software.}
 
 It is based on the World Wide Web and provides similar capabilities under Unix
 to those provided by the DEC product VAXnotes under VMS.
@@ -3300,7 +3054,7 @@ FORUM.
 
 \label{item_JRE}
 \item
-[\htmladdnormallink{JRE}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#JRE}]
+[JRE]
 \index{JRE} \hfill
 % \xref{SUN/NNN}{sunNNN}{}
 
@@ -3314,17 +3068,17 @@ Java tools.
 
 \label{item_NEWS}
 \item
-[\htmladdnormallink{NEWS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#NEWS}]
+[NEWS]
 \index{NEWS} \hfill
 \xref{SUN/195}{sun195}{}
 
-{\bf Starlink's News service.}
+\textbf{Starlink's News service.}
 
-Just type {\tt news} and follow the instructions.
+Just type \texttt{news} and follow the instructions.
 
 \label{item_PERL}
 \item
-[\htmladdnormallink{PERL}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#PERL}]
+[PERL]
 \index{PERL} \hfill
 \xref{SUN/193}{sun193}{}
 
@@ -3339,7 +3093,7 @@ and \emph{Programming perl}\/ are two of these books.  Chapter 39 of
 
 \label{item_PERLMODS}
 \item
-[\htmladdnormallink{PERLMODS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#PERLMODS}]
+[PERLMODS]
 \index{PERLMODS} \hfill
 \xref{SUN/193}{sun193}{}
 
@@ -3353,30 +3107,30 @@ needed by the \htmlref{STARPERL}{item_STARPERL} modules and by the
 
 \label{item_PINE}
 \item
-[\htmladdnormallink{PINE}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#PINE}]
+[PINE]
 \index{PINE} \hfill
 \xref{SUN/169}{sun169}{},
 \xref{170}{sun170}{}.
 MUD/141
 
-{\bf Read e-mail.}
+\textbf{Read e-mail.}
 
-Just type {\tt pine} to start it.
+Just type \texttt{pine} to start it.
 A lot of on-line help is available.
 
 \label{item_STARADMIN}
 \item
-[\htmladdnormallink{STARADMIN}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#STARADMIN}]
+[STARADMIN]
 \index{STARADMIN} \hfill
 \xref{SSN/27}{ssn27}{}
 
-{\bf Build and maintain a database of Starlink users.}
+\textbf{Build and maintain a database of Starlink users.}
 
 Used by Starlink Site Managers to manage their user lists.
 
 \label{item_STARPERL}
 \item
-[\htmladdnormallink{STARPERL}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#STARPERL}]
+[STARPERL]
 \index{STARPERL} \hfill
 \index{NDFPERL}
 \index{STARPERL!NDFPERL} \hfill
@@ -3390,11 +3144,11 @@ facilities such as NDF access (NDFPERL).
 
 \label{item_XDISPLAY}
 \item
-[\htmladdnormallink{XDISPLAY}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#XDISPLAY}]
+[XDISPLAY]
 \index{XDISPLAY} \hfill
 \xref{SUN/129}{sun129}{}
 
-{\bf Get output from an X-client to display on the screen
+\textbf{Get output from an X-client to display on the screen
 of your X-terminal.}
 
 In other words, it provides an easy way to use remote X windows.
@@ -3440,7 +3194,7 @@ In other words, it provides an easy way to use remote X windows.
 
 \label{item_A2PS}
 \item
-[\htmladdnormallink{A2PS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#A2PS}]
+[A2PS]
 \index{A2PS} \hfill
 \xref{SUN/184}{sun184}{}
 
@@ -3451,13 +3205,13 @@ This gives a nicer looking output.
 
 \label{item_EMACS}
 \item
-[\htmladdnormallink{EMACS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#EMACS}]
+[EMACS]
 \index{EMACS} \hfill
 \xref{SUN/34}{sun34}{},
 \xref{170}{sun170}{}.
 MUD/102
 
-{\bf A powerful text editor with many advanced customizable features.}
+\textbf{A powerful text editor with many advanced customizable features.}
 
 It is fairly easy to make it emulate
 EDT\index{EDT}\index{EMACS!EDT} and
@@ -3466,11 +3220,11 @@ This makes it convenient for users familiar with these VAX/VMS editors.
 
 \label{item_GHOSTSCRIPT}
 \item
-[\htmladdnormallink{GHOSTSCRIPT}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#GHOSTSCRIPT}]
+[GHOSTSCRIPT]
 \index{HTX} \hfill
 \xref{SUN/197}{sun197}{}
 
-{\bf PostScript interpreter.}
+\textbf{PostScript interpreter.}
 
 This provides:
 \begin{itemize}
@@ -3481,34 +3235,34 @@ appear as primitive operations in the PostScript language.
 
 \label{item_HTX}
 \item
-[\htmladdnormallink{HTX}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#HTX}]
+[HTX]
 \index{HTX} \hfill
 \xref{SUN/188}{sun188}{}
 
-{\bf Hypertext cross-reference utilities.}
+\textbf{Hypertext cross-reference utilities.}
 
 These are used to maintain large sets of documents which use
 HTML,\index{HTX!HTML} the Hypertext Markup Language.
 They can also form the basis for hypertext help systems for other software.
 There are three components:
 \begin{itemize}
-\item {\bf hlink} -- a hypertext linker.\index{HTX!hlink}
+\item \textbf{hlink} -- a hypertext linker.\index{HTX!hlink}
 This establishes hypertext links between documents which use HTML, and maintains
 the integrity of these links when the documents are changed.
-\item {\bf findme} -- searches for documents by keyword and displays a list of
+\item \textbf{findme} -- searches for documents by keyword and displays a list of
 those found.\index{findme} \index{HTX!findme}
-\item {\bf showme} -- displays a specified part of a document using a web
+\item \textbf{showme} -- displays a specified part of a document using a web
 browser.
 \index{showme} \index{HTX!showme}
 \end{itemize}
 
 \label{item_ISPELL}
 \item
-[\htmladdnormallink{ISPELL}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#ISPELL}]
+[ISPELL]
 \index{ISPELL} \hfill
 \xref{SUN/189}{sun189}{}
 
-{\bf Check spelling.}
+\textbf{Check spelling.}
 
 A screen-oriented spell-checker that shows spelling errors in the context
 of the original file, and suggests possible corrections when it can figure
@@ -3517,12 +3271,12 @@ them out.
 \newpage
 \label{item_JED}
 \item
-[\htmladdnormallink{JED}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#JED}]
+[JED]
 \index{JED} \hfill
 \xref{SUN/168}{sun168}{},
 \xref{170}{sun170}{}
 
-{\bf Edit text.}
+\textbf{Edit text.}
 
 A text editor which provides a reasonably good emulation of
 EDT\index{EDT}\index{JED!EDT},
@@ -3531,7 +3285,7 @@ regions, unlimited undo, horizontal scroll, and display of two or more windows.
 
 \label{item_LATEX2HTML}
 \item
-[\htmladdnormallink{LATEX2HTML}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#LATEX2HTML}]
+[LATEX2HTML]
 \index{LATEX2HTML} \hfill
 \xref{SUN/201}{sun201}{}.
 MUD/152
@@ -3545,11 +3299,11 @@ Processes \LaTeX\ source files into a set of Hypertext Markup Language
 
 \label{item_NUTPU}
 \item
-[\htmladdnormallink{NUTPU}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#NUTPU}]
+[NUTPU]
 \index{NUTPU} \hfill
 \xref{SUN/192}{sun192}{}
 
-{\bf Process text.}
+\textbf{Process text.}
 
 A fully programmable text processing utility.
 It can build new text processors and batch-oriented text manipulation
@@ -3559,11 +3313,11 @@ EDT\index{EDT}\index{NUTPU!EDT}.
 
 \label{item_PSMERGE}
 \item
-[\htmladdnormallink{PSMERGE}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#PSMERGE}]
+[PSMERGE]
 \index{PSMERGE} \hfill
 \xref{SUN/164}{sun164}{}
 
-{\bf Merge PostScript files.}
+\textbf{Merge PostScript files.}
 
 Merges one or more EPSFs into a single PostScript file.
 An EPSF (Encapsulated PostScript File) is a PostScript file structured so that
@@ -3581,8 +3335,9 @@ This allows:
 \item Pictures to be scaled before insertion into a \TeX\ document.
 \end{itemize}
 
+\label{item_STAR2HTML}
 \item
-[\htmladdnormallink{STAR2HTML}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#STAR2HTML}]
+[STAR2HTML]
 \index{STAR2HTML} \hfill
 \xref{SUN/199}{sun199}{}.
 
@@ -3607,20 +3362,20 @@ collection.
 
 \label{item_TEX}
 \item
-[\htmladdnormallink{TEX}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#TEX}]
+[TEX]
 \index{TEX}\index{LATEX}\index{TEX!LATEX} \hfill
 \xref{SUN/9}{sun9}{},\xref{12}{sun12}{},\xref{93}{sun93}{}.
 MUD/48-51,72-3,79,80,126,132-3,152.
 \xref{SSN/24}{ssn24}{}
 
-{\bf Produce high quality text and diagrams by type-setting.}
+\textbf{Produce high quality text and diagrams by type-setting.}
 
 \LaTeX\ is a document preparation system based on \TeX, but easier to use.
 The current versions are \TeX\ v3.1415 and \LaTeX2e\ (Dec 1994).
 The final output is usually produced by a laser printer.
 
 Starlink recommends that you create your documents using \LaTeX2e\ with formats
-based on skeleton files such as {\tt /star/docs/sun.tex.}
+based on skeleton files such as \texttt{/star/docs/sun.tex.}
 
 \xref{SUN/12}{sun12}{}
 is a cookbook showing how to generate common kinds of format using
@@ -3661,19 +3416,19 @@ give advice on how to produce documents in a suitable style for Starlink.
 
 \label{item_FTNCHEK}
 \item
-[\htmladdnormallink{FTNCHEK}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#FTNCHEK}]
+[FTNCHEK]
 \index{FTNCHEK} \hfill
 \xref{SUN/172}{sun172}{}.
 MUD/153
 
-{\bf Detect errors in Fortran 77 source code, especially mistakes that tend to
+\textbf{Detect errors in Fortran 77 source code, especially mistakes that tend to
 be missed by compilers and linkers.}
 
 Probably its most valuable feature is the careful checks it performs on
 subprogram interfaces.
-It examines the actual arguments in each {\tt CALL} statement (or {\tt FUNCTION}
+It examines the actual arguments in each \texttt{CALL} statement (or \texttt{FUNCTION}
 call) and compares them with the corresponding formal arguments of the
-{\tt SUBROUTINE} (or {\tt FUNCTION}) subprogram.
+\texttt{SUBROUTINE} (or \texttt{FUNCTION}) subprogram.
 It warns of mismatches in the number of arguments, and incompatibilities in
 the data type and dimensions of each one.
 It also checks that arguments used before being set in a subprogram have
@@ -3682,31 +3437,31 @@ when their values are used later in the calling program.
 
 \label{item_GCC}
 \item
-[\htmladdnormallink{GCC}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#GCC}]
+[GCC]
 \index{GCC}\hfill \mbox{}
 
-{\bf The GNU C compiler.}
+\textbf{The GNU C compiler.}
 
 \label{item_GENERIC}
 \item
-[\htmladdnormallink{GENERIC}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#GENERIC}]
+[GENERIC]
 \index{GENERIC} \hfill
 \xref{SUN/7}{sun7}{}
 
-{\bf Support generic subroutines.}
+\textbf{Support generic subroutines.}
 
-Preprocesses a {\it generic}\/ Fortran subroutine -- one written to cover
+Preprocesses a \textit{generic}\/ Fortran subroutine -- one written to cover
 several different data types -- into one routine per data type, and
 concatenates these routines into a file.
 The file is then compiled by the Fortran compiler to produce an object module.
 
 \label{item_MESSGEN}
 \item
-[\htmladdnormallink{MESSGEN}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#MESSGEN}]
+[MESSGEN]
 \index{MESSGEN} \hfill
 \xref{SUN/185}{sun185}{}
 
-{\bf Associate error messages with status values returned by Starlink
+\textbf{Associate error messages with status values returned by Starlink
 infrastructure routines.}
 
 This works in conjunction with the Starlink Error Message Service
@@ -3715,7 +3470,7 @@ It enables more informative error messages to be sent to the user.
 
 \label{item_SPAG}
 \item
-[\htmladdnormallink{SPAG}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#SPAG}]
+[SPAG]
 \index{SPAG} \hfill
 \xref{SUN/63}{sun63}{}.
 MUD/127
@@ -3737,32 +3492,32 @@ Fortran code.  It is marketed by Polyhedron Software.
 
 \label{item_SPT}
 \item
-[\htmladdnormallink{SPT}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#SPT}]
+[SPT]
 \index{SPT} \hfill
 \xref{SUN/111}{sun111}{}
 
-{\bf Software porting tools.}
+\textbf{Software porting tools.}
 
 A set of tools to convert code between operating systems
 (principally between VMS and Unix, and between different flavours of Unix).
 They:
 \begin{itemize}
-\item Convert file name specifications in Fortran {\tt INCLUDE} statements and
+\item Convert file name specifications in Fortran \texttt{INCLUDE} statements and
 `escape' backslash characters.
 The output file on VMS is in Stream\_lf format so it can be read on Unix
 systems using NFS.
 \item Manage the creation and removal of soft links on Unix systems.
-Generally, these will point to Fortran {\tt INCLUDE} files, thereby providing a
-machine-independent way of writing {\tt INCLUDE} statements.
+Generally, these will point to Fortran \texttt{INCLUDE} files, thereby providing a
+machine-independent way of writing \texttt{INCLUDE} statements.
 \end{itemize}
 
 \label{item_STARX}
 \item
-[\htmladdnormallink{STARX}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#STARX}]
+[STARX]
 \index{STARX} \hfill
 \xref{SSN/21}{ssn21}{}
 
-{\bf Link X libraries.}
+\textbf{Link X libraries.}
 
 A Starlink environment package that provides a system-independent method of
 linking with X libraries.
@@ -3802,11 +3557,11 @@ changing any of the other Starlink environment components.
 
 \label{item_JPL}
 \item
-[\htmladdnormallink{JPL}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#JPL}]
+[JPL]
 \index{JPL} \hfill
 \xref{SUN/87}{sun87}{}
 
-{\bf Provide extremely accurate position and velocity data for any of the nine
+\textbf{Provide extremely accurate position and velocity data for any of the nine
 planets, the Moon, and the solar system and Earth-Moon barycentres (also
 nutation components) for any given epoch in the range of the ephemeris
 (1960 to 2025).}
@@ -3829,7 +3584,7 @@ with the new format of ephemeris file.
 
 \label{item_MEMSYS}
 \item
-[\htmladdnormallink{MEMSYS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#MEMSYS}]
+[MEMSYS]
 \index{MEMSYS} \hfill
 \xref{SUN/117}{sun117}{}.
 MUD/53
@@ -3914,7 +3669,7 @@ accepting certain conditions.
 
 \label{item_NAG}
 \item
-[\htmladdnormallink{NAG}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#NAG}]
+[NAG]
 \index{NAG} \hfill
 \xref{SUN/28}{sun28}{},
 \xref{29}{sun29}{}.
@@ -3985,11 +3740,11 @@ The standard library organises its routines into the following chapters:
 
 \label{item_PDA}
 \item
-[\htmladdnormallink{PDA}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#PDA}]
+[PDA]
 \index{PDA} \hfill
 \xref{SUN/194}{sun194}{}
 
-{\bf Mathematical subroutine library.}
+\textbf{Mathematical subroutine library.}
 
 This is intended to replace the
 \htmlref{NAG}{item_NAG}
@@ -4001,7 +3756,7 @@ DIERCKX exist only for single precision.
 
 \label{item_SLALIB}
 \item
-[\htmladdnormallink{SLALIB}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#SLALIB}]
+[SLALIB]
 \index{SLALIB} \hfill
 \xref{SUN/67}{sun67}{}
 
@@ -4121,7 +3876,7 @@ stops, I/O, etc.
 
 \label{item_ARD}
 \item
-[\htmladdnormallink{ARD}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#ARD}]
+[ARD]
 \index{ARD} \hfill
 \xref{SUN/183}{sun183}{}
 
@@ -4139,7 +3894,7 @@ Data arrays can be multi-dimensional.
 
 \label{item_ARY}
 \item
-[\htmladdnormallink{ARY}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#ARY}]
+[ARY]
 \index{ARY} \hfill
 \xref{SUN/11}{sun11}{}
 
@@ -4174,7 +3929,7 @@ It can:
 
 \label{item_AST}
 \item
-[\htmladdnormallink{AST}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#AST}]
+[AST]
 \index{AST} \hfill
 \xref{SUN/210}{sun210}{},\xref{SUN/211}{sun211}{}
 
@@ -4191,11 +3946,11 @@ environment-independent.
 
 \label{item_CAT}
 \item
-[\htmladdnormallink{CAT}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#CAT}]
+[CAT]
 \index{CAT} \hfill
 \xref{SUN/181}{sun181}{}
 
-{\bf Create, read, and write astronomical catalogues and similar tabular
+\textbf{Create, read, and write astronomical catalogues and similar tabular
 datasets.}
 
 It supports the following formats:
@@ -4208,12 +3963,12 @@ It supports the following formats:
 
 \label{item_CFITSIO}
 \item
-[\htmladdnormallink{CFITSIO}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#CFITSIO}]
+[CFITSIO]
 \index{CFITSIO} \hfill
 \xref{SUN/227}{sun227}{}.
 MUD/166,167
 
-{\bf Access FITS format files on disk.}
+\textbf{Access FITS format files on disk.}
 
 This new library provides both a C implementation of a FITS i/o library
 and a Fortran wrapper for it.  Thus one can use it from C or Fortran as
@@ -4227,11 +3982,11 @@ to FITS files.
 
 \label{item_FIO}
 \item
-[\htmladdnormallink{FIO}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#FIO}]
+[FIO]
 \index{FIO} \hfill
 \xref{SUN/143}{sun143}{}
 
-{\bf Access sequential and direct-access data files in a machine-independent
+\textbf{Access sequential and direct-access data files in a machine-independent
 way.}
 
 It consists of stand alone
@@ -4242,7 +3997,7 @@ parameter system.
 
 \label{item_FITSIO}
 \item
-[\htmladdnormallink{FITSIO}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#FITSIO}]
+[FITSIO]
 \index{FITSIO} \hfill
 \xref{SUN/136}{sun136}{}.
 MUD/16,162
@@ -4257,11 +4012,11 @@ Users requiring a library for FITS access are recommended to use the
 
 \label{item_GRP}
 \item
-[\htmladdnormallink{GRP}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#GRP}]
+[GRP]
 \index{GRP} \hfill
 \xref{SUN/150}{sun150}{}
 
-{\bf Handle groups of objects which can be described by character strings.}
+\textbf{Handle groups of objects which can be described by character strings.}
 
 These objects can be things like file names, astronomical objects, numerical
 values, etc.
@@ -4272,7 +4027,7 @@ element in another group.
 
 \label{item_GSD}
 \item
-[\htmladdnormallink{GSD}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#GSD}]
+[GSD]
 \index{GSD} \hfill
 \xref{SUN/229}{sun229}{}
 
@@ -4287,7 +4042,7 @@ created by the heterodyne instruments used on the JCMT.
 
 \label{item_HDS}
 \item
-[\htmladdnormallink{HDS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#HDS}]
+[HDS]
 \index{HDS} \hfill
 \xref{SUN/31}{sun31}{},
 \xref{39}{sun39}{},
@@ -4295,13 +4050,13 @@ created by the heterodyne instruments used on the JCMT.
 \xref{102}{sun102}{}.
 \xref{SGP/38}{sgp38}{}
 
-{\bf Store and retrieve data flexibly.}
+\textbf{Store and retrieve data flexibly.}
 
 The Hierarchical Data System is the basic Starlink data system and is of great
 importance to the Project.
 Its most significant features are the following:
 \begin{itemize}
-\item It manipulates entities called {\em data objects}.
+\item It manipulates entities called \emph{data objects}.
  These can be scalars or arrays of up to seven dimensions.
 \item A data object has a tree-like shape whose components comprise other
  objects. The only restriction is that the leaves must be primitive data
@@ -4329,7 +4084,7 @@ for handling objects in the standard Starlink data format.
 \newpage
 \label{item_IMG}
 \item
-[\htmladdnormallink{IMG}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#IMG}]
+[IMG]
 \index{IMG} \hfill
 \xref{SUN/160}{sun160}{}
 
@@ -4346,11 +4101,11 @@ data formats, including FITS and IRAF files as well as Starlink NDF data.
 
 \label{item_MAG}
 \item
-[\htmladdnormallink{MAG}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#MAG}]
+[MAG]
 \index{MAG} \hfill
 \xref{SUN/171}{sun171}{}
 
-{\bf Handle magnetic tapes.}
+\textbf{Handle magnetic tapes.}
 
 Astronomical data on magnetic tapes can be in many formats.
 The MAG library allows you to write programs to read this data on any
@@ -4382,13 +4137,13 @@ Also, the status values returned by different machines can differ.
 
 \label{item_NBS}
 \item
-[\htmladdnormallink{NBS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#NBS}]
+[NBS]
 \index{NBS} \hfill
 \xref{SUN/77}{sun77}{}
 
-{\bf Share data between processes.}
+\textbf{Share data between processes.}
 
-NBS stands for {\em Noticeboard System}.
+NBS stands for \emph{Noticeboard System}.
 
 A given process may own many noticeboards and may access ones owned by others.
 Normally, the only process that writes to a noticeboard is its owner, but
@@ -4407,14 +4162,14 @@ noticeboard without knowing anything about what it contains.
 
 \label{item_NDF}
 \item
-[\htmladdnormallink{NDF}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#NDF}]
+[NDF]
 \index{NDF} \hfill
 \xref{SUN/33}{sun33}{}.
 \xref{SSN/20}{ssn20}{}
 
-{\bf Access data stored in NDF format.}
+\textbf{Access data stored in NDF format.}
 
-The {\em Extensible $n$-Dimensional Data Format}\/ is the standard
+The \emph{Extensible $n$-Dimensional Data Format}\/ is the standard
 Starlink format for $n$-d arrays of numbers, such as spectra, images,
 etc, and it forms the basis of most Starlink spectral and image-processing
 applications.
@@ -4444,9 +4199,9 @@ mutually compatible ways.
 systems whose detailed requirements vary considerably.
 \end{itemize}
 
-This problem has been solved by introducing the concept of {\em extensibility},
-and by dividing the data structure into two parts -- a set of {\em standard
-components}\/ and a set of {\em extensions}\/ -- each of which individually
+This problem has been solved by introducing the concept of \emph{extensibility},
+and by dividing the data structure into two parts -- a set of \emph{standard
+components}\/ and a set of \emph{extensions}\/ -- each of which individually
 satisfies one of the two requirements.
 The structure consists of a central `core' of information, whose
 interpretation is well-defined and for which general-purpose software can be
@@ -4459,7 +4214,7 @@ detailed discussion in
 
 \label{item_NDG}
 \item
-[\htmladdnormallink{NDG}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#NDG}]
+[NDG]
 \index{NDG} \hfill
 \xref{SUN/2}{sun2}{}
 
@@ -4474,14 +4229,14 @@ library uses (as described in \xref{SSN/20}{ssn20}{}).
 
 \label{item_PAR}
 \item
-[\htmladdnormallink{PAR}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#PAR}]
+[PAR]
 \index{PAR} \hfill
 \xref{SUN/114}{sun114}{}
 
-{\bf Parameter system.}
+\textbf{Parameter system.}
 
 A convenient way for programs to exchange information with the
-outside world through I/O channels called {\em parameters}.
+outside world through I/O channels called \emph{parameters}.
 These enable a user to control a program's behaviour.
 
 It supports numeric, character, and logical parameters, and is
@@ -4495,11 +4250,11 @@ Other facilities include setting a prompt string, and suggested defaults.
 \newpage
 \label{item_PRIMDAT}
 \item
-[\htmladdnormallink{PRIMDAT}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#PRIMDAT}]
+[PRIMDAT]
 \index{PRIMDAT} \hfill
 \xref{SUN/39}{sun39}{}
 
-{\bf Process primitive data.}
+\textbf{Process primitive data.}
 
 Does arithmetic, mathematical operations, type conversion, and inter-comparison
 of any of the primitive numerical data types supported by
@@ -4537,11 +4292,11 @@ recognised on input and are not explicitly generated on output).
 
 \label{item_REF}
 \item
-[\htmladdnormallink{REF}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#REF}]
+[REF]
 \index{REF} \hfill
 \xref{SUN/31}{sun31}{}
 
-{\bf Handle references to HDS objects.}
+\textbf{Handle references to HDS objects.}
 
 Stores references to
 \htmlref{HDS}{item_HDS} data objects in special HDS reference objects, and
@@ -4566,11 +4321,11 @@ Its two main uses are:
 
 \label{item_TRANSFORM}
 \item
-[\htmladdnormallink{TRANSFORM}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#TRANSFORM}]
+[TRANSFORM]
 \index{TRANSFORM} \hfill
 \xref{SUN/61}{sun61}{}
 
-{\bf Relate different coordinate systems.}
+\textbf{Relate different coordinate systems.}
 
 Provides a standard, flexible method for manipulating coordinate
 transformations and for transferring information about them between programs.
@@ -4644,7 +4399,7 @@ data structure.
 
 \label{item_AGI}
 \item
-[\htmladdnormallink{AGI}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#AGI}]
+[AGI]
 \index{AGI} \hfill
 \xref{SUN/48}{sun48}{}
 
@@ -4663,14 +4418,14 @@ overlap.
 
 \label{item_GKS}
 \item
-[\htmladdnormallink{GKS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#GKS}]
+[GKS]
 \index{GKS} \hfill
 \xref{SUN/83}{sun83}{},
 \xref{113}{sun113}{}.
 MUD/27.
 \xref{SSN/39}{ssn39}{}
 
-{\bf Low-level graphics library.}
+\textbf{Low-level graphics library.}
 
 The Graphical Kernel System is an international standard.
 The current version is 7.4 and this what you should use.
@@ -4697,7 +4452,7 @@ conditions, and should be highly reliable.
 
 \item It contains features which are not all found in any other single package:
 \begin{itemize}
-\item Area fill with several fill styles on {\em all}\/ devices.
+\item Area fill with several fill styles on \emph{all}\/ devices.
 \item Cell array supported on dot matrix printers.
 \item Multiple fonts.
 \item Selective clearing of display surface.
@@ -4708,11 +4463,11 @@ The advantages of GKS also apply to graphics software which use it, such as
 
 \label{item_GNS}
 \item
-[\htmladdnormallink{GNS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#GNS}]
+[GNS]
 \index{GNS} \hfill
 \xref{SUN/57}{sun57}{}
 
-{\bf Support names for GKS graphics devices.}
+\textbf{Support names for GKS graphics devices.}
 
 Almost any graphics program requires you to identify a graphics device to use.
 When it uses
@@ -4721,7 +4476,7 @@ they are identified by two integers:
 a `workstation type' and a `connection identifier.'
 (`Workstation' is GKS terminology for a graphics device of any description.)
 You can't remember the workstation types of all Starlink's graphics devices,
-so the {\em Graphics Name Service}\/ has been provided to translate
+so the \emph{Graphics Name Service}\/ has been provided to translate
 `friendly' and easy-to-remember names into their GKS equivalents.
 
 Most high level graphics packages, such as
@@ -4747,7 +4502,7 @@ but this isn't normally apparent to the programmer.
 
 \label{item_GRAPHPAR}
 \item
-[\htmladdnormallink{GRAPHPAR}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#GRAPHPAR}]
+[GRAPHPAR]
 \index{GRAPHPAR} \hfill
 \xref{SUN/113}{sun113}{}
 
@@ -4761,11 +4516,11 @@ These are the components of GKS, SGS and Starlink-Pgplot that provide the
 interface to the respective libraries from ADAM programs.
 \label{item_GWM}
 \item
-[\htmladdnormallink{GWM}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#GWM}]
+[GWM]
 \index{GWM} \hfill
 \xref{SUN/130}{sun130}{}
 
-{\bf Create graphics windows on an X display that do not disappear when a
+\textbf{Create graphics windows on an X display that do not disappear when a
 program terminates.}
 
 X was designed to support GUIs and it has two properties that make an X window
@@ -4800,12 +4555,12 @@ machine as the application.
 \newpage
 \label{item_IDI}
 \item
-[\htmladdnormallink{IDI}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#IDI}]
+[IDI]
 \index{IDI} \hfill
 \xref{SUN/65}{sun65}{}.
 MUD/28
 
-{\bf An international standard for displaying astronomical data on an
+\textbf{An international standard for displaying astronomical data on an
 image display.}
 
 It is intended for programs that need to manipulate images to a greater extent
@@ -4839,12 +4594,12 @@ to mediate between them.
 
 \label{item_NCAR}
 \item
-[\htmladdnormallink{NCAR}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#NCAR}]
+[NCAR]
 \index{NCAR}\index{NCAR!SNX}\index{SNX} \hfill
 \xref{SUN/88}{sun88}{}.
 MUD/59
 
-{\bf High-level graphics utilities.}
+\textbf{High-level graphics utilities.}
 
 This extensive suite was obtained from the
 National Center for Atmospheric Research in Boulder, Colorado.
@@ -4875,7 +4630,7 @@ The plots provided are:
 
 \label{item_NATIVE-PGPLOT}
 \item
-[\htmladdnormallink{Native-PGPLOT}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#PGPLOT}]
+[Native-PGPLOT]
 \index{PGPLOT!Native} \hfill
 \xref{SUN/15}{sun15}{},
 \xref{113}{sun113}{}.
@@ -4900,7 +4655,7 @@ re-linking using the appropriate libraries.
 
 \label{item_STARLINK-PGPLOT}
 \item
-[\htmladdnormallink{Starlink-PGPLOT}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#PGPLOT}]
+[Starlink-PGPLOT]
 \index{PGPLOT!Starlink} \hfill
 \xref{SUN/15}{sun15}{},
 \xref{113}{sun113}{}.
@@ -4925,12 +4680,12 @@ This is the version supported by Starlink for its applications.
 
 \label{item_SGS}
 \item
-[\htmladdnormallink{SGS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#SGS}]
+[SGS]
 \index{SGS} \hfill
 \xref{SUN/85}{sun85}{},
 \xref{113}{sun113}{}
 
-{\bf A friendly interface to a subset of GKS.}
+\textbf{A friendly interface to a subset of GKS.}
 
 SGS stands for `Simple Graphics System.'
 
@@ -4953,11 +4708,11 @@ It can:
 
 \label{item_SNX}
 \item
-[\htmladdnormallink{SNX}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#SNX}]
+[SNX]
 \index{SNX} \hfill
 \xref{SUN/90}{sun90}{}
 
-{\bf Starlink extensions to
+\textbf{Starlink extensions to
 \htmlref{NCAR}{item_NCAR}.}
 
 They provide more convenient access to certain features of NCAR without
@@ -5024,11 +4779,11 @@ plots can be managed.
 
 \label{item_CHR}
 \item
-[\htmladdnormallink{CHR}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#CHR}]
+[CHR]
 \index{CHR} \hfill
 \xref{SUN/40}{sun40}{}
 
-{\bf Augment the limited character handling facilities of Fortran 77.}
+\textbf{Augment the limited character handling facilities of Fortran 77.}
 
 Converts Fortran data types into text strings and the reverse,
 does wild card matching, string sorting, paragraph reformatting and
@@ -5048,11 +4803,11 @@ It can:
 
 \label{item_CNF}
 \item
-[\htmladdnormallink{CNF}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#CNF}]
+[CNF]
 \index{CNF} \hfill
 \xref{SUN/209}{sun209}{}
 
-{\bf Mix program segments written in Fortran and C in a portable manner.}
+\textbf{Mix program segments written in Fortran and C in a portable manner.}
 
 It provides:
 \begin{itemize}
@@ -5063,11 +4818,11 @@ between subprograms.
 
 \label{item_EMS}
 \item
-[\htmladdnormallink{EMS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#EMS}]
+[EMS]
 \index{EMS} \hfill
 \xref{SSN/4}{ssn4}{}
 
-{\bf Construct and store error messages for future delivery to a user via ERR.}
+\textbf{Construct and store error messages for future delivery to a user via ERR.}
 
 ERR is the Starlink Error Reporting System, which is part of
 \htmlref{MERS}{item_MERS}.
@@ -5078,7 +4833,7 @@ It conforms to the error reporting conventions of MERS.\index{MERS!EMS}
 
 \label{item_HLP}
 \item
-[\htmladdnormallink{HLP}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#HLP}]
+[HLP]
 \index{HLP}\index{HELP|see{HLP}} \hfill
 \xref{SUN/124}{sun124}{}
 
@@ -5095,7 +4850,7 @@ It is free-standing and does not call any other Starlink packages.
 
 \label{item_KAPLIBS}
 \item
-[\htmladdnormallink{KAPLIBS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#KAPLIBS}]
+[KAPLIBS]
 \index{KAPLIBS} \hfill
 \xref{SUN/238}{sun238}{}
 
@@ -5111,11 +4866,11 @@ useful to examine the source code of relevant KAPPA commands.
 
 \label{item_MERS}
 \item
-[\htmladdnormallink{MERS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#MERS}]
+[MERS]
 \index{MERS} \hfill
 \xref{SUN/104}{sun104}{}
 
-{\bf Report messages and errors.}
+\textbf{Report messages and errors.}
 
 There is a general need for programs to inform the user about:
 
@@ -5129,16 +4884,16 @@ sensible parameter values.
 
 MERS comprises two libraries to help you do this:
 \begin {itemize}
-\item {\bf MSG}\index{MSG}\index{MERS!MSG}
+\item \textbf{MSG}\index{MSG}\index{MERS!MSG}
 -- Message Reporting System, used for reporting non-error information.
-\item {\bf ERR}\index{ERR}\index{MERS!ERR}
+\item \textbf{ERR}\index{ERR}\index{MERS!ERR}
 -- Error Reporting System, used specifically for reporting error messages.
 \end {itemize}
 
 \newpage
 \label{item_ONE}
 \item
-[\htmladdnormallink{ONE}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#ONE}]
+[ONE]
 \index{ONE} \hfill
 \xref{SUN/234}{sun234}{}
 
@@ -5152,11 +4907,11 @@ The routines are written in C but are callable direct from Fortran.
 
 \label{item_PCS}
 \item
-[\htmladdnormallink{PCS}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#PCS}]
+[PCS]
 \index{PCS} \hfill
 \xref{SSN/29}{ssn29}{}
 
-{\bf Parameter and communication system.}
+\textbf{Parameter and communication system.}
 
 Application programs often need to obtain parameter values from a variety of
 sources and to communicate with other programs.
@@ -5171,11 +4926,11 @@ the Starlink Software Environment.
 
 \label{item_PSX}
 \item
-[\htmladdnormallink{PSX}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#PSX}]
+[PSX]
 \index{PSX} \hfill
 \xref{SUN/121}{sun121}{}
 
-{\bf Use the POSIX and X/OPEN libraries.}
+\textbf{Use the POSIX and X/OPEN libraries.}
 
 Lets you use operating system facilities in a machine independent way.
 
@@ -5214,7 +4969,7 @@ Lets you use operating system facilities in a machine independent way.
 
 \label{item_ADAM}
 \item
-[\htmladdnormallink{ADAM}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#ADAM}]
+[ADAM]
 \index{ADAM} \hfill
 \xref{SG/4}{sg4}{},
 \xref{6}{sg6}{}.
@@ -5324,11 +5079,11 @@ programs, which have become common.
 
 \label{item_EXPECT}
 \item
-[\htmladdnormallink{EXPECT}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#EXPECT}]
+[EXPECT]
 \index{EXPECT} \hfill
 \xref{SUN/200}{sun200}{}
 
-{\bf Emulate a user sitting at a terminal.}
+\textbf{Emulate a user sitting at a terminal.}
 
 When combined with
 \htmlref{TK}{item_TK}, it can put a GUI in front of an existing application
@@ -5336,45 +5091,45 @@ without modifying it.
 
 \label{item_ICL}
 \item
-[\htmladdnormallink{ICL}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#ICL}]
+[ICL]
 \index{ICL} \hfill
 \xref{SG/4}{sg4}{},
 \xref{5}{sg5}{}
 
-{\bf A programmable user interface to an astronomical data reduction or data
+\textbf{A programmable user interface to an astronomical data reduction or data
 acquisition system.}
 
 It is one of the main user interfaces for the ADAM software environment.
 In some ways it is similar to a high level programming language such as
 Fortran or Pascal, but it has some important differences:
 \begin{itemize}
-\item It is a {\em command}\/ language.
+\item It is a \emph{command}\/ language.
 One of its main uses is to let you type commands with few restrictions
 on the format.
-\item It is an {\em interactive}\/ language.
+\item It is an \emph{interactive}\/ language.
 It provides a complete environment for entering, editing, and debugging
 programs, rather than relying on external editors, linkers, etc.
-\item It is a {\em programming language}\/ suitable for relatively simple and
+\item It is a \emph{programming language}\/ suitable for relatively simple and
 straightforward programs.
 \end{itemize}
 
 \label{item_INIT}
 \item
-[\htmladdnormallink{INIT}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#INIT}]
+[INIT]
 \index{INIT}\hfill \mbox{}
 
-{\bf A grouping of the Starlink login resource files and other associated
+\textbf{A grouping of the Starlink login resource files and other associated
 bits and pieces.}
 
-The {\tt .cshrc} and {\tt .login} files are now handled like standard packages
+The \texttt{.cshrc} and \texttt{.login} files are now handled like standard packages
 and are edited by the install procedure to contain the correct root path for the
 USSC set.
-This allows easy installation on systems where the directory {\tt /star}
+This allows easy installation on systems where the directory \texttt{/star}
 does not exist.
 
 \label{item_SAE}
 \item
-[\htmladdnormallink{SAE}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#SAE}]
+[SAE]
 \index{SAE} \hfill
 \xref{SUN/191}{sun191}{}
 
@@ -5386,11 +5141,11 @@ administrative grouping.
 
 \label{item_STARTCL}
 \item
-[\htmladdnormallink{STARTCL}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#STARTCL}]
+[STARTCL]
 \index{STARTCL} \hfill
 \xref{SUN/186}{sun186}{}
 
-{\bf Extend TCL and TK.}
+\textbf{Extend TCL and TK.}
 
 A public domain utility called
 \htmlref{TCL}{item_TCL}/\htmlref{TK}{item_TK}
@@ -5399,8 +5154,8 @@ STARTCL comprises three extensions to TCL and the TK Toolkit that enable
 TCL/TK applications to cooperate with Starlink applications.
 These are:
 \begin{itemize}
-\item A TK widget that displays Starlink graphics by emulating the {\bf gwm}
-graphics window server and a {\bf gwm} canvas item.
+\item A TK widget that displays Starlink graphics by emulating the \textbf{gwm}
+graphics window server and a \textbf{gwm} canvas item.
 \item An interface to the
 \htmlref{ADAM}{item_ADAM}
 message system.
@@ -5409,25 +5164,25 @@ message system.
 
 \label{item_TCL}
 \item
-[\htmladdnormallink{TCL}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#TCL}]
+[TCL]
 \index{TCL} \hfill
 \xref{SUN/186}{sun186}{},
 \xref{200}{sun200}{}.
 MUD/164
 
-{\bf Control and extend applications using a scripting language.}
+\textbf{Control and extend applications using a scripting language.}
 
-TCL stands for {\em Tool Command Language}.
+TCL stands for \emph{Tool Command Language}.
 
 \label{item_TK}
 \item
-[\htmladdnormallink{TK}{http://www.starlink.ac.uk/static_www/soft2_ALPH.html#TK}]
+[TK]
 \index{TK} \hfill
 \xref{SUN/186}{sun186}{},
 \xref{200}{sun200}{}.
 MUD/164
 
-{\bf Build GUIs.}
+\textbf{Build GUIs.}
 
 An X window toolkit for use with
 \htmlref{TCL}{item_TCL} and
@@ -5461,7 +5216,7 @@ pervious editions.
 
 \newpage
 
-\printindex
+%\printindex
 
 % ? End of main text
 \end{document}
