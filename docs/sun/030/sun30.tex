@@ -1,45 +1,16 @@
-\documentstyle{article}
-\pagestyle{myheadings}
+\documentclass[nolof,11pt,noabs]{starlink}
 
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocnumber}    {30.2}
-\newcommand{\stardocauthors}   {David Giaretta}
-\newcommand{\stardocdate}      {22th Sept 1989}
-\newcommand{\stardoctitle}     {Using the Starlink Database MicroVAX computer}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocnumber      {30.2}
+\stardocauthors     {David Giaretta}
+\stardocdate        {22th Sept 1989}
+\stardoctitle       {Using the Starlink Database MicroVAX computer}
 %------------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{240mm}
-\setlength{\topmargin}{-5mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
 
 \begin{document}
-\thispagestyle{empty}
-SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
-RUTHERFORD APPLETON LABORATORY\\
-{\large\bf Starlink Project\\}
-{\large\bf \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Large\bf \stardoctitle}
-\end{center}
-\vspace{5mm}
-
-\tableofcontents
+\scfrontmatter
 
 \newpage
 \section{Introduction}
@@ -68,7 +39,7 @@ These may be changed in the future.
 
 \subsection{Getting help}
 
-Typing {\bf STADAT\_HELP} gives help on STADAT resources.
+Typing \textbf{STADAT\_HELP} gives help on STADAT resources.
 \begin{itemize}
 \item Difficulties concerned with network
      access should be reported to STADAT::OPER
@@ -91,18 +62,18 @@ The second is Coloured Book software access (by TRANSFER only).
 
 Users may only log into STADAT by SET HOST from a Starlink node
 (major or minor):
-\begin{verbatim}
-    $ SET HOST STADAT
-\end{verbatim}
+\begin{terminalv}
+$ SET HOST STADAT
+\end{terminalv}
 This is a DECNET facility and can only be used from Starlink nodes on DECNET.
 Access from non-Starlink DECNET nodes is barred and PAD cannot be used
 to log in.
-Users should copy files from STADAT using the TRANSFER command (see SUN/36,
+Users should copy files from STADAT using the TRANSFER command (see \xref{SUN/36}{sun36}{},
 Appendix A.1):
-\begin{verbatim}
-    $ TRANSFER/USERNAME=NETUSR,NETUSR/CODE=FAST -
-         RL.STADAT::DISK$STARDATA:<file specification>  <file specification>
-\end{verbatim}
+\begin{terminalv}
+$ TRANSFER/USERNAME=NETUSR,NETUSR/CODE=FAST -
+     RL.STADAT::DISK$STARDATA:<file specification>  <file specification>
+\end{terminalv}
 This is more efficient than COPY.
 
 
@@ -117,7 +88,7 @@ There are two usernames set up on the machine for each
 Starlink node.
 One of them is a private username for the Site Manager.
 The other is a public username that you can use; this may be used
-by {\em all} users at your site who have asked to use the machine.
+by \emph{all} users at your site who have asked to use the machine.
 Each site's public username is different and is managed separately.
 
 If you wish to use the machine, ask your Site Manager for the appropriate
@@ -134,7 +105,7 @@ You should adapt your behaviour to this circumstance.
 In particular, delete unwanted files before logging out, and don't expect
 any files you do leave to remain in existence for very long.
 
-{\bf Don't do anything antisocial like changing passwords or tinkering with the
+\textbf{Don't do anything antisocial like changing passwords or tinkering with the
 LOGIN.COM file. The latter should call \@SSC:LOGIN.}
 
 There are a few extra usernames on the machine for particular activities,
@@ -155,10 +126,10 @@ Collection (SSC) and hence always uses the
 latest versions of software items.
 \item USSP (see ULDA below for total size).
 This is the IUE ULDA access software which was obtained from VILSPA.
-See SUN/20 for more details.
+See \xref{SUN/20}{sun20}{} for more details.
 \item SCAR, including source code.
-See SUN/70 for more details.
-\item SPAG, a code unscrambler. See SUN/63 for details.
+See \xref{SUN/70}{sun70}{} for more details.
+\item SPAG, a code unscrambler. See \xref{SUN/63}{sun63}{} for details.
 \item Fortran compiler, Coloured Book, PSI-Access.
 \end{itemize}
 
@@ -170,26 +141,26 @@ The following data sets are available:
 \item CHART catalogues in directory [STARCATS].
 \item The logical search path SCAR\_DAT\_PATH is set up by typing
 SCARSTART, and points to directories containing SCAR catalogues.
-\item IRAS LRS database --- see SUN/14.
+\item IRAS LRS database --- see \xref{SUN/14}{sun14}{}.
 \item ULDA (including USSP software).
 This is the IUE Uniform Low Dispersion Archive.
 Its size will increase as time goes on (rate unknown).
-Its use is described in SUN/20.
-\item IUE merged Observing Log, and use of IUEDEARCH (SUN/58).
+Its use is described in \xref{SUN/20}{sun20}{}.
+\item IUE merged Observing Log, and use of IUEDEARCH (\xref{SUN/58}{sun58}{}).
 \item Various Spectral Atlases, in directory SPECTRAL\_ATLASDIR:\\
       typing:
-\begin{verbatim}
-    $ @SPECTRAL_ATLASDIR:LOGIN
-\end{verbatim}
+\begin{terminalv}
+$ @SPECTRAL_ATLASDIR:LOGIN
+\end{terminalv}
 sets up the appropriate logicals. The command ATLAS\_HELP provides help for
 the atlases available. Most allow one to extract the spectra chosen directly
 into DIPSO files,  after first listing the spectra available.
-\begin{verbatim}
-    $ ATLAS_HELP SUMMARY
-\end{verbatim}
+\begin{terminalv}
+$ ATLAS_HELP SUMMARY
+\end{terminalv}
 shows a summary of the spectral atlases available.
-\item    JPL Ephemeris 1800-2050  : disk\$stardata:[ephemeris]jpl.dat (SUN/87)\\
-         In the examples in SUN/87 you can assign the data file to the
+\item    JPL Ephemeris 1800-2050  : disk\$stardata:[ephemeris]jpl.dat (\xref{SUN/87}{sun87}{})\\
+         In the examples in \xref{SUN/87}{sun87}{} you can assign the data file to the
          above instead of jpldir:de200.dat and pick up the full ephemeris.
 \end{itemize}
 Other items, such as an 1885-1985 Supernova database to be produced at RAL, and
@@ -203,9 +174,9 @@ Users will be informed by revisions of this note and by news items.
 \item IUE \\
 the IUE captive account allows use of services
 concerned with IUE data such as fast searching of the IUE log
-and IUE image de-archiving (see SUN/58).
+and IUE image de-archiving (see \xref{SUN/58}{sun58}{}).
 \item IRASLRS\\
-the IRASLRS captive account allows access to the LRS database (see SUN/14).
+the IRASLRS captive account allows access to the LRS database (see \xref{SUN/14}{sun14}{}).
 \end{itemize}
 
 
@@ -222,20 +193,24 @@ The following is a list of facilities available and the logical names
 which must be defined.
 
 \begin{itemize}
-\item Spectral Atlases\\
-{\bf \$ define/job spectral\_atlasdir stadat::spectral\_atlasdir:\\
-\$ @spectral\_atlasdir:login\\ }
-\item IUEDEARCH (SUN/58)\\
-{\bf \$ define/job iuedearchdisk stadat::iuedearchdisk:\\
-\$ @iuedearchdisk:[iues.capaccnt]iuedearch }
-
+\item Spectral Atlases
+\begin{terminalv}
+$ define/job spectral_atlasdir stadat::spectral_atlasdir:
+$ @spectral_atlasdir:login
+\end{terminalv}
+\item IUEDEARCH (\xref{SUN/58}{sun58}{})
+\begin{terminalv}
+$ define/job iuedearchdisk stadat::iuedearchdisk:
+$ @iuedearchdisk:[iues.capaccnt]iuedearch
+\end{terminalv}
 \item UNSPL --- part of USSP\\
- unspl should be defined as ``run stadat::ussp\_dir:unspl''\\
-{\bf \$ unspl}
-
+ unspl should be defined as ``run stadat::ussp\_dir:unspl''
+\begin{terminalv}
+$ unspl
+\end{terminalv}
 \item    JPL Ephemeris 1800-2050  \\
-         In the examples in SUN/87 you can assign the data file to
-         stadat::disk\$stardata:[ephemeris]jpl.dat.
+         In the examples in \xref{SUN/87}{sun87}{} you can assign the data file to\\
+         \texttt{stadat::disk\$stardata:[ephemeris]jpl.dat}.
 
 \end{itemize}
 
@@ -295,13 +270,13 @@ individuals are away should be avoided.
 \section{References}
 
 \begin{description}
-\item [SUN/14] : Obtaining spectra from the IRAS LRS database
-\item [SUN/20] : USSP --- The IUE ULDA Software Support Package (to be issued).
-\item [SUN/36] : Starlink Networking.
-\item [SUN/58] : IUEDEARCH --- access to IUE archive data
-\item [SUN/63] : SPAG --- Spaghetti Unscrambler
-\item [SUN/70] : SCAR --- Starlink catalogue access and reporting.
-\item [SUN/87] : JPL --- Solar System ephemeris
+\item [\xref{SUN/14}{sun14}{}] : Obtaining spectra from the IRAS LRS database
+\item [\xref{SUN/20}{sun20}] : USSP --- The IUE ULDA Software Support Package (to be issued).
+\item [\xref{SUN/36}{sun36}{}] : Starlink Networking.
+\item [\xref{SUN/58}{sun58}{}] : IUEDEARCH --- access to IUE archive data
+\item [\xref{SUN/63}{sun63}{}] : SPAG --- Spaghetti Unscrambler
+\item [\xref{SUN/70}{sun70}{}] : SCAR --- Starlink catalogue access and reporting.
+\item [\xref{SUN/87}{sun87}{}] : JPL --- Solar System ephemeris
 \end{description}
 
 \end{document}
