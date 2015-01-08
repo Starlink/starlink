@@ -1,49 +1,17 @@
-\documentstyle[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt,nolof,noabs]{starlink}
+
 
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocnumber}    {20.4}
-\newcommand{\stardocauthors}   {M J Murray, D J Stickland}
-\newcommand{\stardocdate}      {30 June 1993}
-\newcommand{\stardoctitle}     {ULDA/USSP --- Accessing the IUE Uniform Low-Dispersion Archive}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocnumber      {20.4}
+\stardocauthors     {M J Murray, D J Stickland}
+\stardocdate        {30 June 1993}
+\stardoctitle       {ULDA/USSP --- Accessing the IUE Uniform Low-Dispersion Archive}
 %------------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
 
 \begin{document}
-\thispagestyle{empty}
-SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
-RUTHERFORD APPLETON LABORATORY\\
-{\large\bf Starlink Project\\}
-{\large\bf \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Large\bf \stardoctitle}
-\end{center}
-\vspace{5mm}
-
-\setlength{\parskip}{0mm}
-\tableofcontents
-\setlength{\parskip}{\medskipamount}
-\markright{\stardocname}
+\scfrontmatter
 
 \newpage
 \section{The ULDA/USSP Project}
@@ -51,9 +19,9 @@ RUTHERFORD APPLETON LABORATORY\\
 The usefulness of the data collected by the IUE satellite
 has been enormously enhanced by the maintenance of a data archive
 from which interested astronomers can request any image (subject
-to the six-month data retrieval rule). See SUN/58 for details.
+to the six-month data retrieval rule). See \xref{SUN/58}{sun58}{} for details.
 Most UK astronomers now reduce their IUE data from the photometric
-images available in the archive using IUEDR (SUN/37).   However,
+images available in the archive using IUEDR (\xref{SUN/37}{sun37}{}).   However,
 %for quick-look or other non-critical purposes,
 it is now possible to obtain reduced low-resolution spectra on-line.
 These data have been reduced in a fairly
@@ -61,17 +29,17 @@ homogenous way using the IUE Project's Spectral Image Processing System
 (IUESIPS),
 %which gives an adequate product in most cases (and certainly
 %for data acquired since {!whenever SIPS2 was implemented!}).
-and have been made available in the form of a {\it Uniform Low-Dispersion
+and have been made available in the form of a \textit{Uniform Low-Dispersion
 Archive} (ULDA).
 This comprises absolutely-calibrated,  extracted, low-dispersion
 spectra corrected for exposure times and with the appropriate  ITF correction
 (flux in ergs cm$^{-2}$  s$^{-1}$ {\AA}$^{-1}$).
-A full description of the data is given in the {\it ESA IUE Newsletter No.~30,}
+A full description of the data is given in the \textit{ESA IUE Newsletter No.~30,}
 July 1988,
 and a comparison of the ULDA with IUEDR products is featured in
-the {\it Starlink Bulletin, no.~4}.
+the \textit{Starlink Bulletin, no.~4}.
 
-In order to facilitate access to the ULDA, the {\it ULDA Software Support
+In order to facilitate access to the ULDA, the \textit{ULDA Software Support
 Package} (USSP) has been developed.
 The USSP enables astronomers to select interactively
 any images contained in the ULDA and provides facilities for efficient
@@ -146,9 +114,9 @@ per Starlink area.
 Your local Site Manager will tell you the account name and password.
 
 Log in via your own Starlink account by typing:
-\begin{verbatim}
-     $ SET HOST STADAT
-\end{verbatim}
+\begin{terminalv}
+$ SET HOST STADAT
+\end{terminalv}
 Access via the PAD is not permitted for security reasons.
 Your local Site Manager will be responsible for the management
 of your area account.
@@ -183,10 +151,10 @@ being the abbreviation of your country.
 For example if your Starlink username is  ABC your first choice
 should be UKABC.
 Any files you generate with QUEST will be
-UKABC.{\it filetype} (where {\it filetype} may be SPE, AUX {\it etc.}).
+UKABC.\textit{filetype} (where \textit{filetype} may be SPE, AUX \textit{etc.}).
 For convenience, the USSP identifier UKABC is assumed throughout this document.
 
-{\bf N.B.} EACH RUN OF THE PROGRAM  QUEST WILL AUTOMATICALLY DELETE
+\textbf{N.B.} EACH RUN OF THE PROGRAM  QUEST WILL AUTOMATICALLY DELETE
 ANY EXISTING FILES BELONGING TO THE IDENTIFIER USED.
 Thus after selecting spectra which you actually want,  you must downlink with
 UNSPL before running QUEST again.
@@ -205,12 +173,12 @@ responses will simply result in a message and another chance to answer.
 Nevertheless, a sample session is shown  below.
 
 To begin a session with QUEST simply type:
-\begin{verbatim}
-     $ QUEST
-\end{verbatim}
+\begin{terminalv}
+$ QUEST
+\end{terminalv}
 %\subsubsection{USSP identifier}
 You will be invited to give your USSP identifier or register one for yourself.
-Registration simply involves typing {\tt R} in response to QUEST's initial
+Registration simply involves typing \texttt{R} in response to QUEST's initial
 question, and then replying with your chosen username to the second.
 You will be asked to confirm what you have typed, and in the event someone has
 already chosen this name, or your choice is invalid you will be asked to think
@@ -234,15 +202,15 @@ the selected files to a local computer.
 However this is not likely to be necessary in the UK.
 
 The main menu is now displayed:
-\begin{verbatim}
-       1      -      SEARCH FOR A SET OF SPECTRA
-       2      -      SEARCH FOR SPECTRA - SHORT PROMPT
-       3      -      DISPLAY WHAT WAS FOUND BY SEARCH
-       4      -      SELECT SPECTRA FROM THOSE FOUND BY SEARCH (FOR DOWNLINK)
-       5      -      SAVE DESCRIPTORS OF WHAT LAST SEARCH FOUND (FOR DOWNLINK)
-       6      -      DISPLAY & SAVE DUBIOUS INFO.FOR WHAT LAST SEARCH FOUND
-       ? [N]  -      HELP ME, N = ONE OF ABOVE ANSWERS
-\end{verbatim}
+\begin{terminalv}
+1      -      SEARCH FOR A SET OF SPECTRA
+2      -      SEARCH FOR SPECTRA - SHORT PROMPT
+3      -      DISPLAY WHAT WAS FOUND BY SEARCH
+4      -      SELECT SPECTRA FROM THOSE FOUND BY SEARCH (FOR DOWNLINK)
+5      -      SAVE DESCRIPTORS OF WHAT LAST SEARCH FOUND (FOR DOWNLINK)
+6      -      DISPLAY & SAVE DUBIOUS INFO.FOR WHAT LAST SEARCH FOUND
+? [N]  -      HELP ME, N = ONE OF ABOVE ANSWERS
+\end{terminalv}
 A typical session would be a SEARCH (for a set of spectra) followed
 by a DISPLAY (what was found by search)
 followed by a SELECT (spectra $\ldots$ for downlink).
@@ -280,7 +248,7 @@ Image numbers are integers greater than or equal to 1000.
 For example should you want to confine the search to images taken with the SWP
 camera you should type SWP.
 A single image can be chosen by completely specifying it at this point.
-{\it e.g.} SWP4276L.
+\textit{e.g.} SWP4276L.
 \item [Sky position.] If an RA, DEC, is specified QUEST will find
 those spectra whose RA, DEC fall within a window centered at the given position.
 The size of the window is determined from the accuracy to which the RA,DEC
@@ -297,7 +265,7 @@ The search window sizes are:
 
 \begin{center}
 \begin{tabular}{|ll|ll|} \hline
-\multicolumn{2}{|c|}{\bf R.A.}&\multicolumn{2}{c|}{\bf DEC.} \\
+\multicolumn{2}{|c|}{\textbf{R.A.}}&\multicolumn{2}{c|}{\textbf{DEC.}} \\
 Accuracy used &Window size&Accuracy used &Window size\\ \hline
 Hours only&$\pm$30 mins&Degrees Only&$\pm$4 Degs\\
 Hours \& minutes&$\pm$10 mins&Degrees \& minutes &$\pm$25 mins\\
@@ -317,128 +285,128 @@ you may fail to find those which may have been entered in
 an alternative way. Specifying an RA,DEC is usually a better way to find
 spectra of a particular object.
 \end{description}
-{\bf Examples:}
+\textbf{Examples:}
 
 In the session shown below the user is looking for images of HD52973 taken
 with the SWP camera with the large aperture. (The user's responses are the
 text following the `$>$' prompt.)
 \begin{footnotesize}
-\begin{verbatim}
-     $ QUEST
-         ENTER   -    YOUR USER ID
-                 -    "R"    TO GET AN ID
-                 -    "D"    TO DISPLAY A COUNTRY'S ID'S
-                 -    "E"    TO END
+\begin{terminalv}
+$ QUEST
+   ENTER   -    YOUR USER ID
+           -    "R"    TO GET AN ID
+           -    "D"    TO DISPLAY A COUNTRY'S ID'S
+           -    "E"    TO END
 
-                                        N O T E:-
-          A) DO NOT USE SOMEONE ELSE'S ID, YOU WILL WIPE OUT HIS FILES, AND HE YOURS
-          B) YOUR FILE NAMES WILL BE YOUR ID + STANDARD QUALIFIERS (E.G.'.SPE')
+                                  N O T E:-
+    A) DO NOT USE SOMEONE ELSE'S ID, YOU WILL WIPE OUT HIS FILES, AND HE YOURS
+    B) YOUR FILE NAMES WILL BE YOUR ID + STANDARD QUALIFIERS (E.G.'.SPE')
 
-     YOUR ID/?/R/D/E> UKABC
+YOUR ID/?/R/D/E> UKABC
 
-      PLEASE SELECT WHICH OF THE FOLLOWING IS YOUR REASON GETTING SPECTRA
+PLEASE SELECT WHICH OF THE FOLLOWING IS YOUR REASON GETTING SPECTRA
 
-              1  - RECOVERY, SENDS YOU -> SELECT, USE IF DOWNLINK FAILED
-              2  - CURIOSITY
-              3  - M.SC. PROJECT
-              4  - PH.D. PROJECT
-              5  - UNDERGRADUATE CLASS PROJECT
-              6  - NORMAL RESEARCH
+        1  - RECOVERY, SENDS YOU -> SELECT, USE IF DOWNLINK FAILED
+        2  - CURIOSITY
+        3  - M.SC. PROJECT
+        4  - PH.D. PROJECT
+        5  - UNDERGRADUATE CLASS PROJECT
+        6  - NORMAL RESEARCH
 
-     1 TO 6 OR E(STOP QUEST) OR ? > 2
-                       +++  OPENING UKABC.SPE     (STATUS=OLD)  +++
-                       +++  OPENING UKABC.SPE     (STATUS=NEW)  +++
+1 TO 6 OR E(STOP QUEST) OR ? > 2
+                 +++  OPENING UKABC.SPE     (STATUS=OLD)  +++
+                 +++  OPENING UKABC.SPE     (STATUS=NEW)  +++
 
-                                  M A I N     M E N U
-              1      -      SEARCH FOR A SET OF SPECTRA
-              2      -      SEARCH FOR SPECTRA - SHORT PROMPT
-              3      -      DISPLAY WHAT WAS FOUND BY SEARCH
-              4      -      SELECT SPECTRA FROM THOSE FOUND BY SEARCH (FOR DOWNLINK)
-              5      -      SAVE DESCRIPTORS OF WHAT LAST SEARCH FOUND (FOR DOWNLINK)
-              6      -      DISPLAY & SAVE DUBIOUS INFO.FOR WHAT LAST SEARCH FOUND
-              ?      -      HELP ME, N = ONE OF ABOVE ANSWERS
+                            M A I N     M E N U
+        1      -      SEARCH FOR A SET OF SPECTRA
+        2      -      SEARCH FOR SPECTRA - SHORT PROMPT
+        3      -      DISPLAY WHAT WAS FOUND BY SEARCH
+        4      -      SELECT SPECTRA FROM THOSE FOUND BY SEARCH (FOR DOWNLINK)
+        5      -      SAVE DESCRIPTORS OF WHAT LAST SEARCH FOUND (FOR DOWNLINK)
+        6      -      DISPLAY & SAVE DUBIOUS INFO.FOR WHAT LAST SEARCH FOUND
+        ?      -      HELP ME, N = ONE OF ABOVE ANSWERS
 
-      1 TO 6, ? (HELP) OR  E (END) > 2
-                                     E X A M P L E:-
-     "SWP4123L ,  3000"   = (SPECTRUM FOR SWP CAMERA, IMAGE NO.4123 & LARGE APERTURE)
-        P L U S    (ALL SPECTRA FOR IMAGE NUMBER 3000, FOR ANY CAMERA OR APERTURE)
+1 TO 6, ? (HELP) OR  E (END) > 2
+                               E X A M P L E:-
+"SWP4123L ,  3000"   = (SPECTRUM FOR SWP CAMERA, IMAGE NO.4123 & LARGE APERTURE)
+  P L U S    (ALL SPECTRA FOR IMAGE NUMBER 3000, FOR ANY CAMERA OR APERTURE)
 
-     CAMERA,IM.NO.& AP'S/<CR>/?/R/X > SWPL
-     CAMERA,IM.NO.& AP'S/<CR>/?/R/X >
+CAMERA,IM.NO.& AP'S/<CR>/?/R/X > SWPL
+CAMERA,IM.NO.& AP'S/<CR>/?/R/X >
 
-                                     E X A M P L E:-
-                                     ----------
-       "10 -12, ALL 2030"  =(10HRS+/-30MINS & -12DEGS+/-4DEGS) OR DEC=20.5+/-0.5DEG
+                               E X A M P L E:-
+                               ----------
+ "10 -12, ALL 2030"  =(10HRS+/-30MINS & -12DEGS+/-4DEGS) OR DEC=20.5+/-0.5DEG
 
-     RA+DEC.PAIRS/<CR>/?/X >
-                                      E X A M P L E:
-            "35 , 53"    =  ALL SPECTRA FOR OBJECTS WITH IUE CLASSES 35 OR 53
+RA+DEC.PAIRS/<CR>/?/X >
+                                E X A M P L E:
+      "35 , 53"    =  ALL SPECTRA FOR OBJECTS WITH IUE CLASSES 35 OR 53
 
-     OBJECT CLASSES/<CR>/?/X >
-                                      E X A M P L E:
-                     "NGC136, "    =   ALL SPECTRA FOR BOTH OBJECTS
+OBJECT CLASSES/<CR>/?/X >
+                                E X A M P L E:
+               "NGC136, "    =   ALL SPECTRA FOR BOTH OBJECTS
 
-     HOMOGENEOUS ID'S/<CR>/?/X > HD52973
-     HOMOGENEOUS ID'S/<CR>/?/X >
+HOMOGENEOUS ID'S/<CR>/?/X > HD52973
+HOMOGENEOUS ID'S/<CR>/?/X >
 
-                                10   R E C O R D S      F O U N D
+                          10   R E C O R D S      F O U N D
 
-                                  M A I N     M E N U
-              1      -      SEARCH FOR A SET OF SPECTRA
-              2      -      SEARCH FOR SPECTRA - SHORT PROMPT
-              3      -      DISPLAY WHAT WAS FOUND BY SEARCH
-              4      -      SELECT SPECTRA FROM THOSE FOUND BY SEARCH (FOR DOWNLINK)
-              5      -      SAVE DESCRIPTORS OF WHAT LAST SEARCH FOUND (FOR DOWNLINK)
-              6      -      DISPLAY & SAVE DUBIOUS INFO.FOR WHAT LAST SEARCH FOUND
-              ? [N]  -      HELP ME, N = ONE OF ABOVE ANSWERS
+                            M A I N     M E N U
+        1      -      SEARCH FOR A SET OF SPECTRA
+        2      -      SEARCH FOR SPECTRA - SHORT PROMPT
+        3      -      DISPLAY WHAT WAS FOUND BY SEARCH
+        4      -      SELECT SPECTRA FROM THOSE FOUND BY SEARCH (FOR DOWNLINK)
+        5      -      SAVE DESCRIPTORS OF WHAT LAST SEARCH FOUND (FOR DOWNLINK)
+        6      -      DISPLAY & SAVE DUBIOUS INFO.FOR WHAT LAST SEARCH FOUND
+        ? [N]  -      HELP ME, N = ONE OF ABOVE ANSWERS
 
-     1 TO 6, ? (HELP) OR  E (END) > 5
+1 TO 6, ? (HELP) OR  E (END) > 5
 
-              SPECTRAL DESCRIPTORS ARE BEING SAVED ON UKABC.DES - PLEASE WAIT
+        SPECTRAL DESCRIPTORS ARE BEING SAVED ON UKABC.DES - PLEASE WAIT
 
-                                  M A I N     M E N U
-              1      -      SEARCH FOR A SET OF SPECTRA
-              2      -      SEARCH FOR SPECTRA - SHORT PROMPT
-              3      -      DISPLAY WHAT WAS FOUND BY SEARCH
-              4      -      SELECT SPECTRA FROM THOSE FOUND BY SEARCH (FOR DOWNLINK)
-              5      -      SAVE DESCRIPTORS OF WHAT LAST SEARCH FOUND (FOR DOWNLINK)
-              6      -      DISPLAY & SAVE DUBIOUS INFO.FOR WHAT LAST SEARCH FOUND
-              ? [N]  -      HELP ME, N = ONE OF ABOVE ANSWERS
+                            M A I N     M E N U
+        1      -      SEARCH FOR A SET OF SPECTRA
+        2      -      SEARCH FOR SPECTRA - SHORT PROMPT
+        3      -      DISPLAY WHAT WAS FOUND BY SEARCH
+        4      -      SELECT SPECTRA FROM THOSE FOUND BY SEARCH (FOR DOWNLINK)
+        5      -      SAVE DESCRIPTORS OF WHAT LAST SEARCH FOUND (FOR DOWNLINK)
+        6      -      DISPLAY & SAVE DUBIOUS INFO.FOR WHAT LAST SEARCH FOUND
+        ? [N]  -      HELP ME, N = ONE OF ABOVE ANSWERS
 
-     1 TO 6, ? (HELP) OR  E (END) > 4
+1 TO 6, ? (HELP) OR  E (END) > 4
 
-     REF>CAM+IMAGE!   HOMOGENEOUS  !  R.A. !  DECL. !OBSERV.!EXP.T. !OB!USAGE/ !EXP.!
-     NO.>+APERTURE!       ID       !HH:MMSS! DD:MMSS! DATE  !SECS.  !CL!DUBIOUS!CODE!
-       1>SWP 7271L!HD52973         ! 7: 1 8! 20:3842!30NOV79! 4200.0!53! U     !    !
-       2>SWP 6379L!HD52973         ! 7: 1 8! 20:3842! 4SEP79! 2399.0!53! U     !    !
-       3>SWP 6383L!HD52973         ! 7: 1 8! 20:3842! 4SEP79! 4800.0!53! U  D  !    !
-       4>SWP10478L!HD52973         ! 7: 1 8! 20:3842!26OCT80! 3600.0!53! U     !    !
-       5>SWP10514L!HD52973         ! 7: 1 8! 20:3842!31OCT80! 3000.0!53!       !    !
-       6>SWP 7442L!HD52973         ! 7: 1 8! 20:3859!20DEC79! 5400.0!53!       ! 301!
-       7>SWP 7443L!HD52973         ! 7: 1 8! 20:3859!20DEC79! 9600.0!53! U     ! 503!
-       8>SWP17927L!HD52973         ! 7: 1 8! 20:3842!12SEP82! 8820.0!53!       !    !
-       9>SWP17939L!HD52973         ! 7: 1 8! 20:3842!13SEP82!10800.0!53!       !    !
-      10>SWP17915L!HD52973         ! 7: 1 8! 20:3842!11SEP82! 7800.0!53! U     !    !
-                           <<<<  E N D    O F    L I S T  >>>>
-        GIVE REF.NOS.(E.G. 3,8) AND/OR RANGES(E.G.3-8) TO SELECT/END/OR LAST PAGE
-     PREV.PAGE (-)/E/SELECT LIST > 1-4,7,10
-     PREV.PAGE (-)/E/SELECT LIST >
-      END ? (Y/N) Y
-     WANT 'USAGE' DATA FOR SPECTRA SELECTED FILED (<CR>/N/?) > N
+REF>CAM+IMAGE!   HOMOGENEOUS  !  R.A. !  DECL. !OBSERV.!EXP.T. !OB!USAGE/ !EXP.!
+NO.>+APERTURE!       ID       !HH:MMSS! DD:MMSS! DATE  !SECS.  !CL!DUBIOUS!CODE!
+  1>SWP 7271L!HD52973         ! 7: 1 8! 20:3842!30NOV79! 4200.0!53! U     !    !
+  2>SWP 6379L!HD52973         ! 7: 1 8! 20:3842! 4SEP79! 2399.0!53! U     !    !
+  3>SWP 6383L!HD52973         ! 7: 1 8! 20:3842! 4SEP79! 4800.0!53! U  D  !    !
+  4>SWP10478L!HD52973         ! 7: 1 8! 20:3842!26OCT80! 3600.0!53! U     !    !
+  5>SWP10514L!HD52973         ! 7: 1 8! 20:3842!31OCT80! 3000.0!53!       !    !
+  6>SWP 7442L!HD52973         ! 7: 1 8! 20:3859!20DEC79! 5400.0!53!       ! 301!
+  7>SWP 7443L!HD52973         ! 7: 1 8! 20:3859!20DEC79! 9600.0!53! U     ! 503!
+  8>SWP17927L!HD52973         ! 7: 1 8! 20:3842!12SEP82! 8820.0!53!       !    !
+  9>SWP17939L!HD52973         ! 7: 1 8! 20:3842!13SEP82!10800.0!53!       !    !
+ 10>SWP17915L!HD52973         ! 7: 1 8! 20:3842!11SEP82! 7800.0!53! U     !    !
+                      <<<<  E N D    O F    L I S T  >>>>
+   GIVE REF.NOS.(E.G. 3,8) AND/OR RANGES(E.G.3-8) TO SELECT/END/OR LAST PAGE
+PREV.PAGE (-)/E/SELECT LIST > 1-4,7,10
+PREV.PAGE (-)/E/SELECT LIST >
+ END ? (Y/N) Y
+WANT 'USAGE' DATA FOR SPECTRA SELECTED FILED (<CR>/N/?) > N
 
-                     THE END OF A QUEST
-\end{verbatim}
+               THE END OF A QUEST
+\end{terminalv}
 \end{footnotesize}
-\normalsize
+
 The appropriate responses for other possible selection criteria are as follows:
 
 \footnotesize
 \begin{center}
 \begin{tabular}{|l|l|l|l|l|} \hline
 \footnotesize
-{}&\multicolumn{4}{c|}{\bf Responses to prompts} \\ \hline
-{\bf Selection criteria}&{\bf Camera {\it etc.}}&{\bf RA,DEC}&{\bf Obj. Class}
-&{\bf Hom. ID}\\ \hline
+{}&\multicolumn{4}{c|}{\textbf{Responses to prompts}} \\ \hline
+\textbf{Selection criteria}&\textbf{Camera \textit{etc.}}&\textbf{RA,DEC}&\textbf{Obj. Class}
+&\textbf{Hom. ID}\\ \hline
 Image SWP2347L &SWP2347L&&&\\
 SWP images of dwarf novae &SWP&&56&\\
 LWR large aperture images of HD52973&LWR L&&&HD52973\\
@@ -474,7 +442,7 @@ a spectrum when
 the results of a search are displayed,
 this indicates a comment of some sort is associated with that particular image.
 Possible comments are that the spectrum has an  uncertain exposure time, or
-was taken in trailed mode {\it etc.}
+was taken in trailed mode \textit{etc.}
 This information can be examined by choosing
 the DISPLAY \& SAVE DUBIOUS INFO. on QUEST's main menu.
 Any information generated by this selection will be written not
@@ -487,7 +455,7 @@ the list of the search results are displayed.
 To select all the spectra, you can reply 1--400 immediately.
 Alternatively a subset of spectra can be selected. For example the reply
 2--5,9,37 will select only spectra number 2,3,4,5,9 and 37 in the list.
-If spectra are specified twice ({\it e.g.} 2--10, 7,8) they will
+If spectra are specified twice (\textit{e.g.} 2--10, 7,8) they will
 only be written once in the output file.
 
 QUEST terminates automatically after a SELECT.
@@ -545,21 +513,21 @@ as the filename.
 
 For example if your USSP identifier is UKABC and you want your output files in
 DIPSO format an UNSPL session might proceed as follows
-\begin{verbatim}
-      $ UNSPL
+\begin{terminalv}
+$ UNSPL
 
-        UNSPL> OUTPUT SPECTRAL FILES FORMAT : DIPSO
-        UNSPL> DOWNLINK DATA FROM HOST SITE [Y/N] ?Y
-        UNSPL> USSP USER IDENTIFICATION : UKABC
-        DOWNLINKING FILE STADAT::DISK$STARDATA:[JM.USSP.USER]UKABC.SPE
-                               END-OF-FILE - RECORDS COPIED :   1
-        DOWNLINKING FILE STADAT::DISK$STARDATA:[JM.USSP.USER]UKABC.DES
-                               END-OF-FILE - RECORDS COPIED : 262
-        DOWNLINKING FILE STADAT::DISK$STARDATA:[JM.USSP.USER]UKABC.AUX
-                               END-OF-FILE - RECORDS COPIED :   5
-                                   DIPSO FORMAT SWP17368L.ULD
-                               END-OF-FILE - NUMBER OF SPECTRA :   1
-\end{verbatim}
+ UNSPL> OUTPUT SPECTRAL FILES FORMAT : DIPSO
+ UNSPL> DOWNLINK DATA FROM HOST SITE [Y/N] ?Y
+ UNSPL> USSP USER IDENTIFICATION : UKABC
+ DOWNLINKING FILE STADAT::DISK$STARDATA:[JM.USSP.USER]UKABC.SPE
+                        END-OF-FILE - RECORDS COPIED :   1
+ DOWNLINKING FILE STADAT::DISK$STARDATA:[JM.USSP.USER]UKABC.DES
+                        END-OF-FILE - RECORDS COPIED : 262
+ DOWNLINKING FILE STADAT::DISK$STARDATA:[JM.USSP.USER]UKABC.AUX
+                        END-OF-FILE - RECORDS COPIED :   5
+                            DIPSO FORMAT SWP17368L.ULD
+                        END-OF-FILE - NUMBER OF SPECTRA :   1
+\end{terminalv}
 In this particular example only one spectrum SWP17368L had been selected
 from those found by the search with QUEST.
 UNSPL produced the file SWP17368L.ULD in the users directory.
@@ -590,15 +558,15 @@ $-$3200&Pixel outside photometrically corrected region\\
 If the DIPSO format was selected the spectrum could be examined using
 the DIPSO USSPRD and USSPCLIP commands as follows: {\sl (The user's input is
 shown in capitals, with explanations following the exclamation marks.)}
-\begin{verbatim}
-     $ DIPSO
-       Welcome to DIPSO 2.2
-     > USSPRD SWP17368L                ! read the image
-     > PUSH                            ! push it on to DIPSO stack
-     > DEV GRAPHPACK                   ! device assignment (GKS workstation name)
-     > PM                              ! plot graph
-     > QUIT
-\end{verbatim}
+\begin{terminalv}
+$ DIPSO
+ Welcome to DIPSO 2.2
+> USSPRD SWP17368L                ! read the image
+> PUSH                            ! push it on to DIPSO stack
+> DEV GRAPHPACK                   ! device assignment (GKS workstation name)
+> PM                              ! plot graph
+> QUIT
+\end{terminalv}
 In the above example data with associated error flags more negative than $-250$
 were discarded on input.
 However the user can specify a different discrimination level for rejecting
@@ -606,10 +574,10 @@ data.
 The descriptions of the two relevant DIPSO commands are as follows:
 {\sl( Parameters enclosed in square brackets are optional.)}
 \begin{description}
-\item{\bf USSPRD filename$[$.typ$]$ $[${\it epsmin}$]$} --
+\item\textbf{USSPRD filename$[$.typ$]$ $[$\textit{epsmin}$]$} --
 reads the file into DIPSO. The filename extension defaults to `.ULD'.
 DIPSO rejects points on input if they are flagged with an epsilon less than or
-equal to {\it epsmin} (which defaults to $-251$), leaving the spectrum in
+equal to \textit{epsmin} (which defaults to $-251$), leaving the spectrum in
 the current arrays.
 It is forbidden to set epsmin less than or equal $-1600$, since this would
 result in totally unflagged, certainly bad, data being acquired.
@@ -621,7 +589,7 @@ possible, using USSPCLIP {\it(q.v.).}   However, it is recommended that the
 default epsmin be accepted unless you really know what you're doing,
 and have good reasons to choose a different value.
 
-\item{\bf USSPCLIP {\it epsmin} $n1\ [n2\ w1\ w2]$} --
+\item\textbf{USSPCLIP \textit{epsmin} $n1\ [n2\ w1\ w2]$} --
 clips points out of IUE USSP spectra which have `epsilons' less than
 or equal to epsmin.
 The data are expected to have been previously read into the stack
@@ -634,7 +602,7 @@ full wavelength range).
 
 \end{description}
 
-The reader  is referred to SUN/50 for a full description of DIPSO.
+The reader  is referred to \xref{SUN/50}{sun50}{} for a full description of DIPSO.
 
 \end{document}
 
