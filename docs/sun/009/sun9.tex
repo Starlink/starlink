@@ -1,19 +1,21 @@
-\documentclass[11pt,twoside]{article}
-\usepackage{graphicx}
-\pagestyle{myheadings}
+\documentclass[11pt,twoside,nolof]{starlink}
+
+% ? Specify used packages
+\usepackage{texnames}
+% ? End of specify used packages
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {9.7}
-\newcommand{\stardocauthors}   {Anne Charles}
-\newcommand{\stardocdate}      {26 June 1997}
-\newcommand{\stardoctitle}     {\LaTeX \\ A Document Preparation System}
-\newcommand{\stardocversion}   {Version 2e}
-\newcommand{\stardocmanual}    {User's Guide}
-\newcommand{\stardocabstract}  {This is a guide to the \LaTeX\
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {9.7}
+\stardocauthors     {Anne Charles}
+\stardocdate        {26 June 1997}
+\stardoctitle       {\LaTeX \\ A Document Preparation System}
+\stardocversion     {Version 2e}
+\stardocmanual      {User's Guide}
+\stardocabstract  {This is a guide to the \LaTeX\
                                 facilities available on Starlink. It gives a
                                 brief description of how \LaTeX\ works.
                                 It also tells how to display or print the
@@ -22,232 +24,16 @@
 % ? End of document identification
 
 % -----------------------------------------------------------------------------
+% ? Document-specific \providecommand or \newenvironment commands.
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
+\bibliographystyle{plain}
 
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % from the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
 % ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-\input{texnames.sty}
-\bibliographystyle{plain}
-
-\begin{htmlonly}
-  \newcommand{\BIBTeX}{BIBTeX}
-  \newcommand{\SLITeX}{SLITeX}
-  \newcommand{\LaTeXe}{LaTeX 2e}
-\end{htmlonly}
+\scfrontmatter
 
 \section{\xlabel{introduction}\label{introduction}Introduction}
 
@@ -281,8 +67,7 @@ Many \LaTeX-related documents can be accessed via the WWW page
 \emph{\TeX\ and \LaTeX\ on Starlink}:
 
 \begin{quote}
-      \htmladdnormallink{\texttt{http://www.starlink.ac.uk/\~{}acc/tex/tex.html}}
-      {http://www.starlink.ac.uk/\~{}acc/tex/tex.html}
+   \url{http://www.starlink.ac.uk/~acc/tex/tex.html}
 \end{quote}
 
 If you intend to use \LaTeX\ to write Starlink documentation (such as SUNs),
@@ -325,14 +110,14 @@ The process may be demonstrated by following an example.
 \label{se:example}
 A good example of \LaTeX\ source comes with the release.
 Copy it to your current directory:
-\begin{verbatim}
-      % cp /usr/local/teTeX/texmf/tex/latex/base/sample2e.tex .
-\end{verbatim}
+\begin{terminalv}
+% cp /usr/local/teTeX/texmf/tex/latex/base/sample2e.tex .
+\end{terminalv}
 Invoke \LaTeX\ to convert the source
 \texttt{.tex} file to the device independent \texttt{.dvi} file:
-\begin{verbatim}
-      % latex sample2e
-\end{verbatim}
+\begin{terminalv}
+% latex sample2e
+\end{terminalv}
 The file extension is assumed to be \texttt{.tex}.
 This creates the file \texttt{sample2e.dvi}.
 
@@ -340,9 +125,9 @@ To process the \texttt{.dvi} file for printing in PostScript mode,
 use the \texttt{dvips} program:\footnote{Use \texttt{dvican sample2e}
 for a Canon laser printer in native mode.}
 
-\begin{verbatim}
-      % dvips sample2e
-\end{verbatim}
+\begin{terminalv}
+% dvips sample2e
+\end{terminalv}
 
 The file extension is assumed to be \texttt{.dvi}.
 This creates the file \texttt{sample2e.ps}\footnote{\texttt{sample.dvi-can}
@@ -350,9 +135,9 @@ if you used \texttt{dvican}}.
 
 To print the file:\footnote{\texttt{lpr -Pn sample2e.dvi-can} for a Canon laser
 printer file.}
-\begin{verbatim}
-      % lpr -Pn sample2e.ps
-\end{verbatim}
+\begin{terminalv}
+% lpr -Pn sample2e.ps
+\end{terminalv}
 
 \texttt{n} specifies the printer.
 
@@ -395,9 +180,9 @@ had encountered an ordinary error. Return to command level by typing \texttt{x}.
 \subsection{\xlabel{spelling}Spelling}
 \label{se:unixspell}
 To use the spell utility for finding spelling errors in a \LaTeX\ input file:
-\begin{verbatim}
-      % ispell <filename>
-\end{verbatim}
+\begin{terminalv}
+% ispell <filename>
+\end{terminalv}
 
 For details on how to use the \texttt{ispell} utility, type \texttt{man ispell}.
 
@@ -409,12 +194,12 @@ program which can interpret the dvi code for the device you want to use:\footnot
 \texttt{dvi2vdu} is a previewer for Pericom, Graphon and some VT terminals;
                   there is help in the program and a
     \htmladdnormallink{manual}
-    {http://www.starlink.ac.uk/\~{}acc/tex/doc/programs/dviman.dvi}
+    {http://www.starlink.ac.uk/~acc/tex/doc/programs/dviman.dvi}
     \cite{dvican}.
 \texttt{dvican} is a translator for Canon LBP-8II and LBP-8III Laser
                  printers in native Canon mode; see the
     \htmladdnormallink{manual}
-    {http://www.starlink.ac.uk/\~{}acc/tex/doc/programs/dvitovdu.dvi}
+    {http://www.starlink.ac.uk/~acc/tex/doc/programs/dvitovdu.dvi}
     \cite{dvi2vdu}
     for more information.}
 
@@ -424,7 +209,7 @@ program which can interpret the dvi code for the device you want to use:\footnot
 \item \texttt{dvips} --- translator for PostScript devices; type \texttt{man dvips}
                   or see the
     \htmladdnormallink{dvips manual}
-    {http://www.starlink.ac.uk/\~{}acc/tex/doc/programs/dvipsk.dvi}\cite{dvips}
+    {http://www.starlink.ac.uk/~acc/tex/doc/programs/dvipsk.dvi}\cite{dvips}
     for more information.
 \end{itemize}
 
@@ -441,33 +226,33 @@ The \verb+xdvi+ translator will work on Xterminals and Xworkstations.
 Usually, \verb+xdvi+ knows where to send its output, but sometimes it must
 be told by using \xref{\texttt{xdisplay}}{sun129}{}\cite{sun129}.
 This will interrogate your terminal and access method:
-\begin{verbatim}
-      % xdisplay
-\end{verbatim}
+\begin{terminalv}
+% xdisplay
+\end{terminalv}
 or
-\begin{verbatim}
-      % xdisplay <workstation_name>
-\end{verbatim}
+\begin{terminalv}
+% xdisplay <workstation_name>
+\end{terminalv}
 You only need to do this once per session.
 
 For \texttt{xdisplay} to work properly you may need to authorize the remote
 workstation to open a window on the local workstation:
-\begin{verbatim}
-      % xhost +<workstation_name>
-\end{verbatim}
+\begin{terminalv}
+% xhost +<workstation_name>
+\end{terminalv}
 where \verb+<workstation_name>+ is the full name or valid alias or TCP/IP
 address of the remote workstation. The following commands are equivalent:
-\begin{verbatim}
-      % xhost +axp1.ast.man.ac.uk
-      % xhost +axp1
-      % xhost +130.88.9.41
-\end{verbatim}
+\begin{terminalv}
+% xhost +axp1.ast.man.ac.uk
+% xhost +axp1
+% xhost +130.88.9.41
+\end{terminalv}
 
 \subsubsection{Command Syntax}
 The command:
-\begin{verbatim}
-      % xdvi <filename>
-\end{verbatim}
+\begin{terminalv}
+% xdvi <filename>
+\end{terminalv}
 creates a window on the default X-windows display and displays the first
 page of the file \texttt{<filename>.dvi}.
 
@@ -495,18 +280,18 @@ given in the descriptions of the options. To do this
 create a file \texttt{.Xdefaults} in your top level directory.
 Include in this file the resource names
 and arguments of each of the options you wish to specify.  For example:
-\begin{verbatim}
-   XDvi.copy: off
-   XDvi.thorough: on
-   XDvi.shrinkFactor: 2
-   XDvi.Margin: 0.95
-   XDvi*geometry: 1015x750+3+25
-\end{verbatim}
+\begin{terminalv}
+XDvi.copy: off
+XDvi.thorough: on
+XDvi.shrinkFactor: 2
+XDvi.Margin: 0.95
+XDvi*geometry: 1015x750+3+25
+\end{terminalv}
    When \verb+xdvi+ is invoked, it behaves as if it had been invoked with the
    command:
-\begin{verbatim}
-   % xdvi +copy -thorough -s 2 -margins 0.95 -geometry 1015x750+3+25 dvifile
-\end{verbatim}
+\begin{terminalv}
+% xdvi +copy -thorough -s 2 -margins 0.95 -geometry 1015x750+3+25 dvifile
+\end{terminalv}
    Specifying options on the command line will override any options listed
    in the \texttt{.Xdefaults} file.
 
@@ -518,43 +303,43 @@ $\bullet$ \textbf{Print at 600 dpi}
 
 Most PostScript printers print at 300dpi.  However,
 if your printer is capable of printing at 600dpi you can invoke it by:
-\begin{verbatim}
-      % dvips -D 600 -Z <filename>
-\end{verbatim}
+\begin{terminalv}
+% dvips -D 600 -Z <filename>
+\end{terminalv}
 
 $\bullet$ \textbf{Print selected pages}
 
 To print the pages which are numbered 5 through 10:
 
-\begin{verbatim}
-      % dvips -p5 -l10 <filename>
-\end{verbatim}
+\begin{terminalv}
+% dvips -p5 -l10 <filename>
+\end{terminalv}
 
 To print the fifth through tenth pages:
 
-\begin{verbatim}
-      % dvips -p=5 -l=10 <filename>
-\end{verbatim}
+\begin{terminalv}
+% dvips -p=5 -l=10 <filename>
+\end{terminalv}
 
 $\bullet$ \textbf{Print in landscape mode}
 
 Use the \texttt{landscape} class option in the \texttt{.tex} file
 to set the default margins correctly:
 
-\begin{verbatim}
-      \documentclass[landscape]{article}
-\end{verbatim}
+\begin{terminalv}
+\documentclass[landscape]{article}
+\end{terminalv}
 
 Then invoke \texttt{dvips} as follows:
 
-\begin{verbatim}
-      % dvips -t landscape <filename>
-\end{verbatim}
+\begin{terminalv}
+% dvips -t landscape <filename>
+\end{terminalv}
 
 For more information about \texttt{dvips} options, type \texttt{man dvips} or
 see the
     \htmladdnormallink{dvips manual}
-    {http://www.starlink.ac.uk/\~{}acc/tex/doc/programs/dvipsk.dvi}\cite[section 7, p. 26]{dvips}.
+    {http://www.starlink.ac.uk/~acc/tex/doc/programs/dvipsk.dvi}\cite[section 7, p. 26]{dvips}.
 
 \section{\xlabel{more_about_latex}\label{more_about_latex}More about \LaTeX}
 
@@ -562,7 +347,7 @@ see the
 proc, slides}
 \label{se:dstyle}
 
-$\bullet$ \\textbf{Standard Classes}
+$\bullet$ \textbf{Standard Classes}
 
 \LaTeX\ provides the following standard document classes:
 \texttt{article, book, letter, report} and \texttt{slides}.
@@ -571,21 +356,21 @@ for Starlink documents.
 You may specify class options for size of type, one or two-column formatting,
 \emph{etc}.
 Templates for producing the document in standard Starlink styles,
-{\em e.g.} SUNs, SGPs, \emph{etc}. are stored in
+\emph{e.g.} SUNs, SGPs, \emph{etc}. are stored in
 \verb+/star/docs+ as \verb+sun.tex+, \verb+sgp.tex+, \verb+ssn.tex+ and
 \verb+sg.tex+.
 
 If you use \LaTeX's default margin settings in your non-Starlink documents,
 you should specify \texttt{a4paper} as a document-class option:
-\begin{verbatim}
-      \documentclass[a4paper]{article}
-\end{verbatim}
+\begin{terminalv}
+\documentclass[a4paper]{article}
+\end{terminalv}
 otherwise it will default to \texttt{letterpaper}, American quarto.
 There has been much discussion about this on USENET News.
 The conclusion seems to be that it has to default to
 something and no matter what is chosen a lot of people will be unhappy.
 
-$\bullet$ \\textbf{The \texttt{proc} Document Class}
+$\bullet$ \textbf{The \texttt{proc} Document Class}
 
 The \texttt{proc} document class produces two-column output for conference
 proceedings.  The command \hbox{\verb|\copyrightspace|} makes the blank
@@ -597,37 +382,37 @@ generates a footnote in that column.
 
 \LaTeX\ automatically numbers the output pages.  It is a good idea
 to identify the paper on each page of output.  Placing the following command
-in the preamble (before the \hbox{\verb|\begin{document}|} command)
+in the preamble (before the \hbox{\verb|\begin{document}|} command
 prints ``Jones---Foo'' at the bottom of each page:
 
-\begin{verbatim}
-      \markright{Jones---Foo}
-\end{verbatim}
+\begin{terminalv}
+\markright{Jones---Foo}
+\end{terminalv}
 
-$\bullet$ \\textbf{Slides}
+$\bullet$ \textbf{Slides}
 
 \SLITeX\ has been replaced by the \texttt{slides} document class,
 which is accessed by specifying:
 
-\begin{verbatim}
-      \documentclass{slides}
-\end{verbatim}
+\begin{terminalv}
+\documentclass{slides}
+\end{terminalv}
 
 See the \LaTeX\ manual\cite{lamport} for more information.
 There are other ways of making
 \htmladdnormallink{slides}
-{http://www.starlink.ac.uk/\~{}acc/tex/packages.html#slides}.
+{http://www.starlink.ac.uk/~acc/tex/packages.html\#slides}.
 \begin{latexonly} See the
 WWW page mentioned in Section~\ref{introduction} more information.
 \end{latexonly}
 
 \subsection{\xlabel{packages}Packages and Programs}
 
-$\bullet$ \\textbf{Packages}
+$\bullet$ \textbf{Packages}
 
 An extensive range of
 \htmladdnormallink{\LaTeX\ packages}
-{http://www.starlink.ac.uk/\~{}acc/tex/packages.html}
+{http://www.starlink.ac.uk/~acc/tex/packages.html}
 is included in this release.
 \begin{latexonly} See the
 WWW page mentioned in Section~\ref{introduction} more information.
@@ -635,28 +420,28 @@ WWW page mentioned in Section~\ref{introduction} more information.
 
 Specify each package you use as follows:
 
-\begin{verbatim}
-      \documentclass{article}
-      \usepackage{<package1>,<package2>,...}
-\end{verbatim}
+\begin{terminalv}
+\documentclass{article}
+\usepackage{<package1>,<package2>,...}
+\end{terminalv}
 
 
-$\bullet$ \\textbf{BIBTeX}
+$\bullet$ \textbf{BIBTeX}
 
 \BIBTeX\ produces a bibliography from databases of sources.
 See the
 \htmladdnormallink{\BIBTeX\ manual}
-{http://www.starlink.ac.uk/\~{}acc/tex/doc/bibtex/base/btxdoc.dvi}\cite{bibtex}
+{http://www.starlink.ac.uk/~acc/tex/doc/bibtex/base/btxdoc.dvi}\cite{bibtex}
 and the \LaTeX\ manual\cite[Section 4.3.1 and Appendix B]{lamport}
 for more information.
 
 
-$\bullet$ \\textbf{MakeIndex}
+$\bullet$ \textbf{MakeIndex}
 
 MakeIndex is a tool for making an index for a document.
 See the
 \htmladdnormallink{MakeIndex manual}
-{http://www.starlink.ac.uk/\~{}acc/tex/doc/makeindex/makeindex.dvi}\cite{makeindex}
+{http://www.starlink.ac.uk/~acc/tex/doc/makeindex/makeindex.dvi}\cite{makeindex}
 for more information.
 
 \subsection{\xlabel{fonts}Fonts}
@@ -725,9 +510,9 @@ the printer. Each new frame generates a separate file.
 Hint: The name of the output file will default to \texttt{gks74.ps}.
 However, you can enter it at the time of specifying the GKS workstation:
 
-\begin{verbatim}
-       epsf_p;graph.eps
-\end{verbatim}
+\begin{terminalv}
+epsf_p;graph.eps
+\end{terminalv}
 
 The output will then be in files \texttt{graph.eps},
 \texttt{graph.eps.1}, \texttt{graph.eps.2}, \emph{etc}.
@@ -771,11 +556,11 @@ go on to section \ref{IncludePSFile}.
     the \texttt{ghostscript} program \texttt{ps2epsi}.
     For more information, see the
     \htmladdnormallink{EPS manual}
-    {http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/epslatex.ps}\cite[section 3.1, p 7]{eps}.
+    {http://www.starlink.ac.uk/~acc/tex/doc/latex/graphics/epslatex.ps}\cite[section 3.1, p 7]{eps}.
     If you are unable to use \texttt{ps2epsi}, you must determine what the
     \texttt{BoundingBox}  should be and add it by hand. For information see the
     \htmladdnormallink{EPS manual}
-    {http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/epslatex.ps}\cite[section 3.1, \#2, p 8]{eps}.
+    {http://www.starlink.ac.uk/~acc/tex/doc/latex/graphics/epslatex.ps}\cite[section 3.1, \#2, p 8]{eps}.
 
 \subsection{\xlabel{including_the_postscript_file}\label{includepsfile}Including the PostScript File\xlabel{IncludePSFile}
 \label{IncludePSFile}}
@@ -786,10 +571,10 @@ is enabled by the \verb+\usepackage+ command.
 Use the \verb+\includegraphics+ command to include the PostScript file.
 For more information about the \texttt{graphicx} package, see the
 \htmladdnormallink{graphics manual}
-{http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/grfguide.ps}\cite[section 4, pp 6-14]{graphics},
+{http://www.starlink.ac.uk/~acc/tex/doc/latex/graphics/grfguide.ps}\cite[section 4, pp 6-14]{graphics},
 and the
 \htmladdnormallink{EPS manual}
-{http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/epslatex.ps}\cite[part I, section 1,  p 5]{eps}.
+{http://www.starlink.ac.uk/~acc/tex/doc/latex/graphics/epslatex.ps}\cite[part I, section 1,  p 5]{eps}.
 
 Allow the image to float to the next page if it does not fit on the
 current page by placing the \verb+\includegraphics+ command inside a
@@ -797,45 +582,45 @@ current page by placing the \verb+\includegraphics+ command inside a
 For more information about the \texttt{figure} environment, see the \LaTeX\
 manual\cite[section 3.5.1]{lamport} and the
 \htmladdnormallink{EPS manual}
-{http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/epslatex.ps}\cite[part IV, section 10, p 36]{eps}.
+{http://www.starlink.ac.uk/~acc/tex/doc/latex/graphics/epslatex.ps}\cite[part IV, section 10, p 36]{eps}.
 
 Centre the image by preceding the \verb+\includegraphics+ command with
 \verb+\centering+.
 
-    \begin{verbatim}
-      \documentclass{article}
-      \usepackage{graphicx}
-      ...
-      \begin{figure}
-        \centering
-        \includegraphics{<filename>}
-        \caption{<text>}
-      \end{figure}
-    \end{verbatim}
+\begin{terminalv}
+\documentclass{article}
+\usepackage{graphicx}
+   ...
+  \begin{figure}
+    \centering
+    \includegraphics{<filename>}
+    \caption{<text>}
+  \end{figure}
+\end{terminalv}
 
 Specifying \texttt{draft} as an option to the \texttt{graphicx} package,
 prints the filename in a box of the correct size. This can save time
 when writing the document:
 
-    \begin{verbatim}
-      \documentclass{article}
-      \usepackage[draft]{graphicx}
-    \end{verbatim}
+\begin{terminalv}
+\documentclass{article}
+\usepackage[draft]{graphicx}
+\end{terminalv}
 
 You can specify a scale factor, angle of rotation, image width, and/or
 image height within the \verb+\includegraphics+ command, for example:
-    \begin{verbatim}
-      \includegraphics[scale=0.5]{<filename>}
-      \includegraphics[angle=45]{<filename>}
-      \includegraphics[width=2in]{<filename>}
-      \includegraphics[totalheight=4in]{<filename>}
-      \includegraphics[scale=0.5,totalheight=4in]{<filename>}
-    \end{verbatim}
+\begin{terminalv}
+\includegraphics[scale=0.5]{<filename>}
+\includegraphics[angle=45]{<filename>}
+\includegraphics[width=2in]{<filename>}
+\includegraphics[totalheight=4in]{<filename>}
+\includegraphics[scale=0.5,totalheight=4in]{<filename>}
+\end{terminalv}
 For a more detailed discussion, see the
 \htmladdnormallink{EPS manual}
-{http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/epslatex.ps}\cite[part III, section 6, pp 15-19]{eps}.
+{http://www.starlink.ac.uk/~acc/tex/doc/latex/graphics/epslatex.ps}\cite[part III, section 6, pp 15-19]{eps}.
 
-\subsection{Manipulating the Image: \\
+\subsection{Manipulating the Image:
 Placement, Landscape, Side-by-side, Text Around Image\xlabel{ManipulatingImage}}
 
 $\bullet$ \textbf{Placement}
@@ -843,13 +628,13 @@ $\bullet$ \textbf{Placement}
     Choose where \LaTeX\ should place the figure by specifying an
     option to the \texttt{figure} environment:
 
-    \begin{verbatim}
-      \begin{figure}[<option>]
-        \centering
-        \includegraphics{<filename>}
-        \caption{<text>}
-      \end{figure}
-    \end{verbatim}
+\begin{terminalv}
+\begin{figure}[<option>]
+   \centering
+   \includegraphics{<filename>}
+   \caption{<text>}
+\end{figure}
+\end{terminalv}
 
     where the \texttt{figure} \emph{option} can be any combination of the
     following:
@@ -866,7 +651,7 @@ $\bullet$ \textbf{Placement}
     to make \LaTeX\ try really hard to place the figure where you have
     specified.  See the
     \htmladdnormallink{EPS manual}
-    {http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/epslatex.ps}\cite[part IV, section 10, p 36]{eps}.
+    {http://www.starlink.ac.uk/~acc/tex/doc/latex/graphics/epslatex.ps}\cite[part IV, section 10, p 36]{eps}.
 
 $\bullet$ \textbf{Landscape}
 
@@ -874,23 +659,23 @@ $\bullet$ \textbf{Landscape}
     to print an image in the landscape orientation, while
     keeping the page heading in the portrait orientation:
 
-    \begin{verbatim}
-      \documentclass{article}
-      \usepackage{lscape,graphicx}
-      ...
-      \begin{landscape}
-        \begin{figure}
-          \centering
-          \includegrapics{<filename>}
-          \caption{<text>}
-        \end{figure}
-      \end{landscape}
-    \end{verbatim}
+\begin{terminalv}
+ \documentclass{article}
+ \usepackage{lscape,graphicx}
+ ...
+\begin{landscape}
+  \begin{figure}
+    \centering
+    \includegrapics{<filename>}
+    \caption{<text>}
+  \end{figure}
+\end{landscape}
+\end{terminalv}
 
     For more information about the \texttt{landscape} environment and other
     ways of producing landscape orientation, see the
     \htmladdnormallink{EPS manual}
-    {http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/epslatex.ps}\cite[part IV, section 11, p 38-41]{eps}.
+    {http://www.starlink.ac.uk/~acc/tex/doc/latex/graphics/epslatex.ps}\cite[part IV, section 11, p 38-41]{eps}.
 
     Note: I have found that the caption may not be rotated when viewed with
     \texttt{xdvi}; however, it is rotated correctly by \texttt{dvips}. The
@@ -907,24 +692,24 @@ $\bullet$ \textbf{Side-by-side}
     \end{enumerate}
 
     These are all discussed in detail in the
-    \htmladdnormallink{EPS manual}{http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/graphics/epslatex.ps}\cite[part IV, section 12, pp 41-48]{eps}.
+    \htmladdnormallink{EPS manual}{http://www.starlink.ac.uk/~acc/tex/doc/latex/graphics/epslatex.ps}\cite[part IV, section 12, pp 41-48]{eps}.
     The \texttt{subfigure} method is also documented in the
-    \htmladdnormallink{subfigure manual}{http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/styles/subfigure.dvi}\cite{subfigure}.
+    \htmladdnormallink{subfigure manual}{http://www.starlink.ac.uk/~acc/tex/doc/latex/styles/subfigure.dvi}\cite{subfigure}.
 
 $\bullet$ \textbf{Text Around Image: floatflt}
 
   Use the \texttt{floatflt} package to get text to wrap around a small figure:
 
-  \begin{verbatim}
-    \documentclass{article}
-    \usepackage{floatflt,graphicx}
-    ...
-    \begin{floatingfigure}[<option>]{<width>}
-      \centering
-      \includegraphics{<filename>}
-      \caption{<text>}
-    \end{floatingfigure}
-  \end{verbatim}
+\begin{terminalv}
+\documentclass{article}
+\usepackage{floatflt,graphicx}
+...
+\begin{floatingfigure}[<option>]{<width>}
+  \centering
+  \includegraphics{<filename>}
+  \caption{<text>}
+\end{floatingfigure}
+\end{terminalv}
 
 where \emph{option} indicates the placement of the figure on the page and
 can be any combination of the following:
@@ -938,25 +723,25 @@ can be any combination of the following:
 
 For example:
 
-  \begin{verbatim}
-    \documentclass{article}
-    \usepackage{floatflt,graphicx}
-    ...
-    \begin{floatingfigure}[l]{5cm}
-      \centering
-      \includegraphics[scale=0.5]{graph.ps}
-      \caption{An Interesting Graph}
-    \end{floatingfigure}
-  \end{verbatim}
+\begin{terminalv}
+\documentclass{article}
+\usepackage{floatflt,graphicx}
+ ...
+\begin{floatingfigure}[l]{5cm}
+  \centering
+  \includegraphics[scale=0.5]{graph.ps}
+  \caption{An Interesting Graph}
+\end{floatingfigure}
+\end{terminalv}
 
 
   Detailed information, including a section about `Known problems and
 limitations', can be found in the
-  \htmladdnormallink{\texttt{floatflt} manual}{http://www.starlink.ac.uk/\~{}acc/tex/doc/latex/floatflt/floatflt.dvi}\cite{floatflt}.
+  \htmladdnormallink{\texttt{floatflt} manual}{http://www.starlink.ac.uk/~acc/tex/doc/latex/floatflt/floatflt.dvi}\cite{floatflt}.
 
   Note: If the size of the image is larger than the size allowed by
-{\em width}, no figure will be created and no warning message will be
-given. To get the figure to appear, increase {\em width} and/or
+\emph{width}, no figure will be created and no warning message will be
+given. To get the figure to appear, increase \emph{width} and/or
 decrease \texttt{scale}.
 
 
@@ -985,7 +770,7 @@ PostScript:
     \end{quote}
     See the
     \htmladdnormallink{xv manual}
-    {http://www.starlink.ac.uk/\~{}acc/tex/xvdocs.ps}\cite[section 8 `The Load Window', section 9 `The Save Window', section 10
+    {http://www.starlink.ac.uk/~acc/tex/xvdocs.ps}\cite[section 8 `The Load Window', section 9 `The Save Window', section 10
     `The PostScript Window']{xv}.
   \item \htmladdnormallink{ImageMagick}
     {http://www.wizards.dupont.com/cristy/ImageMagick.html}
@@ -994,9 +779,9 @@ PostScript:
     distributed by Starlink.
     \begin{latexonly}
     You can find out more about it at:
-    \begin{verbatim}
-      http://www.wizards.dupont.com/cristy/ImageMagick.html
-    \end{verbatim}
+    \begin{quote}
+     \url{http://www.wizards.dupont.com/cristy/ImageMagick.html}
+    \end{quote}
     \end{latexonly}
 \end{enumerate}
 
@@ -1010,16 +795,16 @@ other formats:
   \item \htmladdnormallink{\TeX/\LaTeX\ FAQ}
     {http://www.cogs.susx.ac.uk/cgi-bin/texfaq2html?keyword=font&question=48}
     \begin{latexonly}
-      \begin{verbatim}
-http://www.cogs.susx.ac.uk/cgi-bin/texfaq2html?keyword=font\&question=48
-      \end{verbatim}
+      \begin{quote}
+\url{http://www.cogs.susx.ac.uk/cgi-bin/texfaq2html?keyword=font\&question=48}
+      \end{quote}
     \end{latexonly}
   \item \htmladdnormallink{Converters between \LaTeX\ and PC Textprocessors}
     {http://www.kfa-juelich.de/isr/1/texconv.html}
     \begin{latexonly}
-      \begin{verbatim}
-http://www.kfa-juelich.de/isr/1/texconv.html
-      \end{verbatim}
+      \begin{quote}
+\url{http://www.kfa-juelich.de/isr/1/texconv.html}
+      \end{quote}
     \end{latexonly}
 \end{itemize}
 
