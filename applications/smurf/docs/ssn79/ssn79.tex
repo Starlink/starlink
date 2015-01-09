@@ -146,7 +146,7 @@ properly fit to the full data set. See Figure~\ref{fig:parallel}.
 \begin{center}
 \includegraphics[width=\textwidth]{ssn79_parallel_flowchart}
 \caption[Parallel flow chart]{The distributed-memory parallel version
-  of the iterative map-maker is essentially $N_\mathrm{node}$
+  of the iterative map-maker is essentially $N_{\mathrm{node}}$
   map-makers running independently, except that communication between
   processes is required to calculate the models (represented by green
   arrows). Note that the termination condition (represented by
@@ -157,12 +157,12 @@ properly fit to the full data set. See Figure~\ref{fig:parallel}.
 \end{center}
 \end{figure}
 
-By breaking up the data set over $N_\mathrm{node}$ processes, we are
+By breaking up the data set over $N_{\mathrm{node}}$ processes, we are
 able to handle data sets much larger than can be done with a single
 machine. Additionally, since the calculations are split up over many
 nodes, the map-maker can in principle run much faster than the serial
-version. The speed-up in run time is not simply $1/N_\mathrm{node}$,
-however, due to the time required by the communication steps, which
+version. The speed-up in run time is not simply $1/N_{\mathrm{node}}$, however,
+due to the time required by the communication steps, which
 can be significant. Also, since the model calculations proceed
 sequentially, the system proceeds only as fast as the slowest
 node. The scaling of run time with number of processes for a prototype
@@ -214,7 +214,7 @@ Figure~\ref{fig:serial_highpass} illustrates how the existing
 multithreaded map-maker performs the convolutions necessary for the
 high-pass filter model. Since each detector time-stream can be
 processed independently, the detectors are divided into
-$N_\mathrm{thread}$ chunks and each thread performs the convolution of
+$N_{\mathrm{thread}}$ chunks and each thread performs the convolution of
 each detector with the filter and stores the result directly in a
 shared-memory array.
 
@@ -232,7 +232,7 @@ shared-memory array.
 With full detector time streams on each node, parallelizing the
 high-pass filter model is trivial, as shown in
 Figure~\ref{fig:parallel_highpass}. Each node is responsible for
-$N_\mathrm{det} / N_\mathrm{node}$ detectors which are then further
+$N_{\mathrm{det}} / N_{\mathrm{node}}$ detectors which are then further
 split up for each thread. No communication between processes is
 required.
 
@@ -271,8 +271,8 @@ to the parallel version is more clear.
   the signal and number of detectors are accumulated at each time
   slice, then the average at each step is calculated. Note that it is
   simple to extend this to a weighted average by accumulating
-  $w_\mathrm{dt} x_\mathrm{dt}$ and $w_\mathrm{dt}$ instead of
-  $x_\mathrm{dt}$ and 1.}
+  $w_{\mathrm{dt}} x_{\mathrm{dt}}$ and $w_{\mathrm{dt}}$ instead of
+  $x_{\mathrm{dt}}$ and 1.}
 \label{fig:serial_common}
 \end{center}
 \end{figure}
@@ -298,7 +298,7 @@ shown in Figure~\ref{fig:parallel_common}.
 
 The code to perform this operation might look something like this:
 
-\begin{verbatim}
+\begin{terminalv}
 for (idet=0; idet<ndet; idet++) {
   for (isamp=0; isamp<nsamp; isamp++) {
     signal[isamp] += data[idet*ndet+isamp];
@@ -314,7 +314,7 @@ MPI_Allreduce(MPI_IN_PLACE, count, nsamp, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 for (isamp=0; isamp<nsamp; isamp++) {
   signal[isamp] /= count[isamp];
 }
-\end{verbatim}
+\end{terminalv}
 
 This program is run by each process, where \verb+ndet+ is the number
 of detectors ``owned'' by the process, and is not restricted to be the
