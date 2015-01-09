@@ -34,7 +34,7 @@ with the ACSIS correlator at JCMT.
       <uname>agg</uname>
     </person>
   </developers>
-  <documentation> sun258 sun259 sc19</documentation>
+  <documentation> sun258 sun259 sc19 ssn79</documentation>
   <bugreports>scuba2dr@phas.ubc.ca</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
