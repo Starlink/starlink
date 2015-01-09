@@ -90,6 +90,7 @@ SSN                           STARLINK SYSTEM NOTES                          SSN
 076.01  2001-05-24 ACD   17   CATREMOTE - a tool for querying remote catalogues
 077.01  2001-08-16 ajc   14   ADAM - The control subsystem
 078.01  2005-04-11 nxg   ??   The Starlink Build System
+079.01  2014-12-17 AGM   ??   Further parallelization of iteratemap with MPI
 
 SUG                            STARLINK USER GUIDE                           SUG
 .10     1997-10-17 MDL   24   Starlink User's Guide
@@ -277,6 +278,7 @@ AUTHORS                          AUTHORS                                AUTHORS
        ACF   Adrian Fish             (UCL - left)
        AFT   Allyn Tennant           (Marshall SFC)
        AGG   Andy Gibb               (UBC)
+       AGM   A. Gaelen Marsden       (UBC)
        AJC   Alan Chipperfield       (RAL)
        AJP   Alan Penny              (RAL)
        APL   Alan Lotts              (DUR)
