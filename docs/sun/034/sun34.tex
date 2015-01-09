@@ -1,63 +1,27 @@
-\documentstyle[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt,nolof,noabs]{starlink}
 
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocnumber}    {34.1}
-\newcommand{\stardocauthors}   {G R Mellor}
-\newcommand{\stardocdate}      {7 October 1991}
-\newcommand{\stardoctitle}     {GNU EMACS --- Display Editor}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocnumber      {34.1}
+\stardocauthors     {G R Mellor}
+\stardocdate        {7 October 1991}
+\stardoctitle       {GNU EMACS --- Display Editor}
 %------------------------------------------------------------------------------
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
 %------------------------------------------------------------------------------
-% Add any \newcommand or \newenvironment commands here
+% Add any \providecommand or \newenvironment commands here
 %------------------------------------------------------------------------------
 
 \begin{document}
-\thispagestyle{empty}
-SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
-RUTHERFORD APPLETON LABORATORY\\
-{\large\bf Starlink Project\\}
-{\large\bf \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Large\bf \stardoctitle}
-\end{center}
-\vspace{5mm}
-
-%------------------------------------------------------------------------------
-%  Add this part if you want a table of contents
-%  \setlength{\parskip}{0mm}
-%  \tableofcontents
-%  \setlength{\parskip}{\medskipamount}
-%  \markright{\stardocname}
-%------------------------------------------------------------------------------
+\scfrontmatter
 
 \section{Introduction}
 
 This document describes the GNU EMACS editor as distributed by Starlink
 for UNIX systems. It is intended to provide an introduction for the
 new user. For a comprehensive description of the editor, refer to
-the {\it GNU EMACS Manual}.
+the \textit{GNU EMACS Manual}.
 
 
 The GNU EMACS editor is a powerful editor with many advanced customizable
@@ -70,25 +34,25 @@ facilities similar to the EVE editor are also available.
 \section{Getting Started}
 
 An Emacs tutorial is provided with the editor and can be accessed
-by first running Emacs by typing {\tt emacs} and then typing {\tt C-h t}
-where {\tt C-h} means pressing the Control and h keys simultaneously.
+by first running Emacs by typing \texttt{emacs} and then typing \texttt{C-h t}
+where \texttt{C-h} means pressing the Control and h keys simultaneously.
 This teaches the raw commands which are all key combinations commencing
-with either the Control Key ({\tt C}) or the Meta/Escape Key ({\tt M}).
+with either the Control Key (\texttt{C}) or the Meta/Escape Key (\texttt{M}).
 A more
 user friendly system can be obtained by customizing the editor.
-The customized definitions reside in an initialisation file {\tt .emacs}
-in the home directory. A template {\tt .emacs} file providing
-a basic EDT keypad emulation is available in {\tt /star/emacs}.
+The customized definitions reside in an initialisation file \texttt{.emacs}
+in the home directory. A template \texttt{.emacs} file providing
+a basic EDT keypad emulation is available in \texttt{/star/emacs}.
 Some further basic commands that might also be required are listed
 in the GNU Emacs Reference Card which is appended to this document.
 
 \section{Exiting Emacs}
 
-There are two different ways of exiting Emacs: {\it suspending} and
-{\it killing} Emacs. {\it killing} means destroying the Emacs job,
-however {\it suspending} Emacs allows you to return to the session later.
+There are two different ways of exiting Emacs: \textit{suspending} and
+\textit{killing} Emacs. \textit{killing} means destroying the Emacs job,
+however \textit{suspending} Emacs allows you to return to the session later.
 The best way to finish a session is to save the file and then suspend
-Emacs. Emacs can be resumed later with a {\tt \%emacs} command if you are
+Emacs. Emacs can be resumed later with a \texttt{\%emacs} command if you are
 using the C shell.
 
 \end{document}
