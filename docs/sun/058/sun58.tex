@@ -1,222 +1,29 @@
-\documentclass[11pt,twoside]{article}
-\pagestyle{myheadings}
+\documentclass[11pt,twoside,nolof,noabs]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {58.7}
-\newcommand{\stardocauthors}   {C. Lloyd}
-\newcommand{\stardocdate}      {16 March 1995}
-\newcommand{\stardoctitle}     {IUEDA\\[2ex]
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {58.7}
+\stardocauthors     {C. Lloyd}
+\stardocdate        {16 March 1995}
+\stardoctitle     {IUEDA\\[2ex]
                                Access to the IUE data archive}
 % ? End of document identification
 
 % -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % from the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
+% ? Document-specific \providecommand or \newenvironment commands.
 % ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle}
-   \end{center}
-   \vspace{5mm}
-
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-\end{htmlonly}
-
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section {Introduction\xlabel{introduction}}
 
-The {\it International Ultraviolet Explorer\/} satellite (IUE) is one of the
+The \textit{International Ultraviolet Explorer\/} satellite (IUE) is one of the
 most successful, versatile and productive astronomical satellites, providing
 ultraviolet spectra of a wide range of sources for the whole astronomical
 community.
@@ -285,25 +92,25 @@ number of images during the commissioning phase, early in the mission.
 
 IUE images are referred to by the camera name and a running image number,
 eg. SWP22861.
-Each image is held as a number of files which contain the {\it raw\/} image,
+Each image is held as a number of files which contain the \textit{raw\/} image,
 some intermediate partly processed images and the final extracted 1-d spectra.
 The data in the archive is in what is known as Guest Observer (GO) format.
 The raw IUE image is a 2-d scan of the camera target.
 The intensity in each pixel is given as a Data Number (DN) in the
 range 0 -- 255.
 The image is superimposed on a `pedestal' of $\sim$ 20 DN and
-overexposed ({\it saturated}) parts of the spectrum are set to 255 DN.
+overexposed (\textit{saturated}) parts of the spectrum are set to 255 DN.
 
 In the photometric image the
 DN values for each pixel are converted to fluxes via an Intensity Transfer
 Function (ITF) and are given in terms of a Flux Number (FN).
 Two types of photometric image have been used.
 Until about 1981 the raw image was geometrically as well as photometrically
-corrected to produce a {\it gphot\/} image.
+corrected to produce a \textit{gphot\/} image.
 The geometric correction removes the distortion in the camera and
 the read process.
 More recently the raw image has been photometrically
-corrected in raw space, to yield a {\it phot\/} image, and the geometric
+corrected in raw space, to yield a \textit{phot\/} image, and the geometric
 correction left to a later part of the processing.
 The timing of the change over of from gphot to phot was different for
 the two ground stations and different dispersions (see Table
@@ -414,7 +221,7 @@ spectra.
 The \$IUEDR directory contains tables to correct for the camera sensitivity
 degredation.
 A helpful introduction to using IUEDR may be found in
-\xref{SG/7: {\em IUE Analysis - A
+\xref{SG/7: \emph{IUE Analysis - A
 Tutorial}}{sg7}{} and in the more comprehensive but rather old MUD/45: IUEDR User
 Guide.
 The \xref{DIPSO}{sun50}{} package (SUN/50) has many features specifically designed for IUE
@@ -424,7 +231,7 @@ For some work the Uniform Low Dispersion Archive \xref{SUN/20}{sun20}{} may be a
 The ULDA is an on-line archive of LORES extracted spectra which have had the
 details of the targets and exposures verified.
 However it should be remembered that
-these spectra are {\it not} uniformly processed, and are identical to the
+these spectra are \textit{not} uniformly processed, and are identical to the
 extracted spectra in the full archive.
 The ULDA may still be accessed from the various STARLINK site accounts on
 stadat.
@@ -444,12 +251,14 @@ probably take a further two years to complete.
 \xlabel{the_iue_captive_account}\label{captive}}
 
 The IUE captive account is on the (VMS) database machine at RAL
-(stadat.rl.ac.uk).
+(\texttt{stadat.rl.ac.uk}).
 It is principally used to access the IUE catalogue but also enables IUE
 observing details, beta angles, to be calculated.
 To use the captive account
 
-{\tt \% telnet stadat.rl.ac.uk}
+\begin{terminalv}
+% telnet stadat.rl.ac.uk
+\end{terminalv}
 
 and login to username IUE (no password is required).
 You will be asked for a name, which is used for a subdirectory to contain your
@@ -492,43 +301,44 @@ need to do so.
 
 To consult the catalogue select the IUELOG option.
 There is usually a page of information about the latest log update and then
-you are prompted for a {\it label} which will be used to identify any files you
+you are prompted for a \textit{label} which will be used to identify any files you
 want to keep.
 You should only need to search the MAIN catalogue (the default).
 You will be asked,
 
-{\tt Enter search key}
-
+\begin{terminalv}
+Enter search key}
+\end{terminalv}
 which may be any of the following.
 
-{\tt HIRES} selects high resolution images
+\texttt{HIRES} selects high resolution images
 
-{\tt LORES} selects low resolution images, these two are mutually exclusive.
+\texttt{LORES} selects low resolution images, these two are mutually exclusive.
 If you do not select either then by default both resolutions are selected.
 
 \smallskip
-{\tt LWP n, m}
+\texttt{LWP n, m}
 
-{\tt LWR n, m}
+\texttt{LWR n, m}
 
-{\tt SWP n, m}
+\texttt{SWP n, m}
 
-{\tt SWR n, m} where both n and m are optional image numbers specifying a range
+\texttt{SWR n, m} where both n and m are optional image numbers specifying a range
 of required images. If no range is given then all images are selected.
 Only one camera may be specifically selected at a time but by default all
 cameras are selected.
 
 \smallskip
-{\tt OC n, m} where n and m (optional) specify a range of object classes
+\texttt{OC n, m} where n and m (optional) specify a range of object classes
 otherwise
 all object classes are selected. A single object class may be specified.
 
 \smallskip
-{\tt RA hh mm ss.s, hh mm ss.s} where the ra's specify the limits of a range in
+\texttt{RA hh mm ss.s, hh mm ss.s} where the ra's specify the limits of a range in
 right ascension.
 The RA's may be truncated to any level. Single digit hours, minutes or seconds
 may be given as a single digit or with a preceding zero. Hours, minutes and
-seconds {\it must} be separated by spaces and the two limits {\it must} be
+seconds \textit{must} be separated by spaces and the two limits \textit{must} be
 separated by a comma. The limits are in the sense, from and increasing to,
 and it is possible to search across the boundary from 24 to 0 hours, although
 a warning will be issued.
@@ -536,45 +346,45 @@ A single RA may be given which defines the centre of
 a search area the size of which is determined by the BOX keyword (see below).
 
 \smallskip
-{\tt DEC $\pm$dd mm ss, $\pm$dd mm ss} where the Dec's specify the limits of
+\texttt{DEC $\pm$dd mm ss, $\pm$dd mm ss} where the Dec's specify the limits of
 a range in
 declination. The general comments for RA also apply. Positive Dec's do not
 require a sign.
 The RA and DEC keywords may be used completely independently.
 
 \smallskip
-{\tt BOX n} where n
+\texttt{BOX n} where n
 specifies the size of the search box in arc minutes around a central
-RA and Dec. If RA and Dec {\it limits} are given then the value of BOX is
+RA and Dec. If RA and Dec \textit{limits} are given then the value of BOX is
 irrelevant. There is no Dec dependence of the dimension of the box in RA.
 The default value of n is 30.
 
 \smallskip
-{\tt NAME string} where string specifies a target name. The string may include
+\texttt{NAME string} where string specifies a target name. The string may include
 spaces and wildcard (*) characters. The time taken for a name search, including
 wildcards, may be up to 90 seconds.
 
 \smallskip
-{\tt PROG string} where string specifies a programme identification code.
+\texttt{PROG string} where string specifies a programme identification code.
 The string may include wildcard (*) characters.
 
 \smallskip
-{\tt DATE year day, year day} where the dates define the limits of the search.
+\texttt{DATE year day, year day} where the dates define the limits of the search.
 The year may be given with or without the preceding 19.
 The year and day are separated by spaces and the two limits by a comma.
 The year only may be given and a single year may also be selected.
 
 \smallskip
-{\tt CLEAR} clears all the search criteria to their default values
+\texttt{CLEAR} clears all the search criteria to their default values
 
 \smallskip
-{\tt GO} starts the search
+\texttt{GO} starts the search
 
 \smallskip
-{\tt Q} quits the search program.
+\texttt{Q} quits the search program.
 
 \smallskip
-{\tt ?} brief outline of the keywords
+\texttt{?} brief outline of the keywords
 
 \smallskip
 The search keys are entered one per line in response to the prompt.
@@ -587,15 +397,15 @@ The workfiles may be searched (using the old system) but with multiple search
 keys this should not be necessary and the new system alone should provide the
 list you want.
 Any of the workfiles may be kept with the KEEP option
-and will be saved as {\it label}.IUE.
+and will be saved as \textit{label}.IUE.
 Initially the workfiles are
 in RA order but it is possible to sort them using the ORDER option
 by either date or camera and image number. Enter DATE or CIM as appropriate, or
 Q to quit the order option.
 All the KEEPed and ORDERed files are saved as different
-generations of [IUE]{\it label}.IUE.
+generations of [IUE]\textit{label}.IUE.
 Note that the label and not the workfile name is used.
-The {\it label}.IUE files may be transferred or MAILed to your own account.
+The \textit{label}.IUE files may be transferred or MAILed to your own account.
 
 
 Any files you create in the IUE directory will be deleted automatically after
@@ -634,54 +444,50 @@ repetition of information in archive requests.
 To register send a mail message to iues@stadat.rl.ac.uk
 with the subject
 
-{\tt register}
+\texttt{register}
 
 The first line should contain
 
-{\tt start}
+\texttt{start}
 
 Then give a short string to identify yourself (eg. your initials).
 This will be used as a unique prefix to {it all\/} your de-archiving requests.
 
-{\tt cl}
+\texttt{cl}
 
 Then give your first name...
 
-{\tt Chris}
+\texttt{Chris}
 
 ...surname...
 
-{\tt Lloyd}
+\texttt{Lloyd}
 
 ...and the name of your institute, one word, ed UCL, Keele. These inputs are
 case sensitive.
 
-{\tt RAL}
+\texttt{RAL}
 
 Then give your IP e-mail address.
 This will be used for all communication with you.
 
-{\tt cl@ast.star.rl.ac.uk}
+\texttt{cl@ast.star.rl.ac.uk}
 
 ...and the last line
 
-{\tt end}
+\texttt{end}
 
 So the text of the mail message will be
 
-{\tt start}
-\newline
-{\tt cl}
-\newline
-{\tt Chris}
-\newline
-{\tt Lloyd}
-\newline
-{\tt RAL}
-\newline
-{\tt cl@ast.star.rl.ac.uk}
-\newline
-{\tt end}
+\begin{terminalv}
+start
+cl
+Chris
+Lloyd
+RAL
+cl@ast.star.rl.ac.uk
+end
+\end{terminalv}
 
 After the mail message has been processed you will be sent confirmation
 of the registration or some diagnostics if there were any problems, eg. if your
@@ -692,15 +498,15 @@ identifier is already in use.
 To submit a de-archiving request
 send a mail message to iues@stadat.rl.ac.uk with the subject
 
-{\tt iueda}
+\texttt{iueda}
 
 The first line should contain
 
-{\tt start}
+\texttt{start}
 
 Then give the identifier you have registered under
 
-{\tt cl}
+\texttt{cl}
 
 Then give the request name. This can be anything relatively brief but
 descriptive to identify this request. Don't add anything to identify
@@ -708,7 +514,7 @@ yourself as all your requests will be prefixed by your identifier.
 The request name may be the same as one used previously, for example to keep
 all the images of one target or programme together.
 
-{\tt tausco}
+\texttt{tausco}
 
 Then give the image codes for the images you want, which may be any combination
 of the following.
@@ -725,16 +531,16 @@ A & All files \\
 \end{tabular}
 \end{center}
 
-{\tt ge}
+\texttt{ge}
 
 Then give the list of image numbers; an edited list from the IUELOG output may
 also be used.
 
-{\tt swp9788}
+\texttt{swp9788}
 \newline
-{\tt SWP 16574}
+\texttt{SWP 16574}
 \newline
-{\tt LWP21674}
+\texttt{LWP21674}
 \newline
 .~~~~~~~~~\}
 \newline
@@ -744,31 +550,23 @@ also be used.
 
 and finally
 
-{\tt end}
+\texttt{end}
 
 So the text of the mail message will be
 
-{\tt start}
-\newline
-{\tt cl}
-\newline
-{\tt tausco}
-\newline
-{\tt ge}
-\newline
-{\tt swp9788}
-\newline
-{\tt SWP 48580}
-\newline
-{\tt LWP21674}
-\newline
+\begin{terminalv}
+start
+cl
+tausco
+ge
+swp9788
+SWP 49580
+LWP21674
 .
-\newline
 .
-\newline
 .
-\newline
-{\tt end}
+end
+\end{terminalv}
 
 When the de-archiving request is processed you will be e-mailed a file giving
 details of the images (target name, resolution etc.) and any problems that may
@@ -783,21 +581,21 @@ iues@star.rl.ac.uk.
 
 To ftp the files to your host machine...
 
-{\tt ftp star-gw.rl.ac.uk}
+\texttt{ftp star-gw.rl.ac.uk}
 
-{\tt login: anonymous}
+\texttt{login: anonymous}
 
-{\tt password:} your id
+\texttt{password:} your id
 
-{\tt ftp> cd pub/iue/}identifier\_requestname~~~in this case {\tt /cl\_tausco}
+\texttt{ftp> cd pub/iue/}identifier\_requestname~~~in this case \texttt{/cl\_tausco}
 
-{\tt ftp> binary}
+\texttt{ftp> binary}
 
-{\tt ftp> prompt}
+\texttt{ftp> prompt}
 
-{\tt ftp> mget *}
+\texttt{ftp> mget *}
 
-{\tt ftp> bye}
+\texttt{ftp> bye}
 
 If there are multiple versions, for example when both apertures have been
 used, then they will appear with the suffix .1, .2 etc.
@@ -807,7 +605,7 @@ results in two images being dearchived, but one will be incorrect.
 \subsection{Index errors}
 
 If there is an error in the index then the file copied may not contain the
-image you requested, so {\it always\/} check that the header contains what you
+image you requested, so \textit{always\/} check that the header contains what you
 expect.
 If you discover an index error then please contact
 iues@star.rl.ac.uk.
@@ -818,24 +616,20 @@ against the catalogue and outputs a summary of the target and processing
 information.
 On receiving the output request file you should check that the targets
 correspond to what you expect.
-\tt
-\begin{verbatim}
+\begin{terminalv}
  --------
  SWP15350  RA 00 20 18.0  Dec -12 29 15  Station G  Object 1835
  SWP15350  LOW  DISPERSION  NEW  EXTRACTION TWO  APERTURES
  --------
-\end{verbatim}
-\rm
+\end{terminalv}
 The procedure also checks that the image is outside the six month release
 period and if not you will be told when the image will be released.
-\tt
-\begin{verbatim}
+\begin{terminalv}
  --------
  LWP27383  RA 11 07 56.9  Dec -60 42 27  Station G  Object    97152
  LWP27383 * This image will be released in  87 days
  --------
-\end{verbatim}
-\rm
+\end{terminalv}
 On some occasions there is an ambiguity in the index and procedure will try to
 retrieve two images, assuming that both tracking stations acquired the image.
 There will be a pair of messages in the output file and two sets of files will
@@ -843,8 +637,7 @@ usually be copied, however only one of these will be correct. It is also
 possible to have one set of files copied and an error message generated in the
 de-archiving summary, described below, which would not be a real
 error.
-\tt
-\begin{verbatim}
+\begin{terminalv}
 --------
 SWP 6572 * Ambiguous station Goddard assumed
 SWP 6572  RA 21 37 24.0  Dec +57 16 00  Station ?  Object 206267
@@ -853,22 +646,18 @@ SWP 6572  HIGH DISPERSION  ???? EXTRACTION ONE  APERTURES
 SWP 6572 * Ambiguous station Vilspa assumed
 SWP 6572  RA 21 37 24.0  Dec +57 16 00  Station ?  Object 206267
 SWP 6572  HIGH DISPERSION  ???? EXTRACTION ONE  APERTURES
-\end{verbatim}
-\rm
+\end{terminalv}
 If an image is in the catalogue but for whatever reason does not appear in the
 archive then the following message is generated. Such images are usually close
 to the release date.
-\tt
-\begin{verbatim}
+\begin{terminalv}
 --------
 SWP51660  RA 16 32 45.9  Dec -28 06 51  Station G  Object 00149438
 SWP51660 * Image not available
-\end{verbatim}
-\rm
+\end{terminalv}
 Finally if there is an error in the camera name or the image number is outside
 a permitted range then an error message will be generated.
-\tt
-\begin{verbatim}
+\begin{terminalv}
 --------
 LWL23434 * Error in camera name
 --------
@@ -878,23 +667,23 @@ SWP  876 * Error reading index
 --------
 LWR    0 * Image unavailable in index
 --------
-\end{verbatim}
-\rm
+\end{terminalv}
+
 \subsection{De-archiving summary}
 When the images have been copied a summary file is e-mailed to the requestor.
 The file simply contains a list of the files that were or were not copied.
 The listing should be compared with the output request file taking note of any
 duplicate files that may have been generated.
 \tt
-\begin{verbatim}
- error: SWP15350.PHOT was not copied
- error: SWP15350.EXT  was not copied
- error: SWP15350.EXT  was not copied
- image: SWP15341.PHOT copied
- image: SWP15341.EXT  copied
- image: SWP15342.PHOT copied
- image: SWP15342.EXT  copied
-\end{verbatim}
+\begin{terminalv}
+error: SWP15350.PHOT was not copied
+error: SWP15350.EXT  was not copied
+error: SWP15350.EXT  was not copied
+image: SWP15341.PHOT copied
+image: SWP15341.EXT  copied
+image: SWP15342.PHOT copied
+image: SWP15342.EXT  copied
+\end{terminalv}
 \rm
 If any images are not copied then you should report them to iues@star.rl.ac.uk.
 
@@ -906,14 +695,14 @@ When reading an IUE image file check that it contains
 the image you expect.
 As well as the obvious the header contains much more information essential to
 the correct running of IUEDR.
-To inspect the header use the {\tt listiue}, {\tt readiue} or {\tt readsips}
+To inspect the header use the \texttt{listiue}, \texttt{readiue} or \texttt{readsips}
 command with the
-parameter {\tt nline=-1}, which will list the whole header of perhaps 100 lines.
+parameter \texttt{nline=-1}, which will list the whole header of perhaps 100 lines.
 With X-terminals it is a simple matter to scroll back through the listing to
 find the relevant information.
-At the {\tt DRIVE} prompt give the name of the file, a photometric image for
-{\tt readiue}, an extracted file for {\tt readsips} or any file type
-for {\tt listiue}.
+At the \texttt{DRIVE} prompt give the name of the file, a photometric image for
+\texttt{readiue}, an extracted file for \texttt{readsips} or any file type
+for \texttt{listiue}.
 The image number and target name, resolution, aperture and exposure time
 appear at the start of the header in line 3. In some early images this
 information may be more scattered or even missing.
@@ -922,8 +711,7 @@ item on line 5, 10.2 in this case, but this helpful format has only been used
 at Vilspa in recent years.
 The THDA may also be found amongst the processing information
 in the header of the extracted file.
-\tt
-\begin{verbatim}
+\begin{terminalv}
 > listiue nlines=-1
 DRIVE - Tape Drive or File Name. /'swp7471.phot'/ > swp45203.phot
 -------------------------------------------------------------------------
@@ -934,14 +722,12 @@ DRIVE - Tape Drive or File Name. /'swp7471.phot'/ > swp45203.phot
  10,5845,FO,10.2,,102D38M45.4S,289,435,2021,FO                       5  C
  FESBCK:NOT MEASURABLE                                               6  C
                                                                      7  C
-\end{verbatim}
-\rm
+\end{terminalv}
 
 The next section of the header contains the event round robin, only part of
 which is shown here.
 
-\tt
-\begin{verbatim}
+\begin{terminalv}
                                                                      8  C
                                                                      9  C
  92203204652* 10  * 218 *        *201424 TLM,LWPROM               * 10  C
@@ -954,8 +740,8 @@ which is shown here.
 .
 .
 .
-\end{verbatim}
-\rm
+\end{terminalv}
+
 Towards the end of the header is the line which gives the type of photometric
 image, whether it was
 photometrically or geometrically and photometrically corrected; phot or gphot
@@ -963,28 +749,25 @@ is required by IUEDR.
 The gphot images are usually clearly identified but phot
 images are not always, and
 recourse may have to be made to the Table (\ref{change}).
-\tt
-\begin{verbatim}
 
+\begin{terminalv}
  92072120345203L HO 0920722930201000000000000201239002000540V        1APC
  PA145VHD152270            101650486414420- 10.205845FO3    0697     2APC
           LLOYD      000000000000                                    3APC
  ***** PHOTOMETRICALLY CORRECTED IMAGE *****                            C
  ***** SCHEME NAME:  F3HLAC, VILSPA RELEASE: R14 *****                  C
-\end{verbatim}
-\rm
+\end{terminalv}
+
 Immediately following is the ITF table which identifies the ITF used in the
 processing.
 Use the table in the IUEDR Reference Manual under
 ITFMAX to match the first line of the ITF table
-\tt
-\begin{verbatim}
+
+\begin{terminalv}
            0       1684       3374       6873       9091      10586   1PC
-\end{verbatim}
-\rm
+\end{terminalv}
 to the value of ITFMAX.
-\tt
-\begin{verbatim}
+\begin{terminalv}
  PCF C/** DATA REC. 11 1   1   1 768 8448 5 3  6.1  5.0 2536   .00000 1PC
            0       1684       3374       6873       9091      10586   1PC
        14371      17745      21524      25105      28500              1PC
@@ -997,17 +780,14 @@ to the value of ITFMAX.
  Data part contains 768 lines of size 1536 bytes.
  This is a photometric image (IUE_GPHOT or IUE_PHOT).
 >
-\end{verbatim}
-\rm
+\end{terminalv}
 The header for the extracted file contains additional information about the
 processing and the spacecraft velocity data.
-Use either of the commands {\tt listiue} or {\tt readsips} to see this header.
+Use either of the commands \texttt{listiue} or \texttt{readsips} to see this header.
 The THDA which is used by IUEDR for
 temperature dependent corrections may be found here.
 If the values are different the one for RESEAU MOTION is used.
-\tt
-\begin{verbatim}
-
+\begin{terminalv}
  THDA FOR RESEAU MOTION = 10.18                                         C
  THDA FOR SPECTRUM MOTION = 10.18                                       C
  THERMAL SHIFTS:   LINE =   .193   SAMPLE =  -.338                      C
@@ -1023,8 +803,7 @@ If the values are different the one for RESEAU MOTION is used.
  Data part contains 421 lines of size 2048 bytes.
  This is a High Resolution Spectrum (IUE_HIRES) from IUESIPS#2.
 >
-\end{verbatim}
-\rm
+\end{terminalv}
 
 \section{Permanent features
 \xlabel{permanent_features}\label{blemish}}
