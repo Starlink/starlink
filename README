@@ -448,17 +448,28 @@ by default by your operating system.
 
 Ubuntu:
    git
+   build-essential (includes libc6-dev libc-dev gcc g++ make dpkg-dev)
    gfortran (or g95)
-   g++
    libxext-dev
    libxau-dev
    libx11-dev
    libxt-dev
+   xutils-dev
    libncurses5-dev
    flex
+   bison
    byacc
    latex
+   texlive-latex-base
    texlive-latex-extra
+   texlive-science
+   latex-color
+   pgf
+   tex4ht
+   texlive-fonts-extra
+   cm-super
+   texinfo
+   texi2html
 
 Fedora:
    As for Ubuntu, but note that package names are usually changed from
