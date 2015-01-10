@@ -307,8 +307,10 @@ for (idet=0; idet<ndet; idet++) {
 }
 
 #if USE_MPI
-MPI_Allreduce(MPI_IN_PLACE, signal, nsamp, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-MPI_Allreduce(MPI_IN_PLACE, count, nsamp, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+MPI_Allreduce(MPI_IN_PLACE, signal, nsamp, MPI_DOUBLE, MPI_SUM,
+              MPI_COMM_WORLD);
+MPI_Allreduce(MPI_IN_PLACE, count, nsamp, MPI_DOUBLE, MPI_SUM,
+              MPI_COMM_WORLD);
 #endif
 
 for (isamp=0; isamp<nsamp; isamp++) {
@@ -404,6 +406,16 @@ issues that will have to be considered are listed:
 
 \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\xlabel{acknowledgments}Acknowledgments\label{se:acknowledgments}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This work was done under the supervision of Tim Jenness
+(\url{tjenness@cornell.edu}) and Douglas Scott
+(\url{dscott@phas.ubc.ca}) and funded by the Canadian CCAT
+Consortium. The prototype map-maker was developed using facilities
+provided by WestGrid and Compute Canada Calcul
+Canada.\footnote{\url{http://www.computecanada.ca}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{}
