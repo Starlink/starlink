@@ -38,10 +38,9 @@
 *          Determines whether to zeropad.
 *     RESOLUTION = _INTEGER (Read)
 *          Spectral Grid Resolution.
-*          0 : Low Resolution
-*          1 : Medium Resolution
-*          Any other value : High Resolution
-*          Default behaviour is the High Resolution
+*          0 : Full Resolution
+*          Any other value : Custom Resolution
+*          Default behaviour is the Full Resolution
 
 *  Authors:
 *     COBA: Coskun Oba (UoL)
@@ -100,6 +99,9 @@
 *        - This includes both 850 and 450 band spectral filter profile wave number ranges
 *     2014-10-09 (MS)
 *        Comment out debug printf's
+*     2015-01-09 (MS)
+*        Fixed handling of non-SFP case
+*        - NOTE: When dealing with non-existent SFP calibration files, ORAC-DR specifies sfp=!
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -251,14 +253,7 @@ void smurf_fts2_spectrum(int* status)
     kpg1Rgndf("IN", 0, 1, "", &gIn, &nFiles, status);
     kpg1Wgndf("OUT", gOut, nFiles, nFiles, "Equal number of input and output files expected!", &gOut, &nOutFiles, status);
     kpg1Gtgrp("SFP", &gSfp, &nSFPFiles, status);
-    if(*status != SAI__OK) {
-        /* TODO: Check for any other possible error conditions */
-        /* Assume SFP calibration file not given, and proceed without it */
-        doSFP = 0;
-        *status = SAI__OK;
-    } else {
-        doSFP = 1;
-    }
+	if(nSFPFiles > 0) doSFP = 1;
 
     /* Read in ADAM parameters */
     parGet0i("ZEROPAD", &zeropad, status);
