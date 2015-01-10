@@ -253,7 +253,14 @@ void smurf_fts2_spectrum(int* status)
     kpg1Rgndf("IN", 0, 1, "", &gIn, &nFiles, status);
     kpg1Wgndf("OUT", gOut, nFiles, nFiles, "Equal number of input and output files expected!", &gOut, &nOutFiles, status);
     kpg1Gtgrp("SFP", &gSfp, &nSFPFiles, status);
-	if(nSFPFiles > 0) doSFP = 1;
+    if(*status != SAI__OK) {
+        /* TODO: Check for any other possible error conditions */
+        /* Assume SFP calibration file not given, and proceed without it */
+        doSFP = 0;
+        *status = SAI__OK;
+    } else {
+	    if(nSFPFiles > 0) doSFP = 1;
+    }
 
     /* Read in ADAM parameters */
     parGet0i("ZEROPAD", &zeropad, status);
