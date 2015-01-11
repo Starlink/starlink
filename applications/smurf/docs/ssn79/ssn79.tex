@@ -12,8 +12,6 @@
 \stardocauthors   {Gaelen Marsden}
 \stardocdate      {8th January 2015}
 \stardoctitle     {Further parallelization of iteratemap with MPI}
-\stardocversion   {Version 0.1}
-%%\stardocmanual    {User's Guide}
 \stardocabstract  {
   This document describes how to extend the parallelization of the
   iterative makemap method for use on a distributed-memory cluster using
@@ -298,6 +296,7 @@ shown in Figure~\ref{fig:parallel_common}.
 
 The code to perform this operation might look something like this:
 
+\begin{small}
 \begin{terminalv}
 for (idet=0; idet<ndet; idet++) {
   for (isamp=0; isamp<nsamp; isamp++) {
@@ -317,6 +316,7 @@ for (isamp=0; isamp<nsamp; isamp++) {
   signal[isamp] /= count[isamp];
 }
 \end{terminalv}
+\end{small}
 
 This program is run by each process, where \verb+ndet+ is the number
 of detectors ``owned'' by the process, and is not restricted to be the
