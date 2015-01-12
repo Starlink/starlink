@@ -1,5 +1,16 @@
-    Development version
-    ===================
+  Development Version
+  ===================
+    
+    Version 4.4-6
+    =============
+
+    Compound images now respect the blank pixel colour selection.
+
+  Star-2014A Release
+  ==================
+
+    Version 4.4-5
+    =============
 
     A new toolbox for displaying histograms of rectangular regions
     of the displayed image has been added.
