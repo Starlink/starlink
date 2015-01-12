@@ -5676,6 +5676,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter specbnd {
+                type LITERAL
+                prompt {How to choose pixel bounds on output spectral axis}
+                default FIRST
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
         }
 
         action unmakecube {

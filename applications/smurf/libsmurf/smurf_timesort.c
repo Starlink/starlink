@@ -154,6 +154,20 @@
 *          same as the number of input NDFs, and all output NDFs will have the
 *          same size. If a negative or zero value is supplied, then a single
 *          output NDF will be created holding all the input data. [!]
+*     SPECBND = LITERAL (Read)
+*          Indicates what to do if the input NDFs have differing pixel
+*          bounds on the spectral axis.
+*
+*          - "FIRST": The spectral axis in each output NDF will have the
+*          same pixel bounds as the spectral axis in the first input NDF.
+*          - "UNION": The pixel bounds of the spectral axis in each output
+*          NDF will be the union of the pixel bounds of the spectral axis in
+*          all input NDFs.
+*          - "INTERSECTION": The pixel bounds of the spectral axis in each
+*          output NDF will be the intersection of the pixel bounds of the
+*          spectral axis in all input NDFs.
+*
+*          ["FIRST"]
 
 *  Related Applications:
 *     SMURF: MAKECUBE
@@ -222,9 +236,11 @@
 *     21-AUG-2013 (AGG):
 *        Do not call grpList if no output files are generated. This
 *        avoids a GRP__INVID error in such cases.
+*     12-JAN-2015 (DSB):
+*        Added parameter SPECBND.
 
 *  Copyright:
-*     Copyright (C) 2007-2009,2012 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2009,2012,2015 Science and Technology Facilities Council.
 *     Copyright (C) 2013 University of British Columbia.
 *     All Rights Reserved.
 
@@ -313,6 +329,7 @@ void smurf_timesort( int *status ) {
    char basename[ GRP__SZNAM + 1 ];
    char fullname[ GRP__SZNAM + 10 ];
    char ltbuf[ 11 ];
+   char specbnd[20];
    char timeorg[32];
    char timescl[32];
    char timesys[32];
@@ -825,6 +842,10 @@ void smurf_timesort( int *status ) {
          nullsizelimit = 1;
       }
 
+/* Get the other required parameters. */
+      parChoic( "SPECBND", "FIRST", "UNION,INTERSECTION,FIRST", 0, specbnd,
+                sizeof(specbnd), status );
+
 /* The "igrp3" group contains the names of NDFs containing the first
    subscan in each observation/sub-system. Get a group of output base NDF
    names based on these files. These base names will be edited to create
@@ -916,26 +937,95 @@ void smurf_timesort( int *status ) {
             uchan = 0;
             lchan = 0;
             nchan = 0;
+            udet = 0;
+            ldet = 0;
             ndet = 0;
 
-/* Assume for the moment that all input NDFs have Variance and Quality
-   arrays. */
-            hasvar = 1;
-            hasqual = 1;
-
-/* Loop round each input NDF in the current sub-system. */
+/* First we loop over all input NDFs in the current sub-system in order
+   to get the dimensions of the output NDFs on the detector and spectral
+   pixel axes. */
             for( isubscan = 0; isubscan < nsubscan && *status == SAI__OK; isubscan++ ) {
                key = astMapKey( subscan_map, isubscan );
 
 /* Get the one-based index of the input NDF within the input GRP group . */
                astMapGet0I( subscan_map, key, &ifile );
 
-/* Begin an AST context for this input NDF. */
-               astBegin;
-
 /* Get an NDF identifier for the input NDF. */
                ndgNdfas( igrp1, ifile, "READ", &indf1, status );
                ndfid[ isubscan ] = indf1;
+
+/* Tell the user which NDF is being processed. */
+               ndfMsg( "F", indf1 );
+               msgSeti( "I", isubscan + 1 );
+               msgSeti( "N", nsubscan );
+               msgOutif( MSG__VERB, "", "Getting dimensions of "
+                         "^F (^I/^N)...", status );
+
+/* Get the shape of the data array. */
+               ndfBound( indf1, 3, lbnd, ubnd, &ndim, status );
+               if( ndim != 3 && *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  ndfMsg( "NDF", indf1 );
+                  errRep( "", "Input NDF ^NDF is not 3 dimensional.", status );
+               }
+
+/* Get the corresponding dimensions. */
+               dims[ 0 ] = ubnd[ 0 ] - lbnd[ 0 ] + 1;
+               dims[ 1 ] = ubnd[ 1 ] - lbnd[ 1 ] + 1;
+               dims[ 2 ] = ubnd[ 2 ] - lbnd[ 2 ] + 1;
+
+/* If this is the first input file, store the channel number and detector
+   bounds, and the number of detectors in the data. These are the inital
+   values assumed for the output NDFs. */
+               if( isubscan == 0 ) {
+                  lchan = lbnd[ 0 ];
+                  uchan = ubnd[ 0 ];
+                  nchan = dims[ 0 ];
+                  ldet = lbnd[ 1 ];
+                  udet = ubnd[ 1 ];
+                  ndet = dims[ 1 ];
+
+/* If this is not the first input file, update the above output NDF bounds
+   so that they represent the union, intersection, etc, as requested by
+   the SPECBND parameter. */
+               } else if( *status == SAI__OK ) {
+
+/* If the spectral axis of the output represents the union of the input
+   NDFs, adjust the spectral bounds of the output NDFs. */
+                  if( !strcmp( specbnd, "UNION" ) ) {
+                     if( lbnd[ 0 ] < lchan ) lchan = lbnd[ 0 ];
+                     if( ubnd[ 0 ] > uchan ) uchan = lbnd[ 0 ];
+
+/* If the spectral axis of the output represents the intersection of the input
+   NDFs, adjust the spectral bounds of the output NDFs. */
+                  } else if( !strcmp( specbnd, "INTERSECTION" ) ) {
+                     if( lbnd[ 0 ] > lchan ) lchan = lbnd[ 0 ];
+                     if( ubnd[ 0 ] < uchan ) uchan = lbnd[ 0 ];
+                  }
+               }
+            }
+
+/* Report an error if the output spectral axis has zero length. */
+            if( lchan > uchan && *status == SAI__OK ) {
+               *status = SAI__ERROR;
+               errRep( "", "The spectral axis is the output NDF(s) would "
+                       "have zero length.", status );
+            }
+
+/* Assume for the moment that all input NDFs have Variance and Quality
+   arrays. */
+            hasvar = 1;
+            hasqual = 1;
+
+/* Now we loop again over all input NDFs in the current sub-system in
+   order. */
+            for( isubscan = 0; isubscan < nsubscan && *status == SAI__OK; isubscan++ ) {
+
+/* Begin an AST context for this input NDF. */
+               astBegin;
+
+/* Get the NDF identifier for the input NDF. */
+               indf1 = ndfid[ isubscan ];
 
 /* Tell the user which NDF is being processed. */
                ndfMsg( "F", indf1 );
@@ -957,44 +1047,21 @@ void smurf_timesort( int *status ) {
                dims[ 1 ] = ubnd[ 1 ] - lbnd[ 1 ] + 1;
                dims[ 2 ] = ubnd[ 2 ] - lbnd[ 2 ] + 1;
 
-/* If this is the first input file, store the channel number and detector
-   bounds, and the number of detectors in the data. */
-               if( isubscan == 0 ) {
-                  lchan = lbnd[ 0 ];
-                  uchan = ubnd[ 0 ];
-                  nchan = uchan - lchan + 1;
-                  ldet = lbnd[ 1 ];
-                  udet = ubnd[ 1 ];
-                  ndet = dims[ 1 ];
+/* Get a section of the input NDF with the required bounds on the
+   detector and spectral axes. */
+               slbnd[ 0 ] = lchan;
+               slbnd[ 1 ] = ldet;
+               slbnd[ 2 ] = lbnd[ 2 ];
+               subnd[ 0 ] = uchan;
+               subnd[ 1 ] = udet;
+               subnd[ 2 ] = ubnd[ 2 ];
+               ndfSect( indf1, 3, slbnd, subnd, &indf1s, status );
 
-/* If this is not the first input file, check the channel number bounds
-   are the same as in the first input NDF. Report an error if not. */
-               } else if( ( lchan != lbnd[ 0 ] || uchan != ubnd[ 0 ] ) &&
-                          *status == SAI__OK ) {
-                  *status = SAI__ERROR;
-                  ndfMsg( "NDF", indf1 );
-                  msgSeti( "LC", lchan );
-                  msgSeti( "UC", uchan );
-                  msgSeti( "LB", lbnd[ 0 ] );
-                  msgSeti( "UB", ubnd[ 0 ] );
-                  errRep( "", "The spectral channel bounds (^LB,^UB) of '^NDF' differ "
-                          "from (^LC,^UC) of the first NDF.", status );
-
-/* If this is not the first input file, check the detector index bounds
-   are the same as in the first input NDF. If not, use a section that
-   matches the first NDF on the detector index axis. */
-               } else if( ldet != lbnd[ 1 ] || udet != ubnd[ 1 ] ) {
-                  slbnd[ 0 ] = lbnd[ 0 ];
-                  slbnd[ 1 ] = ldet;
-                  slbnd[ 2 ] = lbnd[ 2 ];
-                  subnd[ 0 ] = ubnd[ 0 ];
-                  subnd[ 1 ] = udet;
-                  subnd[ 2 ] = ubnd[ 2 ];
-                  ndfSect( indf1, 3, slbnd, subnd, &indf1s, status );
-                  ndfAnnul( &indf1, status );
-                  indf1 = indf1s;
-                  ndfid[ isubscan ] = indf1s;
-               }
+/* From here on use this section identifier instead of the original NDF
+   identifier. */
+               ndfAnnul( &indf1, status );
+               indf1 = indf1s;
+               ndfid[ isubscan ] = indf1s;
 
 /* If all input NDFs read so far have a Variance array, see if this one
    does too. */
