@@ -1279,7 +1279,7 @@ double astDat_( double in, int forward, int *status ){
 *     - This function is based on SLA_DAT by P.T.Wallace.
 *     - This routine must be updated on each occasion that a leap second is
 *     announced
-*     - Latest leap second:  2009 January 1
+*     - Latest leap second:  2015 July 1
 
 *-
 */
@@ -1294,8 +1294,12 @@ double astDat_( double in, int forward, int *status ){
    ------------------------------- */
    if( forward ) {
 
+/* 2015 July 1 */
+      if ( in >= 57204.0 ) {
+         result = 36.0;
+
 /* 2012 July 1 */
-      if ( in >= 56109.0 ) {
+      } else if ( in >= 56109.0 ) {
          result = 35.0;
 
 /* 2009 January 1 */
