@@ -1,53 +1,17 @@
-\documentstyle[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt,nolof,noabs]{starlink}
 
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocnumber}    {82.4}
-\newcommand{\stardocauthors}   {D C Parsons, H J Walker}
-\newcommand{\stardocdate}      {21 June 1993}
-\newcommand{\stardoctitle}     {IRAS --- Data Products Primer}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocnumber      {82.4}
+\stardocauthors     {D C Parsons, H J Walker}
+\stardocdate        {21 June 1993}
+\stardoctitle       {IRAS --- Data Products Primer}
 %------------------------------------------------------------------------------
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{240mm}
-\setlength{\topmargin}{-5mm}
-
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
 \begin{document}
-\thispagestyle{empty}
-SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
-RUTHERFORD APPLETON LABORATORY\\
-{\large\bf Starlink Project\\}
-{\large\bf \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Large\bf \stardoctitle}
-\end{center}
-\vspace{5mm}
-%\setlength{\parskip}{0mm}
-%\tableofcontents
-\setlength{\parskip}{\medskipamount}
-\markright{\stardocname}
-\setlength{\parskip}{0mm}
-\tableofcontents
-\setlength{\parskip}{\medskipamount}
-\markright{\stardocname}
+\scfrontmatter
 
-\pagebreak
 \section{Introduction}
 
 The purpose of this note is to introduce the IRAS data products,
@@ -114,7 +78,7 @@ versions available, due to improved calibration. When you are extracting data,
 check that you have the most recent version, and when comparing your data with
 published results, check that they used the most recent version!
 
-{\bf It cannot be over-emphasised that potential users of IRAS data products
+\textbf{It cannot be over-emphasised that potential users of IRAS data products
 MUST read the IRAS Catalogs and Atlases Explanatory Supplement before embarking
 on a research programme utilising any of the products described here.
 Particular attention should be given to section A.3 page I--2 of the Explanatory
@@ -125,16 +89,16 @@ product.}
 \label{m:cats}
 IRAS catalogues are of three types:---
 \begin{itemize}
-\item Detection catalogues containing IRAS fluxes or spectra, {\em e.g.}$\;$ the
+\item Detection catalogues containing IRAS fluxes or spectra, \emph{e.g.}$\;$ the
 IRAS Point Source Catalog,
 \item Association catalogues containing one type of IRAS source,
-{\em e.g.}$\;$ IRAS Point Source Catalog objects associated with galaxies
+\emph{e.g.}$\;$ IRAS Point Source Catalog objects associated with galaxies
 and quasars,
 \item Position catalogues giving the positions at which observations were
-made, but no other data {\em e.g.}$\;$ for Pointed Observations.
+made, but no other data \emph{e.g.}$\;$ for Pointed Observations.
 \end{itemize}
-SUN/120 (CATPAC --- Catalogue Applications Package),
-SUN/106 (SCAR --- Beginner's Guide) and SUN/70 (Starlink Catalogue Access and
+\xref{SUN/120}{sun120}{} (CATPAC --- Catalogue Applications Package),
+\xref{SUN/106}{sun106}{} (SCAR --- Beginner's Guide) and \xref{SUN/70}{sun70}{} (Starlink Catalogue Access and
 Reporting) describe how to access the IRAS catalogues. The catalogues are
 available on STADAT (the STArlink DATabase machine) and may also be available
 at your node.
@@ -340,10 +304,10 @@ The reading and preprocessing stage consists of
 standard form which can be processed by image processing applications.
 \end{itemize}
 \begin{description}
-\item [SUN/80.3] `IRAS90 --- Extraction and
+\item [\xref{SUN/80.3}{sun80}{}] `IRAS90 --- Extraction and
 Preparation of IRAS Images' provides details of all these
 processes.
-\item [SUN/163] `IRAS90 --- Survey and PO Data Analysis Package --- Reference
+\item [\xref{SUN/163}{sun163}{}] `IRAS90 --- Survey and PO Data Analysis Package --- Reference
 Guide' provides details of the full flexibility of the PREPARE preprocessor.
 \end{description}
 
@@ -359,15 +323,15 @@ astronomical coordinate positions.
 to bring out certain features, or smoothing it.
 \end{itemize}
 \begin{description}
-\item [SUN/161] `IRAS90 --- Introductory/User Guide to Calibrated Reconstructed
+\item [\xref{SUN/161}{sun161}{}] `IRAS90 --- Introductory/User Guide to Calibrated Reconstructed
 Detector Data Analysis' provides a walkthrough of how to carry out
 frequently used examples of the first two types of processing, using KAPPA
 for the image processing and IRAS90 software for applications dealing
 with astronomical coordinates.
-\item [SUN/163] `IRAS90 --- Survey and PO Data Analysis Package --- Reference
+\item [\xref{SUN/163}{sun163}{}] `IRAS90 --- Survey and PO Data Analysis Package --- Reference
 Guide' provides details of the full flexibility of each of the IRAS90
 applications.
-\item [SUN/95] `KAPPA --- Kernel Application Package' provides full details of
+\item [\xref{SUN/95}{sun95}{}] `KAPPA --- Kernel Application Package' provides full details of
 KAPPA and its applications. This is a very flexible image display and processing
 suite of applications, however it does not deal with position in astronomical
 coordinates, this facility is provided, for IRAS data, by the IRAS90
@@ -386,18 +350,18 @@ A updated suite of software to access, process and help in analysis of CRDD
 data, called IRAS90 is now available. This runs under the Starlink ADAM
 environment.
 \begin{description}
-\item [SUN/161] `IRAS90 --- Introductory/User Guide to Calibrated
+\item [\xref{SUN/161}{sun161}{}] `IRAS90 --- Introductory/User Guide to Calibrated
 Reconstructed Detector Data Analysis' provides details of the complete CRDD
 processing cycle as carried out with the IRAS90 software and KAPPA.
-\item [SUN/163] `IRAS90 --- Survey and PO Data Analysis Package --- Reference
+\item [\xref{SUN/163}{sun163}{}] `IRAS90 --- Survey and PO Data Analysis Package --- Reference
 Guide' provides details of the full flexibility of each of the IRAS90
 applications.
-\item [SUN/95] `KAPPA --- Kernel Application Package' provides full details of
+\item [\xref{SUN/95}{sun95}{}] `KAPPA --- Kernel Application Package' provides full details of
 KAPPA and its applications.
 \end{description}
 
 Staff at RAL will extract the data from the archive for you, this is a very
-time consuming task. Details of the data you will receive are given in SUN/161.
+time consuming task. Details of the data you will receive are given in \xref{SUN/161}{sun161}{}.
 Sources when processed are oval, since the resolution in-scan is better than the
 resolution cross-scan and the maps usually have stripes in them, due to the
 preliminary calibration made independently for each detector.
@@ -437,13 +401,13 @@ in \ref{m:cats}.
 
 Program I\_$\,$LRSEXT has been written to extract the 8 -- 13 $\mu$m and
 11 -- 22 $\mu$m spectra for a source and write the spectra to files in a
-format which can be handled by the spectral analysis program DIPSO (SUN/50).
+format which can be handled by the spectral analysis program DIPSO (\xref{SUN/50}{sun50}{}).
 DIPSO can then be used to display the spectra and perform some analysis on them.
 The spectra are extracted from the catalogue on the basis of position
 association, the positions being input by the user either interactively or from
 a file.
 For more details on the program I\_$\,$LRSEXT, reference should be made to
-SUN/81.
+\xref{SUN/81}{sun81}{}.
 
 The IRAS LRS Catalogue contains mean spectra, for sources in the Point
 Source Catalog.
@@ -461,7 +425,7 @@ after producing a sub-set using SCAR, you must input the positions to
 I\_$\,$LRSEXT to extract the spectra.
 
 The IRASLRS captive account on STADAT allows users to interrogate the LRS
-database, see SUN/14.
+database, see \xref{SUN/14}{sun14}{}.
 This allows access to the full dataset of $\sim$170,000 spectra extracted
 during the IRAS mission, and from which the LRS Atlas was created.
 Some spectra are very obviously ``wrong'', due to incorrect data being stored,
@@ -560,7 +524,7 @@ above.
         DEC is available in SCAR catalogue IAOD.
 	\item FITS images of IRAS Observations of Large Optical Galaxies\\
          A FITS tape containing the ``Catalog of IRAS Observations of Large
-         Optical Galaxies'' (Rice et al., 1988: Ap.J. Supp {\bf 68}, 91),
+         Optical Galaxies'' (Rice et al., 1988: Ap.J. Supp \textbf{68}, 91),
          with an accompanying report. This tape contains IRAS images, made
          from the co-added raw data, of 85 2nd Reference Catalogue bright
          galaxies with blue light isophotal diameters $>$8$'$.
@@ -576,10 +540,10 @@ above.
          These give a time ordered history of emission as seen by IRAS at all
          4 wavelengths,
          with a resolution of 0.5$^{\circ}$, in ecliptic coordinates.
-\item CALIBRATED RAW DETECTOR DATA (CRDD) --- see SUN/161\\
+\item CALIBRATED RAW DETECTOR DATA (CRDD) --- see \xref{SUN/161}{sun161}{}\\
 	This is the ultimate source of all other survey products.
 	Users may obtain copies of data for small selected areas from RAL.
-\item LOW RESOLUTION SPECTROMETER (LRS) SPECTRA --- see SUN/81 and SUN/14\\
+\item LOW RESOLUTION SPECTROMETER (LRS) SPECTRA --- see \xref{SUN/81}{sun81}{} and \xref{SUN/14}{sun14}{}\\
 There are two overlapping wavelength ranges: 7.7 -- 13.4 $\mu$m and
 11.0 -- 22.6 $\mu$m.
 The spectra of the 5425 brightest (and most reliable) sources in the IRAS Low
@@ -592,30 +556,30 @@ the Atlas.
 \end{enumerate}
 
 \section{References}
-{\em IRAS Catalogs and Atlases: Explanatory Supplement}, 1988. ed. C.A.
+\emph{IRAS Catalogs and Atlases: Explanatory Supplement}, 1988. ed. C.A.
 Beichman, G. Neugebauer, H.J. Habing, P.E. Clegg, and T.J. Chester (Washington,
 DC:GPO) --- This will be found in the libraries of most institutes.
 
-{\em IRAS Sky Survey Atlas Explanatory Supplement}, 1993. S Wheelock et al.
+\emph{IRAS Sky Survey Atlas Explanatory Supplement}, 1993. S Wheelock et al.
 
-{\em A Users Guide to IRAS Pointed Observation Products}, 1985. E.T. Young et
+\emph{A Users Guide to IRAS Pointed Observation Products}, 1985. E.T. Young et
 al. IPAC preprint no. PRE-008N.
 
-{\em IRAS-DAX Chopped Photometric Channel Explanatory Supplement} P.R. Wesselius
+\emph{IRAS-DAX Chopped Photometric Channel Explanatory Supplement} P.R. Wesselius
  et al. Laboratory for Space Research, Groningen, Netherlands.
 
 \begin{tabular}{ccl}
-SUN/14&---&IRASLRS --- Obtaining spectra from the IRAS LRS database\\
-SUN/50&---&DIPSO --- A friendly spectrum analysis program\\
-SUN/70&---&SCAR --- Starlink Catalogue Access and Reporting\\
-SUN/80&---&IRAS90 --- Extraction and Preparation of IRAS Images\\
-SUN/81&---&LRSEXT --- IRAS LRS Spectra Extraction\\
-SUN/95&---&KAPPA --- Kernel Application Package\\
-SUN/106&---&SCAR --- Beginner's Guide\\
-SUN/120&---&CATPAC --- Catalogue Applications Package\\
-SUN/161&---&IRAS90 --- Introductory/User Guide to Calibrated Reconstructed
+\xref{SUN/14}{sun14}{}&---&IRASLRS --- Obtaining spectra from the IRAS LRS database\\
+\xref{SUN/50}{sun50}{}&---&DIPSO --- A friendly spectrum analysis program\\
+\xref{SUN/70}{sun70}{}&---&SCAR --- Starlink Catalogue Access and Reporting\\
+\xref{SUN/80}{sun80}{}&---&IRAS90 --- Extraction and Preparation of IRAS Images\\
+\xref{SUN/81}{sun81}{}&---&LRSEXT --- IRAS LRS Spectra Extraction\\
+\xref{SUN/95}{sun95}{}&---&KAPPA --- Kernel Application Package\\
+\xref{SUN/106}{sun106}{}&---&SCAR --- Beginner's Guide\\
+\xref{SUN/120}{sun120}{}&---&CATPAC --- Catalogue Applications Package\\
+\xref{SUN/161}{sun161}{}&---&IRAS90 --- Introductory/User Guide to Calibrated Reconstructed
 Detector Data Analysis\\
-SUN/163&---&IRAS90 --- Survey and PO Data Analysis Package --- Reference
+\xref{SUN/163}{sun163}{}&---&IRAS90 --- Survey and PO Data Analysis Package --- Reference
 Guide\\
 \end{tabular}
 \appendix
