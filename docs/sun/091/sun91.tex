@@ -1,70 +1,23 @@
-\documentstyle{article}
-\pagestyle{myheadings}
+\documentclass[nolof,noabs,11pt]{starlink}
+
 
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocnumber}    {91.2}
-\newcommand{\stardocauthors}   {D C Parsons, P J Richards, D L Giaretta}
-\newcommand{\stardocdate}      {12 July 1989}
-\newcommand{\stardoctitle}     {IRAS --- Calibrated Raw Detector Data Analysis
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocnumber      {91.2}
+\stardocauthors     {D C Parsons, P J Richards, D L Giaretta}
+\stardocdate        {12 July 1989}
+\stardoctitle     {IRAS --- Calibrated Raw Detector Data Analysis
 \linebreak \linebreak User Guide}
 %------------------------------------------------------------------------------
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{240mm}
-\setlength{\topmargin}{-5mm}
-
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% macro for files
-% For file name, explanation of file name, and comments
-\def\tfile#1/#2/#3/.{
-\par\noindent
-\vtop{\hsize=1.2truein \noindent
-{\tt #1}\hfill \break
- \vfill}
-\hfill
-\vtop{\hsize=1.8truein \noindent
-{\em #2} \hfill \break
- \vfill}
-\hfill
-\vtop{\hsize=2.3truein \noindent
-{#3} \hfill \break
- \vfill}
-}
-%
+% -----------------------------------------------------------------------------
+% ? Document specific \providecommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
 
 \begin{document}
-\thispagestyle{empty}
-SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
-RUTHERFORD APPLETON LABORATORY\\
-{\large\bf Starlink Project\\}
-{\large\bf \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Large\bf \stardoctitle}
-\end{center}
-\vspace{5mm}
-
-\setlength{\parskip}{0mm}
-\tableofcontents
-\setlength{\parskip}{\medskipamount}
-\markright{\stardocname}
-
-\pagebreak
+\scfrontmatter
 
 \section {Introduction}
 
@@ -262,7 +215,7 @@ the uninitiated.
 There is also a package, EDRSX, which can be applied to CRDD data. This provides
 alternative programs to perform, for example, destriping and image
 manipulation. The data produced by the programs documented here must be
-converted to EDRS format before using EDRSX programs. Please refer to SUN/23 for
+converted to EDRS format before using EDRSX programs. Please refer to \xref{SUN/23}{sun23}{} for
 brief descriptions.
 
 \section {Detailed descriptions of programs}
@@ -271,7 +224,7 @@ brief descriptions.
 Detailed descriptions of all the programs except KAPPA follow. The section on
 KAPPA merely describes the type of processing you could do with KAPPA, and how
 to obtain a file which will interface with KAPPA, the full documentation of
-KAPPA is in SUN/95.
+KAPPA is in \xref{SUN/95}{sun95}{}.
 
 All programs run in the Starlink Interim environment. Plans are in hand to
 migrate to the ADAM environment.
@@ -346,7 +299,7 @@ range of choices.
 \end{itemize}
 
 \subsection {An example of using I\_SNIP\_CRDD:}
-\begin{verbatim}
+\begin{terminalv}
     $ I_SNIP_CRDD
     Input source name - up to 16 characters
     NAME:=LMC1
@@ -371,12 +324,12 @@ range of choices.
     ANS:=Y
     Is INPUT on RAL I_SNIP_CRDD archive tape? (y/n):
     ANS:=N
-\end{verbatim}
+\end{terminalv}
 
 \vspace {3mm}
 If the answer is N the computer will then ask
 
-\begin{verbatim}
+\begin{terminalv}
     Which position is plate on tape (eg 1= first plate on tape)
     1
     Which tape drive [XXXX]?
@@ -384,43 +337,43 @@ If the answer is N the computer will then ask
 
     Please load tape < tape number > on drive < drive name >
     Please press < RETURN > when tape is loaded on tape deck:
-\end{verbatim}
+\end{terminalv}
 
 The user must now mount the correct tape (without a write ring), put
 the device online, and press $<$~RETURN~$>$
 
-\begin{verbatim}
+\begin{terminalv}
     %MOUNT-I-MOUNTED, mounted on _ <drive name>
-\end{verbatim}
+\end{terminalv}
 If you have selected the choose crossings option they will all be listed
 on the screen, and written to a file XXXXCROSS.LIS (where XXXX is the source
 name).  There may be more than one screen full, in which case you have
 the option of stopping the program and looking at the list of crossings.
 
-\begin{verbatim}
+\begin{terminalv}
     There are more crossings - do you want to stop and study
     the crossings or continue and make a choice.
     CONTINUE? (Y/N):
     ANS:= Y
-\end{verbatim}
+\end{terminalv}
 N will stop the program at this point.
 
 The computer now lists other pages of crossings
 
-\begin{verbatim}
+\begin{terminalv}
     Enter your choices (default none) for example 1,4,6-9
     2-7
 
     Your choices were 2-7
     Are these correct? (Y/N)
     ANS:=Y
-\end{verbatim}
+\end{terminalv}
 In both choose crossings and non-choose crossings modes the program will then
 proceed to create the .BDF files for each crossing, generating the following
 output as it processes the data.
 
 \pagebreak
-\begin{verbatim}
+\begin{terminalv}
                I_SNIP_CRDD Version 1.2 released  1-APR-1989
              run on  6-APR-1989    11:00:11.73
 
@@ -432,9 +385,9 @@ output as it processes the data.
       CRDD files generated:
 
         LMC1_         X SCAN POS      UTCS TIME    SOP NO     LENGTH
-\end{verbatim}
+\end{terminalv}
 \hrule
-\begin{verbatim}
+\begin{terminalv}
        B2S2  B3S2        16.2      89299711.857     557        258.0
        B2S3  B3S3        21.8      89349168.647     558        258.0
        B2S4  B3S4        10.0      89355351.011     559        258.0
@@ -442,41 +395,39 @@ output as it processes the data.
          .     .           .              .           .           .
          .     .           .              .           .           .
         etc   etc         etc            etc         etc         etc
-\end{verbatim}
+\end{terminalv}
 
-N.B.\ Any crossing marked with {\tt S} between SOP NO and LENGTH is one that
+N.B.\ Any crossing marked with \texttt{S} between SOP NO and LENGTH is one that
 is shorter than the scan length.
 
 \subsection {Files produced}
 
-\tfile\hfill filename \hfill/\hfill explanation \hfill/\hfill contents \hfill/.
+\begin{tabular}{lp{1.8in}p{2.9in}}
+filename & explanation & contents \\ \hline
 
-\tfile \hrule/\hrule/\hrule/.
+\texttt{XXXXXX.LIS} & where \texttt{XXXXXX} is the source name & A log of the files
+produced, and source details \\
 
-\tfile XXXXXX.LIS/where XXXXXX is the source name/A log of the files
-produced, and source details/.
+\texttt{XXXX\_BnSm.BDF} & where \texttt{XXXX} are the first 4 chars of source name,
+n is the band no, and m is the crossing number & BDF file containing
+CRDD data for a crossing. \\
 
-\tfile XXXX\_BnSm.BDF/where XXXX are the first 4 chars of source name,
-n is the band no, and m is the crossing number/BDF file containing
-CRDD data for a crossing/.
-
-The number of bands and crossings you chose will determine the number of BDF
+\multicolumn{3}{p{\textwidth}}{The number of bands and crossings you chose will determine the number of BDF
 files  produced by I\_SNIP\_CRDD. The filenames correspond to the crossings
-chosen and are produced automatically.
+chosen and are produced automatically.} \\
 
-\tfile XXXXCROSS.LIS/where XXXX are the first 4 chars of the
-source name/Crossing details/.
+\texttt{XXXXCROSS.LIS} & where \texttt{XXXX} are the first 4 chars of the
+source name & Crossing details. \\
 
-\tfile XXXXMAP.LIS/where XXXX are the first 4 chars of the source name/A crude
-map of the plate area.\hfill\break
+\texttt{XXXXMAP.LIS} & where \texttt{XXXX} are the first 4 chars of the source name & A crude
+map of the plate area.
 Shows asterixes for each 5 secs of data found and places them on the plate
-area\hfill\break
-/.
+area.\\
 
-\tfile DUMMYn.BDF/where n is the band no of any bands NOT chosen by you/Empty;
+\texttt{DUMMYn.BDF} & where n is the band no of any bands NOT chosen by you & Empty;
 needed for certain INTERIM routines, not needed by the user and may be
-deleted when the program ends/.
-
+deleted when the program ends. \\
+\end{tabular}
 
 \pagebreak
 \section {I\_DESTRIPE --- Data destriping}
@@ -525,17 +476,17 @@ destriped data).
 
 \subsection {An example of using I\_DESTRIPE}
 
-\begin {verbatim}
-    $ I_DESTRIPE
-    CRDD file to be destriped
-    IN:= LMC1_B2S3
-    Remove background (y/n)?
-    REMBAK/N/:= Y
-    Constant(n), Sloping(y)
-    SLOPE/N/:= Y
-    Destriped file
-    OUT:= LMC1_B2S3_DS
-\end{verbatim}
+\begin {terminalv}
+$ I_DESTRIPE
+CRDD file to be destriped
+IN:= LMC1_B2S3
+Remove background (y/n)?
+REMBAK/N/:= Y
+Constant(n), Sloping(y)
+SLOPE/N/:= Y
+Destriped file
+OUT:= LMC1_B2S3_DS
+\end{terminalv}
 \pagebreak
 
 \section{I\_CRDIMAGE --- Converting scan samples to scan images}
@@ -582,20 +533,20 @@ could be used to indicate an image produced by I\_CRDIMAGE.
 
 \subsection{An example of using I\_CRDIMAGE}
 
-\begin {verbatim}
-    $ I_CRDIMAGE
-    Name of file containing CRDD data
-    CRDDF:=     GCAS_B1S1_DS
-    Size of pixels in output image(arc mins)
-    PIXSIZE/0.2500000/:= <RETURN>
-    Pixel size(arc mins):  0.25 x 0.25
+\begin {terminalv}
+$ I_CRDIMAGE
+Name of file containing CRDD data
+CRDDF:=     GCAS_B1S1_DS
+Size of pixels in output image(arc mins)
+PIXSIZE/0.2500000/:= <RETURN>
+Pixel size(arc mins):  0.25 x 0.25
 
-    Length of scan to be processed(arcmin)
+Length of scan to be processed(arcmin)
 
-    SCANLEN/120.00000/:=   120
-    Name of file to contain output image
-    IMAGE:=     GCAS_B1S1_IM
-\end{verbatim}
+SCANLEN/120.00000/:=   120
+Name of file to contain output image
+IMAGE:=     GCAS_B1S1_IM
+\end{terminalv}
 \pagebreak
 
 \section {I\_COMBINE --- Image combination}
@@ -649,29 +600,29 @@ name, n is the band number, and p is the HCON number).
 
 \subsection {An example of using I\_COMBINE}
 
-\begin {verbatim}
-     $ I_COMBINE
+\begin {terminalv}
+$ I_COMBINE
 
-     Version 3.0 (3_AUG_1987)
+Version 3.0 (3_AUG_1987)
 
-     IMAGE:=GCAS_B1S1_IM
-     IMAGE:=GCAS_B1S2_IM
-     IMAGE:=GCAS_B1S3_IM
-     IMAGE:=  etc. etc.
-     IMAGE:= <RETURN>
+IMAGE:=GCAS_B1S1_IM
+IMAGE:=GCAS_B1S2_IM
+IMAGE:=GCAS_B1S3_IM
+IMAGE:=  etc. etc.
+IMAGE:= <RETURN>
 
-     Create the whole image or some other area?
+Create the whole image or some other area?
 
-     WHOLE/T/:= <RETURN>
+WHOLE/T/:= <RETURN>
 
-     Select output pixel size in arcmin,(X,Y)
+Select output pixel size in arcmin,(X,Y)
 
-     SIZE/0.25,0.25/:= <RETURN>
+SIZE/0.25,0.25/:= <RETURN>
 
-     Processing image 1.......        ~o)(o~                    :
+Processing image 1.......        ~o)(o~                    :
 
-     OUTPUT:= N6543_B1_HC1_IM
-\end{verbatim}
+OUTPUT:= N6543_B1_HC1_IM
+\end{terminalv}
 
 \subsection {Processing time}
 
@@ -683,9 +634,9 @@ took 5mins and 100 CPU secs on a MicroVAX 3500.
 
 You cannot combine images from different wavebands, If you try to you will get
 problems. Normally these manifest themselves as an error message :-
-\begin{verbatim}
+\begin{terminalv}
 %FOR-F-OUTSTAOVE, output statement overflows record
-\end{verbatim}
+\end{terminalv}
 \pagebreak
 
 \section{I\_EASYIMAGE --- Destriping and image forming}
@@ -737,14 +688,14 @@ be processed
 
 A suitable format for the file is :-
 
-\begin{verbatim}
+\begin{terminalv}
 	GCAS_B1S1
 	GCAS_B1S2
 	GCAS_B1S3
 	GCAS_B1S4
 	GCAS_B1S5
 	GCAS_B1S6
-\end{verbatim}
+\end{terminalv}
 
 \item You will need to decide the size of the pixels you require depending
 on the wavelength band you are processing. The recommended pixel sizes are :-
@@ -760,30 +711,30 @@ removed or both constant and slope.
 
 \subsection{An example of using I\_EASYIMAGE}
 
-\begin {verbatim}
-    $ I_EASYIMAGE
+\begin {terminalv}
+$ I_EASYIMAGE
 
-    Remove background (Y/N)? :=
-    Y
-    Remove slope in background (Y/N) ? :=
-    Y
-    Size of square pixel in output image (arcmin)? :=
-    0.25
-    Length of scan (arcmin) ? :-
-    120
-    PROCESSING IMAGE  1  :  GCAS_B1S1
-    DESTRIPING AND GRIDDING COMPLETED FOR IMAGE 1
-    PROCESSING IMAGE  2  :  GCAS_B1S2
-    DESTRIPING AND GRIDDING COMPLETED FOR IMAGE 2
-        .       .      .        .      .    .   .
-        .       .      .        .      .    .   .
-        .       .      .        .      .    .   .
-        .       .      .        .      .    .   .
+Remove background (Y/N)? :=
+Y
+Remove slope in background (Y/N) ? :=
+Y
+Size of square pixel in output image (arcmin)? :=
+0.25
+Length of scan (arcmin) ? :-
+120
+PROCESSING IMAGE  1  :  GCAS_B1S1
+DESTRIPING AND GRIDDING COMPLETED FOR IMAGE 1
+PROCESSING IMAGE  2  :  GCAS_B1S2
+DESTRIPING AND GRIDDING COMPLETED FOR IMAGE 2
+   .       .      .        .      .    .   .
+   .       .      .        .      .    .   .
+   .       .      .        .      .    .   .
+   .       .      .        .      .    .   .
 
-    *********************************
-    **ALL FILES DESTRIPED & GRIDDED**
-    *********************************
-\end{verbatim}
+*********************************
+**ALL FILES DESTRIPED & GRIDDED**
+*********************************
+\end{terminalv}
 N.B.\ This procedure is CPU intensive.
 If more than 4 or 5 scans are to be processed, the user is advised to run the
 job during off-peak hours, ie lunch times or after 6.00 pm.
@@ -881,34 +832,34 @@ could be used to indicate an image produced by I\_CRDD\_COMBINE.
 
 \subsection{An example of using I\_CRDD\_COMBINE}
 
-\begin{verbatim}
-    $ I_CRDD_COMBINE
+\begin{terminalv}
+$ I_CRDD_COMBINE
 
-    CRDDF:= GCAS_B1S1_DS
-    CRDDF:= GCAS_B1S2_DS
-    CRDDF:= GCAS_B1S3_DS
-    CRDDF:=  etc. etc.
-    CRDDF:=  <RETURN>
+CRDDF:= GCAS_B1S1_DS
+CRDDF:= GCAS_B1S2_DS
+CRDDF:= GCAS_B1S3_DS
+CRDDF:=  etc. etc.
+CRDDF:=  <RETURN>
 
-    Whole image to be produced (T/F)?
-    WHOLE/T/:= <RETURN>
-    Size of pixels in output image (arc mins)
-    PIXSIZE/0.25000x0.25000/:= <RETURN>
-    Pixel size (arc mins): 0.25000x0.25000
-    Sector factor
-    SFACT/2.000000/:= <RETURN>
-    Length of scan to be processed (arc mins)
-    SCANLEN/120.0000/:= <RETURN>
-    Weighting of detector samples required (T/F)?
-    WEIGHT/F/:= T
-    AYEDGE/0.5000000/:= <RETURN>
-    Amplitude at in-scan edge: 0.50
-    AZEDGE/0.5000000/:= <RETURN>
-    Amplitude at X-scan edge: 0.50
-    Processing image 1...      =(o-o\                                         |
+Whole image to be produced (T/F)?
+WHOLE/T/:= <RETURN>
+Size of pixels in output image (arc mins)
+PIXSIZE/0.25000x0.25000/:= <RETURN>
+Pixel size (arc mins): 0.25000x0.25000
+Sector factor
+SFACT/2.000000/:= <RETURN>
+Length of scan to be processed (arc mins)
+SCANLEN/120.0000/:= <RETURN>
+Weighting of detector samples required (T/F)?
+WEIGHT/F/:= T
+AYEDGE/0.5000000/:= <RETURN>
+Amplitude at in-scan edge: 0.50
+AZEDGE/0.5000000/:= <RETURN>
+Amplitude at X-scan edge: 0.50
+Processing image 1...      =(o-o\                                         |
 
-    OUTPUT:= GCAS_B1_H1_CC
-\end{verbatim}
+OUTPUT:= GCAS_B1_H1_CC
+\end{terminalv}
 
 \subsection{Examples of output from I\_CRDD\_COMBINE}
 
@@ -971,48 +922,47 @@ data.
 
 \begin{itemize}
 \item [Part 1:] Prepare a contour map of the whole image
-\begin{verbatim}
-    $ I_CONTOUR
-    Version 3.0  (3-AUG-1987)
-    IMAGE:=GCAS_B4_HC3_IM3.BDF
-    Processing image  1...                                                   :
-    Special plot or use defaults?
-    SPECIAL/F/:= <RETURN>
-    Min and Max values are:-      -24.09       93.90
-    Enter up to 20 contour levels,
-    OR just the base level,
-    OR the base level and further qualifiers,
-    OR just press return for default levels
-    LEVELS:= <RETURN>
-    Base contour is 5.00 and subsequent ones *1.50
-    Enter a title:-
-    TITLE//:=GCAS_B4_HC3_IM3
-\end{verbatim}
+\begin{terminalv}
+$ I_CONTOUR
+Version 3.0  (3-AUG-1987)
+IMAGE:=GCAS_B4_HC3_IM3.BDF
+Processing image  1...                                                   :
+Special plot or use defaults?
+SPECIAL/F/:= <RETURN>
+Min and Max values are:-      -24.09       93.90
+Enter up to 20 contour levels,
+OR just the base level,
+OR the base level and further qualifiers,
+OR just press return for default levels
+LEVELS:= <RETURN>
+Base contour is 5.00 and subsequent ones *1.50
+Enter a title:-
+TITLE//:=GCAS_B4_HC3_IM3
+\end{terminalv}
 \pagebreak
-\begin{verbatim}
+\begin{terminalv}
+  name        description
 
-      name        description
+  7800        Pericom 7800
+  ARGS1
+  ARGSOV1
+  BBC         BBC micro
+  CANON       Canon Laser printer - bit map file is CANON.DAT
+  CANON_L     Canon Laser (Landscape) - bit map file is CANON.DAT
+  CANON_P     Canon Laser (Portrait) - bit map file is CANON.DAT
+  CIFER_2634  Cifer 2634G
+  CIFER_T5    Cifer T5
+  GRAPHPACK   Pericom Graph Pack
+  IKON        Digisolve Ikon
+  IKONOV      Ikon overlay
+  MG100       Pericom Graph Pack
+  PRINTRONIX  Printronix printer - bit map file is PRINTRONIX.BIT
+  TEK         Tektronix 4010
+  ZETA        Zeta 8 pen plotter - plot file is ZETA.DAT
 
-      7800        Pericom 7800
-      ARGS1
-      ARGSOV1
-      BBC         BBC micro
-      CANON       Canon Laser printer - bit map file is CANON.DAT
-      CANON_L     Canon Laser (Landscape) - bit map file is CANON.DAT
-      CANON_P     Canon Laser (Portrait) - bit map file is CANON.DAT
-      CIFER_2634  Cifer 2634G
-      CIFER_T5    Cifer T5
-      GRAPHPACK   Pericom Graph Pack
-      IKON        Digisolve Ikon
-      IKONOV      Ikon overlay
-      MG100       Pericom Graph Pack
-      PRINTRONIX  Printronix printer - bit map file is PRINTRONIX.BIT
-      TEK         Tektronix 4010
-      ZETA        Zeta 8 pen plotter - plot file is ZETA.DAT
-
-    Which do you want to use?
-    DEVICE/7800/:= <RETURN>
-\end{verbatim}
+Which do you want to use?
+DEVICE/7800/:= <RETURN>
+\end{terminalv}
 Press the $<$GRAPH$>$ key on the Pericom to get graphical display.
 
 The computer then draws a contour map of the source region on a grid of RA and
@@ -1021,10 +971,10 @@ map is annotated with the coordinates of the origin, the title and a key to
 the contour levels (which are given in absolute flux levels).
 
 In the small graphics type face it prints at the top of the screen
-\begin{verbatim}
-    Do you want to measure fluxes and positions?
-    FLUXES/F/:=
-\end{verbatim}
+\begin{terminalv}
+Do you want to measure fluxes and positions?
+FLUXES/F/:=
+\end{terminalv}
 Press $<$shift$>$$<$VDU$>$ to obtain the subsequent output in standard typeface
 \item [Part 2:] To determine a suitable size of area for a subimage.
 
@@ -1037,13 +987,13 @@ measuring facility. The x and y size are in arc min.
 The procedure for doing the latter is as follows:-
 
 Enter T for true to the question
-\begin{verbatim}
-    Do you want to measure fluxes and positions?
-    FLUXES/F/:= T
-    A record will be kept in FLUXES.LIS
-    Manual,file or quit
-    MODE/M/:= <RETURN>
-\end{verbatim}
+\begin{terminalv}
+Do you want to measure fluxes and positions?
+FLUXES/F/:= T
+A record will be kept in FLUXES.LIS
+Manual,file or quit
+MODE/M/:= <RETURN>
+\end{terminalv}
 Press graph only key to get a graphic screen
 
 A cross wire cursor should be present on the screen if not press $<$RETURN$>$ to
@@ -1052,11 +1002,11 @@ by using $<$SHIFT$>$ and arrow keys for coarse movement and arrow keys alone for
 fine movement. When you are satisfied with the position push any key twice, and
 the position and the flux will be typed in very small graphics type. It will
 also type:-
-\begin{verbatim}
-    Manual,file or quit
-    MODE/M/:= <RETURN>
-\end{verbatim}
-Press the VDU key to type in standard typeface and type {\tt Q}
+\begin{terminalv}
+Manual,file or quit
+MODE/M/:= <RETURN>
+\end{terminalv}
+Press the VDU key to type in standard typeface and type \texttt{Q}
 
 \pagebreak
 \item [Part 3:] To draw a contour map of a subimage, and to plot with a lower
@@ -1064,54 +1014,54 @@ base contour level.
 
 After your preceding runs the program will type:-
 
-\begin{verbatim}
-    Do you want to plot this image again?
-    Enter F - No,
-          T - yes, change all parameters,
-          D - yes, change Device only,
-          L - yes, change contour Levels,
-    AGAIN/F/:=T
-    Special plot or use defaults?
-    SPECIAL/F/:=T
-    Plot the whole image or some other area?
-    WHOLE/T/:=F
-    Current centre:  RA =   0 54 59.3
-                    DEC =  60 38 10
-        size is  125.0 x  121.0 arcmins
-    Enter centre RA and DEC and size of the area you want to use as:-
-    raH,raM,raS, decD,decM,decS, Xsize,Ysize
-    AREA:=0,55,30,60,46,00,20,20
+\begin{terminalv}
+Do you want to plot this image again?
+Enter F - No,
+     T - yes, change all parameters,
+     D - yes, change Device only,
+     L - yes, change contour Levels,
+AGAIN/F/:=T
+Special plot or use defaults?
+SPECIAL/F/:=T
+Plot the whole image or some other area?
+WHOLE/T/:=F
+Current centre:  RA =   0 54 59.3
+               DEC =  60 38 10
+   size is  125.0 x  121.0 arcmins
+Enter centre RA and DEC and size of the area you want to use as:-
+raH,raM,raS, decD,decM,decS, Xsize,Ysize
+AREA:=0,55,30,60,46,00,20,20
 
-    Label the contours?
-    LABELS/T/:= <RETURN>
-    Mark the edge of the area covered?
-    EDGE/T/:= <RETURN>
-    RA and DEC in lines or ticks?
-    LINES/T/:= <RETURN>
-    Enter RA and DEC line spacings in secs,arcmins
-    SPACINGS/15.00000, 5.000000/:= <RETURN>
-    Plot particular objects on the map?
-    OBJECTS/F/:= <RETURN>
-    Min and Max values are:-       -5.25       93.90
-    Enter up to 20 contour levels,
-    OR just the base level,
-    OR the base level and further qualifiers,
-    OR just press return for default levels
-    LEVELS:=0.5,2.0
-    Base contour is 0.500 and subsequent ones *2.00
-    Enter a title:-
-    TITLE/GCAS_B4_HC3_IM3/:= <RETURN>
-\end{verbatim}
+Label the contours?
+LABELS/T/:= <RETURN>
+Mark the edge of the area covered?
+EDGE/T/:= <RETURN>
+RA and DEC in lines or ticks?
+LINES/T/:= <RETURN>
+Enter RA and DEC line spacings in secs,arcmins
+SPACINGS/15.00000, 5.000000/:= <RETURN>
+Plot particular objects on the map?
+OBJECTS/F/:= <RETURN>
+Min and Max values are:-       -5.25       93.90
+Enter up to 20 contour levels,
+OR just the base level,
+OR the base level and further qualifiers,
+OR just press return for default levels
+LEVELS:=0.5,2.0
+Base contour is 0.500 and subsequent ones *2.00
+Enter a title:-
+TITLE/GCAS_B4_HC3_IM3/:= <RETURN>
+\end{terminalv}
 
 Press the $<$GRAPH$>$ key on the Pericom to get graphical display.
 
 The computer then draws a contour map of the subimage.
 
 In the small graphics type face it prints at the top of the screen
-\begin{verbatim}
-    Do you want to measure fluxes and positions?
-    FLUXES/F/:=
-\end{verbatim}
+\begin{terminalv}
+Do you want to measure fluxes and positions?
+FLUXES/F/:=
+\end{terminalv}
 Press $<$shift$>$$<$VDU$>$ to obtain the subsequent output in standard typeface
 
 \pagebreak
@@ -1123,13 +1073,13 @@ The procedure for drawing a box is :-
 
 Enter T for true to the question
 
-\begin{verbatim}
-    Do you want to measure fluxes and positions?
-    FLUXES/F/:= T
-    A record will be kept in FLUXES.LIS
-    Manual,file or quit
-    MODE/M/:= <RETURN>
-\end{verbatim}
+\begin{terminalv}
+Do you want to measure fluxes and positions?
+FLUXES/F/:= T
+A record will be kept in FLUXES.LIS
+Manual,file or quit
+MODE/M/:= <RETURN>
+\end{terminalv}
 
 Press graph only key to get a graphic screen
 
@@ -1147,14 +1097,14 @@ FLUXES.LIS file. It will also mark the position of the maximum flux within the
 box, and give the value of the flux at this point.
 
 It will also type:-
-\begin{verbatim}
-    Save marked area?
-    SAVE/T/:= <RETURN>
-    FILE:= GCAS_B4_HC3_CENTERBOX.LIS
+\begin{terminalv}
+Save marked area?
+SAVE/T/:= <RETURN>
+FILE:= GCAS_B4_HC3_CENTERBOX.LIS
 
-    Manual,file or quit
-    MODE/M/:=
-\end{verbatim}
+Manual,file or quit
+MODE/M/:=
+\end{terminalv}
 
 To continue with any other boxes, or to obtain fluxes at a point press
 $<$RETURN$>$.
@@ -1167,26 +1117,26 @@ To quit from the cycle of finding fluxes type Q in reply to the mode prompt.
 After finishing the run you can examine the results of the flux measurements
 by printing or typing the file FLUXES.LIS eg.
 
-\begin{verbatim}
-    type fluxes.lis
-       gcas_b4_hc3_im3
+\begin{terminalv}
+type fluxes.lis
+  gcas_b4_hc3_im3
 
-       Peak  RA   0 55 32.7      Dec  60 48 12
-       Peak flux  =  9.3896E+07  Jy/Ster
-       Total flux =   204.6      Jy
-       (using   100  points)
-       Total - background =   139.1      Jy
-       Average FWHM =  4.10 mins
+  Peak  RA   0 55 32.7      Dec  60 48 12
+  Peak flux  =  9.3896E+07  Jy/Ster
+  Total flux =   204.6      Jy
+  (using   100  points)
+  Total - background =   139.1      Jy
+  Average FWHM =  4.10 mins
 
-       RA   0 54 25.8       Dec  60 53  9
-       Flux  =  6.3332E+07  Jy/Ster
+  RA   0 54 25.8       Dec  60 53  9
+  Flux  =  6.3332E+07  Jy/Ster
 
-       RA   0 57  3.1       Dec  60 50 10
-       Flux  =  2.6011E+07  Jy/Ster
+  RA   0 57  3.1       Dec  60 50 10
+  Flux  =  2.6011E+07  Jy/Ster
 
-       RA   0 56 18.9       Dec  60 38 21
-       Flux  =  6.9975E+07  Jy/Ster
-\end{verbatim}
+  RA   0 56 18.9       Dec  60 38 21
+  Flux  =  6.9975E+07  Jy/Ster
+\end{terminalv}
 
 \pagebreak
 \item [Part 5:] To prepare a file containing the contour map for printing on the
@@ -1194,33 +1144,33 @@ laser printer.
 
 Note that the position of any boxes will not appear on the map.
 
-\begin{verbatim}
-    Do you want to plot this image again?
-    Enter F - No,
-          T - yes, change all parameters,
-          D - yes, change Device only,
-          L - yes, change contour Levels,
-    AGAIN/F/:=D
-\end{verbatim}
+\begin{terminalv}
+Do you want to plot this image again?
+Enter F - No,
+     T - yes, change all parameters,
+     D - yes, change Device only,
+     L - yes, change contour Levels,
+AGAIN/F/:=D
+\end{terminalv}
 
 The program will then print out a list of available devices
 
-\begin{verbatim}
-    Which do you want to use?
-    DEVICE/7800/:=CANON
-    Enter plot scale in mm/arcmin
-    SCALE/7.813919/:= <RETURN>
-    When the program finishes to get your plot type
-    PRINT/QUEUE=SYS_LASER/PASSALL CANON.DAT
-    Finished plotting
-    Do you want to plot this image again?
-    Enter F - No,
-          T - yes, change all parameters,
-          D - yes, change Device only,
-          L - yes, change contour Levels,
-    AGAIN/F/:= <RETURN>
-    $
-\end{verbatim}
+\begin{terminalv}
+Which do you want to use?
+DEVICE/7800/:=CANON
+Enter plot scale in mm/arcmin
+SCALE/7.813919/:= <RETURN>
+When the program finishes to get your plot type
+PRINT/QUEUE=SYS_LASER/PASSALL CANON.DAT
+Finished plotting
+Do you want to plot this image again?
+Enter F - No,
+     T - yes, change all parameters,
+     D - yes, change Device only,
+     L - yes, change contour Levels,
+AGAIN/F/:= <RETURN>
+$
+\end{terminalv}
 
 \item [Part 6:] To plot the points and boxes used on this image on the image of
 the same source at another wavelength, and determine corresponding flux
@@ -1235,56 +1185,56 @@ To replot the position of points you must first prepare a file containing
 containing their coordinates, the easiest way to do this is to edit the
 FLUXES.LIS file to look like this:-
 
-\begin{verbatim}
-    $ type gcas_b4_hc3_positions.lis
+\begin{terminalv}
+$ type gcas_b4_hc3_positions.lis
 
-    0 54 25.8       60 53  9
+0 54 25.8       60 53  9
 
-    0 57  3.1       60 50 10
+0 57  3.1       60 50 10
 
-    0 56 18.9       60 38 21
-\end{verbatim}
+0 56 18.9       60 38 21
+\end{terminalv}
 
 Then you can run I\_CONTOUR using the data file for the other waveband as
 follows:-
 
-\begin{verbatim}
-    $ I_CONTOUR
-    Version 3.0  (3-AUG-1987)
-    IMAGE:=GCAS_B2_HC3_IM3.BDF
-    Special plot or use defaults?
-    SPECIAL/F/:=T
-    Plot the whole image or some other area?
-    WHOLE/T/:= <RETURN>
-    Label the contours?
-    LABELS/T/:= <RETURN>
-    Mark the edge of the area covered?
-    EDGE/T/:= <RETURN>
-    RA and DEC in lines or ticks?
-    LINES/T/:= <RETURN>
-\end{verbatim}
+\begin{terminalv}
+$ I_CONTOUR
+Version 3.0  (3-AUG-1987)
+IMAGE:=GCAS_B2_HC3_IM3.BDF
+Special plot or use defaults?
+SPECIAL/F/:=T
+Plot the whole image or some other area?
+WHOLE/T/:= <RETURN>
+Label the contours?
+LABELS/T/:= <RETURN>
+Mark the edge of the area covered?
+EDGE/T/:= <RETURN>
+RA and DEC in lines or ticks?
+LINES/T/:= <RETURN>
+\end{terminalv}
 \pagebreak
-\begin{verbatim}
-    Enter RA and DEC line spacings in secs,arcmins
-    SPACINGS/120.0000, 15.00000/:= <RETURN>
-    Plot particular objects on the map?
-    OBJECTS/F/:=T
-    Which file contains their positions?
-    FILE/TT/:= gcas_b4_hc3_positions.lis
-\end{verbatim}
+\begin{terminalv}
+Enter RA and DEC line spacings in secs,arcmins
+SPACINGS/120.0000, 15.00000/:= <RETURN>
+Plot particular objects on the map?
+OBJECTS/F/:=T
+Which file contains their positions?
+FILE/TT/:= gcas_b4_hc3_positions.lis
+\end{terminalv}
 Continue answering the prompts as in part 3 above. The contour map will be
 drawn with numbered stars at the points. Because of graphics overtyping it is
 easiest first to display any boxes. You can do this by entering:-
-\begin{verbatim}
-    Do you want to measure fluxes and positions?
-    FLUXES/F/:= T
+\begin{terminalv}
+Do you want to measure fluxes and positions?
+FLUXES/F/:= T
 
-    A record will be kept in FLUXES.LIS
+A record will be kept in FLUXES.LIS
 
-    Manual,file or quit
-    MODE/M/:= F
-    FILE:= GCAS_B4_HC3_CENTERBOX.LIS
-\end{verbatim}
+Manual,file or quit
+MODE/M/:= F
+FILE:= GCAS_B4_HC3_CENTERBOX.LIS
+\end{terminalv}
 
 To measure the fluxes at points you need to follow the procedure outlined
 in part 2 positioning the cross wires over each point in turn. The fluxes both
@@ -1389,7 +1339,7 @@ background flux around the edge of the area.
 \subsection{Introduction}
 
 This short note is not intended as a guide to KAPPA which is fully documented
-in SUN/95. It is intended to give you some idea of the type of processing one
+in \xref{SUN/95}{sun95}{}. It is intended to give you some idea of the type of processing one
 could do with KAPPA and the preprocessing needed to get CRDD data which is in
 INTERIM .BDF format into .HDS Image Data format.
 
@@ -1426,12 +1376,12 @@ I\_CONTOUR to obtain accurate positions and fluxes.
 \subsection{Changing a CRDD data file into a file for use with KAPPA}
 
 A program STARIN is available to do the necessary conversion. It is fully
-documented in SUN/96. The options we require for CRDD image file conversion
+documented in \xref{SUN/96}{sun96}{}. The options we require for CRDD image file conversion
 that the HDS data type should be \_real, you can also specify no descriptors to
 be copied unless you wish to copy them back (using the descriptors portion of
 STAROUT which is also described in that SUN).
 
-You should read the introductory parts of SUN/95 before using KAPPA especially
+You should read the introductory parts of \xref{SUN/95}{sun95}{} before using KAPPA especially
 that relating to the definition of work space.
 
 \pagebreak
@@ -1566,63 +1516,64 @@ and the conversion factor between Jansky's and Watts.
 
 \subsection{An example of using I\_COADD}
 
-\begin{verbatim}
-    $ I_COADD
+\begin{terminalv}
+$ I_COADD
 
-    FILTER SNR threshold,            SNR  = 1.0
-    FILTER correlation threshold     CORL = 0.7
-    Detector width extension(arcmin) DZ   = 0.0
-    Detector samples noise weighted
-    Detector samples Printed
-    Detector samples Not interpolated to
-    remove fractional offsets
+FILTER SNR threshold,            SNR  = 1.0
+FILTER correlation threshold     CORL = 0.7
+Detector width extension(arcmin) DZ   = 0.0
+Detector samples noise weighted
+Detector samples Printed
+Detector samples Not interpolated to
+remove fractional offsets
 
-    Are defaults to be changed(y/n)?
-    ANS:= N
-\end{verbatim}
-If you decide to alter the defaults and answer {\tt Y} to the question above
+Are defaults to be changed(y/n)?
+ANS:= N
+\end{terminalv}
+If you decide to alter the defaults and answer \texttt{Y} to the question above
 you will get the following prompts:-
 
-\begin{verbatim}
-    ANS:= Y
-    SNR/1.0/:= <RETURN>
-    CORL/0.7/:= <RETURN>
-    DZ/0.0/:=   <RETURN>
-    Is data interpolation required(y/n)?
-    ANS:= N
-    Is noise weighting required(y/n)?
-    ANS:= Y
-    Are raw data values to be printed(y/n)?
-    ANS:= Y
-    Is a noise histogram required(y/n)?
-    ANS:= N
-\end{verbatim}
+\begin{terminalv}
+ANS:= Y
+SNR/1.0/:= <RETURN>
+CORL/0.7/:= <RETURN>
+DZ/0.0/:=   <RETURN>
+Is data interpolation required(y/n)?
+ANS:= N
+Is noise weighting required(y/n)?
+ANS:= Y
+Are raw data values to be printed(y/n)?
+ANS:= Y
+Is a noise histogram required(y/n)?
+ANS:= N
+\end{terminalv}
 Whether you accept or change the default values the following prompts will be
 printed
-\begin{verbatim}
-    Name of CRDD file?
-    CRDDF:= N6543_B1S1
-    N6543       BAND 1 SOP: 546 UTC1ST: 12345678.123
+\begin{terminalv}
+Name of CRDD file?
+CRDDF:= N6543_B1S1
+N6543       BAND 1 SOP: 546 UTC1ST: 12345678.123
 
-    Is another CRDD file to be input(y/n)?
-    ANS:= N
-\end{verbatim}
+Is another CRDD file to be input(y/n)?
+ANS:= N
+\end{terminalv}
 N terminates requests for CRDD files for this source.
 
-\begin{verbatim}
-    Is another source to be processed(y/n)?
-    ANS:= N
-\end{verbatim}
+\begin{terminalv}
+Is another source to be processed(y/n)?
+ANS:= N
+\end{terminalv}
 N  terminates  program  run. Y causes requests for CRDD files for another source.
 
-\begin{verbatim}
-     Output is in file COADOP.LIS
-\end{verbatim}
+\begin{terminalv}
+Output is in file COADOP.LIS
+\end{terminalv}
 
 \pagebreak
 
 \section{Appendix}
 
+\setlength{\unitlength}{1mm}
 \begin{picture}(170,230)
 \put (0,200){Figure 1}
 \put (0,93){Figure 2}
