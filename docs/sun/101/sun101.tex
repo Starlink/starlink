@@ -1,239 +1,30 @@
-\documentclass[twoside,11pt]{article}
-\pagestyle{myheadings}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {101.2}
-\newcommand{\stardocauthors}   {Jo Murray}
-\newcommand{\stardocdate}      {24 January 1991}
-\newcommand{\stardoctitle}     {Introduction to ADAM Programming}
-\newcommand{\stardocabstract}  {This document is a tutorial in the art
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {101.2}
+\stardocauthors     {Jo Murray}
+\stardocdate        {24 January 1991}
+\stardoctitle       {Introduction to ADAM Programming}
+\stardocabstract  {This document is a tutorial in the art
 of ADAM programming.  ADAM is the Starlink Software Environment.}
 % ? End of document identification
 
 % -----------------------------------------------------------------------------
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\newcommand{\CR}{\mbox{$\left<{\rm CR}\right>$}}
-\renewcommand{\_}{{\tt\char'137}}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
 
 % -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % from the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
+% ? Document-specific \providecommand or \newenvironment commands.
+\providecommand{\CR}{\mbox{$\left<{\rm CR}\right>$}}
 % ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\newpage
-~
-\newpage
-
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section{Introduction\label{intro}\xlabel{introduction}}
 
@@ -248,7 +39,7 @@ how to compile and link ADAM programs.
 Subsequent sections deal with
 topics such as accessing  NDFs, error and message reporting, data processing,
 I/O, character handling, graphics,
-bad pixel handling {\it etc.}
+bad pixel handling \textit{etc.}
 Later sections illustrate the power of running ADAM programs under the
 special {\sl Interactive Command Language} (ICL) rather than the familiar
 DCL (Digital Command Language).
@@ -310,7 +101,7 @@ Primitives actually contain data -- like ordinary VMS files, whereas
 structures contain further levels of objects -- like VMS directory files.
 
 There are defined locations for standard items such as the main data array,
-axes, title, units {\it etc.} (see Appendix~\ref{apxndf}).
+axes, title, units \textit{etc.} (see Appendix~\ref{apxndf}).
 The only mandatory item is the main data
 array; all other items are optional.
 Non-standard items are stored in {\sl extensions\/}
@@ -328,42 +119,42 @@ see also Appendix~\ref{apxrod}.
 
 For example, the title of an NDF can be read into the character string
 VALUE by the call below:
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_CGET (NDF, 'TITLE', VALUE, STATUS)
-\end{verbatim}
+\end{terminalv}
 The units and label can be accessed by replacing
-{\tt 'TITLE'} with {\tt 'UNITS'} and {\tt 'LABEL'} respectively.
+\texttt{'TITLE'} with \texttt{'UNITS'} and \texttt{'LABEL'} respectively.
 
 Of course, you still want to know what the format actually is\ldots\
 You can examine the contents of a sample NDF
-using {\tt TRACE}\footnote{Type ADAMSTART to set up the symbol TRACE.}.
+using \texttt{TRACE}\footnote{Type ADAMSTART to set up the symbol TRACE.}.
 NDFs have the default file extension `.SDF' and a selection are
 contained in the  ADAM\_EXAMPLES directory.
 The example below uses SPECTRUM.SDF.
-\begin{verbatim}
-  $ TRACE SPECTRUM
+\begin{terminalv}
+$ TRACE SPECTRUM
 
-  SPECTRUM  <NDF>
+SPECTRUM  <NDF>
 
-     DATA_ARRAY(852)  <_REAL>       56.47374,97.49321,68.82304,82.95155,
-                                    ... 820.8976,570.0729,471.8835,449.574
-     TITLE          <_CHAR*30>      'HR6259 - a Red Giant in w Cen'
-     LABEL          <_CHAR*4>       'Flux'
-     AXIS(1)        <AXIS>          {structure}
+  DATA_ARRAY(852)  <_REAL>       56.47374,97.49321,68.82304,82.95155,
+                                 ... 820.8976,570.0729,471.8835,449.574
+  TITLE          <_CHAR*30>      'HR6259 - a Red Giant in w Cen'
+  LABEL          <_CHAR*4>       'Flux'
+  AXIS(1)        <AXIS>          {structure}
 
-     Contents of AXIS(1)
-        LABEL          <_CHAR*20>      'Wavelength'
-        UNITS          <_CHAR*20>      'Angstroms'
-        DATA_ARRAY(852)  <_REAL>       3849.26,3849.79,3850.32,3850.849,
-                                       ... 4298.309,4298.838,4299.368,4299.897
-  End of Trace.
-\end{verbatim}
+  Contents of AXIS(1)
+     LABEL          <_CHAR*20>      'Wavelength'
+     UNITS          <_CHAR*20>      'Angstroms'
+     DATA_ARRAY(852)  <_REAL>       3849.26,3849.79,3850.32,3850.849,
+                                    ... 4298.309,4298.838,4299.368,4299.897
+End of Trace.
+\end{terminalv}
 The indentation reflects the hierarchy of the data objects.
 For example, the {\sl first-level\/} objects in the structure above are
-{\tt  DATA\_ARRAY, TITLE, LABEL} and {\tt AXIS(1).}
+\texttt{DATA\_ARRAY, TITLE, LABEL} and \texttt{AXIS(1).}
 The first three of these are primitives whereas
-{\tt AXIS(1)} is a structure and contains the {\sl second-level\/}
-objects {\tt LABEL, UNITS \& DATA\_ARRAY.}
+\texttt{AXIS(1)} is a structure and contains the {\sl second-level\/}
+objects \texttt{LABEL, UNITS \& DATA\_ARRAY.}
 
 The output also indicates that the main data array is of type
 {\tt\_REAL}\footnote{HDS data types {\tt\_REAL} and {\tt\_CHAR} correspond to Fortran types REAL
@@ -371,13 +162,13 @@ and CHARACTER respectively (see Appendix~\ref{apxhds}).}
 and is a 1-d array with 852 elements;
 the first and last of these are shown, separated by an ellipsis.
 Similarly  TITLE is an object of type {\tt\_CHAR} and length
-30, and has a value of\ {\tt 'HR6259 - a Red Giant in w Cen'}.
+30, and has a value of\ \texttt{'HR6259 - a Red Giant in w Cen'}.
 
 It is important to note that the above  is an example format which
 happens to show a primitive NDF,
-{\it i.e.} {\tt DATA\_ARRAY} is a primitive object.
+\textit{i.e.} \texttt{DATA\_ARRAY} is a primitive object.
 \xref{SGP/38}{sgp38}{} describes other possibilities or {\sl variants\/} in
-which {\tt DATA\_ARRAY} is a structure which  can be used to express
+which \texttt{DATA\_ARRAY} is a structure which  can be used to express
 data in a variety of ways.
 
 
@@ -390,24 +181,24 @@ The first surprise for the new ADAM programmer is that the application
 consists merely of a subroutine, HELLO.FOR, and an
 associated {\sl interface\/} file, HELLO.IFL.
 The application code, HELLO.FOR is as follows:
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE HELLO (STATUS)
       INTEGER STATUS
 
 *   Output Hello message.
       WRITE(*,*) 'Hello'
       END
-\end{verbatim}
+\end{terminalv}
 And the  interface file, HELLO.IFL:
-\begin{verbatim}
-  interface hello
-  endinterface
-\end{verbatim}
+\begin{terminalv}
+interface hello
+endinterface
+\end{terminalv}
 All ADAM applications comprise a `main' subroutine with the single
-integer {\tt STATUS} argument.
+integer \texttt{STATUS} argument.
 The program which calls the subroutine is automatically
-generated and compiled at the ADAM {\tt LINK} stage.
-The files thus created, {\tt APPMAIN.FOR} and {\tt APPMAIN.OBJ}
+generated and compiled at the ADAM \texttt{LINK} stage.
+The files thus created, \texttt{APPMAIN.FOR} and \texttt{APPMAIN.OBJ}
 are automatically deleted when the executable file (named after the
 application subroutine) is created.
 
@@ -424,7 +215,7 @@ Usually an interface file comprises  a list of
 such parameters together with information associated with each parameter.
 For example, the program in the next section has a single parameter
 called INPUT, and the interface file indicates that this  parameter should
-be prompted for with the string `{\tt Input NDF structure}'.
+be prompted for with the string `\texttt{Input NDF structure}'.
 The interface file is automatically processed when the associated program
 runs.
 In the case of the HELLO program, there are no parameters, so the interface
@@ -439,28 +230,28 @@ a proper ADAM program (see Section~\ref{repdim1}).
 
 Before compiling and linking ADAM programs it is necessary to issue the
 following commands:
-\begin{verbatim}
-  $ ADAMSTART
-  $ ADAMDEV
-\end{verbatim}
-These commands set up many symbols, logical names {\it etc.}
+\begin{terminalv}
+$ ADAMSTART
+$ ADAMDEV
+\end{terminalv}
+These commands set up many symbols, logical names \textit{etc.}
 such as the special ADAM link command ALINK.
 It may be convenient to include them in your LOGIN.COM.
 
 To produce an executable file, the
-source files {\tt ADAM\_EXAMPLES:HELLO.FOR, HELLO.IFL}\ can be copied and the
+source files \texttt{ADAM\_EXAMPLES:HELLO.FOR, HELLO.IFL}\ can be copied and the
 procedure below  followed:\footnote{To link with the debug option add
-``{\tt~/DEBUG}'' at the end of the link
+``\texttt{~/DEBUG}'' at the end of the link
 command line.}
-\begin{verbatim}
-  $ FORTRAN HELLO                                       ! Produces HELLO.OBJ
-  $ ALINK HELLO                                         ! Produces HELLO.EXE
-\end{verbatim}
+\begin{terminalv}
+$ FORTRAN HELLO                                       ! Produces HELLO.OBJ
+$ ALINK HELLO                                         ! Produces HELLO.EXE
+\end{terminalv}
 The HELLO program can now be tested:
-\begin{verbatim}
-  $ RUN HELLO
-  Hello
-\end{verbatim}
+\begin{terminalv}
+$ RUN HELLO
+Hello
+\end{terminalv}
 
 \newpage
 \section{A simple program\label{repdim}\xlabel{a_simple_program}}
@@ -469,7 +260,7 @@ The program discussed in this section reports the
 dimensions of the main data array of an input NDF.
 The code for REPDIM.FOR is reproduced below and can be copied from the
 directory ADAM\_EXAMPLES.
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE REPDIM (STATUS)
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -493,49 +284,49 @@ directory ADAM\_EXAMPLES.
 *   End the NDF context.
       CALL NDF_END (STATUS)
       END
-\end{verbatim}
+\end{terminalv}
 
 The interface file REPDIM.IFL, associated with the above routine is
 as follows:
-\begin{verbatim}
-  interface REPDIM
-     parameter      INPUT
-        prompt      'Input NDF structure'
-     endparameter
-  endinterface
-\end{verbatim}
+\begin{terminalv}
+interface REPDIM
+  parameter      INPUT
+     prompt      'Input NDF structure'
+  endparameter
+endinterface
+\end{terminalv}
 
 
-{\large\bf The application code explained.}
+\textbf{\large The application code explained.}
 
 But how does it work?
 To examine the code in detail:
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE REPDIM (STATUS)
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INTEGER DIM(10), I, NDF1, NDIM, STATUS
-\end{verbatim}
+\end{terminalv}
 The  main subroutine is declared with the single STATUS argument
 as with all ADAM applications.
-The {\tt IMPLICIT NONE} statement forces the explicit declaration of the
+The \texttt{IMPLICIT NONE} statement forces the explicit declaration of the
 type of all variables used within the program. The use of this extension
 is generally recommended for Starlink programming.
 The next statement includes the file with logical name SAE\_PAR which
 contains a set of symbolic constants used in ADAM.
 The only such constant used in this example is SAI\_\_OK
 which corresponds to  the `OK' value of STATUS
-\footnote{If you  {\tt \$ TYPE SAE\_PAR} you will probably
+\footnote{If you  \texttt{\$ TYPE SAE\_PAR} you will probably
 see that the value of  SAI\_\_OK  is zero, but different implementations
 of ADAM may redefine the value of this and other symbolic  constants,
 so it is important
 that they are used in preference to the numbers they represent in programs.}.
 The fourth statement above simply declares the variables used.
-\begin{verbatim}
+\begin{terminalv}
 *   Check inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
-\end{verbatim}
-Most subroutines used in ADAM include the variable {\tt STATUS} as the last
+\end{terminalv}
+Most subroutines used in ADAM include the variable \texttt{STATUS} as the last
 argument. (In the case of `main' subroutines like REPDIM.FOR, STATUS is the
 only argument.)
 The STATUS value is checked on entering a routine, and if it does not
@@ -548,10 +339,10 @@ if STATUS has been set to a non-ok value, then  a
 succession of calls to a series of routines will simply `fall through'
 with each subroutine returning control as soon as it tests the STATUS
 value.
-\begin{verbatim}
+\begin{terminalv}
 *   Begin an NDF context.
       CALL NDF_BEGIN
-\end{verbatim}
+\end{terminalv}
 This statement begins an NDF {\sl context\/} which ends with the
 NDF\_END at the end.
 The significance of this {\sl context\/} is that any
@@ -559,14 +350,14 @@ clearing up made necessary by NDF routines called
 during the context will be done automatically by the NDF\_END.
 The programmer familiar with HDS will realise that this means
 there is no need to worry about explicitly
-annulling identifiers or unmapping arrays {\it etc.}
-\begin{verbatim}
+annulling identifiers or unmapping arrays \textit{etc.}
+\begin{terminalv}
 *   Get the name of the input NDF file and associate an NDF identifier with it.
       CALL NDF_ASSOC ('INPUT', 'READ', NDF1, STATUS)
-\end{verbatim}
+\end{terminalv}
 This is the statement which uses the interface file.
 The first argument of the NDF\_ASSOC call is an ADAM {\sl parameter} --
-in this case called {\tt 'INPUT'}.
+in this case called \texttt{'INPUT'}.
 Parameters are used to refer to values which are input by the user of an
 ADAM program.
 The parameter {\tt'INPUT'} is defined in the interface file, and referring to it
@@ -576,13 +367,13 @@ supplied by the user is returned to the program.
 The file named is opened, in this case with 'READ' access
 as specified, and an NDF identifier (NDF1) used to refer to the input NDF
 is returned.
-\begin{verbatim}
+\begin{terminalv}
 *   Enquire the dimension sizes of the NDF and write them out.
       CALL NDF_DIM (NDF1, 10, DIM, NDIM, STATUS)
       IF (STATUS.EQ.SAI__OK) THEN
          WRITE(*,*) NDIM, (DIM(I), I=1,NDIM)
       ENDIF
-\end{verbatim}
+\end{terminalv}
 These lines do most of the work of the program.
 The NDF\_DIM call will return the dimensions of the main data array
 for the NDF associated with the NDF1 identifier.
@@ -597,24 +388,24 @@ statement, as it would not be appropriate to output the answers
 if STATUS were not OK.
 (Of course, if the output were done  using a routine which used
 inherited status checking, the check would be unnecessary.)
-\begin{verbatim}
+\begin{terminalv}
 *   End the NDF context.
       CALL NDF_END (STATUS)
       END
-\end{verbatim}
+\end{terminalv}
 The NDF\_END matches the NDF\_BEGIN,
 and as described above, this routine does any tidying up incurred by
 calls made since the last NDF\_BEGIN.
 
 The program can be compiled and linked  and tested with
 an NDF as shown below:
-\begin{verbatim}
-  $ FORTRAN REPDIM
-  $ ALINK REPDIM
-  $ RUN REPDIM
-  INPUT - Input NDF structure > SPECTRUM
-            1         852
-\end{verbatim}
+\begin{terminalv}
+$ FORTRAN REPDIM
+$ ALINK REPDIM
+$ RUN REPDIM
+INPUT - Input NDF structure > SPECTRUM
+         1         852
+\end{terminalv}
 
 \newpage
 \section{Error and message reporting\label{repdim1}\xlabel{error_and_message_reporting}}
@@ -643,43 +434,43 @@ in the program interface file, but this procedure is
 not recommended.},
 TEXT is the message text, and STATUS is the global status.
 (The routine will not execute if STATUS is not OK.)
-\begin{verbatim}
+\begin{terminalv}
       CALL MSG_OUT (MSG, TEXT, STATUS)
-\end{verbatim}
+\end{terminalv}
 Thus the example below would result in the message `HELLO'.
-\begin{verbatim}
+\begin{terminalv}
       CALL MSG_OUT (' ', 'HELLO', STATUS)
-\end{verbatim}
+\end{terminalv}
 Should the programmer wish to embed any program variables in
 the message, this can be accomplished with the use of  {\sl tokens}.
 A token is set to the value of the variable concerned
-using one of the {\tt MSG\_SETx}\  routines which have the form:
-\begin{verbatim}
+using one of the \texttt{MSG\_SETx}\  routines which have the form:
+\begin{terminalv}
       CALL MSG_SETx ('TOKEN', VALUE)
-\end{verbatim}
-where `{\tt x}' is one of R, I, D, L or
+\end{terminalv}
+where `\texttt{x}' is one of R, I, D, L or
 C to deal with real, integer, double precision, logical and
 character variables respectively.
 The tokens are inserted in the message text
-at a point indicated by $^\wedge$TOKEN.
+at a point indicated by \wedge TOKEN.
 
 Thus, in the example program in the previous section the integer NDIM could
 be reported as follows:
-\begin{verbatim}
+\begin{terminalv}
       CALL MSG_SETI ('NDIM', NDIM)
       CALL MSG_OUT (' ', 'No. of dimensions is ^NDIM', STATUS)
-\end{verbatim}
+\end{terminalv}
 The dimensions are reported separately to avoid the problem
 of not knowing how many there are\footnote{A more elegant method of
 formatting this message is shown in Section~\ref{char} which deals with
 the CHR\_ character handling routines.}:
-\begin{verbatim}
+\begin{terminalv}
       CALL MSG_OUT (' ', 'Dimensions are:', STATUS)
       DO I=1,NDIM
          CALL MSG_SETI ('DIM', DIM(I))
          CALL MSG_OUT ('  ', '             ^DIM', STATUS)
       ENDDO
-\end{verbatim}
+\end{terminalv}
 These changes have been made in ADAM\_EXAMPLES:REPDIM1.FOR.
 
 Values output in this way have the most concise format possible.
@@ -687,32 +478,32 @@ If the programmer wishes to use a particular format this is done
 by setting the token with a MSG\_FMTx routine instead
 of MSG\_SETx.
 The former routines have the calling sequence:
-\begin{verbatim}
+\begin{terminalv}
       CALL MSG_FMTx (TOKEN, FORMAT, VALUE)
-\end{verbatim}
+\end{terminalv}
 For example if the variable Y=193.12, the two calls following result in the
 message on the last line:
-\begin{verbatim}
+\begin{terminalv}
       CALL MSG_FMTR ('YVAL', '(1E12.3)', Y)
       CALL MSG_OUT (' ', 'Y value is ^YVAL', STATUS)
 
   Y value is  0.193E+03
-\end{verbatim}
+\end{terminalv}
 If an unsuitable format is used in these  routines the token is not set.
 Generally if a token is undefined, the output message contains the token name
 in brackets, for example:
-\begin{verbatim}
-  Y value is ^<YVAL>
-\end{verbatim}
+\begin{terminalv}
+Y value is ^<YVAL>
+\end{terminalv}
 {\sl N.B. ALL message tokens become undefined after a call to MSG\_OUT.}
 
 {\bigskip\large\bf Error Reporting.}
 
 Errors are reported using ERR\_REP which is of similar form to
 MSG\_OUT and uses tokens in the same way. The calling sequence is:
-\begin{verbatim}
+\begin{terminalv}
       CALL ERR_REP (ERR, TEXT, STATUS)
-\end{verbatim}
+\end{terminalv}
 Unlike MSG\_OUT this routine will execute with bad status set, for obvious
 reasons.
 It is recommended that a meaningful non-blank error name is used.
@@ -720,7 +511,7 @@ It is recommended that a meaningful non-blank error name is used.
 In general, if a program reaches an error condition it should set STATUS
 to  an error value, report the error and abort.
 For example the program IMADD can only deal with 2-D arrays:
-\begin{verbatim}
+\begin{terminalv}
       IF (NDIM.NE.2) THEN
          STATUS=SAI__ERROR
          CALL MSG_SETI ('NDIM', NDIM)
@@ -728,7 +519,7 @@ For example the program IMADD can only deal with 2-D arrays:
      :        'Array is not an image, but is ^NDIM-dimensional', STATUS)
          GOTO 999
       ENDIF
-\end{verbatim}
+\end{terminalv}
 Generally the error value in an applications program should be set
 to SAI\_\_ERROR, a symbolic
 constant defined in the SAE\_PAR file which is used to represent a general
@@ -740,14 +531,14 @@ If STATUS is set by a subroutine, that subroutine should make an error report
 as described above. However the calling program may make an additional
 report to provide contextual information.
 For example:
-\begin{verbatim}
+\begin{terminalv}
       CALL IMADD (ARRAY, CONST, STATUS)
       IF (STATUS.NE.SAI__OK)THEN
          CALL ERR_REP ('CADD_ADD', 'CADD: Error adding constant to array',
      :                  STATUS)
          GOTO 999
       ENDIF
-\end{verbatim}
+\end{terminalv}
 {\sl N.B. ALL message tokens become undefined after a call to ERR\_REP.}
 
 {\bigskip\large\bf Message Synchronization.}
@@ -761,9 +552,9 @@ messages may be reported on the graphics rather than the text plane of a VDU;
 an example is discussed in Section~\ref{icl}.
 The problem is avoided by making the call below immediately before any
 graphical output. (Unnecessary use is harmless.)
-\begin{verbatim}
+\begin{terminalv}
       CALL MSG_SYNC (STATUS)
-\end{verbatim}
+\end{terminalv}
 
 \newpage
 \section{Data manipulation\label{add7}\xlabel{data_manipulation}}
@@ -774,7 +565,7 @@ Although not the most useful of applications in itself, it
 does illustrate the method usually used in ADAM programs to
 manipulate data arrays and introduces the
 concept of {\sl dynamic memory mapping}.
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE ADD7 (STATUS)
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -816,15 +607,15 @@ concept of {\sl dynamic memory mapping}.
          A(I) = A(I) + VALUE
       ENDDO
       END
-\end{verbatim}
+\end{terminalv}
 And the interface file:
-\begin{verbatim}
-  interface ADD7
-     parameter      INPUT
-        prompt      'Input NDF structure'
-     endparameter
-  endinterface
-\end{verbatim}
+\begin{terminalv}
+interface ADD7
+  parameter      INPUT
+     prompt      'Input NDF structure'
+  endparameter
+endinterface
+\end{terminalv}
 \newpage
 {\large\bf Dynamic memory mapping.}
 
@@ -855,9 +646,9 @@ memory, and
 returns the pointer PTR1 whose value  is the actual memory address of
 the first byte of the allocated memory.
 Also returned is NELM, the number of elements in the data array.
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_MAP (NDF1, 'Data', '_REAL', 'UPDATE', PTR1, NELM, STATUS)
-\end{verbatim}
+\end{terminalv}
 This address (PTR1) cannot be used to access  the data array in the subroutine
 ADD7.
 {\sl But\/} it can be used in the call to the subroutine ADDIT.
@@ -878,16 +669,16 @@ variable, but its actual value.
 The \%VAL extension is supported by compilers on both SUN and Convex machines.}
 Thus in  the call below, passing the argument \%VAL(PTR1) is equivalent
 to actually passing the data array whose address is stored in PTR1.
-\begin{verbatim}
+\begin{terminalv}
          CALL ADDIT (NELM, %VAL(PTR1), VALUE, STATUS)
-\end{verbatim}
+\end{terminalv}
 An array of the correct size  can then be declared in the subroutine ADDIT
 thus:
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE ADDIT (NELM, A, VALUE, STATUS)
       INTEGER NELM
       REAL A(NELM)
-\end{verbatim}
+\end{terminalv}
 ADDIT now operates directly on the array in memory just as if it had
 received it in the normal way.
 
@@ -922,7 +713,7 @@ confirm that the addition has been carried out.
 \section{Interface files and Parameters\label{addconst}\xlabel{interface_files_and_paramenters}}
 
 It must be admitted that the previous example has limited value.
-The facility to specify {\tt VALUE} at run-time
+The facility to specify \texttt{VALUE} at run-time
 would be an improvement.
 A simple READ statement might seem like the answer, but as mentioned before,
 this approach
@@ -936,9 +727,9 @@ become clear.
 The program on the previous page could be modified by replacing the
 statement assigning 7.0 to VALUE with the call below which gets an
 ADAM parameter, in this case, named 'CONST'.
-\begin{verbatim}
+\begin{terminalv}
       CALL PAR_GET0R ('CONST', VALUE, STATUS)
-\end{verbatim}
+\end{terminalv}
 This change has been made in ADAM\_EXAMPLES:ADDCONST.FOR.
 The `PAR\_GET'\ part is self explanatory,  and the `0' indicates that
 the parameter to be retrieved is a scalar
@@ -946,100 +737,100 @@ the parameter to be retrieved is a scalar
 The final `R' in the subroutine
 name indicates that the routine retrieves a variable of type REAL.
 Similarly PAR\_GET0I retrieves an integer, PAR\_GET0C, a character
-string {\it etc.}
+string \textit{etc.}
 A list of the PAR routines with their functions and calling
 sequences is given in Appendix~\ref{apxpar}.
 
 The ADAM parameter 'CONST' must now be declared in the interface file as
 shown:
-\begin{verbatim}
-   interface ADDCONST
-      parameter      INPUT
-         prompt      'Input NDF data structure'
-      endparameter
-      parameter      CONST
-         prompt      'Value to be added'
-      endparameter
-   endinterface
-\end{verbatim}
+\begin{terminalv}
+interface ADDCONST
+  parameter      INPUT
+     prompt      'Input NDF data structure'
+  endparameter
+  parameter      CONST
+     prompt      'Value to be added'
+  endparameter
+endinterface
+\end{terminalv}
 When the PAR\_GET0R routine is called, it looks to the interface file
 for instructions on retrieving the parameter in question.
 In this case, the only information found there is that the
 prompt 'Value to be added?' should be issued.
 If a suitable number is then entered by the user, it is assigned to VALUE
 and STATUS remains `OK'.
-Any unsuitable response ({\it e.g.} a logical value) and the parameter
+Any unsuitable response (\textit{e.g.} a logical value) and the parameter
 system will
 issue an error message, and doggedly repeat the prompt five times or until
 a satisfactory value is entered.
 
 
-The {\tt prompt} is an example of a {\sl fieldname}.
+The \texttt{prompt} is an example of a {\sl fieldname}.
 Other fieldnames which are commonly defined in interface files are
 discussed briefly below,
 and a full discussion of
 the subject of interface files is contained in \xref{SUN/115}{sun115}{}.
 \begin{description}
 \item{$\bullet$ \tt position} --
-rather than simply typing {\tt \$ RUN ADDCONST}, you can set up a symbol:
-\begin{verbatim}
+rather than simply typing \texttt{\$ RUN ADDCONST}, you can set up a symbol:
+\begin{terminalv}
 $ ADDCONST== "$mydir:ADDCONST"
-\end{verbatim}
+\end{terminalv}
 where {\sl mydir\/} is the logical name of the directory which contains
 ADDCONST.EXE.
-Typing {\tt ADDCONST} will now cause execution of the program.
+Typing \texttt{ADDCONST} will now cause execution of the program.
 It is now possible to enter the parameters the program needs on the
 command line.
 Possible that is, if the program knows the order in which to expect them.
-Including the lines, ``{\tt position 1}'' and ``{\tt position 2}'' within the
+Including the lines, ``\texttt{position 1}'' and ``\texttt{position 2}'' within the
 parameter declarations of 'INPUT' and 'CONST' respectively  provides this
 information.
 After 	modifying the interface file in this way, the example command
 below will work.
-\begin{verbatim}
+\begin{terminalv}
 $ ADDCONST SPECTRUM 15
-\end{verbatim}
+\end{terminalv}
 
 \item{$\bullet$ \tt keyword} -- parameters can also be specified on
 the command line by using {\sl keywords}.
 If a keyword is not declared for a parameter in the interface file,
 the parameter name itself is used as the keyword.
 Thus the same result as in the previous item can be obtained by typing:
-\begin{verbatim}
+\begin{terminalv}
 $ ADDCONST CONST=15 INPUT=SPECTRUM
-\end{verbatim}
+\end{terminalv}
 It is not recommended that keywords be explicitly declared in interface
 files.
 
 \item{$\bullet$ \tt ppath} --
 when an ADAM program prompts for a parameter, a suggested value
 may be appended to the prompt string. For example:
-\begin{verbatim}
-  CONST - Value to be added / 17.4 / >
-\end{verbatim}
+\begin{terminalv}
+CONST - Value to be added / 17.4 / >
+\end{terminalv}
 This suggested value (17.4) is used if the user presses
 $<$CR$>$ in response to the prompt.
-The fieldname {\tt ppath}
+The fieldname \texttt{ppath}
 is used to specify where the parameter system gets this suggested value.
-For example, if ppath is declared as {\tt current}, the value supplied for
+For example, if ppath is declared as \texttt{current}, the value supplied for
 the parameter during the
 previous run of the program will be used.
 It is also possible to select a  fixed default value which is supplied
-via the {\tt default}  fieldname.
-In the example interface file below, the parameter {\tt INPUT}
-has been given a default value of {\tt SPECTRUM}.
+via the \texttt{default}  fieldname.
+In the example interface file below, the parameter \texttt{INPUT}
+has been given a default value of \texttt{SPECTRUM}.
 %The fieldname ppath is declared as a character string containing a list of
-%one or more of {\tt current, default, dynamic} and {\tt global}.
-However, ppath for {\tt INPUT} has been
-set to {\tt 'current,default'}. This means that the prompt will contain the
+%one or more of \texttt{current, default, dynamic} and \texttt{global}.
+However, ppath for \texttt{INPUT} has been
+set to \texttt{'current,default'}. This means that the prompt will contain the
 current value -- that is, the last
-value assigned to the {\tt INPUT} parameter -- unless no value has been assigned, in
-which case the value specified by the {\tt default} fieldname will be used.
+value assigned to the \texttt{INPUT} parameter -- unless no value has been assigned, in
+which case the value specified by the \texttt{default} fieldname will be used.
 Other possibilities for defining ppath are described in
 \xref{SUN/115}{sun115}{}.
 
 \item{$\bullet$ \tt type} -- this can be any of the primitive data types
-recognised by the ADAM system, {\it i.e.}\ '\_INTEGER', '\_REAL', '\_DOUBLE',
+recognised by the ADAM system, \textit{i.e.}\ '\_INTEGER', '\_REAL', '\_DOUBLE',
 '\_CHAR' or '\_LOGICAL'.
 Alternatively a type such as 'NDF' can be used, but this is purely
 descriptive and is ignored by the parameter system.
@@ -1047,7 +838,7 @@ If a primitive type is specified, the parameter system
 will check if a value of the appropriate type has been offered, and will
 perform any necessary type conversion if possible.
 {\sl N.B. If type is specified for a parameter, the declaration  must appear
-before any of the {\tt default}, {\tt range} or  {\tt in} fieldnames
+before any of the \texttt{default}, \texttt{range} or  \texttt{in} fieldnames
 are declared.}
 
 \item{$\bullet$ \tt help} -- the help fieldname contains a single line
@@ -1075,25 +866,25 @@ an error message would warn of
 \end{description}
 A modified version of ADDCONST.IFL incorporating some of the above
 fieldnames is shown below.
-\begin{verbatim}
-   interface ADDCONST
-      parameter      INPUT          # Input NDF
-         position    1
-         type        NDF
-         prompt      'Input NDF data structure'
-         access      UPDATE
-         ppath       'current,default'
-         default     SPECTRUM
-         help        'Enter the name of the NDF '
-      endparameter
-      parameter      CONST          # Scalar value to add
-         position    2
-         type        _REAL
-         prompt      'Value to be added'
-         ppath       'current'
-      endparameter
-   endinterface
-\end{verbatim}
+\begin{terminalv}
+interface ADDCONST
+  parameter      INPUT          # Input NDF
+     position    1
+     type        NDF
+     prompt      'Input NDF data structure'
+     access      UPDATE
+     ppath       'current,default'
+     default     SPECTRUM
+     help        'Enter the name of the NDF '
+  endparameter
+  parameter      CONST          # Scalar value to add
+     position    2
+     type        _REAL
+     prompt      'Value to be added'
+     ppath       'current'
+  endparameter
+endinterface
+\end{terminalv}
 Some of the values assigned to fieldnames above are surrounded by quotes ' '.
 This is necessary if the values are character constants (such as the prompts),
 or contain more than one word (such as the ppath)  but is optional otherwise.
@@ -1108,9 +899,9 @@ However it is often preferable to create a new NDF rather than overwriting an
 input one.
 This can be done by {\sl propagating\/} an existing NDF using
 NDF\_PROP, which has the following calling sequence.
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_PROP (NDF1, CLIST, PARAM, NDF2, STATUS)
-\end{verbatim}
+\end{terminalv}
 NDF1 is the identifier for an existing NDF which is used
 as the model (or template) for the new NDF.
 CLIST contains a list of data objects separated by commas as described
@@ -1127,7 +918,7 @@ data objects plus all extensions
 are propagated to the new NDF.
 Others are propagated by specifying them in CLIST.
 The propagation of default standard items can be suppressed by
-specifying 'NOHISTORY' {\it etc.}
+specifying 'NOHISTORY' \textit{etc.}
 The propagation of a particular extension is suppressed by specifying the
 extension name, for example, NOEXTENSION(FIGARO).
 
@@ -1135,10 +926,10 @@ For example, the CLIST arguments below propagate the items which follow:
 
 \begin{tabular}{ll}
 {\bf{CLIST}                             }&\bf{Items propagated}\\
-{\tt ' '                                }&{\sl title, label, history \& extensions}\\
-{\tt 'NOHISTORY'                        }&{\sl title, label \& extensions}\\
-{\tt 'DATA,QUALITY,VARIANCE,AXIS'       }&{\sl title, label, history, extensions, data, quality, variance \& axis}\\
-{\tt 'NOEXTENSION(IRAS,FIGARO)'         }&{\sl title, label, history \& extensions except IRAS \& Figaro}\\
+\texttt{' '                                }&{\sl title, label, history \& extensions}\\
+\texttt{'NOHISTORY'                        }&{\sl title, label \& extensions}\\
+\texttt{'DATA,QUALITY,VARIANCE,AXIS'       }&{\sl title, label, history, extensions, data, quality, variance \& axis}\\
+\texttt{'NOEXTENSION(IRAS,FIGARO)'         }&{\sl title, label, history \& extensions except IRAS \& Figaro}\\
 \end{tabular}
 
 ADAM\_EXAMPLES:ADDNEW.FOR is
@@ -1148,7 +939,7 @@ file.
 The associated interface file, ADDNEW.IFL, includes the
 parameter 'OUTPUT' to retrieve the name of  the output NDF.
 The relevant portion of ADDNEW.FOR is reproduced below:
-\begin{verbatim}
+\begin{terminalv}
 *  Obtain an identifier for the input NDF.
       CALL NDF_ASSOC ('INPUT', 'READ', NDF1, STATUS)
 
@@ -1164,9 +955,9 @@ The relevant portion of ADDNEW.FOR is reproduced below:
 
 *  Add the constant value to the data array.
       CALL ADDIT (NELM, %VAL (PTR2), VALUE, STATUS)
-\end{verbatim}
-Note that the input NDF is opened with {\tt 'READ'} access rather than
-{\tt 'UPDATE'} as in ADDCONST.FOR.
+\end{terminalv}
+Note that the input NDF is opened with \texttt{'READ'} access rather than
+\texttt{'UPDATE'} as in ADDCONST.FOR.
 
 In this example, everything including the main data array is propagated,
 and the copied data array in the output NDF is then mapped for update
@@ -1194,17 +985,17 @@ or creating a correctly evaluated variance array. (The subject of
 processing the variance array is considered in Section~\ref{variance}.)
 In the example program ADDNEW, all the data objects were propagated
 because  adding a constant to the main data array does not invalidate
-the AXIS, VARIANCE, QUALITY {\it etc.}
+the AXIS, VARIANCE, QUALITY \textit{etc.}
 
 
 For a given application, the standard objects in an NDF can be
 divided into three categories:
 \begin{description}
-\item {\bf Those which remain valid} -- items in this first
+\item \textbf{Those which remain valid} -- items in this first
 category are propagated unchanged. Title, history and label often
 fall into this category, hence their inclusion by default.
 
-\item {\bf Those which are processed to retain their validity} -- these can
+\item \textbf{Those which are processed to retain their validity} -- these can
 be propagated and modified {\sl in situ} or created afresh in the output
 NDF.
 The main data array often falls into this category as it is usually
@@ -1217,7 +1008,7 @@ and output arrays; for example a data array cannot be reversed {\sl in
 situ}. In such cases the input data array should not be propagated as
 it is inefficient to copy large data arrays unnecessarily.
 
-\item {\bf Those which have become invalid} -- these must not be propagated
+\item \textbf{Those which have become invalid} -- these must not be propagated
 to the output NDF. Examples include variance arrays in cases where the program
 cannot or does not evaluate a new variance array.
 \end{description}
@@ -1229,17 +1020,17 @@ the recording and processing of IRAS observations.
 The treatment of extensions obeys similar rules to that of standard
 NDF components and can be summarised as follows:
 \begin{description}
-\item {\bf Extensions which the application doesn't recognise} -- such
+\item \textbf{Extensions which the application doesn't recognise} -- such
 extensions should be propagated unchanged.
 (It is clearly inappropriate that the information in extensions
 be deleted by a general application.)
 
 
-\item {\bf Extensions which the application recognises and is equipped to
+\item \textbf{Extensions which the application recognises and is equipped to
 process correctly} -- such extensions should be propagated and processed.
 The application should ensure that no items become invalid.
 
-\item {\bf Extensions the application recognises but realises it is not
+\item \textbf{Extensions the application recognises but realises it is not
 equipped to process} -- these must not be propagated.
 \end{description}
 
@@ -1249,13 +1040,13 @@ propagated or not.
 In the example NDF below, the data component was {\sl not\/} propagated,
 and before values were assigned to the new data array, the
 output NDF had the following form:
-\begin{verbatim}
-  IMAGE1  <NDF>
+\begin{terminalv}
+IMAGE1  <NDF>
 
-     DATA_ARRAY(256,256)  <_REAL>   {undefined}
+  DATA_ARRAY(256,256)  <_REAL>   {undefined}
 
-  End of Trace.
-\end{verbatim}
+End of Trace.
+\end{terminalv}
 If the data shape and type are appropriate for the output NDF, the array
 can be mapped for 'WRITE' and appropriate values assigned.
 However, if the data shape or type are not as required in
@@ -1274,9 +1065,9 @@ A free logical unit number is obtained by associating a file with a {\sl file
 descriptor\/} and then finding which logical unit number has been allocated to
 that file descriptor.
 The call to associate a file with a file descriptor (FD) has the form:
-\begin{verbatim}
+\begin{terminalv}
       CALL FIO_ASSOC (FILE, ACCESS, FORM, RECSZ, FD, STATUS)
-\end{verbatim}
+\end{terminalv}
 where the arguments are: FILE, the ADAM parameter used to retrieve the
 filename; ACCESS, the access mode which should be one
 of 'READ', 'WRITE', 'UPDATE' or 'APPEND';
@@ -1287,9 +1078,9 @@ FD, the file descriptor, and the usual STATUS.
 
 The logical unit number (UNIT) allocated to the file is then obtained with the
 call below and can be used to perform normal Fortran I/O.
-\begin{verbatim}
+\begin{terminalv}
       CALL FIO_UNIT (FD, UNIT, STATUS)
-\end{verbatim}
+\end{terminalv}
 
 ADAM\_EXAMPLES:RDDATA.FOR reads various data from a text file and finds the
 mean of a set of numbers.
@@ -1298,7 +1089,7 @@ first line, the number of data elements on the second, followed by the
 data elements in free format.
 
 The portion of RDDATA.FOR which reads the text file is reproduced below.
-\begin{verbatim}
+\begin{terminalv}
 *  Associate file with file identifier FD.
       CALL FIO_ASSOC ('INFILE', 'READ', 'FORTRAN', 0, FD, STATUS)
 
@@ -1324,12 +1115,12 @@ The portion of RDDATA.FOR which reads the text file is reproduced below.
 *   Read the data array.
       READ (UNIT, *, IOSTAT=IOSTAT) (ARRAY(I),I=1,NELM)
       IF (IOSTAT.NE.0) GOTO 998
-\end{verbatim}
+\end{terminalv}
 Note that after each read the variable IOSTAT is checked and
 if a non-zero value is found the program control moves to the statement
 labelled 998.
 Any ADAM  program which uses READ or WRITE in this way must check
-for I/O errors,  {\it i.e.}\ IOSTAT becoming non-zero.
+for I/O errors,  \textit{i.e.}\ IOSTAT becoming non-zero.
 If an I/O error occurs, a program  may be able to handle it --
 otherwise it should make an error report and abort.
 An error report is made using the routine ERR\_FIOER which puts
@@ -1337,7 +1128,7 @@ the message appropriate
 to the value of IOSTAT into a message token. The token is then
 reported using ERR\_REP as shown in the  further extract from RDDATA.FOR
 which follows.
-\begin{verbatim}
+\begin{terminalv}
 998   CONTINUE
 *   Report any I/O error.
       IF (IOSTAT.NE.0) THEN
@@ -1347,20 +1138,20 @@ which follows.
          CALL ERR_FIOER ('MSG', IOSTAT)
          CALL ERR_REP ('RDDATA_FIOER', '^MSG', STATUS)
       ENDIF
-\end{verbatim}
+\end{terminalv}
 After opening a file with FIO\_ASSOC it is necessary to cancel the ADAM
 parameter used for the filename, and deactivate the FIO package when
 interaction with the file
 has ceased, as shown below.
-\begin{verbatim}
+\begin{terminalv}
 *   Cancel the ADAM parameter INFILE and deactivate FIO.
       CALL FIO_CANCL ('INFILE', STATUS)
       CALL FIO_DEACT (STATUS)
-\end{verbatim}
+\end{terminalv}
 The FIO routines must be explicitly included during linking thus:
-\begin{verbatim}
-  $ ALINK RDDATA,ADAM_LIB:FIOLINK/OPT
-\end{verbatim}
+\begin{terminalv}
+$ ALINK RDDATA,ADAM_LIB:FIOLINK/OPT
+\end{terminalv}
 The program RDDATA can be tested with the data file DATA.DAT in
 ADAM\_EXAMPLES.
 
@@ -1377,7 +1168,7 @@ For example, if FIO\_ASSOC tries to open a non-existent file for 'READ'
 an error will result, and STATUS will be set to the symbolic constant
 FIO\_NOTFD.
 (A complete list of the FIO error codes is contained in APN/9
--- or you can {\tt \$ TYPE FIO\_ERR}.)
+-- or you can \texttt{\$ TYPE FIO\_ERR}.)
 
 When a particular error condition is trapped in this way, the program
 should call the routine ERR\_FLUSH as shown below. This has two effects;
@@ -1386,7 +1177,7 @@ to SAI\_\_OK, and secondly it forces the immediate output of any pending
 error messages. (If the error message is not flushed immediately, the user
 may be bewildered by error messages on program termination which refer to
 error conditions which have been corrected.)
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'FIO_ERR'
 *     ...
       CALL FIO_ASSOC ('INFILE', 'READ', 'FORTRAN', 0, FD, STATUS)
@@ -1394,19 +1185,19 @@ error conditions which have been corrected.)
 *      File not found - take appropriate action, but first
 *      reset STATUS to SAI__OK and flush the error message.
          CALL ERR_FLUSH (STATUS)
-\end{verbatim}
+\end{terminalv}
 However the errors may happen not during FIO calls
 but during Fortran READ statements which set
 IOSTAT on failure.
 The IOSTAT returned by these statements can be converted to an FIO STATUS
 value with the routine FIO\_SERR as shown in the example below.
-\begin{verbatim}
+\begin{terminalv}
       IF (IOSTAT.NE.0) THEN
 *      Translate IOSTAT into an FIO STATUS.
          CALL FIO_SERR (IOSTAT,STATUS)
          IF (STATUS.EQ.FIO_EOF) THEN
 *         End of file - take appropriate action.
-\end{verbatim}
+\end{terminalv}
 
 \newpage
 \section{Creating NDFs from scratch -- a format conversion routine\label{outndf}\xlabel{creating_ndfs_from_scratch}}
@@ -1422,9 +1213,9 @@ in Section~\ref{rddata}.)
 
 
 A new NDF is created with the call:
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_CREAT (PARAM, TYPE, NDIM, LBND, UBND, NDF, STATUS)
-\end{verbatim}
+\end{terminalv}
 where, PARAM is the ADAM parameter used to get the name of the NDF;
 TYPE is the data type required for the  main data array,
 NDIM is the number of dimensions for the main data array,
@@ -1446,13 +1237,13 @@ one.
 
 The program OUTNDF reads a text file with
 the format  shown below:
-\begin{verbatim}
+\begin{terminalv}
 IUE spectrum of Saturn
 534
    1191.200      1.6757190E-13
    1198.279      1.2435831E-13
    ...            ...
-\end{verbatim}
+\end{terminalv}
 That is, a title on the first line, the number of data elements on the
 second, followed by successive pairs of axis and data values.
 
@@ -1474,7 +1265,7 @@ the subroutine GTDATA to read in the arrays from
 the text file.
 
 The code which creates the output NDF is reproduced below:
-\begin{verbatim}
+\begin{terminalv}
 *  Use FIO to open the input text file and get the logical unit number.
 *  Read TITLE and NELM, and check NELM is greater than zero.
 *   ...
@@ -1513,9 +1304,9 @@ The code which creates the output NDF is reproduced below:
 
 *   Report any I/O errors, shut down FIO and end.
 *    ...
-\end{verbatim}
+\end{terminalv}
 And the subroutine which reads the data\ldots
-\begin{verbatim}
+\begin{terminalv}
 *   Subroutine to read main data and axis arrays.
       SUBROUTINE GTDATA (UNIT, NELM, WAVE, FLUX, STATUS)
       IMPLICIT NONE
@@ -1531,7 +1322,7 @@ And the subroutine which reads the data\ldots
 *   Report any I/O error.
 *    ...
       END
-\end{verbatim}
+\end{terminalv}
 The program OUTNDF can be tested with the data file SATURN.DAT in
 ADAM\_EXAMPLES and can easily be adapted to deal with other data formats
 as required.
@@ -1553,32 +1344,32 @@ The CHR library is automatically linked during the ALINK procedure.
 Several of the most useful CHR routines are considered below.
 
 One set of routines can be characterised as having the form
-{\tt CHR\_xTOy} where {\tt x} and {\tt y} are each  one
-of {\tt C, D, I, L \& R} corresponding to type
-{\tt CHARACTER, DOUBLE, INTEGER, LOGICAL \& REAL} respectively.
+\texttt{CHR\_xTOy} where \texttt{x} and \texttt{y} are each  one
+of \texttt{C, D, I, L \& R} corresponding to type
+\texttt{CHARACTER, DOUBLE, INTEGER, LOGICAL \& REAL} respectively.
 For example the call below will encode the  real number X as a string:
-\begin{verbatim}
+\begin{terminalv}
       CALL CHR_RTOC (X, STRING, NCHAR)
-\end{verbatim}
+\end{terminalv}
 NCHAR is the number of characters in the returned STRING.
-Thus if {\tt X=1237.4}, {\tt STRING} is returned as {\tt'1237.4'}
-and {\tt NCHAR} becomes {\tt 6}.
+Thus if \texttt{X=1237.4}, \texttt{STRING} is returned as {\tt'1237.4'}
+and \texttt{NCHAR} becomes \texttt{6}.
 
 
 The example program REPDIM1 in Section~\ref{repdim1} reported the dimensions of
 the input data array one after another.
 A tidier result can be achieved by building a  string using a succession of
-CHR\_PUTx calls, where as above, {\tt x} can be any of C, D, I, L or  R.
+CHR\_PUTx calls, where as above, \texttt{x} can be any of C, D, I, L or  R.
 These calls have the form:
-\begin{verbatim}
+\begin{terminalv}
       CALL CHR_PUTx (VALUE, STRING, NCHAR)
-\end{verbatim}
+\end{terminalv}
 where VALUE is a value of appropriate type, STRING is a character string which
 has the encoded value {\sl appended},  and NCHAR on entry contains the
 position in the STRING at which the encoded VALUE is inserted and contains
 the length of the new string on return.
 The code to report the array dimensions can be changed to:
-\begin{verbatim}
+\begin{terminalv}
 *   Report the dimensions.
       NCHAR = 0
       CALL CHR_PUTC ('Array dimensions are ', STRING, NCHAR)
@@ -1589,18 +1380,18 @@ The code to report the array dimensions can be changed to:
          CALL CHR_PUTI (DIM(I), STRING, NCHAR)
       ENDDO
       CALL MSG_OUT ('  ', STRING, STATUS)
-\end{verbatim}
+\end{terminalv}
 ADAM\_EXAMPLES:REPDIM2.FOR contains this modification.
 Running this program on the datafile IMAGE.SDF produces the output below:
-\begin{verbatim}
- No. of dimensions is 2
- Array dimensions are 256 x 256
-\end{verbatim}
+\begin{terminalv}
+No. of dimensions is 2
+Array dimensions are 256 x 256
+\end{terminalv}
 Another common use for the CHR routines is in the `cleaning' and
 comparison  of strings.
 The fragment of code below is used to remove blanks and
 determine if the units given in the two strings are the same.
-\begin{verbatim}
+\begin{terminalv}
       CHARACTER*(100) STRNG1, STRNG2
       LOGICAL YES
       LOGICAL CHR_SIMLR                   ! Logical external Function.
@@ -1611,7 +1402,7 @@ determine if the units given in the two strings are the same.
       CALL CHR_RMBLK (STRNG1)         ! Remove blanks from STRNG1
       CALL CHR_RMBLK (STRNG2)         ! Remove blanks from STRNG2
       YES =CHR_SIMLR (STRNG1, STRNG2) ! Determine if strings equal apart from case.
-\end{verbatim}
+\end{terminalv}
 \newpage
 A more ambitious example taken from ADAM\_EXAMPLES:GETEBV.FOR follows.
 The  extract below compares an input object name, OBJECT,
@@ -1619,25 +1410,25 @@ with star names
 in a text file (EBV.DAT) and if a match is found, the
 value (the E$_{B-V}$) associated with the star is reported.
 The text file  format is:
-\begin{verbatim}
+\begin{terminalv}
 * E(B-V) calculated from intrinsic photometry. (Accurate to within 0.03.)
 *  HD#     E(B-V)
    HD886   0.02
   HD1337   0.18
    ..        ..
-\end{verbatim}
+\end{terminalv}
 The code first tidies the input string OBJECT by removing blanks.
 The first character of OBJECT is then tested to see if it is a number.
 If only the number has been given, the string 'HD' is added at the beginning.
 Each line in the text file is now read;
-blank lines and lines beginning with `{\tt *}' are ignored.
+blank lines and lines beginning with `\texttt{*}' are ignored.
 Other lines are decoded into words.
 On each line the first word is the star name and the second is a
 string containing the E$_{B-V}$ associated with that star.
 The star name on each line is compared with OBJECT.
 If a match is found the second word on that line is decoded into a real
 value and reported.
-\begin{verbatim}
+\begin{terminalv}
 *   Remove all blanks.
       CALL CHR_RMBLK (OBJECT)
 
@@ -1678,7 +1469,7 @@ value and reported.
             END IF
          END IF
       END DO
-\end{verbatim}
+\end{terminalv}
 
 \newpage
 \section{Handling data quality\label{badpix}\xlabel{handling_data_quality}}
@@ -1698,7 +1489,7 @@ attempting to take the square root of a negative number.
 Two methods of dealing with data quality in NDFs are
 available as follow:
 \begin{description}
-\item[{\bf Bad or `magic' values}] -- bad data values are replaced with special
+\item[\textbf{Bad or `magic' values}] -- bad data values are replaced with special
 bad values. Each data type has an associated bad value. For example
 the bad value for real data on a VAX is defined as
 FFFFFFFF in hexadecimal,  which is approximately  $-$1.7014E38
@@ -1706,11 +1497,11 @@ FFFFFFFF in hexadecimal,  which is approximately  $-$1.7014E38
 However, this and other bad values are system
 dependent and programs {\sl must\/} refer to them using symbolic
 constants. These symbolic constants are defined in the include file with
-logical name PRM\_PAR, (see also Section~\ref{prim}) and are of the form {\tt VAL\_\_BADx} where {\tt x}
-is one of {\tt R, D, I, W, UW, B} or {\tt UB}  corresponding to the
-HDS data types {\tt \_REAL,
+logical name PRM\_PAR, (see also Section~\ref{prim}) and are of the form \texttt{VAL\_\_BADx} where \texttt{x}
+is one of \texttt{R, D, I, W, UW, B} or \texttt{UB}  corresponding to the
+HDS data types \texttt{\_REAL,
 \_DOUBLE, \_INTEGER, \_WORD, \_UWORD, \_BYTE,} and {\tt\_UBYTE} respectively.
-\item[{\bf Quality arrays}] -- data quality can also be indicated by
+\item[\textbf{Quality arrays}] -- data quality can also be indicated by
 using a quality array associated with a data array.
 Non-zero quality values generally indicate that the
 associated data element is bad.
@@ -1721,7 +1512,7 @@ The advantage of a quality array is that different indicators of
 quality may be set. For example, IUE data have associated flags which
 are used to indicate one of a range of conditions which may apply to a
 data element; a pixel may be subject to microphonic noise
-or be saturated or coincide with a reseau mark {\it etc.}
+or be saturated or coincide with a reseau mark \textit{etc.}
 An application may wish to differentiate between these conditions.
 This topic is not considered further, but the reader is referred to
 \xref{SUN/33}{sun33}{},
@@ -1742,7 +1533,7 @@ Such an application must consider what to do in the event that any of the
 input data are negative.
 The correct behaviour is to check for this condition and insert the
 bad value for the data type as follows:
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'PRM_PAR'                      ! Defines VAL__BADR etc
       REAL IN(NELM), OUT(NELM)
 *   ........
@@ -1754,18 +1545,18 @@ bad value for the data type as follows:
             OUT(I)=SQRT(IN(I))
          ENDIF
       ENDDO
-\end{verbatim}
+\end{terminalv}
 However if an application is going to consider bad pixels it should also
 recognise the possibility of bad input pixel values. Such values should be
 propagated as bad (unless explicitly repaired in some fashion).
 So the test shown above should be amended as follows:
-\begin{verbatim}
+\begin{terminalv}
 *    Test if input is negative or is itself a bad value.
          IF ( IN(I).LE.0 .OR. IN(I).EQ.VAL__BADR ) THEN
             OUT(I)=VAL__BADR
-\end{verbatim}
+\end{terminalv}
 The above example illustrates the only two operations which should be conducted
-with bad values, {\it i.e.}\ assignment and comparison.
+with bad values, \textit{i.e.}\ assignment and comparison.
 It is inappropriate to perform any arithmetic function such as taking
 the square root of a bad value.
 \newpage
@@ -1774,7 +1565,7 @@ the square root of a bad value.
 Ideally all applications which process data should consider the possibility of
 bad data values. A simple application which divides each element in
 a data array by two may not
-itself give rise to new bad pixels, {\bf but} it should trap the case where the
+itself give rise to new bad pixels, \textbf{but} it should trap the case where the
 input value is bad, as the output ought to contain the appropriate bad value,
 {\sl not\/} the bad value divided by two!
 
@@ -1812,25 +1603,25 @@ the value of the bad-pixel flag for any data arrays of interest.
 The call below will cause the value of the logical
 variable BAD to be set according
 to whether there are bad pixels in the main data array of the NDF.
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_BAD (NDF, 'Data', CHECK, BAD, STATUS)
-\end{verbatim}
+\end{terminalv}
 The input logical argument CHECK requires some explanation.
 If CHECK is set to .FALSE. the value of the bad-pixel flag returned is as
-described above, {\it i.e.}\\
-{\tt BAD=.FALSE.}$\Rightarrow$ definitely no bad pixels present, whereas
-{\tt BAD=.TRUE.}$\Rightarrow$ bad pixels may be present.\\
+described above, \textit{i.e.}\\
+\texttt{BAD=.FALSE.}$\Rightarrow$ definitely no bad pixels present, whereas
+\texttt{BAD=.TRUE.}$\Rightarrow$ bad pixels may be present.\\
 However, if CHECK is set to .TRUE. this forces an explicit (and time
 consuming) check for the presence of bad data values and the bad-pixel flag
 becomes set as follows: \\
-{\tt BAD=.FALSE.}$\Rightarrow$ no bad pixels present, and
-{\tt BAD=.TRUE.}$\Rightarrow$  bad pixels {\sl are\/} present.
+\texttt{BAD=.FALSE.}$\Rightarrow$ no bad pixels present, and
+\texttt{BAD=.TRUE.}$\Rightarrow$  bad pixels {\sl are\/} present.
 
 An application which cannot deal with bad values should use the explicit
-check ({\it i.e.} {\tt CHECK=.TRUE.}) so that it never gives up unnecessarily.
+check (\textit{i.e.} \texttt{CHECK=.TRUE.}) so that it never gives up unnecessarily.
 However, an application which is using the check for efficiency purposes
 might choose merely to look at the value of the bad-pixel flag
-({\it i.e.} {\tt CHECK=.FALSE.}) as the time taken to do the explicit
+(\textit{i.e.} \texttt{CHECK=.FALSE.}) as the time taken to do the explicit
 check might negate any efficiency advantage which is gained.
 %(Of course the decision is application dependant.)
 
@@ -1845,7 +1636,7 @@ The value of the bad-pixel flag for an NDF array component
 is set by calling NDF\_SBAD as shown in this extract
 from ADAM\_EXAMPLES:SQROOT.FOR.  The program  counts how many bad values
 it has assigned in the output array and sets the bad-pixel flag accordingly.
-\begin{verbatim}
+\begin{terminalv}
 *   Set bad-pixel flag according to whether any bad pixels have been set.
 *   (NBAD is the number of bad pixels which have been set.)
       IF (NBAD.EQ.0) THEN
@@ -1853,7 +1644,7 @@ it has assigned in the output array and sets the bad-pixel flag accordingly.
       ELSE
          CALL NDF_SBAD (.TRUE., NDF2, 'DATA', STATUS)
       ENDIF
-\end{verbatim}
+\end{terminalv}
 
 \newpage
 \section{Processing the variance array\label{variance}\xlabel{processing_the_variance_array}}
@@ -1875,7 +1666,7 @@ the standard deviation in the result, $\sigma_z$, is related to the standard
 deviations in the input numbers $\sigma_x,\sigma_y$, as follows:
 $$\sigma_z=\sqrt{\sigma_x^2+\sigma_y^2}$$
 whereas if the variance is considered, the variance in the result
-$V_z$ is simply the sum of the variances of the input numbers, {\it i.e.}
+$V_z$ is simply the sum of the variances of the input numbers, \textit{i.e.}
 $$V_z=V_x+V_y$$
 The latter is significantly quicker to compute.
 
@@ -1898,7 +1689,7 @@ output data, as taking the square root of a data set
 changes the variance.
 
 However,  in the case where Gaussian statistics apply and
-a data element is raised to a power, {\it i.e.}
+a data element is raised to a power, \textit{i.e.}
 $$ y=x^n$$
 the variance in $y$, $V_y$ is related to the variance in $x$, $V_x$, as
 follows:
@@ -1916,7 +1707,7 @@ processing of data arrays which it cannot handle.
 negative numbers! A more robust program is presented in the next section.)
 
 The check for the presence of bad pixels in the input data is as follows:
-\begin{verbatim}
+\begin{terminalv}
 *  Abort if main data array contains bad pixels.
       CALL NDF_BAD (NDF1, 'Data', .TRUE., BAD, STATUS)
       IF (BAD) THEN
@@ -1925,7 +1716,7 @@ The check for the presence of bad pixels in the input data is as follows:
      :                'Sorry, cannot cope with bad pixels', STATUS)
          GOTO 999
       ENDIF
-\end{verbatim}
+\end{terminalv}
 The remainder of the program is summarised in the following steps.
 The input NDF is checked for the existence of a variance array;
 if such an array exists, then both the main data and variance
@@ -1933,8 +1724,8 @@ arrays will be processed by the program, otherwise only the
 main data array  will be processed.
 
 NDF\_MAP can be given a list of components rather than just one.
-In the example below the list will comprise either {\tt 'Data'} or
-{\tt 'Data,Variance'} as
+In the example below the list will comprise either \texttt{'Data'} or
+\texttt{'Data,Variance'} as
 appropriate.\footnote{One advantage of mapping the data and variance arrays with
 a single call is that it is more efficient for NDF\_MAP to access any quality
 array only once and insert bad pixels into the mapped data and variance arrays
@@ -1958,7 +1749,7 @@ must  match the data array).
 The mapped arrays are passed to a subroutine which takes the square root of
 each element in the main data array and calculates the variance appropriate
 to the output NDF if a variance structure was found  in the input NDF.
-\begin{verbatim}
+\begin{terminalv}
 *   Check whether variance array exists
       CALL NDF_STATE (NDF1, 'Variance', VARNCE, STATUS)
 
@@ -1982,9 +1773,9 @@ to the output NDF if a variance structure was found  in the input NDF.
 *   The output variance is also generated if appropriate.
       CALL SQRTVR(NELM, VARNCE, %VAL(PNTR1(1)), %VAL(PNTR1(2)),
      :            %VAL(PNTR2(1)), %VAL(PNTR2(2)), STATUS)
-\end{verbatim}
+\end{terminalv}
 And the code from the subroutine:
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE SQRTVAR (NELM, VARNCE, IN, VARIN, OUT, VAROUT, STATUS)
 *     ...
 *   Take the square root of each input element and find the variance.
@@ -1993,7 +1784,7 @@ And the code from the subroutine:
          IF (VARNCE) VAROUT(I) = VARIN(I)*0.25/IN(I)
       ENDDO
       END
-\end{verbatim}
+\end{terminalv}
 
 \newpage
 \section{PRIMDAT -- Primitive data processing\label{prim}\xlabel{primdat}}
@@ -2003,16 +1794,16 @@ constants, functions and subroutines which aid in the processing of numeric
 data.
 Facilities to cope with all HDS numeric data types
 are included;
-manipulation involving the non-numeric types, {\tt \_LOGICAL} and {\tt\_CHAR}
+manipulation involving the non-numeric types, \texttt{\_LOGICAL} and {\tt\_CHAR}
 can be done using the CHR routines as described in Section~\ref{char}.
 
 The names of the routines and constants described below usually end with a
 one or two letter code appropriate to the data type to which they apply.
-These codes are {\tt R, D, I, W, UW, B} or {\tt UB}  corresponding to the
-HDS data types {\tt \_REAL,
+These codes are \texttt{R, D, I, W, UW, B} or \texttt{UB}  corresponding to the
+HDS data types \texttt{\_REAL,
 \_DOUBLE, \_INTEGER, \_WORD, \_UWORD, \_BYTE,} and {\tt\_UBYTE} respectively.
-For example, {\tt VAL\_\_BADR} is the symbolic constant which represents the bad
-data value for  {\tt\_REAL} data, whereas {\tt VAL\_\_BADUB} represents the bad
+For example, \texttt{VAL\_\_BADR} is the symbolic constant which represents the bad
+data value for  {\tt\_REAL} data, whereas \texttt{VAL\_\_BADUB} represents the bad
 data value for {\tt\_UBYTE} data.
 
 {\bigskip\large\bf VAL, NUM and VEC routines.}
@@ -2026,18 +1817,18 @@ There are three sets of routines, which can be summarised as follow:
 \begin{description}
 \item{ \bf VAL\_ functions} -- these perform arithmetic operations and type
 conversion on scalar values. Bad data handling is incorporated.
-\item{\bf NUM\_ functions} -- these are like the VAL routines except that bad
+\item\textbf{NUM\_ functions} -- these are like the VAL routines except that bad
 data handling is not incorporated; numerical errors can cause these
 routines to crash and bad input values are interpreted literally.
-\item{\bf VEC\_ routines} -- these are subroutines which perform the
+\item\textbf{VEC\_ routines} -- these are subroutines which perform the
 same operations as the VAL functions but operate on arrays of numbers.
 \end{description}
 
 The name of a routine consists of one of the above prefixes, plus an
 indication of the function it performs and the type of data it expects.
 For example, the name of the subroutine which takes the square root of a
-double-precision input data array is {\tt VEC\_SQRTD}.
-There are also type conversion routines. For example, {\tt VEC\_RTOI}
+double-precision input data array is \texttt{VEC\_SQRTD}.
+There are also type conversion routines. For example, \texttt{VEC\_RTOI}
 converts a real array to an integer one.
 A list of the formats of the routines is shown in the table on the following
 page.
@@ -2048,11 +1839,11 @@ numeric types.
 The trigonometric functions in the right-hand table are implemented only
 for types {\tt\_REAL} and {\tt\_DOUBLE}; those trigonometric
 functions whose name
-ends with {\tt D} operate in degrees; the others use radians.
+ends with \texttt{D} operate in degrees; the others use radians.
 
 {\small
 \begin{tabular}{|l|c|l|}\hline
-{\bf {\sl Func}}&{\bf N$_{\rm arg}$}&{\bf Operation performed} \\ \hline
+\textbf{{\sl Func}}&\textbf{N$_{\rm arg}$}&\textbf{Operation performed} \\ \hline
 ADD & 2 & addition: ARG1 $+$ ARG2 \\
 SUB & 2 & subtraction: ARG1 $-$ ARG2 \\
 MUL & 2 & multiplication: ARG1 $*$ ARG2 \\
@@ -2074,7 +1865,7 @@ MOD & 2 & Fortran MOD (remainder) fn. \\
 SIGN & 2 & Fortran SIGN (transfer of sign) fn. \\ \hline
 \end{tabular}
 \ \ ~~~~~\begin{tabular}{|c|c|l|} \hline
-{\bf {\sl Func}}&{\bf N$_{\rm arg}$}&{\bf Operation performed} \\ \hline
+\textbf{{\sl Func}}&\textbf{N$_{\rm arg}$}&\textbf{Operation performed} \\ \hline
 SIN & 1 &  $\sin (\mbox{ARG})$ \\
 SIND & 1 & $\sin (\mbox{ARG})$ \\
 COS & 1 & $\cos (\mbox{ARG})$ \\
@@ -2100,53 +1891,54 @@ TANH & 1 & $\tanh (\mbox{ARG})$ \\ \hline
 \newpage
 The following table gives the format of the routines as described above;
 
-{\small
+\begin{footnotesize}
 \begin{tabular}{|l|l|} \hline
 Format of routine & Example\\ \hline
-{\tt RESULT = VAL\_{\sl func\/}x (BAD, ARG, STATUS)}&
-{\tt PROOT = VAL\_SQRTR (BAD, P, STATUS)} \\
-{\tt RESULT = VAL\_{\sl func\/}x (BAD, ARG, ARG1, STATUS)}&
-{\tt BSUM = VAL\_ADDUB (BAD, B1, B2, STATUS)} \\
-{\tt RESULT = VAL\_xTOy (BAD, ARG, STATUS)}&
-{\tt IP = VAL\_RTOI (BAD, P, STATUS)} \\
-{\tt RESULT = NUM\_{\sl func\/}x (ARG)}&
-{\tt PLOG = NUM\_LOGR (P)} \\
-{\tt RESULT = NUM\_{\sl func\/}x (ARG, ARG1)}&
-{\tt ICUBE = NUM\_PWRI (I, 3)} \\
-{\tt RESULT = NUM\_xTOy (ARG)}&
-{\tt P = NUM\_DTOR (D)} \\
-{\tt CALL VEC\_{\sl func\/}x (BAD, ARG, RESULT, IERR, NERR, STATUS)}&
-{\tt CALL VEC\_SINR (BAD, P, SINP, I, N, STATUS)} \\
-{\tt CALL VEC\_{\sl func\/}x (BAD, ARG, ARG1, RESULT, IERR, NERR, STATUS)}&
-{\tt CALL VEC\_ADDD (BAD, A, B, C, I, N, STATUS)} \\
-{\tt CALL VEC\_xTOy (BAD, ARG, RESULT, IERR, NERR, STATUS)}&
-{\tt CALL VEC\_RTOI (BAD, P, IP, I, N, STATUS)} \\
+\texttt{RESULT = VAL\_{\sl func\/}x (BAD, ARG, STATUS)}&
+\texttt{PROOT = VAL\_SQRTR (BAD, P, STATUS)} \\
+\texttt{RESULT = VAL\_{\sl func\/}x (BAD, ARG, ARG1, STATUS)}&
+\texttt{BSUM = VAL\_ADDUB (BAD, B1, B2, STATUS)} \\
+\texttt{RESULT = VAL\_xTOy (BAD, ARG, STATUS)}&
+\texttt{IP = VAL\_RTOI (BAD, P, STATUS)} \\
+\texttt{RESULT = NUM\_{\sl func\/}x (ARG)}&
+\texttt{PLOG = NUM\_LOGR (P)} \\
+\texttt{RESULT = NUM\_{\sl func\/}x (ARG, ARG1)}&
+\texttt{ICUBE = NUM\_PWRI (I, 3)} \\
+\texttt{RESULT = NUM\_xTOy (ARG)}&
+\texttt{P = NUM\_DTOR (D)} \\
+\texttt{CALL VEC\_{\sl func\/}x (BAD, ARG, RESULT, IERR, NERR, STATUS)}&
+\texttt{CALL VEC\_SINR (BAD, P, SINP, I, N, STATUS)} \\
+\texttt{CALL VEC\_{\sl func\/}x (BAD, ARG, ARG1, RESULT, IERR, NERR, STATUS)}&
+\texttt{CALL VEC\_ADDD (BAD, A, B, C, I, N, STATUS)} \\
+\texttt{CALL VEC\_xTOy (BAD, ARG, RESULT, IERR, NERR, STATUS)}&
+\texttt{CALL VEC\_RTOI (BAD, P, IP, I, N, STATUS)} \\
 \hline
 \end{tabular}
-}
+\end{footnotesize}
 
 The arguments are summarised below.
-{\tt BAD} is a logical value specifying whether
+\texttt{BAD} is a logical value specifying whether
 bad input arguments are to be recognised;
-{\tt N} is the number of elements in the case of VAL routines;
-{\tt ARG}, {\tt ARG1} and {\tt ARG2} are the input
-arguments, and {\tt RESULT} is the result.
+\texttt{N} is the number of elements in the case of VAL routines;
+\texttt{ARG}, \texttt{ARG1} and \texttt{ARG2} are the input
+arguments, and \texttt{RESULT} is the result.
 (In the case of the VEC routines the input
-arguments {\tt ARG, ARG1, ARG2}  and the {\tt RESULT}  are vectorised arrays,
+arguments \texttt{ARG, ARG1, ARG2}  and the \texttt{RESULT}  are vectorised arrays,
 whereas they represent  single values in the cases of the VAL and NUM
 routines.)
-{\tt IERR} is an integer output argument which identifies the
+\texttt{IERR} is an integer output argument which identifies the
 first array element to generate a numerical error,
-{\tt NERR} is an integer output argument which returns a count of the
+\texttt{NERR} is an integer output argument which returns a count of the
 number of numerical errors which occur,
-and finally {\tt STATUS} is the usual integer status.
+and finally \texttt{STATUS} is the usual integer status.
 
 Thus the subroutine call in ADAM\_EXAMPLES:SQROOT.FOR could be
 replaced with the call below:
-{\small
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
       CALL VEC_SQRTR (.TRUE., NELM, %VAL(PTR1), %VAL(PTR2), IERR, NBAD, STATUS)
-\end{verbatim}}
+\end{terminalv}
+\end{small}
 The program SQROOT.FOR assumes that the input array is of
 REAL type -- a safe assumption as
 the NDF\_MAP routine used type {\tt'\_REAL'} which means that the array
@@ -2162,15 +1954,15 @@ ADAM\_EXAMPLES:SQROOTGEN.FOR contains these modifications.
 
 The PRIMDAT routines are linked using the options file PRM\_LINK as shown
 below:
-\begin{verbatim}
-  $ ALINK prog,PRM_LINK/OPT
-\end{verbatim}
+\begin{terminalv}
+$ ALINK prog,PRM_LINK/OPT
+\end{terminalv}
 
 {\bigskip\large\bf Symbolic constants.}
 
 The  set of symbolic constants provided within the PRIMDAT package is
 made available to a program by including the file with logical name
-{\tt PRM\_PAR}.
+\texttt{PRM\_PAR}.
 These constants relate to machine-specific numeric quantities -- for
 example, the
 range of values which can be represented for a particular data type or
@@ -2178,30 +1970,30 @@ the number of bytes per value used for each data type.
 Programs {\sl must\/}  use such symbolic constants  rather than
 the numbers which they represent.
 For example, the largest integer which can be represented on a VAX is
-2147483647 ({\it i.e.} $2^{31}-1$).
+2147483647 (\textit{i.e.} $2^{31}-1$).
 A program which uses this number in arithmetic checks
-{\it etc.}\ will not be portable to a machine with different arithmetic capabilities.
+\textit{etc.}\ will not be portable to a machine with different arithmetic capabilities.
 However, software which uses the appropriate symbolic constant  (called
 VAL\_\_MAXI) can
-be  ported  simply by providing an appropriate version of {\tt PRM\_PAR}.
+be  ported  simply by providing an appropriate version of \texttt{PRM\_PAR}.
 
 The complete set of symbolic constants is represented in the table below,
-where the final {\tt x}  in the name is one of
-{\tt R, D, I, W, UW, B} or {\tt UB}  as indicated above.
+where the final \texttt{x}  in the name is one of
+\texttt{R, D, I, W, UW, B} or \texttt{UB}  as indicated above.
 The data type of each symbolic constant matches that of the
 data type to which it applies, except in the cases of
-{\tt VAL\_\_NBx} and {\tt VAL\_\_SZx} which are, of course, integers.
+\texttt{VAL\_\_NBx} and \texttt{VAL\_\_SZx} which are, of course, integers.
 \begin{center}
 \begin{tabular}{|l|l|} \hline
-{\bf Constant   }& {\bf Quantity }\\ \hline
-{\tt VAL\_\_BADx}        & Bad data value\\
-{\tt VAL\_\_EPSx}        & Machine precision -- minimum $\epsilon$ such that
+\textbf{Constant   }& \textbf{Quantity }\\ \hline
+\texttt{VAL\_\_BADx}        & Bad data value\\
+\texttt{VAL\_\_EPSx}        & Machine precision -- minimum $\epsilon$ such that
 1 is distinguishable from ($1+\epsilon)$\\
-{\tt VAL\_\_MAXx}        & Maximum (most positive) non-bad value\\
-{\tt VAL\_\_MINx}        & Minimum (most negative) non-bad value\\
-{\tt VAL\_\_NBx}         & Number of bytes used by a value\\
-{\tt VAL\_\_SMLx}        & Smallest positive non-zero value\\
-{\tt VAL\_\_SZx}         & Number of characters needed to format value as a decimal string\\
+\texttt{VAL\_\_MAXx}        & Maximum (most positive) non-bad value\\
+\texttt{VAL\_\_MINx}        & Minimum (most negative) non-bad value\\
+\texttt{VAL\_\_NBx}         & Number of bytes used by a value\\
+\texttt{VAL\_\_SMLx}        & Smallest positive non-zero value\\
+\texttt{VAL\_\_SZx}         & Number of characters needed to format value as a decimal string\\
 \hline
 \end{tabular}
 \end{center}
@@ -2219,11 +2011,11 @@ NCAR/AUTOGRAPH high-level facilities and the Starlink extensions to NCAR,
 enables a `default' graph to be drawn with only a few simple subroutine calls.
 With a little more effort the programmer can alter  the style of the plot
 in virtually every desirable way,
-{\it e.g.}\ size, labelling, tick mark appearance, histogram, logarithmic
-axes,  {\it etc.})}.
+\textit{e.g.}\ size, labelling, tick mark appearance, histogram, logarithmic
+axes,  \textit{etc.})}.
 In the aforementioned program, the relevant code can be
 represented as follows:
-\begin{verbatim}
+\begin{terminalv}
 *  Read  X,Y data arrays and get number of points, NELM.
       .......
 *  Open SGS, then match the AUTOGRAPH co-ord system with the current zone.
@@ -2236,9 +2028,9 @@ represented as follows:
 
 *   Close down SGS.
       CALL SGS_CLOSE
-\end{verbatim}
+\end{terminalv}
 The equivalent lines in an ADAM program would be:
-\begin{verbatim}
+\begin{terminalv}
 *  Open SGS, then match the AUTOGRAPH co-ord system with the current zone.
       CALL SGS_ASSOC ('DEVICE', 'WRITE', ZONE, STATUS)
       CALL SNX_AGWV
@@ -2249,7 +2041,7 @@ The equivalent lines in an ADAM program would be:
 *   Close down SGS.
       CALL SGS_ANNUL (ZONE, STATUS)
       CALL SGS_DEACT (STATUS)
-\end{verbatim}
+\end{terminalv}
 The differences are in the opening and closing of SGS; to summarize:
 \begin{itemize}
 \item the SGS\_OPEN is replaced by an SGS\_ASSOC.
@@ -2272,36 +2064,36 @@ but that is incidental.
 Several other considerations should be borne in mind when writing graphics
 applications under ADAM:
 
-{\bf Linking} -- the standard ADAM link, ALINK,
+\textbf{Linking} -- the standard ADAM link, ALINK,
 automatically links in the ADAM version of SGS.
-The non-ADAM SGS link command procedure activated by {\tt \@SGS\_DIR:SGSLINK}
+The non-ADAM SGS link command procedure activated by \texttt{\@SGS\_DIR:SGSLINK}
 must {\sl not\/} be included.
 This can happen accidentally as it is  included in several
 packaged link commands.
 For example, the standard NCAR/SNX link command is
-{\tt  \$ LINK prog,\@NCAR\_DIR:SNXLINK}
+\texttt{\$ LINK prog,\@NCAR\_DIR:SNXLINK}
 which is a packaged version of:
-\begin{verbatim}
-    $ LINK prog,NCAR_DIR:AGPWRITX,AGCHNLZ,SNXLIB/L,NCARLIB/L,@SGS_DIR:SGSLINK
-\end{verbatim}
+\begin{terminalv}
+$ LINK prog,NCAR_DIR:AGPWRITX,AGCHNLZ,SNXLIB/L,NCARLIB/L,@SGS_DIR:SGSLINK
+\end{terminalv}
 \newpage
 The link command for SNXPLOT is deduced by
-omitting {\tt \@SGS\_DIR:SGSLINK} from the NCAR link, {\it i.e.}
-\begin{verbatim}
-  $ ALINK SNXPLOT,NCAR_DIR:AGPWRITX,AGCHNLZ,SNXLIB/L,NCARLIB/L
-\end{verbatim}
-{\bf Error checking.} -- Unlike standard SGS, SGS under ADAM
+omitting \texttt{\@SGS\_DIR:SGSLINK} from the NCAR link, \textit{i.e.}
+\begin{terminalv}
+$ ALINK SNXPLOT,NCAR_DIR:AGPWRITX,AGCHNLZ,SNXLIB/L,NCARLIB/L
+\end{terminalv}
+\textbf{Error checking.} -- Unlike standard SGS, SGS under ADAM
 uses inherited STATUS checking.
 A list of symbolic constants and the errors they represent is contained in
 the file with logical name SGS\_ERR.
 These values can be used to perform tests such as:
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'SGS_ERR'
 *      ...
       IF (STATUS.EQ.SGS__ZONTB) THEN
 *      Zone too big - take appropriate action.
-\end{verbatim}
-{\bf Bad pixels} -- the program SNXPLOT.FOR is likely to
+\end{terminalv}
+\textbf{Bad pixels} -- the program SNXPLOT.FOR is likely to
 crash if it encounters values $\sim-$1.7E38
 as will be the case if the input data contain bad pixels.
 However NCAR will ignore any data points which contain the current
@@ -2310,11 +2102,11 @@ This value can be set to the bad value appropriate for the data type
 (see Section~\ref{badpix}) causing NCAR to ignore bad pixels.
 The appropriate call is as follows, (see the NCAR users' manual,
 available as a Starlink MUD for details).
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'BAD_PAR'                   ! Make VAL__BADR etc. available
 *     ...
       CALL AGSETF ('NULL/1.', VAL__BADR)  ! After SGS_ASSOC & before plotting
-\end{verbatim}
+\end{terminalv}
 This modification has been made in ADAM\_EXAMPLES:SNXPLOT1.FOR.
 
 
@@ -2328,7 +2120,7 @@ these are discussed in \xref{SUN/15}{sun15}{}.}, it is necessary to
 inquire the workstation identifier, encode this as a character string and pass
 this string as the FILE (device) argument to PGBEGIN.
 The significant portion of the code is reproduced below:
-\begin{verbatim}
+\begin{terminalv}
       INTEGER ZONE, STATUS, IWKID, NCHAR
 *     ....
 *   Activate SGS.
@@ -2353,9 +2145,9 @@ The significant portion of the code is reproduced below:
 *   Deactivate SGS
       CALL SGS_ANNUL (ZONE, STATUS)
       CALL SGS_DEACT (STATUS)
-\end{verbatim}
+\end{terminalv}
 The link command for this  program is
-{\tt \$ ALINK PGPLOT,PGPLOT\_DIR:GRPSHR/LIB}.
+\texttt{\$ ALINK PGPLOT,PGPLOT\_DIR:GRPSHR/LIB}.
 
 \newpage
 \section{Dealing with Extensions -- using HDS routines\label{extensions}\xlabel{dealing_with_extensions}}
@@ -2375,7 +2167,7 @@ It is, of course, possible to perform {\sl all\/} access to HDS structures
 using HDS routines (see \xref{SUN/92}{sun92}{}). The NDF routines simply
 provide a convenient method of accessing standard items in NDFs, but
 %those HDS structures which use the Starlink {\sl Extensible
-%N-Dimensional Format}, {\it i.e.} NDFs.
+%N-Dimensional Format}, \textit{i.e.} NDFs.
 %The NDF routines are designed to cope with standard items in the NDF --
 the programmer must
 resort to HDS routines to deal with items in extensions.
@@ -2385,11 +2177,11 @@ and finding HDS {\sl locators\/} to specific extensions.
 
 This last statement requires some explanation.
 HDS refers to items in a structure via {\sl locators}; each
-locator is a {\tt CHARACTER*15} variable which points to a HDS object.
-Strictly, a locator is a string of length {\tt DAT\_\_SZLOC} -- this latter
-item being a symbolic constant which is defined in the {\tt SAE\_PAR}
+locator is a \texttt{CHARACTER*15} variable which points to a HDS object.
+Strictly, a locator is a string of length \texttt{DAT\_\_SZLOC} -- this latter
+item being a symbolic constant which is defined in the \texttt{SAE\_PAR}
 include file.
-Locators must be declared as {\tt CHARACTER*(DAT\_\_SZLOC)} as there is no
+Locators must be declared as \texttt{CHARACTER*(DAT\_\_SZLOC)} as there is no
 guarantee that the length of 15 will be
 used for future HDS implementations on machines other
 than VAXs.
@@ -2399,8 +2191,8 @@ Recalling the program ADAM\_EXAMPLES:ADD7.FOR discussed in
 Section~\ref{add7}, a constant value was added to each element in
 an NDF main data array. NDF\_ASSOC was used to associate the input file
 with an NDF identifier and NDF\_MAP was used to map the main data array.
-The program below performs a similar task, but uses HDS {\tt DAT\_} routines.
-\begin{verbatim}
+The program below performs a similar task, but uses HDS \texttt{DAT\_} routines.
+\begin{terminalv}
       SUBROUTINE ADD8 (STATUS)
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -2423,26 +2215,26 @@ The program below performs a similar task, but uses HDS {\tt DAT\_} routines.
       CALL DAT_ANNUL (DLOC, STATUS)
       CALL DAT_ANNUL (ILOC, STATUS)
       END
-\end{verbatim}
+\end{terminalv}
 Two locators ILOC and DLOC are used in this program; ILOC  is associated
-with the top-level of the input NDF, {\it i.e.} with {\tt INPUT}, and DLOC
-with {\tt INPUT.DATA\_ARRAY}.
+with the top-level of the input NDF, \textit{i.e.} with \texttt{INPUT}, and DLOC
+with \texttt{INPUT.DATA\_ARRAY}.
 Both are declared as
-{\tt CHARACTER*DAT\_\_SZLOC} and both are {\sl annulled\/} with a call
-to {\tt DAT\_ANNUL} at the end of the program.
+\texttt{CHARACTER*DAT\_\_SZLOC} and both are {\sl annulled\/} with a call
+to \texttt{DAT\_ANNUL} at the end of the program.
 Annulling a locator cancels the association between the locator and the
 object and unmaps any arrays mapped via the locator.
 The first call to DAT\_ASSOC associates a locator ILOC with the input file.
 This locator effectively points to the top-level of the file.
 To find a locator to a first-level object, DAT\_FIND is used.
-For example, the call above finds a locator to {\tt INPUT.DATA\_ARRAY.}
-DAT\_MAPV maps the object {\tt INPUT.DATA\_ARRAY} as a vectorised array,
+For example, the call above finds a locator to \texttt{INPUT.DATA\_ARRAY.}
+DAT\_MAPV maps the object \texttt{INPUT.DATA\_ARRAY} as a vectorised array,
 just as NDF\_MAP did in ADD7.
 
 However, this program will only work if the main data array is
-to be found in {\tt INPUT.DATA\_ARRAY} --
-{\it i.e.} the NDF is primitive. If {\tt INPUT.DATA\_ARRAY} is a structure
-with the actual data array contained in {\tt INPUT.DATA\_ARRAY.DATA} as is
+to be found in \texttt{INPUT.DATA\_ARRAY} --
+\textit{i.e.} the NDF is primitive. If \texttt{INPUT.DATA\_ARRAY} is a structure
+with the actual data array contained in \texttt{INPUT.DATA\_ARRAY.DATA} as is
 also consistent with the NDF definition, then ADD8 will crash.
 The program could  perform checks to discern the format for itself, but
 it is obviously easier to use the NDF routines to access standard objects.
@@ -2453,15 +2245,15 @@ The next example considered here uses information from the FIGARO extension.
 This  extension may contain the exposure time for an observation.
 If this exists it will be held in {\tt.OBS.TIME} in the FIGARO extension.
 This extract from a TRACE on ADAM\_EXAMPLES:FIGDATA.SDF shows the actual
-location is {\tt FIGDATA.MORE.FIGARO.OBS.TIME.}
-\begin{verbatim}
-  FIGDATA  <NDF>
-     ...
-     MORE           <EXT>           {structure}
-        FIGARO         <EXT>           {structure}
-           OBS            <STRUCT>        {structure}
-              TIME           <_REAL>         7.5
-\end{verbatim}
+location is \texttt{FIGDATA.MORE.FIGARO.OBS.TIME.}
+\begin{terminalv}
+FIGDATA  <NDF>
+  ...
+  MORE           <EXT>           {structure}
+     FIGARO         <EXT>           {structure}
+        OBS            <STRUCT>        {structure}
+           TIME           <_REAL>         7.5
+\end{terminalv}
 The example program ADAM\_EXAMPLES:DIVTIM.FOR reads the value of the
 exposure time and divides the main data array by this value.
 The steps involved in accessing the exposure time value are described
@@ -2470,39 +2262,39 @@ below.
 The input file is associated with an NDF identifier in the usual way.
 The program checks for the existence of a FIGARO extension and if such an
 extension does exist,  a locator to it is found.
-\begin{verbatim}
+\begin{terminalv}
 *   Check that FIGARO extension is there.
       CALL NDF_XSTAT (NDF, 'FIGARO', EXIST, STATUS)
       IF (EXIST) THEN
 *      Get locator to FIGARO extension.
          CALL NDF_XLOC (NDF, 'FIGARO', 'UPDATE', FLOC, STATUS)
-\end{verbatim}
+\end{terminalv}
 It is now necessary to use HDS routines.
 The program checks to see if there is an .OBS structure in the FIGARO
 extension; if there is, a locator to it is found.
-\begin{verbatim}
+\begin{terminalv}
 *      See if FIGARO .OBS  structure is there.
          CALL DAT_THERE (FLOC, 'OBS', EXIST, STATUS)
          IF (EXIST) THEN
 *         Get locator for FIGARO .OBS structure.
             CALL DAT_FIND (FLOC, 'OBS', OLOC, STATUS)
-\end{verbatim}
+\end{terminalv}
 Now the program checks for the existence of a {\tt.TIME} object in the
 FIGARO {\tt.OBS} structure. If this exists, a locator to it is found.
-\begin{verbatim}
+\begin{terminalv}
 *         See if .OBS.TIME is there.
             CALL DAT_THERE (OLOC, 'TIME', EXIST, STATUS)
             IF (EXIST) THEN
 *            Get locator for FIGARO .OBS.TIME item.
                CALL DAT_FIND (OLOC, 'TIME', TLOC, STATUS)
-\end{verbatim}
-The value of the {\tt .OBS.TIME} object is now retrieved. The locator to
+\end{terminalv}
+The value of the \texttt{.OBS.TIME} object is now retrieved. The locator to
 it can be annulled.
-\begin{verbatim}
+\begin{terminalv}
 *            Get value of .OBS.TIME
                CALL DAT_GET(TLOC, '_REAL', 0, 0, TIME, STATUS)
                CALL DAT_ANNUL (TLOC, STATUS)
-\end{verbatim}
+\end{terminalv}
 
 \newpage
 \section{Running under ICL\label{icl}\xlabel{running_under_icl}}
@@ -2528,30 +2320,30 @@ The following simple experiment should demonstrate this.
 Set up a symbol to run one of the ADAM programs.
 (The example below uses REPDIM2 which reports the
 dimensions of the input NDF -- as described in Section~\ref{add7}.)
-\begin{verbatim}
-  $ REPDIM2:=="$ADAM_EXAMPLES:REPDIM2"
-\end{verbatim}
+\begin{terminalv}
+$ REPDIM2:=="$ADAM_EXAMPLES:REPDIM2"
+\end{terminalv}
 Now run the program on an NDF:
-\begin{verbatim}
-  $ REPDIM2 IMAGE
-  No. of dimensions is 2
-  Array dimensions are 256 x 256
-\end{verbatim}
+\begin{terminalv}
+$ REPDIM2 IMAGE
+No. of dimensions is 2
+Array dimensions are 256 x 256
+\end{terminalv}
 Try this a few times and note how long it takes.
 A significant fraction of the run-time of this small program
 is occupied with loading the executable code into the computer's memory.
 This loading takes place every time the program runs.
 
 The session below shows how to run the same program under ICL:
-\begin{verbatim}
-  $ ICL
-    (informational messages appear)
-  ICL> DEFINE REPDIM2 ADAM_EXAMPLES:REPDIM2
-  ICL> REPDIM2 IMAGE
-  Loading ADAM_EXAMPLES:REPDIM2 into 012DREPDIM2
-  No. of dimensions is 2
-  Array dimensions are 256 x 256
-\end{verbatim}
+\begin{terminalv}
+$ ICL
+ (informational messages appear)
+ICL> DEFINE REPDIM2 ADAM_EXAMPLES:REPDIM2
+ICL> REPDIM2 IMAGE
+Loading ADAM_EXAMPLES:REPDIM2 into 012DREPDIM2
+No. of dimensions is 2
+Array dimensions are 256 x 256
+\end{terminalv}
 This takes just as long as running the program under DCL, {\sl but\/}
 the executable image has been loaded into a subprocess, in this case named
 012DREPDIM2.
@@ -2568,14 +2360,14 @@ programs.
 In the continuation of the session above, commands for ADDNEW and ADDCONST
 are defined and the programs run. The ICL command TASKS
 shows which tasks are active.
-\begin{verbatim}
-  ICL> TASKS
-        ******  Cached Tasks  ******
-      Task Names             Process Names
-         ADDNEW                 012DADDNEW
-       ADDCONST               012DADDCONST
-        REPDIM2                012DREPDIM2
-\end{verbatim}
+\begin{terminalv}
+ICL> TASKS
+     ******  Cached Tasks  ******
+   Task Names             Process Names
+      ADDNEW                 012DADDNEW
+    ADDCONST               012DADDCONST
+     REPDIM2                012DREPDIM2
+\end{terminalv}
 Three\footnote{Three is the default value, but this may be adjusted on a
 system basis.} is  the maximum number of tasks which can be
 simultaneously active.
@@ -2583,9 +2375,9 @@ When another program is loaded the user is warned that the REPDIM2 process
 is being killed; a subsequent invocation of REPDIM2 would require
 it to be loaded again.
 
-You can explicitly kill a process by typing {\tt KILL }{\sl process name}.
+You can explicitly kill a process by typing \texttt{KILL }{\sl process name}.
 All processes are usually stopped when the user leaves ICL by typing
-{\tt EXIT}.
+\texttt{EXIT}.
 
 \newpage
 {\large\bf Monoliths.}
@@ -2600,32 +2392,32 @@ However once the monolith is loaded any programs it contains are ready to
 run. In the example below, once KAPPA is loaded, all the KAPPA commands are
 ready to run.
 (Section~\ref{monolith} explains how to build a monolith.)
-\begin{verbatim}
-  $ ICL
-  ICL> KAPPA                             ! This defines all the KAPPA command names
-  ICL> CREFRAME                          ! The first command causes KAPPA to be loaded
-  Loading KAPPA_DIR:KAPPA into 012DKAPPA
-\end{verbatim}
+\begin{terminalv}
+$ ICL
+ICL> KAPPA                             ! This defines all the KAPPA command names
+ICL> CREFRAME                          ! The first command causes KAPPA to be loaded
+Loading KAPPA_DIR:KAPPA into 012DKAPPA
+\end{terminalv}
 
 {\large\bf Words of warning.}
 
 Programs which run under DCL should give the same results under ICL.
 Several possible problem areas should be noted:
 \begin{description}
-\item{\bf Initialisation of variables} -- the programmer
+\item\textbf{Initialisation of variables} -- the programmer
 who relies on VMS initialising variables to zero will get away with this
 carelessness when running Fortran programs under DCL.
 However program variable values are `remembered' between invocations
 of a program under ICL, so uninitialised variables may well have
 non-zero values. {\sl So don't rely on initialisation to zero!}
 
-\item{\bf Case of input parameters} -- parameters entered on a DCL
+\item\textbf{Case of input parameters} -- parameters entered on a DCL
 command line are automatically converted to upper case, but this does not
 happen on an ICL command line. This may catch out the program which is
 case sensitive. {\sl So don't write case-sensitive programs if you can help
 it!}
 
-\item{\bf Message synchronization} -- as discussed in Section~\ref{repdim1},
+\item\textbf{Message synchronization} -- as discussed in Section~\ref{repdim1},
 it is possible for message reports to be
 made on the graphics screen of a VDU when running under ICL.
 An example of this undesirable behaviour occurs when a program reads
@@ -2638,9 +2430,9 @@ buffered and may arrive after the switch to graphics has occurred.
 The solution is to flush  the textual output buffer immediately before any
 graphical output (such as a cursor call).
 This is done with the call:
-\begin{verbatim}
+\begin{terminalv}
       CALL MSG_SYNC (STATUS)
-\end{verbatim}
+\end{terminalv}
 The program ADAM\_EXAMPLES:CURSOR.FOR has this call in the necessary places;
 without the MSG\_SYNC calls, the program exhibits the problem described
 above.
@@ -2650,15 +2442,15 @@ above.
 
 DCL  commands can be executed from ICL by prefixing the DCL command with
 `\$' (or `DCL') thus:
-\begin{verbatim}
-  ICL> $ SHO TIME
-\end{verbatim}
+\begin{terminalv}
+ICL> $ SHO TIME
+\end{terminalv}
 The first time a DCL command is entered in an ICL session, a subprocess
 for executing DCL commands will be created.
 Note that although abbreviated forms of commands can be used, it is
 necessary to enter the complete DCL command on a line
 as the user  cannot be prompted for unspecified command parameters.
-(So you cannot type {\tt \$ SHOW} and be prompted with {\tt \_What?})
+(So you cannot type \texttt{\$ SHOW} and be prompted with \texttt{\_What?})
 Another consideration is that DCL commands are run in a separate
 process from the main ICL `command' process. This has several
 implications. For example, changing the default directory in the DCL
@@ -2668,9 +2460,9 @@ the directory current when the ICL process began.
 The command DEFAULT can be used to set the default directory for
 both the command process and DCL
 subprocess, thus:
-\begin{verbatim}
-  ICL> DEFAULT DISK$USER1:[JM.ADAM]
-\end{verbatim}
+\begin{terminalv}
+ICL> DEFAULT DISK$USER1:[JM.ADAM]
+\end{terminalv}
 Similar comments apply to the allocation of devices such as tape drives
 to processes.
 
@@ -2694,30 +2486,30 @@ is not fixed but depends on the current value of a variable.
 The example session below illustrates some of ICL's capabilities.
 The open bracket `{\tt\{}' on an ICL command line  begins a comment.
 Explanations of the ICL commands below are shown enclosed in brackets
-{\tt \{\}}  but the closing bracket is included only for appearance.
-\begin{verbatim}
-  $ ICL
-  ICL> x=3              {Assign 3 to variable x}
-  ICL> =x               {Print the value of x}
-          3
-  ICL> x='Hi there'     {Assign string to x - ICL variables have no intrinsic type}
-  ICL> =x               {Print the value of x}
-  Hi there
-  ICL> x=x&x            {String concatenation achieved using `&'}
-  ICL> =x               {Print the value of x}
-  Hi thereHi there
-  ICL> =sqrt(4)         {ICL has many Fortran-like intrinsic functions}
-  2
-  ICL> x=upcase(x)      {And other functions too.}
-  ICL> =x
-  HI THEREHI THERE
-\end{verbatim}
+\texttt{\{\}}  but the closing bracket is included only for appearance.
+\begin{terminalv}
+$ ICL
+ICL> x=3              {Assign 3 to variable x}
+ICL> =x               {Print the value of x}
+       3
+ICL> x='Hi there'     {Assign string to x - ICL variables have no intrinsic type}
+ICL> =x               {Print the value of x}
+Hi there
+ICL> x=x&x            {String concatenation achieved using `&'}
+ICL> =x               {Print the value of x}
+Hi thereHi there
+ICL> =sqrt(4)         {ICL has many Fortran-like intrinsic functions}
+2
+ICL> x=upcase(x)      {And other functions too.}
+ICL> =x
+HI THEREHI THERE
+\end{terminalv}
 {\smallskip\large\bf ICL commands.}
 
-A selection of ICL commands were introduced in Section~\ref{icl}, {\it i.e.}
-{\tt LOAD, TASKS, DEFINE, KILL} and {\tt DEFAULT}.
+A selection of ICL commands were introduced in Section~\ref{icl}, \textit{i.e.}
+\texttt{LOAD, TASKS, DEFINE, KILL} and \texttt{DEFAULT}.
 A full list of the commands and their specifications can be examined by
-typing {\tt HELP} in ICL.
+typing \texttt{HELP} in ICL.
 
 {\smallskip\large\bf ICL functions.}
 
@@ -2728,10 +2520,10 @@ later in this section).
 SNAME has two or three arguments, the first and second being a string and an
 integer. The optional third argument gives the number of characters which
 the integer part of the resultant string should occupy, for example:
-\verb+SNAME('FIBRE',2)+ returns {\tt FIBRE2} whereas
-\verb+SNAME('FIBRE',2,3)+ returns {\tt FIBRE002}.
+\verb+SNAME('FIBRE',2)+ returns \texttt{FIBRE2} whereas
+\verb+SNAME('FIBRE',2,3)+ returns \texttt{FIBRE002}.
 A complete up-to-date list of functions can be viewed by typing
-{\tt HELP FUNCTIONS} in ICL.
+\texttt{HELP FUNCTIONS} in ICL.
 
 
 {\smallskip\large\bf ICL control structures.}
@@ -2744,13 +2536,13 @@ Three variants of the loop structure exist; an example of each is shown below.
 A BREAK statement can be used to pass control to the end of a LOOP;
 normally such a statement would be inside an IF structure.
 Also shown is an example IF structure.
-\begin{verbatim}
-  LOOP          LOOP WHILE (I<5)     LOOP FOR I=1 TO 7      IF A=0
-  ...           ...                  ...                    ...
-  END LOOP      END LOOP             END LOOP               ELSE IF NOT DONE
-                                                            ...
-                                                            END IF
-\end{verbatim}
+\begin{terminalv}
+LOOP          LOOP WHILE (I<5)     LOOP FOR I=1 TO 7      IF A=0
+...           ...                  ...                    ...
+END LOOP      END LOOP             END LOOP               ELSE IF NOT DONE
+                                                          ...
+                                                          END IF
+\end{terminalv}
 ICL control structures can only be used in procedures.
 Both a LOOP and an IF control structure are used in the procedure PLOTS shown
 later in this section.
@@ -2762,36 +2554,36 @@ and are activated by typing LOAD {\sl filename} in ICL.
 For example, rather than typing the commands to define ADDNEW and REPDIM2
 in each ICL session, the appropriate commands (as shown below) might be
 written to  a file called MYCOM.ICL.
-\begin{verbatim}
-  DEFINE ADDNEW  ADAM_EXAMPLES:ADDNEW
-  DEFINE REPDIM2 ADAM_EXAMPLES:REPDIM2
-\end{verbatim}
+\begin{terminalv}
+DEFINE ADDNEW  ADAM_EXAMPLES:ADDNEW
+DEFINE REPDIM2 ADAM_EXAMPLES:REPDIM2
+\end{terminalv}
 On entering ICL, loading this command file is analogous to activating a DCL
 command file.
-\begin{verbatim}
- ICL> LOAD MYCOM         {Defines ADDNEW and REPDIM2}
-\end{verbatim}
+\begin{terminalv}
+ICL> LOAD MYCOM         {Defines ADDNEW and REPDIM2}
+\end{terminalv}
 Just as you probably have a  LOGIN.COM file which  executes every time
 you begin a VAX session,
 an ICL login file can be set up which will execute each time
 you enter ICL.
-This is done by defining the appropriate file as {\tt ICL\_LOGIN}.
+This is done by defining the appropriate file as \texttt{ICL\_LOGIN}.
 For example, you might include the following line in your LOGIN.COM:
-\begin{verbatim}
-  $ DEFINE ICL_LOGIN ADAM_EXAMPLES:LOGIN.ICL
-\end{verbatim}
+\begin{terminalv}
+$ DEFINE ICL_LOGIN ADAM_EXAMPLES:LOGIN.ICL
+\end{terminalv}
 
 
 {\large\bf ICL procedures.}
 
 ICL procedures are ideal for programming data-reduction sequences.
 An ICL procedure can use any ICL commands (including user-defined commands)
-control structures, functions {\it etc.}
+control structures, functions \textit{etc.}
 As mentioned above, loading a procedure does not
 cause it to run; it is simply made available for running whenever the
 procedure name is typed.
-A procedure begins with the declaration {\tt PROC}~{\sl procedurename}
-and ends with {\tt END PROC}.
+A procedure begins with the declaration \texttt{PROC}~{\sl procedurename}
+and ends with \texttt{END PROC}.
 For example, the command file MYCOM.ICL above can be converted into a
 procedure named MYPROC.ICL by inserting an initial line
 \verb+PROC MYPROC+ and a final line \verb+END PROC+.
@@ -2800,49 +2592,49 @@ it is
 run by typing the procedure name
 as shown below.
 Subsequent runs do not require the procedure to be loaded again.
-\begin{verbatim}
-  ICL> LOAD MYPROC
-  ICL> MYPROC
-\end{verbatim}
+\begin{terminalv}
+ICL> LOAD MYPROC
+ICL> MYPROC
+\end{terminalv}
 Unlike command files, ICL procedures can have arguments as shown in the
 example below:
-\begin{verbatim}
-  PROC MULT X Y
-     Z=X*Y
-     =Z
-  END PROC
-\end{verbatim}
+\begin{terminalv}
+PROC MULT X Y
+  Z=X*Y
+  =Z
+END PROC
+\end{terminalv}
 This is loaded and run as shown below:
-\begin{verbatim}
-  ICL> LOAD MULT
-  ICL> MULT 15 2
-      30
-\end{verbatim}
+\begin{terminalv}
+ICL> LOAD MULT
+ICL> MULT 15 2
+   30
+\end{terminalv}
 The procedure below was written to produce CANON plots from seven
 data files each containing a spectrum.
 These spectra had been extracted from a CCD image and named
-{\tt FIBRE01.SDF,  \ldots FIBRE08.SDF}. One file,
-{\tt FIBRE06.SDF}  is missing from the sequence, as this corresponded to
+\texttt{FIBRE01.SDF,  \ldots FIBRE08.SDF}. One file,
+\texttt{FIBRE06.SDF}  is missing from the sequence, as this corresponded to
 a dud fibre.
 The procedure uses KAPPA's LINPLOT to produce and print
 the graphs on a CANON laser printer (see \xref{SUN/95}{sun95}{}); it is
 therefore necessary to define the command LINPLOT
 (by typing KAPPA) before running the procedure. Additional explanation is
-provided in the on-line file {\tt ADAM\_EXAMPLES:PLOTS.ICL}.
+provided in the on-line file \texttt{ADAM\_EXAMPLES:PLOTS.ICL}.
 %Note that it is necessary
 %to append \verb+@+ in front of the filename given to the LINPLOT COMMAND.
 %This tells the procedure that FILENAME
-\begin{verbatim}
-  PROC PLOTS
-  LOOP FOR I = 1 TO 8
-     IF NOT (I = 6)
-        FILENAME = (SNAME('FIBRE',I,2))
-        LINPLOT INPIC=('@'&FILENAME) DEVICE=CANON_L PLTITL=(FILENAME) \
-        $ PRINT/PASSALL/QUE=SYS_LASER CANON.DAT
-     ENDIF
-  END LOOP
-  END PROC
-\end{verbatim}
+\begin{terminalv}
+PROC PLOTS
+LOOP FOR I = 1 TO 8
+  IF NOT (I = 6)
+     FILENAME = (SNAME('FIBRE',I,2))
+     LINPLOT INPIC=('@'&FILENAME) DEVICE=CANON_L PLTITL=(FILENAME) \
+     $ PRINT/PASSALL/QUE=SYS_LASER CANON.DAT
+  ENDIF
+END LOOP
+END PROC
+\end{terminalv}
 
 \newpage
 \section{Creating a help library\label{help}\xlabel{creating_a_help_library}}
@@ -2854,43 +2646,43 @@ The procedure to provide help information for the program
 ADDCONST is outlined below.
 
 The first step is to create a help file appropriate for the  program.
-This is a text file and has the default extension {\tt .HLP}.
+This is a text file and has the default extension \texttt{.HLP}.
 ADDCONST is a very simple program with only two parameters: INPUT -- which
 is used to  get the name of an input NDF, and CONST,
 a scalar value which is added to the NDF main data array.
 An appropriate  help file ADAM\_EXAMPLES:ADDCONST.HLP is reproduced below:
-\begin{verbatim}
-  1 ADDCONST
-  Add a scalar to an NDF data structure.
-  Description:
-     The routine adds a scalar (i.e. constant) value to each pixel of
-     an NDF's data array to produce a new NDF data structure.
+\begin{terminalv}
+1 ADDCONST
+Add a scalar to an NDF data structure.
+Description:
+  The routine adds a scalar (i.e. constant) value to each pixel of
+  an NDF's data array to produce a new NDF data structure.
 
-  2 Parameters
-  For information on individual parameters, select from the list below:
+2 Parameters
+For information on individual parameters, select from the list below:
 
-  3 INPUT
-  INPUT = NDF (Update)
-     Input NDF data structure, to which the value is to be added.
+3 INPUT
+INPUT = NDF (Update)
+  Input NDF data structure, to which the value is to be added.
 
-  3 CONST
-  Enter a scalar value.
-  This will be added to each element in the main data array of the NDF.
-\end{verbatim}
+3 CONST
+Enter a scalar value.
+This will be added to each element in the main data array of the NDF.
+\end{terminalv}
 The structure of the text file is hierarchical;
-the above file contains four items, {\tt ADDCONST, Parameters, INPUT} and
-{\tt CONST}.
+the above file contains four items, \texttt{ADDCONST, Parameters, INPUT} and
+\texttt{CONST}.
 Each item has a position in the hierarchy within the
 help file  as indicated by the number 1, 2
 or 3 at the beginning of a line.
 The lines of text following each item contain the help information
 associated with it.
-For example, {\tt ADDCONST} is a first-level object containing the application name
+For example, \texttt{ADDCONST} is a first-level object containing the application name
 and is followed by several lines of text containing general information
 associated with the application.
-{\tt Parameters} is a second-level object, with a single line of associated text.
+\texttt{Parameters} is a second-level object, with a single line of associated text.
 The individual parameters are each at the third level.
-In this case there are two, {\tt INPUT} and {\tt CONST}, each of which
+In this case there are two, \texttt{INPUT} and \texttt{CONST}, each of which
 is followed by a number of lines of associated help
 information.
 
@@ -2898,77 +2690,77 @@ information.
 This help file must be inserted into a help library.
 The commands to create such a library -- in this case called
 MYHELP.HLB -- and insert ADDCONST.HLP are as follow:
-\begin{verbatim}
-  $ LIB/HELP/CREATE MYHELP         ! Creates MYHELP.HLB
-  $ LIB/HELP MYHELP ADDCONST       ! Inserts ADDCONST.HLP into MYHELP.HLP
-\end{verbatim}
+\begin{terminalv}
+$ LIB/HELP/CREATE MYHELP         ! Creates MYHELP.HLB
+$ LIB/HELP MYHELP ADDCONST       ! Inserts ADDCONST.HLP into MYHELP.HLP
+\end{terminalv}
 The final step is to modify the ADDCONST interface file so that the
 program knows where to look for the help information.
-This is done using the {\tt helpkey} field.
+This is done using the \texttt{helpkey} field.
 The location of help information for a particular item is indicated by
 specifying the help
 library and the position in the library hierarchy where the information is
 stored.
 For example, the help information for the parameter CONST is located in
-{\tt MYHELP ADDCONST PARAMETERS CONST}.
+\texttt{MYHELP ADDCONST PARAMETERS CONST}.
 A  suitably modified ADDCONST.IFL is shown below:
-\begin{verbatim}
-  interface ADDCONST
-     parameter      INPUT          # Input NDF
-        position    1
-        ...
-        helpkey     'ADAM_EXAMPLES:MYHELP ADDCONST PARAMETERS INPUT'
-     endparameter
-     parameter      CONST          # Scalar value to add
-        position    2
-        ...
-        helpkey     'ADAM_EXAMPLES:MYHELP ADDCONST PARAMETERS CONST'
-     endparameter
-  endinterface
-\end{verbatim}
+\begin{terminalv}
+interface ADDCONST
+  parameter      INPUT          # Input NDF
+     position    1
+     ...
+     helpkey     'ADAM_EXAMPLES:MYHELP ADDCONST PARAMETERS INPUT'
+  endparameter
+  parameter      CONST          # Scalar value to add
+     position    2
+     ...
+     helpkey     'ADAM_EXAMPLES:MYHELP ADDCONST PARAMETERS CONST'
+  endparameter
+endinterface
+\end{terminalv}
 An obvious refinement suggests itself. The location of the help library
 appropriate for  a program can be specified once in the interface file,
 and the helpkey associated with each
 parameter can merely point to the location of the help within that library.
 Indeed not just the library name, but a location within the help library
 hierarchy
-can be specified using the {\tt helplib} field.
+can be specified using the \texttt{helplib} field.
 Only the part specific to each parameter need be given in the
 helpkey field for that parameter.
 Thus the interface file for ADDCONST could be amended as shown below:
-\begin{verbatim}
-  interface ADDCONST
-     helplib     'ADAM_EXAMPLES:MYHELP ADDCONST PARAMETERS'
-     parameter      INPUT          # Input NDF
-        position    1
-        ...
-        helpkey     'INPUT'
-     endparameter
-     parameter      CONST          # Scalar value to add
-         position    2
-         ...
-        helpkey     'CONST'
-     endparameter
-  endinterface
-\end{verbatim}
-Having done this, the help can be accessed by typing {\tt ?}
+\begin{terminalv}
+interface ADDCONST
+  helplib     'ADAM_EXAMPLES:MYHELP ADDCONST PARAMETERS'
+  parameter      INPUT          # Input NDF
+     position    1
+     ...
+     helpkey     'INPUT'
+  endparameter
+  parameter      CONST          # Scalar value to add
+      position    2
+      ...
+     helpkey     'CONST'
+  endparameter
+endinterface
+\end{terminalv}
+Having done this, the help can be accessed by typing \texttt{?}
 in response to a prompt as shown below:
-\begin{verbatim}
-  $ RUN ADDCONST
-  INPUT - Input NDF structure > ?
+\begin{terminalv}
+$ RUN ADDCONST
+INPUT - Input NDF structure > ?
 
-  ADDCONST
+ADDCONST
 
-    PARAMETERS
+ PARAMETERS
 
-      INPUT
+   INPUT
 
-         INPUT = NDF (Update)
-         Input NDF data structure, to which the value is to be added.
+      INPUT = NDF (Update)
+      Input NDF data structure, to which the value is to be added.
 
-  INPUT - Input NDF structure >
-\end{verbatim}
-Typing {\tt ??} rather than {\tt ?} leaves the user in the HELP system
+INPUT - Input NDF structure >
+\end{terminalv}
+Typing \texttt{??} rather than \texttt{?} leaves the user in the HELP system
 to browse through any other available information. Pressing $<$CR$>$
 one or more times (according to the current level in the help library)
 restores the program
@@ -2977,12 +2769,12 @@ prompt.
 It is also possible to examine the help information without running the
 program. This is usually done under ICL using the command DEFHELP as
 shown below:
-\begin{verbatim}
-  $ ICL
-  ICL> DEFHELP ADDCONST ADAM_EXAMPLES:MYHELP
-  ICL> HELP ADDCONST
-       ... Help information appears
-\end{verbatim}
+\begin{terminalv}
+$ ICL
+ICL> DEFHELP ADDCONST ADAM_EXAMPLES:MYHELP
+ICL> HELP ADDCONST
+    ... Help information appears
+\end{terminalv}
 The directory where the help library resides must be specified in the
 DEFHELP command; otherwise
 DEFHELP will search for MYHELP.HLB in system directories.
@@ -2990,7 +2782,7 @@ DEFHELP will search for MYHELP.HLB in system directories.
 Usually help libraries contain information on a number of programs;
 other help files could be prepared and inserted into MYHELP.HLB.
 If a program has a standard ADAM prologue,
-an appropriate {\tt .HLP} file can be generated automatically; see
+an appropriate \texttt{.HLP} file can be generated automatically; see
 Section~\ref{prologues} for details.
 
 \newpage
@@ -3000,7 +2792,7 @@ All of the example programs discussed so far have been fairly short and
 to-the-point.
 However {\sl real\/} ADAM programs have lengthy prologues which describe
 the program's function, parameters, arguments, history, deficiencies, authors
-{\it etc.}
+\textit{etc.}
 The main purpose of such prologues is to document the program for
 prospective users and make the job of maintenance easier.
 
@@ -3019,55 +2811,55 @@ An example ADAM prologue is reproduced on the opposite page and the
 prologue of the accompanying interface file is reproduced below.
 The complete files are contained in ADAM\_EXAMPLES:CADD.FOR and
 {  CADD.IFL}.
-\begin{verbatim}
-  #+
-  #  Name:
-  #     CADD.IFL
+\begin{terminalv}
+#+
+#  Name:
+#     CADD.IFL
 
-  #  Type of module:
-  #     ADAM A-task parameter interface.
+#  Type of module:
+#     ADAM A-task parameter interface.
 
-  #  Author:
-  #     RFWS: R.F. Warren-Smith (STARLINK)
-  #     {enter_new_authors_here}
+#  Author:
+#     RFWS: R.F. Warren-Smith (STARLINK)
+#     {enter_new_authors_here}
 
-  #  History:
-  #     11-APR-1990 (RFWS):
-  #	 Original version.
-  #     {enter_changes_here}
+#  History:
+#     11-APR-1990 (RFWS):
+#	 Original version.
+#     {enter_changes_here}
 
-  #-
-\end{verbatim}
+#-
+\end{terminalv}
 The SST utilities used to produce documentation and help modules
 can be summarised as follow:
 \begin{description}
-\item{\bf PROLAT -- for producing \LaTeX\ documentation.}
+\item\textbf{PROLAT -- for producing \LaTeX\ documentation.}
 The PROLAT utility processes a file (or files) containing a prologue
 of the correct form,
-to produce a {\tt .TEX} file (called {\tt PROLAT.TEX} by default).
+to produce a \texttt{.TEX} file (called \texttt{PROLAT.TEX} by default).
 This file can then be processed in the normal way (see \xref{SUN/12}{sun12}{}).
 The sequence of commands  below illustrate the procedure for processing
-the file {\tt CADD.FOR}.
-\begin{verbatim}
+the file \texttt{CADD.FOR}.
+\begin{terminalv}
 $ SST                          ! Make SST available
 $ PROLAT CADD.FOR              ! Process CADD.FOR to produce PROLAT.TEX
 $ LATEX PROLAT                 ! Usual sequence to LaTeX and print
 $ DVICAN PROLAT
 $ PRCN PROLAT.DVI-CAN
-\end{verbatim}
-\item{\bf PROHLP -- for producing help libraries.} Just as PROLAT produces a
-{\tt .TEX} file, PROHLP produces a {\tt .HLP} text file (called
-{\tt PROHLP.HLP} by default) which can be inserted
+\end{terminalv}
+\item\textbf{PROHLP -- for producing help libraries.} Just as PROLAT produces a
+\texttt{.TEX} file, PROHLP produces a \texttt{.HLP} text file (called
+\texttt{PROHLP.HLP} by default) which can be inserted
 into a HELP library as shown below. (See Section~\ref{help} for more
 information on HELP libraries.)
-\begin{verbatim}
+\begin{terminalv}
 $ SST                                   ! Make SST available
 $ PROHLP CADD.FOR                       ! Process CADD.FOR to produce PROHLP.HLP
 $ LIBRARY/HELP MYHELP.HLB PROHLP.HLP    ! Insert HLP file into MYHELP.HLB
-\end{verbatim}
+\end{terminalv}
 \end{description}
 \newpage
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE CADD( STATUS )
 *+
 *  Name:
@@ -3125,7 +2917,7 @@ $ LIBRARY/HELP MYHELP.HLB PROHLP.HLP    ! Insert HLP file into MYHELP.HLB
 *     {note_any_bugs_here}
 
 *-
-\end{verbatim}
+\end{terminalv}
 
 \newpage
 \section{Building a monolith\label{monolith}\xlabel{building_a_monolith}}
@@ -3140,14 +2932,14 @@ all the programs intended to comprise the monolith.
 In this example  the library is called
 MIXLIB.OLB.\footnote{Of course this step is not really necessary; you could simply
 list all the .OBJ files individually at the link stage.}
-\begin{verbatim}
-  $ LIB/CREATE MIXLIB           ! Creates MIXLIB.OLB
-  $ LIB MIXLIB ADDNEW,REPDIM2   ! Puts ADDNEW.OBJ & REPDIM2.OBJ into MIXLIB.OLB
-\end{verbatim}
+\begin{terminalv}
+$ LIB/CREATE MIXLIB           ! Creates MIXLIB.OLB
+$ LIB MIXLIB ADDNEW,REPDIM2   ! Puts ADDNEW.OBJ & REPDIM2.OBJ into MIXLIB.OLB
+\end{terminalv}
 A master program which calls the program corresponding to the  command
 entered must now be written. MIXTURE.FOR below will call ADDNEW or REPDIM2 as
 appropriate.
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE MIXTURE (NAME, STATUS)
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -3160,53 +2952,53 @@ appropriate.
          CALL REPDIM2 (STATUS)
       ENDIF
       END
-\end{verbatim}
+\end{terminalv}
 This program must now be compiled and linked.
 The special MLINK command is used to link monoliths.
 The object code library, MIXLIB, and anything else
 needed to link the constituent programs
-({\it e.g.}\ graphics libraries) should also be included in the link.
-\begin{verbatim}
-  $ FOR MIXTURE
-  $ MLINK MIXTURE,MIXLIB/LIB
-\end{verbatim}
+(\textit{e.g.}\ graphics libraries) should also be included in the link.
+\begin{terminalv}
+$ FOR MIXTURE
+$ MLINK MIXTURE,MIXLIB/LIB
+\end{terminalv}
 A monolith interface file containing the interface files for each of  the
 constituent programs must now be created.
 MIXTURE.IFL is shown below. Note that the file begins with the
-line ``{\tt monolith}~{\sl monolith-name}'' and ends with
-``{\tt endmonolith}''.
+line ``\texttt{monolith}~{\sl monolith-name}'' and ends with
+``\texttt{endmonolith}''.
 All the necessary interface files are simply included in between.
-\begin{verbatim}
-  monolith mixture
-     interface addconst
-      ...
-     interface repdim2
-      ...
-  endmonolith
-\end{verbatim}
+\begin{terminalv}
+monolith mixture
+  interface addconst
+   ...
+  interface repdim2
+   ...
+endmonolith
+\end{terminalv}
 MIXTURE.ICL, an ICL command file to define the commands in the monolith should
 now be written. Each command points to the monolith which contains the
-program {\it i.e.} MIXTURE.EXE.
-\begin{verbatim}
-  define addnew  mixture
-  define repdim2 mixture
-\end{verbatim}
+program \textit{i.e.} MIXTURE.EXE.
+\begin{terminalv}
+define addnew  mixture
+define repdim2 mixture
+\end{terminalv}
 To try the monolith, simply
 enter ICL and load the procedure MIXTURE.ICL to define the commands.
 The first command which specifies a program in the monolith will cause the
 monolith to be loaded.
-\begin{verbatim}
-  $ ICL
-  ICL> LOAD MIXTURE     ! Defines commands
-  ICL> REPDIM2          ! Loads MIXTURE monolith
-\end{verbatim}
+\begin{terminalv}
+$ ICL
+ICL> LOAD MIXTURE     ! Defines commands
+ICL> REPDIM2          ! Loads MIXTURE monolith
+\end{terminalv}
 
 \newpage
 \section{Miscellaneous ADAM packages\label{misc}\xlabel{miscellaneous_adam_packages}}
 
 The following packages may also be of interest:
 \begin{description}
-\item{\bf AGI -- Applications Graphics Interface.} AGI is a graphics-database
+\item\textbf{AGI -- Applications Graphics Interface.} AGI is a graphics-database
 system  which is used to retain information associated with a plot after the
 program creating the plot has finished. This information can be recalled
 by subsequent programs.
@@ -3220,37 +3012,37 @@ can then retrieve the coordinate system used by the first
 program and can thus be used to measure positions on the plot.
 This set of routines is linked as shown below.
 See \xref{SUN/48}{sun48}{} for a full description.
-\begin{verbatim}
-  $ ALINK prog,AGI_DIR:AGILINK/OPT
-\end{verbatim}
+\begin{terminalv}
+$ ALINK prog,AGI_DIR:AGILINK/OPT
+\end{terminalv}
 
-\item{\bf IDI -- Image Display Interface.}
+\item\textbf{IDI -- Image Display Interface.}
 IDI provides a device-independent way of writing programs to perform
 image display.
-GKS provides limited image display facilities, {\it i.e.} an image can be
+GKS provides limited image display facilities, \textit{i.e.} an image can be
 displayed  and  its look-up table changed.
 Unlike GKS, IDI allows an image to be zoomed and panned, and a
 `snapshot' can be taken of an image, enabling a hardcopy to be made
 (see KAPPA SNAPSHOT application).
 IDI routines are linked as shown below; see \xref{SUN/65}{sun65}{} for details.
-\begin{verbatim}
-  $ ALINK prog,IDI_DIR:IDILINK/OPT
-\end{verbatim}
+\begin{terminalv}
+$ ALINK prog,IDI_DIR:IDILINK/OPT
+\end{terminalv}
 
-\item{\bf SLALIB.} This is a collection of subroutines and functions
+\item\textbf{SLALIB.} This is a collection of subroutines and functions
 most of which are concerned with astronomical position and time.
 If you want a routine to find the approximate heliocentric position and
 velocity of the Earth on a particular date, SLALIB is the place to look.
 There are also more general mathematical routines which perform
 matrix operations, random number generation, trigonometrical functions
-{\it etc.}
+\textit{etc.}
 See \xref{SUN/67}{sun67}{} for a full description.
 SLALIB routines are linked as shown below:
-\begin{verbatim}
-  $ ALINK prog,SLALIB_DIR:SLALIB/LIB
-\end{verbatim}
+\begin{terminalv}
+$ ALINK prog,SLALIB_DIR:SLALIB/LIB
+\end{terminalv}
 
-\item{\bf Magnetic tape handling.}
+\item\textbf{Magnetic tape handling.}
 The MAG\_ package provides facilities for positioning, reading, and writing
 magnetic tapes.
 To link an ADAM program with the MAG  library, it is necessary to
@@ -3258,9 +3050,9 @@ include the options file
 ADAM\_LIB:MAGLINK/OPT in the link command as shown below.
 See APN/1 for a full
 description.
-\begin{verbatim}
-  $ ALINK task,ADAM_LIB:MAGLINK/OPT
-\end{verbatim}
+\begin{terminalv}
+$ ALINK task,ADAM_LIB:MAGLINK/OPT
+\end{terminalv}
 
 \end{description}
 \newpage
@@ -3275,11 +3067,10 @@ Only the main data array must be present; all the other items are optional.
 ADAM\_EXAMPLES:EXAMPLE.SDF is an NDF which contains all the standard
 NDF components and also has a Figaro extension.
 The structure of the file
-(as revealed by {\tt \$ TRACE ADAM\_EXAMPLES:EXAMPLE}) is shown below.
+(as revealed by \texttt{\$ TRACE ADAM\_EXAMPLES:EXAMPLE}) is shown below.
 
-
-\begin{verbatim}
-
+\begin{small}
+\begin{terminalv}
 EXAMPLE  <NDF>
 
    DATA_ARRAY(856)  <_REAL>       -1.7014117E38,0.2284551,-2.040089,
@@ -3318,10 +3109,9 @@ EXAMPLE  <NDF>
          TIME           <_REAL>         1275
          SECZ           <_REAL>         2.13
 
-
-
 End of Trace.
-\end{verbatim}
+\end{terminalv}
+\end{small}
 \newpage
 
 Of course, this is only an example format. There are various ways of
@@ -3334,24 +3124,24 @@ access routines to identify the components.
 
 \begin{description}
 
-\item[{\bf DATA}] -- the main data array is the only
+\item[\textbf{DATA}] -- the main data array is the only
 component which must be present in an NDF.
 In the case of EXAMPLE.SDF, the data component is a 1-d
 array of real type with 856 elements.
 
-\item[{\bf TITLE}] -- the  character string {\tt'HR6259 - AAT fibre
+\item[\textbf{TITLE}] -- the  character string {\tt'HR6259 - AAT fibre
 data'} describes the contents of the NDF. The NDF's TITLE
-might be used as the title of a graph {\it etc.}
+might be used as the title of a graph \textit{etc.}
 
-\item[{\bf LABEL}] -- the character string {\tt'Flux'} describes the
+\item[\textbf{LABEL}] -- the character string {\tt'Flux'} describes the
 quantity represented in the NDF's main data array. The LABEL is
-intended for use on the axis of graphs {\it etc.}
+intended for use on the axis of graphs \textit{etc.}
 
-\item[{\bf UNITS}] -- this character string
+\item[\textbf{UNITS}] -- this character string
 describes the physical units of the quantity stored in the main data
 array, in this case, {\tt'Counts/s'}.
 
-\item[{\bf QUALITY}] -- this component is used to indicate
+\item[\textbf{QUALITY}] -- this component is used to indicate
 the quality of each element in the main data array.
 The quality structure contains a
 quality array and a BADBITS value, both of which {\sl must\/} be of
@@ -3364,20 +3154,20 @@ This means that a value of 1 in the quality array indicates a bad pixel
 in the main data array, whereas any other value indicates that
 the associated pixel is good.
 
-\item[{\bf VARIANCE}] -- the variance array is the same shape and size
+\item[\textbf{VARIANCE}] -- the variance array is the same shape and size
 as the main data array and contains the errors
 associated with the individual data values.
 These are stored as {\sl variance\/} estimates for each
 pixel.
 
-\item[{\bf AXIS}] -- the AXIS structure may contain axis information
+\item[\textbf{AXIS}] -- the AXIS structure may contain axis information
 for any dimension of the NDF's main array.
 In this case, the main data array is only 1-d, therefore only the
 AXIS(1) structure is present.
 This structure contains the actual axis data array, and also
 label and units information.
 
-\item[{\bf HISTORY}] -- the history component provides a record of
+\item[\textbf{HISTORY}] -- the history component provides a record of
 the processing history of the NDF.
 Only the first of three records is shown for EXAMPLE.SDF. This indicates
 that the spectrum was extracted from fibre data using the Figaro FINDSP
@@ -3397,7 +3187,7 @@ use these values will know where to find them.
 \end{description}
 
 \newpage
-\newcommand{\japp}[2]{\item{\tt\hspace*{-5mm} #1} -- {#2}}
+\providecommand{\japp}[2]{\item{\tt\hspace*{-5mm} #1} -- {#2}}
 \section{NDF routine summary\label{apxrod}\xlabel{ndf_routine_summary}}
 
 {\small
@@ -3583,7 +3373,7 @@ The correspondence between Fortran types and HDS data types is as follows:
 
 \begin{center}
 \begin{tabular}{|l|l|} \hline
-{\bf HDS Type} & {\bf VAX FORTRAN Type}\\ \hline
+\textbf{HDS Type} & \textbf{VAX FORTRAN Type}\\ \hline
 \_INTEGER & INTEGER \\
 \_REAL & REAL \\
 \_DOUBLE & DOUBLE PRECISION\\
@@ -3598,17 +3388,17 @@ The correspondence between Fortran types and HDS data types is as follows:
 \end{center}
 
 For example, a variable declared as REAL in a program has HDS type
-{\tt '\_REAL'}.
+\texttt{'\_REAL'}.
 It is necessary to appreciate that if the data type is
 an argument in a
 routine then that  argument should be '\_REAL' rather than 'REAL'.
 For example:
-\begin{verbatim}
+\begin{terminalv}
       CALL NDF_MAP (NDF, 'Data', '_REAL', 'UPDATE', PTR, NELM, STATUS)
-\end{verbatim}
+\end{terminalv}
 
-{\sl N.B. HDS structures also have a type, although this is purely descriptive.
-For example, the type of an axis  structure in an NDF is {\tt AXIS}.
+\textsl{N.B. HDS structures also have a type, although this is purely descriptive.
+For example, the type of an axis  structure in an NDF is \texttt{AXIS}.
 The only restriction on the names of structure types is that they
 must not begin with an underscore (to distinguish them from
 primitive data types).}
@@ -3624,20 +3414,20 @@ A full description will shortly be available, that is,
 
 \begin{description}
 
-\item{\tt PAR\_CANCL (PARAM, STATUS)}
+\item\texttt{PAR\_CANCL (PARAM, STATUS)}
  -- cancel a parameter.
 The named parameter is cancelled and any storage associated
 with it is released. A subsequent attempt to get a value for the
 parameter will result in a new value being obtained by the
 underlying parameter system.
 
-\item{\tt PAR\_DEF0x(PAR, VALUE, STATUS)}
+\item\texttt{PAR\_DEF0x(PAR, VALUE, STATUS)}
 -- set scalar dynamic default parameter value.
 This routine sets a scalar as the dynamic default value for a
 parameter. The dynamic default may be used as the parameter
 value by means of appropriate specifications in the interface file.
 
-\item{\tt PAR\_DEF1x (PARAM, NVAL VALUES, STATUS)}
+\item\texttt{PAR\_DEF1x (PARAM, NVAL VALUES, STATUS)}
 -- set a 1-D array of values as the dynamic default for a parameter.
 This routine sets a 1-D array of values as the dynamic default for
 a parameter of primitive type. The dynamic default may be used as
@@ -3645,7 +3435,7 @@ the parameter value by  means of appropriate specifications in the interface
 file.
 
 
-\item{\tt PAR\_DEFNx (PARAM, NDIM, MAXD, VALUES, ACTD, STATUS)}
+\item\texttt{PAR\_DEFNx (PARAM, NDIM, MAXD, VALUES, ACTD, STATUS)}
 -- set an array of values as the dynamic default for a parameter.
 This routine sets an array of values as the dynamic default for
 a parameter of primitive type. The dynamic default may be used
@@ -3653,47 +3443,47 @@ as the parameter value by  means of appropriate specifications in the
 interface file.
 
 
-\item{\tt PAR\_GET0x (PARAM, VALUE, STATUS)}
+\item\texttt{PAR\_GET0x (PARAM, VALUE, STATUS)}
 -- obtain a scalar parameter value.
 This routine obtains a primitive scalar parameter value.
 
 
-\item{\tt PAR\_GET1x (PARAM, MAXVAL, VALUES, ACTVAL, STATUS)}
+\item\texttt{PAR\_GET1x (PARAM, MAXVAL, VALUES, ACTVAL, STATUS)}
 -- read vector parameter values.
 This routine obtains a primitive vector parameter value.
 
 
-\item{\tt PAR\_GETNx (PARAM, NDIM, MAXD, VALUES, ACTD, STATUS)}
+\item\texttt{PAR\_GETNx (PARAM, NDIM, MAXD, VALUES, ACTD, STATUS)}
 -- obtain an array parameter value.
 This routine obtains a primitive array parameter value.
 
 
 
-\item{\tt PAR\_GETVx (PARAM, MAXVAL, VALUES, ACTVAL, STATUS)}
+\item\texttt{PAR\_GETVx (PARAM, MAXVAL, VALUES, ACTVAL, STATUS)}
 -- read parameter values as if object were a vector.
 This routine reads the values from a primitive parameter storage
-object as if it were vectorized ({\it i.e.} regardless of its dimensionality).
+object as if it were vectorized (\textit{i.e.} regardless of its dimensionality).
 
-\item{\tt PAR\_PROMT (PARAM, PROMPT, STATUS)}
+\item\texttt{PAR\_PROMT (PARAM, PROMPT, STATUS)}
 -- set a new prompt string for a parameter.
 Replace the prompt string for the indicated parameter by the
 given string.
 
 
-\item{\tt PAR\_PUT0x (PARAM, VALUE, STATUS)}
+\item\texttt{PAR\_PUT0x (PARAM, VALUE, STATUS)}
 -- write a scalar parameter value.
 This routine puts a primitive scalar value into the storage object
 for the named parameter.
 
 
 
-\item{\tt PAR\_PUT1x (PAR, NVAL, VALUES, STATUS)}
+\item\texttt{PAR\_PUT1x (PAR, NVAL, VALUES, STATUS)}
 -- write vector parameter values.
 This routine puts a 1-D array of primitive values into the storage
 object for the named parameter.
 
 
-\item{\tt PAR\_PUTNx (PARAM, NDIM, MAXD, VALUES, ACTD, STATUS)}
+\item\texttt{PAR\_PUTNx (PARAM, NDIM, MAXD, VALUES, ACTD, STATUS)}
 -- write array parameter values.
 This routine puts an $n$-dimensional array of primitive values into
 the storage object
@@ -3702,110 +3492,110 @@ for the named parameter.
 \end{description}
 
 \newpage
-\section{Character handling routines\label{apxchar}\xlabel{character_handling_routines}}
+\section{Character handling routines\label{apxchar}\xlabel{character_handling_routines_app}}
 
 The following are subroutines unless specifically indicated as functions.
 \begin{tabbing}
- {{\tt{CHR\_DELIM(}}{\em string, delim, index1, index2}{\tt )}} \=
+ {{\tt{CHR\_DELIM(}}\emph{string, delim, index1, index2}\texttt{)}} \=
  Locate substring with given delimiter character.\kill
-{\bf Decoding Routines}\\
- {{\tt{CHR\_CTOD(}}{\em string, dvalue, status}{\tt )}}  \>
+\textbf{Decoding Routines}\\
+ {{\tt{CHR\_CTOD(}}\emph{string, dvalue, status}\texttt{)}}  \>
  Read a double precision number from a character string.\\
- {{\tt{CHR\_CTOI(}}{\em string, ivalue, status}{\tt )}}\>
+ {{\tt{CHR\_CTOI(}}\emph{string, ivalue, status}\texttt{)}}\>
  Read an integer number from a character string.\\
- {{\tt{CHR\_CTOL(}}{\em string, lvalue, status}{\tt )}}\>
+ {{\tt{CHR\_CTOL(}}\emph{string, lvalue, status}\texttt{)}}\>
  Read a logical value from a character string.\\
- {{\tt{CHR\_CTOR(}}{\em string, rvalue, status}{\tt )}}\>
+ {{\tt{CHR\_CTOR(}}\emph{string, rvalue, status}\texttt{)}}\>
  Read a real number from a character string.\\
- {{\tt{CHR\_DCWRD(}}{\em string, mxw, nwrd, start, stop,words, lstat}{\tt )}}
+ {{\tt{CHR\_DCWRD(}}\emph{string, mxw, nwrd, start, stop,words, lstat}\texttt{)}}
  Returns all the words in a string.\\
- {{\tt{CHR\_HTOI(}}{\em string, ivalue, status}{\tt )}}\>
+ {{\tt{CHR\_HTOI(}}\emph{string, ivalue, status}\texttt{)}}\>
  Read an integer from a hex string.\\
- {{\tt{CHR\_OTOI(}}{\em string, ivalue, status}{\tt )}}\>
+ {{\tt{CHR\_OTOI(}}\emph{string, ivalue, status}\texttt{)}}\>
  Read an integer from an octal string.\\
 \\
-{\bf Encoding and Formatting Routines}\\
- {{\tt{CHR\_CTOC(}}{\em value, cvalue, nchar}{\tt )}}\>
+\textbf{Encoding and Formatting Routines}\\
+ {{\tt{CHR\_CTOC(}}\emph{value, cvalue, nchar}\texttt{)}}\>
  Write a character value into a string.\\
- {{\tt{CHR\_DTOC(}}{\em dvalue, cvalue, nchar}{\tt )}}\>
+ {{\tt{CHR\_DTOC(}}\emph{dvalue, cvalue, nchar}\texttt{)}}\>
  Encode a double precision value as a string.\\
- {{\tt{CHR\_ITOC(}}{\em ivalue, cvalue, nchar}{\tt )}}\>
+ {{\tt{CHR\_ITOC(}}\emph{ivalue, cvalue, nchar}\texttt{)}}\>
  Encode an integer value as a string.\\
- {{\tt{CHR\_LTOC(}}{\em lvalue, cvalue, nchar}{\tt )}}\>
+ {{\tt{CHR\_LTOC(}}\emph{lvalue, cvalue, nchar}\texttt{)}}\>
  Encode a logical value as a string.\\
- {{\tt{CHR\_RTOC(}}{\em rvalue, cvalue, nchar}{\tt )}}\>
+ {{\tt{CHR\_RTOC(}}\emph{rvalue, cvalue, nchar}\texttt{)}}\>
  Encode a real value as a string.\\
- {{\tt{CHR\_PUTC(}}{\em cvalue, string, length}{\tt )}}\>
+ {{\tt{CHR\_PUTC(}}\emph{cvalue, string, length}\texttt{)}}\>
  Copy one string into another at given position.\\
- {{\tt{CHR\_PUTD(}}{\em dvalue, string, length}{\tt )}}\>
+ {{\tt{CHR\_PUTD(}}\emph{dvalue, string, length}\texttt{)}}\>
  Put double precision value into string at given position.\\
- {{\tt{CHR\_PUTI(}}{\em ivalue, string, length}{\tt )}}\>
+ {{\tt{CHR\_PUTI(}}\emph{ivalue, string, length}\texttt{)}}\>
  Put integer value into string at given position.\\
- {{\tt{CHR\_PUTL(}}{\em lvalue, string, length}{\tt )}}\>
+ {{\tt{CHR\_PUTL(}}\emph{lvalue, string, length}\texttt{)}}\>
  Put logical value into string at given position.\\
- {{\tt{CHR\_PUTR(}}{\em rvalue, string, length}{\tt )}}\>
+ {{\tt{CHR\_PUTR(}}\emph{rvalue, string, length}\texttt{)}}\>
  Put real value into string at given position.\\
- {{\tt{CHR\_RTOAN(}}{\em rvalue, units, string, length}{\tt )}}\>
+ {{\tt{CHR\_RTOAN(}}\emph{rvalue, units, string, length}\texttt{)}}\>
  Write a real into character string as hr/deg:min:sec.\\
 \\
-{\bf Enquiry Routines}\\
- {{\tt{CHR\_DELIM(}}{\em string, delim, index1, index2}{\tt )}} \>
+\textbf{Enquiry Routines}\\
+ {{\tt{CHR\_DELIM(}}\emph{string, delim, index1, index2}\texttt{)}} \>
  Locate substring with given delimiter character.\\
- {{\tt{CHR\_EQUAL(}}{\em str1, str2}{\tt )}}\>
+ {{\tt{CHR\_EQUAL(}}\emph{str1, str2}\texttt{)}}\>
  Determine whether two strings are equal. (Logical function)\\
- {{\tt{CHR\_FANDL(}}{\em string, index1, index2}{\tt )}}\>
+ {{\tt{CHR\_FANDL(}}\emph{string, index1, index2}\texttt{)}}\>
  Find the indices of the first and last non-blank characters.\\
- {{\tt{CHR\_FIWE(}}{\em string, index, status}{\tt )}}\>
+ {{\tt{CHR\_FIWE(}}\emph{string, index, status}\texttt{)}}\>
  Find next end of word.\\
- {{\tt{CHR\_FIWS(}}{\em string, index, status}{\tt )}}\>
+ {{\tt{CHR\_FIWS(}}\emph{string, index, status}\texttt{)}}\>
  Find start of next word.\\
- {{\tt{CHR\_INDEX(}}{\em string, substr}{\tt )}}\>
+ {{\tt{CHR\_INDEX(}}\emph{string, substr}\texttt{)}}\>
  Find the index of a substring in a string. (Integer function)\\
- {{\tt{CHR\_INSET(}}{\em set, string}{\tt )}}\>
+ {{\tt{CHR\_INSET(}}\emph{set, string}\texttt{)}}\>
  Determine whether a string is a member of a set. (Logical function)\\
- {{\tt{CHR\_ISALF(}}{\em char}{\tt )}}\>
+ {{\tt{CHR\_ISALF(}}\emph{char}\texttt{)}}\>
  Determine whether a character is alphabetic. (Logical function)\\
- {{\tt{CHR\_ISALM(}}{\em char}{\tt )}}\>
+ {{\tt{CHR\_ISALM(}}\emph{char}\texttt{)}}\>
  Determine whether a character is alphanumeric. (Logical function)\\
- {{\tt{CHR\_ISDIG(}}{\em char}{\tt )}}\>
+ {{\tt{CHR\_ISDIG(}}\emph{char}\texttt{)}}\>
  Determine whether a character is a digit. (Logical function)\\
- {{\tt{CHR\_ISNAM(}}{\em string}{\tt )}}\>
+ {{\tt{CHR\_ISNAM(}}\emph{string}\texttt{)}}\>
  Determine whether a string is a valid name. (Logical function)\\
- {{\tt{CHR\_LEN(}}{\em string}{\tt )}}\>
+ {{\tt{CHR\_LEN(}}\emph{string}\texttt{)}}\>
  Find used length of string. (Integer function)\\
- {{\tt{CHR\_SIMLR(}}{\em str1, str2}{\tt )}}\>
+ {{\tt{CHR\_SIMLR(}}\emph{str1, str2}\texttt{)}}\>
  Determine if two strings are equal apart from case. (Logical function)\\
- {{\tt{CHR\_SIZE(}}{\em string}{\tt )}}\>
+ {{\tt{CHR\_SIZE(}}\emph{string}\texttt{)}}\>
  Find the declared size of string. (Integer function)\\
 \\
-{\bf String Manipulation Routines}\\
- {{\tt{CHR\_APPND(}}{\em str1, str2, len2}{\tt )}}\>
+\textbf{String Manipulation Routines}\\
+ {{\tt{CHR\_APPND(}}\emph{str1, str2, len2}\texttt{)}}\>
  Copy one string into another -- ignoring trailing blanks.\\
- {{\tt{CHR\_CLEAN(}}{\em string}{\tt )}}\>
+ {{\tt{CHR\_CLEAN(}}\emph{string}\texttt{)}}\>
  Remove all non-printable {\tt{ASCII}} characters from a string.\\
- {{\tt{CHR\_COPY(}}{\em instr, flag, outstr, lstat}{\tt )}}\>
+ {{\tt{CHR\_COPY(}}\emph{instr, flag, outstr, lstat}\texttt{)}}\>
  Copy one string to another, checking for truncation.\\
- {{\tt{CHR\_FILL(}}{\em char, string}{\tt )}}\>
+ {{\tt{CHR\_FILL(}}\emph{char, string}\texttt{)}}\>
  Fill a string with a given character.\\
- {{\tt{CHR\_LCASE(}}{\em string}{\tt )}}\>
+ {{\tt{CHR\_LCASE(}}\emph{string}\texttt{)}}\>
  Convert a string to lower case.\\
- {{\tt{CHR\_LDBLK(}}{\em string}{\tt )}}\>
+ {{\tt{CHR\_LDBLK(}}\emph{string}\texttt{)}}\>
  Remove leading blanks from a string.\\
- {{\tt{CHR\_LOWER(}}{\em achar}{\tt )}}\>
+ {{\tt{CHR\_LOWER(}}\emph{achar}\texttt{)}}\>
  Give lower case equivalent of a character. (Character function)\\
- {{\tt{CHR\_MOVE(}}{\em str1, str2}{\tt )}}\>
+ {{\tt{CHR\_MOVE(}}\emph{str1, str2}\texttt{)}}\>
  Move one string into another -- ignoring trailing blanks.\\
- {{\tt{CHR\_RMBLK(}}{\em string}{\tt )}}\>
+ {{\tt{CHR\_RMBLK(}}\emph{string}\texttt{)}}\>
  Remove all blanks from a string in situ.\\
- {{\tt{CHR\_SWAP(}}{\em c1, c2}{\tt )}}\>
+ {{\tt{CHR\_SWAP(}}\emph{c1, c2}\texttt{)}}\>
  Swap two single-character variables.\\
- {{\tt{CHR\_TERM(}}{\em length, string}{\tt )}}\>
+ {{\tt{CHR\_TERM(}}\emph{length, string}\texttt{)}}\>
  Terminate string by padding out with blanks.\\
- {{\tt{CHR\_TRUNC(}}{\em delim, string}{\tt )}}\>
+ {{\tt{CHR\_TRUNC(}}\emph{delim, string}\texttt{)}}\>
  Truncate string rightwards from a given delimiter.\\
- {{\tt{CHR\_UCASE(}}{\em string}{\tt )}}\>
+ {{\tt{CHR\_UCASE(}}\emph{string}\texttt{)}}\>
  Convert a string to upper case.\\
- {{\tt{CHR\_UPPER(}}{\em achar}{\tt )}}\>
+ {{\tt{CHR\_UPPER(}}\emph{achar}\texttt{)}}\>
  Give upper case equivalent of a character. (Character function)
 \end{tabbing}
 \end{document}
