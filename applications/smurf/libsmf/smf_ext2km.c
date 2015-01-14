@@ -80,10 +80,14 @@
 *        section, and so the length of the 3rd NDF pixel axis may not be
 *        the same as the number of time slices in the time-ordered extension
 *        arrays.
+*     14-JAN-2015 (DSB):
+*        Report an error if the lower pixel index bound on the detector
+*        axis is not 1, or the upper bound is not equal to the number of
+*        receptors in the ACSIS extension.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008,2015 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -136,6 +140,7 @@ void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap,
    int prim;
    int there;
    int ubnd[ NDF__MXDIM ];
+   size_t ndet;
 
 /* Check the inherited status */
    if( *status != SAI__OK ) return;
@@ -175,6 +180,24 @@ void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap,
       datShape( cloc, NDF__MXDIM, dim, &ndim, status );
       ntime = dim[ ndim - 1 ];
       datAnnul( &cloc, status );
+   }
+
+/* Check the pixel index bounds of the detector axis look correct (we
+   cannot handle NDF sections). */
+   if( !strcmp( xname, "ACSIS" ) ) {
+      datFind( xloc, "RECEPTORS", &cloc, status );
+      datSize( cloc, &ndet, status );
+      datAnnul( &cloc, status );
+      if( ( lbnd[ 1 ] != 1 || ubnd[ 1 ] != (int) ndet ) && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         msgSeti( "L", lbnd[ 1 ] );
+         msgSeti( "U", ubnd[ 1 ] );
+         msgSeti( "N", ndet );
+         ndfMsg( "F", indf );
+         errRep( " ", "Unexpected pixel index bounds (^L:^U) on the detector "
+                  "axis (axis 2) of '^F'. The bounds on the detector axis "
+                  "should be (1:^N).", status );
+      }
    }
 
 /* First deal with mode 1... */
