@@ -93,8 +93,8 @@
          undef %used;
       }
 
-#  Note if we are in a Latex "verbatim" environment.
-      if ( /^ *\\begin\{verbatim\} *$/ ) { $verbatim = 1 };
+#  Note if we are in a Latex "verbatim" or "terminalv" environment.
+      if ( /^ *\\begin\{(verbatim|terminalv)\} *$/ ) { $verbatim = 1 };
 
 #  Count the source lines read from each section.
       $source_line++;
@@ -122,6 +122,10 @@
 #  linkified.
          $atfun = ( $linkatfun && ( /^ *$label_q:/ ) );
 
+#  Is this a caption? Do not replace entries in first part of caption
+# that appears in TOC LOF
+         $iscap = /\\caption/;
+
 #  Check if a link should be made. Omit links in "verbatim" environments,
 #  in any line which starts a new section (because labels don't work properly
 #  if they get into the table of contents), in the 4th line of an SST
@@ -130,6 +134,7 @@
 #  is in a list of Function or Attribute descriptions, if it is at the start 
 #  of the line  and is followed by a colon.
          if ( $atfun || ( !$verbatim &&
+                          !$iscap &&
                           !$sx &&
                           !( $inr && ( $source_line == 4 ) ) &&
                           !$used{ $label } ) )  {
@@ -151,7 +156,7 @@
       }
 
 #  Detect the end of "verbatim" environments.
-      if ( /^ *\\end\{verbatim\} *$/ ) { $verbatim = 0 };
+      if ( /^ *\\end\{(verbatim|terminalv)\} *$/ ) { $verbatim = 0 };
 
 #  Output the modified line.
       print;
