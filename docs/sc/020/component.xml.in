@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sc/020</path>
+  <description>The Heterodyne Data Reduction Cookbook</description>
+  <abstract><p>
+      This cookbook provides a short introduction to Starlink
+      facilities, especially SMURF, the Sub-Millimetre User
+      Reduction Facility and Kappa, the Kernel Application
+      Package, for reducing, displaying, and analysing ACSIS data. In
+      particular, this cookbook illustrates the various steps required
+      to reduce the data; and gives an overview of the ORAC-DR
+      pipeline which carries out many of these steps using a single
+      command. Specialised pipeline recipes are discussed.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Holly S. Thomas</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>2014</year>
+    <name>STFC</name>
+  </copyright>
+</component>
