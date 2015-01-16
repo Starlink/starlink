@@ -28,7 +28,7 @@ f     In addition to those routines applicable to all Regions, the
 f     following routines may also be applied to all Circles:
 *
 c     - astCirclePars: Get the geometric parameters of the Circle
-c     - AST_CIRCLEPARS: Get the geometric parameters of the Circle
+f     - AST_CIRCLEPARS: Get the geometric parameters of the Circle
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
