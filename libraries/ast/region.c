@@ -111,7 +111,7 @@ c     - astGetRegionBounds: Get the bounds of a Region
 f     - AST_GETREGIONBOUNDS: Get the bounds of a Region
 c     - astGetRegionFrame: Get a copy of the Frame represent by a Region
 f     - AST_GETREGIONFRAME: Get a copy of the Frame represent by a Region
-f     - astGetRegionFrameSet: Get a copy of the Frameset encapsulated by a Region
+c     - astGetRegionFrameSet: Get a copy of the Frameset encapsulated by a Region
 f     - AST_GETREGIONFRAMESET: Get a copy of the Frameset encapsulated by a Region
 c     - astGetRegionMesh: Get a mesh of points covering a Region
 f     - AST_GETREGIONMESH: Get a mesh of points covering a Region

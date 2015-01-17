@@ -4170,8 +4170,8 @@ f        An array with one element for each Frame axis
 c     unc
 f     UNC = INTEGER (Given)
 *        An optional pointer to an existing Region which specifies the
-*        uncertainties associated with the boundary of the Box being created.
-*        The uncertainty in any point on the boundary of the Box is found by
+*        uncertainties associated with the boundary of the Interval being created.
+*        The uncertainty in any point on the boundary of the Interval is found by
 *        shifting the supplied "uncertainty" Region so that it is centred at
 *        the boundary point being considered. The area covered by the
 *        shifted uncertainty Region then represents the uncertainty in the
@@ -4183,11 +4183,11 @@ f     UNC = INTEGER (Given)
 *        or be a Prism containing centro-symetric component Regions. A deep
 *        copy of the supplied Region will be taken, so subsequent changes to
 *        the uncertainty Region using the supplied pointer will have no
-*        effect on the created Box. Alternatively,
+*        effect on the created Interval. Alternatively,
 f        a null Object pointer (AST__NULL)
 c        a NULL Object pointer
 *        may be supplied, in which case a default uncertainty is used
-*        equivalent to a box 1.0E-6 of the size of the Box being created.
+*        equivalent to a box 1.0E-6 of the size of the Interval being created.
 *
 *        The uncertainty Region has two uses: 1) when the
 c        astOverlap

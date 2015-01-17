@@ -1667,7 +1667,7 @@ f     UNC = INTEGER (Given)
 *        or be a Prism containing centro-symetric component Regions. A deep
 *        copy of the supplied Region will be taken, so subsequent changes to
 *        the uncertainty Region using the supplied pointer will have no
-*        effect on the created Box. Alternatively,
+*        effect on the created NullRegion. Alternatively,
 f        a null Object pointer (AST__NULL)
 c        a NULL Object pointer
 *        may be supplied, in which case a default uncertainty of zero is
