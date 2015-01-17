@@ -1,284 +1,42 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt]{starlink}
 
 % ? Specify used packages
-  \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
 
-\pagestyle{myheadings}
+
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {107.4}
-\newcommand{\stardocauthors}   {M J Bly}
-\newcommand{\stardocdate}      {6 August 1998}
-\newcommand{\stardoctitle}     {MAPLE \\[2ex]
+\stardocnumber      {107.4}
+\stardocauthors     {M J Bly}
+\stardocdate        {6 August 1998}
+\stardoctitle     {MAPLE \\[2ex]
                                 Mathematical Manipulation Language}
-\newcommand{\stardocversion}   {Maple V release 4}
-\newcommand{\stardocmanual}    {User's Guide}
-\newcommand{\stardocabstract}  {%
-
+\stardocversion     {Maple V release 4}
+\stardocmanual      {User's Guide}
+\stardocabstract  {%
 MAPLE is a commercial software package for symbolic mathematical
 calculation developed by the Symbolic Computation Group at the
 University of Waterloo.  Starlink has a licence to run MAPLE on the
 central Unix service at RAL. MAPLE has facilities for symbolic algebra
 mathematical manipulation and provides a powerful facility for solving
 many types of mathematical problem.
-
 }
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % from the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
+% ? Document-specific \providecommand or \newenvironment commands.
 % ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\begin{latexonly}
-    \setlength{\parskip}{0mm}
-   \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 % ? Main text
 
@@ -345,15 +103,15 @@ It does provide simple character plots.
 
 To start the command line interface, just type:
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 % maple
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 (\texttt{\%} is the shell prompt).
 
 You will see a banner similar to this:
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 % maple
     |\^/|     Maple V Release 4 (WMI Temporary License)
 ._|\|   |/|_. Copyright (c) 1981-1996 by Waterloo Maple Inc. All rights
@@ -361,25 +119,25 @@ You will see a banner similar to this:
  <____ ____>  Waterloo Maple Inc.
       |       Type ? for help.
 >
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 (\verb+>+ is the MAPLE command-line prompt).
 
 You can access the help system for MAPLE by using the \texttt{`?'} command.
 An introduction is available if you type:
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 > ?intro
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 To leave the MAPLE command-line interface and exit back to the shell,
 use the \texttt{`quit'} command:
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 > quit
 bytes used=374712, alloc=393144, time=0.18
 %
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 \subsection{\xlabel{the_X11_interface}The X11 interface}
 
@@ -392,30 +150,30 @@ system console).
 
 To do this, use the \texttt{xdisplay} command:
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 % xdisplay your.machine.name
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 or set the \texttt{DISPLAY} variable by hand:
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 % setenv DISPLAY  your.machine.name:0.0
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 You should also make sure you have allowed access to the local system by
 setting the secuity masks using the \texttt{xhost} command on your local
 machine:
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 % xhost +central.machine.name
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 When you have X output directed to your local system you should start the
 X11 interface with the \texttt{xmaple} command:
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 % xmaple
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 A window similar to Figure~\ref{fig_main_window} will be generated on your
 console/Xterminal.
@@ -439,7 +197,7 @@ lines after the \verb+>+ prompt and the computer replies with the next line.
 The notes after the example explain some of the features you may find
 mysterious at first reading.
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 > 3+4+5;
                                12
 > e1:=expand(x*(x+1)*(x-1));
@@ -459,7 +217,7 @@ mysterious at first reading.
      ... lists the functions in the Maple library
 > quit
      ... escapes from Maple
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 The second command illustrates the assignment operator \texttt{`:='}. It
 assigns the expression on the right of the operator to the variable
@@ -484,15 +242,15 @@ MAPLE has a very large number of functions available. You can find an
 explanation of these functions and examples of their use by typing the
 command:
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 > help(<function>);
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 during a MAPLE session. For example,
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 > help(int);
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 will describe the \texttt{`int'} function which performs integration.
 
@@ -565,28 +323,28 @@ packages which specialise in particular areas of mathematics. These are:
 Information on these packages can be obtained from within MAPLE by
 entering:
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 > help(<package>);
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 and information on the functions within a package can be obtained by:
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 > help(<package>,<topic>);
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 Thus, if you were learning calculus you could find help by entering:
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 > help(student);
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 and if you were particularly interested in finding out how to integrate
 by parts, enter:
 
-\begin{quote}\begin{verbatim}
+\begin{terminalv}
 > help(student,intparts);
-\end{verbatim}\end{quote}
+\end{terminalv}
 
 Sounds a great way of doing your Maths homework.
 
