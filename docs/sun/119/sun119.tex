@@ -1,104 +1,25 @@
-\documentstyle[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt,nolof]{starlink}
 
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocauthors}   {A R Wood}
-\newcommand{\stardocdate}      {18 August 1992}
-\newcommand{\stardoctitle}     {CHI --- Catalogue Handling Interface}
-\newcommand{\stardoctita}      {CHI}
-\newcommand{\stardoctitb}      {Catalogue Handling Interface}
-\newcommand{\stardocnumber}    {119.2}
-\newcommand{\stardocversion}   {Version 1.1}
-\newcommand{\stardocmanual}    {Programmer's Manual}
-%------------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-\renewcommand{\_}{{\tt\char'137}}
-\renewcommand{\thepage}{\roman{page}}
-
-
-\begin{document}
-\thispagestyle{empty}
-SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
-RUTHERFORD APPLETON LABORATORY\\
-{\large\bf Starlink Project\\}
-{\large\bf \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Huge\bf  \stardoctita \\ [2.5ex]}
-{\Huge\bf  \stardoctitb \\ [2.5ex]}
-{\LARGE\bf \stardocversion \\ [4ex]}
-{\Huge\bf  \stardocmanual}
-\end{center}
-\vspace{20mm}
-
-%------------------------------------------------------------------------------
-%  Package Description
-\begin{center}
-{\Large\bf Description}
-\end{center}
-
-
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocauthors     {A R Wood}
+\stardocdate        {18 August 1992}
+\stardoctitle       {CHI --- Catalogue Handling Interface}
+\stardocnumber      {119.2}
+\stardocversion     {Version 1.1}
+\stardocmanual      {Programmer's Manual}
+\stardocabstract{%
 The CHI (Catalogue Handling Interface) and CHP (Catalogue Handling Plus)
 routines provide access to the STARLINK database systems.
 Applications written using the CHI and CHP routines will
 run on the current STARLINK database (ADC) and any future STARLINK database
 systems.
-
-%------------------------------------------------------------------------------
-%  Add this part if you want a table of contents
-\newpage
-\markright{\stardocname}
-\null\vspace {5mm}
-\begin {center}
-\rule{80mm}{0.5mm} \\ [1ex]
-{\Large\bf \stardoctita \\ [2.5ex]
-           \stardoctitb \\ [2.5ex]
-           \stardocversion} \\ [2ex]
-\rule{80mm}{0.5mm}
-\end{center}
-\vspace{10mm}
-
-\setlength{\parskip}{0mm}
-\tableofcontents
-\setlength{\parskip}{\medskipamount}
+}
 %------------------------------------------------------------------------------
 
-%------------------------------------------------------------------------------
-%  Introduction page
-\newpage
-\markright{\stardocname}
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-
-\null\vspace {5mm}
-\begin {center}
-\rule{80mm}{0.5mm} \\ [1ex]
-{\Large\bf \stardoctita \\ [2.5ex]
-           \stardoctitb \\ [2.5ex]
-           \stardocversion} \\ [2ex]
-\rule{80mm}{0.5mm}
-\end{center}
-\vspace{30mm}
+\begin{document}
+\scfrontmatter
 
 \section {Introduction}
 
@@ -109,7 +30,7 @@ Catalogue Handling Interface (CHI) and the Catalogue Handling Interface Plus
 
 \begin {description}
 
-\item [SUN/120]  CATPAC --- CATalogue handling applications PACkage.
+\item [\xref{SUN/120}{sun120}{}]  CATPAC --- CATalogue handling applications PACkage.
 
 \end {description}
 
@@ -129,10 +50,10 @@ functionality not found in the CHI routines.
 This new functionality falls into two areas.
 \begin{enumerate}
   \item A CHP routine may add general functionality applicable
-to all catalogues ( {\em e.g.} CHP\_SAMPLE Select every Nth row from a catalogue)
+to all catalogues (\emph{e.g.}, CHP\_SAMPLE Select every Nth row from a catalogue)
   \item A CHP routine may add specialist functionality dealing with the
 manipulation of catalogue data in a domain specific way
-( {\em e.g.} Astronomical catalogues with sexagesimal
+(\emph{e.g.}, Astronomical catalogues with sexagesimal
 field formats ).
 \end{enumerate}
 \end{itemize}
@@ -146,27 +67,27 @@ so CHI and CHP routines can be freely mixed.
 Catalogues are created, accessed, modified and deleted in programs by means of
 calls to CHI and CHP routines. The routine names have the following structure:
 
-\begin{verbatim}
-      <pck>_<func><qual>
-\end{verbatim}
+\begin{terminalv}
+<pck>_<func><qual>
+\end{terminalv}
 
 where \verb+<pck>+ is the package name, \verb+<func>+ represents the
 function performed by the routine and \verb+<qual>+ is a qualifier which is
-used to identify different versions of the {\bf GETSVAL}, {\bf GETVAL},
-and {\bf NEWFLD} routines.
+used to identify different versions of the \textbf{GETSVAL}, \textbf{GETVAL},
+and \textbf{NEWFLD} routines.
 
 \subsection{Program Structure}
 
 Catalogue handling applications must have the following structure:
 
-\begin{verbatim}
-         <declarations>
+\begin{terminalv}
+      <declarations>
       STATUS = SAI__OK
       CALL CHI_OPEN( STATUS )
-         <executable statements>
+      <executable statements>
       CALL CHI_CLOSE( STATUS )
       END
-\end{verbatim}
+\end{terminalv}
 
 \subsection{Symbolic Names and Include Files}
 
@@ -188,24 +109,24 @@ This defines symbolic constants for the CHI and CHP routines.
 
 \begin{tabbing}
 ....................................\=................................................................................\=....\kill
-{\bf CHI\_\_SZNAME}    \>The maximum size of a catalogue name.     \>8\\
-{\bf CHI\_\_NUMCATS}   \>The maximum number of catalogues.         \>512\\
-{\bf CHI\_\_NUMPARS}   \>The maximum number of parameters.         \>512\\
-{\bf CHI\_\_SZPNAME}   \>The maximum size of a parameter name.     \>17\\
-{\bf CHI\_\_SZPFMT}    \>The maximum size of the parameter format. \>6\\
-{\bf CHI\_\_SZPVAL}    \>The maximum size of the parameter value.  \>17\\
-{\bf CHI\_\_SZPCMT}    \>The maximum size of the parameter comment.\>50\\
-{\bf CHI\_\_NUMFLDS}   \>The maximum number of fields.             \>512\\
-{\bf CHI\_\_SZFNAME}   \>The maximum size of a field name.         \>17\\
-{\bf CHI\_\_SZFFMT}    \>The maximum size of the field format.     \>6\\
-{\bf CHI\_\_SZFUNIT}   \>The maximum size of the field units.      \>10\\
-{\bf CHI\_\_SZFNVAL}   \>The maximum size of the field null value. \>17\\
-{\bf CHI\_\_SZFCMT}    \>The maximum size of the field comment.    \>50\\
-{\bf CHI\_\_SZCVAL}    \>The maximum size of a character value.    \>512\\
-{\bf CHI\_\_SZEXP}     \>The maximum size of an expression         \>80\\
+\textbf{CHI\_\_SZNAME}    \>The maximum size of a catalogue name.     \>8\\
+\textbf{CHI\_\_NUMCATS}   \>The maximum number of catalogues.         \>512\\
+\textbf{CHI\_\_NUMPARS}   \>The maximum number of parameters.         \>512\\
+\textbf{CHI\_\_SZPNAME}   \>The maximum size of a parameter name.     \>17\\
+\textbf{CHI\_\_SZPFMT}    \>The maximum size of the parameter format. \>6\\
+\textbf{CHI\_\_SZPVAL}    \>The maximum size of the parameter value.  \>17\\
+\textbf{CHI\_\_SZPCMT}    \>The maximum size of the parameter comment.\>50\\
+\textbf{CHI\_\_NUMFLDS}   \>The maximum number of fields.             \>512\\
+\textbf{CHI\_\_SZFNAME}   \>The maximum size of a field name.         \>17\\
+\textbf{CHI\_\_SZFFMT}    \>The maximum size of the field format.     \>6\\
+\textbf{CHI\_\_SZFUNIT}   \>The maximum size of the field units.      \>10\\
+\textbf{CHI\_\_SZFNVAL}   \>The maximum size of the field null value. \>17\\
+\textbf{CHI\_\_SZFCMT}    \>The maximum size of the field comment.    \>50\\
+\textbf{CHI\_\_SZCVAL}    \>The maximum size of a character value.    \>512\\
+\textbf{CHI\_\_SZEXP}     \>The maximum size of an expression         \>80\\
                        \>(search, reject, join, merge criteria)\\
-{\bf CHP\_\_SZFFMT}    \>The maximum size of a CHP field format.     \>6\\
-{\bf CHP\_\_SZFCMT}    \>The maximum size of a CHP field comment.    \>50\\
+\textbf{CHP\_\_SZFFMT}    \>The maximum size of a CHP field format.     \>6\\
+\textbf{CHP\_\_SZFCMT}    \>The maximum size of a CHP field comment.    \>50\\
 \end{tabbing}
 
 These values are subject to change in subsequent releases.
@@ -217,7 +138,7 @@ Appendix~\ref{appendix:errors}) used in the test. Here is an example of how to
 use these symbols:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
       INCLUDE 'SAE_PAR'
       INCLUDE 'CHI_PAR'
       INCLUDE 'CHI_ERR'
@@ -239,7 +160,7 @@ use these symbols:
       ELSE
         <action on other errors>
       ENDIF
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 
@@ -302,15 +223,15 @@ inefficient searches or joins.
 
 Users of ADAM may compile and link applications which call CHI and CHP routines
 without the need for a special ``log in'', since all necessary  activation of
-CHI will automatically be performed by the normal {\tt \$ ADAMSTART}, {\tt \$
-ADAMDEV} and {\tt \$ CATPAC} procedures. Thus, to compile and link an ADAM
-application called ADAMPROG, the {\tt \$ ALINK} command is used as normal,
+CHI will automatically be performed by the normal \texttt{\$ ADAMSTART}, \texttt{\$
+ADAMDEV} and \texttt{\$ CATPAC} procedures. Thus, to compile and link an ADAM
+application called ADAMPROG, the \texttt{\$ ALINK} command is used as normal,
 thus:
 
-\begin{verbatim}
-      $ FORTRAN ADAMPROG
-      $ ALINK ADAMPROG,CHILINK/OPT
-\end{verbatim}
+\begin{terminalv}
+$ FORTRAN ADAMPROG
+$ ALINK ADAMPROG,CHILINK/OPT
+\end{terminalv}
 
 \appendix
 
@@ -337,13 +258,13 @@ The CHP routines can conveniently classified according to their functionality.
 
  \begin{enumerate}
 
-  \item CHP\_FK425 Apply the SLALIB SLA\_FK425 function (See SUN/67)
+  \item CHP\_FK425 Apply the SLALIB SLA\_FK425 function (See \xref{SUN/67}{sun67}{})
 
-  \item CHP\_FK45Z Apply the SLALIB SLA\_FK45Z function (See SUN/67)
+  \item CHP\_FK45Z Apply the SLALIB SLA\_FK45Z function (See \xref{SUN/67}{sun67}{})
 
-  \item CHP\_FK524 Apply the SLALIB SLA\_FK524 function (See SUN/67)
+  \item CHP\_FK524 Apply the SLALIB SLA\_FK524 function (See \xref{SUN/67}{sun67}{})
 
-  \item CHP\_FK54Z Apply the SLALIB SLA\_FK54Z function (See SUN/67)
+  \item CHP\_FK54Z Apply the SLALIB SLA\_FK54Z function (See \xref{SUN/67}{sun67}{})
 
   \item CHP\_INCAT Input a catalogue from data in an ASCII file.
 
@@ -354,7 +275,7 @@ a given column.
 
   \item CHP\_NOENT Create a new table with no entries.
 
-  \item CHP\_PM Apply the SLALIB SLA\_PM function (See SUN/67)
+  \item CHP\_PM Apply the SLALIB SLA\_PM function (See \xref{SUN/67}{sun67}{})
 
   \item CHP\_SAMPLE Select every Nth row from a table.
 
@@ -371,7 +292,7 @@ a given column.
   \item CHP\_CHKNAMES Check a list of fieldnames against a catalogue.
 
 \item CHP\_GETFINF Get a particular piece of information associated with this
-field. ({\em e.g.} get the FORMAT associated with this field NAME). If this
+field. (\emph{e.g.}, get the FORMAT associated with this field NAME). If this
 routine is used to find the FORMAT the fields sexagesimal format will be found.
 An equivalent call to CHI\_GETFINF would return the FORMAT of the underlying
 radian value. The NULLVALUE is also converted to sexagesimal format when this
@@ -467,7 +388,7 @@ The CHI routines can conveniently classified according to their functionality.
   \item CHI\_GETF Get all the field names and the number of fields.
 
   \item CHI\_GETFINF Get a particular piece of information associated with this
-  field. ({\em e.g.} get the FORMAT associated with this field NAME)
+  field. (\emph{e.g.}, get the FORMAT associated with this field NAME)
 
   \item CHI\_GETNOTES Get the notes or part of the notes associated with this
   catalogue.
@@ -481,7 +402,7 @@ The CHI routines can conveniently classified according to their functionality.
   \item CHI\_GETP Get all the parameter names and the number of parameters.
 
   \item CHI\_GETPINF Get a particular piece of information associated with this
-  parameter. ({\em e.g.} get the VALUE associated with this parameter NAME)
+  parameter. (\emph{e.g.}, get the VALUE associated with this parameter NAME)
 
   \item CHI\_PUTNOTES Adds a line to the notes associated with this catalogue.
 
@@ -521,7 +442,7 @@ The CHI routines can conveniently classified according to their functionality.
   those entries that fail the selection criteria.
 
   \item CHI\_SEARCH Create a new catalogue from an existing catalogue. All
-      entries in the new catalogue obey some selection criteria. ({\em e.g.}
+      entries in the new catalogue obey some selection criteria. (\emph{e.g.},
   `MAG .GT. 8')
 
   \item CHI\_SELENTS Create a new catalogue from an existing catalogue. Only
@@ -536,7 +457,7 @@ The CHI routines can conveniently classified according to their functionality.
   existing catalogues according to some join criteria.
 
   \item CHI\_TURBOSEARCH Efficiently create a new catalogue from an existing
-   catalogue. All in the new catalogue obey some selection criteria. ({\em e.g.}
+   catalogue. All in the new catalogue obey some selection criteria. (\emph{e.g.},
   `MAG .GT. 8')
 
  \end{enumerate}
@@ -631,10 +552,10 @@ The CHI routines can conveniently classified according to their functionality.
 \item [CHP\_CHKFLD] ---   Check if a field exists in a catalogue.
 \item [CHP\_CHKNAMES] ---   Check a list of fieldnames against a catalogue.
 \item [CHP\_CONVFMAT] ---   Convert general sexagesimal format value.
-\item [CHP\_FK425] ---  Apply the SLALIB SLA\_FK425 function (See SUN/67).
-\item [CHP\_FK45Z] ---  Apply the SLALIB SLA\_FK45Z function (See SUN/67).
-\item [CHP\_FK524] ---  Apply the SLALIB SLA\_FK524 function (See SUN/67).
-\item [CHP\_FK54Z] ---  Apply the SLALIB SLA\_FK54Z function (See SUN/67).
+\item [CHP\_FK425] ---  Apply the SLALIB SLA\_FK425 function (See \xref{SUN/67}{sun67}{}).
+\item [CHP\_FK45Z] ---  Apply the SLALIB SLA\_FK45Z function (See \xref{SUN/67}{sun67}{}).
+\item [CHP\_FK524] ---  Apply the SLALIB SLA\_FK524 function (See \xref{SUN/67}{sun67}{}).
+\item [CHP\_FK54Z] ---  Apply the SLALIB SLA\_FK54Z function (See \xref{SUN/67}{sun67}{}).
 \item [CHP\_GETFINF] ---  Get a piece of information associated with a field.
 \item [CHP\_GETVALALL] ---  Get a set of values for fields of different types.
 \item [CHP\_INCAT] ---  Input a catalogue from data in an ASCII file.
@@ -642,7 +563,7 @@ The CHI routines can conveniently classified according to their functionality.
 \item [CHP\_LITTLEBIG] ---  Extract the rows with the largest or smallest
 values in a given column.
 \item [CHP\_NOENT] ---  Create a new table with no entries.
-\item [CHP\_PM] ---  Apply the SLALIB SLA\_PM function (See SUN/67).
+\item [CHP\_PM] ---  Apply the SLALIB SLA\_PM function (See \xref{SUN/67}{sun67}{}).
 \item [CHP\_PUTENT] ---  Put a set of values that constitute an entry into a
 catalogue.
 \item [CHP\_RECFMAT] ---  Convert general sexagesimal format.
@@ -733,114 +654,6 @@ and Error Handling Section of this document.
 
 \subsection {Detailed Description of the CHP Routines}
 \begin{small}
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-
-%  Define a \tt font of the required size.
-\font\ssttt=cmtt10 scaled 1095
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-4.45pt}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%---------------------------------------------
-%******  End of LAYOUT.TEX layout definitions
-%---------------------------------------------
 
 \sstroutine{
    CHP\_CATCORR
@@ -1062,7 +875,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          NEWNAMES( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given)}
       }{ \\
          Fields from the list that appeared in the catalogue.
       }
@@ -1129,7 +942,7 @@ and Error Handling Section of this document.
       Create a catalogue containing new fields for the Right Ascension,
       Declination, Parallax, Radial velocity and proper motions after a
       conversion has been made from the FK4 system coordinates. The
-      new fields are calculated using SLA\_FK425. See SUN/67
+      new fields are calculated using SLA\_FK425. See \xref{SUN/67}{sun67}{}
 
       Conversion from Besselian epoch 1950.0 to Julian epoch 2000.0 only
       is provided.
@@ -1235,7 +1048,7 @@ and Error Handling Section of this document.
    \sstdescription{
       Create a catalogue containing new fields for the Right Ascension
       and Declination after a conversion has been made from the FK4 system
-      coordinates. The new fields are calculated using SLA\_FK45Z. See SUN/67
+      coordinates. The new fields are calculated using SLA\_FK45Z. See \xref{SUN/67}{sun67}{}
    }
    \sstinvocation{
        CALL CHP\_FK45Z( INPUT, OUTPUT, R1950, D1950, BEPOCH, R2000, D2000,
@@ -1298,7 +1111,7 @@ and Error Handling Section of this document.
       Create a catalogue containing new fields for the Right Ascension,
       Declination, Parallax, Radial velocity and proper motions after a
       conversion has been made from the FK4 system coordinates. The
-      new fields are calculated using SLA\_FK524. See SUN/67
+      new fields are calculated using SLA\_FK524. See \xref{SUN/67}{sun67}{}
 
       Conversion from Julian epoch 2000.0 to Besselian epoch 1950.0 only
       is provided.
@@ -1404,7 +1217,7 @@ and Error Handling Section of this document.
    \sstdescription{
       Create a catalogue containing new fields for the Right Ascension
       and Declination after a conversion has been made from the FK5 system
-      coordinates. The new fields are calculated using SLA\_FK54Z. See SUN/67
+      coordinates. The new fields are calculated using SLA\_FK54Z. See \xref{SUN/67}{sun67}{}
    }
    \sstinvocation{
        CALL CHP\_FK54Z( INPUT, OUTPUT, R2000, D2000, BEPOCH, R1950, D1950,
@@ -1520,7 +1333,7 @@ and Error Handling Section of this document.
       taken from the next entry in the catalogue  but see Notes if you are
       mixing different CHI\_GET calls. Data is returned in the appropriate
       element of the appropriate array. FNAMES will contain the names of the
-      fields and FLDTYPES the type of field. So if FLDTYPES(3) is an {\tt '}I{\tt '} the
+      fields and FLDTYPES the type of field. So if FLDTYPES(3) is an \texttt{'}I\texttt{'} the
       array INTVALS(3) will contain the data from the field whose name is
       given in FNAMES(3).
    }
@@ -1538,7 +1351,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          FNAMES( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
       }{ \\
          Names of the fields whose data is required.
       }
@@ -1570,7 +1383,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          CHARVALS( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
          Array to receive the data from character fields.
       }
@@ -1638,7 +1451,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          PFORMATS( CHI\_\_NUMPARS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZPFMT ) (Given)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZPFMT ) (Given)}
       }{ \\
          Formats of the parameters.
       }
@@ -1650,7 +1463,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          PCOMMENTS( CHI\_\_NUMPARS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZPCMT ) (Given)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZPCMT ) (Given)}
       }{ \\
          Comments associated with the parameters.
       }
@@ -1667,14 +1480,14 @@ and Error Handling Section of this document.
       \sstsubsection{
          INFFORMATS( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFFMT ) (Given)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFFMT ) (Given)}
       }{ \\
          Formats of the fields being read.
       }
       \sstsubsection{
          OUTFFORMATS( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFFMT ) (Given)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFFMT ) (Given)}
       }{ \\
          Formats of the fields when displayed.
       }
@@ -1691,7 +1504,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          FCOMMENTS( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFCMT ) (Given)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFCMT ) (Given)}
       }{ \\
          Comments associated with the fields.
       }
@@ -1849,28 +1662,28 @@ and Error Handling Section of this document.
       \sstsubsection{
          PNAMES( CHI\_\_NUMPARS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZPNAME ) (Given and Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZPNAME ) (Given and Returned)}
       }{ \\
          Names of the parameters in the catalogue.
       }
       \sstsubsection{
          PFORMATS( CHI\_\_NUMPARS ) =
       }{
-         {\bf  CHARACTER $*$ ( CHI\_\_SZPFMT ) (Given and Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZPFMT ) (Given and Returned)}
       }{ \\
          Formats of the parameters in the catalogue.
       }
       \sstsubsection{
          PVALUE( CHI\_\_NUMPARS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZPVAL ) (Given and Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZPVAL ) (Given and Returned)}
       }{ \\
          Values of the parameters in the catalogue.
       }
       \sstsubsection{
          PCOMMENTS( CHI\_\_NUMPARS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZPCMT ) (Given)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZPCMT ) (Given)}
       }{ \\
          Comments associated with the parameters in the catalogue.
       }
@@ -1882,14 +1695,14 @@ and Error Handling Section of this document.
       \sstsubsection{
          FNAMES( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given and Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given and Returned)}
       }{ \\
          Names of the fields in the catalogue.
       }
       \sstsubsection{
          FFORMATS( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFFMT ) (Given and Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFFMT ) (Given and Returned)}
       }{ \\
          Formats of the fields in the catalogue.
       }
@@ -1906,7 +1719,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          FCOMMENTS( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFCMT ) (Given)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFCMT ) (Given)}
       }{ \\
          Comments associated with the fields in the catalogue.
       }
@@ -1931,7 +1744,7 @@ and Error Handling Section of this document.
    \sstdescription{
       Create a catalogue containing new fields for the new Right Ascension and
       Declination after the correction has been made for proper motion.
-      Calculated using SLA\_PM. See SUN/67.
+      Calculated using SLA\_PM. See \xref{SUN/67}{sun67}{}.
 
       Proper motions should be given in radians per year of epoch.
       Parallax should be given in arcseconds.
@@ -2034,7 +1847,7 @@ and Error Handling Section of this document.
       names given in FNAMES. Only if the field appears in the catalogue and
       the type agrees with the that given in FLDTYPES will data be put into
       the field for this entry. All other fields take their null values. The
-      routine remembers where it found the data for each field ({\em e.g.} FLUX1 data
+      routine remembers where it found the data for each field (\emph{e.g.}, FLUX1 data
       in REALVALS(5)). On subsequent calls the routine assumes that the FLUX1
       value will be in REALVALS(5). Any ordering information in the catalogue
       is ignored, but not destroyed. Use this mode when you know all the field
@@ -2104,7 +1917,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          FNAMES( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given and Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given and Returned)}
       }{ \\
          Names of the fields whose data is being supplied.
       }
@@ -2141,7 +1954,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          CHARVALS( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
          Array containing the data for character fields.
       }
@@ -2668,7 +2481,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          CATNAMES( CHI\_\_NUMCATS) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZNAME ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZNAME ) (Returned)}
       }{ \\
          Names of the available catalogues.
       }
@@ -3130,35 +2943,35 @@ and Error Handling Section of this document.
       \sstsubsection{
          FNAMES( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
       }{ \\
          Names of the fields in the catalogue.
       }
       \sstsubsection{
          FFORMATS( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFFMT ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFFMT ) (Returned)}
       }{ \\
          Formats of the fields in the catalogue.
       }
       \sstsubsection{
          FUNITS( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFUNIT ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFUNIT ) (Returned)}
       }{ \\
          Units of the fields in the catalogue.
       }
       \sstsubsection{
          FNULLS( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFNVAL ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFNVAL ) (Returned)}
       }{ \\
          Null values of the fields in the catalogue.
       }
       \sstsubsection{
          FCOMMENTS( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFCMT ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFCMT ) (Returned)}
       }{ \\
          Comments associated with the fields in the catalogue.
       }
@@ -3209,14 +3022,14 @@ and Error Handling Section of this document.
       \sstsubsection{
          PNAMES( CHI\_\_NUMPARS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZPNAME ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZPNAME ) (Returned)}
       }{ \\
          Names of the parameters in the catalogue.
       }
       \sstsubsection{
          PFORMATS( CHI\_\_NUMPARS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZPFMT ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZPFMT ) (Returned)}
       }{ \\
          Formats of the parameters in the catalogue.
       }
@@ -3228,7 +3041,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          PCOMMENTS( CHI\_\_NUMPARS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZPCMT ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZPCMT ) (Returned)}
       }{ \\
          Comments associated with the parameters in the catalogue.
       }
@@ -3307,7 +3120,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          FNAMES( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
       }{ \\
          Names of the fields in the catalogue.
       }
@@ -3604,7 +3417,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          PNAMES( CHI\_\_NUMPARS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZPNAME ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZPNAME ) (Returned)}
       }{ \\
          Names of the parameters in the catalogue.
       }
@@ -3714,7 +3527,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          FNAMES( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
       }{ \\
          Names of the fields in the catalogue.
       }
@@ -3736,14 +3549,14 @@ and Error Handling Section of this document.
       \sstsubsection{
          CHARVALS(NUMENTS,CHI\_\_NUMFLDS) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
          Array to receive the character data.
       }
       \sstsubsection{
          DOUBVALS(NUMENTS,CHI\_\_NUMFLDS) =
       }{
-         {\bf DOUBLE PRECISION (Returned)}
+         \textbf{DOUBLE PRECISION (Returned)}
       }{ \\
          Array to receive the double precision data.
       }
@@ -3839,7 +3652,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          CHARVALS(NUMENTS,CHI\_\_NUMFLDS) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
          Array to receive the data.
       }
@@ -3902,7 +3715,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          FNAMES( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
       }{ \\
          Names of the fields in the catalogue.
       }
@@ -3924,14 +3737,14 @@ and Error Handling Section of this document.
       \sstsubsection{
          CHARVALS(NUMENTS,CHI\_\_NUMFLDS) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
          Array to receive the character data.
       }
       \sstsubsection{
          DOUBVALS(NUMENTS,CHI\_\_NUMFLDS) =
       }{
-         {\bf DOUBLE PRECISION (Returned)}
+         \textbf{DOUBLE PRECISION (Returned)}
       }{ \\
          Array to receive the double precision data.
       }
@@ -3980,7 +3793,7 @@ and Error Handling Section of this document.
       catalogue  but see Notes if you are mixing different CHI\_GET calls.
       Data is returned in the appropriate element of the appropriate
       array. FNAMES will contain the names of the fields and FLDTYPES the
-      type of field. So if FLDTYPES(3) is an {\tt '}I{\tt '} the array
+      type of field. So if FLDTYPES(3) is an \texttt{'}I\texttt{'} the array
       INTVALS(3) will contain the data from the field whose name is given in
       FNAMES(3).
    }
@@ -3998,7 +3811,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          FNAMES( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
       }{ \\
          Names of the fields whose data is required.
       }
@@ -4030,7 +3843,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          CHARVALS( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
          Array to receive the data from character fields.
       }
@@ -4085,7 +3898,7 @@ and Error Handling Section of this document.
       checking, an error is found the error is reported and the name of the
       offending field is returned in FNAMES(1)
       The routine remembers where it has to put the retrieved data for each
-      field ({\em e.g.} The value of the STARID field has to be put into CHARVALS(5)).
+      field (\emph{e.g.}, The value of the STARID field has to be put into CHARVALS(5)).
       On subsequent calls the routine assumes that it should place the data
       from the STARID into CHARVALS(5).
 
@@ -4126,7 +3939,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          CHARVALS( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
          Array to receive the data from character fields.
       }
@@ -4162,7 +3975,7 @@ and Error Handling Section of this document.
       catalogue but see Notes if you are mixing different CHI\_GET and
       CHI\_EVAL calls. Data is returned in the appropriate element of the
       appropriate array. So if FNAMES(1) is the name of an integer field then
-      FLDTYPES(1) will be {\tt '}I{\tt '} and the array INTVALS(1) will
+      FLDTYPES(1) will be \texttt{'}I\texttt{'} and the array INTVALS(1) will
       contain the data from the field.
 
       There are two levels of checking which are selected using the argument
@@ -4174,7 +3987,7 @@ and Error Handling Section of this document.
       checking, an error is found the error is reported and the name of the
       offending field is returned in FNAMES(1)
       The routine remembers where it has to put the retrieved data for each
-      field ({\em e.g.} The value of the STARID field has to be put into CHARVALS(5)).
+      field (\emph{e.g.}, The value of the STARID field has to be put into CHARVALS(5)).
       On subsequent calls the routine assumes that it should place the data
       from the STARID into CHARVALS(5). Use this mode when you know that the
       field names and types are correct.
@@ -4238,7 +4051,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          CHARVALS( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
          Array to receive the data from character fields.
       }
@@ -4368,7 +4181,7 @@ and Error Handling Section of this document.
       used in the merge but there is an opportunity to update these values.
       Setting the flag  FMATFLG(5) to TRUE indicates that value of FFORMAT(5)
       is to  be used to update the format of the field in the output catalogue
-      given in MERGEFLDS(3,5). In the same way the fields{\tt '} units, nullvalue and
+      given in MERGEFLDS(3,5). In the same way the fields\texttt{'} units, nullvalue and
       comment can be updated with the values of FUNIT, FNULL and
       FCOMMENT by setting the flags UNITFLG, NULLFLG and COMFLG
       respectively. If the format or the nullvalue of any field are changed
@@ -4419,7 +4232,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          MERGEFLDS( 3, NUMMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given)}
       }{ \\
          Fields to be merged.
       }
@@ -4437,7 +4250,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          FFORMATS( NUMMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFFMT ) (Given and Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFFMT ) (Given and Returned)}
       }{ \\
          New formats of the field.
       }
@@ -4630,28 +4443,28 @@ and Error Handling Section of this document.
       \sstsubsection{
          PNAMES( CHI\_\_NUMPARS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZPNAME ) (Given and Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZPNAME ) (Given and Returned)}
       }{ \\
          Names of the parameters in the catalogue.
       }
       \sstsubsection{
          PFORMATS( CHI\_\_NUMPARS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZPFMT ) (Given and Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZPFMT ) (Given and Returned)}
       }{ \\
          Formats of the parameters in the catalogue.
       }
       \sstsubsection{
          PVALUE( CHI\_\_NUMPARS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZPVAL ) (Given and Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZPVAL ) (Given and Returned)}
       }{ \\
          Values of the parameters in the catalogue.
       }
       \sstsubsection{
          PCOMMENTS( CHI\_\_NUMPARS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZPCMT ) (Given)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZPCMT ) (Given)}
       }{ \\
          Comments associated with the parameters in the catalogue.
       }
@@ -4663,14 +4476,14 @@ and Error Handling Section of this document.
       \sstsubsection{
          FNAMES( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given and Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given and Returned)}
       }{ \\
          Names of the fields in the catalogue.
       }
       \sstsubsection{
          FFORMATS( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFFMT ) (Given and Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFFMT ) (Given and Returned)}
       }{ \\
          Formats of the fields in the catalogue.
       }
@@ -4687,7 +4500,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          FCOMMENTS( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFCMT ) (Given)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFCMT ) (Given)}
       }{ \\
          Comments associated with the fields in the catalogue.
       }
@@ -4752,7 +4565,7 @@ and Error Handling Section of this document.
       names given in FNAMES. Only if the field appears in the catalogue and
       the type agrees with the that given in FLDTYPES will data be put into
       the field for this entry. All other fields take their null values. The
-      routine remembers where it found the data for each field ({\em e.g.} FLUX1 data
+      routine remembers where it found the data for each field (\emph{e.g.}, FLUX1 data
       in REALVALS(5)). On subsequent calls the routine assumes that the FLUX1
       value will be in REALVALS(5). Any ordering information in the catalogue
       is ignored, but not destroyed. Use this mode when you know all the field
@@ -4859,7 +4672,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          CHARVALS( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZCVAL ) (Returned)}
       }{ \\
          Array containing the data for character fields.
       }
@@ -5176,7 +4989,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          FNAMES( CHI\_\_NUMFLDS ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given and Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given and Returned)}
       }{ \\
          Names of the fields to be selected.
       }
@@ -5267,7 +5080,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          SORTFLDS( CHI\_\_NUMFLDS, 3 ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFNAME ) (Given)}
       }{ \\
          Names of the sort fields.
       }
@@ -5314,7 +5127,7 @@ and Error Handling Section of this document.
       \sstsubsection{
          SORTFLDS( CHI\_\_NUMFLDS, 3 ) =
       }{
-         {\bf CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
+         \textbf{CHARACTER $*$ ( CHI\_\_SZFNAME ) (Returned)}
       }{ \\
          Names of the sort fields. Primary field first.
       }
@@ -5520,7 +5333,7 @@ and Error Handling Section of this document.
       update the information associated with the field.  Setting the flag
       FMATFLG to TRUE indicates that value of FFORMAT is to be used to update
       the format associated with this field. If FMATFLG is FALSE the field
-      format will be unchanged. In the same way the fields{\tt '} units, nullvalue and
+      format will be unchanged. In the same way the fields\texttt{'} units, nullvalue and
       comment can be updated with the values of FUNIT, FNULL and
       FCOMMENT by setting the flags FMATFLG, UNITFLG, NULLFLG and COMFLG
       respectively. If the format or the nullvalue of the field are changed
@@ -5612,9 +5425,9 @@ and Error Handling Section of this document.
       \sstexamplesubsection{
          CALL CHI\_UPDATE( TESTCAT, TEMP, TEMP$*$1.1, .FALSE., FFORMAT,
       }{
-         {\tt .FALSE., FUNITS, .FALSE., FNULL, .TRUE., 'Recalibrated}
+         \texttt{.FALSE., FUNITS, .FALSE., FNULL, .TRUE., 'Recalibrated}
       }{
-         {\tt temperature', STATUS)}
+         \texttt{temperature', STATUS)}
       }{ \\
          In this example the field TEMP is being increased by 10\% to
          reflect an instrument recalibration. All the information
@@ -5641,7 +5454,7 @@ and Error Handling Section of this document.
       Update the information associated with a field. Setting the flag
       NAMEFLG to TRUE indicates that value of NEWNAME is to be used to update
       the name of this field. If NAMEFLG is FALSE the field name will be
-      unchanged. In the same way the fields{\tt '} format, units, nullvalue and
+      unchanged. In the same way the fields\texttt{'} format, units, nullvalue and
       comment can be updated with the values of FFORMAT, FUNIT, FNULL and
       FCOMMENT by setting the flags FMATFLG, UNITFLG, NULLFLG and COMFLG
       respectively. If the format or the nullvalue of any field are changed
@@ -5743,7 +5556,7 @@ and Error Handling Section of this document.
       Update the information associated with a parameter. Setting the flag
       NAMEFLG to TRUE indicates that value of NEWNAME is to be used to update
       the name associated with this parameter. If NAMEFLG is FALSE the parameter
-      name will be unchanged. In the same way the parameters{\tt '} format, value and
+      name will be unchanged. In the same way the parameters\texttt{'} format, value and
       comment can be updated with the values of PFORMAT, PVALUE and PCOMMENT
       by setting the flags FMATFLG, VALFLG and COMFLG respectively.
       If the format or the value of the parameter are changed
@@ -5844,37 +5657,37 @@ following table and described in more detail below.
 
 \begin{center}
 \begin{tabular}{|l|l|} \hline
-{\em Symbolic Name} & {\em Meaning}\\ \hline \hline
-{\bf CHI\_\_CATNOTFND} & Catalogue not found\\
-{\bf CHI\_\_PAREXISTS} & Parameters already exists.\\
-{\bf CHI\_\_IVLDFREQ} & Invalid value required (field).\\
-{\bf CHI\_\_IVLDPREQ} & Invalid value required (parameter).\\
-{\bf CHI\_\_PARNOTFND} & Parameter not found.\\
-{\bf CHI\_\_FLDNOTFND} & Field not found.\\
-{\bf CHI\_\_INSENTRIES} & Insufficient entries.\\
-{\bf CHI\_\_IVLDEXP} & Invalid expression.\\
-{\bf CHI\_\_EOF} & End of file.\\
-{\bf CHI\_\_INDCAT} & Indexed catalogue.\\
-{\bf CHI\_\_INVLDFMT} & Invalid format.\\
-{\bf CHI\_\_CONVERR} &  Conversion error.\\
-{\bf CHI\_\_IVLDFFMT} & Invalid field format.\\
-{\bf CHI\_\_IVLDPFMT} & Invalid parameter format.\\
-{\bf CHI\_\_IVLDSRCH} & Invalid search expression.\\
-{\bf CHI\_\_IVLDJOIN} & Invalid join expression.\\
-{\bf CHI\_\_WSOFL} & Work stack overflow.\\
-{\bf CHI\_\_TOOIT} & Too many items in expression.\\
-{\bf CHI\_\_PRSER} & Parse system error.\\
-{\bf CHI\_\_IVSYN} & Operand expected.\\
-{\bf CHI\_\_TOOOP} & Too many operators.\\
-{\bf CHI\_\_UFLOP} & Underflow on operator stack.\\
-{\bf CHI\_\_ICMPT} & Operator and operand incompatible.\\
-{\bf CHI\_\_NTSUP} & Option not supported.\\
-{\bf CHI\_\_IVOPR} & Invalid operator.\\
-{\bf CHI\_\_TOORX} & Too many relations in expression.\\
-{\bf CHI\_\_NOREL} & Too many relational sub-expressions.\\
-{\bf CHI\_\_DECOD} & Operand decode error.\\
-{\bf CHI\_\_MISMA} & Mismatche quotes or parentheses.\\
-{\bf CHI\_\_IVFUN} & Invalid function.\\
+\emph{Symbolic Name} & \emph{Meaning}\\ \hline \hline
+\textbf{CHI\_\_CATNOTFND} & Catalogue not found\\
+\textbf{CHI\_\_PAREXISTS} & Parameters already exists.\\
+\textbf{CHI\_\_IVLDFREQ} & Invalid value required (field).\\
+\textbf{CHI\_\_IVLDPREQ} & Invalid value required (parameter).\\
+\textbf{CHI\_\_PARNOTFND} & Parameter not found.\\
+\textbf{CHI\_\_FLDNOTFND} & Field not found.\\
+\textbf{CHI\_\_INSENTRIES} & Insufficient entries.\\
+\textbf{CHI\_\_IVLDEXP} & Invalid expression.\\
+\textbf{CHI\_\_EOF} & End of file.\\
+\textbf{CHI\_\_INDCAT} & Indexed catalogue.\\
+\textbf{CHI\_\_INVLDFMT} & Invalid format.\\
+\textbf{CHI\_\_CONVERR} &  Conversion error.\\
+\textbf{CHI\_\_IVLDFFMT} & Invalid field format.\\
+\textbf{CHI\_\_IVLDPFMT} & Invalid parameter format.\\
+\textbf{CHI\_\_IVLDSRCH} & Invalid search expression.\\
+\textbf{CHI\_\_IVLDJOIN} & Invalid join expression.\\
+\textbf{CHI\_\_WSOFL} & Work stack overflow.\\
+\textbf{CHI\_\_TOOIT} & Too many items in expression.\\
+\textbf{CHI\_\_PRSER} & Parse system error.\\
+\textbf{CHI\_\_IVSYN} & Operand expected.\\
+\textbf{CHI\_\_TOOOP} & Too many operators.\\
+\textbf{CHI\_\_UFLOP} & Underflow on operator stack.\\
+\textbf{CHI\_\_ICMPT} & Operator and operand incompatible.\\
+\textbf{CHI\_\_NTSUP} & Option not supported.\\
+\textbf{CHI\_\_IVOPR} & Invalid operator.\\
+\textbf{CHI\_\_TOORX} & Too many relations in expression.\\
+\textbf{CHI\_\_NOREL} & Too many relational sub-expressions.\\
+\textbf{CHI\_\_DECOD} & Operand decode error.\\
+\textbf{CHI\_\_MISMA} & Mismatche quotes or parentheses.\\
+\textbf{CHI\_\_IVFUN} & Invalid function.\\
 \hline
 \end{tabular}
 \end{center}
