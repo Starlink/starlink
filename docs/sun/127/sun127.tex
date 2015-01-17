@@ -1,45 +1,25 @@
-\documentstyle{article}
-\pagestyle{myheadings}
+\documentclass[nolof,11pt]{starlink}
 
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocnumber}    {127.1}
-\newcommand{\stardocauthors}   {Julian Osborne}
-\newcommand{\stardocdate}      {2 July 1991}
-\newcommand{\stardoctitle}     {The EXOSAT Database System}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocnumber      {127.1}
+\stardocauthors     {Julian Osborne}
+\stardocdate        {2 July 1991}
+\stardoctitle       {The EXOSAT Database System}
+\stardocabstract{
+The purpose of this note is to alert users to the existence of the EXOSAT
+database system, to point them in the direction of the manuals and to
+provide a very quick guide to accessing the system. It is not intended to be
+a complete guide to all the facilities available, the on-line
+and paper documentation fill these needs.
+}
 %------------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{240mm}
-\setlength{\topmargin}{-5mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
 
 \begin{document}
-\thispagestyle{empty}
-SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
-RUTHERFORD APPLETON LABORATORY\\
-{\large\bf Starlink Project\\}
-{\large\bf \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-University of Leicester\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Large\bf \stardoctitle}
-\end{center}
-\vspace{5mm}
+\scfrontmatter
+
+\section{Introduction}
 
 The purpose of this note is to alert users to the existence of the EXOSAT
 database system, to point them in the direction of the manuals and to
@@ -66,11 +46,11 @@ locally.
 
 At Leicester there are currently 24 databases available. Apart from the
 EXOSAT databases, there are a number of EINSTEIN databases and many
-astronomical catalogues, {\it e.g.}~SAO,
+astronomical catalogues, \textit{e.g.}~SAO,
 IRAS point source catalogue, HD, Variable Star Catalogue, etc.
 An increasing number of ROSAT-related
 databases will be made available as the mission progresses. An important
-ROSAT database currently available is {\tt ROSSTL},
+ROSAT database currently available is \texttt{ROSSTL},
 the ROSAT short term timeline.
 This database allows users to see the exact planned times of ROSAT
 observations and is updated every week or so. Individual SCAR catalogues can
@@ -90,25 +70,28 @@ documents will become more or less dated. For this reason, substantial
 on-line help is also available within the EXOSAT database system. Users
 experiencing difficulties can e-mail me (LTVAD::JULO) for guidance.
 
+\section{Example}
+
 To use the EXOSAT database system at Leicester, users must login to the
 captive account XRAY on the database machine LTXDB. No login password is
 required, but users will asked for a password if the system does not recognise
 them.
 
-The main database programme is called {\tt browse}.
-Enter {\tt browse} {\it dbname},
-where {\it dbname} is the database name, to access a database, or {\tt browse ?}
-to list the available databases. Within {\tt browse},
-enter {\tt ?} to get a list
-of commands, and {\tt help} {\it command} to get help on that command.
+The main database programme is called \texttt{browse}.
+Enter \texttt{browse} \textit{dbname},
+where \textit{dbname} is the database name, to access a database, or \texttt{browse ?}
+to list the available databases. Within \texttt{browse},
+enter \texttt{?} to get a list
+of commands, and \texttt{help} \textit{command} to get help on that command.
 
 A trivial sample login session is illustrated below. On login the user is
-alerted to new bulletins. The command {\tt bulletin} is used to read these.
+alerted to new bulletins. The command \texttt{bulletin} is used to read these.
 In this sesion the following
-{\tt browse} commands are used: {\tt sn} -- search by name;
-{\tt lpa} -- list parameters; {\tt cdb} -- change database; {\tt ex} -- exit.
+\texttt{browse} commands are used: \texttt{sn} -- search by name;
+\texttt{lpa} -- list parameters; \texttt{cdb} -- change database; \texttt{ex} -- exit.
 
-\begin{verbatim}
+\begin{small}
+\begin{terminalv}
 $ set host ltxdb
 
 Leicester Starlink VAXcluster  -  Node LTXDB
@@ -192,7 +175,6 @@ Loading SAO database sample TOTAL indexed on DEC
 SAO_TOTAL_DEC > ex
 Leicester> lo
   XRAY         logged out at  2-JUL-1991 15:40:16.80
-
-\end{verbatim}
-
+\end{terminalv}
+\end{small}
 \end{document}
