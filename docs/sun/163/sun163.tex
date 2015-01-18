@@ -1,247 +1,26 @@
-\documentstyle[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt,nolof,noabs]{starlink}
 
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocnumber}    {163.3}
-\newcommand{\stardocauthors}   {David S. Berry, W Gong, D C Parsons}
-\newcommand{\stardocdate}      {19 February 1995}
-\newcommand{\stardoctitle}     {IRAS90 --- IRAS Survey and PO Data Analysis
-                                Package\\[2ex] --- Reference Guide}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocnumber      {163.3}
+\stardocauthors     {David S. Berry, W. Gong, D. C. Parsons}
+\stardocdate        {19 February 1995}
+\stardoctitle     {IRAS90 --- IRAS Survey and PO Data Analysis
+                                Package}
+\stardocmanual{Reference Guide}
 %------------------------------------------------------------------------------
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-\setlength{\unitlength}{1mm}
-
 %------------------------------------------------------------------------------
-% Add any \newcommand or \newenvironment commands here
+% Add any \providecommand or \newenvironment commands here
 
-% degrees symbol
-\newcommand{\dgs}{\hbox{$^\circ$}}
 % centre an asterisk
-\newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
-% A kind of list item, like description, but with an easily adjustable
-% item separation.
-\newcommand{\menuitem}[2]
-  {{\bf #1}: \addtolength{\baselineskip}{-0.4ex}
-  \parbox[t]{128mm}{#2} \addtolength{\baselineskip}{0.4ex} \\ \hspace{-5pt}}
-% an environment for references
-\newenvironment{refs}{\goodbreak
-                      \vspace{3ex}
-                      \begin{list}{}{\setlength{\topsep}{0mm}
-                                     \setlength{\partopsep}{0mm}
-                                     \setlength{\itemsep}{0mm}
-                                     \setlength{\parsep}{0mm}
-                                     \setlength{\leftmargin}{1.5em}
-                                     \setlength{\itemindent}{-\leftmargin}
-                                     \setlength{\labelsep}{0mm}
-                                     \setlength{\labelwidth}{0mm}}
-                    }{\end{list}}
+\providecommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
 
-% SST definitions
-% ---------------
-
-%+
-%  Name:
-%     LAYOUT.TEX
-
-%  Purpose:
-%     Define Latex commands for laying out documentation produced by PROLAT.
-
-%  Language:
-%     Latex
-
-%  Type of Module:
-%     Data file for use by the PROLAT application.
-
-%  Description:
-%     This file defines Latex commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by Latex. The
-%     contents of this file should be included in the source presented to
-%     Latex in front of any output from PROLAT. By default, this is done
-%     automatically by PROLAT.
-
-%  Notes:
-%     The definitions in this file should be included explicitly in any file
-%     which requires them. The \include directive should not be used, as it
-%     may not then be possible to process the resulting document with Latex
-%     at a later date if changes to this definitions file become necessary.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-
-%  Define a \tt font of the required size.
-\font\ssttt=cmtt10 scaled 1095
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-4.45pt}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the output results parameters section (for an application).
-\newcommand{\sstresparameters}[1]{
-   \item[Results Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the graphics style parameters section (for an application).
-\newcommand{\sstgraphparameters}[1]{
-   \item[Graphics-style Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%  End of LAYOUT.TEX layout definitions.
-%.
-
-% End of SST definitions
 %------------------------------------------------------------------------------
 
 \begin{document}
-\thispagestyle{empty}
-DRAL / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-{\large Particle Physics \& Astronomy Research Council}\\
-{\large Starlink Project\\}
-{\large \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Large\bf \stardoctitle}
-\end{center}
-\vspace{5mm}
-
-\setlength{\parskip}{0mm} \tableofcontents
-\setlength{\parskip}{\medskipamount} \markright{\stardocname} \newpage
+\scfrontmatter
 
 \section{Introduction}
 {\small IRAS90} is a package of applications which provides facilities for the
@@ -348,9 +127,9 @@ To run {\small IRAS90} on {\small VMS} from {\small DCL} , just enter the
 command
 
 \small
-\begin{verbatim}
-     $ IRAS90
-\end{verbatim}
+\begin{terminalv}
+$ IRAS90
+\end{terminalv}
 \normalsize
 
 This executes a procedure setting up symbols for {\small IRAS90}'s command
@@ -361,29 +140,29 @@ must be within the {\small ADAM} command language.  This requires just one extra
 command, namely
 
 \small
-\begin{verbatim}
-     $ ADAM
-\end{verbatim}
+\begin{terminalv}
+$ ADAM
+\end{terminalv}
 \normalsize
 
 You will see any messages produced by system and user procedures, followed
-by the {\tt ICL>} prompt. Again there is a procedure for making the
+by the \texttt{ICL>} prompt. Again there is a procedure for making the
 commands known to the command language, and not unexpectedly, it too is
 
 \small
-\begin{verbatim}
-     ICL> IRAS90
-\end{verbatim}
+\begin{terminalv}
+ICL> IRAS90
+\end{terminalv}
 \normalsize
 
 To run {\small IRAS90} on {\small UNIX} from the shell, first ensure that you
-have a subdirectory {\bf adam} within the directory identified by environment
-variable {\bf HOME}. Then enter the command
+have a subdirectory \textbf{adam} within the directory identified by environment
+variable \textbf{HOME}. Then enter the command
 
 \small
-\begin{verbatim}
-     % iras90
-\end{verbatim}
+\begin{terminalv}
+% iras90
+\end{terminalv}
 \normalsize
 This executes a script setting up aliases for {\small IRAS90}'s command names.
 
@@ -395,7 +174,7 @@ is ready for use.
 information contained in this document, in a hierarchical VMS-like form. It can
 be accessed in several ways:
 \begin {itemize}
-\item The command {\small I90HELP} (or {\bf i90help} on {\small UNIX}) will put
+\item The command {\small I90HELP} (or \textbf{i90help} on {\small UNIX}) will put
 the user at the top level of the help library. The user can then navigate
 through the help library using the usual {\small VMS} techniques (even on
 {\small UNIX}). \item When an {\small IRAS90} application issues a prompt, the
@@ -408,9 +187,9 @@ library is finally exited.
 \item Within {\small ICL}, the command
 
 \small
-\begin{verbatim}
-     ICL> HELP <application>
-\end{verbatim}
+\begin{terminalv}
+ICL> HELP <application>
+\end{terminalv}
 \normalsize
 will display information about the specified {\small IRAS90} application. Note,
 the application must be specified on the {\small HELP} command line as shown. The user
@@ -452,9 +231,9 @@ values which contribute to each image pixel.
 
 \begin{sloppypar}
 I will assume that the current directory is empty except for a set of {\small
-CRDD} files called {\bf xxxx\_bisj.sdf} (where {\bf xxxx} is a string
-identifying the object, {\bf i} is the waveband index (1, 2, 3 or 4 for the 12,
-25, 60 and 100 $\mu$m bands) and {\bf j} is a scan number varying from 1 to how
+CRDD} files called \textbf{xxxx\_bisj.sdf} (where \textbf{xxxx} is a string
+identifying the object, \textbf{i} is the waveband index (1, 2, 3 or 4 for the 12,
+25, 60 and 100 $\mu$m bands) and \textbf{j} is a scan number varying from 1 to how
 ever many {\small CRDD} files you have. The following commands perform the
 standard mapping operations, using default behaviour (prompts are shown indented
 from the commands, and the user response follows the \verb+>+ character.
@@ -463,37 +242,37 @@ entering any other text):
 \end{sloppypar}
 
 \small
-\begin{verbatim}
-     DESTCRDD
-       IN - Input CRDD files // > xxxx_b1s*
-       OUT - Output CRDD files > *_ds
-     BACKCRDD
-       IN - Input CRDD files // > xxxx_b1s*_ds
-       OUT - Output CRDD files > *|_ds|_bk|
-     MAPCRDD
-       IN - The input CRDD files // > xxxx_b1s*_bk
-       PIXSIZE - Output pixel dimensions in arc-minutes // > <RET>
-       CENTRE_LON - Right Ascension (B1950) of the image centre // > <RET>
-       CENTRE_LAT - Declination (B1950) of the image centre // > <RET>
-       BOXSIZE - Dimensions of output image in arc-minutes // > <RET>
-       OUT - The output NDF containing the mapped CRDD > xxxx_b1_image
-\end{verbatim}
+\begin{terminalv}
+DESTCRDD
+  IN - Input CRDD files // > xxxx_b1s*
+  OUT - Output CRDD files > *_ds
+BACKCRDD
+  IN - Input CRDD files // > xxxx_b1s*_ds
+  OUT - Output CRDD files > *|_ds|_bk|
+MAPCRDD
+  IN - The input CRDD files // > xxxx_b1s*_bk
+  PIXSIZE - Output pixel dimensions in arc-minutes // > <RET>
+  CENTRE_LON - Right Ascension (B1950) of the image centre // > <RET>
+  CENTRE_LAT - Declination (B1950) of the image centre // > <RET>
+  BOXSIZE - Dimensions of output image in arc-minutes // > <RET>
+  OUT - The output NDF containing the mapped CRDD > xxxx_b1_image
+\end{terminalv}
 \normalsize
 
 Any strings contained between the the two ``\verb+/+'' characters can be ignored
 for the moment.
 This sequence of commands will cause all the 12 $\mu$m {\small CRDD} files to be
-mapped into an image stored in the file {\bf xxxx\_b1\_image.sdf}. Note, all
+mapped into an image stored in the file \textbf{xxxx\_b1\_image.sdf}. Note, all
 {\small CRDD} files are processed together, there is no need to  re-invoke each
 application for each {\small CRDD} file. The \verb+*+ characters are used as
 wild-cards within input file specifications, and an output file specification
-such as ``\verb+*|_ds|_bk|+'' means ``{\em Create an output {\small NDF} for
+such as ``\verb+*|_ds|_bk|+'' means ``\emph{Create an output {\small NDF} for
 every input {\small NDF}, with the output name being the same as the input name
-except that} {\bf \_ds} {\em is replaced by} {\bf \_bk}''. See section
+except that} \textbf{\_ds} \emph{is replaced by} \textbf{\_bk}''. See section
 \ref{SEC:GRP} for a full description of the use of wild-cards for specifying
 input and output {\small NDF}s. Thus the above commands will create a set of
-files {\bf xxxx\_bisj\_ds.sdf} containing the destriped {\small CRDD} files, and
-a set of files {\bf xxxx\_bisj\_bk.sdf} containing the background subtracted
+files \textbf{xxxx\_bisj\_ds.sdf} containing the destriped {\small CRDD} files, and
+a set of files \textbf{xxxx\_bisj\_bk.sdf} containing the background subtracted
 {\small CRDD} files.
 
 \subsection{Displaying an Image Annotated with Celestial Coordinates}
@@ -562,7 +341,7 @@ The first step can be accomplished using the following recipe:
 \ref{SEC:MAPS}).
 \item Use each image to generate simulated {\small CRDD}, using application
 {\small SIMCRDD}. The input {\small CRDD} files (which are used to define the
-position and PSF for each sample) should be for the {\em other} waveband. For
+position and PSF for each sample) should be for the \emph{other} waveband. For
 instance, if the two wavebands are 60 and 100 $\mu$m, then the 60 $\mu$m image
 should be sampled at positions defined by the 100 $\mu$m {\small CRDD} files,
 and likewise the 100 $\mu$m image should be sampled at positions defined by the
@@ -593,7 +372,7 @@ described in appendix \ref{APP:MAS}.
 By default, flux density values calculated by {\small IRAS90} assume that the
 flux density emitted by the source is inversely proportional to frequency.
 Adjusting quoted flux density values to refer to some other known source
-spectrum is known as ``colour correction'' and is described in the {\em {\small
+spectrum is known as ``colour correction'' and is described in the \emph{{\small
 IRAS} Catalogs and Atlases Explanatory Supplement}, page VI-27. The application
 {\small COLCORR} produces colour corrected images assuming that the source
 spectrum is that of an optically thin greybody. The user should first produce
@@ -636,7 +415,7 @@ all samples falling within the source region).
 \item Run {\small DESTCRDD} on the original input {\small CRDD} files,
 specifying ``{\small .NOT.SOURCE}'' for parameter {\small QEXP}. This causes all
 the samples with quality ``{\small SOURCE}'' to be excluded from the estimation
-of the detector backgrounds. Note, it does {\em not} mean that these samples
+of the detector backgrounds. Note, it does \emph{not} mean that these samples
 will be excluded from the output {\small CRDD} files!
 \item Run {\small BACKCRDD} on the output {\small CRDD} files from {\small
 DESTCRDD}, specifying ``{\small .NOT.SOURCE}'' for parameter {\small QEXP}. This
@@ -725,10 +504,10 @@ may contain references to other text files. If the file
 {\small VALUES.DAT} contained the following two lines:
 
 \small
-\begin{verbatim}
+\begin{terminalv}
 A,B,C
 D,^NEWFILE.DAT
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 The the strings A, B, C and D would be returned to the
@@ -783,7 +562,7 @@ If an {\small IRAS90} application creates more than one output {\small
 NDF}, it will also create an output text file containing the names of
 the output  {\small NDF}s in a form which can be used to specify the
 {\small NDF}s as input to another {\small IRAS90} application. The text
-file is called {\bf iras90\_ndfs.lis} and is located in the users login
+file is called \textbf{iras90\_ndfs.lis} and is located in the users login
 directory. Succesive {\small IRAS90} applications will over-write such
 text files created by previous applications. If such a file is created, then
 the global parameter {\small DATA\_ARRAY} will be modified so that
@@ -802,51 +581,51 @@ which are stored at the top level of a container file.
 are all possible responses:
 
 \small
-\begin{verbatim}
-  b1,b2,b3,b4
-\end{verbatim}
+\begin{terminalv}
+b1,b2,b3,b4
+\end{terminalv}
 \normalsize
 \vspace{-3mm}
 This means ``Use b1.sdf, b2.sdf, b3.sdf and b4.sdf''. It is  assumed that the
 {\small NDF}s are the top level objects  within the .sdf files.
 
 \small
-\begin{verbatim}
-  cena_b1-
-\end{verbatim}
+\begin{terminalv}
+cena_b1-
+\end{terminalv}
 \normalsize
 \vspace{-3mm}
 This means ``Use cena\_b1.sdf and then (because of the minus sign at the end)
 asks the user for  more {\small NDF}s''.
 
 \small
-\begin{verbatim}
-  *
-\end{verbatim}
+\begin{terminalv}
+*
+\end{terminalv}
 \normalsize
 \vspace{-3mm}
 This means ``Use all .sdf files in the current directory''.
 
 \small
-\begin{verbatim}
-  hh1_b1s*_ds
-\end{verbatim}
+\begin{terminalv}
+hh1_b1s*_ds
+\end{terminalv}
 \normalsize
 \vspace{-3mm}
 This means ``Use hh1\_b1s1\_ds.sdf, hh1\_b1s2\_ds.sdf, etc''.
 
 \small
-\begin{verbatim}
-  ^files.lis
-\end{verbatim}
+\begin{terminalv}
+^files.lis
+\end{terminalv}
 \normalsize
 \vspace{-3mm}
 This means ``Read the names of {\small NDF}s from the text file files.lis.
 
 \small
-\begin{verbatim}
-  ../data/*
-\end{verbatim}
+\begin{terminalv}
+../data/*
+\end{terminalv}
 \normalsize
 \vspace{-3mm}
 This means ``Use all .sdf files contained in the {\small UNIX} directory
@@ -856,35 +635,35 @@ This means ``Use all .sdf files contained in the {\small UNIX} directory
 are possible responses:
 
 \small
-\begin{verbatim}
-  file1,file2,file3
-\end{verbatim}
+\begin{terminalv}
+file1,file2,file3
+\end{terminalv}
 \normalsize
 \vspace{-3mm}
 This means ``Create file1.sdf, file2.sdf and file3.sdf''.
 
 \small
-\begin{verbatim}
-  ^out.dat
-\end{verbatim}
+\begin{terminalv}
+^out.dat
+\end{terminalv}
 \normalsize
 \vspace{-3mm}
 This means ``Read the names of the output {\small NDF}s from
 text file out.dat''.
 
 \small
-\begin{verbatim}
-  *_ds
-\end{verbatim}
+\begin{terminalv}
+*_ds
+\end{terminalv}
 \normalsize
 \vspace{-3mm}
 This means ``Append the string ``\_ds'' to the end of all
                       the input {\small NDF} names.
 
 \small
-\begin{verbatim}
-  ../bk/*|_ds|_bk|
-\end{verbatim}
+\begin{terminalv}
+../bk/*|_ds|_bk|
+\end{terminalv}
 \normalsize
 \vspace{-3mm}
 This means ``Substitute the string ``\_bk'' for all  occurrences of the string
@@ -898,39 +677,39 @@ be specified by  their X and Y pixel indices, then the pixels (10,11),
 (21,-10) and (0,0) could be specified in any of the following ways:
 
 \small
-\begin{verbatim}
-  10,11,21,-10,0,0
-\end{verbatim}
+\begin{terminalv}
+10,11,21,-10,0,0
+\end{terminalv}
 \normalsize
 \vspace{-3mm}
 This gives the indices as a comma separated list.
 
 \small
-\begin{verbatim}
-  10,11-
-  21,-10-
-  0,0
-\end{verbatim}
+\begin{terminalv}
+10,11-
+21,-10-
+0,0
+\end{terminalv}
 \normalsize
 \vspace{-3mm}
 Ending each line with a minus  sign causes the user to be re-prompted for more
 values.
 
 \small
-\begin{verbatim}
-  ^pixels.dat
-\end{verbatim}
+\begin{terminalv}
+^pixels.dat
+\end{terminalv}
 \normalsize
 \vspace{-3mm}
 The file pixels.dat is read. The file could contain the  following four lines:
 
 \small
-\begin{verbatim}
-  #  Approximate star centres.
-  10,11
-  21,-10
-  0,0
-\end{verbatim}
+\begin{terminalv}
+#  Approximate star centres.
+10,11
+21,-10
+0,0
+\end{terminalv}
 \normalsize
 
 \subsection{Quality in IRAS90}
@@ -1066,9 +845,9 @@ exclude the data from these four sources by giving the parameter
 {\small QEXP} the following value:
 
 \small
-\begin{verbatim}
-  .NOT.( SOURCE_1 .OR. SOURCE_2 .OR. SOURCE_3 .OR. SOURCE_4 )
-\end{verbatim}
+\begin{terminalv}
+.NOT.( SOURCE_1 .OR. SOURCE_2 .OR. SOURCE_3 .OR. SOURCE_4 )
+\end{terminalv}
 \normalsize
 
 \subsection{History in IRAS90}
@@ -1112,9 +891,9 @@ if the next application which the user wishes to run is {\small SETQUAL},
 then the command could be
 
 \small
-\begin{verbatim}
-  SETQUAL HISTORY=T
-\end{verbatim}
+\begin{terminalv}
+SETQUAL HISTORY=T
+\end{terminalv}
 \normalsize
 {\small SETQUAL} (and all subsequent applications) will then add history
 information to the output {\small NDF}s. The default behaviour can be
@@ -1122,9 +901,9 @@ re-instated at some later time by assigning a false value to a
 {\small HISTORY} parameter; eg
 
 \small
-\begin{verbatim}
-  QUALTOBAD HISTORY=F
-\end{verbatim}
+\begin{terminalv}
+QUALTOBAD HISTORY=F
+\end{terminalv}
 \normalsize
 Note, not all {\small IRAS90} applications have {\small HISTORY}
 parameters, only  those which modify existing {\small NDF}s or create
@@ -1422,28 +1201,28 @@ Each detector is assumed to have the following effective solid
 angle (in units of 1.0E-7 steradians):
 
 \small
-\begin{verbatim}
-    #1     #2     #3     #4     #5     #6     #7     #8     #9
-   14.1,  13.7,  12.9,  13.1,  13.2,  13.2,  13.6,  6.10,  6.04,
+\begin{terminalv}
+ #1     #2     #3     #4     #5     #6     #7     #8     #9
+14.1,  13.7,  12.9,  13.1,  13.2,  13.2,  13.6,  6.10,  6.04,
 
-    #10    #11    #12    #13    #14    #15    #16    #17    #18
-   6.07,  1.92,  4.85,  6.10,  6.19,  6.56,  3.39,  DEAD   3.46,
+ #10    #11    #12    #13    #14    #15    #16    #17    #18
+6.07,  1.92,  4.85,  6.10,  6.19,  6.56,  3.39,  DEAD   3.46,
 
-    #19    #20    #21    #22    #23    #24    #25    #26    #27
-   3.40,   DEAD  3.48,  3.38,  3.21,  3.22,  3.17,  0.92,  2.41,
+ #19    #20    #21    #22    #23    #24    #25    #26    #27
+3.40,   DEAD  3.48,  3.38,  3.21,  3.22,  3.17,  0.92,  2.41,
 
-    #28    #29    #30    #31    #32    #33    #34    #35    #36
-   2.95,  3.25,  3.25,  1.97,  6.40,  6.32,  6.25,  6.36,   DEAD
+ #28    #29    #30    #31    #32    #33    #34    #35    #36
+2.95,  3.25,  3.25,  1.97,  6.40,  6.32,  6.25,  6.36,   DEAD
 
-    #37    #38    #39    #40    #41    #42    #43    #44    #45
-   6.37,  4.84,  1.82,  3.50,  3.44,  3.48,  3.50,  3.45,  3.46,
+ #37    #38    #39    #40    #41    #42    #43    #44    #45
+6.37,  4.84,  1.82,  3.50,  3.44,  3.48,  3.50,  3.45,  3.46,
 
-    #46    #47    #48    #49    #50    #51    #52    #53    #54
-   1.78,  0.89,  3.31,  3.22,  3.29,  3.25,  3.19,  3.24,  2.45,
+ #46    #47    #48    #49    #50    #51    #52    #53    #54
+1.78,  0.89,  3.31,  3.22,  3.29,  3.25,  3.19,  3.24,  2.45,
 
-    #55    #56    #57    #58    #59    #60    #61    #62
-    7.9,  13.3,  14.0,  12.9,  14.0,  13.8,  14.2,   6.8
-\end{verbatim}
+ #55    #56    #57    #58    #59    #60    #61    #62
+ 7.9,  13.3,  14.0,  12.9,  14.0,  13.8,  14.2,   6.8
+\end{terminalv}
 \normalsize
 
 These values were derived by M. Moshir at the Infrared
@@ -1541,9 +1320,9 @@ Time and dates should be specified in the same format as the
 following example:
 
 \small
-\begin{verbatim}
-     1992-JAN-1 11:23:23.22
-\end{verbatim}
+\begin{terminalv}
+1992-JAN-1 11:23:23.22
+\end{terminalv}
 \normalsize
 
 Notes:
@@ -1590,50 +1369,52 @@ The assistance of the following people is gratefully acknowledged:
 \label{ap:summary}
 
 \begin{small}
-\menuitem{BACKCRDD  }{ Remove a background from a group of CRDD files.}
-\menuitem{COLCORR   }{ Create colour corrected surface brightness images.}
-\menuitem{COLTEMP   }{ Create colour temperature and optical depth maps.}
-\menuitem{COADDCRDD }{ Coadd CRDD traces crossing specified positions. }
-\menuitem{DEGLCRDD  }{ Deglitch a group of CRDD files. }
-\menuitem{DESTCRDD  }{ Equalise detector offsets within a group of CRDD files.}
-\menuitem{FINDCRDD  }{ Accepts a list of sources, and prepares files specifying
+\begin{aligndesc}
+\menuitem{BACKCRDD}{ Remove a background from a group of CRDD files.}
+\menuitem{COLCORR}{ Create colour corrected surface brightness images.}
+\menuitem{COLTEMP}{ Create colour temperature and optical depth maps.}
+\menuitem{COADDCRDD}{ Coadd CRDD traces crossing specified positions. }
+\menuitem{DEGLCRDD}{ Deglitch a group of CRDD files. }
+\menuitem{DESTCRDD}{ Equalise detector offsets within a group of CRDD files.}
+\menuitem{FINDCRDD}{ Accepts a list of sources, and prepares files specifying
 corresponding CRDD data to be extracted.}
-\menuitem{FFIELD    }{ Identify the ISSA fields covering a given position.}
-\menuitem{HISTORY   }{ Display history from a group of NDFs.}
-\menuitem{I90HELP   }{ Display help on IRAS90.}
-\menuitem{IFIELD    }{ Display IRAS SKY SURVEY ATLAS plate details for a
+\menuitem{FFIELD}{ Identify the ISSA fields covering a given position.}
+\menuitem{HISTORY}{ Display history from a group of NDFs.}
+\menuitem{I90HELP}{ Display help on IRAS90.}
+\menuitem{IFIELD}{ Display IRAS SKY SURVEY ATLAS plate details for a
 specified position.}
-\menuitem{IRASTRACE }{ Display IRAS extension information from a group of NDF.}
-\menuitem{MAPCRDD   }{ Map a group of CRDD files into an image.}
-\menuitem{NEWUNITS  }{ Change the system of units in which an NDF is stored.}
-\menuitem{POINTCRDD }{ Detects point sources along the trace(s) of CRDD NDF
+\menuitem{IRASTRACE}{ Display IRAS extension information from a group of NDF.}
+\menuitem{MAPCRDD}{ Map a group of CRDD files into an image.}
+\menuitem{NEWUNITS}{ Change the system of units in which an NDF is stored.}
+\menuitem{POINTCRDD}{ Detects point sources along the trace(s) of CRDD NDF
 file.}
-\menuitem{POSCRDD   }{ Locate the closest CRDD files to a given position.}
-\menuitem{PREPARE   }{ Prepare a FITS image for use by other IRAS90 routines.}
-\menuitem{PSCONT    }{ Make hard-copy contour map with sky coordinate grid.}
-\menuitem{QUALTOBAD }{ Set NDF pixels bad which have a given set of qualities.}
-\menuitem{REMQUAL   }{ Remove the definition of pixel qualities from an NDF.}
-\menuitem{SETIMAGE  }{ Assign new global properties to an IRAS90 image.}
-\menuitem{SETQUAL   }{ Assign a quality to a group of pixels in an NDF.}
-\menuitem{SHOWQUAL  }{ Display the qualities currently defined within an NDF.}
-\menuitem{SIMCRDD   }{ Generate simulated CRDD from a supplied trial sky image.}
-\menuitem{SKYALIGN  }{ Align images using internally stored astrometric
+\menuitem{POSCRDD}{ Locate the closest CRDD files to a given position.}
+\menuitem{PREPARE}{ Prepare a FITS image for use by other IRAS90 routines.}
+\menuitem{PSCONT}{ Make hard-copy contour map with sky coordinate grid.}
+\menuitem{QUALTOBAD}{ Set NDF pixels bad which have a given set of qualities.}
+\menuitem{REMQUAL}{ Remove the definition of pixel qualities from an NDF.}
+\menuitem{SETIMAGE}{ Assign new global properties to an IRAS90 image.}
+\menuitem{SETQUAL}{ Assign a quality to a group of pixels in an NDF.}
+\menuitem{SHOWQUAL}{ Display the qualities currently defined within an NDF.}
+\menuitem{SIMCRDD}{ Generate simulated CRDD from a supplied trial sky image.}
+\menuitem{SKYALIGN}{ Align images using internally stored astrometric
 information.}
-\menuitem{SKYBOX    }{ Report extent and position of a rectangular region of the
+\menuitem{SKYBOX}{ Report extent and position of a rectangular region of the
 sky.}
-\menuitem{SKYGRID   }{ Annotate a picture with a celestial coordinates grid.}
-\menuitem{SKYLINE   }{ Draw meridians, parallels and great circles over an
+\menuitem{SKYGRID}{ Annotate a picture with a celestial coordinates grid.}
+\menuitem{SKYLINE}{ Draw meridians, parallels and great circles over an
 image.}
-\menuitem{SKYMARK   }{ Draw markers over an image at specified celestial
+\menuitem{SKYMARK}{ Draw markers over an image at specified celestial
 coordinates.}
-\menuitem{SKYPHOT   }{ Calculate integrated fluxes within square, circular, or
+\menuitem{SKYPHOT}{ Calculate integrated fluxes within square, circular, or
 polygonal apertures.}
-\menuitem{SKYPOS    }{ Transform positions between image and celestial
+\menuitem{SKYPOS}{ Transform positions between image and celestial
 coordinates.}
-\menuitem{SKYWRITE  }{ Write text over an image at specified celestial
+\menuitem{SKYWRITE}{ Write text over an image at specified celestial
 coordinates.}
-\menuitem{TRACECRDD }{ Graphically display detector data streams from a CRDD
+\menuitem{TRACECRDD}{ Graphically display detector data streams from a CRDD
 file.}
+\end{aligndesc}
 \end{small}
 
 \newpage
@@ -1751,53 +1532,50 @@ coordinates.
 In the routine specifications which follow, application parameters have the
 following format.
 
-\begin{verbatim}
-     name  =  type (access)
-        description
-\end{verbatim}
+\begin{terminalv}
+name  =  type (access)
+  description
+\end{terminalv}
 
-The {\em name} is the string which should be used to refer to the parameter. The
-{\em type} is a description of the type of object or value which should be
-assigned to the value. The {\em access} string specifies if the parameter is
-used to pass information from the environment to the application ( ``{\em
-read}'' access), from the application to the environment ( ``{\em write}''
-access), or both ( ``{\em update}'' access).
+The \emph{name} is the string which should be used to refer to the parameter. The
+\emph{type} is a description of the type of object or value which should be
+assigned to the value. The \emph{access} string specifies if the parameter is
+used to pass information from the environment to the application ( ``\emph{read}'' access), from the application to the environment ( ``\emph{write}''
+access), or both ( ``\emph{update}'' access).
 
-Each routine specifications includes a {\em Usage\/} entry.  This shows how the
+Each routine specifications includes a \emph{Usage\/} entry.  This shows how the
 application is invoked from the command line.   It lists the parameters which
 can be specified by position on the command line, in the order in which they
-are used. Parameter which are not included in the {\em Usage\/} entry can be
+are used. Parameter which are not included in the \emph{Usage\/} entry can be
 assigned a value on the command line by using a keyword assignment. Here is an
-example. The {\em Usage\/} entry for application SKYGRID is:
+example. The \emph{Usage\/} entry for application SKYGRID is:
 
-\bigskip
-
-{\ssttt \hspace*{1.0em}
-        SKYGRID DEVICE IN
-}
+\begin{terminalv}
+SKYGRID DEVICE IN
+\end{terminalv}
 
 If the following command line was used to invoke SKYGRID
 
 \small
-\begin{verbatim}
-     ICL> SKYGRID XWINDOWS M51 PENA=2 PENB=2 LINES
-\end{verbatim}
+\begin{terminalv}
+ICL> SKYGRID XWINDOWS M51 PENA=2 PENB=2 LINES
+\end{terminalv}
 \normalsize
 
 then the positional parameters DEVICE and IN would be assigned the values
 ``XWINDOWS'' and ``M51'' respectively. Parameters PENA and PENB are not included
-in the list of positional parameters in the {\em Usage\/} entry and so need to
+in the list of positional parameters in the \emph{Usage\/} entry and so need to
 be specified using keyword assignments (eg ``PENA=2''). The parameter LINES
 takes a logical value, and so including ``LINES'' on the command line is
 equivalent to ``LINES=YES'' (similarly, ``NOLINES'' would have been equivalent
 to ``LINES=NO'').
 
-There is also an {\em Examples\/} section for most applications.  This shows
+There is also an \emph{Examples\/} section for most applications.  This shows
 how to run the application from the command line.  More often you'll enter the
 command name and just some of the parameters, and be prompted for the rest.
 
-The {\em Parameters\/} section has a notation scheme to indicate
-normally defaulted parameters, {\it i.e.}\ those for which there will
+The \emph{Parameters\/} section has a notation scheme to indicate
+normally defaulted parameters, \textit{i.e.}\ those for which there will
 be no prompt.
 For such parameters a matching pair of square brackets ({\ssttt []})
 terminates the description.  The content between the brackets mean
@@ -1811,7 +1589,7 @@ description will include a description of how the dynamic default is generated.
 As above, but there are two default values that are created dynamically.
 \item[{\ssttt [}{\rm default}{\ssttt ]}]
 Occasionally, a description of the default is given in normal type,
-{\it e.g.}\ the size of the plotting region in a graphics application,
+\textit{e.g.}\ the size of the plotting region in a graphics application,
 where the exact default values depend on the device chosen.
 \item[{\ssttt [default]}]
 If the brackets contain a value in teletype-fount, this is the explicit
@@ -1858,7 +1636,7 @@ default value.
          HISTORY = \_LOGICAL (Read)
       }{
          Determines if history information is to be stored within the
-         output CRDD files. See help on {\tt "}History\_in\_IRAS90{\tt "} for more
+         output CRDD files. See help on \texttt{"}History\_in\_IRAS90\texttt{"} for more
          information on history.  The history information will contain
          the names of the input CRDD files and BACKCRDD parameter
          values.                               [current history setting]
@@ -1867,7 +1645,7 @@ default value.
          IN = NDF (Read)
       }{
          Specifies a group of input CRDD files. This should be in the
-         form of a group expression (see help on {\tt "}Group\_expressions{\tt "}).
+         form of a group expression (see help on \texttt{"}Group\_expressions\texttt{"}).
          The CRDD files must contain data from the same IRAS waveband.
          There is no limit on the number of CRDD files which can be
          specified.
@@ -1877,7 +1655,7 @@ default value.
       }{
          The level of information displayed on the users screen. This
          should take one of the values QUIET, NORMAL or VERBOSE (see
-         help on {\tt "}Message\_filtering{\tt "}).
+         help on \texttt{"}Message\_filtering\texttt{"}).
                                         [current message filter setting]
       }
       \sstsubsection{
@@ -1886,8 +1664,8 @@ default value.
          A group of output CRDD files corresponding one-for-one with
          the list of input CRDD files given for parameter IN.  This
          should be in the form of a group expression (see help on
-         {\tt "}Group\_expressions{\tt "}). Expressions such as {\tt "}$*$\_BAK{\tt "} are expanded
-         by replacing the {\tt "}$*${\tt "} character with each input CRDD file in
+         \texttt{"}Group\_expressions\texttt{"}). Expressions such as \texttt{"}$*$\_BAK\texttt{"} are expanded
+         by replacing the \texttt{"}$*$\texttt{"} character with each input CRDD file in
          turn.
       }
       \sstsubsection{
@@ -1911,7 +1689,7 @@ default value.
       }{
          A quality expression giving the quality of samples which are
          to be included in the estimation of the backgrounds to be
-         subtracted from each CRDD file. A value of {\tt "}ANY{\tt "} causes all
+         subtracted from each CRDD file. A value of \texttt{"}ANY\texttt{"} causes all
          samples to be used, without regard to quality.            [ANY]
       }
       \sstsubsection{
@@ -1962,8 +1740,8 @@ default value.
       }{
          This command attempts to estimate linear backgrounds for all
          NDFs in the current directory which have names ending with
-         {\tt "}\_DS{\tt "}. The estimated backgrounds are stored in corresponding
-         output NDFs in which {\tt "}\_DS{\tt "} is replaced by {\tt "}\_FIT{\tt "}. Any samples
+         \texttt{"}\_DS\texttt{"}. The estimated backgrounds are stored in corresponding
+         output NDFs in which \texttt{"}\_DS\texttt{"} is replaced by \texttt{"}\_FIT\texttt{"}. Any samples
          which have either of the two qualities SOURCE\_A and/or
          SOURCE\_B are excluded from the estimation of the background.
       }
@@ -1972,7 +1750,7 @@ default value.
       Excluding Samples from the Background Estimate
    }{
       The user may choose to exclude certain samples from the
-      estimation of the background by giving a {\tt "}quality expression{\tt "} for
+      estimation of the background by giving a \texttt{"}quality expression\texttt{"} for
       parameter QEXP. Only those samples which have qualities
       satisfying the given quality expression are included in the
       estimation of the background. Qualities can be assigned to
@@ -1983,8 +1761,8 @@ default value.
    }{
       After removing samples which do not satisfy the quality
       expression, the median surface brightness value in each CRDD file
-      is found (see help on {\tt "}Detector\_solid\_angles{\tt "} and
-      {\tt "}Detector\_bandwidths{\tt "} for lists of the detector effective solid
+      is found (see help on \texttt{"}Detector\_solid\_angles\texttt{"} and
+      \texttt{"}Detector\_bandwidths\texttt{"} for lists of the detector effective solid
       angles and band widths used to convert between flux, flux density
       and surface brightness values). An attempt is then made to
       improve the fit to the background by iteratively removing any
@@ -2166,7 +1944,7 @@ default value.
          HISTORY = \_LOGICAL (Read)
       }{
          Determines if history information is to be stored within the
-         output NDF. See help on {\tt "}History\_in\_IRAS90{\tt "} for more
+         output NDF. See help on \texttt{"}History\_in\_IRAS90\texttt{"} for more
          information on history.
                                                [current history setting]
       }
@@ -2194,7 +1972,7 @@ default value.
       }{
          The level of information displayed on the users screen. This
          should take one of the values QUIET, NORMAL or VERBOSE (see
-         help on {\tt "}Message\_filtering{\tt "}).
+         help on \texttt{"}Message\_filtering\texttt{"}).
                                         [current message filter setting]
       }
       \sstsubsection{
@@ -2338,8 +2116,8 @@ default value.
       the parameter DISTANCE should be set false.
 
       When the input CRDD files have variance components, the default
-      weighting will be {\tt '}distance-variance{\tt '}, otherwise the weighting
-      will be {\tt '}distance-NEFD{\tt '}.
+      weighting will be \texttt{'}distance-variance\texttt{'}, otherwise the weighting
+      will be \texttt{'}distance-NEFD\texttt{'}.
 
       For each crossing scan, a sequence of about 80.0 arcmin length is
       extracted centered on the expected source position, these are usually
@@ -2353,7 +2131,7 @@ default value.
       opposite direction to the direction of the closest scan. Then the
       samples are aligned so that the samples crossing the source position
       coincide. The interpolation used when aligning the traces can be either
-      {\tt '}nearest{\tt '} or {\tt '}linear{\tt '}. In nearest interpolation the sample nearest to
+      \texttt{'}nearest\texttt{'} or \texttt{'}linear\texttt{'}. In nearest interpolation the sample nearest to
       the source position is used as a central point. In linear interpolation
       the central value is a linear combination of the two samples closest
       to the source position and the values for each sample worked outwards
@@ -2396,7 +2174,7 @@ default value.
       SOP, OBS and detector number, and such figures as cross scan distance
       reported by the applications may be irrelevant to data trace it contains.
       Thus TRACECRDD will report the correct reference position, a cross scan
-      value and positions in {\tt '}get data value{\tt '} that may be out by the half
+      value and positions in \texttt{'}get data value\texttt{'} that may be out by the half
       detector width, an average point source profile for the waveband, and
       a detector number which is not applicable.
 
@@ -2433,7 +2211,7 @@ default value.
          trace for each expected point source. It will only be used when
          the application is running in non-automatic mode. If the
          application is running in automatic mode the default value will
-         be {\tt "}coadded\_{\tt "}sourcename{\tt "}\_b{\tt "}waveband number eg coadded\_wola\_b3 .
+         be \texttt{"}coadded\_\texttt{"}sourcename\texttt{"}\_b\texttt{"}waveband number eg coadded\_wola\_b3 .
       }
       \sstsubsection{
          COORDS = LITERAL (Read)
@@ -2442,7 +2220,7 @@ default value.
          point source positions. When reporting in the log file, this
          sky coordinate system will also be used to describe the crossed
          expected point source position. Valid values include ECLIPTIC,
-         EQUATORIAL and GALACTIC. See help on {\tt "}Sky\_coordinates{\tt "} for more
+         EQUATORIAL and GALACTIC. See help on \texttt{"}Sky\_coordinates\texttt{"} for more
          information on available sky coordinate systems.
          [current sky coordinate system]
       }
@@ -2450,7 +2228,7 @@ default value.
          IN = NDF (Read)
       }{
          Specifies a group of input CRDD NDF files. This should be in the
-         form of a group expression (see help on {\tt "}Group\_expressions{\tt "}).
+         form of a group expression (see help on \texttt{"}Group\_expressions\texttt{"}).
          All files in the group should be from the same CRDD type, but can
          be from different waveband. If an expected source is crossed by
          the detector traces from the different wavebands, the coadding
@@ -2500,7 +2278,7 @@ default value.
       }{
          The level of information displayed on the users screen. This
          should take one of the values QUIET, NORMAL or VERBOSE (see
-         help on {\tt "}Message\_filtering{\tt "}).  [current message filter setting]
+         help on \texttt{"}Message\_filtering\texttt{"}).  [current message filter setting]
       }
       \sstsubsection{
          OFILTXT = LITERAL (Read)
@@ -2524,9 +2302,9 @@ default value.
          in the coordinate system specified by the parameter COORDS
          (eg if COORDS is EQUATORIAL then SOURCE\_LAT should be given
           the Declination of the image centre). See help on
-         {\tt "}Sky\_coordinates{\tt "} for the formats allowed for this value.
+         \texttt{"}Sky\_coordinates\texttt{"} for the formats allowed for this value.
          The application will keep prompting for the next expected
-         source position until a null, {\tt '}!{\tt '}, value is given to the
+         source position until a null, \texttt{'}!\texttt{'}, value is given to the
          parameter SOURCE\_NAME.
       }
       \sstsubsection{
@@ -2536,9 +2314,9 @@ default value.
          in the coordinate system specified by the parameter COORDS
          (eg if COORDS is EQUATORIAL then source\_LON should be given the
          Right Ascension of the image centre). See help on
-         {\tt "}Sky\_coordinates{\tt "} for the formats allowed for this value.
+         \texttt{"}Sky\_coordinates\texttt{"} for the formats allowed for this value.
          The application will keep prompting for the next expected
-         source position until a null, {\tt '}!{\tt '}, value is given to the
+         source position until a null, \texttt{'}!\texttt{'}, value is given to the
          parameter SOURCE\_NAME.
       }
       \sstsubsection{
@@ -2546,7 +2324,7 @@ default value.
       }{
          The name of the additional expected sources specified by the
          user. The application will keep prompting for the name of the
-         next source until a null value,{\tt '}!{\tt '} is supplied. [!]
+         next source until a null value,\texttt{'}!\texttt{'} is supplied. [!]
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -2554,7 +2332,7 @@ default value.
          The title of the output NDF file which contains the coadded
          data trace. In the automation mode, the title of the NDF for a
          expected source will be created by the application by
-         concatenating the string {\tt '}COADDCRDD:{\tt '} and the source name. And
+         concatenating the string \texttt{'}COADDCRDD:\texttt{'} and the source name. And
          hance this parameter will not be used in this mode.
       }
       \sstsubsection{
@@ -2659,7 +2437,7 @@ default value.
          HISTORY = LOGICAL (Read)
       }{
          Determines if history information is to be added to the input
-         or output CRDD files. See help on {\tt "}History\_in\_IRAS90{\tt "} for more
+         or output CRDD files. See help on \texttt{"}History\_in\_IRAS90\texttt{"} for more
          information on history.
          [Current history setting]
       }
@@ -2667,7 +2445,7 @@ default value.
          IN = NDF (Read)
       }{
          Specifies a group of input CRDD files. This should be in the
-         form of a group expression (see help on {\tt "}Group\_expressions{\tt "}).
+         form of a group expression (see help on \texttt{"}Group\_expressions\texttt{"}).
          There is no limit on the number of CRDD files which can be
          specified.
       }
@@ -2676,13 +2454,13 @@ default value.
       }{
          The level of information displayed on the users screen. This
          should take one of the values QUIET, NORMAL or VERBOSE (see
-         help on {\tt "}Message\_filtering{\tt "}).
+         help on \texttt{"}Message\_filtering\texttt{"}).
          [current message filter setting]
       }
       \sstsubsection{
          NITER = INTEGER (Given)
       }{
-         The number of iterations to perform the {\tt "}soomth-reject{\tt "}
+         The number of iterations to perform the \texttt{"}soomth-reject\texttt{"}
          procedure. [8]
       }
       \sstsubsection{
@@ -2692,8 +2470,8 @@ default value.
          Starlink bad values, this parameter is used to give a group of
          output CRDD files corresponding one-for-one with the list of
          input CRDD files given for parameter IN. This should be in the
-         form of a group expression (see help on {\tt "}Group\_expressions{\tt "}).
-         Expressions such as {\tt "}$*$\_DG{\tt "} are expanded by replacing the {\tt "}$*${\tt "}
+         form of a group expression (see help on \texttt{"}Group\_expressions\texttt{"}).
+         Expressions such as \texttt{"}$*$\_DG\texttt{"} are expanded by replacing the \texttt{"}$*$\texttt{"}
          character with each input CRDD file in turn.
       }
       \sstsubsection{
@@ -2702,7 +2480,7 @@ default value.
          An NDF holding in-scan profiles of ideal point sources. The
          width of a point source in a waveband are difined as the width
          of the profile, given here,  at its half max. value.
-         The default value is the files {\tt "}profiles.sdf{\tt "} contained in
+         The default value is the files \texttt{"}profiles.sdf\texttt{"} contained in
          the main IRAS90 directory, which contains profiles taken from
          the IRAS Catalogs and Atlases Explanatory Supplement, page
          V-14. [ ]
@@ -2828,7 +2606,7 @@ default value.
          HISTORY = \_LOGICAL (Read)
       }{
          Determines if history information is to be stored within the
-         output CRDD files. See help on {\tt "}History\_in\_IRAS90{\tt "} for more
+         output CRDD files. See help on \texttt{"}History\_in\_IRAS90\texttt{"} for more
          information on history. The history information will contain
          the names of the input CRDD files, DESTCRDD parameter values,
          and the offsets subtracted from each detector.
@@ -2838,7 +2616,7 @@ default value.
          IN = NDF (Read)
       }{
          Specifies a group of input CRDD files. This should be in the
-         form of a group expression (see help on {\tt "}Group\_expressions{\tt "}).
+         form of a group expression (see help on \texttt{"}Group\_expressions\texttt{"}).
          The CRDD files must contain data from the same IRAS waveband.
          There is no limit on the number of CRDD files which can be
          specified.
@@ -2848,7 +2626,7 @@ default value.
       }{
          The level of information displayed on the users screen. This
          should take one of the values QUIET, NORMAL or VERBOSE (see
-         help on {\tt "}Message\_filtering{\tt "}).
+         help on \texttt{"}Message\_filtering\texttt{"}).
                                         [current message filter setting]
       }
       \sstsubsection{
@@ -2863,8 +2641,8 @@ default value.
          A group of output CRDD files corresponding one-for-one with
          the list of input CRDD files given for parameter IN.  This
          should be in the form of a group expression (see help on
-         {\tt "}Group\_expressons{\tt "}). Expressions such as {\tt "}$*$\_DS{\tt "} are expanded
-         by replacing the {\tt "}$*${\tt "} character with each input CRDD file in
+         \texttt{"}Group\_expressons\texttt{"}). Expressions such as \texttt{"}$*$\_DS\texttt{"} are expanded
+         by replacing the \texttt{"}$*$\texttt{"} character with each input CRDD file in
          turn.
       }
       \sstsubsection{
@@ -2872,7 +2650,7 @@ default value.
       }{
          A quality expression giving the quality of samples which are
          to be included in the estimation of the offset to be
-         subtracted from each detector. A value of {\tt "}ANY{\tt "} causes all
+         subtracted from each detector. A value of \texttt{"}ANY\texttt{"} causes all
          samples to be used, without regard to quality.            [ANY]
       }
       \sstsubsection{
@@ -2915,9 +2693,9 @@ default value.
          DESTCRDD $*$\_RAW $*$$|$\_RAW$|$\_DS$|$ QEXP=.NOT.(SOURCE\_A.OR.SOURCE\_B)
       }{
          This command attempts to destripe all NDFs in the current
-         directory which have names ending with {\tt "}\_RAW{\tt "}, placing the
-         results in corresponding output NDFs in which {\tt "}\_RAW{\tt "} is
-         replaced by {\tt "}\_DS{\tt "}. Any samples which have either of the two
+         directory which have names ending with \texttt{"}\_RAW\texttt{"}, placing the
+         results in corresponding output NDFs in which \texttt{"}\_RAW\texttt{"} is
+         replaced by \texttt{"}\_DS\texttt{"}. Any samples which have either of the two
          qualities SOURCE\_A and/or SOURCE\_B are excluded from the
          estimation of the detector offsets.
       }
@@ -2926,14 +2704,14 @@ default value.
       Estimation of Detector Offsets
    }{
       The user may choose to exclude certain samples from the estimation
-      of the detector offsets, by giving a {\tt "}quality expression{\tt "} for
+      of the detector offsets, by giving a \texttt{"}quality expression\texttt{"} for
       parameter QEXP. Only those samples which have qualities satisfying
       the given quality expression are included in the estimation of the
       detector offsets. Qualities can be assigned to selected samples
       using routine SETQUAL.
 
       After removing samples which do not satisfy the quality
-      expression, each detector data stream is {\tt "}cleaned{\tt "} by removing
+      expression, each detector data stream is \texttt{"}cleaned\texttt{"} by removing
       any remaining bright sources which may adversly influence the
       estimation of the background surface brightness. To do this the
       detector data stream is smoothed with a box filter, the size of
@@ -2948,12 +2726,12 @@ default value.
 
       Next, the median value of the remaining data is found, and is
       converted into a surface brightness value in Mega-Janskys per
-      steradian (see help on {\tt "}Detector\_solid\_angles{\tt "} and
-      {\tt "}Detector\_bandwidths{\tt "} for lists of detector effective solid
+      steradian (see help on \texttt{"}Detector\_solid\_angles\texttt{"} and
+      \texttt{"}Detector\_bandwidths\texttt{"} for lists of detector effective solid
       angles and band widths). The mean of the median surface
       brightnesses of all detectors in the CRDD file is found. The
       detector offsets are then calculated by subtracting this mean
-      surface brightness from each individual detector{\tt '}s median surface
+      surface brightness from each individual detector\texttt{'}s median surface
       brightness. The offsets are finally converted back from
       Mega-Janskys per steradian to the units of the input CRDD file.
 
@@ -3036,7 +2814,7 @@ default value.
          (The facility that requires this is not available in FINDCRDD
          version 1.0).
 
-         Type of survey data required: 0 = Don{\tt '}t know, 2 = PASS 2 CRDD
+         Type of survey data required: 0 = Don\texttt{'}t know, 2 = PASS 2 CRDD
          on tape, 3 = PASS 3 CRDD on exobyte.
       }
       \sstsubsection{
@@ -3125,7 +2903,7 @@ default value.
       \sstsubsection{
          MENU11CHOICE = LITERAL (Read)
       }{
-         Users choice from {\tt '}Select data to use{\tt '} menu within the Input
+         Users choice from \texttt{'}Select data to use\texttt{'} menu within the Input
          Source Positions option:-
          \sstitemlist{
 
@@ -3157,7 +2935,7 @@ default value.
       \sstsubsection{
          MENU12CHOICE = LITERAL (Read)
       }{
-         Users choice from {\tt '}Edit source list{\tt '} menu within the Input
+         Users choice from \texttt{'}Edit source list\texttt{'} menu within the Input
          source positions option:-
          \sstitemlist{
 
@@ -3255,7 +3033,7 @@ default value.
          some of the required region off the edge of the plate.
 
          The default name of this file is generated automatically as
-         {\tt '}source name{\tt '}\_OFFEDGE ( or the corresponding lower case on a
+         \texttt{'}source name\texttt{'}\_OFFEDGE ( or the corresponding lower case on a
          UNIX machine) and offered to the user.
       }
       \sstsubsection{
@@ -3430,7 +3208,7 @@ default value.
          No ADAM parameter is given for the OUTPUT HDS FILE. An output
          HDS file is generated for each plate, containing information on
          the data EXCRDD needs to extract form that plate. This file is
-         automatically given the name {\tt "}PLATExxxx{\tt "} where xxxx is the plate
+         automatically given the name \texttt{"}PLATExxxx\texttt{"} where xxxx is the plate
          number, and therefore the program does not need to access the
          parameter system. ( or the corresponding lower case name on a UNIX
          machine)
@@ -3499,7 +3277,7 @@ default value.
          created the history record, then the record is displayed. The
          names of all IRAS90 applications are stored in the form
          IRAS90:xxx, where xxx is the name of the application. Thus if
-         COMMAND was given the value {\tt "}IRAS90:{\tt "}, then only those history
+         COMMAND was given the value \texttt{"}IRAS90:\texttt{"}, then only those history
          records which were created by IRAS90 applications would be
          displayed. A null value causes all history records to be
          displayed (subject to any other selection criteria). If LOOP
@@ -3511,7 +3289,7 @@ default value.
       }{
          The operation to be performed. Options are DISPLAY, ERASE or
          ADD. If LOOP has a false value then the run time default is
-         {\tt '}DISPLAY{\tt '}, otherwise there is no run time default.           []
+         \texttt{'}DISPLAY\texttt{'}, otherwise there is no run time default.           []
       }
       \sstsubsection{
          LOGFILE = LITERAL (Write)
@@ -3583,10 +3361,10 @@ default value.
          HISTORY M51$*$ ERASE
       }{
          This will remove all history information from all NDFs with
-         names which start with the string {\tt "}M51{\tt "}.
+         names which start with the string \texttt{"}M51\texttt{"}.
       }
       \sstexamplesubsection{
-         HISTORY {\tt "}CENA,M82{\tt "} LOGFILE=HISTORY MSG\_FILTER=QUIET
+         HISTORY \texttt{"}CENA,M82\texttt{"} LOGFILE=HISTORY MSG\_FILTER=QUIET
       }{
          This will write all the history information contained within
          the two NDFs CENA and M82 to the text file HISTORY.DAT, but
@@ -3600,10 +3378,10 @@ default value.
          then reprompt the user for a new operation.
       }
       \sstexamplesubsection{
-         HISTORY M51 ADD TEXT={\tt "}So far so good{\tt "}
+         HISTORY M51 ADD TEXT=\texttt{"}So far so good\texttt{"}
       }{
          This will append a new history record to M51, containing the
-         text {\tt "}So far so good{\tt "}.
+         text \texttt{"}So far so good\texttt{"}.
       }
       \sstexamplesubsection{
          HISTORY M51 ADD TEXT=\^{}NEWHIST.LIS
@@ -3657,22 +3435,22 @@ default value.
       \sstsubsection{
          SUBSUBSUBTOPIC = LITERAL (Read)
       }{
-         Subsubsubtopic for which help is to be given.             [{\tt "} {\tt "}]
+         Subsubsubtopic for which help is to be given.             [\texttt{"} \texttt{"}]
       }
       \sstsubsection{
          SUBSUBTOPIC = LITERAL (Read)
       }{
-         Subsubtopic for which help is to be given.                [{\tt "} {\tt "}]
+         Subsubtopic for which help is to be given.                [\texttt{"} \texttt{"}]
       }
       \sstsubsection{
          SUBTOPIC = LITERAL (Read)
       }{
-         Subtopic for which help is to be given.                   [{\tt "} {\tt "}]
+         Subtopic for which help is to be given.                   [\texttt{"} \texttt{"}]
       }
       \sstsubsection{
          TOPIC = LITERAL (Read)
       }{
-         Topic for which help is to be given.                      [{\tt "} {\tt "}]
+         Topic for which help is to be given.                      [\texttt{"} \texttt{"}]
       }
    }
 }
@@ -3804,7 +3582,7 @@ default value.
          IRASTRACE CENA$*$ CENA.LIS
       }{
          This will display the contents of the IRAS extensions within
-         all NDF beginning with the string {\tt "}CENA{\tt "}. The information will
+         all NDF beginning with the string \texttt{"}CENA\texttt{"}. The information will
          also be written to the text file CENA.LIS
       }
    }
@@ -3881,7 +3659,7 @@ default value.
          The second dimension (i.e. the in-scan axis) should have an
          associated AXIS structure containing a CENTRE array and a UNITS
          component. The UNITS component must start with the string
-         {\tt "}ARC-MIN{\tt "} (case is ignored), and the CENTRE array must contain the
+         \texttt{"}ARC-MIN\texttt{"} (case is ignored), and the CENTRE array must contain the
          in-scan offset from the detector centre to each point in the
          profile, in arc-minutes. These values should be in the same sense
          as the focal plane Y axis.
@@ -4087,13 +3865,13 @@ section \ref{SEC:SKY}
       \sstsubsection{
          ORIENT = \_REAL (Read)
       }{
-         The position angle of the second image axis( or {\tt "}Y{\tt "} axis), in
+         The position angle of the second image axis( or \texttt{"}Y\texttt{"} axis), in
          degrees.  That is, the angle from north (defined by the
          coordinate system specified by parameter COORDS) to the image
-         {\tt "}Y{\tt "} axis ({\tt "}upwards{\tt "} if the image is displayed normally).
+         \texttt{"}Y\texttt{"} axis (\texttt{"}upwards\texttt{"} if the image is displayed normally).
          Positive angles are measured in the same sense as rotation
          from north through east.  The default value of zero puts
-         north {\tt "}upwards{\tt "}.                                          [0.0]
+         north \texttt{"}upwards\texttt{"}.                                          [0.0]
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -4130,7 +3908,7 @@ section \ref{SEC:SKY}
          A quality expression (see section \ref{SEC:QUAL}).  Only
          those samples from the input CRDD files which have a QUALITY
          satisfying the given quality expression will be included in
-         the mapping process. The default value of {\tt "}ANY{\tt "} causes all
+         the mapping process. The default value of \texttt{"}ANY\texttt{"} causes all
          data to be used regardless of QUALITY.  If any of the quality
          names referenced in the quality expression are not defined for
          an input CRDD file, then the entire CRDD file is included in
@@ -4142,7 +3920,7 @@ section \ref{SEC:SKY}
          SECSIZE = \_REAL (Read)
       }{
          The cross-scan and in-scan sizes of a full size detector
-         {\tt "}sector{\tt "} in arc-minutes.  Smaller values will produce a more
+         \texttt{"}sector\texttt{"} in arc-minutes.  Smaller values will produce a more
          accurately Gaussian in-scan weighting function, but will
          increase the run-time in proportion. The default values are
          both equal to half of the minimum of the two pixel dimensions
@@ -4186,7 +3964,7 @@ section \ref{SEC:SKY}
          variances.  If INTERNAL is specified, then the output
          variances are estimated internally from the spread of CRDD
          samples contributing to each output pixel. Users must be aware
-         of the warnings about such variances contained in the {\tt "}Notes{\tt "}
+         of the warnings about such variances contained in the \texttt{"}Notes\texttt{"}
          section below. A value of NONE for VAROUT causes no output
          variances to be calculated, with a corresponding reduction in
          run time.  If all input CRDD files have VARIANCES components,
@@ -4256,7 +4034,7 @@ section \ref{SEC:SKY}
 
       The algorithm proceeds for each data sample by first finding the
       centre of the detector within the output image. The area covered
-      by the detector is then divided into rectangular {\tt "}sectors{\tt "} (see
+      by the detector is then divided into rectangular \texttt{"}sectors\texttt{"} (see
       parameter SECSIZE).  The sample weight within each sector is
       found (it is considered to be constant across the sector), and
       multiplied by the sample value. The output pixel closest to the
@@ -4265,7 +4043,7 @@ section \ref{SEC:SKY}
       (expressed as surface brightness values), and the second hold the
       sum of the weights. After this has been done for all data
       samples, the first image is divided by the second.  Any pixels
-      which have zero weight are set to the {\tt "}bad{\tt "} value.  Each output
+      which have zero weight are set to the \texttt{"}bad\texttt{"} value.  Each output
       pixel value is thus the weighted mean of the neighbouring data
       samples.
    }
@@ -4277,7 +4055,7 @@ section \ref{SEC:SKY}
       fewer pixels).  However, if all input data have associated
       variance estimates, there is an option (see parameter WEIGHT) for
       giving each sample a total weight proportional to the reciprocal
-      of the sample{\tt '}s variance. It should be borne in mind that
+      of the sample\texttt{'}s variance. It should be borne in mind that
       brighter samples usually have larger variances, so this option
       will give lower weight to brighter samples, thus (for instance)
       systematically lowering point source fluxes. Samples with zero
@@ -4294,7 +4072,7 @@ section \ref{SEC:SKY}
       in this image are the square of the weights used in the first
       image. The final variances are formed by dividing this third
       image by the square of the second image. These variances represent
-      the expected error between the {\tt "}true{\tt "} sky AFTER CONVOLUTION WITH
+      the expected error between the \texttt{"}true\texttt{"} sky AFTER CONVOLUTION WITH
       THE DETECTOR PSFS, and the calculated surface brightness image.
       It should be remembered that Starlink software assumes that the
       NDF VARIANCE component holds variances related to independent,
@@ -4313,8 +4091,8 @@ section \ref{SEC:SKY}
       source, will be completely dominated by the real variations
       caused by the point source. They will have only a relatively
       small contribution from the variations caused by noise. Caution
-      should therefore be shown when using these {\tt "}internally
-      calculated{\tt "} variance estimates.  Having said that, one benefit of
+      should therefore be shown when using these \texttt{"}internally
+      calculated\texttt{"} variance estimates.  Having said that, one benefit of
       using internal variance values, is that the resulting output
       variances will automatically include noise caused by residual
       striping in the input data. This will not usually be the case if
@@ -4329,7 +4107,7 @@ section \ref{SEC:SKY}
       are described in the section \ref{SEC:UNITS}. The detector effective
       solid angles and bandwidths used to produce the output values are
       listed in the section \ref{SEC:SOLAN} and
-      {\tt "}Detector\_bandwidths{\tt "}. These values are also written to the
+      \texttt{"}Detector\_bandwidths\texttt{"}. These values are also written to the
       HISTORY component of the output NDF (see parameter HISTORY).
    }
 }
@@ -4377,7 +4155,7 @@ section \ref{SEC:SKY}
          A group of output NDFs corresponding one-for-one with the list
          of input NDFs given for parameter IN.  This should be in the
          form of a group expression (see section \ref{SEC:GRP}).
-         Expressions such as {\tt "}$*$\_NEW{\tt "} are expanded by replacing the {\tt "}$*${\tt "}
+         Expressions such as \texttt{"}$*$\_NEW\texttt{"} are expanded by replacing the \texttt{"}$*$\texttt{"}
          character with each input NDF in turn.
       }
       \sstsubsection{
@@ -4391,10 +4169,10 @@ section \ref{SEC:SKY}
       \sstexamplesubsection{
          NEWUNITS M51$*$ $*$\_SB MJy/sr
       }{
-         This example copies all NDFs starting with the string {\tt "}M51{\tt "} to
+         This example copies all NDFs starting with the string \texttt{"}M51\texttt{"} to
          a set of corresponding output NDFs. The name of each output
          NDF is formed by extending the name of the input NDF with the
-         string {\tt "}\_SB{\tt "}. The data values are converted into Mega-Janskys
+         string \texttt{"}\_SB\texttt{"}. The data values are converted into Mega-Janskys
          per steradian. If any of the inputs contain variance values,
          they are converted into units of (MJy/sr)$*$$*$2.
       }
@@ -4430,7 +4208,7 @@ section \ref{SEC:SKY}
 }{
    \sstdescription{
       This application is designed to detect point sources along the
-      data traces of CRDD or CRDD-like NDF{\tt '}s (e.g. the outputs of
+      data traces of CRDD or CRDD-like NDF\texttt{'}s (e.g. the outputs of
       COADDCRDD, etc. ) files.
 
       The application will run in two modes, in non-automatic mode it will
@@ -4443,7 +4221,7 @@ section \ref{SEC:SKY}
       the user is then also prompted for the detectors to use, which can
       be nearest, choose or all. If the user selects choose the detectors and
       their cross-scan distances will be presented and the user can accept or
-      reject each. If the user enters null {\tt '}!{\tt '} to the source position the
+      reject each. If the user enters null \texttt{'}!\texttt{'} to the source position the
       application will assume the full scan length should be searched for
       all detectors.
 
@@ -4483,7 +4261,7 @@ section \ref{SEC:SKY}
       vii) A final test of the candidate position is applied. The signal at
            the position is compared with the local noise and it accepted as
            a point source if it exceeds THRESH\_S2N times the local noise.
-           If THRESH\_S2N is given the null value {\tt '}!{\tt '} this test will not be
+           If THRESH\_S2N is given the null value \texttt{'}!\texttt{'} this test will not be
            applied and all candidates will be reported.
 
       The output results consist of three sections, the detection parameter
@@ -4515,7 +4293,7 @@ section \ref{SEC:SKY}
          position and to decribe the sky positions of the found point sources
          when reporting the detection results.
          Valid values include ECLIPTIC, EQUATORIAL and GALACTIC.
-         See help on {\tt "}Sky\_coordinates{\tt "} for more information on on available
+         See help on \texttt{"}Sky\_coordinates\texttt{"} for more information on on available
          sky coordinate systems.
          [current sky coordinate system]
       }
@@ -4555,7 +4333,7 @@ section \ref{SEC:SKY}
       }{
          The level of information displayed on the users screen. This
          should take one of the values QUIET, NORMAL or VERBOSE (see
-         help on {\tt "}Message\_filtering{\tt "}).  [current message filter setting]
+         help on \texttt{"}Message\_filtering\texttt{"}).  [current message filter setting]
       }
       \sstsubsection{
          NOISE\_SMPL = REAL (Read)
@@ -4571,7 +4349,7 @@ section \ref{SEC:SKY}
          An NDF holding in-scan point source profiles used as that
          expected from an ideal point source when comparing the data of
          the slected candidate sources with the ideal point source.
-         The default value is the files {\tt "}profiles.sdf{\tt "} contained in
+         The default value is the files \texttt{"}profiles.sdf\texttt{"} contained in
          the main IRAS90 directory, which contains profiles taken from
          the IRAS Catalogs and Atlases Explanatory Supplement, page
          V-14. [ ]
@@ -4581,7 +4359,7 @@ section \ref{SEC:SKY}
       }{
          The length of scan segment in arcmin north of the expected point
          source position to be searched for point sources and used in the
-         whole scan noise estimate. If a null, {\tt '}!{\tt '} response is given,
+         whole scan noise estimate. If a null, \texttt{'}!\texttt{'} response is given,
          the trace(s) will be searched from the beginning of that end.
          [40.0]
       }
@@ -4590,7 +4368,7 @@ section \ref{SEC:SKY}
       }{
          The length of scan segment in arcmin south of the expected point
          source position to be searched for point sources and used in the
-         whole scan noise estimate. If a null, {\tt '}!{\tt '} response is given,
+         whole scan noise estimate. If a null, \texttt{'}!\texttt{'} response is given,
          the trace(s) will be searched from the beginning of that end.
          [40.0]
       }
@@ -4600,8 +4378,8 @@ section \ref{SEC:SKY}
          The sky latitude of the expected source position, in the coordinate
          system specified by the parameter COORDS (eg if COORDS is EQUATORIAL
          then SOURCE\_LAT should be given the Declination of the position).
-         See help on {\tt "}Sky\_coordinates{\tt "} for the formats allowed for this value.
-         If a null, {\tt '}!{\tt '}, response is given, the search for the point source
+         See help on \texttt{"}Sky\_coordinates\texttt{"} for the formats allowed for this value.
+         If a null, \texttt{'}!\texttt{'}, response is given, the search for the point source
          will be performed from the start to the end of all traces for all
          detectors in the CRDD file.
       }
@@ -4611,8 +4389,8 @@ section \ref{SEC:SKY}
          The sky longitude of the expected source position, in the coordinate
          system specified by the parameter COORDS (eg if COORDS is EQUATORIAL
          then SOURCE\_LON should be given the Right Ascension of the position).
-         See help on {\tt "}Sky\_coordinates{\tt "} for the formats allowed for this value.
-         If a null, {\tt '}!{\tt '}, response is given, the search for the point source
+         See help on \texttt{"}Sky\_coordinates\texttt{"} for the formats allowed for this value.
+         If a null, \texttt{'}!\texttt{'}, response is given, the search for the point source
          will be performed from the start to the end of all traces for all
          detectors in the CRDD file.
       }
@@ -4652,7 +4430,7 @@ section \ref{SEC:SKY}
          UNITS = LITERAL (Read)
       }{
          The units in which the data values are to be displayed. See
-         help on {\tt "}Data\_units{\tt "} for a list of the available units.  [Jy]
+         help on \texttt{"}Data\_units\texttt{"} for a list of the available units.  [Jy]
       }
    }
 }
@@ -4757,13 +4535,13 @@ section \ref{SEC:SKY}
    }
    \sstexamples{
       \sstexamplesubsection{
-         POSCRDD ZCMA$*$ {\tt "}7 2 10{\tt "} -12 LOGFILE=POS.LOG COORDS=EQ
+         POSCRDD ZCMA$*$ \texttt{"}7 2 10\texttt{"} -12 LOGFILE=POS.LOG COORDS=EQ
       }{
          This example displays the distance of all CRDD files which
-         start with the string {\tt "}ZCMA{\tt "} from the position RA=7h 2m 10s
+         start with the string \texttt{"}ZCMA\texttt{"} from the position RA=7h 2m 10s
          DEC=-12d 0m 0s. Any scans which actually pass through the
-         position are indicated by the columns with titles {\tt "}Sample{\tt "} and
-         {\tt "}Det.{\tt "} being non-blank. The output information is displayed on
+         position are indicated by the columns with titles \texttt{"}Sample\texttt{"} and
+         \texttt{"}Det.\texttt{"} being non-blank. The output information is displayed on
          the screen and logged to the text file POS.LOG.
       }
    }
@@ -4888,7 +4666,7 @@ section \ref{SEC:SKY}
          A group of output NDFs corresponding one-for-one with the list
          of input NDFs given for parameter IN.  This should be in the
          form of a group expression (see section \ref{SEC:GRP}).
-         Expressions such as {\tt "}$*$\_NEW{\tt "} are expanded by replacing the {\tt "}$*${\tt "}
+         Expressions such as \texttt{"}$*$\_NEW\texttt{"} are expanded by replacing the \texttt{"}$*$\texttt{"}
          character with each input NDF in turn. HISTORY and all
          extensions are propagated from the input to the output NDFs.
       }
@@ -4950,7 +4728,7 @@ section \ref{SEC:SKY}
       }{
          This example prepare all NDFs in the current directory,
          putting the results in NDFs with same names but extended with
-         the string {\tt "}\_PRE{\tt "}. If possible, any noise image found in the
+         the string \texttt{"}\_PRE\texttt{"}. If possible, any noise image found in the
          current directory are stored in the VARIANCE component of the
          associated data image.
       }
@@ -4958,7 +4736,7 @@ section \ref{SEC:SKY}
          PREPARE \^{}OLD\_NAMES.LIS $*$\_PRE TITLE=\^{}TITLES.LIS LABEL=\^{}LABELS.LIS
       }{
          The NDFs listed in the file OLD\_NAMES.LIS are prepared and put
-         into NDFs with the same names extended with the string {\tt "}\_PRE{\tt "}.
+         into NDFs with the same names extended with the string \texttt{"}\_PRE\texttt{"}.
          The title and label to use for each NDF are read from the files
          TITLES.LIS and LABELS.LIS.
       }
@@ -5104,8 +4882,8 @@ section \ref{SEC:SKY}
 
       YORIC surface brightness maps and associated photometric noise
       maps can be stored together in the same output NDF in the same
-      way as for PO images (see {\tt "}Preparing Pointed Observation
-      Images{\tt "}).
+      way as for PO images (see \texttt{"}Preparing Pointed Observation
+      Images\texttt{"}).
    }
    \sstdiytopic{
       CPC Images
@@ -5120,7 +4898,7 @@ section \ref{SEC:SKY}
       appending the strings \_50 (for the 50 um image) and \_100 (for the
       100 um image) to the end of the NDF name.  Likewise, any values
       given for parameters TITLE or LABEL are extended by appending one
-      of the strings {\tt "}(50 um){\tt "} or {\tt "}(100 um){\tt "} to the end of the supplied
+      of the strings \texttt{"}(50 um)\texttt{"} or \texttt{"}(100 um)\texttt{"} to the end of the supplied
       value. Each individual CPC image is processed like an ISSA image
       with the following exceptions:
 
@@ -5215,7 +4993,7 @@ printer
          \sstitem
           This procedure provides limited facilities for customising the
           plot using the other parameter of TURBOCONT and SKYGRID. To do
-          this the first argument ({\tt "}NDF{\tt "}) should be given the value PROMPT
+          this the first argument (\texttt{"}NDF\texttt{"}) should be given the value PROMPT
           (any values supplied for MODE and NCONT are ignored). This causes
           the keyword PROMPT to be supplied to SKYGRID and TURBOCONT, thus
           causing the user to be prompted for all parameters used by these
@@ -5277,7 +5055,7 @@ printer
          A group of output NDFs corresponding one-for-one with the list
          of input NDFs given for parameter IN.  This should be in the
          form of a group expression (see section \ref{SEC:GRP}).
-         Expressions such as {\tt "}$*$\_NEW{\tt "} are expanded by replacing the {\tt "}$*${\tt "}
+         Expressions such as \texttt{"}$*$\_NEW\texttt{"} are expanded by replacing the \texttt{"}$*$\texttt{"}
          character with each input NDF in turn.
       }
       \sstsubsection{
@@ -5290,11 +5068,11 @@ printer
       \sstexamplesubsection{
          QUALTOBAD M51$*$ $*$\_CLEAN SATURATED.OR.GLITCH
       }{
-         This example copies all NDFs starting with the string {\tt "}M51{\tt "} to
+         This example copies all NDFs starting with the string \texttt{"}M51\texttt{"} to
          a set of corresponding output NDFs. The name of each output
          NDF is formed by extending the name of the input NDF with the
-         string {\tt "}\_CLEAN{\tt "}. Any pixels which hold either of the qualities
-         {\tt "}SATURATED{\tt "} or {\tt "}GLITCH{\tt "} are set to the bad value in the output
+         string \texttt{"}\_CLEAN\texttt{"}. Any pixels which hold either of the qualities
+         \texttt{"}SATURATED\texttt{"} or \texttt{"}GLITCH\texttt{"} are set to the bad value in the output
          NDFs.
       }
    }
@@ -5308,7 +5086,7 @@ printer
    \sstdescription{
       This routine removes selected quality name definitions from each
       NDF specified by parameter NDF.  All quality names information may
-      be removed by specifying a quality name of {\tt "}ANY{\tt "}.  For more
+      be removed by specifying a quality name of \texttt{"}ANY\texttt{"}.  For more
       information about using quality within the IRAS90 package see
       the section \ref{SEC:QUAL}.
    }
@@ -5359,7 +5137,7 @@ printer
          REMQUAL M51$*$ ANY
       }{
          This example will remove all defined quality names from all
-         NDFs with names starting with the string {\tt "}M51{\tt "}.
+         NDFs with names starting with the string \texttt{"}M51\texttt{"}.
       }
    }
 }
@@ -5382,7 +5160,7 @@ printer
          HISTORY = \_LOGICAL (Read)
       }{
          Determines if history information is to be stored within the
-         modified NDFs. See help on {\tt "}History\_in\_IRAS90{\tt "} for more
+         modified NDFs. See help on \texttt{"}History\_in\_IRAS90\texttt{"} for more
          information on history.
                                                [current history setting]
       }
@@ -5406,7 +5184,7 @@ printer
       }{
          The level of information displayed on the users screen. This
          should take one of the values QUIET, NORMAL or VERBOSE (see
-         help on {\tt "}Message\_filtering{\tt "}).
+         help on \texttt{"}Message\_filtering\texttt{"}).
                                         [current message filter setting]
       }
       \sstsubsection{
@@ -5436,12 +5214,12 @@ printer
       specified by parameter QNAME to (or from) selected pixels in each
       NDF specified by parameter NDF. For more information about using
       quality within the IRAS90 package see the help on
-      {\tt "}Quality\_in\_IRAS90{\tt "}.
+      \texttt{"}Quality\_in\_IRAS90\texttt{"}.
 
       The user can select the pixels to be operated on in one of three
       ways (see parameter SELECT):
 
-      1) By giving a group of `mask{\tt '} NDFs (one for each input NDF).
+      1) By giving a group of `mask\texttt{'} NDFs (one for each input NDF).
       Pixels with bad values in the mask NDFs will be selected from the
       corresponding input NDFs.
 
@@ -5449,7 +5227,7 @@ printer
       be selected (a single list is provided which is used for all input
       NDFs).
 
-      3) By giving an ``ARD description{\tt '}{\tt '} for the regions of the NDFs
+      3) By giving an ``ARD description\texttt{'}\texttt{'} for the regions of the NDFs
       which are to be selected. The ARD system (see SUN/183) uses a
       textual language to describe geometric regions of an array. Text
       files containing ARD description suitable for use with this
@@ -5478,15 +5256,15 @@ printer
       \sstsubsection{
          ARD = LITERAL (Read)
       }{
-         An ARD description for the `selected{\tt '} regions of the input
+         An ARD description for the `selected\texttt{'} regions of the input
          NDFs.  This should be supplied in the form of a group
-         expression (see help on {\tt "}Group Expressions{\tt "}). See SUN/183 or
+         expression (see help on \texttt{"}Group Expressions\texttt{"}). See SUN/183 or
          KAPPA:ARDGEN for further details of the syntax of an ARD
          description.  This routine expects positions within the ARD
          description to be given in terms of pixel co-ordinates. The
          same ARD description is used for all input NDFs.  The ARD
          parameter is only prompted for if the SELECT parameter is
-         given the value {\tt "}ARD{\tt "}.
+         given the value \texttt{"}ARD\texttt{"}.
       }
       \sstsubsection{
          COMMENT = LITERAL (Read)
@@ -5501,9 +5279,9 @@ printer
          FUNCTION = LITERAL (Read)
       }{
          This parameter specifies what function is to be performed on
-         the {\tt "}selected{\tt "} pixels specified using parameters MASK, LIST or
-         ARD. It can take any of the values {\tt "}HS{\tt "}, {\tt "}HU{\tt "}, {\tt "}NS{\tt "}, {\tt "}NU{\tt "},
-         {\tt "}HS$+$NU{\tt "} or {\tt "}HU$+$NS{\tt "}
+         the \texttt{"}selected\texttt{"} pixels specified using parameters MASK, LIST or
+         ARD. It can take any of the values \texttt{"}HS\texttt{"}, \texttt{"}HU\texttt{"}, \texttt{"}NS\texttt{"}, \texttt{"}NU\texttt{"},
+         \texttt{"}HS$+$NU\texttt{"} or \texttt{"}HU$+$NS\texttt{"}
 
          HS - Ensure that the quality specified by QNAME is held by
               all the selected pixels. The quality of all other
@@ -5534,15 +5312,15 @@ printer
          HISTORY = \_LOGICAL (Read)
       }{
          Determines if history information is to be added to the NDFs.
-         See help on {\tt "}History\_in\_IRAS90{\tt "} for more information on
+         See help on \texttt{"}History\_in\_IRAS90\texttt{"} for more information on
          history.                              [current history setting]
       }
       \sstsubsection{
          LIST = LITERAL (Read)
       }{
          A list of the pixels within the input NDFs which are to be
-         `selected{\tt '} (see parameter FUNCTION). This should be in the
-         form of a group expression (see help on {\tt "}Group\_expressions{\tt "})
+         `selected\texttt{'} (see parameter FUNCTION). This should be in the
+         form of a group expression (see help on \texttt{"}Group\_expressions\texttt{"})
          giving a list of pixel indices (eg X1, Y1, X2, Y2,...  for a
          two dimensional NDF). The same list is used for all input
          NDFs.  LIST is only prompted for if parameter SELECT is given
@@ -5552,10 +5330,10 @@ printer
          MASK = NDF (Read)
       }{
          A group of mask NDFs. Each mask is used to define the
-         `selected{\tt '} pixels within the corresponding input NDF (see
+         `selected\texttt{'} pixels within the corresponding input NDF (see
          parameter FUNCTION). The masks should be aligned
          pixel-for-pixel with the input NDFs.  Pixels which are bad in
-         the mask NDFs are `selected{\tt '}. The quality of any pixels which
+         the mask NDFs are `selected\texttt{'}. The quality of any pixels which
          lie outside the bounds of the corresponding mask NDF is left
          unaltered.  This parameter is only prompted for if the
          parameter SELECT is given the value MASK.
@@ -5565,7 +5343,7 @@ printer
       }{
          The level of information displayed on the users screen. This
          should take one of the values QUIET, NORMAL or VERBOSE (see
-         help on {\tt "}Message\_filtering{\tt "}).
+         help on \texttt{"}Message\_filtering\texttt{"}).
                                         [current message filter setting]
       }
       \sstsubsection{
@@ -5573,7 +5351,7 @@ printer
       }{
          A group of NDFs in which the quality information is to be
          stored. This should be in the form of a group expression (see
-         help on {\tt "}Group\_expresssions{\tt "}).
+         help on \texttt{"}Group\_expresssions\texttt{"}).
       }
       \sstsubsection{
          QNAME = LITERAL (Read)
@@ -5614,29 +5392,29 @@ printer
    }
    \sstexamples{
       \sstexamplesubsection{
-         SETQUAL M51 SATURATED {\tt "}Saturated pixels{\tt "} M51\_CUT
+         SETQUAL M51 SATURATED \texttt{"}Saturated pixels\texttt{"} M51\_CUT
       }{
-         This example ensures that the quality {\tt "}SATURATED{\tt "} is defined
-         within the NDF {\tt "}M51{\tt "}. The comment {\tt "}Saturated pixels{\tt "} is stored
+         This example ensures that the quality \texttt{"}SATURATED\texttt{"} is defined
+         within the NDF \texttt{"}M51\texttt{"}. The comment \texttt{"}Saturated pixels\texttt{"} is stored
          with the quality name if it did not already exist in the NDF.
          The quality SATURATED is then assigned to all pixels for which
          the corresponding pixel in NDF M51\_CUT is bad. The quality of
          all other pixels is left unchanged.
       }
       \sstexamplesubsection{
-         SETQUAL {\tt "}M51,CENA{\tt "} SOURCE\_A SELECT=LIST LIST=$\wedge$SOURCE\_A.LIS FUNCTION=HS$+$NU
+         SETQUAL \texttt{"}M51,CENA\texttt{"} SOURCE\_A SELECT=LIST LIST=$\wedge$SOURCE\_A.LIS FUNCTION=HS$+$NU
       }{
          This example ensures that pixels within the two NDFs M51 and
          CENA which are included in the list of pixel indices held in
-         text file SOURCE\_A.LIS, have the quality {\tt "}SOURCE\_A{\tt "}, and also
+         text file SOURCE\_A.LIS, have the quality \texttt{"}SOURCE\_A\texttt{"}, and also
          ensures that none of the pixels which were not included in
          SOURCE\_A.LIS have the quality.
       }
       \sstexamplesubsection{
-         SETQUAL M51 SOURCE\_B SELECT=ARD ARD={\tt "}CIR(80,80,9).AND.CIR(70,70,7){\tt "}
+         SETQUAL M51 SOURCE\_B SELECT=ARD ARD=\texttt{"}CIR(80,80,9).AND.CIR(70,70,7)\texttt{"}
       }{
          This example ensures that all pixels within the region of
-         intersection of two circles have the quality {\tt "}SOURCE\_B{\tt "}. The
+         intersection of two circles have the quality \texttt{"}SOURCE\_B\texttt{"}. The
          first circle is centred on pixel co-ordinates (80,80) and has
          a radius of 9 pixels. The second circle is centred at (70,70)
          and has a radius of 7 pixels.
@@ -5644,9 +5422,9 @@ printer
       \sstexamplesubsection{
          SETQUAL M51 SOURCE\_B SELECT=ARD ARD=$\wedge$BACKGROUND.ARD
       }{
-         This example assigns the quality {\tt "}SOURCE\_B{\tt "} to pixels of the
-         NDF {\tt "}M51{\tt "} as described by an ARD description stored in the text
-         file {\tt "}BACKGROUND.ARD{\tt "}. This text file could for instance have
+         This example assigns the quality \texttt{"}SOURCE\_B\texttt{"} to pixels of the
+         NDF \texttt{"}M51\texttt{"} as described by an ARD description stored in the text
+         file \texttt{"}BACKGROUND.ARD\texttt{"}. This text file could for instance have
          been created using KAPPA routine ARDGEN.
       }
    }
@@ -5713,7 +5491,7 @@ printer
    }
    \sstexamples{
       \sstexamplesubsection{
-         SHOWQUAL {\tt "}M51,CENA{\tt "} YES
+         SHOWQUAL \texttt{"}M51,CENA\texttt{"} YES
       }{
          This example displays all the quality names currently defined
          for the two NDFs M51 and CENA, together with the number of
@@ -5744,7 +5522,7 @@ printer
          HISTORY = \_LOGICAL (Read)
       }{
          Determines if history information is to be stored within the
-         output CRDD files. See help on {\tt "}History\_in\_IRAS90{\tt "} for more
+         output CRDD files. See help on \texttt{"}History\_in\_IRAS90\texttt{"} for more
          information on history. The history information will contain
          the names of the input CRDD files, trial sky image, and
          detector Point Spread Functions.      [current history setting]
@@ -5753,7 +5531,7 @@ printer
          IN = NDF (Read)
       }{
          Specifies a group of input CRDD files. This should be in the
-         form of a group expression (see help on {\tt "}Group\_expressions{\tt "}).
+         form of a group expression (see help on \texttt{"}Group\_expressions\texttt{"}).
          The input CRDD files can be in any of the standard IRAS90
          systems of units.
       }
@@ -5762,7 +5540,7 @@ printer
       }{
          The level of information displayed on the users screen. This
          should take one of the values QUIET, NORMAL or VERBOSE (see
-         help on {\tt "}Message\_filtering{\tt "}).
+         help on \texttt{"}Message\_filtering\texttt{"}).
                                         [current message filter setting]
       }
       \sstsubsection{
@@ -5771,8 +5549,8 @@ printer
          A group of output CRDD files corresponding one-for-one with
          the list of input CRDD files given for parameter IN.  This
          should be in the form of a group expression (see help on
-         {\tt "}Group\_expressons{\tt "}). Expressions such as {\tt "}$*$\_SIM{\tt "} are expanded
-         by replacing the {\tt "}$*${\tt "} character with each input CRDD file in
+         \texttt{"}Group\_expressons\texttt{"}). Expressions such as \texttt{"}$*$\_SIM\texttt{"} are expanded
+         by replacing the \texttt{"}$*$\texttt{"} character with each input CRDD file in
          turn. The output CRDD files are in the same units as the input
          CRDD files.
       }
@@ -5786,7 +5564,7 @@ printer
          (where $<$PSF$>$ is replaced by the value supplied for parameter
          PSF). The default value causes the standard PSFs supplied as
          part of the IRAS90 package to be used. See the help on
-         {\tt "}Point\_Spread\_Functions{\tt "} for more information on the origin and
+         \texttt{"}Point\_Spread\_Functions\texttt{"} for more information on the origin and
          format of these files.                                       []
       }
       \sstsubsection{
@@ -5803,7 +5581,7 @@ printer
          This causes an artificial CRDD file to be created for each
          file in the current directory which satisfies the wild-card
          template ZCMA\_$*$\_DS. Each created CRDD file has the same name
-         as the input except that the string {\tt "}\_SIM{\tt "} is appended to the
+         as the input except that the string \texttt{"}\_SIM\texttt{"} is appended to the
          end. The input CRDD files determine the sky position and
          detector number to use for each simulated CRDD value. The CRDD
          values are formed by convolving the standard detector PSFs with
@@ -6012,13 +5790,13 @@ section \ref{SEC:PROJ} for more information on available
       \sstsubsection{
          ORIENT = \_REAL (Read)
       }{
-         The position angle of the second axis (or {\tt "}Y{\tt "} axis) of the
+         The position angle of the second axis (or \texttt{"}Y\texttt{"} axis) of the
          output image grid, in degrees.  That is, the angle from north
          (defined by the coordinate system specified by parameter
-         COORDS) to the image {\tt "}Y{\tt "} axis ({\tt "}upwards{\tt "} if the image is
+         COORDS) to the image \texttt{"}Y\texttt{"} axis (\texttt{"}upwards\texttt{"} if the image is
          displayed normally).  Positive angles are measured in the same
          sense as rotation from north through east.  The default value
-         of zero puts north {\tt "}upwards{\tt "}. This parameter is only used if
+         of zero puts north \texttt{"}upwards\texttt{"}. This parameter is only used if
          the parameter REF is given a null value.                  [0.0]
       }
       \sstsubsection{
@@ -6027,7 +5805,7 @@ section \ref{SEC:PROJ} for more information on available
          A group of output NDFs corresponding one-for-one with the list
          of input NDFs given for parameter IN.  This should be in the
          form of a group expression (see section \ref{SEC:GRP}).
-         Expressions such as {\tt "}$*$\_AL{\tt "} are expanded by replacing the {\tt "}$*${\tt "}
+         Expressions such as \texttt{"}$*$\_AL\texttt{"} are expanded by replacing the \texttt{"}$*$\texttt{"}
          character with each input NDF name in turn.
       }
       \sstsubsection{
@@ -6289,13 +6067,13 @@ section \ref{SEC:SKY} for more information on available sky
          SKYBOX NOCURSOR IN=M51 COSYS=IMAGE XY1=[1,1] XY2=[50,50]
       }{
          The box extends from pixel (1,1) to pixel (50,50) in the NDF
-         {\tt "}M51{\tt "}. The sky coordinates of the corners and the centre of
+         \texttt{"}M51\texttt{"}. The sky coordinates of the corners and the centre of
          the box will then be displayed, together with the extent of
          the box in the X and Y directions. No picture will be added to
          the graphics database, and no outline will de drawn.
       }
       \sstexamplesubsection{
-         SKYBOX BOXSIZE=[50,60] NOOUTLINE PIC PICNAM={\tt '}FRAME{\tt '}
+         SKYBOX BOXSIZE=[50,60] NOOUTLINE PIC PICNAM=\texttt{'}FRAME\texttt{'}
       }{
          A cursor is displayed and the user asked to identify the
          centre of the box. The box extends for 25 arc-minutes on each
@@ -6543,9 +6321,9 @@ section \ref{SEC:SKY} for the formats allowed for this value.  If
 
       Many curves can be drawn by a single invocation of this routine
       (see parameter OPTION). The curves to be drawn can be specified
-      either {\tt "}interactively{\tt "} (by positioning a graphics cursor or by
+      either \texttt{"}interactively\texttt{"} (by positioning a graphics cursor or by
       suppling values in response to parameter prompts), or
-      {\tt "}non-interactively{\tt "} (by supplying a text file containing the curve
+      \texttt{"}non-interactively\texttt{"} (by supplying a text file containing the curve
       specifications); see parameter MODE. A text file can be created
       containing specifications of all the curves which have been
       drawn. This file can be supplied as input to a subsequent run of
@@ -6634,7 +6412,7 @@ section \ref{SEC:SKY} for more information on available sky
          FILE = LITERAL (Read)
       }{
          The name of the text file used to give the information about
-         the curves to be drawn in non-interactive mode. See the {\tt "}Notes{\tt "}
+         the curves to be drawn in non-interactive mode. See the \texttt{"}Notes\texttt{"}
          section below for a description of the format of this file
       }
       \sstsubsection{
@@ -6694,7 +6472,7 @@ section \ref{SEC:SKY} for more information on available sky
 
          FILE - Curves are drawn according to the specifications
          contained within a text file (see parameter FILE). This is
-         referred to as {\tt "}non-interactive{\tt "} mode. The run-time default is
+         referred to as \texttt{"}non-interactive\texttt{"} mode. The run-time default is
          CURSOR if a cursor is available, and KEYBOARD otherwise.     []
       }
       \sstsubsection{
@@ -6821,7 +6599,7 @@ section \ref{SEC:SKY} for more information on available sky
          \sstitemlist{
 
             \sstitem The file is divided into comments and fields. Comments
-            consist of strings commencing with a {\tt "}\#{\tt "} character, and are
+            consist of strings commencing with a \texttt{"}\#\texttt{"} character, and are
             considered to extend to the end of the line. Such comments are
             ignored. Fields are strings which specify any of the items of
             information described below. Each line in the file may contain
@@ -6866,10 +6644,10 @@ section \ref{SEC:SKY} for more information on available sky
       graphics cursor, or by reading them from a text file, or by
       supplying them in response to parameter prompts.
 
-      There are 5 different markers available for selection: {\tt '}.{\tt '}, {\tt '}$+${\tt '},
-      {\tt '}$*${\tt '},  {\tt '}o{\tt '} and {\tt '}x{\tt '}. Except the {\tt '}.{\tt '}, there is the option in which
+      There are 5 different markers available for selection: \texttt{'}.\texttt{'}, \texttt{'}$+$\texttt{'},
+      \texttt{'}$*$\texttt{'},  \texttt{'}o\texttt{'} and \texttt{'}x\texttt{'}. Except the \texttt{'}.\texttt{'}, there is the option in which
       the size of the markers are proportional to the image data value
-      at the selected position. In this case, a {\tt '}.{\tt '} will temporarily be
+      at the selected position. In this case, a \texttt{'}.\texttt{'} will temporarily be
       put at each of the selected positions until the full range of
       image data values at all selected positions is known.  The
       temporary markers will then be replaced by the selected marker,
@@ -7021,7 +6799,7 @@ section \ref{SEC:SKY} for details of the formats allowed for this
           EXIT - Exit the application.
 
          The application will keep prompt for a new value of this
-         parameter until {\tt '}MARK{\tt '} or {\tt '}EXIT{\tt '} is given. The input can be
+         parameter until \texttt{'}MARK\texttt{'} or \texttt{'}EXIT\texttt{'} is given. The input can be
          abbrievated to an unambiguous length and is case insensitive.
       }
       \sstsubsection{
@@ -7055,14 +6833,14 @@ section \ref{SEC:SKY} for details of the formats allowed for this
          TYPE = LITERAL (Read)
       }{
          The marker to be used. The following markers are currently
-         available {\tt "}.{\tt "}, {\tt "}$+${\tt "}, {\tt "}$*${\tt "}, {\tt "}o{\tt "}, {\tt "}x{\tt "}                           [$+$]
+         available \texttt{"}.\texttt{"}, \texttt{"}$+$\texttt{"}, \texttt{"}$*$\texttt{"}, \texttt{"}o\texttt{"}, \texttt{"}x\texttt{"}                           [$+$]
       }
    }
    \sstnotes{
       \sstitemlist{
 
-         \sstitem The displayed image should have name {\tt '}DATA{\tt '} and be either the
-         current one of the most recent one with the name {\tt '}DATA{\tt '} in the
+         \sstitem The displayed image should have name \texttt{'}DATA\texttt{'} and be either the
+         current one of the most recent one with the name \texttt{'}DATA\texttt{'} in the
          AGI data base, that is, the picture should either be the most
          recently displayed, or be made current by using KAPPA application
          CURSOR or PICLIST etc (see SUN/95 for more details about the
@@ -7111,7 +6889,7 @@ section \ref{SEC:SKY} for details of the formats allowed for this
       }{
          Specifies the coordinate system used for referring to sky
          positions. Valid values include ECLIPTIC, EQUATORIAL,
-         GALACTIC. See help on {\tt "}Sky\_coordinates{\tt "} for more information
+         GALACTIC. See help on \texttt{"}Sky\_coordinates\texttt{"} for more information
          on available sky coordinate systems.
                                          [current sky coordinate system]
       }
@@ -7125,7 +6903,7 @@ section \ref{SEC:SKY} for details of the formats allowed for this
       }{
          A file from which to read sky coordinates. This is only
          prompted for if parameter MODE has the value FILE. See the
-         help on {\tt "}Coordinate\_files{\tt "} for a description of the format
+         help on \texttt{"}Coordinate\_files\texttt{"} for a description of the format
          required for this file. Note, the file must contain sky
          coordinates, not image coordinates.
       }
@@ -7148,7 +6926,7 @@ section \ref{SEC:SKY} for details of the formats allowed for this
          coordinate system specified by COORDS (eg if COORDS was
          EQUATORIAL, LAT should be given a Declination value). LAT is
          only prompted for if parameter MODE has the value KEYBOARD.
-         See help on {\tt "}Sky\_coordinates{\tt "} for more information on
+         See help on \texttt{"}Sky\_coordinates\texttt{"} for more information on
          available sky coordinate systems.
       }
       \sstsubsection{
@@ -7163,7 +6941,7 @@ section \ref{SEC:SKY} for details of the formats allowed for this
       }{
          The longitude corresponding to the latitude value given for
          parameter LAT. LON is only prompted for if parameter MODE has
-         the value KEYBOARD. See help on {\tt "}Sky\_coordinates{\tt "} for more
+         the value KEYBOARD. See help on \texttt{"}Sky\_coordinates\texttt{"} for more
          information on available sky coordinate systems.
       }
       \sstsubsection{
@@ -7203,7 +6981,7 @@ section \ref{SEC:SKY} for details of the formats allowed for this
       }{
          The level of information displayed on the users screen and
          logged to the log file. This should take one of the values
-         QUIET, NORMAL or VERBOSE (see help on {\tt "}Message\_filtering{\tt "}).
+         QUIET, NORMAL or VERBOSE (see help on \texttt{"}Message\_filtering\texttt{"}).
                                         [current message filter setting]
       }
       \sstsubsection{
@@ -7341,7 +7119,7 @@ section \ref{SEC:SKY} for details of the formats allowed for this
       }{
          Specifies the coordinate system used for referring to sky
          positions. Valid values include ECLIPTIC, EQUATORIAL,
-         GALACTIC. See help on {\tt "}Sky\_coordinates{\tt "} for more information
+         GALACTIC. See help on \texttt{"}Sky\_coordinates\texttt{"} for more information
          on available sky coordinate systems.
                                          [current sky coordinate system]
       }
@@ -7367,7 +7145,7 @@ section \ref{SEC:SKY} for details of the formats allowed for this
       }{
          A file from which to read coordinates. This is only prompted
          for if parameter MODE has the value FILE. See the help on
-         {\tt "}Coordinate\_files{\tt "} for a description of the format required for
+         \texttt{"}Coordinate\_files\texttt{"} for a description of the format required for
          this file.
       }
       \sstsubsection{
@@ -7402,7 +7180,7 @@ section \ref{SEC:SKY} for details of the formats allowed for this
          system specified by COORDS (eg if COORDS was EQUATORIAL, LAT
          should be given a Declination value). LAT is only prompted
          for if parameter MODE has the value KEYBOARD. See help on
-         {\tt "}Sky\_coordinates{\tt "} for more information on available sky
+         \texttt{"}Sky\_coordinates\texttt{"} for more information on available sky
          coordinate systems.
       }
       \sstsubsection{
@@ -7426,7 +7204,7 @@ section \ref{SEC:SKY} for details of the formats allowed for this
          system specified by COORDS (eg if COORDS was EQUATORIAL, LON
          should be given a Right Ascension value). LON is only prompted
          for if parameter MODE has the value KEYBOARD. See help on
-         {\tt "}Sky\_coordinates{\tt "} for more information on available sky
+         \texttt{"}Sky\_coordinates\texttt{"} for more information on available sky
          coordinate systems.
       }
       \sstsubsection{
@@ -7467,7 +7245,7 @@ section \ref{SEC:SKY} for details of the formats allowed for this
       }{
          The level of information displayed on the users screen and
          logged to the log file. This should take one of the values
-         QUIET, NORMAL or VERBOSE (see help on {\tt "}Message\_filtering{\tt "}).
+         QUIET, NORMAL or VERBOSE (see help on \texttt{"}Message\_filtering\texttt{"}).
                                         [current message filter setting]
       }
       \sstsubsection{
@@ -7643,7 +7421,7 @@ section \ref{SEC:SKY} for details of the formats allowed for this
 
       In non-interactive mode, an input text file is required which can
       be the output of a previous run of this routine or can be created
-      by the user. The format of this file is described in the {\tt "}Notes:{\tt "}
+      by the user. The format of this file is described in the \texttt{"}Notes:\texttt{"}
       section.
 
       After getting a null response when in interactive mode, or
@@ -7665,7 +7443,7 @@ section \ref{SEC:SKY} for details of the formats allowed for this
          This parameter is used to specify which attribute of the text
          is to be set. It takes the following values:
 
-          DIRECTION - Set the text {\tt '}up{\tt '} direction.
+          DIRECTION - Set the text \texttt{'}up\texttt{'} direction.
 
           HEIGHT - Set the text height.
 
@@ -7767,7 +7545,7 @@ section \ref{SEC:SKY} for more information on available sky
          the string. The second should be one of L, C and R and
          specifies whether the given position is lie on the left,
          centre or right edge of the string. Only first two characters
-         in JUST will be used. On entry it is set to {\tt '}BC{\tt '}.
+         in JUST will be used. On entry it is set to \texttt{'}BC\texttt{'}.
       }
       \sstsubsection{
          LAT = LITERAL (Read)
@@ -7815,7 +7593,7 @@ section \ref{SEC:SKY} for more information on available sky
 
          FILE - Strings are drawn according to the specifications
          contained within a text file (see parameter FILE). This is
-         referred to as {\tt "}non-interactive{\tt "} mode. The run-time default is
+         referred to as \texttt{"}non-interactive\texttt{"} mode. The run-time default is
          CURSOR if a cursor is available, and KEYBOARD otherwise.     []
       }
       \sstsubsection{
@@ -7915,7 +7693,7 @@ section \ref{SEC:SKY} for more information on available sky
          \sstitemlist{
 
             \sstitem The file is divided into comments and fields. Comments
-            consist of strings commencing with a {\tt "}\#{\tt "} character, and are
+            consist of strings commencing with a \texttt{"}\#\texttt{"} character, and are
             considered to extend to the end of the line. Such comments are
             ignored. Fields are strings which specify any of the items of
             information described below. Each line in the file may contain
@@ -7998,13 +7776,13 @@ section \ref{SEC:SKY} for more information on available sky
          sources visible in the data traces.
 
          \sstitem
-         The ability to assign a {\tt "}quality{\tt "} to samples selected using
+         The ability to assign a \texttt{"}quality\texttt{"} to samples selected using
          a graphics cursor (see section \ref{SEC:QUAL} for more
          information about the use of quality in IRAS90).
 
       }
-      Some of these features may be controlled using a primative {\tt "}Graphical
-      User Interface{\tt "}.
+      Some of these features may be controlled using a primative \texttt{"}Graphical
+      User Interface\texttt{"}.
    }
    \sstusage{
       TRACECRDD NDF DETS XLIMIT YLIMIT
@@ -8029,25 +7807,25 @@ section \ref{SEC:SKY} for more information on available sky
       \sstsubsection{
          CURSOR = \_LOGICAL (Read)
       }{
-         If a true value is supplied, then the {\tt "}Graphical User
-         Interface{\tt "} will be used (if possible). Otherwise, a parameter
+         If a true value is supplied, then the \texttt{"}Graphical User
+         Interface\texttt{"} will be used (if possible). Otherwise, a parameter
          interface will be used.                                 [FALSE]
       }
       \sstsubsection{
          DATA = \_REAL (Write)
       }{
          This is an output parameter to which is written the last data
-         value displayed using the {\tt "}Get Data Value{\tt "} option (selected
-         using parameter NEXT or through the {\tt "}Graphical User
-         Interface{\tt "}).
+         value displayed using the \texttt{"}Get Data Value\texttt{"} option (selected
+         using parameter NEXT or through the \texttt{"}Graphical User
+         Interface\texttt{"}).
       }
       \sstsubsection{
          DATDET = \_INTEGER (Write)
       }{
          This is an output parameter to which is written the last
-         detector number displayed using the {\tt "}Get Data Value{\tt "} or {\tt "}Draw
-         Point Source{\tt "} options (selected using parameter NEXT or
-         through the {\tt "}Graphical User Interface{\tt "}).
+         detector number displayed using the \texttt{"}Get Data Value\texttt{"} or \texttt{"}Draw
+         Point Source\texttt{"} options (selected using parameter NEXT or
+         through the \texttt{"}Graphical User Interface\texttt{"}).
       }
       \sstsubsection{
          DETS = LITERAL (Read)
@@ -8073,17 +7851,17 @@ section \ref{SEC:SKY} for more information on available sky
          HISTORY = \_LOGICAL (Read)
       }{
          Determines if history information is to be added to the NDF in
-         the event of the {\tt "}Assign Quality{\tt "} option being selected using
-         the parameter NEXT or through the {\tt "}Graphical User Interface{\tt "}.
+         the event of the \texttt{"}Assign Quality\texttt{"} option being selected using
+         the parameter NEXT or through the \texttt{"}Graphical User Interface\texttt{"}.
          See section \ref{SEC:HIS} for more information on
          history.                              [current history setting]
       }
       \sstsubsection{
          LOGFILE = LITERAL (Read)
       }{
-         The name of a text file to which the results of the {\tt "}Get Data
-         Value{\tt "} and {\tt "}Draw Point Source{\tt "} options (selected using
-         parameter NEXT or through the {\tt "}Graphical User Interface{\tt "}) will
+         The name of a text file to which the results of the \texttt{"}Get Data
+         Value\texttt{"} and \texttt{"}Draw Point Source\texttt{"} options (selected using
+         parameter NEXT or through the \texttt{"}Graphical User Interface\texttt{"}) will
          be written. No file is created if these options are not used,
          or if a null value is supplied.                             [!]
       }
@@ -8095,8 +7873,8 @@ section \ref{SEC:SKY} for more information on available sky
          to use any of the additional features. If a true value is
          supplied, then the user may repeatedly re-draw the display
          with different parameter values, or use any of the other
-         features selected by parameter NEXT, or through the {\tt "}Graphical
-         User Interface{\tt "}.                                         [TRUE]
+         features selected by parameter NEXT, or through the \texttt{"}Graphical
+         User Interface\texttt{"}.                                         [TRUE]
       }
       \sstsubsection{
          MSG\_FILTER = INTEGER (Read)
@@ -8109,9 +7887,9 @@ section \ref{SEC:SKY} for more information on available sky
          NDF = NDF (Update)
       }{
          The NDF holding the CRDD to be displayed. This is updated by
-         any new quality assignments made using the {\tt "}Assign Quality{\tt "}
-         option selected using parameter NEXT or through the {\tt "}Graphical
-         User Interface{\tt "}.
+         any new quality assignments made using the \texttt{"}Assign Quality\texttt{"}
+         option selected using parameter NEXT or through the \texttt{"}Graphical
+         User Interface\texttt{"}.
       }
       \sstsubsection{
          NEXT = LITERAL (Read)
@@ -8139,7 +7917,7 @@ section \ref{SEC:SKY} for more information on available sky
             ASSIGN QUALITY - Assign a nominated quality to samples
             selected using the graphics cursor.
 
-         If the {\tt "}Graphical User Interface{\tt "} is being used (see parameter
+         If the \texttt{"}Graphical User Interface\texttt{"} is being used (see parameter
          CURSOR), then the parameter NEXT is not used, but these
          options can be selected from a menu using the graphics cursor.
       }
@@ -8180,14 +7958,14 @@ section \ref{SEC:SKY} for more information on available sky
          has the same effect).  Section names can be abbreviated. If an
          ambiguous abbreviation is supplied, than all sections matching
          the abbreviation are omitted from the display. Thus, for
-         instance, the string {\tt "}M{\tt "} would cause both left and right hand
+         instance, the string \texttt{"}M\texttt{"} would cause both left and right hand
          markers to be omitted.                                [NOTHING]
       }
       \sstsubsection{
          PARAM = LITERAL (Read)
       }{
          Specifies which aspect of the display is to be modified if the
-         {\tt "}Change Parameters{\tt "} option is selected using parameter NEXT.
+         \texttt{"}Change Parameters\texttt{"} option is selected using parameter NEXT.
          It can take the following values (or any un-ambiguous
          abbreviation):
 
@@ -8212,8 +7990,8 @@ section \ref{SEC:SKY} for more information on available sky
             TITLE - Change the title displayed at the top of the
             display.
 
-            COMMAND SOURCE - Toggles between the {\tt "}Graphical User
-            Interface{\tt "} and the parameter interface as the means of
+            COMMAND SOURCE - Toggles between the \texttt{"}Graphical User
+            Interface\texttt{"} and the parameter interface as the means of
             getting commands.
 
             OFFSET METHOD - Change the offsets by which each trace is
@@ -8230,7 +8008,7 @@ section \ref{SEC:SKY} for more information on available sky
             Y limits and trace offsets to be calculated and used. New
             detectors may also be selected using the DET\# option.
 
-         If the {\tt "}Graphical User Interface{\tt "} is being used (see parameter
+         If the \texttt{"}Graphical User Interface\texttt{"} is being used (see parameter
          CURSOR), then the parameter PARAM is not used, but these
          options can be selected from a menu using the graphics cursor.
       }
@@ -8238,17 +8016,17 @@ section \ref{SEC:SKY} for more information on available sky
          PEAK = \_REAL (Write)
       }{
          This is an output parameter to which is written the last
-         source peak value displayed using the {\tt "}Draw Point Source{\tt "}
+         source peak value displayed using the \texttt{"}Draw Point Source\texttt{"}
          option (selected using parameter NEXT or through the
-         {\tt "}Graphical User Interface{\tt "}).
+         \texttt{"}Graphical User Interface\texttt{"}).
       }
       \sstsubsection{
          PROFILES = NDF (Read)
       }{
          An NDF holding in-scan point source profiles to be used by the
-         {\tt "}Draw Point Source{\tt "} option selected using parameter NEXT or
-         through the {\tt "}Graphical User Interface{\tt "}. The default value is
-         the files {\tt "}profiles.sdf{\tt "} contained in the main IRAS90
+         \texttt{"}Draw Point Source\texttt{"} option selected using parameter NEXT or
+         through the \texttt{"}Graphical User Interface\texttt{"}. The default value is
+         the files \texttt{"}profiles.sdf\texttt{"} contained in the main IRAS90
          directory, which contains profiles taken from the IRAS Catalogs
          and Atlases Explanatory Supplement, page V-14.               []
       }
@@ -8278,15 +8056,15 @@ section \ref{SEC:SKY} for more information on available sky
          A quality expression giving the quality of samples which are
          to be included in the display. See section \ref{SEC:QUAL}
          for information about the use of quality.
-         A value of {\tt "}ANY{\tt "} causes all samples to be used, without regard
+         A value of \texttt{"}ANY\texttt{"} causes all samples to be used, without regard
          to quality.                                               [ANY]
       }
       \sstsubsection{
          QNAME = LITERAL (Read)
       }{
          The quality name to be assigned to the selected samples in the
-         event of the {\tt "}Assign Quality{\tt "} option being selected (by the
-         parameter NEXT or through the {\tt "}Graphical User Interface{\tt "}).  If
+         event of the \texttt{"}Assign Quality\texttt{"} option being selected (by the
+         parameter NEXT or through the \texttt{"}Graphical User Interface\texttt{"}).  If
          the supplied name is not already defined within the input NDF,
          then a definition of the name is added to the NDF. The user is
          warned if the quality name is already defined within the NDF.
@@ -8296,18 +8074,18 @@ section \ref{SEC:SKY} for more information on available sky
       }{
          This is an output parameter consisting of an array of two
          values. The first is the last in-scan position and the second
-         is the last cross-scan position displayed using the {\tt "}Get Data
-         Value{\tt "} or {\tt "}Draw Point Source{\tt "} options (selected using parameter
-         NEXT or through the {\tt "}Graphical User Interface{\tt "}).
+         is the last cross-scan position displayed using the \texttt{"}Get Data
+         Value\texttt{"} or \texttt{"}Draw Point Source\texttt{"} options (selected using parameter
+         NEXT or through the \texttt{"}Graphical User Interface\texttt{"}).
       }
       \sstsubsection{
          SKYPSN = \_DOUBLE (Write)
       }{
          This is an output parameter consisting of an array of two
          values. The first is the last sky longitude and the second
-         is the last sky latitude displayed using the {\tt "}Get Data
-         Value{\tt "} or {\tt "}Draw Point Source{\tt "} options (selected using parameter
-         NEXT or through the {\tt "}Graphical User Interface{\tt "}). Both values
+         is the last sky latitude displayed using the \texttt{"}Get Data
+         Value\texttt{"} or \texttt{"}Draw Point Source\texttt{"} options (selected using parameter
+         NEXT or through the \texttt{"}Graphical User Interface\texttt{"}). Both values
          are in radians.
       }
       \sstsubsection{
@@ -8416,7 +8194,7 @@ section \ref{SEC:SKY} for more information on available sky
          This is like the previous example except that the NOLOOP
          keyword causes the application to terminate as soon as the
          display has been drawn, and the output goes to a Canon laser
-         printer. Note, the {\tt "}$\backslash${\tt "} character causes the suggested defaults
+         printer. Note, the \texttt{"}$\backslash$\texttt{"} character causes the suggested defaults
          for parameters DETS, XLIMIT and YLIMIT to be accepted without
          prompting the user. This sort of command is useful if a plot
          is to be produced in a situation in which there is no user to
@@ -8426,7 +8204,7 @@ section \ref{SEC:SKY} for more information on available sky
       \sstexamplesubsection{
          TRACECRDD CENA\_B1S3 CURSOR QEXP=FRED.AND.TOM
       }{
-         This causes the {\tt "}Graphical User Interface{\tt "} to be used for
+         This causes the \texttt{"}Graphical User Interface\texttt{"} to be used for
          obtaining values for the parameters NEXT and PARAM, rather than
          the keyboard. In addition, only those samples which have both
          the qualities FRED and TOM are displayed.
@@ -8440,7 +8218,7 @@ section \ref{SEC:SKY} for more information on available sky
       omitted.
 
       The main item in the display is the rectangular area containing
-      the actual data traces (the {\tt "}data area{\tt "}). The bottom edge of this
+      the actual data traces (the \texttt{"}data area\texttt{"}). The bottom edge of this
       rectangle has a scale indicating distance along the scan in
       arc-minutes. The value zero is assigned to the point in the scan
       which is closest to the reference position of the input CRDD
@@ -8455,29 +8233,29 @@ section \ref{SEC:SKY} for more information on available sky
       The detectors from which data is to be displayed are specified
       using parameter DETS. The data traces are offset vertically
       within the data area, and are shifted horizontally so that the
-      {\tt "}mis-alignment{\tt "} caused by the detectors being at varying in-scan
+      \texttt{"}mis-alignment\texttt{"} caused by the detectors being at varying in-scan
       positions within the focal plane, is removed. The detector
-      corresponding to each trace is indicated by means of an {\tt "}in-line
-      label{\tt "} towards the left end of the trace. If the default KAPPA
+      corresponding to each trace is indicated by means of an \texttt{"}in-line
+      label\texttt{"} towards the left end of the trace. If the default KAPPA
       pallette is in effect, the in-line labels will be green (on
       colour devices). Only those samples which satisfy the quality
       expression given by parameter QEXP are included in the traces.
       Bad or missing sample values are indicated by gaps in the traces.
-      The base level for each trace is indicated by a pair of {\tt "}offset
-      markers{\tt "}, one on each of the vertical edges of the data area.
+      The base level for each trace is indicated by a pair of \texttt{"}offset
+      markers\texttt{"}, one on each of the vertical edges of the data area.
       These offset markers are short green horizontal lines placed at
       the position which corresponds to zero flux for the trace to
       which they refer (the detector number to which the offset markers
       refer is displayed just above the left hand offset marker).
 
-      The data area is surrounded by a {\tt "}frame area{\tt "} containing
+      The data area is surrounded by a \texttt{"}frame area\texttt{"} containing
       annotation of various types. This includes a title above the data
       area specified by parameter PTITLE. The X axis label is fixed, and
       the Y axis label indicates the units used on the Y axis.
 
       The traces are always drawn such that the end of the scan which is
       closest to the southern ecliptic pole is at the left, and this is
-      indicated by annotations {\tt "}South{\tt "} and {\tt "}North{\tt "} at the left and right
+      indicated by annotations \texttt{"}South\texttt{"} and \texttt{"}North\texttt{"} at the left and right
       ends of the bottom edge of the data area. An arrow placed between
       these annotations indicates the direction in which the scan was
       taken (south to north or north to south). The arrow indicates the
@@ -8489,9 +8267,9 @@ section \ref{SEC:SKY} for more information on available sky
       determine a sample value by eye, one would read off the data value
       from the scale on the left hand edge of the data area, and then
       subtract the offset for the detector listed in the offset table.
-      In fact it is much easier to use the {\tt "}Get Data Value{\tt "} option to do
-      this! (see parameter NEXT). The table also lists the {\tt "}cross scan
-      distance{\tt "} of each trace. This is the offset (in arc-minutes) from
+      In fact it is much easier to use the \texttt{"}Get Data Value\texttt{"} option to do
+      this! (see parameter NEXT). The table also lists the \texttt{"}cross scan
+      distance\texttt{"} of each trace. This is the offset (in arc-minutes) from
       the CRDD file reference position to the detector track (positive
       in the same sense as the focal plane Z coordinate).
 
@@ -8506,13 +8284,13 @@ section \ref{SEC:SKY} for more information on available sky
    }{
       The default parameter values usually produce a reasonable
       display.  However there may be some situations in which
-      parameters need to be changed, for instance to {\tt "}zoom in{\tt "} on a
+      parameters need to be changed, for instance to \texttt{"}zoom in\texttt{"} on a
       particular feature of interest, to change the graphics device, or
       to omit sections of the display prior to producing a hard copy.
       If the parameter LOOP is given a true value (which is the
       default), the user is asked to specify a further action once the
       display has been produced (see parameter NEXT). One option is
-      {\tt "}Change Parameters{\tt "}. This allows several of the parameters which
+      \texttt{"}Change Parameters\texttt{"}. This allows several of the parameters which
       determine the appearance of the display to be changed before
       redrawing the display. The parameter to change is specified by
       giving an appropriate value for the parameter PARAM.
@@ -8522,9 +8300,9 @@ section \ref{SEC:SKY} for more information on available sky
    }{
       Sample values and positions can be estimated by eye from the
       display, but it is generally easier and more accurate to use a
-      graphics cursor. This can be done by taking the {\tt "}Get Data Value{\tt "}
-      option (specified by the parameter NEXT or through the {\tt "}Graphical
-      User Interface{\tt "}). If the current graphics device has a cursor,
+      graphics cursor. This can be done by taking the \texttt{"}Get Data Value\texttt{"}
+      option (specified by the parameter NEXT or through the \texttt{"}Graphical
+      User Interface\texttt{"}). If the current graphics device has a cursor,
       the user is asked to position the cursor at the point of
       interest. The user does not need to position the cursor exactly
       on a trace; the closest trace will always be used. Various items
@@ -8548,8 +8326,8 @@ section \ref{SEC:SKY} for more information on available sky
       taken from the IRAS Catalogs and Atlases Explanatory Supplement
       (page V-14). They may be displayed at any point within the data
       area in order to compare a feature in the data with a point
-      source. This is done by selecting the {\tt "}Draw Point Source{\tt "} option
-      for parameter NEXT or through the {\tt "}Graphical User Interface{\tt "}. The
+      source. This is done by selecting the \texttt{"}Draw Point Source\texttt{"} option
+      for parameter NEXT or through the \texttt{"}Graphical User Interface\texttt{"}. The
       user is then requested to place the graphics cursor at the
       position at which the peak of the profile should be put. A sloping
       background is then estimated from the neighbouring data in the
@@ -8568,7 +8346,7 @@ section \ref{SEC:SKY} for more information on available sky
       peak may be specified by parameters SRCDET, SRCPSN, and SRCPEAK.
       If for any reason the user wishes to display profiles other than
       those taken from the Explanatory Supplement, then a copy of the
-      file {\tt "}profiles.sdf{\tt "} (contained in the main IRAS90 directory)
+      file \texttt{"}profiles.sdf\texttt{"} (contained in the main IRAS90 directory)
       should be taken and suitable modifications made.  The modified
       file may then be given for parameter PROFILES.
    }
@@ -8579,8 +8357,8 @@ section \ref{SEC:SKY} for more information on available sky
       section \ref{SEC:QUAL}. TRACECRDD provides a means of
       assigning nominated qualities to samples in a CRDD file selected
       using a graphical interface. To do this the user should select
-      the {\tt "}Assign Quality{\tt "} option for the parameter NEXT (or through
-      the {\tt "}Graphical User Interface{\tt "}). The user is then asked to
+      the \texttt{"}Assign Quality\texttt{"} option for the parameter NEXT (or through
+      the \texttt{"}Graphical User Interface\texttt{"}). The user is then asked to
       position the graphics cursor to indicate two diagonally opposite
       corners of a box on the display. A quality name is then obtained
       using parameter QNAME and this quality is assigned to all the
@@ -8599,23 +8377,23 @@ section \ref{SEC:SKY} for more information on available sky
       The Graphical User Interface
    }{
       By default, the user selects options by assigning suitable values
-      to the parameters described in the {\tt "}ADAM parameters{\tt "} section.
-      Alternatively, a primative form of {\tt "}Graphical User Interface{\tt "} (GUI)
+      to the parameters described in the \texttt{"}ADAM parameters\texttt{"} section.
+      Alternatively, a primative form of \texttt{"}Graphical User Interface\texttt{"} (GUI)
       can be used for selecting the options normally determined by
       parameters NEXT and PARAM. This alternative is only available if
       the graphics workstation has a graphics cursor and also has the
       facility for clearing sub-regions of the display. If this is the
       case, the user may select the GUI either by giving the parameter
       CURSOR a true value on the command line, or by selecting the
-      {\tt "}Command Source{\tt "} option for the parameter PARAM.
+      \texttt{"}Command Source\texttt{"} option for the parameter PARAM.
 
       The GUI provides the user with menus of options displayed on the
       graphics display as a series of boxes, each containing a
       description of an option. The user selects an option by
       positioning the cursor over a box and pressing any key. The menu
       is erased once a valid choice has been made. The parameter
-      interface can be reinstated by selecting the {\tt "}Command Source{\tt "}
-      option from the menu produced by selecting the {\tt "}Change Parameters{\tt "}
+      interface can be reinstated by selecting the \texttt{"}Command Source\texttt{"}
+      option from the menu produced by selecting the \texttt{"}Change Parameters\texttt{"}
       option.
    }
 }
@@ -8673,10 +8451,10 @@ preferred to the {\small BDF2NDF} application from the {\small CONVERT}
 package. To start up {\small NDFOUT}, use the following commands:
 
 \small
-\begin{verbatim}
-  $ DSCL GO EDRSX
-  EDRSX> NDFOUT
-\end{verbatim}
+\begin{terminalv}
+$ DSCL GO EDRSX
+EDRSX> NDFOUT
+\end{terminalv}
 \normalsize
 
 \section{An Example of a Colour Temperature Procedure}
@@ -8693,13 +8471,13 @@ procedure is in the file {\small IRAS90\_DIR:MASTER.ICL} ({\small VMS} only).
 To run the procedure as it stands, the following commands should be used:
 
 \small
-\begin{verbatim}
-     $ ADAM
-     ICL> IRAS90
-     ICL> KAPPA
-     ICL> LOAD IRAS90_DIR:MASTER
-     ICL> MASTER ^HCON2_B1.LIS ^HCON2_B2.LIS M51_TEMP M51_TAU
-\end{verbatim}
+\begin{terminalv}
+$ ADAM
+ICL> IRAS90
+ICL> KAPPA
+ICL> LOAD IRAS90_DIR:MASTER
+ICL> MASTER ^HCON2_B1.LIS ^HCON2_B2.LIS M51_TEMP M51_TAU
+\end{terminalv}
 \normalsize
 
 This assumes that the text files {\small HCON2\_B1.LIS} and {\small HCON2\_B2.LIS}
@@ -8714,7 +8492,7 @@ background regions. For this reason, {\small MASTER} pays particular
 attention to achieving good destriping.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
 PROC MASTER INA INB TEMP TAU
 {+
 {  Name:
@@ -8956,7 +8734,7 @@ DCL DELETE MASTER_MAP%.SDF;*,MM_*_SIM.SDF;*,BK.LIS;*
 DCL PURGE *_DS.SDF,*_BK.SDF
 {
 ENDPROC
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 \end{document}
