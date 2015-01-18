@@ -1,19 +1,18 @@
-\documentclass[twoside,11pt]{article}
-\pagestyle{myheadings}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {162.1}
-\newcommand{\stardocauthors}   {A C Davenhall \\
-{\it Department of Physics and Astronomy, University of Leicester} }
-\newcommand{\stardocdate}      {18 March 1993}
-\newcommand{\stardoctitle}     {A Guide to\\[2ex]
-                        Astronomical Catalogues, Databases and Archives\\[2ex]
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {162.1}
+\stardocauthors   {A C Davenhall \\
+\textit{Department of Physics and Astronomy, University of Leicester} }
+\stardocdate        {18 March 1993}
+\stardoctitle     {A Guide to\\
+                        Astronomical Catalogues, Databases and Archives\\
                         available through Starlink}
-\newcommand{\stardocabstract}  {
+\stardocabstract  {
 This note is a guide to the astronomical catalogues, databases and
 archives which are either available on Starlink computers or which can
 be accessed from Starlink computers. It also describes the Starlink
@@ -23,222 +22,13 @@ A brief description is given of each facility or software item.
 % ? End of document identification
 
 % -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % from the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
+% ? Document-specific \providecommand or \newenvironment commands.
 % ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\newpage
-~
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section{Introduction\xlabel{introduction}}
 
@@ -297,23 +87,23 @@ collection of catalogues in SCAR format are maintained permanently
 on-line on STADAT (see Section~\ref{STADAT}, below). Also, it is
 possible to add private catalogues.
 
-{\it Starlink status:} optional
+\textit{Starlink status:} optional
 
-{\it Starlink support:} best efforts
+\textit{Starlink support:} best efforts
 
-{\it Availability:} VAX/VMS only
+\textit{Availability:} VAX/VMS only
 
-{\it Documentation:}
+\textit{Documentation:}
 
-{\it SCAR --- Beginner's Guide}
+\textit{SCAR --- Beginner's Guide}
 (SUN/106) by A.R. Wood, 19th October
 1990.
 
-{\it SCAR --- Starlink Catalogue Access and Reporting}
+\textit{SCAR --- Starlink Catalogue Access and Reporting}
 (SUN/70) by
 H.J. Walker, J.H. Fairclough and M.D. Lawden, 1st October 1990.
 
-New users are strongly recommended to start with the {\it Beginner's
+New users are strongly recommended to start with the \textit{Beginner's
 Guide.}
 
 \subsection{CATPAC\xlabel{catpac}}
@@ -325,15 +115,15 @@ CATPAC can access any SCAR catalogue. It is easier to use and more
 robust than SCAR, but currently does not provide all the facilities
 available in SCAR.
 
-{\it Starlink status:} optional
+\textit{Starlink status:} optional
 
-{\it Starlink support:} high
+\textit{Starlink support:} high
 
-{\it Availability:} VAX/VMS only
+\textit{Availability:} VAX/VMS only
 
-{\it Documentation:}
+\textit{Documentation:}
 
-{\it CATPAC --- Catalogue Applications Package}
+\textit{CATPAC --- Catalogue Applications Package}
 \xref{(SUN/120}{sun120}{}) by A.R. Wood,
 18th August 1992.
 
@@ -348,16 +138,16 @@ astronomical functionality. R-EXEC does not come with a set of
 astronomical catalogues. However, a facility to read FITS ASCII tables
 has been added.
 
-{\it Starlink status:} optional
+\textit{Starlink status:} optional
 
-{\it Starlink support:} best efforts
+\textit{Starlink support:} best efforts
 
-{\it Availability: } currently only VAX/VMS and MS-DOS (though the
+\textit{Availability: } currently only VAX/VMS and MS-DOS (though the
 latter is not distributed by Starlink).
 
-{\it Documentation: }
+\textit{Documentation: }
 
-A user guide is available: {\it R-EXEC Guide and Reference}, version
+A user guide is available: \textit{R-EXEC Guide and Reference}, version
 2.4 (RAL-90-085) by B.J. Read, November 1990 (SERC, RAL). Starlink site
 managers should hold copies.
 
@@ -371,15 +161,15 @@ comes with a set of catalogues which are an integral part of the package
 and which are written in a very specific format. It is not easy to add
 new catalogues into the system.
 
-{\it Starlink status:} standard
+\textit{Starlink status:} standard
 
-{\it Starlink support:} little / none
+\textit{Starlink support:} little / none
 
-{\it Availability:} VAX/VMS only
+\textit{Availability:} VAX/VMS only
 
-{\it Documentation:}
+\textit{Documentation:}
 
-{\it CHART --- Finding chart and stellar data}
+\textit{CHART --- Finding chart and stellar data}
 (\xref{SUN/32}{sun32}{}) by P.M. Allan,
 24th April 1989.
 
@@ -402,7 +192,7 @@ The data stored on the disks may be held in some standard astronomical
 format, such as FITS, or in a `one-off' format peculiar to the
 individual dataset. The disks sometimes contain software to access and
 display their contents. Starlink provides the CDCOPY utility for
-accessing CD-ROMs. This utility is described in {\it CDCOPY - Reading
+accessing CD-ROMs. This utility is described in \textit{CDCOPY - Reading
 CD-ROMs}
 (SUN/69) by C.G. Page, 24th April 1992.
 
@@ -418,19 +208,19 @@ consult your local site manager.
 \subsection{The HST Guide Star Catalog version 1.1
 \xlabel{the_hst_guide_star_catalog_version_11}\label{GSC}}
 
-{\it authors:} B.M. Lasker, C.R. Sturch, B.J. McLean, J.L. Russell,
+\textit{authors:} B.M. Lasker, C.R. Sturch, B.J. McLean, J.L. Russell,
 H. Jenkner and M.M. Shara,
 
-{\it issue date:} 1st August 1992 (version 1.1)
+\textit{issue date:} 1st August 1992 (version 1.1)
 
-{\it institution:} Space Telescope Science Institute. 3700 San Martin
+\textit{institution:} Space Telescope Science Institute. 3700 San Martin
 Drive, Baltimore, Maryland 21218, USA.
 
-{\it number of disks:} 2
+\textit{number of disks:} 2
 
-{\it format:} FITS ASCII tables
+\textit{format:} FITS ASCII tables
 
-The HST {\it Guide Star Catalog} (GSC) was produced by the Space
+The HST \textit{Guide Star Catalog} (GSC) was produced by the Space
 Telescope Science Institute to support the acquisition of off-axis
 guide stars for the Hubble Space Telescope. However, because of its
 general usefulness to the astronomical community, it has been made
@@ -447,41 +237,41 @@ The GSC is divided into 9537 zones, bounded by arcs of constant Right
 Ascension and Declination. The data for each region are stored as a
 separate FITS file.
 
-{\it History:}
+\textit{History:}
 
 Version 1.1 of the GSC supersedes version 1, which was released on
 1st June 1989. The improvements of version 1.1 over version 1 include:
 assimilation of data for the brighter stars, better identification of
 overlapping objects and incorporation of a number of errata.
 
-{\it References:}
+\textit{References:}
 
 Note that the following references describe version 1 of the GSC, not
 version 1.1.
 
 B.M. Lasker, C.R. Sturch, B.J. McLean, J.L. Russell, H. Jenkner and
-M.M. Shara, 1990, {\it Astron J}, {\bf 99}, pp2019-2058.
+M.M. Shara, 1990, \textit{Astron J}, \textbf{99}, pp2019-2058.
 
 J.L. Russell, B.M. Lasker, B.J. McLean, C.R. Sturch and H. Jenkner,
-1990, {\it Astron J}, {\bf 99}, pp2059-2081.
+1990, \textit{Astron J}, \textbf{99}, pp2059-2081.
 
 H. Jenkner, B.M. Lasker, C.R. Sturch, B.J. McLean, M.M. Shara and
-J.L. Russell, 1990, {\it Astron J}, {\bf 99}, pp2082-2154.
+J.L. Russell, 1990, \textit{Astron J}, \textbf{99}, pp2082-2154.
 
 \subsection{Selected Astronomical Catalogs volume 1
 \xlabel{selected_astronomical_catalogs_volume_1}\label{SAC}}
 
-{\it authors:} L.E. Brotzman and S.E. Gessner.
+\textit{authors:} L.E. Brotzman and S.E. Gessner.
 
-{\it issue date:} 1992
+\textit{issue date:} 1992
 
-{\it institution:} Astronomical Data Center, National Space Science Data
+\textit{institution:} Astronomical Data Center, National Space Science Data
 Center, NASA Goddard Space Flight Center, Greenbelt, Maryland 20771,
 USA.
 
-{\it number of disks:} 2
+\textit{number of disks:} 2
 
-{\it format:} FITS ASCII tables (1 disk), ASCII text (1 disk)
+\textit{format:} FITS ASCII tables (1 disk), ASCII text (1 disk)
 
 This CD-ROM set issued by the American NSSDC contains 114 of the most
 widely used astronomical catalogues. It is an extremely useful
@@ -493,62 +283,62 @@ One disk contains copies of the catalogues in FITS format, the other has
 copies of the catalogues as simple text files. Documentation for each of
 the catalogues is included on the disks.
 
-Errata for the catalogues on the disks are published in the {\it ADC
+Errata for the catalogues on the disks are published in the \textit{ADC
 Electronic News} (see Section~\ref{ADC}, below). To date errata have
-appeared in the following issues: July 1992, {\bf 1}, issue 2;
-October 1992, {\bf 1}, issue 3; January 1992, {\bf 2}, issue 1.
+appeared in the following issues: July 1992, \textbf{1}, issue 2;
+October 1992, \textbf{1}, issue 3; January 1992, \textbf{2}, issue 1.
 
 \subsection{The Catalogue of Principal Galaxies
 \xlabel{the_catalogue_of_principal_galaxies}\label{PGC}}
 
-{\it authors:} G. Paturel, L. Bottinelli, P. Fouqu\'{e} and L.
+\textit{authors:} G. Paturel, L. Bottinelli, P. Fouqu\'{e} and L.
 Gouguenheim
 
-{\it issue date:} 1992
+\textit{issue date:} 1992
 
-{\it Institution:} Observatoire de Lyon, 69561 Saint-Genis Laval Cedex,
+\textit{Institution:} Observatoire de Lyon, 69561 Saint-Genis Laval Cedex,
 France.
 
-{\it number of disks:} 1
+\textit{number of disks:} 1
 
-This CD-ROM contains a copy of the {\it Catalogue of Principal Galaxies}
+This CD-ROM contains a copy of the \textit{Catalogue of Principal Galaxies}
 (PGC). It is a catalogue containing cross-identifications and other
 data for 73,098 galaxies. It was compiled from data in the Lyon-Meudon
 Extragalactic database (see Section~\ref{EDB}).
 
-{\it References:}
+\textit{References:}
 
-The CD-ROM and accompanying documentation is available as {\it PGC-ROM
+The CD-ROM and accompanying documentation is available as \textit{PGC-ROM
 1992} by G. Paturel, L. Bottinelli, P. Fouqu\'{e} and L. Gouguenheim,
-1992, {\it Monographies de la Base de Donn\'{e}es Extragalactiques},
-No. {\bf 4} (Lyon: Observatoire de Lyon).
+1992, \textit{Monographies de la Base de Donn\'{e}es Extragalactiques},
+No. \textbf{4} (Lyon: Observatoire de Lyon).
 
 A brief description is given by G. Paturel, L. Bottinelli and L.
-Gouguenheim, 1993, {\it Bulletin d'Information du Centre de Donn\'{e}es
-Stellaires}, no. {\bf 42}, pp33-38.
+Gouguenheim, 1993, \textit{Bulletin d'Information du Centre de Donn\'{e}es
+Stellaires}, no. \textbf{42}, pp33-38.
 
-The paper version of the catalogue is available as {\it The Catalogue
+The paper version of the catalogue is available as \textit{The Catalogue
 of Principal Galaxies} by G. Paturel, P. Fouqu\'{e}, L. Bottinelli and
-L. Gouguenheim, 1989, {\it Monographies de la Base de Donn\'{e}es
-Extragalactiques}, No. {\bf 1} (3 volumes), (Lyon: Observatoire de
+L. Gouguenheim, 1989, \textit{Monographies de la Base de Donn\'{e}es
+Extragalactiques}, No. \textbf{1} (3 volumes), (Lyon: Observatoire de
 Lyon).
 
 See also G. Paturel, P. Fouqu\'{e}, L. Bottinelli and L. Gouguenheim,
-1989, {\it Astr Astrophys Suppl}, {\bf 80}, pp299-315.
+1989, \textit{Astr Astrophys Suppl}, \textbf{80}, pp299-315.
 
 \subsection{Images from the Radio Universe
 \xlabel{images_from_the_radio_universe}}
 
-{\it authors:} J.J. Condon and D. Wells.
+\textit{authors:} J.J. Condon and D. Wells.
 
-{\it issue date:} 1992
+\textit{issue date:} 1992
 
-{\it institution:} National Radio Astronomy Observatory, 520 Edgemont
+\textit{institution:} National Radio Astronomy Observatory, 520 Edgemont
 Road, Charlottesville, Virginia 22903, USA.
 
-{\it number of disks:} 1
+\textit{number of disks:} 1
 
-{\it format:} FITS (images), ASCII text (catalogues)
+\textit{format:} FITS (images), ASCII text (catalogues)
 
 This CD-ROM contains a number of images of radio-astronomical sources
 (in FITS format) and a number of radio source catalogues (held as ASCII
@@ -558,7 +348,7 @@ best data currently available. The observations were made with a variety
 of radio telescopes and were generously contributed by numerous
 institutions in various countries.
 
-{\it References:}
+\textit{References:}
 
 Documentation, and comprehensive references for the individual datasets,
 are included on the disk.
@@ -566,18 +356,18 @@ are included on the disk.
 \subsection{IRAS Sky Survey Atlas for High Ecliptic Latitudes
 \xlabel{iras_sky_survey_atlas_for_high_ecliptic_latitudes}}
 
-{\it authors:} S. Wheelock, H. McCallon, F. Boulanger, T.N. Gautier,
+\textit{authors:} S. Wheelock, H. McCallon, F. Boulanger, T.N. Gautier,
 C. Oken, T. Chester, J. Chillemi, J. White, D. Kester and D. Gregorich.
 
-{\it issue date:} November 1991
+\textit{issue date:} November 1991
 
-{\it institution:} Infrared Processing and Analysis Center, Jet
+\textit{institution:} Infrared Processing and Analysis Center, Jet
 Propulsion Laboratory, Mail Code 100-22, California Institute of
 Technology, Pasadena, California 91125, USA.
 
-{\it number of disks:} 4
+\textit{number of disks:} 4
 
-{\it format:} FITS
+\textit{format:} FITS
 
 The InfraRed Astronomical Satellite (IRAS) conducted an all-sky
 survey at infrared wavelengths in 1983. This CD-ROM set is the first
@@ -593,24 +383,24 @@ sky surface brightness after removal of the emission from solar system
 dust in four wavebands centred on 12, 25, 60 and 100 micron.
 
 The following caveats apply to using the ISSA. It was designed to
-give {\it differential} photometry after subtraction of the zodiacal
+give \textit{differential} photometry after subtraction of the zodiacal
 emission. It should not be used for measuring absolute sky surface
 brightness. Furthermore, it is intended for the study of extended
 structures. For structures detected in the survey with sizes less than
-5' either the {\it IRAS Point Source Catalog}, the {\it IRAS Faint
-Source Survey} or the {\it IRAS Small Scale Structure Catalog} should
-be consulted. Some of these catalogues are included in {\it Selected
+5' either the \textit{IRAS Point Source Catalog}, the \textit{IRAS Faint
+Source Survey} or the \textit{IRAS Small Scale Structure Catalog} should
+be consulted. Some of these catalogues are included in \textit{Selected
 Astronomical Catalogs volume 1} (see Section~\ref{SAC}, above).
 
-{\it References:}
+\textit{References:}
 
 Further information about the atlas, including important details about
-the absolute calibration of IRAS can be found in the {\it ISSA
+the absolute calibration of IRAS can be found in the \textit{ISSA
 Explanatory Supplement}, available from the National Space Science
 Data Center, NASA Goddard Space Flight Center, Code 933, Greenbelt,
 Maryland 20771, USA.
 
-See also {\it IRAS Catalogs and Atlases: Explanatory Supplement}, 1988,
+See also \textit{IRAS Catalogs and Atlases: Explanatory Supplement}, 1988,
 Joint IRAS Science Working Group, edited by C.A. Beichman, G.
 Neugebauer, H.J. Habing, P.E. Clegg and T.J. Chester (Washington DC:
 GPO).
@@ -620,8 +410,8 @@ GPO).
 
 The Einstein Data Center of the Smithsonian Institution Astrophysical
 Observatory has produced a number of sets of CD-ROMs containing data
-from the {\it Einstein} Observatory X-ray astronomy satellite (HEAO-B).
-The {\it Einstein} satellite operated from November 1978 to April 1981.
+from the \textit{Einstein} Observatory X-ray astronomy satellite (HEAO-B).
+The \textit{Einstein} satellite operated from November 1978 to April 1981.
 It contained an X-ray imaging telescope which operated in the energy
 band 0.2 to 3.5 keV. This telescope had two imaging detectors: the
 Imaging Proportional Counter (IPC) and the High Resolution Imager (HRI).
@@ -642,7 +432,7 @@ survey, programme. The sets of disks listed below are available.
   \item[The Einstein Observatory SLEW Survey] (1st January 1991, FITS
    $n$-dimensional tables extension, 1 disk). A set of event lists
    (details of individual photons detected), and a catalogue of
-   detected sources for the {\it Einstein} SLEW survey. The SLEW survey
+   detected sources for the \textit{Einstein} SLEW survey. The SLEW survey
    was constructed from data acquired while the IPC was slewing between
    pointed observations.
 
@@ -659,7 +449,7 @@ survey, programme. The sets of disks listed below are available.
 
 \end{description}
 
-Further information about the {\it Einstein} Observatory CD-ROMs
+Further information about the \textit{Einstein} Observatory CD-ROMs
 can be obtained from: Einstein Data Products Office, High Energy
 Astrophysics Division, Harvard-Smithsonian Center for Astrophysics,
 60 Garden Street, Mail Stop 3, Cambridge, Massachusetts 01238, USA.
@@ -668,19 +458,19 @@ E-mail: 6699::EDPO (SPAN), edpo@cfa.harvard.edu (INTERNET).
 \subsection{Einstein Observatory SSS, MPC and FPCS Data Products
 \xlabel{einstein_observatory_sss_mpc_and_data_products}}
 
-{\it issue date:} 1st June 1992
+\textit{issue date:} 1st June 1992
 
-{\it institution:} High Energy Astrophysics Archive Center, Code 668,
+\textit{institution:} High Energy Astrophysics Archive Center, Code 668,
 NASA Goddard Space Flight Center, Greenbelt, Maryland 20771, USA.
 E-mail: 15735::HEASARC (SPAN),
 \newline heasarc@heasrc.gsfc.nasa.gov (INTERNET)
 
-{\it number of disks:} 1
+\textit{number of disks:} 1
 
-{\it format:} FITS binary tables
+\textit{format:} FITS binary tables
 
 This CD-ROM contains astronomical data files derived from observations
-made with the {\it Einstein} X-Ray Astronomy Satellite (HEAO-B) using
+made with the \textit{Einstein} X-Ray Astronomy Satellite (HEAO-B) using
 the Solid State Spectrometer (SSS), the Monitor Proportional Counter
 (MPC) and the Focal Plane Crystal Spectrometer (FPCS). The SSS and MPC
 data products contain summary spectra and light curves derived from the
@@ -689,7 +479,7 @@ Center. The FPCS files were produced at the Center for Space Research
 and Department of Physics at the Massachusetts Institute of Technology
 and include lists of every detected photon during each observation as
 well as summary spectra. This CD-ROM complements the CD-ROMs issued by
-the SAO Einstein Data Center which contain data from the {\it Einstein}
+the SAO Einstein Data Center which contain data from the \textit{Einstein}
 IPC and HRI instruments (see Section~\ref{EINSTEIN}, above).
 
 
@@ -712,8 +502,7 @@ sorts of data. The facilities available include:
    available on-line. A \verb-NEWS- item listing the catalogues
    available is distributed to all Starlink sites bi-annually. A service
    is provided to convert, on request, catalogues distributed by the
-   INADC (see Section~\ref{INADC}, below) and regions of the {\it
-   Guide Star Catalog} (see Section~\ref{GSC}, above) into SCAR
+   INADC (see Section~\ref{INADC}, below) and regions of the \textit{Guide Star Catalog} (see Section~\ref{GSC}, above) into SCAR
    format. Copies of these catalogues may also be provided in their
    original format, if requested,
 
@@ -724,7 +513,7 @@ sorts of data. The facilities available include:
    low-resolution spectra in the wavelength range 7 - 24 micron for
    approximately 40,000 separate sources and an atlas of averaged
    spectra for 5425 sources. Access to this archive is described in
-   {\it IRASLRS --- Obtaining Spectra from the IRAS LRS database}
+   \textit{IRASLRS --- Obtaining Spectra from the IRAS LRS database}
    (SUN/14) by H. Walker and D. Giaretta, 18th July 1989,
 
   \item various spectral atlases.
@@ -738,23 +527,23 @@ users may be allocated their own usernames, and some archives, for
 example IUE and IRAS, are accessed from captive accounts. To log on to
 STADAT type
 
-\begin{verbatim}
+\begin{terminalv}
     SET  HOST  STADAT
-\end{verbatim}
+\end{terminalv}
 
 from your local VAX. Once logged on, type
 
-\begin{verbatim}
+\begin{terminalv}
     STADAT_HELP
-\end{verbatim}
+\end{terminalv}
 
 for information on the facilities available. For further information on
 the various spectral atlases type
 
-\begin{verbatim}
+\begin{terminalv}
     @SPECTRAL_ATLASDIR:LOGIN
     ATLAS_HELP
-\end{verbatim}
+\end{terminalv}
 
 Comments, suggestions, requests for new catalogues etc. should be sent
 by E-mail to account STADAT::CATMAIL (Starlink DECNET),
@@ -785,9 +574,9 @@ central IBM machine. The IULDA is maintained on STADAT. To access either
 archive you must first log on to STADAT. From your local Starlink VAX
 type
 
-\begin{verbatim}
+\begin{terminalv}
     SET  HOST  STADAT
-\end{verbatim}
+\end{terminalv}
 
 A captive account is available for the main archive: in response to the
 `Username:' prompt type \verb-IUE-; no password is required. For the
@@ -798,24 +587,24 @@ For further information contact Chris Lloyd, IUE Project, Space Science
 Department, Rutherford Appleton Laboratory, Didcot, Oxfordshire, OX11
 0QX. E-mail: RLSAC::CXL (Starlink DECNET), 19465::CXL (SPAN).
 
-{\it Documentation:}
+\textit{Documentation:}
 
-The main IUE archive is described in {\it IUEDEARCH --- Access to the
+The main IUE archive is described in \textit{IUEDEARCH --- Access to the
 IUE Data Archive}
 (\xref{SUN/58}{sun58}{}) by C. Lloyd, 2nd December 1992.
 
-The IULDA is described in {\it IULDA/USSP --- Accessing the IUE Uniform
+The IULDA is described in \textit{IULDA/USSP --- Accessing the IUE Uniform
 Low-Dispersion Archive} (\xref{SUN/20}{sun20}{}) by Jo Murray,
 17th October 1990.
 
 Additional information on extracting spectra from IUE data is given in
-{\it IUEDR --- IUE Data Reduction Package (2.0)}
+\textit{IUEDR --- IUE Data Reduction Package (2.0)}
 (\xref{SUN/37}{sun37}{}) by Jack
 Giddings and Paul Rees, 3rd January 1989.
 
-A more general overview of the IUE archives is given in {\it The many
+A more general overview of the IUE archives is given in \textit{The many
 faces of the Archive of the International Ultraviolet Explorer
-satellite} by W. Wamsteker, 1991, in {\it Databases and On-Line Data
+satellite} by W. Wamsteker, 1991, in \textit{Databases and On-Line Data
 in Astronomy}, eds. D. Egret and M. Albrecht (Dordrecht: Kluwer)
 pp35-46.
 
@@ -838,9 +627,9 @@ These data products can be analysed using software integral to the
 system. The system runs on node LTXDB, a MicroVAX II in the Leicester
 Starlink cluster. To log on to this node type
 
-\begin{verbatim}
+\begin{terminalv}
     SET  HOST  LTXDB
-\end{verbatim}
+\end{terminalv}
 
 from your local Starlink VAX. A captive account is provided to
 interrogate the LDS. To access it reply \verb-XRAY- in response to the
@@ -848,7 +637,7 @@ interrogate the LDS. To access it reply \verb-XRAY- in response to the
 on you will be asked to supply a name to identify yourself to the
 system. On-line help can be obtained by typing \verb-HELP-.
 
-A brief introduction to the LDS is given in {\it The EXOSAT Database
+A brief introduction to the LDS is given in \textit{The EXOSAT Database
 Management System}
 \newline
 (\xref{SUN/127}{sun127}{}), by J. Osborne, 2nd July 1991. This document refers
@@ -881,9 +670,8 @@ period of one year and two weeks after the data were dispatched to them.
 After this period has elapsed the observations become publicly
 available.
 
-A brief description of the ROSAT archive appeared in {\it The ROSAT
-Data Archive} by S. Sembay and M.G. Watson, October 1992, {\it
-Starlink Bulletin}, issue {\bf 10}, pp12-13. For further information
+A brief description of the ROSAT archive appeared in \textit{The ROSAT
+Data Archive} by S. Sembay and M.G. Watson, October 1992, \textit{Starlink Bulletin}, issue \textbf{10}, pp12-13. For further information
 contact Steve Sembay, Department of Physics and Astronomy, University
 of Leicester, University Road, Leicester, LE1 7RH. E-mail: LTVAD::SSE
 (Starlink DECNET), 19838::SSE (SPAN) or sse@uk.ac.le.star (JANET).
@@ -904,18 +692,18 @@ catalogue of all the plates taken with the UK Schmidt Telescope is
 maintained on-line and a captive account is available to interrogate it.
 To access this catalogue from your local Starlink VAX type
 
-\begin{verbatim}
+\begin{terminalv}
     SET  HOST  REVAD
-\end{verbatim}
+\end{terminalv}
 
 In response to the `Username:' prompt reply \verb-UKSCAT-; no password
 is required. Then follow the instructions. A help file giving a brief
 description of the catalogue format is available. To obtain a copy of
 this help file, type (from your local VAX)
 
-\begin{verbatim}
+\begin{terminalv}
     COPY  REVAD::DISK$USER3:[UKSCAT]UKSCAT.DOC  *
-\end{verbatim}
+\end{terminalv}
 
 and file \verb-UKSCAT.DOC- will be created in your file space. It
 requires only eighteen blocks of disk space and is a simple text file
@@ -960,9 +748,9 @@ subsequently request copies of them. This software is run from a captive
 account on the Cambridge Starlink cluster. To access it from your local
 Starlink VAX type
 
-\begin{verbatim}
+\begin{terminalv}
     SET  HOST  CAVAD
-\end{verbatim}
+\end{terminalv}
 
 Alternatively, the appropriate INTERNET address is camv0.ast.cam.ac.uk
 or 131.111.69.9. In either case the prompt `Username:' should appear.
@@ -973,15 +761,15 @@ be obtained from Eduard Zuiderwijk, Royal Greenwich Observatory,
 Madingley Road, Cambridge, CB3 0EZ. E-mail: CAVAD::EZJ (Starlink
 DECNET), 20031::EJZ (SPAN), ezj@uk.ac.cam.ast-star (JANET).
 
-{\it Documentation:}
+\textit{Documentation:}
 
-{\it La Palma Data Archive User's Guide} by E. Raimond and G. van
+\textit{La Palma Data Archive User's Guide} by E. Raimond and G. van
 Diepen, June 1989, version 1.0, Isaac Newton Group, La Palma, User
 Manual No. XIX.
 
-For a more general discussion, see also {\it Archives of the Isaac
+For a more general discussion, see also \textit{Archives of the Isaac
 Newton Group, La Palma and Westerbork Observatories} by E. Raimond,
-1991, in {\it Databases and On-Line Data in Astronomy}, eds. D. Egret
+1991, in \textit{Databases and On-Line Data in Astronomy}, eds. D. Egret
 and M. Albrecht (Dordrecht: Kluwer) pp115-124.
 
 \subsection{JCMT Data Archive\xlabel{jcmt_data_archive}}
@@ -1003,9 +791,9 @@ and the two systems are very similar. This software is run from a
 captive account on the ROE Starlink cluster. To access it from your
 local Starlink VAX type
 
-\begin{verbatim}
+\begin{terminalv}
     SET  HOST  REVAD
-\end{verbatim}
+\end{terminalv}
 
 In response to the `Username:' prompt reply \verb-ARCQUERY-; no password
 is required. On-line help information is provided and a user guide and
@@ -1015,12 +803,12 @@ Astronomy Division, Royal Observatory, Blackford Hill, Edinburgh, EH9
 3HJ. E-mail: REVAD::KXH (Starlink DECNET), 19889::KXH (SPAN),
 kxh@uk.ac.roe.star (JANET).
 
-{\it Documentation:}
+\textit{Documentation:}
 
-{\it User's Guide to the Hawaii Telescopes Data Archive}, version 1.1
+\textit{User's Guide to the Hawaii Telescopes Data Archive}, version 1.1
 by A.C. Davenhall, February 1993 (Royal Observatory Edinburgh).
 
-{\it Quick Reference Sheet for the Hawaii Telescopes Data Archive} by
+\textit{Quick Reference Sheet for the Hawaii Telescopes Data Archive} by
 A.C. Davenhall, June 1992 (Royal Observatory Edinburgh).
 
 Because the JCMT archive uses the same software as the La Palma archive,
@@ -1028,7 +816,7 @@ the user guide for the latter is also relevant (see
 Section~\ref{LAPALMA}, above).
 
 A brief introduction to the JCMT archive is given by K. Hummel and A.C.
-Davenhall, March 1993, {\it The JCMT - UKIRT Newsletter}, no. {\bf 5},
+Davenhall, March 1993, \textit{The JCMT - UKIRT Newsletter}, no. \textbf{5},
 pp22-24.
 
 \subsection{Atomic Databases at Belfast
@@ -1056,11 +844,11 @@ Berrington, Department of Applied Mathematics, Queen's University of
 Belfast, Belfast, BT7 1NN. E-mail:
 \newline amg0016@uk.ac.queens-belfast.app-maths.vax1 (JANET).
 
-{\it Documentation:}
+\textit{Documentation:}
 
 A description of some aspects of this project is given by W. Cunto,
-C. Mendoza, F. Ochsenbein and C.J. Zeippen, 1993, {\it Bulletin
-d'Information du Centre de Donn\'{e}es Stellaires}, no. {\bf 42},
+C. Mendoza, F. Ochsenbein and C.J. Zeippen, 1993, \textit{Bulletin
+d'Information du Centre de Donn\'{e}es Stellaires}, no. \textbf{42},
 pp39-43.
 
 \section{Facilities Overseas\xlabel{facilities_overseas}}
@@ -1079,21 +867,21 @@ in the Local Miscellaneous User Documentation directory (LMUDSDIR) on
 node STADAT. To obtain copies you should log on to your local Starlink
 VAX and type
 
-\begin{verbatim}
+\begin{terminalv}
     COPY  STADAT::LMUDSDIR:MUD135.LIS  *
     COPY  STADAT::LMUDSDIR:MUD136.LIS  *
-\end{verbatim}
+\end{terminalv}
 
 The two documents require a total of about 220 blocks of disk space.
 Both are simple text files suitable for printing. The IAC document
 contains some details which are specific to that institution.
 
-A good source of further information is {\it Databases and On-Line Data
+A good source of further information is \textit{Databases and On-Line Data
 in Astronomy}, eds. D. Egret and M. Albrecht, 1991 (Dordrecht: Kluwer).
 A list of computer-readable space astronomy archives was compiled by
-N.E. White (1987, in Appendix C of {\it Astrophysics Data Program},
+N.E. White (1987, in Appendix C of \textit{Astrophysics Data Program},
 NRA-87-OSSA-11), though it is now a few years out of date. Much useful
-background information is contained in {\it Data in Astronomy} by C.
+background information is contained in \textit{Data in Astronomy} by C.
 Jaschek, 1989 (Cambridge University Press, Cambridge). Some general
 information about accessing remote hosts across communication networks
 is given in Section~\ref{REMOTE}.
@@ -1106,7 +894,7 @@ collect, collate, preserve and disseminate astronomical data. They will
 accept most sorts of astronomical data, but are particularly oriented
 towards catalogues and similar sorts of reduced data. Inevitably, many
 of these data are now held in a computer readable form. The various data
-centres collaborate through the {\it International Network of
+centres collaborate through the \textit{International Network of
 Astronomical Data Centres} (INADC) and swap datasets, operate a common
 naming scheme for catalogues etc. Probably the two most important data
 centres are the Centre de Donn\'{e}es Stellaires (CDS), in Strasbourg
@@ -1122,7 +910,7 @@ Section~\ref{STADAT}, above).
 The Centre de Donn\'{e}es Stellaires (CDS) at the Strasbourg Observatory
 was the first astronomical data centre, set up in 1972. In addition to
 maintaining a collection of astronomical catalogues and data, the CDS
-publishes the bi-annual {\it Bulletin d'Information du Centre de
+publishes the bi-annual \textit{Bulletin d'Information du Centre de
 Donn\'{e}es Stellaires}, which is the principal publication concerned
 with astronomical catalogues and data.
 
@@ -1130,9 +918,9 @@ A list of the catalogues currently available and copies of most of them
 can be obtained by anonymous ftp (File Transfer Protocol). The details
 are as follows.
 
-{\it INTERNET address: } cdsarc.u-strasbg.fr or 130.79.128.5
-\newline {\it Username:} \verb-anonymous-
-\newline {\it Password:} Type your full name and the name of your
+\textit{INTERNET address: } cdsarc.u-strasbg.fr or 130.79.128.5
+\newline \textit{Username:} \verb-anonymous-
+\newline \textit{Password:} Type your full name and the name of your
 institute.
 
 In order to access this system, you should log on to a local Starlink
@@ -1149,10 +937,10 @@ concerned with changing directories and copying files are available to
 you. Initially you should set your current directory to the root
 directory of the directory tree containing the catalogues, which is
 directory \verb-pub/cats-. Note also that some of the larger catalogues
-are held in {\it Unix compressed format}. Further details are given in
-{\it The Archive of astronomical catalogues at CDS} by F. Ochsenbein,
-July 1992, {\it Bulletin d'Information du Centre de Donn\'{e}es
-Stellaires}, no. {\bf 41}, pp65-70.
+are held in \textit{Unix compressed format}. Further details are given in
+\textit{The Archive of astronomical catalogues at CDS} by F. Ochsenbein,
+July 1992, \textit{Bulletin d'Information du Centre de Donn\'{e}es
+Stellaires}, no. \textbf{41}, pp65-70.
 
 Further information about the CDS can be requested by sending e-mail
 to 29588::QUESTION (SPAN), question@fr.u-strasbg.simbad (INTERNET), or
@@ -1169,10 +957,10 @@ is available which provides information on the catalogues held by the
 ADC and allows the interactive submission of requests for catalogues.
 The details are as follows.
 
-{\it SPAN address: } 15548
-\newline {\it INTERNET address:} nssdca.gsfc.nasa.gov or 128.183.36.23
-\newline {\it Username:} \verb-NODIS-
-\newline {\it Password:} No password required; captive account.
+\textit{SPAN address: } 15548
+\newline \textit{INTERNET address:} nssdca.gsfc.nasa.gov or 128.183.36.23
+\newline \textit{Username:} \verb-NODIS-
+\newline \textit{Password:} No password required; captive account.
 
 See Section~\ref{REMOTE} for details of establishing a connection to
 a remote host. The first time that you log on you will
@@ -1180,7 +968,7 @@ be asked to supply your name and other details. You are logged on to a
 general service covering all the archives of the NSSDC; select option
 ten from the main menu to see the holdings of the ADC.
 
-The ADC publishes {\it ADC Electronic News} which is distributed by
+The ADC publishes \textit{ADC Electronic News} which is distributed by
 e-mail. Subscription and back issues are also handled automatically by
 e-mail. In order to invoke the various functions you should compose
 standard messages (in the format described below) and send them to
@@ -1193,21 +981,21 @@ as follows.
 \begin{itemize}
 
   \item to subscribe:
-  \begin{verbatim}
+  \begin{terminalv}
     SUBSCRIBE ADCNEWS full name
-  \end{verbatim}
+  \end{terminalv}
 
    where \verb-full name- is replaced with your full name,
 
   \item to list the back issues available:
-  \begin{verbatim}
+  \begin{terminalv}
     INDEX ADCNEWS
-  \end{verbatim}
+  \end{terminalv}
 
   \item to retrieve a back issue, for example volume 1, issue 1:
-  \begin{verbatim}
+  \begin{terminalv}
     GET ADCNEWS VOLUME1.ISSUE1
-  \end{verbatim}
+  \end{terminalv}
 
    with obvious extensions for other issues and volumes.
 
@@ -1235,10 +1023,10 @@ SIMBAD runs on a Unix workstation at the Strasbourg Observatory. It
 can be accessed remotely through either the SPAN or INTERNET networks.
 The details are as follows.
 
-{\it SPAN address: } 29588
-\newline {\it INTERNET address:} simbad.u-strasbg.fr or 130.79.128.4
-\newline {\it Username:} site specific; see below
-\newline {\it Password:} site specific; see below
+\textit{SPAN address: } 29588
+\newline \textit{INTERNET address:} simbad.u-strasbg.fr or 130.79.128.4
+\newline \textit{Username:} site specific; see below
+\newline \textit{Password:} site specific; see below
 
 See Section~\ref{REMOTE} for details of establishing a connection to
 a remote host. However, before you can use SIMBAD you need to be
@@ -1260,13 +1048,13 @@ to account
 \newline 29588::QUESTION (SPAN), question@fr.u-strasbg.simbad
 (INTERNET).
 
-{\it Documentation:}
+\textit{Documentation:}
 
-{\it SIMBAD User's Guide and Reference Manual} SIMBAD III, release 1.2,
+\textit{SIMBAD User's Guide and Reference Manual} SIMBAD III, release 1.2,
 April 1992 (Strasbourg: Observatoire Astronomique de Strasbourg).
 
-For a more general description see {\it The SIMBAD Astronomical
-database} by D. Egret, M. Wenger and P. Dubois, 1991, in {\it Databases
+For a more general description see \textit{The SIMBAD Astronomical
+database} by D. Egret, M. Wenger and P. Dubois, 1991, in \textit{Databases
 and On-Line Data in Astronomy}, eds. D. Egret and M. Albrecht
 (Dordrecht: Kluwer) pp79-88.
 
@@ -1285,9 +1073,9 @@ data for over 82,000 objects.
 NED is intended to be accessed primarily through communication networks.
 The details are as follows.
 
-{\it INTERNET address:} ned.ipac.caltech.edu
-\newline {\it Username:} \verb-NED-
-\newline {\it Password:} No password required; captive account.
+\textit{INTERNET address:} ned.ipac.caltech.edu
+\newline \textit{Username:} \verb-NED-
+\newline \textit{Password:} No password required; captive account.
 
 See Section~\ref{REMOTE} for details of establishing a connection to
 a remote host. The NED user interface is simple and easy to use,
@@ -1300,11 +1088,11 @@ Analysis Center, Jet Propulsion Laboratory, California Institute of
 Technology, Pasadena, California 91125, USA. E-mail: 15193::HELOU
 (SPAN), helou@ipac.caltech.edu (INTERNET).
 
-{\it Documentation:}
+\textit{Documentation:}
 
-A general description of NED is given in {\it The NASA/IPAC
+A general description of NED is given in \textit{The NASA/IPAC
 Extragalactic Database} by G. Helou, B.F. Madore, M. Schmitz, M.D.
-Bicay, X. Wu and J. Bennett, 1991, in {\it Databases and On-Line Data in
+Bicay, X. Wu and J. Bennett, 1991, in \textit{Databases and On-Line Data in
 Astronomy}, eds. D. Egret and M. Albrecht (Dordrecht: Kluwer) pp89-106.
 
 \subsection{Extragalactic Database, EDB
@@ -1322,25 +1110,25 @@ above) was created from the EDB.
 
 On-line access to the EDB is available. The details are as follows.
 
-{\it INTERNET address:} 134.214.4.7
-\newline {\it Username:} \verb-base- (note: lower case is mandatory)
-\newline {\it Password:} No password required; captive account.
+\textit{INTERNET address:} 134.214.4.7
+\newline \textit{Username:} \verb-base- (note: lower case is mandatory)
+\newline \textit{Password:} No password required; captive account.
 
 See Section~\ref{REMOTE} for details of establishing a connection to
 a remote host. After logging on follow the instructions (which are in
 English). Further information can be obtained from the Observatoire de
 Lyon, 69561 Saint-Genis Laval Cedex, France.
 
-{\it Documentation:}
+\textit{Documentation:}
 
 General descriptions of the EDB are given in:
 
 G. Paturel, L. Bottinelli, P. Fouqu\'{e}, and L. Gouguenheim, 1988, in
-{\it Astronomy from Large Databases} eds. F. Murtagh and A. Heck
+\textit{Astronomy from Large Databases} eds. F. Murtagh and A. Heck
 (Garching: ESO conference and workshop proceedings no. 28) pp435-440.
 
 G. Paturel, L. Gouguenheim and L. Bottinelli, 1992, in
-{\it Astronomy from Large Databases II} eds. A. Heck and F. Murtagh
+\textit{Astronomy from Large Databases II} eds. A. Heck and F. Murtagh
 (Garching: ESO conference and workshop proceedings no. 43) pp429-431.
 
 \subsection{HEASARC
@@ -1350,19 +1138,17 @@ The High Energy Astrophysics Science Archive Research Center (HEASARC)
 at the Goddard Space Flight Center was created by NASA in 1990 as a site
 for X-ray and $\gamma$-ray astronomy archival research. The HEASARC
 maintains an archive from a number of high-energy astronomy satellites,
-including ones that have completed their missions, such as {\it
-Einstein}, HEAO 1, HEAO 3, OSO 8, SAS 2 and 3, {\it Uhuru} and {\it
-Vela} 5B, and others which are still in operation or construction, such
-as ROSAT, GRO, BBXRT, {\it Astro}-D and XTE. It is anticipated that
+including ones that have completed their missions, such as \textit{Einstein}, HEAO 1, HEAO 3, OSO 8, SAS 2 and 3, \textit{Uhuru} and \textit{Vela} 5B, and others which are still in operation or construction, such
+as ROSAT, GRO, BBXRT, \textit{Astro}-D and XTE. It is anticipated that
 approximately one terabyte of data will be held by 1995.
 
 On-line access to the HEASARC archives is supported. The details are as
 follows.
 
-{\it SPAN address: } 15761
-\newline {\it INTERNET address:} ndadsa.gsfc.nasa.gov or 128.183.36.17
-\newline {\it Username:} \verb-XRAY-
-\newline {\it Password:} No password required; captive account.
+\textit{SPAN address: } 15761
+\newline \textit{INTERNET address:} ndadsa.gsfc.nasa.gov or 128.183.36.17
+\newline \textit{Username:} \verb-XRAY-
+\newline \textit{Password:} No password required; captive account.
 
 See Section~\ref{REMOTE} for details of establishing a connection to
 a remote host. The first time that you log on you will be asked to
@@ -1378,15 +1164,15 @@ to
 The postal address of the HEASARC is: HEASARC, Code 668, NASA, Goddard
 Space Flight Center, Greenbelt, Maryland 20771, USA.
 
-{\it Documentation:}
+\textit{Documentation:}
 
 A variety of documentation is available from the HEASARC.
 
-A useful introduction to the on-line service is {\it The HEASARC On-line
-Service - An Overview}, by K.L. Rhode, 1992, {\it Legacy}, no. {\bf 1},
+A useful introduction to the on-line service is \textit{The HEASARC On-line
+Service - An Overview}, by K.L. Rhode, 1992, \textit{Legacy}, no. \textbf{1},
 pp21-28.
 
-{\it Legacy} is the HEASARC journal; copies of it and the other
+\textit{Legacy} is the HEASARC journal; copies of it and the other
 documentation can be requested by e-mail sent to the account for
 requesting further information given above.
 
@@ -1394,20 +1180,20 @@ requesting further information given above.
 
 The EINLINE on-line service is provided by the Einstein Data Center at
 the Smithsonian Astrophysical Observatory. It was originally set up to
-make the results of the {\it Einstein} Observatory catalogue of IPC
+make the results of the \textit{Einstein} Observatory catalogue of IPC
 X-ray sources available in a form suitable for preparing ROSAT observing
 proposals. Subsequently it has grown to include access to many other
-{\it Einstein} data products and tabular data from other wavebands,
+\textit{Einstein} data products and tabular data from other wavebands,
 including an extensive collection of radio-astronomical catalogues
 compiled by Heinz Andernach.
 
 The details of access to this service are as follows.
 
-{\it SPAN address: } 6714
-\newline {\it INTERNET address:} cfa204.harvard.edu, or
+\textit{SPAN address: } 6714
+\newline \textit{INTERNET address:} cfa204.harvard.edu, or
 einline.harvard.edu, or 128.103.40.204
-\newline {\it Username:} \verb-einline- (note: lower case is mandatory)
-\newline {\it Password:} No password required; captive account.
+\newline \textit{Username:} \verb-einline- (note: lower case is mandatory)
+\newline \textit{Password:} No password required; captive account.
 
 See Section~\ref{REMOTE} for details of establishing a connection to
 a remote host. After logging on follow the instructions.
@@ -1417,7 +1203,7 @@ Requests for further information should either be sent by e-mail to:
 Einstein Data Products Office, Smithsonian Astrophysical Observatory,
 60 Garden Street, MS 12 Cambridge, Massachusetts 01238, USA.
 
-{\it Documentation:}
+\textit{Documentation:}
 
 Documentation on the various datasets and facilities available may be
 down-loaded from the on-line service.
@@ -1434,10 +1220,10 @@ them.
 
 The system can be accessed remotely; the details are as follows.
 
-{\it SPAN address: } 37927
-\newline {\it INTERNET address:} bodira.bo.cnr.it or 137.204.51.8
-\newline {\it Username:} \verb-DIRA2-
-\newline {\it Password:} \verb-DIRA2-
+\textit{SPAN address: } 37927
+\newline \textit{INTERNET address:} bodira.bo.cnr.it or 137.204.51.8
+\newline \textit{Username:} \verb-DIRA2-
+\newline \textit{Password:} \verb-DIRA2-
 
 See Section~\ref{REMOTE} for details of establishing a connection to
 a remote host. After logging on follow the instructions, which are in
@@ -1445,10 +1231,10 @@ English. Further information can be obtained from: M. Nanni, C.N.R.
 Instituto di Radioastronomia, Via Irnerio, 46, 40126 Bologno, Italy.
 E-mail: 38057::NANNI (SPAN) or nanni@astbo1.bo.cnr.it (INTERNET).
 
-{\it Documentation:}
+\textit{Documentation:}
 
 A comprehensive 230-page user manual, written in English, is available:
-{\it DIRA2, version 1.1, User Manual}, Astronet Database Group, Italy,
+\textit{DIRA2, version 1.1, User Manual}, Astronet Database Group, Italy,
 May 1992. To obtain a copy log on to DIRA2 and follow the instructions,
 or in case of difficulty contact, in the first instance, M. Nanni at
 the above address.
@@ -1471,10 +1257,10 @@ and images from some observation logs (including the HST).
 The details for accessing STARCAT at the Space Telescope European
 Coordinating Facility are as follows.
 
-{\it SPAN address: } 28771
-\newline {\it INTERNET address:} stesis.hq.eso.org or 134.171.8.100
-\newline {\it Username:} \verb-starcat-
-\newline {\it Password:} No password required; captive account.
+\textit{SPAN address: } 28771
+\newline \textit{INTERNET address:} stesis.hq.eso.org or 134.171.8.100
+\newline \textit{Username:} \verb-starcat-
+\newline \textit{Password:} No password required; captive account.
 
 See Section~\ref{REMOTE} for details of establishing a connection to
 a remote host. After logging on follow the instructions. In the first
@@ -1487,17 +1273,17 @@ D-W8046, Garching bei M\"{u}nchen, Germany. E-mail: 28760::bpirenne
 The STScI provides copies of the archive on both VAX/VMS and Unix
 systems. The details of accessing these systems are as follows.
 
-{\bf VAX/VMS archive host}
+\textbf{VAX/VMS archive host}
 
-{\it INTERNET address:} stdata.stsci.edu or 130.167.1.135
-\newline {\it Username:} \verb-GUEST-
-\newline {\it Password:} \verb-ARCHIVE-
+\textit{INTERNET address:} stdata.stsci.edu or 130.167.1.135
+\newline \textit{Username:} \verb-GUEST-
+\newline \textit{Password:} \verb-ARCHIVE-
 
-{\bf Unix archive host}
+\textbf{Unix archive host}
 
-{\it INTERNET address:} stdatu.stsci.edu or 130.167.1.148
-\newline {\it Username:} \verb-guest- (note: lower case is mandatory)
-\newline {\it Password:} \verb-archive- (note: lower case is mandatory)
+\textit{INTERNET address:} stdatu.stsci.edu or 130.167.1.148
+\newline \textit{Username:} \verb-guest- (note: lower case is mandatory)
+\newline \textit{Password:} \verb-archive- (note: lower case is mandatory)
 
 See Section~\ref{REMOTE} for details of establishing a connection to
 a remote host. After logging on, a subset of the normal operating system
@@ -1512,33 +1298,33 @@ STARCAT without them. Requests for copies of the manuals, further
 information and assistance should be sent by e-mail to archive@stsci.edu
 (INTERNET).
 
-{\it Documentation:}
+\textit{Documentation:}
 
-{\it STARCAT User Guide} version 4.52 by A. Micol, B. Pirenne and
-D. Durand, 9th July 1992, ST-ECF O-02 series, {\bf XII} (Garching:
+\textit{STARCAT User Guide} version 4.52 by A. Micol, B. Pirenne and
+D. Durand, 9th July 1992, ST-ECF O-02 series, \textbf{XII} (Garching:
 Space Telescope European Coordinating Facility).
 
-{\it HST Catalogue User Guide} for STARCAT version 4.6 by B. Pirenne and
-D. Durand, 30th July 1992, ST-ECF O-02 series, {\bf XIII} (Garching:
+\textit{HST Catalogue User Guide} for STARCAT version 4.6 by B. Pirenne and
+D. Durand, 30th July 1992, ST-ECF O-02 series, \textbf{XIII} (Garching:
 Space Telescope European Coordinating Facility).
 
 General descriptions are given in:
 
-{\it Data Archive Systems for the Hubble Space Telescope} by E.
-Schreier, P. Benvenuti and F. Pasian, 1991, in {\it Databases and
+\textit{Data Archive Systems for the Hubble Space Telescope} by E.
+Schreier, P. Benvenuti and F. Pasian, 1991, in \textit{Databases and
 On-Line Data in Astronomy}, eds. D. Egret and M. Albrecht (Dordrecht:
 Kluwer) pp47-58.
 
-{\it STARCAT: An Interface to Astronomical Databases} by B. Pirenne,
-M.A. Albrecht, D. Durand and S. Gaudet, 1992, in {\it Astronomy from
+\textit{STARCAT: An Interface to Astronomical Databases} by B. Pirenne,
+M.A. Albrecht, D. Durand and S. Gaudet, 1992, in \textit{Astronomy from
 Large Databases II} eds. A. Heck and F. Murtagh (Garching: ESO
 conference and workshop proceedings no. 43) pp447-453.
 
 The future direction of the archive software at the STScI is described
 in:
 
-{\it STARVIEW: The Astronomer's Interface to the Hubble Space Telescope
-Archive} by M.D. Johnson, 1992, in {\it Astronomy from Large Databases
+\textit{STARVIEW: The Astronomer's Interface to the Hubble Space Telescope
+Archive} by M.D. Johnson, 1992, in \textit{Astronomy from Large Databases
 II} eds. A. Heck and F. Murtagh (Garching: ESO conference and workshop
 proceedings no. 43) pp75-83.
 
@@ -1564,20 +1350,20 @@ Space Telescope archives. A bibliographic database is also available.
 
 The details of accessing ESIS are as follows.
 
-{\it SPAN address: } 29617
-\newline {\it INTERNET address:} 192.252.106.127
-\newline {\it Username:} \verb-ESIS-
-\newline {\it Password:} No password required; captive account.
+\textit{SPAN address: } 29617
+\newline \textit{INTERNET address:} 192.252.106.127
+\newline \textit{Username:} \verb-ESIS-
+\newline \textit{Password:} No password required; captive account.
 
 See Section~\ref{REMOTE} for details of establishing a connection to
 a remote host. Further information can be obtained from: ISD Help Desk,
 ESRIN, P.O. Box 64, 00044 Frascati (RM), Italy. E-mail: 29617::ISDHELP
 (SPAN).
 
-{\it Documentation:}
+\textit{Documentation:}
 
-A general introduction to ESIS is given in {\it ESIS A Science
-Information System} by M.A. Albrecht, 1991, in {\it Databases and
+A general introduction to ESIS is given in \textit{ESIS A Science
+Information System} by M.A. Albrecht, 1991, in \textit{Databases and
 On-Line Data in Astronomy}, eds. D. Egret and M. Albrecht (Dordrecht:
 Kluwer) pp127-138.
 
@@ -1612,17 +1398,17 @@ obtained from: ADS User Support, Center for Astrophysics and Space
 Astronomy, University of Colorado, Boulder, Colorado 80309, USA. E-mail:
 ads@cuads.colorado.edu (INTERNET).
 
-{\it Documentation:}
+\textit{Documentation:}
 
 General introductions to the ADS are given in:
 
- {\it The NASA Astrophysics Data System} by J.R. Weiss and J.C. Good,
-1991, in {\it Databases and On-Line Data in Astronomy}, eds. D. Egret
+ \textit{The NASA Astrophysics Data System} by J.R. Weiss and J.C. Good,
+1991, in \textit{Databases and On-Line Data in Astronomy}, eds. D. Egret
 and M. Albrecht (Dordrecht: Kluwer) pp139-150.
 
-{\it Astrophysics Data System (ADS)} by S.S. Murray, E.W. Brugel, G.
+\textit{Astrophysics Data System (ADS)} by S.S. Murray, E.W. Brugel, G.
 Eichhorn, A. Ferris, J.C. Good, M.J. Kurtz, J.A. Nousek and J.L. Stoner,
-1992, in {\it Astronomy from Large Databases II} eds. A. Heck and F.
+1992, in \textit{Astronomy from Large Databases II} eds. A. Heck and F.
 Murtagh (Garching: ESO conference and workshop proceedings no. 43)
 pp387-391.
 
@@ -1655,15 +1441,15 @@ Log on to a VAX running VMS.
 
   \item[SPAN] Type
 
-  \begin{verbatim}
+  \begin{terminalv}
     SET  HOST  span_number
-  \end{verbatim}
+  \end{terminalv}
 
    for example, to access the HEASARC, type
 
-  \begin{verbatim}
+  \begin{terminalv}
     SET  HOST  15761
-  \end{verbatim}
+  \end{terminalv}
 
    The login prompt for the remote computer should appear.
 
@@ -1671,18 +1457,18 @@ Log on to a VAX running VMS.
    Starlink VAX it is necessary to go through a SPAN to INTERNET
    gateway. For example, type
 
-  \begin{verbatim}
+  \begin{terminalv}
     SET  HOST  6913
-  \end{verbatim}
+  \end{terminalv}
 
    which will log you on to the EAST gateway. A `login:' prompt will
    appear. You should reply with the INTERNET address of your remote
-   destination {\it followed by an exclamation mark}. For example,
+   destination \textit{followed by an exclamation mark}. For example,
    to access NED by this route, you would type
 
-  \begin{verbatim}
+  \begin{terminalv}
     ned.ipac.caltech.edu!
-  \end{verbatim}
+  \end{terminalv}
 
    (note the exclamation mark at the end). The login prompt for the
    remote computer should now appear. Note that the EAST gateway is
@@ -1705,31 +1491,31 @@ Log on to a Unix workstation.
 
    If you do need to use this route the details are as follows. Type
 
-  \begin{verbatim}
+  \begin{terminalv}
     telnet 128.183.104.4
-  \end{verbatim}
+  \end{terminalv}
 
    At the `login:' prompt type the SPAN address of the host that you
-   want to access, {\it followed by two colons}. For example, to access
+   want to access, \textit{followed by two colons}. For example, to access
    the HEASARC you would type
 
-  \begin{verbatim}
+  \begin{terminalv}
     15761::
-  \end{verbatim}
+  \end{terminalv}
 
    The login prompt for the remote computer should appear.
 
   \item[INTERNET] Type
 
-  \begin{verbatim}
+  \begin{terminalv}
     telnet  internet_address
-  \end{verbatim}
+  \end{terminalv}
 
    (note that lower case is mandatory). For example, to access NED
 
-  \begin{verbatim}
+  \begin{terminalv}
     telnet  ned.ipac.caltech.edu
-  \end{verbatim}
+  \end{terminalv}
 
    The login prompt for the remote computer should appear.
 
@@ -1749,7 +1535,7 @@ In addition to numbers, SPAN nodes may also have names. The names are
 simply synonyms for the numbers and may also be used in the
 \verb-SET HOST- command. A given SPAN number should always be available,
 whereas the corresponding name may or may not have been set up at your
-site. In principle, the SPAN name for a site {\it should} be less likely
+site. In principle, the SPAN name for a site \textit{should} be less likely
 to change than its number, though in practice either or both can change.
 
 \subsection{INTERNET numbers and names\xlabel{internet_numbers_and_names}}
