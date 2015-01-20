@@ -457,11 +457,11 @@ the axes along with the pixel bounds of your data file by running
 \ndftrace. In the example above the ranges are 10.5$^\circ$ to
 10$^\circ$ in Longitude (note the range goes from left to right),
 0$^\circ$ to 0.25$^\circ$ in Latitude, and -25 to +25 km/s in
-velocity. To leave an axis untouched simply include the comma but do 
+velocity. To leave an axis untouched simply include the comma but do
 not specify any bounds.
 
 
-\begin{tip} 
+\begin{tip}
 Be careful to give world coordinate values in floating point.
 Integers are interpreted as pixel indices.
 \end{tip}
@@ -567,7 +567,7 @@ position. It may be omitted for frequency switched observations.
 \item $T_{sys}$ is the system temperature in kelvins and describes the
 total noise of the system. It includes contributions from the
 background sky temperature, the Earth's atmosphere, ground spillover
-picked up by the side lobes and the noise from the the receiver itself
+picked up by the side lobes and the noise from the receiver itself
 (known as $T_{rec}$).  $T_{rec}$ can be determined by measuring the
 effects on $T_{sys}$ when looking at hot and cold loads, where the
 cold load is black-body source.
@@ -1057,7 +1057,7 @@ requirements may be excessive.
 Other options are \param{badmask=or} (default) and
 \param{badmask=first}. \param{Or} means that an output pixel will be
 bad if any of the input pixels that contribute to it are bad and is
-the default.  \param{First} means that the decisions on which pixels
+the default.  The flag \param{first} means that the decisions on which pixels
 will be flagged as bad will be made with the first input spectrum
 while the rest are ignored.
 
@@ -1106,8 +1106,8 @@ sky co-ordinate system), PIXSIZE is set to 6 arcseconds, and
 \label{sec:gridding}
 
 There are several regridding options available to you through the
-parameter on the command line. E.g.
 \makecube\ command. These are specified with the \param{SPREAD}
+parameter on the command line.  For instance,
 \begin{terminalv}
 % makecube in=rawfile spread=sincsinc params="[6,9]"
 \end{terminalv}
@@ -1914,7 +1914,7 @@ parameter.
 \end{terminalv}
 
 In the example above, \parget\ should return just one pair of pixel
-coordinates, which can then form part of an NDF section to extract the
+co-ordinates, which can then form part of an NDF section to extract the
 non-noisy part of rawfile\_01 using \ndfcopy. If there is more than one
 range you want to use the lowest and highest values.
 
@@ -2121,6 +2121,10 @@ remain fixed on top.
 window} in the top menu of the \gaiathing{Contouring} window. Here you
 can define a second image to be contoured and specify new levels and
 appearance. Open as many new contouring windows as necessary.
+
+To save the graphic, there is a \gaiathing{File} $>$ \gaiathing{Print},
+but some people find prefer a tool with a capture facility such as
+\textsc{xv}.
 
 \end{enumerate}
 
@@ -2366,7 +2370,7 @@ ends in the frequency axis. %but still specify percentage - why??
 
 \item Quality assurance checks are run on the raw cubes. See Appendix
 \ref{app:qa} for a description of the checks performed. Any
-time-slices failing any of the these checks gets flagged as bad and
+time-slices failing any of these checks gets flagged as bad and
 are not included in the group coadd that follows.
 
 \item Once all the raw observations have undergone the initial
@@ -2586,7 +2590,7 @@ flag.]{\small The options available for the \param{-calib
 bad\_receptors} flag when running the pipeline.}
 \end{table}
 
-\section{\xlabel{running_pl}Starting the pipeline}
+\section{\xlabel{starting_pl}Starting the pipeline}
 \label{sec:runpl}
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
@@ -2667,7 +2671,7 @@ options and their descriptions see \oracdrsun.
 \param{-batch}    & Delays group processing until the individual files have been reduced.  \\
 %\param{-skip}    & Allow the data detection loop to skip missing observations.  \\
 \param{-onegroup} & Forces all the observations into the same group. Useful if
-                    building up a map from rasters with different target coordinates
+                    building up a map from rasters with different target co-ordinates
                     or from different dates.  \\
 \hline
 \multicolumn{2}{l}{\textbf{Supplying parameter files}} \\
@@ -2710,13 +2714,14 @@ created so long as the observation passes the QA check.
 \end{tip}
 
 \subsection{Why have multiple reduced files been generated?}
+\label{sec:multireduced}
 
 You will find the pipeline splits large reduced cubes (e.g. from
 raster maps) into smaller tiles of $<$512\,MB. This is to save on
 computer memory. It does this from the central position outwards so
 you may find some of the smaller edge tiles are strange, often narrow,
 rectangles. These tiles can be pasted together with the \Kappa\
-command paste but beware of the final file size. For example,
+command \paste\ but beware of the final file size. For example,
 \begin{terminalv}
 % paste ga20140601_15_1_reduced\*.sdf tiledmap
 \end{terminalv}
