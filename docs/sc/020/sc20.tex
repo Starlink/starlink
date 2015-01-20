@@ -2772,6 +2772,30 @@ single reduced cube.
   group files.}
 \end{table}
 
+In addition to these NDFs a number of log files are created.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{p{2.8cm}|p{11.8cm}}
+\hline
+\multicolumn{2}{l}{\textbf{Default Files}}\\
+\hline
+\file{.oracdr\_*.log}  & The \oracdr\ log file. \\
+\file{log.flat}   & Flat-field ratios for each receptor and observation. \\
+\file{log.group}  & The files contributing to each group. \\
+\file{log.noisestats} & Noise statistics for each observation and group. \\
+\file{log.qa}     & Quality assurance reports \\
+\hline
+\end{tabular}
+\label{tab:pipe-logfiles}
+\caption{\small Table of the log files written by the science pipeline.}
+\end{table}
+
+Finally there are HDS scratch \file{t*.sdf} files, and temporary files
+\file{oractemp*} which can be NDFs or small text files such as file
+lists.  These should be removed automatically at the end of processing,
+unless something has gone wrong.
+
 
 \section{\xlabel{cadc}Getting your data from CADC}
 
