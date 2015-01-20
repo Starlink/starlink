@@ -816,6 +816,16 @@ of 6$\arcsec$. }
 \end{center}
 \end{figure}
 
+\subsection{Hybrid}
+\label{sec:hybrid}
+
+Subsystems are normally arranged to cover different spectral lines and
+would be processed independently.  However, there is also a mode in
+which the subsystems overlap in frequency, called \textbf{hybrid}.
+Such data are combined to yield a broader spectral coverage, say where
+there multiple lines in proximity.  The number of subsystems is a
+power of two up to a maximum of 16.
+
 \clearpage
 
 \chapter{\xlabel{data_files}Raw ACSIS Data}
@@ -1845,21 +1855,34 @@ convert the offset units to arcseconds instead of radians.
 
 \section{\xlabel{hybrid}Hybrid Data}
 
-To merge two hybrid observations first do \wcsalign\ on both files.
+To merge two \htmlref{hybrid}{sec:hybrid}{} observations run \wcsalign\ on both files.
 \begin{terminalv}
 % wcsalign in="'rawfile_01.sdf,rawfile_02.sdf'" insitu lbnd=! ubnd=! ref=!
 \end{terminalv}
-Next trim each sub-system to remove noisy ends of the spectra in the
+Next trim each subsystem to remove noisy ends of the spectra in the
 overlap region. You can get the pixel bounds from \ndftrace\ (here
 1024). The example below trims 35 channels from the `left' of
 rawfile\_01 and 24 channels from the `right' of rawfile\_02.
 \begin{terminalv}
-% ndfcopy in='rawfile1_01(35:1024,,)'
-% ndfcopy in='rawfile_02(0:1000,,)'
+% ndfcopy in='rawfile_01(35:1024,,)' out=trimfile_01
+% ndfcopy in='rawfile_02(0:1000,,)'  out=trimfile_02
 \end{terminalv}
-These can then be merged using \wcsmosaic.
+
+At this point the subsystems are aligned pixel for pixel.  So a
+subtraction with \sub\ will generate the differences in the trimmed
+overlap region analysed by \stats\ from which the median is found,
+which is 0.04 in the example below.
+
 \begin{terminalv}
-% wcsmosaic in='"rawfile_01,rawfile_02"' out=rawfile12 lbnd=! method=nearest accept
+% sub trimfile_01 trimfile_02 overlap_12
+% stats overlap_12 order
+% cadd trimfile_02 0.04 offsetfile_02
+\end{terminalv}
+
+You can then apply the offset to the second subsystem with \cadd.
+This the the first subsystem can then be merged using \wcsmosaic.
+\begin{terminalv}
+% wcsmosaic in='"rawfile_01,offsetfile_02"' out=rawfile12 lbnd=! method=nearest accept
 \end{terminalv}
 You should check the final spectra to make sure there is no noise bump
 in the middle where they overlap.
