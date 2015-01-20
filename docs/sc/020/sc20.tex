@@ -1036,7 +1036,7 @@ the raw files for observation 10.
 \subsection{Specifying spectral bounds}
 
 To save disk space and processing time you can specify the region of
-the spectra to be processed with \param{specbounds}. If you know your
+the spectra to be processed with \param{SPECBOUNDS}. If you know your
 line lies close to 0 km/s you may chose to process only the central
 100 km/s as in the example below.
 \begin{terminalv}
@@ -1046,7 +1046,7 @@ line lies close to 0 km/s you may chose to process only the central
 \subsection{Masking receptors}
 
 When combining several maps with masked bad receptors one can use the
-\param{badmask} parameter of \makecube. This option determines the way
+\param{BADMASK} parameter of \makecube. This option determines the way
 in which bad pixels are propagated from input to output. The one that
 produces the best map is \param{badmask=and}, which uses all the data
 so an output pixel will be bad only if all the input pixels that
@@ -1081,7 +1081,7 @@ receptor-to-receptor flat-field.
 
 \subsection{Defining an output grid}
 \label{sec:outputgrid}
-You can use the \param{ref} option to define an NDF which is used to
+You can use the \param{REF} option to define an NDF which is used to
 define an output grid. This NDF can even be in two dimensions even
 though your data may be in three dimensions.
 \begin{terminalv}
@@ -1089,7 +1089,7 @@ though your data may be in three dimensions.
 \end{terminalv}
 
 If you do not supply a reference file \makecube\ will revert to the
-\param{autogrid} option.
+\param{AUTOGRID} option.
 
 If \param{autogrid=true}, the output grid is determined automatically
 so that as many data samples as possible fall close to the centre of
@@ -1106,8 +1106,8 @@ sky co-ordinate system), PIXSIZE is set to 6 arcseconds, and
 \label{sec:gridding}
 
 There are several regridding options available to you through the
-\makecube\ command. These are specified with the \param{spread}
 parameter on the command line. E.g.
+\makecube\ command. These are specified with the \param{SPREAD}
 \begin{terminalv}
 % makecube in=rawfile spread=sincsinc params="[6,9]"
 \end{terminalv}
@@ -1119,7 +1119,7 @@ pixels in HARP maps due to missing receptors (see Figure
 \ref{fig:spread}).
 
 %If \param{spread=nearest} you can supply a value for the
-%\param{badmask} option. This determines the way in which bad pixels
+%\param{BADMASK} option. This determines the way in which bad pixels
 %are propagated from input to output. The default is
 %\param{badmask=AND} which uses all data and results in the best map
 %,however it requires considerable memory so the alternatives are FIRST
@@ -1152,10 +1152,10 @@ blank pixels throughout the map.}
 
 \subsection{Generating a variance map}
 
-The option \param{genvar} can be used to generate a variance array for
+The option \param{GENVAR} can be used to generate a variance array for
 your cube. This is important if you are adding multiple maps with
 different variances as it allows them to be accurately weighted. There
-are three options for \param{genvar}:
+are three options for \param{GENVAR}:
 
 \begin{center}
 \begin{minipage}[t]{0.12\linewidth}
@@ -1164,10 +1164,10 @@ are three options for \param{genvar}:
 \begin{minipage}[t]{0.8\linewidth}
 The output variance values are based on the spread of input data
 values contributing to each output pixel. Note that this option is not
-available if parameter \param{sparse} is set \param{true}. If the
-\param{badmask} value is \param{or} or \param{first}, then a single
+available if parameter \param{SPARSE} is set \param{true}. If the
+\param{BADMASK} value is \param{or} or \param{first}, then a single
 variance value will be produced for each output spectrum. However,
-when \param{badmask} is \param{and}, an independent variance value is
+when \param{BADMASK} is \param{and}, an independent variance value is
 calculated for each channel in each output spectrum.
 \end{minipage}
 \vspace{0.7cm}\\
@@ -1196,7 +1196,7 @@ If one has observed a number of offset positions which are not on a
 regular grid or are widely spaced, it is of little use to make a
 normal cube with \makecube, which then would have a large size and
 which would be mostly empty. Then one can use the \makecube\ parameter
-\param{sparse}. When \param{sparse=true} a one-dimensional array is
+\param{SPARSE}. When \param{sparse=true} a one-dimensional array is
 created which stacks spectra in the order in which they were observed
 (from left to right when viewed with \gaia).
 \begin{terminalv}
@@ -1207,7 +1207,7 @@ This is generates a one-dimensional array where spectra are displayed by
 
 \subsection{Creating a catalogue of receptor positions}
 
-You can use the option \param{outcat} to generate a catalogue of the
+You can use the option \param{OUTCAT} to generate a catalogue of the
 spatial potions of the receptors used to make your final cube. The
 label associated with each row in the catalogue is the detector name.
 The detector positions in the catalogue are ordered as follows: all
@@ -1503,11 +1503,21 @@ metadata?}).
 
 \section{\xlabel{mosaic}Mosaicking cubes}
 \label{sec:mosaic}
+
 If you pass raw files covering different regions of the sky to
 \makecube\ it will automatically mosaic them together. This can be
 heavy work for your processor so you may wish to make individual cubes
 and combine them during post-processing. To coadd multiple reduced
 maps you should use \wcsmosaic.
+
+Note that this is not the same as abutting the tiles of a reduced cube
+from a single \makecube\ command.  Such tiles share common pixel
+co-ordinates and so can be abutted with \paste\
+(\cref{Section}{sec:multireduced}{why have multiple reduced files been
+generated?}). Separately created
+cubes will not have the same pixel co-ordinates, and therefore the
+world co-ordinates are required to align the tesserae in the mosaic of
+an extended region.
 
 \begin{terminalv}
 % wcsmosaic in=^maplist out=mosaic lbnd=! ubnd=! variance
