@@ -1921,13 +1921,19 @@ range you want to use the lowest and highest values.
 \section{\xlabel{pv}Position-velocity diagram}
 
 You can create a position-velocity map by collapsing over the skylat
-axis of a reduced cube. Use the \Kappa\ command \collapse\ with
+or skylon axis of a reduced cube. Use the \Kappa\ command \collapse\ with
 \param{axis=skylat}:
 
 \begin{terminalv}
 collapse in=reduced.sdf axis=skylat estimator=sum out=pv
 \end{terminalv}
 You can view your pv map with  \gaia\ or \display.
+
+To obtain a position-velocity map at an arbitrary angle there is a
+\xref{\textsc{pvslice}}{sun237}{pvslice} in the \datacube\ package.
+This can be invoked directly, or its recipe extracted from the
+\textsc{pvslice} script if you know the co-ordinates of the ends of
+the slice and do not need the graphics.
 
 \section{\xlabel{channel}Creating channel maps}
 \label{sec:channel}
