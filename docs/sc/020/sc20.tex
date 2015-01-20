@@ -664,7 +664,7 @@ JCMT heterodyne receiver.}
 
 Since 2006 September, the backend for heterodyne instruments has been the
 Auto-Correlation Spectrometer and Imaging System known simply as ACSIS
-(see Figure \ref{fig:acsis}). Given the various combinations of
+(see \cref{Figure}{fig:acsis}{}). Given the various combinations of
 ACSIS's 32 down-converter modules and available IF outputs from the
 different instruments, a number of bandwidth modes and corresponding
 frequency resolutions are available. Listed below are the most common
@@ -728,7 +728,7 @@ with HARP.}
 A stare, or sample, observation is as simple as it sounds. When you
 open reduced cubes of stare observations in \gaia\ you will see a map
 consisting of one pixel for each receptor (just one in the case of
-RxA). The left-hand panel of Figure \ref{fig:harpmodes} shows a stare
+RxA). The left-hand panel of \cref{Figure}{fig:harpmodes}{} shows a stare
 observation opened in \gaia. You can also view the central spectrum
 using \linplot\ (see \cref{Appendix}{app:display}{Viewing your data
 with KAPPA}) or \splat.
@@ -744,13 +744,13 @@ fill in the 30$\arcsec$ spacing between the HARP receptors resulting in a
 mirror in a 4$\times$4 or 5$\times$5 pattern to give a HARP4 or HARP5
 map respectively.  The HARP4 pattern has a 7.$\uarcs$5 pixels while the
 HARP5 has 6$\arcsec$ pixels, slightly under- and over-sampling compared
-with Nyquist. The central panel of Figure \ref{fig:harpmodes} shows a
+with Nyquist. The central panel of \cref{Figure}{fig:harpmodes}{} shows a
 HARP5 jiggle pattern.
 
 Each of these patterns can be pixel-centered, where the target
 coordinates fall on one of the central four pixels, or map-centered where
 the target coordinates lie at the centre of the map between the four
-central pixels. See Figure \ref{fig:jiggle} for an illustration of the
+central pixels. See \cref{Figure}{fig:jiggle}{} for an illustration of the
 different jiggle patterns. Although designed for HARP this mode can be
 used with the single-element receivers.
 \end{minipage}
@@ -1564,7 +1564,7 @@ your mask. The masked pixels will appear blank when you open it with
 
 \item Trim off the blank pixels using \ndfcopy\ with the
 \param{trimbad} option. This leaves just your selected region; see the
-right-hand panel of Figure \ref{fig:crop}.
+right-hand panel of \cref{Figure}{fig:crop}{}.
 \begin{terminalv}
 % ndfcopy maskmap trimbad
 \end{terminalv}
