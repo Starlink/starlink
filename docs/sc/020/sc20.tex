@@ -198,7 +198,7 @@ a UNIX shell.
 \end{tabular}
 \end{table}
 
-\section{\xlabel{software}Options for Reducing you Data}
+\section{\xlabel{software_options}Options for Reducing your Data}
 
 You have three options for processing your data:
 \\\\
@@ -878,13 +878,13 @@ buttons on the sidebar in the main window.
 See the \xref{\textsc{Gaia} manual}{sun214}{} for full
 details.\latex{\footnote{\texttt{http://docs.jach.hawaii.edu/star/sun214.htx/sun214.html}}}
 
-\section{\xlabel{makecube}Identifying and Masking Bad Data}
+\section{\xlabel{maskbad}Identifying and Masking Bad Data}
 \label{sec:badrecs}
 
 You can mask bad receptors in the time-series data with the \Kappa\
 command \chpix. In the example below all data for Receptors 7 and 8
 (on the second axis) are turned off by setting them to BAD. Note the
-commas in the \param{section} parameter which specify which axis is
+commas in the \param{SECTION} parameter which specify which axis is
 being referred to; here the first (spectra) and third (time) axes are
 unchanged so no range is defined. You will have to repeat the command
 for non-contiguous receptor numbers.
@@ -1417,7 +1417,7 @@ the advanced method outlined above.
 \end{tip}
 
 
-\section{\xlabel{rebin}Main beam conversion}
+\section{\xlabel{tempscale}Temperature scales}
 \label{sec:mult}
 
 Your cube will come out of \makecube\, and the pipeline, in units of
@@ -2261,7 +2261,7 @@ Smoothing: \newline spatial = 3$\times$3 pixels \newline frequency =
 \end{tabular}
 \end{table}
 
-\section{\xlabel{recipes}The process}
+\section{\xlabel{recipe_process}The process}
 You can follow this commentary via the flow chart in Figure \ref{fig:pipeline}.
 
 Two notations are used in the following list:\\
