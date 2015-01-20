@@ -694,7 +694,7 @@ ones. Visit the JCMT web pages for a full list.
 \end{table}
 There are a number of special configurations available with ACSIS.
 These make use of multiple sub-bands to cover lines at different
-frequencies.  You can find the sub-system number for a given
+frequencies.  You can find the subsystem number for a given
 observation by the FITS header \param{SUBSYSNR}.
 
 You will find each subsystem number corresponds to a different
@@ -1774,19 +1774,19 @@ TIP: You can write out the error component into a new file using
 \chapter{\xlabel{advanced}Advanced Analysis}
 \label{sec:advanced}
 
-\section{\xlabel{coords}Changing coordinate frames}
+\section{\xlabel{coords}Changing co-ordinate frames}
 
-Coordinate systems of regridded Starlink files are described by the
-world coordinate system, (WCS). There are a number of basic coordinate
+Co-ordinate systems of regridded Starlink files are described by the
+world co-ordinate system, (WCS). There are a number of basic co-ordinate
 systems (or frames) common to all NDFs; these are described by their
 DOMAIN (essentially their name) and are PIXEL, AXIS, GRID and
 FRACTION. Additional frames can be stored in the WCS component. Two
 common additional frames are SKY and SPECTRUM. SKY refers to
 two-dimensional frames (known as SkyFrames) which describe sky
-coordinates. SPECTRUM refers to one-dimensional frames (known as
+co-ordinates. SPECTRUM refers to one-dimensional frames (known as
 SpecFrames) that describe a position within a spectrum.
 
-The choice of coordinates within the SkyFrame or SpecFrame is called
+The choice of co-ordinates within the SkyFrame or SpecFrame is called
 the system. For example, for SkyFrames this may be Galactic or FK5,
 while for SpecFrames this may be velocity or frequency.
 
@@ -1794,7 +1794,7 @@ The current frame and the system can both be changed using the \Kappa\
 applications \wcsframe\ and \wcsattrib. The current frame for data
 processed with \makecube\ (either manually or by the pipeline)
 typically has a DOMAIN of SKY-DSBSPECTRUM. The compound name refers to
-the first two axes of the frame having sky coordinates and the third
+the first two axes of the frame having sky co-ordinates and the third
 axis having dual side-band spectral units. You can check this with
 \ndftrace:
 
@@ -1802,7 +1802,7 @@ axis having dual side-band spectral units. You can check this with
 % ndftrace file | grep Domain
 \end{terminalv}
 You can change the attributes of a cube using \wcsattrib. To change
-the SkyFrame coordinate system set the \att{System} attribute.
+the SkyFrame co-ordinate system set the \att{System} attribute.
 \begin{terminalv}
 % wcsattrib file set system galactic
 \end{terminalv}
@@ -1820,7 +1820,7 @@ becomes SKY. If you need to change frames manually use \wcsframe.
 % wcsframe file sky
 \end{terminalv}
 
-For offset coordinates you will need to set the system
+For offset co-ordinates you will need to set the system
 \param{skyrefis} to origin. The final two lines in the example below
 convert the offset units to arcseconds instead of radians.
 \begin{terminalv}
@@ -2112,7 +2112,7 @@ Step 3.
 
 \item In the \gaiathing{Import CUPID catalogue} window, select a file
 with the \gaiathing{Choose file}... button. For polygon shapes tick
-the STC shape box. You can change the RA/Dec coordinates from
+the STC shape box. You can change the RA/Dec co-ordinates from
 Cen1/Cen2, which give the central position of the clumps, to
 Peak1/Peak2 which give the position of the peak within them.
 
@@ -2299,7 +2299,7 @@ and bandwidths.
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
 \item The raw data is copied to the local directory. Typically,
-sub-systems are treated as individual and separate observations by
+subsystems are treated as individual and separate observations by
 ORAC-DR except for hybrid-mode observations.
 
 \item Because data acquisition is asynchronous, time slices are not
@@ -2697,7 +2697,7 @@ single reduced cube.
                     integ file \\
 \file{rsp}        & Representative spectrum (same as \file{sp001}), used to form
                     rsp PNG \\
-\file{iwc}        & Intensity weighted coordinate image \\
+\file{iwc}        & Intensity weighted co-ordinate image \\
 \file{noise}      & Noise map \\
 \file{reduced00n} & Final trimmed, baselined cube of the $n^\textnormal{th}$ tile.
                     There may be a few of these as large maps will be split into
@@ -3078,15 +3078,15 @@ Ensure white is entry 0 and black in entry 1.
 \begin{itemize}
 \item Use \wcsattrib\ to set how your axes should be formatted. Here
 the format of the first and second axes is set to two decimal places
-for Galactic coordinates. Find out more about the \att{Format} attribute
+for Galactic co-ordinates. Find out more about the \att{Format} attribute
 under \wcsattrib\ in the \xref{\textsc{Kappa} manual}{sun95}{}.
 \begin{terminalv}
 % wcsattrib map set format"(1)" .2
 % wcsattrib map set format"(2)" .2
 \end{terminalv}
 
-\item For FK5 coordinates you can use the same method to set exactly
-how the coordinates should be displayed. The example below sets R.A.
+\item For FK5 co-ordinates you can use the same method to set exactly
+how the co-ordinates should be displayed. The example below sets R.A.
 units to $0^h00^m00^s$ and Dec. units to $00'00''$.
 \begin{terminalv}
 % wcsattrib fk5map set format"(1)" ghms
@@ -3235,7 +3235,7 @@ The plus sign means the change will not be remembered next time
 This example plots a grid of 5$\times$4 pixels around $l=61.$\udeg$06
 and $b=0.$\udeg$15. Each spectrum has a range of 10 to 30 km/s.  Note
 the decimal points are necessary for the spectral limits, otherwise
-the spectrum would extend from pixel coordinates 10 to 30.  The
+the spectrum would extend from pixel co-ordinates 10 to 30.  The
 \param{specstyle} option allows you to format the spectral axes inside
 the main plot. The formatting options are the usual plotting
 attributes.  The flag \param{reflabel} annotates the interior spectral
@@ -3372,7 +3372,7 @@ BASELINE\_LINEARITY\_SCALELENGTH & This is used to reject receptors that have no
                                    remove the noise while not removing the
 				   low-frequency patterns in the spectra.\\
 \hline
-CUBE\_WCS & The coordinate system to regrid cubes to.\\
+CUBE\_WCS & The co-ordinate system to regrid cubes to.\\
 
 \hline
 MOMENTS & Comma separated list of the moments maps to create (integ,iwc).\\
