@@ -1,17 +1,16 @@
-\documentclass[twoside,11pt]{article}
-\pagestyle{myheadings}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {165.4}
-\newcommand{\stardocauthors}   {David S Berry, Diana Parsons}
-\newcommand{\stardocdate}      {19 February 1995}
-\newcommand{\stardoctitle}     {IRAS90\\[2ex]
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {165.4}
+\stardocauthors     {David S Berry, Diana Parsons}
+\stardocdate        {19 February 1995}
+\stardoctitle     {IRAS90\\[2ex]
                                Programmer's Guide}
-\newcommand{\stardocabstract}  {
+\stardocabstract  {
 {\small IRAS90} is a package of applications which provides facilities
 for the reduction and analysis of {\small IRAS} Survey and Pointed
 Observation (PO) data (also known as ``Additional Observation'', or
@@ -23,246 +22,17 @@ This document gives some guide-lines for users who want to produce their own
 % ? End of document identification
 
 % -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % from the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
-
-% degrees symbol
-\newcommand{\dgs}{\hbox{$^\circ$}}
+% ? Document-specific \providecommand or \newenvironment commands.
 
 % centre an asterisk
-\newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
-
-% A kind of list item, like description, but with an easily adjustable
-% item separation.
-\newcommand{\menuitem}[2]
-  {{\bf #1}: \addtolength{\baselineskip}{-0.4ex}
-  \parbox[t]{128mm}{#2} \addtolength{\baselineskip}{0.4ex} \\ \hspace{-5pt}}
-
-% an environment for references
-\newenvironment{refs}{\goodbreak
-                      \vspace{3ex}
-                      \begin{list}{}{\setlength{\topsep}{0mm}
-                                     \setlength{\partopsep}{0mm}
-                                     \setlength{\itemsep}{0mm}
-                                     \setlength{\parsep}{0mm}
-                                     \setlength{\leftmargin}{1.5em}
-                                     \setlength{\itemindent}{-\leftmargin}
-                                     \setlength{\labelsep}{0mm}
-                                     \setlength{\labelwidth}{0mm}}
-                    }{\end{list}}
+\providecommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
 
 % ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section{Introduction to IRAS90\xlabel{introduction_to_iras90}}
 
@@ -518,27 +288,27 @@ SUNs.
 The contents of an archive file can be listed using the command:
 
 \small
-\begin{verbatim}
-   % tar tvf $IRAS90_SOURCE/apps_source.tar
-\end{verbatim}
+\begin{terminalv}
+% tar tvf $IRAS90_SOURCE/apps_source.tar
+\end{terminalv}
 \normalsize
 
 To get the A-task source code for the application {\small DESTCRDD}, use
 the command:
 
 \small
-\begin{verbatim}
-   % tar xvf $IRAS90_SOURCE/apps_source.tar destcrdd.f
-\end{verbatim}
+\begin{terminalv}
+% tar xvf $IRAS90_SOURCE/apps_source.tar destcrdd.f
+\end{terminalv}
 \normalsize
 
 To extract the interface file for application {\small DESTCRDD}, use the
 command:
 
 \small
-\begin{verbatim}
-   % tar xvf $IRAS90_SOURCE/ifl_source.tar destcrdd.ifl
-\end{verbatim}
+\begin{terminalv}
+% tar xvf $IRAS90_SOURCE/ifl_source.tar destcrdd.ifl
+\end{terminalv}
 \normalsize
 
 \subsection{Location of code and documentation on VMS Systems
@@ -580,33 +350,33 @@ iras90\_source.tar on Unix, are held loose in {\small IRAS90\_DIR}.
 To list the existing application specific routines, use the command:
 
 \small
-\begin{verbatim}
-   $ LIB/LIST IRAS90_DIR:IRAS90_SUB.TLB
-\end{verbatim}
+\begin{terminalv}
+$ LIB/LIST IRAS90_DIR:IRAS90_SUB.TLB
+\end{terminalv}
 \normalsize
 
 To get the A-task source code for the application {\small DESTCRDD}, use the
 command:
 
 \small
-\begin{verbatim}
-   $ LIB/EXT=DESTCRDD/OUT=DESTCRDD.FOR IRAS90_DIR:IRAS90.TLB
-\end{verbatim}
+\begin{terminalv}
+$ LIB/EXT=DESTCRDD/OUT=DESTCRDD.FOR IRAS90_DIR:IRAS90.TLB
+\end{terminalv}
 \normalsize
 
 To extract the interface file for application {\small DESTCRDD}, use the
 command:
 
 \small
-\begin{verbatim}
-   $ LIB/EXT=DESTCRDD/OUT=DESTCRDD.IFL IRAS90_DIR:IRAS90_IFL.TLB
-\end{verbatim}
+\begin{terminalv}
+$ LIB/EXT=DESTCRDD/OUT=DESTCRDD.IFL IRAS90_DIR:IRAS90_IFL.TLB
+\end{terminalv}
 \normalsize
 
 \section{IRAS90 Programming Conventions
 \xlabel{iras90_programming_conventions}\label{SEC:CONV}}
 
-This section contains descriptions of {\em some} of the conventions
+This section contains descriptions of \emph{some} of the conventions
 which have been adhered to in the production of the released {\small
 IRAS90} applications.  If you intend to submit your applications for
 inclusion in {\small IRAS90} you should ensure that they also conforms
@@ -670,10 +440,10 @@ NDF}s, using routine {\small NDF\_SBAD}.
 rather than the {\small ARY} library.
 
 \item Application specific subroutines should have names in the form
-{\em xxxxyz}, where {\em xxxx} are the first four characters from the
-application name, {\em y} is a single letter (a-z), and {\em z} is a
+\emph{xxxxyz}, where \emph{xxxx} are the first four characters from the
+application name, \emph{y} is a single letter (a-z), and \emph{z} is a
 single digit (0-9).  If there already exists an application with the
-same first four letters in its name, then the preference for {\em xxxx}
+same first four letters in its name, then the preference for \emph{xxxx}
 is the first, fifth, sixth and seventh letters of the application name.
 If this cannot be done, then any unique string can be used, but it
 should indicate which application the routine is associated with. For
@@ -729,8 +499,8 @@ MSG\_IFGET}, specifying {\small ADAM} parameter {\small MSG\_FILTER}.
 
 \item All messages displayed with routines {\small MSG\_OUTIF} and
 {\small MSG\_OUT} should correspond to parameters with names of the
-form {\em xxxxx\_MSGy} where {\em xxxxxx} is the name of the routine,
-and {\em y} is a number which increases monotonically for each message
+form \emph{xxxxx\_MSGy} where \emph{xxxxxx} is the name of the routine,
+and \emph{y} is a number which increases monotonically for each message
 produced by the routine (starting at 1 for the first message).
 
 \item All messages should start with at least two spaces.
@@ -740,30 +510,30 @@ STATUS}'' should be guarded against the possibility of a pre-existing
 error value being over-written, as in the following code fragment:
 
 \small
-\begin{verbatim}
-   *  If the pixel size is zero, report an error.
-         IF( PIXSIZ .EQ. 0.0 .AND. STATUS .EQ. SAI__OK ) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP( 'CTEMA0_ERR1',
-        :                 'CTEMA0: Zero pixel size encountered',
-        :                 STATUS )
-            GO TO 999
-         END IF
-\end{verbatim}
+\begin{terminalv}
+*  If the pixel size is zero, report an error.
+     IF( PIXSIZ .EQ. 0.0 .AND. STATUS .EQ. SAI__OK ) THEN
+        STATUS = SAI__ERROR
+        CALL ERR_REP( 'CTEMA0_ERR1',
+    :                 'CTEMA0: Zero pixel size encountered',
+    :                 STATUS )
+        GO TO 999
+     END IF
+\end{terminalv}
 \normalsize
 
 \item All ``{\small DO WHILE}'' loops should terminate if {\small STATUS}
 indicates an error has occurred:
 
 \small
-\begin{verbatim}
-   *  Loop until all values have been done, or an error occurs.
-         MORE = .TRUE.
-         DO WHILE ( MORE .AND. STATUS .EQ. SAI__OK )
-            ...
-            ...
-         END DO
-\end{verbatim}
+\begin{terminalv}
+*  Loop until all values have been done, or an error occurs.
+     MORE = .TRUE.
+     DO WHILE ( MORE .AND. STATUS .EQ. SAI__OK )
+        ...
+        ...
+     END DO
+\end{terminalv}
 \normalsize
 
 \item Any subroutine call which includes variable array sizes within
@@ -772,16 +542,16 @@ adjustable array dimensions errors occurring if an array size of zero
 is passed to the subroutine because of the error condition):
 
 \small
-\begin{verbatim}
-   *  Map the data array.
-         CALL NDF_MAP( INDF, 'DATA', '_REAL', 'READ', IPIN, EL, STATUS )
+\begin{terminalv}
+*  Map the data array.
+     CALL NDF_MAP( INDF, 'DATA', '_REAL', 'READ', IPIN, EL, STATUS )
 
-   *  Abort if an error has occurred.
-         IF( STATUS .NE. SAI__OK ) GO TO 999
+*  Abort if an error has occurred.
+     IF( STATUS .NE. SAI__OK ) GO TO 999
 
-   *  Find the total data sum in the data array.
-         CALL CTEMA1( EL, %VAL( IPIN ), SUM, STATUS )
-\end{verbatim}
+*  Find the total data sum in the data array.
+     CALL CTEMA1( EL, %VAL( IPIN ), SUM, STATUS )
+\end{terminalv}
 \normalsize
 
 \item If a subroutine call uses the {\small \%VAL} construct to pass a
@@ -802,29 +572,29 @@ annul the wrong error. One way to do this is to include a status check
 before the subroutine call which generates the status to be annulled:
 
 \small
-\begin{verbatim}
-   *  Get a value for parameter BOXSIZE.
-         CALL PAR_GET0R( 'BOXSIZE', BOXSIZ, STATUS )
+\begin{terminalv}
+*  Get a value for parameter BOXSIZE.
+     CALL PAR_GET0R( 'BOXSIZE', BOXSIZ, STATUS )
 
-   *  Abort if an error has occurred.
-         IF( STATUS .NE. SAI__OK ) GO TO 999
+*  Abort if an error has occurred.
+     IF( STATUS .NE. SAI__OK ) GO TO 999
 
-   *  Get a value for parameter SIGMA.
-         CALL PAR_GET0R( 'SIGMA', SIGMA, STATUS )
+*  Get a value for parameter SIGMA.
+     CALL PAR_GET0R( 'SIGMA', SIGMA, STATUS )
 
-   *  If a null value was supplied, annul the error and indicate that
-   *  no filtering is required.
-         IF( STATUS .EQ. PAR__NULL ) THEN
-            CALL ERR_ANNUL( STATUS )
-            FILT = .FALSE.
-         ELSE
-            FILT = .TRUE.
-         END IF
-\end{verbatim}
+*  If a null value was supplied, annul the error and indicate that
+*  no filtering is required.
+     IF( STATUS .EQ. PAR__NULL ) THEN
+        CALL ERR_ANNUL( STATUS )
+        FILT = .FALSE.
+     ELSE
+        FILT = .TRUE.
+     END IF
+\end{terminalv}
 \normalsize
 
 \item All error reports should correspond to parameters with names of the form
-{\em xxxxx\_ERRy} where {\em xxxxxx} is the name of the routine, and {\em y} is
+\emph{xxxxx\_ERRy} where \emph{xxxxxx} is the name of the routine, and \emph{y} is
 a number which increases monotonically for each call to {\small ERR\_REP} made
 by the routine (starting at 1 for the first error).
 
@@ -834,17 +604,17 @@ They should include as much information as possible about the conditions under
 which the error occurred:
 
 \small
-\begin{verbatim}
-            CALL NDF_MSG( 'NDF', INDF )
-            CALL MSG_SETI( 'C', COLUMN )
-            CALL MSG_SETI( 'R', ROW )
-            CALL MSG_SETR( 'D', DATA( COLUMN, ROW ) )
-            CALL MSG_SETR( 'L', MAXDAT )
+\begin{terminalv}
+   CALL NDF_MSG( 'NDF', INDF )
+   CALL MSG_SETI( 'C', COLUMN )
+   CALL MSG_SETI( 'R', ROW )
+   CALL MSG_SETR( 'D', DATA( COLUMN, ROW ) )
+   CALL MSG_SETR( 'L', MAXDAT )
 
-            CALL ERR_REP( 'CTEMA2_ERR1',
-        : 'CTEMA2: Illegal value (^D) found at column ^C, row ^R of '//
-        : '^NDF. Maximum legal value is ^L.', STATUS )
-\end{verbatim}
+   CALL ERR_REP( 'CTEMA2_ERR1',
+: 'CTEMA2: Illegal value (^D) found at column ^C, row ^R of '//
+: '^NDF. Maximum legal value is ^L.', STATUS )
+\end{terminalv}
 \normalsize
 
 \item Checks for the error conditions {\small PAR\_\_NULL} and {\small
@@ -858,23 +628,23 @@ check the status and issue a contextual report if an error has occurred.
 data is being calculated.
 
 \small
-\begin{verbatim}
-   *  Create the output NDF.
-         CALL NDF_PROP( INDF1, ' ', 'OUT', INDF2, STATUS )
+\begin{terminalv}
+*  Create the output NDF.
+      CALL NDF_PROP( INDF1, ' ', 'OUT', INDF2, STATUS )
 
-   *  Map the output data array.
-         CALL NDF_MAP( INDF2, 'DATA', '_REAL', 'READ', IPOUT, EL, STATUS )
+*  Map the output data array.
+      CALL NDF_MAP( INDF2, 'DATA', '_REAL', 'READ', IPOUT, EL, STATUS )
 
-   *  Abort if an error has occurred.
-         IF( STATUS .NE. SAI__OK ) GO TO 999
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
-   *  Fill the output data array with values.
-         CALL CTEMC3( EL, %VAL( IPOUT ), STATUS )
+*  Fill the output data array with values.
+      CALL CTEMC3( EL, %VAL( IPOUT ), STATUS )
 
-   *  If an error has occurred, delete the output NDF.
-    999  CONTINUE
-         IF( STATUS .NE. SAI__OK ) CALL NDF_DELET( INDF2, STATUS )
-\end{verbatim}
+*  If an error has occurred, delete the output NDF.
+ 999  CONTINUE
+      IF( STATUS .NE. SAI__OK ) CALL NDF_DELET( INDF2, STATUS )
+\end{terminalv}
 \normalsize
 
 \item The A-task prologue should conform to the style generated by the Language
@@ -902,7 +672,7 @@ duplicating descriptions within the applications prologue). For example,
 ``Detector numbers should be given in the form of a group expression (see help
 on ``Group\_Expressions'')''.
 
-\item The A-task prologue should contain a description of how {\em each} {\small NDF}
+\item The A-task prologue should contain a description of how \emph{each} {\small NDF}
 component is processed, particularly a description of what happens to the
 {\small QUALITY} and {\small VARIANCE} components should be included.
 
@@ -911,7 +681,7 @@ prologue should be filled in.
 
 \item Parameter should be described in alphabetical order.
 
-\item {\em All} parameters used by the application should be described in the
+\item \emph{All} parameters used by the application should be described in the
 prologue (except for {\small NDFLIST}, see item \ref{IT:NDFLIST}).
 
 \item If a parameter is normally defaulted, the description of the parameter
@@ -956,7 +726,7 @@ interface file.
 \begin{description}
 \item [GLOBAL.DATA\_ARRAY ] should be read by parameters associated with input
 {\small NDF}s, and written by ``{\small NDFLIST}'' parameters (see item
-\ref{IT:NDFLIST}), and {\em not} by parameters associated with output {\small
+\ref{IT:NDFLIST}), and \emph{not} by parameters associated with output {\small
 NDF}s unless there is no {\small NDFLIST} parameter.
 \item [GLOBAL.MSG\_FILTER ] should be read and written by ``{\small
 MSG\_FILTER}'' parameters (see item \ref{IT:MSG_FILTER}).
@@ -984,13 +754,13 @@ The utility routines (and all other {\small IRAS90} routines) use the
 \xref{SUN/104}{sun104}{}. Utility routines flag
 errors by reporting an error message and setting the returned status to some
 specific value indicating the type of error which has occurred. These status
-values are unique amongst {\em all} status values used by any {\small ADAM}
+values are unique amongst \emph{all} status values used by any {\small ADAM}
 software, and are calculated using the expression:
 
 \small
-\begin{verbatim}
-     134250498 + 65536*<facility number> + 8*<err_num>
-\end{verbatim}
+\begin{terminalv}
+134250498 + 65536*<facility number> + 8*<err_num>
+\end{terminalv}
 \normalsize
 
 where \verb+<facility number>+ is a number reserved by Starlink for the
@@ -1023,10 +793,10 @@ Before starting to develop {\small IRAS90} software the following commands
 should be issued:
 
 \small
-\begin{verbatim}
-   % iras90
-   % iras90_dev
-\end{verbatim}
+\begin{terminalv}
+% iras90
+% iras90_dev
+\end{terminalv}
 \normalsize
 
 The iras90\_dev script sets up softlinks to all the {\small IRAS90} utility
@@ -1050,42 +820,42 @@ should be compiled to create corresponding object modules using the
 could be:
 
 \small
-\begin{verbatim}
-   % f77 -O -c freda0.f
-   % f77 -O -c freda1.f
-     ...
-     (etc)
-     ...
-\end{verbatim}
+\begin{terminalv}
+% f77 -O -c freda0.f
+% f77 -O -c freda1.f
+ ...
+ (etc)
+ ...
+\end{terminalv}
 \normalsize
 
 This assumes that the application conforms to the conventions described
 in section \ref{SEC:CONV} in that the names of the application specific
 routines end in \verb+a0+, \verb+a1+, ... \verb+b0+, \verb+b1+, ...
 etc. An archive library should then be created and the object modules
-for all the application specific routines ({\em not} the A-task object
+for all the application specific routines (\emph{not} the A-task object
 module) should be inserted into the archive. If you are not running under
 Solaris the archive should finally be ``randomised'':
 
 \small
-\begin{verbatim}
-   % ar c fred.a
-   % ar r fred.a freda0.o
-   % ar r fred.a freda1.o
-     ...
-     (etc)
-     ...
-   % ranlib fred.a
-\end{verbatim}
+\begin{terminalv}
+% ar c fred.a
+% ar r fred.a freda0.o
+% ar r fred.a freda1.o
+ ...
+ (etc)
+ ...
+% ranlib fred.a
+\end{terminalv}
 \normalsize
 
 The application \verb+fred+ can then be linked using the following command:
 
 \small
-\begin{verbatim}
-   % alink fred.f fred.a -L/star/lib -L$IRAS90_SOURCE \
-     `iras90_link`
-\end{verbatim}
+\begin{terminalv}
+% alink fred.f fred.a -L/star/lib -L$IRAS90_SOURCE \
+ `iras90_link`
+\end{terminalv}
 \normalsize
 
 Note the use of left quote marks (\verb+`+) rather than the more usual right
@@ -1093,9 +863,9 @@ quote marks (\verb+'+). After completing all compilations and linkings, the
 command:
 
 \small
-\begin{verbatim}
-   % iras90_dev remove
-\end{verbatim}
+\begin{terminalv}
+% iras90_dev remove
+\end{terminalv}
 \normalsize
 
 should be executed in order to remove unnecessary files (actually soft
@@ -1104,9 +874,9 @@ The application can be run by just typing its name together with any
 command line parameter assignments or keywords:
 
 \small
-\begin{verbatim}
-   % fred in=m31 out=\*_proc
-\end{verbatim}
+\begin{terminalv}
+% fred in=m31 out=\*_proc
+\end{terminalv}
 \normalsize
 
 If the application is to be run from a directory other than the one
@@ -1114,9 +884,9 @@ containing the executable and interface files, then an alias can be set
 up for it using the command:
 
 \small
-\begin{verbatim}
-   % alias fred <directory path>/fred
-\end{verbatim}
+\begin{terminalv}
+% alias fred <directory path>/fred
+\end{terminalv}
 \normalsize
 
 \subsection{On VMS Systems\xlabel{on_vms_systems}}
@@ -1125,30 +895,30 @@ Before starting to develop {\small IRAS90} software the following commands
 should be issued:
 
 \small
-\begin{verbatim}
-   $ ADAMSTART
-   $ ADAMDEV
-   $ IRAS90
-   $ IRAS90_DEV
-\end{verbatim}
+\begin{terminalv}
+$ ADAMSTART
+$ ADAMDEV
+$ IRAS90
+$ IRAS90_DEV
+\end{terminalv}
 \normalsize
 
 The A-task routine and all the application specific routines should
 then be compiled as usual using the {\small FORTRAN} command. An object
 library should then be created and the object modules for all the
-application specific routines ({\em not} the A-task object module)
+application specific routines (\emph{not} the A-task object module)
 should be inserted into the library. If the application name is {\small
 FRED}, the commands would be:
 
 \small
-\begin{verbatim}
-   $ LIB/CRE FRED.OLB
-   $ LIB FRED FREDA0
-   $ LIB FRED FREDA1
-     ...
-     (etc)
-     ...
-\end{verbatim}
+\begin{terminalv}
+$ LIB/CRE FRED.OLB
+$ LIB FRED FREDA0
+$ LIB FRED FREDA1
+ ...
+ (etc)
+ ...
+\end{terminalv}
 \normalsize
 
 This assumes that the application conforms to the conventions described in
@@ -1157,9 +927,9 @@ end in {\small A0, A1, ... B0, B1, ... } etc. The application FRED can then be
 linked using the following command:
 
 \small
-\begin{verbatim}
-   $ ALINK FRED,FRED/LIB,IRAS90_LINK_ADAM/OPT
-\end{verbatim}
+\begin{terminalv}
+$ ALINK FRED,FRED/LIB,IRAS90_LINK_ADAM/OPT
+\end{terminalv}
 \normalsize
 
 Before running the application an interface file should be created (a
@@ -1171,9 +941,9 @@ for a new one. The simplest way to run the application is just to use
 the {\small RUN} command:
 
 \small
-\begin{verbatim}
-   $ RUN FRED
-\end{verbatim}
+\begin{terminalv}
+$ RUN FRED
+\end{terminalv}
 \normalsize
 
 However, the {\small RUN} command does not allow anything to appear
@@ -1185,45 +955,45 @@ directory containing files {\small FRED.EXE} and {\small FRED.IFL}. If
 this logical name is {\small FRED\_DIR}, then the command:
 
 \small
-\begin{verbatim}
-   $ FRED:==$FRED_DIR:FRED
-\end{verbatim}
+\begin{terminalv}
+$ FRED:==$FRED_DIR:FRED
+\end{terminalv}
 \normalsize
 
 will define the foreign command {\small FRED}, so that the application can
 be run (from any directory) with command line parameter assignments:
 
 \small
-\begin{verbatim}
-   $ FRED IN=M31 OUT=*_PROC
-\end{verbatim}
+\begin{terminalv}
+$ FRED IN=M31 OUT=*_PROC
+\end{terminalv}
 \normalsize
 
 To run the application from {\small ICL}, first start up {\small ICL} and then
 issue the command:
 
 \small
-\begin{verbatim}
-   ICL> DEFINE FRED FRED_DIR:FRED
-\end{verbatim}
+\begin{terminalv}
+ICL> DEFINE FRED FRED_DIR:FRED
+\end{terminalv}
 \normalsize
 
 Again, {\small FRED\_DIR} is a logical name pointing to the directory
 containing {\small FRED.EXE} and {\small FRED\-.IFL}. Note, this logical
-name must be a {\em job} logical name, set up prior to starting {\small
+name must be a \emph{job} logical name, set up prior to starting {\small
 ICL} with the command:
 
 \small
-\begin{verbatim}
-   $ DEFINE/JOB FRED_DIR <directory specification>
-\end{verbatim}
+\begin{terminalv}
+$ DEFINE/JOB FRED_DIR <directory specification>
+\end{terminalv}
 \normalsize
 
 \appendix
 \section{The NDG Library
 \xlabel{the_ndg_library}\label{APP:NDG}}
 
-The {\small NDG} library (which is used for accessing multiple {\small NDF}s
+The {\small NDG} library (\xref{SUN/2}{sun2}{}; which is used for accessing multiple {\small NDF}s
 using a single parameter) started life as an {\small IRAS90} utility library
 called {\small IRG}. It will eventually be released as a Starlink subroutine
 library, independent of {\small IRAS90}. Until then, it continues to be
