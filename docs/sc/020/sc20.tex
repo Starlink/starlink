@@ -294,6 +294,13 @@ instance of \task{stats} is printed to the screen.
 % parget mean stats
 \end{terminalv}
 
+\begin{tip}
+Try not to exit from Starlink tasks by breaking in, since this may
+corrupt the parameter file (reported as an integrity check error).  If
+this happens delete the parameter file.  Enter \texttt{!!} at a prompt
+if possible to have a clean exit.
+\end{tip}
+
 \subsection{Extracting a value for scripting}
 
 \parget\ is designed to make life easier when passing values between
@@ -452,6 +459,11 @@ the axes along with the pixel bounds of your data file by running
 0$^\circ$ to 0.25$^\circ$ in Latitude, and -25 to +25 km/s in
 velocity. In the velocity axes one pixel is one channel. To leave an
 axis untouched simply include the comma but do not specify any bounds.
+
+\begin{tip} 
+Be careful to give world coordinate values in floating point.
+Integers are interpreted as pixel indices.
+\end{tip}
 
 To define your bounds in FK5 coordinates use the following format.
 \begin{terminalv}
