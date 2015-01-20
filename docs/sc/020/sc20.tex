@@ -449,7 +449,7 @@ quotes is necessary on a UNIX shell command line, but not in response
 to a prompt or in many other scripting languages.
 
 \begin{terminalv}
-% stats `cube(10.5:10.0,0.0:0.25,-25:25)'
+% stats `cube(10.5:10.0,0.0:0.25,-25.:25.)'
 \end{terminalv}
 The bounds are given in the coordinates of the data (Galactic for Axes
 1 and 2 and velocity for Axis 3). You can find the number and names of
@@ -457,8 +457,9 @@ the axes along with the pixel bounds of your data file by running
 \ndftrace. In the example above the ranges are 10.5$^\circ$ to
 10$^\circ$ in Longitude (note the range goes from left to right),
 0$^\circ$ to 0.25$^\circ$ in Latitude, and -25 to +25 km/s in
-velocity. In the velocity axes one pixel is one channel. To leave an
-axis untouched simply include the comma but do not specify any bounds.
+velocity. To leave an axis untouched simply include the comma but do 
+not specify any bounds.
+
 
 \begin{tip} 
 Be careful to give world coordinate values in floating point.
