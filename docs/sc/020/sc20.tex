@@ -536,10 +536,10 @@ spectral lines at high resolution. Heterodyne receivers take a weak
 incoming signal and mix it with a reference frequency known as the
 local oscillator (LO). This results in a signal of lower
 (intermediate) frequency (IF) which can be amplified and more easily
-sampled. JCMT receivers have an IF of 4\,GHz. This mixing produces two
-frequencies for each value of the LO ($\nu_{sky} =
-\nu_{LO}\pm\nu_{IF}$) which are known as the upper sideband (USB) and
-lower sideband (LSB).
+sampled. The current JCMT receivers have an IF of 4\,GHz (RxA) or
+5\,GHz (ACSIS). This mixing produces two frequencies for each value of
+the LO ($\nu_{sky} = \nu_{LO}\pm\nu_{IF}$) which are known as the
+upper sideband (USB) and lower sideband (LSB).
 
 In a single sideband receiver one of these is suppressed. Double
 sideband receivers have the two frequencies superimposed.
@@ -607,7 +607,7 @@ mapping.
 \hline
 Receiver &FWHM & $\eta_\textnormal{MB}$ & $\eta_\textnormal{fss}$\\
 \hline
-RxA&19.7$\arcsec$&0.69 & 0.80\\
+RxA&19.7$\arcsec$&0.57 & 0.80\\
 \hline
 \end{tabular}
 \end{center}
@@ -662,7 +662,7 @@ JCMT heterodyne receiver.}
 
 \subsection{ACSIS Backend}
 
-Since 2005, the backend for heterodyne instruments has been the
+Since 2006 September, the backend for heterodyne instruments has been the
 Auto-Correlation Spectrometer and Imaging System known simply as ACSIS
 (see Figure \ref{fig:acsis}). Given the various combinations of
 ACSIS's 32 down-converter modules and available IF outputs from the
@@ -699,9 +699,9 @@ observation by the FITS header \param{SUBSYSNR}.
 
 You will find each subsystem number corresponds to a different
 molecule or transition (given by the FITS headers \param{MOLECULE} and
-\param{TRANSITI}). the most common pairings are
+\param{TRANSITI}). The most common pairings are
 C$^{18}$O\,(3-2)/$^{13}$CO\,(3-2) and DCN\,(5-4)/HCN\,(4-3) for HARP,
-and SiO\,(60-50)/SO\,(43-34) for RxA.
+and SiO\,(6$_0$-5$_0$)/SO\,(4$_3$-3$_4$) for RxA.
 
 \begin{figure}[t!]
 \begin{center}
@@ -739,7 +739,7 @@ with KAPPA}) or \splat.
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}
 A jiggle map is a common HARP observing mode. They are designed to
-fill in 30$\arcsec$ spacing between the HARP receptors resulting in a
+fill in the 30$\arcsec$ spacing between the HARP receptors resulting in a
 2$'\times$2$\arcm$ map. This is achieved by 'jiggling' the secondary
 mirror in a 4$\times$4 or 5$\times$5 pattern to give a HARP4 or HARP5
 map respectively.  The HARP4 pattern has a 7.$\uarcs$5 pixels while the
@@ -752,8 +752,7 @@ coordinates fall on one of the central four pixels, or map-centered where
 the target coordinates lie at the centre of the map between the four
 central pixels. See Figure \ref{fig:jiggle} for an illustration of the
 different jiggle patterns. Although designed for HARP this mode can be
-used with the single-element receivers. The right-hand panel of Figure
-\ref{fig:harpmodes} shows a HARP raster map.
+used with the single-element receivers.
 \end{minipage}
 \vspace{0.7cm}\\
 \begin{minipage}[t]{0.14\linewidth}
@@ -768,7 +767,8 @@ to give a fully sampled map with 7.$\uarcs$3 pixels. This will result in
 jagged edges to your reduced map which you may wish to trim. It is
 common when using HARP to repeat the map scanning along the other axis
 to give a `basket-weave' pair of maps. Each one of the pair will
-appear as an individual observation.
+appear as an individual observation.  The right-hand panel of Figure
+\ref{fig:harpmodes} shows a HARP raster map.
 \end{minipage}
 
 \subsection{Reference}
@@ -778,16 +778,16 @@ appear as an individual observation.
 \begin{minipage}[t]{0.85\linewidth}
 In position-switch (PSSW) mode, the whole telescope moves off source
 and on to the reference position. This allows a large offset to the
-reference position, useful in busy environments such as the Galactic
+reference position, useful in crowded environments such as the Galactic
 Plane. The main disadvantage is that it takes a longer time resulting
-in less-accurate sky subtraction.
+in less-accurate sky subtraction or non-flat baselines.
 \end{minipage}
 \vspace{0.7cm}\\
 \begin{minipage}[t]{0.14\linewidth}
 \textbf{Beam-switch}
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}
-In beam-switch (BSW) mode, the secondary chops onto the reference
+In beam-switch (BSW) mode, the secondary-mirror chops onto the reference
 position. This results in fast and accurate sky subtraction but it is
 limited to targets which have a blank reference position within
 180$\arcsec$ (the maximum chop distance of the SMU).
@@ -798,8 +798,9 @@ limited to targets which have a blank reference position within
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}
 In frequency-switch (FSW) mode the telescope does not move but the
-centre of the spectral band is shifted to a line free region of the
-spectrum. It is very efficient with no off-source time and can be
+centre of the spectral band is shifted, typically by 8 or 16\,Mhz,
+to a line-free region of the spectrum. It is very efficient with no
+off-source time and can be
 useful when no emission-free reference position can be found.
 \end{minipage}
 
@@ -850,7 +851,7 @@ shows a map of the HARP receptors (along the $x$-axis; note the 16
 pixels) for a given sample of the observation (time on the $y$-axis).
 You can track the performance of an individual receptor by following a
 column from bottom to top to check its consistency. In
-\cref{Figure}{fig:rawgaia}{the first figure below} H04 is dead for the
+\cref{Figure}{fig:rawgaia}{the first figure below} H03 is dead for the
 whole observation. The spectrum for a receptor at one of the time
 slices can be seen by clicking on the pixel. This will bring up a
 third window---the \gaiathing{Spectral plot} (see
@@ -979,7 +980,7 @@ observation  :
 
 The \param{autogrid} option allows the
 software to determine the optimal projection parameters for
-regridding. This is fine for stares and jiggles but is not so good for
+regridding. This is usually fine for stares and jiggles but is not so good for
 rasters. See Section \ref{sec:gridding} for more discussion.
 
 For large data sets, it may be beneficial to break the output array up
@@ -1263,7 +1264,7 @@ you would set \param{fwhm=3}.
 
 \section{Removing a baseline}
 
-Baselines should be removed using \Kappa:\mfittrend. This routine can
+Baselines can be removed using \Kappa:\mfittrend. This routine can
 fit polynomials up to order 15, or cubic splines, to each spectrum in
 your cube. You can specify the ranges to fit via the \param{ranges}
 parameter, or you can allow them to be determined automatically
@@ -1295,9 +1296,13 @@ again clipped etc. By default this will clip at 2, 2, 2.5 and
 clip levels. The \param{clip} option is only used when
 \param{auto=true}.
 
+For convenience \gaia\ has a \gaiathing{Baseline} tab in its cube
+control panel.  This invokes \mfittrend.
+
+
 \subsection{Advanced method}
 These steps give a more in depth way of determining the baselines and
-mimic the the pipeline.
+mimic the pipeline.
 
 \begin{enumerate}[label=(\arabic*)]
 \item Perform a \block\ smooth on your reduced cube. Here the
@@ -1376,6 +1381,10 @@ for some data.
 If you do not know the axis name you can give the number instead
 (1=RA, 2=Dec, 3=vrad).
 
+For convenience \gaia\ has a \gaiathing{Collapse} tab in its cube
+control panel.  This invokes \collapse.
+
+
 \subsection{Advanced method}
 
 These steps mimic the pipeline and show the procedure for generating
@@ -1434,18 +1443,18 @@ the advanced method outlined above.
 \label{sec:mult}
 
 Your cube will come out of \makecube\, and the pipeline, in units of
-$T_A^*$. To convert this to main beam temperature, $T_{MB}$ multiply
+$T_A^*$. To convert this to main beam brightness temperature, $T_{MB}$ divide
 your cube by the main-beam efficiency, $\eta_\textnormal{MB}$. Alternatively, to
-convert to receiver temperature, $T_{rec}$, multiply by the forward
+convert to receiver temperature, $T_{rec}$, divide by the forward
 scattering and spillover efficiency, $\eta_\textnormal{fss}$.  See
 \cref{Section}{sec:instruments}{Heterodyne instruments} for efficiency
 values for RxA and HARP, and the JCMT webpages for further information
 and historical numbers.
 
-You can use the \Kappa\ command \cmult\ to multiply any NDF by a constant.
+You can use the \Kappa\ command \cdiv\ to divide any NDF by a constant.
 
 \begin{terminalv}
-% cmult in=harpcube 0.63 out=harpcube_Tmb
+% cdiv in=harpcube scalar=0.63 out=harpcube_Tmb
 \end{terminalv}
 
 \section{\xlabel{rebin}Changing the pixel size}
