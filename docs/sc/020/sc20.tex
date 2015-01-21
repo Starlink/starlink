@@ -110,7 +110,7 @@ This guide covers the following:
 \item \cref{Chapter}{sec:raw}{Chapter 4}  -- Examining raw ACSIS data.
 \item \cref{Chapter}{sec:reduce}{Chapter 5}  -- Regridding your data with \makecube.
 \item \cref{Chapter}{sec:analyse}{Chapter 6}  -- Analysing your reduced cube.
-\item \cref{Chapter}{sec:advanced}{Chapter 7}  -- Advanced analysis techniques such as changing coordinate frames.
+\item \cref{Chapter}{sec:advanced}{Chapter 7}  -- Advanced analysis techniques such as changing co-ordinate frames.
 \item \cref{Chapter}{sec:gaia}{Chapter 7}  -- Using \gaia\ to analyse your data.
 \item \cref{Chapter}{sec:pipe}{Chapter 8}  -- The ACSIS pipeline and recipes explained.
 \item \cref{Chapter}{sec:runpipe}{Chapter 9}  -- How to run the pipeline.
@@ -352,7 +352,7 @@ use the \fitsval\ command instead, e.g.
 \item[\textbf{ndftrace}]
 \task{ndftrace} displays the attributes of the NDF data structure.
 This will tell you, for example, the units of the data, pixel bounds,
-dimensions, world coordinates, and axis assignations.
+dimensions, world co-ordinates, and axis assignations.
 \begin{terminalv}
 % ndftrace map fullframe fullwcs
 \end{terminalv}
@@ -436,7 +436,7 @@ to a prompt or in many other scripting languages.
 \begin{terminalv}
 % stats `cube(10.5:10.0,0.0:0.25,-25.:25.)'
 \end{terminalv}
-The bounds are given in the coordinates of the data (Galactic for Axes
+The bounds are given in the co-ordinates of the data (Galactic for Axes
 1 and 2 and velocity for Axis 3). You can find the number and names of
 the axes along with the pixel bounds of your data file by running
 \ndftrace. In the example above the ranges are 10.5$^\circ$ to
@@ -447,11 +447,11 @@ not specify any bounds.
 
 
 \begin{tip}
-Be careful to give world coordinate values in floating point.
+Be careful to give world co-ordinate values in floating point.
 Integers are interpreted as pixel indices.
 \end{tip}
 
-To define your bounds in FK5 coordinates use the following format.
+To define your bounds in FK5 co-ordinates use the following format.
 \begin{terminalv}
 % stats `cube(22h18m:22h32m,05d:05d30m,)'
 \end{terminalv}
@@ -472,8 +472,8 @@ the position $l=10^\circ$, $b=0^\circ$.
 \end{terminalv}
 
 \begin{tip}
-To help identify your sub-region in pixel coordinates, open your
-file in \gaia\ and change the built-in coordinates to PIXEL via
+To help identify your sub-region in pixel co-ordinates, open your
+file in \gaia\ and change the built-in co-ordinates to PIXEL via
 \gaiathing{Image-Analysis} $>$ \gaiathing{Change coordinate} $>$
 \gaiathing{Built-in coordinates}.
 \end{tip}
@@ -731,8 +731,8 @@ with Nyquist. The central panel of \cref{Figure}{fig:harpmodes}{} shows a
 HARP5 jiggle pattern.
 
 Each of these patterns can be pixel-centered, where the target
-coordinates fall on one of the central four pixels, or map-centered where
-the target coordinates lie at the centre of the map between the four
+co-ordinates fall on one of the central four pixels, or map-centered where
+the target co-ordinates lie at the centre of the map between the four
 central pixels. See \cref{Figure}{fig:jiggle}{} for an illustration of the
 different jiggle patterns. Although designed for HARP this mode can be
 used with the single-element receivers.
@@ -1197,7 +1197,7 @@ For large data sets, it may be beneficial to break the output array up
 into a number of smaller rectangular tiles. This can be controlled by
 the \param{TILEDIMS} parameter.  The files can be stitched together
 later using the \Kappa\ application \paste\ which may be used any time
-the tiles to be abutted have the same pixel coordinates.  Each tile
+the tiles to be abutted have the same pixel co-ordinates.  Each tile
 may also have a rim of extra data to allow for future coadding,
 the width of which is set by the \param{TILEBORDER} parameter.
 
