@@ -42,25 +42,31 @@
 % Frame attributes fount.
 \providecommand{\att}[1]{\textsf{#1}}
 
-% degrees symbol
+% degrees, arcminutes, arcseconds symbols
 %\usepackage{siunitx}
 \ifpdf
-\newcommand{\dgs}{\si{\degree}}%$^{\circ}$}
+  \newcommand{\dgs}{\si{\degree}}%$^{\circ}$}
+  \newcommand{\udeg}{\hspace{-0.3em}\dgs\hspace{-0.08em}}
+  \newcommand{\arcm}{\si{\arcminute}}%\hbox{$^{\prime$}}}
+  \newcommand{\arcsec}{\si{\arcsecond}}%\arcm\hspace{-0.1em}\arcm}
+  \newcommand{\uarcs}{\hspace{-0.27em}\arcsec\hspace{-0.07em}}
+
 \else
-\newcommand{\dgs}{\HCode{&deg}}
+  \newcommand{\dgs}{\HCode{&deg}}
+  \newcommand{\udeg}{\HCode{&deg}}
+   \newcommand{\arcm}{$'$}
+   \newcommand{\arcsec}{$''$}
+   \newcommand{\uarcs}{$''$}
 \fi
 
+
 % arcminute symbol
-\providecommand{\arcm}{\si{\arcminute}}%\hbox{$^{\prime$}}}
 
 % arcsec symbol
-\providecommand{\arcsec}{\si{\arcsecond}}%\arcm\hspace{-0.1em}\arcm}
 
 % decimal-degree symbol
-\providecommand{\udeg}{\hspace{-0.3em}\dgs\hspace{-0.08em}}
 
 % decimal-arcsecond symbol
-\providecommand{\uarcs}{\hspace{-0.27em}\arcsec\hspace{-0.07em}}
 
 %-------------------------------------------------------------------
 
@@ -592,7 +598,7 @@ mapping.
 \hline
 Receiver &FWHM & $\eta_\textnormal{MB}$ & $\eta_\textnormal{fss}$\\
 \hline
-RxA&19.7$\arcsec$&0.57 & 0.80\\
+RxA&19.\uarcs7&0.57 & 0.80\\
 \hline
 \end{tabular}
 \end{center}
@@ -631,7 +637,7 @@ below}.
 \hline
 Receiver &FWHM & $\eta_\textnormal{MB}$ & $\eta_\textnormal{fss}$\\
 \hline
-HARP&14$\arcsec$ &0.63& 0.88\\
+HARP&14\arcsec &0.63& 0.88\\
 \hline
 \end{tabular}
 \end{center}
@@ -722,11 +728,11 @@ with KAPPA}) or \splat.
 
 \item[\textbf{Jiggle}]
 A jiggle map is a common HARP observing mode. They are designed to
-fill in the 30$\arcsec$ spacing between the HARP receptors resulting in a
-2$'\times$2$\arcm$ map. This is achieved by 'jiggling' the secondary
+fill in the 30\arcsec spacing between the HARP receptors resulting in a
+2\arcm$\times$2$'$ map. This is achieved by 'jiggling' the secondary
 mirror in a 4$\times$4 or 5$\times$5 pattern to give a HARP4 or HARP5
-map respectively.  The HARP4 pattern has a 7.$\uarcs$5 pixels while the
-HARP5 has 6$\arcsec$ pixels, slightly under- and over-sampling compared
+map respectively.  The HARP4 pattern has a 7.\uarcs5 pixels while the
+HARP5 has 6\arcsec pixels, slightly under- and over-sampling compared
 with Nyquist. The central panel of \cref{Figure}{fig:harpmodes}{} shows a
 HARP5 jiggle pattern.
 
@@ -741,8 +747,8 @@ used with the single-element receivers.
 Raster mapping, or scan mapping, is designed for mapping large areas
 with maximum efficiency. The telescope continuously takes data while
 scanning across the source. When HARP is used for raster mapping the
-array is rotated 14.$\udeg$04 to the direction of the scan in order
-to give a fully sampled map with 7.$\uarcs$3 pixels. This will result in
+array is rotated 14.\udeg04 to the direction of the scan in order
+to give a fully sampled map with 7.\uarcs3 pixels. This will result in
 jagged edges to your reduced map which you may wish to trim. It is
 common when using HARP to repeat the map scanning along the other axis
 to give a `basket-weave' pair of maps. Each one of the pair will
@@ -765,7 +771,7 @@ in less-accurate sky subtraction or non-flat baselines.
 In beam-switch (BSW) mode, the secondary-mirror chops onto the reference
 position. This results in fast and accurate sky subtraction but it is
 limited to targets which have a blank reference position within
-180$\arcsec$ (the maximum chop distance of the SMU).
+180\arcsec (the maximum chop distance of the SMU).
 
 \item[\textbf{Frequency-switch}]
 In frequency-switch (FSW) mode the telescope does not move but the
@@ -780,9 +786,9 @@ useful when no emission-free reference position can be found.
 \begin{center}
 \includegraphics[width=0.8\linewidth]{sc20_jiggles}
 \caption[HARP4 and HARP5 jiggle patterns]{Top row: HARP4 jiggle
-patterns produce a map of 16$\times$16 pixels each of 7.$\uarcs$5. Bottom
+patterns produce a map of 16$\times$16 pixels each of 7.\uarcs5. Bottom
 row: HARP5 jiggle patterns produce a map of 20$\times$20 pixels each
-of 6$\arcsec$. }
+of 6\arcsec. }
 \label{fig:jiggle}
 \end{center}
 \end{figure}
@@ -1227,7 +1233,7 @@ PSF-weighted mean of the input pixels within the filter box.
 % gausmooth in=mymap out=smoothedmap fwhm=3
 \end{terminalv}
 Note that the \param{fwhm} option is given in the number of pixels.
-For example, to smooth a map with 4$\arcsec$ pixels by a 12$\arcsec$ Gaussian
+For example, to smooth a map with 4\arcsec pixels by a 12\arcsec Gaussian
 you would set \param{fwhm=3}.
 
 \section{Removing a baseline}
@@ -1439,7 +1445,7 @@ instructions on converting your FITS file to NDF format.
 
 Alternatively, to resample your data onto smaller pixels you should
 use the \Kappa\ command \sqorst. In the example below 'map' has a
-pixel size of 8$\arcsec$, while `resamplemap' has a pixel size of 4$\arcsec$ --
+pixel size of 8\arcsec, while `resamplemap' has a pixel size of 4\arcsec --
 the number of pixels has been doubled by applying a factor of 2 to the
 spatial axes. A factor of 1 was applied to the frequency (third) axis
 leaving it unchanged.
@@ -3199,7 +3205,7 @@ details.
 
 \begin{itemize}
 \item Plot the spectra from cube.sdf at the position
-$l$=60.$\udeg$87, $b$=0.$\udeg$18. Use existing \file{style.dat} except
+$l$=60.\udeg87, $b$=0.\udeg18. Use existing \file{style.dat} except
 override the text label size which is too big for these axes labels.
 \begin{terminalv}
 % linplot "cube(60.87,0.18,)" style="'^style.dat,size(textlab)=1'"
@@ -3255,8 +3261,8 @@ The plus sign means the change will not be remembered next time
   specstyle="'colour(textlab)=red,colour(numlab)=red'" mode=hist
 \end{terminalv}
 
-This example plots a grid of 5$\times$4 pixels around $l=61.$\udeg$06
-and $b=0.$\udeg$15. Each spectrum has a range of 10 to 30 km/s.  Note
+This example plots a grid of 5$\times$4 pixels around $l$=61.\udeg06
+and $b$=0.\udeg15. Each spectrum has a range of 10 to 30 km/s.  Note
 the decimal points are necessary for the spectral limits, otherwise
 the spectrum would extend from pixel co-ordinates 10 to 30.  The
 \param{specstyle} option allows you to format the spectral axes inside
