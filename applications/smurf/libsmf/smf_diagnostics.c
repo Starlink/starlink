@@ -154,6 +154,8 @@
 *        Original version.
 *     17-JUL-2014 (DSB):
 *        Added option to create diagnostic maps from each model.
+*     21-JAN-2015 (DSB):
+*        Make the inclusion of data for a specific bolometer optional.
 
 *  Copyright:
 *     Copyright (C) 2013-2014 Science and Technology Facilities Council.
@@ -214,7 +216,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    int append;
    int cube;
    int history;
-   int ibolo = -2;
+   int ibolo = -4;
    int imodel;
    int irow;
    int isub;
@@ -344,59 +346,64 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
       astMapGet0D( kmap, "MINGOOD", &mingood );
 
       if( *status == SAI__OK ) {
-         astMapGet1I( kmap, "BOLO", 2, &nval, ivals );
-         if( *status == SAI__OK ) {
-            if( nval == 2 ) {
-               if( ivals[ 0 ] < 0 || ivals[ 0 ] >= 32 ) {
-                  *status = SAI__ERROR;
-                  errRepf( "", "Illegal value %d for column number in "
-                           "config parameter DIAG.BOLO - must be in "
-                           "the range 0 to 31.", status, ivals[ 0 ] );
-               } else if( ivals[ 1 ] < 0 || ivals[ 1 ] >= 40 ) {
-                  *status = SAI__ERROR;
-                  errRepf( "", "Illegal value %d for row number in "
-                           "config parameter DIAG.BOLO - must be in "
-                           "the range 0 to 39.", status, ivals[ 1 ] );
+         if( astMapGet1I( kmap, "BOLO", 2, &nval, ivals ) ) {
+            if( *status == SAI__OK ) {
+               if( nval == 2 ) {
+                  if( ivals[ 0 ] < 0 || ivals[ 0 ] >= 32 ) {
+                     *status = SAI__ERROR;
+                     errRepf( "", "Illegal value %d for column number in "
+                              "config parameter DIAG.BOLO - must be in "
+                              "the range 0 to 31.", status, ivals[ 0 ] );
+                  } else if( ivals[ 1 ] < 0 || ivals[ 1 ] >= 40 ) {
+                     *status = SAI__ERROR;
+                     errRepf( "", "Illegal value %d for row number in "
+                              "config parameter DIAG.BOLO - must be in "
+                              "the range 0 to 39.", status, ivals[ 1 ] );
+                  } else {
+                     ibolo = ivals[ 1 ]*32 + ivals[ 0 ];
+                  }
                } else {
-                  ibolo = ivals[ 1 ]*32 + ivals[ 0 ];
+                  if( ivals[ 0 ] < 0 || ivals[ 0 ] >= 1280 ) {
+                     *status = SAI__ERROR;
+                     errRepf( "", "Illegal value %d for bolometer index in "
+                              "config parameter DIAG.BOLO - must be in "
+                              "the range 0 to 1279.", status, ivals[ 0 ] );
+                  } else {
+                     ibolo = ivals[ 0 ];
+                  }
                }
-            } else {
-               if( ivals[ 0 ] < 0 || ivals[ 0 ] >= 1280 ) {
-                  *status = SAI__ERROR;
-                  errRepf( "", "Illegal value %d for bolometer index in "
-                           "config parameter DIAG.BOLO - must be in "
-                           "the range 0 to 1279.", status, ivals[ 0 ] );
-               } else {
-                  ibolo = ivals[ 0 ];
-               }
-            }
 
 /* If the supplied strings could not be converted to integers, annul the error
    and interpret them as simple strings. */
-         } else if( nval == 1 && *status == AST__MPGER ){
-            errAnnul( status );
+            } else if( nval == 1 && *status == AST__MPGER ){
+               errAnnul( status );
 
 /* Only one string allowed. */
-            if( astMapLength( kmap, "BOLO" ) == 1 ) {
+               if( astMapLength( kmap, "BOLO" ) == 1 ) {
 
 /* Get the string, and compare to the allowed values. */
-               astMapGet0C( kmap, "BOLO", &cval );
-               if( astChrMatch( "MEAN", cval ) ) {
-                  ibolo = -1;
-               } else if( astChrMatch( "WMEAN", cval ) ) {
-                  ibolo = -2;
-               } else if( astChrMatch( "TYPICAL", cval ) ) {
-                  ibolo = -3;
+                  astMapGet0C( kmap, "BOLO", &cval );
+                  if( astChrMatch( "MEAN", cval ) ) {
+                     ibolo = -1;
+                  } else if( astChrMatch( "WMEAN", cval ) ) {
+                     ibolo = -2;
+                  } else if( astChrMatch( "TYPICAL", cval ) ) {
+                     ibolo = -3;
+                  } else if( *status == SAI__OK ) {
+                     *status = SAI__ERROR;
+                     errRepf( "", "Illegal value %s supplied for config "
+                              "parameter DIAG.BOLO.", status, cval );
+                  }
                } else if( *status == SAI__OK ) {
                   *status = SAI__ERROR;
-                  errRepf( "", "Illegal value %s supplied for config "
-                           "parameter DIAG.BOLO.", status, cval );
+                  errRepf( "", "Illegal value supplied for config "
+                           "parameter DIAG.BOLO.", status );
                }
-            } else if( *status == SAI__OK ) {
-               *status = SAI__ERROR;
-               errRepf( "", "Illegal value supplied for config "
-                        "parameter DIAG.BOLO.", status );
             }
+
+/* Do not include data for a specific bolometer if BOLO is set to <undef>. */
+         } else {
+            ibolo = -4;
          }
       }
 
@@ -499,17 +506,19 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 /* Add extra information to the top level of the container file, if it
    has just been created. */
       if( new ) {
-         if( ibolo < 0 ) {
-            cval = ( ibolo == -1 ) ? "MEAN" : "WMEAN";
-            datNew0C( cloc, "BOLO", strlen(cval), status );
-            datFind( cloc, "BOLO", &dloc, status );
-            datPut0C( dloc, cval, status );
-         } else {
-            datNew0I( cloc, "BOLO", status );
-            datFind( cloc, "BOLO", &dloc, status );
-            datPut0I( dloc, ibolo, status );
+         if( ibolo != -4 ) {
+            if( ibolo < 0 ) {
+               cval = ( ibolo == -1 ) ? "MEAN" : "WMEAN";
+               datNew0C( cloc, "BOLO", strlen(cval), status );
+               datFind( cloc, "BOLO", &dloc, status );
+               datPut0C( dloc, cval, status );
+            } else {
+               datNew0I( cloc, "BOLO", status );
+               datFind( cloc, "BOLO", &dloc, status );
+               datPut0I( dloc, ibolo, status );
+            }
+            datAnnul( &dloc, status );
          }
-         datAnnul( &dloc, status );
 
          datNew0C( cloc, "ARRAY", strlen(subarray), status );
          datFind( cloc, "ARRAY", &dloc, status );

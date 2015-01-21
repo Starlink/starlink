@@ -29,9 +29,10 @@
 *        On entry: If larger than or equal to zero, this is the zero based
 *        index of the bolometer to dump. If -1, dump the mean of all
 *        bolometers. If -2 dump the weighted mean of all bolometers. If -3
-*        dump an automatically chosen typical bolometer.
-*        On exit: the zero-based index of the chosen detector if ibolo
-*        was -3 on entry. Otherwise, ibolo is returned unchanged.
+*        dump an automatically chosen typical bolometer. If -4, do not
+*        dump any bolometer. On exit: the zero-based index of the chosen
+*        detector if ibolo was -3 on entry. Otherwise, ibolo is returned
+*        unchanged.
 *     irow = int (Given)
 *        The zero-based row number within each NDF at which to store
 *        the line of diagnostic info.
@@ -94,9 +95,11 @@
 *        Original version.
 *     21-OCT-2013 (DSB):
 *        Added argument "addqual".
+*     21-JAN-2015 (DSB):
+*        Added "ibolo=-4" option.
 
 *  Copyright:
-*     Copyright (C) 2013 Science and Technology Facilities Council.
+*     Copyright (C) 2013,2015 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -361,353 +364,361 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
       }
    }
 
+/* If we are dumping time-streams for a single bolometer... */
+   if( *ibolo != -4 ) {
+
 /* Allocate space for the time stream to dump. */
-   buffer = astMalloc( ntslice*sizeof( *buffer ) );
+      buffer = astMalloc( ntslice*sizeof( *buffer ) );
 
 /* Get the time stream containing the data to be dumped. If it contains
    only one time-stream (e.g COM), use it. */
-   usebolo = *ibolo;
-   if( nbolo == 1 ) usebolo = 0;
+      usebolo = *ibolo;
+      if( nbolo == 1 ) usebolo = 0;
 
 /* If a specified single bolometer was requested, copy it into
    the buffer, replacing flagged samples with VAL__BADD. */
-   if( usebolo >= 0 && *status == SAI__OK ) {
+      if( usebolo >= 0 && *status == SAI__OK ) {
 
-      pd = ((double *) data->pntr[0]) + usebolo*bstride;
-      pq = qual ? qual + usebolo*bstride : NULL;
-      if( pq && addqual ) qbuffer = astMalloc( ntslice*sizeof( *qbuffer ) );
+         pd = ((double *) data->pntr[0]) + usebolo*bstride;
+         pq = qual ? qual + usebolo*bstride : NULL;
+         if( pq && addqual ) qbuffer = astMalloc( ntslice*sizeof( *qbuffer ) );
 
-      ngood = 0;
-      for( itime = 0; itime < ntslice; itime++ ){
-         if( qbuffer ) qbuffer[ itime ] = *pq;
-         if( ( qbuffer || ( !pq || *pq == 0 ) ) && *pd != VAL__BADD ) {
-            buffer[ itime ] = *pd;
-            ngood++;
-         } else {
-            buffer[ itime ] = VAL__BADD;
+         ngood = 0;
+         for( itime = 0; itime < ntslice; itime++ ){
+            if( qbuffer ) qbuffer[ itime ] = *pq;
+            if( ( qbuffer || ( !pq || *pq == 0 ) ) && *pd != VAL__BADD ) {
+               buffer[ itime ] = *pd;
+               ngood++;
+            } else {
+               buffer[ itime ] = VAL__BADD;
+            }
+            pd += tstride;
+            if( pq ) pq += tstride;
          }
-         pd += tstride;
-         if( pq ) pq += tstride;
-      }
 
-      if( ngood < mingood*ntslice && *status == SAI__OK ) {
-         *status = SAI__ERROR;
-         errRep( "", "smf_diag: Failed to dump diagnostic data since "
-                 "selected bolometer has too few good values.", status );
-      }
+         if( ngood < mingood*ntslice && *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRep( "", "smf_diag: Failed to dump diagnostic data since "
+                    "selected bolometer has too few good values.", status );
+         }
 
 /* If the mean or weighted mean bolometer, or a typical bolometer, is
    required, find it. */
-   } else if( *status == SAI__OK ) {
+      } else if( *status == SAI__OK ) {
 
 /* Get the variances for each bolometer if needed. */
-      var = NULL;
-      if( usebolo == -2 || usebolo == -3 ) {
-         var = astMalloc( nbolo*sizeof( *var ) );
-         for( iw = 0; iw < nw; iw++ ) {
-            pdata = job_data + iw;
-            pdata->oper = 2;
-            pdata->out = var;
-            pdata->data = data;
-            thrAddJob( wf, 0, pdata, smf1_diag, 0, NULL, status );
+         var = NULL;
+         if( usebolo == -2 || usebolo == -3 ) {
+            var = astMalloc( nbolo*sizeof( *var ) );
+            for( iw = 0; iw < nw; iw++ ) {
+               pdata = job_data + iw;
+               pdata->oper = 2;
+               pdata->out = var;
+               pdata->data = data;
+               thrAddJob( wf, 0, pdata, smf1_diag, 0, NULL, status );
+            }
+            thrWait( wf, status );
          }
-         thrWait( wf, status );
-      }
 
 /* If required, find a typical bolometer... Get a list of bolometer
    indices, sorted by variance value, and select the bolometer with the
    most good samples that is within the central 40% to 60% quartiles. */
-      if( usebolo == -3 ) {
-         index = smf_sortD( nbolo, var, &sorted, status );
-         if( *status == SAI__OK ) {
-            dim_t maxgood, itest;
-            maxgood = 0;
-            for( itest = 0.4*nbolo; itest <= 0.6*nbolo; itest++ ) {
-               jbolo = index[ itest ];
+         if( usebolo == -3 ) {
+            index = smf_sortD( nbolo, var, &sorted, status );
+            if( *status == SAI__OK ) {
+               dim_t maxgood, itest;
+               maxgood = 0;
+               for( itest = 0.4*nbolo; itest <= 0.6*nbolo; itest++ ) {
+                  jbolo = index[ itest ];
 
-               pd = ((double *) data->pntr[0]) + jbolo*bstride;
-               pq = qual ? qual + jbolo*bstride : NULL;
+                  pd = ((double *) data->pntr[0]) + jbolo*bstride;
+                  pq = qual ? qual + jbolo*bstride : NULL;
+                  ngood = 0;
+                  for( itime = 0; itime < ntslice; itime++ ){
+                     if( ( !pq || *pq == 0 ) && *pd != VAL__BADD ) ngood++;
+                     pd += tstride;
+                     if( pq ) pq += tstride;
+                  }
+
+                  if( ngood > maxgood ) {
+                     maxgood = ngood;
+                     usebolo = jbolo;
+                  }
+               }
+
+/* Copy the data from the selected bolometer into the buffer. */
+               pd = ((double *) data->pntr[0]) + usebolo*bstride;
+               pq = qual ? qual + usebolo*bstride : NULL;
+
+               if( pq && addqual ) qbuffer = astMalloc( ntslice*sizeof( *qbuffer ) );
+
                ngood = 0;
                for( itime = 0; itime < ntslice; itime++ ){
-                  if( ( !pq || *pq == 0 ) && *pd != VAL__BADD ) ngood++;
+                  if( qbuffer ) qbuffer[ itime ] = *pq;
+                  if( ( qbuffer || ( !pq || *pq == 0 ) ) && *pd != VAL__BADD ) {
+                     buffer[ itime ] = *pd;
+                     ngood++;
+                  } else {
+                     buffer[ itime ] = VAL__BADD;
+                  }
                   pd += tstride;
                   if( pq ) pq += tstride;
                }
 
-               if( ngood > maxgood ) {
-                  maxgood = ngood;
-                  usebolo = jbolo;
+               if( ngood < mingood*ntslice && *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  errRep( "", "smf_diag: Failed to dump diagnostic data since "
+                          "selected bolometer has too few good values.", status );
                }
             }
-
-/* Copy the data from the selected bolometer into the buffer. */
-            pd = ((double *) data->pntr[0]) + usebolo*bstride;
-            pq = qual ? qual + usebolo*bstride : NULL;
-
-            if( pq && addqual ) qbuffer = astMalloc( ntslice*sizeof( *qbuffer ) );
-
-            ngood = 0;
-            for( itime = 0; itime < ntslice; itime++ ){
-               if( qbuffer ) qbuffer[ itime ] = *pq;
-               if( ( qbuffer || ( !pq || *pq == 0 ) ) && *pd != VAL__BADD ) {
-                  buffer[ itime ] = *pd;
-                  ngood++;
-               } else {
-                  buffer[ itime ] = VAL__BADD;
-               }
-               pd += tstride;
-               if( pq ) pq += tstride;
-            }
-
-            if( ngood < mingood*ntslice && *status == SAI__OK ) {
-               *status = SAI__ERROR;
-               errRep( "", "smf_diag: Failed to dump diagnostic data since "
-                       "selected bolometer has too few good values.", status );
-            }
-         }
-         index = astFree( index );
+            index = astFree( index );
 
 /* Otherwise, calculate the mean or weighted mean bolometer time series. */
-      } else {
-         for( iw = 0; iw < nw; iw++ ) {
-            pdata = job_data + iw;
-            pdata->in = data->pntr[ 0 ];
-            pdata->out = buffer;
-            pdata->qua = qual;
-            pdata->oper = usebolo;
-            pdata->var = var;
-            thrAddJob( wf, 0, pdata, smf1_diag, 0, NULL, status );
+         } else {
+            for( iw = 0; iw < nw; iw++ ) {
+               pdata = job_data + iw;
+               pdata->in = data->pntr[ 0 ];
+               pdata->out = buffer;
+               pdata->qua = qual;
+               pdata->oper = usebolo;
+               pdata->var = var;
+               thrAddJob( wf, 0, pdata, smf1_diag, 0, NULL, status );
+            }
+            thrWait( wf, status );
          }
-         thrWait( wf, status );
+
+         var = astFree( var );
+
       }
 
-      var = astFree( var );
-
-   }
-
 /* Loop over the two possible outputs - time and power */
-   for( i = 0; i < 2; i++ ) {
+      for( i = 0; i < 2; i++ ) {
 
 /* Continue if the current output is not needed. */
-      if( ( i == 0 && !time ) || ( i == 1 && !power ) ) continue;
+         if( ( i == 0 && !time ) || ( i == 1 && !power ) ) continue;
 
 /* If we are dumping the power spectrum, replace the time series with the
    power spectrum within "buffer". Temporarily hijack the COM model for
    this (we choose COM since it has only one bolometer). */
-      if( i == 1 ) {
-         if( dat->com ) {
-            data_tmp = dat->com[ 0 ]->sdata[ isub ];
+         if( i == 1 ) {
+            if( dat->com ) {
+               data_tmp = dat->com[ 0 ]->sdata[ isub ];
 
 /* Check COM is a single bolo time stream. */
-            if( data_tmp->ndims != 3 ||
-                data_tmp->dims[ 0 ] != ntslice ||
-                data_tmp->dims[ 1 ] != 1 ||
-                data_tmp->dims[ 2 ] != 1 ) {
-               if( *status == SAI__OK ) {
-                  *status = SAI__ERROR;
-                  errRep( "", "smf_diag: COM has unexpected dimensions.",
-                          status );
-               }
+               if( data_tmp->ndims != 3 ||
+                   data_tmp->dims[ 0 ] != ntslice ||
+                   data_tmp->dims[ 1 ] != 1 ||
+                   data_tmp->dims[ 2 ] != 1 ) {
+                  if( *status == SAI__OK ) {
+                     *status = SAI__ERROR;
+                     errRep( "", "smf_diag: COM has unexpected dimensions.",
+                             status );
+                  }
 
-            } else {
+               } else {
 
 /* Save the original COM data pointer, and use the local buffer instead. */
-               oldcom = data_tmp->pntr[ 0 ];
-               data_tmp->pntr[ 0 ] = buffer;
+                  oldcom = data_tmp->pntr[ 0 ];
+                  data_tmp->pntr[ 0 ] = buffer;
 
 /* Create a temporary quality array that flags the VAL__BADD values in
    buffer. We base it on a copy of the quality array for a used bolometer
    in the residuals, so that the new quality array inherits padding and apodisation flags. */
-               oldcomq = data_tmp->qual;
-               sidequal = data_tmp->sidequal;
-               data_tmp->qual = astMalloc( ntslice*sizeof( *data_tmp->qual ));
-               data_tmp->sidequal = NULL;
+                  oldcomq = data_tmp->qual;
+                  sidequal = data_tmp->sidequal;
+                  data_tmp->qual = astMalloc( ntslice*sizeof( *data_tmp->qual ));
+                  data_tmp->sidequal = NULL;
 
 /* Examine the residuals quality array to find a bolometer that has not
    been completey rejected. Then copy the bolometer's quality values into
    the temporary array created above, retaining PAD and APOD flags but
    removing all others. Set SPIKE quality (a convenient bad value) for any
    values that are bad in the time series being dumped (the "buffer" array). */
-               smf_get_dims( dat->res[ 0 ]->sdata[isub], NULL, NULL,
-                             &nbolor, NULL, NULL, &bstrider, &tstrider, status );
-               pqr = smf_select_qualpntr( dat->res[ 0 ]->sdata[isub], NULL, status );
-               pq = data_tmp->qual;
-               ngood = 0;
-               for( jbolo = 0; jbolo < nbolor; jbolo++ ) {
-                  if( !( *pqr & SMF__Q_BADB ) ) {
-                     for( itime = 0; itime < ntslice; itime++ ) {
-                        qval = *pqr & ( SMF__Q_APOD | SMF__Q_PAD );
-                        if( buffer[ itime ] == VAL__BADD ) {
-                           if( !(qval & SMF__Q_PAD) ) qval = SMF__Q_SPIKE;
-                           buffer[ itime ] = 0.0; /* Bad values cause grief in smf_fft_data */
-                        } else {
-                           ngood++;
+                  smf_get_dims( dat->res[ 0 ]->sdata[isub], NULL, NULL,
+                                &nbolor, NULL, NULL, &bstrider, &tstrider, status );
+                  pqr = smf_select_qualpntr( dat->res[ 0 ]->sdata[isub], NULL, status );
+                  pq = data_tmp->qual;
+                  ngood = 0;
+                  for( jbolo = 0; jbolo < nbolor; jbolo++ ) {
+                     if( !( *pqr & SMF__Q_BADB ) ) {
+                        for( itime = 0; itime < ntslice; itime++ ) {
+                           qval = *pqr & ( SMF__Q_APOD | SMF__Q_PAD );
+                           if( buffer[ itime ] == VAL__BADD ) {
+                              if( !(qval & SMF__Q_PAD) ) qval = SMF__Q_SPIKE;
+                           buffer[ itime ] = 0.0;    /* Bad values cause grief in smf_fft_data */
+                           } else {
+                              ngood++;
+                           }
+                           *(pq++) = qval;
+                           pqr += tstrider;
                         }
-                        *(pq++) = qval;
-                        pqr += tstrider;
+                        break;
                      }
-                     break;
+                     pqr += bstrider;
                   }
-                  pqr += bstrider;
-               }
 
 /* If too few good values, just take the FFT of a load of zerso. */
-               if( ngood < mingood*ntslice ) {
-                  for( itime = 0; itime < ntslice; itime++ ){
-                     buffer[ itime ] = 0.0;
+                  if( ngood < mingood*ntslice ) {
+                     for( itime = 0; itime < ntslice; itime++ ){
+                        buffer[ itime ] = 0.0;
+                     }
                   }
-               }
 
 /* Now do the fft */
-               pow = smf_fft_data( wf, data_tmp, NULL, 0, SMF__BADSZT,
-                                   status );
-               smf_convert_bad( wf, pow, status );
+                  pow = smf_fft_data( wf, data_tmp, NULL, 0, SMF__BADSZT,
+                                      status );
+                  smf_convert_bad( wf, pow, status );
 
 /* Convert to power */
-               smf_fft_cart2pol( wf, pow, 0, 1, status );
-               smf_isfft( pow, NULL, NULL, fdims, NULL, NULL, status );
+                  smf_fft_cart2pol( wf, pow, 0, 1, status );
+                  smf_isfft( pow, NULL, NULL, fdims, NULL, NULL, status );
 
 /* Get the WCS and copy the power spectrum to the buffer. */
-               ndata = fdims[ 0 ];
-               if( *status == SAI__OK ) {
-                  if( pow->hdr->tswcs ) {
-                     wcs = astClone( pow->hdr->tswcs );
-                  } else if( pow->hdr->wcs ) {
-                     wcs = astClone( pow->hdr->wcs );
-                  }
-                  memcpy( buffer, pow->pntr[ 0 ], ndata*sizeof( buffer ) );
-                  smf_close_file( wf, &pow, status );
+                  ndata = fdims[ 0 ];
+                  if( *status == SAI__OK ) {
+                     if( pow->hdr->tswcs ) {
+                        wcs = astClone( pow->hdr->tswcs );
+                     } else if( pow->hdr->wcs ) {
+                        wcs = astClone( pow->hdr->wcs );
+                     }
+                     memcpy( buffer, pow->pntr[ 0 ], ndata*sizeof( buffer ) );
+                     smf_close_file( wf, &pow, status );
 
 /* If too few good values, store a set of bad values in place of the
    power spectrum. */
-                  if( ngood < mingood*ntslice ) {
-                     for( itime = 0; itime < ndata; itime++ ){
-                        buffer[ itime ] = VAL__BADD;
+                     if( ngood < mingood*ntslice ) {
+                        for( itime = 0; itime < ndata; itime++ ){
+                           buffer[ itime ] = VAL__BADD;
+                        }
                      }
                   }
+
+                  data_tmp->pntr[ 0 ] = oldcom;
+                  (void) astFree( data_tmp->qual );
+                  data_tmp->qual = oldcomq;
+                  data_tmp->sidequal = sidequal;
                }
 
-               data_tmp->pntr[ 0 ] = oldcom;
-               (void) astFree( data_tmp->qual );
-               data_tmp->qual = oldcomq;
-               data_tmp->sidequal = sidequal;
+            } else if( *status == SAI__OK ) {
+               *status = SAI__ERROR;
+               errRepf( "", "smf_diag: Cannot dump power spectra since "
+                        "no COM model is being used.", status );
             }
 
-         } else if( *status == SAI__OK ) {
-            *status = SAI__ERROR;
-            errRepf( "", "smf_diag: Cannot dump power spectra since "
-                     "no COM model is being used.", status );
+         } else {
+            ndata = ntslice;
          }
 
-      } else {
-         ndata = ntslice;
-      }
-
 /* Form the name of the NDF to receive the data. */
-      name = NULL;
-      nc = 0;
-      name = astAppendString( name, &nc, root );
-      name = astAppendString( name, &nc, i ? "_power" : "_time" );
+         name = NULL;
+         nc = 0;
+         name = astAppendString( name, &nc, root );
+         name = astAppendString( name, &nc, i ? "_power" : "_time" );
 
 /* Open the NDF, creating it if necesary. Ensure its bounds encompass the
    requested row. */
-      ndfOpen( loc, name, "UPDATE", "UNKNOWN", &indf, &place, status );
-      if( place != NDF__NOPL ) {
-         lbnd[ 0 ] = 1;
-         ubnd[ 0 ] = ndata;
-         lbnd[ 1 ] = irow + 1;
-         ubnd[ 1 ] = irow + 1;
-         ndfNew( "_DOUBLE", 2, lbnd, ubnd, &place, &indf, status );
-         mode = "Write";
+         ndfOpen( loc, name, "UPDATE", "UNKNOWN", &indf, &place, status );
+         if( place != NDF__NOPL ) {
+            lbnd[ 0 ] = 1;
+            ubnd[ 0 ] = ndata;
+            lbnd[ 1 ] = irow + 1;
+            ubnd[ 1 ] = irow + 1;
+            ndfNew( "_DOUBLE", 2, lbnd, ubnd, &place, &indf, status );
+            mode = "Write";
 
 /* Since a new NDF was created, add WCS if available. */
-         if( wcs ) {
+            if( wcs ) {
 
 /* If storing power spectra, the FrameSet created by smf_fft_data is for a
    4D NDF, so we need to modify it for out 2D NDFs.  */
-            if( i == 1 ) {
+               if( i == 1 ) {
 
 /* Search for the frequency axis. */
-               nax = astGetI( wcs, "NAXES" );
-               for( iax = 1; iax <= nax; iax++ ) {
-                  sprintf( attr, "Domain(%d)", iax );
-                  dom = astGetC( wcs, attr );
-                  if( astChrMatch( dom, "SPECTRUM" ) ) {
+                  nax = astGetI( wcs, "NAXES" );
+                  for( iax = 1; iax <= nax; iax++ ) {
+                     sprintf( attr, "Domain(%d)", iax );
+                     dom = astGetC( wcs, attr );
+                     if( astChrMatch( dom, "SPECTRUM" ) ) {
 
 /* Frequency axis found. Extract the grid->freq mapping, and get the
    SpecFrame. */
-                     astMapSplit( wcs, 1, &iax, &fax, &fmap );
-                     if( fmap ) {
-                        ffrm = astPickAxes( wcs, 1, &fax, NULL );
+                        astMapSplit( wcs, 1, &iax, &fax, &fmap );
+                        if( fmap ) {
+                           ffrm = astPickAxes( wcs, 1, &fax, NULL );
 
 /* Create a 2D WCS by combining the above frequency axis with a simple 1D
    axis describing iteration number. */
-                        (void) astAnnul( wcs );
-                        wcs = astFrameSet( astFrame( 2, "Domain=GRID" ), " " );
-                        totmap = astCmpMap( fmap, astUnitMap( 1, " " ), 0, " " );
-                        totfrm = astCmpFrame( ffrm, astFrame( 1, "Domain=ITERATION"
-                          ",Label(1)=Iteration number,Symbol(1)=Iter" ), " " );
-                        astAddFrame( wcs, AST__BASE, totmap, totfrm );
+                           (void) astAnnul( wcs );
+                           wcs = astFrameSet( astFrame( 2, "Domain=GRID" ), " " );
+                           totmap = astCmpMap( fmap, astUnitMap( 1, " " ), 0, " " );
+                           totfrm = astCmpFrame( ffrm, astFrame( 1, "Domain=ITERATION"
+                             ",Label(1)=Iteration number,Symbol(1)=Iter" ), " " );
+                           astAddFrame( wcs, AST__BASE, totmap, totfrm );
 
-                     } else if( *status == SAI__OK ) {
-                        *status = SAI__ERROR;
-                        errRep( "", "smf_diag: Cannot extract the frequency axis "
-                                "from the power spectrum wcs.", status );
-                     }
+                        } else if( *status == SAI__OK ) {
+                           *status = SAI__ERROR;
+                           errRep( "", "smf_diag: Cannot extract the frequency axis "
+                                   "from the power spectrum wcs.", status );
+                        }
 
 /* Do not need to check any more axes so break. */
-                     break;
+                        break;
+                     }
                   }
-               }
 
 /* Report an error if no frequency axis was found. */
-               if( iax == nax && *status == SAI__OK ) {
-                  *status = SAI__ERROR;
-                  errRep( "", "smf_diag: No frequency axis found in the "
-                          "power spectrum wcs.", status );
+                  if( iax == nax && *status == SAI__OK ) {
+                     *status = SAI__ERROR;
+                     errRep( "", "smf_diag: No frequency axis found in the "
+                             "power spectrum wcs.", status );
+                  }
                }
+               ndfPtwcs( wcs, indf, status );
+               wcs = astAnnul( wcs );
             }
-            ndfPtwcs( wcs, indf, status );
-            wcs = astAnnul( wcs );
-         }
 
 /* If using an existing NDF, modify its bounds to encompass the new row
    and indicate it should be opened in update mode. */
-      } else {
-         ndfBound( indf, 2, lbnd, ubnd, &ndim, status );
-         lbnd[ 0 ] = 1;
-         ubnd[ 0 ] = ndata;
-         if( lbnd[ 1 ] > irow + 1 ) lbnd[ 1 ] = irow + 1;
-         if( ubnd[ 1 ] < irow + 1 ) ubnd[ 1 ] = irow + 1;
-         ndfSbnd( 2, lbnd, ubnd, indf, status );
-         mode = "Update";
-      }
+         } else {
+            ndfBound( indf, 2, lbnd, ubnd, &ndim, status );
+            lbnd[ 0 ] = 1;
+            ubnd[ 0 ] = ndata;
+            if( lbnd[ 1 ] > irow + 1 ) lbnd[ 1 ] = irow + 1;
+            if( ubnd[ 1 ] < irow + 1 ) ubnd[ 1 ] = irow + 1;
+            ndfSbnd( 2, lbnd, ubnd, indf, status );
+            mode = "Update";
+         }
 
 /* Map the data array and copy the values. */
-      ndfMap( indf, "DATA", "_DOUBLE", mode, (void **) &ip, &el,
-              status );
-      if( *status == SAI__OK ) memcpy( ip + ( irow + 1 - lbnd[1] )*ndata,
-                                       buffer, sizeof(double)*ndata );
+         ndfMap( indf, "DATA", "_DOUBLE", mode, (void **) &ip, &el,
+                 status );
+         if( *status == SAI__OK ) memcpy( ip + ( irow + 1 - lbnd[1] )*ndata,
+                                          buffer, sizeof(double)*ndata );
 
 /* If required, map the Quality array and copy the values, then unmap it. */
-      if( qbuffer ) {
-         qua = smf_qual_map( wf, indf, mode, NULL, &nmap, status );
-         if( *status == SAI__OK ) memcpy( qua + ( irow + 1 - lbnd[1] )*ndata,
-                                          qbuffer, sizeof(*qua)*ndata );
-         smf_qual_unmap( wf, indf, SMF__QFAM_TSERIES, qua, status );
+         if( qbuffer ) {
+            qua = smf_qual_map( wf, indf, mode, NULL, &nmap, status );
+            if( *status == SAI__OK ) memcpy( qua + ( irow + 1 - lbnd[1] )*ndata,
+                                             qbuffer, sizeof(*qua)*ndata );
+            smf_qual_unmap( wf, indf, SMF__QFAM_TSERIES, qua, status );
 
 /* Set the bad bits mask so that the data array will not be masked when
    it is mapped when dumping diagnostics for the next iteration. */
-         ndfSbb( 0, indf, status );
-      }
+            ndfSbb( 0, indf, status );
+         }
 
 /* Free resources. */
-      ndfAnnul( &indf, status );
-      name = astFree( name );
-   }
+         ndfAnnul( &indf, status );
+         name = astFree( name );
+      }
 
 /* Return the used bolometer, if required. */
-   if( *ibolo == -3 ) *ibolo = usebolo;
+      if( *ibolo == -3 ) *ibolo = usebolo;
+
+/* Free resources. */
+      buffer = astFree( buffer );
+      qbuffer = astFree( qbuffer );
+   }
 
 /* If required, dump the time series for all bolometers to a new cube. */
    if( cube && data->ndims == 3 && (data->pntr)[0] ) {
@@ -853,7 +864,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
       double *pvals = NULL;
       double *qvals = NULL;
 
-/* If not akready done, identify the samples that fall in the specified
+/* If not already done, identify the samples that fall in the specified
    pixel, and store columns holding the corresponding time slice and
    bolometer indices. Ignore models such as COM that only have 1
    time-series. */
@@ -975,8 +986,6 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    }
 
 /* Free remaining resources. */
-   buffer = astFree( buffer );
-   qbuffer = astFree( qbuffer );
    job_data = astFree( job_data );
 
 /* End the AST context. */

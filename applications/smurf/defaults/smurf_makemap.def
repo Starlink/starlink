@@ -671,6 +671,11 @@ diag.array = <undef>
 #    		bolometer with typical noise charactersitics is chosen and
 #    		used. The index of the chosen bolometer is reported, and
 #    		stored in the dumped NDFs.
+#
+#               - The string "<undef>", in which case the output NDFs
+#               describing a single bolometer are not produced (maps and
+#               cubes may still be produced though - see parameter
+#               "diag.map" and parameter "diag.cube").
 diag.bolo = WMEAN
 
 #-----------------------------------------------------------------
@@ -1974,7 +1979,7 @@ noexportsetbad = 0
 #		unrepresentative noise levels, and there is a hard minimum
 #		of 101 on the number of downsampled time slices in a noise
 #       box. Also, if the number of time slices in the data is smaller
-#       than two times the requested box size, then a single noise 
+#       than two times the requested box size, then a single noise
 #       value is used for each bolometer.
 noi.box_size = 0
 
