@@ -1,283 +1,43 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt]{starlink}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
 
-\pagestyle{myheadings}
+
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}   {Starlink User Note}
-\newcommand{\stardocinitials}   {SUN}
-\newcommand{\stardocsource}     {sun\stardocnumber}
-\newcommand{\stardocnumber}     {168.3}
-\newcommand{\stardocauthors}    {B.\ K.\ McIlwrath\\C.\ G.\ Page}
-\newcommand{\stardocversion}    {Version 2.0}
-\newcommand{\stardocdate}       {27 November 1998}
-\newcommand{\stardoctitle}      {EDT mode for JED\\[2ex]
+\stardoccategory     {Starlink User Note}
+\stardocinitials     {SUN}
+\stardocsource       {sun\stardocnumber}
+\stardocnumber       {168.3}
+\stardocauthors      {B.\ K.\ McIlwrath\\C.\ G.\ Page}
+\stardocversion      {Version 2.0}
+\stardocdate         {27 November 1998}
+\stardoctitle      {EDT mode for JED\\[2ex]
                                 An advanced Unix text editor}
-\newcommand{\stardocmanual}    {User's Guide}
-\newcommand{\stardocabstract}  {This note describes Starlink extended EDT
+\stardocmanual      {User's Guide}
+\stardocabstract  {This note describes Starlink extended EDT
 emulation for the JED editor. It provides a Unix text editor which can
 utilise the advanced facilities of DEC VTn00, xterm and similar terminals.
 JED in this mode provides a reasonably good emulation of the VAX/VMS editor
 EDT in addition to many extra facilities.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % from the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
+% ? Document-specific \providecommand or \newenvironment commands.
 % ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section{\xlabel{what_is_jed}What is JED?}
 \label{what_is_jed}
 
 JED is a small, fast and freely available text-editor for Unix systems
 written by \htmladdnormallink
-{John E. Davis}{http://space.mit.edu/\~{}davis/jed.html} of MIT (the author's
+{John E. Davis}{http://space.mit.edu/~davis/jed.html} of MIT (the author's
 copyright notice is reproduced in Section~{\ref{jed-cr}}). Core JED
 facilities include utilising the cursor positioning abilities of suitable
 terminals, highlighting of selected text ranges, multiple buffers, keypad
@@ -475,11 +235,9 @@ These files are called \texttt{solaris-keymap} and
 in the following example or copied to a local file and edited as
 required.
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 xmodmap /usr/local/jed/lib/solaris-keymap
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 This mapping may also prove useful in remote logins to VMS systems
 where considerable functionality is bound to the applications keys.
@@ -532,11 +290,9 @@ For example to load file \texttt{prog.f} into one window with the cursor at
 line number 123, and then load \texttt{prog.lis} into the second window
 positioned at the first occurrence of the string \textit{myfunc} you could
 use:
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 % jed prog.f -g 123 -2 prog.lis -s myfunc
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 \subsection{\xlabel{jed_initialisation_file}JED initialisation file}
 \label{jed_initialisation_file}
@@ -570,8 +326,7 @@ appending a $\sim$ to its name so that the original contents are
 preserved. In addition, while editing is in progress JED saves the
 contents of each buffer in a disc file after every 300 changes (which may
 be every 300 keystrokes if you are simply entering text). These auto-save
-files, which have names of the form {\tt
-\#}{\em filename}\texttt{\#}, are deleted when JED exits
+files, which have names of the form \texttt{\#}\emph{filename}\texttt{\#}, are deleted when JED exits
 normally, but may be useful in the event of a crash.
 
 If, on startup, JED finds a auto-save file which is newer than the file being
@@ -737,8 +492,7 @@ GOLD B - Using Multiple Buffers and Windows}
 
 JED can handle two or more windows at once, and display in them either
 different parts of the same file or two or more different files.  You
-can cut and paste from one window to another. The {\tt
-GOLD B} key prompts for a number of options.
+can cut and paste from one window to another. The \texttt{GOLD B} key prompts for a number of options.
 
 \begin{center}
 \begin{tabular}{|ll|}
@@ -931,12 +685,12 @@ it is located in directory \texttt{/usr/openwin/demo}.
 
 For example the default \texttt{Num Lock} key under Linux produces the
 following \texttt{xev} output.
-\begin{verbatim}
+\begin{terminalv}
 KeyPress event, serial 18, synthetic NO, window 0x2400001,
     root 0x2a, subw 0x0, time 1681183101, (77,108), root:(83,132),
     state 0x0, keycode 77 (keysym 0xff7f, Num_Lock), same_screen YES,
     XLookupString gives 0 characters:  ""
-\end{verbatim}
+\end{terminalv}
 
 This shows that the X-server assigned keycode of this key is 77 and that the
 current mapping for this key is to the keyboard event \textit{Num Lock}.
@@ -948,7 +702,7 @@ this row, KP\_0 to KP\_9 for the numeric keys, KP\_Separator for the
 KP\_Decimal for the \texttt{.} key and KP\_Add for the \texttt{+} key.
 
 Part of an \texttt{xmodmap} input file (from RedHat Linux 5.1) is:
-\begin{verbatim}
+\begin{terminalv}
 !
 ! 'Num Lock' row
 !
@@ -956,7 +710,7 @@ keycode 77  = KP_F1
 keycode 112 = KP_F2
 keycode 63  = KP_F3
 keycode 82  = KP_F4
-\end{verbatim}
+\end{terminalv}
 
 \end{itemize}
 
