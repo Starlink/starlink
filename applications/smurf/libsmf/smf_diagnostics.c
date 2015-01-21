@@ -15,7 +15,7 @@
 *  Invocation:
 *     smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 *		       int chunk, AstKeyMap *keymap, smfArray **allmodel,
-*                      smf_modeltype type, int *status )
+*                      smf_modeltype type, int flags, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -134,11 +134,17 @@
 *        requested models, the residuals are also written out immediately
 *        after each requested model is subtracted.
 *
+*        LASTONLY - If non-zero, then diagnostics are only created for
+*        the last iteration. If zero, then diagnostics are created for
+*        all iterations.
+*
 *     allmodel = smfArray ** (Returned)
 *        Array of smfArrays holding the model. Only element zero is used.
 *        Should be NULL if the AST model is being dumped.
 *     type = smf_modeltype (Given)
 *        Indicates which model is to be dumped.
+*     flags = int (Given)
+*        Control flags.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -196,7 +202,7 @@
 
 void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                       int chunk, AstKeyMap *keymap, smfArray **allmodel,
-                      smf_modeltype type, int *status ){
+                      smf_modeltype type, int flags, int *status ){
 
 /* Local Variables: */
    AstKeyMap *kmap;
@@ -221,6 +227,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    int irow;
    int isub;
    int ivals[ 2 ];
+   int lastonly;
    int map;
    int mask;
    int new;
@@ -255,9 +262,14 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    res = dat->res[0];
    nsub = res->ndat;
 
+/* See if diagnostics are to be created only for the final iteration. */
+   astMapGet0I( kmap, "LASTONLY", &lastonly );
+
 /* Get the name of the HDS container file in which to store the
-   diagnostics info. Skip to the end if none is specified. */
-   if( astMapGet0C( kmap, "OUT", &out ) ) {
+   diagnostics info. Skip to the end if none is specified, or if
+   diagnostics are not needed for this iteration. */
+   if( astMapGet0C( kmap, "OUT", &out ) &&
+       ( !lastonly || (flags & SMF__DIMM_LASTITER)    ) ) {
 
 /* See if we should append data for the current run of makemap to NDFs
    created by a previous run (e.g. when running the skyloop script). */

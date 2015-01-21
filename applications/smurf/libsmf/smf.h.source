@@ -967,7 +967,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 
 void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                       int chunk, AstKeyMap *keymap, smfArray **allmodel,
-                      smf_modeltype type, int *status );
+                      smf_modeltype type, int flags, int *status );
 
 double smf_difftime( struct timeval *tv1, struct timeval *tv2, int *status);
 

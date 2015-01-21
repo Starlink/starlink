@@ -693,6 +693,16 @@ diag.bolo = WMEAN
 diag.cube = 0
 
 #-----------------------------------------------------------------
+#  Name: 	diag.lastonly
+#  Type: 	int
+#  Default: 	0
+#  Purpose: 	Qualifies the required dignostic information.
+#  Description: If non-zero, diagnotics information is dumped only for
+#               the last iteration. Otherwise, information is dumped on
+#               all iterations.
+diag.lastonly = 0
+
+#-----------------------------------------------------------------
 #  Name: 	diag.map
 #  Type: 	int
 #  Default: 	0

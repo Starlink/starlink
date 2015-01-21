@@ -2268,7 +2268,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               /* Before subtraction of the model, dump the original
                  residuals. */
               smf_diagnostics( wf, 0, &dat, contchunk, keymap, model[j],
-                               modeltyps[j], status );
+                               modeltyps[j], dimmflags, status );
 
               /* Estimate the new model and subtract it from the residuals. */
               (*modelptr)( wf, &dat, 0, keymap, model[j], dimmflags, status );
@@ -2276,7 +2276,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               /* After subtraction of the model, dump the model itself
                  and the modified residuals. */
               smf_diagnostics( wf, 1, &dat, contchunk, keymap, model[j],
-                               modeltyps[j], status );
+                               modeltyps[j], dimmflags, status );
 
               /* Set a flag if we now have a NOI model. */
               if( modeltyps[j] == SMF__NOI ) noidone = 1;
@@ -2537,7 +2537,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           /* Before subtraction of the model, dump the original
              residuals. */
           smf_diagnostics( wf, 0, &dat, contchunk, keymap, NULL,
-                           SMF__AST, status );
+                           SMF__AST, dimmflags, status );
 
           /* Remember if no AST model was subtracted from the
              previous iteration. The dat.ast_skipped flag is updated
@@ -2575,12 +2575,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           /* After subtraction of the model, dump the model itself
              and the modified residuals. */
           smf_diagnostics( wf, 1, &dat, contchunk, keymap, NULL,
-                           SMF__AST, status );
+                           SMF__AST, dimmflags, status );
 
 
           /* And dump RES as a model in its own right. */
           smf_diagnostics( wf, 1, &dat, contchunk, keymap, NULL,
-                           SMF__RES, status );
+                           SMF__RES, dimmflags,  status );
 
 
 #ifdef __ITERATEMAP_SHOW_MEM
