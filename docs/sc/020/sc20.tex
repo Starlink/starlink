@@ -333,10 +333,9 @@ FITS headers and properties, such as dimensions, of the data
 respectively. The third option is the stand-alone application
 \HDSTRACE.
 \vspace{0.7cm}\\
-\begin{minipage}[t]{0.12\linewidth}
-\textbf{fitslist}
-\end{minipage}
-\begin{minipage}[t]{0.85\linewidth}This lists the FITS header information
+\begin{aligndesc}
+\item[\textbf{fitslist}]
+This lists the FITS header information
 for any NDF (raw or reduced). This extensive list includes dates \&
 times, source name, observation type, band width, number of channels,
 receptor information, exposure time, start and end elevation and
@@ -349,24 +348,16 @@ use the \fitsval\ command instead, e.g.
 \begin{terminalv}
 % fitsval file OBJECT
 \end{terminalv}
-\end{minipage}
-\vspace{0.7cm}\\
-\begin{minipage}[t]{0.12\linewidth}
-\textbf{ndftrace}
-\end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
+
+\item[\textbf{ndftrace}]
 \task{ndftrace} displays the attributes of the NDF data structure.
 This will tell you, for example, the units of the data, pixel bounds,
 dimensions, world coordinates, and axis assignations.
 \begin{terminalv}
 % ndftrace map fullframe fullwcs
 \end{terminalv}
-\end{minipage}
 
-\begin{minipage}[t]{0.12\linewidth}
-\textbf{hdstrace}
-\end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
+\item[\textbf{hdstrace}]
 \task{hdstrace} lists the name, data type and values of an HDS
 (Hierarchical Data System) object. The following example shows the
 structure of a time-series cube, including the pixel origin of the
@@ -382,7 +373,7 @@ viewing easier.
 \begin{terminalv}
 % hdstrace file.MORE.ACSIS.TSYS nlines=all | less
 \end{terminalv}
-\end{minipage}
+\end{aligndesc}
 \vspace{0.4cm}
 
 You can see it descends two levels (into \texttt{MORE} and
@@ -404,10 +395,9 @@ If you are presented with a data file you may wish to see what
 commands have been run on it and, in the case of a coadded cube, which
 data went into it. Two \Kappa\ commands can help you with this:
 \vspace{0.7cm}\\
-\begin{minipage}[t]{0.12\linewidth}
-\textbf{hislist}
-\end{minipage}
-\begin{minipage}[t]{0.85\linewidth}The \Kappa\ command \hislist\ will return the history records of the NDF.
+\begin{aligndesc}
+\item[\textbf{hislist}]
+The \Kappa\ command \hislist\ will return the history records of the NDF.
 \begin{terminalv}
 % hislist myfile brief
 \end{terminalv}
@@ -418,20 +408,15 @@ each case. This works for all NDFs including those reduced by the
 pipeline, for these all the commands executed as part of the pipeline
 reduction script will be listed. The version of software used for each
 step is also reported.
-\end{minipage}
-\vspace{0.7cm}\\
-\begin{minipage}[t]{0.12\linewidth}
-\textbf{provshow}
-\end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
+
+\item[\textbf{provshow}]
 The \Kappa\ command \task{provshow} displays the details of the NDFs
 that were used in the creation of the given file. It includes both
 immediate parents and older ancestor NDFs.
 \begin{terminalv}
 % provshow file
 \end{terminalv}
-\end{minipage}
-\vspace{0.7cm}\\
+\end{aligndesc}
 
 \section{\xlabel{ndfsections}How to examine, process or extract a subset of your data}
 \label{sec:ndfsections}
@@ -725,10 +710,8 @@ with HARP.}
 
 \subsection{On-source}
 
-\begin{minipage}[t]{0.14\linewidth}
-\textbf{Stare}
-\end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
+\begin{aligndesc}
+\item[\textbf{Stare}]
 A stare, or sample, observation is as simple as it sounds. When you
 open reduced cubes of stare observations in \gaia\ you will see a map
 consisting of one pixel for each receptor (just one in the case of
@@ -736,12 +719,8 @@ RxA). The left-hand panel of \cref{Figure}{fig:harpmodes}{} shows a stare
 observation opened in \gaia. You can also view the central spectrum
 using \linplot\ (see \cref{Appendix}{app:display}{Viewing your data
 with KAPPA}) or \splat.
-\end{minipage}
-\vspace{0.7cm}\\
-\begin{minipage}[t]{0.14\linewidth}
-\textbf{Jiggle}
-\end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
+
+\item[\textbf{Jiggle}]
 A jiggle map is a common HARP observing mode. They are designed to
 fill in the 30$\arcsec$ spacing between the HARP receptors resulting in a
 2$'\times$2$\arcm$ map. This is achieved by 'jiggling' the secondary
@@ -757,12 +736,8 @@ the target coordinates lie at the centre of the map between the four
 central pixels. See \cref{Figure}{fig:jiggle}{} for an illustration of the
 different jiggle patterns. Although designed for HARP this mode can be
 used with the single-element receivers.
-\end{minipage}
-\vspace{0.7cm}\\
-\begin{minipage}[t]{0.14\linewidth}
-\textbf{Raster}
-\end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
+
+\item[\textbf{Raster}]
 Raster mapping, or scan mapping, is designed for mapping large areas
 with maximum efficiency. The telescope continuously takes data while
 scanning across the source. When HARP is used for raster mapping the
@@ -773,40 +748,32 @@ common when using HARP to repeat the map scanning along the other axis
 to give a `basket-weave' pair of maps. Each one of the pair will
 appear as an individual observation.  The right-hand panel of Figure
 \ref{fig:harpmodes} shows a HARP raster map.
-\end{minipage}
+\end{aligndesc}
 
 \subsection{Reference}
-\begin{minipage}[t]{0.14\linewidth}
-\textbf{Position-switch}
-\end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
+
+\begin{aligndesc}
+\item[\textbf{Position-switch}]
+
 In position-switch (PSSW) mode, the whole telescope moves off source
 and on to the reference position. This allows a large offset to the
 reference position, useful in crowded environments such as the Galactic
 Plane. The main disadvantage is that it takes a longer time resulting
 in less-accurate sky subtraction or non-flat baselines.
-\end{minipage}
-\vspace{0.7cm}\\
-\begin{minipage}[t]{0.14\linewidth}
-\textbf{Beam-switch}
-\end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
+
+\item[\textbf{Beam-switch}]
 In beam-switch (BSW) mode, the secondary-mirror chops onto the reference
 position. This results in fast and accurate sky subtraction but it is
 limited to targets which have a blank reference position within
 180$\arcsec$ (the maximum chop distance of the SMU).
-\end{minipage}
-\vspace{0.7cm}\\
-\begin{minipage}[t]{0.14\linewidth}
-\textbf{Frequency-switch}
-\end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
+
+\item[\textbf{Frequency-switch}]
 In frequency-switch (FSW) mode the telescope does not move but the
 centre of the spectral band is shifted, typically by 8 or 16\,Mhz,
 to a line-free region of the spectrum. It is very efficient with no
 off-source time and can be
 useful when no emission-free reference position can be found.
-\end{minipage}
+\end{aligndesc}
 
 
 \begin{figure}[b!]
@@ -1158,10 +1125,8 @@ different variances as it allows them to be accurately weighted. There
 are three options for \param{GENVAR}:
 
 \begin{center}
-\begin{minipage}[t]{0.12\linewidth}
-\textbf{Spread}
-\end{minipage}
-\begin{minipage}[t]{0.8\linewidth}
+\begin{aligndesc}
+\item[\textbf{Spread}]
 The output variance values are based on the spread of input data
 values contributing to each output pixel. Note that this option is not
 available if parameter \param{SPARSE} is set \param{true}. If the
@@ -1169,25 +1134,17 @@ available if parameter \param{SPARSE} is set \param{true}. If the
 variance value will be produced for each output spectrum. However,
 when \param{BADMASK} is \param{and}, an independent variance value is
 calculated for each channel in each output spectrum.
-\end{minipage}
-\vspace{0.7cm}\\
-\begin{minipage}[t]{0.12\linewidth}
-\textbf{Tsys}
-\end{minipage}
-\begin{minipage}[t]{0.8\linewidth}
+
+\item[\textbf{Tsys}]
 The output variance values are based on the system noise temperature
 values supplied in the input NDFs. Since each input spectrum is
 characterised by a single Tsys value, each output spectrum will have a
 constant variance value (i.e. all channels in an output spectrum will
 have the same variance value). [Default].
-\end{minipage}
-\vspace{0.7cm}\\
-\begin{minipage}[t]{0.12\linewidth}
-\textbf{None}
-\end{minipage}
-\begin{minipage}[t]{0.8\linewidth}
+
+\item[\textbf{None}]
  No output variance values are created.\\
-\end{minipage}
+\end{aligndesc}
 \end{center}
 
 \subsection{Sparse grid}
@@ -1986,10 +1943,8 @@ The shape option allows \findclumps\ to create and STC-S description
 (polygonal or elliptical) for each clump found. These are added as
 extra columns to the output catalogue.
 \vspace{0.7cm}\\
-\begin{minipage}[t]{0.12\linewidth}
-\textbf{Polygon}
-\end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
+\begin{aligndesc}
+\item[\textbf{Polygon}]
 Each polygon will have, at most, 15 vertices. For two-dimensional data
 the polygon is a fit to the clump's outer boundary (the region
 containing all good data values). For three-dimensional data the
@@ -1998,19 +1953,15 @@ significant 10\% of spatial pixels, where ``significance'' is measured
 by the number of spectral channels that contribute to the spatial
 pixel. The polygon is then a fit to the outer boundary of the
 remaining spatial pixels.
-\end{minipage}
-\vspace{0.7cm}\\
-\begin{minipage}[t]{0.12\linewidth}
-\textbf{Ellipse}
-\end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
+
+\item[\textbf{Ellipse}]
 All data values in the clump are projected onto the spatial plane and
 ``size'' of the collapsed clump at four different position angles---all
 separated by 45$^\circ$---is found. The ellipse that generates
 the same sizes at the four position angles is then found and used as
 the clump shape.
-\end{minipage}
-\vspace{0.7cm}\\
+\end{aligndesc}
+
 You can plot the clump outlines over an image using \gaia. See Section
 \ref{sec:plotclumps} for instructions.
 
