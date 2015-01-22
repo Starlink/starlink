@@ -17,12 +17,6 @@ AC_CONFIG_SRCDIR([starlink.cls])
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS(per-package-dirs)
 
-dnl    List the sun/ssn/... numbers which document this package and
-dnl    which are present as .tex files in this directory.
-STAR_LATEX_DOCUMENTATION(sun270)
-
-
-
 AC_CONFIG_FILES([Makefile component.xml])
 
 dnl    This is the bit that does the actual work
