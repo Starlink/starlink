@@ -1,71 +1,40 @@
-\documentstyle[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt,nolof]{starlink}
+
 
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocnumber}    {169.3}
-\newcommand{\stardocauthors}   {G.R.Mellor}
-\newcommand{\stardocdate}      {13 August 1994}
-\newcommand{\stardoctitle}     {PINE --- Electronic mail interface}
-%------------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-%------------------------------------------------------------------------------
-% Add any \newcommand or \newenvironment commands here
-%------------------------------------------------------------------------------
-
-\begin{document}
-\thispagestyle{empty}
-DRAL / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-{\large Particle Physics \& Astronomy Research Council}\\
-{\large Starlink Project\\}
-{\large \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Large\bf \stardoctitle}
-\end{center}
-\vspace{5mm}
-
-%------------------------------------------------------------------------------
-%  Add this part if you want a table of contents
-%  \setlength{\parskip}{0mm}
-%  \tableofcontents
-%  \setlength{\parskip}{\medskipamount}
-%  \markright{\stardocname}
-%------------------------------------------------------------------------------
-
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocnumber      {169.3}
+\stardocsource       {sun\stardocnumber}
+\stardocauthors     {G.R.Mellor}
+\stardocdate        {13 August 1994}
+\stardoctitle       {PINE --- Electronic mail interface}
+\stardoccopyright{Copyright 1994 Particle Physics \& Astronomy
+  Research Council}
+\stardocabstract{
 The PINE mail interface is a user-friendly mail utility for Unix systems.
 It has been adopted by Starlink as the recommended mail utility because
 of its ease of use compared with the mail utilities supplied as standard with
-the Unix operating system. PINE is intended to be intuitive and ``{\it
-to be learned by exploration rather than reading manuals}''. Here however
+the Unix operating system. PINE is intended to be intuitive and ``\emph{to be learned by exploration rather than reading manuals}''. Here however
 are a few brief notes to get you started.
+}
+
+%------------------------------------------------------------------------------
+
+%------------------------------------------------------------------------------
+% Add any \providecommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\scfrontmatter
 
 \section{Using PINE}
 
 PINE is started by typing:
 
-\begin{verbatim}
-      % pine
-\end{verbatim}
+\begin{terminalv}
+% pine
+\end{terminalv}
 
 If you are invoking PINE for the first time, you will see some
 administrative messages and then the PINE main menu. PINE functions
@@ -73,73 +42,71 @@ can all be accessed using single letter commands - some of the main
 ones are shown on the main menu. Whilst using PINE, other relevant commands
 (and their functions) will be listed at the bottom of the screen.
 Note that often there are more commands than can be listed on one screen.
-Option {\tt O} will toggle to a list of ``other'' commands.
+Option \texttt{O} will toggle to a list of ``other'' commands.
 
 \subsection{Reading Mail}
 
 Mail sent to your user account arrives in a system directory. PINE
-see this directory as a ``mail folder'' called {\tt INBOX}. From the
-main menu, typing {\tt I} will list the mail contained in a folder.
-By default this will be {\tt INBOX}. A mail message from the list
-can be selected using arrow keys or entering its number. Then {\tt
-$<$RETURN$>$} will display the message. Various other navigational commands
+see this directory as a ``mail folder'' called \texttt{INBOX}. From the
+main menu, typing \texttt{I} will list the mail contained in a folder.
+By default this will be \texttt{INBOX}. A mail message from the list
+can be selected using arrow keys or entering its number. Then \texttt{$<$RETURN$>$} will display the message. Various other navigational commands
 appear at the bottom of the screen.
 
-To extract a mail message to a file, use the {\tt E} command. You will be
+To extract a mail message to a file, use the \texttt{E} command. You will be
 prompted for a filename to save the message text in. By default, this
 file will be created in your home directory. If you wish to save it
 elsewhere, include either a relative (to your home directory)
 or absolute directory specification with the filename.
 
-{\em e.g.}~~{\tt savemail/message.1} will save file {\tt message.1} to
-{\tt \$HOME/savemail/message.1}
+\emph{e.g.}~~\texttt{savemail/message.1} will save file \texttt{message.1} to
+\texttt{\$HOME/savemail/message.1}
 
-To print mail, use the {\tt Y} command. This will prompt for
+To print mail, use the \texttt{Y} command. This will prompt for
 a print command. A suitable default command can be configured as
 shown in Section\ref{sec-cust}.
 
 \subsection{Folders}
 
-Once your incoming mail is read, it should be deleted ({\tt D}) or
+Once your incoming mail is read, it should be deleted (\texttt{D}) or
 stored neatly in a folder. It is essential that mail you wish to save
 is moved to your personal folders to avoid filling up the main system
-mail area where your {\tt INBOX} is situated.  To save a message to a
-folder, type {\tt S} and PINE will prompt for a folder name. If it does
-not exist, PINE will create it (in your {\tt Mail} subdirectory).
-Option {\tt L} will give a list of your folders which can be navigated
-through using arrow keys and then acessed using option {\tt I}.
+mail area where your \texttt{INBOX} is situated.  To save a message to a
+folder, type \texttt{S} and PINE will prompt for a folder name. If it does
+not exist, PINE will create it (in your \texttt{Mail} subdirectory).
+Option \texttt{L} will give a list of your folders which can be navigated
+through using arrow keys and then acessed using option \texttt{I}.
 
 \subsection{Sending Mail}
 
-Typing {\tt C} will produce the compose screen. The first few lines are
-fields which are mostly self explanatory. The {\tt Attchmnt:} field is
-usually used for sending non-text files with your message ({\em e.g.}
+Typing \texttt{C} will produce the compose screen. The first few lines are
+fields which are mostly self explanatory. The \texttt{Attchmnt:} field is
+usually used for sending non-text files with your message (\emph{e.g.}
 GIF image files).
 
-If you wish to include a text file in your message, use the {\tt
-$<$CTRL$>$-R} option when composing the message. You will be prompted
+If you wish to include a text file in your message, use the \texttt{$<$CTRL$>$-R} option when composing the message. You will be prompted
 for a filename.  Note that by default, PINE assumes that the file is in
 your home directory. If this is not the case, include either a relative
 (to your home directory) or absolute directory specification with the
 filename.
 
-To write the mail message, a rudimentary editor called {\tt Pico} is
+To write the mail message, a rudimentary editor called \texttt{Pico} is
 invoked by default.  Its various functions are listed at the bottom of
 the screen.  PINE can be configured to allow the use of your own
 favourite editor (see section~\ref{sec-cust}). This cannot be invoked
 by default however.  When commencing composition, it is necessary to
-use command {\tt $<$CTRL$>$-$<$underscore$>$} to invoke your personal
+use command \texttt{$<$CTRL$>$-$<$underscore$>$} to invoke your personal
 editor.  Afterwards, exit your editor in the usual way.
 
 Once the message is finished (whichever editor was used for composition),
-type  {\tt $<$CTRL$>$-X} to send it.
+type  \texttt{$<$CTRL$>$-X} to send it.
 
 \subsection{Replying/Forwarding Mail}
 
 To reply to or forward a mail message, first select or read the
-appropriate message. Then to reply, use option {\tt R}.  This gives the
+appropriate message. Then to reply, use option \texttt{R}.  This gives the
 useful option of including the original mail message in your message
-allowing you to respond to specific points. Option {\tt F} will forward
+allowing you to respond to specific points. Option \texttt{F} will forward
 mail. Note the flexibility of the system - it is possible to modify the
 message, addressee, and/or subject before actually sending.
 
@@ -149,28 +116,28 @@ In order to save memorising all those long email addresses, it is
 possible to save them in your personal address book together with a
 nickname.  When composing a message in future, the nickname can be used
 and PINE will substitute the correct address. From the main menu,
-option {\tt A} will select the address book. Now option {\tt A} will
+option \texttt{A} will select the address book. Now option \texttt{A} will
 add an address to the book. You are prompted for the person's full
 name, mail address and nickname.
 
 The address book also allows the creation of distribution lists.
-Option {\tt S} creates a list and option {\tt Z} adds to an existing
+Option \texttt{S} creates a list and option \texttt{Z} adds to an existing
 list of users. To mail to this list, just type the list nickname in the
-{\tt To:} field and PINE will expand it.
+\texttt{To:} field and PINE will expand it.
 
 \subsection{Customising PINE}
 \label{sec-cust}
 
-When you invoke PINE for the first time, a file called {\tt .pinerc},
+When you invoke PINE for the first time, a file called \texttt{.pinerc},
 containing a set of commands to customise PINE, is created in the your
 home directory. The initial settings are the system defaults but it is
 possible to customise them for your own preferences.  Some of these
 settings should not be changed if PINE is to work correctly, however
 some of the configurable ones are listed below, together with
-explanations (as comment lines beginning with {\tt \#}).
+explanations (as comment lines beginning with \texttt{\#}).
 
 \begin{small}
-\begin{verbatim}
+\begin{terminalv}
 # default-fcc specifies a folder where a copy of outgoing mail is saved.
 # To suppress saving of outgoing mail, set: default-fcc=""
 default-fcc="saved-messages"
@@ -196,13 +163,13 @@ printer=lpr -Pstar_laser
 
 # Special print command if it isn't one of the standard printers
 personal-print-command=lpr -Pstar_laser
-\end{verbatim}
+\end{terminalv}
 \end{small}
 
 \section{Mail addresses}
 
 For information on how to determine and construct mail addresses
-see SUN/182 "Email Addressing".
+see \xref{SUN/182}{sun182}{} "Email Addressing".
 
 \section{Acknowledgements}
 
