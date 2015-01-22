@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@" support="S">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/latexsupport</path>
+  <description>Helper files for using LaTeX for starlink docs</description>
+  <abstract><p>LaTeX style files, classes and ancillary configuration files
+      for building starlink pdf (using pdflatex)
+      and html documentation (using tex4ht).</p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Sarah F Graves</name>
+      <uname>sfg</uname>
+      <email>s.graves@jach.hawaii.edu</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>2014</year>
+    <name>Science and Technology Facilities Council</name>
+  </copyright>
+  <notes><p>Provides the 'starlink' LaTeX class</p></notes>
+</component>

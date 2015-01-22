@@ -927,6 +927,31 @@ them.
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
+<component id="latexsupport" support="S">
+  <version>1.0</version>
+  <path>applications/latexsupport</path>
+  <description>Helper files for using LaTeX for starlink docs</description>
+  <abstract><p>Style files and classes for building pdf documentation
+  and html documentation (Using pdflatex and tex4ht respectively).</p></abstract>
+  <dependencies >
+  </dependencies>
+  <developers>
+    <person>
+      <name>Sarah F Graves</name>
+      <uname>sfg</uname>
+      <email>s.graves@jach.hawaii.edu</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <copyright>
+    <year>2014</year>
+    <name>Science and Technology Facilities Council</name>
+  </copyright>
+  <notes><p>Provides the 'starlink' LaTeX class</p></notes>
+</component>
+
 <component id="messgen" support="S">
   <version>1.2</version>
   <path>applications/messgen</path>

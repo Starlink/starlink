@@ -1691,6 +1691,10 @@ $(MANIFESTS)/latex2html:
 	cd thirdparty/latex2html/latex2html \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/latexsupport:
+	cd applications/latexsupport \
+	  && $(MAKE_CPT)
+
 # Component libtool is a buildsupport component
 $(MANIFESTS)/libtool:
 	cd thirdparty/fsf/autotools/libtool \
@@ -3256,6 +3260,7 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/jcmtdr \
 	$(MANIFESTS)/kaplibs \
 	$(MANIFESTS)/kappa \
+	$(MANIFESTS)/latexsupport \
 	$(MANIFESTS)/messgen \
 	$(MANIFESTS)/nbs \
 	$(MANIFESTS)/ndf \

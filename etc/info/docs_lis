@@ -269,6 +269,7 @@ SUN                            STARLINK USER NOTES                           SUN
 267.01  2012-03-23 TJ    ??   PAL - Positional Astronomy Library
 268.01  2013-11-14 DSB   ??   CVG - A Library of Format Conversion Utility Routines
 269.01  2014-08-14 TL    ??   ORAC-DR - Las Cumbres Observatory recipes
+270.01  2015-01-21 SFG   ??   Starlink Latex Suppport for pdf and html
 
 AUTHORS                          AUTHORS                                AUTHORS
                                      (Site code)
@@ -404,6 +405,7 @@ AUTHORS                          AUTHORS                                AUTHORS
        RWS   Rodney Warren-Smith     (RAL - left)
        SCR   Subhash Rehan           (KEN - left)
        SER   Stephen Rankin          (RAL)
+       SFG   Sarah Graves            (JACH)
        SMB   Steven Beard            (EDI)
        SR    Simon Riggs             (RAL - left)
        ST    Stephen Todd            (EDI)
