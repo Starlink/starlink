@@ -18,8 +18,8 @@ dnl    Include defaults for Starlink configurations
 AC_PROG_MAKE_SET
 STAR_DEFAULTS
 
-dnl    This package has one dependency, l2h in thirdparty.
-STAR_DECLARE_DEPENDENCIES([build], [latex2html])
+dnl    This package has two dependencies, latex2html and latexsupport.
+STAR_DECLARE_DEPENDENCIES([build], [latex2html latexsupport])
 
 dnl    And requires that Perl is already built, from which we use the
 dnl    starperl command.

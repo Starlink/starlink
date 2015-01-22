@@ -64,21 +64,15 @@ rebuild the native parts of JNIAST, JNIHDS or SPLAT.
       % export STARCONF_DEFAULT_PREFIX=/local-star
 
 -  Set up the environmental variables to allow the latex documentation
-   to build.
+   to build. For the pdf documentation to build correctly, the
+   $TEXINPUTS variable must be set to the location of the latexsupport
+   directory.
 
-   This requires the $STARLATEXSUPPORT to be set the location of the
-   applications/latexsupport directory, and the $TEXINPUTS variable to
-   also contain this location. (Note that these are the absolute paths
-   to this directory within the checked-out code, not the path to an
-   installed directory).
-
-
-      % setenv STARLATEXSUPPORT /my/code/checkout/applications/latexsupport
-      % setenv TEXINPUTS $STARLATEXSUPPORT//:
+   e.g.:
+      % setenv TEXINPUTS $STARLINK_DIR/share/latexsupport//:
 
    or
-      % export STARLATEXSUPPORT=/my/code/checkout/applications/latexsupport
-      % export TEXINPUTS=$STARLATEXSUPPORT//:
+      % export TEXINPUTS=$STARLINK_DIR/share/latexsupport//:
 
 -  Delete any previous Starlink environment variables.
 
