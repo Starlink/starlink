@@ -1,18 +1,9 @@
 \documentclass[twoside,11pt,nolof]{starlink}
 
-% ? Specify used packages
-% ? End of specify used packages
-
-
-
 % -----------------------------------------------------------------------------
-% ? Document identification
-% Fixed part
 \stardoccategory    {Starlink User Note}
 \stardocinitials    {SUN}
 \stardocsource      {sun\stardocnumber}
-
-% Variable part - replace [xxx] as appropriate.
 \stardocnumber      {209.11}
 \stardocauthors   {P.M.\ Allan\\
                                 A.J.\ Chipperfield\\
@@ -20,8 +11,7 @@
                                 P.W.\ Draper\\
                                 D.S.\ Berry}
 \stardocdate        {12 May 2011}
-\stardoctitle     {CNF and F77 \\ [1ex]
-                                Mixed Language Programming -- FORTRAN and C}
+\stardoctitle     {CNF and F77\linebreak Mixed Language Programming -- FORTRAN and C}
 \stardocversion     {Version 4.3}
 \stardocmanual      {Programmer's Manual}
 \stardocabstract  {
@@ -31,33 +21,9 @@ F77 is a set of C macros for handling the FORTRAN/C subroutine linkage in a
 portable way, and CNF is a set of functions to handle the difference between
 FORTRAN and C character strings, logical values and pointers to
 dynamically allocated memory.}
-% ? End of document identification
 % -----------------------------------------------------------------------------
 
-% Definition to give a banner that only has the name of the routine on the
-% left, not on the left and right.
-
 \newcounter{examples}
-
-\providecommand{\sstmacro}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large \textbf{#1}}}
-   %\setlength{\sstcaptionlength}{\textwidth}
-   %\setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-1.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-4.45pt}
-   \settowidth{\sstexampleswidth}{\textbf{Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large \textbf{#1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \begin{description}
-      #3
-   \end{description}
-}
 
 % Define a table for use in examples
 \providecommand{\sstexamplestable}[1]{\begin{tabular}{ll}
@@ -66,8 +32,10 @@ dynamically allocated memory.}
                              }
 \providecommand{\sstexamplestableentry}[2]{#1 & {\texttt{#2}}}
 
-\providecommand{\relabel}[1]{}
-
+% command to do xlabel and label in the sstmacronolabel commands
+% (These are the commands that put formatting in the title
+% of the macro, so it can't be automatically used as a label)
+\newcommand{\relabel}[1]{\xlabel{#1}\label{#1}}
 
 
 % Define layout of brief listing sections.
@@ -83,14 +51,9 @@ dynamically allocated memory.}
                              \hspace*{\fill} \nopagebreak
                              \subitem \emph{#2} \hspace*{\fill}
                             }
-% End of extra sst definitions.
-%.
 
-
-% ? End of document specific commands
 % -----------------------------------------------------------------------------
-%  Title Page.
-%  ===========
+
 \begin{document}
 \scfrontmatter
 
@@ -3992,7 +3955,7 @@ being necessary on future systems.
 Unless otherwise stated, \textit{type} is one of CHARACTER, INTEGER, REAL,
 DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 
-\sstmacro{
+\sstmacronolabel{
    DECLARE\_\textit{type}
 }{
    \relabel{DECLARE_type}Declare a FORTRAN variable
@@ -4032,7 +3995,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstmacronolabel{
    DECLARE\_\textit{type}\_ARRAY
 }{
    \relabel{DECLARE_type_ARRAY}Declare a FORTRAN array
@@ -4080,7 +4043,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
           }
       }
 
-      \item where \texttt{F77\_\textit{type}\_TYPE} expands to the appropriate
+      where \texttt{F77\_\textit{type}\_TYPE} expands to the appropriate
             C type.
    }
    \sstdiytopic{Associated macro:}{
@@ -4088,7 +4051,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstmacronolabel{
    DECLARE\_\textit{type}\_ARRAY\_DYN
 }{
    \relabel{DECLARE_type_ARRAY_DYN}Declare a dynamic \textit{type} array
@@ -4147,7 +4110,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstmacronolabel{
    F77\_ASSOC\_\textit{type}\_ARRAY
 }{
    \relabel{F77_ASSOC_type_ARRAY}Associate a FORTRAN array with a C array.
@@ -4196,7 +4159,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstmacronolabel{
    F77\_CREATE\_\textit{type}\_ARRAY
 }{
    \relabel{F77_CREATE_type_ARRAY}Create an array of \textit{type}.
@@ -4271,7 +4234,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstmacronolabel{
    F77\_EXPORT\_\textit{type}
 }{
    \relabel{F77_EXPORT_type}Export a C variable to a FORTRAN variable.
@@ -4334,7 +4297,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstmacronolabel{
    F77\_EXPORT\_\textit{type}\_ARRAY
 }{
    \relabel{F77_EXPORT_type_ARRAY}Export an array of \textit{type} from C
@@ -4403,7 +4366,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstmacronolabel{
    F77\_FREE\_\textit{type}
 }{
    \relabel{F77_FREE_type}Free a dynamic variable of \textit{type}
@@ -4438,7 +4401,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstmacronolabel{
    F77\_IMPORT\_\textit{type}
 }{
    \relabel{F77_IMPORT_type}Import a FORTRAN variable to a C variable.
@@ -4501,7 +4464,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstmacronolabel{
    F77\_IMPORT\_\textit{type}\_ARRAY
 }{
    \relabel{F77_IMPORT_type_ARRAY}Import an array of \textit{type} from FORTRAN
@@ -4570,7 +4533,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstmacronolabel{
    F77\_\textit{type}\_FUNCTION
 }{
    \relabel{F77_type_FUNCTION}Declare a FORTRAN function
@@ -4609,7 +4572,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstmacronolabel{
    GENPTR\_\textit{type}
 }{
    \relabel{GENPTR_type}Generate a pointer to an argument
@@ -4649,7 +4612,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstmacronolabel{
    GENPTR\_\textit{type}\_ARRAY
 }{
    \relabel{GENPTR_type_ARRAY}Generate a pointer to an array argument
@@ -4688,10 +4651,10 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
-   \relabel{GENPTR_type_FUNCTION}GENPTR\_\textit{type}\_FUNCTION
+\sstmacronolabel{
+   GENPTR\_\textit{type}\_FUNCTION
 }{
-   Generate a pointer to a FUNCTION argument
+   \relabel{GENPTR_type_FUNCTION}Generate a pointer to a FUNCTION argument
 }{
    \sstdescription{
       Ensure that there exists a pointer of the appropriate type to the
@@ -4730,7 +4693,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstmacronolabel{
    \textit{type}
 }{
    \relabel{type}Declare a \textit{type} argument
@@ -4772,7 +4735,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstmacronolabel{
    \textit{type}\_ARG
 }{
    \relabel{type_ARG}Pass a \textit{type} argument to a FORTRAN routine
@@ -4808,7 +4771,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstmacronolabel{
    \textit{type}\_ARRAY
 }{
    \relabel{type_ARRAY}Declare a array argument
@@ -4849,7 +4812,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
         \htmlref{\texttt{CHARACTER\_ARRAY}}{CHARACTER_ARRAY}
    }
 }
-\sstmacro{
+\sstmacronolabel{
    \textit{type}\_ARRAY\_ARG
 }{
    \relabel{type_ARRAY_ARG}Pass an array argument to a FORTRAN routine
@@ -4891,7 +4854,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstmacronolabel{
    \textit{type}\_FUNCTION
 }{
    \relabel{type_FUNCTION}Declare a FUNCTION argument
@@ -4928,7 +4891,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
 }
-\sstmacro{
+\sstmacronolabel{
    \textit{type}\_FUNCTION\_ARG
 }{
    \relabel{type_FUNCTION_ARG}Pass a FUNCTION argument to a FORTRAN routine
