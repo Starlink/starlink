@@ -173,3 +173,38 @@
 \newcommand{\sstimplementation}[1]{\sstdiytopic{Implementation}{#1}}
 
 %\renewcommand{\backslash}{\textbackslash}
+
+
+%% regular SST MACRO is exactly the same as SST routine.
+%% (used in sun209)
+\newcommand{\sstmacro}[3]{\sstroutine{#1}{#2}{#3}}
+
+%% SST macronolabel should be same as regular sstroutine, but not
+%% define a label (see sun209 -- this is because sun209 uses \textit
+%% in some of its macro titles, so thesse cannot be automatically
+%% changed to a label. The label must be manually created when
+%% using these.
+\newcommand{\sstmacronolabel}[3]{
+  \clearpage
+  % Create the section.
+  \ssttitle{#1}{#2}
+
+  % Set the first parameter as the label; need to remove spaces first.
+  %\label{\RemoveSpaces{#1}}
+
+  %..  change the mark on the left hand side to include the name of the chapter.
+  \markright{\textit{\RemoveSpaces{#1}}}
+  \iftwoside
+  \fancyhead[RE,LO]{\thepage\hspace{1cm}\rightmark}
+  \else
+  \lhead{\thepage\hspace{1cm}\rightmark}
+  \fi
+
+  %..  Nest all the material within a description
+  \begin{description}[style=nextline]
+    #3
+  \end{description}
+
+  % End the page
+  \newpage
+}
