@@ -540,7 +540,7 @@ receivers. The required integration time is directly proportional to
 the total noise in the system given by $T_{sys}$) via the radiometer
 formula
 
-\[T_A^*(rms) = \frac{2\,T_{sys}\,\kappa}{\sqrt{\Delta\nu\,t}}\]
+\[T_{\textnormal{A}}^*(rms) = \frac{2\,T_{sys}\,\kappa}{\sqrt{\Delta\nu\,t}}\]
 
 where the terms are as follows:
 \begin{itemize}
@@ -555,20 +555,22 @@ source and the reference position).
 observations where half the time is spend off source at the reference
 position. It may be omitted for frequency switched observations.
 
-\item $T_{sys}$ is the system temperature in kelvins and describes the
-total noise of the system. It includes contributions from the
-background sky temperature, the Earth's atmosphere, ground spillover
-picked up by the side lobes and the noise from the receiver itself
-(known as $T_{rec}$).  $T_{rec}$ can be determined by measuring the
-effects on $T_{sys}$ when looking at hot and cold loads, where the
-cold load is black-body source.
+\item $T_{\textnormal{sys}}$ is the system temperature in kelvins and
+describes the total noise of the system. It includes contributions
+from the background sky temperature, the Earth's atmosphere, ground
+spillover picked up by the side lobes and the noise from the receiver
+itself (known as $T_{\textnormal{rec}}$).  $T_{\textnormal{rec}}$ can
+be determined by measuring the effects on $T_{\textnormal{sys}}$ when
+looking at hot and cold loads, where the cold load is black-body
+source.
 
-\item $T^*_{A}(rms)$ is the rms value of the noise observed in the
-spectrum in kelvins. \end{itemize}
+\item $T^*_{\textnormal{A}}(rms)$ is the rms value of the noise observed
+in the spectrum in kelvins.
+\end{itemize}
 
 
 \begin{tip}
-Both $T_{sys}$ and $T_{rec}$ are stored in the raw data files.
+Both $T_{\textnormal;{sys}}$ and $T_\textnormal{rec})$ are stored in the raw data files.
 This information is stored in the .MORE.ACSIS.TSYS and .MORE.ACSIS.TRX
 extensions respectively, and can be viewed using \HDSTRACE\ (see
 \cref{Section}{sec:fitslist}{How can I view the metadata?}).
@@ -3751,12 +3753,12 @@ Quality assurance parameters are supplied via the command line option
 \hline
 BADPIX\_MAP    & Maximum number of bad pixels allowed in the final map. \\
 GOODRECEP      & Minimum number of working receptors \\
-TSYSBAD        & Upper limit of T$_{sys}$ for raw time-series data.\\
+TSYSBAD        & Upper limit of T$_{\textnormal{sys}}$ for raw time-series data.\\
 FLAGTSYSBAD    & Flag any receptor with $>$FLAGTSYSBAD of datapoints with
-                 T$_{sys}>$ TSYSBAD \\
-TSYSMAX        & Median T$_{sys}>$ per receptor after flagging by FLAGTSYSBAD
+                 T$_{\textnormal{sys}}>$ TSYSBAD \\
+TSYSMAX        & Median T$_{\textnormal{sys}}>$ per receptor after flagging by FLAGTSYSBAD
                  must be $<$TSYSMAX \\
-TSYSVAR        & Maximum allowable receptor-to-receptor  T$_{sys}$ variation \\
+TSYSVAR        & Maximum allowable receptor-to-receptor T$_{\textnormal{sys}}$ variation \\
 RMSVAR\_RCP    & Maximum allowable receptor-to-receptor RMS variation \\
 RMSVAR\_SPEC   & The average rms noise shall not vary by more than RMSVAR\_SPEC
                  from one end of a spectrum to the other. \\
