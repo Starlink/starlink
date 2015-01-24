@@ -136,6 +136,9 @@ rm -f .sst.tmp
    rm -f f_attribs.tex f_classes.tex f_routines.tex f_commands.tex
    rm -f memory_routines.tex
 
-   pdflatex sun210; pdflatex sun210
-   pdflatex sun211; pdflatex sun211
+
+   TEXINPUTS=@STARLINK@/share/latexsupport//:${TEXINPUTS} pdflatex -interaction=nonstopmode sun210
+   TEXINPUTS=@STARLINK@/share/latexsupport//:${TEXINPUTS} pdflatex -interaction=nonstopmode sun210
+   TEXINPUTS=@STARLINK@/share/latexsupport//:${TEXINPUTS} pdflatex -interaction=nonstopmode sun211
+   TEXINPUTS=@STARLINK@/share/latexsupport//:${TEXINPUTS} pdflatex -interaction=nonstopmode sun211
 

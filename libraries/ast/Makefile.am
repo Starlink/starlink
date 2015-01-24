@@ -744,7 +744,9 @@ install-exec-hook: libast.la
 @PREDIST@    -e 's,@PACKAGE_VERSION_MAJOR\@,$(PACKAGE_VERSION_MAJOR),' \
 @PREDIST@    -e 's,@PACKAGE_VERSION_MINOR\@,$(PACKAGE_VERSION_MINOR),' \
 @PREDIST@    -e 's,@PACKAGE_VERSION_RELEASE\@,$(PACKAGE_VERSION_RELEASE),' \
-@PREDIST@    -e 's,@PERL\@,$(PERL),'
+@PREDIST@    -e 's,@PERL\@,$(PERL),' \
+@PREDIST@    -e 's,@STARLINK\@,$(STARLINK),'
+
 @PREDIST@version.h: version.h.in configure.ac
 @PREDIST@	rm -f $@; $(predist_subs) version.h.in >$@
 @PREDIST@builddocs: builddocs.in configure.ac
