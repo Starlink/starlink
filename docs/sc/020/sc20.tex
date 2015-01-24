@@ -188,7 +188,7 @@ a UNIX shell.
 \hline
 \gaia\ & \gaia\ is an interactive image and data-cube display and
          analysis tool. It incorporates tools such as source detection,
-         three -dimensional visualisation, clump visualisation, photometry,
+         three-dimensional visualisation, clump visualisation, photometry,
          and the ability to query and overlay on-line or local catalogues.
        & \texttt{\%\,gaia} & \gaiasun\ \gaiasc\ \\
 
@@ -935,7 +935,7 @@ spectra (see Figures \ref{fig:maskreceptor} and
 \label{fig:maskreceptor}
 \caption[Identifying bad receptors in the raw data.]{
   The left-hand \gaia\ window shows the raw data before masking.
-  Clicking on a pixel will show the spectra. The spectra shown is from
+  Clicking on a pixel will show the spectra. The spectrum shown is from
   receptor H01 at Step 18 (see circled $Y$ value). To mask this receptor
   in time from Step 18 to 33---at which point the bad baselines
   disappear---use \chpix. The right-hand \gaia\ window shows the raw
@@ -2302,8 +2302,8 @@ below).
 \item Draw the shape on your map by clicking and dragging the mouse.
 The \gaiathing{Spectral plot} window will automatically update to show
 your combined spectrum. You can re-position and resize your shape at
-any time. You can see from \cref{Figure}{fig:gaia_avgspec2} that the
-averaged spectra gives a much clearer profile of the source.
+any time. You can see from \cref{Figure}{fig:gaia_avgspec2}{} that the
+averaged spectrum gives a much clearer profile of the source.
 
 
 \begin{figure}[ht!]
@@ -2356,7 +2356,7 @@ to show your collapse image.
 \end{center}
 \end{figure}
 
-\section{3D visualisation with GAIA}
+\section{Three-dimensional visualisation with GAIA}
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 \item Select \gaiathing{View$>$3D Visualisation$>$Iso
@@ -3399,7 +3399,7 @@ details.
 \section{Plotting spectra}
 
 \begin{itemize}
-\item Plot the spectra from cube.sdf at the position
+\item Plot the spectrum from \file{cube.sdf} at the position
 $l$=60.\udeg87, $b$=0.\udeg18. Use existing \file{style.dat} except
 override the text label size which is too big for these axes labels.
 \begin{terminalv}
@@ -3443,7 +3443,7 @@ data range. In additional \param{extended}, the available options are
 \end{center}
 \end{figure}
 
-\item To plot a second spectra over this one, re-call \display\ but
+\item To plot a second spectrum over this one, re-call \display\ but
 with the \param{noclear} option to keep the original plot underneath.
 The formatting defaults to the last time \linplot\ was run, but with
 the one-off temporary change of setting the colour of the line to red.
