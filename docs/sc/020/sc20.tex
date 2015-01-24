@@ -851,22 +851,35 @@ Selecting Axis number two will display spectra against time while Axis
 number three gives spectra against receptors. You can scroll through
 your data by moving the \gaiathing{Index of plane} slider.
 
-\myfig{sc20_gaia1}{[h!]}{width=0.9\linewidth}{fig:rawgaia}{\gaia\ main window.}{
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{sc20_gaia1}
+\typeout{sc20_gaia1 inserted on page \arabic{page}}
+\label{fig:rawgaia}
+\caption[\gaia\ main window.]{
   Initial \textsc{Gaia} windows displayed upon loading a raw
   data file. The main window on the left shows a map of receptors at
   given time-samples during the observation. You may have to zoom in
   multiple times by clicking the large \gaiathing{Z} button on the side
   panel. On the right, the \gaiathing{Display image sections of a cube}
   window enables you to navigate the time axis.}
+\end{center}
+\end{figure}
 
-
-\myfig{sc20_gaia2}{[h!]}{width=0.7\linewidth}{fig:gaia2}{Spectral plot window with \gaia.}{
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{sc20_gaia2}
+\typeout{sc20_gaia2 inserted on page \arabic{page}}
+\label{fig:gaia2}
+\caption[Spectral plot window with \gaia.]{
   The \gaiathing{Spectral plot} window displaying its time-varying
   signal, appears automatically once a pixel is clicked in the main window.
   The vertical red line indicates the time slice that is currently selected
   in the \gaiathing{Display image sections of a cube} window. This can be
   dragged across the spectrum to scroll through the spectra. Examine exposure
   time map etc. in ancillary arrays.}
+\end{center}
+\end{figure}
 
 A second way to scroll through your spectrum is to click and drag the
 vertical red bar on the \gaiathing{Spectral plot} window. As you do so
@@ -913,20 +926,34 @@ the cube control panel to step through each receptor looking for bad
 spectra (see Figures \ref{fig:maskreceptor} and
 \ref{fig:maskreceptor2}).
 
-\myfig{sc20_maskreceptor}{[h!]}{width=1\linewidth}{fig:maskreceptor}{Identifying bad receptors in the raw data.}{
-  The left hand \gaia\ window shows the raw data before masking.
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=1\linewidth]{sc20_maskreceptor}
+\typeout{sc20_maskreceptor inserted on page \arabic{page}}
+\label{fig:maskreceptor}
+\caption[Identifying bad receptors in the raw data.]{
+  The left-hand \gaia\ window shows the raw data before masking.
   Clicking on a pixel will show the spectra. The spectra shown is from
   receptor H01 at Step 18 (see circled $Y$ value). To mask this receptor
   in time from Step 18 to 33---at which point the bad baselines
-  disappear---use \chpix. The right hand \gaia\ window shows the raw
+  disappear---use \chpix. The right-hand \gaia\ window shows the raw
   data after masking where the time range in question is now blank.}
+\end{center}
+\end{figure}
 
-\myfig{sc20_badreceptor2}{[h!]}{width=0.9\linewidth}{fig:maskreceptor2}{Identifying bad receptors in the raw data: second method.}{
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{sc20_badreceptor2}
+\typeout{sc20_badreceptor2 inserted on page \arabic{page}}
+\label{fig:maskreceptor2}
+\caption[Identifying bad receptors in the raw data: second method.]{
   In this example, the second axis (receptor number) has been
   selected. Use the arrows outlined in red on the \gaiathing{Index of
   plane} bar to scroll through the receptors. Here you can see
   Receptor 13 (see circled \gaiathing{Index of plane} value) which
   goes noisy two-thirds the way through the observation.}
+\end{center}
+\end{figure}
 
 \clearpage
 \chapter{\xlabel{reduce}Regridding your Data}
@@ -979,11 +1006,18 @@ velocity) is reported in the output section.
 You can visualise your map by opening it with \gaia---see
 Figure~\ref{fig:gaiareduced}.
 
-\myfig{sc20_makecubeout}{[t!]}{width=0.65\linewidth}{fig:gaiareduced}{A regridded cube produced with \makecube.}{
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=0.65\linewidth]{sc20_makecubeout}
+\typeout{sc20_makecubeout inserted on page \arabic{page}}
+\label{fig:gaiareduced}
+\caption[A regridded cube produced with \makecube.]{
   The regridded cube displayed with \gaia. The 5$\times$5 jiggle
   pattern is evident in the map as is the missing receptor in the
   top-left corner. The smaller window shows the spectrum for the pixel
   selected by the blue cross on the map.}
+\end{center}
+\end{figure}
 
 \subsection{Reducing multiple observations}
 
@@ -1189,13 +1223,19 @@ file called \file{cat.FIT} is created. When viewing your map with \gaia\ this
 catalogue can be overlaid to identify the receptors contributing to
 each pixel (see Figure \ref{fig:makecube-outcat}).
 
-\myfig{sc20_makecube-outcat}{[h!]}{width=1\linewidth}{fig:makecube-outcat}{Displaying receptor positions in \gaia.}{
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=1\linewidth]{sc20_makecube-outcat}
+\typeout{sc20_makecube-outcat inserted on page \arabic{page}}
+\label{fig:makecube-outcat}
+\caption[Displaying receptor positions in \gaia.]{
   The receptor positions overlaid on a regridded cube of a HARP stare
   observation. This is viewed in \gaia\ by selecting
   \gaiathing{Data-Servers} $>$ \gaiathing{Local Catalogs} and selecting
-  your \param{OUTCAT} filename (here
-  \file{cat.FITS}). Notice that dead receptors are excluded from the
-  list.}
+  your \param{OUTCAT} filename (here \file{cat.FITS}). Notice that dead
+  receptors are excluded from the list.}
+\end{center}
+\end{figure}
 
 \subsection{Tile dimensions}
 
@@ -1650,11 +1690,11 @@ region using \gaia.}
 \includegraphics[height=7cm]{sc20_ard5}
 \hspace{0.3cm}
 \includegraphics[height=7cm]{sc20_ard6}
-\caption[Cropping a region of a two-dimensional map.]{(Left) After
-applying the ARD mask, the cropped region is still surrounded by blank pixels. (Right)
-The blank pixels have been trimmed using \ndfcopy\ with the
-\param{trimbad} option.}
 \label{fig:crop}
+\caption[Cropping a region of a two-dimensional map.]{(Left) After
+  applying the ARD mask, the cropped region is still surrounded by blank pixels.
+  (Right) The blank pixels have been trimmed using \ndfcopy\ with the
+  \param{trimbad} option.}
 \end{center}
 \end{figure}
 
@@ -1686,11 +1726,20 @@ of 1 is appropriate.
 \cref{Figure}{fig:fillholes}{The figure below} shows an initial map
 with holes and the final filled map.
 
-\myfigduo{sc20_holeyharp}{sc20_polyfillaharp}{[ht!]}{
-  width=0.48\linewidth}{fig:fillholes}{0.5mm}{Filling holes in your
-  HARP map with \fillbad.}{Filling holes in your HARP map with
-  \fillbad. Compare the original map (left) to the filled map (right).
-  A blue pixel indicates an undefined spectrum.}
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=0.48\linewidth]{sc20_holeyharp}
+\typeout{sc20_holeyharp inserted on page \arabic{page}}
+\hspace{0.5mm}
+\includegraphics[width=0.48\linewidth]{sc20_polyfillaharp}
+\typeout{sc20_polyfillaharp inserted on page \arabic{page}}
+\label{fig:fillholes}
+\caption[Filling holes in your HARP map with \fillbad.]{
+  Filling holes in your HARP map with \fillbad. Compare the original map
+  (left) with the filled map (right).  A blue pixel indicates an
+  undefined spectrum.}
+\end{center}
+\end{figure}
 
 
 \section{\xlabel{noise}Checking the noise}
@@ -1731,9 +1780,16 @@ An alternative to setting the number of bins via the \param{numbin}
 parameter is to set the width of each bin using the \param{width}
 parameter.
 
-\myfig{sc20_noihisto1}{[h!]}{width=0.6\linewidth}{fig:noihisto}{
-   A histogram of the error component.}{
-   The error component plotted with \histogram.}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.6\linewidth]{sc20_noihisto1}
+\typeout{sc20_noihisto1 inserted on page \arabic{page}}
+\label{fig:noihisto}
+\caption[
+  A histogram of the error component.]{
+  The error component plotted with \histogram.}
+\end{center}
+\end{figure}
 
 It is also useful to view the noise map itself.
 \cref{Figure}{fig:noisemap}{The figure below} shows how to select the
@@ -1752,9 +1808,15 @@ TIP: You can write out the error component into a new file using
 \end{tip}
 
 
-\myfig{sc20_noimap}{[h!]}{width=0.6\linewidth}{fig:noisemap}{
-   The noise map of a mosaic of tiles.}{
-   The noise map of a mosaic of tiles taken in differing weather conditions.}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.6\linewidth]{sc20_noimap}
+\typeout{sc20_noimap inserted on page \arabic{page}}
+\label{fig:noisemap}
+\caption[The noise map of a mosaic of tiles.]{The noise map of a mosaic
+  of tiles taken in differing weather conditions.}
+\end{center}
+\end{figure}
 
 
 \clearpage
@@ -1926,8 +1988,14 @@ Channel maps can also be created using \gaia. See
 \cref{Section}{sec:gaiachannel}{Channel maps} for instructions.
 
 
-\myfig{sc20_chanmap}{[h!]}{width=0.8\linewidth}{fig:chanmap}{
-   Displaying a channel map with \gaia.}{Displaying a channel map with \gaia.}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.8\linewidth]{sc20_chanmap}
+\typeout{sc20_chanmap inserted on page \arabic{page}}
+\label{fig:chanmap}
+\caption[Displaying a channel map with \gaia.]{Displaying a channel map with \gaia.}
+\end{center}
+\end{figure}
 
 \section{\xlabel{clumpfinding}Clump finding}
 \label{sec:clumpfind}
@@ -1975,12 +2043,17 @@ You can plot the clump outlines over an image using \gaia. See Section
 \ref{sec:plotclumps} for instructions.
 
 \vspace{0.7cm}
-\myfig{sc20_clumps}{[h!]}{width=0.7\linewidth}{fig:clumps2}{
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{sc20_clumps}
+\typeout{sc20_clumps inserted on page \arabic{page}}
+\label{fig:clumps2}
+\caption[A velocity slice of the result of three-dimensional clump finding viewed with \gaia.]{
   A velocity slice of the result of three-dimensional clump finding viewed
-  with \gaia.}{A velocity slice of the result of three-dimensional clump
-  finding viewed with \gaia. This output NDF contains boundaries of the
-  clumps with the value reflecting the number of pixels contained within that
-  clump.}
+  with \gaia. This output NDF contains boundaries of the clumps with the
+  valuereflecting the number of pixels contained within that clump.}
+\end{center}
+\end{figure}
 
 
 \clearpage
@@ -2005,8 +2078,14 @@ edges of these limit lines in the \gaiathing{Spectral plot} window.
 \item Click \gaiathing{Run}.
 \end{enumerate}
 
-\myfig{sc20_gaia_baseline}{[h!]}{width=0.9\linewidth}{fig:gaiabaseline}{
-  Removing a baseline with \gaia.}{Removing a baseline with \gaia.}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{sc20_gaia_baseline}
+\typeout{sc20_gaia_baseline inserted on page \arabic{page}}
+\label{fig:gaiabaseline}
+\caption[Removing a baseline with \gaia.]{Removing a baseline with \gaia.}
+\end{center}
+\end{figure}
 
 \section{Creating channel maps with GAIA}
 \label{sec:gaiachannel}
@@ -2028,8 +2107,14 @@ window.
 
 \item Select the collapse method (Max is chosen in the example).
 
-\myfig{sc20_gaia_channel1}{[h!]}{width=0.93\linewidth}{fig:gaia_chan1}{
-  Creating a channel map with \gaia.}{Creating a channel map with \gaia.}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.93\linewidth]{sc20_gaia_channel1}
+\typeout{sc20_gaia_channel1 inserted on page \arabic{page}}
+\label{fig:gaia_chan1}
+\caption[Creating a channel map with \gaia.]{Creating a channel map with \gaia.}
+\end{center}
+\end{figure}
 
 \item Use the slider bars to select the total number of channels you
 want to generate and the number of \texttt{x}-axis channels. The
@@ -2038,8 +2123,14 @@ display grid.
 
 \item Click \gaiathing{Run}. The result is shown in the figure below.
 
-\myfig{sc20_gaia_channel2}{[t!]}{width=0.6\linewidth}{fig:gaia_chan2}{
-  Channel map created with \gaia.}{Channel map created with \gaia.}
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=0.6\linewidth]{sc20_gaia_channel2}
+\typeout{sc20_gaia_channel2 inserted on page \arabic{page}}
+\label{fig:gaia_chan2}
+\caption[Channel map created with \gaia.]{Channel map created with \gaia.}
+\end{center}
+\end{figure}
 \end{enumerate}
 
 
@@ -2057,8 +2148,14 @@ the left-hand side of the \gaiathing{Contouring} window. The example
 below defines linearly spaced contours starting at 900K. Clicking the
 \gaiathing{Generate} button will return you to the Levels tab.
 
-\myfig{sc20_contouring1}{[h!]}{width=0.4\linewidth}{fig:gaia_contour1}{
-  Setting contours with \gaia.}{Setting contours with \gaia.}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.4\linewidth]{sc20_contouring1}
+\typeout{sc20_contouring1 inserted on page \arabic{page}}
+\label{fig:gaia_contour1}
+\caption[Setting contours with \gaia.]{Setting contours with \gaia.}
+\end{center}
+\end{figure}
 
 You can also input or edit the contour levels manually in the \gaiathing{Levels} tab.
 
@@ -2066,16 +2163,28 @@ You can also input or edit the contour levels manually in the \gaiathing{Levels}
 \gaiathing{Options} menu. You can experiment with the other tabs
 (Region and Key) for options concerning contour area and legend.
 
-\myfig{sc20_contouring2}{[h!]}{width=0.4\linewidth}{fig:gaia_contour2}{
-  Formatting contours with \gaia.}{Formatting contours with \gaia.}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.4\linewidth]{sc20_contouring2}
+\typeout{sc20_contouring2 inserted on page \arabic{page}}
+\label{fig:gaia_contour2}
+\caption[Formatting contours with \gaia.]{Formatting contours with \gaia.}
+\end{center}
+\end{figure}
 
 \item Click the \gaiathing{Draw Contours} button to make the contours
 appear over your map in the main window. If you are contouring over a
 cube you can scroll through the velocity axis whilst the contours
 remain fixed on top.
 
-\myfig{sc20_contouring6}{[h!]}{width=0.6\linewidth}{fig:gaia_contour3}{
-  Contoured map in \gaia.}{Contoured map in \gaia.}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.6\linewidth]{sc20_contouring6}
+\typeout{sc20_contouring6 inserted on page \arabic{page}}
+\label{fig:gaia_contour3}
+\caption[Contoured map in \gaia.]{Contoured map in \gaia.}
+\end{center}
+\end{figure}
 
 \item To add a second set of contours select \gaiathing{File$>$New
 window} in the top menu of the \gaiathing{Contouring} window. Here you
@@ -2107,12 +2216,24 @@ that for two-dimensional catalogues an alternative route is to select
 \gaiathing{Data-Servers$>$Local catalogs}. In this case you can skip
 Step 3.
 
-\myfig{sc20_plotclumps2b}{[h!]}{width=0.5\linewidth}{fig:gaia_clumps1}{
-  Importing a \cupid\ catalogue with \gaia.}{Importing a \cupid\
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.5\linewidth]{sc20_plotclumps2b}
+\typeout{sc20_plotclumps2b inserted on page \arabic{page}}
+\label{fig:gaia_clumps1}
+\caption[Importing a \cupid\ catalogue with \gaia.]{Importing a \cupid\
   catalogue with \gaia.}
+\end{center}
+\end{figure}
 
-\myfig{sc20_plotclumps3}{[h!]}{width=0.5\linewidth}{fig:gaia_clumps2}{
-  Catalogue window in \gaia.}{Catalogue window in \gaia.}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.5\linewidth]{sc20_plotclumps3}
+\typeout{sc20_plotclumps3 inserted on page \arabic{page}}
+\label{fig:gaia_clumps2}
+\caption[Catalogue window in \gaia.]{Catalogue window in \gaia.}
+\end{center}
+\end{figure}
 
 \item In the \gaiathing{Import CUPID catalogue} window, select a file
 with the \gaiathing{Choose file}... button. For polygon shapes tick
@@ -2123,8 +2244,14 @@ Peak1/Peak2 which give the position of the peak within them.
 \item A catalogue window for your FITS file will appear listing all
 the sources and their positions and extents.
 
-\myfig{sc20_plotclumps5}{[h!]}{width=0.5\linewidth}{fig:gaia_clumps3}{
-  Catalogue window in \gaia.}{Catalogue window in \gaia.}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.5\linewidth]{sc20_plotclumps5}
+\typeout{sc20_plotclumps5 inserted on page \arabic{page}}
+\label{fig:gaia_clumps3}
+\caption[Catalogue window in \gaia.]{Catalogue window in \gaia.}
+\end{center}
+\end{figure}
 
 \item Outlines of your clumps, or symbols at the peak positions, will
 be automatically overlaid on your map. If this does not happen, click
@@ -2132,9 +2259,15 @@ the \gaiathing{Plot} button on the catalogue window. When you click on
 a clump from the catalogue list the outline of that clump will appear
 in bold on your map.
 
-\myfig{sc20_plotclumps6}{[h!]}{width=0.6\linewidth}{fig:gaia_clumps4}{
-    Clumps outlined overlaid on integrated map in \gaia.}{
-    Clumps outlined overlaid on integrated map in \gaia.}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.6\linewidth]{sc20_plotclumps6}
+\typeout{sc20_plotclumps6 inserted on page \arabic{page}}
+\label{fig:gaia_clumps4}
+\caption[Clumps outlined overlaid on integrated map in \gaia.]{Clumps
+  outlined overlaid on integrated map in \gaia.}
+\end{center}
+\end{figure}
 
 \item If you are displaying a three-dimensional catalogue over a cube,
 it will only display clumps which include data from the current slice.
@@ -2154,9 +2287,15 @@ below).
 
 \item Select the combination method (Mean is chosen in the example below).
 
-\myfig{sc20_gaia_avgspec1}{[h!]}{width=0.8\linewidth}{fig:gaia_avgspec}{
-  Displaying an average spectrum with \gaia.}{Displaying an average spectrum
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.8\linewidth]{sc20_gaia_avgspec1}
+\typeout{sc20_gaia_avgspec1 inserted on page \arabic{page}}
+\end{center}
+\label{fig:gaia_avgspec}
+\caption[Displaying an average spectrum with \gaia.]{Displaying an average spectrum
   with \gaia.}
+\end{figure}
 
 \item Draw the shape on your map by clicking and dragging the mouse.
 The \gaiathing{Spectral plot} window will automatically update to show
@@ -2164,12 +2303,20 @@ your combined spectrum. You can re-position and resize your shape at
 any time. You can see from \cref{Figure}{fig:gaia_avgspec2} that the
 averaged spectra gives a much clearer profile of the source.
 
-\myfigduo{sc20_gaia_avgspec2}{sc20_gaia_avgspec3}{[h!]}{width=0.48\linewidth}
-   {fig:gaia_avgspec2}{0.5mm}{
-   Example of averaged spectra.}{(Left) Average of the spectra within
-   the blue circle in the figure above. (Right) Single spectrum from the
-   centre of the blue circle above.}
 
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=0.48\linewidth]{sc20_gaia_avgspec2}
+\typeout{sc20_gaia_avgspec2 inserted on page \arabic{page}}
+\hspace{0.5mm}
+\includegraphics[width=0.48\linewidth]{sc20_gaia_avgspec3}
+\typeout{sc20_gaia_avgspec3 inserted on page \arabic{page}}
+\label{fig::gaia_avgspec2}
+\caption[Example of averaged spectra.]{(Left) Average of the spectra within
+  the blue circle in the figure above. (Right) Single spectrum from the
+  centre of the blue circle above.}
+\end{center}
+\end{figure}
 
 \end{enumerate}
 
@@ -2197,8 +2344,15 @@ method} drop-down list (Integ is selected in the example below).
 \item Click \gaiathing{Run}. The main window will automatically update
 to show your collapse image.
 \end{enumerate}
-\myfig{sc20_gaia_collapse}{[h!]}{width=0.9\linewidth}{fig:gaia_collapse}{
-  Collapsing your cube using \gaia.}{Collapsing your cube using \gaia.}
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{sc20_gaia_collapse}
+\typeout{sc20_gaia_collapse inserted on page \arabic{page}}
+\label{fig:gaia_collapse}
+\caption[Collapsing your cube using \gaia.]{Collapsing your cube using \gaia.}
+\end{center}
+\end{figure}
 
 \section{3D visualisation with GAIA}
 
@@ -2207,16 +2361,28 @@ to show your collapse image.
 surfaces.../Volume rendering} in the \gaiathing{Display image sections
 of a cube} window.
 
-\myfig{sc20_gaia_3dmenu}{[h!]}{width=0.45\linewidth}{fig:gaia_3d}{
-  Selecting the Volume rendering menu in \gaia.}{
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.45\linewidth]{sc20_gaia_3dmenu}
+\typeout{sc20_gaia_3dmenu inserted on page \arabic{page}}
+\label{fig:gaia_3d}
+\caption[Selecting the Volume rendering menu in \gaia.]{
   Selecting the \gaiathing{Volume rendering} menu in \gaia.}
+\end{center}
+\end{figure}
 
 \item Click and drag the image display to change the orientation in
 the \gaiathing{Volume render} window.
 
-\myfig{sc20_gaia-3dvolume2}{[h!]}{width=0.6\linewidth}{fig:gaia_3d2}{
-  Three-dimensional visualisation in \gaia.}{Three-dimensional
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.6\linewidth]{sc20_gaia-3dvolume2}
+\typeout{sc20_gaia-3dvolume2 inserted on page \arabic{page}}
+\label{fig:gaia_3d2}
+\caption[Three-dimensional visualisation in \gaia.]{Three-dimensional
   visualisation in \gaia.}
+\end{center}
+\end{figure}
 
 \item Include axes labelling, the image plane and other features using
 the check boxes on the side bar.
@@ -3139,19 +3305,31 @@ include all the data.
 \end{terminalv}
 Depending on your default settings you may get a map like the one below.
 
-\myfig{sc20_display1}{[h!]}{width=0.475\linewidth}{fig:display1}{
-  First attempt at displaying an integrated map with \Kappa:\display.}{
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.475\linewidth]{sc20_display1}
+\typeout{sc20_display1 inserted on page \arabic{page}}
+\label{fig:display1}
+\caption[First attempt at displaying an integrated map with \Kappa:\display.]{
   First attempt at displaying an integrated map with \Kappa:\display.}
+\end{center}
+\end{figure}
 
 \item Re-draw calling a style file and changing the scaling.
 \begin{terminalv}
 % display integ.sdf axes style=^style.dat mode=scale low=0 high=100
 \end{terminalv}
 
-\myfig{sc20_display2}{[h!]}{width=0.475\linewidth}{fig:display2}{
-  Displaying an integrated map with \Kappa:\display\ using a style file.}{
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.475\linewidth]{sc20_display2}
+\typeout{sc20_display2 inserted on page \arabic{page}}
+\label{fig:display2}
+\caption[Displaying an integrated map with \Kappa:\display\ using a style file.]{
   Displaying an integrated map with \Kappa:\display\ using a style file
   to format the plotting attributes.}
+\end{center}
+\end{figure}
 
 Below is a copy of the style file (\file{style.dat}) used to make
 \cref{Figure}{fig:display2}{the figure above}.
@@ -3178,9 +3356,15 @@ textlabgap(2)=0.01
 % display integ.sdf axes style=^style.dat mode=scale low=0 high=100
 \end{terminalv}
 
-\myfig{sc20_display9}{[h!]}{width=0.47\linewidth}{fig:display9}{
-  Reversing the colour scale in \Kappa:\display.}{
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.47\linewidth]{sc20_display9}
+\typeout{sc20_display9 inserted on page \arabic{page}}
+\label{fig:display9}
+\caption[Reversing the colour scale in \Kappa:\display.]{
   Reversing the colour scale in \Kappa:\display.}
+\end{center}
+\end{figure}
 
 \item There are a number of colour palettes available in Starlink. You
 can find them in the \file{\$STARLINK\_DIR//bin/kappa/} directory.
@@ -3198,9 +3382,17 @@ details.
 % display integ.sdf axes style=^style.dat mode=scale low=0 high=100 \
   lut=$STARLINK_DIR/bin/kappa/random3_lut
 \end{terminalv}
-\myfig{sc20_display10}{[h!]}{width=0.5\linewidth}{fig:display10}{
-  Displaying an integrated map in colour with \Kappa:\display.}{
+
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.5\linewidth]{sc20_display10}
+\typeout{sc20_display10 inserted on page \arabic{page}}
+\label{fig:display10}
+\caption[Displaying an integrated map in colour with \Kappa:\display.]{
   Displaying an integrated map in colour with \Kappa:\display.}
+\end{center}
+\end{figure}
 
 \end{itemize}
 
@@ -3214,9 +3406,15 @@ override the text label size which is too big for these axes labels.
 % linplot "cube(60.87,0.18,)" style="'^style.dat,size(textlab)=1'"
 \end{terminalv}
 
-\myfig{sc20_display3}{[h!]}{width=0.55\linewidth}{fig:display3}{
-  Displaying a spectrum with \Kappa:\display.}{
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.55\linewidth]{sc20_display3}
+\typeout{sc20_display3 inserted on page \arabic{page}}
+\label{fig:display3}
+\caption[Displaying a spectrum with \Kappa:\display.]{
   Displaying a spectrum with \Kappa:\display.}
+\end{center}
+\end{figure}
 
 \item Re-plot, but this time only show the velocity range 10 to 35
 km/s. You can do it this way:
@@ -3231,13 +3429,19 @@ or using \param{xleft} and \param{xright}.
 \end{terminalv}
 In the example above, the additional option \param{lmode} is included.
 This sets how the upper and lower limits for the y-axis are defined.
-This example expands the minimum and maxiumum values by 15\% of the
+This example expands the minimum and maximum values by 15\% of the
 data range. In additional \param{extended}, the available options are
 \param{range}, \param{percentile} and \param{sigma}.
 
-\myfig{sc20_display4}{[h!]}{width=0.55\linewidth}{fig:display4}{
-  Displaying a zoomed-in spectrum with \Kappa:\display.}{
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.55\linewidth]{sc20_display4}
+\typeout{sc20_display4 inserted on page \arabic{page}}
+\label{fig:display4}
+\caption[Displaying a zoomed-in spectrum with \Kappa:\display.]{
   Displaying a zoomed-in spectrum with \Kappa:\display.}
+\end{center}
+\end{figure}
 
 \item To plot a second spectra over this one, re-call \display\ but
 with the \param{noclear} option to keep the original plot underneath.
@@ -3251,9 +3455,16 @@ The plus sign means the change will not be remembered next time
 \end{terminalv}
 \end{itemize}
 
-\myfig{sc20_display5}{[h!]}{width=0.55\linewidth}{fig:display5}{
-  Displaying two super-imposed spectra with \Kappa:\display.}{
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.55\linewidth]{sc20_display5}
+\typeout{sc20_display5 inserted on page \arabic{page}}
+\label{fig:display5}
+\caption[Displaying two super-imposed spectra with \Kappa:\display.]{
   Displaying two super-imposed spectra with \Kappa:\display.}
+\end{center}
+\end{figure}
+
 
 \section{Plotting a grid of spectra}
 \begin{itemize}
@@ -3274,9 +3485,16 @@ attributes.  The flag \param{reflabel} annotates the interior spectral
 axes.
 
 \end{itemize}
-\myfig{sc20_clinplot}{[h!]}{width=0.9\linewidth}{fig:display6}{Displaying
-a grid of spectra with \clinplot.}{Displaying a grid of spectra with
-\clinplot.}
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{sc20_clinplot}
+\typeout{sc20_clinplot inserted on page \arabic{page}}
+\label{fig:display6}
+\caption[Displaying a grid of spectra with \clinplot.]{Displaying a grid of
+  spectra with \clinplot.}
+\end{center}
+\end{figure}
 
 
 \section{Plotting two images side by side}
@@ -3295,9 +3513,15 @@ a grid of spectra with \clinplot.}{Displaying a grid of spectra with
 % display integ axes style=^style.dat mode=scale low=0 high=100
 \end{terminalv}
 
-%\myfig{sc20_display6}{[h!]}{width=0.6\linewidth}{fig:display6}{
-%  Displaying two super-imposed spectra with \Kappa:\display.}{
+%\begin{figure}[h!]
+%\begin{center}
+%\includegraphics[width=0.6\linewidth]{sc20_display6}
+%\typeout{sc20_display6 inserted on page \arabic{page}}
+%\label{fig:display6}
+%\caption[Displaying two super-imposed spectra with \Kappa:\display.]{
 %  Displaying two super-imposed spectra with \Kappa:\display.}
+%\end{center}
+%\end{figure}
 
 \item Select the second frame.
 \begin{terminalv}
@@ -3307,20 +3531,34 @@ a grid of spectra with \clinplot.}{Displaying a grid of spectra with
 \begin{terminalv}
 % display subinteg axes style=^style.dat mode=scale low=0 high=100
 \end{terminalv}
-\myfig{sc20_display7}{[h!]}{width=0.8\linewidth}{fig:display7}{Displaying
-two super-imposed spectra with \Kappa:\display.}{Displaying two
-super-imposed spectra with \Kappa:\display.}
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.8\linewidth]{sc20_display7}
+\typeout{sc20_display7 inserted on page \arabic{page}}
+\label{fig:display7}
+\caption[Displaying two super-imposed spectra with \Kappa:\display.]{Displaying two
+   super-imposed spectra with \Kappa:\display.}
+\end{center}
+\end{figure}
 
 \item Still in the second frame, plot contours over the map from a smoothed version of subinteg.sdf.
 \begin{terminalv}
 % contour smoothsub.sdf noaxes noclear nokey ncont=5 mode=free \
   heights="[40,80,120,160,200]" pens='"width=3.0,colour=red"'
 \end{terminalv}
-\myfig{sc20_display8}{[h!]}{width=0.8\linewidth}{fig:display8}{
-  Displaying two super-imposed spectra with \Kappa:\display.}{
-  Displaying two super-imposed spectra with \Kappa:\display.}
-\end{itemize}
 
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.8\linewidth]{sc20_display8}
+\typeout{sc20_display8 inserted on page \arabic{page}}
+\label{fig:display8}
+\caption[Displaying two super-imposed spectra with \Kappa:\display.]{
+  Displaying two super-imposed spectra with \Kappa:\display.}
+\end{center}
+\end{figure}
+
+\end{itemize}
 
 \section{Selecting a different graphics device}
 
