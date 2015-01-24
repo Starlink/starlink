@@ -1,11 +1,6 @@
 \documentclass[twoside,11pt]{starlink}
 
-% ? Specify used packages
-% ? End of specify used packages
-
 % -----------------------------------------------------------------------------
-% ? Document identification
-% Fixed part
 \stardoccategory    {Starlink System Note}
 \stardocinitials    {SSN}
 \stardocsource      {sun\stardocnumber}
@@ -13,15 +8,12 @@
 {Copyright \copyright\ 2001 Council for the Central Laboratory of the Research
  Councils \newline\
 Copyright \copyright\ 2008 Science and Technology Facilities Council}
-
-% Variable part - replace [xxx] as appropriate.
 \stardocnumber      {4.14}
 \stardocauthors   {P.C.T. Rees \\
-                                A.J. Chipperfield \\
-                                P.W. Draper}
-\stardocdate        {31 Jul 2008}
-\stardoctitle       {EMS \\ [\latex{1ex}]
-                                Error Message Service}
+                   A.J. Chipperfield \\
+                   P.W. Draper}
+\stardocdate       {31 Jul 2008}
+\stardoctitle      {EMS \linebreak Error Message Service}
 \stardocversion     {Version 2.2-0}
 \stardocmanual      {Programmer's Manual}
 \stardocabstract  {This document describes the Error Message
@@ -42,14 +34,13 @@ This document is intended for Starlink systems programmers and can safely be
 ignored by applications programmers and users.}
 
 % -----------------------------------------------------------------------------
-% -----------------------------------------------------------------------------
+
 % ? Document specific \providecommand or \newenvironment commands.
 \providecommand{\listline}{\hspace{1pt}\\}
 \setlength{\unitlength}{1mm}
-% ? End of document specific commands
+
 % -----------------------------------------------------------------------------
-%  Title Page.
-%  ===========
+
 \begin{document}
 \scfrontmatter
 
@@ -857,10 +848,10 @@ interface.
 
 The correct operation of \texttt{EMS\_FACER} (and \texttt{emsFacer}) also
 requires the necessary facility message files to be installed (see
-\htmlref{`Operating system specific routines'\latex{ below}}
-{operating_system_specific_routines}).
+\htmlref{`Operating system specific routines' below}{operating_system_specific_routines}).
 
-\subsection{\xlabel{operating_system_specific_routines}Operating system
+\subsection{\xlabel{operating_system_specific_routines}
+\label{operating_system_specific_routines}Operating system
 specific routines}
 \label{deps}
 EMS is coded in ANSI C, according to the Starlink C coding conventions
