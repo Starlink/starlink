@@ -1,5 +1,4 @@
-\documentclass[twoside,11pt]{article}
-\pagestyle{myheadings}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
@@ -27,17 +26,17 @@
 
 
 %-----------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {174.1}
-\newcommand{\stardocauthors}   {A C Davenhall \\
-{\it Department of Physics and Astronomy, University of Leicester} }
-\newcommand{\stardocdate}      {29 November 1993}
-\newcommand{\stardoctitle}     {An Astronomer's Guide to\\[1ex]
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {174.1}
+\stardocauthors   {A C Davenhall \\
+\textit{Department of Physics and Astronomy, University of Leicester} }
+\stardocdate        {29 November 1993}
+\stardoctitle     {An Astronomer's Guide to\\[1ex]
 On-line Bibliographic Databases and\\[1ex]
 Information Services}
-\newcommand{\stardocabstract}  {
+\stardocabstract  {
 This document is a guide to on-line bibliographic databases and other
 information services which might be useful to astronomers. It
 concentrates on facilities which are either provided within the
@@ -55,222 +54,13 @@ data archives available on-line.
 % ? End of document identification
 
 % -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % from the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
+% ? Document-specific \providecommand or \newenvironment commands.
 % ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\newpage
-~
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section{Introduction\xlabel{introduction}}
 
@@ -308,7 +98,7 @@ There is some overlap between the two documents because some of the
 systems described in
 \xref{SUN/162}{sun162}{} include bibliographic information.
 
-The recent compilation {\it Intelligent Information Retrieval: The
+The recent compilation \textit{Intelligent Information Retrieval: The
 Case of Astronomy and Related Space Sciences}\, edited by A. Heck and
 F. Murtagh (see Section~\ref{FURTHER}) covers very similar topics to
 this document. However it is more concerned with the rationale behind
@@ -324,7 +114,7 @@ communications protocol). A wide variety of facilities are available
 through INTERNET, and some powerful and sophisticated software tools
 are becoming available to access them. An excellent and thoroughly
 recommended introduction to the INTERNET, and the facilities and
-services available in it, is {\it The Whole Internet User's Guide and
+services available in it, is \textit{The Whole Internet User's Guide and
 Catalog}\, by Ed Krol (see Section~\ref{FURTHER}). In particular, this
 book gives further details of many of the INTERNET tools described
 Part~\ref{INTERNET_TOOLS}.
@@ -342,23 +132,22 @@ acd@star.le.ac.uk (JANET and INTERNET).
 \pagebreak
 \part{Bibliographic Databases}
 
-\section{Overview\xlabel{overview}}
+\section{Overview\xlabel{overview_bib}}
 
 Traditionally locating articles, papers or books on some specific
 astronomical topic has involved searching through the annual volumes
-of {\it Astronomy and Astrophysics Abstracts}\, published by the
+of \textit{Astronomy and Astrophysics Abstracts}\, published by the
 Astronomisches Rechen-Institut of Heidelberg, or for older material, its
-predecessor the {\it Astronomischer Jahresbericht}. Bibliographic
+predecessor the \textit{Astronomischer Jahresbericht}. Bibliographic
 databases containing similar sorts of information have existed as
 commercial products for well over a decade. Typically such databases
 contain information covering a wide range of subjects, rather than
 being specifically astronomical. The INSPEC database described
 briefly below is typical of such large, commercial bibliographic
 databases. The use of these systems in astronomy has been reviewed
-by J.M. Rey-Watson (1988, in {\it Astronomy from Large Databases}\, eds.
+by J.M. Rey-Watson (1988, in \textit{Astronomy from Large Databases}\, eds.
 F. Murtagh and A. Heck, Garching: ESO conference and workshop
-proceedings no. 28, pp453-458) and J.M. Watson (1991, in {\it
-Databases and On-Line Data in Astronomy}, eds. D. Egret and M.
+proceedings no. 28, pp453-458) and J.M. Watson (1991, in \textit{Databases and On-Line Data in Astronomy}, eds. D. Egret and M.
 Albrecht, Dordrecht: Kluwer, pp199-210).
 
 The INSPEC database produced by the United Kingdom Institution of
@@ -385,9 +174,9 @@ cannot be guaranteed (though in practice coverage is complete for
 eminent journals in the core subjects of the database).
 
 In October 1993 INSPEC contained about 4,500,000 entries, with new
-entries being added at a rate of about 250,000 entries {\it per annum}.
+entries being added at a rate of about 250,000 entries \textit{per annum}.
 These entries are selected from articles in about 4300 journals and
-nearly 2000 conference proceedings {\it per annum}. All the eminent
+nearly 2000 conference proceedings \textit{per annum}. All the eminent
 astronomical journals are covered.
 
 INSPEC may be accessed in a number of ways. It can be supplied on
@@ -428,9 +217,8 @@ data, without abstracts, for individual objects and NED contains
 bibliographic data, with abstracts, for individual extra-galactic
 objects. A charge is made for the use of SIMBAD.
 
-None of these systems are direct replacements for {\it Astronomy and
-Astrophysics Abstracts}. Rather, they complement the paper {\it
-Abstracts}\, by permitting large and complex searches which were not
+None of these systems are direct replacements for \textit{Astronomy and
+Astrophysics Abstracts}. Rather, they complement the paper \textit{Abstracts}\, by permitting large and complex searches which were not
 practical hitherto.
 
 
@@ -490,7 +278,7 @@ citation indices are supplied and owned by the Institute for Scientific
 Information Inc.~(ISI) in the United States. They contain details of
 articles drawn from over 7000 journals and the Index to Scientific and
 Technical Proceedings (ISTP) which contains details of the papers
-presented at over 400 conferences {\it per annum}. For each article,
+presented at over 400 conferences \textit{per annum}. For each article,
 bibliographic details, but not abstracts, are available. Keywords for
 each article have been included since 1990. The period covered is from
 1981 to the present. The database is updated once per week. Articles
@@ -498,7 +286,7 @@ on astronomical topics are usually within the scope of the SCI, though
 the A\&HCI contains some articles about the history of astronomy.
 Table~\ref{BIDS_JNLS} shows the astronomical journals which are covered
 by the BIDS ISI SCI. It excludes any physics or general journals which
-carry astronomical papers except {\it Nature}.
+carry astronomical papers except \textit{Nature}.
 
 \begin{table}[htbp]
 
@@ -599,7 +387,7 @@ Centre, Boston Spa. It is a new database and the period covered is only
 since October 1992. It is however, very up to date, with the details of
 new journals being input within a few days of their receipt. It is
 anticipated that details for about one million articles will be added
-{\it per annum}. For each article full bibliographic details, but not
+\textit{per annum}. For each article full bibliographic details, but not
 abstracts, are included. Most eminent astronomical journals are
 covered.
 
@@ -638,18 +426,18 @@ present. Complete coverage of any of the sources is not guaranteed.
 \begin{center}
 \begin{tabular}{lc}
 Subject                               & NASA classification  \\ \hline
-{\bf Astronomy}                       & {\bf 89}  \\
+\textbf{Astronomy}                       & \textbf{89}  \\
 Solar Astronomy                       & 89-01     \\
 Stellar Astronomy and Cosmology       & 89-02     \\
 Meteors and Meteorites                & 89-03     \\
-{\bf Astrophysics}                    & {\bf 90}  \\
+\textbf{Astrophysics}                    & \textbf{90}  \\
 Gravitation                           & 90-01     \\
 Astrophysical Plasmas                 & 90-02     \\
-{\bf Lunar and Planetary Exploration} & {\bf 91}  \\
+\textbf{Lunar and Planetary Exploration} & \textbf{91}  \\
 The Moon                              & 91-01     \\
 Planetary Sciences and Exploration    & 91-02     \\
-{\bf Solar Physics}                   & {\bf 92}  \\
-{\bf Space Radiation}                 & {\bf 93}  \\
+\textbf{Solar Physics}                   & \textbf{92}  \\
+\textbf{Space Radiation}                 & \textbf{93}  \\
 Cosmic Radiation                      & 93-01     \\
 Solar Radiation and Activity          & 93-02     \\
 Radiation Belts                       & 93-03     \\
@@ -676,13 +464,13 @@ beware, however, that the current speed of data communication lines in
 Europe makes ESIS un-usable at most institutions. The imminent release
 of a client-server version of ESIS may improve this situation.
 
-{\it Reference:}
+\textit{Reference:}
 
 The ADS abstract service is described by M.J. Kurtz, T. Karakashian,
 C.S. Grant, G. Eichhorn, S.S. Murray, J.M. Watson, P.G. Ossorio and
-J.L. Stoner, 1993, in {\it Astronomical Data Analysis Software and
+J.L. Stoner, 1993, in \textit{Astronomical Data Analysis Software and
 Systems II}, eds. R.J. Hanisch, R.J.V. Brissenden and J. Barnes,
-Astronomical Society of the Pacific Conference Series, {\bf 52},
+Astronomical Society of the Pacific Conference Series, \textbf{52},
 pp132-136.
 
 
@@ -729,33 +517,30 @@ Journal of Geophysical Research \\
 \end{table}
 
 The STELAR database can be queried with WAIS (see Section~\ref{WAIS}),
-though first you should obtain a copy of the source file {\tt
-abstracts.src}. A copy of this file can be obtained from the European
+though first you should obtain a copy of the source file \texttt{abstracts.src}. A copy of this file can be obtained from the European
 Space Telescope Coordinating Facility (again see Section~\ref{WAIS},
 especially Table~\ref{WAIS_SOURCE}).
 
 Further information on the STELAR project can be obtained by sending
 an e-mail message to: stelar-info@hypatia.gsfc.nasa.gov (INTERNET).
 
-{\it References:}
+\textit{References:}
 
-M.E. Van Steenberg, 1992, in {\it DeskTop Publishing in Astronomy and
+M.E. Van Steenberg, 1992, in \textit{DeskTop Publishing in Astronomy and
 Space Sciences}, ed. A. Heck (World Scientific, Singapore), pp149-154.
 
 A. Warnock, J.E. Gass, L.E. Brotzman, M.E. Van Steenberg, D. Kovalsky
-and F. Giovane, October 1992, {\it Amer. Astron. Soc. Newsletter} {\bf
-62}, insert p10.
+and F. Giovane, October 1992, \textit{Amer. Astron. Soc. Newsletter} \textbf{62}, insert p10.
 
 M.E. Van Steenberg, J.E. Gass, L.E. Brotzman, A. Warnock, D. Kovalsky
-and F. Giovane, October 1992, {\it Amer. Astron. Soc. Newsletter} {\bf
-62}, insert p11.
+and F. Giovane, October 1992, \textit{Amer. Astron. Soc. Newsletter} \textbf{62}, insert p11.
 
-M.E. Van Steenberg, Fall 1992, {\it NSSDC News}, {\bf 8}, number 3, p14.
+M.E. Van Steenberg, Fall 1992, \textit{NSSDC News}, \textbf{8}, number 3, p14.
 
 A. Warnock, M.E. Van Steenberg, L.E. Brotzman, J.E. Gass, D. Kovalsky
-and F. Giovane, 1993, in {\it Astronomical Data Analysis Software and
+and F. Giovane, 1993, in \textit{Astronomical Data Analysis Software and
 Systems II}, eds. R.J. Hanisch, R.J.V. Brissenden and J. Barnes,
-Astronomical Society of the Pacific Conference Series, {\bf 52},
+Astronomical Society of the Pacific Conference Series, \textbf{52},
 pp137-141.
 
 
@@ -828,11 +613,11 @@ information. Some of the facilities available include:
 \end{itemize}
 
 Full details of using the system can be obtained by sending an e-mail
-message with the single word {\tt help} in the subject field and no
+message with the single word \texttt{help} in the subject field and no
 text in the main body to address astro-ph@babbage.sissa.it (INTERNET).
 Preprints in the archive are arranged by the month in which they were
 entered, and a list of the months for which preprints are available may
-be obtained by sending a message with the single word {\tt listing} in
+be obtained by sending a message with the single word \texttt{listing} in
 the subject field, and again no text in the main body to the same
 address. There do not appear to be any facilities to search the entire
 archive for preprints by a given author or on a given topic.
@@ -840,12 +625,12 @@ archive for preprints by a given author or on a given topic.
 The details of accessing the system via anonymous ftp (see
 Section~\ref{ANON_FTP}) are as follows:
 
-{\it INTERNET address: } babbage.sissa.it or 147.122.1.21
-\newline {\it Username:} \verb-anonymous-
-\newline {\it Password:} Type your username and e-mail address
+\textit{INTERNET address: } babbage.sissa.it or 147.122.1.21
+\newline \textit{Username:} \verb-anonymous-
+\newline \textit{Password:} Type your username and e-mail address
 
-Once you are connected, the relevant directories are {\tt listings}
-which contains abstracts and {\tt papers} which contains the full text
+Once you are connected, the relevant directories are \texttt{listings}
+which contains abstracts and \texttt{papers} which contains the full text
 of the preprints. Each preprint is kept in its own subdirectory, the
 name of the subdirectory being the internal number assigned to it by
 the archive.
@@ -861,7 +646,7 @@ listed, together with their addresses, in Table~\ref{SISSA}.
 \begin{center}
 \begin{tabular}{ll}
 Subject   &  Electronic mail address  \\ \hline
-{\bf astronomy, astrophysics and cosmology}  & {\bf astro-ph@babbage.sissa.it} \\
+\textbf{astronomy, astrophysics and cosmology}  & \textbf{astro-ph@babbage.sissa.it} \\
 condensed matter                      & cond-mat@babbage.sissa.it \\
 functional analysis                   & funct-an@babbage.sissa.it \\
 general relativity and quantum cosmology  & gr-qc@babbage.sissa.it \\
@@ -899,19 +684,19 @@ the Los Alamos archive.
 The preprint archive at the Los Alamos National Laboratory (LANL), New
 Mexico may be queried either remotely using standardized mail messages
 or via anonymous ftp. To obtain further information on the archive send
-a blank e-mail message with {\tt HELP} in the subject field to address
+a blank e-mail message with \texttt{HELP} in the subject field to address
 hepth@xxx.lanl.gov (INTERNET).
 
 The details of accessing the system via anonymous ftp (see
 Section~\ref{ANON_FTP}) are as follows:
 
-{\it INTERNET address: } xxx.lanl.gov or 128.165.23.9
-\newline {\it Username:} \verb-anonymous-
-\newline {\it Password:} Type your username and e-mail address
+\textit{INTERNET address: } xxx.lanl.gov or 128.165.23.9
+\newline \textit{Username:} \verb-anonymous-
+\newline \textit{Password:} Type your username and e-mail address
 
-{\it Reference:}
+\textit{Reference:}
 
-G. Taubes, 26 February 1993, {\it Science}, {\bf 259}, pp1246-1248.
+G. Taubes, 26 February 1993, \textit{Science}, \textbf{259}, pp1246-1248.
 
 \subsection{CERN\xlabel{cern}}
 
@@ -920,11 +705,11 @@ Geneva includes all preprints produced at CERN, a copy of the LANL
 archive and various other documents. It is accessed via anonymous ftp
 (see Section~\ref{ANON_FTP}), the details being as follows.
 
-{\it INTERNET address: } asis01.cern.ch or 128.141.201.136
-\newline {\it Username:} \verb-anonymous-
-\newline {\it Password:} Type your username and e-mail address
+\textit{INTERNET address: } asis01.cern.ch or 128.141.201.136
+\newline \textit{Username:} \verb-anonymous-
+\newline \textit{Password:} Type your username and e-mail address
 
-Once you are connected, type {\tt cd preprints} to select the directory
+Once you are connected, type \texttt{cd preprints} to select the directory
 containing the preprints. This directory is divided into a large number
 of subdirectories, one per institution (or group of institutions) which
 have submitted preprints.
@@ -943,7 +728,7 @@ full bibliographic details are added. The list contains about 5000
 entries and is updated fortnightly.
 
 The list can be queried with WAIS (see Section~\ref{WAIS}), though first
-you should obtain a copy of the source file {\tt stsci-preprint-db.src}.
+you should obtain a copy of the source file \texttt{stsci-preprint-db.src}.
 A copy of this file can be obtained from the European Space Telescope
 Coordinating Facility (again see Section~\ref{WAIS}, especially
 Table~\ref{WAIS_SOURCE}).
@@ -962,7 +747,7 @@ period from October 1986 to the present and on the 1st May 1993
 contained about 13,000 entries. It is updated once per week.
 
 The list can be queried with WAIS (see Section~\ref{WAIS}), though first
-you should obtain a copy of the source file {\tt nrao-raps.src}.
+you should obtain a copy of the source file \texttt{nrao-raps.src}.
 A copy of this file can be obtained from the European Space Telescope
 Coordinating Facility (again see Section~\ref{WAIS}, especially
 Table~\ref{WAIS_SOURCE}).
@@ -979,16 +764,16 @@ unlike BIDS, can be accessed from outside the United Kingdom.
 
 The Harvard-Smithsonian Center for Astrophysics (CfA), Cambridge,
 Massachusetts maintains tables of contents for the following journals:
-{\it Astrophysical Journal, Astrophysical Journal Supplement,
-Astronomical Journal} and {\it Publications of the Astronomical Society
+\textit{Astrophysical Journal, Astrophysical Journal Supplement,
+Astronomical Journal} and \textit{Publications of the Astronomical Society
 of the Pacific}. The period covered is from January 1988 to the present.
 
 The details of accessing the system are as follows:
 
-{\it INTERNET address:} cfa$n$.harvard.edu (where $n = 3, 4, 5, 7$ or
+\textit{INTERNET address:} cfa$n$.harvard.edu (where $n = 3, 4, 5, 7$ or
 $8$)
-\newline {\it Username:} \verb-APJAJ-
-\newline {\it Password:} No password required; captive account
+\newline \textit{Username:} \verb-APJAJ-
+\newline \textit{Password:} No password required; captive account
 
 In order to access this system, you should log on to a local Starlink
 Unix system and type, for example:
@@ -997,15 +782,15 @@ Unix system and type, for example:
 \verb:telnet cfa3.harvard.edu:
 \vspace{2.0 mm}
 
-Reply {\tt APJAJ} in response to the `Username:' prompt; no password is
+Reply \texttt{APJAJ} in response to the `Username:' prompt; no password is
 required. You will be logged into a captive account and some
 introductory information will be displayed. Thereafter simply follow
 the instructions.
 
-\subsection{STScI\xlabel{stsci}}
+\subsection{STScI\xlabel{stsci_toc}}
 
 The Space Telescope Science Institute (STScI), Baltimore maintains a
-table of contents for the {\it Publications of the Astronomical
+table of contents for the \textit{Publications of the Astronomical
 Society of the Pacific} (PASP). Abstracts for the individual papers are
 also available. This system is new and coverage only extends from
 January 1993 to the present.
@@ -1013,9 +798,9 @@ January 1993 to the present.
 The system is accessed via anonymous ftp (see Section~\ref{ANON_FTP}).
 The details are as follows:
 
-{\it INTERNET address:} stsci.edu or 130.167.1.2
-\newline {\it Username:} \verb-anonymous-
-\newline {\it Password:} Type your username and e-mail address
+\textit{INTERNET address:} stsci.edu or 130.167.1.2
+\newline \textit{Username:} \verb-anonymous-
+\newline \textit{Password:} Type your username and e-mail address
 
 Once you are connected to the system type \verb-cd pasp- to select the
 directory containing the abstracts. The files in directory \verb-pasp-
@@ -1023,9 +808,9 @@ are all text files suitable for printing. The contents and abstract for
 each monthly issue of the journal are kept in a separate file. These
 files have names of the form:
 
-\begin{verbatim}
+\begin{terminalv}
 contents_yy_mm
-\end{verbatim}
+\end{terminalv}
 
 For example, file \verb-contents_93_02- contains details for the
 February 1993 issue. The remaining files contain a miscellany of useful
@@ -1099,14 +884,14 @@ Both the NRAO and STScI preprint lists are sufficiently extensive to
 offer a reasonable alternative to BIDS ISI, and they have the advantage
 that, unlike BIDS ISI, they are accessible outside the United Kingdom.
 
-Finally, it is worth remembering that the printed {\it Astronomy and
+Finally, it is worth remembering that the printed \textit{Astronomy and
 Astrophysics Abstracts}\, offer extremely comprehensive coverage; none
 of the on-line systems are as exhaustive.
 
 \pagebreak
 \part{Information Services}
 
-\section{Overview\xlabel{overview}}
+\section{Overview\xlabel{overview_is}}
 
 This section lists a miscellany of astronomical information services
 other than bibliographic databases and observation archives. The
@@ -1190,34 +975,32 @@ how to access it are as follows.
 
 \end{itemize}
 
-Note that these reports are accessed using the Unix command {\tt
-finger}. No username or password is required. The reports can be
+Note that these reports are accessed using the Unix command \texttt{finger}. No username or password is required. The reports can be
 quite lengthy and are probably best retrieved into a text file.
-However, unfortunately, the {\tt finger} command when used across
+However, unfortunately, the \texttt{finger} command when used across
 INTERNET inserts an unprintable character at the end of each line, which
 makes the resulting file unsuitable for display. A Unix magic
 incantation to remove this character prior to writing to the file
 is, for example:
 
-\begin{verbatim}
+\begin{terminalv}
 finger aurora@xi.uleth.ca | sed '1,$s/.$/ /' > aurora.lis
-\end{verbatim}
+\end{terminalv}
 
-This example writes the auroral activity report to file {\tt
-aurora.lis}.
+This example writes the auroral activity report to file \texttt{aurora.lis}.
 
 A database of solar and auroral activity is also maintained at the
 University of Lethbridge, and can be accessed by anonymous ftp (see
 Section~\ref{ANON_FTP}). The details  are as follows:
 
-{\it INTERNET address:} xi.uleth.ca or 142.66.3.29
-\newline {\it Username:} \verb-anonymous-
-\newline {\it Password:} Type your username and e-mail address
+\textit{INTERNET address:} xi.uleth.ca or 142.66.3.29
+\newline \textit{Username:} \verb-anonymous-
+\newline \textit{Password:} Type your username and e-mail address
 
-Once you are connected, the relevant directory is {\tt /pub/solar}.
-File {\tt 00-index.txt} in this directory contains an index of the
+Once you are connected, the relevant directory is \texttt{/pub/solar}.
+File \texttt{00-index.txt} in this directory contains an index of the
 database contents. A particularly useful file is
-\newline {\tt /pub/solar/Docs/glossary.doc} which gives a glossary of
+\newline \texttt{/pub/solar/Docs/glossary.doc} which gives a glossary of
 technical terms used in the reports.
 
 Further information and assistance can be obtained from Cary Oler,
@@ -1243,37 +1026,36 @@ kept in the following files:
 
 \begin{description}
 
-  \item[{\tt LADMINDIR:USERNAMES.LIS}] lists local Starlink users at
+  \item[\texttt{LADMINDIR:USERNAMES.LIS}] lists local Starlink users at
    your node,
 
-  \item[{\tt ADMINDIR:USERNAMES.LIS}] lists all Starlink users at all
+  \item[\texttt{ADMINDIR:USERNAMES.LIS}] lists all Starlink users at all
    nodes,
 
-  \item[{\tt ADMINDIR:UNIXNAMES.LIS}] lists Starlink Unix users and
+  \item[\texttt{ADMINDIR:UNIXNAMES.LIS}] lists Starlink Unix users and
    gives codes for their locations,
 
-  \item[{\tt ADMINDIR:LOCATIONS.LIS}] explains the codes used to
+  \item[\texttt{ADMINDIR:LOCATIONS.LIS}] explains the codes used to
    describe the locations of Starlink users.
 
 \end{description}
 
-All these lists are updated regularly. The local {\tt USERNAMES.LIS} is
+All these lists are updated regularly. The local \texttt{USERNAMES.LIS} is
 more likely to be up to date than the Starlink-wide version, though the
 latter is probably more self-consistent. All the files are simple text
 files, and can be searched using standard operating system commands,
 for example:
 
-\begin{verbatim}
+\begin{terminalv}
 SEARCH  ADMINDIR:USERNAMES.LIS  Davenhall
-\end{verbatim}
+\end{terminalv}
 
 \subsubsection{Unix\xlabel{unix}}
 
 On Starlink Unix systems lists of users and their addresses are
 maintained in file
-\newline {\tt /star/admin/unixnames}. It is a simple text file, and
-can be searched using standard operating system commands, such as {\tt
-grep}.
+\newline \texttt{/star/admin/unixnames}. It is a simple text file, and
+can be searched using standard operating system commands, such as \texttt{grep}.
 
 \subsection{International List of Astronomical Electronic Mail Addresses
 \xlabel{international_list}\label{EMAIL}}
@@ -1284,29 +1066,29 @@ astronomers throughout the world. This list is distributed widely and
 is available at most (but not all) Starlink sites. Your site manager
 should be able to advise whether it is available at your site.
 
-The utility {\tt email} is provided on Starlink VAX/VMS systems to
+The utility \texttt{email} is provided on Starlink VAX/VMS systems to
 search these files for a given user. This facility is not available on
 Starlink Unix systems. If the lists are available at your site, simply
 type, for example:
 
-\begin{verbatim}
+\begin{terminalv}
 email  Davenhall
-\end{verbatim}
+\end{terminalv}
 
 Normally you will not need to know the names and locations of the files
 holding these lists, but for completeness they are usually:
 
 \begin{description}
 
-  \item[{\tt LDOCSDIR:ASTROPERSONS.LIS }] which gives, for each person
+  \item[\texttt{LDOCSDIR:ASTROPERSONS.LIS }] which gives, for each person
    listed, their username, e-mail address and a code for their
    institution.
 
-  \item[{\tt LDOCSDIR:ASTROPLACES.LIS }] which gives, for each
+  \item[\texttt{LDOCSDIR:ASTROPLACES.LIS }] which gives, for each
    astronomical institution listed, its e-mail address, and telephone
    and fax numbers.
 
-  \item[{\tt LDOCSDIR:ASTROPOSTAL.LIS }] which gives, for each
+  \item[\texttt{LDOCSDIR:ASTROPOSTAL.LIS }] which gives, for each
    astronomical institution listed, its full postal address.
 
 \end{description}
@@ -1314,8 +1096,7 @@ holding these lists, but for completeness they are usually:
 In all cases the files are simple text files, so you can, if you so
 desire, search them with standard operating system commands, edit them
 in read-only mode etc. Note, however, that the details of a given
-institution occupy several lines of {\tt ASTROPLACES.LIS} and {\tt
-ASTROPOSTAL.LIS}.
+institution occupy several lines of \texttt{ASTROPLACES.LIS} and \texttt{ASTROPOSTAL.LIS}.
 
 In addition to the Starlink versions, these lists are distributed
 widely, so you may be able to access them, even if you are not a
@@ -1330,15 +1111,14 @@ follows.
    the following description assumes you are using an X-terminal gopher
    client).
 
-  \item Choose menu {\tt STEIS search tools} and then menu {\tt
-   Search Astronomer EMail Address (STScI version)}.
+  \item Choose menu \texttt{STEIS search tools} and then menu \texttt{Search Astronomer EMail Address (STScI version)}.
 
-  \item A window will appear containing a box labelled {\tt Search of:}.
+  \item A window will appear containing a box labelled \texttt{Search of:}.
    Enter the surname of the person you are looking for in this box,
    and hit return.
 
   \item After a few moments a window will appear with a box containing
-   the words {\tt Matches for} {\it the-surname-you-entered}.
+   the words \texttt{Matches for} \textit{the-surname-you-entered}.
    Double-click on this text and information about the person will be
    displayed.
 
@@ -1351,16 +1131,16 @@ The lists are updated annually and any comments or additional
 information are gratefully received. They should be sent by e-mail
 to email@ast-star.cam.uk (JANET and INTERNET).
 
-{\it Documentation:}
+\textit{Documentation:}
 
-A description of the lists is available in {\it Electronic Mail}\, by
+A description of the lists is available in \textit{Electronic Mail}\, by
 C.R. Benn and R. Martin, 1993. If the lists are installed on
 your node this document will be held as file
-\newline {\tt LDOCSDIR:ASTROGUIDE.TEX}. It is a Tex source file.
+\newline \texttt{LDOCSDIR:ASTROGUIDE.TEX}. It is a Tex source file.
 
 A number of other directories of astronomers and astronomical
 institutions are also available. They are reviewed by A. Heck (1991, in
-{\it Databases and On-Line Data in Astronomy}, eds. D.~Egret and
+\textit{Databases and On-Line Data in Astronomy}, eds. D.~Egret and
 M.~Albrecht, Dordrecht: Kluwer, pp211-224).
 
 
@@ -1369,31 +1149,31 @@ M.~Albrecht, Dordrecht: Kluwer, pp211-224).
 A number of more general services for finding the e-mail addresses for
 users outside the astronomical community are available. These services,
 often called `white pages' (in an analogy to a telephone directory),
-are beyond the scope of this document, but are described in {\it The
+are beyond the scope of this document, but are described in \textit{The
 Whole Internet User's Guide and Catalog}, especially Chapter Ten (see
 Section~\ref{FURTHER}).
 
-One simple but useful facility is the Unix command {\tt finger}. Usually
+One simple but useful facility is the Unix command \texttt{finger}. Usually
 this command can be used in the common case where you want to find out
 the username of a colleague, but you already know (or can find out) the
 INTERNET address of a computer running Unix which he uses. Beware
-however, that some systems will refuse remote {\tt finger} requests.
+however, that some systems will refuse remote \texttt{finger} requests.
 From a Starlink Unix system simply type:
 
 \vspace{2.0 mm}
-{\tt finger ~ }{\it surname}{\tt @}{\it host}
+\texttt{finger ~ }\textit{surname}\texttt{@}\textit{host}
 \vspace{2.0 mm}
 
-for example {\tt Davenhall@star.le.ac.uk}. If an INTERNET connection
+for example \texttt{Davenhall@star.le.ac.uk}. If an INTERNET connection
 to the given address can be established, some information about the
 user, including their username, will be displayed.  The same technique
 can be used in the less common case where you know a username and want
 to find the corresponding actual name of its owner. Here you would
 type, for example:
 
-\begin{verbatim}
+\begin{terminalv}
 finger  acd@star.le.ac.uk
-\end{verbatim}
+\end{terminalv}
 
 and the same information would be displayed.
 
@@ -1461,7 +1241,7 @@ information services. The services available (in November 1993) are
 listed in Tables~\ref{AIR_WEB} to \ref{AIR_FTP}. You should note: the
 number of services available is increasing, some of the services are not
 always available, and some of them do not seem to have been set up very
-well: {\it caveat emptor}. Most of these services can be accessed
+well: \textit{caveat emptor}. Most of these services can be accessed
 through STEIS using gopher and they can all be accessed through STEIS
 using the Web. Details are included in the appropriate section, below.
 
@@ -1606,7 +1386,7 @@ VLA Information System   \\
 \end{tabular}
 \end{center}
 
-\caption{{\tt Telnet} resources available through STEIS}
+\caption{\texttt{Telnet} resources available through STEIS}
 \label{AIR_TEL}
 
 \end{table}
@@ -1669,23 +1449,23 @@ able to advise. If you are using an X interface then first you must
 redirect X output to your terminal. The details will vary, but your site
 manager should be able to advise. Then type perhaps:
 
-\begin{verbatim}
+\begin{terminalv}
 xgopher stsci.edu 70
-\end{verbatim}
+\end{terminalv}
 
 If you are accessing gopher on a remote client you should log on to it
 and then find the STEIS server by working through something like the
 following menu items (the details may vary between clients):
 
 \begin{verse}
-{\tt Other Gopher and Information Servers  \\
+\texttt{Other Gopher and Information Servers  \\
 USA  \\
 General  \\
 Space Telescope Electronic Information System}
 \end{verse}
 
 To access other astronomical information services, choose STEIS menu
-{\tt Astronomical Internet Resources} and then the service you require.
+\texttt{Astronomical Internet Resources} and then the service you require.
 
 \subsection{STEIS via the Web
 \xlabel{steis_via_the_web}\label{STEIS_WEB}}
@@ -1694,25 +1474,25 @@ Details of accessing STEIS through the Web (see Section~\ref{WEB}) are
 as follows. The URL of the STEIS Astronomical Information Resources
 home page is:
 
-\begin{verbatim}
-http://stsci.edu/net-resources.html
-\end{verbatim}
+\begin{quote}
+\url{http://stsci.edu/net-resources.html}
+\end{quote}
 
 (note that the last character is the letter `l', not the digit `1').
 To navigate to STEIS from the public Web client at CERN, use the
 following list of links:
 
 \begin{verse}
-{\tt The Virtual Library  \\
+\texttt{The Virtual Library  \\
 Astronomy and Astrophysics  \\
 See also Space} ~~ (the last link in the list)  \\
-{\tt Space Telescope Science Institute electronic information service}\\
+\texttt{Space Telescope Science Institute electronic information service}\\
 \end{verse}
 
 A similar route should be possible from most Web clients.
 
 To access other astronomical information services, choose either link
-{\tt Astronomical Internet Resources} or {\tt STEIS WWW Top Level}
+\texttt{Astronomical Internet Resources} or \texttt{STEIS WWW Top Level}
 and then the service you require.
 
 \subsection{STEIS via Anonymous ftp
@@ -1721,9 +1501,9 @@ and then the service you require.
 The details of accessing STEIS using anonymous ftp (see
 Section~\ref{ANON_FTP}) are as follows:
 
-{\it INTERNET address:} stsci.edu or 130.167.1.2
-\newline {\it Username:} \verb-anonymous-
-\newline {\it Password:} Type your username and e-mail address
+\textit{INTERNET address:} stsci.edu or 130.167.1.2
+\newline \textit{Username:} \verb-anonymous-
+\newline \textit{Password:} Type your username and e-mail address
 
 \subsection{STEIS Listserver\xlabel{steis_listserver}}
 
@@ -1737,13 +1517,13 @@ used files whenever they are updated. The files available (in November
 \begin{center}
 \begin{tabular}{ll}
 Description                                &  Filename        \\ \hline
-Lists observations for the coming year     & {\tt long-range-plane}  \\
-Detailed weekly schedule of observations   & {\tt timeline}   \\
-Daily activity/instrument status reports   & {\tt hst-status} \\
-List of all observations completed to date & {\tt completed-observations} \\
-Point spread functions for the WFPC \dag   & {\tt wfpc-psf-library}  \\
-Delta flat field information for the WFPC \dag  & {\tt wfpc-delta-flats} \\
-Information about the Faint Object Camera (FOC) & {\tt foc-news} \\
+Lists observations for the coming year     & \texttt{long-range-plane}  \\
+Detailed weekly schedule of observations   & \texttt{timeline}   \\
+Daily activity/instrument status reports   & \texttt{hst-status} \\
+List of all observations completed to date & \texttt{completed-observations} \\
+Point spread functions for the WFPC \dag   & \texttt{wfpc-psf-library}  \\
+Delta flat field information for the WFPC \dag  & \texttt{wfpc-delta-flats} \\
+Information about the Faint Object Camera (FOC) & \texttt{foc-news} \\
 \end{tabular}
 
 \vspace{4.0 mm}
@@ -1766,19 +1546,19 @@ standardized messages as follows.
   \item To subscribe to a file the message text should be:
 
   \vspace{2.0 mm}
-  {\tt subscribe ~} {\it filename} ~~ {\it your-name}
+  \texttt{subscribe ~} \textit{filename} ~~ \textit{your-name}
   \vspace{2.0 mm}
 
-   where {\it filename}\, is one of the filenames listed in
-   Table~\ref{STEIS_FILES} and {\it your-name} is your full name.
+   where \textit{filename}\, is one of the filenames listed in
+   Table~\ref{STEIS_FILES} and \textit{your-name} is your full name.
 
-  \item To `unsubscribe' to file {\it filename:}
+  \item To `unsubscribe' to file \textit{filename:}
 
   \vspace{2.0 mm}
-  {\tt unsubscribe ~} {\it filename}
+  \texttt{unsubscribe ~} \textit{filename}
   \vspace{2.0 mm}
 
-  \item For a summary of the commands available: {\tt HELP}
+  \item For a summary of the commands available: \texttt{HELP}
 
 \end{itemize}
 
@@ -1798,17 +1578,17 @@ include:
 
   \item information and abstracts for meetings,
 
-  \item the electronic journal {\it Lunar and Planetary Information
+  \item the electronic journal \textit{Lunar and Planetary Information
    Bulletin}.
 
 \end{itemize}
 
-The primary means of accessing the system is {\tt telnet} and you need
+The primary means of accessing the system is \texttt{telnet} and you need
 a VT100 compatible terminal. The details are as follows:
 
-{\it INTERNET address: } lpi.jsc.nasa.gov or 146.154.14.11
-\newline {\it Username:} \verb-LPI-
-\newline {\it Password:} No password required; captive account
+\textit{INTERNET address: } lpi.jsc.nasa.gov or 146.154.14.11
+\newline \textit{Username:} \verb-LPI-
+\newline \textit{Password:} No password required; captive account
 
 Log on to a local Starlink Unix system and type either:
 
@@ -1816,22 +1596,22 @@ Log on to a local Starlink Unix system and type either:
 \verb:telnet lpi.jsc.nasa.gov : ~~ or ~~ \verb:telnet 146.154.14.11:
 \vspace{2.0 mm}
 
-In response to the `Username:' prompt reply {\tt LPI}; no password is
+In response to the `Username:' prompt reply \texttt{LPI}; no password is
 required. Once logged on you will enter a simple menu system. Use the
 arrow keys to navigate the options and hit return to select an option.
 
 Some of the LPI services can also be accessed using anonymous ftp (see
 Section~\ref{ANON_FTP}). The details are as follows:
 
-{\it INTERNET address: } lpi.jsc.nasa.gov or 146.154.14.11
-\newline {\it Username:} \verb-anonymous-
-\newline {\it Password:} Type your username and e-mail address
+\textit{INTERNET address: } lpi.jsc.nasa.gov or 146.154.14.11
+\newline \textit{Username:} \verb-anonymous-
+\newline \textit{Password:} Type your username and e-mail address
 
 Note that the LPI computers are VAXes running the VMS operating system,
 and hence when specifying directories within ftp you should use the
 VAX/VMS notation. Various data are available. For example, directory
-{\tt [ANONYMOUS.AMLAMP]} contains a database of meteorite falls in
-Antarctica. Retrieve files {\tt README.1ST} and {\tt README.2ND} from
+\texttt{[ANONYMOUS.AMLAMP]} contains a database of meteorite falls in
+Antarctica. Retrieve files \texttt{README.1ST} and \texttt{README.2ND} from
 this directory for details of this database.
 
 
@@ -1849,7 +1629,7 @@ and it responds with e-mail messages containing the requested
 information. Information in the service is divided into a number of
 `packages', and each package comprises one or more files. The name
 of an individual file comprises the package name and a `part name', in
-the form {\tt package.part}. Table~\ref{JCMT_FILE} lists the packages
+the form \texttt{package.part}. Table~\ref{JCMT_FILE} lists the packages
 available (in November 1993).
 
 \begin{table}[htbp]
@@ -1889,21 +1669,21 @@ and the text should comprise standardized messages as follows.
 
 \begin{itemize}
 
-  \item To list all the packages available: {\tt LIST}
+  \item To list all the packages available: \texttt{LIST}
 
-  \item To retrieve all the parts of package {\it package:}
-
-  \vspace{2.0 mm}
-   {\tt SENDME} ~~ {\it package}
-  \vspace{2.0 mm}
-
-  \item To retrieve part {\it part} of package {\it package:}
+  \item To retrieve all the parts of package \textit{package:}
 
   \vspace{2.0 mm}
-   {\tt SENDME} ~~ {\it package.part}
+   \texttt{SENDME} ~~ \textit{package}
   \vspace{2.0 mm}
 
-  \item For further information: {\tt HELP}
+  \item To retrieve part \textit{part} of package \textit{package:}
+
+  \vspace{2.0 mm}
+   \texttt{SENDME} ~~ \textit{package.part}
+  \vspace{2.0 mm}
+
+  \item For further information: \texttt{HELP}
 
 \end{itemize}
 
@@ -1921,9 +1701,9 @@ HEM@jach.hawaii.edu (INTERNET).
 JCMT\_INFORM is a captive account on the Starlink VAX cluster at the
 Royal Observatory Edinburgh (ROE). The details of accessing it are:
 
-{\it INTERNET address:} star.roe.ac.uk or 192.108.120.10
-\newline {\it Username:} \verb-JCMTINFORM-
-\newline {\it Password:} No password required; captive account
+\textit{INTERNET address:} star.roe.ac.uk or 192.108.120.10
+\newline \textit{Username:} \verb-JCMTINFORM-
+\newline \textit{Password:} No password required; captive account
 
 Log on to a local Starlink Unix system and type either:
 
@@ -1931,7 +1711,7 @@ Log on to a local Starlink Unix system and type either:
 \verb:telnet star.roe.ac.uk: ~~ or ~~ \verb:telnet 192.108.120.10:
 \vspace{2.0 mm}
 
-In response to the `Username:' prompt reply {\tt JCMTINFORM}; no
+In response to the `Username:' prompt reply \texttt{JCMTINFORM}; no
 password is required. The facilities available include:
 
 \begin{itemize}
@@ -1967,9 +1747,9 @@ NISS is accessed via the United Kingdom JANET academic network and via
 INTERNET. It can be accessed from sites outside the United Kingdom. The
 details are as follows:
 
-{\it INTERNET address:} niss.ac.uk or 193.63.76.2
-\newline {\it Username:} No username required; captive account
-\newline {\it Password:} No password required; captive account
+\textit{INTERNET address:} niss.ac.uk or 193.63.76.2
+\newline \textit{Username:} No username required; captive account
+\newline \textit{Password:} No password required; captive account
 
 From a Starlink Unix system you would type:
 
@@ -2034,10 +1814,10 @@ is an alternative method of searching the NISS collections using WAIS
 
 \paragraph{NISS Newspapers and Journals Services}
 provides on-line access to back-issues of newspapers and journals.
-Currently only {\it The Times}\, newspaper is available. The text for
+Currently only \textit{The Times}\, newspaper is available. The text for
 the current edition is not available. Since mid-April 1993 editions
 have been added at about 11:00pm on the day after publication. Editions
-of the {\it The Sunday Times}\, are added on the Wednesday following
+of the \textit{The Sunday Times}\, are added on the Wednesday following
 publication. This service is available under an agreement between CHEST
 and the American Cybercasting Corporation (ACC).
 
@@ -2056,7 +1836,7 @@ number of United Kingdom Higher Education Institutions.
 provides access to a number of bibliographic databases, covering, for
 example, medical and chemical subjects (Data-Star), library holdings
 (OCLC, Melvyl), and mathematics communications and publishing
-({\bf e-MATH}). You have to register to use some of these databases.
+(\textbf{e-MATH}). You have to register to use some of these databases.
 Instructions for registration are included in the on-line help
 information.
 
@@ -2066,7 +1846,7 @@ including information about the European Economic Community (ECHO),
 worldwide information on computing organizations (PARADISE X.500) and
 distance teaching and education information (ICDL). There is also access
 to Archie (see Section~\ref{ARCHIE}) and WAIS (see Section~\ref{WAIS}).
-However, WAIS is accessed using the {\tt swais} client which is
+However, WAIS is accessed using the \texttt{swais} client which is
 difficult and unfriendly to use.
 
 \paragraph{Archive Services}
@@ -2128,12 +1908,12 @@ INTERNET, computer networks in general and computer-mediated
 communication. A copy may be retrieved by anonymous ftp (see
 Section~\ref{ANON_FTP}). The details are as follows:
 
-{\it INTERNET address: } ftp.rpi.edu or 128.113.1.5
-\newline {\it Username:} \verb-anonymous-
-\newline {\it Password:} Type your username and e-mail address
+\textit{INTERNET address: } ftp.rpi.edu or 128.113.1.5
+\newline \textit{Username:} \verb-anonymous-
+\newline \textit{Password:} Type your username and e-mail address
 
-The list is held in file {\tt pub/communications/internet-cmc}.
-\newline File {\tt pub/communications/internet-cmc.readme} may also be
+The list is held in file \texttt{pub/communications/internet-cmc}.
+\newline File \texttt{pub/communications/internet-cmc.readme} may also be
 of interest.
 
 \paragraph{The Yanoff List} This list is compiled by Scott Yanoff
@@ -2143,32 +1923,31 @@ several ways to retrieve this list, though perhaps the most convenient
 is anonymous ftp (see Section~\ref{ANON_FTP}). The details are as
 follows:
 
-{\it INTERNET address: } csd4.csd.uwm.edu or 129.89.7.4
-\newline {\it Username:} \verb-anonymous-
-\newline {\it Password:} Type your username and e-mail address
+\textit{INTERNET address: } csd4.csd.uwm.edu or 129.89.7.4
+\newline \textit{Username:} \verb-anonymous-
+\newline \textit{Password:} Type your username and e-mail address
 
-The list is held in file {\tt pub/inet.services.txt}. For details
+The list is held in file \texttt{pub/inet.services.txt}. For details
 of other ways of retrieving the list type:
 
-\begin{verbatim}
+\begin{terminalv}
 finger  yanoff@csd4.csd.uwm.edu
-\end{verbatim}
+\end{terminalv}
 
 \paragraph{Internet Resources Guide}
 
 The United States National Science Foundation (NSF) has compiled
-an extensive {\it Internet Resources Guide}. This document is currently
+an extensive \textit{Internet Resources Guide}. This document is currently
 available by anonymous ftp (see Section~\ref{ANON_FTP}). The
 details are:
 
-{\it INTERNET address:} ds.internic.net or 198.49.45.10
-\newline {\it Username:} \verb-anonymous-
-\newline {\it Password:} Type your username and e-mail address
+\textit{INTERNET address:} ds.internic.net or 198.49.45.10
+\newline \textit{Username:} \verb-anonymous-
+\newline \textit{Password:} Type your username and e-mail address
 
-The {\it Guide} is held as file {\tt
-/resource-guide/resource-guide.ps.tar.Z}. It is a PostScript file
+The \textit{Guide} is held as file \texttt{/resource-guide/resource-guide.ps.tar.Z}. It is a PostScript file
 which has been compressed and entered into a tar archive. See
-Chapter Six of {\it The Whole Internet User's Guide and Catalog}\,
+Chapter Six of \textit{The Whole Internet User's Guide and Catalog}\,
 (see Section~\ref{FURTHER}) for a description of how to un-compress
 and unpack such a file. However, before  you retrieve and print
 out a copy you should realise that it is a weighty tome.
@@ -2177,7 +1956,7 @@ out a copy you should realise that it is a weighty tome.
 Files containing the individual chapters are also available, and you
 could retrieve these if you are only interested in a particular topic.
 Table~\ref{IRG_CHAP} lists The topics covered in each chapter. These
-files are also kept in directory {\tt /resource-guide}.
+files are also kept in directory \texttt{/resource-guide}.
 
 \begin{table}[htbp]
 
@@ -2194,12 +1973,12 @@ Miscellaneous     & M  \\
 \end{tabular}
 \end{center}
 
-\caption{Chapters of the NSF {\it Internet Resources Guide}}
+\caption{Chapters of the NSF \textit{Internet Resources Guide}}
 \label{IRG_CHAP}
 
 \end{table}
 
-The {\it Internet Resource Guide} will continue to be available for some
+The \textit{Internet Resource Guide} will continue to be available for some
 time, but there will be no further development of it. It will be
 replaced by an on-line system which can be searched for information on
 a specific topic. For further information on these developments send an
@@ -2214,10 +1993,10 @@ the INTERNET. The software available includes both specifically
 astronomical software and more general software which may be of interest
 to astronomers. Finding and obtaining public domain software is beyond
 the scope of this document, but an excellent introduction is given by
-E.D. Feigelson and F. Murtagh (1992, {\it PASP}, {\bf 104}, pp574-581).
+E.D. Feigelson and F. Murtagh (1992, \textit{PASP}, \textbf{104}, pp574-581).
 
 Various public domain software archives may be accessed through the
-{\tt Archive Services} menu of NISS (see Section~\ref{NISS}). Archie
+\texttt{Archive Services} menu of NISS (see Section~\ref{NISS}). Archie
 (see Section~\ref{ARCHIE}) is useful for searching for software.
 
 Users outside the United Kingdom might be interested to know that
@@ -2234,7 +2013,7 @@ star@star.rl.ac.uk (INTERNET).
 \part{INTERNET Tools}
 \label{INTERNET_TOOLS}
 
-\section{Overview\xlabel{overview}}
+\section{Overview\xlabel{overview_internet}}
 
 A number of tools are available for accessing information held on remote
 computers linked to your local machine by the INTERNET
@@ -2249,8 +2028,8 @@ information, most of it non-astronomical. Necessarily this section
 presents only a very brief summary of the tools, orientated towards
 providing enough information to allow you to use them to access the
 facilities described in previous sections. More thorough discussions
-are given in {\it The Whole Internet User's Guide and Catalog}\, and
-{\it Intelligent Information Retrieval: The Case of Astronomy and
+are given in \textit{The Whole Internet User's Guide and Catalog}\, and
+\textit{Intelligent Information Retrieval: The Case of Astronomy and
 Related Space Sciences}\, (see Section~\ref{FURTHER}).
 
 In order to use many of the tools you must run an appropriate `client'
@@ -2281,8 +2060,7 @@ dumb terminals, another which provides extra features etc. Your site
 manager will choose one which bests suits local conditions.
 
 Finally, many of these tools are relatively new and are still being
-enhanced. You will sometimes encounter problems when using them: {\it
-caveat emptor}.
+enhanced. You will sometimes encounter problems when using them: \textit{caveat emptor}.
 
 
 \section{Anonymous ftp
@@ -2301,10 +2079,10 @@ below.
 ftp is best used from a Starlink Unix system. Type:
 
 \vspace{2.0 mm}
-{\tt ftp} {\it remote-address}
+\texttt{ftp} \textit{remote-address}
 \vspace{2.0 mm}
 
-where {\it remote-address} is the INTERNET address of the remote system
+where \textit{remote-address} is the INTERNET address of the remote system
 which you wish to access. Either the alphabetic or numeric version of
 the INTERNET address may be used. For example, to connect to STEIS (see
 Section~\ref{STEIS}) you would type:
@@ -2317,13 +2095,13 @@ If a connection can be established successfully you will be prompted to
 supply a username (or login name) and password. You should respond as
 follows:
 
-{\it Login:} \verb-anonymous-
-\newline {\it Password:} Type your username and e-mail address
+\textit{Login:} \verb-anonymous-
+\newline \textit{Password:} Type your username and e-mail address
 
-Most anonymous ftp sites will also accept {\tt ftp} as the login name.
+Most anonymous ftp sites will also accept \texttt{ftp} as the login name.
 By convention your username and e-mail address should be given in the
 form `username@address', for example
-\newline {\tt acd@star.le.ac.uk}. You are
+\newline \texttt{acd@star.le.ac.uk}. You are
 now ready to examine and retrieve files from the remote system. Various
 versions of the ftp program are available, and the commands differ
 slightly between them. However, the following frequently used commands,
@@ -2332,33 +2110,32 @@ usually available.
 
 \begin{description}
 
-  \item[{\tt cd} {\it directory}] -- select directory {\it directory}\,
+  \item[\texttt{cd} \textit{directory}] -- select directory \textit{directory}\,
    as the current directory on the remote machine\footnote{Directories
    are usually specified using the Unix notation. If the remote system
    is not running Unix you may have to use the notation appropriate to
    its operating system.}.
 
-  \item[{\tt dir}] -- list the files in the current directory.
+  \item[\texttt{dir}] -- list the files in the current directory.
 
-  \item[{\tt get} {\it filename}] -- retrieve a copy of file {\it
-   filename}\, to your local computer. ftp should be in ASCII mode when
+  \item[\texttt{get} \textit{filename}] -- retrieve a copy of file \textit{filename}\, to your local computer. ftp should be in ASCII mode when
    retrieving text files and in binary mode when retrieving binary
-   files (see commands {\tt ascii} and {\tt binary}). A description of
+   files (see commands \texttt{ascii} and \texttt{binary}). A description of
    compressed and archived (`tar') files is beyond the scope of this
-   document; see Chapter Six of {\it The Whole Internet User's Guide
+   document; see Chapter Six of \textit{The Whole Internet User's Guide
    and Catalog}\, (see Section~\ref{FURTHER}). However, it is worth
    noting that ftp should be in binary mode when retrieving such files.
 
-  \item[{\tt pwd}] -- display the current directory.
+  \item[\texttt{pwd}] -- display the current directory.
 
-  \item[{\tt ascii}] -- switch to ASCII mode; ASCII is the default mode.
+  \item[\texttt{ascii}] -- switch to ASCII mode; ASCII is the default mode.
 
-  \item[{\tt binary}] -- switch to binary mode.
+  \item[\texttt{binary}] -- switch to binary mode.
 
-  \item[{\tt help}] -- will often display information about the commands
+  \item[\texttt{help}] -- will often display information about the commands
    available.
 
-  \item[{\tt quit}] -- exits ftp.
+  \item[\texttt{quit}] -- exits ftp.
 
 \end{description}
 
@@ -2367,33 +2144,33 @@ A useful trick for displaying the contents of a remote file on your
 terminal is the command:
 
 \begin{verse}
-{\tt get} {\it filename}\, {\tt "$|$ more"}
+\texttt{get} \textit{filename}\, \texttt{"$|$ more"}
 \end{verse}
 
-{\it Documentation:}
+\textit{Documentation:}
 
-ftp is described in Chapter Six of {\it The Whole Internet
+ftp is described in Chapter Six of \textit{The Whole Internet
 User's Guide and Catalog}, Chapter Six (see Section~\ref{FURTHER}).
 
 Some additional useful documents can be obtained by anonymous ftp
 from Dartmouth College, Hanover, New Hampshire. The details are:
 
-{\it INTERNET address:} pilot.njin.net or 128.6.7.38
-\newline {\it Username:} \verb-anonymous-
-\newline {\it Password:} Type your username and e-mail address
+\textit{INTERNET address:} pilot.njin.net or 128.6.7.38
+\newline \textit{Username:} \verb-anonymous-
+\newline \textit{Password:} Type your username and e-mail address
 
-Once connected you should select directory {\tt pub/ftp-list}. The
+Once connected you should select directory \texttt{pub/ftp-list}. The
 following files may be useful.
 
 \begin{description}
 
-  \item[{\tt ftp.help}] An introduction to using ftp (unfortunately you
+  \item[\texttt{ftp.help}] An introduction to using ftp (unfortunately you
    have to be at least moderately familiar with ftp to retrieve a copy).
 
-  \item[{\tt suggestions}] A set of useful hints about setting up your
+  \item[\texttt{suggestions}] A set of useful hints about setting up your
    own anonymous ftp site.
 
-  \item[{\tt ftp.list}] A list of anonymous ftp sites, with a summary of
+  \item[\texttt{ftp.list}] A list of anonymous ftp sites, with a summary of
    the type of software available at each site.  There are entries for
    about 900 sites. Maintenance of the list was discontinued in
    December 1991 because the development of systems like Archie (see
@@ -2465,7 +2242,7 @@ Spain                & archie.rediris.es          & 130.206.1.2  \\
 Sweden               & archie.luth.se             & 130.240.18.4  \\
 Switzerland          & archie.switch.ch           & 130.59.1.40  \\
 Taiwan               & archie.ncu.edu.tw          & 140.115.19.24  \\
-{\bf United Kingdom} & {\bf archie.doc.ic.ac.uk}  & {\bf 146.169.11.3}\\
+\textbf{United Kingdom} & \textbf{archie.doc.ic.ac.uk}  & \textbf{146.169.11.3}\\
 United States (Maryland)    & archie.sura.net     & 128.167.254.179  \\
 United States (New England) & archie.unl.edu      & 129.93.1.14  \\
 United States (New Jersey)  & archie.internic.net & 198.48.45.10  \\
@@ -2479,8 +2256,8 @@ United States (New York)    & archie.ans.net      & 147.225.1.10  \\
 
 \end{table}
 
-In response to the `login:' prompt reply {\tt archie}; no password is
-required. Once you are logged on, type {\tt help} for information on the
+In response to the `login:' prompt reply \texttt{archie}; no password is
+required. Once you are logged on, type \texttt{help} for information on the
 commands available. A full description of Archie is beyond the scope of
 this document. However, a brief introduction is given below. This
 discussion refers to the dumb-terminal Archie client, which is the
@@ -2491,39 +2268,39 @@ Suppose that you were searching for an archie client to install
 on your local machine, and guessed that such a client would have the
 string `archie' as part of its name. You would type:
 
-\begin{verbatim}
+\begin{terminalv}
 set search sub
-\end{verbatim}
+\end{terminalv}
 
 to specify that searches were to operate on substrings, rather than
 requiring an exact match to the entire file name. Then perform the
 search:
 
-\begin{verbatim}
+\begin{terminalv}
 prog archie
-\end{verbatim}
+\end{terminalv}
 
 and a list of files (and their locations) which match the criterion will
 be displayed. You can mail a copy of this back to your local computer
 so that you can examine it at your leisure by:
 
 \vspace{2.0 mm}
-{\tt mail} ~~ {\it your-INTERNET-e-mail-address}
+\texttt{mail} ~~ \textit{your-INTERNET-e-mail-address}
 \vspace{2.0 mm}
 
-for example {\tt mail acd@star.le.ac.uk}. When you have finished, type
-{\tt quit} to exit Archie. {\tt whatis} is another useful command. It
+for example \texttt{mail acd@star.le.ac.uk}. When you have finished, type
+\texttt{quit} to exit Archie. \texttt{whatis} is another useful command. It
 searches a database containing a description of each file known to
 Archie and can be used to find files relating to some topic. Once you
 have found the names of such files you can locate them in the usual way
-using {\tt prog}.
+using \texttt{prog}.
 
-{\it Documentation:}
+\textit{Documentation:}
 
-Archie is described in Chapter Nine of {\it The Whole Internet
+Archie is described in Chapter Nine of \textit{The Whole Internet
 User's Guide and Catalog}\, (see Section~\ref{FURTHER}).
 
-It is also described by E. Emtage in Chapter Seven of {\it Intelligent
+It is also described by E. Emtage in Chapter Seven of \textit{Intelligent
 Information Retrieval: The Case of Astronomy and Related Space
 Sciences}\, (see Section~\ref{FURTHER}).
 
@@ -2541,7 +2318,7 @@ Once you locate files of interest you can display them; text files will
 be listed and more capable, X-terminal based gopher clients can also
 display images. Files may also be retrieved to your local computer.
 Gopher does not allow you to access any information which could not be
-made available using anonymous ftp or {\tt telnet}, but it does make
+made available using anonymous ftp or \texttt{telnet}, but it does make
 accessing this information much simpler.
 
 There are various gopher servers around the world. They are all
@@ -2568,7 +2345,7 @@ access the European public client you would type:
 \verb:telnet gopher.sunet.se: ~~ or ~~ \verb:telnet 192.36.125.2:
 \vspace{2.0 mm}
 
-In response to the `login:' prompt reply {\tt gopher}; no password is
+In response to the `login:' prompt reply \texttt{gopher}; no password is
 required.
 
 \begin{table}[htbp]
@@ -2578,7 +2355,7 @@ required.
 Area          & INTERNET address     & INTERNET number & Login \\ \hline
 Australia     & info.anu.edu.au          & 150.203.84.20  & info    \\
 Ecuador       & ecnet.ec                 & 157.100.45.2   & gopher  \\
-{\bf Europe} & {\bf gopher.sunet.se} & {\bf 192.36.125.2} & {\bf gopher} \\
+\textbf{Europe} & \textbf{gopher.sunet.se} & \textbf{192.36.125.2} & \textbf{gopher} \\
 North America & consultant.micro.umn.edu & 134.84.132.4   & gopher  \\
 North America & gopher.uiuc.edu          & 128.174.33.160 & gopher  \\
 North America & panda.uiowa.edu          & 128.255.40.201 & panda   \\
@@ -2597,25 +2374,25 @@ Gopher allows you to navigate through the directory tree on the
 server you are using. When you encounter files rather than directories
 you may examine them and retrieve copies. Somewhere in the directory
 tree for the server (usually quite close to the top) there will be an
-entry called something like {\tt Other Gopher and Information Servers}.
+entry called something like \texttt{Other Gopher and Information Servers}.
 Selecting this entry displays details of other gopher servers and
 allows you to select one of them (in a transparent way which gives the
 appearance that you are just navigating to another directory). You may
 then examine the directories of this server, or proceed from it to yet
 another server.
 
-{\it Documentation:}
+\textit{Documentation:}
 
-Gopher is described in Chapter Eleven of {\it The Whole Internet
+Gopher is described in Chapter Eleven of \textit{The Whole Internet
 User's Guide and Catalog}\, (see Section~\ref{FURTHER}).
 
 It is also described by F. Anklesaria and M. McCahill in Chapter Nine
-of {\it Intelligent Information Retrieval: The Case of Astronomy and
+of \textit{Intelligent Information Retrieval: The Case of Astronomy and
 Related Space Sciences}\, (see Section~\ref{FURTHER}).
 
 A list of frequently asked questions (FAQs in INTERNET jargon) about
 gopher is available by anonymous ftp from STEIS (see
-Section~\ref{STEIS_FTP}). It is held as file {\tt .Gopher-FAQ} in the
+Section~\ref{STEIS_FTP}). It is held as file \texttt{.Gopher-FAQ} in the
 top level directory. Note that because the file name begins with a dot
 it will not appear in normal Unix directory listings.
 
@@ -2630,7 +2407,7 @@ searching text, but can be used for any information for which an
 appropriate index has been built. WAIS is the primary interface to
 several of the bibliographic databases described in Part I. This note
 concentrates on using WAIS to access these databases. A more
-comprehensive (and balanced) description is given in {\it The Whole
+comprehensive (and balanced) description is given in \textit{The Whole
 Internet User's Guide and Catalog}, Chapter Twelve (see
 Section~\ref{FURTHER}).
 
@@ -2639,16 +2416,15 @@ should be able to advise. If your site does not have a client installed
 you can obtain one by anonymous ftp (see Section~\ref{ANON_FTP}). The
 details are as follows:
 
-{\it INTERNET address:} think.com or 131.239.2.1
-\newline {\it Username:} \verb-anonymous-
-\newline {\it Password:} Type your username and e-mail address
+\textit{INTERNET address:} think.com or 131.239.2.1
+\newline \textit{Username:} \verb-anonymous-
+\newline \textit{Password:} Type your username and e-mail address
 
-You should copy file {\tt /public/wais/wais-8-b5.tar.Z}. Installation
+You should copy file \texttt{/public/wais/wais-8-b5.tar.Z}. Installation
 instructions are included in this tar file.
 
 Alternatively, you could use Archie (see Section~\ref{ARCHIE}) to locate
-a suitable client. Note however that the dumb-terminal client {\tt
-swais} is particularly unfriendly and difficult to use; the X-terminal
+a suitable client. Note however that the dumb-terminal client \texttt{swais} is particularly unfriendly and difficult to use; the X-terminal
 version is much to be preferred. Also note that you cannot install the
 client yourself; your site manager must do so on your behalf.
 
@@ -2662,24 +2438,23 @@ is as follows.
 
 \begin{enumerate}
 
-  \item Create a directory called {\tt wais-sources} as a subdirectory
+  \item Create a directory called \texttt{wais-sources} as a subdirectory
    of your login directory.
 
   \item For each database that you are going to access you need to
    insert in this directory a `source file' describing how to access
-   it. By convention these source files have file type {\tt .src}.
+   it. By convention these source files have file type \texttt{.src}.
 
    Fortunately copies of the relevant source files are kept at the ESA
    Space Telescope European Coordinating Facility, Garching bei
    M\"{u}nchen, from where copies may be retrieved by anonymous ftp
    (see Section~\ref{ANON_FTP}). The details are:
 
-   {\it INTERNET address:} ecf.hq.eso.org  or 134.171.11.4
-   \newline {\it Username:} \verb-anonymous-
-   \newline {\it Password:} Type your username and e-mail address
+   \textit{INTERNET address:} ecf.hq.eso.org  or 134.171.11.4
+   \newline \textit{Username:} \verb-anonymous-
+   \newline \textit{Password:} Type your username and e-mail address
 
-   The source files are in directory {\tt
-   pub/swlib/various-wais-sources}
+   The source files are in directory \texttt{pub/swlib/various-wais-sources}
 
   \item Table~\ref{WAIS_SOURCE} gives the names of the source files
    for the various bibliographic databases. You may as well retrieve
@@ -2694,9 +2469,9 @@ is as follows.
 \begin{center}
 \begin{tabular}{lcl}
 Database            &  Section      & Source file \\   \hline
-STELAR              & \ref{STELAR}  & {\tt abstracts.src} \\
-STScI preprint list & \ref{STSCI}   & {\tt stsci-preprint-db.src} \\
-NRAO preprint list  & \ref{NRAO}    & {\tt nrao-raps.src} \\
+STELAR              & \ref{STELAR}  & \texttt{abstracts.src} \\
+STScI preprint list & \ref{STSCI}   & \texttt{stsci-preprint-db.src} \\
+NRAO preprint list  & \ref{NRAO}    & \texttt{nrao-raps.src} \\
 \end{tabular}
 \end{center}
 
@@ -2710,9 +2485,9 @@ X-terminal and first you must redirect X output to your terminal. The
 details will vary, but your site manager should be able to advise. Then
 type perhaps:
 
-\begin{verbatim}
+\begin{terminalv}
 xwais &
-\end{verbatim}
+\end{terminalv}
 
 An outline of the procedure to find articles is as follows (this
 description assumes that you are using the X-terminal WAIS client).
@@ -2720,19 +2495,18 @@ description assumes that you are using the X-terminal WAIS client).
 \begin{enumerate}
 
   \item Click on the `new question' button. This button is labelled
-   {\tt New} and is enclosed in the {\tt Question} box, in the upper
+   \texttt{New} and is enclosed in the \texttt{Question} box, in the upper
    half of the window.
 
-  \item A new window should appear. Click on the button marked {\tt
-   Add source}. Yet another window with a list of all your sources
+  \item A new window should appear. Click on the button marked \texttt{Add source}. Yet another window with a list of all your sources
    should appear.
 
   \item Choose the source corresponding to the database which you wish
    to search by double-clicking on it. For example, double-click on
-   {\tt nrao-raps.src} to choose the NRAO preprint lists. This source
+   \texttt{nrao-raps.src} to choose the NRAO preprint lists. This source
    should then be listed as an active source.
 
-  \item In the box labelled {\tt Tell me about:} enter the words which
+  \item In the box labelled \texttt{Tell me about:} enter the words which
    you wish to search for. You can enter as many words as you like,
    separated by spaces. The order of the words is not important. Hit
    return to start the search.
@@ -2742,7 +2516,7 @@ description assumes that you are using the X-terminal WAIS client).
    facilities for displaying all the information about the article
    (which will include the abstract in the case of STELAR) and saving
    the details as a text file on your local machine. Such files are
-   created in directory {\tt wais-documents}, which is a subdirectory
+   created in directory \texttt{wais-documents}, which is a subdirectory
    of your login directory.
 
 \end{enumerate}
@@ -2756,7 +2530,7 @@ The search software looks for articles containing all the words you
 have supplied. That is, the words are combined using a logical (or
 boolean) `and' operation; there are no facilities for making more
 complex searches involving other logical operators, such as `or' or
-`not'\footnote{Standard WAIS clients such as {\tt xwais} do not support
+`not'\footnote{Standard WAIS clients such as \texttt{xwais} do not support
 boolean operators or `wild cards' in searches. However, recent versions
 of the Z39.50 standard include these concepts. Some more recent clients
 and servers which understand the revised protocol provide these
@@ -2784,13 +2558,13 @@ Some of the bibliographic databases are quite often unavailable (at
 least, when accessed from the United Kingdom); if you appear not to
 be able to get through you should simply try again later.
 
-{\it Documentation:}
+\textit{Documentation:}
 
 \nopagebreak
-WAIS is described in Chapter Twelve of {\it The Whole Internet
+WAIS is described in Chapter Twelve of \textit{The Whole Internet
 User's Guide and Catalog}\, (see Section~\ref{FURTHER}).
 
-It is also described by J. Fullton in Chapter Eight of {\it Intelligent
+It is also described by J. Fullton in Chapter Eight of \textit{Intelligent
 Information Retrieval: The Case of Astronomy and Related Space
 Sciences}\, (see Section~\ref{FURTHER}).
 
@@ -2798,15 +2572,15 @@ Thinking Machines Corporation has compiled a bibliography of WAIS.
 It is available via anonymous ftp (see Section~\ref{ANON_FTP}). The
 details are:
 
-{\it INTERNET address:} wais.com or 192.216.46.98
-\newline {\it Username:} \verb-anonymous-
-\newline {\it Password:} Type your username and e-mail address
+\textit{INTERNET address:} wais.com or 192.216.46.98
+\newline \textit{Username:} \verb-anonymous-
+\newline \textit{Password:} Type your username and e-mail address
 
-It is held in file {\tt /pub/wais-inc-doc/bibliography.txt}.
+It is held in file \texttt{/pub/wais-inc-doc/bibliography.txt}.
 
 A list of frequently asked questions (FAQs in INTERNET jargon) about
 WAIS is available by anonymous ftp from STEIS (see
-Section~\ref{STEIS_FTP}). It is held as file {\tt .WAIS-FAQ} in the
+Section~\ref{STEIS_FTP}). It is held as file \texttt{.WAIS-FAQ} in the
 top level directory. Note that because the file name begins with a dot
 it will not appear in normal Unix directory listings.
 
@@ -2836,23 +2610,22 @@ page'. Usually the home page contains introductory material.
 The novel concept of the Web is that components of a Web
 document may be scattered around the INTERNET, rather than limited to
 a single machine. Also, Web links may lead to WAIS indices, gopher
-menus and {\tt telnet} connections to remote facilities.
+menus and \texttt{telnet} connections to remote facilities.
 
 You will probably access the Web from an X-terminal. First you must
 redirect X output to your terminal. The details will vary, but your site
 manager should be able to advise. Then you will probably type something
 like:
 
-\begin{verbatim}
+\begin{terminalv}
 xmosaic
-\end{verbatim}
+\end{terminalv}
 
 The home page will be displayed and you can either follow the linear
-narrative of the text, or explore links, as you choose. In the {\tt
-xmosaic} browser links are either shown in a different colour, or by
+narrative of the text, or explore links, as you choose. In the \texttt{xmosaic} browser links are either shown in a different colour, or by
 underlining (depending on whether or not you are using a colour
 X-terminal). On the basis of limited experience, compared to the clients
-for some of the other tools, {\tt xmosaic} seems to make more onerous
+for some of the other tools, \texttt{xmosaic} seems to make more onerous
 demands on the local computer, so the performance may be somewhat
 sluggish.
 
@@ -2860,13 +2633,13 @@ Your client will be set up to access the home page of a given document
 by default. Every Web document has a unique `Uniform Resource Locator'
 (URL\footnote{Previously the acronym stood for `Universal Resource
 Locator'.}) which identifies it. You can control the default document
-by specifying the URL. For {\tt xmosaic} the default URL is specified
+by specifying the URL. For \texttt{xmosaic} the default URL is specified
 by setting an environment variable prior to starting the browser. For
 example:
 
-\begin{verbatim}
+\begin{terminalv}
 setenv  WWW_HOME  http://stsci.edu/net-resources.html
-\end{verbatim}
+\end{terminalv}
 
 (note that the last character is the letter `l', not the digit `1').
 This URL specifies the index of Astronomical INTERNET resources
@@ -2887,35 +2660,35 @@ dumb terminals. Links are indicated by numbers in square brackets
 (`[~]') immediately after the linked text. You simply type the number
 of the link to proceed to its text, or hit return to carry on with the
 main document. One route in the CERN client which may be of interest is
-to proceed first to the {\tt The Virtual Library} link and
-thence to the {\tt Astronomy and Astrophysics} link.
+to proceed first to the \texttt{The Virtual Library} link and
+thence to the \texttt{Astronomy and Astrophysics} link.
 
-{\it Documentation:}
+\textit{Documentation:}
 
-The Web is described in Chapter Thirteen of {\it The Whole Internet
+The Web is described in Chapter Thirteen of \textit{The Whole Internet
 User's Guide and Catalog}\, (see Section~\ref{FURTHER}).
 
-It is also described by B. White in Chapter Ten of {\it Intelligent
+It is also described by B. White in Chapter Ten of \textit{Intelligent
 Information Retrieval: The Case of Astronomy and Related Space
 Sciences}\, (see Section~\ref{FURTHER}).
 
 A list of frequently asked questions (FAQs in INTERNET jargon) about
 the Web is available by anonymous ftp from STEIS (see
-Section~\ref{STEIS_FTP}). It is held as file {\tt .WWW-FAQ} in the
+Section~\ref{STEIS_FTP}). It is held as file \texttt{.WWW-FAQ} in the
 top level directory. Note that because the file name begins with a dot
 it will not appear in normal Unix directory listings.
 
-{\it Getting Started with NCSA Mosaic}\, by M. Andreessen, May 1993 is
-an introductory article about the {\tt xmosaic} client. However, it is
+\textit{Getting Started with NCSA Mosaic}\, by M. Andreessen, May 1993 is
+an introductory article about the \texttt{xmosaic} client. However, it is
 intended more for site managers who have to install it than for users.
 It includes details of how to obtain a copy of the client. It is
 available through Starlink as MUD/147.
 
-{\it Hypertext and Hypermedia} by J. Nielsen, 1990 (Academic Press,
+\textit{Hypertext and Hypermedia} by J. Nielsen, 1990 (Academic Press,
 San Francisco). This book is about hypertext in general, rather than
 being specifically about the Web.
 
-The issue of {\it Communications of the ACM}\, for July 1998 contained a
+The issue of \textit{Communications of the ACM}\, for July 1998 contained a
 special section devoted to hypertext. However, it was about hypertext
 in general, rather than specifically about the Web (indeed, it predates
 the Web).
@@ -2947,7 +2720,7 @@ information.
 \begin{description}
 
   \item[Gopher] represents each item of information as either a menu,
-   a document, an index or a {\tt telnet} connection.
+   a document, an index or a \texttt{telnet} connection.
 
   \item[WAIS] represents all information as an index, and everything
    selected by searching an index is a document.
@@ -2969,30 +2742,30 @@ the tools complement each other.
 
 \begin{itemize}
 
-  \item {\it The Whole Internet User's Guide and
+  \item \textit{The Whole Internet User's Guide and
    Catalog}\, by Ed Krol, 1992 (O'Reilly and Associates Inc,
    Sebastopol, California). This book is an excellent introduction to
    the INTERNET and the tools available for it.
 
-  \item {\it Intelligent Information Retrieval: The Case of Astronomy
+  \item \textit{Intelligent Information Retrieval: The Case of Astronomy
    and Related Space Sciences}\, eds. A. Heck and F. Murtagh, 1993
    (Kluwer, Dordrecht). This book covers much the same field as the
    present document, but is more concerned with the principles behind
    the facilities provided, rather than being a cookbook of what is
    available and how to access it.
 
-  \item {\it A Guide to Astronomical Catalogues, Databases and Archives
+  \item \textit{A Guide to Astronomical Catalogues, Databases and Archives
    available through Starlink} by A.C. Davenhall, March 1993
    (\xref{SUN/162}{sun162}{}).
    This SUN includes descriptions of SIMBAD, NED, ADS and ESIS, all of
    which contain bibliographic information.
 
-  \item F. Murtagh and H. -M. Adorf in {\it The ESO Messenger (El
-   Mensajero)}, June 1993, Number {\bf 72}, pp45-47. This paper is
+  \item F. Murtagh and H. -M. Adorf in \textit{The ESO Messenger (El
+   Mensajero)}, June 1993, Number \textbf{72}, pp45-47. This paper is
    similar in scope and purpose to the present document.
 
-  \item {\it Network Resources for Astronomers}\, by R.J. Hanisch,
-   October 1992 and {\it On-line Data and Information in Astronomy}
+  \item \textit{Network Resources for Astronomers}\, by R.J. Hanisch,
+   October 1992 and \textit{On-line Data and Information in Astronomy}
    by H. Andernach, February 1993. These documents are similar to the
    present document and \xref{SUN/162}{sun162}{} and describe many on-line
    databases and
@@ -3005,9 +2778,9 @@ the tools complement each other.
 \section{Acknowledgements\xlabel{acknowledgements}}
 
 I learnt of some of the bibliographic databases from F. Murtagh and
-H. -M. Adorf's paper in {\it The ESO Messenger}. Dr.~B.G.~Marsden
+H. -M. Adorf's paper in \textit{The ESO Messenger}. Dr.~B.G.~Marsden
 kindly supplied useful information about the IAU Circulars. Ed Krol's
-{\it The Whole Internet User's Guide and Catalog}\, explained the
+\textit{The Whole Internet User's Guide and Catalog}\, explained the
 various INTERNET tools, which previously had seemed capricious and
 baffling. The descriptions of the various facilities were mostly
 abstracted from the introductory sections of the corresponding
