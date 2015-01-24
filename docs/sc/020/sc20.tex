@@ -583,8 +583,8 @@ the JCMT in 2014; they have both been in active service for many years
 and comprise the bulk of archived JCMT heterodyne data. For
 information on previous instruments see the JCMT web pages.
 
-In the following $\eta_\textnormal{MB}$ is the main-beam efficiency and
-$\eta_\textnormal{fss}$ is the forward spillover and scattering efficiency.
+In the following $\eta_{\textnormal{MB}}$ is the main-beam efficiency and
+$\eta_{\textnormal{\,fss}}$ is the forward spillover and scattering efficiency.
 
 \subsection{RxA Frontend}
 
@@ -596,7 +596,7 @@ mapping.
 \begin{center}
 \begin{tabular}{|p{1.5cm}|p{1.2cm}|p{0.8cm}|p{0.8cm}|}
 \hline
-Receiver &FWHM & $\eta_\textnormal{MB}$ & $\eta_\textnormal{fss}$\\
+Receiver &FWHM & $\eta_{\textnormal{MB}}$ & $\eta_{\textnormal{\,fss}}$\\
 \hline
 RxA&19.\uarcs7&0.57 & 0.80\\
 \hline
@@ -635,7 +635,7 @@ below}.
 \begin{center}
 \begin{tabular}{|p{1.5cm}|p{1.2cm}|p{0.8cm}|p{0.8cm}|}
 \hline
-Receiver &FWHM & $\eta_\textnormal{MB}$ & $\eta_\textnormal{fss}$\\
+Receiver &FWHM & $\eta_{\textnormal{MB}}$ & $\eta_{\textnormal{\,fss}}$\\
 \hline
 HARP&14\arcsec &0.63& 0.88\\
 \hline
@@ -1417,10 +1417,10 @@ the advanced method outlined above.
 \label{sec:mult}
 
 Your cube will come out of \makecube\, and the pipeline, in units of
-$T_A^*$. To convert this to main beam brightness temperature, $T_{MB}$ divide
-your cube by the main-beam efficiency, $\eta_\textnormal{MB}$. Alternatively, to
-convert to receiver temperature, $T_{rec}$, divide by the forward
-scattering and spillover efficiency, $\eta_\textnormal{fss}$.  See
+$T_{\textnormal{A}}^*$. To convert this to main beam brightness temperature, $T_{\textnormal{MB}}$
+divide your cube by the main-beam efficiency, $\eta_{\textnormal{MB}}$. Alternatively,
+to convert to receiver temperature, $T_{rec}$, divide by the forward
+scattering and spillover efficiency, $\eta_{\textnormal{\,fss}}$.  See
 \cref{Section}{sec:instruments}{Heterodyne instruments} for efficiency
 values for RxA and HARP, and the JCMT webpages for further information
 and historical numbers.
@@ -2707,7 +2707,7 @@ single reduced cube.
                     rsp PNG \\
 \file{iwc}        & Intensity weighted co-ordinate image \\
 \file{noise}      & Noise map \\
-\file{reduced00n} & Final trimmed, baselined cube of the $n^\textnormal{th}$ tile.
+\file{reduced00n} & Final trimmed, baselined cube of the $n^{\textnormal{th}}$ tile.
                     There may be a few of these as large maps will be split into
                     tiles of 512\,MB. \\
 \file{rmslo}      & Low-frequency noise \\
@@ -2723,7 +2723,7 @@ single reduced cube.
                     masked out. \\
 \file{bl001}      & Baselined cube \\
 \file{linteg00n}  & Integrated intensity image formed around the
-                    $n^\textnormal{th}$ line. \\
+                    $n^{\textnormal{th}}$ line. \\
 \hline
 \end{tabular}
 \label{tab:pipe-out}
