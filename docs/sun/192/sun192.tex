@@ -1,54 +1,18 @@
-\documentstyle[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt,nolof,noabs]{starlink}
 
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocnumber}    {192.1}
-\newcommand{\stardocauthors}   {S.\,C.\,Rehan}
-\newcommand{\stardocdate}      {10 May 1995}
-\newcommand{\stardoctitle}     {nu/TPU --- A DEC TPU compatible editor for UNIX}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocnumber      {192.1}
+\stardocauthors     {S.\,C.\,Rehan}
+\stardocdate        {10 May 1995}
+\stardoctitle       {nu/TPU --- A DEC TPU compatible editor for UNIX}
 %------------------------------------------------------------------------------
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-%------------------------------------------------------------------------------
-% Add any \newcommand or \newenvironment commands here
+% Add any \providecommand or \newenvironment commands here
 %------------------------------------------------------------------------------
 
 \begin{document}
-\thispagestyle{empty}
-CCL / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-{\large Particle Physics \& Astronomy Research Council}\\
-{\large Starlink Project\\}
-{\large \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Large\bf \stardoctitle}
-\end{center}
-\vspace{5mm}
-
-%------------------------------------------------------------------------------
-%  Add this part if you want a table of contents
-%  \setlength{\parskip}{0mm}
-%  \tableofcontents
-%  \setlength{\parskip}{\medskipamount}
-%  \markright{\stardocname}
-%------------------------------------------------------------------------------
+\scfrontmatter
 
 \section{What is nu/TPU?}
 
@@ -59,14 +23,14 @@ nu/TPU is very similar to these editors.
 
 To invoke nu/TPU type tpu at the unix prompt i.e.
 
-\begin{quote}\tt
-\% tpu
-\end{quote}
+\begin{terminalv}
+% tpu
+\end{terminalv}
 
 \section{Choosing an editor on Unix}
 
 For information regarding which editors are available under Unix and
-advice on which one to use, see SUN/170. This document contains
+advice on which one to use, see \xref{SUN/170}{sun170}{}. This document contains
 important warnings about the dangers of adopting nu/TPU as your default
 editor under Unix.
 
