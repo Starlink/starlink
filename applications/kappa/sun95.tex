@@ -11694,18 +11694,14 @@ Transforms a position from one NDF co-ordinate Frame to another.}
 \KAPPA\ applications may be classified in terms of their
 functions as follows.
 
-{\large
-\begin{center}
-{\bf DATA IMPORT \& EXPORT}
-\end{center}
-}
 
-\begin{description}
-%
+\subsection{DATA IMPORT \& EXPORT}
 \label{cl:datagen}
-\item {\large\bf Image generation and input}
 
-\begin{description}
+
+\subsubsection{Image generation and input}
+
+\begin{aligndesc}
 \classitem{CREFRAME}
  Generates a test two-dimensional NDF from a selection of several types.
 \classitem{FITSDIN}
@@ -11720,11 +11716,12 @@ functions as follows.
  Evaluates mathematical expressions applied to NDF data structures.
 \classitem{TRANDAT}
  Converts free-format data into an NDF.
-\end {description}
-\vspace*{0.7ex}
-%
-\item {\large\bf Preparation for output}
-\begin{description}
+\end {aligndesc}
+
+
+\subsubsection{Preparation for output}
+
+\begin{aligndesc}
 \classitem{FITSEDIT}
  Edits the FITS extension of an NDF.
 \classitem{FITSEXP}
@@ -11735,21 +11732,18 @@ functions as follows.
  Creates an NDF FITS extension from a text file.
 \classitem{FITSWRITE}
  Writes a new keyword to the FITS extension.
-\end {description}
-\end {description}
+\end {aligndesc}
 
-\vspace*{-1ex}
 
-{\large
-\begin{center}
-{\bf DATA DISPLAY}
-\end{center}
-}
 
-\begin{description}
-%
-\item {\large\bf Detail enhancement}
-\begin{description}
+
+\subsection{DATA DISPLAY}
+
+
+\subsubsection{Detail enhancement}
+
+
+\begin{aligndesc}
 \classitem{CARPET}
  Creates a cube representing a carpet plot of an image.
 \classitem{COLCOMP}
@@ -11763,32 +11757,32 @@ functions as follows.
 \classitem{THRESH}
  Edits an NDF such that array values below and above two thresholds take
  constant values.
-\end{description}
-\vspace*{0.7ex}
-%
-\item {\large\bf Device selection}
-\begin{description}
+\end{aligndesc}
+
+
+\subsubsection{Device selection}
+
+\begin{aligndesc}
 \classitem{GDNAMES}
  Shows which graphics devices are available.
 \classitem{GDSET}
  Selects a \htmlref{current graphics device}{se:devglobal}.
-\end{description}
-\vspace*{0.7ex}
-%
-\goodbreak
-\item {\large\bf Display control}
-\begin{description}
+\end{aligndesc}
+
+\subsubsection{Display control}
+
+\begin{aligndesc}
 \classitem{CURSOR}
  Reports the co-ordinates of points selected using the cursor.
 \classitem{GDCLEAR}
  Clears a graphics device and purges its database entries.
 \classitem{GDSTATE}
  Shows the current status of a graphics device.
-\end{description}
-\vspace*{0.7ex}
-%
-\item {\large\bf Graphics Database}
-\begin{description}
+\end{aligndesc}
+
+\subsubsection{Graphics Database}
+
+\begin{aligndesc}
 \classitem{PICBASE}
  Selects the BASE picture from the \htmlref{graphics database}{se:agitate}.
 \classitem{PICCUR}
@@ -11821,11 +11815,11 @@ functions as follows.
  Finds the first unobscured FRAME picture in the graphics database.
 \classitem{PICXY}
  Creates a new picture defined by co-ordinate bounds.
-\end{description}
-\vspace*{0.7ex}
-%
-\item {\large\bf Lookup/Colour tables}
-\begin{description}
+\end{aligndesc}
+
+\subsubsection{Lookup/Colour tables}
+
+\begin{aligndesc}
 \classitem{LUTABLE}
  Manipulates an graphics device \htmlref{colour table}{se:coltab}.
 \classitem{LUTBGYRW}
@@ -11862,11 +11856,12 @@ functions as follows.
  Loads the {\it warm\/} lookup table.
 \classitem{LUTZEBRA}
  Loads a pseudo-contour lookup table.
-\end{description}
-\vspace*{0.7ex}
-%
-\item {\large\bf Output}
-\begin{description}
+\end{aligndesc}
+
+
+\subsubsection{Output}
+
+\begin{aligndesc}
 \classitem{ARDPLOT}
  Plots the boundaries of regions described in an \htmlref{ARD file}{se:ardwork}~ over an existing picture.
 \classitem{CLINPLOT}
@@ -11895,12 +11890,12 @@ functions as follows.
  Displays a scatter plot between data in two NDFs.
 \classitem{VECPLOT}
  Plots a two-dimensional vector map.
-\end{description}
-\vspace*{0.7ex}
-%
-\label{cl:palette}
-\item {\large\bf Palette}
-\begin{description}
+\end{aligndesc}
+
+
+\subsubsection{Palette}
+
+\begin{aligndesc}
 \classitem{PALDEF}
  Loads the default \htmlref{palette}{se:palette}~ to a colour table.
 \classitem{PALENTRY}
@@ -11909,21 +11904,15 @@ functions as follows.
  Fills the palette of a colour table from an NDF.
 \classitem{PALSAVE}
  Saves the current palette of a colour table to an NDF.
-\end{description}
-\end{description}
+\end{aligndesc}
 
-\vspace*{-1ex}
+\subsection{DATA MANIPULATION}
 
-{\large
-\begin{center}
-{\bf DATA MANIPULATION}
-\end{center}
-}
 
-\begin{description}
-%
-\item {\large\bf Arithmetic}
-\begin{description}
+
+\subsubsection{Arithmetic}
+
+\begin{aligndesc}
 \classitem{ADD}
  Adds two NDF data structures.
 \classitem{CADD}
@@ -11962,11 +11951,12 @@ functions as follows.
  Subtracts one NDF data structure from another.
 \classitem{TRIG}
  Performs a trigonometric transformation on an NDF.
-\end {description}
-\vspace*{0.7ex}
-%
-\item {\large\bf Combination}
-\begin{description}
+\end {aligndesc}
+
+
+\subsubsection{Combination}
+
+\begin{aligndesc}
 \classitem{CALPOL}
  Calculates polarisation parameters.
 \classitem{COLCOMP}
@@ -11980,12 +11970,13 @@ functions as follows.
  difference.
 \classitem{WCSMOSAIC}
  Tiles a group of NDFs using World Co-ordinate System information.
-\end{description}
-\vspace*{0.7ex}
-%
+\end{aligndesc}
+
+
+\subsubsection{Compression and expansion}
 \label{cl:compexp}
-\item {\large\bf Compression and expansion}
-\begin{description}
+
+\begin{aligndesc}
 \classitem{CARPET}
  Creates a cube representing a carpet plot of an image.
 \classitem{CHANMAP}
@@ -12012,12 +12003,12 @@ functions as follows.
  Squashes or stretches an NDF.
 \classitem{WCSALIGN}
  Aligns a group of NDFs using \htmlref{WCS}{apndf:wcs}~ information.
-\end{description}
-\vspace*{0.7ex}
-\goodbreak
-%
-\item {\large\bf Configuration change}
-\begin{description}
+\end{aligndesc}
+
+
+\subsubsection{Configuration change}
+
+\begin{aligndesc}
 \classitem{CHAIN}
  Concatenates a series of vectorized NDFs.
 \classitem{FLIP}
@@ -12044,11 +12035,12 @@ functions as follows.
  Shifts pixels in an NDF by a given amount along each axis.
 \classitem{WCSSLIDE}
  Applies a translational correction to the WCS in an NDF.
-\end{description}
-\vspace*{0.7ex}
-%
-\item {\large\bf Filtering}
-\begin{description}
+\end{aligndesc}
+
+
+\subsubsection{Filtering}
+
+\begin{aligndesc}
 \classitem{BLOCK}
  Smooths an NDF using an n-dimensional rectangular box filter.
 \classitem{CONVOLVE}
@@ -12069,20 +12061,20 @@ functions as follows.
  Removes odd-even defects from a one-dimensional NDF.
 \classitem{WIENER}
  Applies a Wiener filter to a one- or two-dimensional array.
-\end{description}
-\vspace*{0.7ex}
-%
-\item {\large\bf HDS components}
-\begin{description}
+\end{aligndesc}
+
+\subsubsection{HDS components}
+
+\begin{aligndesc}
 \classitem{ERASE}
  Erases an \HDSref\ object.
 \classitem{NATIVE}
  Converts an HDS object to native machine data representation.
-\end{description}
-\vspace*{0.7ex}
-%
-\item {\large\bf NDF array components}
-\begin{description}
+\end{aligndesc}
+
+
+\subsubsection{NDF array components}
+\begin{aligndesc}
 \classitem{NDFCOMPRESS}
  Compresses an NDF so that it occupies less disk space.
 \classitem{NDFCOPY}
@@ -12109,12 +12101,10 @@ functions as follows.
  Sets new values for the \htmlref{VARIANCE component}{apndf:variance}~ of an NDF data structure.
 \classitem{SHOWQUAL}
  Displays the named qualities stored in an NDF \htmlref{QUALITY component}{apndf:quality}.
-\end{description}
-\vspace*{0.7ex}
-%
-\goodbreak
-\item {\large\bf NDF axis components}
-\begin{description}
+\end{aligndesc}
+
+\subsubsection{NDF axis components}
+\begin{aligndesc}
 \classitem{AXCONV}
  Expands spaced axes in an NDF into the primitive form.
 \classitem{AXLABEL}
@@ -12127,22 +12117,20 @@ functions as follows.
  Sets values for an \htmlref{axis array component}{apndf:axis} within an NDF data structure.
 \classitem{SETNORM}
  Sets a new value for one or all of an NDF's axis-normalisation flags.
-\end{description}
-\vspace*{0.7ex}
-%
-\item {\large\bf NDF character components}
-\begin{description}
+\end{aligndesc}
+
+\subsubsection{NDF character components}
+\begin{aligndesc}
 \classitem{SETLABEL}
  Sets a new \htmlref{label}{apndf:label}~ for an NDF data structure.
 \classitem{SETTITLE}
  Sets a new \htmlref{title}{apndf:title}~ for an NDF data structure.
 \classitem{SETUNITS}
  Sets a new \htmlref{units}{apndf:units}~ value for an NDF data structure.
-\end{description}
-\vspace*{0.7ex}
-%
-\item {\large\bf NDF extensions}
-\begin{description}
+\end{aligndesc}
+
+\subsubsection{NDF extensions}
+\begin{aligndesc}
 \classitem{FITSEDIT}
  Edits the \htmlref{FITS extension}{se:fitsairlock}~ of an NDF.
 \classitem{FITSEXIST}
@@ -12163,24 +12151,25 @@ functions as follows.
  Manipulates the contents of a specified NDF \htmlref{extension}{apndf:extensions}.
 \classitem{SETSKY}
  Stores \htmlref{WCS}{apndf:wcs}~ Information in an NDF.
-\end{description}
-\vspace*{0.7ex}
-%
-\item {\large\bf NDF History}
-\begin{description}
+\end{aligndesc}
+
+\subsubsection{NDF History}
+\begin{aligndesc}
 \classitem{HISCOM}
  Adds commentary to the \htmlref{history}{se:ndfhistory} of an NDF.
 \classitem{HISLIST}
  Lists NDF \htmlref{history records}{apndf:history}.
 \classitem{HISSET}
  Sets the NDF history update mode.
-\end{description}
-\vspace*{0.7ex}
-%
-\goodbreak
+\end{aligndesc}
+
+
+
+
+\subsubsection{NDF Provenance}
 \label{cl:prov}
-\item {\large\bf NDF Provenance}
-\begin{description}
+
+\begin{aligndesc}
 \classitem{PROVADD}
  Stores \htmlref{provenance information}{apndf:provenance} in an NDF.
 \classitem{PROVMOD}
@@ -12189,12 +12178,11 @@ functions as follows.
  Removes selected provenance information from an NDF.
 \classitem{PROVSHOW}
  Displays provenance information for an NDF.
-\end{description}
-\vspace*{0.7ex}
-%
-\label{cl:wcs}
-\item {\large\bf NDF World Co-ordinate Systems}
-\begin{description}
+\end{aligndesc}
+
+
+\subsubsection{NDF World Co-ordinate Systems}
+\begin{aligndesc}
 \classitem{PERMAXES}
  Permutes the axes of an NDF.
 \classitem{WCSADD}
@@ -12218,12 +12206,13 @@ WCS component of an NDF.
  Applies a translational correction to the WCS in an NDF.
 \classitem{WCSTRAN}
  Transforms a position from one NDF co-ordinate Frame to another.
-\end{description}
-\vspace*{0.7ex}
-%
+\end{aligndesc}
+
+
+
+\subsubsection{Pixel editing and masking}
 \label{cl:pixedit}
-\item {\large\bf Pixel editing and masking}
-\begin{description}
+\begin{aligndesc}
 \classitem{ARDGEN}
  Creates a text file describing selected regions of an image.
 \classitem{ARDMASK}
@@ -12270,19 +12259,20 @@ WCS component of an NDF.
 \classitem{ZAPLIN}
  Replaces regions in a two-dimensional NDF by bad values or by linear
  interpolation.
-\end{description}
-\vspace*{0.7ex}
-%
-\item {\large\bf Polarimetry}
-\begin{description}
+\end{aligndesc}
+
+
+\subsubsection{Polarimetry}
+\begin{aligndesc}
 \classitem{CALPOL}
  Calculates polarisation parameters.
-\end{description}
-\vspace*{0.7ex}
-%
+\end{aligndesc}
+
+
+\subsubsection{Resampling and transformations}
 \label{cl:regrid}
-\item {\large\bf Resampling and transformations}
-\begin{description}
+
+\begin{aligndesc}
 \classitem{PLUCK}
  Plucks slices from an NDF at arbitrary positions.
 \classitem{REGRID}
@@ -12291,12 +12281,14 @@ WCS component of an NDF.
  Aligns a group of NDFs using \htmlref{WCS}{apndf:wcs}~ information.
 \classitem{WCSMOSAIC}
  Tiles a group of NDFs using World Co-ordinate System information.
-\end{description}
-\vspace*{0.7ex}
-%
+\end{aligndesc}
+
+
+
+\subsubsection{Surface and vector fitting}
 \label{cl:surfit}
-\item {\large\bf Surface and vector fitting}
-\begin{description}
+
+\begin{aligndesc}
 \classitem{FITSURFACE}
  Fits a polynomial surface to two-dimensional data array.
 \classitem{MAKESURFACE}
@@ -12305,21 +12297,16 @@ WCS component of an NDF.
  Fits independent trends to data lines that are parallel to an axis.
 \classitem{SURFIT}
  Fits a polynomial or spline surface to a two-dimensional data array using blocking.
-\end{description}
-\end{description}
+\end{aligndesc}
 
-\vspace*{-1ex}
 
-{\large
-\begin{center}
-{\bf DATA ANALYSIS}
-\end{center}
-}
 
-\begin{description}
-%
-\item {\large\bf Statistics}
-\begin{description}
+\subsection{DATA ANALYSIS}
+
+
+\subsubsection{Statistics}
+
+\begin{aligndesc}
 \classitem{APERADD}
  Derives statistics of pixels within a specified aperture of an NDF.
 \classitem{HISTAT}
@@ -12333,11 +12320,12 @@ WCS component of an NDF.
  or below a threshold.
 \classitem{STATS}
  Computes simple statistics for an NDF's pixels.
-\end{description}
-\vspace*{0.7ex}
-%
-\item {\large\bf Other}
-\begin{description}
+\end{aligndesc}
+
+
+\subsubsection{Other}
+
+\begin{aligndesc}
 \classitem{BEAMFIT}
  Fits beam features in a two-dimensional NDF.
 \classitem{CENTROID}
@@ -12350,23 +12338,14 @@ WCS component of an NDF.
  in a two-dimensional NDF.
 \classitem{SURFIT}
  Fits a polynomial or spline surface to a two-dimensional data array.
-\end{description}
-\end{description}
+\end{aligndesc}
 
-\vspace*{-1ex}
 
-\goodbreak
-{\large
-\begin{center}
-{\bf SCRIPTING TOOLS}
-\end{center}
-}
 
-\begin{description}
-\item{~}
-\vspace*{-5.6ex}
-%
-\begin{description}
+
+\subsection{SCRIPTING TOOLS}
+
+\begin{aligndesc}
 \classitem{CALC}
  Evaluates a mathematical expression.
 \classitem{CONFIGECHO}
@@ -12375,22 +12354,12 @@ WCS component of an NDF.
  Expands a group expression into a list of explicit NDF names.
 \classitem{PARGET}
  Obtains the value or values of an \htmlref{application parameter}{se:parout}.
-\end{description}
-\end{description}
+\end{aligndesc}
 
-\vspace*{-1ex}
 
-{\large
-\begin{center}
-{\bf INQUIRIES \& STATUS}
-\end{center}
-}
+\subsection{INQUIRIES \& STATUS}
 
-\begin{description}
-\item{~}
-\vspace*{-5.6ex}
-%
-\begin{description}
+\begin{aligndesc}
 \classitem{GLOBALS}
  Displays the values of the \KAPPA\ \htmlref{global parameters}{se:parglobals}.
 \classitem{FITSEXIST}
@@ -12403,31 +12372,20 @@ WCS component of an NDF.
  Displays the attributes of an \htmlref{NDF data structure}{ap:NDFformat}.
 \classitem{NOGLOBALS}
  Resets the \KAPPA\ global parameters.
-\end{description}
-\end{description}
+\end{aligndesc}
 
-\vspace*{-1ex}
 
-{\large
-\begin{center}
-{\bf MISCELLANEOUS}
-\end{center}
-}
+\subsection{MISCELLANEOUS}
 
-\begin{description}
-\item{~}
-\vspace*{-5.6ex}
-%
-\begin{description}
+\begin{aligndesc}
 \classitem{KAPHELP}
  Gives help about \KAPPA.
 \classitem{LISTMAKE}
  Creates a catalogue holding a positions list.
 \classitem{KAPVERSION}
  Checks the version number of the installed package.
-\end{description}
-\end{description}
-%\end{small}
+\end{aligndesc}
+
 
 \section{\xlabel{ap_quotas}Quotas to run KAPPA\label{ap:quotas}}
 
