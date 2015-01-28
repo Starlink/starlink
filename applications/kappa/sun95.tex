@@ -1,15 +1,6 @@
 \documentclass[twoside,11pt]{starlink}
 
-% ? Specify used packages
-%\usepackage        %  Use this one for final production.
-%\usepackage
-%% \usepackage %  Use this one for drafting.
-% ? End of specify used packages
-
-
-
 % -----------------------------------------------------------------------------
-% ? Document identification
 \stardoccategory  {Starlink User Note}
 \stardocinitials  {SUN}
 \stardocsource    {sun95.41}
@@ -19,7 +10,6 @@
 \stardoctitle     {KAPPA --- Kernel Application Package}
 \stardocversion   {2.2}
 \stardocmanual    {User's Guide}
-% ? End of document identification
 % -----------------------------------------------------------------------------
 \stardocabstract{
 \KAPPA\ is an applications package comprising about 180
@@ -40,111 +30,52 @@ section on writing scripts.  This document includes several tutorials
 and is illustrated with numerous examples.  The bulk of this document
 comprises detailed descriptions of each command as well as classified
 and alphabetical summaries.}
-% ? End of document identification
 % -----------------------------------------------------------------------------
 
 \stardocname{\stardocinitials /\stardocnumber}
 
-%
-%\setlength{\textwidth}{160mm}
-%\setlength{\textheight}{230mm}
-%\setlength{\topmargin}{-2mm}
-%\setlength{\oddsidemargin}{0mm}
-%\setlength{\evensidemargin}{0mm}
-%\setlength{\parindent}{0mm}
-%\setlength{\parskip}{\medskipamount}
-%\setlength{\unitlength}{1mm}
 
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \providecommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document-specific \providecommand or \newenvironment commands.
-
-% Also define the html equivalents.
-
-% degrees symbol
-%\usepackage{siunitx}
 \ifpdf
-\newcommand{\dgs}{\si{\degree}}%$^{\circ}$}
+\newcommand{\dgs}{\si{\degree}}
 \else
 \newcommand{\dgs}{\HCode{&deg}}
 \fi
-%
 
-% arcminute symbol
-\providecommand{\arcm}{\si{\arcminute}}%\hbox{$^{\prime$}}}
-%
+\providecommand{\arcm}{\si{\arcminute}}
+
 
 
 % arcsec symbol
-\providecommand{\arcsec}{\si{\arcsecond}}%\arcm\hskip -0.1em\arcm}
-%
-
+\providecommand{\arcsec}{\si{\arcsecond}}
 
 % hours symbol
 \providecommand{\hr}{\hbox{$^{\textrm{h}}$}}
-%
-
 
 % minutes symbol
 \providecommand{\mn}{\hbox{$^{\textrm{m}}$}}
-%
-
 
 % seconds symbol
 \providecommand{\scn}{\hbox{$^{\textrm{s}}$}}
-%
-
 
 % decimal-minutes symbol
 \providecommand{\um}{\hskip-0.3em\hbox{$^{\textrm{m}}$}\hskip-0.08em}
 
-
-
 % decimal-degree symbol
 \providecommand{\udeg}{\hskip-0.3em\dgs\hskip-0.08em}
 
-
-
 % decimal-second symbol
 \providecommand{\us}{\hskip-0.27em\hbox{$^{\text{s}}$}\hskip-0.06em}
-%
-
 
 % decimal-arcminute symbol
 \providecommand{\uarcm}{\hskip-0.28em\arcm\hskip-0.04em}
 
-
-
 % decimal-arcsecond symbol
 \providecommand{\uarcs}{\hskip-0.27em\arcsec\hskip-0.02em}
-%
-
 
 % centre an asterisk
 \providecommand{\lsk}{\raisebox{-0.4ex}{\textrm{*}}}
 
 \hyphenation{which-ever}
-
-% A kind of list item, like description, but with an easily adjustable
-% item separation.  Note that the paragraph and fount-size change are
-% needed to make the revised \baselinestretch work.
-
-
-
-
-
-% an environment for references (for the SST sstdiytopic command).
 
 
 % Lines for breaking up Appendices A and B.
@@ -154,8 +85,6 @@ and alphabetical summaries.}
 
 % Frame attributes fount.
 \providecommand{\att}[1]{\textsf{#1}}
-
-
 \providecommand{\htmlattref}[2]{\htmlref{\att{#1}}{#2}}
 
 % Shorthands for hypertext links.
@@ -207,49 +136,11 @@ and alphabetical summaries.}
 \providecommand{\STLref}{\xref{{\footnotesize STL}}{sun190}{STLREF}}
 \providecommand{\TWODSPECref}{\xref{{\footnotesize TWODSPEC}}{sun16}{}}
 
-
-% ----------------------
-
-% ? End of document specific commands
 %------------------------------------------------------------------------------
-%  Title Page.
-%  ===========
+
 \begin{document}
 \scfrontmatter
-
-
-%  Colour verbatim text.
-
-%  ==========================
-
-
-
 % -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%   ==================
-
-
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
- \newpage
- \begin{latexonly}
-   %\setlength{\parskip}{0mm}
-   
-   %\setlength{\parskip}{\medskipamount}
-   
-%  
- \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-% \newpage
-\cleardoublepage
-
-
-% The main text begins here.
-% -----------------------------------------------------------------------------
-
 \section{\xlabel{se_kappaintro}Introduction\label{se:kappaintro}}
 
 \subsection{Background}
