@@ -87,6 +87,11 @@ p.indent{ text-indent: 0em }
     font-size:110%;
 }
 
+.subsubsectionHead, .likesubsubsectionHead {
+    font-family: "Georgia", serif;
+    font-weight: bold;
+    font-size: 105%;
+}
 /* spacing for sectionheads*/
 .sectionHead, .likesectionHead{
     padding:5px;

@@ -44,7 +44,7 @@
 
 
 % %.. verbatim environment for quoting terminal.
-\DefineVerbatimEnvironment{terminalv}{Verbatim}{xleftmargin=.5in,formatcom=\color{MidnightBlue}}
+\DefineVerbatimEnvironment{terminalv}{Verbatim}{xleftmargin=.5in,formatcom=\color{MidnightBlue},fontsize=\small}
 
 
 % %.. Empty environment latex only.
@@ -177,8 +177,8 @@
 }
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % Number sections down to subsection level
-% %\setcounter{secnumdepth}{0}
+% Number sections down to subsubsection level
+\setcounter{secnumdepth}{4}
 
 % %%% Formatting of the section headging
 \newcommand{\colorsection}[1]{%
@@ -195,7 +195,6 @@
 {\normalfont\Large\bfseries}{}{0pt}{\colorsection}
 \titleformat{name=\section,numberless}%
 {\normalfont\Large\bfseries}{}{0pt}{\colorsectionnumberless}
-
 \fi
 
 %... Chapter headings
