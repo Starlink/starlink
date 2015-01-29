@@ -113,7 +113,7 @@
              $used{ $label }++;
              $label_x = $_;
              $label_x =~ s/\W//g;
-             s/$/\\sstlabel{$label_x}/;
+             #s/$/\\sstlabel{$label_x}/;
          }
 
 #  If we are in a Functions or Attributes section, see if the match occurs
@@ -148,7 +148,7 @@
 
 #  Form a version of the label with non alphanumerics removed.
             $label_x = $label;
-            $label_x =~ s/\W//g;
+            #$label_x =~ s/\W//g;
 
 #  Edit each instance of the label in the source line to insert an \htmlref.
             s/$label_q/\\htmlref{$label}{$label_x}/;
