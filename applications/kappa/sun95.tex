@@ -40245,7 +40245,7 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
       }{
          The method to use when sampling the input pixel values.  For
          details of these schemes, see the descriptions of routine
-         \xref{AST\_RESAMPLEx}{sun210}{AST_RESAMPLEX} in
+         \xref{AST\_RESAMPLEx}{sun210}{AST_RESAMPLE\$<X>\$} in
          \xref{SUN/210}{sun210}{}.  METHOD can take the following values.
 
          \ssthitemlist{
@@ -42491,8 +42491,8 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          resampling), or dividing an input pixel value between a group
          of neighbouring output pixels (if rebinning).  For details
          of these schemes, see the descriptions of routines
-         \xref{AST\_RESAMPLEx}{sun210}{AST_RESAMPLEX} and
-         \xref{AST\_REBINSEQx}{sun210}{AST_REBINSEQX} in
+         \xref{AST\_RESAMPLEx}{sun210}{AST_RESAMPLE\$<X>\$} and
+         \xref{AST\_REBINSEQx}{sun210}{AST_REBINSEQ\$<X>\$} in
          \xref{SUN/210}{sun210}{}. METHOD can take the following values.
 
          \ssthitemlist{
@@ -42759,8 +42759,8 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          the sub-pixel interpolation schemes employed.
 
          \sstitem
-         This task is based on the \xref{AST\_RESAMPLEx}{sun210}{AST_RESAMPLEX}
-         and \xref{AST\_REBINSEQx}{sun210}{AST_REBINSEQX} routines described in
+         This task is based on the \xref{AST\_RESAMPLEx}{sun210}{AST_RESAMPLE\$<X>\$}
+         and \xref{AST\_REBINSEQx}{sun210}{AST_REBINSEQ\$<X>\$} routines described in
          \xref{SUN/210}{sun210}{}.
       }
    }
@@ -46610,7 +46610,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       be adequate, but for greater control over the resampling
       process the METHOD and PARAMS parameters can be used.  Detailed
       discussion of the use of these parameters can be found in the
-      \xref{``Sub-pixel Interpolation Schemes''}{sun210}{AST_RESAMPLEX}~
+      \xref{``Sub-pixel Interpolation Schemes''}{sun210}{AST_RESAMPLE\$<X>\$}~
       section of the AST\_RESAMPLE documentation.
    }
    \sstnotes{
@@ -46929,7 +46929,7 @@ KAPPA: \htmlref{REGRID}{REGRID},
       control over the resampling process the METHOD and PARAMS
       parameters can be used.  Detailed discussion of the use of these
       parameters can be found in the
-      \xref{``Sub-pixel Interpolation Schemes''}{sun210}{AST_RESAMPLEX}~
+      \xref{``Sub-pixel Interpolation Schemes''}{sun210}{AST_RESAMPLE\$<X>\$}~
       section of the AST\_RESAMPLE documentation. By default, all
       interpolation schemes preserve flux density rather than total
       flux, but this may be changed using the CONSERVE parameter.
@@ -49441,8 +49441,8 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          resampling), or dividing an input pixel value up between a group
          of neighbouring output pixels (if rebinning).  For details
          of these schemes, see the descriptions of routines
-         \xref{AST\_RESAMPLEx}{sun210}{AST_RESAMPLEX} and
-         \xref{AST\_REBINx}{sun210}{AST_REBINX} in
+         \xref{AST\_RESAMPLEx}{sun210}{AST_RESAMPLE\$<X>\$} and
+         \xref{AST\_REBINx}{sun210}{AST_REBIN\$<\$X\$>\$} in
          \xref{SUN/210}{sun210}{}.  METHOD can take the following values.
 
          \ssthitemlist{
@@ -50562,7 +50562,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       }{
          The method to use when dividing an input pixel value between a
          group of neighbouring output pixels.  For details on these
-         schemes, see the description of \xref{AST\_REBINx}{sun210}{AST_REBINX}
+         schemes, see the description of \xref{AST\_REBINx}{sun210}{AST_REBIN\$<X>\$}
          in \xref{SUN/210}{sun210}{}.  METHOD can take the following
          values.
 
@@ -53936,8 +53936,8 @@ The following applications have been modified:
       \begin{itemize}
         \item The new parameter AXES allows regridding of selected
         pixel axes.
-        \item It now uses \xref{AST\_REBINSEQx}{sun210}{AST_REBINSEQX} rather
-        than \xref{AST\_REBINx}{sun210}{AST_REBINX}.  This introduces
+        \item It now uses \xref{AST\_REBINSEQx}{sun210}{AST_REBINSEQ\$<X>\$} rather
+        than \xref{AST\_REBINx}{sun210}{AST_REBIN\$<X>\$}.  This introduces
         a NORM parameter, which permits normalisation of the
         output array by the number of contributing input array elements.
         Access to Parameter CONSERVE now depends on NORM, and
