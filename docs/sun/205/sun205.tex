@@ -1,241 +1,29 @@
-\documentclass[twoside,11pt]{article}
-\pagestyle{myheadings}
+\documentclass[twoside,11pt,nolof,noabs]{starlink}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {205.1}
-\newcommand{\stardocauthors}   {D.\,J.\,Rawlinson\\
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardocnumber      {205.1}
+\stardocauthors   {D.\,J.\,Rawlinson\\
                                 J.\,C.\,Sherman}
-\newcommand{\stardocdate}      {12th  December 1995}
-\newcommand{\stardoctitle}     {FORUM --- Starlink Conferencing Software}
-\newcommand{\stardocversion}   {[software version]}
-\newcommand{\stardocmanual}    {[manual type]}
+\stardocdate        {12th  December 1995}
+\stardoctitle       {FORUM --- Starlink Conferencing Software}
 % ? End of document identification
 % -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % from the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
+% ? Document-specific \providecommand or \newenvironment commands.
 % ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
-%\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Large \bf  \stardoctitle \\ [2.5ex]}
-%   {\LARGE\bf \stardocversion \\ [4ex]}
-%   {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-%   \vspace{10mm}
-%   \begin{center}
-%      {\Large\bf Abstract}
-%   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-%  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%   ==================
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-% \newpage
-% \begin{latexonly}
-%   \setlength{\parskip}{0mm}
-%   \tableofcontents
-%   \setlength{\parskip}{\medskipamount}
-%   \markright{\stardocname}
-% \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-%\newpage
-%\renewcommand{\thepage}{\arabic{page}}
-%\setcounter{page}{1}
-
+\scfrontmatter
 
 \section{Introduction}
 
-This {\em User Note} is a brief introduction to FORUM for users.
-A companion document, SSN/33, intended for Site Managers, describes
+This \emph{User Note} is a brief introduction to FORUM for users.
+A companion document, \xref{SSN/33}{ssn33}{}, intended for Site Managers, describes
 how to install FORUM.
 
 FORUM was first developed by Richard West, Leicester University, and
@@ -257,7 +45,7 @@ separate systems at several Starlink sites, FORUM maintains an index
 only for each instance of FORUM.
 
 The best way to find out more about FORUM is to run it.  FORUM has also
-been described in a {\em Starlink Bulletin} article, December 1995.
+been described in a \emph{Starlink Bulletin} article, December 1995.
 
 
 \section{Using Starlink FORUM}
@@ -265,18 +53,17 @@ been described in a {\em Starlink Bulletin} article, December 1995.
 To run FORUM simply start up your
 usual WWW browser, for example, Netscape or Mosaic, and either open the URL
 \begin{quote}
-{\tt http://rlsaxps.bnsc.rl.ac.uk/Forum}
+\url{http://rlsaxps.bnsc.rl.ac.uk/Forum}
 \end{quote}
 or click on FORUM from the Starlink home page.
 
 You will be presented with a list of Conferences and will usually find
 that access is denied to some of them (access restrictions are described
-in \S \ref{sec:access}).   If you find that access is denied to {\em
-all} Conferences, then it may be that your system is not running the
+in \S \ref{sec:access}).   If you find that access is denied to \emph{all} Conferences, then it may be that your system is not running the
 correct identity checking software.   Alternatively, it may be that you
 are using a WWW proxy (if a proxy is used then the machine calling
 FORUM will be the proxy server and not yours, with obvious difficulties
-for identity checking).  If you find you cannot access {\em any} FORUM
+for identity checking).  If you find you cannot access \emph{any} FORUM
 Conferences, please contact your Site Manager.
 
 Once connected, you should immediately enter your user profile
@@ -298,7 +85,7 @@ submissions are typed in while running FORUM (this is always the case
 for Ripostes), the server address and port number can be left blank.
 
 FORUM has a short [Help] page and new users can experiment using the
-{\tt Test} Conference.  For example, try out new techniques such as
+\texttt{Test} Conference.  For example, try out new techniques such as
 uploading GIF files or embedding HTML in notes.
 
 \subsection{[Upload]}
@@ -306,14 +93,14 @@ uploading GIF files or embedding HTML in notes.
 The [Upload] function is accessed via the [Add Reply] function.  It
 uploads existing files and, as noted previously, makes use of user
 profile information.   The file to be uploaded must be placed in your
-{\em public\_html} sub-directory before running FORUM and FORUM relies
+\emph{public\_html} sub-directory before running FORUM and FORUM relies
 on the usual WWW syntax to access this directory (for example,
 \verb+~jcs+).   The file to be uploaded will be copied to FORUM so you
 are free to delete or rename your own copy after using [Upload].
 Because of this copying, if you are uploading an HTML file then any
 pointers to other HTML pages must use absolute addresses, rather than
 relative addresses.  Please refer to your Site Manager if you are
-unfamiliar with the use of {\em public\_html}.
+unfamiliar with the use of \emph{public\_html}.
 
 \subsection{[Extract Unseen]} This function extracts all unseen notes
 in a Conference (the Conference in use at the time) to a Web page.
@@ -321,12 +108,12 @@ This page can be read directly or, using the usual Netscape or Mosaic
 functions, output to a printer or file.
 
 The [Extract Unseen] function is especially useful in conjunction with
-the {\tt Lynx} character-cell based WWW Browser, which can be run in
+the \texttt{Lynx} character-cell based WWW Browser, which can be run in
 batch mode.    For example, a batch command
 
-\begin{center} {\tt \% lynx -dump
-http://rlsaxps.bnsc.rl.ac.uk/Forum/extractunseen/Conference >out}
-\end{center}
+\begin{terminalv}
+% lynx -dump http://rlsaxps.bnsc.rl.ac.uk/Forum/extractunseen/Conference >out
+\end{terminalv}
 
 where `Conference' is the case-sensitive Conference name, will extract
 all unseen notes and redirect them to `out'.   In this way, all unseen
@@ -340,13 +127,13 @@ available to all users.   Please send any requests for further
 Conferences, or help, to Dave Rawlinson (djr@star.rl.ac.uk).
 
 The three generally available Conferences at the time of writing are:
-{\tt Test, Software Links,} and {\tt Questions and Answers}.  The
-{\tt Test} Conference has already been mentioned.
-The {\tt Software Links} Conference is intended for users to announce
+\texttt{Test, Software Links,} and \texttt{Questions and Answers}.  The
+\texttt{Test} Conference has already been mentioned.
+The \texttt{Software Links} Conference is intended for users to announce
 any public domain software package they have in use at their site and
 believe would be generally useful to UK astronomers.   Such software
 can be made available by placing a link to it in the note.
-The {\tt Questions and Answers} Conference is a forum for all Starlink users
+The \texttt{Questions and Answers} Conference is a forum for all Starlink users
 to raise questions and discuss problems on any aspect of Starlink.  It is
 hoped that in time it will become a repository of information that
 users can search if they come across a problem.
@@ -356,7 +143,7 @@ users can search if they come across a problem.
 Access restrictions are important for some Site Manager Conferences,
 which include, for example, material on Unix security and
 commercial-in-confidence matters.  FORUM restricts access via an
-authentication daemon called {\tt pidentd}, and provides user-based
+authentication daemon called \texttt{pidentd}, and provides user-based
 access control, Conference by Conference.  Identity checking is also an
 essential part of determining unseen notes, which must be done user by
 user.
@@ -365,7 +152,7 @@ Experience has shown that completely open Conferences can be abused.
 We have therefore set up FORUM to retain a record of who has accessed
 the system, even when access to a Conference is open to all users.
 This requires that all users must be running the identity checking
-daemon {\tt pidentd} (or an equivalent) on their node.  We hope this
+daemon \texttt{pidentd} (or an equivalent) on their node.  We hope this
 will deter abuse but  a penalty of identity checking is that it causes
 a delay of a few seconds per page.
 
