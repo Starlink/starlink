@@ -116,9 +116,6 @@
 \renewcommand\scpushright[1]{\a:scpushright#1\b:scpushright}
 \Configure{scpushright}{\Tg<span class="pushright">}{\Tg</span>}
 
-%% Fix the starlink \htmladdnormallink for the web.
-\renewcommand{\htmladdnormallink}[2]{\href{#2}{#1}}
-
 %% Tasks -- set up as a span of their own class.
 \NewConfigure{task}{2}
 \renewcommand\task[1]{\a:task#1\b:task}
