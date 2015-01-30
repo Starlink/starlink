@@ -672,7 +672,7 @@ diag.array = <undef>
 #    		used. The index of the chosen bolometer is reported, and
 #    		stored in the dumped NDFs.
 #
-#               - The string "<undef>", in which case the output NDFs
+#               - The string "NONE", in which case the output NDFs
 #               describing a single bolometer are not produced (maps and
 #               cubes may still be produced though - see parameter
 #               "diag.map" and parameter "diag.cube").
