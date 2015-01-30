@@ -225,9 +225,20 @@
 #  requested. If not, then output a remote URL constructed from that of the
 #  remote server (provide a default for this if necessary). In this case there
 #  is no check that the document or label exists.
+
+#  If document is in list of obsolete docs, then the generated url should be on ADS.
+#  This will not link to a specific section of the doc.
+
       if test ! -n "${done}" -a ! "${HTX_WHERE}" = 'l'; then
-         HTX_SERVER="${HTX_SERVER-http://www.starlink.ac.uk/cgi-bin/htxserver}"
-         echo "${HTX_SERVER}/${docname}.htx/${docname}.html?xref_${label}"
+	  if grep -q "${docname} " ${HTX_DIR}/obsdoc_adsurl.txt; then
+	      line=`grep "${docname} " ${HTX_DIR}/obsdoc_adsurl.txt`
+	      set $line;
+	      echo "http://adsabs.harvard.edu/abs/${2}"
+
+	  else
+              HTX_SERVER="${HTX_SERVER-http://www.starlink.ac.uk/cgi-bin/htxserver}"
+              echo "${HTX_SERVER}/${docname}.htx/${docname}.html?xref_${label}"
+	 fi
       fi         
 
 #  End of script.
