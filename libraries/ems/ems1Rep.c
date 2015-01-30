@@ -188,7 +188,7 @@ void ems1Rep( const char *err, const char *text, Logical useformat,
       /* format, and then copy back - currently can not use star_strlcpy */
       vsnprintf(fstr, sizeof(fstr), mstr, args );
       strncpy( mstr, fstr, sizeof(mstr) );
-      mstr[sizeof(mstr)] = '\0';
+      mstr[sizeof(mstr)-1] = '\0';
       mlen = strlen(mstr);
     }
 
