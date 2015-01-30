@@ -171,37 +171,8 @@ ALL_TARGETS = \
 	$(MANIFESTS)/ssn67 \
 	$(MANIFESTS)/ssn75 \
 	$(MANIFESTS)/sun1 \
-	$(MANIFESTS)/sun9 \
-	$(MANIFESTS)/sun20 \
-	$(MANIFESTS)/sun30 \
-	$(MANIFESTS)/sun34 \
-	$(MANIFESTS)/sun58 \
-	$(MANIFESTS)/sun63 \
-	$(MANIFESTS)/sun73 \
-	$(MANIFESTS)/sun82 \
-	$(MANIFESTS)/sun91 \
 	$(MANIFESTS)/sun101 \
-	$(MANIFESTS)/sun107 \
-	$(MANIFESTS)/sun119 \
-	$(MANIFESTS)/sun127 \
-	$(MANIFESTS)/sun145 \
-	$(MANIFESTS)/sun161 \
-	$(MANIFESTS)/sun162 \
-	$(MANIFESTS)/sun163 \
-	$(MANIFESTS)/sun165 \
-	$(MANIFESTS)/sun168 \
-	$(MANIFESTS)/sun169 \
-	$(MANIFESTS)/sun170 \
-	$(MANIFESTS)/sun172 \
-	$(MANIFESTS)/sun174 \
-	$(MANIFESTS)/sun189 \
-	$(MANIFESTS)/sun192 \
-	$(MANIFESTS)/sun197 \
-	$(MANIFESTS)/sun201 \
 	$(MANIFESTS)/sun202 \
-	$(MANIFESTS)/sun205 \
-	$(MANIFESTS)/sun207 \
-	$(MANIFESTS)/sun247 \
 	$(MANIFESTS)/sun249
 
 
