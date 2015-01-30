@@ -230,8 +230,8 @@
 #  This will not link to a specific section of the doc.
 
       if test ! -n "${done}" -a ! "${HTX_WHERE}" = 'l'; then
-	  if grep -q "${docname} " ${HTX_DIR}/obsdoc_adsurl.txt; then
-	      line=`grep "${docname} " ${HTX_DIR}/obsdoc_adsurl.txt`
+	  if grep -q "${docname}$" ${HTX_DIR}/obsdoc.txt; then
+	      line=`grep "${docname} " ${HTX_DIR}/adsurl.txt`
 	      set $line;
 	      echo "http://adsabs.harvard.edu/abs/${2}"
 
