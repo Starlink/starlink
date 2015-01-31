@@ -2571,34 +2571,9 @@ $(MANIFESTS)/spt: \
 	cd applications/spt \
 	  && $(MAKE_CPT)
 
-$(MANIFESTS)/ssn18: \
-		$(MANIFESTS)/star2html
-	cd docs/ssn/018 \
-	  && $(MAKE_CPT)
-
 $(MANIFESTS)/ssn22: \
 		$(MANIFESTS)/star2html
 	cd docs/ssn/022 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/ssn23: \
-		$(MANIFESTS)/star2html
-	cd docs/ssn/023 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/ssn24: \
-		$(MANIFESTS)/star2html
-	cd docs/ssn/024 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/ssn26: \
-		$(MANIFESTS)/star2html
-	cd docs/ssn/026 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/ssn27: \
-		$(MANIFESTS)/star2html
-	cd docs/ssn/027 \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/ssn3: \
@@ -2606,59 +2581,9 @@ $(MANIFESTS)/ssn3: \
 	cd docs/ssn/003 \
 	  && $(MAKE_CPT)
 
-$(MANIFESTS)/ssn30: \
-		$(MANIFESTS)/star2html
-	cd docs/ssn/030 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/ssn31: \
-		$(MANIFESTS)/star2html
-	cd docs/ssn/031 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/ssn32: \
-		$(MANIFESTS)/star2html
-	cd docs/ssn/032 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/ssn33: \
-		$(MANIFESTS)/star2html
-	cd docs/ssn/033 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/ssn36: \
-		$(MANIFESTS)/star2html
-	cd docs/ssn/036 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/ssn37: \
-		$(MANIFESTS)/star2html
-	cd docs/ssn/037 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/ssn39: \
-		$(MANIFESTS)/star2html
-	cd docs/ssn/039 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/ssn6: \
-		$(MANIFESTS)/star2html
-	cd docs/ssn/006 \
-	  && $(MAKE_CPT)
-
 $(MANIFESTS)/ssn64: \
 		$(MANIFESTS)/star2html
 	cd docs/ssn/064 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/ssn67: \
-		$(MANIFESTS)/star2html
-	cd docs/ssn/067 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/ssn7: \
-		$(MANIFESTS)/star2html
-	cd docs/ssn/007 \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/ssn75: \
@@ -3059,24 +2984,9 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/sla \
 	$(MANIFESTS)/smurf \
 	$(MANIFESTS)/specx \
-	$(MANIFESTS)/ssn18 \
 	$(MANIFESTS)/ssn22 \
-	$(MANIFESTS)/ssn23 \
-	$(MANIFESTS)/ssn24 \
-	$(MANIFESTS)/ssn26 \
-	$(MANIFESTS)/ssn27 \
 	$(MANIFESTS)/ssn3 \
-	$(MANIFESTS)/ssn30 \
-	$(MANIFESTS)/ssn31 \
-	$(MANIFESTS)/ssn32 \
-	$(MANIFESTS)/ssn33 \
-	$(MANIFESTS)/ssn36 \
-	$(MANIFESTS)/ssn37 \
-	$(MANIFESTS)/ssn39 \
-	$(MANIFESTS)/ssn6 \
 	$(MANIFESTS)/ssn64 \
-	$(MANIFESTS)/ssn67 \
-	$(MANIFESTS)/ssn7 \
 	$(MANIFESTS)/ssn75 \
 	$(MANIFESTS)/ssn8 \
 	$(MANIFESTS)/sst \

@@ -132,24 +132,9 @@ ALL_TARGETS = \
 	$(MANIFESTS)/sgp28 \
 	$(MANIFESTS)/sgp31 \
 	$(MANIFESTS)/ssn3 \
-	$(MANIFESTS)/ssn6 \
-	$(MANIFESTS)/ssn7 \
 	$(MANIFESTS)/ssn8 \
-	$(MANIFESTS)/ssn18 \
 	$(MANIFESTS)/ssn22 \
-	$(MANIFESTS)/ssn23 \
-	$(MANIFESTS)/ssn24 \
-	$(MANIFESTS)/ssn26 \
-	$(MANIFESTS)/ssn27 \
-	$(MANIFESTS)/ssn30 \
-	$(MANIFESTS)/ssn31 \
-	$(MANIFESTS)/ssn32 \
-	$(MANIFESTS)/ssn33 \
-	$(MANIFESTS)/ssn36 \
-	$(MANIFESTS)/ssn37 \
-	$(MANIFESTS)/ssn39 \
 	$(MANIFESTS)/ssn64 \
-	$(MANIFESTS)/ssn67 \
 	$(MANIFESTS)/ssn75 \
 	$(MANIFESTS)/sun1 \
 	$(MANIFESTS)/sun101 \

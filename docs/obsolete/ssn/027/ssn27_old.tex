@@ -1,0 +1,2962 @@
+\documentstyle{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {27.5}
+\newcommand{\stardocauthors}   {W F Lupton}
+\newcommand{\stardocdate}      {9 January 1989}
+\newcommand{\stardoctitle}     {HDS --- Hierarchical Data System}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+
+\vspace {5mm}
+
+{\large\bf Design and Implementation}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\listoftables
+\listoffigures
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\newpage
+\section {INTENDED AUDIENCE}
+
+This document is aimed at users of HDS who wish to know something about how it
+is implemented, and at system programmers who are contemplating maintaining,
+altering or adding new facilities to HDS. The reader is assumed to be familiar
+with the VMS operating system, but no prior knowledge of HDS is assumed
+(although the material will be easier to assimilate if he has used it as an
+application programmer).
+
+This is not an exhaustive document and, as is often the case, the ultimate
+documentation is the code. However, all of the major concepts are discussed
+here and anybody wishing seriously to get to grips with the internals of
+HDS should definitely read it.
+
+\section {HOW TO USE THIS DOCUMENT}
+
+If you know nothing about HDS, read the INTRODUCTION and the HDS CONCEPTS
+sections first. If you have already used it as an application programmer, you
+can start at the HDS ARCHITECTURE section (if you know what you are looking for
+you may be able to go straight there by referring to the CONTENTS). If you are
+interested in modifying HDS then you can start at the HDS IMPLEMENTATION
+section. If you just want some tips for making more efficient use of HDS then
+you can start at the TUNING section.
+
+Throughout the text, footnotes are used to draw attention to areas where
+the implementation requires further work or where something is handled in
+an unsatisfactory way. Footnotes are not used for any other purpose.
+
+\section {INTRODUCTION}
+
+HDS is a hierarchical data storage and retrieval system. It is structured as a
+set of subroutines which are used by application programs to create, store,
+access and manipulate {\em data objects}. These objects have a tree-like
+structure which can be altered in shape as well as content during program
+execution. It is this dynamic structuring facility which most clearly
+differentiates HDS from normal file systems. The main features of HDS are:
+
+\begin {itemize}
+\item Self description of objects
+\item Hierarchical structure of objects
+\item Dynamic alteration of object shape
+\item Automatic type conversion
+\item Bad value identification
+\item Mapping and caching to improve efficiency
+\end {itemize}
+
+HDS uses no system-wide resources such as global sections or event flags and
+does not require any VMS process privileges to execute. With few exceptions,
+the guidelines recommended in \cite{creating_modular_procedures} have been
+adhered to. It follows the VAX Procedure Calling Standard and can thus be used
+by any DEC-supported language product. VAX FORTRAN is the programming language
+normally used to access the system. It is described in
+\cite{programming_in_fortran} and the routine specifications are given in
+\cite{sun_92}.
+
+\section {HDS CONCEPTS}
+
+The basic building block of data stored by the system is the {\em data object}
+which will be referred to by the name {\em object}. An object possesses the
+following attributes:
+
+\begin {description}
+\item [NAME]: a character string which identifies the object. Although in
+general this is arbitrary, special meaning {\em may} be attached to certain
+names by application software or environment.
+\item [TYPE]: a character string which specifies the object's {\em type}.
+There are two {\em classes}:
+\begin {itemize}
+\item {\bf Primitive} --- actual data values such as a 2-D image array, a
+character string denoting the name of a telescope, or a pair of integer
+coordinate values.
+\item {\bf Structure} --- collections of other objects (primitive or structure)
+which are grouped together because of an inherent logical relationship.
+\end {itemize}
+\item [SHAPE]: an n-element array specifying the sizes of the n dimensions of
+the object. The maximum number of dimensions is seven. A scalar object is
+regarded as having zero dimensions.
+\item [STATE]: a logical variable which specifies whether or not data values
+are defined for the object.
+\end {description}
+
+Structure objects are tree-like and each object in them can be a scalar or an
+array with up to 7 dimensions. Figure~\ref{diagrams_of_structure_objects}
+contains some diagrams of structure objects.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(130,43)
+\thicklines
+\put (7,40){P(n)}
+\put (67,40){S(n)}
+\put (67,30){P(n)}
+\put (82,30){P(n)}
+\put (97,30){P(n)}
+\put (7,30){S(n)}
+\put (7,20){P(n)}
+\put (22,20){S(n)}
+\put (37,20){P(n,n,n)}
+\put (22,10){P(n)}
+\put (37,10){P(n)}
+\put (52,10){S(n,n)}
+\put (52,0){P(n)}
+\put (67,0){P(n,n,n,n)}
+\put (70,38){\line(0,-1){4}}
+\put (70,36){\line(1,0){30}}
+\put (85,36){\line(0,-1){2}}
+\put (100,36){\line(0,-1){2}}
+\put (10,28){\line(0,-1){4}}
+\put (10,26){\line(1,0){30}}
+\put (25,26){\line(0,-1){2}}
+\put (40,26){\line(0,-1){2}}
+\put (25,18){\line(0,-1){4}}
+\put (25,16){\line(1,0){30}}
+\put (40,16){\line(0,-1){2}}
+\put (55,16){\line(0,-1){2}}
+\put (55,8){\line(0,-1){4}}
+\put (55,6){\line(1,0){15}}
+\put (70,6){\line(0,-1){2}}
+\put (100,15){\bf KEY}
+\put (90,10){S(n) --- Structure object}
+\put (90,5){P(n) --- Primitive object}
+\end {picture}
+\caption {Diagrams of Structure Objects}
+\label {diagrams_of_structure_objects}
+\end {center}
+\end {figure}
+
+\subsection {Primitive Objects}
+
+Primitive objects contain the actual data values that are processed by
+application software. HDS supports five {\em standard} primitive data types
+which correspond to the main FORTRAN-77 types. They are illustrated in
+Table~\ref{standard_primitive_data_types}.
+
+\begin {table}[htbp]
+\begin {center}
+\begin {tabular}{||l|l|l||}
+\hline
+Primitive data type	& VAX FORTRAN type		& HDS type \\
+\hline
+Integer			& {\tt INTEGER}			& {\tt `\_INTEGER'} \\
+Single floating point	& {\tt REAL}			& {\tt `\_REAL'} \\
+Double floating point	& {\tt DOUBLE PRECISION}	& {\tt `\_DOUBLE'} \\
+Logical			& {\tt LOGICAL}			& {\tt `\_LOGICAL'} \\
+Character		& {\tt CHARACTER[*n]}		& {\tt `\_CHAR[*n]'} \\
+\hline
+\end {tabular}
+\caption {Standard Primitive Data Types}
+\label {standard_primitive_data_types}
+\end {center}
+\end {table}
+
+Because of the diverse nature of astronomical data a further set of primitive
+data types called {\em non-standard} are also supported but their
+indiscriminate use may make software less portable. They are illustrated
+in Table~\ref{non_standard_primitive_data_types}.
+
+\begin {table}[htbp]
+\begin {center}
+\begin {tabular}{||l|l|l||}
+\hline
+Primitive data type	& VAX FORTRAN type	& HDS type \\
+\hline
+Byte			& {\tt BYTE}		& {\tt `\_BYTE'} \\
+Unsigned byte		& {\tt BYTE}		& {\tt `\_UBYTE'} \\
+Word			& {\tt INTEGER*2}	& {\tt `\_WORD'} \\
+Unsigned word		& {\tt INTEGER*2}	& {\tt `\_UWORD'} \\
+\hline
+\end {tabular}
+\caption {Non-standard Primitive Data Types}
+\label {non_standard_primitive_data_types}
+\end {center}
+\end {table}
+
+Note the use of the leading underscore in the HDS type names --- this is used
+to distinguish between primitive and structure objects. The precision of
+primitive data depends on the architecture of the host machine. The only host
+machines used at present are those with the DEC VAX architecture. The VAX data
+types are described in \cite{programming_in_fortran} and their sizes and ranges
+are illustrated in Table~\ref{sizes_and_ranges_of_primitive_data_types}.
+
+\begin {table}[htbp]
+\begin {center}
+\begin {tabular}{||l|r|l||}
+\hline
+Data type	& Storage	& Range \\
+\hline
+{\tt INTEGER}	& 32 bits	& {\tt -2147483648 to 2147483647} \\
+{\tt REAL}	& 32 bits	& {\tt +/- 0.29e-38 to 1.7e+38} \\
+{\tt DOUBLE}	& 64 bits	& {\tt +/- 0.29d-38 to 1.7d+38} \\
+{\tt LOGICAL}	& 32 bits	& {\tt TRUE or FALSE} \\
+{\tt CHAR}	& 8 bits	& {\tt Any 8-bit pattern} \\
+{\tt CHAR*n}	& n*8 bits	& {\tt 0 < n < 65536} \\
+\hline
+{\tt BYTE}	& 8 bits	& {\tt -128 to 127} \\
+{\tt UBYTE}	& 8 bits	& {\tt 0 to 255} \\
+{\tt WORD}	& 16 bits	& {\tt -32768 to 32767} \\
+{\tt UWORD}	& 16 bits	& {\tt 0 to 65535} \\
+\hline
+\end {tabular}
+\caption {Sizes and Ranges of Primitive Data Types}
+\label {sizes_and_ranges_of_primitive_data_types}
+\end {center}
+\end {table}
+
+The REAL and DOUBLE data types correspond to the VAX F\_floating and
+D\_floating formats, which have a precision of 7 and 16 decimal places
+respectively; the extended range G\_floating and H\_floating formats are
+not currently supported.
+
+\subsubsection {Type Conversion}
+
+Generally an application program need not concern itself with the actual data
+type of the primitive objects it processes since HDS performs automatic data
+conversion when necessary. Although this is transparent to a program, it may be
+rather more obvious to a user sitting at a terminal, particularly when large
+arrays are being processed. In many circumstances it may be more efficient to
+provide special-case code for each data type to avoid the overheads involved
+with automatic conversion. An alternative is to encourage users to bias their
+data towards one specific format such as single precision floating point;
+application software can then be designed around this chosen type.
+
+Data of one numeric type can be converted to any of the other numeric types
+although precision may be lost in some cases. The conversion is performed using
+ordinary C assignment statements. When arithmetic overflow occurs the data item
+becomes undefined and is replaced by a {\em bad} value. These are illustrated
+in Table~\ref{bad_values_for_primitive_data_types}\footnote{The data conversion
+routines are currently unsatisfactory: a bad value will not be converted to a
+bad value, overflows on DOUBLE PRECISION and REAL to INTEGER and LOGICAL are
+not detected, and they are relatively slow.}.
+
+\begin {table}[htbp]
+\begin {center}
+\begin {tabular}{||l|l|l||}
+\hline
+Data type		& Bad value		& Hexadecimal pattern \\
+\hline
+{\tt INTEGER}		& {\tt -2147483648}	& {\tt `80000000'} \\
+{\tt REAL}		& {\tt -1.7014117e+38}	& {\tt `FFFFFFFF'} \\
+{\tt DOUBLE PRECISION}	& {\tt -1.7014117e+38}	& {\tt `FFFFFFFFFFFFFFFF'} \\
+{\tt LOGICAL}		& {\tt integer -1}	& {\tt `FFFFFFFF'} \\
+{\tt CHAR[*n]}		& {\tt `*...*'}		& {\tt `2A...2A'} \\
+{\tt BYTE}		& {\tt -128}		& {\tt `80'} \\
+{\tt UBYTE}		& {\tt 255}		& {\tt `FF'} \\
+{\tt WORD}		& {\tt -32768}		& {\tt `8000'} \\
+{\tt UWORD}		& {\tt 65535}		& {\tt `FFFF'} \\
+\hline
+\end {tabular}
+\caption {Bad Values for Primitive Data Types}
+\label {bad_values_for_primitive_data_types}
+\end {center}
+\end {table}
+
+The conversion process is {\em not} prematurely terminated when overflow is
+detected --- the condition is ultimately signalled through the HDS subroutine
+status return.
+
+The two non-numeric types LOGICAL and CHARACTER are converted to and from each
+other and the numeric types using the following rules:
+
+\begin {itemize}
+\item LOGICAL TRUE and FALSE are converted to character strings
+{\tt `TRUE'} and {\tt `FALSE'} and numbers 1 and 0 respectively.
+\item Character strings beginning with any of the characters {\tt \{t,T,y,Y\}}
+are converted to LOGICAL TRUE. All other character strings are converted to
+LOGICAL FALSE.
+\item Numbers are converted to LOGICALs by first converting to an integer
+and then looking only at the least significant bit. If it is set, the value
+is TRUE and if not it is FALSE.
+\item Numbers are converted to and from character strings using the {\tt
+LIB\$CVT\_DX\_DX} routine --- see \cite{run_time_library_reference}.
+\end {itemize}
+
+Truncation or padding may occur between character-type objects of different
+lengths. When destination strings are longer than source strings the values
+are padded to the right with spaces. However, truncation can result in
+significant characters being lost, which is regarded as an error by HDS (unlike
+FORTRAN-77). For example, consider the following 4-element {\tt \_CHAR*47}
+object (courtesy of Lewis Carroll):
+
+\begin {verbatim}
+        `Yet what are all such gaieties to me           '
+        `Whose thoughts are full of indices and surds?  '
+        `x-squared plus seven-x plus fifty-three        '
+        `Equals eleven thirds                           '
+\end{verbatim}
+
+An HDS program attempting to read this into a {\tt \_CHAR*38} array would find
+that although the first and last strings are transferred successfully (because
+only spaces were discarded), an error status would be returned because
+significant characters were lost from the second and third strings.
+Character-to-character translation is never prematurely terminated; this allows
+the program to ignore the truncation errors if this is sensible.
+
+\subsection {Structure Objects}
+
+In a typical astronomical data-reduction environment it is unlikely that
+primitive objects will exist as independent entities. Consider a plate-scan of
+the galaxy NGC1365 which has been reduced to a 2-D array of floating point
+values. The supplementary information accompanying the image might be:
+
+\begin {verbatim}
+        TELESCOPE  = `UKST'
+        INSTRUMENT = `3A0/PDS'
+        RA         = 10 59 17.107
+        DEC        = +47 23 15.94
+        EQUINOX    = B1950.0
+\end{verbatim}
+
+Image-processing systems have tended to store such information in rigid fixed
+formats. However, HDS gives you the flexibility to structure it in whatever
+format you regard as natural. Figure~\ref{an_example_hierarchical_structure}
+illustrates one possible arrangement. The top-level object is called NGC1365
+and is of type {\em plate} (type names will be expressed in lowercase and
+enclosed in brackets). The structure is held in a single VMS file called a {\em
+container file}. Every container file has a top-level object which would
+usually (but not necessarily) have the same name as the VMS file. Since
+structures are built top-down, if a file is initially created with a primitive
+top-level object no more objects can subsequently be added.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(150,110)
+\thicklines
+\put (60,105){\framebox(26,5){NGC1365}}
+\put (60,100){\framebox(26,5){[plate]}}
+\put (0,85){\framebox(26,5){SCAN\_DATA}}
+\put (0,80){\framebox(26,5){[\_real]}}
+\put (0,75){\framebox(26,5){(512,512)}}
+\put (40,85){\framebox(26,5){TELESCOPE}}
+\put (40,80){\framebox(26,5){[\_char*4]}}
+\put (40,75){\framebox(26,5){`UKST'}}
+\put (80,85){\framebox(26,5){INSTRUMENT}}
+\put (80,80){\framebox(26,5){[\_char*7]}}
+\put (80,75){\framebox(26,5){`3AO/PDS'}}
+\put (120,85){\framebox(26,5){SKY\_POSITION}}
+\put (120,80){\framebox(26,5){[equatorial]}}
+\put (30,60){\framebox(26,5){RA}}
+\put (30,55){\framebox(26,5){[hms]}}
+\put (80,60){\framebox(26,5){DEC}}
+\put (80,55){\framebox(26,5){[dms]}}
+\put (120,60){\framebox(26,5){EQUINOX}}
+\put (120,55){\framebox(26,5){[equinox]}}
+\put (0,40){\framebox(26,5){HOURS}}
+\put (0,35){\framebox(26,5){[\_byte]}}
+\put (0,30){\framebox(26,5){10}}
+\put (30,40){\framebox(26,5){MINUTES}}
+\put (30,35){\framebox(26,5){[\_byte]}}
+\put (30,30){\framebox(26,5){59}}
+\put (60,40){\framebox(26,5){SECONDS}}
+\put (60,35){\framebox(26,5){[\_real]}}
+\put (60,30){\framebox(26,5){17.107}}
+\put (100,40){\framebox(26,5){SYSTEM}}
+\put (100,35){\framebox(26,5){[\_char*1]}}
+\put (100,30){\framebox(26,5){`B'}}
+\put (130,40){\framebox(26,5){EPOCH}}
+\put (130,35){\framebox(26,5){[\_real]}}
+\put (130,30){\framebox(26,5){1950.0}}
+\put (50,15){\framebox(26,5){DEGREES}}
+\put (50,10){\framebox(26,5){[\_byte]}}
+\put (50,5){\framebox(26,5){47}}
+\put (80,15){\framebox(26,5){ARCMINS}}
+\put (80,10){\framebox(26,5){[\_byte]}}
+\put (80,5){\framebox(26,5){23}}
+\put (110,15){\framebox(26,5){ARCSECS}}
+\put (110,10){\framebox(26,5){[\_real]}}
+\put (110,5){\framebox(26,5){15.94}}
+\put (13,95){\line(1,0){120}}
+\put (43,70){\line(1,0){90}}
+\put (13,50){\line(1,0){60}}
+\put (113,50){\line(1,0){30}}
+\put (63,25){\line(1,0){60}}
+\put (73,100){\line(0,-1){5}}
+\put (133,55){\line(0,-1){5}}
+\put (13,95){\vector(0,-1){5}}
+\put (53,95){\vector(0,-1){5}}
+\put (93,95){\vector(0,-1){5}}
+\put (133,95){\vector(0,-1){5}}
+\put (43,70){\vector(0,-1){5}}
+\put (93,70){\vector(0,-1){5}}
+\put (133,80){\vector(0,-1){15}}
+\put (13,50){\vector(0,-1){5}}
+\put (43,55){\vector(0,-1){10}}
+\put (73,50){\vector(0,-1){5}}
+\put (93,55){\vector(0,-1){35}}
+\put (113,50){\vector(0,-1){5}}
+\put (143,50){\vector(0,-1){5}}
+\put (63,25){\vector(0,-1){5}}
+\put (123,25){\vector(0,-1){5}}
+\end {picture}
+\caption {An Example Hierarchical Structure}
+\label {an_example_hierarchical_structure}
+\end {center}
+\end {figure}
+
+In Figure~\ref{an_example_hierarchical_structure}, NGC1365 is a structure with
+four {\em components}, three of which are primitive objects and the fourth a
+structure. RA, DEC and EQUINOX are also structures which store the values as
+discrete numeric items. Rather than separating their individual parts you could
+have chosen to store them as primitive character objects as illustrated in
+Figure~\ref{an_alternative_representation_for_sky_position}, although this
+scheme would obviously require software within the application program to decode
+the strings if the individual items were to be used arithmetically.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(110,35)
+\thicklines
+\put (40,30){\framebox(30,5){SKY\_POSITION}}
+\put (40,25){\framebox(30,5){[equatorial]}}
+\put (0,10){\framebox(30,5){RA}}
+\put (0,5){\framebox(30,5){[\_char*12]}}
+\put (0,0){\framebox(30,5){`10:59:17.107'}}
+\put (40,10){\framebox(30,5){DEC}}
+\put (40,5){\framebox(30,5){[\_char*12]}}
+\put (40,0){\framebox(30,5){`47:23:15.94'}}
+\put (80,10){\framebox(30,5){EQUINOX}}
+\put (80,5){\framebox(30,5){[\_char*7]}}
+\put (80,0){\framebox(30,5){`B1950.0'}}
+\put (15,20){\line(1,0){80}}
+\put (15,20){\vector(0,-1){5}}
+\put (55,25){\vector(0,-1){10}}
+\put (95,20){\vector(0,-1){5}}
+\end {picture}
+\caption {An Alternative Representation for SKY\_POSITION}
+\label {an_alternative_representation_for_sky_position}
+\end {center}
+\end {figure}
+
+In reality, conventions will be adopted to promote standardisation and
+portability. For example, any character-type primitive object named RA might be
+expected to contain a right ascension value of the form {\em
+hours:minutes:seconds}. Alternatively, any object of type {\em hms} may be
+assumed to be a structure with three primitive components named HOURS, MINUTES
+and SECONDS.
+
+Applications should not attach any significance to the order in which
+components appear in a structure. Currently, new components are simply appended
+to the existing list of objects when they are created although this is an
+implementation strategy not a design feature\footnote{The algorithms used
+for creating, deleting and searching for objects are relatively
+unsophisticated. All searches are simply linear.}.
+
+So far the examples have illustrated the use of scalar structures. However, a
+structure can also have a {\em shape}, ie.\ have one or more dimensions. A
+typical application of structure arrays is the processing of a sequential set
+of data files held on magnetic tape. For example,
+Figure~\ref{an_example_of_a_structure_array} shows how a set of raw IPCS images
+could be stored as a 1-D structure. Given a tape labelled AAO28, a program
+could create a structure array in a container file and subsequently build up
+the component objects in each structure element as the tape is processed.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(120,25)
+\thicklines
+\put (0,20){\framebox(30,5){AAO28(1)}}
+\put (0,15){\framebox(30,5){[ipcs\_raw]}}
+\put (30,20){\framebox(30,5){AAO28(2)}}
+\put (30,15){\framebox(30,5){[ipcs\_raw]}}
+\put (60,20){\framebox(30,5){AAO28(3)}}
+\put (60,15){\framebox(30,5){[ipcs\_raw]}}
+\put (90,20){\framebox(30,5){AAO28(4)}}
+\put (90,15){\framebox(30,5){[ipcs\_raw]}}
+\put (5,3){\framebox(8,2){\ldots}}
+\put (17,3){\framebox(8,2){\ldots}}
+\put (35,3){\framebox(8,2){\ldots}}
+\put (47,3){\framebox(8,2){\ldots}}
+\put (65,3){\framebox(8,2){\ldots}}
+\put (77,3){\framebox(8,2){\ldots}}
+\put (95,3){\framebox(8,2){\ldots}}
+\put (107,3){\framebox(8,2){\ldots}}
+\put (9,10){\line(1,0){12}}
+\put (39,10){\line(1,0){12}}
+\put (69,10){\line(1,0){12}}
+\put (99,10){\line(1,0){12}}
+\put (15,15){\line(0,-1){5}}
+\put (45,15){\line(0,-1){5}}
+\put (75,15){\line(0,-1){5}}
+\put (105,15){\line(0,-1){5}}
+\put (9,10){\vector(0,-1){5}}
+\put (21,10){\vector(0,-1){5}}
+\put (39,10){\vector(0,-1){5}}
+\put (51,10){\vector(0,-1){5}}
+\put (69,10){\vector(0,-1){5}}
+\put (81,10){\vector(0,-1){5}}
+\put (99,10){\vector(0,-1){5}}
+\put (111,10){\vector(0,-1){5}}
+\end {picture}
+\caption {An Example of a Structure Array}
+\label {an_example_of_a_structure_array}
+\end {center}
+\end {figure}
+
+As with the naming and typing of objects, conventions will also be adopted for
+the shaping of objects, eg.\ whether all tape-reading utilities should create
+structure arrays as above or a (non-related) set of scalar structures.
+
+\subsection {Temporary Objects}
+
+HDS allows you to create temporary objects. A temporary object is exactly the
+same as a permanent object --- the only difference is that temporary objects
+are created in a container file that is automatically deleted when it is
+closed. This is all handled automatically for you. When the first temporary
+object is created, a file called {\tt SYS\$SCRATCH:Tnnnnnnnn.SDF}\footnote{Note
+that this is often the default login directory.} is created ({\tt nnnnnnnn} is
+the HEX VMS process ID which is used to prevent any naming conflict with the
+user's permanent files). The first temporary object is called {\tt
+TEMP\_00000000}, the second is called {\tt TEMP\_00000001} and so on.
+
+\subsection {Locators}
+\label {locators}
+
+The application routines use entities called {\em locator}\/s to refer to HDS
+objects. From the point of view of an application program, a locator is a {\tt
+CHARACTER*15} variable. From the point of view of HDS it looks like the data
+structure illustrated in Figure~\ref{structure_of_a_locator}.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(40,25)
+\thicklines
+\put (0,0){\framebox(40,5){reserve}}
+\put (0,5){\framebox(40,5){pointer to LCP}}
+\put (0,10){\framebox(40,5){validity check}}
+\put (42,2){(7 bytes)}
+\put (42,7){(4 bytes)}
+\put (42,12){(4 bytes)}
+\end {picture}
+\caption {Structure of a Locator}
+\label {structure_of_a_locator}
+\end {center}
+\end {figure}
+
+An active locator contains a pointer to an associated {\em Locator Control
+Packet} (LCP), which resides on a doubly-linked list maintained by HDS. When a
+new locator is required, a packet is dynamically allocated from process space
+and added to the list. HDS actually maintains a look-aside list of free LCPs
+in order to reduce the overheads involved in allocating dynamic memory. An LCP
+acts as a cache for information about the object that would otherwise have to
+be fetched from disc. This includes the object's name, type and shape, fields
+which describe the attributes of any primitive data that is currently mapped,
+and various flags which indicate the state of the object.
+
+Further discussion of the use of the LCP is deferred until
+Section~\ref{use_of_locators} by which time the appropriate terminology will
+have been introduced.
+
+\section {HDS ARCHITECTURE}
+
+HDS is implemented as three distinct modules --- their relationship is
+illustrated in Figure~\ref{relationship_of_hds_modules}. The DAT module
+contains the user-callable routines. The REC module contains the record
+management routines. The EXC module contains the exception handlers (which are
+also user-callable).
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(50,20)
+\thicklines
+\put (0,15){\framebox(20,5){DAT}}
+\put (0,0){\framebox(20,5){REC}}
+\put (30,0){\framebox(20,5){EXC}}
+\put (10,15){\vector(0,-1){10}}
+\put (10,15){\vector(3,-1){29}}
+\put (20,2.5){\vector(1,0){10}}
+\end {picture}
+\caption {Relationship of HDS Modules}
+\label {relationship_of_hds_modules}
+\end {center}
+\end {figure}
+
+The modules have been made independent of each other to facilitate further
+development of the system. For example, the REC routines do not recognise HDS
+objects --- they are called by the DAT module to manipulate records within a
+container file. DAT and REC are two different layers between the application
+program and the underlying file system. Each provides the layer above with a
+characteristic data entity to manipulate. This is illustrated in
+Figure~\ref{entities_accessed_at_different_levels}.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(40,50)
+\thicklines
+\put (0,0){\framebox(40,5){VAX/VMS}}
+\put (0,15){\framebox(40,5){REC}}
+\put (0,30){\framebox(40,5){DAT}}
+\put (0,45){\framebox(40,5){Application program}}
+\put (20,10){\makebox(0,0){Container file, Block}}
+\put (20,25){\makebox(0,0){Record}}
+\put (20,40){\makebox(0,0){HDS Data Object}}
+\put (20,38){\vector(0,-1){3}}
+\put (20,23){\vector(0,-1){3}}
+\put (20,8){\vector(0,-1){3}}
+\put (20,45){\line(0,-1){3}}
+\put (20,30){\line(0,-1){3}}
+\put (20,15){\line(0,-1){3}}
+\put (50,35){\line(0,-1){20}}
+\put (50,35){\line(-1,0){2}}
+\put (50,15){\line(-1,0){2}}
+\put (50,25){\line(1,0){2}}
+\put (56,25){\makebox(0,0){HDS}}
+\end {picture}
+\caption {Entities Accessed at Different Levels}
+\label {entities_accessed_at_different_levels}
+\end {center}
+\end {figure}
+
+\subsection {Objects and Records}
+
+The DAT module currently defines four classes of records:
+
+\begin {description}
+\item [CONTAINER record]: points to the file's top-level object.
+\item [COMPONENT record]: lists a structure's components.
+\item [STRUCTURE record]: describes a structure-type object.
+\item [PRIMITIVE record]: describes a primitive-type object.
+\end {description}
+
+The REC module does not distinguish between different record classes. New ones
+can be defined in DAT without having to change REC.
+
+Figure~\ref{how_an_object_maps_onto_records} shows an example of how an object
+structure is mapped onto a record structure by HDS.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(140,72)
+\thicklines
+\put (0,69){{\bf Object Structure}}
+\put (0,29){{\bf Record Structure}}
+\put (20,55){S: Structure}
+\put (20,50){P: Primitive}
+\put (20,15){Co: Container}
+\put (20,10){C: Component}
+\put (20,5){S: Structure}
+\put (20,0){P: Primitive}
+\put (48,69){S(n)}
+\put (78,69){S(n)}
+\put (78,59){P(n)}
+\put (108,69){P(n)}
+\put (108,59){P(n)}
+\put (108,49){S(n)}
+\put (138,49){P(n)}
+\put (138,39){P(n)}
+\put (38,29){Co}
+\put (48,29){S(n)}
+\put (68,29){C}
+\put (78,29){S(n)}
+\put (98,29){C}
+\put (108,29){P(n)}
+\put (78,19){P(n)}
+\put (108,19){P(n)}
+\put (108,9){S(n)}
+\put (128,9){C}
+\put (138,9){P(n)}
+\put (138,-1){P(n)}
+\put (55,70){\line(1,0){22}}
+\put (85,70){\line(1,0){22}}
+\put (75,60){\line(1,0){2}}
+\put (105,60){\line(1,0){2}}
+\put (105,50){\line(1,0){2}}
+\put (115,50){\line(1,0){22}}
+\put (135,40){\line(1,0){2}}
+\put (43,30){\line(1,0){5}}
+\put (55,30){\line(1,0){12}}
+\put (72,30){\line(1,0){5}}
+\put (85,30){\line(1,0){12}}
+\put (102,30){\line(1,0){5}}
+\put (75,20){\line(1,0){2}}
+\put (105,20){\line(1,0){2}}
+\put (105,10){\line(1,0){2}}
+\put (115,10){\line(1,0){12}}
+\put (132,10){\line(1,0){5}}
+\put (135,0){\line(1,0){2}}
+\put (75,70){\line(0,-1){10}}
+\put (105,70){\line(0,-1){20}}
+\put (135,50){\line(0,-1){10}}
+\put (75,30){\line(0,-1){10}}
+\put (105,30){\line(0,-1){20}}
+\put (135,10){\line(0,-1){10}}
+\end {picture}
+\caption {How an Object Maps on to Records}
+\label {how_an_object_maps_onto_records}
+\end {center}
+\end {figure}
+
+Elements which are arrays are indicated by appending {\em (n)} to the symbol;
+in general, these can have up to seven dimensions. Each array element has the
+structure represented by the tree to its right. Note that {\em each} element of
+a structure array in the {\bf Object Structure} diagram corresponds in the {\bf
+Record Structure} diagram to a Component record which points to Structure
+and/or Primitive records that represent the component objects. This means
+that elements of a structure array do not automatically have all the same
+components as each other.
+
+\subsection {Files and Blocks}
+
+Container files are organised as a sequence of 512-byte fixed length blocks
+which correspond directly to disc blocks and VAX/VMS pages. Blocks are the
+basic unit of disc space allocation. There are three types of block:
+
+\begin {description}
+\item [HCB]: Header Control Block
+\item [LRB]: Logical Record Block
+\item [PDB]: Pure Data Block
+\end {description}
+
+Figure~\ref{structure_of_a_container_file} illustrates how they are arranged in
+a container file.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(40,25)
+\thicklines
+\put (0,0){\framebox(40,5){LRB or PDB}}
+\put (0,10){\framebox(40,5){LRB or PDB}}
+\put (0,15){\framebox(40,5){LRB}}
+\put (0,20){\framebox(40,5){HCB}}
+\put (0,10){\line(0,-1){1}}
+\put (0,8){\line(0,-1){1}}
+\put (0,6){\line(0,-1){1}}
+\put (40,10){\line(0,-1){1}}
+\put (40,8){\line(0,-1){1}}
+\put (40,6){\line(0,-1){1}}
+\end {picture}
+\caption {Structure of a Container File}
+\label {structure_of_a_container_file}
+\end {center}
+\end {figure}
+
+The {\em Header Control Block} is always the first block in every container
+file. It contains the following fields and is illustrated in
+Figure~\ref{structure_of_the_header_control_block}.
+
+\begin {itemize}
+\item {\bf File stamp} --- an arbitrary bit-string used by the REC module to
+identify the file as a valid HDS container file.
+\item {\bf Version number} --- used as a check against the current version of
+HDS when an existing container file is opened. An error is signalled if the
+file version number exceeds the software version number (which is only ever
+incremented when the file format is changed).
+\item {\bf End-of-file block number} --- the last physical block in the
+file; it indicates the total file space.
+\item {\bf Free space stack} --- contains a finite number of entries which
+specify how much free space there is in Logical Record Blocks and which Pure
+Data Blocks are free. This is discussed in Section~\ref{disc_space_management}.
+\end {itemize}
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(40,25)
+\thicklines
+\put (0,0){\framebox(40,5){free space stack}}
+\put (0,5){\framebox(40,5){reserve}}
+\put (0,10){\framebox(40,5){end-of-file block no.}}
+\put (0,15){\framebox(40,5){HDS version no.}}
+\put (0,20){\framebox(40,5){file-stamp}}
+\put (42,2){(480 bytes)}
+\put (42,7){(24 bytes)}
+\put (42,12){(32 bits)}
+\put (42,17){(8 bits)}
+\put (42,22){(24 bits)}
+\end {picture}
+\caption {Structure of the Header Control Block}
+\label {structure_of_the_header_control_block}
+\end {center}
+\end {figure}
+
+A {\em Logical Record Block} is partitioned into a number of 34-byte {\em
+chips}. A chip is the unit used by the REC module to allocate space in an LRB
+for a record. Each record occupies an integral number of chips, the number
+depending on its size (blocks are not spanned). With 15 chips per block, this
+leaves 2 bytes for a chip bitmap which specifies which chips are currently
+allocated (bit-set) and which are free (bit-clear). An LRB is illustrated
+in Figure~\ref{structure_of_a_logical_record_block}.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(40,25)
+\thicklines
+\put (0,0){\framebox(40,5){chip [14]}}
+\put (0,10){\framebox(40,5){chip [1]}}
+\put (0,15){\framebox(40,5){chip [0]}}
+\put (0,20){\framebox(40,5){bitmap}}
+\put (0,10){\line(0,-1){1}}
+\put (0,8){\line(0,-1){1}}
+\put (0,6){\line(0,-1){1}}
+\put (40,10){\line(0,-1){1}}
+\put (40,8){\line(0,-1){1}}
+\put (40,6){\line(0,-1){1}}
+\put (42,22){(2 bytes)}
+\put (42,17){(34 bytes)}
+\put (42,12){(34 bytes)}
+\put (42,2){(34 bytes)}
+\end {picture}
+\caption {Structure of a Logical Record Block}
+\label {structure_of_a_logical_record_block}
+\end {center}
+\end {figure}
+
+A {\em Pure Data Block} is used to store data and, from the point of view of
+HDS, can simply be regarded as a sequence of 512 bytes. PDB space is allocated
+as a {\em frame} which is a contiguous sequence of PDBs.
+
+\subsection {Record Structures}
+
+Each record within a file can be located by a unique {\em Record-ID} (RID)
+which is unchanging for the lifetime of the record. This is the relative block
+number within the file and the chip offset within the block. Allowing 20 bits
+for the block number gives a maximum file space of 1048576 blocks (512 Mbytes)
+which should not prove too restrictive. The structure of a RID is illustrated
+in Figure~\ref{structure_of_a_record_id}.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(40,10)
+\thicklines
+\put (0,5){\framebox(40,5){block no.}}
+\put (0,0){\framebox(40,5){chip offset}}
+\put (42,7){(20 bits)}
+\put (42,2){(4 bits)}
+\end {picture}
+\caption {Structure of a Record-ID}
+\label {structure_of_a_record_id}
+\end {center}
+\end {figure}
+
+Every record has a unique parent (owner) record which is also identified by its
+RID. However, unlike a record's personal identifier which it keeps for life,
+its parent-ID can be modified which gives the effect of moving the record
+(and all records owned by it) from one location in a structure to another.
+
+A RID occupies 24 bits. Occasionally one sees a RID apparently occupying
+32 bits. This is because the DAT module knows nothing about the structure
+of a RID and always regards it as a 32-bit integer.
+
+A Record consists of three {\em domains}, illustrated in
+Figure~\ref{structure_of_a_record}:
+
+\begin {description}
+\item [CONTROL domain]: holds the Record Control Label (RCL).
+This contains the record size and class, the domain lengths, the parent
+Record-ID, and various bit flags describing record attributes.
+\item [STATIC domain]: holds small amounts of data that are static in length
+(although not necessarily in content).
+\item [DYNAMIC domain]: holds large amounts of data or data whose length is
+dynamic in nature.
+\end {description}
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(40,15)
+\thicklines
+\put (0,10){\framebox(40,5){Control domain (RCL)}}
+\put (0,5){\framebox(40,5){Static domain}}
+\put (0,0){\framebox(40,5){Dynamic domain}}
+\put (42,12){(10 bytes)}
+\put (42,7){($\leq $498 bytes)}
+\put (42,2){($\leq 2^{32}$ bytes)}
+\end {picture}
+\caption {Structure of a Record}
+\label {structure_of_a_record}
+\end {center}
+\end {figure}
+
+The {\em Record Control Label} (RCL) is illustrated in
+Figure~\ref{structure_of_a_record_control_label}. The 4 flags A, C, M and Z
+signify the following when set:
+
+\begin {description}
+\item [A]: domain (D) is active, ie.\ the contents are meaningful.
+\item [C]: domain (D) is chained --- see Section~\ref{chained_dynamic_domains}.
+\item [M]: domain (D) is currently mapped for write-access.
+\item [Z]: domain (D) is to be explicitly zeroed when created.
+\end {description}
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(40,25)
+\thicklines
+\put (0,20){\framebox(40,5){parent RID}}
+\put (0,15){\framebox(25,5){reserve}}
+\put (25,15){\framebox(5,5){M}}
+\put (30,15){\framebox(5,5){Z}}
+\put (35,15){\framebox(5,5){A}}
+\put (0,10){\framebox(5,5){C}}
+\put (5,10){\framebox(15,5){class}}
+\put (20,10){\framebox(20,5){size}}
+\put (0,5){\framebox(40,5){domain (S) length}}
+\put (0,0){\framebox(40,5){domain (D) length}}
+\put (42,22){(24 bits)}
+\put (42,17){($5+1+1+1$ bits)}
+\put (42,12){($1+3+4$ bits)}
+\put (42,7){(8 bits)}
+\put (42,2){(32 bits)}
+\end {picture}
+\caption {Structure of a Record Control Label}
+\label {structure_of_a_record_control_label}
+\end {center}
+\end {figure}
+
+\subsubsection {Chained Dynamic Domains}
+\label {chained_dynamic_domains}
+
+If the initial size of the record prevents it from being stored in an LRB, the
+dynamic domain is {\em chained} --- a frame of PDBs is allocated from the free
+space stack to hold the actual data and the position of the first block is
+stored in the record's dynamic domain. An existing unchained record can become
+chained due to the subsequent expansion of the dynamic domain. To illustrate
+the basic characteristics of chained and unchained records, consider the
+configurations illustrated in
+Figure~\ref{an_example_of_a_chained_and_an_unchained_record}.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(100,65)
+\thicklines
+\put (0,55){\framebox(40,5){RCL}}
+\put (0,50){\framebox(40,5){domain S}}
+\put (0,45){\framebox(40,5){*}}
+\put (0,30){\framebox(40,5){\ldots}}
+\put (0,25){\framebox(40,5){\ldots}}
+\put (0,20){\framebox(40,5){\ldots}}
+\put (0,15){\framebox(40,5){\ldots}}
+\put (0,10){\framebox(40,5){\ldots}}
+\put (0,5){\framebox(40,5){\ldots}}
+\put (0,0){\framebox(40,5){\ldots}}
+\put (60,55){\framebox(40,5){RCL}}
+\put (60,50){\framebox(40,5){domain S}}
+\put (60,45){\framebox(40,5){domain D}}
+\put (20,47.5){\vector(0,-1){12.5}}
+\put (42,0){\vector(0,1){35}}
+\put (42,35){\vector(0,-1){35}}
+\put (20,63){\makebox(0,0){Chained record}}
+\put (80,63){\makebox(0,0){Unchained record}}
+\put (42,47){(4 bytes)}
+\put (102,47){(237 bytes)}
+\put (44,22){FRAME containing domain D}
+\put (44,17){(3519 bytes)}
+\put (44,12){(7 PDBs)}
+\end {picture}
+\caption {An Example of a Chained and an Unchained Record}
+\label {an_example_of_a_chained_and_an_unchained_record}
+\end {center}
+\end {figure}
+
+The unchained record's domain D contains 237 bytes of data which can be stored
+directly within the confines of the LRB. The chained record's domain D length
+of 3519 bytes results in the actual data being stored in a frame of seven
+contiguous PDBs; the D domain in the LRB becomes a 4-byte field containing a
+pointer to the first block in the frame.
+
+\subsubsection {Container and Component Records}
+
+These records are similar in function. A Container Record can be regarded as a
+top level Component Record. It is the first record in every container file,
+ie.\ it starts in the first chip of the second block. Their structures are
+illustrated in Figure~\ref{structure_of_container_and_component_records}.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(100,40)
+\thicklines
+\put (0,30){\framebox(40,5){RCL}}
+\put (0,25){\framebox(40,5){null}}
+\put (0,20){\framebox(40,5){top-level name}}
+\put (0,15){\framebox(40,5){RID}}
+\put (60,30){\framebox(40,5){RCL}}
+\put (60,25){\framebox(40,5){no.\ of components}}
+\put (60,20){\framebox(40,5){component name 1}}
+\put (60,15){\framebox(40,5){RID}}
+\put (60,5){\framebox(40,5){component name n}}
+\put (60,0){\framebox(40,5){RID}}
+\put (112,32){Domain C}
+\put (112,27){Domain S}
+\put (112,22){Domain D}
+\put (20,38){\makebox(0,0){{\bf Container}}}
+\put (80,38){\makebox(0,0){{\bf Component}}}
+\put (42,32){(10)}
+\put (42,27){(0)}
+\put (42,22){(16)}
+\put (42,17){(4)}
+\put (102,32){(10)}
+\put (102,27){(4)}
+\put (102,22){(16)}
+\put (102,17){(4)}
+\put (102,7){(16)}
+\put (102,2){(4)}
+\put (60,15){\line(0,-1){1}}
+\put (60,13){\line(0,-1){1}}
+\put (60,11){\line(0,-1){1}}
+\put (100,15){\line(0,-1){1}}
+\put (100,13){\line(0,-1){1}}
+\put (100,11){\line(0,-1){1}}
+\put (0,30.5){\line(1,0){40}}
+\put (0,25.5){\line(1,0){40}}
+\put (0,15.5){\line(1,0){40}}
+\put (60,30.5){\line(1,0){40}}
+\put (60,25.5){\line(1,0){40}}
+\put (60,0.5){\line(1,0){40}}
+\end {picture}
+\caption {Structure of Container and Component Records}
+\label {structure_of_container_and_component_records}
+\end {center}
+\end {figure}
+
+A Component Record is basically a list of object names and associated RIDs. If a
+component is a structure, its RID will point to a Structure Record; if it is a
+primitive, the RID will point to a Primitive Record. Consider a case where a
+structure has three components, RA, DEC and EQUINOX. Its component record's
+static domain contains the value 3 and the dynamic domain is illustrated in
+Figure~\ref{an_example_of_the_dynamic_domain_in_a_component_record}.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(120,10)
+\thicklines
+\put (0,5){\framebox(35,5){RA}}
+\put (35,5){\framebox(5,5){*}}
+\put (40,5){\framebox(35,5){DEC}}
+\put (75,5){\framebox(5,5){*}}
+\put (80,5){\framebox(35,5){EQUINOX}}
+\put (115,5){\framebox(5,5){*}}
+\put (37.5,7.5){\vector(0,-1){7.5}}
+\put (77.5,7.5){\vector(0,-1){7.5}}
+\put (117.5,7.5){\vector(0,-1){7.5}}
+\end {picture}
+\caption {An Example of the Dynamic Domain in a Component Record}
+\label {an_example_of_the_dynamic_domain_in_a_component_record}
+\end {center}
+\end {figure}
+
+\subsubsection {Structure and Primitive Records}
+
+These records are collectively known as {\em Object Records}. They are similar
+in function and their structures are illustrated in
+Figure~\ref{structure_of_structure_and_primitive_records}.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(100,25)
+\thicklines
+\put (0,20){\framebox(40,5){RCL}}
+\put (0,15){\framebox(40,5){ODL}}
+\put (0,10){\framebox(40,5){RID}}
+\put (0,0){\framebox(40,5){RID}}
+\put (60,20){\framebox(40,5){RCL}}
+\put (60,15){\framebox(40,5){ODL}}
+\put (60,10){\framebox(40,5){value}}
+\put (60,0){\framebox(40,5){value}}
+\put (112,22){Domain C}
+\put (112,17){Domain S}
+\put (112,12){Domain D}
+\put (20,28){\makebox(0,0){{\bf Structure}}}
+\put (80,28){\makebox(0,0){{\bf Primitive}}}
+\put (42,22){(10)}
+\put (42,12){(4)}
+\put (42,2){(4)}
+\put (102,22){(10)}
+\put (0,10){\line(0,-1){1}}
+\put (0,8){\line(0,-1){1}}
+\put (0,6){\line(0,-1){1}}
+\put (40,10){\line(0,-1){1}}
+\put (40,8){\line(0,-1){1}}
+\put (40,6){\line(0,-1){1}}
+\put (60,10){\line(0,-1){1}}
+\put (60,8){\line(0,-1){1}}
+\put (60,6){\line(0,-1){1}}
+\put (100,10){\line(0,-1){1}}
+\put (100,8){\line(0,-1){1}}
+\put (100,6){\line(0,-1){1}}
+\put (0,20.5){\line(1,0){40}}
+\put (0,15.5){\line(1,0){40}}
+\put (0,0.5){\line(1,0){40}}
+\put (60,20.5){\line(1,0){40}}
+\put (60,15.5){\line(1,0){40}}
+\put (60,0.5){\line(1,0){40}}
+\end {picture}
+\caption {Structure of Structure and Primitive Records}
+\label {structure_of_structure_and_primitive_records}
+\end {center}
+\end {figure}
+
+The static domain contains an {\em Object Descriptor Label} (ODL), which
+is illustrated in Figure~\ref{structure_of_an_object_descriptor_label}.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(40,25)
+\thicklines
+\put (0,0){\framebox(40,5){axis [naxes]}}
+\put (0,10){\framebox(40,5){axis [2]}}
+\put (0,15){\framebox(40,5){axis [1]}}
+\put (0,20){\framebox(10,5){naxes}}
+\put (10,20){\framebox(30,5){type}}
+\put (0,10){\line(0,-1){1}}
+\put (0,8){\line(0,-1){1}}
+\put (0,6){\line(0,-1){1}}
+\put (40,10){\line(0,-1){1}}
+\put (40,8){\line(0,-1){1}}
+\put (40,6){\line(0,-1){1}}
+\put (42,22){($1+15$ bytes)}
+\put (42,17){(4 bytes)}
+\put (42,12){(4 bytes)}
+\put (42,2){(4 bytes)}
+\end {picture}
+\caption {Structure of an Object Descriptor Label}
+\label {structure_of_an_object_descriptor_label}
+\end {center}
+\end {figure}
+
+Primitive Records can be distinguished from Structure Records by the fact that
+the TYPE specification in the ODL corresponds to one of the primitive data
+types. Figure~\ref{examples_of_object_descriptor_labels} illustrates some
+examples of ODLs.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(50,55)
+\thicklines
+\put (0,45){\framebox(40,5){equatorial}}
+\put (40,45){\framebox(5,5){0}}
+\put (0,30){\framebox(40,5){spectrum}}
+\put (40,30){\framebox(5,5){2}}
+\put (45,30){\framebox(10,5){8}}
+\put (55,30){\framebox(10,5){9}}
+\put (0,15){\framebox(40,5){\_real}}
+\put (40,15){\framebox(5,5){2}}
+\put (45,15){\framebox(10,5){512}}
+\put (55,15){\framebox(10,5){256}}
+\put (0,0){\framebox(40,5){\_char*80}}
+\put (40,0){\framebox(5,5){1}}
+\put (45,0){\framebox(10,5){36}}
+\put (0,53){A scalar structure of type `equatorial'}
+\put (0,38){An $8 \times 9$ structure array of type `spectrum'}
+\put (0,23){A $512 \times 256$ single precision floating point array}
+\put (0,8){A 36-element character vector}
+\end {picture}
+\caption {Examples of Object Descriptor Labels}
+\label {examples_of_object_descriptor_labels}
+\end {center}
+\end {figure}
+
+\subsection {Manipulation of Records}
+
+The following sections describe the processes by which various types of record
+manipulation are implemented.
+
+\subsubsection {Record access}
+
+Records are accessed by the DAT module through their RIDs. However, since a
+program can have more than one file open, further qualification is required and
+the RID and file ({\em slot} --- see Section~\ref{access_to_files}) number
+together are used uniquely to identify a record. This entity is termed a {\em
+handle} and its structure is illustrated in Figure~\ref{structure_of_a_handle}.
+It is analogous to the {\em locator} used in application programs to identify
+an object. The relationship is illustrated in
+Figure~\ref{entities_handled_by_the_dat_and_rec_modules}.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(40,10)
+\thicklines
+\put (0,5){\framebox(40,5){RID}}
+\put (0,0){\framebox(10,5){}}
+\put (10,0){\framebox(10,5){read}}
+\put (20,0){\framebox(20,5){slot}}
+\put (42,7){(4 bytes)}
+\put (42,2){($1+1+6$ bits)}
+\end {picture}
+\caption {Structure of a Handle}
+\label {structure_of_a_handle}
+\end {center}
+\end {figure}
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(85,23)
+\thicklines
+\put (24,20){{\bf DAT module}}
+\put (64,20){{\bf REC module}}
+\put (0,10){{\bf entity:}}
+\put (0,5){{\bf address:}}
+\put (30,10){object}
+\put (30,5){locator}
+\put (70,10){record}
+\put (70,5){handle}
+\put (45,11){\vector(1,0){20}}
+\put (65,11){\vector(-1,0){20}}
+\put (45,6){\vector(1,0){20}}
+\put (65,6){\vector(-1,0){20}}
+\end {picture}
+\caption {Entities Handled by the DAT and REC Modules}
+\label {entities_handled_by_the_dat_and_rec_modules}
+\end {center}
+\end {figure}
+
+\subsubsection {Record creation}
+
+Because of the hierarchical nature of the system, the DAT module must supply a
+handle to the parent record when invoking the record creation routine. To
+minimise the processing overheads, the strategy is to try first to create the
+new record in the same LRB as its parent. If this fails the free space stack is
+searched for an LRB with enough contiguous free chips to satisfy the request.
+If this fails a virgin LRB must be found, either by grabbing a free block or by
+extending the file if necessary. A frame of PDBs must also be allocated if the
+record's dynamic domain has to be chained due to its size.
+
+\subsubsection {Record deletion}
+
+If the dynamic domain is chained, the associated frame of PDBs is first
+returned to the free space stack. The appropriate bits in the LRB's chip bitmap
+are then cleared (indicating that the chips are free) and finally the free
+space stack is updated to reflect the deallocation of the record's chips.
+
+\subsubsection {Record expansion}
+
+The expansion of an existing record's dynamic domain is probably the most
+complex operation performed by the record management facility. In the simplest
+cases the required extra space can be found at the current end of the domain
+--- if the record is chained the last block in the PDB frame may have
+sufficient space to accommodate the expansion; if unchained there may be room
+in the last chip, or there may be enough free chips adjacent to the current end
+of record to satisfy the request. If there is insufficient space to directly
+expand an unchained record the dynamic domain must be chained --- a PDB frame
+of appropriate size is first allocated from the free space stack, the current
+contents of the domain moved and then overwritten with the block number of the
+new frame. Because this only requires 4 bytes the record's dynamic domain
+contracts which may result in the deallocation of chips. If the record is
+already chained the frame of PDBs must be expanded. Depending on the current
+state of the file, one of three actions will be performed:
+
+\begin {itemize}
+\item If there are sufficient contiguous free blocks after the end of the frame,
+these are allocated.
+\item If all the blocks between the end of the frame and the end of the file are
+free, but there aren't enough to satisfy the request, the file is extended.
+\item In the worst case where the frame cannot be directly expanded, a new frame
+of the required size must be allocated and the existing data moved.
+The old frame is returned to the free space stack.
+\end {itemize}
+
+\subsubsection {Record contraction}
+
+If the domain is chained, contraction can result in PDBs being returned to the
+free space stack. If chips are released from an unchained record the chip
+bitmap is updated.
+
+\subsection {Access to Files}
+\label {access_to_files}
+
+Container files are opened by the RMS service {\tt \$OPEN} with the {\em User
+File Open} (UFO) option which allows a process to take advantage of the
+file-mapping facilities provided by VMS. Furthermore, as this service returns an
+I/O channel to the file the {\tt \$QIO} System Service can also be utilised in
+those situations where mapping is expensive. VMS restricts the number of mapped
+sections a process can have to a typical limit of 32. The {\em Create and Map
+Section} system service {\tt \$CRMPSC} is only used to access PDBs; LRBs and
+HCBs are read and written using {\tt \$QIO}s. For details of VAX/VMS System
+Services see \cite{system_services_reference}.
+
+To reduce I/O activity, LRBs and HCBs are cached on a {\em Working Page List}
+--- 16 Kbytes of cache space is provided which allows up to 32 blocks to reside
+in physical memory at any instant. When the list becomes full and a new block
+is required, an existing block must be released. If the block has been modified
+it is written back to the file before the physical memory space is re-used.
+Each block is controlled by an associated {\em Block Control Packet} (BCP).
+The structure of a BCP is illustrated by
+Figure~\ref{structure_of_a_block_control_packet}.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(40,5)
+\thicklines
+\put (0,0){\framebox(10,5){}}
+\put (10,0){\framebox(10,5){slot}}
+\put (20,0){\framebox(20,5){block}}
+\put (42,2){($6+6+20$ bits)}
+\end {picture}
+\caption {Structure of a Block-ID}
+\label {structure_of_a_block_id}
+\end {center}
+\end {figure}
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(50,25)
+\thicklines
+\put (0,20){\framebox(50,5){pointer to next BCP}}
+\put (0,15){\framebox(50,5){pointer to last BCP}}
+\put (0,10){\framebox(50,5){pointer to block in memory}}
+\put (0,5){\framebox(50,5){block-id}}
+\put (0,0){\framebox(5,5){}}
+\put (5,0){\framebox(15,5){modified}}
+\put (20,0){\framebox(30,5){reference count}}
+\put (52,22){(4 bytes)}
+\put (52,17){(4 bytes)}
+\put (52,12){(4 bytes)}
+\put (52,7){(4 bytes)}
+\put (52,2){($2+1+5$ bits)}
+\end {picture}
+\caption {Structure of a Block Control Packet}
+\label {structure_of_a_block_control_packet}
+\end {center}
+\end {figure}
+
+When a file is first opened (or created) it is assigned a {\em slot} in the
+{\em File Control Vector} (FCV). An FCV slot is illustrated in
+Figure~\ref{structure_of_a_file_control_vector_slot}. Each active slot contains
+such information as the expanded file-name string, device, directory and
+file-IDs, read-only and read/write I/O channels, and various bit flags which
+describe the status and disposition of the file. A reference count is kept of
+the number of explicit open operations performed by calls to {\tt HDS\_OPEN}; a
+file is not physically closed until this count drops to zero. Slots in the FCV
+are also allocated to the {\em temporary} container files which are created in
+the user's {\tt SYS\$SCRATCH} directory and automatically deleted when closed.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(40,15)
+\thicklines
+\put (0,10){\framebox(40,5){device id}}
+\put (0,5){\framebox(40,5){file id}}
+\put (0,0){\framebox(40,5){directory id}}
+\put (42,12){($1+15$ bytes)}
+\put (42,7){($3 \times 2$ bytes)}
+\put (42,2){($3 \times 2$ bytes)}
+\end {picture}
+\caption {Structure of a File-ID}
+\label {structure_of_a_file_id}
+\end {center}
+\end {figure}
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(40,35)
+\thicklines
+\put (0,30){\framebox(40,5){pointer to filename}}
+\put (0,25){\framebox(40,5){pointer to file-id}}
+\put (0,20){\framebox(40,5){lock id}}
+\put (0,15){\framebox(40,5){read channel}}
+\put (0,10){\framebox(40,5){write channel}}
+\put (0,5){\framebox(40,5){reference count}}
+\put (0,0){\framebox(16,5){reserve}}
+\put (16,0){\framebox(8,5){lock}}
+\put (24,0){\framebox(8,5){open}}
+\put (32,0){\framebox(8,5){dele}}
+\put (42,32){(4 bytes)}
+\put (42,27){(4 bytes)}
+\put (42,22){(4 bytes)}
+\put (42,17){(2 bytes)}
+\put (42,12){(2 bytes)}
+\put (42,7){(2 bytes)}
+\put (42,2){($13+1+1+1$ bits)}
+\end {picture}
+\caption {Structure of a File Control Vector Slot}
+\label {structure_of_a_file_control_vector_slot}
+\end {center}
+\end {figure}
+
+\subsection {Sharing of Files}
+
+Container files can be accessed concurrently by multiple processes and
+subprocesses. Read-only sharing in a multi-user environment generally presents
+few, if any, real problems and this facility is provided free by HDS. However,
+processing costs can rise sharply if multiple concurrent writers are allowed,
+particularly under a local buffer caching scheme such as that employed by HDS.
+The system does, in fact, support concurrent writers, but on a synchronous
+rather than asynchronous basis, ie.\ although a file may be open for
+write-access by multiple processes, only one will be able to actually perform
+write operations at any given time. This is achieved through the use of the
+{\tt \$ENQ} System Service which is used to grant a process exclusive
+write-access to a specific container file, either explicitly by a call to {\tt
+HDS\_LOCK} or automatically when the process performs its first write
+operation. If the file is currently locked by another process, the requesting
+process has the option of waiting or receiving control back immediately; refer
+to the section on tuning for more information. A process can relinquish a lock
+on a container file by calling {\tt HDS\_FREE}. This writes back all modified
+cached blocks to the file and then releases the {\tt \$ENQ} lock thereby
+granting write-access to other processes. HDS rundown automatically releases
+all container file locks\footnote{A call to {\tt HDS\_FREE} does {\em not}
+unmap data. This is potentially a serious problem.}.
+
+\subsection {Management of Disc Space}
+\label {disc_space_management}
+
+The {\em Free Space Stack} is a part of the HCB. It grows from both ends like
+Process Space on the VAX. Entries at the bottom describe which  PDB frames are
+free; entries at the top describe the largest free contiguous space in each LRB.
+
+Consider the configuration illustrated in
+Figure~\ref{an_example_of_a_free_space_stack}. Examining the bottom of the
+stack, there are 17 free blocks starting at block 101 and 3 spare at 8; these
+blocks are available as either new PDB frames or individual LRBs. The top of the
+stack contains three entries: LRB 2 has at most 5 contiguous free chips (see
+below), LRB 7 has none, and 19 has 10 contiguous chips as its largest free
+space. The stack is initially filled with {\em null} entries (-1) which
+gradually disappear as the opposing ends of the stack grow towards each other.
+When only one null entry is left the stack is regarded as full and no new
+entries can be added (although {\em void} entries, ie.\ those with zero free
+space, can be re-used). This gradual degradation of a file allows tidying-up to
+be deferred until the free space stack is full rather than incorporating this
+function into normal application processing.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(40,40)
+\thicklines
+\put (0,0){\framebox(20,5){17}}
+\put (0,5){\framebox(20,5){3}}
+\put (0,10){\framebox(20,5){-1}}
+\put (0,20){\framebox(20,5){-1}}
+\put (0,25){\framebox(20,5){10}}
+\put (0,30){\framebox(20,5){0}}
+\put (0,35){\framebox(20,5){5}}
+\put (20,0){\framebox(20,5){101}}
+\put (20,5){\framebox(20,5){8}}
+\put (20,10){\framebox(20,5){-1}}
+\put (20,20){\framebox(20,5){-1}}
+\put (20,25){\framebox(20,5){19}}
+\put (20,30){\framebox(20,5){7}}
+\put (20,35){\framebox(20,5){2}}
+\put (0,20){\line(0,-1){1}}
+\put (0,18){\line(0,-1){1}}
+\put (0,16){\line(0,-1){1}}
+\put (40,20){\line(0,-1){1}}
+\put (40,18){\line(0,-1){1}}
+\put (40,16){\line(0,-1){1}}
+\put (42,40){\vector(0,-1){15}}
+\put (42,25){\vector(0,1){15}}
+\put (42,10){\vector(0,-1){10}}
+\put (42,0){\vector(0,1){10}}
+\put (44,32){LRB space}
+\put (44,4){PDB space}
+\end {picture}
+\caption {An Example of a Free Space Stack}
+\label {an_example_of_a_free_space_stack}
+\end {center}
+\end {figure}
+
+When the free space stack becomes full any space subsequently released will
+effectively be lost. When a file has degraded this far it may be advisable to
+perform a tidying-up operation such as creating a new container file and
+copying all the objects from the existing file, preserving the logical
+structure.
+
+\subsection {Management of Dynamic Memory}
+
+The REC module supervises the dynamic allocation of virtual memory within
+process address space. When REC is initialised the program region is expanded
+to accommodate a bitmap which is used subsequently to reflect the state of
+virtual memory pages (ie.\ whether they are allocated or free). The size of
+this bitmap is calculated from the VMS system parameter VIRTUALPAGECNT which
+specifies the maximum number of virtual pages that can be mapped for any
+process. The VMS System Symbol Table {\tt SYS\$SYSTEM:SYS.STB} must be scanned
+by the VAX Linker to resolve the address of this parameter.
+
+Access to the bitmap and the virtual memory controlled by it is via a {\em
+Virtual Memory Pool} (VMP) structure which is illustrated in
+Figure~\ref{structure_of_the_virtual_memory_pool}. Initially the bitmap
+describes only itself.
+
+When large amounts of memory are required or a PDB frame is to be mapped from a
+container file, the bitmap is searched on a first-fit basis for a contiguous
+sequence of free virtual memory pages. If found, they are allocated and the
+appropriate bits in the bitmap set. If there is insufficient space in the
+current program region it must be expanded.
+
+When small amounts of memory are required the VMS RTL routine {\tt LIB\$GET\_VM}
+is invoked. This may itself result in an expansion of the program region. If
+this happens then the next time that the HDS memory management routines expand
+the program region the bits will be set in the bitmap corresponding both to the
+pages got earlier using {\tt LIB\$GET\_VM} and to the pages just got. The
+bits corresponding to the memory allocated using {\tt LIB\$GET\_VM} will
+never get reset, so HDS will never attempt to use that memory.
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(40,15)
+\thicklines
+\put (0,10){\framebox(40,5){pointer to bitmap}}
+\put (0,5){\framebox(40,5){pool start address}}
+\put (0,0){\framebox(40,5){pool end address}}
+\put (42,12){(4 bytes)}
+\put (42,7){(4 bytes)}
+\put (42,2){(4 bytes)}
+\end {picture}
+\caption {Structure of the Virtual Memory Pool}
+\label {structure_of_the_virtual_memory_pool}
+\end {center}
+\end {figure}
+
+All data in LRBs is accessed via direct I/O. All data in PDBs is mapped. This
+means that it is only an object's {\em size} that governs the method of access
+--- the largest object that can possibly fit into an LRB has a size of 480
+bytes (an RCL plus the ODL of a 1-D object occupy $10+16+4$ bytes which leaves
+$510-30$ or 480 bytes for the data) so all larger objects will be mapped
+regardless of whether they are being accessed using {\tt DAT\_GET}, {\tt
+DAT\_MAP} or {\tt DAT\_BASIC}.
+
+A separate question is whether the application receives a direct pointer
+to or copy of the object data in the container file. This can only happen
+if the data is contiguous and if no type conversion is necessary. The most
+efficient way to access data is thus to use {\tt DAT\_MAP} or {\tt DAT\_BASIC},
+to use contiguous slices and to access the data in the same format as it
+is stored on disc. If you only intend accessing a part of a large data object
+then it is well worthwhile using {\tt DAT\_SLICE} to obtain a locator to
+the bit in which you are interested. Not only does this save virtual memory,
+but it saves the system from having to dispose of that virtual memory.
+
+\section {HDS IMPLEMENTATION}
+
+Both the DAT and REC modules have a set of externally-visible routines and a set
+of internal routines. DAT's external routines are those which are called by
+applications. REC's external routines are those which are called by DAT. (The
+EXC routines may be called by the application, by DAT and by REC).
+Appendix~\ref{routine_lists} contains reference lists of all the routines
+in all the modules.
+
+This section explains source conventions and rules with the specific aim of
+allowing easy understanding of high-level DAT routines and safe implementation
+of new such routines.
+
+\subsection {Use of Global Variables}
+\label {use_of_global_variables}
+
+HDS makes very limited use of global variables. Those that are used fall
+into three categories:
+
+\begin {itemize}
+\item A status variable that is shared by all modules.
+\item Current values for the quantities that can be tuned --- see
+Section~\ref{system_tuning}.
+\item Miscellaneous quantities that is is convenient to have accessible
+in other modules. There are not many of these.
+\end {itemize}
+
+The global status variable is called {\tt HDS\_GL\_STATUS}. It is used in
+the following manner:
+
+\begin {itemize}
+\item On entry to all user-callable DAT routines it is set to the HDS success
+status {\tt DAT\_\_OKAY}.
+\item Any routine that fails simply sets {\tt HDS\_GL\_STATUS} and this
+is frequently checked using a set of macros --- see
+Section~\ref{use_of_macros}.
+\end {itemize}
+
+\subsection {Use of Macros}
+\label {use_of_macros}
+
+Several utility macros are used throughout HDS. Nearly all of them have
+names that begin with underscore characters to allow easy identification.
+They split up into the following categories:
+
+\begin {description}
+\item [Simple utility functions]: calculate the {\tt min} and {\tt max} of two
+numbers --- these are the only macros whose names do not begin with underscores.
+\item [Moving data around]: these all begin with the characters {\tt \_ch}
+and are all wraps around calls to VMS or C RTL routines.
+\item [Accessing system calls]: {\tt \_getjpiw}, {\tt \_dclexh}, {\tt \_canexh}
+and {\tt \_valrms} all access system services or RMS routines.
+\item [Common expression evaluation]: {\tt \_nchips} and {\_nblocs} perform
+common calculations.
+\item [Avoiding call overheads]: {\tt \_seek\_bloc} and {\tt \_drop\_bloc}
+avoid what would otherwise be subroutine calls.
+\item [Checking status]: {\tt \_ok} checks whether a status value is an
+OK HDS status.
+\item [Entering and exiting routines]: these all begin {\tt \_enter} or
+{\tt \_exit} and are described below.
+\item [Invoking other routines]: {\tt \_invoke} and {\tt \_call} are described
+below.
+\end {description}
+
+\subsubsection {Entering, exiting and calling routines}
+
+Every HDS routine begins with a line of the form:
+
+\begin {quote}
+\begin {verbatim}
+_enter(ROUTINE_NAME)
+\end{verbatim}
+\end {quote}
+
+This is to permit keeping track of how many times HDS routines have been
+called. Normally the {\tt \_enter} macro has an empty definition.
+
+When an HDS routine invokes another routine it has three choices:
+
+\begin {itemize}
+\item It can call the routine directly,
+\item It can use the {\tt \_invoke} macro, or
+\item It can use the {\tt \_call} macro.
+\end {itemize}
+
+If the routine is called directly then any error checking must be explicit.
+
+The {\tt \_invoke (proc)} macro looks like:
+
+\begin {quote}
+\begin {verbatim}
+{
+proc;
+if (!_ok(hds_gl_status)) _exit0;
+}
+\end{verbatim}
+\end {quote}
+
+In other words, it invokes the routine and then, if the global status is
+not still OK, it exits using the {\tt \_exit0} macro, which simply does:
+
+\begin {quote}
+\begin {verbatim}
+return hds_gl_status;
+\end{verbatim}
+\end {quote}
+
+The {\tt \_call (event)} macro is similar but slightly more complicated. It
+looks like:
+
+\begin {quote}
+\begin {verbatim}
+{
+*status = (event);
+if (!_ok(*status))
+    _exit1(exc_$hds(status));
+}
+\end{verbatim}
+\end {quote}
+
+It can be seen that it is designed for use in routines that have a {\tt STATUS}
+variable and for calling routines that return a status as their function value
+as well as or instead of setting {\tt HDS\_GL\_STATUS}. If the called routine
+returns a bad status, the HDS exception handler {\tt EXC\_\$HDS} is called to
+handle and / or report that error. The default behaviour of {\tt EXC\_\$HDS} is
+to return the input status as its function result, so this bad status will now
+be returned to the calling routine via the {\tt \_exit1 (status)} macro, which
+simply does:
+
+\begin {quote}
+\begin {verbatim}
+{
+hds_gl_status = status;
+return hds_gl_status;
+}
+\end{verbatim}
+\end {quote}
+
+{\tt \_call} is only used in the top-level DAT routines, all of which have {\tt
+STATUS} parameters. {\tt \_invoke} is used in low-level DAT routines and all
+REC routines, all of which return status as their function values.
+
+The {\tt \_exit0} and {\tt \_exit1} macros have already been introduced.
+{\tt \_exit0} is used when {\tt HDS\_GL\_STATUS} has already got the value
+which is to be returned as the function value. {\tt \_exit1} is the same
+except that it takes a {\tt STATUS} and copies it to {\tt HDS\_GL\_STATUS}
+before returning it. There are also {\tt \_exit2} and {\tt \_exit3} macros
+which are less relevant to this discussion.
+
+Examination of the macro definitions shows that the following forms are
+both valid:
+
+\begin {minipage}[t]{80mm}
+\begin {quote}
+\begin {verbatim}
+_call (DAT__xxxxx)
+\end{verbatim}
+\end {quote}
+\end {minipage}
+\begin {minipage}[t]{80mm}
+\begin {quote}
+\begin {verbatim}
+_exit1 (DAT_xxxxx)
+\end{verbatim}
+\end {quote}
+\end {minipage}
+
+The former is very commonly used in the high-level DAT routines as a means of
+returning a failure status to an application routine and the latter is very
+commonly used in the low-level DAT routines and the REC routines for returning
+a failure status to a high-level DAT routine.
+
+Finally, {\em don't} put semi-colons after any of these macro calls! They
+are not required since all of them are blocks rather than single statements.
+Often, such a semi-colon will do no harm, but it can do in a case such
+as this:
+
+\begin {minipage}[t]{80mm}
+\begin {quote}
+\begin {verbatim}
+if (a == b)
+    _call (DAT__OBJIN);
+
+
+
+
+
+else
+    printf ("not equal");
+\end{verbatim}
+\end {quote}
+\end {minipage}
+\begin {minipage}[t]{80mm}
+\begin {quote}
+\begin {verbatim}
+if (a == b)
+    {
+    *status = DAT__OBJIN;
+    if (!_ok(*status))
+        _exit1(exc_$hds(status));
+    }
+    ;
+else
+    printf ("not equal");
+\end{verbatim}
+\end {quote}
+\end {minipage}
+
+\subsection {Use of Exception Handlers}
+
+When an error occurs, HDS always calls {\tt EXC\_\$VMS} or {\tt EXC\_\$HDS}
+just before returning to the calling application. The idea is that {\tt
+EXC\_\$HDS} is called for HDS errors and {\tt EXC\_\$VMS} is called for VMS
+errors.
+
+In the VAX/VMS implementation these two routines are identical --- {\tt
+EXC\_\$HDS} simply calls {\tt EXC\_\$VMS} --- because there is no overlap
+between HDS and VMS error codes. If HDS were ever implemented on a system where
+this was not possible then the two routines would have to be different.
+If this happened it would also be necessary to make {\tt EXC\_\$VMS} return
+an HDS error code as its function value since otherwise high-level DAT routines
+would be able to return ambiguous status values (this is what used to happen
+but it had the unfortunate side-effect that if a VMS error occurred there
+was no indication of what exactly had gone wrong).
+
+All {\tt EXC\_\$HDS} calls are made by the {\tt \_call} macro from one of
+the high-level DAT routines. All {\tt EXC\_\$VMS} calls are made directly
+from the REC routines. When a {\tt EXC\_\$VMS} call is made from REC there
+will also be a later {\tt EXC\_\$HDS} call from the DAT routines, which
+will result in such errors being reported twice. This is a consequence of
+the fact that {\tt EXC\_\$VMS} doesn't return an HDS error code --- see
+the discussion of the previous paragraph.
+
+\subsection {Inter-module Interfaces}
+
+The use of global variables is described in
+Section~\ref{use_of_global_variables}. Not surprisingly, apart from the use of
+global variables, all the communication between the DAT and REC modules is via
+argument lists. Nearly all such arguments are simple scalar variables, although
+there are a few structures.
+
+Table~\ref{argument_names_used_in_the_high_level_rec_routines} is a list
+ordered by type of argument names used in the high-level REC routines.
+Apparently HAN, RID and RCL are the only structures whose definitions are
+known by both DAT and REC. In fact this is not the case because DAT regards
+both HAN and RID as being integers. Thus RCL is the only structure whose
+definition is known to both modules. Typically DAT sets up some of its fields
+and REC fills in the rest of them.
+
+\begin {table}[htbp]
+\begin {center}
+\begin {tabular}{||l|l|l||}
+\hline
+Data type	& Passing Mechanism	& Argument names \\
+\hline
+{\tt INTEGER}	& By value		& {\tt EXTENT,LENGTH,OFFSET,SIZE} \\
+{\tt CHARACTER}	& Address of descriptor	& {\tt FILE} \\
+{\tt CHAR}	& By value		& {\tt STATE,MODE,DISP} \\
+{\tt CHAR}	& By reference		& {\tt PNTR,BUF} \\
+{\tt CHAR}	& Pointer by reference	& {\tt FNS} \\
+\hline
+{\tt HAN}	& By reference		& {\tt HAN,HAN1,HAN2,PAR,KIN,SRC,DES} \\
+{\tt RID}	& By reference		& {\tt RID} \\
+{\tt RCL}	& By reference		& {\tt RCL} \\
+\hline
+\end {tabular}
+\caption {Argument Names Used in the High-level REC Routines}
+\label {argument_names_used_in_the_high_level_rec_routines}
+\end {center}
+\end {table}
+
+\subsection {Use of Locators}
+\label {use_of_locators}
+
+Section~\ref{locators} introduced the LCP and indicated that it is used
+for caching object information that would otherwise be held only on disc.
+In this section, the structure and usage of the LCP are described in detail.
+
+\subsubsection {Structure of the LCP}
+
+The LCP structure is illustrated in
+Figure~\ref{structure_of_a_locator_control_packet}. The three flags {\bf valid},
+{\bf struc} and {\bf read} signify the following when set:
+
+\begin {description}
+\item [valid]: the fields of the LCP are valid (when the LCP is first allocated
+all its fields are zero and it is therefore not valid)
+\item [struc]: the LCP describes a structure object (ie.\ the first character
+of the object type is not an underscore character)
+\item [read]: only read access is permitted to the object described by the
+LCP (this is always inherited from the object's parent and is therefore
+the same for all objects in a given container file)
+\end {description}
+
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(64,75)
+\thicklines
+\put (0,0){\framebox(64,5){object data descriptor}}\put (66,2){(8 bytes)}
+\put (0,5){\framebox(64,5){application data descriptor}}\put (66,7){(8 bytes)}
+\put (0,10){\framebox(64,5){dimension bounds $(l_{1},u_{1},l_{2},u_{2},l_{3},%
+u_{3})$}}\put (66,12){($6 \times 4$ bytes)}
+\put (0,15){\framebox(16,5){naxes}}
+\put (16,15){\framebox(16,5){mode}}
+\put (32,15){\framebox(32,5){level}}\put (66,17){($1+1+2$ bytes)}
+\put (0,20){\framebox(64,5){offset}}\put (66,22){(4 bytes)}
+\put (0,25){\framebox(64,5){RID of parent component record}}\put (66,27){(4 %
+bytes)}
+\put (0,30){\framebox(64,5){handle to object record}}\put (66,32){(4 bytes)}
+\put (0,35){\framebox(64,5){product of object dimensions}}\put (66,37){(4 %
+bytes)}
+\put (0,40){\framebox(4,5){}}
+\put (4,40){\framebox(60,5){object name}}\put (66,42){($1+15$ bytes)}
+\put (0,45){\framebox(4,5){}}
+\put (4,45){\framebox(60,5){object type}}\put (66,47){($1+15$ bytes)}
+\put (0,50){\framebox(4,5){}}
+\put (4,50){\framebox(60,5){group name}}\put (66,52){($1+15$ bytes)}
+\put (0,55){\framebox(32,5){reserve}}
+\put (32,55){\framebox(32,5){object state}}\put (66,57){($8+8 \times 1$ bits)}
+\put (0,60){\framebox(16,5){reserve}}
+\put (16,60){\framebox(16,5){read}}
+\put (32,60){\framebox(16,5){struc}}
+\put (48,60){\framebox(16,5){valid}}\put (66,62){($13+3 \times 1$ bits)}
+\put (0,65){\framebox(64,5){link to previous LCP}}\put (66,67){(4 bytes)}
+\put (0,70){\framebox(64,5){link to next LCP}}\put (66,72){(4 bytes)}
+\end {picture}
+\caption {Structure of a Locator Control Packet}
+\label {structure_of_a_locator_control_packet}
+\end {center}
+\end {figure}
+
+There are seven flags describing the object state. Actually it is more correct
+to say that they describe the view presented by the LCP of the object because
+the same object can simultaneously be viewed in several different ways using
+different LCPs. The flags are:
+
+\begin {description}
+\item [mapped]: object data (ie.\ the object record's dynamic domain) is
+currently mapped into virtual memory by the application
+\item [vmcopy]: the application is mapped to a virtual memory copy of the
+object data. This is only used when the {\bf mapped} flag is set. It can
+be set either because type conversion was necessary or because the object's
+dynamic domain is not chained (so it is in an LRB rather than a PDB)
+\item [unlike]: the object data type is different from that requested by
+the application and so type conversion was necessary. This is only used when
+the {\bf mapped} flag is set
+\item [slice]: the LCP describes a slice of the object. A slice is defined by
+sub-ranges in up to the first three dimensions
+\item [cell]: the LCP describes a single cell (or element) of the object
+\item [vector]: the LCP describes a vectorised object. Regardless of the
+actual dimensionality of the object, it is considered to be a 1-D array when
+accessed using this LCP
+\item [broken]: the LCP describes a non-contiguous part of the object. This
+can only be the case when the {\bf slice} flag is set as well
+\end {description}
+
+A few of the other LCP fields may require a little explanation:
+
+\begin {description}
+\item [group]: is a character string that can be used to associate related
+LCPs. It can be set using {\tt HDS\_LINK} and then is inherited by all
+lower-level LCPs. {\tt HDS\_FLUSH} can be used to unmap all data associated
+with all LCPs with a given group specification and then to mark those LCPs
+as being invalid
+\item [offset and dimension bounds]: are used for describing slices, cells
+and vectorised objects
+\item [mode]: is only used for LCPs associated with mapped data - it is
+the access mode (Read / Write / Update) with which the data is mapped
+\item [level]: is the level of this object within the container file. A
+top-level object is at level zero
+\item [data descriptors]: VMS descriptors are used to describe both the
+application's view of the data and the object's view of the data. The class,
+type and length fields are filled in in the object data descriptor when
+the LCP is created. The pointer fields and all the fields in the application
+data descriptor are filled in when the data is read, written or mapped.
+Many of the internal routines, eg.\ the type conversion routines, use these
+descriptors
+\end {description}
+
+\subsubsection {Administration of the LCP}
+
+When a new locator is to be created, an {\em export locator} routine is called.
+This allocates and zeroes a new LCP, then arranges for the locator to point
+to this LCP. The result of this is to create a new and invalid locator.
+The high-level DAT routine will then fill in fields --- normally the last
+field to be filled in is the {\bf valid} flag.
+
+When an existing locator is to be used, an {\em import locator} routine
+is called. This routine performs several checks in an attempt to ensure
+that attempts to use invalid locators will be detected:
+
+\begin {itemize}
+\item the locator variable passed from the application is indeed {\tt
+CHARACTER*15}
+\item the validity check field is correct
+\item the LCP {\bf valid} flag is set
+\item the parent of the record whose handle is in the LCP is the same as
+the parent field in the LCP
+\end {itemize}
+
+When an existing locator is to be de-activated, the LCP valid flag is reset
+and the LCP is put on a free list. A future attempt to use this LCP will
+fail unless the same LCP has by chance subsequently been associated with
+exactly the same object.
+
+\subsection {Structure of a High-level DAT Routine}
+
+Most of the high-level DAT routines have a fairly standard structure:
+
+\begin {itemize}
+\item exit if status is bad and set global status to {\tt DAT\_\_OKAY}
+\item import any input locators
+\item check LCP fields to see if the proposed operation is valid
+\item validate other arguments
+\item export any output locators
+\item convert fields from input locators to output locators
+\item perform operation-specific processing
+\item set output locator state flags
+\end {itemize}
+
+Consider a genuine but not too long example: {\tt DAT\_GET}. Perhaps
+surprisingly, {\tt DAT\_GET}, {\tt DAT\_PUT} and {\tt DAT\_MAP} are amongst
+the most straightforward of the routines. The code in what follows is lifted
+directly from the current version of the C code. The only changes that have
+been made is that some declarations have been removed and the comments
+have been enhanced and typeset.
+
+\begin {quote}
+\begin {verbatim}
+dat_get(locator,type,ndim,dims,values,status) {
+\end{verbatim}
+\end {quote}
+
+Enter routine and import the locator.
+
+\begin {quote}
+\begin {verbatim}
+if (!_ok(*status))
+        return;
+hds_gl_status      = DAT__OKAY;
+_call(import_loc(locator, &lcp))
+\end{verbatim}
+\end {quote}
+
+These are merely short-hand variables for accessing the data part of the LCP
+(ie.\ everything except for the forward and backward links) and for accessing
+the LCP state flags.
+
+\begin {quote}
+\begin {verbatim}
+data               = &lcp->data;
+state              = &data->state;
+\end{verbatim}
+\end {quote}
+
+Ensure that there is no currently mapped data and that the object is primitive.
+
+\begin {quote}
+\begin {verbatim}
+if (state->mapped)
+        _call(DAT__PRMAP)
+if (data->struc)
+        _call(DAT__OBJIN)
+\end{verbatim}
+\end {quote}
+
+Determine the shape of the object and match the dimensions. The {\tt
+get\_shape} routine returns {\tt naxes} and the {\tt axis} array.
+
+\begin {quote}
+\begin {verbatim}
+_call(get_shape(data, &naxes, axis))
+if (*ndim != naxes)
+        _call(DAT__DIMIN)
+for (i=0; i<naxes; i++)
+        if (dims[i] != axis[i])
+                _call(DAT__DIMIN)
+\end{verbatim}
+\end {quote}
+
+Validate the application data type specification. The {\tt check\_type} routine
+copies the type from the supplied character variable, checking that there are
+no illegal characters, ignoring white space and converting to upper-case.
+
+\begin {quote}
+\begin {verbatim}
+_call(check_type(type, typbuf))
+\end{verbatim}
+\end {quote}
+
+Determine the attributes of the application data and reject the operation if
+not primitive. The {\tt get\_attrib} routine fills in the class, type and length
+fields in the application data descriptor. The application must be requesting
+data in one of the primitive types.
+
+\begin {quote}
+\begin {verbatim}
+_call(get_attrib(typbuf, &data->app))
+app                = &data->app;
+if (app->dsc$b_class != DAT_K_PRIMITIVE)
+        _call(DAT__TYPIN)
+\end{verbatim}
+\end {quote}
+
+Match the object and application data attributes and reject the operation if
+the types are incompatible.
+
+\begin {quote}
+\begin {verbatim}
+obj                = &data->obj;
+_call(match_types(obj, app))
+\end{verbatim}
+\end {quote}
+
+Ensure that the object data is active. The {\tt rec\_\$peek} routine reads the
+RCL from the object record.
+
+\begin {quote}
+\begin {verbatim}
+_call(rec_$peek(&data->han, &rcl))
+if (!rcl.active)
+        _call(DAT__UNSET)
+\end{verbatim}
+\end {quote}
+
+Save the address of the application program buffer, or use the descriptor
+supplied by the program if character-type. The application data descriptor is
+now complete.
+
+\begin {quote}
+\begin {verbatim}
+app->dsc$a_pointer = values;
+if (app->dsc$b_dtype == DSC$K_DTYPE_T)
+        _chmove(8, values, app);
+\end{verbatim}
+\end {quote}
+
+Calculate the length (in bytes) of the object data and determine the byte
+offset into the object record's dynamic domain. Note that the object data
+descriptor describes a single element of the object data.
+
+\begin {quote}
+\begin {verbatim}
+objlen             = obj->dsc$w_length * data->size;
+objoff             = obj->dsc$w_length * data->offset;
+\end{verbatim}
+\end {quote}
+
+Gather the object data if discontiguous. The LCP may refer to a sliced object.
+If so, the object data may be discontiguous. If so, the {\tt gather\_data}
+routine will gather the discontiguous bits into a contiguous part of virtual
+memory. The use of the {\tt copy\_status} variable is explained below.
+
+\begin {quote}
+\begin {verbatim}
+if (state->broken)
+        {
+        gather_data(data);
+        copy_status     = hds_gl_status;
+        }
+\end{verbatim}
+\end {quote}
+
+Otherwise, locate the record's dynamic domain and translate the data to the
+program's buffer. The {\tt rec\_\$locate} and {\tt rec\_\$ditch} routines
+always go in pairs. The {\tt rec\_\$locate} routine returns a pointer to a
+contiguous part of the object record's dynamic domain. That pointer is
+guaranteed to be valid until the {\tt rec\_\$ditch} routine is called.
+
+\begin {quote}
+\begin {verbatim}
+else
+        {
+        _call(rec_$locate(&data->han, objlen, objoff, `R', &dom))
+        obj->dsc$a_pointer = dom;
+\end{verbatim}
+\end {quote}
+
+Both the object and application data descriptors are now complete. The {\tt
+trans\_data} routine will translate the data from the object to the application
+buffer. If no conversion is necessary then the data will simply be moved using
+the {\tt OTS\$MOVE3} routine.
+
+\begin {quote}
+\begin {verbatim}
+        trans_data(data->size, obj, app);
+\end{verbatim}
+\end {quote}
+
+A conversion error may have set {\tt hds\_gl\_status}. However this is no
+reason not to call {\tt rec\_\$ditch} so save {\tt hds\_gl\_status} in {\tt
+copy\_status}, reset {\tt hds\_gl\_status}, call {\tt rec\_\$ditch}, and then
+\ldots
+
+\begin {quote}
+\begin {verbatim}
+        copy_status     = hds_gl_status;
+        hds_gl_status   = DAT__OKAY;
+        rec_$ditch(&data->han, objlen, objoff, `R', &dom);
+        }
+\end{verbatim}
+\end {quote}
+\ldots check the value of {\tt copy\_status} before return. If {\tt
+copy\_status} is bad this has the effect of copying it to the status argument
+and then exiting.
+
+\begin {quote}
+\begin {verbatim}
+_call(copy_status)
+\end{verbatim}
+\end {quote}
+
+This is the normal exit, returning the value of {\tt hds\_gl\_status} to the
+caller.
+
+\begin {quote}
+\begin {verbatim}
+_exit0;
+}
+\end{verbatim}
+\end {quote}
+
+\section {TUNING}
+\label {system_tuning}
+
+The {\tt HDS\_TUNE} routine is used to alter any of the six internal control
+parameters and these will affect the behaviour of the system. The parameters
+are discussed below.
+
+\subsection {MAXWPL --- Maximum Size of the Working Page List}
+
+Initially this is defaulted to 32 which provides 16 Kbytes of cache store. To
+increase it --- it cannot be decreased --- {\tt HDS\_TUNE} must be called {\em
+before} the system is started, eg:
+
+\begin {quote}
+\begin {verbatim}
+.....startup HDS after allocating 100 pages for the WPL
+CALL HDS_TUNE(`MAXWPL',100,STATUS)
+CALL HDS_START(STATUS)
+\end{verbatim}
+\end {quote}
+
+\subsection {INALQ --- Initial File Allocation Quantity}
+
+This determines how many disc blocks are to be allocated when a new container
+file is created. The default of 2 provides space for the Header Control Block
+and one Logical Record Block (although, because of clustering, more than 2
+blocks may actually be allocated). It must be set before each file creation as
+it reverts to the default value afterwards, eg:
+
+\begin {quote}
+\begin {verbatim}
+.....create file with initial size of 1030 blocks
+CALL HDS_TUNE(`INALQ',1030,STATUS)
+CALL HDS_NEW(`NGC1365',NAME,`plate',0,0,LOC,STATUS)
+\end{verbatim}
+\end {quote}
+
+\subsection {NBLOCKS --- Transfer Size for File to File Copy}
+
+This determines how many disc blocks are to be transferred per I/O operation
+when performing a file to file copy. The default is 32 --- this can be
+increased but cannot be decreased. It must be set before each file copy as it
+reverts to the default value afterwards, eg:
+
+\begin {quote}
+\begin {verbatim}
+.....copy file to a new container file
+CALL HDS_TUNE(`NBLOCKS',100,STATUS)
+CALL HDS_OPEN(`NGC1365',`READ',LOC,STATUS)
+CALL HDS_COPY(LOC,`NGC1365',`NGC1365',STATUS)
+\end{verbatim}
+\end {quote}
+
+\subsection {WAIT/SYSLCK --- Control over File-locking Facility}
+
+{\bf WAIT} is a logical switch which specifies the action a process is to take
+when attempting to lock for write-access a container file that is currently
+locked by another process. It is initially set to FALSE, ie.\ the operation
+returns immediately with an error status if the request cannot be granted. An
+explicit call to {\tt HDS\_TUNE} must be made to alter this setting --- it does
+not automatically revert to the default after being used.
+
+{\bf SYSLCK} is a logical switch which, if set, allows container files to be
+locked on a system-wide basis. The default of FALSE provides locking only on a
+UIC group basis. Only processes with the VMS SYSLCK privilege can set this
+parameter. See the section {\em Lock Management Services} in
+\cite{system_services_reference} for more information on this subject.
+
+\subsection {NCOMP --- Optimum Number of Components in a Structure}
+
+This is used to specify a suitable value for the number of components in a new
+structure (defaulted to 6), eg:
+
+\begin {quote}
+\begin {verbatim}
+.....create and locate the RA structure object
+CALL DAT_NEW(LOC1,`RA',`hms',0,0,STATUS)
+CALL DAT_FIND(LOC1,`RA',LOC2,STATUS)
+
+.....reset NCOMP to 3 before creating the first component
+CALL HDS_TUNE(`NCOMP',3,STATUS)
+CALL DAT_NEW(LOC2,`HOURS',`_byte',0,0,STATUS)
+\end{verbatim}
+\end {quote}
+
+It reverts to the default value after the creation of a component record. It
+reserves space in a newly created component record for subsequent entries.
+Obviously, if a structure such as RA will always possess 3 components, a saving
+of space can be made by decreasing {\tt NCOMP}. On the other hand, if a
+structure with a large number of components is to be created, it may be
+advisable to set this parameter appropriately to keep the component record
+unchained for as long as possible. If not, the expansion of the dynamic domain
+when the 7th object is created may force the contents into a PDB, which
+prevents the domain from being cached.
+
+\appendix
+
+\clearpage
+\section {Lists of Routines by Module}
+\label {routine_lists}
+
+In this section are listed all the routines in all the modules that comprise
+HDS. They are split up into logical groups and the routines are listed
+alphabetically within these groups. The main reason for providing these lists
+is to aid in reading code.
+
+For each routine, the argument list and a very brief description of its
+function is given.
+
+Note that no mention is made here of the PRO module. This is a set of routines
+that can count the number of times HDS routines have been called and maintain
+totals of the elapsed and CPU times spent in them. These routines are not
+regarded as being part of HDS.
+
+\subsection {High-level DAT Routines}
+
+These routines split into the {\em environment} routines and the {\em
+application} routines. None of the environment routines need normally be called
+from applications since access to them is hidden behind calls to {\em get
+parameter} and {\em put parameter} routines. They are listed in
+Table~\ref{high_level_dat_routines_hds_routines} and the application routines
+are listed in Table~\ref{high_level_dat_routines_dat_routines}.
+
+\begin {table}[htbp]
+\begin {center}
+\begin {tabular}{||l|l||}
+\hline
+Routine name and argument list		& Description \\
+\hline
+{\tt HDS\_CLOSE (locator,status)}	& Close container file \\
+{\tt HDS\_COPY (locator,file,name,status)} & Copy object to container file \\
+{\tt HDS\_ERASE (locator,status)}	& Erase container file \\
+{\tt HDS\_FLUSH (group,status)}	& Flush locator group \\
+{\tt HDS\_FREE (locator,status)}	& Free container file \\
+{\tt HDS\_GROUP (locator,group,status)}	& Locator group \\
+{\tt HDS\_LINK (locator,group,status)}	& Link locator to group\\
+{\tt HDS\_LOCK (locator,status)}	& Lock container file \\
+{\tt HDS\_NEW (file,name,type,ndim,dims,locator,status)} & Create new container file \\
+{\tt HDS\_OPEN (file,mode,locator,status)} & Open existing container file \\
+{\tt HDS\_PROFL (name,level,status)}	& Enable execution profiling \\
+{\tt HDS\_RUN (subroutine,status)}	& Run application subroutine \\
+{\tt HDS\_SHOW (topic,status)}		& Show HDS statistic \\
+{\tt HDS\_START (status)}		& Startup locator facility \\
+{\tt HDS\_STATE (state,status)}		& HDS state ? \\
+{\tt HDS\_STOP (status)}		& Rundown locator facility \\
+{\tt HDS\_TRACE (locator,nlev,path,file,status)} & Trace path of object \\
+{\tt HDS\_TUNE (cont,value,status)}	& Tune HDS control setting \\
+\hline
+\end {tabular}
+\caption {High-level DAT Routines --- HDS\_ routines}
+\label {high_level_dat_routines_hds_routines}
+\end {center}
+\end {table}
+
+\begin {table}[htbp]
+\begin {center}
+\begin {tabular}{||l|l||}
+\hline
+Routine name and argument list				& Description \\
+\hline
+{\tt DAT\_ALTER (locator,ndim,dims,status)}		& Alter size of object \\
+{\tt DAT\_ANNUL (locator,status)}			& Annul locator \\
+{\tt DAT\_BASIC (locator,mode,pntr,length,status)}	& Map data (in basic machine units) \\
+{\tt DAT\_CELL (locator1,nsub,subs,locator2,status)}	& Locate cell \\
+{\tt DAT\_CLONE (locator1,locator2,status)}		& Clone locator \\
+{\tt DAT\_COERC (locator1,ndim,locator2,status)}	& Coerce object shape \\
+{\tt DAT\_CONV (locator,type,conv,status)}		& Type conversion possible ? \\
+{\tt DAT\_COPY (locator1,locator2,name,status)}		& Copy object \\
+{\tt DAT\_ERASE (locator,name,status)}			& Erase object \\
+{\tt DAT\_FIND (locator1,name,locator2,status)}		& Find named component \\
+{\tt DAT\_GET (locator,type,ndim,dims,values,status)}	& Read data \\
+{\tt DAT\_GETx (locator,ndim,dims,values,status)}	& Read I/R/D/L/C data \\
+{\tt DAT\_INDEX (locator1,index,locator2,status)}	& Index into component list \\
+{\tt DAT\_LEN (locator,len,status)}			& Primitive length ? \\
+{\tt DAT\_MAP (locator,type,mode,ndim,dims,pntr,status)}& Map data \\
+{\tt DAT\_MAPx (locator,mode,ndim,dims,pntr,status)}	& Map I/R/D/L/C data \\
+{\tt DAT\_MOULD (locator,ndim,dims,status)}		& Alter shape of object \\
+{\tt DAT\_MOVE (locator1,locator2,name,status)}		& Move object \\
+{\tt DAT\_NAME (locator,name,status)}			& Object name ? \\
+{\tt DAT\_NCOMP (locator,ncomp,status)}			& Number of components ? \\
+{\tt DAT\_NEW (locator,name,type,ndim,dims,status)}	& Create new component \\
+{\tt DAT\_PAREN (locator1,locator2,status)}		& Object parent ? \\
+{\tt DAT\_PRIM (locator,prim,status)}			& Primitive object ? \\
+{\tt DAT\_PUT (locator,type,ndim,dims,values,status)}	& Write data \\
+{\tt DAT\_PUTx (locator,ndim,dims,values,status)}	& Write I/R/D/L/C data \\
+{\tt DAT\_RENAM (locator,name,status)}			& Rename object \\
+{\tt DAT\_RESET (locator,status)}			& Reset object state \\
+{\tt DAT\_RETYP (locator,type,status)}			& Retype object \\
+{\tt DAT\_SHAPE (locator,maxdim,dims,actdim,status)}	& Object shape ? \\
+{\tt DAT\_SIZE (locator,size,status)}			& Object size ? \\
+{\tt DAT\_SLICE (locator1,nsub,lower,upper,locator2,status)} & Locate slice \\
+{\tt DAT\_STATE (locator,state,status)}			& Object state ? \\
+{\tt DAT\_STRUC (locator,struc,status)}			& Structure object ? \\
+{\tt DAT\_TEMP (type,ndim,dims,locator,status)}		& Create temporary object \\
+{\tt DAT\_THERE (locator,name,there,status)}		& Object there ? \\
+{\tt DAT\_TYPE (locator,type,status)}			& Object type ? \\
+{\tt DAT\_UNMAP (locator,status)}			& Unmap data \\
+{\tt DAT\_VALID (locator,valid,status)}			& Valid locator ? \\
+{\tt DAT\_VEC (locator1,locator2,status)}		& Vectorise object \\
+\hline
+\end {tabular}
+\caption {High-level DAT Routines --- DAT\_ routines}
+\label {high_level_dat_routines_dat_routines}
+\end {center}
+\end {table}
+
+\subsection {Low-level DAT Routines}
+
+These routines are not user-callable. They provide common services to the
+high-level DAT routines and are listed in Table~\ref{low_level_dat_routines}.
+
+\begin {table}[htbp]
+\begin {center}
+\begin {tabular}{||l|l||}
+\hline
+Routine name and argument list			& Description \\
+\hline
+{\tt CHECK\_GROUP (group,buf)}			& Check group  \\
+{\tt CHECK\_MODE (mode,buf)}			& Check mode  \\
+{\tt CHECK\_NAME (name,buf)}			& Check name  \\
+{\tt CHECK\_SHAPE (ndim,dims,odl)}		& Check shape information \\
+{\tt CHECK\_TYPE (type,buf)}			& Check type  \\
+{\tt COPY\_OBJECT (ncomp,src,src\_crv,des,des\_crv)} & Recursively copy an object \\
+{\tt DEFUSE\_LCP (pntr)}	       		& Deactivate LCP  \\
+{\tt ENCODE\_SUBS (nlim,nsub,subs,buf,nchar)}	& Encode subscript expression \\
+{\tt ERASE\_OBJECT  (ncomp,src,src\_crv,des,des\_crv)} & Recursively erase an object \\
+{\tt EXPORT\_LOC (locator,pntr)}		& Export a locator \\
+{\tt FLUSH\_DATA (data)}			& Flush mapped data  \\
+{\tt GATHER\_DATA (data)}			& Gather discontiguous data \\
+{\tt GET\_ATTRIB (typbuf,att)}			& Determine attributes of object \\
+{\tt GET\_OFF (ndim,dims,subs,offset)}		& Get offset (from subscripts) \\
+{\tt GET\_SHAPE (data,naxes,axis)}		& Enquire object shape \\
+{\tt GET\_SUBS (ndim,dims,offset,subs)}		& Get subscripts (from offset) \\
+{\tt IMPORT\_LOC (locator,pntr)}		& Import a locator \\
+{\tt MAKE\_SCRATCH ()}				& Create scratch container file \\
+{\tt MATCH\_TYPES (obj,app)}			& Match data types \\
+{\tt MOVE\_DATA (nval,imp,exp)}			& Move data \\
+{\tt MOVE\_OBJECT (ncomp,src,src\_crv,des,des\_crv)} & Recursively move an object \\
+{\tt REFILL\_FLQ ()}				& Refill Free Locator Queue  \\
+{\tt SCATTER\_DATA (data)}			& Scatter discontiguous data \\
+{\tt TRANS\_CHAR (nval,imp,exp)}		& Translate data to or from character format \\
+{\tt TRANS\_DATA (nval,imp,exp)}		& Translate data \\
+\hline
+\end {tabular}
+\caption {Low-level DAT Routines}
+\label {low_level_dat_routines}
+\end {center}
+\end {table}
+
+\clearpage
+\subsection {High-level REC Routines}
+
+These are the externally-visible REC routines. They are called by the high-
+and low-level DAT routines and are listed in
+Table~\ref{high_level_rec_routines}.
+
+\begin {table}[htbp]
+\begin {center}
+\begin {tabular}{||l|l||}
+\hline
+Routine name and argument list	& Description \\
+\hline
+{\tt REC\_\$ADOPT (han,par)}	& Adopt new parent \\
+{\tt REC\_\$ATTACH (file,state,mode,rcl,han)} & Attach container file \\
+{\tt REC\_\$CLEAR (han)}	& Clear domain(D) \\
+{\tt REC\_\$CREATE (par,rcl,han)} & Create new record \\
+{\tt REC\_\$DEMAND (han,fns)}	& Demand container filename \\
+{\tt REC\_\$DETACH (han,disp)}	& Detach container file \\
+{\tt REC\_\$DITCH (han,length,offset,mode,pntr)} & Ditch domain(D) \\
+{\tt REC\_\$EXPAND (han,extent)} & Expand domain(D) \\
+{\tt REC\_\$FCOPY (src,des)}	& Physical file copy \\
+{\tt REC\_\$FREEVM (size,pntr)} & Free virtual memory  \\
+{\tt REC\_\$GRABVM (size,pntr)} & Grab virtual memory  \\
+{\tt REC\_\$IDENT (han,rid)}	& Identify record \\
+{\tt REC\_\$LIST ()}		& List open-file statistics \\
+{\tt REC\_\$LOCATE (han,length,offset,mode,pntr)} & Locate domain(D) \\
+{\tt REC\_\$LOCK (han)}		& Lock container file \\
+{\tt REC\_\$MATCH (han1,han2)}	& Match handles \\
+{\tt REC\_\$PEEK (han,rcl)}	& Peek domain(C) \\
+{\tt REC\_\$PROFL (name,level)}	& Enable execution profiling \\
+{\tt REC\_\$READ (han,buf)}	& Read domain(S) \\
+{\tt REC\_\$RUBOUT (han)}	& Rubout existing record \\
+{\tt REC\_\$SHRINK (han,extent)}& Shrink domain(D) \\
+{\tt REC\_\$START ()}		& Startup record facility \\
+{\tt REC\_\$STICK (rid,kin,han)} & Stick handle on record \\
+{\tt REC\_\$STOP ()}		& Rundown record facility \\
+{\tt REC\_\$UNLOCK (han)}	& Unlock container file \\
+{\tt REC\_\$WRITE (han,buf)}	& Write domain(S) \\
+\hline
+\end {tabular}
+\caption {High-level REC Routines}
+\label {high_level_rec_routines}
+\end {center}
+\end {table}
+
+\subsection {Low-level REC Routines}
+
+These routines provide common services to the
+high-level REC routines and are listed in Table~\ref{low_level_rec_routines}.
+
+\begin {table}[htbp]
+\begin {center}
+\begin {tabular}{||l|l||}
+\hline
+Routine name and argument list		& Description \\
+\hline
+{\tt CLEAR\_BITMAP (bitmap,length,nbits,sbpos)} & Clear bit map \\
+{\tt CLOSE\_FILE (iochan)}		& Close file \\
+{\tt CREATE\_FILE (file,size,alq)}	& Create file \\
+{\tt DELETE\_FILE (fid)}		& Delete file \\
+{\tt DROP\_BLOC (slot,bloc)}		& Drop (release) Bloc  \\
+{\tt EXTEND\_FILE (fid,size,alq)}	& Extend file \\
+{\tt FIND\_FILE (file,fid,fns)}		& Find file \\
+{\tt FIND\_SLOT (fid)}			& Find slot \\
+{\tt FLUSH\_BLOC (bcp)}			& Flush (write-back) Bloc \\
+{\tt FREE\_FRAME (slot,size,bloc)}	& Free frame \\
+{\tt FREE\_SPACE (size,range)}		& Free space \\
+{\tt GRAB\_FRAME (slot,size,bloc)}	& Grab frame \\
+{\tt GRAB\_SPACE (size,range)}		& Grab space \\
+{\tt GROW\_FRAME (slot,size,extra,bloc)} & Grow frame \\
+{\tt LOCK\_SLOT (slot)}			& Lock slot \\
+{\tt MAP\_FRAME (slot,size,bloc,mode,pntr)} & Map frame \\
+{\tt OPEN\_FILE (fid,mode,iochan)}	& Open file \\
+{\tt SCAN\_BITMAP (bitmap,length,nbits,sbpos)} & Scan bit map \\
+{\tt SEEK\_BLOC (slot,bloc,mode,pntr)} & Seek (locate) Bloc \\
+{\tt SEEK\_BLOC\_1 (slot,bloc,mode,pntr)} & Seek (locate) Bloc (latter part) \\
+{\tt SET\_BITMAP (bitmap,length,nbits,sbpos)} & Set bit map \\
+{\tt SHUT\_SLOT (slot)}			& Shut slot \\
+{\tt UNLOCK\_SLOT (slot)}		& Unlock slot \\
+{\tt UNMAP\_FRAME (slot,size,pntr)}	& Unmap frame \\
+{\tt UPDATE\_FREE (slot,bloc,cbm)}	& Update Free (record stack) \\
+\hline
+\end {tabular}
+\caption {Low-level REC Routines}
+\label {low_level_rec_routines}
+\end {center}
+\end {table}
+
+\clearpage
+\subsection {EXC Routines}
+
+These routines are all user-callable although normally {\tt EXC\_\$HDS}
+and {\tt EXC\_\$VMS} would only be called by HDS. They provide control over
+the handling and reporting of error conditions and are listed in
+Table~\ref{exc_routines}.
+
+\begin {table}[htbp]
+\begin {center}
+\begin {tabular}{||l|l||}
+\hline
+Routine name and argument list		& Description \\
+\hline
+{\tt EXC\_\$FLAGS (flags,oldflags)}	& Set error reporting flags \\
+{\tt EXC\_\$HANDL (handler,oldhandler)}	& Define error handler \\
+{\tt EXC\_\$HDS (status)}		& HDS exception handler \\
+{\tt EXC\_\$LEVEL (level,oldlevel)}	& Set threshold severity level \\
+{\tt EXC\_\$LOG (msg,status)}		& Log exception \\
+{\tt EXC\_\$MSG (status,len,msg)}	& Translate condition value \\
+{\tt EXC\_\$PROFL (name,level)}		& Enable execution profiling \\
+{\tt EXC\_\$VMS (status)}		& VMS exception handler \\
+\hline
+\end {tabular}
+\caption {EXC Routines}
+\label {exc_routines}
+\end {center}
+\end {table}
+
+\subsection {QUE Routines}
+
+These routines hardly deserve a mention. They provide the same services
+as the VAX {\tt INSQUE} and {\tt REMQUE} instructions and are listed in
+Table~\ref{que_routines}.
+
+\begin {table}[htbp]
+\begin {center}
+\begin {tabular}{||l|l||}
+\hline
+Routine name and argument list	& Description \\
+\hline
+{\tt INSQUE (entryy,pred)}	& Insert entry in queue \\
+{\tt REMQUE (entryy,addr)}	& Remove entry from queue \\
+\hline
+\end {tabular}
+\caption {QUE Routines}
+\label {que_routines}
+\end {center}
+\end {table}
+
+\clearpage
+\section {Error Codes}
+
+This section is modified from the equivalent section in \cite{sun_92}.
+
+A positive status value is returned by any HDS routine which detects an error
+condition. If a program is to perform specific tests on status values, the
+HDS-supplied symbolic identifiers described below should be used rather than
+explicit numerical constants. Following DEC conventions, symbolic status
+identifiers are prefixed with the facility name and a double underscore. The
+appropriate symbol definitions are contained in a file with the logical name
+{\tt dat\_err}. The symbols defined in this file are shown and described in
+Table~\ref{error_codes}.
+
+\begin {table}[htbp]
+\begin {center}
+\begin {tabular}{||l|l||}
+\hline
+{\em Identifier}	& {\em Description}\\
+\hline
+{\tt DAT\_\_ACTIV}	& Already active\\
+{\tt DAT\_\_ACCON}	& Access conflict\\
+{\tt DAT\_\_COMEX}	& Component already exists\\
+{\tt DAT\_\_CONER}	& Conversion error\\
+{\tt DAT\_\_CONIN}	& Conversion invalid\\
+{\tt DAT\_\_DELIN}	& Deletion invalid\\
+{\tt DAT\_\_DIMIN}	& Dimensions invalid\\
+{\tt DAT\_\_FATAL}	& Fatal internal error\\
+{\tt DAT\_\_FILCK}	& File locked\\
+{\tt DAT\_\_FILIN}	& File invalid\\
+{\tt DAT\_\_FILNF}	& File not found\\
+{\tt DAT\_\_FILPR}	& File protected\\
+{\tt DAT\_\_GRPIN}	& Group invalid\\
+{\tt DAT\_\_INCHK}	& Integrity check\\
+{\tt DAT\_\_LOCIN}	& Locator invalid\\
+{\tt DAT\_\_MODIN}	& Mode invalid\\
+{\tt DAT\_\_NAMIN}	& Name invalid\\
+{\tt DAT\_\_OBJNF}	& Object not found\\
+{\tt DAT\_\_OBJIN}	& Object invalid\\
+{\tt DAT\_\_PRMAP}	& Primitive data mapped\\
+{\tt DAT\_\_RELIN}	& Relationship invalid\\
+{\tt DAT\_\_SUBIN}	& Subscripts invalid\\
+{\tt DAT\_\_TRUNC}	& Text truncated\\
+{\tt DAT\_\_TYPIN}	& Type invalid\\
+{\tt DAT\_\_UNSET}	& Primitive data undefined\\
+{\tt DAT\_\_VERMM}	& Version mismatch\\
+{\tt DAT\_\_WEIRD}	& Unknown error\\
+\hline
+\end {tabular}
+\caption {Error Codes}
+\label {error_codes}
+\end {center}
+\end {table}
+
+The meaning of the errors associated with these codes is described in more
+detail below:
+
+\begin{description}
+\item [ACTIV]:
+Routine {\tt HDS\_START} has been called when HDS was already active.
+\item [ACCON]:
+A write operation has been rejected because the container file was originally
+opened for read-only access.
+\item [COMEX]:
+An attempt to create a new component of a structure has failed because a
+component of the same name already exists.
+\item [CONER]:
+One of the following conditions occurred during type conversion:
+\begin{itemize}
+\item Floating point overflow (when converting from double precision to single
+precision).
+\item Integer overflow.
+\end{itemize}
+\item [CONIN]:
+Conversion is not allowed between the two data types specified.
+\item [DELIN]:
+The object to be deleted was a non-empty structure.
+\item [DIMIN]:
+One of the following conditions occurred:
+\begin{itemize}
+\item When creating an object, the number of dimensions specified exceeds the
+system-imposed limit (currently 7), or one or more of the dimension sizes is
+zero or negative.
+\item When slicing an object, the number of dimensions specified exceeds the
+system-imposed limit (currently 3), or an incorrect number of lower and upper
+bounds has been specified.
+\item An attempt to read, write, or map primitive data has failed because the
+dimensions specified do not match the actual shape of the object.
+\end{itemize}
+\item [FATAL]:
+An unrecoverable error has been detected within one of the HDS modules.
+Supplementary information is normally associated with this condition which gives
+some indication of the nature of the error.
+\item [FILCK]:
+An attempt to open a container file in WRITE or UPDATE mode has failed
+because the file is currently open for write-access by another process.
+\item [FILIN]:
+The specified file does not conform to the structure of an HDS container file.
+\item [FILNF]:
+The specified file cannot be found, or the device, directory or filename does
+not obey the syntax rules for a VMS file specification.
+\item [FILPR]:
+The file is protected from being accessed in the specified mode (or from being
+deleted).
+\item [GRPIN]:
+The supplied text does not conform to the syntax of a group specification.
+\item [INCHK]:
+Typically, an attempt to access an object has failed because the object has been
+deleted or moved through another locator, either in the same program or in
+another process.
+\item [LOCIN]:
+One of the following conditions occurred:
+\begin{itemize}
+\item A non-CHARACTER variable has been specified as a locator (or a CHARACTER
+variable of the wrong length).
+\item The specified locator is not currently active, ie.\ not associated with an
+object.
+\item The specified locator had been generated by an HDS routine which did not
+run to successful completion.
+\end{itemize}
+\item [MODIN]:
+The supplied text is not a valid access mode.
+\item [NAMIN]:
+The supplied text does not conform to the syntax of a name specification.
+\item [OBJNF]:
+A request to locate a component of a structure, by name or position, has failed
+because the object does not exist.
+\item [OBJIN]:
+An input locator points to an object which is not suitable for the type of
+operation requested.
+Specifically, when the locator is associated with one of the following:
+\begin{itemize}
+\item A structure object where a primitive is required (and vice versa).
+\item An n-D object where a scalar (or cell) is required.
+\item A slice or cell of an n-D object where the complete array is required.
+\item A top-level object where a component object is required (and vice versa).
+\end{itemize}
+\item [PRMAP]:
+A GET, PUT or MAP operation has been rejected because primitive data is
+currently mapped to the specified locator.
+\item [RELIN]:
+An attempt to move an object has failed because the recipient structure is
+contained in a different file.
+\item [SUBIN]:
+An attempt to locate a slice or cell of an n-D object has failed
+because the subscript information references an element which is outside the
+array bounds of the object (or a lower bound exceeds an upper bound).
+\item [TRUNC]:
+Reading or writing character data has resulted in the truncation of significant
+(non-blank) characters.
+\item [TYPIN]:
+The supplied text does not conform to the syntax of a type specification.
+\item [UNSET]:
+An attempt to read primitive object data has failed because the values are
+currently undefined.
+\item [VERMM]:
+The HDS version number of a container file exceeds the current version number
+of the HDS software.
+Typically, this signifies that the file has previously been created by a new
+version of HDS that cannot be handled by a program linked with an older version.
+\item [WEIRD]:
+If this condition ever occurs, panic.
+\end{description}
+
+\begin {thebibliography}{XXXXXXX}
+\addcontentsline{toc}{section}{References}
+\bibitem[FORTRAN]{programming_in_fortran} {\em Programming in VAX FORTRAN},
+AA-D034D-TE, DEC
+\bibitem[LSN/32]{lsn_32} LSN/32 (RAL), {\em HDS --- Hierarchical Data System: C
+version}
+\bibitem[MODPROC]{creating_modular_procedures} {\em Guide to Creating Modular
+Procedures on VAX/VMS}, AA-FB84A-TE, DEC
+\bibitem[RTL]{run_time_library_reference} {\em VAX/VMS Run-Time Library
+Routines Reference Manual}, AA-QLZ55-GZ, DEC
+\bibitem[SUN/92]{sun_92} SUN/92, {\em HDS --- Hierarchical Data System:
+Programmer's guide}
+\bibitem[SYSSERV]{system_services_reference} {\em VAX/VMS System Services
+Reference Manual}, AA-Z501A-TE, DEC
+\end {thebibliography}
+
+\section* {Glossary}
+\addcontentsline{toc}{section}{Glossary}
+\markboth{GLOSSARY}{GLOSSARY}
+
+\begin {description}
+\item [AAO]: Anglo-Australian Observatory.
+\item [Array]: A object that has an associated dimensionality. The opposite
+of a scalar.
+\item [BCP]: Block Control Packet (qv).
+\item [BID]: Block-ID (qv).
+\item [Bitmap]: An array of bits where each bit indicates the availability or
+unavailability of some resource. HDS uses bitmaps for maintaining records
+of virtual memory usage and of chip usage within LRBs.
+\item [BLISS-32]: A high-level DEC-specific system programming language that
+was used for the first version of HDS.
+\item [Block]: A disc block. HDS regards the first block in a disc file as
+being block 1.
+\item [Block Control Packet]: A data structure (illustrated in
+Figure~\ref{structure_of_a_block_control_packet}) that controls access to a
+cached disc block.
+\item [Block-ID]: A data structure (illustrated in
+Figure~\ref{structure_of_a_block_id}) that describes a block and its associated
+file.
+\item [Broken]: Used of the data associated with an LCP. Such data is said
+to be broken if it is not a contiguous part of the data held in the container
+file (because it has been sliced).
+\item [C]: A high-level, widely and fairly portable system programming language
+that is used for the current version of HDS.
+\item [Cell]: A single element of an array.
+\item [Chained]: Used of a record's dynamic domain. A dynamic domain is said
+to be chained if there is not enough room for it in the same LRB as the
+rest of the record, forcing it to be held in a frame of PDBs. The opposite
+of un-chained.
+\item [Chips]: The unit of storage allocation in an LRB.
+\item [Component]: An object at one level below a structure object. A component
+can itself be either a structure or a primitive object.
+\item [Component Record]: A record that contains a list of a structure object's
+component names and associated RIDs.
+\item [Component Record Vector]: A data structure that describes one element
+of the dynamic domain of a Component Record.
+\item [Container File]: An HDS file. The term is used to underline the fact
+that the file itself is just an container for objects.
+\item [Container Record]: The second record in a container file. It contains
+the name and RID of the file's top-level object.
+\item [Control Domain]: The fixed size (10 bytes) part of a record that
+contains the RCL.
+\item [CRV]: Component Record Vector (qv).
+\item [DAT]: The top-level HDS module. It contains all of the user-callable
+routines (apart from the EXC routines).
+\item [Data Object]: Any HDS object. It can be a structure or a primitive
+object.
+\item [Dynamic Domain]: The dynamically alterable part of a record. It can
+be expanded and contracted after a record has been created. In a structure
+object it contains the RIDs of the child objects. In a primitive object it
+contains actual data.
+\item [EXC]: The exception-handling module. It contains routines to control
+the handling and reporting of error conditions.
+\item [FCV]: File Control Vector (qv).
+\item [FID]: File-ID (qv).
+\item [File]: Unless otherwise stated, this always means an HDS container file.
+\item [File Control Vector]: A data structure (illustrated in
+Figure~\ref{structure_of_a_file_control_vector_slot}) that contains information
+about a container file currently being accessed by HDS.
+\item [File-ID]: A data structure (illustrated in
+Figure~\ref{structure_of_a_file_id}) that contains an encoded form of a
+container file name.
+\item [FORTRAN]: FORmula TRANslation. An early scientific programming language
+still widely used in research and engineering environments. It is the most
+common language used for HDS applications. The current standard version is
+called Fortran-77 and VAX Fortran is a superset of this.
+\item [FPL]: Free Page List (qv).
+\item [Frame]: A set of contiguous PDBs.
+\item [Free Page List]: Those pages in the data cache that are not currently
+in use.
+\item [Free Space Stack]: The latter part of a container file's HCB. It
+contains details of free blocks and chips in the container file.
+\item [HAN]: Handle (qv).
+\item [Handle]: A data structure (illustrated in
+Figure~\ref{structure_of_a_handle}) that contains the information necessary
+to access a given chip in a given block in a given file.
+\item [HCB]: Header Control Block (qv).
+\item [HDS]: Hierarchical Data System. To find out more, read this document.
+\item [Header Control Block]: The first block of a container file. It contains
+various header items and the free space stack.
+\item [LCP]: Locator Control Packet (qv).
+\item [LOC]: Locator (qv).
+\item [Locator]: A data structure (illustrated in
+Figure~\ref{structure_of_a_locator}) that is passed to and from application
+routines and which allows access to the associated LCP and thus to the
+associated object.
+\item [Locator Control Packet]: A data structure (illustrated in
+Figure~\ref{structure_of_a_locator_control_packet}) that contains cached
+information about an object and extra information about how that object is
+currently being accessed.
+\item [Logical Record Block]: A disc block that is split up into a chip bitmap
+and $15 \times 34$ byte chips. This is in contrast to a PDB, which is pure
+data.
+\item [LRB]: Logical Record Block (qv).
+\item [Mapped]: Used of object data. An object is said to be mapped if the
+application has been given a pointer to its data. The term does not refer
+to the method of access from the container file.
+\item [Name]: Object name. A text string of not more than 15 characters
+(padded to the right with spaces).
+\item [Object]: Data Object (qv).
+\item [Object Descriptor Label]: A data structure (illustrated in
+Figure~\ref{structure_of_an_object_descriptor_label}) that describes an object's
+type and shape. It comprises the static domain of a Structure or Primitive
+Record.
+\item [Object Record]: A Structure or Primitive Record (qv). Its static domain
+is an ODL and its dynamic domain is either a set of RIDs or else primitive data.
+\item [ODL]: Object Descriptor Label (qv).
+\item [Parent]: Record Parent (qv).
+\item [PDB]: Pure Data Block (qv).
+\item [PLT]: Primitive Lookup Table (qv).
+\item [Primitive]: Having actual associated data values. The opposite of
+structure.
+\item [Primitive Lookup Table]: A data structure that relates primitive types
+to numbers of bits per pixel, VMS descriptor types etc.
+\item [Primitive Record]: A record describing a primitive object. Its static
+domain is an ODL and its dynamic domain is actual primitive data.
+\item [PRO]: The profiling module. It contains routines to count numbers
+of entries to routines and to maintain total elapsed and CPU times. It is
+not regarded as being part of HDS.
+\item [Pure Data Block]: A disc block which is all used for data. This is
+in contrast to an LRB, which is split up into 15 chips.
+\item [QUE]: The queue-handling module. It contains simulations of the VAX
+{\tt INSQUE} and {\tt REMQUE} instructions.
+\item [RAL]: Rutherford-Appleton Laboratory
+\item [RCL]: Record Control Label (qv).
+\item [REC]: The record-access module. It contains routines that are called
+only by the routines in the DAT module.
+\item [Record Classes]: There are four of these: Container Record, Component
+Record, Structure Record and Primitive Record (qv).
+\item [Record Control Label]: A data structure (illustrated in
+Figure~\ref{structure_of_a_record_control_label}) that comprises the control
+domain of all records. It is a fixed size structure that contains information
+such as the lengths of the static and dynamic domains.
+\item [Record Domains]: The three logical parts of a record. The control
+domain is of a fixed size (10 bytes) and contains the RCL. The static domain is
+of a fixed size (chosen at record creation time and cannot exceed 498 bytes).
+The dynamic domain is of a variable size.
+\item [Record Parent]: The record that owns the record in question.
+\item [Record-ID]: A data structure (illustrated in
+Figure~\ref{structure_of_a_record_id}) that describes a given chip in a given
+record.
+\item [RGO]: Royal Greenwich Observatory.
+\item [RID]: Record-ID (qv).
+\item [RMS]: Record Management Services. These are a part of the VMS Operating
+System.
+\item [RTL]: Run-Time Library. These are routines that are automatically
+available to all programs running under VMS.
+\item [Scalar]: A object that consists of a single item with no associated
+dimensionality. The opposite of an array.
+\item [Shape]: The dimensionality of an object. It can be described by a
+number of axes and, if that number is greater than zero, one dimension size
+for each axis.
+\item [Slice]: A subset of an object. It is described by giving a range of
+up to the first three dimensions. If the data in a slice is not contiguous
+then it is said to be broken (qv).
+\item [Slot]: A file number. It is used to refer to one of the files that
+are currently opened by HDS --- the slot is the entry number in the FCV.
+\item [SRV]: Structure Record Vector (qv).
+\item [Stack]: (Free Space) Stack (qv).
+\item [Static Domain]: The fixed size (chosen at record creation time and
+cannot exceed 498 bytes) part of a record.
+\item [STK]: (Free Space) Stack (qv).
+\item [Structure]: Not having actual associated data values but instead having
+zero or more components. The opposite of primitive.
+\item [Structure Record]: A record describing a structure object. Its static
+domain is an ODL and its dynamic domain is a list of its elements' RIDs.
+\item [Structure Record Vector]: A data structure that describes one element
+of the dynamic domain of a Structure Record.
+\item [Type]: Object type. A text string of not more than 15 characters
+(padded to the right with spaces). If it begins with an underscore the object
+is primitive. Otherwise it is a structure.
+\item [Un-chained]: Used of a record's dynamic domain. A dynamic domain is said
+to be un-chained if its dynamic domain is held in the same LRB as the rest of
+the record. The opposite of chained.
+\item [VAX]: Virtual Address eXtended. The sole range of machines on which
+HDS is currently implemented.
+\item [Vectorised]: Used of the data associated with an LCP. Such data is said
+to be vectorised if an explicit routine call has forced it to be regarded
+as a vector.
+\item [Virtual Memory Pool]: A data structure (illustrated in
+Figure~\ref{structure_of_the_virtual_memory_pool}) that allows access to
+the virtual memory that is managed by HDS.
+\item [VMP]: Virtual Memory Pool (qv).
+\item [VMS]: Virtual Memory System. VAX/VMS is the Operating System under
+which HDS has been implemented.
+\item [Working Page List]: Those pages in the data cache that are currently
+in use.
+\item [WPL]: Working Page List (qv).
+\end {description}
+
+\section* {Acknowledgements}
+\addcontentsline{toc}{section}{Acknowledgements}
+\markboth{ACKNOWLEDGEMENTS}{ACKNOWLEDGEMENTS}
+The original version of HDS was designed and implemented by Dave Pearce and
+Anton Walter at RAL during 1982 and 1983. It was written in BLISS-32, a
+powerful systems implementation language which produces highly optimised object
+code. It has been translated into C by Mike Lawden at RAL and William Lupton at
+RGO / AAO --- see \cite{lsn_32} for further details.
+
+Documentation on the design and implementation of HDS was originally written
+by Dave Pearce (RAL).
+This was revised, reorganised and extended by Mike Lawden (RAL) and issued as
+an earlier version of this paper.
+\end {document}
