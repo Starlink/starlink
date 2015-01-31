@@ -2375,34 +2375,9 @@ $(MANIFESTS)/sgmlkit: \
 	cd applications/sgmlkit \
 	  && $(MAKE_CPT)
 
-$(MANIFESTS)/sgp1: \
-		$(MANIFESTS)/star2html
-	cd docs/sgp/001 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sgp12: \
-		$(MANIFESTS)/star2html
-	cd docs/sgp/012 \
-	  && $(MAKE_CPT)
-
 $(MANIFESTS)/sgp16: \
 		$(MANIFESTS)/star2html
 	cd docs/sgp/016 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sgp2: \
-		$(MANIFESTS)/star2html
-	cd docs/sgp/002 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sgp21: \
-		$(MANIFESTS)/star2html
-	cd docs/sgp/021 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sgp25: \
-		$(MANIFESTS)/star2html
-	cd docs/sgp/025 \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/sgp28: \
@@ -2415,64 +2390,9 @@ $(MANIFESTS)/sgp31: \
 	cd docs/sgp/031 \
 	  && $(MAKE_CPT)
 
-$(MANIFESTS)/sgp38: \
-		$(MANIFESTS)/star2html
-	cd docs/sgp/038 \
-	  && $(MAKE_CPT)
-
 $(MANIFESTS)/sgp4: \
 		$(MANIFESTS)/star2html
 	cd docs/sgp/004 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sgp41: \
-		$(MANIFESTS)/star2html
-	cd docs/sgp/041 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sgp42: \
-		$(MANIFESTS)/star2html
-	cd docs/sgp/042 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sgp44: \
-		$(MANIFESTS)/star2html
-	cd docs/sgp/044 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sgp45: \
-		$(MANIFESTS)/star2html
-	cd docs/sgp/045 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sgp47: \
-		$(MANIFESTS)/star2html
-	cd docs/sgp/047 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sgp49: \
-		$(MANIFESTS)/star2html
-	cd docs/sgp/049 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sgp50: \
-		$(MANIFESTS)/star2html
-	cd docs/sgp/050 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sgp51: \
-		$(MANIFESTS)/star2html
-	cd docs/sgp/051 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sgp52: \
-		$(MANIFESTS)/star2html
-	cd docs/sgp/052 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sgp7: \
-		$(MANIFESTS)/star2html
-	cd docs/sgp/007 \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/sgs: \
@@ -3130,26 +3050,10 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/sg6 \
 	$(MANIFESTS)/sg9 \
 	$(MANIFESTS)/sgmlkit \
-	$(MANIFESTS)/sgp1 \
-	$(MANIFESTS)/sgp12 \
 	$(MANIFESTS)/sgp16 \
-	$(MANIFESTS)/sgp2 \
-	$(MANIFESTS)/sgp21 \
-	$(MANIFESTS)/sgp25 \
 	$(MANIFESTS)/sgp28 \
 	$(MANIFESTS)/sgp31 \
-	$(MANIFESTS)/sgp38 \
 	$(MANIFESTS)/sgp4 \
-	$(MANIFESTS)/sgp41 \
-	$(MANIFESTS)/sgp42 \
-	$(MANIFESTS)/sgp44 \
-	$(MANIFESTS)/sgp45 \
-	$(MANIFESTS)/sgp47 \
-	$(MANIFESTS)/sgp49 \
-	$(MANIFESTS)/sgp50 \
-	$(MANIFESTS)/sgp51 \
-	$(MANIFESTS)/sgp52 \
-	$(MANIFESTS)/sgp7 \
 	$(MANIFESTS)/sgs \
 	$(MANIFESTS)/shl \
 	$(MANIFESTS)/sla \
