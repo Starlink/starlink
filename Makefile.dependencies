@@ -2355,16 +2355,6 @@ $(MANIFESTS)/scb: \
 	cd applications/obsolete/scb \
 	  && $(MAKE_CPT)
 
-$(MANIFESTS)/sg10: \
-		$(MANIFESTS)/star2html
-	cd docs/sg/010 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sg12: \
-		$(MANIFESTS)/star2html
-	cd docs/sg/012 \
-	  && $(MAKE_CPT)
-
 $(MANIFESTS)/sg4: \
 		$(MANIFESTS)/star2html
 	cd docs/sg/004 \
@@ -2373,11 +2363,6 @@ $(MANIFESTS)/sg4: \
 $(MANIFESTS)/sg6: \
 		$(MANIFESTS)/star2html
 	cd docs/sg/006 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sg8: \
-		$(MANIFESTS)/star2html
-	cd docs/sg/008 \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/sg9: \
@@ -3141,11 +3126,8 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/sc6 \
 	$(MANIFESTS)/sc7 \
 	$(MANIFESTS)/sc9 \
-	$(MANIFESTS)/sg10 \
-	$(MANIFESTS)/sg12 \
 	$(MANIFESTS)/sg4 \
 	$(MANIFESTS)/sg6 \
-	$(MANIFESTS)/sg8 \
 	$(MANIFESTS)/sg9 \
 	$(MANIFESTS)/sgmlkit \
 	$(MANIFESTS)/sgp1 \

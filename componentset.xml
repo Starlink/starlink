@@ -2501,35 +2501,6 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sg8">
-  <version>2</version>
-  <path>docs/sg/008</path>
-  <description>An Introduction to Visualisation Software for Astronomy</description>
-  <abstract><p>
-      This document is an introduction to various common visualisation
-      techniques and packages which might be used on Starlink systems.
-      It is aimed at astronomers with complex datasets to display and
-      explore but no prior knowledge of visualisation techniques.  Its
-      purpose is to assist such an astronomer to find visualisation
-      software suitable for his problem.  It is not a manual for any
-      particular package.
-    </p></abstract>
-  <dependencies >
-    <sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>A C Davenhall</name>
-    </person>
-  </developers>
-  <documentation> sg8</documentation>
-  <bugreports>starlink@jiscmail.ac.uk</bugreports>
-  <copyright>
-    <year>1996, 1997</year>
-    <name>CLRC</name>
-  </copyright>
-</component>
-
 <component id="sg9">
   <version>2</version>
   <path>docs/sg/009</path>
@@ -2557,69 +2528,6 @@ to handle data from a variety of different instruments.
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1996</year>
-    <name>CLRC</name>
-  </copyright>
-</component>
-
-<component id="sg10">
-  <version>2</version>
-  <path>docs/sg/010</path>
-  <description>Preparing to Observe</description>
-  <abstract><p>
-      This document identifies a number of software applications and
-      packages that will prove useful to observers writing an
-      observing application or preparing for an observing run. A brief
-      description of the software is given.
-
-      WWW URLs are provided for WWW-based resources such a databases,
-      catalogues and on-line atlases.
-    </p></abstract>
-  <dependencies >
-    <sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Grant Privett</name>
-    </person>
-  </developers>
-  <documentation> sg10</documentation>
-  <bugreports>starlink@jiscmail.ac.uk</bugreports>
-  <copyright>
-    <year>1997, 1998</year>
-    <name>CLRC</name>
-  </copyright>
-</component>
-
-<component id="sg12">
-  <version>2</version>
-  <path>docs/sg/012</path>
-  <description>An Introduction to IRAF</description>
-  <abstract><p>
-      This document is an introduction to the IRAF software package
-      and its use on Starlink systems.  IRAF is a powerful and
-      comprehensive environment for reducing and analysing
-      astronomical data.  It was developed at the National Optical
-      Astronomy Observatories, Tucson and is in widespread use around
-      the world.  IRAF has its own data file format, command language,
-      on-line help system and programming language.  It is a modular
-      system.  The basic core, which is always present, provides
-      general facilities for image processing and data reduction.  For
-      more specialised tasks additional packages are loaded to augment
-      the core system. Software for processing most sorts of
-      astronomical data is available for the IRAF environment.
-    </p></abstract>
-  <dependencies >
-    <sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>R. Morris, G.J. Privett &amp; A.C. Davenhall</name>
-    </person>
-  </developers>
-  <documentation> sg12</documentation>
-  <bugreports>starlink@jiscmail.ac.uk</bugreports>
-  <copyright>
-    <year>1998, 1999</year>
     <name>CLRC</name>
   </copyright>
 </component>

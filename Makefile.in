@@ -126,10 +126,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/sc21 \
 	$(MANIFESTS)/sg4 \
 	$(MANIFESTS)/sg6 \
-	$(MANIFESTS)/sg8 \
 	$(MANIFESTS)/sg9 \
-	$(MANIFESTS)/sg10 \
-	$(MANIFESTS)/sg12 \
 	$(MANIFESTS)/sgp1 \
 	$(MANIFESTS)/sgp2 \
 	$(MANIFESTS)/sgp4 \
