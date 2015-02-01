@@ -1,50 +1,18 @@
-\documentstyle{article}
-\pagestyle{myheadings}
+\documentclass[nolof,11pt,noabs]{starlink}
 
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink General Paper}
-\newcommand{\stardocinitials}  {SGP}
-\newcommand{\stardocnumber}    {2.2}
-\newcommand{\stardocauthors}   {P T Wallace}
-\newcommand{\stardocdate}      {26th September 1990}
-\newcommand{\stardoctitle}     {Starlink Software Support Responsibilities}
+\stardoccategory    {Starlink General Paper}
+\stardocinitials    {SGP}
+\stardocnumber      {2.2}
+\stardocauthors     {P T Wallace}
+\stardocdate        {26th September 1990}
+\stardoctitle       {Starlink Software Support Responsibilities}
 %------------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{240mm}
-\setlength{\topmargin}{-5mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-\newcounter{sectno}
-\newcommand{\sect}[1]   {\addtocounter{sectno}{1}
-                         \goodbreak\vspace{4ex}\noindent
-                         {\thesectno}.\hspace*{1em}{\bf #1}\\[3ex]}
 
 \begin{document}
-\thispagestyle{empty}
-SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
-RUTHERFORD APPLETON LABORATORY\\
-{\large\bf Starlink Project\\}
-{\large\bf \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Large\bf \stardoctitle}
-\end{center}
-\vspace{5mm}
+\scfrontmatter
 
-\sect {BACKGROUND}
+\section{BACKGROUND}
 In a series of papers written by the Project during 1988,
 the Starlink Users' Committee's attention was drawn
 to a mismatch between
@@ -80,7 +48,7 @@ the present range of activities must continue,
 with no radical reductions in
 the number of nodes or types of astronomy.
 \item Starlink should limit its development and support
-of {\it applications} software.
+of \textit{applications} software.
 Support for specialised
 applications and instrument specific software
 should be left to the astronomical community, though
@@ -88,17 +56,17 @@ the development of such software should continue to
 be compatible with Starlink, and this might be a condition for
 grant awards.
 \item Starlink should concentrate instead on developing
-{\it environment} software, so as to provide adequate tools for
+\textit{environment} software, so as to provide adequate tools for
 applications programming done by the
 astronomical community.
 \item Starlink's important and
 time-consuming advisory r\^{o}le to
 SERC committees and to grant applicants on new
-hardware ({\it e.g.}\ whether specific hardware
+hardware (\textit{e.g.}\ whether specific hardware
 is value for money) should be more fully appreciated
 by the astronomical community.
 \item Starlink's r\^{o}le in assessing new
-developments ({\it e.g.}\ UNIX workstations)
+developments (\textit{e.g.}\ UNIX workstations)
 should be placed at higher priority.
 \item The distinctions between software that is
 (i)~fully documented and supported, (ii)~partially
@@ -130,7 +98,7 @@ interested users at individual sites.
 
 As well as setting out limits to Starlink's software
 responsibilities, the Project's
-plans try to compensate by identifying areas in which {\it firmer}
+plans try to compensate by identifying areas in which \textit{firmer}
 commitments
 can be made than was customary in the past.  It is, in particular,
 hoped that the new policies will enable
@@ -141,13 +109,13 @@ Spring~1990, in the form of an early draft of the
 present document, and suggestions made during those consultations were
 taken into account before the document was first released generally.
 
-\sect {SOFTWARE SUPPORT}
+\section{SOFTWARE SUPPORT}
 It is well-established in the software industry that
 most -- perhaps 70\% -- of the total effort expended on
 a program during its life cycle is spent on maintenance,
 and that the initial design, coding and testing phases
 form an unexpectedly small part of the
-whole.\footnote{See for example pp3-5 of {\it Software Evolution}, Lowell~Jay~Arthur,
+whole.\footnote{See for example pp3-5 of \textit{Software Evolution}, Lowell~Jay~Arthur,
 John~Wiley and Sons (1988), and the bibliography on pp249-250.
 This author attributes 3\% of the life-cycle costs to requirements
 definition, 3\% to preliminary design, 5\% to detailed design,
@@ -159,7 +127,7 @@ unaware of this, and prefer to cling to the comforting but na\"{\i}ve
 notion that
 once a program is working it will continue to do so for
 ever without human intervention.  But what does
-{\it maintenance} consist of?
+\textit{maintenance} consist of?
 \begin{itemize}
 \item Maintaining an awareness of how the software works so that bugs can
 be fixed, and reasonably quickly;  fixing bugs.
@@ -178,17 +146,17 @@ preparing new releases;  supplying software and documentation on request.
 to the item in question.
 \item Keeping the software up-to-date,
 to fit in with other software, to reflect changing practices or
-to take advantage of new graphics devices {\it etc}.
+to take advantage of new graphics devices \textit{etc}.
 \end{itemize}
 Starlink is able to commit itself to providing support in
 all these respects, but only for a subset of the existing software.
 
 In many ways, the Project's revised software support policy
 is simply a restatement of the original ideas for Starlink,
-{\it circa} 1979.  Nonetheless, the most controversial
+\textit{circa} 1979.  Nonetheless, the most controversial
 aspect of the plan, and the one that has been hardest for
 the community to understand and accept, is the Project's inability
-to commit itself to {\it full} support of more than a
+to commit itself to \textit{full} support of more than a
 small fraction of the total volume of applications software required.
 It is commonly assumed at many Starlink sites
 that local responsibility for writing software is limited to
@@ -203,8 +171,8 @@ can provide more than a very modest fraction of the necessary
 effort.  The {\small STARLINK} management's job is to
 encourage, advise and support the astronomers who are willing and
 able to contribute their own efforts and their own expertise to the
-task.''\footnote{{\it STARLINK}, M.J.Disney \& P.T.Wallace,
-Q.Jl.R.Astr.Soc.(1982) {\bf 23}, p501}
+task.''\footnote{\textit{STARLINK}, M.J.Disney \& P.T.Wallace,
+Q.Jl.R.Astr.Soc.(1982) \textbf{23}, p501}
 \end{quotation}
 Although manpower levels in Starlink's central
 team have been increased since
@@ -217,25 +185,25 @@ is even more pronounced today than when the Project was first
 set up.  There is, regrettably, no sign that this volunteer
 effort is any more available now than in earlier times.
 
-\sect{WHICH SOFTWARE?}
+\section{WHICH SOFTWARE?}
 The software required by astronomers covers a broad range, from
 operating systems such as VMS to real-time control of
 data-acquisition instrumentation.  Within this range, we
 can identify the following categories (all required if the gap between
 the instrument and the data analysis computer is to be bridged --
-{\it i.e.}\ they are {\it not} priorities):
+\textit{i.e.}\ they are \textit{not} priorities):
 \begin{enumerate}
 \item Operating systems.
 \item I/O device drivers.
 \item Application support environment software (parameter
-      systems, command languages, {\it etc}.).
-\item Kernel graphics packages ({\it e.g.}\ GKS).
-\item High-level graphics utilities ({\it e.g.}\ PGPLOT, NCAR).
-\item General-purpose applications ({\it e.g.}\ FIGARO, KAPPA).
-\item Astronomical subroutine libraries ({\it e.g.}\ SLALIB).
-\item Applications for one type of astronomy ({\it e.g.}\ GASP).
-\item Data reduction systems for one class of detector ({\it e.g.}\ CCD).
-\item Data reduction systems for one instrument ({\it e.g.}\ TAURUS).
+      systems, command languages, \textit{etc}.).
+\item Kernel graphics packages (\textit{e.g.}\ GKS).
+\item High-level graphics utilities (\textit{e.g.}\ PGPLOT, NCAR).
+\item General-purpose applications (\textit{e.g.}\ FIGARO, KAPPA).
+\item Astronomical subroutine libraries (\textit{e.g.}\ SLALIB).
+\item Applications for one type of astronomy (\textit{e.g.}\ GASP).
+\item Data reduction systems for one class of detector (\textit{e.g.}\ CCD).
+\item Data reduction systems for one instrument (\textit{e.g.}\ TAURUS).
 \item Data acquisition software for telescope and satellite-borne
 instruments.
 \end{enumerate}
@@ -248,7 +216,7 @@ category~11 software is provided by instrument builders.
 Regarding categories~3-5, Starlink undertakes to provide a suite
 of software covering these areas, and also participates to various extents in
 the distribution and support of selected ``foreign'' software
-environments (AIPS, IDL, IRAF {\it etc}.).
+environments (AIPS, IDL, IRAF \textit{etc}.).
 There have, in the past, been
 misunderstandings over category~10 (for historical reasons mainly
 in ground-based optical circles rather than in radio or space), but
@@ -280,14 +248,14 @@ to be as helpful as it can under the circumstances, taking into
 account the extent to which contributed software has been written
 according to Starlink standards (see SGP/16).
 
-\sect {MANAGEMENT IMPLICATIONS}
+\section{MANAGEMENT IMPLICATIONS}
 Within the Starlink Project, the agreed policies on software
 mainly affect the work of three groups:
 (i)~the RAL applications staff, (ii)~the RAL
 user support and software distribution staff, and (iii)~the
 contract applications programmers.
 
-{\it RAL APPLICATIONS:} \hspace{2ex} The {\bf Head
+\textit{RAL APPLICATIONS:} \hspace{2ex} The \textbf{Head
 of Applications} (HoA), who is responsible for
 managing the SIGs and the contract programmers, is expected in
 his own software work to concentrate on programming standards
@@ -301,7 +269,7 @@ support environment package ADAM, now mature and
 well-supported), with
 the objective of minimising the software support
 burden falling on the community.  This is a crucial point.
-A key purpose of a system like ADAM is to {\it minimise} the
+A key purpose of a system like ADAM is to \textit{minimise} the
 total software effort required to provide astronomers with
 the applications they need.  Writing independent
 one-off applications may appear to offer faster results, but
@@ -309,8 +277,8 @@ soon the lack of uniformity, the difficulties of inter-package
 data exchange, and above all the constant re-invention of the
 wheel mean that the total effort has gone up, not down, compared
 with the environment approach.
-Similarly, the {\bf RAL programmers} tend to work more on infrastructure
-software than on applications {\it per se}, typically developing
+Similarly, the \textbf{RAL programmers} tend to work more on infrastructure
+software than on applications \textit{per se}, typically developing
 subroutine libraries rather than complete astronomical application
 programs.  Nonetheless, some development of applications
 proper does go on within Starlink.  This is
@@ -320,8 +288,8 @@ maintaining its relevance.  Such software will, of course, always be
 developed according to Starlink programming standards and
 will be designed with long-term support in mind.
 
-{\it RAL USER SUPPORT:}  \hspace{2ex} The
-{\bf User Support and Software Distribution Group}
+\textit{RAL USER SUPPORT:}  \hspace{2ex} The
+\textbf{User Support and Software Distribution Group}
 adds to the Starlink Software Collection
 items which astronomers have submitted for release.
 In the case of new items, the Head of Applications is
@@ -342,8 +310,8 @@ Another r\^{o}le of the Group is to provide various forms
 of user education, including the production of new and improved
 documentation and the development of course and display materials.
 
-{\it HEI CONTRACTORS:} \hspace{2ex} Work directed by {\bf SIGs} and carried out
-by the fixed-term {\bf contract programmers}
+\textit{HEI CONTRACTORS:} \hspace{2ex} Work directed by \textbf{SIGs} and carried out
+by the fixed-term \textbf{contract programmers}
 will not, after the programmer's
 contract comes to an end, be supported
 automatically by Starlink's central RAL team,
@@ -363,7 +331,7 @@ that there is financial provision for maintaining the numbers of
 contract programmers at HEIs well into the future, and some prospect
 that their numbers will increase, beyond the current level of 8.
 
-\sect {EDUCATION}
+\section{EDUCATION}
 The different software products available through Starlink have
 vastly different levels of support and longevity, and
 the Project is devising methods to make users more aware of these
@@ -380,14 +348,14 @@ colour-coded covers bearing printed statements as to the
 level of support available, including specific details of
 who is looking after the product and the long-term prognosis.
 
-\sect {SOFTWARE SUPPORT CATEGORIES}
+\section{SOFTWARE SUPPORT CATEGORIES}
 The file RLVAD::LADMINDIR:SUPPORT.LIS contains details of the support
 arrangements for each item of Starlink software.  A listing of this
 file is appended to the present document as a guide;  for the latest
 information it is essential to refer to the file itself.
 
 The support for each named item is classified in two ways.  There are
-five {\it support levels}:
+five \textit{support levels}:
 \begin{enumerate}
 \item[A] Unconditional support, by Starlink staff, at short
 notice;  compatibility with other software will be maintained.
@@ -397,14 +365,14 @@ geographical, response time or control factors.
 \item[D] Little or no support available.
 \item[E] Obsolescent.
 \end{enumerate}
-and four {\it support classes}:
+and four \textit{support classes}:
 \begin{enumerate}
 \item[C] Commercially supported.  (All such software is of support level B.)
 \item[S] Starlink-supported.
 \item[N] Non-Starlink-supported.
 \item[U] Unsupported.  (All such software is of support level D or E.)
 \end{enumerate}
-The important parameter is the {\it support level};  this is what an
+The important parameter is the \textit{support level};  this is what an
 astronomer should take into account when deciding whether or not
 to employ any given software item in his or her work.
 
