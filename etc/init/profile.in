@@ -322,6 +322,13 @@ if test -f ${bindir}/icl; then
    export ICL_LOGIN_SYS=${staretcdir}/icl_login_sys.icl
 fi
 
+#  JCMTDR
+
+if test -f ${bindir}/jcmtdr/jcmtdr.sh; then
+    export JCMTDR_DIR=${bindir}/jcmtdr
+    export JCMTDR_HELP=${starhelpdir}/jcmtdr/jcmtdr
+fi
+
 #  JPL
 
 if test -f ${staretcdir}/jpleph.dat; then
@@ -661,6 +668,17 @@ else
    gaia () { ${STARLINK_DIR}/etc/notinst gaia; }
    gaiadisp () { ${STARLINK_DIR}/etc/notinst gaiadisp; }
 fi
+
+# JCMT-DR
+
+if test -f ${bindir}/jcmtdr/jcmtdr.sh; then
+  jcmtdr () { . $JCMTDR_DIR/jcmtdr.sh; }
+  jcmtdrsetup () { . $JCMTDR_DIR/jcmtdr.sh; }
+else
+  jcmtdr () { ${STARLINK_DIR}/etc/notinst jcmtdr; }
+  jcmtdrsetup () { ${STARLINK_DIR}/etc/notinst jcmtdr; }
+fi
+
 
 # Kappa
 
