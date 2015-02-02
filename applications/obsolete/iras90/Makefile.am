@@ -77,9 +77,9 @@ specresp100.sdf: makeresp makeresp.ifc
 	./makeresp specresp100 100
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ \
-    sun161_a_1_1.ps sun161_a_3_1_canon.dat sun161_a_4_3.ps sun161_a_1_2.ps \
-    sun161_a_4_1.ps sun161_a_4_4.ps sun161_a_2_1.ps sun161_a_4_2.ps \
-    sun161_a_4_5.ps
+    sun161_a_1_1.pdf sun161_a_3_1_canon.dat sun161_a_4_3.pdf sun161_a_1_2.pdf \
+    sun161_a_4_1.pdf sun161_a_4_4.pdf sun161_a_2_1.pdf sun161_a_4_2.pdf \
+    sun161_a_4_5.pdf
 
 # Define the help source file.
 starhelp_DATA = iras90_help.shl
