@@ -75,6 +75,7 @@
       INCLUDE 'NDF_PAR'          ! NDF constants.
       INCLUDE 'IRQ_PAR'          ! IRQ constants.
       INCLUDE 'IRQ_ERR'          ! IRQ error values.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER LOCS*(*)
@@ -182,15 +183,17 @@
 *  the quality on entry to this *routine.
       IF( FIXED ) THEN
          CALL IRQ1_RBIT( LOCS, BIT, STATUS )
-         CALL IRQ1_QSET( BIT, .FALSE., NEL, %VAL( PNT ), STATUS )
+         CALL IRQ1_QSET( BIT, .FALSE., NEL, %VAL( CNF_PVAL( PNT ) ), 
+     :                   STATUS )
       END IF
 
 *  Set the appropriate bit in the QUALITY array for the selected pixels.
       CALL IRQ1_QLST( BIT, LISTED, .TRUE., NDIM, NCOORD, LIST, LBND,
-     :                UBND, NEL, %VAL( PNT ), STATUS )
+     :                UBND, NEL, %VAL( CNF_PVAL( PNT ) ), STATUS )
 
 *  Count the number of pixels for which the bit is set or clear.
-      CALL IRQ1_QCNT( BIT, NEL, %VAL( PNT ), SET, CLEAR, STATUS )
+      CALL IRQ1_QCNT( BIT, NEL, %VAL( CNF_PVAL( PNT ) ), 
+     :                SET, CLEAR, STATUS )
 
 *  Unmap the QUALITY array.
       CALL NDF_UNMAP( INDF, 'QUALITY', STATUS )

@@ -69,6 +69,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'I90_DAT'          ! IRAS90 package data
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NPSMP, NPROF
@@ -134,7 +135,7 @@
 *  Re-sample the non-zero segment of the profile and put the result into
 *  the temporary working array.
       CALL POIND1( NPSMP, NPROF, DATA, AXIS, BAND, PRFWID,
-     :             %VAL( PPROF ), STATUS )
+     :             %VAL( CNF_PVAL( PPROF ) ), STATUS )
 
  999  CONTINUE
 

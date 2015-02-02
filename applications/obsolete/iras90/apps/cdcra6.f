@@ -86,6 +86,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Primitive constants
       INCLUDE 'I90_DAT'          ! IRAS90 package constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NCRDD
@@ -203,14 +204,16 @@
 
 *  Extract the data of the crossing section from the CRDD NDF.
             CALL CDCRB0( LBND( 1 ), UBND( 1 ), LBND( 2 ), UBND( 2 ),
-     :                  %VAL( PNTR( 1 ) ), SCALE, REVS, INTER, SCNLEN,
+     :                  %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                  SCALE, REVS, INTER, SCNLEN,
      :                   NCROS, CRSDTX, CRSSMP, CRSFLG, DATARY, STATUS )
 
 *  If variance is to be used, extract the variance of the crossing
 *  section from the CRDD NDF.
             IF ( WEIGHT( : 8 ) .EQ. 'VARIANCE' ) THEN
                CALL CDCRB0( LBND( 1 ), UBND( 1 ), LBND( 2 ), UBND( 2 ),
-     :                     %VAL( PNTR( 2 ) ), SCALE, REVS, INTER,
+     :                     %VAL( CNF_PVAL( PNTR( 2 ) ) ), 
+     :                     SCALE, REVS, INTER,
      :                     SCNLEN, NCROS, CRSDTX, CRSSMP, CRSFLG,
      :                     WGTARY, STATUS )
             END IF

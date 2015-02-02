@@ -235,6 +235,7 @@
       INCLUDE 'GRP_PAR'          ! GRP constants.
       INCLUDE 'IRQ_PAR'          ! IRQ constants.
       INCLUDE 'IRQ_ERR'          ! IRQ status constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -422,7 +423,8 @@
 *  Loop round, converting the character values stored in the group into
 *  integer values stored within the workspace.
          DO I = 1, NC
-            CALL SETQA0( IGRP1, I, NDIMI, NC, %VAL( IPLIST ), STATUS )
+            CALL SETQA0( IGRP1, I, NDIMI, NC, 
+     :                   %VAL( CNF_PVAL( IPLIST ) ), STATUS )
          END DO
 
 *  The character versions of the pixel indices are no longer needed, so
@@ -566,13 +568,15 @@
 *  pixels.
             REGVAL = 2
             CALL ARD_WORK( IGRP4, NDIM, LBND, UBND, VAL__BADR, .FALSE.,
-     :                     REGVAL, %VAL( IPARD ), ALBNDI, AUBNDI,
+     :                     REGVAL, %VAL( CNF_PVAL( IPARD ) ), 
+     :                     ALBNDI, AUBNDI,
      :                     ALBNDE, AUBNDE, STATUS )
 
 *  Now produce a _REAL work array in which selected pixels hold bad
 *  values, and non selected pixels hold positive values
             CALL PSX_CALLOC( ELMASK, '_REAL', IPMASK, STATUS )
-            CALL SETQA1( ELMASK, %VAL( IPARD ), %VAL( IPMASK ), STATUS )
+            CALL SETQA1( ELMASK, %VAL( CNF_PVAL( IPARD ) ), 
+     :                   %VAL( CNF_PVAL( IPMASK ) ), STATUS )
 
 *  Release the integer work array.
             CALL PSX_FREE( IPARD, STATUS )
@@ -583,19 +587,23 @@
 
                IF( FUNC .EQ. 'HS' ) THEN
                   CALL IRQ_SETQM( LOCS, .TRUE., QNAME, ELMASK,
-     :                            %VAL( IPMASK ), SET, STATUS )
+     :                            %VAL( CNF_PVAL( IPMASK ) ), 
+     :                            SET, STATUS )
 
                ELSE IF( FUNC .EQ. 'HU' ) THEN
                   CALL IRQ_SETQM( LOCS, .FALSE., QNAME, ELMASK,
-     :                            %VAL( IPMASK ), SET, STATUS )
+     :                            %VAL( CNF_PVAL( IPMASK ) ), 
+     :                            SET, STATUS )
 
                ELSE IF( FUNC .EQ. 'NS' ) THEN
                   CALL IRQ_RESQM( LOCS, .TRUE., QNAME, ELMASK,
-     :                            %VAL( IPMASK ), SET, STATUS )
+     :                            %VAL( CNF_PVAL( IPMASK ) ), 
+     :                            SET, STATUS )
 
                ELSE IF( FUNC .EQ. 'NU' ) THEN
                   CALL IRQ_RESQM( LOCS, .FALSE., QNAME, ELMASK,
-     :                            %VAL( IPMASK ), SET, STATUS )
+     :                            %VAL( CNF_PVAL( IPMASK ) ), 
+     :                            SET, STATUS )
 
                END IF
 
@@ -625,19 +633,23 @@
 
                IF( FUNC .EQ. 'HS' ) THEN
                   CALL IRQ_SETQM( LOCS, .TRUE., QNAME, ELMASK,
-     :                            %VAL( IPMASK ), SET, STATUS )
+     :                            %VAL( CNF_PVAL( IPMASK ) ), 
+     :                            SET, STATUS )
 
                ELSE IF( FUNC .EQ. 'HU' ) THEN
                   CALL IRQ_SETQM( LOCS, .FALSE., QNAME, ELMASK,
-     :                            %VAL( IPMASK ), SET, STATUS )
+     :                            %VAL( CNF_PVAL( IPMASK ) ), 
+     :                            SET, STATUS )
 
                ELSE IF( FUNC .EQ. 'NS' ) THEN
                   CALL IRQ_RESQM( LOCS, .TRUE., QNAME, ELMASK,
-     :                            %VAL( IPMASK ), SET, STATUS )
+     :                            %VAL( CNF_PVAL( IPMASK ) ), 
+     :                            SET, STATUS )
 
                ELSE IF( FUNC .EQ. 'NU' ) THEN
                   CALL IRQ_RESQM( LOCS, .FALSE., QNAME, ELMASK,
-     :                            %VAL( IPMASK ), SET, STATUS )
+     :                            %VAL( CNF_PVAL( IPMASK ) ), 
+     :                            SET, STATUS )
 
                END IF
 
@@ -654,19 +666,23 @@
 
                IF( FUNC .EQ. 'HS' ) THEN
                   CALL IRQ_SETQL( LOCS, .TRUE., QNAME, NDIMI, NC,
-     :                            %VAL( IPLIST ), SET, STATUS )
+     :                            %VAL( CNF_PVAL( IPLIST ) ), 
+     :                            SET, STATUS )
 
                ELSE IF( FUNC .EQ. 'HU' ) THEN
                   CALL IRQ_SETQL( LOCS, .FALSE., QNAME, NDIMI, NC,
-     :                            %VAL( IPLIST ), SET, STATUS )
+     :                            %VAL( CNF_PVAL( IPLIST ) ), 
+     :                            SET, STATUS )
 
                ELSE IF( FUNC .EQ. 'NS' ) THEN
                   CALL IRQ_RESQL( LOCS, .TRUE., QNAME, NDIMI, NC,
-     :                            %VAL( IPLIST ), SET, STATUS )
+     :                            %VAL( CNF_PVAL( IPLIST ) ), 
+     :                            SET, STATUS )
 
                ELSE IF( FUNC .EQ. 'NU' ) THEN
                   CALL IRQ_RESQL( LOCS, .FALSE., QNAME, NDIMI, NC,
-     :                            %VAL( IPLIST ), SET, STATUS )
+     :                            %VAL( CNF_PVAL( IPLIST ) ), 
+     :                            SET, STATUS )
                END IF
 
             END IF

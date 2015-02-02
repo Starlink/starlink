@@ -51,6 +51,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Starlink data constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER EL
@@ -80,14 +81,15 @@
 
 *  Set up the array of pixel indices to be included in the median
 *  estimation. Any bad pixels are omitted.
-      CALL IRM1_SETIP( EL, DATA, %VAL( IPIP ), NGOOD, STATUS )
+      CALL IRM1_SETIP( EL, DATA, %VAL( CNF_PVAL( IPIP ) ), 
+     :                 NGOOD, STATUS )
 
 *  If there are some good data values, call IRM_QNTLR to do the work.
 *  Uniform weighting is used, and the resulting value is produced by linear
 *  interpolation.
       IF( NGOOD .NE. 0 ) THEN
          CALL IRM_QNTLR( .FALSE., .TRUE., 0.5, NGOOD, DATA, W,
-     :                   %VAL( IPIP ), MEDIAN, STATUS )
+     :                   %VAL( CNF_PVAL( IPIP ) ), MEDIAN, STATUS )
       END IF
 
 *  Release the work space used to hold the pixel pointers.

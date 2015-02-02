@@ -152,6 +152,7 @@
       INCLUDE 'DAT_PAR'          ! DAT_ constants
       INCLUDE 'IRA_PAR'          ! IRA_ constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER BSMP
@@ -375,7 +376,8 @@
 
 *  Find the indices of the first and last non-zero values in the
 *   profile.
-      CALL TRACB4( DIM( 1 ), DIM( 2 ), %VAL( DPNTR ), LINNO, BG, ED,
+      CALL TRACB4( DIM( 1 ), DIM( 2 ), %VAL( CNF_PVAL( DPNTR ) ), 
+     :             LINNO, BG, ED,
      :            STATUS )
 
 *  If too few non-zero values found, report an error.
@@ -562,7 +564,8 @@
             CALL TRACB5( BSMP, ESMP, INSCN( BSMP, DTINDX( NERTRC ) ),
      :                   DETDAT( BSMP, DTINDX( NERTRC ) ),
      :                   SCALE( NERTRC), NERSMP, ED, BG, AEL,
-     :                   %VAL( APNTR ), SLOPE, CONST, STATUS )
+     :                   %VAL( CNF_PVAL( APNTR ) ), 
+     :                   SLOPE, CONST, STATUS )
 
 *  Calculate the Peak value of the point source.
             IF ( CURSOR ) STRTH = UY - CONST - OFFSET( NERTRC )
@@ -571,8 +574,9 @@
             IF ( STRTH .LT. 0.0 ) STRTH = 0.0
 
 *  Draw the point source template.
-            CALL TRACB6( DIM( 1 ), DIM( 2 ), %VAL( APNTR ),
-     :                   %VAL( DPNTR ), LINNO, BG, ED, XLMT, YLMT,
+            CALL TRACB6( DIM( 1 ), DIM( 2 ), %VAL( CNF_PVAL( APNTR ) ),
+     :                   %VAL( CNF_PVAL( DPNTR ) ), 
+     :                   LINNO, BG, ED, XLMT, YLMT,
      :                   UX, OFFSET( NERTRC ), CONST, SLOPE, STRTH,
      :                   SCNDIR, PEN, STATUS )
 

@@ -99,6 +99,7 @@
       INCLUDE 'NDF_PAR'          ! NDF_ constants
       INCLUDE 'IRI_PAR'          ! IRI_ constants.
       INCLUDE 'IRI_ERR'          ! IRI_ error constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NCARD
@@ -308,8 +309,9 @@
      :                 STATUS )
          CALL NDF_MAP( INDF3, 'VARIANCE', '_REAL', 'WRITE', IPVAR, EL,
      :                 STATUS )
-         CALL VEC_MULR( .TRUE., EL, %VAL( IPDATA ), %VAL( IPDATA ),
-     :                  %VAL( IPVAR ), IERR, NERR, STATUS )
+         CALL VEC_MULR( .TRUE., EL, %VAL( CNF_PVAL( IPDATA ) ), 
+     :                  %VAL( CNF_PVAL( IPDATA ) ),
+     :                  %VAL( CNF_PVAL( IPVAR ) ), IERR, NERR, STATUS )
          CALL NDF_UNMAP( INDF2, 'DATA', STATUS )
          CALL NDF_UNMAP( INDF3, 'VARIANCE', STATUS )
       END IF

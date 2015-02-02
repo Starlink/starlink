@@ -75,6 +75,7 @@
 
 *  Global Variables:
       INCLUDE 'IRC_COM'          ! IRC common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CCM_VALID( IRC__MAX ) = LOGICAL (Read)
 *           True if the corresponding IRC identifier is valid.
 *        CCM_TYPE( IRC__MAX ) = CHARACTER (Read)
@@ -149,7 +150,7 @@
 *  Call an appropriate routine for each CRDD type.
       IF( CCM_TYPE( IDC ) .EQ. 'SURVEY_BSIGHT' ) THEN
          CALL IRC1_PMPSB( IDC, LBND(1), UBND(1), LBND(2), UBND(2),
-     :                    %VAL(PNTR), STATUS )
+     :                    %VAL(CNF_PVAL(PNTR)), STATUS )
 
 *  If the CRDD type is unrecognised, give an error report.
       ELSE

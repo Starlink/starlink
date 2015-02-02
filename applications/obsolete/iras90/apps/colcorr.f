@@ -103,6 +103,7 @@
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'I90_DAT'          ! IRAS90 data.
       INCLUDE 'IRI_PAR'          ! IRI_ constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -257,12 +258,15 @@
 *  to handle the two cases of output variances being required or not
 *  required.
       IF( VAR ) THEN
-         CALL CCORA0( EL, %VAL( IPT ), %VAL( IPO ), %VAL( IPVT ),
-     :                %VAL( IPVO ), CC, NU, %VAL( IPOUT ),
-     :                %VAL( IPVOUT ), BAD, STATUS )
+         CALL CCORA0( EL, %VAL( CNF_PVAL( IPT ) ), 
+     :                %VAL( CNF_PVAL( IPO ) ), %VAL( CNF_PVAL( IPVT ) ),
+     :                %VAL( CNF_PVAL( IPVO ) ), CC, NU, 
+     :                %VAL( CNF_PVAL( IPOUT ) ),
+     :                %VAL( CNF_PVAL( IPVOUT ) ), BAD, STATUS )
       ELSE
-         CALL CCORA1( EL, %VAL( IPT ), %VAL( IPO ), CC, NU,
-     :                %VAL( IPOUT ), BAD, STATUS )
+         CALL CCORA1( EL, %VAL( CNF_PVAL( IPT ) ), 
+     :                %VAL( CNF_PVAL( IPO ) ), CC, NU,
+     :                %VAL( CNF_PVAL( IPOUT ) ), BAD, STATUS )
       END IF
 
 *  Set the bad value flag for the output NDF.

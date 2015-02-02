@@ -105,6 +105,7 @@
 
 *  Global Variables:
       INCLUDE 'FICOMN' ! Common blocks for FINDCRDD
+      INCLUDE 'CNF_PAR'! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER IPLAT
@@ -368,19 +369,19 @@
          ISCAN = 1
 
          CALL FIND35( ELSCA( 1 ), ISCAN, SCSOP( SCPOS ),
-     :   %VAL( PNTRSC( 1 )), STATUS )
+     :   %VAL( CNF_PVAL( PNTRSC( 1 ) )), STATUS )
          CALL FIND35( ELSCA( 2 ), ISCAN, SCOBS( SCPOS ),
-     :   %VAL( PNTRSC( 2 )), STATUS )
+     :   %VAL( CNF_PVAL( PNTRSC( 2 ) )), STATUS )
          CALL FIND37( ELSCA( 3 ), ISCAN, SCXSC( SCPOS ),
-     :   %VAL( PNTRSC( 3 )), STATUS )
+     :   %VAL( CNF_PVAL( PNTRSC( 3 ) )), STATUS )
          CALL FIND34( ELSCA( 4 ), ISCAN, SCSTUT( SCPOS ),
-     :   %VAL( PNTRSC( 4 )), STATUS )
+     :   %VAL( CNF_PVAL( PNTRSC( 4 ) )), STATUS )
          CALL FIND34( ELSCA( 5 ), ISCAN, SCENUT( SCPOS ),
-     :   %VAL( PNTRSC( 5 )), STATUS )
+     :   %VAL( CNF_PVAL( PNTRSC( 5 ) )), STATUS )
          CALL FIND35( ELSCA( 6 ), ISCAN, SCSOLI( SCPOS ),
-     :   %VAL( PNTRSC( 6 )), STATUS )
+     :   %VAL( CNF_PVAL( PNTRSC( 6 ) )), STATUS )
          CALL FIND36( ELSCA( 7 ), ISCAN, SCOVFL( SCPOS ),
-     :   %VAL( PNTRSC( 7 )), STATUS )
+     :   %VAL( CNF_PVAL( PNTRSC( 7 ) )), STATUS )
 
 *  For subsequent scans in linked list
  400     CONTINUE
@@ -394,19 +395,19 @@
 
 *  Enter data
             CALL FIND35( ELSCA( 1 ), ISCAN, SCSOP( SCPOS ),
-     :      %VAL( PNTRSC( 1 )), STATUS )
+     :      %VAL( CNF_PVAL( PNTRSC( 1 ) )), STATUS )
             CALL FIND35( ELSCA( 2 ), ISCAN, SCOBS( SCPOS ),
-     :      %VAL( PNTRSC( 2 )), STATUS )
+     :      %VAL( CNF_PVAL( PNTRSC( 2 ) )), STATUS )
             CALL FIND37( ELSCA( 3 ), ISCAN, SCXSC( SCPOS ),
-     :      %VAL( PNTRSC( 3 )), STATUS )
+     :      %VAL( CNF_PVAL( PNTRSC( 3 ) )), STATUS )
             CALL FIND34( ELSCA( 4 ), ISCAN, SCSTUT( SCPOS ),
-     :      %VAL( PNTRSC( 4 )), STATUS )
+     :      %VAL( CNF_PVAL( PNTRSC( 4 ) )), STATUS )
             CALL FIND34( ELSCA( 5 ), ISCAN, SCENUT( SCPOS ),
-     :      %VAL( PNTRSC( 5 )), STATUS )
+     :      %VAL( CNF_PVAL( PNTRSC( 5 ) )), STATUS )
             CALL FIND35( ELSCA( 6 ), ISCAN, SCSOLI( SCPOS ),
-     :      %VAL( PNTRSC( 6 )), STATUS )
+     :      %VAL( CNF_PVAL( PNTRSC( 6 ) )), STATUS )
             CALL FIND36( ELSCA( 7 ), ISCAN, SCOVFL( SCPOS ),
-     :      %VAL( PNTRSC( 7 )), STATUS )
+     :      %VAL( CNF_PVAL( PNTRSC( 7 ) )), STATUS )
 
 *  GOTO start of adding data for subsequent scans in linked list
             GO TO 400
@@ -481,32 +482,37 @@
 *  Set next position in the output HDS SOURCE
             ISOURC = ISOURC + 1
 
-            CALL FIND33( NOLISO,  ISOURC, %VAL( PNTRSO( 1 )),
+            CALL FIND33( NOLISO,  ISOURC,
+     :                   %VAL( CNF_PVAL( PNTRSO( 1 ) )),
      :      SONAME( SOPOS ), STATUS, %VAL( NMLEN ) )
-            CALL FIND33( NOLISO,  ISOURC, %VAL( PNTRSO( 2 )),
+            CALL FIND33( NOLISO,  ISOURC,
+     :                   %VAL( CNF_PVAL( PNTRSO( 2 ) )),
      :      SOTITL( SOPOS ), STATUS , %VAL( TILEN ) )
-            CALL FIND33( NOLISO,  ISOURC, %VAL( PNTRSO( 3 )),
+            CALL FIND33( NOLISO,  ISOURC,
+     :                   %VAL( CNF_PVAL( PNTRSO( 3 ) )),
      :      SOCO1( SOPOS ), STATUS , %VAL( IRA__SZFSC ) )
-            CALL FIND33( NOLISO,  ISOURC, %VAL( PNTRSO( 4 )),
-     :      SOCO2( SOPOS ), STATUS, %VAL( IRA__SZFSC  ) )
-            CALL FIND33( NOLISO,  ISOURC, %VAL( PNTRSO( 5 )),
-     :      SOCOSY( SOPOS ), STATUS, %VAL( IRA__SZSCS  ) )
+            CALL FIND33( NOLISO,  ISOURC,
+     :                   %VAL( CNF_PVAL( PNTRSO( 4 ) )),
+     :      SOCO2( SOPOS ), STATUS, %VAL( IRA__SZFSC ) )
+            CALL FIND33( NOLISO,  ISOURC,
+     :                   %VAL( CNF_PVAL( PNTRSO( 5 ) )),
+     :      SOCOSY( SOPOS ), STATUS, %VAL( IRA__SZSCS ) )
             CALL FIND37( ELSOU( 6 ),  ISOURC, SORA( SOPOS ),
-     :      %VAL( PNTRSO( 6 )), STATUS )
+     :      %VAL( CNF_PVAL( PNTRSO( 6 ) )), STATUS )
             CALL FIND37( ELSOU( 7 ),  ISOURC, SODEC( SOPOS ),
-     :      %VAL( PNTRSO( 7 )), STATUS )
+     :      %VAL( CNF_PVAL( PNTRSO( 7 ) )), STATUS )
             CALL FIND37( ELSOU( 8 ),  ISOURC, SOINSZ( SOPOS ),
-     :      %VAL( PNTRSO( 8 )), STATUS )
+     :      %VAL( CNF_PVAL( PNTRSO( 8 ) )), STATUS )
             CALL FIND37( ELSOU( 9 ),  ISOURC, SOCRSZ( SOPOS ),
-     :      %VAL( PNTRSO( 9 )), STATUS )
+     :      %VAL( CNF_PVAL( PNTRSO( 9 ) )), STATUS )
             CALL FIND36( ELSOU( 10 ), ISOURC, SOWAB1( SOPOS ),
-     :      %VAL( PNTRSO( 10 )), STATUS )
+     :      %VAL( CNF_PVAL( PNTRSO( 10 ) )), STATUS )
             CALL FIND36( ELSOU( 11 ), ISOURC, SOWAB2( SOPOS ),
-     :      %VAL( PNTRSO( 11 )), STATUS )
+     :      %VAL( CNF_PVAL( PNTRSO( 11 ) )), STATUS )
             CALL FIND36( ELSOU( 12 ), ISOURC, SOWAB3( SOPOS ),
-     :      %VAL( PNTRSO( 12 )), STATUS )
+     :      %VAL( CNF_PVAL( PNTRSO( 12 ) )), STATUS )
             CALL FIND36( ELSOU( 13 ), ISOURC, SOWAB4( SOPOS ),
-     :      %VAL( PNTRSO( 13 )), STATUS )
+     :      %VAL( CNF_PVAL( PNTRSO( 13 ) )), STATUS )
  500     CONTINUE
 
 *  Annul locators to SOURCE vectors

@@ -53,6 +53,7 @@
 
 *  Global Variables:
       INCLUDE 'IRC_COM'          ! IRC common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CCM_CRDDL( IRC__MAX ) = CHARACTER (Read)
 *           HDS locator for CRDD_INFO component.
 *        CCM_BAND( IRC__MAX ) = INTEGER (Read)
@@ -122,10 +123,15 @@
       END IF
 
 *  Call a lower level routine to do the work.
-      CALL IRC1_TR2SB( ROUTNE, SUPP, UTCS0, BPOSNS, %VAL( IPU ),
-     :                 %VAL( IPP ), %VAL( IPT ), %VAL( IPL ),
-     :                 %VAL( IPDP ), %VAL( IPDT ), %VAL( IPGLT ),
-     :                 %VAL( IPGLN ), CCM_BAND( IDC ), STATUS )
+      CALL IRC1_TR2SB( ROUTNE, SUPP, UTCS0, BPOSNS, 
+     :                 %VAL( CNF_PVAL( IPU ) ),
+     :                 %VAL( CNF_PVAL( IPP ) ), %VAL( CNF_PVAL( IPT ) ), 
+     :                 %VAL( CNF_PVAL( IPL ) ),
+     :                 %VAL( CNF_PVAL( IPDP ) ), 
+     :                 %VAL( CNF_PVAL( IPDT ) ), 
+     :                 %VAL( CNF_PVAL( IPGLT ) ),
+     :                 %VAL( CNF_PVAL( IPGLN ) ), 
+     :                 CCM_BAND( IDC ), STATUS )
 
 *  Unmap the arrays and annull the locators.
       IF( SUPP ) THEN

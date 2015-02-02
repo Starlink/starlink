@@ -76,6 +76,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'I90_DAT'          ! IRAS90 data.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -168,8 +169,10 @@
 *  Call another routine to store the array values.
       CALL MRESA0( SIZE( BAND ), NRESP( 1, BAND ), PRESP( BAND ),
      :             WAVEL0( BAND ), DWAVEL( BAND ), VERR, LERR,
-     :             %VAL( IPDV( 1 ) ), %VAL( IPDV( 2 ) ),
-     :             %VAL( IPCV( 1 ) ), %VAL( IPCV( 2 ) ), STATUS )
+     :             %VAL( CNF_PVAL( IPDV( 1 ) ) ), 
+     :             %VAL( CNF_PVAL( IPDV( 2 ) ) ),
+     :             %VAL( CNF_PVAL( IPCV( 1 ) ) ), 
+     :             %VAL( CNF_PVAL( IPCV( 2 ) ) ), STATUS )
 
 *  Set up AXIS array scalar values.
       CALL NDF_ACPUT( 'Wavelength', INDF, 'LABEL', 1, STATUS )

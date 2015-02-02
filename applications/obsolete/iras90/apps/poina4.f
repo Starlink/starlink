@@ -78,6 +78,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'I90_DAT'          ! IRAS90 package data
       INCLUDE 'PRM_PAR'          ! Primitive constants eg VAL__SMLD
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER*( * )PPROFL
@@ -115,7 +116,8 @@
 *  Re-sample the source profile at the rate of the IRAS scan and copy
 *  copy the non-zero segment of the profile associated with the input
 *  CRDD waveband to the working array..
-      CALL POINC0( NPSMP, NPROF, %VAL( PPROFD ), %VAL( PPROFX ), BAND,
+      CALL POINC0( NPSMP, NPROF, %VAL( CNF_PVAL( PPROFD ) ), 
+     :             %VAL( CNF_PVAL( PPROFX ) ), BAND,
      :             PRFWID, PPROF, STATUS )
 
 *  If error happened, exit.
@@ -123,7 +125,8 @@
 
 *  Calculate pre-determined constants to be used when correlating data
 *  segment with the point source template.
-      CALL POINC1( PRFWID, %VAL( PPROF ), SPSQ, SIP, SP, SISQ, SI, S1,
+      CALL POINC1( PRFWID, %VAL( CNF_PVAL( PPROF ) ), 
+     :             SPSQ, SIP, SP, SISQ, SI, S1,
      :             V, STATUS )
 
 *  If the calculated determinant is zero, the given point source profile

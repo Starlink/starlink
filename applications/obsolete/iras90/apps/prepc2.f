@@ -72,6 +72,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP_ constants.
       INCLUDE 'MSG_PAR'          ! MSG_ constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
@@ -160,8 +161,8 @@
 *  row I of the array. The first element of each row is NOISE or DATA
 *  and indicates if the NDF is a noise or data map. The other elements
 *  depend on the type of input image.
-         CALL PREPC3( INDF, I, NITEM, SIZE, %VAL( IPWORK ), NNOISE,
-     :                STATUS, %VAL( LNITEM ) )
+         CALL PREPC3( INDF, I, NITEM, SIZE, %VAL( CNF_PVAL( IPWORK ) ),
+     :                NNOISE, STATUS, %VAL( LNITEM ) )
 
 *  Annul the NDF identifier.
          CALL NDF_ANNUL( INDF, STATUS )
@@ -207,7 +208,8 @@
 *  variable I points to the other member of the pair). If this is not
 *  part of a pair, the information for the current NDF is still erased
 *  from the workspace.
-            CALL PREPC4( I, NITEM, SIZE, %VAL( IPWORK ), PAIR, INOISE,
+            CALL PREPC4( I, NITEM, SIZE, %VAL( CNF_PVAL( IPWORK ) ),
+     :                   PAIR, INOISE,
      :                   IDATA, INFO, STATUS, %VAL( LNITEM ) )
 
 *  If this NDF has been erased from the workspace, pass on to the next

@@ -50,6 +50,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NPNT
@@ -83,7 +84,8 @@
 
 *  Find the size of the marker for each point to be marked.
       CALL SMARB0( LBND( 1 ), UBND( 1 ), LBND( 2 ), UBND( 2 ),
-     :            %VAL( PNTR( 1 ) ), NPNT, X, Y, MXMNSZ, MKSIZ, STATUS )
+     :            %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :            NPNT, X, Y, MXMNSZ, MKSIZ, STATUS )
 
 *  Unmap the NDF.
       CALL NDF_UNMAP( NDF, 'Data', STATUS )

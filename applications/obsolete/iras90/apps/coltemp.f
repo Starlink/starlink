@@ -143,6 +143,7 @@
       INCLUDE 'MSG_PAR'          ! MSG_ constants
       INCLUDE 'I90_DAT'          ! IRAS90 data
       INCLUDE 'IRI_PAR'          ! IRI_ constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -423,17 +424,28 @@
 *  separate routines to handle the two cases of output variances being
 *  required or not required.
       IF( VAR ) THEN
-         CALL CTEMZ4( EL, %VAL( IPIN1 ), %VAL( IPIN2 ), %VAL( IPVIN1 ),
-     :                %VAL( IPVIN2 ), SCALE1, SCALE2, LCK,
-     :                %VAL( IPCKR ), %VAL( IPLKR ), %VAL( IPCKF1 ),
-     :                %VAL( IPLKF1 ), RATLO, RATHI, CC, %VAL( IPT ),
-     :                %VAL( IPOD ), %VAL( IPVT ), %VAL( IPVOD ), BAD,
+         CALL CTEMZ4( EL, %VAL( CNF_PVAL( IPIN1 ) ), 
+     :                %VAL( CNF_PVAL( IPIN2 ) ), 
+     :                %VAL( CNF_PVAL( IPVIN1 ) ),
+     :                %VAL( CNF_PVAL( IPVIN2 ) ), SCALE1, SCALE2, LCK,
+     :                %VAL( CNF_PVAL( IPCKR ) ), 
+     :                %VAL( CNF_PVAL( IPLKR ) ), 
+     :                %VAL( CNF_PVAL( IPCKF1 ) ),
+     :                %VAL( CNF_PVAL( IPLKF1 ) ), RATLO, RATHI, CC, 
+     :                %VAL( CNF_PVAL( IPT ) ),
+     :                %VAL( CNF_PVAL( IPOD ) ), 
+     :                %VAL( CNF_PVAL( IPVT ) ), 
+     :                %VAL( CNF_PVAL( IPVOD ) ), BAD,
      :                STATUS )
       ELSE
-         CALL CTEMZ2( EL, %VAL( IPIN1 ), %VAL( IPIN2 ), SCALE1, SCALE2,
-     :                LCK, %VAL( IPCKR ), %VAL( IPLKR ), %VAL( IPCKF1 ),
-     :                %VAL( IPLKF1 ), RATLO, RATHI, CC, %VAL( IPT ),
-     :                %VAL( IPOD ), BAD, STATUS )
+         CALL CTEMZ2( EL, %VAL( CNF_PVAL( IPIN1 ) ), 
+     :                %VAL( CNF_PVAL( IPIN2 ) ), SCALE1, SCALE2,
+     :                LCK, %VAL( CNF_PVAL( IPCKR ) ), 
+     :                %VAL( CNF_PVAL( IPLKR ) ), 
+     :                %VAL( CNF_PVAL( IPCKF1 ) ),
+     :                %VAL( CNF_PVAL( IPLKF1 ) ), RATLO, RATHI, CC, 
+     :                %VAL( CNF_PVAL( IPT ) ),
+     :                %VAL( CNF_PVAL( IPOD ) ), BAD, STATUS )
       END IF
 
 *  Set the bad value flag for the output NDFs.

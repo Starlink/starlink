@@ -153,6 +153,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Starlink data constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER IDC
@@ -390,7 +391,8 @@
 *  Include the current sample in the running sum arrays.
                CALL MAPCC6( XLO, YLO, XHI, YHI, RLO, RHI, PLO, PHI,
      :                      POFFX, POFFY, WFACT, PWGSZX, PWGSZY,
-     :                      %VAL( IPPWG( GINDX, GINDY ) ), DATVAL,
+     :                      %VAL( CNF_PVAL( IPPWG( GINDX, GINDY ) ) ), 
+     :                      DATVAL,
      :                      VARVAL, DATOUT, VAROUT, WGTOUT, INSIDE,
      :                      STATUS )
 
@@ -401,7 +403,8 @@
 *  ...see if the sample falls within the output map area.
                CALL MAPCC7( XLO, YLO, XHI, YHI, RLO, RHI, PLO, PHI,
      :                      POFFX, POFFY, PWGSZX, PWGSZY,
-     :                      %VAL( IPPWG( GINDX, GINDY ) ), INSIDE,
+     :                      %VAL( CNF_PVAL( IPPWG( GINDX, GINDY ) ) ), 
+     :                      INSIDE,
      :                      STATUS )
 
 *  If it does, increment the number of bad samples.

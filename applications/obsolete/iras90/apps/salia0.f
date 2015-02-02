@@ -78,6 +78,7 @@
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'DAT_PAR'          ! DAT_ constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER INDF1
@@ -202,7 +203,8 @@
 
 *  Fill these arrays with the required image coordinates.
       CALL SALIA3( IDAR, IDA1, SCS, LBND2( 1 ), UBND2( 1 ), LBND2( 2 ),
-     :             UBND2( 2 ), ERRLIM, %VAL( IPX ), %VAL( IPY ),
+     :             UBND2( 2 ), ERRLIM, %VAL( CNF_PVAL( IPX ) ), 
+     :             %VAL( CNF_PVAL( IPY ) ),
      :             STATUS )
 
 *  Map the DATA component of the input and output NDF.
@@ -246,9 +248,12 @@
 *  Fill the output arrays by resampling the input arrays.
       CALL SALIA4( QUAL, VAR, METHOD, LBND2( 1 ), UBND2( 1 ),
      :             LBND2( 2 ), UBND2( 2 ), LBND1( 1 ), UBND1( 1 ),
-     :             LBND1( 2 ), UBND1( 2 ), %VAL( IPD1 ), %VAL( IPV1 ),
-     :             %VAL( IPQ1 ), %VAL( IPX ), %VAL( IPY ), %VAL( IPD2 ),
-     :             %VAL( IPV2 ), %VAL( IPQ2 ), STATUS )
+     :             LBND1( 2 ), UBND1( 2 ), %VAL( CNF_PVAL( IPD1 ) ), 
+     :             %VAL( CNF_PVAL( IPV1 ) ),
+     :             %VAL( CNF_PVAL( IPQ1 ) ), %VAL( CNF_PVAL( IPX ) ), 
+     :             %VAL( CNF_PVAL( IPY ) ), %VAL( CNF_PVAL( IPD2 ) ),
+     :             %VAL( CNF_PVAL( IPV2 ) ), %VAL( CNF_PVAL( IPQ2 ) ), 
+     :             STATUS )
 
 *  Release the temporary arrays used to hold input coordinates.
       CALL PSX_FREE( IPX, STATUS )

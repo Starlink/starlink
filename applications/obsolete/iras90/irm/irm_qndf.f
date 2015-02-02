@@ -87,6 +87,7 @@
       INCLUDE 'MSG_PAR'          ! MSG_ constants.
       INCLUDE 'IRQ_PAR'          ! IRQ constants.
       INCLUDE 'IRQ_ERR'          ! IRQ error values.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER INDF
@@ -212,7 +213,8 @@
 
 *  Set the appropriate pixels bad in the DATA array of the temporary
 *  NDF.
-               CALL IRQ_SBAD( IDQ, HELD, NEL, %VAL( IPT ), ALLBAD,
+               CALL IRQ_SBAD( IDQ, HELD, NEL, %VAL( CNF_PVAL( IPT ) ), 
+     :                        ALLBAD,
      :                        NOBAD, STATUS )
 
 *  Unmap the DATA array of the temporary NDF.

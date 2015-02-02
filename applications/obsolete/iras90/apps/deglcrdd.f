@@ -168,6 +168,7 @@
       INCLUDE 'IRQ_PAR'          ! IRQ package constants
       INCLUDE 'I90_DAT'          ! IRAS90 package constants
       INCLUDE 'IRA_PAR'          ! IRA package constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -283,7 +284,8 @@
      :                 STATUS )
 
 *  Find the width of the point source profile.
-      CALL DGCRA0( NPSMP, NPROF, %VAL( PPROFD ), %VAL( PPROFX ), PRFWID,
+      CALL DGCRA0( NPSMP, NPROF, %VAL( CNF_PVAL( PPROFD ) ), 
+     :             %VAL( CNF_PVAL( PPROFX ) ), PRFWID,
      :             STATUS )
 
 *  Annul the id to the point source profile NDF.
@@ -393,9 +395,12 @@
 
 *  Reject the samples which stay too far away from the local average.
          CALL DGCRA1( UBND( 1 ) - LBND( 1 ) + 1,
-     :                UBND( 2 ) - LBND( 2 ) + 1, %VAL( PDIN ), BOXSZ,
-     :                NITER, CLIP, %VAL( OUT ),  %VAL( WORK1 ),
-     :               %VAL( WORK2 ),  %VAL( WORK3 ),  STATUS )
+     :                UBND( 2 ) - LBND( 2 ) + 1, 
+     :                %VAL( CNF_PVAL( PDIN ) ), BOXSZ,
+     :                NITER, CLIP, %VAL( CNF_PVAL( OUT ) ),  
+     :                %VAL( CNF_PVAL( WORK1 ) ),
+     :               %VAL( CNF_PVAL( WORK2 ) ),  
+     :               %VAL( CNF_PVAL( WORK3 ) ),  STATUS )
 
 *  If error happened while rejecting, exit.
          IF ( STATUS .NE. SAI__OK ) GOTO 970
@@ -413,8 +418,10 @@
 *  Detect glitches in the clearned input data, set set the samples in
 *  the glitches as bad.
             CALL DGCRA2( UBND( 1 ) - LBND( 1 ) + 1,
-     :                   UBND( 2 ) - LBND( 2 ) + 1, %VAL( PDIN ),
-     :                  %VAL( OUT ), GLHWID, NBAD, %VAL( PDOUT ),
+     :                   UBND( 2 ) - LBND( 2 ) + 1, 
+     :                   %VAL( CNF_PVAL( PDIN ) ),
+     :                  %VAL( CNF_PVAL( OUT ) ), GLHWID, NBAD, 
+     :                  %VAL( CNF_PVAL( PDOUT ) ),
      :                   STATUS )
 
 *  If some samples have detected as in glitches and set as bad, set the
@@ -464,8 +471,10 @@
 
 *  Assign the named quality to the samples in the glitches.
             CALL DGCRA4( LOCS, QNAME, UBND( 1 ) - LBND( 1 ) + 1,
-     :                   UBND( 2 ) - LBND( 2 ) + 1, %VAL( PDIN ),
-     :                  %VAL( OUT ), 2, GLHWID, %VAL( WORK3 ),
+     :                   UBND( 2 ) - LBND( 2 ) + 1, 
+     :                   %VAL( CNF_PVAL( PDIN ) ),
+     :                  %VAL( CNF_PVAL( OUT ) ), 2, GLHWID, 
+     :                  %VAL( CNF_PVAL( WORK3 ) ),
      :                   STATUS )
 
 *  Add a history record to the NDF.

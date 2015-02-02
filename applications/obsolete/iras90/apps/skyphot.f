@@ -208,6 +208,7 @@
       INCLUDE 'IRI_PAR'          ! IRI_ constants
       INCLUDE 'GRP_PAR'          ! GRP_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -763,7 +764,8 @@
 *  aperture, and display and log the results.
                   ELSE
                      CALL SPHOZ1( LBND( 1 ), UBND( 1 ), LBND( 2 ),
-     :                            UBND( 2 ), %VAL( IPDATA ), SCALE,
+     :                            UBND( 2 ), %VAL( CNF_PVAL( IPDATA ) ), 
+     :                            SCALE,
      :                            PIXSOL, BACK, X, Y, XSIZE, YSIZE,
      :                            LOGING, FD, IDA, SCS, SHAPE, MEAN,
      :                            FLUXD, SIGMA, STATUS )
@@ -789,7 +791,8 @@
 *  aperture, and display and log the results.
          IF( SHAPE .EQ. 'POLYGON' ) THEN
             CALL SPHOZ2( LBND( 1 ), UBND( 1 ), LBND( 2 ), UBND( 2 ),
-     :                   %VAL( IPDATA ), SCALE, PIXSOL, BACK, NVERT,
+     :                   %VAL( CNF_PVAL( IPDATA ) ), 
+     :                   SCALE, PIXSOL, BACK, NVERT,
      :                   XVERT, YVERT, LOGING, FD, IDA, SCS, MEAN,
      :                   FLUXD, SIGMA, STATUS )
 

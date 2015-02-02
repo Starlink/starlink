@@ -92,6 +92,7 @@
       INCLUDE 'IRQ_PAR'          ! IRQ constants.
       INCLUDE 'IRQ_ERR'          ! IRQ error constants.
       INCLUDE 'GRP_PAR'          ! GRP constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -214,7 +215,8 @@
 
 *  Set bad all output DATA pixels which satisfy the given quality
 *  expression.
-         CALL IRQ_SBAD( IDQ, .TRUE., NEL, %VAL( IPNT ), ALLBAD, NOBAD,
+         CALL IRQ_SBAD( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+     :                  ALLBAD, NOBAD,
      :                  STATUS )
 
 *  If the output contains no valid data, give a warning message.
@@ -239,7 +241,8 @@
          IF( THERE ) THEN
             CALL NDF_MAP( NDFOUT, 'VARIANCE', '_REAL', 'UPDATE', IPNT,
      :                    NEL, STATUS )
-            CALL IRQ_SBAD( IDQ, .TRUE., NEL, %VAL( IPNT ), ALLBAD,
+            CALL IRQ_SBAD( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+     :                     ALLBAD,
      :                     NOBAD, STATUS )
 
             IF( ALLBAD ) THEN

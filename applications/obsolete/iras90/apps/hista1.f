@@ -68,6 +68,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER IGRP
@@ -155,7 +156,8 @@
       CALL DAT_MAPV( TLOC, '_CHAR*80', 'WRITE', PNTR, SIZE, STATUS )
 
 *  Store the text in the mapped array.
-      CALL GRP_GET( IGRP, 1, SIZE, %VAL( PNTR ), STATUS, %VAL( 80 ) )
+      CALL GRP_GET( IGRP, 1, SIZE, %VAL( CNF_PVAL( PNTR ) ), STATUS,
+     :              %VAL( 80 ) )
 
 *  Update the value of CURRENT_RECORD, and increment NEXT.
 *  CURRENT_RECORD holds the index of the most recently completed HISTORY

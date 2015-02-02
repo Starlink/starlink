@@ -145,6 +145,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER IDC
@@ -366,7 +367,8 @@
 *  Include the current sample in the running sum arrays.
             CALL MAPCC9( XLO, YLO, XHI, YHI, RLO, RHI, PLO, PHI,
      :                   POFFX, POFFY, WFACT, PWGSZX, PWGSZY,
-     :                   %VAL( IPPWG( GINDX, GINDY ) ), DATVAL,
+     :                   %VAL( CNF_PVAL( IPPWG( GINDX, GINDY ) ) ), 
+     :                   DATVAL,
      :                   DATOUT, VAROUT, WGTOUT, INSIDE, STATUS )
 
 *  If the edge of the image has been reached, increment the number of

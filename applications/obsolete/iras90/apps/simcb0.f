@@ -141,6 +141,7 @@
       INCLUDE 'PRM_PAR'          ! Starlink data constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
       INCLUDE 'I90_DAT'          ! IRAS90 data
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER IDC
@@ -372,7 +373,8 @@
 *  Generate the current simulated sample value.
             CALL SIMCC6( XLO, YLO, XHI, YHI, RLO, RHI, PLO, PHI,
      :                   POFFX, POFFY, PWGSZX, PWGSZY, FACTOR,
-     :                   %VAL( IPPWG( GINDX, GINDY ) ), SKY, NBAD,
+     :                   %VAL( CNF_PVAL( IPPWG( GINDX, GINDY ) ) ), 
+     :                   SKY, NBAD,
      :                   DATOUT( SAMP, DET) , INSIDE, STATUS )
 
 *  If the edge of the image has been reached, increment the number of

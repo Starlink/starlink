@@ -147,6 +147,7 @@
       INCLUDE 'I90_DAT'          ! IRAS90 data
       INCLUDE 'IRA_PAR'          ! IRA_ constants
       INCLUDE 'PRM_PAR'          ! PRM_ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER BSMP
@@ -286,7 +287,8 @@
 *  Put the trace to be drawn into temproray work space.
       CALL TRACB2( BSMP, ESMP, BDET, EDET, INSCN, DETDAT,
      :             NDISP, DTINDX, SCALE, OFFSET, XLMT,
-     :             %VAL( YPNTR ), %VAL( XPNTR ), STATUS )
+     :             %VAL( CNF_PVAL( YPNTR ) ), %VAL( CNF_PVAL( XPNTR ) ), 
+     :             STATUS )
 
 *  If the scan is from north to south, set the mapping order for
 *  in-scan coordinates to horizontal axis as increasing from right
@@ -348,8 +350,10 @@
       TITLN = CHR_LEN( TITLE )
 
 *  Draw the data traces.
-      CALL IRM_MLINE( ESMP - BSMP + 1, NDISP, .FALSE., %VAL( XPNTR ),
-     :                %VAL( YPNTR ), XORDER, 0, PEN, .TRUE., X1, X2,
+      CALL IRM_MLINE( ESMP - BSMP + 1, NDISP, .FALSE., 
+     :                %VAL( CNF_PVAL( XPNTR ) ),
+     :                %VAL( CNF_PVAL( YPNTR ) ), 
+     :                XORDER, 0, PEN, .TRUE., X1, X2,
      :                Y1, Y2, AXSPEN, TITLE( :TITLN ), TITPEN,
      :                XLAB( :XLABLN ), YLAB( : YLABLN ), 1.2*TEXTHT,
      :                ALBPEN, INLAB, INLBPS, INLPEN, -1, -1, XLMT, YLMT,

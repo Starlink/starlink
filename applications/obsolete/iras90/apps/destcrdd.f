@@ -204,6 +204,7 @@
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'I90_DAT'          ! IRAS90 data
       INCLUDE 'IRC_PAR'          ! IRC constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -455,10 +456,14 @@
 
 *  Destripe the current CRDD file.
          CALL DESTA0( IDC, UBND( 2 ), LBND( 2 ), UBND( 1 ), LBND( 1 ),
-     :                %VAL( IPIN ), %VAL( IPT ), HBOX, NITER, CLIP,
+     :                %VAL( CNF_PVAL( IPIN ) ), %VAL( CNF_PVAL( IPT ) ), 
+     :                HBOX, NITER, CLIP,
      :                UNITS, WSLOW, WSHIGH, OK, QNAME, LOCS,
-     :                %VAL( IPOUT ), DETNO, DETOFF, BSB, NS, BAD,
-     :                %VAL( IPW1 ), %VAL( IPW2 ), %VAL( IPW3 ), STATUS )
+     :                %VAL( CNF_PVAL( IPOUT ) ), 
+     :                DETNO, DETOFF, BSB, NS, BAD,
+     :                %VAL( CNF_PVAL( IPW1 ) ), 
+     :                %VAL( CNF_PVAL( IPW2 ) ), 
+     :                %VAL( CNF_PVAL( IPW3 ) ), STATUS )
 
 *  Set the output bad pixel flag.
          CALL NDF_SBAD( BAD, INDF2, 'DATA', STATUS )

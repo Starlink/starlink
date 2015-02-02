@@ -102,6 +102,7 @@
       INCLUDE 'DAT_PAR'          ! DAT_ constants.
       INCLUDE 'GRP_PAR'          ! GRP_ constants.
       INCLUDE 'IRI_PAR'          ! IRI_ constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER PHIST*(*)
@@ -180,10 +181,12 @@
 *  corresponding dummy argument in routine PREPA4. Character arrays
 *  passed using %VAL must always come earlier in the argument list than
 *  any other character strings.
-      CALL PREPA4( NCARD, %VAL( FTSPNT ), TYPE, STATUS, %VAL( CLEN ) )
+      CALL PREPA4( NCARD, %VAL( CNF_PVAL( FTSPNT ) ), TYPE, STATUS,
+     :             %VAL( CLEN ) )
 
 *  Get the label and title for outputs associated with this input NDF.
-      CALL PREPA5( NCARD, %VAL( FTSPNT ), TYPE, LABEL, TITLE, STATUS,
+      CALL PREPA5( NCARD, %VAL( CNF_PVAL( FTSPNT ) ),
+     :             TYPE, LABEL, TITLE, STATUS,
      :             %VAL( CLEN ) )
 
 *  If this is a CPC image, the single input NDF creates two output NDFs,
@@ -205,7 +208,8 @@
          L = LABEL( : LLEN )//' (50 um)'
 
 *  Create the 50um (band 1) output NDF.
-         CALL PREPA7( NCARD, %VAL( FTSPNT ), PFACT, TYPE, 1, INDF3,
+         CALL PREPA7( NCARD, %VAL( CNF_PVAL( FTSPNT ) ),
+     :                PFACT, TYPE, 1, INDF3,
      :                INDF2, N, T, L, FLDLON, FLDLAT, SCS, PROJ, UNITS,
      :                IGRP, PHIST, STATUS, %VAL( CLEN ) )
 
@@ -215,7 +219,8 @@
          L = LABEL( : LLEN )//' (100 um)'
 
 *  Create the 100um (band 2) output NDF.
-         CALL PREPA7( NCARD, %VAL( FTSPNT ), PFACT, TYPE, 2, INDF4,
+         CALL PREPA7( NCARD, %VAL( CNF_PVAL( FTSPNT ) ),
+     :                PFACT, TYPE, 2, INDF4,
      :                INDF2, N, T, L, FLDLON, FLDLAT, SCS, PROJ, UNITS,
      :                IGRP, PHIST, STATUS, %VAL( CLEN ) )
 
@@ -227,12 +232,15 @@
       ELSE
 
 *  Get the waveband index.
-         CALL PREPA8( NCARD, %VAL( FTSPNT ), BAND, STATUS, %VAL( CLEN ))
+         CALL PREPA8( NCARD, %VAL( CNF_PVAL( FTSPNT ) ), BAND, STATUS,
+     :                %VAL( CLEN ))
 
 *  Create the output NDF.
-         CALL PREPA7( NCARD, %VAL( FTSPNT ), PFACT, TYPE, BAND, INDF1,
+         CALL PREPA7( NCARD, %VAL( CNF_PVAL( FTSPNT ) ),
+     :                PFACT, TYPE, BAND, INDF1,
      :                INDF2, NDFOUT, TITLE, LABEL, FLDLON, FLDLAT, SCS,
-     :                PROJ, UNITS, IGRP, PHIST, STATUS, %VAL( CLEN ) )
+     :                PROJ, UNITS, IGRP, PHIST, STATUS,
+     :                %VAL( CLEN ) )
 
       END IF
 

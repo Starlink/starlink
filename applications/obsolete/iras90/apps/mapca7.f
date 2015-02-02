@@ -153,6 +153,7 @@
       INCLUDE 'I90_DAT'          ! IRAS constants.
       INCLUDE 'IRC_PAR'          ! IRC constants.
       INCLUDE 'IRI_PAR'          ! IRI constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER IDC
@@ -368,11 +369,14 @@
      :                         NINT( START( IDET ) ),
      :                         NINT( END( IDET ) ), SAMPLO, DINDLO,
      :                         SAMPHI, DINDHI, XLO, YLO, XHI, YHI,
-     :                         C2, NZSECT, NYSECT, %VAL( IPSECT ),
-     :                         %VAL(IPINS( 1 )), %VAL(IPINS( 2 )),
+     :                         C2, NZSECT, NYSECT, 
+     :                         %VAL( CNF_PVAL( IPSECT ) ),
+     :                         %VAL(CNF_PVAL(IPINS( 1 ))), 
+     :                         %VAL(CNF_PVAL(IPINS( 2 ))),
      :                         PWGSZX, PWGSZY, NX, NY, IPPWG,
-     :                         NEW, %VAL( IPDOUT ), %VAL( IPVOUT ),
-     :                         %VAL( IPTEMP ), STATUS )
+     :                         NEW, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
+     :                         %VAL( CNF_PVAL( IPTEMP ) ), STATUS )
 
 *  If input variance values are NOT to be used to modify the weight of
 *  each input data value...
@@ -383,11 +387,14 @@
      :                         NINT( START( IDET ) ),
      :                         NINT( END( IDET ) ), SAMPLO, DINDLO,
      :                         SAMPHI, DINDHI, XLO, YLO, XHI, YHI,
-     :                         C2, NZSECT, NYSECT, %VAL( IPSECT ),
-     :                         %VAL(IPINS( 1 )), %VAL(IPINS( 2 )),
+     :                         C2, NZSECT, NYSECT, 
+     :                         %VAL( CNF_PVAL( IPSECT ) ),
+     :                         %VAL(CNF_PVAL(IPINS( 1 ))), 
+     :                         %VAL(CNF_PVAL(IPINS( 2 ))),
      :                         PWGSZX, PWGSZY, NX, NY, IPPWG,
-     :                         NEW, %VAL( IPDOUT ), %VAL( IPVOUT ),
-     :                         %VAL( IPTEMP ), STATUS )
+     :                         NEW, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
+     :                         %VAL( CNF_PVAL( IPTEMP ) ), STATUS )
 
                END IF
 
@@ -404,11 +411,14 @@
      :                         NINT( START( IDET ) ),
      :                         NINT( END( IDET ) ), SAMPLO, DINDLO,
      :                         SAMPHI, DINDHI, XLO, YLO, XHI, YHI,
-     :                         C2, NZSECT, NYSECT, %VAL( IPSECT ),
-     :                         %VAL(IPINS( 1 )), %VAL(IPINS( 2 )),
+     :                         C2, NZSECT, NYSECT, 
+     :                         %VAL( CNF_PVAL( IPSECT ) ),
+     :                         %VAL(CNF_PVAL(IPINS( 1 ))), 
+     :                         %VAL(CNF_PVAL(IPINS( 2 ))),
      :                         PWGSZX, PWGSZY, NX, NY, IPPWG,
-     :                         NEW, %VAL( IPDOUT ), %VAL( IPVOUT ),
-     :                         %VAL( IPTEMP ), STATUS )
+     :                         NEW, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
+     :                         %VAL( CNF_PVAL( IPTEMP ) ), STATUS )
 
 *  If input variance values are NOT to be used to modify the weight of
 *  each input data value...
@@ -418,10 +428,14 @@
      :                         NINT( SAMP0 ), NINT( START( IDET ) ),
      :                         NINT( END( IDET ) ), SAMPLO, DINDLO,
      :                         SAMPHI, DINDHI, XLO, YLO, XHI, YHI,
-     :                         C2, NZSECT, NYSECT, %VAL( IPSECT ),
-     :                         %VAL(IPINS( 1 )), PWGSZX, PWGSZY, NX,
-     :                         NY, IPPWG, NEW, %VAL( IPDOUT ),
-     :                         %VAL( IPVOUT ), %VAL( IPTEMP ), STATUS )
+     :                         C2, NZSECT, NYSECT, 
+     :                         %VAL( CNF_PVAL( IPSECT ) ),
+     :                         %VAL(CNF_PVAL(IPINS( 1 ))), 
+     :                         PWGSZX, PWGSZY, NX,
+     :                         NY, IPPWG, NEW, 
+     :                         %VAL( CNF_PVAL( IPDOUT ) ),
+     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPTEMP ) ), STATUS )
 
                END IF
 
@@ -438,10 +452,13 @@
      :                         NINT( START( IDET ) ),
      :                         NINT( END( IDET ) ), SAMPLO, DINDLO,
      :                         SAMPHI, DINDHI, XLO, YLO, XHI, YHI,
-     :                         C2, NZSECT, NYSECT, %VAL( IPSECT ),
-     :                         %VAL(IPINS( 1 )), %VAL(IPINS( 2 )),
+     :                         C2, NZSECT, NYSECT, 
+     :                         %VAL( CNF_PVAL( IPSECT ) ),
+     :                         %VAL(CNF_PVAL(IPINS( 1 ))), 
+     :                         %VAL(CNF_PVAL(IPINS( 2 ))),
      :                         PWGSZX, PWGSZY, NX, NY, IPPWG,
-     :                         NEW, %VAL( IPDOUT ), %VAL( IPTEMP ),
+     :                         NEW, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPTEMP ) ),
      :                         STATUS )
 
 *  If input variance values are NOT to be used to modify the weight of
@@ -452,10 +469,12 @@
      :                         NINT( SAMP0 ), NINT( START( IDET ) ),
      :                         NINT( END( IDET ) ), SAMPLO, DINDLO,
      :                         SAMPHI, DINDHI, XLO, YLO, XHI, YHI,
-     :                         C2, NZSECT, NYSECT, %VAL( IPSECT ),
-     :                         %VAL(IPINS( 1 )), PWGSZX, PWGSZY, NX, NY,
-     :                         IPPWG, NEW, %VAL( IPDOUT ),
-     :                         %VAL( IPTEMP ), STATUS )
+     :                         C2, NZSECT, NYSECT, 
+     :                         %VAL( CNF_PVAL( IPSECT ) ),
+     :                         %VAL(CNF_PVAL(IPINS( 1 ))), 
+     :                         PWGSZX, PWGSZY, NX, NY,
+     :                         IPPWG, NEW, %VAL( CNF_PVAL( IPDOUT ) ),
+     :                         %VAL( CNF_PVAL( IPTEMP ) ), STATUS )
 
 
                END IF
@@ -479,11 +498,14 @@
      :                         NINT( START( IDET ) ),
      :                         NINT( END( IDET ) ), SAMPLO, DINDLO,
      :                         SAMPHI, DINDHI, XLO, YLO, XHI, YHI,
-     :                         C2, NZSECT, NYSECT, %VAL( IPSECT ),
-     :                         %VAL(IPINS( 1 )), %VAL(IPINS( 2 )),
+     :                         C2, NZSECT, NYSECT, 
+     :                         %VAL( CNF_PVAL( IPSECT ) ),
+     :                         %VAL(CNF_PVAL(IPINS( 1 ))), 
+     :                         %VAL(CNF_PVAL(IPINS( 2 ))),
      :                         PWGSZX, PWGSZY, NX, NY, IPPWG,
-     :                         NEW, %VAL( IPDOUT ), %VAL( IPVOUT ),
-     :                         %VAL( IPTEMP ), STATUS )
+     :                         NEW, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
+     :                         %VAL( CNF_PVAL( IPTEMP ) ), STATUS )
 
 *  If input variance values are NOT to be used to modify the weight of
 *  each input data value.
@@ -494,11 +516,14 @@
      :                         NINT( START( IDET ) ),
      :                         NINT( END( IDET ) ), SAMPLO, DINDLO,
      :                         SAMPHI, DINDHI, XLO, YLO, XHI, YHI,
-     :                         C2, NZSECT, NYSECT, %VAL( IPSECT ),
-     :                         %VAL(IPINS( 1 )), %VAL(IPINS( 2 )),
+     :                         C2, NZSECT, NYSECT, 
+     :                         %VAL( CNF_PVAL( IPSECT ) ),
+     :                         %VAL(CNF_PVAL(IPINS( 1 ))), 
+     :                         %VAL(CNF_PVAL(IPINS( 2 ))),
      :                         PWGSZX, PWGSZY, NX, NY, IPPWG,
-     :                         NEW, %VAL( IPDOUT ), %VAL( IPVOUT ),
-     :                         %VAL( IPTEMP ), STATUS )
+     :                         NEW, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
+     :                         %VAL( CNF_PVAL( IPTEMP ) ), STATUS )
 
                END IF
 
@@ -515,11 +540,14 @@
      :                         NINT( START( IDET ) ),
      :                         NINT( END( IDET ) ), SAMPLO, DINDLO,
      :                         SAMPHI, DINDHI, XLO, YLO, XHI, YHI,
-     :                         C2, NZSECT, NYSECT, %VAL( IPSECT ),
-     :                         %VAL(IPINS( 1 )), %VAL(IPINS( 2 )),
+     :                         C2, NZSECT, NYSECT, 
+     :                         %VAL( CNF_PVAL( IPSECT ) ),
+     :                         %VAL(CNF_PVAL(IPINS( 1 ))), 
+     :                         %VAL(CNF_PVAL(IPINS( 2 ))),
      :                         PWGSZX, PWGSZY, NX, NY, IPPWG,
-     :                         NEW, %VAL( IPDOUT ), %VAL( IPVOUT ),
-     :                         %VAL( IPTEMP ), STATUS )
+     :                         NEW, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
+     :                         %VAL( CNF_PVAL( IPTEMP ) ), STATUS )
 
 *  If input variance values are NOT to be used to modify the weight of
 *  each input data value.
@@ -529,10 +557,14 @@
      :                         NINT( SAMP0 ), NINT( START( IDET ) ),
      :                         NINT( END( IDET ) ), SAMPLO, DINDLO,
      :                         SAMPHI, DINDHI, XLO, YLO, XHI, YHI,
-     :                         C2, NZSECT, NYSECT, %VAL( IPSECT ),
-     :                         %VAL(IPINS( 1 )), PWGSZX, PWGSZY, NX,
-     :                         NY, IPPWG, NEW, %VAL( IPDOUT ),
-     :                         %VAL( IPVOUT ), %VAL( IPTEMP ), STATUS )
+     :                         C2, NZSECT, NYSECT, 
+     :                         %VAL( CNF_PVAL( IPSECT ) ),
+     :                         %VAL(CNF_PVAL(IPINS( 1 ))), 
+     :                         PWGSZX, PWGSZY, NX,
+     :                         NY, IPPWG, NEW, 
+     :                         %VAL( CNF_PVAL( IPDOUT ) ),
+     :                         %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPTEMP ) ), STATUS )
 
                END IF
 
@@ -549,10 +581,13 @@
      :                         NINT( START( IDET ) ),
      :                         NINT( END( IDET ) ), SAMPLO, DINDLO,
      :                         SAMPHI, DINDHI, XLO, YLO, XHI, YHI,
-     :                         C2, NZSECT, NYSECT, %VAL( IPSECT ),
-     :                         %VAL(IPINS( 1 )), %VAL(IPINS( 2 )),
+     :                         C2, NZSECT, NYSECT, 
+     :                         %VAL( CNF_PVAL( IPSECT ) ),
+     :                         %VAL(CNF_PVAL(IPINS( 1 ))), 
+     :                         %VAL(CNF_PVAL(IPINS( 2 ))),
      :                         PWGSZX, PWGSZY, NX, NY, IPPWG,
-     :                         NEW, %VAL( IPDOUT ), %VAL( IPTEMP ),
+     :                         NEW, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                         %VAL( CNF_PVAL( IPTEMP ) ),
      :                         STATUS )
 
 *  If input variance values are NOT to be used to modify the weight of
@@ -563,10 +598,12 @@
      :                         NINT( SAMP0 ), NINT( START( IDET ) ),
      :                         NINT( END( IDET ) ), SAMPLO, DINDLO,
      :                         SAMPHI, DINDHI, XLO, YLO, XHI, YHI,
-     :                         C2, NZSECT, NYSECT, %VAL( IPSECT ),
-     :                         %VAL(IPINS( 1 )), PWGSZX, PWGSZY, NX, NY,
-     :                         IPPWG, NEW, %VAL( IPDOUT ),
-     :                         %VAL( IPTEMP ), STATUS )
+     :                         C2, NZSECT, NYSECT, 
+     :                         %VAL( CNF_PVAL( IPSECT ) ),
+     :                         %VAL(CNF_PVAL(IPINS( 1 ))), 
+     :                         PWGSZX, PWGSZY, NX, NY,
+     :                         IPPWG, NEW, %VAL( CNF_PVAL( IPDOUT ) ),
+     :                         %VAL( CNF_PVAL( IPTEMP ) ), STATUS )
 
                END IF
 

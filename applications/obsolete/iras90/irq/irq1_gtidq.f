@@ -113,6 +113,7 @@
 
 *  Global Variables:
       INCLUDE 'IRQ_COM'          ! IRQ common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        QCM_INDF( IRQ__MAXQ ) = INTEGER (Write)
 *           Cloned NDF identifiers for the NDFs to which each quality
 *           expression refers.
@@ -212,7 +213,8 @@
      :               QCM_MSPNT( IDQ ), NEL, STATUS )
 
 *  Store the supplied masks in the MASKS array.
-      CALL VEC_ITOI( .FALSE., NEL, MASKS, %VAL( QCM_MSPNT( IDQ ) ),
+      CALL VEC_ITOI( .FALSE., NEL, MASKS, 
+     :               %VAL( CNF_PVAL( QCM_MSPNT( IDQ ) ) ),
      :                IERR, NERR, STATUS )
 
 *  Now do the same for the OPCODE array, which holds the op. codes
@@ -223,7 +225,8 @@
      :               STATUS )
       CALL DAT_MAPV( QCM_LOCOP( IDQ ), '_INTEGER', 'WRITE',
      :               QCM_OPPNT( IDQ ), NEL, STATUS )
-      CALL VEC_ITOI( .FALSE., NEL, OPCODE, %VAL( QCM_OPPNT( IDQ ) ),
+      CALL VEC_ITOI( .FALSE., NEL, OPCODE, 
+     :               %VAL( CNF_PVAL( QCM_OPPNT( IDQ ) ) ),
      :                IERR, NERR, STATUS )
 
 *  If all is OK, indicate that the identifier is in use.

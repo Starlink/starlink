@@ -51,6 +51,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER NDFNAM*(*)
@@ -118,7 +119,7 @@
 *  extra argument is ignored on VMS because there is no corresponding
 *  argument defined in HISTA3, but is used on UNIX to get access to the
 *  mapped character array.
-      CALL HISTA3( SIZE, %VAL( PNTR ), LOGPOS, FD, STATUS,
+      CALL HISTA3( SIZE, %VAL( CNF_PVAL( PNTR ) ), LOGPOS, FD, STATUS,
      :             %VAL( CLEN ) )
 
 *  Annul the locators (thus unmapping the TEXT array).

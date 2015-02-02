@@ -43,6 +43,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT constants
       INCLUDE 'I90_DAT'          ! IRAS satellite and mission data.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -114,7 +115,8 @@
       CALL NDF_MAP( ONDF, 'DATA', '_REAL', 'READ', IP, NEL, STATUS )
 
 *  Check that the array VEC holds the correct values.
-      IF ( STATUS .EQ. SAI__OK ) CALL CHECK( %VAL( IP ), UBND, LBND,
+      IF ( STATUS .EQ. SAI__OK ) CALL CHECK( %VAL( CNF_PVAL( IP ) ), 
+     :                                       UBND, LBND,
      :                                       STATUS )
 
 *  End the NDF context.

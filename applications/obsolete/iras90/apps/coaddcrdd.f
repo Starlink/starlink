@@ -316,6 +316,7 @@
       INCLUDE 'I90_DAT'          ! IRAS90 package constants
       INCLUDE 'IRA_PAR'          ! IRA package constants
       INCLUDE 'IRC_PAR'          ! IRC package constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -575,13 +576,14 @@
 *  array, alignning the traces to the trace closest to the source.
                CALL CDCRA6( NCRDD, NDFID, IRCID, SCNDIR, INTER, WEIGHT,
      :                     SCNLEN, NCROS, CRSFLX, CRSDTX, CRSSMP,
-     :                     CRSFLG, %VAL( DPNT ), %VAL( WPNT ), STATUS )
+     :                     CRSFLG, %VAL( CNF_PVAL( DPNT ) ), 
+     :                     %VAL( CNF_PVAL( WPNT ) ), STATUS )
 
 *  Take distance effects into account if requirement.
                IF ( DIST ) THEN
                   CALL CDCRA7( NCRDD, IRCID, GVDTEG, SCNLEN, NCROS,
      :                         CRSFLX, CRSDTX, CRSDIS, DETWID,
-     :                         %VAL( WPNT ), STATUS )
+     :                         %VAL( CNF_PVAL( WPNT ) ), STATUS )
                END IF
 
 *  Write the information about the crossings to the log file.
@@ -611,10 +613,12 @@
      :                          EL, STATUS )
 
 *  Coadd the crossing and output the result to an NDF file.
-                  CALL CDCRD0( SCNLEN, NCROS, %VAL( DPNT ),
-     :                        %VAL( WPNT ), INT( CRSSMP( 1 ) ), CRSFLG,
+                  CALL CDCRD0( SCNLEN, NCROS, %VAL( CNF_PVAL( DPNT ) ),
+     :                        %VAL( CNF_PVAL( WPNT ) ), 
+     :                        INT( CRSSMP( 1 ) ), CRSFLG,
      :                         LBND( 1 ), UBND( 1 ), LBND( 2 ),
-     :                         UBND( 2 ), %VAL( OPNT( 1 ) ), STATUS )
+     :                         UBND( 2 ), %VAL( CNF_PVAL( OPNT( 1 ) ) ), 
+     :                        STATUS )
 
 *  Un-map the output NDF data-array, annul the output NDF id and close
 *  the output SDF file.

@@ -80,6 +80,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ constants
       INCLUDE 'IRI_PAR'          ! IRI_ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER INDF
@@ -156,15 +157,15 @@
 *  corresponding dummy argument in routine PREPA4. Character arrays
 *  passed using %VAL must always come earlier in the argument list than
 *  any other character strings.
-      CALL PREPA4( NCARD, %VAL( FTSPNT ), WORK( 2, II ),  STATUS,
-     :             %VAL( CLEN ) )
+      CALL PREPA4( NCARD, %VAL( CNF_PVAL( FTSPNT ) ),
+     :             WORK( 2, II ), STATUS, %VAL( CLEN ) )
 
 *  If this is a PO image,
       IF( WORK( 2, II ) .EQ. IRI__DSCO ) THEN
 
 *  See what type of PO image it is.
-         CALL PREPC7( NCARD, %VAL( FTSPNT ), FLUX, NOISE, STATUS,
-     :                %VAL( CLEN ) )
+         CALL PREPC7( NCARD, %VAL( CNF_PVAL( FTSPNT ) ),
+     :                FLUX, NOISE, STATUS, %VAL( CLEN ) )
 
 *  Store the type of image.
          IF( NOISE ) THEN
@@ -175,7 +176,8 @@
          END IF
 
 *  Get the value of keyword DSKYGRID.
-         CALL IRM_GKEYR( NCARD, %VAL( FTSPNT ), 1, 'DSKYGRID', THERE,
+         CALL IRM_GKEYR( NCARD, %VAL( CNF_PVAL( FTSPNT ) ),
+     :                   1, 'DSKYGRID', THERE,
      :                   RSKGRD, CARD, STATUS, %VAL( CLEN ) )
 
 *  If not found, report an error.
@@ -192,13 +194,15 @@
          CALL CHR_ITOC( NINT( RSKGRD ), WORK( 3, II ), NCHAR )
 
 *  Store the waveband index.
-         CALL PREPA8( NCARD, %VAL( FTSPNT ), BAND, STATUS,
+         CALL PREPA8( NCARD, %VAL( CNF_PVAL( FTSPNT ) ), BAND, STATUS,
      :                %VAL( CLEN ) )
          CALL CHR_ITOC( BAND, WORK( 4, II ), NCHAR )
 
 *  Get the value of the FITS keyword BUNIT.
-         CALL IRM_GKEYC( NCARD, %VAL( FTSPNT ), 1, 'BUNIT', THERE,
-     :                   WORK( 5, II ), CARD, STATUS, %VAL( CLEN ) )
+         CALL IRM_GKEYC( NCARD, %VAL( CNF_PVAL( FTSPNT ) ),
+     :                   1, 'BUNIT', THERE,
+     :                   WORK( 5, II ), CARD, STATUS,
+     :                   %VAL( CLEN ) )
          IF( .NOT. THERE .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL NDF_MSG( 'NDF', INDF )
@@ -212,7 +216,7 @@
       ELSE IF( WORK( 2, II ) .EQ. IRI__YORIC ) THEN
 
 *  See what type of YORIC image it is.
-         CALL PREPC6( NCARD, %VAL( FTSPNT ), YORTYP, STATUS,
+         CALL PREPC6( NCARD, %VAL( CNF_PVAL( FTSPNT ) ), YORTYP, STATUS,
      :                %VAL( CLEN ) )
 
 *  Store the type of image.
@@ -224,7 +228,8 @@
          END IF
 
 *  Get the value of the FITS keyword OBJECT.
-         CALL IRM_GKEYC( NCARD, %VAL( FTSPNT ), 1, 'OBJECT', THERE,
+         CALL IRM_GKEYC( NCARD, %VAL( CNF_PVAL( FTSPNT ) ),
+     :                   1, 'OBJECT', THERE,
      :                   WORK( 3, II ), CARD, STATUS, %VAL( CLEN ) )
          IF( .NOT. THERE .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
@@ -236,8 +241,10 @@
          END IF
 
 *  Get the value of the FITS keyword DATE.
-         CALL IRM_GKEYC( NCARD, %VAL( FTSPNT ), 1, 'DATE', THERE,
-     :                   WORK( 4, II ), CARD, STATUS, %VAL( CLEN ) )
+         CALL IRM_GKEYC( NCARD, %VAL( CNF_PVAL( FTSPNT ) ),
+     :                   1, 'DATE', THERE,
+     :                   WORK( 4, II ), CARD, STATUS,
+     :                   %VAL( CLEN ) )
          IF( .NOT. THERE .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL NDF_MSG( 'NDF', INDF )
@@ -248,7 +255,8 @@
          END IF
 
 *  Get the values of the FITS keyword ITERNO
-         CALL IRM_GKEYR( NCARD, %VAL( FTSPNT ), 1, 'ITERNO', THERE,
+         CALL IRM_GKEYR( NCARD, %VAL( CNF_PVAL( FTSPNT ) ),
+     :                   1, 'ITERNO', THERE,
      :                   RITER, CARD, STATUS, %VAL( CLEN ) )
          IF( .NOT. THERE .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
@@ -263,12 +271,13 @@
          CALL CHR_ITOC( NINT( RITER ), WORK( 5, II ), NCHAR )
 
 *  Get the waveband index and store it.
-         CALL PREPA8( NCARD, %VAL( FTSPNT ), BAND, STATUS,
+         CALL PREPA8( NCARD, %VAL( CNF_PVAL( FTSPNT ) ), BAND, STATUS,
      :                %VAL( CLEN ) )
          CALL CHR_ITOC( BAND, WORK( 6, II ), NCHAR )
 
 *  Get the value of the FITS keyword BUNIT.
-         CALL IRM_GKEYC( NCARD, %VAL( FTSPNT ), 1, 'BUNIT', THERE,
+         CALL IRM_GKEYC( NCARD, %VAL( CNF_PVAL( FTSPNT ) ),
+     :                   1, 'BUNIT', THERE,
      :                   WORK( 7, II ), CARD, STATUS, %VAL( CLEN ) )
          IF( .NOT. THERE .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR

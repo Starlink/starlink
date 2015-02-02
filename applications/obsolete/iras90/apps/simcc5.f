@@ -109,6 +109,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants.
       INCLUDE 'PRM_PAR'          ! Standard Starlink constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       REAL C2( 6 )
@@ -209,7 +210,8 @@
 *  arrays.
             CALL SIMCF0( C4, PXLO, PXHI, PYLO, PYHI, PSF, PWGSZX,
      :                   PWGSZY, RLO1, RHI1, PLO1, PHI1, RLO, RHI, PLO,
-     :                   PHI, %VAL( IPPWG( II, JJ ) ), %VAL( IPPWG2 ),
+     :                   PHI, %VAL( CNF_PVAL( IPPWG( II, JJ ) ) ), 
+     :                   %VAL( CNF_PVAL( IPPWG2 ) ),
      :                   STATUS )
 
          END DO
@@ -272,7 +274,8 @@
 *  Store the pixel weight grids using the new mapped array.
                CALL SIMCF1( C4, PXLO, PXHI, PYLO, PYHI, PSF, PWGSZX,
      :                      PWGSZY, RLO, RHI, PLO, PHI,
-     :                      %VAL( IPPWG( II, JJ ) ), %VAL( IPPWG2 ),
+     :                      %VAL( CNF_PVAL( IPPWG( II, JJ ) ) ), 
+     :                      %VAL( CNF_PVAL( IPPWG2 ) ),
      :                      STATUS )
 
             END DO

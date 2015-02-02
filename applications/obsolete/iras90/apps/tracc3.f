@@ -115,6 +115,7 @@
       INCLUDE 'IRQ_ERR'          ! IRQ_ error constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDFIN
@@ -189,7 +190,8 @@
 *  hightlighted on the display by being re-drawn in pen 2.
       CALL TRACC4( BSMP, ESMP, BDET, EDET, INSCN, DATA, NDISP, OFFSET,
      :             DTINDX, SCALE, XLMT, YLMT, IDC, COLOUR, CURSOR,
-     :             CLRBLK, SCNDIR, 4, 2, .TRUE., %VAL( IPWORK ),
+     :             CLRBLK, SCNDIR, 4, 2, .TRUE., 
+     :             %VAL( CNF_PVAL( IPWORK ) ),
      :             STATUS )
 
 *  Get a quality name from the environment.
@@ -279,7 +281,7 @@
 *  Assign the quality to all selected samples.
       CALL IRQ_SETQM( LOCS, .TRUE., QNAME,
      :                ( ESMP - BSMP + 1 )*( EDET - BDET + 1 ),
-     :                %VAL( IPWORK ), SET, STATUS )
+     :                %VAL( CNF_PVAL( IPWORK ) ), SET, STATUS )
 
 *  Tell the user how many samples now hold the quality.
       CALL MSG_SETI( 'SET', SET )

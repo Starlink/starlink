@@ -354,6 +354,7 @@
       INCLUDE 'IRA_PAR'          ! IRA constants.
       INCLUDE 'IRI_PAR'          ! IRI constants.
       INCLUDE 'NDF_PAR'          ! NDF constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -878,7 +879,8 @@
 *  Create the output DATA and (if required) VARIANCE arrays.
       CALL MAPCA5( IGRP, IDA, NCRDDF, WEIGHT, VAROUT, NDFOUT, LBND,
      :             UBND, BAND0, SECSIZ, FWHM, NINCL, INCLUD,
-     :             QEXP, OUNITS, NX, NY, PIXSOL, %VAL( IPPWPS ),
+     :             QEXP, OUNITS, NX, NY, PIXSOL, 
+     :             %VAL( CNF_PVAL( IPPWPS ) ),
      :             STATUS )
 
 *  See if HISTORY is required in output NDF.
@@ -905,7 +907,7 @@
 *  pointers to mapped character arrays. There is no dummy argument
 *  within MAPCC0 corresponding to this argument.
          CALL MAPCC0( NDFOUT, IGRP, NCRDDF, NINCL, INCLUD, BAND0, SIZE,
-     :                %VAL( IP ), STATUS, %VAL( 80 ) )
+     :                %VAL( CNF_PVAL( IP ) ), STATUS, %VAL( 80 ) )
 
 *  Convert the pointer back into its original form so that the workspace
 *  can be released.

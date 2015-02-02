@@ -100,6 +100,7 @@
       INCLUDE 'I90_DAT'          ! IRAS90 data
       INCLUDE 'IRA_PAR'          ! IRA_ constants
       INCLUDE 'IRC_PAR'          ! IRC_ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER LBNDS( 2 )
@@ -218,9 +219,11 @@
      :                   LBNDC( 1 ), LBNDC( 2 ), UBNDC( 1 ), UBNDC( 2 ),
      :                   LBNDS( 1 ), LBNDS( 2 ), UBNDS( 1 ), UBNDS( 2 ),
      :                   C2, LBNDP( 1 ), UBNDP( 1 ), LBNDP( 2 ),
-     :                   UBNDP( 2 ), %VAL( IPPSF ), %VAL( IPSKY ),
+     :                   UBNDP( 2 ), %VAL( CNF_PVAL( IPPSF ) ), 
+     :                   %VAL( CNF_PVAL( IPSKY ) ),
      :                   PWGSZX, PWGSZY, SCALES, SCALEC, NX, NY, IPPWG,
-     :                   IPPWG2, NEW, %VAL( IPCRDD ), STATUS )
+     :                   IPPWG2, NEW, %VAL( CNF_PVAL( IPCRDD ) ), 
+     :                   STATUS )
 
 *  Add this detector number to the list of detectors simulated for this
 *  CRDD file.

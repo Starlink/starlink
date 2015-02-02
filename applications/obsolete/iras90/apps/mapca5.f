@@ -128,6 +128,7 @@
       INCLUDE 'I90_DAT'          ! IRAS90 constants.
       INCLUDE 'IRA_PAR'          ! IRA_ constants.
       INCLUDE 'GRP_PAR'          ! GRP_ constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER IGRP
@@ -235,7 +236,7 @@
 *  transform sector indices to focal plane offsets from the detector
 *  centre for a full size detector.
       CALL MAPCA6( BAND, FWHM( 1 ), FWHM( 2 ), NSECT( 1 ),
-     :             NSECT( 2 ), %VAL( IPSECT ), C1, STATUS )
+     :             NSECT( 2 ), %VAL( CNF_PVAL( IPSECT ) ), C1, STATUS )
 
 *  Map the output NDF DATA component, initialising its contents to zero.
       CALL NDF_MAP( NDFOUT, 'DATA', '_REAL', 'WRITE/ZERO', IPDOUT,
@@ -367,7 +368,8 @@
 
 *  Normalize the output DATA array using the mapped weights image
 *  pointed to by IPTEMP.
-      CALL MAPCC2( NELOUT, %VAL( IPTEMP ), %VAL( IPDOUT ), BADOUT,
+      CALL MAPCC2( NELOUT, %VAL( CNF_PVAL( IPTEMP ) ), 
+     :             %VAL( CNF_PVAL( IPDOUT ) ), BADOUT,
      :             STATUS )
 
 *  Set the bad pixel flag for the output DATA array.
@@ -378,15 +380,17 @@
 
 *  If required, calculate INTERNAL variances values.
       IF( VAROUT .EQ. 'INTERNAL' ) THEN
-         CALL MAPCC4( NELOUT, %VAL( IPDOUT ), %VAL( IPTEMP ),
-     :                %VAL( IPVOUT ), BADOUT, STATUS )
+         CALL MAPCC4( NELOUT, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                %VAL( CNF_PVAL( IPTEMP ) ),
+     :                %VAL( CNF_PVAL( IPVOUT ) ), BADOUT, STATUS )
 
 *  Set the output variance bad pixel flag
          CALL NDF_SBAD( BADOUT, NDFOUT, 'VARIANCE', STATUS )
 
 *  If required, calculate EXTERNAL variances values.
       ELSE IF( VAROUT .EQ. 'EXTERNAL' ) THEN
-         CALL MAPCC3( NELOUT, %VAL( IPTEMP ), %VAL( IPVOUT ), BADOUT,
+         CALL MAPCC3( NELOUT, %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                %VAL( CNF_PVAL( IPVOUT ) ), BADOUT,
      :                STATUS )
 
 *  Set the output variance bad pixel flag

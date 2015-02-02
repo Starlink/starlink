@@ -57,6 +57,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER INDF1
@@ -88,8 +89,9 @@
       CALL NDF_MAP( INDF2, 'DATA', '_REAL', 'WRITE', PNT2, EL, STATUS )
 
 *  Do the flipping,  scaling and adding constant as required.
-      CALL PREPC1( DIM( 1 ), DIM( 2 ), %VAL( PNT1 ), XFLIP, YFLIP,
-     :             SCALE, ZERO, %VAL( PNT2 ), STATUS )
+      CALL PREPC1( DIM( 1 ), DIM( 2 ), %VAL( CNF_PVAL( PNT1 ) ), 
+     :             XFLIP, YFLIP,
+     :             SCALE, ZERO, %VAL( CNF_PVAL( PNT2 ) ), STATUS )
 
 *  Unmap the data arrays.
       CALL NDF_UNMAP( INDF1, 'DATA', STATUS )

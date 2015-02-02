@@ -101,6 +101,7 @@
       INCLUDE 'I90_DAT'          ! IRAS90 data.
       INCLUDE 'IRC_PAR'          ! IRC_ constants.
       INCLUDE 'IRI_PAR'          ! IRI_ constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -315,9 +316,12 @@
 *  Modify the data and (if defined) variance components of the output
 *  NDF.
             CALL NEWUA1( VAR, IDC, UNITS, OLDUN, LBND( 1 ), UBND( 1 ),
-     :                   LBND( 2 ), UBND( 2 ), %VAL( IPIN( 1 ) ),
-     :                   %VAL( IPIN( 2 ) ), %VAL( IPOUT( 1 ) ),
-     :                   %VAL( IPOUT( 2 ) ), DBAD, VBAD, STATUS )
+     :                   LBND( 2 ), UBND( 2 ), 
+     :                   %VAL( CNF_PVAL( IPIN( 1 ) ) ),
+     :                   %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
+     :                   %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                   %VAL( CNF_PVAL( IPOUT( 2 ) ) ), 
+     :                   DBAD, VBAD, STATUS )
 
 *  Release the IRC identifier.
             CALL IRC_ANNUL( IDC, STATUS )
@@ -347,8 +351,10 @@
 
 *  Modify the data and (if defined) variance components.
             CALL NEWUA2( VAR, PIXSOL, BAND, UNITS, OLDUN, EL,
-     :                   %VAL( IPIN( 1 ) ), %VAL( IPIN( 2 ) ),
-     :                   %VAL( IPOUT( 1 ) ), %VAL( IPOUT( 2 ) ),
+     :                   %VAL( CNF_PVAL( IPIN( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( IPIN( 2 ) ) ),
+     :                   %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                   DBAD, VBAD, STATUS )
 
          END IF

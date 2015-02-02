@@ -103,6 +103,7 @@
       INCLUDE 'DAT_PAR'          ! DAT constants
       INCLUDE 'NDF_PAR'          ! NDF constants.
       INCLUDE 'IRA_PAR'          ! IRA constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -263,8 +264,10 @@
 *  Check status before calling FILDAT to fill the output data array
 *  with a checked pattern.
       IF( STATUS .EQ. SAI__OK ) THEN
-         CALL FILDAT( IDA, SCS, SQSIZE, DIMS(1), DIMS(2), %VAL(IPDAT),
-     :                %VAL(IPW1), %VAL(IPW2), STATUS )
+         CALL FILDAT( IDA, SCS, SQSIZE, DIMS(1), DIMS(2), 
+     :                %VAL(CNF_PVAL(IPDAT)),
+     :                %VAL(CNF_PVAL(IPW1)), %VAL(CNF_PVAL(IPW2)), 
+     :                STATUS )
       END IF
 
 *  Release the two temporary work arrays.

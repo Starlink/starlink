@@ -219,6 +219,7 @@
       INCLUDE 'MSG_PAR'          ! MSG package constants
       INCLUDE 'PRM_PAR'          ! Primitive constants
       INCLUDE 'PAR_ERR'          ! Parameter error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -379,7 +380,7 @@
          CALL POINA3( 'DET_CHOICE', 'DET_REQ', 'UNITS', AUTO, BAND,
      :                DETLBD, DETUBD, EXPDEC, EXPRA, EXPSRC, IDC,
      :                LOGFID, LOGREQ, MAXDET, NDFID, SCLENN, SCLENS,
-     :                SMPLBD, SMPUBD, WHLSCN, %VAL(PDATA),
+     :                SMPLBD, SMPUBD, WHLSCN, %VAL(CNF_PVAL(PDATA)),
      :                DETERR, DETEXS, DETNUM,
      :                DETNSM, DETREQ, DETSCA, DETSMP, DETVAL,
      :                DETXSC, UNITS, STATUS )
@@ -422,15 +423,16 @@
 
 * Copy data
                   CALL POINA5( DETLBD, DETUBD, IDET, MAXDET,
-     :                         SMPLBD, SMPUBD, %VAL(PDATA), DETSMP,
-     :                         %VAL(POUTDA), OUTSMP, STATUS )
+     :                         SMPLBD, SMPUBD, %VAL(CNF_PVAL(PDATA)), 
+     :                         DETSMP,
+     :                         %VAL(CNF_PVAL(POUTDA)), OUTSMP, STATUS )
 
 * Calculate the noise for the detector along either the whole scan or the
 * length determined by SCAN_NORTH and SCAN_SOUTH, and removing outlying
 * samples
                   CALL POINA6( .FALSE., VAL__BADI, VAL__BADI, MINSMP,
      :                         OUTSMP, .TRUE., SMPLBD, SMPUBD, THSD,
-     :                         %VAL(POUTDA),
+     :                         %VAL(CNF_PVAL(POUTDA)),
      :                         ACTSMP, DETER2, WMEAN, WNOBAD,
      :                         WNOLRG, WNOSMP, WSTDEV, STATUS )
 
@@ -453,8 +455,10 @@
 * each point in the data array. NB outwav(N) contains the result of applying
 * the filter to samples detsmp( N ) to detsamp( N ) + 7 which is centered
 * at detsmp( N ) + 4.5
-                     CALL POINA8( SMPLBD, SMPUBD, %VAL(POUTDA), OUTSMP,
-     :                            DETER3, %VAL(PINTRD), %VAL(POUWAV),
+                     CALL POINA8( SMPLBD, SMPUBD, 
+     :                            %VAL(CNF_PVAL(POUTDA)), OUTSMP,
+     :                            DETER3, %VAL(CNF_PVAL(PINTRD)), 
+     :                            %VAL(CNF_PVAL(POUWAV)),
      :                            STATUS )
 
 * Check whether the current detector is ok or should be skipped
@@ -465,13 +469,15 @@
 * in the bad valued samples)
                         CALL POINA6( .FALSE., VAL__BADI, VAL__BADI,
      :                               MINSMP, OUTSMP, .TRUE., SMPLBD,
-     :                               SMPUBD, THSD, %VAL(POUWAV),
+     :                               SMPUBD, THSD, 
+     :                               %VAL(CNF_PVAL(POUWAV)),
      :                               ACTSMP, DETER2, FMEAN, FNOBAD,
      :                               FNOLRG, FNOSMP, FSTDEV, STATUS )
 
 * Scan the square wave filtered data for candidate point sources
                         CALL POINA9( MAXSRC, FMEAN, FSTDEV, OUTSMP,
-     :                               SMPLBD, SMPUBD, %VAL(POUWAV),
+     :                               SMPLBD, SMPUBD, 
+     :                               %VAL(CNF_PVAL(POUWAV)),
      :                               THFILT, CANDSM, CANDN, STATUS )
 
 * Check whether there are any candidate sources
@@ -487,9 +493,12 @@
 * point source passes the required tests its data is stored for subsequent
 * output.
                            CALL POINB0( MAXSRC, BAND, CANDN, CANDSM,
-     :                                  SMPLBD, SMPUBD, %VAL(PINTRD),
-     :                                  NOISMP, PRFWID,%VAL( PPROF ),
-     :                                  SMPLBD, SMPUBD, %VAL(POUTDA),
+     :                                  SMPLBD, SMPUBD, 
+     :                                  %VAL(CNF_PVAL(PINTRD)),
+     :                                  NOISMP, PRFWID,
+     :                                  %VAL( CNF_PVAL( PPROF ) ),
+     :                                  SMPLBD, SMPUBD, 
+     :                                  %VAL(CNF_PVAL(POUTDA)),
      :                                  SPSQ, SIP, SP, SISQ, SI, S1, V,
      :                                  S2NREQ, THCORR, THS2N, THSD,
      :                                  MINSMP, SRCAMP, SRCBAS, SRCCOR,

@@ -126,6 +126,7 @@
       INCLUDE 'MSG_PAR'          ! MSG_ constants.
       INCLUDE 'PAR_ERR'          ! PAR_ error constants.
       INCLUDE 'IRA_PAR'          ! IRA_ constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -224,7 +225,7 @@
 *  values are stored in the workspace if an error occurs (or has already
 *  occurred).
          CALL POSCA0( INDF, INDEX, RA, DEC, NCRDDF, NITEM,
-     :                %VAL( IPW1 ), STATUS )
+     :                %VAL( CNF_PVAL( IPW1 ) ), STATUS )
 
 *  If an error occured processing the current NDF, add a context report,
 *  and flush the errors.
@@ -251,12 +252,13 @@
       CALL NDF_END( STATUS )
 
 *  Sort the stored information.
-      CALL POSCA1( NCRDDF, NITEM, %VAL( IPW1), %VAL( IPW2 ), NUSED,
+      CALL POSCA1( NCRDDF, NITEM, %VAL( CNF_PVAL( IPW1 )), 
+     :             %VAL( CNF_PVAL( IPW2 ) ), NUSED,
      :             STATUS )
 
 *  Display the sorted information.
       CALL POSCA2( IGRP, A, B, SCS, LOGPOS, FD, NCRDDF, NITEM,
-     :             %VAL( IPW1 ), NUSED, STATUS )
+     :             %VAL( CNF_PVAL( IPW1 ) ), NUSED, STATUS )
 
 *  Store a list of the processed files for use by later applications.
       CALL IRM_LISTN( 'NDFLIST', IGRP, 'POSCRDD', STATUS )

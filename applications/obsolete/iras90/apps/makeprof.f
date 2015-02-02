@@ -92,6 +92,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'I90_DAT'          ! IRAS90 data.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -166,7 +167,8 @@
 
 *  Call another routine to store the values.
       CALL MPROA0( SIZE, I90__BANDS, RDATA, AXIS1, I90__WAVEL,
-     :             %VAL( IPDATA ), %VAL( IPC1 ), %VAL( IPC2 ), STATUS )
+     :             %VAL( CNF_PVAL( IPDATA ) ), %VAL( CNF_PVAL( IPC1 ) ), 
+     :             %VAL( CNF_PVAL( IPC2 ) ), STATUS )
 
 *  Set up first AXIS array scalar values.
       CALL NDF_ACPUT( 'In-scan position', INDF, 'LABEL', 1, STATUS )

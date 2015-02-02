@@ -196,6 +196,7 @@
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'I90_DAT'          ! IRAS90 data
       INCLUDE 'IRC_PAR'          ! IRC constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -449,10 +450,12 @@
 
 *  Do the work.
             CALL BACKA0( IDC, UBND( 2 ), LBND( 2 ), UBND( 1 ),
-     :                   LBND( 1 ), %VAL( IPIN ), %VAL( IPT ), CLIP,
+     :                   LBND( 1 ), %VAL( CNF_PVAL( IPIN ) ), 
+     :                   %VAL( CNF_PVAL( IPT ) ), CLIP,
      :                   UNITS, OUTBAC, OUTTYP, OK, QNAME, LOCS,
-     :                   %VAL( IPOUT ), BAD, REMOVE, %VAL( IPW1),
-     :                   %VAL( IPW2 ), STATUS )
+     :                   %VAL( CNF_PVAL( IPOUT ) ), BAD, REMOVE, 
+     :                   %VAL( CNF_PVAL( IPW1 )),
+     :                   %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
 
 *  Now handle linear backgrounds.
@@ -477,11 +480,16 @@
 
 *  Do the work.
             CALL BACKA1( IDC, UBND( 2 ), LBND( 2 ), UBND( 1 ),
-     :                   LBND( 1 ), %VAL( IPIN ), %VAL( IPT ), CLIP,
+     :                   LBND( 1 ), %VAL( CNF_PVAL( IPIN ) ), 
+     :                   %VAL( CNF_PVAL( IPT ) ), CLIP,
      :                   UNITS, OUTBAC, OUTTYP, OK, QNAME, LOCS,
-     :                   %VAL( IPOUT ), BAD, GRAD, OFFSET, DNLOW,
-     :                   %VAL( IPW1), %VAL( IPW2 ), %VAL( IPW3 ),
-     :                   %VAL( IPW4 ), %VAL( IPW5 ), STATUS )
+     :                   %VAL( CNF_PVAL( IPOUT ) ), 
+     :                   BAD, GRAD, OFFSET, DNLOW,
+     :                   %VAL( CNF_PVAL( IPW1 )), 
+     :                   %VAL( CNF_PVAL( IPW2 ) ), 
+     :                   %VAL( CNF_PVAL( IPW3 ) ),
+     :                   %VAL( CNF_PVAL( IPW4 ) ), 
+     :                   %VAL( CNF_PVAL( IPW5 ) ), STATUS )
 
 *  If an unknown background type was specified, abort.
          ELSE IF( STATUS .EQ. SAI__OK ) THEN

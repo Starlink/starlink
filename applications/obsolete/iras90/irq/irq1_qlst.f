@@ -83,6 +83,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER BIT
@@ -122,11 +123,13 @@
 
 *  Convert the N dimensional coordinates to the corresponding 1D vector
 *  addresses, excluding any coordinates which fall outside the bounds.
-      CALL IRQ1_NDTOV( NDIM, NCOORD, LIST, LBND, UBND, %VAL( PNT ), NOK,
+      CALL IRQ1_NDTOV( NDIM, NCOORD, LIST, LBND, UBND, 
+     :                 %VAL( CNF_PVAL( PNT ) ), NOK,
      :                 STATUS )
 
 *  Perform the required operation on the selected pixels.
-      CALL IRQ1_QLST2( BIT, LISTED, SET, NOK, %VAL( PNT ), SIZE, QUAL,
+      CALL IRQ1_QLST2( BIT, LISTED, SET, NOK, %VAL( CNF_PVAL( PNT ) ), 
+     :                 SIZE, QUAL,
      :                    STATUS )
 
 *  Annul the temporary workspace.

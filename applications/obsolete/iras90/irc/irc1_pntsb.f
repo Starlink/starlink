@@ -64,6 +64,7 @@
 
 *  Global Variables:
       INCLUDE 'IRC_COM'          ! IRC common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CCM_CRDDL( IRC__MAX ) = CHARACTER (Read)
 *           HDS locator for CRDD_INFO component.
 *        CCM_POINT( IRC__MAX ) = LOGICAL (Read and Write)
@@ -175,8 +176,10 @@
 *  longitude (of date) and clock angle, and store the corresponding
 *  gradients and intercepts in common.
       IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL IRC1_SBFIT( IDC, BPOSNS, MJD, %VAL(IPUTC), %VAL(IPSUN),
-     :                    %VAL(IPPSI), %VAL(IPW), STATUS )
+         CALL IRC1_SBFIT( IDC, BPOSNS, MJD, %VAL(CNF_PVAL(IPUTC)), 
+     :                    %VAL(CNF_PVAL(IPSUN)),
+     :                    %VAL(CNF_PVAL(IPPSI)), %VAL(CNF_PVAL(IPW)), 
+     :                    STATUS )
       END IF
 
 *  Release the temporary array.

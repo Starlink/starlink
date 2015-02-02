@@ -562,6 +562,7 @@
       INCLUDE 'IRC_PAR'          ! IRC constants
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'PAR_ERR'          ! PAR error values.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -777,8 +778,10 @@
 
 *  Get the global properties, the in-scan distance and x-scan distance
 *  of the input CRDD file.
-      CALL TRACA1( IDC, BSMP, ESMP, BDET, EDET, %VAL( IPDATA ), BAND,
-     :             REFRA, REFDEC, ADET, SCNDIR, %VAL( IPNTR ), XSCN,
+      CALL TRACA1( IDC, BSMP, ESMP, BDET, EDET, 
+     :             %VAL( CNF_PVAL( IPDATA ) ), BAND,
+     :             REFRA, REFDEC, ADET, SCNDIR, 
+     :             %VAL( CNF_PVAL( IPNTR ) ), XSCN,
      :             YMX, YMN, AVERAG, SGMA, NVAL, NAVAIL, STATUS )
 
 *  If there are no detectors available for selection, set status, report
@@ -797,7 +800,8 @@
 
 *  Copy the required samples from the input DATA array to the temporary
 *  array pointed to by DPNTR.
-      CALL TRACC5( 'QEXP', INDF, EL, %VAL( IPDATA ), %VAL( DPNTR ),
+      CALL TRACC5( 'QEXP', INDF, EL, %VAL( CNF_PVAL( IPDATA ) ), 
+     :             %VAL( CNF_PVAL( DPNTR ) ),
      :              QEXP, STATUS )
 
 *  Get the cross-scan range which defines the list of default detectors.
@@ -865,12 +869,15 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 998
 
 *  Get in-scan display limits.
-      CALL TRACA5( BSMP, ESMP, BDET, EDET, %VAL( IPNTR ), NDISP, DTINDX,
+      CALL TRACA5( BSMP, ESMP, BDET, EDET, %VAL( CNF_PVAL( IPNTR ) ), 
+     :             NDISP, DTINDX,
      :             'XLIMIT', XLMT, STATUS )
 
 *  Get vertical display limits.
-      CALL TRACA6( IDC, BSMP, ESMP, BDET, EDET, %VAL( IPNTR ),
-     :             %VAL( DPNTR ), NDISP, DTINDX, SCALE, XLMT,
+      CALL TRACA6( IDC, BSMP, ESMP, BDET, EDET, 
+     :             %VAL( CNF_PVAL( IPNTR ) ),
+     :             %VAL( CNF_PVAL( DPNTR ) ), 
+     :             NDISP, DTINDX, SCALE, XLMT,
      :             YMX, YMN, 'YLIMIT', YLMT, STATUS )
 
 *  See which parts of the display are to be omitted. Use a dynamic
@@ -914,8 +921,10 @@
       DO WHILE ( .NOT.QUIT .AND. STATUS .EQ. SAI__OK )
 
 *  Display the data traces for the specified detectors.
-         CALL TRACA7( BSMP, ESMP, BDET, EDET, %VAL( IPNTR ), XSCN,
-     :               %VAL( DPNTR ), UNITS, REFRA, REFDEC, COORDS,
+         CALL TRACA7( BSMP, ESMP, BDET, EDET, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                XSCN,
+     :               %VAL( CNF_PVAL( DPNTR ) ), 
+     :               UNITS, REFRA, REFDEC, COORDS,
      :               NDISP, DET, DTINDX, SCALE, XLMT, YLMT, PTITLE,
      :               SCNDIR, COLOUR, AVERAG, OFFMTD, FLAGS, OFFSET,
      :               STATUS )
@@ -954,8 +963,10 @@
      :                         'PYSIZE', 'XLIMIT', 'YLIMIT', 'PTITLE',
      :                         'UNITS', 'SPACE', 'OFFSET', 'OMIT',
      :                         'QEXP', 'XSCAN', INDF, IDC, BSMP, ESMP,
-     :                         BDET, EDET, %VAL( IPNTR ), XSCN,
-     :                         %VAL( IPDATA), %VAL( DPNTR ), CRDUNT,
+     :                         BDET, EDET, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                         XSCN,
+     :                         %VAL( CNF_PVAL( IPDATA )), 
+     :                         %VAL( CNF_PVAL( DPNTR ) ), CRDUNT,
      :                         YMX, YMN, NAVAIL, ADET, QEXP, DET,
      :                         DTINDX, NDISP, SCALE, PIC0, PIC1, ZONE,
      :                         COLOUR, CURSOR, CLRBLK, XLMT, YLMT,
@@ -987,8 +998,10 @@
 *  If 'Get data value' is required, ...
                ELSE IF ( ITEMNO .EQ. 4 .OR. SELITM( : 14 ) .EQ.
      :                                      'GET DATA VALUE' ) THEN
-                  CALL TRACA9( BSMP, ESMP, BDET, EDET, %VAL( IPNTR ),
-     :                         XSCN, %VAL( IPDATA ), NDISP, OFFSET,
+                  CALL TRACA9( BSMP, ESMP, BDET, EDET, 
+     :                         %VAL( CNF_PVAL( IPNTR ) ),
+     :                         XSCN, %VAL( CNF_PVAL( IPDATA ) ), 
+     :                         NDISP, OFFSET,
      :                         DTINDX, SCALE, XLMT, YLMT, IDC, 'DATDET',
      :                         'DATA', 'SCNPSN', 'SKYPSN',  COORDS,
      :                         UNITS, FID, CURSOR, CLRBLK, LOG, STATUS )
@@ -1007,8 +1020,10 @@
 *  If 'Draw point source' is specified, ...
                ELSE IF ( ITEMNO .EQ. 5 .OR. SELITM( : 17 ) .EQ.
      :                                      'DRAW POINT SOURCE' ) THEN
-                  CALL TRACB0( BSMP, ESMP, BDET, EDET, %VAL( IPNTR ),
-     :                         XSCN, %VAL( IPDATA ), SCNDIR,  NDISP,
+                  CALL TRACB0( BSMP, ESMP, BDET, EDET, 
+     :                         %VAL( CNF_PVAL( IPNTR ) ),
+     :                         XSCN, %VAL( CNF_PVAL( IPDATA ) ), 
+     :                         SCNDIR,  NDISP,
      :                         OFFSET, DET, DTINDX, SCALE, XLMT, YLMT,
      :                         BAND, IDC, 'SRCDET', 'SRCPSN', 'SRCPEAK',
      :                        'PROFILES', 'DATDET', 'SCNPSN', 'SKYPSN',
@@ -1031,7 +1046,8 @@
      :                                      'ASSIGN QUALITY' ) THEN
 
                   CALL TRACC3( INDF, BSMP, ESMP, BDET, EDET,
-     :                         %VAL( IPNTR ), %VAL( IPDATA ), NDISP,
+     :                         %VAL( CNF_PVAL( IPNTR ) ), 
+     :                         %VAL( CNF_PVAL( IPDATA ) ), NDISP,
      :                         OFFSET, DTINDX, SCALE, XLMT, YLMT, IDC,
      :                         'QNAME', 'XNAME', 'XTYPE', 'COMMENT',
      :                         'HISTORY', COLOUR, CURSOR, CLRBLK,
