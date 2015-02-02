@@ -51,7 +51,7 @@
       INCLUDE 'DYNAMIC_MEMORY'
 
 *  Data structure error codes
-      INCLUDE 'DTA_CODES'
+      INCLUDE 'DTACODES'
 
 *  functions:
       LOGICAL PAR_ABORT                ! check PAR abort flag

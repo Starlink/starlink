@@ -50,7 +50,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DTA_CODES'        ! DTA error codes
+      INCLUDE 'DTACODES'         ! DTA error codes
 
 *  Arguments Given:
       CHARACTER * ( * ) STRUCT, ELEMENT
@@ -136,7 +136,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DTA_CODES'        ! DTA error codes
+      INCLUDE 'DTACODES'         ! DTA error codes
 
 *  Arguments Given:
       CHARACTER * ( * ) STRUCT, ELEMENT
@@ -223,7 +223,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DTA_CODES'        ! DTA error codes
+      INCLUDE 'DTACODES'         ! DTA error codes
 
 *  Arguments Given:
       CHARACTER * ( * ) STRUCT, ELEMENT
@@ -311,7 +311,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DTA_CODES'        ! DTA error codes
+      INCLUDE 'DTACODES'         ! DTA error codes
 
 *  Arguments Given:
       CHARACTER * ( * ) STRUCT, ELEMENT
@@ -399,7 +399,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DTA_CODES'        ! DTA error codes
+      INCLUDE 'DTACODES'         ! DTA error codes
 
 *  Arguments Given:
       CHARACTER * ( * ) STRUCT, ELEMENT

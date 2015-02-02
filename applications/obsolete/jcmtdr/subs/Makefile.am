@@ -15,7 +15,8 @@ jcmt_convrt.f jcmt_funsrt.f jcmt_iunsrt.f jcmt_settau.f jcmt_bessl3.f \
 jcmt_corext.f jcmt_genasc.f jcmt_mklst.f jcmt_sinc.f jcmt_bm2rd.f     \
 jcmt_corlst.f jcmt_gensyc.f jcmt_off2rd.f jcmt_sort_d.f
 
-# Requires DTA_CODES and DYN_MEMORY from FIGARO
+# Requires DTACODES from FIGARO
+AM_FCFLAGS = -I../../../figaro/dta
 
 PRIVATE_INCLUDES = ASTRO_PAR
 
