@@ -376,4 +376,9 @@ td.td {
     padding-left:5px;
     padding-right:5px;
 }
+
+/* default latex vertical align is center, not baseline?*/
+td {
+   vertical-align: middle;
+}
 \EndCss
