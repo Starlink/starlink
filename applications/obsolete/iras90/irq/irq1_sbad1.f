@@ -243,7 +243,7 @@
          NEWTOS = TOS - 1
 
          DO EL = 1, SIZE
-            WORK( EL, NEWTOS ) = WORK( EL, TOS ) .XOR. WORK( EL, NEWTOS)
+            WORK( EL, NEWTOS ) = WORK( EL, TOS ) .NEQV. WORK( EL,NEWTOS)
          END DO
 
          TOS = NEWTOS

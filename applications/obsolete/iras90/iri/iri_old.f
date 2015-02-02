@@ -428,7 +428,7 @@
 
 *  Check that the items POUNITS and PONOISE occur together, or not at
 *  all.
-      IF( ( FPOUNI .XOR. FPONOI ) .AND. STATUS .EQ. SAI__OK ) THEN
+      IF( ( FPOUNI .NEQV. FPONOI ) .AND. STATUS .EQ. SAI__OK ) THEN
 
          STATUS = IRI__MISF
          CALL ERR_REP( 'IRI_OLD_ERR10',

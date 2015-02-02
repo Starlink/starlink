@@ -63,7 +63,6 @@
 *  Arguments Given:
       CHARACTER*( * ) PAUTO
       CHARACTER*( * ) PLOGFI
-      CHARACTER*( * ) PMSGFL
 
 *  Arguments Returned:
       LOGICAL AUTO

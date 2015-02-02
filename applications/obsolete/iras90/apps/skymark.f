@@ -368,7 +368,7 @@
 *  a valid NDF, get the NDF file name from the user.
       IF ( .NOT.REFOBJ .OR. STATUS .NE. SAI__OK ) THEN
          CALL ERR_ANNUL( STATUS )
-         CALL NDF_ASSOC( 'NDF',, 'READ', NDF, STATUS )
+         CALL NDF_ASSOC( 'NDF', 'READ', NDF, STATUS )
 
 *  Or a valid NDF is obtained through reference, report to the user.
       ELSE

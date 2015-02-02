@@ -13,7 +13,7 @@ c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       integer   iptype
       integer*2 online(162)
 c
-      double precision        yzpxls(2,8), deams(10),
+      double precision        yzpxls(2,10), deams(10),
      +             pcras(10), pcdecs(10)
       integer      indx, pns(10)
 c
@@ -208,6 +208,7 @@ cts      real       pxlnos(2,10), deams(10), pcras(10), pcdecs(10)
       real       lon0, lat0, line, sample, dl, ds, theta
 cts      real*8     tapnos(10),unlstd
       character*8     tapnos(10),unlstd
+      character*4     mycs
 c    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
       common /com1/vepc, radpc, decdpc
       real         vepc(3,1716)
