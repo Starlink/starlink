@@ -8,6 +8,7 @@
 
       integer dims (2)
       integer address, slot
+      include 'CNF_PAR'
 
       if (status .ne. 0) return
 
@@ -18,7 +19,7 @@
       call dsa_map_data ('temp', 'update', 'float', address, slot,
      :   status)
       if (status .eq. 0) then
-         call gen_move (4*nx*ny, array, %val(address))
+         call gen_move (4*nx*ny, array, %val(CNF_PVAL(address)))
       end if
       call dsa_unmap (slot, status)
       call dsa_close_structure ('temp', status)

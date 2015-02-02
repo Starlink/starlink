@@ -64,6 +64,7 @@
       INTEGER FDATA
       DOUBLE PRECISION SMALL, LARGE, CENTRE
 
+      INCLUDE 'CNF_PAR'
 *.
 
 *  Get a work space for the single precision data.
@@ -82,10 +83,10 @@
 
 *  Truncate the given data to single precision, subtracting a mid-range
 *  value.
-      CALL JCMT_QDISORT2( N, DATA, CENTRE, %VAL(FDATA) )
+      CALL JCMT_QDISORT2( N, DATA, CENTRE, %VAL(CNF_PVAL(FDATA)) )
 
 *  Sort.
-      CALL GEN_QFISORT( %VAL(FDATA), N, PTRS )
+      CALL GEN_QFISORT( %VAL(CNF_PVAL(FDATA)), N, PTRS )
 
 *  Release the work space.
       CALL DSA_FREE_WORKSPACE( SLOT, STATUS )
