@@ -26,14 +26,14 @@ $(FIG_LIBS) \
 
 jcmtdr_TASKS = $(TASKS)
 
-BUILT_SOURCES = jcmtdr.csh jcmtdr.icl $(IFL_FILES)
+BUILT_SOURCES = jcmtdr.sh jcmtdr.csh jcmtdr.icl $(IFL_FILES)
 
 TASKS = ae2rd1 ae2rd2 fake iras_tag jcmtextc makemap map2mem map2ts \
 	restore ts2map
 
 IFL_FILES = $(TASKS:=.ifl) jcmtdr.ifl
 
-DYNSCRIPTS = jcmtdr.csh jcmtdr.icl
+DYNSCRIPTS = jcmtdr.csh jcmtdr.icl jcmtdr.sh
 
 #  Generate ifl and startup scripts from the ifd file and then do any 
 #  necessary post processing of the generated files to overcome 
