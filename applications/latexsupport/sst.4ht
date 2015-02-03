@@ -23,6 +23,12 @@
    #3
 }
 
+\renewcommand{\sstroutinenolabel}[3]{%
+   \ssttitle{#1}{#2}%
+   \addcontentsline{toc}{subsection}{\protect\numberline{}#1---#2}
+   #3
+}
+
 % Command to set the title of the sstrefsection
 \renewcommand{\ssttitle}[2]{
         \sstrefsection{#1}

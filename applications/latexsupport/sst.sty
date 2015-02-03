@@ -175,16 +175,13 @@
 %\renewcommand{\backslash}{\textbackslash}
 
 
-%% regular SST MACRO is exactly the same as SST routine.
-%% (used in sun209)
-\newcommand{\sstmacro}[3]{\sstroutine{#1}{#2}{#3}}
 
-%% SST macronolabel should be same as regular sstroutine, but not
+%% SSTroutinenolabel should be same as regular sstroutine, but not
 %% define a label (see sun209 -- this is because sun209 uses \textit
 %% in some of its macro titles, so thesse cannot be automatically
 %% changed to a label. The label must be manually created when
 %% using these.
-\newcommand{\sstmacronolabel}[3]{
+\newcommand{\sstroutinenolabel}[3]{
   \clearpage
   % Create the section.
   \ssttitle{#1}{#2}
