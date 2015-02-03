@@ -10765,55 +10765,55 @@ In order to calculate the zenith sky opacity to the sky brightnesses
 the \skydip\ task fits a theoretical curve to the data. The theoretical
 curve at each wavelength takes the form:
 \begin{equation}
-J_\mathrm{meas} = (1 - \eta_\mathrm{tel}) J_\mathrm{tel} +
-                   \eta_\mathrm{tel} J_\mathrm{atm} -
-                   b  \eta_\mathrm{tel} J_\mathrm{atm} e^{-A\tau},
+J_{\mathrm{meas}} = (1 - \eta_{\mathrm{tel}}) J_{\mathrm{tel}} +
+                   \eta_{\mathrm{tel}} J_{\mathrm{atm}} -
+                   b  \eta_{\mathrm{tel}} J_{\mathrm{atm}} e^{-A\tau},
 \end{equation}
-where $J_\mathrm{meas}$ is the measured brightness temperature of the
-sky, $\eta_\mathrm{tel}$ is the transmission of the telescope,
-$J_\mathrm{tel}$ is the brightness temperature of a black-body at the
-temperature of the telescope, $J_\mathrm{atm}$ is the brightness
+where $J_{\mathrm{meas}}$ is the measured brightness temperature of the
+sky, $\eta_{\mathrm{tel}}$ is the transmission of the telescope,
+$J_{\mathrm{tel}}$ is the brightness temperature of a black-body at the
+temperature of the telescope, $J_{\mathrm{atm}}$ is the brightness
 temperature of the atmosphere, $b$ is the bandwidth factor of the filter
 being used ($1-b$ is the fraction of the filter bandwidth that is opaque
 due to atmospheric absorption and, like $\tau$, it is a function of water
 vapour content), $\tau$ is the zenith sky optical depth and $A$ is the
 airmass of the measurement.
 
-Of these parameters, $J_\mathrm{meas}$, $J_\mathrm{tel}$  and $A$ are known.
-$J_\mathrm{atm}$ can be estimated from the ambient air temperature at ground
+Of these parameters, $J_{\mathrm{meas}}$, $J_{\mathrm{tel}}$  and $A$ are known.
+$J_{\mathrm{atm}}$ can be estimated from the ambient air temperature at ground
 level using a model for the behaviour of the observing layer above the
-telescope, as described below. $\eta_\mathrm{tel}$ may be fitted to the data
+telescope, as described below. $\eta_{\mathrm{tel}}$ may be fitted to the data
 for every skydip and, because it does not vary with atmospheric conditions, a
 reliable `average' value can be derived from many observations. Thus, there
 are two remaining free parameters, $\tau$ and $b$, that must be derived
-from the fit (three if fitting $\eta_\mathrm{tel}$).
+from the fit (three if fitting $\eta_{\mathrm{tel}}$).
 
-$J_\mathrm{atm}$ is calculated from $T_\mathrm{amb}$, the ambient air
+$J_{\mathrm{atm}}$ is calculated from $T_{\mathrm{amb}}$, the ambient air
 temperature, by assuming that the sky emission is dominated by a single
 absorber/emitter whose density falls exponentially and temperature linearly
 with height. In this case it can be shown that
 
 \begin{equation}
-J_\mathrm{atm} = J_\mathrm{amb} \int_0^{40}\! A \left[k\exp\left(-\frac{h}{h_2}
+J_{\mathrm{atm}} = J_{\mathrm{amb}} \int_0^{40}\! A \left[k\exp\left(-\frac{h}{h_2}
 \right)\exp\left[A k h_2 \left(\exp\left(-\frac{h}{h_2}\right)-1\right)\right]
 \left(1-\frac{h}{h_1}\right)\right]\mathrm{d}h,
 \end{equation}
 
-where $h_1$ is $J_\mathrm{amb}/6.5$ to give a 6.5~K fall in temperature per km
+where $h_1$ is $J_{\mathrm{amb}/6.5}$ to give a 6.5~K fall in temperature per km
 height, $h_2$ is the scale height of the absorbers (2~km), $A$ is the airmass
 and $k$ the extinction per km.
 
 If we approximate the result of the integral by
 \begin{equation}
-J_\mathrm{atm} = J_\mathrm{amb} X_\mathrm{g} \left[1-\exp\left(-A k h_2\right)\right],
+J_{\mathrm{atm}} = J_{\mathrm{amb}} X_{\mathrm{g}} \left[1-\exp\left(-A k h_2\right)\right],
 \end{equation}
-it can be shown that $X_\mathrm{g}$ has the form
+it can be shown that $X_{\mathrm{g}}$ has the form
 \begin{equation}
-X_\mathrm{g} = 1 + \frac{h_2 T_\mathrm{lapse}}{T_\mathrm{amb}}\exp\left(-\frac{A \tau}{X_\mathrm{gconst}}\right)
+X_{\mathrm{g}} = 1 + \frac{h_2 T_{\mathrm{lapse}}}{T_{\mathrm{amb}}}\exp\left(-\frac{A \tau}{X_{\mathrm{gconst}}}\right)
 \end{equation}
 
-where $T_\mathrm{lapse}$ is the temperature drop per kilometre altitude
-($-6.5$~K/km) and $X_\mathrm{gconst}$ is a constant determined empirically and
+where $T_{\mathrm{lapse}}$ is the temperature drop per kilometre altitude
+($-6.5$~K/km) and $X_{\mathrm{gconst}}$ is a constant determined empirically and
 has a value of 3.669383.
 
 For more information see \cite{skydip}.
@@ -10825,7 +10825,7 @@ result of the skydip fit. The default values for the hot and cold temperatures
 are usually stored in the data header but occasionally these values are
 redetermined and the header values must be over-ruled.  As of version 1.6 of
 \scusoft\ the cold load temperature (as well as the default telescope
-efficiency, $\eta_\mathrm{tel}$) for the 850 and 450-$\mu$m filters is
+efficiency, $\eta_{\mathrm{tel}}$) for the 850 and 450-$\mu$m filters is
 suggested from a lookup table rather than the data headers. Also, the hot load
 temperature is now known to be wavelength dependent and an adjustment of
 -1K (at 850 microns) and -3K (at 450 microns) is now automatically applied
