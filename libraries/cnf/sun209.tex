@@ -32,7 +32,7 @@ dynamically allocated memory.}
                              }
 \providecommand{\sstexamplestableentry}[2]{#1 & {\texttt{#2}}}
 
-% command to do xlabel and label in the sstmacronolabel commands
+% command to do xlabel and label in the sstroutinenolabel commands
 % (These are the commands that put formatting in the title
 % of the macro, so it can't be automatically used as a label)
 \newcommand{\relabel}[1]{\xlabel{#1}\label{#1}}
@@ -3955,7 +3955,7 @@ being necessary on future systems.
 Unless otherwise stated, \textit{type} is one of CHARACTER, INTEGER, REAL,
 DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 
-\sstmacronolabel{
+\sstroutinenolabel{
    DECLARE\_\textit{type}
 }{
    \relabel{DECLARE_type}Declare a FORTRAN variable
@@ -3995,7 +3995,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacronolabel{
+\sstroutinenolabel{
    DECLARE\_\textit{type}\_ARRAY
 }{
    \relabel{DECLARE_type_ARRAY}Declare a FORTRAN array
@@ -4051,7 +4051,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacronolabel{
+\sstroutinenolabel{
    DECLARE\_\textit{type}\_ARRAY\_DYN
 }{
    \relabel{DECLARE_type_ARRAY_DYN}Declare a dynamic \textit{type} array
@@ -4110,7 +4110,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacronolabel{
+\sstroutinenolabel{
    F77\_ASSOC\_\textit{type}\_ARRAY
 }{
    \relabel{F77_ASSOC_type_ARRAY}Associate a FORTRAN array with a C array.
@@ -4159,7 +4159,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacronolabel{
+\sstroutinenolabel{
    F77\_CREATE\_\textit{type}\_ARRAY
 }{
    \relabel{F77_CREATE_type_ARRAY}Create an array of \textit{type}.
@@ -4234,7 +4234,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacronolabel{
+\sstroutinenolabel{
    F77\_EXPORT\_\textit{type}
 }{
    \relabel{F77_EXPORT_type}Export a C variable to a FORTRAN variable.
@@ -4297,7 +4297,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacronolabel{
+\sstroutinenolabel{
    F77\_EXPORT\_\textit{type}\_ARRAY
 }{
    \relabel{F77_EXPORT_type_ARRAY}Export an array of \textit{type} from C
@@ -4366,7 +4366,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacronolabel{
+\sstroutinenolabel{
    F77\_FREE\_\textit{type}
 }{
    \relabel{F77_FREE_type}Free a dynamic variable of \textit{type}
@@ -4401,7 +4401,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacronolabel{
+\sstroutinenolabel{
    F77\_IMPORT\_\textit{type}
 }{
    \relabel{F77_IMPORT_type}Import a FORTRAN variable to a C variable.
@@ -4464,7 +4464,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacronolabel{
+\sstroutinenolabel{
    F77\_IMPORT\_\textit{type}\_ARRAY
 }{
    \relabel{F77_IMPORT_type_ARRAY}Import an array of \textit{type} from FORTRAN
@@ -4533,7 +4533,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacronolabel{
+\sstroutinenolabel{
    F77\_\textit{type}\_FUNCTION
 }{
    \relabel{F77_type_FUNCTION}Declare a FORTRAN function
@@ -4572,7 +4572,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacronolabel{
+\sstroutinenolabel{
    GENPTR\_\textit{type}
 }{
    \relabel{GENPTR_type}Generate a pointer to an argument
@@ -4612,7 +4612,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacronolabel{
+\sstroutinenolabel{
    GENPTR\_\textit{type}\_ARRAY
 }{
    \relabel{GENPTR_type_ARRAY}Generate a pointer to an array argument
@@ -4651,7 +4651,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacronolabel{
+\sstroutinenolabel{
    GENPTR\_\textit{type}\_FUNCTION
 }{
    \relabel{GENPTR_type_FUNCTION}Generate a pointer to a FUNCTION argument
@@ -4693,7 +4693,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacronolabel{
+\sstroutinenolabel{
    \textit{type}
 }{
    \relabel{type}Declare a \textit{type} argument
@@ -4735,7 +4735,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacronolabel{
+\sstroutinenolabel{
    \textit{type}\_ARG
 }{
    \relabel{type_ARG}Pass a \textit{type} argument to a FORTRAN routine
@@ -4771,7 +4771,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacronolabel{
+\sstroutinenolabel{
    \textit{type}\_ARRAY
 }{
    \relabel{type_ARRAY}Declare a array argument
@@ -4812,7 +4812,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
         \htmlref{\texttt{CHARACTER\_ARRAY}}{CHARACTER_ARRAY}
    }
 }
-\sstmacronolabel{
+\sstroutinenolabel{
    \textit{type}\_ARRAY\_ARG
 }{
    \relabel{type_ARRAY_ARG}Pass an array argument to a FORTRAN routine
@@ -4854,7 +4854,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacronolabel{
+\sstroutinenolabel{
    \textit{type}\_FUNCTION
 }{
    \relabel{type_FUNCTION}Declare a FUNCTION argument
@@ -4891,7 +4891,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
 }
-\sstmacronolabel{
+\sstroutinenolabel{
    \textit{type}\_FUNCTION\_ARG
 }{
    \relabel{type_FUNCTION_ARG}Pass a FUNCTION argument to a FORTRAN routine
@@ -4932,7 +4932,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
 
 \newpage
 \subsection{\xlabel{specific_descriptions}\label{f77_specific}Specific Descriptions}
-\sstmacro{
+\sstroutine{
    CHARACTER
 }{
    Declare a CHARACTER argument
@@ -4970,7 +4970,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
             to char.
    }
 }
-\sstmacro{
+\sstroutine{
    CHARACTER\_ARG
 }{
    Pass a CHARACTER argument to a FORTRAN routine
@@ -5003,7 +5003,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    CHARACTER\_ARRAY
 }{
    Declare a CHARACTER array argument
@@ -5036,7 +5036,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
 }
-\sstmacro{
+\sstroutine{
    CHARACTER\_ARRAY\_ARG
 }{
    Pass a CHARACTER array argument to a FORTRAN routine
@@ -5075,7 +5075,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    CHARACTER\_RETURN\_ARG
 }{
    Pass argument(s) that will be the return value of a FORTRAN CHARACTER
@@ -5114,7 +5114,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    CHARACTER\_RETURN\_VALUE
 }{
    Declare argument(s) that will be the return value of a FORTRAN CHARACTER
@@ -5152,7 +5152,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    DECLARE\_CHARACTER
 }{
    Declare a CHARACTER variable
@@ -5205,7 +5205,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
             actually passed to the called FORTRAN routine.
    }
 }
-\sstmacro{
+\sstroutine{
    DECLARE\_CHARACTER\_ARRAY
 }{
    Declare a CHARACTER array
@@ -5264,7 +5264,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    DECLARE\_CHARACTER\_DYN
 }{
    Declare a CHARACTER variable
@@ -5312,7 +5312,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_BLANK\_COMMON
 }{
    Refer to blank common
@@ -5349,7 +5349,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
 }
-\sstmacro{
+\sstroutine{
    F77\_BYTE\_TYPE
 }{
    Define the type BYTE
@@ -5373,7 +5373,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
 }
-\sstmacro{
+\sstroutine{
    F77\_CALL
 }{
    Call a FORTRAN routine from C
@@ -5410,7 +5410,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_CHARACTER\_ARG\_TYPE
 }{
    Define the type of a FORTRAN CHARACTER argument
@@ -5443,7 +5443,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_CHARACTER\_ARRAY\_ARG\_TYPE
 }{
    Define the type of a FORTRAN CHARACTER array argument
@@ -5476,7 +5476,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_CHARACTER\_TYPE
 }{
    Define the type CHARACTER
@@ -5500,7 +5500,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_CREATE\_CHARACTER
 }{
    Create a FORTRAN CHARACTER variable
@@ -5558,7 +5558,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_CREATE\_CHARACTER\_ARRAY
 }{
    Create a FORTRAN CHARACTER array
@@ -5626,7 +5626,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_CREATE\_CHARACTER\_ARRAY\_M
 }{
    Create a FORTRAN CHARACTER array (n-D)
@@ -5695,7 +5695,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_CREATE\_LOGICAL\_ARRAY\_M
 }{
    Create a FORTRAN LOGICAL array (n-D)
@@ -5742,7 +5742,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_DOUBLE\_TYPE
 }{
    Define the type DOUBLE PRECISION
@@ -5767,7 +5767,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_EXPORT\_CHARACTER
 }{
    Export a C variable to a FORTRAN variable.
@@ -5813,7 +5813,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_EXPORT\_CHARACTER\_ARRAY
 }{
    Export a CHARACTER array from C to FORTRAN
@@ -5872,7 +5872,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_EXPORT\_CHARACTER\_ARRAY\_P
 }{
    Export an array of pointers to char from C to a FORTRAN CHARACTER array.
@@ -5927,7 +5927,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_EXTERNAL\_NAME
 }{
    The external name of a function
@@ -5952,7 +5952,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
 }
-\sstmacro{
+\sstroutine{
    F77\_FALSE
 }{
    The logical value FALSE
@@ -5981,7 +5981,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_IMPORT\_CHARACTER
 }{
    Import a FORTRAN variable to a C variable.
@@ -6027,7 +6027,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_IMPORT\_CHARACTER\_ARRAY
 }{
    Import a CHARACTER array from FORTRAN to C.
@@ -6086,7 +6086,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_IMPORT\_CHARACTER\_ARRAY\_P
 }{
    Import a FORTRAN CHARACTER array to a C array of pointers to char.
@@ -6148,7 +6148,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_INTEGER\_TYPE
 }{
    Define the type INTEGER
@@ -6171,7 +6171,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
 }
-\sstmacro{
+\sstroutine{
    F77\_ISFALSE
 }{
    Is this the FORTRAN logical value false?
@@ -6222,7 +6222,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
 }
-\sstmacro{
+\sstroutine{
    F77\_LOCK
 }{
    Prevents code from being run simultaneously in two separate threads
@@ -6259,7 +6259,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       unlock the global mutex.
    }
 }
-\sstmacro{
+\sstroutine{
    F77\_ISTRUE
 }{
    Is this the FORTRAN logical value true?
@@ -6311,7 +6311,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_LOGICAL\_TYPE
 }{
    Define the type LOGICAL
@@ -6334,7 +6334,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
 }
-\sstmacro{
+\sstroutine{
    F77\_NAMED\_COMMON
 }{
    Refer to a named common block
@@ -6379,7 +6379,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_POINTER\_TYPE
 }{
    Define the type POINTER
@@ -6404,7 +6404,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_REAL\_TYPE
 }{
    Define the type REAL
@@ -6427,7 +6427,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
 }
-\sstmacro{
+\sstroutine{
    F77\_SUBROUTINE
 }{
    Declare a SUBROUTINE
@@ -6459,7 +6459,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
 }
-\sstmacro{
+\sstroutine{
    F77\_TRUE
 }{
    The logical value TRUE
@@ -6490,7 +6490,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_UBYTE\_TYPE
 }{
    Define the type UBYTE
@@ -6514,7 +6514,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_UWORD\_TYPE
 }{
    Define the type UWORD
@@ -6538,7 +6538,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    F77\_WORD\_TYPE
 }{
    Define the type WORD
@@ -6562,7 +6562,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    GENPTR\_CHARACTER
 }{
    Generate a pointer to a CHARACTER argument
@@ -6605,7 +6605,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
             length.
    }
 }
-\sstmacro{
+\sstroutine{
    GENPTR\_CHARACTER\_ARRAY
 }{
    Generate a pointer to a CHARACTER array argument
@@ -6649,7 +6649,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    GENPTR\_SUBROUTINE
 }{
    Generate a pointer to a SUBROUTINE argument.
@@ -6686,7 +6686,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    SUBROUTINE
 }{
    Declare a SUBROUTINE argument.
@@ -6719,7 +6719,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    SUBROUTINE\_ARG
 }{
    Pass a SUBROUTINE argument to a FORTRAN routine.
@@ -6753,7 +6753,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
    }
 }
 
-\sstmacro{
+\sstroutine{
    TRAIL
 }{
    Declare hidden trailing arguments
@@ -6787,7 +6787,7 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
       }
    }
 }
-\sstmacro{
+\sstroutine{
    TRAIL\_ARG
 }{
    Pass the length of a CHARACTER argument to a FORTRAN routine
