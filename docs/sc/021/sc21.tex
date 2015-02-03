@@ -445,7 +445,7 @@ directions and at different times. The scan patterns themselves, along
 with the associated parameters (velocity and scan-spacing), have been
 designed and optimised to meet both these criteria.
 
-\myfig{sc21_wayne_scan}{[t!]}{width=0.98\linewidth}{fig:scan}{%
+\starfig{sc21_wayne_scan}{[t!]}{width=0.98\linewidth}{fig:scan}{%
   Illustration of the SCUBA-2 observing patterns}{%
   From left: telescope track over a single rotation of the pattern;
   telescope track after multiple rotations of the pattern; resulting
@@ -770,7 +770,7 @@ a cube}. The \gaiathing{Index of plane} slider towards the top of this
 window may be moved to display different time slices in the main
 window.
 
-\myfig{sc21_gaia1}{[b]}{width=\linewidth}{fig:gaia_main}{
+\starfig{sc21_gaia1}{[b]}{width=\linewidth}{fig:gaia_main}{
   Raw data displayed in the main \gaia\ window}{
   Initial \gaia\ windows displayed upon loading a data cube.
   The main window in the left shows a map of bolometer values at a fixed
@@ -786,7 +786,7 @@ This shows an automatically scaled plot of the raw time stream of data for
 that given bolometer. It will be overridden when you click on a different
 bolometer.
 
-\myfig{sc21_gaia2}{[t]}{width=0.8\linewidth}{fig:gaia_spec}{
+\starfig{sc21_gaia2}{[t]}{width=0.8\linewidth}{fig:gaia_spec}{
   \gaia\ spectral plot window}{
   The \gaiathing{Spectral plot} window displays the time-varying signal. This window
   appears automatically when a bolometer is clicked in the main window.
@@ -828,7 +828,7 @@ The pixel scale is left at the default values of 2\,arcsec on a side at
 using the \texttt{pixsize=}$x$ option on the command-line, where $x$ is in
 arcsec).
 
-\myfig{sc21_crl2688_regrid}{[b!]}{width=0.65\linewidth}{fig:regrid}{
+\starfig{sc21_crl2688_regrid}{[b!]}{width=0.65\linewidth}{fig:regrid}{
   The regridded map of CRL~2688 displayed with \gaia.}{
   The regridded map of CRL~2688 with the s8a sub-array displayed with \gaia.
 }
@@ -1001,7 +1001,7 @@ time without \model{AST} complicating the model fitting.
 \end{enumdesc}
 
 
-\myfig{sc21_flow_dimm_blue}{}{width=0.78\linewidth}{fig:dimm}{
+\starfig{sc21_flow_dimm_blue}{}{width=0.78\linewidth}{fig:dimm}{
   Flowchart of the map-maker}{
   A flow chart illustrating the dynamic iterative map-maker. Note that
   for each iteration the \model{AST} model is subtracted from the
@@ -1314,7 +1314,7 @@ encountered) override any other instance of them.
 
 %\hrule
 %\vspace{0.2cm}
-\myfig{sc21_dimmcongitree}{[t]}{width=\linewidth}{fig:configtree}{
+\starfig{sc21_dimmcongitree}{[t]}{width=\linewidth}{fig:configtree}{
   Hierarchy of the configuration files}{
   Hierarchy of the configuration files.
 }
@@ -1775,7 +1775,7 @@ number of clues in this output that indicate the status of the
 reduction.
 
 \begin{latexonly}
-\myfig{sc21_crl2688}{[t!]}{width=0.7\linewidth}{fig:itermap}{
+\starfig{sc21_crl2688}{[t!]}{width=0.7\linewidth}{fig:itermap}{
   CRL~2688 produced with \makemap}{
   Map of CRL~2688 produced with the \smurf\ task \makemap\ using the
   iterative algorithm with default parameters.
@@ -2263,7 +2263,7 @@ The output is shown in the \cref{Figure}{fig:noihisto}{the plot below}.
 For more information on the options for \histogram\ see
 \kappasun.
 
-\myfig{sc21_noihist}{}{width=0.7\linewidth}{fig:noihisto}{
+\starfig{sc21_noihist}{}{width=0.7\linewidth}{fig:noihisto}{
   The error array viewed with \textsc{Kappa} command \task{histogram}.}{
   The error array viewed with \textsc{Kappa} command \task{histogram}.
 }
@@ -2290,7 +2290,7 @@ using the \textsc{Kappa} command \ndfcopy. For example, \texttt{\% ndfcopy map c
 
 
 
-\myfig{sc21_noigaia6}{[h!]}{width=\linewidth}{fig:noigaia}{
+\starfig{sc21_noigaia6}{[h!]}{width=\linewidth}{fig:noigaia}{
   The error map viewed with \gaia}{
   The error array displayed with \gaia. After clicking the
   \gaiathing{Error} button (circled in red) you will have to rescale your map.
@@ -2328,7 +2328,7 @@ list in the pop-up window then click the \gaiathing{Quality}
 button. You will need to rescale the map to bring out the masks--see
 \cref{Figure}{fig:qualdisp}{below}.
 
-\myfig{sc21_qualitygaia}{[t!]}{width=0.9\hsize}{fig:qualdisp}{
+\starfig{sc21_qualitygaia}{[t!]}{width=0.9\hsize}{fig:qualdisp}{
    Display of the mask made by the map-maker}{
    Using \gaia\ to display the mask applied by the map-maker. Select the
    QUALITY component of your map.
@@ -2382,7 +2382,7 @@ For more information on the use of masks by \makemap\ and the
 parameters that affect them see \cref{Chapter}{sec:tweak}{Tailoring
 your Reduction}.
 
-\myfig{sc21_dispmask3}{[hb!]}{width=0.95\linewidth}{fig:maskdisp}{
+\starfig{sc21_dispmask3}{[hb!]}{width=0.95\linewidth}{fig:maskdisp}{
    Contours of an \model{AST} mask overlaid on a map}{
    Using \gaia\ to display your map with the \model{AST} mask used by
    the map-maker contoured on top.
@@ -2484,7 +2484,7 @@ same sizes at the four position angles is then found and used as the
 clump shape.
 \end{minipage}
 
-\myfig{sc21_plotstcshapes}{[ht!]}{width=1.0\linewidth}{fig:stcshapes}{
+\starfig{sc21_plotstcshapes}{[ht!]}{width=1.0\linewidth}{fig:stcshapes}{
   Overlaying a clump catalogue in \gaia.}{
   STC shapes displayed over the input map with \gaia. To overlay your clumps
   in this way display your map with \textsc{Gaia}. Under the \gaiathing{Image-Analysis}
@@ -3042,7 +3042,7 @@ rather than editing the file itself.
 \section{\xlabel{skyloop}Skyloop}
 \label{sec:skyloop}
 
-\myfig{sc21_skyloop}{}{width=0.55\linewidth}{fig:skyloop}{
+\starfig{sc21_skyloop}{}{width=0.55\linewidth}{fig:skyloop}{
   Illustration of the \task{skyloop} approach}{
   Illustration of the \task{skyloop} approach
   to map-making compared with the standard map-maker.
@@ -3295,7 +3295,7 @@ in this case to a 900-arcsec radius circle. The output file will be named
 
 \end{terminalv}
 
-\myfig{sc21_850cosmo_mf_crop_snr}{}{width=0.6\linewidth}{fig:snrmask}{
+\starfig{sc21_850cosmo_mf_crop_snr}{}{width=0.6\linewidth}{fig:snrmask}{
   S/N map of a cosmology field}{
   Signal-to-noise map made using the \Kappa\ command \makesnr.
   The map has been scaled from 0 to $+$3.
@@ -3480,7 +3480,7 @@ config='"^dimmconfig_bright_extended.lis,maptol=0.04,ast.zero_snr=3.5"'
 \end{terminalv}
 The resulting map is shown in \cref{Figure}{fig:galmakemap}{the figure below}.
 
-\myfig{sc21_gal_11}{[t!]}{width=0.6\linewidth}{fig:galmakemap}{
+\starfig{sc21_gal_11}{[t!]}{width=0.6\linewidth}{fig:galmakemap}{
   Galactic example: initial reduction using \file{dimmconfig\_bright\_extended.lis}}{
   The output from the map-maker using \file{dimmconfig\_bright\_extended.lis}.
 }
@@ -3563,7 +3563,7 @@ We now crop the map to remove the noisy edges using the \picard\ recipe
 at the exposure-time image with \gaia.  See
 \cref{Figure}{fig:exptime}{the exposure time image}.
 
-\myfig{sc21_gal_exptime}{[h!]}{width=0.7\linewidth}{fig:exptime}{
+\starfig{sc21_gal_exptime}{[h!]}{width=0.7\linewidth}{fig:exptime}{
   Galactic example: exposure time map}{
   The exposure-time image of the science map from \cref{Figure}{fig:galmakemap}{
   our example map}. You can right-click and drag the mouse
@@ -3601,7 +3601,7 @@ a different dataset, e.g. a
 See \cref{Chapter}{sec:tweak}{Tailoring Your Reduction} for further
 discussion.
 
-\myfig{sc21_gal12_crop}{[b!]}{width=0.65\hsize}{fig:crop_map}{
+\starfig{sc21_gal12_crop}{[b!]}{width=0.65\hsize}{fig:crop_map}{
   Galactic example: cropped final map}{
   The final cropped, reduced map from the map-maker run with
   an external mask supplied.
@@ -4369,7 +4369,7 @@ curve-of-growth---see \cref{Figure}{fig:cog}{the figure below}. To correct for a
 aperture size differing from 60-arcsec diameter you should read off the
 appropriate scaling factor for your FCF from the graph below.
 
-\myfig{sc21_curveofgrowth}{[h!]}{width=\linewidth}{fig:cog}{
+\starfig{sc21_curveofgrowth}{[h!]}{width=\linewidth}{fig:cog}{
   Aperture photometry curve of growth}{
   Aperture photometry curve of growth normalised for a 60-arcsec
   aperture at 450$\mu$m \textbf{(left)} and 850$\mu$m
