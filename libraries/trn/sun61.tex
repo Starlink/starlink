@@ -1,31 +1,18 @@
-\documentclass[twoside,11pt]{article}
-
-% ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
-% ? End of specify used packages
-
-\pagestyle{myheadings}
-
+\documentclass[twoside,nolof,11pt]{starlink}
 % -----------------------------------------------------------------------------
-% ? Document identification
-% Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardoccopyright
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
-% Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {61.4}
-\newcommand{\stardocauthors}   {R.F. Warren-Smith}
-\newcommand{\stardocdate}      {12th January 2006}
-\newcommand{\stardoctitle}     {TRANSFORM \latexhtml{\\[2.5ex]}{\\}
-                                Coordinate Transformation Facility}
-\newcommand{\stardocversion}   {Version 0.9-6}
-\newcommand{\stardocmanual}    {Programmer's Guide and Reference Manual}
-\newcommand{\stardocabstract}  {%
-
+\stardocnumber      {61.4}
+\stardocauthors     {R.F. Warren-Smith}
+\stardocdate        {12th January 2006}
+\stardoctitle       {TRANSFORM --- Coordinate Transformation Facility}
+\stardocversion     {Version 0.9-6}
+\stardocmanual      {Programmer's Guide and Reference Manual}
+\stardocabstract  {%
 TRANSFORM provides a standard, flexible method for manipulating
 coordinate transformations and for transferring information about them
 between applications.  It can handle coordinate systems with any number
@@ -34,7 +21,6 @@ of dimensions and can efficiently process large
 numerical precisions.  No specific support for astronomical coordinate
 transformations or map projections is included -- these features are
 provided by the \xref{AST}{sun210}{} library.
-
 }
 
 % ? End of document identification
@@ -68,522 +54,37 @@ provided by the \xref{AST}{sun210}{} library.
 %
 % -
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
+\stardocname  {\stardocinitials /\stardocnumber}
+
+% -----------------------------------------------------------------------------
+
 \setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
 %   General definitions for use throughout the document.
-\newcommand{\name}[1]{\mbox{\small{#1}}}
-\newcommand{\fortvar}[1]{\mbox{\emph{#1}}}
+\providecommand{\name}[1]{\small{#1}}
+\providecommand{\fortvar}[1]{\emph{#1}}
 
 %   This defines "example" headings keeps count of them.
 \newcounter{examplecounter}
-\newcommand{\example}[1]{\addtocounter{examplecounter}{1}
-                         \paragraph{\textbf{Example \theexamplecounter. #1}}}
-\newcommand{\exampledone}[0]{\begin{center} \rule{6em}{0.2mm} \end{center}}
+\providecommand{\example}[1]{\addtocounter{examplecounter}{1}
+                         \subsubsection*{Example \theexamplecounter. #1}}
+\providecommand{\exampledone}[0]{\begin{center} \rule{6em}{0.2mm} \end{center}}
 
 %   These are used in the Appendix on "Classifying Transformations".
-\newcommand{\pdiff}[2]{\frac{\partial y_{#1}}{\partial x_{#2}}}
-\newcommand{\req}[0]{$\bullet$}
-\newcommand{\imp}[0]{$\circ$}
-\newcommand{\pro}[0]{$\times$}
-\newcommand{\irr}[0]{$-$}
+\providecommand{\pdiff}[2]{\frac{\partial y_{#1}}{\partial x_{#2}}}
+\providecommand{\req}[0]{$\bullet$}
+\providecommand{\imp}[0]{$\circ$}
+\providecommand{\pro}[0]{$\times$}
+\providecommand{\irr}[0]{$-$}
 
-\newcommand{\noteroutine}[2]{\textbf{#1}\hspace*{\fill}\nopagebreak \\
+\providecommand{\noteroutine}[2]{\textbf{#1}\hspace*{\fill}\nopagebreak \\
                              \hspace*{3em}\emph{#2}\hspace*{\fill}\par}
 
-%+
-%  Name:
-%     SST.TEX
 
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
-
-% ? End of document specific commands
-% -----------------------------------------------------------------------------
-%  Title Page.
-%  ===========
-\renewcommand{\thepage}{\roman{page}}
+%--------------------------------------------------------------------------
 \begin{document}
-\thispagestyle{empty}
+\scfrontmatter
 
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
-   \begin{rawhtml} <H3> \end{rawhtml}
-      \stardocversion \\
-      \stardocmanual
-   \begin{rawhtml} </H3> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? Latex Copyright Statement
-%  =========================
-\begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
-\end{latexonly}
-% ? End of Latex copyright statement
-
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-
-% ? Main text
-
+%--------------------------------------------------------------------------
 \section{\xlabel{introduction}Introduction}
 
 This document describes version 0.9 of the \name{TRANSFORM} coordinate
@@ -647,7 +148,7 @@ constructing larger \name{HDS} datasets and also when designing
 
 The \name{TRANSFORM} facility stores the information which it requires for
 conversion between different coordinate systems in \name{HDS} structures
-called {\em transformations}.
+called \emph{transformations}.
 They have an \name{HDS} type of \name{TRN\_TRANSFORM}\footnote{
 Full internal details of all the \name{HDS} structures used by the
 \name{TRANSFORM} facility are given in Appendix~\ref{appendix_structures}.}
@@ -661,7 +162,6 @@ thus:
 
 \begin{quote}
 \begin{center}
-\setlength{\unitlength}{1mm}
 \thicklines
 \begin{picture}(60, 30)(-30,-15)
 \put(-15,-5){\framebox(30,10){\textbf{Transformation}}}
@@ -688,7 +188,7 @@ Thus, given the coordinates of a point in one system, the coordinates of the
 associated point in the other system may be derived by using the information
 stored in the transformation structure.
 
-\paragraph{Transformation variables.}
+\subsubsection{Transformation variables.}
 The inter-conversion of coordinates in this way between two different
 2-dimensional systems (\emph{e.g.}\ between \emph{Equatorial} and
 \emph{Galactic} sky coordinates) is a familiar concept.
@@ -705,31 +205,30 @@ subroutines and are the means by which coordinate values are passed to and
 from the transformation; they may be visualised as a set of input and output
 ports attached to it, as follows:
 
-\begin{displaymath}
-\begin{array}{c}
-\mbox{Forward } \longrightarrow \\
+%\begin{displaymath}
 
-m \mbox{ input values }
-\left\{ \begin{array}{c} x_{1} \\ x_{2} \\ \vdots \\ x_{m} \end{array} \right\}
+\begin{center}
+\begin{tabular}{c c c c c}
+$m$ input values &
+$\left\{ \begin{array}{c} x_{1} \\ x_{2} \\ \vdots \\ x_{m} \end{array} \right\}$ &
 
-\begin{array}{c}\mbox{
-\setlength{\unitlength}{1mm}
-\thicklines
+%\thicklines
+\begin{tabular}{c}
+Forward $\longrightarrow$\\
 \begin{picture}(40, 10)(-20,-5)
 \put(-15,-5){\framebox(30,10){\textbf{Transformation}}}
 \multiput(-15,-2.5)(0,2.5){3}{\line(-1,0){3}}
 \multiput(-18,-2.5)(0,2.5){3}{\circle*{1}}
 \multiput(15,-2)(0,4){2}{\line(1,0){3}}
 \multiput(18,-2)(0,4){2}{\circle*{1}}
-\end{picture}
-} \end{array}
-
-\left\{ \begin{array}{c} y_{1} \\ y_{2} \\ \vdots \\ y_{n} \end{array} \right\}
-n \mbox{ output values}
-
-\\ \longleftarrow \mbox{ Inverse}
-\end{array}
-\end{displaymath}
+\end{picture}\\
+$\longleftarrow$ Inverse\\
+\end{tabular}
+&
+$\left\{ \begin{array}{c} y_{1} \\ y_{2} \\ \vdots \\ y_{n} \end{array} \right\}$ &
+$n$ output values \\
+\end{tabular}
+\end{center}
 
 Any coordinate values supplied to the ports (\emph{i.e.}\ variables) at
 either end of the transformation may be converted into a corresponding set
@@ -770,7 +269,7 @@ As will be seen later, it is often convenient to extract the mappings from
 a transformation and to process them as separate entities.
 
 
-\paragraph{Notation.}
+\subsubsection{Notation}
 A general transformation with $m$ input variables and $n$ output variables,
 in which both the forward and inverse mappings are defined, is denoted here
 by \mbox{[$m \leftrightarrow n$]}.
@@ -869,24 +368,21 @@ adopted before writing software which used such a transformation.
 
 Using the notation outlined above, this simple transformation would be
 denoted by:
-\begin{quote}
 \begin{center}
-\mbox{[$(x_d,y_d) \leftrightarrow (x_p,y_p)$]}
+$\left[(x_d,y_d) \leftrightarrow{}(x_p,y_p)\right]$
 \end{center}
-\end{quote}
+
 \emph{i.e.}\ with the input variables appearing on the left.
 The forward mapping would then be denoted by:
-\begin{quote}
 \begin{center}
-\mbox{\{$(x_d,y_d) \rightarrow (x_p,y_p)$\}}
+$\left\{(x_d,y_d) \rightarrow (x_p,y_p)\right\}$
 \end{center}
-\end{quote}
+
 and the inverse mapping by:
-\begin{quote}
 \begin{center}
-\mbox{\{$(x_p,y_p) \rightarrow (x_d,y_d)$\}}
+$\left\{(x_p,y_p) \rightarrow (x_d,y_d)\right\}$
 \end{center}
-\end{quote}
+
 \exampledone
 
 
@@ -903,7 +399,7 @@ At present, however, only one method is supported, based on the explicit use
 of transformation functions.
 
 For instance, suppose you wished to create the \mbox{[$(x,y) \leftrightarrow
-(r,\theta)$]} transformation relating a two-dimensional {\em Cartesian}
+(r,\theta)$]} transformation relating a two-dimensional \emph{Cartesian}
 coordinate system \mbox{$(x,y)$} to a \emph{Polar} system
 \mbox{$(r,\theta)$}.
 In this case, the transformation's two mappings might be defined in terms of
@@ -933,7 +429,7 @@ converting it directly into character data, as follows:
 
 \example{Formulating a Cartesian-to-Polar transformation.}
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 *  Define the number of input and output variables.
       INTEGER NVIN, NVOUT
       PARAMETER ( NVIN = 2, NVOUT = 2 )
@@ -949,7 +445,7 @@ converting it directly into character data, as follows:
       INV( 1 ) = 'x = r * cos( theta )'
       INV( 2 ) = 'y = r * sin( theta )'
 
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 Programming notes:
@@ -985,10 +481,10 @@ the transformation functions which define it.
 Thus, if the inverse transformation functions had been specified as:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 INV( 1 ) = 'x'
 INV( 2 ) = 'y'
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 then the inverse mapping would not be defined.
@@ -1005,9 +501,9 @@ The transformation functions formulated above may be used to create an
 (create new transformation), as follows:
 
 \begin{quote}\small
-\begin{verbatim}
+\begin{terminalv}
 CALL TRN_NEW( NVIN, NVOUT, FOR, INV, PREC, COMM, ELOC, NAME, LOCTR, STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 where:
@@ -1043,7 +539,7 @@ The following arrangement might be used to create a transformation called
 earlier:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 *  Declare variables.
       INCLUDE 'SAE_PAR'
       INCLUDE 'TRN_PAR'                                    [1]
@@ -1061,7 +557,7 @@ earlier:
       CALL TRN_NEW( NVIN, NVOUT, FOR, INV, PREC, COMM,     [4][5]
      :              ELOC, 'MYTRAN', LOCTR, STATUS )
 
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 Programming notes:
@@ -1117,9 +613,9 @@ argument will then be ignored and may also be blank).
 Thus, if \name{TRN\_NEW} were invoked by:
 
 \begin{quote}\small
-\begin{verbatim}
+\begin{terminalv}
 CALL TRN_NEW( NVIN, NVOUT, FOR, INV, PREC, COMM, ' ', ' ', LOCTR, STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 then the locator \fortvar{LOCTR} would subsequently be associated with a
@@ -1137,9 +633,9 @@ Therefore, before a transformation can be used to transform coordinate data,
 its mapping information must first be \emph{compiled} using \name{TRN\_COMP}
 (compile transformation), thus:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL TRN_COMP( LOCTR, FORWD, ID, STATUS )
-\end{verbatim}
+\end{terminalv}
 
 The \name{TRN\_COMP} routine accepts a locator \fortvar{LOCTR} associated
 with a transformation and checks the information within it.
@@ -1179,9 +675,9 @@ used by a transformation by calling \name{TRN\_GTNV} (get numbers of
 variables), thus:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 CALL TRN_GTNV( LOCTR, NVIN, NVOUT, STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 The information is returned via the \fortvar{NVIN} and \fortvar{NVOUT}
@@ -1194,9 +690,9 @@ A similar routine \name{TRN\_GTNVC} (get numbers of compiled variables) is
 provided for use with compiled mappings:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 CALL TRN_GTNVC( ID, NVIN, NVOUT, STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 In this case, the mapping is specified by its \emph{integer} identifier
@@ -1228,9 +724,9 @@ mapping to a set of 1-dimensional data points specified by a list of
 \emph{real} coordinates, the following statement might be used:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 CALL TRN_TR1R( BAD, NX, XIN, ID, XOUT, STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 where:
@@ -1263,17 +759,17 @@ obtained through the \name{ADAM} parameter system.
 For instance, if the user entered:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 X*EXP(-4.4*X)
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 then a graph of the function \mbox{$y=xe^{-4.4x}$} would be plotted over the
 range \mbox{$0\le x\le 1$}.
 
 \begin{quote}
-\begin{verbatim}
-\verb#*  Declare variables.
+\begin{terminalv}
+  Declare variables.
       INCLUDE 'SAE_PAR'
       INTEGER NPTS
       PARAMETER ( NPTS = 1000 )
@@ -1303,7 +799,7 @@ range \mbox{$0\le x\le 1$}.
       CALL DAT_ANNUL( LOCTR, STATUS )                         [5]
       CALL TRN_ANNUL( ID, STATUS )
 
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 Programming notes:
@@ -1320,8 +816,7 @@ compiled (\name{TRN\_COMP}).
 \item After generating the \fortvar{X} values, \name{TRN\_TR1R} is called to
 apply the compiled mapping, thereby generating the corresponding \fortvar{Y}
 values.
-The \fortvar{BAD} argument is set to \name{.FALSE.} since there are no {\em
-bad} input coordinates.
+The \fortvar{BAD} argument is set to \name{.FALSE.} since there are no \emph{bad} input coordinates.
 
 \item A graph is plotted using the \name{GKS} polyline routine \name{GPL}.
 It is assumed that a suitable coordinate system has been established.
@@ -1352,9 +847,9 @@ Thus, to apply a compiled \mbox{\{$2 \rightarrow 2$\}} mapping to a set of
 $X_{IN}$ and $Y_{IN}$, the following statement might be used:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 CALL TRN_TR2R( BAD, NXY, XIN, YIN, ID, XOUT, YOUT, STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 where:
@@ -1389,7 +884,7 @@ It is assumed that the identifier \fortvar{ID} is associated with a compiled
 cursor coordinates into ``user'' coordinates:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 *  Declare variables.
       INTEGER STATUS, N, ID
       REAL XCUR( 1 ), YCUR( 1 ), XUSER( 1 ), YUSER( 1 )
@@ -1414,7 +909,7 @@ cursor coordinates into ``user'' coordinates:
       ENDDO
     1 CONTINUE
 
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 Programming notes:
@@ -1445,9 +940,9 @@ it should be released.
 This is done by calling \name{TRN\_ANNUL} (annul compiled mapping), thus:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 CALL TRN_ANNUL( ID, STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 This causes the compiled mapping to be deleted and the \fortvar{ID} value
@@ -1461,9 +956,9 @@ currently associated with a compiled mapping.}
 Finally, before an application finishes, the statement:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 CALL TRN_CLOSE( STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 should be executed.
@@ -1496,12 +991,12 @@ either \textbf{I}, \textbf{R} or \textbf{D} according to whether the data are
 specified by \emph{integer}, \emph{real} or \emph{double precision} values
 respectively.
 Thus, to transform a general set of data points specified by an array of
-{\em real} coordinates, the routine \name{TRN\_TRNR} would be used, thus:
+\emph{real} coordinates, the routine \name{TRN\_TRNR} would be used, thus:
 
 \begin{quote}\small
-\begin{verbatim}
+\begin{terminalv}
 CALL TRN_TRNR( BAD, ND1, NCIN, NDAT, DATA, ID, NR1, NCOUT, RESULT, STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 where:
@@ -1548,7 +1043,7 @@ With a suitable choice of mapping, such an arrangement might be used to
 generate perspective pictures of 3-dimensional objects:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 *  Define dimensions of the DATA and RESULT arrays.
       PARAMETER ( MAXPTS = 5000, MAXDIM = 3 )
 
@@ -1576,7 +1071,7 @@ generate perspective pictures of 3-dimensional objects:
 *  Plot the resulting 2-dimensional data points.
       CALL GPL( 3601, RESULT( 1, 1 ), RESULT( 1, 2 ) ) [4]
 
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 Programming notes:
@@ -1615,7 +1110,7 @@ as division by zero or overflow) will inevitably occur from time to time.
 There is no need to include specific protection against this when a
 transformation is formulated, however, because such errors will
 automatically be trapped and converted into one of the standard Starlink
-{\em bad} values.\footnote{
+\emph{bad} values.\footnote{
 The Starlink \emph{bad} values are symbolic constants with names of the form
 \name{VAL\_\_BADx}, where x is either \textbf{D}, \textbf{R}, \textbf{I},
 \textbf{W}, \textbf{UW}, \textbf{B} or \textbf{UB} according to the data
@@ -1671,17 +1166,13 @@ this by allowing transformations to be \emph{concatenated}.
 
 \begin{tabular}{c}
 
-$\begin{array}{c}
+\begin{tabular}{c c c c c}
 
-\left\{ \begin{array}{c} x_1 \\ x_2 \end{array} \right\}
+$\left\{ \begin{array}{c} x_1 \\ x_2 \end{array} \right\}$ & 
 
-\begin{array}{c}
+\begin{tabular}{c}
+Forward$\longrightarrow$\\
 
-\mbox{Forward} \longrightarrow \\
-
-\mbox{
-\setlength{\unitlength}{1mm}
-\thicklines
 \begin{picture}(40, 15)(-20,-6.5)
 \put(-15,-5){\framebox(30,10){\begin{tabular}{c}{\textbf{Transformation}}\\
                                                 {\textbf{1}}
@@ -1690,25 +1181,17 @@ $\begin{array}{c}
 \multiput(-18,-2)(0,4){2}{\circle*{1}}
 \multiput(15,-2.5)(0,2.5){3}{\line(1,0){3}}
 \multiput(18,-2.5)(0,2.5){3}{\circle*{1}}
-\end{picture}
-}\\
-
-\longleftarrow \mbox{Inverse}
-
-\end{array}
+\end{picture}\\
+$\longleftarrow$ Inverse\\
+\end{tabular} &
 
 
-\left\{ \begin{array}{c} y_1 \leftrightarrow X_1 \\
+$\left\{ \begin{array}{c} y_1 \leftrightarrow X_1 \\
                          y_2 \leftrightarrow X_2 \\
-                         y_3 \leftrightarrow X_3 \end{array} \right\}
+                         y_3 \leftrightarrow X_3 \end{array} \right\}$ &
 
-\begin{array}{c}
-
-\mbox{Forward} \longrightarrow \\
-
-\mbox{
-\setlength{\unitlength}{1mm}
-\thicklines
+\begin{tabular}{c}
+Forward $\longrightarrow$ \\
 \begin{picture}(40, 15)(-20,-6.5)
 \put(-15,-5){\framebox(30,10){\begin{tabular}{c}{\textbf{Transformation}}\\
                                                 {\textbf{2}}
@@ -1717,19 +1200,13 @@ $\begin{array}{c}
 \multiput(-18,-2.5)(0,2.5){3}{\circle*{1}}
 \multiput(15,0)(0,0){1}{\line(1,0){3}}
 \multiput(18,0)(0,0){1}{\circle*{1}}
-\end{picture}
-}\\
+\end{picture}\\
+$\longleftarrow$ Inverse\\
+\end{tabular} & 
 
-\longleftarrow \mbox{Inverse}
+$\left\{ \begin{array}{c} Y_1 \end{array} \right\}$\\
+\end{tabular} \\
 
-\end{array}
-
-\left\{ \begin{array}{c} Y_1 \end{array} \right\}
-
-\end{array}$
-
-\\
-\setlength{\unitlength}{1mm}
 \begin{picture}(22,20)(-11,-10)
 \put(0,0){\oval(22,5)}
 \put(0,0){\makebox(0,0){\emph{Concatenate}}}
@@ -1738,16 +1215,14 @@ $\begin{array}{c}
 \end{picture}
 \\
 
-$\begin{array}{c}
 
-\mbox{Forward} \longrightarrow \\
+\begin{tabular}{c c c}
 
-\left\{ \begin{array}{c} x_1 \\ x_2 \end{array} \right\}
+$\left\{ \begin{array}{c} x_1 \\ x_2 \end{array} \right\}$ & 
 
-\begin{array}{c}
-\mbox{
-\setlength{\unitlength}{1mm}
-\thicklines
+\begin{tabular}{c}
+Forward$\longrightarrow$ \\
+
 \begin{picture}(80, 25)(-40,-10)
 \put(-35,-9.5){\framebox(70,22){}}
 \put(0,9.5){\makebox(0,0){\textbf{New Transformation}}}
@@ -1765,16 +1240,12 @@ $\begin{array}{c}
                                    \end{tabular}}}
 \multiput(32.5,0)(0,0){1}{\line(1,0){5}}
 \multiput(37.5,0)(0,0){1}{\circle*{1}}
-\end{picture}
-}\\
+\end{picture}\\
+$\longleftarrow$ Inverse\\
+\end{tabular} &
 
-\longleftarrow \mbox{Inverse}
-
-\end{array}
-
-\left\{ \begin{array}{c} Y_1 \end{array} \right\}
-
-\end{array}$
+$\left\{ \begin{array}{c} Y_1 \end{array} \right\}$\\
+\end{tabular}
 
 \end{tabular}
 
@@ -1824,14 +1295,14 @@ unit.
 Once transformations have been combined in this way, however, they cannot
 later be separated.
 
-\paragraph{Performing concatenation.}
+\subsubsection{Performing concatenation}
 Concatenation of a pair of transformations is performed by the routine
 \name{TRN\_JOIN} (concatenate transformations), as follows:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 CALL TRN_JOIN( LOCTR1, LOCTR2, ELOC, NAME, LOCNEW, STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 where:
@@ -1870,9 +1341,9 @@ For example, to prefix one transformation to another, \name{TRN\_PRFX}
 (prefix transformation) would be used, thus:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 CALL TRN_PRFX( LOCTR1, LOCTR2, STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 In this case, the two transformations with locators \fortvar{LOCTR1} and
@@ -1887,8 +1358,8 @@ case the second transformation remains unchanged.
 
 \example{Adjusting an astrometric calibration.}
 Suppose \fortvar{LOCTRS} is a locator to a transformation which relates the
-pixel coordinates \mbox{$(x,y)$} of a \name{CCD} image to positions on the
-sky \mbox{$(\alpha,\delta)$}.
+pixel coordinates $(x,y)$ of a \name{CCD} image to positions on the
+sky $(\alpha,\delta)$.
 If the size of this image is altered during data reduction, then its pixel
 coordinates will change and the astrometric calibration will need adjustment
 to take account of this.
@@ -1923,9 +1394,9 @@ necessary adjustment which should be applied as a prefix to the original
 transformation, thus:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 CALL TRN_PRFX( LOCTRA, LOCTRS, STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 The modified transformation (\fortvar{LOCTRS}\/) will then correctly relate
@@ -1957,9 +1428,9 @@ and output variables will also be inter-changed).
 It is performed by \name{TRN\_INV} (invert transformation), thus:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 CALL TRN_INV( LOCTR, STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 where \fortvar{LOCTR} is a locator to the transformation to be inverted.
@@ -2002,31 +1473,31 @@ be made and which is subsequently replaced by the value to be inserted.
 For example, if the character variable \fortvar{TEXT} had the value:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 'magnitude = - 2.5 * log10( count ) + zero_point'
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
-then \name{TRN\_STOKR} (substitute a {\em real} token value) could be used
+then \name{TRN\_STOKR} (substitute a \emph{real} token value) could be used
 to substitute a numerical value for the `\verb#zero_point#' token, as
 follows:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 CALL TRN_STOKR( 'zero_point', 17.7, TEXT, NSUBS, STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 This causes all occurrences of the `\verb#zero_point#' token  to be replaced
-with the formatted {\em real} number `\verb#17.7#', while \fortvar{NSUBS}
+with the formatted \emph{real} number `\verb#17.7#', while \fortvar{NSUBS}
 returns the number of substitutions made (in this case there will only be
 one).
 The value of \fortvar{TEXT} then becomes:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 'magnitude = - 2.5 * log10( count ) + 17.7'
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 Note that the \name{TRN\_STOKx} routines will respect the syntax of
@@ -2035,9 +1506,9 @@ in parentheses before a substitution is made.
 For instance, if the call to \name{TRN\_STOKR} had been:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 CALL TRN_STOKR( 'zero_point', -17.7, TEXT, NSUBS, STATUS )
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 then the `\verb#zero_point#' token would be replaced by `\verb#(-17.7)#' to
@@ -2054,7 +1525,7 @@ The same principles can be followed to write routines for creating a variety
 of specialised transformations.
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE LINEAR( SCALE, ZERO, ELOC, NAME, LOCTR, STATUS )
 
 *  Declare variables.
@@ -2091,7 +1562,7 @@ of specialised transformations.
 
       END
 
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 Programming notes:
@@ -2131,7 +1602,7 @@ each ordinate of a 3-dimensional coordinate system \mbox{$(X_1,X_2,X_3)$} by
 2.0 to yield the coordinates \mbox{$(Y_1,Y_2,Y_3)$}:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
        INTEGER I, NSUBS, STATUS
        CHARACTER FOR( 3 ) * 30
 
@@ -2139,7 +1610,7 @@ each ordinate of a 3-dimensional coordinate system \mbox{$(X_1,X_2,X_3)$} by
           FOR( I ) = 'Y<I> = X<I> * 2.0'
           CALL TRN_STOKI( 'I', I, FOR( I ), NSUBS, STATUS )
      1 CONTINUE
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 \exampledone
 
@@ -2160,7 +1631,7 @@ The following constructs an expression representing a polynomial in $X$ with
 an arbitrary number of numerical coefficients:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 *  Declare variables.
       INTEGER NCOEFF, STATUS, I, NSUBS
       REAL COEFF( NCOEFF )
@@ -2187,7 +1658,7 @@ an arbitrary number of numerical coefficients:
          ENDIF
    1  CONTINUE
 
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 Programming notes:
@@ -2215,9 +1686,9 @@ The effect of this algorithm with (say) the 5 polynomial coefficients 0.1,
 0.12, 1.06, $-$4.4 \& 1E$-$7, would be to produce the following expression:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 '((((1E-7)*X+(-4.4))*X+1.06)*X+0.12)*X+0.1'
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 which casts the polynomial into a form for efficient evaluation using
@@ -2279,14 +1750,14 @@ CONSTANT\_DET & The area (or volume) scale factor is constant. & TRN\_\_CONDT \\
 UNIT\_DET & Areas (or volumes) are preserved. & TRN\_\_UNIDT \\
 \hline
 \end{tabular}
-
-\caption{The basic classification properties which may be declared for a
+\end{center}
+\caption[Constants]{The basic classification properties which may be declared for a
 transformation and the symbolic constants associated with each.
 The constants are defined in the include file \name{TRN\_PAR}.}
 
 \label{table:classification}
 
-\end{center}
+
 \end{table}
 
 In most situations, a transformations's mappings are not adequately
@@ -2341,7 +1812,7 @@ This is done by calling \name{TRN\_PTCL} (put classification), as follows:
 \example{Inserting classification information.}
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 
 *  Declare variables.
       INCLUDE 'TRN_PAR'
@@ -2363,14 +1834,14 @@ This is done by calling \name{TRN\_PTCL} (put classification), as follows:
 *  Enter the classification information.
       CALL TRN_PTCL( CLASS, LOCTR, STATUS )            [5]
 
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 Programming notes:
 
 \begin{enumerate}
 
-\item A 1-dimensional {\em logical} array \fortvar{CLASS} is declared with
+\item A 1-dimensional \emph{logical} array \fortvar{CLASS} is declared with
 \fortvar{TRN\_\_MXCLS} elements (this symbolic constant specifies the number
 of basic classification properties currently recognised and is defined in
 the include file \name{TRN\_PAR}).
@@ -2408,7 +1879,7 @@ information indicates that this is so.
 \example{Retrieving classification information.}
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 
 *  Declare variables.
       INCLUDE 'TRN_PAR'
@@ -2421,7 +1892,7 @@ information indicates that this is so.
       OK = CLASS( TRN__LIN ) .AND.                     [3]
      :     CLASS( TRN__ISOT )
 
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 Programming notes:
@@ -2535,26 +2006,32 @@ internal arithmetic to the external data being processed.
 This is controlled by the precision specification, which is a character
 string taking one of the following six values:
 
-\begin{quote}
+
 \begin{center}
 \begin{tabular}{cc}
 
-Fixed precisions $\left\{ \mbox{
-\begin{tabular}{l}
-`{\tt \_INTEGER}'\\
-`{\tt \_REAL}'\\
-`{\tt \_DOUBLE}'
-\end{tabular} } \right.$
-& Elastic precisions $\left\{ \mbox{
-\begin{tabular}{l}
-`{\tt \_INTEGER:}'\\
-`{\tt \_REAL:}'\\
-`{\tt \_DOUBLE:}'
-\end{tabular} } \right.$
+\begin{tabular}{cc}
+Fixed precisions &
+$\left\{\begin{array}{c}
+\mathtt{`\_INTEGER'}\\
+\mathtt{`\_REAL'}\\
+\mathtt{`\_DOUBLE'}
+\end{array} \right.$
+\end{tabular}
+
+&
+\begin{tabular}{cc}
+Elastic precisions &
+$\left\{\begin{array}{c}
+\mathtt{`\_INTEGER:'}\\
+\mathtt{`\_REAL:'}\\
+\mathtt{`\_DOUBLE:'}
+\end{array} \right.$
+\end{tabular}
 
 \end{tabular}
 \end{center}
-\end{quote}
+
 
 \textbf{Fixed precisions} specify the type of arithmetic to be used explicitly.
 In this case, the data used in the calculation (both incoming coordinates
@@ -2575,30 +2052,27 @@ adjustment is also allowed.
 In this case, the precision specification indicates the \textbf{minimum}
 precision of the arithmetic to be used, but this may be increased if the
 data type warrants it.
-Thus, a precision specification of \mbox{`{\tt \_REAL:}'} would request that
+Thus, a precision specification of \mbox{`\texttt{\_REAL:}'} would request that
 \emph{real} arithmetic be used unless \emph{double precision} data were being
 processed (in which case \emph{double precision} arithmetic would be used
 instead).
 In general, the type of arithmetic used is related to the precision
 specification and the type of data being processed as follows:
 
-\begin{quote}
+
 \begin{center}
+\emph{Elastic Precision Specification}\\
 \begin{tabular}{|c|c|c|c|}
-\cline{2-4}
-\multicolumn{1}{c}{} & \multicolumn{3}{|c|}{\em Elastic Precision
-Specification}\\
 \hline
-{\em Data Type} & `\verb#_INTEGER:#' & `\verb#_REAL:#' & `\verb#_DOUBLE:#' \\
+\emph{Data Type} & `\verb#_INTEGER:#' & `\verb#_REAL:#' & `\verb#_DOUBLE:#' \\
 \hline
-\name{\_INTEGER} & {\em integer} & {\em real} & {\em double precision} \\
-\name{\_REAL} & {\em real} & {\em real} & {\em double precision} \\
-\name{\_DOUBLE} & {\em double precision} & {\em double precision} & {\em
-double precision}\\
+\name{\_INTEGER} & \emph{integer} & \emph{real} & \emph{double precision} \\
+\name{\_REAL} & \emph{real} & \emph{real} & \emph{double precision} \\
+\name{\_DOUBLE} & \emph{double precision} & \emph{double precision} & \emph{double precision}\\
 \hline
 \end{tabular}
 \end{center}
-\end{quote}
+
 
 Once the arithmetic precision has been decided, the transformation functions
 are evaluated in the same way as for a fixed precision (\emph{i.e.}\ by
@@ -2631,10 +2105,10 @@ The \name{INCLUDE} file names used by both of these facilities must first
 be defined by executing the commands:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 % prm_dev
 % trn_dev
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 Applications which contain Fortran \name{INCLUDE} statements associated with
@@ -2647,11 +2121,9 @@ well as all the other required Starlink libraries.
 For instance, to link an application called \name{PROG}, the \name{ADAM}
 command:
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 % alink prog.f -o prog `trn_link_adam`
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 should be used.
 
@@ -2710,20 +2182,23 @@ correspond with the variables `\verb#p#' and `\verb#q#' respectively:
 
 \begin{center}
 \begin{tabular}{cc}
-
-\mbox{Forward } $\left\{ \mbox{
-\begin{tabular}{l}
-`\texttt{p = ALPHA + 2}' \\
-`\texttt{q = 44 - 2 * OMEGA}' \\
+\begin{tabular}{cc}
+Forward &
+$\left\{\begin{array}{l}
+`\mathtt{p = ALPHA + 2}' \\
+`\mathtt{q = 44 - 2 * OMEGA}'
+\end{array}
+\right.$
 \end{tabular}
-}\right.$
 &
-\mbox{Inverse } $\left\{ \mbox{
-\begin{tabular}{l}
-`\texttt{ALPHA = p - 2}' \\
-`\texttt{OMEGA = ( 44 - q ) / 2}'
+\begin{tabular}{cc}
+Inverse &
+ $\left\{\begin{array}{l}
+`\mathtt{ALPHA = p - 2}' \\
+`\mathtt{OMEGA = ( 44 - q ) / 2}'
+\end{array}
+\right.$
 \end{tabular}
-}\right.$
 
 \end{tabular}
 \end{center}
@@ -2743,19 +2218,17 @@ Thus, the transformation given by:
 \begin{center}
 \begin{tabular}{cc}
 
-\mbox{Forward } $\left\{ \mbox{
-\begin{tabular}{l}
-`\texttt{p = ALPHA + 2}' \\
-`\texttt{q = 44 - 2 * OMEGA}' \\
-\end{tabular}
-}\right.$
+Forward $\left\{\begin{array}{l}
+`\mathtt{p = ALPHA + 2}' \\
+`\mathtt{q = 44 - 2 * OMEGA}'
+\end{array}
+\right.$
 &
-\mbox{Inverse } $\left\{ \mbox{
-\begin{tabular}{l}
-`\texttt{ALPHA}' \\
-`\texttt{OMEGA}'
-\end{tabular}
-}\right.$
+Inverse $\left\{\begin{array}{l}
+`\mathtt{ALPHA}' \\
+`\mathtt{OMEGA}'
+\end{array}
+\right.$
 
 \end{tabular}
 \end{center}
@@ -2820,20 +2293,20 @@ This, in turn, may depend on the type of data being transformed
 (Section~\ref{section:advanced:precision}) so constant values are converted
 automatically to the data type required.
 For instance, a constant written as `\mbox{\texttt{2.1}}' might be interpreted as
+
 \emph{integer}~(2), \emph{real}~(2.1E0), or \emph{double precision}~(2.1D0)
-according to the type of arithmetic being used.
+according to the type of arithmetic being used. \emph{N.B. Handling of data types may change in future to allow
+  implicit type conversion and ``mixed mode'' arithmetic. To avoid
+  possible problems, floating-point to integer conversion of constants
+  should currently be avoided if the constant has a fractional part.
+  In practice such cases are rare.}
 
-\emph{N.B. Handling of data types may change in future to allow implicit type
-conversion and ``mixed mode'' arithmetic.
-To avoid possible problems, floating-point to integer conversion of
-constants should currently be avoided if the constant has a fractional part.
-In practice such cases are rare.}
 
-\paragraph{Arithmetic operations.}
+\textbf{Arithmetic operations.}
 The standard arithmetic operators $+$, $-$, $*$, $/$ and $**$ are available
 and their use is identical to Fortran~77, thus:
 
-\begin{quote}
+
 \begin{center}
 \begin{tabular}{lcl}
 
@@ -2846,7 +2319,7 @@ and their use is identical to Fortran~77, thus:
 
 \end{tabular}
 \end{center}
-\end{quote}
+
 
 The normal rules of operator precedence apply.
 Matching pairs of parentheses may also be used (and are recommended) to
@@ -2864,7 +2337,7 @@ number and the equivalent expression `X$*$X' is preferred.
 This deficiency will be removed in future.}
 
 
-\paragraph{Boolean operations.}
+\textbf{Boolean operations.}
 The standard logical/boolean operators .EQ., .NE., .GT., .LT.,
 .GE., .LE., .OR., .AND. and .NOT. are available and their use
 is identical to Fortran~77, except that there is no distinct logical data
@@ -2894,7 +2367,7 @@ programming language.
 
 \subsection{\xlabel{builtin_functions}Built-in Functions}
 
-\paragraph{Standard functions.}
+\textbf{Standard functions.}
 A set of standard built-in functions is available and corresponds closely
 with the Fortran~77 set of intrinsic functions
 (Table~\ref{table:standardbuiltins}).
@@ -3012,11 +2485,11 @@ Many of the properties described here depend on the nature of a \emph{Jacobian
 matrix} associated with a transformation; there are potentially two
 of these matrices, corresponding with the forward and inverse mappings.
 Using the notation of Equation~\ref{equation:transformationfunctions}, the
-Jacobian matrix ${\bf J}_F$ associated with the forward mapping is the
+Jacobian matrix $\mathbf{J}_{F}$ associated with the forward mapping is the
 \mbox{$n \times m$} matrix of partial derivatives:
 
 \begin{equation}
-\textbf{J}_F = \left[ \begin{array}{cccc}
+\mathbf{J}_{F} = \left[ \begin{array}{cccc}
 \pdiff{1}{1} & \pdiff{1}{2} & \cdots & \pdiff{1}{m} \\
              &              &        &              \\
 \pdiff{2}{1} & \pdiff{2}{2} & \cdots & \pdiff{2}{m} \\
@@ -3025,7 +2498,7 @@ Jacobian matrix ${\bf J}_F$ associated with the forward mapping is the
 \end{array} \right]
 \end{equation}
 
-while that associated with the inverse mapping ${\bf J}_I$ is the equivalent
+while that associated with the inverse mapping $\mathbf{J}_{I}$ is the equivalent
 \mbox{$m \times n$} matrix obtained by inter-changing input and output
 variables ($x$ and $y$) throughout.
 
@@ -3068,26 +2541,26 @@ If the mapping is not linear, then the Jacobian matrix will vary from point to
 point.
 Nevertheless, it may still be regarded as a local linear approximation to
 the true mapping (apart from re-location of the origin) and \mbox{$\det
-\textbf{J}$} can still be interpreted as the \textbf{local} area (or volume) scale
+\mathbf{J}$} can still be interpreted as the \textbf{local} area (or volume) scale
 factor, which may now change from point to point.
 
-\paragraph{Changing dimensionality.}
+\textbf{Changing dimensionality.}
 For transformations with an equal number of input and output variables
-(\mbox{$m=n$}), the Jacobian matrices $\textbf{J}_F$ and $\textbf{J}_I$
+(\mbox{$m=n$}), the Jacobian matrices $\mathbf{J}_F$ and $\mathbf{J}_I$
 associated
 with the forward and inverse mappings (if specified) will both be square.
 If the transformation functions are correctly formulated, then these two
 matrices will be mutually inverse and will satisfy:
 
 \begin{equation}
-\textbf{J}_F \textbf{J}_I = \textbf{J}_I \textbf{J}_F = \textbf{I}
+\mathbf{J}_F \mathbf{J}_I = \mathbf{J}_I \mathbf{J}_F = \mathbf{I}
 \end{equation}
 
 where $\textbf{I}$ is an identity matrix.
 Their determinants will also be related by:
 
 \begin{equation}
-\det{\textbf{J}_I} = \frac{1}{\det{\textbf{J}_F}}
+\det{\mathbf{J}_I} = \frac{1}{\det{\mathbf{J}_F}}
 \end{equation}
 
 As a consequence of this (and the definitions of the basic classification
@@ -3265,10 +2738,8 @@ The presence of a possible shift of origin is disregarded throughout:
 
 \begin{table}
 \begin{center}
-
+\emph{Type of Mapping}\\
 \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|}
-\cline{2-10}
-\multicolumn{1}{c}{} & \multicolumn{9}{|c|}\emph{Type of Mapping} \\
 \hline
 \emph{Basic Property}
               & A    & B    & C    & D    & E    & F    & G    & H    & I    \\
@@ -3285,9 +2756,7 @@ UNIT\_DET     & \req & \req & \irr & \irr & \irr & \req & \req & \irr & \irr \\
 \end{tabular}
 
 \begin{footnotesize}
-
-Key:\\
-\mbox{
+\begin{tabular}{ll}
 \begin{tabular}[t]{rc@{ -- }l}
 Mapping types: & A & Shift of origin \\
                & B & Rotation about an axis \\
@@ -3298,7 +2767,7 @@ Mapping types: & A & Shift of origin \\
                & G & Axis reversal \\
                & H & Conformal map projection \\
                & I & Equal area map projection \\
-\end{tabular}
+\end{tabular}&
 \begin{tabular}[t]{rc@{ -- }l}
 Symbols: & \req & Required \\
          & \imp & Implied \\
@@ -3306,10 +2775,8 @@ Symbols: & \req & Required \\
          & \irr & Irrelevant \\
          & ?    & See note in text \\
 \end{tabular}
-}
-
+\end{tabular}
 \end{footnotesize}
-
 \end{center}
 
 \caption{Common types of mapping with their composite classification
@@ -3407,7 +2874,7 @@ These structures are not handled directly by user-level \name{TRANSFORM}
 routines.
 
 \item[\textbf{TYPE = \name{TRN\_CLASS}}] structures are used to hold
-{\em classification} information about the properties of a transformation.
+\emph{classification} information about the properties of a transformation.
 These structures are also not handled directly by the user-level
 \name{TRANSFORM} routines.
 
@@ -3426,12 +2893,10 @@ It is defined as follows:
 
 \begin{tabular}{|llc|c|}
 \hline
-\multicolumn{4}{|c|}{\raisebox{0ex}[3.5ex][1.5ex]{\bf Components of a
-\name{TRN\_TRANSFORM} Structure}} \\
+\multicolumn{4}{|c|}{\textbf{Components of a \name{TRN\_TRANSFORM} Structure}} \\
 \hline
 \hline
-{\em Component Name} & {\em \name{HDS} Type} & {\em Typical Value} & {\em
-Optional?} \\
+\emph{Component Name} & \emph{\name{HDS} Type} & \emph{Typical Value} & \emph{Optional?} \\
 \hline
 TRN\_VERSION & \_REAL & 0.9 & no \\
 FORWARD & \_CHAR & `\verb#DEFINED#' & no \\
@@ -3578,12 +3043,10 @@ The \name{TRN\_CLASS} structure is defined as follows:
 
 \begin{tabular}{|llc|c|}
 \hline
-\multicolumn{4}{|c|}{\raisebox{0ex}[3.5ex][1.5ex]{\bf Components of a
-\name{TRN\_CLASS} Structure}} \\
+\multicolumn{4}{|c|}{\textbf{Components of a \name{TRN\_CLASS} Structure}} \\
 \hline
 \hline
-{\em Component Name} & {\em \name{HDS} Type} & {\em Typical Value} & {\em
-Optional?} \\ \hline
+\emph{Component Name} & \emph{\name{HDS} Type} & \emph{Typical Value} & \emph{Optional?} \\ \hline
 LINEAR & \_LOGICAL & TRUE & yes \\
 INDEPENDENT & \_LOGICAL & TRUE & yes \\
 DIAGONAL & \_LOGICAL & TRUE & yes \\
@@ -3603,6 +3066,8 @@ Their names correspond with the classification properties described in
 Appendix~\ref{appendix:classification} and their logical values indicate
 whether the transformation has the associated property. If any component is
 absent, its value defaults to \name{.FALSE.}
+
+
 
 \newpage
 \section{\xlabel{routine_descriptions}Routine Descriptions}
@@ -3733,6 +3198,8 @@ Annul compiled mapping
       }
    }
 }
+
+
 \sstroutine{
    TRN\_APND
 }{
@@ -3848,7 +3315,7 @@ Annul compiled mapping
    Get classification
 }{
    \sstdescription{
-      Obtain an array of {\em logical} classification values from a
+      Obtain an array of \emph{logical} classification values from a
       transformation.
       The classification information is fully validated before it is
       returned.
@@ -3911,6 +3378,7 @@ Annul compiled mapping
       }
    }
 }
+
 
 \sstroutine{TRN\_GTNV}{Get numbers of variables}
 {
@@ -4216,7 +3684,7 @@ Annul compiled mapping
    \sstinvocation{CALL TRN\_TR1x( BAD, NX, XIN, ID, XOUT, STATUS )}
    \sstarguments{
       \sstsubsection{BAD = L}{
-         Whether the input coordinates may be {\em bad}.}
+         Whether the input coordinates may be \emph{bad}.}
       \sstsubsection{NX = I}{
          The number of data points to transform.}
       \sstsubsection{XIN = ?(\small{NX})}{
@@ -4252,7 +3720,7 @@ Annul compiled mapping
    \sstinvocation{CALL TRN\_TR2x( BAD, NXY, XIN, YIN, ID, XOUT, YOUT, STATUS )}
    \sstarguments{
       \sstsubsection{BAD = L}{
-         Whether the input coordinates may be {\em bad}.}
+         Whether the input coordinates may be \emph{bad}.}
       \sstsubsection{NXY = I}{
          The number of data points to transform.}
       \sstsubsection{XIN = ?({\small NXY})}{
@@ -4293,7 +3761,7 @@ Annul compiled mapping
            RESULT, STATUS )}
    \sstarguments{
       \sstsubsection{BAD = L}{
-         Whether the input coordinates may be {\em bad}.}
+         Whether the input coordinates may be \emph{bad}.}
       \sstsubsection{ND1 = I}{
          First dimension of the \fortvar{DATA} array (as declared in the
          calling routine).}
@@ -4418,9 +3886,9 @@ include file \name{TRN\_ERR} and may be incorporated into an application
 with the statement:
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 INCLUDE 'TRN_ERR'
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 The following list gives the names of these error codes, the associated
@@ -4458,7 +3926,7 @@ The right hand side of a transformation function contains an invalid comma
 \item \textbf{TRN\_\_DIMIN, dimensions invalid}\\
 An \name{HDS} object has inappropriate dimensions for its purpose.
 
-\item {\bf TRN\_\_DSTIN, definition status invalid}\\
+\item \textbf{TRN\_\_DSTIN, definition status invalid}\\
 The \name{FORWARD} or \name{INVERSE} component of an \name{HDS}
 transformation structure contains an invalid value.
 Only the values \name{`DEFINED'} and \name{`UNDEFINED'} (case insensitive)
@@ -4572,7 +4040,4 @@ invoked from the right hand side of a transformation function.
 
 \end{description}
 
-\end{document}
-
-% ? End of main text
 \end{document}
