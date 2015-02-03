@@ -76,8 +76,8 @@ provided by the \xref{AST}{sun210}{} library.
 \providecommand{\pro}[0]{$\times$}
 \providecommand{\irr}[0]{$-$}
 
-\providecommand{\noteroutine}[2]{\textbf{#1}\hspace*{\fill}\nopagebreak \\
-                             \hspace*{3em}\emph{#2}\hspace*{\fill}\par}
+\providecommand{\noteroutine}[3]{\htmlref{\textbf{#1}}{#1}\textbf{#2}\hspace*{\fill}\nopagebreak \\
+                             \hspace*{3em}\emph{#3}\hspace*{\fill}\par}
 
 
 %--------------------------------------------------------------------------
@@ -3011,39 +3011,39 @@ The following is a complete list of user-level \name{TRANSFORM} routines
 with a brief description of their purpose.
 Full specifications are given in the next Section.
 
-\noteroutine{TRN\_ANNUL( ID, STATUS )}
+\noteroutine{TRN\_ANNUL}{( ID, STATUS )}
             { Annul compiled mapping}
-\noteroutine{TRN\_APND( LOCTR1, LOCTR2, STATUS )}
+\noteroutine{TRN\_APND}{( LOCTR1, LOCTR2, STATUS )}
             { Append transformation}
-\noteroutine{TRN\_CLOSE( STATUS )}
+\noteroutine{TRN\_CLOSE}{( STATUS )}
             { Close the \name{TRANSFORM} facility}
-\noteroutine{TRN\_COMP( LOCTR, FORWD, ID, STATUS )}
+\noteroutine{TRN\_COMP}{( LOCTR, FORWD, ID, STATUS )}
             { Compile transformation}
-\noteroutine{TRN\_GTCL( LOCTR, FORWD, CLASS, STATUS )}
+\noteroutine{TRN\_GTCL}{( LOCTR, FORWD, CLASS, STATUS )}
             { Get classification}
-\noteroutine{TRN\_GTCLC( ID, CLASS, STATUS )}
+\noteroutine{TRN\_GTCLC}{( ID, CLASS, STATUS )}
             { Get compiled classification}
-\noteroutine{TRN\_GTNV( LOCTR, NVIN, NVOUT, STATUS )}
+\noteroutine{TRN\_GTNV}{( LOCTR, NVIN, NVOUT, STATUS )}
             { Get numbers of variables}
-\noteroutine{TRN\_GTNVC( ID, NVIN, NVOUT, STATUS )}
+\noteroutine{TRN\_GTNVC}{( ID, NVIN, NVOUT, STATUS )}
             { Get numbers of compiled variables}
-\noteroutine{TRN\_INV( LOCTR, STATUS )}
+\noteroutine{TRN\_INV}{( LOCTR, STATUS )}
             { Invert transformation}
-\noteroutine{TRN\_JOIN( LOCTR1, LOCTR2, ELOC, NAME, LOCTR, STATUS )}
+\noteroutine{TRN\_JOIN}{( LOCTR1, LOCTR2, ELOC, NAME, LOCTR, STATUS )}
             { Concatenate transformations}
-\noteroutine{TRN\_NEW( NVIN, NVOUT, FOR, INV, PREC, COMM, ELOC, NAME, LOCTR, STATUS )}
+\noteroutine{TRN\_NEW}{( NVIN, NVOUT, FOR, INV, PREC, COMM, ELOC, NAME, LOCTR, STATUS )}
             { Create new transformation}
-\noteroutine{TRN\_PRFX( LOCTR1, LOCTR2, STATUS )}
+\noteroutine{TRN\_PRFX}{( LOCTR1, LOCTR2, STATUS )}
             { Prefix transformation}
-\noteroutine{TRN\_PTCL( CLASS, LOCTR, STATUS )}
+\noteroutine{TRN\_PTCL}{( CLASS, LOCTR, STATUS )}
             { Put classification}
-\noteroutine{TRN\_STOK[x]( TOKEN, VALUE, TEXT, NSUBS, STATUS )}
+\noteroutine{TRN\_STOK[x]}{( TOKEN, VALUE, TEXT, NSUBS, STATUS )}
             { Substitute token}
-\noteroutine{TRN\_TR1x( BAD, NX, XIN, ID, XOUT, STATUS )}
+\noteroutine{TRN\_TR1x}{( BAD, NX, XIN, ID, XOUT, STATUS )}
             { Transform 1-dimensional data}
-\noteroutine{TRN\_TR2x( BAD, NXY, XIN, YIN, ID, XOUT, YOUT, STATUS )}
+\noteroutine{TRN\_TR2x}{( BAD, NXY, XIN, YIN, ID, XOUT, YOUT, STATUS )}
             { Transform 2-dimensional data}
-\noteroutine{TRN\_TRNx( BAD, ND1, NCIN, NDAT, DATA, ID, NR1, NCOUT, RESULT, STATUS )}
+\noteroutine{TRN\_TRNx}{( BAD, ND1, NCIN, NDAT, DATA, ID, NR1, NCOUT, RESULT, STATUS )}
             { Transform general data}
 
 \newpage
