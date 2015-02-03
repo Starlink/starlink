@@ -12,6 +12,9 @@ dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
 AC_CONFIG_SRCDIR(sun1.tex)
 
+
+LATEX2DVI='TEXINPUTS=${STARLINK}/share/latexsupport//: $$LATEX "\\batchmode\\input $$1" && makeindex $$1 && $$LATEX "\\batchmode\\input $$1" && $$LATEX "\\batchmode\\input $$1"'
+
 STAR_DEFAULTS(docs-only)
 
 STAR_LATEX_DOCUMENTATION(sun1)
