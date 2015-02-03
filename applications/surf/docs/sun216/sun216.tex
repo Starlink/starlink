@@ -239,16 +239,17 @@ data (image, skydip result, photometry result) calculated by the on-line
 system. These data can be examined either by using \hdstrace\cite{hdstrace} or, for images, a Starlink-compatible image display
 package (note that nested NDFs are used - see Appendix \ref{filenames}).
 
-\begin{latexonly}
+\begin{landscape}
 \begin{center}
 \begin{figure}
-\hspace*{20mm}
-\includegraphics[width=0.90\textheight,angle=90]{sun216_arrays}
+\vspace{20mm}
+\centering
+\includegraphics[width=0.90\linewidth]{sun216_arrays}
 \caption{The SCUBA arrays}
 \label{arrays}
 \end{figure}
 \end{center}
-\end{latexonly}
+\end{landscape}
 
 
 
@@ -1998,7 +1999,7 @@ given bolometer can be concatenated together using \scucat).
 
 \begin{figure}
 \begin{center}
-\includegraphics[angle=270,width=5in]{sun216_qdraw}
+\includegraphics[width=5in]{sun216_qdraw}
 \caption{Photometry data of 3C279. This is the concatenated data from three
 separate observations.}
 \label{qdrawfig}
@@ -10930,7 +10931,7 @@ The fit is shown in Fig.\ \ref{fitsdip}. \skydip\ is the only task that can
 process raw demodulated data and data processed with \resw.
 \begin{figure}
 \begin{center}
-\includegraphics[width=4in,angle=-90]{sun216_fitsdip}
+\includegraphics[width=4in]{sun216_fitsdip}
 \caption{Skydip plus model without measurement 5}
 \label{fitsdip}
 \end{center}
@@ -11024,7 +11025,7 @@ on the correct, unshifted, calibrator signal.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=5in,angle=-90]{sun216_shift_diag}
+\includegraphics[width=5in]{sun216_shift_diag}
 \caption{The standard calibrator signal (solid line) with an overlay of a
 shifted calibrator signal (dashed). The A/D cards are indicated and a shift
 is clearly seen on card B.}
