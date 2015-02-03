@@ -330,7 +330,7 @@
 %#don't include -cunithtf as commandline option -- it will enable
 %ligatures as htmlcharacters. Breaks cut and paste etc.
 
-\renewcommand{\myfig}[6]{
+\renewcommand{\starfig}[6]{
   \begin{figure}#2
   \begin{center}
     \includegraphics[#3]{#1}
