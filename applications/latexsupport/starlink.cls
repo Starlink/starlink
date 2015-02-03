@@ -123,6 +123,8 @@
 %... allow environments using verbatim
 \RequirePackage{fancyvrb}
 
+%... allow starlink docs to use indexes
+\RequirePackage{makeidx}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

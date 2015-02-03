@@ -349,3 +349,9 @@
 %problems with _ in labels (e.g. in xrefs)
 \let\oldunderscore\_
 \renewcommand{\_}{\ifmmode \oldunderscore \else \string_\fi}
+
+
+% Ensure index shows up in toc.
+\let\oldprintindex\printindex
+\renewcommand{\printindex}{%
+  \phantomsection \addcontentsline{toc}{section}{Index}\oldprintindex}
