@@ -277,6 +277,10 @@ dt.enumerate-enumitem{
     margin-top:0%;
 }
 
+/* general description class */
+dt {
+   font-weight: bold;
+}
 
 /* foot notes */
 div.footnotes{margin-right:0px;}
