@@ -1353,11 +1353,16 @@ detection (see \cref{Section}{sec:mf}{Point-source detection}),
 however this is not applied by the map-maker.
 \vspace{0.3cm}
 
-\myfigduo{sc21_cosmo1-def}{sc21_cosmo1-bf}{[t!]}{width=0.47\linewidth}{fig:bfcompare}{3mm}{
-  Example map reduced with \file{dimmconfig\_blank\_field.lis}}{
-  Maps of a deep cosmology field reduced with \textbf{(left)}
-  \file{dimmconfig.lis} and \textbf{(right)} \file{dimmconfig\_blank\_field.lis}.
-}
+\begin{figure}[t!]
+\includegraphics[width=0.47\linewidth]{sc21_cosmo1-def}
+\hspace{3mm}
+\includegraphics[width=0.47\linewidth]{sc21_cosmo1-bf}
+\caption[Example map reduced with \file{dimmconfig\_blank\_field.lis}]{
+    Maps of a deep cosmology field reduced with \textbf{(left)}
+    \file{dimmconfig.lis} and \textbf{(right)}
+    \file{dimmconfig\_blank\_field.lis} \label{fig:bfcompare}}.
+\end{figure}
+
 
 
 % The tildes around the equal sign are to ensure HTML table field is
@@ -1478,12 +1483,16 @@ is tighter. The S/N threshold for DC steps (\param{dcthresh}) is relaxed from
 \subsection{dimmconfig\_bright\_extended.lis}
 
 \begin{latexonly}
-\myfigduo{sc21_gal_def}{sc21_gal_brex}{[t!]}{width=0.47\linewidth}{fig:becompare}{3mm}{
-  Example map reduced with \file{dimmconfig\_bright\_extended.lis}}{
-  A region towards the Galactic Centre reduced with \textbf{(left)}
-  \file{dimmconfig.lis} and \textbf{(right)}
-  \file{dimmconfig\_bright\_extended.lis}.
-}
+\begin{figure}[t!]
+\includegraphics[width=0.47\linewidth]{sc21_gal_def}
+\hspace{3mm}
+\includegraphics[width=0.47\linewidth]{sc21_gal_brex}
+\caption[Example map reduced with
+  \file{dimmconfig\_bright\_extended.lis}]
+ {A region towards the Galactic Centre reduced with \textbf{(left)}
+   \file{dimmconfig.lis} and \textbf{(right)}
+   \file{dimmconfig\_bright\_extended.lis}.\label{fig:becompare}}
+\end{figure}
 
 This configuration is for reducing maps that do not fall into the
 other two categories. The emission is usually extended to some degree
@@ -2783,13 +2792,17 @@ Note that the variances stored in the final map are from the penultimate
 iteration to avoid having artificially reduced values.
 
 
-\myfigduo{sc21_brex_19}{sc21_brex_18}{}{width=0.46\linewidth}{fig:fltcompare}{7mm}{
-  Illustrating the effects of high-pass filtering}{
+\begin{figure}
+\includegraphics[width=0.46\linewidth]{sc21_brex_19}
+\hspace{7mm}
+\includegraphics[width=0.46\linewidth]{sc21_brex_18}
+\caption[Illustrating the effects of high-pass filtering]{
   Highlighting the effects of high-pass filtering on your map.
   \textbf{(Left)} Map made with \param{850.flt.filt\_edge\_largescale~=~300}.
   \textbf{(Right)} Map made with \param{850.flt.filt\_edge\_largescale~=~1000}.
-  All other configuration parameters remain the same.
+  All other configuration parameters remain the same.\label{fig:fltcompare}
 }
+\end{figure}
 
 
 \section{\xlabel{fitcom}Fitting COM for each sub-array}
@@ -3237,13 +3250,17 @@ time is also propagated correctly to the output mosaic (it is stored
 in the \texttt{MORE.SMURF.EXP\_TIME} extension).
 \\
 
-\myfigduo{sc21_850cosmo_bf}{sc21_850cosmo_mf_crop}{}{width=0.48\linewidth}{fig:cosmomap}{2mm}{
-  Cosmology field with the matched filter applied}{
+\begin{figure}
+\includegraphics[width=0.48\linewidth]{sc21_850cosmo_bf}
+\hspace{2mm}
+\includegraphics[width=0.48\linewidth]{sc21_850cosmo_mf_crop}
+\caption[Cosmology field with the matched filter applied]{
   Reduced \textsc{pong} maps of cosmology field A1835. \textbf{Left:}
   Map reduced with \file{dimmconfig\_blank\_field.lis}.
   \textbf{Right:} Map on the left after the matched filter has been
-  applied and it has been cropped.
+  applied and it has been cropped.\label{fig:cosmomap}
 }
+\end{figure}
 
 \textbf{Step 3: Apply the matched filter}\\
 In order to optimally find sources that are the size of the telescope
@@ -3503,12 +3520,16 @@ The final mask is shown in the right-panel of \cref{Figure}{fig:mask}{the figure
 Note how it encompasses more emission and has softer edges than the
 first threshold map. \\
 
-\myfigduo{sc21_gal_mask1}{sc21_gal_mask2}{[t]}{width=0.475\linewidth}{fig:mask}{2mm}{
-  Galactic example: thresholded SNR map and smoothed map}{
+\begin{figure}[t]
+\includegraphics[width=0.475\linewidth]{sc21_gal_mask1}
+\hspace{2mm}
+\includegraphics[width=0.475\linewidth]{sc21_gal_mask2}
+\caption[Galactic example: thresholded SNR map and smoothed map]{
   \textbf{(Left)} The initial mask created by thresholding 850map\_snr
   to 3$\sigma$. \textbf{(Right)} Second mask made by thresholding the
-  smoothed map to 0.02.
+  smoothed map to 0.02.\label{fig:mask}
 }
+\end{figure}
 
 
 \textbf{Step 3: Re-running the map-maker with an external mask supplied}
