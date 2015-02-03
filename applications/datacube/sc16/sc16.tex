@@ -414,7 +414,7 @@ produces a staggered column on slitlets (as shown in
 Figure~\ref{sc16_uist_fig}) which is used as the input for the
 spectrometer in place of the long slit.
 
-\myfig{sc16_uist}{[thb]}{height=0.6\textheight}{sc16_uist_fig}{The UIST staggered slitlets.}{The UIST staggered slitlets.}
+\starfig{sc16_uist}{[thb]}{height=0.6\textheight}{sc16_uist_fig}{The UIST staggered slitlets.}{The UIST staggered slitlets.}
 
 Data acquisition, reduction and control software is provided by the
 \htmladdnormallink{JAC}{http://www.jach.hawaii.edu/} ORAC system.  The
@@ -1820,7 +1820,7 @@ the spectral axis, and that is what is assumed this manual.  You can
 select a plane to view in the main display by giving its index or
 adjusting the slider.
 
-\myfig{sc16_gaia_cubetool}{[thb]}{height=0.4\textheight}{sc16_gaia_cubetool_fig}{The
+\starfig{sc16_gaia_cubetool}{[thb]}{height=0.4\textheight}{sc16_gaia_cubetool_fig}{The
 GAIA toolbox for displaying a cube.}{The
 \GAIA\ toolbox for displaying a cube.}
 
@@ -1894,7 +1894,7 @@ spectrum.  See
 Figure~\ref{sc16_gaia_spectrum_fig}.
 \newpage
 
-\myfig{sc16_gaia_spectrum}{[thb]}{height=0.7\textheight}{sc16_gaia_spectrum_fig}{GAIA
+\starfig{sc16_gaia_spectrum}{[thb]}{height=0.7\textheight}{sc16_gaia_spectrum_fig}{GAIA
 displays a collapsed cube with two spectra.}{\GAIA\
 displays a logarithmically scaled, collapsed cube, from which two
 spectra are shown.  The \latexhtml{lighter}{green} reference spectrum
@@ -1919,7 +1919,7 @@ value.  In order to see inside a surface, each surface should have an opacity
 that is less than 1.0.  An example using the same Orion dataset is in
 Figure~\ref{sc16_gaia_isosurface_fig}.
 
-\myfig{sc16_gaia_isosurface}{[thb]}{height=0.46\textheight}{sc16_gaia_isosurface_fig}{Isophotal
+\starfig{sc16_gaia_isosurface}{[thb]}{height=0.46\textheight}{sc16_gaia_isosurface_fig}{Isophotal
   contours}{Isophotal
 contours with various colours and opacities allows you to see different depths. }
 
@@ -1941,7 +1941,7 @@ two data limits as a single volume.  You assign a colour and opacity to each
 limit.  The controls and options are the same as for the iso-surfaces.
 See Figure~\ref{sc16_gaia_volume_fig}.
 
-\myfig{sc16_gaia_volume}{[thb]}{height=0.6\textheight}{sc16_gaia_volume_fig}{Volume
+\starfig{sc16_gaia_volume}{[thb]}{height=0.6\textheight}{sc16_gaia_volume_fig}{Volume
 rendering of the Orion dataset.}{Volume
 rendering of the Orion dataset.  The colour transfer function is a
 simple mapping between two selected colours between a supplied data
@@ -2048,12 +2048,12 @@ Figures~\ref{sc16_slicer3_cut_fig} and
 These display a projection of an IFU data cube and
 the user operating on it with the cut and probe tools.
 
-\myfig{sc16_slicer3_cut}{[thb]}{height=0.5\textheight}{sc16_slicer3_cut_fig}{The
+\starfig{sc16_slicer3_cut}{[thb]}{height=0.5\textheight}{sc16_slicer3_cut_fig}{The
 IDL Slice3 GUI showing a projection and a cut.}{The
 IDL Slicer3 GUI showing a projection of an NDF data cube, with a cut
 running in the $\lambda$ direction.}
 
-\myfig{sc16_slicer3_probe}{[thb]}{height=0.5\textheight}{sc16_slicer3_probe_fig}{The
+\starfig{sc16_slicer3_probe}{[thb]}{height=0.5\textheight}{sc16_slicer3_probe_fig}{The
 IDL Slice3 GUI showing a projection and the data probe.}{The
 IDL Slicer3 GUI showing a projection of and NDF data cube, along with
 the data probe.}
@@ -2078,7 +2078,7 @@ A list of the library routines, broken down by task, can be found at
 
 \subsubsection{ATV Image Viewer}
 
-\myfig{sc16_atv}{[thb]}{height=0.5\textheight}{sc16_atv_fig}{The ATV
+\starfig{sc16_atv}{[thb]}{height=0.5\textheight}{sc16_atv_fig}{The ATV
   viewr interface.}{The
 \ATV\ viewer interface.}
 
@@ -2163,7 +2163,7 @@ NDF output file: out
 \end{terminalv}
 \end{small}
 
-\myfig{sc16_squash}{[thb]}{height=0.5\textheight}{sc16_squash_fig}{The
+\starfig{sc16_squash}{[thb]}{height=0.5\textheight}{sc16_squash_fig}{The
 squash script.}{The
 \textbf{squash} script.}
 
@@ -2211,7 +2211,7 @@ shell script, this time specify more restrictive $\lambda$ limits,
 would create a two-dimensional passband image, collapsing a
 200~\AA-wide section of the spectral axis.
 
-\myfig{sc16_passband}{[thb]}{height=0.5\textheight}{sc16_passband_fig}{The
+\starfig{sc16_passband}{[thb]}{height=0.5\textheight}{sc16_passband_fig}{The
 passband script.}{The
 \textbf{passband} script.}
 
@@ -2298,7 +2298,7 @@ below.
 
 \subsubsection{How do I step through passband images?}
 
-\myfig{sc16_step}{[thb]}{height=0.5\textheight}{sc16_step_fig}{A
+\starfig{sc16_step}{[thb]}{height=0.5\textheight}{sc16_step_fig}{A
 series of 500\AA\ passband images of 3C~27 produced by the
 \textbf{step} shell script.}{A series of 500\AA\ passband images of 3C~27 produced by the
 \textbf{step} shell script.}
@@ -2396,7 +2396,7 @@ The \xref{\textbf{ripper}}{sun237}{ripper} shell script in the
 \DATACUBEref\ package was designed as a user-friendly interface over
 the \KAPPA\ \xref{\textbf{ndfcopy}}{sun95}{NDFCOPY} application.
 
-\myfig{sc16_ripper}{[thb]}{height=0.5\textheight}{sc16_ripper_fig}{The \textbf{ripper} script.}{The \textbf{ripper} script.}
+\starfig{sc16_ripper}{[thb]}{height=0.5\textheight}{sc16_ripper_fig}{The \textbf{ripper} script.}{The \textbf{ripper} script.}
 
 \begin{small}
 \begin{terminalv}
@@ -2450,7 +2450,7 @@ different parts of the cube, plotting the two most recent to the right
 of a white-light image of the cube.  See
 Figure~\ref{sc16_compare_fig}.
 
-\myfig{sc16_compare}{[thb]}{height=0.5\textheight}{sc16_compare_fig}{The \textbf{compare} script.}{The \textbf{compare} script.}
+\starfig{sc16_compare}{[thb]}{height=0.5\textheight}{sc16_compare_fig}{The \textbf{compare} script.}{The \textbf{compare} script.}
 
 For instance,
 
@@ -2536,7 +2536,7 @@ The \DATACUBE\ package provides two tasks to carry out this process,
 the \xref{\textbf{stacker}}{sun237}{stacker} (see
 Figure~\ref{sc16_stacker_fig}) and \xref{\textbf{multistack}}{sun237}{multistack} shell scripts.
 
-\myfig{sc16_stacker}{[thb]}{height=0.5\textheight}{sc16_stacker_fig}{The \textbf{stacker} script.}{The \textbf{stacker} script.}
+\starfig{sc16_stacker}{[thb]}{height=0.5\textheight}{sc16_stacker_fig}{The \textbf{stacker} script.}{The \textbf{stacker} script.}
 
 A run of the \textbf{stacker} script is shown below.
 
@@ -2688,7 +2688,7 @@ given for $x$ and $y$, the two values separated by a comma.
 \end{terminalv}
 \end{small}
 
-\myfig{sc16_gridspec}{[thb]}{height=0.5\textheight}{sc16_gridspec_fig}{The
+\starfig{sc16_gridspec}{[thb]}{height=0.5\textheight}{sc16_gridspec_fig}{The
 gridspec script.}{The
 \textbf{gridspec} script, operating on a subset of the 3C~27 observation
 consisting of the central core of the galaxy, averaging sixteen
@@ -2736,7 +2736,7 @@ velocity map of that line in the cube.  See
 Figure~\ref{sc16_velmap_fig}.  Below is an
 example.
 
-\myfig{sc16_velmap}{[thb]}{height=0.5\textheight}{sc16_velmap_fig}{The
+\starfig{sc16_velmap}{[thb]}{height=0.5\textheight}{sc16_velmap_fig}{The
   velmap script}{The
 \textbf{velmap} script, operating on a sub-cube of the 3C~27 observation
 consisting of the central core of the galaxy.}
@@ -2893,7 +2893,7 @@ plot of [O{\sc{III}}] map on the velocity map.  See
 Figure~\ref{sc16_velmoment_fig}.  Below is an
 example.
 
-\myfig{sc16_velmoment}{[thb]}{height=0.5\textheight}{sc16_velmoment_fig}{The
+\starfig{sc16_velmoment}{[thb]}{height=0.5\textheight}{sc16_velmoment_fig}{The
 velmoment script.}{The
 \textbf{velmoment} script, operating on a sub-cube of the 3C~27 observation
 consisting of the central core of the galaxy.}
@@ -2948,7 +2948,7 @@ Figure~\ref{sc16_peakmap_fig}.  Much like the \textbf{velmap} script the
 \textbf{peakmap} script allows you to manually refit any spectrum that
 you think may have been poorly fitted by the automatic process.
 
-\myfig{sc16_peakmap}{[thb]}{height=0.5\textheight}{sc16_peakmap_fig}{The \texttt{peakmap} script.}{The \texttt{peakmap} script.}
+\starfig{sc16_peakmap}{[thb]}{height=0.5\textheight}{sc16_peakmap_fig}{The \texttt{peakmap} script.}{The \texttt{peakmap} script.}
 
 It should be noted that generating a \xref{passband
 image}{sun237}{passband} of a line region, and a line-strength map
@@ -2990,7 +2990,7 @@ plane, additionally, the wavelength calibration of the two cubes you
 wish to mosaic may be entirely different, certainly the case for cubes
 coming from different instruments.
 
-\myfig{sc16_mosaic}{[thb]}{height=0.5\textheight}{sc16_mosaic_fig}{A
+\starfig{sc16_mosaic}{[thb]}{height=0.5\textheight}{sc16_mosaic_fig}{A
   white-light image of a mosaic.}{The
 white-light image of a mosaic of two data cubes created using \textbf{makemos};
 a dashed line has been drawn on to the image for clarity.}
@@ -3377,12 +3377,12 @@ compiled under both Solaris and Tru64 UNIX, and with the adoption of
 {{\footnotesize GNOME}\normalsize} as the standard SUN desktop will
 increasing come installed by default on platforms other than Linux.
 
-\myfig{sc16_xvelmap}{[thb]}{height=0.5\textheight}{sc16_xvelmap_fig}{An
+\starfig{sc16_xvelmap}{[thb]}{height=0.5\textheight}{sc16_xvelmap_fig}{An
 \textbf{XDialog} script based on \textbf{velmap}; here it asks for an
 input file.}{An \textbf{XDialog} script based on \textbf{velmap}; here it asks for an
 input file.}
 
-\myfig{sc16_xvelmap2}{[thb]}{height=0.5\textheight}{sc16_xvelmap2_fig}{The
+\starfig{sc16_xvelmap2}{[thb]}{height=0.5\textheight}{sc16_xvelmap2_fig}{The
   same \textbf{XDialog} script later in the run.}{The
 same \textbf{XDialog} script later in the run; here we are prompted for the
 central wavelength of the line.}
