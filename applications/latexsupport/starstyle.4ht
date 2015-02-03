@@ -340,19 +340,6 @@
   \end{figure}
 }
 
-\renewcommand{\myfigduo}[8]{
-  \begin{figure}
-    \begin{center}
-    \includegraphics[#4]{#1}
-    \typeout{#1 inserted on page \arabic{page}}
-    \hspace{#6}
-    \includegraphics[#4]{#2}
-    \typeout{#2 inserted on page \arabic{page}}
-    \end{center}
-    \caption[#7]{\label{#5} #8}
-  \end{figure}
-}
-
 
 % Fix bug in mathcal 
 %\renewcommand{\cal}[1]{\HCode{<mi class="ltx_font_mathcalligraphic" mathvariant="script">}#1\HCode{</mi>}}

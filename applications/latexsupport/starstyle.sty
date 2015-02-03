@@ -93,22 +93,6 @@
   \end{figure}
 }
 
-
-% Address twin (side-by-side) graphics in a similar fashion where the
-% second argument is the second graphic, and the remaining arguments
-% incremented by one slot save an extra argument #6 for the size of
-% the gap between the two graphics, thus #7 and #8 are the captions.
-\newcommand{\myfigduo}[8]{
-  \begin{figure}#3
-    \includegraphics[#4]{#1}
-    \typeout{#1 inserted on page \arabic{page}}
-    \hspace{#6}
-    \includegraphics[#4]{#2}
-    \typeout{#2 inserted on page \arabic{page}}
-    \caption[#7]{\label{#5}\small #8}
-  \end{figure}
-}
-
 % command for a text box that floats around and pops out from the text (framed)
 \mdfsetup{%
  backgroundcolor=white,%
