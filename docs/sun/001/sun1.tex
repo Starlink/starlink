@@ -25,7 +25,7 @@
 \stardocnumber      {1.24}
 \stardocauthors     {ed. S.\, E.\, Rankin}
 \stardocdate        {5 August 2003}
-\stardoctitle       {STARLINK\\Software Collection}
+\stardoctitle       {STARLINK\linebreak Software Collection}
 \stardocabstract  {%
 The Starlink Software Collection is a set of software which is managed
 and distributed by the Starlink Project.  Some of the software was
@@ -78,7 +78,8 @@ name.
 %  LaTeX2HTML symbol.
 \providecommand{\latextohtml}{\LaTeX2\texttt{HTML}}
 
-
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -253,8 +254,7 @@ with the data array, even other NDFs.
 \subsection{General Purpose}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{AIPS}{item_AIPS}]
 --- Image processing \hfill \emph{Not distributed}
@@ -269,17 +269,14 @@ with the data array, even other NDFs.
 \item [\htmlref{STARJAVA}{item_STARJAVA}]
 --- Starlink Java Infrastructure and Applications Set
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
+
+\subsubsection{AIPS \hfill\xref{SUN/207}{sun207}{} MUD/101}
 \label{item_AIPS}
-\item
-[AIPS]
-\index{AIPS} \hfill
-\xref{SUN/207}{sun207}{}.
-MUD/101
+\index{AIPS}
 
 \textbf{Calibrate and edit radio-interferometric data, construct images
 using Fourier synthesis techniques and display and analyse these
@@ -303,11 +300,11 @@ Sobel edge enhancement filter.
 intensity to denote integral brightness.
 \end{itemize}
 
-\label{item_IDL}
-\item
-[IDL]
-\index{IDL} \hfill MUD/29,30,31,161
 
+
+\subsubsection{IDL \hfill MUD/29,30,31,161}
+\label{item_IDL}
+\index{IDL}
 \textbf{Explore and manipulate data using a comprehensive set of tools.}
 
 The Interactive Data Language (IDL) is proprietary package, written by Dave
@@ -329,13 +326,11 @@ It provides:
 It can be used with minimal effort for many applications, or developed into
 more complex procedures as required.
 
-\label{item_IRAF}
-\item
-[IRAF]
-\index{IRAF} \hfill
-\xref{SUN/179}{sun179}{}.
-MUD/104,105,154,156,157
 
+
+\subsubsection{IRAF \hfill \xref{SUN/179}{sun179}{}.MUD/104,105,154,156,157}
+\index{IRAF}
+\label{item_IRAF}
 \textbf{Reduce and analyse data -- general purpose.}
 
 The Image Reduction and Analysis Facility (IRAF) was developed by the
@@ -398,10 +393,10 @@ A further capability, currently being investigated, would be to run
 Starlink applications from the IRAF command-line just as if they were
 native IRAF applications.
 
+
+\subsubsection{MIDAS}
+\index{MIDAS}
 \label{item_MIDAS}
-\item
-[MIDAS]
-\index{MIDAS} \mbox{}
 
 \textbf{Reduce and analyse optical astronomy data within a basic image
 processing environment.}
@@ -435,11 +430,11 @@ It also contains extensive packages in the areas of spectral reduction
 field photometry, object search and classification, fitting and modeling of
 data, astrometry, and statistical analysis.
 
+
+
+\subsubsection{STARJAVA \hfill \xref{SUN/251}{sun251}{}}
+\index{STARJAVA}
 \label{item_STARJAVA}
-\item
-[STARJAVA]
-\index{STARJAVA} \hfill
-\xref{SUN/251}{sun251}{}
 
 Starlink is developing a set of Java data reduction and analysis tools
 and Java data access classes. The new Java tools and classes are needed
@@ -543,10 +538,11 @@ It also appears in the DOCS package and can be seen with the command
 \texttt{showme sun243}.
 
 STARJAVA is not available under Tru64 Unix.
+
+
+\subsubsection{XANADU}
 \label{item_XANADU}
-\item
-[XANADU]
-\index{XANADU} \mbox{}
+\index{XANADU}
 
 \textbf{Analyse spectra, timing, and images of X-ray astronomical data
 obtained from multiple missions.}
@@ -560,9 +556,9 @@ Its principal components are:
 
 
 \begin{description}
-\label{item_XSPEC}
-\item [XSPEC]\index{XSPEC}\index{XANADU!XSPEC} \mbox{}
 
+\item[XSPEC]\index{XSPEC}\index{XANADU!XSPEC} \mbox{}
+\label{item_XSPEC}
 \textbf{Fit X-ray spectra -- command-driven, interactive.}
 
 It is detector-independent, so it can be used for any spectrometer.
@@ -570,9 +566,10 @@ It has been used to analyze data from HEAO-1 A2, Einstein Observatory, EXOSAT,
 Ginga, ROSAT, BBXRT, ASCA, CGRO, and IUE.
 It has also been used for simulations for XTE and AXAF.
 
-\label{item_XIMAGE}
-\item [XIMAGE]\index{XIMAGE}\index{XANADU!XIMAGE} \mbox{}
 
+\item[XIMAGE]\mbox{}
+\index{XIMAGE}\index{XANADU!XIMAGE}
+\label{item_XIMAGE}
 \textbf{Display and analysis of multi-mission X-ray images.}
 
 It is instrument-independent and analyses data from any X-ray imaging
@@ -613,9 +610,10 @@ It will read images from an unknown mission, but beware of trying to make a
 detailed analysis -- adding new missions usually requires either adding new
 files and/or adding new calls and relinking XIMAGE.
 
-\label{item_XRONOS}
-\item [XRONOS]\index{XRONOS}\index{XANADU!XRONOS} \mbox{}
 
+\item[XRONOS]\mbox{}
+\index{XRONOS}\index{XANADU!XRONOS}
+\label{item_XRONOS}
 \textbf{Analyse timing -- general purpose.}
 
 Although designed mostly for X-ray astronomy, it is basically detector
@@ -639,7 +637,7 @@ Command files are supported by the last two.
 Its applications can be run in command-driven fashion within the EXOSAT
 Database System.
 
-\end{description}
+
 
 XANADU also contains native versions of:
 
@@ -661,23 +659,21 @@ Of these, PGPLOT and FITSIO are also distributed independently by Starlink.
 \subsection{Pipeline systems}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{ORAC-DR}{item_ORAC-DR}]
 --- UKIRT and JCMT instrument data reduction pipeline
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
-\label{item_ORAC-DR}
-\item
-[ORAC-DR]
-\index{ORAC-DR} \hfill
+
+\subsubsection{ORAC-DR  \hfill
 \xref{SUN/230}{sun230}{},\xref{SUN/231}{sun231}{},\xref{SUN/232}{sun232}{},
-\xref{SUN/246}{sun246}{}
+\xref{SUN/246}{sun246}{}}
+\label{item_ORAC-DR}
+\index{ORAC-DR}
 
 \textbf{General purpose data reduction pipeline}
 
@@ -697,15 +693,13 @@ such as \htmlref{KAPPA}{item_KAPPA},
 It can also use \htmlref{GAIA}{item_GAIA} for image display.
 
 
-\end{description}
 
 \newpage
 
 \subsection{Image Processing \& Photometry}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{ATOOLS}{item_ATOOLS}]
 --- Coodinate frame manipulation
@@ -734,16 +728,16 @@ It can also use \htmlref{GAIA}{item_GAIA} for image display.
 \item [\htmlref{SX}{item_SX}]
 --- Data visualisation
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
+
+
+
+\subsubsection{ATOOLS}
+\index{ATOOLS}
 \label{item_ATOOLS}
-\item
-[ATOOLS]
-\index{ATOOLS} \hfill
-% \xref{SUN/NNN}{sunNNN}{}
 
 \textbf{Manipulation of coordinate frame descriptions.}
 
@@ -753,11 +747,11 @@ of coordinate frames, mappings, \emph{etc.}, in the form of
 package corresponds closely to one of the functions within the AST
 library. ATOOLS thus provides a high-level interface to the AST library.
 
+
+
+\subsubsection{CCDPACK \hfill \xref{SUN/139}{sun139}{}}
 \label{item_CCDPACK}
-\item
-[CCDPACK]
-\index{CCDPACK} \hfill
-\xref{SUN/139}{sun139}{}
+\index{CCDPACK}
 
 \textbf{Reduce CCD-like data, and mosaic frames together.}
 
@@ -822,12 +816,10 @@ and/or zero-point corrections.
 
 The CCDPACK package my be run from the IRAF CL.
 
+
+\subsubsection{DAOPHOT  \hfill \xref{SUN/42}{sun42}{} MUD/9,10}
 \label{item_DAOPHOT}
-\item
-[DAOPHOT]
-\index{DAOPHOT} \hfill
-\xref{SUN/42}{sun42}{}.
-MUD/9,10
+\index{DAOPHOT}
 
 \textbf{Stellar photometry of crowded fields.}
 
@@ -845,11 +837,11 @@ three additional routines allow results to be displayed on an image device.
 It uses image data in NDF format, which means it is interoperable with other
 Starlink packages.
 
+
+
+\subsubsection{ESP \hfill\xref{SUN/180}{sun180}{}}
 \label{item_ESP}
-\item
-[ESP]
-\index{ESP} \hfill
-\xref{SUN/180}{sun180}{}
+\index{ESP}
 
 \textbf{Photometry of galaxies and other extended objects.}
 
@@ -881,12 +873,10 @@ conjunction with packages like
 You can define areas to exclude or include in the analysis,
 using keyword descriptions in text files.
 
-\label{item_EXTRACTOR}
-\item
-[EXTRACTOR]
-\index{EXTRACTOR} \hfill
-\xref{SUN/226}{sun226}{}
 
+\subsubsection{Extractor \hfill \xref{SUN/226}{sun226}{}}
+\label{item_EXTRACTOR}
+\index{EXTRACTOR}
 \textbf{Locate and parameterize objects in a 2-d image.}
 
 EXTRACTOR is a program for automatically detecting objects on an
@@ -899,12 +889,11 @@ EXTRACTOR is a development of Emmanuel Bertin's SExtractor
 Environment.  This means that it uses the Starlink parameter system,
 accepts images in NDF format and uses the AST library for astrometry.
 
-\label{item_GAIA}
-\item
-[GAIA]
-\index{GAIA} \hfill
-\xref{SUN/214}{sun214}{}
 
+
+\subsubsection{GAIA \hfill \xref{SUN/214}{sun214}{}}
+\label{item_GAIA}
+\index{GAIA}
 \textbf{A traditional image display tool (like
 \htmlref{SAOIMAGE}{item_SAOIMAGE}), but which can integrate other
 programs.}
@@ -956,12 +945,10 @@ image data values displayed as a profile change).
 
 The GAIA package may be run from the IRAF CL.
 
-\label{item_KAPPA}
-\item
-[KAPPA]
-\index{KAPPA} \hfill
-\xref{SUN/95}{sun95}{}
 
+\subsubsection{KAPPA  \hfill \xref{SUN/95}{sun95}{}}
+\label{item_KAPPA}
+\index{KAPPA}
 \textbf{General-purpose functions, particularly suitable for image
 processing, data visualisation, and manipulating \htmlref{NDF}{item_NDF}
 components.}
@@ -1065,12 +1052,10 @@ X-windows and overlays are supported.
 
 The KAPPA package may also be run from the IRAF CL.
 
-\label{item_KAPRH}
-\item
-[KAPRH]
-\index{KAPRH} \hfill
-\xref{SUN/239}{sun239}{}
 
+\subsubsection{KAPRPH  \hfill \xref{SUN/239}{sun239}{}}
+\label{item_KAPRH}
+\index{KAPRH}
 \textbf{Retired KAPPA commands}
 
 KAPRH is a package containing commands retired from the
@@ -1086,12 +1071,13 @@ KAPRH contains the following retired KAPPA commands:
 
 
 as well as a help command: \texttt{KRHHELP}.
-\label{item_PHOTOM}
-\item
-[PHOTOM]
-\index{PHOTOM} \hfill
-\xref{SUN/45}{sun45}{}
 
+
+
+
+\subsubsection{PHOTOM \hfill \xref{SUN/45}{sun45}{}}
+\index{PHOTOM} 
+\label{item_PHOTOM}
 \textbf{Aperture photometry.}
 
 It has two basic operating modes:
@@ -1113,12 +1099,11 @@ This allows the detailed inspection of objects and their environments, and
 provides a highly interactive environment for placing, rotating, and
 resizing apertures.
 
-\label{item_PISA}
-\item
-[PISA]
-\index{PISA} \hfill
-\xref{SUN/109}{sun109}{}
 
+
+\subsubsection{PISA \hfill \xref{SUN/109}{sun109}{}}
+\index{PISA} 
+\label{item_PISA}
 \textbf{Locate and parameterize objects in a 2-d image.}
 
 The Position, Intensity, and Shape Analysis package (PISA) is applicable in
@@ -1135,13 +1120,10 @@ The parameters can be determined using thresholding techniques, or an analytical
 stellar profile can be used to fit the objects.
 In crowded regions it can deblend overlapping sources.
 
-\label{item_SAOIMAGE}
-\item
-[SAOIMAGE]
-\index{SAOIMAGE} \hfill
-\xref{SUN/166}{sun166}{}.
-MUD/140
 
+\subsubsection{SAOIMAGE \hfill \xref{SUN/166}{sun166}{}. MUD/140}
+\index{SAOIMAGE}
+\label{item_SAOIMAGE}
 \textbf{Display astronomical images.}
 
 You can manipulate images in a number of ways, see the changes applied, and
@@ -1182,12 +1164,10 @@ the region around it can be displayed and constantly updated.}
 \item{Hard copy.}
 \end{itemize}
 
-\label{item_STARMAN}
-\item
-[STARMAN]
-\index{STARMAN} \hfill
-\xref{SUN/141}{sun141}{}
 
+\subsubsection{STARMAN  \hfill\xref{SUN/141}{sun141}{}}
+\label{item_STARMAN}
+\index{STARMAN}
 \textbf{Stellar photometry.}
 
 \textit{STARMAN is not distributed on Starlink CDs and has not been
@@ -1245,14 +1225,15 @@ transforming, etc..
 \end{itemize}
 
 \newpage   %% paging
-\label{item_SX}
-\item
-[SX]
-\index{SX}\index{DX} \hfill
+
+
+\subsubsection{SX  \hfill
 \xref{SC/2}{sc2}{},
 \xref{SG/8}{sg8}{},
-\xref{SUN/203}{sun203}{}
+\xref{SUN/203}{sun203}{}}
 
+\label{item_SX}
+\index{SX}\index{DX}
 \textbf{Enhancements to DX.}
 
 DX (Data Explorer) is a scientific data visualisation and analysis package
@@ -1277,15 +1258,14 @@ They:
  common astronomical formats, to be imported into DX.
 \end{itemize}
 
-\end{description}
+
 
 \newpage
 
 \subsection{Spectroscopy}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{DATACUBE}{item_DATACUBE}]
 --- IFU datacube analysis
@@ -1298,16 +1278,15 @@ They:
 \item [\htmlref{NDPROGS}{item_NDPROGS}]
 --- $n$-dimensional data analysis
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
+
+
+\subsubsection{DATACUBE  \hfill \xref{SUN/237}{sun237}{}, \xref{SC/16}{sc16}{}}
+\index{DATACUBE}
 \label{item_DATACUBE}
-\item
-[DATACUBE]
-\index{DATACUBE} \hfill
-\xref{SUN/237}{sun237}{}, \xref{SC/16}{sc16}{}
 
 \textbf{IFS datacube manipulation and visualisation.}
 
@@ -1324,12 +1303,12 @@ tasks implemented in Fortran.
 IFU data analysis is discussed in detail in the cookbook
 \textit{The IFU Data Product Cookbook}\/(\xref{SC/16}{sc16}{}).
 \newpage   %% paging
-\label{item_DIPSO}
-\item
-[DIPSO]
-\index{DIPSO} \hfill
-\xref{SUN/50}{sun50}{}
 
+
+
+\subsubsection{DIPSO  \hfill\xref{SUN/50}{sun50}{}}
+\index{DIPSO}
+\label{item_DIPSO}
 \textbf{Analyse and visualise spectroscopic data.}
 
 A powerful and versatile package, specifically tailored to the requirements of
@@ -1368,12 +1347,11 @@ The following operations are available:
 \item Simple statistics.
 \end{itemize}
 
-\label{item_ECHOMOP}
-\item
-[ECHOMOP]
-\index{ECHOMOP} \hfill
-\xref{SUN/152}{sun152}{}
 
+
+\subsubsection{ECHOMOP  \hfill \xref{SUN/152}{sun152}{}}
+\label{item_ECHOMOP}
+\index{ECHOMOP}
 \textbf{Reduce \'{e}chelle spectra data frames.}
 
 Options range from full-scale automated reduction to step-by-step
@@ -1404,12 +1382,10 @@ It can:
 \item Output products.
 \end{itemize}
 
-\label{item_FIGARO} \item
-[FIGARO]
-\index{FIGARO} \hfill
-\xref{SUN/86}{sun86}{}.
-MUD/12,13,14
 
+\subsubsection{FIGARO  \hfill \xref{SUN/86}{sun86}{}.MUD/12,13,14}
+\index{FIGARO}
+\label{item_FIGARO}
 \textbf{Reduce and analyse astronomical data.}
 
 FIGARO is a general-purpose data reduction package.  It contains
@@ -1521,12 +1497,13 @@ The FIGARO programs may be run from the IRAF CL but the former SPECDRE
 and TWODSPEC programs are not yet available under the IRAF CL.
 
 \newpage   %% paging
-\label{item_NDPROGS}
-\item
-[NDPROGS]
-\index{NDPROGS} \hfill
-\xref{SUN/19}{sun19}{}
 
+
+
+
+\subsubsection{NDPROGS  \hfill\xref{SUN/19}{sun19}{}}
+\index{NDPROGS}
+\label{item_NDPROGS}
 \textbf{Manipulate and display images of up to six dimensions.}
 
 \textit{The NDPROGS package is no longer supported and will be withdrawn
@@ -1554,15 +1531,14 @@ data quality and error arrays, thus widening the scope and
 accessibility of the package.
 
 
-\end{description}
+
 
 \newpage
 
 \subsection{Time Series \& Polarimetry}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{PERIOD}{item_PERIOD}]
 --- Time series analysis
@@ -1573,18 +1549,13 @@ accessibility of the package.
 \item [\htmlref{TSP}{item_TSP}]
 --- Time series \& polarimetry
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
+\subsubsection{PERIOD  \hfill \xref{SUN/167}{sun167}{}. \xref{SSN/25}{ssn25}{}}
+\index{PERIOD}
 \label{item_PERIOD}
-\item
-[PERIOD]
-\index{PERIOD} \hfill
-\xref{SUN/167}{sun167}{}.
-\xref{SSN/25}{ssn25}{}
-
 \textbf{Search for periodicities in data.}
 
 It is menu-driven.
@@ -1637,12 +1608,12 @@ Significance estimates for periods derived by most methods are notoriously
 unreliable.
 In PERIOD, the Fisher randomisation method, one of the best, is employed.
 
-\label{item_POLMAP}
-\item
-[POLMAP]
-\index{POLMAP} \hfill
-\xref{SUN/204}{sun204}{}
 
+
+\subsubsection{POLMAP  \hfill
+\xref{SUN/204}{sun204}{}}
+\index{POLMAP}
+\label{item_POLMAP}
 \textbf{Analyse linear spectropolarimetry data.}
 
 A linear polarization spectrum is a set of Stokes vectors
@@ -1665,12 +1636,11 @@ other hand, does no data reduction, but was designed with data analysis
 in mind.  POLMAP can also display data that TSP cannot handle, and can
 read and write TSP polarization spectrum format files.
 
-\label{item_POLPACK}
-\item
-[POLPACK]
-\index{POLPACK} \hfill
-\xref{SUN/223}{sun223}{}
 
+
+\subsubsection{POLPACK  \hfill\xref{SUN/223}{sun223}{}}
+\index{POLPACK}
+\label{item_POLPACK}
 \textbf{Imaging Polarimetry data reduction}
 
 POLPACK is a package of applications for mapping the linear or circular
@@ -1704,12 +1674,13 @@ any difference in the sensitivity of the two channels of a dual-beam
 polarimeter. These corrections rely on redundancy in the supplied data,
 and require a specific set of analyser positions to be used.
 
-\label{item_TSP}
-\item
-[TSP]
-\index{TSP} \hfill
-\xref{SUN/66}{sun66}{}
 
+
+
+\subsubsection{TSP  \hfill
+\xref{SUN/66}{sun66}{}}
+\index{TSP}
+\label{item_TSP}
 \textbf{Reduce time-series and polarimetric data.}
 
 Time-series and polarimetry facilities are missing from most existing
@@ -1741,32 +1712,28 @@ photometry package at the AAT.
 \end{itemize}
 
 
-\end{description}
-
 \newpage
 
 \subsection{Database Management}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
+
 \begin{description}
 \item [\htmlref{CATPAC}{item_CATPAC}]
 --- Catalogue and table manipulation
 \item [\htmlref{CURSA}{item_CURSA}]
 --- Catalogue and table manipulation
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
+
+
+\subsubsection{CATPAC  \hfill\xref{SUN/120}{sun120}{}}
+\index{CATPAC}
 \label{item_CATPAC}
-\item
-[CATPAC]
-\index{CATPAC} \hfill
-\xref{SUN/120}{sun120}{}
-
 \textbf{Manipulate catalogues and tables.}
 
 \textit{CATPAC is no longer supported and is not distributed on Starlink
@@ -1785,12 +1752,11 @@ catalogues.  In particular, it can:
 CATPAC was designed as a replacement for SCA but is being superseded by
 \htmlref{CURSA}{item_CURSA} (see below).
 
-\label{item_CURSA}
-\item
-[CURSA]
-\index{CURSA} \hfill
-\xref{SUN/190}{sun190}{}
 
+
+\subsubsection{CURSA  \hfill\xref{SUN/190}{sun190}{}}
+\index{CURSA}
+\label{item_CURSA}
 \textbf{Manipulate catalogues and tables.}
 
 It can:
@@ -1814,40 +1780,33 @@ It can access catalogues held in the following formats:
 Catalogues in the STL format are simple Ascii text files.
 
 
-\end{description}
 
 \newpage
 
 \subsection{Specific Wavelengths}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{ASTERIX}{item_ASTERIX}]
 --- X-ray data processing
 \item [\htmlref{SPECX}{item_SPECX}]
 --- Millimetre-wave spectral reduction
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
+
+\subsubsection{ASTERIX  \hfill \xref{SUN/98}{sun98}{}. MUD/4}
+\index{ASTERIX}
 \label{item_ASTERIX}
-\item
-[ASTERIX]
-\index{ASTERIX} \hfill
-\xref{SUN/98}{sun98}{}.
-MUD/4
-
 \textbf{Analyse astronomical data in the X-ray waveband.}
 
-\itshape
-ASTERIX has been withdrawn from the Starlink Software
+\emph{ASTERIX has been withdrawn from the Starlink Software
 distribution and is no longer included on Starlink CDs (from Spring
 2000) due to the end of funding for the ROSAT satellite
-program.  It may remain as a legacy package at UK Starlink sites.
+program.  It may remain as a legacy package at UK Starlink sites.}
 
 Continued `best efforts' support may be provided by the Space Research
 group at the University of Birmingham for the recent development
@@ -1864,8 +1823,7 @@ Its data are stored in \htmlref{HDS}{item_HDS} files, and are therefore
 compatible with many other Starlink packages.  There are basically two
 different types:
 
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [Binned data] -- (\emph{e.g.} time series, spectra, images) are
 stored in \htmlref{NDF}{item_NDF} format.  Data errors (stored in the
@@ -1874,7 +1832,7 @@ form of variances) and quality are catered for.
 `events'.  Each event will have a set of properties, \emph{e.g.}
 X-position, Y-position, time, raw pulse height.
 \end{description}
-\end{description}
+
 
 The input data are first processed by an instrument interface.
 Event data are then processed and binned, and the binned data are processed.
@@ -1897,13 +1855,11 @@ The commands may be classified as follows:
 \item Graphical and textual display.
 \end{itemize}
 
-\label{item_SPECX}
-\item
-[SPECX]
-\index{SPECX} \hfill
-\xref{SUN/17}{sun17}{}.
-MUD/69,70
 
+
+\subsubsection{SPECX  \hfill \xref{SUN/17}{sun17}{}. MUD/69,70}
+\index{SPECX}
+\label{item_SPECX}
 \textbf{Reduce and display mm and sub-mm data.}
 
 Although it can process spectra from many different instruments, it is
@@ -1934,15 +1890,13 @@ JCMT; write out maps and spectra in the file formats of
 and write spectra and maps to Ascii files for input into other packages.
 
 
-\end{description}
 
 \newpage
 
 \subsection{Specific Instruments}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{CGS4DR}{item_CGS4DR}]
 --- CGS4 (UKIRT) data reduction
@@ -1967,17 +1921,16 @@ and write spectra and maps to Ascii files for input into other packages.
 \item [\htmlref{XRT}{item_XRT}]
 --- XRT data tools
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
+
+
+
+\subsubsection{CGS4DR  \hfill \xref{SUN/27}{sun27}{}}
+\index{CGS4DR}
 \label{item_CGS4DR}
-\item
-[CGS4DR]
-\index{CGS4DR} \hfill
-\xref{SUN/27}{sun27}{}
-
 \textbf{Reduce CGS4 data.}
 
 \textit{Cgs4dr is not available on Linux.}
@@ -2021,11 +1974,11 @@ and \textsc{sky} frames.
 \item Plot data in a variety of ways.
 \end{itemize}
 
+
+
+\subsubsection{FLUXES  \hfill \xref{SUN/213}{sun213}{}}
+\index{FLUXES}
 \label{item_FLUXES}
-\item
-[FLUXES]
-\index{FLUXES} \hfill
-\xref{SUN/213}{sun213}{}
 
 \textbf{Calculate accurate topocentric positions of the planets, and also
 integrated flux densities of five of them at a number of wavelengths, for the
@@ -2053,15 +2006,15 @@ A script, FLUXNOW, runs the program for the current time and date.
 This gives you current positions and flux levels for all the
 planets.
 
-\label{item_IRAS90}
-\item
-[IRAS90]
-\index{IRAS90} \hfill
+
+
+\subsubsection{IRAS90  \hfill
 \xref{SUN/82}{sun82}{},
 \xref{161}{sun161}{},
 \xref{163}{sun163}{},
-\xref{165}{sun165}{}
-
+\xref{165}{sun165}{}}
+\index{IRAS90}
+\label{item_IRAS90}
 \textbf{Process IRAS data.}
 
 \textit{IRAS90 is not distributed on Starlink CDs and is no longer supported
@@ -2088,12 +2041,11 @@ However, the most closely related software is
 This can process CRDD data to produce an image of a region of the sky, or
 search for and examine an object at a given position.
 
-\label{item_IRCAMDR}
-\item
-[IRCAMDR]
-\index{IRCAMDR} \hfill
-\xref{SUN/41}{sun41}{}
 
+
+\subsubsection{IRCAMDR  \hfill\xref{SUN/41}{sun41}{}}
+\index{IRCAMDR}
+\label{item_IRCAMDR}
 \textbf{Reduce, analyse, and display data from IRCAM3.  It can also
 handle any 2-d image in the standard Starlink NDF data format.}
 
@@ -2123,12 +2075,11 @@ pixel removal.
 \item Polarimetry.
 \end{itemize}
 
-\label{item_IRCAMPACK}
-\item
-[IRCAMPACK]
-\index{IRCAMPACK} \hfill
-\xref{SUN/177}{sun177}{}
 
+
+\subsubsection{IRCAMPACK  \hfill \xref{SUN/177}{sun177}{}}
+\index{IRCAMPACK}
+\label{item_IRCAMPACK}
 \textbf{Process IRCAM data.}
 
 IRCAM is an infrared camera on the United Kingdom Infra-red Telescope (UKIRT).
@@ -2146,16 +2097,16 @@ IRCAM data files.
 \item Provide a simple imaging polarimetry reduction procedure.
 \end{itemize}
 
-\label{item_IUEDR}
-\item
-[IUEDR]
-\index{IUEDR} \hfill
+
+
+\subsubsection{IUEDR  \hfill
 \xref{SG/3}{sg3}{},
 \xref{7}{sg7}{}.
 \xref{SUN/37}{sun37}{}.
 \xref{MUD/45}{mud45}{},
-46,47
-
+46,47}
+\index{IUEDR}
+\label{item_IUEDR}
 \textbf{Process data from the IUE \'{e}chelle spectrograph, starting
 with the raw image and finishing with the fully calibrated spectrum.}
 
@@ -2206,13 +2157,13 @@ by TRAK.
 
 \end{itemize}
 
-\label{item_JCMTDR}
-\item
-[JCMTDR]
-\index{JCMTDR} \hfill
-\xref{SC/1}{sc1}{}.
-\xref{SUN/132}{sun132}{}
 
+
+\subsubsection{JCMTDR  \hfill
+\xref{SC/1}{sc1}{}.
+\xref{SUN/132}{sun132}{}}
+\index{JCMTDR}
+\label{item_JCMTDR}
 \textbf{Reduce continuum mapping data obtained with the UKT14
 instrument on the JCMT.}
 
@@ -2245,12 +2196,11 @@ packages to process the data.  \htmlref{IRCAMPACK}{item_IRCAMPACK} can
 also access the main data arrays, although other parts of the data
 structure will be inaccessible.
 
-\label{item_REPACK}
-\item
-[REPACK]
-\index{REPACK} \hfill
-\xref{SUN/208}{sun208}{}
 
+
+\subsubsection{REPACK \hfill \xref{SUN/208}{sun208}{}}
+\index{REPACK}
+\label{item_REPACK}
 \textbf{Handle ROSAT Wide Field Camera survey data.}
 
 \textit{REPACK is not distributed on Starlink CDs though it may remain as
@@ -2282,14 +2232,12 @@ REPACK only operates on HDS format images.
 Event files, available just in FITS format, can be sorted to ASTERIX (HDS)
 datasets such as images and light-curves.
 
-\label{item_SURF}
-\item
-[SURF]
-\index{SURF} \hfill
-\xref{SC/10}{sc10}{},
-\xref{11}{sc11}{}.
-\xref{SUN/216}{sun216}{}
 
+
+\subsubsection{SURF  \hfill \xref{SC/10}{sc10}{}, \xref{11}{sc11}{}.%
+\xref{SUN/216}{sun216}{}}
+\index{SURF}
+\label{item_SURF}
 \textbf{SCUBA data re-reduction facility}
 
 SURF is a set of programs for reducing demodulated Submillimetre
@@ -2309,12 +2257,12 @@ The facilities provided by SURF include:
 \item array overlay.
 \end{itemize}
 
-\label{item_WFCPACK}
-\item
-[WFCPACK]
-\index{WFCPACK} \hfill
-\xref{SUN/62}{sun62}{}
 
+
+\subsubsection{WFCPACK \hfill
+\xref{SUN/62}{sun62}{}}
+\index{WFCPACK}
+\label{item_WFCPACK}
 \textbf{Produce ASTERIX (HDS) datasets from Wide Field Camera data collected
 during the pointed phase of the ROSAT mission.}
 
@@ -2334,12 +2282,12 @@ environment, and a number of ICL
 procedures are provided to perform some of the more commonly required
 operations, such as extracting background subtracted lightcurves.
 
-\label{item_XRT}
-\item
-[XRT]
-\index{XRT} \hfill
-% \xref{SUN/NNN}{sunNNN}{}
 
+
+\subsubsection{XRT}
+\index{XRT}
+% \xref{SUN/NNN}{sunNNN}{}
+\label{item_XRT}
 \textbf{ROSAT XRT data access.}
 
 The XRT is a package provides access to ROSAT XRT data stored in FITS files
@@ -2350,29 +2298,26 @@ analysis tools.
 At present the documentation and Help facilities are copies of the ASTERIX files,
 so that some of the tools used in examples may be no longer available.
 
-\end{description}
 
 \newpage
 
 \subsection{Format Conversion}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{CONVERT}{item_CONVERT}]
 --- Data format conversion
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
+
+\subsubsection{CONVERT  \hfill
+\xref{SUN/55}{sun55}{}}
+\index{CONVERT}
 \label{item_CONVERT}
-\item
-[CONVERT]
-\index{CONVERT} \hfill
-\xref{SUN/55}{sun55}{}
 
 \textbf{Convert the standard Starlink $n$-d data format \htmlref{NDF}{item_NDF}
 to and from other formats.}
@@ -2402,32 +2347,25 @@ The following formats can only be handled by the VMS version:
 \end{itemize}
 
 
-\end{description}
 
 \newpage
 
 \subsection{Mathematics \& Statistics}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{ASURV}{item_ASURV}]
 --- Astronomical survival statistics
 \item [\htmlref{MAPLE}{item_MAPLE}]
 --- Mathematical manipulation \hfill \emph{Not distributed}
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
+\subsubsection{ASURV \index{ASURV} \hfill \xref{SUN/13}{sun13}{}. MUD/5,6}
 \label{item_ASURV}
-\item
-[ASURV]
-\index{ASURV} \hfill
-\xref{SUN/13}{sun13}{}.
-MUD/5,6
 
 \textbf{Analyse statistically astronomical data with upper limits.}
 
@@ -2452,13 +2390,9 @@ regressions -- each based on different models of where upper limits
 truly lie -- so that you can judge the importance of the different
 assumptions.
 
+\subsubsection{MAPLE \index{MAPLE} \hfill%
+\xref{SUN/107}{sun107}{}. \xref{SGP/47}{sgp47}{}. MUD/52,137-139,144,145}
 \label{item_MAPLE}
-\item
-[MAPLE]
-\index{MAPLE} \hfill
-\xref{SUN/107}{sun107}{}.
-\xref{SGP/47}{sgp47}{}.
-MUD/52,137-139,144,145
 
 \textbf{Interactive symbolic algebra computation.}
 
@@ -2487,15 +2421,12 @@ More general information about computer algebra software is available in
 It is marketed by WATCOM, Waterloo, Ontario, CANADA.
 
 
-\end{description}
-
 \newpage
 
 \subsection{Graphics}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{MONGO}{item_MONGO}]
 --- Interactive data plotting \hfill \emph{Not distributed}
@@ -2503,17 +2434,12 @@ It is marketed by WATCOM, Waterloo, Ontario, CANADA.
 --- Interactive data plotting
 \item [\htmlref{SM}{item_SM}] --- Interactive data plotting
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
+\subsubsection{MONGO \index{MONGO} \hfill \xref{SUN/64}{sun64}{}. MUD/54}
 \label{item_MONGO}
-\item
-[MONGO]
-\index{MONGO} \hfill
-\xref{SUN/64}{sun64}{}.
-MUD/54
 
 \textbf{Plot data interactively.}
 
@@ -2522,11 +2448,8 @@ so on, and then create publishable quality output.
 In general, it has been superseded by
 \htmlref{PONGO}{item_PONGO}.
 
+\subsubsection{PONGO \index{PONGO} \hfill \xref{SUN/137}{sun137}{}}
 \label{item_PONGO}
-\item
-[PONGO]
-\index{PONGO} \hfill
-\xref{SUN/137}{sun137}{}
 
 \textbf{Plot data interactively.}
 
@@ -2567,10 +2490,8 @@ format tables to be read.
 
 The PONGO package may be run from the IRAF CL.
 
+\subsubsection{SM \index{SM} \hfill MUD/159,160}
 \label{item_SM}
-\item
-[SM]
-\index{SM} \hfill MUD/159,160
 
 \textbf{Draw graphs and plots interactively.}
 
@@ -2588,7 +2509,6 @@ a plot routine for reuse.
 \end{itemize}
 
 
-\end{description}
 
 \newpage
 
@@ -2597,8 +2517,7 @@ a plot routine for reuse.
 \subsection{Astronomical Utilities}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{ASTROM}{item_ASTROM}]
 --- Basic astrometry
@@ -2625,16 +2544,13 @@ a plot routine for reuse.
 \item [\htmlref{SKYCAL}{item_SKYCAL}]
 --- Interactive almanac and calculator
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
+
+\subsubsection{ASTROM \index{ASTROM} \hfill \xref{SUN/5}{sun5}{}}
 \label{item_ASTROM}
-\item
-[ASTROM]
-\index{ASTROM} \hfill
-\xref{SUN/5}{sun5}{}
 
 \textbf{Basic astrometry -- simple plate reduction.}
 
@@ -2645,10 +2561,8 @@ positions of reference and unknown stars;  it performs the various
 coordinate transformation and fitting operations required, displays a synopsis
 report on your terminal, and prepares a detailed report for printing.
 
+\subsubsection{AUTOASTROM \index{AUTOASTROM} \hfill \xref{SUN/251}{sun251}{}}
 \label{item_AUTOASTROM}
-[AUTOASTROM]
-\index{AUTOASTROM} \hfill
-\xref{SUN/251}{sun251}{}
 
 We describe the autoastrom package, which provides an interface
 to the ASTROM application. This creates a semi-automatic route
@@ -2690,11 +2604,9 @@ astrometric facilities of ASTROM, autoastrom will:
 \item alternatively or additionally make the astrometry available as a set of
       FITS-WCS header cards.
 \end{itemize}
+
+\subsubsection{CHART \index{CHART} \hfill \xref{SUN/32}{sun32}{}}
 \label{item_CHART}
-\item
-[CHART]
-\index{CHART} \hfill
-\xref{SUN/32}{sun32}{}
 
 \textbf{Plot star fields (positions, magnitudes, and other data) from
 the CSI79, SAO, AGK3, PERTH70, and Dixon non-stellar objects
@@ -2727,11 +2639,8 @@ then convert unknown \emph{x,y}\/ positions to RA, Dec or vice versa.
 \htmlref{ASTROM}{item_ASTROM} performs the actual astrometry, from
 within CHART if necessary.
 
+\subsubsection{COCO \index{COCO} \hfill \xref{SUN/56}{sun56}{}}
 \label{item_COCO}
-\item
-[COCO]
-\index{COCO} \hfill
-\xref{SUN/56}{sun56}{}
 
 \textbf{Convert star coordinates from one system to another.}
 
@@ -2764,11 +2673,8 @@ Discriminating astronomers and astrophysicists are best advised to give both
 B1950 and J2000 positions for sources mentioned in their publications; the
 conversion can be done using COCO.
 
+\subsubsection{ECHWIND \index{ECHWIND} \hfill \xref{SUN/53}{sun53}{}}
 \label{item_ECHWIND}
-\item
-[ECHWIND]
-\index{ECHWIND} \hfill
-\xref{SUN/53}{sun53}{}
 
 \textbf{Plan observations with either the Utrecht \'{e}chelle spectrograph
 (UES) or the UCL coud\'{e} \'{e}chelle spectrograph (UCLES).}
@@ -2792,10 +2698,8 @@ The position of the box can be marked on the screen, so as to ease preparation
 of observations where multiple overlapping wavelength ranges are required.
 You can also save the current detector position in a text file.
 
+\subsubsection{FINDCOORDS \index{FINDCOORDS} \hfill \xref{SUN/240}{sun240}{}}
 \label{item_FINDCOORDS}
-[FINDCOORDS]
-\index{FINDCOORDS} \hfill
-\xref{SUN/240}{sun240}{}
 
 \textbf{Finding the Coordinates of a Named Object.}
 
@@ -2829,11 +2733,8 @@ Internet connection.  Also, the name given must be recognised by SIMBAD,
 though the latter's dictionary of names is very extensive.
 
 
+\subsubsection{HDSTOOLS\index{HDSTOOLS} \hfill \xref{SUN/245}{sun245}{}}
 \label{item_HDSTOOLS}
-\item
-[HDSTOOLS]
-\index{HDSTOOLS} \hfill
-\xref{SUN/245}{sun245}{}
 
 \textbf{HDS file editing and manipulating tools.}
 
@@ -2861,11 +2762,9 @@ The following tools are available:
 \item HWRITE   - Write an HDS object into formatted or unformatted file.
 
 \end{itemize}
+
+\subsubsection{HDSTRACE \index{HDSTRACE} \hfill \xref{SUN/102}{sun102}{}}
 \label{item_HDSTRACE}
-\item
-[HDSTRACE]
-\index{HDSTRACE} \hfill
-\xref{SUN/102}{sun102}{}
 
 \textbf{List the contents of an HDS data structure.}
 
@@ -2875,11 +2774,8 @@ is one of the most popular features of the
 Starlink environment as it enables associated data items to be stored together
 in a single file, but in a structured fashion.
 
+\subsubsection{NAOS \index{NAOS} \hfill \xref{SUN/235}{sun235}{}}
 \label{item_NAOS}
-\item
-[NAOS]
-\index{NAOS} \hfill
-\xref{SUN/235}{sun235}{}
 
 \textbf{Finding Guide Stars for use with NAOMI on the WHT.}
 
@@ -2893,11 +2789,8 @@ and NAOS remotely searches a version of the USNO PMM astrometric catalogue to
 find suitable guide stars for these targets.  You would usually use NAOS at
 your home institution prior to travelling to La Palma to observe with NAOMI.
 
+\subsubsection{OBSERVE \index{OBSERVE} \hfill \xref{SUN/146}{sun146}{}}
 \label{item_OBSERVE}
-\item
-[OBSERVE]
-\index{OBSERVE} \hfill
-\xref{SUN/146}{sun146}{}
 
 \textbf{Show the observability of a star through the year from a given geographical
 location.}
@@ -2911,11 +2804,8 @@ It generates a plot that shows, for a complete year the:
 \item Distance of the Moon from the star.
 \end{itemize}
 
+\subsubsection{RV \index{RV} \hfill \xref{SUN/78}{sun78}{}}
 \label{item_RV}
-\item
-[RV]
-\index{RV} \hfill
-\xref{SUN/78}{sun78}{}
 
 \textbf{List the components, in a given direction, of the observer's velocity on a
 given date.}
@@ -2937,12 +2827,9 @@ The normal operating style is interactive: prompts appear on a terminal, data
 are entered specifying the report required, and a listing is sent to disk for
 later printing.
 
+\subsubsection{SKYCAL\index{SKYCAL} \hfill%
+\xref{SUN/187}{sun187}{}. MUD/158}
 \label{item_SKYCAL}
-\item
-[SKYCAL]
-\index{SKYCAL} \hfill
-\xref{SUN/187}{sun187}{}.
-MUD/158
 
 \textbf{Almanac and calculator -- interactive.}
 
@@ -2961,17 +2848,14 @@ calendars.
 Both programs have several preset Observatory locations to choose from.
 You can also specify your own.
 
-\newpage
 
-\end{description}
 
 \newpage
 
 \subsection{General Utilities}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{DOCFIND}{item_DOCFIND}]
 --- Starlink document search
@@ -2996,16 +2880,12 @@ You can also specify your own.
 \item [\htmlref{XDISPLAY}{item_XDISPLAY}]
 --- X window display setup
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
+\subsubsection{DOCFIND\index{DOCFIND} \hfill \xref{SUN/38}{sun38}{}}
 \label{item_DOCFIND}
-\item
-[DOCFIND]
-\index{DOCFIND} \hfill
-\xref{SUN/38}{sun38}{}
 
 \textbf{Search Starlink document and keyword indexes for a specified keyword.}
 
@@ -3019,23 +2899,17 @@ It has been superseded by the more powerful \texttt{showme} and
 \texttt{findme} commands provided by the \htmlref{HTX}{item_HTX}
 utility.
 
+\subsubsection{EMAIL \index{EMAIL} \hfill \xref{SUN/182}{sun182}{}}
 \label{item_EMAIL}
-\item
-[EMAIL]
-\index{EMAIL} \hfill
-\xref{SUN/182}{sun182}{}
 
 \textbf{Look up information needed to send e-mail.}
 
 The program searches the Starlink user database and the on-line World E-mail
 Guide for usernames and sitenames.
 
+\subsubsection{FORUM \index{FORUM} \hfill%
+\xref{SUN/205}{sun205}{}. \xref{SSN/33}{ssn33}{}}
 \label{item_FORUM}
-\item
-[FORUM]
-\index{FORUM} \hfill
-\xref{SUN/205}{sun205}{}.
-\xref{SSN/33}{ssn33}{}
 
 \textbf{Starlink's conferencing software.}
 
@@ -3052,10 +2926,9 @@ an index of all Conferences, even when they were located on separate systems
 at several Starlink sites, FORUM maintains an index only for each instance of
 FORUM.
 
+
+\subsubsection{JRE \index{JRE}}
 \label{item_JRE}
-\item
-[JRE]
-\index{JRE} \hfill
 % \xref{SUN/NNN}{sunNNN}{}
 
 \textbf{Java Runtime Environment.}
@@ -3066,21 +2939,15 @@ included to provide a standard stable base on which to base Starlink
 Java tools.
 
 
+\subsubsection{NEWS \index{NEWS} \hfill \xref{SUN/195}{sun195}{}}
 \label{item_NEWS}
-\item
-[NEWS]
-\index{NEWS} \hfill
-\xref{SUN/195}{sun195}{}
 
 \textbf{Starlink's News service.}
 
 Just type \texttt{news} and follow the instructions.
 
+\subsubsection{PERL \index{PERL} \hfill \xref{SUN/193}{sun193}{}}
 \label{item_PERL}
-\item
-[PERL]
-\index{PERL} \hfill
-\xref{SUN/193}{sun193}{}
 
 \textbf{A language for manipulating text, files, and processes easily.}
 
@@ -3091,11 +2958,8 @@ Perl that will help you understand and use it.  \emph{Learning Perl}\/
 and \emph{Programming perl}\/ are two of these books.  Chapter 39 of
 \emph{Unix Power Tools}\/ gives an introduction to Perl.
 
+\subsubsection{PERLMODS \index{PERLMODS} \hfill \xref{SUN/193}{sun193}{}}
 \label{item_PERLMODS}
-\item
-[PERLMODS]
-\index{PERLMODS} \hfill
-\xref{SUN/193}{sun193}{}
 
 \textbf{Additional CPAN modules for the Perl package}
 
@@ -3105,36 +2969,25 @@ Perl Archive Network) which are added to the standard
 needed by the \htmlref{STARPERL}{item_STARPERL} modules and by the
 \htmlref{SURF}{item_SURF} package.
 
+\subsubsection{PINE \index{PINE} \hfill%
+\xref{SUN/169}{sun169}{}, \xref{170}{sun170}{}. MUD/141}
 \label{item_PINE}
-\item
-[PINE]
-\index{PINE} \hfill
-\xref{SUN/169}{sun169}{},
-\xref{170}{sun170}{}.
-MUD/141
 
 \textbf{Read e-mail.}
 
 Just type \texttt{pine} to start it.
 A lot of on-line help is available.
 
+\subsubsection{STARADMIN \index{STARADMIN} \hfill \xref{SSN/27}{ssn27}{}}
 \label{item_STARADMIN}
-\item
-[STARADMIN]
-\index{STARADMIN} \hfill
-\xref{SSN/27}{ssn27}{}
 
 \textbf{Build and maintain a database of Starlink users.}
 
 Used by Starlink Site Managers to manage their user lists.
 
+\subsubsection{STARPERL \index{STARPERL} \index{NDFPERL}%
+\index{STARPERL!NDFPERL} \hfill \xref{SUN/222}{sun222}{}, \xref{SUN/228}{sun228}{}}
 \label{item_STARPERL}
-\item
-[STARPERL]
-\index{STARPERL} \hfill
-\index{NDFPERL}
-\index{STARPERL!NDFPERL} \hfill
-\xref{SUN/222}{sun222}{}, \xref{SUN/228}{sun228}{}
 
 \textbf{Additional modules for the Perl package}
 
@@ -3142,11 +2995,8 @@ STARPERL is a package of additional Starlink modules which are added to
 the standard \htmlref{PERL}{item_PERL} installation to provide
 facilities such as NDF access (NDFPERL).
 
+\subsubsection{XDISPLAY \index{XDISPLAY} \hfill \xref{SUN/129}{sun129}{}}
 \label{item_XDISPLAY}
-\item
-[XDISPLAY]
-\index{XDISPLAY} \hfill
-\xref{SUN/129}{sun129}{}
 
 \textbf{Get output from an X-client to display on the screen
 of your X-terminal.}
@@ -3154,15 +3004,13 @@ of your X-terminal.}
 In other words, it provides an easy way to use remote X windows.
 
 
-\end{description}
 
 \newpage
 
 \subsection{Document Preparation}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{A2PS}{item_A2PS}]
 --- Ascii to PostScript converter
@@ -3187,29 +3035,21 @@ In other words, it provides an easy way to use remote X windows.
 \item [\htmlref{TEX}{item_TEX}]
 --- Document preparation system
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
+\subsubsection{A2PS \index{A2PS} \hfill \xref{SUN/184}{sun184}{}}
 \label{item_A2PS}
-\item
-[A2PS]
-\index{A2PS} \hfill
-\xref{SUN/184}{sun184}{}
 
 \textbf{Convert Ascii format files to PostScript format for printing on
 PostScript printers.}
 
 This gives a nicer looking output.
 
+\subsubsection{EMACS \index{EMACS} \hfill%
+\xref{SUN/34}{sun34}{}, \xref{170}{sun170}{}. MUD/102}
 \label{item_EMACS}
-\item
-[EMACS]
-\index{EMACS} \hfill
-\xref{SUN/34}{sun34}{},
-\xref{170}{sun170}{}.
-MUD/102
 
 \textbf{A powerful text editor with many advanced customizable features.}
 
@@ -3218,11 +3058,8 @@ EDT\index{EDT}\index{EMACS!EDT} and
 EVE\index{EVE}\index{EMACS!EVE}.
 This makes it convenient for users familiar with these VAX/VMS editors.
 
+\subsubsection{GHOSTSCRIPT \index{HTX} \hfill \xref{SUN/197}{sun197}{}}
 \label{item_GHOSTSCRIPT}
-\item
-[GHOSTSCRIPT]
-\index{HTX} \hfill
-\xref{SUN/197}{sun197}{}
 
 \textbf{PostScript interpreter.}
 
@@ -3233,11 +3070,8 @@ This provides:
 appear as primitive operations in the PostScript language.
 \end{itemize}
 
+\subsubsection{HTX \index{HTX} \hfill \xref{SUN/188}{sun188}{}}
 \label{item_HTX}
-\item
-[HTX]
-\index{HTX} \hfill
-\xref{SUN/188}{sun188}{}
 
 \textbf{Hypertext cross-reference utilities.}
 
@@ -3256,11 +3090,8 @@ browser.
 \index{showme} \index{HTX!showme}
 \end{itemize}
 
+\subsubsection{ISPELL \index{ISPELL} \hfill \xref{SUN/189}{sun189}{}}
 \label{item_ISPELL}
-\item
-[ISPELL]
-\index{ISPELL} \hfill
-\xref{SUN/189}{sun189}{}
 
 \textbf{Check spelling.}
 
@@ -3269,12 +3100,11 @@ of the original file, and suggests possible corrections when it can figure
 them out.
 
 \newpage
+
+\subsubsection{JED\index{JED} \hfill%
+\xref{SUN/168}{sun168}{},%
+\xref{170}{sun170}{}}
 \label{item_JED}
-\item
-[JED]
-\index{JED} \hfill
-\xref{SUN/168}{sun168}{},
-\xref{170}{sun170}{}
 
 \textbf{Edit text.}
 
@@ -3283,12 +3113,8 @@ EDT\index{EDT}\index{JED!EDT},
 together with a few extra facilities such as cut-and-paste of rectangular
 regions, unlimited undo, horizontal scroll, and display of two or more windows.
 
+\subsubsection{LATEX2HTML\index{LATEX2HTML} \hfill \xref{SUN/201}{sun201}{}. MUD/152}
 \label{item_LATEX2HTML}
-\item
-[LATEX2HTML]
-\index{LATEX2HTML} \hfill
-\xref{SUN/201}{sun201}{}.
-MUD/152
 
 \textbf{Convert \LaTeX\ to HTML.}
 
@@ -3297,11 +3123,8 @@ MUD/152
 Processes \LaTeX\ source files into a set of Hypertext Markup Language
 (HTML) files, suitable for browsing with hypertext viewers and web browsers.
 
+\subsubsection{NUTPU\index{NUTPU} \hfill \xref{SUN/192}{sun192}{}}
 \label{item_NUTPU}
-\item
-[NUTPU]
-\index{NUTPU} \hfill
-\xref{SUN/192}{sun192}{}
 
 \textbf{Process text.}
 
@@ -3311,11 +3134,8 @@ routines.
 Its main value for Starlink users is its close emulation of
 EDT\index{EDT}\index{NUTPU!EDT}.
 
+\subsubsection{PSMERGE\index{PSMERGE} \hfill \xref{SUN/164}{sun164}{}}
 \label{item_PSMERGE}
-\item
-[PSMERGE]
-\index{PSMERGE} \hfill
-\xref{SUN/164}{sun164}{}
 
 \textbf{Merge PostScript files.}
 
@@ -3335,11 +3155,8 @@ This allows:
 \item Pictures to be scaled before insertion into a \TeX\ document.
 \end{itemize}
 
+\subsubsection{STAR2HTML \index{STAR2HTML} \hfill \xref{SUN/199}{sun199}{}.}
 \label{item_STAR2HTML}
-\item
-[STAR2HTML]
-\index{STAR2HTML} \hfill
-\xref{SUN/199}{sun199}{}.
 
 \textbf{Convert Starlink documents to Hypertext.}
 
@@ -3360,13 +3177,11 @@ Starlink documents use a series of additional macros to allow
 inter-document cross referencing within the Starlink document
 collection.
 
+\subsubsection{TEX \index{TEX}\index{LATEX}\index{TEX!LATEX} \hfill
+\xref{SUN/9}{sun9}{},\xref{12}{sun12}{},\xref{93}{sun93}{}.%
+MUD/48-51,72-3,79,80,126,132-3,152.%
+\xref{SSN/24}{ssn24}{}}
 \label{item_TEX}
-\item
-[TEX]
-\index{TEX}\index{LATEX}\index{TEX!LATEX} \hfill
-\xref{SUN/9}{sun9}{},\xref{12}{sun12}{},\xref{93}{sun93}{}.
-MUD/48-51,72-3,79,80,126,132-3,152.
-\xref{SSN/24}{ssn24}{}
 
 \textbf{Produce high quality text and diagrams by type-setting.}
 
@@ -3384,15 +3199,13 @@ is a cookbook showing how to generate common kinds of format using
 give advice on how to produce documents in a suitable style for Starlink.
 
 
-\end{description}
 
 \newpage
 
 \subsection{Programming Support}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{FTNCHEK}{item_FTNCHEK}]
 --- Fortran source code checker
@@ -3409,17 +3222,12 @@ give advice on how to produce documents in a suitable style for Starlink.
 \item [\htmlref{STARX}{item_STARX}]
 --- X library linker
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
+\subsubsection{FTNCHEK \index{FTNCHEK} \hfill \xref{SUN/172}{sun172}{}. MUD/153}
 \label{item_FTNCHEK}
-\item
-[FTNCHEK]
-\index{FTNCHEK} \hfill
-\xref{SUN/172}{sun172}{}.
-MUD/153
 
 \textbf{Detect errors in Fortran 77 source code, especially mistakes that tend to
 be missed by compilers and linkers.}
@@ -3435,18 +3243,13 @@ It also checks that arguments used before being set in a subprogram have
 defined values on entry, and correspondingly that arguments are set on exit
 when their values are used later in the calling program.
 
+\subsubsection{GCC \index{GCC}\hfill \mbox{}}
 \label{item_GCC}
-\item
-[GCC]
-\index{GCC}\hfill \mbox{}
 
 \textbf{The GNU C compiler.}
 
+\subsubsection{GENERIC \index{GENERIC} \hfill \xref{SUN/7}{sun7}{}}
 \label{item_GENERIC}
-\item
-[GENERIC]
-\index{GENERIC} \hfill
-\xref{SUN/7}{sun7}{}
 
 \textbf{Support generic subroutines.}
 
@@ -3455,11 +3258,8 @@ several different data types -- into one routine per data type, and
 concatenates these routines into a file.
 The file is then compiled by the Fortran compiler to produce an object module.
 
+\subsubsection{MESSGEN\index{MESSGEN} \hfill \xref{SUN/185}{sun185}{}}
 \label{item_MESSGEN}
-\item
-[MESSGEN]
-\index{MESSGEN} \hfill
-\xref{SUN/185}{sun185}{}
 
 \textbf{Associate error messages with status values returned by Starlink
 infrastructure routines.}
@@ -3468,12 +3268,8 @@ This works in conjunction with the Starlink Error Message Service
 (\htmlref{EMS}{item_EMS}).
 It enables more informative error messages to be sent to the user.
 
+\subsubsection{SPAG \index{SPAG} \hfill \xref{SUN/63}{sun63}{}. MUD/127}
 \label{item_SPAG}
-\item
-[SPAG]
-\index{SPAG} \hfill
-\xref{SUN/63}{sun63}{}.
-MUD/127
 
 \textbf{Improve the structure of the source code of a poorly organised
 Fortran program.}
@@ -3490,11 +3286,8 @@ while remaining logically equivalent to the original program.  The
 result improves the readability and maintainability of badly-written
 Fortran code.  It is marketed by Polyhedron Software.
 
+\subsubsection{SPT \index{SPT} \hfill \xref{SUN/111}{sun111}{}}
 \label{item_SPT}
-\item
-[SPT]
-\index{SPT} \hfill
-\xref{SUN/111}{sun111}{}
 
 \textbf{Software porting tools.}
 
@@ -3511,11 +3304,8 @@ Generally, these will point to Fortran \texttt{INCLUDE} files, thereby providing
 machine-independent way of writing \texttt{INCLUDE} statements.
 \end{itemize}
 
+\subsubsection{STARX \index{STARX} \hfill \xref{SSN/21}{ssn21}{}}
 \label{item_STARX}
-\item
-[STARX]
-\index{STARX} \hfill
-\xref{SSN/21}{ssn21}{}
 
 \textbf{Link X libraries.}
 
@@ -3527,8 +3317,6 @@ It allows the X library linking strategy to be changed easily, without
 changing any of the other Starlink environment components.
 
 
-\end{description}
-
 \newpage
 
 \section{Subroutine Libraries}
@@ -3536,8 +3324,7 @@ changing any of the other Starlink environment components.
 \subsection{Astronomical \& Mathematical}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{JPL}{item_JPL}]
 --- Solar system ephemeris
@@ -3550,16 +3337,12 @@ changing any of the other Starlink environment components.
 \item [\htmlref{SLALIB}{item_SLALIB}]
 --- Positional astronomy
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
 \label{item_JPL}
-\item
-[JPL]
-\index{JPL} \hfill
-\xref{SUN/87}{sun87}{}
+\subsubsection{JPL \index{JPL} \hfill \xref{SUN/87}{sun87}{}}
 
 \textbf{Provide extremely accurate position and velocity data for any of the nine
 planets, the Moon, and the solar system and Earth-Moon barycentres (also
@@ -3582,12 +3365,8 @@ Existing applications will need to be changed before they can be linked
 against the new library, and existing executable programs are not compatible
 with the new format of ephemeris file.
 
+\subsubsection{MEMSYS\index{MEMSYS} \hfill \xref{SUN/117}{sun117}{}. MUD/53}
 \label{item_MEMSYS}
-\item
-[MEMSYS]
-\index{MEMSYS} \hfill
-\xref{SUN/117}{sun117}{}.
-MUD/53
 
 \textbf{Quantified maximum entropy image reconstruction.}
 
@@ -3667,13 +3446,10 @@ In this case, the data is linear and the matrix $R_{kj}$ embodies the PSF.
 Before using it you must sign a form (available from your Site Manager)
 accepting certain conditions.
 
+
+\subsubsection{NAG \index{NAG} \hfill \xref{SUN/28}{sun28}{},%
+\xref{29}{sun29}{}. MUD/55,56,57,58,128}
 \label{item_NAG}
-\item
-[NAG]
-\index{NAG} \hfill
-\xref{SUN/28}{sun28}{},
-\xref{29}{sun29}{}.
-MUD/55,56,57,58,128
 
 \textbf{Mathematical subroutine library.}
 
@@ -3738,11 +3514,8 @@ The standard library organises its routines into the following chapters:
 \end{itemize}
 }
 
+\subsubsection{PDA \index{PDA} \hfill \xref{SUN/194}{sun194}{}}
 \label{item_PDA}
-\item
-[PDA]
-\index{PDA} \hfill
-\xref{SUN/194}{sun194}{}
 
 \textbf{Mathematical subroutine library.}
 
@@ -3754,11 +3527,8 @@ The interface is mostly double precision, although the Fourier transform
 part provides for both double and single precision and the routines from
 DIERCKX exist only for single precision.
 
+\subsubsection{SLALIB\index{SLALIB} \hfill \xref{SUN/67}{sun67}{}}
 \label{item_SLALIB}
-\item
-[SLALIB]
-\index{SLALIB} \hfill
-\xref{SUN/67}{sun67}{}
 
 \textbf{Positional astronomy library.}
 
@@ -3819,15 +3589,12 @@ stops, I/O, etc.
 \end{itemize}
 
 
-\end{description}
-
 \newpage
 
 \subsection{Data Access \& Management}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{ARD}{item_ARD}]
 --- Region description language
@@ -3868,18 +3635,13 @@ stops, I/O, etc.
 \item [\htmlref{TRANSFORM}{item_TRANSFORM}]
 --- Coordinate transformation
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
 \newpage
-\begin{description}
 
+\subsubsection{ARD\index{ARD} \hfill \xref{SUN/183}{sun183}{}}
 \label{item_ARD}
-\item
-[ARD]
-\index{ARD} \hfill
-\xref{SUN/183}{sun183}{}
-
 \textbf{Describe regions of a data array.}
 
 The Ascii Region Definition system provides a textual language for
@@ -3892,11 +3654,9 @@ These can be combined using Boolean operators (AND, OR, NOT, etc) to create
 more complex shapes.
 Data arrays can be multi-dimensional.
 
+
+\subsubsection{ARY \index{ARY} \hfill\xref{SUN/11}{sun11}{}}
 \label{item_ARY}
-\item
-[ARY]
-\index{ARY} \hfill
-\xref{SUN/11}{sun11}{}
 
 \textbf{Access Starlink ARRAY data structures built using
 \htmlref{HDS}{item_HDS}.}
@@ -3927,11 +3687,10 @@ It can:
 \item Use message system routines.
 \end{itemize}
 
+
+\subsubsection{AST \index{AST} \hfill%
+ \xref{SUN/210}{sun210}{},\xref{SUN/211}{sun211}{}}
 \label{item_AST}
-\item
-[AST]
-\index{AST} \hfill
-\xref{SUN/210}{sun210}{},\xref{SUN/211}{sun211}{}
 
 \textbf{A library for handling World Coordinate Systems in astronomy}
 
@@ -3944,11 +3703,9 @@ writing astronomical applications which need to manipulate coordinate system
 data, especially celestial coordinate systems.  AST is portable and
 environment-independent.
 
+
+\subsubsection{CAT\index{CAT} \hfill \xref{SUN/181}{sun181}{}}
 \label{item_CAT}
-\item
-[CAT]
-\index{CAT} \hfill
-\xref{SUN/181}{sun181}{}
 
 \textbf{Create, read, and write astronomical catalogues and similar tabular
 datasets.}
@@ -3961,12 +3718,10 @@ It supports the following formats:
 \item SCAR/ADC (on VAX/VMS only).
 \end{itemize}
 
+
+\subsubsection{CFITSIO \index{CFITSIO} \hfill%
+ \xref{SUN/227}{sun227}{}. MUD/166,167}
 \label{item_CFITSIO}
-\item
-[CFITSIO]
-\index{CFITSIO} \hfill
-\xref{SUN/227}{sun227}{}.
-MUD/166,167
 
 \textbf{Access FITS format files on disk.}
 
@@ -3980,11 +3735,9 @@ at the Goddard Space Flight Center, USA.  It is fully compliant with
 the FITS Year 2000 directive.   This is the recommended library for access
 to FITS files.
 
+
+\subsubsection{FIO \index{FIO} \hfill \xref{SUN/143}{sun143}{}}
 \label{item_FIO}
-\item
-[FIO]
-\index{FIO} \hfill
-\xref{SUN/143}{sun143}{}
 
 \textbf{Access sequential and direct-access data files in a machine-independent
 way.}
@@ -3995,12 +3748,9 @@ RIO\index{FIO!RIO}\index{RIO} routines, which can be used independently of
 the Starlink software environment, plus routines to interface to the Starlink
 parameter system.
 
+
+\subsubsection{FITSIO \index{FITSIO} \hfill \xref{SUN/136}{sun136}{}. MUD/16,162}
 \label{item_FITSIO}
-\item
-[FITSIO]
-\index{FITSIO} \hfill
-\xref{SUN/136}{sun136}{}.
-MUD/16,162
 
 \textbf{Access FITS format files on disk.}
 
@@ -4010,11 +3760,9 @@ being developed and is not compliant with the FITS Year 2000 directive.
 Users requiring a library for FITS access are recommended to use the
 \htmlref{CFITSIO}{item_CFITSIO} library.
 
+
+\subsubsection{GRP \index{GRP} \hfill \xref{SUN/150}{sun150}{}}
 \label{item_GRP}
-\item
-[GRP]
-\index{GRP} \hfill
-\xref{SUN/150}{sun150}{}
 
 \textbf{Handle groups of objects which can be described by character strings.}
 
@@ -4025,11 +3773,9 @@ strings between applications by means of a text file.
 It can also create groups in which each element is a modified version of an
 element in another group.
 
+
+\subsubsection{GSD \index{GSD} \hfill\xref{SUN/229}{sun229}{}}
 \label{item_GSD}
-\item
-[GSD]
-\index{GSD} \hfill
-\xref{SUN/229}{sun229}{}
 
 \textbf{Global Section Datafile (GSD) access library.}
 
@@ -4040,15 +3786,14 @@ itself is presented in addition to descriptions of the library routines.
 Its main use is in \htmlref{SPECX}{item_SPECX} to read the GSD files
 created by the heterodyne instruments used on the JCMT.
 
+
+\subsubsection{HDS \index{HDS} \hfill%
+\xref{SUN/31}{sun31}{},%
+\xref{39}{sun39}{},%
+\xref{92}{sun92}{},%
+\xref{102}{sun102}{}.%
+\xref{SGP/38}{sgp38}{}}
 \label{item_HDS}
-\item
-[HDS]
-\index{HDS} \hfill
-\xref{SUN/31}{sun31}{},
-\xref{39}{sun39}{},
-\xref{92}{sun92}{},
-\xref{102}{sun102}{}.
-\xref{SGP/38}{sgp38}{}
 
 \textbf{Store and retrieve data flexibly.}
 
@@ -4082,11 +3827,9 @@ for handling arrays, and
 for handling objects in the standard Starlink data format.
 
 \newpage
+
+\subsubsection{IMG \index{IMG} \hfill \xref{SUN/160}{sun160}{}}
 \label{item_IMG}
-\item
-[IMG]
-\index{IMG} \hfill
-\xref{SUN/160}{sun160}{}
 
 \textbf{Easy access to astronomical image data and associated headers.}
 
@@ -4099,11 +3842,9 @@ Because of Starlink's automatic format conversion facilities, this library
 also gives programmers straightforward access to a wide range of astronomical
 data formats, including FITS and IRAF files as well as Starlink NDF data.
 
+
+\subsubsection{MAG \index{MAG} \hfill \xref{SUN/171}{sun171}{}}
 \label{item_MAG}
-\item
-[MAG]
-\index{MAG} \hfill
-\xref{SUN/171}{sun171}{}
 
 \textbf{Handle magnetic tapes.}
 
@@ -4135,11 +3876,9 @@ It can:
 Not all operations are available on all types of tape deck.
 Also, the status values returned by different machines can differ.
 
+
+\subsubsection{NBS \index{NBS} \hfill \xref{SUN/77}{sun77}{}}
 \label{item_NBS}
-\item
-[NBS]
-\index{NBS} \hfill
-\xref{SUN/77}{sun77}{}
 
 \textbf{Share data between processes.}
 
@@ -4160,12 +3899,10 @@ of the noticeboard routines.
 Noticeboards are self-defining -- a process can find and access data from a
 noticeboard without knowing anything about what it contains.
 
+
+\subsubsection{NDF \index{NDF} \hfill \xref{SUN/33}{sun33}{}.%
+\xref{SSN/20}{ssn20}{}}
 \label{item_NDF}
-\item
-[NDF]
-\index{NDF} \hfill
-\xref{SUN/33}{sun33}{}.
-\xref{SSN/20}{ssn20}{}
 
 \textbf{Access data stored in NDF format.}
 
@@ -4212,11 +3949,9 @@ Those who wish to know more of the background to this philosophy can find a
 detailed discussion in
 \xref{SGP/38}{sgp38}{}.
 
+
+\subsubsection{NDG\index{NDG} \hfill \xref{SUN/2}{sun2}{}}
 \label{item_NDG}
-\item
-[NDG]
-\index{NDG} \hfill
-\xref{SUN/2}{sun2}{}
 
 \textbf{Routines for Accessing Groups of NDFs.}
 
@@ -4227,11 +3962,9 @@ an HDS container file, and can also process foreign data formats using the
 \htmlref{CONVERT}{item_CONVERT} utilities that the \htmlref{NDF}{item_NDF}
 library uses (as described in \xref{SSN/20}{ssn20}{}).
 
+
+\subsubsection{PAR \index{PAR} \hfill \xref{SUN/114}{sun114}{}}
 \label{item_PAR}
-\item
-[PAR]
-\index{PAR} \hfill
-\xref{SUN/114}{sun114}{}
 
 \textbf{Parameter system.}
 
@@ -4248,11 +3981,9 @@ Results may be put into parameters to be passed to other applications.
 Other facilities include setting a prompt string, and suggested defaults.
 
 \newpage
+
+\subsubsection{PRIMDAT\index{PRIMDAT} \hfill \xref{SUN/39}{sun39}{}}
 \label{item_PRIMDAT}
-\item
-[PRIMDAT]
-\index{PRIMDAT} \hfill
-\xref{SUN/39}{sun39}{}
 
 \textbf{Process primitive data.}
 
@@ -4290,11 +4021,9 @@ recognised on input and are not explicitly generated on output).
 
 \end{itemize}
 
+
+\subsubsection{REF \index{REF} \hfill \xref{SUN/31}{sun31}{}}
 \label{item_REF}
-\item
-[REF]
-\index{REF} \hfill
-\xref{SUN/31}{sun31}{}
 
 \textbf{Handle references to HDS objects.}
 
@@ -4319,11 +4048,8 @@ Its two main uses are:
 \item To avoid duplicating a large dataset.
 \end{itemize}
 
+\subsubsection{TRANSFORM \index{TRANSFORM} \hfill \xref{SUN/61}{sun61}{}}
 \label{item_TRANSFORM}
-\item
-[TRANSFORM]
-\index{TRANSFORM} \hfill
-\xref{SUN/61}{sun61}{}
 
 \textbf{Relate different coordinate systems.}
 
@@ -4359,15 +4085,12 @@ HDS datasets, and also when designing `extensions' to the standard Starlink
 data structure.
 
 
-\end{description}
-
 \newpage
 
 \subsection{Graphics}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{AGI}{item_AGI}]
 --- Applications graphics interface
@@ -4392,16 +4115,12 @@ data structure.
 \item [\htmlref{SNX}{item_SNX}]
 --- Starlink extensions to NCAR
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
+\subsubsection{AGI \index{AGI} \hfill \xref{SUN/48}{sun48}{}}
 \label{item_AGI}
-\item
-[AGI]
-\index{AGI} \hfill
-\xref{SUN/48}{sun48}{}
 
 \textbf{Graphics database.}
 
@@ -4416,14 +4135,10 @@ up the screen into areas for subsequent plotting using more complicated
 patterns than just a regular grid; the areas can be different sizes or
 overlap.
 
+
+\subsubsection{GKS \index{GKS} \hfill \xref{SUN/83}{sun83}{},%
+\xref{113}{sun113}{}. MUD/27. \xref{SSN/39}{ssn39}{}}
 \label{item_GKS}
-\item
-[GKS]
-\index{GKS} \hfill
-\xref{SUN/83}{sun83}{},
-\xref{113}{sun113}{}.
-MUD/27.
-\xref{SSN/39}{ssn39}{}
 
 \textbf{Low-level graphics library.}
 
@@ -4461,11 +4176,9 @@ conditions, and should be highly reliable.
 The advantages of GKS also apply to graphics software which use it, such as
 \htmlref{SGS}{item_SGS}.
 
+
+\subsubsection{GNS \index{GNS} \hfill \xref{SUN/57}{sun57}{}}
 \label{item_GNS}
-\item
-[GNS]
-\index{GNS} \hfill
-\xref{SUN/57}{sun57}{}
 
 \textbf{Support names for GKS graphics devices.}
 
@@ -4500,11 +4213,9 @@ It is used internally in
 \htmlref{AGI}{item_AGI},
 but this isn't normally apparent to the programmer.
 
+
+\subsubsection{GRAPHPAR \index{GRAPHPAR} \hfill \xref{SUN/113}{sun113}{}}
 \label{item_GRAPHPAR}
-\item
-[GRAPHPAR]
-\index{GRAPHPAR} \hfill
-\xref{SUN/113}{sun113}{}
 
 \textbf{Access the graphics libraries
 \htmlref{GKS}{item_GKS},
@@ -4514,11 +4225,9 @@ from Starlink programs.}
 
 These are the components of GKS, SGS and Starlink-Pgplot that provide the
 interface to the respective libraries from ADAM programs.
+
+\subsubsection{GWM \index{GWM} \hfill \xref{SUN/130}{sun130}{}}
 \label{item_GWM}
-\item
-[GWM]
-\index{GWM} \hfill
-\xref{SUN/130}{sun130}{}
 
 \textbf{Create graphics windows on an X display that do not disappear when a
 program terminates.}
@@ -4553,12 +4262,9 @@ server, and the graphics window manager does not have to run on the same
 machine as the application.
 
 \newpage
+
+\subsubsection{IDI \index{IDI} \hfill \xref{SUN/65}{sun65}{}. MUD/28}
 \label{item_IDI}
-\item
-[IDI]
-\index{IDI} \hfill
-\xref{SUN/65}{sun65}{}.
-MUD/28
 
 \textbf{An international standard for displaying astronomical data on an
 image display.}
@@ -4592,12 +4298,9 @@ A better solution is to use
 \htmlref{AGI}{item_AGI}
 to mediate between them.
 
+\subsubsection{NCAR \index{NCAR}\index{NCAR!SNX}\index{SNX} \hfill%
+\xref{SUN/88}{sun88}{}. MUD/59}
 \label{item_NCAR}
-\item
-[NCAR]
-\index{NCAR}\index{NCAR!SNX}\index{SNX} \hfill
-\xref{SUN/88}{sun88}{}.
-MUD/59
 
 \textbf{High-level graphics utilities.}
 
@@ -4628,13 +4331,10 @@ The plots provided are:
 \item 2-d velocity fields.
 \end{itemize}
 
+
+\subsubsection{Native-PGPLOT \index{PGPLOT!Native} \hfill %
+\xref{SUN/15}{sun15}{}, \xref{113}{sun113}{}. MUD/61}
 \label{item_NATIVE-PGPLOT}
-\item
-[Native-PGPLOT]
-\index{PGPLOT!Native} \hfill
-\xref{SUN/15}{sun15}{},
-\xref{113}{sun113}{}.
-MUD/61
 
 \textbf{A high-level graphics package for plotting \emph{ x,y}\/ plots,
 functions, histograms, bar charts, contour maps, and grey-scale
@@ -4653,14 +4353,11 @@ on the low-level graphics package known as GRPCKG.
 applications can be moved from one version to the other simply by
 re-linking using the appropriate libraries.
 
-\label{item_STARLINK-PGPLOT}
-\item
-[Starlink-PGPLOT]
-\index{PGPLOT!Starlink} \hfill
-\xref{SUN/15}{sun15}{},
-\xref{113}{sun113}{}.
-MUD/61
 
+\subsubsection{Starlink-PGPLOT\index{PGPLOT!Starlink} \hfill \xref{SUN/15}{sun15}{},%
+\xref{113}{sun113}{}.MUD/61}
+
+\label{item_STARLINK-PGPLOT}
 \textbf{A high-level graphics package for plotting \emph{x,y}\/ plots,
 functions, histograms, bar charts, contour maps, and grey-scale
 images.}
@@ -4678,12 +4375,10 @@ libraries.
 
 This is the version supported by Starlink for its applications.
 
+
+\subsubsection{SGS\index{SGS} \hfill\xref{SUN/85}{sun85}{},%
+\xref{113}{sun113}{}}
 \label{item_SGS}
-\item
-[SGS]
-\index{SGS} \hfill
-\xref{SUN/85}{sun85}{},
-\xref{113}{sun113}{}
 
 \textbf{A friendly interface to a subset of GKS.}
 
@@ -4706,12 +4401,9 @@ It can:
 \item Do GKS inquires.
 \end{itemize}
 
-\label{item_SNX}
-\item
-[SNX]
-\index{SNX} \hfill
-\xref{SUN/90}{sun90}{}
 
+\subsubsection{SNX \index{SNX} \hfill \xref{SUN/90}{sun90}{}}
+\label{item_SNX}
 \textbf{Starlink extensions to
 \htmlref{NCAR}{item_NCAR}.}
 
@@ -4743,15 +4435,14 @@ plots can be managed.
 \end{itemize}
 
 
-\end{description}
+
 
 \newpage
 
 \subsection{Other}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{CHR}{item_CHR}]
 --- Character handling
@@ -4772,17 +4463,13 @@ plots can be managed.
 \item [\htmlref{PSX}{item_PSX}]
 --- POSIX interface
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
 
+
+\subsubsection{CHR \index{CHR} \hfill \xref{SUN/40}{sun40}{}}
 \label{item_CHR}
-\item
-[CHR]
-\index{CHR} \hfill
-\xref{SUN/40}{sun40}{}
-
 \textbf{Augment the limited character handling facilities of Fortran 77.}
 
 Converts Fortran data types into text strings and the reverse,
@@ -4801,12 +4488,9 @@ It can:
 \item Search for strings.
 \end{itemize}
 
-\label{item_CNF}
-\item
-[CNF]
-\index{CNF} \hfill
-\xref{SUN/209}{sun209}{}
 
+\subsubsection{CNF \index{CNF} \hfill\xref{SUN/209}{sun209}{}}
+\label{item_CNF}
 \textbf{Mix program segments written in Fortran and C in a portable manner.}
 
 It provides:
@@ -4816,12 +4500,9 @@ between subprograms.
 \item C functions to handle Fortran character strings and logical values.
 \end{itemize}
 
-\label{item_EMS}
-\item
-[EMS]
-\index{EMS} \hfill
-\xref{SSN/4}{ssn4}{}
 
+\subsubsection{EMS \index{EMS} \hfill \xref{SSN/4}{ssn4}{}}
+\label{item_EMS}
 \textbf{Construct and store error messages for future delivery to a user via ERR.}
 
 ERR is the Starlink Error Reporting System, which is part of
@@ -4831,12 +4512,9 @@ any software environment (e.g.\ for message output or access to the
 parameter and data systems).
 It conforms to the error reporting conventions of MERS.\index{MERS!EMS}
 
-\label{item_HLP}
-\item
-[HLP]
-\index{HLP}\index{HELP|see{HLP}} \hfill
-\xref{SUN/124}{sun124}{}
 
+\subsubsection{HLP \index{HLP}\index{HELP|see{HLP}} \hfill \xref{SUN/124}{sun124}{}}
+\label{item_HLP}
 \textbf{Retrieve named items from a hierarchical library of text.}
 
 Functionally, it is very similar to the VAX/VMS Help system.
@@ -4848,12 +4526,9 @@ together at run-time and appear to the user as a single tree.
 \end{itemize}
 It is free-standing and does not call any other Starlink packages.
 
-\label{item_KAPLIBS}
-\item
-[KAPLIBS]
-\index{KAPLIBS} \hfill
-\xref{SUN/238}{sun238}{}
 
+\subsubsection{KAPLIBS \index{KAPLIBS} \hfill \xref{SUN/238}{sun238}{}}
+\label{item_KAPLIBS}
 \textbf{General purpose KAPPA libraries}
 
 KAPLIBS is a new package containing several Fortran subroutine
@@ -4864,12 +4539,9 @@ anyone developing their own KAPPA-like applications.
 brief documentation, but users of KAPLIBS will probably find it
 useful to examine the source code of relevant KAPPA commands.
 
-\label{item_MERS}
-\item
-[MERS]
-\index{MERS} \hfill
-\xref{SUN/104}{sun104}{}
 
+\subsubsection{MERS\index{MERS} \hfill \xref{SUN/104}{sun104}{}}
+\label{item_MERS}
 \textbf{Report messages and errors.}
 
 There is a general need for programs to inform the user about:
@@ -4891,12 +4563,9 @@ MERS comprises two libraries to help you do this:
 \end {itemize}
 
 \newpage
-\label{item_ONE}
-\item
-[ONE]
-\index{ONE} \hfill
-\xref{SUN/234}{sun234}{}
 
+\subsubsection{ONE\index{ONE} \hfill\xref{SUN/234}{sun234}{}}
+\label{item_ONE}
 \textbf{Odds and Ends library}
 
 The ONE library is a small set of Fortran and C routines of a general nature
@@ -4905,11 +4574,9 @@ more focussed Starlink libraries.
 
 The routines are written in C but are callable direct from Fortran.
 
+
+\subsubsection{PCS \index{PCS} \hfill\xref{SSN/29}{ssn29}{}}
 \label{item_PCS}
-\item
-[PCS]
-\index{PCS} \hfill
-\xref{SSN/29}{ssn29}{}
 
 \textbf{Parameter and communication system.}
 
@@ -4924,26 +4591,22 @@ but form a basic part of
 \htmlref{ADAM}{item_ADAM},
 the Starlink Software Environment.
 
-\label{item_PSX}
-\item
-[PSX]
-\index{PSX} \hfill
-\xref{SUN/121}{sun121}{}
 
+\subsubsection{PSX \index{PSX} \hfill \xref{SUN/121}{sun121}{}}
+\label{item_PSX}
 \textbf{Use the POSIX and X/OPEN libraries.}
 
 Lets you use operating system facilities in a machine independent way.
 
 
-\end{description}
+
 
 \newpage
 
 \section{Infrastructure}
 
 \rule{\textwidth}{0.5mm}
-\begin{description}
-\item[\mbox{}]\mbox{}
+
 \begin{description}
 \item [\htmlref{ADAM}{item_ADAM}]
 --- Starlink software environment
@@ -4962,14 +4625,10 @@ Lets you use operating system facilities in a machine independent way.
 \item [\htmlref{TK}{item_TK}]
 --- X window toolkit for TCL
 \end{description}
-\end{description}
+
 \rule{\textwidth}{0.5mm}
 
-\begin{description}
-
-\label{item_ADAM}
-\item
-[ADAM]
+\subsubsection{ADAM
 \index{ADAM} \hfill
 \xref{SG/4}{sg4}{},
 \xref{6}{sg6}{}.
@@ -4979,7 +4638,8 @@ Lets you use operating system facilities in a machine independent way.
 \xref{134}{sun134}{},
 \xref{144}{sun144}{}.
 \xref{SGP/45}{sgp45}{}.
-\xref{SSN/64}{ssn64}{}
+\xref{SSN/64}{ssn64}{}}
+\label{item_ADAM}
 
 \textbf{Starlink's main software environment.}
 
@@ -5077,11 +4737,9 @@ province of this document.  However, it is interesting to note that
 programs written for data acquisition tasks are rather like windows
 programs, which have become common.
 
+
+\subsubsection{EXPECT\index{EXPECT} \hfill \xref{SUN/200}{sun200}{}}
 \label{item_EXPECT}
-\item
-[EXPECT]
-\index{EXPECT} \hfill
-\xref{SUN/200}{sun200}{}
 
 \textbf{Emulate a user sitting at a terminal.}
 
@@ -5089,12 +4747,10 @@ When combined with
 \htmlref{TK}{item_TK}, it can put a GUI in front of an existing application
 without modifying it.
 
+
+
+\subsubsection{ICL \index{ICL} \hfill \xref{SG/4}{sg4}{},\xref{5}{sg5}{}}
 \label{item_ICL}
-\item
-[ICL]
-\index{ICL} \hfill
-\xref{SG/4}{sg4}{},
-\xref{5}{sg5}{}
 
 \textbf{A programmable user interface to an astronomical data reduction or data
 acquisition system.}
@@ -5113,10 +4769,9 @@ programs, rather than relying on external editors, linkers, etc.
 straightforward programs.
 \end{itemize}
 
+
+\subsubsection{INIT \index{INIT}\hfill \mbox{}}
 \label{item_INIT}
-\item
-[INIT]
-\index{INIT}\hfill \mbox{}
 
 \textbf{A grouping of the Starlink login resource files and other associated
 bits and pieces.}
@@ -5127,24 +4782,22 @@ USSC set.
 This allows easy installation on systems where the directory \texttt{/star}
 does not exist.
 
-\label{item_SAE}
-\item
-[SAE]
-\index{SAE} \hfill
-\xref{SUN/191}{sun191}{}
 
+\subsubsection{SAE  \hfill\xref{SUN/191}{sun191}{}}
+\index{SAE}
+\label{item_SAE}
 \textbf{Starlink application environment.}
 
 INIT gathers together the global \texttt{include} and \texttt{error}
 files needed by the infrastructure and applications.  It is purely an
 administrative grouping.
 
-\label{item_STARTCL}
-\item
-[STARTCL]
-\index{STARTCL} \hfill
-\xref{SUN/186}{sun186}{}
 
+
+\subsubsection{STARTCL \hfill
+\xref{SUN/186}{sun186}{}}
+\index{STARTCL}
+\label{item_STARTCL}
 \textbf{Extend TCL and TK.}
 
 A public domain utility called
@@ -5162,26 +4815,23 @@ message system.
 \item An interface to the ADAM notice board system.
 \end{itemize}
 
-\label{item_TCL}
-\item
-[TCL]
-\index{TCL} \hfill
-\xref{SUN/186}{sun186}{},
-\xref{200}{sun200}{}.
-MUD/164
 
+\subsubsection{TCL  \hfill
+\xref{SUN/186}{sun186}{},
+\xref{200}{sun200}{}. MUD/164}
+\index{TCL}
+\label{item_TCL}
 \textbf{Control and extend applications using a scripting language.}
 
 TCL stands for \emph{Tool Command Language}.
 
-\label{item_TK}
-\item
-[TK]
-\index{TK} \hfill
-\xref{SUN/186}{sun186}{},
-\xref{200}{sun200}{}.
-MUD/164
 
+\subsubsection{TK  \hfill
+\xref{SUN/186}{sun186}{},
+\xref{200}{sun200}{}.}
+\index{TK}
+MUD/164
+\label{item_TK}
 \textbf{Build GUIs.}
 
 An X window toolkit for use with
@@ -5190,7 +4840,7 @@ An X window toolkit for use with
 It can build Motif-like user interfaces using TCL scripts instead of C code.
 
 
-\end{description}
+
 
 \newpage
 
