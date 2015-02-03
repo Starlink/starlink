@@ -428,7 +428,6 @@ This description of the transformation could now be used in a program by
 converting it directly into character data, as follows:
 
 \example{Formulating a Cartesian-to-Polar transformation.}
-\begin{quote}
 \begin{terminalv}
 *  Define the number of input and output variables.
       INTEGER NVIN, NVOUT
@@ -446,7 +445,6 @@ converting it directly into character data, as follows:
       INV( 2 ) = 'y = r * sin( theta )'
 
 \end{terminalv}
-\end{quote}
 
 Programming notes:
 
@@ -480,12 +478,10 @@ This is done simply by omitting the right hand sides (and `$=$' signs) from
 the transformation functions which define it.
 Thus, if the inverse transformation functions had been specified as:
 
-\begin{quote}
 \begin{terminalv}
 INV( 1 ) = 'x'
 INV( 2 ) = 'y'
 \end{terminalv}
-\end{quote}
 
 then the inverse mapping would not be defined.
 Note that the left hand sides of the transformation functions must still
@@ -500,11 +496,9 @@ The transformation functions formulated above may be used to create an
 \name{HDS} transformation structure by calling the routine \name{TRN\_NEW}
 (create new transformation), as follows:
 
-\begin{quote}\small
 \begin{terminalv}
 CALL TRN_NEW( NVIN, NVOUT, FOR, INV, PREC, COMM, ELOC, NAME, LOCTR, STATUS )
 \end{terminalv}
-\end{quote}
 
 where:
 
@@ -538,7 +532,6 @@ The following arrangement might be used to create a transformation called
 \name{MYTRAN} from the \fortvar{FOR} and \fortvar{INV} arrays defined
 earlier:
 
-\begin{quote}
 \begin{terminalv}
 *  Declare variables.
       INCLUDE 'SAE_PAR'
@@ -558,7 +551,6 @@ earlier:
      :              ELOC, 'MYTRAN', LOCTR, STATUS )
 
 \end{terminalv}
-\end{quote}
 
 Programming notes:
 
@@ -612,11 +604,9 @@ To create such a transformation, the \fortvar{ELOC} argument to
 argument will then be ignored and may also be blank).
 Thus, if \name{TRN\_NEW} were invoked by:
 
-\begin{quote}\small
 \begin{terminalv}
 CALL TRN_NEW( NVIN, NVOUT, FOR, INV, PREC, COMM, ' ', ' ', LOCTR, STATUS )
 \end{terminalv}
-\end{quote}
 
 then the locator \fortvar{LOCTR} would subsequently be associated with a
 temporary transformation (\emph{i.e.}\ a temporary \name{HDS} structure of
@@ -674,11 +664,9 @@ An application may determine the number of input and output variables
 used by a transformation by calling \name{TRN\_GTNV} (get numbers of
 variables), thus:
 
-\begin{quote}
 \begin{terminalv}
 CALL TRN_GTNV( LOCTR, NVIN, NVOUT, STATUS )
 \end{terminalv}
-\end{quote}
 
 The information is returned via the \fortvar{NVIN} and \fortvar{NVOUT}
 arguments.
@@ -689,11 +677,9 @@ of validating a transformation.
 A similar routine \name{TRN\_GTNVC} (get numbers of compiled variables) is
 provided for use with compiled mappings:
 
-\begin{quote}
 \begin{terminalv}
 CALL TRN_GTNVC( ID, NVIN, NVOUT, STATUS )
 \end{terminalv}
-\end{quote}
 
 In this case, the mapping is specified by its \emph{integer} identifier
 \fortvar{ID}.
@@ -723,11 +709,9 @@ respectively.  Thus, to apply a compiled \mbox{\{$1 \rightarrow 1$\}}
 mapping to a set of 1-dimensional data points specified by a list of
 \emph{real} coordinates, the following statement might be used:
 
-\begin{quote}
 \begin{terminalv}
 CALL TRN_TR1R( BAD, NX, XIN, ID, XOUT, STATUS )
 \end{terminalv}
-\end{quote}
 
 where:
 
@@ -758,18 +742,15 @@ The function to be plotted is specified by the user via an expression
 obtained through the \name{ADAM} parameter system.
 For instance, if the user entered:
 
-\begin{quote}
 \begin{terminalv}
 X*EXP(-4.4*X)
 \end{terminalv}
-\end{quote}
 
 then a graph of the function \mbox{$y=xe^{-4.4x}$} would be plotted over the
 range \mbox{$0\le x\le 1$}.
 
-\begin{quote}
 \begin{terminalv}
-  Declare variables.
+*  Declare variables.
       INCLUDE 'SAE_PAR'
       INTEGER NPTS
       PARAMETER ( NPTS = 1000 )
@@ -798,9 +779,7 @@ range \mbox{$0\le x\le 1$}.
       CALL GPL( NPTS, X, Y )                                  [4]
       CALL DAT_ANNUL( LOCTR, STATUS )                         [5]
       CALL TRN_ANNUL( ID, STATUS )
-
 \end{terminalv}
-\end{quote}
 
 Programming notes:
 
@@ -846,11 +825,9 @@ Thus, to apply a compiled \mbox{\{$2 \rightarrow 2$\}} mapping to a set of
 2-dimensional data points specified by two lists of \emph{real} coordinates
 $X_{IN}$ and $Y_{IN}$, the following statement might be used:
 
-\begin{quote}
 \begin{terminalv}
 CALL TRN_TR2R( BAD, NXY, XIN, YIN, ID, XOUT, YOUT, STATUS )
 \end{terminalv}
-\end{quote}
 
 where:
 
@@ -883,7 +860,6 @@ It is assumed that the identifier \fortvar{ID} is associated with a compiled
 \mbox{\{$2 \rightarrow 2$\}} mapping which has been established to convert
 cursor coordinates into ``user'' coordinates:
 
-\begin{quote}
 \begin{terminalv}
 *  Declare variables.
       INTEGER STATUS, N, ID
@@ -908,9 +884,7 @@ cursor coordinates into ``user'' coordinates:
          CALL MSG_OUT( ' ', 'X = ^X ; Y = ^Y', STATUS ) [3]
       ENDDO
     1 CONTINUE
-
 \end{terminalv}
-\end{quote}
 
 Programming notes:
 
@@ -939,11 +913,9 @@ When a compiled mapping is no longer required, the resources associated with
 it should be released.
 This is done by calling \name{TRN\_ANNUL} (annul compiled mapping), thus:
 
-\begin{quote}
 \begin{terminalv}
 CALL TRN_ANNUL( ID, STATUS )
 \end{terminalv}
-\end{quote}
 
 This causes the compiled mapping to be deleted and the \fortvar{ID} value
 to be reset to \name{TRN\_\_NOID}.\footnote{
@@ -955,11 +927,9 @@ It may be used, when necessary, to indicate that an identifier is not
 currently associated with a compiled mapping.}
 Finally, before an application finishes, the statement:
 
-\begin{quote}
 \begin{terminalv}
 CALL TRN_CLOSE( STATUS )
 \end{terminalv}
-\end{quote}
 
 should be executed.
 Calling \name{TRN\_CLOSE} will first annul any compiled mappings which are
@@ -993,11 +963,9 @@ respectively.
 Thus, to transform a general set of data points specified by an array of
 \emph{real} coordinates, the routine \name{TRN\_TRNR} would be used, thus:
 
-\begin{quote}\small
 \begin{terminalv}
 CALL TRN_TRNR( BAD, ND1, NCIN, NDAT, DATA, ID, NR1, NCOUT, RESULT, STATUS )
 \end{terminalv}
-\end{quote}
 
 where:
 
@@ -1042,7 +1010,6 @@ The resulting points are then plotted using \name{GKS}.
 With a suitable choice of mapping, such an arrangement might be used to
 generate perspective pictures of 3-dimensional objects:
 
-\begin{quote}
 \begin{terminalv}
 *  Define dimensions of the DATA and RESULT arrays.
       PARAMETER ( MAXPTS = 5000, MAXDIM = 3 )
@@ -1070,9 +1037,7 @@ generate perspective pictures of 3-dimensional objects:
 
 *  Plot the resulting 2-dimensional data points.
       CALL GPL( 3601, RESULT( 1, 1 ), RESULT( 1, 2 ) ) [4]
-
 \end{terminalv}
-\end{quote}
 
 Programming notes:
 
@@ -1299,11 +1264,9 @@ later be separated.
 Concatenation of a pair of transformations is performed by the routine
 \name{TRN\_JOIN} (concatenate transformations), as follows:
 
-\begin{quote}
 \begin{terminalv}
 CALL TRN_JOIN( LOCTR1, LOCTR2, ELOC, NAME, LOCNEW, STATUS )
 \end{terminalv}
-\end{quote}
 
 where:
 
@@ -1340,11 +1303,9 @@ or \emph{appending} another one to it.
 For example, to prefix one transformation to another, \name{TRN\_PRFX}
 (prefix transformation) would be used, thus:
 
-\begin{quote}
 \begin{terminalv}
 CALL TRN_PRFX( LOCTR1, LOCTR2, STATUS )
 \end{terminalv}
-\end{quote}
 
 In this case, the two transformations with locators \fortvar{LOCTR1} and
 \fortvar{LOCTR2} are concatenated (as above), but the resultant
@@ -1393,11 +1354,9 @@ This transformation (with locator \fortvar{LOCTRA}, say) represents the
 necessary adjustment which should be applied as a prefix to the original
 transformation, thus:
 
-\begin{quote}
 \begin{terminalv}
 CALL TRN_PRFX( LOCTRA, LOCTRS, STATUS )
 \end{terminalv}
-\end{quote}
 
 The modified transformation (\fortvar{LOCTRS}\/) will then correctly relate
 the image's \textbf{new} pixel coordinates to positions on the sky, the
@@ -1427,11 +1386,9 @@ the inter-change of the forward and inverse mappings (the numbers of input
 and output variables will also be inter-changed).
 It is performed by \name{TRN\_INV} (invert transformation), thus:
 
-\begin{quote}
 \begin{terminalv}
 CALL TRN_INV( LOCTR, STATUS )
 \end{terminalv}
-\end{quote}
 
 where \fortvar{LOCTR} is a locator to the transformation to be inverted.
 After such a call, compiling the transformation in the \textbf{forward}
@@ -1472,21 +1429,17 @@ which is placed in a character string at the point where an insertion is to
 be made and which is subsequently replaced by the value to be inserted.
 For example, if the character variable \fortvar{TEXT} had the value:
 
-\begin{quote}
 \begin{terminalv}
 'magnitude = - 2.5 * log10( count ) + zero_point'
 \end{terminalv}
-\end{quote}
 
 then \name{TRN\_STOKR} (substitute a \emph{real} token value) could be used
 to substitute a numerical value for the `\verb#zero_point#' token, as
 follows:
 
-\begin{quote}
 \begin{terminalv}
 CALL TRN_STOKR( 'zero_point', 17.7, TEXT, NSUBS, STATUS )
 \end{terminalv}
-\end{quote}
 
 This causes all occurrences of the `\verb#zero_point#' token  to be replaced
 with the formatted \emph{real} number `\verb#17.7#', while \fortvar{NSUBS}
@@ -1494,22 +1447,18 @@ returns the number of substitutions made (in this case there will only be
 one).
 The value of \fortvar{TEXT} then becomes:
 
-\begin{quote}
 \begin{terminalv}
 'magnitude = - 2.5 * log10( count ) + 17.7'
 \end{terminalv}
-\end{quote}
 
 Note that the \name{TRN\_STOKx} routines will respect the syntax of
 transformation functions, so that negative numerical values will be enclosed
 in parentheses before a substitution is made.
 For instance, if the call to \name{TRN\_STOKR} had been:
 
-\begin{quote}
 \begin{terminalv}
 CALL TRN_STOKR( 'zero_point', -17.7, TEXT, NSUBS, STATUS )
 \end{terminalv}
-\end{quote}
 
 then the `\verb#zero_point#' token would be replaced by `\verb#(-17.7)#' to
 prevent the illegal expression \mbox{`\ldots \texttt{+ -17.7}'} from being
@@ -1524,7 +1473,6 @@ transformation which contains several adjustable numerical parameters.
 The same principles can be followed to write routines for creating a variety
 of specialised transformations.
 
-\begin{quote}
 \begin{terminalv}
       SUBROUTINE LINEAR( SCALE, ZERO, ELOC, NAME, LOCTR, STATUS )
 
@@ -1561,9 +1509,7 @@ of specialised transformations.
      :              ELOC, NAME, LOCTR, STATUS )
 
       END
-
 \end{terminalv}
-\end{quote}
 
 Programming notes:
 
@@ -1601,7 +1547,6 @@ This simple example formulates a set of transformation functions to multiply
 each ordinate of a 3-dimensional coordinate system \mbox{$(X_1,X_2,X_3)$} by
 2.0 to yield the coordinates \mbox{$(Y_1,Y_2,Y_3)$}:
 
-\begin{quote}
 \begin{terminalv}
        INTEGER I, NSUBS, STATUS
        CHARACTER FOR( 3 ) * 30
@@ -1611,7 +1556,6 @@ each ordinate of a 3-dimensional coordinate system \mbox{$(X_1,X_2,X_3)$} by
           CALL TRN_STOKI( 'I', I, FOR( I ), NSUBS, STATUS )
      1 CONTINUE
 \end{terminalv}
-\end{quote}
 \exampledone
 
 \paragraph{Recursive substitution.}
@@ -1630,7 +1574,6 @@ a suitable recursively defined form.
 The following constructs an expression representing a polynomial in $X$ with
 an arbitrary number of numerical coefficients:
 
-\begin{quote}
 \begin{terminalv}
 *  Declare variables.
       INTEGER NCOEFF, STATUS, I, NSUBS
@@ -1659,7 +1602,6 @@ an arbitrary number of numerical coefficients:
    1  CONTINUE
 
 \end{terminalv}
-\end{quote}
 
 Programming notes:
 
@@ -1685,11 +1627,9 @@ string.
 The effect of this algorithm with (say) the 5 polynomial coefficients 0.1,
 0.12, 1.06, $-$4.4 \& 1E$-$7, would be to produce the following expression:
 
-\begin{quote}
 \begin{terminalv}
 '((((1E-7)*X+(-4.4))*X+1.06)*X+0.12)*X+0.1'
 \end{terminalv}
-\end{quote}
 
 which casts the polynomial into a form for efficient evaluation using
 Horner's method.
@@ -1811,7 +1751,6 @@ This is done by calling \name{TRN\_PTCL} (put classification), as follows:
 
 \example{Inserting classification information.}
 
-\begin{quote}
 \begin{terminalv}
 
 *  Declare variables.
@@ -1835,7 +1774,6 @@ This is done by calling \name{TRN\_PTCL} (put classification), as follows:
       CALL TRN_PTCL( CLASS, LOCTR, STATUS )            [5]
 
 \end{terminalv}
-\end{quote}
 
 Programming notes:
 
@@ -1878,9 +1816,7 @@ information indicates that this is so.
 
 \example{Retrieving classification information.}
 
-\begin{quote}
 \begin{terminalv}
-
 *  Declare variables.
       INCLUDE 'TRN_PAR'
       LOGICAL CLASS( TRN__MXCLS ), OK                  [1]
@@ -1891,9 +1827,7 @@ information indicates that this is so.
 *  Test for the required properties.
       OK = CLASS( TRN__LIN ) .AND.                     [3]
      :     CLASS( TRN__ISOT )
-
 \end{terminalv}
-\end{quote}
 
 Programming notes:
 
@@ -2104,12 +2038,10 @@ are also required.
 The \name{INCLUDE} file names used by both of these facilities must first
 be defined by executing the commands:
 
-\begin{quote}
 \begin{terminalv}
 % prm_dev
 % trn_dev
 \end{terminalv}
-\end{quote}
 
 Applications which contain Fortran \name{INCLUDE} statements associated with
 the \name{TRANSFORM} facility may then be compiled.
@@ -3885,11 +3817,9 @@ Symbolic names for the \name{TRANSFORM} error codes are defined in the
 include file \name{TRN\_ERR} and may be incorporated into an application
 with the statement:
 
-\begin{quote}
 \begin{terminalv}
 INCLUDE 'TRN_ERR'
 \end{terminalv}
-\end{quote}
 
 The following list gives the names of these error codes, the associated
 error messages and an explanation of each error condition:
