@@ -1,17 +1,16 @@
-\documentclass[twoside,11pt]{article}
-\pagestyle{myheadings}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % -----------------------------------------------------------------------------
-% ? Document identification
-\newcommand{\stardoccategory}  {Starlink General Paper}
-\newcommand{\stardocinitials}  {SGP}
-\newcommand{\stardocsource}    {sgp\stardocnumber}
-\newcommand{\stardocnumber}    {28.8}
-\newcommand{\stardocauthors}   {M D Lawden\\
+% Document identification
+\stardoccategory    {Starlink General Paper}
+\stardocinitials    {SGP}
+\stardocsource      {sgp\stardocnumber}
+\stardocnumber      {28.8}
+\stardocauthors     {M D Lawden\\
                                 A C Charles}
-\newcommand{\stardocdate}      {25 September 1997}
-\newcommand{\stardoctitle}     {How to write good documents for Starlink}
-\newcommand{\stardocabstract}  {
+\stardocdate        {25 September 1997}
+\stardoctitle       {How to write good documents for Starlink}
+\stardocabstract  {
   This document gives advice on how to write good Starlink documents.
   It lists Starlink documents which users said they liked in the 1994
   Starlink Software Survey, and identifies common characteristics of style
@@ -26,223 +25,12 @@
   to spend time and effort on a document in order to save the reader time
   and effort in reading it.
 }
-% ? End of document identification
+\stardocname  {\stardocinitials /\stardocnumber}
 
 % -----------------------------------------------------------------------------
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-% ? End of document specific commands
-% -----------------------------------------------------------------------------
-%  Title Page.
-%  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\bf Abstract}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-\newpage
-\begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section{Introduction}
 
@@ -320,7 +108,7 @@ Software Survey of 1994.
 This is shown by the answers given to questions 3 and 4.
 
 \begin{quote}
-Question 3: {\em How could Starlink software be improved?}
+Question 3: \emph{How could Starlink software be improved?}
 \end{quote}
 
 Out of 18 possible answers, the 2nd and 3rd most popular (totalling 17\%
@@ -331,7 +119,7 @@ of the vote) were:
 \end{itemize}
 
 \begin{quote}
-Question 4: {\em How could Starlink Documentation be improved?}
+Question 4: \emph{How could Starlink Documentation be improved?}
 \end{quote}
 
 Out of 23 possible answers, the top four (getting 45\% of the vote) were:
@@ -342,7 +130,7 @@ Out of 23 possible answers, the top four (getting 45\% of the vote) were:
 \item Better examples for programmers.
 \end{itemize}
 
-The message is loud and clear: users want more help with how to {\em use}
+The message is loud and clear: users want more help with how to \emph{use}
 the facilities provided by a piece of software, rather than just plain
 descriptions of the facilities provided.
 
@@ -352,15 +140,15 @@ The survey also asked users to mark the quality of the documents provided with
 each software item they used.
 The ones which got the highest average marks (starting with the best) were:
 \begin{itemize}
-\item \xref{SUN/40}{sun40}{}: {\em CHR -- Character handling routines.}
-\item \xref{SUN/39}{sun39}{}: {\em PRIMDAT -- Processing of primitive numerical data.}
-\item SUN/100: {\em TPOINT -- Telescope pointing analysis system.}
-\item \xref{SUN/33}{sun33}{}: {\em NDF -- Accessing extensible n-D data.}
-\item SUN/105: {\em STARLSE -- Starlink extensions to language sensitive editor.}
-\item SUN/110: {\em SST -- A simple software tools package.}
-\item \xref{SUN/31}{sun31}{}: {\em REF -- Handling references to HDS objects.}
-\item \xref{SUN/87}{sun87}{}: {\em JPL -- Solar system ephemeris.}
-\item SUN/90: {\em SNX -- Starlink extensions to NCAR graphics utilities.}
+\item \xref{SUN/40}{sun40}{}: \emph{CHR -- Character handling routines.}
+\item \xref{SUN/39}{sun39}{}: \emph{PRIMDAT -- Processing of primitive numerical data.}
+\item SUN/100: \emph{TPOINT -- Telescope pointing analysis system.}
+\item \xref{SUN/33}{sun33}{}: \emph{NDF -- Accessing extensible n-D data.}
+\item SUN/105: \emph{STARLSE -- Starlink extensions to language sensitive editor.}
+\item SUN/110: \emph{SST -- A simple software tools package.}
+\item \xref{SUN/31}{sun31}{}: \emph{REF -- Handling references to HDS objects.}
+\item \xref{SUN/87}{sun87}{}: \emph{JPL -- Solar system ephemeris.}
+\item SUN/90: \emph{SNX -- Starlink extensions to NCAR graphics utilities.}
 \end{itemize}
 These are the documents the users said they liked best, so take a look at them
 and consider modelling your documents on their organisation and style.
@@ -384,7 +172,7 @@ Two key ones are:
 These provide recipes for common types of data reduction.
 Users will, therefore, not need to understand a package in depth before being
 able to do useful work with it.
-They are issued as {\em Starlink Cookbooks}\,
+They are issued as \emph{Starlink Cookbooks}\,
 (\htmladdnormallink{SC}{http://www.starlink.ac.uk/sc.html}).
 
 \subsection{Hypertext}
@@ -396,7 +184,7 @@ as an integrated whole, using a hypertext linker called HTX
 Starlink documents are written mostly in \LaTeX.
 New documents are produced in both hypertext and paper form.
 Old documents which only exist in paper form can be converted to HTML form by
-translators such as {\tt Star2HTML}
+translators such as \texttt{Star2HTML}
 (see \xref{SUN/199}{sun199}{}).
 
 The hypertext infrastructure software and organisation required is now
@@ -409,7 +197,7 @@ A \htmladdnormallink{beginner's guide}{http://www.ncsa.uiuc.edu/General/Internet
 to HTML has been distributed as MUD/149.
 An updated version of this is available on the web at:
 \begin{quote}
-{\tt http://www.ncsa.uiuc.edu/General/Internet/WWW/HTMLPrimer.html}
+\texttt{http://www.ncsa.uiuc.edu/General/Internet/WWW/HTMLPrimer.html}
 \end{quote}
 
 \section{World Wide Web}
@@ -422,13 +210,13 @@ Have a look at the Starlink pages.
 There are lots of them, and a good place to start is the
 \htmladdnormallink{central Starlink page}{http://www.starlink.ac.uk/} at:
 \begin{quote}
-{\tt http://www.starlink.ac.uk/}
+\texttt{http://www.starlink.ac.uk/}
 \end{quote}
-From here you can go to most Starlink sites from the {\em Sites}\, link.
+From here you can go to most Starlink sites from the \emph{Sites}\, link.
 There are also lots of Style Guides available to help you write good web pages.
 An \htmladdnormallink{example}{http://www.w3.org/hypertext/WWW/Provider/Style/Overview.html} is:
 \begin{quote}
-{\tt http://www.w3.org/hypertext/WWW/Provider/Style/Overview.html}
+\texttt{http://www.w3.org/hypertext/WWW/Provider/Style/Overview.html}
 \end{quote}
 
 \section{\label{GoodStyle}Good style and organisation}
@@ -471,7 +259,7 @@ documents:
 \item Organise your paper into sections using sectioning commands (see
 \xref{SC/9, Section2}{sc9}{document_structure}).
 
-\item Use the {\em list}\/ facilities to highlight options or features
+\item Use the \emph{list}\/ facilities to highlight options or features
 (see
 \xref{SC/9, Section 4}{sc9}{lists}).
 
@@ -480,13 +268,13 @@ including any prompt symbol.
 Leave a space between the prompt symbol and the command -- `what you read is
 what you see'.
 Thus:
-\begin{verbatim}
+\begin{terminalv}
     ICL> CAR_HELP SEARCH
-\end{verbatim}
+\end{terminalv}
 is clearer than
-\begin{verbatim}
+\begin{terminalv}
 ICL>CAR_HELP SEARCH
-\end{verbatim}
+\end{terminalv}
 
 \item Try to keep your formatting techniques as simple and obvious as possible.
 We find the basic techniques shown in \xref{SC/9}{sc9}{} to be adequate for
@@ -525,24 +313,24 @@ The most common fault in writing.
 It is an insidious disease which afflicts us all, but it can be controlled if
 you look for it.
 There is far too much to read without having to wade through redundant waffle.
-Good documents should be {\em short}\/ and {\em concise}.
+Good documents should be \emph{short}\/ and \emph{concise}.
 Get to the point!
 A reader does not want to waste his time ploughing through:
 \begin{quote}
-{\em The purpose of this document is to introduce the reader to the CHART
+\emph{The purpose of this document is to introduce the reader to the CHART
 software system which has been developed to facilitate the production of
 finding charts which, hopefully, will be of some assistance to the user's
 astronomical investigations.}
 \end{quote}
 when he would be quite satisfied with:
 \begin{quote}
-{\em This program produces star finding charts.}
+\emph{This program produces star finding charts.}
 \end{quote}
 
 \item [Members only:]
 
 Authors sometimes get so wrapped up in their work that they cannot conceive
-of anyone not being {\em au fait}\/ with what they are writing about.
+of anyone not being \emph{au fait}\/ with what they are writing about.
 Don't just write for members of your clique, but give outsiders some background
 and context to your work.
 Also, a brief introduction is very useful for me when I am adding notes on new
@@ -554,14 +342,14 @@ Believe it or not, people sometimes omit to describe how to start up their
 software, or they may bury this information in the middle of a big paragraph.
 Put this information near the front and make it clear, e.g.:
 \begin{quote}
-{\em To start the program, type the command:
-\begin{verbatim}
+\emph{To start the program, type the command:}
+\begin{terminalv}
     $ CHART
-\end{verbatim}
-You can then get an introductory summary of the principal commands by typing:
-\begin{verbatim}
+\end{terminalv}
+\emph{You can then get an introductory summary of the principal commands by typing:}
+\begin{terminalv}
     $ PROMPT
-\end{verbatim}}
+\end{terminalv}
 \end{quote}
 
 \item [Smothered punctuation marks:]
@@ -572,7 +360,7 @@ However, the convention of leaving a space between sentences and after
 punctuation marks is under attack.
 One now sees text written like this:
 \begin{quote}
-{\em I can save my precious time,and energy,by missing out unnecessary
+\emph{I can save my precious time,and energy,by missing out unnecessary
 spaces;anyway,I'm impatient.I don't care if this makes my text
 irritating to read,and infuriating to edit,as my time is more important than
 yours,and this extra speed gives me a competitive edge.}
@@ -583,15 +371,15 @@ meant for the human eye.
 
 \item [Lonely parentheses:]
 
-This is the inverse of the {\em Smothered punctuation marks} disease\/ --
+This is the inverse of the \emph{Smothered punctuation marks} disease\/ --
 too much space rather than too little.
 It has the following symptom:
 \begin{quote}
-{\em Some authors ( not many ) do this.}
+\emph{Some authors ( not many ) do this.}
 \end{quote}
 No doubt, such authors think this is clearer than:
 \begin{quote}
-{\em Most (thank goodness) do this.}
+\emph{Most (thank goodness) do this.}
 \end{quote}
 The problem with this disease is that it makes the syntactic structure of a
 sentence less obvious -- you are writing for the human eye, not a parser.
@@ -683,16 +471,16 @@ We are not looking forward to it.
 \section{References}
 
 \begin{enumerate}
-\item MUD/149: {\em HTML -- A beginner's guide.}
-\item \xref{SC/9}{sc9}{}: {\em \LaTeX\ Cook-book.}
-\item \xref{SGP/42}{sgp42}{}: {\em Starlink software strategy.}
-\item SGP/43: {\em Starlink software survey results, 1994.}
-\item \xref{SUN/9}{sun9}{}: {\em \LaTeX\ -- A document preparation system.}
-\item \xref{SUN/188}{sun188}{}: {\em HTX -- Hypertext cross-reference utilities.}
-\item \xref{SUN/199}{sun199}{}: {\em Star2HTML -- Converting Starlink documents
+\item MUD/149: \emph{HTML -- A beginner's guide.}
+\item \xref{SC/9}{sc9}{}: \emph{\LaTeX\ Cook-book.}
+\item \xref{SGP/42}{sgp42}{}: \emph{Starlink software strategy.}
+\item SGP/43: \emph{Starlink software survey results, 1994.}
+\item \xref{SUN/9}{sun9}{}: \emph{\LaTeX\ -- A document preparation system.}
+\item \xref{SUN/188}{sun188}{}: \emph{HTX -- Hypertext cross-reference utilities.}
+\item \xref{SUN/199}{sun199}{}: \emph{Star2HTML -- Converting Starlink documents
   to hypertext.}
-\item \xref{SUN/201}{sun201}{}: {\em Latex2HTML -- \LaTeX\ to HTML conversion.}
-\item Leslie Lamport: {\em A Document Preparation System. \LaTeX\ User's
+\item \xref{SUN/201}{sun201}{}: \emph{Latex2HTML -- \LaTeX\ to HTML conversion.}
+\item Leslie Lamport: \emph{A Document Preparation System. \LaTeX\ User's
 Guide \& Reference Manual}, 2nd ed, Addison-Wesley, 1994,
 ISBN 0-201-52983-1
 \end{enumerate}
@@ -706,23 +494,23 @@ ISBN 0-201-52983-1
 \subsection{Code, date, filename}
 
 Every Starlink document has an identifier and a date of issue.
-Identifiers have a format like {\tt SGP/28.7} where {\tt SGP} is the class code,
-{\tt 28} is the number within that class, and {\tt 7} is the version number
+Identifiers have a format like \texttt{SGP/28.7} where \texttt{SGP} is the class code,
+\texttt{28} is the number within that class, and \texttt{7} is the version number
 starting at 1.
 Identifiers are allocated by the Document Librarian
-({\tt mdl@star.rl.ac.uk}).
+(\texttt{mdl@star.rl.ac.uk}).
 When a note is revised, its version number should be incremented and the
 date of issue updated.
 
-Files which store Starlink documents should have a name like {\tt sgp28.tex},
-where {\tt sgp} shows the document class, {\tt 28} tells you the number, and
-{\tt tex} tells you it is a \TeX\ or \LaTeX\ source file.
-Files containing Starlink classified documents are stored in {\tt /star/docs}.
+Files which store Starlink documents should have a name like \texttt{sgp28.tex},
+where \texttt{sgp} shows the document class, \texttt{28} tells you the number, and
+\texttt{tex} tells you it is a \TeX\ or \LaTeX\ source file.
+Files containing Starlink classified documents are stored in \texttt{/star/docs}.
 
 \subsection{Standard headers, type size, page size, layout}
 
-Use the \LaTeX\ template files like {\tt sun.tex} which are stored in
-{\tt /star/docs}.
+Use the \LaTeX\ template files like \texttt{sun.tex} which are stored in
+\texttt{/star/docs}.
 These have properly formatted headers and correct type size, page size, and
 layout.
 They also have the definitions required for you to produce hypertext, as
@@ -741,20 +529,20 @@ avoided.
 An example title is:
 
 \begin{center}
-{\bf ASPIC -- A set of image processing programs}
+\textbf{ASPIC -- A set of image processing programs}
 \end{center}
 
 Don't assume a reader already knows what your software does.
 For example, don't have a title like:
 
 \begin{center}
-{\bf MYPROG -- An introduction}
+\textbf{MYPROG -- An introduction}
 \end{center}
 
 Say what MYPROG does:
 
 \begin{center}
-{\bf MYPROG -- An HTML editor: Introduction}
+\textbf{MYPROG -- An HTML editor: Introduction}
 \end{center}
 
 \newpage
@@ -763,17 +551,17 @@ Say what MYPROG does:
 
 \subsection{Starting or revising a document}
 
-When {\em starting a new document}, copy the appropriate template file from
-{\tt /star/docs}
+When \emph{starting a new document}, copy the appropriate template file from
+\texttt{/star/docs}
 into your own directory and change the variable information; then add your
 own text.
 This procedure is explained in some detail in
 \xref{SUN/199}{sun199}{}.
-Produce your original file in the form of a {\tt .tex} file ready for
+Produce your original file in the form of a \texttt{.tex} file ready for
 processing by \LaTeX\ and Star2HTML.
 
-When {\em updating a document}, copy the existing file from {\tt /star/docs}
-and edit that; do {\em not} start from a private copy as your submitted file
+When \emph{updating a document}, copy the existing file from \texttt{/star/docs}
+and edit that; do \emph{not} start from a private copy as your submitted file
 may have been edited by a Librarian before final issue, and the
 changes (such as spelling corrections) will be lost and have to be done again.
 
@@ -803,8 +591,7 @@ This procedure is explained in \xref{SUN/199}{sun199}{}.
 The basic procedure for checking the hypertext version of your document
 from within your working directory is as follows:
 \begin{quote}
-{\tt
-\% star2html sgp28\\
+\texttt{\% star2html sgp28\\
 \% hlink\\
 \% showme ./sgp28}
 \end{quote}
@@ -814,7 +601,7 @@ running a web browser.
 \subsection{Submitting a document for distribution}
 
 When you have finished your document, tell the Software Librarian
-({\tt starlink@jiscmail.ac.uk}) where your file is.
+(\texttt{starlink@jiscmail.ac.uk}) where your file is.
 If necessary, send paper copies of any additional material, such as diagrams,
 which is required in the final document, but which doesn't appear in hardcopy
 derived from your file.
