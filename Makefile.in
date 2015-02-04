@@ -131,6 +131,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/sgp16 \
 	$(MANIFESTS)/sgp28 \
 	$(MANIFESTS)/sgp31 \
+	$(MANIFESTS)/sgp38 \
 	$(MANIFESTS)/ssn3 \
 	$(MANIFESTS)/ssn8 \
 	$(MANIFESTS)/ssn22 \
