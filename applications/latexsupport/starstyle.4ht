@@ -26,7 +26,12 @@
 %%% Index -- don't want to produce this on html
 \renewcommand{\printindex}{}
 \renewcommand{\makeindex}{}
-
+%% The index command can make things go mad in tex4HT
+%% (specific example where when it was called within the
+%% parameter of an unumbered subsection, but its probably
+%% more widespread). Therefore removing as we can't
+%% make indexes in html at the moment anyway.
+\renewcommand{\index}[1]{}
 
 
 %%%%%%%--------- Navigation links
