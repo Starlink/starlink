@@ -1,6 +1,11 @@
 \documentclass[twoside,11pt,nolof]{starlink}
 
+% ? Specify used packages
+% ? End of specify used packages
+
 % -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
 \stardoccategory    {Starlink User Note}
 \stardocinitials    {SUN}
 \stardocsource      {sun\stardocnumber}
@@ -19,42 +24,15 @@ The Simple Software Tools package (SST) is a package of applications
 designed to help with the production of software and documentation, with
 particular emphasis on ADAM programming using Fortran~77.
 }
+% ? End of document identification
 % -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%      1-FEB-2000 (AJC):
-%        Add Copyright statement in LaTeX
-%     {Add further history here}
-%
-% -
-
-\stardocname  {\stardocinitials /\stardocnumber}
-
+% ? Document specific \providecommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
 %  ===========
 \begin{document}
 \scfrontmatter
-
 
 \section{INTRODUCTION}
 
@@ -85,7 +63,7 @@ All the applications in the SST package run under ADAM, so before you start
 you should execute the command:
 
 \begin{terminalv}
-   $ ADAMSTART
+$ ADAMSTART
 \end{terminalv}
 
 This is a good opportunity to add this command to your LOGIN.COM file if you
@@ -97,22 +75,22 @@ These commands are initially made available by typing `SST' at the command
 prompt, \emph{e.g.}\ from ICL:
 
 \begin{terminalv}
-   $ ICL
-   ICL> SST
+$ ICL
+ICL> SST
 \end{terminalv}
 
 or from DCL:
 
 \begin{terminalv}
-   $ SST
+$ SST
 \end{terminalv}
 
 In either case, the following message will be displayed, indicating that the
 package is ready for use:
 
-\begin{quote}
-\texttt{Simple Software Tools (SST) commands are now available.}
-\end{quote}
+\begin{terminalv}
+Simple Software Tools (SST) commands are now available.
+\end{terminalv}
 
 You can then invoke any of the SST applications by typing the appropriate
 command (see Appendix~\ref{appendix:descriptions} for a detailed description
@@ -122,14 +100,14 @@ When working from ICL you can obtain help about SST by using the HELP command,
 thus:
 
 \begin{terminalv}
-   ICL> HELP SST
+ICL> HELP SST
 \end{terminalv}
 
 You can also obtain help on each individual application by giving its name,
 \emph{e.g:}
 
 \begin{terminalv}
-   ICL> HELP FORSTATS
+ICL> HELP FORSTATS
 \end{terminalv}
 
 will give help on the SST application FORSTATS.
@@ -168,10 +146,10 @@ the file PROG.FOR, then the following sequence of commands would extract this
 information and send the derived document to a Canon laser printer:
 
 \begin{terminalv}
-   ICL> PROLAT PROG.FOR
-   ICL> SPAWN LATEX PROLAT
-   ICL> $DVICAN PROLAT
-   ICL> $PRCN PROLAT.DVI-CAN
+ICL> PROLAT PROG.FOR
+ICL> SPAWN LATEX PROLAT
+ICL> $DVICAN PROLAT
+ICL> $PRCN PROLAT.DVI-CAN
 \end{terminalv}
 
 When working from ICL, notice how `SPAWN' must be used in front of the LATEX
@@ -189,7 +167,7 @@ Thus, the following command could be used to document an entire software
 system if the necessary files resided in the current directory:
 
 \begin{terminalv}
-   ICL> PROLAT *.FOR
+ICL> PROLAT *.FOR
 \end{terminalv}
 
 PROLAT has a number of options to tailor its behaviour.
@@ -239,22 +217,22 @@ The first step would be to create the library (if you have not already done
 so), as follows:
 
 \begin{terminalv}
-   ICL> $LIBRARY/CREATE/HELP MYLIB.HLB
+ICL> $LIBRARY/CREATE/HELP MYLIB.HLB
 \end{terminalv}
 
 The prologue information is then extracted using PROHLP which, by default,
 writes it to the file PROHLP.HLP:
 
 \begin{terminalv}
-   ICL> PROHLP PROG.FOR
+ICL> PROHLP PROG.FOR
 \end{terminalv}
 
 The extracted information can then be inserted into the library and the
 intermediate help file deleted:
 
 \begin{terminalv}
-   ICL> $LIBRARY/HELP MYLIB.HLB PROHLP.HLP
-   ICL> $DELETE PROHLP.HLP;*
+ICL> $LIBRARY/HELP MYLIB.HLB PROHLP.HLP
+ICL> $DELETE PROHLP.HLP;*
 \end{terminalv}
 
 You can check that the help library contains the correct information by using
@@ -268,7 +246,7 @@ Thus, at the start of the interface file, before any parameter definitions,
 there should be a line such as:
 
 \begin{terminalv}
-   helplib 'MYDISK::[ME.PROGS]MYLIB'
+helplib 'MYDISK::[ME.PROGS]MYLIB'
 \end{terminalv}
 
 which identifies the help library to be used.
@@ -278,7 +256,7 @@ Each of the application's parameters for which help information is available
 should also have a line in its interface file entry such as:
 
 \begin{terminalv}
-   helpkey *
+helpkey *
 \end{terminalv}
 
 where `$*$' specifies that a default set of keywords should be used to
@@ -305,7 +283,7 @@ code files (containing prologue information) as input to PROPAK, for
 instance:
 
 \begin{terminalv}
-   ICL> PROPAK *.FOR PACK=XYZ
+ICL> PROPAK *.FOR PACK=XYZ
 \end{terminalv}
 
 Note that a value for the PACK parameter (the name of the package to be
@@ -363,7 +341,7 @@ Normally, PROCVT will be used with both an input and an output file
 specified, for instance:
 
 \begin{terminalv}
-   ICL> PROCVT OLD.FOR NEW.FOR
+ICL> PROCVT OLD.FOR NEW.FOR
 \end{terminalv}
 
 This command will convert the old-style prologue held in the file OLD.FOR
@@ -422,7 +400,7 @@ To run FORSTATS on a software system contained in a set of `.FOR' files, you
 might use the command:
 
 \begin{terminalv}
-   ICL> FORSTATS *.FOR
+ICL> FORSTATS *.FOR
 \end{terminalv}
 
 This command will analyse the specified files and write a statistics file
