@@ -1,34 +1,24 @@
-\documentclass[twoside,11pt]{article}
-
-% ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
-% ? End of specify used packages
-
-\pagestyle{myheadings}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % -----------------------------------------------------------------------------
-% ? Document identification
-% Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright}
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
+\stardoccopyright
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {110.2}
-\newcommand{\stardocauthors}   {R.F. Warren-Smith}
-\newcommand{\stardocdate}      {5th October 1990}
-\newcommand{\stardoctitle}     {SST - A Simple Software Tools Package}
-\newcommand{\stardocversion}   {Version 1.0}
-\newcommand{\stardocmanual}    {User's Manual}
-\newcommand{\stardocabstract}  {
+\stardocnumber      {110.2}
+\stardocauthors     {R.F. Warren-Smith}
+\stardocdate        {5th October 1990}
+\stardoctitle       {SST - A Simple Software Tools Package}
+\stardocversion     {Version 1.0}
+\stardocmanual      {User's Manual}
+\stardocabstract  {
 The Simple Software Tools package (SST) is a package of applications
 designed to help with the production of software and documentation, with
 particular emphasis on ADAM programming using Fortran~77.
 }
-% ? End of document identification
 % -----------------------------------------------------------------------------
 
 % +
@@ -59,499 +49,12 @@ particular emphasis on ADAM programming using Fortran~77.
 %
 % -
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
+\stardocname  {\stardocinitials /\stardocnumber}
 
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-
-%+
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-%-
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%% Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  sstroutine.
-   \newcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-      \\
-   }
-
-%  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
-      \begin{description}
-         #1
-      \end{description}
-      \\
-   }
-
-%  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
-
-%  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
-
-%  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
-
-%  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-%.
-
-
-
-% ? End of document specific commands
-% -----------------------------------------------------------------------------
-%  Title Page.
 %  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
+\scfrontmatter
 
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
-
-% ? Heading for abstract if used.
-   \vspace{10mm}
-   \begin{center}
-      {\Large\textbf{Abstract}}
-   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-\stardocabstract
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? Latex Copyright Statement
-%  =========================
-%\begin{latexonly}
-%\newpage
-%\vspace*{\fill}
-%\stardoccopyright
-%\end{latexonly}
-% ? End of Latex copyright statement
-
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
 
 \section{INTRODUCTION}
 
@@ -581,9 +84,9 @@ A simple source-code and comment statistics tool is also included.
 All the applications in the SST package run under ADAM, so before you start
 you should execute the command:
 
-\begin{verbatim}
+\begin{terminalv}
    $ ADAMSTART
-\end{verbatim}
+\end{terminalv}
 
 This is a good opportunity to add this command to your LOGIN.COM file if you
 have not already done so.
@@ -591,24 +94,24 @@ have not already done so.
 The commands within the SST package itself can be used either from the ADAM
 command language ICL, or from DCL.
 These commands are initially made available by typing `SST' at the command
-prompt, {\em e.g.}\ from ICL:
+prompt, \emph{e.g.}\ from ICL:
 
-\begin{verbatim}
+\begin{terminalv}
    $ ICL
    ICL> SST
-\end{verbatim}
+\end{terminalv}
 
 or from DCL:
 
-\begin{verbatim}
+\begin{terminalv}
    $ SST
-\end{verbatim}
+\end{terminalv}
 
 In either case, the following message will be displayed, indicating that the
 package is ready for use:
 
 \begin{quote}
-{\tt Simple Software Tools (SST) commands are now available.}
+\texttt{Simple Software Tools (SST) commands are now available.}
 \end{quote}
 
 You can then invoke any of the SST applications by typing the appropriate
@@ -618,16 +121,16 @@ of the applications available).
 When working from ICL you can obtain help about SST by using the HELP command,
 thus:
 
-\begin{verbatim}
+\begin{terminalv}
    ICL> HELP SST
-\end{verbatim}
+\end{terminalv}
 
 You can also obtain help on each individual application by giving its name,
-{\em e.g:}
+\emph{e.g:}
 
-\begin{verbatim}
+\begin{terminalv}
    ICL> HELP FORSTATS
-\end{verbatim}
+\end{terminalv}
 
 will give help on the SST application FORSTATS.
 ``In-line'' help on an application's parameters is also available, in the
@@ -641,8 +144,7 @@ value for a parameter.
 
 The SST application PROLAT is provided to facilitate the production of
 documentation for packages of applications and subroutine libraries.
-It works by extracting the necessary information from ``prologues'' ({\em
-i.e.}\ header comments) within the source-code files which comprise the
+It works by extracting the necessary information from ``prologues'' (\emph{i.e.}\ header comments) within the source-code files which comprise the
 software, and formatting this information into a \LaTeX\ document.
 The documentation in Appendix~\ref{appendix:descriptions}, for example, has
 been produced by this means.
@@ -665,12 +167,12 @@ For example, if an application with suitable prologue information resides in
 the file PROG.FOR, then the following sequence of commands would extract this
 information and send the derived document to a Canon laser printer:
 
-\begin{verbatim}
+\begin{terminalv}
    ICL> PROLAT PROG.FOR
    ICL> SPAWN LATEX PROLAT
    ICL> $DVICAN PROLAT
    ICL> $PRCN PROLAT.DVI-CAN
-\end{verbatim}
+\end{terminalv}
 
 When working from ICL, notice how `SPAWN' must be used in front of the LATEX
 command.
@@ -686,9 +188,9 @@ in order to combine a number of program descriptions into a single document.
 Thus, the following command could be used to document an entire software
 system if the necessary files resided in the current directory:
 
-\begin{verbatim}
+\begin{terminalv}
    ICL> PROLAT *.FOR
-\end{verbatim}
+\end{terminalv}
 
 PROLAT has a number of options to tailor its behaviour.
 For instance, you can specify that you are processing information about a
@@ -697,8 +199,7 @@ slightly different documentation format.
 You can also specify that you want only the descriptive part of the document
 without any \LaTeX\ declarations.
 This latter option is useful if you are adding the information to a larger
-document which already contains all the necessary \LaTeX\ commands ({\em
-e.g.}\ as an appendix, such as in the present document).
+document which already contains all the necessary \LaTeX\ commands (\emph{e.g.}\ as an appendix, such as in the present document).
 
 Note that PROLAT does not attempt to provide a sophisticated text-processing
 language and does not, therefore, exploit all the layout facilities which
@@ -737,24 +238,24 @@ accessed when the program is run.
 The first step would be to create the library (if you have not already done
 so), as follows:
 
-\begin{verbatim}
+\begin{terminalv}
    ICL> $LIBRARY/CREATE/HELP MYLIB.HLB
-\end{verbatim}
+\end{terminalv}
 
 The prologue information is then extracted using PROHLP which, by default,
 writes it to the file PROHLP.HLP:
 
-\begin{verbatim}
+\begin{terminalv}
    ICL> PROHLP PROG.FOR
-\end{verbatim}
+\end{terminalv}
 
 The extracted information can then be inserted into the library and the
 intermediate help file deleted:
 
-\begin{verbatim}
+\begin{terminalv}
    ICL> $LIBRARY/HELP MYLIB.HLB PROHLP.HLP
    ICL> $DELETE PROHLP.HLP;*
-\end{verbatim}
+\end{terminalv}
 
 You can check that the help library contains the correct information by using
 the DCL command \$HELP with the /LIBRARY qualifier.
@@ -766,9 +267,9 @@ references to the appropriate entries in the help library.
 Thus, at the start of the interface file, before any parameter definitions,
 there should be a line such as:
 
-\begin{verbatim}
+\begin{terminalv}
    helplib 'MYDISK::[ME.PROGS]MYLIB'
-\end{verbatim}
+\end{terminalv}
 
 which identifies the help library to be used.
 Note that a full directory specification is needed (or an equivalent logical
@@ -776,9 +277,9 @@ name).
 Each of the application's parameters for which help information is available
 should also have a line in its interface file entry such as:
 
-\begin{verbatim}
+\begin{terminalv}
    helpkey *
-\end{verbatim}
+\end{terminalv}
 
 where `$*$' specifies that a default set of keywords should be used to
 access the parameter information in the help library.
@@ -791,7 +292,7 @@ this set of defaults.
 
 If you have developed a subroutine library using STARLSE, with prologue
 information in the correct form, then the SST application PROPAK can be used
-to generate an LSE {\em package definition} to facilitate future use of the
+to generate an LSE \emph{package definition} to facilitate future use of the
 library from within the STARLSE editor.
 This package definition will define LSE templates for each of the routines
 in the library.
@@ -803,9 +304,9 @@ A package definition can be generated by providing the appropriate source
 code files (containing prologue information) as input to PROPAK, for
 instance:
 
-\begin{verbatim}
+\begin{terminalv}
    ICL> PROPAK *.FOR PACK=XYZ
-\end{verbatim}
+\end{terminalv}
 
 Note that a value for the PACK parameter (the name of the package to be
 produced) must also be given.
@@ -861,9 +362,9 @@ becomes suitable for documentation purposes.
 Normally, PROCVT will be used with both an input and an output file
 specified, for instance:
 
-\begin{verbatim}
+\begin{terminalv}
    ICL> PROCVT OLD.FOR NEW.FOR
-\end{verbatim}
+\end{terminalv}
 
 This command will convert the old-style prologue held in the file OLD.FOR
 into STARLSE format and will write it (together with all the associated
@@ -913,16 +414,16 @@ where more attention to in-code commentary would be useful to assist future
 support programmers.
 Conversely, when inheriting an existing software package, FORSTATS can be
 used as an aid to identifying possible problem areas before planning
-changes, {\em etc.}
+changes, \emph{etc.}
 In a large software system, it can also be invaluable simply for listing the
 program units present and indicating their size.
 
 To run FORSTATS on a software system contained in a set of `.FOR' files, you
 might use the command:
 
-\begin{verbatim}
+\begin{terminalv}
    ICL> FORSTATS *.FOR
-\end{verbatim}
+\end{terminalv}
 
 This command will analyse the specified files and write a statistics file
 (FORSTATS.LIS by default), which can then be printed.
@@ -968,7 +469,7 @@ line.
          A list of (optionally wild-carded) file specifications which
          identify the Fortran 77 source code files to be used for
          input.  Up to 10 values may be given, but only a single
-         specification such as {\tt '}$*$.FOR{\tt '} is normally required. There is
+         specification such as \texttt{'}$*$.FOR\texttt{'} is normally required. There is
          no limit to the number of program units which may be held in
          each input file.
       }
@@ -1008,7 +509,7 @@ line.
          for the KEY parameter on the command line.
       }
       \sstexamplesubsection{
-         FORSTATS IN=[{\tt "}A$*$.FOR{\tt "},{\tt "}B$*$.FOR{\tt "}] OUT=ANALYSIS.LIS
+         FORSTATS IN=[\texttt{"}A$*$.FOR\texttt{"},\texttt{"}B$*$.FOR\texttt{"}] OUT=ANALYSIS.LIS
       }{
          In this example, a sequence of input file specifications is
          given and each will be analysed in turn. The combined
@@ -1020,7 +521,7 @@ line.
       software system, since it does not depend on any particular
       layout or format. However, the analysis performed does include a
       test for the existence of prologue information. For this purpose,
-      prologues are taken to be delimited by {\tt '}$+${\tt '} or {\tt '}-{\tt '} characters
+      prologues are taken to be delimited by \texttt{'}$+$\texttt{'} or \texttt{'}-\texttt{'} characters
       appearing in the second column of a comment line. Note that
       unlike some other SST applications, both these characters are
       considered as equivalent by FORSTATS; i.e. the first occurrence
@@ -1040,10 +541,10 @@ line.
 \sstroutine{
    PROCVT
 }{
-   Converts {\tt "}old-style{\tt "} ADAM/SSE prologues into STARLSE format
+   Converts \texttt{"}old-style\texttt{"} ADAM/SSE prologues into STARLSE format
 }{
    \sstdescription{
-      This application converts {\tt "}old-style{\tt "} ADAM/SSE routine prologues
+      This application converts \texttt{"}old-style\texttt{"} ADAM/SSE routine prologues
       into the format generated by the extended VAX Language Sensitive
       Editor STARLSE (SUN/105). The converted prologue information may
       then be used as input to other SST applications which generate
@@ -1066,9 +567,9 @@ line.
          IN() = LITERAL (Read)
       }{
          A list of (optionally wild-carded) file specifications which
-         identify the Fortran 77 source code files with {\tt "}old-style{\tt "}
+         identify the Fortran 77 source code files with \texttt{"}old-style\texttt{"}
          ADAM prologues which are to be used for input. Up to 10 values
-         may be given, but only a single specification such as {\tt '}$*$.FOR{\tt '}
+         may be given, but only a single specification such as \texttt{'}$*$.FOR\texttt{'}
          is normally required.  There is no limit on the number of
          program units which may be held in each input file.
       }
@@ -1078,10 +579,10 @@ line.
          This value specifies the programming language (i.e. the
          particular dialect of Fortran 77) in which the source code is
          written. It does not affect the processing performed, but will
-         be inserted into the output prologues under the {\tt "}Language{\tt "}
+         be inserted into the output prologues under the \texttt{"}Language\texttt{"}
          section heading. If a null (!) or blank value is given, then
          an appropriate STARLSE placeholder will be used instead. The
-         required entry can then be made later by hand. [{\tt '}VAX Fortran{\tt '}]
+         required entry can then be made later by hand. [\texttt{'}VAX Fortran\texttt{'}]
       }
       \sstsubsection{
          OUT = FILE (Write)
@@ -1102,16 +603,16 @@ line.
          file MYPROG\_NEW.FOR.
       }
       \sstexamplesubsection{
-         PROCVT $*$.FOR OUT=SUBS.FOR ATASK=FALSE LANG={\tt "}Starlink Fortran 77{\tt "}
+         PROCVT $*$.FOR OUT=SUBS.FOR ATASK=FALSE LANG=\texttt{"}Starlink Fortran 77\texttt{"}
       }{
          Reads the source code for a subroutine library, held in the
          files $*$.FOR, and converts its prologue information to STARLSE
          format. The converted source code is written to a single
          output file SUBS.FOR. The language specified in the converted
-         prologues will be {\tt "}Starlink Fortran 77{\tt "}.
+         prologues will be \texttt{"}Starlink Fortran 77\texttt{"}.
       }
       \sstexamplesubsection{
-         PROCVT IN=[{\tt "}$*$.FOR{\tt "},{\tt "}$*$.GEN{\tt "}] NOATASK
+         PROCVT IN=[\texttt{"}$*$.FOR\texttt{"},\texttt{"}$*$.GEN\texttt{"}] NOATASK
       }{
          In this example, a sequence of input file specifications is
          given. Each will be processed in turn, converting its prologue
@@ -1120,11 +621,11 @@ line.
       }
    }
    \sstnotes{
-      Due to the variety of layouts found in existing {\tt "}old-style{\tt "}
+      Due to the variety of layouts found in existing \texttt{"}old-style\texttt{"}
       ADAM/SSE prologues, this application is not guaranteed always to
       produce a perfect result. Particular problem areas are the
       inconsistent use of indentation, and the occasional use of
-      section headings and placeholders (of the form {\tt '}$<$...$>${\tt '}) which do
+      section headings and placeholders (of the form \texttt{'}$<$...$>$\texttt{'}) which do
       not quite match those given in the original ADAM/SSE prologue
       templates.  Nevertheless, in most cases, PROCVT will produce a
       result which can be edited fairly easily using STARLSE to conform
@@ -1176,7 +677,7 @@ line.
          A list of (optionally wild-carded) file specifications which
          identify the Fortran 77 source code files to be used for
          input. Up to 10 values may be given, but only a single
-         specification such as {\tt '}$*$.FOR{\tt '} is normally required.
+         specification such as \texttt{'}$*$.FOR\texttt{'} is normally required.
 
          If the SINGLE parameter is set to TRUE (the default), then
          only a single prologue will be expected in each input file. If
@@ -1210,7 +711,7 @@ line.
       }{
          Extracts prologue information from the application program
          source code held in the file PROG.FOR and produces a help
-         library entry for it. The program{\tt '}s name is used as the
+         library entry for it. The program\texttt{'}s name is used as the
          level-1 help keyword. The output is written to the file
          PROG.HLP.
       }
@@ -1220,7 +721,7 @@ line.
          Extracts prologue information for a subroutine library, whose
          source code resides in the files $*$.FOR, one routine per file.
          Help library entries describing the routines are written to
-         the file SUBS.HLP, with each routine{\tt '}s name being used as a
+         the file SUBS.HLP, with each routine\texttt{'}s name being used as a
          level-1 help keyword.
       }
       \sstexamplesubsection{
@@ -1233,7 +734,7 @@ line.
          level-1 help keyword.
       }
       \sstexamplesubsection{
-         PROHLP IN=[{\tt "}A$*$.FOR{\tt "},{\tt "}B$*$.FOR{\tt "}] NOATASK
+         PROHLP IN=[\texttt{"}A$*$.FOR\texttt{"},\texttt{"}B$*$.FOR\texttt{"}] NOATASK
       }{
          In this example, a sequence of input file specifications is
          given. Each will be processed in turn to generate a help file
@@ -1244,8 +745,8 @@ line.
    }
    \sstnotes{
       Care must be taken to ensure that begin-prologue and end-prologue
-      lines (starting {\tt '}$*$$+${\tt '} and {\tt '}$*$-{\tt '} respectively) appear before and
-      after each prologue and that {\tt '}$+${\tt '} and {\tt '}-{\tt '} symbols are not used in
+      lines (starting \texttt{'}$*$$+$\texttt{'} and \texttt{'}$*$-\texttt{'} respectively) appear before and
+      after each prologue and that \texttt{'}$+$\texttt{'} and \texttt{'}-\texttt{'} symbols are not used in
       the second column elsewhere in the file, otherwise prologues may
       not be correctly identified.
    }
@@ -1311,7 +812,7 @@ line.
          A list of (optionally wild-carded) file specifications which
          identify the Fortran 77 source code files to be used for
          input. Up to 10 values may be given, but only a single
-         specification such as {\tt '}$*$.FOR{\tt '} is normally required.
+         specification such as \texttt{'}$*$.FOR\texttt{'} is normally required.
 
          If the SINGLE parameter is set to TRUE (the default), then
          only a single prologue will be expected in each input file. If
@@ -1377,7 +878,7 @@ line.
          a larger document.
       }
       \sstexamplesubsection{
-         PROLAT IN=[{\tt "}$*$.FOR{\tt "},{\tt "}$*$.GEN{\tt "}] NOATASK PAGE
+         PROLAT IN=[\texttt{"}$*$.FOR\texttt{"},\texttt{"}$*$.GEN\texttt{"}] NOATASK PAGE
       }{
          In this example, a sequence of input file specifications is
          given. Each will be processed in turn to generate Latex
@@ -1388,8 +889,8 @@ line.
    }
    \sstnotes{
       Care must be taken to ensure that begin-prologue and end-prologue
-      lines (starting {\tt '}$*$$+${\tt '} and {\tt '}$*$-{\tt '} respectively) appear before and
-      after each prologue and that {\tt '}$+${\tt '} and {\tt '}-{\tt '} symbols are not used in
+      lines (starting \texttt{'}$*$$+$\texttt{'} and \texttt{'}$*$-\texttt{'} respectively) appear before and
+      after each prologue and that \texttt{'}$+$\texttt{'} and \texttt{'}-\texttt{'} symbols are not used in
       the second column elsewhere in the file, otherwise prologues may
       not be correctly identified.
    }
@@ -1463,7 +964,7 @@ line.
          A list of (optionally wild-carded) file specifications which
          identify the Fortran 77 source code files to be used for
          input. Up to 10 values may be given, but only a single
-         specification such as {\tt '}$*$.FOR{\tt '} is normally required.
+         specification such as \texttt{'}$*$.FOR\texttt{'} is normally required.
 
          If the SINGLE parameter is set to TRUE (the default), then
          only a single prologue will be expected in each input file. If
@@ -1486,7 +987,7 @@ line.
          prefix characters used on the routines themselves are
          recommended for use as the package name. For example, if
          routines in the package have names such as XYZ\_ROUTN, then
-         {\tt "}XYZ{\tt "} should be used as the package name.
+         \texttt{"}XYZ\texttt{"} should be used as the package name.
       }
       \sstsubsection{
          SINGLE = \_LOGICAL (Read)
@@ -1508,7 +1009,7 @@ line.
       }{
          Extracts prologue information from the routines held in the
          files MPK\_$*$.FOR, one per file, and produces a STARLSE package
-         definition for them. The package is called {\tt "}MPK{\tt "} and its
+         definition for them. The package is called \texttt{"}MPK\texttt{"} and its
          definition is written to the file MYPACK.LSE.
       }
       \sstexamplesubsection{
@@ -1516,7 +1017,7 @@ line.
       }{
          Extracts prologue information for a subroutine library, whose
          source code resides in the files $*$.FOR, one routine per file.
-         The resulting definition, of a STARLSE package called {\tt "}TEST{\tt "},
+         The resulting definition, of a STARLSE package called \texttt{"}TEST\texttt{"},
          is written to the default output file PROPAK.LSE. The package
          contains references to the help library TEST\_DIR:TESTHELP,
          from which on-line help may be obtained when using the package
@@ -1527,11 +1028,11 @@ line.
       }{
          Extracts prologue information from a sequence of subroutines
          or functions, all of which are held in the file SOURCE.FOR,
-         and defines a STARLSE package called {\tt "}MYLIB{\tt "} in the default
+         and defines a STARLSE package called \texttt{"}MYLIB\texttt{"} in the default
          output file PROPAK.TEX.
       }
       \sstexamplesubsection{
-         PROPAK IN=[{\tt "}A$*$.FOR{\tt "},{\tt "}B$*$.FOR{\tt "}] HELP=PACK\_HELP
+         PROPAK IN=[\texttt{"}A$*$.FOR\texttt{"},\texttt{"}B$*$.FOR\texttt{"}] HELP=PACK\_HELP
       }{
          In this example, a sequence of input file specifications is
          given. Each will be processed in turn to generate a combined
@@ -1541,8 +1042,8 @@ line.
    }
    \sstnotes{
       Care must be taken to ensure that begin-prologue and end-prologue
-      lines (starting {\tt '}$*$$+${\tt '} and {\tt '}$*$-{\tt '} respectively) appear before and
-      after each prologue and that {\tt '}$+${\tt '} and {\tt '}-{\tt '} symbols are not used in
+      lines (starting \texttt{'}$*$$+$\texttt{'} and \texttt{'}$*$-\texttt{'} respectively) appear before and
+      after each prologue and that \texttt{'}$+$\texttt{'} and \texttt{'}-\texttt{'} symbols are not used in
       the second column elsewhere in the file, otherwise prologues may
       not be correctly identified.
    }
