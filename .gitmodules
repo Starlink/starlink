@@ -163,3 +163,6 @@
 [submodule "thirdparty/erfa/erfa"]
 	path = thirdparty/erfa/erfa
 	url = git://github.com/liberfa/erfa.git
+[submodule "thirdparty/perlsys/perlmods/perl-Pod-SST"]
+	path = thirdparty/perlsys/perlmods/perl-Pod-SST
+	url = ../perl-Pod-SST
