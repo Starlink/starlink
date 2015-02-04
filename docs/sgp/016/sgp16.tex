@@ -1,259 +1,36 @@
-\documentclass[twoside,11pt]{article}
-\pagestyle{myheadings}
+\documentclass[twoside,11pt,nolof,noabs]{starlink}
+
 
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink General Paper}
-\newcommand{\stardocinitials}  {SGP}
-\newcommand{\stardocnumber}    {16.10}
-\newcommand{\stardocsource}    {sgp\stardocnumber}
-\newcommand{\stardocauthors}   {P.~T.~Wallace}
-\newcommand{\stardocdate}      {23rd~March~1992}
-\newcommand{\stardoctitle}     {Starlink Application Programming Standard}
-%------------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{240mm}
-\setlength{\topmargin}{-5mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
+\stardoccategory    {Starlink General Paper}
+\stardocinitials    {SGP}
+\stardocnumber      {16.10}
+\stardocsource      {sgp\stardocnumber}
+\stardocauthors     {P.~T.~Wallace}
+\stardocdate        {23rd~March~1992}
+\stardoctitle       {Starlink Application Programming Standard}
+\stardocname  {\stardocinitials /\stardocnumber}
 % -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
 
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % from the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
+%  Document-specific \providecommand or \newenvironment commands.
 \newcounter{sruleno}
-\newcommand{\srule}[1]{
+\providecommand{\srule}[1]{
     \addtocounter{sruleno}{1}
     \goodbreak
-    \rule[0.5ex]{\textwidth}{0.3mm}
-    {\Large #1 \hfill {\thesruleno}}
-    \rule[0.5ex]{\textwidth}{0.1mm}
+    \rule{\textwidth}{0.3mm}
+    \textbf{#1} \scpushright{ \textbf{\thesruleno}}
+    \rule{\textwidth}{0.1mm}
 }
-
-\begin{htmlonly}
-  \newcommand{\srule}[1]{
-       \addtocounter{sruleno}{1}
-       \begin{rawhtml} <HR> \end{rawhtml}
-       {\Large \thesruleno}~~~~{\Large #1}
-       \begin{rawhtml} <HR> \end{rawhtml}
-       \end{tabular}
-  }
-\end{htmlonly}
 
 \renewcommand{\_}{{\tt\char'137}}
 
-%------------------------------------------------------------------------------
-% ? End of document-specific commands
 % -----------------------------------------------------------------------------
 
-%  Title Page.
-%  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
+\scfrontmatter
 
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Science \& Engineering Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Large\bf \stardoctitle}
-   \end{center}
-   \vspace{5mm}
 
-% ? Heading for abstract if used.
-%   \vspace{10mm}
-%   \begin{center}
-%      {\Large\bf Abstract}
-%   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Science \& Engineering Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-%  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-%\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-% \newpage
-%\begin{latexonly}
-%   \setlength{\parskip}{0mm}
-%   \tableofcontents
-%   \setlength{\parskip}{\medskipamount}
-%   \markright{\stardocname}
-%\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\newpage
-
-\begin{latexonly}\begin{center}
-\vspace{10mm}
-PREFACE
-\end{center}
-\end{latexonly}
-\html{\section{\xlabel{preface}PREFACE}}
+\section{\xlabel{preface}PREFACE}
 
 This Programming Standard should be read by all those who implement
 programs on Starlink computers.  The techniques described are
@@ -387,7 +164,7 @@ Note that anyone wishing to adhere more rigidly to the Fortran~77 standard is
 permitted to do so.
 The latest version of Fortran, called Fortran~90, contains
 many improvements over Fortran~77 and almost eliminates the need to
-use {\bf any} platform-specific features.  Extra facilities not
+use \textbf{any} platform-specific features.  Extra facilities not
 available in existing Fortran~77 implementations (for example the
 processing of whole arrays
 as primitive data items) are also available.
@@ -397,7 +174,7 @@ almost all of these are already prohibited by the Starlink standard.
 Fortran~90 compilers are not presently provided on Starlink but
 will be in due course.
 
-The following extensions to the Fortran~77 standard are {\bf permitted}
+The following extensions to the Fortran~77 standard are \textbf{permitted}
 within Starlink:
 \begin{quote}
 \begin{tabbing}
@@ -409,11 +186,11 @@ INCLUDE\>encouraged
 \end{tabbing}
 \end{quote}
 IMPLICIT~NONE, END~DO, DO~WHILE and INCLUDE are all
-in Fortran~90.  See Section~5, {\it Writing Portable
+in Fortran~90.  See Section~5, \textit{Writing Portable
 Programs}, for detailed advice on INCLUDE statements.
 
 Here are some examples of features which are part of neither the Fortran~77
-standard nor the Starlink standard, and are to be {\bf avoided}:
+standard nor the Starlink standard, and are to be \textbf{avoided}:
 \begin{quote}
 INTEGER*4, REAL*4, REAL*8, LOGICAL*1 etc.\ (see note 1, below)\\
 Names $>$ 6 characters (note 2)\\
@@ -449,12 +226,12 @@ names, and some even like using
 whole sentences with underscores between the words.  Opinions vary
 on whether long names help readability all that much, but what is
 certain is that several computer systems of considerable potential
-importance to UK astronomers do {\bf not} support long
+importance to UK astronomers do \textbf{not} support long
 names (for example some mainframes,
 certain attached processors, some workstations).  Some
 computers accept names longer than 6 characters
 but only a little longer; others
-accept long names but ignore all but the first {\it n}\, characters.
+accept long names but ignore all but the first \textit{n}\, characters.
 
 Though names internal to a Starlink program must be no more than 6 characters
 long, the use of names of more than 6 characters is permissible (and indeed
@@ -515,9 +292,9 @@ They should not be used for any other purpose.
 \srule{Stick to the Fortran~77 character set !!}
 The Fortran~77 standard permits use of only the following characters
 (except in comments and character strings):
-\begin{verbatim}
+\begin{terminalv}
     0-9, A-Z, space, currency symbol, +-*/(),'.:
-\end{verbatim}
+\end{terminalv}
 Though a few other characters are sufficiently common for trouble to be unlikely
 it is best to avoid them even in comments as they may appear different on
 different terminals and printers -- hash and pounds sign are particular
@@ -540,8 +317,8 @@ would be different entities for example).
 The character set allowed by Fortran~90 includes \verb|_ ! " % & ; < > ? [ ]|.
 
 Take care with collating sequence.  The letters A-Z appear in the
-expected {\it order}, but you cannot assume
-that they are {\it contiguous}\, in
+expected \textit{order}, but you cannot assume
+that they are \textit{contiguous}\, in
 the collating sequence.  Similar remarks apply to 0-9.  Do not
 assume that the numbers appear before the letters.  Assume
 nothing about the collating sequence of punctuation characters,
@@ -556,13 +333,13 @@ End of line comments (preceded by `!') are not in the
 Fortran~77 standard, and are best avoided, though they
 are in Fortran~90 and are supported by many current compilers.
 There is some justification for using them with data declarations.
-If used at all they must be neatly aligned by means of spaces, {\bf not}
+If used at all they must be neatly aligned by means of spaces, \textbf{not}
 TAB characters (see the next rule).
 
 \srule{Don't use TABs !!!}
 The use of TAB characters is prohibited, both in source code and as required
 data input to a program.
-Though their use in source code may give an {\it illusion}\,
+Though their use in source code may give an \textit{illusion}\,
 of good layout with a
 minimum of effort, tab settings on different terminals and printers will in
 general be different and will not reproduce what appeared on the screen when the
@@ -573,9 +350,9 @@ used keys or special function keys to produce multiple spaces -- for instance
 
 \srule{Arithmetic IF banned !!!}
 The use of the arithmetic IF:
-\begin{verbatim}
+\begin{terminalv}
     IF (X) 10,10,20
-\end{verbatim}
+\end{terminalv}
 is prohibited.
 It offers even more opportunity for unstructured programming than the
 discredited GO~TO and, moreover, doesn't read naturally in
@@ -589,11 +366,11 @@ Don't use the computed GO~TO unless you have to, and then only to
 implement a properly laid out `case' construct.  In such instances, a good
 plan is to use comments to indicate the case for each destination.
 For example:
-\begin{verbatim}
+\begin{terminalv}
     *  Switch according to command
           GO TO ( 1000, 2000, 3000, 9000 )
     *               Go  Hold  Stop  Abort
-\end{verbatim}
+\end{terminalv}
 
 \srule{ASSIGN banned !!!}
 The ASSIGN statement is prohibited.  It offers endless opportunities
@@ -632,13 +409,13 @@ and RETURNs are similarly prohibited.
 The DIMENSION statement should not be used; arrays must be given explicit type
 declarations.
 For example:
-\begin{verbatim}
+\begin{terminalv}
     REAL A(512,512)
-\end{verbatim}
+\end{terminalv}
 must be used, rather than:
-\begin{verbatim}
+\begin{terminalv}
     DIMENSION A(512,512)
-\end{verbatim}
+\end{terminalv}
 
 \srule{Don't try to overprint !!!}
 In FORMAT statements,
@@ -655,7 +432,7 @@ banned.
 The SAVE statement must be used in all cases where
 subprograms assume that their local variables retain
 their values between successive invocations.  If you
-don't do this, {\bf your programs will not run
+don't do this, \textbf{your programs will not run
 correctly on some computers} even though they happen to work on VAX/VMS
 and other compilers that allocate static storage by default.
 Note that SAVE is
@@ -694,10 +471,10 @@ usually less need for naming conventions.
 Arrays appearing in COMMON must have their type and dimensions declared in
 separate statements which precede the COMMON declaration.
 For example:
-\begin{verbatim}
+\begin{terminalv}
     REAL ARRAY(512)
     COMMON /fac_BLOCK/ ARRAY
-\end{verbatim}
+\end{terminalv}
 
 The types of subprogram arguments must be specified explicitly.
 
@@ -729,13 +506,13 @@ unit numbers from a pool, and this is recommended.
 \srule{Don't use mixed mode arithmetic !!}
 Avoid mixed mode arithmetic or change of type across an assignment statement.
 Use explicit type conversions; for example:
-\begin{verbatim}
+\begin{terminalv}
     X = REAL(N-1)
-\end{verbatim}
+\end{terminalv}
 rather than:
-\begin{verbatim}
+\begin{terminalv}
     X = N-1
-\end{verbatim}
+\end{terminalv}
 
 Changing from one number format to another is a very significant
 event in an algorithm and should be clearly expressed.  Great
@@ -749,12 +526,12 @@ DOUBLE~PRECISION for example).
 
 \srule{LOGICAL and INTEGER are different !!!}
 LOGICAL and INTEGER usage must not be mixed.  For example:
-\begin{verbatim}
+\begin{terminalv}
     INTEGER JFLAG
        :
        :
     IF (.NOT.JFLAG) ...
-\end{verbatim}
+\end{terminalv}
 is not permitted.
 
 \srule{Use only INTEGER DO-variables !!}
@@ -776,7 +553,7 @@ only in a straightforward way.  In particular:
 \subsection{Design}
 
 \srule{Use Structured Programming !!}
-The principles of {\em structured programming} should
+The principles of \emph{structured programming} should
 be followed except in cases where this obscures the program logic.
 
 Programs written using structured programming techniques
@@ -797,7 +574,7 @@ than ones containing tangled GO~TO logic, but may be harder to
 write, especially if you have not completely
 grasped what you are trying to do before you start coding.
 
-To conform to the Starlink standard, a program must {\it not}\, show signs of
+To conform to the Starlink standard, a program must \textit{not}\, show signs of
 having been written `bottom-up', or having `grown like Topsy'.
 It can be a good plan to begin by writing the program in a `structured English'
 pseudo-language; this can then become, as comments, part of the program.
@@ -829,7 +606,7 @@ If you are prepared to use the non-ANSI-standard DO~WHILE, you can write a
 loop which includes tests for exit and repeat conditions,
 without using the GO~TO:
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 LOGICAL LOOP
      :
 LOOP = .TRUE.
@@ -842,7 +619,7 @@ DO WHILE (LOOP)
      :
   END IF
 END DO
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 \srule{Don't loop using GO~TO !!}
@@ -937,9 +714,9 @@ type & range & accuracy \\ \\
 \end{quote}
 
 \srule{Don't access uninitialized variables !!!}
-{\bf Never} access an uninitialized variable.
+\textbf{Never} access an uninitialized variable.
 Relying on variables being initially zero (usually
-the case for VAX Fortran) is {\bf not} permitted.
+the case for VAX Fortran) is \textbf{not} permitted.
 
 \srule{Don't use VAX system service or RTL calls !!}
 Any programs which call system services (QIO etc.) or Run-Time Library
@@ -969,11 +746,11 @@ changed.
 In general, the sizes of tables, queues, buffers and work arrays should be
 defined parametrically.
 For example:
-\begin{verbatim}
+\begin{terminalv}
     *  Reference star positions
           PARAMETER (NREFS=1000)
           REAL REFS(2,NREFS)
-\end{verbatim}
+\end{terminalv}
 
 If a size is required in more than one program unit, it should be
 declared in an INCLUDE file.
@@ -984,9 +761,9 @@ statement is important in order to minimize rounding, this
 can be achieved by means of otherwise redundant parentheses.
 For example, if DELTA1 and DELTA2 are small compared with B, their sum could be
 computed without avoidable loss of precision as follows:
-\begin{verbatim}
+\begin{terminalv}
     A = B+(DELTA1+DELTA2)
-\end{verbatim}
+\end{terminalv}
 
 \srule{Validate inputs !!!}
 Everything coming into the program from outside must be validated.
@@ -1015,7 +792,7 @@ decide whether or not messages will actually appear on the user's
 screen.
 
 \srule{Don't terminate by count !!!}
-Terminate input by end-of-file or by a special end record, {\bf not} by
+Terminate input by end-of-file or by a special end record, \textbf{not} by
 count.
 
 \srule{Don't test REALs for equality !!!}
@@ -1048,7 +825,7 @@ MAX(A,B) rather than AMAX1(A,B).
 Starlink library routines should be used whenever possible, rather than
 writing routines which duplicate (or almost duplicate) the functions of
 existing Starlink routines.
-It is permissible to {\it adapt}\, Starlink code where the required changes are
+It is permissible to \textit{adapt}\, Starlink code where the required changes are
 substantial and the code uses only published interfaces; the source must be
 seamlessly blended with the new application and be given a new name.
 
@@ -1137,7 +914,7 @@ libraries by using the LIBPRE facility (see SUN/8).
 Example:
 \begin{quote}
 \begin{footnotesize}
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE sla_NUT (DATE, RMATN)
 *+
 *     - - - -
@@ -1165,7 +942,7 @@ Example:
 *
 *  P.T.Wallace   Starlink   10 May 1990
 *-
-\end{verbatim}
+\end{terminalv}
 \end{footnotesize}
 \end{quote}
 Note, however, that much of the freedom implied by the above recommendations
@@ -1196,7 +973,7 @@ Comments beginning in column 7 are strongly discouraged, even if preceded by
 \mbox{\tt{C*****}} and the like.
 \srule{Be considerate !!!}
 Every effort must be made to present the program in the clearest and most
-agreeable way {\bf from the point
+agreeable way \textbf{from the point
 of view of the support programmer} -- who has a much
 more difficult job to do than the original author.
 The layout must be neat, clean and consistent, and there must
@@ -1277,7 +1054,7 @@ This scheme is used in the following example.  This is, of course,
 only one acceptable layout, and tastes vary.
 \begin{quote}
 \begin{footnotesize}
-\begin{verbatim}
+\begin{terminalv}
 *   Reset bad pixel count
       NBLEM = 0
 
@@ -1336,7 +1113,7 @@ only one acceptable layout, and tastes vary.
 
 *   Final report
       WRITE (LINE,'(I6,''  blemishes removed'')') NBLEM
-\end{verbatim}
+\end{terminalv}
 \end{footnotesize}
 \end{quote}
 
@@ -1358,7 +1135,7 @@ and the example in the previous rule).
 All graphics operations must be carried out, ultimately,
 by the GKS (SUN/83) and IDI (SUN/65) libraries.
 
-{\bf GKS:~~} Direct use of raw GKS in applications is
+\textbf{GKS:~~} Direct use of raw GKS in applications is
 discouraged, in favour of using one
 of the Starlink-supported higher-level packages as an intermediary.
 These include SGS, the \mbox{NCAR} utilities (and the SNX routines),
@@ -1370,7 +1147,7 @@ are provided elsewhere.  MONGO is supplied by Starlink principally
 for interactive use, and is in any case being phased out in favour
 of the Starlink \mbox{PGPLOT}-based PONGO package.)
 
-{\bf SGS:~~} Where only low-level facilities are required (lines,
+\textbf{SGS:~~} Where only low-level facilities are required (lines,
 character strings, formatted numbers, simple shapes, but
 not complete axes or whole graphs) the SGS package (SUN/85)
 is recommended.  SGS consists mainly of convenient packaging
@@ -1378,7 +1155,7 @@ of GKS functions, including easy control of plotting zone
 and a flexible workstation naming scheme, and can be used
 in conjunction with direct GKS calls.
 
-{\bf PGPLOT:~~} In standalone applications where complete graphs are to be
+\textbf{PGPLOT:~~} In standalone applications where complete graphs are to be
 drawn and convenience is more important than flexibility,
 the Caltech \mbox{PGPLOT} package (SUN/15) may be used.
 \mbox{PGPLOT} was expressly designed to meet the requirements of
@@ -1396,13 +1173,13 @@ However, direct access to GKS during use of \mbox{PGPLOT}
 is prohibited, limiting the package's capabilities
 to those explicitly provided by \mbox{PGPLOT} itself.
 
-{\bf NAG:~~} The NAG Graphical Supplement (currently available
+\textbf{NAG:~~} The NAG Graphical Supplement (currently available
 only at certain sites --  see RAL~LUN/45) also draws complete graphs,
 in a number of useful though spartan formats.  It has
 portability advantages, however, especially for users of
 UK university computing facilities.  Some direct access to GKS is possible.
 
-{\bf NCAR \& SNX:~~} The \mbox{NCAR} package, (SUN/88) supplied by the
+\textbf{NCAR \& SNX:~~} The \mbox{NCAR} package, (SUN/88) supplied by the
 National Center for Atmospheric Research, is widely available and runs
 on many different types of computer (n.b./ recent versions are proprietary).
 The Starlink SNX routines (SUN/90) allow the \mbox{NCAR} routines
@@ -1416,7 +1193,7 @@ example numeric labels can be intercepted and replaced;
 opposite axes can have different scales (including
 non-linear ones), lines can have embedded captions, and so on.
 
-{\bf IDI:~~} The IDI package (SUN/65) differs in its objectives from all
+\textbf{IDI:~~} The IDI package (SUN/65) differs in its objectives from all
 those mentioned so far, which are mainly oriented towards line-drawing.
 IDI is a low-level interface for image display devices, and supports
 concepts absent in GKS,
@@ -1426,7 +1203,7 @@ IDI's drawing facilities are rather primitive, but IDI comes
 into its own for highly interactive applications, involving
 special cursors, pan/zoom, blink etc.
 
-{\bf AGI \& GNS:~~} Two supporting packages are the Graphics Database library
+\textbf{AGI \& GNS:~~} Two supporting packages are the Graphics Database library
 AGI (SUN/48) and the Graphics Name Service library GNS (SUN/57).
 AGI remembers what has been plotted where and allows one
 applications to access the plotting of another.  GNS is a
@@ -1436,7 +1213,7 @@ Application programmers should be fully aware of what
 these packages do, should make full use of these facilities,
 and should not duplicate their functions in application code.
 
-{\bf Mixtures:~~} With care, several of the plotting packages can
+\textbf{Mixtures:~~} With care, several of the plotting packages can
 be used in conjunction with one another.  The various packages
 interrelate with each other and with applications
 in ways which are unfortunately too complicated and
@@ -1455,7 +1232,7 @@ safety and simplicity would be well advised to stick to a single
 package (for example \mbox{PGPLOT}) used in a straightforward way.
 
 \srule{Don't interpret graphics device names or numbers !!!}
-Do {\bf not} examine in applications the GKS/SGS/GNS workstation
+Do \textbf{not} examine in applications the GKS/SGS/GNS workstation
 type or name in order to control the behaviour of the
 program.  For example, you are not allowed to say ``the
 GKS workstation type is 3200, therefore this is an
@@ -1486,7 +1263,7 @@ Starlink may, of course, differ from those laid down by Starlink.
 \subsection{Rules for programming ADAM applications}
 
 \srule{Initialize variables !!!}
-It is {\bf essential} that variables are initialized.
+It is \textbf{essential} that variables are initialized.
 Even the VAX's initialization to 0 cannot be relied upon as the task may or
 may not be reloaded between invocations.
 DATA statements must only be used to initialize data which will not change.
@@ -1566,17 +1343,17 @@ PAR\_\_NULL and DAT\_\_SZLOC by INCLUDE files for each package.
 These symbolic names should be used on every occasion that the constant is
 required.  Follow these conventions when developing your own
 INCLUDE files, and use file names in the INCLUDE statements
-which conform to the convention {\it fac}\_{\it err} for
-error codes and {\it fac}\_{\it par} for other symbolic
-constants, where {\it fac} is the facility name.  Further
-advice on INCLUDE statements can be found in Section~5, {\it Writing
+which conform to the convention \textit{fac}\_\textit{err} for
+error codes and \textit{fac}\_\textit{par} for other symbolic
+constants, where \textit{fac} is the facility name.  Further
+advice on INCLUDE statements can be found in Section~5, \textit{Writing
 Portable Programs}.
 
 \srule{RETURN is permissible when testing status.}
 The RETURN statement is allowed in the form:
-\begin{verbatim}
+\begin{terminalv}
     IF (STATUS.NE.SAI__OK) RETURN
-\end{verbatim}
+\end{terminalv}
 as the first executable statement in a subroutine.
 This avoids an extra, unhelpful IF clause and indentation.
 Alternatively, use a GO~TO n, where line n is a CONTINUE statement immediately
@@ -1590,7 +1367,7 @@ package (SUN/98), as well
 as ones for general use.  Use only the standard tokens.
 
 \srule{PAR\_\_ABORT status (!!) must abort the application !!!}
-An application must terminate if the {\it abort} response (!!) is
+An application must terminate if the \textit{abort} response (!!) is
 made when a parameter has been requested.  Note that this rule
 does not mean that the application has to test for the abort
 status after every parameter is obtained;  the inherited
@@ -1609,7 +1386,7 @@ application closes down in an orderly fashion.
 \section{WRITING PORTABLE PROGRAMS}
 
 One of the key reasons for having a Starlink programming standard
-is to promote {\it software portability}.  What is meant by this
+is to promote \textit{software portability}.  What is meant by this
 term, and why is it important?
 
 \subsection{Meaning of Portability}
@@ -1631,10 +1408,10 @@ infrastructure software provided by others.
 \end{itemize}
 To put the recommendations of the Starlink Standard in context,
 consider four degrees of portability, called here
-{\it Absolute Portability}, {\it Portable Fortran},
-{\it Adaptable Fortran}\, and {\it Laissez-Faire}.
+\textit{Absolute Portability}, \textit{Portable Fortran},
+\textit{Adaptable Fortran}\, and \textit{Laissez-Faire}.
 
-{\bf ABSOLUTE PORTABILITY} is where application source code
+\textbf{ABSOLUTE PORTABILITY} is where application source code
 compiles and runs on all types of computer without
 any alterations whatsoever.  Once the programmer has completed work on
 an application, the code need never again be touched.
@@ -1658,45 +1435,45 @@ system, and reduces the convenience and
 effectiveness of online source code debuggers.
 These drawbacks led Starlink to reject this approach.
 
-{\bf PORTABLE FORTRAN}, Starlink's recommendation, is to write
+\textbf{PORTABLE FORTRAN}, Starlink's recommendation, is to write
 applications in an industry-standard language --
 Fortran~77 -- with controlled use of certain platform-dependent
 features as sanctioned by Sections 2 and 4 of the present document.
 Significant departures from
 standard Fortran (for example the use of \verb|%VAL|) should be present
-in only a small minority of modules, with most routines in {\it de facto}\,
+in only a small minority of modules, with most routines in \textit{de facto}\,
 standard Fortran.  These departures can, if and when
 necessary, easily be edited using simple preprocessors like
 \verb|forconv| or even by hand.  Furthermore, the programs can be
 understood and modified by non-specialists.
 
-{\bf ADAPTABLE FORTRAN}, also embraced by the Starlink Standard, differs
-from {\it Portable Fortran}\, in the degree to which
+\textbf{ADAPTABLE FORTRAN}, also embraced by the Starlink Standard, differs
+from \textit{Portable Fortran}\, in the degree to which
 departures from ANSI Fortran are tolerated.  While gratuitous use of
 platform-specific features is frowned upon, it is accepted that
 some use of such features will be convenient and relatively
 harmless.  Programs of this general level of portability are easy to
 write and to adapt manually for new platforms as required.
 
-{\bf LAISSEZ-FAIRE} programming is where programmers can use whatever the
+\textbf{LAISSEZ-FAIRE} programming is where programmers can use whatever the
 current machine's Fortran compiler accepts -- the objective is simply
 to have a program that works.  If a new computer is introduced,
 authors can decide whether to adapt, rewrite or scrap their applications.
 This style of programming lies outside the Starlink Standard and
 is deprecated for anything more than a casual one-off.
 
-The {\it Absolute Portability}\, and {\it Portable Fortran}\,
-categories presuppose substantial quantities of {\it infrastructure
+The \textit{Absolute Portability}\, and \textit{Portable Fortran}\,
+categories presuppose substantial quantities of \textit{infrastructure
 software}, libraries and utilities which leave the
 programmer free to concentrate on the application itself rather than
 worrying about user interfaces, error handling, input/output and
 so on.  At the lowest levels within the infrastructure there is a
 small platform-specific kernel, which has to be
-rewritten for each new machine.  The {\it Adaptable Fortran}\,
-and {\it Laissez-Faire}\, categories allow
+rewritten for each new machine.  The \textit{Adaptable Fortran}\,
+and \textit{Laissez-Faire}\, categories allow
 programmers to provide their own infrastructure if they wish.
 
-{\bf Starlink's recommendation is to base programs on
+\textbf{Starlink's recommendation is to base programs on
 the various standard tools and libraries, and to aim for the
 PORTABLE FORTRAN level in applications code.}
 
@@ -1744,12 +1521,12 @@ illustrate more general portability issues.
   some are rejected by the compilers but others cannot be detected at
   compile time and will cause programs to fail.
   \begin{itemize}
-   \item {\it Overlapping character substrings:~~}
+   \item \textit{Overlapping character substrings:~~}
     The character strings on either size of an assignment
     statement must not overlap.  If not detected at compile
     time, such an overlap will produce incorrect results on
     Unix platforms.
-   \item {\it Illegal string concatenation:~~}
+   \item \textit{Illegal string concatenation:~~}
     The concatenation operator \verb|//| cannot be used in
     circumstances that would require the allocation of arbitrary
     amounts of dynamic memory at run-time.
@@ -1759,7 +1536,7 @@ illustrate more general portability issues.
     function call.  (The ANSI standard puts it thus:  a passed-length
     character dummy argument may only be the operand of a concatenation
     operator within an assignment statement.)
-   \item {\it Mixing character and numeric data in a COMMON block:~~}
+   \item \textit{Mixing character and numeric data in a COMMON block:~~}
     Separate COMMON blocks are required for character data on the one
     hand, and numeric and logical data on the other.  (Similarly,
     it is illegal to EQUIVALENCE character data with anything else.)
@@ -1774,27 +1551,27 @@ illustrate more general portability issues.
     routines, not in the middle of large programs.
    \item Compilers vary in their tolerance of illegal combinations of
     keywords, which must be avoided.
-   \item {\it I/O unit numbers:~~}
+   \item \textit{I/O unit numbers:~~}
     On Unix platforms the I/O unit numbers 0, 5 and 6 refer to the standard
     error, input and output channels respectively and cannot be used for
     anything else.  Furthermore, only those unit numbers can usefully be used
     for reading from and writing to the terminal; other logical units are
     buffered in a way that is inappropriate for terminal I/O.
-   \item {\it Version numbers:~~}
+   \item \textit{Version numbers:~~}
     The Unix file system does not have file versions; opening a
     file with \verb|STATUS='NEW'| when the
     file already exists will either destroy
     the contents of the file or fail depending on the system.
-   \item {\it READONLY:~~}
+   \item \textit{READONLY:~~}
     On the DECstation, the non-standard keyword \verb|READONLY| is required in
     order to open a file that you do not have write access to. The Sun
     compiler issues a warning message if \verb|READONLY| is used.
-   \item {\it RECORDTYPE:~~}
+   \item \textit{RECORDTYPE:~~}
     On Unix platforms, opening an existing file with the non-standard
     keyword \verb|RECORDTYPE='FIXED'| requires
     that the RECL keyword is used as well because unlike on VMS the file
     system does not store the record length in the file header.
-   \item {\it Unformatted direct-access files:~~}
+   \item \textit{Unformatted direct-access files:~~}
     In the OPEN statement for direct-access files the Fortran standard
     requires the record length to be specified, by means of the
     \verb|RECL| keyword.
@@ -1803,7 +1580,7 @@ illustrate more general portability issues.
     an unformatted file.  For unformatted files the Sun uses bytes, whereas
     the VAX and DECstation use numeric storage units (the space required
     to store a REAL or INTEGER value).
-   \item {\it Printer control codes:~~}
+   \item \textit{Printer control codes:~~}
     In the OPEN statement, \verb|CARRIAGECONTROL='LIST'| is non-standard and
     is not supported by some platforms.  There is no machine-independent
     way of specifying whether a text file contains Fortran printer control
@@ -1812,12 +1589,12 @@ illustrate more general portability issues.
     predicted.  This problem must be handled through per-platform code
     variations or by using per-platform utilities for processing the
     files (for example the \verb|fpr| command on the DECstation and Sun).
-   \item {\it Prompt strings:~~}
+   \item \textit{Prompt strings:~~}
     There is no portable way of suppressing CR/LF after
     a message has been output, though the VAX, DECstation and Sun all
     use the non-standard `\verb|$|' edit descriptor.  Provision must
     be made for per-platform variations at this point in an application.
-   \item {\it Status:~~}
+   \item \textit{Status:~~}
     The I/O status values returned by OPEN, CLOSE, READ and WRITE
     are non-portable and application code should avoid using them in
     anything more than a general way (or should use the ERR\_FIOERR
@@ -1826,7 +1603,7 @@ illustrate more general portability issues.
     numbers from the different platforms onto a single adopted set of
     values since the conditions that each platform reports
     as errors are different.
-   \item {\it End-of-File:~~}
+   \item \textit{End-of-File:~~}
     A READ or WRITE statement which includes the ERR= specifier
     behaves differently on different platforms when end-of-file
     is encountered.  The condition is treated as an error on the
@@ -1858,13 +1635,13 @@ illustrate more general portability issues.
   There are a number of bugs that can go unnoticed on VMS but will cause
   programs to fail on other systems:
   \begin{itemize}
-   \item {\it Argument mismatches across subroutine and function calls:~~}
+   \item \textit{Argument mismatches across subroutine and function calls:~~}
     For example a DOUBLE~PRECISION argument passed to a subroutine
     expecting a REAL happens to work on VMS but is a bug.
-   \item {\it Uninitialized variables:~~}
+   \item \textit{Uninitialized variables:~~}
     On a VAX uninitialized variables will be set to zero;  on Suns and
     DECstations they will not (see section~2, rule~36).
-   \item {\it Missing SAVE statements:~~}
+   \item \textit{Missing SAVE statements:~~}
     On VMS the values of variables local to a subroutine are retained
     between calls to the subroutine.  On other systems they may not be;
     on the DECstation, for example, it depends on compiler switches.
@@ -1889,9 +1666,9 @@ illustrate more general portability issues.
     \verb|xxxx| is some name of your own choosing.
    \item Include them with statement like:
     \begin{quote}
-    \begin{verbatim}
+    \begin{terminalv}
       INCLUDE 'xxxx'
-    \end{verbatim}
+    \end{terminalv}
     \end{quote}
    \item Either compile your code in the same directory as the included files
     are stored or define \verb|xxxx| as a logical name.
@@ -1902,29 +1679,29 @@ illustrate more general portability issues.
   libraries have logical names defined on the VAXs so that, for example,
   SAE\_PAR.FOR is included with the statement:
     \begin{quote}
-    \begin{verbatim}
+    \begin{terminalv}
       INCLUDE 'SAE_PAR'
-    \end{verbatim}
+    \end{terminalv}
     \end{quote}
   On Unix the corresponding file is called \verb|sae_par| and is stored in
   \verb|/star/include| along with all the other Starlink INCLUDE files so that
   the INCLUDE statement must be changed to:
     \begin{quote}
-    \begin{verbatim}
+    \begin{terminalv}
       INCLUDE '/star/include/sae_par'
-    \end{verbatim}
+    \end{terminalv}
     \end{quote}
   The \verb|forconv| program
   described in SUN/111 will accomplish the conversion from VMS
   to Unix. The reverse operation can be done with a simple edit script.
 
   It is also possible, though not at present the recommended
-  technique, to set up a {\it soft link}\, file pointing to the required
+  technique, to set up a \textit{soft link}\, file pointing to the required
   INCLUDE file and to specify the name of the soft link file in
   the INCLUDE statement.
  \item ONE MODULE PER SOURCE FILE:~~
   Code that is going to be inserted into a subroutine library (a Unix
-  {\it archive}) must have just one routine per source file before it is
+  \textit{archive}) must have just one routine per source file before it is
   compiled.  This is because the Unix equivalent (\verb|ar|) of the VMS
   librarian does not split object files into separate modules when it inserts
   them into a library.  The Unix command \verb|fsplit| will split a Fortran
@@ -1944,7 +1721,7 @@ illustrate more general portability issues.
 
    \begin{tabbing}
    xxxxx \= xxxxxxxxxxx \= \kill
-     \> {\it suffix} \> {\it platform} \\ \\
+     \> \textit{suffix} \> \textit{platform} \\ \\
      \> \verb|_vax| \> VAX/VMS \\
      \> \verb|_sun4| \> Sun SPARCstation etc. \\
      \> \verb|_mips| \> DECstation etc. \\
@@ -1955,7 +1732,7 @@ illustrate more general portability issues.
    and the file extension should identify the language in the normal way:
    \begin{tabbing}
    xxxxx \= xxxxxxxxxxx \= \kill
-     \> {\it extension} \> {\it language} \\ \\
+     \> \textit{extension} \> \textit{language} \\ \\
      \> \verb|.f| \> FORTRAN \\
      \> \verb|.c| \> C
    \end{tabbing}
@@ -1972,137 +1749,134 @@ illustrate more general portability issues.
 
 The following is a list of packages used by existing Starlink software.
 Software written by others than those actually responsible for developing or
-maintaining these packages must {\bf not} use existing package names, even if
+maintaining these packages must \textbf{not} use existing package names, even if
 the new routines resemble or complement the official set.
 Programmers may wish to submit their own package names for inclusion in the
 following lists.
 \begin{quote}
-\begin{tabbing}
-XXXXXXXXXXXX\=\kill
-ADAM\>ADAM interface file handling\\
-ADAMCL\>ADAM Command Language\\
-ADC\>Astronomical Data Catalogues\\
-AG*\>AGI + interfaces to graphics packages\\
-AIF\>Auxiliary ADAM interface routines\\
-ANT\>ADAM networking\\
-ARGS\>ARGSLIB\\
-ARY\>ARRAY-structure access\\
-AST\>Asterix\\
-CHA\>CHART part of SCAR\\
-CHI\>Catalogue Handling Interface\\
-CHP\>Character Handling ``Plus''\\
-CHR\>Character handling\\
-CHT\>CHART\\
-CLV\>ADAM command language variable system\\
-CMP\>HDS component handling\\
-CNF\>C 'n' Fortran\\
-CNV\>Figaro data-conversion\\
-CON\>CONVERT package routines\\
-CTASK\>ADAM Ctasks\\
-CTM\>Colour-Table Management\\
-DAT\>HDS and extensions to it\\
-DAU\>HDS internal routines\\
-DCV\>Data conversion\\
-DIA\>DIAGRAM\\
-DIP\>Internal system for DIAGRAM\\
-DSA\>Figaro data-structure access\\
-DSK\>Disc output for PGPLOT\\
-DTA\>Figaro data-structure access\\
-DTASK\>ADAM Dtasks\\
-DYN\>Figaro dynamic memory routines\\
-EMS\>Error Message Service\\
-ENG\>ADAM Engineering interface\\
-EOS\>Extendable Object System\\
-ERR\>Error reporting system\\
-EXC\>HDS internal routines\\
-FIG\>Figaro general purpose\\
-FIO\>File I/O\\
-FIT\>FITS processing (including Figaro FITS)\\
-FTS\>KAPPA FITS library\\
-GEN\>General utility routines\\
-GKD\>Graphics dialogue routines\\
-GKS\>Graphics Kernel System\\
-GNS\>Graphics Name System\\
-GWM\>Graphics Window Manager\\
-HDS\>Hierarchical Data System\\
-HELPSYS\>ADAM help system\\
-HLP\>Starlink portable help system\\
-ICH\>ICL real-to-character conversion\\
-ICL\>Interactive Command Language\\
-IDI\>Image display interface to ADAM\\
-IMG\>Simple Image Interface\\
-IOC\>Low-level C magtape routines\\
-IRA--IRZ\>IRAS software\\
-KPE\>KAPPA environment packaging\\
-KPG\>KAPPA general routines\\
-KPS\>KAPPA specific routines\\
-LEX\>ADAM command line parsing\\
-LOCK\>ADAM file sharing system\\
-LOG\>ADAM logging system\\
-MAG\>Magnetic tape handling high level\\
-MCH\>Machine-dependent constants etc.\\
-MESSYS\>ADAM message system implementation\\
-MGO\>MONGO routines\\
-MIO\>Magnetic tape handling low level\\
-MON\>ADAM monitor parameter system\\
-MSG\>Message reporting system\\
-MSP\>Message System Primitives\\
-NBS\>NoticeBoard System\\
-NDF\>NDF access\\
-NUM\>Primitive data arithmetic\\
-PAR\>ADAM parameter system interface\\
-PARSECON\>ADAM interface file parsing\\
-PRM\>PRIMDAT\\
-PSX\>POSIX interface\\
-REC\>HDS internal routines\\
-REF\>HDS reference handling\\
-RIO\>Random-access I/O\\
-REPORT\>ADAM reporting system\\
-SLA\>Subprograms mainly concerned with positional astronomy\\
-SGS\>Simple Graphics System\\
-SMS\>ADAM Screen Management System\\
-SNX\>NCAR/SGS integration\\
-SST\>Simple Software Tools\\
-STRING\>String handling\\
-SUBPAR\>ADAM parameter system implementation level\\
-TAP\>Theoretical astrophysics library\\
-TASK\>ADAM task control\\
-TCV\>ICL type conversion\\
-TEL\>UKIRT clock handling\\
-TPT\>TPOINT\\
-TRA\>Trace\\
-TRN\>TRANSFORM coordinate transformation facility\\
-UFACE\>ADAM User Interface\\
-UNI\>Unit conversion utilities\\
-UTIL\>ADAM/VMS utility\\
-VAL\>Primitive data arithmetic\\
-VAR\>Figaro user variable routines\\
-VEC\>Primitive vector arithmetic\\
-VIO\>VDU I/O (Used by SCAR)
-\end{tabbing}
+\begin{aligndesc}
+\item[ADAM] ADAM interface file handling
+\item[ADAMCL] ADAM Command Language
+\item[ADC] Astronomical Data Catalogues
+\item[AG*] AGI + interfaces to graphics packages
+\item[AIF] Auxiliary ADAM interface routines
+\item[ANT] ADAM networking
+\item[ARGS] ARGSLIB
+\item[ARY] ARRAY-structure access
+\item[AST] Asterix
+\item[CHA] CHART part of SCAR
+\item[CHI] Catalogue Handling Interface
+\item[CHP] Character Handling ``Plus''
+\item[CHR] Character handling
+\item[CHT] CHART
+\item[CLV] ADAM command language variable system
+\item[CMP] HDS component handling
+\item[CNF] C 'n' Fortran
+\item[CNV] Figaro data-conversion
+\item[CON] CONVERT package routines
+\item[CTASK] ADAM Ctasks
+\item[CTM] Colour-Table Management
+\item[DAT] HDS and extensions to it
+\item[DAU] HDS internal routines
+\item[DCV] Data conversion
+\item[DIA] DIAGRAM
+\item[DIP] Internal system for DIAGRAM
+\item[DSA] Figaro data-structure access
+\item[DSK] Disc output for PGPLOT
+\item[DTA] Figaro data-structure access
+\item[DTASK] ADAM Dtasks
+\item[DYN] Figaro dynamic memory routines
+\item[EMS] Error Message Service
+\item[ENG] ADAM Engineering interface
+\item[EOS] Extendable Object System
+\item[ERR] Error reporting system
+\item[EXC] HDS internal routines
+\item[FIG] Figaro general purpose
+\item[FIO] File I/O
+\item[FIT] FITS processing (including Figaro FITS)
+\item[FTS] KAPPA FITS library
+\item[GEN] General utility routines
+\item[GKD] Graphics dialogue routines
+\item[GKS] Graphics Kernel System
+\item[GNS] Graphics Name System
+\item[GWM] Graphics Window Manager
+\item[HDS] Hierarchical Data System
+\item[HELPSYS] ADAM help system
+\item[HLP] Starlink portable help system
+\item[ICH] ICL real-to-character conversion
+\item[ICL] Interactive Command Language
+\item[IDI] Image display interface to ADAM
+\item[IMG] Simple Image Interface
+\item[IOC] Low-level C magtape routines
+\item[IRA--IRZ] IRAS software
+\item[KPE] KAPPA environment packaging
+\item[KPG] KAPPA general routines
+\item[KPS] KAPPA specific routines
+\item[LEX] ADAM command line parsing
+\item[LOCK] ADAM file sharing system
+\item[LOG] ADAM logging system
+\item[MAG] Magnetic tape handling high level
+\item[MCH] Machine-dependent constants etc.
+\item[MESSYS] ADAM message system implementation
+\item[MGO] MONGO routines
+\item[MIO] Magnetic tape handling low level
+\item[MON] ADAM monitor parameter system
+\item[MSG] Message reporting system
+\item[MSP] Message System Primitives
+\item[NBS] NoticeBoard System
+\item[NDF] NDF access
+\item[NUM] Primitive data arithmetic
+\item[PAR] ADAM parameter system interface
+\item[PARSECON] ADAM interface file parsing
+\item[PRM] PRIMDAT
+\item[PSX] POSIX interface
+\item[REC] HDS internal routines
+\item[REF] HDS reference handling
+\item[RIO] Random-access I/O
+\item[REPORT] ADAM reporting system
+\item[SLA] Subprograms mainly concerned with positional astronomy
+\item[SGS] Simple Graphics System
+\item[SMS] ADAM Screen Management System
+\item[SNX] NCAR/SGS integration
+\item[SST] Simple Software Tools
+\item[STRING] String handling
+\item[SUBPAR] ADAM parameter system implementation level
+\item[TAP] Theoretical astrophysics library
+\item[TASK] ADAM task control
+\item[TCV] ICL type conversion
+\item[TEL] UKIRT clock handling
+\item[TPT] TPOINT
+\item[TRA] Trace
+\item[TRN] TRANSFORM coordinate transformation facility
+\item[UFACE] ADAM User Interface
+\item[UNI] Unit conversion utilities
+\item[UTIL] ADAM/VMS utility
+\item[VAL] Primitive data arithmetic
+\item[VAR] Figaro user variable routines
+\item[VEC] Primitive vector arithmetic
+\item[VIO] VDU I/O (Used by SCAR)
+\end{aligndesc}
 \end{quote}
 \goodbreak
 In addition to the above, the following blocks of facility names
 are reserved by Starlink:
 \begin{quote}
-\begin{tabbing}
-XXXXXXXXXXXX\=\kill
-DSx\>x = 0-9,A-Z\\
-SLx\>x = 0-9,A-Z
-\end{tabbing}
+\begin{aligndesc}
+\item[DSx] x = 0-9,A-Z
+\item[SLx] x = 0-9,A-Z
+\end{aligndesc}
 \end{quote}
 \goodbreak
 Though not strictly facility names, the following prefixes are used internally
 within ADAM facilities and should be avoided:
 \begin{quote}
-\begin{tabbing}
-XXXXXXXXXXXX\=\kill
-ACT\>ADAM task activation errors\\
-ADM\>ADAM general errors\\
-PARSE\>PARSECON errors\\
-SAI\>Starlink Applications Interface errors\\
-USER\>Error values available for users\\
-VAL\>Special values
-\end{tabbing}
+\begin{aligndesc}
+\item[ACT] ADAM task activation errors
+\item[ADM] ADAM general errors
+\item[PARSE] PARSECON errors
+\item[SAI] Starlink Applications Interface errors
+\item[USER] Error values available for users
+\item[VAL] Special values
+\end{aligndesc}
 \end{quote}
 \end{document}
