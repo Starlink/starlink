@@ -2385,11 +2385,6 @@ $(MANIFESTS)/sgp28: \
 	cd docs/sgp/028 \
 	  && $(MAKE_CPT)
 
-$(MANIFESTS)/sgp31: \
-		$(MANIFESTS)/star2html
-	cd docs/sgp/031 \
-	  && $(MAKE_CPT)
-
 $(MANIFESTS)/sgp38: \
 		$(MANIFESTS)/star2html
 	cd docs/sgp/038 \
@@ -2982,7 +2977,6 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/sgmlkit \
 	$(MANIFESTS)/sgp16 \
 	$(MANIFESTS)/sgp28 \
-	$(MANIFESTS)/sgp31 \
 	$(MANIFESTS)/sgp38 \
 	$(MANIFESTS)/sgp4 \
 	$(MANIFESTS)/sgs \

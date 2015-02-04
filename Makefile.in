@@ -130,7 +130,6 @@ ALL_TARGETS = \
 	$(MANIFESTS)/sgp4 \
 	$(MANIFESTS)/sgp16 \
 	$(MANIFESTS)/sgp28 \
-	$(MANIFESTS)/sgp31 \
 	$(MANIFESTS)/sgp38 \
 	$(MANIFESTS)/ssn3 \
 	$(MANIFESTS)/ssn8 \
