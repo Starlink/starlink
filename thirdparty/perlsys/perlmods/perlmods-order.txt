@@ -20,3 +20,4 @@ perl-JAC-Setup
 perl-JSA
 perl-Astro-ITC-SCUBA2
 perl-UKIRT-Archive
+perl-Pod-SST
