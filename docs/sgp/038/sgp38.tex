@@ -1,248 +1,25 @@
-\documentclass[twoside,11pt]{article}
-\pagestyle{myheadings}
+\documentclass[twoside,11pt,nolof,noabs]{starlink}
+
 
 %------------------------------------------------------------------------------
 % ? Document identification
-\newcommand{\stardoccategory}  {Starlink General Paper}
-\newcommand{\stardocinitials}  {SGP}
-\newcommand{\stardocnumber}    {38.3}
-\newcommand{\stardocsource}    {sgp\stardocnumber}
-\newcommand{\stardocauthors}   {Malcolm J Currie, P T Wallace \&
+\stardoccategory    {Starlink General Paper}
+\stardocinitials    {SGP}
+\stardocnumber      {38.3}
+\stardocsource      {sgp\stardocnumber}
+\stardocauthors     {Malcolm J Currie, P T Wallace \&
                                 R F Warren-Smith}
-\newcommand{\stardocdate}      {2009 December 10}
-\newcommand{\stardoctitle}     {Starlink Standard Data Structures}
-% ? End of document identification
-%------------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\latexhtml}[2]{#1}
-
-%  Provide CSS support.
-\newcommand{\htmlsetstyle}[3][]{}
-\newcommand{\htmladdtostyle}[3][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  Define LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-%\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-%\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
-
+\stardocdate        {2009 December 10}
+\stardoctitle       {Starlink Standard Data Structures}
+\stardocname  {\stardocinitials /\stardocnumber}
 % -----------------------------------------------------------------------------
 
-\newcommand{\numcir}[1]{\mbox{\hspace{3ex}$\bigcirc$\hspace{-1.7ex}{\small #1}}}
-\begin{htmlonly}
-   \newcommand{\numcir}[1]{~~~~~~ \htmlref{{#1}}{se:expnote{#1}}}
-\end{htmlonly}
-
-\newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
+\providecommand{\numcir}[1]{\mbox{\hspace{3ex}$\bigcirc$\hspace{-1.7ex}{\small #1}}}
+\providecommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
 
 % -----------------------------------------------------------------------------
-
-%  Title Page.
-%  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
-   RUTHERFORD APPLETON LABORATORY\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Large\bf \stardoctitle}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-%   \vspace{10mm}
-%   \begin{center}
-%      {\Large\bf Abstract}
-%   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      SCIENCE \& ENGINEERING RESEARCH COUNCIL /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-%  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-%\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-%\newpage
-\begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\scfrontmatter
 
 \section{Introduction}
 \label{se:intro}
@@ -260,7 +37,7 @@ concepts, while later sections give more detailed
 definitions of the data structures.
 
 Standard data structures comprise an important part of the
-{\it software environment}.
+\textit{software environment}.
 Their use enables software packages to share data, thereby
 reducing the number of functions which must be
 duplicated and hence
@@ -268,23 +45,23 @@ the total quantity of software needed.
 
 To assist in designing standard data formats of adequate
 versatility, Starlink has implemented HDS, the
-{\it Hierarchical Data System},
+\textit{Hierarchical Data System},
 a flexible system for storing and retrieving data in a
 structured fashion.
 HDS structures consist of assemblies of
-{\it data objects}
+\textit{data objects}
 arranged in trees.  Each tree resides within a
-{\it container file},
+\textit{container file},
 one top-level tree per container file.
 Data objects have a
-{\it NAME},
+\textit{NAME},
 which identifies that particular object, and a
-{\it TYPE},
+\textit{TYPE},
 which describes what sort of object it is.
 A data object can either be a
-{\it structure}
+\textit{structure}
 or a
-{\it primitive}.
+\textit{primitive}.
 Primitives are such things as integers,
 character strings, and floating-point numbers, and express the
 data themselves.  Both structures and primitives can
@@ -336,7 +113,7 @@ not all contributors are fully convinced that the rejection
 of their ideas was justified.  This is inevitable given the
 size and diversity of the Starlink community.
 
-\paragraph{Design Fundamentals}
+\subsection*{Design Fundamentals}
 The most fundamental issue (certainly the
 most fruitful source of controversy) is whether we are
 trying to design formats which are so comprehensive that
@@ -346,11 +123,11 @@ it, or whether we are instead trying to design
 the simplest possible system which can do the job.
 
 The first approach, sometimes called the ``we've thought of
-everything'' philosophy or {\it TOE}, is the one that has been
+everything'' philosophy or \textit{TOE}, is the one that has been
 traditionally employed.  The designers of such systems
 have tried to predict everything that might be needed (in their
 experience as optical spectroscopists, aperture synthesists,
-X-ray observers, {\it etc.}) for the general case of a picture,
+X-ray observers, \textit{etc.}) for the general case of a picture,
 spectrum, time series, or whatever.  These designs generally
 work well for their inventor, but when others try to use them
 they find omissions, inconsistencies, ambiguities and
@@ -359,8 +136,8 @@ own or use existing items in a non-standard way.  Even where
 a new form of data is expressed in what appears to be the
 standard way, experience has shown that precise interpretation
 by different application programs
-of all the various ancillary items ({\it e.g.}\ exposure time,
-astrometric parameters, {\it etc.}) cannot be relied on, and so
+of all the various ancillary items (\textit{e.g.}\ exposure time,
+astrometric parameters, \textit{etc.}) cannot be relied on, and so
 these items become little more than comments.
 
 The Starlink designs reject the TOE
@@ -377,7 +154,7 @@ familiar TOE approach, where
 there is a place to put the $\alpha,\delta$, exposure time,
 polarimeter setting,
 relative humidity, feed-horn
-collimation parameters, {\it etc.}, and are unhappy that
+collimation parameters, \textit{etc.}, and are unhappy that
 many of the items they wish to include have to be
 ``demoted'' by being
 moved into an extension.  Alternatively, they are
@@ -408,10 +185,10 @@ manageable size) is that the standard structures, and
 the general-purpose applications which process them, may have uses
 outside astronomy.
 
-\paragraph{The Extensible n-Dimensional-Data Format}
+\subsection*{The Extensible n-Dimensional-Data Format}
 The Starlink standard data structures can be divided into two
 categories:
-{\it low-level,} and {\it composite}.  Low-level structures are
+\textit{low-level,} and \textit{composite}.  Low-level structures are
 self-contained; coupled with
 individual data objects they are used to build the composite
 formats, and include axis information, title, history, and quality.
@@ -424,8 +201,7 @@ astronomical data, a number of composite data formats will be
 defined for various classes or forms of data as required.
 
 The only current example of a composite data format, the NDF, is
-presented in Table~\ref{ta:example1}.  (NDF is short for {\it
-Extensible n-Dimensional-Data Format} and will be described fully
+presented in Table~\ref{ta:example1}.  (NDF is short for \textit{Extensible n-Dimensional-Data Format} and will be described fully
 \latex{in Section~\ref{se:ndf}.)}\html{\htmlref{here.)}{se:ndf}}  The
 NDF is based on the $n$-dimensional data array, which is the most
 natural way to express many sorts of astronomical data set---notably
@@ -436,7 +212,7 @@ though not necessarily, at the top level.  For example, the top-level
 structure within a container file might be built from several NDFs,
 each an observation of the same source but through a different filter.
 
-\begin{table}[htb]
+\begin{table}
 \centering
 \caption{Components of the Extensible $n$-Dimensional-Data
 structure}
@@ -444,17 +220,17 @@ structure}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & variant of the $<${\bf NDF}$>$ \\
-{[}{\bf TITLE}{]} & $<${\bf \_CHAR}$>$ & title of {[}{\bf DATA\_ARRAY}{]} \\
-{[}{\bf DATA\_ARRAY}{]} & $<${\bf various}$>$ & NAXIS-dimensional data array \\
-{[}{\bf LABEL}{]} & $<${\bf \_CHAR}$>$ & label describing the data array \\
-{[}{\bf UNITS}{]} & $<${\bf \_CHAR}$>$ & units of the data array \\
-{[}{\bf VARIANCE}{]} & $<${\bf s\_array}$>$ & variance of the data array \\
-{[}{\bf BAD\_PIXEL}{]} & $<${\bf \_LOGICAL}$>$ & bad-pixel flag \\
-{[}{\bf QUALITY}{]} & $<${\bf various}$>$ & quality of the data array \\
-{[}{\bf AXIS}(NAXIS){]} & $<${\bf AXIS}$>$ & axis values, labels, units and errors \\
-{[}{\bf HISTORY}{]} & $<${\bf HISTORY}$>$ & history structure \\
-{[}{\bf MORE}{]} & $<${\bf EXT}$>$ & extension structure \\ \hline
+{[}\textbf{VARIANT}{]} & $<$\textbf{\_CHAR}$>$ & variant of the $<$\textbf{NDF}$>$ \\
+{[}\textbf{TITLE}{]} & $<$\textbf{\_CHAR}$>$ & title of {[}\textbf{DATA\_ARRAY}{]} \\
+{[}\textbf{DATA\_ARRAY}{]} & $<$\textbf{various}$>$ & NAXIS-dimensional data array \\
+{[}\textbf{LABEL}{]} & $<$\textbf{\_CHAR}$>$ & label describing the data array \\
+{[}\textbf{UNITS}{]} & $<$\textbf{\_CHAR}$>$ & units of the data array \\
+{[}\textbf{VARIANCE}{]} & $<$\textbf{s\_array}$>$ & variance of the data array \\
+{[}\textbf{BAD\_PIXEL}{]} & $<$\textbf{\_LOGICAL}$>$ & bad-pixel flag \\
+{[}\textbf{QUALITY}{]} & $<$\textbf{various}$>$ & quality of the data array \\
+{[}\textbf{AXIS}(NAXIS){]} & $<$\textbf{AXIS}$>$ & axis values, labels, units and errors \\
+{[}\textbf{HISTORY}{]} & $<$\textbf{HISTORY}$>$ & history structure \\
+{[}\textbf{MORE}{]} & $<$\textbf{EXT}$>$ & extension structure \\ \hline
 \end{tabular}
 \end{table}
 
@@ -464,32 +240,32 @@ nor are the brackets around the NAME.  They are
 just a notation convention
 to distinguish TYPE from NAME.)
 
-There are several low-level objects within the NDF, each with a {\it
-NAME} for access and identification, and a {\it TYPE} to control the
+There are several low-level objects within the NDF, each with a \textit{NAME} for access and identification, and a \textit{TYPE} to control the
 general processing.  They comprise:
 \begin{itemize}
-\item primitives: \begin{minipage}[t]{3in}
+\item primitives:
                   \begin{tabular}{l}
-                  {[}{\bf TITLE}{]}, \\
-                  {[}{\bf LABEL}{]}, \\
-                  {[}{\bf UNITS}{]}, \\
-                  {[}{\bf BAD\_PIXEL}{]}, \\
-                  \end{tabular}\end{minipage}
-\item structures: \begin{minipage}[t]{2in}
+                  {[}\textbf{TITLE}{]}, \\
+                  {[}\textbf{LABEL}{]}, \\
+                  {[}\textbf{UNITS}{]}, \\
+                  {[}\textbf{BAD\_PIXEL}{]}, \\
+                  \end{tabular}
+\item structures: 
                   \begin{tabular}{l}
-                  {[}{\bf HISTORY}{]}, \\
-                  {[}{\bf MORE}{]}; \\
-                  \end{tabular}\end{minipage}
-\item arrays of structures: {[}{\bf AXIS}{]};
-\item objects which can be either primitive or a structure: \begin{minipage}[t]{2in}
+                  {[}\textbf{HISTORY}{]}, \\
+                  {[}\textbf{MORE}{]}; \\
+                  \end{tabular}
+
+\item arrays of structures: {[}\textbf{AXIS}{]};
+\item objects which can be either primitive or a structure:
                   \begin{tabular}{l}
-                  {[}{\bf DATA\_ARRAY}{]}, \\
-                  {[}{\bf VARIANCE}{]}, \\
-                  {[}{\bf QUALITY}{]}. \\
-                  \end{tabular}\end{minipage}
+                  {[}\textbf{DATA\_ARRAY}{]}, \\
+                  {[}\textbf{VARIANCE}{]}, \\
+                  {[}\textbf{QUALITY}{]}. \\
+                  \end{tabular}
 \end{itemize}
 
-Only the {[}{\bf DATA\_ARRAY}{]} is mandatory---so a primitive HDS
+Only the {[}\textbf{DATA\_ARRAY}{]} is mandatory---so a primitive HDS
 object containing a 2-D array of numbers (for example) is valid as the
 only component of an NDF. A full description of the components is
 given \latex{in Section~\ref{se:ndf}}\html{\htmlref{here}{se:ndf}} and
@@ -507,7 +283,7 @@ In designing the NDF, efforts were made
 to retain some compatibility
 with the original Wright-Giddings proposals.  A limited but
 useful degree of compatibility was achieved---the former
-location of the main data array ({\it i.e.}\ at the top level) is
+location of the main data array (\textit{i.e.}\ at the top level) is
 still recognised, and the name has been
 retained---but it proved impossible to accommodate more
 of the original proposals without enormously
@@ -521,18 +297,18 @@ are all essentially $n$-dimensional arrays together with
 some ancillary items, and fit naturally into the
 form of the NDF, simple though it is.
 In the next section, we will look at the
-general question of {\bf layering}---how the
+general question of \textbf{layering}---how the
 elaborate requirements of any particular data type can
 be broken down into different levels of generality.  We
 will then go on to consider
-the topics of {\bf substructures} (how
+the topics of \textbf{substructures} (how
 common building blocks may be identified and exploited),
-{\bf extensibility} (how items peculiar to a data type
+\textbf{extensibility} (how items peculiar to a data type
 or an application package may be accommodated), and
 various processing considerations including the
-{\bf propagation} of extensions.
+\textbf{propagation} of extensions.
 
-\paragraph{Layering}
+\subsection*{Layering}
 There are several well-defined levels of generality in designing
 data formats, with each level building on those below it (see
 Table~\ref{ta:layering}).  Having designed and implemented
@@ -540,19 +316,19 @@ HDS, the Starlink Project could have left it at that and,
 beyond stipulating that applications must use HDS for their
 data storage, have allowed each software package
 to be autonomous.
-This is the {\bf HDS} level.
-The second level uses a {\bf mathematical}
+This is the \textbf{HDS} level.
+The second level uses a \textbf{mathematical}
 representation to provide generality;  the rules for processing data
 objects are mathematical abstractions, though chosen to map
 well onto the processing of pictures and spectra and other
-types of astronomical work.  The {\bf astronomical}
+types of astronomical work.  The \textbf{astronomical}
 representation is much more complex than the mathematical level,
 and contains information relating to astrometry, radiometry,
-{\it etc.}
-{\bf Specialist} structures for instrument- or application-specific
+\textit{etc.}
+\textbf{Specialist} structures for instrument- or application-specific
 processing are still more complex.
 
-\begin{table}[htb]
+\begin{table}
 \centering
 \caption{Layering of Starlink data formats.}
 \label{ta:layering}
@@ -586,7 +362,7 @@ well defined, software to handle
 these low-level objects is relatively easy to write,
 and once written can be used by many different packages.
 
-{\small KAPPA} ({\bf K}ernel {\bf Ap}plication {\bf Pa}ckage ---
+{\small KAPPA} (\textbf{K}ernel \textbf{Ap}plication \textbf{Pa}ckage ---
 see \xref{SUN/95}{sun95}) is a set of
 applications which processes these abstracted data
 objects.  {\small KAPPA} is
@@ -611,7 +387,7 @@ structures.  They are currently being designed
 and will be described
 in a future version of this document.
 
-\paragraph{Substructures}
+\subsection*{Substructures}
 The essence of HDS is the ability to define
 multiple levels rather than having everything at the
 top level in a ``flat'' design.
@@ -649,83 +425,83 @@ the two angles as floating-point numbers or using
 a single character string (notwithstanding the example in
 \xref{SSN/27}{ssn27}, which is a demonstration rather than a recommendation!).
 
-\begin{table}[htb]
+\begin{table}
 \centering
-\caption{Components of $<${\bf ARRAY}$>$ Structure,
-{[}{\bf VARIANT}{]} = {\tt `SIMPLE'}}
+\caption{Components of $<$\textbf{ARRAY}$>$ Structure,
+{[}\textbf{VARIANT}{]} = \texttt{`SIMPLE'}}
 \label{ta:example2}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name  & TYPE & Brief Description \\ \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & {\tt `SIMPLE'} \\
-{[}{\bf ORIGIN}(NAXIS){]} & $<${\bf integer}$>$ & origin of the data array \\
-{[}{\bf DATA}{]} & $<${\bf narray}$>$ & actual value at every pixel \\ \hline
+{[}\textbf{VARIANT}{]} & $<$\textbf{\_CHAR}$>$ & \texttt{`SIMPLE'} \\
+{[}\textbf{ORIGIN}(NAXIS){]} & $<$\textbf{integer}$>$ & origin of the data array \\
+{[}\textbf{DATA}{]} & $<$\textbf{narray}$>$ & actual value at every pixel \\ \hline
 \end{tabular}
 \end{table}
 
-\begin{table}[htb]
+\begin{table}
 \centering
-\caption{Components of $<${\bf ARRAY}$>$ Structure,
-{[}{\bf VARIANT}{]} = {\tt `SCALED'}}
+\caption{Components of $<$\textbf{ARRAY}$>$ Structure,
+{[}\textbf{VARIANT}{]} = \texttt{`SCALED'}}
 \label{ta:example3}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & {\tt `SCALED'} \\
-{[}{\bf ORIGIN}(NAXIS){]} & $<${\bf integer}$>$ & origin of the data array \\
-{[}{\bf DATA}{]} & $<${\bf narray}$>$ & scaled numeric value at every pixel \\
-{[}{\bf SCALE}{]} & $<${\bf numeric}$>$ & scale factor \\
-{[}{\bf ZERO}{]} & $<${\bf numeric}$>$ & zero point \\ \hline
+{[}\textbf{VARIANT}{]} & $<$\textbf{\_CHAR}$>$ & \texttt{`SCALED'} \\
+{[}\textbf{ORIGIN}(NAXIS){]} & $<$\textbf{integer}$>$ & origin of the data array \\
+{[}\textbf{DATA}{]} & $<$\textbf{narray}$>$ & scaled numeric value at every pixel \\
+{[}\textbf{SCALE}{]} & $<$\textbf{numeric}$>$ & scale factor \\
+{[}\textbf{ZERO}{]} & $<$\textbf{numeric}$>$ & zero point \\ \hline
 \end{tabular}
 \end{table}
 
 Example structures are shown in
 Tables~\ref{ta:example2}--\ref{ta:example4}.
-The first two are {\it variants} of the $<${\bf ARRAY}$>$
+The first two are \textit{variants} of the $<$\textbf{ARRAY}$>$
 structure, and are different ways of storing an $n$-dimensional array of
 numbers.  A variant qualifies the TYPE and the processing rules of the
 structure, and may appear in any structure.  The most basic form is
 specified by
-{[}{\bf VARIANT}{]} = {\tt `SIMPLE'}, which is the default should
-{[}{\bf VARIANT}{]} not be
-present. In this case $<${\bf ARRAY}$>$ comprises an
+{[}\textbf{VARIANT}{]} = \texttt{`SIMPLE'}, which is the default should
+{[}\textbf{VARIANT}{]} not be
+present. In this case $<$\textbf{ARRAY}$>$ comprises an
 array of numbers plus the origin in each
-dimension. {[}{\bf ORIGIN}{]} defines the zero point of the
-pixel coordinate system. For {[}{\bf VARIANT}{]} = {\tt `SCALED'},
+dimension. {[}\textbf{ORIGIN}{]} defines the zero point of the
+pixel coordinate system. For {[}\textbf{VARIANT}{]} = \texttt{`SCALED'},
 the array of numbers has been
 scaled, perhaps as 16-bit integers to save disk space for large-format
-data.  {[}{\bf SCALE}{]} and {[}{\bf ZERO}{]} are used to generate the
+data.  {[}\textbf{SCALE}{]} and {[}\textbf{ZERO}{]} are used to generate the
 actual array values.
 In almost all cases, standard subroutines will deal automatically
 with the different variants and
 simply present the application with a locator to an array of numbers.
 
-\begin{table}[htb]
+\begin{table}
 \centering
-\caption{Contents of the $<${\bf HISTORY}$>$ Structure}
+\caption{Contents of the $<$\textbf{HISTORY}$>$ Structure}
 \label{ta:example4}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf CREATED}{]} & $<${\bf \_CHAR}$>$ & creation date and time \\
-{[}{\bf EXTEND\_SIZE}{]} & $<${\bf \_INTEGER}$>$ & increment number of records \\
-{[}{\bf CURRENT\_RECORD}{]} & $<${\bf \_INTEGER}$>$ & record number being used \\
-{[}{\bf RECORDS}($m$){]} & $<${\bf HIST\_REC}$>$ & array of $m$ history records \\ \hline
+{[}\textbf{CREATED}{]} & $<$\textbf{\_CHAR}$>$ & creation date and time \\
+{[}\textbf{EXTEND\_SIZE}{]} & $<$\textbf{\_INTEGER}$>$ & increment number of records \\
+{[}\textbf{CURRENT\_RECORD}{]} & $<$\textbf{\_INTEGER}$>$ & record number being used \\
+{[}\textbf{RECORDS}($m$){]} & $<$\textbf{HIST\_REC}$>$ & array of $m$ history records \\ \hline
 \end{tabular}
 \end{table}
 
 All the objects in the first two examples have primitive TYPEs.  This
-need not be the case.  The $<${\bf HISTORY}$>$ structure contains a further
-structure {[}{\bf RECORDS}{]} to store history text and time tag. History
+need not be the case.  The $<$\textbf{HISTORY}$>$ structure contains a further
+structure {[}\textbf{RECORDS}{]} to store history text and time tag. History
 records are brief and are only intended to assist the user.  Their
-contents must {\bf not} be used by applications to
+contents must \textbf{not} be used by applications to
 control processing.
 
 The rules for designing new structures are presented
 in \latex{Section~\ref{se:newdesign}.}\html{\htmlref{Creating New
 Structures.}{se:newdesign}}
 
-\paragraph{Extensibility}
+\subsection*{Extensibility}
 No data format design will ever satisfy all requirements, and
 some provision has to be made for accommodating ancillary
 information, specific to a group of applications or a
@@ -755,11 +531,11 @@ utilities which edit HDS structures to fix up inconsistencies.
 Specialist packages could implement all this transparently by
 providing command procedures.
 
-In the NDF, extensibility is provided through the [{\bf MORE}{]}
+In the NDF, extensibility is provided through the [\textbf{MORE}{]}
 structure.  Information required by application packages (and
 under the complete control of those packages) is arranged
-into structures usually of TYPE $<${\bf EXT}$>$ and stored within
-[{\bf MORE}{]}.
+into structures usually of TYPE $<$\textbf{EXT}$>$ and stored within
+[\textbf{MORE}{]}.
 In order to allow
 applications to recognise their own extension objects
 without risk of clashes, the
@@ -769,9 +545,9 @@ example of an extension might be one called ASTROMETRY, which
 would contain information about the relationship between
 the data and the celestial reference frame.
 
-[{\bf MORE}{]} structures can occur once
+[\textbf{MORE}{]} structures can occur once
 at the top level of the NDF, and
-once in each [{\bf AXIS}{]} element.
+once in each [\textbf{AXIS}{]} element.
 
 As well as processing the extensions they recognise, applications
 are obliged to propagate all other extensions to any output
@@ -779,9 +555,9 @@ structures.
 
 Details of the defined extensions are given in other documents.
 
-\paragraph{Propagation}
+\subsection*{Propagation}
 Although the data objects in the NDF are general, not all applications
-will know how to process all the objects.  For example, the {[}{\bf VARIANCE}{]}
+will know how to process all the objects.  For example, the {[}\textbf{VARIANCE}{]}
 in the NDF becomes meaningless after thresholding.
 Therefore, the rule for propagation,
 is as follows.
@@ -796,13 +572,13 @@ rendering the object meaningless or wrong. Unknown or poorly
 understood objects must be ignored---never fudged.
 \end{itemize}
 
-\paragraph{Tree walking}
-``Tree walking'', {\it i.e.}\  by one means or another moving to a higher
+\subsection*{Tree walking}
+``Tree walking'', \textit{i.e.}\  by one means or another moving to a higher
 position within an structure and processing data objects there, is
 forbidden. If such objects are required their names must be acquired
 from outside the application, and a new locator obtained.
 
-\paragraph{Instrumental data}
+\subsection*{Instrumental data}
 It will often be most convenient and efficient to delay conversion of
 instrumental
 data into standard formats until calibration,
@@ -811,28 +587,28 @@ completed.  The software for performing this
 conversion is best provided by the
 instrument builders.
 However, in some instances it will prove
-convenient to use a composite structure ({\it e.g.}\
+convenient to use a composite structure (\textit{e.g.}\
 an NDF) for uncalibrated data so that
 general-purpose applications can be used for
 for display and other quick-look operations.
 
-\paragraph{Bad data}
+\subsection*{Bad data}
 Two methods are available for dealing with bad data.  The
-{\bf magic value} method uses special values
+\textbf{magic value} method uses special values
 stored within the data themselves to
 indicate that a datum is undefined or invalid.  The second method is
-{\bf quality}.  Each data value may have associated with
+\textbf{quality}.  Each data value may have associated with
 it a data-quality value, an 8-bit
 code which flags whether the data value is special
 in some way or combination of ways.
 
-The NDF has a {[}{\bf BAD\_PIXEL}{]} flag, which allows applications
+The NDF has a {[}\textbf{BAD\_PIXEL}{]} flag, which allows applications
 to find out in advance if there are any
-magic-value data within the {[}{\bf DATA\_ARRAY}{]}.  If not, a
+magic-value data within the {[}\textbf{DATA\_ARRAY}{]}.  If not, a
 version of the algorithm which does not do the checks can be
 invoked, in order to save time.  Note that in this document the term
-{\em pixel} is used in its generic sense, {\it i.e.}\ equivalent to
-an {\em array element} or {\em bin}, and therefore, {\em pixel}
+\emph{pixel} is used in its generic sense, \textit{i.e.}\ equivalent to
+an \emph{array element} or \emph{bin}, and therefore, \emph{pixel}
 does not imply membership of a two-dimensional array.
 
 Full details of bad-pixel methods are presented \latex{in
@@ -844,16 +620,16 @@ Variants\label{se:natyvar}}
 \subsection{\xlabel{se_charset}Character Set\label{se:charset}}
 
 NAMEs, TYPEs and the contents of strings in HDS
-{\bf must} consist only of
-printable ASCII characters ({\it i.e.}\ hexadecimal
+\textbf{must} consist only of
+printable ASCII characters (\textit{i.e.}\ hexadecimal
 20 through 7E).  Beyond this, HDS itself
 (see \xref{SUN/92}{sun92}) imposes restrictions on NAMEs and TYPES,
 to which we add the
 requirement that the first character of a
-(non-primitive) TYPE must {\bf not} be
+(non-primitive) TYPE must \textbf{not} be
 underscore.
 
-It is {\bf strongly recommended} by Starlink that NAMEs and TYPEs
+It is \textbf{strongly recommended} by Starlink that NAMEs and TYPEs
 be limited to letters, numbers, and the underscore character, and
 that the first character be a letter.  This is to
 prevent inconvenience
@@ -868,7 +644,7 @@ will, at some stage, cause insurmountable difficulties.
 
 The names of HDS container files should be chosen to be the
 same as the names of their top-level data structures, or at
-least to be closely related.  Note that filenames must {\bf not}
+least to be closely related.  Note that filenames must \textbf{not}
 appear in applications code (see \xref{SGP/16}{sgp16}).
 
 \subsection{\xlabel{se_roleoftype}The R\^{o}le of TYPE\label{se:roleoftype}}
@@ -880,7 +656,7 @@ expect and how to interpret the object.
 
 It is possible to take the view that the TYPE attribute
 of HDS objects is important only for
-primitives ({\it e.g.}\  $<${\bf \_REAL}$>$) and is not needed for
+primitives (\textit{e.g.}\  $<$\textbf{\_REAL}$>$) and is not needed for
 higher-level structures.
 Such structures would thus have a NAME but no TYPE, and applications
 would interpret them by the presence or absence of NAMEd components, as
@@ -900,33 +676,33 @@ names (15 characters, chosen to maintain adequate storage efficiency).
 
 In order to minimise the total number of TYPEs to be recognised,
 the TYPE may be supplemented by
-a {\it variant}, an HDS object
-of TYPE $<${\bf \_CHAR}$>$
-called [{\bf VARIANT}{]}.  In such cases,
+a \textit{variant}, an HDS object
+of TYPE $<$\textbf{\_CHAR}$>$
+called [\textbf{VARIANT}{]}.  In such cases,
 the TYPE will define the general processing rules for a given
 structure, while
-{[}{\bf VARIANT}{]}
+{[}\textbf{VARIANT}{]}
 will specify detailed interpretation.  The variant also enables a data
 structure to be developed and modified.  Therefore, applications must
-ascertain the value of {[}{\bf VARIANT}{]} in every structure to
+ascertain the value of {[}\textbf{VARIANT}{]} in every structure to
 determine whether or not it can process that version of the structure.
-Mostly, this will merely be a check of the existence of {[}{\bf VARIANT}{]}.
+Mostly, this will merely be a check of the existence of {[}\textbf{VARIANT}{]}.
 
 To avoid incompatibilities between programs, it will be necessary to
 register both TYPEs and variants with the Starlink Head of Applications.
 
 How do you decide whether a structure should have
 a new TYPE or be a variant of a TYPE?  The guideline is as
-follows.  {[}{\bf VARIANT}{]} should be used
+follows.  {[}\textbf{VARIANT}{]} should be used
 if an algorithm written to process an existing TYPE could also process
 the new structure, merely by interposing an automatic conversion routine
 which requires no additional external information.
-If {[}{\bf VARIANT}{]} is not present within a structure,
-or it has the value {\tt `SIMPLE'},
+If {[}\textbf{VARIANT}{]} is not present within a structure,
+or it has the value \texttt{`SIMPLE'},
 then the structure is in its most basic and readily
 comprehensible form.
 
-Any general utility program, ({\it e.g.}\  one from the
+Any general utility program, (\textit{e.g.}\  one from the
 {\small KAPPA} package) can use TYPE
 when available, but must also be prepared
 to rummage within a data structure
@@ -940,30 +716,30 @@ by its dimension(s), NAME, TYPE and meaning.  The
 notation adopted in this document to describe these
 attributes is as follows.
 
-The {\bf dimensions} are given in a FORTRAN-like way.
+The \textbf{dimensions} are given in a FORTRAN-like way.
 For example:
 \begin{verse}
-   {[}{\bf DATA\_ARRAY}(NAXIS1,NAXIS2){]}
+   {[}\textbf{DATA\_ARRAY}(NAXIS1,NAXIS2){]}
 \end{verse}
 is an NAXIS1 $\times$ NAXIS2 array with name
-{[}{\bf DATA\_ARRAY}{]}.
+{[}\textbf{DATA\_ARRAY}{]}.
 The square brackets are a notation convention
 in this document to indicate the
 NAME of a data object. They are not part of the NAME.
-As in this example, use is made of symbolic constants ({\it e.g.}\  NAXIS1)
+As in this example, use is made of symbolic constants (\textit{e.g.}\  NAXIS1)
 in specifying array dimensions.
 The meaning of these constants are described for each structure.
 
-A {\bf NAME} in capitals is the NAME the component must take; where the NAME
-is in lowercase it is generic, {\it i.e.}\  it may be chosen by the
+A \textbf{NAME} in capitals is the NAME the component must take; where the NAME
+is in lowercase it is generic, \textit{i.e.}\  it may be chosen by the
 programmer provided it does not duplicate a Starlink-reserved NAME.
 NAME is not globally significant---its meaning is only defined within
 the context of a containing structure.
 
-{\bf TYPE} may be one of the {\it primitives} or one
-allotted to a {\it structure},
-denoted $<${\bf \_TYPE}$>$ and
-$<${\bf TYPE}$>$ respectively. As mentioned earlier, the $>$ and
+\textbf{TYPE} may be one of the \textit{primitives} or one
+allotted to a \textit{structure},
+denoted $<$\textbf{\_TYPE}$>$ and
+$<$\textbf{TYPE}$>$ respectively. As mentioned earlier, the $>$ and
 $<$ signs form a notation convention used in the text of this
 document to signify the TYPE of a data object, and they are not
 themselves part of the TYPE. Details of
@@ -977,36 +753,36 @@ In order to allow for
 flexibility in the way in which data are represented, certain structure
 components are allowed to take one of a number of options. This is
 indicated in this document by ``pseudo-types'',
-which are denoted by $<${\bf type}$>$;
+which are denoted by $<$\textbf{type}$>$;
 the standard pseudo-types are listed in Table~\ref{ta:pseudotypes}.
 
-\begin{table}[htb]
+\begin{table}
 \centering
 \caption{Standard Pseudo-types}
 \label{ta:pseudotypes}
 \begin{tabular}[t]{|l|l|}
 \hline
 Pseudo-type & Allowed Types \\ \hline
-$<${\bf various}$>$  & structured or primitive (to be specified) \\
-$<${\bf numeric}$>$  & one of the primitive numeric TYPEs \\
-$<${\bf integer}$>$  & one of the primitive integer TYPEs \\
-$<${\bf float}$>$    & one of the primitive floating-point TYPEs \\
-$<${\bf narray}$>$   & a $<${\bf numeric}$>$ array \\
-$<${\bf farray}$>$   & a $<${\bf float}$>$ array \\
-$<${\bf iarray}$>$   & a $<${\bf integer}$>$ array \\
-$<${\bf c\_array}$>$ & an array of complex numbers or an $<${\bf ARRAY}$>$ TYPE \\
-$<${\bf p\_array}$>$ & a $<${\bf narray}$>$ or an $<${\bf ARRAY}$>$ TYPE \\
-$<${\bf s\_array}$>$ & a $<${\bf numeric}$>$ scalar or $<${\bf p\_array}$>$ \\ \hline
+$<$\textbf{various}$>$  & structured or primitive (to be specified) \\
+$<$\textbf{numeric}$>$  & one of the primitive numeric TYPEs \\
+$<$\textbf{integer}$>$  & one of the primitive integer TYPEs \\
+$<$\textbf{float}$>$    & one of the primitive floating-point TYPEs \\
+$<$\textbf{narray}$>$   & a $<$\textbf{numeric}$>$ array \\
+$<$\textbf{farray}$>$   & a $<$\textbf{float}$>$ array \\
+$<$\textbf{iarray}$>$   & a $<$\textbf{integer}$>$ array \\
+$<$\textbf{c\_array}$>$ & an array of complex numbers or an $<$\textbf{ARRAY}$>$ TYPE \\
+$<$\textbf{p\_array}$>$ & a $<$\textbf{narray}$>$ or an $<$\textbf{ARRAY}$>$ TYPE \\
+$<$\textbf{s\_array}$>$ & a $<$\textbf{numeric}$>$ scalar or $<$\textbf{p\_array}$>$ \\ \hline
 \end{tabular}
 \end{table}
 
-The $<${\bf various}$>$ notation is used where the options do not
+The $<$\textbf{various}$>$ notation is used where the options do not
 neatly fit into one of the categories in Table~\ref{ta:pseudotypes}.
 \latex{Sections~\ref{se:basic}}\html{\htmlref{Low-Level
 Structures}{se:basic}} and \latex{\ref{se:ndf}}\html{\htmlref{The
 Extensible n-dimensional Format}{se:ndf}} contain tables of the
 contents of standard structures, followed by descriptions of the
-individual items. The possible options for each $<${\bf various}$>$
+individual items. The possible options for each $<$\textbf{various}$>$
 can be found within the description of the associated data object.
 
 There is problem for the notation.
@@ -1014,30 +790,30 @@ Certain data objects are arrays. The number and sizes of each dimension
 of these arrays are mostly not fixed, and so cannot be specified explicitly
 in a structure's table of contents.
 To overcome this problem, the array pseudo-types
-$<${\bf narray}$>$, $<${\bf farray}$>$
-and $<${\bf iarray}$>$ are used instead of the scalars
-$<${\bf numeric}$>$, $<${\bf float}$>$ and $<${\bf integer}$>$ respectively
+$<$\textbf{narray}$>$, $<$\textbf{farray}$>$
+and $<$\textbf{iarray}$>$ are used instead of the scalars
+$<$\textbf{numeric}$>$, $<$\textbf{float}$>$ and $<$\textbf{integer}$>$ respectively
 in cases where the number and size of an array's dimensions cannot be
-specified {\it a priori}.
+specified \textit{a priori}.
 Thus, if a vector object has its dimensions specified in a table,
 it will not have an array pseudo-type assigned to it, because the
 dimensions are constant.
 
 The first letter of the last-three types in Table~\ref{ta:pseudotypes}
-may be an {\it aide m\'{e}moire} of their meanings: {\bf c} stands for
-complex, {\bf p} for primitive and {\bf s} for scalar.
+may be an \textit{aide m\'{e}moire} of their meanings: \textbf{c} stands for
+complex, \textbf{p} for primitive and \textbf{s} for scalar.
 
-The notation $<${\bf c\_array}$>$ can mean either an $<${\bf ARRAY}$>$ or a
-$<${\bf COMPLEX\_ARRAY}$>$ (described below). The \mbox{$<${\bf ARRAY}$>$} TYPE
+The notation $<$\textbf{c\_array}$>$ can mean either an $<$\textbf{ARRAY}$>$ or a
+$<$\textbf{COMPLEX\_ARRAY}$>$ (described below). The \mbox{$<$\textbf{ARRAY}$>$} TYPE
 illustrates some of the terminology used in this document.
-\mbox{$<${\bf ARRAY}$>$} has
+\mbox{$<$\textbf{ARRAY}$>$} has
 POLYNOMIAL, SCALED, SPARSE and SPACED variants.
 These forms are all methods for expressing an array of numbers, intended
 for use where a primitive array
 would not be suitable.  Whenever one of
 these special forms is used, the primitive TYPE of the
 equivalent array (for example \_REAL), which we will call the
-{\it equivalent primitive type}, must also
+\textit{equivalent primitive type}, must also
 be specified to allow application programs to select the
 most efficient form of processing.
 
@@ -1046,7 +822,7 @@ in Table~\ref{ta:pseudoex}.
 Parameterised dimensions indicate that their number and sizes are
 fixed. Numerical dimensions are arbitrary.
 
-\begin{table}[htb]
+\begin{table}
 \centering
 \caption{Pseudo-type Examples}
 \label{ta:pseudoex}
@@ -1054,19 +830,19 @@ fixed. Numerical dimensions are arbitrary.
 \hline
 \multicolumn{2}{|c||}{Entry in a Table of Contents} & \multicolumn{2}{c|}{Example} \\ \hline
 Name & Pseudo-type & Name and dimensions & Type \\ \hline
-{[}{\bf BASE}{]} & $<${\bf numeric}$>$  & {[}{\bf BASE}{]} & $<${\bf \_INTEGER}$>$ \\ \hline
-{[}{\bf LIST}(NAXIS,NDATA){]} & $<${\bf integer}$>$  & {[}{\bf LIST}(2,450){]} & $<${\bf \_WORD}$>$ \\ \hline
-{[}{\bf TMIN}(NAXIS){]} & $<${\bf float}$>$ & {[}{\bf TMIN}(3){]} & $<${\bf \_DOUBLE}$>$ \\ \hline
-{[}{\bf DATA}{]} & $<${\bf narray}$>$ & {[}{\bf DATA}(512,100,3){]} & $<${\bf \_REAL}$>$ \\ \hline
-{[}{\bf VARIANCE}{]} & $<${\bf farray}$>$ & {[}{\bf VARIANCE}(100){]} & $<${\bf \_DOUBLE}$>$ \\ \hline
-{[}{\bf DATA\_ARRAY}{]} & $<${\bf iarray}$>$ & {[}{\bf DATA\_ARRAY}(512){]} & $<${\bf \_INTEGER}$>$ \\ \hline
-{[}{\bf DATA\_ARRAY}{]} & $<${\bf c\_array}$>$ & {[}{\bf DATA\_ARRAY}{]} & $<${\bf ARRAY}$>$ \\
- & & {\em or} {[}{\bf DATA\_ARRAY}{]} & $<${\bf COMPLEX\_ARRAY}$>$ \\ \hline
-{[}{\bf QUALITY}{]} & $<${\bf p\_array}$>$ & {[}{\bf QUALITY}(384,512){]} & $<${\bf \_UBYTE}$>$ \\
- & & {\em or} {[}{\bf QUALITY}{]} & $<${\bf ARRAY}$>$ \\ \hline
-{[}{\bf WIDTH}{]} & $<${\bf s\_array}$>$ & {[}{\bf VARIANCE}{]} & $<${\bf \_REAL}$>$ \\
- & & {\em or} {[}{\bf WIDTH}(2000){]} & $<${\bf \_INTEGER}$>$ \\
- & & {\em or} {[}{\bf WIDTH}{]} & $<${\bf ARRAY}$>$ \\ \hline
+{[}\textbf{BASE}{]} & $<$\textbf{numeric}$>$  & {[}\textbf{BASE}{]} & $<$\textbf{\_INTEGER}$>$ \\ \hline
+{[}\textbf{LIST}(NAXIS,NDATA){]} & $<$\textbf{integer}$>$  & {[}\textbf{LIST}(2,450){]} & $<$\textbf{\_WORD}$>$ \\ \hline
+{[}\textbf{TMIN}(NAXIS){]} & $<$\textbf{float}$>$ & {[}\textbf{TMIN}(3){]} & $<$\textbf{\_DOUBLE}$>$ \\ \hline
+{[}\textbf{DATA}{]} & $<$\textbf{narray}$>$ & {[}\textbf{DATA}(512,100,3){]} & $<$\textbf{\_REAL}$>$ \\ \hline
+{[}\textbf{VARIANCE}{]} & $<$\textbf{farray}$>$ & {[}\textbf{VARIANCE}(100){]} & $<$\textbf{\_DOUBLE}$>$ \\ \hline
+{[}\textbf{DATA\_ARRAY}{]} & $<$\textbf{iarray}$>$ & {[}\textbf{DATA\_ARRAY}(512){]} & $<$\textbf{\_INTEGER}$>$ \\ \hline
+{[}\textbf{DATA\_ARRAY}{]} & $<$\textbf{c\_array}$>$ & {[}\textbf{DATA\_ARRAY}{]} & $<$\textbf{ARRAY}$>$ \\
+ & & \emph{or} {[}\textbf{DATA\_ARRAY}{]} & $<$\textbf{COMPLEX\_ARRAY}$>$ \\ \hline
+{[}\textbf{QUALITY}{]} & $<$\textbf{p\_array}$>$ & {[}\textbf{QUALITY}(384,512){]} & $<$\textbf{\_UBYTE}$>$ \\
+ & & \emph{or} {[}\textbf{QUALITY}{]} & $<$\textbf{ARRAY}$>$ \\ \hline
+{[}\textbf{WIDTH}{]} & $<$\textbf{s\_array}$>$ & {[}\textbf{VARIANCE}{]} & $<$\textbf{\_REAL}$>$ \\
+ & & \emph{or} {[}\textbf{WIDTH}(2000){]} & $<$\textbf{\_INTEGER}$>$ \\
+ & & \emph{or} {[}\textbf{WIDTH}{]} & $<$\textbf{ARRAY}$>$ \\ \hline
 \end{tabular}
 \end{table}
 
@@ -1100,22 +876,22 @@ For example, consider a hypothetical application which
 would calibrate an array of data
 by dividing into it another
 array containing the calibration information.
-The attributes of the two arrays, and the result, {[}{\bf FLUX}{]}
+The attributes of the two arrays, and the result, {[}\textbf{FLUX}{]}
 might be:
 
 \begin{center}
 \begin{tabular}{lll}
 Name & Label & Units \\ \hline
-{[}{\bf DATA}{]} & {\tt flux} & {\tt count/s} \\
-{[}{\bf CALIB}{]} & {\tt flux-calibration} & {\tt J/(m**2*Ang*count)} \\
-{[}{\bf FLUX}{]} & {\tt flux-density} & {\tt J/(m**2*Ang*s)} \\ \hline
+{[}\textbf{DATA}{]} & \texttt{flux} & \texttt{count/s} \\
+{[}\textbf{CALIB}{]} & \texttt{flux-calibration} & \texttt{J/(m**2*Ang*count)} \\
+{[}\textbf{FLUX}{]} & \texttt{flux-density} & \texttt{J/(m**2*Ang*s)} \\ \hline
 \end{tabular}
 \end{center}
 \medskip
 
-where {\tt Ang} is \AA ngstrom to avoid a clash with {\tt A} (ampere),
+where \texttt{Ang} is \AA ngstrom to avoid a clash with \texttt{A} (ampere),
 and parentheses
-are to bracket units in the denominator; {\tt J/m**2/Ang/s},
+are to bracket units in the denominator; \texttt{J/m**2/Ang/s},
 for example, would be easy to misinterpret.
 In this case (and probably all others), it would
 be impossible to predict
@@ -1124,34 +900,34 @@ However, the units could (with some care) be determined.
 Towards this goal,
 present-day
 applications should conform to the following guidelines when
-generating the output {[}{\bf UNITS}{]} object as follows.
+generating the output {[}\textbf{UNITS}{]} object as follows.
 \begin{itemize}
 \item Fortran conventions and intrinsic functions are to be used.
 \item Parentheses should be
-placed around the input {[}{\bf UNITS}{]} if an intrinsic
+placed around the input {[}\textbf{UNITS}{]} if an intrinsic
 function or arithmetic operation has been applied to the associated data.
-\item If a meaningless output {[}{\bf UNITS}{]} arises, say due to addition or
+\item If a meaningless output {[}\textbf{UNITS}{]} arises, say due to addition or
 subtraction of different input
-{[}{\bf UNITS}{]}, no output {[}{\bf UNITS}{]} should be created.
+{[}\textbf{UNITS}{]}, no output {[}\textbf{UNITS}{]} should be created.
 \end{itemize}
 To clarify these rules here are some examples.
 
 \smallskip
 \begin{center}
 \begin{tabular}{llll}
-$1^{\rm st}$ input {[}{\bf UNITS}{]} & $2^{\rm nd}$ input {[}{\bf UNITS}{]} &
-Operation & Output {[}{\bf UNITS}{]} \\ \hline
-{\tt 'count/s'} & & arithmetic with a constant & {\tt 'count/s'} \\
-{\tt 'count/s'} & & logarithm to base 10 & {\tt 'log10(count/s)'} \\
-{\tt 'count/s'} & {\tt 's'} & multiplication of data & {\tt '(count/s)*(s)'} \\
-{\tt 'count/s'} & {\tt 'W'} & subtraction of data & --- \\
-{\tt 'J/(m**2*Ang*s)'} & & exponentiation to power of 2 &
-{\tt '2.**(J/(m**2*Ang*s))'} \\ \hline
+$1^{\rm st}$ input {[}\textbf{UNITS}{]} & $2^{\rm nd}$ input {[}\textbf{UNITS}{]} &
+Operation & Output {[}\textbf{UNITS}{]} \\ \hline
+\texttt{'count/s'} & & arithmetic with a constant & \texttt{'count/s'} \\
+\texttt{'count/s'} & & logarithm to base 10 & \texttt{'log10(count/s)'} \\
+\texttt{'count/s'} & \texttt{'s'} & multiplication of data & \texttt{'(count/s)*(s)'} \\
+\texttt{'count/s'} & \texttt{'W'} & subtraction of data & --- \\
+\texttt{'J/(m**2*Ang*s)'} & & exponentiation to power of 2 &
+\texttt{'2.**(J/(m**2*Ang*s))'} \\ \hline
 \end{tabular}
 \end{center}
 \medskip
 Present applications will not have the ability to interpret or parse
-{[}{\bf UNITS}{]} objects.
+{[}\textbf{UNITS}{]} objects.
 Until standard routines appear
 which do this (which will not happen soon and may never
 happen), applications must not attempt to do this themselves.
@@ -1174,10 +950,10 @@ scale values by factor multiples of 1000.  There is one problem here:
 micro- is abbreviated to $\mu$, which is not a character available
 within HDS strings (see
 \latex{Section~\ref{se:charset};}\html{\htmlref{Character Set;}{se:charset}}
-the character {\tt u} should be
+the character \texttt{u} should be
 used instead.  Also, the SI units include an
 $\Omega$ abbreviation; here, the full unit name,
-{\tt ohm}, should be used.
+\texttt{ohm}, should be used.
 Using SI units is, on the face of it, clean and simple, and the right thing
 to do.
 However, at present, SI units are quite alien to many in the
@@ -1186,7 +962,7 @@ would probably not be acceptable.  (There is also the
 complication that to distinguish the abbreviations for
 seconds and siemens case-sensitive testing would be required.)
 
-\begin{table}[htb]
+\begin{table}
 \centering
 \caption{International System (SI) Nomenclature}
 \label{ta:siunit}
@@ -1229,7 +1005,7 @@ ionising radiation) & & \\ \hline
 Some of the SI quantities are rarely, if ever, used in astronomy,
 but are included in Table~\ref{ta:siunit} for completeness.
 
-\begin{table}[htb]
+\begin{table}
 \centering
 \caption{The more commonly appearing quantities, their SI
 units, and alternatives in current use}
@@ -1237,33 +1013,33 @@ units, and alternatives in current use}
 \begin{tabular}[t]{|l|c|l|}
 \hline
 Quantity & SI & Others in use and their abbreviations\\ \hline
-length & {\tt m} & {\tt centimetre(cm), parsec(pc), astronomical unit(AU)} \\
-mass & {\tt kg} & {\tt gram(g), solar mass(Mo)} \\
-time & {\tt s} & {\tt minute(m), hour(h), day(d), year(yr), Julian date(JD)} \\
-velocity & {\tt m/s} & {\tt km/s} \\
-plane angle & {\tt rad} & {\tt degree, arcminute, arcsecond} \\
-solid angle & {\tt sr} & {\tt square degree, square arcsecond} \\
-wavelength & {\tt m} & {\tt Angstrom, micron, centimetre} \\
-energy & {\tt J} & {\tt erg} \\
-force & {\tt N} & {\tt dyne} \\
-pressure & {\tt Pa} & {\tt dyne/cm**2} \\
-density & {\tt kg/m**3} & {\tt g/cm**3} \\
-power & {\tt W} & {\tt erg/s} \\
-flux & {\tt W/m**2} & {\tt erg/(cm**2*s)} \\
-luminous flux & {\tt lm} & {\tt erg/(cm**2*s*sr), magnitude(mag)} \\
-spectral-flux density & {\tt Jy} & {\tt erg/(cm**2*s*keV), erg/(cm**2*s*Ang)} \\
-surface brightness & {\tt Jy/sr} & {\tt magnitudes/arcsecond**2} \\
-magnetic-flux density & {\tt T} & {\tt gauss} \\ \hline
+length & \texttt{m} & \texttt{centimetre(cm), parsec(pc), astronomical unit(AU)} \\
+mass & \texttt{kg} & \texttt{gram(g), solar mass(Mo)} \\
+time & \texttt{s} & \texttt{minute(m), hour(h), day(d), year(yr), Julian date(JD)} \\
+velocity & \texttt{m/s} & \texttt{km/s} \\
+plane angle & \texttt{rad} & \texttt{degree, arcminute, arcsecond} \\
+solid angle & \texttt{sr} & \texttt{square degree, square arcsecond} \\
+wavelength & \texttt{m} & \texttt{Angstrom, micron, centimetre} \\
+energy & \texttt{J} & \texttt{erg} \\
+force & \texttt{N} & \texttt{dyne} \\
+pressure & \texttt{Pa} & \texttt{dyne/cm**2} \\
+density & \texttt{kg/m**3} & \texttt{g/cm**3} \\
+power & \texttt{W} & \texttt{erg/s} \\
+flux & \texttt{W/m**2} & \texttt{erg/(cm**2*s)} \\
+luminous flux & \texttt{lm} & \texttt{erg/(cm**2*s*sr), magnitude(mag)} \\
+spectral-flux density & \texttt{Jy} & \texttt{erg/(cm**2*s*keV), erg/(cm**2*s*Ang)} \\
+surface brightness & \texttt{Jy/sr} & \texttt{magnitudes/arcsecond**2} \\
+magnetic-flux density & \texttt{T} & \texttt{gauss} \\ \hline
 \end{tabular}
 \end{table}
 
 Within the literature there is liberal misuse of the terms
-{\it intensity}, {\it flux}
-and {\it flux density}.  For example, ``flux'' is
+\textit{intensity}, \textit{flux}
+and \textit{flux density}.  For example, ``flux'' is
 frequently used where ``flux
 density'' is the correct term.  Table~\ref{ta:units} shows the diversity
 of units currently employed, and the duplication of abbreviations,
-{\it e.g.} {\tt m} both for minute and metre.  Starlink's current
+\textit{e.g.} \texttt{m} both for minute and metre.  Starlink's current
 recommendation is to use SI units;  if this is unacceptable,
 the names or abbreviations used must be unambiguous.
 
@@ -1289,10 +1065,10 @@ structures may employ different representations of error
 information.
 
 On input to an application assume that the elements of the
-{[}{\bf DATA\_ARRAY}{]} data object are independent and subject to
-normal statistics, and that the contents of the {[}{\bf VARIANCE}{]}
+{[}\textbf{DATA\_ARRAY}{]} data object are independent and subject to
+normal statistics, and that the contents of the {[}\textbf{VARIANCE}{]}
 data object are the variances of the corresponding elements of
-{[}{\bf DATA\_ARRAY}{]}.
+{[}\textbf{DATA\_ARRAY}{]}.
 For most data, however, this will not be true, and therefore
 the variance should be taken merely as a guide.  Ultimately, it will be
 entirely the responsibility of the user to ensure that the result is
@@ -1300,7 +1076,7 @@ sensible.  For example, if two copies of the same data are added
 together this will not be detected by the application, and
 the variances will be wrong (by a factor of two).
 
-The {[}{\bf VARIANCE}{]} data object will
+The {[}\textbf{VARIANCE}{]} data object will
 be propagated in cases where the application can
 readily compute its processed values.  For example, it is relatively
 easy to define the effect on the variances of
@@ -1309,7 +1085,7 @@ variances will be computed and included
 in output structures;  however more complicated operations,
 including convolution, are not so amenable, and variances
 will not be computed.  The programmer
-should state for each program whether {[}{\bf VARIANCE}{]} is
+should state for each program whether {[}\textbf{VARIANCE}{]} is
 processed or not, and the limitations of the variance computation.
 
 \section{History}
@@ -1318,9 +1094,9 @@ For the storage of information related to the genealogy and
 processing history of a data frame, the
 Birmingham/Asterix design and subroutine-interface library
 has been adopted.  Therefore the structure is named
-{[}{\bf HISTORY}{]} and has TYPE $<${\bf HISTORY}$>$.  (See
+{[}\textbf{HISTORY}{]} and has TYPE $<$\textbf{HISTORY}$>$.  (See
 Asterix Programmer Note 86\_008.)
-A {[}{\bf HISTORY}{]} structure describes
+A {[}\textbf{HISTORY}{]} structure describes
 the object in which it appears at the top level;
 it never describes anything at higher levels.
 This usually means that one history applies to one
@@ -1334,8 +1110,8 @@ and notepad utilities.  There
 should be a logical parameter in applications to enable/disable history
 recording, which is normally defaulted in the interface file to
 disabled.  Applications which do not modify or create structures containing
-{[}{\bf HISTORY}{]} ({\it e.g.}\
-$<${\bf NDF}$>$) do not need to update it ---
+{[}\textbf{HISTORY}{]} (\textit{e.g.}\
+$<$\textbf{NDF}$>$) do not need to update it ---
 a display
 application, for example, would not have to write a history
 record.
@@ -1348,15 +1124,15 @@ a processing sequence.  They are present to assist the user:
 
 History records should be brief.
 
-Details are given in \latex{Section~\ref{se:shistory}.}\html{\htmlref{$<${\bf HISTORY}$>$
+Details are given in \latex{Section~\ref{se:shistory}.}\html{\htmlref{$<$\textbf{HISTORY}$>$
 Structure.}{se:history}}
 
 \section{\xlabel{se_badpixel}Bad-Pixel Methods\label{se:badpixel}}
 
 Starlink standard data formats support two
-methods of handling bad data: {\it magic value} (which
+methods of handling bad data: \textit{magic value} (which
 flags specified pixels as undefined)
-and {\it data quality} (a more general mechanism, which may
+and \textit{data quality} (a more general mechanism, which may
 be used to indicate any attribute of selected pixels, including
 ``badness'').  Magic value is simple
 and efficient.  Data quality
@@ -1364,7 +1140,7 @@ is flexible and preserves the original data.
 
 \subsection{\xlabel{se_quality}Quality\label{se:quality}}
 
-To flag a data value as ``bad'', an associated {\it data-quality}
+To flag a data value as ``bad'', an associated \textit{data-quality}
 value can be used.  This is an array of
 8-bit positive integers, one per element of the data
 array with which it is associated (a single value,
@@ -1379,7 +1155,7 @@ As its name implies, data-quality is a qualitative description of
 the data value.  It is frequently
 used to flag bad pixels,
 but is also useful for ``good'' attributes,
-{\it e.g.}\ which regions of a picture constitute the
+\textit{e.g.}\ which regions of a picture constitute the
 sky sample.
 It is not in any sense an error estimate (though groups of
 bits might be used to convey some numerical meaning);
@@ -1397,7 +1173,7 @@ it as missing.
 intensity, but has
 to be interpreted in a different way from other pixels.
 The case of pixels affected
-by fiducial marks ({\it e.g.}\  reseaux) is a
+by fiducial marks (\textit{e.g.}\  reseaux) is a
 common example of this.  For most parts of the
 processing, such pixels must be excluded.
 However, in an application which locates the fiducial marks
@@ -1422,8 +1198,7 @@ or measured data.
 
 \subsection{\xlabel{se_magic}Magic or Undefined Value\label{se:magic}}
 
-The alternative method for handling bad pixels is the so-called {\it
-magic value} method,  where a pixel is assigned a special flag when it
+The alternative method for handling bad pixels is the so-called \textit{magic value} method,  where a pixel is assigned a special flag when it
 has an undefined value---it corresponds to a dead element in a CCD
 chip, for example, or is the result of division by zero.  This
 terminology should not be confused with the HDS ``undefined state'',
@@ -1436,7 +1211,7 @@ The method is efficient on space: it can always be applied without
 increasing the data-storage requirement because the flag or magic value
 replaces the unwanted data value.  (For applications where it is important
 to retain pixel values, or where
-there is a {\it degree} of badness, {\bf data quality} should
+there is a \textit{degree} of badness, \textbf{data quality} should
 be used.)  The method enables an application to
 discover whether a given pixel is bad as soon as it is
 accessed.
@@ -1450,7 +1225,7 @@ were undefined.
 
 Once a bad pixel has been detected, the application can take appropriate
 action -- flagging the corresponding output pixel as bad, or attempting
-a repair, perhaps {\it via} a choice of interpolation methods.
+a repair, perhaps \textit{via} a choice of interpolation methods.
 
 The HDS undefined state must not be used to indicate bad pixels.  If an
 application finds a data-object in this state, it must report an error,
@@ -1473,32 +1248,32 @@ The groups of true/false logical flags involved in the
 data quality mechanism are stored as integer values.  We
 picture these integers as having conventional
 binary encoding, and adopt the convention that 1$\equiv$true.
-Specific VAX representations and conventions are {\bf not}
+Specific VAX representations and conventions are \textbf{not}
 followed and are not in any way involved with the discussion.
 
 \subsubsection{\xlabel{se_impquality}Data Quality\label{se:impquality}}
 
 Quality is an 8-bit value associated with each datum, and is stored as
 an unsigned byte.  A value of zero
-({\it i.e.}\ all quality flags set 0$\equiv$false) implies a
+(\textit{i.e.}\ all quality flags set 0$\equiv$false) implies a
 ``ordinary'' value which can be accepted at face value by
 application programs.
 
-\paragraph{General-purpose applications}
+\subsection*{General-purpose applications}
 In general-purpose applications, the data-quality values
 are regarded as
 a set of 8 independent
 masks, each of which is 1 bit deep.
 Whether a given pixel is to be included in the
-processing or not ({\it i.e.}\ whether it ``bad'')
+processing or not (\textit{i.e.}\ whether it ``bad'')
 is determined by comparing its quality value with a bit pattern
-stored in a $<${\bf \_UBYTE}$>$ data object {[}{\bf BADBITS}{]} within
-the $<${\bf QUALITY}$>$ structure.  The
+stored in a $<$\textbf{\_UBYTE}$>$ data object {[}\textbf{BADBITS}{]} within
+the $<$\textbf{QUALITY}$>$ structure.  The
 following logical expression is evaluated:
-  \[ BAD  =  QUALITY \wedge BADBITS \]
+  $$ \mathrm{BAD}  =  \mathrm{QUALITY} \wedge \mathrm{BADBITS} $$
 where $\wedge$ is the logical AND operation.
 
-Note that if a {[}{\bf BADBITS}{]} mask is zero ({\it i.e.}\ all
+Note that if a {[}\textbf{BADBITS}{]} mask is zero (\textit{i.e.}\ all
 false), the corresponding data-quality mask is ignored.  This can be
 used to turn off all 8 data-quality
 masks and allow inspection or processing of the
@@ -1512,8 +1287,8 @@ For a single bit, the above expression has the following truth table:\\
   \put(98,5.5){\makebox(0,0){1}}
   \multiput(104,3)(0,5){3}{\line(-1,0){27}}
   \multiput(80,3)(12,0){3}{\line(0,1){13}}
-  \put(53,5){\shortstack{{[}{\bf QUALITY}{]}\\ bit}}
-  \put(78,18){{[}{\bf BADBITS}{]} bit}
+  \put(53,5){\shortstack{{[}\textbf{QUALITY}{]}\\ bit}}
+  \put(78,18){{[}\textbf{BADBITS}{]} bit}
   \put(86,15){\makebox(0,0){0}}
   \put(78.5,10.5){\makebox(0,0){0}}
   \put(78.5,5.5){\makebox(0,0){1}}
@@ -1525,20 +1300,20 @@ and the overall logical value of BAD is the OR of the results
 for all eight bits---just one of which has to be TRUE to make
 the resulting pixel bad.
 
-An example may clarify this.  Assume {[}{\bf BADBITS}{]} is 01001010
+An example may clarify this.  Assume {[}\textbf{BADBITS}{]} is 01001010
 (where the bits of the binary number are written with the most
 significant at the left, and are numbered from the right beginning
 with zero).
 For this
-{[}{\bf BADBITS}{]} value, a pixel with a
-{[}{\bf QUALITY}{]} value of 10100100 is interpreted
+{[}\textbf{BADBITS}{]} value, a pixel with a
+{[}\textbf{QUALITY}{]} value of 10100100 is interpreted
 as non-bad, because bits 2, 5 and 7, which are set in the
-data-quality value, are not set in {[}{\bf BADBITS}{]}.
+data-quality value, are not set in {[}\textbf{BADBITS}{]}.
 However, a
-{[}{\bf QUALITY}{]} value of 10100110 generates a bad value because
+{[}\textbf{QUALITY}{]} value of 10100110 generates a bad value because
 bit 1, which is set in the data-quality
-value, is also set in {[}{\bf BADBITS}{]}.
-If data object {[}{\bf BADBITS}{]} is not present its value is
+value, is also set in {[}\textbf{BADBITS}{]}.
+If data object {[}\textbf{BADBITS}{]} is not present its value is
 assumed to be
 to be 00000000, and general-purpose applications will
 accept as ``good'' any pixel, irrespective of the
@@ -1552,7 +1327,7 @@ presence of undefined values, are as follows.
 \begin{itemize}
 \item Undefined pixels stay bad after processing.
 \item Undefined pixels generated during the processing (other than
-through data quality), {\it e.g.} logarithm of a negative data value,
+through data quality), \textit{e.g.} logarithm of a negative data value,
 are propagated to the output data value.
 \item If processing would or might have changed the value
 of a pixel, had the pixel
@@ -1566,9 +1341,9 @@ value and quality or (2) to propagate an undefined pixel.
 \item [Conventions] ---
 \begin{itemize}
 \item When there is more than one input data array
-({\it cf.}\ \latex{Section~\ref{se:propag}}\html{\htmlref{Propagation}{se:propag}}),
-the {\it input} or {\it original} data quality is deemed to be that
-associated with the {\it principal} data array.
+(\textit{cf.}\ \latex{Section~\ref{se:propag}}\html{\htmlref{Propagation}{se:propag}}),
+the \textit{input} or \textit{original} data quality is deemed to be that
+associated with the \textit{principal} data array.
 
 However, in some cases it is hard to identify a
 principal data array, or the principal data array does not have
@@ -1577,7 +1352,7 @@ Therefore, what is best depends on the
 nature of the application.
 For example, in the computation of the statistics of corresponding
 pixels from each of a series of pictures, to produce mean or
-standard-deviation arrays, it is vital to exclude {\bf all}
+standard-deviation arrays, it is vital to exclude \textbf{all}
 bad values from the calculations.  A related problem is
 what the quality of output data arrays should be, and
 here again programmers must make case-by-case judgements.
@@ -1590,14 +1365,14 @@ pixel was a part of fiducial mark.)
 \item The original data and quality values remain unchanged.
 \end{itemize}
 
-If a {[}{\bf QUALITY}{]} array is present it is
+If a {[}\textbf{QUALITY}{]} array is present it is
 assumed that it is to be used to define bad pixels unless:
 \begin{itemize}
 \item there is a parameter which overrides the default;
-\item the bit pattern of {[}{\bf BADBITS}{]} is 00000000, or
-\item {[}{\bf BADBITS}{]} is omitted from the $<${\bf QUALITY}$>$ structure.
+\item the bit pattern of {[}\textbf{BADBITS}{]} is 00000000, or
+\item {[}\textbf{BADBITS}{]} is omitted from the $<$\textbf{QUALITY}$>$ structure.
 \end{itemize}
-If {[}{\bf QUALITY}{]} is not present the magic-value method is assumed.
+If {[}\textbf{QUALITY}{]} is not present the magic-value method is assumed.
 \end{description}
 
 There is no one ideal way of handling data quality in general-purpose
@@ -1614,11 +1389,11 @@ are present or not, and then call different
 processing routines for the two cases.
 \end{itemize}
 
-\paragraph{Specialist applications}
+\subsection*{Specialist applications}
 Applications can be as sophisticated and specialised as they
 like in their use of data quality,
 and are at liberty to assign specific meanings to
-values of data quality, {\it e.g.}\  a fiducial mark, vignetting,
+values of data quality, \textit{e.g.}\  a fiducial mark, vignetting,
 saturation.
 The details of
 how data-quality information is encoded within the 8 bits
@@ -1636,7 +1411,7 @@ masks.  However, it is also permissible to take
 several bits (which ought to be contiguous) and interpret them
 as a positive integer.
 Single bit fields are used to contain
-a flag (1 = .TRUE., 0 = .FALSE.) for some feature ({\it e.g.}\  ``pixel
+a flag (1 = .TRUE., 0 = .FALSE.) for some feature (\textit{e.g.}\  ``pixel
 in fiducial'').
 Multiple-bit fields are used to contain code numbers or degree of
 quality.
@@ -1657,7 +1432,7 @@ Since the data quality codes are stored separately from the actual data,
 data-quality editing will normally be a reversible process, leaving
 the data values themselves untouched.
 
-({\it n.b.}\ The implementation of data quality is
+(\textit{n.b.}\ The implementation of data quality is
 largely unchanged from the
 Wright-Giddings proposal.)
 
@@ -1668,20 +1443,20 @@ magic-value method uses the values given in Table~\ref{ta:magicvalues}.
 Alert readers will note that these are the
 same as the bad values used by HDS.
 
-\begin{table}[htb]
+\begin{table}
 \centering
 \caption{Magic values for bad pixels}
 \label{ta:magicvalues}
 \begin{tabular}{|l|l|l|}
 \hline
 Data TYPE & Value & Hexadecimal pattern \\ \hline
-$<${\bf \_BYTE}$>$ & $-$128 & 80 \\
-$<${\bf \_UBYTE}$>$ & \hspace{0.8em}255 & FF \\
-$<${\bf \_WORD}$>$ & $-$32768 & 8000 \\
-$<${\bf \_UWORD}$>$ & \hspace{0.8em}65535 & FFFF \\
-$<${\bf \_INTEGER}$>$ & $-$2147483648 & 80000000 \\
-$<${\bf \_REAL}$>$ & $-$1.7014117E+38 & FFFFFFFF \\
-$<${\bf \_DOUBLE}$>$ & $-$1.701411834604923D+38 & FFFFFFFFFFFFFFFF \\ \hline
+$<$\textbf{\_BYTE}$>$ & $-$128 & 80 \\
+$<$\textbf{\_UBYTE}$>$ & \hspace{0.8em}255 & FF \\
+$<$\textbf{\_WORD}$>$ & $-$32768 & 8000 \\
+$<$\textbf{\_UWORD}$>$ & \hspace{0.8em}65535 & FFFF \\
+$<$\textbf{\_INTEGER}$>$ & $-$2147483648 & 80000000 \\
+$<$\textbf{\_REAL}$>$ & $-$1.7014117E+38 & FFFFFFFF \\
+$<$\textbf{\_DOUBLE}$>$ & $-$1.701411834604923D+38 & FFFFFFFFFFFFFFFF \\ \hline
 \end{tabular}
 \end{table}
 
@@ -1689,23 +1464,23 @@ Use of ``undefined data'' flags must be restricted to three operations:
 (i) setting a datum to ``undefined'', (ii) testing whether a datum is
 in the undefined state, and (iii) replacing an undefined datum with a
 valid value (using an assignment statement).  Arithmetic operations on
-undefined data values are {\bf banned}.  Magic values are applicable to both
+undefined data values are \textbf{banned}.  Magic values are applicable to both
 scalar and vector data objects.  There are some exceptions and these
 are individually noted.
 
 For efficiency, pixel values are tested inline for equality with the
 magic value of the appropriate type.  However, the numerical values
 given above must not be written explicitly in the code; instead,
-variables called {\tt VAL\_\_BAD<T>}, where {\tt <T>} is the one or two-letter
-type code ({\it e.g.}\  see \xref{SUN/7}{sun7}), should
+variables called \texttt{VAL\_\_BAD<T>}, where \texttt{<T>} is the one or two-letter
+type code (\textit{e.g.}\  see \xref{SUN/7}{sun7}), should
 be used.  These variables are specified
 via an INCLUDE file with logical name BAD\_PAR.  Here is a trivial
 example, which computes the mean of a one-dimensional REAL array.
-({\it n.b.}\ Actual applications would include comments and
+(\textit{n.b.}\ Actual applications would include comments and
 defences against rounding errors, excluded for brevity here.)
 
 \goodbreak
-\begin{verbatim}
+\begin{terminalv}
       INTEGER I, N, NPIX
       PARAMETER (NPIX = 100)
 
@@ -1727,16 +1502,16 @@ defences against rounding errors, excluded for brevity here.)
       ELSE
          MEAN = SUM/ REAL( N )
       END
-\end{verbatim}
+\end{terminalv}
 
 Note that only valid pixels are counted and summed.
 
 For reasons of efficiency of processor time and work space, and to
 permit easier portability and adaptation of general-purpose subroutine
-libraries, a flag called {[}{\bf BAD\_PIXEL}{]} may be
+libraries, a flag called {[}\textbf{BAD\_PIXEL}{]} may be
 provided within a structure
 to denote whether undefined pixels are present.  Only if it is present
-and set to {\tt .FALSE.} will it be
+and set to \texttt{.FALSE.} will it be
 permissible to bypass magic-value testing.  Thus, many packages
 will support two sets of algorithmic subroutines; one which
 tests magic values, and one which does not.
@@ -1756,27 +1531,27 @@ However, the standard structures do not immediately cater for
 package- or instrument-specific objects
 and their processing, and indeed show very little evidence
 of their planned astronomical r\^{o}le, which is realised
-through the use of {\it extensions}.
+through the use of \textit{extensions}.
 
 Extension information can be stored only in specially
 reserved places within
 certain standard data structures (including the
 NDF).  These places comprise optional structures of NAME
-{[}{\bf MORE}{]}
-TYPE $<${\bf EXT}$>$, which contain, in turn,
-the extensions proper, usually of TYPE $<${\bf EXT}$>$.
+{[}\textbf{MORE}{]}
+TYPE $<$\textbf{EXT}$>$, which contain, in turn,
+the extensions proper, usually of TYPE $<$\textbf{EXT}$>$.
 The NAMEs and TYPEs of the extensions, self-contained assemblies of
 related information peculiar to an application package or
 data source, must be registered with the Starlink Head of
-Application to avoid clashes.  (Which {[}{\bf MORE}{]} they
+Application to avoid clashes.  (Which {[}\textbf{MORE}{]} they
 go in has also to be specified.)
 Programmers should select names
 which are sensible, descriptive and related to the
 extension and the project concerned.
 Simple generic names should be
 avoided in case they are needed later for
-Starlink general-purpose packages, {\it e.g.}
-\mbox{{[}{\bf HEADERS}{]}}, {[}{\bf PHOTOMETRY}{]}.
+Starlink general-purpose packages, \textit{e.g.}
+\mbox{{[}\textbf{HEADERS}{]}}, {[}\textbf{PHOTOMETRY}{]}.
 
 Starlink will, in due course, define standard representations
 of time and celestial positions (using the rules
@@ -1790,8 +1565,8 @@ new package, of basic astronomy applications, will be written.
 
 \section{\xlabel{se_propag}Propagation of Data Objects\label{se:propag}}
 
-Many applications take one or more {\it input} objects and
-generate one or more {\it output} objects.  In such cases,
+Many applications take one or more \textit{input} objects and
+generate one or more \textit{output} objects.  In such cases,
 applications have to make
 decisions about what parts of the input
 objects are to be propagated to the outputs, guided by the
@@ -1799,7 +1574,7 @@ following rules:
 \begin{itemize}
 \item
 General-purpose applications will copy extensions
-({\it cf.} \latex{Section~\ref{se:exten}}\html{\htmlref{Extensions}{se:exten}})
+(\textit{cf.} \latex{Section~\ref{se:exten}}\html{\htmlref{Extensions}{se:exten}})
 to the same location within an output structure provided their
 parent structure has been propagated; specialist applications are,
 of course, allowed to process individual items within the extensions
@@ -1809,9 +1584,9 @@ Items whose properties are well understood in the context of a given
 application may be processed by that application.
 \item
 Items whose properties are not well defined in the context of a given
-application must {\bf not} be propagated by that application.  Thus, items
+application must \textbf{not} be propagated by that application.  Thus, items
 or structures rendered meaningless, wrong or even dubious by the
-processing must not be propagated.  The {\it ad hoc} approach to
+processing must not be propagated.  The \textit{ad hoc} approach to
 doubtful cases is strongly discouraged.
 \item
 ``Rogue'' objects---anything outside the Starlink standard---should
@@ -1819,7 +1594,7 @@ be ignored.
 \item
 Applications are not allowed to pollute standard structures
 with rogue objects;  all application-specific items must reside
-in registered extensions, within one of the {[}{\bf MORE}{]}
+in registered extensions, within one of the {[}\textbf{MORE}{]}
 structures.
 \end{itemize}
 
@@ -1832,15 +1607,15 @@ any revision or extension of the standard structure definitions
 in the future.
 
 In cases where applications access more than one composite data structure
-to generate a single output structure, {\it e.g.} arithmetic of two data
+to generate a single output structure, \textit{e.g.} arithmetic of two data
 arrays, there are additional problems about the propagation of certain
-data objects.  These are mainly descriptive items {\it e.g.}
-{[}{\bf HISTORY}{]}, {[}{\bf LABEL}{]}.
+data objects.  These are mainly descriptive items \textit{e.g.}
+{[}\textbf{HISTORY}{]}, {[}\textbf{LABEL}{]}.
 Should one, all or none of these data objects be propagated?
 If the third rule above is followed rigorously the answer is none, but
 many useful and relevant data objects would then be lost.  To assist
 in deciding whether they can be
-retained, the concept of a dominant or {\it principal data array} is
+retained, the concept of a dominant or \textit{principal data array} is
 introduced, whose various associated items will be the ones propagated.
 By convention, the application's interface file
 will be arranged so that, of the parameters specifying data
@@ -1857,44 +1632,43 @@ If there is a principal array, its history should be propagated with
 a record appended for the latest operation, which could include the
 name and title of the secondary data arrays.  If the data arrays are
 equally important, it is probably best
-to create a new {[}{\bf HISTORY}{]} structure,
+to create a new {[}\textbf{HISTORY}{]} structure,
 again with the names/titles of its parents.  However, for cases
 where this option will not suffice, a special
 HDS editor application will be provided for grafting
 in history records taken from
-existing $<${\bf HISTORY}$>$ structures.
+existing $<$\textbf{HISTORY}$>$ structures.
 
 \section{\xlabel{se_basic}Low-Level Structures\label{se:basic}}
 
 In this section, we begin by describing a number of
-{\it low-level} structures, the basic building blocks which
-can be used to build NDFs and other {\it composite} structures.
+\textit{low-level} structures, the basic building blocks which
+can be used to build NDFs and other \textit{composite} structures.
 
-\subsection{\xlabel{se_polynomial}$<${\bf POLYNOMIAL}$>$ Structure\label{se:spolynomial}}
+\subsection{\xlabel{se_polynomial}$<$\textbf{POLYNOMIAL}$>$ Structure\label{se:spolynomial}}
 
-The $<${\bf POLYNOMIAL}$>$ structure is used for storing the
+The $<$\textbf{POLYNOMIAL}$>$ structure is used for storing the
 coefficients of an $n$-dimensional ordinary or Chebyshev polynomial,
-or the coefficients of a cubic B-spline.  The value of the {[}{\bf
-VARIANT}{]} component defines which of these types of polynomial is
-stored.  Evaluation of the polynomial yields a $<${\bf float}$>$
+or the coefficients of a cubic B-spline.  The value of the {[}\textbf{VARIANT}{]} component defines which of these types of polynomial is
+stored.  Evaluation of the polynomial yields a $<$\textbf{float}$>$
 scalar result.
 
 In the following descriptions NAXIS is the dimensionality of the
-{[}{\bf DATA\_ARRAY}{]} and therefore the dimensionality of the space
+{[}\textbf{DATA\_ARRAY}{]} and therefore the dimensionality of the space
 over which the polynomial function is defined.
 
-\subsubsection{{[}{\bf VARIANT}{]} = `SIMPLE'}
+\subsubsection{{[}\textbf{VARIANT}{]} = `SIMPLE'}
 
 \begin{table}[hbt]
 \centering
-\caption{Contents of the $<${\bf POLYNOMIAL}$>$ Structure,
-               {[}{\bf VARIANT}{]} = `SIMPLE'}
+\caption{Contents of the $<$\textbf{POLYNOMIAL}$>$ Structure,
+               {[}\textbf{VARIANT}{]} = `SIMPLE'}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & {\tt `SIMPLE'} \\
-{[}{\bf DATA\_ARRAY}{]} & $<${\bf farray}$>$ & coefficients \\
-{[}{\bf VARIANCE}{]}  & $<${\bf farray}$>$ & variance of the
+{[}\textbf{VARIANT}{]} & $<$\textbf{\_CHAR}$>$ & \texttt{`SIMPLE'} \\
+{[}\textbf{DATA\_ARRAY}{]} & $<$\textbf{farray}$>$ & coefficients \\
+{[}\textbf{VARIANCE}{]}  & $<$\textbf{farray}$>$ & variance of the
 coefficients \\ \hline
 \end{tabular}
 \end{table}
@@ -1904,10 +1678,10 @@ coefficients \\ \hline
 results from the evaluation of the polynomial inherits the equivalent
 primitive TYPE of the polynomial coefficients.
 
-The {[}{\bf DATA\_ARRAY}{]} is the $NAXIS$-dimensional array
+The {[}\textbf{DATA\_ARRAY}{]} is the $NAXIS$-dimensional array
 containing the $NAXIS$-di\-men\-sion\-al poly\-no\-mial
 co\-efficients.  The function is evaluated as:
-\[{\rm VALUE} = \sum {\rm DATA\underline{~~}ARRAY}(I_1,I_2,\ldots,I_{\rm NAXIS}) \prod_{j=1}^{\rm NAXIS} {\rm AXIS}_j\!^{I_j-1} \]
+$$\mathrm{VALUE} = \sum \mathrm{DATA\_ARRAY}(I_1,I_2,\ldots,I_{\mathrm{NAXIS}}) \prod_{j=1}^{\mathrm{NAXIS}} \mathrm{AXIS}_j\!^{I_j-1} $$
 summed over all elements of the DATA\_ARRAY.
 
 Here, AXIS$_n$ is the co-ordinate value along axis $n$, and NAXIS$_n$
@@ -1915,25 +1689,25 @@ is the dimension of axis $n$.
 
 \item [{[}VARIANCE{]}]  This optional component is used to describe the
 variance of the errors associated with the polynomial coefficients
-given by the {[}{\bf DATA\_ARRAY}{]} component, and it must be an
-array of the same dimension as {[}{\bf DATA\_ARRAY}{]}.
+given by the {[}\textbf{DATA\_ARRAY}{]} component, and it must be an
+array of the same dimension as {[}\textbf{DATA\_ARRAY}{]}.
 
 \end{description}
 
-\subsubsection{{[}{\bf VARIANT}{]} = `CHEBYSHEV'}
+\subsubsection{{[}\textbf{VARIANT}{]} = `CHEBYSHEV'}
 
 \begin{table}[hbt]
 \centering
-\caption{Contents of the $<${\bf POLYNOMIAL}$>$ Structure,
-               {[}{\bf VARIANT}{]} = `CHEBYSHEV'}
+\caption{Contents of the $<$\textbf{POLYNOMIAL}$>$ Structure,
+               {[}\textbf{VARIANT}{]} = `CHEBYSHEV'}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & {\tt `CHEBYSHEV'} \\
-{[}{\bf DATA\_ARRAY}{]} & $<${\bf farray}$>$ & Chebyshev coefficients \\
-{[}{\bf VARIANCE}{]}  & $<${\bf farray}$>$ & variance of the coefficients \\
-{[}{\bf TMIN}(NAXIS){]} & $<${\bf float}$>$ & lower bound of co-ordinate range\\
-{[}{\bf TMAX}(NAXIS){]} & $<${\bf float}$>$ & upper bound of co-ordinate range\\ \hline
+{[}\textbf{VARIANT}{]} & $<$\textbf{\_CHAR}$>$ & \texttt{`CHEBYSHEV'} \\
+{[}\textbf{DATA\_ARRAY}{]} & $<$\textbf{farray}$>$ & Chebyshev coefficients \\
+{[}\textbf{VARIANCE}{]}  & $<$\textbf{farray}$>$ & variance of the coefficients \\
+{[}\textbf{TMIN}(NAXIS){]} & $<$\textbf{float}$>$ & lower bound of co-ordinate range\\
+{[}\textbf{TMAX}(NAXIS){]} & $<$\textbf{float}$>$ & upper bound of co-ordinate range\\ \hline
 \end{tabular}
 \end{table}
 
@@ -1943,15 +1717,17 @@ Component Name & TYPE & Brief Description \\ \hline
 scalar (VALUE) which results from the evaluation of the polynomial
 inherits the equivalent primitive TYPE of the polynomial coefficients.
 
-The {[}{\bf DATA\_ARRAY}{]} contains the NAXIS-dimensional
+The {[}\textbf{DATA\_ARRAY}{]} contains the NAXIS-dimensional
 array of Chebyshev-polynomial coefficients.  The function is evaluated as:
 
-\[{\rm VALUE}=\sum {\rm DATA\underline{~~}ARRAY}(I_1,I_2,\ldots,I_{\rm NAXIS})\prod_{j=1}^{\rm NAXIS} T(I_{j-1},S_j) \]
+
+$$\mathrm{VALUE}=\sum \mathrm{DATA\_ARRAY}(I_1,I_2,\ldots,I_{\mathrm{NAXIS}})\prod_{j=1}^{\mathrm{NAXIS}} T(I_{j-1},S_j) $$
+
 summed over all elements of the DATA\_ARRAY, where $T(m,x)$ is the
 Chebyshev polynomial of order $m$ evaluated at $x$ (in the range $-$1
 to $+$1), and
 
-\[ S_n = ( 2 * {\rm AXIS}_n - ( {\rm TMAX}(n) + {\rm TMIN}(n))/({\rm TMAX}(n) - {\rm TMIN}(n)) \]
+$$ S_n = ( 2 * \mathrm{AXIS}_n - ( \mathrm{TMAX}(n) + \mathrm{TMIN}(n))/(\mathrm{TMAX}(n) - \mathrm{TMIN}(n)) $$
 
 
 If the polynomial is evaluated outside this interval, the result is bad, and set
@@ -1959,8 +1735,8 @@ to the magic value.
 
 \item [{[}VARIANCE{]}]  This optional component is used to describe the
 variance of the errors associated with the Chebyshev polynomial coefficients
-given by the {[}{\bf DATA\_ARRAY}{]} component, and it must be an
-array of the same dimension as {[}{\bf DATA\_ARRAY}{]}.
+given by the {[}\textbf{DATA\_ARRAY}{]} component, and it must be an
+array of the same dimension as {[}\textbf{DATA\_ARRAY}{]}.
 
 \item [{[}TMIN{\rm ($n$)}{]}, {[}TMAX{\rm ($n$)}{]}]
 These are the minimum and maximum values along AXIS number $n$.  They
@@ -1970,39 +1746,39 @@ are mandatory.
 \end{description}
 
 
-\subsubsection{{[}{\bf VARIANT}{]} = `BSPLINE'}
+\subsubsection{{[}\textbf{VARIANT}{]} = `BSPLINE'}
 
 \begin{table}[hbt]
 \centering
-\caption{Contents of the $<${\bf POLYNOMIAL}$>$ Structure,
-               {[}{\bf VARIANT}{]} = `BSPLINE'}
+\caption{Contents of the $<$\textbf{POLYNOMIAL}$>$ Structure,
+               {[}\textbf{VARIANT}{]} = `BSPLINE'}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & {\tt `BSPLINE'} \\
-{[}{\bf DATA\_ARRAY}{]} & $<${\bf farray}$>$ & coefficients \\
-{[}{\bf VARIANCE}{]}  & $<${\bf farray}$>$ & variance of the coefficients \\
-{[}{\bf SCALE}{]}  & $<${\bf float}$>$ & normalisation \\
-{[}{\bf KNOTS}{]}  & $<${\bf farray}$>$ & co-ordinates of the knots \\ \hline
+{[}\textbf{VARIANT}{]} & $<$\textbf{\_CHAR}$>$ & \texttt{`BSPLINE'} \\
+{[}\textbf{DATA\_ARRAY}{]} & $<$\textbf{farray}$>$ & coefficients \\
+{[}\textbf{VARIANCE}{]}  & $<$\textbf{farray}$>$ & variance of the coefficients \\
+{[}\textbf{SCALE}{]}  & $<$\textbf{float}$>$ & normalisation \\
+{[}\textbf{KNOTS}{]}  & $<$\textbf{farray}$>$ & co-ordinates of the knots \\ \hline
 \end{tabular}
 \end{table}
 
 \begin{description}
 
-\item The {[}{\bf DATA\_ARRAY}{]} contains the NAXIS-dimensional array of
+\item The {[}\textbf{DATA\_ARRAY}{]} contains the NAXIS-dimensional array of
 cubic-spline coefficients.  Its dimension along an axis is equal to
 the total number of knots along that axis less four.  The function
 is evaluated as:
 
-\[{\rm VALUE}=1/{\rm SCALE}~~\sum {\rm DATA\underline{~~}ARRAY}(I_1,I_2,\ldots,I_{\rm NAXIS})\prod_{j=1}^{\rm NAXIS} B_j({\rm AXIS}_j) \]
+$$\mathrm{VALUE}=1/\mathrm{SCALE}~~\sum \mathrm{DATA\underline{~~}ARRAY}(I_1,I_2,\ldots,I_{\mathrm{NAXIS}})\prod_{j=1}^{\mathrm{NAXIS}} B_j(\mathrm{AXIS}_j) $$
 where $B_j$(AXIS$_j$) is the normalised cubic B-spline along the $j$th
-axis with the knots recorded in {[}{\bf KNOTS}{]}, and SCALE is the value
-of component {[}{\bf SCALE}{]}.
+axis with the knots recorded in {[}\textbf{KNOTS}{]}, and SCALE is the value
+of component {[}\textbf{SCALE}{]}.
 
 \item [{[}VARIANCE{]}]  This optional component is used to describe the
 variance of the errors associated with the spline coefficients
-given by the {[}{\bf DATA\_ARRAY}{]} component, and it must be an
-array of the same dimension as {[}{\bf DATA\_ARRAY}{]}.
+given by the {[}\textbf{DATA\_ARRAY}{]} component, and it must be an
+array of the same dimension as {[}\textbf{DATA\_ARRAY}{]}.
 
 \item [{[}KNOTS{]}]  A vector of knot co-ordinates, starting with
 those along the first dimension, followed by any second dimension, and
@@ -2014,25 +1790,25 @@ spline into the fitted value.
 
 \end{description}
 
-\subsection{\xlabel{se_array}$<${\bf ARRAY}$>$Structure\label{se:sarray}}
+\subsection{\xlabel{se_array}$<$\textbf{ARRAY}$>$Structure\label{se:sarray}}
 
 We will now describe the various structures for arrays of numbers
 introduced in \latex{Section~\ref{se:notation}.}\html{\htmlref{Notation
 and Pseudo-types.}{se:notation}}
-An \mbox{$<${\bf ARRAY}$>$} structure has a number of variants.
+An \mbox{$<$\textbf{ARRAY}$>$} structure has a number of variants.
 
-\subsubsection{{[}{\bf VARIANT}{]} = `SIMPLE'}
+\subsubsection{{[}\textbf{VARIANT}{]} = `SIMPLE'}
 
-\begin{table}[htb]
+\begin{table}
 \centering
-\caption{Components of $<${\bf ARRAY}$>$ Structure,
-               {[}{\bf VARIANT}{]} = `SIMPLE'}
+\caption{Components of $<$\textbf{ARRAY}$>$ Structure,
+               {[}\textbf{VARIANT}{]} = `SIMPLE'}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name  & TYPE & Brief Description \\ \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & {\tt `SIMPLE'} \\
-{[}{\bf ORIGIN}(NAXIS){]} & $<${\bf integer}$>$ & origin of the data array \\
-{[}{\bf DATA}{]} & $<${\bf narray}$>$ & actual value at every pixel \\ \hline
+{[}\textbf{VARIANT}{]} & $<$\textbf{\_CHAR}$>$ & \texttt{`SIMPLE'} \\
+{[}\textbf{ORIGIN}(NAXIS){]} & $<$\textbf{integer}$>$ & origin of the data array \\
+{[}\textbf{DATA}{]} & $<$\textbf{narray}$>$ & actual value at every pixel \\ \hline
 \end{tabular}
 \end{table}
 
@@ -2041,16 +1817,16 @@ Component Name  & TYPE & Brief Description \\ \hline
 The pixel origin in each dimension.  If this object is not present,
 each origin is assumed to be 1.  Note that this
 ability, though present in FORTRAN77, is
-absent from HDS {\it per se}.
+absent from HDS \textit{per se}.
 
 This information may be communicated to
 access routines via the upper and lower bounds on each array dimension,
 so that the Fortran dimensions would be
-\begin{verbatim}
+\begin{terminalv}
     ARRAY(ORIGIN(1):DIMS(1)+ORIGIN(1)-1, ORIGIN(2):DIMS(2)+ORIGIN(2)-1, ...).
-\end{verbatim}
+\end{terminalv}
 
-{[}{\bf ORIGIN}{]} overcomes a number of quite serious problems,
+{[}\textbf{ORIGIN}{]} overcomes a number of quite serious problems,
 including the old chestnut ``does the first pixel start at (1,1) or
 (0,0)?'', because the origin is specified explicitly. Also negative
 pixel indices become available, and therefore an application is freed
@@ -2064,7 +1840,7 @@ of a data array yet maintain the array's coordinate system (it can be
 re-combined with the original if necessary). Since the coordinate
 system is preserved, all the axis scaling is also preserved. This means,
 for instance, that applications do not have to re-compute the polynomial
-coefficients in an $<${\bf AXIS}$>$ structure when the array size is
+coefficients in an $<$\textbf{AXIS}$>$ structure when the array size is
 changed.
 \item [NAXIS]
 The number of axes in the array being represented.
@@ -2072,35 +1848,35 @@ The number of axes in the array being represented.
 This mandatory item is the NAXIS-dimensional array of numbers.
 \end{description}
 
-\subsubsection{{[}{\bf VARIANT}{]} = `SCALED'}
-A scaled \mbox{$<${\bf ARRAY}$>$} is sometimes referred
-to as {\it block floating point}.
+\subsubsection{{[}\textbf{VARIANT}{]} = `SCALED'}
+A scaled \mbox{$<$\textbf{ARRAY}$>$} is sometimes referred
+to as \textit{block floating point}.
 When dealing with large-format data, disk space is a major
 consideration; significant space may be saved by storing data in a
 16-bit form via the block floating-point format.  Scaling may also be
 used as a means of implementing global scalar changes in the array's
 values without the need to change the array, or to move to a more
-expensive storage type ({\it e.g.}\  to $<${\bf float}$>$ from
-$<${\bf \_WORD}$>$) in order to work with very small or very large values.
+expensive storage type (\textit{e.g.}\  to $<$\textbf{float}$>$ from
+$<$\textbf{\_WORD}$>$) in order to work with very small or very large values.
 
-\begin{table}[htb]
+\begin{table}
 \centering
-\caption{Components of $<${\bf ARRAY}$>$ Structure, {[}{\bf VARIANT}{]} = {\tt `SCALED'}}
+\caption{Components of $<$\textbf{ARRAY}$>$ Structure, {[}\textbf{VARIANT}{]} = \texttt{`SCALED'}}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & {\tt `SCALED'} \\
-{[}{\bf ORIGIN}(NAXIS){]} & $<${\bf integer}$>$ & origin of the data array \\
-{[}{\bf DATA}{]} & $<${\bf narray}$>$ & scaled numeric value at every pixel \\
-{[}{\bf SCALE}{]} & $<${\bf numeric}$>$ & scale factor \\
-{[}{\bf ZERO}{]} & $<${\bf numeric}$>$ & zero point \\ \hline
+{[}\textbf{VARIANT}{]} & $<$\textbf{\_CHAR}$>$ & \texttt{`SCALED'} \\
+{[}\textbf{ORIGIN}(NAXIS){]} & $<$\textbf{integer}$>$ & origin of the data array \\
+{[}\textbf{DATA}{]} & $<$\textbf{narray}$>$ & scaled numeric value at every pixel \\
+{[}\textbf{SCALE}{]} & $<$\textbf{numeric}$>$ & scale factor \\
+{[}\textbf{ZERO}{]} & $<$\textbf{numeric}$>$ & zero point \\ \hline
 \end{tabular}
 \end{table}
 
 General-purpose applications will process the scaled variant.
 However, users may notice extra delays
 while the array is converted to
-$<${\bf narray}$>$ for processing
+$<$\textbf{narray}$>$ for processing
 and rescaled for storage at the end of each application.  In such cases,
 they may prefer the
 alternative strategy of first running a utility application
@@ -2111,9 +1887,9 @@ the data back to the scaled-array
 form.
 
 The numeric value of a pixel is:
-\begin{verbatim}
+\begin{terminalv}
          ZERO + DATA element * SCALE.
-\end{verbatim}
+\end{terminalv}
 
 \begin{description}
 \item [NAXIS]
@@ -2125,95 +1901,94 @@ each origin is assumed to be 1.
 The array stored in scaled (block-floating-point) format. Mandatory.
 \item [{[}SCALE{]}]
 A positive scale factor used to convert the element of
-{[}{\bf DATA}{]} to its
-unscaled $<${\bf numeric}$>$ form.  If it is not present,
+{[}\textbf{DATA}{]} to its
+unscaled $<$\textbf{numeric}$>$ form.  If it is not present,
 or is negative, or is bad, an error condition results.
 It is evaluated as follows:
-\begin{verbatim}
+\begin{terminalv}
 
       SCALE = (MAX - MIN)/(TMAX<T> - TMIN<T>)
 
-\end{verbatim}
-where {\tt MAX}, {\tt MIN} are the maximum and minimum valid ({\it i.e.}\  not bad)
-data values respectively, and {\tt TMAX<T>}, {\tt TMIN<T>}  are
-the largest and smallest valid values for the primitive type of {[}{\bf DATA}{]}, represented
-by token {\tt <T>}.
+\end{terminalv}
+where \texttt{MAX}, \texttt{MIN} are the maximum and minimum valid (\textit{i.e.}\  not bad)
+data values respectively, and \texttt{TMAX<T>}, \texttt{TMIN<T>}  are
+the largest and smallest valid values for the primitive type of {[}\textbf{DATA}{]}, represented
+by token \texttt{<T>}.
 \item [{[}ZERO{]}]
-The zero point used to convert the element of {[}{\bf
-DATA}{]} to its unscaled $<${\bf numeric}$>$ form.  If it is not
+The zero point used to convert the element of {[}\textbf{DATA}{]} to its unscaled $<$\textbf{numeric}$>$ form.  If it is not
 present,
 or is undefined, a value of zero is assumed.  It is evaluated as follows:
-\begin{verbatim}
+\begin{terminalv}
 
       ZERO = TMIN<T> - SCALE * MIN
 
-\end{verbatim}
+\end{terminalv}
 
-The equivalent primitive type is the TYPE of {[}{\bf ZERO}{]} or, if
-{[}{\bf ZERO}{]} is absent, the TYPE of {[}{\bf SCALE}{]}.  If both
-{[}{\bf ZERO}{]} and {[}{\bf SCALE}{]} are missing the equivalent
-$<${\bf numeric}$>$ array defaults to TYPE $<${\bf \_REAL}$>$.
+The equivalent primitive type is the TYPE of {[}\textbf{ZERO}{]} or, if
+{[}\textbf{ZERO}{]} is absent, the TYPE of {[}\textbf{SCALE}{]}.  If both
+{[}\textbf{ZERO}{]} and {[}\textbf{SCALE}{]} are missing the equivalent
+$<$\textbf{numeric}$>$ array defaults to TYPE $<$\textbf{\_REAL}$>$.
 \end{description}
 
-\subsubsection{{[}{\bf VARIANT}{]} = `SPACED'}
-A spaced \mbox{$<${\bf ARRAY}$>$} is one where the data values
+\subsubsection{{[}\textbf{VARIANT}{]} = `SPACED'}
+A spaced \mbox{$<$\textbf{ARRAY}$>$} is one where the data values
 vary linearly with array index.
 An example where this variant could be used is axis data, which are
 often equally spaced.
 
 General-purpose applications will handle these structures.  However,
 extra time will be expended (though probably much less than for a
-scaled \mbox{$<${\bf ARRAY}$>$}) whilst conversion to
-and from a $<${\bf narray}$>$ is performed.
+scaled \mbox{$<$\textbf{ARRAY}$>$}) whilst conversion to
+and from a $<$\textbf{narray}$>$ is performed.
 They do not contain magic-value bad pixels.
 
-\begin{table}[htb]
+\begin{table}
 \centering
-\caption{Components of $<${\bf ARRAY}$>$ Structure,
-{[}{\bf VARIANT}{]} = {\tt `SPACED'}}
+\caption{Components of $<$\textbf{ARRAY}$>$ Structure,
+{[}\textbf{VARIANT}{]} = \texttt{`SPACED'}}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\  \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & {\tt `SPACED'} \\
-{[}{\bf ORIGIN}(NAXIS){]} & $<${\bf integer}$>$ & origin of the data array \\
-{[}{\bf DIMENSIONS}(NAXIS){]} & $<${\bf integer}$>$ & dimensions of equivalent numeric array\\
-{[}{\bf SCALE}(NAXIS){]} & $<${\bf numeric}$>$ & scale factors \\
-{[}{\bf BASE}(NAXIS){]} & $<${\bf numeric}$>$ & zero points \\ \hline
+{[}\textbf{VARIANT}{]} & $<$\textbf{\_CHAR}$>$ & \texttt{`SPACED'} \\
+{[}\textbf{ORIGIN}(NAXIS){]} & $<$\textbf{integer}$>$ & origin of the data array \\
+{[}\textbf{DIMENSIONS}(NAXIS){]} & $<$\textbf{integer}$>$ & dimensions of equivalent numeric array\\
+{[}\textbf{SCALE}(NAXIS){]} & $<$\textbf{numeric}$>$ & scale factors \\
+{[}\textbf{BASE}(NAXIS){]} & $<$\textbf{numeric}$>$ & zero points \\ \hline
 \end{tabular}
 \end{table}
 
 The value of an element of the equivalent
-$<${\bf numeric}$>$ array would be:
-\[{\rm VALUE} = \sum_{i=1}^{\rm NAXIS} ({\rm BASE}(i) + (k_i-1) * {\rm SCALE}(i) ) \]
-where $k_i$ is the element number of the $i^{\rm th}$ dimension.
+$<$\textbf{numeric}$>$ array would be:
+$$\mathrm{VALUE} = \sum_{i=1}^{\mathrm{NAXIS}} (\mathrm{BASE}(i) + (k_i-1) * \mathrm{SCALE}(i) ) $$
+where $k_i$ is the element number of the $i^{\mathrm{th}}$ dimension.
 \begin{description}
 \item [NAXIS]
 The number of axes in the array being represented.
 \item [{[}ORIGIN{]}]
 The pixel origin in each dimension.  If this object is not present,
 each origin is assumed to be 1.
-\item [{[}{\bf SCALE}{]}]
+\item [{[}\textbf{SCALE}{]}]
 The scale factor for each dimension used to convert the corresponding
-array index of {[}{\bf DATA}{]} to its
-$<${\bf numeric}$>$ form.  If it is not present, or is undefined,
+array index of {[}\textbf{DATA}{]} to its
+$<$\textbf{numeric}$>$ form.  If it is not present, or is undefined,
 a value of 1 is assumed for each dimension.
-\item [{[}{\bf BASE}{]}]
+\item [{[}\textbf{BASE}{]}]
 The zero point for each dimension used to convert the corresponding
-array index of {[}{\bf DATA}{]} to its
-$<${\bf numeric}$>$ form.  If it is not present, or is undefined, a value of 0
+array index of {[}\textbf{DATA}{]} to its
+$<$\textbf{numeric}$>$ form.  If it is not present, or is undefined, a value of 0
 is assumed for each dimension.
 \item [{[}DIMENSIONS{]}]
 The axis dimensions of the full array.  Mandatory.
 The equivalent primitive type
-is the TYPE of {[}{\bf BASE}{]}, or if {[}{\bf BASE}{]} is
-absent, the TYPE of {[}{\bf SCALE}{]}.  If both
-{[}{\bf BASE}{]} and {[}{\bf SCALE}{]} are missing, the
-equivalent $<${\bf numeric}$>$ array defaults to
-TYPE $<${\bf \_REAL}$>$.
+is the TYPE of {[}\textbf{BASE}{]}, or if {[}\textbf{BASE}{]} is
+absent, the TYPE of {[}\textbf{SCALE}{]}.  If both
+{[}\textbf{BASE}{]} and {[}\textbf{SCALE}{]} are missing, the
+equivalent $<$\textbf{numeric}$>$ array defaults to
+TYPE $<$\textbf{\_REAL}$>$.
 \end{description}
 
-\subsubsection{{[}{\bf VARIANT}{]} = `SPARSE'}
-A sparse \mbox{$<${\bf ARRAY}$>$} structure is used for storing
+\subsubsection{{[}\textbf{VARIANT}{]} = `SPARSE'}
+A sparse \mbox{$<$\textbf{ARRAY}$>$} structure is used for storing
 the values of an array where most of the pixels are equal in value
 (zero perhaps).
 The structure is composed of a list of array indices for the
@@ -2222,19 +1997,19 @@ elements, and their corresponding data values.
 The ``grey'' value adopted for the majority of the array elements is
 also supplied.
 
-\begin{table}[htb]
+\begin{table}
 \centering
-\caption{Components of $<${\bf ARRAY}$>$ Structure, {[}{\bf VARIANT}{]} = {\tt `SPARSE'}}
+\caption{Components of $<$\textbf{ARRAY}$>$ Structure, {[}\textbf{VARIANT}{]} = \texttt{`SPARSE'}}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\  \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & {\tt `SPARSE'} \\
-{[}{\bf ORIGIN}(NAXIS){]} & $<${\bf integer}$>$ & origin of the data array \\
-{[}{\bf DATA}(NDATA){]} & $<${\bf numeric}$>$ & data values for pixel subset \\
-{[}{\bf LIST}(NAXIS,NDATA){]} & $<${\bf integer}$>$ & list of pixel array indices \\
-{[}{\bf DIMENSIONS}(NAXIS){]} & $<${\bf integer}$>$ &
-dimension of equivalent $<${\bf numeric}$>$ array \\
-{[}{\bf GREY}{]} & $<${\bf numeric}$>$ & grey value \\ \hline
+{[}\textbf{VARIANT}{]} & $<$\textbf{\_CHAR}$>$ & \texttt{`SPARSE'} \\
+{[}\textbf{ORIGIN}(NAXIS){]} & $<$\textbf{integer}$>$ & origin of the data array \\
+{[}\textbf{DATA}(NDATA){]} & $<$\textbf{numeric}$>$ & data values for pixel subset \\
+{[}\textbf{LIST}(NAXIS,NDATA){]} & $<$\textbf{integer}$>$ & list of pixel array indices \\
+{[}\textbf{DIMENSIONS}(NAXIS){]} & $<$\textbf{integer}$>$ &
+dimension of equivalent $<$\textbf{numeric}$>$ array \\
+{[}\textbf{GREY}{]} & $<$\textbf{numeric}$>$ & grey value \\ \hline
 \end{tabular}
 \end{table}
 
@@ -2254,41 +2029,41 @@ These are the array indices for each significant array value.
 Mandatory.
 \item [{[}DIMENSIONS{]}]
 This array contains the axis dimensions of the full data array.
-It is used to generate the equivalent $<${\bf narray}$>$.
+It is used to generate the equivalent $<$\textbf{narray}$>$.
 Mandatory.
 \item [{[}GREY{]}]
 This is the value used to fill the array elements not
-referenced in the {[}{\bf LIST}{]} component.  It should
+referenced in the {[}\textbf{LIST}{]} component.  It should
 have the same primitive
-TYPE as {[}{\bf DATA}{]}.  If absent,
+TYPE as {[}\textbf{DATA}{]}.  If absent,
 it is assumed to be
 the bad-pixel magic value
-(for {[}{\bf DATA}{]}'s primitive type) since the pixel's
+(for {[}\textbf{DATA}{]}'s primitive type) since the pixel's
 value is undefined.
 \end{description}
 
-The equivalent primitive type is the TYPE of {[}{\bf DATA}{]}.
+The equivalent primitive type is the TYPE of {[}\textbf{DATA}{]}.
 
-\subsubsection{{[}{\bf VARIANT}{]} = `POLYNOMIAL'}
+\subsubsection{{[}\textbf{VARIANT}{]} = `POLYNOMIAL'}
 The array is represented by an $n$-dimensional
 polynomial.
 (This variant does not conform to the
 guideline about variants since conversion of an array of numbers to a
 polynomial requires additional information.  However, for clarity and
 because the reverse operation is possible---polynomial to an array of
-numbers---a variant of $<${\bf ARRAY}$>$ has been used.)
+numbers---a variant of $<$\textbf{ARRAY}$>$ has been used.)
 
-\begin{table}[htb]
+\begin{table}
 \centering
-\caption{Components of $<${\bf ARRAY}$>$ Structure, {[}{\bf VARIANT}{]} = {\tt `POLYNOMIAL'}}
+\caption{Components of $<$\textbf{ARRAY}$>$ Structure, {[}\textbf{VARIANT}{]} = \texttt{`POLYNOMIAL'}}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & {\tt `POLYNOMIAL'} \\
-{[}{\bf ORIGIN}(NAXIS){]} & $<${\bf integer}$>$ & origin of the data array \\
-{[}{\bf DATA}{]} & $<${\bf POLYNOMIAL}$>$ & polynomial representing array \\
-{[}{\bf DIMENSIONS}(NAXIS){]} & $<${\bf integer}$>$ & dimension of equivalent \\
-& & $<${\bf numeric}$>$ array \\ \hline
+{[}\textbf{VARIANT}{]} & $<$\textbf{\_CHAR}$>$ & \texttt{`POLYNOMIAL'} \\
+{[}\textbf{ORIGIN}(NAXIS){]} & $<$\textbf{integer}$>$ & origin of the data array \\
+{[}\textbf{DATA}{]} & $<$\textbf{POLYNOMIAL}$>$ & polynomial representing array \\
+{[}\textbf{DIMENSIONS}(NAXIS){]} & $<$\textbf{integer}$>$ & dimension of equivalent \\
+& & $<$\textbf{numeric}$>$ array \\ \hline
 \end{tabular}
 \end{table}
 
@@ -2307,7 +2082,7 @@ array, the polynomial is evaluated at pixel centres, which start
 at 0.5 for the first pixel given a uniform bin.
 \item [{[}DIMENSIONS{]}]
 This array contains the axis dimensions of the full data array.
-It is used to generate the equivalent $<${\bf narray}$>$.
+It is used to generate the equivalent $<$\textbf{narray}$>$.
 Mandatory.
 \end{description}
 
@@ -2315,254 +2090,251 @@ The `SPACED' variant may appear merely
 to be a degenerate form of the `POLYNOMIAL' variant.  However, there are reasons for
 having a `SPACED' variant:
 \begin{itemize}
-\item the case where the equivalent primitive type is $<${\bf
-integer}$>$ is common, whereas the polynomial variant only produces
-$<${\bf float}$>$ results.
-\item The spaced $<${\bf ARRAY}$>$ uses the pixel indices
+\item the case where the equivalent primitive type is $<$\textbf{integer}$>$ is common, whereas the polynomial variant only produces
+$<$\textbf{float}$>$ results.
+\item The spaced $<$\textbf{ARRAY}$>$ uses the pixel indices
 to generate the values, whereas a
 polynomial array uses the pixel co-ordinates.  Pixel
 indices are integers, starting at 1; pixel
 co-ordinates are real numbers, which start at 0.5
 for uniformly-sized bins.
-\item The spaced $<${\bf ARRAY}$>$ format will be easier to understand
+\item The spaced $<$\textbf{ARRAY}$>$ format will be easier to understand
 in a structure listing.
 \end{itemize}
 
 To reiterate, general-purpose applications will be able to process
-\mbox{$<${\bf ARRAY}$>$} structures, though their performance will be
-degraded when the {[}{\bf VARIANT}{]} is not {\tt `SIMPLE'} because of
+\mbox{$<$\textbf{ARRAY}$>$} structures, though their performance will be
+degraded when the {[}\textbf{VARIANT}{]} is not \texttt{`SIMPLE'} because of
 the extra processing required. These options do not create a significant
 overhead for the normal case, the base variant.
-When the {[}{\bf VARIANT}{]} is not {\tt `SIMPLE'},
+When the {[}\textbf{VARIANT}{]} is not \texttt{`SIMPLE'},
 users will probably be warned that their data are in a special format,
 be given the option to abort the application, and be directed to
 documentation for applications better suited to the data.
 
-\subsection{\xlabel{se_complex}$<${\bf COMPLEX\_ARRAY}$>$ Structure\label{se:scomplex}}
+\subsection{\xlabel{se_complex}$<$\textbf{COMPLEX\_ARRAY}$>$ Structure\label{se:scomplex}}
 
-HDS does not provide a $<${\bf \_COMPLEX}$>$ primitive type, and
-therefore if complex data are to be stored a $<${\bf COMPLEX\_ARRAY}$>$
+HDS does not provide a $<$\textbf{\_COMPLEX}$>$ primitive type, and
+therefore if complex data are to be stored a $<$\textbf{COMPLEX\_ARRAY}$>$
 structure, defined in Table~\ref{ta:complex} must be used.
 
-\begin{table}[htb]
+\begin{table}
 \centering
-\caption{Components of $<${\bf COMPLEX\_ARRAY}$>$ Structure}
+\caption{Components of $<$\textbf{COMPLEX\_ARRAY}$>$ Structure}
 \label{ta:complex}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & registered variant \\
-{[}{\bf REAL}{]} & $<${\bf p\_array}$>$ & real-component data values  \\
-{[}{\bf IMAGINARY}{]} & $<${\bf p\_array}$>$ & imaginary-component data values \\ \hline
+{[}\textbf{VARIANT}{]} & $<$\textbf{\_CHAR}$>$ & registered variant \\
+{[}\textbf{REAL}{]} & $<$\textbf{p\_array}$>$ & real-component data values  \\
+{[}\textbf{IMAGINARY}{]} & $<$\textbf{p\_array}$>$ & imaginary-component data values \\ \hline
 \end{tabular}
 \end{table}
 
-Currently, the [{[}VARIANT{]}] can only be {\tt `SIMPLE'}.
+Currently, the [{[}VARIANT{]}] can only be \texttt{`SIMPLE'}.
 
-The dimensions of {[}{\bf REAL}{]} and {[}{\bf IMAGINARY}{]} must be identical.
+The dimensions of {[}\textbf{REAL}{]} and {[}\textbf{IMAGINARY}{]} must be identical.
 Both components
-are mandatory.  The pixel origin will be taken from {[}{\bf REAL}{]} component's
-structure, {\it i.e.}\  {[}{\bf REAL.ORIGIN}{]}.
+are mandatory.  The pixel origin will be taken from {[}\textbf{REAL}{]} component's
+structure, \textit{i.e.}\  {[}\textbf{REAL.ORIGIN}{]}.
 
 If a pixel is undefined, the magic value should be assigned to both
 corresponding elements of the real and imaginary arrays.  However,
 should the application encounter the case where only
 one element is flagged, the whole pixel should be regarded as undefined.
 
-The {[}{\bf ORIGIN]} components should match, but only {[}{\bf REAL.ORIGIN}{]}
+The {[}\textbf{ORIGIN]} components should match, but only {[}\textbf{REAL.ORIGIN}{]}
 is used.
 
-\subsection{\xlabel{se_axis}$<${\bf AXIS}$>$ Structure\label{se:saxis}}
+\subsection{\xlabel{se_axis}$<$\textbf{AXIS}$>$ Structure\label{se:saxis}}
 
-This structure has TYPE $<${\bf AXIS}$>$ and is used to
+This structure has TYPE $<$\textbf{AXIS}$>$ and is used to
 store information describing the size and spacing of the
 pixels in a multi-dimensional data array.
-In use, $<${\bf AXIS}$>$ structures are arranged as elements of
+In use, $<$\textbf{AXIS}$>$ structures are arranged as elements of
 a 1-dimensional array (of structures).  The number of elements
 (structures) in this array is equal to the dimensionality
 (number of axes) of the data array being described, so that
-each $<${\bf AXIS}$>$ structure relates to a single
+each $<$\textbf{AXIS}$>$ structure relates to a single
 data dimension.  The following description applies to one
 element of that multi-dimensional structure.
 
-\begin{table}[htb]
+\begin{table}
 \centering
-\caption{Components of $<${\bf AXIS}$>$ structure element}
+\caption{Components of $<$\textbf{AXIS}$>$ structure element}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & registered variant \\
-{[}{\bf DATA\_ARRAY}{]} & $<${\bf p\_array}$>$ & axis value at each pixel \\
-{[}{\bf LABEL}{]} & $<${\bf \_CHAR}$>$ & axis label \\
-{[}{\bf UNITS}{]} & $<${\bf \_CHAR}$>$ & axis units \\
-{[}{\bf VARIANCE}{]} & $<${\bf s\_array}$>$ & axis variance in {[}{\bf DATA\_ARRAY}{]} \\
-{[}{\bf NORMALISED}{]} & $<${\bf \_LOGICAL}$>$ & true if the data have been normalised \\
-{[}{\bf WIDTH}{]} & $<${\bf s\_array}$>$ & bin width of each pixel \\
-{[}{\bf MORE}{]} & $<${\bf EXT}$>$ & extension structure \\ \hline
+{[}\textbf{VARIANT}{]} & $<$\textbf{\_CHAR}$>$ & registered variant \\
+{[}\textbf{DATA\_ARRAY}{]} & $<$\textbf{p\_array}$>$ & axis value at each pixel \\
+{[}\textbf{LABEL}{]} & $<$\textbf{\_CHAR}$>$ & axis label \\
+{[}\textbf{UNITS}{]} & $<$\textbf{\_CHAR}$>$ & axis units \\
+{[}\textbf{VARIANCE}{]} & $<$\textbf{s\_array}$>$ & axis variance in {[}\textbf{DATA\_ARRAY}{]} \\
+{[}\textbf{NORMALISED}{]} & $<$\textbf{\_LOGICAL}$>$ & true if the data have been normalised \\
+{[}\textbf{WIDTH}{]} & $<$\textbf{s\_array}$>$ & bin width of each pixel \\
+{[}\textbf{MORE}{]} & $<$\textbf{EXT}$>$ & extension structure \\ \hline
 \end{tabular}
 \end{table}
 
 \begin{description}
 \item [{[}VARIANT{]}]
-Currently, this can only be {\tt `SIMPLE'}.
-\item [{[}{\bf DATA\_ARRAY}{]}]
+Currently, this can only be \texttt{`SIMPLE'}.
+\item [{[}\textbf{DATA\_ARRAY}{]}]
 This mandatory component, which
-can be the only item within the $<${\bf AXIS}$>$ structure,
+can be the only item within the $<$\textbf{AXIS}$>$ structure,
 is used to provide co-ordinates along the axis.
-Each value corresponds to the {\it centre} of a pixel.  For an
+Each value corresponds to the \textit{centre} of a pixel.  For an
 $n$-dimensional data array, with no axis calibration, and equally spaced
-data, the Starlink standard is for the $n^{\rm th}$ pixel centre to be at
-$(n-1)$.5 in each axis, {\it e.g.}\  for display purposes
-({\it cf.}\  \xref{SSN/22}{ssn22}). However, in some applications the pixel
+data, the Starlink standard is for the $n^{\mathrm{th}}$ pixel centre to be at
+$(n-1)$.5 in each axis, \textit{e.g.}\  for display purposes
+(\textit{cf.}\  \xref{SSN/22}{ssn22}). However, in some applications the pixel
 index is adequate and clearer.  Programmers should take care to use
 the appropriate scheme.
 
 The co-ordinates are given as
 a vector with length corresponding to that of the corresponding
 dimension of the data array. In practice, it will often be
-the polynomial or spaced variant of TYPE \mbox{$<${\bf ARRAY}$>$}.
+the polynomial or spaced variant of TYPE \mbox{$<$\textbf{ARRAY}$>$}.
 
 \item [{[}LABEL{]}]
 This is a textual description of the co-ordinate type.  It may
 contain the ``control'' codes that are used by graphics packages
-to produce special characters---backslashes {\it etc}.
+to produce special characters---backslashes \textit{etc}.
 \item [{[}UNITS{]}]
 This is a textual description of the co-ordinate units.
 \item [{[}VARIANCE{]}]
 This component is used to describe the variance of the
 errors associated with co-ordinate
-values given by the {[}{\bf DATA\_ARRAY}{]} component.
+values given by the {[}\textbf{DATA\_ARRAY}{]} component.
 It must either be an array of
-the same dimension as {[}{\bf DATA\_ARRAY}{]} or,
-should a single variance apply to all elements of {[}{\bf
-DATA\_ARRAY}{]},
+the same dimension as {[}\textbf{DATA\_ARRAY}{]} or,
+should a single variance apply to all elements of {[}\textbf{DATA\_ARRAY}{]},
 a scalar.
 \item [{[}NORMALISED{]}]
 If true, the data have been normalised to the pixel size
-({\it i.e.}\ divided by the pixel width along this axis).
+(\textit{i.e.}\ divided by the pixel width along this axis).
 In other words if the data are
-normalised the data values reduce as the pixels are stretched and {\it
-vice versa}. Optional. If absent, it defaults to false.
+normalised the data values reduce as the pixels are stretched and \textit{vice versa}. Optional. If absent, it defaults to false.
 \item [{[}WIDTH{]}]
 The width or extent of each bin for irregularly spaced
 and/or overlapping data.
 If it is an array, it must have
-the same dimensions as the {[}{\bf DATA\_ARRAY}{]}.
+the same dimensions as the {[}\textbf{DATA\_ARRAY}{]}.
 The scalar form applies to all the pixels and is intended for overlapping
-pixels.  Optional.  If absent, the extent of the $n^{\rm th}$
+pixels.  Optional.  If absent, the extent of the $n^{\mathrm{th}}$
 element is assumed to be
-\[ 0.5~(D_{n-1}+D_n)~~~{\rm to}~~~0.5~(D_n+D_{n+1}) , \]
-where $D_n$ is the $n^{\rm th}$ centre
-value given by {[}{\bf DATA\_ARRAY}{]}. The
-extreme values are twice the available half widths, {\it viz.}
-\[ D_n - 0.5 * {\rm WIDTH} ~~~ {\rm to} ~~~ D_n + 0.5 * {\rm WIDTH} \]
-for the $n^{\rm th}$ element.
+$$ 0.5~(D_{n-1}+D_n)~~~\mathrm{to}~~~0.5~(D_n+D_{n+1}) , $$
+where $D_n$ is the $n^{\mathrm{th}}$ centre
+value given by {[}\textbf{DATA\_ARRAY}{]}. The
+extreme values are twice the available half widths, \textit{viz.}
+$$ D_n - 0.5 * \mathrm{WIDTH} ~~~ \mathrm{to} ~~~ D_n + 0.5 * \mathrm{WIDTH} $$
+for the $n^{\mathrm{th}}$ element.
 \item [{[}MORE{]}] The extension in which application-specific
 axis-related information can be stored,
-{\it e.g.} whether the axis is cyclic, the type of axis: spectral,
-spatial, temporal {\it etc.}
+\textit{e.g.} whether the axis is cyclic, the type of axis: spectral,
+spatial, temporal \textit{etc.}
 \end{description}
 
-\subsection{\xlabel{se_squality}$<${\bf QUALITY}$>$ Structure\label{se:squality}}
+\subsection{\xlabel{se_squality}$<$\textbf{QUALITY}$>$ Structure\label{se:squality}}
 
 This structure is used for storing data-quality information.
 
-\begin{table}[htb]
+\begin{table}
 \centering
-\caption{Components of $<${\bf QUALITY}$>$ structure}
+\caption{Components of $<$\textbf{QUALITY}$>$ structure}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & registered variant \\
-{[}{\bf QUALITY}{]} & $<${\bf p\_array}$>$ & quality value of each pixel \\
-{[}{\bf BADBITS}{]} & $<${\bf \_UBYTE}$>$ &
+{[}\textbf{VARIANT}{]} & $<$\textbf{\_CHAR}$>$ & registered variant \\
+{[}\textbf{QUALITY}{]} & $<$\textbf{p\_array}$>$ & quality value of each pixel \\
+{[}\textbf{BADBITS}{]} & $<$\textbf{\_UBYTE}$>$ &
       mask of allowed bad bits in quality \\ \hline
 \end{tabular}
 \end{table}
 
 \begin{description}
 \item [{[}VARIANT{]}]
-Currently can only be {\tt `SIMPLE'}.
+Currently can only be \texttt{`SIMPLE'}.
 \item [{[}QUALITY{]}]
 The data-quality value(s).  If it is scalar it applies
 to all the pixels.  The actual or
-equivalent primitive type must be $<${\bf \_UBYTE}$>$.  Mandatory.
+equivalent primitive type must be $<$\textbf{\_UBYTE}$>$.  Mandatory.
 
 The r\^{o}le of data-quality and how it can be used to advantage were
 described earlier.
 \item [{[}BADBITS{]}]
 A set of 8 one-bit flags which flag that the corresponding
 data quality bits indicate bad pixels;
-if omitted a default value of zero ({\it i.e.}\ data quality
+if omitted a default value of zero (\textit{i.e.}\ data quality
 is ignored in deciding whether a pixel is bad or not)
 is assumed.
 \end{description}
 
-\subsection{\xlabel{se_shistory}$<${\bf HISTORY}$>$ Structure\label{se:shistory}}
+\subsection{\xlabel{se_shistory}$<$\textbf{HISTORY}$>$ Structure\label{se:shistory}}
 
 This structure has NAME
-{[}{\bf HISTORY}{]} and
-TYPE $<${\bf HISTORY}$>$.  Its components are shown in
+{[}\textbf{HISTORY}{]} and
+TYPE $<$\textbf{HISTORY}$>$.  Its components are shown in
 Table~\ref{ta:history}.
 
-\begin{table}[htb]
+\begin{table}
 \centering
-\caption{Contents of the $<${\bf HISTORY}$>$ Structure}
+\caption{Contents of the $<$\textbf{HISTORY}$>$ Structure}
 \label{ta:history}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & registered variant \\
-{[}{\bf CREATED}{]} & $<${\bf \_CHAR}$>$ & creation date and time \\
-{[}{\bf EXTEND\_SIZE}{]} & $<${\bf \_INTEGER}$>$ & increment number of records \\
-{[}{\bf CURRENT\_RECORD}{]} & $<${\bf \_INTEGER}$>$ & record number being used \\
-{[}{\bf RECORDS}($m$){]} & $<${\bf HIST\_REC}$>$ & array of $m$ history records \\ \hline
+{[}\textbf{VARIANT}{]} & $<$\textbf{\_CHAR}$>$ & registered variant \\
+{[}\textbf{CREATED}{]} & $<$\textbf{\_CHAR}$>$ & creation date and time \\
+{[}\textbf{EXTEND\_SIZE}{]} & $<$\textbf{\_INTEGER}$>$ & increment number of records \\
+{[}\textbf{CURRENT\_RECORD}{]} & $<$\textbf{\_INTEGER}$>$ & record number being used \\
+{[}\textbf{RECORDS}($m$){]} & $<$\textbf{HIST\_REC}$>$ & array of $m$ history records \\ \hline
 \end{tabular}
 \end{table}
 
 \begin{description}
 \item [{[}VARIANT{]}]
-Currently, this can only be {\tt `SIMPLE'}.
+Currently, this can only be \texttt{`SIMPLE'}.
 \item [{[}CREATED{]}]
 The date and time when the HISTORY structure was created,
 derived from the computer's clock.  Mandatory.  The format for
 dates and times is as following examples:
-\begin{verbatim}
+\begin{terminalv}
     1988/AUG/07 23:59:59.999
     2001-JAN-01 01:02:03.456
-\end{verbatim}
+\end{terminalv}
 \item [{[}EXTEND\_SIZE{]}]
 The number of history records to be created whenever the existing
 records have been filled.  The default is 5.
 Initially 10 records are created.  (The item
-{[}{\bf INITIAL\_SIZE}{]}
+{[}\textbf{INITIAL\_SIZE}{]}
 in the original ASTERIX history system is redundant and has been
 removed.)
 \item [{[}CURRENT\_RECORD{]}]
 The number of the current history record.  Mandatory.
-\item [{[}RECORDS{]}]  An array of $<${\bf HIST\_REC}$>$
+\item [{[}RECORDS{]}]  An array of $<$\textbf{HIST\_REC}$>$
 structures containing the
 history records.  Mandatory.
 \end{description}
 
-\begin{table}[htb]
+\begin{table}
 \centering
-\caption{Contents of the $<${\bf HIST\_REC}$>$ Structure}
+\caption{Contents of the $<$\textbf{HIST\_REC}$>$ Structure}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & registered variant \\
-{[}{\bf DATE}{]} & $<${\bf \_CHAR}$>$ & creation date and time \\
-{[}{\bf COMMAND}{]} & $<${\bf \_CHAR}$>$ & application name
+{[}\textbf{VARIANT}{]} & $<$\textbf{\_CHAR}$>$ & registered variant \\
+{[}\textbf{DATE}{]} & $<$\textbf{\_CHAR}$>$ & creation date and time \\
+{[}\textbf{COMMAND}{]} & $<$\textbf{\_CHAR}$>$ & application name
       and version \\
-{[}{\bf TEXT}($m$){]} & $<${\bf \_CHAR}$>$ &
+{[}\textbf{TEXT}($m$){]} & $<$\textbf{\_CHAR}$>$ &
       $m$ lines of text \\ \hline
 \end{tabular}
 \end{table}
 
 \begin{description}
 \item [{[}VARIANT{]}]
-Currently, this can only be {\tt `SIMPLE'}.
+Currently, this can only be \texttt{`SIMPLE'}.
 \item [{[}DATE{]}]
 The date and time when the record was created, derived from the
 computer's clock.  Mandatory.
@@ -2570,7 +2342,7 @@ computer's clock.  Mandatory.
 The name and version number of the application or command
 which modified or created the structure at
 or below the level in the hierarchy of this
-$<${\bf HISTORY}$>$ object.  Mandatory.
+$<$\textbf{HISTORY}$>$ object.  Mandatory.
 \item [{[}TEXT{]}]  History text, which can span an
 unlimited number of records.  It may
 contain commentary or details of input parameters.  Parameters should be
@@ -2578,20 +2350,20 @@ converted to text using environment calls.
 \end{description}
 
 Note there are currently no variants
-of the $<${\bf HISTORY}$>$ and $<${\bf HIST\_REC}$>$
+of the $<$\textbf{HISTORY}$>$ and $<$\textbf{HIST\_REC}$>$
 structures.
 
 \xlabel{se_ndf}\section{The Extensible n-Dimensional-Data Format\label{se:ndf}}
 
 The most-common structure for data that are not instrument specific is
-what has become known as the {\it bulk-data frame}.  To avoid
+what has become known as the \textit{bulk-data frame}.  To avoid
 confusion with the Interim Environment's BDF,
 the new Starlink standard for storing bulk-data frames
 is called the Extensible $n$-Dimensional-Data Format (NDF for short).
 It has no specific HDS NAME because a container file may
-have several $<${\bf NDF}$>$ structures at a given level.  It
+have several $<$\textbf{NDF}$>$ structures at a given level.  It
 has an optional
-TYPE of $<${\bf NDF}$>$ that will not be tested by general-purpose
+TYPE of $<$\textbf{NDF}$>$ that will not be tested by general-purpose
 applications but is recommended to assist
 recognition by human readers of structure listings.
 NDFs may be structured recursively---see the
@@ -2605,14 +2377,14 @@ allow old Asterix and Wright-Giddings-formatted data,
 of which there is a great deal,
 to be processed by the new general-purpose applications.
 The NDF structure comprises a title, a data array and its associated objects
-(a {[}{\bf DATA\_ARRAY}{]} structure in the Wright-Giddings terminology),
+(a {[}\textbf{DATA\_ARRAY}{]} structure in the Wright-Giddings terminology),
 axis information, history and one or more registered named objects containing
 application-specific components.
 Note that everything at the top level is intended to be under Starlink
 control, and although general-purpose applications will (for
 an initial period) tolerate
 non-standard components at this level, such
-{\it rogue objects} will not be processed beyond being
+\textit{rogue objects} will not be processed beyond being
 copied to the same place within an output structure.  This
 Starlink-components-only restriction, which does
 not preclude extensibility (done through the MORE objects),
@@ -2627,31 +2399,31 @@ display a warning message, to alert the user to
 take some action (for example to run the
 appropriate format conversion utility).
 
-\begin{table}[htb]
+\begin{table}
 \centering
 \caption{Components of the Extensible $n$-Dimensional-Data structure}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf VARIANT}{]} & $<${\bf \_CHAR}$>$ & variant of the $<${\bf NDF}$>$ type \\
-{[}{\bf TITLE}{]} & $<${\bf \_CHAR}$>$ & title of $<${\bf NDF}$>$ \\
-{[}{\bf DATA\_ARRAY}{]} & $<${\bf various}$>$ & NAXIS-dimensional data array \\
-{[}{\bf LABEL}{]} & $<${\bf \_CHAR}$>$ & label describing the data array \\
-{[}{\bf UNITS}{]} & $<${\bf \_CHAR}$>$ & units of the data array \\
-{[}{\bf VARIANCE}{]} & $<${\bf s\_array}$>$ & variance of the data array \\
-{[}{\bf BAD\_PIXEL}{]} & $<${\bf \_LOGICAL}$>$ & bad pixel flag \\
-{[}{\bf QUALITY}{]} & $<${\bf various}$>$ & quality of the data array \\
-{[}{\bf AXIS}(NAXIS){]} & $<${\bf AXIS}$>$ & axis values, labels, units and errors \\
-{[}{\bf HISTORY}{]} & $<${\bf HISTORY}$>$ & history structure \\
-{[}{\bf MORE}{]} & $<${\bf EXT}$>$  & extension structure \\ \hline
+{[}\textbf{VARIANT}{]} & $<$\textbf{\_CHAR}$>$ & variant of the $<$\textbf{NDF}$>$ type \\
+{[}\textbf{TITLE}{]} & $<$\textbf{\_CHAR}$>$ & title of $<$\textbf{NDF}$>$ \\
+{[}\textbf{DATA\_ARRAY}{]} & $<$\textbf{various}$>$ & NAXIS-dimensional data array \\
+{[}\textbf{LABEL}{]} & $<$\textbf{\_CHAR}$>$ & label describing the data array \\
+{[}\textbf{UNITS}{]} & $<$\textbf{\_CHAR}$>$ & units of the data array \\
+{[}\textbf{VARIANCE}{]} & $<$\textbf{s\_array}$>$ & variance of the data array \\
+{[}\textbf{BAD\_PIXEL}{]} & $<$\textbf{\_LOGICAL}$>$ & bad pixel flag \\
+{[}\textbf{QUALITY}{]} & $<$\textbf{various}$>$ & quality of the data array \\
+{[}\textbf{AXIS}(NAXIS){]} & $<$\textbf{AXIS}$>$ & axis values, labels, units and errors \\
+{[}\textbf{HISTORY}{]} & $<$\textbf{HISTORY}$>$ & history structure \\
+{[}\textbf{MORE}{]} & $<$\textbf{EXT}$>$  & extension structure \\ \hline
 \end{tabular}
 \end{table}
 
 \begin{description}
 \item [{[}VARIANT{]}]  Specifies which
-sort of $<${\bf NDF}$>$ structure.  The variant
+sort of $<$\textbf{NDF}$>$ structure.  The variant
 must be one
-of the registered strings, of which only {\tt `SIMPLE'} is currently
+of the registered strings, of which only \texttt{`SIMPLE'} is currently
 available.
 \item [{[}TITLE{]}]  A title for the data which
 may be used to annotate plots and
@@ -2660,77 +2432,76 @@ listings, and which will help identify the NDF.
 brief to describe the contents
 of a dataset in detail, but will
 be useful for display purposes.)
-\item [{[}{\bf DATA\_ARRAY}{]}]  This is the primary
+\item [{[}\textbf{DATA\_ARRAY}{]}]  This is the primary
 $n$-dimensional array of data values.
 It is the ONLY obligatory structure element.  The
-{[}{\bf DATA\_ARRAY}{]} can be
+{[}\textbf{DATA\_ARRAY}{]} can be
 present in one of these forms:
 \begin{enumerate}
-\item A $<${\bf narray}$>$.
-This primitive form, {\it i.e.}\ just a $<${\bf numeric}$>$ array of numbers,
+\item A $<$\textbf{narray}$>$.
+This primitive form, \textit{i.e.}\ just a $<$\textbf{numeric}$>$ array of numbers,
 is available to give compatibility with the old Wright-Giddings proposals.
 Although its
 use is discouraged for new applications, it
 is recommended that general-purpose applications
-propagate the $<${\bf narray}$>$ format, as input,
+propagate the $<$\textbf{narray}$>$ format, as input,
 rather than convert to an
-\mbox{$<${\bf ARRAY}$>$} structure.
-\item A $<${\bf c\_array}$>$.
+\mbox{$<$\textbf{ARRAY}$>$} structure.
+\item A $<$\textbf{c\_array}$>$.
 \end{enumerate}
 \item [{[}LABEL{]}]  This is a textual description for the kind of quantity
-stored in the {[}{\bf DATA\_ARRAY}{]} array.
+stored in the {[}\textbf{DATA\_ARRAY}{]} array.
 \item [{[}UNITS{]}]  This is a textual description for the units in which the
 data values are given. If more than one NDF is being processed, the various
-{[}{\bf UNITS}{]} text may be tested for equality.  Should they prove
+{[}\textbf{UNITS}{]} text may be tested for equality.  Should they prove
 unequal, the
 application must inform the user, who then may have an opportunity to
-permit processing to continue;  however, {[}{\bf UNITS}{]}
-would {\bf not} under these circumstances be
+permit processing to continue;  however, {[}\textbf{UNITS}{]}
+would \textbf{not} under these circumstances be
 propagated to the output NDF if any.
 \item [{[}VARIANCE{]}]  This is used to store the variance of the
-errors associated with {[}{\bf DATA\_ARRAY}{]}.
+errors associated with {[}\textbf{DATA\_ARRAY}{]}.
 It is used for computing symmetric error bars.
 The array dimensions must correspond to those of the
-{[}{\bf DATA\_ARRAY}{]} component.
+{[}\textbf{DATA\_ARRAY}{]} component.
 If all values in the data array have the same error, this can
 be represented by the scalar option.
 Other, more complex, forms of error representation
-({\it e.g.}\  asymmetric errors)
+(\textit{e.g.}\  asymmetric errors)
 can be stored in specialised extensions, yet to be defined.
 \item [{[}BAD\_PIXEL{]}]  If this
 is false, applications may assume that
-{[}{\bf DATA\_ARRAY}{]} and {[}{\bf VARIANCE}{]} contain no magic-value
+{[}\textbf{DATA\_ARRAY}{]} and {[}\textbf{VARIANCE}{]} contain no magic-value
 pixels. If it is either true or absent, applications
 must either test for magic-value pixels or---if incapable
 of performing bad-pixel processing---give up.
 \item [{[}QUALITY{]}]  The data-quality values for the
-corresponding elements of {[}{\bf DATA\_ARRAY}{]}.
-Its TYPE is either $<${\bf narray}$>$ or $<${\bf QUALITY}$>$.
+corresponding elements of {[}\textbf{DATA\_ARRAY}{]}.
+Its TYPE is either $<$\textbf{narray}$>$ or $<$\textbf{QUALITY}$>$.
 Note that the array can be stored
-in a sparse variant \mbox{$<${\bf ARRAY}$>$} structure;
+in a sparse variant \mbox{$<$\textbf{ARRAY}$>$} structure;
 however, the dimensions of the sparse array must correspond to those of the
-{[}{\bf DATA\_ARRAY}{]} component, and the actual or equivalent
-primitive type for the data-quality values must be $<${\bf \_UBYTE}$>$.
-The $<${\bf narray}$>$ option is to allow compatability with existing data in
+{[}\textbf{DATA\_ARRAY}{]} component, and the actual or equivalent
+primitive type for the data-quality values must be $<$\textbf{\_UBYTE}$>$.
+The $<$\textbf{narray}$>$ option is to allow compatability with existing data in
 Wright-Giddings format; there was no
-{[}{\bf BADBITS}{]} flag in the Wright-Giddings format,
+{[}\textbf{BADBITS}{]} flag in the Wright-Giddings format,
 and so when such existing data are processed by
 general-purpose applications
 non-zero data quality will not be interpreted as
 bad pixels as would have occurred formerly.
 \item [NAXIS]  The dimensionality of
-the {[}{\bf DATA\_ARRAY}{]}, and therefore
+the {[}\textbf{DATA\_ARRAY}{]}, and therefore
 the number of elements (structures) in the AXIS array
 (of structures).
-\item [{[}AXIS{]}] This is an array of $<${\bf AXIS}$>$ structures, where
-{[}{\bf AXIS}($n$){]} corresponds to the $n^{\rm th}$ dimension of the
-{[}{\bf DATA\_ARRAY}{]}.
-If {[}{\bf AXIS}{]} is not present the pixel index is used, starting
-from the associated value(s) of {[}{\bf DATA\_ARRAY.ORIGIN}{]}, or 1 if the
+\item [{[}AXIS{]}] This is an array of $<$\textbf{AXIS}$>$ structures, where
+{[}\textbf{AXIS}($n$){]} corresponds to the $n^{\mathrm{th}}$ dimension of the
+{[}\textbf{DATA\_ARRAY}{]}.
+If {[}\textbf{AXIS}{]} is not present the pixel index is used, starting
+from the associated value(s) of {[}\textbf{DATA\_ARRAY.ORIGIN}{]}, or 1 if the
 origin data object does not exist. If a simple pixel index is required,
-then the {[}{\bf AXIS}{]} should be omitted from the $<${\bf NDF}$>$.
-\item [{[}MORE{]}]  This is a wrapper containing extensions; it is {\em
-not} itself an extension. The extensions and their components
+then the {[}\textbf{AXIS}{]} should be omitted from the $<$\textbf{NDF}$>$.
+\item [{[}MORE{]}]  This is a wrapper containing extensions; it is \emph{not} itself an extension. The extensions and their components
 are outside the scope of the NDF definition, and they will
 be defined separately and in many cases will belong
 to specific applications packages.
@@ -2747,7 +2518,7 @@ and to minimise the risk of clashes, it is strongly recommended
 that one structure per application package be used rather than multiple
 minor items. It is also recommended that hierarchical structuring be used
 within extensions (rather than just `flat' lists of components)
-so as to group related data objects, {\it e.g.}\  by
+so as to group related data objects, \textit{e.g.}\  by
 processing or instrument.
 \end{description}
 
@@ -2756,36 +2527,36 @@ Notes:
 \begin{enumerate}
 \item Locating the data array.
 
-General-purpose applications expecting an $<${\bf NDF}$>$ structure should
+General-purpose applications expecting an $<$\textbf{NDF}$>$ structure should
 be prepared to process
 the data array of Wright-Giddings formats as well.  Also, it should not
 matter in either case whether the name of the structure containing the
 data array or the name of the data array itself is supplied by the user.
-However, only when the name of the $<${\bf NDF}$>$ structure is given can
+However, only when the name of the $<$\textbf{NDF}$>$ structure is given can
 other data objects in the NDF be processed, because of the no-tree-walking
 rule. An outline algorithm to achieve the required functionality is:
 
 \begin{tabbing}
 Giv\=en \=nam\=e o\=f o\=bje\=ct\\
 Find its type\\
-{\bf if} (type {\bf not} primitive) {\bf then}\+ \\
-   {\bf if} (type {\bf not} $<${\bf c\_array}$>$) {\bf then}\+ \\
-      {\bf if} (type {\bf not} $<${\bf NDF}$>$){\bf then}\+ \\
+\textbf{if} (type \textbf{not} primitive) \textbf{then}\+ \\
+   \textbf{if} (type \textbf{not} $<$\textbf{c\_array}$>$) \textbf{then}\+ \\
+      \textbf{if} (type \textbf{not} $<$\textbf{NDF}$>$)\textbf{then}\+ \\
          issue warning but proceed\- \\
-      {\bf endif} \\
-      look for {[}{\bf DATA\_ARRAY}{]} \\
-      {\bf if} ({[}{\bf DATA\_ARRAY}{]} {\bf not} found) {\bf then}\+ \\
+      \textbf{endif} \\
+      look for {[}\textbf{DATA\_ARRAY}{]} \\
+      \textbf{if} ({[}\textbf{DATA\_ARRAY}{]} \textbf{not} found) \textbf{then}\+ \\
          No data processed \\
          Exit\- \\
-      {\bf else}\+ \\
+      \textbf{else}\+ \\
          Search for other required items\- \\
-      {\bf endif}\- \\
-   {\bf endif}\- \\
-{\bf endif} \\
-Process {[}{\bf DATA\_ARRAY}{]}.
+      \textbf{endif}\- \\
+   \textbf{endif}\- \\
+\textbf{endif} \\
+Process {[}\textbf{DATA\_ARRAY}{]}.
 \end{tabbing}
 
-\item Accessing part of a {[}{\bf DATA\_ARRAY}{]}
+\item Accessing part of a {[}\textbf{DATA\_ARRAY}{]}
 
 Some general-purpose applications will need to be able to access subsets
 of a data array.  The problem is twofold: first, the method of
@@ -2832,68 +2603,56 @@ could be implemented simply as a sequence of NDFs as follows:
 \begin{tabbing}
 
 na\=me\=~~~~~~sp\=eci\=al\_ty\=pe\+ \\
-  {[}{\bf name1}{]} \> \> $<${\bf NDF}$>$\+ \\
+  {[}\textbf{name1}{]} \> \> $<$\textbf{NDF}$>$\+ \\
     $\vdots$ \> \>$\vdots$\- \\
-  {[}{\bf name2}{]} \> \> $<${\bf NDF}$>$\+ \\
+  {[}\textbf{name2}{]} \> \> $<$\textbf{NDF}$>$\+ \\
     $\vdots$ \> \>$\vdots$\- \\
-  {[}{\bf name3}{]} \> \> $<${\bf NDF}$>$\+ \\
+  {[}\textbf{name3}{]} \> \> $<$\textbf{NDF}$>$\+ \\
     $\vdots$ \> \>$\vdots$\- \\
 
 \end{tabbing}
 \end{latexonly}
 
-\begin{htmlonly}
-\begin{quote}
 
-name~~~~~~~~~~special\_type\\
-~~~{[}{\bf name1}{]}~~~~~~$<${\bf NDF}$>$ \\
-~~~~~~~$\vdots$~~~~~~~~~~~~~~~~~~$\vdots$\- \\
-~~~{[}{\bf name2}{]}~~~~~~$<${\bf NDF}$>$ \\
-~~~~~~~$\vdots$~~~~~~~~~~~~~~~~~~$\vdots$\- \\
-~~~{[}{\bf name3}{]}~~~~~~$<${\bf NDF}$>$ \\
-~~~~~~~$\vdots$~~~~~~~~~~~~~~~~~~$\vdots$\- \\
 
-\end{quote}
-\end{htmlonly}
 
 Another approach would be to use an HDS array, each
 element of which is an NDF.
 
-\item Merging two or more $<${\bf NDF}$>$ structures
+\item Merging two or more $<$\textbf{NDF}$>$ structures
 
 The merging of history records has been discussed
-in \latex{Section~\ref{se:shistory},}\html{\htmlref{$<${\bf
-HISTORY}$>$ Structure,}{se:shistory}} and the same approach
-is followed for other data objects within an $<${\bf NDF}$>$.
+in \latex{Section~\ref{se:shistory},}\html{\htmlref{$<$\textbf{HISTORY}$>$ Structure,}{se:shistory}} and the same approach
+is followed for other data objects within an $<$\textbf{NDF}$>$.
 Thus, cases are divided into (i)
 those with a principal data array, where only the
-components of its $<${\bf NDF}$>$ structure are
+components of its $<$\textbf{NDF}$>$ structure are
 processed/copied to an output array, and
 (ii) those where the
 data arrays have equal importance, and
-the application, by convention, assumes the first $<${\bf NDF}$>$ supplied
+the application, by convention, assumes the first $<$\textbf{NDF}$>$ supplied
 contains the
-principal data array.  There will be an HDS editor and $<${\bf NDF}$>$
+principal data array.  There will be an HDS editor and $<$\textbf{NDF}$>$
 ``dressing/undressing'' utilities when this is not satisfactory.  It is
 suggested that a common {\small ADAM} parameter name be assigned to this `principal'
-$<${\bf NDF}$>$, {\it e.g.}\  MAIN\_ARRAY.
+$<$\textbf{NDF}$>$, \textit{e.g.}\  MAIN\_ARRAY.
 \end{enumerate}
 
 \xlabel{se_expolarimetry}\subsection{Polarimetry Example\label{se:expolarimetry}}
 
-{\it Stokes parameters} are the most common method for storing and analysis
+\textit{Stokes parameters} are the most common method for storing and analysis
 of polarimetric data.  Here is an illustrative
 example of how they might be stored
-using the $<${\bf NDF}$>$ structure, taking the approach that
+using the $<$\textbf{NDF}$>$ structure, taking the approach that
 the $I$ data is the principal data array, and is therefore
 stored at the top-level of the structure.  The $Q$, $U$ and $V$-parameter data
-are $<${\bf NDF}$>$ structures called, respectively,
-{[}{\bf STOKES\_Q}{]}, {[}{\bf STOKES\_U}{]}
-and {[}{\bf STOKES\_V}{]}, and
+are $<$\textbf{NDF}$>$ structures called, respectively,
+{[}\textbf{STOKES\_Q}{]}, {[}\textbf{STOKES\_U}{]}
+and {[}\textbf{STOKES\_V}{]}, and
 located within a polarimetry extension.
 
 The obvious alternative approach would be simply to
-add to the {[}{\bf DATA\_ARRAY}{]} an extra dimension so that
+add to the {[}\textbf{DATA\_ARRAY}{]} an extra dimension so that
 the different Stokes parameters could all be stored in a
 single data array.  Thus, for example, the four Stokes pictures from a
 512$\times$512 imaging polarimeter would be stored as different planes of a
@@ -2909,35 +2668,35 @@ whereas analogous arithmetic between values in the spatial
 time and wavelength/energy dimensions (for example rebinning)
 would, of course, be valid.
 
-\begin{table}[htb]
+\begin{table}
 \centering
 \caption{Example Polarimetry extension.}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf STOKES\_Q}{]} & $<${\bf NDF}$>$ & Stokes $Q$ data objects \\
-{[}{\bf STOKES\_U}{]} & $<${\bf NDF}$>$ & Stokes $U$ data objects \\
-{[}{\bf STOKES\_V}{]} & $<${\bf NDF}$>$ & Stokes $V$ data objects \\ \hline
+{[}\textbf{STOKES\_Q}{]} & $<$\textbf{NDF}$>$ & Stokes $Q$ data objects \\
+{[}\textbf{STOKES\_U}{]} & $<$\textbf{NDF}$>$ & Stokes $U$ data objects \\
+{[}\textbf{STOKES\_V}{]} & $<$\textbf{NDF}$>$ & Stokes $V$ data objects \\ \hline
 \end{tabular}
 \end{table}
 
-\begin{table}[htb]
+\begin{table}
 \centering
-\caption{A polarimetry example using the $<${\bf NDF}$>$}
+\caption{A polarimetry example using the $<$\textbf{NDF}$>$}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf TITLE}{]} & $<${\bf \_CHAR}$>$ & title of $<${\bf NDF}$>$ \\
-{[}{\bf DATA\_ARRAY}{]} & $<${\bf various}$>$ & Stokes $I$ data array \\
-{[}{\bf LABEL}{]} & $<${\bf \_CHAR}$>$ & label describing the data array \\
-{[}{\bf UNITS}{]} & $<${\bf \_CHAR}$>$ & units of the data array \\
-{[}{\bf VARIANCE}{]} & $<${\bf s\_array}$>$ & variance of the data array \\
-{[}{\bf QUALITY}{]} & $<${\bf various}$>$ & quality of the data array \\
-{[}{\bf AXIS}(NAXIS){]} & $<${\bf AXIS}$>$ & axis values, labels, units and errors\\
+{[}\textbf{TITLE}{]} & $<$\textbf{\_CHAR}$>$ & title of $<$\textbf{NDF}$>$ \\
+{[}\textbf{DATA\_ARRAY}{]} & $<$\textbf{various}$>$ & Stokes $I$ data array \\
+{[}\textbf{LABEL}{]} & $<$\textbf{\_CHAR}$>$ & label describing the data array \\
+{[}\textbf{UNITS}{]} & $<$\textbf{\_CHAR}$>$ & units of the data array \\
+{[}\textbf{VARIANCE}{]} & $<$\textbf{s\_array}$>$ & variance of the data array \\
+{[}\textbf{QUALITY}{]} & $<$\textbf{various}$>$ & quality of the data array \\
+{[}\textbf{AXIS}(NAXIS){]} & $<$\textbf{AXIS}$>$ & axis values, labels, units and errors\\
 & & applicable to all Stokes parameters \\
-{[}{\bf HISTORY}{]} & $<${\bf HISTORY}$>$ & history structure \\
-{[}{\bf MORE}{]} & $<${\bf EXT}$>$ & extension structure \\
-\hspace{14mm}{[}{\bf .POLARIMETRY}{]} & $<${\bf EXT}$>$ & polarimetry extension \\ \hline
+{[}\textbf{HISTORY}{]} & $<$\textbf{HISTORY}$>$ & history structure \\
+{[}\textbf{MORE}{]} & $<$\textbf{EXT}$>$ & extension structure \\
+\hspace{14mm}{[}\textbf{.POLARIMETRY}{]} & $<$\textbf{EXT}$>$ & polarimetry extension \\ \hline
 \end{tabular}
 \end{table}
 
@@ -2949,119 +2708,119 @@ not be able to do so,
 because of the rule on ``tree-walking''.  To obtain
 other than default
 axis data using a general-purpose application, say displaying
-{[}{\bf STOKES\_Q.DATA\_ARRAY}{]}, the axis information
+{[}\textbf{STOKES\_Q.DATA\_ARRAY}{]}, the axis information
 must be duplicated in the
-{[}{\bf STOKES\_Q}{]} structure; alternatively,
+{[}\textbf{STOKES\_Q}{]} structure; alternatively,
 application should have
 a parameter which
 specifies where the axis information is to be found.
 If the default is taken, the application should look
-for the $<${\bf AXIS}$>$ structure in
-the normal place, {\it i.e.}\  within {[}{\bf STOKES\_Q.}{]}
+for the $<$\textbf{AXIS}$>$ structure in
+the normal place, \textit{i.e.}\  within {[}\textbf{STOKES\_Q.}{]}
 
-\xlabel{se_sndf}\subsection{Simplified $<${\bf NDF}$>$ Structure\label{se:sndf}}
+\xlabel{se_sndf}\subsection{Simplified $<$\textbf{NDF}$>$ Structure\label{se:sndf}}
 
 The support software associated with the
 standard data structures described above
 will take a long time to develop. In the meantime, some astronomers
 and programmers will want to convert their applications to {\small ADAM} and
 to start using HDS data structures.  Therefore, a simple and limited
-form of the $<${\bf NDF}$>$ structure is available for their use.  It will be
+form of the $<$\textbf{NDF}$>$ structure is available for their use.  It will be
 comprehensible to the standard interfaces once they are ready, so
 that existing
 applications would then require minor modification, but the data files would
 not.
 
-\begin{table}[htb]
+\begin{table}
 \centering
 \caption{Components of the Simple Extensible $n$-Dimensional-Data structure}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf TITLE}{]} & $<${\bf \_CHAR}$>$ & title of {[}{\bf DATA\_ARRAY}{]} \\
-{[}{\bf DATA\_ARRAY}{]} & $<${\bf narray}$>$ & NAXIS-dimensional data array \\
-{[}{\bf AXIS}(NAXIS){]} & $<${\bf AXIS}$>$ & axis values, labels, units and errors \\ \hline
+{[}\textbf{TITLE}{]} & $<$\textbf{\_CHAR}$>$ & title of {[}\textbf{DATA\_ARRAY}{]} \\
+{[}\textbf{DATA\_ARRAY}{]} & $<$\textbf{narray}$>$ & NAXIS-dimensional data array \\
+{[}\textbf{AXIS}(NAXIS){]} & $<$\textbf{AXIS}$>$ & axis values, labels, units and errors \\ \hline
 \end{tabular}
 \end{table}
 
 \begin{description}
-\item [{[}TITLE{]}]  As described in the full $<${\bf NDF}$>$.
-\item [{[}{\bf DATA\_ARRAY}{]}]  This is the primary
+\item [{[}TITLE{]}]  As described in the full $<$\textbf{NDF}$>$.
+\item [{[}\textbf{DATA\_ARRAY}{]}]  This is the primary
 $n$-dimensional array of data values.
 It is the ONLY obligatory structure element.  Note it can only be an array
-of numbers in the simplified $<${\bf NDF}$>$.
-\item [NAXIS]  No change from the standard $<${\bf NDF}$>$.
-\item [{[}AXIS{]}] Note these are simplified $<${\bf AXIS}$>$ structures.
+of numbers in the simplified $<$\textbf{NDF}$>$.
+\item [NAXIS]  No change from the standard $<$\textbf{NDF}$>$.
+\item [{[}AXIS{]}] Note these are simplified $<$\textbf{AXIS}$>$ structures.
 If they are not present, the pixel coordinates are used for the
 axis arrays, which have the
-same dimensions as the {[}{\bf DATA\_ARRAY}{]}
+same dimensions as the {[}\textbf{DATA\_ARRAY}{]}
 \end{description}
 
-\begin{table}[htb]
+\begin{table}
 \centering
-\caption{Components of the Simplified $<${\bf AXIS}$>$ structure element}
+\caption{Components of the Simplified $<$\textbf{AXIS}$>$ structure element}
 \begin{tabular}{|l|l|l|}
 \hline
 Component Name & TYPE & Brief Description \\ \hline
-{[}{\bf DATA\_ARRAY}{]} & $<${\bf narray}$>$ & axis value at each pixel \\
-{[}{\bf LABEL}{]} & $<${\bf \_CHAR}$>$ & axis label \\
-{[}{\bf UNITS}{]} & $<${\bf \_CHAR}$>$ & axis units \\ \hline
+{[}\textbf{DATA\_ARRAY}{]} & $<$\textbf{narray}$>$ & axis value at each pixel \\
+{[}\textbf{LABEL}{]} & $<$\textbf{\_CHAR}$>$ & axis label \\
+{[}\textbf{UNITS}{]} & $<$\textbf{\_CHAR}$>$ & axis units \\ \hline
 \end{tabular}
 \end{table}
 
 \begin{description}
-\item [{[}{\bf DATA\_ARRAY}{]}]  Note this can only be an array of numbers.
+\item [{[}\textbf{DATA\_ARRAY}{]}]  Note this can only be an array of numbers.
 Mandatory.
-\item [{[}LABEL{]}]  No change from the normal $<${\bf AXIS}$>$ structure.
+\item [{[}LABEL{]}]  No change from the normal $<$\textbf{AXIS}$>$ structure.
 \item [{[}UNITS{]}]  No change.
 \end{description}
 Applications must test pixels for magic values---there is no
-{[}{\bf BAD\_PIXEL}{]} flag in the simplified $<${\bf NDF}$>$.
+{[}\textbf{BAD\_PIXEL}{]} flag in the simplified $<$\textbf{NDF}$>$.
 
 \xlabel{se_comparison}\section{Comparison with Wright-Giddings proposals\label{se:comparison}}
 
 The term ``structure'' in the Wright-Giddings (WG) proposals meant
 a collection of related data objects, so that one level of the hierarchy
-could contain more than one ``structure'', {\it e.g.}\  GLOBAL and
-{[}{\bf DATA\_ARRAY}{]}.
+could contain more than one ``structure'', \textit{e.g.}\  GLOBAL and
+{[}\textbf{DATA\_ARRAY}{]}.
 
-Of the GLOBAL structure only {[}{\bf TITLE}{]} has been copied into the
-$<${\bf NDF}$>$ structure.
+Of the GLOBAL structure only {[}\textbf{TITLE}{]} has been copied into the
+$<$\textbf{NDF}$>$ structure.
 
-\begin{table}[htb]
+\begin{table}
 \centering
-\caption{Comparison of $<${\bf NDF}$>$ and the Wright-Giddings ``DATA\_ARRAY
+\caption{Comparison of $<$\textbf{NDF}$>$ and the Wright-Giddings ``DATA\_ARRAY
 structure''}
 \begin{tabular}{|l|l|l|}
 \hline
 Wright-Giddings & NDF name & Comments \\ \hline
-& {[}{\bf TITLE}{]} & same name in WG GLOBAL \\
-& {[}{\bf VARIANT}{]} & no counterpart in WG \\
-{[}{\bf DATA\_ARRAY}{]} & {[}{\bf DATA\_ARRAY}{]} & unchanged in name or meaning \\
-{[}{\bf DATA\_MIN}{]} & & no counterpart in $<${\bf NDF}$>$\\
-{[}{\bf DATA\_MAX}{]} & & no counterpart in $<${\bf NDF}$>$ \\
-{[}{\bf DATA\_BLANK}{]} & & no counterpart in $<${\bf NDF}$>$ \\
-{[}{\bf DATA\_SCALE}{]} & & {[}{\bf SCALE}{]} in scaled $<${\bf narray}$>$ \\
-{[}{\bf DATA\_ZERO}{]} & & {[}{\bf ZERO}{]} in scaled $<${\bf narray}$>$ \\
-{[}{\bf DATA\_LABEL}{]} & {[}{\bf LABEL}{]} & unchanged in meaning \\
-{[}{\bf DATA\_UNITS}{]} & {[}{\bf UNITS}{]} & unchanged in meaning \\
-{[}{\bf DATA\_QUALITY}{]} & {[}{\bf QUALITY}{]} & unchanged in meaning \\
-& {[}{\bf BAD\_PIXEL}{]} & no counterpart in WG \\
-{[}{\bf DATA\_ERROR}{]} & {[}{\bf VARIANCE}{]} & variance rather than $\sigma$ \\
-{[}{\bf AXIS\_CALIB}{]} & & no counterpart in $<${\bf NDF}$>$ \\
-{[}{\bf AXIS$<$n$>$\_DATA}{]} & {[}{\bf AXIS($<$n$>$).DATA\_ARRAY}{]} &
-{[}{\bf DATA\_ARRAY}{]} for consistency \\
-{[}{\bf AXIS$<$n$>$\_UNITS}{]} & {[}{\bf AXIS($<$n$>$).UNITS}{]} & unchanged in meaning \\
-{[}{\bf AXIS$<$n$>$\_LABEL}{]} & {[}{\bf AXIS($<$n$>$).LABEL}{]} & unchanged in meaning \\
-{[}{\bf AXIS$<$n$>$\_ERROR}{]} & {[}{\bf AXIS($<$n$>$).VARIANCE}{]} & variance rather than $\sigma$ \\
-{[}{\bf AXIS$<$n$>$\_CALIB}{]} & & no counterpart in $<${\bf NDF}$>$ \\
-& {[}{\bf HISTORY}{]} & no counterpart in WG \\
-& {[}{\bf MORE}{]} & no counterpart though it can\\
+& {[}\textbf{TITLE}{]} & same name in WG GLOBAL \\
+& {[}\textbf{VARIANT}{]} & no counterpart in WG \\
+{[}\textbf{DATA\_ARRAY}{]} & {[}\textbf{DATA\_ARRAY}{]} & unchanged in name or meaning \\
+{[}\textbf{DATA\_MIN}{]} & & no counterpart in $<$\textbf{NDF}$>$\\
+{[}\textbf{DATA\_MAX}{]} & & no counterpart in $<$\textbf{NDF}$>$ \\
+{[}\textbf{DATA\_BLANK}{]} & & no counterpart in $<$\textbf{NDF}$>$ \\
+{[}\textbf{DATA\_SCALE}{]} & & {[}\textbf{SCALE}{]} in scaled $<$\textbf{narray}$>$ \\
+{[}\textbf{DATA\_ZERO}{]} & & {[}\textbf{ZERO}{]} in scaled $<$\textbf{narray}$>$ \\
+{[}\textbf{DATA\_LABEL}{]} & {[}\textbf{LABEL}{]} & unchanged in meaning \\
+{[}\textbf{DATA\_UNITS}{]} & {[}\textbf{UNITS}{]} & unchanged in meaning \\
+{[}\textbf{DATA\_QUALITY}{]} & {[}\textbf{QUALITY}{]} & unchanged in meaning \\
+& {[}\textbf{BAD\_PIXEL}{]} & no counterpart in WG \\
+{[}\textbf{DATA\_ERROR}{]} & {[}\textbf{VARIANCE}{]} & variance rather than $\sigma$ \\
+{[}\textbf{AXIS\_CALIB}{]} & & no counterpart in $<$\textbf{NDF}$>$ \\
+{[}\textbf{AXIS$<$n$>$\_DATA}{]} & {[}\textbf{AXIS($<$n$>$).DATA\_ARRAY}{]} &
+{[}\textbf{DATA\_ARRAY}{]} for consistency \\
+{[}\textbf{AXIS$<$n$>$\_UNITS}{]} & {[}\textbf{AXIS($<$n$>$).UNITS}{]} & unchanged in meaning \\
+{[}\textbf{AXIS$<$n$>$\_LABEL}{]} & {[}\textbf{AXIS($<$n$>$).LABEL}{]} & unchanged in meaning \\
+{[}\textbf{AXIS$<$n$>$\_ERROR}{]} & {[}\textbf{AXIS($<$n$>$).VARIANCE}{]} & variance rather than $\sigma$ \\
+{[}\textbf{AXIS$<$n$>$\_CALIB}{]} & & no counterpart in $<$\textbf{NDF}$>$ \\
+& {[}\textbf{HISTORY}{]} & no counterpart in WG \\
+& {[}\textbf{MORE}{]} & no counterpart though it can\\
 & & store WG GLOBAL objects \\ \hline
 \end{tabular}
 \end{table}
 
-WG components no longer used in $<${\bf NDF}$>$ :
+WG components no longer used in $<$\textbf{NDF}$>$ :
 \begin{description}
 \item [{[}DATA\_MIN{]}, {[}DATA\_MAX{]}]  Following the precept of making
 life easier for
@@ -3071,7 +2830,7 @@ result, especially for data with a wide dynamic range (as is often
 found in astronomy), because the extrema only give information about
 two pixels and are therefore unrepresentative.  What often happens is that
 the display process is repeated several times (albeit more efficiently
-if {[}{\bf DATA\_MIN}{]} and {[}{\bf DATA\_MAX}{]} are stored), each time
+if {[}\textbf{DATA\_MIN}{]} and {[}\textbf{DATA\_MAX}{]} are stored), each time
 guessing the correct range more accurately.  Even in those cases where
 the maximum and minimum provide a good scaling, their computation accounts
 for only about 20 per cent of the total time taken by the display
@@ -3092,16 +2851,16 @@ available to applications.
 \item [{[}DATA\_LABEL{]}, {[}DATA\_UNITS{]} and {[}DATA\_QUALITY{]}]  These
 have changed to allow
 standard subroutines to work on different labels, units and quality,
-{\it e.g.}\  in $<${\bf AXIS}$>$, and not be tied into a naming scheme,
-{\it e.g.}\  {[}{\bf AXIS\_LABEL}{]}.
-The interpretation of {[}{\bf DATA\_QUALITY}{]} has also changed for general-purpose
+\textit{e.g.}\  in $<$\textbf{AXIS}$>$, and not be tied into a naming scheme,
+\textit{e.g.}\  {[}\textbf{AXIS\_LABEL}{]}.
+The interpretation of {[}\textbf{DATA\_QUALITY}{]} has also changed for general-purpose
 applications.
-\item [{[}DATA\_ERROR{]}]  This has changed as for {[}{\bf DATA\_LABEL}{]}
-{\it etc.,} but also because the interpretation has changed to variance.
+\item [{[}DATA\_ERROR{]}]  This has changed as for {[}\textbf{DATA\_LABEL}{]}
+\textit{etc.,} but also because the interpretation has changed to variance.
 \item [{[}AXIS\_CALIB{]} and {[}AXIS$<$n$>$\_CALIB{]}]  These are too specialised and the
 processing rules are unknown for general-purpose applications.
-Calibration data should be situated in {[}{\bf MORE}{]} within an extension, perhaps
-which shadows the main {[}{\bf AXIS}{]} structures.
+Calibration data should be situated in {[}\textbf{MORE}{]} within an extension, perhaps
+which shadows the main {[}\textbf{AXIS}{]} structures.
 \end{description}
 
 \xlabel{se_newdesign}\section{Creating new structures\label{se:newdesign}}
@@ -3125,9 +2884,9 @@ any level without risking naming conflicts.
 
 In the description
 of the design process the total hierarchy of structures is called a
-{\it dataset} to distinguish it from a single component structure.
+\textit{dataset} to distinguish it from a single component structure.
 It is equivalent to the contents of an HDS container file.
-The term {\it structure} refers to a set of related data items; it
+The term \textit{structure} refers to a set of related data items; it
 corresponds to a single level of a dataset.
 Often a dataset will consist simply of a single structure.
 
@@ -3144,12 +2903,12 @@ Define what the software is going to do and not going to do \numcir{1}\\
 Identify, in concept, the datasets required \\
 Determine their interrelations, perhaps via a tree diagram \numcir{2}\\
 Start at the most deeply nested level of the hierarchy\\
-{\bf for} each structure\+ \\
+\textbf{for} each structure\+ \\
    Identify the data components\numcir{3}\\
-   {\bf if} an existing standard structure can be used {\bf then}\+ \\
+   \textbf{if} an existing standard structure can be used \textbf{then}\+ \\
       Use it \\
       Place remaining associated items in a new structure or in an extension\- \\
-   {\bf else}\+ \\
+   \textbf{else}\+ \\
       Assign a unique HDS TYPE to the new structure \numcir{4}\\
       Assign a NAME to each component \numcir{5}\\
       Determine the rules and restrictions governing the way the data will be stored in the\\
@@ -3157,43 +2916,19 @@ Start at the most deeply nested level of the hierarchy\\
       Assign a TYPE to each component \numcir{6}\\
       Identify the sorts of operation to be performed on the structure and ensure they are\\
       ~~meaningfully defined \numcir{7}\\
-      {\bf if} the processing of a component cannot be defined in some cases {\bf then} remove the\\
+      \textbf{if} the processing of a component cannot be defined in some cases \textbf{then} remove the\\
       ~~component from the structure\\
       Implement and document the software needed to process the new structure \numcir{8}\\
-      {\bf if} the new structure is to become a standard type {\bf then}\+ \\
+      \textbf{if} the new structure is to become a standard type \textbf{then}\+ \\
          Submit it and its software to Starlink for approval\- \numcir{9}\\
-      {\bf endif}\- \\
-   {\bf endif}\- \\
-{\bf endfor} \\
+      \textbf{endif}\- \\
+   \textbf{endif}\- \\
+\textbf{endfor} \\
 \end{tabbing}
 \end{latexonly}
 
-\begin{htmlonly}
-\begin{quote}
-Define what the software is going to do and not going to do \numcir{1} \\
-Identify, in concept, the datasets required \\
-Determine their interrelations, perhaps via a tree diagram \numcir{2}\\
-Start at the most deeply nested level of the hierarchy\\
-{\bf for} each structure \\
-~~~~Identify the data components\numcir{3}\\
-~~~~{\bf if} an existing standard structure can be used {\bf then} \\
-~~~~~~~~Use it \\
-~~~~~~~~Place remaining associated items in a new structure or in an extension \\
-~~~~{\bf else} \\
-~~~~~~~~Assign a unique HDS TYPE to the new structure \numcir{4}\\
-~~~~~~~~Assign a NAME to each component \numcir{5}\\
-~~~~~~~~Determine the rules and restrictions governing the way the data will be stored in the various components\\
-~~~~~~~~Assign a TYPE to each component \numcir{6}\\
-~~~~~~~~Identify the sorts of operation to be performed on the structure and ensure they are meaningfully defined \numcir{7}\\
-~~~~~~~~{\bf if} the processing of a component cannot be defined in some cases {\bf then} remove the component from the structure\\
-~~~~~~~~Implement and document the software needed to process the new structure \numcir{8}\\
-~~~~~~~~{\bf if} the new structure is to become a standard type {\bf then} \\
-~~~~~~~~~~~~Submit it and its software to Starlink for approval \numcir{9}\\
-~~~~~~~~{\bf endif} \\
-~~~~{\bf endif} \\
-{\bf endfor} \\
-\end{quote}
-\end{htmlonly}
+
+
 
 
 \xlabel{se_newexn}\subsection{Explanatory Notes\label{se:newexn}}
@@ -3324,7 +3059,7 @@ the structure definition should be completely ignored.
 \item
 From time to time, ignorance and independence of spirit will no doubt
 lead implementors and users into inserting extra components into a
-structure, but these are illegal and will be ignored.  This is {\bf not}
+structure, but these are illegal and will be ignored.  This is \textbf{not}
 a valid way of defining a new structure.
 \end{itemize}
 \html{\label{se:expnote9}}
@@ -3389,21 +3124,14 @@ content of this document.
 \section{References}
 \label{se:refs}
 
-\parindent=-3mm
-\begin{verse}
-\hspace{-9.2mm}
-Wright, S.L. \& Giddings, J.R.  1983 {\it Standard Starlink Data
-Structures} (draft proposal).
-\vspace{-2mm}
-\end{verse}
 
-\begin{verse}
-\hspace{-9.2mm}
-Wells, D.C. \& Greisen, E.W.  1979 in {\it Image Processing in Astronomy},
+Wright, S.L. \& Giddings, J.R.  1983 \textit{Standard Starlink Data
+Structures} (draft proposal).
+
+Wells, D.C. \& Greisen, E.W.  1979 in \textit{Image Processing in Astronomy},
 eds. Sedmak, K., Capaccioli, M. \& Allen, R.J., Osservatorio Astronomico
 di Trieste, p.445.
-\vspace{-2mm}
-\end{verse}
+
 
 \appendix
 \section{Release Notes}
@@ -3412,7 +3140,7 @@ The recent changes (SGP/38.3) are:
 \begin{itemize}
 \item a correction to the formula for evalution of the normalised
 co-ordinates for a Chebyshev polynomial,
-\item the addition of a $<${\bf POLYNOMIAL}$>$ variant for B-Splines,
+\item the addition of a $<$\textbf{POLYNOMIAL}$>$ variant for B-Splines,
 and
 \item some formatting changes.
 \end{itemize}
