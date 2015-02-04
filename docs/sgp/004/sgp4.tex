@@ -1,255 +1,34 @@
-\documentclass[twoside,11pt]{article}
-\pagestyle{myheadings}
+\documentclass[twoside,11pt,nolof,noabs]{starlink}
+
 
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink General Paper}
-\newcommand{\stardocinitials}  {SGP}
-\newcommand{\stardocnumber}    {4.2}
-\newcommand{\stardocsource}    {sgp\stardocnumber}
-\newcommand{\stardocauthors}   {Anne Charles and Jo Murray}
-\newcommand{\stardocdate}      {20 June 1994}
-\newcommand{\stardoctitle}     {Starlink C Programming Standard}
+\stardoccategory    {Starlink General Paper}
+\stardocinitials    {SGP}
+\stardocnumber      {4.2}
+\stardocsource      {sgp\stardocnumber}
+\stardocauthors     {Anne Charles and Jo Murray}
+\stardocdate        {20 June 1994}
+\stardoctitle       {Starlink C Programming Standard}
+\stardocname  {\stardocinitials /\stardocnumber}
 %------------------------------------------------------------------------------
+%  Document-specific \providecommand or \newenvironment commands.
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-\newcommand{\ansi}{ \bf ANSI standard change: }
+\providecommand{\ansi}{ \bf ANSI standard change: }
 
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-
-% -----------------------------------------------------------------------------
-% ? Document-specific \newcommand or \newenvironment commands.
 \newcounter{sruleno}
 \newcommand{\srule}[1]{
     \addtocounter{sruleno}{1}
     \goodbreak
-    \rule[0.5ex]{\textwidth}{0.3mm}
-    {\Large #1 \hfill {\thesruleno}}
-    \rule[0.5ex]{\textwidth}{0.1mm}
+    \rule{\textwidth}{0.3mm}
+    \textbf{#1} \scpushright{\textbf{\thesruleno}}
+    \rule{\textwidth}{0.1mm}
 }
 
-
-\begin{htmlonly}
-  \newcommand{\srule}[1]{
-       \addtocounter{sruleno}{1}
-       \begin{rawhtml} <HR> \end{rawhtml}
-       {\Large \thesruleno}~~~~{\Large #1}
-       \begin{rawhtml} <HR> \end{rawhtml}
-       \end{tabular}
-  }
-\end{htmlonly}
-
-
-% ? End of document-specific commands
+% End of document-specific commands
 % -----------------------------------------------------------------------------
 
-%  Title Page.
-%  ===========
-\renewcommand{\thepage}{\roman{page}}
 \begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Large\bf \stardoctitle}
-   \end{center}
-   \vspace{5mm}
-
-% ? Heading for abstract if used.
-%   \vspace{10mm}
-%   \begin{center}
-%      {\Large\bf Abstract}
-%   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-%  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-%\stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-% \newpage
-\begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
-\end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-\newpage
-
-
-%------------------------------------------------------------------------------
+\scfrontmatter
 
 \section{Introduction}
 
@@ -287,8 +66,8 @@ However all implementations are accompanied by a (more or less) standard
 library of functions to accomplish I/O and other tasks.
 These standard functions are made available to  a program by specifying
 the modules  which contain the required set of functions via an include file.
-For example the Standard I/O routines are contained in the file {\tt stdio.h},
-which must be explicitly {\tt include}d in the program source if the functions
+For example the Standard I/O routines are contained in the file \texttt{stdio.h},
+which must be explicitly \texttt{include}d in the program source if the functions
 contained therein are to be used.
 
 The suggestions which follow are made with maintainability, portability and
@@ -302,7 +81,7 @@ possibility to the human reader.
 
 Starlink has adopted {\sl The Elements of C Programming Style} by Jay Ranade
 and Alan Nash as its principal C programming standard.  This book is
-{\it essential reading}\/ for all contributors of Starlink programs written in
+\textit{essential reading}\/ for all contributors of Starlink programs written in
 C. The present document does not reiterate
 what is in the book, but contains some additions and clarifications.  Where
 the advice in Chapter 18, Coding for Non-C Programmers, diverges from
@@ -329,7 +108,7 @@ preprocessor macros defined within a package for internal use only.
 \item [OPAQUE TYPE] is a C type which is defined using the \verb~typedef~
 keyword and whose
 value is hidden from the application.  Manipulation of the value of the type
-is usually done using utility functions, {\em e.g.,} the Motif Widget type.
+is usually done using utility functions, \emph{e.g.,} the Motif Widget type.
 \end{description}
 
 
@@ -342,41 +121,41 @@ numerical equivalent of existing Fortran constants, both EXPORTED and
 INTERNAL, must be the same.
 \item The existing Fortran naming convention for package symbolic constants
 is strongly recommended:
-\begin{verbatim}
+\begin{terminalv}
       PKG__NAME
-\end{verbatim}
+\end{terminalv}
 \item There is no requirement to distinguish between EXPORTED and INTERNAL
 symbolic constants.
 \begin{itemize}
 \item EXPORTED symbolic constants are defined in the public package header
 file
-\begin{verbatim}
+\begin{terminalv}
       pkg.h
-\end{verbatim}
+\end{terminalv}
 \item INTERNAL symbolic constants are defined in the private package header
 file
-\begin{verbatim}
+\begin{terminalv}
       pkg_sys.h
-\end{verbatim}
+\end{terminalv}
 \end{itemize}
 \end{itemize}
 
 \srule{Naming Conventions -- Types}
 \begin{itemize}
 \item Package-defined types must conform to the naming convention:
-\begin{verbatim}
+\begin{terminalv}
       PkgName
-\end{verbatim}
+\end{terminalv}
 \item Types which are not OPAQUE must not be pointer types.
 \item The global type
-\begin{verbatim}
+\begin{terminalv}
       StarStatus
-\end{verbatim}
+\end{terminalv}
 is defined in the Starlink header file
-\begin{verbatim}
+\begin{terminalv}
       star.h
-\end{verbatim}
-which is synonymous with {\tt sae\_par.h} and is reserved for the definition
+\end{terminalv}
+which is synonymous with \texttt{sae\_par.h} and is reserved for the definition
 of the Starlink inherited status.
 \end{itemize}
 
@@ -384,24 +163,24 @@ of the Starlink inherited status.
 \begin{itemize}
 \item EXPORTED package-defined functions and function-like macros, those which
 evaluate their parameters only once, must conform to the naming convention:
-\begin{verbatim}
+\begin{terminalv}
       pkgName
-\end{verbatim}
+\end{terminalv}
 \item For a given package, the names of EXPORTED functions
 and function-like macros which are
 equivalent to existing EXPORTED Fortran routines must reflect their
 Fortran equivalents:
-\begin{verbatim}
+\begin{terminalv}
       Fortran:  PKG_NAME
 
       C:        pkgName
-\end{verbatim}
+\end{terminalv}
 \item INTERNAL package-defined functions and function-like macros
 must indicate that they are INTERNAL
 functions by having an underscore appended to their names:
-\begin{verbatim}
+\begin{terminalv}
       pkgMyname_
-\end{verbatim}
+\end{terminalv}
 \item The name-length restrictions applied in Fortran may be relaxed in the
 case of INTERNAL C functions and function-like macros.
 \end{itemize}
@@ -410,13 +189,13 @@ case of INTERNAL C functions and function-like macros.
 \begin{itemize}
 \item All identifiers for other macros must be in upper case.
 \item The global macro
-\begin{verbatim}
+\begin{terminalv}
       INT
-\end{verbatim}
+\end{terminalv}
 is defined in the standard Starlink header file
-\begin{verbatim}
+\begin{terminalv}
       star.h
-\end{verbatim}
+\end{terminalv}
 and is used for the declaration of integers guaranteed to have a size of
 32 bits.
 \end{itemize}
@@ -424,11 +203,11 @@ and is used for the declaration of integers guaranteed to have a size of
 \subsection{Programming advice}
 
 \srule{Pointer names should be clearly identified.}
-For example, the variable {\tt i} and the associated pointer
+For example, the variable \texttt{i} and the associated pointer
 might be declared thus:
-\begin{verbatim}
+\begin{terminalv}
       int i, *i_ptr;
-\end{verbatim}
+\end{terminalv}
 
 
 \srule{Do not include whitespace inside compound operators.}
@@ -440,18 +219,18 @@ practice to do so.
 
 \srule{Don't use the remainder operator with negative integral operands.}
 The remainder operator \verb~%~ gives the remainder when the first operand is
-divided by the second. That is, {\tt a\%b} is the modulus of {\tt a}
-with respect to {\tt b}.
-However, if either {\tt a} or {\tt b} is negative the result will vary according to the
+divided by the second. That is, \texttt{a\%b} is the modulus of \texttt{a}
+with respect to \texttt{b}.
+However, if either \texttt{a} or \texttt{b} is negative the result will vary according to the
 way integer division is implemented on the particular machine.
 Of course, division by zero must also be avoided.
 
 
-\srule{Declare global variables used in routines as {\tt extern}.}
+\srule{Declare global variables used in routines as \texttt{extern}.}
 The use of global variables in C can lead to confusion over which
 variables are active in a particular program module --
 just as the use of COMMON variables in Fortran can be a problem.
-Try to declare  all such variables as {\tt extern} in the routines which
+Try to declare  all such variables as \texttt{extern} in the routines which
 use them.
 If this practice is adopted the reader can just look at a page of code
 and see a list of ALL the active variables in a module.
@@ -460,25 +239,25 @@ It is recommended that:
 \item The global variables used by a program are defined only once
 in a single source file  in which they are explicitly initialized.
 For example:
-\begin{verbatim}
+\begin{terminalv}
       int counter = 0;
-\end{verbatim}
+\end{terminalv}
 \item In each function which uses an external variable defined elsewhere,
- use the storage class {\tt extern} and do not supply
+ use the storage class \texttt{extern} and do not supply
 an explicit initializer:
-\begin{verbatim}
+\begin{terminalv}
       extern int counter;
-\end{verbatim}
+\end{terminalv}
 \end{itemize}
 Of course, the variable must be given the same type in all
 locations.
-The {\tt lint} program which is usually available on Unix machines can be
+The \texttt{lint} program which is usually available on Unix machines can be
 used to check multiple files for consistent declarations.
 
 \srule{When using true/false variables, create a `pseudo-type' BOOL and define
   constants TRUE and FALSE.}
 For example:
-\begin{verbatim}
+\begin{terminalv}
       #define BOOL int
       #define TRUE 1
       #define FALSE 0
@@ -488,22 +267,22 @@ For example:
       flag = TRUE;
       if ( flag )
       ...
-\end{verbatim}
+\end{terminalv}
 
-\srule{Do not use {\tt long double} data type.}
-Do not use {\tt long double} data type even with ANSI compilers. Not all
+\srule{Do not use \texttt{long double} data type.}
+Do not use \texttt{long double} data type even with ANSI compilers. Not all
 support it.
 
 \srule{Use casts to indicate where (legal) type conversions are taking
 place.}
-For example the function {\tt sqrt} expects a {\tt double} argument.
-To find the square root of the integer {\tt n}, the cast below should be
+For example the function \texttt{sqrt} expects a \texttt{double} argument.
+To find the square root of the integer \texttt{n}, the cast below should be
 used:
-\begin{verbatim}
+\begin{terminalv}
       sqrt ( ( double ) n )
-\end{verbatim}
-This does not affect the value of {\tt n} but provides a value of type
-{\tt double} as the argument for the {\tt sqrt} function.
+\end{terminalv}
+This does not affect the value of \texttt{n} but provides a value of type
+\texttt{double} as the argument for the \texttt{sqrt} function.
 
 
 \srule{Don't cast pointer types.}
@@ -520,15 +299,15 @@ compiler to detect errors in the number of parameters and their types.
 
 \srule{Pay careful attention to the type of the return value from
 library functions.}
-For example the code fragment below is wrong because {\tt getchar} returns
-an {\tt int} not a {\tt char}.
-\begin{verbatim}
+For example the code fragment below is wrong because \texttt{getchar} returns
+an \texttt{int} not a \texttt{char}.
+\begin{terminalv}
       #include <stdio.h>
       char c;
       c = getchar ();
-\end{verbatim}
-The correct way to use {\tt getchar} is indicated in the example below:
-\begin{verbatim}
+\end{terminalv}
+The correct way to use \texttt{getchar} is indicated in the example below:
+\begin{terminalv}
       #include <stdio.h>
       char c;
       int i;
@@ -536,17 +315,17 @@ The correct way to use {\tt getchar} is indicated in the example below:
           /* end of file - do something about it */
       else
           c = ( char ) i;
-\end{verbatim}
+\end{terminalv}
 
 \srule{Use a function pointer type that specifies the correct return type.}
 Functions must be correctly typed.
 The assumption that the default
-type ({\tt int}) is sufficiently large to accommodate a pointer of any
+type (\texttt{int}) is sufficiently large to accommodate a pointer of any
 type is not correct on all computers.
 For example,  the first function shown below will produce unpredictable
 results on some computers.
 The `good' function illustrates the correct approach.
-\begin{verbatim}
+\begin{terminalv}
       /* Bad: */
       func ( double a, double b )
       {
@@ -562,16 +341,16 @@ The `good' function illustrates the correct approach.
          c = a * b;
          return &c;
       }
-\end{verbatim}
+\end{terminalv}
 
-\srule{Use {\tt void *} for generic pointers, not {\tt char *.}}
-The ANSI C standard replaces {\tt char~*} with {\tt void~*} as the
+\srule{Use \texttt{void *} for generic pointers, not \texttt{char *.}}
+The ANSI C standard replaces \texttt{char~*} with \texttt{void~*} as the
 correct type for a generic pointer.
 
 
-\srule{Always test the pointer returned by {\tt malloc} {\it etc.}
+\srule{Always test the pointer returned by \texttt{malloc} \textit{etc.}
 for equality with   the null pointer before attempting to use it.}
-Ignoring the possibility that {\tt malloc} has failed
+Ignoring the possibility that \texttt{malloc} has failed
 can cause an access violation
 on a  VAX and mayhem on many other systems.
 
@@ -580,10 +359,10 @@ comparison.}
 A null pointer does not point anywhere. The effect of misusing a
 null pointer is unpredictable.
 Consider the code below:
-\begin{verbatim}
+\begin{terminalv}
       ptr = NULL;
       printf ( "Location 0 contains %d\n", *ptr );
-\end{verbatim}
+\end{terminalv}
 Some C implementations permit the
 hardware location~0 to be read (and written), whilst others do not.
 Hence the code above will execute on some computers but not on others.
@@ -591,9 +370,9 @@ Hence the code above will execute on some computers but not on others.
 \srule{Don't assume a zeroed variable will be interpreted as a null pointer.}
 Use the value NULL (which is defined as 0 in \verb!<stdio.h>!)
 when assigning a null pointer. That is:
-\begin{verbatim}
+\begin{terminalv}
       ptr = NULL;
-\end{verbatim}
+\end{terminalv}
 Note that a null pointer does not necessarily
 result from the conversion of a floating-point zero.
 
@@ -603,13 +382,13 @@ cannot be assumed to be a floating-point zero.
 \srule{If the return value of a function is being discarded then
 cast the  value to void.}
 For example, rather than:
-\begin{verbatim}
+\begin{terminalv}
       printf ( "Hello\n" );
-\end{verbatim}
+\end{terminalv}
 use:
-\begin{verbatim}
+\begin{terminalv}
       ( void ) printf ( "Hello\n" );
-\end{verbatim}
+\end{terminalv}
 
 \newpage
 \subsection{Program design}
@@ -624,7 +403,7 @@ Adding a break statement at the end of a switch statement does not
 affect the program control flow, but does mean that there
 is less likelihood of introducing a bug if a further case is added
 in the future.
-\begin{verbatim}
+\begin{terminalv}
       switch ( c ) {
          case 'a':
             ...
@@ -633,7 +412,7 @@ in the future.
             ...
             break;
       }
-\end{verbatim}
+\end{terminalv}
 
 
 \srule{Use only non-floating loop variables.}
@@ -643,17 +422,17 @@ explicitly treated in the code if necessary.
 
 
 \srule{Avoid changing the current loop index and range within a
-{\tt for} loop.}
+\texttt{for} loop.}
 Unlike Fortran, C allows the loop index  and range to be changed
 from within the loop control structure.
-For example it is permissible to alter both {\tt i} and {\tt n}
-in the body of the {\tt for} loop below.
-\begin{verbatim}
+For example it is permissible to alter both \texttt{i} and \texttt{n}
+in the body of the \texttt{for} loop below.
+\begin{terminalv}
       for ( i=0; i < n; i++ )
       {
          ...
       }
-\end{verbatim}
+\end{terminalv}
 However this freedom should not be used unnecessarily as it leads to
 confusing code.
 
@@ -671,44 +450,43 @@ Put the longest elements first to minimize `padding'.
 alignment.}
 What is optimal on one machine may not be on another. Rely
 on the advice in the previous item.
-When using bit fields, use an {\tt int~:~0}
+When using bit fields, use an \texttt{int~:~0}
 field to ensure re-alignment afterwards if necessary.
 
 
 
-\srule{Don't use casts and {\tt strcmp} (or {\tt memcmp}) to compare the contents of
+\srule{Don't use casts and \texttt{strcmp} (or \texttt{memcmp}) to compare the contents of
 structures for equality.}
 The padding regions within the structures may
 contain junk, even if the declared fields are identical.
 
-\srule{Use assignment to copy structures (not {\tt strcpy} or {\tt memcpy}).}
+\srule{Use assignment to copy structures (not \texttt{strcpy} or \texttt{memcpy}).}
 As indicated above, this approach avoids the problem of padding.
 
 
 \srule{Use the correct method for error detection.}
 Most library routines return an indication of failure via an external
-variable called {\tt errno}.
+variable called \texttt{errno}.
 The obvious way to check for an error might appear to be:
 \begin{quote}
     {\sl call library function}\\
-    {\tt if ( errno )}\\
+    \texttt{if ( errno )}\\
     {\sl  \ \ \ \ make an error report}
 \end{quote}
-However there is no guarantee that the library routine will clear {\tt
-errno} in the absence of an error. Initializing {\tt errno} to zero
+However there is no guarantee that the library routine will clear \texttt{errno} in the absence of an error. Initializing \texttt{errno} to zero
 before  calling the routine does not solve the problem;
-{\tt errno} may be set as
+\texttt{errno} may be set as
 a side effect of the function executing without the function actually failing!
 
 The correct method is to test the value returned by the function
 for an error indication
-before examining {\tt errno} to find the nature of the error. For example:
+before examining \texttt{errno} to find the nature of the error. For example:
 \begin{quote}
-      {\tt status = func ( a, b );}\\
-      {\tt if ( status )}\\
-      {\tt \{}\\
-      {\sl (examine} {\tt errno}{\sl )}\\
-      {\tt \}}
+      \texttt{status = func ( a, b );}\\
+      \texttt{if ( status )}\\
+      \texttt{\{}\\
+      {\sl (examine} \texttt{errno}{\sl )}\\
+      \texttt{\}}
 \end{quote}
 See SSN/4, Section~8,  for advice on making a suitable error report
 compliant with Starlink error-reporting conventions.
@@ -731,13 +509,13 @@ As mentioned above, global status should be the final item
 in a function parameter list.
 It should be a pointer to an integer type, and it is recommended that it is
 implemented as shown in the example below:
-\begin{verbatim}
+\begin{terminalv}
       #include "star.h"
       int function fun ( int p, int q, StarStatus *status )
       {
          ...
       }
-\end{verbatim}
+\end{terminalv}
 This ensures that the status value is inherited from and can be
 returned to the calling module so that appropriate action can be
 taken if an error is detected.
@@ -760,30 +538,30 @@ However it is permissible to have an extra return after
 an initial status check if such a check is performed.
 
 
-\srule{Don't use the {\tt gets} function.}
+\srule{Don't use the \texttt{gets} function.}
 It is impossible to ensure that the string being
 read doesn't over-run the input buffer and overwrite other areas of memory.
 
-\srule{Use the {\tt sizeof} function explicitly where appropriate.}
+\srule{Use the \texttt{sizeof} function explicitly where appropriate.}
 For clarity and portability, it is recommended that the size of objects be
 obtained using the \verb~sizeof~ function.
 For example, use:
-\begin{verbatim}
+\begin{terminalv}
       pntr = ( struct ABC * ) malloc ( sizeof ( struct ABC ) );
-\end{verbatim}
+\end{terminalv}
 
 Do not use:
-\begin{verbatim}
+\begin{terminalv}
       #define SIZEABC ...
          ...
       pntr = malloc ( SIZEABC );
-\end{verbatim}
+\end{terminalv}
 
 
 \srule{Beware using standard library pseudo-random number generators.}
 The range of the numbers generated will be machine-dependent.
 ANSI compilers limit the upper bound of the range of numbers generated to
-{\tt RAND\_MAX}.
+\texttt{RAND\_MAX}.
 This number can be used to normalize the distribution, although
 problems with the resolution of the resulting number distribution may remain.
 
@@ -798,7 +576,7 @@ Many pre-ANSI C compilers assume that the binary operators
 are both associative and commutative, (in the case where all variables have
 the same type).
 Hence it may rearrange the expression
-{\tt ( a + b ) + ( c + d )} to {\tt ( a + d ) + ( b + c )}.
+\texttt{( a + b ) + ( c + d )} to \texttt{( a + d ) + ( b + c )}.
 
 This rearrangement may cause problems if, for example, the order
 specified was chosen to avoid the possibility of overflow.
@@ -824,44 +602,44 @@ program's dependence on the implementation getting everything correct.
 
 \srule{Don't assume a particular encoding system is in use.}
 Each standard character in C must have a distinct, positive integer encoding.
-{\bf However this need not be accomplished using the ASCII encoding system.}
+\textbf{However this need not be accomplished using the ASCII encoding system.}
 Many C programs rely on the assumption that letters of the alphabet,
 (or the digits 0--9) are coded contiguously as is the case with ASCII.
 For example, the test below might be used to check if a character is
 a capital letter:
-\begin{verbatim}
+\begin{terminalv}
       c >= 'A' && c <= 'Z'
-\end{verbatim}
+\end{terminalv}
 This code will work with ASCII, but not with the EBCDIC character set.
 
 The programmer must use the functions supplied with the standard
 header
-\begin{verbatim}
+\begin{terminalv}
       ctype.h
-\end{verbatim}
+\end{terminalv}
 This contains functions for testing and converting characters.  For example,
 the function
-\begin{verbatim}
+\begin{terminalv}
       isupper ( (int) c )
-\end{verbatim}
+\end{terminalv}
 is a portable replacement for the code above.
 Similarly, the test of whether a character is a decimal digit
 should be accomplished with the standard function
-\begin{verbatim}
+\begin{terminalv}
       isdigit ( (int) c )
-\end{verbatim}
+\end{terminalv}
 not with the test:
-\begin{verbatim}
+\begin{terminalv}
       c >= '0' && c <= '9'
-\end{verbatim}
+\end{terminalv}
 
 \srule{Initialize all automatic variables before use.}
 If local variables are not set they may contain junk.
 
-\srule{Always explicitly declare {\tt signed} or {\tt unsigned} when using
+\srule{Always explicitly declare \texttt{signed} or \texttt{unsigned} when using
 characters to store  numerical ({\sl i.e.} non-character) data.}
 This is important because
-the default {\tt char} type may be signed
+the default \texttt{char} type may be signed
 or unsigned depending on the implementation.
 
 
@@ -873,7 +651,7 @@ than the standard requires.
 
 \srule{Don't write hex or octal constants which assume the word-length of a
 machine.}
-For example use {\tt$\sim0$}, not {\tt 0Xffffffff}.
+For example use {\tt$\sim0$}, not \texttt{0Xffffffff}.
 
 
 \srule{Don't make assumptions about the order or degree of packing of
@@ -900,7 +678,7 @@ These are documented in \xref{SGP/5}{sgp5}.
 
 \srule{Set out pre-processor directives correctly.}
 Start all pre-processor directives on column~1 and do not have any white
-space between the {\tt \#} and the keyword -- some compilers insist on
+space between the \texttt{\#} and the keyword -- some compilers insist on
 these requirements.
 
 \srule{Limit use of preprocessor commands.}
@@ -939,50 +717,50 @@ a compiler error and the mistake will be spotted.
 A header file which defines a macro  should test whether it has been
 previously defined  so that the macro is
 not interpreted twice if it has actually been included twice. For example:
-\begin{verbatim}
+\begin{terminalv}
       #ifndef header_read
       #define header_read 1
 
         ...
 
       #endif
-\end{verbatim}
+\end{terminalv}
 This is a requirement for ANSI C header files and should also be applied to
 personal files.
 
 \srule{Don't use reserved words as names of preprocessor macros.}
 The following identifiers are reserved and must not be used as program
 identifiers:
-\begin{verbatim}
+\begin{terminalv}
       auto, break, case, char, const, continue, default, do, double,
       else, enum, extern, float, for, goto, if, int, long, register,
       return, short, signed, sizeof, static, struct, switch, typedef,
       union, unsigned, void, volatile, while.
-\end{verbatim}
+\end{terminalv}
 Although  not forbidden by the standard it is bad programming practice
 to use these words as preprocessor macro names.
 
 
-\srule{Don't put directory names explicitly into {\tt \#include} statements.}
+\srule{Don't put directory names explicitly into \texttt{\#include} statements.}
 Rather than specifying directory names, use the
 compiler options to search the relevant directories.
 
 \srule{Use the standard syntax for include files.}
 Files should be included with the standard syntax.  To search for the file
 beginning where the source program was found, use
-\begin{verbatim}
+\begin{terminalv}
       #include "filename"
-\end{verbatim}
+\end{terminalv}
 
 To search for the file in the system directories, use
-\begin{verbatim}
+\begin{terminalv}
       #include <filename>
-\end{verbatim}
+\end{terminalv}
 
 The VAX C syntax
-\begin{verbatim}
+\begin{terminalv}
       #include filename
-\end{verbatim}
+\end{terminalv}
 extracts the header file from a VMS text library. This is non-portable.
 
 
