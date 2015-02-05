@@ -1,4 +1,4 @@
-\documentclass[twoside,11pt]{starlink}
+\documentclass[chapters,twoside,11pt]{starlink}
 %
 % An Introduction to Fibre Spectroscopy.
 %
@@ -47,6 +47,9 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
 % ? Document specific \providecommand or \newenvironment commands.
+
+% This has parts but no chapters, so remove the chapter part from section numbers.
+\renewcommand*\thesection{\arabic{section}}
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -70,7 +73,7 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 \cleardoublepage
 \newpage
 
-
+\part{Introductory Material}
 \section{\xlabel{INTRO}\label{INTRO}Introduction}
 
 \begin{quote}
