@@ -9,8 +9,9 @@
 \ifwithchapters
    \typeout{...WithChapters starlinkxhtml.cfg...}
    \CutAt{chapter}
-
+   \CutAt{part}
    \TocAt{chapter,section,subsection,sstrefsection}
+   \TocAt{part,chapter,section,subsection,sstrefsection}
 \else
    \typeout{...WithoutChapters stalrinkxhtml.cfg...}
    \CutAt{section}
@@ -113,7 +114,7 @@
 
   %% Slightly different table of contents with or without chapters.
   \ifwithchapters
-  \tableofcontents[chapter,section,subsection,subsubsection,appendix]
+  \tableofcontents[part,chapter,section,subsection,subsubsection,appendix]
   \else
   \tableofcontents[section,subsection,subsubsection,appendix]
   \fi
