@@ -1,161 +1,30 @@
-\documentclass[twoside,11pt]{article}
-
-% ? Specify used packages
-\usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
-% ? End of specify used packages
-
-\pagestyle{myheadings}
+\documentclass[twoside,11pt,nolof,noabs]{starlink}
 
 % -----------------------------------------------------------------------------
-% ? Document identification
-\newcommand{\stardoccategory}  {Starlink Guide}
-\newcommand{\stardocinitials}  {SG}
-\newcommand{\stardocsource}    {sg\stardocnumber}
-\newcommand{\stardocnumber}    {9.2}
-\newcommand{\stardocauthors}   {Martin Clayton}
-\newcommand{\stardocdate}      {11 December 1996}
-\newcommand{\stardoctitle}     {Introduction to Echelle Spectroscopy}
-\newcommand{\stardocversion}   {[software-version]}
-\newcommand{\stardocmanual}    {[manual-type]}
-\newcommand{\stardocabstract}  {[Text of abstract]}
-% ? End of document identification
+\stardoccategory    {Starlink Guide}
+\stardocinitials    {SG}
+\stardocsource      {sg\stardocnumber}
+\stardocnumber      {9.2}
+\stardocauthors     {Martin Clayton}
+\stardocdate        {11 December 1996}
+\stardoctitle       {Introduction to Echelle Spectroscopy}
+%\stardocversion     {[software-version]}
+%\stardocmanual      {[manual-type]}
+\stardocname  {\stardocinitials /\stardocnumber}
 
 % -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-\setcounter{tocdepth}{3}
-\setcounter{secnumdepth}{3}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
+%  Document specific \providecommand or \newenvironment commands.
 %
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-% Define commands for HTML-only or LaTeX-only text.
-\newcommand{\html}[1]{}
-\newcommand{\latex}[1]{#1}
-
-% Use latex2html 98.2.
-\newcommand{\latexhtml}[2]{#1}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-%
-\newcommand{\echdiagobjectbox}[3]{
+\providecommand{\echdiagobjectbox}[3]{
     \put(#1,#2){\oval(2.0, 0.5)}
     \put(#1,#2){\makebox(0,0){\shortstack{#3}}}
     }
 %
-\newcommand{\echdiagactionbox}[3]{
+\providecommand{\echdiagactionbox}[3]{
     \put(#1,#2){\framebox(2.0, 0.5){\shortstack{#3}}}
     }
 %
-\newcommand{\echdiagarmtext}[3]{
+\providecommand{\echdiagarmtext}[3]{
     \put(#1,#2){\makebox(0,0){\shortstack{#3}}}
     }
 %
@@ -165,141 +34,21 @@
 \renewcommand{\textfraction}{0.01}
 
 %
-\newcommand{\sgspec}[2]{#1}
-\begin{htmlonly}
-  \newcommand{\sgspec}[2]{#2}
-\end{htmlonly}
-
-% ? End of document specific commands
+\providecommand{\sgspec}[2]{#1}
+%  End of document specific commands
 % -----------------------------------------------------------------------------
-%  Title Page.
-%  ===========
-\renewcommand{\thepage}{\roman{page}}
+
 \begin{document}
-\thispagestyle{empty}
+\scfrontmatter
 
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-%  {\LARGE\bf \stardocversion \\ [4ex]}
-%  {\Huge\bf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required.
-   \begin{center}
-   \leavevmode\includegraphics[height=120mm]{sg9_cover}
-
-   An Echelle spectrum
-   \end{center}
-% ? End of picture
-
-% ? Heading for abstract if used.
-%  \vspace{10mm}
-%  \begin{center}
-%     {\Large\bf Abstract}
-%  \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-%     \stardocversion\\
-%     \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
-
-% ? Add picture here if required.
-   \begin{figure}[h]
-   \includegraphics[height=120mm]{sg9_cover}
-   \end{figure}
-
-   \begin{center}
-   An Echelle spectrum
-   \end{center}
-
-% ? End of picture.
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \newcommand{\latexonlytoc}[0]{}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-% \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-% \stardocabstract
-% ? End of document abstract
-% -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \markboth{Contents}{\stardocname}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
- \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
 
 \section{\label{se_introduction}\xlabel{introduction}Introduction}
-\markboth{Introduction}{\stardocname}
 
-\htmlref{{\bf Echelle}}{gl_echelle} \htmlref{{\bf
-spectrographs}}{gl_spectrograph} are available as
+
+\htmlref{\textbf{Echelle}}{gl_echelle} \htmlref{\textbf{spectrographs}}{gl_spectrograph} are available as
 common-user instruments at several observatories and satellites.  These
 spectrographs offer the observer both a reasonably high
-\htmlref{{\bf resolution}}{gl_resolution} and
+\htmlref{\textbf{resolution}}{gl_resolution} and
 a wide wavelength-coverage; at the expense of a fairly complex
 data-reduction procedure.
 
@@ -319,19 +68,19 @@ data-reduction scripts, including templates for fully automated data
 reductions with \xref{ECHOMOP}{sun152}{}\@.
 
 A significant part of the process of successful spectrum extraction
-is the preliminary handling of the \htmlref{{\bf CCD}}{gl_ccd} data frames.
+is the preliminary handling of the \htmlref{\textbf{CCD}}{gl_ccd} data frames.
 Those planning to use
 \htmladdnormallink{IRAF}
 {http://www.starlink.ac.uk/iraf/web/iraf-homepage.html}\sgspec{\footnote{IRAF
 documents can be found in your IRAF installation; you
 do not need to get them from Tucson or a mirror.  Check with your manager for
-details.}}{{\em (All IRAF-related hyperlinks in this document are to the
+details.}}{\emph{(All IRAF-related hyperlinks in this document are to the
 UK-based Starlink IRAF mirror except \htmladdnormallink{this one}
 {http://iraf.noao.edu/} which goes to the Tucson site.)}} should consult
 \htmladdnormallink{{\sl A User's Guide to CCD Reductions with IRAF}}
 {ftp://starlink-ftp.rl.ac.uk/pub/iraf/iraf/docs/ccduser2.ps.Z} (UGCRI) by Philip Massey.
-UGCRI is quite a good document for {\em any} user of CCD data, even those
-planning to use {\em e.g.} \xref{CCDPACK}{sun139}{} or
+UGCRI is quite a good document for \emph{any} user of CCD data, even those
+planning to use \emph{e.g.} \xref{CCDPACK}{sun139}{} or
 \xref{FIGARO}{sun86}{} to do the preparation\sgspec{---}{ - }the
 \xref{{\sl CCD Reduction Cookbook} (SC/5)}{sc5}{} is the definitive
 introduction to this type of work.
@@ -347,8 +96,7 @@ data.  There is also a hypertext tutorial for DOECSLIT at
 
 \begin{itemize}
 
-\item \htmladdnormallink{{\tt
-      http://www.starlink.ac.uk/iraf/web/tutorials/doecslit/doecslit.html}}
+\item \htmladdnormallink{\texttt{http://www.starlink.ac.uk/iraf/web/tutorials/doecslit/doecslit.html}}
       {http://www.starlink.ac.uk/iraf/web/tutorials/doecslit/doecslit.html}
 
 \end{itemize}
@@ -384,20 +132,20 @@ reports, comments and news, is maintained at
 
 \begin{itemize}
 
-\item \sgspec{{\tt http://www.star.ucl.ac.uk/\symbol{126}mjc/echelle/}}
+\item \sgspec{\texttt{http://www.star.ucl.ac.uk/\symbol{126}mjc/echelle/}}
       {\htmladdnormallink{\verb+http://www.star.ucl.ac.uk/~mjc/echelle/+}
       {http://www.star.ucl.ac.uk/\~{}mjc/echelle/}}
 
 \end{itemize}
 
-Terms in the body text of this Guide in {\bf bold} are described in the
+Terms in the body text of this Guide in \textbf{bold} are described in the
 \htmlref{glossary}{se_glossary} later in this document;
 if you cannot find the term you want there, you might try the
 {\sl NASA Thesaurus:}
 
 \begin{itemize}
 
-\item \sgspec{{\tt http://www.sti.nasa.gov/nasa-thesaurus.html}}
+\item \sgspec{\texttt{http://www.sti.nasa.gov/nasa-thesaurus.html}}
       {\htmladdnormallink{\verb+http://www.sti.nasa.gov/nasa-thesaurus.html+}
       {http://www.sti.nasa.gov/nasa-thesaurus.html}}
 
@@ -406,17 +154,17 @@ if you cannot find the term you want there, you might try the
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\label{se_example_echelle}\xlabel{example_echelle}An Echelle
-         Spectrum}\markboth{An Echelle Spectrum}{\stardocname}
+         Spectrum}
 
 In `traditional' spectrographs a dispersing element\sgspec{---}{ - }typically a
-\htmlref{{\bf diffraction grating}}{gl_grating} or
-\htmlref{{\bf prism}}{gl_prism}\sgspec{---}{ - }is used to produce the spectrum.
+\htmlref{\textbf{diffraction grating}}{gl_grating} or
+\htmlref{\textbf{prism}}{gl_prism}\sgspec{---}{ - }is used to produce the spectrum.
 This results in a single spectrum which can be imaged using a
-\htmlref{{\bf CCD}}{gl_ccd} or other
+\htmlref{\textbf{CCD}}{gl_ccd} or other
 type of camera.  The data can then be extracted using a suitable
 program.  The recordable part of the wavelength range covered by this type of
 spectrograph is limited by the size of available image sensors,
-{\em i.e.}, CCDs.
+\emph{i.e.}, CCDs.
 
 A quick inspection of a CCD image of such a spectrum will also reveal
 that much of the detector area away from the spectrum itself is unused.
@@ -425,18 +173,18 @@ use an \'{e}chelle spectrograph.
 
 An \'{e}chelle is a diffraction grating in which the rulings are much
 further apart than usual.
-This leads to spectra of very high \htmlref{{\bf dispersion}}{gl_dispersion},
+This leads to spectra of very high \htmlref{\textbf{dispersion}}{gl_dispersion},
 but only over a short wavelength range in each order.
 As well as being `short', the high orders will overlap.  To overcome
-this effect a \htmlref{{\bf cross-dispersing}}{gl_cross_dispersion}
+this effect a \htmlref{\textbf{cross-dispersing}}{gl_cross_dispersion}
 element is used to produce an
-\htmlref{{\bf order separation}}{gl_order_separation}.
+\htmlref{\textbf{order separation}}{gl_order_separation}.
 \sgspec{Figure~\ref{fi_ech_image}}{The figure below}
 shows a small part of such
 an \'{e}chellogram recorded with a CCD camera.  You can see a short part
 of three orders which run from the top to the bottom of the image at a
 slight angle.  In the order to the right you can see a couple of
-absorption features.  Several \htmlref{{\bf cosmic-ray events}}{gl_cosmic_ray}
+absorption features.  Several \htmlref{\textbf{cosmic-ray events}}{gl_cosmic_ray}
 (bright spots) are also visible.
 
 \begin{figure}
@@ -471,11 +219,11 @@ Additional complexity arises because:
 \item The orders can have a more complex shape than those from a
       single-order instrument.
 
-\item The high \htmlref{{\bf dispersion}}{gl_dispersion} used can make
+\item The high \htmlref{\textbf{dispersion}}{gl_dispersion} used can make
       it difficult to distinguish
       between true spectral features and cosmic-ray events.
 
-\item \htmlref{{\bf Flat fielding}}{gl_flat_field} the data can be difficult.
+\item \htmlref{\textbf{Flat fielding}}{gl_flat_field} the data can be difficult.
 
 \item In some cases adjacent orders overlap slightly in the spatial
       direction (there can be several reasons for this) making
@@ -488,7 +236,7 @@ which address these specific features of \'{e}chelle data reduction.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\label{se_preparation}\xlabel{preparation}Preparing for Observation}
-\markboth{Preparing for Observation}{\stardocname}
+
 
 There is a comprehensive Starlink Guide for those preparing for
 an observing run\sgspec{---}{ - }\xref{{\sl Preparing to Observe}
@@ -511,26 +259,26 @@ data preparation:
 
 \begin{description}
 
-\item [{\bf Bias frames}]
+\item [\textbf{Bias frames}]
       Zero-second exposures taken with no signal light entering the
       instrument but with any pre-flash used for the object exposures
       present.
 
-\item [{\bf Dark frames}]
+\item [\textbf{Dark frames}]
       Long exposures taken with the shutter closed.  Typically, the
       exposure time used is similar to that selected for the object
       frames.
 
-\item [{\bf Flat-field frames}]
+\item [\textbf{Flat-field frames}]
       Exposures taken with a suitable continuum lamp
       (usually Tungsten) as light source.
 
-\item [{\bf Arc frames}]
-      Exposures taken with an \htmlref{{\bf arc lamp}}{gl_arc}
+\item [\textbf{Arc frames}]
+      Exposures taken with an \htmlref{\textbf{arc lamp}}{gl_arc}
       (usually Thorium-Argon) as
       light source, to be used for wavelength reference.
 
-\item [{\bf Object frames}]
+\item [\textbf{Object frames}]
       Exposures taken with a target object or reference object as the
       `light source'.
 
@@ -543,16 +291,15 @@ preparation of the CCD data.
 
 \subsection{Detector Pre-processing}
 
-A more complete introduction to the handling of \htmlref{{\bf CCD}}{gl_ccd}
+A more complete introduction to the handling of \htmlref{\textbf{CCD}}{gl_ccd}
 data can be found in the \xref{{\sl CCD Reduction Cookbook} (SC/5)}{sc5}{},
 a brief outline is given here.
 
 In order to remove detector-related effects a complete set of
-\htmlref{{\bf bias}}{gl_bias_frame}, \htmlref{{\bf dark}}{gl_dark_frame},
+\htmlref{\textbf{bias}}{gl_bias_frame}, \htmlref{\textbf{dark}}{gl_dark_frame},
 and
-\htmlref{{\bf flat-field}}{gl_flat_field} frames should be obtained.
-It is important to {\em
-\htmlref{{\bf bracket}}{gl_bracketing}} the science data exposures with
+\htmlref{\textbf{flat-field}}{gl_flat_field} frames should be obtained.
+It is important to \emph{\htmlref{\textbf{bracket}}{gl_bracketing}} the science data exposures with
 complete sets of CCD
 characterisation frames.  A post-observation review of these will reveal
 any image shifts.  Having bracket frames allows the data to be
@@ -564,15 +311,15 @@ See \sgspec{\S \ref{se_image_preparation}}
 for outline details of CCD data preparation.
 
 In some cases it may be possible to not use any
-\htmlref{{\bf bias frames}}{gl_bias_frame}.  Instead,
+\htmlref{\textbf{bias frames}}{gl_bias_frame}.  Instead,
 a median value for the bias level is obtained by inspecting the
-\htmlref{{\bf overscan region}}{gl_overscan} in some or all of the object/arc
+\htmlref{\textbf{overscan region}}{gl_overscan} in some or all of the object/arc
 frames.
 You can use fewer bias frames when you have a high signal-to-detector-noise
 ratio.
 
 For exposure times limited by cosmic-ray event counts, the
-\htmlref{{\bf dark current}}{gl_dark_current}
+\htmlref{\textbf{dark current}}{gl_dark_current}
 in most CCD cameras is not a significant factor.  The simplest way to
 decide whether to take dark frames is to take one of exposure time
 similar to that you are using for object frames, and check the signal level.
@@ -581,8 +328,8 @@ similar to that you are using for object frames, and check the signal level.
 \subsection{\label{se_flat_beware}\xlabel{flat_beware}Flat Fields}
 
 Beware of flat fielding in \'{e}chelle spectroscopy.  For a stable
-spectrograph ({\em{e.g.}} \htmlref{{\bf UCLES}}{gl_ucles} which is in the
-\htmlref{{\bf AAT}}{gl_aao_aat} coud\'{e} room)
+spectrograph ({\em{e.g.}} \htmlref{\textbf{UCLES}}{gl_ucles} which is in the
+\htmlref{\textbf{AAT}}{gl_aao_aat} coud\'{e} room)
 you can take flat-field frames at any suitable time.  For less-stable
 instruments it may be difficult to get a useable flat field.
 The problem is getting the object and flat-field orders to fall on the
@@ -592,16 +339,16 @@ before and after each science exposure in the same way as you would
 take arcs.
 
 When preparing flat-field frames for your data ensure that a
-\htmlref{{\bf dekker}}{gl_dekker} size (length)
+\htmlref{\textbf{dekker}}{gl_dekker} size (length)
 larger than that used for the science exposures is used\sgspec{---}{ - }avoid
 order overlap in the image, though.  This ensures that a reasonable
-\htmlref{{\bf flat-field}}{gl_flat_field} is available across the complete
+\htmlref{\textbf{flat-field}}{gl_flat_field} is available across the complete
 profile of each order.  If a choice of gratings is available, use the
 one which will give you the widest order separation.
 
 In some areas of the \'{e}chellogram the brightness of a single
 flat-field may fall off or vary rapidly due to the characteristic
-spectrum of the \htmlref{{\bf arc lamp}}{gl_arc}
+spectrum of the \htmlref{\textbf{arc lamp}}{gl_arc}
 used or variations in the efficiency of the
 detector (some front-illuminated CCDs have 20\sgspec{--}{-}30\%
 variations in efficiency over a small wavelength band).
@@ -628,11 +375,11 @@ For well-exposed continuous spectra the object frame can be used for
 tracing.  However, in the case of faint objects, or
 objects with strong absorption features in their spectra, tracing of
 object frames will not be easy.
-A \htmlref{{\bf flat-field frame}}{gl_flat_field} can be used for tracing as
+A \htmlref{\textbf{flat-field frame}}{gl_flat_field} can be used for tracing as
 this is likely to give a good signal.
 Therefore, if necessary, obtain a few flat fields with a narrow
-\htmlref{{\bf dekker}}{gl_dekker} to improve the traces.
-It may be worth having {\em several} possible frames for
+\htmlref{\textbf{dekker}}{gl_dekker} to improve the traces.
+It may be worth having \emph{several} possible frames for
 tracing\sgspec{---}{ - }in case some of them are badly contaminated
 by cosmic rays and so difficult to use.
 
@@ -640,9 +387,9 @@ by cosmic rays and so difficult to use.
 \subsection{Wavelength Calibration}
 
 As with the CCD characterisation frames, wavelength-scale reference
-(arc) frames should be taken \htmlref{{\bf bracketing}}{gl_bracketing} the
-science exposures {\em if} precise wavelength scales are required.
-At the high \htmlref{{\bf dispersions}}{gl_dispersion}
+(arc) frames should be taken \htmlref{\textbf{bracketing}}{gl_bracketing} the
+science exposures \emph{if} precise wavelength scales are required.
+At the high \htmlref{\textbf{dispersions}}{gl_dispersion}
 used in \'{e}chelle spectrographs a small
 change in the optical system can lead to a detectable shift between the
 bracketing images.
@@ -657,7 +404,7 @@ band size is much larger than the wavelength coverage of
 a single \'{e}chelle order.  In practice, this can make the application
 of proper flux calibration to high-resolution \'{e}chelle spectra
 difficult or infeasible.  Proper high-resolution spectral standards are
-now starting to become available (notably for \htmlref{{\bf HST}}{gl_hst})\@.
+now starting to become available (notably for \htmlref{\textbf{HST}}{gl_hst})\@.
 If you intend to flux calibrate your data you should ensure that suitable
 standards are available.
 
@@ -667,76 +414,10 @@ flux calibration.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\label{se_basics}\xlabel{basics}The Basics of Echelle Data Reduction}
-\markboth{The Basics of Echelle Data Reduction}{\stardocname}
 
-\begin{htmlonly}
-The flow chart below maps out the main steps in the
-\'{e}chelle data reduction process.
-\begin{rawhtml}
-<PRE>
-                     raw CCD
-                        |
-                        v
-                  CCD  processing
-                        |
-                        v
-                  prepared images
-                        |
-                        v
-                  order  location
-                        |
-                        v
-                   order tracing
-                        |
-                        v
-                    slit set-up
-                        |
-                        v
-                     normalise
-                    flat  field
-                        |
-                        v
-       /---------choose background---------\
-       |                                   |
-scattered light                      sky  subtract
-       |                                   |
-       v                                   v
-     model                             model sky
-scattered light                            |
-       |                                   |
-       \-------->background  model<--------/
-                        |
-                        V
-                     extract
-                        |
-       /----------------+------------------\
-       |                                   |
-      arcs                              objects
-       |                                   |
-       v                                   |
-locate arc lines                           |
-       |                                   |
-       v                                   |
- fit wavelength                            |
-     scales                                |
-       |                                   |
-       \---------->wavelength-<------------/
-               calibrated  objects
-                        |
-                        +------------->single-order spectra
-                        |
-       /----------------+------------------\
-       |                |                  |
-       v                |                  v
- blaze correct          |           flux calibrate
-       |                v                  |
-       \---------->scrunch/merge<----------/
-                        |
-                        v
-                  merged spectra
-</PRE>
-\end{rawhtml}
-\end{htmlonly}
+
+
+
 
 \sgspec{Figure~\ref{fi_flow} is a flow chart which maps out the main steps
 in the \'{e}chelle data reduction process.}{}
@@ -745,7 +426,7 @@ the natural steps in the reduction process is handled by a task.
 This is the top-level menu presented by ECHMENU:
 
 \begin{latexonly}
-\begin{verbatim}
+\begin{terminalv}
   0. HELP/HYPER (ASCII or hypertext help).
   1. Start a reduction.                 16. Check trace consistency.
   2. Trace orders.                      17. Post-trace Cosmic Ray locate.
@@ -763,31 +444,10 @@ This is the top-level menu presented by ECHMENU:
  14. Save reduced data.                 29. System ($) commands.
  15. Plot order traces.                 30. Output balance-factor frame.
                                         31. EXIT (alias Q/E/QUIT/EXIT/99).
-\end{verbatim}
+\end{terminalv}
 \end{latexonly}
-\begin{htmlonly}
-\begin{rawhtml}
-<PRE WIDTH=80>
-  <A HREF="/sun152.htx/#xref_option0">0.</A> HELP/HYPER (ASCII or hypertext help).
-  <A HREF="/sun152.htx/#xref_option1">1.</A> Start a reduction.                 <A HREF="/sun152.htx/#xref_option16">16.</A> Check trace consistency.
-  <A HREF="/sun152.htx/#xref_option2">2.</A> Trace orders.                      <A HREF="/sun152.htx/#xref_option17">17.</A> Post-trace Cosmic Ray locate.
-  <A HREF="/sun152.htx/#xref_option3">3.</A> Clip fitted traces.                <A HREF="/sun152.htx/#xref_option18">18.</A> Image cosmic ray pixels.
-  <A HREF="/sun152.htx/#xref_option4">4.</A> Determine dekker/object extent.    <A HREF="/sun152.htx/#xref_option19">19.</A> Quick-look Extraction.
-  <A HREF="/sun152.htx/#xref_option5">5.</A> Model flat field.                  <A HREF="/sun152.htx/#xref_option20">20.</A> Check wavelength scales.
-  <A HREF="/sun152.htx/#xref_option6">6.</A> Model sky.                         <A HREF="/sun152.htx/#xref_option21">21.</A> Scrunch and merge multiple.
-  <A HREF="/sun152.htx/#xref_option7">7.</A> Model object profile.              <A HREF="/sun152.htx/#xref_option22">22.</A> Model scattered light.
-  <A HREF="/sun152.htx/#xref_option8">8.</A> Extract orders 1-D.                <A HREF="/sun152.htx/#xref_option23">23.</A> ADJUST tuning parameters.
-  <A HREF="/sun152.htx/#xref_option9">9.</A> Locate arc line candidates.        <A HREF="/sun152.htx/#xref_option24">24.</A> Set single-order operations.
- <A HREF="/sun152.htx/#xref_option10">10.</A> Identify features.                 <A HREF="/sun152.htx/#xref_option25">25.</A> Set all-order operations.
- <A HREF="/sun152.htx/#xref_option11">11.</A> Flatten order shape.               <A HREF="/sun152.htx/#xref_option26">26.</A> DISABLE an order.
- <A HREF="/sun152.htx/#xref_option12">12.</A> Scrunch to linear scale.           <A HREF="/sun152.htx/#xref_option27">27.</A> PLOT reduction arrays.
- <A HREF="/sun152.htx/#xref_option13">13.</A> Model/Extract orders 2-D.          <A HREF="/sun152.htx/#xref_option28">28.</A> Full MENU.
- <A HREF="/sun152.htx/#xref_option14">14.</A> Save reduced data.                 <A HREF="/sun152.htx/#xref_option29">29.</A> System ($) commands.
- <A HREF="/sun152.htx/#xref_option15">15.</A> Plot order traces.                 <A HREF="/sun152.htx/#xref_option30">30.</A> Output balance-factor frame.
-                                        31. EXIT (alias Q/E/QUIT/EXIT/99).
-</PRE>
-\end{rawhtml}
-\end{htmlonly}
+
+
 
 \begin{latexonly}
 \begin{figure}
@@ -899,36 +559,36 @@ The basic steps in the preparation are:
 
 \begin{description}
 
-\item [{\bf Generate \htmlref{bias frame}{gl_bias_frame}}]
+\item [\textbf{Generate \htmlref{bias frame}{gl_bias_frame}}]
       Typically done by finding the median of several frames taken at
       the telescope.
 
-\item [{\bf Generate \htmlref{flat-field frame}{gl_flat_field}}]
+\item [\textbf{Generate \htmlref{flat-field frame}{gl_flat_field}}]
       Again, done by finding the median of several frames taken at
       the telescope.  Before taking the median of the frames, the
       median bias frame and a zero-offset constant are subtracted
       (see below).
 
-\item [{\bf Subtract bias frame}]
+\item [\textbf{Subtract bias frame}]
       The median bias frame is subtracted from each arc frame and
       each object frame.
 
-\item [{\bf Subtract zero-offset}]
-      A selected area of the CCD \htmlref{{\bf overscan region}}{gl_overscan}
+\item [\textbf{Subtract zero-offset}]
+      A selected area of the CCD \htmlref{\textbf{overscan region}}{gl_overscan}
       is used to find the
       `zero-level' of the camera electronics.  This is usually a number
-      in the range 20\sgspec{--}{-}200 \htmlref{{\bf ADU}}{gl_adu}\@.
+      in the range 20\sgspec{--}{-}200 \htmlref{\textbf{ADU}}{gl_adu}\@.
       The median value of the selected region
       should be used (to avoid cosmic-ray contamination).  This constant
       value is then subtracted from every pixel in the CCD image.
 
-\item [{\bf Crop images}]
+\item [\textbf{Crop images}]
       Regions\sgspec{---}{ - }such as the overscan\sgspec{---}{ - }are
       not used during the extraction
       process and should be removed (the same as cropping a photograph)
       as they may confuse some of the algorithms in the \'{e}chelle data
       reduction engine.  Very often CCD images will have `rough' edges,
-      {\em i.e.} non-useable data, which should also be trimmed off at
+      \emph{i.e.} non-useable data, which should also be trimmed off at
       this point.
 
 \end{description}
@@ -938,7 +598,7 @@ need to:
 
 \begin{description}
 
-\item [{\bf Rotate and orient the image}]
+\item [\textbf{Rotate and orient the image}]
       All the major packages constrain the orientation of the \'{e}chelle
       orders in some way.  The images may have to be adjusted to meet
       these constraints.
@@ -964,8 +624,7 @@ Once the set of arc and object images have been prepared in this way the
 There are quite a few different packages for preparing CCD data. All
 these packages offer similar functionality.  You'll probably find that
 it's easiest to use the preparation package which complements the
-\'{e}chelle reduction software you choose, {\em e.g.}, {\tt
-noao.imred.ccdred} for IRAF {\tt doecslit}\@.  There are two popular
+\'{e}chelle reduction software you choose, \emph{e.g.}, \texttt{noao.imred.ccdred} for IRAF \texttt{doecslit}\@.  There are two popular
 Starlink packages which you might use,
 \xref{FIGARO}{sun86}{} and \xref{CCDPACK}{sun139}{}\@.  CCDPACK includes
 some tools for conveniently managing the preparation of many frames and
@@ -981,7 +640,7 @@ useful data in some of the orders.  Location is achieved by taking a
 slice across the dispersion direction which when plotted appears similar
 to the graph \sgspec{in Figure~\ref{fi_scan_plot}\@.}{below.}
 
-This example is a section across an \htmlref{{\bf IUE}}{gl_iue} \'{echelle}
+This example is a section across an \htmlref{\textbf{IUE}}{gl_iue} \'{echelle}
 image.
 You can see about 60 orders are present in this case.
 In practice, the section across the image will use data from several
@@ -1052,10 +711,10 @@ ECHMENU.}
 \end{figure}
 
 In each order of an \'{e}chelle spectrogram an image of the spectrograph
-\htmlref{{\bf slit}}{gl_slit}
+\htmlref{\textbf{slit}}{gl_slit}
 is projected onto the final image.  The physical length of the slit
-is determined by the \htmlref{{\bf dekker}}{gl_dekker}.
-In a \htmlref{{\bf flat-field frame}}{gl_flat_field} the entire slit should
+is determined by the \htmlref{\textbf{dekker}}{gl_dekker}.
+In a \htmlref{\textbf{flat-field frame}}{gl_flat_field} the entire slit should
 be illuminated, and so the length of the projected image (in the dispersed
 direction) will be limited by the dekker setting.
 (The dekker setting should be made sufficiently small
@@ -1064,7 +723,7 @@ that adjacent orders don't overlap in the spatial direction.)
 Using a flat-field frame we can determine which pixels on the detector lie
 inside the projected slit and which pixels lie outside the slit.  A
 reduction program will use the previously determined order traces to build
-a \htmlref{{\bf cross-dispersion}}{gl_cross_dispersion} profile of each
+a \htmlref{\textbf{cross-dispersion}}{gl_cross_dispersion} profile of each
 order in the frame.
 These profiles can then be used to decide where the `software' dekker
 limits are.
@@ -1109,7 +768,7 @@ Statistical extraction methods (such as optimal extraction) require
 that the flat field be normalised to remove the colour of the lamp used.
 
 IRAF and MIDAS both provide tasks for the preparation of normalised
-flat-field frames (respectively, {\tt noao.imred.echelle.apflatten} and
+flat-field frames (respectively, \texttt{noao.imred.echelle.apflatten} and
 {\tt{flat/echelle}})\@.  These frames can be viewed in the same
 way as any other image.  \xref{ECHOMOP}{sun152}{} can use such a
 normalised flat-field frame, or the normalised apertures can be computed
@@ -1146,7 +805,7 @@ The background signal in an \'{e}chelle image consists of:
 \end{itemize}
 
 The first two contributions are removed in the CCD data preparation
-phase.  The signal due to \htmlref{{\bf dark current}}{gl_dark_current} is
+phase.  The signal due to \htmlref{\textbf{dark current}}{gl_dark_current} is
 usually small for short (the order of minutes) exposures in
 cryogenically-cooled CCD systems.
 
@@ -1166,7 +825,7 @@ background over the whole image, rather than trying to use inter-order
 background channels which are contaminated with light from the object or
 from an adjacent order.  \sgspec{Figure~\ref{fi_scan_plot}}
 {\htmlref{The figure}{fi_scan_plot}} shows how the
-short-wavelength orders (left-hand side) of an \htmlref{{\bf IUE}}{gl_iue}
+short-wavelength orders (left-hand side) of an \htmlref{\textbf{IUE}}{gl_iue}
 spectrum start to overlap\sgspec{---}{ - }the inter-order background has
 clearly risen in this region.
 
@@ -1215,7 +874,7 @@ extraction.  Linear extraction is less computationally demanding than
 weighted extraction methods and is useful for checking data quickly or
 situations where it is not possible to prepare the data for optimal
 extraction ({\em{e.g.}}, you don't have the CCD
-\htmlref{{\bf readout noise}}{gl_readout_noise} details).
+\htmlref{\textbf{readout noise}}{gl_readout_noise} details).
 
 Optimal extraction is designed\sgspec{---}{ - }in theory at
 least\sgspec{---}{ - }to achieve the best
@@ -1223,8 +882,8 @@ possible signal-to-noise ratio with CCD spectral data.  The method uses
 the Poisson statistics of photons, information about the CCD signal
 processing electronics transfer function, and the modelled profile for
 the object to weight contributions to the signal.  To use the optimal
-extraction method you will need to know the \htmlref{{\bf readout noise}}
-{gl_readout_noise} and \htmlref{{\bf gain}}{gl_ccd_gain} for the CCD
+extraction method you will need to know the \htmlref{\textbf{readout noise}}
+{gl_readout_noise} and \htmlref{\textbf{gain}}{gl_ccd_gain} for the CCD
 camera used to obtain the spectra.
 The main limitation of optimal extraction algorithms is the requirement
 that the spatial profile of the object is a smooth function of wavelength.
@@ -1296,12 +955,12 @@ Which ever reduction software you choose to use, you should find that a
 list of spectral feature wavelengths for common arc reference lamps is
 available on-line (refer to the package documentation for details).
 You may also be able to lay your hands on a hardcopy of a `mapped'
-\htmlref{{\bf comparison spectrum}}{gl_comparison} for your selected
-\htmlref{{\bf arc lamp}}{gl_arc},  perhaps obtained using
+\htmlref{\textbf{comparison spectrum}}{gl_comparison} for your selected
+\htmlref{\textbf{arc lamp}}{gl_arc},  perhaps obtained using
 the same spectrograph as your data.  For example, {\sl
-\htmlref{{\bf UCLES}}{gl_ucles} Spectrum
+\htmlref{\textbf{UCLES}}{gl_ucles} Spectrum
 of the Thorium-Argon Hollow-Cathode Lamp} should be available at most UK
-Starlink sites (a \htmlref{{\bf UES}}{gl_ues} version is also available).
+Starlink sites (a \htmlref{\textbf{UES}}{gl_ues} version is also available).
 This document also gives the free spectral range and wavelength coverage
 for each order of the UCLES which can be used to estimate the wavelengths
 in other orders once you have identified features for your first
@@ -1338,7 +997,7 @@ middle.
 
 Once you have a complete wavelength-calibrated comparison spectrum you
 can `copy' the wavelength scale onto you object spectra.  It may be
-useful to calibrate {\em two} arcs which \htmlref{{\bf bracket}}{gl_bracketing}
+useful to calibrate \emph{two} arcs which \htmlref{\textbf{bracket}}{gl_bracketing}
 the object exposure in
 time.  This will show any time-dependent variation in the wavelength
 scale.  If there is some change (and it is reasonably small) you can
@@ -1353,8 +1012,8 @@ with \xref{ECHOMOP}{sun152}{}-reduced data is given in the
 It may be the case that a set of wavelength-calibrated, individual-order
 spectra is suitable for your scientific purposes.  At this point, you
 can also perform flux calibration or correct for the
-\htmlref{{\bf blaze function}}{gl_blaze_correction} (a
-\htmlref{{\bf grating}}{gl_grating}-dependent variation in the brightness along
+\htmlref{\textbf{blaze function}}{gl_blaze_correction} (a
+\htmlref{\textbf{grating}}{gl_grating}-dependent variation in the brightness along
 orders).  You might also want to combine the individual orders into a single
 spectrum and/or re-bin the data onto a fixed-step wavelength scale.
 
@@ -1384,7 +1043,7 @@ been scaled and shifted for this plot.}
 
 \subsubsection{Flux Calibration}
 
-An alternative to applying the \htmlref{{\bf blaze correction}}
+An alternative to applying the \htmlref{\textbf{blaze correction}}
 {gl_blaze_correction} is to fully flux-calibrate the data.
 As mentioned earlier, there may not be reference
 standards of sufficiently small band-pass size to enable a useful flux
@@ -1420,18 +1079,18 @@ offers both simple linear interpolation and a quadratic option.
 \subsubsection{Combining Orders\sgspec{---}{ - }Merging}
 
 Once individual \'{e}chelle orders have been
-\htmlref{{\bf blaze-corrected}}{gl_blaze_correction} and scrunched
+\htmlref{\textbf{blaze-corrected}}{gl_blaze_correction} and scrunched
 to a fixed-bin wavelength scale they can me combined into a single spectrum.
 This process might also involve combining spectra from different exposures
-to overcome dropouts due to \htmlref{{\bf cosmic-ray hits}}{cosmic_ray}
-{\em etc.}
+to overcome dropouts due to \htmlref{\textbf{cosmic-ray hits}}{cosmic_ray}
+\emph{etc.}
 
 Although there are plenty of utilities available for splicing together
 spectra, the best option here is to use one of the merging utilities
 included in an \'{e}chelle data reduction package.  This will allow you
 to apply a weighting strategy in the regions where the wavelength
-coverage of orders overlaps; {\em e.g.}, ignore data where one order is
-much fainter than the other, use flux-weighted mean {\em etc.}
+coverage of orders overlaps; \emph{e.g.}, ignore data where one order is
+much fainter than the other, use flux-weighted mean \emph{etc.}
 
 
 \subsection{\label{se_cosmic_rays}\xlabel{cosmic_rays}Handling Cosmic Rays}
@@ -1439,19 +1098,19 @@ much fainter than the other, use flux-weighted mean {\em etc.}
 In the previous descriptions cosmic rays have only been occasionally
 mentioned.  The successful reduction of \'{e}chelle data requires
 careful attention to be paid to the location and handling of
-\htmlref{{\bf cosmic-ray hits}}{gl_cosmic_ray} in the data.
+\htmlref{\textbf{cosmic-ray hits}}{gl_cosmic_ray} in the data.
 There are several strategies for the detection of cosmic rays, here are
 some of them:
 
 \begin{description}
 
-\item [{\bf Inspection by eye}]
+\item [\textbf{Inspection by eye}]
       This is the simplest method\sgspec{---}{ - }display an image and you will
       probably be able to see some cosmic-ray hits.  This is less useful
-      for object frames than, say, \htmlref{{\bf dark frames}}{gl_dark_frame}
+      for object frames than, say, \htmlref{\textbf{dark frames}}{gl_dark_frame}
       as real data can appear similar to a cosmic-ray hit.
 
-\item [{\bf Median Filtering}]
+\item [\textbf{Median Filtering}]
       Two median filters are applied to each image; one along rows, one
       along columns.  These are then divided into the original image and
       a histogram of the result is produced.  If there are lots of
@@ -1459,17 +1118,17 @@ some of them:
       histogram will be visible.  Pixels above the threshold can be
       flagged as cosmic-ray hits.
 
-\item [{\bf Profile Modelling}]
+\item [\textbf{Profile Modelling}]
       This technique can be applied in several ways.  Most commonly it
       is implemented as part of the optimal extraction of spectra.
       Essentially, by constructing a profile of the `real' science data,
-      unexpected\sgspec{---}{ - }{\em i.e.}, statistically unlikely
+      unexpected\sgspec{---}{ - }\emph{i.e.}, statistically unlikely
       \sgspec{---}{ - }cosmic-ray hits
       can be found, even when they fall on the spectrum itself.  This
       method can require a large amount of processing time for a large
       \'{e}chelle image.
 
-\item [{\bf Comparison of `Identical' frames}]
+\item [\textbf{Comparison of `Identical' frames}]
       This is another simple method.  It can be used where you have
       several frames of the same object taken in the same configuration.
       A median image can be generated and pixels which deviate strongly
@@ -1483,9 +1142,9 @@ interpolate across a cosmic-ray hit.  The alternative is to simply flag
 the cosmic-ray pixels found so that they are not used in the spectrum
 extraction.
 
-You should ensure that cosmic rays in your CCD \htmlref{{\bf bias}}
-{gl_bias_frame}, \htmlref{{\bf dark}}{gl_dark_frame}, and
-\htmlref{{\bf flat-field}}{gl_flat_field} frames are removed prior to
+You should ensure that cosmic rays in your CCD \htmlref{\textbf{bias}}
+{gl_bias_frame}, \htmlref{\textbf{dark}}{gl_dark_frame}, and
+\htmlref{\textbf{flat-field}}{gl_flat_field} frames are removed prior to
 attempting reduction\sgspec{---}{ - }a median filter is suitable.  It is
 particularly important that cosmic rays do not severely degrade the
 frame used for order tracing\sgspec{---}{ - }otherwise the whole
@@ -1508,7 +1167,7 @@ mistakenly flagged as cosmic-ray events.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\label{se_facilities}\xlabel{selecting_a_package}Data
          Reduction Facilities }
-\markboth{Data Reduction Facilities}{\stardocname}
+
 
 Like any form of data reduction, there are as many ways of handling
 \'{e}chelle spectra as there are people doing it.
@@ -1531,25 +1190,25 @@ by ECHOMOP.
 \subsubsection{\xlabel{echomop}\label{se_echomop}STARLINK\sgspec{---}{ - }ECHOMOP}
 
 ECHOMOP development was funded specifically for the reduction of data from
-the \htmlref{{\bf AAT}}{gl_aao_aat} coud\'{e} \'{e}chelle spectrograph
-\htmlref{{\bf UCLES}}{gl_ucles}\@.
+the \htmlref{\textbf{AAT}}{gl_aao_aat} coud\'{e} \'{e}chelle spectrograph
+\htmlref{\textbf{UCLES}}{gl_ucles}\@.
 The author made the package sufficiently flexible that it can be used for
 reduction of data from other instruments.
 
-Part of the package is an interactive menu interface, {\tt echmenu}, which
+Part of the package is an interactive menu interface, \texttt{echmenu}, which
 guides you through the steps of a reduction.  The individual tasks
 required for a reduction can alternatively be accessed from the user's
 preferred command shell.
 
 The package provides a complete set of tasks for \'{e}chelle data
-reduction.  CCD-related processing is {\em not} included and must be done
+reduction.  CCD-related processing is \emph{not} included and must be done
 using a suitable package ({\em{e.g.}}, \xref{CCDPACK}{sun139}{} or
-\xref{FIGARO}{sun86}{})\@.  {\tt echmenu} guides you
+\xref{FIGARO}{sun86}{})\@.  \texttt{echmenu} guides you
 through the complete reduction process covering; order location,
 order tracing, slit definition, flat-fielding, sky background subtraction or
 scattered light modelling, extraction, and wavelength calibration.
 Input/output data are held in \xref{Starlink NDF format}{sun33}{} files.
-Internal data are held in a {\em reduction structure} which is an
+Internal data are held in a \emph{reduction structure} which is an
 ECHOMOP-specific format HDS file.
 
 ECHOMOP has facilities which include: an automated arc-line-location
@@ -1600,45 +1259,45 @@ ECHOMOP provides three extraction weighting schemes:
 \subsubsection{\xlabel{doecslit}\label{se_doecslit}IRAF\sgspec{---}{ - }ECHELLE/DOECSLIT}
 
 IRAF contains a set of tasks for \'{e}chelle data reduction in the package
-{\tt noao.imred.echelle}, the extraction being carried out by the main task
-{\tt doecslit}\@.  This is a `mature' software package in that it has not
+\texttt{noao.imred.echelle}, the extraction being carried out by the main task
+\texttt{doecslit}\@.  This is a `mature' software package in that it has not
 undergone significant changes in recent IRAF releases.
 
 The software inherits its user interface from IRAF and as such should be
-easy to use for those familiar with the IRAF shell {\tt cl}, parameter
+easy to use for those familiar with the IRAF shell \texttt{cl}, parameter
 entry and editing, and IRAF image file handling.
 
-An IRAF task similar to {\tt doecslit}, {\tt dofibers}, with
+An IRAF task similar to \texttt{doecslit}, \texttt{dofibers}, with
 instrument-specific variants is available.  This task is quite similar to
-{\tt doecslit} except that the aperture for each object must be
+\texttt{doecslit} except that the aperture for each object must be
 individually defined.
 
 Facilities to carry out all the procedures required for reduction of
 \'{e}chelle data are provided.  Initial processing of CCD images is done
-using tasks in {\tt noao.imred.ccdred}\@.  These tasks are also used in the
-flat-field generation process.  {\tt doecslit}, which is an IRAF script,
+using tasks in \texttt{noao.imred.ccdred}\@.  These tasks are also used in the
+flat-field generation process.  \texttt{doecslit}, which is an IRAF script,
 guides a user through the data reduction process carrying out; sky
 background or scattered light subtraction, extraction, wavelength
 calibration, and flux calibration (if needed).  Data are input/output in
 2- or 3-dimensional IRAF images.
 
 There is no special facility provided for merging of the orders from an
-\'{e}chellogram into a single spectrum, the {\tt scombine} task provides
+\'{e}chellogram into a single spectrum, the \texttt{scombine} task provides
 a simple facility for merging the orders.
 
 Parameters required for flux calibration (relating to the position of the
 observatory) must be provided by the user with
 non-\htmlref{{\bf{NOAO}}}{gl_noao} data ({\em{i.e.}},
-most UK astronomers) using the {\tt observatory} task.
+most UK astronomers) using the \texttt{observatory} task.
 Suitable extinction data are also required.
 
-Data processing with {\tt doecslit} can be interrupted and restarted
+Data processing with \texttt{doecslit} can be interrupted and restarted
 without a problem.  The pattern of one data processing run can be inherited
 by another run to speed up common or similar reduction tasks.
 
-The {\tt echelle} package has a full documentation set in the same style as
+The \texttt{echelle} package has a full documentation set in the same style as
 other IRAF packages.  On-line help describing the tasks and the parameters
-for each are available and accessible from the IRAF {\tt cl} shell.
+for each are available and accessible from the IRAF \texttt{cl} shell.
 
 The paper document {\sl A User's Guide to Reducing Echelle Spectra With
 IRAF} is an excellent introduction to the processing of \'{e}chelle data
@@ -1648,13 +1307,13 @@ user are included.  This document works through the steps of a reduction
 detail to get users started. Use of related tasks for plotting the
 data\sgspec{---}{ - }of which IRAF has many\sgspec{---}{ - }is described.
 
-{\tt doecslit} usage and parameters are documented in {\sl Guide to Slit
+\texttt{doecslit} usage and parameters are documented in {\sl Guide to Slit
 Spectra Reduction Task DOECSLIT}\@.  This is the paper reference document
 for the task.
 
 IRAF is supported by a team at NOAO\@.
 
-{\tt noao.imred.echelle}, supports two extraction weighting schemes:
+\texttt{noao.imred.echelle}, supports two extraction weighting schemes:
 
 \begin{itemize}
 
@@ -1662,7 +1321,7 @@ IRAF is supported by a team at NOAO\@.
       Weights all object pixels equally.
 
 \item {\bf{Variance.}} \mbox{}\\
-      An alternative name for the {\em optimal} extraction weighting
+      An alternative name for the \emph{optimal} extraction weighting
       method.
       Scheme weights each pixel by the product of the calculated profile
       $P(i,j)$ and an estimate of the uncertainty of the pixel intensity.
@@ -1671,22 +1330,22 @@ IRAF is supported by a team at NOAO\@.
 
 \subsubsection{\xlabel{midas_ech}\label{se_midas_ech}MIDAS\sgspec{---}{ - }CONTEXT ECHELLE}
 
-\htmlref{{\bf ESO}}{gl_eso} MIDAS provides a suite of commands and
+\htmlref{\textbf{ESO}}{gl_eso} MIDAS provides a suite of commands and
 options for the reduction of data from \'{e}chelle instruments.
 The software is contained within the MIDAS context ECHELLE\@.
 
-In a similar manner to the IRAF tasks in {\tt noao.imred.echelle},
+In a similar manner to the IRAF tasks in \texttt{noao.imred.echelle},
 the MIDAS ECHELLE context inherits command and parameter style from
 the host environment.
 
-Like {\tt noao.imred.echelle}, a full range of facilities for \'{e}chelle
+Like \texttt{noao.imred.echelle}, a full range of facilities for \'{e}chelle
 data reduction are provided.  The processing of CCD data into a format
 suitable for the ECHELLE context to work with is carried out using other
 tasks from MIDAS\@.  ECHELLE provides a set of about 30 commands arranged
 in five procedures to carry out the reduction.  Facilities for order
 location, extraction, wavelength calibration, and instrument response
 correction are provided.  Data can be read from
-\htmlref{{\bf FITS}}{gl_fits} or \htmlref{{\bf IHAP}}{gl_ihap} formats only.
+\htmlref{\textbf{FITS}}{gl_fits} or \htmlref{\textbf{IHAP}}{gl_ihap} formats only.
 MIDAS tables are used at some stages in the reduction process
 ({\em{e.g.}}, wavelength calibration).
 
@@ -1749,7 +1408,7 @@ Three extraction weighting schemes are available:
 
 The three packages briefly described \sgspec{above}{previously} can meet
 most \'{e}chelle data reduction requirements.  There are, however, other
-factors to be considered with basic functionality {\em etc.}
+factors to be considered with basic functionality \emph{etc.}
 
 Here's a table which lists some useful commands for each of the three
 packages mentioned previously:
@@ -1758,97 +1417,59 @@ packages mentioned previously:
 \begin{table}
 \begin{center}
 {\sl
-IRAF commands are from the {\tt noao.imred.echelle} package unless otherwise
+IRAF commands are from the \texttt{noao.imred.echelle} package unless otherwise
 stated.
 
 Starlink commands are part of ECHOMOP unless otherwise stated.
 
-All MIDAS commands are accessible once {\tt set/context echelle} has been done.
+All MIDAS commands are accessible once \texttt{set/context echelle} has been done.
 }
 \vspace*{11pt}
 
 \begin{tabular}{llll}
 \hline\hline
-{\bf Task}         & IRAF                   & STARLINK             & MIDAS                     \\
+\textbf{Task}         & IRAF                   & STARLINK             & MIDAS                     \\
 \hline\hline
-Rotate image       & {\tt images.rotate   } & {\tt FIGARO IROT90 } & {\tt ROTATE/ECHELLE     } \\
-                   &                        & {\tt KAPPA ROTATE  } &                           \\
-Subtract constant  & {\tt images.imarith  } & {\tt FIGARO ICSUB  } & {\tt COMPUTE/IMAGE      } \\
-from image         &                        & {\tt KAPPA CSUB    } &                           \\
-Divide images      & {\tt images.imdivide } & {\tt FIGARO IDIV   } & {\tt COMPUTE/IMAGE      } \\
-pixel-by-pixel     &                        & {\tt KAPPA DIV     } &                           \\
-Generate median of & {\tt noao.imred.     } & {\tt FIGARO MEDSKY } & {\tt AVERAGE/IMAGES     } \\
-several images     & {\tt ccdred.combine  } &                      &                           \\
-Order location     & {\tt apfind          } & {\tt ech\_trace    } & {\tt SEARCH/ORDER       } \\
-Order tracing      & {\tt aptrace         } & {\tt ech\_trace    } & {\tt DEFINE/ECHELLE     } \\
-                   &                        & {\tt ech\_fitord   } & {\tt DEFINE/HOUGH       } \\
-Slit definition    & {\tt apdefault       } & {\tt ech\_spatial  } & {\tt DEFINE/HOUGH       } \\
-                   & {\tt apedit          } & {\tt ech\_profile  } &                           \\
-Normalise          & {\tt apnormal        } & {\tt ech\_ffield   } & {\tt FLAT/ECHELLE $+$   } \\
-flat field         & {\tt apflatten       } &                      & {\tt COMPUTE/IMAGE      } \\
-Model scattered    & {\tt apscatter       } & {\tt ech\_mdlbck   } & {\tt BACKGROUND/ECHELLE } \\
+Rotate image       & \texttt{images.rotate   } & \texttt{FIGARO IROT90 } & \texttt{ROTATE/ECHELLE     } \\
+                   &                        & \texttt{KAPPA ROTATE  } &                           \\
+Subtract constant  & \texttt{images.imarith  } & \texttt{FIGARO ICSUB  } & \texttt{COMPUTE/IMAGE      } \\
+from image         &                        & \texttt{KAPPA CSUB    } &                           \\
+Divide images      & \texttt{images.imdivide } & \texttt{FIGARO IDIV   } & \texttt{COMPUTE/IMAGE      } \\
+pixel-by-pixel     &                        & \texttt{KAPPA DIV     } &                           \\
+Generate median of & \texttt{noao.imred.     } & \texttt{FIGARO MEDSKY } & \texttt{AVERAGE/IMAGES     } \\
+several images     & \texttt{ccdred.combine  } &                      &                           \\
+Order location     & \texttt{apfind          } & \texttt{ech\_trace    } & \texttt{SEARCH/ORDER       } \\
+Order tracing      & \texttt{aptrace         } & \texttt{ech\_trace    } & \texttt{DEFINE/ECHELLE     } \\
+                   &                        & \texttt{ech\_fitord   } & \texttt{DEFINE/HOUGH       } \\
+Slit definition    & \texttt{apdefault       } & \texttt{ech\_spatial  } & \texttt{DEFINE/HOUGH       } \\
+                   & \texttt{apedit          } & \texttt{ech\_profile  } &                           \\
+Normalise          & \texttt{apnormal        } & \texttt{ech\_ffield   } & \texttt{FLAT/ECHELLE $+$   } \\
+flat field         & \texttt{apflatten       } &                      & \texttt{COMPUTE/IMAGE      } \\
+Model scattered    & \texttt{apscatter       } & \texttt{ech\_mdlbck   } & \texttt{BACKGROUND/ECHELLE } \\
 light              &                        &                      &                           \\
-Model per-order    &                        & {\tt ech\_sky      } & {\tt DEFINE/SKY $+$     } \\
-`sky' background   &                        &                      & {\tt EXTRACT/SKY        } \\
-Extract            & {\tt apsum           } & {\tt ech\_extrct   } & {\tt EXTRACT/ECHELLE    } \\
-Locate arc lines   & {\tt ecidentify      } & {\tt ech\_linloc   } & {\tt SEARCH/ECHELLE     } \\
-Fit wavelength     & {\tt ecidentify      } & {\tt ech\_idwave   } & {\tt IDENTIFY/ECHELLE   } \\
+Model per-order    &                        & \texttt{ech\_sky      } & \texttt{DEFINE/SKY $+$     } \\
+`sky' background   &                        &                      & \texttt{EXTRACT/SKY        } \\
+Extract            & \texttt{apsum           } & \texttt{ech\_extrct   } & \texttt{EXTRACT/ECHELLE    } \\
+Locate arc lines   & \texttt{ecidentify      } & \texttt{ech\_linloc   } & \texttt{SEARCH/ECHELLE     } \\
+Fit wavelength     & \texttt{ecidentify      } & \texttt{ech\_idwave   } & \texttt{IDENTIFY/ECHELLE   } \\
 scales             &                        &                      &                           \\
-Blaze correct      & {\tt continuum       } & {\tt ech\_blaze    } & {\tt RIPPLE/ECHELLE     } \\
-flux calibrate     & {\tt calibrate       } & {\tt FIGARO SPFLUX } & {\tt RESPONSE/ECHELLE   } \\
-Scrunch            &                        & {\tt ech\_scrunch  } & {\tt REBIN/ECHELLE      } \\
-Merge              & {\tt scombine        } & {\tt ech\_mulmrg   } & {\tt MERGRE/ECHELLE     } \\
+Blaze correct      & \texttt{continuum       } & \texttt{ech\_blaze    } & \texttt{RIPPLE/ECHELLE     } \\
+flux calibrate     & \texttt{calibrate       } & \texttt{FIGARO SPFLUX } & \texttt{RESPONSE/ECHELLE   } \\
+Scrunch            &                        & \texttt{ech\_scrunch  } & \texttt{REBIN/ECHELLE      } \\
+Merge              & \texttt{scombine        } & \texttt{ech\_mulmrg   } & \texttt{MERGRE/ECHELLE     } \\
 \hline\hline
 \end{tabular}
 \end{center}
 \end{table}
 \end{latexonly}
-\begin{htmlonly}
-{\sl
-IRAF commands are from the {\tt noao.imred.echelle} package unless otherwise
-stated.\\
-Starlink commands are part of \xref{ECHOMOP}{sun152}{} unless otherwise stated.\\
-All MIDAS commands are accessible once {\tt set/context echelle} has been
-done.}
-\begin{rawhtml}
-<PRE>
-<HR><B>Task               IRAF             STARLINK       MIDAS</B>
-<HR>Rotate image       images.rotate    <A HREF="/sun86.htx/#xref_">FIGARO</A> <A HREF="/sun86.htx/#xref_IROT90">IROT90</A>  ROTATE/ECHELLE
-                                    <A HREF="/sun95.htx/#xref_">KAPPA</A> <A HREF="/sun95.htx/#xref_ROTATE">ROTATE</A>
-Subtract constant  images.imarith   FIGARO <A HREF="/sun86.htx/#xref_ICSUB">ICSUB</A>   COMPUTE/IMAGE
-from image                          KAPPA <A HREF="/sun95.htx/#xref_CSUB">CSUB</A>
-Divide images      images.imdivide  FIGARO <A HREF="/sun86.htx/#xref_IDIV">IDIV</A>    COMPUTE/IMAGE
-pixel-by-pixel                      KAPPA <A HREF="/sun95.htx/#xref_DIV">DIV</A>
-Generate median of noao.imred.      FIGARO <A HREF="/sun86.htx/#xref_MEDSKY">MEDSKY</A>  AVERAGE/IMAGES
-several images     ccdred.combine
-Order location     apfind           <A HREF="/sun152.htx/#xref_ech_trace">ech_trace</A>      SEARCH/ORDER
-Order tracing      aptrace          <A HREF="/sun152.htx/#xref_ech_trace">ech_trace</A>      DEFINE/ECHELLE
-                                    <A HREF="/sun152.htx/#xref_ech_fitord">ech_fitord</A>     DEFINE/HOUGH
-Slit definition    apdefault        <A HREF="/sun152.htx/#xref_ech_spatial">ech_spatial</A>    DEFINE/HOUGH
-                   apedit           <A HREF="/sun152.htx/#xref_ech_profile">ech_profile</A>
-Normalise          apnormal         <A HREF="/sun152.htx/#xref_ech_ffield">ech_ffield</A>     FLAT/ECHELLE +
-flat field         apflatten                       COMPUTE/IMAGE
-Model scattered    apscatter        <A HREF="/sun152.htx/#xref_ech_mdlbck">ech_mdlbck</A>     BACKGROUND/ECHELLE
-light
-Model per-order                     <A HREF="/sun152.htx/#xref_ech_sky">ech_sky</A>        DEFINE/SKY +
-`sky' background                                   EXTRACT/SKY
-Extract            apsum            <A HREF="/sun152.htx/#xref_ech_extrct">ech_extrct</A>     EXTRACT/ECHELLE
-Locate arc lines   ecidentify       <A HREF="/sun152.htx/#xref_ech_linloc">ech_linloc</A>     SEARCH/ECHELLE
-Fit wavelength     ecidentify       <A HREF="/sun152.htx/#xref_ech_idwave">ech_idwave</A>     IDENTIFY/ECHELLE
-scales
-Blaze correct      continuum        <A HREF="/sun152.htx/#xref_ech_blaze">ech_blaze</A>      RIPPLE/ECHELLE
-flux calibrate     calibrate        FIGARO <A HREF="/sun86.htx/#xref_SPFLUX">SPFLUX</A>  RESPONSE/ECHELLE
-Scrunch                             <A HREF="/sun152.htx/#xref_ech_scrunch">ech_scrunch</A>    REBIN/ECHELLE
-Merge              scombine         <A HREF="/sun152.htx/#xref_ech_mulmrg">ech_mulmrg</A>     MERGRE/ECHELLE<HR>
-</PRE>
-\end{rawhtml}
-\end{htmlonly}
+
+
 
 The availability of a package is important\sgspec{---}{ - }it may be difficult
 to get started with a package not already available at your
 site\sgspec{---}{ - }don't let this put you off, but be aware that some effort
 may have to be expended before you start to work with any data.
-If you are already an expert at the IRAF {\tt cl} then you may get
+If you are already an expert at the IRAF \texttt{cl} then you may get
 `up-to-speed' more quickly with the IRAF \'{e}chelle package as compared
 to learning a new environment from scratch.
 Similarly, it may be useful to use a package which a local colleague is
@@ -1857,7 +1478,7 @@ time they're using the package.
 
 It is worth considering the format of the data that you will receive
 from the observatory.  Most data will be provided in
-\htmlref{{\bf FITS}}{gl_fits} format.
+\htmlref{\textbf{FITS}}{gl_fits} format.
 Most software (all the above) can read FITS data.  (To get FITS information to
 a format accessible by ECHOMOP you should use \xref{KAPPA}{sun95}{}
 \xref{FITSIN}{sun95}{FITSIN} or \xref{FITSDIN}{sun95}{FITSDIN}.)
@@ -1875,104 +1496,71 @@ usable way\sgspec{---}{ - }or even at all\sgspec{---}{ - }in some cases.
 A point worth considering is the provision of bad-pixel masks.
 ECHOMOP allows the individual pixels to be excluded from an extraction
 by reference to the quality component of an NDF\@.  In IRAF you will
-have to interpolate across any cosmic rays {\em etc.}, prior to
+have to interpolate across any cosmic rays \emph{etc.}, prior to
 performing the extraction.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \section{\label{se_glossary}\xlabel{glossary}Glossary}
-\markboth{Glossary}{\stardocname}
-
-\begin{htmlonly}
-\htmlref{A}{gl_adu}
-\htmlref{B}{gl_bias_frame}
-\htmlref{C}{gl_centroiding}
-\htmlref{D}{gl_dark_current}
-\htmlref{E}{gl_echelle}
-\htmlref{F}{gl_figaro}
-\htmlref{G}{gl_ccd_gain}
-\htmlref{H}{gl_halation}
-\htmlref{I}{gl_ids}
-\htmlref{J}{gl_jkt}
-\htmlref{K}{gl_kappa}
-L
-% \htmlref{L}{gl_}
-\htmlref{M}{gl_midas}
-\htmlref{N}{gl_ndf}
-\htmlref{O}{gl_order_separation}
-\htmlref{P}{gl_periscopes}
-\htmlref{Q}{gl_qe}
-\htmlref{R}{gl_readout_noise}
-\htmlref{S}{gl_scanning}
-\htmlref{T}{gl_template_order}
-\htmlref{U}{gl_ucles}
-\htmlref{V}{gl_vlt}
-\htmlref{W}{gl_wht}
-X
-% \htmlref{X}{gl_}
-Y
-% \htmlref{Y}{gl_}
-\htmlref{Z}{gl_zero_sub}
-\end{htmlonly}
 
 \begin{itemize}
 
-\item {\bf\label{gl_adu}ADU}\\
+\item \textbf{\label{gl_adu}ADU}\\
       Literally, Analogue-to-Digital Units.  These are the raw numbers
       which emerge from a digitiser\sgspec{---}{ - }the ``counts'' per pixel
       read out from a CCD.
 
-\item {\bf\label{gl_arc_lamp}Arc lamp}\\
+\item \textbf{\label{gl_arc_lamp}Arc lamp}\\
       A lamp which burns with a characteristic spectrum which is used as
       a reference or comparison for the wavelength scale of a spectrum.
 
-\item {\bf\label{gl_aao_aat}AAO/AAT}\\
+\item \textbf{\label{gl_aao_aat}AAO/AAT}\\
       Anglo-Australian Observatory/Anglo-Australian Telescope.
 
-\item {\bf\label{gl_bias_frame}Bias frame}\\
+\item \textbf{\label{gl_bias_frame}Bias frame}\\
       An image generated from several raw CCD frames taken with no
       light incident upon the detector and of `zero' exposure time.
 
-\item {\bf\label{gl_blaze}Blaze, blaze angle}\\
+\item \textbf{\label{gl_blaze}Blaze, blaze angle}\\
       Literally, {\sl to cut\/} in this context.  Arises from the nature
-      of some \htmlref{{\bf gratings}}{gl_grating} where the grooves are
+      of some \htmlref{\textbf{gratings}}{gl_grating} where the grooves are
       non-symmetrical to
       concentrate the incident light in one or several orders on one
       side of the zero order of the image.
 
-\item {\bf\label{gl_blaze_correction}Blaze correction}\\
+\item \textbf{\label{gl_blaze_correction}Blaze correction}\\
       Process of normalising each order in an \'{e}chelle spectrum
       to remove the brightness variation due to the blaze angle.
       Sometimes called ripple removal or simply normalisation.
 
-\item {\bf\label{gl_bracketing}Bracketing}\\
+\item \textbf{\label{gl_bracketing}Bracketing}\\
       A term from photography.  Simply means taking reference exposures
-      before and after the `main' exposure {\bf bracketing} it in time.
+      before and after the `main' exposure \textbf{bracketing} it in time.
       Can be used to apply to a pair of series of exposures taken before
       and after science data.  For example, arc frames, flat-field frames
-      {\em etc.}, are usually collected both before and after observing to
+      \emph{etc.}, are usually collected both before and after observing to
       allow any time dependency to be found and, at least to a first order,
       compensated for.
 
-\item {\bf\label{gl_centroiding}Centroiding}\\
+\item \textbf{\label{gl_centroiding}Centroiding}\\
       Process of estimating the true position of the centre of a spectral
       order in the spatial direction, where the shape of the profile of
       the order can be predicted and the profile is under-sampled.
 
-      A similar process occurs in \htmlref{{\bf IPCS}}{gl_ipcs} cameras to
+      A similar process occurs in \htmlref{\textbf{IPCS}}{gl_ipcs} cameras to
       locate photon ``events'' (usually with sub-pixel accuracy).
 
-\item {\bf\label{gl_collimator}Collimator}\\
+\item \textbf{\label{gl_collimator}Collimator}\\
       Optical element which produces a light beam in which the rays
       are (at least very nearly) parallel.
 
-\item {\bf\label{gl_comparison}Comparison Spectrum}\\
+\item \textbf{\label{gl_comparison}Comparison Spectrum}\\
       A spectrum from a known source, typically an
-      \htmlref{{\bf arc lamp}}{gl_arc},
+      \htmlref{\textbf{arc lamp}}{gl_arc},
       used as a reference for the modelling of the wavelength scale of
       spectra.
 
-\item {\bf\label{gl_cosmic_ray}Cosmic-ray hit}\\
+\item \textbf{\label{gl_cosmic_ray}Cosmic-ray hit}\\
       Extra signal present in CCD images due to the incidence of a cosmic
       ray on the detector during an integration.  Cosmic-ray hits appear
       as bright spots, usually occupying only a few pixels on the detector.
@@ -1986,42 +1574,42 @@ Y
       two or more exposures of the same spectrum in the same instrument
       configuration and compare them or take a median.
 
-\item {\bf\label{gl_cross_dispersion}Cross-dispersion}\\
+\item \textbf{\label{gl_cross_dispersion}Cross-dispersion}\\
       The direction perpendicular to that in which a spectrum is
       dispersed.  In an \'{e}chelle spectrograph a {\sl cross-dispersing}
       optical element is used to separate orders in the
       direction perpendicular to the dispersion.
 
-\item {\bf\label{gl_ccd}CCD}\\
+\item \textbf{\label{gl_ccd}CCD}\\
       Charge-Coupled Device.   For astronomy, the most commonly used
       optical imaging sensor.
 
-\item {\bf\label{gl_ccdpack}CCDPACK}\\
+\item \textbf{\label{gl_ccdpack}CCDPACK}\\
       A Starlink package for the preparation of CCD data for reduction.
       Includes tools for managing the processing of large numbers of
       images.  Described in \xref{SUN/139}{sun139}{}.
 
-\item {\bf\label{gl_convert}CONVERT}\\
+\item \textbf{\label{gl_convert}CONVERT}\\
       A Starlink utility package for converting between different image
       formats.  Described in \xref{SUN/55}{sun55}{}.
 
-\item {\bf\label{gl_dark_currrent}Dark current}\\
+\item \textbf{\label{gl_dark_currrent}Dark current}\\
       Electrons released in a detector (often a CCD) by the action of
       the thermal energy of the body of the detector.
 
-\item {\bf\label{gl_dark_frame}Dark Frame}\\
+\item \textbf{\label{gl_dark_frame}Dark Frame}\\
       An exposure taken with the shutter closed.  Typically, the
       exposure time used is similar to that selected for the object
       frames in an observing run.  Dark frames give an estimate of
-      the background level due to \htmlref{{\bf dark current}}{gl_dark_current}
+      the background level due to \htmlref{\textbf{dark current}}{gl_dark_current}
       in a CCD.
 
-\item {\bf\label{gl_dekker}Dekker}\\
+\item \textbf{\label{gl_dekker}Dekker}\\
       A fork-shaped part of the slit assembly of a spectrograph which
       sets the length of the slit.  This limits the size of the light
       beam in the direction perpendicular to the spectrograph dispersion.
 
-\item {\bf\label{gl_dispersion}Dispersion}\\
+\item \textbf{\label{gl_dispersion}Dispersion}\\
       A measure of the `power' of a spectrograph. A dimensionless number,
       typically given in \AA mm${}^{-1}$.  This number arises by dividing
       the true
@@ -2030,56 +1618,56 @@ Y
 
       Also the act of splitting light into its components by wavelength.
 
-\item {\bf\label{gl_dipso}DIPSO}\\
+\item \textbf{\label{gl_dipso}DIPSO}\\
       A self-styled ``friendly spectral analysis program'' in
       widespread use in the community.  Described in
       \xref{SUN/50}{sun50}{}.
 
-\item {\bf\label{gl_dst}DST}\\
+\item \textbf{\label{gl_dst}DST}\\
       A data format used by early versions of \xref{FIGARO}{sun86}{}\@.
       The \xref{CONVERT}{sun55}{} utility provides facilities for
       translating DST files to NDF.
 
-\item {\bf\label{gl_echelle}Echelle}\\
+\item \textbf{\label{gl_echelle}Echelle}\\
       Literally, from the French, {\sl Ladder.}
-      A \htmlref{{\bf grating}}{gl_grating} in which the
+      A \htmlref{\textbf{grating}}{gl_grating} in which the
       lines are ruled much further apart than those of an ordinary
       diffraction grating.  This gives the \'{e}chelle a very high
       resolution over a short wavelength range when the high orders are
       used.
 
-\item {\bf\label{gl_eso}ESO}\\
+\item \textbf{\label{gl_eso}ESO}\\
       \htmladdnormallink{European Southern Observatory}
       {http://http.hq.eso.org/}.
 
-\item {\bf\label{gl_figaro}FIGARO}\\
+\item \textbf{\label{gl_figaro}FIGARO}\\
       A general astronomical data reduction package.  Available in
       several flavours.  The Starlink version is described in
       \xref{SUN/86}{sun86}{}.
 
-\item {\bf\label{gl_fits}FITS}\\
+\item \textbf{\label{gl_fits}FITS}\\
       Flexible Image Transport System.  The most commonly used format
       format for astronomical image data storage.
 
-\item {\bf\label{gl_flat_field}Flat field, flat fielding}\\
-      A {\bf flat field} is one illuminated with some uniform source.
+\item \textbf{\label{gl_flat_field}Flat field, flat fielding}\\
+      A \textbf{flat field} is one illuminated with some uniform source.
       Used to determine the relative sensitivity of the elements
       (pixels) in a system.
 
-      {\bf Flat fielding} is the process of dividing by a normalised
+      \textbf{Flat fielding} is the process of dividing by a normalised
       flat-field to remove the sensitivity variations of a system.
 
-\item {\bf\label{gl_fsr}Free Spectral Range (FSR)}\\
+\item \textbf{\label{gl_fsr}Free Spectral Range (FSR)}\\
       The part of an \'{e}chelle order spectrum which ``belongs'' to that
       order, {\it{i.e.}}, the wavelength range over which this order is the
       brightest of the orders in the \'{e}chellogram.
 
-\item {\bf\label{gl_ccd_gain}Gain, Output transfer function}\\
-      The number of \htmlref{{\bf ADU}}{gl_adu}
+\item \textbf{\label{gl_ccd_gain}Gain, Output transfer function}\\
+      The number of \htmlref{\textbf{ADU}}{gl_adu}
       counts per electron ({\it{i.e.}} per photon)
       in the output signal from a CCD camera.
 
-\item {\bf\label{gl_grating}Grating, diffraction grating}\\
+\item \textbf{\label{gl_grating}Grating, diffraction grating}\\
       Optical element ruled with (usually) thousands of fine parallel
       lines which produce interference patterns when light is incident
       upon them.  Can be used as the main dispersing element in a
@@ -2090,71 +1678,71 @@ Y
       $\lambda$ is a selected wavelength, $d$ is the rule spacing, and
       $\theta$ is the angle of incidence of light.
 
-\item {\bf\label{gl_ghrs}GHRS}\\
+\item \textbf{\label{gl_ghrs}GHRS}\\
       Goddard High-Resolution spectrograph.  An instrument on the
       Hubble Space Telescope.
 
-\item {\bf\label{gl_halation}Halation}\\
+\item \textbf{\label{gl_halation}Halation}\\
       A term originally used in photography to denote the process by which
       the image in a developed emulsion is spread beyond the bounds of the
       incident light.  Is used to describe the spreading of light from
       one order to the next in an \'{e}chelle spectrogram.
 
-\item {\bf\label{gl_hst}HST}\\
+\item \textbf{\label{gl_hst}HST}\\
       Hubble Space Telescope.
 
-\item {\bf\label{gl_ids}IDS}\\
+\item \textbf{\label{gl_ids}IDS}\\
       Intermediate Dispersion Spectrograph.  An instrument at the
       ING\@.
 
-\item {\bf\label{gl_ihap}IHAP}\\
+\item \textbf{\label{gl_ihap}IHAP}\\
       An image format used by MIDAS.  This format is available for
       input to MIDAS for backward-compatibility with some of the
       data acquisition systems at the La Silla Observatory.
 
-\item {\bf\label{gl_ing}ING}\\
+\item \textbf{\label{gl_ing}ING}\\
       The Isaac Newton Group of telescopes at the RGO on La Palma.
 
-\item {\bf\label{gl_int}INT}\\
+\item \textbf{\label{gl_int}INT}\\
       Isaac Newton Telescope at the La Palma Observatory.
 
-\item {\bf\label{gl_ipcs}IPCS}\\
+\item \textbf{\label{gl_ipcs}IPCS}\\
       Image Photon Counting System.  A common optical image sensor,
-      has zero \htmlref{{\bf readout noise}}{gl_readout_noise} and good blue
+      has zero \htmlref{\textbf{readout noise}}{gl_readout_noise} and good blue
       response.
 
-\item {\bf\label{gl_iraf}IRAF}\\
+\item \textbf{\label{gl_iraf}IRAF}\\
       Image Reduction and Analysis Facility.
 
-\item {\bf\label{gl_isis}ISIS}\\
+\item \textbf{\label{gl_isis}ISIS}\\
       A twin spectrograph at the WHT.  The two `arms' are optimised
       for response in the red and blue regions of the optical waveband.
 
-\item {\bf\label{gl_iue}IUE}\\
+\item \textbf{\label{gl_iue}IUE}\\
       International Ultraviolet Explorer.
 
-\item {\bf\label{gl_jkt}JKT}\\
+\item \textbf{\label{gl_jkt}JKT}\\
       Jacobus Kapteyn Telescope at the La Palma Observatory.
 
-\item {\bf\label{gl_kappa}KAPPA}\\
+\item \textbf{\label{gl_kappa}KAPPA}\\
       The Starlink Kernel Application Package.  A suite of facilities
       for processing and viewing astronomical images.
       Described in \xref{SUN/95}{sun95}{}.
 
-\item {\bf\label{gl_midas}MIDAS}\\
+\item \textbf{\label{gl_midas}MIDAS}\\
       Munich Image Data Analysis System.  A complete package for the
       handling of astronomical data written and maintained by a team
       at ESO.
 
-\item {\bf\label{gl_ndf}NDF}\\
+\item \textbf{\label{gl_ndf}NDF}\\
       The Standard Starlink data storage format.  An hierarchical format for
       multi-dimensional data storage.  Accessed using libraries supported
       by Starlink.  NDF is described in \xref{SUN/33}{sun33}{}.
 
-\item {\bf\label{gl_noao}NOAO}\\
+\item \textbf{\label{gl_noao}NOAO}\\
       National Optical Astronomical Observatories.
 
-\item {\bf\label{gl_order_separation}Order separation}\\
+\item \textbf{\label{gl_order_separation}Order separation}\\
       The gap between adjacent orders in an \'{e}chelle image.
       There is a compromise between the spectral range covered and the
       distance between orders.  (If the orders are close together more fit
@@ -2162,144 +1750,143 @@ Y
       When working with non-starlike objects a larger order separation
       is desirable otherwise the signal from adjacent orders may overlap.
 
-\item {\bf\label{gl_overscan}Overscan, overscan region}\\
+\item \textbf{\label{gl_overscan}Overscan, overscan region}\\
       The action of clocking a raster sensor ({\em{e.g.}}, CCD) for more
       cycles than the number of signal collection sites in the
       detector line.  This leads to additional `empty' pixels in the
       row as read out from the detector.  On an image display this
-      will appear as a band along the edge of the image, the {\bf
-      overscan region.}  Used to determine the zero-point of the
-      analogue circuit of the camera, {\em i.e.}, for no signal input
+      will appear as a band along the edge of the image, the \textbf{overscan region.}  Used to determine the zero-point of the
+      analogue circuit of the camera, \emph{i.e.}, for no signal input
       to the system from the detector.
 
-\item {\bf\label{gl_periscopes}Periscope(s)}\\
+\item \textbf{\label{gl_periscopes}Periscope(s)}\\
       Optical arrangement which feeds light (usually from the sky
       background) into the slit of a spectrograph.  These can be used
       when the object being observed would otherwise fill the slit
       and so no sky signal would be recorded.
 
-\item {\bf\label{gl_prism}Prism}\\
+\item \textbf{\label{gl_prism}Prism}\\
       Usually, a wedge-shaped optical element which disperses light
       passing through it.  The name arises from the Greek {\sl prisma
       prismatos}, `thing sawn' (well that's what it says in the
       dictionary anyway\ldots)
 
-\item {\bf\label{gl_qe}Quantum Efficiency, QE}\\
+\item \textbf{\label{gl_qe}Quantum Efficiency, QE}\\
       The ratio of the number of photoelectrons produced to the number
       of photons incident upon a detector.  CCDs have QEs of about
       50\% or greater at optical wavelengths.
 
-\item {\bf\label{gl_dral}RAL}\\
+\item \textbf{\label{gl_dral}RAL}\\
       Rutherford Appleton Laboratory.  The Starlink project is
       run from RAL.
 
-\item {\bf\label{gl_readout_noise}Readout noise}\\
+\item \textbf{\label{gl_readout_noise}Readout noise}\\
       In this context, usually means the signal measured for no input
       signal for a detector such as a CCD.
 
-\item {\bf\label{gl_resolution}Resolution}\\
+\item \textbf{\label{gl_resolution}Resolution}\\
       The difference in wavelength between two (notional) features
       which can be just distinguished in the spectrum.
 
-\item {\bf\label{gl_resolving_power}Resolving power}\\
+\item \textbf{\label{gl_resolving_power}Resolving power}\\
       The value $\lambda/\Delta\lambda$ where $\lambda$ is the wavelength
       at some point in a spectrum and $\Delta\lambda$ is the resolution
       at that wavelength.
 
-\item {\bf\label{gl_scanning}Scan, scanning}\\
+\item \textbf{\label{gl_scanning}Scan, scanning}\\
       Process of determining the approximate position of orders in a
       spectral image.  In the case of \'{e}chelle spectra this allows
       you to select which orders you wish to extract.
 
-\item {\bf\label{gl_slit}Slit}\\
+\item \textbf{\label{gl_slit}Slit}\\
       Usually narrow entry point for light to a spectrograph.
       The slit is often made from a pair of ordinary razor blades which can
       be machined to achieve very straight edges.  This gives a precisely
       determined light source for the instrument.
 
-\item {\bf\label{gl_spectrograph}Spectrograph}\\
+\item \textbf{\label{gl_spectrograph}Spectrograph}\\
       An instrument for separating and recording the spectral components of
       light.  Contemporary instruments use electronic cameras to record the
       spectra.
 
-\item {\bf\label{gl_starlink}Starlink}\\
+\item \textbf{\label{gl_starlink}Starlink}\\
       UK national network of computers for astronomical data reduction
       and the organisation which manages the network.
 
-\item {\bf\label{gl_stray_light}Stray light}\\
+\item \textbf{\label{gl_stray_light}Stray light}\\
       Light which arises within an instrument due to reflections from
       surfaces not intended to act as optical elements.
 
-\item {\bf\label{gl_sdf}SDF}\\
+\item \textbf{\label{gl_sdf}SDF}\\
       Starlink Data File.  A file with the extension \verb+.sdf+
       accessible via Starlink software or libraries.
 
-\item {\bf\label{gl_stsdas}STSDAS}\\
+\item \textbf{\label{gl_stsdas}STSDAS}\\
       Space Telescope Science Data Analysis System.  A package written
-      for \htmlref{{\bf HST}}{gl_hst} data reduction, closely integrated
-      with \htmlref{{\bf IRAF}}{gl_iraf}.
+      for \htmlref{\textbf{HST}}{gl_hst} data reduction, closely integrated
+      with \htmlref{\textbf{IRAF}}{gl_iraf}.
 
-\item {\bf\label{gl_template_order}Template, order}\\
+\item \textbf{\label{gl_template_order}Template, order}\\
       A description of the position of spectral orders in an image
       as determined by tracing the orders.  The traced orders in one image
       being used to predict the position of the orders in a second image
       taken with the same instrumental configuration.
 
-\item {\bf\label{gl_template_reduct}Template, reduction}\\
+\item \textbf{\label{gl_template_reduct}Template, reduction}\\
       A set of commands and/or parameter values which are appropriate for a
       general type of data reduction operation.  Usually in the form of a
       {\sl data reduction script} which can be quickly tailored for a
       particular reduction task.
 
-\item {\bf\label{gl_throughput}Throughput}\\
+\item \textbf{\label{gl_throughput}Throughput}\\
       A measure of the overall efficiency of an optical system.
       For optical telescope/spectrograph combinations this will be of
       the order of a few to tens of percent.
 
-\item {\bf\label{gl_tracing}Tracing}\\
+\item \textbf{\label{gl_tracing}Tracing}\\
       The Process of finding the path of a spectrum or order of a spectrum
       across an image frame.
 
-\item {\bf\label{gl_ucles}UCLES}\\
+\item \textbf{\label{gl_ucles}UCLES}\\
       University College London Echelle Spectrograph.
       A medium-resolution instrument in the coud\'{e} room at the
-      \htmlref{{\bf AAT}}{gl_aao_aat}.
+      \htmlref{\textbf{AAT}}{gl_aao_aat}.
 
-\item {\bf\label{gl_ues}UES}\\
+\item \textbf{\label{gl_ues}UES}\\
       Utrecht Echelle Spectrograph.
       Northern hemisphere `twin' of the UCLES at the WHT, has a
       different control system but similar optical design.
 
-\item {\bf\label{gl_uhrf}UHRF}\\
+\item \textbf{\label{gl_uhrf}UHRF}\\
       Ultra-High Resolution Facility of the UCLES.  An (up to)
       diffraction-limited resolution spectrograph for the
-      \htmlref{{\bf AAT}}{aao_aat}\@.
+      \htmlref{\textbf{AAT}}{aao_aat}\@.
       Uses some of the optics of the UCLES.
 
-\item {\bf\label{gl_vicar}VICAR}\\
+\item \textbf{\label{gl_vicar}VICAR}\\
       Literally {\sl Video Image Communication and Retrieval.}
       A format used for some images notably those for most data
-      from the \htmlref{{\bf IUE}}{gl_iue} satellite.
+      from the \htmlref{\textbf{IUE}}{gl_iue} satellite.
 
-\item {\bf\label{gl_vlt}VLT}\\
+\item \textbf{\label{gl_vlt}VLT}\\
       Very Large Telescope.  Usually refers to the ESO VLT, but can
       also refer to very-large telescopes in the general sense.
 
-\item {\bf\label{gl_wht}WHT}\\
+\item \textbf{\label{gl_wht}WHT}\\
       William Herschel Telescope.  4.2m telescope at the RGO on La Palma.
 
-\item {\bf\label{gl_zero_sub}Zero subtraction}\\
+\item \textbf{\label{gl_zero_sub}Zero subtraction}\\
       Process of the removal of the instrument zero-signal level as
       determined by measuring the signal in the
-      \htmlref{{\bf overscan region}}{gl_overscan} of a CCD image.
+      \htmlref{\textbf{overscan region}}{gl_overscan} of a CCD image.
 
-% \item {\bf\label{gl_}}\\
+% \item \textbf{\label{gl_}}\\
 
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
-\markboth{References}{\stardocname}
+
 \label{se_references}\xlabel{references}
 \begin{thebibliography}{999}\addcontentsline{toc}{section}{References}
 
@@ -2315,7 +1902,7 @@ Y
 
 \bibitem{echref} Michael Bessell and Max Pettini,\\
       {\sl UCLES Spectrum of the Thorium-Argon Hollow-Cathode Lamp,}\\
-      \htmlref{{\bf AAO}}{gl_aao_aat} UM 28.1, January 1991.
+      \htmlref{\textbf{AAO}}{gl_aao_aat} UM 28.1, January 1991.
 
 \bibitem{hamilton} Christopher W.~Churchill,\\
       {\sl Introduction to Echelle Data Reduction Using the Image
@@ -2391,7 +1978,7 @@ Y
       {\sl
       \htmladdnormallink{IRAF Tutorials: Echelle Slit Reductions with DOECSLIT}
       {http://www.starlink.ac.uk/iraf/web/tutorials/doecslit/doecslit.html},}\\
-      {\tt http://www.starlink.ac.uk/iraf/web/tutorials/doecslit/doecslit.html},
+      \texttt{http://www.starlink.ac.uk/iraf/web/tutorials/doecslit/doecslit.html},
       \\
       April 1994.
 
