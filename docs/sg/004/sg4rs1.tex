@@ -3,8 +3,6 @@
 
 \chapter{ICL}
 \label{C_rsicl}
-\pagestyle{myheadings}
-\markboth{Reference}{\stardocname}
 
 \small
 
@@ -28,7 +26,7 @@ Statements are first entered into a procedure, then the procedure is
 executed.
 \end{description}
 
-\item [Data types] ---
+\item [Data types ---]
 
 \begin{description}
 \item[Real]
@@ -37,13 +35,13 @@ executed.
 \item[String]
 \end{description}
 
-\item [Expression] ---
+\item [Expression--- ]
 
 \begin{verbatim}
     value [operator value operator value ...]
 \end{verbatim}
 
-\item [Value] ---
+\item [Value--- ]
 
 \begin{description}
 \item [Constant:] \mbox{}
@@ -62,7 +60,7 @@ executed.
 See below.
 \end{description}
 
-\item [Operator] ---
+\item [Operator--- ]
 
 \begin{quote}
 \begin{tabular}{cl}
@@ -81,7 +79,7 @@ See below.
 \end{description}
 \end{quote}
 
-\item [Statement] ---
+\item [Statement--- ]
 
 Normally one statement per line.
 A tilde (\verb%~%) at the end of a line indicates that the statement continues
@@ -164,7 +162,7 @@ You can escape from a loop via a BREAK statement.
 \end{description}
 \end{description}
 
-\item [Command Search Path] ---
+\item [Command Search Path--- ]
 
 \begin{enumerate}
 \item User defined commands (defined by DEFSTRING, DEFUSER, DEFPROC)
@@ -183,196 +181,196 @@ Commands relevant mainly to data acquisition are omitted.
 A full list is contained in \xref{SG/5}{sg5}{}.
 \begin{description}
 
-\item [Information \& Escape] ---
+\item [Information \& Escape--- ]
 
 \begin{quote}
 \begin{description}
-\item[HELP] :
+\item[HELP:]
  Display on-line documentation.
-\item[EXIT] :
+\item[EXIT:]
  Exit from ICL.
 \end{description}
 \end{quote}
 
-\item [Defining user commands] ---
+\item [Defining user commands--- ]
 
 \begin{quote}
 \begin{description}
-\item[DEFSTRING] :
+\item[DEFSTRING:]
  Associate a command with an equivalence string.
-\item[DEFINE] :
+\item[DEFINE:]
  Define a command to run an ADAM task.
-\item[DEFUSER] :
+\item[DEFUSER:]
  Associate a command with a user written subroutine.
-\item[DEFPROC] :
+\item[DEFPROC:]
  Associate a command with a procedure.
 \end{description}
 \end{quote}
 
-\item [I/O] ---
+\item [I/O--- ]
 
 \begin{description}
 \item [Terminal I/O:] \mbox{}
 \begin{description}
-\item[PRINT] :
+\item[PRINT:]
  Output to the terminal.
-\item[INPUT] :
+\item[INPUT:]
  Input a string.
-\item[INPUTI] :
+\item[INPUTI:]
  Input integers.
-\item[INPUTL] :
+\item[INPUTL:]
  Input logical values.
-\item[INPUTR] :
+\item[INPUTR:]
  Input real numbers.
 \end{description}
 \item [Screen mode:] \mbox{}
 \begin{description}
-\item[SET SCREEN] :
+\item[SET SCREEN:]
  Set screen I/O mode.
-\item[SET NOSCREEN] :
+\item[SET NOSCREEN:]
  Set normal I/O mode.
-\item[SET ATTRIBUTES] :
+\item[SET ATTRIBUTES:]
  Set attributes for text written with the LOCATE command.
-\item[LOCATE] :
+\item[LOCATE:]
  Write to screen at specified position.
-\item[CLEAR] :
+\item[CLEAR:]
  Clear lines in a specified range.
 \end{description}
 \item [Keyboard facilities:] \mbox{}
 \begin{description}
-\item[KEY] :
+\item[KEY:]
  Define an equivalence string for a key.
-\item[KEYTRAP] :
+\item[KEYTRAP:]
  Specify trapping of a key.
-\item[KEYOFF] :
+\item[KEYOFF:]
  Turn off trapping of a key.
 \end{description}
 \item [File I/O:] \mbox{}
 \begin{description}
-\item[CREATE] :
+\item[CREATE:]
  Create a file and open it for output.
-\item[OPEN] :
+\item[OPEN:]
  Open an existing file for input.
-\item[APPEND] :
+\item[APPEND:]
  Open an existing file for appending.
-\item[CLOSE] :
+\item[CLOSE:]
  Close a file opened with CREATE, OPEN, or APPEND.
-\item[WRITE] :
+\item[WRITE:]
  Write to a file.
-\item[READ] :
+\item[READ:]
  Read a string from a file.
-\item[READI] :
+\item[READI:]
  Read integers from a file.
-\item[READL] :
+\item[READL:]
  Read logical values from a file.
-\item[READR] :
+\item[READR:]
  Read real numbers from a file.
 \end{description}
 \end{description}
 
-\item [Access to DCL] ---
+\item [Access to DCL--- ]
 
 \begin{description}
 \item [General:] \mbox{}
 \begin{description}
-\item[\$] :
+\item[\$:]
  Issue a DCL command.
-\item[SPAWN] :
+\item[SPAWN:]
  Spawn a subprocess to issue one or more DCL commands.
-\item[DEFAULT] :
+\item[DEFAULT:]
  Set/Show default directory.
 \end{description}
 \item [Managing tape drives:] \mbox{}
 \begin{description}
-\item[ALLOC] :
+\item[ALLOC:]
  Allocate a device.
-\item[DEALLOC] :
+\item[DEALLOC:]
  Deallocate a device.
-\item[MOUNT] :
+\item[MOUNT:]
  Mount a tape.
-\item[DISMOUNT] :
+\item[DISMOUNT:]
  Dismount a tape.
 \end{description}
 \end{description}
 
-\item [Parameters] ---
+\item [Parameters--- ]
 
 \begin{quote}
 \begin{description}
-\item[SETPAR] :
+\item[SETPAR:]
  Set the value of a parameter where the program has an associated command.
-\item[GETPAR] :
+\item[GETPAR:]
  Get the value of a parameter where the program has an associated command.
-\item[CREATEGLOBAL] :
+\item[CREATEGLOBAL:]
  Create a global parameter.
-\item[SETGLOBAL] :
+\item[SETGLOBAL:]
  Set the value of a global parameter.
-\item[GETGLOBAL] :
+\item[GETGLOBAL:]
  Get the value of a global parameter into an ICL variable.
 \end{description}
 \end{quote}
 
-\item [Procedures] ---
+\item [Procedures--- ]
 
 \begin{description}
 \item [Listing and editing:] \mbox{}
 \begin{description}
-\item[LIST] :
+\item[LIST:]
  List a procedure.
-\item[PROCS] :
+\item[PROCS:]
  List procedure names.
-\item[VARS] :
+\item[VARS:]
  List procedure variables.
-\item[EDIT] :
+\item[EDIT:]
  Edit a procedure.
-\item[SET EDITOR] :
+\item[SET EDITOR:]
  Change the editor (TPU, EDT, or LSE) used by EDIT.
 \end{description}
 \item [Saving and loading:] \mbox{}
 \begin{description}
-\item[SAVE] :
+\item[SAVE:]
  Save a procedure.
-\item[LOAD] :
+\item[LOAD:]
  Accept commands from a saved procedure.
-\item[DELETE] :
+\item[DELETE:]
  Delete a procedure.
 \end{description}
 \item [Tracing execution:] \mbox{}
 \begin{description}
-\item[SET TRACE] :
+\item[SET TRACE:]
  Switch tracing of procedures ON.
-\item[SET NOTRACE] :
+\item[SET NOTRACE:]
  Switch tracing of procedures OFF.
 \end{description}
 \end{description}
 
-\item [Errors and Exceptions] ---
+\item [Errors and Exceptions--- ]
 
 \begin{quote}
 \begin{description}
-\item[SIGNAL] :
+\item[SIGNAL:]
  Signal an ICL exception.
 \end{description}
 \end{quote}
 
-\item [Help system] ---
+\item [Help system--- ]
 
 \begin{quote}
 \begin{description}
-\item[DEFHELP] :
+\item[DEFHELP:]
  Define the source of help information.
 \end{description}
 \end{quote}
 
-\item [Miscellaneous] ---
+\item [Miscellaneous--- ]
 
 \begin{quote}
 \begin{description}
-\item[TASKS] :
+\item[TASKS:]
  List all loaded tasks.
-\item[SAVEINPUT] :
+\item[SAVEINPUT:]
  Save previous input lines in a text file.
-\item[SETPRECISION] :
+\item[SETPRECISION:]
  Set the number of decimal digits precision for unformatted conversions
  of real values to strings.
 \end{description}
@@ -386,119 +384,114 @@ symbol in the {\em Type} column stands for `Real or Integer').
 
 \begin{description}
 
-\item [Mathematical Functions] ---
+\item [Mathematical Functions--- ]
 
-\begin{tabbing}
-VARIABLE(proc,X)xxxx\=Logicalxxx\=\kill
-{\em Name} \> {\em Type} \> {\em Definition} \\
+\begin{tabular}{l l l}
+{\em Name} & {\em Type} & {\em Definition} \\
 \\
-SIN(X) \> Real \> Trig. functions (x in radians). \\
-COS(X) \> Real \\
-TAN(X) \> Real \\
-SIND(X) \> Real \> Trig. functions (x in degrees). \\
-COSD(X) \> Real \\
-TAND(X) \> Real \\
-ASIN(X) \> Real \> $\sin^{-1} x \; where -1 \leq x \leq 1 $;
+SIN(X) & Real & Trig. functions (x in radians). \\
+COS(X) & Real \\
+TAN(X) & Real \\
+SIND(X) & Real & Trig. functions (x in degrees). \\
+COSD(X) & Real \\
+TAND(X) & Real \\
+ASIN(X) & Real & $\sin^{-1} x \; where -1 \leq x \leq 1 $;
  $ -\pi/2 \leq result \leq \pi/2$.\\
-ACOS(X) \> Real \> $\cos^{-1} x \; where -1 \leq x \leq 1 $;
+ACOS(X) & Real & $\cos^{-1} x \; where -1 \leq x \leq 1 $;
  $ 0 \leq result \leq \pi$.\\
-ATAN(X) \> Real \> $\tan^{-1} x $; $ -\pi/2 \leq result \leq \pi/2$.\\
-ATAN2(X1,X2) \> Real \> $\tan^{-1} (x_{1}/x_{2}) $; $ -\pi < result \leq \pi $.\\
-ASIND(X) \> Real \> Inverse trig functions in degrees. \\
-ACOSD(X) \> Real \\
-ATAND(X) \> Real \\
-ATAN2D(X1/X2) \> Real \\
-SINH(X) \> Real \> Hyperbolic functions. \\
-COSH(X) \> Real \\
-TANH(X) \> Real \\
-ABS(X) \> * \> $\mid x \mid$.\\
-DIM(X1,X2) \> * \> Positive difference between $x_1$ and $x_2$. \\
-EXP(X) \> Real \> $e^{x}$. \\
-LOG(X) \> Real \> $\ln x$.\\
-LOG10(X) \> Real \> $\log_{10} x $.\\
-MIN(X1,X2,...) \> * \> Minimum of two or more arguments. \\
-MAX(X1,X2,...) \> * \> Maximum of two or more arguments. \\
-MOD(X1,X2) \> * \> Remainder when $x_1$ is divided by $x_2$. \\
-SIGN(X1,X2) \> * \> Transfer of sign $\mid x_1 \mid$ Sign $x_2$. \\
-SQRT(X) \> Real \> $\sqrt{x}$.\\
-\end{tabbing}
+ATAN(X) & Real & $\tan^{-1} x $; $ -\pi/2 \leq result \leq \pi/2$.\\
+ATAN2(X1,X2) & Real & $\tan^{-1} (x_{1}/x_{2}) $; $ -\pi < result \leq \pi $.\\
+ASIND(X) & Real & Inverse trig functions in degrees. \\
+ACOSD(X) & Real \\
+ATAND(X) & Real \\
+ATAN2D(X1/X2) & Real \\
+SINH(X) & Real & Hyperbolic functions. \\
+COSH(X) & Real \\
+TANH(X) & Real \\
+ABS(X) & * & $\mid x \mid$.\\
+DIM(X1,X2) & * & Positive difference between $x_1$ and $x_2$. \\
+EXP(X) & Real & $e^{x}$. \\
+LOG(X) & Real & $\ln x$.\\
+LOG10(X) & Real & $\log_{10} x $.\\
+MIN(X1,X2,...) & * & Minimum of two or more arguments. \\
+MAX(X1,X2,...) & * & Maximum of two or more arguments. \\
+MOD(X1,X2) & * & Remainder when $x_1$ is divided by $x_2$. \\
+SIGN(X1,X2) & * & Transfer of sign $\mid x_1 \mid$ Sign $x_2$. \\
+SQRT(X) & Real & $\sqrt{x}$.\\
+\end{tabular}
 
-\item [Formatting and String Handling Functions] ---
+\item [Formatting and String Handling Functions--- ]
 
-\begin{tabbing}
-VARIABLE(proc,X)xxxx\=Logicalxxx\=\kill
-BIN(I,n,m) \> String \> Integer I formatted in binary into an n char string \\
- \> \> with m significant digits. \\
-DEC(I,n,m) \> String \> Integer I formatted in decimal into an n char string \\
- \> \> with m significant digits. \\
-HEX(I,n.m) \> String \> Integer I formatted in hexadecimal into an n char string \\
- \> \> with m significant digits. \\
-OCT(I,n,m) \> String \> Integer I formatted in octal into an n char string \\
- \> \> with m significant digits. \\
-DECL(S) \> Real \> Declination in radians from string in degrees, minutes, seconds. \\
-DEC2S(R,NDP,SEP) \> String \> String in DMS with separator SEP and NDP decimal places \\
- \> \> on seconds, from Dec in radians. \\
-RA(S) \> Real \> Right Ascension in radians from a string in hours, minutes, seconds. \\
-RA2S(R,NDP,SEP) \> String \> String in HMS with separator SEP and NDP decimal places \\
- \> \> on seconds, from RA in radians. \\
-CHAR(I) \> String \> Character with ASCII value I. \\
-ICHAR(S) \> Integer \> ASCII value of first character of string S. \\
-INDEX(S1,S2) \> Integer \> Position of first occurrence of string S2 in string
+\begin{tabular}{l l l}
+BIN(I,n,m) & String & Integer I formatted in binary into an n char string \\
+ & & with m significant digits. \\
+DEC(I,n,m) & String & Integer I formatted in decimal into an n char string \\
+ & & with m significant digits. \\
+HEX(I,n.m) & String & Integer I formatted in hexadecimal into an n char string \\
+ & & with m significant digits. \\
+OCT(I,n,m) & String & Integer I formatted in octal into an n char string \\
+ & & with m significant digits. \\
+DECL(S) & Real & Declination in radians from string in degrees, minutes, seconds. \\
+DEC2S(R,NDP,SEP) & String & String in DMS with separator SEP and NDP decimal places \\
+ & & on seconds, from Dec in radians. \\
+RA(S) & Real & Right Ascension in radians from a string in hours, minutes, seconds. \\
+RA2S(R,NDP,SEP) & String & String in HMS with separator SEP and NDP decimal places \\
+ & & on seconds, from RA in radians. \\
+CHAR(I) & String & Character with ASCII value I. \\
+ICHAR(S) & Integer & ASCII value of first character of string S. \\
+INDEX(S1,S2) & Integer & Position of first occurrence of string S2 in string
  S1.\\
-LEN(S) \> Integer \> Length of string. \\
-ELEMENT(I,DELIM,S) \> String \> Ith element of delimited string. \\
-SUBSTR(S,n,m) \> String \> Substring of S beginning at n of length m. \\
-SNAME(S,n,m) \> String \> Name derived by concatenating string S with integer n \\
- \> \>          formatted into m characters including leading zeros. \\
-UPCASE(S) \> String \> String S converted to upper case. \\
-LGE(S1,S2) \> Logical \> True if S1 $\geq$ S2 (ASCII collating sequence). \\
-LGT(S1,S2) \> Logical \> True if S1 $>$ S2 (ASCII collating sequence). \\
-LLE(S1,S2) \> Logical \> True if S1 $\leq$ S2 (ASCII collating sequence). \\
-LLT(S1,S2) \> Logical \> True if S1 $<$ S2 (ASCII collating sequence). \\
-\end{tabbing}
+LEN(S) & Integer & Length of string. \\
+ELEMENT(I,DELIM,S) & String & Ith element of delimited string. \\
+SUBSTR(S,n,m) & String & Substring of S beginning at n of length m. \\
+SNAME(S,n,m) & String & Name derived by concatenating string S with integer n \\
+ & &          formatted into m characters including leading zeros. \\
+UPCASE(S) & String & String S converted to upper case. \\
+LGE(S1,S2) & Logical & True if S1 $\geq$ S2 (ASCII collating sequence). \\
+LGT(S1,S2) & Logical & True if S1 $>$ S2 (ASCII collating sequence). \\
+LLE(S1,S2) & Logical & True if S1 $\leq$ S2 (ASCII collating sequence). \\
+LLT(S1,S2) & Logical & True if S1 $<$ S2 (ASCII collating sequence). \\
+\end{tabular}
 
-\item [Bitwise Logical Operations] ---
+\item [Bitwise Logical Operations--- ]
 
-\begin{tabbing}
-VARIABLE(proc,X)xxxx\=Logicalxxx\=\kill
-IAND(I1,I2) \> Integer \> Bitwise AND. \\
-IOR(I1,I2) \> Integer \> Bitwise OR. \\
-IEOR(I1,I2) \> Integer \> Bitwise Exclusive OR. \\
-INOT(I) \> Integer \> Bitwise Complement. \\
-\end{tabbing}
+\begin{tabular}{l l l}
+IAND(I1,I2) & Integer & Bitwise AND. \\
+IOR(I1,I2) & Integer & Bitwise OR. \\
+IEOR(I1,I2) & Integer & Bitwise Exclusive OR. \\
+INOT(I) & Integer & Bitwise Complement. \\
+\end{tabular}
 
-\item [Type Conversion and Inquiry Functions] ---
+\item [Type Conversion and Inquiry Functions--- ]
 
-\begin{tabbing}
-VARIABLE(proc,X)xxxx\=Logicalxxx\=\kill
-FLOAT(I) \> Real \> Integer I converted to real. \\
-IFIX(X) \> Integer \> X converted to integer by truncation. \\
-INT(X) \> Integer \> X converted to integer by truncation. \\
-NINT(X) \> Integer \> Nearest integer to X. \\
-INTEGER(X) \> Integer \> X converted to integer. \\
-LOGICAL(X) \> Logical \> X converted to logical. \\
-REAL(X) \> Real \> X converted to real.\\
-STRING(X) \> String \> X converted to string. \\
-TYPE(X) \> String \> The type of X (`REAL', `INTEGER', `LOGICAL', \\
- \> \>`STRING', or `UNDEFINED'). \\
-UNDEFINED(X) \> Logical \> TRUE if X is undefined. \\
-\end{tabbing}
+\begin{tabular}{l l l}
+FLOAT(I) & Real & Integer I converted to real. \\
+IFIX(X) & Integer & X converted to integer by truncation. \\
+INT(X) & Integer & X converted to integer by truncation. \\
+NINT(X) & Integer & Nearest integer to X. \\
+INTEGER(X) & Integer & X converted to integer. \\
+LOGICAL(X) & Logical & X converted to logical. \\
+REAL(X) & Real & X converted to real.\\
+STRING(X) & String & X converted to string. \\
+TYPE(X) & String & The type of X (`REAL', `INTEGER', `LOGICAL', \\
+ & &`STRING', or `UNDEFINED'). \\
+UNDEFINED(X) & Logical & TRUE if X is undefined. \\
+\end{tabular}
 
-\item [Miscellaneous Functions] ---
+\item [Miscellaneous Functions--- ]
 
-\begin{tabbing}
-VARIABLE(proc,X)xxxx\=Logicalxxx\=\kill
-DATE() \> String \> Current date. \\
-TIME() \> String \> Current time. \\
-GETNBS(S) \> Any \> Value of noticeboard item. \\
-GET\_SYMBOL(S) \> String \> Value of DCL symbol. \\
-INKEY() \> Integer \> Key value of last key trapped (Screen mode only). \\
-KEYVALS(S) \> Integer \> Value of key with name S. \\
-OK(stat) \> Logical \> True if VMS Status OK. \\
-FILE\_EXISTS(S) \> Logical \> True if file S exists. \\
-RANDOM(I) \> Real \> Random number between 0 and 1 from seed variable I. \\
-VARIABLE(proc,X) \> Any \> Returns value of variable X of procedure proc.\\
-\end{tabbing}
+\begin{tabular}{l l l}
+DATE() & String & Current date. \\
+TIME() & String & Current time. \\
+GETNBS(S) & Any & Value of noticeboard item. \\
+GET\_SYMBOL(S) & String & Value of DCL symbol. \\
+INKEY() & Integer & Key value of last key trapped (Screen mode only). \\
+KEYVALS(S) & Integer & Value of key with name S. \\
+OK(stat) & Logical & True if VMS Status OK. \\
+FILE\_EXISTS(S) & Logical & True if file S exists. \\
+RANDOM(I) & Real & Random number between 0 and 1 from seed variable I. \\
+VARIABLE(proc,X) & Any & Returns value of variable X of procedure proc.\\
+\end{tabular}
 \end{description}
 
 \section{Exceptions}

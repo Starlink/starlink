@@ -1,7 +1,6 @@
 \chapter{Subroutine Libraries}
 \label{C_rssl}
-\pagestyle{myheadings}
-\markboth{Reference}{\stardocname}
+
 \small
 
 This chapter lists the names of the subroutines in the libraries mentioned in
@@ -27,10 +26,10 @@ The parameter system routines are listed below.
 The letter `{\bf d}' stands for the dimensionality:
 \begin{quote}
 \begin{description}
-\item [0] --- scalar.
-\item [1] --- vector.
-\item [N] --- n-d array.
-\item [V] --- vectorised.
+\item [0 ---] scalar.
+\item [1 ---] vector.
+\item [N ---] n-d array.
+\item [V ---] vectorised.
 \end{description}
 \end{quote}
 The letter `{\bf t}' stands for one of the five HDS data types:
@@ -46,12 +45,12 @@ The letter `{\bf t}' stands for one of the five HDS data types:
 There are no PAR\_DEFVx routines.
 \begin{quote}
 \begin{description}
-\item [PAR\_CANCL] : Cancel a parameter.
-\item [PAR\_DEFdt] : Set a dynamic default parameter value.
-\item [PAR\_GETdt] : Read a parameter value.
-\item [PAR\_PROMT] : Set a new prompt string for a parameter.
-\item [PAR\_PUTdt] : Write a parameter value.
-\item [PAR\_STATE] : Return the state of a parameter.
+\item [PAR\_CANCL:]  Cancel a parameter.
+\item [PAR\_DEFdt:]  Set a dynamic default parameter value.
+\item [PAR\_GETdt:]  Read a parameter value.
+\item [PAR\_PROMT:]  Set a new prompt string for a parameter.
+\item [PAR\_PUTdt:]  Write a parameter value.
+\item [PAR\_STATE:]  Return the state of a parameter.
 \end{description}
 \end{quote}
 
@@ -69,196 +68,196 @@ There are no PAR\_DEFVx routines.
 \vspace{2mm}
 
 \begin{description}
-\item [Parameter] ---
+\item [Parameter ---]
 
 \begin{description}
-\item [NDF\_ASSOC] : Associate an existing NDF with a parameter.
-\item [NDF\_CINP] : Obtain an NDF character component value via the parameter system.
-\item [NDF\_CREAT] : Create a new simple NDF via the parameter system.
-\item [NDF\_CREP] : Create a new primitive NDF via the parameter system.
-\item [NDF\_EXIST] : See if an existing NDF is associated with a parameter.
-\item [NDF\_PROP] : Propagate NDF information to create a new NDF via the parameter system.
+\item [NDF\_ASSOC:]  Associate an existing NDF with a parameter.
+\item [NDF\_CINP:]  Obtain an NDF character component value via the parameter system.
+\item [NDF\_CREAT:]  Create a new simple NDF via the parameter system.
+\item [NDF\_CREP:]  Create a new primitive NDF via the parameter system.
+\item [NDF\_EXIST:]  See if an existing NDF is associated with a parameter.
+\item [NDF\_PROP:]  Propagate NDF information to create a new NDF via the parameter system.
 \end{description}
 
-\item [Message] ---
+\item [Message ---]
 
 \begin{description}
-\item [NDF\_CMSG] : Assign the value of an NDF character component to a message token.
-\item [NDF\_MSG] : Assign the name of an NDF to a message token.
+\item [NDF\_CMSG:]  Assign the value of an NDF character component to a message token.
+\item [NDF\_MSG:]  Assign the name of an NDF to a message token.
 \end{description}
 
-\item [Accessing existing NDFs] ---
+\item [Accessing existing NDFs ---]
 
 \begin{description}
-\item [NDF\_ASSOC] : Associate an existing NDF with a parameter.
-\item [NDF\_EXIST] : See if an existing NDF is associated with a parameter.
-\item [NDF\_FIND] : Find an NDF in an HDS structure and import it into the NDF system.
-\item [NDF\_IMPRT] : Import an NDF into the NDF system from HDS.
+\item [NDF\_ASSOC:]  Associate an existing NDF with a parameter.
+\item [NDF\_EXIST:]  See if an existing NDF is associated with a parameter.
+\item [NDF\_FIND:]  Find an NDF in an HDS structure and import it into the NDF system.
+\item [NDF\_IMPRT:]  Import an NDF into the NDF system from HDS.
 \end{description}
 
-\item [Inquiring NDF attributes] ---
+\item [Inquiring NDF attributes ---]
 
 \begin{description}
-\item [NDF\_BOUND] : Inquire the pixel-index bounds of an NDF.
-\item [NDF\_DIM] : Inquire the dimension sizes of an NDF.
-\item [NDF\_ISACC] : Determine whether a specified type of NDF access is available.
-\item [NDF\_ISBAS] : Inquire if an NDF is a base NDF.
-\item [NDF\_ISTMP] : Determine if an NDF is temporary.
-\item [NDF\_NBLOC] : Determine the number of blocks of adjacent pixels in an NDF.
-\item [NDF\_NCHNK] : Determine the number of chunks of contiguous pixels in an NDF.
-\item [NDF\_SAME] : Inquire if two NDFs are part of the same base NDF.
-\item [NDF\_SIZE] : Determine the size of an NDF.
-\item [NDF\_VALID] : Determine whether an NDF identifier is valid.
+\item [NDF\_BOUND:]  Inquire the pixel-index bounds of an NDF.
+\item [NDF\_DIM:]  Inquire the dimension sizes of an NDF.
+\item [NDF\_ISACC:]  Determine whether a specified type of NDF access is available.
+\item [NDF\_ISBAS:]  Inquire if an NDF is a base NDF.
+\item [NDF\_ISTMP:]  Determine if an NDF is temporary.
+\item [NDF\_NBLOC:]  Determine the number of blocks of adjacent pixels in an NDF.
+\item [NDF\_NCHNK:]  Determine the number of chunks of contiguous pixels in an NDF.
+\item [NDF\_SAME:]  Inquire if two NDFs are part of the same base NDF.
+\item [NDF\_SIZE:]  Determine the size of an NDF.
+\item [NDF\_VALID:]  Determine whether an NDF identifier is valid.
 \end{description}
 
-\item [Inquiring component attributes] ---
+\item [Inquiring component attributes ---]
 
 \begin{description}
-\item [NDF\_BAD] : Determine if an NDF array component may contain bad pixels.
-\item [NDF\_BB] : Obtain the bad-bits mask value for the quality component of an NDF.
-\item [NDF\_CLEN] : Determine the length of an NDF character component.
-\item [NDF\_CMPLX] : Determine whether an NDF array component holds complex values.
-\item [NDF\_FORM] : Obtain the storage form of an NDF array component.
-\item [NDF\_FTYPE] : Obtain the full data type of an NDF array component.
-\item [NDF\_QMF] : Obtain the value of an NDF's quality masking flag.
-\item [NDF\_STATE] : Determine the state of an NDF component (defined or undefined).
-\item [NDF\_TYPE] : Obtain the numeric data type of an NDF array component.
+\item [NDF\_BAD:]  Determine if an NDF array component may contain bad pixels.
+\item [NDF\_BB:]  Obtain the bad-bits mask value for the quality component of an NDF.
+\item [NDF\_CLEN:]  Determine the length of an NDF character component.
+\item [NDF\_CMPLX:]  Determine whether an NDF array component holds complex values.
+\item [NDF\_FORM:]  Obtain the storage form of an NDF array component.
+\item [NDF\_FTYPE:]  Obtain the full data type of an NDF array component.
+\item [NDF\_QMF:]  Obtain the value of an NDF's quality masking flag.
+\item [NDF\_STATE:]  Determine the state of an NDF component (defined or undefined).
+\item [NDF\_TYPE:]  Obtain the numeric data type of an NDF array component.
 \end{description}
 
-\item [Creating and deleting NDFs] ---
+\item [Creating and deleting NDFs ---]
 
 \begin{description}
-\item [NDF\_CREAT] : Create a new simple NDF via the parameter system.
-\item [NDF\_CREP] : Create a new primitive NDF via the parameter system.
-\item [NDF\_DELET] : Delete an NDF.
-\item [NDF\_NEW] : Create a new simple NDF.
-\item [NDF\_NEWP] : Create a new primitive NDF.
-\item [NDF\_PROP] : Propagate NDF information to create a new NDF via the parameter system.
+\item [NDF\_CREAT:]  Create a new simple NDF via the parameter system.
+\item [NDF\_CREP:]  Create a new primitive NDF via the parameter system.
+\item [NDF\_DELET:]  Delete an NDF.
+\item [NDF\_NEW:]  Create a new simple NDF.
+\item [NDF\_NEWP:]  Create a new primitive NDF.
+\item [NDF\_PROP:]  Propagate NDF information to create a new NDF via the parameter system.
 \end{description}
 
-\item [Setting NDF attributes] ---
+\item [Setting NDF attributes ---]
 
 \begin{description}
-\item [NDF\_NOACC] : Disable a specified type of access to an NDF.
-\item [NDF\_SBND] : Set new pixel-index bounds for an NDF.
-\item [NDF\_SHIFT] : Apply pixel-index shifts to an NDF.
+\item [NDF\_NOACC:]  Disable a specified type of access to an NDF.
+\item [NDF\_SBND:]  Set new pixel-index bounds for an NDF.
+\item [NDF\_SHIFT:]  Apply pixel-index shifts to an NDF.
 \end{description}
 
-\item [Setting component attributes] ---
+\item [Setting component attributes ---]
 
 \begin{description}
-\item [NDF\_RESET] : Reset an NDF component to an undefined state.
-\item [NDF\_SBAD] : Set the bad-pixel flag for an NDF array component.
-\item [NDF\_SBB] : Set a bad-bits mask value for the quality component of an NDF.
-\item [NDF\_SQMF] : Set a new logical value for an NDF's quality masking flag.
-\item [NDF\_STYPE] : Set a new type for an NDF array component.
+\item [NDF\_RESET:]  Reset an NDF component to an undefined state.
+\item [NDF\_SBAD:]  Set the bad-pixel flag for an NDF array component.
+\item [NDF\_SBB:]  Set a bad-bits mask value for the quality component of an NDF.
+\item [NDF\_SQMF:]  Set a new logical value for an NDF's quality masking flag.
+\item [NDF\_STYPE:]  Set a new type for an NDF array component.
 \end{description}
 
-\item [Accessing component values] ---
+\item [Accessing component values ---]
 
 \begin{description}
-\item [NDF\_CGET] : Obtain the value of an NDF character component.
-\item [NDF\_CPUT] : Assign a value to an NDF character component.
-\item [NDF\_MAP] : Obtain mapped access to an array component of an NDF.
-\item [NDF\_MAPQL] : Map the quality component of an NDF as an array of logical values.
-\item [NDF\_MAPZ] : Obtain complex mapped access to an array component of an NDF.
-\item [NDF\_QMASK] : Combine an NDF quality value with a bad-bits mask to give a logical result.
-\item [NDF\_UNMAP] : Unmap an NDF or a mapped NDF array.
+\item [NDF\_CGET:]  Obtain the value of an NDF character component.
+\item [NDF\_CPUT:]  Assign a value to an NDF character component.
+\item [NDF\_MAP:]  Obtain mapped access to an array component of an NDF.
+\item [NDF\_MAPQL:]  Map the quality component of an NDF as an array of logical values.
+\item [NDF\_MAPZ:]  Obtain complex mapped access to an array component of an NDF.
+\item [NDF\_QMASK:]  Combine an NDF quality value with a bad-bits mask to give a logical result.
+\item [NDF\_UNMAP:]  Unmap an NDF or a mapped NDF array.
 \end{description}
 
-\item [Inquiring and setting axis attributes] ---
+\item [Inquiring and setting axis attributes ---]
 
 \begin{description}
-\item [NDF\_ACLEN] : Determine the length of an NDF axis character component.
-\item [NDF\_ACRE] : Ensure that an axis coordinate system exists for an NDF.
-\item [NDF\_AFORM] : Obtain the storage form of an NDF axis array.
-\item [NDF\_ANORM] : Obtain the logical value of an NDF axis normalisation flag.
-\item [NDF\_AREST] : Reset an NDF axis component to an undefined state.
-\item [NDF\_ASNRM] : Set a new value for an NDF axis normalisation flag.
-\item [NDF\_ASTAT] : Determine the state of an NDF axis component (defined or undefined).
-\item [NDF\_ASTYP] : Set a new numeric type for an NDF axis array.
-\item [NDF\_ATYPE] : Obtain the numeric type of an NDF axis array.
+\item [NDF\_ACLEN:]  Determine the length of an NDF axis character component.
+\item [NDF\_ACRE:]  Ensure that an axis coordinate system exists for an NDF.
+\item [NDF\_AFORM:]  Obtain the storage form of an NDF axis array.
+\item [NDF\_ANORM:]  Obtain the logical value of an NDF axis normalisation flag.
+\item [NDF\_AREST:]  Reset an NDF axis component to an undefined state.
+\item [NDF\_ASNRM:]  Set a new value for an NDF axis normalisation flag.
+\item [NDF\_ASTAT:]  Determine the state of an NDF axis component (defined or undefined).
+\item [NDF\_ASTYP:]  Set a new numeric type for an NDF axis array.
+\item [NDF\_ATYPE:]  Obtain the numeric type of an NDF axis array.
 \end{description}
 
-\item [Accessing axis values] ---
+\item [Accessing axis values ---]
 
 \begin{description}
-\item [NDF\_ACGET] : Obtain the value of an NDF axis character component.
-\item [NDF\_ACMSG] : Assign the value of an NDF axis character component to a message token.
-\item [NDF\_ACPUT] : Assign a value to an NDF axis character component.
-\item [NDF\_AMAP] : Obtain mapped access to an NDF axis array.
-\item [NDF\_AUNMP] : Unmap an NDF axis array component.
+\item [NDF\_ACGET:]  Obtain the value of an NDF axis character component.
+\item [NDF\_ACMSG:]  Assign the value of an NDF axis character component to a message token.
+\item [NDF\_ACPUT:]  Assign a value to an NDF axis character component.
+\item [NDF\_AMAP:]  Obtain mapped access to an NDF axis array.
+\item [NDF\_AUNMP:]  Unmap an NDF axis array component.
 \end{description}
 
-\item [Creating and controlling identifiers] ---
+\item [Creating and controlling identifiers ---]
 
 \begin{description}
-\item [NDF\_ANNUL] : Annul an NDF identifier.
-\item [NDF\_BASE] : Obtain an identifier for a base NDF.
-\item [NDF\_BEGIN] : Begin a new NDF context.
-\item [NDF\_CLONE] : Clone an NDF identifier.
-\item [NDF\_END] : End the current NDF context.
-\item [NDF\_VALID] : Determine whether an NDF identifier is valid.
+\item [NDF\_ANNUL:]  Annul an NDF identifier.
+\item [NDF\_BASE:]  Obtain an identifier for a base NDF.
+\item [NDF\_BEGIN:]  Begin a new NDF context.
+\item [NDF\_CLONE:]  Clone an NDF identifier.
+\item [NDF\_END:]  End the current NDF context.
+\item [NDF\_VALID:]  Determine whether an NDF identifier is valid.
 \end{description}
 
-\item [Handling NDF (and Array) sections] ---
+\item [Handling NDF (and Array) sections ---]
 
 \begin{description}
-\item [NDF\_BASE] : Obtain an identifier for a base NDF.
-\item [NDF\_BLOCK] : Obtain an NDF section containing a block of adjacent pixels.
-\item [NDF\_CHUNK] : Obtain an NDF section containing a chunk of contiguous pixels.
-\item [NDF\_NBLOC] : Determine the number of blocks of adjacent pixels in an NDF.
-\item [NDF\_NCHNK] : Determine the number of chunks of contiguous pixels in an NDF.
-\item [NDF\_SECT] : Create an NDF section.
-\item [NDF\_SSARY] : Create an array section, using an NDF section as a template.
-\item [NDF\_XIARY] : Obtain access to an array stored in an NDF extension.
+\item [NDF\_BASE:]  Obtain an identifier for a base NDF.
+\item [NDF\_BLOCK:]  Obtain an NDF section containing a block of adjacent pixels.
+\item [NDF\_CHUNK:]  Obtain an NDF section containing a chunk of contiguous pixels.
+\item [NDF\_NBLOC:]  Determine the number of blocks of adjacent pixels in an NDF.
+\item [NDF\_NCHNK:]  Determine the number of chunks of contiguous pixels in an NDF.
+\item [NDF\_SECT:]  Create an NDF section.
+\item [NDF\_SSARY:]  Create an array section, using an NDF section as a template.
+\item [NDF\_XIARY:]  Obtain access to an array stored in an NDF extension.
 \end{description}
 
-\item [Matching and merging attributes] ---
+\item [Matching and merging attributes ---]
 
 \begin{description}
-\item [NDF\_MBAD] : Merge the bad-pixel flags of the array components of a pair of NDFs.
-\item [NDF\_MBADN] : Merge the bad-pixel flags of the array components of a number of NDFs.
-\item [NDF\_MBND] : Match the pixel-index bounds of a pair of NDFs.
-\item [NDF\_MBNDN] : Match the pixel-index bounds of a number of NDFs.
-\item [NDF\_MTYPE] : Match the types of the array components of a pair of NDFs.
-\item [NDF\_MTYPN] : Match the types of the array components of a number of NDFs.
+\item [NDF\_MBAD:]  Merge the bad-pixel flags of the array components of a pair of NDFs.
+\item [NDF\_MBADN:]  Merge the bad-pixel flags of the array components of a number of NDFs.
+\item [NDF\_MBND:]  Match the pixel-index bounds of a pair of NDFs.
+\item [NDF\_MBNDN:]  Match the pixel-index bounds of a number of NDFs.
+\item [NDF\_MTYPE:]  Match the types of the array components of a pair of NDFs.
+\item [NDF\_MTYPN:]  Match the types of the array components of a number of NDFs.
 \end{description}
 
-\item [Creating placeholders] ---
+\item [Creating placeholders ---]
 
 \begin{description}
-\item [NDF\_PLACE] : Obtain an NDF placeholder.
-\item [NDF\_TEMP] : Obtain a placeholder for a temporary NDF.
+\item [NDF\_PLACE:]  Obtain an NDF placeholder.
+\item [NDF\_TEMP:]  Obtain a placeholder for a temporary NDF.
 \end{description}
 
-\item [Copying NDFs] ---
+\item [Copying NDFs ---]
 
 \begin{description}
-\item [NDF\_COPY] : Copy an NDF to a new location.
-\item [NDF\_PROP] : Propagate NDF information to create a new NDF via the parameter system.
+\item [NDF\_COPY:]  Copy an NDF to a new location.
+\item [NDF\_PROP:]  Propagate NDF information to create a new NDF via the parameter system.
 \end{description}
 
-\item [Handling extensions] ---
+\item [Handling extensions ---]
 
 \begin{description}
-\item [NDF\_XDEL] : Delete a specified NDF extension.
-\item [NDF\_XGT0t] : Read a scalar value from a component within a named NDF extension.
-\item [NDF\_XIARY] : Obtain access to an array stored in an NDF extension.
-\item [NDF\_XLOC] : Obtain access to a named NDF extension via an HDS locator.
-\item [NDF\_XNAME] : Obtain the name of the Nth extension in an NDF.
-\item [NDF\_XNEW] : Create a new extension in an NDF.
-\item [NDF\_XNUMB] : Determine the number of extensions in an NDF.
-\item [NDF\_XPT0t] : Write a scalar value to a component within a named NDF extension.
-\item [NDF\_XSTAT] : Determine if a named NDF extension exists.
+\item [NDF\_XDEL:]  Delete a specified NDF extension.
+\item [NDF\_XGT0t:]  Read a scalar value from a component within a named NDF extension.
+\item [NDF\_XIARY:]  Obtain access to an array stored in an NDF extension.
+\item [NDF\_XLOC:]  Obtain access to a named NDF extension via an HDS locator.
+\item [NDF\_XNAME:]  Obtain the name of the Nth extension in an NDF.
+\item [NDF\_XNEW:]  Create a new extension in an NDF.
+\item [NDF\_XNUMB:]  Determine the number of extensions in an NDF.
+\item [NDF\_XPT0t:]  Write a scalar value to a component within a named NDF extension.
+\item [NDF\_XSTAT:]  Determine if a named NDF extension exists.
 \end{description}
 
-\item [Tuning] ---
+\item [Tuning ---]
 
 \begin{description}
-\item [NDF\_GTUNE] : Obtain the value of an NDF system tuning parameter.
-\item [NDF\_TRACE] : Set the internal NDF system error-tracing flag.
-\item [NDF\_TUNE] : Set an NDF system tuning parameter.
+\item [NDF\_GTUNE:]  Obtain the value of an NDF system tuning parameter.
+\item [NDF\_TRACE:]  Set the internal NDF system error-tracing flag.
+\item [NDF\_TUNE:]  Set an NDF system tuning parameter.
 \end{description}
 
 \end{description}
@@ -275,98 +274,98 @@ There are no PAR\_DEFVx routines.
 
 \begin{description}
 
-\item [Message] ---
+\item [Message ---]
 
 \begin{description}
-\item [ARY\_MSG] : Assign the name of an array to a message token.
+\item [ARY\_MSG:]  Assign the name of an array to a message token.
 \end{description}
 
-\item [Accessing existing arrays] ---
+\item [Accessing existing arrays ---]
 
 \begin{description}
-\item [ARY\_FIND] : Find an array in an HDS structure and import it into the ARY system.
-\item [ARY\_IMPRT] : Import an array into the ARY system from HDS.
+\item [ARY\_FIND:]  Find an array in an HDS structure and import it into the ARY system.
+\item [ARY\_IMPRT:]  Import an array into the ARY system from HDS.
 \end{description}
 
-\item [Inquiring array attributes] ---
+\item [Inquiring array attributes ---]
 
 \begin{description}
-\item [ARY\_BAD] : Determine if an array may contain bad pixels.
-\item [ARY\_BOUND] : Inquire the pixel-index bounds of an array.
-\item [ARY\_CMPLX] : Determine whether an array holds complex values.
-\item [ARY\_DIM] : Inquire the dimension sizes of an array.
-\item [ARY\_FORM] : Obtain the storage form of an array.
-\item [ARY\_FTYPE] : Obtain the full data type of an array.
-\item [ARY\_ISACC] : Determine whether a specified type of array access is available.
-\item [ARY\_ISMAP] : Determine if an array is currently mapped.
-\item [ARY\_ISBAS] : Inquire if an array is a base array.
-\item [ARY\_ISTMP] : Determine if an array is temporary.
-\item [ARY\_NDIM] : Inquire the dimensionality of an array.
-\item [ARY\_OFFS] : Obtain the pixel offset between two arrays.
-\item [ARY\_SAME] : Inquire if two arrays are part of the same base array.
-\item [ARY\_SIZE] : Determine the size of an array.
-\item [ARY\_STATE] : Determine the state of an array (defined or undefined).
-\item [ARY\_TYPE] : Obtain the numeric type of an array.
-\item [ARY\_VALID] : Determine whether an array identifier is valid.
-\item [ARY\_VERFY] : Verify that an array's data structure is correctly constructed.
+\item [ARY\_BAD:]  Determine if an array may contain bad pixels.
+\item [ARY\_BOUND:]  Inquire the pixel-index bounds of an array.
+\item [ARY\_CMPLX:]  Determine whether an array holds complex values.
+\item [ARY\_DIM:]  Inquire the dimension sizes of an array.
+\item [ARY\_FORM:]  Obtain the storage form of an array.
+\item [ARY\_FTYPE:]  Obtain the full data type of an array.
+\item [ARY\_ISACC:]  Determine whether a specified type of array access is available.
+\item [ARY\_ISMAP:]  Determine if an array is currently mapped.
+\item [ARY\_ISBAS:]  Inquire if an array is a base array.
+\item [ARY\_ISTMP:]  Determine if an array is temporary.
+\item [ARY\_NDIM:]  Inquire the dimensionality of an array.
+\item [ARY\_OFFS:]  Obtain the pixel offset between two arrays.
+\item [ARY\_SAME:]  Inquire if two arrays are part of the same base array.
+\item [ARY\_SIZE:]  Determine the size of an array.
+\item [ARY\_STATE:]  Determine the state of an array (defined or undefined).
+\item [ARY\_TYPE:]  Obtain the numeric type of an array.
+\item [ARY\_VALID:]  Determine whether an array identifier is valid.
+\item [ARY\_VERFY:]  Verify that an array's data structure is correctly constructed.
 \end{description}
 
-\item [Creating and deleting arrays] ---
+\item [Creating and deleting arrays ---]
 
 \begin{description}
-\item [ARY\_DELET] : Delete an array.
-\item [ARY\_DUPE] : Duplicate an array.
-\item [ARY\_NEW] : Create a new simple array.
-\item [ARY\_NEWP] : Create a new primitive array.
+\item [ARY\_DELET:]  Delete an array.
+\item [ARY\_DUPE:]  Duplicate an array.
+\item [ARY\_NEW:]  Create a new simple array.
+\item [ARY\_NEWP:]  Create a new primitive array.
 \end{description}
 
-\item [Setting array attributes] ---
+\item [Setting array attributes ---]
 
 \begin{description}
-\item [ARY\_NOACC] : Disable a specified type of access to an array.
-\item [ARY\_RESET] : Reset an array to an undefined state.
-\item [ARY\_SBAD] : Set the bad-pixel flag for an array.
-\item [ARY\_SHIFT] : Apply pixel-index shifts to an array.
-\item [ARY\_STYPE] : Set a new type for an array.
+\item [ARY\_NOACC:]  Disable a specified type of access to an array.
+\item [ARY\_RESET:]  Reset an array to an undefined state.
+\item [ARY\_SBAD:]  Set the bad-pixel flag for an array.
+\item [ARY\_SHIFT:]  Apply pixel-index shifts to an array.
+\item [ARY\_STYPE:]  Set a new type for an array.
 \end{description}
 
-\item [Accessing array values] ---
+\item [Accessing array values ---]
 
 \begin{description}
-\item [ARY\_MAP] : Obtain mapped access to an array.
-\item [ARY\_MAPZ] : Obtain complex mapped access to an array.
-\item [ARY\_UNMAP] : Unmap an array.
+\item [ARY\_MAP:]  Obtain mapped access to an array.
+\item [ARY\_MAPZ:]  Obtain complex mapped access to an array.
+\item [ARY\_UNMAP:]  Unmap an array.
 \end{description}
 
-\item [Creating and controlling identifiers] ---
+\item [Creating and controlling identifiers ---]
 
 \begin{description}
-\item [ARY\_ANNUL] : Annul an array identifier.
-\item [ARY\_BASE] : Obtain an identifier for a base array.
-\item [ARY\_CLONE] : Clone an array identifier.
-\item [ARY\_SECT] : Create an array section.
-\item [ARY\_SSECT] : Produce a similar array section to an existing one.
-\item [ARY\_VALID] : Determine whether an array identifier is valid.
+\item [ARY\_ANNUL:]  Annul an array identifier.
+\item [ARY\_BASE:]  Obtain an identifier for a base array.
+\item [ARY\_CLONE:]  Clone an array identifier.
+\item [ARY\_SECT:]  Create an array section.
+\item [ARY\_SSECT:]  Produce a similar array section to an existing one.
+\item [ARY\_VALID:]  Determine whether an array identifier is valid.
 \end{description}
 
-\item [Creating placeholders] ---
+\item [Creating placeholders ---]
 
 \begin{description}
-\item [ARY\_PLACE] : Obtain a placeholder for an array.
-\item [ARY\_TEMP] : Obtain a placeholder for a temporary array.
+\item [ARY\_PLACE:]  Obtain a placeholder for an array.
+\item [ARY\_TEMP:]  Obtain a placeholder for a temporary array.
 \end{description}
 
-\item [Copying arrays] ---
+\item [Copying arrays ---]
 
 \begin{description}
-\item [ARY\_COPY] : Copy an array to a new location.
-\item [ARY\_DUPE] : Duplicate an array.
+\item [ARY\_COPY:]  Copy an array to a new location.
+\item [ARY\_DUPE:]  Duplicate an array.
 \end{description}
 
-\item [Miscellaneous] ---
+\item [Miscellaneous ---]
 
 \begin{description}
-\item [ARY\_TRACE] : Set the internal ARY system error-tracing flag.
+\item [ARY\_TRACE:]  Set the internal ARY system error-tracing flag.
 \end{description}
 
 \end{description}
@@ -384,12 +383,12 @@ There are no PAR\_DEFVx routines.
 
 \begin{quote}
 \begin{description}
-\item [REF\_ANNUL] : Annul a locator which may have been obtained via a reference.
-\item [REF\_CRPUT] : Create a reference object and put a reference in it.
-\item [REF\_FIND] : Obtain a locator to an object (possibly via a reference).
-\item [REF\_GET] : Obtain a locator to a referenced object.
-\item [REF\_NEW] : Create an empty reference object.
-\item [REF\_PUT] : Put a reference into a reference object.
+\item [REF\_ANNUL:]  Annul a locator which may have been obtained via a reference.
+\item [REF\_CRPUT:]  Create a reference object and put a reference in it.
+\item [REF\_FIND:]  Obtain a locator to an object (possibly via a reference).
+\item [REF\_GET:]  Obtain a locator to a referenced object.
+\item [REF\_NEW:]  Create an empty reference object.
+\item [REF\_PUT:]  Put a reference into a reference object.
 \end{description}
 \end{quote}
 
@@ -413,24 +412,24 @@ Not all possible combinations may be available; please refer to
 
 \begin{quote}
 \begin{description}
-\item [HDS\_CLOSE] : Close container file.
-\item [HDS\_COPY] : Copy object to container file.
-\item [HDS\_NEW] : Create container file.
-\item [HDS\_ERASE] : Erase container file.
-\item [HDS\_FREE] : Free container file.
-\item [HDS\_GTUNE] : Inquire value of tuning parameter.
-\item [HDS\_LOCK] : Lock container file.
-\item [HDS\_OPEN] : Open container file.
-\item [HDS\_GROUP] : Inquire locator group.
-\item [HDS\_FLUSH] : Flush locator group.
-\item [HDS\_LINK] : Link locator group.
-\item [HDS\_START] : Startup locator facility.
-\item [HDS\_STOP] : Rundown locator facility.
-\item [HDS\_RUN] : Run application.
-\item [HDS\_STATE] : Inquire HDS state.
-\item [HDS\_TUNE] : Set HDS parameter.
-\item [HDS\_SHOW] : Show HDS statistics.
-\item [HDS\_TRACE] : Trace object path.
+\item [HDS\_CLOSE:]  Close container file.
+\item [HDS\_COPY:]  Copy object to container file.
+\item [HDS\_NEW:]  Create container file.
+\item [HDS\_ERASE:]  Erase container file.
+\item [HDS\_FREE:]  Free container file.
+\item [HDS\_GTUNE:]  Inquire value of tuning parameter.
+\item [HDS\_LOCK:]  Lock container file.
+\item [HDS\_OPEN:]  Open container file.
+\item [HDS\_GROUP:]  Inquire locator group.
+\item [HDS\_FLUSH:]  Flush locator group.
+\item [HDS\_LINK:]  Link locator group.
+\item [HDS\_START:]  Startup locator facility.
+\item [HDS\_STOP:]  Rundown locator facility.
+\item [HDS\_RUN:]  Run application.
+\item [HDS\_STATE:]  Inquire HDS state.
+\item [HDS\_TUNE:]  Set HDS parameter.
+\item [HDS\_SHOW:]  Show HDS statistics.
+\item [HDS\_TRACE:]  Trace object path.
 \end{description}
 \end{quote}
 
@@ -440,25 +439,25 @@ Not all possible combinations may be available; please refer to
 
 \begin{description}
 
-\item [Inquiry] ---
+\item [Inquiry ---]
 
 \begin{description}
-\item [CMP\_LEN] : Inquire component precision.
-\item [CMP\_PRIM] : Inquire component primitive.
-\item [CMP\_SHAPE] : Inquire component shape.
-\item [CMP\_SIZE] : Inquire component size.
-\item [CMP\_STRUC] : Inquire component structure.
-\item [CMP\_TYPE] : Inquire component type.
+\item [CMP\_LEN:]  Inquire component precision.
+\item [CMP\_PRIM:]  Inquire component primitive.
+\item [CMP\_SHAPE:]  Inquire component shape.
+\item [CMP\_SIZE:]  Inquire component size.
+\item [CMP\_STRUC:]  Inquire component structure.
+\item [CMP\_TYPE:]  Inquire component type.
 \end{description}
 
-\item [Basic I/O] ---
+\item [Basic I/O ---]
 
 \begin{description}
-\item [CMP\_GETdt] : Read component.
-\item [CMP\_PUTdt] : Write component.
-\item [CMP\_MAPd] : Map component.
-\item [CMP\_UNMAP] : Unmap component.
-\item [CMP\_MODt] : Obtain component.
+\item [CMP\_GETdt:]  Read component.
+\item [CMP\_PUTdt:]  Write component.
+\item [CMP\_MAPd:]  Map component.
+\item [CMP\_UNMAP:]  Unmap component.
+\item [CMP\_MODt:]  Obtain component.
 \end{description}
 
 \end{description}
@@ -469,79 +468,79 @@ Not all possible combinations may be available; please refer to
 
 \begin{description}
 
-\item [Parameter] ---
+\item [Parameter ---]
 
 \begin{description}
-\item [DAT\_ASSOC] : Associate a data object with a parameter.
-\item [DAT\_EXIST] : Same as DAT\_ASSOC except if there is an error it returns
+\item [DAT\_ASSOC:]  Associate a data object with a parameter.
+\item [DAT\_EXIST:]  Same as DAT\_ASSOC except if there is an error it returns
  a status value, whereas DAT\_ASSOC repeatedly attempts to get a valid locator.
-\item [DAT\_CANCL] : Cancel the association between a data object and a
+\item [DAT\_CANCL:]  Cancel the association between a data object and a
  parameter.
-\item [DAT\_CREAT] : Create a data structure component.
-\item [DAT\_DEF] : Suggest values for a parameter.
-\item [DAT\_DELET] : Delete an object associated with a parameter.
-\item [DAT\_UPDAT] : Force HDS update from memory cache.
+\item [DAT\_CREAT:]  Create a data structure component.
+\item [DAT\_DEF:]  Suggest values for a parameter.
+\item [DAT\_DELET:]  Delete an object associated with a parameter.
+\item [DAT\_UPDAT:]  Force HDS update from memory cache.
 \end{description}
 
-\item [Inquiry] ---
+\item [Inquiry ---]
 
 \begin{description}
-\item [DAT\_NAME] : Inquire object name.
-\item [DAT\_REF] : Inquire object reference name.
-\item [DAT\_PRIM] : Inquire object primitive.
-\item [DAT\_SHAPE] : Inquire object shape.
-\item [DAT\_SIZE] : Inquire object size.
-\item [DAT\_STATE] : Inquire object state.
-\item [DAT\_STRUC] : Inquire object structure.
-\item [DAT\_TYPE] : Inquire object type.
-\item [DAT\_WHERE] : Inquire primitive data in file.
-\item [DAT\_LEN] : Inquire primitive precision.
-\item [DAT\_PREC] : Inquire storage precision.
-\item [DAT\_DREP] : Inquire primitive data representation information.
-\item [DAT\_CLEN] : Inquire character string length.
-\item [DAT\_NCOMP] : Inquire number of components.
-\item [DAT\_THERE] : Inquire component existence.
-\item [DAT\_VALID] : Inquire locator valid.
+\item [DAT\_NAME:]  Inquire object name.
+\item [DAT\_REF:]  Inquire object reference name.
+\item [DAT\_PRIM:]  Inquire object primitive.
+\item [DAT\_SHAPE:]  Inquire object shape.
+\item [DAT\_SIZE:]  Inquire object size.
+\item [DAT\_STATE:]  Inquire object state.
+\item [DAT\_STRUC:]  Inquire object structure.
+\item [DAT\_TYPE:]  Inquire object type.
+\item [DAT\_WHERE:]  Inquire primitive data in file.
+\item [DAT\_LEN:]  Inquire primitive precision.
+\item [DAT\_PREC:]  Inquire storage precision.
+\item [DAT\_DREP:]  Inquire primitive data representation information.
+\item [DAT\_CLEN:]  Inquire character string length.
+\item [DAT\_NCOMP:]  Inquire number of components.
+\item [DAT\_THERE:]  Inquire component existence.
+\item [DAT\_VALID:]  Inquire locator valid.
 \end{description}
 
-\item [Basic I/O] ---
+\item [Basic I/O ---]
 
 \begin{description}
-\item [DAT\_GETdt] : Read primitive object.
-\item [DAT\_PUTdt] : Write primitive object.
-\item [DAT\_MAPt] : Map primitive object.
-\item [DAT\_BASIC] : Map primitive object as a sequence of bytes.
-\item [DAT\_UNMAP] : Unmap primitive object.
+\item [DAT\_GETdt:]  Read primitive object.
+\item [DAT\_PUTdt:]  Write primitive object.
+\item [DAT\_MAPt:]  Map primitive object.
+\item [DAT\_BASIC:]  Map primitive object as a sequence of bytes.
+\item [DAT\_UNMAP:]  Unmap primitive object.
 \end{description}
 
 \newpage
 
-\item [Other (sorted by description)] ---
+\item [Other (sorted by description) ---]
 
 \begin{description}
-\item [DAT\_ALTER] : Alter object size.
-\item [DAT\_MOULD] : Alter object shape.
-\item [DAT\_ANNUL] : Annul locator.
-\item [DAT\_MSG] : Assign object name to message token.
-\item [DAT\_RETYP] : Change object type.
-\item [DAT\_CLONE] : Clone locator.
-\item [DAT\_COERC] : Coerce object shape.
-\item [DAT\_CCOPY] : Copy one structure level.
-\item [DAT\_COPY] : Copy object.
-\item [DAT\_CCTYP] : Create type string.
-\item [DAT\_NEWdt] : Create component.
-\item [DAT\_TEMP] : Create temporary object.
-\item [DAT\_ERASE] : Erase component.
-\item [DAT\_FIND] : Find named component.
-\item [DAT\_PAREN] : Find parent.
-\item [DAT\_INDEX] : Index into component list.
-\item [DAT\_CELL] : Locate cell.
-\item [DAT\_SLICE] : Locate slice.
-\item [DAT\_MOVE] : Move object.
-\item [DAT\_RENAM] : Rename object.
-\item [DAT\_RESET] : Reset object state.
-\item [DAT\_ERMSG] : Translate error status.
-\item [DAT\_VEC] : Vectorise object.
+\item [DAT\_ALTER:]  Alter object size.
+\item [DAT\_MOULD:]  Alter object shape.
+\item [DAT\_ANNUL:]  Annul locator.
+\item [DAT\_MSG:]  Assign object name to message token.
+\item [DAT\_RETYP:]  Change object type.
+\item [DAT\_CLONE:]  Clone locator.
+\item [DAT\_COERC:]  Coerce object shape.
+\item [DAT\_CCOPY:]  Copy one structure level.
+\item [DAT\_COPY:]  Copy object.
+\item [DAT\_CCTYP:]  Create type string.
+\item [DAT\_NEWdt:]  Create component.
+\item [DAT\_TEMP:]  Create temporary object.
+\item [DAT\_ERASE:]  Erase component.
+\item [DAT\_FIND:]  Find named component.
+\item [DAT\_PAREN:]  Find parent.
+\item [DAT\_INDEX:]  Index into component list.
+\item [DAT\_CELL:]  Locate cell.
+\item [DAT\_SLICE:]  Locate slice.
+\item [DAT\_MOVE:]  Move object.
+\item [DAT\_RENAM:]  Rename object.
+\item [DAT\_RESET:]  Reset object state.
+\item [DAT\_ERMSG:]  Translate error status.
+\item [DAT\_VEC:]  Vectorise object.
 \end{description}
 
 \end{description}
@@ -642,16 +641,16 @@ Table 1.1: Analysis of Data System routine functions.
 
 \begin{quote}
 \begin{description}
-\item [MSG\_BLANK] : Output a blank line.
-\item [MSG\_FMTt] : Assign a value to a message token (formatted).
-\item [MSG\_IFGET] : Get the filter level from parameter system.
-\item [MSG\_IFLEV] : Return the current filter level for conditional message output.
-\item [MSG\_IFSET] : Set the filter level for conditional message output.
-\item [MSG\_LOAD] : Expand and return a message.
-\item [MSG\_OUT] : Output a message.
-\item [MSG\_OUTIF] : Conditionally deliver the text of a message to the user.
-\item [MSG\_RENEW] : Renew any annulled message tokens in the current context.
-\item [MSG\_SETt] : Assign a value to a message token (concise).
+\item [MSG\_BLANK:]  Output a blank line.
+\item [MSG\_FMTt:]  Assign a value to a message token (formatted).
+\item [MSG\_IFGET:]  Get the filter level from parameter system.
+\item [MSG\_IFLEV:]  Return the current filter level for conditional message output.
+\item [MSG\_IFSET:]  Set the filter level for conditional message output.
+\item [MSG\_LOAD:]  Expand and return a message.
+\item [MSG\_OUT:]  Output a message.
+\item [MSG\_OUTIF:]  Conditionally deliver the text of a message to the user.
+\item [MSG\_RENEW:]  Renew any annulled message tokens in the current context.
+\item [MSG\_SETt:]  Assign a value to a message token (concise).
 \end{description}
 \end{quote}
 
@@ -661,18 +660,18 @@ Table 1.1: Analysis of Data System routine functions.
 
 \begin{quote}
 \begin{description}
-\item [ERR\_ANNUL] : Annul the contents of the current error context.
-\item [ERR\_BEGIN] : Begin a new error reporting environment.
-\item [ERR\_END] : End the current error reporting environment.
-\item [ERR\_FIOER] : Assign a Fortran I/O error message to a token.
-\item [ERR\_FLUSH] : Flush the current error context.
-\item [ERR\_LEVEL] : Inquire the current error context level.
-\item [ERR\_LOAD] : Return error messages from the current error context.
-\item [ERR\_MARK] : Mark (start) a new error context.
-\item [ERR\_REP] : Report an error message.
-\item [ERR\_RLSE] : Release (end) the current error context.
-\item [ERR\_STAT] : Inquire the last reported error status.
-\item [ERR\_SYSER] : Assign an operating system error message to a token.
+\item [ERR\_ANNUL:]  Annul the contents of the current error context.
+\item [ERR\_BEGIN:]  Begin a new error reporting environment.
+\item [ERR\_END:]  End the current error reporting environment.
+\item [ERR\_FIOER:]  Assign a Fortran I/O error message to a token.
+\item [ERR\_FLUSH:]  Flush the current error context.
+\item [ERR\_LEVEL:]  Inquire the current error context level.
+\item [ERR\_LOAD:]  Return error messages from the current error context.
+\item [ERR\_MARK:]  Mark (start) a new error context.
+\item [ERR\_REP:]  Report an error message.
+\item [ERR\_RLSE:]  Release (end) the current error context.
+\item [ERR\_STAT:]  Inquire the last reported error status.
+\item [ERR\_SYSER:]  Assign an operating system error message to a token.
 \end{description}
 \end{quote}
 
@@ -707,67 +706,67 @@ have the following names:
 
 \begin{quote}
 \begin{description}
-\item [AUTOGRAPH] :
+\item [AUTOGRAPH:] 
  Draw and annotate curves or families of curves.
 \\
-\item [CONRAN] :
+\item [CONRAN:] 
  Contour irregularly spaced data labelling the contour lines.
-\item [CONRAQ] :
+\item [CONRAQ:] 
  Like CONRAN, but faster because it has no labelling capability.
-\item [CONRAS] :
+\item [CONRAS:] 
  Like CONRAN, but slower because lines are smoothed and crowded lines are
  removed.
 \\
-\item [CONREC] :
+\item [CONREC:] 
  Contour 2-d arrays, labelling the contour lines.
-\item [CONRECQCK] :
+\item [CONRECQCK:] 
  Like CONREC, but faster because it has no labelling capability.
-\item [CONRECSUPR] :
+\item [CONRECSUPR:] 
  Like CONREC, but slower because lines are smoothed and crowded lines are
  removed.
 \\
-\item [DASHCHAR] :
+\item [DASHCHAR:] 
  Software dashed line package with labelling capability.
-\item [DASHLINE] :
+\item [DASHLINE:] 
  Like DASHCHAR, but faster because it has no labelling capability.
-\item [DASHSMTH] :
+\item [DASHSMTH:] 
  Like DASHCHAR, but slower because lines are smoothed.
-\item [DASHSUPR] :
+\item [DASHSUPR:] 
  Like DASHCHAR, but slower because lines are smoothed and crowded lines are
  removed.
 \\
-\item [EZMAP] :
+\item [EZMAP:] 
  Plot continental, national, US state boundaries in one of nine map
  projections.
-\item [GRIDAL] :
+\item [GRIDAL:] 
  Draw graph paper, axis etc.
-\item [HAFTON] :
+\item [HAFTON:] 
  Draw halftone (greyscale) picture from a 2-d array.
-\item [HSTGRM] :
+\item [HSTGRM:] 
  Plot histograms.
-\item [ISOSRF] :
+\item [ISOSRF:] 
  Plot iso-value surfaces (with hidden lines removed) from a 3-d array.
-\item [ISOSRFHR] :
+\item [ISOSRFHR:] 
  Plot iso-value surfaces (with hidden lines removed) from a high resolution
  3-d array.
-\item [PWRITX] :
+\item [PWRITX:] 
  Plot high quality software characters.
-\item [PWRITY] :
+\item [PWRITY:] 
  Plot simple software characters.
-\item [PWRZI] :
+\item [PWRZI:] 
  Draw characters in three-space, for use with the ISOSRF utility.
-\item [PWRZS] :
+\item [PWRZS:] 
  Draw characters in three-space, for use with the SRFACE utility.
-\item [PWRZT] :
+\item [PWRZT:] 
  Draw characters in three-space, for use with the THREED utility.
-\item [SRFACE] :
+\item [SRFACE:] 
  Plot a 3-d display of a surface (with hidden lines removed) from a 2-d array.
-\item [STRMLN] :
+\item [STRMLN:] 
  Plot a representation of a vector flow of any field for which planar vector
  components are given on a regular rectangular lattice.
-\item [THREED] :
+\item [THREED:] 
  Provide a three space line drawing capability.
-\item [VELVCT] :
+\item [VELVCT:] 
  Draw a 2-d velocity field by drawing arrows from the data
  locations.
 \end{description}
@@ -779,31 +778,31 @@ have the following names:
 
 \begin{description}
 
-\item [Functions] ---
+\item [Functions ---]
 
 \begin{description}
-\item [SNX\_AGGUX] : Transform grid X coordinate to user X coordinate.
-\item [SNX\_AGGUY] : Transform grid Y coordinate to user Y coordinate.
-\item [SNX\_AGUGX] : Transform user X coordinate to grid X coordinate.
-\item [SNX\_AGUGY] : Transform user Y coordinate to grid Y coordinate.
+\item [SNX\_AGGUX:]  Transform grid X coordinate to user X coordinate.
+\item [SNX\_AGGUY:]  Transform grid Y coordinate to user Y coordinate.
+\item [SNX\_AGUGX:]  Transform user X coordinate to grid X coordinate.
+\item [SNX\_AGUGY:]  Transform user Y coordinate to grid Y coordinate.
 \end{description}
 
-\item [Subroutines] ---
+\item [Subroutines ---]
 
 \begin{description}
-\item [SNX\_AGOP] : Make AUTOGRAPH/SGS/GKS ready for plotting.
-\item [SNX\_EZRXY] : Plot x,y data, with labelling, using AUTOGRAPH.
-\item [SNX\_AGLAB] : Set up an AUTOGRAPH label.
-\item [SNX\_CHSET] : Select one of the two NCAR Roman fonts.
-\item [SNX\_AGSAV] : Save the state of AUTOGRAPH.
-\item [SNX\_AGRES] : Restore the state of AUTOGRAPH.
-\item [SNX\_TO] : Switch between NCAR and SGS plotting.
-\item [SNX\_AGWV] : Make the AUTOGRAPH graph window match the current viewport
+\item [SNX\_AGOP:]  Make AUTOGRAPH/SGS/GKS ready for plotting.
+\item [SNX\_EZRXY:]  Plot x,y data, with labelling, using AUTOGRAPH.
+\item [SNX\_AGLAB:]  Set up an AUTOGRAPH label.
+\item [SNX\_CHSET:]  Select one of the two NCAR Roman fonts.
+\item [SNX\_AGSAV:]  Save the state of AUTOGRAPH.
+\item [SNX\_AGRES:]  Restore the state of AUTOGRAPH.
+\item [SNX\_TO:]  Switch between NCAR and SGS plotting.
+\item [SNX\_AGWV:]  Make the AUTOGRAPH graph window match the current viewport
  ($=$ zone if using SGS).
-\item [SNX\_AGCS] : Make the current SGS zone world coordinates match the
+\item [SNX\_AGCS:]  Make the current SGS zone world coordinates match the
       AUTOGRAPH grid coordinate system.
-\item [SNX\_CURS] : Read a cursor position.
-\item [SNX\_WRTST] : Plot a character string.
+\item [SNX\_CURS:]  Read a cursor position.
+\item [SNX\_WRTST:]  Plot a character string.
 \end{description}
 
 \end{description}
@@ -820,115 +819,115 @@ have the following names:
 
 \begin{description}
 
-\item [Control] ---
+\item [Control ---]
 
 \begin{description}
-\item [PGADVANCE] : See PGPAGE.
-\item [PGASK] : Control new page prompting.
-\item [PGBBUF] : Begin batch of output (buffer).
-\item [PGBEGIN] : Begin PGPLOT, open output device.
-\item [PGEBUF] : End batch of output (buffer).
-\item [PGEND] : Terminate PGPLOT.
-\item [PGPAGE] : Advance to a new page or clear screen.
-\item [PGPAPER] : Change the size of the view surface.
-\item [PGUPDT] : Update display.
+\item [PGADVANCE:]  See PGPAGE.
+\item [PGASK:]  Control new page prompting.
+\item [PGBBUF:]  Begin batch of output (buffer).
+\item [PGBEGIN:]  Begin PGPLOT, open output device.
+\item [PGEBUF:]  End batch of output (buffer).
+\item [PGEND:]  Terminate PGPLOT.
+\item [PGPAGE:]  Advance to a new page or clear screen.
+\item [PGPAPER:]  Change the size of the view surface.
+\item [PGUPDT:]  Update display.
 \end{description}
 
-\item [Windows and viewports] ---
+\item [Windows and viewports ---]
 
 \begin{description}
-\item [PGBOX] : Draw labeled frame around viewport.
-\item [PGENV] : Set window and viewport and draw labeled frame.
-\item [PGVPORT] : Set viewport (normalized device coordinates).
-\item [PGVSIZE] : Set viewport (inches).
-\item [PGVSTAND] : Set standard (default) viewport.
-\item [PGWINDOW] : Set window.
-\item [PGWNAD] : Set window and adjust viewport to same aspect ratio.
+\item [PGBOX:]  Draw labeled frame around viewport.
+\item [PGENV:]  Set window and viewport and draw labeled frame.
+\item [PGVPORT:]  Set viewport (normalized device coordinates).
+\item [PGVSIZE:]  Set viewport (inches).
+\item [PGVSTAND:]  Set standard (default) viewport.
+\item [PGWINDOW:]  Set window.
+\item [PGWNAD:]  Set window and adjust viewport to same aspect ratio.
 \end{description}
 
-\item [Primitive drawing] ---
+\item [Primitive drawing ---]
 
 \begin{description}
-\item [PGDRAW] : Draw a line from the current pen position to a point.
-\item [PGLINE] : Draw a polyline.
-\item [PGMOVE] : Move pen.
-\item [PGPOINT] : Draw one or more graph markers.
-\item [PGPOLY] : Fill a polygonal area with shading.
-\item [PGRECT] : Draw a rectangle, using fill-area attributes.
+\item [PGDRAW:]  Draw a line from the current pen position to a point.
+\item [PGLINE:]  Draw a polyline.
+\item [PGMOVE:]  Move pen.
+\item [PGPOINT:]  Draw one or more graph markers.
+\item [PGPOLY:]  Fill a polygonal area with shading.
+\item [PGRECT:]  Draw a rectangle, using fill-area attributes.
 \end{description}
 
-\item [Text] ---
+\item [Text ---]
 
 \begin{description}
-\item [PGLABEL] : Write labels for x-axis, y-axis, and top of plot.
-\item [PGMTEXT] : Write text at position relative to viewport.
-\item [PGPTEXT] : Write text at arbitrary position and angle.
-\item [PGTEXT] : Write text (horizontal, left-justified).
+\item [PGLABEL:]  Write labels for x-axis, y-axis, and top of plot.
+\item [PGMTEXT:]  Write text at position relative to viewport.
+\item [PGPTEXT:]  Write text at arbitrary position and angle.
+\item [PGTEXT:]  Write text (horizontal, left-justified).
 \end{description}
 
-\item [Attribute setting] ---
+\item [Attribute setting ---]
 
 \begin{description}
-\item [PGSCF] : Set character font.
-\item [PGSCH] : Set character height.
-\item [PGSCI] : Set color index.
-\item [PGSCR] : Set color representation.
-\item [PGSFS] : Set fill-area style.
-\item [PGSHLS] : Set color representation using HLS system.
-\item [PGSLS] : Set line style.
-\item [PGSLW] : Set line width.
+\item [PGSCF:]  Set character font.
+\item [PGSCH:]  Set character height.
+\item [PGSCI:]  Set color index.
+\item [PGSCR:]  Set color representation.
+\item [PGSFS:]  Set fill-area style.
+\item [PGSHLS:]  Set color representation using HLS system.
+\item [PGSLS:]  Set line style.
+\item [PGSLW:]  Set line width.
 \end{description}
 
-\item [Higher-level drawing] ---
+\item [Higher-level drawing ---]
 
 \begin{description}
-\item [PGBIN] : Histogram of binned data.
-\item [PGCONS] : Contour map of a 2-d data array (fast algorithm).
-\item [PGCONT] : Contour map of a 2-d data array (contour-following).
-\item [PGCONX] : Contour map of a 2-d data array (non-rectangular).
-\item [PGERRX] : Horizontal error bar.
-\item [PGERRY] : Vertical error bar.
-\item [PGFUNT] : Function defined by X = F(T), Y = G(T).
-\item [PGFUNX] : Function defined by Y = F(X).
-\item [PGFUNY] : Function defined by X = F(Y).
-\item [PGGRAY] : Gray-scale map of a 2-d data array.
-\item [PGHI2D] : Cross-sections through a 2-d data array.
-\item [PGHIST] : Histogram of unbinned data.
+\item [PGBIN:]  Histogram of binned data.
+\item [PGCONS:]  Contour map of a 2-d data array (fast algorithm).
+\item [PGCONT:]  Contour map of a 2-d data array (contour-following).
+\item [PGCONX:]  Contour map of a 2-d data array (non-rectangular).
+\item [PGERRX:]  Horizontal error bar.
+\item [PGERRY:]  Vertical error bar.
+\item [PGFUNT:]  Function defined by X = F(T), Y = G(T).
+\item [PGFUNX:]  Function defined by Y = F(X).
+\item [PGFUNY:]  Function defined by X = F(Y).
+\item [PGGRAY:]  Gray-scale map of a 2-d data array.
+\item [PGHI2D:]  Cross-sections through a 2-d data array.
+\item [PGHIST:]  Histogram of unbinned data.
 \end{description}
 
-\item [Interactive graphics (cursor)] ---
+\item [Interactive graphics (cursor) ---]
 
 \begin{description}
-\item [PGCURSE] : Read cursor position.
-\item [PGLCUR] : Draw a line using the cursor.
-\item [PGNCURSE] : Mark a set of points using the cursor.
-\item [PGOLIN] : Mark a set of points using the cursor.
+\item [PGCURSE:]  Read cursor position.
+\item [PGLCUR:]  Draw a line using the cursor.
+\item [PGNCURSE:]  Mark a set of points using the cursor.
+\item [PGOLIN:]  Mark a set of points using the cursor.
 \end{description}
 
-\item [Inquiry] ---
+\item [Inquiry ---]
 
 \begin{description}
-\item [PGQCF] : Inquire character font.
-\item [PGQCH] : Inquire character height.
-\item [PGQCI] : Inquire color index.
-\item [PGQCR] : Inquire color representation.
-\item [PGQFS] : Inquire fill-area style.
-\item [PGQINF] : Inquire general information.
-\item [PGQLS] : Inquire line style.
-\item [PGQLW] : Inquire line width.
-\item [PGQVP] : Inquire viewport size and position.
-\item [PGQWIN] : Inquire window boundary coordinates.
+\item [PGQCF:]  Inquire character font.
+\item [PGQCH:]  Inquire character height.
+\item [PGQCI:]  Inquire color index.
+\item [PGQCR:]  Inquire color representation.
+\item [PGQFS:]  Inquire fill-area style.
+\item [PGQINF:]  Inquire general information.
+\item [PGQLS:]  Inquire line style.
+\item [PGQLW:]  Inquire line width.
+\item [PGQVP:]  Inquire viewport size and position.
+\item [PGQWIN:]  Inquire window boundary coordinates.
 \end{description}
 
-\item [Utilities] ---
+\item [Utilities ---]
 
 \begin{description}
-\item [PGETXT] : Erase text from graphics display.
-\item [PGIDEN] : Write username, date, and time at bottom of plot.
-\item [PGLDEV] : List available device types.
-\item [PGNUMB] : Convert a number into a plottable character string.
-\item [PGRND] : Find the smallest ``round'' number greater than x.
-\item [PGRNGE] : Choose axis limits.
+\item [PGETXT:]  Erase text from graphics display.
+\item [PGIDEN:]  Write username, date, and time at bottom of plot.
+\item [PGLDEV:]  List available device types.
+\item [PGNUMB:]  Convert a number into a plottable character string.
+\item [PGRND:]  Find the smallest ``round'' number greater than x.
+\item [PGRNGE:]  Choose axis limits.
 \end{description}
 
 \end{description}
@@ -945,147 +944,147 @@ have the following names:
 
 \begin{description}
 
-\item [Axes, Grids, Borders, and Titles] ---
+\item [Axes, Grids, Borders, and Titles ---]
 
 \begin{description}
-\item [J06AAF] : Pair of axes for current data region, automatic annotation.
-\item [J06ABF] : Pair of axes for current data region, user-specified annotation.
-\item [J06ACF] : Grid for the current data region, automatic annotation.
-\item [J06ADF] : Grid for the current data region, user-specifiable annotation.
-\item [J06AEF] : Scaled border for current data region, automatic annotation.
-\item [J06AFF] : Scaled border for current data region, user-specified annotation.
-\item [J06AGF] : Single axis under user control.
-\item [J06AHF] : Plot title, centred at the top of the current data region.
-\item [J06AJF] : Axis title, centred at side or bottom of current data region.
-\item [J06AKF] : Pair of logarithmic axes for current data region, automatic annotation.
-\item [J06ALF] : Logarithmic grid for current data region, automatic annotation.
-\item [J06AMF] : Logarithmic border for current data region, automatic annotation.
-\item [J06ANF] : Single logarithmic axis under user control.
-\item [J06APF] : Single axis with user-specified position of tick marks and annotation.
-\item [J06AQF] : Single axis with user-supplied annotation, and control over position of tick marks and annotation.
+\item [J06AAF:]  Pair of axes for current data region, automatic annotation.
+\item [J06ABF:]  Pair of axes for current data region, user-specified annotation.
+\item [J06ACF:]  Grid for the current data region, automatic annotation.
+\item [J06ADF:]  Grid for the current data region, user-specifiable annotation.
+\item [J06AEF:]  Scaled border for current data region, automatic annotation.
+\item [J06AFF:]  Scaled border for current data region, user-specified annotation.
+\item [J06AGF:]  Single axis under user control.
+\item [J06AHF:]  Plot title, centred at the top of the current data region.
+\item [J06AJF:]  Axis title, centred at side or bottom of current data region.
+\item [J06AKF:]  Pair of logarithmic axes for current data region, automatic annotation.
+\item [J06ALF:]  Logarithmic grid for current data region, automatic annotation.
+\item [J06AMF:]  Logarithmic border for current data region, automatic annotation.
+\item [J06ANF:]  Single logarithmic axis under user control.
+\item [J06APF:]  Single axis with user-specified position of tick marks and annotation.
+\item [J06AQF:]  Single axis with user-supplied annotation, and control over position of tick marks and annotation.
 \end{description}
 
-\item [Point plotting and Straight line drawing] ---
+\item [Point plotting and Straight line drawing ---]
 
 \begin{description}
-\item [J06BAF] : Plot data points with optional straight lines and markers.
-\item [J06BBF] : Linear regression line using output from G02CAF, G02CBF, G02CCF or G02CDF.
-\item [J06BCF] : Plot a series of data points with optional error bars.
-\item [J06BYF] : Key to current NAG pen styles.
-\item [J06BZF] : Key to current line styles and/or markers.
+\item [J06BAF:]  Plot data points with optional straight lines and markers.
+\item [J06BBF:]  Linear regression line using output from G02CAF, G02CBF, G02CCF or G02CDF.
+\item [J06BCF:]  Plot a series of data points with optional error bars.
+\item [J06BYF:]  Key to current NAG pen styles.
+\item [J06BZF:]  Key to current line styles and/or markers.
 \end{description}
 
-\item [Curve drawing] ---
+\item [Curve drawing ---]
 
 \begin{description}
-\item [J06CAF] : Plot single-valued curve through data points.
-\item [J06CBF] : Plot single-valued curve through data points, called point-wise.
-\item [J06CCF] : Plot possibly multi-valued curve through data points.
-\item [J06CDF] : Plot possibly multi-valued curve through data points, called point-wise.
+\item [J06CAF:]  Plot single-valued curve through data points.
+\item [J06CBF:]  Plot single-valued curve through data points, called point-wise.
+\item [J06CCF:]  Plot possibly multi-valued curve through data points.
+\item [J06CDF:]  Plot possibly multi-valued curve through data points, called point-wise.
 \end{description}
 
-\item [ODE graphics] ---
+\item [ODE graphics ---]
 
 \begin{description}
-\item [J06DAF] : Plot a graph of components of the solution of a system of ODEs, comprehensive version, using option setting.
+\item [J06DAF:]  Plot a graph of components of the solution of a system of ODEs, comprehensive version, using option setting.
 \end{description}
 
-\item [General function drawing] ---
+\item [General function drawing ---]
 
 \begin{description}
-\item [J06EAF] : Plot user-supplied function over specified range.
-\item [J06EBF] : Plot user-supplied function over specified range, called point-wise.
-\item [J06ECF] : Plot a parametric curve.
+\item [J06EAF:]  Plot user-supplied function over specified range.
+\item [J06EBF:]  Plot user-supplied function over specified range, called point-wise.
+\item [J06ECF:]  Plot a parametric curve.
 \end{description}
 
 \newpage
 
-\item [Special function drawing] ---
+\item [Special function drawing ---]
 
 \begin{description}
-\item [J06FAF] : Plot cubic spline in an interval, from its B-spline representation.
-\item [J06FBF] : Plot polynomial represented in Chebyshev form, using output from E02ADF or E02AFF.
+\item [J06FAF:]  Plot cubic spline in an interval, from its B-spline representation.
+\item [J06FBF:]  Plot polynomial represented in Chebyshev form, using output from E02ADF or E02AFF.
 \end{description}
 
-\item [Contouring] ---
+\item [Contouring ---]
 
 \begin{description}
-\item [J06GAF] : Easy-to-use contour map, data on regular rectangular grid.
-\item [J06GBF] : Comprehensive contour map, data on regular rectangular grid.
-\item [J06GCF] : Easy-to-use contour map, data on irregular rectangular grid.
-\item [J06GDF] : Comprehensive contour map, data on irregular rectangular grid.
-\item [J06GEF] : Easy-to-use contour map, user-supplied function.
-\item [J06GFF] : Comprehensive contour map, user-supplied function.
-\item [J06GGF] : Comprehensive contour map, using option setting, data scattered.
-\item [J06GYF] : Key to contour plot produced with J06GGF.
-\item [J06GZF] : Key to contour indices.
+\item [J06GAF:]  Easy-to-use contour map, data on regular rectangular grid.
+\item [J06GBF:]  Comprehensive contour map, data on regular rectangular grid.
+\item [J06GCF:]  Easy-to-use contour map, data on irregular rectangular grid.
+\item [J06GDF:]  Comprehensive contour map, data on irregular rectangular grid.
+\item [J06GEF:]  Easy-to-use contour map, user-supplied function.
+\item [J06GFF:]  Comprehensive contour map, user-supplied function.
+\item [J06GGF:]  Comprehensive contour map, using option setting, data scattered.
+\item [J06GYF:]  Key to contour plot produced with J06GGF.
+\item [J06GZF:]  Key to contour indices.
 \end{description}
 
-\item [Surface viewing] ---
+\item [Surface viewing ---]
 
 \begin{description}
-\item [J06HAF] : Easy-to-use isometric surface view, data on regular rectangular grid.
-\item [J06HBF] : Comprehensive isometric surface view, data on regular rectangular grid.
-\item [J06HCF] : Perspective surface view, data on regular rectangular grid.
-\item [J06HDF] : Easy-to-use perspective surface view, data on irregular rectangular grid.
-\item [J06HEF] : Comprehensive perspective surface view, data on irregular rectangular grid.
-\item [J06HFF] : Perspective surface view, sections parallel to either horizontal axis.
-\item [J06HGF] : Perspective view of a 3-d histogram.
-\item [J06HHF] : Annotate data points on a perspective surface view.
-\item [J06HJF] : Annotate individual data blocks on a 3-d histogram.
-\item [J06HKF] : Isometric surface view of a 2-d function f(x,y).
-\item [J06HLF] : Perspective surface view of a 2-d function f(x,y).
+\item [J06HAF:]  Easy-to-use isometric surface view, data on regular rectangular grid.
+\item [J06HBF:]  Comprehensive isometric surface view, data on regular rectangular grid.
+\item [J06HCF:]  Perspective surface view, data on regular rectangular grid.
+\item [J06HDF:]  Easy-to-use perspective surface view, data on irregular rectangular grid.
+\item [J06HEF:]  Comprehensive perspective surface view, data on irregular rectangular grid.
+\item [J06HFF:]  Perspective surface view, sections parallel to either horizontal axis.
+\item [J06HGF:]  Perspective view of a 3-d histogram.
+\item [J06HHF:]  Annotate data points on a perspective surface view.
+\item [J06HJF:]  Annotate individual data blocks on a 3-d histogram.
+\item [J06HKF:]  Isometric surface view of a 2-d function f(x,y).
+\item [J06HLF:]  Perspective surface view of a 2-d function f(x,y).
 \end{description}
 
-\item [Data presentation] ---
+\item [Data presentation ---]
 
 \begin{description}
-\item [J06JAF] : Shaded bar chart, vertical, various styles (easy-to-use).
-\item [J06JBF] : Shaded bar chart, vertical, various styles (comprehensive).
-\item [J06JCF] : Shaded bar chart, variable width bars.
-\item [J06JDF] : Shaded bar chart, horizontal, various styles (easy-to-use).
-\item [J06JEF] : Shaded bar chart, horizontal, various styles (comprehensive).
-\item [J06JFF] : Shaded block chart, variable width and height blocks.
-\item [J06JGF] : Marker diagram, sorts data into bins.
-\item [J06JHF] : Marker diagram, subdivision of bins.
-\item [J06JKF] : Shaded pie chart, (easy-to-use).
-\item [J06JLF] : Shaded pie chart, (comprehensive).
-\item [J06JMF] : Shaded bar chart, vertical or horizontal, no subdivision of bins (easy-to-use).
-\item [J06JNF] : Frequency distribution diagram, various styles, integer grid input.
-\item [J06JPF] : Frequency distribution diagram and scatter plot, various styles, x,y input data.
-\item [J06JYF] : Key to numeric values.
-\item [J06JZF] : Key to area fill styles.
+\item [J06JAF:]  Shaded bar chart, vertical, various styles (easy-to-use).
+\item [J06JBF:]  Shaded bar chart, vertical, various styles (comprehensive).
+\item [J06JCF:]  Shaded bar chart, variable width bars.
+\item [J06JDF:]  Shaded bar chart, horizontal, various styles (easy-to-use).
+\item [J06JEF:]  Shaded bar chart, horizontal, various styles (comprehensive).
+\item [J06JFF:]  Shaded block chart, variable width and height blocks.
+\item [J06JGF:]  Marker diagram, sorts data into bins.
+\item [J06JHF:]  Marker diagram, subdivision of bins.
+\item [J06JKF:]  Shaded pie chart, (easy-to-use).
+\item [J06JLF:]  Shaded pie chart, (comprehensive).
+\item [J06JMF:]  Shaded bar chart, vertical or horizontal, no subdivision of bins (easy-to-use).
+\item [J06JNF:]  Frequency distribution diagram, various styles, integer grid input.
+\item [J06JPF:]  Frequency distribution diagram and scatter plot, various styles, x,y input data.
+\item [J06JYF:]  Key to numeric values.
+\item [J06JZF:]  Key to area fill styles.
 \end{description}
 
-\item [Vector field plotting] ---
+\item [Vector field plotting ---]
 
 \begin{description}
-\item [J06KAF] : Plot a 2-d vector field diagram.
-\item [J06KBF] : Plot a 3-d vector field diagram.
-\item [J06KCF] : Plot a 2-d vector field diagram from a user-supplied function.
-\item [J06KDF] : Plot a 3-d vector field diagram from a user-supplied function.
+\item [J06KAF:]  Plot a 2-d vector field diagram.
+\item [J06KBF:]  Plot a 3-d vector field diagram.
+\item [J06KCF:]  Plot a 2-d vector field diagram from a user-supplied function.
+\item [J06KDF:]  Plot a 3-d vector field diagram from a user-supplied function.
 \end{description}
 
-\item [Statistical graphics] ---
+\item [Statistical graphics ---]
 
 \begin{description}
-\item [J06SAF] : Plot a time-series, and optionally user-supplied forecasts and standard error limits.
-\item [J06SBF] : Plot autocorrelation or partial autocorrelation function of a time series.
-\item [J06SCF] : Plot a cumulative normal probability graph. Data may be grouped together and a histogram plotted.
-\item [J06SDF] : Plot a linear regression line and optional confidence limits for data and line.
-\item [J06SEF] : Draw box and whisker plots.
+\item [J06SAF:]  Plot a time-series, and optionally user-supplied forecasts and standard error limits.
+\item [J06SBF:]  Plot autocorrelation or partial autocorrelation function of a time series.
+\item [J06SCF:]  Plot a cumulative normal probability graph. Data may be grouped together and a histogram plotted.
+\item [J06SDF:]  Plot a linear regression line and optional confidence limits for data and line.
+\item [J06SEF:]  Draw box and whisker plots.
 \end{description}
 
-\item [I/O utilities] ---
+\item [I/O utilities ---]
 
 \begin{description}
-\item [J06VAF] : Return or define the unit number for error messages.
-\item [J06VBF] : Return or define the unit number for advisory messages.
-\item [J06VCF] : Return or define the unit number for command sequence output.
-\item [J06VDF] : Return or define the unit number from which Hershey fonts will be read (used only by PC Graphics implementations).
-\item [J06VEF] : Return or define the unit number to which SAVE options should be directed.
-\item [J06VFF] : Read a set of optional parameters from an external file.
-\item [J06VGF] : Supply individual optional parameter for a specified routine.
+\item [J06VAF:]  Return or define the unit number for error messages.
+\item [J06VBF:]  Return or define the unit number for advisory messages.
+\item [J06VCF:]  Return or define the unit number for command sequence output.
+\item [J06VDF:]  Return or define the unit number from which Hershey fonts will be read (used only by PC Graphics implementations).
+\item [J06VEF:]  Return or define the unit number to which SAVE options should be directed.
+\item [J06VFF:]  Read a set of optional parameters from an external file.
+\item [J06VGF:]  Supply individual optional parameter for a specified routine.
 \end{description}
 
 \end{description}
@@ -1102,124 +1101,124 @@ have the following names:
 
 \begin{description}
 
-\item [Parameter] ---
+\item [Parameter ---]
 
 \begin{description}
-\item [SGS\_ASSOC] : Associate an SGS zone with a parameter.
-\item [SGS\_CANCL] : Cancel the association of an SGS zone with a parameter.
-\item [SGS\_ANNUL] : Release an SGS zone and annul its descriptor.
+\item [SGS\_ASSOC:]  Associate an SGS zone with a parameter.
+\item [SGS\_CANCL:]  Cancel the association of an SGS zone with a parameter.
+\item [SGS\_ANNUL:]  Release an SGS zone and annul its descriptor.
 \end{description}
 
-\item [Control] ---
+\item [Control ---]
 
 \begin{description}
-\item [SGS\_OPEN] : Open SGS \& GKS, opening and activating one workstation.
-\item [SGS\_INIT] : Open SGS \& GKS, without opening a workstation.
-\item [SGS\_CLOSE] : Shut down SGS \& GKS.
-\item [SGS\_OPNWK] : Open a new workstation and select it.
-\item [SGS\_CLSWK] : Close a workstation.
-\item [SGS\_WLIST] : Output a list of available workstations.
-\item [SGS\_SPEN] : Select a pen for line and text drawing.
-\item [SGS\_IPEN] : Inquire current pen number.
-\item [SGS\_FLUSH] : Complete all pending output.
-\item [SGS\_ISLER] : Inquire whether device has selective erase capability.
-\item [SGS\_CLRFG] : Set or clear the `clear display on open' flag.
+\item [SGS\_OPEN:]  Open SGS \& GKS, opening and activating one workstation.
+\item [SGS\_INIT:]  Open SGS \& GKS, without opening a workstation.
+\item [SGS\_CLOSE:]  Shut down SGS \& GKS.
+\item [SGS\_OPNWK:]  Open a new workstation and select it.
+\item [SGS\_CLSWK:]  Close a workstation.
+\item [SGS\_WLIST:]  Output a list of available workstations.
+\item [SGS\_SPEN:]  Select a pen for line and text drawing.
+\item [SGS\_IPEN:]  Inquire current pen number.
+\item [SGS\_FLUSH:]  Complete all pending output.
+\item [SGS\_ISLER:]  Inquire whether device has selective erase capability.
+\item [SGS\_CLRFG:]  Set or clear the `clear display on open' flag.
 \end{description}
 
-\item [Zones] ---
+\item [Zones ---]
 
 \begin{description}
-\item [SGS\_ZONE] : Create and select a zone of the specified extent.
-\item [SGS\_ZSHAP] : Create and select a zone of the specified aspect ratio.
-\item [SGS\_ZSIZE] : Create and select a zone of the specified size.
-\item [SGS\_ZPART] : Partition current zone into NX by NY pieces.
-\item [SGS\_SW] : Set window of current zone to given bounds.
-\item [SGS\_SELZ] : Select another zone.
-\item [SGS\_RELZ] : Release the specified zone.
-\item [SGS\_CLRZ] : Clear the current zone (even if this means clearing the
+\item [SGS\_ZONE:]  Create and select a zone of the specified extent.
+\item [SGS\_ZSHAP:]  Create and select a zone of the specified aspect ratio.
+\item [SGS\_ZSIZE:]  Create and select a zone of the specified size.
+\item [SGS\_ZPART:]  Partition current zone into NX by NY pieces.
+\item [SGS\_SW:]  Set window of current zone to given bounds.
+\item [SGS\_SELZ:]  Select another zone.
+\item [SGS\_RELZ:]  Release the specified zone.
+\item [SGS\_CLRZ:]  Clear the current zone (even if this means clearing the
  whole display surface).
-\item [SGS\_ICURZ] : Inquire ID of current zone.
-\item [SGS\_IZONE] : Inquire window bounds and size on the display surface for
+\item [SGS\_ICURZ:]  Inquire ID of current zone.
+\item [SGS\_IZONE:]  Inquire window bounds and size on the display surface for
  the current zone.
-\item [SGS\_IDUN] : Inquire the plotting resolution of the current zone.
-\item [SGS\_TPZ] : Transform position from one zone to another.
-\item [SGS\_BZNDC] : Set the NDC extent of a base zone.
+\item [SGS\_IDUN:]  Inquire the plotting resolution of the current zone.
+\item [SGS\_TPZ:]  Transform position from one zone to another.
+\item [SGS\_BZNDC:]  Set the NDC extent of a base zone.
 \end{description}
 
-\item [Plotting lines] ---
+\item [Plotting lines ---]
 
 \begin{description}
-\item [SGS\_BPOLY] : Begin a new polyline.
-\item [SGS\_APOLY] : Append a new line to the polyline.
-\item [SGS\_OPOLY] : Output the polyline.
-\item [SGS\_IPLXY] : Inquire end of current polyline.
-\item [SGS\_LINE] : Begin a new polyline with a single line.
-\item [SGS\_BOX] : Draw a rectangle.
-\item [SGS\_CIRCL] : Draw a circle.
-\item [SGS\_ARC] : Draw an arc of a circle.
-\item [SGS\_CLRBL] : Clear a rectangular area (if this can be done without
+\item [SGS\_BPOLY:]  Begin a new polyline.
+\item [SGS\_APOLY:]  Append a new line to the polyline.
+\item [SGS\_OPOLY:]  Output the polyline.
+\item [SGS\_IPLXY:]  Inquire end of current polyline.
+\item [SGS\_LINE:]  Begin a new polyline with a single line.
+\item [SGS\_BOX:]  Draw a rectangle.
+\item [SGS\_CIRCL:]  Draw a circle.
+\item [SGS\_ARC:]  Draw an arc of a circle.
+\item [SGS\_CLRBL:]  Clear a rectangular area (if this can be done without
  affecting the rest of the display surface).
 \end{description}
 
-\item [Plotting text] ---
+\item [Plotting text ---]
 
 \begin{description}
-\item [SGS\_BTEXT] : Begin a new text string.
-\item [SGS\_ATEXT] : Append text to the current string.
-\item [SGS\_OTEXT] : Output the text string.
-\item [SGS\_ATXI] : Format an integer onto the current text string.
-\item [SGS\_ATXR] : Format a real number onto the current text string.
-\item [SGS\_ATXL] : Append text to the current text string, omitting trailing
+\item [SGS\_BTEXT:]  Begin a new text string.
+\item [SGS\_ATEXT:]  Append text to the current string.
+\item [SGS\_OTEXT:]  Output the text string.
+\item [SGS\_ATXI:]  Format an integer onto the current text string.
+\item [SGS\_ATXR:]  Format a real number onto the current text string.
+\item [SGS\_ATXL:]  Append text to the current text string, omitting trailing
  blanks.
-\item [SGS\_ATXB] : Append right justified field to the current text string.
-\item [SGS\_TX] : Begin a new text string with a string.
-\item [SGS\_TXI] : Begin a new text string with a formatted integer.
-\item [SGS\_TXR] : Begin a new text string with a formatted real number.
-\item [SGS\_ITXB] : Inquire status of current text string.
+\item [SGS\_ATXB:]  Append right justified field to the current text string.
+\item [SGS\_TX:]  Begin a new text string with a string.
+\item [SGS\_TXI:]  Begin a new text string with a formatted integer.
+\item [SGS\_TXR:]  Begin a new text string with a formatted real number.
+\item [SGS\_ITXB:]  Inquire status of current text string.
 \end{description}
 
-\item [Plotting markers] ---
+\item [Plotting markers ---]
 
 \begin{description}
-\item [SGS\_MARK] : Draw a single marker.
-\item [SGS\_MARKL] : Draw a marker at current end of polyline.
+\item [SGS\_MARK:]  Draw a single marker.
+\item [SGS\_MARKL:]  Draw a marker at current end of polyline.
 \end{description}
 
-\item [Attributes of characters] ---
+\item [Attributes of characters ---]
 
 \begin{description}
-\item [SGS\_SFONT] : Select text font.
-\item [SGS\_SPREC] : Specify text precision.
-\item [SGS\_SHTX] : Specify character height.
-\item [SGS\_SARTX] : Specify text aspect ratio.
-\item [SGS\_SUPTX] : Specify character orientation.
-\item [SGS\_SSPTX] : Specify character spacing.
-\item [SGS\_STXJ] : Specify text alignment.
-\item [SGS\_ITXA] : Inquire text attributes.
+\item [SGS\_SFONT:]  Select text font.
+\item [SGS\_SPREC:]  Specify text precision.
+\item [SGS\_SHTX:]  Specify character height.
+\item [SGS\_SARTX:]  Specify text aspect ratio.
+\item [SGS\_SUPTX:]  Specify character orientation.
+\item [SGS\_SSPTX:]  Specify character spacing.
+\item [SGS\_STXJ:]  Specify text alignment.
+\item [SGS\_ITXA:]  Inquire text attributes.
 \end{description}
 
-\item [Input] ---
+\item [Input ---]
 
 \begin{description}
-\item [SGS\_CUVIS] : Set visibility of cursor.
-\item [SGS\_DEFCH] : Define valid choice keys.
-\item [SGS\_DISCU] : Disable sample mode for cursor.
-\item [SGS\_ENSCU] : Enable sample mode for cursor.
-\item [SGS\_ICUAV] : Inquire cursor availability.
-\item [SGS\_INCHO] : Inquire number of choices.
-\item [SGS\_REQCH] : Request choice.
-\item [SGS\_REQCU] : Request cursor position.
-\item [SGS\_SAMCU] : Sample cursor position.
-\item [SGS\_SELCH] : Select choice device.
-\item [SGS\_SETCU] : Set cursor position.
+\item [SGS\_CUVIS:]  Set visibility of cursor.
+\item [SGS\_DEFCH:]  Define valid choice keys.
+\item [SGS\_DISCU:]  Disable sample mode for cursor.
+\item [SGS\_ENSCU:]  Enable sample mode for cursor.
+\item [SGS\_ICUAV:]  Inquire cursor availability.
+\item [SGS\_INCHO:]  Inquire number of choices.
+\item [SGS\_REQCH:]  Request choice.
+\item [SGS\_REQCU:]  Request cursor position.
+\item [SGS\_SAMCU:]  Sample cursor position.
+\item [SGS\_SELCH:]  Select choice device.
+\item [SGS\_SETCU:]  Set cursor position.
 \end{description}
 
-\item [GKS Inquires] ---
+\item [GKS Inquires ---]
 
 \begin{description}
-\item [SGS\_ICURW] : Inquire workstation ID for the current zone.
-\item [SGS\_WIDEN] : Translate workstation name to GKS type and connection ID.
-\item [SGS\_WNAME] : Get list of workstation names.
+\item [SGS\_ICURW:]  Inquire workstation ID for the current zone.
+\item [SGS\_WIDEN:]  Translate workstation name to GKS type and connection ID.
+\item [SGS\_WNAME:]  Get list of workstation names.
 \end{description}
 
 \end{description}
@@ -1241,11 +1240,11 @@ addition to which there exist the following `parameter routines':
 
 \begin{quote}
 \begin{description}
-\item [GKS\_ASSOC] : Associate a GKS workstation with a parameter and open it.
-\item [GKS\_CANCL] : Cancel the association of a GKS workstation with a parameter.
-\item [GKS\_ANNUL] : Release a GKS workstation and annul its descriptor.
-\item [GKS\_GSTAT] : Inquire if GKS has reported an error.
-\item [GKS\_DEACT] : De-activate GKS.
+\item [GKS\_ASSOC:]  Associate a GKS workstation with a parameter and open it.
+\item [GKS\_CANCL:]  Cancel the association of a GKS workstation with a parameter.
+\item [GKS\_ANNUL:]  Release a GKS workstation and annul its descriptor.
+\item [GKS\_GSTAT:]  Inquire if GKS has reported an error.
+\item [GKS\_DEACT:]  De-activate GKS.
 \end{description}
 \end{quote}
 
@@ -1261,130 +1260,130 @@ addition to which there exist the following `parameter routines':
 
 \begin{description}
 
-\item [Parameter] ---
+\item [Parameter ---]
 
 \begin{description}
-\item [IDI\_ASSOC] : Associate a display device with a parameter.
-\item [IDI\_CANCL] : Cancel the association of a display device with a
+\item [IDI\_ASSOC:]  Associate a display device with a parameter.
+\item [IDI\_CANCL:]  Cancel the association of a display device with a
  parameter.
-\item [IDI\_ANNUL] : Release a display device and annul its descriptor.
+\item [IDI\_ANNUL:]  Release a display device and annul its descriptor.
 \end{description}
 
-\item [Control] ---
+\item [Control ---]
 
 \begin{description}
-\item [IIDOPN] : Open display.
-\item [IIDCLO] : Close display.
-\item [IIDRST] : Reset display.
-\item [IIDUPD] : Update display.
-\item [IIDERR] : Get error.
+\item [IIDOPN:]  Open display.
+\item [IIDCLO:]  Close display.
+\item [IIDRST:]  Reset display.
+\item [IIDUPD:]  Update display.
+\item [IIDERR:]  Get error.
 \end{description}
 
-\item [Configuration] ---
+\item [Configuration ---]
 
 \begin{description}
-\item [IIDQDV] : Query device characteristics.
-\item [IIDQCI] : Query capabilities integer.
-\item [IIDQCR] : Query capabilities real.
-\item [IIDQDC] : Query defined configuration.
-\item [IIDSEL] : Select configuration.
+\item [IIDQDV:]  Query device characteristics.
+\item [IIDQCI:]  Query capabilities integer.
+\item [IIDQCR:]  Query capabilities real.
+\item [IIDQDC:]  Query defined configuration.
+\item [IIDSEL:]  Select configuration.
 \end{description}
 
-\item [Memories] ---
+\item [Memories ---]
 
 \begin{description}
-\item [IIMSMV] : Set memory visibility.
-\item [IIZWSC] : Write memory scroll.
-\item [IIZWZM] : Write memory zoom.
-\item [IIZRSZ] : Read memory scroll and zoom.
-\item [IIMSLT] : Select memory look-up tables.
-\item [IIMSDP] : Select display path.
-\item [IIMWMY] : Write memory.
-\item [IIMCMY] : Clear memory.
-\item [IIMRMY] : Read memory.
-\item [IIMSTW] : Set transfer window.
+\item [IIMSMV:]  Set memory visibility.
+\item [IIZWSC:]  Write memory scroll.
+\item [IIZWZM:]  Write memory zoom.
+\item [IIZRSZ:]  Read memory scroll and zoom.
+\item [IIMSLT:]  Select memory look-up tables.
+\item [IIMSDP:]  Select display path.
+\item [IIMWMY:]  Write memory.
+\item [IIMCMY:]  Clear memory.
+\item [IIMRMY:]  Read memory.
+\item [IIMSTW:]  Set transfer window.
 \end{description}
 
-\item [Graphics] ---
+\item [Graphics ---]
 
 \begin{description}
-\item [IIGPLY] : Draw polyline.
-\item [IIGTXT] : Plot text.
+\item [IIGPLY:]  Draw polyline.
+\item [IIGTXT:]  Plot text.
 \end{description}
 
-\item [Look-up table] ---
+\item [Look-up table ---]
 
 \begin{description}
-\item [IILWIT] : Write intensity transformation table.
-\item [IILRIT] : Read intensity transformation table.
-\item [IILWLT] : Write video look-up tables.
-\item [IILRLT] : Read video look-up tables.
+\item [IILWIT:]  Write intensity transformation table.
+\item [IILRIT:]  Read intensity transformation table.
+\item [IILWLT:]  Write video look-up tables.
+\item [IILRLT:]  Read video look-up tables.
 \end{description}
 
-\item [Zoom and Pan] ---
+\item [Zoom and Pan ---]
 
 \begin{description}
-\item [IIZWZP] : Write display zoom and pan.
-\item [IIZRZP] : Read display zoom and pan.
+\item [IIZWZP:]  Write display zoom and pan.
+\item [IIZRZP:]  Read display zoom and pan.
 \end{description}
 
-\item [Cursor] ---
+\item [Cursor ---]
 
 \begin{description}
-\item [IICINC] : Initialize cursor.
-\item [IICSCV] : Set cursor visibility.
-\item [IICRCP] : Read cursor position.
-\item [IICWCP] : Write cursor position.
+\item [IICINC:]  Initialize cursor.
+\item [IICSCV:]  Set cursor visibility.
+\item [IICRCP:]  Read cursor position.
+\item [IICWCP:]  Write cursor position.
 \end{description}
 
-\item [Region of interest] ---
+\item [Region of interest ---]
 
 \begin{description}
-\item [IIRINR] : Initialize rectangular region of interest.
-\item [IIRSRV] : Set visibility rectangular region of interest.
-\item [IIRRRI] : Read rectangular region of interest.
-\item [IIRWRI] : Write rectangular region of interest.
+\item [IIRINR:]  Initialize rectangular region of interest.
+\item [IIRSRV:]  Set visibility rectangular region of interest.
+\item [IIRRRI:]  Read rectangular region of interest.
+\item [IIRWRI:]  Write rectangular region of interest.
 \end{description}
 
-\item [Interaction] ---
+\item [Interaction ---]
 
 \begin{description}
-\item [IIIENI] : Enable interaction.
-\item [IIIEIW] : Execute interaction and wait.
-\item [IIISTI] : Stop interactive input.
-\item [IIIQID] : Query interactor description.
-\item [IIIGLD] : Get locator displacement.
-\item [IIIGIE] : Get integer evaluator.
-\item [IIIGRE] : Get real evaluator.
-\item [IIIGLE] : Get logical evaluator.
-\item [IIIGSE] : Get string evaluator.
+\item [IIIENI:]  Enable interaction.
+\item [IIIEIW:]  Execute interaction and wait.
+\item [IIISTI:]  Stop interactive input.
+\item [IIIQID:]  Query interactor description.
+\item [IIIGLD:]  Get locator displacement.
+\item [IIIGIE:]  Get integer evaluator.
+\item [IIIGRE:]  Get real evaluator.
+\item [IIIGLE:]  Get logical evaluator.
+\item [IIIGSE:]  Get string evaluator.
 \end{description}
 
-\item [Miscellaneous] ---
+\item [Miscellaneous ---]
 
 \begin{description}
-\item [IIDSNP] : Create snapshot.
-\item [IIMBLM] : Blink memories.
-\item [IIDSSS] : Set split screen.
-\item [IILSBV] : Set intensity bar visibility.
-\item [IIDIAG] : Diagnostic routine.
-\item [IIEGEP] : Get escape parameter.
-\item [IIEPEP] : Put escape parameter.
+\item [IIDSNP:]  Create snapshot.
+\item [IIMBLM:]  Blink memories.
+\item [IIDSSS:]  Set split screen.
+\item [IILSBV:]  Set intensity bar visibility.
+\item [IIDIAG:]  Diagnostic routine.
+\item [IIEGEP:]  Get escape parameter.
+\item [IIEPEP:]  Put escape parameter.
 \end{description}
 
-\item [Workstation interface] ---
+\item [Workstation interface ---]
 
 \begin{description}
-\item [IIDENC] : Enable configuration.
-\item [IIDAMY] : Allocate memory.
-\item [IIDSTC] : Stop configuration.
-\item [IIDRLC] : Release configuration.
+\item [IIDENC:]  Enable configuration.
+\item [IIDAMY:]  Allocate memory.
+\item [IIDSTC:]  Stop configuration.
+\item [IIDRLC:]  Release configuration.
 \end{description}
 
-\item [Additional] ---
+\item [Additional ---]
 
 \begin{description}
-\item [IDI\_CLRFG] : Set clear flag.
+\item [IDI\_CLRFG:]  Set clear flag.
 \end{description}
 
 \end{description}
@@ -1401,102 +1400,102 @@ addition to which there exist the following `parameter routines':
 
 \begin{description}
 
-\item [Parameter] ---
+\item [Parameter ---]
 
 \begin{description}
-\item [AGI\_ASSOC] : Associate a workstation with a parameter.
-\item [AGI\_CANCL] : Cancel parameter association.
-\item [AGI\_ANNUL] : Annul the picture identifier.
+\item [AGI\_ASSOC:]  Associate a workstation with a parameter.
+\item [AGI\_CANCL:]  Cancel parameter association.
+\item [AGI\_ANNUL:]  Annul the picture identifier.
 \end{description}
 
-\item [Control] ---
+\item [Control ---]
 
 \begin{description}
-\item [AGI\_BEGIN] : Mark the beginning of a new AGI scope.
-\item [AGI\_CLOSE] : Close AGI in a non-ADAM environment.
-\item [AGI\_END] : Mark the end of an AGI scope.
-\item [AGI\_NUPIC] : Create a new picture in the database.
-\item [AGI\_OPEN] : Open AGI in a non-ADAM environment.
-\item [AGI\_PDEL] : Delete all pictures on a workstation.
-\item [AGI\_SELP] : Select the given picture as the current one.
-\item [AGI\_SROOT] : Select the root picture for searching.
+\item [AGI\_BEGIN:]  Mark the beginning of a new AGI scope.
+\item [AGI\_CLOSE:]  Close AGI in a non-ADAM environment.
+\item [AGI\_END:]  Mark the end of an AGI scope.
+\item [AGI\_NUPIC:]  Create a new picture in the database.
+\item [AGI\_OPEN:]  Open AGI in a non-ADAM environment.
+\item [AGI\_PDEL:]  Delete all pictures on a workstation.
+\item [AGI\_SELP:]  Select the given picture as the current one.
+\item [AGI\_SROOT:]  Select the root picture for searching.
 \end{description}
 
-\item [Inquiries] ---
+\item [Inquiries ---]
 
 \begin{description}
-\item [AGI\_IBASE] : Inquire base picture for current workstation.
-\item [AGI\_ICOM] : Inquire comment for current picture.
-\item [AGI\_ICURP] : Inquire current picture identifier.
-\item [AGI\_INAME] : Inquire name of current picture.
-\item [AGI\_IPOBS] : Inquire if current picture obscured by another.
-\item [AGI\_ISAMD] : Inquire if pictures are on same device.
-\item [AGI\_ITOBS] : Inquire if test points are obscured.
-\item [AGI\_IWOCO] : Inquire world coordinates of current picture.
+\item [AGI\_IBASE:]  Inquire base picture for current workstation.
+\item [AGI\_ICOM:]  Inquire comment for current picture.
+\item [AGI\_ICURP:]  Inquire current picture identifier.
+\item [AGI\_INAME:]  Inquire name of current picture.
+\item [AGI\_IPOBS:]  Inquire if current picture obscured by another.
+\item [AGI\_ISAMD:]  Inquire if pictures are on same device.
+\item [AGI\_ITOBS:]  Inquire if test points are obscured.
+\item [AGI\_IWOCO:]  Inquire world coordinates of current picture.
 \end{description}
 
-\item [Recall] ---
+\item [Recall ---]
 
 \begin{description}
-\item [AGI\_RCF] : Recall first picture of specified name.
-\item [AGI\_RCFP] : Recall first picture embracing a position.
-\item [AGI\_RCL] : Recall last picture of specified name.
-\item [AGI\_RCLP] : Recall last picture embracing a position.
-\item [AGI\_RCP] : Recall preceding picture of specified name.
-\item [AGI\_RCPP] : Recall preceding picture embracing a position.
-\item [AGI\_RCS] : Recall succeeding picture of specified name.
-\item [AGI\_RCSP] : Recall succeeding picture embracing a position.
+\item [AGI\_RCF:]  Recall first picture of specified name.
+\item [AGI\_RCFP:]  Recall first picture embracing a position.
+\item [AGI\_RCL:]  Recall last picture of specified name.
+\item [AGI\_RCLP:]  Recall last picture embracing a position.
+\item [AGI\_RCP:]  Recall preceding picture of specified name.
+\item [AGI\_RCPP:]  Recall preceding picture embracing a position.
+\item [AGI\_RCS:]  Recall succeeding picture of specified name.
+\item [AGI\_RCSP:]  Recall succeeding picture embracing a position.
 \end{description}
 
-\item [Labels] ---
+\item [Labels ---]
 
 \begin{description}
-\item [AGI\_ILAB] : Inquire label of a picture.
-\item [AGI\_SLAB] : Store label in picture.
+\item [AGI\_ILAB:]  Inquire label of a picture.
+\item [AGI\_SLAB:]  Store label in picture.
 \end{description}
 
-\item [Reference] ---
+\item [Reference ---]
 
 \begin{description}
-\item [AGI\_GTREF] : Get a reference to an HDS object.
-\item [AGI\_PTREF] : Write a reference to an HDS object.
+\item [AGI\_GTREF:]  Get a reference to an HDS object.
+\item [AGI\_PTREF:]  Write a reference to an HDS object.
 \end{description}
 
-\item [Transformations] ---
+\item [Transformations ---]
 
 \begin{description}
-\item [AGI\_TDDTW] : Transform double precision data to world coordinates.
-\item [AGI\_TDTOW] : Transform data to world coordinates.
-\item [AGI\_TNEW] : Store a transformation in the database.
-\item [AGI\_TWTDD] : Transform double precision world to data coordinates.
-\item [AGI\_TWTOD] : Transform world to data coordinates.
+\item [AGI\_TDDTW:]  Transform double precision data to world coordinates.
+\item [AGI\_TDTOW:]  Transform data to world coordinates.
+\item [AGI\_TNEW:]  Store a transformation in the database.
+\item [AGI\_TWTDD:]  Transform double precision world to data coordinates.
+\item [AGI\_TWTOD:]  Transform world to data coordinates.
 \end{description}
 
-\item [Interface to IDI] ---
+\item [Interface to IDI ---]
 
 \begin{description}
-\item [AGD\_ACTIV] : Initialise IDI.
-\item [AGD\_DEACT] : Close down IDI.
-\item [AGD\_NWIND] : Define an IDI window from the current picture.
-\item [AGD\_SWIND] : Save an IDI window in the database.
+\item [AGD\_ACTIV:]  Initialise IDI.
+\item [AGD\_DEACT:]  Close down IDI.
+\item [AGD\_NWIND:]  Define an IDI window from the current picture.
+\item [AGD\_SWIND:]  Save an IDI window in the database.
 \end{description}
 
-\item [Interface to PGPLOT] ---
+\item [Interface to PGPLOT ---]
 
 \begin{description}
-\item [AGP\_ACTIV] : Initialise PGPLOT.
-\item [AGP\_DEACT] : Close down PGPLOT.
-\item [AGP\_NVIEW] : Create a new viewport from the current picture.
-\item [AGP\_SVIEW] : Save the current viewport in the database.
+\item [AGP\_ACTIV:]  Initialise PGPLOT.
+\item [AGP\_DEACT:]  Close down PGPLOT.
+\item [AGP\_NVIEW:]  Create a new viewport from the current picture.
+\item [AGP\_SVIEW:]  Save the current viewport in the database.
 \end{description}
 
-\item [Interface to SGS] ---
+\item [Interface to SGS ---]
 
 \begin{description}
-\item [AGS\_ACTIV] : Initialise SGS.
-\item [AGS\_DEACT] : Close down SGS.
-\item [AGS\_NZONE] : Create a new zone from the current picture.
-\item [AGS\_SZONE] : Save the current zone in the database.
+\item [AGS\_ACTIV:]  Initialise SGS.
+\item [AGS\_DEACT:]  Close down SGS.
+\item [AGS\_NZONE:]  Create a new zone from the current picture.
+\item [AGS\_SZONE:]  Save the current zone in the database.
 \end{description}
 
 \end{description}
@@ -1513,41 +1512,41 @@ addition to which there exist the following `parameter routines':
 
 \begin{description}
 
-\item [Get names] ---
+\item [Get names ---]
 
 \begin{description}
-\item [GNS\_GTN] : Get terminal name.
-\item [GNS\_GWNG] : Get next GKS workstation name.
-\item [GNS\_GWNI] : Get next IDI workstation name.
+\item [GNS\_GTN:]  Get terminal name.
+\item [GNS\_GWNG:]  Get next GKS workstation name.
+\item [GNS\_GWNI:]  Get next IDI workstation name.
 \end{description}
 
-\item [Inquiries] ---
+\item [Inquiries ---]
 
 \begin{description}
-\item [GNS\_IANG] : Inquire AGI name of GKS workstation.
-\item [GNS\_IANI] : Inquire AGI name of IDI workstation.
-\item [GNS\_IDNG] : Inquire device name of GKS workstation.
-\item [GNS\_IETG] : Inquire string to erase text screen.
-\item [GNS\_IGAG] : Inquire GKS workstation name from AGI name.
-\item [GNS\_IIAI] : Inquire IDI workstation name from AGI name.
-\item [GNS\_ITWCG] : Inquire a workstation characteristic from its type.
-\item [GNS\_IWCG] : Inquire a workstation characteristic.
-\item [GNS\_IWSG] : Inquire workstation scale.
+\item [GNS\_IANG:]  Inquire AGI name of GKS workstation.
+\item [GNS\_IANI:]  Inquire AGI name of IDI workstation.
+\item [GNS\_IDNG:]  Inquire device name of GKS workstation.
+\item [GNS\_IETG:]  Inquire string to erase text screen.
+\item [GNS\_IGAG:]  Inquire GKS workstation name from AGI name.
+\item [GNS\_IIAI:]  Inquire IDI workstation name from AGI name.
+\item [GNS\_ITWCG:]  Inquire a workstation characteristic from its type.
+\item [GNS\_IWCG:]  Inquire a workstation characteristic.
+\item [GNS\_IWSG:]  Inquire workstation scale.
 \end{description}
 
-\item [Control] ---
+\item [Control ---]
 
 \begin{description}
-\item [GNS\_START] : Start the GNS system for the specified package.
-\item [GNS\_STOP] : Stop the GNS system for the specified package.
+\item [GNS\_START:]  Start the GNS system for the specified package.
+\item [GNS\_STOP:]  Stop the GNS system for the specified package.
 \end{description}
 
-\item [Translation] ---
+\item [Translation ---]
 
 \begin{description}
-\item [GNS\_TNDG] : Translate a name and device to a GKS device specification.
-\item [GNS\_TNG] : Translate a name to a GKS device specification.
-\item [GNS\_TNI] : Translate a name to a IDI device specification.
+\item [GNS\_TNDG:]  Translate a name and device to a GKS device specification.
+\item [GNS\_TNG:]  Translate a name to a GKS device specification.
+\item [GNS\_TNI:]  Translate a name to a IDI device specification.
 \end{description}
 
 \end{description}
@@ -1569,41 +1568,41 @@ addition to which there exist the following `parameter routines':
 
 \begin{description}
 
-\item [Parameter] ---
+\item [Parameter ---]
 
 \begin{description}
-\item [FIO\_ASSOC] : Associate a parameter with a sequential file.
-\item [FIO\_CANCL] : Cancel the association between a parameter and a
+\item [FIO\_ASSOC:]  Associate a parameter with a sequential file.
+\item [FIO\_CANCL:]  Cancel the association between a parameter and a
  sequential file.
 \end{description}
 
-\item [File management and positioning] ---
+\item [File management and positioning ---]
 
 \begin{description}
-\item [FIO\_OPEN] : Create and open a sequential file.
-\item [FIO\_CLOSE] : Close a sequential file.
-\item [FIO\_RWIND] : Rewind a sequential file.
-\item [FIO\_ERASE] : Delete a sequential file.
-\item [FIO\_SERR] : Set error status.
-\item [FIO\_DEACT] : Deactivate FIO.
-\item [FIO\_STOP] : Close down FIO.
+\item [FIO\_OPEN:]  Create and open a sequential file.
+\item [FIO\_CLOSE:]  Close a sequential file.
+\item [FIO\_RWIND:]  Rewind a sequential file.
+\item [FIO\_ERASE:]  Delete a sequential file.
+\item [FIO\_SERR:]  Set error status.
+\item [FIO\_DEACT:]  Deactivate FIO.
+\item [FIO\_STOP:]  Close down FIO.
 \end{description}
 
-\item [File information and Fortran unit numbers] ---
+\item [File information and Fortran unit numbers ---]
 
 \begin{description}
-\item [FIO\_FNAME] : Get a file's full name.
-\item [FIO\_UNIT] : Get a file's Fortran unit number.
-\item [FIO\_GUNIT] : Get an unused Fortran unit number.
-\item [FIO\_PUNIT] : Release a Fortran unit number.
+\item [FIO\_FNAME:]  Get a file's full name.
+\item [FIO\_UNIT:]  Get a file's Fortran unit number.
+\item [FIO\_GUNIT:]  Get an unused Fortran unit number.
+\item [FIO\_PUNIT:]  Release a Fortran unit number.
 \end{description}
 
-\item [I/O] ---
+\item [I/O ---]
 
 \begin{description}
-\item [FIO\_READ] : Read a sequential record.
-\item [FIO\_READF] : Fast read a sequential record.
-\item [FIO\_WRITE] : Write a sequential record.
+\item [FIO\_READ:]  Read a sequential record.
+\item [FIO\_READF:]  Fast read a sequential record.
+\item [FIO\_WRITE:]  Write a sequential record.
 \end{description}
 
 \end{description}
@@ -1614,26 +1613,26 @@ addition to which there exist the following `parameter routines':
 
 \begin{description}
 
-\item [Parameter] ---
+\item [Parameter ---]
 
 \begin{description}
-\item [RIO\_ASSOC] : Associate a parameter with a direct-access file.
-\item [RIO\_CANCL] : Cancel the association between a direct-access file and a
+\item [RIO\_ASSOC:]  Associate a parameter with a direct-access file.
+\item [RIO\_CANCL:]  Cancel the association between a direct-access file and a
  parameter.
 \end{description}
 
-\item [File management] ---
+\item [File management ---]
 
 \begin{description}
-\item [RIO\_OPEN] : Open a direct-access file.
-\item [RIO\_ERASE] : Delete a direct-access file.
+\item [RIO\_OPEN:]  Open a direct-access file.
+\item [RIO\_ERASE:]  Delete a direct-access file.
 \end{description}
 
-\item [I/O] ---
+\item [I/O ---]
 
 \begin{description}
-\item [RIO\_READ] : Read a direct-access record.
-\item [RIO\_WRITE] : Write a direct-access record.
+\item [RIO\_READ:]  Read a direct-access record.
+\item [RIO\_WRITE:]  Write a direct-access record.
 \end{description}
 
 \end{description}
@@ -1651,42 +1650,42 @@ addition to which there exist the following `parameter routines':
 
 \begin{description}
 
-\item [Parameter] ---
+\item [Parameter ---]
 
 \begin{description}
-\item [MAG\_ASSOC] : Associate a parameter with a tape drive.
-\item [MAG\_CANCL] : Cancel the association between a parameter and a tape
+\item [MAG\_ASSOC:]  Associate a parameter with a tape drive.
+\item [MAG\_CANCL:]  Cancel the association between a parameter and a tape
  drive.
-\item [MAG\_ANNUL] : Annul a tape descriptor.
+\item [MAG\_ANNUL:]  Annul a tape descriptor.
 \end{description}
 
-\item [Device management] ---
+\item [Device management ---]
 
 \begin{description}
-\item [MAG\_ALOC] : Allocate a tape drive.
-\item [MAG\_DEAL] : De-allocate a tape drive.
-\item [MAG\_MOUNT] : Mount a tape on a drive.
-\item [MAG\_DISM] : Dismount a tape on a drive.
+\item [MAG\_ALOC:]  Allocate a tape drive.
+\item [MAG\_DEAL:]  De-allocate a tape drive.
+\item [MAG\_MOUNT:]  Mount a tape on a drive.
+\item [MAG\_DISM:]  Dismount a tape on a drive.
 \end{description}
 
-\item [Tape positioning] ---
+\item [Tape positioning ---]
 
 \begin{description}
-\item [MAG\_JUMP] : Skip blocks.
-\item [MAG\_SKIP] : Skip files.
-\item [MAG\_JEOV] : Skip past an EOV marker.
-\item [MAG\_REW] : Position a tape at its beginning.
-\item [MAG\_MOVE] : Position a tape at an absolute position.
-\item [MAG\_POS] : Obtain an absolute position.
-\item [MAG\_SET] : Set an absolute position.
+\item [MAG\_JUMP:]  Skip blocks.
+\item [MAG\_SKIP:]  Skip files.
+\item [MAG\_JEOV:]  Skip past an EOV marker.
+\item [MAG\_REW:]  Position a tape at its beginning.
+\item [MAG\_MOVE:]  Position a tape at an absolute position.
+\item [MAG\_POS:]  Obtain an absolute position.
+\item [MAG\_SET:]  Set an absolute position.
 \end{description}
 
-\item [I/O] ---
+\item [I/O ---]
 
 \begin{description}
-\item [MAG\_READ] : Read a block from a tape.
-\item [MAG\_WRITE] : Write a block to a tape.
-\item [MAG\_WTM] : Write a tape mark to a tape.
+\item [MAG\_READ:]  Read a block from a tape.
+\item [MAG\_WRITE:]  Write a block to a tape.
+\item [MAG\_WTM:]  Write a tape mark to a tape.
 \end{description}
 
 \end{description}
@@ -1705,64 +1704,64 @@ addition to which there exist the following `parameter routines':
 
 \begin{description}
 
-\item [Control] ---
+\item [Control ---]
 
 \begin{description}
-\item [CHI\_OPEN] : Activate the interface.
-\item [CHI\_CLOSE] : Deactivate the interface.
+\item [CHI\_OPEN:]  Activate the interface.
+\item [CHI\_CLOSE:]  Deactivate the interface.
 \end{description}
 
-\item [List catalogues] ---
+\item [List catalogues ---]
 
 \begin{description}
-\item [CHI\_AVAILCATS] :  Get a list of currently available catalogues.
+\item [CHI\_AVAILCATS:]   Get a list of currently available catalogues.
 \end{description}
 
-\item [Manipulate data] ---
+\item [Manipulate data ---]
 
 \begin{description}
-\item [CHI\_GETNUMENTS] : Get the number of entries in a catalogue.
-\item [CHI\_GETP] : Get the parameter names and the number of parameters.
-\item [CHI\_GETF] : Get the field names and the number of fields.
-\item [CHI\_GETFINF] : Get information associated with a field.
-\item [CHI\_GETPINF] : Get information associated with a parameter.
-\item [CHI\_ADDP] : Add a parameter to a catalogue.
-\item [CHI\_DELP] : Delete a parameter from a catalogue.
+\item [CHI\_GETNUMENTS:]  Get the number of entries in a catalogue.
+\item [CHI\_GETP:]  Get the parameter names and the number of parameters.
+\item [CHI\_GETF:]  Get the field names and the number of fields.
+\item [CHI\_GETFINF:]  Get information associated with a field.
+\item [CHI\_GETPINF:]  Get information associated with a parameter.
+\item [CHI\_ADDP:]  Add a parameter to a catalogue.
+\item [CHI\_DELP:]  Delete a parameter from a catalogue.
 \end{description}
 
-\item [Create catalogues] ---
+\item [Create catalogues ---]
 
 \begin{description}
-\item [CHI\_NOENT] : Create a new catalogue with no entries.
-\item [CHI\_CREATDUP] : Create a duplicate catalogue with no entries.
-\item [CHI\_SELFLDS] : Create a new catalogue with fields selected from an existing catalogue.
-\item [CHI\_SEARCH] : Create a new catalogue with entries selected from an existing catalogue.
-\item [CHI\_REJECT] : Similar to CHI\_SEARCH but with entries that {\em fail} selection criteria.
-\item [CHI\_JOIN] : Create a new catalogue by joining two existing catalogues based on join criteria.
-\item [CHI\_MERGE] : Create a new catalogue by merging two existing catalogues.
-\item [CHI\_NEWFLD] : Create a new catalogue by adding a new field to an existing catalogue.
+\item [CHI\_NOENT:]  Create a new catalogue with no entries.
+\item [CHI\_CREATDUP:]  Create a duplicate catalogue with no entries.
+\item [CHI\_SELFLDS:]  Create a new catalogue with fields selected from an existing catalogue.
+\item [CHI\_SEARCH:]  Create a new catalogue with entries selected from an existing catalogue.
+\item [CHI\_REJECT:]  Similar to CHI\_SEARCH but with entries that {\em fail} selection criteria.
+\item [CHI\_JOIN:]  Create a new catalogue by joining two existing catalogues based on join criteria.
+\item [CHI\_MERGE:]  Create a new catalogue by merging two existing catalogues.
+\item [CHI\_NEWFLD:]  Create a new catalogue by adding a new field to an existing catalogue.
 \end{description}
 
-\item [Delete catalogues] ---
+\item [Delete catalogues ---]
 
 \begin{description}
-\item [CHI\_DELCAT] : Delete a catalogue.
+\item [CHI\_DELCAT:]  Delete a catalogue.
 \end{description}
 
-\item [Put information into catalogues] ---
+\item [Put information into catalogues ---]
 
 \begin{description}
-\item [CHI\_PUTCENT] : Put a complete entry into a catalogue.
-\item [CHI\_PUTENT] :  Put a set of values that constitute an entry into a catalogue.
+\item [CHI\_PUTCENT:]  Put a complete entry into a catalogue.
+\item [CHI\_PUTENT:]   Put a set of values that constitute an entry into a catalogue.
 \end{description}
 
-\item [Get information out of catalogues] ---
+\item [Get information out of catalogues ---]
 
 \begin{description}
-\item  [CHI\_GETCENT] :  Get a complete entry from a catalogue.
-\item  [CHI\_GETCENTPOS] : Get a complete entry from a given position in a catalogue.
-\item  [CHI\_GETVAL] : Get a field value(s) from the next entry in a catalogue.
-\item  [CHI\_GETSVALS] : Get a field value(s) for a specified number of entries in a catalogue.
+\item  [CHI\_GETCENT:]   Get a complete entry from a catalogue.
+\item  [CHI\_GETCENTPOS:]  Get a complete entry from a given position in a catalogue.
+\item  [CHI\_GETVAL:]  Get a field value(s) from the next entry in a catalogue.
+\item  [CHI\_GETSVALS:]  Get a field value(s) for a specified number of entries in a catalogue.
 \end{description}
 \end{description}
 
@@ -1784,70 +1783,70 @@ writer of ADAM applications.
 
 \begin{description}
 
-\item [Decoding] ---
+\item [Decoding ---]
 
 \begin{description}
-\item [CHR\_CTOD] : Read a double precision number from a character string.
-\item [CHR\_CTOI] : Read an integer number from a character string.
-\item [CHR\_CTOL] : Read a logical value from a character string.
-\item [CHR\_CTOR] : Read a real number from a character string.
-\item [CHR\_DCWRD] : Returns all the words in a string.
-\item [CHR\_HTOI] : Read an integer from a hex string.
-\item [CHR\_OTOI] : Read an integer from an octal string.
+\item [CHR\_CTOD:]  Read a double precision number from a character string.
+\item [CHR\_CTOI:]  Read an integer number from a character string.
+\item [CHR\_CTOL:]  Read a logical value from a character string.
+\item [CHR\_CTOR:]  Read a real number from a character string.
+\item [CHR\_DCWRD:]  Returns all the words in a string.
+\item [CHR\_HTOI:]  Read an integer from a hex string.
+\item [CHR\_OTOI:]  Read an integer from an octal string.
 \end{description}
 
-\item [Encoding and Formatting] ---
+\item [Encoding and Formatting ---]
 
 \begin{description}
-\item [CHR\_CTOC] : Write a character value into a string.
-\item [CHR\_DTOC] : Encode a double precision value as a string.
-\item [CHR\_ITOC] : Encode an integer value as a string.
-\item [CHR\_LTOC] : Encode a logical value as a string.
-\item [CHR\_RTOC] : Encode a real value as a string.
-\item [CHR\_PUTC] : Copy one string into another at given position.
-\item [CHR\_PUTD] : Put double precision value into string at given position.
-\item [CHR\_PUTI] : Put integer value into string at given position.
-\item [CHR\_PUTL] : Put logical value into string at given position
-\item [CHR\_PUTR] : Put real value into string at given position.
-\item [CHR\_RTOAN] : Write a real into character string as hr/deg:min:sec.
+\item [CHR\_CTOC:]  Write a character value into a string.
+\item [CHR\_DTOC:]  Encode a double precision value as a string.
+\item [CHR\_ITOC:]  Encode an integer value as a string.
+\item [CHR\_LTOC:]  Encode a logical value as a string.
+\item [CHR\_RTOC:]  Encode a real value as a string.
+\item [CHR\_PUTC:]  Copy one string into another at given position.
+\item [CHR\_PUTD:]  Put double precision value into string at given position.
+\item [CHR\_PUTI:]  Put integer value into string at given position.
+\item [CHR\_PUTL:]  Put logical value into string at given position
+\item [CHR\_PUTR:]  Put real value into string at given position.
+\item [CHR\_RTOAN:]  Write a real into character string as hr/deg:min:sec.
 \end{description}
 
-\item [Inquiry] ---
+\item [Inquiry ---]
 
 \begin{description}
-\item [CHR\_DELIM] : Locate substring with given delimiter character.
-\item [CHR\_EQUAL] : Determine whether two strings are equal.
-\item [CHR\_FANDL] : Find the indices of the first and last non-blank characters.
-\item [CHR\_FIWE] : Find next end of word.
-\item [CHR\_FIWS] : Find start of next word.
-\item [CHR\_INDEX] : Find the index of a substring in a string.
-\item [CHR\_INSET] : Determine whether a string is a member of a set.
-\item [CHR\_ISALF] : Determine whether a character is alphabetic.
-\item [CHR\_ISALM] : Determine whether a character is alphanumeric.
-\item [CHR\_ISDIG] : Determine whether a character is a digit.
-\item [CHR\_ISNAM] : Determine whether a string is a valid name.
-\item [CHR\_LEN] : Find used length of string.
-\item [CHR\_SIMLR] : Determine whether two strings are equal apart from case.
-\item [CHR\_SIZE] : Find the declared size of string.
+\item [CHR\_DELIM:]  Locate substring with given delimiter character.
+\item [CHR\_EQUAL:]  Determine whether two strings are equal.
+\item [CHR\_FANDL:]  Find the indices of the first and last non-blank characters.
+\item [CHR\_FIWE:]  Find next end of word.
+\item [CHR\_FIWS:]  Find start of next word.
+\item [CHR\_INDEX:]  Find the index of a substring in a string.
+\item [CHR\_INSET:]  Determine whether a string is a member of a set.
+\item [CHR\_ISALF:]  Determine whether a character is alphabetic.
+\item [CHR\_ISALM:]  Determine whether a character is alphanumeric.
+\item [CHR\_ISDIG:]  Determine whether a character is a digit.
+\item [CHR\_ISNAM:]  Determine whether a string is a valid name.
+\item [CHR\_LEN:]  Find used length of string.
+\item [CHR\_SIMLR:]  Determine whether two strings are equal apart from case.
+\item [CHR\_SIZE:]  Find the declared size of string.
 \end{description}
 
-\item [String manipulation] ---
+\item [String manipulation ---]
 
 \begin{description}
-\item [CHR\_APPND] : Copy one string into another (ignoring trailing blanks).
-\item [CHR\_CLEAN] : Remove all non-printable ASCII characters from a string.
-\item [CHR\_COPY] : Copy one string to another, checking for truncation.
-\item [CHR\_FILL] : Fill a string with a given character.
-\item [CHR\_LCASE] : Convert a string to lower case.
-\item [CHR\_LDBLK] : Remove leading blanks from a string.
-\item [CHR\_LOWER] : Give lower case equivalent of a character.
-\item [CHR\_MOVE] : Move one string into another (ignoring trailing blanks).
-\item [CHR\_RMBLK] : Remove all blanks from a string in situ.
-\item [CHR\_SWAP] : Swap two single-character variables.
-\item [CHR\_TERM] : Terminate string by padding out with blanks.
-\item [CHR\_TRUNC] : Truncate string rightwards from a given delimiter.
-\item [CHR\_UCASE] : Convert a string to upper case.
-\item [CHR\_UPPER] : Give upper case equivalent of a character.
+\item [CHR\_APPND:]  Copy one string into another (ignoring trailing blanks).
+\item [CHR\_CLEAN:]  Remove all non-printable ASCII characters from a string.
+\item [CHR\_COPY:]  Copy one string to another, checking for truncation.
+\item [CHR\_FILL:]  Fill a string with a given character.
+\item [CHR\_LCASE:]  Convert a string to lower case.
+\item [CHR\_LDBLK:]  Remove leading blanks from a string.
+\item [CHR\_LOWER:]  Give lower case equivalent of a character.
+\item [CHR\_MOVE:]  Move one string into another (ignoring trailing blanks).
+\item [CHR\_RMBLK:]  Remove all blanks from a string in situ.
+\item [CHR\_SWAP:]  Swap two single-character variables.
+\item [CHR\_TERM:]  Terminate string by padding out with blanks.
+\item [CHR\_TRUNC:]  Truncate string rightwards from a given delimiter.
+\item [CHR\_UCASE:]  Convert a string to upper case.
+\item [CHR\_UPPER:]  Give upper case equivalent of a character.
 \end{description}
 
 \end{description}
@@ -1869,37 +1868,37 @@ character strings.}
 
 \begin{description}
 
-\item [Import a Fortran string to C] ---
+\item [Import a Fortran string to C ---]
 
 \begin{description}
-\item [CNF\_CREIB] : Create a temporary C string and import a blank filled Fortran string into it.
-\item [CNF\_CREIM] : Create a temporary C string and import a Fortran string into it.
-\item [CNF\_IMPB] : Import a Fortran string into a C string, retaining trailing blanks.
-\item [CNF\_IMPBN] : Import no more than max characters from a Fortran string into a C string, retaining trailing blanks.
-\item [CNF\_IMPN] : Import no more than max characters from a Fortran string into a C string.
-\item [CNF\_IMPRT] : Import a Fortran string into a C string.
+\item [CNF\_CREIB:]  Create a temporary C string and import a blank filled Fortran string into it.
+\item [CNF\_CREIM:]  Create a temporary C string and import a Fortran string into it.
+\item [CNF\_IMPB:]  Import a Fortran string into a C string, retaining trailing blanks.
+\item [CNF\_IMPBN:]  Import no more than max characters from a Fortran string into a C string, retaining trailing blanks.
+\item [CNF\_IMPN:]  Import no more than max characters from a Fortran string into a C string.
+\item [CNF\_IMPRT:]  Import a Fortran string into a C string.
 \end{description}
 
-\item [Export a C string to Fortran] ---
+\item [Export a C string to Fortran ---]
 
 \begin{description}
-\item [CNF\_EXPN] : Export a C string to a Fortran string, copying given a maximum number of characters.
-\item [CNF\_EXPRT] : Export a C string to a Fortran string.
+\item [CNF\_EXPN:]  Export a C string to a Fortran string, copying given a maximum number of characters.
+\item [CNF\_EXPRT:]  Export a C string to a Fortran string.
 \end{description}
 
-\item [String lengths] ---
+\item [String lengths ---]
 
 \begin{description}
-\item [CNF\_LENC] : Find the length of a C string.
-\item [CNF\_LENF] : Find the length of a Fortran string.
+\item [CNF\_LENC:]  Find the length of a C string.
+\item [CNF\_LENF:]  Find the length of a Fortran string.
 \end{description}
 
-\item [Miscellaneous] ---
+\item [Miscellaneous ---]
 
 \begin{description}
-\item [CNF\_COPYF] : Copy one Fortran string to another Fortran string.
-\item [CNF\_CREAT] : Create a temporary C string and return a pointer to it.
-\item [CNF\_FREE] : Return temporary space.
+\item [CNF\_COPYF:]  Copy one Fortran string to another Fortran string.
+\item [CNF\_CREAT:]  Create a temporary C string and return a pointer to it.
+\item [CNF\_FREE:]  Return temporary space.
 \end{description}
 
 \end{description}
@@ -1912,133 +1911,133 @@ character strings.}
 
 \begin{description}
 
-\item [Declaration of a C function] ---
+\item [Declaration of a C function ---]
 
 \begin{description}
-\item [F77\_BYTE\_FUNCTION] : Declare a function that returns a BYTE value.
-\item [F77\_CHARACTER\_FUNCTION] : Declare a function that returns a CHARACTER value.
-\item [F77\_DOUBLE\_FUNCTION] : Declare a function that returns a DOUBLE PRECISION value.
-\item [F77\_INTEGER\_FUNCTION] : Declare a function that returns an INTEGER value.
-\item [F77\_LOGICAL\_FUNCTION] : Declare a function that returns a LOGICAL value.
-\item [F77\_REAL\_FUNCTION] : Declare a function that returns a REAL value.
-\item [F77\_SUBROUTINE] : Declare a SUBROUTINE.
-\item [F77\_WORD\_FUNCTION] : Declare a function that returns a WORD value.
+\item [F77\_BYTE\_FUNCTION:]  Declare a function that returns a BYTE value.
+\item [F77\_CHARACTER\_FUNCTION:]  Declare a function that returns a CHARACTER value.
+\item [F77\_DOUBLE\_FUNCTION:]  Declare a function that returns a DOUBLE PRECISION value.
+\item [F77\_INTEGER\_FUNCTION:]  Declare a function that returns an INTEGER value.
+\item [F77\_LOGICAL\_FUNCTION:]  Declare a function that returns a LOGICAL value.
+\item [F77\_REAL\_FUNCTION:]  Declare a function that returns a REAL value.
+\item [F77\_SUBROUTINE:]  Declare a SUBROUTINE.
+\item [F77\_WORD\_FUNCTION:]  Declare a function that returns a WORD value.
 \end{description}
 
-\item [Arguments of a C function] ---
+\item [Arguments of a C function ---]
 
 \begin{description}
-\item [BYTE] : Declare a BYTE argument.
-\item [BYTE\_ARRAY] : Declare a BYTE array argument.
-\item [CHARACTER] : Declare a CHARACTER argument.
-\item [CHARACTER\_ARRAY] : Declare a CHARACTER array argument.
-\item [CHARACTER\_RETURN\_VALUE] : Declare an argument that will be the return value of a CHARACTER function.
-\item [DOUBLE] : Declare a DOUBLE PRECISION argument.
-\item [DOUBLE\_ARRAY] : Declare a DOUBLE PRECISION array argument.
-\item [INTEGER] : Declare an INTEGER argument.
-\item [INTEGER\_ARRAY] : Declare an INTEGER array argument.
-\item [LOGICAL] : Declare a LOGICAL argument.
-\item [LOGICAL\_ARRAY] : Declare a LOGICAL array argument.
-\item [POINTER] : Declare a POINTER argument.
-\item [REAL] : Declare a REAL argument.
-\item [REAL\_ARRAY] : Declare a REAL array argument.
-\item [TRAIL] : Declare hidden trailing arguments.
-\item [TRAIL\_ARG] : Pass the length of a CHARACTER argument to a Fortran routine.
-\item [WORD] : Declare a WORD argument.
-\item [WORD\_ARRAY] : Declare a WORD array argument.
+\item [BYTE:]  Declare a BYTE argument.
+\item [BYTE\_ARRAY:]  Declare a BYTE array argument.
+\item [CHARACTER:]  Declare a CHARACTER argument.
+\item [CHARACTER\_ARRAY:]  Declare a CHARACTER array argument.
+\item [CHARACTER\_RETURN\_VALUE:]  Declare an argument that will be the return value of a CHARACTER function.
+\item [DOUBLE:]  Declare a DOUBLE PRECISION argument.
+\item [DOUBLE\_ARRAY:]  Declare a DOUBLE PRECISION array argument.
+\item [INTEGER:]  Declare an INTEGER argument.
+\item [INTEGER\_ARRAY:]  Declare an INTEGER array argument.
+\item [LOGICAL:]  Declare a LOGICAL argument.
+\item [LOGICAL\_ARRAY:]  Declare a LOGICAL array argument.
+\item [POINTER:]  Declare a POINTER argument.
+\item [REAL:]  Declare a REAL argument.
+\item [REAL\_ARRAY:]  Declare a REAL array argument.
+\item [TRAIL:]  Declare hidden trailing arguments.
+\item [TRAIL\_ARG:]  Pass the length of a CHARACTER argument to a Fortran routine.
+\item [WORD:]  Declare a WORD argument.
+\item [WORD\_ARRAY:]  Declare a WORD array argument.
 \end{description}
 
-\item [Generate pointers to arguments] ---
+\item [Generate pointers to arguments ---]
 
 \begin{description}
-\item [GENPTR\_BYTE] : Generate a pointer to a BYTE argument.
-\item [GENPTR\_BYTE\_ARRAY] : Generate a pointer to a BYTE array argument.
-\item [GENPTR\_CHARACTER] : Generate a pointer to a CHARACTER argument.
-\item [GENPTR\_CHARACTER\_ARRAY] : Generate a pointer to a CHARACTER array argument.
-\item [GENPTR\_DOUBLE] : Generate a pointer to a DOUBLE PRECISION argument.
-\item [GENPTR\_DOUBLE\_ARRAY] : Generate a pointer to a DOUBLE PRECISION array argument.
-\item [GENPTR\_INTEGER] : Generate a pointer to an INTEGER argument.
-\item [GENPTR\_INTEGER\_ARRAY] : Generate a pointer to an INTEGER array argument.
-\item [GENPTR\_LOGICAL] : Generate a pointer to a LOGICAL argument.
-\item [GENPTR\_LOGICAL\_ARRAY] : Generate a pointer to a LOGICAL array argument.
-\item [GENPTR\_POINTER] : Generate a pointer to a POINTER argument.
-\item [GENPTR\_REAL] : Generate a pointer to a REAL argument.
-\item [GENPTR\_REAL\_ARRAY] : Generate a pointer to a REAL array argument.
-\item [GENPTR\_WORD] : Generate a pointer to a WORD argument.
-\item [GENPTR\_WORD\_ARRAY] : Generate a pointer to a WORD array argument.
+\item [GENPTR\_BYTE:]  Generate a pointer to a BYTE argument.
+\item [GENPTR\_BYTE\_ARRAY:]  Generate a pointer to a BYTE array argument.
+\item [GENPTR\_CHARACTER:]  Generate a pointer to a CHARACTER argument.
+\item [GENPTR\_CHARACTER\_ARRAY:]  Generate a pointer to a CHARACTER array argument.
+\item [GENPTR\_DOUBLE:]  Generate a pointer to a DOUBLE PRECISION argument.
+\item [GENPTR\_DOUBLE\_ARRAY:]  Generate a pointer to a DOUBLE PRECISION array argument.
+\item [GENPTR\_INTEGER:]  Generate a pointer to an INTEGER argument.
+\item [GENPTR\_INTEGER\_ARRAY:]  Generate a pointer to an INTEGER array argument.
+\item [GENPTR\_LOGICAL:]  Generate a pointer to a LOGICAL argument.
+\item [GENPTR\_LOGICAL\_ARRAY:]  Generate a pointer to a LOGICAL array argument.
+\item [GENPTR\_POINTER:]  Generate a pointer to a POINTER argument.
+\item [GENPTR\_REAL:]  Generate a pointer to a REAL argument.
+\item [GENPTR\_REAL\_ARRAY:]  Generate a pointer to a REAL array argument.
+\item [GENPTR\_WORD:]  Generate a pointer to a WORD argument.
+\item [GENPTR\_WORD\_ARRAY:]  Generate a pointer to a WORD array argument.
 \end{description}
 
-\item [Data types] ---
+\item [Data types ---]
 
 \begin{description}
-\item [F77\_BYTE\_TYPE] : Define the type BYTE.
-\item [F77\_CHARACTER\_TYPE] : Define the type CHARACTER.
-\item [F77\_DOUBLE\_TYPE] : Define the type DOUBLE PRECISION.
-\item [F77\_INTEGER\_TYPE] : Define the type INTEGER.
-\item [F77\_LOGICAL\_TYPE] : Define the type LOGICAL.
-\item [F77\_REAL\_TYPE] : Define the type REAL.
-\item [F77\_WORD\_TYPE] : Define the type WORD.
+\item [F77\_BYTE\_TYPE:]  Define the type BYTE.
+\item [F77\_CHARACTER\_TYPE:]  Define the type CHARACTER.
+\item [F77\_DOUBLE\_TYPE:]  Define the type DOUBLE PRECISION.
+\item [F77\_INTEGER\_TYPE:]  Define the type INTEGER.
+\item [F77\_LOGICAL\_TYPE:]  Define the type LOGICAL.
+\item [F77\_REAL\_TYPE:]  Define the type REAL.
+\item [F77\_WORD\_TYPE:]  Define the type WORD.
 \end{description}
 
-\item [Logical values] ---
+\item [Logical values ---]
 
 \begin{description}
-\item [F77\_FALSE] : The logical value FALSE.
-\item [F77\_ISFALSE] : Is this the Fortran logical value false?
-\item [F77\_ISTRUE] : Is this the Fortran logical value true?
-\item [F77\_TRUE] : The logical value TRUE.
+\item [F77\_FALSE:]  The logical value FALSE.
+\item [F77\_ISFALSE:]  Is this the Fortran logical value false?
+\item [F77\_ISTRUE:]  Is this the Fortran logical value true?
+\item [F77\_TRUE:]  The logical value TRUE.
 \end{description}
 
-\item [External names] ---
+\item [External names ---]
 
 \begin{description}
-\item [F77\_EXTERNAL\_NAME] : The external name of a function.
+\item [F77\_EXTERNAL\_NAME:]  The external name of a function.
 \end{description}
 
-\item [Common blocks] ---
+\item [Common blocks ---]
 
 \begin{description}
-\item [F77\_BLANK\_COMMON] : Refer to blank common.
-\item [F77\_NAMED\_COMMON] : Refer to a named common block.
+\item [F77\_BLANK\_COMMON:]  Refer to blank common.
+\item [F77\_NAMED\_COMMON:]  Refer to a named common block.
 \end{description}
 
-\item [Declaring variables for passing to a Fortran routine] ---
+\item [Declaring variables for passing to a Fortran routine ---]
 
 \begin{description}
-\item [DECLARE\_BYTE] : Declare a BYTE variable.
-\item [DECLARE\_BYTE\_ARRAY] : Declare a BYTE array.
-\item [DECLARE\_CHARACTER] : Declare a CHARACTER variable.
-\item [DECLARE\_CHARACTER\_ARRAY] : Declare a CHARACTER array.
-\item [DECLARE\_DOUBLE] : Declare a DOUBLE variable.
-\item [DECLARE\_DOUBLE\_ARRAY] : Declare a DOUBLE array.
-\item [DECLARE\_INTEGER] : Declare an INTEGER variable.
-\item [DECLARE\_INTEGER\_ARRAY] : Declare an INTEGER array.
-\item [DECLARE\_LOGICAL] : Declare a LOGICAL variable.
-\item [DECLARE\_LOGICAL\_ARRAY] : Declare a LOGICAL array.
-\item [DECLARE\_REAL] : Declare a REAL variable.
-\item [DECLARE\_REAL\_ARRAY] : Declare a REAL array.
-\item [DECLARE\_WORD] : Declare a WORD variable.
-\item [DECLARE\_WORD\_ARRAY] : Declare a WORD array.
+\item [DECLARE\_BYTE:]  Declare a BYTE variable.
+\item [DECLARE\_BYTE\_ARRAY:]  Declare a BYTE array.
+\item [DECLARE\_CHARACTER:]  Declare a CHARACTER variable.
+\item [DECLARE\_CHARACTER\_ARRAY:]  Declare a CHARACTER array.
+\item [DECLARE\_DOUBLE:]  Declare a DOUBLE variable.
+\item [DECLARE\_DOUBLE\_ARRAY:]  Declare a DOUBLE array.
+\item [DECLARE\_INTEGER:]  Declare an INTEGER variable.
+\item [DECLARE\_INTEGER\_ARRAY:]  Declare an INTEGER array.
+\item [DECLARE\_LOGICAL:]  Declare a LOGICAL variable.
+\item [DECLARE\_LOGICAL\_ARRAY:]  Declare a LOGICAL array.
+\item [DECLARE\_REAL:]  Declare a REAL variable.
+\item [DECLARE\_REAL\_ARRAY:]  Declare a REAL array.
+\item [DECLARE\_WORD:]  Declare a WORD variable.
+\item [DECLARE\_WORD\_ARRAY:]  Declare a WORD array.
 \end{description}
 
-\item [Passing arguments to a Fortran routine] ---
+\item [Passing arguments to a Fortran routine ---]
 
 \begin{description}
-\item [BYTE\_ARG] : Pass a BYTE argument to a Fortran routine.
-\item [BYTE\_ARRAY\_ARG] : Pass a BYTE array argument to a Fortran routine.
-\item [CHARACTER\_ARG] : Pass a CHARACTER argument to a Fortran routine.
-\item [CHARACTER\_ARRAY\_ARG] : Pass a CHARACTER array argument to a Fortran routine.
-\item [DOUBLE\_ARG] : Pass a DOUBLE argument to a Fortran routine.
-\item [DOUBLE\_ARRAY\_ARG] : Pass an actual DOUBLE array argument to a Fortran routine.
-\item [F77\_CALL] : Call a Fortran routine from C.
-\item [INTEGER\_ARG] : Pass an INTEGER argument to a Fortran routine.
-\item [INTEGER\_ARRAY\_ARG] : Pass an INTEGER array argument to a Fortran routine.
-\item [LOGICAL\_ARG] : Pass a LOGICAL argument to a Fortran routine.
-\item [LOGICAL\_ARRAY\_ARG] : Pass a LOGICAL array argument to a Fortran routine.
-\item [REAL\_ARG] : Pass a REAL argument to a Fortran routine.
-\item [REAL\_ARRAY\_ARG] : Pass a REAL array argument to a Fortran routine.
-\item [WORD\_ARG] : Pass a WORD argument to a Fortran routine.
-\item [WORD\_ARRAY\_ARG] : Pass a WORD array argument to a Fortran routine.
+\item [BYTE\_ARG:]  Pass a BYTE argument to a Fortran routine.
+\item [BYTE\_ARRAY\_ARG:]  Pass a BYTE array argument to a Fortran routine.
+\item [CHARACTER\_ARG:]  Pass a CHARACTER argument to a Fortran routine.
+\item [CHARACTER\_ARRAY\_ARG:]  Pass a CHARACTER array argument to a Fortran routine.
+\item [DOUBLE\_ARG:]  Pass a DOUBLE argument to a Fortran routine.
+\item [DOUBLE\_ARRAY\_ARG:]  Pass an actual DOUBLE array argument to a Fortran routine.
+\item [F77\_CALL:]  Call a Fortran routine from C.
+\item [INTEGER\_ARG:]  Pass an INTEGER argument to a Fortran routine.
+\item [INTEGER\_ARRAY\_ARG:]  Pass an INTEGER array argument to a Fortran routine.
+\item [LOGICAL\_ARG:]  Pass a LOGICAL argument to a Fortran routine.
+\item [LOGICAL\_ARRAY\_ARG:]  Pass a LOGICAL array argument to a Fortran routine.
+\item [REAL\_ARG:]  Pass a REAL argument to a Fortran routine.
+\item [REAL\_ARRAY\_ARG:]  Pass a REAL array argument to a Fortran routine.
+\item [WORD\_ARG:]  Pass a WORD argument to a Fortran routine.
+\item [WORD\_ARRAY\_ARG:]  Pass a WORD array argument to a Fortran routine.
 \end{description}
 
 \end{description}
@@ -2060,26 +2059,26 @@ Table 1.2.
 
 \begin{description}
 
-\item [Value functions] ---
+\item [Value functions ---]
 
 \begin{description}
-\item [VAL\_fs] : Apply function f to one or two numbers of type s.
-\item [VAL\_sTOt] : Convert a number from type s to type t.
+\item [VAL\_fs:]  Apply function f to one or two numbers of type s.
+\item [VAL\_sTOt:]  Convert a number from type s to type t.
 \end{description}
 
-\item [Vectorised routines] ---
+\item [Vectorised routines ---]
 
 \begin{description}
-\item [VEC\_fs] : Apply function f to one or two vectors of type s.
-\item [VEC\_sTOt] : Convert a vector from type s to type t.
+\item [VEC\_fs:]  Apply function f to one or two vectors of type s.
+\item [VEC\_sTOt:]  Convert a vector from type s to type t.
 \end{description}
 
-\item [Numerical functions] ---
+\item [Numerical functions ---]
 
 \begin{description}
-\item [NUM\_fs] : Apply function f to one or two numbers of type s.
-\item [NUM\_rs] : Apply relation r to two numbers of type s.
-\item [NUM\_sTOt] : Convert a number from type s to type t.
+\item [NUM\_fs:]  Apply function f to one or two numbers of type s.
+\item [NUM\_rs:]  Apply relation r to two numbers of type s.
+\item [NUM\_sTOt:]  Convert a number from type s to type t.
 \end{description}
 
 \end{description}
@@ -2255,17 +2254,17 @@ The functions shown here are only implemented for the floating point data types
 
 \begin{quote}
 \begin{description}
-\item [PSX\_CUSERID] : Get the username.
-\item [PSX\_GETEGID] : Get the effective group ID.
-\item [PSX\_GETENV] : Translate an environment variable.
-\item [PSX\_GETEUID] : Get the effective user ID.
-\item [PSX\_GETGID] : Get the real group ID.
-\item [PSX\_GETPID] : Get the process ID.
-\item [PSX\_GETPPID] : Get the process ID of the parent process.
-\item [PSX\_GETUID] : Get the real user ID.
-\item [PSX\_ISATTY] : Determine if a file is a terminal.
-\item [PSX\_TTYNAME] : Get the name of a terminal.
-\item [PSX\_UNAME] : Get information about the host computer system.
+\item [PSX\_CUSERID:]  Get the username.
+\item [PSX\_GETEGID:]  Get the effective group ID.
+\item [PSX\_GETENV:]  Translate an environment variable.
+\item [PSX\_GETEUID:]  Get the effective user ID.
+\item [PSX\_GETGID:]  Get the real group ID.
+\item [PSX\_GETPID:]  Get the process ID.
+\item [PSX\_GETPPID:]  Get the process ID of the parent process.
+\item [PSX\_GETUID:]  Get the real user ID.
+\item [PSX\_ISATTY:]  Determine if a file is a terminal.
+\item [PSX\_TTYNAME:]  Get the name of a terminal.
+\item [PSX\_UNAME:]  Get information about the host computer system.
 \end{description}
 \end{quote}
 
@@ -2275,29 +2274,29 @@ The functions shown here are only implemented for the floating point data types
 
 \begin{description}
 
-\item [Pseudo-Random Numbers] ---
+\item [Pseudo-Random Numbers ---]
 
 \begin{description}
-\item [PSX\_RAND] : Generate a random number.
-\item [PSX\_SRAND] : Set the seed for the random number generator.
+\item [PSX\_RAND:]  Generate a random number.
+\item [PSX\_SRAND:]  Set the seed for the random number generator.
 \end{description}
 
-\item [Memory Management] ---
+\item [Memory Management ---]
 
 \begin{description}
-\item [PSX\_CALLOC] : Allocate space for several objects of specified type.
-\item [PSX\_FREE] : Free virtual memory.
-\item [PSX\_MALLOC] : Allocate virtual memory.
-\item [PSX\_REALLOC] : Change the size of an allocated region of virtual memory.
+\item [PSX\_CALLOC:]  Allocate space for several objects of specified type.
+\item [PSX\_FREE:]  Free virtual memory.
+\item [PSX\_MALLOC:]  Allocate virtual memory.
+\item [PSX\_REALLOC:]  Change the size of an allocated region of virtual memory.
 \end{description}
 
-\item [Date and Time] ---
+\item [Date and Time ---]
 
 \begin{description}
-\item [PSX\_ASCTIME] : Convert a time structure to a character string.
-\item [PSX\_CTIME] : Convert the calendar time to a character string
-\item [PSX\_LOCALTIME] : Convert the value returned by PSX\_TIME to individual values.
-\item [PSX\_TIME] : Get the current calendar time.
+\item [PSX\_ASCTIME:]  Convert a time structure to a character string.
+\item [PSX\_CTIME:]  Convert the calendar time to a character string
+\item [PSX\_LOCALTIME:]  Convert the value returned by PSX\_TIME to individual values.
+\item [PSX\_TIME:]  Get the current calendar time.
 \end{description}
 \end{description}
 
@@ -2319,211 +2318,211 @@ For brevity, only the single-precision forms are listed.
 
 \begin{description}
 
-\item [String decoding] ---
+\item [String decoding ---]
 
 \begin{description}
-\item [SLA\_INTIN] : Convert free-format string into integer.
-\item [SLA\_FLOTIN] : Convert free-format string into floating-point number.
-\item [SLA\_AFIN] : Convert free-format string from deg,arcmin,arcsec to radians.
+\item [SLA\_INTIN:]  Convert free-format string into integer.
+\item [SLA\_FLOTIN:]  Convert free-format string into floating-point number.
+\item [SLA\_AFIN:]  Convert free-format string from deg,arcmin,arcsec to radians.
 \end{description}
 
-\item [Sexagesimal conversion] ---
+\item [Sexagesimal conversion ---]
 
 \begin{description}
-\item [SLA\_CTF2D] : Hours, minutes, seconds to days.
-\item [SLA\_CD2TF] : Days to hours, minutes, seconds.
-\item [SLA\_CTF2R] : Hours, minutes, seconds to radians.
-\item [SLA\_CR2TF] : Radians to hours, minutes, seconds.
-\item [SLA\_CAF2R] : Degrees, arcminutes, arcseconds to radians.
-\item [SLA\_CR2AF] : Radians to degrees, arcminutes, arcseconds.
+\item [SLA\_CTF2D:]  Hours, minutes, seconds to days.
+\item [SLA\_CD2TF:]  Days to hours, minutes, seconds.
+\item [SLA\_CTF2R:]  Hours, minutes, seconds to radians.
+\item [SLA\_CR2TF:]  Radians to hours, minutes, seconds.
+\item [SLA\_CAF2R:]  Degrees, arcminutes, arcseconds to radians.
+\item [SLA\_CR2AF:]  Radians to degrees, arcminutes, arcseconds.
 \end{description}
 
-\item [Angles, Vectors and Rotation matrices] ---
+\item [Angles, Vectors and Rotation matrices ---]
 
 \begin{description}
-\item [SLA\_RANGE] : Normalise angle into range $\pm\pi$.
-\item [SLA\_RANORM] : Normalise angle into range $0\!-\!2\pi$.
-\item [SLA\_CS2C] : Spherical coordinates to \xyz.
-\item [SLA\_CC2S] : \xyz\ to spherical coordinates.
-\item [SLA\_VDV] : Scalar product of two 3-vectors.
-\item [SLA\_VXV] : Vector product of two 3-vectors.
-\item [SLA\_VN] : Normalise a 3-vector also giving the modulus.
-\item [SLA\_SEP] : Angle between two points on a sphere.
-\item [SLA\_BEAR] : Direction of one point on a sphere seen from another.
-\item [SLA\_EULER] : Form rotation matrix from three Euler angles.
-\item [SLA\_AV2M] : Form rotation matrix from axial vector.
-\item [SLA\_M2AV] : Determine axial vector from rotation matrix.
-\item [SLA\_MXV] : Rotate vector forwards.
-\item [SLA\_IMXV] : Rotate vector backwards.
-\item [SLA\_MXM] : Product of two 3x3 matrices.
-\item [SLA\_CS2C6] : Convert position and velocity in spherical coordinates to Cartesian coordinates.
-\item [SLA\_CC62S] : Convert position and velocity in Cartesian coordinates to spherical coordinates.
+\item [SLA\_RANGE:]  Normalise angle into range $\pm\pi$.
+\item [SLA\_RANORM:]  Normalise angle into range $0\!-\!2\pi$.
+\item [SLA\_CS2C:]  Spherical coordinates to \xyz.
+\item [SLA\_CC2S:]  \xyz\ to spherical coordinates.
+\item [SLA\_VDV:]  Scalar product of two 3-vectors.
+\item [SLA\_VXV:]  Vector product of two 3-vectors.
+\item [SLA\_VN:]  Normalise a 3-vector also giving the modulus.
+\item [SLA\_SEP:]  Angle between two points on a sphere.
+\item [SLA\_BEAR:]  Direction of one point on a sphere seen from another.
+\item [SLA\_EULER:]  Form rotation matrix from three Euler angles.
+\item [SLA\_AV2M:]  Form rotation matrix from axial vector.
+\item [SLA\_M2AV:]  Determine axial vector from rotation matrix.
+\item [SLA\_MXV:]  Rotate vector forwards.
+\item [SLA\_IMXV:]  Rotate vector backwards.
+\item [SLA\_MXM:]  Product of two 3x3 matrices.
+\item [SLA\_CS2C6:]  Convert position and velocity in spherical coordinates to Cartesian coordinates.
+\item [SLA\_CC62S:]  Convert position and velocity in Cartesian coordinates to spherical coordinates.
 \end{description}
 
-\item [Calendars] ---
+\item [Calendars ---]
 
 \begin{description}
-\item [SLA\_CLDJ] : Gregorian Calendar to Modified Julian Date.
-\item [SLA\_CALDJ] : Gregorian Calendar to Modified Julian Date, permitting century default.
-\item [SLA\_DJCAL] : Modified Julian Date to Gregorian Calendar, convenient for formatted output.
-\item [SLA\_DJCL] : Modified Julian Date to Gregorian Year, Month, Day, Fraction.
-\item [SLA\_CALYD] : Calendar to year and day in year.
-\item [SLA\_EPB] : Modified Julian Date to Besselian Epoch.
-\item [SLA\_EPB2D] : Besselian Epoch to Modified Julian Date.
-\item [SLA\_EPJ] : Modified Julian Date to Julian Epoch.
-\item [SLA\_EPJ2D] : Julian Epoch to Modified Julian Date.
+\item [SLA\_CLDJ:]  Gregorian Calendar to Modified Julian Date.
+\item [SLA\_CALDJ:]  Gregorian Calendar to Modified Julian Date, permitting century default.
+\item [SLA\_DJCAL:]  Modified Julian Date to Gregorian Calendar, convenient for formatted output.
+\item [SLA\_DJCL:]  Modified Julian Date to Gregorian Year, Month, Day, Fraction.
+\item [SLA\_CALYD:]  Calendar to year and day in year.
+\item [SLA\_EPB:]  Modified Julian Date to Besselian Epoch.
+\item [SLA\_EPB2D:]  Besselian Epoch to Modified Julian Date.
+\item [SLA\_EPJ:]  Modified Julian Date to Julian Epoch.
+\item [SLA\_EPJ2D:]  Julian Epoch to Modified Julian Date.
 \end{description}
 
-\item [Timescales] ---
+\item [Timescales ---]
 
 \begin{description}
-\item [SLA\_GMST] : Conversion from Universal Time to sidereal time.
-\item [SLA\_EQEQX] : Equation of the equinoxes.
-\item [SLA\_DAT] : Offset of Atomic Time from UT: TAI$-$UTC.
-\item [SLA\_DTT] : Offset of ``Ephemeris Time'' from UT: TDT$-$UTC.
-\item [SLA\_RCC] : Relativistic clock correction: TDB$-$TDT.
+\item [SLA\_GMST:]  Conversion from Universal Time to sidereal time.
+\item [SLA\_EQEQX:]  Equation of the equinoxes.
+\item [SLA\_DAT:]  Offset of Atomic Time from UT: TAI$-$UTC.
+\item [SLA\_DTT:]  Offset of ``Ephemeris Time'' from UT: TDT$-$UTC.
+\item [SLA\_RCC:]  Relativistic clock correction: TDB$-$TDT.
 \end{description}
 
-\item [Precession and Nutation] ---
+\item [Precession and Nutation ---]
 
 \begin{description}
-\item [SLA\_NUT] : Nutation matrix.
-\item [SLA\_NUTC] : Longitude and obliquity components of nutation, and mean obliquity.
-\item [SLA\_PREC] : Precession matrix.
-\item [SLA\_PRENUT] : Combined precession/nutation matrix.
-\item [SLA\_PREBN] : Precession matrix, old system.
-\item [SLA\_PRECES] : Precession, in either the old or the new system.
+\item [SLA\_NUT:]  Nutation matrix.
+\item [SLA\_NUTC:]  Longitude and obliquity components of nutation, and mean obliquity.
+\item [SLA\_PREC:]  Precession matrix.
+\item [SLA\_PRENUT:]  Combined precession/nutation matrix.
+\item [SLA\_PREBN:]  Precession matrix, old system.
+\item [SLA\_PRECES:]  Precession, in either the old or the new system.
 \end{description}
 
-\item [Proper motion] ---
+\item [Proper motion ---]
 
 \begin{description}
-\item [SLA\_PM] : Adjust for proper motion.
+\item [SLA\_PM:]  Adjust for proper motion.
 \end{description}
 
-\item [FK4/5 conversions] ---
+\item [FK4/5 conversions ---]
 
 \begin{description}
-\item [SLA\_FK425] : Convert B1950.0 FK4 star data to J2000.0 FK5.
-\item [SLA\_FK45Z] : Convert B1950.0 FK4 position to J2000.0 FK5 assuming zero proper motion in an inertial frame and no parallax.
-\item [SLA\_FK524] : Convert J2000.0 FK5 star data to B1950.0 FK4.
-\item [SLA\_FK54Z] : Convert J2000.0 FK5 position to B1950.0 FK4 assuming zero proper motion and no parallax.
-\item [SLA\_DBJIN] : Like SLA\_DFLTIN but with extensions to accept leading `B' and `J'.
-\item [SLA\_KBJ] : Select epoch prefix `B' or `J'.
-\item [SLA\_EPCO] : Convert an epoch into the appropriate form -- `B' or `J'.
+\item [SLA\_FK425:]  Convert B1950.0 FK4 star data to J2000.0 FK5.
+\item [SLA\_FK45Z:]  Convert B1950.0 FK4 position to J2000.0 FK5 assuming zero proper motion in an inertial frame and no parallax.
+\item [SLA\_FK524:]  Convert J2000.0 FK5 star data to B1950.0 FK4.
+\item [SLA\_FK54Z:]  Convert J2000.0 FK5 position to B1950.0 FK4 assuming zero proper motion and no parallax.
+\item [SLA\_DBJIN:]  Like SLA\_DFLTIN but with extensions to accept leading `B' and `J'.
+\item [SLA\_KBJ:]  Select epoch prefix `B' or `J'.
+\item [SLA\_EPCO:]  Convert an epoch into the appropriate form -- `B' or `J'.
 \end{description}
 
-\item [Elliptic aberration] ---
+\item [Elliptic aberration ---]
 
 \begin{description}
-\item [SLA\_ETRMS] : E-terms.
-\item [SLA\_SUBET] : Remove the E-terms.
-\item [SLA\_ADDET] : Add the E-terms.
+\item [SLA\_ETRMS:]  E-terms.
+\item [SLA\_SUBET:]  Remove the E-terms.
+\item [SLA\_ADDET:]  Add the E-terms.
 \end{description}
 
-\item [Geocentric coordinates] ---
+\item [Geocentric coordinates ---]
 
 \begin{description}
-\item [SLA\_OBS] : Interrogate list of observatory parameters.
-\item [SLA\_GEOC] : Convert geodetic position to geocentric.
-\item [SLA\_PVOBS] : Position and velocity of observatory.
+\item [SLA\_OBS:]  Interrogate list of observatory parameters.
+\item [SLA\_GEOC:]  Convert geodetic position to geocentric.
+\item [SLA\_PVOBS:]  Position and velocity of observatory.
 \end{description}
 
-\item [Apparent and observed place] ---
+\item [Apparent and observed place ---]
 
 \begin{description}
-\item [SLA\_MAP] : Mean place to geocentric apparent place.
-\item [SLA\_MAPPA] : Precompute mean to apparent parameters.
-\item [SLA\_MAPQK] : Mean to apparent using precomputed parameters.
-\item [SLA\_MAPQKZ] : Mean to apparent using precomputed parameters, for zero proper motion, parallax and radial velocity.
-\item [SLA\_AMP] : Geocentric apparent place to mean place.
-\item [SLA\_AMPQK] : Apparent to mean using precomputed parameters.
-\item [SLA\_AOP] : Apparent place to observed place.
-\item [SLA\_AOPPA] : Precompute apparent to observed parameters.
-\item [SLA\_AOPPAT] : Update sidereal time in apparent to observed parameters.
-\item [SLA\_AOPQK] : Apparent to observed using precomputed parameters.
-\item [SLA\_OAP] : Observed to apparent.
-\item [SLA\_OAPQK] : Observed to apparent using precomputed parameters.
-\item [SLA\_ZD] : \hadec\ to zenith distance.
-\item [SLA\_PA] : \hadec\ to parallactic angle.
+\item [SLA\_MAP:]  Mean place to geocentric apparent place.
+\item [SLA\_MAPPA:]  Precompute mean to apparent parameters.
+\item [SLA\_MAPQK:]  Mean to apparent using precomputed parameters.
+\item [SLA\_MAPQKZ:]  Mean to apparent using precomputed parameters, for zero proper motion, parallax and radial velocity.
+\item [SLA\_AMP:]  Geocentric apparent place to mean place.
+\item [SLA\_AMPQK:]  Apparent to mean using precomputed parameters.
+\item [SLA\_AOP:]  Apparent place to observed place.
+\item [SLA\_AOPPA:]  Precompute apparent to observed parameters.
+\item [SLA\_AOPPAT:]  Update sidereal time in apparent to observed parameters.
+\item [SLA\_AOPQK:]  Apparent to observed using precomputed parameters.
+\item [SLA\_OAP:]  Observed to apparent.
+\item [SLA\_OAPQK:]  Observed to apparent using precomputed parameters.
+\item [SLA\_ZD:]  \hadec\ to zenith distance.
+\item [SLA\_PA:]  \hadec\ to parallactic angle.
 \end{description}
 
-\item [Refraction and air mass] ---
+\item [Refraction and air mass ---]
 
 \begin{description}
-\item [SLA\_REFRO] : Change in zenith distance due to refraction.
-\item [SLA\_REFCO] : Constants for simple refraction model.
-\item [SLA\_REFZ] : Unrefracted to refracted ZD, simple model.
-\item [SLA\_REFV] : Unrefracted to refracted \azel\ vector, simple model.
-\item [SLA\_AIRMAS] : Air mass.
+\item [SLA\_REFRO:]  Change in zenith distance due to refraction.
+\item [SLA\_REFCO:]  Constants for simple refraction model.
+\item [SLA\_REFZ:]  Unrefracted to refracted ZD, simple model.
+\item [SLA\_REFV:]  Unrefracted to refracted \azel\ vector, simple model.
+\item [SLA\_AIRMAS:]  Air mass.
 \end{description}
 
-\item [Ecliptic coordinates] ---
+\item [Ecliptic coordinates ---]
 
 \begin{description}
-\item [SLA\_ECMAT] : Equatorial to ecliptic rotation matrix.
-\item [SLA\_EQECL] : J2000.0 `FK5' to ecliptic coordinates.
-\item [SLA\_ECLEQ] : Ecliptic coordinates to J2000.0 `FK5'.
+\item [SLA\_ECMAT:]  Equatorial to ecliptic rotation matrix.
+\item [SLA\_EQECL:]  J2000.0 `FK5' to ecliptic coordinates.
+\item [SLA\_ECLEQ:]  Ecliptic coordinates to J2000.0 `FK5'.
 \end{description}
 
-\item [Galactic coordinates] ---
+\item [Galactic coordinates ---]
 
 \begin{description}
-\item [SLA\_EG50] : B1950.0 `FK4' to galactic.
-\item [SLA\_GE50] : Galactic to B1950.0 `FK4'.
-\item [SLA\_EQGAL] : J2000.0 `FK5' to galactic.
-\item [SLA\_GALEQ] : Galactic to J2000.0 `FK5'.
+\item [SLA\_EG50:]  B1950.0 `FK4' to galactic.
+\item [SLA\_GE50:]  Galactic to B1950.0 `FK4'.
+\item [SLA\_EQGAL:]  J2000.0 `FK5' to galactic.
+\item [SLA\_GALEQ:]  Galactic to J2000.0 `FK5'.
 \end{description}
 
-\item [Supergalactic coordinates] ---
+\item [Supergalactic coordinates ---]
 
 \begin{description}
-\item [SLA\_GALSUP] : Galactic to supergalactic.
-\item [SLA\_SUPGAL] : Supergalactic to galactic.
+\item [SLA\_GALSUP:]  Galactic to supergalactic.
+\item [SLA\_SUPGAL:]  Supergalactic to galactic.
 \end{description}
 
-\item [Ephemerides] ---
+\item [Ephemerides ---]
 
 \begin{description}
-\item [SLA\_EARTH] : Approximate heliocentric position and velocity of the Earth.
-\item [SLA\_EVP] : Barycentric and heliocentric velocity and position of the Earth.
-\item [SLA\_MOON] : Approximate geocentric position and velocity of the Moon.
-\item [SLA\_RVEROT] : Velocity component due to rotation of the Earth.
-\item [SLA\_ECOR] : Components of velocity and light time due to Earth orbital motion.
-\item [SLA\_RVLSR] : Velocity component due to solar motion wrt LSR.
-\item [SLA\_RVGALC] : Velocity component due to rotation of the Galaxy.
-\item [SLA\_RVLG] : Velocity component due to rotation and translation of the Galaxy, relative to the mean motion of the local group.
+\item [SLA\_EARTH:]  Approximate heliocentric position and velocity of the Earth.
+\item [SLA\_EVP:]  Barycentric and heliocentric velocity and position of the Earth.
+\item [SLA\_MOON:]  Approximate geocentric position and velocity of the Moon.
+\item [SLA\_RVEROT:]  Velocity component due to rotation of the Earth.
+\item [SLA\_ECOR:]  Components of velocity and light time due to Earth orbital motion.
+\item [SLA\_RVLSR:]  Velocity component due to solar motion wrt LSR.
+\item [SLA\_RVGALC:]  Velocity component due to rotation of the Galaxy.
+\item [SLA\_RVLG:]  Velocity component due to rotation and translation of the Galaxy, relative to the mean motion of the local group.
 \end{description}
 
-\item [Astrometry] ---
+\item [Astrometry ---]
 
 \begin{description}
-\item [SLA\_S2TP] : Transform spherical coordinates into tangent plane.
-\item [SLA\_TP2S] : Transform tangent plane coordinates into spherical.
-\item [SLA\_PCD] : Apply pincushion/barrel distortion.
-\item [SLA\_UNPCD] : Remove pincushion/barrel distortion.
-\item [SLA\_FITXY] : Fit a linear model to relate two sets of \xy\ coordinates.
-\item [SLA\_PXY] : Compute predicted coordinates and residuals.
-\item [SLA\_INVF] : Invert a linear model.
-\item [SLA\_XY2XY] : Transform one \xy.
-\item [SLA\_DCMPF] : Decompose a linear fit into scales {\it etc.}
+\item [SLA\_S2TP:]  Transform spherical coordinates into tangent plane.
+\item [SLA\_TP2S:]  Transform tangent plane coordinates into spherical.
+\item [SLA\_PCD:]  Apply pincushion/barrel distortion.
+\item [SLA\_UNPCD:]  Remove pincushion/barrel distortion.
+\item [SLA\_FITXY:]  Fit a linear model to relate two sets of \xy\ coordinates.
+\item [SLA\_PXY:]  Compute predicted coordinates and residuals.
+\item [SLA\_INVF:]  Invert a linear model.
+\item [SLA\_XY2XY:]  Transform one \xy.
+\item [SLA\_DCMPF:]  Decompose a linear fit into scales {\it etc.}
 \end{description}
 
-\item [Numerical methods] ---
+\item [Numerical methods ---]
 
 \begin{description}
-\item [SLA\_SMAT] : Matrix inversion and solution of simultaneous equations.
-\item [SLA\_SVD] : Singular value decomposition of a matrix.
-\item [SLA\_SVDSOL] : Solution from given vector plus SVD.
-\item [SLA\_SVDCOV] : Covariance matrix from SVD.
-\item [SLA\_RANDOM] : Generate pseudo-random real number in the range {$0 \leq x < 1$}.
-\item [SLA\_GRESID] : Generate pseudo-random normal deviate ($\equiv$ `Gaussian residual').
+\item [SLA\_SMAT:]  Matrix inversion and solution of simultaneous equations.
+\item [SLA\_SVD:]  Singular value decomposition of a matrix.
+\item [SLA\_SVDSOL:]  Solution from given vector plus SVD.
+\item [SLA\_SVDCOV:]  Covariance matrix from SVD.
+\item [SLA\_RANDOM:]  Generate pseudo-random real number in the range {$0 \leq x < 1$}.
+\item [SLA\_GRESID:]  Generate pseudo-random normal deviate ($\equiv$ `Gaussian residual').
 \end{description}
 
-\item [Real-time] ---
+\item [Real-time ---]
 
 \begin{description}
-\item [SLA\_WAIT] : Interval wait.
+\item [SLA\_WAIT:]  Interval wait.
 \end{description}
 
 \end{description}
@@ -2540,22 +2539,22 @@ For brevity, only the single-precision forms are listed.
 
 \begin{quote}
 \begin{description}
-\item [TRN\_ANNUL] : Annul compiled mapping.
-\item [TRN\_APND] : Append transformation.
-\item [TRN\_CLOSE] : Close the TRANSFORM facility.
-\item [TRN\_COMP] : Compile transformation.
-\item [TRN\_GTCL] : Get classification.
-\item [TRN\_GTCLC] : Get compiled classification.
-\item [TRN\_GTNV] : Get numbers of variables.
-\item [TRN\_GTNVC] : Get numbers of compiled variables.
-\item [TRN\_INV] : Invert transformation.
-\item [TRN\_JOIN] : Concatenate transformations.
-\item [TRN\_NEW] : Create new transformation.
-\item [TRN\_PRFX] : Prefix transformation.
-\item [TRN\_PTCL] : Put classification.
-\item [TRN\_STOKx] : Substitute token.
-\item [TRN\_TR1x] : Transform 1-d data.
-\item [TRN\_TR2x] : Transform 2-d data.
-\item [TRN\_TRNx] : Transform general data.
+\item [TRN\_ANNUL:]  Annul compiled mapping.
+\item [TRN\_APND:]  Append transformation.
+\item [TRN\_CLOSE:]  Close the TRANSFORM facility.
+\item [TRN\_COMP:]  Compile transformation.
+\item [TRN\_GTCL:]  Get classification.
+\item [TRN\_GTCLC:]  Get compiled classification.
+\item [TRN\_GTNV:]  Get numbers of variables.
+\item [TRN\_GTNVC:]  Get numbers of compiled variables.
+\item [TRN\_INV:]  Invert transformation.
+\item [TRN\_JOIN:]  Concatenate transformations.
+\item [TRN\_NEW:]  Create new transformation.
+\item [TRN\_PRFX:]  Prefix transformation.
+\item [TRN\_PTCL:]  Put classification.
+\item [TRN\_STOKx:]  Substitute token.
+\item [TRN\_TR1x:]  Transform 1-d data.
+\item [TRN\_TR2x:]  Transform 2-d data.
+\item [TRN\_TRNx:]  Transform general data.
 \end{description}
 \end{quote}

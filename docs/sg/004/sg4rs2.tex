@@ -1,7 +1,5 @@
 \chapter{Applications}
 \label{C_rsapp}
-\pagestyle{myheadings}
-\markboth{Reference}{\stardocname}
 
 \small
 
@@ -20,346 +18,346 @@ Shortform and macro commands are shown with suffixes of a cross and an
 asterisk respectively.
 
 \begin{description}
-\item [Instrument Interfaces] ---
+\item [Instrument Interfaces ---]
 \begin{description}
 \item [Exosat:]\hfill
 \begin{description}
-\item [BCKBOXEXOLE*] : Draw a source and background box on an Exosat LE image and sort the data within these regions.
-\item [BOXEXOLE*] : Draw a box on an Exosat LE image and sort the data within this region.
-\item [EXOLESORT] : Sort Exosat LE raw data files into Asterix datasets.
-\item [EXOMESORT] : Sort Exosat ME raw data files into Asterix datasets.
-\item [EXORESP] : Write an EXOSAT ME response matrix into a dataset.
-\item [EXOSUBPH] : Subtract background for ME data.
-\item [READEXO] : Read Exosat FOT's onto disc.
-\item [SCANEXO] : Scan an Exosat tape and produce a summary.
-\item [SHOWEXO] : Produce a summary of observations on a disc directory.
-\item [TIMEXOLE*] : Plot a time series, select a time window, and sort LE data between these values.
-\item [TIMEXOME*] : Same for the ME data.
+\item [BCKBOXEXOLE*:]  Draw a source and background box on an Exosat LE image and sort the data within these regions.
+\item [BOXEXOLE*:]  Draw a box on an Exosat LE image and sort the data within this region.
+\item [EXOLESORT:]  Sort Exosat LE raw data files into Asterix datasets.
+\item [EXOMESORT:]  Sort Exosat ME raw data files into Asterix datasets.
+\item [EXORESP:]  Write an EXOSAT ME response matrix into a dataset.
+\item [EXOSUBPH:]  Subtract background for ME data.
+\item [READEXO:]  Read Exosat FOT's onto disc.
+\item [SCANEXO:]  Scan an Exosat tape and produce a summary.
+\item [SHOWEXO:]  Produce a summary of observations on a disc directory.
+\item [TIMEXOLE*:]  Plot a time series, select a time window, and sort LE data between these values.
+\item [TIMEXOME*:]  Same for the ME data.
 \end{description}
 
 \item [Rosat WFC:]\hfill
 \begin{description}
-\item [S2ADDOWNER] : Add an ownership flag to an S2 catalogue using WFC sky division.
-\item [S2ADDPFLAG] : Add a processing flag to an S2 catalogue.
-\item [S2CATLIST] : List contents of an S2 format catalogue.
-\item [S2CATMERGE] : Merge two S2 format catalogues to create a third.
-\item [S2FILTMERGE] : Merge source search results from each filter into an S2 catalogue.
-\item [S2GIDECODE] : Unpack cross-reference data from an S2 catalogue into SCAR global index.
-\item [S2GIENCODE] : Pack a SCAR global index into an S2 catalogue.
-\item [WFCBACK] :  Produce a background subtracted image given raw image.
-\item [WFCSPEC] :  Produce a WFC spectral file.
+\item [S2ADDOWNER:]  Add an ownership flag to an S2 catalogue using WFC sky division.
+\item [S2ADDPFLAG:]  Add a processing flag to an S2 catalogue.
+\item [S2CATLIST:]  List contents of an S2 format catalogue.
+\item [S2CATMERGE:]  Merge two S2 format catalogues to create a third.
+\item [S2FILTMERGE:]  Merge source search results from each filter into an S2 catalogue.
+\item [S2GIDECODE:]  Unpack cross-reference data from an S2 catalogue into SCAR global index.
+\item [S2GIENCODE:]  Pack a SCAR global index into an S2 catalogue.
+\item [WFCBACK:]   Produce a background subtracted image given raw image.
+\item [WFCSPEC:]   Produce a WFC spectral file.
 \end{description}
 
 \item [Rosat XRT:]\hfill
 \begin{description}
-\item [PREPXRT] :  Reformat the output from XRTDISK .
-\item [XRTCORR] :  Correct XRT files.
-\item [XRTDISK] :  Read XRT FITS disk files.
-\item [XRTORB] :   Reformat an XRT orbit file.
-\item [XRTRESP] :  Write XRT response into file.
-\item [XRTSUB] :   Subtract XRT files.
-\item [XSORT] :    Sort raw XRT data.
+\item [PREPXRT:]   Reformat the output from XRTDISK .
+\item [XRTCORR:]   Correct XRT files.
+\item [XRTDISK:]   Read XRT FITS disk files.
+\item [XRTORB:]    Reformat an XRT orbit file.
+\item [XRTRESP:]   Write XRT response into file.
+\item [XRTSUB:]    Subtract XRT files.
+\item [XSORT:]     Sort raw XRT data.
 \end{description}
 \end{description}
 
-\item [Event Processing] ---
+\item [Event Processing ---]
 \begin{quote}
 \begin{description}
-\item [EVBIN] : Create a binned dataset from an event dataset.
-\item [EVCSUBSET] : Extract a circular or annular region from an event dataset.
-\item [EVLIST] : Display the DATA\_ARRAY component of all lists in an event dataset.
-\item [EVMERGE] : Merge two or more event datasets.
-\item [EVPOLAR] :  Bin an event dataset into a polar binned dataset.
-\item [EVSIM] : Generate a simulated event dataset.
-\item [EVSUBSET] : Extract linearly a subset from an event dataset.
+\item [EVBIN:]  Create a binned dataset from an event dataset.
+\item [EVCSUBSET:]  Extract a circular or annular region from an event dataset.
+\item [EVLIST:]  Display the DATA\_ARRAY component of all lists in an event dataset.
+\item [EVMERGE:]  Merge two or more event datasets.
+\item [EVPOLAR:]   Bin an event dataset into a polar binned dataset.
+\item [EVSIM:]  Generate a simulated event dataset.
+\item [EVSUBSET:]  Extract linearly a subset from an event dataset.
 \end{description}
 \end{quote}
 
-\item [Binned Dataset] ---
+\item [Binned Dataset ---]
 \begin{quote}
 \begin{description}
-\item [AXFLIP] :   Reverse directions of any or all of dataset's axes.
-\item [AXORDER] :  Re-order axes of a dataset.
-\item [AXSHOW] :   Display axes.
-\item [BINMERGE] : Merge up to ten datasets.
-\item [BINSUBSET] : Subset a binned dataset.
-\item [ENMAP] :    Produce an energy map for plotting.
-\item [INTERP] :   Reconstitute bad pixels by spline interpolation.
-\item [MEANDAT] :  Find the mean of several datafiles.
-\item [POLYFIT] :  Fit 1-d polynomial(s) to a dataset.
-\item [PROJECT] :  Project data along one axis.
-\item [RATIO] :    Give the ratio of two bands on any axis in an n-d array.
-\item [REBIN] :    Rebin a binned dataset.
-\item [SCATTERGRAM] : Produce scatter plot of one array versus another.
-\item [SETRANGES] : Set ranges to be used by a subsequent program.
-\item [SIGNIF] :   Change an input dataset to its weighted significance.
-\item [SMOOTH] :   Smooth an n-d datafile with a user-selectable mask.
-\item [SYSERR] :   Add a constant percentage to the variance of each point.
-\item [VALIDATE] : Basic validation of binned dataset.
+\item [AXFLIP:]    Reverse directions of any or all of dataset's axes.
+\item [AXORDER:]   Re-order axes of a dataset.
+\item [AXSHOW:]    Display axes.
+\item [BINMERGE:]  Merge up to ten datasets.
+\item [BINSUBSET:]  Subset a binned dataset.
+\item [ENMAP:]     Produce an energy map for plotting.
+\item [INTERP:]    Reconstitute bad pixels by spline interpolation.
+\item [MEANDAT:]   Find the mean of several datafiles.
+\item [POLYFIT:]   Fit 1-d polynomial(s) to a dataset.
+\item [PROJECT:]   Project data along one axis.
+\item [RATIO:]     Give the ratio of two bands on any axis in an n-d array.
+\item [REBIN:]     Rebin a binned dataset.
+\item [SCATTERGRAM:]  Produce scatter plot of one array versus another.
+\item [SETRANGES:]  Set ranges to be used by a subsequent program.
+\item [SIGNIF:]    Change an input dataset to its weighted significance.
+\item [SMOOTH:]    Smooth an n-d datafile with a user-selectable mask.
+\item [SYSERR:]    Add a constant percentage to the variance of each point.
+\item [VALIDATE:]  Basic validation of binned dataset.
 \end{description}
 \end{quote}
 
-\item [Conversion] ---
+\item [Conversion ---]
 \begin{quote}
 \begin{description}
-\item [ASTCONV] :  Convert between old \& new Asterix binned datasets.
-\item [AST2XSP] :  Convert Asterix spectral files into XSPEC format.
-\item [ASTQDP] :   Allow an Asterix file to be used within QDP.
-\item [EVBIN] :    Create a binned dataset from an event dataset.
-\item [EXPORT] :   Output one or more datasets to ASCII file.
-\item [IMPORT] :   Read an ASCII text file into an Asterix binned dataset.
-\item [TEXT2HDS] : Convert columns in a text file into HDS arrays.
+\item [ASTCONV:]   Convert between old \& new Asterix binned datasets.
+\item [AST2XSP:]   Convert Asterix spectral files into XSPEC format.
+\item [ASTQDP:]    Allow an Asterix file to be used within QDP.
+\item [EVBIN:]     Create a binned dataset from an event dataset.
+\item [EXPORT:]    Output one or more datasets to ASCII file.
+\item [IMPORT:]    Read an ASCII text file into an Asterix binned dataset.
+\item [TEXT2HDS:]  Convert columns in a text file into HDS arrays.
 \end{description}
 \end{quote}
 
-\item [Display] ---
+\item [Display ---]
 \begin{quote}
 \begin{description}
-\item [BINLIST] :  Display a 1-d binned dataset.
-\item [EVLIST] :   Display the DATA\_ARRAY component of all lists in an event dataset.
-\item [HEADER] :   Display header \& processing information in a dataset.
-\item [HISTORY] :  Display history of a dataset.
+\item [BINLIST:]   Display a 1-d binned dataset.
+\item [EVLIST:]    Display the DATA\_ARRAY component of all lists in an event dataset.
+\item [HEADER:]    Display header \& processing information in a dataset.
+\item [HISTORY:]   Display history of a dataset.
 \end{description}
 \end{quote}
 
-\item [Maths] ---
+\item [Maths ---]
 \begin{quote}
 \begin{description}
-\item [ARITHMETIC] : Perform basic arithmetic (+,$-$,/,*) on two data objects.
-\item [ADD+]       : Invoke ARITHMETIC in + mode.
-\item [SUBTRACT+]  : Invoke ARITHMETIC in $-$ mode.
-\item [MULTIPLY+]  : Invoke ARITHMETIC in * mode.
-\item [DIVIDE+]    : Invoke ARITHMETIC in / mode.
-\item [OPERATE]    : Perform operations e.g. $Log_{10}$ on a dataset.
+\item [ARITHMETIC:]  Perform basic arithmetic (+,$-$,/,*) on two data objects.
+\item [ADD+:]        Invoke ARITHMETIC in + mode.
+\item [SUBTRACT+:]   Invoke ARITHMETIC in $-$ mode.
+\item [MULTIPLY+:]   Invoke ARITHMETIC in * mode.
+\item [DIVIDE+:]     Invoke ARITHMETIC in / mode.
+\item [OPERATE:]     Perform operations e.g. $Log_{10}$ on a dataset.
 \end{description}
 \end{quote}
 
-\item [Time Series Analysis] ---
+\item [Time Series Analysis ---]
 \begin{quote}
 \begin{description}
-\item [ACF] :      Auto-correlation program.
-\item [BARYCORR] : Barycentric correction.
-\item [CROSSCOR] : Cross-correlate two 1-d series.
-\item [CROSSPEC] : Compute the cross spectrum of two 1-d datasets.
-\item [DIFDAT] :   Difference adjacent data points in an array.
-\item [DYNAMICAL] : Find power spectrum of successive segments of a time series.
-\item [FOLDAOV] :  Period search ANOVA folding.
-\item [FOLDBIN] :  Fold a time-series into phase bins at a given period.
-\item [FOLDLOTS] : Epoch folding, period search algorithm.
-\item [LOMBSCAR] : Lomb-Scargle power spectral analysis.
-\item [PHASE] :    Convert a time-series into a phase series.
-\item [POWER] :    Find the power spectrum of a full unweighted 1-d dataset.
-\item [SINFIT] :   Find a periodogram of irregularly spaced 1-d data.
-\item [STREAMLINE] : Strip bad quality data out of a file.
-\item [TIMSIM] :   Simulate a time series.
-\item [VARTEST] :  Test a time series for variability.
+\item [ACF:]       Auto-correlation program.
+\item [BARYCORR:]  Barycentric correction.
+\item [CROSSCOR:]  Cross-correlate two 1-d series.
+\item [CROSSPEC:]  Compute the cross spectrum of two 1-d datasets.
+\item [DIFDAT:]    Difference adjacent data points in an array.
+\item [DYNAMICAL:]  Find power spectrum of successive segments of a time series.
+\item [FOLDAOV:]   Period search ANOVA folding.
+\item [FOLDBIN:]   Fold a time-series into phase bins at a given period.
+\item [FOLDLOTS:]  Epoch folding, period search algorithm.
+\item [LOMBSCAR:]  Lomb-Scargle power spectral analysis.
+\item [PHASE:]     Convert a time-series into a phase series.
+\item [POWER:]     Find the power spectrum of a full unweighted 1-d dataset.
+\item [SINFIT:]    Find a periodogram of irregularly spaced 1-d data.
+\item [STREAMLINE:]  Strip bad quality data out of a file.
+\item [TIMSIM:]    Simulate a time series.
+\item [VARTEST:]   Test a time series for variability.
 \end{description}
 \end{quote}
 
-\item [Image Processing] ---
+\item [Image Processing ---]
 \begin{description}
 \item [Interactive:]\hfill
 \begin{description}
-\item [IAZIMUTH] : Produce azimuthal distribution.
-\item [IBLUR] :    Smooth an image.
-\item [IBLURB+] :  Smooth with a box filter.
-\item [IBLURG+] :  Smooth with a Gaussian.
-\item [IBOX] :     Define rectangular section of image.
-\item [IBOXSTATS*] : Select region and give statistics.
-\item [ICENTROID] : Find the centroid in a given region.
-\item [ICIRCSTATS*] : Get flux from a circular region.
-\item [ICLEAR] :   Clear current plotting zone.
-\item [ICLOSE] :   Close down image processing system.
-\item [ICOLOUR] :  Change colour table.
-\item [ICONTOUR] : Contour current image.
-\item [ICURRENT] : Display the current position, image etc.
-\item [IDISPLAY] : Display current image.
-\item [IGRID] :    Put grid over image in specified coords.
-\item [IHARD] :    Hard copy of current plot.
-\item [IHIST] :    Histogram pixels inside current box.
-\item [ILIMITS] :  Change axis limits on 1-d plot.
-\item [IMARK] :    Mark sources on image.
-\item [INEW] :     Load new image.
-\item [INOISE] :   Add Gaussian noise to image.
-\item [IPATCH] :   Patch bad quality pixels in image.
-\item [IPEAKS] :   Find peaks in image.
-\item [IPEEK] :    Take a peek at selected bit of image.
-\item [IPEEKQ+] :  Look at quality.
-\item [IPEEKV+] :  Look at variances.
-\item [IPGDEF] :   Change basic graphics properties.
-\item [IPLOT] :    Display current 1-d plot.
-\item [IPOSIT] :   Set the current position.
-\item [IPREVIOUS] : Go back to previous image.
-\item [IPSF] :     Put PSF profile on 1-d plot.
-\item [IRADIAL] :  Produce radial plot.
-\item [IREDISPLAY+] : Redisplay current image.
-\item [IREMOVE] :  Remove sources from image.
-\item [IREPLOT+] : Redisplay current 1-d plot.
-\item [ISAVE] :    Save current image to file.
-\item [ISAVE1D] :  Save current 1-d data to file.
-\item [ISCALE] :   Rescale image.
-\item [ISEP] :     Calculate separation between two positions.
-\item [ISLICE] :   Take 1-d slice from image.
-\item [ISTART] :   Start up image processing system.
-\item [ISTATS] :   Give basic statistics on pre-selected region of image.
-\item [ISTYLE] :   Set plotting style of 1-d plot.
-\item [ISURFACE] : Display image as 3-d surface.
-\item [ITITLE] :   Change title of current image or plot.
-\item [IUNZOOM*] : Redisplay whole image.
-\item [IWHOLE] :   Select whole image.
-\item [IZAP] :     Remove individual pixels from image.
-\item [IZONES] :   Change zones on display surface.
-\item [IZOOM*] :   Zoom in on section of image.
+\item [IAZIMUTH:]  Produce azimuthal distribution.
+\item [IBLUR:]     Smooth an image.
+\item [IBLURB+:]   Smooth with a box filter.
+\item [IBLURG+:]   Smooth with a Gaussian.
+\item [IBOX:]      Define rectangular section of image.
+\item [IBOXSTATS*:]  Select region and give statistics.
+\item [ICENTROID:]  Find the centroid in a given region.
+\item [ICIRCSTATS*:]  Get flux from a circular region.
+\item [ICLEAR:]    Clear current plotting zone.
+\item [ICLOSE:]    Close down image processing system.
+\item [ICOLOUR:]   Change colour table.
+\item [ICONTOUR:]  Contour current image.
+\item [ICURRENT:]  Display the current position, image etc.
+\item [IDISPLAY:]  Display current image.
+\item [IGRID:]     Put grid over image in specified coords.
+\item [IHARD:]     Hard copy of current plot.
+\item [IHIST:]     Histogram pixels inside current box.
+\item [ILIMITS:]   Change axis limits on 1-d plot.
+\item [IMARK:]     Mark sources on image.
+\item [INEW:]      Load new image.
+\item [INOISE:]    Add Gaussian noise to image.
+\item [IPATCH:]    Patch bad quality pixels in image.
+\item [IPEAKS:]    Find peaks in image.
+\item [IPEEK:]     Take a peek at selected bit of image.
+\item [IPEEKQ+:]   Look at quality.
+\item [IPEEKV+:]   Look at variances.
+\item [IPGDEF:]    Change basic graphics properties.
+\item [IPLOT:]     Display current 1-d plot.
+\item [IPOSIT:]    Set the current position.
+\item [IPREVIOUS:]  Go back to previous image.
+\item [IPSF:]      Put PSF profile on 1-d plot.
+\item [IRADIAL:]   Produce radial plot.
+\item [IREDISPLAY+:]  Redisplay current image.
+\item [IREMOVE:]   Remove sources from image.
+\item [IREPLOT+:]  Redisplay current 1-d plot.
+\item [ISAVE:]     Save current image to file.
+\item [ISAVE1D:]   Save current 1-d data to file.
+\item [ISCALE:]    Rescale image.
+\item [ISEP:]      Calculate separation between two positions.
+\item [ISLICE:]    Take 1-d slice from image.
+\item [ISTART:]    Start up image processing system.
+\item [ISTATS:]    Give basic statistics on pre-selected region of image.
+\item [ISTYLE:]    Set plotting style of 1-d plot.
+\item [ISURFACE:]  Display image as 3-d surface.
+\item [ITITLE:]    Change title of current image or plot.
+\item [IUNZOOM*:]  Redisplay whole image.
+\item [IWHOLE:]    Select whole image.
+\item [IZAP:]      Remove individual pixels from image.
+\item [IZONES:]    Change zones on display surface.
+\item [IZOOM*:]    Zoom in on section of image.
 \end{description}
 
 \item [Non-interactive:]\hfill
 \begin{description}
-\item [IDMSTOD*] : Convert dd:mm:ss to decimal degrees.
-\item [IDTODMS*] : Convert decimal degrees to dd:mm:ss.
-\item [IDTOHMS*] : Convert decimal degrees to hh:mm:ss.
-\item [IHMSTOD*] : Convert hh:mm:ss to decimal degrees.
-\item [IMOSAIC] :  Merge several non-congruent images.
-\item [IPOLAR] :   Produce polar surface brightness profile of image.
+\item [IDMSTOD*:]  Convert dd:mm:ss to decimal degrees.
+\item [IDTODMS*:]  Convert decimal degrees to dd:mm:ss.
+\item [IDTOHMS*:]  Convert decimal degrees to hh:mm:ss.
+\item [IHMSTOD*:]  Convert hh:mm:ss to decimal degrees.
+\item [IMOSAIC:]   Merge several non-congruent images.
+\item [IPOLAR:]    Produce polar surface brightness profile of image.
 \end{description}
 \end{description}
 
-\item [Parameter] ---
+\item [Parameter ---]
 \begin{quote}
 \begin{description}
-\item [GLOBAL] :   Display current values of all global parameters.
+\item [GLOBAL:]    Display current values of all global parameters.
 \end{description}
 \end{quote}
 
-\item [Spectral analysis] ---
+\item [Spectral analysis ---]
 \begin{quote}
 \begin{description}
-\item [FREEZE] :   Freeze parameter(s) in spectral model.
-\item [IGNORE+] :  Allow spectral channels to be excluded from fitting.
-\item [RESTORE+] : Reinstate spectral channels for fitting.
-\item [SDATA] :    Define datasets to be fitted.
-\item [SERROR] :   Evaluate confidence region for spectral model parameters.
-\item [SFIT] :     Fit spectral model to one or more datasets.
-\item [SFLUX] :    Evaluate flux from defined model over energy band.
-\item [SMODEL] :   Allow user definition of multi-component spectral model.
-\item [SPLOT] :    Plot data, fits and residuals.
-\item [THAW] :     Free spectral model parameter (after FREEZEing).
+\item [FREEZE:]    Freeze parameter(s) in spectral model.
+\item [IGNORE+:]   Allow spectral channels to be excluded from fitting.
+\item [RESTORE+:]  Reinstate spectral channels for fitting.
+\item [SDATA:]     Define datasets to be fitted.
+\item [SERROR:]    Evaluate confidence region for spectral model parameters.
+\item [SFIT:]      Fit spectral model to one or more datasets.
+\item [SFLUX:]     Evaluate flux from defined model over energy band.
+\item [SMODEL:]    Allow user definition of multi-component spectral model.
+\item [SPLOT:]     Plot data, fits and residuals.
+\item [THAW:]      Free spectral model parameter (after FREEZEing).
 \end{description}
 \end{quote}
 
-\item [Statistical analysis] ---
+\item [Statistical analysis ---]
 \begin{quote}
 \begin{description}
-\item [BINSUM] :   Integrate dataset -- use for cumulative distributions.
-\item [COMPARE] :  Compare two datafiles or a file and a model.
-\item [FREQUENCY] : Produce histogram of values in data array.
-\item [KSTAT] :    Calculate Kendall K statistic for 1-d dataset.
-\item [STATISTIX] : Find mean, standard deviation etc.\ of data array.
+\item [BINSUM:]    Integrate dataset -- use for cumulative distributions.
+\item [COMPARE:]   Compare two datafiles or a file and a model.
+\item [FREQUENCY:]  Produce histogram of values in data array.
+\item [KSTAT:]     Calculate Kendall K statistic for 1-d dataset.
+\item [STATISTIX:]  Find mean, standard deviation etc.\ of data array.
 \end{description}
 \end{quote}
 
-\item [Quality processing] ---
+\item [Quality processing ---]
 \begin{quote}
 \begin{description}
-\item [CIGNORE] :  Set quality bad in circular region.
-\item [CQUALITY] : Perform quality manipulation on circular region.
-\item [CRESTORE] : Set quality good in circular region.
-\item [IGNORE+] :  Invoke QUALITY in IGNORE mode; sets temporary bad quality bit.
-\item [MAGIC] :    Set magic values.
-\item [QUALITY] :  General quality manipulation application.
-\item [RESTORE+] : Invoke QUALITY in RESTORE mode; clears temporary bad quality bit.
-\item [SETQUAL+] : Invoke QUALITY in SET mode; sets quality to specified value.
+\item [CIGNORE:]   Set quality bad in circular region.
+\item [CQUALITY:]  Perform quality manipulation on circular region.
+\item [CRESTORE:]  Set quality good in circular region.
+\item [IGNORE+:]   Invoke QUALITY in IGNORE mode; sets temporary bad quality bit.
+\item [MAGIC:]     Set magic values.
+\item [QUALITY:]   General quality manipulation application.
+\item [RESTORE+:]  Invoke QUALITY in RESTORE mode; clears temporary bad quality bit.
+\item [SETQUAL+:]  Invoke QUALITY in SET mode; sets quality to specified value.
 \end{description}
 \end{quote}
 
-\item [HDS editor] ---
+\item [HDS editor ---]
 \begin{quote}
 \begin{description}
-\item [HCOPY] :    Copy an HDS object recursively.
-\item [HCREATE] :  Create an HDS object in a file.
-\item [HDELETE] :  Delete an HDS object.
-\item [HDIR] :     Display the components of an HDS file or structure.
-\item [HDISPLAY] : Display the contents of an HDS primitive.
-\item [HFILL] :    Fill a primitive object with one value.
-\item [HMODIFY] :  Change the value(s) in an existing object.
-\item [HREAD] :    Read from an ASCII (or binary) file to an HDS object.
-\item [HRENAME] :  Rename an HDS object.
-\item [HRESET] :   Set values in an HDS primitive to `undefined'.
-\item [HRESHAPE] : Alter size of dimensions in an HDS primitive array.
-\item [HRETYPE] :  Change type of a structured object.
-\item [HSE] :      Interactive HDS screen editor -- see HSEHELP.
-\item [HTAB] :     Simultaneously display several HDS primitive vectors.
-\item [HWRITE] :   Write an HDS primitive to an ASCII (or binary) file.
+\item [HCOPY:]     Copy an HDS object recursively.
+\item [HCREATE:]   Create an HDS object in a file.
+\item [HDELETE:]   Delete an HDS object.
+\item [HDIR:]      Display the components of an HDS file or structure.
+\item [HDISPLAY:]  Display the contents of an HDS primitive.
+\item [HFILL:]     Fill a primitive object with one value.
+\item [HMODIFY:]   Change the value(s) in an existing object.
+\item [HREAD:]     Read from an ASCII (or binary) file to an HDS object.
+\item [HRENAME:]   Rename an HDS object.
+\item [HRESET:]    Set values in an HDS primitive to `undefined'.
+\item [HRESHAPE:]  Alter size of dimensions in an HDS primitive array.
+\item [HRETYPE:]   Change type of a structured object.
+\item [HSE:]       Interactive HDS screen editor -- see HSEHELP.
+\item [HTAB:]      Simultaneously display several HDS primitive vectors.
+\item [HWRITE:]    Write an HDS primitive to an ASCII (or binary) file.
 \end{description}
 \end{quote}
 
-\item [Source Searching] ---
+\item [Source Searching ---]
 \begin{quote}
 \begin{description}
-\item [BSUB] :     Background subtraction program.
-\item [CREPSF] :   Create a PSF file.
-\item [PSS] :      Search a binned dataset for sources.
-\item [PSSPAR+] :  Invoke PSS in parameterise mode.
-\item [SSANOT+] :  Annotate an image given source search results.
-\item [SSCARIN] :  Export source search results to binary SCAR catalogue.
-\item [SSDUMP] :   Dump source search results to an ASCII file.
-\item [SSMERGE] :  Merge two or more source results together.
-\item [SSZAP] :    Set quality bad around sources found by PSS.
-\item [XPSSCORR] : Exposure-correct XRT source fluxes produced by PSS.
+\item [BSUB:]      Background subtraction program.
+\item [CREPSF:]    Create a PSF file.
+\item [PSS:]       Search a binned dataset for sources.
+\item [PSSPAR+:]   Invoke PSS in parameterise mode.
+\item [SSANOT+:]   Annotate an image given source search results.
+\item [SSCARIN:]   Export source search results to binary SCAR catalogue.
+\item [SSDUMP:]    Dump source search results to an ASCII file.
+\item [SSMERGE:]   Merge two or more source results together.
+\item [SSZAP:]     Set quality bad around sources found by PSS.
+\item [XPSSCORR:]  Exposure-correct XRT source fluxes produced by PSS.
 \end{description}
 \end{quote}
 
-\item [GRAFIX display] ---
+\item [GRAFIX display ---]
 \begin{quote}
 \begin{description}
-\item [DEVICES] :  Show the available graphics display devices.
-\item [DOPEN+] :   Open device (variant of DEVICES).
-\item [DCLOSE+] :  Close device (variant of DEVICES).
+\item [DEVICES:]   Show the available graphics display devices.
+\item [DOPEN+:]    Open device (variant of DEVICES).
+\item [DCLOSE+:]   Close device (variant of DEVICES).
 \\
-\item [DRAW] :     Display specified (or current) dataset.
-\item [QDRAW+] :   Draw quick and simple plot (variant of DRAW).
-\item [RDRAW+] :   Plot raw data only (variant of DRAW).
+\item [DRAW:]      Display specified (or current) dataset.
+\item [QDRAW+:]    Draw quick and simple plot (variant of DRAW).
+\item [RDRAW+:]    Plot raw data only (variant of DRAW).
 \\
-\item [MULTI] :    Create multi-graph dataset from binned datasets.
-\item [AMULTI+] :  Add another binned dataset to a multi-graph dataset.
-\item [DMULTI+] :  Remove a dataset from a multi-graph dataset (variants of MULTI).
-\item [DESIGN] :   Display specified plots within a multi-graph dataset.
-\item [LAYOUT] :   Specify number of plots in x \& y in multi-graph dataset.
+\item [MULTI:]     Create multi-graph dataset from binned datasets.
+\item [AMULTI+:]   Add another binned dataset to a multi-graph dataset.
+\item [DMULTI+:]   Remove a dataset from a multi-graph dataset (variants of MULTI).
+\item [DESIGN:]    Display specified plots within a multi-graph dataset.
+\item [LAYOUT:]    Specify number of plots in x \& y in multi-graph dataset.
 \\
-\item [POSIT] :    Specify position of plot in NDC or cm.
-\item [XLOG+] :    Set x-axis logarithmic (variant of AXES).
-\item [YLOG+] :    Set y-axis logarithmic (variant of AXES).
-\item [XYLOG+] :   Set both axes logarithmic (variant of AXES).
-\item [AXES] :     Set plotting attributes for axes.
-\item [XAXIS+] :   Set attributes for x-axis (variant of AXES).
-\item [YAXIS+] :   Set attributes for y-axis (variant of AXES).
+\item [POSIT:]     Specify position of plot in NDC or cm.
+\item [XLOG+:]     Set x-axis logarithmic (variant of AXES).
+\item [YLOG+:]     Set y-axis logarithmic (variant of AXES).
+\item [XYLOG+:]    Set both axes logarithmic (variant of AXES).
+\item [AXES:]      Set plotting attributes for axes.
+\item [XAXIS+:]    Set attributes for x-axis (variant of AXES).
+\item [YAXIS+:]    Set attributes for y-axis (variant of AXES).
 \\
-\item [LABEL] :    Set labels on plot.
-\item [XLABEL+] :  Set x-label (variant of LABELS).
-\item [YLABEL+] :  Set y-label (variant of LABELS).
-\item [LEGEND] :   Add, delete or modify legend lines.
-\item [ALEGEND+] : Add a legend line (variant of LEGEND).
-\item [DLEGEND+] : Delete a legend line (variant of LEGEND).
-\item [ANOTATE] :  Place text in graph (binned dataset) at specified position.
+\item [LABEL:]     Set labels on plot.
+\item [XLABEL+:]   Set x-label (variant of LABELS).
+\item [YLABEL+:]   Set y-label (variant of LABELS).
+\item [LEGEND:]    Add, delete or modify legend lines.
+\item [ALEGEND+:]  Add a legend line (variant of LEGEND).
+\item [DLEGEND+:]  Delete a legend line (variant of LEGEND).
+\item [ANOTATE:]   Place text in graph (binned dataset) at specified position.
 \\
-\item [POLYLINE] : Draw 1-d image as polyline.
-\item [MARKER] :   Draw 1-d dataset with specified PGPLOT marker.
-\item [STEPLINE] : Draw 1-d dataset as histogram.
-\item [ERRORS] :   Draw error boxes of specified shape on 1-d dataset.
+\item [POLYLINE:]  Draw 1-d image as polyline.
+\item [MARKER:]    Draw 1-d dataset with specified PGPLOT marker.
+\item [STEPLINE:]  Draw 1-d dataset as histogram.
+\item [ERRORS:]    Draw error boxes of specified shape on 1-d dataset.
 \\
-\item [PIXEL] :    Draw 2-d image as pixels.
-\item [CONTOUR] :  Draw 2-d dataset as contours.
-\item [THREED] :   Draw 2-d dataset as quasi 3-d plot.
+\item [PIXEL:]     Draw 2-d image as pixels.
+\item [CONTOUR:]   Draw 2-d dataset as contours.
+\item [THREED:]    Draw 2-d dataset as quasi 3-d plot.
 \\
-\item [COLTAB] :   Manipulate colour table for 2-d plot.
-\item [COLBAR+] :  Cause colour bar to be put on 2-d plot.
-\item [GREYSCALE+] : Set colour table to greyscale.
-\item [SKYGRID] :  Put coordinate grid on 2-d plot.
+\item [COLTAB:]    Manipulate colour table for 2-d plot.
+\item [COLBAR+:]   Cause colour bar to be put on 2-d plot.
+\item [GREYSCALE+:]  Set colour table to greyscale.
+\item [SKYGRID:]   Put coordinate grid on 2-d plot.
 \\
-\item [CURSOR] :   Put interactive cursor on screen.
-\item [SHAPES] :   Put a shape onto a displayed image.
-\item [ZOOM*] :    Set plot limits interactively.
+\item [CURSOR:]    Put interactive cursor on screen.
+\item [SHAPES:]    Put a shape onto a displayed image.
+\item [ZOOM*:]     Set plot limits interactively.
 \\
-\item [PGDEF] :    Set global PGPLOT default attributes.
+\item [PGDEF:]     Set global PGPLOT default attributes.
 \end{description}
 \end{quote}
 \end{description}
@@ -376,20 +374,20 @@ asterisk respectively.
 
 \begin{quote}
 \begin{description}
-\item [CALCOR] : Perform dark or flash count corrections for a list of NDFs.
-\item [CCDBATCH] : Prepare a CCDPACK command procedure for submission to batch.
-\item [CCDCLEAR] : Clear the current globals parameters.
-\item [CCDNOTE] : Add a note to the log file.
-\item [CCDSETUP] : Set up the CCDPACK global parameters.
-\item [CCDSHOW] : Display the current values of the CCDPACK global parameters.
-\item [DEBIAS] : Debiass lists of NDFs either by bias NDF subtraction or by
+\item [CALCOR:]  Perform dark or flash count corrections for a list of NDFs.
+\item [CCDBATCH:]  Prepare a CCDPACK command procedure for submission to batch.
+\item [CCDCLEAR:]  Clear the current globals parameters.
+\item [CCDNOTE:]  Add a note to the log file.
+\item [CCDSETUP:]  Set up the CCDPACK global parameters.
+\item [CCDSHOW:]  Display the current values of the CCDPACK global parameters.
+\item [DEBIAS:]  Debiass lists of NDFs either by bias NDF subtraction or by
  interpolation; apply bad data masks; extract a subset of the data area;
  produce variances; apply saturation values.
-\item [FLATCOR] : Perform the flatfield correction on a list of NDFs.
-\item [LISTLOG] : List the contents of a logfile.
-\item [MAKEBIAS] : Produce a bias calibration NDF.
-\item [MAKECAL] : Produce calibration NDFs for flash or dark counts.
-\item [MAKEFLAT] : Produce a flatfield NDF.
+\item [FLATCOR:]  Perform the flatfield correction on a list of NDFs.
+\item [LISTLOG:]  List the contents of a logfile.
+\item [MAKEBIAS:]  Produce a bias calibration NDF.
+\item [MAKECAL:]  Produce calibration NDFs for flash or dark counts.
+\item [MAKEFLAT:]  Produce a flatfield NDF.
 \end{description}
 \end{quote}
 
@@ -405,14 +403,14 @@ asterisk respectively.
 
 \begin{quote}
 \begin{description}
-\item [DIPSO2NDF] : DIPSO to NDF format conversion.
-\item [NDF2DIPSO] : NDF to DIPSO format conversion.
+\item [DIPSO2NDF:]  DIPSO to NDF format conversion.
+\item [NDF2DIPSO:]  NDF to DIPSO format conversion.
 \\
-\item [DST2NDF] : Figaro version 2 to NDF format conversion.
-\item [NDF2DST] : NDF to Figaro version 2 format conversion.
+\item [DST2NDF:]  Figaro version 2 to NDF format conversion.
+\item [NDF2DST:]  NDF to Figaro version 2 format conversion.
 \\
-\item [BDF2NDF] : Interim (BDF) to NDF format conversion.
-\item [NDF2BDF] : NDF to Interim (BDF) format conversion.
+\item [BDF2NDF:]  Interim (BDF) to NDF format conversion.
+\item [NDF2BDF:]  NDF to Interim (BDF) format conversion.
 \end{description}
 \end{quote}
 
@@ -429,48 +427,48 @@ asterisk respectively.
 This consists of the portable package itself, together with three additional
 routines to display results obtained by DAOPHOT on an image display.
 \begin{description}
-\item [DAOPHOT] : this responds to the following commands :
+\item [DAOPHOT:]  this responds to the following commands :
 \begin{description}
-\item [ADDSTAR] : Add synthetic stars to an image.
-\item [ALLSTAR] : An alternative to the iterative profile fitting routine NSTAR.
-\item [APPEND] : Concatenate two data files.
-\item [ATTACH] : Specify the disk file name of the required picture.
-\item [DUMP] : Display raw values from part of your picture on your terminal.
-\item [EXIT] : Leave the program.
-\item [FIND] : Find all the stars above a certain threshold.
-\item [FUDGE] : Change image data to fix minor problems such as cosmic ray hits
+\item [ADDSTAR:]  Add synthetic stars to an image.
+\item [ALLSTAR:]  An alternative to the iterative profile fitting routine NSTAR.
+\item [APPEND:]  Concatenate two data files.
+\item [ATTACH:]  Specify the disk file name of the required picture.
+\item [DUMP:]  Display raw values from part of your picture on your terminal.
+\item [EXIT:]  Leave the program.
+\item [FIND:]  Find all the stars above a certain threshold.
+\item [FUDGE:]  Change image data to fix minor problems such as cosmic ray hits
  (last resort).
-\item [GROUP] : Group stars together, on the principle that if two stars are
+\item [GROUP:]  Group stars together, on the principle that if two stars are
  close enough that the light from one will influence the profile-fit of the
  other then they should be in the same group.
-\item [HELP] : Produce a simple list of the commands which are available.
-\item [LIST] : Display the image header of `Caltech data-structure files'.
-\item [MONITOR] : Restore reporting of progress to your terminal.
-\item [NOMONITOR] : Switch off the reporting of progress to your terminal.
-\item [NSTAR] : Perform multiple, simultaneous profile-fitting photometry.
-\item [OFFSET] : Add fixed values to every X and Y co-ordinate in a data file.
-\item [OPTIONS] : Set values for various parameters to ones suitable for the
+\item [HELP:]  Produce a simple list of the commands which are available.
+\item [LIST:]  Display the image header of `Caltech data-structure files'.
+\item [MONITOR:]  Restore reporting of progress to your terminal.
+\item [NOMONITOR:]  Switch off the reporting of progress to your terminal.
+\item [NSTAR:]  Perform multiple, simultaneous profile-fitting photometry.
+\item [OFFSET:]  Add fixed values to every X and Y co-ordinate in a data file.
+\item [OPTIONS:]  Set values for various parameters to ones suitable for the
  given data.
-\item [PEAK] : Perform profile-fitting for a single star.
-\item [PHOTOMETRY] : Perform concentric aperture photometry in the specified
+\item [PEAK:]  Perform profile-fitting for a single star.
+\item [PHOTOMETRY:]  Perform concentric aperture photometry in the specified
  image.
-\item [PICK] : Select a set of reasonable candidates for PSF stars.
-\item [PSF] : Obtain a point-spread function from the given image.
-\item [SELECT] : Cut down the size of some of the groups found by GROUP (if
+\item [PICK:]  Select a set of reasonable candidates for PSF stars.
+\item [PSF:]  Obtain a point-spread function from the given image.
+\item [SELECT:]  Cut down the size of some of the groups found by GROUP (if
  there are too many stars in a group).
-\item [SKY] : Estimate the sky brightness in the image.
-\item [SORT] : Re-order the stars in one of the lists produced by DAOPHOT
+\item [SKY:]  Estimate the sky brightness in the image.
+\item [SORT:]  Re-order the stars in one of the lists produced by DAOPHOT
  according to various criteria.
-\item [SUBSTAR] : Remove suitable multiples of a PSF, at specified locations,
+\item [SUBSTAR:]  Remove suitable multiples of a PSF, at specified locations,
 from an image.
 \end{description}
 
-\item [DAOGREY] : Display the image data on a suitable device.
+\item [DAOGREY:]  Display the image data on a suitable device.
 
-\item [DAOPLOT] : Take a file produced by DAOPHOT and overlay the positions
+\item [DAOPLOT:]  Take a file produced by DAOPHOT and overlay the positions
  of objects in the file on top of the grey-scale image produced by DAOGREY.
 
-\item [DAOCURS] : Display a cursor over the grey image produced by DAOGREY so
+\item [DAOCURS:]  Display a cursor over the grey image produced by DAOGREY so
  that positions can be read off the screen.
 \end{description}
 
@@ -486,10 +484,10 @@ from an image.
 
 \begin {description}
 
-\item [I/O] ---
+\item [I/O ---]
 
 \begin{description}
-\item [Input]\hspace{-1.5mm}:
+\item [Input:]
 \begin{description}
 \item [ALASIN]: Read a spectrum in ALAS (Abs. Line Analysis System) format.
 \item [FIND]: Read an image in IPCS format.
@@ -524,7 +522,7 @@ from an image.
 \item [TAPE]: Set the tape drive to be used for input.
 \end{description}
 
-\item [Output]\hspace{-1.5mm}:
+\item [Output:]
 \begin{description}
 \item [ALASOUT]: Write a spectrum in ALAS (Abs. Line Analysis System) format.
 \item [STAROUT]: Write an image or spectrum in Starlink BDF file format.
@@ -541,10 +539,10 @@ from an image.
 \end{description}
 \end{description}
 
-\item [DISPLAY] ---
+\item [DISPLAY ---]
 
 \begin{description}
-\item [On graphics/image devices]\hspace{-1.5mm}:
+\item [On graphics/image devices:]
 \begin{description}
 \item [ARGS]: Select which ARGS device is to be used.
 \item [BLINK]: Blink a displayed image pair.
@@ -578,7 +576,7 @@ from an image.
 \item [ZOOM]: Zoom and pan an image (in a way compatible with ICUR).
 \end{description}
 
-\item [On non-graphics devices]\hspace{-1.5mm}:
+\item [On non-graphics devices:]
 \begin{description}
 \item [EXAM]: Examine the contents of a data object.
 \item [ILIST]: List the data in an image (or spectrum).
@@ -587,10 +585,10 @@ from an image.
 
 \end{description}
 
-\item [CALIBRATION] ---
+\item [CALIBRATION ---]
 
 \begin{description}
-\item [Flat field calibration]\hspace{-1.5mm}:
+\item [Flat field calibration:]
 \begin{description}
 \item [CFIT]: Generate a spectrum using the cursor.
 \item [FF]: Flat field an image (uses JT's algorithm).
@@ -600,7 +598,7 @@ from an image.
 \item [ISXDIV]: Divide a continuum into a spectrum, given a mask spectrum.
 \end{description}
 
-\item [Wavelength calibration]\hspace{-1.5mm}:
+\item [Wavelength calibration:]
 \begin{description}
 \item [ARC]: Identify manual arc line interactively.
 \item [ECHARC]: Fit an echelle arc.
@@ -617,7 +615,7 @@ from an image.
 \item [XCOPY]: Copy X-info (e.g.\ wavelengths) into a spectrum.
 \end{description}
 
-\item [Flux calibration]\hspace{-1.5mm}:
+\item [Flux calibration:]
 \begin{description}
 \item [ABCONV]: Convert a spectrum from Janskys into AB magnitudes.
 \item [CALDIV]: Generate a calibration spectrum from continuum standard spectra.
@@ -638,7 +636,7 @@ from an image.
 \item [SPIFIT]: Fit a global polynomial to a spiketrum $\rightarrow$  a spectrum.
 \end{description}
 
-\item [Distortion measurement and correction]\hspace{-1.5mm}:
+\item [Distortion measurement and correction:]
 \begin{description}
 \item [CDIST]: Correct S-distortion using SDIST results.
 \item [ICUR]: Show x,y and data values using ARGS cursor.
@@ -650,14 +648,14 @@ from an image.
 \item [SDIST]: Analyse an image containing spectra for S-distortion.
 \end{description}
 
-\item [Extinction coefficients]\hspace{-1.5mm}:
+\item [Extinction coefficients:]
 \begin{description}
 \item [EXTIN]: Correct a spectrum for atmospheric extinction.
 \item [GSPIKE]: Generate a spiketrum from a table of values.
 \item [LINTERP]: Interpolate linearly between spiketrum points $\rightarrow$ spectrum.
 \end{description}
 
-\item [B star calibration]\hspace{-1.5mm}:
+\item [B star calibration:]
 \begin{description}
 \item [BSMULT]: Remove atmospheric band using a B star calibration spectrum.
 \item [CFIT]: Generate a spectrum using the cursor.
@@ -668,10 +666,10 @@ from an image.
 \end{description}
 \end{description}
 
-\item [MANIPULATION] ---
+\item [MANIPULATION ---]
 
 \begin{description}
-\item [Arithmetic]\hspace{-1.5mm}:
+\item [Arithmetic:]
 \begin{description}
 \item [CLIP]: Clip data above and below a pair of threshold values.
 \item [CONTRACT]: Reduce size of files by contracting arrays.
@@ -708,7 +706,7 @@ from an image.
 \end{description}
 
 
-\item [Complicated]\hspace{-1.5mm}:
+\item [Complicated:]
 \begin{description}
 \item [ADJOIN]: Append two spectra (strictly a merge by wavelength value).
 \item [BCLEAN]: Remove automatically bad lines \& cosmic rays from CCD data.
@@ -740,7 +738,7 @@ from an image.
 \item [SURFIT]: Fit an image using bi-cubic splines.
 \end{description}
 
-\item [Complex data]\hspace{-1.5mm}:
+\item [Complex data:]
 \begin{description}
 \item [BFFT]: Take the reverse FFT of a complex data structure.
 \item [CMPLX2I]: Extract the imaginary part of a complex data structure.
@@ -760,7 +758,7 @@ from an image.
 \item [ROTX]: Rotate data along the X-axis.
 \end{description}
 
-\item [Fudging]\hspace{-1.5mm}:
+\item [Fudging:]
 \begin{description}
 \item [CSET]: Set regions of a spectrum to a constant value interactively.
 \item [DELOBJ]: Delete a data object or a file.
@@ -778,7 +776,7 @@ from an image.
 \item [XCSUB]: Subtract a constant from the X data in a file.
 \end{description}
 
-\item [Slices]\hspace{-1.5mm}:
+\item [Slices:]
 \begin{description}
 \item [EXTLIST]: Add a number of non-contiguous lines in an image $\rightarrow$  a spectrum.
 \item [EXTRACT]: Add contiguous lines of an image $\rightarrow$  a spectrum.
@@ -796,7 +794,7 @@ from an image.
 \item [YTPLANE]: Add contiguous YT planes of a data cube $\rightarrow$  an image.
 \end{description}
 
-\item [Fibre images]\hspace{-1.5mm}:
+\item [Fibre images:]
 \begin{description}
 \item [FINDSP]: Locate fibre spectra in an image.
 \item [POLEXT]: Extract fibre spectra from an image after a FINDSP analysis.
@@ -804,10 +802,10 @@ from an image.
 \end{description}
 \end{description}
 
-\item [SPECTROMETERS] ---
+\item [SPECTROMETERS ---]
 
 \begin{description}
-\item [Fabry-Perot infra-red grating spectrometer]\hspace{-1.5mm}:
+\item [Fabry-Perot infra-red grating spectrometer:]
 \begin{description}
 \item [FET321]: Extract a spectrum from 1 detector from etalon mode FIGS data.
 \item [FIGS321]: Process a FIGS data cube down to a single spectrum.
@@ -823,7 +821,7 @@ from an image.
 \item [REMBAD]: Remove pixels that have been flagged as bad from data.
 \end{description}
 
-\item [Echelle spectrometer]\hspace{-1.5mm}:
+\item [Echelle spectrometer:]
 \begin{description}
 \item [CDIST]: Correct S-distortion using SDIST results.
 \item [ECHARC]: Fit an echelle arc.
@@ -840,25 +838,25 @@ from an image.
 \end{description}
 \end{description}
 
-\item [ANALYSIS] ---
+\item [ANALYSIS ---]
 
 \begin{description}
 
-\item [Absorption line analysis]\hspace{-1.5mm}:
+\item [Absorption line analysis:]
 
 \begin{description}
 \item [ABLINE]: Analyse absorption lines interactively.
 \item [GAUSS]: Fit Gaussians to emission or absorption lines interactively.
 \end{description}
 
-\item [Photometry]\hspace{-1.5mm}:
+\item [Photometry:]
 \begin{description}
 \item [CENTERS]: Generate a file of object centroids from CPOS output.
 \item [CPOS]: Select points with the image display cursor.
 \item [FOTO]: Perform aperture photometry given CENTERS output.
 \end{description}
 
-\item [Gaussian fitting to spectral lines]\hspace{-1.5mm}:
+\item [Gaussian fitting to spectral lines:]
 \begin{description}
 \item [EMLT]: Fit Gaussians to the strongest lines in a spectrum.
 \item [GAUSS]: Fit Gaussians to emission or absorption lines interactively.
@@ -866,10 +864,10 @@ from an image.
 
 \end{description}
 
-\item [MISCELLANEOUS] ---
+\item [MISCELLANEOUS ---]
 
 \begin{description}
-\item [Miscellaneous]\hspace{-1.5mm}:
+\item [Miscellaneous:]
 \begin{description}
 \item [CCDLIN]: Apply a linearity correction to AAO CCD data.
 \item [ERRCON]: Convert percentage error values to absolute values.
@@ -897,354 +895,354 @@ from an image.
 These are the IRCAM commands which are relevant specifically to data reduction:
 
 \begin{description}
-\item [Image Display] ---
+\item [Image Display ---]
 \begin{description}
-\item [AGAIN] : Plot the last image again.
-\item [CFLASH] : Plot an image without scaling.
-\item [CHPLT] : Plot PhaseA, PhaseB and Difference on workstation.
-\item [CNSIGMA] : Plot an image with range N-sigma on mean at cursor posn.
-\item [CPLOT] : Plot an image with user defined max,min with cursor.
-\item [CRANPLOT] : Plot an image between user defined range using cursor.
-\item [CVARG] : Plot an image with vargrey between max,min with cursor.
-\item [DISP] : Plot STARE, SKY difference on workstation.
-\item [DISPHOT] : Retired, use DISP.
-\item [FLASH] : Plot an image without scaling.
-\item [MOREN] : Plot an image using N\_sigma range on mean again.
-\item [MOREP] : Plot an image using plot between limits again.
-\item [MORER] : Plot an image using ranplot range on mean again.
-\item [MOREV] : Plot an image using vargrey CUT.
-\item [NSIGMA] : Plot an image using N\_sigma range on mean.
-\item [PLOT] : Plot an image between maximum, minimum values.
-\item [PLOTGLITCH] : Plot an image, glitchmarks it, plot result.
-\item [PLOTLOT] : Plot and do stuff on a number of images.
-\item [RANPLOT] : Plot an image between user defined range.
-\item [SHOW] : Display an image with one of the plot procedures.
-\item [STPLT] : Plot STARE, SKY difference on workstation.
-\item [VARGREY] : Plot an image with variable scaling between max,min.
+\item [AGAIN:]  Plot the last image again.
+\item [CFLASH:]  Plot an image without scaling.
+\item [CHPLT:]  Plot PhaseA, PhaseB and Difference on workstation.
+\item [CNSIGMA:]  Plot an image with range N-sigma on mean at cursor posn.
+\item [CPLOT:]  Plot an image with user defined max,min with cursor.
+\item [CRANPLOT:]  Plot an image between user defined range using cursor.
+\item [CVARG:]  Plot an image with vargrey between max,min with cursor.
+\item [DISP:]  Plot STARE, SKY difference on workstation.
+\item [DISPHOT:]  Retired, use DISP.
+\item [FLASH:]  Plot an image without scaling.
+\item [MOREN:]  Plot an image using N\_sigma range on mean again.
+\item [MOREP:]  Plot an image using plot between limits again.
+\item [MORER:]  Plot an image using ranplot range on mean again.
+\item [MOREV:]  Plot an image using vargrey CUT.
+\item [NSIGMA:]  Plot an image using N\_sigma range on mean.
+\item [PLOT:]  Plot an image between maximum, minimum values.
+\item [PLOTGLITCH:]  Plot an image, glitchmarks it, plot result.
+\item [PLOTLOT:]  Plot and do stuff on a number of images.
+\item [RANPLOT:]  Plot an image between user defined range.
+\item [SHOW:]  Display an image with one of the plot procedures.
+\item [STPLT:]  Plot STARE, SKY difference on workstation.
+\item [VARGREY:]  Plot an image with variable scaling between max,min.
 \end{description}
 
-\item [Colours] ---
+\item [Colours ---]
 \begin{description}
-\item [ABLOCK] : Plot a colour block.
-\item [ALLCOL] : Write all colour tables to image display.
-\item [CABLOCK] : Plot a colour block at cursor position.
-\item [COL11] : Write COL11 colour table.
-\item [COL13] : Write COL13 colour table.
-\item [COL19] : Write COL19 colour table.
-\item [COL3] : Write COL3 colour table.
-\item [COL5] : Write COL5 colour table.
-\item [COL7] : Write COL7 colour table.
-\item [COLCYCLE] : Cycle colour table n times into new colour table.
-\item [COLINV] : Invert the colour table on subsequent COLTABs.
-\item [COLIST] : List colour tables currently available.
-\item [COLOUR] : Manipulate colours for PLT2D D-task.
-\item [COLTAB] : Write a colour table.
-\item [COLTAB\_LIST] : List coltab tables with description.
-\item [CRECOLT] : Create colour tables by pen/intensity selection.
-\item [GREY] : Write a GREY colour table.
-\item [HEAT] : Write the HEAT colour table.
-\item [MANYCOL] : Combine n different colour tables into one output colour table.
-\item [PENCOL] : Set the colour of a pen.
-\item [PENINT] : Set the intensity of the 3 guns for a pen.
-\item [SPEC] : Write a SPEC colour table.
-\item [WRITELUT] : Write a colour table LUT to workstation.
+\item [ABLOCK:]  Plot a colour block.
+\item [ALLCOL:]  Write all colour tables to image display.
+\item [CABLOCK:]  Plot a colour block at cursor position.
+\item [COL11:]  Write COL11 colour table.
+\item [COL13:]  Write COL13 colour table.
+\item [COL19:]  Write COL19 colour table.
+\item [COL3:]  Write COL3 colour table.
+\item [COL5:]  Write COL5 colour table.
+\item [COL7:]  Write COL7 colour table.
+\item [COLCYCLE:]  Cycle colour table n times into new colour table.
+\item [COLINV:]  Invert the colour table on subsequent COLTABs.
+\item [COLIST:]  List colour tables currently available.
+\item [COLOUR:]  Manipulate colours for PLT2D D-task.
+\item [COLTAB:]  Write a colour table.
+\item [COLTAB\_LIST:]  List coltab tables with description.
+\item [CRECOLT:]  Create colour tables by pen/intensity selection.
+\item [GREY:]  Write a GREY colour table.
+\item [HEAT:]  Write the HEAT colour table.
+\item [MANYCOL:]  Combine n different colour tables into one output colour table.
+\item [PENCOL:]  Set the colour of a pen.
+\item [PENINT:]  Set the intensity of the 3 guns for a pen.
+\item [SPEC:]  Write a SPEC colour table.
+\item [WRITELUT:]  Write a colour table LUT to workstation.
 \end{description}
 
-\item [Line Graphics] ---
+\item [Line Graphics ---]
 \begin{description}
-\item [BORDER] : Plot a border around last image.
-\item [BOX] : Plot a box.
-\item [CBOX] : Plot a box centred on cursor.
-\item [CC] : Wrap around for CROSSCUT.
-\item [CCIRCLE] : Plot a circle at cursor.
-\item [CCROSS] : Plot a cross at cursor.
-\item [CCUT] : Plot a cut using cursor defined points on current image.
-\item [CELLIPSE] : Plot a ELLIPSE at cursor.
-\item [CIRCLE] : Plot a circle.
-\item [CLINE] : Plot a line between two cursor positions.
-\item [CONTOUR] : Plot a contour image.
-\item [CONT\_TIT] : Set title for a contour plot.
-\item [CROSS] : Plot a cross.
-\item [CROSSCUT] : Plot an x and a y cut on current image.
-\item [CUT] : Plot a cut on current image.
-\item [CUT2FF] : Enable/disable writing of cut to ff file.
-\item [CUT\_TIT] : Set title for a cut plot.
-\item [ELLIPSE] : Plot an ellipse.
-\item [FEATURE] : Plot a line graphics/comment feature on workstation.
-\item [GRID] : Plot a grid on an image.
-\item [HIST] : Plot a histogram.
-\item [LINE] : Plot a line between user specified positions.
-\item [LINECOL] : Set all line graphics pens to specified color.
-\item [SURROUND] : Put a border and ticks/numbers around image.
-\item [VEC] : Plot a polarization vector plot on current workstation.
-\item [VEC\_TIT] : Set a title for a vector plot.
+\item [BORDER:]  Plot a border around last image.
+\item [BOX:]  Plot a box.
+\item [CBOX:]  Plot a box centred on cursor.
+\item [CC:]  Wrap around for CROSSCUT.
+\item [CCIRCLE:]  Plot a circle at cursor.
+\item [CCROSS:]  Plot a cross at cursor.
+\item [CCUT:]  Plot a cut using cursor defined points on current image.
+\item [CELLIPSE:]  Plot a ELLIPSE at cursor.
+\item [CIRCLE:]  Plot a circle.
+\item [CLINE:]  Plot a line between two cursor positions.
+\item [CONTOUR:]  Plot a contour image.
+\item [CONT\_TIT:]  Set title for a contour plot.
+\item [CROSS:]  Plot a cross.
+\item [CROSSCUT:]  Plot an x and a y cut on current image.
+\item [CUT:]  Plot a cut on current image.
+\item [CUT2FF:]  Enable/disable writing of cut to ff file.
+\item [CUT\_TIT:]  Set title for a cut plot.
+\item [ELLIPSE:]  Plot an ellipse.
+\item [FEATURE:]  Plot a line graphics/comment feature on workstation.
+\item [GRID:]  Plot a grid on an image.
+\item [HIST:]  Plot a histogram.
+\item [LINE:]  Plot a line between user specified positions.
+\item [LINECOL:]  Set all line graphics pens to specified color.
+\item [SURROUND:]  Put a border and ticks/numbers around image.
+\item [VEC:]  Plot a polarization vector plot on current workstation.
+\item [VEC\_TIT:]  Set a title for a vector plot.
 \end{description}
 
-\item [Text] ---
+\item [Text ---]
 \begin{description}
-\item [LABEL] : Label an image with position values from a file.
-\item [WRCCOM] : Write a comment at cursor.
-\item [WRCOM] : Write a comment on current workstation.
+\item [LABEL:]  Label an image with position values from a file.
+\item [WRCCOM:]  Write a comment at cursor.
+\item [WRCOM:]  Write a comment on current workstation.
 \end{description}
 
-\item [Maths] ---
+\item [Maths ---]
 \begin{description}
-\item [ADD] : Add two images together.
-\item [CADD] : Add a constant to an image.
-\item [CDIV] : Divide an image by a constant.
-\item [CMULT] : Multiply an image by a constant.
-\item [CSUB] : Subtract a constant from an image.
-\item [DIV] : Divide two images.
-\item [EXP10] : Take 10 exponential of an image.
-\item [EXPE] : Take e exponential of an image.
-\item [EXPON] : Take N exponential of an image.
-\item [LOG10] : Log base 10 of an image.
-\item [LOGAR] : Log base N of an image.
-\item [LOGE] : Log base e of an image.
-\item [MEDLOT] : Subtract median from a number of images.
-\item [MULT] : Multiply two images.
-\item [OADD] : Procedure to run ADD rapi2d action.
-\item [OCADD] : Procedure to run CADD rapi2d action.
-\item [OCDIV] : Procedure to run CDIV rapi2d action.
-\item [OCMULT] : Procedure to run CMULT rapi2d action.
-\item [OCSUB] : Procedure to run CSUB rapi2d action.
-\item [ODIV] : Procedure to run DIV rapi2d action.
-\item [OMULT] : Procedure to run MULT rapi2d action.
-\item [OSUB] : Procedure to run SUB rapi2d action.
-\item [POW] : Raise image to arbitrary power.
-\item [ROOT] : Take square root of an image.
-\item [SUB] : Subtract two images.
-\item [TRIG] : Perform trigonometrical functions on image.
+\item [ADD:]  Add two images together.
+\item [CADD:]  Add a constant to an image.
+\item [CDIV:]  Divide an image by a constant.
+\item [CMULT:]  Multiply an image by a constant.
+\item [CSUB:]  Subtract a constant from an image.
+\item [DIV:]  Divide two images.
+\item [EXP10:]  Take 10 exponential of an image.
+\item [EXPE:]  Take e exponential of an image.
+\item [EXPON:]  Take N exponential of an image.
+\item [LOG10:]  Log base 10 of an image.
+\item [LOGAR:]  Log base N of an image.
+\item [LOGE:]  Log base e of an image.
+\item [MEDLOT:]  Subtract median from a number of images.
+\item [MULT:]  Multiply two images.
+\item [OADD:]  Procedure to run ADD rapi2d action.
+\item [OCADD:]  Procedure to run CADD rapi2d action.
+\item [OCDIV:]  Procedure to run CDIV rapi2d action.
+\item [OCMULT:]  Procedure to run CMULT rapi2d action.
+\item [OCSUB:]  Procedure to run CSUB rapi2d action.
+\item [ODIV:]  Procedure to run DIV rapi2d action.
+\item [OMULT:]  Procedure to run MULT rapi2d action.
+\item [OSUB:]  Procedure to run SUB rapi2d action.
+\item [POW:]  Raise image to arbitrary power.
+\item [ROOT:]  Take square root of an image.
+\item [SUB:]  Subtract two images.
+\item [TRIG:]  Perform trigonometrical functions on image.
 \end{description}
 
-\item [Statistics] ---
+\item [Statistics ---]
 \begin{description}
-\item [ANNSTATS] : Annular aperture statistics with eccentric annuli.
-\item [APERADD] : Perform simple aperture statistics.
-\item [APERPHOT] : Aperture photometry program.
-\item [APPH1] : Aperture photometry using cremap offset file.
-\item [HISTGEN] : Generate histogram of an image (plot with HIST).
-\item [HISTO] : Histogram statistics on an image.
-\item [MAG] : Calculate magnitude of feature in image using input zp.
-\item [MSTATS] : Statistics on n images through each pixel.
-\item [OCMAG] : Procedure to run MAG rapi2d action with cursor.
-\item [OCSTATS] : Procedure to run STATS rapi2d action with cursor.
-\item [OHISTGEN] : Procedure to run HISTGEN A-task
-\item [OHISTO] : Procedure to run HISTO rapi2d action.
-\item [OSTATS] : Procedure to run STATS rapi2d action.
-\item [STATS] : Statistics on sub-image.
+\item [ANNSTATS:]  Annular aperture statistics with eccentric annuli.
+\item [APERADD:]  Perform simple aperture statistics.
+\item [APERPHOT:]  Aperture photometry program.
+\item [APPH1:]  Aperture photometry using cremap offset file.
+\item [HISTGEN:]  Generate histogram of an image (plot with HIST).
+\item [HISTO:]  Histogram statistics on an image.
+\item [MAG:]  Calculate magnitude of feature in image using input zp.
+\item [MSTATS:]  Statistics on n images through each pixel.
+\item [OCMAG:]  Procedure to run MAG rapi2d action with cursor.
+\item [OCSTATS:]  Procedure to run STATS rapi2d action with cursor.
+\item [OHISTGEN:]  Procedure to run HISTGEN A-task
+\item [OHISTO:]  Procedure to run HISTO rapi2d action.
+\item [OSTATS:]  Procedure to run STATS rapi2d action.
+\item [STATS:]  Statistics on sub-image.
 \end{description}
 
-\item [Image size changing] ---
+\item [Image size changing ---]
 \begin{description}
-\item [ABSEP] : Separate odd and even readout channels into 2 images.
-\item [BINUP] : Reduce image in size by binning pixels (separate x and y).
-\item [COMPADD] : Compress an image in size by adding pixels.
-\item [COMPAVE] : Compress an image in size by averaging pixels.
-\item [COMPICK] : Compress an image in size by picking pixels.
-\item [COMPRESS] : General compression in size program.
-\item [DISPICK] : Procedure to run PICKIM rapi2d action with cursor.
-\item [MANIC] : Change an image size arbitrarily.
-\item [OEFIX] : Scale odd and even channels wrt median in channels.
-\item [OSHSIZE] : Procedure to run SHSIZE rapi2d action.
-\item [PICKIM] : Pixeks a sub-image from an image and stores.
-\item [PICKLOT] : Pickims a number of images.
-\item [PIXDUPE] : Increase image size by pixel duplication.
-\item [SHSIZE] : Return size of an image.
-\item [SQORST] : Change shape and dimensionality of an image.
-\item [XGROW] : Grow an image in x direction.
-\item [YADD] : Add up all pixels down each column and generate linear output.
-\item [YGROW] : Grow an image in y direction.
+\item [ABSEP:]  Separate odd and even readout channels into 2 images.
+\item [BINUP:]  Reduce image in size by binning pixels (separate x and y).
+\item [COMPADD:]  Compress an image in size by adding pixels.
+\item [COMPAVE:]  Compress an image in size by averaging pixels.
+\item [COMPICK:]  Compress an image in size by picking pixels.
+\item [COMPRESS:]  General compression in size program.
+\item [DISPICK:]  Procedure to run PICKIM rapi2d action with cursor.
+\item [MANIC:]  Change an image size arbitrarily.
+\item [OEFIX:]  Scale odd and even channels wrt median in channels.
+\item [OSHSIZE:]  Procedure to run SHSIZE rapi2d action.
+\item [PICKIM:]  Pixeks a sub-image from an image and stores.
+\item [PICKLOT:]  Pickims a number of images.
+\item [PIXDUPE:]  Increase image size by pixel duplication.
+\item [SHSIZE:]  Return size of an image.
+\item [SQORST:]  Change shape and dimensionality of an image.
+\item [XGROW:]  Grow an image in x direction.
+\item [YADD:]  Add up all pixels down each column and generate linear output.
+\item [YGROW:]  Grow an image in y direction.
 \end{description}
 
-\item [Mosaicing] ---
+\item [Mosaicing ---]
 \begin{description}
-\item [AUTOMOS] : Correct dc offsets and mosaic n images automatically.
-\item [CREQUILT] : Create a quilt file from lists of offsets and images.
-\item [MOFF] : Calculate spatial and dc offset of 2 overlapping images.
-\item [MOS2] : Display 2 images, gets stats and scales and mosaics.
-\item [MOSAIC] : Mosaic together n overlapping images.
-\item [MOSAIC2] : Mosaic 2 overlapping images together.
-\item [MOSCOR] : Calculate dc offset between two offset images.
-\item [QUILT] : Mosaic n images together using terminal/file input.
-\item [WMOSAIC] : Mosaic with weighting on image contributions.
-\item [WQUILT] : Quilt with weighting on image contributions.
+\item [AUTOMOS:]  Correct dc offsets and mosaic n images automatically.
+\item [CREQUILT:]  Create a quilt file from lists of offsets and images.
+\item [MOFF:]  Calculate spatial and dc offset of 2 overlapping images.
+\item [MOS2:]  Display 2 images, gets stats and scales and mosaics.
+\item [MOSAIC:]  Mosaic together n overlapping images.
+\item [MOSAIC2:]  Mosaic 2 overlapping images together.
+\item [MOSCOR:]  Calculate dc offset between two offset images.
+\item [QUILT:]  Mosaic n images together using terminal/file input.
+\item [WMOSAIC:]  Mosaic with weighting on image contributions.
+\item [WQUILT:]  Quilt with weighting on image contributions.
 \end{description}
 
-\item [Polarimetry] ---
+\item [Polarimetry ---]
 \begin{description}
-\item [APERPOL] : Aperture polarimetry from 4 input intensity images.
-\item [DEVFCS] : Calculate deviation of polarization from centro-symmetry.
-\item [FLATPOL] : Flat-field and deglitch 4 polarization images.
-\item [OCAPERPOL] : Procedure to run APERPOL action with cursor.
-\item [POLCAL] : Calculate polarization from input 4 intensity images.
-\item [POLLY] : Calculate polarization from input 4 values.
-\item [POLREG] : Move 4 polarization images to average position and trim.
-\item [POLSHFT] : Move 4 polarization images to average position.
-\item [POLSHIFT] : Wrap around for POLSHFT.
-\item [POLSHOT] : Remove shot-noise polarization contribution from image.
-\item [POLTHRESH] : Threshold 4 polarization intensity images.
-\item [SKYSUB4] : Subtract median of area of 4 images image from images.
-\item [THETAFIX] : Correct polarization position angle to 0-180 degs.
+\item [APERPOL:]  Aperture polarimetry from 4 input intensity images.
+\item [DEVFCS:]  Calculate deviation of polarization from centro-symmetry.
+\item [FLATPOL:]  Flat-field and deglitch 4 polarization images.
+\item [OCAPERPOL:]  Procedure to run APERPOL action with cursor.
+\item [POLCAL:]  Calculate polarization from input 4 intensity images.
+\item [POLLY:]  Calculate polarization from input 4 values.
+\item [POLREG:]  Move 4 polarization images to average position and trim.
+\item [POLSHFT:]  Move 4 polarization images to average position.
+\item [POLSHIFT:]  Wrap around for POLSHFT.
+\item [POLSHOT:]  Remove shot-noise polarization contribution from image.
+\item [POLTHRESH:]  Threshold 4 polarization intensity images.
+\item [SKYSUB4:]  Subtract median of area of 4 images image from images.
+\item [THETAFIX:]  Correct polarization position angle to 0-180 degs.
 \end{description}
 
-\item [Daophot] ---
+\item [Daophot ---]
 \begin{description}
-\item [DAOCEN] : Take xcursor input and calculate centroid at that position.
-\item [DAOFIND] : Plot crosses or circles on each star found.
-\item [DAOGID] : Get ID of nearest star to cursor selected one.
-\item [DAOGID2] : Get ID of nearest star to cursor selected one.
+\item [DAOCEN:]  Take xcursor input and calculate centroid at that position.
+\item [DAOFIND:]  Plot crosses or circles on each star found.
+\item [DAOGID:]  Get ID of nearest star to cursor selected one.
+\item [DAOGID2:]  Get ID of nearest star to cursor selected one.
 \end{description}
 
-\item [Inquiries] ---
+\item [Inquiries ---]
 \begin{description}
-\item [GETCP] : Get the pixel position of a cursor input.
-\item [GETCR] : Get the real position of a cursor input.
-\item [GETMC] : Get the calculated maximum,minimum in a PLOT/NSIGMA.
-\item [GETMM] : Get the maximum and minimum specified for a PLOT.
-\item [GETPEN] : Get pens of all line graphics and pen numbers.
-\item [GETPLOT] : Get the current state of image area PLOT.
-\item [GETPOLCOL] : Get the current settings of the colours for polax.
-\item [GETPS] : Get the plate scale for feature plotting on images.
-\item [GETRAST] : Get the size in raster units of the current workstation.
-\item [GETSTEN] : Get the start and size in raster units of image area.
+\item [GETCP:]  Get the pixel position of a cursor input.
+\item [GETCR:]  Get the real position of a cursor input.
+\item [GETMC:]  Get the calculated maximum,minimum in a PLOT/NSIGMA.
+\item [GETMM:]  Get the maximum and minimum specified for a PLOT.
+\item [GETPEN:]  Get pens of all line graphics and pen numbers.
+\item [GETPLOT:]  Get the current state of image area PLOT.
+\item [GETPOLCOL:]  Get the current settings of the colours for polax.
+\item [GETPS:]  Get the plate scale for feature plotting on images.
+\item [GETRAST:]  Get the size in raster units of the current workstation.
+\item [GETSTEN:]  Get the start and size in raster units of image area.
 \end{description}
 
-\item [Set] ---
+\item [Set ---]
 \begin{description}
-\item [SETAREA] : Copy useful files from standard directory to users.
-\item [SETBAD] : Set bad pixel image to be used.
-\item [SETCEN] : Set the centre of the image in a PLOT/NSIGMA.
-\item [SETCIM] : Set the cursoring image to other than that displayed.
-\item [SETCOL] : Set the colour of special features.
-\item [SETCOMORI] : Change the character orientation.
-\item [SETCONT] : Set up the contour plot.
-\item [SETCONTIC] : Set contour maps tick mark extent.
-\item [SETCUR] : Set where the cursor refers to in CPLOT, CNSIGMA etc.
-\item [SETCURMARK] : Set the cursor marking parameter from user's choice.
-\item [SETCUT] : Set up a cut plot.
-\item [SETCUTAXRAT] : Set the axis ratio for cut.
-\item [SETDARK] : Set dark image to be used.
-\item [SETFONT] : Change the font and character orientation.
-\item [SETMAG] : Set the magnification for subsequent PLOTS/NSIGMAS.
-\item [SETMAX] : Set the maximum for image scaling in a PLOT.
-\item [SETMIN] : Set the minimum for image scaling in a PLOT.
-\item [SETMM] : Set the maximum and minimum for image scaling in a PLOT.
-\item [SETNUM] : Set offset or ra/dec mode for contour maps and surround.
-\item [SETNUMORI] : Set the orientation of numbers in around image.
-\item [SETNUMSCA] : Set the numbers scale factor for around image.
-\item [SETPLOTAREA] : Set the option to plot whole or sub- image.
-\item [SETPOLCOL] : Set the current settings of the colours for polax.
-\item [SETPRE] : Set correct file prefix for observation files.
-\item [SETPS] : Set the plate scale for feature plotting on image.
-\item [SETQUAD] : Set a quadrant for an image plot.
-\item [SETRADEC] : Set ra/dec for contour maps and surround.
-\item [SETUP\_IRCAM] : Set IRCAM parameters for IRACS,MOTASK,PLT2D D\_tasks.
-\item [SETVAL] : Set a specified value in an image at user locations.
-\item [SETVARG] : Set X and Y percentage cut for vargrey plot.
-\item [SETVEC] : Set up a polarization vector map on current workstation.
+\item [SETAREA:]  Copy useful files from standard directory to users.
+\item [SETBAD:]  Set bad pixel image to be used.
+\item [SETCEN:]  Set the centre of the image in a PLOT/NSIGMA.
+\item [SETCIM:]  Set the cursoring image to other than that displayed.
+\item [SETCOL:]  Set the colour of special features.
+\item [SETCOMORI:]  Change the character orientation.
+\item [SETCONT:]  Set up the contour plot.
+\item [SETCONTIC:]  Set contour maps tick mark extent.
+\item [SETCUR:]  Set where the cursor refers to in CPLOT, CNSIGMA etc.
+\item [SETCURMARK:]  Set the cursor marking parameter from user's choice.
+\item [SETCUT:]  Set up a cut plot.
+\item [SETCUTAXRAT:]  Set the axis ratio for cut.
+\item [SETDARK:]  Set dark image to be used.
+\item [SETFONT:]  Change the font and character orientation.
+\item [SETMAG:]  Set the magnification for subsequent PLOTS/NSIGMAS.
+\item [SETMAX:]  Set the maximum for image scaling in a PLOT.
+\item [SETMIN:]  Set the minimum for image scaling in a PLOT.
+\item [SETMM:]  Set the maximum and minimum for image scaling in a PLOT.
+\item [SETNUM:]  Set offset or ra/dec mode for contour maps and surround.
+\item [SETNUMORI:]  Set the orientation of numbers in around image.
+\item [SETNUMSCA:]  Set the numbers scale factor for around image.
+\item [SETPLOTAREA:]  Set the option to plot whole or sub- image.
+\item [SETPOLCOL:]  Set the current settings of the colours for polax.
+\item [SETPRE:]  Set correct file prefix for observation files.
+\item [SETPS:]  Set the plate scale for feature plotting on image.
+\item [SETQUAD:]  Set a quadrant for an image plot.
+\item [SETRADEC:]  Set ra/dec for contour maps and surround.
+\item [SETUP\_IRCAM:]  Set IRCAM parameters for IRACS,MOTASK,PLT2D D\_tasks.
+\item [SETVAL:]  Set a specified value in an image at user locations.
+\item [SETVARG:]  Set X and Y percentage cut for vargrey plot.
+\item [SETVEC:]  Set up a polarization vector map on current workstation.
 \end{description}
 
-\item [Bad Pixel Removal] ---
+\item [Bad Pixel Removal ---]
 \begin{description}
-\item [CHPIX] : Change pixel values in image.
-\item [DEGLOT] : Deglitch a number of images.
-\item [GLITCH] : Remove bad pixels by interpolation.
-\item [GLITCHMARK] : Mark glitches for glitch A-task interactively.
-\item [INSETB] : Set pixels inside user defined box to user value.
-\item [INSETC] : Set pixels inside user defined circle to user value.
-\item [OGLITCH] : Procedure to run GLITCH rapi2d action.
-\item [OUTSETB] : Set pixels outside specified box to user value.
-\item [OUTSETC] : Set pixels outside user specified circle to user value.
+\item [CHPIX:]  Change pixel values in image.
+\item [DEGLOT:]  Deglitch a number of images.
+\item [GLITCH:]  Remove bad pixels by interpolation.
+\item [GLITCHMARK:]  Mark glitches for glitch A-task interactively.
+\item [INSETB:]  Set pixels inside user defined box to user value.
+\item [INSETC:]  Set pixels inside user defined circle to user value.
+\item [OGLITCH:]  Procedure to run GLITCH rapi2d action.
+\item [OUTSETB:]  Set pixels outside specified box to user value.
+\item [OUTSETC:]  Set pixels outside user specified circle to user value.
 \end{description}
 
-\item [Smoothing] ---
+\item [Smoothing ---]
 \begin{description}
-\item [BLOCK] : Block smooth an image.
-\item [GAUSS] : Gaussian smooth an image.
-\item [GAUSSTH] : Gaussian smooth images below a specified threshold.
-\item [LAPLACE] : Laplace transform an image.
-\item [MEDIAN] : Spatially median filter an image.
+\item [BLOCK:]  Block smooth an image.
+\item [GAUSS:]  Gaussian smooth an image.
+\item [GAUSSTH:]  Gaussian smooth images below a specified threshold.
+\item [LAPLACE:]  Laplace transform an image.
+\item [MEDIAN:]  Spatially median filter an image.
 \end{description}
 
-\item [General and Miscellaneous] ---
+\item [General and Miscellaneous ---]
 \begin{description}
-\item [AMCORR] : Correct images for air mass.
-\item [ASCIIFILE] : Take text/variables from ADAMCL and write to ASCII file.
-\item [ASCIILIST] : Convert SDF image to ASCII list of numbers.
-\item [BATCH\_ZEROPOINTS] : Read zeropoint for DISP from ASCII file.
-\item [CALMAG] : Calculate magnitude from number and zeropoint.
-\item [CALZER] : Calculate zeropoint from number and magnitude.
-\item [CENTROID] : Calculate centroid of stellar profile.
-\item [CIT] : Wrap around for CLEARIT.
-\item [CLEAR] : Clear the workstation.
-\item [CLEARIT] : Clear a section of the image display screen.
-\item [CLOSE] : Close plotting.
-\item [COLMED] : Calculate median down columns and create output mask.
-\item [CREFP] : Create fp scan list in SDF format.
-\item [CREFRAME] : Create an image with standard patterns.
-\item [CREMAP] : Create image positional offset list in SDF format (gomos).
-\item [CURSOR] : Display the cursor and returns X,Y, value.
-\item [DARKLOT] : Dark subtract a number of images.
-\item [DARKSUB] : Subtract dark from a number of images.
-\item [DATASW] : Switch data input from numbers to names.
-\item [DEFGRAD] : Define gradients in image and return map.
-\item [DEFPROMPT] : Define the prompt for ADAMCL.
-\item [DIST] : Calculate distance and angle between two points in image.
-\item [FCOADD] : Add up n images into one image.
-\item [FITSREAD] : Read fits tape and create SDF file.
-\item [FITSWM] : Write SDF files to fits tape.
-\item [FLATDEG] : Flat field and deglitch a number of images.
-\item [FLATLOT] : Flat field a number of images.
-\item [FLATRED] : Reduce image.
-\item [FLIP] : Flip an image east-west or north-south.
-\item [GFIT] : Fit Gaussian to star.
-\item [HARDCOPY] : Close plotting, open it on hardcopy workstation.
-\item [HELPLIST] : List commonly used procedures.
-\item [HISTEQ] : Histogram equalization of an image.
-\item [INDEX] : Index through an SDF image listing components.
-\item [INTLK] : Generate integer map of an image.
-\item [LINCONT] : Linearize normal readout (non-NDR) images.
-\item [LINCONT\_NDR] : Linearize NDR readout images.
-\item [LISTMAP] : List out a mosaic offset file to terminal.
-\item [LOOK] : Inspect pixels in an image.
-\item [LOUD] : Set the bell parameters to normal values.
-\item [MCURSOR] : Display repeatedly the cursor.
-\item [MED3D] : Median filter through stack of n images.
-\item [NUMB] : Calculate number of pixels above specified signal.
-\item [OBSEXT] : Extract an image from a observation container file.
-\item [OBSLIST] : List a specified component of an observation structure.
-\item [ODIST] : Procedure to run DIST rapi2d action.
-\item [OLOOK] : Procedure to run LOOK rapi2d action.
-\item [ONUMB] : Procedure to run NUMB rapi2d action.
-\item [OPEN] : Open plotting on a workstation.
-\item [PLT2D\_RESET] : Close plotting and open it again.
-\item [RADIM] : Generate radial image profile from image and centre position.
-\item [REDLIST] : List reduction routines for info.
-\item [RELOAD\_PLT2D] : Load/reload Plt2d.
-\item [RELOAD\_RAPI2D] : Load/reload Rapi2d.
-\item [ROTATE] : Rotate an image by an arbitrary amount.
-\item [ROWMED] : Median filter along rows of an image generating a map.
-\item [SHADOW] : Shadow enhance an image.
-\item [SHIFT] : Shift an image by fraction pixels by linear interpolation.
-\item [SHIFT2] : Move 2 images to average position.
-\item [SHIFT3] : Centroid and shift 3 images.
-\item [SNAPFILE] : Convert spanshot images to SDF format images.
-\item [SNOOP\_IRCAM] : Get IRCAM parameters from IRACS,MOTASK,PLT2D.
-\item [SOFT] : Set the bell parameters to 0 values.
-\item [SQ] : Wrap around for SETQUAD.
-\item [STARFIT] : Fit star and return stack dump (Starlink routine).
-\item [STD] : Use cursor to get star position and aperadd.
-\item [STDPLOT] : Plot last GKS QMS file to laser printer.
-\item [STEPIM] : Step an image (like pseudo-contouring with values filled).
-\item [SUBDARK] : Subtract dark.
-\item [SYS] : Get the SYS/S from VMS.
-\item [THRESH] : Set values above and below specified levels to user values.
-\item [THRESH0] : Set values below 0 to user value.
-\item [TOMAG] : Convert intensity to magnitudes in images.
-\item [TRACE] : Trace HDS structure.
-\item [TRANDAT] : Transfer ASCII list of numbers to SDF image.
-\item [USE] : Get the users from VMS.
+\item [AMCORR:]  Correct images for air mass.
+\item [ASCIIFILE:]  Take text/variables from ADAMCL and write to ASCII file.
+\item [ASCIILIST:]  Convert SDF image to ASCII list of numbers.
+\item [BATCH\_ZEROPOINTS:]  Read zeropoint for DISP from ASCII file.
+\item [CALMAG:]  Calculate magnitude from number and zeropoint.
+\item [CALZER:]  Calculate zeropoint from number and magnitude.
+\item [CENTROID:]  Calculate centroid of stellar profile.
+\item [CIT:]  Wrap around for CLEARIT.
+\item [CLEAR:]  Clear the workstation.
+\item [CLEARIT:]  Clear a section of the image display screen.
+\item [CLOSE:]  Close plotting.
+\item [COLMED:]  Calculate median down columns and create output mask.
+\item [CREFP:]  Create fp scan list in SDF format.
+\item [CREFRAME:]  Create an image with standard patterns.
+\item [CREMAP:]  Create image positional offset list in SDF format (gomos).
+\item [CURSOR:]  Display the cursor and returns X,Y, value.
+\item [DARKLOT:]  Dark subtract a number of images.
+\item [DARKSUB:]  Subtract dark from a number of images.
+\item [DATASW:]  Switch data input from numbers to names.
+\item [DEFGRAD:]  Define gradients in image and return map.
+\item [DEFPROMPT:]  Define the prompt for ADAMCL.
+\item [DIST:]  Calculate distance and angle between two points in image.
+\item [FCOADD:]  Add up n images into one image.
+\item [FITSREAD:]  Read fits tape and create SDF file.
+\item [FITSWM:]  Write SDF files to fits tape.
+\item [FLATDEG:]  Flat field and deglitch a number of images.
+\item [FLATLOT:]  Flat field a number of images.
+\item [FLATRED:]  Reduce image.
+\item [FLIP:]  Flip an image east-west or north-south.
+\item [GFIT:]  Fit Gaussian to star.
+\item [HARDCOPY:]  Close plotting, open it on hardcopy workstation.
+\item [HELPLIST:]  List commonly used procedures.
+\item [HISTEQ:]  Histogram equalization of an image.
+\item [INDEX:]  Index through an SDF image listing components.
+\item [INTLK:]  Generate integer map of an image.
+\item [LINCONT:]  Linearize normal readout (non-NDR) images.
+\item [LINCONT\_NDR:]  Linearize NDR readout images.
+\item [LISTMAP:]  List out a mosaic offset file to terminal.
+\item [LOOK:]  Inspect pixels in an image.
+\item [LOUD:]  Set the bell parameters to normal values.
+\item [MCURSOR:]  Display repeatedly the cursor.
+\item [MED3D:]  Median filter through stack of n images.
+\item [NUMB:]  Calculate number of pixels above specified signal.
+\item [OBSEXT:]  Extract an image from a observation container file.
+\item [OBSLIST:]  List a specified component of an observation structure.
+\item [ODIST:]  Procedure to run DIST rapi2d action.
+\item [OLOOK:]  Procedure to run LOOK rapi2d action.
+\item [ONUMB:]  Procedure to run NUMB rapi2d action.
+\item [OPEN:]  Open plotting on a workstation.
+\item [PLT2D\_RESET:]  Close plotting and open it again.
+\item [RADIM:]  Generate radial image profile from image and centre position.
+\item [REDLIST:]  List reduction routines for info.
+\item [RELOAD\_PLT2D:]  Load/reload Plt2d.
+\item [RELOAD\_RAPI2D:]  Load/reload Rapi2d.
+\item [ROTATE:]  Rotate an image by an arbitrary amount.
+\item [ROWMED:]  Median filter along rows of an image generating a map.
+\item [SHADOW:]  Shadow enhance an image.
+\item [SHIFT:]  Shift an image by fraction pixels by linear interpolation.
+\item [SHIFT2:]  Move 2 images to average position.
+\item [SHIFT3:]  Centroid and shift 3 images.
+\item [SNAPFILE:]  Convert spanshot images to SDF format images.
+\item [SNOOP\_IRCAM:]  Get IRCAM parameters from IRACS,MOTASK,PLT2D.
+\item [SOFT:]  Set the bell parameters to 0 values.
+\item [SQ:]  Wrap around for SETQUAD.
+\item [STARFIT:]  Fit star and return stack dump (Starlink routine).
+\item [STD:]  Use cursor to get star position and aperadd.
+\item [STDPLOT:]  Plot last GKS QMS file to laser printer.
+\item [STEPIM:]  Step an image (like pseudo-contouring with values filled).
+\item [SUBDARK:]  Subtract dark.
+\item [SYS:]  Get the SYS/S from VMS.
+\item [THRESH:]  Set values above and below specified levels to user values.
+\item [THRESH0:]  Set values below 0 to user value.
+\item [TOMAG:]  Convert intensity to magnitudes in images.
+\item [TRACE:]  Trace HDS structure.
+\item [TRANDAT:]  Transfer ASCII list of numbers to SDF image.
+\item [USE:]  Get the users from VMS.
 \end{description}
 \end{description}
 
@@ -1260,7 +1258,7 @@ These are the IRCAM commands which are relevant specifically to data reduction:
 
 \begin{description}
 
-\item [I/O] ---
+\item [I/O ---]
 \begin{description}
 \item [Image generation and input:]\hfill
 \begin {description}
@@ -1277,7 +1275,7 @@ These are the IRCAM commands which are relevant specifically to data reduction:
 \end {description}
 \end {description}
 
-\item [DISPLAY] ---
+\item [DISPLAY ---]
 \begin{description}
 \item [Detail enhancement:]\hfill
 \begin{description}
@@ -1428,7 +1426,7 @@ These are the IRCAM commands which are relevant specifically to data reduction:
 \end{description}
 \end{description}
 
-\item [MANIPULATION] ---
+\item [MANIPULATION ---]
 \begin {description}
 \item [Arithmetic:]\hfill
 \begin {description}
@@ -1562,7 +1560,7 @@ These are the IRCAM commands which are relevant specifically to data reduction:
 \end{description}
 \end {description}
 
-\item [ANALYSIS] ---
+\item [ANALYSIS ---]
 \begin{description}
 \item [Statistics:]\hfill
 \begin{description}
@@ -1599,7 +1597,7 @@ These are the IRCAM commands which are relevant specifically to data reduction:
 \end {description}
 \end {description}
 
-\item [INQUIRIES and STATUS] ---
+\item [INQUIRIES and STATUS ---]
 \begin {quote}
 \begin {description}
 \item [GLOBALS]:
@@ -1611,7 +1609,7 @@ These are the IRCAM commands which are relevant specifically to data reduction:
 \end {description}
 \end {quote}
 
-\item [MISCELLANEOUS] ---
+\item [MISCELLANEOUS ---]
 \begin {quote}
 \begin {description}
 \item [KAPHELP]:
@@ -1632,29 +1630,29 @@ These are the IRCAM commands which are relevant specifically to data reduction:
 
 \begin{quote}
 \begin{description}
-\item [A --- Annulus] :
+\item [A --- Annulus:] 
  Alter the way in which the background level is measured.
-\item [C --- Centroid] :
+\item [C --- Centroid:] 
  Specify if the object is centered in the aperture before doing the measurement.
-\item [E --- Exit] :
+\item [E --- Exit:] 
  Terminate the current PHOTOM session.
-\item [F --- File of positions] :
+\item [F --- File of positions:] 
  Do measurements automatically.
-\item [H --- Help] :
+\item [H --- Help:] 
  Display a line of help information for each command.
-\item [I --- Interactive shape] :
+\item [I --- Interactive shape:] 
  Adjust the size and shape of the cursor interactively.
-\item [M --- Measure] :
+\item [M --- Measure:] 
  Measure individually selected objects interactively.
-\item [N --- Non-interactive shape] :
+\item [N --- Non-interactive shape:] 
  Specify the size and shape of the aperture from the keyboard.
-\item [O --- Options] :
+\item [O --- Options:] 
  Change values of parameters specified in the interface file from the keyboard.
-\item [P --- Photon statistics] :
+\item [P --- Photon statistics:] 
  Alter the way in which errors are calculated.
-\item [S --- Sky] :
+\item [S --- Sky:] 
  Choose the method of estimating the background level in the sky aperture.
-\item [V --- Values] :
+\item [V --- Values:] 
  Display the current settings of significant parameters.
 \end{description}
 \end{quote}
@@ -1672,18 +1670,18 @@ These are the IRCAM commands which are relevant specifically to data reduction:
 \begin{quote}
 \begin{description}
 
-\item [ADDNOISE] :
+\item [ADDNOISE:] 
  Add Poissonian or Gaussian noise to model (or any other) data.
 
-\item [PISA2SCAR] :
+\item [PISA2SCAR:] 
  Convert PISAFIND and PISAPEAK result files to SCAR format, so they can be
  used either by SCAR or by the CHA catalogue manipulation applications.
 
-\item [PISACUT] :
+\item [PISACUT:] 
  Separate a file of variables into two groups by thresholding the values in a
  single column.
 
-\item [PISAFIND] :
+\item [PISAFIND:] 
  Perform image analysis on a 2-d data frame.
  There are two basic modes of operation --- {\em isophotal analysis} (in which
  pixels  with data values above the threshold are examined for connectivity and
@@ -1691,30 +1689,30 @@ These are the IRCAM commands which are relevant specifically to data reduction:
  stellar profile is fitted to the objects found by a preliminary isophotal
  analysis).
 
-\item [PISAFIT] :
+\item [PISAFIT:] 
  Fit the radially symmetric mixed Gaussian/Exponential/Lorentzian function,
  as used by PISAFIND in its profile fitting mode, to objects whose
  {\bf accurate} positions are given in a formatted list.
 
-\item [PISAGEN] :
+\item [PISAGEN:] 
  Generate model data using the PISA profile fitting function using the positions
  and integrated intensities found by PISAFIND in its profile fitting mode (or
  any other data in similar format).
 
-\item [PISAKNN] :
+\item [PISAKNN:] 
  Use the results of PISAPEAK to discriminate objects into two classes using
  KNN (k nearest neighbours) distribution-free multivariate discrimination to
  classify objects into two classes.
 
-\item [PISAMATCH] :
+\item [PISAMATCH:] 
  Match the indices in one file against those in a second file, writing the
  matching entries of the second file into an output file.
 
-\item [PISAPEAK] :
+\item [PISAPEAK:] 
  Transform the PISAFIND parameterisations so that the variables are intensity
  invariant, assuming a stellar profile, for use in star-galaxy separation.
 
-\item [PISAPLOT] :
+\item [PISAPLOT:] 
  Plot the results of the PISAFIND analysis as a series of ellipses which
  reflect the size and shape of the objects as defined by their parameters.
 
@@ -1733,78 +1731,78 @@ These are the IRCAM commands which are relevant specifically to data reduction:
 
 \begin{description}
 
-\item [Database management] ---
+\item [Database management ---]
 
 \begin{description}
-\item [SEARCH] : Select subsets.
-\item [SORT] : Reorder.
-\item [JOIN] : Find objects in common.
-\item [DIFFER] : Find objects not in common.
-\item [MERGE] : Merge catalogues.
-\item [SPLIT] : Split into two catalogues.
-\item [WITHIN] : Select objects from within a polygon.
-\item [CONVERT] : Change format, make indexes, new fields etc.
-\item [EDIT] : Add and delete records, and correct values.
+\item [SEARCH:]  Select subsets.
+\item [SORT:]  Reorder.
+\item [JOIN:]  Find objects in common.
+\item [DIFFER:]  Find objects not in common.
+\item [MERGE:]  Merge catalogues.
+\item [SPLIT:]  Split into two catalogues.
+\item [WITHIN:]  Select objects from within a polygon.
+\item [CONVERT:]  Change format, make indexes, new fields etc.
+\item [EDIT:]  Add and delete records, and correct values.
 \end{description}
 
-\item [Display] ---
+\item [Display ---]
 
 \begin{description}
-\item [REPORT] : List all or some of a catalogue's contents.
-\item [PRINT] : Print it to a default file.
-\item [LISTOUT] : Show values of a given field.
-\item [CALC] : Calculate new fields.
-\item [RECALC] : Update existing fields.
-\item [CONVERT] : Change format.
-\item [WRAP] : Produce a printable version of a catalogue with records longer
+\item [REPORT:]  List all or some of a catalogue's contents.
+\item [PRINT:]  Print it to a default file.
+\item [LISTOUT:]  Show values of a given field.
+\item [CALC:]  Calculate new fields.
+\item [RECALC:]  Update existing fields.
+\item [CONVERT:]  Change format.
+\item [WRAP:]  Produce a printable version of a catalogue with records longer
  than 132 characters.
-\item [CHART] : Plot objects on a finding chart.
-\item [AITOFF] : Plot all objects on an all-sky plot.
-\item [IMAGEPLOT] : Plot objects for COSMOS-style processing.
+\item [CHART:]  Plot objects on a finding chart.
+\item [AITOFF:]  Plot all objects on an all-sky plot.
+\item [IMAGEPLOT:]  Plot objects for COSMOS-style processing.
 \end{description}
 
-\item [Statistics] ---
+\item [Statistics ---]
 
 \begin{description}
-\item [LITTLEBIG] : Find either the largest or smallest numbers in a catalogue.
-\item [SAMPLE] : Select every Nth object from a catalogue.
-\item [HISTOGRAM] : Plot a histogram of a given field.
-\item [SCATTER] : Plot two fields and perform regression analysis.
-\item [CORRELATE] : Correlate (non-parametrically) two fields.
-\item [LINCOR] : Compute the Pearson product-moment linear correlation
+\item [LITTLEBIG:]  Find either the largest or smallest numbers in a catalogue.
+\item [SAMPLE:]  Select every Nth object from a catalogue.
+\item [HISTOGRAM:]  Plot a histogram of a given field.
+\item [SCATTER:]  Plot two fields and perform regression analysis.
+\item [CORRELATE:]  Correlate (non-parametrically) two fields.
+\item [LINCOR:]  Compute the Pearson product-moment linear correlation
   coefficient.
 \end{description}
 
-\item [Create and process description files] ---
+\item [Create and process description files ---]
 
 \begin{description}
-\item [EXTAPE] : Examine the contents of an ASCII tape and dump it to disk.
-\item [LISTIN] : Read a simple VMS file into SCAR.
-\item [FORM1] : Create a description file in screen mode.
-\item [FORM2] : Create a description file in prompt mode.
-\item [ASPIC] : Create a description file for an ASPIC/IAM catalogue.
-\item [ASCII] : Convert a description file for BINARY data to one for ASCII
+\item [EXTAPE:]  Examine the contents of an ASCII tape and dump it to disk.
+\item [LISTIN:]  Read a simple VMS file into SCAR.
+\item [FORM1:]  Create a description file in screen mode.
+\item [FORM2:]  Create a description file in prompt mode.
+\item [ASPIC:]  Create a description file for an ASPIC/IAM catalogue.
+\item [ASCII:]  Convert a description file for BINARY data to one for ASCII
  data.
-\item [BINARY] : Convert a description file for ASCII data to one for BINARY
+\item [BINARY:]  Convert a description file for ASCII data to one for BINARY
  data.
-\item [POLYGON] : Create a description file of polygon vertices.
+\item [POLYGON:]  Create a description file of polygon vertices.
 \end{description}
 
-\item [Small tools] ---
+\item [Small tools ---]
 
 \begin{description}
-\item [SETUP] : Define default values for certain options.
-\item [CATSIZE] : Find the number of objects in a catalogue.
-\item [COUNTREC] : Count the number of objects in a sequential file.
-\item [COSMAGCAL] : Calculate magnitudes from COSMOS magnitudes.
-\item [HARDCOPY] : Produce hardcopy of output produced by graphics programs.
-\item [MOUNT] : Allocate a deck, mount a foreign tape, and assign it a
+\item [SETUP:]  Define default values for certain options.
+\item [CATSIZE:]  Find the number of objects in a catalogue.
+\item [COUNTREC:]  Count the number of objects in a sequential file.
+\item [COSMAGCAL:]  Calculate magnitudes from COSMOS magnitudes.
+\item [HARDCOPY:]  Produce hardcopy of output produced by graphics programs.
+\item [MOUNT:]  Allocate a deck, mount a foreign tape, and assign it a
  logical name.
-\item [DISMOUNT] : Dismount a tape, deallocate a deck, and deassign the
+\item [DISMOUNT:]  Dismount a tape, deallocate a deck, and deassign the
  logical name.
-\item [DSCFHELP] : Insert a description file into a help library.
-\item [DEBUG] : Switch on the VMS debugger (for Programmers only).
-\item [GETPAR] : Get a parameter value when in the ICL environment.
+\item [DSCFHELP:]  Insert a description file into a help library.
+\item [DEBUG:]  Switch on the VMS debugger (for Programmers only).
+\item [GETPAR:]  Get a parameter value when in the ICL environment.
 \end{description}
 \end{description}
 
@@ -1820,42 +1818,42 @@ These are the IRCAM commands which are relevant specifically to data reduction:
 
 \begin{description}
 
-\item [I/O] ---
+\item [I/O ---]
 \begin{description}
-\item [ASCIN] : Read a 1-d or N-d data set from an ASCII table.
-\item [ASCOUT] : Write a subset to an ASCII table.
+\item [ASCIN:]  Read a 1-d or N-d data set from an ASCII table.
+\item [ASCOUT:]  Write a subset to an ASCII table.
 \end{description}
 
-\item [Display] ---
+\item [Display ---]
 \begin{description}
-\item [SPECPLOT] : Plot a spectrum.
+\item [SPECPLOT:]  Plot a spectrum.
 \end{description}
 
-\item [Data manipulation] ---
+\item [Data manipulation ---]
 \begin{description}
-\item [GOODVAR] : Replace negative, zero and bad variance or error values.
+\item [GOODVAR:]  Replace negative, zero and bad variance or error values.
 \end{description}
 
-\item [Statistics] ---
+\item [Statistics ---]
 \begin{description}
-\item [CORREL] : Correlate three data sets.
+\item [CORREL:]  Correlate three data sets.
 \end{description}
 
-\item [Reshaping] ---
+\item [Reshaping ---]
 \begin{description}
-\item [GROW] : Copy from an N-d cube into an (N+M)-d one.
-\item [SUBSET] : Take a subset of a data set (up to 10-d).
-\item [XTRACT] : Average an N-d cube into an (N-M)-d one.
+\item [GROW:]  Copy from an N-d cube into an (N+M)-d one.
+\item [SUBSET:]  Take a subset of a data set (up to 10-d).
+\item [XTRACT:]  Average an N-d cube into an (N-M)-d one.
 \end{description}
 
-\item [Data calibration] ---
+\item [Data calibration ---]
 \begin{description}
-\item [BBODY] : Calculate a black body spectrum.
+\item [BBODY:]  Calculate a black body spectrum.
 \end{description}
 
-\item [Fitting] ---
+\item [Fitting ---]
 \begin{description}
-\item [FITGAUSS] : Fit continuum and Gaussian to a spectrum.
+\item [FITGAUSS:]  Fit continuum and Gaussian to a spectrum.
 \end{description}
 \end{description}
 
@@ -1871,25 +1869,25 @@ These are the IRCAM commands which are relevant specifically to data reduction:
 
 \begin{quote}
 \begin{description}
-\item [FORSTATS] : Analyse a sequence of Fortran 77 source files, divide
+\item [FORSTATS:]  Analyse a sequence of Fortran 77 source files, divide
  their contents into program units, and produce statistics about the number
  and distribution of code and comment lines in each unit.
  Compare these statistics are with typical values from well-crafted Fortran
  code.
 
-\item [PROCVT] : Convert `old-style' ADAM/SSE routine prologues into the
+\item [PROCVT:]  Convert `old-style' ADAM/SSE routine prologues into the
  format generated by the extended VAX Language Sensitive Editor (STARLSE).
 
-\item [PROHLP] : Read a series of Fortran 77 source files containing
+\item [PROHLP:]  Read a series of Fortran 77 source files containing
  prologues generated by STARLSE, and produce an output file for each routine
  containing user-documentation in a format suitable for insertion into
  a Help library.
 
-\item [PROLAT] : Read a series of Fortran 77 source files containing
+\item [PROLAT:]  Read a series of Fortran 77 source files containing
  prologues generated by STARLSE, and produce an output file containing
  user-documentation for each routine written in \LaTeX.
 
-\item [PROPAK] : Read a series of Fortran 77 source files containing
+\item [PROPAK:]  Read a series of Fortran 77 source files containing
  prologues generated by STARLSE, and produce an output file containing
  an LSE `package definition' suitable for use with STARLSE.
 
@@ -1907,72 +1905,72 @@ These are the IRCAM commands which are relevant specifically to data reduction:
 \vspace{2mm}
 
 \begin{description}
-\item [Data I/O] ---
+\item [Data I/O ---]
 \begin{description}
-\item [BUILD3D] : Insert a Figaro frame into a time series image.
-\item [RCCDTS] : Read AAO CCD time series data.
-\item [RCGS2] : Read CGS2 polarimetry data.
-\item [RFIGARO] : Read a Stokes parameter spectrum from a Figaro image.
-\item [RHATPOL] : Read Hatfield polarimeter data.
-\item [RHATHSP] : Read Hatfield polarimeter high speed photometry data.
-\item [RHDSPLOT] : Read ASCII files of Hatfield polarimeter data.
-\item [RHSP3] : Read an HSP3 tape.
-\item [RIRPS] : Read IRPS photometry data.
-\item [RTURKU] : Read ASCII files of data from the Turku UBVRI polarimeter.
-\item [TLIST] : List time series data to a file.
-\item [XCOPY] : Copy wavelength data from a Figaro spectrum.
+\item [BUILD3D:]  Insert a Figaro frame into a time series image.
+\item [RCCDTS:]  Read AAO CCD time series data.
+\item [RCGS2:]  Read CGS2 polarimetry data.
+\item [RFIGARO:]  Read a Stokes parameter spectrum from a Figaro image.
+\item [RHATPOL:]  Read Hatfield polarimeter data.
+\item [RHATHSP:]  Read Hatfield polarimeter high speed photometry data.
+\item [RHDSPLOT:]  Read ASCII files of Hatfield polarimeter data.
+\item [RHSP3:]  Read an HSP3 tape.
+\item [RIRPS:]  Read IRPS photometry data.
+\item [RTURKU:]  Read ASCII files of data from the Turku UBVRI polarimeter.
+\item [TLIST:]  List time series data to a file.
+\item [XCOPY:]  Copy wavelength data from a Figaro spectrum.
 \end{description}
-\item [Data analysis] ---
+\item [Data analysis ---]
 \begin{description}
-\item [CALFIT] : Fit a calibration curve to a polarization spectrum.
-\item [CALFITPA] : Fit a calibration curve to the polarization position angle.
-\item [CALIB] : Efficiency calibrate a polarization spectrum.
-\item [CALPA] : Position angle calibrate a polarization spectrum.
-\item [CCD2POL] : Reduce CCD spectropolarimetry data.
-\item [CCD2STOKES] : Reduce CCD spectropolarimetry data.
-\item [CCDPHOT] : Photometry of a star on a time series image.
-\item [CCDPOL] : Polarimetry of a star on a time series image.
-\item [CMULT] : Multiply a polarization spectrum by a constant.
-\item [COMBINE] : Combine two polarization spectra.
-\item [DIVIDE] : Divide a polarization spectrum by an intensity spectrum.
-\item [DSTOKES] : Delete a Stokes parameter from a dataset.
-\item [EXTIN] : Correct a polarization spectrum for extinction.
-\item [FLCONV] : Convert a flux calibrated spectrum to f-lambda.
-\item [FLIP] : Invert the sign of the Stokes parameter in a spectrum.
-\item [IMOTION] : Analyze the image motion in a time series image.
-\item [IPCS2STOKES] : Reduce IPCS spectropolarimetry data.
-\item [LHATPOL] : List Hatfield polarimeter infrared data.
-\item [LMERGE] : Merge two polarization spectra.
-\item [LTCORR] : Apply light time corrections to the time axis of a data set.
-\item [PTHETA] : Output the P and Theta values for a polarization spectrum.
-\item [QUMERGE] : Merge Q and U spectra into single dataset.
-\item [QUSUB] : Subtract a Q,U vector from a polarization spectrum.
-\item [REVERSE] : Reverse a spectrum in the wavelength axis.
-\item [ROTPA] : Rotate the position of a polarization spectrum.
-\item [SCRUNCH] : Rebin a polarization spectrum.
-\item [SHIFTADD] : Add frames of time series image, correcting for image motion.
-\item [SPFLUX] : Apply flux calibration to a polarization spectrum.
-\item [SUBSET] : Take a subset of a dataset in wavelength or time axes.
-\item [SUBTRACT] : Subtract two polarization spectra.
-\item [TBIN] : Bin a time series.
-\item [TDERIV] : Calculate time derivative of a dataset.
-\item [TEXTIN] : Correct a time series dataset for extinction.
-\item [TMERGE] : Merge two time series datasets.
-\item [TSETBAD] : Mark bad points in time series interactively.
-\item [TSEXTRACT] : Extract optimally a light curve from a time series image.
-\item [TSHIFT] : Apply a time shift to a dataset.
-\item [TSPROFILE] : Determine a spatial profile from a time series image.
+\item [CALFIT:]  Fit a calibration curve to a polarization spectrum.
+\item [CALFITPA:]  Fit a calibration curve to the polarization position angle.
+\item [CALIB:]  Efficiency calibrate a polarization spectrum.
+\item [CALPA:]  Position angle calibrate a polarization spectrum.
+\item [CCD2POL:]  Reduce CCD spectropolarimetry data.
+\item [CCD2STOKES:]  Reduce CCD spectropolarimetry data.
+\item [CCDPHOT:]  Photometry of a star on a time series image.
+\item [CCDPOL:]  Polarimetry of a star on a time series image.
+\item [CMULT:]  Multiply a polarization spectrum by a constant.
+\item [COMBINE:]  Combine two polarization spectra.
+\item [DIVIDE:]  Divide a polarization spectrum by an intensity spectrum.
+\item [DSTOKES:]  Delete a Stokes parameter from a dataset.
+\item [EXTIN:]  Correct a polarization spectrum for extinction.
+\item [FLCONV:]  Convert a flux calibrated spectrum to f-lambda.
+\item [FLIP:]  Invert the sign of the Stokes parameter in a spectrum.
+\item [IMOTION:]  Analyze the image motion in a time series image.
+\item [IPCS2STOKES:]  Reduce IPCS spectropolarimetry data.
+\item [LHATPOL:]  List Hatfield polarimeter infrared data.
+\item [LMERGE:]  Merge two polarization spectra.
+\item [LTCORR:]  Apply light time corrections to the time axis of a data set.
+\item [PTHETA:]  Output the P and Theta values for a polarization spectrum.
+\item [QUMERGE:]  Merge Q and U spectra into single dataset.
+\item [QUSUB:]  Subtract a Q,U vector from a polarization spectrum.
+\item [REVERSE:]  Reverse a spectrum in the wavelength axis.
+\item [ROTPA:]  Rotate the position of a polarization spectrum.
+\item [SCRUNCH:]  Rebin a polarization spectrum.
+\item [SHIFTADD:]  Add frames of time series image, correcting for image motion.
+\item [SPFLUX:]  Apply flux calibration to a polarization spectrum.
+\item [SUBSET:]  Take a subset of a dataset in wavelength or time axes.
+\item [SUBTRACT:]  Subtract two polarization spectra.
+\item [TBIN:]  Bin a time series.
+\item [TDERIV:]  Calculate time derivative of a dataset.
+\item [TEXTIN:]  Correct a time series dataset for extinction.
+\item [TMERGE:]  Merge two time series datasets.
+\item [TSETBAD:]  Mark bad points in time series interactively.
+\item [TSEXTRACT:]  Extract optimally a light curve from a time series image.
+\item [TSHIFT:]  Apply a time shift to a dataset.
+\item [TSPROFILE:]  Determine a spatial profile from a time series image.
 \end{description}
-\item [Plotting] ---
+\item [Plotting ---]
 \begin{description}
-\item [DISPLAY] : Display a 3-d TSP dataset on an image display device.
-\item [EPLOT] : Plot a polarization spectrum as P, Theta with error bars.
-\item [FPLOT] : Plot a polarization spectrum as polarized intensity.
-\item [PHASEPLOT] : Plot time series data against phase.
-\item [PPLOT] : Plot a polarization spectrum as P, Theta.
-\item [QPLOT] : Plot time series data quickly.
-\item [QUPLOT] : Plot a polarization spectrum in the Q,U plane.
-\item [SPLOT] : Plot a polarization spectrum with a single Stokes parameter.
-\item [TSPLOT] : Plot time series data.
+\item [DISPLAY:]  Display a 3-d TSP dataset on an image display device.
+\item [EPLOT:]  Plot a polarization spectrum as P, Theta with error bars.
+\item [FPLOT:]  Plot a polarization spectrum as polarized intensity.
+\item [PHASEPLOT:]  Plot time series data against phase.
+\item [PPLOT:]  Plot a polarization spectrum as P, Theta.
+\item [QPLOT:]  Plot time series data quickly.
+\item [QUPLOT:]  Plot a polarization spectrum in the Q,U plane.
+\item [SPLOT:]  Plot a polarization spectrum with a single Stokes parameter.
+\item [TSPLOT:]  Plot time series data.
 \end{description}
 \end{description}

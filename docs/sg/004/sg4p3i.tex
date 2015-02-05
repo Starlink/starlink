@@ -1,6 +1,5 @@
 \chapter{The Graphics System}
 \label{C_graphics}
-\markboth{Programmers}{\stardocname}
 
 The Starlink graphics software was introduced in Chapter \ref{C_overlibs}.
 A guide to its use is available in \xref{SUN/113}{sun113}{}.
@@ -85,7 +84,6 @@ mechanism external to the program, or solicit information from the user.
 
 \section{SGS --- Simple graphics system}
 \label{S_sgsgks}
-\markboth{Programmers}{\stardocname}
 
 The following example graphics program uses SGS to draw a circle on a selected
 graphics device:
@@ -209,7 +207,6 @@ With hard copy graphics devices, such as `postscript\_l', a file is created
 which must then be sent to the device with a DCL PRINT command.
 
 \section{IDI --- Image display interface}
-\markboth{Programmers}{\stardocname}
 
 IDI is a standard for displaying astronomical data on an image display.
 It is introduced in \xref{SUN/65}{sun65}{}, and the routine specifications are
@@ -248,7 +245,6 @@ unpredictable.
 A better solution is to use AGI to mediate between the packages.
 
 \section{AGI --- Applications graphics interface}
-\markboth{Programmers}{\stardocname}
 
 One of the recurring problems in graphics programming is that you would
 like a program to know about graphics drawn by another program.
@@ -323,7 +319,6 @@ A new picture is always created inside the current picture.
 The current picture for each workstation is remembered between sessions.
 
 \paragraph{AGI routines:}\hfill
-\markboth{Programmers}{\stardocname}
 
 The `objects' manipulated by the AGI library are `pictures' in the database.
 The basic set of routines in the library begin with the prefix `AGI\_'.
@@ -385,7 +380,6 @@ that the picture must enclose a given test point.
 \end{quote}
 
 \paragraph{Interfacing with other graphics components:}\hfill
-\markboth{Programmers}{\stardocname}
 
 The basic routines do not assume the use of any particular graphics
 library.
@@ -442,10 +436,8 @@ Full details of the AGI routines are given in \xref{SUN/48}{sun48}{}, and a
 comprehensive example of its use is given in \xref{SUN/95}{sun95}{}.
 You can examine the coding of other examples by looking at the DISPLAY and
 PHOTOM routines in the KAPPA source library KAPPA\_DIR:KAPPA.TLB.
-\markboth{Programmers}{\stardocname}
 
 \section{GNS --- Graphics workstation name service}
-\markboth{Programmers}{\stardocname}
 
 Almost any graphics program requires the user to identify which graphics
 device is to be used.
@@ -475,7 +467,6 @@ More information on GNS and descriptions of its routines are given in
 \xref{SUN/57}{sun57}{}.
 
 \paragraph{Demonstration program:}\hfill
-\markboth{Programmers}{\stardocname}
 
 A complete list of all the workstation names defined on your system can be
 obtained by running the program {\tt GNS\_DIR:GNSRUN}.

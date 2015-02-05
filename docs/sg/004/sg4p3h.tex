@@ -1,6 +1,5 @@
 \chapter{The Message and Error Systems}
 \label{C_messerrs}
-\markboth{Programmers}{\stardocname}
 
 There is a general need for application programs to provide the user with
 informative messages about:
@@ -138,7 +137,7 @@ a spectrum can output its result by:
 Here, MSG\_SETR assigns the result, stored in the REAL variable FLUX, to the
 message token named `FLUX'.
 The token string is then included in the message text by prefixing it with the
-up-arrow, `$^\wedge$', escape character.
+up-arrow, `$^{\wedge}$', escape character.
 The usual set of similar routines is provided to handle the other standard
 data types.
 
@@ -177,7 +176,7 @@ As for MSG\_SETx, {\em x} corresponds to each of the five standard Fortran 77
 data types --- {\em D}, {\em R}, {\em I}, {\em L} and {\em C}.
 
 Sometimes it is necessary to include the message token escape character,
-`$^\wedge$', literally in a message.
+`$^{\wedge}$', literally in a message.
 When the character is not the last in a message string, it can be included
 literally by duplicating it.
 When it is immediately followed by a blank, or is at the end of the MSG\_OUT
@@ -241,7 +240,7 @@ There are two kinds of reference required:
 \item The  {\em name} of an object, device, or file.
 \end{itemize}
 We can include references of these kinds by prefixing parameter names with an
-{\em escape character} of which there are three: `$\wedge$', `\%', `\$'.
+{\em escape character} of which there are three: `${\wedge}$', `\%', `\$'.
 To include a parameter's keyword, prefix its name with a `\%' character, as in:
 
 \begin{small}
@@ -289,9 +288,9 @@ For example:
 \end{verbatim}
 \end{small}
 
-In this example, the escape sequence `$^\wedge$' prefixes the token name,
+In this example, the escape sequence `$^{\wedge}$' prefixes the token name,
 `PAR'.
-The sequence `$^\wedge$PAR' gets replaced by the contents of the character
+The sequence `$^{\wedge}$PAR' gets replaced by the contents of the character
 string contained in the variable PNAME; this, being prefixed by `\%', then
 gets replaced in the final message by the keyword associated with the
 parameter.

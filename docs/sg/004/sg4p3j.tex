@@ -1,6 +1,5 @@
 \chapter{Input/Output Systems}
 \label{C_iosys}
-\markboth{Programmers}{\stardocname}
 
 In ADAM programs, most data will be stored in HDS objects and handled by the
 Data system.
@@ -36,7 +35,6 @@ It is addressed by a tape descriptor, TD.
 
 \section{FIO --- Sequential file I/O}
 \label{S_fio}
-\markboth{Programmers}{\stardocname}
 
 A file is opened by associating it with parameter
 PAR using the {\bf FIO\_ASSOC}
@@ -75,7 +73,6 @@ used length of the buffer.
 This makes reading much faster when the used length is not requried.
 
 \paragraph{Example:}\hfill
-\markboth{Programmers}{\stardocname}
 
 The following example shows how FIO routines are used to write a single
 formatted line to a file:
@@ -162,7 +159,6 @@ The status can then be tested by, for example:
 \end{small}
 
 \paragraph{Fortran I/O:}\hfill
-\markboth{Programmers}{\stardocname}
 
 Fortran I/O will be required if unformatted records are to be stored in a
 sequential file, or formatted records in a direct access file.
@@ -211,7 +207,6 @@ Note that there would be no FIO descriptor for such files.
 
 \section{RIO --- Direct file I/O}
 \label{S_rio}
-\markboth{Programmers}{\stardocname}
 
 The RIO system is very similar to the FIO system, and most of its routines have
 the same call sequence.
@@ -264,7 +259,6 @@ A classified list of routines is given in Section~\ref{R_FIO}.
 \section{MAG --- Magnetic tape system}
 \label{S_mag}
 
-\markboth{Programmers}{\stardocname}
 
 The routines in the MAG library have names which begin with the prefix `MAG\_',
 followed by characters which indicate their function.
@@ -361,7 +355,6 @@ A specific status can then be tested by, for example:
 \end{small}
 
 \paragraph{Linking:}\hfill
-\markboth{Programmers}{\stardocname}
 
 To link a program with the MAG library, include ADAM\_LIB:MAGLINK/OPT in the
 link command, for example:
@@ -373,7 +366,6 @@ link command, for example:
 \end{small}
 
 \subsection{Device management}
-\markboth{Programmers}{\stardocname}
 
 Device management is concerned with the allocation of a tape drive to a program,
 and the mounting of tapes on this drive.
@@ -426,7 +418,6 @@ parameter should be TRUE if tape is to be unloaded (the default), and FALSE
 otherwise.
 
 \subsection{Tape positioning}
-\markboth{Programmers}{\stardocname}
 
 The information on a tape consists of a sequence of blocks.
 There is a special kind of block called a `tape mark' which is used to
@@ -477,7 +468,6 @@ However, when reading backwards, the last data block in a file is specified
 by BLOCK=2.
 
 \paragraph{Position memory:}\hfill
-\markboth{Programmers}{\stardocname}
 
 The MAG package enables the position of a tape on a specific drive to be
 remembered between program runs.
@@ -488,7 +478,6 @@ MAG\_MOUNT will initialize the position at FILE=1, START=.TRUE., BLOCK=1, while
 MAG\_DISM  will make the values undefined.
 
 \subsection{Example}
-\markboth{Programmers}{\stardocname}
 
 The following example is a sketch of a program which reads a magnetic tape
 using MAG routines:
