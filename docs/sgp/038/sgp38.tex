@@ -81,7 +81,7 @@ you get to the items themselves (the primitives);  all the
 rest is packaging.
 
 Readers of the present document
-should be familiar with the HDS Programmer's Guide, \xref{SUN/92}{sun92}.
+should be familiar with the HDS Programmer's Guide, \xref{SUN/92}{sun92}{}.
 
 In conjunction with a release of
 the Starlink Software Environment ({\small SSE}---a forerunner of the
@@ -193,7 +193,7 @@ self-contained; coupled with
 individual data objects they are used to build the composite
 formats, and include axis information, title, history, and quality.
 The composite formats are akin to the Interim
-Environment's Bulk Data Frame (see \xref{SUN/4}{sun4}).
+Environment's Bulk Data Frame (see \xref{SUN/4}{sun4}{}).
 
 Since the idea of some completely general data format has
 been rejected (for reasons already presented), even for
@@ -363,14 +363,14 @@ these low-level objects is relatively easy to write,
 and once written can be used by many different packages.
 
 {\small KAPPA} (\textbf{K}ernel \textbf{Ap}plication \textbf{Pa}ckage ---
-see \xref{SUN/95}{sun95}) is a set of
+see \xref{SUN/95}{sun95}{}) is a set of
 applications which processes these abstracted data
 objects.  {\small KAPPA} is
 intended to be a quick, exploratory data-analysis tool, and its
 applications will act as paradigms
 or templates for specialist software packages.
 
-Another important package is {\small FIGARO} (\xref{SUN/86}{sun86}), which
+Another important package is {\small FIGARO} (\xref{SUN/86}{sun86}{}), which
 has been influential in defining the Starlink
 standard data formats and is at present undergoing a refit
 to bring it fully into line.
@@ -423,7 +423,7 @@ celestial position with separate components for hours, minutes, seconds
 and degrees, arcminutes, arcseconds, rather than expressing
 the two angles as floating-point numbers or using
 a single character string (notwithstanding the example in
-\xref{SSN/27}{ssn27}, which is a demonstration rather than a recommendation!).
+\xref{SSN/27}{ssn27}{}, which is a demonstration rather than a recommendation!).
 
 \begin{table}
 \centering
@@ -509,7 +509,7 @@ particular instrument for example.  What should an application
 do if it encounters objects which are not part of a
 standard structure?
 
-In most of the {\small ASPIC} applications (see \xref{SG/1}{sg1}) such objects ---
+In most of the {\small ASPIC} applications (see \xref{SG/1}{sg1}{}) such objects ---
 which have to be expressed in simple ways akin to {\small FITS}
 descriptors ---
 are simply ignored, and consequently do not appear in any new data
@@ -623,7 +623,7 @@ NAMEs, TYPEs and the contents of strings in HDS
 \textbf{must} consist only of
 printable ASCII characters (\textit{i.e.}\ hexadecimal
 20 through 7E).  Beyond this, HDS itself
-(see \xref{SUN/92}{sun92}) imposes restrictions on NAMEs and TYPES,
+(see \xref{SUN/92}{sun92}{}) imposes restrictions on NAMEs and TYPES,
 to which we add the
 requirement that the first character of a
 (non-primitive) TYPE must \textbf{not} be
@@ -645,7 +645,7 @@ will, at some stage, cause insurmountable difficulties.
 The names of HDS container files should be chosen to be the
 same as the names of their top-level data structures, or at
 least to be closely related.  Note that filenames must \textbf{not}
-appear in applications code (see \xref{SGP/16}{sgp16}).
+appear in applications code (see \xref{SGP/16}{sgp16}{}).
 
 \subsection{\xlabel{se_roleoftype}The R\^{o}le of TYPE\label{se:roleoftype}}
 
@@ -743,7 +743,7 @@ $<$\textbf{TYPE}$>$ respectively. As mentioned earlier, the $>$ and
 $<$ signs form a notation convention used in the text of this
 document to signify the TYPE of a data object, and they are not
 themselves part of the TYPE. Details of
-HDS primitive TYPEs can be found in \xref{SUN/92}{sun92}.
+HDS primitive TYPEs can be found in \xref{SUN/92}{sun92}{}.
 
 Within Starlink standard data structures TYPE is
 recognised globally---a given TYPE always means the same thing no
@@ -1472,7 +1472,7 @@ For efficiency, pixel values are tested inline for equality with the
 magic value of the appropriate type.  However, the numerical values
 given above must not be written explicitly in the code; instead,
 variables called \texttt{VAL\_\_BAD<T>}, where \texttt{<T>} is the one or two-letter
-type code (\textit{e.g.}\  see \xref{SUN/7}{sun7}), should
+type code (\textit{e.g.}\  see \xref{SUN/7}{sun7}{}), should
 be used.  These variables are specified
 via an INCLUDE file with logical name BAD\_PAR.  Here is a trivial
 example, which computes the mean of a one-dimensional REAL array.
@@ -2187,7 +2187,7 @@ Each value corresponds to the \textit{centre} of a pixel.  For an
 $n$-dimensional data array, with no axis calibration, and equally spaced
 data, the Starlink standard is for the $n^{\mathrm{th}}$ pixel centre to be at
 $(n-1)$.5 in each axis, \textit{e.g.}\  for display purposes
-(\textit{cf.}\  \xref{SSN/22}{ssn22}). However, in some applications the pixel
+(\textit{cf.}\  \xref{SSN/22}{ssn22}{}). However, in some applications the pixel
 index is adequate and clearer.  Programmers should take care to use
 the appropriate scheme.
 
