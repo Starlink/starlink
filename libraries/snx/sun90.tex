@@ -1,293 +1,25 @@
-\documentclass[twoside,11pt]{article}
-
-% ? Specify used packages
-\usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
-% ? End of specify used packages
-
-\pagestyle{myheadings}
-
+\documentclass[twoside,11pt,nolof,noabs]{starlink}
 % -----------------------------------------------------------------------------
-% ? Document identification
-% Fixed part
-\newcommand{\stardoccategory}  {Starlink User Note}
-\newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright}
-{Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
-
-% Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {90.10}
-\newcommand{\stardocauthors}   {P C T Rees, M J Bly,  P T Wallace}
-\newcommand{\stardocdate}      {7 March 1995}
-\newcommand{\stardoctitle}     {SNX --- Starlink Extensions to
-                                the NCAR Graphics Utilities}
-\newcommand{\stardocversion}   {Version 1.1-1}
-\newcommand{\stardocmanual}    {Programmer's Manual}
-\newcommand{\stardocabstract}  {[Text of abstract]}
-% ? End of document identification
-% -----------------------------------------------------------------------------
-
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%      1-FEB-2000 (AJC):
-%        Add Copyright statement in LaTeX
-%     {Add further history here}
-%
-% -
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-% ? End of document specific commands
-% -----------------------------------------------------------------------------
-%  Title Page.
-%  ===========
-\renewcommand{\thepage}{\roman{page}}
-\begin{document}
-\thispagestyle{empty}
-
-%  Latex document header.
-%  ======================
-\begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
-   {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber}
-   \begin{flushright}
-   \stardocauthors\\
-   \stardocdate
-   \end{flushright}
-   \vspace{-4mm}
-   \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
-   \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
-   \end{center}
-   \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-   \begin{center}
-   \includegraphics[scale=0.7]{sun90_fig-1}
-   \end{center}
-% ? End of picture
-
-% ? Heading for abstract if used.
-%   \vspace{10mm}
-%   \begin{center}
-%      {\Large\textbf{Abstract}}
-%   \end{center}
-% ? End of heading for abstract.
-\end{latexonly}
-
-%  HTML documentation header.
-%  ==========================
-\begin{htmlonly}
-   \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
-
-% ? Add picture here if required for the hypertext version.
-    \includegraphics[width=0.5\textwidth]{sun90_fig-1}
-% ? End of picture
-
-   \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
-   \stardocauthors \\
-   \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
-   \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
-   \begin{rawhtml} </H2> \end{rawhtml}
-   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
-
-%  HTML document table of contents.
-%  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
-  \label{stardoccontents}
-  \begin{rawhtml}
-    <HR>
-    <H2>Contents</H2>
-  \end{rawhtml}
-  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-        {stardoccontents}}
-
-% ? New section for abstract if used.
-%  \section{\xlabel{abstract}Abstract}
-% ? End of new section for abstract
-\end{htmlonly}
-
-% -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
-%\stardocabstract
-% ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? Latex Copyright Statement
-%  =========================
-\begin{latexonly}
-\newpage
-\vspace*{\fill}
+% Document identification
+\stardoccategory    {Starlink User Note}
+\stardocinitials    {SUN}
+\stardocsource      {sun\stardocnumber}
 \stardoccopyright
-\end{latexonly}
-% ? End of Latex copyright statement
+{Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
+\stardocnumber      {90.10}
+\stardocauthors     {P C T Rees, M J Bly,  P T Wallace}
+\stardocdate        {7 March 1995}
+\stardoctitle       {SNX --- Starlink Extensions to
+                                the NCAR Graphics Utilities}
+\stardocversion     {Version 1.1-1}
+\stardocmanual      {Programmer's Manual}
+\stardocname  {\stardocinitials /\stardocnumber}
 
 % -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
-% ? End of Latex document table of contents
-% -----------------------------------------------------------------------------
 
-\cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\begin{document}
+\scfrontmatter
+
 
 \section {Introduction}
 
@@ -325,7 +57,7 @@ in this document:
 \item Plot a finished graph, with annotation, by means of a single call.
 
 \item Include special characters in graph labels (Greek, subscripts,
-mathematical symbols, {\em etc.}).
+mathematical symbols, \emph{etc.}).
 
 \item Plot character strings anywhere on the graph.
 
@@ -403,15 +135,15 @@ coordinate system.
 \subsection {Use with the UNIX operating system}
 
 \begin{sloppypar} Assuming all Starlink directories have been added to
-the environment variables {\tt PATH} and {\tt LD\_LIBRARY\_PATH} (see
+the environment variables \texttt{PATH} and \texttt{LD\_LIBRARY\_PATH} (see
 SUN/118), then to link a non-ADAM program with SNX and NCAR the command
 line would be:  \end{sloppypar}
 
 \begin {quote}
 \begin {small}
-\begin{verbatim}
+\begin{terminalv}
 % f77 program.o -L/star/lib `snx_link` -o program.out
-\end{verbatim}
+\end{terminalv}
 \end {small}
 \end {quote}
 
@@ -422,19 +154,18 @@ require special handling.  The first gives access to the special fonts
 provided by the NCAR routine PWRITX:  it is a Starlink version of the
 NCAR subroutine AGPWRT.  The second intercepts and changes the numeric
 labels produced by AUTOGRAPH, turning ``.1" and ``$-.5$" into ``0.1"
-and ``$-0.5$" {\em etc.}: it is a Starlink version of the NCAR
+and ``$-0.5$" \emph{etc.}: it is a Starlink version of the NCAR
 subroutine AGCHNL.  These routines will be automatically linked by
-using {\tt `snx\_link`} if you have called the SNX routine {\tt
-SNX\_AGOP}.   If you are using SNX routines as part of an NCAR/SGS mix,
-and have not called {\tt SNX\_AGOP} to initialise the graphics system,
+using \texttt{`snx\_link`} if you have called the SNX routine \texttt{SNX\_AGOP}.   If you are using SNX routines as part of an NCAR/SGS mix,
+and have not called \texttt{SNX\_AGOP} to initialise the graphics system,
 you must link with the objects directly:
 
 \begin {quote}
 \begin {small}
-\begin{verbatim}
+\begin{terminalv}
 % f77 program.o /star/lib/agpwritx.o /star/lib/agchnlz.o \
        -L/star/lib `snx_link` -o program.out
-\end{verbatim}
+\end{terminalv}
 \end {small}
 \end {quote}
 
@@ -449,9 +180,9 @@ Compiling and linking ADAM applications is discussed in Appendix
 Non-ADAM programs may be linked with the SNX and NCAR libraries by
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 $ LINK program, NCAR_DIR:SNX_LINK/OPT, STAR_LINK/OPT
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 This command line will link with the SNX, NCAR and SGS libraries.
@@ -463,9 +194,9 @@ Compiling and linking ADAM applications is discussed in Appendix
 
 To make AUTOGRAPH/SGS/GKS ready for plotting, use the Fortran statement
 
-\begin{verbatim}
+\begin{terminalv}
       CALL SNX_AGOP
-\end{verbatim}
+\end{terminalv}
 
 The routine asks for the SGS/GKS workstation name via the standard input device
 used by NCAR (normally the terminal).
@@ -484,9 +215,9 @@ zone creation routines to select the desired region and then call SNX\_AGWV
 To plot a labelled graph of the curve joining (x,y) points given as separate x
 and y arrays, the following can be used:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL SNX_EZRXY( XDRA, YDRA, NPTS, XLAB, YLAB, GLAB )
-\end{verbatim}
+\end{terminalv}
 
 XDRA and YDRA are real 1-dimensional arrays containing the x and y points
 respectively; the integer NPTS is the number of (x,y) values; XLAB, YLAB and
@@ -500,12 +231,12 @@ When using SNX, the format of numeric labels is ``0.4", ``$-0.25$" instead of
 the default style used by AUTOGRAPH, ``.4", ``$-.25$", by virtue of linking
 with the Starlink version of AGCHNL (\S\ref{link_sect}).
 Other control over labelling (character sizes, multiple lines, character
-orientation, {\em etc.}) can be achieved by setting the appropriate AUTOGRAPH
+orientation, \emph{etc.}) can be achieved by setting the appropriate AUTOGRAPH
 parameters and then calling the NCAR routine EZXY directly, and by writing
 bespoke versions of the user-replaceable routines AGCHNL and AGUTOL.
 
-NCAR can plot other forms of data: {\em e.g.}\ y array only, multiple curves,
-{\em etc.}
+NCAR can plot other forms of data: \emph{e.g.}\ y array only, multiple curves,
+\emph{etc.}
 These are discussed in the NCAR AUTOGRAPH document -- see EZY, EZMY, EZMXY.
 
 Appendices \ref{demo1_sect}--\ref{demo3_sect} contain several examples of the
@@ -514,12 +245,12 @@ use of SNX\_EZRXY.
 
 \section {AUTOGRAPH Labels}
 
-To set up one of the four predefined AUTOGRAPH labels (see \S 2.30 {\em et
+To set up one of the four predefined AUTOGRAPH labels (see \S 2.30 \emph{et
 seq.} in the AUTOGRAPH document), the following call may be used:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL SNX_AGLAB( LNAME, TEXT )
-\end{verbatim}
+\end{terminalv}
 
 LNAME and TEXT are both character strings.
 The first character of LNAME is the label name (`R', `L', `B' or `T' for
@@ -534,9 +265,9 @@ For LNAME $=$ `T' or `L', the AUTOGRAPH line number is set to 100; for `B' or
 Illegal LNAME values cause the top label to be set to
 
 \begin {quote}
-\begin{verbatim}
+\begin{terminalv}
 '*** AGLAB LABEL ERROR ***'.
-\end{verbatim}
+\end{terminalv}
 \end {quote}
 
 The SNX\_AGLAB routine can be used in conjunction with the AUTOGRAPH facilities.
@@ -546,13 +277,13 @@ units.
 Here, one grid unit is the height of the box within which the curve is
 plotted.
 
-\begin{verbatim}
+\begin{terminalv}
       CALL SNX_AGLAB( 'B', 'This is the first line of text' )
       CALL AGSETC( 'LABEL/NAME.', 'B' )
       CALL AGSETI( 'LINE/NUMBER.', -200 )
       CALL AGSETF( 'LINE/CHARACTER.', 0.03 )
       CALL AGSETC( 'LINE/TEXT.', 'This is the second line of text' )
-\end{verbatim}
+\end{terminalv}
 
 It is permissible to omit the AGSETC call which specifies the `B' label as
 this will have been done already by SNX\_AGLAB.
@@ -561,18 +292,18 @@ this will have been done already by SNX\_AGLAB.
 \section {Control over Text Font and Character Set} \label{text_sect}
 
 An ordinary AUTOGRAPH application program linked only with the NCAR library,
-{\em e.g.}
+\emph{e.g.}
 
 \begin {quote}
-\begin{verbatim}
+\begin{terminalv}
 $ LINK PROGRAM, NCAR_DIR:NCAR_LINK/OPT, STAR_LINK/OPT
-\end{verbatim}
+\end{terminalv}
 \end {quote}
 
 on VAX/VMS,
 will include the standard version of the routine AGPWRT which uses the GKS
 text-drawing facilities.
-Extremely flexible control over font, colour, {\em etc.}, is available via GKS
+Extremely flexible control over font, colour, \emph{etc.}, is available via GKS
 (see \S 2.43 of the AUTOGRAPH document), but NCAR itself contains
 some facilities for controlling the text font which many users will find more
 accessible, particularly when Greek letters, subscripts and other special
@@ -590,16 +321,16 @@ by two consecutive apostrophes.
 A choice of two native NCAR character sets is available.
 The selection can be made as follows:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL SNX_CHSET( I )
-\end{verbatim}
+\end{terminalv}
 
 The integer argument I may be either 1 or 2.
 I$=$1 selects the ``duplex" font set and I$=$2 the ``complex" font.
 The ``complex" characters (the default) are more ornate and
 fussier than the comparatively plain ``duplex" characters.
 Only the Roman characters are changed by the SNX\_CHSET call --
-not the Greek, {\em etc.}
+not the Greek, \emph{etc.}
 
 For precise details of how to construct the PWRITX strings, refer to Appendix
 \ref{PWRT_sect}, which includes the program preamble comments describing the
@@ -608,19 +339,19 @@ The principle is that within the string of ordinary characters, function codes
 can be embedded describing changes of font, size and position.
 The function codes are delimited by apostrophes.
 For example, a label meaning $r^{2}$ could be written using the string
-``{\tt r'S'2'N'}''.
-The ``{\tt r}" is simply drawn as a lower case ``r"; the ``{\tt 'S'}" is a
-function code switching to superscript; the ``{\tt 2}" is then drawn as a small
-numeral in the superscript position; and finally the ``{\tt 'N'}" switches back
+``\texttt{r'S'2'N'}''.
+The ``\texttt{r}" is simply drawn as a lower case ``r"; the ``\texttt{'S'}" is a
+function code switching to superscript; the ``\texttt{2}" is then drawn as a small
+numeral in the superscript position; and finally the ``\texttt{'N'}" switches back
 from superscript to normal.
 Though daunting at first, the strings are quite easy to construct and to debug
 by trial and error.
 
 As a more complicated
-example, the string ``{\tt Area = 'GL'P'R'r'S'2}" will generate a label
+example, the string ``\texttt{Area = 'GL'P'R'r'S'2}" will generate a label
 equivalent to ``Area $=\pi r^{2}$".
 (The apostrophes make for messy Fortran literals; this one would be
-``{\tt `Area = ''GL''P''R''r''S''2'}''.)
+``\texttt{`Area = ''GL''P''R''r''S''2'}''.)
 The first PWRITX function code `GL' selects the Greek Lowercase
 font;  P happens to be the source character which generates the
 pi;  the next function code `R' switches back to Roman for the
@@ -644,21 +375,21 @@ This involves a special form of the call to AGPWRT, available
 only with the AGPWRITX implementation of this routine.
 The call is:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL AGPWRT( 0.0, 0.0, ' ', 0, 0, 0, -100 )
-\end{verbatim}
+\end{terminalv}
 
 or
 
-\begin{verbatim}
+\begin{terminalv}
       CALL AGPWRT( 0.0, 0.0, ' ', 0, 0, 0, 100 )
-\end{verbatim}
+\end{terminalv}
 
 (All the arguments except the last one, ICEN, which must be $\pm100$,
 are ignored.)
 The $-100$ ICEN value selects character drawing via
 the ordinary PWRIT routine, which uses the GKS character drawing
-facilities and thus allows control of font, precision, {\em etc.}
+facilities and thus allows control of font, precision, \emph{etc.}
 The +100 ICEN value selects character drawing via the fancy PWRITX routine.
 
 
@@ -671,12 +402,12 @@ This can be accomplished by using the
 routines SNX\_AGSAV and SNX\_AGRES, which respectively
 save and restore the AUTOGRAPH context.  Thus the sequence:
 
-\begin{verbatim}
+\begin{terminalv}
       Plot something with AUTOGRAPH
       CALL SNX_AGSAV( HEAP )
       Plot something else with AUTOGRAPH
       CALL SNX_AGRES( HEAP )
-\end{verbatim}
+\end{terminalv}
 
 will leave AUTOGRAPH in the same state as it was after the first plot.
 HEAP is a 1-dimensional real array in which SNX\_AGSAV stores
@@ -706,12 +437,12 @@ plotted earlier, something which is for that matter hard to do with GKS itself.
 
 AUTOGRAPH can be made to plot within the current GKS viewport as follows:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL SNX_AGWV
-\end{verbatim}
+\end{terminalv}
 
 This will cause the AUTOGRAPH graph window (the rectangle which
-contains the labels, axes, grid, {\em etc.}) to be coincident with the GKS
+contains the labels, axes, grid, \emph{etc.}) to be coincident with the GKS
 viewport. A specially convenient way to set up a GKS viewport is by means of
 SGS; a call to SNX\_AGWV following any zone creation or selection call will
 cause AUTOGRAPH to arrange its plot within that zone.
@@ -726,15 +457,15 @@ after drawing the graph, or either the background or curve) it
 may be necessary to make additions to the plot or to perform input.
 This can be done conveniently as follows:
 
-\begin{verbatim}
+\begin{terminalv}
       Plot the graph with AUTOGRAPH
       CALL SNX_AGCS
-\end{verbatim}
+\end{terminalv}
 
 The call to SNX\_AGCS sets the extent (in world coordinates) of the
 current SGS zone, presumed to cover the AUTOGRAPH graph
 window (the rectangular area within which the whole AUTOGRAPH
-plot, including labels {\em etc.}, is drawn), so that the AUTOGRAPH
+plot, including labels \emph{etc.}, is drawn), so that the AUTOGRAPH
 grid window (the rectangular
 area within which the curve itself is plotted) has bounds
 (0.0,1.0,0.0,1.0).
@@ -745,10 +476,10 @@ to create another zone covering just the grid window, but
 still with grid coordinates.
 This is easily accomplished by:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL SGS_ZONE( 0.0, 1.0, 0.0, 1.0, IZGW, J )
       CALL SGS_SW( 0.0, 1.0, 0.0, 1.0, J )
-\end{verbatim}
+\end{terminalv}
 
 
 \subsection {SGS/AUTOGRAPH coordinate conversions}
@@ -756,32 +487,32 @@ This is easily accomplished by:
 For data-related plotting and input, four functions are
 provided to perform the necessary coordinate conversions.
 The two sets of coordinates are respectively the grid
-coordinates (GX,GY) and the user ({\em i.e.}\ data) coordinates (UX,UY).
+coordinates (GX,GY) and the user (\emph{i.e.}\ data) coordinates (UX,UY).
 
 \begin{quote}
 To convert a grid x coordinate to a user x coordinate:
 
-\begin{verbatim}
+\begin{terminalv}
       UX = SNX_AGGUX( GX )
-\end{verbatim}
+\end{terminalv}
 
 To convert a grid y coordinate to a user y coordinate:
 
-\begin{verbatim}
+\begin{terminalv}
       UY = SNX_AGGUY( GY )
-\end{verbatim}
+\end{terminalv}
 
 To convert a user x coordinate to a grid x coordinate:
 
-\begin{verbatim}
+\begin{terminalv}
       GX = SNX_AGUGX( UX )
-\end{verbatim}
+\end{terminalv}
 
 To convert a user y coordinate to a grid y coordinate:
 
-\begin{verbatim}
+\begin{terminalv}
       GY = SNX_AGUGY( UY )
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 The grid coordinates are such that the grid window part of
@@ -800,7 +531,7 @@ AUTOGRAPH provides for multiline labels in one of several
 predefined regions of the plot, but can be awkward to use for
 placing character strings in arbitrary places.
 The SPPS routine WTSTR is more suitable for this purpose, but
-operates in user ({\em i.e.}\ data) coordinates, not appropriate for
+operates in user (\emph{i.e.}\ data) coordinates, not appropriate for
 plotting outside the grid window, and expresses the character
 size in low level ``plotter units".
 Character strings can, of course, be plotted directly
@@ -811,9 +542,9 @@ The Starlink extension routine SNX\_WTRST is a further method
 of plotting strings.
 The call is as follows:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL SNX_WRTST( XG, YG, STRING, HG, JOR, JCTR )
-\end{verbatim}
+\end{terminalv}
 
 XG,YG (real) is the position of the string in grid coordinates.
 STRING is the character string to be plotted, and may contain PWRITX codes
@@ -825,7 +556,7 @@ JOR (integer) is the string orientation, in degrees anticlockwise from
 the usual left-to-right.
 JCTR (integer) describes the justification; $-2$ and $-1$ $=$ left,
 0 $=$ centred, +1 and +2 $=$ right, where ``left" means ``the middle of
-the left edge of the leftmost character is at XG,YG" {\em etc.}
+the left edge of the leftmost character is at XG,YG" \emph{etc.}
 The values 0 and $\pm2$ produce proportionally-spaced strings and
 allow fancy characters to be used;
 $\pm1$ produces monospaced strings consisting of ordinary letters
@@ -854,13 +585,13 @@ necessary buffer flushing operations and saves/restores the
 SGS zone, is the SNX\_TO routine.
 This is used as follows:
 
-\begin{verbatim}
+\begin{terminalv}
       Plot with NCAR
       CALL SNX_TO( 'SGS' )
       Plot with SGS
       CALL SNX_TO( 'NCAR' )
       More plotting with NCAR
-\end{verbatim}
+\end{terminalv}
 
 Only the first character of the argument is significant.
 The sequence must begin with the switch to SGS and then alternate strictly.
@@ -869,30 +600,30 @@ When you have just plotted something using an NCAR
 routine (or at least a low level one -- the high level utilities do it
 for you) and wish to switch to SGS or GKS, make the following call:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL PLOTIT( 0, 0, 2 )
-\end{verbatim}
+\end{terminalv}
 
 or if you are switching from SGS:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL SGS_FLUSH
-\end{verbatim}
+\end{terminalv}
 
 or from GKS:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL GUWK( WKID, REGFL )
-\end{verbatim}
+\end{terminalv}
 
 After plotting with AUTOGRAPH, further GKS or SGS work will
 require the coordinate systems to be re-established.
 In SGS this can be done as follows:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL SGS_ICURZ( IZ )
       CALL SGS_SELZ( IZ )
-\end{verbatim}
+\end{terminalv}
 
 This can be omitted if the routine SNX\_AGCS is being called.
 Conversely, the NCAR coordinate systems will need to be saved and
@@ -905,11 +636,11 @@ GETSET and SET.
 
 To input coordinates from a graph plotted with AUTOGRAPH, use the call
 
-\begin{verbatim}
+\begin{terminalv}
       CALL SNX_CURS( X, Y, N )
-\end{verbatim}
+\end{terminalv}
 
-X, Y (real) are user ({\em i.e.}\ data) coordinates.
+X, Y (real) are user (\emph{i.e.}\ data) coordinates.
 Their value when the call is made is used to preset the cursor
 position (if this is possible on the GKS workstation concerned).
 On exit, they are set to the position indicated by the
@@ -918,7 +649,7 @@ The integer N is the SGS choice, and will generally indicate the button
 that has been pressed.
 
 Variations of choice device, cursor visibility, echo type,
-{\em etc.}, may be made by direct SGS/GKS calls before SNX\_CURS is called.
+\emph{etc.}, may be made by direct SGS/GKS calls before SNX\_CURS is called.
 
 Appendix \ref{demo3_sect} contains a demonstration program for SNX\_CURS.
 
@@ -944,14 +675,14 @@ SUN/144 ~~ADAM --- UNIX Version.
 
 \begin{sloppypar}
 Assuming all Starlink directories have been added to the environment variables
-{\bf PATH} and {\bf LD\_LIBRARY\_PATH} (see SUN/118), then to link an ADAM
+\textbf{PATH} and \textbf{LD\_LIBRARY\_PATH} (see SUN/118), then to link an ADAM
 application with SNX the command line would be
 \end{sloppypar}
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 % alink application.o `snx_link_adam`
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 SUN/144 gives further details of compiling and linking ADAM applications
@@ -964,19 +695,19 @@ When developing ADAM applications, all logical names and symbols used
 during compiling and linking are defined by executing the procedures
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 $ ADAMSTART
 $ ADAM_DEV
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 The application may then be compiled using the FORTRAN command and linked using
-the ALINK and MLINK procedures, {\em e.g.}
+the ALINK and MLINK procedures, \emph{e.g.}
 
 \begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 $ ALINK application,NCAR_DIR:SNX_LINK_ADAM/OPT
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 
@@ -1016,30 +747,29 @@ in this document, XYPLOT may be useful as a template for developing
 other simple graphics utilities, and can be used in its own right as a
 convenient way of producing a presentable plot of a list of (x,y)
 data.  The Fortran source may be found in the file NCAR\_DIR:XYPLOT.FOR
-on VAX/VMS and in the archive {\tt
-/star/\-starlink/\-lib/\-snx/\-examples/\-snx-examples\_source.tar} on
+on VAX/VMS and in the archive \texttt{/star/\-starlink/\-lib/\-snx/\-examples/\-snx-examples\_source.tar} on
 UNIX.  On VAX/VMS, this program may be compiled, linked and run using
 the command sequence
 
 \begin {quote}
-\begin{verbatim}
+\begin{terminalv}
 $ FORTRAN NCAR_DIR:XYPLOT
 $ LINK XYPLOT, NCAR_DIR:SNX_LINK/OPT, STAR_LINK/OPT
 $ RUN XYPLOT
-\end{verbatim}
+\end{terminalv}
 \end {quote}
 
 On UNIX, this program may already be installed in directory
-{\tt /star/bin/examples/snx}.  If it has been deinstalled and removed to save
+\texttt{/star/bin/examples/snx}.  If it has been deinstalled and removed to save
 space, you can copy the entire source directory to a scratch dircetory, and
 with the SYSTEM environment variable set appropriately, build and run it thus:
 
 \begin {quote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv SYSTEM alpha_OSF/1
 % ./mk xyplot
 % ./xyplot
-\end{verbatim}
+\end{terminalv}
 \end {quote}
 
 \sloppypar
@@ -1047,15 +777,14 @@ XYPLOT reads an input file and plots a graph.  The input file consists
 of a sequence of alphanumeric records, the first three of which are the
 labels (title, x-axis, y-axis) with the rest each containing an (x,y)
 point (in free format).  The example data may be found in the file
-NCAR\_DIR:XYPLOT.DAT on VAX/VMS and {\tt
-/star/\-bin/\-examples/\-snx/xyplot.dat} on UNIX (if installed).  The
+NCAR\_DIR:XYPLOT.DAT on VAX/VMS and \texttt{/star/\-bin/\-examples/\-snx/xyplot.dat} on UNIX (if installed).  The
 resulting graph consists of a line joining the points in the order in
 which they are given.
 
 \subsection {Fortran source}
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       PROGRAM XYPLOT
 *+
 *     - - - - - - -
@@ -1116,7 +845,7 @@ which they are given.
       END IF
 
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 Notice that most of the program is devoted to reading in the data, and that
@@ -1149,7 +878,7 @@ most real applications would require just plain
 text without PWRITX codes.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
 A Bogus Star 'V:-50IGL'Y'H:-80KRU'C  DLT 1986
 Wavelength / '.A'
 F'GLB'K'NRU' / 10'S'-26'N' erg cm'S'-2'N' s'S'-1'N' '.AS'-1
@@ -1164,7 +893,7 @@ F'GLB'K'NRU' / 10'S'-26'N' erg cm'S'-2'N' s'S'-1'N' '.AS'-1
              :
              :
              :
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 XYPLOT is a convenient tool for quickly debugging complicated label strings.
@@ -1194,43 +923,42 @@ similar to the one from XYPLOT (Appendix \ref{demo1_sect}).  The SPEED
 program demonstrates three different compromises between plotting speed
 and quality of result.  The source and a suitable data file (which is
 the same format as for XYPLOT) are distributed with the SNX software:
-in the directory NCAR\_DIR on VAX/VMS and in the archive {\tt
-/star/\-starlink/\-lib/\-snx/examples/snx-examples.tar} on UNIX.
+in the directory NCAR\_DIR on VAX/VMS and in the archive \texttt{/star/\-starlink/\-lib/\-snx/examples/snx-examples.tar} on UNIX.
 
 On VAX/VMS, this program may be compiled, linked and run using the command
 sequence
 
 \begin {quote}
-\begin{verbatim}
+\begin{terminalv}
 $ FORTRAN NCAR_DIR:SPEED
 $ LINK SPEED, NCAR_DIR:SNX_LINK/OPT, STAR_LINK/OPT
 $ RUN SPEED
-\end{verbatim}
+\end{terminalv}
 \end {quote}
 
 On UNIX, this program may already be installed in directory
-{\tt /star/bin/examples/snx}.  If it has been deinstalled and removed to save
+\texttt{/star/bin/examples/snx}.  If it has been deinstalled and removed to save
 space, you can copy the entire source directory to a scratch dircetory, and
 with the SYSTEM environment variable set appropriately, build and run it thus:
 
 \begin {quote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv SYSTEM alpha_OSF/1
 % ./mk speed
 %./speed
-\end{verbatim}
+\end{terminalv}
 \end {quote}
 
 
 The program will prompt ``Filename?" (respond NCAR\_DIR:SPEED.DAT on VAX/VMS
-and {\bf /star/\-starlink/\-lib/\-snx/speed.dat} on UNIX) and ``Workstation?"
+and \textbf{/star/\-starlink/\-lib/\-snx/speed.dat} on UNIX) and ``Workstation?"
 (give the SGS workstation name).
 The prompt:
 
 \begin {quote}
-\begin{verbatim}
+\begin{terminalv}
     Precision/font?  H=h/w, S=GKS, N=NCAR, E=exit
-\end{verbatim}
+\end{terminalv}
 \end {quote}
 
 will then appear.
@@ -1255,7 +983,7 @@ positions of the individual characters are unchanged.)
 \subsection {Fortran source}
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       PROGRAM SPEED
 
 *+
@@ -1390,7 +1118,7 @@ positions of the individual characters are unchanged.)
  9999 CONTINUE
 
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 
@@ -1404,7 +1132,7 @@ PWRITX function codes as these will not work when
 the ``S" or ``H" options are used.
 
 \small
-\begin{verbatim}
+\begin{terminalv}
 Simulated Stellar Spectrum
 Wavelength
 Flux
@@ -1420,7 +1148,7 @@ Flux
              :
              :
              :
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 
@@ -1433,30 +1161,30 @@ the scale running right to left.
 The objective is to demonstrate the SNX\_CURS input routine, and to show that
 data coordinates can be read in and used.
 Again, the source is distributed with the SNX software: in the directory
-NCAR\_DIR on VAX/VMS and {\bf /star/\-starlink/\-lib/\-snx/examples} on UNIX.
+NCAR\_DIR on VAX/VMS and \textbf{/star/\-starlink/\-lib/\-snx/examples} on UNIX.
 
 On VAX/VMS, this program may be compiled, linked and run using the command
 sequence
 
 \begin {quote}
-\begin{verbatim}
+\begin{terminalv}
 $ FORTRAN NCAR_DIR:INDEMO
 $ LINK INDEMO, NCAR_DIR:SNX_LINK/OPT, STAR_LINK/OPT
 $ RUN INDEMO
-\end{verbatim}
+\end{terminalv}
 \end {quote}
 
 On UNIX, this program may already be installed in directory
-{\tt /star/bin/examples/snx}.  If it has been deinstalled and removed to save
+\texttt{/star/bin/examples/snx}.  If it has been deinstalled and removed to save
 space, you can copy the entire source directory to a scratch dircetory, and
 with the SYSTEM environment variable set appropriately, build and run it thus:
 
 \begin {quote}
-\begin{verbatim}
+\begin{terminalv}
 % setenv SYSTEM alpha_OSF/1
 % ./mk indemo
 % ./indemo
-\end{verbatim}
+\end{terminalv}
 \end {quote}
 
 Give the SGS workstation name in response to the ``Workstation?" prompt.
@@ -1472,7 +1200,7 @@ or a zero cursor choice entered.
 \subsection {Fortran source}
 
 \small
-\begin{verbatim}
+\begin{terminalv}
       PROGRAM INDEMO
 
 *+
@@ -1566,7 +1294,7 @@ or a zero cursor choice entered.
       CALL sgs_CLOSE
 
       END
-\end{verbatim}
+\end{terminalv}
 \normalsize
 
 
@@ -1575,23 +1303,23 @@ or a zero cursor choice entered.
 The special version of the AGPWRT routine described earlier uses the
 PWRITX routine to plot the required character string.  A feature of
 this routine is that function codes can be embedded in the character
-string to select different fonts, draw subscripts, {\em etc.} These
+string to select different fonts, draw subscripts, \emph{etc.} These
 function codes are the ones you will need to use if you wish to have
-Greek letters, {\em etc.}\ in your labels.  The AGPWRITX documentation
+Greek letters, \emph{etc.}\ in your labels.  The AGPWRITX documentation
 is given below, and is followed by a plot showing all the available
 characters (the Roman characters being those in the ``complex" font).
 
-\begin{verbatim}
+\begin{terminalv}
       SUBROUTINE AGPWRT( XPOS, YPOS, CHRS, NCHS, ISIZ, IORI, ICEN )
-\end{verbatim}
+\end{terminalv}
 
 This routine is a substitute for the NCAR routine of the
 same name, but allowing the PWRITX character drawing routine
 to be used instead of the usual PWRIT, giving access to special fonts,
-{\em etc.}
+\emph{etc.}
 
 The character string accepted by the PWRITX routine includes
-control codes to switch font, {\em etc.}
+control codes to switch font, \emph{etc.}
 This implementation of
 AGPWRT accepts and passes PWRITX codes and also inserts the
 appropriate codes where lowercase and certain other characters
@@ -1625,7 +1353,7 @@ Given:
 
 \begin{tabular}{llll}
  & XPOS,YPOS & r,r & string position in SPPS user coordinates\\
- & CHRS,NCHS & c,i & string and length, inclusive of codes, {\em etc.}\\
+ & CHRS,NCHS & c,i & string and length, inclusive of codes, \emph{etc.}\\
  & ISIZ & i & character size\\
  & IORI & i & orientation\\
  & ICEN & i & justification, or PWRIT/PWRITX selection
@@ -1776,7 +1504,7 @@ Function codes:
 \begin{quote}
 Function codes are sequences of characters, enclosed within
 apostrophes, which may (except when ICEN$=\pm1$) be included in the
-character string CHRS to change font, case, {\em etc.}\ within the plotted
+character string CHRS to change font, case, \emph{etc.}\ within the plotted
 string.
 No punctuation is needed between functions except for a
 comma between adjacent numbers;  however, commas may be used between
@@ -1794,8 +1522,8 @@ FONT ALPHABET
 
 \begin{quote}
 \begin{tabular}{ll}
-R & Roman characters, {\em etc.}\\
-G & Greek characters, {\em etc.}
+R & Roman characters, \emph{etc.}\\
+G & Greek characters, \emph{etc.}
 \end{tabular}
 \end{quote}
 
@@ -1862,13 +1590,13 @@ specified number of characters.
 The N option returns character, case and size to that of the
 base but maintains the current character position.
 
-\begin{verbatim}
+\begin{terminalv}
    For example:  'U1'T'S1'EST    will be drawn   e
                                                 Tst
 
            and   'U1'T'S'E'N'ST  will be drawn   e
                                                 T st
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 DIRECT CONTROL OVER POSITION
@@ -1943,9 +1671,9 @@ SPECIAL CHARACTERS
 For example, to draw a string meaning ``three Angstrom units per
 millimetre" we might use:
 
-\begin{verbatim}
+\begin{terminalv}
       CALL AGPWRT( XPOS, YPOS, '3''.A''/mm', ...
-\end{verbatim}
+\end{terminalv}
 \end{quote}
 
 DIRECT CHARACTER ACCESS
