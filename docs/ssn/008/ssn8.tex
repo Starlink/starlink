@@ -1,57 +1,19 @@
-\documentstyle{article}
-\pagestyle{myheadings}
+\documentclass[noabs,11pt,nolof]{starlink}
 
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink System Note}
-\newcommand{\stardocinitials}  {SSN}
-\newcommand{\stardocnumber}    {8.1}
-\newcommand{\stardocauthors}   {R.F. Warren-Smith}
-\newcommand{\stardocdate}      {6th March 1991}
-\newcommand{\stardoctitle}     {Naming Conventions for Accessing \\[1ex]
+\stardoccategory    {Starlink System Note}
+\stardocinitials    {SSN}
+\stardocnumber      {8.1}
+\stardocauthors     {R.F. Warren-Smith}
+\stardocdate        {6th March 1991}
+\stardoctitle     {Naming Conventions for Accessing \\[1ex]
                                 Starlink Subroutine Libraries}
 %------------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{240mm}
-\setlength{\topmargin}{-5mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-%------------------------------------------------------------------------------
-% Add any \newcommand or \newenvironment commands here
+% Add any \providecommand or \newenvironment commands here
 %------------------------------------------------------------------------------
 
 \begin{document}
-\thispagestyle{empty}
-SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
-RUTHERFORD APPLETON LABORATORY\\
-{\large\bf Starlink Project\\}
-{\large\bf \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Large\bf \stardoctitle}
-\end{center}
-\vspace{5mm}
-
-%------------------------------------------------------------------------------
-%  Add this part if you want a table of contents
-\setlength{\parskip}{0mm}
-\tableofcontents
-\setlength{\parskip}{\medskipamount}
-\markright{\stardocname}
-%------------------------------------------------------------------------------
+\scfrontmatter
 
 \section{Introduction}
 
@@ -96,7 +58,7 @@ other software to assimilate new features when the library is upgraded
 without the need to re-link the calling software.
 The linking procedures themselves are also simplified by removing the need
 to know about, or to specify, all the sub-libraries (or sub-sub-libraries
-{\em etc.}) which may be required.
+\emph{etc.}) which may be required.
 
 However, shareable images place a responsibility on the developer of a
 subroutine library to ensure that any modifications which may be made are
@@ -105,7 +67,7 @@ Any changes which would require the calling software to be re-linked will
 take a long time to propagate through all affected software and should
 always be avoided.
 In particular, the need to ensure upward-compatibility of shareable image
-{\em transfer vectors} must be appreciate --- the VAX Linker Utility
+\emph{transfer vectors} must be appreciate --- the VAX Linker Utility
 Manual should be consulted for details.
 
 In some cases, the use of a shareable image may not be possible or
@@ -146,7 +108,7 @@ other supporting software will not be available.
 To satisfy these requirements, it is anticipated that many Starlink
 libraries will be made available in two ``compatibility levels''.
 
-The ``{\em stand-alone}'' version of a library will be a general-purpose
+The ``\emph{stand-alone}'' version of a library will be a general-purpose
 implementation which is intended for use on its own, separate from any
 pre-defined programming environment.
 Such a library may call the stand-alone versions of other Starlink
@@ -156,7 +118,7 @@ The stand-alone version of a library is provided for use by applications
 which do not intend to integrate closely with any particular programming
 environment.
 
-Conversely, the {\em ADAM} version of a library will be closely bound to the
+Conversely, the \emph{ADAM} version of a library will be closely bound to the
 Starlink ADAM programming environment, which allows a closer degree of
 cooperation between separate libraries (in particular through the use of the
 ADAM parameter system).
@@ -172,21 +134,21 @@ use of ADAM facilities.
 The naming conventions described in this document are based upon the use of
 a unique name for each subroutine library together with a simple unique
 abbreviation of it.
-This abbreviation is commonly referred to as the {\em library prefix},
+This abbreviation is commonly referred to as the \emph{library prefix},
 although both it and the full library name are used as prefixes when
 constructing logical names and DCL symbols associated with the library.
 
 In the remainder of this document, the library name:
 
-\begin{verbatim}
-   LIBRARY
-\end{verbatim}
+\begin{terminalv}
+LIBRARY
+\end{terminalv}
 
 and its abbreviation:
 
-\begin{verbatim}
-   LIB
-\end{verbatim}
+\begin{terminalv}
+LIB
+\end{terminalv}
 
 are used to denote these, with the understanding that they should be
 replaced with the specific library name or prefix in question.
@@ -201,7 +163,7 @@ a double underscore `\_\_'.}
 \paragraph{Library names.}
 The library name LIBRARY is the name or acronym used to identify
 the library as a software item in the Starlink Software Index.\footnote{Some
-existing libraries ({\em e.g.}\ PAR) are not distributed as separate
+existing libraries (\emph{e.g.}\ PAR) are not distributed as separate
 software items, but all new libraries should be designed with separate
 distribution in mind.}
 Thus examples of library names are:
@@ -209,12 +171,12 @@ Thus examples of library names are:
 \begin{quote}
 \begin{center}
 \begin{tabular}{ll}
-CHR & {\em Character Handling Routines} \\
-EMS & {\em Error and Message Service} \\
-HDS & {\em Hierarchical Data System} \\
-IDI & {\em Image Display Interface} \\
-PRIMDAT & {\em Primitive Data Processing} \\
-SGS & {\em Simple Graphics System}
+CHR & \emph{Character Handling Routines} \\
+EMS & \emph{Error and Message Service} \\
+HDS & \emph{Hierarchical Data System} \\
+IDI & \emph{Image Display Interface} \\
+PRIMDAT & \emph{Primitive Data Processing} \\
+SGS & \emph{Simple Graphics System}
 \end{tabular}
 \end{center}
 \end{quote}
@@ -226,7 +188,7 @@ should contain only alphanumeric characters (no underscores are allowed).
 Existing library names should not be re-used (see the Starlink Software
 Index for a list of names currently in use) and potentially confusing names
 should be avoided.
-In particular, names or terms which are used for other purposes ({\em e.g.}\
+In particular, names or terms which are used for other purposes (\emph{e.g.}\
 command names), or which have potentially ambiguous meanings, should not be
 used as library names.
 
@@ -240,7 +202,7 @@ The prefixes for the libraries above are:
 
 \begin{quote}
 \begin{center}
-{\tt CHR, EMS, HDS, IDI, PRM, SGS}
+\texttt{CHR, EMS, HDS, IDI, PRM, SGS}
 \end{center}
 \end{quote}
 
@@ -252,7 +214,7 @@ Thus, routines in the SGS library have names such as:
 
 \begin{quote}
 \begin{center}
-{\tt SGS\_LINE, SGS\_SHTX,} {\em etc.}
+\texttt{SGS\_LINE, SGS\_SHTX,} \emph{etc.}
 \end{center}
 \end{quote}
 
@@ -265,7 +227,7 @@ some of them internally:
 
 \begin{quote}
 \begin{center}
-{\tt CMP, DAT, DAU, EXC, HDS, PRO, REC}
+\texttt{CMP, DAT, DAU, EXC, HDS, PRO, REC}
 \end{center}
 \end{quote}
 
@@ -281,9 +243,9 @@ Starlink project team at RAL.
 
 For each library, a logical name of the following standard form:
 
-\begin{verbatim}
-   LIBRARY_DIR
-\end{verbatim}
+\begin{terminalv}
+LIBRARY_DIR
+\end{terminalv}
 
 should be defined to identify the directory in which user-accessible files
 reside.
@@ -295,9 +257,9 @@ be changed.
 The library directory name should be defined in the system logical name
 table by means of a suitable command in the SSC:STARTUP.COM file, such as:
 
-\begin{verbatim}
-   $ DEFINE/SYSTEM LIBRARY_DIR <disk>:<directory>
-\end{verbatim}
+\begin{terminalv}
+$ DEFINE/SYSTEM LIBRARY_DIR <disk>:<directory>
+\end{terminalv}
 
 This command will then be executed at system startup.
 Other software may test for the existence or non-existence of the directory
@@ -316,12 +278,12 @@ without further preparation once the Starlink login file has been executed
 using the command:\footnote{Except that ADAM applications will also require
 the \$ADAMSTART command.}
 
-\begin{verbatim}
-   $ @SSC:LOGIN
-\end{verbatim}
+\begin{terminalv}
+$ @SSC:LOGIN
+\end{terminalv}
 
-However, additional logical name definitions ({\em e.g.}\ for include files,
-{\em etc.}) will usually be needed if software development is planned.
+However, additional logical name definitions (\emph{e.g.}\ for include files,
+\emph{etc.}) will usually be needed if software development is planned.
 Each library should therefore provide a DCL command file whose purpose is to
 define any logical names and/or DCL symbols needed when developing software
 which calls the library.
@@ -329,17 +291,17 @@ which calls the library.
 This file should reside in the library directory and a DCL global symbol of
 the following standard form:
 
-\begin{verbatim}
-   LIB_DEV
-\end{verbatim}
+\begin{terminalv}
+LIB_DEV
+\end{terminalv}
 
 should be defined in order to execute it.
 This symbol should be defined by means of a suitable command in the Starlink
 login file SSC:LOGIN.COM, such as:
 
-\begin{verbatim}
-   $ LIB_DEV :== @LIBRARY_DIR:LIB_DEV
-\end{verbatim}
+\begin{terminalv}
+$ LIB_DEV :== @LIBRARY_DIR:LIB_DEV
+\end{terminalv}
 
 where LIB\_DEV.COM is the command file in question (this file name is
 recommended for future use but existing files which serve the same purpose
@@ -352,9 +314,9 @@ allows software development.
 A software developer wishing to make use of the library's facilities should
 first execute the command:
 
-\begin{verbatim}
-   $ LIB_DEV
-\end{verbatim}
+\begin{terminalv}
+$ LIB_DEV
+\end{terminalv}
 
 to set up the appropriate development environment.
 A sequence of such commands might typically be placed in a LOGIN.COM file in
@@ -364,9 +326,9 @@ commands in their own startup procedures.
 To facilitate this type of use, a library's startup file should ensure that
 if the command issued is of the form:
 
-\begin{verbatim}
-   $ LIB_DEV NOLOG
-\end{verbatim}
+\begin{terminalv}
+$ LIB_DEV NOLOG
+\end{terminalv}
 
 then the presence of ``NOLOG'' as the first parameter will suppress the
 output of any informational message.
@@ -383,7 +345,7 @@ names of the following standard form in order to identify them:
 \begin{quote}
 \begin{tabular}{rl}
 & LIB\_IMAGE\\
-{\em and/or} & LIB\_IMAGE\_ADAM
+\emph{and/or} & LIB\_IMAGE\_ADAM
 \end{tabular}
 \end{quote}
 
@@ -409,10 +371,10 @@ The logical names identifying a library's shareable images should be defined
 in the system logical name table at system startup by means of suitable
 commands in the SSC:STARTUP.COM file, such as:
 
-\begin{verbatim}
-   $ DEFINE/SYSTEM LIB_IMAGE      LIBRARY_DIR:LIB_IMAGE
-   $ DEFINE/SYSTEM LIB_IMAGE_ADAM LIBRARY_DIR:LIB_IMAGE_ADAM
-\end{verbatim}
+\begin{terminalv}
+$ DEFINE/SYSTEM LIB_IMAGE      LIBRARY_DIR:LIB_IMAGE
+$ DEFINE/SYSTEM LIB_IMAGE_ADAM LIBRARY_DIR:LIB_IMAGE_ADAM
+\end{terminalv}
 
 where LIB\_IMAGE.EXE and LIB\_IMAGE\_ADAM.EXE are the shareable image files
 in question (these file names are recommended for future use but existing
@@ -428,8 +390,8 @@ logical names of the following standard form in order to identify them:
 
 \begin{quote}
 \begin{tabular}{rl}
-& {\tt LIB\_LINK} \\
-{\em and/or} & {\tt LIB\_LINK\_ADAM}
+& \texttt{LIB\_LINK} \\
+\emph{and/or} & \texttt{LIB\_LINK\_ADAM}
 \end{tabular}
 \end{quote}
 
@@ -440,17 +402,17 @@ corresponding logical name should be left undefined.
 
 Normally the options file for linking with a shareable image will refer
 directly to that image, which should be identified by its logical name
-according to the conventions in \S\ref{ss:imagenames}, {\em e.g:}
+according to the conventions in \S\ref{ss:imagenames}, \emph{e.g:}
 
-\begin{verbatim}
-   LIB_IMAGE/SHARE
-\end{verbatim}
+\begin{terminalv}
+LIB_IMAGE/SHARE
+\end{terminalv}
 
 or
 
-\begin{verbatim}
-   LIB_IMAGE_ADAM/SHARE
-\end{verbatim}
+\begin{terminalv}
+LIB_IMAGE_ADAM/SHARE
+\end{terminalv}
 
 In cases where there is no difference between the stand-alone and ADAM
 executable images, both versions of the linker options file should
@@ -462,25 +424,24 @@ ADAM linking processes will differ.
 Thus, a stand-alone application might be linked with a particular library as
 follows:
 
-\begin{verbatim}
-   $ LIB_DEV               ! Done initially, normally in a LOGIN.COM file
-   $ FORTRAN MYPROG
-   $ LINK MYPROG,LIB_LINK/OPT
-\end{verbatim}
+\begin{terminalv}
+$ LIB_DEV               ! Done initially, normally in a LOGIN.COM file
+$ FORTRAN MYPROG
+$ LINK MYPROG,LIB_LINK/OPT
+\end{terminalv}
 
 while an ADAM application would be linked thus:
 
-\begin{verbatim}
-   $ LIB_DEV               ! Done initially, normally in a LOGIN.COM file
-   $ FORTRAN MYPROG
-   $ ALINK MYPROG,LIB_LINK_ADAM/OPT
-\end{verbatim}
+\begin{terminalv}
+$ LIB_DEV               ! Done initially, normally in a LOGIN.COM file
+$ FORTRAN MYPROG
+$ ALINK MYPROG,LIB_LINK_ADAM/OPT
+\end{terminalv}
 
 Note that only those libraries explicitly referenced in the application need
 be considered when constructing a linker command line.
 Any sub-libraries called at lower levels will be included automatically
-through having previously been linked into those shareable images which {\bf
-are} referenced.
+through having previously been linked into those shareable images which \textbf{are} referenced.
 
 In practice, explicit reference to startup commands or linker options files
 will not normally be required in order to access libraries which form part
@@ -498,10 +459,10 @@ The logical names identifying the linker options files should be defined in
 the process logical name table by means of suitable commands in the library
 startup file (\S\ref{ss:librarystartup}), such as:
 
-\begin{verbatim}
-   $ DEFINE/NOLOG LIB_LINK      LIBRARY_DIR:LIB_LINK
-   $ DEFINE/NOLOG LIB_LINK_ADAM LIBRARY_DIR:LIB_LINK_ADAM
-\end{verbatim}
+\begin{terminalv}
+$ DEFINE/NOLOG LIB_LINK      LIBRARY_DIR:LIB_LINK
+$ DEFINE/NOLOG LIB_LINK_ADAM LIBRARY_DIR:LIB_LINK_ADAM
+\end{terminalv}
 
 where LIB\_LINK.OPT and LIB\_LINK\_ADAM.OPT are the linker options files in
 question (these file names are recommended for future use but existing files
@@ -517,17 +478,17 @@ Subroutine libraries may provide Fortran include files for public use and
 should define logical names to access them as follows:
 
 \begin{quote}
-{\tt LIB\_ERR} --- {\em Error codes associated with the library} \\
-{\tt LIB\_PAR} --- {\em Other constants defined by PARAMETER statements}
+\texttt{LIB\_ERR} --- \emph{Error codes associated with the library} \\
+\texttt{LIB\_PAR} --- \emph{Other constants defined by PARAMETER statements}
 \end{quote}
 
 Users of include files should always refer to them by their logical names,
-{\em e.g:}
+\emph{e.g:}
 
-\begin{verbatim}
-      INCLUDE 'LIB_ERR'
-      INCLUDE 'LIB_PAR'
-\end{verbatim}
+\begin{terminalv}
+INCLUDE 'LIB_ERR'
+INCLUDE 'LIB_PAR'
+\end{terminalv}
 
 No distinction is drawn between ADAM and stand-alone versions of include
 files because, in practice, they will always be the same (there being no
@@ -552,15 +513,16 @@ mandatory part of the library naming conventions and which are optional.
 Definitions such as the following will normally be required in
 SSC:STARTUP.COM (the Starlink system startup
 file\footnote{Note, however, that Starlink software items which are
-considered ``optional'' have their startup commands placed in a {\em
-local\/} version of the Starlink STARTUP.COM and LOGIN.COM files which
+considered ``optional'' have their startup commands placed in a \emph{local\/} version of the Starlink STARTUP.COM and LOGIN.COM files which
 reside in the LSSC: directory.}):
 
-\begin{verbatim}
-   $ DEFINE/SYSTEM LIBRARY_DIR    <disk>:<directory>         ! Library directory name
-   $ DEFINE/SYSTEM LIB_IMAGE      LIBRARY_DIR:LIB_IMAGE      ! Stand-alone shareable image
-   $ DEFINE/SYSTEM LIB_IMAGE_ADAM LIBRARY_DIR:LIB_IMAGE_ADAM ! ADAM shareable image
-\end{verbatim}
+\begin{small}
+\begin{terminalv}
+$ DEFINE/SYSTEM LIBRARY_DIR    <disk>:<directory>         ! Library directory name
+$ DEFINE/SYSTEM LIB_IMAGE      LIBRARY_DIR:LIB_IMAGE      ! Stand-alone shareable image
+$ DEFINE/SYSTEM LIB_IMAGE_ADAM LIBRARY_DIR:LIB_IMAGE_ADAM ! ADAM shareable image
+\end{terminalv}
+\end{small}
 
 These logical name definitions are mandatory, except that if either image
 file does not exist, then the corresponding logical name should be left
@@ -575,9 +537,9 @@ given above are a recommendation for future use.
 A definition such as the following will normally be required in
 SSC:LOGIN.COM (the Starlink login file\footnotemark[\thefootnote]):
 
-\begin{verbatim}
-   $ LIB_DEV :== @LIBRARY_DIR:LIB_DEV
-\end{verbatim}
+\begin{terminalv}
+$ LIB_DEV :== @LIBRARY_DIR:LIB_DEV
+\end{terminalv}
 
 This global symbol definition is mandatory unless the library is installed
 in a form which does not permit software development, in which case it
@@ -595,13 +557,13 @@ given above is a recommendation for future use.
 Definitions such as the following will normally be required in the library
 startup file which is executed by the \$LIB\_DEV command:
 
-\begin{verbatim}
-   $ DEFINE/NOLOG LIB_LINK      LIBRARY_DIR:LIB_LINK      ! Stand-alone link options
-   $ DEFINE/NOLOG LIB_LINK_ADAM LIBRARY_DIR:LIB_LINK_ADAM ! ADAM link options
-   $ DEFINE/NOLOG LIB_ERR       LIBRARY_DIR:LIB_ERR       ! Error codes
-   $ DEFINE/NOLOG LIB_PAR       LIBRARY_DIR:LIB_PAR       ! Other constants
-   $ DEFINE/NOLOG LIB_?????     LIBRARY_DIR:LIB_?????     ! Any other include files
-\end{verbatim}
+\begin{terminalv}
+$ DEFINE/NOLOG LIB_LINK      LIBRARY_DIR:LIB_LINK      ! Stand-alone link options
+$ DEFINE/NOLOG LIB_LINK_ADAM LIBRARY_DIR:LIB_LINK_ADAM ! ADAM link options
+$ DEFINE/NOLOG LIB_ERR       LIBRARY_DIR:LIB_ERR       ! Error codes
+$ DEFINE/NOLOG LIB_PAR       LIBRARY_DIR:LIB_PAR       ! Other constants
+$ DEFINE/NOLOG LIB_?????     LIBRARY_DIR:LIB_?????     ! Any other include files
+\end{terminalv}
 
 These logical name definitions are mandatory, except that if any of the
 files do not exist, then the corresponding name should be left undefined.
@@ -618,26 +580,26 @@ provide and the logical names or symbols to be used to refer to them:
 \begin{center}
 \begin{tabular}{|l|l|l|l|}
 \hline
-{\bf File/Directory} & {\bf Purpose} & {\bf Name/Symbol} & {\bf Defined in...} \\
+\textbf{File/Directory} & \textbf{Purpose} & \textbf{Name/Symbol} & \textbf{Defined in...} \\
 \hline \hline
-{\tt <disk>:<directory>} & {\em Library directory}
-   & {\tt LIBRARY\_DIR} & {\tt SSC:STARTUP.COM} \\
-{\tt LIB\_IMAGE.EXE} & {\em Stand-alone shareable image}
-   & {\tt LIB\_IMAGE} & {\tt SSC:STARTUP.COM} \\
-{\tt LIB\_IMAGE\_ADAM.EXE} & {\em ADAM shareable image}
-   & {\tt LIB\_IMAGE\_ADAM} & {\tt SSC:STARTUP.COM} \\
-{\tt LIB\_DEV.COM} & {\em Library startup file}
-   & {\tt LIB\_DEV} & {\tt SSC:LOGIN.COM} \\
-{\tt LIB\_LINK.OPT} & {\em Stand-alone link options file}
-   & {\tt LIB\_LINK} & {\tt LIBRARY\_DIR:LIB\_DEV.COM} \\
-{\tt LIB\_LINK\_ADAM.OPT} & {\em ADAM link options file}
-   & {\tt LIB\_LINK\_ADAM} & {\tt LIBRARY\_DIR:LIB\_DEV.COM} \\
-{\tt LIB\_ERR.FOR} & {\em Error codes (include file)}
-   & {\tt LIB\_ERR} & {\tt LIBRARY\_DIR:LIB\_DEV.COM} \\
-{\tt LIB\_PAR.FOR} & {\em Other constants (include file)}
-   & {\tt LIB\_PAR} & {\tt LIBRARY\_DIR:LIB\_DEV.COM} \\
-{\tt LIB\_?????.FOR} & {\em Any other include files}
-   & {\tt LIB\_?????} & {\tt LIBRARY\_DIR:LIB\_DEV.COM} \\
+\texttt{<disk>:<directory>} & \emph{Library directory}
+   & \texttt{LIBRARY\_DIR} & \texttt{SSC:STARTUP.COM} \\
+\texttt{LIB\_IMAGE.EXE} & \emph{Stand-alone shareable image}
+   & \texttt{LIB\_IMAGE} & \texttt{SSC:STARTUP.COM} \\
+\texttt{LIB\_IMAGE\_ADAM.EXE} & \emph{ADAM shareable image}
+   & \texttt{LIB\_IMAGE\_ADAM} & \texttt{SSC:STARTUP.COM} \\
+\texttt{LIB\_DEV.COM} & \emph{Library startup file}
+   & \texttt{LIB\_DEV} & \texttt{SSC:LOGIN.COM} \\
+\texttt{LIB\_LINK.OPT} & \emph{Stand-alone link options file}
+   & \texttt{LIB\_LINK} & \texttt{LIBRARY\_DIR:LIB\_DEV.COM} \\
+\texttt{LIB\_LINK\_ADAM.OPT} & \emph{ADAM link options file}
+   & \texttt{LIB\_LINK\_ADAM} & \texttt{LIBRARY\_DIR:LIB\_DEV.COM} \\
+\texttt{LIB\_ERR.FOR} & \emph{Error codes (include file)}
+   & \texttt{LIB\_ERR} & \texttt{LIBRARY\_DIR:LIB\_DEV.COM} \\
+\texttt{LIB\_PAR.FOR} & \emph{Other constants (include file)}
+   & \texttt{LIB\_PAR} & \texttt{LIBRARY\_DIR:LIB\_DEV.COM} \\
+\texttt{LIB\_?????.FOR} & \emph{Any other include files}
+   & \texttt{LIB\_?????} & \texttt{LIBRARY\_DIR:LIB\_DEV.COM} \\
 \hline
 \end{tabular}
 \end{center}
