@@ -19,10 +19,11 @@ C (3-May-1983)
 C  5-Aug-1986 - add GREXEC support [AFT].
 C  6-Sep-1989 - standardize [TJP].
 C 20-Apr-1995 - Verbose PS file support.  If PGPLOT_PS_VERBOSE_TEXT is
-C               defined, text strings in PS files are preceded by a 
+C               defined, text strings in PS files are preceded by a
 C               comment with the text of the string plotted as vectors
 C               [TJP after D.S.Briggs].
 C  4-Feb-1997 - grexec requires an RBUF array, not a scalar [TJP].
+C  6-Feb-2015 - PostScript Fonts support
 C-----------------------------------------------------------------------
       INCLUDE 'grpckg1.inc'
       LOGICAL ABSXY,UNUSED,VISBLE,CENTER
@@ -37,7 +38,8 @@ C-----------------------------------------------------------------------
       INTEGER SLEN, GRTRIM
       INTRINSIC ABS, COS, LEN, MIN, SIN
       CHARACTER DEVTYP*14, STEMP*258
-      LOGICAL DEVINT, VTEXT
+      LOGICAL DEVINT, VTEXT, PSFONT
+      CHARACTER*2 SFONT
 C
 C Check that there is something to be plotted.
 C
@@ -58,6 +60,7 @@ C
 C Put device dependent code here or at end
 C
       VTEXT = .FALSE.
+      PSFONT = .FALSE.
       CALL GRQTYP (DEVTYP, DEVINT)
       IF ((DEVTYP.EQ.'PS').OR.(DEVTYP.EQ.'VPS').OR.
      1    (DEVTYP.EQ.'CPS').OR.(DEVTYP.EQ.'VCPS')) THEN
@@ -68,6 +71,13 @@ C
             STEMP = '% Start "' // STRING(1:SLEN) // '"'
             CALL GREXEC (GRGTYP, 23, RBUF, 0, STEMP, SLEN+10)
          END IF
+         CALL GRGENV('PS_FONT', STEMP, I)
+         CALL GRLOWCASE(STEMP)
+         IF(I.GE.2)THEN
+           PSFONT= STEMP(1:I).NE.'no'
+         ELSE
+           PSFONT= .false.
+         ENDIF
       END IF
 C
 C Save current viewport, and open the viewport to include the full
@@ -94,6 +104,40 @@ C
       IFNTLV = 0
       DX = 0.0
       DY = 0.0
+C----------------------- PostScript fonts handling
+      SLEN = GRTRIM(STRING)
+      IF(PSFONT)THEN
+C check for \ sequences
+        I=1
+ 301    CONTINUE
+        IF (PSFONT .and. STRING(I:I) .eq. '\' )THEN
+          I=I+1
+          SFONT=STRING(I:I+1)
+          CALL GRLOWCASE(SFONT)
+          IF(SFONT(1:1).eq.'f'.or. SFONT(1:1).eq.'g')I=I+1
+C sequences that unset PSFONT:
+          IF(SFONT(1:1).eq.'f'.and. SFONT(2:2).eq.'s')PSFONT= .false.
+          IF(SFONT(1:1).eq.'(' .or. SFONT(1:1).eq.'m')PSFONT= .false.
+        ENDIF
+        I=I+1
+        IF(I .LT. SLEN)GOTO 301
+      ENDIF
+
+      IF(PSFONT)THEN
+        IF (.NOT.GRPLTD(GRCIDE)) CALL GRBPIC
+        RBUF(2)=XORG
+        RBUF(3)=YORG
+        RBUF(4)=FACTOR
+        RBUF(5)=ORIENT
+        RBUF(6)=GRCFNT(GRCIDE)
+        IP=30
+        CALL GREXEC (GRGTYP, IP, RBUF, 0, STRING, SLEN)
+        DX = RBUF(2)
+        DY = RBUF(3)
+        XORG = XORG + DX
+        YORG = YORG + DY
+      ELSE
+C-----------------------
 C
 C Convert the string to a list of symbol numbers; to prevent overflow
 C of array LIST, the length of STRING is limited to 256 characters.
@@ -157,11 +201,15 @@ C                 ! backspace
   330     XORG = XORG + DX*FNTFAC
           YORG = YORG + DY*FNTFAC
   380 CONTINUE
+C-----------------------end if PostScript fonts handling
+      ENDIF
+C-----------------------
 C
 C Set pen position ready for next character.
 C
       GRXPRE(GRCIDE) = XORG
       GRYPRE(GRCIDE) = YORG
+
 C
 C Another possible device dependent section
 C
@@ -179,3 +227,19 @@ C
       CALL GRSLS(LSTYLE)
 C
       END
+C ------------------------------------
+C subroutine GRLOWCASE : convert string to lower case
+
+      subroutine GRLOWCASE (text)
+      character*(*) text
+C convert text to lower case
+
+      character*1 symbol
+
+      do 45 i=1, LEN(text)
+       symbol= text(i:i)
+       if (symbol .ge. 'A' .and. symbol .le. 'Z') then
+        text(i:i)= char(ichar(symbol) - ichar('A') + ichar('a'))
+       endif
+  45  continue
+      end
