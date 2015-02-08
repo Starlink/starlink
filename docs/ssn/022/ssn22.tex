@@ -1,56 +1,24 @@
-\documentstyle[11pt]{article}
-\pagestyle{myheadings}
+\documentclass[11pt,nolof,noabs]{starlink}
+
 
 %------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink System Note}
-\newcommand{\stardocinitials}  {SSN}
-\newcommand{\stardocnumber}    {22.3}
-\newcommand{\stardocauthors}   {P.\,T.\,Wallace \& M.\,J.\,Bly}
-\newcommand{\stardocdate}      {8 June 1992}
-\newcommand{\stardoctitle}     {Coordinate Systems for Pixel Arrays}
+\stardoccategory    {Starlink System Note}
+\stardocinitials    {SSN}
+\stardocnumber      {22.3}
+\stardocauthors     {P.\,T.\,Wallace \& M.\,J.\,Bly}
+\stardocdate        {8 June 1992}
+\stardoctitle       {Coordinate Systems for Pixel Arrays}
 %------------------------------------------------------------------------------
 
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
+%------------------------------------------------------------------------------
+% Add any \providecommand or \newenvironment commands here
+
 \setlength{\unitlength}{1mm}
 
 %------------------------------------------------------------------------------
-% Add any \newcommand or \newenvironment commands here
-%------------------------------------------------------------------------------
 
 \begin{document}
-\thispagestyle{empty}
-SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
-RUTHERFORD APPLETON LABORATORY\\
-{\large\bf Starlink Project\\}
-{\large\bf \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Large\bf \stardoctitle}
-\end{center}
-\vspace{5mm}
-
-%------------------------------------------------------------------------------
-%  Add this part if you want a table of contents
-%  \setlength{\parskip}{0mm}
-%  \tableofcontents
-%  \setlength{\parskip}{\medskipamount}
-%  \markright{\stardocname}
-%------------------------------------------------------------------------------
+\scfrontmatter
 
 \section{Background}
 
@@ -110,9 +78,8 @@ For a Fortran array DIMENSION A(I,J):
 
 \vspace{10mm}
 
-Note that this conforms to the existing IDI output routines, but that  {\em
-(i)}\/~the current GKS draw pixel array implementation is reversed in y and
-{\em (ii)}\/~ DAOPHOT's coordinate system differs by 0.5 pixels in each
+Note that this conforms to the existing IDI output routines, but that  \emph{(i)}\/~the current GKS draw pixel array implementation is reversed in y and
+\emph{(ii)}\/~ DAOPHOT's coordinate system differs by 0.5 pixels in each
 direction.
 
 \end{document}
