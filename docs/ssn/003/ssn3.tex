@@ -1,294 +1,55 @@
-\documentstyle{article}
-\pagestyle{myheadings}
-
+\documentclass[11pt,twoside,noabs,nolof]{starlink}
 %------------------------------------------------------------------------------
-\makeatletter
-%+                              M A N . S T Y
-%
-%  Module name:
-%    MAN.STY
-%
-%  Function:
-%    Default definitions for \LaTeX\ macros used in MAN output
-%
-%  Description:
-%    As much as possible of the output from the MAN automatic manual generator
-%    uses calls to user-alterable macros rather than direct calls to built-in
-%    \LaTeX\ macros. This file contains the default definitions for these
-%    macros.
-%
-%  Language:
-%    \LaTeX
-%
-%  Support:
-%    William Lupton, {AAO}
-%-
-%  History:
-%    16-Nov-88 - WFL - Add definitions to permit hyphenation to work on
-%		 words containing special characters and in teletype fonts.
+\stardoccategory    {Starlink System Note}
+\stardocinitials    {SSN}
+\stardocnumber      {3.1}
+\stardocauthors     {William Lupton}
+\stardocdate        {22nd December 1989}
+\stardoctitle       {The ECH Echelle Spectrograph Model Package}
+\stardocname  {\stardocinitials /\stardocnumber}
+%------------------------------------------------------------------------------
 
-\typeout{Default MAN macros. Released 8th November 1988}
+\newcommand{\mansection}[2]{\subsection{#1 --- #2}}
+\newenvironment{mansectionroutines}{\begin{description}}{\end{description}}
 
-% permit hyphenation when in teletype font (support 9,10,11,12 point only -
-% could extend), define lccodes for special characters so that the hyphen-
-% ation algorithm is not switched off. Define underscore character to be
-% explicit underscore rather than lots of kerns etc.
+\newcommand{\mansectionitem}[1]{\item[#1:]}
 
-%\hyphenchar\nintt=`-\hyphenchar\tentt=`-\hyphenchar\elvtt=`-\hyphenchar\twltt=`-
+\newcommand{\manroutine}[3]{\ssttitle{#1}{#2}\addcontentsline{toc}{subsection}{\protect\numberline{}#1---#2}}
 
-\lccode`_=`_\lccode`$=`$
-
-\renewcommand{\_}{{\tt\char'137}}
-
-%+                      M A N _ I N T R O
-%
-%  Section name:
-%    MAN_INTRO
-%
-%  Function:
-%    Macros used in the .TEX_INTRO file
-%
-%  Description:
-%    There are no such special macros.
-%-
-
-%+                      M A N _ S U M M A R Y
-%
-%  Section name:
-%    MAN_SUMMARY
-%
-%  Function:
-%    Macros used in the .TEX_SUMMARY file
-%
-%  Description:
-%    There is a command to introduce a new section (mansection) and a list-like
-%    environment (mansectionroutines) that handles the list of routines in the
-%    current section. In addition a mansectionitem command can be used instead
-%    of the item command to introduce a new routine in the current section.
-%-
-
-\newcommand {\mansection}[2]{\subsection{#1 --- #2}}
-
-\newenvironment {mansectionroutines}{\begin{description}\item[\mbox{}]\mbox{}\begin{description}}%
-{\end{description}\end{description}}
-
-\newcommand {\mansectionitem}[1]{\item [#1:] \mbox{}}
-
-%+                      M A N _ D E S C R
-%
-%  Section name:
-%    MAN_DESCR
-%
-%  Function:
-%    Macros used in the .TEX_DESCR file
-%
-%  Description:
-%    There is a command to introduce a new routine (manroutine) and a list-like
-%    environment (manroutinedescription) that handles the list of paragraphs
-%    describing the current routine. In addition a manroutineitem command can
-%    be used instead of the item command to introduce a new paragraph for the
-%    current routine.
-%
-%    Two-column tables (the ones that can occur anywhere and which are
-%    triggered by "=>" as the second token on a line) are bracketed by a
-%    new environment (mantwocolumntable). Other sorts of table are introduced
-%    by relevant  environments (manparametertable, manfunctiontable and
-%    manvaluetable). The definitions of these environments call various other
-%    user-alterable commands, thus allowing considerable user control over such
-%    tables... (to be filled in when the commands have been written)
-%-
-
-\newcommand {\manrule}{\rule{\textwidth}{0.5mm}}
-
-\newcommand {\manroutine}[2]{\subsection{#1 --- #2}}
-
-\newenvironment {manroutinedescription}{\begin{description}}{\end{description}%
-\manrule}
-
-\newenvironment {mansubparameterdescription}{\begin{description}}%
-{\end{description}}
-
-\newcommand {\manroutineitem}[2]{\item [#1:] #2\mbox{}}
+\newcommand{\manroutineitem}[2]{\subsubsection*{#1}#2\par{}}
+\newcommand{\manroutinebreakitem}[2]{\subsubsection*{#1}#2\par{}}
 
 % two column tables
-
-\newcommand {\mantwocolumncols}{||l|p{80mm}||}
-
-\newcommand {\mantwocolumntop}{\hline}
-
-\newcommand {\mantwocolumnblank}{\mantwocolumn@ss\mantwocolumn@hl%
-\gdef\mantwocolumn@hl{}\gdef\mantwocolumn@ss{}}
-
-\newcommand {\mantwocolumnbottom}{\mantwocolumn@ss\mantwocolumn@hl}
-
-\newenvironment {mantwocolumntable}{\gdef\mantwocolumn@ss{}%
-\gdef\mantwocolumn@hl{}\hspace*{\fill}\vspace*{-\partopsep}\begin{center}%
-\begin{tabular}{\mantwocolumncols}\mantwocolumntop}{\mantwocolumnbottom%
-\end{tabular}\end{center}}
-
-\newcommand{\mantwocolumnentry}[1]{\mantwocolumn@ss\gdef\mantwocolumn@ss{\\}%
-\gdef\mantwocolumn@hl{\hline}#1 & }
+\newcommand{\mantwocolumnentry}[1]{\\ #1 & }
+\newenvironment{mantwocolumntable}{%
+\begin{center}%
+\begin{tabular}{||l|p{80mm}||}%
+\hline}%
+{\end{tabular}%
+\end{center}}
 
 % parameter tables
+\newenvironment{manparametertable}{\begin{tabular}{lllp{80mm}}}%
+{\end{tabular}}
+\newcommand{\manparameterentry}[3]{\\#1 & #2 & #3 & }
 
-\newcommand {\manparametercols}{lllp{80mm}}
 
-\newcommand {\manparameterorder}[3]{#1 & #2 & #3 & }
+% teletype conversion
+\newcommand{\mantt}[1]{\texttt{#1}}
 
-\newcommand {\manparametertop}{}
 
-\newcommand {\manparameterblank}{\gdef\manparameter@hl{}\gdef\manparameter@ss{}}
+\newenvironment{mandescription}{\begin{description}}{\end{description}}
 
-\newcommand {\manparameterbottom}{}
+\newcommand{\mandescriptionitem}[1]{\item [#1]}
 
-\newenvironment {manparametertable}{\gdef\manparameter@ss{}%
-\gdef\manparameter@hl{}\hspace*{\fill}\vspace*{-\partopsep}\begin{trivlist}%
-\item[]\begin{tabular}{\manparametercols}\manparametertop}{\manparameterbottom%
-\end{tabular}\end{trivlist}}
-
-\newcommand {\manparameterentry}[3]{\manparameter@ss\gdef\manparameter@ss{\\}%
-\gdef\manparameter@hl{\hline}\manparameterorder{#1}{#2}{#3}}
-
-% return tables
-
-\newcommand {\manreturncols}{lllp{80mm}}
-
-\newcommand {\manreturnorder}[3]{#1 & #2 & #3 & }
-
-\newcommand {\manreturntop}{}
-
-\newcommand {\manreturnblank}{\gdef\manreturn@hl{}\gdef\manreturn@ss{}}
-
-\newcommand {\manreturnbottom}{}
-
-\newenvironment {manreturntable}{\gdef\manreturn@ss{}%
-\gdef\manreturn@hl{}\hspace*{\fill}\vspace*{-\partopsep}\begin{trivlist}%
-\item[]\begin{tabular}{\manreturncols}\manreturntop}{\manreturnbottom%
-\end{tabular}\end{trivlist}}
-
-\newcommand {\manreturnentry}[3]{\manreturn@ss\gdef\manreturn@ss{\\}%
-\gdef\manreturn@hl{\hline}\manreturnorder{#1}{#2}{#3}}
-
-% function tables
-
-\newcommand {\manfunctioncols}{||l|l|p{80mm}||}
-
-\newcommand {\manfunctionorder}[2]{#1 & #2 & }
-
-\newcommand {\manfunctiontop}{\hline}
-
-\newcommand {\manfunctionblank}{\manfunction@ss\manfunction@hl%
-\gdef\manfunction@ss{}\gdef\manfunction@hl{}}
-
-\newcommand {\manfunctionbottom}{\manfunction@ss\manfunction@hl}
-
-\newenvironment {manfunctiontable}{\gdef\manfunction@ss{}\gdef\manfunction@hl{}%
-\hspace*{\fill}\vspace*{-\partopsep}\begin{center}\begin{tabular}%
-{\manfunctioncols}\manfunctiontop}{\manfunctionbottom\end{tabular}\end{center}}
-
-\newcommand {\manfunctionentry}[2]{\manfunction@ss\gdef\manfunction@ss{\\}%
-\gdef\manfunction@hl{\hline}\manfunctionorder{#1}{#2}}
-
-% value tables
-
-\newcommand {\manvaluecols}{||l|l|l|p{80mm}||}
-
-\newcommand {\manvalueorder}[3]{#1 & #2 & #3 & }
-
-\newcommand {\manvaluetop}{\hline}
-
-\newcommand {\manvalueblank}{\manvalue@ss\manvalue@hl\gdef\manvalue@ss{}%
-\gdef\manvalue@hl{}}
-
-\newcommand {\manvaluebottom}{\manvalue@ss\manvalue@hl}
-
-\newenvironment {manvaluetable}{\gdef\manvalue@ss{}\gdef\manvalue@hl{}%
-\hspace*{\fill}\vspace*{-\partopsep}\begin{center}\begin{tabular}%
-{\manvaluecols}\manvaluetop}{\manvaluebottom\end{tabular}\end{center}}
-
-\newcommand {\manvalueentry}[3]{\manvalue@ss\gdef\manvalue@ss{\\}%
-\gdef\manvalue@hl{\hline}\manvalueorder{#1}{#2}{#3}}
-
-% list environments
-
-\newenvironment {manenumerate}{\begin{enumerate}}{\end{enumerate}}
-
-\newcommand {\manenumerateitem}[1]{\item [#1]}
-
-\newenvironment {manitemize}{\begin{itemize}}{\end{itemize}}
-
-\newcommand {\manitemizeitem}{\item}
-
-\newenvironment {mandescription}{\begin{description}\item[\mbox{}]\mbox{}\begin{description}}%
-{\end{description}\end{description}}
-
-\newcommand {\mandescriptionitem}[1]{\item [#1]}
-
-\newcommand {\mantt}{\tt}
-
-% "semi-verbatim" environment (modified from LaTeX source)
-
-\def\@mansemiverbatim{\trivlist\item[]\if@minipage\else\vskip\parskip\fi%
-\leftskip\@totalleftmargin\rightskip\z@%
-\parindent\z@\parfillskip\@flushglue\parskip\z@%
-\@tempswafalse\def\par{\if@tempswa\hbox{}\fi\@tempswatrue\@@par}%
-\obeylines}
-
-\def\mansemiverbatim{\@mansemiverbatim\frenchspacing\@vobeyspaces}
-
-\let\endmansemiverbatim=\endtrivlist
-%------------------------------------------------------------------------------
-
-%------------------------------------------------------------------------------
-\newcommand{\stardoccategory}  {Starlink System Note}
-\newcommand{\stardocinitials}  {SSN}
-\newcommand{\stardocnumber}    {3.1}
-\newcommand{\stardocauthors}   {William Lupton}
-\newcommand{\stardocdate}      {22nd December 1989}
-\newcommand{\stardoctitle}     {The ECH Echelle Spectrograph Model Package}
-%------------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{240mm}
-\setlength{\topmargin}{-5mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-%------------------------------------------------------------------------------
-% Add any \newcommand or \newenvironment commands here
-%------------------------------------------------------------------------------
 
 \newcommand{\coude}{coud\'{e}}
 
-\begin{document}
-\thispagestyle{empty}
-SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
-RUTHERFORD APPLETON LABORATORY\\
-{\large\bf Starlink Project\\}
-{\large\bf \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Large\bf \stardoctitle}
-\end{center}
-\vspace{5mm}
+%-------------------------------------------------------------------------
 
-%------------------------------------------------------------------------------
-\setlength{\parskip}{0mm}
-\tableofcontents
-\setlength{\parskip}{\medskipamount}
-\markright{\stardocname}
-%------------------------------------------------------------------------------
+\begin{document}
+
+\scfrontmatter
 
 \section{Introduction}
 
@@ -359,15 +120,14 @@ of how they are used.
 
 \section{Overview}
 
-The routine that is called is {\tt ECH\_LOAD}. This reads and interprets a
+The routine that is called is \texttt{ECH\_LOAD}. This reads and interprets a
 spectrograph parameter file which defines the list of available spectrographs
-and their echelles and cameras. The use of {\tt ECH\_LOAD} is in fact optional
+and their echelles and cameras. The use of \texttt{ECH\_LOAD} is in fact optional
 --- if it is not called then only UCLES with its 31 and 79 echelle and its long
 camera is available.
 
-The next routine that is called is {\tt ECH\_INIT}. This selects the actual
-instrument / echelle / camera combination that is to be modelled. {\tt
-ECH\_INIT} allows use of the syntax ``instrument/echelle/camera'' in response
+The next routine that is called is \texttt{ECH\_INIT}. This selects the actual
+instrument / echelle / camera combination that is to be modelled. \texttt{ECH\_INIT} allows use of the syntax ``instrument/echelle/camera'' in response
 to the prompt for the echelle name. The user response is split up into tokens
 and then the first token is checked against the list of defined instruments. If
 it matches one of them, attention switches to the next token. If it doesn't,
@@ -379,10 +139,9 @@ is found to the current token. If, after all this, any unmatched tokens remain,
 an error is reported and the first instrument /  echelle / camera combination
 defined in the spectrograph parameter file is assumed.
 
-Once {\tt ECH\_INIT} has been called, any of the other routines can be called.
-Two of the routines are at a higher level than the rest of them. These are {\tt
-ECH\_FORMAT\_CENTRE}, which determines the spectrograph settings for a given
-central wavelength and order number, and {\tt ECH\_WAVECEN}, which determines
+Once \texttt{ECH\_INIT} has been called, any of the other routines can be called.
+Two of the routines are at a higher level than the rest of them. These are \texttt{ECH\_FORMAT\_CENTRE}, which determines the spectrograph settings for a given
+central wavelength and order number, and \texttt{ECH\_WAVECEN}, which determines
 the central wavelength and order number for a given set of spectrograph
 settings.
 
@@ -397,30 +156,32 @@ contain more examples.
 \section{Routine Descriptions}
 
 This section contains details of each routine. In particular, refer to the
-descriptions of the {\tt ECH\_LOAD} and {\tt ECH\_INIT} routines for details of
+descriptions of the \texttt{ECH\_LOAD} and \texttt{ECH\_INIT} routines for details of
 how to create and use spectrograph parameter files, and refer to the
-description of the {\tt ECH\_FORMAT\_CENTRE} routine for details of how the
+description of the \texttt{ECH\_FORMAT\_CENTRE} routine for details of how the
 spectrograph configuration for a specified wavelength is determined.
 
 %\input{ech_block.tex_descr}---------------------------------------------------
+
 \manroutine {{\mantt{ECH\_BLOCK}}}{  {\mantt{BLOCK}} {\mantt{DATA}} to %
 initialise spectrograph configuration}
-\begin{manroutinedescription}
-\manroutineitem {Description }{}
-     This refers to the {\mantt{ECH\_PARAMS}} {\mantt{COMMON}} block, which %
-contains the parameters
-     of all possible spectrographs, not to the {\mantt{ECH\_COMMON}} {\mantt{%
-COMMON}} block, which
-     contains the details only of the current configuration.
 
-     This {\mantt{BLOCK}} {\mantt{DATA}} initialises the {\mantt{COMMON}} %
-block in such a way that a call
-     to {\mantt{ECH\_INIT}} without a call to {\mantt{ECH\_LOAD}} to load the %
-parameters of a
-     specific spectrograph configuration will use the values which are correct
-     for {\mantt{UCLES}}. These values also serve to provide defaults for %
-quantities
-     which are not overridden as a result of {\mantt{ECH\_LOAD}}.
+
+ \manroutineitem {Description }{}
+      This refers to the {\mantt{ECH\_PARAMS}} {\mantt{COMMON}} block, which %
+ contains the parameters
+      of all possible spectrographs, not to the {\mantt{ECH\_COMMON}} {\mantt{%
+ COMMON}} block, which
+      contains the details only of the current configuration.
+
+      This {\mantt{BLOCK}} {\mantt{DATA}} initialises the {\mantt{COMMON}} %
+ block in such a way that a call
+      to {\mantt{ECH\_INIT}} without a call to {\mantt{ECH\_LOAD}} to load the %
+ parameters of a
+      specific spectrograph configuration will use the values which are correct
+      for {\mantt{UCLES}}. These values also serve to provide defaults for %
+ quantities
+      which are not overridden as a result of {\mantt{ECH\_LOAD}}.
 
 \manroutineitem {Bugs }{}
      None known.
@@ -428,10 +189,11 @@ quantities
 \manroutineitem {Authors }{}
      W.F. Lupton  {\mantt{AAO}}  ({\mantt{AAOEPP}}::{\mantt{WFL}})
 
-\end{manroutinedescription}
+
+
 \manroutine {{\mantt{ECH\_COLLIMATOR}}}{  Determine which collimator to use at %
 a given wavelength}
-\begin{manroutinedescription}
+
 \manroutineitem {Description }{}
      If a central wavelength is given, use the {\mantt{WIDE}} collimator for %
 wavelengths
@@ -471,10 +233,10 @@ The optimal collimator, either {\mantt{WIDE}} or {\mantt{UV}}
 \manroutineitem {Authors }{}
      C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
 
-\end{manroutinedescription}
+
 \manroutine {{\mantt{ECH\_DISP}}}{  Determine the dispersion in mm for a given %
 wavelength}
-\begin{manroutinedescription}
+
 \manroutineitem {Description }{}
      Use the grating equation to calculate the echelle beta angle at the given
      wavelength in the given order. Then calculate it at the point where the
@@ -513,10 +275,10 @@ Dispersion (mm)
 \manroutineitem {Authors }{}
      C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
 
-\end{manroutinedescription}
+
 \manroutine {{\mantt{ECH\_FORMAT\_CENTRE}}}{  Determine the appropriate %
 spectrograph settings}
-\begin{manroutinedescription}
+
 \manroutineitem {Description }{}
      Firstly, calculate the prism system rotation and position. The required
      echelle gamma angle is not quite the same as the prism rotation angle.
@@ -575,10 +337,10 @@ Slit angle (radians)
 \manroutineitem {Authors }{}
      F. Diego  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{FD}})
 
-\end{manroutinedescription}
+
 \manroutine {{\mantt{ECH\_FRSPR}}}{  Determine the free spectral range in %
 Angstroms}
-\begin{manroutinedescription}
+
 \manroutineitem {Description }{}
      Determine the central wavelength of the specified order and then
      use the grating equation directly to calculate the free spectral
@@ -612,10 +374,10 @@ spectral range (Angstroms)
 \manroutineitem {Authors }{}
      C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
 
-\end{manroutinedescription}
+
 \manroutine {{\mantt{ECH\_INIT}}}{  Initialise {\mantt{COMMON}} blocks for a %
 specified instrument combination}
-\begin{manroutinedescription}
+
 \manroutineitem {Description }{}
      If a parameter name has been specified, ask the user which configuration
      to use. Otherwise use the one which was supplied.
@@ -673,10 +435,10 @@ blank. Is
 \manroutineitem {Authors }{}
      C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
 
-\end{manroutinedescription}
+
 \manroutine {{\mantt{ECH\_LOAD}}}{  Load {\mantt{COMMON}} blocks describing %
 spectrograph parameters}
-\begin{manroutinedescription}
+
 \manroutineitem {Description }{}
      If a parameter name has been specified, ask the user which file contains
      the parameters. Otherwise use the one which was supplied.
@@ -735,7 +497,7 @@ INTEGER}})
      The following example describes {\mantt{UCLES}} and illustrates a %
 notional short
      camera of focal length 400mm.
-     \begin{verbatim}
+     \begin{terminalv}
 *       !+ UCLES.DAT
 *       !
 *       !  UCLES spectrograph parameters.
@@ -762,7 +524,7 @@ notional short
 *             FCAM 700.0
 *          CAMERA SHORT
 *             FCAM 400.0
-*     \end{verbatim}
+*     \end{terminalv}
      This routine should be called before {\mantt{ECH\_INIT}} is called. If it %
 is not
      called, {\mantt{ECH\_INIT}} will only be able to support the 31 and 79 %
@@ -793,10 +555,10 @@ PARAM}} is blank. Is
 \manroutineitem {Authors }{}
      W.F. Lupton  {\mantt{AAO}}  ({\mantt{AAOEPP}}::{\mantt{WFL}})
 
-\end{manroutinedescription}
+
 \manroutine {{\mantt{ECH\_ORDERNUM}}}{  Determine the order number of a %
 specified wavelength}
-\begin{manroutinedescription}
+
 \manroutineitem {Description }{}
      Use the grating equation to calculate the free spectral range and then
      derive the order number directly from it.
@@ -831,10 +593,10 @@ number corresponding to wavelength
 \manroutineitem {Authors }{}
      C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
 
-\end{manroutinedescription}
+
 \manroutine {{\mantt{ECH\_PRISMPOS}}}{  Determine the optimal prism rotation %
 and position}
-\begin{manroutinedescription}
+
 \manroutineitem {Description }{}
      Determine the prism rotation and position by direct calculation. The
      rotation is such that a ray of the specified wavelength will fall on
@@ -864,18 +626,18 @@ Optimal prism position (mm)
 \manroutineitem {Authors }{}
      C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
 
-\end{manroutinedescription}
+
 \manroutine {{\mantt{ECH\_REFINDEX}}}{  Determine the refractive index of %
 fused silica}
-\begin{manroutinedescription}
+
 \manroutineitem {Description }{}
      Use the empirical expression derived by I.H. Malitson, J.O.S.A 55, 1205,
      Oct 1965. This expression is:
-     \begin{verbatim}
+     \begin{terminalv}
 *                  0.6961663 . w**2     0.4079426 . w**2      0.8974794 . w**2
 *     ref**2 = 1 + ----------------- + ------------------- + ------------------
 *                 w**2 - 0.0684043**2  w**2 - 0.0062414**2   w**2 - 9.896161**2
-*     \end{verbatim}
+*     \end{terminalv}
      where wavelength is measured in microns. This routine uses wavelength in
      Angstroms and converts to microns internally.
 
@@ -898,9 +660,9 @@ Refractive index
 \manroutineitem {Authors }{}
      W.F. Lupton  {\mantt{AAO}}  ({\mantt{AAOEPP}}::{\mantt{WFL}})
 
-\end{manroutinedescription}
+
 \manroutine {{\mantt{ECH\_SLITANGLE}}}{  Determine the optimum slit angle}
-\begin{manroutinedescription}
+
 \manroutineitem {Description }{}
      Determine the slit angle by direct calculation.
 
@@ -926,10 +688,10 @@ Optimal slit angle (radians)
 \manroutineitem {Authors }{}
      C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
 
-\end{manroutinedescription}
+
 \manroutine {{\mantt{ECH\_WAVECEN}}}{  Determine the central wavelength of the %
 order}
-\begin{manroutinedescription}
+
 \manroutineitem {Description }{}
      Use a binary chop search to determine the order which corresponds to
      the given echelle gamma angle. Having determined the order, perform a
@@ -968,10 +730,10 @@ Order number corresponding to the current
 \manroutineitem {Authors }{}
      C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
 
-\end{manroutinedescription}
+
 \manroutine {{\mantt{ECH\_WCENTRAL}}}{  Determine the central wavelength in %
 Angstroms}
-\begin{manroutinedescription}
+
 \manroutineitem {Description }{}
      Use the grating equiation directly to determine the central wavelength.
 
@@ -1003,10 +765,11 @@ Central wavelength of this order
 \manroutineitem {Authors }{}
      C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
 
-\end{manroutinedescription}
+
+
 \manroutine {{\mantt{ECH\_XDISPFS}}}{  Determine the cross-dispersion in mm %
 for a given wavelength}
-\begin{manroutinedescription}
+
 \manroutineitem {Description }{}
      Calculate the refractive index at the given wavelength. Then calculate it
      at the point where the cross-dispersion is by definition zero. Knowing
@@ -1040,7 +803,7 @@ Cross-dispersion (mm)
 \manroutineitem {Authors }{}
      C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
 
-\end{manroutinedescription}
+
 %------------------------------------------------------------------------------
 
-\end {document}
+\end{document}
