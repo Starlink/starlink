@@ -658,7 +658,7 @@ JCMT telescope based on Mauna Kea, Hawaii.
 </component>
 
 <component id="gaia" support="S">
-  <version>4.4-5</version>
+  <version>4.4-6</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
@@ -931,9 +931,11 @@ them.
   <version>1.0</version>
   <path>applications/latexsupport</path>
   <description>Helper files for using LaTeX for starlink docs</description>
-  <abstract><p>Style files and classes for building pdf documentation
-  and html documentation (Using pdflatex and tex4ht respectively).</p></abstract>
+  <abstract><p>LaTeX style files, classes and ancillary configuration files
+      for building starlink pdf (using pdflatex)
+      and html documentation (using tex4ht).</p></abstract>
   <dependencies >
+    
   </dependencies>
   <developers>
     <person>
@@ -1646,7 +1648,7 @@ package.
 </component>
 
 <component id="smurf">
-  <version>1.6.0</version>
+  <version>1.6.1</version>
   <path>applications/smurf</path>
   <description>SMURF - Sub-mm User Reduction Facility</description>
   <abstract><p>
@@ -1677,7 +1679,7 @@ with the ACSIS correlator at JCMT.
       <uname>agg</uname>
     </person>
   </developers>
-  <documentation> sun258 sun259 sc19</documentation>
+  <documentation> sun258 sun259 sc19 ssn79</documentation>
   <bugreports>scuba2dr@phas.ubc.ca</bugreports>
 </component>
 
@@ -2408,6 +2410,36 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
+<component id="sc20">
+  <version>1</version>
+  <path>docs/sc/020</path>
+  <description>The Heterodyne Data Reduction Cookbook</description>
+  <abstract><p>
+      This cookbook provides a short introduction to Starlink
+      facilities, especially SMURF, the Sub-Millimetre User
+      Reduction Facility and Kappa, the Kernel Application
+      Package, for reducing, displaying, and analysing ACSIS data. In
+      particular, this cookbook illustrates the various steps required
+      to reduce the data; and gives an overview of the ORAC-DR
+      pipeline which carries out many of these steps using a single
+      command. Specialised pipeline recipes are discussed.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Holly S. Thomas</name>
+    </person>
+  </developers>
+  <documentation> sc20</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <copyright>
+    <year>2014</year>
+    <name>STFC</name>
+  </copyright>
+</component>
+
 <component id="sc21">
   <version>1.2</version>
   <path>docs/sc/021</path>
@@ -3006,6 +3038,25 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
+<component id="sun270" support="U">
+  <version>0.1</version>
+  <path>docs/sun/270</path>
+  <description>Starlink Latex Suppport for pdf and html</description>
+  <abstract><p>Documentation and advice for using the starlink.cls
+      \LaTeX\ class and its TeX4HT configurations when building pdf
+      and html starlink documentation.</p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Sarah F Graves</name>
+    </person>
+  </developers>
+  <documentation> sun270</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+</component>
+
 <component id="info" support="S">
   <version>2004.1-1</version>
   <path>etc/info</path>
@@ -3049,7 +3100,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="pal" support="S">
-  <version>0.7.0</version>
+  <version>0.9.0</version>
   <path>libext/pal</path>
   <description>Positional Astronomy Library</description>
   <abstract><p>
@@ -4979,7 +5030,7 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
 </component>
 
 <component id="vtk" support="U">
-  <version>5.10.1</version>
+  <version>6.1.0</version>
   <path>thirdparty/kitware/vtk</path>
   <description>VTK/CMAKE</description>
   <dependencies >
