@@ -661,6 +661,11 @@
 *     15-MAR-2012 (DSB):
 *        When getting WCS from the NDF, always ensure the current Frame
 *        is 2-dimensional.
+*     10-FEB-2015 (DSB):
+*        Since 20-OCT-2009, setting the Ident attribute for a FrameSet
+*        changes the Ident for the FrameSet itself, not for the current
+*        Frame. So now we need to extract a pointer to the current Frame
+*        before setting the Ident attribute.
 *     {enter_further_changes_here}
 
 *-
@@ -718,6 +723,7 @@
       DOUBLE PRECISION GX      ! X GRID co-ord at image centre
       DOUBLE PRECISION GY      ! Y GRID co-ord at image centre
       INTEGER BPCI             ! Bad-pixel colour index
+      INTEGER CFRM             ! Pointer to current Frame
       INTEGER DIMS( NDIM )     ! Dimensions of input array
       INTEGER EL               ! Number of elements in the mapped array
       INTEGER I                ! General variable
@@ -1461,7 +1467,9 @@
 *  of the current Frame since KPG1_ASGET will have set this to something
 *  begining with "ROI" if any regions of interest were found within the
 *  WCS FrameSet.
-      IDENT = AST_GETC( IPLOT, 'Ident', STATUS )
+      CFRM = AST_GETFRAME( IPLOT, AST__CURRENT, STATUS )
+      IDENT = AST_GETC( CFRM, 'Ident', STATUS )
+      CALL AST_ANNUL( CFRM, STATUS )
       IF( IDENT( : 3 ) .EQ. 'ROI' ) THEN
 
 *  If required, get an AST KeyMap holding Plots covering the area of

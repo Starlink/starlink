@@ -55,6 +55,11 @@
 *  History:
 *     2-JUN-2006 (DSB):
 *        Original version.
+*     10-FEB-2015 (DSB):
+*        Since 20-OCT-2009, setting the Ident attribute for a FrameSet
+*        changes the Ident for the FrameSet itself, not for the current
+*        Frame. So now we need to extract a pointer to the current Frame
+*        before setting the Ident attribute.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -85,6 +90,7 @@
       DOUBLE PRECISION RLBND( ATL__MXDIM )! Region lower bounds
       DOUBLE PRECISION RUBND( ATL__MXDIM )! Region upper bounds
       INTEGER FRM              ! Pointer to a Frame in Plot
+      INTEGER FRMJ             ! Pointer to a Frame in Plot
       INTEGER I                ! General variable
       INTEGER IFRM             ! Index of Frame in Plot
       INTEGER IPLOT2           ! Pointer to copy of supplied Plot
@@ -155,7 +161,9 @@
 *  attribute, making it the current Frame in the Plot.
                DO JFRM = 1, NFRM
                   CALL AST_SETI( IPLOT2, 'Current', JFRM, STATUS )
-                  IDENT = AST_GETC( IPLOT2, 'Ident', STATUS )
+                  FRMJ = AST_GETFRAME( IPLOT2, AST__CURRENT, STATUS )
+                  IDENT = AST_GETC( FRMJ, 'Ident', STATUS )
+                  CALL AST_ANNUL( FRMJ, STATUS )
                   IF( IDENT .EQ. DOM ) THEN
 
 *  If this is the first ROI, fix the gaps between major ticks so that

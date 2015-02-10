@@ -598,6 +598,11 @@
 *        Modified to use ATL_PLROI.
 *     2010 October 13 (MJC):
 *        Permit temporary style attributes.
+*     10-FEB-2015 (DSB):
+*        Since 20-OCT-2009, setting the Ident attribute for a FrameSet
+*        changes the Ident for the FrameSet itself, not for the current
+*        Frame. So now we need to extract a pointer to the current Frame
+*        before setting the Ident attribute.
 *     {enter_further_changes_here}
 
 *-
@@ -644,6 +649,7 @@
       DOUBLE PRECISION POS( 2 ) ! Label reference position
       DOUBLE PRECISION XP( 2 )  ! Label text positions
       DOUBLE PRECISION YP( 2 )  ! Label test positions
+      INTEGER CFRM              ! Pointer to current Frame
       INTEGER CNTCLS( MXCONT )  ! No. of closed contours at each height
       INTEGER CNTPEN( MXCONT )  ! Pen index used to draw each contour
       INTEGER DIMS( NDIM )      ! Dimensions of input array
@@ -1032,7 +1038,9 @@
 *  of the current Frame since KPG1_ASGET will have set this to something
 *  begining with "ROI" if any regions of interest were found within the
 *  WCS FrameSet.
-         IDENT = AST_GETC( IPLOT, 'Ident', STATUS )
+         CFRM = AST_GETFRAME( IPLOT, AST__CURRENT, STATUS )
+         IDENT = AST_GETC( CFRM, 'Ident', STATUS )
+         CALL AST_ANNUL( CFRM, STATUS )
          IF( IDENT( : 3 ) .EQ. 'ROI' ) THEN
 
 *  Get an AST KeyMap holding Plots covering the area of each ROI.
