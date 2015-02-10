@@ -291,8 +291,8 @@
 \global\let\end:itm=\empty}
    {\PopMacro\end:itm \global\let\end:itm \end:itm
 \EndP\HCode{</dd></table>}\ShowPar}
-   {\end:itm \global\def\end:itm{\EndP\Tg</td>\Tg</tr>}\HCode{<tr><td>}\bgroup \bf}
-   {\egroup\EndP\HCode{</td><td\Hnewline>}}
+   {\end:itm \global\def\end:itm{\EndP\Tg</td>\Tg</tr>}\HCode{<tr><th>}\bgroup \bf}
+   {\egroup\EndP\HCode{</th><td\Hnewline>}}
 
 \Css{table.aligndesc td{vertical-align:top; padding: 0px 5px 0px 5px;}}
 \Css{table.aligndesc{margin-left:1em;margin-right:1em}}

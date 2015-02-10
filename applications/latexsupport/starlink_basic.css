@@ -225,11 +225,11 @@ dt.enumerate-enumitem{
 }
 
 /*Css for enumerated description list.*/
-.edlong{
-    counter-reset: edlong-counter;
+.enumdesc{
+    counter-reset: enumdesc-counter;
 }
 
-.edlong dt {
+.enumdesc dt {
     position: relative;
     font-weight: bold;
     font-size: 100%;
@@ -237,16 +237,16 @@ dt.enumerate-enumitem{
     right: 2.5%;
 }
 
-.edlong dt:before{
-    content: "(" counter(edlong-counter) ")";
-    counter-increment: edlong-counter;
+.enumdesc dt:before{
+    content: "(" counter(enumdesc-counter) ")";
+    counter-increment: enumdesc-counter;
     font-weight: bold;
     font-size: 100%;
     padding-left:2.5%;
     padding-right:1em;
 }
 
-.edlong dt, .edlong dd{
+.enumdesc dt, .enumdesc dd{
     padding-left: 2.5%;
     padding-right: 2.5%;
 }
@@ -278,10 +278,17 @@ dt.enumerate-enumitem{
 }
 
 /* general description class */
-dt {
-   font-weight: bold;
+.description dt {
+    font-weight: bold;
+    margin-left:1.5em;
 }
 
+.description dd{
+    margin-bottom:1em;
+    margin-left:1.5em;
+}
+
+*/
 /* foot notes */
 div.footnotes{margin-right:0px;}
 
@@ -375,6 +382,13 @@ div.crosslinks li a:hover, div.crosslinks li a:focus{
     color:black;
 }
 
+
+table.aligndesc td, table.aligndesc th{
+    padding-bottom:0.25em
+    padding-top:0.25em;
+    vertical-align:top;
+}
+
 /* basic table stuff*/
 td.td {
     padding-left:5px;
@@ -385,4 +399,7 @@ td.td {
 td {
    vertical-align: middle;
 }
+
+
+
 \EndCss
