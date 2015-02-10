@@ -122,12 +122,12 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -271,11 +271,15 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     29-APR-2013 (DSB):
 *        Added protected methods astSetFrameVariants and astGetFrameVariants.
 *     1-MAY-2013 (DSB):
-*        Override the astDoNotSimplify method to indicate that Frames should 
-*        always be simplified. This is mainly because the STC class uses the 
-*        Ident attribute with Frames, and preventing such frames from 
+*        Override the astDoNotSimplify method to indicate that Frames should
+*        always be simplified. This is mainly because the STC class uses the
+*        Ident attribute with Frames, and preventing such frames from
 *        simplifying (which is what the parent astDoNotSimplify method does)
 *        causes the STC tester in the ast_tester directory to fail.
+*     10-FEB-2015 (DSB):
+*        When checking attribute settings for attribute names that end with
+*        an axis index, stop looking for the axis index when the first equals
+*        sign is encountered.
 *class--
 */
 
@@ -9785,7 +9789,7 @@ L1:
    a Frame axis, then it may refer to an Axis object of a derived type
    (which has additional attributes not recognised here). */
    } else if ( !free_axis_setting && ( nc = 0,
-               ( 1 == astSscanf( setting, "%*[^()]%n(%d)%n=%*[^\n]%n",
+               ( 1 == astSscanf( setting, "%*[^()=]%n(%d)%n=%*[^\n]%n",
                                        &axis_nc, &axis, &axis_value, &nc ) )
                && ( nc >= len ) ) ) {
 

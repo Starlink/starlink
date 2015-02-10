@@ -63,12 +63,12 @@ f     The CmpFrame class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -181,6 +181,10 @@ f     The CmpFrame class does not define any new routines beyond those
 *     29-APR-2011 (DSB):
 *        Prevent astFindFrame from matching a subclass template against a
 *        superclass target.
+*     10-FEB-2015 (DSB):
+*        When checking attribute settings for attribute names that end with
+*        an axis index, stop looking for the axis index when the first equals
+*        sign is encountered.
 *class--
 */
 
@@ -8036,7 +8040,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 /* If the attribute is qualified by an axis index, try accessing it as an
    attribute of the primary Frame containing the specified index. */
          if ( nc = 0,
-             ( 2 == astSscanf( setting, "%[^(](%d)= %n%*s %n", buf1, &axis,
+             ( 2 == astSscanf( setting, "%[^(=](%d)= %n%*s %n", buf1, &axis,
                                &value, &nc ) ) && ( nc >= len ) ) {
 
 /* Find the primary Frame containing the specified axis. */
