@@ -11,8 +11,8 @@
 \stardoctitle       {CUPID -- A 3D Clump Identification and Analysis Package}
 \stardocversion     {Version 2.0}
 \stardocmanual      {Users' Manual}
-\stardocabstract  {CUPID is a package of the identification
-and analysis of clumps of emission within 1-, 2- and 3- dimensional
+\stardocabstract    {CUPID provides a set of commands that
+identfy and analyse clumps of emission within 1-, 2- and 3- dimensional
 data arrays.}
 
 % ? End of document identification
@@ -63,10 +63,10 @@ clumps of emission within 1, 2 or 3D data arrays. Specifically, it currently
 provides the following facilities:
 
 \begin{itemize}
-\item background estimation (uses spatial filtering to remove features with
-      scale size less than a given value).
+\item background removal (uses spatial filtering to remove features with
+      scale sizes greater than a given value).
 \item identification of clumps of emission using a variety of different
-      algorithms (\emph{e.g.} GaussClumps, ClumpFind, \emph{etc}).
+      algorithms (\emph{e.g.} FellWalker, GaussClumps, ClumpFind, \emph{etc}).
 \item creation of catalogues of clump parameters
 \item creation of cut-out images containing the emission from individual clumps.
 \end{itemize}
@@ -76,8 +76,7 @@ format used by most Starlink software, and is described fully in
 \xref{SUN/33}{sun33}{}. However, other astronomical data formats may also
 be processed using transparent on-the-fly data conversion facilities
 provided by the NDF subroutine library, and the CONVERT package. The use of
-these facilities is described \slhyperref{here}{in section }{}{SEC:CONVERT},
-and more fully in \xref{SUN/55}{sun55}{}.
+these facilities in \xref{SUN/55}{sun55}{}.
 
 All CUPID applications use standard Starlink subroutine libraries for
 accessing parameters, producing graphics, reporting errors, \emph{etc}. They
@@ -96,12 +95,14 @@ general information about these issues:
 \item ``\xref{NDF History}{sun95}{se_ndfhistory}''
 \item ``\xref{The Graphics Database}{sun95}{se_agitate}''
 \item ``\xref{Using World Co-ordinate Systems}{sun95}{se_wcsuse}''
-\item ``\xref{Procedures}{sun95}{se_procedures}''
 \end{itemize}
 
 \subsection{\xlabel{availablecommands}Available Commands}
 Currently, the following commands are available within CUPID:
 \begin{description}
+
+\item[\htmlref{CLUMPINFO}{CLUMPINFO}] - Obtain information about
+one or more previously identified clumps;
 
 \item[\htmlref{CUPIDHELP}{CUPIDHELP}] - gives on-line help for all CUPID
 commands;
@@ -138,6 +139,93 @@ command.
 been removed from the data before using FINDCLUMPS. This can be done
 using the \htmlref{FINDBACK}{FINDBACK} command.}
 \end{center}
+
+\subsection{\xlabel{fellwalker}FellWalker}
+This algorithm was developed specifically for CUPID to address some of
+the problems associated with ClumpFind. It is fully described in
+\href{http://www.sciencedirect.com/science/article/pii/S2213133714000675}
+{\emph{Berry} (2015, Astronomy \& Computing, vol. 10,p22-31)}.
+
+It is most simply described assuming the data array is
+2-dimensional, although it applies in a similar manner to 3-dimensional
+data. Its name was chosen to suggest a parallel between a contour map of
+a 2D astronomical data array, and the height contours seen in a geographical
+map of a hilly area, such as used by most fell-walkers. The algorithm
+used to assign a data pixel to a clump of emission can be compared to
+that of a fell-walker ascending a hill by following the line of steepest
+ascent (not perhaps the most sensible way to ascend a hill in practise
+but one which lends some verisimilitude to the present algorithm!).
+
+The algorithm considers every data pixel in the supplied array in turn as
+a potential start for a ``walk'' to a neighbouring peak. Pixels which are
+below a nominated background level (specified by configuration parameter
+\texttt{FellWalker.Noise}) are ignored and are flagged as not belonging to any
+emission clump. These are skipped over, as are pixels which have already
+been assigned to a clump. Once a pixel is found that has not yet been
+assigned to a clump and is above the background level, the algorithm
+proceeds to trace out a route from this pixel to a neighbouring peak. It
+does this in a series of steps (comparable to the steps of a
+fell-walker). At each step the algorithm looks at the 3$\times$3 square of
+neighbouring pixels (a 3$\times$3$\times$3 cube for 3D data), and selects the
+neighbour which would produce the highest gradient for the next step. The
+algorithm then moves to that pixel and proceeds with the next step.
+
+Eventually, this algorithm will reach a local maximum; a point from which
+all routes go down-hill. But this may be merely a noise spike, rather
+than a significant peak, and so a check is made over a more extended
+neighbourhood to see if a pixel with a higher data value than the current
+pixel can be found (the extent of this extended neighbourhood is
+specified by the configuration parameter \texttt{FellWalker.MaxJump}). If so, the
+algorithm ``jumps'' to the pixel with the highest value in the extended
+neighbourhood, and then proceeds as before to walk up-hill. If no pixel
+with a higher value is found within the extended neighbourhood, the pixel
+is designated as a significant peak, and is assigned a unique integer
+identifier. This integer is used to identify all pixels which are within
+the clump of emission containing the peak, and all pixels which were
+visited along the walk are assigned this identifier.
+
+If, in the process of walking up-hill, a pixel is visited which has
+already been assigned to a clump, then the walk is terminated at that
+point and all the pixels so far visited are assigned to the same clump.
+
+In some cases, the initial part of a walk may be over very flat
+``terrain''. The significant part of a walk is considered to start when
+the average gradient (taken over a 4 step length) first reaches the value
+of configuration parameter \texttt{FlatSlope}. Any pixels visited prior to this point
+are deemed not to be in any clump. However, this only applies if the
+walk starts at or close to ``sea level''. For walks which start from a
+higher level (\emph{i.e.} from a pixel which has a data value greater than
+the selected background level plus twice the RMS noise level), the entire
+length of the walk is used, including any initial flat section.
+
+Once all pixels in the data array have been considered as potential
+starts for such a walk, an array will have been created which holds an
+integer clump identifier for every data pixel. To reduce the effect of
+noise on the boundaries between clumps, a cellular automata can be used
+to smooth the boundaries. This replaces each clump identifier by the most
+commonly occurring value within a 3$\times$3 square (or 3$\times$3$\times$3
+cube for 3D data)
+of neighbours. The number of times which this cleaning process should be
+applied is specified by configuration parameter \texttt{CleanIter}.
+
+If the high data values in a clump form a plateau with slight
+undulations, then the above algorithm may create a separate clump for
+each undulation. This is probably inappropriate, especially if the dips
+between the undulations are less than or are comparable to the noise
+level in the data. This situation can arise for instance if the
+pixel-to-pixel noise is correlated on a scale equal to or larger than the
+value of the \texttt{MaxJump} configuration parameter. To avoid this, adjoining
+clumps are merged together if the dip between them is less than a
+specified value. Specifically, if two clumps with peak values \emph{PEAK1}
+and  \emph{PEAK2}, where \emph{PEAK1} is less than \emph{PEAK2}, are
+adjacent to each other, and if the pixels along the interface between the
+two clumps all have data values which are larger than ``\emph{PEAK1 - MinDip}''
+(where \emph{MinDip} is the value of the \texttt{MinDip} configuration
+parameter), then the two clumps are merged together.
+
+The results of this merging process are the final clump allocations for
+every data pixel, from which the catalogue of clump parameters is
+produced.
 
 \subsection{\xlabel{gaussclumps}GaussClumps}
 
@@ -481,88 +569,6 @@ parameter \texttt{Reinhold.FixClumpsIterations}.
 The results of this cleaning process are the final clump allocations for
 every data pixel, from which the catalogue of clump parameters is produced.
 
-\subsection{\xlabel{fellwalker}FellWalker}
-This algorithm is most simply described assuming the data array is
-2-dimensional, although it applies in a similar manner to 3-dimensional
-data. Its name was chosen to suggest a parallel between a contour map of
-a 2D astronomical data array, and the height contours seen in a geographical
-map of a hilly area, such as used by most fell-walkers. The algorithm
-used to assign a data pixel to a clump of emission can be compared to
-that of a fell-walker ascending a hill by following the line of steepest
-ascent (not perhaps the most sensible way to ascend a hill in practise
-but one which lends some verisimilitude to the present algorithm!).
-
-The algorithm considers every data pixel in the supplied array in turn as
-a potential start for a ``walk'' to a neighbouring peak. Pixels which are
-below a nominated background level (specified by configuration parameter
-\texttt{FellWalker.Noise}) are ignored and are flagged as not belonging to any
-emission clump. These are skipped over, as are pixels which have already
-been assigned to a clump. Once a pixel is found that has not yet been
-assigned to a clump and is above the background level, the algorithm
-proceeds to trace out a route from this pixel to a neighbouring peak. It
-does this in a series of steps (comparable to the steps of a
-fell-walker). At each step the algorithm looks at the 3$\times$3 square of
-neighbouring pixels (a 3$\times$3$\times$3 cube for 3D data), and selects the
-neighbour which would produce the highest gradient for the next step. The
-algorithm then moves to that pixel and proceeds with the next step.
-
-Eventually, this algorithm will reach a local maximum; a point from which
-all routes go down-hill. But this may be merely a noise spike, rather
-than a significant peak, and so a check is made over a more extended
-neighbourhood to see if a pixel with a higher data value than the current
-pixel can be found (the extent of this extended neighbourhood is
-specified by the configuration parameter \texttt{FellWalker.MaxJump}). If so, the
-algorithm ``jumps'' to the pixel with the highest value in the extended
-neighbourhood, and then proceeds as before to walk up-hill. If no pixel
-with a higher value is found within the extended neighbourhood, the pixel
-is designated as a significant peak, and is assigned a unique integer
-identifier. This integer is used to identify all pixels which are within
-the clump of emission containing the peak, and all pixels which were
-visited along the walk are assigned this identifier.
-
-If, in the process of walking up-hill, a pixel is visited which has
-already been assigned to a clump, then the walk is terminated at that
-point and all the pixels so far visited are assigned to the same clump.
-
-In some cases, the initial part of a walk may be over very flat
-``terrain''. The significant part of a walk is considered to start when
-the average gradient (taken over a 4 step length) first reaches the value
-of configuration parameter \texttt{FlatSlope}. Any pixels visited prior to this point
-are deemed not to be in any clump. However, this only applies if the
-walk starts at or close to ``sea level''. For walks which start from a
-higher level (\emph{i.e.} from a pixel which has a data value greater than
-the selected background level plus twice the RMS noise level), the entire
-length of the walk is used, including any initial flat section.
-
-Once all pixels in the data array have been considered as potential
-starts for such a walk, an array will have been created which holds an
-integer clump identifier for every data pixel. To reduce the effect of
-noise on the boundaries between clumps, a cellular automata can be used
-to smooth the boundaries. This replaces each clump identifier by the most
-commonly occurring value within a 3$\times$3 square (or 3$\times$3$\times$3
-cube for 3D data)
-of neighbours. The number of times which this cleaning process should be
-applied is specified by configuration parameter \texttt{CleanIter}.
-
-If the high data values in a clump form a plateau with slight
-undulations, then the above algorithm may create a separate clump for
-each undulation. This is probably inappropriate, especially if the dips
-between the undulations are less than or are comparable to the noise
-level in the data. This situation can arise for instance if the
-pixel-to-pixel noise is correlated on a scale equal to or larger than the
-value of the \texttt{MaxJump} configuration parameter. To avoid this, adjoining
-clumps are merged together if the dip between them is less than a
-specified value. Specifically, if two clumps with peak values \emph{PEAK1}
-and  \emph{PEAK2}, where \emph{PEAK1} is less than \emph{PEAK2}, are
-adjacent to each other, and if the pixels along the interface between the
-two clumps all have data values which are larger than ``\emph{PEAK1 - MinDip}''
-(where \emph{MinDip} is the value of the \texttt{MinDip} configuration
-parameter), then the two clumps are merged together.
-
-The results of this merging process are the final clump allocations for
-every data pixel, from which the catalogue of clump parameters is
-produced.
-
 \section{Examining the Results}
 
 For all algorithms other than GaussClumps, the pixel values in the output
@@ -656,14 +662,6 @@ display the intersection of the tenth pixel plane with clump number 12, do:
 
 \item Use the 3D facilities of \xref{GAIA}{sun214}{} \latex{(SUN/214)},
 accessed through the \verb+Open cube+ entry in the \verb+File+ menu.
-
-\item Use a complete 3D visualisation such as OpenDX (see
-\url{http://www.opendx.org/}). The
-facilities of the Starlink DX extension package (known as ``SX''
-\xref{SX}{sun203}{} \latex{(SUN/203)}) may be useful as it provides
-a means of converting NDF data files to the DX native format, and also
-provides some demonstration DX ``networks'' that can be used to do simple
-visualisations of a 3D data cube.
 
 \end{enumerate}
 
