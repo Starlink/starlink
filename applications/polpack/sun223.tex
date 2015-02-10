@@ -10,12 +10,12 @@
 \stardocsource      {sun\stardocnumber}
 \stardocnumber      {223.7}
 \stardocauthors     {D.S. Berry \& T.M. Gledhill }
-\stardocdate        {17th December 2012}
+\stardocdate        {10th February 2015}
 \stardoctitle       {POLPACK \\
                             An Imaging Polarimetry Reduction Package}
 \stardocversion     {Version 3.2-0}
 \stardocmanual      {Users' Manual}
-\startitlepic {\includegraphics[clip,scale=1.0]{sun223_figures/fig}}
+\startitlepic {\includegraphics[clip,width=0.75\textwidth]{sun223_figures/fig}}
 \stardocabstract  {POLPACK is a package of applications for
 reducing imaging polarimetry or spectropolarimetry data. They cover
 registration, sky subtraction, calculation of Stokes parameters, and
@@ -71,7 +71,6 @@ the Joint Astronomy Centre in Hawaii), and reduced using SURF and POLPACK.
 
 \providecommand{\STARURL}{http://www.starlink.ac.uk}
 \providecommand{\TCLURL}{http://www.scriptics.com/}
-\providecommand{\IRAFURL}{http://www.starlink.ac.uk/iraf/web/iraf-homepage.html}
 \providecommand{\STORE}{http://www.starlink.ac.uk/cgi-bin/storetop}
 
 \providecommand{\latexonlysection}[1]{\section{#1}}
@@ -217,7 +216,7 @@ Each component is described more fully below.
 
   \begin{figure}[htb]
   \begin{center}
-  \includegraphics[clip,scale=0.5]{sun223_figures/optical}
+  \includegraphics[clip,width=0.95\textwidth]{sun223_figures/optical}
   \caption{The main optical components in a typical dual-beam imaging polarimeter.}
   \label{fig:optical}
   \end{center}
@@ -250,7 +249,7 @@ a mask containing only a single aperture), but the principle is the same.
 
   \begin{figure}[p]
   \begin{center}
-  \includegraphics[clip,scale=0.8]{sun223_figures/grids}
+  \includegraphics[clip,width=0.95\textwidth]{sun223_figures/grids}
   \caption{An example of a masking system used in a dual-beam imaging polarimeter.}
   \label{fig:grids}
   \end{center}
@@ -368,7 +367,7 @@ further processing.
   \vspace{5mm}
   \begin{figure}[htbp]
   \begin{center}
-  \includegraphics[clip,scale=0.5]{sun223_figures/extract}
+  \includegraphics[clip,width=0.95\textwidth]{sun223_figures/extract}
   \caption{Extraction of the \emph{O} and \emph{E} ray images.}
   \label{fig:extract}
   \end{center}
@@ -505,7 +504,7 @@ Figure~\ref{fig:singopt}.
   \vspace{2mm}
   \begin{figure}[htb]
   \begin{center}
-  \includegraphics[clip,scale=0.5]{sun223_figures/singopt}
+  \includegraphics[clip,width=0.95\textwidth]{sun223_figures/singopt}
   \caption{The main optical components in a typical single-beam imaging polarimeter.}
   \label{fig:singopt}
   \end{center}
@@ -540,7 +539,7 @@ and half-wave plate (see Figure~\ref{fig:effan}).
 
   \begin{figure}[htpb]
   \begin{center}
-  \includegraphics[clip,scale=0.5]{sun223_figures/effan}
+  \includegraphics[clip,width=0.95\textwidth]{sun223_figures/effan}
   \vspace{4mm}
   \caption{The effective analyser position for a rotating half-wave plate.}
   \label{fig:effan}
@@ -658,7 +657,7 @@ is given in Figure~\ref{fig:dataflow}.
 
   \begin{figure}[htpb]
   \begin{center}
-  \includegraphics[clip,scale=0.7]{sun223_figures/dataflow}
+  \includegraphics[clip,width=0.75\textwidth]{sun223_figures/dataflow}
   \vspace{4mm}
   \caption{The main steps in the production of a polarization map.}
   \label{fig:dataflow}
@@ -681,7 +680,6 @@ information about these issues:
 \item ``\xref{NDF History}{sun95}{se_ndfhistory}''
 \item ``\xref{The Graphics Database}{sun95}{se_agitate}''
 \item ``\xref{Using World Co-ordinate Systems}{sun95}{se_wcsuse}''
-\item ``\xref{Procedures}{sun95}{se_procedures}''
 \end{itemize}
 
 \subsection{\label{SEC:CONVERT}\xlabel{formatconversion}Format Conversion}
@@ -836,8 +834,7 @@ command:
 \end{terminalv}
 
 This command must be issued before attempting to use any POLPACK
-applications. POLPACK is also available from the \xref{ICL}{sg5}{}
-(see SG/5) command language, and the IRAF cl.
+applications.
 
 \subsection{\label{SEC:IMPORT}Importing Header Information}
 POLPACK needs to know certain items of header information about each of
@@ -1025,7 +1022,7 @@ being made during this phase.
 
   \begin{figure}[htpb]
   \begin{center}
-  \includegraphics[clip,scale=0.85]{sun223_figures/polka}
+  \includegraphics[clip,width=0.85\textwidth]{sun223_figures/polka}
   \vspace{4mm}
   \caption{The Graphical User Interface presented by POLKA.}
   \label{fig:polka}
@@ -1181,24 +1178,17 @@ In addition, the catalogues produced by POLBIN and POLVEC can be examined
 and interactively edited using the polarimetry toolbox within
 \xref{GAIA}{sun214}{} (SUN/214).
 
-Since the polarization parameters are stored in a catalogue, the
-\xref{CURSA}{sun190}{} package (see SUN/190) can be used to
-examine and manipulate them. One particularly useful facility within
-CURSA is the \xref{CATSELECT}{sun190}{SELECT} application, which
-allows rows within a catalogue to be selected on the basis of an
-arbitrary mathematical expression. For instance the following commands
-create a new catalogue called \verb+selcat.FIT+ which contains all the
-vectors from \verb+bincat.FIT+ for which the polarization is less than
-30\% and has a standard deviation less than 5\%:
+Since the polarization parameters are stored in a catalogue, TOPCAT (see
+\url{http://www.starlink.ac.uk/topcat/}) can be used to examine them. Also,
+the STILTS package (\url{http://www.starlink.ac.uk/stilts/}) can be
+used to manipulate them. For instance the following commands create a new
+catalogue called \verb+selcat.FIT+ which contains all the vectors from
+\verb+bincat.FIT+ for which the polarization is less than 30\% and has a
+standard deviation less than 5\%:
 
 \begin{terminalv}
-% cursa
-% catselect catin=bincat catout=selcat norejcat seltyp=e "expr='p<30 & dp<5'"
+% stilts tpipe in=bincat.FIT out=selcat.FIT cmd='select "p<30 && dp<5"'
 \end{terminalv}
-
-The \xref{XCATVIEW}{sun190}{XVIEW} application allows you to examine the
-data in a catalogue, using a Graphical User Interface to control the
-operation and display the results.
 
 Note, the \htmlref{POLIMAGE}{POLIMAGE} application can be used to extract
 the values from a specified column of a catalogue into an image. The image
@@ -1235,17 +1225,14 @@ the vectors with polarizations of less than 50\% and standard deviations of
 less than 5\%:
 
 \begin{terminalv}
-% cursa
-% catselect catin=bincat catout=selcat norejcat seltyp=e "expr='p<50 & dp<5'"
+% stilts tpipe in=bincat.FIT out=selcat.FIT cmd='select "p<50 && dp<5"'
 \end{terminalv}
 
 \item \label{STEP:DEVICE} Start up KAPPA, and then select the graphics
-device and the image display device (both are set to an X windows display
-in this example):
+device (set to an X windows display in this example):
 \begin{terminalv}
 % kappa
 % gdset xwindows
-% idset xwindows
 \end{terminalv}
 
 \item Clear the screen:
@@ -1319,36 +1306,31 @@ grey-scale image, replace step \ref{STEP:DISPLAY} with:
 % contour "cube(,,1)" mode=per percentiles="[90,93,96,99]" noaxes nokey
 \end{terminalv}
 
-\item If you want your output in the form of a PostScript file, there is
-an extra step. This is because graphics applications such as DISPLAY,
-CONTOUR, POLPLOT, \emph{etc.}, produce separate output PostScript files which
-then need to be combined into a single file using the
-\xref{\texttt{psmerge}}{sun164}{} command. In step \ref{STEP:DEVICE},
-specify the device as \verb+epsf_l+ (Encapsulated PostScript, landscape
-mode) instead of \verb+xwindows+. The first graphics applications to be
-run will then write its output to the file \verb+gks74.ps+, and
-subsequent graphics applications will write their output to files
-\verb+gks74.ps.1+, \verb+gks74.ps.2+, \emph{etc.}\footnote{The sequence number
-added to the end of the file name is always one higher than in any
-existing files.}. To produce a contour map with overlaid vectors, replace
-steps \ref{STEP:DISPLAY} and \ref{STEP:POLPLOT} with:
+\item If you want your output in the form of a PostScript file, you
+should choose one of the ``accumulating'' postscript devices such as
+``\texttt{/acps}, from the list of graphics devices produced by the KAPPA
+\xref{GDNAMES}{sun95}{GDNAMES} command. This causes the postscript output
+from each subsequent command to be accumulated into a single postscript
+file, which by default is called \emph{pgplot.ps}. For instance, to produce
+a contour map with overlaid vectors, do:
 
 \begin{terminalv}
-% rm gks74.ps*
+% setenv PGPLOT_PS_FONT Times
+% gdset \acps
+% gdclear
 % contour "cube(,,1)" mode=per percentiles="[90,93,96,99]" noaxes nokey
-% mv gks74.ps.1 contour.ps
 % polplot selcat noclear
-% mv gks74.ps.1 polplot.ps
-% psmerge polplot.ps contour.ps > total.ps
 \end{terminalv}
 
-Note, CONTOUR produces two PostScript files (\verb+gks74.ps+ and
-\verb+gks74.ps.1+). Make sure you use \verb+gks74.ps.1+\footnote{If you are
-unsure about which PostScript file is which, don't forget that you can
-examine the individual files using \texttt{ghostview}.}.
+The file \verb+pgplot.ps+ then contains the combined PostScript data
+from both the contour plot and the vector plot, which can be converted
+to some other graphics format or printed on a suitable printer
 
-The file \verb+total.ps+ then  contains the combined PostScript data
-which can be printed on a suitable printer.
+Note setting environment variable PGPLOT\_PS\_FONT to ``Times'' causes
+text to be produced using a higher quality postscript font (Times New
+Roman). Other alternative font names are ``Helvetica'', ``Courier'',
+``NewCentury'' and ``Zapf''. Leaving the environment variable unset will
+cause the lower quality default PGPLOT font to be used.
 
 \end{itemize}
 
@@ -1538,7 +1520,7 @@ with the catalogue will be precessed if necessary.
 ecliptic co-ordinates referred to the B1983.4 equinox.
 
 \subsubsection {Aligning Vector Maps with Other Images}
-If you are using KAPPA V0.13 or later, and have an image containing a
+If you have an image containing a
 calibration in a suitable celestial co-ordinate system, then you can plot
 the polarization vectors in alignment with the image. If you follow the
 procedure described \slhyperref{here}{in section }{}{SEC:DISP}, then the
@@ -1555,85 +1537,6 @@ quoted strings \texttt{""} and vector braces \texttt{[ ]} must be protected
 by using either the escape character {\small \verb+\+} or by single
 quotes (wild-card characters must be protected as these are expanded
 internally by POLPACK, rather than by the shell).
-
-\section{Running from the IRAF cl}
-POLPACK is written for the \xref{Starlink software environment}{sg5}{},
-but may also be run from the \htmladdnormallink{IRAF}{\IRAFURL} cl,
-reading and writing IRAF \texttt{.imh} image files using the `on-the-fly'
-data-conversion facilities described \slhyperref{here} {in section }{}
-{SEC:CONVERT}.
-
-Assuming that all the \htmlref{required software}{required_software}
-has been installed in the \xref{recommended way}{sun217}
-{installing_the_starlink_software} and IRAF initialised as usual, the
-POLPACK may be loaded at the cl prompt by:
-
-\begin{terminalv}
-cl> polpack
-\end{terminalv}
-
-the menu of commands will be displayed as for normal IRAF packages and
-applications are invoked and help obtained in the normal way. However,
-the IRAF Cl is not the Starlink software environment, and you will find
-some differences in the way POLPACK behaves when run from the two
-environments (other than the obvious ones like the way parameters are
-prompted for). These include:
-
-\begin{itemize}
-
-\item The \htmlref{POLHELP}{POLHELP} command is not available. Use the
-IRAF help system instead.
-
-\item In transforming data from NDF to IRAF format, some information may
-be lost. In particular, any VARIANCE component in an NDF will be lost and
-so variance estimates will not be made by POLPACK. Also, bad pixels
-within NDFs will be replaced by the value zero when converted to IRAF
-format.
-
-\item Some of the Starlink packages which you may be used to using with
-POLPACK may not be available under IRAF. For instance, at the moment the
-\xref{CURSA}{sun190}{} package which can be used to manipulate catalogues of
-polarization vectors is not available under IRAF.
-
-\end{itemize}
-
-The experienced IRAF user will also detected some differences between the
-way POLPACK runs under cl and the way standard IRAF packages run under cl
-\dash\ in the areas of graphics and parameter handling for instance. Some
-general guidance on running Starlink applications from IRAF cl is given in
-\xref{SUN/217}{sun217}{}. A description, intended for programmers, of the
-way Starlink packages are set up for use with IRAF, and some technical
-detail about how the system works is in \xref{SSN/35}{ssn35}{}.
-
-\subsection{Required Software\label{required_software}}
-To run POLPACK applications from IRAF cl you will require the following
-Starlink software items in addition to POLPACK:
-
-\begin{description}
-
-\item[\xref{IRAFSTAR}{ssn35}{}] The IRAF/Starlink inter-operability
-infrastructure.
-
-\item[\xref{TCLSYS}{sun200}{}] The Starlink distribution of
-\htmladdnormallink{Tcl}{\TCLURL} and associated items.
-
-\item[\xref{STARTCL}{sun186}{}] Starlink extensions to Tcl \dash\ including
-the TCL/GWM Xdisplay Widget.
-
-\item[RUNTIME] Miscellaneous items of software required by most applications
-at runtime.
-
-\item[\xref{CONVERT}{sun55}{}] The data-conversion software required if the
-automatic data-conversion facilities are to be used.
-
-\item[\xref{HTX}{sun188}{}] Document cross-referencing software required during
-installation of Starlink software.
-
-\end{description}
-
-More details on this, including how to obtain and install the software are in
-\xref{SUN/217}{sun217}{installing_the_starlink_software}
-Appendix A.
 
 \section{\label{SEC:GRPEXP}\xlabel{groupexpressions}Group Expressions}
 Several of the POLPACK applications have parameters which are described
@@ -1894,16 +1797,6 @@ unexpected behaviour is encountered while using POLPACK:
 
 \begin{description}
 
-\item [``POLPLOT cannot align the vector map with a previously displayed
-image''] - If you use the CURSA application \xref{XCATVIEW}{sun190}{XVIEW}
-to create a catalogue, you should ensure that textual information is
-stored with the output catalogue. This is done by selecting the
-appropriate option when you use the \texttt{Save} command  in the
-\texttt{File} menu. The textual information stored with a POLPACK
-catalogue contains the information describing how to align the vectors with
-other co-ordinate systems, and so failure to copy this information will
-mean that the output catalogue cannot be aligned with other images.
-
 \item [``\texttt{Command not found}''] - Have you started up POLPACK
 as described \slhyperref{here}{in section }{}{SEC:START}?
 
@@ -1943,37 +1836,7 @@ the HDS\_SCRATCH environment variable before running POLKA.
 The scheme used to activate the hypertext browser may not work for all
 combinations of browsers and operating systems. You may be able to get
 round this by specifying a different browser using the HTX\_BROWSER
-environment variable. For instance, some revisions of \texttt{netscape V4}
-fail to appear using POLKA under Digital UNIX V4. If you have a copy of
-\texttt{netscape V3} you could use it instead by setting HTX\_BROWSER to
-its path:
-
-\begin{terminalv}
-% setenv HTX_BROWSER /usr/local/bin/netscape.v3
-\end{terminalv}
-
-replacing the example path with the correct path for your machine.
-
-\item [``POLKA always uses a private colour map''] - POLKA
-requires its own private colour table if there are other colour-greedy
-applications running when POLKA tries to create the image display area.
-The \texttt{netscape} hypertext browser is a common example. Shutting down
-such applications before running POLKA should get round the problem.
-
-Note, if the parameter STARTHELP has a true value when running POLKA,
-then a hypertext browser will be created automatically \emph{before} the
-image display area is created. If this causes a private colour map to be
-used, then you could disable the automatic creation of the hypertext
-browser by setting STARTHELP to a false value when running POLKA:
-
-\begin{terminalv}
-% polka starthelp=no
-\end{terminalv}
-
-This need only be done once. Subsequent invocations of POLKA will use the
-same value for STARTHELP until a new value is specified on the command
-line. If necessary, you can still access the hypertext help using the
-\texttt{Help} menu button at the top right corner of the POLKA interface.
+environment variable.
 
 \item [``The catalogue produced by POLVEC has lots of zero polarized
 intensity values in it''] - POLVEC can apply a correction to to the values
@@ -1988,22 +1851,6 @@ zero polarized intensity values. Note, the $Q$ and $U$ values are
 estimates of the required quantities.
 
 \end{description}
-
-\section{Acknowledging this Software}
-Please acknowledge the use of this software in any publications arising
-from research in which it has played a significant role. Please also
-acknowledge the use of any other Starlink resources (hardware or
-software) in such publications. The following is suggested as a suitable
-form of words:
-
-\begin{center}
-\begin{quote}
-\emph{The authors acknowledge the data analysis facilities provided by
-the Starlink Project which is run by CCLRC on behalf of PPARC. In
-addition, the following Starlink packages have been used: POLPACK,} ...
-\end{quote}
-\end{center}
-
 
 \newpage
 \appendix
@@ -3249,8 +3096,9 @@ for NDF applications.
          in the DATA component of the output NDF. A list of available
          column names is displayed if a non-existent column name is given.
          An arbitrary algebraic combination of columns may be used by
-         supplying a CURSA expression instead of a single column name. See
-         SUN/190 for details of the syntax of these expressions.
+         supplying a expression instead of a single column name. The
+         expressions should be in the form expected by the CURSA package -
+         see \xref{SUN/190}{sun190}{} for details of the syntax.
       }
       \sstsubsection{
          COLVAR = LITERAL (Read)
@@ -5616,7 +5464,7 @@ dialogue box shown in Figure~\ref{fig:gaia1}.
 
   \begin{figure}[htb]
   \begin{center}
-  \includegraphics[clip,scale=0.5]{sun223_figures/gaia1}
+  \includegraphics[clip,width=0.75\textwidth]{sun223_figures/gaia1}
   \caption{The main GAIA dialogue box used to create an RA/DEC calibration.}
   \label{fig:gaia1}
   \end{center}
@@ -5635,7 +5483,7 @@ Figure~\ref{fig:gaia2}.
 
   \begin{figure}[htb]
   \begin{center}
-  \includegraphics[clip,scale=0.5]{sun223_figures/gaia2}
+  \includegraphics[clip,width=0.75\textwidth]{sun223_figures/gaia2}
   \caption{The GAIA dialogue box used to give a new reference position.}
   \label{fig:gaia2}
   \end{center}
@@ -5657,7 +5505,7 @@ object picker dialogue box
 
   \begin{figure}[htb]
   \begin{center}
-  \includegraphics[clip,scale=0.5]{sun223_figures/gaia3}
+  \includegraphics[clip,width=0.75\textwidth]{sun223_figures/gaia3}
   \caption{The GAIA object picker dialogue box.}
   \label{fig:gaia3}
   \end{center}
@@ -5829,7 +5677,7 @@ Figure~\ref{fig:varest}:
 
   \begin{figure}[htbp]
   \begin{center}
-  \includegraphics[clip,scale=0.9]{sun223_figures/varest}
+  \includegraphics[clip,width=0.95\textwidth]{sun223_figures/varest}
   \caption[The estimation of input variances.]{The estimation of input variances. The observed and expected
            intensity images are combined to form a single variance image.}
   \label{fig:varest}
@@ -5918,7 +5766,7 @@ illustrated in Figure~\ref{fig:quadfit}.
 
   \begin{figure}[htbp]
   \begin{center}
-  \includegraphics[clip,scale=0.75]{sun223_figures/quadfit}
+  \includegraphics[clip,width=0.95\textwidth]{sun223_figures/quadfit}
   \caption[A 1-D representation of the smoothing performed in
   single-beam mode.]{A 1-dimensional representation of the smoothing performed by
            POLCAL in single-beam mode. In this example, each pixel is
@@ -6062,7 +5910,7 @@ assumed that the reference direction is parallel to the first image axis).
 
   \begin{figure}[htbp]
   \begin{center}
-  \includegraphics[clip,scale=0.75]{sun223_figures/polext}
+  \includegraphics[clip,width=0.95\textwidth]{sun223_figures/polext}
   \caption{The allowed items within the POLPACK extension.}
   \label{fig:polext}
   \end{center}
