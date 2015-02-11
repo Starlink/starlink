@@ -38,7 +38,9 @@ built separately, using the procedure described in Java README
 (currently these are available from the git repository at
 git://github.com/Starlink/starjava.git). You do not need to build any of
 the Starlink classic applications to build the Java ones, unless you need to
-rebuild the native parts of JNIAST, JNIHDS or SPLAT.
+rebuild the native parts of JNIAST, JNIHDS or SPLAT. To build the documents
+for the Starjava applications FROG and SPLAT you will need the Starlink
+applications star2html and the latex classes provided in latexsupport.
 
  Preparation
  -----------
@@ -428,7 +430,10 @@ Prerequisites
 This section lists some of the software development tools and headers
 that are required to build Starlink. The list is not exhastive, but is
 just a suggestion of some packages to check that may not not be provided
-by default by your operating system.
+by default by your operating system. To build the documentation on any system
+will require a reasonably complete up-to-date TeX install that includes the
+TeX4HT system -- for example, a recent TeXLive installation which includes
+a variety of standard packages.
 
 Ubuntu:
    git
