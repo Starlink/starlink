@@ -360,9 +360,9 @@ Platform specific build notes
   g95, or gfortran. The latter is available from hpc.sourceforge.net
   as well as MacPorts.
 
-  Note you'll also need a development installation of the Apple X11
-  environment, and a functioning TeX and Ghostscript if you want to build the
-  documents.
+  Note you'll also need to install X11 (see http://xquartz.macosforge.org),
+  and a functioning TeX and Ghostscript if you want to build the
+  documents. The build on Mac OSX is not relocatable.
 
   - Solaris
 
@@ -488,6 +488,12 @@ CentOS 7:
    libxml2-devel
    ncurses-devel
    texlive-multirow
+
+MacOSX:
+    gfortran
+    XCode
+    xcode commandline tools
+
 
 SGML tools:
    A few documents within the Starlink tree were prepared using a
