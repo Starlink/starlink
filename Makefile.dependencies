@@ -757,10 +757,6 @@ $(MANIFESTS)/docfind: \
 	cd applications/docfind \
 	  && $(MAKE_CPT)
 
-$(MANIFESTS)/dvi2bitmap:
-	cd thirdparty/norman/dvi2bitmap \
-	  && $(MAKE_CPT)
-
 $(MANIFESTS)/echomop: \
 		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ary \
@@ -2912,7 +2908,6 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/datacube \
 	$(MANIFESTS)/dipso \
 	$(MANIFESTS)/docfind \
-	$(MANIFESTS)/dvi2bitmap \
 	$(MANIFESTS)/echomop \
 	$(MANIFESTS)/echwind \
 	$(MANIFESTS)/ems \

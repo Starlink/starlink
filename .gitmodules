@@ -7,9 +7,6 @@
 [submodule "thirdparty/kitware/vtk/cmake"]
 	path = thirdparty/kitware/vtk/cmake
 	url = ../cmake.git
-[submodule "thirdparty/norman/dvi2bitmap/dvi2bitmap"]
-	path = thirdparty/norman/dvi2bitmap/dvi2bitmap
-	url = ../dvi2bitmap.git
 [submodule "thirdparty/eso/skycat/skycat"]
 	path = thirdparty/eso/skycat/skycat
 	url = ../skycat.git
