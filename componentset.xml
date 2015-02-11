@@ -2300,7 +2300,7 @@ to handle data from a variety of different instruments.
       information should be of interest to all of the astronomical
       computing community.</p></abstract>
   <dependencies >
-    <sourceset>sgmlkit</sourceset>
+    <sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2836,7 +2836,7 @@ to handle data from a variety of different instruments.
   <path>docs/ssn/078</path>
   <description>Description of the build system</description>
   <dependencies >
-    <sourceset>sgmlkit</sourceset>
+    <sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -3100,7 +3100,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="pal" support="S">
-  <version>0.9.0</version>
+  <version>0.9.1</version>
   <path>libext/pal</path>
   <description>Positional Astronomy Library</description>
   <abstract><p>

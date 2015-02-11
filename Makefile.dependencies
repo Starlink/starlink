@@ -2289,8 +2289,7 @@ $(MANIFESTS)/sc12: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/sc13: \
-		$(MANIFESTS)/dvi2bitmap \
-		$(MANIFESTS)/sgmlkit
+		$(MANIFESTS)/star2html
 	cd docs/sc/013 \
 	  && $(MAKE_CPT)
 
@@ -2597,8 +2596,7 @@ $(MANIFESTS)/ssn75: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/ssn78: \
-		$(MANIFESTS)/dvi2bitmap \
-		$(MANIFESTS)/sgmlkit
+		$(MANIFESTS)/star2html
 	cd docs/ssn/078 \
 	  && $(MAKE_CPT)
 
