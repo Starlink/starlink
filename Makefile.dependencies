@@ -2374,11 +2374,6 @@ $(MANIFESTS)/sg9: \
 	cd docs/sg/009 \
 	  && $(MAKE_CPT)
 
-$(MANIFESTS)/sgmlkit: \
-		$(MANIFESTS)/dvi2bitmap
-	cd applications/sgmlkit \
-	  && $(MAKE_CPT)
-
 $(MANIFESTS)/sgp16: \
 		$(MANIFESTS)/star2html
 	cd docs/sgp/016 \
@@ -2977,7 +2972,6 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/sg4 \
 	$(MANIFESTS)/sg6 \
 	$(MANIFESTS)/sg9 \
-	$(MANIFESTS)/sgmlkit \
 	$(MANIFESTS)/sgp16 \
 	$(MANIFESTS)/sgp28 \
 	$(MANIFESTS)/sgp38 \

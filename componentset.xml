@@ -1613,40 +1613,6 @@ package.
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
-<component id="sgmlkit" support="S">
-  <version>0.7-13</version>
-  <path>applications/sgmlkit</path>
-  <description>Starlink documentation SGML kit</description>
-  <abstract><p>The Starlink SGML set supports people writing Starlink
-      documents, such as SUNs, SSNs, MUDs and the like.  It consists of a
-      definition of a markup language suitable for such documents,
-      plus software to convert these source documents to reader-friendly
-      form.  At present, these `output formats' include HTML and LaTeX
-      (and hence include postscript and PDF formats).</p></abstract>
-  <dependencies >
-    <sourceset>dvi2bitmap</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Norman Gray</name>
-      <uname>nxg</uname>
-      <email>norman@astro.gla.ac.uk</email>
-      <role>owner</role>
-    </person>
-    <person>
-      <name>Mark Taylor</name>
-      <uname>mbt</uname>
-      <email>m.b.taylor@bristol.ac.uk</email>
-    </person>
-  </developers>
-  <documentation> ssn70</documentation>
-  <bugreports>starlink@jiscmail.ac.uk</bugreports>
-  <copyright>
-    <year>1999-2004</year>
-    <name>Council for the Central Laboratory of the Research Councils</name>
-  </copyright>
-</component>
-
 <component id="smurf">
   <version>1.6.1</version>
   <path>applications/smurf</path>
