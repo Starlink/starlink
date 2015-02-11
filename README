@@ -118,14 +118,14 @@ applications star2html and the latex classes provided in latexsupport.
 
  To build the complete source distribution, you go through the steps:
 
-   ./bootstrap
-   make configure-deps
-   ./configure -C
-   make world
+   % ./bootstrap
+   % make configure-deps
+   % ./configure -C
+   % make world
 
-   cd thirdparty/perlsys/perlmods
-   setenv STARLINK_DIR $STARCONF_DEFAULT_PREFIX
-   ./build-modules.sh
+   % cd thirdparty/perlsys/perlmods
+   % setenv STARLINK_DIR $STARCONF_DEFAULT_PREFIX # For csh-like shells.
+   % ./build-modules.sh
 
  Each of these steps is described in detail below.
 
