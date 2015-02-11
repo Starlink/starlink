@@ -8,7 +8,7 @@
   <description>Description of the build system</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >
-    <sourceset>sgmlkit</sourceset>
+    <sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
