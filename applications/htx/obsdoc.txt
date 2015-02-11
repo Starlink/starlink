@@ -72,6 +72,7 @@ ssn66
 ssn67
 ssn7
 ssn70
+ssn71
 ssn9
 sun100
 sun103
