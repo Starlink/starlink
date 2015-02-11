@@ -2988,29 +2988,6 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sun248" support="U">
-  <version>0.1</version>
-  <path>docs/sun/248</path>
-  <description>Building Starlink Software</description>
-  <abstract><p>This document contains instructions on how to build the Starlink
-      software from source.  It contains a few platform-specific notes, and
-      a comparison with the old 'mk-based' build system.  This document is
-      deliberately terse, since we have invested effort in making the
-      processes involved as easy as possible.</p></abstract>
-  <dependencies >
-    <sourceset>sgmlkit</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Norman Gray</name>
-      <uname>nxg</uname>
-      <email>norman@astro.gla.ac.uk</email>
-    </person>
-  </developers>
-  <documentation> sun248</documentation>
-  <bugreports>starlink@jiscmail.ac.uk</bugreports>
-</component>
-
 <component id="sun249">
   <version>2</version>
   <path>docs/sun/249</path>

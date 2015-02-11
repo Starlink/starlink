@@ -2756,12 +2756,6 @@ $(MANIFESTS)/sun202: \
 	cd docs/sun/202 \
 	  && $(MAKE_CPT)
 
-$(MANIFESTS)/sun248: \
-		$(MANIFESTS)/dvi2bitmap \
-		$(MANIFESTS)/sgmlkit
-	cd docs/sun/248 \
-	  && $(MAKE_CPT)
-
 $(MANIFESTS)/sun249: \
 		$(MANIFESTS)/star2html
 	cd docs/sun/249 \
