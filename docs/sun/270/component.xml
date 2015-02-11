@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sun270" support="U">
+  <version>0.1</version>
+  <path>docs/sun/270</path>
+  <description>Starlink Latex Suppport for pdf and html</description>
+  <abstract><p>Documentation and advice for using the starlink.cls
+      \LaTeX\ class and its TeX4HT configurations when building pdf
+      and html starlink documentation.</p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Sarah F Graves</name>
+    </person>
+  </developers>
+  <documentation> sun270</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
