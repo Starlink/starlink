@@ -383,14 +383,8 @@ Platform specific build notes
 Further information
 -------------------
 
-The Starlink document SUN/248 gives further advice about building Starlink
-classic applications, including some old, out-of-date, platform-specific
-notes.  A version is currently (May 2006) available at
-<http://www.astro.gla.ac.uk/users/norman/star/sun248/>.
-The source is in the repository at docs/sun/248.
-
 You should consult the project web pages at <http://www.starlink.ac.uk>,
-<http://starlink.jach.hawaii.edu> and consider subscribing to the Starlink
+<http://starlink.eao.hawaii.edu> and consider subscribing to the Starlink
 development and user mailing lists: see
 <http://www.jiscmail.ac.uk/archives/starlink.html> and
 <http://www.jiscmail.ac.uk/archives/stardev.html>.
@@ -414,9 +408,9 @@ git repository
 --------------
 
 In February 2009 the Starlink source code was moved to a git repository
-at the JAC Hawaii. This is described by a wiki at:
+on github. This is described by a wiki at:
 
-   http://starlink.jach.hawaii.edu/
+   http://starlink.eao.hawaii.edu/
 
 The build procedures described above are still correct, but much of the
 associated documentation, SSN/78 etc. are becoming rapidly out-of-date.
