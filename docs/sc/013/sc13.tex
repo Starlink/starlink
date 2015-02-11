@@ -830,19 +830,19 @@ only suitable language.
 Why is this?  The reason can be illustrated by the two
 languages' loop semantics.  Fortran's loop is very simple:
 
-\begin{verbatim}
+\begin{terminalv}
    do 10, i=1,n
 C  process array element a(i)
 10 continue
-\end{verbatim}
+\end{terminalv}
 
 The equivalent construction in C is
 
-\begin{verbatim}
+\begin{terminalv}
     for (i=0; i<n; i++) {
        /* process array element a[i] */
     }
-\end{verbatim}
+\end{terminalv}
 
 The difference is what the two language compilers can say about the
 loop. The Fortran compiler can know that the loop
@@ -860,14 +860,14 @@ pointer, it could point \emph{anywhere}.  The Fortran
 compiler could
 rewrite the first loop as
 
-\begin{verbatim}
+\begin{terminalv}
       do 10, i=1,n,4
 C     process array element a(i)
 C     process array element a(i+1)
 C     process array element a(i+2)
 C     process array element a(i+3)
    10 continue
-\end{verbatim}
+\end{terminalv}
 
 cutting the number end-of-loop tests by a factor of four (this is a
 simple example of `loop unrolling', and presumes that
@@ -1300,9 +1300,9 @@ there's one built in to the JVM.  Give the option
 \texttt{-Xrunhprof:help} to find out how to invoke it.
 For example: 
 
-\begin{verbatim}
+\begin{terminalv}
 java -Xrunhprof:cpu=samples,file=myprog.hprof myclass
-\end{verbatim}
+\end{terminalv}
 
 There's quite a lot of information in
 here (and the file format is under development), but as
@@ -1342,9 +1342,9 @@ performing edits on a stream of text.  For example, the
 following rather elaborate \texttt{sed} script
 prints all the section headings from a LaTeX document:
 
-\begin{verbatim}
+\begin{terminalv}
 sed -n 's/^\\\(sub\)*section{\(.*\)}.*\$/\2/p' sc13.tex
-\end{verbatim}
+\end{terminalv}
 
 This may look like
 gibberish, but it is simpler than it looks.  The option
@@ -1391,10 +1391,10 @@ are two versions of \texttt{ps} on Suns --- this
 example assumes you are using the
 \texttt{/usr/ucb/ps} version.}
 
-\begin{verbatim}
+\begin{terminalv}
 ps u | sed 1d | \
    awk '{print $4, $0; totmem+=$4}; END {printf "total memory: %f\n", totmem}'
-\end{verbatim}
+\end{terminalv}
 
 This (not terribly useful) line generates a process
 listing using \texttt{ps}, uses \texttt{sed} to
@@ -1506,7 +1506,7 @@ in your current directory.  Then you can run
 \ref{a:profiling}, we can build and profile them as
 follows:
 
-\begin{verbatim}
+\begin{terminalv}
 % f77 -pg -o timewaster p1.f p2.f p3.f
 p1.f:
 MAIN silly:
@@ -1521,14 +1521,14 @@ Linking:
 gmon.out        p1.o            p2.o            p3.o
 p1.f            p2.f            p3.f            timewaster*
 % gprof timewaster > timewaster.gprof
-\end{verbatim}
+\end{terminalv}
 
 The output file \texttt{timewaster.gprof} is many lines long, even
 though the program is so short!  The file contains a great deal of
 information, but buried amongst it is the following display (from the
 Sun profiler, trimmed):
 
-\begin{verbatim}
+\begin{terminalv}
 called/total       parents
 index  %time    self descendents  called+self    name    	index
 called/total       children
@@ -1543,7 +1543,7 @@ called/total       children
  -----------------------------------------------
 0.64        0.00  100000/100000      MAIN_ [1]
 4]     90.1    0.64        0.00  100000         mkidentity_ [4]
-\end{verbatim}
+\end{terminalv}
 
 This indicates that the subroutine \texttt{mkidentity}
 was called 100000 times from the main program, and that
@@ -1715,11 +1715,13 @@ If you run through this array
 with the first index changing fastest, as in the
 following fragment
 
-\begin{verbatim}
-do 10,
-j=1,1000 do 20, i=1,1000 call some_calc (ia(i,j)) 20
-continue 10 continue
-\end{verbatim}
+\begin{terminalv}
+      do 10, j=1,1000
+        do 20, i=1,1000
+          call some_calc (ia(i,j))
+   20   continue
+   10 continue
+\end{terminalv}
 
 then
 you will move through the array in the `natural' order.
@@ -1811,7 +1813,7 @@ precision by using raw I/O rather than formatted ASCII
 [\hyperlink{ta:rw}{RW}].
 A C example is:
 
-\begin{verbatim}
+\begin{terminalv}
 FILE *ofile; float arr[10];
 
 /* set arr[i] to have sensible values */
@@ -1819,7 +1821,7 @@ FILE *ofile; float arr[10];
 ofile = fopen ("output-c.dat", "w");
 fwrite ((void*)arr, sizeof(arr[0]), 10, ofile);
 fclose (ofile);
-\end{verbatim}
+\end{terminalv}
 
 Note that we carefully cast the variable
 \texttt{arr} to type \texttt{void*}, and that we
@@ -1850,14 +1852,14 @@ interpretation.
 
 The corresponding Fortran example is
 
-\begin{verbatim}
+\begin{terminalv}
       real arr(10)
 
 C     set arr() to have sensible values
       open (unit=99,file='output-f.dat',form='unformatted')
       write (99) arr
       close (99)
-\end{verbatim}
+\end{terminalv}
 
 Note that Fortran unformatted output is not portable in
 any way.  Unlike C raw I/O, the Fortran compiler is free
@@ -1885,7 +1887,7 @@ values positive and negative \texttt{Infinity} are
 legitimate numbers which can appear in a calculation.
 Consider the following code fragment:
 
-\begin{verbatim}
+\begin{terminalv}
       do 10, i=-5000,5000
          do 20, j=-5000,5000
             if (j .ne. 0) then
@@ -1895,7 +1897,7 @@ Consider the following code fragment:
             endif
    20    continue
    10 continue
-\end{verbatim}
+\end{terminalv}
 
 The \texttt{if} test is to avoid a division-by-zero
 error.  If this loop were buried deep within a hierarchy
@@ -2020,7 +2022,7 @@ corresponding command is \texttt{limit coredumpsize unlimited}}.  You can obtain
 post-mortem information from this core file with
 \texttt{dbx}, as follows:
 
-\begin{verbatim}
+\begin{terminalv}
 % dbx crash core
 [...]
 program terminated by signal SEGV (no mapping at the fault address)
@@ -2028,7 +2030,7 @@ program terminated by signal SEGV (no mapping at the fault address)
 =>[1] bananas(0x0, 0x1, 0xef691338, 0x10074, 0x2, 0xeffff8d0), at 0x10870
 [2] main(0x1, 0xeffff94c, 0xeffff954, 0x20800, 0x1, 0x0), at 0x108fc
 (dbx) quit
-\end{verbatim}
+\end{terminalv}
 
 The \texttt{where} command to \texttt{dbx} shows
 where the program was when it crashed (the
@@ -2050,7 +2052,7 @@ not on Solaris or for \texttt{gdb} on Linux.
 If we run \texttt{crash} again now, and look at the core file, we see
 that the debugger can provide us with more information.
 
-\begin{verbatim}
+\begin{terminalv}
 % dbx crash core
 [...]
 program terminated by signal SEGV (no mapping at the fault address)
@@ -2069,7 +2071,7 @@ dbx: reference through nil pointer
 (dbx) print zp
 zp = (nil)
 (dbx) quit
-\end{verbatim}
+\end{terminalv}
 
 Note that we can examine the values of variables in scope
 at the point where execution stopped, and that
@@ -2085,19 +2087,19 @@ normally, albeit with bugs we wish to track down.  For
 example, start the debugger and tell it to stop when it
 enters the function \texttt{bananas}:
 
-\begin{verbatim}
+\begin{terminalv}
 % dbx crash
 [...]
 (dbx) stop in bananas
 (2) stop in bananas
-\end{verbatim}
+\end{terminalv}
 
 You can set multiple breakpoints (so called) not only in functions,
 but also at line numbers, or linenumbers within files (using
 \texttt{(dbx) stop at crash.c:12}).  Then tell the
 program to start running:
 
-\begin{verbatim}
+\begin{terminalv}
 (dbx) run
 Running: crash
 (process id 29707)
@@ -2109,7 +2111,7 @@ stopped in bananas at line 7 in file "crash.c"
 7       if (i != 0)
 (dbx) print i
 i = 1
-\end{verbatim}
+\end{terminalv}
 
 Note that, as well as output from the debugger itself, we
 also see output from the running program.  If the program
@@ -2120,7 +2122,7 @@ line forward in the code, verify that the parameter
 \texttt{i} has its expected value, then tell the
 program to resume execution.
 
-\begin{verbatim}
+\begin{terminalv}
 (dbx) cont
 banana number 1
 No bananas left!
@@ -2133,7 +2135,7 @@ signal SEGV (no mapping at the fault address) in bananas
 at line 12 in file "crash.c"
 12           printf ("banana split: %d\n", *zp);
 (dbx) quit
-\end{verbatim}
+\end{terminalv}
 
 The Solaris debugger can be used through a GUI: give the
 command \texttt{debugger} to start this up.  The Digital
@@ -2278,12 +2280,12 @@ When a Fortran compiler produces object code,it
 \emph{typically} adds an underscore to the end of each
 function name.  That is, the subroutine:
 
-\begin{verbatim}
+\begin{terminalv}
       subroutine func1 (i)
       integer i
       call func2 (i)
       end
-\end{verbatim}
+\end{terminalv}
 
 will produce object code with an external symbol
 \texttt{func1\_} calling a subroutine named
@@ -2294,12 +2296,12 @@ functions.  There are two ways of dealing with this.
 First, you can call this subroutine from C by calling
 it with the correct name:
 
-\begin{verbatim}
+\begin{terminalv}
 int i1;
 extern void func1_ (int *i);
 /* call it */
 func1_ (&i1);
-\end{verbatim}
+\end{terminalv}
 
 So far so good.  The problem arises when you want to
 call C from the Fortran function, since the Fortran
@@ -2510,7 +2512,7 @@ produce output in C, Fortran and LaTeX.
 
 For example, consider the following example.
 
-\begin{verbatim}
+\begin{terminalv}
 star:nxg> maple
     |\^/|     Maple V Release 4 (Rutherford Appleton Laboratory)
 ._|\|   |/|_. Copyright (c) 1981-1996 by Waterloo Maple Inc. All rights
@@ -2523,7 +2525,7 @@ star:nxg> maple
                          gi := amp exp(- 1/2 -------)
                                                  2
                                                sa
-\end{verbatim}
+\end{terminalv}
 
 We start up Maple, and enter an expression for a gaussian.
 Maple makes an attempt to display the result intelligibly.
@@ -2537,7 +2539,7 @@ differentiate it.
 Now define the variable \texttt{xparam}, and redisplay
 \texttt{gi}.
 
-\begin{verbatim}
+\begin{terminalv}
 > xparam:= cos(theta)*(xc-x0);
       xparam := cos(theta) (xc - x0)
 
@@ -2547,13 +2549,13 @@ Now define the variable \texttt{xparam}, and redisplay
                      amp exp(- 1/2 ----------------------)
                                               2
                                             sa
-\end{verbatim}
+\end{terminalv}
 
 Then differentiate the gaussian, and assign the result to
 \texttt{gid}.  The result is something you're happy not
 to have had to work out yourself.
 
-\begin{verbatim}
+\begin{terminalv}
 > gid := diff (gi, theta);
                                                                  2          2
                                 2                      cos(theta)  (xc - x0)
@@ -2563,7 +2565,7 @@ to have had to work out yourself.
  gid := ----------------------------------------------------------------------
                                            2
                                          sa
-\end{verbatim}
+\end{terminalv}
 
 If that the purpose of this was to do a calculation
 somewhere, you might want to code this expression in
@@ -2571,7 +2573,7 @@ Fortran.  Doing this by hand would be error-prone, but Maple
 can produce output in Fortran as well as this
 `prettyprinted' style.
 
-\begin{verbatim}
+\begin{terminalv}
 > fortran (gid,optimized);
       t1 = cos(theta)
       t4 = (xc-x0)**2
@@ -2579,7 +2581,7 @@ can produce output in Fortran as well as this
       t7 = 1/t6
       t10 = t1**2
       t15 = amp*t1*t4*t7*sin(theta)*exp(-t10*t4*t7/2)
-\end{verbatim}
+\end{terminalv}
 
 The \texttt{optimized} argument tells Maple to try to
 produce Fortran code without repeated subexpressions.  You
@@ -2589,7 +2591,7 @@ produce output in C as well, though because the
 identifier\texttt{C} is potentially such a common one,
 you must explicity load the C library first.
 
-\begin{verbatim}
+\begin{terminalv}
 > readlib(C):
 > C([gf=gid],optimized);
       t1 = cos(theta);
@@ -2598,7 +2600,7 @@ you must explicity load the C library first.
       t7 = 1/t6;
       t10 = t1*t1;
       gf = amp*t1*t4*t7*sin(theta)*exp(-t10*t4*t7/2);
-\end{verbatim}
+\end{terminalv}
 
 There are two things to note here.  The first is that we
 have renamed the expression \texttt{gid} on the fly.
@@ -2611,12 +2613,12 @@ as has happened automatically for
 
 You can also produce results in LaTeX
 
-\begin{verbatim}
+\begin{terminalv}
 > latex(gid);
 {\it amp}\,\cos(\theta)\left ({\it xc}-{\it x0}\right )^{2}\sin(\theta
 ){e^{-1/2\,{\frac {\left (\cos(\theta)\right )^{2}\left ({\it xc}-{
 \it x0}\right )^{2}}{{{\it sa}}^{2}}}}}{{\it sa}}^{-2}
-\end{verbatim}
+\end{terminalv}
 
 Maple has done the correct thing with the cosine and sine
 functions, and with the $\theta$
@@ -2684,24 +2686,24 @@ programming anything complicated with it.
 Start it up with the simple command \texttt{gnuplot}.
 Once it's started, you can give it commands as simple as
 
-\begin{verbatim}
+\begin{terminalv}
 gnuplot> plot sin(x)
-\end{verbatim}
+\end{terminalv}
 
 to produce a plot of the sine function with default
 ranges, or you can give it a range and specify a line type
 as follows
 
-\begin{verbatim}
+\begin{terminalv}
 gnuplot> plot [x=0:3.14] sin(x)*cos(x**2)**2 with impulses
-\end{verbatim}
+\end{terminalv}
 
 Gnuplot can also graph data files.  The example file
 \texttt{gausssine.dat} consists of two columns of
 $64 \times 64$ values.  It can be
 plotted in gnuplot with the commands:
 
-\begin{verbatim}
+\begin{terminalv}
 gnuplot> set output 'gausssine-gnuplot.eps'
 gnuplot> set terminal postscript eps
 Terminal type set to 'postscript'
@@ -2709,7 +2711,7 @@ Options are 'eps monochrome dashed "Helvetica" 14'
 gnuplot> splot 'gausssine.dat' using 1 with lines
 gnuplot> set terminal x11    # set the terminal type back to the (default) X
 gnuplot> set output          # close the output file
-\end{verbatim}
+\end{terminalv}
 
 This produces the EPS file shown in \ref{f:gausssine:g}.
 The file has a blank line after
@@ -2758,7 +2760,7 @@ manipulations.  For example, the data in the file
 \texttt{gausssine.dat} was produced by the following
 sequence of IDL commands:
 
-\begin{verbatim}
+\begin{terminalv}
 x=(findgen(64)-32)^2
 d=fltarr(64,64)
 for i=0,63 do d(i,*)=sqrt(x+(i-32)^2)
@@ -2766,7 +2768,7 @@ a3=exp(-(d/15)^2)
 s=sin(findgen(64)/63*5*3.141592657)
 s2=s#s
 m=s2*a3
-\end{verbatim}
+\end{terminalv}
 
 The function \texttt{findgen(N)} returns a float array
 (indexed from 0 to $N-1$) in
@@ -2796,14 +2798,14 @@ it, with the large collection of options and parameters to
 the \texttt{surface} command.  We can produce
 PostScript output with the following sequence of commands:
 
-\begin{verbatim}
+\begin{terminalv}
   !p.font=0             ; use postscript fonts rather than IDL outlines
   set_plot, 'ps'        ; use the postscript output driver
   device, /encap, filename='gausssine-idl.eps'
                         ; produce encapsulated postscript
   surface, m
   device, /close        ; close the file
-\end{verbatim}
+\end{terminalv}
 
 This produces the EPS file shown in \ref{f:gausssine:i}.
 A minor, but persistent, irritation
@@ -3208,9 +3210,9 @@ CONVERT package, documented in \xref{SUN/55}{sun55}{}.
 CONVERT is extremely easy to use, and
 converting a FITS file, say, to an NDF is as easy as
 
-\begin{verbatim}
+\begin{terminalv}
 fits2ndf myfile.fits myfile
-\end{verbatim}
+\end{terminalv}
 
 If you have to read or write FITS files, then visit the
 \href{http://fits.gsfc.nasa.gov/}{FITS home page}
@@ -3598,10 +3600,10 @@ little program.  It isn't bullet-proof, but if it fails,
 this is probably the least of your cross-platform
 problems.  You can use the program as follows:
 
-\begin{verbatim}
+\begin{terminalv}
 % echo '#define BIGENDIAN' \
     `if ./islittleendian; then echo 0; else echo 1; fi` >bytesex.h
-\end{verbatim}
+\end{terminalv}
 
 to create a file \texttt{bytesex.h} with either \texttt{\#define BIGENDIAN 1}
 or \texttt{\#define BIGENDIAN 0} in it.
@@ -3671,11 +3673,11 @@ the techniques involved in calling C from Fortran and
 
 On a Sun, compile and link them as follows:
 
-\begin{verbatim}
+\begin{terminalv}
 f77 -c mixed-f.f -ext_names=plain
 cc -c mixed-c.c
 f77 -o mixed mixed-c.o mixed-f.o
-\end{verbatim}
+\end{terminalv}
 
 The extra option to the first \texttt{f77} command
 tells the compiler not to add an underscore to function
