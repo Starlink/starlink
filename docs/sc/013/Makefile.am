@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-stardocs_DATA = @STAR_XML_DOCUMENTATION@
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 starexamples_DATA = sc13.$(VERSION)-examples.tar.gz
 
 sc13.htx_tar: examples/fpp.c.xml

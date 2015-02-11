@@ -19,7 +19,7 @@
       information should be of interest to all of the astronomical
       computing community.</p></abstract>
   <dependencies >
-    <sourceset>sgmlkit</sourceset>
+    <sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
