@@ -1683,10 +1683,6 @@ $(MANIFESTS)/kaprh: \
 	cd applications/kaprh \
 	  && $(MAKE_CPT)
 
-$(MANIFESTS)/latex2html:
-	cd thirdparty/latex2html/latex2html \
-	  && $(MAKE_CPT)
-
 $(MANIFESTS)/latexsupport:
 	cd applications/latexsupport \
 	  && $(MAKE_CPT)

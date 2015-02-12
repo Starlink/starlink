@@ -5013,26 +5013,6 @@ GKS (SUN/83) should be used.</p></abstract>
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
-<component id="latex2html" support="U">
-  <version>2012.1</version>
-  <path>thirdparty/latex2html/latex2html</path>
-  <description>LaTeX2HTML - convert LaTeX to HTML</description>
-  <abstract><p>
-The well known LaTeX2HTML converter. Used only for converting Starlink
-documents to hypertext.
-</p></abstract>
-  <dependencies >
-    
-  </dependencies>
-  <developers>
-    <person>
-      <name>starlink@jiscmail.ac.uk</name>
-    </person>
-  </developers>
-  <documentation></documentation>
-  <bugreports>starlink@jiscmail.ac.uk</bugreports>
-</component>
-
 <component id="mesa" support="U">
   <version>7.0.1</version>
   <path>thirdparty/mesa3d/mesa</path>

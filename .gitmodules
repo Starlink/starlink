@@ -25,9 +25,6 @@
 [submodule "thirdparty/ijg/jpeg/jpeg"]
 	path = thirdparty/ijg/jpeg/jpeg
 	url = ../jpeg.git
-[submodule "thirdparty/latex2html/latex2html/latex2html"]
-	path = thirdparty/latex2html/latex2html/latex2html
-	url = ../latex2html.git
 [submodule "thirdparty/mesa3d/mesa/mesa"]
 	path = thirdparty/mesa3d/mesa/mesa
 	url = ../mesa.git
