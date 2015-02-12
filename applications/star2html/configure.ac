@@ -18,24 +18,22 @@ dnl    Include defaults for Starlink configurations
 AC_PROG_MAKE_SET
 STAR_DEFAULTS
 
-dnl    This package has two dependencies, latex2html and latexsupport.
-STAR_DECLARE_DEPENDENCIES([build], [latex2html latexsupport])
+dnl    This package has one dependencies,  latexsupport.
+STAR_DECLARE_DEPENDENCIES([build], [latexsupport])
 
 dnl    And requires that Perl is already built, from which we use the
 dnl    starperl command.
 STAR_DECLARE_DEPENDENCIES([configure], [perl])
 STAR_CHECK_PROGS([env])
-AC_CHECK_PROGS(PDF2PS, 'pdf2ps')
-AC_CHECK_PROGS(PDFTOPS, 'pdftops -eps')
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun199,
-                         [sun199.tex sun199.pdf sun199.htx_tar mud152.pdf])
+                         [sun199.tex sun199.pdf sun199.htx_tar])
 dnl    We override the standard .tex.htx_tar rule inside Makefile.am, and so
 dnl    don't need the @STAR2HTML@ substitution.
 
-dnl    Note that the latex2html.in and star2html.in files contain
+dnl    Note that the star2html.in files contain
 dnl    references to the installation directories, and so must be
 dnl    substituted here at make time, rather than by ./configure at
 dnl    configuration time.  See section `Installation Directory

@@ -5,109 +5,36 @@
 #     star2html
 
 #  Purpose:
-#     Converts standard Starlink documents to HTML (using LaTeX2HTML).
+#     Converts standard Starlink documents to HTML (using TeX4HT).
 
 #  Type of Module:
 #     Perl script
 
-#  Description:
-#     This routine runs the LaTeX2HTML conversion routine on a Starlink
-#     document. It makes sure that the correct authors, document
-#     creation date and a sensible document title and copyright statement
-#     are used together with a valid e-mail address
-#
-#     It also modifies the document to ensure that the html perl style
-#     file is used (the equivalents to these commands are defined in
-#     the standard hypertext document template htxsun.tex).
+#  Description: This routine runs the htlatex script from TeX4HT
+#     document. It requires a document that is using the 'starlink.cls'
+#     latex class file from the Starlink application 'latexsupport'.
 #
 #     The final products of the conversion are entered into a directory
 #     "docname.htx", in accordance with the naming convention needed by
-#     the hypertext linker (sun188). Because of this no use of the
-#     LaTEX2HTML flags "-dir" and "-no_subdir" should be made.
+#     the hypertext linker (sun188).
 
 #  Invocation:
-#     star2html [-a author(s)] [-aux] [-c copyright_statement]
-#               [-d document_date] [-m email_address]
-#               [-obsolete] [-s 0|1] [-t title]
-#		[-splitlevel level]
-#               [arguments for LaTeX2HTML] document
+#     star2html [-splitlevel level] document
 
 #  Parameters:
-#     -a authors (optional)
-#        The names of the document authors. If not supplied the value of
-#        the \stardocauthors command will be used, if this doesn't exist
-#        the name of the person running the application will be used.
-#        This appears in the footer of every page.
-#     -aux
-#        This switch controls whether the document .aux file is to be
-#        used (this is produced by running LaTeX and contains a
-#        description of the section numbering). This is not used by
-#        default as documents may well have a different structure when
-#        processed by LaTeX2HTML to that when processed by LaTeX (if
-#        for instance optional diagrams and/or sections are in effect
-#        using the htmlonly and latexonly environments) and any
-#        numbering may be incorrect.
-#     -c "copyright statement" (optional)
-#        A copyright statement to override the default which will appear
-#        in the footer of each page. The default statement is found from
-#        the \stardoccopyright command if there is one in the document,
-#        or failing that from the environment variable HTX_COPYRIGHT if
-#        defined, or failing that the default is: "Copyright ?? YYYY
-#        Science and Technology Facilities Council" (where YYYY is the
-#        current year). To prevent any copyright statement from appearing,
-#        specify "-c none" or, in the absence of a \stardoccopyright
-#        command or explicit -c switch, set HTX_COPYRIGHT to "none".
-#     -d "document date" (optional)
-#        The date the document was created. If not supplied the value of
-#        the \stardocdate command will be used, if this doesn't exist
-#        todays date will be used. This appears in the footer of every page.
 #     -hcserver URL (optional)
 #        A URL pointing to the hardcopy server to be used for the document.
 #        Should be an copy of the "hcserver" script from the HTX package.
 #        Also see the HTX_HCSERVER variable.
-#     -m "contact email address" (optional)
-#        A contact email address for the document. If not supplied the
-#        value of the environment variable HTX_EMAIL will be
-#        used. If this isn't set then the address "starlink@jiscmail.ac.uk"
-#        will be used. This appears in the footer of every page. If
-#        you are only reponsible for converting yor own documents then
-#        set by using the environment variable (in your .login).
-#     -obsolete
-#        This flag indicates that the document is obsolete (out of date
-#        or no longer maintained) and should be marked as such with a
-#        background image.
-#     -s 1|0
-#        This switch controls whether the input file will be split
-#        into parts, or not, before being processed by LaTeX2HTML. The
-#        split occurs at \section, \subsection, \sstroutine and
-#        \routine statements. Splitting up the document may considerably
-#        speed up processing. The default is to split the document up.
-#     -t title (optional)
-#        The title of the document. If not supplied a guess based on the
-#        value of the \stardoctitle command will be made. If this fails
-#        a name generated from the document type will be used. This is
-#        used as a title for the first page and appears in the footer
-#        of every page.
 #     -splitlevel level (optional)
 #        An optional argument to send htlatex to trigger splitting on the
 #        given command level. 1 indicates don't split, 2 is split at the
 #	 first level of sectioning command in the document, etc.
-#     "arguments for LaTeX2HTML"
-#        Any unknown arguments before the file name will be passed to
-#        LaTeX2HTML (do not use the -dir and -no_subdir arguments).
 #     document
 #        The name of the document to be translated into HTML
 #        (the file type .tex is optional).
 
 #  Environment Variables Used:
-#     HTX_EMAIL
-#       If set then this will be used as the E-mail address. This can
-#       be overridden by the command line parameter -m.
-#
-#     HTX_COPYRIGHT
-#       If set then this will be used as the copyright statement. This
-#       can be overridden by the command line parameter -c.
-#
 #     HTX_HCSERVER
 #       If set then the hardcopy server part of a document will be modified
 #       to use this value. Requires that the document uses the standard
@@ -116,30 +43,8 @@
 
 #  Examples:
 #      star2html sun109.tex
-#         This converts the Starlink document sun109.tex into HTML. The
-#         document title will be "PISA -- Position Intensity and Shape
-#         Analysis" extracted from the \stardoctitle command and the
-#         authors and document date will be extracted from the
-#         \stardocauthors and \stardoctitle commands. A mail address
-#         of starlink@jiscmail.ac.uk will be used unless the HTX_EMAIL
-#         environment variable has been set.
-
-#  Notes:
-#     The algorithms used to extract the values of the \stardocxxxx
-#     commands are heuristic; no attempt has been made to deal with
-#     all possible LaTeX commands. So expect to have to supply values
-#     for these from time to time.
+#         This converts the Starlink document sun109.tex into HTML.
 #
-#     It is expected that the icons associated with LaTeX2HTML are
-#     stored in a subdirectory icons/ of the directory in which the
-#     latex2html script is rooted. Some of these are copied into the
-#     document directory (contents_motif.gif).
-#
-#     You can override the initialisation defaults set by this routine by
-#     including a ".latex2html-init" file in the ".htx" directory
-#     before running star2html on your document. This file should have
-#     the same form as ".latex2html-init" files described in the
-#     LaTeX2HTML documentation.
 
 #  Authors:
 #     PDRAPER: P.W.Draper (Starlink - Durham University)
@@ -264,7 +169,9 @@
 #        - Convert PDF images to EPS
 #     2013-10-02 (TIMJ):
 #        - Use autoconf to find pdftops
-#     {enter_further_changes_here}
+#     11-FEB-2015 (SFG):
+#        - Remove all latex2html specific code and only leave htlatex
+#          aspects.
 
 #  Bugs:
 #     {note_any_bugs_here}
@@ -287,92 +194,49 @@ print( "\n$announce\n$underline\n" );
 #  Initialisation of variables used during cleanup.
 my $keep_style = 1;       # Keep existing style files
 my $have_texfile = 0;     # Have a copy of tex file
-my $have_auxfile = 0;     # Have a copy of aux file
+my $have_auxfile = 1;     # have a copy of aux file
 
-#  Mail address of Starlink Librarian.
-my $STARLINK_LIBRARIAN = '<A HREF="mailto:@PACKAGE_BUGREPORT@">@PACKAGE_BUGREPORT@</A>';
 
-#  Do not copy aux file by default.
-my $AUXCOPY = 0;
-
-#  Default copyright statement.
-my $year = ((gmtime())[5]) + 1900;
-my $DEFAULT_COPYRIGHT = 'Copyright &copy; ' . $year .
-    ' Science and Technology Facilities Council';
-
-#  Do split file into parts by default.
-my $SPLIT = 1;
-my $NSECTIONS = 0;
-
-#  The clear_up routine may exit.
+# The clear up routine can exit
 my $CANEXIT = 1;
 
-#  The document is not obsolete.
+# Document is not obsolete by default.
 my $OBSOLETE = 0;
-
-#.
 
 #  Sort out how we are going to get the current directory name.
 my $DEFAULTDIR = getcwd();
 
-#  Locate the Star2HTML latex2html script. This should be in the same
-#  directory as this file.
-my ( $SCRIPTDIR, $SCRIPTNAME ) = &get_filename_and_directory( $0 );
-
-#  Also check for the "latex2html" script, which should be in the same
-#  place.
-my $LATEX2HTML = File::Spec->catfile( $SCRIPTDIR, 'latex2html');
-if ( ! -x $LATEX2HTML ) {
-  die "Star2HTML fatal: failed to locate LaTeX2HTML wrapper script ($LATEX2HTML)\n";
-}
 
 #  Pick up HCSERVER for hardcopy downloads from environment, overridden by
 #  command-line.
 my $HCSERVER = $ENV{'HTX_HCSERVER'} || "0";
 
 #  Substring to match HCSERVER line and pattern for actual replacement.
-my $HCSERVER_SUBSTRING = 'cgi-bin/hcserver';
+my $HCSERVER_SUBSTRING = 'cgi-bin/htxserver';
 my $HCSERVER_PATTERN = 'http:\/\/[^\\ ]*\/cgi-bin\/hcserver';
 
 #  Parse the command line extracting the document name and recording
 #  the status of the optional parameters.
 my $splitlevel="";
-my ($NOCOPYRIGHT, $COPYRIGHT, $TITLE, $DATE, $AUTHORS, $MAIL, $help);
+my $help;
 my $status = GetOptions(
-    "aux" => \$AUXCOPY,
-    "t=s" => \$TITLE,
-    "d=s" => \$DATE,
-    "a=s" => \$AUTHORS,
     "hcserver=s" => \$HCSERVER,
-    "m=s" => \$MAIL,
-    "s=s" => \$SPLIT,
-    "obsolete" => \$OBSOLETE,
-    "c=s" => \$COPYRIGHT,
     "help"=> \$help,
     "splitlevel=s"=> \$splitlevel,
     );
 
 if ($help) {
-      print( 'Usage: star2html [-a author(s)] [-aux] [-d document date] '.
-             '[-s 1|0] [-c copyright statement] [-old] [-obsolete] '.
-             '[-m email address] '.
-             '[-t title] [-splitlevel level] [arguments for LaTeX2HTML] '.
+      print( 'Usage: star2html [-aux] [-splitlevel <level>] '.
              'starlink_document[.tex]'. "\n");
-      system( $LATEX2HTML, "-h");
       exit(0);
 }
 
 # Prevent double toc if splitting
 if ($splitlevel ne ""){
   $splitlevel .= ",notoc*,nominitoc";
+  print "splitlevel is $splitlevel\n\n";
 }
-print "splitlevel is $splitlevel\n\n";
 
-# Handle copyright
-# "none" is a special case
-if ($COPYRIGHT && $COPYRIGHT =~ /^none$/i) {
-    $NOCOPYRIGHT = "TRUE";
-}
 
 
 #  Last element should be the name of the file. Add a file extension
@@ -396,20 +260,9 @@ my $REALDESTDIR = File::Spec->catdir($TEXDIR, $TEXNAME. '.htx');
 my $DESTFILE = File::Spec->catfile($DESTDIR, $TEXNAME . '.tex');
 my $FILE;
 
-my $usehtlatex = 0;
-
 #  Check file exists and is a text file we can write to.
 if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
    print( "Processing file: $TEXFILE\n" );
-
-# Check if current file is calling latex class 'starlink'.
-   open my $file, '<', "$TEXFILE";
-   my $firstline = <$file>;
-   close $file;
-   $usehtlatex = 0;
-   if ($firstline =~ /\\documentclass.*\{starlink\}/) {
-     $usehtlatex = 1;
-   }
 
 #  Create the target directory. Note if ".htx" form already exists
 #  then we move this into place.
@@ -432,50 +285,20 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
      or &clear_up( "Star2HTML fatal: cannot chdir to $DESTDIR\n" );
 
 #  Edit the necessary corrections to the tex file. This makes a copy
-#  in $DESTDIR. (different version for htlatex and star2html.
-   if ($usehtlatex == 1){
-     &edit_main_htlatex;
-   } else {
-     &edit_main;
-   }
+#  in $DESTDIR.
+   &edit_main_htlatex;
+
 
    $have_texfile = 1;
 
-#  Copy aux, lot and lof files if they exist and we've been asked to.
-   for my $suffix (qw/ .aux .lot .lof/) {
-       my $file = File::Spec->catfile($TEXDIR, $TEXNAME . $suffix);
-       if ( -e $file && $AUXCOPY ) {
-           system("cp", $file, $DESTDIR) and
-               &clear_up( "Star2HTML fatal: cannot copy $file into $DESTDIR\n" );
-           $have_auxfile = 1;
-       }
-   }
-
 #  To support PNG and PDF embedded graphics we need to do two things
-#  1. Copy the PNG file to the temporary directory so that latex2html
+#  1. Copy the PNG file to the temporary directory so that htlatex
 #     will discover it
-#  2. Convert any PDF graphics to EPS. The reason we do this is that it saves
-#     us having to patch latex2html (which is a bit of a rats nest).
 #  We have to work out which .pdf and .png files are relevant. We could copy them
 #  all or we could scan through the tex file for includegraphics directives.
-#  For EPS files latex2html rebuilds a postscript document and picks up the images
-#  via TEXINPUTS. These paths are not searched when latx2html is looking for PNG files.
 #  Try the scanning approach
    {
 
-     # First work out which converter to use
-     my %TOOLS = ( pdftops => '@PDFTOPS@',
-                   pdf2ps => '@PDF2PS@',
-                 );
-
-     my @pdftops;
-     for my $tool (qw/ pdftops pdf2ps /) {
-       my $exe = $TOOLS{$tool};
-       if ($exe) {
-         push(@pdftops, split(/\s+/,$exe));
-         last;
-       }
-     }
 
      my %tocopy;
      my %outpath;
@@ -540,33 +363,8 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
 
        # If using htlatex, just copy the file in and assume that
        # htlatex will convert it.
-       if ($usehtlatex == 1) {
-         system ( "cp $file $destdir") and
-	   &clear_up("Star2HTML fatal: cannot copy $file into $destdir\n");
-       } else {
-	 if ($suffix eq ".png") {
-	   # do not copy if there is a version already there and this one is not newer
-	   my $outfile = File::Spec->catfile($destdir, $name.".png");
-	   if (!-e $outfile || (-M $outfile > -M $file ) ) {
-	     print "Copying $file to $destdir\n";
-	     system("cp", $file, $destdir ) and
-	       &clear_up( "Star2HTML fatal: cannot copy $file into $destdir\n" );
-	   }
-	 } elsif ($suffix eq ".pdf") {
-	   # Must convert this to postscript unless there is an .eps version
-	   # in TEXDIR already
-	   if ( ! -e File::Spec->catfile($TEXDIR, $name . ".eps" ) ) {
-	     my $outfile = File::Spec->catfile($destdir, $name.".ps");
-	     if (!-e $outfile || (-M $outfile > -M $file) ) {
-	       print "Using $pdftops[0] to convert $file to $outfile\n";
-               system(@pdftops, $file, $outfile) and
-                 &clear_up( "Could not convert $file to PS using $pdftops[0]\n");
-	     }
-	   }
-	 } else {
-	   warn "Did not know what to do with file $file\n";
-	 }
-       }
+       system ( "cp $file $destdir") and
+	 &clear_up("Star2HTML fatal: cannot copy $file into $destdir\n");
      }
    }
 
@@ -586,182 +384,28 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
 }
 
 #------------------------------------------------------------------------------
-#  See which arguments we haven't got and try to have a guess at good values.
-if ( !$DATE ) {
-   $DATE = &get_item('\stardocdate');
-   $DATE = &remove_commands( $DATE );
-   $DATE = &tidy_latex( $DATE );
+#  Invoke tex4ht (via htlatex) on the temporary file.
+
+
+print ("Preparations finished - now starting TeX4HT htlatex\n\n");
+my $TEX4HTENV = "";
+my $TEX4HTHTF = "";
+my $TEXINPUTS = "";
+if (defined $ENV{TEXINPUTS}) {
+  $TEXINPUTS = $ENV{TEXINPUTS};
 }
 
-#  If still no date use today.
-if ( !$DATE ) {
-   $DATE = localtime();
+if (defined $ENV{STARLINK_DIR}) {
+  $TEX4HTENV = "TEX4HTENV=" . $ENV{STARLINK_DIR} . '/share/latexsupport/tex4ht.env';
+  $TEX4HTHTF = "TEX4HTHTF=" . ':' . $ENV{STARLINK_DIR} . '/share/latexsupport:';
+  $TEXINPUTS = join(':', $TEXINPUTS, $ENV{STARLINK_DIR} . '/share/latexsupport//:');
 }
-
-if ( !$AUTHORS ) {
-   $AUTHORS = &get_item('\stardocauthors');
-   $AUTHORS = &remove_commands( $AUTHORS );
-   $AUTHORS = &tidy_latex( $AUTHORS );
+my $tex4htcommand =  "TEXINPUTS=$TEXINPUTS $TEX4HTENV $TEX4HTHTF htlatex $DESTFILE \"starlinkxhtml.cfg,$splitlevel,charset=\"utf-8\",fn-in\" ' -cvalidate -cstarfont' \"\" '-interaction=batchmode'";
+print $tex4htcommand . "\n";
+system($tex4htcommand);
+if ($? ) {
+  print( "Star2HTML fatal: Translation of document $TEXFILE failed.\n" );
 }
-
-#  If still no author use the user.
-my $user;
-if ( !$AUTHORS ) {
-   $user = $ENV{'USER'} || $ENV{'LOGNAME'} || (getpwuid($<))[0];
-   $AUTHORS = (getpwnam($user))[6];
-} else {
-   $AUTHORS = &tidy_latex( $AUTHORS );
-}
-
-#  Email address for contact, if not given try for an environment variable
-#  HTX_EMAIL otherwise use the Starlink Librarian.
-if ( !$MAIL ) {
-   $MAIL = $ENV{'HTX_EMAIL'} || "$STARLINK_LIBRARIAN";
-}
-
-#  Copyright statement if required.
-#  If it is required but "statement" not given then find the default from
-#  the documents \stardoccopyright command if set, or the environment
-#  variable HTX_COPYRIGHT if set; otherwise we use the hardcoded default.
-if ( $NOCOPYRIGHT ) {
-   $COPYRIGHT = "";
-} elsif ( !$COPYRIGHT ) {
-   $COPYRIGHT = &get_item('\stardoccopyright');
-   if ( $COPYRIGHT ) {
-      $COPYRIGHT =~ s/\\copyright\\/&copy\;/g;
-      $COPYRIGHT =~ s/\\newline\\/<BR>/g;
-   } elsif ( $ENV{'HTX_COPYRIGHT'} ) {
-      $COPYRIGHT = $ENV{'HTX_COPYRIGHT'};
-      if ( $COPYRIGHT =~ /^none$/i ) {
-         $COPYRIGHT = "";
-      }
-   } else {
-      $COPYRIGHT = $DEFAULT_COPYRIGHT;
-   }
-}
-
-#  Look for document title.
-if ( !$TITLE ) {
-   $TITLE = &get_item('\stardoctitle');
-   $TITLE = &remove_commands( $TITLE );
-   $TITLE = &tidy_latex( $TITLE );
-   $TITLE =~ s/<BR>/ /g;
-   $TITLE =~ s/[\s]+/ /g;
-}
-
-# Use the patterns sunxxx.tex sgpxxx.tex & ssnxxx.tex where xxx is the
-# document number to guess the document type.
-my $TYPE;
-switch:{
-    if ( $TEXNAME =~ /^sun(\d*)/ ){
-       $TYPE = "Starlink User Note $1";
-       last switch;
-    }
-    if ( $TEXNAME =~ /^sgp(\d*)/ ){
-       $TYPE = "Starlink General Paper $1";
-       last switch;
-    }
-    if ( $TEXNAME =~ /^ssn(\d*)/ ){
-       $TYPE = "Starlink System Note $1";
-       last switch;
-    }
-    if ( $TEXNAME =~ /^sg(\d*)/ ) {
-       $TYPE = "Starlink Guide $1";
-       last switch;
-    }
-    if ( $TEXNAME =~ /^sc(\d*)/ ) {
-       $TYPE = "Starlink Cookbook $1";
-       last switch;
-    }
-    $TYPE = "Starlink Document $TEXNAME";
-    last switch;
- }
-
-#------------------------------------------------------------------------------
-#  Make an address string for the bottom of each HTML page.
-my $ADDRESS;
-if ( ! $COPYRIGHT ) {
-  $ADDRESS = '<I>'  . $TITLE .   '<BR>'
-                    . $TYPE  .   '<BR>'
-                    . $AUTHORS . '<BR>'
-                    . $DATE .    '<BR>'
-                    . 'E-mail:' . $MAIL
-                    . '</I>';
-} else {
-  $ADDRESS = '<I>'  . $TITLE .   '<BR>'
-                    . $TYPE  .   '<BR>'
-                    . $AUTHORS . '<BR>'
-                    . $DATE .    '<BR>'
-                    . 'E-mail:' . $MAIL . '<BR>'
-                    . '<BR>'
-                    . $COPYRIGHT . '<BR>'
-                    . '</I>';
-}
-
-#  Close the main file.
-close($FILE);
-
-#  Now create the star2html.perl file in current directory (unless one
-#  already exists).
-create_stylefile();
-
-#  Create the initialisation file.
-create_initfile();
-
-#------------------------------------------------------------------------------
-#  Invoke latex2html on the temporary file. Note we inhibit index file
-#  production.
-
-if ($usehtlatex==1){
-  print ("Preparations finished - now starting TeX4HT htlatex\n\n");
-  my $TEX4HTENV = "";
-  my $TEX4HTHTF = "";
-  my $TEXINPUTS = "";
-  if (defined $ENV{TEXINPUTS}) {
-      $TEXINPUTS = $ENV{TEXINPUTS};
-  }
-
-  if (defined $ENV{STARLINK_DIR}) {
-      $TEX4HTENV = "TEX4HTENV=" . $ENV{STARLINK_DIR} . '/share/latexsupport/tex4ht.env';
-      $TEX4HTHTF = "TEX4HTHTF=" . ':' . $ENV{STARLINK_DIR} . '/share/latexsupport:';
-      $TEXINPUTS = join(':', $TEXINPUTS, $ENV{STARLINK_DIR} . '/share/latexsupport//:');
-  }
-  my $tex4htcommand =  "TEXINPUTS=$TEXINPUTS $TEX4HTENV $TEX4HTHTF htlatex $DESTFILE \"starlinkxhtml.cfg,$splitlevel,charset=\"utf-8\",fn-in\" ' -cvalidate -cstarfont' \"\" '-interaction=batchmode'";
-  print $tex4htcommand . "\n";
-  system($tex4htcommand);
-  if ($? ) {
-    print( "Star2HTML fatal: Translation of document $TEXFILE failed.\n" );
-  }
-} else {
-  print( "Preparations finished - now starting LaTeX2HTML\n\n");
-  my $cwd = Cwd::getcwd();
-  system( $LATEX2HTML,
-	  "-init_file", ".star2html-init", "-no_subdir", "-tmp", $cwd,
-	  "-no_auto_link", "-local_icons", @ARGV, $DESTFILE );
-  if ( $? ) {
-    print( "Star2HTML fatal: Translation of document $TEXFILE failed.\n" );
-  } elsif ( $COPYRIGHT ) {
-    $COPYRIGHT =~ s/&copy\;?/(C)/g;
-    $COPYRIGHT =~ s/<BR>//g;
-    print("Document copyrighted:\n$COPYRIGHT\n");
-  }
-
-  #  Try to copy some special icons from @l2hdir@ to this directory.
-  my $LATEX2HTML_DIR = "$ENV{'STARLINK_DIR'}/share/latex2html/bin";
-  if ( ! -d $LATEX2HTML_DIR ) {
-    $LATEX2HTML_DIR = "@l2hdir@";
-  }
-
-  my $ICONDIR = $LATEX2HTML_DIR . '/../icons';
-  if ( -d $ICONDIR ) {
-    system( "cp", "$ICONDIR/contents_motif.gif", File::Spec->curdir) &&
-      warn("Failed to copy contents_motif.gif from $ICONDIR to output directory\n");
-  }
-}
-
-#  Extract the retrieve source icon. Could avoid the above if this can
-#  be extended for two icons.
-&source_icon;
 
 #  If obsolete do the marking.
 &make_obsolete;
@@ -838,7 +482,7 @@ sub edit_main_htlatex {
     # be important.
 
     # Check for hcserver line, if changing and if found change.
-      if ( $HCSERVER ne 0 and index( $_, $HCSERVER_SUBSTRING ) != -1 ) {
+      if ( $HCSERVER ne "0" and index( $texline, $HCSERVER_SUBSTRING ) != -1 ) {
          s/$HCSERVER_PATTERN/$HCSERVER/;
       }
 
@@ -849,357 +493,8 @@ sub edit_main_htlatex {
   #  Files close automatically on exit
 }
 
-sub edit_main {
-#+
-#  Subroutine to edit the main file (used by latex2html).
-#
-#  Assumes the default directory is where a copy will be made.
-#
-#  Any lines in between a sequence of %\begin{rawtex} and %\end{rawtex}
-#  are commented out. These are assumed to be only relevant to latex processing
-#  and are not used by latex2html in any way (probably raw TeX in a section
-#  before the \begin{document} statement. Two lines are appended immediately
-#  after the \documentstyle or \documentclass statement (or at the end if this
-#  isn't located). These make sure that the correct perl styles are
-#  used (these define perl equivalents of latex commands).
-#-
-
-#  Generate the names of the dummy style files we require (needed to make
-#  sure their perl equivalents are loaded), and create them.
-   my $cwd = getcwd();
-   my $starsty = File::Spec->catfile($cwd, 'star2html.sty');
-   system ( "touch", $starsty );
-
-#  html.sty has contents that define dummy environments for htmlonly,
-#  rawhtml and comment. These are removed by pre-processing and can be
-#  required in the image creation stage (which uses ordinary LaTeX).
-#  Normally these should not be required to function.
-   my $htmlsty = "$cwd" . '/html.sty';
-   open( my $HTMLSTY, ">",$htmlsty )
-      || &clear_up( "Star2HTML fatal: Failed to open dummy style file ($htmlsty).\n" );
-   print( $HTMLSTY "\\newenvironment{htmlonly}{}{} \n" );
-   print( $HTMLSTY "\\newenvironment{rawhtml}{}{} \n" );
-   print( $HTMLSTY "\\newenvironment{comment}{}{} \n" );
-   close( $HTMLSTY );
-
-#  Open the the main file for readonly.
-   open( my $FILE, $TEXFILE )
-      || &clear_up( "Star2HTML fatal: Failed to open main tex file ($TEXFILE).\n" );
-
-#  Open the "copy".
-   open( my $EDIT, ">", $DESTFILE )
-      || &clear_up( "Star2HTML fatal: Cannot open new file for editing.\n" );
-
-#  Now start copying the main file to the edited version. Partitioning
-#  sections into new files.
-   my $fileIO = $EDIT;
-   my $SECTION;
-   my $need_styles = 1;
-   my $comment_out = 0;
-   while (<$FILE>) {
-
-#  Check current line for any of the expected patterns.
-#  \documentstyle or \documentclass or end of document (assumed to be
-#  on one line).
-      if ( ( index( $_, '\documentstyle' ) != -1 ) ||
-           ( index( $_, '\documentclass' ) != -1 ) ) {
-        if ( $need_styles ) {
-          print( $EDIT  $_ );
-          print( $EDIT "\\input{$htmlsty}\n" );
-          print( $EDIT "\\input{$starsty} \n" );
-          $need_styles = 0;
-          next;
-        }
-      }
-
-#  %\begin{rawtex} -- now depreciated, use %begin{\latexonly}.
-      if ( index( $_, '%\begin{rawtex}' ) != -1 ) {
-         if ( $comment_out ) {
-            print( 'Star2HTML warning: possible nesting or mismatch of '.
-                  '%\begin{latexonly}.' );
-         }
-         $comment_out = 1;
-      }
-#  %\end{rawtex}
-      if ( index( $_, '%\end{rawtex}' ) != -1 ) {
-         if ( ! $comment_out ) {
-            print( 'Star2HTML warning: possible nesting or mismatch of '.
-                  '%\end{latexonly}.' );
-         }
-         $comment_out = 0;
-      }
-
-#  Check for hcserver line, if changing and if found change.
-      if ( $HCSERVER ne 0 and index( $_, $HCSERVER_SUBSTRING ) != -1 ) {
-         s/$HCSERVER_PATTERN/$HCSERVER/;
-      }
-
-      if ( $SPLIT ) {
-
-#  Check for \section etc. These toggle new files to contain their contents.
-         if ( m/^\\section|^\\subsection|^\\sstroutine|^\\routine/o ) {
-
-
-#  New section (note reusing SECTION closes previous file).
-            my $section_file = "section$NSECTIONS.tex";
-            $NSECTIONS++;
-            open( $SECTION, ">", $section_file )
-               || &clear_up( "Star2HTML fatal: Failed to open dummy section file ($section_file)\n" );
-            $fileIO = $SECTION;
-            print( $EDIT "\\input{$section_file} \n");
-         }
-      }
-
-      if ( $comment_out ) {
-         print( $fileIO  "% $_" );
-      } else {
-         print( $fileIO $_ );
-      }
-
-   }
-
-#  Check that style include have been done. If not append them.
-   if ( $need_styles ) {
-      print( $EDIT "\\input{$htmlsty}\n" );
-      print( $EDIT "\\input{$starsty} \n" );
-   }
-
-#  Files close automatically on exit
-
-}
 
 #------------------------------------------------------------------------------
-
-sub create_stylefile{
-#+
-#  Subroutine to create the star2html style file.
-#
-#  A file star2html.perl is created if one doesn't already exist (existence
-#  can be used to modify the contents during development, it shouldn't exist
-#  under any other circumstances). The contents of this file are the perl
-#  definitions of HTML specific commands used in the LaTeX. This file should
-#  be included into the document as star2html.sty.
-#
-#  The definitions provided by this file are:
-#
-#     \xref{text}{document}{label}
-#
-#     \xlabel{label}
-#
-#  These are the Starlink specific \ref and \label equivalents for referencing
-#  into other Starlink documents and for advertising entry points into your
-#  documents. So:
-#
-#     \xref{KAPPA SURFIT}{sun95}{SURFIT}
-#
-#  Should result (after hypertext linking) in an HREF pointing to the surfit
-#  application in KAPPA. Provided KAPPA has an equivalent xlabel
-#
-#     \xlabel{SURFIT}
-#
-#  In a appropriate position in the sun95.tex processed (to HTML) document.
-#
-#-
-   if ( -T 'star2html.perl' ) {
-      $keep_style = 1;
-   } else {
-      open( my $STYLE, '>', 'star2html.perl' )
-         || &clear_up( "Star2HTML fatal: Failed to create new perl style file.\n" );
-      $keep_style = 0;
-
-#  Add the special xref and xlabel routines. Also a quote environment
-#  for aligning verbatims within it (the default version doesn't do this).
-#------------------------------------------------------------------------------
-print( $STYLE <<'_EOF_' );
-package main;
-
-#  The base name for all document cross reference roots.
-#  For local documents this would be:
-#     $DOCBASE = '/star/docs/';
-#  And for remote documents at RAL:
-$DOCBASE = 'http://www.starlink.ac.uk/cgi-bin/htxserver/';
-
-sub do_cmd_xref{
-   my $arg = shift;
-   my ($text, $docname, $label);
-   $arg =~ s/$next_pair_pr_rx/$text = $2; ''/eo;
-   $arg =~ s/$next_pair_pr_rx/$docname = $2; ''/eo;
-   $arg =~ s/$next_pair_pr_rx/$label = $2; ''/eo;
-   # Default for local documents would be:
-   #join('','<A HREF="',$DOCBASE,$docname,'.htx/',$docname,'.html#xref_',$label,'">',$text,'</A>',$arg);
-   # And for remote ones (notice?).
-   join('','<A HREF="',$DOCBASE,$docname,'.htx/',$docname,'.html?xref_',$label,'">',$text,'</A>',$arg);
-}
-
-sub do_cmd_xlabel{
-   local($_) = @_;
-   my $label;
-   s/$next_pair_pr_rx/$label = $2; ''/eo;
-   $label =~ s/\n//g;
-   $label =~ s/ //g;
-   $label =~ s/\t//g;
-   $label = 'xref_' . $label;
-   &anchor_label( $label, $CURRENT_FILE, $_);
-}
-
-sub do_env_quote {
-   join('',"<BLOCKQUOTE>","@_","</BLOCKQUOTE>");
-}
-sub do_env_quotation {
-   join('',"<BLOCKQUOTE>","@_","</BLOCKQUOTE>");
-}
-sub do_env_verse {
-   join('',"<BLOCKQUOTE>","@_","</BLOCKQUOTE>");
-}
-
-1;# This must be the last line
-
-_EOF_
-#------------------------------------------------------------------------------
-      close($STYLE);
-   }
-}
-
-#------------------------------------------------------------------------------
-
-sub get_item {
-#+
-#  Subroutine to locate an item in <FILE> and return its value.
-#
-#  The item is the first argument to this routine (something like \stardocname)
-#  The value of this item is assumed to be the set of characters in
-#  the next "{}" pair.
-#
-#  Bugs:
-#    This will fail if the item contains verbatim {}'s.
-#-
-   my $item = shift;
-
-#  Quote all words to stop problems with special characters.
-   $item =~ s/(\W)/\\$1/g;
-
-#  Rewind search to beginning of file.
-   seek($FILE,0,0);
-
-#  Look for the item.
-   while( <$FILE> ){
-      if ( /^[^%]/ && /{$item}(.*)/ ) {
-
-#  Now look for possible pattern of { text } allowing for nested brackets.
-         $_ = $1;
-         my $nopen;
-         my $started = 0;
-         bracket :{ while( 1 ) {
-            $nopen = tr/\{/\{/;
-            if ( $nopen != 0 ) { $started = 1; }
-            my $nclosed = tr/\}/\}/;
-            if ( $started ) {
-               if ( $nclosed >= $nopen ) {
-                  last bracket;
-               }
-            }
-            my $line = <$FILE>;
-            if ( $line ) {
-               $_ .= "\n". $line;
-            } else {
-               print( "Star2HTML warning: end of file reached while extracting $item.\n");
-               return '';
-            }
-         }}
-
-#  Now extract value.
-         my $end = 0;
-         my $start = index( $_, '{', 0 );
-         for(my $i=0 ; $i < $nopen ; $i++ ) {
-            my $nowat = index( $_, '}', $end );
-            $end = $nowat + $end;
-         }
-         return substr( $_, $start + 1, $end - $start - 1);
-      }
-   }
-}
-
-#------------------------------------------------------------------------------
-
-sub tidy_latex {
-#+
-#  Subroutine to remove unwanted characters from a LaTeX string.
-#
-#  The unwanted characters processed are ~ \\, \\[len] and \ which are
-#  replaced by blanks or new lines as appropriate. This routine also collapses
-#  multiple spaces into single spaces.
-#-
-   for (@_) {
-      s/(\\LaTeX\\|\\LaTeX)/LaTeX/mg; # Remove special \LaTeX\ & \LaTeX
-      s/(\\TeX\\|\\TeX)/TeX/mg;       # Remove special \TeX\ & \TeX
-      s/\~/ /mg;                      # ~   ==> " "
-      s/\\\\[\s]*\[[^\]]*\]/\n/mg;    # \\ [len] ==> \n, none-greedy form
-      s/\\\\/\n/mg;                   # \\  ==> \n
-      s/\\\&/&/mg;                    # \&   ==> "&"
-      s/\\./ /mg;                     # \?   ==> " "
-      s/\n+/\n/mg;                    # multiple newlines ==> "\n"
-      s/^[\s]+//mg;                   # remove multiple spaces, tabs etc. from start.
-      s/[\ \t]+/ /mg;                 # multiple spaces or tabs == > " "
-      s/(\}|\{)//mg;                  # Get rid of pesky {}'s
-      s/\'/\\'/mg;                    # Protect embedded single quotes
-      s/\n/<BR>/mg;                   # Finally \n ==> <BR> to get HTML line breaks.
-   }
-   return "@_";
-}
-
-#------------------------------------------------------------------------------
-
-sub remove_commands {
-#+
-#  Subroutine to remove commands from a latex string.
-#
-#  This procedure detects and removes \command{} type environments from a
-#  string. The contents of the command are either retained or removed
-#  according to the command name.
-#
-#  Removes all \footnote{}
-#-
-   my $line = shift;
-
-#  Scan for occurrances of \command{}'s.
-   while ( $line =~ m/\\(\w*)\{/m ) {
-
-#  See if command content should be removed or kept.
-      if ( $1 =~ m/(footnote|vspace)/m ) {
-         $line =~ s/\\$1\{[^\}]*\}//m;
-      } else {
-         $line =~ s/\\$1\{([^\}]*)\}//m;
-         # Do not use $` and $' since no longer recommended
-         $line = substr($line, 0, $-[0]) . $1 . substr($line, $+[0]);
-      }
-   }
-
-#  Scan for other known \command's.
-   $line =~ s/(\\Large|\\large|\\Huge|\\huge|\\normalsize|\\small|\\bf|\\em|\\rm|\\it)//mg;
-   return $line;
-}
-
-
-#------------------------------------------------------------------------------
-
-sub print_value {
-#+
-#  Subroutine to print a default value unless environment variable is set.
-#
-#  The ENV array is checked for a value corresponding to the name of the
-#  first argument. If none exists then the second argument is returned as
-#  a default value.
-#-
-   my ($fh,$name,$default) = @_;
-   if ( defined( $ENV{ $name } ) ) {
-      print( $fh "\$$name = $ENV{ $name }; \n" );
-   } else {
-      print( $fh "\$$name = $default; \n" );
-   }
-}
-
-#------------------------------------------------------------------------------
-
 sub clear_up {
 #+
 #  Subroutine to clear up when exiting.
@@ -1249,13 +544,6 @@ sub clear_up {
       unlink( $file );
    }
 
-#  Remove document parts if split.
-   if ( $SPLIT ) {
-      for (my $i = 0; $i < $NSECTIONS; $i++) {
-         $file = $DESTDIR . 'section' . $i . '.tex';
-         unlink( $file );
-      }
-   }
 
 #  And die.
    if ( $CANEXIT ) {
@@ -1264,121 +552,6 @@ sub clear_up {
 }
 
 #------------------------------------------------------------------------------
-
-sub create_initfile{
-#+
-#  Subroutine to create the star2html specific initialisation file.
-#
-#  Create a .star2html-init file for this directory by adding our defaults.
-#  These can be overridden by environment variables, or by the contents of an
-#  existing .latex2html-init file (this is appended to our file to make sure
-#  it overrides the defaults here).
-#-
-
-   open( my $DEFAULTS, '>','.star2html-init' )
-      || &clear_up( "Star2HTML fatal: Failed to open defaults file, .star2html-init\n" );
-   print( $DEFAULTS "# Star2html latex2html defaults file.\n");
-   print( $DEFAULTS "\$ADDRESS = \'$ADDRESS\'; \n" );
-   print( $DEFAULTS "\$TITLE = \'$TITLE\'; \n" );
-   &print_value( $DEFAULTS, "NO_NAVIGATION", 0 );
-   &print_value( $DEFAULTS, "TOP_NAVIGATION", 1 );
-   &print_value( $DEFAULTS, "BOTTOM_NAVIGATION", 1 );
-   &print_value( $DEFAULTS, "AUTO_NAVIGATION", 0 );
-   &print_value( $DEFAULTS, "INDEX_IN_NAVIGATION", 1 );
-   &print_value( $DEFAULTS, "CONTENTS_IN_NAVIGATION", 1 );
-   &print_value( $DEFAULTS, "NEXT_PAGE_IN_NAVIGATION", 1 );
-   &print_value( $DEFAULTS, "PREVIOUS_PAGE_IN_NAVIGATION", 1 );
-   &print_value( $DEFAULTS, "INFO", 1 );
-   &print_value( $DEFAULTS, "SHOW_SECTION_NUMBERS", 0 );
-   &print_value( $DEFAULTS, "LINE_WIDTH", 500);
-   &print_value( $DEFAULTS, "WORDS_IN_PAGE", 200);
-   &print_value( $DEFAULTS, "default_language", 'english' );
-   &print_value( $DEFAULTS, "WORDS_IN_NAVIGATION_PANEL_TITLES", 4 );
-   &print_value( $DEFAULTS, "MATH_SCALE_FACTOR", 1.5 );
-   &print_value( $DEFAULTS, "FIGURE_SCALE_FACTOR", 1.0 );
-   &print_value( $DEFAULTS, "TRANSPARENT_FIGURES", 1 );
-   &print_value( $DEFAULTS, "PAPERSIZE", 'a3' );
-   &print_value( $DEFAULTS, "ICONSERVER", "\'.\'" );
-#  PNGs sometimes have gray backgrounds, supposed to be removed and
-#  give better antialised edges, but that's not always true (netpbm
-#  version?), so make the background white.
-   &print_value( $DEFAULTS, "WHITE_BACKGROUND", 1 );
-   &print_value( $DEFAULTS, "LATEX_COLOR", "'\\pagecolor{white}'" );
-#  Alternatively remove above and uncomment this to get GIFs.
-#   &print_value( $DEFAULTS, "IMAGE_TYPE", 'gif' );
-
-#  Add navigation panel changes. These add extra words for each
-#  description and a line-break between each description.
-   print( $DEFAULTS <<'_EOF_' );
-sub top_navigation_panel {
-
-    #  Start with a horizontal rule (3-d dividing line)
-    "<BR> <HR>".
-
-    # Now add a few buttons with a space between them
-    "$NEXT $UP $PREVIOUS $CONTENTS $INDEX $CUSTOM_BUTTONS" .
-
-    "<BR>\n" .          # Line break
-
-    # If ``next'' section exists, add its title to the navigation panel
-    ($NEXT_TITLE ? "<B> Next:</B> $NEXT_TITLE<BR>\n" : undef) .
-
-    # Similarly with the ``up'' title ...
-    ($UP_TITLE ? "<B>Up:</B> $UP_TITLE<BR>\n" : undef) .
-
-    # ... and the ``previous'' title
-    ($PREVIOUS_TITLE ? "<B> Previous:</B> $PREVIOUS_TITLE\n" : undef) .
-
-    #  Line Break, horizontal rule (3-d dividing line) and new paragraph
-    "<BR> <HR> <P>\n"
-}
-
-sub bot_navigation_panel {
-
-    #  Start with a horizontal rule (3-d dividing line)
-    "<BR> <HR>".
-
-    # Now add a few buttons with a space between them
-    "$NEXT $UP $PREVIOUS $CONTENTS $INDEX $CUSTOM_BUTTONS" .
-
-    "<BR>\n" .          # Line break
-
-    # If ``next'' section exists, add its title to the navigation panel
-    ($NEXT_TITLE ? "<B> Next:</B> $NEXT_TITLE<BR>\n" : undef) .
-
-    # Similarly with the ``up'' title ...
-    ($UP_TITLE ? "<B>Up:</B> $UP_TITLE<BR>\n" : undef) .
-
-    # ... and the ``previous'' title
-    ($PREVIOUS_TITLE ? "<B> Previous:</B> $PREVIOUS_TITLE\n" : undef) .
-
-    #  Line Break, horizontal rule (3-d dividing line) and new paragraph
-    "<BR> <HR> <P>\n"
-}
-
-$WORDS_IN_NAVIGATION_PANEL_TITLES=20;
-1;
-_EOF_
-
-#  Check for existence of a local .latex2html-init file.
-   if ( -T '.latex2html-init' ) {
-      print( "Appending existing .latex2html-init defaults file.\n" );
-      if ( open( my $REALDEFAULTS, '.latex2html-init' ) ) {
-         my @lines = <$REALDEFAULTS>;                        # read in whole file
-         print( $DEFAULTS @lines );                       # write it out
-         close( $REALDEFAULTS );
-      } else {
-         print( "Star2HTML warning: Failed to append existing defaults file.\n" );
-      }
-   } else {
-
-#  Final line. If appending assume exists already
-      print( $DEFAULTS "1;\n");
-   }
-   close($DEFAULTS);
-}
-#------------------------------------------------------------------------------
-
 sub get_filename_and_directory {
 #+
 #   Subroutine to convert a filename to an absolute directory and filename.
@@ -1419,162 +592,3 @@ sub make_obsolete {
 
 
 #------------------------------------------------------------------------------
-
-## Since uudecode is no longer part of a standard linux distribution
-## the GIF icon is stored as uudecode in a <DATA> handle and we copy
-## the source code from Convert::UU CPAN module inline so as not to
-## have an external dependency. The file is source.gif but that is encoded
-## in the DATA segment.
-
-sub source_icon {
-  # Get the uuencoded GIF
-  my $uue = join("",<DATA>);
-
-  # Decode it
-  my ($string, $filename, $mode) = Convert::UU::uudecode( $uue );
-
-  open (my $fh, ">",$filename)
-    or die "Error opening output GIF $filename: $!";
-  binmode($fh);
-  print $fh $string;
-  close($fh);
-  return;
-}
-
-
-package Convert::UU;
-
-use strict;
-use vars qw($VERSION @ISA @EXPORT_OK);
-use Carp 'croak';
-
-require Exporter;
-
-@ISA = qw(Exporter);
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-@EXPORT_OK = qw(
-             uudecode uuencode
-);
-$VERSION = '0.52';
-
-#
-#  From comp.lang.perl 3/1/95.
-#  Posted by Hans Mulder (hansm@wsinti05.win.tue.nl)
-#
-
-sub uuencode {
-    croak("Usage: uuencode( {string|filehandle} [,filename] [, mode] )")
-      unless(@_ >= 1 && @_ <= 3);
-
-    my($in,$file,$mode) = @_;
-    $mode ||= "644";
-    $file ||= "uuencode.uu";
-
-    my($chunk,@result,$r);
-    if (
-        ref($in) eq 'IO::Handle' or
-        ref(\$in) eq "GLOB" or
-        ref($in) eq "GLOB" or
-        ref($in) eq 'FileHandle'
-       ) {
-        # local $^W = 0; # Why did I get use of undefined value here ?
-        binmode($in);
-        local $/;
-        $in = <$in>;
-    }
-    pos($in)=0;
-    while ($in =~ m/\G(.{1,45})/sgc) {
-      push @result, uuencode_chunk($1);
-    }
-    push @result, "`\n";
-    join "", "begin $mode $file\n", @result, "end\n";
-}
-
-sub uuencode_chunk {
-    my($string) = shift;
-# for the Mac?
-#    my($mod3) = length($string) % 3;
-#    $string .= "\0", $mod3 -= 3 if $mod3;
-    my $encoded_string = pack("u", $string);           # unix uuencode
-# for the Mac?
-#    $encoded_string =~ s/.//;                       # remove length byte
-#    chop($encoded_string);                          # remove trailing \n
-#    $encoded_string =~ tr#`!-_#A-Za-z0-9+/#;        # tr to mime alphabet
-#    substr($encoded_string, $mod3) =~ tr/A/=/;      # adjust padding
-    $encoded_string;
-}
-
-sub uudecode {
-    croak("Usage: uudecode( {string|filehandle|array ref}) ")
-      unless(@_ == 1);
-    my($in) = @_;
-
-    my(@result,$file,$mode);
-    $mode = $file = "";
-    if (
-        ref($in) eq 'IO::Handle' or
-        ref(\$in) eq "GLOB" or
-        ref($in) eq "GLOB" or
-        ref($in) eq 'FileHandle'
-       ) {
-        local($\) = "\n";
-        binmode($in);
-        while (<$in>) {
-            if ($file eq "" and !$mode){
-                ($mode,$file) = ($1, $2) if /^begin\s+(\d+)\s+(.+)$/ ;
-                next;
-            }
-            last if /^end/;
-            push @result, uudecode_chunk($_);
-        }
-    } elsif (ref(\$in) eq "SCALAR") {
-        while ($in =~ m/\G(.*?(\n|\r|\r\n|\n\r))/gc) {
-            my $line = $1;
-            if ($file eq "" and !$mode){
-                ($mode,$file) = $line =~ /^begin\s+(\d+)\s+(.+)$/ ;
-                next;
-            }
-            next if $file eq "" and !$mode;
-            last if $line =~ /^end/;
-            push @result, uudecode_chunk($line);
-        }
-    } elsif (ref($in) eq "ARRAY") {
-        my $line;
-        foreach $line (@$in) {
-            if ($file eq "" and !$mode){
-                ($mode,$file) = $line =~ /^begin\s+(\d+)\s+(.+)$/ ;
-                next;
-            }
-            next if $file eq "" and !$mode;
-            last if $line =~ /^end/;
-            push @result, uudecode_chunk($line);
-        }
-    }
-    wantarray ? (join("",@result),$file,$mode) : join("",@result);
-}
-
-sub uudecode_chunk {
-    my($chunk) = @_;
-    return "" if $chunk =~ /^(?:--|CREATED)/;
-    my $string = substr($chunk,0,int((((ord($chunk) - 32) & 077) + 2) / 3)*4+1);
-
-    my $ret = unpack("u", $string);
-    defined $ret ? $ret : "";
-}
-
-1;
-
-package main;
-
-# The source.gif icon uuencoded
-__DATA__
-begin 644 source.gif
-M1TE&.#EA&@`8`.,``````````("`@+V]O;^_O\#`P,'!P<+"POC\^/______
-M_____________________RP`````&@`8```$=A#)2:N]..?`N_]@,(F:)I!B
-M48!JZZK"*:4KQ;UOC"(J.2,!7$OWZP%%H9P,R*O9;,'ADH;T/*,%(M-XK=ZR
-MTZ:7<XEJJ94Q$A;N@<KLG;#V`<:+0I_MOLV'S&US@F!R@W-G"#&*BXR-4XZ0
--CCY_E'4EEYB9$Q$`.P``
-`
-end

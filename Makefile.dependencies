@@ -2619,7 +2619,6 @@ $(MANIFESTS)/sst: \
 # Component star2html has configure dependencies on { perl },
 # which must be built before this component is configured.
 $(MANIFESTS)/star2html: \
-		$(MANIFESTS)/latex2html \
 		$(MANIFESTS)/latexsupport
 	cd applications/star2html \
 	  && $(MAKE_CPT)

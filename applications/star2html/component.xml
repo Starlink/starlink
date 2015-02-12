@@ -9,17 +9,12 @@
   <abstract><p>Star2HTML lets you write (or convert) a Starlink document
       so that you can create two versions of it from a single source file.
       A paper version is produced by LaTeX, and a hypertext version
-      (suitable for browsing on the web) is produced by either latex2html or
-      tex4ht. TeX4ht is used if the program requests using the 'starlink
-      document class. The starlink document class is installed by the
+      (suitable for browsing on the web) is produced by TeX4HT
+      Documents must use the 'starlink' document class, is installed by the
       starlink application 'latexsupport'.</p>
-    <p>Star2HTML also includes a set of document templates for producing
-      Starlink documents in a standard style (such as `Starlink User
-      Note').  They also define new LaTeX commands for adding extra
-      links to the hypertext version of your document (without
-      affecting the paper version). </p></abstract>
+  </abstract>
   <dependencies >
-    <build>latex2html</build><build>latexsupport</build><configure>perl</configure>
+    <build>latexsupport</build><configure>perl</configure>
   </dependencies>
   <developers>
     <person>
@@ -35,5 +30,5 @@
     <year></year>
     <name>Science and Technology Facilities Council</name>
   </copyright>
-  <notes><p>Starlink customised wrapper around latex2html</p></notes>
+  <notes><p>Starlink customised wrapper around htlatex</p></notes>
 </component>
