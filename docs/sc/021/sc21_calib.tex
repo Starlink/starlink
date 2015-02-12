@@ -1,0 +1,120 @@
+\chapter{\xlabel{calib}SCUBA-2 data calibration}
+\label{app:cal}
+
+\section{\xlabel{fcf}Flux conversion factors (FCF)}
+\label{app:fcf}
+
+Primary and secondary calibrator observations have been reduced using
+the specifically designed \file{dimmconfig\_bright\_compact.lis}.  The
+maps produced from this are then analysed using tailor-made \picard\
+recipes. For instructions on applying the FCFs to your map see
+\cref{Section}{sec:cmult}{this page}.
+
+A map reduced by the map-maker has units of pW. To calibrate the data
+into units of janskys (Jy), a set of bright, point-source objects with
+well-known flux densities are observed regularly to provide a flux
+conversion factor (FCF). The data (in pW) can be multiplied by this
+FCF to obtain a calibrated map. The FCF can also be used to assess the
+relative performance of the instrument from night to night. The noise
+equivalent flux density (NEFD) is a measure of the instrument
+sensitivity, and while not discussed here, is also produced by the
+\textsc{Picard} recipe shown here. For calibration of primary and
+secondary calibrators, the FCFs and NEFDs have been calculated as
+follows:
+
+\begin{enumerate}
+\item The \textsc{Picard} recipe \drrecipe{SCUBA2\_FCFNEFD} takes the
+  reduced map, crops it, and runs background removal. Surface-fitting
+  parameters are changeable in the \textsc{Picard} parameter file.
+
+\item It then runs the \Kappa\ \beamfit\ task on the specified point
+  source. The \task{beamfit} task will estimate the peak
+  (uncalibrated) flux density and the FWHM. The integrated flux
+  density within a given aperture (30-arcsec radius default) is
+  calculated using \photom\ \autophotom. Flux densities for
+  calibrators such as Uranus, Mars, CRL~618, CRL~2688 and HL~Tau are
+  already known to \picard. To derive an FCF for other sources of
+  known flux densities, the fluxes can be added to the parameter file
+  with the source name (in upper case, spaces
+  removed): \param{FLUX\_450.MYSRC~=~0.050}
+  and \param{FLUX\_850.MYSRC~=~0.005} (where the values are in Jy),
+  for example.
+
+\item Three different FCF values are calculated, two of which are
+  described below.
+
+  \begin{enumerate}
+
+  \item \textbf{The arcsecond FCF}
+    \begin{equation}
+      \label{eq:fcf_arcsec}
+      \mathrm{FCF_{arcsec}} = \frac{S_{\mathrm{tot}}}{P_{\mathrm{int}} \times
+        A_{\mathrm{pix}}}
+    \end{equation}
+
+    where $S_{\mathrm{tot}}$ is the total flux density of the
+    calibrator, $P_{\mathrm{int}}$ is the integrated sum of the source
+    in the map (in pW) and $A_{\mathrm{pix}}$ is the pixel area in
+    arcsec$^2$, producing an FCF in Jy/arcsec$^2$/pW.
+
+  \item\textbf{The beam FCF}
+    \begin{equation}
+      \label{eq:fcf_beam}
+      \mathrm{FCF_{beam}} = \frac{S_{\mathrm{peak}}}{P_{\mathrm{peak}}}
+    \end{equation}
+    producing an FCF in units of Jy/beam/pW.
+  \end{enumerate}
+
+\end{enumerate}
+
+The measured peak signal here is derived from the Gaussian fit of
+\task{beamfit}. The peak value is susceptible to pointing and focus
+errors, and we have found this number to be somewhat unreliable,
+particularly at 450$\mu$m.
+
+
+\section{\xlabel{extinction}Extinction correction}
+
+Analysis of the SCUBA-2 secondary calibrators has allowed calculation
+of the transmission relationships for the SCUBA-2 450\,$\mu$m and
+850\,$\mu$m pass-bands to be determined. Full details of the analysis
+and on-sky calibration methods of SCUBA-2 can be found in Dempsey et
+al.\ (2013)~\cite{dempsey12}\cite{dempsey-spie}.
+
+Archibald et al. (2002)\,\cite{archibald} describes how the Caltech
+Submillimeter Observatory (CSO) 225\,GHz opacity, $\tau_{225}$,
+relates to SCUBA opacity terms in each band, $\tau_{450}$ and
+$\tau_{850}$. The JCMT water-vapour radiometer (WVM) uses the 183\,GHz
+water line to calculate the precipitable water vapour (PWV) along the
+line-of-sight of the telescope. This PWV is then input into an
+atmospheric model to calculate the zenith opacity at 225\,GHz
+($\tau_{225}$). This allows ease of comparison with the adjacent CSO
+225\,GHz tipping radiometer. The opacities have been as:
+
+\begin{equation}
+\tau_{450} = 26.0 \times (\tau_{225} - 0.012);
+\end{equation}
+and
+\begin{equation}
+\tau_{850} = 4.6 \times (\tau_{225} - 0.0043).
+\end{equation}
+
+The SCUBA-2 filter characteristics are described in detail
+\htmladdnormallinkfoot{on the JCMT
+  website}{http://www.jach.hawaii.edu/JCMT/continuum/scuba2/filter/}.
+
+The extinction correction parameters that scale from $\tau_{225}$ to
+the relevant filter have been added to the map-maker code. You can
+override these values by setting \param{ext.taurelation.filtname} in
+your map-maker config files to the two coefficients `($a$,$b$)' that
+you want to use (where \param{filtname} is the name of the
+filter). The defaults are listed in
+\file{\$SMURF\_DIR/smurf\_extinction.def}.
+
+% It is worth noting that if an individual science map and
+% corresponding calibrator observation has already been reduced with
+% the old factors (and your source and calibrator are at about the
+% same airmass and if the tau did not change appreciably), any errors
+% in extinction correction should cancel out in the calibration.
+
+

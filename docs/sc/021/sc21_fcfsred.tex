@@ -1,0 +1,59 @@
+\chapter{\xlabel{fcfsred}FCFs by reduction date}
+\label{app:fcfs}
+
+Ongoing development of the SCUBA-2 analysis has resulted in ongoing
+changes to the tau relationship and the FCFs. Depending on when your
+data were reduced you will need to apply different calibration values.
+\\
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|}
+ \hline
+ \multicolumn{1}{|c|}{Date} &
+ \multicolumn{2}{c|}{FCF - 450$\mu$m} &
+ \multicolumn{2}{c|}{FCF - 850$\mu$m} \\
+\cline{2-5}
+& Jy/pW/beam &Jy/pW/arcsec$^2$ & Jy/pW/beam &Jy/pW/arcsec$^2$ \\
+ \hline
+until January 2012 &383  & 4.9&1080 &5.0 \\
+January 2012 - July 2012&606&6.06 &556 &2.42 \\
+July 2012 onwards&491 &4.71 &537 &2.34 \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+\vspace{-2mm}
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|c|c|}
+ \hline
+ \multicolumn{1}{|c}{Date} & \multicolumn{2}{|c|}{Tau Relation}  \\ \cline{2-3}
+                           & 450$\mu$m  & 850$\mu$m \\ \hline
+until January 2012       & 32 $\times$ ($\tau_{225}$ - 0.02)    & 5.2 $\times$ ($\tau_{225}$ - 0.013)  \\
+January 2012 - July 2012 & 26 $\times$ ($\tau_{225}$- 0.01923)  & 4.6 $\times$ ($\tau_{225}$ - 0.00435)  \\
+July 2012 onwards        & 26 $\times$ ($\tau_{225}$ - 0.01196) & 4.6 $\times$ ($\tau_{225}$ - 0.00435)  \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\vspace{-5mm}
+\begin{itemize}
+\item Peak FCF (Jy/pW/beam)---multiply your map by this when you wish
+to measure absolute peak fluxes of discrete sources.
+\item Arcsec FCF (Jy/pW/arcsec$^2$)---multiply your map by this if
+you wish to use the calibrated map to do aperture photometry.
+\end{itemize}
+You can find out when your data was reduced and hence what tau
+relation was applied by using the \Kappa\ command \hislist.
+\vspace{-2mm}
+\begin{terminalv}
+%  hislist file | grep EXT.TAURELATION
+\end{terminalv}
+This will return something like the following,
+\begin{terminalv}
+      EXT.TAURELATION.450=(26.0,-0.012),
+      EXT.TAURELATION.850=(4.6,-0.0043), EXT.TAUSRC=auto, FAKESCALE=1,
+\end{terminalv}
+
+

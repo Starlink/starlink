@@ -1,0 +1,61 @@
+\chapter{\xlabel{calcrms}\drrecipe{SCUBA2\_CHECK\_RMS}}
+\label{app:checkrmsparams}
+
+The \picard\ recipe \drrecipe{SCUBA2\_CHECK\_RMS} estimates the RMS
+and NEFD for a given observation via two methods to compare with
+values from the SCUBA-2 integration time calculator (ITC).
+
+The average NEP is calculated from the QL pipeline log file
+(\file{log.nep}) corresponding to the date and wavelength. The FCF
+(either from the file or the standard value) and mean transmission
+over the observation is used to convert this to a zenith NEFD
+(NEFD\_NEP). The elapsed time is used to convert that to an RMS noise
+(RMS\_NEP).
+
+The input images are cropped to the given size (as specified in the
+FITS headers or via the MAP\_HEIGHT and MAP\_WIDTH recipe parameters)
+before the mean exposure time is derived, along with the mean/median
+noise and NEFD (RMS\_MAP and NEFD\_MAP).
+
+The RMS corresponding to the observation type is calculated from the
+SCUBA-2 ITC (RMS\_ITC); the time is used to convert that to a
+corresponding NEFD (NEFD\_ITC).
+
+The parameters written out to \file{log.checkrms} are listed below:
+\begin{table}[h!]
+  \begin{center}
+    \begin{tabular}{|p{2.5cm}|p{12cm}|}
+      \hline
+      \textbf{Parameter} & \textbf{Description}\\
+      \hline
+      UT & UT date including day fraction\\
+      Source & object name, upper case with spaces removed\\
+      Obs & observation number\\
+      FILTER & filter (wavelength)\\
+      telapsed & elapsed time of observation in seconds\\
+      texp & mean exposure time, derived from EXP\_TIME NDF component (sec)\\
+      trans & mean line-of-sight transmission\\
+      nep\_av & mean NEP for current observation (W/sqrt(Hz))\\
+      nep\_av\_err & uncertainty in nep\_av (W/sqrt(Hz))\\
+      rms\_nep & RMS derived from nefd\_nep (mJy/beam)\\
+      nefd\_nep & NEFD derived from nep\_av and scaled elapsed time (mJy sqrt(sec))\\
+      rms\_map & RMS noise in map, obtained from median of error array (mJy/beam)\\
+      nefd\_map & NEFD derived from combination of variance and exposure time images (mJy sqrt(sec))\\
+      rms\_itc & RMS noise estimated by SCUBA-2 integration time calculator (ITC) (mJy/beam) \\
+      nefd\_itc & NEFD derived from rms\_itc and scaled elapsed time (mJy sqrt(sec)) \\
+      itc\_obstype & observation type used by the ITC to derived RMS\\
+      rms\_ratio & ratio of rms\_map to rms\_itc\\
+      El & mean elevation in degrees\\
+      CSO & mean zenith optical depth at 225 GHz, derived from WVM\\
+      Tau & mean zenith optical depth at the current wavelength (given by FILTER above)\\
+      Radius & radius in arcsec of image used in analysis\\
+      pixscale & pixel scale in arcsec\\
+      f & ITC f parameter\\
+      project & project ID\\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+
+

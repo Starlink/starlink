@@ -1,0 +1,253 @@
+\chapter{Introduction}
+\label{sec:intro}
+
+% set up page numbers in arabic numerals and restart from 1
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\section{This cookbook}
+
+This guide is designed to instruct SCUBA-2 users on the best ways to
+reduce and visualise their data using \starlink\ packages:
+\smurf \cite{smurf}, \Kappa \cite{kappa}, \gaia \cite{gaia} and \picard
+\cite{picard}.
+
+This guide covers the following topics.
+\begin{itemize}
+\itemsep0em
+\item \cref{Chapter}{sec:intro}{Chapter 1} -- Computer resources you'll need before getting started.
+\item \cref{Chapter}{sec:s2}{Chapter 2} -- A description of SCUBA-2 and its observing modes.
+\item \cref{Chapter}{sec:raw}{Chapter 3}  -- Data acquisition and instructions for examining raw data.
+\item \cref{Chapter}{sec:dimm}{Chapter 4}  -- An introduction to the Dynamic Iterative Map-Maker and a description of the configuration files.
+\item \cref{Chapter}{sec:pipe}{Chapter 5}  -- Instructions for using the \oracdr\ pipeline to reduce your data along with details on data retrieved from the JSA.
+\item \cref{Chapter}{sec:eg}{Chapter 6}  -- Two worked examples covering a \htmlref{blank cosmology field}{sec:cosmology} and a \htmlref{galactic field}{sec:bright_ex}.
+\item \cref{Chapter}{sec:tweak}{Chapter 7}  -- Options for tailoring the configuration parameters to improve your final map.
+\item \cref{Chapter}{sec:postprocess}{Chapter 8}  -- Post-processing reduction steps such as applying the FCF, co-adding multiple maps and estimating the noise.
+\item \cref{Chapter}{sec:maps}{Chapter 9}  -- How to reduce your data using the map-maker.
+
+
+\end{itemize}
+
+
+\section{\xlabel{computing} Before you start: computing resources}
+
+Before reducing SCUBA-2 data using the Dynamic Iterative Map-Maker you should confirm you have sufficient computing resources for your type of map.
+
+We recommend the following:
+\begin{table}[h!]
+  \centering
+  \begin{tabular}{ll}
+    \hline
+    \textbf{Reduction type} &\textbf{Memory} \\
+    \hline
+    Large maps (\textsc{pong})& 96 GB\\
+    Small maps (\textsc{daisy})&32 - 64 GB\\
+    850\,$\mu$m data only&32 - 64 GB\\
+    Blank fields&32 - 64 GB\\
+    \hline
+  \end{tabular}
+\end{table}
+
+\subsubsection*{Why these recommendations?}
+
+For large-area maps it is important to process a full observation in a
+single chunk. See the text box on
+\latexhtml{Page~\pageref{box:chunk}}{\htmlref{Chunking}{box:chunk}}\
+for an explanation of chunking. For large maps, using normal map-maker
+parameters a machine having 96\,GB is acceptable. It is important that
+the memory is as fast as can be afforded, as RAM speed has a direct
+linear effect on processing time given that the time-series data are
+continually being funnelled through the CPU.
+
+For blank-field surveys, data that only use 850\,$\mu$m, or smaller
+regions of the sky you can usefully run the map-maker with less memory
+and 32 to 64\,GB is reasonable depending on the specifics of your data
+set. \textsc{smurf} is multi-threaded so multiple cores do help
+although above eight cores the price/performance gains tend to drop
+off.
+
+If you have a very large machine (128\,GB and 24 cores) you can to run
+two instances of the map-maker in parallel. Use the
+\envvar{SMURF\_THREADS} environment variable to restrict each
+map-maker to half the available cores.
+
+
+\section{\xlabel{software}Before you start: software}
+
+This manual uses software from the \starlink\ packages: \smurf\
+\cite{smurf}, \Kappa\ \cite{kappa}, \gaia\ \cite{gaia}, \oracdr\
+\cite{oracdr} and \picard\ \cite{picard}. Starlink software must be
+installed on your system, and Starlink aliases and environment
+variables must be defined before attempting to reduce any SCUBA-2
+data.
+
+
+\subsection{KAPPA and SMURF for data processing}
+
+The Sub-Millimetre User Reduction Facility, or \textsc{Smurf},
+contains the Dynamic Iterative Map-Maker, which will process raw
+SCUBA-2 data into images (see \smurfsun). \textsc{Kappa} meanwhile is
+an application package comprising general-purpose commands mostly for
+manipulating and visualising NDF data (see \kappasun). Before starting
+any data reduction you will want to initiate both \textsc{Smurf} and
+\textsc{Kappa}.
+
+\begin{terminalv}
+% smurf
+% kappa
+\end{terminalv}
+
+You can access the help information by typing \texttt{smurfhelp} or
+\texttt{kaphelp} respectively in a terminal, or by using the
+\task{showme} facility to access the hypertext documentation. See
+\cref{Section}{sec:help}{How to get help} for more information.
+
+
+
+\begin{tip}
+The .sdf extension on filenames is not required when running
+Starlink commands.
+\end{tip}
+
+
+\subsection{GAIA for viewing your map}
+
+Image visualisation can be done with \gaia\ (see
+\gaiasun). \textsc{Gaia} is an image and data-cube display and
+analysis tool, which incorporates facilities such as source detection,
+three-dimensional visualisation, photometry and the ability to query
+and overlay on-line or local catalogues.
+\begin{terminalv}
+% gaia map.sdf
+\end{terminalv}
+
+\subsection{ORAC-DR for running the pipeline}
+
+The \oracdr\ Data Reduction Pipeline \cite{oracdr} (hereafter just
+\textsc{Orac-dr}) is an automated reduction pipeline. \textsc{Orac-dr}
+uses \smurf\ and \Kappa\ (along with other Starlink tools) to perform
+an automated reduction of the raw data following pre-defined recipes
+to produce calibrated maps.  The following commands initialise
+\textsc{Orac-dr} ready to process 850\,$\mu$m and 450\,$\mu$m data
+respectively.
+\begin{terminalv}
+% oracdr_scuba2_850
+% oracdr_scuba2_450
+\end{terminalv}
+For more information on available recipes and intructions for running the pipeline
+see \cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline}.
+
+\subsection{PICARD for post-reduction processing}
+
+\textsc{Picard} uses a similar pipeline system as \oracdr\ for
+post-processing analysis of reduced data. \textsc{Picard}
+documentation can be found at
+\href{http://www.oracdr.org/oracdr/PICARD}{\textsc{Orac-dr} web page},
+or at \picardsun. All \textsc{Picard} recipes follow the same
+structure and are run like so:
+\begin{terminalv}
+% picard -recpars <recipe_params_file> RECIPE <input_files>
+\end{terminalv}
+where \param{<recipe\_param\_file>} is a text file containing the
+relevant recipe parameters. \param{RECIPE} is the name of the recipe
+to be run (note the caps). The list of files to be processed is given
+by  \param{<input\_files>}. These must be in the current directory or a
+directory defined by the environment variable \envvar{ORAC\_DATA\_IN}. A
+number of \textsc{Picard} recipes will be demonstrated in
+\cref{Chapter}{sec:maps}{Reducing your data}.
+
+Other command-line options include \texttt{-log xsf} where the log
+file is written to any combination of the screen [\texttt{s}], a file
+[\texttt{f}] or an X-window [\texttt{x}]. \texttt{s} or \texttt{sf} is
+recommended as the recipes are short and the X-window automatically
+closes upon completion.
+
+You do not specify an output filename for \picard, instead the output
+is generated by adding a recipe depending suffix to the input
+filename. If there is more than one input file then the name of the
+last file is used.
+
+You can create a file which lists the input files to be passed to
+\picard\ for processing. this file is read by \picard\ via the
+Linux/Unix \task{cat} command. For example:
+
+\begin{terminalv}
+% picard -log s RECIPE_NAME `cat myfilestoprocess.lis`
+\end{terminalv}
+
+To execute the \task{cat} command you must enclose it in back
+quotes. You must also include the \file{.sdf} extension on any files
+passed to \picard.
+
+\begin{tip}
+  The .sdf extension on filenames is required by \textsc{Picard}.
+\end{tip}
+
+\begin{tip}
+  If the environment variable \envvar{ORAC\_DATA\_OUT} is defined, any
+  files created by \textsc{Picard} will be written in that
+  location. Check there if new files are expected but do not appear in
+  your working directory.
+\end{tip}
+
+
+\subsection{\xlabel{help}How to get help}
+\label{sec:help}
+
+\begin{table}[h!]
+\begin{tabular}{p{2.3cm}|p{7.3cm}|p{5cm}}
+\hline
+\textbf{Help\newline command} & \textbf{Description} & \textbf{Usage}\\
+\hline
+\task{showme} & If you know the name of the Starlink document you want to view
+                use \task{showme}. When run, it launches a new webpage or tab
+                displaying the hypertext version of the document. &
+                \begin{terminalv}
+% showme sun95
+\end{terminalv}
+\\
+\hline
+\task{findme} & \task{findme} searches Starlink documents for a keyword. When
+                run, it launches a new webpage or tab listing the results. &
+                \texttt{\% findme kappa}\\
+\hline
+\task{docfind} & \task{docfind} searches the internal list files for keywords. It then
+                 searches the document titles. The result is displayed using the
+                 Unix \task{more} command. & \texttt{\% docfind kappa}\\
+\hline
+Run routines with prompts & You can run any routine with the option
+                            \texttt{prompt} after the command. This will
+                            prompt for every parameter available. If you
+                            then want a further description of any parameter
+                            type  \texttt{?} at the relevant prompt. &
+                            \texttt{\% makemap prompt \newline\ \% REF - Ref. NDF /!/$>$ ?}\\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Processing options}
+
+You have two options for processing your data:
+
+\begin{enumerate}
+\item performing each step manually, or
+\item running the automated pipeline (\textsc{Orac-dr}).
+\end{enumerate}
+
+The pipeline approach works well if you have a lot of data to process.
+Performing each step by hand allows more fine-tuned control of certain
+processing and analysis steps, and is especially useful for refining
+the parameters used by the map-maker. However, once the optimal
+parameters have been determined, it is possible to pass them to the
+pipeline. \cref{Chapter}{sec:dimm}{The Dynamic Iterative Map-maker
+  Explained} and \cref{Chapter}{sec:maps}{Reducing Your Data} discuss
+the manual approach; to use the science pipeline, skip straight to
+\cref{Section}{sec:pipe}{The SCUBA-2 Pipeline}.
+
+The JCMT will produce pipeline reduced files for each observation and
+group of repeat observations for each night. These are reduced using
+the \oracdr\ pipeline with the recipe specified in the MSB.
+\cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline} gives instruction on
+retrieving reduced data from the \htmladdnormallink{JCMT Science
+  Archive}{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/} at
+CADC.

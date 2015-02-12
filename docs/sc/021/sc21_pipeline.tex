@@ -1,0 +1,268 @@
+\chapter{\xlabel{pipeline}The SCUBA-2 Pipeline}
+\label{sec:pipe}
+
+\section{\xlabel{pl_overview}Pipeline overview}
+
+SCUBA-2 data reduction pipelines have been developed based on the
+existing \oracdr\ pipeline (Cavanagh et al., 2008\cite{oracdr}) used
+for ACSIS. There are three distinct pipelines currently utilised by
+SCUBA-2: two of these, the quick-look (QL) and summit pipelines, are
+run in real time at the JCMT during data acquisition; the third, the science
+pipeline, offers a comprehensive reduction, which users can run locally.
+
+\begin{itemize}
+\item The QL runs quality assurance checks on the data as it comes in.
+For science data it calculates the noise between 2\,Hz and 10\,Hz,
+along with the NEP and effective NEP, for each 30-second scan. These
+values undergo quality-assurance checks to ensure SCUBA-2 is within
+an acceptable operating range.
+\item The summit pipeline is designed to provide a quick map of the
+data, it does this by running fewer iterations and chunking the data
+more. This is a useful guide to observers who wish to check the
+quality of their data.
+\item The science pipeline is run at CADC. This is normally the next
+day once the data have transferred there.  This nightly processing
+uses an optimal reduction routine, that includes the map-maker and a
+number of post-processing steps (outlined below). Both the raw data
+and reduced products are available for download by project members the
+following day.
+\end{itemize}
+
+The manual for the SCUBA-2 pipeline can be found at \pipelinesun,
+while the pipeline software comes as part of the \starlink\ suite.
+
+
+\section{\xlabel{science_pl}The Science Pipeline}
+
+The science pipeline will automate many of the steps discussed in
+\cref{Chapter}{sec:maps}{Reducing Your Data}:
+\vspace{-0.3cm}
+\begin{itemize}\itemsep-0.3em
+\item Run the iterative map-maker.
+\item Apply the FCF to calibrate to mJy/beam.
+\item Co-add multiple observations of the same object.
+\item Apply the matched-filter (blank-field configuration file only)
+\item Run a source-finding algorithm.
+\end{itemize}
+
+\subsection{\xlabel{pl_output}Pipeline recipes}
+\label{sec:recipes}
+
+When MSBs are created, the PI can select a pipeline recipe to assign
+to the data. When the data are run through the science pipeline this
+recipe is then called by default. This can overridden on the command
+line---see \cref{Section}{sec:parameterfile}{Changing the defaults}.
+Described below are the five main \oracdr\ science recipes.
+
+\subsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN}}
+
+\textbf{configuration file: \file{dimmconfig.lis}}
+
+This recipe uses the default configuration file for \makemap, unless
+the sources is identified as a calibrator. After all observations have
+been processed the data are co-added and calibrated in mJy/beam using
+the default FCF. The noise and NEFD properties for the co-add are
+calculated and written to log files (\file{log.noise} and
+\file{log.nefd} respectively). Finally, the \cupid\ task \findclumps\
+is run using the FellWalker algorithm to create a source catalogue.
+
+For calibrators, \file{dimmconfig\_bright\_compact.lis} is used and
+FCFs are derived from the map.
+
+
+\subsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN\_CHECKRMS}}
+
+\textbf{Configuration file: \file{dimmconfig.lis}}
+
+This recipe is the same as \drrecipe{REDUCE\_SCAN}, but includes extra
+performance estimations determined by \drrecipe{SCUBA2\_CHECK\_RMS}
+(see \cref{Section}{sec:checkrms}{Getting the noise}). These extra
+metrics are written to a log file \file{log.checkrms}. Running
+\drrecipe{SCUBA2\_CHECK\_RMS} in the pipeline, rather than as a
+standalone \picard\ recipe, allows it to calculate results for
+co-added maps.
+
+
+\subsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN\_EXTENDED\_SOURCES}}
+
+\textbf{Configuration file: \file{dimmconfig\_bright\_extended.lis}}
+
+This is the recipe for processing extended sources. Multiple
+observations are co-added and the output map is calibrated in units of
+mJy/arcsec$^2$. This recipe also performs a source-finder routine; the
+results are written as a FITS catalogue (with file extension
+\file{.FIT}) which can be read as a local catalogue into \gaia.
+
+\subsection{\xlabel{faint}\drrecipe{REDUCE\_SCAN\_FAINT\_POINT\_SOURCES}}
+
+\textbf{Configuration file: \file{dimmconfig\_blank\_field.lis}}
+
+This is the recipe for processing maps containing faint compact
+sources. This time the configuration file called by \makemap\ is
+\file{dimmconfig\_blank\_field.lis} and the map calibrated in
+mJy/beam.  The output map is further processed with a matched filter,
+then the S/N is taken to enhance point sources.  A map is written out
+at each step.  This recipe also performs a source finder routine; the
+results are written as a FITS catalogue (with file extension
+\file{.FIT}) which can be read as a local catalogue into \gaia.
+
+
+\subsection{\xlabel{faintjk}\drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE}}
+
+\textbf{Configuration file: \file{dimmconfig\_blank\_field.lis}}
+
+This recipe uses a
+\htmladdnormallink{jack-knife}{http://en.wikipedia.org/wiki/Jackknife_resampling}
+method to remove residual low-spatial frequency noise and create an
+optimal matched-filtered output map. The map-maker is run twice, first
+as a standard reduction using \file{dimmconfig\_blank\_field.lis} (and
+calibrated in mJy/beam), and the second time with a fake source added
+to the time series. This creates a signal map and an effective PSF
+map. A jack-knife map is generated from two halves of the dataset and
+the maps are `whitened' by the removal of the residual 1/\emph{f}
+noise. The whitened signal map is processed with the matched filter
+using the whitened PSF map as the PSF input. The data are calibrated
+in mJy/beam using a corrected FCF.  See \cref{Section}{sec:jk}{Example
+  2 -- Advanced pipeline method} for a more-detailed description of
+this recipe and the files produced.
+
+\section{Changing the defaults}
+\label{sec:parameterfile}
+\subsection{Changing the pipeline recipe}
+You can override the recipe set in the header by listing any different
+one on the command line when starting \oracdr. For example
+\begin{terminalv}
+% oracdr -file mylist -loop file -log x REDUCE_SCAN_CHECKRMS
+\end{terminalv}
+
+You can find out which recipe is set in the data header via the FITS
+header \texttt{RECIPE} keyword in any of your raw files.  For
+example both of these options will return the same result:
+\begin{terminalv}
+% fitsval s8a20120725_00045_0003 RECIPE
+% fitslist s8a20120725_00045_0003 | grep RECIPE
+\end{terminalv}
+
+\subsection{Changing the configuration file}
+
+Although each recipe calls one of the standard configuration files
+you can specify your own. You will need to create a recipe parameter
+file. This file will set the parameter \param{MAKEMAP\_CONFIG} to be
+your new configuration file. The first line must be the name of the
+recipe used in the reduction.
+
+For example, to run the pipeline with \drrecipe{REDUCE\_SCAN\_CHECKRMS} with a
+configuration file called \file{myconfig.lis}, the recipe parameter file
+(\file{mypars.ini}) will look like this.
+\vspace{0.2cm}
+\begin{terminalv}
+[REDUCE_SCAN_CHECKRMS]
+MAKEMAP_CONFIG = myconfig.lis
+\end{terminalv}
+
+Then run the pipeline calling the parameter file via the
+\texttt{-recpars} option.
+\begin{terminalv}
+% oracdr -file mylist -loop file -log xf -recpars myparams.ini REDUCE_SCAN_CHECKRMS
+\end{terminalv}
+
+
+\section{\xlabel{running_pl}Running the Science Pipeline}
+\label{sec:plsteps}
+
+
+\begin{aligndesc}
+\item[Step~1:]
+\textbf{Initialise ORAC-DR}
+
+This is done by:
+\begin{terminalv}
+% oracdr_scuba2_850 -cwd
+\end{terminalv}
+
+\item[Step 2:]
+\textbf{Set environment variables}
+
+These ensure the data are read from and written to the right
+places. Many are set automatically when the pipeline is initialised
+but others must be set manually. Details of the optional variables are
+given in \pipelinesun\ but the three main ones are:
+
+\begin{itemize}\itemsep-0.1em
+\item \envvar{STARLINK\_DIR} -- Location of your Starlink installation.
+\item \envvar{ORAC\_DATA\_IN} -- The location where the data should be read from.
+If you are supplying a text file listing the raw data this should be the
+location of that file.
+\item \envvar{ORAC\_DATA\_OUT} -- The location where the data products should be
+written. Also used as the location for a user-specified configuration file.
+\end{itemize}
+
+\item[Step 3:]
+\textbf{(Optional) Create a personalised configuration file and/or parameter file}
+
+See \cref{Section}{sec:parameterfile}{Changing the defaults} for
+details. In this example we find the recipe \drrecipe{REDUCE\_SCAN}
+assigned to our data. We are happy with the steps in this recipe but
+want to supply a new configuration file and a different set of
+clump-finding parameters. To do so we create a parameter file called
+\file{mypars.ini} which contains the following text.
+
+\begin{terminalv}
+[REDUCE_SCAN]
+MAKEMAP_CONFIG = mynewconfig.lis
+FINDCLUMPS_CFG = myfellwalkerparams.lis
+
+\end{terminalv}
+
+\item[Step 4:]
+\textbf{Run the pipeline}
+
+Run the pipeline using the \texttt{-recpars} option to specify a
+parameter file if required.
+\begin{terminalv}
+% oracdr -files inputlist.txt -loop file  -log xf -recpars mypars.ini
+\end{terminalv}
+\end{aligndesc}
+
+
+\section{\xlabel{pl_output}Pipeline output}
+
+The pipeline will produce a group file for each object being
+processed. If the pipeline is given data from multiple nights, all
+those data will be included in the group co-add using inverse variance
+weighting.
+
+The final maps in your output directory will have the suffix
+\file{\_reduced}. Maps will be made for individual observations, which
+will start with an \file{s} (e.g.
+\file{s20140620\_00030\_850\_reduced.sdf}). Group maps, which may
+contain co-added observations from a single night, are also produced
+which have the prefix \file{gs}
+(e.g. \file{gs20140620\_30\_850\_reduced.sdf}).
+
+\textbf{Note:} A group file is \emph{always} created, even if only a
+single observation is being processed.
+
+Additionally, PNG images are made of the reduced files at a variety of
+resolutions.
+
+\section{\xlabel{cadc}Getting your data from CADC}
+
+The JCMT Science Archive is hosted by The Canadian Astronomy Data
+Centre (CADC). Both raw data and data processed by the science
+pipeline are made available to PIs and co-Is through the CADC
+interface (\url{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}).
+
+To access proprietary data you will need to have your CADC username
+registered by the JAC and thereby associated with the project code.
+
+An important search option to be aware of is `Group Type', where your
+options are Simple, Night, Project and Public. Simple (which becomes
+`obs' on the result page) is an individual observation; night means
+the group file from the pipeline (these may or may not include more
+than one observation; the `Group Members' value will tell you); and
+the project option is generated if an entire project has been run
+through the pipeline and identical sources across the project are
+co-added into master group files.
+
+

@@ -1,0 +1,99 @@
+\chapter{\xlabel{app_clean}Cleaning the raw data}
+\label{app:clean}
+
+You can use the \smurf\ task \clean\ to help inspect time-series.
+\task{sc2clean} can be used to do two basic tasks in one go:
+concatenate data (with or without applying a flatfield); and cleaning
+(fix up steps and spikes, remove the means, filter, remove common-mode
+etc.). It uses the same configuration files as the iterative map-maker
+(though ignoring the map-making specific items).
+
+In this first basic example, we just want to clean up some data enough
+to see whether the bolometers have been flat-fielded correctly, and
+more-or-less exhibit the same behaviour over time. The pre-processing
+or cleaning steps used by the default configuration file are
+summarised in \cref{Table}{tab:dimmdef}{this table}.
+
+\begin{terminalv}
+% sc2clean $FILES clean config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
+\end{terminalv}
+
+Here \file{\$FILES} can just be a single file from a sub-array, or a
+subset, e.g. \file{s8a20110417\_00051\_0003.sdf} (the first file
+containing science data), \file{s8a20110417\_00051\_000"[1234]"} (File
+1 is a noise observation with shutter closed that gets ignored, File 2
+is a flatfield observation that will be used to override the flatfield
+stored in the subsequent Files 3 and 4 which are concatenated
+together, the \file{.sdf} is optional),
+\file{s8a20110417\_00051\_000\textbackslash?} (Files 1 through 9),
+\file{s8a20110417\_00051\_\textbackslash*} (the whole observation).
+
+If you inspect the resulting \file{clean.sdf} in \gaia\
+(\cref{Section}{sec:gaiacube}{Displaying time-series data}) and flip
+through the data cube you should see all of the bolometers signals go
+up and down together with about the same amplitude: the hope is that
+for a well-behaved instrument you are mostly seeing sky noise
+variations that are seen with roughly the same amplitude by all
+bolometers.
+
+Another common feature, if the scans are particularly long and/or fast
+(e.g. 1\,degree across), is strong periodic signals that are
+correlated with the scan pattern. See
+\cref{Section}{sec:scan}{Displaying scan patterns}---in particular you
+will want to plot \texttt{az} and \texttt{el} (the absolute azimuth
+and elevation), and also \texttt{daz} and \texttt{del} (the azimuth
+and elevation offsets from the map centre). This signal is usually
+azimuth-correlated due to magnetic-field pickup. It only shows up in
+azimuth, because the instrument is on a Nasmyth platform and therefore
+does not move in elevation.
+
+Part of the reason the signals look the same is because they have been
+flatfielded. You can turn off flatfielding using the \param{noflat}
+option to \task{sc2clean}, and you should then see that all of the
+detector amplitudes vary.
+
+Another very useful option is to remove the common signal observed by
+all of the bolometers. This may be accomplished by
+
+\begin{terminalv}
+% sc2clean $FILES clean \
+   config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,compreprocess=1"'
+\end{terminalv}
+
+The residual of this signal will exhibit second-order time-varying
+correlated signals across the focal plane. Usually these are not very
+large, but in some cases some very large localized signals have been
+detected, particularly in the 850\,$\mu$m arrays in early 2011.
+
+Another variation on this is to accentuate the residual low-frequency
+noise by low-pass filtering the result. This can again be accomplished
+by simply adding a filter command in the \param{config} parameter,
+which in this case low-pass filters with a cutoff at 10\,Hz:
+
+\begin{terminalv}
+% sc2clean $FILES clean \
+config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,compreprocess=1,filt_edgelow=10"'
+\end{terminalv}
+
+Finally, in some cases you might just want to fit and remove
+polynomial baselines from the bolometers (by default only the mean is
+removed). This example will remove a line, but you can increase the
+value of \param{order} to remove higher-order polynomials
+
+\begin{terminalv}
+% sc2clean $FILES clean \
+   config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,order=1"'
+\end{terminalv}
+
+Any of the cleaning parameter can be specified independently of the
+default configuration files like so:
+\begin{terminalv}
+% sc2clean $FILES clean config='"order=1,dcfitbox=30,dcthresh=25,dcsmooth=50"'
+\end{terminalv}
+Or you can create your own customised configuration file. All the
+pre-processing options that may be specified are listed and described
+in \file{dimmconfig.lis}---see \cref{Appendix}{app:dimm}{here}.
+
+
+
+

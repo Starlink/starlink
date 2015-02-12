@@ -1,0 +1,150 @@
+\chapter{\xlabel{scuba2_overview}SCUBA-2 Overview}
+\label{sec:s2}
+\section{\xlabel{scuba2}The instrument}
+
+
+The Submillimetre Common User Bolometer Array-2 (SCUBA-2) is a
+10,000-pixel bolometer camera. It has two arrays operating
+simultaneously to map the sky in the atmospheric windows of 450 and
+850$\mu$m.
+
+\subsubsection*{How it works}
+The SCUBA-2 bolometers are integrated arrays of superconducting
+transition edge sensors (TESs) with a characteristic transition
+temperature, $T_c$. In addition, each TES is ringed with a resistive
+heater which can compensate for changes in sky power. The SCUBA-2
+focal plane is kept at a base temperature slightly below $T_c$,
+however a voltage is applied across each TES resistance to position
+the bolometer at the transition temperature. From this point, any
+increase of temperature on the bolometers (e.g. from an astronomical
+signal) will increase the TES resistance and heat it up. This causes a
+drop in current and therefore a drop in temperature making the system
+self-regulating.
+
+For properly performing bolometers, the change in current through the
+TES is proportional to the change in resistance, with the response
+calibrated using flat-field observations (described below). This
+changing current generates a magnetic field which is amplified by a
+chain of superconducting quantum interference devices (SQUIDs). This
+induces a feedback current which is proportional to the current
+flowing through the TES, and it is this feedback current that is
+recorded during data acquisition.
+
+
+\subsubsection*{Setups}
+
+Before science data can be taken the system must be optimised. These
+`setups' are performed after slewing to the azimuth of the source,
+where the SQUID, TES and heater biases are set to pre-determined
+nominal values, in order to position the bolometers in the middle of
+the transition range.
+
+\subsubsection*{Flat-field}
+
+ The shutter then opens onto the sky, and
+as it does so the gradual increase in sky power hitting the array is
+compensated for by a decrease in the resistive heater power via a
+servo loop designed to keep the TES output constant. This acts to keep
+the bolometers positioned at the centre of the transition range and is
+known as \textbf{heater tracking}.
+
+The responsivity of the bolometers will change slightly between the
+dark and the sky; therefore, once the shutter is fully open a fast
+\textbf{flat-field} observation is carried out to recalibrate them.
+\textbf{A flat-field measures the responsivity of each bolometer to
+changing sky power}. It does this by utilising the resistance heaters
+which are ramped up and down around the nominal value. The change in
+current through the TES is then recorded for each bolometer giving a
+measure of its responsivity. The flat field solution is then the
+inverse linear gradient of the current as a function of heater power.
+
+At this point bolometers with responsivities above or below a
+threshold limit are rejected, along with bolometers that display a
+non-linear response or have a poor S/N. A second flat-field is
+performed at the end of an observation so bolometers whose
+responsivity has changed over the course of the observation can be
+flagged.
+
+For full details of the array setup and operation see Holland et al.
+(2013) \cite{s2main}.
+
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=0.8\linewidth]{sc21_arrays}
+\label{fig:arrays}
+\caption[The physical layout of the arrays at each wavelength]{
+  \small The layout of the arrays at 850$\mu$m (left) and
+  450$\mu$m (right). The labels denote the name assigned to each
+  sub-array. Raw data files are generated separately for each sub-array
+  and must be co-added. This figure was made by running
+ \wcsmosaic\ on a raw sub-scan from each sub-array.
+}
+\end{center}
+\end{figure}
+
+\section{\xlabel{obs_modes}Observing modes}
+\label{sec:mmodes}
+
+Two observing modes are offered for SCUBA-2---\textsc{daisy} and
+\textsc{pong}. As the bulk of \mbox{SCUBA-2} observing involves
+large area mapping, both observing modes are scan patterns. Your
+choice depends on the size of the area you wish to map, where you
+would like your integration time concentrated and the degree of
+extended emission you wish to recover.
+
+
+\begin{aligndesc}
+
+\item[\textbf{PONG}] A \textsc{pong} map is the scan strategy for
+  covering a large area. The default options allow for three
+  sizes---900\,arcsec, 1800\,arcsec and 3600\,arcsec. A single
+  \textsc{pong} map is a square of these dimensions and the telescope
+  fills in the square by bouncing off the edge of the area. To ensure
+  an even sky background it is recommended a minimum of three, but
+  preferably more than five, \textsc{pong} maps are included in a
+  single observation with a rotation introduced between each one. In
+  this way a circular pattern is built up, (see the lower right-hand
+  panel of \cref{Figure}{fig:scan}{graphic below}), with a diameter
+  equal to your requested map size.
+
+  To recover large-scale extended structure you are advised to use
+  larger \textsc{pong} maps which scan at a higher rate. This option
+  is preferable to tiling multiple smaller maps. Ultimately it is the
+  size of the SCUBA-2 field-of-view that determines the sensitivity to
+  large-scale structure.
+
+\item[\textbf{DAISY}] \textsc{daisy} maps are the option for
+  point-like or compact sources ($<$3~arcmin) by maximising the
+  exposure time on the centre of the image. The telescope moves at a
+  constant velocity in a `spirograph' pattern that has the advantage
+  of keeping the source on the array throughout the observation. This
+  is shown in the top panel of \cref{Figure}{fig:scan}{the figure
+    below}.
+
+\end{aligndesc}
+
+\subsubsection*{Why these patterns?}
+
+SCUBA-2 removes atmospheric noise in the data-processing
+stage (Holland et al. 2013) \cite{s2main}. The power spectrum
+of data taken by SCUBA-2 has a $1/f$ noise curve at lower frequencies. To
+ensure astronomical signals are far away from this $1/f$ noise, fast
+scanning speeds are required.
+
+In order to disentangle source structure from other
+slowly varying signals (e.g. extinction, sky noise, $1/f$ noise), the
+scan pattern must pass across each region of the map from different
+directions and at different times. The scan patterns themselves, along
+with the associated parameters (velocity and scan-spacing), have been
+designed and optimised to meet both these criteria.
+
+\starfig{sc21_wayne_scan}{[t!]}{width=0.98\linewidth}{fig:scan}{%
+  Illustration of the SCUBA-2 observing patterns}{%
+  From left: telescope track over a single rotation of the pattern;
+  telescope track after multiple rotations of the pattern; resulting
+  exposure time map. The scan pattern for your observation can be
+  visualised in this way with \topcat\ using the output from
+  \jcmtstate.  See \cref{section}{sec:scan}{Displaying scan patterns} for
+  more details.  Figure modified from Holland et al. (2013).
+}
+

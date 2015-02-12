@@ -1,0 +1,228 @@
+\chapter{\xlabel{defconfig}Default dimmconfig.lis}
+\label{app:dimm}
+\raggedbottom
+
+
+\begin{sllongtable}{|l|p{1.0cm}|p{11.2cm}|}{%
+\label{tab:dimmdef} The variables listed in \file{dimmconfig.lis} and
+their default values. For a fuller description of each, as well as
+other options, see the comments in \file{smurf\_makemap.def}, or the
+\textit{Configuration Parameters} appendix of \textbf{SUN/258}.}
+\hline
+Parameter & Value & Description \\ \hline
+\endhead
+
+\hline
+\endfoot
+
+\multicolumn{3}{|l|}{\textbf{General}}\\
+\hline
+\param{numiter}       & $-$5 & Number of iterations, where a negative number
+                               is the maximum number of iterations
+                               if using $\chi^2$ and/or map-stopping criteria \\
+\param{maptol}        & 0.05 & Threshold change in the map between consecutive
+                               iterations \\
+\param{chitol}        & undef& Alternative convergence criterion \\
+\param{varmapmethod}  &    1 & Estimate variance map by sample variance of data that
+                               land in each pixel \\
+
+\param{exportndf}     &    0 & Do not export any models \\
+\param{itermap}       &    0 & Do not export itermaps \\
+\param{bolomap}       &    0 & Do not export bolometer maps \\
+\param{shortmap}      &    0 & Do not export short maps \\
+
+\hline
+\multicolumn{3}{|l|}{\textbf{Pre-processing}}\\
+\hline
+\param{downsampscale} & $-$1 & Down-sample to save memory and time, where a negative
+                               value's magnitude will be multiplied by the
+                               \param{pixsize} for the requested map \\
+\param{maxlen}        &    0 & Maximum length (secs) for concatenated data, where
+                               0 requests concatenation of entire chunks \\
+\param{order}         &    1 & Subtract a baseline polynomial of this order \\
+\param{doclean}       &    1 & Allows pre-cleaned data to be used \\
+\param{exportclean}   &    0 & Do not export clean model \\
+\param{badfrac}       & 0.05 & Fraction of samples to be bad to flag entire bolometer
+                               as dead \\
+\param{flagslow}      &   30 & Flag data taken while telescope was moving so slowly
+                               that sources sit in $1/f$ noise \\
+\param{flagfast}      & 1000 & Flag data taken the telescope was moving too fast
+                               causing source smearing \\
+\param{filt\_edgelow} &    0 & Specifies the highest frequency to be retained by the
+                               initial data cleaning \\
+\param{spikethresh}   &    0 & The S/N at which to flag spikes during the initial
+                               data cleaning \\
+\param{spikebox}      &   50 & Size of the filter box for the sigma-clipper used for
+                               spike detection in the initial data cleaning \\
+\param{pcathresh}     &    0 & PCA cleaning is the threshold above which components
+                               will be removed from the bolometer time-series \\
+\param{pcalen}        &    0 & This specifies the chunk length that will be cleaned
+                               as a number of time slices \\
+\param{dcthresh}      & 25.0 & S/N threshold to detect DC step \\
+\param{dcfitbox}      &   30 & Box size over which to fit data with a straight
+                               line on either side of a potential DC jump \\
+\param{dcmaxsteps}    &   10 & The maximum number of steps that can be corrected
+                               in each minute of good data \\
+\param{dclimcorr}     &    0 & If more than \param{dclimcorr} bolometers have a step
+                               at a given time, then all bolometers are corrected
+                               for a step at that time, using lower thresholds \\
+\hline
+
+\hline
+Parameter & Value & Description \\
+\hline
+\multicolumn{3}{|l|}{\textbf{Pre-processing (continued)}}\\
+\hline
+\param{dcsmooth}      &   50 & The width of the median filter used to smooth a
+                               bolometer data stream prior to finding DC jump \\
+\param{noisecliphigh} &  4.0 & Clip bolometers based on their noise. This step
+                               will remove any bolometers noisier than
+                               \param{noisecliphigh}
+                               standard deviations above the median \\
+\param{noisecliplow}   &   0 & Do not clip any bolometers with low noise \\
+\param{noisecliprecom} &   0 & This sets the noise clipping to occur prior to
+                               \model{COM} subtraction instead of at the end of
+                               the cleaning phase \\
+\param{whiten}         &   0 & If non-zero a whitening filter is applied to each
+                               time stream prior to any filtering in the
+                               data-cleaning stage \\
+\param{compreprocess}  &   0 & If non-zero, the \model{COM} is removed before the
+                               iterative algorithm begins \\
+\hline
+\multicolumn{3}{|l|}{\textbf{Pre-process: fakemaps}}\\
+\hline
+\param{fakemap}        & undef & Diagnostic tool to explore the effects of the
+                                 map-making process on known sources \\
+\param{fakescale}      &     1 & Control the use of the supplied fake map \\
+\hline
+\multicolumn{3}{|l|}{\textbf{Iterative}}\\
+\hline
+\param{com.perarray}     &      0 & If non-zero, calculate a separate common-mode
+                                    signal for each sub-array \\
+\param{com.niter}        &      1 & The number of $n$-sigma clipping iterations
+                                    (1 = no clipping) \\
+\param{com.nsigma}       &      3 & The number of standard deviations at which the
+                                    $\sigma$-clipping algorithm trims \\
+\param{com.noflag}       &      0 & If set, disable flagging of bad bolometers
+                                    using common-mode \\
+\param{com.corr\_tol}    &      5 & Number of sigma away from mean
+                                    correlation-coefficient tolerance \\
+\param{com.corr\_abstol} &      5 & Number of sigma away from mean
+                                    correlation-coefficient tolerance \\
+\param{com.gain\_tol}    &      5 & Number of sigma away from mean gain-coefficient
+                                    tolerance \\
+\param{com.gain\_abstol} &      3 & Absolute factor away from mean gain-coefficient
+                                    tolerance \\
+\param{com.gain\_box}    &$-$30.0 & The number of time slices (or seconds if
+                                    negative) in a box \\
+\param{com.gain\_fgood}  &   0.25 & The minimum fraction of good gain boxes for a
+                                    usable bolometer \\
+\param{com.gain\_rat}    &      4 & The ratio of the largest usable gain to the
+                                    mean gain for a bolometer not to be rejected \\
+\param{com.zero\_mask}   &      0 & Whether or not to use \model{COM} masking \\
+\param{com.zero\_circle} &  undef & Defines the mask as a circle with a specified
+                                    radius \\
+\param{com.zero\_lowhits}&      0 & Excludes pixels that contain too few data
+                                    samples from the mask \\
+\param{com.zero\_snr}    &      0 & Excludes samples from the \model{COM} estimate
+                                    that fall within map pixels with S/N values
+                                    greater than \param{com.zero\_snr} \\
+\param{com.zero\_snrlo}  &      0 & The basic mask created by thresholding at
+                                    the S/N value specified by
+                                    \param{com.zero\_snr} is allowed
+                                    to expand down to an S/N equal to
+                                    \param{com.zero\_snrlo} \\
+\param{com.zero\_union}  &      1 & Defines how multiple \model{COM} masks
+                                    are combined \\
+\param{com.zero\_freeze} &      0 & Freezes the \model{COM} model after
+                                    \param{com.zero\_freeze} iterations \\
+
+\hline
+\param{noi.calcfirst}    &      0 & If a non-zero value is supplied, the bolometer
+                                    noise levels are calculated immediately after
+                                    pre-conditioning \\
+\param{noi.box\_size}    &      0 & Specifies the number of time slices used to
+                                    determine the noise level in a section of a
+                                    bolometer time stream \\
+\hline
+\hline
+Parameter & Value & Description \\
+\hline
+\multicolumn{3}{|l|}{\textbf{Iterative (continued)}}\\
+\hline
+\param{flt.notfirst}     &      0 & If non-zero then low frequencies will not be
+                                    removed from the time streams on the first
+                                   iteration \\
+\param{450.flt.filt\_-} & \multirow{2}{*}{600} &
+                                   \multirow{4}{*}{{\Huge$\rbrace$}
+                                   \begin{minipage}{9.8cm}Apply a frequency filter
+                                   to the \model{FLT} model. The value is given in
+                                   arcsecs which the map-maker converts to
+                                   frequency.\end{minipage} } \\
+\param{edge\_largescale}     &        & \\
+\param{850.flt.filt\_-} & \multirow{2}{*}{300} & \\
+\param{edge\_largescale}     &        & \\
+
+\param{flt.zero\_mask}   &      0 & Whether or not to use \model{FLT} masking \\
+\param{flt.zero\_circle} &  undef & Defines the mask as a circle with a specified
+                                   radius \\
+\param{flt.zero\_lohits} &      0 & Excludes pixels that contain too few data samples
+                                   from the mask \\
+\param{flt.zero\_snr}    &      0 & Excludes samples from the \model{FLT} estimate
+                                    that fall within map pixels with S/N values
+                                    greater than \param{flt.zero\_snr} \\
+\param{flt.zero\_snrlo}  &      0 & The basic mask created by thresholding at the
+                                    S/N value specified by
+                                    \param{flt.zero\_snr} is allowed to expand
+                                    down to an S/N equal to
+                                    \param{flt.zero\_snrlo} \\
+\param{flt.zero\_niter}  &      2 & The number of iterations for which the
+                                    \model{FLT} model should be masked \\
+\param{flt.zero\_union}  &      1 & Defines how multiple \model{FLT} masks are
+                                    combined \\
+\param{flt.zero\_freeze} &      0 & Freezes the \model{FLT} model after
+                                    \param{com.zero\_freeze} iterations \\
+\param{ext.tausrc}       &   auto & Options = auto, wvmraw, csotau, filtertau \\
+\param{ext.taumethod}    &adaptive& Options = adaptive, full, quick \\
+\param{ext.csotau}       &  undef & Specifies the CSO tau value to be used by the
+                                    \model{EXT} model \\
+\param{ext.filtertau}    &  undef & Used if parameter \param{ext.tausrc} is set
+                                    to \param{filtertau} \\
+
+\hline
+\param{ast.mapspike}     &     10 & Throw away spikes in the \model{AST} map greater
+                                    than $n$-$\sigma$, excluding the first iteration \\
+\param{ast.zero\_mask}   &      0 & Whether or not to use \model{AST} masking \\
+\param{ast.zero\_circle} &  undef & Defines the mask as a circle with a specified
+                                    radius \\
+\param{ast.zero\_lohits} &      0 & Excludes pixels that contain too few data
+                                    samples from the mask \\
+\param{ast.zero\_snr}    &      0 & Excludes samples from the \model{AST} estimate
+                                    that fall within map pixels with S/N values
+                                    greater than \param{ast.zero\_snr} \\
+\param{ast.zero\_snrlo}  &      0 & The basic mask created by thresholding at the
+                                    S/N specified by
+                                    \param{ast.zero\_snr} is allowed to expand down
+                                    to an S/N equal to \param{ast.zero\_snrlo} \\
+\param{ast.zero\_snr\_fwhm} &   0 & The map-maker produces two maps. The first is
+                                    created normally using the mask specified by
+                                    \param{ast.zero\_snr.} The final S/N-based mask
+                                    is smoothed using a Gaussian with FWHM equal to
+                                    \param{ast.zero\_snr\_fwhm} (in arcsec). The
+                                    map-maker is re-run using this smoothed mask
+                                    to create the final map \\
+\param{ast.zero\_snr\_low} &$-$1.1& Sets the value (0.0 to 1.0) at which to
+                                    threshold the smoothed mask specified by
+                                    \param{ast.zero\_snr\_fwhm} \\
+\param{ast.zero\_union}  &      1 & Defines how multiple \model{AST} masks are
+                                    combined \\
+\param{ast.zero\_freeze}  &     0 & Freezes the \model{AST} model after
+                                    \param{com.zero\_freeze} iterations \\
+\hline
+
+\end{sllongtable}
+
+
+
+
+

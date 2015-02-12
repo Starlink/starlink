@@ -1,0 +1,62 @@
+\chapter{\xlabel{matchedfilter}SCUBA-2 matched filter}
+\label{app:mf}
+
+In order to optimally find sources that are the size of the telescope
+beam, and suppress this residual large-scale noise, the \picard\
+recipe \drrecipe{SCUBA2\_MATCHED\_FILTER} may be used. If there were
+no large-scale noise in the map, the filtered signal map would be
+calculated as follows:
+
+\begin{equation}
+  {\cal{M}} = \frac{[M(x,y)/\sigma^2(x,y)] \otimes P(x,y)}
+  {[1/\sigma^2(x,y)] \otimes [P^2(x,y)]},
+\end{equation}
+
+where $M(x,y)$ and $\sigma(x,y)$ are the signal and RMS noise maps
+respectively produced by \smurf, and $P(x,y)$ is a map of the
+PSF. Here \(\otimes\)
+denotes the 2-dimensional cross-correlation operator. Similarly, the
+variance map would be calculated as
+
+\begin{equation}
+  {\cal{N}}^2 = \frac{1}{[1/\sigma^2(x,y)] \otimes [P^2(x,y)]}.
+\end{equation}
+
+This operation is equivalent to calculating the maximum-likelihood fit
+of the PSF centered over every pixel in the map, taking into account
+the noise. Presently $P(x,y)$ is simply modelled as an ideal Gaussian
+with a FWHM set to the diffraction limit of the telescope.
+
+However, since there is large-scale (and therefore correlated from
+pixel to pixel) noise, the recipe also has an additional step. It
+first smooths the map by cross-correlating with a larger Gaussian
+kernel to estimate the background, and then subtracts it from the
+image. The same operation is also applied to the PSF to estimate the
+effective shape of a point-source in this background-subtracted map.
+
+Before running \textsc{Picard}, a simple parameters file called
+\file{smooth.ini} may be created.
+\begin{terminalv}
+[SCUBA2_MATCHED_FILTER]
+SMOOTH_FWHM = 15
+\end{terminalv}
+%
+where \param{SMOOTH\_FWHM~=~15} indicates that the background should
+be estimated by first smoothing the map and PSF with a 15~arcsec FWHM
+Gaussian. The recipe is then executed as follows:
+%
+\begin{terminalv}
+% picard -recpars smooth.ini SCUBA2_MATCHED_FILTER map.sdf
+\end{terminalv}
+%
+The output of this operation is a smoothed image called
+\file{map\_mf.sdf}. By default, the recipe automatically normalizes
+the output such that the peak flux densities of point sources are
+conserved. Note that the accuracy of this normalization depends on how
+closely the real PSF matches the 7.5~arcsec and 14~arcsec full-width
+at half-maximum (FWHM) Gaussian shapes assumed at 450$\mu$m and
+850$\mu$m, respectively (an explicit PSF can also be supplied using
+the \param{PSF\_MATCHFILTER} recipe parameter).
+
+
+

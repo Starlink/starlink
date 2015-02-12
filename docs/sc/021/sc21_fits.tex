@@ -1,0 +1,40 @@
+\chapter{\xlabel{fits}Convert format from FITS to NDF}
+\label{app:fits}
+
+It is often useful to utilise data from other wavelengths or
+instruments (either for a comparison or for an external mask). In the
+following example, the FITS file called \file{file.fits} is
+converted to NDF format as \file{file.sdf} using the \starlink\
+package \convert. Note that the \file{.sdf} file extension NDF may
+be omitted to save typing.
+
+\begin{terminalv}
+% convert
+% fits2ndf file.fits file.sdf
+\end{terminalv}
+
+Unless your FITS file is from a recognised source, \fitstondf\ puts the
+various FITS extensions into NDF extensions called FITS\_EXT\_$<n>$,
+where $n$ counts from one for the first FITS extension. These are
+located in the top-level MORE component of the NDF. If one of these is
+the array you want---it should be an NDF too---it will be easier to
+handle if you copy out of the NDF extension to its own NDF.
+
+\begin{terminalv}
+% ndfcopy in=file.more.fits_ext_1 out=file_data
+\end{terminalv}
+
+If there is a variance array stored in another extension that you want
+to attach to your new NDF, a command like the following will do that.
+
+\begin{terminalv}
+% setvar ndf=file_data from=file.more.fits_ext_2
+\end{terminalv}
+
+\task{fits2ndf} does offer a way of mapping FITS extensions to familiar NDF
+array components DATA, VARIANCE, and QUALITY through the \param{EXTABLE} file,
+avoiding the \ndfcopy\ and possible \setvar\ steps.
+
+
+
+

@@ -1,0 +1,615 @@
+\chapter{\xlabel{postprocess}Post-processing Reduction Steps}
+\label{sec:postprocess}
+
+\section{\xlabel{apply_fcf}Flux conversion factors}
+\label{sec:cmult}
+
+When your data comes out of the map-maker it is in units of picowatts
+(pW). A flux conversion factor, or FCF, needs to be applied to scale
+your data from units of pW to janskys (Jy). For more information on
+calibrating SCUBA-2 data see Dempsey et al. (2013) \cite{dempsey12}.
+
+
+Below are our default FCFs.
+\vspace{0.5cm}
+\renewcommand*\arraystretch{1.2}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+\multicolumn{2}{|c|}{\textbf{APERTURE}}  &
+\multicolumn{2}{c|}{\textbf{PEAK}}      \\
+\hline
+\multicolumn{2}{|c|}{\fcfa\ (Jy/pW/arcsec$^2$) }  &
+\multicolumn{2}{c|}{\fcfb\ (Jy/pW/beam)}      \\
+\hline
+\hspace{0.4cm} 450\,$\mu$m \hspace{0.3cm} & 850\,$\mu$m & \hspace{0.4cm} 450\,$\mu$m \hspace{0.3cm}& 850\,$\mu$m \\
+\hline
+4.71 $\pm$ 0.5& 2.34 $\pm$ 0.08& 491 $\pm$ 67& 537 $\pm$ 24 \\
+\hline
+\end{tabular}
+\end{table}
+\renewcommand*\arraystretch{1.0}
+\vspace{0.5cm}
+
+\begin{sltextbox}{IMPORTANT NOTES:}
+  \begin{itemize}
+  \item The standard FCF to be applied depends on the reduction date
+    for your data. For data that have been \emph{reduced prior} to
+    July 2012 you should see \cref{Appendix}{app:fcfs}{FCFs by
+      reduction date} for alternative FCFs.
+
+  \item Due to a glitch in the WVM, data reduced between 2012
+    September 19, and 2013 January 18 must be re-reduced using a
+    recent version of Starlink (Hikianalia or later), or should have
+    an FCF derived from a calibrator reduced at the same time (and not
+    our standard FCF) applied to it.
+  \end{itemize}
+\end{sltextbox}
+
+
+\subsection{Aperture flux}
+
+To get the flux density of extended sources with aperture photometry
+you should apply the \fcfa.  You can then sum the emission in an
+aperture. \fcfa\ was determined using a 60-arcsec diameter
+aperture. If your aperture differs from this you should scale your
+flux accordingly---the scaling factor can be read off the curve of
+growth (see \cref{Appendix}{app:cog}{this appendix}). This graph gives
+the ratio of aperture flux to total flux for a range of aperture
+diameters.
+
+\fcfa\ is determined using 1-arcsec pixels. For different pixel sizes
+you will also need to multiply by the pixelsize squared.
+
+\subsection{Peak flux}
+
+If you want to read off the peak flux from your map, you should apply
+the \fcfb\ (also known as the peak FCF).  When you open your map in
+\gaia\ the value of the brightest pixel will be the peak flux of your
+source. (If your source is point-like, the peak value in the map is
+the total flux density). Applying \fcfb\ will result in a map with
+units of Jy/beam. For point-like or compact sources smaller than the
+beam (with a Gaussian profile), this peak value will be the flux
+density of your source.
+
+\subsection{Determining your own FCF}
+
+Calibration observations are taken at various points throughout the
+night and we recommend you compare the FCF calculated from your
+nearest calibrator to the standard FCF. You can use this FCF to scale
+the the standard value accordingly. You should chose the calibrator
+nearest in time to your science observations, unless the weather has
+changed significantly.
+
+\begin{enumerate}
+\item Reduce the calibrator with the map-maker using
+  \file{dimmconfig\_bright\_compact.lis} as the configuration file.
+
+\item Determine the FCF value by passing the output map to the
+  \picard\ recipe
+  \xref{\drrecipe{SCUBA2\_CHECK\_CAL}}{sun265}{SCUBA2_CHECK_CAL}.
+\begin{terminalv}
+% picard SCUBA2_CHECK_CAL 850calibrator.sdf
+\end{terminalv}
+This will produce a log file (\file{log.checkcal}) which records the
+both \fcfb\ and \fcfa. Check that these values closely approximate the
+standard FCF values given above.
+
+\item Re-reduce the calibrator using the map-maker with the
+  \emph{same} configuration file you used for your science
+  observations.
+
+\item Again determine the FCF using \drrecipe{SCUBA2\_CHECK\_CAL}.
+
+\item Apply this FCF to your reduced science data using \cmult---see
+  the next section. Remember to apply the pixel size squared factor if
+  using \fcfa.
+\end{enumerate}
+
+\subsection{Applying the FCF}
+
+You can apply the FCF using the \picard\ recipe
+\xref{\drrecipe{CALIBRATE\_SCUBA2\_DATA}}{sun265}{CALIBRATE\_SCUBA2\_DATA}.
+By default this will multiply your map by 1000$\times$\fcfb, obtained
+from the start of \cref{Section}{sec:cmult}{Flux conversion
+  factors}. This produces a calibrated map with units of mJy/beam.
+
+You can supply a parameter file if you wish to use a different value
+for the FCF or use \fcfa. The recipe will write out the calibrated
+file with an \file{\_cal} suffix and will change the units in the map
+header.
+
+\begin{terminalv}
+% picard CALIBRATE_SCUBA2_DATA  mapinpW.sdf
+\end{terminalv}
+Note that the recipe will also take account of the pixel size when
+applying \fcfa.
+
+
+\section{\xlabel{crop}Cropping your map}
+\label{sec:crop}
+
+The nature of the scan patterns results in SCUBA-2 maps significantly
+larger than the requested size. The high noise towards the outer edges
+is a consequence of the scanning pattern. Although this excess data
+are down-weighted during reduction by the map-maker, you may wish to
+remove it before either combining maps (see
+\cref{Section}{sec:coadd}{Co-adding multiple maps}) or publishing your
+map.
+
+You can crop your map to the map-size set in the data header or to any
+requested size of box or circle using the \picard\ recipe
+\xref{\drrecipe{CROP\_SCUBA2\_IMAGES}}{sun265}{CROP\_SCUBA2\_IMAGES}.
+The centre of the cropping area will always be the centre of your map.
+\begin{terminalv}
+% picard -recpars mypar.lis CROP_SCUBA2_IMAGES map_cal.sdf
+\end{terminalv}
+The example above includes a parameter file specifying the radius of
+the circle to be extracted (in arcsecs).  The format for the parameter
+file is shown below.
+\begin{terminalv}
+[CROP_SCUBA2_IMAGES]
+MAP_RADIUS = 1800.0
+CROP_METHOD = circle
+\end{terminalv}
+
+
+If this parameter file is omitted it will default to a box of sides
+equal to the map size in the header (as requested in the MSB). The
+output from \drrecipe{CROP\_SCUBA2\_IMAGES} is a file with the suffix
+\file{\_crop}. Full details of this recipe can be found in the
+\htmladdnormallinkfoot{\textsc{Picard}
+  website}{http://www.oracdr.org/oracdr/PICARD}
+
+\begin{tip}
+  The default crop shape will be a square. Avoid losing good data by
+  specifying a circle using the parameter file.
+\end{tip}
+
+\section{\xlabel{coadd}Co-adding multiple maps}
+\label{sec:coadd}
+
+You may have multiple maps of the same source which you would like to
+co-add. \picard\ has a recipe called
+\xref{\drrecipe{MOSAIC\_JCMT\_IMAGES}}{sun265}{MOSAIC_JCMT_IMAGES}
+that co-adds maps while correctly dealing with the exposure time and
+weights NDF extensions. The images are combined using inverse-variance
+weighting and the output variance is derived from the input variances.
+\begin{terminalv}
+% picard -recpars mypar.lis MOSAIC_JCMT_IMAGES 850map*_cal_crop.sdf
+\end{terminalv}
+This creates a single output file based on the name of the last file
+in the list, and with a suffix \file{\_mos}.
+
+There are a number of options associated with
+\drrecipe{MOSAIC\_JCMT\_IMAGES} (see the \textsc{Picard} manual for a full
+description). However, the main one is choosing between \wcsmosaic\
+(default) and the \ccdpack\ option \makemos\ for the combination
+method. For more information on \task{makemos} and advice on choosing the
+best method see \xref{\textbf{SUN/139}}{sun139}{}.
+
+The example parameter file below chooses \task{makemos} using a 3-$\sigma$
+clipping threshold.
+
+\begin{terminalv}
+[MOSAIC_JCMT_IMAGES]
+MOSAIC_TASK = makemos
+MAKEMOS_METHOD = sigmas
+MAKEMOS_SIGMAS = 3
+\end{terminalv}
+
+Currently there is no advantage in terms of data quality to reducing
+all observations simultaneously or separately. However, the latter
+does allow the option of assessing the individual maps before co-adding.
+
+\begin{tip}
+  The list of files can be the output from \texttt{cat}. Remember
+  to include the back quotes.  For example, \texttt{\% picard
+    MOSAIC\_JCMT\_IMAGES \`{}cat myfiles.txt\`{}}.
+\end{tip}
+
+
+\subsection{Registering maps}
+
+You can register a series of SCUBA-2 maps to a common reference
+position using the \picard\ recipe
+\xref{\drrecipe{SCUBA2\_REGISTER\_IMAGES}}{sun265}{SCUBA2\_REGISTER\_IMAGES}.
+This is only possible if a there is a common, known source that is
+present in \textit{all} of the input maps. This should be done before
+combining your maps.
+\begin{terminalv}
+% picard -recpars myparams.ini SCUBA2_REGISTER_IMAGES `cat listoffiles.txt`
+\end{terminalv}
+
+Here the parameter file contains the equatorial position of the
+reference source as in the example below. See \picardsun\ for more
+details.
+\begin{center}
+\begin{terminalv}
+[SCUBA2_REGISTER_IMAGES]
+REGISTER_IMAGES = 1
+REGISTER_X  = HH:MM:SS.S
+REGISTER_Y  = DD:MM:SS.S
+\end{terminalv}
+\end{center}
+
+\param{REGISTER\_X} and \param{REGISTER\_Y} may also be galactic
+longitude and latitude respectively, both measured in decimal
+degrees.
+
+\section{\xlabel{noise}Sensitivity}
+
+\subsection{Getting the noise}
+\label{sec:checkrms}
+
+You can use the \picard\ recipe \drrecipe{SCUBA2\_CHECK\_RMS} get the
+noise. This recipe estimates the RMS from both the map, the NEP, and
+the RMS predicted by the Integration Time Calculator. It then writes out
+a series of results in a log file called \file{log.checkrms}. The
+parameters written to this file are listed in
+\cref{Appendix}{app:checkrmsparams}{SCUBA2_CHECK_RMS}.
+
+\begin{terminalv}
+% picard SCUBA2_CHECK_RMS map.sdf
+\end{terminalv}
+If you have not yet applied an FCF, this recipe will apply the
+appropriate default FCF before estimating the noise.
+
+
+\textbf{Note:} \drrecipe{SCUBA2\_CHECK\_RMS} can only be run on single
+observations. To get the map noise from a co-add you should perform the steps below.
+
+
+\subsubsection*{Steps for getting your map noise}
+After applying any necessary FCF, \drrecipe{SCUBA2\_CHECK\_RMS} simply
+executes the following steps to get the map noise.
+
+\begin{enumerate}
+\item Crops the map to remove the noisy edges.
+\begin{terminalv}
+% picard CROP_JCMT_IMAGES map_cal.sdf
+\end{terminalv}
+\item Runs the \Kappa\ command \stats\ to extract the median value from
+the error array.
+\begin{terminalv}
+% stats map_cal_crop comp=err order
+\end{terminalv}
+\end{enumerate}
+
+\begin{tip}
+  Use the error array to avoid contamination of the noise distribution
+  from bright sources.
+\end{tip}
+
+
+\subsection{Map statistics}
+
+The \Kappa\ commands \histat\ and \stats\ are very similar and both
+return a range of statistics describing any NDF. In addition to the
+main data array they can be passed the error (\param{comp=err}), variance
+(\param{comp=var}) or quality (\param{comp=qua}) arrays (if available).
+
+The reported statistics include the pixel maximum and minimum,
+standard deviation, number of pixels used and omitted, along with
+pixel mode, and mean.  If you supply the \param{order} keyword,
+the median is also shown.
+\begin{terminalv}
+% stats comp=err map_cal_crop order
+\end{terminalv}
+
+\textbf{Note:} the standard deviation of the data array will give a
+similar result to the mean/median of the error array except with
+additional contamination from sources.
+
+
+
+\subsection{Viewing the noise histogram}
+
+You can view a histogram of the error array with the
+\textsc{Kappa} command \histogram. Again \param{comp=err} must be
+specified.
+
+\begin{terminalv}
+% histogram map_cal_crop comp=err numbin=200 style="color=white"
+\end{terminalv}
+The output is shown in the \cref{Figure}{fig:noihisto}{the plot below}.
+For more information on the options for \histogram\ see
+\kappasun.
+
+\starfig{sc21_noihist}{}{width=0.7\linewidth}{fig:noihisto}{
+  The error array viewed with \textsc{Kappa} command \task{histogram}.}{
+  The error array viewed with \textsc{Kappa} command \task{histogram}.
+}
+
+\subsection{Examining the error map with GAIA}
+
+It is also useful to view the error map itself. Open your reduced map
+in \gaia, then select the \gaiathing{Error} button on the
+\gaiathing{Select NDF in container file} window---see
+\cref{Figure}{fig:noigaia}{the figure below}. You will need to adjust
+the scaling to view the error map properly.
+
+To assess the noise using \gaia, go to the toolbar on the main window
+and click on \gaiathing{Image-Analysis$\Rightarrow$Image
+regions}. Next select the region shape you would like to check and
+draw it on your map by clicking and dragging the mouse. Click the
+\gaiathing{Stats selected} button in the \gaiathing{Image regions}
+window to get a report of the statistics in the selected region.
+
+\begin{tip}
+  You can write out the error array of your map into a new NDF using
+  the \textsc{Kappa} command \ndfcopy. For example, \texttt{\% ndfcopy
+    map comp=err map\_err}
+\end{tip}
+
+
+
+\starfig{sc21_noigaia6}{[h!]}{width=\linewidth}{fig:noigaia}{
+  The error map viewed with \gaia}{
+  The error array displayed with \gaia. After clicking the
+  \gaiathing{Error} button (circled in red) you will have to rescale your map.
+}
+
+
+\section{\xlabel{regridding}Regridding your data}
+\label{sec:regriddata}
+
+To change the pixel size use the \Kappa\ command \compave. The
+following example increases the pixel size from 4\,arcsec to 8\,arcsec
+by using a compression factor of 2.
+
+\begin{terminalv}
+% compave map map_regrid 2
+\end{terminalv}
+
+\begin{tip}
+  Remember you can use \ndftrace\ if you are unsure of the pixel size.
+\end{tip}
+
+
+% they find that smaller pixels produce higher peak values (due to the
+% smaller pixels producing less smoothing that larger pixels), and
+% also converge faster (due to each pixel needing to be consistent
+% with fewer bolometers). The average noise per pixel is higher for
+% smaller pixels (as expected), and this means that the SNR level used
+% for masking needs to be adjusted to get the same mask produced using
+% larger pixels.
+
+\section{\xlabel{maskshow}Displaying masks}
+\label{sec:maskshow}
+
+Both \file{dimmconfig\_bright\_compact.lis} and
+\file{dimmconfig\_bright\_extended.lis} configuration files use
+masking. You can see where any masks were applied by viewing the
+QUALITY component in \gaia.
+
+First open your map in \textsc{Gaia}. Select the top level NDF from
+list in the pop-up window then click the \gaiathing{Quality}
+button. You will need to rescale the map to bring out the masks--see
+\cref{Figure}{fig:qualdisp}{below}.
+
+\starfig{sc21_qualitygaia}{[t!]}{width=0.9\hsize}{fig:qualdisp}{
+   Display of the mask made by the map-maker}{
+   Using \gaia\ to display the mask applied by the map-maker. Select the
+   QUALITY component of your map.
+}
+
+
+Each value in the QUALITY component of an NDF contains eight ``on/off''
+flags used to indicate a specific binary property of the pixel. The
+first three of these flags indicate whether a pixel is inside or outside a
+specific mask (1=\model{AST}, 2=\model{FLT} or 3=\model{COM}).
+
+There are four potential values for the common combination of
+\model{AST} and \model{FLT} masks:
+
+0 = pixel is inside both \model{FLT} and \model{AST} mask (i.e. is a source pixel)\\
+1 = pixel is inside \model{AST} mask but not \model{FLT} mask\\
+2 = pixel is inside \model{FLT} mask but not \model{AST} mask\\
+3 = pixel is inside neither mask (i.e. is a background pixel)
+
+
+The maximum quality value increases from 3 to 7 if \model{COM} masking
+is also included.
+
+You can see which bit is used for each mask with \showqual.
+\begin{terminalv}
+% showqual map count
+\end{terminalv}
+
+As an example, you can set bad all pixel outside the \model{FLT} mask
+by doing:
+\begin{terminalv}
+% setbb map 2
+\end{terminalv}
+
+
+\subsubsection{Contouring a mask over your map}
+If you would like to plot a mask over your map you will need to copy
+out the QUALITY component of the data to a separate file using
+\task{ndfcopy}.
+\begin{terminalv}
+% ndfcopy comp=qua map map_mask
+\end{terminalv}
+Then open your map in \gaia\ and contour the mask NDF on top.
+Select \gaiathing{Contouring...} from the \gaiathing{Image-Analysis}
+menu, and supply the name of the mask NDF either by entering its name in
+the \gaiathing{Other image:} box, or selecting with
+\gaiathing{Choose file...} file browser. See
+\cref{Figure}{fig:maskdisp}{the figure below}.
+
+For more information on the use of masks by \makemap\ and the
+parameters that affect them see \cref{Chapter}{sec:tweak}{Tailoring
+your Reduction}.
+
+\starfig{sc21_dispmask3}{[hb!]}{width=0.95\linewidth}{fig:maskdisp}{
+   Contours of an \model{AST} mask overlaid on a map}{
+   Using \gaia\ to display your map with the \model{AST} mask used by
+   the map-maker contoured on top.
+}
+
+
+\section{\xlabel{match_filter}Point-source extraction: the matched filter}
+\label{sec:mf}
+
+This effectively fits a single Gaussian point spread function (PSF),
+centered over every pixel in the map, and applies a background
+suppression filter to remove any residual large-scale noise.
+
+Cosmology maps usually contain very faint sources that often need
+extra help extracting. The \picard\ recipe
+\xref{\drrecipe{SCUBA2\_MATCHED\_FILTER}}{sun265}{SCUBA2_MATCHED_FILTER}
+can be used to improve point-source detectability.
+
+The matched filter works by smoothing the map and PSF with a broad
+Gaussian, and then subtracting from the originals. The images are then
+convolved with the modified PSF. The output map should be used
+primarily for source detection only. Although the output is normalised
+to preserve peak flux density, the accuracy of this depends on how
+closely the real PSF matches the telescope beam size. In the case of
+nearby sources, each ends up contributing flux to both peaks.
+
+\begin{terminalv}
+% picard -recpars mypar.lis SCUBA2_MATCHED_FILTER 850_map_cal_crop.sdf
+\end{terminalv}
+
+As in the example parameter file below we have requested the
+background should be estimated by first smoothing the map and PSF with
+a 15-arcsec Gaussian.
+
+\begin{terminalv}
+
+[SCUBA2_MATCHED_FILTER]
+SMOOTH_FWHM = 15
+
+\end{terminalv}
+
+This is a fairly common technique used throughout the extra-galactic
+sub-millimetre community to identify potential sources. A full
+description of the matched filter principle is given in
+\cref{Appendix}{app:mf}{SCUBA-2 matched filter}, while the
+\textsc{Picard} manual gives full details of all the available
+parameters.
+
+\section{\xlabel{clumps}Clump finding}
+\label{sec:clumps}
+\label{sec:clumpfind}
+
+The \cupid\ application \findclumps\ can be used to generate a clump
+catalogue. It identifies clumps of emission in one-, two- or
+three-dimensional NDFs. The user can select from the clump-finding
+algorithms FellWalker, Gaussclumps, ClumpFind or Reinhold and must
+supply a configuration file specific to each method. See the
+\xref{\textsc{Cupid} manual}{sun255}{} for descriptions of the various
+algorithms.
+
+The result is returned as a catalogue in a text file and as a NDF
+pixel mask showing the clump boundaries.
+
+\begin{terminalv}
+% findclumps in=S2map.sdf out=clumpmap.sdf outcat=clumps.FIT logfile=clumps.log \
+  config=^config.dat method=fellwalker rms=25 shape=polygon
+\end{terminalv}
+
+The shape option allows \findclumps\ to create an
+\htmladdnormallink{STC-S}{http://ivoa.net/documents/STC-S/index.html}
+description (polygonal or elliptical) for each clump. These are added
+as extra columns to the output catalogue.
+
+\begin{aligndesc}
+\item[Polygon] Each polygon will have, at most, 15 vertices. For
+  two-dimensional data the polygon is a fit to the clump's outer
+  boundary (the region containing all good data values). For
+  three-dimensional data the spatial footprint of each clump is
+  determined by rejecting the least significant 10\% of spatial
+  pixels, where "significance" is measured by the number of spectral
+  channels that contribute to the spatial pixel. The polygon is then a
+  fit to the outer boundary of the remaining spatial pixels.
+
+\item[Ellipse] All data values in the clump are projected onto the
+  spatial plane and "size" of the collapsed clump at four different
+  position angles---all separated by 45$^\circ$---is found. The
+  ellipse that generates the same sizes at the four position angles is
+  then found and used as the clump shape.
+\end{aligndesc}
+
+\starfig{sc21_plotstcshapes}{[ht!]}{width=1.0\linewidth}{fig:stcshapes}{
+  Overlaying a clump catalogue in \gaia.}{
+  STC shapes displayed over the input map with \gaia. To overlay your clumps
+  in this way display your map with \textsc{Gaia}. Under the \gaiathing{Image-Analysis}
+  menu select \gaiathing{Positions...} followed by \gaiathing{Import CUPID
+  catalogue...} In the pop-up window select the \file{.FIT} file
+  generated by \findclumps\ and ensure the \gaiathing{STC shape} box is
+  checked before importing.
+}
+
+
+\section{\xlabel{provenance}Map provenance \& configuration parameters}
+\label{sec:prov}
+
+You may want to check a reduced file to determine which raw files went
+into it and what configuration parameters were used with the
+map-maker. There are a number of useful \Kappa\ commands to help you
+with this:
+
+\begin{description}
+\item[Map provenance]
+  \provshow\ will list all the NDFs that were used in the creation of
+  your map, while \hislist\ will show a truncated list of input files
+  but will list every configuration parameter used by the map-maker.
+  This includes all the hidden default values as well as those
+  specified in your supplied configuration file. These commands are
+  executed like this:
+\begin{terminalv}
+% provshow 850map
+% hislist 850map
+\end{terminalv}
+
+The output of \task{provshow} can be very long.  If you merely want to
+know what were the original file, the ones with no parents, select the
+root ancestors.
+
+\begin{terminalv}
+% provshow 850map show=roots
+\end{terminalv}
+
+
+\item[Map-maker parameters]
+The task \configmeld\ will identify what configuration parameters were
+used by the map-maker when your data were reduced. \task{configmeld}
+requires a visual-differences tool to be installed on your machine;
+those currently recognised are
+\htmladdnormallinkfoot{\texttt{meld}}{http://meldmerge.org/}
+\htmladdnormallink{\texttt{opendiff}}{http://developer.apple.com/},
+\htmladdnormallink{\texttt{diffmerge}}{http://www.sourcegear.com/diffmerge},
+\htmladdnormallink{\texttt{kdiff3}}{http://kdiff3.sourceforge.net},
+\htmladdnormallink{\texttt{tkdiff}}{http://sourceforge.net/projects/tkdiff}, and
+\htmladdnormallink{\texttt{diffuse}}{http://diffuse.sourceforge.net},
+and are searched for in that order. It will compare the
+configuration parameters for two reduced maps or configuration files
+(which can be mixed and matched). The follow example illustrates two
+ways to run it.
+
+\begin{terminalv}
+% configmeld 850map1.sdf 850map2.sdf
+% configmeld 850map1.sdf ^mydimmconfig2.lis
+\end{terminalv}
+Another useful command is the \Kappa\ command \configecho.
+This is very versatile and will display the name and value of one or
+all configuration parameters either from a configuration file or from
+the history of an NDF.
+
+The first example below will return the value of \param{numiter} from
+the map \file{850map.sdf}. The second example will display the values of all
+the parameters in \file{850map.sdf} and will prefix them with a `+' if they
+differ from the the values given in \file{dimmconfig.lis}.
+
+\begin{terminalv}
+% configecho name=numiter config=! ndf=850map.sdf
+% configecho name=! config=^dimmconfig.lis ndf=850map.sdf
+\end{terminalv}
+\end{description}
+
+
