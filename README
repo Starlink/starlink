@@ -494,15 +494,3 @@ MacOSX:
     XCode
     xcode commandline tools
 
-
-SGML tools:
-   A few documents within the Starlink tree were prepared using a
-   workflow based on SGML tools -- this set includes SC/13, SSN/78,
-   SUN/248, SSN/71 and SSN/70.  The ./configure scripts for the
-   associated components look for the Open-SP and OpenJade tools, and
-   skip the documentation if they don't find them.  These tools are no
-   longer actively maintained, and are not trivial to build, but are
-   still available in packages.  As of late 2014, the Debian 'openjade'
-   package includes both tools, as does the macports.org 'openjade'
-   package; the (OS X) Homebrew package manager includes an 'open-sp'
-   package which does not include OpenJade.
