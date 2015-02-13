@@ -29,6 +29,7 @@
 #     star2html [-a author(s)] [-aux] [-c copyright_statement]
 #               [-d document_date] [-m email_address]
 #               [-obsolete] [-s 0|1] [-t title]
+#		[-splitlevel level]
 #               [arguments for LaTeX2HTML] document
 
 #  Parameters:
@@ -87,6 +88,10 @@
 #        a name generated from the document type will be used. This is
 #        used as a title for the first page and appears in the footer
 #        of every page.
+#     -splitlevel level (optional)
+#        An optional argument to send htlatex to trigger splitting on the
+#        given command level. 1 indicates don't split, 2 is split at the
+#	 first level of sectioning command in the document, etc.
 #     "arguments for LaTeX2HTML"
 #        Any unknown arguments before the file name will be passed to
 #        LaTeX2HTML (do not use the -dir and -no_subdir arguments).
@@ -331,7 +336,7 @@ my $HCSERVER_PATTERN = 'http:\/\/[^\\ ]*\/cgi-bin\/hcserver';
 
 #  Parse the command line extracting the document name and recording
 #  the status of the optional parameters.
-
+my $splitlevel="";
 my ($NOCOPYRIGHT, $COPYRIGHT, $TITLE, $DATE, $AUTHORS, $MAIL, $help);
 my $status = GetOptions(
     "aux" => \$AUXCOPY,
@@ -344,17 +349,24 @@ my $status = GetOptions(
     "obsolete" => \$OBSOLETE,
     "c=s" => \$COPYRIGHT,
     "help"=> \$help,
+    "splitlevel=s"=> \$splitlevel,
     );
 
 if ($help) {
       print( 'Usage: star2html [-a author(s)] [-aux] [-d document date] '.
              '[-s 1|0] [-c copyright statement] [-old] [-obsolete] '.
              '[-m email address] '.
-             '[-t title] [arguments for LaTeX2HTML] '.
+             '[-t title] [-splitlevel level] [arguments for LaTeX2HTML] '.
              'starlink_document[.tex]'. "\n");
       system( $LATEX2HTML, "-h");
       exit(0);
 }
+
+# Prevent double toc if splitting
+if ($splitlevel ne ""){
+  $splitlevel .= ",notoc*,nominitoc";
+}
+print "splitlevel is $splitlevel\n\n";
 
 # Handle copyright
 # "none" is a special case
@@ -714,7 +726,7 @@ if ($usehtlatex==1){
       $TEX4HTHTF = "TEX4HTHTF=" . ':' . $ENV{STARLINK_DIR} . '/share/latexsupport:';
       $TEXINPUTS = join(':', $TEXINPUTS, $ENV{STARLINK_DIR} . '/share/latexsupport//:');
   }
-  my $tex4htcommand =  "TEXINPUTS=$TEXINPUTS $TEX4HTENV $TEX4HTHTF htlatex $DESTFILE \"starlinkxhtml.cfg,charset=\"utf-8\",fn-in\" ' -cvalidate -cstarfont' \"\" '-interaction=batchmode'";
+  my $tex4htcommand =  "TEXINPUTS=$TEXINPUTS $TEX4HTENV $TEX4HTHTF htlatex $DESTFILE \"starlinkxhtml.cfg,$splitlevel,charset=\"utf-8\",fn-in\" ' -cvalidate -cstarfont' \"\" '-interaction=batchmode'";
   print $tex4htcommand . "\n";
   system($tex4htcommand);
   if ($? ) {
