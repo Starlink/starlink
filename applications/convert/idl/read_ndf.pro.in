@@ -49,7 +49,8 @@
 ;;         Terminate gracefully if 64-bit Solaris
 ;;      2010 March 26 (MJC):
 ;;         Use STARLINK_DIR to specify the library path instead of libdir.
-;;
+;;      2015 February 14 (TIMJ):
+;;         Should use CONVERT_DIR
 ;; EXAMPLE:
 ;;-----------------------------------------------------------------------------
 ;;
@@ -92,7 +93,7 @@
 ;;	CALL_EXTERNAL function. These are edited in when during make.
 
         ENTRY_PREFIX = '@ENTRY_PREFIX@'
-        LIB_NAME = getenv('STARLINK_DIR')+'/@DLNAME@'
+        LIB_NAME = getenv('CONVERT_DIR')+'/@DLNAME@'
 
 ;;	Ensure that the library file exists
 	DUM = findfile(LIB_NAME, COUNT=CNT)
