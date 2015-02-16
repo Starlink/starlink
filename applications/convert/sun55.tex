@@ -20,7 +20,7 @@
 \stardocabstract  {
 The \CONVERT\ package contains utilities for converting data files
 between Starlink's Extensible {\em n}-dimensional Data Format
-\xref{(NDF)}{sun33}{abstract},
+\xref{(NDF)}{sun33}{},
 which is used by most Starlink applications, and a number of other common
 data formats.
 Using these utilities, astronomers can process their data selecting the best
@@ -54,7 +54,7 @@ procedures for handling NDFs from within IDL.}
 \providecommand{\BCONVERT}{{\normalsize CONVERT}}
 \providecommand{\CURSA}{{\footnotesize CURSA}}
 \providecommand{\FIGARO}{{\footnotesize FIGARO}}
-\providecommand{\Figaroref}{\xref{{\footnotesize FIGARO}}{sun86}{abstract}}
+\providecommand{\Figaroref}{\xref{{\footnotesize FIGARO}}{sun86}{}}
 \providecommand{\FITSref}{\htmladdnormallink{FITS}{http://fits.gsfc.nasa.gov/}}
 \providecommand{\GIFref}{\htmladdnormallink{GIF}{http://en.wikipedia.org/wiki/GIF}}
 \providecommand{\HDSref}{\xref{HDS}{sun92}{}}
@@ -100,7 +100,7 @@ been immune to this, having the original INTERIM BDF, HDS IMAGE format,
 and \Figaroref\ DSTs to name but three.  However, Starlink is now taking the
 novel approach of supporting different packages sharing a common data
 format---the
-\xref{NDF}{sun33}{abstract}\latex{\footnote{
+\xref{NDF}{sun33}{}\latex{\footnote{
 See SUN/33 for an introduction to the NDF.}}
 (Extensible {\em{n}}-Dimensional-data format)---which most Starlink packages
 are already using.
@@ -3777,7 +3777,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          header (unless ENCODING parameter produces a native encoding in which
          case only one native encoding is stored in the header). Including a
          native encoding in the header will enable other
-         \xref{AST}{sun210}{abstract}-based software
+         \xref{AST}{sun210}{}-based software
          (such as
          \htmlref{FITS2NDF}{FITS2NDF})
          to reconstruct the full details of the WCS information.
@@ -5990,7 +5990,7 @@ Note that \texttt{convert} must be run \emph{after} sourcing the
 \texttt{idl\_setup} script.
 
 \emph{Note also that having started \CONVERT\,
-\xref{the NDF library}{sun33}{abstract}\latex{ (see SUN/33)},
+\xref{the NDF library}{sun33}{}\latex{ (see SUN/33)},
 which is ultimately used by READ\_NDF and WRITE\_NDF, will
 allow them (but not HDS2IDL and IDL2HDS) to do
 \htmlref{on-the-fly conversion}{sect_auto}\latex{ (see Section \ref{sect_auto})}
