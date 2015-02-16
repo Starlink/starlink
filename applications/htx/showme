@@ -141,6 +141,7 @@
 #  Authors:
 #     RFWS: R.F. Warren-Smith (Starlink, RAL)
 #     SER:  S.E. Rankin (Starlink, RAL)
+#     DSB:  David S Berry (JAC - Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -151,6 +152,9 @@
 #     17-May-2004 (SER)
 #        Added file:// when "${ref}" = 'file'. Local files
 #        will now have file:// at the start of the url.
+#     16-FEB-2015 (DSB)
+#        Only apply the 17-MAY-2004 change if required (i.e. if the URL
+#        does not already start with file://).
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -317,9 +321,15 @@
          ${HTX_DIR}/browse "${url}"
 
 #  If the document is not being displayed, simply write out its URL instead.
+#  For local URLs', only add "file://..." to the start if it is not already
+#  there.
       else
          if test "${where}" = 'l'; then
-            echo "file://localhost${url}"
+            if [[ $url == file://* ]]; then
+               echo "${url}"
+            else
+               echo "file://localhost${url}"
+            fi
          else
             echo "${url}"
          fi
