@@ -48,6 +48,8 @@
 #        "netscape" or "mosaic".
 #     13-APR-2007 (DSB):
 #        Add firefox and make it the default browser.
+#     16-FEB-2015 (DSB):
+#        Add chrome and remove mosaic.
 #     {enter_further_changes_here}
 
 #-
@@ -67,28 +69,10 @@
       }
 
       switch -regexp $CCDbrowser {
-	 [Mm]osaic {
 
-#  Use Mosaic. This relies on the remote-command mechanisms prior to CCI.
-	    set mosaicpid 0
-	    catch {
-	       set in [open ~/.mosaicpid r]
-	       gets $in mosaicpid
-	       close $in
-	    }
-	    if { $mosaicpid != 0 } {
-	       set fid [open /tmp/Mosaic.$mosaicpid w]
-	       puts $fid "goto"
-	       puts $fid $url
-	       close $fid
-	       if { [catch {exec kill -USR1 $mosaicpid}] } {
-		  set mosaicpid 0
-	       }
-	    }
-	    if { $mosaicpid == 0 } {
-	       exec  $CCDbrowser $url &
-	    }
-	 }
+         [Cc]hrome|google-chrome {
+            exec $CCDbrowser $url &
+         }
 
          [Nn]etscape|[Mm]ozilla|[Ff]irefox {
 
