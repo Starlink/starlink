@@ -11,10 +11,6 @@ polpack_mon_SOURCES = $(POLPACK_MONO_SOURCE) $(POLPACK_F_ROUTINES)
 polpack_mon_LDADD = $(LOCAL_LINK)
 polpack_mon_TASKS = $(POLPACK_TASKS)
 
-## Sources that need to be built, but are not mentioned elsewhere.
-## Force the creation of the polka hypertext help, which relies on the
-## various rules added to create the main SUN.
-BUILT_SOURCES = polka.htx_tar
 
 #  version.dat is just the package verion in a file for polversion command
 #  This is for backwards compatibility since, of course, we could make
@@ -109,7 +105,11 @@ edit = sed \
 	-e 's,@bindir\@,$(bindir),g' \
 	-e 's,@VERSION\@,$(VERSION),g'
 
+
 @PREDIST@polka.htx_tar: polka.tex
+@PREDIST@	star2html -splitlevel 3 polka.tex
+
+
 
 # Polka needs to be installed as other .htx_tar files but into starhelp
 # starhelp_DATA is used earlier
