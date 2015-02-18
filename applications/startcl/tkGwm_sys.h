@@ -17,6 +17,9 @@
    define EXTERN with different arguments. */
 #undef EXTERN
 
+typedef enum { false, true } boolean;
+#define HAVE_BOOLEAN			/* Prevents conflicting definition of boolean in jmorecfg.h */
+
 #if HAVE_JPEGLIB_H
 #include <jpeglib.h>
 #endif
