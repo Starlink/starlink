@@ -291,82 +291,6 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
 
    $have_texfile = 1;
 
-#  To support PNG and PDF embedded graphics we need to do two things
-#  1. Copy the PNG file to the temporary directory so that htlatex
-#     will discover it
-#  We have to work out which .pdf and .png files are relevant. We could copy them
-#  all or we could scan through the tex file for includegraphics directives.
-#  Try the scanning approach
-   {
-
-
-     my %tocopy;
-     my %outpath;
-     open my $TFH, "<", $TEXFILE
-       or &clear_up("Could not open file $TEXFILE");
-     while (defined (my $texline = <$TFH>) ) {
-       # remove comments
-       $texline =~ s/\%.*$//;
-       if ($texline =~ /includegraphics
-                        (?:\[.*\])?   # Non-capturing parens for the optional options
-                        \{(.*?)\}     # File name is inside curly braces but non-greedy on final brace
-                                      # So that \myfunc{\includegraphics{file}} matches "file" not "file}"
-                       /x ) {
-         my $found = $1;
-
-         # Complain if this is explicitly a pdf
-         if ( $found =~ /\.pdf/ ) {
-           &clear_up( "Please remove explicit PDF suffix from TEX file for $found includegraphics entry" );
-         }
-
-         # if there is a directory path we have to remember it for the output
-         my $dirname;
-         if ( $found =~ /\// ) {
-           use File::Basename qw/ dirname /;
-           $dirname = dirname($found);
-         }
-
-         if (-e File::Spec->catfile( $TEXDIR, $found) ) {
-           # full name already
-           my $path = File::Spec->catfile( $TEXDIR, $found );
-           $tocopy{$path}++;
-           $outpath{$path} = $dirname if defined $dirname;
-         } else {
-           # We do not have to worry about EPS files
-           # and if we find a PNG version we can stop
-           for my $s (qw/ png pdf / ) {
-             my $check = File::Spec->catfile( $TEXDIR, $found . "." . $s);
-             if (-e $check) {
-               $tocopy{$check}++;
-               $outpath{$check} = $dirname if defined $dirname;
-               last;
-             }
-           }
-         }
-       }
-     }
-     for my $file (keys %tocopy) {
-       use File::Basename qw/ fileparse /;
-       next if $file =~ /\.(eps|ps)$/;
-       my ($name, $path, $suffix) = fileparse($file, qr/.pdf|.png/ );
-
-       # Output directory may have an extra path in it if we found that in latex
-       my $destdir = $DESTDIR;
-
-       # if we need the extra path, make sure it is there and create if it isn't
-       if (exists $outpath{$file}) {
-         $destdir = File::Spec->catdir( $destdir, $outpath{$file} );
-         if (!-d $destdir) {
-           mkdir($destdir) or &clear_up("Could not create temp dir $destdir: $!");
-         }
-       }
-
-       # If using htlatex, just copy the file in and assume that
-       # htlatex will convert it.
-       system ( "cp $file $destdir") and
-	 &clear_up("Star2HTML fatal: cannot copy $file into $destdir\n");
-     }
-   }
 
 #  Append tex file directory to TEXINPUTS to get /specials etc.
 #  Note that an empty string should be defaulted for $ENV{TEXINPUTS} if it does
@@ -430,6 +354,92 @@ exit(0);
 
 
 #------------------------------------------------------------------------------
+sub copy_included_graphics{
+#+
+# subroutine to find includegraphics lines in a .tex file
+
+#  To support PNG and PDF embedded graphics we need to do two things
+#  1. Copy the PNG file to the temporary directory so that htlatex
+#     will discover it
+#  We have to work out which .pdf and .png files are relevant. We could copy them
+#  all or we could scan through the tex file for includegraphics directives.
+#  Try the scanning approach
+
+# Argument 1 is the name of the texfile.
+# Argument 2 is the output directory
+#-
+
+  my $TEXFILE = $_[0];
+  my $DESTDIR = $_[1];
+  my %tocopy;
+  my %outpath;
+  open my $TFH, "<", $TEXFILE
+    or &clear_up("Could not open file $TEXFILE");
+  while (defined (my $texline = <$TFH>) ) {
+    # remove comments
+    $texline =~ s/\%.*$//;
+    if ($texline =~ /includegraphics
+		     (?:\[.*\])?   # Non-capturing parens for the optional options
+                        \{(.*?)\}     # File name is inside curly braces but non-greedy on final brace
+			# So that \myfunc{\includegraphics{file}} matches "file" not "file}"
+		    /x ) {
+      my $found = $1;
+
+      # Complain if this is explicitly a pdf
+      if ( $found =~ /\.pdf/ ) {
+	&clear_up( "Please remove explicit PDF suffix from TEX file for $found includegraphics entry" );
+      }
+
+      # if there is a directory path we have to remember it for the output
+      my $dirname;
+      if ( $found =~ /\// ) {
+	use File::Basename qw/ dirname /;
+	$dirname = dirname($found);
+      }
+
+      if (-e File::Spec->catfile( $TEXDIR, $found) ) {
+	# full name already
+	my $path = File::Spec->catfile( $TEXDIR, $found );
+	$tocopy{$path}++;
+	$outpath{$path} = $dirname if defined $dirname;
+      } else {
+	# We do not have to worry about EPS files
+	# and if we find a PNG version we can stop
+	for my $s (qw/ png pdf / ) {
+	  my $check = File::Spec->catfile( $TEXDIR, $found . "." . $s);
+	  if (-e $check) {
+	    $tocopy{$check}++;
+	    $outpath{$check} = $dirname if defined $dirname;
+	    last;
+	  }
+	}
+      }
+    }
+  }
+  for my $file (keys %tocopy) {
+    use File::Basename qw/ fileparse /;
+    next if $file =~ /\.(eps|ps)$/;
+    my ($name, $path, $suffix) = fileparse($file, qr/.pdf|.png/ );
+
+    # Output directory may have an extra path in it if we found that in latex
+    my $destdir = $DESTDIR;
+
+    # if we need the extra path, make sure it is there and create if it isn't
+    if (exists $outpath{$file}) {
+      $destdir = File::Spec->catdir( $destdir, $outpath{$file} );
+      if (!-d $destdir) {
+	mkdir($destdir) or &clear_up("Could not create temp dir $destdir: $!");
+      }
+    }
+
+    # If using htlatex, just copy the file in and assume that
+    # htlatex will convert it.
+    system ( "cp $file $destdir") and
+      &clear_up("Star2HTML fatal: cannot copy $file into $destdir\n");
+  }
+}
+
+
 sub edit_main_htlatex {
 #+
 #  Subroutine to edit the main file when using htlatex
@@ -437,8 +447,14 @@ sub edit_main_htlatex {
 #  Copies the input texfile to the DESTDIR, and replaces any \input commands
 #  with a version of the line that looks for the file in the working directory
 #  and copies the file into the working directory.
+
+
+#  Also copies any images found in a \includegraphics line in either
+#  the main text or in any \input file.
 #-
 
+  # Copy any images referenced in the main file.
+  copy_included_graphics($TEXFILE, $DESTDIR);
   #  Open the the main file for readonly.
   open( my $FILE, $TEXFILE )
     || &clear_up( "Star2HTML fatal: Failed to open main tex file ($TEXFILE).\n" );
@@ -460,17 +476,21 @@ sub edit_main_htlatex {
 
       my $inputfile = $1;
 
-      # Copy this file into output directory.
+      # Copy this file into output directory and copy any graphics
+      # included in it.
       # Turn it into an absolute path
       my $abs_path = File::Spec->rel2abs( $inputfile, $TEXDIR ) ;
 
       if (-e $abs_path){
 	system("cp $abs_path $DESTDIR");
+	copy_included_graphics($inputfile, $DESTDIR);
       } elsif (-e "$abs_path.tex"){
 	system("cp $abs_path.tex $DESTDIR");
+	copy_included_graphics($inputfile, $DESTDIR);
       } else {
 	print "Can't find input $inputfile or $abs_path. \n";
       }
+
 
       # Change the texline to have the new basename for the file.
       use File::Basename;
