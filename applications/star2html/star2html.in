@@ -483,10 +483,10 @@ sub edit_main_htlatex {
 
       if (-e $abs_path){
 	system("cp $abs_path $DESTDIR");
-	copy_included_graphics($inputfile, $DESTDIR);
+	copy_included_graphics($abs_path, $DESTDIR);
       } elsif (-e "$abs_path.tex"){
 	system("cp $abs_path.tex $DESTDIR");
-	copy_included_graphics($inputfile, $DESTDIR);
+	copy_included_graphics("$abs_path.tex", $DESTDIR);
       } else {
 	print "Can't find input $inputfile or $abs_path. \n";
       }
