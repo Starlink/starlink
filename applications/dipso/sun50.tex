@@ -26,7 +26,7 @@
 % ? Document specific \providecommand or \newenvironment commands.
 
 %%\providecommand{\dipcom}[3] { \item [{#1}] {#2} \par}
-\providecommand{\dipcom}[3]{\subsubsection*{\label{COM:#1}\textbf{#1} \emph{#2}}}
+\providecommand{\dipcom}[3]{\subsubsection*{\label{COM:#1}\xlabel{COM:#1}\textbf{#1} \emph{#2}}}
 \newenvironment{dipdesc}{\begin{description}}{\end{description}}
 \providecommand{\dipitem}[2]{ \item[{#1}] {#2} }
 
