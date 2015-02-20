@@ -18,18 +18,10 @@ HYPERTEXT_DOCS=sun152.htx_tar
 $(LATEX_DOCS): sun152.tex sun152.ind
 	tar cf $@ sun152.tex sun152_*.pdf
 
-# Generate the index and paste it in place, replacing the previous version.
+# Generate the index
 sun152.ind: sun152.tex
-	pdflatex '\def\generateindex{1}\input sun152'
+	pdflatex 'sun152'
 	makeindex sun152
-	sed -e '/\\begin{theindex}/r sun152.ind' -e '/\\begin{theindex}/,/\\end{theindex}/d' sun152.tex >t
-	mv t sun152.tex
 
 $(HYPERTEXT_DOCS): sun152.htx/sun152.html
 	tar cf $@ sun152.htx
-
-# The LaTeX2html commands needs some postprocessing.  The .tex file has
-# the magic within it.
-sun152.htx/sun152.html: sun152.tex
-	sed -n 's/^%%S2HPOST//p' sun152.tex | sh
-

@@ -1,13 +1,7 @@
-\documentclass[twoside,11pt]{starlink}
-
-% ? Specify used packages
-% ? End of specify used packages
-
-\pagestyle{myheadings}
+\documentclass[twoside,11pt,nolof]{starlink}
 
 % -----------------------------------------------------------------------------
-% ? Document identification
-% Fixed part
+% Document identification
 \stardoccategory  {Starlink User Note}
 \stardocinitials  {SUN}
 \stardocsource    {sun\stardocnumber}
@@ -35,141 +29,73 @@ optimal extraction, support for variance arrays,
 and 2-D distortion fitting and extraction.
 }
 \startitlepic{\includegraphics[height=60mm]{sun152_cover}}
-% ? End of document identification
+% End of document identification
 % -----------------------------------------------------------------------------
-% ? Document specific \providecommand or \newenvironment commands.
+% Document specific \providecommand or \newenvironment commands.
 
-\providecommand{\mlabel}[1]{\xlabel{#1}\label{#1}}
-
+\newcommand{\mlabel}[1]{\xlabel{#1}\label{#1}}
+\renewcommand{\backslash}{\textbackslash}
 \setcounter{tocdepth}{2}
 \setcounter{secnumdepth}{3}
 \renewcommand{\floatpagefraction}{0.8}
 
-%begin{latexonly}
-% To generate the index, invoke as
-%     latex '\def\generateindex{1}\input sun152'
-\providecommand{\generateindex}{0}
-\ifcase\generateindex
-  \typeout{Not generating index}
-\else
-  \typeout{Generating index}
-  %\usepackage{makeidx}	% unnecessary, since we incorporate the
-				% generated index completely, at the bottom
-  \makeindex
-\fi
+\makeindex
 
 
-\providecommand{\sunspec}[2]{#1}
+
+
+\newcommand{\sunspec}[2]{#2}
 
 % \cmdname{blah_blah} formats command names, and accepts underscores
-\providecommand{\cmdname}{\begingroup \catcode`\_=12 \realcmdname}
-\providecommand{\realcmdname}[1]{\endgroup\texttt{#1}}
+\newcommand{\cmdname}[1]{\begingroup \catcode`\_=12 \realcmdname }
+\newcommand{\realcmdname}[1]{\texttt{#1}\endgroup}
 
-\providecommand{\myindex}[1]{\index{#1}}
-\providecommand{\indexcmdname}[1]{\index{#1@\protect\cmdname{#1}}}
+% Index commands and indexing of command names with underscores
+\newcommand{\myindex}[1]{\index{#1}}
+\newcommand{\indexcmdname}[1]{\index{\begingroup \catcode`\_=12 \texttt{#1} \endgroup}}
 
-\providecommand{\echtask}[4]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #3}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #3}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #4}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #3}}}
-   \label{#1}\label{#2}
-   \uppercase{\myindex{#2@\protect\cmdname{#2}}}
-}
-
-\providecommand{\echparameter}[4]
+% Format an ECH paramter section
+\newcommand{\echparameter}[4]
 {
-\item [#1 = #3] \mbox{}\label{par_#2}\indexcmdname{#2}\\
-#4
+\item [#1 = #3] \mbox{}\label{par_#2}\indexcmdname{\uppercase{\texttt{#2}}}\\
+  \xlabel{par_#2} #4
 }
 
-\providecommand{\echpars}[1]{
-{\bf Parameters:\vspace*{6pt}\\}
-    #1
+
+\newcommand{\echtask}[4]
+           {
+             \subsubsection*{#3  -- #4}
+             \xlabel{#1}\xlabel{#2}\label{#1}\label{#2}
+             \indexcmdname{#2}
 }
 
-\providecommand{\epar}[3]
-{
-    \hspace*{5mm}\makebox[50mm][l]{\bf #1} #2 (p~\pageref{par_#3}.)\\
-}
 
-\providecommand{\lepar}[3]
-{
-    \hspace*{5mm}\makebox[50mm][l]{\bf #1} #2 (p~\pageref{par_#3}.)
-}
-
-\providecommand{\echredobj}[1]{
-{\bf Reduction File Objects:\vspace*{6pt}\\}
-      \hspace*{5mm}\makebox[50mm][l]{Object}\makebox[25mm][l]{Type}{Access}\\
-      #1
-}
-
-\providecommand{\eobj}[3]
-{
-    \hspace*{5mm}\makebox[50mm][l]{\bf #1}\makebox[25mm][l]{\tt #2}{\tt #3}\\
-}
-
-\providecommand{\leobj}[3]
-{
-    \hspace*{5mm}\makebox[50mm][l]{\bf #1}\makebox[25mm][l]{\tt #2}{\tt #3}
-}
-
-%end{latexonly}
-
-% HTML versions
-\begin{htmlonly}
-\providecommand{\sunspec}[2]{#2}
-
-\providecommand{\cmdname}[1]{#1}
-\providecommand{\myindex}[1]{}
-\providecommand{\indexcmdname}[1]{}
-
-\providecommand{\echtask}[4]
-{
-  \subsection{\xlabel{#1}\xlabel{#2}\label{#1}\label{#2}#3---#4}
-}
-
-\providecommand{\echparameter}[4]
-{
-  \subsection{\xlabel{par_#2}\label{par_#2}{\bf #1}}
-  {\bf Type: #3}\\
-#4
-}
-
-\providecommand{\echpars}[1]{
-{\bf Parameters:}
+\newcommand{\echpars}[1]{
+\textbf{ Parameters:}
 \begin{itemize}
 #1
 \end{itemize}
 }
 
-\providecommand{\epar}[3]
-{\item \htmlref{{\bf #1}}{par_#3} - #2}
+\newcommand{\epar}[3]
+{\item \htmlref{\textbf{ #1}}{par_#3} - #2}
 
-\providecommand{\lepar}[3]
-{\item \htmlref{{\bf #1}}{par_#3} - #2}
+\newcommand{\lepar}[3]
+{\item \htmlref{\textbf{ #1}}{par_#3} - #2}
 
-\providecommand{\echredobj}[1]{
-{\bf Reduction File Objects:}
+\newcommand{\echredobj}[1]{
+\textbf{ Reduction File Objects:}
 \begin{itemize}
 #1
 \end{itemize}
 }
 
-\providecommand{\eobj}[3]
-{\item {\bf #1} - {\it type:} #2, {\it access:} #3.}
+\newcommand{\eobj}[3]
+{\item \textbf{ #1} - {\it type:} #2, {\it access:} #3.}
 
-\providecommand{\leobj}[3]
-{\item {\bf #1} - {\it type:} #2, {\it access:} #3.}
-\end{htmlonly}
+\newcommand{\leobj}[3]
+{\item \textbf{ #1} - {\it type:} #2, {\it access:} #3.}
+
 
 % star2HTML and post-processing
 % =============================
@@ -197,130 +123,15 @@ and 2-D distortion fitting and extraction.
 %%S2HPOST    else
 %%S2HPOST        useaux=
 %%S2HPOST    fi
-%%S2HPOST    ${STAR2HTML:=star2html} -a "${AUTH_NAME}" -m "${AUTH_EMAIL}" $useaux \
-%%S2HPOST            -t "${DOC_TITLE}" ${DOC_CODE}
+%%S2HPOST    ${STAR2HTML:=star2html} ${DOC_CODE}
 %%S2HPOST
-%%S2HPOST# Generate Perl script to do the work.
-%%S2HPOST    cat > ${DOC_CODE}$$.pl <<FOO
-%%S2HPOST#!/usr/bin/perl
-%%S2HPOST
-%%S2HPOST# To be used in a pipe.
-%%S2HPOST# Post-processing for star2html.
-%%S2HPOST
-%%S2HPOST\$last_line = '';
-%%S2HPOST\$last_invisanchor = 0;
-%%S2HPOST\$AUTH_EMAIL = '$AUTH_EMAIL';
-%%S2HPOST
-%%S2HPOST\$nlines = 0;
-%%S2HPOSTwhile ( <> ) {
-%%S2HPOST
-%%S2HPOST# Add mailto URL if e-mail address is found.
-%%S2HPOST    s#\$AUTH_EMAIL#<A HREF="mailto:\${AUTH_EMAIL}">\${AUTH_EMAIL}</A>#;
-%%S2HPOST
-%%S2HPOST# Some small adjustments - gets rid of blank space at page top.
-%%S2HPOST    s/<P><ADDRESS>/<ADDRESS>/;
-%%S2HPOST    s/<BR> <HR>/<HR>/g;
-%%S2HPOST    s/<HR> <P>/<HR>/g;
-%%S2HPOST    s/<DD>  <BR>/<DD>/g;
-%%S2HPOST
-%%S2HPOST# Correct problem with ~ being missed in some of my URLs.
-%%S2HPOST#    s-ucl.ac.uk/ mjc-ucl.ac.uk/~mjc-;
-%%S2HPOST
-%%S2HPOST# Convert em dashes into single hyphens.
-%%S2HPOST    s/([^-])---([^-])/\1-\2/g;
-%%S2HPOST
-%%S2HPOST# Try to get rid of "invisible" anchors by tying them to the next word.
-%%S2HPOST# Also try to handle "doubles" caused by \xlabel{}\label{} type things.
-%%S2HPOST    s:(<H[1-9]><A NAME=SECTION[^>]*><A NAME=[^>]*>)&#160;(</A>)(<A NAME=[^>]*>)&#160;(</A>)([^<]*):\1\3\5\2\4:;
-%%S2HPOST    s:(<H[1-9]><A NAME=SECTION[^>]*><A NAME=[^>]*>)&#160;(</A>)([^<]*):\1\3\2:;
-%%S2HPOST
-%%S2HPOST# Same procedure for invisible anchors in list items...
-%%S2HPOST    s:(<LI> <b><A NAME=[^>]*>)&#160(</A>)([^<]*)(</b><BR>):\1\3\2\4:;
-%%S2HPOST
-%%S2HPOST# Minor correct for some lists.
-%%S2HPOST    s:<LI> :<LI>:;
-%%S2HPOST
-%%S2HPOST# Get rid of double horizontal rules (shouldn't be any...)
-%%S2HPOST    if ( \$last_line eq "<HR>\n" ) {
-%%S2HPOST        if ( \$_ eq "<HR>\n" ) {
-%%S2HPOST            next;
-%%S2HPOST        }
-%%S2HPOST
-%%S2HPOST# Get rid of double Paragraph breaks.
-%%S2HPOST    } elsif ( \$last_line eq "<P>\n" ) {
-%%S2HPOST        if ( \$_ eq "<P>\n" ) {
-%%S2HPOST            next;
-%%S2HPOST        }
-%%S2HPOST
-%%S2HPOST# This is an attempt to convert invisible anchors introduced by \indexentry
-%%S2HPOST# to be attached to the next word.
-%%S2HPOST    } elsif ( \$last_invisanchor != 0 ) {
-%%S2HPOST        if ( \$_ eq "<P>\n" ) {
-%%S2HPOST            next;
-%%S2HPOST
-%%S2HPOST        } else {
-%%S2HPOST            \$last_invisanchor = 0;
-%%S2HPOST            ( \$firstword, \$rest ) = split( ' ', \$_, 2 );
-%%S2HPOST            print "\$1\$firstword\$2 \$rest";
-%%S2HPOST            \$last_line = \$_;
-%%S2HPOST            next;
-%%S2HPOST        }
-%%S2HPOST    }
-%%S2HPOST
-%%S2HPOST# Note that an \indexentry introduced anchor is here.
-%%S2HPOST    if ( m-^[ ]?(<A NAME=[^>]*>)&#160;(</A>)- ) {
-%%S2HPOST        \$last_invisanchor = 1;
-%%S2HPOST        \$last_line = \$_;
-%%S2HPOST        next;
-%%S2HPOST
-%%S2HPOST    }
-%%S2HPOST
-%%S2HPOST    print;
-%%S2HPOST    \$last_line = \$_;
-%%S2HPOST
-%%S2HPOST# Encapsulate page in HTML tags.
-%%S2HPOST    if ( \$nlines == 0 ) {
-%%S2HPOST       print "<HTML>\n";
-%%S2HPOST       \$nlines = 1;
-%%S2HPOST    }
-%%S2HPOST}
-%%S2HPOST
-%%S2HPOST# End encapsulate
-%%S2HPOSTprint "</HTML>\n";
-%%S2HPOST
-%%S2HPOST#
-%%S2HPOST# End-of-file.
-%%S2HPOSTFOO
-%%S2HPOST    chmod 755 ${DOC_CODE}$$.pl
-%%S2HPOST
-%%S2HPOST# Make changes.
-%%S2HPOST    cd ${DOC_CODE}.htx
-%%S2HPOST    echo ''
-%%S2HPOST    echo "! star2html post-processing ${DOC_CODE}."
-%%S2HPOST    echo -n "! General HTML changes"
-%%S2HPOST    for f in *.html; do
-%%S2HPOST        ../${DOC_CODE}$$.pl <$f > temp$$.html
-%%S2HPOST        mv -f temp$$.html $f
-%%S2HPOST        echo -n '.'
-%%S2HPOST    done
-%%S2HPOST    rm -f ../${DOC_CODE}$$.pl
-%%S2HPOST    rm -f temp$$.html
-%%S2HPOST    echo ''
-%%S2HPOST
-%%S2HPOST# Hyperlink so that links in the document should work.
-%%S2HPOST    echo '! Hyperlinking document against Master Document Set at RAL.'
-%%S2HPOST    cd ..
-%%S2HPOST    HTX_PATH=.; export HTX_PATH
-%%S2HPOST    ${HLINK:=hlink} .
-%%S2HPOST    echo '! Hyperlink done.'
-%%S2HPOST    echo '! star2html post-processing complete.'
-%%S2HPOST
-%%S2HPOSTexit
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
+
+
 \begin{document}
 \scfrontmatter
 
@@ -328,7 +139,7 @@ and 2-D distortion fitting and extraction.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\mlabel{introduction}INTRODUCTION}
 
-{\sc echomop} provides a set of tasks to expedite the reduction of \'{e}chelle
+\textsc{echomop} provides a set of tasks to expedite the reduction of \'{e}chelle
 spectra data frames.  The options available range from full-scale
 automated reduction to step-by-step, order-by-order manually-assisted
 processing.  The tasks were written originally for the reduction of
@@ -339,8 +150,8 @@ spectra from a wide variety of sources.
 
 \subsection{\mlabel{facilities}Summary of Facilities}
 
-Below is a brief summary of what can be done with {\sc echomop}.
-It should help you to decide whether {\sc echomop} can help you with your
+Below is a brief summary of what can be done with \textsc{echomop}.
+It should help you to decide whether \textsc{echomop} can help you with your
 data reduction.
 
 \begin{itemize}
@@ -366,7 +177,7 @@ data reduction.
 
 \end{itemize}
 
-All {\sc echomop} facilities can be accessed from a single task, ECHMENU,
+All \textsc{echomop} facilities can be accessed from a single task, ECHMENU,
 which guides you through a reduction.
 
 
@@ -375,7 +186,7 @@ which guides you through a reduction.
 There is an \xref{{\sl Introduction to Echelle Spectroscopy} (SG/9)}{sg9}{}
 which is a good starting point for those new to \'{e}chelle data reduction.
 
-If you are new to {\sc echomop}, you should refer to the demonstration
+If you are new to \textsc{echomop}, you should refer to the demonstration
 described in the next sub-section and become familiar with the basic
 steps used to perform a reduction in
 \sunspec{\S\ref{standard_steps}}{\htmlref{Standard
@@ -392,15 +203,15 @@ and \sunspec{\S\ref{parameters}}{\htmlref{Parameters}{parameters}}\@.
 The remainder of this document contains the following information:
 
 \sunspec{\S\ref{using_echomop}}{\htmlref{Using
-{\sc echomop}}{using_echomop}} describes the basic use of the main
-{\sc echomop} task ECHMENU and the single-option tasks available from the shell.
+\textsc{echomop}}{using_echomop}} describes the basic use of the main
+\textsc{echomop} task ECHMENU and the single-option tasks available from the shell.
 
 \sunspec{\S\ref{tasks_options}}{\htmlref{Tasks \&
 Options}{tasks_options}} gives more detailed information on each task
 with lists of all the parameters used by each task.
 
 \sunspec{\S\ref{parameters}}{\htmlref{Parameters}{parameters}}
-describes all {\sc echomop} parameters in full.
+describes all \textsc{echomop} parameters in full.
 
 \sunspec{\S\ref{automatic_reductions} and \S\ref{cloning}}{
 \htmlref{Automatic Reductions}{automatic_reductions} and
@@ -414,32 +225,32 @@ techniques.
 
 \sunspec{\S\ref{input_files} and \S\ref{output_files}}{The
 sections on
-\htmlref{Input Data}{input_data} and \htmlref{Output Data}{output_data}}
-describe {\sc echomop} input and output data formats.
+\htmlref{Input Data}{input_files} and \htmlref{Output Data}{output_files}}
+describe \textsc{echomop} input and output data formats.
 
 \sunspec{\S\ref{echarc_imp_exp}}{\htmlref{ECHARC}{echarc_imp_exp}}
 describes the inter-operability of
-{\sc echomop} with the \xref{{\sc figaro}}{sun86}{} \xref{ECHARC}{sun86}{ECHARC} program.
+\textsc{echomop} with the \xref{{\sc figaro}}{sun86}{} \xref{ECHARC}{sun86}{ECHARC} program.
 
 \sunspec{Appendix~\ref{notes_for_observers}}{The \htmlref{Notes for
 Observers}{notes_for_observers}} gives advice on how to go about
 preparing for an \'{e}chelle observing run and what needs to be done
-with your data prior to using {\sc echomop} for the spectral extraction.
+with your data prior to using \textsc{echomop} for the spectral extraction.
 
 \sunspec{Appendix~\ref{hints} is}
 {The \htmlref{Hints}{hints} are}
 based on information in the on-line HELP text.
-Each sub-section describes the cause of an {\sc echomop} problem and offers
+Each sub-section describes the cause of an \textsc{echomop} problem and offers
 possible solutions.
 
 \sunspec{Appendix~\ref{release_notes} is}
 {The \htmlref{Release Notes}{release_notes} are} the change log for
-{\sc echomop}.  Information about the current release is included.
+\textsc{echomop}.  Information about the current release is included.
 
 \subsection{\mlabel{demonstration}Demonstration}
 
-You can obtain an on-line introduction to the use of {\sc echomop},
-after you have setup {\sc echomop} as described in
+You can obtain an on-line introduction to the use of \textsc{echomop},
+after you have setup \textsc{echomop} as described in
 section~\ref{getting_started}, by typing the command
 
 \begin{terminalv}
@@ -447,9 +258,9 @@ section~\ref{getting_started}, by typing the command
 \end{terminalv}
 
 where {\tt -graphics-device-} is available for plotting the graphs
-during the reduction ({\it{e.g.,}} \texttt{xw}). \myindex{Demonstration}
+during the reduction ({\textit{e.g.,}} \texttt{xw}). \myindex{Demonstration}
 This runs a demonstration reduction using a set of example data
-frames.  It demonstrates the main functions of {\sc echomop} and follows
+frames.  It demonstrates the main functions of \textsc{echomop} and follows
 a simple reduction from the start to the production of an extracted,
 wavelength-calibrated spectrum.  The text of the demonstration is also
 available for printing in the file
@@ -465,7 +276,7 @@ for those who prefer to read from a paper copy whilst running the demo.
 \section{\mlabel{using_echomop}USING ECHOMOP}
 \myindex{Starting up}
 
-{\sc echomop} may be used in a variety of ways depending upon your expertise.
+\textsc{echomop} may be used in a variety of ways depending upon your expertise.
 
 The most convenient method for normal use is to start the main ECHMENU
 task.
@@ -476,7 +287,7 @@ reduction}{standard_steps}}.
 \subsection{\mlabel{getting_started}Getting Started}
 \myindex{Monolith}
 
-{\sc echomop} is prepared for use from the shell by typing the command:
+\textsc{echomop} is prepared for use from the shell by typing the command:
 
 \begin{terminalv}
 % echomop
@@ -490,7 +301,7 @@ To start a reduction type:
 
 at the command-line prompt.
 
-{\sc echomop} uses a disc-based `reduction database' to store objects which may need
+\textsc{echomop} uses a disc-based `reduction database' to store objects which may need
 to be passed between various reduction tasks.\myindex{Reduction database}
 You will initially be asked to provide a name for this file, which will then
 be created in the current directory.
@@ -508,7 +319,7 @@ are `Y', `+', and `/'. \myindex{Accept character}
 
 \subsection{\mlabel{ECHMENU}ECHMENU}
 
-The simplest method of using {\sc echomop} is via the task ECHMENU which has
+The simplest method of using \textsc{echomop} is via the task ECHMENU which has
 access to all the processing modules, along with a set of utilities for
 interactive tuning of parameters, and plotting of graphs of intermediate
 results.  As a reduction progresses, the details and results of each task
@@ -518,7 +329,7 @@ prompts for the name of this `reduction database' file when it
 starts.  If the name of an existing reduction-database is given then
 this file will be opened, otherwise the package will create a new file
 using the name provided.  The name of the file may also be provided on the
-command line, {\it{e.g.}}:
+command line, {\textit{e.g.}}:
 
 \begin{terminalv}
 % echmenu ech_rdctn=filename
@@ -527,10 +338,10 @@ command line, {\it{e.g.}}:
 Once the reduction-database has been opened, the main menu is
 presented.  This menu consists of all the major steps in the reduction
 process, along with a set of utility options, and some more specialised
-options ({\it{e.g.}}, 2-D distortion correction). \myindex{Option!selection
+options ({\textit{e.g.}}, 2-D distortion correction). \myindex{Option!selection
 of}  An option is selected by typing its number followed by carriage
 return.  Some options may also be selected by entering a keyword (or its
-first character) followed by carriage return, {\it{e.g.}},
+first character) followed by carriage return, {\textit{e.g.}},
 
 \begin{terminalv}
 PLOT
@@ -545,10 +356,10 @@ P
 would select the graph plotting utility.  Some options consist of sets of
 different tasks which usually need to be run together.  It is possible to
 run these sub-options individually by typing the number and sub-option
-number in the form main.sub-option  ({\it{e.g.}}, 1.2).
-\myindex{Sub-options!selection of} {\sc echomop} attempts to provide the most
+number in the form main.sub-option  ({\textit{e.g.}}, 1.2).
+\myindex{Sub-options!selection of} \textsc{echomop} attempts to provide the most
 sensible option (for a standard reduction) as the default, and you
-can accept this simply by typing one of the accept characters ({\it{e.g.}},
+can accept this simply by typing one of the accept characters ({\textit{e.g.}},
 `Y'), plus a carriage return. \myindex{Help} Option 0 always
 provides HELP information on the default option, and then allows you
 to browse the HELP library for more detailed information.
@@ -557,13 +368,13 @@ Most options invoke processing modules.  These modules will usually
 require the specification of a number of parameters which will be
 automatically prompted for by the program.  It is possible to
 preview/edit all the parameters (including any hidden ones) for any
-option by entering its number prefixed by a minus sign. {\it{e.g.}},
+option by entering its number prefixed by a minus sign. {\textit{e.g.}},
 -3 would allow preview/edit of the parameters used by option 3.
 \myindex{Prompt}
 
 \begin{quote}
 
-  {\bf NOTE:} {\sl In general, once a parameter has been provided
+  \textbf{ NOTE:} {\sl In general, once a parameter has been provided
   it will NOT be re-prompted for by any module which requires it.
   The modules will simply re-use the value already supplied. The -option
   strategy overrides this behaviour and allows you to change any
@@ -594,7 +405,7 @@ The \xref{{\sc figaro}}{sun86}{} \xref{SOFT}{sun86}{SOFT} command
 may be used to get a list of available graphics devices.
 
 \myindex{Graphics!null device}
-{\sc echomop} also supports both \texttt{SOFT=NONE} and \texttt{SOFT=NULL}
+\textsc{echomop} also supports both \texttt{SOFT=NONE} and \texttt{SOFT=NULL}
 which disable all interactive graphics facilities and save CPU time when
 such facilities are not required.
 
@@ -606,7 +417,7 @@ hard=/device/
 \end{terminalv}
 
 and enabled (in preference to on-screen graphics) using the hidden
-parameter \texttt{HARDCOPY} when starting {\sc echomop} tasks, {\it{e.g.}}:
+parameter \texttt{HARDCOPY} when starting \textsc{echomop} tasks, {\textit{e.g.}}:
 
 \begin{terminalv}
 % echmenu hardcopy=y /any-other-parameters/
@@ -618,11 +429,11 @@ parameter \texttt{HARDCOPY} when starting {\sc echomop} tasks, {\it{e.g.}}:
 
 Before proceeding with a reduction it is recommended that the data frame
 be examined on an imaging display to ensure that the orders are
-orientated as {\sc echomop} expects (See \sunspec{\S\ref{orientation}}
+orientated as \textsc{echomop} expects (See \sunspec{\S\ref{orientation}}
 {\htmlref{Orientation of Spectra}{orientation}}).
 
 If an imaging graphics display is available then you can use the
-DISPLAY command-line parameter when invoking {\sc echomop} tasks, {\em e.g}:
+DISPLAY command-line parameter when invoking \textsc{echomop} tasks, {\em e.g}:
 
 \begin{terminalv}
 % echmenu display=yes /other-parameters/
@@ -641,7 +452,7 @@ The image display will automatically be used to:
 \subsection{\mlabel{parameters_prompts}Parameters and Prompts}
 \myindex{Parameters}
 
-Most of the user-input information required by {\sc echomop} is obtained
+Most of the user-input information required by \textsc{echomop} is obtained
 using the \xref{ADAM parameter system}{sg4}{}.
 This standard method for getting values leads to a consistency of
 user-interface between all \xref{ADAM}{sg4}{}-based tasks.
@@ -668,7 +479,7 @@ responses which are processed by the ADAM parameter system:
 
 \item [\sunspec{$\backslash$}{\texttt{\backslash}}] ---
       \myindex{Prompt!disabling} causes all
-      subsequent parameters to adopt their default values {\bf without}
+      subsequent parameters to adopt their default values \textbf{ without}
       further prompts. (May also be appended to a value response, {\it
       {e.g.}}, \verb+10\+ would set the current parameter to 10 and
       switch off any further prompting).
@@ -678,14 +489,14 @@ responses which are processed by the ADAM parameter system:
 \subsection{\mlabel{tuning_parameters}Tuning Parameters}
 \myindex{Parameters!tuning}
 
-{\sc echomop} tasks use a number of `hidden'
+\textsc{echomop} tasks use a number of `hidden'
 parameters.\myindex{Parameters!hidden}
 These will not normally need to be changed, but provide flexibility when
 processing problem data.  They are also used by ECHMENU to configure itself
 for `quick-look' extraction. \indexcmdname{ECH_TUNER}
 ECHMENU Option~23 allows you to interactively examine and alter these
 parameters.  Parameter values may also be supplied on task command-lines.
-{\sc echomop} tasks always report any \verb+TUNE_+ parameters which have
+\textsc{echomop} tasks always report any \verb+TUNE_+ parameters which have
 been set to non-default values.
 
 
@@ -712,7 +523,7 @@ To run a particular step you can:
 
 \item select the appropriate option from the main ECHMENU menu.
 
-\item type the task name at the command line, {\it{e.g.}}:
+\item type the task name at the command line, {\textit{e.g.}}:
 
 \begin{terminalv}
 % ech_linloc
@@ -722,7 +533,7 @@ To run a particular step you can:
 
 \begin{quote}
 
-   {\bf NOTE:} {\sl that when using the individual tasks the strategy for
+   \textbf{NOTE:} {\sl that when using the individual tasks the strategy for
    selecting single order/all order operation is different.  Individual
    tasks which can operate on single orders all utilise the parameter:
 
@@ -750,7 +561,7 @@ performed then you will be informed of this and the default next step
 will be set back to the step which generates the required information.
 \myindex{Single step tasks}
 If a single step task is invoked before all its input requirements are
-available ({\it{e.g.}}, order tracing before order location) then the task
+available ({\textit{e.g.}}, order tracing before order location) then the task
 will abort with a message indicating which task needs to be run in order to
 provide the necessary pre-requisites.
 
@@ -787,7 +598,7 @@ and parameters values when prompted.
          (\htmlref{{\tt{ech\_count}}}{ech_count}).}
 
    \item {1.5 --- Locate orders
-         (\htmlref{{\tt{ech\_locate}}}{ech_locate}).}
+         (\htmlref{\texttt{ech\_locate}}{ech_locate}).}
 
 \end{itemize}
 
@@ -897,7 +708,7 @@ and parameters values when prompted.
 \myindex{Demonstration}
 
 The demonstration provided by \verb+ech_demo+ follows this overall sequence
-and the reader is encouraged to try it before using {\sc echomop} in earnest.
+and the reader is encouraged to try it before using \textsc{echomop} in earnest.
 \myindex{Wavelength calibration!none} Steps 9 through 12 would be omitted if
 no wavelength calibration\myindex{Arc calibration!none} was required.
 Step 5 would be omitted if no flat field was
@@ -914,7 +725,7 @@ soon as step 4 has been completed (using Option~19).
 Many of the ECHMENU main menu tasks consist of a number of independent
 functions which are automatically invoked. For example Option 12 consists
 of 4 sub-options. The ECHMENU program allows the selection of any sub-option
-directly, {\it{e.g.}}:
+directly, {\textit{e.g.}}:
 
 \begin{terminalv}
 12.3
@@ -925,13 +736,13 @@ would select Option~12.3 (Scrunch extracted object order) explicitly.
 To check if sub-options are available, the context specific HELP for the
 option should be viewed (type 0 at the main menu prompt). Some
 sub-options are individually accessible when using the single purpose
-tasks ({\it{e.g.}}, \texttt{ech\_scrarc}).
+tasks ({\textit{e.g.}}, \texttt{ech\_scrarc}).
 
 
 \subsection{\mlabel{automation}Automation}
 \myindex{Automation}
 
-{\sc echomop} provides automation to many aspects of \'{e}chelle data reduction
+\textsc{echomop} provides automation to many aspects of \'{e}chelle data reduction
 which have traditionally required substantial interactive assistance:
 
 \myindex{Automation!functions}
@@ -960,7 +771,7 @@ that the following conditions are satisfied:
       orders are in different places on the detector.
 
 \item Constraints placed on the expected range of wavelength and
-      dispersion are wide enough. {\it{e.g.}}, if in doubt about the
+      dispersion are wide enough. {\textit{e.g.}}, if in doubt about the
       dispersion being 0.2 or 0.3 Angstroms per-pixel, provide limits of
       \htmlref{{\tt MIN\_DISPERSION=0.1}}{par_MIN_DISPERSION},
       \htmlref{{\tt MAX\_DISPERSION=0.5}}{par_MAX_DISPERSION}.
@@ -1002,7 +813,7 @@ The following algorithmic optimizations will be used:
 \myindex{Errors!arrays}
 \myindex{Variance}
 
-{\sc echomop} can deal with errors from the following variety of sources:
+\textsc{echomop} can deal with errors from the following variety of sources:
 
 \myindex{Flat field!errors}
 
@@ -1090,7 +901,7 @@ or the hypertext version of the text can be accessed using
 \end{terminalv}
 
 
-\echtask{option1}{ech_locate}{1:{\tt ech\_locate}}{Start a Reduction}
+\echtask{option1}{ech_locate}{1: \texttt{ech\_locate}}{Start a Reduction}
 \myindex{Starting a reduction}
 
 This is usually the first option selected and will cause the following
@@ -1132,7 +943,7 @@ The following checks are made:
 
 The trace task will ignore any pixels flagged during frame checking.
 This can aid the tracing of frames containing saturated pixels, bad rows or
-columns, {\it{etc.}} which might upset the tracing process.
+columns, {\textit{etc.}} which might upset the tracing process.
 
 
 \item \mlabel{ech_decos1} {1.2} (\texttt{ech\_decos1})
@@ -1159,9 +970,9 @@ Determine approximate slope of orders across the frame.
 \myindex{Order!slope}
 A common problem when extracting \'{e}chelle orders is that they are
 significantly sloped with respect to the pixel rows/ columns.
-{\sc echomop} can cope with highly sloping orders because it works
+\textsc{echomop} can cope with highly sloping orders because it works
 by first locating a single point in each order and then using this as
-the start point for tracing the order path. {\sc echomop} also calculates
+the start point for tracing the order path. \textsc{echomop} also calculates
 the approximate slope of the orders prior to tracing, and uses this
 information to predict the order position when tracing fails (usually
 due to contaminated pixels).
@@ -1218,7 +1029,7 @@ apparent by visual inspection, you may help locate the orders
 manually.  To control this the parameter
 \indexcmdname{TUNE_AUTLOC}
 \htmlref{{\tt TUNE\_AUTLOC=NO}}{par_TUNE_AUTLOC}
-should be used (default). In which case {\sc echomop} will display a graph
+should be used (default). In which case \textsc{echomop} will display a graph
 of the central portion of the frame and wait for interactive
 verification of, or correction to, the located orders positions. For
 cases where you are confident that the located orders will be
@@ -1307,9 +1118,9 @@ shows an example of the order-location plot with 3 located orders.
 The tracing of the paths of the orders across the data frame is often a
 source of difficulty as it is fairly easy for blemishes in the frame to
 fatally deflect order tracing algorithms from the actual path of the
-order. {\sc echomop} provides a variety of options to help combat these
+order. \textsc{echomop} provides a variety of options to help combat these
 problems. \myindex{Order!tracing} \myindex{Trace!order paths} \myindex{Partial
-orders} {\sc echomop} order tracing first locates the positions of the orders
+orders} \textsc{echomop} order tracing first locates the positions of the orders
 at the centre of the frame, and estimates the average order slope. It
 uses this information to predict the existence of any partial orders at
 the top/bottom of the frame which may have been missed by the
@@ -1330,7 +1141,7 @@ applicable method.
 
 \item{Edge} Detects the upper and lower `edges of the data and
 interpolates. Is less accurate but works well for difficult flat fields
-({\it{e.g.}}, saturated)
+({\textit{e.g.}}, saturated)
 
 \item{Balance} Calculates the centre of gravity (balance point). Works
 well for difficult data when G and C methods are having problems.
@@ -1371,7 +1182,7 @@ however, this may not be satisfactory if the high degree is necessary to
 obtain a good fit over the rest of the order.
 
 In these circumstances, and others where one or more orders polynomials
-have `run away', {\sc echomop} provides an automatic consistency checker. The
+have `run away', \textsc{echomop} provides an automatic consistency checker. The
 consistency checking task works by fitting polynomials to order-number and
 Y-coordinate at a selection of positions across the frame.
 \myindex{Trace!consistency} The predicted order centres from both sets of
@@ -1388,7 +1199,7 @@ which can result when partial orders have been automatically fitted.
 
 The tracing of the \'{e}chelle order paths is central to the entire
 extraction process and care should be taken to ensure the best traces
-possible. {\sc echomop} provides a large number of processing alternatives to
+possible. \textsc{echomop} provides a large number of processing alternatives to
 help ensure this can be done. Most of these provide information such as
 RMS deviations {\it etc.}, when run. In general however, the best way of
 evaluating the success or failure of the tracing process is to visually
@@ -1811,14 +1622,14 @@ The `balance factors' are the per-pixel values which are multiplied into
 the raw data to perform the photometric correction required to correct for
 differing pixel-to-pixel responses of some detectors (mostly CCDs).
 
-{\sc echomop} will use a flat-field frame if one is available. The flat-field
+\textsc{echomop} will use a flat-field frame if one is available. The flat-field
 frame should  be produced using a continuum lamp exposure with the
 instrument in an identical configuration to that used for the object
 exposure (to ensure that any wavelength dependent behaviour of pixel
 response is taken into account). The exposure should be of sufficient
 duration to attain high counts in the brightest parts of the image.
 
-{\sc echomop} fits functions in two directions; along the traces, and along the
+\textsc{echomop} fits functions in two directions; along the traces, and along the
 image columns. The degree of polynomials fitted is tunable, but the
 (low) default degree will normally be perfectly reasonable. Each flat-field
 pixel in an order is then used to calculate a `balance' factor. This is a
@@ -1870,12 +1681,12 @@ The full set of modelling options is:
 \myindex{User-calculated balance factors}
 \indexcmdname{TUNE_PREBAL}
 If you produce your own balance-factor frame, then this may be used by
-{\sc echomop}.
+\textsc{echomop}.
 The parameter \htmlref{{\tt TUNE\_PREBAL}}{par_TUNE_PREBAL}
 should then be set to \verb+YES+\@.
 In this case no modelling takes place and the balance factors are
 simply copied from the frame supplied.
-This should be used if the {\sc echomop} models do not generate an appropriate
+This should be used if the \textsc{echomop} models do not generate an appropriate
 flat-field.\myindex{Flat field!none}\indexcmdname{TUNE_NOFLAT}
 In cases where no flat-field frame is available then the parameter
 \htmlref{{\tt TUNE\_NOFLAT=YES}}{par_TUNE_NOFLAT} can be specified;
@@ -1957,7 +1768,7 @@ to which regions of the slit are to be used for the sky.
 This facility is of particular use when processing frames where
 `periscopes' have been used to add in `sky' regions when observing an
 extended source.
-In such cases, {\sc echomop} currently provides no special
+In such cases, \textsc{echomop} currently provides no special
 treatment and the periscope sky-pixel positions will have to be edited
 into the sky mask using the task \htmlref{{\tt ech\_spatial}/ECHMENU
 Option~4}{ech_spatial}.
@@ -2083,7 +1894,7 @@ spectroscopy}
 sloping and/or distorted orders.
 
 In addition, the rejection of cosmic-ray-contaminated pixels has been made
-available as a separate function in {\sc echomop} as the package is not dedicated
+available as a separate function in \textsc{echomop} as the package is not dedicated
 to CCD-only data reduction.
 \myindex{Cosmic rays!using Horne algorithm}
 \indexcmdname{TUNE_CRCLEAN}
@@ -2265,7 +2076,7 @@ the reduction.
 \myindex{Wavelength scales!reversed}
 \indexcmdname{TUNE_REVCHK}
 Finally the software is flexible as to the vertical orientation of the
-orders, {\it{i.e.}}, higher wavelength orders may be at the top or bottom
+orders, {\textit{i.e.}}, higher wavelength orders may be at the top or bottom
 of the frame (for \'{e}chelle data).
 \myindex{Orientation of frames}
 Calibration may be performed using either 1 or 2 (before and after) ARC
@@ -2301,12 +2112,12 @@ supported:
 
 \item {\sunspec{\Large\tt}{\bf} IM} (import \xref{ECHARC}{sun86}{ECHARC} data)
 %\myindex{ECHARC!data exchange}
-\myindex{ECHARC data exchange@\protect\cmdname{ECHARC} data exchange}
+\myindex{ECHARC data exchange \protect\cmdname{ECHARC} data exchange}
       Provides an interface
       to the ECHARC arc-line identification program. In general the XP
       option should first be used to export data for ECHARC processing.
       ECHARC would then be run, and finally the data IMported back into
-      {\sc echomop}.
+      \textsc{echomop}.
 
 \item {\sunspec{\Large\tt}{\bf} O}(rder selection)
 
@@ -2326,7 +2137,7 @@ supported:
       interface to the ECHARC arc line identification program. In general
       the XP option should first be used to export data for ECHARC
       processing. ECHARC would then be run, and finally the data IMported
-      back into {\sc echomop}.
+      back into \textsc{echomop}.
 
 \item {\sunspec{\Large\tt}{\bf} I}(nteractive identification)
 
@@ -2538,7 +2349,7 @@ supported:
 
             Sends a copy of the current plotted graph to the hardcopy device.
             The appropriate device must have been supplied at program startup
-            ({\it{e.g.}} \verb+echmenu hard=ps_l+).
+            ({\textit{e.g.}} \verb+echmenu hard=ps_l+).
 
       \end{itemize}
 
@@ -2713,7 +2524,7 @@ the same facilities available using the \xref{{\sc figaro}}{sun86}{}
 \xref{SCRUNCH}{sun86}{SCRUNCH} program, except that it works on an
 order-by-order basis.
 
-{\sc echomop} provides both global (bin size constant for all orders) and
+\textsc{echomop} provides both global (bin size constant for all orders) and
 per-order scrunching options. The global option would normally be used when
 it is necessary to co-add the extracted orders from multiple data frames,
 and a standard bin-size is required.
@@ -2788,7 +2599,7 @@ parameter \htmlref{{\tt TUNE\_MRGWGHT}}{par_TUNE_MRGWGHT}\@.
 \myindex{2-D distortion}
 
 Detectors such as the IPCS often cause major geometric distortions in
-the image created using them. {\sc echomop} provides a mechanism for
+the image created using them. \textsc{echomop} provides a mechanism for
 modelling such distortion, and using that model to provide corrections
 during the extraction process. It is also possible to generate a
 `corrected' version of each order,  for visual examination,  or
@@ -2806,13 +2617,13 @@ These differences are modelled using a Chebyshev polynomial.
 
 Once a 2-D fit has been obtained,  it is refined by either manual or
 automatic clipping of deviant points. When done manually the
-positions of all the points being fitted ({\it{i.e.}}, arc line
+positions of all the points being fitted ({\textit{i.e.}}, arc line
 centers) may be plotted in a highly exaggerated form, in which
 systematic distortions of sub-pixel magnitude are readily apparent.
 
 As the wavelength scale produced by the distortion fitting leads
 inevitably to some re-binning when the extraction takes place, it is
-normal to extract into a scrunched wavelength scale ({\it{e.g.}},
+normal to extract into a scrunched wavelength scale ({\textit{e.g.}},
 constant bin size) and this is the default behavior of the 2-D
 extraction task/ECHMENU Option~13.
 
@@ -2851,7 +2662,7 @@ corrected extraction operation. A 2-D Chebyshev polynomial is then fitted to
 the wavelength deviations of each arc-line pixel, relative to the
 wavelength at the trace/arc line intersection. The polynomial is used to
 generate delta-wavelength values at pairs of (X,Y-offset) coordinates,
-{\it{i.e.}};
+{\textit{i.e.}};
 
 \begin{quote}
 
@@ -2943,10 +2754,10 @@ extraction algorithm used is identical to the 1-D case from this point on.
 \myindex{Results!output of}
 
 This option provides three output formats for data reduced within
-{\sc echomop}.
+\textsc{echomop}.
 
 The supported formats are NDF, ASCII, and \xref{DIPSO}{sun50}{}
-\xref{stack}{sun50}{RESTORE}\@.
+\xref{stack}{sun50}{COM:RESTORE}\@.
 Many other file formats can be accessed by use of the Starlink utility
 \xref{CONVERT}{sun55}{}\@.
 Where applicable to the data format, errors will be included.
@@ -2987,7 +2798,6 @@ shows an example of the order trace paths plot.
 \begin{figure}
 \begin{center}
 \includegraphics[width=\textwidth]{sun152_cover}
-
 \parbox{140mm}{
 \caption{A typical set of order paths as plotted using ECHMENU Option~15.
 The distortions at the order extremities are due to the IPCS detector used.}
@@ -3177,7 +2987,7 @@ the very ends of the orders wavelength scales.
 These are the regions where problems are most likely to occur,  as the
 polynomial fits can become unstable when a high number of coefficients has
 been used, and there are no fitted points for a substantial fraction of the
-order ({\it{e.g.}}, first 20\%).
+order ({\textit{e.g.}}, first 20\%).
 
 \echpars{
 \epar{AUTO\_ID}{YES for fully automatic identification.}{AUTO_ID}
@@ -3331,12 +3141,12 @@ message is displayed.
 \myindex{Order!process single}
 
 Allows the selection of a single order for all tasks which operate on an
-order-by-order basis, {\it{e.g.}}, to re-fit the order trace for order 3,
+order-by-order basis, {\textit{e.g.}}, to re-fit the order trace for order 3,
 leaving all other orders unchanged, you would first use this option to
 change the selected order to number 3, and then invoke the
 \htmlref{{\tt ech\_fitord} task/ECHMENU Option~3}{ech_fitord}.
 
-Note that any options which operate on all orders at once ({\it{e.g.}},
+Note that any options which operate on all orders at once ({\textit{e.g.}},
 trace consistency checking) will still operate correctly when a single
 order is selected, as they ignore the selection and use all the orders
 anyway).
@@ -3347,7 +3157,7 @@ operate on single orders all utilise the parameter {\tt
 IDX\_NUM\_ORDERS}\@.
 
 which you should set to the number of the order to process, or to zero to
-indicate that all orders are to be processed in turn. {\it{e.g.}}:
+indicate that all orders are to be processed in turn. {\textit{e.g.}}:
 
 \begin{terminalv}
 % ech_trace idx_num_orders=4
@@ -3355,7 +3165,7 @@ indicate that all orders are to be processed in turn. {\it{e.g.}}:
 
 would just trace order number 4.
 
-\echtask{option25}{ech_all}{25:{\tt ech\_all}}{Set All-order Processing}
+\echtask{option25}{ech_all}{25:\texttt{ech\_all}}{Set All-order Processing}
 \myindex{All order processing}
 
 Selects automatic looping through all available orders for all tasks which
@@ -3401,7 +3211,7 @@ wavelength objects along the X-axis.
 Note that unless you are interested in  the first order of a multi-order
 array then the array indices to start plotting from {\bf must} be supplied.
 
-{\it{e.g.}}: OBJ would denote the first orders' extracted object spectra.
+{\textit{e.g.}}: OBJ would denote the first orders' extracted object spectra.
 OBJ[1,4] would denote the fourth orders' extracted object spectra.
 ARC[100,13,2] would denote the region of the second arc frames thirteenth
 order starting at X-sample 100.
@@ -3420,9 +3230,9 @@ typing the single character followed by carriage-return.
      \myindex{Plotter!image browse}
      Used in conjunction with an imaging display.
      The object or arc data frame should be specified or it will be
-     prompted for ({\it{e.g.}}:  B MYOBJ)
+     prompted for ({\textit{e.g.}}:  B MYOBJ)
 
-     {\sc echomop} will display the image and then put a cursor on the display,
+     \textsc{echomop} will display the image and then put a cursor on the display,
      you can then position the cursor and type a key indicating which type of
      data you wish to select for plotting.
 
@@ -3463,7 +3273,7 @@ typing the single character followed by carriage-return.
 
      Specifying an object name without any dimensional specifications will
      plot the first N elements starting from the beginning of the array,
-     {\it{i.e.}}, ARRAY[1,1,1....] to ARRAY[N,1,1....]
+     {\textit{i.e.}}, ARRAY[1,1,1....] to ARRAY[N,1,1....]
 
 \item {\sunspec{\Large\tt}{\bf} E}(xit)
 
@@ -3474,7 +3284,7 @@ typing the single character followed by carriage-return.
 
      Toggles the plotting mode. The
      grayscale mode is useful for plotting swathes of 2-D and 3-D objects.
-     {\it{e.g.}}:
+     {\textit{e.g.}}:
 
      \begin{itemize}
 
@@ -3531,7 +3341,7 @@ typing the single character followed by carriage-return.
      Allows the specification of various style
      parameters for the plots. The line styles and colours may be
      specified, as may the plot style. The following keywords are
-     recognised and may be appended to the S to save time. {\it{e.g.}},
+     recognised and may be appended to the S to save time. {\textit{e.g.}},
      \verb+S RED+ sets the plot colour to red.
 
      Keywords:
@@ -3565,7 +3375,7 @@ typing the single character followed by carriage-return.
      Permits the division of the plotting surface
      into panes into which subsequent graphs are plotted. Two factors are
      requested, the subdivision factor in the horizontal, and in the
-     vertical directions. {\it{e.g.}}, 3 and 2 would divide the surface
+     vertical directions. {\textit{e.g.}}, 3 and 2 would divide the surface
      into two rows of three graphs. Setting both factors to 1 restores
      normal single graph behaviour.
 
@@ -3621,9 +3431,9 @@ ECHMENU shell task.
 \myindex{ADAM!from spawned process}
 This option can be used to perform system commands like \verb+ls+ and also
 \xref{{\sc figaro}}{sun86}{} commands such as
-\xref{IMAGE}{sun86}{IMAGE} {\it etc.}  However, {\sc echomop}
+\xref{IMAGE}{sun86}{IMAGE} {\it etc.}  However, \textsc{echomop}
 commands which change parameter values will not operate perfectly because the
-monolith already has the {\sc echomop} parameter file open.
+monolith already has the \textsc{echomop} parameter file open.
 
 System commands can also be entered directly at the Option: prompt by
 making the first character a {\tt \$}. Thus:
@@ -3647,7 +3457,7 @@ would execute the system `directory' command, and return to the main menu.
 \end{center}
 \end{figure}
 
-This option was introduced at {\sc echomop} version 3.2-0.  The flat-field balance
+This option was introduced at \textsc{echomop} version 3.2-0.  The flat-field balance
 factors produced by \htmlref{{\tt ech\_ffield}}{ech_ffield} are written to an
 image which can then be inspected, for example using \xref{{\sc kappa}}{sun95}{}
 \xref{DISPLAY}{sun95}{DISPLAY}.
@@ -3674,9 +3484,9 @@ followed by carriage return.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\mlabel{parameters}PARAMETERS}
 
-This is a complete list of all the parameters used by {\sc echomop} tasks.
+This is a complete list of all the parameters used by \textsc{echomop} tasks.
 
-\sunspec{\begin{description}}{}
+\begin{description}
 
 \echparameter{ARC}{ARC}{
  \_CHAR
@@ -3700,11 +3510,11 @@ This is a complete list of all the parameters used by {\sc echomop} tasks.
 \echparameter{ARC\_TYPE}{ARC_TYPE}{
  \_CHAR
 }{
- {\sl As of {\sc echomop} v3.3-0, this parameter is ignored and should
+ {\sl As of \textsc{echomop} v3.3-0, this parameter is ignored and should
   be removed from any scripts using it.  The reference-line
   database should be specified by the parameter
   \htmlref{{\tt ECH\_FTRDB}}{par_ECH_FTRDB}. The parameter will
-  be completely removed at the next release of {\sc echomop}.}
+  be completely removed at the next release of \textsc{echomop}.}
 }
 
 \echparameter{ASCII\_FILE}{ASCII_FILE}{
@@ -3718,7 +3528,7 @@ This is a complete list of all the parameters used by {\sc echomop} tasks.
 \echparameter{AUTO}{AUTO}{
  \_LOGICAL
 }{
- If \texttt{AUTO=YES} then {\sc echomop} will use all the options available
+ If \texttt{AUTO=YES} then \textsc{echomop} will use all the options available
  to automate the processes it invokes.  Currently the following
  parameters will be affected:
 
@@ -3832,13 +3642,7 @@ This is a complete list of all the parameters used by {\sc echomop} tasks.
  For example, setting {\tt BLZ\_NPOLY} to 4 would permit the fitting of
  polynomials of the form:
 
-\sunspec{
- ${\rm constant} + ax + bx^{2} + cx^{3}$.
-}{
-\begin{terminalv}
-constant + ax + bx squared + cx cubed
-\end{terminalv}
-}
+\texttt{constant + ax + bx squared + cx cubed}
 
  Initial suggested value: \texttt{7}.
 }
@@ -3921,7 +3725,7 @@ constant + ax + bx squared + cx cubed
 }{
  The name of the file created to hold the data reduction history.
 
- This file will normally be created by the first {\sc echomop} task run.
+ This file will normally be created by the first \textsc{echomop} task run.
  Any valid datafile name can be used.
 
  By default the file is created in the current directory.
@@ -4058,7 +3862,7 @@ constant + ax + bx squared + cx cubed
  selected frame only.
 
  {\tt IDX\_NREF\_FRAME=0} causes automatic looping through all values for
- the `index', {\it{i.e.}}, processing of all arc frames.
+ the `index', {\textit{i.e.}}, processing of all arc frames.
 }
 
 \echparameter{IDX\_NUM\_ORDERS}{IDX_NUM_ORDERS}{
@@ -4073,7 +3877,7 @@ constant + ax + bx squared + cx cubed
  selected order only.
 
  {\tt IDX\_NREF\_ORDERS=0} causes automatic looping through all values for
- the `index', {\it{i.e.}}, processing of all orders.
+ the `index', {\textit{i.e.}}, processing of all orders.
 }
 
 \echparameter{ID\_INTERACTIVE}{ID_INTERACTIVE}{
@@ -4085,7 +3889,7 @@ constant + ax + bx squared + cx cubed
  the fitted wavelength polynomial, addition and deletion of features
  {\it etc.}
 
- If {\tt ID\_INTERACTIVE} is not set then the {\sc echomop} will try to
+ If {\tt ID\_INTERACTIVE} is not set then the \textsc{echomop} will try to
  identify arc-line features automatically.  For orders with enough features
  (more than 12 lines) this will usually be successful.
 
@@ -4098,7 +3902,7 @@ constant + ax + bx squared + cx cubed
 }{
  Internal parameter used to indirect reduction objects to be copied
  from other reduction databases instead of being calculated
- (the \texttt{<} function in {\sc echomop}).
+ (the \texttt{<} function in \textsc{echomop}).
 }
 
 \echparameter{INPTIM}{INPTIM}{
@@ -4342,7 +4146,7 @@ constant + ax + bx squared + cx cubed
  This parameter determines the overall type of scrunching to use when
  scrunching extracted orders.  Set to \texttt{YES} if the current frames
  wavelength range is to be used (all orders) to generate a full range
- wavelength scale to scrunch into; {\it{i.e.}}, all orders are scrunched
+ wavelength scale to scrunch into; {\textit{i.e.}}, all orders are scrunched
  into the same bin size, but the no of X-axis bins in each order will
  vary.  Set to \texttt{NO} if each order is to be scrunched to its own scale.
  This retains the X-dimension of the orders, but each order will be
@@ -4649,7 +4453,7 @@ constant + ax + bx squared + cx cubed
 
  would run the first 3 processing options and then exit.
 
- If EXIT is not given as an option, {\sc echomop} will start the menu task
+ If EXIT is not given as an option, \textsc{echomop} will start the menu task
  {\tt ECHMENU} when the list of options specified by {\tt TUNE\_AUTOMATE} has
  been exhausted.
 }
@@ -4681,8 +4485,8 @@ constant + ax + bx squared + cx cubed
 }{
  The reduction database from which to clone information.
 
- The reduction database should have been created by {\sc echomop}
- previously.  Objects which would normally be calculated by {\sc echomop}
+ The reduction database should have been created by \textsc{echomop}
+ previously.  Objects which would normally be calculated by \textsc{echomop}
  will instead be copied from the named file.  This allows the cloning
  of sections of a reduction amongst multi-frame datasets.
 }
@@ -4864,7 +4668,7 @@ constant + ax + bx squared + cx cubed
  In general an Arc frame will be used to establish the dekker limits,
  and a value of 80\% will suffice.
 
- The default value is \texttt{0.8} ({\it{i.e.}} 80\%).
+ The default value is \texttt{0.8} ({\textit{i.e.}} 80\%).
 }
 
 \echparameter{TUNE\_DIAGNOSE}{TUNE_DIAGNOSE}{
@@ -4887,13 +4691,13 @@ constant + ax + bx squared + cx cubed
  The maximum difference between observed and theoretical (based on
  observed mean, sigma) CDF's is calculated.  The Kolmogorov-Smirnov
  test is used to evaluate the probability that the measured
- deviation is a chance occurrence ({\it{i.e.}} that the two distributions are
+ deviation is a chance occurrence ({\textit{i.e.}} that the two distributions are
  actually the same).  In general any significant probability
  indicates that the two distributions compare very well.  When the
  K-S probability exceeds the {\tt TUNE\_DPRBTHR} threshold, clipping stops
  and the fit is accepted.
 
- The default value is \texttt{0.9} ({\it{i.e.}} 90\%).
+ The default value is \texttt{0.9} ({\textit{i.e.}} 90\%).
 }
 
 \echparameter{TUNE\_DSGMTHR}{TUNE_DSGMTHR}{
@@ -5121,13 +4925,9 @@ constant + ax + bx squared + cx cubed
  observed features, and those in the database with which a match is
  attempted.  The difference is evaluated by calculating
 \sunspec{
-  \[ {\rm ABS( 1 - ABS( observed / reference ))} \]
+  $$ {\mathrm{ABS( 1 - ABS( observed / reference ))}} $$
 }{
-\begin{rawhtml}
-<PRE WIDTH=72>
-   ABS( 1 - ABS( observed / reference ) )
-</PRE>
-\end{rawhtml}
+
 }
  giving a fractional measure of the difference.  For example:
  difference=0.01 indicates that the two quantities differ by
@@ -5432,7 +5232,6 @@ constant + ax + bx squared + cx cubed
  output the program will pause and wait for a key to be hit before
  continuing.  A variety of options are available at this point:
 
-\sunspec{
 \begin{tabular}{ll}
    D,d,uparrow,KP8,p,P,b,B    & Scroll back one line.\\
    U,u,downarrow,KP2,f,F,n,N  & Scroll forward a line.\\
@@ -5441,23 +5240,7 @@ constant + ax + bx squared + cx cubed
    pageup                     & Previous full screen.\\
    pagedown                   & Next full screen.
 \end{tabular}
-}{
-\begin{rawhtml}
-<PRE WIDTH=72>
-   D,d,uparrow,KP8,p,P,b,B    - Scroll back one line.
 
-   U,u,downarrow,KP2,f,F,n,N  - Scroll forward a line.
-
-   space                      - Resume output.
-
-   return                     - Output next line only.
-
-   pageup                     - Previous full screen.
-
-   pagedown                   - Next full screen.
-</PRE>
-\end{rawhtml}
-}
 
  The program maintains a buffer of lines output to the screen;
  you may move around using the keys mentioned above.  Only the
@@ -5551,7 +5334,7 @@ constant + ax + bx squared + cx cubed
  It will usually be left blank to indicate default reporting to
  the terminal/batch log file.  Options include:
 
-\sunspec{
+
    \begin{tabular}{ll}
    F  & Specifies full reporting of task/module entry.\\
    L  & Specifies duplicate log of reports to disk file\\
@@ -5561,24 +5344,7 @@ constant + ax + bx squared + cx cubed
    E  & Error reports to override other setting (BS).\\
    P  & Print log file on completion (only with L).
    \end{tabular}
-}{
-\begin{rawhtml}
-<PRE WIDTH=72>
-   F  - Specifies full reporting of task/module entry.
 
-   L  - Specifies duplicate log of reports to disk file
-        (ECH_REPORT.LOG in the current directory).
-
-   B  - Brief reporting, task starts only.
-
-   S  - Silent, no terminal reports at all.
-
-   E  - Error reports to override other setting (BS).
-
-   P  - Print log file on completion (only with L).
-</PRE>
-\end{rawhtml}
-}
 
  Specifiers may be concatenated in any order, thus
 
@@ -5729,7 +5495,7 @@ constant + ax + bx squared + cx cubed
  This minimum is used as the maximum sky intensity allowed along
  the spatial profile.
 
- The default value is \texttt{0.5} ({\it{i.e.}} 50\%).
+ The default value is \texttt{0.5} ({\textit{i.e.}} 50\%).
 }
 
 \echparameter{TUNE\_SKYINTER}{TUNE_SKYINTER}{
@@ -5789,11 +5555,11 @@ constant + ax + bx squared + cx cubed
  contributory sky intensity in the object pixels.
 
  The default value is {\tt TUNE\_SKYPOLY=0} to obtain sky averaging
- ({\it{i.e.}},
+ ({\textit{i.e.}},
  sky model is constant at each order/column).
 
  Set {\tt TUNE\_SKYPOLY=-1} when there is no sky to be modelled
- ({\it{i.e.}}, sky model is zero everywhere).
+ ({\textit{i.e.}}, sky model is zero everywhere).
 
  Initial suggested value: \texttt{0}.
 }
@@ -5870,7 +5636,7 @@ constant + ax + bx squared + cx cubed
 
  The threshold is the degree to which off-trace pixels must fall below
  the pixel at trace centre (in the spatial direction) in order to be
- considered as 'off-order'.  {\it{I.e.}}, the trace width is estimated
+ considered as 'off-order'.  {\textit{I.e.}}, the trace width is estimated
  by stepping pixel-by-pixel above and below the trace until the
  intensity falls below (1.0 - {\tt TUNE\_TWTHR}) \sunspec{$\times$}{x}
  intensity-at-trace-centre.
@@ -5922,7 +5688,7 @@ constant + ax + bx squared + cx cubed
  for example, {\tt TUNE\_USE\_NXF=1.2} would select individual-order
  profiling using 20\% of each order.
 
- The default value is \texttt{0.2} ({\it{i.e.}} 20\%).
+ The default value is \texttt{0.2} ({\textit{i.e.}} 20\%).
 }
 
 \echparameter{TUNE\_XBOX}{TUNE_XBOX}{
@@ -6011,7 +5777,7 @@ constant + ax + bx squared + cx cubed
  fit.
 }
 
-\sunspec{\end{description}}{}
+\end{description}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -6071,7 +5837,7 @@ This parameter
 specifies the sequence of operations to perform, where the operations
 are numbered as they would be in an ECHMENU run.  Unless the final
 operation specified is EXIT, then interactive operation is restored
-after all requested operations have been performed. {\it{e.g.}}:
+after all requested operations have been performed. {\textit{e.g.}}:
 \indexcmdname{TUNE_AUTOMATE}
 
 \texttt{echmenu TUNE\_AUTOMATE="'5,6,7,8,EXIT'"}
@@ -6079,8 +5845,8 @@ after all requested operations have been performed. {\it{e.g.}}:
 would do: flat-field, sky, object profile modelling, extract the orders,
 and finally exit.
 
-Alternatively you can create a script containing the sequence of {\sc echomop}
-commands required ({\it{e.g.}} \htmlref{{\tt ech\_trace}}{ech_trace},
+Alternatively you can create a script containing the sequence of \textsc{echomop}
+commands required ({\textit{e.g.}} \htmlref{{\tt ech\_trace}}{ech_trace},
 \htmlref{{\tt ech\_trplt}}{ech_trplt} {\it etc.}) and then invoke
 the script from the shell.
 
@@ -6097,7 +5863,7 @@ values are provided if unattended operation is intended.
 \myindex{Using data from previous reduction}
 \myindex{Reduction database!cloning}
 
-{\sc echomop} provides easy access to facilities to enable previous
+\textsc{echomop} provides easy access to facilities to enable previous
 reductions to be used as baselines for a current reduction. For
 example, the order traces may be in the same positions, the
 wavelength calibrations may be the same {\it etc.}
@@ -6105,7 +5871,7 @@ wavelength calibrations may be the same {\it etc.}
 To include data from previously-created reduction databases the number
 of the option (in ECHMENU main menu) should be followed by a `\texttt{<}'
 character indicating that the information which would otherwise be
-generated should be copied from a previous reduction file. {\it{e.g.}}:
+generated should be copied from a previous reduction file. {\textit{e.g.}}:
 
 \texttt{2<source-file}
 
@@ -6113,10 +5879,10 @@ would copy the order-trace data (created by step 2 of a reduction) from the
 reduction database \texttt{source-file}, instead of calculating the relevant
 values.
 
-To invoke `cloning' when using single-function tasks ({\it{e.g.}}
+To invoke `cloning' when using single-function tasks ({\textit{e.g.}}
 \htmlref{{\tt{ech\_trace}}}{ech_trace}) set
 \htmlref{{\tt{TUNE\_CLONE}}}{par_TUNE_CLONE} to the name of the source
-reduction file. {\it{e.g.}}:
+reduction file. {\textit{e.g.}}:
 
 \texttt{ech\_trace tune\_clone=source-file}
 
@@ -6149,7 +5915,7 @@ should be used:
 \myindex{Multi-object frames}
 \myindex{Fibre-fed spectrographs}
 
-Although {\sc echomop} was written with the UCLES Echelle Spectrograph in mind.
+Although \textsc{echomop} was written with the UCLES Echelle Spectrograph in mind.
 It is in no way limited to processing data from this particular instrument,
 or even, to data from \'{e}chelle spectrographs.  The package can equally well
 be used on multi-object spectra obtained, for example, using popular
@@ -6185,8 +5951,8 @@ following point needs to be remembered:
 \subsection{\mlabel{longslit_spectra}Longslit Spectra}
 \myindex{Longslit spectra}
 
-{\sc echomop} is capable of reducing longslit spectra taken with a variety of
-instruments.  In order to tune {\sc echomop} for this task it will usually be
+\textsc{echomop} is capable of reducing longslit spectra taken with a variety of
+instruments.  In order to tune \textsc{echomop} for this task it will usually be
 necessary to increase the two parameters:
 
 \begin{itemize}
@@ -6197,7 +5963,7 @@ necessary to increase the two parameters:
 
 \item {\texttt{TUNE\_PFLSSAMP}}
 
-      the number of sub-samples in spatial direction ({\it{e.g.}},
+      the number of sub-samples in spatial direction ({\textit{e.g.}},
       10 \sunspec{$\times$}{x} \texttt{TUNE\_MXSKYPIX}).
 
 \end{itemize}
@@ -6208,7 +5974,7 @@ necessary to increase the two parameters:
 \indexcmdname{ECH_SPATIAL}
 
 Although explicit support for extraction of extended objects is not
-provided in this release, it is possible to use {\sc echomop} to extract
+provided in this release, it is possible to use \textsc{echomop} to extract
 an increment at a time.  To do this the normal extraction should first be
 performed to obtain a reliable sky model.  Then the \htmlref{{\tt ech\_spatial}
 task/ECHMENU Option~4}{ech_spatial}
@@ -6224,7 +5990,7 @@ automated using a command file.
 \myindex{CCD}
 \myindex{IPCS}
 
-{\sc echomop} has special facilities for particular detector dependent
+\textsc{echomop} has special facilities for particular detector dependent
 problems. In particular, for CCDs and similar detectors, the data may
 become obscured by cosmic-ray events over a long exposure. The package
 provides 2 different methods of identifying and flagging such pixels. CCDs
@@ -6233,14 +5999,14 @@ to the reduction process. Care must be taken to ensure these values are
 accurate as they can have a severe impact upon the resultant spectrum.
 
 For IPCS detectors, frames can be highly distorted in both X- and
-Y-directions.  {\sc echomop} provides for a detailed 2-D polynomial fit to be
+Y-directions.  \textsc{echomop} provides for a detailed 2-D polynomial fit to be
 made to the distortions present in each order.
 
 
 \subsection{\mlabel{cosmic_rays}Cosmic Rays}
 \myindex{Cosmic rays!location of}
 
-{\sc echomop} provides three major methods of cosmic-ray identification:
+\textsc{echomop} provides three major methods of cosmic-ray identification:
 
 \begin{itemize}
 
@@ -6314,14 +6080,14 @@ Recent developments have led to very significant improvements in this
 area (giving readout noise of less than 1 count per-pixel),  but many
 older chips are still in use.
 
-{\sc echomop} looks for a value for readout noise specified in the data
+\textsc{echomop} looks for a value for readout noise specified in the data
 frame itself (for CCD frames).  If no value can be found then you
 will be prompted for a value by the
 \htmlref{{\tt{READOUT\_NOISE}}}{par_READOUT_NOISE} parameter.
 
 Some of the more modern CCDs use multiple on-chip amplifiers in order
 to provide a rapid readout facility.  Each of these will have its own
-independent readout noise value.  Currently {\sc echomop} assumes that a single
+independent readout noise value.  Currently \textsc{echomop} assumes that a single
 readout noise value is applicable for the whole frame so each sub-section
 of a multiple readout CCD image must be processed separately.
 
@@ -6331,7 +6097,7 @@ of a multiple readout CCD image must be processed separately.
 \myindex{Flux standards}
 \myindex{Standard stars}
 
-This release of {\sc echomop} provides no special support for flux
+This release of \textsc{echomop} provides no special support for flux
 calibration of the extracted spectra.
 \xref{{\sc figaro}}{sun86}{} provides extensive support for this procedure,
 including many standard star data tables.
@@ -6356,7 +6122,7 @@ A limited set of high resolution tables are provided. Type:
 
 to see which ones. These tables may be used with the
 \xref{{\sc figaro}}{sun86}{} flux calibration programs
-to flux calibrate spectra output from {\sc echomop}.
+to flux calibrate spectra output from \textsc{echomop}.
 
 
 \subsection{\mlabel{blaze_function}Blaze Function}
@@ -6444,12 +6210,12 @@ most cases. \indexcmdname{ECH_SCRN2D}
 
 It is often useful when reducing `difficult' data,  to be able to
 examine various intermediate `spectra' generated during the reduction
-process. {\sc echomop} provides a very flexible method of examining any
+process. \textsc{echomop} provides a very flexible method of examining any
 intermediate arrays produced by it or other tasks.  The
 \htmlref{{\tt ech\_plot} task/ECHMENU Option~27}{ech_plot}
 provides zooming, re-binning, re-scaling {\it etc.}
 on any array in the reduction database.  Arrays may be specified by
-name or by using a set of reference names by which {\sc echomop} tasks access
+name or by using a set of reference names by which \textsc{echomop} tasks access
 them.  \indexcmdname{ECH_PLOT} To obtain a directory of known reference names
 use the D(irectory) option in \texttt{ech\_plot}\@.
 
@@ -6457,7 +6223,7 @@ use the D(irectory) option in \texttt{ech\_plot}\@.
 \subsection{\mlabel{heliocentric_corr}Heliocentric Correction}
 \myindex{Heliocentric correction}
 
-{\sc echomop} can apply heliocentric corrections to the output wavelength scales
+\textsc{echomop} can apply heliocentric corrections to the output wavelength scales
 during `Write results' and `Multi-merge' operations.
 In order for this to be possible it is necessary for to provide the package
 with the date and time of the observations involved.
@@ -6478,13 +6244,13 @@ otherwise the applied correction will be shown.
 \section{\mlabel{input_files}INPUT DATA FILES}
 \myindex{Input data files}
 
-{\sc echomop} performs most of its data access via Starlink subroutine
+\textsc{echomop} performs most of its data access via Starlink subroutine
 libraries.
 All data frames should be held in files recognised by the \xref{{\sc
 CONVERT}}{sun55}{} utility.  For efficiency, store your data in the
 Starlink Extensible N-dimesional Data Format (\xref{NDF}{sun33}{}).
 
-A few ASCII format files are also read by {\sc echomop}:
+A few ASCII format files are also read by \textsc{echomop}:
 
 Structure definition files (\texttt{.DEF} files, stored in the
 \texttt{ECHOMOP\_EXEC} directory) are used by the data-access subroutines
@@ -6512,7 +6278,7 @@ At this point it contains a fairly complete record of any intermediate
 results, thus allowing particular sections of a reduction to be tuned
 and repeated as required.
 
-In general you will not need to access the file except via {\sc echomop}.
+In general you will not need to access the file except via \textsc{echomop}.
 The package provides facilities for examining and plotting data from the file.
 You can, however, use \texttt{hdstrace} to look at any data in the file you wish.
 See \xref{SUN/102}{sun102}{} for more details.
@@ -6536,7 +6302,7 @@ names.
 \subsection{\mlabel{saving_disk_space}Saving Disk Space}
 \myindex{Disk space!running out}
 
-{\sc echomop} makes substantial use of disk space throughout the reduction
+\textsc{echomop} makes substantial use of disk space throughout the reduction
 process.  This is due to the intermediate storage of information in the
 reduction file.  Much of the information stored is on a per-order basis.
 For data frames with many orders the disk usage may be substantially
@@ -6559,7 +6325,7 @@ save any space retroactively on reductions  already in progress.
 
 When this procedure is used, it is essential to ensure that the
 per-order mode of operation is used and that the orders are fully
-processed one-by-one. {\it{i.e.}}, flat-field, model sky, extract, and save
+processed one-by-one. {\textit{i.e.}}, flat-field, model sky, extract, and save
 result for order 1,  then for order 2 {\it etc.}  This is because the compact
 version only stores reduction arrays for the last processed order. Thus
 flat-field modelling order 3 and then order 4 would cause the calculated
@@ -6570,8 +6336,8 @@ model for order 3 to be overwritten by the one for order 4.
 \myindex{Arc line lists!format}
 
 Line list files are stored in ASCII format for ease of maintenance.
-{\sc echomop} reads the line list(s) and creates its database file. These
-feature databases are created by {\sc echomop} itself using the ASCII format
+\textsc{echomop} reads the line list(s) and creates its database file. These
+feature databases are created by \textsc{echomop} itself using the ASCII format
 files as input. Line list filenames are expected to have a .ARC
 extension and will be looked for in the directory pointed to by ARCDIRS.
 
@@ -6592,7 +6358,7 @@ where:
 
    {\tt iii.jj}     is an (optional) intensity estimate.
 
-   {\tt text}       is a description of the line {\it{e.g.}}, Th II.
+   {\tt text}       is a description of the line {\textit{e.g.}}, Th II.
 
 \end{quote}
 
@@ -6604,7 +6370,7 @@ of wavelength to be specified:
 \end{terminalv}
 
 The default units are Angstroms.  The units string is only used for output
-messages.  Future {\sc echomop} releases may support greater use of the
+messages.  Future \textsc{echomop} releases may support greater use of the
 wavelength units in constraining fits {\it etc.}
 
 User-created lists should be placed in the directory pointed to by the
@@ -6614,7 +6380,7 @@ User-created lists should be placed in the directory pointed to by the
 \subsection{\mlabel{structure_definition_file}Structure Definition File}
 \myindex{Structure definition files}
 
-Definition files are used by {\sc echomop} to specify the structure of the
+Definition files are used by \textsc{echomop} to specify the structure of the
 files for storing objects produced during the reduction.
 Each of these objects is referred to internally by the package using a
 reference name.  The definition file contains translations of these
@@ -6641,7 +6407,7 @@ Multiple arc lamp images are usually taken to monitor any possible shift
 in the object spectrum which may have occurred during the exposure.
 
 When no shift is evident then the simplest course is to add the two arc
-frames together and provide the result to {\sc echomop} whenever it
+frames together and provide the result to \textsc{echomop} whenever it
 prompts for the arc frame name.
 
 When a shift can be discerned, you must make a judgement as to
@@ -6671,9 +6437,9 @@ features in the object spectrum itself.
 \myindex{Object frames!multiple}
 \myindex{Multiple object frames}
 
-{\sc echomop} is primarily orientated to processing single frame observations.
+\textsc{echomop} is primarily orientated to processing single frame observations.
 Facilities exist in \xref{{\sc figaro}}{sun86}{} for the combining of multiple
-spectra obtained from the reduction of a set of data frames.  {\sc echomop}
+spectra obtained from the reduction of a set of data frames.  \textsc{echomop}
 does however provide
 assistance for the situations where the data frames are well registered,
 removing the necessity for steps such as Order location, tracing, and
@@ -6693,7 +6459,7 @@ For more information see the on-line HELP sub-topic
 If flux calibration is to be done then the calibration frame must be
 presented in a Starlink datafile (\xref{NDF}{sun33}{}) in the same form
 as the data frame.
-{\sc echomop} presently insists that {\bf all} frames are of the same X- and
+\textsc{echomop} presently insists that {\bf all} frames are of the same X- and
 Y-dimensions (a pretty safe bet).  Take care to ensure
 the correct extraction of the calibration frame.  For example, a
 different CCD bias voltage may have been used to that used for the
@@ -6749,7 +6515,7 @@ At this point it contains a fairly complete record of any intermediate
 results, thus allowing particular sections of a reduction to be tuned
 and repeated as required.
 
-In general you will not need to access the file except via {\sc echomop}.
+In general you will not need to access the file except via \textsc{echomop}.
 The package provides facilities for examining and plotting data from the file.
 You can, however, use \texttt{hdstrace} to look at any data in the file you wish.
 See \xref{SUN/102}{sun102}{} for more details.
@@ -6760,7 +6526,7 @@ See \xref{SUN/102}{sun102}{} for more details.
 \myindex{FIGARO!ECHARC}
 
 In order to provide backward compatibility with the extensive line
-fitting \xref{ECHARC}{sun86}{ECHARC} software, {\sc echomop} provides the
+fitting \xref{ECHARC}{sun86}{ECHARC} software, \textsc{echomop} provides the
 ability to
 import/export sets of line positions/identifications between itself
 and ECHARC.  These facilities are provided from the main menu of the
@@ -6776,7 +6542,7 @@ order number, position, and wavelengths of all identified features.
 
 This file has the name \texttt{ECHARC.LIS} and is placed in the current
 directory.
-ECHARC also uses the  arc line reference lists ({\it{i.e.}},
+ECHARC also uses the  arc line reference lists ({\textit{i.e.}},
 \texttt{/arctype/.ARC}) and the same file should of course be used with both
 programs.
 
@@ -6812,7 +6578,7 @@ The orders themselves however, are often not parallel to each other.
 The algorithms used for tracing orders assume the orders run
 approximately in the horizontal direction.  It is therefore necessary to
 rotate any column-parallel frames before reduction (through 90 degrees).
-\myindex{Frame!rotation} {\sc echomop} is very flexible as to the exact
+\myindex{Frame!rotation} \textsc{echomop} is very flexible as to the exact
 order orientation and highly sloped and severely distorted orders can
 usually be extracted without difficulty {\bf provided that a trace
 frame of sufficient quality is provided}.  This will generally be in the
@@ -6820,7 +6586,7 @@ form of a bright star exposure, or a template trace frame such as an
 exposure of a continuum lamp (with a narrow dekker preferably).
 \myindex{Tracing} \myindex{Trace!frame} If the target object under study is
 sufficiently bright, then the object frame itself can of course be used
-as the trace template frame.  {\sc echomop} is capable of tracing very poor
+as the trace template frame.  \textsc{echomop} is capable of tracing very poor
 object frames, {\bf but} with the result that the modelled order positions
 will be less well determined, impacting on all subsequent phases of a
 reduction.   You are encouraged to provide the best
@@ -6857,7 +6623,7 @@ them in a reduction.  Failure to account for the bias may have a
 detrimental effect on the signal-to-noise-ratio (S/N) in the final
 spectrum.
 
-{\sc echomop} does not provide any special facilities for the subtraction
+\textsc{echomop} does not provide any special facilities for the subtraction
 of the bias current from CCD frames.  However, it does require that such
 subtraction be performed {\bf before} processing takes place.
 The bias subtraction may often be done automatically at the observatory
@@ -6883,7 +6649,7 @@ error it may be desirable to determine the error due to bias subtraction
 on a pixel-by-pixel basis using many frames.
 The resulting error estimates must then be copied into the object data
 frames error arrays.
-{\sc echomop} will incorporate these errors when calculating the
+\textsc{echomop} will incorporate these errors when calculating the
 variances on the extracted spectra.
 
 \subsection{\mlabel{CCD_overscan}CCD Overscan Region}
@@ -6930,7 +6696,7 @@ median of a large number of runs where possible. If you wish to include
 the errors on the flat-field then they should be placed in the flat-field
 variance array.  If no variance estimates are provided then
 root-N statistics will be assumed.\myindex{Variance}
-{\sc echomop} can utilise different flat-field frames for different orders if
+\textsc{echomop} can utilise different flat-field frames for different orders if
 required.
 
 \subsection{\mlabel{CCD_adu_to_photon}CCD Correction From Observed
@@ -6956,14 +6722,14 @@ easily investigated. This is because the arc spectrum is always
 extracted in an identical manner to that of the object; using the first
 (and in this case only) supplied arc frame. As with the flat-field frame
 it may also be advantageous to take multiple arc frames, each exposed
-correctly to ensure high S/N in particular orders.  {\sc echomop} can
+correctly to ensure high S/N in particular orders.  \textsc{echomop} can
 use a different arc frame for each order if required.
 
 \subsection{\mlabel{frame_preparation}Preparing for a Reduction}
 \myindex{Frame!preparation}
 
 All raw data should be pre-processed in the following ways before
-using {\sc echomop}:
+using \textsc{echomop}:
 
 \begin{itemize}
 
@@ -6983,7 +6749,7 @@ using {\sc echomop}:
 
 \item \myindex{ADUs}
       DO NOT multiply (CCD) frames by the prevailing ADU to electron
-      conversion factor prior to reduction.  {\sc echomop} tasks prompt for
+      conversion factor prior to reduction.  \textsc{echomop} tasks prompt for
       this value and use it to generate resulting spectra with counts in
       photons.
 
@@ -7186,7 +6952,7 @@ write-protected, or a disk quota being exceeded.
 
 \subsection{\mlabel{feature_list_too_small} Feature List Too Small}
 
-{\sc echomop} uses a special arc line information database to optimise its
+\textsc{echomop} uses a special arc line information database to optimise its
 search algorithm. This algorithm requires sets of approx. 12 lines with
 which to work. The database consists of lines and their 10 nearest
 neighbours on each side (l/r).  The arc-line list supplied (\texttt{.ARC} file)
@@ -7379,7 +7145,7 @@ database creation} If you wish to create a private database for your
 personally specified line list then use task \texttt{ech\_ftrdb} to do so. If
 you are not trying to create a private database then the most likely
 problem is that the environment-variable ARCDIRS has not been used to prefix
-the arc database name ({\it{e.g.}}, ARCDIRS:THAR),
+the arc database name ({\textit{e.g.}}, ARCDIRS:THAR),
 or that the named arc database does not exist (ask the system
 manager).
 
@@ -7395,14 +7161,14 @@ environment-variable.  The default search path is:
 
    {\tt ADAM\_USER} --- ADAM user directory.
 
-   {\tt ECHOMOP\_EXEC } --- {\sc echomop} base directory.
+   {\tt ECHOMOP\_EXEC } --- \textsc{echomop} base directory.
 
 \end{quote}
 
 \subsection{\mlabel{not_a_reduction_format} Not a Reduction Format}
 
 The specified file exists {\bf but} is not a reduction database as
-defined by {\sc echomop} tasks. The most probable cause is that a data frame
+defined by \textsc{echomop} tasks. The most probable cause is that a data frame
 file name has been provided by mistake.
 
 The reduction database {\bf must} be created before the reduction
@@ -7456,7 +7222,7 @@ object in question does not exist in the reduction file specified
 (either using \texttt{TUNE\_CLONE} or the \texttt{<} indirection operator in
 ECHMENU), or that the object is dimensioned differently from the
 corresponding object in the primary reduction database. Objects
-can only be copied when their dimensionalities are identical ({\it{i.e.}} they
+can only be copied when their dimensionalities are identical ({\textit{i.e.}} they
 have the same number of X-pixels, number of orders {\it etc.}).
 
 To check the dimensions of the object you are trying to clone from, use
@@ -7532,7 +7298,7 @@ they describe the many changes from the previous, v3.2-0, release.
 \item In the plotter, the ASCII-dump option now produces a files which
    DIPSO SP2RD can read.  The output filename is no longer fixed.
 \item Deferred PGPLOT errors (which would be reported on exit from
-   {\sc echomop}) have been removed.
+   \textsc{echomop}) have been removed.
 \item The value \texttt{none} is now acceptable to indicate that no flat
    field (\htmlref{{\tt{FFIELD}}}{par_FFIELD} parameter) or no arc
    (\htmlref{{\tt{ARC}}}{par_ARC} parameter) is to  be used.
@@ -7687,7 +7453,7 @@ describe the many changes from the previous, v3.1-0, release.
 \subsubsection{Other changes}
 
 \begin{itemize}
-\item {\sc echomop} no longer uses the NAG library.
+\item \textsc{echomop} no longer uses the NAG library.
 \item The module definition database has been removed.  Modules are defined
    as the program starts up.
 \item Only one call to PSX\_UNAME is made per invocation of the monolith.
@@ -7729,7 +7495,7 @@ describe the many changes from the previous, v3.1-0, release.
 \item Many FORMAT statements have been changed by the addition of `1P'
    scale factors.  This makes output numbers easier to read.
 \item The files ech\_loop\_nvariable.f and ech\_loop\_variable.f have been
-   removed due to the process of speeding up the main {\sc echomop} routine
+   removed due to the process of speeding up the main \textsc{echomop} routine
    and introduction of extra functions.
 \item The IDX\_ parameters were being typed as \_REAL by the program whilst
    they were (correctly) declared as \_INTEGER in interface files.
@@ -7851,7 +7617,7 @@ describe the many changes from the previous, v3.1-0, release.
    feature up in wavelength.
 \item Arc line database files no longer have to have write access enabled.
    This means that files in \texttt{\$ARCDIRS} do not have to be copied to an
-   {\sc echomop} user's working directory.
+   \textsc{echomop} user's working directory.
 \item Several missing parameters have been added to the interface files.
 \item An infinite loop on detection of bad columns or rows in {\tt ech\_fcheck}
    has been removed.
@@ -7868,7 +7634,7 @@ describe the many changes from the previous, v3.1-0, release.
    \_INTEGER.  It is now \_REAL.
 \item Several internal changes to the scrunching routines have been made to
    prevent scrunched spectra being reflected in the wavelength axis,
-   {\it{i.e.}}, all the fluxes being negative.
+   {\textit{i.e.}}, all the fluxes being negative.
 \item Errors in the sky modeller which would lead to attempted processing
    of points outside the bounds of an image have been removed.
 \item The sky modeller now filters out bad-pixel values.
@@ -7886,7 +7652,7 @@ describe the many changes from the previous, v3.1-0, release.
    this case.  In the same way, Options 11.3 and 11.4 now also work as
    elements in a {\tt TUNE\_AUTOMATE} request.
 \item NDF\_SQMF has been used to switch off automatic QUALITY component
-   checking as {\sc echomop} does this itself.
+   checking as \textsc{echomop} does this itself.
 \item The copy-last-plot-to-hardcopy device option in {\tt ech\_plotter}
    now works.
 \item Several divide-by-zero opportunities in the 2-D sky modeller have been
@@ -7902,535 +7668,7 @@ describe the many changes from the previous, v3.1-0, release.
 % We could include the sun152.ind file here with \printindex (requires
 % \usepackage{makeidx} at the top), but instead we paste the generated
 % index in in place.
-\begin{theindex}
-
-  \item 2-D distortion, 37
-    \subitem viewing, 82
-  \item \cmdname {2D_INTERACT}, 77
-
-  \indexspace
-
-  \item Abort
-    \subitem option, 5
-  \item Accept character, 3
-  \item ADAM
-    \subitem data files, 90
-    \subitem from spawned process, 50
-    \subitem parameters, 5
-  \item ADUs, 89, 90
-  \item All order processing, 46
-  \item \cmdname {ARC}, 51
-  \item Arc calibration
-    \subitem none, 8
-  \item Arc fitting
-    \subitem blends, 30
-    \subitem clear, 31
-    \subitem delete line, 31
-    \subitem hardcopies, 32
-    \subitem list known lines, 31
-    \subitem new line, 31
-    \subitem set wavelength, 32
-  \item Arc frames, 82
-    \subitem multiple, 85
-  \item Arc lamp frames, 90
-  \item Arc line
-    \subitem calibration, 7, 29
-    \subitem FWHM, 7, 28
-    \subitem FWHM fit, 7
-    \subitem location, 7, 27
-  \item Arc line database creation, 96
-  \item Arc line lists
-    \subitem format, 84
-  \item \cmdname {ARC_TYPE}, 52
-  \item \cmdname {ASCII_FILE}, 52
-  \item \cmdname {AUTO}, 52
-  \item \cmdname {AUTO_ID}, 52
-  \item Automation, 8, 77
-    \subitem functions, 8
-    \subitem requirements, 8
-
-  \indexspace
-
-  \item Bad row/column, 10, 89
-  \item \cmdname {BAD_ORDER}, 52
-  \item Batch processing, 78
-  \item \cmdname {BIN_SIZE}, 52
-  \item Blaze, 82
-  \item \cmdname {BLZ_INTERACT}, 53
-  \item \cmdname {BLZ_NPOLY}, 53
-  \item \cmdname {BLZFIT}, 52
-
-  \indexspace
-
-  \item CCD, 80
-    \subitem bias, 88, 90
-    \subitem dark count, 89
-    \subitem overscan region, 89
-  \item \cmdname {CENTRAL_ONUM}, 53
-  \item \cmdname {CENTRAL_WAVE}, 53
-  \item Cloning, 78
-    \subitem failure, 97
-  \item Closedown, 51
-  \item Continuum lamp, 89
-  \item Copy line identifications, 79
-  \item Cosmic rays, 7, 11, 90
-    \subitem coincidence checking, 42, 81
-    \subitem imaging, 42
-    \subitem location of, 80
-    \subitem order location, 11
-    \subitem post-trace location, 41
-    \subitem using Horne algorithm, 26
-    \subitem when to locate, 21
-  \item \cmdname {CR_OUTPUT}, 53
-
-  \indexspace
-
-  \item Data frames, 84
-  \item Data quality, 42
-  \item \cmdname {DECIMG}, 53
-  \item Dekker, 89
-  \item Dekker limits, 7, 19
-    \subitem failure, 94
-  \item Delete order, 47
-  \item Demonstration, 2, 8
-  \item Disable order, 47
-  \item Disk space
-    \subitem running out, 84
-  \item \cmdname {DISPLAY}, 53
-
-  \indexspace
-
-  \item \cmdname {ECH_ALL}, 46
-  \item \cmdname {ECH_BLAZE}, 34
-  \item \cmdname {ECH_COUNT}, 11
-  \item \cmdname {ECH_DECIMG}, 42
-  \item \cmdname {ECH_DECOS1}, 90
-  \item \cmdname {ECH_DECOS2}, 41
-  \item \cmdname {ECH_DISABLE}, 47
-  \item \cmdname {ECH_ECHAR}, 54
-  \item \cmdname {ECH_EXIT}, 51
-  \item \cmdname {ECH_EXT2D}, 37
-  \item \cmdname {ECH_EXTRCT}, 26
-  \item \cmdname {ECH_FFIELD}, 22
-  \item \cmdname {ECH_FITORD}, 15
-  \item \cmdname {ECH_FTRDB}, 54
-  \item \cmdname {ECH_GENFLAT}, 50
-  \item \cmdname {ECH_IDWAVE}, 29, 79
-  \item \cmdname {ECH_LINLOC}, 27
-  \item \cmdname {ECH_LOCATE}, 10
-  \item \cmdname {ECH_MDLBCK}, 45, 82
-  \item \cmdname {ECH_MENU}, 50
-  \item \cmdname {ECH_MULMRG}, 44
-  \item \cmdname {ECH_PLOT}, 47, 83
-  \item \cmdname {ECH_PROFILE}, 25
-  \item \cmdname {ECH_QEXTR}, 43
-  \item \cmdname {ECH_RDCTN}, 54
-  \item \cmdname {ECH_RDUCD}, 54
-  \item \cmdname {ECH_RESULT}, 39
-  \item \cmdname {ECH_SCRN2D}, 82
-  \item \cmdname {ECH_SCRUNCH}, 35
-  \item \cmdname {ECH_SINGLE}, 46
-  \item \cmdname {ECH_SKY}, 24
-  \item \cmdname {ECH_SPATIAL}, 19, 24, 80
-  \item \cmdname {ECH_STRUCT}, 54
-  \item \cmdname {ECH_SYSTEM}, 50
-  \item \cmdname {ECH_TRACE}, 13
-  \item \cmdname {ECH_TRCSIS}, 40
-  \item \cmdname {ECH_TRPLT}, 15, 40
-  \item \cmdname {ECH_TUNER}, 5, 46
-  \item \cmdname {ECH_WVCSIS}, 43
-  \item \cmdname {ECHARC} data exchange, 30
-  \item \cmdname {ECHHELP}, 10
-  \item Errors
-    \subitem additive, 9
-    \subitem arrays, 9
-    \subitem due to cosmic rays, 9
-    \subitem multiplicative, 9
-    \subitem on flat field, 23
-    \subitem output, 9
-    \subitem Sky model, 9
-  \item Exit, 51
-  \item Exposure duration, 90
-  \item Extended object frames, 80
-  \item \cmdname {EXTRACT_MODE}, 54
-  \item Extraction, 7, 26
-    \subitem quick-look, 8, 26, 43
-  \item Extraction limits, 7
-
-  \indexspace
-
-  \item \cmdname {FFIELD}, 54
-  \item Fibre-fed spectrographs, 79
-  \item FIGARO
-    \subitem ECHARC, 87
-    \subitem ICSUB, 88
-    \subitem IMAGE, 47
-    \subitem SCRUNCH, 36
-    \subitem SETOBJ command, 11
-    \subitem SOFT, 4
-  \item \cmdname {FLAG}, 55
-  \item Flat field, 7, 22, 89
-    \subitem defines dekker, 19
-    \subitem errors, 9
-    \subitem none, 23
-  \item \cmdname {FLTFIT}, 23, 55
-  \item Flux calibration, 81
-    \subitem frames, 86
-  \item Flux standards, 81
-  \item Frame
-    \subitem dimensions, 7, 10
-    \subitem preparation, 90
-    \subitem rotation, 88, 90, 91
-  \item Frame dimensions, 91
-  \item \cmdname {FRAME_CHECK}, 55
-
-  \indexspace
-
-  \item Graphics
-    \subitem hardcopy, 4
-    \subitem multiple per screen, 49
-    \subitem null device, 4
-    \subitem plot utility, 47
-    \subitem setting device, 4
-
-  \indexspace
-
-  \item \cmdname {HARD}, 55
-  \item \cmdname {HELIO_COR}, 55
-  \item Heliocentric correction, 83
-  \item Help, 4, 10
-  \item \cmdname {HI_WAVE}, 55
-  \item Hidden parameters
-    \subitem edit, 46
-
-  \indexspace
-
-  \item \cmdname {ID_INTERACTIVE}, 56
-  \item \cmdname {IDX_NREF_FRAME}, 55
-  \item \cmdname {IDX_NUM_ORDERS}, 55
-  \item Ignore order, 47
-  \item Image display, 5
-    \subitem use by monolith, 5
-  \item \cmdname {INDIRECT}, 56
-  \item \cmdname {INPTIM}, 56
-  \item Input data files, 83
-  \item IPCS, 80
-
-  \indexspace
-
-  \item KAPPA
-    \subitem CSUB, 88
-
-  \indexspace
-
-  \item Locating orders, 7, 11
-    \subitem failure, 92
-  \item Longslit spectra, 79
-  \item \cmdname {LOW_WAVE}, 56
-
-  \indexspace
-
-  \item Main menu
-    \subitem monolith, 10
-  \item Manual dekker limits, 21
-  \item Manual object limits, 21
-  \item Manually set order path, 14
-  \item Masks
-    \subitem sky/object, 19
-  \item \cmdname {MAX_DISPERSION}, 56
-  \item Memory
-    \subitem running out, 91
-  \item Merge multiple spectra, 36, 44
-  \item \cmdname {MIN_DISPERSION}, 56
-  \item Monolith, 3
-  \item Multi-object frames, 79
-  \item Multiple data frames, 6
-  \item Multiple object frames, 8, 36, 44, 81, 86
-
-  \indexspace
-
-  \item \cmdname {NREF_FRAME}, 57
-  \item \cmdname {NUM_ORDERS}, 57
-
-  \indexspace
-
-  \item \cmdname {OBJ_SKY_GAP}, 57
-  \item Object
-    \subitem profile, 7
-  \item Object frames
-    \subitem multiple, 86
-  \item Object limits, 7, 19
-    \subitem failure, 94
-  \item Object profile, 25
-  \item \cmdname {OBJFIT}, 57
-  \item Observing Hints, 88
-  \item Option
-    \subitem abort, 5
-    \subitem selection of, 3
-  \item Order
-    \subitem blaze, 34
-    \subitem disabling, 16
-    \subitem location, 7, 11
-    \subitem process single, 46
-    \subitem ripple, 7
-    \subitem slope, 7, 11
-    \subitem trace optimisation, 15
-    \subitem trace plotting, 40
-    \subitem traces consistency check, 40
-    \subitem tracing, 7, 13
-    \subitem tracing failure, 95
-    \subitem viewing traces, 15
-  \item Orientation of frames, 29
-  \item Orientation of spectra, 88
-  \item Output, 8, 39
-  \item Output files, 86
-  \item \cmdname {OUTPUT_IMAGE}, 57
-  \item Overlaying graphs, 49
-
-  \indexspace
-
-  \item Parameters, 5
-    \subitem edit tuning, 46
-    \subitem hidden, 5
-    \subitem tuning, 5
-  \item Partial orders, 13
-  \item \cmdname {PFL_INTERACT}, 21, 57
-  \item \cmdname {PFL_MODE}, 57
-  \item Photon counting statistics, 89
-  \item \cmdname {PHOTON_TO_ADU}, 58
-  \item Pixel response variations, 22
-  \item Plot styles, 49
-  \item Plotter, 47
-    \subitem image browse, 47
-    \subitem known objects, 48
-    \subitem overlaying, 49
-    \subitem rebinning, 49
-    \subitem set limits, 48
-    \subitem subsets, 48
-  \item Profile
-    \subitem object, 7
-  \item Prompt, 4
-    \subitem disabling, 5
-
-  \indexspace
-
-  \item Quality array, 42
-  \item Quick-look extraction, 8, 26, 43
-  \item Quick-look mode, 9
-
-  \indexspace
-
-  \item \cmdname {RBNOBJ}, 58
-  \item Re-binning
-    \subitem 2-D, 38
-    \subitem using plotter, 49
-  \item Readout noise, 9, 81
-  \item \cmdname {READOUT_NOISE}, 58
-  \item Reduction database, 3, 83
-    \subitem cannot create, 96
-    \subitem cloning, 78
-    \subitem readonly, 97
-  \item Repeating steps, 6
-  \item \cmdname {RESULT_FORMAT}, 58
-  \item \cmdname {RESULT_TYPE}, 58
-  \item Results, 8
-    \subitem output of, 39
-  \item Ripple, 82
-  \item Ripple correction, 34
-  \item Running out of memory, 91
-
-  \indexspace
-
-  \item Saturated pixels, 10
-  \item Saving results, 86
-  \item Scattered light, 82
-  \item Scrunch
-    \subitem arc, 7
-    \subitem object, 7
-  \item \cmdname {SCRUNCH_TYPE}, 58
-  \item Scrunching, 35
-  \item \cmdname {SET_WSCALE}, 59
-  \item Signal-to-noise, optimal extraction, 26
-  \item Single step tasks, 6
-  \item Sky
-    \subitem errors, 9
-    \subitem model, 7
-    \subitem noise simulation, 24
-    \subitem subtraction, 24
-  \item Sky lines, 81
-  \item \cmdname {SKYFIT}, 59
-  \item \cmdname {SLITIM}, 59
-  \item Slope of orders, 7
-  \item \cmdname {SOFT}, 59
-  \item Spatial profile, 25
-  \item Spatial subsampling, 25
-  \item Spatially resolved spectra, 19
-  \item Spawning a subprocess, 50
-  \item \cmdname {STACK}, 59
-  \item Standard reduction
-    \subitem sequence, 10
-  \item Standard stars, 81
-  \item \cmdname {START_WAVE}, 59
-  \item Starting a reduction, 10
-  \item Starting up, 3
-  \item Structure definition files, 85
-  \item Sub-options, 8
-    \subitem selection of, 4
-  \item System commands, 50
-
-  \indexspace
-
-  \item Trace
-    \subitem consistency, 14, 40
-    \subitem frame, 88
-    \subitem order paths, 13
-    \subitem orders, 7
-  \item \cmdname {TRACE_MODE}, 59
-  \item \cmdname {TRACIM}, 60
-  \item Tracing, 88
-  \item Tracing order paths
-    \subitem failure, 95
-  \item \cmdname {TRC_INTERACT}, 60
-  \item \cmdname {TRC_NPOLY}, 61
-  \item \cmdname {TRC_VETO}, 61
-  \item \cmdname {TRCFIT}, 60
-  \item Trouble-shooting, 83
-  \item \cmdname {TUNE_AAACODE}, 61
-  \item \cmdname {TUNE_AIRTOVAC}, 61
-  \item \cmdname {TUNE_ARCHIVE}, 62
-  \item \cmdname {TUNE_AUTLOC}, 11, 62, 77
-  \item \cmdname {TUNE_AUTOID}, 78
-  \item \cmdname {TUNE_AUTOMATE}, 62, 78
-  \item \cmdname {TUNE_BATCH}, 62, 77
-  \item \cmdname {TUNE_BLZRSET}, 34, 62
-  \item \cmdname {TUNE_CLONE}, 62
-  \item \cmdname {TUNE_CLPBY}, 63
-  \item \cmdname {TUNE_CLPMXDEV}, 63
-  \item \cmdname {TUNE_CNSDEV}, 40, 63
-  \item \cmdname {TUNE_CRCLEAN}, 26, 63
-  \item \cmdname {TUNE_CRINTER}, 63
-  \item \cmdname {TUNE_CRMAX}, 63
-  \item \cmdname {TUNE_CRTRC}, 11, 64, 77, 90
-  \item \cmdname {TUNE_CRXBOX}, 64
-  \item \cmdname {TUNE_CRYBOX}, 64
-  \item \cmdname {TUNE_DB_SCOPE}, 64
-  \item \cmdname {TUNE_DEKABV}, 64
-  \item \cmdname {TUNE_DEKBLW}, 64
-  \item \cmdname {TUNE_DEKTHR}, 64
-  \item \cmdname {TUNE_DIAGNOSE}, 64
-  \item \cmdname {TUNE_DPRBTHR}, 65
-  \item \cmdname {TUNE_DSGMTHR}, 65
-  \item \cmdname {TUNE_FCHECK}, 10, 11, 65, 77
-  \item \cmdname {TUNE_FFINTER}, 65
-  \item \cmdname {TUNE_FFLMED}, 65
-  \item \cmdname {TUNE_FFLSMP}, 65
-  \item \cmdname {TUNE_FFNXPLY}, 66
-  \item \cmdname {TUNE_FFNXREJ}, 66
-  \item \cmdname {TUNE_FFNYPLY}, 66
-  \item \cmdname {TUNE_FFNYREJ}, 66
-  \item \cmdname {TUNE_FFSUBSMP}, 66
-  \item \cmdname {TUNE_FFTHRESH}, 66
-  \item \cmdname {TUNE_FIBRES}, 67
-  \item \cmdname {TUNE_FINCPLY}, 67
-  \item \cmdname {TUNE_FLUX}, 67
-  \item \cmdname {TUNE_HELIO}, 67
-  \item \cmdname {TUNE_IDINMN}, 67
-  \item \cmdname {TUNE_IDINMX}, 67
-  \item \cmdname {TUNE_IDMDLT}, 67
-  \item \cmdname {TUNE_IDMXDIF}, 67
-  \item \cmdname {TUNE_IDSDLT}, 68
-  \item \cmdname {TUNE_IDSTRNG}, 68
-  \item \cmdname {TUNE_INTR}, 68
-  \item \cmdname {TUNE_IUE}, 68
-  \item \cmdname {TUNE_LOG}, 68
-  \item \cmdname {TUNE_MAX2DPLY}, 68
-  \item \cmdname {TUNE_MAX2DPNTS}, 68
-  \item \cmdname {TUNE_MAXLINES}, 68
-  \item \cmdname {TUNE_MAXPOLY}, 68
-  \item \cmdname {TUNE_MAXRFLN}, 69
-  \item \cmdname {TUNE_MERGE}, 69
-  \item \cmdname {TUNE_MINCR}, 69
-  \item \cmdname {TUNE_MRGMAXX}, 69
-  \item \cmdname {TUNE_MRGMINX}, 69
-  \item \cmdname {TUNE_MRGWGHT}, 44, 69
-  \item \cmdname {TUNE_MXBADSMP}, 69
-  \item \cmdname {TUNE_MXSKYPIX}, 69
-  \item \cmdname {TUNE_MXSMP}, 69
-  \item \cmdname {TUNE_NOARC}, 70
-  \item \cmdname {TUNE_NOFLAT}, 23, 70
-  \item \cmdname {TUNE_OBJABV}, 70
-  \item \cmdname {TUNE_OBJBLW}, 70
-  \item \cmdname {TUNE_OBJPOLY}, 25, 70
-  \item \cmdname {TUNE_OBJREJ}, 70
-  \item \cmdname {TUNE_OBJRTHR}, 71
-  \item \cmdname {TUNE_PAGE}, 71
-  \item \cmdname {TUNE_PARTORD}, 71
-  \item \cmdname {TUNE_PFLSSAMP}, 25, 71
-  \item \cmdname {TUNE_PFSAMP}, 71
-  \item \cmdname {TUNE_PREBAL}, 23, 71
-  \item \cmdname {TUNE_QUAD}, 72
-  \item \cmdname {TUNE_QUICK}, 9, 72
-  \item \cmdname {TUNE_REPORT}, 72
-  \item \cmdname {TUNE_REVCHK}, 29, 72
-  \item \cmdname {TUNE_RFLNTHR}, 72
-  \item \cmdname {TUNE_SATRTN}, 10, 73
-  \item \cmdname {TUNE_SCFRACT}, 73, 82
-  \item \cmdname {TUNE_SCRADD}, 73
-  \item \cmdname {TUNE_SCRMODE}, 73
-  \item \cmdname {TUNE_SKEW}, 73
-  \item \cmdname {TUNE_SKVRCORR}, 73
-  \item \cmdname {TUNE_SKYHILIM}, 74
-  \item \cmdname {TUNE_SKYINTER}, 74
-  \item \cmdname {TUNE_SKYLINW}, 24, 74
-  \item \cmdname {TUNE_SKYLTHR}, 24, 74
-  \item \cmdname {TUNE_SKYPOLY}, 74
-  \item \cmdname {TUNE_SKYREJ}, 75
-  \item \cmdname {TUNE_SKYRTHR}, 75
-  \item \cmdname {TUNE_SKYSIM}, 24, 75
-  \item \cmdname {TUNE_SKYXPLY}, 75
-  \item \cmdname {TUNE_TRCNS}, 40, 75
-  \item \cmdname {TUNE_TWTHR}, 75
-  \item \cmdname {TUNE_UHRF}, 76
-  \item \cmdname {TUNE_USE_NXF}, 19, 25, 76
-  \item \cmdname {TUNE_USEAAA}, 76
-  \item \cmdname {TUNE_XBOX}, 76
-  \item \cmdname {TUNE_XZONE}, 76
-  \item \cmdname {TUNE_YBLAZE}, 76
-  \item \cmdname {TUNE_YZONE}, 77
-  \item Tuning parameters
-    \subitem edit, 46
-
-  \indexspace
-
-  \item UCLES, 90
-  \item \cmdname {USE_MEDIAN}, 77
-  \item User-calculated balance factors, 23
-  \item Using data from previous reduction, 78
-
-  \indexspace
-
-  \item Variance, 9, 89
-  \item Viewing spectra, 83
-
-  \indexspace
-
-  \item \cmdname {W2_NX_POLY}, 77
-  \item \cmdname {W2_NY_POLY}, 77
-  \item \cmdname {W_NPOLY}, 77
-  \item Wavelength calibration, 7, 29
-    \subitem fibre data, 79
-    \subitem none, 8
-  \item Wavelength scales
-    \subitem 2-D, 38
-    \subitem cloning, 78
-    \subitem consistency check, 43
-    \subitem reversed, 29
-  \item \cmdname {WAVFIT}, 77
-  \item Weighting
-    \subitem during co-addition, 36
-    \subitem during extraction, 26
-
-\end{theindex}
+\printindex
 
 
 % ? End of main text

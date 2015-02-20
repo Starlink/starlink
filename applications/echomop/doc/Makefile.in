@@ -15,7 +15,7 @@ $(LATEX_DOCS): sun152/sun152.tex
 	cd sun152; tar cf ../$@ sun152.tex sun152_*.pdf
 
 sun152.pdf: sun152/sun152.tex
-	cd sun152; TEXINPUTS=$(STARLINK)/share/latexsupport//:$(TEXINPUTS) pdflatex sun152; TEXINPUTS=$(STARLINK)/share/latexsupport//:$(TEXINPUTS) pdflatex sun152; cd -; $(LN_S) sun152/sun152.pdf sun152.pdf
+	cd sun152; TEXINPUTS=$(STARLINK)/share/latexsupport//:$(TEXINPUTS) pdflatex sun152; makeindex sun152; TEXINPUTS=$(STARLINK)/share/latexsupport//:$(TEXINPUTS) pdflatex sun152; cd -; $(LN_S) sun152/sun152.pdf sun152.pdf
 
 $(HYPERTEXT_DOCS): sun152/sun152.htx/sun152.html
 	cd sun152; tar cf ../$@ sun152.htx
