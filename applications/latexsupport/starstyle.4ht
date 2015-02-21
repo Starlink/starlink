@@ -8,20 +8,35 @@
 % Set up the places to cut and the places to put tocs.
 \ifwithchapters
    \typeout{...WithChapters starlinkxhtml.cfg...}
-   \CutAt{chapter}
-   \CutAt{part}
-   \TocAt{chapter,section,subsection,sstrefsection}
-   \TocAt{part,chapter,section,subsection,sstrefsection}
+   \ifmultipage
+     \typeout{... typesetting html across multiple pages...}
+     \CutAt{chapter}
+     \CutAt{part}
+     \TocAt{chapter,section,subsection,sstrefsection}
+     \TocAt{part,chapter,section,subsection,sstrefsection}
+     \else
+     \typeout{... single page...}
+    \fi
 \else
    \typeout{...WithoutChapters stalrinkxhtml.cfg...}
-   \CutAt{section}
-   \TocAt{section,subsection,sstrefsection}
+   \ifmultipage
+     \typeout{... typesetting html across multiple pages...}
+     \CutAt{section}
+     \TocAt{section,subsection,sstrefsection}
+     \else
+     \typeout{... single page...}
+   \fi
 \fi
-\CutAt{appendix}
-\Configure{+CutAt}{appendix}{[}{]}
-\TocAt{appendix, section, subsection, sstrefsection}
-\CutAt{sstrefsection,sstrefsection}
-\Configure{+CutAt}{sstrefsection}{[}{]}
+\ifmultipage
+  \typeout{... typesetting html across multiple pages...}
+  \CutAt{appendix}
+  \Configure{+CutAt}{appendix}{[}{]}
+  \TocAt{appendix, section, subsection, sstrefsection}
+  \CutAt{sstrefsection,sstrefsection}
+  \Configure{+CutAt}{sstrefsection}{[}{]}
+\else
+  \typeout{.... single page...}
+\fi
 
 
 %%% Index -- don't want to produce this on html

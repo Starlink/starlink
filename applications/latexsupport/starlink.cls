@@ -20,10 +20,16 @@
 \newif\ifwithabs
 \withabstrue
 
+% If all one page (affects html output only)
+\newif\ifmultipage
+\multipagetrue
+
+% Declare the options.
 \DeclareOption{chapters}{\withchapterstrue}
 \DeclareOption{twoside}{\twosidetrue}
 \DeclareOption{nolof}{\withloffalse}
 \DeclareOption{noabs}{\withabsfalse}
+\DeclareOption{onepage}{\multipagefalse}
 
 % Pass all options not defined above to the classes.
 % (Must be done before process options)
