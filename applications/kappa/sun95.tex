@@ -12310,21 +12310,18 @@ number of parameters are large, and usually occur because they depend
 on the value of another parameter.  These are denoted by a curly
 brace; the parameters on each line are related, and each line is
 mutually exclusive.  An example should clarify.
-\bigskip
+%\bigskip
 
-{\ssttt \hspace*{1.0em}
-      contour ndf [comp] mode ncont [key] [device]
-        \newline\hspace*{1.5em}
-        $\left\{ {\begin{tabular}{l}
-                  low=? high=? \\
-                  percentiles=? \\
-                  sigmas=?
-                  \end{tabular} }
-        \right.$
-        \newline\hspace*{1.9em}
-        \makebox[0mm][c]{\small mode}
-}
-\bigskip
+     \begin{tabular}{c l}
+      \texttt{contour ndf [comp] mode ncont [key] [device]} &
+      {  $\begin{cases}
+          \mathtt{low=?\ high=?} \\
+          \mathtt{percentiles=?} \\
+          \mathtt{sigmas=?}
+        \end{cases} $}\\
+      & \texttt{mode}\\
+    \end{tabular}
+
 
 NDF, COMP, MODE, NCONT, KEY, DEVICE, and SMOOTHING are all positional
 parameters.  Only NDF, MODE, and NCONT would be prompted if not given
