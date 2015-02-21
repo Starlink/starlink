@@ -1,11 +1,16 @@
 %  Shortcuts
 %  ---------
 
+
+%% Note that due to limitations in tex4ht, you need to use \sb for _
+%% and \sp for ^ if the macro is defined before the \begin{document}
+%% command.
+
 % Typographical shortcuts
-\newcommand{\fcfbe}{\ensuremath{\mathrm{FCF_{beamequiv}}}}
-\newcommand{\fcfb}{\ensuremath{\mathrm{FCF_{beam}}}}
-\newcommand{\fcfa}{$\mathrm{FCF_{arcsec}}$}
-\newcommand{\fcfm}{$\mathrm{FCF_{match}}$}
+\newcommand{\fcfbe}{\ensuremath{\mathrm{FCF\sb{beamequiv}}}}
+\newcommand{\fcfb}{\ensuremath{\mathrm{FCF\sb{beam}}}}
+\newcommand{\fcfa}{$\mathrm{FCF\sb{arcsec}}$}
+\newcommand{\fcfm}{$\mathrm{FCF\sb{match}}$}
 
 % Starlink Package name
 \newcommand{\starlink}{\href{http://starlink.jach.hawaii.edu}{Starlink}}
