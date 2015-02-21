@@ -1,11 +1,14 @@
 /* css.sty */
+
 /*Basic body styling */
 html{
     background-color:silver;
 }
+
 body{
     background-color:white;
 }
+
 /* Set up css for the spans:*/
 .sc{font-variant: small-caps;}
 
@@ -20,10 +23,10 @@ body{
     font-family: "Droid Sans Mono",monospace;
     white-space: normal;
     font-size: 85%;
-    line-space:85%
+    line-space:85%;
 }
 
-/* terminal listings*/
+/* terminal listings and similar*/
 .terminalv,.verb,.verbatim,.fancyvrb,pre{
     font-family: "Droid Sans Mono",monospace;
     white-space: nowrap;
@@ -44,11 +47,12 @@ body{
 }
 
 /*.titlesection{font-size: 100%; line-height: 120%; width:100%}*/
-span.sctitleformat{
+div.titleformat{
     font-size: 200%;
-    line-height: 100%;
+    line-height: 150%;
     text-align: center;
     display: block;
+    font-weight: bold;
 }
 
 /*General css for regular body:*/
@@ -65,20 +69,22 @@ body{
     font-size: 1em;
     line-height: 130%;
     border: 1px solid #fefeef;
-    /*border-radius:8px;*/
     padding:1em 3em;
 }
 
 /*Turn off indenting of text.*/
-p.indent{ text-indent: 0em }
-
-
+p.indent{
+    text-indent: 0em;
+}
 
 /*CSS font face option*/
 @font-face{font-family: "Droid Sans Mono";}
 
 /*Font for .figure*/
-.figure{font-family: "Verdana",sans-serif; font-size: 80%;}
+.figure{
+    font-family: "Verdana",sans-serif;
+    font-size: 80%;
+}
 
 /*Fonts for section headings.*/
 .sectionHead, .likesectionHead, .subsectionHead,.likesubsectionHead, .sstattributeHead{
@@ -86,12 +92,12 @@ p.indent{ text-indent: 0em }
     font-weight:bold;
     font-size:110%;
 }
-
 .subsubsectionHead, .likesubsubsectionHead {
     font-family: "Georgia", serif;
     font-weight: bold;
     font-size: 105%;
 }
+
 /* spacing for sectionheads*/
 .sectionHead, .likesectionHead{
     padding:5px;
@@ -115,16 +121,21 @@ strong, b, .partToc a, .partToc, .likepartToc a, .likepartToc,
 
 /*Background colour for sectionHeads (blue)*/
 .likesectionHead,
-  .sectionHead{background-color:#ACCFE6;padding:0.5;}
+.sectionHead{
+    background-color:#ACCFE6;
+    padding:0.5;
+}
 
 /*Fonts for chapter and appendix head*/
-.appendixHead,.chapterHead{line-height:140%;}
+.appendixHead,.chapterHead{
+    line-height:140%;
+}
 
 /*Minipage??? This will be problematic...*/
 div.minipage {
  float: left;
  margin: 1ex 1em 1ex 0;
- }
+}
 
 div.minipage:last-child ::after {
     content "<par></par>";
@@ -186,14 +197,16 @@ img, img.graphics{
 }
 
 .figure img.graphics{
-    margin-left:auto; margin-right:auto;
+    margin-left:auto;
+    margin-right:auto;
 }
 
-div.float{margin-left:auto;
-	  margin-right:auto;
-	  margin-top:3em;
-	  margin-bottom:3em;
-	  display:block;
+div.float{
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:3em;
+    margin-bottom:3em;
+    display:block;
 }
 
 div.figure{
@@ -261,19 +274,16 @@ dt.enumerate-enumitem{
   float:left;
   clear: left;
   width: 15%;
-  /*background-color:#0ff;*/
 }
 
 .sldes dd {%
     float: left;
     width:85%;
     display:inline-block;
-    /*background-color:orange;*/
     margin-left:0%;
     margin-bottom: 2em;}
 
 .sldes dd p:first-child{
-    /*background-color:yellow;*/
     margin-top:0%;
 }
 
@@ -288,12 +298,11 @@ dt.enumerate-enumitem{
     margin-left:1.5em;
 }
 
-*/
-/* foot notes */
-div.footnotes{margin-right:0px;}
 
-/*div.footnotes{border-top:solid 1px black; border-bottom:solid 1px black; padding-bottom:1ex; padding-top:0.5ex; margin-top:2ex; font-style:italic; font-size:85%;margin-right:0px}
-div.footnotes p{margin-top:0; margin-bottom:0; text-indent:0}*/
+/* foot notes */
+div.footnotes{
+    margin-right:0px;
+}
 
 div.footnotes span.footnote-mark{
     padding-right:5px;
@@ -302,7 +311,6 @@ div.footnotes span.footnote-mark{
 
 /*Css to align div.centers in center*/
 div.center >div {text-align: center;}
-p{text-align: left;}
 
 
 /* cross links */
@@ -338,7 +346,6 @@ ul.nav li, ul.nav li a {
 }
 ul.nav li a{
     border: none;
-    /*border-radius:8px;*/
     padding:0.1ex 1ex;
 }
 
@@ -357,13 +364,14 @@ ul.nav li.title{
     border:none;
     font-variant:small-caps;
 }
+
 ul.nav li.toc, ul.nav li.toc-hidden{
     margin:0px 3ex;
 }
-ul.nav li.toc{
-    /*float:right;*/
-}
 
+ul.nav li.toc{
+       float: right;
+}
 div.crosslinks li a{
     display:inline-block;
     text-decoration:none;
