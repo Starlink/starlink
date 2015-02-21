@@ -3,162 +3,6 @@
 %% Package for styling the output (primarily in pdf)
 %%%%
 
-
-
-
-% % Command for text that should be pushed to the right of the line (eg
-% % following an hfill, on a single line of text
-
-\newcommand*{\scpushright}[1]{\hfill #1}
-
-
-\DeclareGraphicsExtensions{.pdf,.png,.jpg,.jpeg}
-
-
-
-% %...reference and link commands
-\newcommand{\cref}[3]{#1~\ref{#2}}
-\newcommand{\xlabel}[1]{\label{\protect{xref_#1}}}
-\newcommand{\latexhtml}[3]{#1}
-
-
-\newcommand*{\scfrontmatter}{
-\renewcommand{\thepage}{\roman{page}}
-\setcounter{page}{1}
-\begin{titlepage}%
-\startitlepage
-\end{titlepage}
-\Abstract{}
-\clearpage
-\begingroup \catcode`\_=12 \tableofcontents \endgroup
-\clearpage
-\ifwithlof
-\typeout{Testing lof!}
-\begingroup \catcode`\_=12 \listoffigures \endgroup
-\fi
-\clearpage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
-}
-
-
-% %.. verbatim environment for quoting terminal.
-\DefineVerbatimEnvironment{terminalv}{Verbatim}{xleftmargin=.5in,formatcom=\color{MidnightBlue},fontsize=\small}
-
-
-% %.. Empty environment latex only.
-\newenvironment{latexonly}{}{}
-
-
-
-
-%.. environments that don't do anything
-\def\makeinnocent#1{\catcode`#1=12 }
- \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
- \def\ThrowAwayComment#1{\begingroup
-     \def\CurrentComment{#1}%
-     \let\do\makeinnocent \dospecials
-     \makeinnocent\^^L% and whatever other special cases
-     \endlinechar`\^^M \catcode`\^^M=12 \xComment}
- {\catcode`\^^M=12 \endlinechar=-1 %
-  \gdef\xComment#1^^M{\def\test{#1}
-       \csarg\ifx{PlainEnd\CurrentComment Test}\test
-           \let\html@next\endgroup
-       \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-             \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-       \else \let\html@next\xComment
-       \fi \fi \html@next}
- }
- \def\excludecomment
-   #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-      {\escapechar=-1\relax
-       \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-       \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-      }}
-
-\excludecomment{htmlonly}
-
-\newcommand{\latex}[1]{#1}
-
-
-% % Graphics commands
-% %--------------------------------------
-
-\newcommand{\starfig}[6]{
-  \begin{figure}#2
-    \centering\includegraphics[#3]{#1}
-    \typeout{#1 inserted on page \arabic{page}}
-    \caption[#5]{\label{#4} #6}
-  \end{figure}
-}
-
-% command for a text box that floats around and pops out from the text (framed)
-\mdfsetup{%
- backgroundcolor=white,%
-    middlelinewidth=4pt,%
-    middlelinecolor=bblue,%
-    userdefinedwidth=0.8\textwidth,%
-    roundcorner=10pt, %
-    innertopmargin=\topskip}%
-
-\newenvironment{sltextbox}[1]{%
-\begin{figure*}[h]\begin{mdframed}[userdefinedwidth=0.8\textwidth,
-                            align=center,%
-                       frametitle=#1,%
-        frametitlebackgroundcolor=bblue]%
-\setlength{\parskip}{\medskipamount}%
-}%
-{\end{mdframed}\end{figure*}}
-
-
-
-%Framed  boxes (obsolete).
-\newsavebox{\fmbox}
-\newenvironment{fmpage}[1]{\begin{lrbox}{\fmbox}\begin{minipage}{#1}}{\end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}}}
-
-
-%.. Tip box
-\newenvironment{tip}%
-{\begin{figure*}[h]\begin{mdframed}[userdefinedwidth=0.8\textwidth,align=center,frametitle=Tip,frametitlebackgroundcolor=bblue]%
-\setlength{\parskip}{\medskipamount}%
-}%
-{\end{mdframed}\end{figure*}}
-
-%.........................................
-
-% Format the abstract page
-\renewcommand{\abstractnamefont}{\normalfont\Large\bfseries\colorsectionnumberless}
-\renewcommand{\abstracttextfont}{\normalfont}
-
-
-\newcommand{\Abstract}{%
-  \ifwithabs
-    \ifwithchapters
-        \chapter*{}
-    \fi
-    \section*{Abstract}
-    \thispagestyle{fancy}
-    \markboth{Abstract}{}
-    \thestardocabstract{}
-    \\
-    \vspace*{\fill}
-    \\
-    {\small\thestardoccopyright{}}
-    \clearpage
-  \fi
-}
-
-
-\newcommand{\Acronyms}{%
-  \ifwithchapters
-  \chapter*{}
-  \fi
-  \section*{Acronyms}
-  \markboth{Acronyms}{}
-  \addcontentsline{toc}{section}{\protect\numberline{}Acronyms}
-}
-
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Number sections down to subsubsection level
 \setcounter{secnumdepth}{4}
@@ -203,16 +47,6 @@
 \titlespacing*{\subparagraph}{\parindent}{2ex plus 1ex minus
   .2ex}{1em}
 
-
-% Do set up. Should this include acronyms?
-\newcommand{\scstart}{
-\Abstract
-\cleardoublepage
-\tableofcontents
-\cleardoublepage
-\listoffigures
-\cleardoublepage
-}
 
 
 
@@ -291,15 +125,6 @@
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Format the table of contents
-%\ifpdf
-%\setlength{\cftbeforetoctitleskip}{-3em}
-%\setlength{\cftbeforechapskip}{0.5em}
-%\setlength{\cftbeforesecskip}{0.5em}
-%\fi
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % General spacing
@@ -308,26 +133,18 @@
 \renewcommand{\arraystretch}{1.5}
 
 
+%%%% Set up defaults for floats
+% maximum size of 'top area'
+\renewcommand{\topfraction}{0.9}
+% maximum size of 'bottom area'
+\renewcommand{\bottomfraction}{0.9}
+% minimum amount of text on a non-float page
+\renewcommand{\textfraction}{0.1}
 
 
 
-
-
-\setlength{\LTcapwidth}{\textwidth}
-\newenvironment{sllongtable}[2]{%
-\begin{longtable}{#1}\caption{#2}\\}
-{\end{longtable}}
-
-
+%Enumerate list appearance
 \setlist[enumerate,1]{label=(\arabic*)}
-
-
-%\renewcommand{\thesection}{\arabic{chapter.section}}
-
-
-
-
-
 
 
 % macros for typesetting parameters
@@ -336,22 +153,9 @@
 \providecommand{\ndfcomp}[1]{\texttt{#1}}    % NDF component
 
 
-%hyperref command in sun95 renewed
-\newcommand{\sthyperref}[4]{#2\ref{\protect{#4}}#3}
 
 \newcommand{\menuitem}[2]{\item[\protect{\hyperref[#1]{#1}}] #2}
 \newcommand{\classitem}[1]{\item [\protect{\hyperref[#1]{#1}}]}
 
 
 
-
-
-%problems with _ in labels (e.g. in xrefs)
-\let\oldunderscore\_
-\renewcommand{\_}{\ifmmode \oldunderscore \else \string_\fi}
-
-
-% Ensure index shows up in toc.
-\let\oldprintindex\printindex
-\renewcommand{\printindex}{%
-  \phantomsection \addcontentsline{toc}{section}{Index}\oldprintindex}

@@ -1,7 +1,9 @@
+% -*- mode: tex; -*-
+
+%%% This file implements tex4ht alterations to starlink.cls and
+%%% starstyle.sty
 
 %%%%%%%%%%%%%%%%%%% Table of contents and sectioning formatting
-
-
 % This needs to occur before the TocAt commands.
 \ConfigureToc{sstrefsection}{}{}{}{}
 
@@ -42,6 +44,7 @@
 %%% Index -- don't want to produce this on html
 \renewcommand{\printindex}{}
 \renewcommand{\makeindex}{}
+
 %% The index command can make things go mad in tex4HT
 %% (specific example where when it was called within the
 %% parameter of an unumbered subsection, but its probably
@@ -83,10 +86,10 @@
 
 % Following code slightly altered from html4.4ht:
 \Configure{crosslinks+}
-   {%\HCode{<div class="titlebar">}\thestardoctitle{}\HCode{</div>}
+   {%
      \HCode{<div class="crosslinks"><ul class='nav'>}
      \HCode{<li class="prev">} \my:prevlink\ \HCode{</li>}
-     \HCode{<li class="title">}\thestardoctitle{}\HCode{</li>}
+     \HCode{<li class="title">}\theshorttitle{}\HCode{</li>}
      \HCode{<li class="next">}\my:nextlink\ \HCode{</li>}
      \HCode{<li class="toc">}\hyperlink{toc}{TOC \HCode{&\#8593}}\HCode{</li>}
    }
@@ -102,7 +105,7 @@
      \HCode{<div class="copyright">}\scpushright{\thestardoccopyright{}}\HCode{</div>}
      \HCode{<ul class='nav'>}
      \HCode{<li class="prev">} \my:prevlink\ \HCode{</li>}
-     \HCode{<li class="title">}\thestardoctitle{}\HCode{</li>}
+     \HCode{<li class="title">}\theshorttitle{}\HCode{</li>}
      \HCode{<li class="next">}\my:nextlink\ \HCode{</li>}
      \HCode{<li class="toc">}\hyperlink{toc}{TOC \HCode{&\#8593}}\HCode{</li>}
    }
@@ -111,11 +114,10 @@
 
 
 %%%%%%% ---- sort out the front matter
-
 \renewcommand{\scfrontmatter}{%
 
   %% Setup the title to be the contents of @title,
-  \Tag{TITLE+}{\@title}
+  \Tag{TITLE+}{\@shorttitle}
 
   %% Version of the latex title `page`.
   \begin{titlepage}
@@ -135,63 +137,65 @@
   \fi
 }
 
+%% Set up the abstract
+\renewcommand{\Abstract}{
+  \ifwithabs
+    \ifwithchapters
+        \chapter*{}
+        \typeout{....AbstractChapter...}
+        \else
+        \typeout{....No chapters....}
+     \fi
+     \section*{Abstract}
+     \thestardocabstract{}%
+  \fi
+}
+
+% Formatting for the main coverpage title command in html
+\NewConfigure{titlemain}{1}
+\renewcommand\titlemain{\a:titlemain}
+
+\Configure{titlemain}{\ifvmode\ShowPar\fi\HCode{<div class="titleformat">}
+\ifvmode\ShowPar\fi\par{}\HCode{<span>}\thestardoctitle \Tg</span>
+\ifvmode\ShowPar\fi\par{}\HCode{<span>}\thestardocversion \Tg</span>
+\ifvmode\ShowPar\fi\par{}\HCode{<span>}\thestardocmanual \Tg</span> \HCode{</div>}
+}
+
+%% Set up the title page as a div, class="titlesection"
+\ConfigureEnv{titlepage}{\Tg<div class="titlesection">}{\Tg</div>}{}{}
+
+%% Format the titlepage graphics
+\renewcommand{\thestargraphics}{%
+\begin{center}
+\thestartitlepic
+\vspace{7.5mm}
+\rule{\textwidth}{0.5mm}
+\end{center}
+}
 
 %%%%%------- Custom commands
-
-
 %% An equivalent for hfill (to push things to the right)
 \NewConfigure{scpushright}{2}
 \renewcommand\scpushright[1]{\a:scpushright#1\b:scpushright}
 \Configure{scpushright}{\Tg<span class="pushright">}{\Tg</span>}
+
 
 %% Tasks -- set up as a span of their own class.
 \NewConfigure{task}{2}
 \renewcommand\task[1]{\a:task#1\b:task}
 \Configure{task}{\ifvmode \ShowPar\fi \HCode{<span class="task">}}{\Tg</span>}
 
-
-
-%% Set up the title page as a div, class="titlesection"
-\ConfigureEnv{titlepage}{\Tg<div class="titlesection">}{\Tg</div>}{}{}
-
-%% Configure the format of the starlink title.
-\NewConfigure{sctitleformat}{2}
-\renewcommand\sctitleformat[1]{\a:sctitleformat#1\b:sctitleformat \Tag{Title+}{\thetitle}}
-\Configure{sctitleformat}{
-  \ifvmode \ShowPar\fi \HCode{<span class="sctitleformat">}
-}{\Tg</span>}
-
 %% Configure the verbatim environment as a div, class labelled verb.
 \ConfigureEnv{verbatim}{
   \ifvmode \ShowPar\fi \HCode{<div class="verb">}
 }{\Tg</div>}{}{}
 
-
 %% use html plus/minus symbol -- not necessary?
 %\renewcommand\pm{\HCode{&plusmn}}
 
-
-%% Set up minipage to be a div of class minipage. (won't make it look right)
-%\ConfigureEnv{minipage}{
-%  \ifvmode \ShowPar\fi \HCode{<div class="minipage">}
-%}{\Tg</div>}{}{}
-
-% Macros using sub and superscripts -- use \sb instead of _ and \sp
-% instead of ^. Alternatively you can compile using the options early_
-% and early^ in the second command line parameter.
-% ( You can still use _ and ^ in the document, its only in macros defined
-% in the class/styles or defined before the \begin{document} that you can't)
-\renewcommand{\fcfbe}{\ensuremath{\mathrm{FCF\sb{beamequiv}}}}
-\renewcommand{\fcfb}{\ensuremath{\mathrm{FCF\sb{beam}}}}
-\renewcommand{\fcfa}{$\mathrm{FCF\sb{arcsec}}$}
-\renewcommand{\fcfm}{$\mathrm{FCF\sb{match}}$}
-
-
-%% Starlink xreferences (cludge. This needs fixing when incorporated
-%% in the build script)
+%% Starlink xreferences.
 \renewcommand{\xref}[3]{\href{http://starlink.jach.hawaii.edu/cgi-bin/htxserver/#2.htx/#2.html?xref_#3}{#1}}
 \renewcommand{\xlabel}[1]{\HCode{<a name="xref_#1">}\Tg</a>}
-
 
 %% latexhtml stuff, should be removed from texts eventually. Set to
 %% use the latex option
@@ -199,7 +203,6 @@
 
 %% htmlref -- just use standard \hyperref, eventually remove?
 \renewcommand{\htmlref}[2]{\hyperref[#2]{#1}}
-
 
 %% starlink textbox, as its own div
 \ConfigureEnv{sltextbox}{
@@ -227,35 +230,12 @@
 \ConfigureEnv{fmpage}{\ifvmode\ShowPar\fi\HCode{<div class="fmpage">}}{\Tg</div>}{}{}
 \renewenvironment{fmpage}[1]{}{}
 
-
-
-% Section title colouring
-\renewcommand{\colorsection}[1]{#1}
-\renewcommand{\colorsectionnumberless}[1]{#1}
-
-
 % Fix some weirdness in symbols
 %\renewcommand{\^}{\HCode{^}}
 \renewcommand\${\HCode{$}}%$ %$ is to fix syntax highlighting.
 
-
 %% Put the center enviornment in its own div.
 \renewenvironment{center}{\Tg<div class="center">}{\Tg</div>}
-
-%% Set up the abstract
-\renewcommand{\Abstract}{
-  \ifwithabs
-    \ifwithchapters
-        \chapter*{}
-        \typeout{....AbstractChapter...}
-        \else
-        \typeout{....No chapters....}
-     \fi
-     \section*{Abstract}
-     \thestardocabstract{}%
-  \fi
-}
-
 
 %% Set up acronyms if used.
 \renewcommand{\Acronyms}{
@@ -276,9 +256,6 @@
    {\end:itm \global\def\end:itm{\EndP\Tg</dd>}\HCode{<dt>}\bgroup \bf}
    {\egroup\EndP\HCode{</dt><dd\Hnewline >}}
 
-
-
-
 %% Configure the general description class
 \let\description@orig=\description
 \def\description{\@ifnextchar[% ]
@@ -294,8 +271,6 @@
    {\end:itm \global\def\end:itm{\EndP\Tg</dd>}\HCode{<dt
         class="description">}\bgroup \bf}
    {\egroup\EndP\HCode{</dt><dd\Hnewline class="description">}}
-
-
 
 % aligndesc: a description list with left labels aligned; formatted
 % as a table in html.
@@ -329,34 +304,12 @@
 \begin{table}\caption{#2}\begin{longtable}{#1 }}
 {\end{longtable}\end{table}}
 
-
 %% Sideways tables -- format as regular table
 \renewenvironment{sidewaystable}{\begin{table}}{\end{table}}{}
 \renewenvironment{sidewaystable*}{\begin{table}}{\end{table}}{}
 
-
 %% landscape pages -- ignore command
 \renewenvironment{landscape}{}{}
-
-% Css for toc (depends on whether or not chappters are included, so
-% not in standard table)
-\Css{.sectionToc{}}
-\Css{.subsectionToc{padding-left:1em;}}
-\Css{.subsubsectionToc{padding-left:3em;font-size:100\%}}
-\Css{.chapterHead,.appendixHead{line-height:150\%}}
-
-\ifwithchapters
-\Css{.chapterToc{}}
-\Css{.sectionToc{padding-left:1em}}
-\Css{.subsectionToc{padding-left:4em;}}
-\Css{.subsubsectionToc{padding-left:7em}}
-\fi
-
-
-
-
-%#don't include -cunithtf as commandline option -- it will enable
-%ligatures as htmlcharacters. Breaks cut and paste etc.
 
 \renewcommand{\starfig}[6]{
   \begin{figure}#2
@@ -373,8 +326,6 @@
 %\renewcommand{\cal}[1]{\HCode{<mi class="ltx_font_mathcalligraphic" mathvariant="script">}#1\HCode{</mi>}}
 %\renewcommand{\mathfrak}[1]{\HCode{<mi mathvariant="bold-fraktur">}#1\HCode{</mi>}}
 
-
-
 % replace \rule with an html <HR>:
 \renewcommand\rule[2]{\HCode{<HR>}}
 
@@ -383,3 +334,21 @@
 
 \renewenvironment{small}{}{}
 \ConfigureEnv{small}{\HCode{<div class="small">}}{\HCode{</div>}}{}{}
+
+% Section title colouring
+\renewcommand{\colorsection}[1]{#1}
+\renewcommand{\colorsectionnumberless}[1]{#1}
+
+% Css for toc (depends on whether or not chappters are included, so
+% not in standard css file)
+\Css{.sectionToc{}}
+\Css{.subsectionToc{padding-left:1em;}}
+\Css{.subsubsectionToc{padding-left:3em;font-size:100\%}}
+\Css{.chapterHead,.appendixHead{line-height:150\%}}
+
+\ifwithchapters
+\Css{.chapterToc{}}
+\Css{.sectionToc{padding-left:1em}}
+\Css{.subsectionToc{padding-left:4em;}}
+\Css{.subsubsectionToc{padding-left:7em}}
+\fi
