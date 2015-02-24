@@ -147,10 +147,10 @@ typedef struct smfCalcModelSSNData {
    double delhi;
    double dello;
    double thresh;
+   double wlim;
    int *lut_data;
    int kernel_length;
    int oper;
-   int wlim;
    size_t bstride;
    size_t tstride;
    size_t vbstride;
