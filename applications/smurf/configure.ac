@@ -103,6 +103,9 @@ AC_CHECK_FUNCS( mmap msync munmap ftruncate, [], [
         exit -1
         ] )
 
+dnl    Floating point exception handling is not portable
+AC_CHECK_FUNCS( feenableexcept )
+
 AC_CHECK_HEADERS(math.h)
 AC_CHECK_HEADERS(mach/mach.h)
 

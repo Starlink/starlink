@@ -106,6 +106,9 @@
 *-
 */
 
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #define _GNU_SOURCE   // gives us feenableexcept on older gcc's
 #define __USE_GNU     // gives us feenableexcept on newer gcc's
@@ -220,7 +223,9 @@ void smf_calcmodel_ssn( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 /* Check inherited status. */
    if( *status != SAI__OK ) return;
 
+#if HAVE_FEENABLEEXCEPT
 feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
+#endif
 
 /* Start an AST context to record details of AST Objects created in
    this function. */
@@ -637,7 +642,9 @@ static void smf1_calcmodel_ssn( void *job_data_ptr, int *status ) {
 /* Check inherited status */
    if( *status != SAI__OK ) return;
 
+#if HAVE_FEENABLEEXCEPT
 feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
+#endif
 
 /* Get a pointer that can be used for accessing the required items in the
    supplied structure. */
