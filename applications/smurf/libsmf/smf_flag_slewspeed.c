@@ -67,6 +67,8 @@
 *        Guard against divide by zero if step time is zero.
 *     2012-03-06 (TIMJ):
 *        Use SOFA instead of SLA.
+*     2015-02-23 (DSB):
+*        Flag time slices that have bad TCS values.
 
 *  Copyright:
 *     Copyright (C) 2011-2012 Science & Technology Facilities Council.
@@ -201,42 +203,55 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
 
   /* Loop over time slice */
   for( i=1; (*status==SAI__OK)&&i<(ntslice-1); i++ ) {
-    /* Calculate new steptime */
-    double steptime1 = (allState[i].tcs_tai   - allState[i-1].tcs_tai) * SPD;
-    double steptime2 = (allState[i+1].tcs_tai - allState[i].tcs_tai) * SPD;
 
-    /* Get new coordinates at third position */
-    pos3_ac1 = allState[i+1].tcs_tr_ac1;
-    pos3_ac2 = allState[i+1].tcs_tr_ac2;
+    /* Check all required TCS values are good. */
+    if( allState[i].tcs_tai != VAL__BADD &&
+        allState[i-1].tcs_tai != VAL__BADD &&
+        allState[i+1].tcs_tai != VAL__BADD &&
+        allState[i+1].tcs_tr_ac1 != VAL__BADD &&
+        allState[i+1].tcs_tr_ac2 != VAL__BADD ) {
 
-    /* calculate angular separations between sets of positions in arcsec */
-    sep1 = iauSeps( pos1_ac1, pos1_ac2, pos2_ac1, pos2_ac2 ) * DR2AS;
-    sep2 = iauSeps( pos2_ac1, pos2_ac2, pos3_ac1, pos3_ac2 ) * DR2AS;
+       /* Calculate new steptime */
+       double steptime1 = (allState[i].tcs_tai   - allState[i-1].tcs_tai) * SPD;
+       double steptime2 = (allState[i+1].tcs_tai - allState[i].tcs_tai) * SPD;
 
-    /* Check for zero step time. These can occur at the start and end of
-       the timstream because padding samples are given identical TCS_TAI
-       values by smf_concat smfGroup. */
-    if( steptime1 > 0.0 && steptime2 > 0.0 ) {
+       /* Get new coordinates at third position */
+       pos3_ac1 = allState[i+1].tcs_tr_ac1;
+       pos3_ac2 = allState[i+1].tcs_tr_ac2;
 
-    /* Average speed in arcsec/sec */
-      speed = (sep1 + sep2)/(steptime1+steptime2);
+       /* calculate angular separations between sets of positions in arcsec */
+       sep1 = iauSeps( pos1_ac1, pos1_ac2, pos2_ac1, pos2_ac2 ) * DR2AS;
+       sep2 = iauSeps( pos2_ac1, pos2_ac2, pos3_ac1, pos3_ac2 ) * DR2AS;
 
-    /* Acceleration magnitude in arcsec/sec^2 (currently ignored) */
-      accel = fabs( (sep2-sep1)/(steptime1*steptime2) );
+       /* Check for zero step time. These can occur at the start and end of
+          the timstream because padding samples are given identical TCS_TAI
+          values by smf_concat smfGroup. */
+       if( steptime1 > 0.0 && steptime2 > 0.0 ) {
+
+       /* Average speed in arcsec/sec */
+         speed = (sep1 + sep2)/(steptime1+steptime2);
+
+       /* Acceleration magnitude in arcsec/sec^2 (currently ignored) */
+         accel = fabs( (sep2-sep1)/(steptime1*steptime2) );
+       } else {
+         accel = speed = 0.0;
+       }
+
+       if( (smin && (speed < smin)) || (smax && (speed > smax)) ) {
+         /* Does this time step need to be flagged? */
+         flag[i] = 1;
+       } else if( isfinite(speed) ) {
+         /* Update measurement of avspeed if it is sensible (we could have
+            strange values if there are repeated pointing header values...
+            don't necessarily need to flag the bolo data as bad, but they
+            shouldn't get added to our speed estimates! */
+         avspeed += speed;
+         navspeed ++;
+       }
+
+    /* Flag this time step if any TCS values are bad. */
     } else {
-      accel = speed = 0.0;
-    }
-
-    if( (smin && (speed < smin)) || (smax && (speed > smax)) ) {
-      /* Does this time step need to be flagged? */
-      flag[i] = 1;
-    } else if( isfinite(speed) ) {
-      /* Update measurement of avspeed if it is sensible (we could have
-         strange values if there are repeated pointing header values...
-         don't necessarily need to flag the bolo data as bad, but they
-         shouldn't get added to our speed estimates! */
-      avspeed += speed;
-      navspeed ++;
+       flag[i] = 1;
     }
 
     /* Update first two positions */
