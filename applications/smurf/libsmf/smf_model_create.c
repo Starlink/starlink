@@ -224,6 +224,8 @@
 *     2014-10-08 (DSB):
 *        Only use multiple NOI values per bolometer if the time stream
 *        is long enough to create at least two NOI values.
+*     2014-12-18 (DSB):
+*        Added SSN.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -788,6 +790,20 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
 
             if (idata && idata->hdr) {
               smf_set_clabels( "Filtered-out Signal", "Signal",
+                               idata->hdr->units, &head.hdr, status );
+            }
+            break;
+
+          case SMF__SSN: /* Scan synchronous noise */
+            head.data.dtype = SMF__DOUBLE;
+            head.data.ndims = 3;
+            for( k=0; k<3; k++ ) {
+              head.data.dims[k] = (idata->dims)[k];
+              head.data.lbnd[k] = (idata->lbnd)[k];
+            }
+
+            if (idata && idata->hdr) {
+              smf_set_clabels( "Scan-synchronous noise", "Signal",
                                idata->hdr->units, &head.hdr, status );
             }
             break;

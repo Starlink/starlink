@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     double *smf_tophat2( ThrWorkForce *wf, const double *map, dim_t dims[2],
-*                          dim_t box, int sub, double wlim, int *status )
+*                          dim_t box, int sub, double wlim, int niter,
+*                          int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -29,10 +30,13 @@
 *     sub = int (Given)
 *        If zero, the returned array contains the smoothed array. If
 *        non-zero, the returned array contains the supplied array
-*        minus the smoothed array.
+*        minus the smoothed array. Not used if niter is greater than 1
+*        (in which case the smoothed array is always returned).
 *     wlim = double (Given)
 *        The fraction of good input pixels for a good output pixel. If
 *        zero, the bad pixel mask is copied from the input to the output.
+*     niter = int (Given)
+*        The number of times to apply the top hat filter.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -44,6 +48,7 @@
 *     The supplied map is smoothed using a 2D box filter of the specified
 *     size. A newly allocated map is returned holding either the
 *     smoothed map of the difference between the original and smoothed maps.
+*     The filter may be applied more than once (see "niter").
 
 *  Authors:
 *     David S Berry (JAC, Hawaii)
@@ -110,16 +115,20 @@ static void smf1_tophat2_job( void *job_data, int *status );
 
 /* Main entry point. */
 double *smf_tophat2( ThrWorkForce *wf, const double *map, const dim_t dims[2],
-                     dim_t box, int sub, double wlim, int *status ){
+                     dim_t box, int sub, double wlim, int niter, int *status ){
 
 /* Local Variables: */
    double *work = NULL;
    smfTophat2JobData *job_data;
    smfTophat2JobData *pdata;
    int nw;
+   int iter;
    int iw;
    int rowstep;
    int colstep;
+   double *temp1 = NULL;
+   double *temp2 = NULL;
+   const double *in = NULL;
    double *result = NULL;
 
 /* Check inherited status. */
@@ -127,8 +136,9 @@ double *smf_tophat2( ThrWorkForce *wf, const double *map, const dim_t dims[2],
 
 /* Allocate the returned array, and a work array, initialising them both
    to hold zeros. */
-   result = astCalloc( dims[ 0 ]*dims[ 1 ], sizeof( *result ) );
+   temp1 = astCalloc( dims[ 0 ]*dims[ 1 ], sizeof( *temp1 ) );
    work = astCalloc( dims[ 0 ]*dims[ 1 ], sizeof( *work ) );
+   if( niter > 1 ) temp2 = astCalloc( dims[ 0 ]*dims[ 1 ], sizeof( *temp2 ) );
 
 /* How many threads do we get to play with */
    nw = wf ? wf->nworker : 1;
@@ -143,49 +153,67 @@ double *smf_tophat2( ThrWorkForce *wf, const double *map, const dim_t dims[2],
       rowstep = dims[ 1 ]/nw;
       if( rowstep == 0 ) rowstep = 1;
 
-/* Set up jobs to smooth each row. */
-      for( iw = 0; iw < nw; iw++ ) {
-         pdata = job_data + iw;
+/* Do the required number of smoothings. */
+      for( iter = 0; iter < niter; iter++ ) {
 
-         pdata->rlo = iw*rowstep;
-         pdata->clo = iw*colstep;
-         if( iw == nw - 1 ) {
-            pdata->rhi = dims[ 1 ] - 1;
-            pdata->chi = dims[ 0 ] - 1;
+/* Set the input and output arrays for the next iteration. */
+         if( iter == 0 ) {
+            result = temp1;
+            in = map;
+         } else if( iter % 2 == 0 ) {
+            result = temp1;
+            in = temp2;
          } else {
-            pdata->rhi = pdata->rlo + rowstep - 1;
-            pdata->chi = pdata->clo + colstep - 1;
+            in = temp1;
+            result = temp2;
          }
 
-         pdata->nrow = dims[ 1 ];
-         pdata->ncol = dims[ 0 ];
-         pdata->hbox = box/2;
-         pdata->sub = sub;
-         pdata->in = map;
-         pdata->dout = result;
-         pdata->wout = work;
-         pdata->wlim = wlim;
-         pdata->oper = 0;
-         thrAddJob( wf, 0, pdata, smf1_tophat2_job, 0, NULL, status );
-      }
+/* Set up jobs to smooth each row. */
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+
+            pdata->rlo = iw*rowstep;
+            pdata->clo = iw*colstep;
+            if( iw == nw - 1 ) {
+               pdata->rhi = dims[ 1 ] - 1;
+               pdata->chi = dims[ 0 ] - 1;
+            } else {
+               pdata->rhi = pdata->rlo + rowstep - 1;
+               pdata->chi = pdata->clo + colstep - 1;
+            }
+
+            pdata->nrow = dims[ 1 ];
+            pdata->ncol = dims[ 0 ];
+            pdata->hbox = box/2;
+            pdata->sub = ( niter == 1 ) ? sub : 0;
+            pdata->in = in;
+            pdata->dout = result;
+            pdata->wout = work;
+            pdata->wlim = wlim;
+            pdata->oper = 0;
+            thrAddJob( wf, 0, pdata, smf1_tophat2_job, 0, NULL, status );
+         }
 
 /* Wait for the workforce to complete all jobs. */
-      thrWait( wf, status );
+         thrWait( wf, status );
 
 /* Set up jobs to smooth each column. */
-      for( iw = 0; iw < nw; iw++ ) {
-         pdata = job_data + iw;
-         pdata->oper = 1;
-         thrAddJob( wf, 0, pdata, smf1_tophat2_job, 0, NULL, status );
-      }
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->oper = 1;
+            thrAddJob( wf, 0, pdata, smf1_tophat2_job, 0, NULL, status );
+         }
 
 /* Wait for the workforce to complete all jobs. */
-      thrWait( wf, status );
+         thrWait( wf, status );
+      }
    }
 
 /* Free resources. */
    job_data = astFree( job_data );
    work = astFree( work );
+   if( temp1 != result ) temp1 = astFree( temp1 );
+   if( temp2 != result ) temp2 = astFree( temp2 );
 
 /* Return the pointer to the returned array. */
    return result;

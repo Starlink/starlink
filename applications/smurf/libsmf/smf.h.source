@@ -682,6 +682,10 @@ void smf_calcmodel_smo( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status );
 
+void smf_calcmodel_ssn( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
+                        AstKeyMap *keymap, smfArray **allmodel, int flags,
+                        int *status );
+
 void smf_calcmodel_tmp( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status );
@@ -1034,7 +1038,7 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
 
 double *smf_ffclean( ThrWorkForce *wf, const double *map, const double *mapvar,
                      const dim_t dims[2], dim_t box, dim_t box0, double thresh,
-                     int *status );
+                     int resids, double *sigma, int *status );
 
 smfData *smf_fft_2dazav( const smfData *data, double *df, int *status );
 
@@ -1963,7 +1967,7 @@ void smf_timerinit( struct timeval *tv1, struct timeval *tv2, int *status);
 double smf_timerupdate( struct timeval *tv1, struct timeval *tv2, int *status);
 
 double *smf_tophat2( ThrWorkForce *wf, const double *map, const dim_t dims[2],
-                     dim_t box, int sub, double wlim, int *status );
+                     dim_t box, int sub, double wlim, int niter, int *status );
 
 void smf_tslice_ast (smfData * data, dim_t index, int needwcs, fts2Port fts_port,
                      int * status );
@@ -1999,7 +2003,7 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
                         smfArray *qua, smfDIMMData *dat, dim_t msize,
                         const Grp *bolrootgrp, int varmapmethod,
                         const int *lbnd_out, const int *ubnd_out,
-                        AstFrameSet *outfset, int *status );
+                        AstFrameSet *outfset, const char *root, int *status );
 
 void smf_write_clabels( const smfData* data, int * status );
 
@@ -2037,5 +2041,4 @@ void smf_write_smfData ( ThrWorkForce *wf, const smfData *data, const smfData *v
 void smf_write_smfFilter( ThrWorkForce *wf, const smfFilter *filt, const char *filename,
                           const Grp * igrp, size_t grpindex,
                           int *status );
-
 

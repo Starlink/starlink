@@ -21,7 +21,8 @@
 *     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     mtype = (Given)
-*        The type of model (COM, FLT or AST) for which the mask is required.
+*        The type of model (COM, SSN, FLT or AST) for which the mask is
+*        required.
 *     config = AstKeyMap * (Given)
 *        Configuration parameters that control the map-maker.
 *     dat = smfDIMMData * (Given)
@@ -254,12 +255,15 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    } else if( mtype == SMF__FLT ) {
       modname = "FLT";
       mask = &(dat->flt_mask);
+   } else if( mtype == SMF__SSN ) {
+      modname = "SSN";
+      mask = &(dat->ssn_mask);
    } else {
       modname = NULL;
       mask = NULL;
       *status = SAI__ERROR;
       errRepf( " ", "smf_get_mask: Unsupported model type %d supplied - "
-               "must be COM, FLT or AST.", status, mtype );
+               "must be COM, SSN, FLT or AST.", status, mtype );
    }
    subkm = NULL;
    astMapGet0A( config, modname, &subkm );
@@ -584,7 +588,8 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 
                         mapuse = smf_ffclean( wf, dat->map, dat->mapvar,
                                               dat->mdims, hipass,
-                                              zero_snr_lopass, zero_snr, status );
+                                              zero_snr_lopass, zero_snr, 0,
+                                              NULL, status );
                         if( *status == SAI__OK ) {
                            pd = mapuse;
                            pn = newmask;
@@ -627,7 +632,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                                       zero_snr_lopass, modname );
                            mapuset = smf_tophat2( wf, snrmap, dat->mdims,
                                                   zero_snr_lopass, 0, 1.0E-6,
-                                                  status );
+                                                  1, status );
                         } else {
                            mapuset = snrmap;
                         }
@@ -639,7 +644,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                                       "box filter prior to forming the %s mask.",
                                       status, zero_snr_hipass, modname );
                            mapuse = smf_tophat2( wf, mapuset, dat->mdims,
-                                                 hipass, 1, 1.0E-6, status );
+                                                 hipass, 1, 1.0E-6, 1, status );
                         } else {
                            mapuse = mapuset;
                         }
@@ -663,21 +668,45 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                            pd = mapuse;
                            pn = newmask;
 
-                           if( accmask ) {
-                              pa = accmask;
-                              for( i = 0; i < dat->msize; i++,pd++ ) {
-                                 if( *(pa++) == 0 ) {
-                                    *(pn++) = 0;
-                                 } else {
+
+                           if( mtype == SMF__SSN ) {
+
+                              if( accmask ) {
+                                 pa = accmask;
+                                 for( i = 0; i < dat->msize; i++,pd++ ) {
+                                    if( *(pa++) == 0 ) {
+                                       *(pn++) = 0;
+                                    } else {
+                                       *(pn++) = ( *pd != VAL__BADD &&
+                                                   fabs( *pd ) < zero_snr ) ? 1 : 0;
+                                    }
+                                 }
+
+                              } else {
+                                 for( i = 0; i < dat->msize; i++,pd++ ) {
                                     *(pn++) = ( *pd != VAL__BADD &&
-                                                *pd < zero_snr ) ? 1 : 0;
+                                                fabs( *pd ) < zero_snr ) ? 1 : 0;
                                  }
                               }
 
                            } else {
-                              for( i = 0; i < dat->msize; i++,pd++ ) {
-                                 *(pn++) = ( *pd != VAL__BADD &&
-                                             *pd < zero_snr ) ? 1 : 0;
+
+                              if( accmask ) {
+                                 pa = accmask;
+                                 for( i = 0; i < dat->msize; i++,pd++ ) {
+                                    if( *(pa++) == 0 ) {
+                                       *(pn++) = 0;
+                                    } else {
+                                       *(pn++) = ( *pd != VAL__BADD &&
+                                                   *pd < zero_snr ) ? 1 : 0;
+                                    }
+                                 }
+
+                              } else {
+                                 for( i = 0; i < dat->msize; i++,pd++ ) {
+                                    *(pn++) = ( *pd != VAL__BADD &&
+                                                *pd < zero_snr ) ? 1 : 0;
+                                 }
                               }
                            }
 

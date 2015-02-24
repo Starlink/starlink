@@ -49,6 +49,8 @@
 *     2010-06-14 (TIMJ):
 *        Alphabetize models and use a switch statement rather than loads
 *        of strcmp calls.
+*     2014-12-18 (DSB):
+*        Added SSN.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -149,7 +151,11 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status ) {
     break;
   case 'S':
   case 's':
-    retval = SMF__SMO;
+    if (strncasecmp( modelname, "SMO", 3 ) == 0) {
+      retval = SMF__SMO;
+    } else if (strncasecmp( modelname, "SSN", 3 ) == 0) {
+      retval = SMF__SSN;
+    }
     break;
   case 'T':
   case 't':

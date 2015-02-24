@@ -307,7 +307,8 @@ typedef enum smf_modeltype {
   SMF__PLN=2048,            /* Spatial plane removal */
   SMF__SMO=4096,            /* Time series smoothing */
   SMF__TWO=8192,            /* Two-component common-mode */
-  SMF__TMP=16384            /* Generic fitting of external template to bolos */
+  SMF__TMP=16384,           /* Generic fitting of external template to bolos */
+  SMF__SSN=32768            /* Scan-syhcnronous noise */
 } smf_modeltype;
 
 /* Observing mode and type */
@@ -513,6 +514,7 @@ typedef enum {
   SMF__Q_LOWAP   = BIT_TO_VAL(11),  /* Apodisation factor is too low to invert */
   SMF__Q_BADEF   = BIT_TO_VAL(12),  /* Optical efficiency correction is bad */
   SMF__Q_RING    = BIT_TO_VAL(13),  /* Sample suffers from FLT ringing */
+  SMF__Q_SSN     = BIT_TO_VAL(14),  /* Flagged as bad by the SSN model */
 } smf_qual_bits;
 
 /* These macros are for several commonly-used combinations of quality flags */
@@ -524,7 +526,7 @@ typedef enum {
 #define SMF__Q_FIT ~(SMF__Q_APOD|SMF__Q_STAT)            /* Samples that can't
                                                            be used to fit
                                                            time-domain models */
-#define SMF__Q_GAP (SMF__Q_RING|SMF__Q_BADDA|SMF__Q_SPIKE|SMF__Q_JUMP|SMF__Q_COM|SMF__Q_EXT|SMF__Q_LOWAP)/* Samples
+#define SMF__Q_GAP (SMF__Q_SSN|SMF__Q_RING|SMF__Q_BADDA|SMF__Q_SPIKE|SMF__Q_JUMP|SMF__Q_COM|SMF__Q_EXT|SMF__Q_LOWAP)/* Samples
                                                            that should
                                                            be gap-filled */
 #define SMF__Q_BOUND (SMF__Q_PAD|SMF__Q_APOD)            /* apodized/padded
@@ -535,6 +537,7 @@ typedef enum {
   SMF__MAPQ_AST = BIT_TO_VAL(0),   /* AST mask */
   SMF__MAPQ_FLT = BIT_TO_VAL(1),   /* FLT mask */
   SMF__MAPQ_COM = BIT_TO_VAL(2),   /* COM mask */
+  SMF__MAPQ_SSN = BIT_TO_VAL(3),   /* SSN mask */
 } smf_qual_map_bits;
 
 /* These are used to group SMURF TSERIES quality into related groups that
@@ -565,10 +568,10 @@ typedef enum {
 /* Number of quality bits in each family. SMF__NQBITS can be used
    for declaring array sizes. */
 typedef enum {
-  SMF__NQBITS_TSERIES = 14,
-  SMF__NQBITS_MAP     = 3,
+  SMF__NQBITS_TSERIES = 15,
+  SMF__NQBITS_MAP     = 4,
   SMF__NQBITS_TCOMP   = 6,
-  SMF__NQBITS         = 14    /* Largest number of bits in a family */
+  SMF__NQBITS         = 15    /* Largest number of bits in a family */
 } smf_qfam_count_t;
 
 
@@ -777,6 +780,7 @@ typedef struct smfDIMMData {
   unsigned char *ast_mask;   /* Map indicating region to be masked in ast */
   unsigned char *com_mask;   /* Map indicating region to be masked in com */
   unsigned char *flt_mask;   /* Map indicating region to be masked in flt */
+  unsigned char *ssn_mask;   /* Map indicating region to be masked in ssn */
   int iter;                  /* Iteration number */
   int ast_skipped;           /* True if the subtraction of AST was skipped
                                 on the previous iteration */

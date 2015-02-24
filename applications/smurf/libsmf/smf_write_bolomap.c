@@ -17,7 +17,7 @@
 *                        smfArray *qua, smfDIMMData *dat, dim_t msize,
 *                        const Grp *bolrootgrp, int varmapmethod,
 *                        const int *lbnd_out, const int *ubnd_out,
-*                        AstFrameSet *outfset, int *status ) {
+*                        AstFrameSet *outfset, const char *root, int *status ) {
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -33,7 +33,8 @@
 *     msize = dim_t (Given)
 *        Number of pixels in map/mapvar
 *     bolrootgrp = const Grp* (Given)
-*        Root name for bolomaps. Can be path to HDS container.
+*        Root name for bolomaps. Can be path to HDS container. Only
+*        used if "root" is NULL.
 *     varmapmethod = int (Given)
 *        Method for estimating map variance. If 1 use sample variance,
 *        if 0 propagate noise from time series.
@@ -42,7 +43,10 @@
 *     ubnd_out = const int* (Given)
 *        2-element array pixel coord. for the upper bounds of the output map
 *     outfset = AstFrameSet* (Given)
-*        Frameset containing the sky->output map mapping
+*        Frameset containing the sky->output map mapping. May be NULL.
+*     root = const char * (Given)
+*        The root name for the bolometer maps. If NULL, then the value
+*        specified by "bolrootgrp" is used.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -127,7 +131,7 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
                         smfArray *qua, smfDIMMData *dat, dim_t msize,
                         const Grp *bolrootgrp, int varmapmethod,
                         const int *lbnd_out, const int *ubnd_out,
-                        AstFrameSet *outfset, int *status ) {
+                        AstFrameSet *outfset, const char *root, int *status ) {
 
   int addtomap=0;               /* Set if adding to existing map */
   size_t bstride;               /* Bolometer stride */
@@ -146,11 +150,20 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
 
   if( *status != SAI__OK ) return;
 
-  if( !res || !lut || !qua || !dat || !bolrootgrp ||
-      !lbnd_out || !ubnd_out || !outfset ) {
+  if( !res || !lut || !qua || !dat || !lbnd_out || !ubnd_out ||
+      (!root && !bolrootgrp) ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": NULL inputs supplied", status );
     return;
+  }
+
+/* If the root name was specified as a fixed string via parameter
+   "root,", create a new container file to contain the bolomaps. */
+  if( root ) {
+    HDSLoc *cloc = NULL;
+    msgOutf( "", "Writing bolomaps to new file %s.sdf\n", status, root );
+    hdsNew( root, "BOLOMAPS", "BOLOMAPS", 0, NULL, &cloc, status );
+    datAnnul( &cloc, status );
   }
 
   /* Loop over subgroup index (subarray) */
@@ -202,9 +215,13 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
           /* Create a name for the new map, take into account the
              chunk number and subarray. Only required if we are using a single
              output container. */
-          pname = tmpname;
-          grpGet( bolrootgrp, 1, 1, &pname, sizeof(tmpname), status );
-          one_strlcpy( name, tmpname, sizeof(name), status );
+          if( root ) {
+             one_strlcpy( name, root, sizeof(name), status );
+          } else {
+             pname = tmpname;
+             grpGet( bolrootgrp, 1, 1, &pname, sizeof(tmpname), status );
+             one_strlcpy( name, tmpname, sizeof(name), status );
+          }
           one_strlcat( name, ".", sizeof(name), status );
 
           /* Subarray, column and row. HDS does not care about case but we
@@ -324,8 +341,10 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
             qua_data[k*bstride] = SMF__Q_BADB;
 
             /* Write WCS */
-            smf_set_moving(outfset,NULL,status);
-            ndfPtwcs( outfset, mapdata->file->ndfid, status );
+            if( outfset ) {
+               smf_set_moving(outfset,NULL,status);
+               ndfPtwcs( outfset, mapdata->file->ndfid, status );
+            }
           }
 
           /* Clean up */

@@ -52,6 +52,7 @@ smf_calcmodel_gai.c \
 smf_calcmodel_noi.c \
 smf_calcmodel_pln.c \
 smf_calcmodel_smo.c \
+smf_calcmodel_ssn.c \
 smf_calcmodel_tmp.c \
 smf_calcmodel_two.c \
 smf_check_coords.c \

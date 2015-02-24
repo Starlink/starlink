@@ -230,6 +230,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    smfArray *array;
    smfData *data = NULL;
    smfData *data_tmp;
+   smfData *noi;
    smfData *pow;
    smfData *sidequal;
    smf_qual_t *oldcomq;
@@ -826,10 +827,16 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 /* Final call to rebin re-normalizes */
             if( idx == idxhi ) rebinflags = rebinflags | AST__REBINEND;
 
+/* Variances... */
+            if( nbolo > 1 && ntslice > 1 && dat->noi ) {
+               noi =  dat->noi[0]->sdata[idx];
+            } else {
+               noi = NULL;
+            }
+
 /* Rebin the residual + astronomical signal into a map */
-            smf_rebinmap1( wf, array->sdata[ idx ], NULL,
-                           dat->lut[0]->sdata[idx]->pntr[0], 0, 0, 0,
-                           NULL, 0, SMF__Q_GOOD, 1, rebinflags,
+            smf_rebinmap1( wf, array->sdata[ idx ], noi, dat->lut[0]->sdata[idx]->pntr[0],
+                           0, 0, 0, NULL, 0, SMF__Q_GOOD, 1, rebinflags,
                            wf_map, wf_mapwgt, wf_mapwgtsq, wf_hitsmap,
                            wf_mapvar, dat->msize, &scalevar, status );
           }

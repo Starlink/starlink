@@ -16,7 +16,7 @@
 *     double *smf_ffclean( ThrWorkForce *wf, const double *map,
 *                          const double *mapvar, const dim_t dims[2],
 *                          dim_t box, dim_t box0, double thresh,
-*                          int *status )
+*                          int resids, double *sigma, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -37,6 +37,14 @@
 *        using a box filter of width "box0" pixels.
 *     thresh = double (Given)
 *        The number of sigma at which to clip.
+*     resids = int (Given)
+*        If positive, the returned array will contain the smoothed
+*        residuals rather than the cleaned image. If negative, the
+*        returned array will contain the smoothed image rather than the
+*        cleaned image.
+*     sigma = double * (Returned)
+*        If not NULL, returned holding the global noise level within the
+*        supplied map.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -121,6 +129,7 @@
 typedef struct smfFFCleanJobData {
    const double *mapvar;
    double *resid;
+   double *smooth;
    double *result;
    double lim;
    double sum1;
@@ -137,11 +146,12 @@ static void smf1_ffclean_job( void *job_data, int *status );
 /* Main entry point. */
 double *smf_ffclean( ThrWorkForce *wf, const double *map, const double *mapvar,
                      const dim_t dims[2], dim_t box, dim_t box0, double thresh,
-                     int *status ){
+                     int resids, double *sigma, int *status ){
 
 /* Local Variables: */
    double *result = NULL;
    double *residuals = NULL;
+   double *smoothed = NULL;
    double lim = 0.0;
    double mean;
    double sum1;
@@ -163,6 +173,9 @@ double *smf_ffclean( ThrWorkForce *wf, const double *map, const double *mapvar,
 /* Allocate the returned array holding a copy of the supplied array. */
    nel = dims[ 0 ]*dims[ 1 ];
    result = astStore( NULL, map, nel*sizeof( *result ) );
+
+/* Allocate another work marrau. */
+   residuals = astMalloc( nel*sizeof( *result ) );
 
 /* How many threads do we get to play with */
    nw = wf ? wf->nworker : 1;
@@ -199,7 +212,8 @@ double *smf_ffclean( ThrWorkForce *wf, const double *map, const double *mapvar,
 
 /* If required, smooth the map before starting the cleaning operation. */
       if( box0 > 1 ) {
-         double *newres = smf_tophat2( wf, result, dims, box0, 0, 0.0, status );
+         double *newres = smf_tophat2( wf, result, dims, box0, 0, 0.0, 1,
+                                       status );
          (void) astFree( result );
          result = newres;
       }
@@ -207,10 +221,23 @@ double *smf_ffclean( ThrWorkForce *wf, const double *map, const double *mapvar,
 /* Loop until converged, or the max number of iterations is reached. */
       for( iter = 0; iter < MAXITER && *status == SAI__OK; iter++ ) {
 
+/* Free the smoothed array created by the previous iteration. */
+         smoothed = astFree( smoothed );
+
 /* The result array currently holds all the input pixel values that have
-   not yet been rejected. Smooth it, and get the residuals by removing
-   the smoothed version from the result array. */
-         residuals = smf_tophat2( wf, result, dims, box, 1, 1.0E-6, status );
+   not yet been rejected. Smooth it. */
+         smoothed = smf_tophat2( wf, result, dims, box, 0, 1.0E-6, 1, status );
+
+/* Get the residuals by removing the smoothed version from the result array. */
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->oper = 3;
+            pdata->resid = residuals;
+            pdata->smooth = smoothed;
+            pdata->result = result;
+            thrAddJob( wf, 0, pdata, smf1_ffclean_job, 0, NULL, status );
+         }
+         thrWait( wf, status );
 
 /* If this is the first iteration, we do not yet have any clipping
    limits. So we need to get the statistics of the residuals explicitly. */
@@ -280,22 +307,36 @@ double *smf_ffclean( ThrWorkForce *wf, const double *map, const double *mapvar,
          variance = sum2/nsum - mean*mean;
          lim = sqrt( variance )*thresh;
 
-/* Free the current residuals array. */
-         residuals = astFree( residuals );
-
-/* Report progress. */
-         msgOutiff( MSG__DEBUG, "", "smf_ffclean: iter=%d sigma=%g nrej=%zu\n",
-                    status, iter, sqrt( variance ), nsum );
-
 /* No more iterations if the number of remaining samples has changed by
    fewer than 10. */
          if( abs( nsum - nsum_old ) < 10 ) break;
       }
    }
 
-/* Free resources. */
+/* If required, return the residuals rather than the cleaned image. */
+   if( resids > 0 ) {
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         pdata->oper = 3;
+         pdata->result = (double *) map;
+         pdata->resid = result;
+         pdata->smooth = smoothed;
+         thrAddJob( wf, 0, pdata, smf1_ffclean_job, 0, NULL, status );
+      }
+      thrWait( wf, status );
+   } else if( resids < 0 ) {
+      (void *) astFree( result );
+      result = smoothed;
+      smoothed = NULL;
+   }
+
+/* If required, return the global noise level in themap. */
+   if( sigma ) *sigma = sqrt( variance );
+
+/* Free other resources. */
    job_data = astFree( job_data );
    residuals = astFree( residuals );
+   smoothed = astFree( residuals );
 
 /* Return the pointer to the returned array. */
    return result;
@@ -385,6 +426,19 @@ static void smf1_ffclean_job( void *job_data, int *status ) {
             }
          } else {
             *p1 = VAL__BADD;
+         }
+      }
+
+/* Subtract the smoothed array from the result array to get the residuals. */
+   } else if( pdata->oper == 3 ) {
+      p0 = pdata->resid + pdata->pixlo;
+      p1 = pdata->smooth + pdata->pixlo;
+      p2 = pdata->result + pdata->pixlo;
+      for( ipix = pdata->pixlo; ipix <= pdata->pixhi; ipix++,p0++,p1++,p2++ ) {
+         if( *p1 != VAL__BADD && *p2 != VAL__BADD ) {
+            *p0 = *p2 - *p1;
+         } else {
+            *p0 = VAL__BADD;
          }
       }
 

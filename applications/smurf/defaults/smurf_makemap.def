@@ -1953,6 +1953,8 @@ memcheck=0
 #
 #		- smo: time series smoothing using a median or mean boxcar filter
 #
+#		- ssn: scan-synchronous (i.e. azimuth dependent) noise removal
+#
 #		- pln: remove plane from each time slice
 #
 #		- tmp: remove externally define template such as azimuth
@@ -2259,6 +2261,284 @@ smo.notfirst = 1
 #  Purpose: 	Controls the SMO model.
 #  Description: The type of filter used by the SMO model: median or mean.
 smo.type = median
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.binsize
+#  Type: 	real
+#  Default: 	-4
+#  Purpose: 	Controls the Scan Synchronous Noise model.
+#  Description: ssn.binsize gives the size of the azimuth bins used to
+#               form the profile of bolometer value against azimuth offset.
+#               If zero is zupplied , the map pixel size is used. If a
+#               negative value is supplied, the bin size is specified as a
+#               multiple of the map pixel size. If a positive value is
+#               suppled, it is given directly in arc-seconds.
+ssn.binsize = -4
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.ksigma
+#  Type: 	real
+#  Default: 	1.0
+#  Purpose: 	Controls the Scan Synchronous Noise model.
+#  Description: If ssn.ksigma is greater than zero, then the profile that
+#               gives the scan-synchronous noise for each bolometer is
+#               smoothed with a Gaussian kernel before being used. The
+#               value supplied for ssn.ksigma is the standard deviation
+#               of the kernel in units of azimuth bins (see parameter
+#               "ssn.binsize").
+ssn.ksigma = 1.0
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.notfirst
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	May improve convergence by avoiding the use of a scan
+#               sychronous noise model on the first iteration.
+#  Description: If this is non-zero, then scan synchronous noise will not
+#		be removed from the time streams on the first iteration.
+ssn.notfirst = 0
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.seclen
+#  Type: 	float
+#  Default: 	10
+#  Purpose: 	Controls the Scan Synchronous Noise model.
+#  Description: If this is non-zero, then each bolometer time stream
+#               is split into sections and a separate SSN model is
+#               calculated for each section. The value of ssn.seclen
+#               determines the length of each section, and should be
+#               supplied as a multiple of the basic azimuth period of the
+#               scan pattern. For instance, a value of "5" will result in
+#               each section containing five azimuth periods (a period is
+#               twice the time taken for the boresight to pass through
+#               zero azimuth offset).
+ssn.seclen = 10
+
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.thresh
+#  Type: 	float
+#  Default: 	0
+#  Purpose: 	Controls the Scan Synchronous Noise model.
+#  Description: If this is non-zero, then bolometers for which the
+#               magnitude of the scan synchronous noise is less that
+#               the specified multiple of the noise level are assumed to
+#               have zero scan synchronous noise. Raising the value will
+#               result in only the bolometers with the strongest SSN being
+#               corrected. Bolometers with weaker SSN are left uncorrected.
+ssn.thresh = 0
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.zero_accum
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Prevents unstable SNR masks halting convergence.
+#  Description: Masks defined by SNR limits can show instabilities in which
+#               pixels can repeatedly enter the mask on one iteration and
+#               leave it on the next. Such oscillating pixels tend to
+#               occur around the edges of source areas in the mask, and
+#               can prevent convergence of the iterative map-making process.
+#               Setting SSN.ZERO_ACCUM to a non-zero value can prevent
+#               this by forcing source pixels to be accumulated rather
+#               than replaced on successive iterations. Thus, if
+#               SSN.ZERO_ACCUM is non-zero, any map pixel which is flagged
+#               as a source pixel on some iteration will never be
+#               unflagged - once a source pixel, always a souce pixel.
+ssn.zero_accum = 0
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.zero_circle
+#  Type: 	real
+#  Default: 	<undef>
+#  Purpose: 	May speed up convergences by excluding sources within a
+#               circle of given radius from the SSN estimate.
+#  Description: Using ssn.zero_circle causes any samples falling within a
+#		specified circle on the map to be excluded from the
+#		estimation of the SSN model.
+ssn.zero_circle = <undef>
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.zero_freeze
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Prevent the SSN mask from changing after a given number
+#		of iterations. This can help convergence.
+#  Description: If ssn.zero_freeze is non-zero, the SSN mask will be frozen
+#		after the specified number of iterations. A value of zero
+#		means that the mask is never frozen. Note, any initial
+#               iterations specified by parameter "ast.skip" are not
+#               included in the count of iterations.
+ssn.zero_freeze = 0
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.zero_lowhits
+#  Type: 	real
+#  Default: 	0
+#  Purpose: 	Experimental.
+#  Description: Using ssn.zero_lowhits causes samples to be excluded from
+#               the estimation of the SSN model if they fall in
+#               regions of the map where the number of samples falling in each
+#               pixel is higher than ssn.zero_lowhits times the mean number
+#               of samples per pixel, averaged over the map. A value of
+#               zero means that no masking of low hits regions is
+#               performed. The mask is updated on each iteration.
+ssn.zero_lowhits = 0
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.zero_mask
+#  Type: 	integer or string
+#  Default: 	0
+#  Purpose: 	May speed up convergences by excluding sources within a
+#               region specified by an external mask file from the
+#               estimation of the SSN model.
+#  Description: If ssn.zero_mask is set to one of "REF", "MASK2" or
+#		"MASK3" then an NDF will be obtained using the specified
+#		ADAM parameter (REF, MASK2 or MASK3) and used as a
+#		user-defined mask. Setting ssn.zero_mask to an integer value
+#		larger than zero has the same effect as setting it to "REF".
+#		Setting it to an integer less than or equal to zero results
+#		in no external mask being used with the COM model. Note,
+#		using "REF" ensures that the mask and the output image of
+#		MAKEMAP are on the same pixel grid - using "MASK2" or "MASK3"
+#		does not provide this guarantee (it is then the users
+#		responsibility to ensure that the supplied masks are aligned
+# 		with the output image in pixel coordinates). The pixels in
+#		the map that are to be included in the estimation of the
+#               SSN model should be set to the bad value in the mask. All
+#               other pixels will be excluded from the model.
+ssn.zero_mask = 0
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.zero_niter
+#  Type: 	int
+#  Default: 	2
+#  Purpose: 	Allows SSN masking to be switched off after a given
+#		number of iterations.
+#  Description: If ssn.zero_niter is non-zero, it gives the number of
+#		iterations for which the SSN model should be masked.
+#		Subsequent iterations are not masked. A value of zero
+#		means "mask on all iterations". However, if parameter
+#		"ssn.zero_notlast" is set, the mask will will not be applied
+#		on the last iteration, even if ssn.zero_niter is zero.
+#		Note, using SSN masking on many iterations can inhibit
+#		convergence. Also, any initial iterations specified by
+#               parameter "ast.skip" are not included in the count of
+#               iterations.
+ssn.zero_niter = 2
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.zero_notlast
+#  Type: 	int
+#  Default: 	1
+#  Purpose: 	Prevent SSN masking being performed on the last iteration.
+#  Description: If ssn.zero_notlast is 1, then the SSN model is not masked on
+# 		the final iteration.
+ssn.zero_notlast = 1
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.zero_snr
+#  Type: 	real
+#  Default: 	0.0
+#  Purpose: 	May speed up convergences by excluding samples that
+#               correspond to high SNR pixels in the map.
+#  Description: Setting the ssn.zero_snr parameter will prevent samples
+#		contributing to the SSN model if they fall within map pixels
+#		that have SNR values greater than ssn.zero_snr. A ssn.zero_snr
+#		value of zero means no SNR mask is used. See also parameter
+#               "ssn.zero_snr_ffclean".
+#
+#               Note, the SNR values are only available once a map has been
+#               created, and so using this parameter results in no SSN masking
+#               on the first iteration. Consequently the map at the end of the
+#               first iteration may have noticable straight lines aligned
+#               with azimuth that pass through bright sources, since no SSN
+#               masking was done. Normally, these lines would polute the AST
+#               model derived from the map, and thus polute the residuals on
+#               the next iteration, resulting in the lines remaining in later
+#               maps. To avoid this, parameter "ast.skip" can be set to a
+#               positive value. This causes the AST model to be skipped (i.e.
+#               no AST signal is subtracted from the residuals) for the first
+#               "ast.skip" iterations. This means that a good SSN mask can be
+#               formed from these initial iterations before any AST model is
+#               calculated and used.
+ssn.zero_snr = 0
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.zero_snr_ffclean
+#  Type: 	int
+#  Default: 	0
+#  Purpose: 	Provides alternative method for SNR masking.
+#  Description: Setting this parameter to a non-zero value causes the
+#               SNR mask requested by parameter "ssn.zero_snr" to be
+#               created using an algorithm like that used by the KAPPA
+#               command "FFCLEAN" (see SUN/95), instead of using a simple
+#               thresholding of the SNR map. The parameter "ssn.zero_snr"
+#               gives the clipping level of the ffclean algorithm, and the
+#               parameter "ssn.zero_snr_hipass" gives the box size. Using
+#               an ffclean algorithm prevents the source regions within
+#               the mask being larger than the box size, and may thus
+#               produce faster convergence and avoid blobs developing.
+ssn.zero_snr_ffclean = 0
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.zero_snr_hipass
+#  Type: 	real
+#  Default: 	0.0
+#  Purpose: 	Flatten map before making SNR mask
+#  Description: Setting this parameter to a positive value causes the
+#               SNR mask requested by parameter "ssn.zero_snr" to be
+#               based on a copy of the SNR map that has been high-pass
+#               filtering to remove structures larger than the number of
+#               arc-seconds given by ssn.zero_snr_hipass. This will in
+#               general reduce the number of source pixels in the mask.
+#               See also parameter "ssn.zero_snr_ffclean".
+ssn.zero_snr_hipass = 0.0
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.zero_snr_lopass
+#  Type: 	real
+#  Default: 	0.0
+#  Purpose: 	Smooths map before making SNR mask
+#  Description: Setting this parameter to a positive value causes the
+#               SNR mask requested by parameter "ssn.zero_snr" to be
+#               based on a copy of the SNR map that has been low-pass
+#               filtering (i.e smoothed) to remove noise and other
+#               features smaller than the number of map pixels given
+#               by ssn.zero_snr_lopass. This may help to prevent pixels
+#               oscillating in and out of the mask on successive
+#               iterations, and thus aid smoother convergence.
+ssn.zero_snr_lopass = 0.0
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.zero_snrlo
+#  Type: 	real
+#  Default: 	0
+#  Purpose: 	May speed up convergences by increasing the size of the
+#               SNR mask without introducing noise.
+#  Description: If non-zero values are supplied for ssn.zero_snrlo and
+#		parameter "ssn.zero_snr", then the basic mask created by
+#		thresholding at the SNR value specified by ssn.zero_snr is
+#		modified by expanding each un-masked "source" area down to
+#		an SNR equal to ssn.zero_snrlo, without introducing any new
+#		isolated source areas. The ssn.zero_snrlo should be lower than
+#		the ssn.zero_snr value.
+ssn.zero_snrlo = 0
+
+#-----------------------------------------------------------------
+#  Name: 	ssn.zero_union
+#  Type: 	integer
+#  Default: 	1
+#  Purpose: 	Controls how multiple SSN masks are combined.
+#  Description: If more than one SSN mask is specified (for instance, if
+#		values are supplied for both parameter "ssn.zero_lowhits"
+#		and parameter "ssn.zero_snr"), then they are combined
+#		into a single mask. If ssn.zero_union is true (i.e.
+#		non-zero), then the source region in the combined mask is
+#		the union of the source regions in the individual masks.
+#		If ssn.zero_union is false (i.e. zero), then the source
+#		region in the combined mask is the intersection of the
+#		source regions in the individual masks.
+ssn.zero_union = 1
 
 #-----------------------------------------------------------------
 #  Name: 	tmp.docos

@@ -91,15 +91,17 @@
 *     2013-03-25 (TIMJ):
 *        Silence compiler warning in default case.
 *     2014-01-16 (DSB):
-*        The NOI model has "maxlen" times slices, not 1, if NOI.BOXSIZE 
+*        The NOI model has "maxlen" times slices, not 1, if NOI.BOXSIZE
 *        is non-zero.
+*     2014-12-18 (DSB):
+*        Added SSN.
 *     {enter_further_changes_here}
 
 *  Notes:
 *     This should match memory allocated in smf_grp_related.
 
 *  Copyright:
-*     Copyright (C) 2010, 2013 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2014 Science & Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2011 University of British Columbia.
 *     All Rights Reserved.
@@ -289,7 +291,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
 	case SMF__NOI:
           /* SMF__NOI also estimates the noise in each detector from the
              power spectra, requiring a temporary buffer to store an FFT.
-             The number of variances per detector depends on NOI.BOX_SIZE 
+             The number of variances per detector depends on NOI.BOX_SIZE
              - 1 if NOI.BOXSIZE is zero and "maxlen" otherwise. . */
           dofft = 1;
 
@@ -342,6 +344,9 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
           total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
           break;
         case SMF__SMO:
+          total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+          break;
+        case SMF__SSN:
           total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
           break;
         case SMF__TMP:

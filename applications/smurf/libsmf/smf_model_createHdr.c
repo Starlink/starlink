@@ -67,6 +67,8 @@
 *        Add SMF__SMO
 *     2010-06-08 (EC):
 *        Add SMF__TWO
+*     2014-12-18 (DSB):
+*        Added SSN.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -207,6 +209,10 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
       break;
 
     case SMF__SMO:
+      fset = astCopy( refwcs );
+      break;
+
+    case SMF__SSN:
       fset = astCopy( refwcs );
       break;
 

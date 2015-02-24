@@ -213,7 +213,7 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
                             status );
 
 /* If the NDF has a Quality component, import it and create initial AST,
-   FLT and COM masks from it. These will often be over-ridden by new masks
+   FLT, SSN and COM masks from it. These will often be over-ridden by new masks
    calculated with smf_calcmodel_ast below, but will not be over-written
    if the masks have been frozen by xxx.zero_freeze. */
       ndfState( indf2, "Quality", &there, status );
@@ -237,6 +237,11 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
                   if( !dat->com_mask ) dat->com_mask = astCalloc( dat->msize,
                                                   sizeof( *(dat->com_mask) ) );
                   (dat->com_mask)[ i ] = 1;
+               }
+               if( *pq & SMF__MAPQ_SSN ) {
+                  if( !dat->ssn_mask ) dat->ssn_mask = astCalloc( dat->msize,
+                                                  sizeof( *(dat->ssn_mask) ) );
+                  (dat->ssn_mask)[ i ] = 1;
                }
             }
          }
