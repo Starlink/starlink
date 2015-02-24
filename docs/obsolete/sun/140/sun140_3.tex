@@ -106,7 +106,7 @@ interest to the user, too.  Namely Sections \ref{specfit} and
 \ref{axcalib} give examples of using several applications together.
 
 Specdre is a package for spectroscopy data reduction and analysis. It
-fills the gap between Figaro and Kappa: On one hand all its routines
+fills the gap between Figaro and KAPPA: On one hand all its routines
 conform with Starlink's concept of bad values and variances, on the
 other hand they offer spectroscopy applications hitherto available only
 in Figaro. Specdre can in general work on data sets with seven or less
@@ -179,7 +179,7 @@ exit}.) There are three alternative ways to achieve this:
    ICL> specdre               ICL> specdre               $ adam specdre
 \end{verbatim}
 
-Once in ICL, you can initialise further packages, like Kappa, CCDPack or
+Once in ICL, you can initialise further packages, like KAPPA, CCDPack or
 Figaro:
 
 \begin{verbatim}
@@ -410,11 +410,11 @@ at hand.
 \section{Graphics}
 \label{graphic}
 
-The management of graphics output follows closely that of Kappa. To make
-full use of the graphics capabilities, you will need to use some Kappa
+The management of graphics output follows closely that of KAPPA. To make
+full use of the graphics capabilities, you will need to use some KAPPA
 commands; and you will find Pongo extremely useful to add almost
 anything to your plots.  For normal use you can get along without
-Kappa or Pongo.
+KAPPA or Pongo.
 The actual plots are achieved through a combination of AGI, SGS,
 PGPLOT, and GKS. The graphics is done with PGPLOT, but the device is
 handled via AGI and SGS, and GKS is the low level package underlying
@@ -439,7 +439,7 @@ overriding the global parameter:
 \end{verbatim}
 
 This will also change the global parameter so that next time you use the same
-device automatically.  (If you use Kappa commands like {\tt display} the
+device automatically.  (If you use KAPPA commands like {\tt display} the
 change is not permanent and affects only the one invokation of that command.)
 
 There are other Specdre commands that may or may not use a graphics device.
@@ -469,7 +469,7 @@ psmerge} (cf.\ SUN/164).  Usually the output is a complete PostScript
 file ready to be printed.
 
 As an example, here is the ICL procedure that created the plot on the
-cover page.  It uses commands from Kappa, Specdre and Pongo.
+cover page.  It uses commands from KAPPA, Specdre and Pongo.
 
 \goodbreak
 \small
@@ -603,7 +603,7 @@ you can work your way through the rows of a CCD long slit spectrum,
 store each row's fit in the Extension and fill the result storage space.
 The collection of all fits is again an NDF (located in the Extension)
 and can be fed into other applications like {\tt specplot}, {\tt
-ascout}, or indeed Kappa's {\tt display}.
+ascout}, or indeed KAPPA's {\tt display}.
 
 The Extension also provides a place to store a full-size array for the
 wavelength or frequency etc.\ of each pixel.  This array of
@@ -654,7 +654,7 @@ array of spectroscopic values.
    rate, brightness etc.\ of a pixel, the spectroscopic values' NDF
    stores the wavelength, frequency, radial velocity etc.\ for that
    pixel.  This information is recognised only by Specdre.  You cannot
-   expect Kappa's {\tt linplot} to use it for axis labelling, Specdre's
+   expect KAPPA's {\tt linplot} to use it for axis labelling, Specdre's
    {\tt specplot} does use it of course.  You also cannot use this array
    to specify an NDF section in a parameter value.
 
@@ -713,7 +713,7 @@ Specdre's handling of N-D data falls into three categories.
 
 \end{itemize}
 
-{\tt subset} is very similar to Kappa's {\tt ndfcopy} or to taking an
+{\tt subset} is very similar to KAPPA's {\tt ndfcopy} or to taking an
 ``on the fly'' section as input to an application.  The differences are
 that {\tt subset} also takes subsets of NDFs in the Specdre
 Extension consistent with the subset of the main NDF,
@@ -819,7 +819,7 @@ model data set. You could then subtract that from the original data.
 Here is a complex example how you might proceed with a long slit
 spectrum, it won't work like that since parameters are missing. Also the
 telluric correction may not be the correct way of doing things. The
-example only shows how you can juggle with Specdre/Kappa applications.
+example only shows how you can juggle with Specdre/KAPPA applications.
 
 \begin{verbatim}
    ICL> fitcheby image(,1) mask1=[1,3,5] mask2=[2,4,6] comp=1             { 1)
@@ -850,7 +850,7 @@ example only shows how you can juggle with Specdre/Kappa applications.
 \item[2)] For the whole image use the stored result to generate a
    corresponding data set representing the fitted continuum.
 
-\item[3)] Use a Kappa command to divide the original image by the
+\item[3)] Use a KAPPA command to divide the original image by the
    continuum.
 
 \item[4)] For each row of the normalised image use the intervening
@@ -861,9 +861,9 @@ example only shows how you can juggle with Specdre/Kappa applications.
    dialogue and just recall the command line to edit the row number.
 
 \item[5)] The second line fitted, the third component stored, is not
-   stellar but terrestrial, subtract it with the Kappa command {\tt sub}.
+   stellar but terrestrial, subtract it with the KAPPA command {\tt sub}.
 
-\item[6)] Use Kappa's {\tt cadd} to turn the simple telluric lines into
+\item[6)] Use KAPPA's {\tt cadd} to turn the simple telluric lines into
    proper telluric spectra with continuum at 1.0. Then divide the
    normalised spectra by the telluric spectra.
 
@@ -956,7 +956,7 @@ any improved feature identifications are kept.  If the user steps
 through all rows, then the spectroscopic values will be kept as well.
 (You can have spectroscopic values in the Specdre Extension either for
 all rows or none at all!).  You may want to set the label and unit for
-the spectroscopic values after {\tt arcdisp} with Kappa's {\tt setlabel,
+the spectroscopic values after {\tt arcdisp} with KAPPA's {\tt setlabel,
 setunits}.
 
 So far you have only succeeded in producing an array of calibrated
@@ -1000,7 +1000,7 @@ and you can stop tasks to get some breathing space again:
 \begin{verbatim}
    ICL> tasks                       { list of tasks running
    ICL> kill specdre_dir:specdre    { kill Specdre package
-   ICL> kill kappa_dir:kappa        { kill Kappa package
+   ICL> kill kappa_dir:kappa        { kill KAPPA package
 \end{verbatim}
 
 This does not de-initialise the packages. When you issue another Specdre
@@ -1065,19 +1065,19 @@ improved functionality. But Specdre is not as complete a package as
 Figaro.
 
 On the other hand Specdre is installed and invoked much in the same way as
-Kappa. It can be run from ICL so that all the advantages of ICL -- like editing
+KAPPA. It can be run from ICL so that all the advantages of ICL -- like editing
 ICL procedures, having to load the package executable only once and keeping
 several packages loaded in separate sub-processes -- can benefit the use of
 Specdre. ICL is described in SG/5.
 
-Another advantage under ICL is that through AGI Specdre, Kappa and Pongo
+Another advantage under ICL is that through AGI Specdre, KAPPA and Pongo
 can share information about what has been plotted.  Pongo is a versatile
 plotting programme to do anything beyond displaying an image or a
 spectrum from binary data files.  It is documented in SUN/137.
 
 Users should also note that part of the reduction traditionally done with
 Figaro may be available in CCDPack, described in SUN/139. The combination of
-Kappa, CCDPack and Specdre has the advantage that all are well integrated.
+KAPPA, CCDPack and Specdre has the advantage that all are well integrated.
 
 The following list includes also other spectroscopy software items.
 
@@ -1147,7 +1147,7 @@ Starlink's Extensible N-Dimensional Data Format (NDF) is described in SGP/38,
 but SUN/33 may be a more useful description of the data format and the NDF
 routines used to access the data. NDF files are Starlink Data Files and can be
 recognised by their file name extension {\tt .sdf}. This data format is used by
-other Starlink packages like Kappa and CCDPack, and it is one of the formats
+other Starlink packages like KAPPA and CCDPack, and it is one of the formats
 supported by Figaro (version 3.0) and DSA-based packages.
 
 Spectroscopy is basically a one-dimensional type of problem. But the inclusion

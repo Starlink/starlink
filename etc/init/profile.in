@@ -335,14 +335,14 @@ if test -f ${staretcdir}/jpleph.dat; then
    export JPL_DIR=${staretcdir}
 fi
 
-#  Kappa
+#  KAPPA
 
 if test -f ${bindir}/kappa/kappa.sh; then
    export KAPPA_DIR=${bindir}/kappa
    export KAPPA_HELP=${starhelpdir}/kappa/kappa
 fi
 
-#  Kappa Retirement Home (kaprh)
+#  KAPPA Retirement Home (kaprh)
 
 if test -f ${bindir}/kaprh/kaprh.sh; then
    export KAPRH_DIR=${bindir}/kaprh

@@ -425,7 +425,7 @@ else
 endif
 
 #
-#   Kappa
+#   KAPPA
 #
 
 if ( -e ${bindir}/kappa/kappa.csh ) then
