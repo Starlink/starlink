@@ -1628,61 +1628,6 @@ $(MANIFESTS)/kappa: \
 	cd applications/kappa \
 	  && $(MAKE_CPT)
 
-$(MANIFESTS)/kaprh: \
-		$(MANIFESTS)/agi \
-		$(MANIFESTS)/ard \
-		$(MANIFESTS)/ary \
-		$(MANIFESTS)/ast \
-		$(MANIFESTS)/atl \
-		$(MANIFESTS)/cat \
-		$(MANIFESTS)/cfitsio \
-		$(MANIFESTS)/chr \
-		$(MANIFESTS)/cnf \
-		$(MANIFESTS)/ctg \
-		$(MANIFESTS)/ems \
-		$(MANIFESTS)/fio \
-		$(MANIFESTS)/generic \
-		$(MANIFESTS)/gks \
-		$(MANIFESTS)/gns \
-		$(MANIFESTS)/graphpar \
-		$(MANIFESTS)/grp \
-		$(MANIFESTS)/gwm \
-		$(MANIFESTS)/hds \
-		$(MANIFESTS)/hlp \
-		$(MANIFESTS)/idi \
-		$(MANIFESTS)/ifd \
-		$(MANIFESTS)/irq \
-		$(MANIFESTS)/kaplibs \
-		$(MANIFESTS)/lpg \
-		$(MANIFESTS)/mers \
-		$(MANIFESTS)/ncar \
-		$(MANIFESTS)/ndf \
-		$(MANIFESTS)/ndg \
-		$(MANIFESTS)/one \
-		$(MANIFESTS)/par \
-		$(MANIFESTS)/pcs \
-		$(MANIFESTS)/pda \
-		$(MANIFESTS)/pgp \
-		$(MANIFESTS)/pgplot \
-		$(MANIFESTS)/prm \
-		$(MANIFESTS)/psx \
-		$(MANIFESTS)/ref \
-		$(MANIFESTS)/sae \
-		$(MANIFESTS)/sgs \
-		$(MANIFESTS)/shl \
-		$(MANIFESTS)/sla \
-		$(MANIFESTS)/snx \
-		$(MANIFESTS)/sst \
-		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem \
-		$(MANIFESTS)/starutil \
-		$(MANIFESTS)/starx \
-		$(MANIFESTS)/tcl \
-		$(MANIFESTS)/tk \
-		$(MANIFESTS)/trn
-	cd applications/kaprh \
-	  && $(MAKE_CPT)
-
 $(MANIFESTS)/latexsupport:
 	cd applications/latexsupport \
 	  && $(MAKE_CPT)
