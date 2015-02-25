@@ -394,34 +394,6 @@ cube manipulation. </p></abstract>
   </copyright>
 </component>
 
-<component id="echwind" support="S">
-  <version>3.1-4</version>
-  <path>applications/echwind</path>
-  <description>UCL Echelle Spectrograph Observation Planning</description>
-  <abstract><p>
-ECHWIND is used to assist in the planning of observations with either the
-Utrecht Echelle Spectrograph (UES) or the UCL coude echelle spectrograph
-(UCLES). It can be run at your home institution, when preparing an observing
-proposal, or before or during an observing run.
-  </p></abstract>
-  <dependencies >
-    <build>pgplot</build><build>starx</build><sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Marion Fisher</name>
-    </person>
-    <person>
-      <name>William Lupton</name>
-    </person>
-    <person>
-      <name>Anne Charles</name>
-    </person>
-  </developers>
-  <documentation> sun53</documentation>
-  <bugreports>starlink@jiscmail.ac.uk</bugreports>
-</component>
-
 <component id="esp" support="S">
   <version>0.11-4</version>
   <path>applications/esp</path>

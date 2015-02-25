@@ -37,7 +37,6 @@ ALL_TARGETS = \
 	$(MANIFESTS)/dipso \
 	$(MANIFESTS)/docfind \
 	$(MANIFESTS)/echomop \
-	$(MANIFESTS)/echwind \
 	$(MANIFESTS)/ems \
 	$(MANIFESTS)/erfa \
 	$(MANIFESTS)/esp \

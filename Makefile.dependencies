@@ -810,24 +810,6 @@ $(MANIFESTS)/echomop: \
 	cd applications/echomop \
 	  && $(MAKE_CPT)
 
-$(MANIFESTS)/echwind: \
-		$(MANIFESTS)/chr \
-		$(MANIFESTS)/cnf \
-		$(MANIFESTS)/ems \
-		$(MANIFESTS)/gwm \
-		$(MANIFESTS)/mers \
-		$(MANIFESTS)/pgplot \
-		$(MANIFESTS)/psx \
-		$(MANIFESTS)/sae \
-		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem \
-		$(MANIFESTS)/starutil \
-		$(MANIFESTS)/starx \
-		$(MANIFESTS)/tcl \
-		$(MANIFESTS)/tk
-	cd applications/echwind \
-	  && $(MAKE_CPT)
-
 # Component email is OBSOLETE -- do not build
 $(MANIFESTS)/email: \
 		$(MANIFESTS)/star2html
@@ -2849,7 +2831,6 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/dipso \
 	$(MANIFESTS)/docfind \
 	$(MANIFESTS)/echomop \
-	$(MANIFESTS)/echwind \
 	$(MANIFESTS)/ems \
 	$(MANIFESTS)/esp \
 	$(MANIFESTS)/extractor \

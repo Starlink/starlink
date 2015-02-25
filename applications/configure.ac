@@ -15,7 +15,7 @@ AC_PROG_MAKE_SET
 dnl    The following list must be kept up-to-date by hand.
 dnl    The list is available as the substitution variable @subdirs@.
 dnl    (must be kept on one line)
-AC_CONFIG_SUBDIRS([astrom atools ccdpack coco convert cupid cursa datacube daophot dipso docfind echomop echwind esp extractor extreme fluxes figaro findcoords gaia generic hdstools hdstrace htx icl ifd kappa kaprh messgen news observe pamela period photom pongo pisa polmap polpack psmerge rv smurf specx spt sst star2html startcl starx surf tsp xdisplay latexsupport])
+AC_CONFIG_SUBDIRS([astrom atools ccdpack coco convert cupid cursa datacube daophot dipso docfind echomop esp extractor extreme fluxes figaro findcoords gaia generic hdstools hdstrace htx icl ifd kappa messgen news observe pamela period photom pongo pisa polmap polpack psmerge rv smurf specx spt sst star2html startcl starx surf tsp xdisplay latexsupport])
 
 AC_CONFIG_FILES(Makefile)
 
