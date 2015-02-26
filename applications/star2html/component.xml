@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="star2html" support="S">
-  <version>1.7-1</version>
+  <version>2.0-1</version>
   <path>applications/star2html</path>
   <description>Convert Starlink documents to hypertext</description>
   <abstract><p>Star2HTML lets you write (or convert) a Starlink document
