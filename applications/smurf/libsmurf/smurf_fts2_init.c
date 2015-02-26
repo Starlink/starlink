@@ -72,6 +72,8 @@
 *        and the corresponding mirror positions of ~6.3 ms,
 *        interpolation of raw interferograms has been added.
 *        An optional parameter: RTSDELAY accepts a double value representing time in ms.
+*     2015-02-20 (MS):
+*        Added new smfFts fields for quality statistics
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -144,6 +146,14 @@ void smurf_fts2_init(int* status)
   smfData* zpd              = NULL;     /* Pointer to ZPD index data */
   smfData* fpm              = NULL;     /* Pointer polynomial fit parameters */
   smfData* sigma            = NULL;
+  smfData* dead             = NULL;     /* Dead pixel flag m x n array */
+  smfData* a                = NULL;     /* Pointer to a band (1/f low frequency) integrated powers */
+  smfData* b                = NULL;     /* Pointer to b band (in band signal) integrated powers */
+  smfData* c                = NULL;     /* Pointer to c band (noise) integrated powers */
+  smfData* d                = NULL;     /* Pointer to d band (first harmonic) integrated powers */
+  smfData* phaseFit         = NULL;     /* Pointer to Phase X^2 goodness of fit measures */
+  smfData* cosmicRays       = NULL;     /* Pointer to numbers of cosmic rays occuring */
+  smfData* fluxJumps        = NULL;     /* Pointer to numbers of flux jumps occuring */
   int nMirPos               = 0;        /* Number of frames where the mirror actually moves */
   int nStart                = 0;        /* Frame index where the mirror starts moving */
   int nStop                 = 0;        /* Frame index where the mirror stops */
@@ -577,8 +587,84 @@ void smurf_fts2_init(int* status)
     sigma->dims[1] = 1;
     sigma->pntr[0] = (double*) astCalloc(1, sizeof(double));
 
+    /* Create a 2D empty dead pixel array */
+    dead = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+    dead->dtype   = SMF__INTEGER;
+    dead->ndims   = 2;
+    dead->dims[0] = nWidth;
+    dead->dims[1] = nHeight;
+    dead->pntr[0] = (int*) astCalloc(nPixels, sizeof(int));
+
+    /* Create a 2D empty a band array */
+    a = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+    a->dtype   = SMF__DOUBLE;
+    a->ndims   = 2;
+    a->dims[0] = nWidth;
+    a->dims[1] = nHeight;
+    a->pntr[0] = (double*) astCalloc(nPixels, sizeof(double));
+
+    /* Create a 2D empty b band array */
+    b = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+    b->dtype   = SMF__DOUBLE;
+    b->ndims   = 2;
+    b->dims[0] = nWidth;
+    b->dims[1] = nHeight;
+    b->pntr[0] = (double*) astCalloc(nPixels, sizeof(double));
+
+    /* Create a 2D empty c band array */
+    c = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+    c->dtype   = SMF__DOUBLE;
+    c->ndims   = 2;
+    c->dims[0] = nWidth;
+    c->dims[1] = nHeight;
+    c->pntr[0] = (double*) astCalloc(nPixels, sizeof(double));
+
+    /* Create a 2D empty d band array */
+    d = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+    d->dtype   = SMF__DOUBLE;
+    d->ndims   = 2;
+    d->dims[0] = nWidth;
+    d->dims[1] = nHeight;
+    d->pntr[0] = (double*) astCalloc(nPixels, sizeof(double));
+
+    /* Create a 2D empty phaseFit array */
+    phaseFit = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+    phaseFit->dtype   = SMF__DOUBLE;
+    phaseFit->ndims   = 2;
+    phaseFit->dims[0] = nWidth;
+    phaseFit->dims[1] = nHeight;
+    phaseFit->pntr[0] = (double*) astCalloc(nPixels, sizeof(double));
+
+    /* Create a 2D empty cosmicRays array */
+    cosmicRays = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+    cosmicRays->dtype   = SMF__INTEGER;
+    cosmicRays->ndims   = 2;
+    cosmicRays->dims[0] = nWidth;
+    cosmicRays->dims[1] = nHeight;
+    cosmicRays->pntr[0] = (int*) astCalloc(nPixels, sizeof(int));
+
+    /* Create a 2D empty fluxJumps array */
+    fluxJumps = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+    fluxJumps->dtype   = SMF__INTEGER;
+    fluxJumps->ndims   = 2;
+    fluxJumps->dims[0] = nWidth;
+    fluxJumps->dims[1] = nHeight;
+    fluxJumps->pntr[0] = (int*) astCalloc(nPixels, sizeof(int));
+
+    // Initialize FTS2 values to bad
+    for(i=0;i<nPixels;i++) {
+        *((int*) dead->pntr[0] + i) = VAL__BADI;
+        *((double*) a->pntr[0] + i) = VAL__BADD;
+        *((double*) b->pntr[0] + i) = VAL__BADD;
+        *((double*) c->pntr[0] + i) = VAL__BADD;
+        *((double*) d->pntr[0] + i) = VAL__BADD;
+        *((double*) phaseFit->pntr[0] + i) = VAL__BADD;
+        *((int*) cosmicRays->pntr[0] + i) = VAL__BADI;
+        *((int*) fluxJumps->pntr[0] + i) = VAL__BADI;
+    }
+
     /* Write to output */
-    outData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
+    outData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, dead, a, b, c, d, phaseFit, cosmicRays, fluxJumps, status);
     smf_write_smfData(NULL, outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
     smf_close_file( NULL,&outData, status);
   }

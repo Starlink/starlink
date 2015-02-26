@@ -105,6 +105,8 @@
 *     2014-05-02 (MS)
 *        Fixed memory leak with fftw plan
 *        - Added fftw plan destructor for each instance constructed.
+*     2015-02-20 (MS):
+*        Added new smfFts fields for quality statistics
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -218,6 +220,14 @@ void smurf_fts2_phasecorrds(int* status)
     smfData* zpd              = NULL;               /* Pointer to ZPD index data */
     smfData* fpm              = NULL;               /* Pointer polynomial fit parameters */
     smfData* sigma            = NULL;
+    smfData* dead             = NULL;               /* Dead pixel flag m x n array */
+    smfData* a                = NULL;               /* Pointer to a band (1/f low frequency) integrated powers */
+    smfData* b                = NULL;               /* Pointer to b band (in band signal) integrated powers */
+    smfData* c                = NULL;               /* Pointer to c band (noise) integrated powers */
+    smfData* d                = NULL;               /* Pointer to d band (first harmonic) integrated powers */
+    smfData* phaseFit         = NULL;               /* Pointer to Phase X^2 goodness of fit measures */
+    smfData* cosmicRays       = NULL;               /* Pointer to numbers of cosmic rays occuring */
+    smfData* fluxJumps        = NULL;               /* Pointer to numbers of flux jumps occuring */
     int64_t nUsed             = 0;                  /* Number of used data points */
     int pDegree               = 0;                  /* Degree of the polynomial used to fit phase */
     int i                     = 0;                  /* Counter */
@@ -517,6 +527,70 @@ void smurf_fts2_phasecorrds(int* status)
         sigma->dims[0] = nWidth;
         sigma->dims[1] = nHeight;
         sigma->pntr[0] = (double*) astCalloc(nPixels, sizeof(double));
+
+        /* Create a 2D empty dead pixel array */
+        dead = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+        dead->dtype   = SMF__INTEGER;
+        dead->ndims   = 2;
+        dead->dims[0] = nWidth;
+        dead->dims[1] = nHeight;
+        dead->pntr[0] = (int*) astCalloc(nPixels, sizeof(int));
+
+        /* Create a 2D empty a band array */
+        a = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+        a->dtype   = SMF__DOUBLE;
+        a->ndims   = 2;
+        a->dims[0] = nWidth;
+        a->dims[1] = nHeight;
+        a->pntr[0] = (double*) astCalloc(nPixels, sizeof(double));
+
+        /* Create a 2D empty b band array */
+        b = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+        b->dtype   = SMF__DOUBLE;
+        b->ndims   = 2;
+        b->dims[0] = nWidth;
+        b->dims[1] = nHeight;
+        b->pntr[0] = (double*) astCalloc(nPixels, sizeof(double));
+
+        /* Create a 2D empty c band array */
+        c = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+        c->dtype   = SMF__DOUBLE;
+        c->ndims   = 2;
+        c->dims[0] = nWidth;
+        c->dims[1] = nHeight;
+        c->pntr[0] = (double*) astCalloc(nPixels, sizeof(double));
+
+        /* Create a 2D empty d band array */
+        d = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+        d->dtype   = SMF__DOUBLE;
+        d->ndims   = 2;
+        d->dims[0] = nWidth;
+        d->dims[1] = nHeight;
+        d->pntr[0] = (double*) astCalloc(nPixels, sizeof(double));
+
+        /* Create a 2D empty phaseFit array */
+        phaseFit = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+        phaseFit->dtype   = SMF__DOUBLE;
+        phaseFit->ndims   = 2;
+        phaseFit->dims[0] = nWidth;
+        phaseFit->dims[1] = nHeight;
+        phaseFit->pntr[0] = (double*) astCalloc(nPixels, sizeof(double));
+
+        /* Create a 2D empty cosmicRays array */
+        cosmicRays = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+        cosmicRays->dtype   = SMF__INTEGER;
+        cosmicRays->ndims   = 2;
+        cosmicRays->dims[0] = nWidth;
+        cosmicRays->dims[1] = nHeight;
+        cosmicRays->pntr[0] = (int*) astCalloc(nPixels, sizeof(int));
+
+        /* Create a 2D empty fluxJumps array */
+        fluxJumps = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+        fluxJumps->dtype   = SMF__INTEGER;
+        fluxJumps->ndims   = 2;
+        fluxJumps->dims[0] = nWidth;
+        fluxJumps->dims[1] = nHeight;
+        fluxJumps->pntr[0] = (int*) astCalloc(nPixels, sizeof(int));
 
         /* Allocate memory for arrays */
         IFG     = astCalloc(nFrames, sizeof(*IFG));
@@ -1126,7 +1200,7 @@ void smurf_fts2_phasecorrds(int* status)
         }
 
         /* Write output */
-        outData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
+        outData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, dead, a, b, c, d, phaseFit, cosmicRays, fluxJumps, status);
         n = one_snprintf(outData->file->name, sizeof(fileName), "%sphs", status, fileName);
         if(n < 0 || n >= SMF_PATH_MAX) {
             errRepf(TASK_NAME, "Error creating outData->file->name", status);

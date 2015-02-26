@@ -59,6 +59,7 @@
  *     David Berry (JAC, UCLan)
  *     Malcolm J. Currie (Starlink)
  *     COBA: Coskun Oba (UoL)
+ *     Matt Sherwood (MS, UofL)
  *     {enter_new_authors_here}
 
  *  History:
@@ -248,6 +249,8 @@
  *        Use the STEPTIME and SCANVEL values from the SMURF extension, if
  *        any, in preference to the FITS headers. These extension items are
  *        created by makemap when exporting cleaned time series data.
+ *     2015-02-20 (MS)
+ *        Added new smfFts fields for quality statistics
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -674,6 +677,263 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
               }
             }
           }
+
+          /* Read in SMFFTS->DEAD */
+          ndfOpen(hdsFTS, "DEAD", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
+          if(*status == SAI__OK && ndfFTS != NDF__NOID) {
+              ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
+              if(*status == SAI__OK) {
+                  if(ndimsFTS != 2) {
+                      *status = SAI__ERROR;
+                      errRep("", FUNC_NAME ": FTS2->DEAD must be 2-D!", status);
+                  }
+                  ndfMap( ndfFTS, "DATA", "_INTEGER", mode, &pntr, &nmapFTS, status);
+                  if(*status == SAI__OK) {
+                      fts->dead = smf_create_smfData(CREATEFLAG, status);
+                      if(*status == SAI__OK) {
+                          size_t count;
+                          fts->dead->dtype   = SMF__INTEGER;
+                          fts->dead->ndims   = ndimsFTS;
+                          fts->dead->dims[0] = dimsFTS[0];
+                          fts->dead->dims[1] = dimsFTS[1];
+                          fts->dead->lbnd[0] = 0;
+                          fts->dead->lbnd[1] = 0;
+
+                          /* Make a deep copy */
+                          count = dimsFTS[0] * dimsFTS[1];
+                          fts->dead->pntr[0] = astMalloc( count*sizeof(int) );
+                          for(index = 0; index < count; index++) {
+                              *((int*) (fts->dead->pntr[0]) + index) = *((int*) pntr + index);
+                          }
+                       }
+                    }
+                }
+            }
+
+            /* Read in SMFFTS->A */
+            ndfOpen(hdsFTS, "A", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
+            if(*status == SAI__OK && ndfFTS != NDF__NOID) {
+                ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
+                if(*status == SAI__OK) {
+                    if(ndimsFTS != 2) {
+                        *status = SAI__ERROR;
+                        errRep("", FUNC_NAME ": FTS2->A must be 2-D!", status);
+                    }
+                    ndfMap( ndfFTS, "DATA", "_DOUBLE", mode, &pntr, &nmapFTS, status);
+                    if(*status == SAI__OK) {
+                        fts->a = smf_create_smfData(CREATEFLAG, status);
+                        if(*status == SAI__OK) {
+                            size_t count;
+                            fts->a->dtype   = SMF__DOUBLE;
+                            fts->a->ndims   = ndimsFTS;
+                            fts->a->dims[0] = dimsFTS[0];
+                            fts->a->dims[1] = dimsFTS[1];
+                            fts->a->lbnd[0] = 0;
+                            fts->a->lbnd[1] = 0;
+
+                            /* Make a deep copy */
+                            count = dimsFTS[0] * dimsFTS[1];
+                            fts->a->pntr[0] = astMalloc( count*sizeof(double) );
+                            for(index = 0; index < count; index++) {
+                                *((double*) (fts->a->pntr[0]) + index) = *((double*) pntr + index);
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* Read in SMFFTS->B */
+            ndfOpen(hdsFTS, "B", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
+            if(*status == SAI__OK && ndfFTS != NDF__NOID) {
+                ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
+                if(*status == SAI__OK) {
+                    if(ndimsFTS != 2) {
+                        *status = SAI__ERROR;
+                        errRep("", FUNC_NAME ": FTS2->B must be 2-D!", status);
+                    }
+                    ndfMap( ndfFTS, "DATA", "_DOUBLE", mode, &pntr, &nmapFTS, status);
+                    if(*status == SAI__OK) {
+                         fts->b = smf_create_smfData(CREATEFLAG, status);
+                        if(*status == SAI__OK) {
+                            size_t count;
+                            fts->b->dtype   = SMF__DOUBLE;
+                            fts->b->ndims   = ndimsFTS;
+                            fts->b->dims[0] = dimsFTS[0];
+                            fts->b->dims[1] = dimsFTS[1];
+                            fts->b->lbnd[0] = 0;
+                            fts->b->lbnd[1] = 0;
+
+                            /* Make a deep copy */
+                            count = dimsFTS[0] * dimsFTS[1];
+                            fts->b->pntr[0] = astMalloc( count*sizeof(double) );
+                            for(index = 0; index < count; index++) {
+                                *((double*) (fts->b->pntr[0]) + index) = *((double*) pntr + index);
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* Read in SMFFTS->C */
+            ndfOpen(hdsFTS, "C", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
+            if(*status == SAI__OK && ndfFTS != NDF__NOID) {
+                ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
+                if(*status == SAI__OK) {
+                    if(ndimsFTS != 2) {
+                        *status = SAI__ERROR;
+                        errRep("", FUNC_NAME ": FTS2->C must be 2-D!", status);
+                    }
+                    ndfMap( ndfFTS, "DATA", "_DOUBLE", mode, &pntr, &nmapFTS, status);
+                    if(*status == SAI__OK) {
+                        fts->c = smf_create_smfData(CREATEFLAG, status);
+                        if(*status == SAI__OK) {
+                            size_t count;
+                            fts->c->dtype   = SMF__DOUBLE;
+                            fts->c->ndims   = ndimsFTS;
+                            fts->c->dims[0] = dimsFTS[0];
+                            fts->c->dims[1] = dimsFTS[1];
+                            fts->c->lbnd[0] = 0;
+                            fts->c->lbnd[1] = 0;
+
+                            /* Make a deep copy */
+                            count = dimsFTS[0] * dimsFTS[1];
+                            fts->c->pntr[0] = astMalloc( count*sizeof(double) );
+                            for(index = 0; index < count; index++) {
+                                *((double*) (fts->c->pntr[0]) + index) = *((double*) pntr + index);
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* Read in SMFFTS->D */
+            ndfOpen(hdsFTS, "D", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
+            if(*status == SAI__OK && ndfFTS != NDF__NOID) {
+                ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
+                if(*status == SAI__OK) {
+                    if(ndimsFTS != 2) {
+                        *status = SAI__ERROR;
+                        errRep("", FUNC_NAME ": FTS2->D must be 2-D!", status);
+                    }
+                    ndfMap( ndfFTS, "DATA", "_DOUBLE", mode, &pntr, &nmapFTS, status);
+                    if(*status == SAI__OK) {
+                        fts->d = smf_create_smfData(CREATEFLAG, status);
+                        if(*status == SAI__OK) {
+                            size_t count;
+                            fts->d->dtype   = SMF__DOUBLE;
+                            fts->d->ndims   = ndimsFTS;
+                            fts->d->dims[0] = dimsFTS[0];
+                            fts->d->dims[1] = dimsFTS[1];
+                            fts->d->lbnd[0] = 0;
+                            fts->d->lbnd[1] = 0;
+
+                            /* Make a deep copy */
+                            count = dimsFTS[0] * dimsFTS[1];
+                            fts->d->pntr[0] = astMalloc( count*sizeof(double) );
+                            for(index = 0; index < count; index++) {
+                                *((double*) (fts->d->pntr[0]) + index) = *((double*) pntr + index);
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* Read in SMFFTS->PHASEFIT */
+            ndfOpen(hdsFTS, "PHASEFIT", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
+            if(*status == SAI__OK && ndfFTS != NDF__NOID) {
+                ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
+                if(*status == SAI__OK) {
+                    if(ndimsFTS != 2) {
+                        *status = SAI__ERROR;
+                        errRep("", FUNC_NAME ": FTS2->PHASEFIT must be 2-D!", status);
+                    }
+                    ndfMap( ndfFTS, "DATA", "_DOUBLE", mode, &pntr, &nmapFTS, status);
+                    if(*status == SAI__OK) {
+                        fts->phaseFit = smf_create_smfData(CREATEFLAG, status);
+                        if(*status == SAI__OK) {
+                            size_t count;
+                            fts->phaseFit->dtype   = SMF__DOUBLE;
+                            fts->phaseFit->ndims   = ndimsFTS;
+                            fts->phaseFit->dims[0] = dimsFTS[0];
+                            fts->phaseFit->dims[1] = dimsFTS[1];
+                            fts->phaseFit->lbnd[0] = 0;
+                            fts->phaseFit->lbnd[1] = 0;
+
+                            /* Make a deep copy */
+                            count = dimsFTS[0] * dimsFTS[1];
+                            fts->phaseFit->pntr[0] = astMalloc( count*sizeof(double) );
+                            for(index = 0; index < count; index++) {
+                                *((double*) (fts->phaseFit->pntr[0]) + index) = *((double*) pntr + index);
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* Read in SMFFTS->COSMICRAYS */
+            ndfOpen(hdsFTS, "COSMICRAYS", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
+            if(*status == SAI__OK && ndfFTS != NDF__NOID) {
+                ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
+                if(*status == SAI__OK) {
+                    if(ndimsFTS != 2) {
+                        *status = SAI__ERROR;
+                        errRep("", FUNC_NAME ": FTS2->COSMICRAYS must be 2-D!", status);
+                    }
+                    ndfMap( ndfFTS, "DATA", "_INTEGER", mode, &pntr, &nmapFTS, status);
+                    if(*status == SAI__OK) {
+                        fts->cosmicRays = smf_create_smfData(CREATEFLAG, status);
+                        if(*status == SAI__OK) {
+                            size_t count;
+                            fts->cosmicRays->dtype   = SMF__INTEGER;
+                            fts->cosmicRays->ndims   = ndimsFTS;
+                            fts->cosmicRays->dims[0] = dimsFTS[0];
+                            fts->cosmicRays->dims[1] = dimsFTS[1];
+                            fts->cosmicRays->lbnd[0] = 0;
+                            fts->cosmicRays->lbnd[1] = 0;
+
+                            /* Make a deep copy */
+                            count = dimsFTS[0] * dimsFTS[1];
+                            fts->cosmicRays->pntr[0] = astMalloc( count*sizeof(int) );
+                            for(index = 0; index < count; index++) {
+                                *((int*) (fts->cosmicRays->pntr[0]) + index) = *((int*) pntr + index);
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* Read in SMFFTS->FLUXJUMPS */
+            ndfOpen(hdsFTS, "FLUXJUMPS", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
+            if(*status == SAI__OK && ndfFTS != NDF__NOID) {
+                ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
+                if(*status == SAI__OK) {
+                    if(ndimsFTS != 2) {
+                        *status = SAI__ERROR;
+                        errRep("", FUNC_NAME ": FTS2->FLUXJUMPS must be 2-D!", status);
+                    }
+                    ndfMap( ndfFTS, "DATA", "_INTEGER", mode, &pntr, &nmapFTS, status);
+                    if(*status == SAI__OK) {
+                        fts->fluxJumps = smf_create_smfData(CREATEFLAG, status);
+                        if(*status == SAI__OK) {
+                            size_t count;
+                            fts->fluxJumps->dtype   = SMF__INTEGER;
+                            fts->fluxJumps->ndims   = ndimsFTS;
+                            fts->fluxJumps->dims[0] = dimsFTS[0];
+                            fts->fluxJumps->dims[1] = dimsFTS[1];
+                            fts->fluxJumps->lbnd[0] = 0;
+                            fts->fluxJumps->lbnd[1] = 0;
+
+                            /* Make a deep copy */
+                            count = dimsFTS[0] * dimsFTS[1];
+                            fts->fluxJumps->pntr[0] = astMalloc( count*sizeof(int) );
+                            for(index = 0; index < count; index++) {
+                                *((int*) (fts->fluxJumps->pntr[0]) + index) = *((int*) pntr + index);
+                            }
+                        }
+                    }
+                }
+            }
+
           // CLEANUP FTS2
           if(hdsFTS) { datAnnul(&hdsFTS, status); }
         }

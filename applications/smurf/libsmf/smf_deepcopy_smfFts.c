@@ -35,11 +35,14 @@
 
 *  Authors:
 *     Coskun Oba (COBA, UoL)
+*     Matt Sherwood (MS, UofL)
 *     {enter_new_authors_here}
 
 *  History:
 *     2010-09-16 (COBA):
 *        Initial version.
+*     2015-02-20 (MS)
+*        Added new smfFts fields for quality statistics
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -90,11 +93,19 @@ smf_deepcopy_smfFts(const smfData* old, int* status)
   if(*status != SAI__OK) { return NULL; }
   if(old == NULL) { return NULL; }
 
-  smfData* zpd    = NULL; /* Pointer to polynomial coefficients */
-  smfData* fpm    = NULL; /* Pointer to polynomial coefficients */
-  smfData* sigma  = NULL; /* Pointer to standard deviations */
-  smfFts* newFts  = NULL; /* Pointer to new smfFts struct */
-  smfFts* oldFts  = NULL; /* Pointer to old smfFts struct */
+  smfData* zpd          = NULL; /* Pointer to polynomial coefficients */
+  smfData* fpm          = NULL; /* Pointer to polynomial coefficients */
+  smfData* sigma        = NULL; /* Pointer to standard deviations */
+  smfData* dead         = NULL; /* Pointer to dead pixels */
+  smfData* a            = NULL; /* Pointer to a band (1/f low frequency) integrated powers */
+  smfData* b            = NULL; /* Pointer to b band (in band signal) integrated powers */
+  smfData* c            = NULL; /* Pointer to c band (noise) integrated powers */
+  smfData* d            = NULL; /* Pointer to d band (first harmonic) integrated powers */
+  smfData* phaseFit     = NULL; /* Pointer to Phase X^2 goodness of fit measures */
+  smfData* cosmicRays   = NULL; /* Pointer to numbers of cosmic rays occuring */
+  smfData* fluxJumps    = NULL; /* Pointer to numbers of flux jumps occuring */
+  smfFts* newFts        = NULL; /* Pointer to new smfFts struct */
+  smfFts* oldFts        = NULL; /* Pointer to old smfFts struct */
 
   oldFts = old->fts;
   if(oldFts == NULL) { return NULL; }
@@ -134,7 +145,103 @@ smf_deepcopy_smfFts(const smfData* old, int* status)
               0, 0, status);
   }
 
-  newFts = smf_construct_smfFts(newFts, zpd, fpm, sigma, status);
+  if(oldFts->dead) {
+    dead = smf_deepcopy_smfData( NULL,
+              oldFts->dead, 0,
+              SMF__NOCREATE_VARIANCE |
+              SMF__NOCREATE_QUALITY |
+              SMF__NOCREATE_HEAD |
+              SMF__NOCREATE_FILE |
+              SMF__NOCREATE_DA |
+              SMF__NOCREATE_FTS,
+              0, 0, status);
+  }
+
+  if(oldFts->a) {
+    a = smf_deepcopy_smfData( NULL,
+             oldFts->a, 0,
+             SMF__NOCREATE_VARIANCE |
+             SMF__NOCREATE_QUALITY |
+             SMF__NOCREATE_HEAD |
+             SMF__NOCREATE_FILE |
+             SMF__NOCREATE_DA |
+             SMF__NOCREATE_FTS,
+             0, 0, status);
+  }
+
+  if(oldFts->b) {
+    b = smf_deepcopy_smfData( NULL,
+            oldFts->b, 0,
+            SMF__NOCREATE_VARIANCE |
+            SMF__NOCREATE_QUALITY |
+            SMF__NOCREATE_HEAD |
+            SMF__NOCREATE_FILE |
+            SMF__NOCREATE_DA |
+            SMF__NOCREATE_FTS,
+            0, 0, status);
+  }
+
+  if(oldFts->c) {
+    c = smf_deepcopy_smfData( NULL,
+            oldFts->c, 0,
+            SMF__NOCREATE_VARIANCE |
+            SMF__NOCREATE_QUALITY |
+            SMF__NOCREATE_HEAD |
+            SMF__NOCREATE_FILE |
+            SMF__NOCREATE_DA |
+            SMF__NOCREATE_FTS,
+            0, 0, status);
+  }
+
+  if(oldFts->d) {
+    d = smf_deepcopy_smfData( NULL,
+            oldFts->c, 0,
+            SMF__NOCREATE_VARIANCE |
+            SMF__NOCREATE_QUALITY |
+            SMF__NOCREATE_HEAD |
+            SMF__NOCREATE_FILE |
+            SMF__NOCREATE_DA |
+            SMF__NOCREATE_FTS,
+            0, 0, status);
+  }
+
+  if(oldFts->phaseFit) {
+    phaseFit = smf_deepcopy_smfData( NULL,
+        oldFts->phaseFit, 0,
+        SMF__NOCREATE_VARIANCE |
+        SMF__NOCREATE_QUALITY |
+        SMF__NOCREATE_HEAD |
+        SMF__NOCREATE_FILE |
+        SMF__NOCREATE_DA |
+        SMF__NOCREATE_FTS,
+        0, 0, status);
+  }
+
+  if(oldFts->cosmicRays) {
+    cosmicRays = smf_deepcopy_smfData( NULL,
+        oldFts->cosmicRays, 0,
+        SMF__NOCREATE_VARIANCE |
+        SMF__NOCREATE_QUALITY |
+        SMF__NOCREATE_HEAD |
+        SMF__NOCREATE_FILE |
+        SMF__NOCREATE_DA |
+        SMF__NOCREATE_FTS,
+        0, 0, status);
+  }
+
+  if(oldFts->fluxJumps) {
+    fluxJumps = smf_deepcopy_smfData( NULL,
+        oldFts->fluxJumps, 0,
+        SMF__NOCREATE_VARIANCE |
+        SMF__NOCREATE_QUALITY |
+        SMF__NOCREATE_HEAD |
+        SMF__NOCREATE_FILE |
+        SMF__NOCREATE_DA |
+        SMF__NOCREATE_FTS,
+        0, 0, status);
+  }
+
+  newFts = smf_construct_smfFts(newFts, zpd, fpm, sigma, dead, a, b, c, d, phaseFit, cosmicRays, fluxJumps, status);
 
   return newFts;
 }

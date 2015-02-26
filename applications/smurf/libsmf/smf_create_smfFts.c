@@ -32,11 +32,14 @@
 
 *  Authors:
 *     Coskun Oba (COBA, UoL)
+*     Matt Sherwood (MS, UofL)
 *     {enter_new_authors_here}
 
 *  History:
 *     2010-09-16 (COBA):
 *        Initial version.
+*     2015-02-20 (MS)
+*       Added new smfFts fields for quality statistics
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -99,6 +102,14 @@ smf_create_smfFts(int* status)
   fts->zpd = NULL;
   fts->fpm = NULL;
   fts->sigma = NULL;
+  fts->dead = NULL;
+  fts->a = NULL;
+  fts->b = NULL;
+  fts->c = NULL;
+  fts->d = NULL;
+  fts->phaseFit = NULL;
+  fts->cosmicRays = NULL;
+  fts->fluxJumps = NULL;
 
   return fts;
 }

@@ -71,6 +71,7 @@
 *     Tim Jenness (JAC, Hawaii)
 *     Ed Chapin (UBC)
 *     COBA: Coskun Oba (UoL)
+*     Matt Sherwood (MS, UofL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -114,10 +115,12 @@
 *     2013-01-22 (DSB):
 *        Added argument single.
 *     2014-01-23 (DSB):
-*        Add items to the SMURF extension in the output NDF to hold the 
-*        STEPTIME and SCANVEL values that were actually used. These may be 
-*        different to the values in the FITS header. This helps when importing 
-*        the data into a subsequent run of makemap (i.e. SKYLOOP). 
+*        Add items to the SMURF extension in the output NDF to hold the
+*        STEPTIME and SCANVEL values that were actually used. These may be
+*        different to the values in the FITS header. This helps when importing
+*        the data into a subsequent run of makemap (i.e. SKYLOOP).
+*     2015-02-20 (MS):
+*        Added new smfFts fields for quality statistics
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -515,11 +518,27 @@ void smf_write_smfData( ThrWorkForce *wf, const smfData *data,
       int* outzpd       = NULL;
       double* outfpm    = NULL;
       double* outsigma  = NULL;
+      int* outdead      = NULL;
+      double* outa      = NULL;
+      double* outb      = NULL;
+      double* outc      = NULL;
+      double* outd      = NULL;
+      double* outphaseFit= NULL;
+      double* outcosmicRays = NULL;
+      double* outfluxJumps = NULL;
       HDSLoc* loc       = NULL;
 
       if( (fts->zpd && fts->zpd->pntr[0]) ||
           (fts->fpm && fts->fpm->pntr[0]) ||
-          (fts->sigma && fts->sigma->pntr[0])) {
+          (fts->sigma && fts->sigma->pntr[0]) ||
+          (fts->dead && fts->dead->pntr[0]) ||
+          (fts->a && fts->a->pntr[0]) ||
+          (fts->b && fts->b->pntr[0]) ||
+          (fts->c && fts->c->pntr[0]) ||
+          (fts->d && fts->d->pntr[0]) ||
+          (fts->phaseFit && fts->phaseFit->pntr[0]) ||
+          (fts->cosmicRays && fts->cosmicRays->pntr[0]) ||
+          (fts->fluxJumps && fts->fluxJumps->pntr[0])) {
         loc = smf_get_xloc(outdata, "FTS2", "FTS2", "UPDATE", 0, 0, status);
       }
 
@@ -570,6 +589,134 @@ void smf_write_smfData( ThrWorkForce *wf, const smfData *data,
           outsigma = pntr;
           if((*status == SAI__OK) && outsigma) {
             memcpy(outsigma, fts->sigma->pntr[0], nmap * sizeof(*outsigma));
+          }
+          ndfAnnul(&id, status);
+        }
+
+        /* WRITE DEAD */
+        if(fts->dead && fts->dead->pntr[0]) {
+          lbnd[0] = 0;
+          lbnd[1] = 0;
+          ubnd[0] = lbnd[0] + fts->dead->dims[0] - 1;
+          ubnd[1] = lbnd[1] + fts->dead->dims[1] - 1;
+          id = smf_get_ndfid( loc, "DEAD", "WRITE", "UNKNOWN", "_INTEGER",
+                              fts->dead->ndims, lbnd, ubnd, status);
+          ndfMap(id, "DATA", "_INTEGER", "WRITE", &pntr, &nmap, status);
+          outdead = pntr;
+          if((*status == SAI__OK) && outdead) {
+              memcpy(outdead, fts->dead->pntr[0], nmap * sizeof(*outdead));
+          }
+          ndfAnnul(&id, status);
+        }
+
+        /* WRITE A */
+        if(fts->a && fts->a->pntr[0]) {
+          lbnd[0] = 0;
+          lbnd[1] = 0;
+          ubnd[0] = lbnd[0] + fts->a->dims[0] - 1;
+          ubnd[1] = lbnd[1] + fts->a->dims[1] - 1;
+          id = smf_get_ndfid( loc, "A", "WRITE", "UNKNOWN", "_DOUBLE",
+                              fts->a->ndims, lbnd, ubnd, status);
+          ndfMap(id, "DATA", "_DOUBLE", "WRITE", &pntr, &nmap, status);
+          outa = pntr;
+          if((*status == SAI__OK) && outa) {
+            memcpy(outa, fts->a->pntr[0], nmap * sizeof(*outa));
+          }
+          ndfAnnul(&id, status);
+        }
+
+        /* WRITE B */
+        if(fts->b && fts->b->pntr[0]) {
+          lbnd[0] = 0;
+          lbnd[1] = 0;
+          ubnd[0] = lbnd[0] + fts->b->dims[0] - 1;
+          ubnd[1] = lbnd[1] + fts->b->dims[1] - 1;
+          id = smf_get_ndfid( loc, "B", "WRITE", "UNKNOWN", "_DOUBLE",
+                              fts->b->ndims, lbnd, ubnd, status);
+          ndfMap(id, "DATA", "_DOUBLE", "WRITE", &pntr, &nmap, status);
+          outb = pntr;
+          if((*status == SAI__OK) && outb) {
+            memcpy(outb, fts->b->pntr[0], nmap * sizeof(*outb));
+          }
+          ndfAnnul(&id, status);
+        }
+
+        /* WRITE C */
+        if(fts->c && fts->c->pntr[0]) {
+          lbnd[0] = 0;
+          lbnd[1] = 0;
+          ubnd[0] = lbnd[0] + fts->c->dims[0] - 1;
+          ubnd[1] = lbnd[1] + fts->c->dims[1] - 1;
+          id = smf_get_ndfid( loc, "C", "WRITE", "UNKNOWN", "_DOUBLE",
+                              fts->c->ndims, lbnd, ubnd, status);
+          ndfMap(id, "DATA", "_DOUBLE", "WRITE", &pntr, &nmap, status);
+          outc = pntr;
+          if((*status == SAI__OK) && outc) {
+            memcpy(outc, fts->c->pntr[0], nmap * sizeof(*outc));
+          }
+          ndfAnnul(&id, status);
+        }
+
+        /* WRITE D */
+        if(fts->d && fts->d->pntr[0]) {
+          lbnd[0] = 0;
+          lbnd[1] = 0;
+          ubnd[0] = lbnd[0] + fts->d->dims[0] - 1;
+          ubnd[1] = lbnd[1] + fts->d->dims[1] - 1;
+          id = smf_get_ndfid( loc, "D", "WRITE", "UNKNOWN", "_DOUBLE",
+                              fts->d->ndims, lbnd, ubnd, status);
+          ndfMap(id, "DATA", "_DOUBLE", "WRITE", &pntr, &nmap, status);
+          outd = pntr;
+          if((*status == SAI__OK) && outd) {
+            memcpy(outd, fts->d->pntr[0], nmap * sizeof(*outd));
+          }
+          ndfAnnul(&id, status);
+        }
+
+        /* WRITE PHASEFIT */
+        if(fts->phaseFit && fts->phaseFit->pntr[0]) {
+          lbnd[0] = 0;
+          lbnd[1] = 0;
+          ubnd[0] = lbnd[0] + fts->phaseFit->dims[0] - 1;
+          ubnd[1] = lbnd[1] + fts->phaseFit->dims[1] - 1;
+          id = smf_get_ndfid( loc, "PHASEFIT", "WRITE", "UNKNOWN", "_DOUBLE",
+                              fts->phaseFit->ndims, lbnd, ubnd, status);
+          ndfMap(id, "DATA", "_DOUBLE", "WRITE", &pntr, &nmap, status);
+          outphaseFit = pntr;
+          if((*status == SAI__OK) && outphaseFit) {
+            memcpy(outphaseFit, fts->phaseFit->pntr[0], nmap * sizeof(*outphaseFit));
+          }
+          ndfAnnul(&id, status);
+        }
+
+        /* WRITE COSMICRAYS */
+        if(fts->cosmicRays && fts->cosmicRays->pntr[0]) {
+          lbnd[0] = 0;
+          lbnd[1] = 0;
+          ubnd[0] = lbnd[0] + fts->cosmicRays->dims[0] - 1;
+          ubnd[1] = lbnd[1] + fts->cosmicRays->dims[1] - 1;
+          id = smf_get_ndfid( loc, "COSMICRAYS", "WRITE", "UNKNOWN", "_DOUBLE",
+                              fts->cosmicRays->ndims, lbnd, ubnd, status);
+          ndfMap(id, "DATA", "_DOUBLE", "WRITE", &pntr, &nmap, status);
+          outcosmicRays = pntr;
+          if((*status == SAI__OK) && outcosmicRays) {
+            memcpy(outcosmicRays, fts->cosmicRays->pntr[0], nmap * sizeof(*outcosmicRays));
+          }
+          ndfAnnul(&id, status);
+        }
+
+        /* WRITE FLUXJUMPS */
+        if(fts->fluxJumps && fts->fluxJumps->pntr[0]) {
+          lbnd[0] = 0;
+          lbnd[1] = 0;
+          ubnd[0] = lbnd[0] + fts->fluxJumps->dims[0] - 1;
+          ubnd[1] = lbnd[1] + fts->fluxJumps->dims[1] - 1;
+          id = smf_get_ndfid( loc, "FLUXJUMPS", "WRITE", "UNKNOWN", "_DOUBLE",
+                              fts->fluxJumps->ndims, lbnd, ubnd, status);
+          ndfMap(id, "DATA", "_DOUBLE", "WRITE", &pntr, &nmap, status);
+          outfluxJumps = pntr;
+          if((*status == SAI__OK) && outfluxJumps) {
+            memcpy(outfluxJumps, fts->fluxJumps->pntr[0], nmap * sizeof(*outfluxJumps));
           }
           ndfAnnul(&id, status);
         }

@@ -47,11 +47,14 @@
 
 *  Authors:
 *     Coskun Oba (COBA, UoL)
+*     Matt Sherwood (MS, UofL)
 *     {enter_new_authors_here}
 
 *  History:
 *     2010-09-16 (COBA):
 *        Initial version.
+*     2015-02-20 (MS):
+*        Added new smfFts fields for quality statistics
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -101,6 +104,14 @@ smf_construct_smfFts( smfFts* tofill,
                       smfData* zpd,
                       smfData* fpm,
                       smfData* sigma,
+                      smfData* dead,
+                      smfData* a,
+                      smfData* b,
+                      smfData* c,
+                      smfData* d,
+                      smfData* phaseFit,
+                      smfData* cosmicRays,
+                      smfData* fluxJumps,
                       int* status)
 {
   if(*status != SAI__OK) { return NULL; }
@@ -111,6 +122,14 @@ smf_construct_smfFts( smfFts* tofill,
       fts->zpd = zpd;
       fts->fpm = fpm;
       fts->sigma = sigma;
+      fts->dead = dead;
+      fts->a = a;
+      fts->b = b;
+      fts->c = c;
+      fts->d = d;
+      fts->phaseFit = phaseFit;
+      fts->cosmicRays = cosmicRays;
+      fts->fluxJumps = fluxJumps;
       return fts;
     } else {
       msgOutif( MSG__VERB,

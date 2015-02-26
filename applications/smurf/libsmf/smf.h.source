@@ -418,6 +418,8 @@
  *              routine
  *     2013-07-31 (MS)
  *        Add smf_fit_poly1d_chisq
+ *     2015-02-20 (MS)
+ *       Added new smfFts fields for quality statistics
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -832,6 +834,8 @@ smfFile *smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
 
 smfFts* smf_construct_smfFts( smfFts* tofill,
                               smfData* zpd, smfData* fpm, smfData* sigma,
+                              smfData* dead, smfData* a, smfData* b, smfData* c, smfData* d,
+                              smfData* phaseFit, smfData* cosmicRays, smfData* fluxJumps,
                               int* status);
 
 smfGroup *smf_construct_smfGroup( const Grp *igrp, size_t **subgroups,

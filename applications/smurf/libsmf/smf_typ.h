@@ -24,6 +24,7 @@
  *     Ed Chapin (UBC)
  *     David Berry (JAC, UCLan)
  *     Coskun Oba (COBA, UoL)
+ *     Matt Sherwood (MS, UofL)
  *     {enter_new_authors_here}
 
  *  History:
@@ -190,6 +191,8 @@
 *        Add isFFT to smfData
 *     2011-10-03 (EC):
 *        Extend smfFilter to handle 2-d map filters
+*     2015-02-20 (MS):
+*        Added new smfFts fields for quality statistics
 *     {enter_further_changes_here}
 
  *  Copyright:
@@ -680,6 +683,14 @@ typedef struct smfFts
                               * [m x n x p] dimensional data */
   struct smfData* sigma;     /* Standard deviations obtained for each bolometer
                               * in the subarray, [m x n] dimensional data */
+  struct smfData* dead;      /* Dead pixel indicator [m x n] dimensional data */
+  struct smfData* a;         /* a band (low frequency (1/f)) integrated power [m x n] dimensional data */
+  struct smfData* b;         /* b band (in band signal) integrated power [m x n] dimensional data */
+  struct smfData* c;         /* c band (noise region) integrated power [m x n] dimensional data */
+  struct smfData* d;         /* d band (1st harmonic) integrated power [m x n] dimensional data */
+  struct smfData* phaseFit;  /* Phase X^2 goodness of fit measure [m x n] dimensional data */
+  struct smfData* cosmicRays;/* Number of cosmic rays occuring [m x n] dimensional data */
+  struct smfData* fluxJumps; /* Number of flux jumps occuring [m x n] dimensional data */
 } smfFts;
 
 /* This struct stores DREAM parameters */
