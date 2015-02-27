@@ -45,6 +45,8 @@
 #     14-APR-2003 (DSB):
 #        Use KAPPA:REGRID instead of CCDPACK:TRANNDF, and KAPPA:WCSADD
 #        instead of KAPPA:TRANMAKE.
+#     27-FEB-2015 (DSB):
+#        Remove KAPRH dependency. This requires removing FITTYPE=5 option.
 #---------------------------------------------------------------------------
 
 proc Accept {} {
@@ -1520,9 +1522,9 @@ proc ConvMap {gotc type} {
 #        shift, rotation and magnification values. Otherwise, the opposite
 #        is done.
 #     type
-#        The current mapping type (1-5). If "gotc" is non-zero, then this
-#        determines the default rotations and magnifications returned if
-#        any of the C coefficients are not supplied. If "gotc" is zero,
+#        The current mapping type (1-4), or null. If "gotc" is non-zero, then
+#        this determines the default rotations and magnifications returned
+#        if any of the C coefficients are not supplied. If "gotc" is zero,
 #        then any restrictions on the mapping implied by the map type are
 #        imposed on the supplied shifts, rotations and magnifications.
 #
@@ -2538,9 +2540,7 @@ proc DescMap {map} {
 #     list, and storing them in global array MAP_C.
 #
 #  Arguments:
-#     map
-#       The HDS path to the TRANSFORM structure, or "ref", or a list of
-#       6 parameter values.
+#     The string "ref", or a list of 6 parameter values.
 #
 #  Returned Value:
 #     A list of 6 coeffecients describing the linear mapping, or a null
@@ -2590,97 +2590,9 @@ proc DescMap {map} {
       set ret $map
       set ok 1
 
-# Otherwise, analyse the TRANSFORM structure in the specified HDS
-# container file. Use KAPRH:TRANTRACE to obtain the textual representation
-# of the forward and inverse transformation functions, and then extract the
-# constants from these expresions using regular expressions. Verify that
-# the constants are usable numbers using "scan". Note, it appears that
-# trantrace fails sometimes on the first attempt, returning DAT__LOCIN.
-# This can be cured by re-running it.
+# Otherwise, report an error.
    } elseif { $map != "" } {
-
-# Decide on a name for the trantrace log file.
-      set logfile [UniqueFile]
-
-# Loop round running trantrace until it succeeds, or we have tried 3 times.
-      set ok 0
-      set ntry 0
-      while { !$ok && $ntry < 3 } {
-
-# Only report ADAM errors on the last attempt.
-         if { $ntry < 2 } {
-            set ok [Obey kaprh trantrace "transform=$map logfile=$logfile" noreport]
-         } {
-            set ok [Obey kaprh trantrace "transform=$map logfile=$logfile"]
-         }
-
-# If trantrace failed, delete the log file.
-         if { !$ok  } {
-            catch "exec rm -f $logfile"
-         }
-
-# Increment the number of attempts which have been made to run trantrace.
-         incr ntry
-      }
-
-# If trantrace would not run, report a contextual error.
-      if { !$ok } {
-         Message "KAPRH:TRANTRACE failed - cannot display mapping."
-
-# Otherwise, read the logfile.
-      } {
-         set logid [open $logfile r]
-         set read_for 0
-         set gotx 0
-         set goty 0
-         while { [gets $logid line] != -1 } {
-            if { $read_for } {
-               if { !$gotx } {
-                  set gotx [regexp {XX=([^+]+)\+([^*]+)\*X\+([^*]+)\*Y} $line match c(1) c(2) c(3)]
-               }
-               if { !$goty } {
-                  set goty [regexp {YY=([^+]+)\+([^*]+)\*X\+([^*]+)\*Y} $line match c(4) c(5) c(6)]
-               }
-               if { $gotx && $goty } { break }
-            } {
-               if { [regexp {Forward Mappings} $line] } {
-                  set read_for 1
-               }
-            }
-         }
-         close $logid
-
-         if { $gotx && $goty } {
-            for {set i 1} {$i < 7} {incr i} {
-
-               regsub -nocase -all D $c($i) E text
-
-               if { [scan $text "%g" val] == 1 ||
-                    [scan $text "(%g)" val] == 1 } {
-                  lappend ret $val
-                  set MAP_C($i) $val
-               } {
-                  Message "Illegal string \"$c($i)\" for transformation coefficient $i - cannot display mapping."
-                  set ok 0
-                  break
-               }
-
-            }
-
-# Return "ref" for a unit mapping.
-            if { $ok } {
-               if { $MAP_C(1) == 0.0 && $MAP_C(2) == 1.0 && $MAP_C(3) == 0.0 &&
-                    $MAP_C(4) == 0.0 && $MAP_C(5) == 0.0 && $MAP_C(6) == 1.0 } {
-                  set ret "ref"
-               }
-            }
-
-         } {
-            set ok 0
-            Message "Cannot find transformation functions in KAPRH:TRANTRACE logfile - cannot display mapping."
-         }
-      }
-      catch "exec rm -f $logfile"
+      Message "Polka: unsupported map value $map supplied to DescMap."
    }
 
    if { !$ok } {
@@ -3961,15 +3873,7 @@ proc EditMapping {image mapping} {
 
 # For a full 6 parameter fit, everything is writable.
       } elseif { $fittype == 5 } {
-         for {set i 1} {$i < 7} {incr i} {
-            set rv($i) normal
-         }
-         set rv(MX) normal
-         set rv(MY) normal
-         set rv(RX) normal
-         set rv(RY) normal
-         set rv(SX) normal
-         set rv(SY) normal
+         Message "POLKA: fittype 5 is no longer supported (programming error)."
       }
    }
 
@@ -5934,7 +5838,7 @@ proc Fit {labxy gx gy labuv gu gv fittype mess} {
 #     gv
 #        A list of Y coordinates for the mapped positions.
 #     fittype
-#        The numerical fittype to use (see CCDPACK:REGISTER).
+#        The numerical fittype to use.
 #
 #  Returned Value:
 #     A list of 6 parameter values. A blank string is returned if the
@@ -5950,77 +5854,10 @@ proc Fit {labxy gx gy labuv gu gv fittype mess} {
    if { $fittype != 5 } {
       set ret [Fit1234 $labxy $gx $gy $labuv $gu $gv $fittype]
 
-# Otherwise, use CCDPACK:REGISTER...
+# Otherwise, report an error (fittype 5 is no longer supported because it
+# required KAPRH tasks, which have now gone).
    } {
-
-# The pixel coordinates for the input and mapped positions are written to
-# separate text files in the format of a CCDPACK position list. Create a
-# file to hold the names of these two position list files and open it.
-      set infiles [UniqueFile]
-      set infilesid [open $infiles w]
-
-# Do each of the two list in turn...
-      foreach list "input mapped" {
-         if { $list == "input" } {
-            set lab $labxy
-            set pxlist $gx
-            set pylist $gy
-         } {
-            set lab $labuv
-            set pxlist $gu
-            set pylist $gv
-         }
-
-# Decide on the file name for this list, write it to the file created
-# above, and open it.
-         set infile [UniqueFile]
-         puts $infilesid $infile
-         set infileid [open $infile w]
-
-# Write the labels and pixel coordinates to the file opened earlier. Only
-# use positions with non-blank labels. Count the number of positions written
-# to the text file.
-         set nused 0
-         set size [llength $pxlist]
-         for {set i 0} {$i < $size} {incr i} {
-            set px [lindex $pxlist $i]
-            set py [lindex $pylist $i]
-            set lbl [lindex $lab $i]
-            if { $lbl != "" } {
-               puts $infileid "$lbl $px $py"
-               incr nused
-            }
-         }
-
-# Close the text file holding the position list for the current ray.
-         close $infileid
-
-# If no positions were written to the file, we cannot find the mapping.
-# Leave the loop in this case.
-         if { $nused == 0 } { break }
-      }
-
-# Close the file holding the names of the position list files.
-      close $infilesid
-
-# If the lists were produced OK, we can now find the mapping which
-# registers them.
-      if { $nused > 0 } {
-
-# Get the name of a new HDS container file (without the ".sdf") to hold the
-# mapping.
-         set trfile [UniqueFile]
-
-# Use CCDPACK:REGISTER to determine the mapping.
-         if { [Obey ccdpack register "fittype=$fittype inlist=^$infiles logto=neither ndfnames=no placein=file trfile=$trfile"] } {
-
-# Extract the coefficient values from the TRANSFORM structure.
-            set ret [DescMap ${trfile}.TRN_2.TRANSFORM]
-
-# Delete the TRANSFORM structure.
-            HdsDel ${trfile}.TRN_2.TRANSFORM
-         }
-      }
+      Message "POLKA: fittype 5 is no longer supported (programming error)."
    }
 
    return $ret

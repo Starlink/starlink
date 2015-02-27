@@ -68,8 +68,11 @@ fi
 #     24-APR-2000 (DSB):
 #        Check that the right versions of CCDPACK and KAPPA are available.
 #     4-DEC-2012 (DSB):
-#        Check for undefined font when creating label describing current 
+#        Check for undefined font when creating label describing current
 #        canvas interaction mode.
+#     27-FEB-2015 (DSB):
+#        Remove KAPRH dependency. This involves removing the fittype=5
+#        option.
 #-
 
 # Uncomment this section to see the names of all procedure as they are
@@ -136,7 +139,6 @@ fi
    set MAPTYPE(2) "Shift and rotation"
    set MAPTYPE(3) "Shift and magnification"
    set MAPTYPE(4) "Shift, rotation and magnification"
-   set MAPTYPE(5) "Full 6 parameter fit"
    set MENUBACK "#b0b0b0"
    set NONE 5
    set O_RAY_FEATURES 0
@@ -264,7 +266,7 @@ fi
 # Save the path to the directory containing POLPACK hypertext documents.
    set POLPACK_HELP $POLPACK_DIR/../../help/polpack
 
-# Get the paths to the CCDPACK, KAPRH and KAPPA directories from the
+# Get the paths to the CCDPACK and KAPPA directories from the
 # corresponding environment variables.
    if { [info exists env(KAPPA_DIR)] } {
       set KAPPA_DIR $env(KAPPA_DIR)
@@ -276,12 +278,6 @@ fi
       set CCDPACK_DIR $env(CCDPACK_DIR)
    } else {
       set CCDPACK_DIR /star/bin/ccdpack
-   }
-
-   if { [info exists env(KAPRH_DIR)] } {
-      set KAPRH_DIR $env(KAPRH_DIR)
-   } else {
-      set KAPRH_DIR /star/bin/kaprh
    }
 
 #  Name this application (for xresources etc.)
@@ -393,7 +389,6 @@ fi
    LoadTask kapview  $KAPPA_DIR/kapview_mon
    LoadTask kappa    $KAPPA_DIR/kappa_mon
    LoadTask ndfpack  $KAPPA_DIR/ndfpack_mon
-   LoadTask kaprh    $KAPRH_DIR/kaprh_mon
    LoadTask ccdpack  $CCDPACK_DIR/ccdpack_reg
    LoadTask polpack  $POLPACK_DIR/polpack_mon
 
@@ -924,21 +919,18 @@ fi
       set MAPSTATE(2) normal
       set MAPSTATE(3) normal
       set MAPSTATE(4) normal
-      set MAPSTATE(5) normal
 
    } elseif { $DBEAM } {
       set MAPSTATE(1) normal
       set MAPSTATE(2) disabled
       set MAPSTATE(3) normal
       set MAPSTATE(4) disabled
-      set MAPSTATE(5) disabled
 
    } else {
       set MAPSTATE(1) normal
       set MAPSTATE(2) normal
       set MAPSTATE(3) normal
       set MAPSTATE(4) normal
-      set MAPSTATE(5) disabled
 
    }
 
@@ -946,7 +938,7 @@ fi
 # depend on whether or not we are processing polarimeter data (as
 # specified by global POL - set by the atask).
    set mapmenu [menu $OPTSMENU.map]
-   for {set type 1} {$type < 6} {incr type} {
+   for {set type 1} {$type < 5} {incr type} {
       $mapmenu add radiobutton -label $MAPTYPE($type) -variable FITTYPE \
                                -selectcolor $RB_COL -value $MAPTYPE($type) \
                                -state $MAPSTATE($type)
@@ -960,7 +952,7 @@ fi
 
 # Add items to the "OE Mapping Type" sub-menu.
    set oemapmenu [menu $mapmenu.oe]
-   for {set type 1} {$type < 6} {incr type} {
+   for {set type 1} {$type < 5} {incr type} {
       $oemapmenu add radiobutton -label $MAPTYPE($type) -variable OEFITTYPE \
                                  -selectcolor $RB_COL -value $MAPTYPE($type) \
                                  -state $MAPSTATE($type)

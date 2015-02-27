@@ -1,13 +1,9 @@
 1 POLPACK
 
- Version 3.2 of POLPACK (an applications package for processing imaging
+ Version 3.3 of POLPACK (an applications package for processing imaging
  polarimetry data) is now available. It is fully documented in SUN/223.
 
- The main changes since V3.2 are:
+ The main changes since V3.3 are:
 
- o  A new command POLROTREF has been added to rotate the reference
- direction of a pair of Q and U images.
-
- o  The POLVEC command now omits vectors from positions that have
- negative total intensity values.
+ o  POLKA no longer supports an unconstrained full 6-coefficient linear fit.
 

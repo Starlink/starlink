@@ -10,10 +10,10 @@
 \stardocsource      {sun\stardocnumber}
 \stardocnumber      {223.7}
 \stardocauthors     {D.S. Berry \& T.M. Gledhill }
-\stardocdate        {10th February 2015}
+\stardocdate        {27th February 2015}
 \stardoctitle       {POLPACK \\
                             An Imaging Polarimetry Reduction Package}
-\stardocversion     {Version 3.2-0}
+\stardocversion     {Version 3.3-0}
 \stardocmanual      {Users' Manual}
 \startitlepic {\includegraphics[clip,width=0.75\textwidth]{sun223_figures/fig}}
 \stardocabstract  {POLPACK is a package of applications for
@@ -3705,20 +3705,9 @@ for NDF applications.
 
          4 - Shift of origin, rotation and magnification.
 
-         5 - A full 6 parameter mapping of the form:
-
-\begin{quote}
-\begin{tabular}{ll}
-              &  X\_out = C1  $+$  C2 $*$ X\_in  $+$  C3 $*$ Y\_in \\
-              &  Y\_out = C4  $+$  C5 $*$ X\_in  $+$  C6 $*$ Y\_in
-\end{tabular}
-\end{quote}
-
          Only mapping types 1 and 3 are available when processing
          dual-beam polarimeter data. Mapping types 2 and 4 are also
-         available when processing single-beam data. Mapping type 5
-         is only available when processing non-polarimetric data (see
-         parameter POL). [1]
+         available when processing single-beam data. [1]
       }
       \sstsubsection{
          HELPAREA = \_LOGICAL (Update)
@@ -3822,10 +3811,9 @@ for NDF applications.
          non-polarimeter data may be aligned and sky subtracted using POLKA
          if parameter POL is assigned a FALSE value. This indicates that the
          input intensity frames are not to be treated as polarimeter data. In
-         this case, a wider range of mappings are available (see parameter
-         FITTYPE) when aligning the input frames, but Stokes vectors may not
-         be produced (see parameter OUT\_S). The use of the GUI is the same as
-         in single-beam mode (see parameter DUALBEAM). [TRUE]
+         this case, Stokes vectors may not be produced (see parameter OUT\_S).
+         The use of the GUI is the same as in single-beam mode (see parameter
+         DUALBEAM). [TRUE]
       }
       \sstsubsection{
          PSFSIZE = \_INTEGER (Update)
@@ -5933,6 +5921,13 @@ assumed that the reference direction is parallel to the first image axis).
 This section describes the major changes introduced at each release of
 POLPACK.
 
+
+
+\subsection{V3.3-0}
+
+\begin{itemize}
+ \item POLKA no longer supports an unconstrained full 6-coefficient linear fit.
+\end{itemize}
 
 
 \subsection{V3.2-0}

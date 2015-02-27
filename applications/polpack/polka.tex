@@ -126,9 +126,6 @@ between any pair of images is assumed to be a shift of origin plus an
 optional magnification. A rotation may also be included if POLKA is being
 run in single-beam mode.
 
-For non-polarimeter data, a full six co-efficient linear mapping may be
-used which can produce shift, magnification, rotation and shear.
-
 In all cases, the coefficients of the mappings are determined by
 performing a least squares fit between the positions in the two images.
 The images are re-sampled using either nearest-neighbour or bi-linear
@@ -778,37 +775,33 @@ images. Selecting the \emph{O-E Mapping Type} entry (at the bottom of the
 menu) causes a similar menu to be posted which allows the selection of
 the mapping to be used between the $O$ and $E$ rays.
 
-The available mappings are all linear, the most general one being the
-\emph{Full 6 parameter fit}. This is a mapping of the form:
+The available mappings are all linear, and are generally of the form:
 
 \begin{eqnarray*}
 XX = C_{1} + C_{2}*X + C_{3}*Y \\
 YY = C_{4} + C_{5}*X + C_{6}*Y
 \end{eqnarray*}
 
-where the co-efficients $C_{1}$ to $C_{6}$ are all independent, and free
-to take any value ($(X,Y)$ are the supplied pixel coordinates, and
-$(XX,YY)$ are the corresponding mapped pixel coordinates). This type of
+($(X,Y)$ are the supplied pixel coordinates, and $(XX,YY)$ are the
+corresponding mapped pixel coordinates). This type of
 mapping can produce shift, rotation, magnification and shear (i.e. the
-rotation may be different for the two axes). This is very general,
-and it is usually better to choose one of the other constrained linear
-mappings. These allow
-combinations of shift, rotation and magnification, but no shear (i.e. the
-rotation is the same for both axes). In addition, the magnification
-produced by these constrained mappings is always the same on both axes.
+rotation may be different for the two axes). Since allowing shear is usually
+not appropriate, the coefficients are constrained to prevent shear from
+occurring. The available mappings allow combinations of shift, rotation
+and magnification, but no shear (i.e. the rotation is the same for both
+axes). In addition, the magnification produced by these constrained
+mappings is always the same on both axes.
 
 NOTE, for polarimeter data, any rotation between images
 effectively changes the analyser angle. The algorithm used by
 \xref{POLCAL}{sun223}{POLCAL} to create Stokes vectors can take account
 of this rotation, but only in single-beam mode. For this reason, mappings
-which include rotation are not available in dual-beam mode. The full,
-unrestricted six co-efficiwent fit can produce shear and should only
-be used with non-polarimetric data.
+which include rotation are not available in dual-beam mode.
 
-The constrained mappings are specified in terms of the shift, rotation and
-magnification which they produce. Using this description, the original
-axes are first rotated about their original origin. Each rotated axis is
-then magnified, and finally the origin is shifted.
+These constrained linear mappings are specified in terms of the shift,
+rotation and magnification which they produce. Using this description,
+the original axes are first rotated about their original origin. Each
+rotated axis is then magnified, and finally the origin is shifted.
 
 Each mapping type has several free parameters (shifts, rotations, etc)
 which can take different values for each input image. These are usually
@@ -1500,12 +1493,10 @@ be changed.\footnote{The current mapping type is set using the \htmlref{\emph{Ma
 \htmlref{\emph{Options}}{POLKA_OPTIONS_MENU} menu, and is displayed just
 below the two mapping description panels in the dialog box.} The values
 in the lower panel, which give the co-efficients of the linear equations
-describing the mapping, may only be modified if the mapping type is
-``Full 6 parameter fit''. For all other mapping types, these values are
-protected, and the mapping may only be changed by entering selected
-shift, rotation and magnification values in the upper panel, depending on
-the mapping type. The specific restrictions imposed by the various
-mapping types are:
+describing the mapping, are protected and the mapping may only be changed
+by entering selected shift, rotation and magnification values in the upper
+panel, depending on the mapping type. The specific restrictions imposed by
+the various mapping types are:
 
 
 \begin{description}
@@ -1528,8 +1519,6 @@ X axis \emph{Magnification} and X axis \emph{Rotation} values may all be set.
 The Y axis \emph{Magnification} and \emph{Rotation} are automatically set
 to equal the X axis values and may not be changed by the user.
 
-\item[Full 6 parameter fit] - All values may set independently for each
-axis by the user.
 \end{description}
 
 Either the forward or inverse mapping may be inspected and edited. Use

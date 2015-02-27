@@ -129,17 +129,9 @@
 *
 *        4 - Shift of origin, rotation and magnification.
 *
-*        5 - A full 6 parameter mapping of the form:
-*
-*              X_out = C1  +  C2 * X_in  +  C3 * Y_in
-*
-*              Y_out = C4  +  C5 * X_in  +  C6 * Y_in
-*
-*         Only mapping types 1 and 3 are available when processing
-*         dual-beam polarimeter data. Mapping types 2 and 4 are also
-*         available when processing single-beam data. Mapping type 5
-*         is only available when processing non-polarimetric data (see
-*         parameter POL). [1]
+*        Only mapping types 1 and 3 are available when processing
+*        dual-beam polarimeter data. Mapping types 2 and 4 are also
+*        available when processing single-beam data. [1]
 *     HELPAREA = _LOGICAL (Update)
 *        If a TRUE value is supplied, then dynamic help information will be
 *        displayed in a box at the bottom of the GUI. This information
@@ -210,10 +202,9 @@
 *        non-polarimeter data may be aligned and sky subtracted using POLKA
 *        if parameter POL is assigned a FALSE value. This indicates that the
 *        input intensity frames are not to be treated as polarimeter data. In
-*        this case, a wider range of mappings are available (see parameter
-*        FITTYPE) when aligning the input frames, but Stokes vectors may not
-*        be produced (see parameter OUT_S). The use of the GUI is the same as
-*        in single-beam mode (see parameter DUALBEAM). [TRUE]
+*        this case, Stokes vectors may not be produced (see parameter OUT_S).
+*        The use of the GUI is the same as in single-beam mode (see parameter
+*        DUALBEAM). [TRUE]
 *     PSFSIZE = _INTEGER (Update)
 *        This value controls the centroiding process which is used to find
 *        accurate centres for the features identified using the mouse.
@@ -375,6 +366,8 @@
 *        SKYPAR was never accessed.
 *     13-APR-2007 (DSB):
 *        Fix GRP leak.
+*     27-FEB-2015 (DSB):
+*        Remove FITTYPE 5 option (necessary to remove dependency on KAPRH).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -674,7 +667,7 @@
          CALL PAR_GODD( 'FITTYPE', 1, 1, 3, .FALSE., FIT, STATUS )
          CALL PAR_GODD( 'OEFITTYPE', 1, 1, 3, .FALSE., OEFIT, STATUS )
       ELSE
-         CALL PAR_GDR0I( 'FITTYPE', 1, 1, 5, .FALSE., FIT, STATUS )
+         CALL PAR_GDR0I( 'FITTYPE', 1, 1, 4, .FALSE., FIT, STATUS )
       END IF
 
 *  Get the colours to use for various parts of the display.
