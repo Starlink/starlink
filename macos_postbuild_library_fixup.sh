@@ -144,6 +144,15 @@ for i in $(find $STARLINK_DIR/lib -name '*.dylib' -type f); do
      add_rpath_starlink $i
 done
 
+# 2. Fix up all .bundles living under Perl/.
+echo "Fixing up .bundles under $STARLINK_DIR/Perl"
+echo
+echo
+for i in $(find $STARLINK_DIR/Perl -name '*.bundle' -type f); do
+    fixup_starlink_dylib_links $i
+    add_rpath_starlink $i
+done
+
 # 2. Do the same thing for each binary living under bin/
 echo "Fixing up binaries under $STARLINK_DIR/bin"
 echo
