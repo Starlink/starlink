@@ -7,3 +7,6 @@
 
  o  POLKA no longer supports an unconstrained full 6-coefficient linear fit.
 
+ o  A bug has been fixed in POLKA that could cause dialog boxes to flash
+    uncontrollably when partially obscured by the main polka window.
+

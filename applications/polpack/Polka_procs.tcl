@@ -8241,10 +8241,6 @@ proc MakeDialog {w title grab} {
    set top [toplevel $w -colormap $TOP]
    wm title $top "Polka - $title"
 
-# Set up a binding so that this window is automatically raised above the
-# main Polka window each time it becomes partially or totally obscured.
-   bind $top <Visibility> "+if { \"%s\" != \"VisibilityUnobscured\" } {raise $top .}"
-
 # Set the F_OWNER variable so that this window is handed the focus by the
 # main Polka window. Set the current value to be re-instated later.
    set old_f_owner $F_OWNER
