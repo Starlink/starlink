@@ -441,7 +441,8 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    the TCL script. */
       fd = fopen( outfile_name, "r" );
 
-/* If succesful, display each non-null line of the file and report an error. */
+/* If succesful, display each non-null line of the file. Do not report an
+   error since the messages may be harmless. */
       if( fd ) {
 
          report = 0;
@@ -450,11 +451,6 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                msgOut( " ", buf, STATUS );
                report = 1;
             }
-         }
-
-         if( report && *STATUS == SAI__OK ){
-            *STATUS = SAI__ERROR;
-            errRep( " ", "Messages received from the TCL script.", STATUS );
          }
 
          fclose( fd );
