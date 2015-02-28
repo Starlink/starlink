@@ -1577,21 +1577,21 @@ command name and just some of the parameters, and be prompted for the rest.
 The \emph{Parameters\/} section has a notation scheme to indicate
 normally defaulted parameters, \textit{i.e.}\ those for which there will
 be no prompt.
-For such parameters a matching pair of square brackets ({\ssttt []})
+For such parameters a matching pair of square brackets (\texttt{[]})
 terminates the description.  The content between the brackets mean
 \begin{description}
-\item[{\ssttt []}]
+\item[\texttt{[]}]
 Empty brackets means that the default is created dynamically
 by the application, and may depend on the values of other parameters.
 Therefore, the default cannot be given explicitly. In this case, the parameter
 description will include a description of how the dynamic default is generated.
-\item[{\ssttt [,]}]
+\item[\texttt{[,]}]
 As above, but there are two default values that are created dynamically.
-\item[{\ssttt [}{\rm default}{\ssttt ]}]
+\item[\texttt{[}{\rm default}\texttt{]}]
 Occasionally, a description of the default is given in normal type,
 \textit{e.g.}\ the size of the plotting region in a graphics application,
 where the exact default values depend on the device chosen.
-\item[{\ssttt [default]}]
+\item[\texttt{[default]}]
 If the brackets contain a value in teletype-fount, this is the explicit
 default value.
 \end{description}
