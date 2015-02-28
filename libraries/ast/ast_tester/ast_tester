@@ -155,7 +155,7 @@ foreach n ( "timj ast fits-wcs cdmatrix=1" \
             "timj ast native" \
             "timj ast native" \
             "a20070718_00010_02_cube ast fits-wcs" \
-            "dss fit ast" \
+            "dss fits-dss ast" \
             "dss ast dss" \
             "dss ast fits-wcs cdmatrix=1" \
             "degen1 ast fits-wcs cdmatrix=1" \
