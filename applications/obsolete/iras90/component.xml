@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="iras90" status="obsolete" support="U">
+  <version>1.1-2</version>
+  <path>applications/obsolete/iras90</path>
+  <description>IRAS90 - IRAS data processing</description>
+  <abstract><p>
+IRAS90 is a suite of programs for processing IRAS data.
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><build option='link'>ard</build><build option='link'>agi</build><build option='link'>fio</build><build option='link'>ifd</build><build option='link'>snx</build><build option='link'>ndf</build><build option='link'>ndg</build><build option='link'>ary</build><build option='link'>sla</build><build option='link'>shl</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>Diana Parsons</name>
+    </person>
+    <person>
+      <name>W Gong</name>
+    </person>
+    <person>
+      <name>H J Walker</name>
+    </person>
+  </developers>
+  <documentation> sun161 sun163 sun165</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

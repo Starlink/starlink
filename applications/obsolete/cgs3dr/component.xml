@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="cgs3dr" status="obsolete" support="U">
+  <version>1.0-0</version>
+  <path>applications/obsolete/cgs3dr</path>
+  <description>CGS3DR - CGS3 Data Reduction</description>
+  <abstract><p>
+
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><build option='link'>ary</build><build option='link'>ndf</build><build option='link'>prm</build><build option='link'>fio</build><build option='link'>tsp</build><build option='link'>figaro</build><build option='link'>chr</build><build option='link'>ndf</build><build option='link'>par</build><build option='link'>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan Bridger</name>
+      <uname>ab</uname>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation> sun206</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

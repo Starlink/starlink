@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="star2html" support="S">
+  <version>1.5-0</version>
+  <path>applications/star2html</path>
+  <description>Convert Starlink documents to hypertext</description>
+  <abstract><p>Star2HTML lets you write (or convert) a Starlink document
+      so that you can create two versions of it from a single source file.
+      A paper version is produced by LaTeX, and a hypertext version
+      (suitable for browsing on the web) is produced by latex2html.
+      You can tailor each version to its own medium by marking selected text as
+      LaTeX-only or HTML-only.</p>
+    <p>Star2HTML also includes a set of document templates for producing
+      Starlink documents in a standard style (such as `Starlink User
+      Note').  They also define new LaTeX commands for adding extra
+      links to the hypertext version of your document (without
+      affecting the paper version). </p></abstract>
+  <dependencies >
+
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter Draper</name>
+      <uname>pwd</uname>
+      <email>P.W.Draper@durham.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation> sun199</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+  <notes><p>Starlink customised wrapper around latex2html</p></notes>
+</component>

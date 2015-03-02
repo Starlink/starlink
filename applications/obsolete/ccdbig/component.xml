@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ccdbig" support="U">
+  <version>0.1-1</version>
+  <path>applications/obsolete/ccdbig</path>
+  <description>CCDBIG - Assess CCDPACK performance with large datasets</description>
+  <abstract><p>
+Traces an HDS file
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><build option='link'>fio</build><build option='link'>generic</build><build option='link'>chr</build><build option='link'>ifd</build><build option='link'>prm</build><build option='link'>par</build><build option='link'>sae</build><build option='link'>hds</build><build option='link'>img</build><build option='link'>kaplibs</build><build option='link'>pda</build><build option='link'>ccdpack</build><use>ccdpack</use><use>kappa</use><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Mrk B. Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation> ssn69</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
