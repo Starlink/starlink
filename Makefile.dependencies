@@ -264,6 +264,7 @@ $(MANIFESTS)/cat: \
 	cd libraries/cat \
 	  && $(MAKE_CPT)
 
+# Component ccdbig is OBSOLETE -- do not build
 $(MANIFESTS)/ccdbig: \
 		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ary \
@@ -808,6 +809,25 @@ $(MANIFESTS)/echomop: \
 		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/echomop \
+	  && $(MAKE_CPT)
+
+# Component echwind is OBSOLETE -- do not build
+$(MANIFESTS)/echwind: \
+		$(MANIFESTS)/chr \
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ems \
+		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/mers \
+		$(MANIFESTS)/pgplot \
+		$(MANIFESTS)/psx \
+		$(MANIFESTS)/sae \
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
+		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk
+	cd applications/obsolete/echwind \
 	  && $(MAKE_CPT)
 
 # Component email is OBSOLETE -- do not build
@@ -1450,6 +1470,7 @@ $(MANIFESTS)/itcl: \
 	  && $(CONFIG_CPT) \
 	  && $(MAKE_CPT)
 
+# Component jcmtdr is OBSOLETE -- do not build
 $(MANIFESTS)/jcmtdr: \
 		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ary \
@@ -1498,7 +1519,7 @@ $(MANIFESTS)/jcmtdr: \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
-	cd applications/jcmtdr \
+	cd applications/obsolete/jcmtdr \
 	  && $(MAKE_CPT)
 
 # Component jpeg is a configure dependency, so is configurable in place.
@@ -1608,6 +1629,62 @@ $(MANIFESTS)/kappa: \
 		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/kappa \
+	  && $(MAKE_CPT)
+
+# Component kaprh is OBSOLETE -- do not build
+$(MANIFESTS)/kaprh: \
+		$(MANIFESTS)/agi \
+		$(MANIFESTS)/ard \
+		$(MANIFESTS)/ary \
+		$(MANIFESTS)/ast \
+		$(MANIFESTS)/atl \
+		$(MANIFESTS)/cat \
+		$(MANIFESTS)/cfitsio \
+		$(MANIFESTS)/chr \
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ctg \
+		$(MANIFESTS)/ems \
+		$(MANIFESTS)/fio \
+		$(MANIFESTS)/generic \
+		$(MANIFESTS)/gks \
+		$(MANIFESTS)/gns \
+		$(MANIFESTS)/graphpar \
+		$(MANIFESTS)/grp \
+		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hds \
+		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/idi \
+		$(MANIFESTS)/ifd \
+		$(MANIFESTS)/irq \
+		$(MANIFESTS)/kaplibs \
+		$(MANIFESTS)/lpg \
+		$(MANIFESTS)/mers \
+		$(MANIFESTS)/ncar \
+		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/ndg \
+		$(MANIFESTS)/one \
+		$(MANIFESTS)/par \
+		$(MANIFESTS)/pcs \
+		$(MANIFESTS)/pda \
+		$(MANIFESTS)/pgp \
+		$(MANIFESTS)/pgplot \
+		$(MANIFESTS)/prm \
+		$(MANIFESTS)/psx \
+		$(MANIFESTS)/ref \
+		$(MANIFESTS)/sae \
+		$(MANIFESTS)/sgs \
+		$(MANIFESTS)/shl \
+		$(MANIFESTS)/sla \
+		$(MANIFESTS)/snx \
+		$(MANIFESTS)/sst \
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
+		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
+		$(MANIFESTS)/trn
+	cd applications/obsolete/kaprh \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/latexsupport:
@@ -2293,6 +2370,11 @@ $(MANIFESTS)/sg9: \
 	cd docs/sg/009 \
 	  && $(MAKE_CPT)
 
+# Component sgmlkit is OBSOLETE -- do not build
+$(MANIFESTS)/sgmlkit:
+	cd applications/obsolete/sgmlkit \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/sgp16: \
 		$(MANIFESTS)/star2html
 	cd docs/sgp/016 \
@@ -2544,6 +2626,11 @@ $(MANIFESTS)/sst: \
 $(MANIFESTS)/star2html: \
 		$(MANIFESTS)/latexsupport
 	cd applications/star2html \
+	  && $(MAKE_CPT)
+
+# Component star2html-old is OBSOLETE -- do not build
+$(MANIFESTS)/star2html-old:
+	cd applications/obsolete/star2html \
 	  && $(MAKE_CPT)
 
 # Component starbench is OBSOLETE -- do not build
@@ -2851,7 +2938,6 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/img \
 	$(MANIFESTS)/info \
 	$(MANIFESTS)/init \
-	$(MANIFESTS)/jcmtdr \
 	$(MANIFESTS)/kaplibs \
 	$(MANIFESTS)/kappa \
 	$(MANIFESTS)/latexsupport \

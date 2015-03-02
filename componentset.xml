@@ -990,7 +990,7 @@ packages.
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
-<component id="ccdbig" support="U">
+<component id="ccdbig" status="obsolete" support="U">
   <version>0.1-1</version>
   <path>applications/obsolete/ccdbig</path>
   <description>CCDBIG - Assess CCDPACK performance with large datasets</description>
@@ -1068,6 +1068,34 @@ or perform astrometric reductions.
     </person>
   </developers>
   <documentation> sun32</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+</component>
+
+<component id="echwind" status="obsolete" support="U">
+  <version>3.1-4</version>
+  <path>applications/obsolete/echwind</path>
+  <description>UCL Echelle Spectrograph Observation Planning</description>
+  <abstract><p>
+ECHWIND is used to assist in the planning of observations with either the
+Utrecht Echelle Spectrograph (UES) or the UCL coude echelle spectrograph
+(UCLES). It can be run at your home institution, when preparing an observing
+proposal, or before or during an observing run.
+  </p></abstract>
+  <dependencies >
+    <build>pgplot</build><build>starx</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Marion Fisher</name>
+    </person>
+    <person>
+      <name>William Lupton</name>
+    </person>
+    <person>
+      <name>Anne Charles</name>
+    </person>
+  </developers>
+  <documentation> sun53</documentation>
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
@@ -1161,9 +1189,9 @@ file extension stored in the standard Starlink NDF data format.
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
-<component id="jcmtdr">
+<component id="jcmtdr" status="obsolete" support="U">
   <version>1.2-3</version>
-  <path>applications/jcmtdr</path>
+  <path>applications/obsolete/jcmtdr</path>
   <description>JCMTDR - Applications for Reducing JCMT GSD Data</description>
   <abstract><p>
   JCMTDR is a Starlink applications that is intended to replace NOD2 for the
@@ -1194,6 +1222,35 @@ file extension stored in the standard Starlink NDF data format.
     </person>
   </developers>
   <documentation> sun132 sc1</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+</component>
+
+<component id="kaprh" status="obsolete" support="U">
+  <version>2.0</version>
+  <path>applications/obsolete/kaprh</path>
+  <description>KAPRH - A home for retired KAPPA applications</description>
+  <abstract><p>
+KAPRH is an applications package containing commands
+which have been ``retired'' from the KAPPA package (see SUN/95). They
+are retained within KAPRH to satisfy any occasional need there may be for
+them.
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><build>ast</build><build>fio</build><build>gks</build><build>gns</build><build>hds</build><build>idi</build><build>kaplibs</build><build>mers</build><build>ndf</build><build>par</build><build>pcs</build><build>prm</build><build>sae</build><build>trn</build><build>ifd</build><build>generic</build><build option='link'>agi</build><build option='link'>ard</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>gks</build><build option='link'>gns</build><build option='link'>grp</build><build option='link'>gwm</build><build option='link'>idi</build><build option='link'>kaplibs</build><build option='link'>ncar</build><build option='link'>ndf</build><build option='link'>ndg</build><build option='link'>pda</build><build option='link'>prm</build><build option='link'>psx</build><build option='link'>ref</build><build option='link'>sgs</build><build option='link'>shl</build><build option='link'>sla</build><build option='link'>snx</build><build option='link'>trn</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
+    </person>
+    <person>
+      <name>Malcolm Currie</name>
+      <uname>dsb</uname>
+    </person>
+  </developers>
+  <documentation> sun239</documentation>
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
@@ -1231,19 +1288,57 @@ file extension stored in the standard Starlink NDF data format.
   </copyright>
 </component>
 
-<component id="star2html" support="S">
-  <version>1.7-0</version>
-  <path>applications/star2html</path>
+<component id="sgmlkit" status="obsolete" support="U">
+  <version>0.7-13</version>
+  <path>applications/obsolete/sgmlkit</path>
+  <description>Starlink documentation SGML kit</description>
+  <abstract><p>The Starlink SGML set supports people writing Starlink
+      documents, such as SUNs, SSNs, MUDs and the like.  It consists of a
+      definition of a markup language suitable for such documents,
+      plus software to convert these source documents to reader-friendly
+      form.  At present, these `output formats' include HTML and LaTeX
+      (and hence include postscript and PDF formats).</p></abstract>
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
+    </person>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> ssn70</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <copyright>
+    <year>1999-2004</year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+</component>
+
+<component id="star2html-old" status="obsolete" support="U">
+  <version>1.5-0</version>
+  <path>applications/obsolete/star2html</path>
   <description>Convert Starlink documents to hypertext</description>
   <abstract><p>Star2HTML lets you write (or convert) a Starlink document
       so that you can create two versions of it from a single source file.
       A paper version is produced by LaTeX, and a hypertext version
-      (suitable for browsing on the web) is produced by TeX4HT
-      Documents must use the 'starlink' document class, is installed by the
-      starlink application 'latexsupport'.</p>
-  </abstract>
+      (suitable for browsing on the web) is produced by latex2html.
+      You can tailor each version to its own medium by marking selected text as
+      LaTeX-only or HTML-only.</p>
+    <p>Star2HTML also includes a set of document templates for producing
+      Starlink documents in a standard style (such as `Starlink User
+      Note').  They also define new LaTeX commands for adding extra
+      links to the hypertext version of your document (without
+      affecting the paper version). </p></abstract>
   <dependencies >
-    <build>latexsupport</build><configure>perl</configure>
+
   </dependencies>
   <developers>
     <person>
@@ -1259,7 +1354,7 @@ file extension stored in the standard Starlink NDF data format.
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
   </copyright>
-  <notes><p>Starlink customised wrapper around htlatex</p></notes>
+  <notes><p>Starlink customised wrapper around latex2html</p></notes>
 </component>
 
 <component id="starbench" status="obsolete" support="U">
