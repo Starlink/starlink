@@ -17,7 +17,8 @@ AC_PATH_PROG(PYTHON, python, python)
 AC_PROG_LN_S
 
 # We need dvi2bitmap in order to build the sgmlkit documentation
-STAR_DECLARE_DEPENDENCIES(sourceset, dvi2bitmap)
+dnl In obsolete form dvi2bitmap is not available in the Starlink tree
+dnl STAR_DECLARE_DEPENDENCIES(sourceset, dvi2bitmap)
 
 STAR_PREDIST_SOURCES(doc/dtd2sgml/CATALOG)
 

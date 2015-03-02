@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
-<!-- @configure_input@ -->
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="@PACKAGE@" status="obsolete" support="U">
-  <version>@PACKAGE_VERSION@</version>
+<component id="sgmlkit" status="obsolete" support="U">
+  <version>0.7-13</version>
   <path>applications/obsolete/sgmlkit</path>
   <description>Starlink documentation SGML kit</description>
   <abstract><p>The Starlink SGML set supports people writing Starlink
@@ -12,8 +12,8 @@
       plus software to convert these source documents to reader-friendly
       form.  At present, these `output formats' include HTML and LaTeX
       (and hence include postscript and PDF formats).</p></abstract>
-  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
-    @STAR_DEPENDENCIES_CHILDREN@
+  <dependencies >
+    
   </dependencies>
   <developers>
     <person>
@@ -28,8 +28,8 @@
       <email>m.b.taylor@bristol.ac.uk</email>
     </person>
   </developers>
-  <documentation>@STAR_DOCUMENTATION@</documentation>
-  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <documentation> ssn70</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1999-2004</year>
     <name>Council for the Central Laboratory of the Research Councils</name>

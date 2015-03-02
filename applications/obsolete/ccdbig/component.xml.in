@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@" support="U">
+<component id="@PACKAGE@" status="obsolete" support="U">
   <version>@PACKAGE_VERSION@</version>
   <path>applications/obsolete/ccdbig</path>
   <description>CCDBIG - Assess CCDPACK performance with large datasets</description>

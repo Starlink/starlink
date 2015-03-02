@@ -2,9 +2,9 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@" support="S">
+<component id="@PACKAGE@" status="obsolete" support="U">
   <version>@PACKAGE_VERSION@</version>
-  <path>applications/star2html</path>
+  <path>applications/obsolete/star2html</path>
   <description>Convert Starlink documents to hypertext</description>
   <abstract><p>Star2HTML lets you write (or convert) a Starlink document
       so that you can create two versions of it from a single source file.

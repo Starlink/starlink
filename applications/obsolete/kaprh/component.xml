@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="kaprh" status="obsolete" support="U">
+  <version>2.0</version>
+  <path>applications/obsolete/kaprh</path>
+  <description>KAPRH - A home for retired KAPPA applications</description>
+  <abstract><p>
+KAPRH is an applications package containing commands
+which have been ``retired'' from the KAPPA package (see SUN/95). They
+are retained within KAPRH to satisfy any occasional need there may be for
+them.
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><build>ast</build><build>fio</build><build>gks</build><build>gns</build><build>hds</build><build>idi</build><build>kaplibs</build><build>mers</build><build>ndf</build><build>par</build><build>pcs</build><build>prm</build><build>sae</build><build>trn</build><build>ifd</build><build>generic</build><build option='link'>agi</build><build option='link'>ard</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>gks</build><build option='link'>gns</build><build option='link'>grp</build><build option='link'>gwm</build><build option='link'>idi</build><build option='link'>kaplibs</build><build option='link'>ncar</build><build option='link'>ndf</build><build option='link'>ndg</build><build option='link'>pda</build><build option='link'>prm</build><build option='link'>psx</build><build option='link'>ref</build><build option='link'>sgs</build><build option='link'>shl</build><build option='link'>sla</build><build option='link'>snx</build><build option='link'>trn</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
+    </person>
+    <person>
+      <name>Malcolm Currie</name>
+      <uname>dsb</uname>
+    </person>
+  </developers>
+  <documentation> sun239</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

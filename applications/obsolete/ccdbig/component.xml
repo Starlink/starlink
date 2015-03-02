@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="ccdbig" support="U">
+<component id="ccdbig" status="obsolete" support="U">
   <version>0.1-1</version>
   <path>applications/obsolete/ccdbig</path>
   <description>CCDBIG - Assess CCDPACK performance with large datasets</description>

@@ -2,9 +2,9 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="jcmtdr">
+<component id="jcmtdr" status="obsolete" support="U">
   <version>1.2-3</version>
-  <path>applications/jcmtdr</path>
+  <path>applications/obsolete/jcmtdr</path>
   <description>JCMTDR - Applications for Reducing JCMT GSD Data</description>
   <abstract><p>
   JCMTDR is a Starlink applications that is intended to replace NOD2 for the
