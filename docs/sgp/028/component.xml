@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sgp28">
+<component id="sgp28" support="S">
   <version>8</version>
   <path>docs/sgp/028</path>
   <description>How to write good documents for Starlink</description>

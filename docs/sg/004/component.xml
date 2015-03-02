@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sg4">
+<component id="sg4" support="S">
   <version>2</version>
   <path>docs/sg/004</path>
   <description>The Starlink Software Environment</description>

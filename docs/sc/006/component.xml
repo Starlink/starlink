@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sc6">
+<component id="sc6" support="S">
   <version>4</version>
   <path>docs/sc/006</path>
   <description>The CCD Photometric Calibration Cookbook</description>

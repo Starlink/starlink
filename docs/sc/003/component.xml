@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sc3">
+<component id="sc3" support="S">
   <version>2</version>
   <path>docs/sc/003</path>
   <description>Echelle Data Reduction Cookbook</description>

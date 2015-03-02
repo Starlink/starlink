@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sg9">
+<component id="sg9" support="S">
   <version>2</version>
   <path>docs/sg/009</path>
   <description>Introduction to Echelle Spectroscopy</description>

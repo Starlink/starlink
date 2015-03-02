@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sun249">
+<component id="sun249" support="S">
   <version>2</version>
   <path>docs/sun/249</path>
   <description>Starlink Standard Data Structures</description>

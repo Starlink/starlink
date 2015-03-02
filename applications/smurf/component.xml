@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="smurf">
+<component id="smurf" support="S">
   <version>1.6.1</version>
   <path>applications/smurf</path>
   <description>SMURF - Sub-mm User Reduction Facility</description>

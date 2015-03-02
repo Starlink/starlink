@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="surf">
+<component id="surf" support="S">
   <version>1.8-1</version>
   <path>applications/surf</path>
   <description>SURF - SCUBA User Reduction Facility</description>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sc17">
+<component id="sc17" support="S">
   <version>1</version>
   <path>docs/sc/017</path>
   <description>The GAIA Cookbook</description>

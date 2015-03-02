@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sc14">
+<component id="sc14" support="S">
   <version>2</version>
   <path>docs/sc/014</path>
   <description>The Fibre Spectroscopy Cookbook</description>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sc13">
+<component id="sc13" support="S">
   <version>2-5</version>
   <path>docs/sc/013</path>
   <description>Theory and Modelling Resources Cookbook</description>

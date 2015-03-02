@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sug">
+<component id="sug" support="S">
   <version>1</version>
   <path>docs/sug</path>
   <description>Starlink User Guide</description>

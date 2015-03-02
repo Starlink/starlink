@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sc2">
+<component id="sc2" support="S">
   <version>3</version>
   <path>docs/sc/002</path>
   <description>The DX Cookbook</description>

@@ -590,7 +590,7 @@ and its coordinates are displayed.
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
-<component id="fluxes">
+<component id="fluxes" support="S">
   <version>1.4-1</version>
   <path>applications/fluxes</path>
   <description>FLUXES - JCMT Postion and Flux Density Calibration</description>
@@ -1409,7 +1409,7 @@ reduction program.
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
-<component id="pamela">
+<component id="pamela" support="S">
   <version>1.0.6</version>
   <path>applications/pamela</path>
   <description>PAMELA</description>
@@ -1647,7 +1647,7 @@ package.
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
-<component id="smurf">
+<component id="smurf" support="S">
   <version>1.6.1</version>
   <path>applications/smurf</path>
   <description>SMURF - Sub-mm User Reduction Facility</description>
@@ -1704,7 +1704,7 @@ with the ACSIS correlator at JCMT.
   <bugreports>timj@jach.hawaii.edu</bugreports>
 </component>
 
-<component id="specx">
+<component id="specx" support="S">
   <version>6.8-5</version>
   <path>applications/specx</path>
   <description>SPECX - A millimetre wave spectral reduction package</description>
@@ -1892,7 +1892,7 @@ UNIX).
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
-<component id="surf">
+<component id="surf" support="S">
   <version>1.8-1</version>
   <path>applications/surf</path>
   <description>SURF - SCUBA User Reduction Facility</description>
@@ -2010,7 +2010,7 @@ to handle data from a variety of different instruments.
 </component>
 
 
-<component id="sc2">
+<component id="sc2" support="S">
   <version>3</version>
   <path>docs/sc/002</path>
   <description>The DX Cookbook</description>
@@ -2043,7 +2043,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sc3">
+<component id="sc3" support="S">
   <version>2</version>
   <path>docs/sc/003</path>
   <description>Echelle Data Reduction Cookbook</description>
@@ -2070,7 +2070,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sc4">
+<component id="sc4" support="S">
   <version>3</version>
   <path>docs/sc/004</path>
   <description>C-shell Cookbook</description>
@@ -2108,7 +2108,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sc5">
+<component id="sc5" support="S">
   <version>3</version>
   <path>docs/sc/005</path>
   <description>The 2-D CCD Data Reduction Cookbook</description>
@@ -2150,7 +2150,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sc6">
+<component id="sc6" support="S">
   <version>4</version>
   <path>docs/sc/006</path>
   <description>The CCD Photometric Calibration Cookbook</description>
@@ -2192,7 +2192,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sc7">
+<component id="sc7" support="S">
   <version>2</version>
   <path>docs/sc/007</path>
   <description>Simple Spectroscopy Reductions</description>
@@ -2225,7 +2225,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sc9">
+<component id="sc9" support="S">
   <version>1</version>
   <path>docs/sc/009</path>
   <description>LaTeX Cookbook</description>
@@ -2249,7 +2249,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sc12">
+<component id="sc12" support="S">
   <version>1</version>
   <path>docs/sc/012</path>
   <description>Writing your own Data Reduction Software</description>
@@ -2278,7 +2278,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sc13">
+<component id="sc13" support="S">
   <version>2-5</version>
   <path>docs/sc/013</path>
   <description>Theory and Modelling Resources Cookbook</description>
@@ -2312,7 +2312,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sc14">
+<component id="sc14" support="S">
   <version>2</version>
   <path>docs/sc/014</path>
   <description>The Fibre Spectroscopy Cookbook</description>
@@ -2342,7 +2342,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sc15">
+<component id="sc15" support="S">
   <version>2</version>
   <path>docs/sc/015</path>
   <description>C-shell Cookbook</description>
@@ -2370,7 +2370,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sc17">
+<component id="sc17" support="S">
   <version>1</version>
   <path>docs/sc/017</path>
   <description>The GAIA Cookbook</description>
@@ -2405,7 +2405,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sc20">
+<component id="sc20" support="S">
   <version>1</version>
   <path>docs/sc/020</path>
   <description>The Heterodyne Data Reduction Cookbook</description>
@@ -2435,7 +2435,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sc21">
+<component id="sc21" support="S">
   <version>1.2</version>
   <path>docs/sc/021</path>
   <description>The SCUBA-2 Data-analysis Cookbook</description>
@@ -2467,7 +2467,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sg4">
+<component id="sg4" support="S">
   <version>2</version>
   <path>docs/sg/004</path>
   <description>The Starlink Software Environment</description>
@@ -2491,7 +2491,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sg6">
+<component id="sg6" support="S">
   <version>3</version>
   <path>docs/sg/006</path>
   <description>Programmer's Facilities &amp; Documentation Guide</description>
@@ -2528,7 +2528,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sg9">
+<component id="sg9" support="S">
   <version>2</version>
   <path>docs/sg/009</path>
   <description>Introduction to Echelle Spectroscopy</description>
@@ -2559,7 +2559,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sgp4">
+<component id="sgp4" support="S">
   <version>2</version>
   <path>docs/sgp/004</path>
   <description>Starlink C Programming Standard</description>
@@ -2588,7 +2588,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sgp16">
+<component id="sgp16" support="S">
   <version>10</version>
   <path>docs/sgp/016</path>
   <description>Starlink Application Programming Standard</description>
@@ -2617,7 +2617,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sgp28">
+<component id="sgp28" support="S">
   <version>8</version>
   <path>docs/sgp/028</path>
   <description>How to write good documents for Starlink</description>
@@ -2653,7 +2653,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sgp38">
+<component id="sgp38" support="S">
   <version>2</version>
   <path>docs/sgp/038</path>
   <description>Starlink Standard Data Structures</description>
@@ -2684,7 +2684,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="ssn3">
+<component id="ssn3" support="S">
   <version>1</version>
   <path>docs/ssn/003</path>
   <description>The ECH Echelle Spectrograph Model Package</description>
@@ -2716,7 +2716,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="ssn8">
+<component id="ssn8" support="S">
   <version>1</version>
   <path>docs/ssn/008</path>
   <description>{Naming Conventions for Accessing Starlink Subroutine Libraries</description>
@@ -2740,7 +2740,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="ssn22">
+<component id="ssn22" support="S">
   <version>3</version>
   <path>docs/ssn/022</path>
   <description>Coordinate Systems for Pixel Arrays</description>
@@ -2766,7 +2766,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="ssn64">
+<component id="ssn64" support="S">
   <version>5</version>
   <path>docs/ssn/064</path>
   <description>ADAM---Organization of Application Packages</description>
@@ -2792,7 +2792,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="ssn75">
+<component id="ssn75" support="S">
   <version>1</version>
   <path>docs/ssn/075</path>
   <description>Writing Catalogue and Image Servers for GAIA and CURSA</description>
@@ -2844,7 +2844,7 @@ to handle data from a variety of different instruments.
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
-<component id="sug">
+<component id="sug" support="S">
   <version>1</version>
   <path>docs/sug</path>
   <description>Starlink User Guide</description>
@@ -2873,7 +2873,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sun1">
+<component id="sun1" support="S">
   <version>24</version>
   <path>docs/sun/001</path>
   <description>STARLINK Software Collection}</description>
@@ -2926,7 +2926,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sun101">
+<component id="sun101" support="S">
   <version>2</version>
   <path>docs/sun/101</path>
   <description>Introduction to ADAM Programming</description>
@@ -2950,7 +2950,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sun202">
+<component id="sun202" support="S">
   <version>2</version>
   <path>docs/sun/202</path>
   <description>XRT: ROSAT XRT Data Reduction</description>
@@ -2983,7 +2983,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sun249">
+<component id="sun249" support="S">
   <version>2</version>
   <path>docs/sun/249</path>
   <description>Starlink Standard Data Structures</description>

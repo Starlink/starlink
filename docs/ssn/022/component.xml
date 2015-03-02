@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="ssn22">
+<component id="ssn22" support="S">
   <version>3</version>
   <path>docs/ssn/022</path>
   <description>Coordinate Systems for Pixel Arrays</description>

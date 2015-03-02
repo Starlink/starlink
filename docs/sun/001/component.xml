@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sun1">
+<component id="sun1" support="S">
   <version>24</version>
   <path>docs/sun/001</path>
   <description>STARLINK Software Collection}</description>

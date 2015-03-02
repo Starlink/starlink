@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sc12">
+<component id="sc12" support="S">
   <version>1</version>
   <path>docs/sc/012</path>
   <description>Writing your own Data Reduction Software</description>

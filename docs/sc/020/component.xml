@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sc20">
+<component id="sc20" support="S">
   <version>1</version>
   <path>docs/sc/020</path>
   <description>The Heterodyne Data Reduction Cookbook</description>

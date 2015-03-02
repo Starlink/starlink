@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sc4">
+<component id="sc4" support="S">
   <version>3</version>
   <path>docs/sc/004</path>
   <description>C-shell Cookbook</description>

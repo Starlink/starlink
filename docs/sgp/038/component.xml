@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sgp38">
+<component id="sgp38" support="S">
   <version>2</version>
   <path>docs/sgp/038</path>
   <description>Starlink Standard Data Structures</description>

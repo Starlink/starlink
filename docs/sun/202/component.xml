@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sun202">
+<component id="sun202" support="S">
   <version>2</version>
   <path>docs/sun/202</path>
   <description>XRT: ROSAT XRT Data Reduction</description>

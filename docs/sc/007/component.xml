@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sc7">
+<component id="sc7" support="S">
   <version>2</version>
   <path>docs/sc/007</path>
   <description>Simple Spectroscopy Reductions</description>

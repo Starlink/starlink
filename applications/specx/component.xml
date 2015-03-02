@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="specx">
+<component id="specx" support="S">
   <version>6.8-5</version>
   <path>applications/specx</path>
   <description>SPECX - A millimetre wave spectral reduction package</description>

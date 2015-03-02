@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="ssn64">
+<component id="ssn64" support="S">
   <version>5</version>
   <path>docs/ssn/064</path>
   <description>ADAM---Organization of Application Packages</description>

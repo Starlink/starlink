@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sgp16">
+<component id="sgp16" support="S">
   <version>10</version>
   <path>docs/sgp/016</path>
   <description>Starlink Application Programming Standard</description>

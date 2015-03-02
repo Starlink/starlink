@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sg6">
+<component id="sg6" support="S">
   <version>3</version>
   <path>docs/sg/006</path>
   <description>Programmer's Facilities &amp; Documentation Guide</description>

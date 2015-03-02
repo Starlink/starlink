@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="fluxes">
+<component id="fluxes" support="S">
   <version>1.4-1</version>
   <path>applications/fluxes</path>
   <description>FLUXES - JCMT Postion and Flux Density Calibration</description>

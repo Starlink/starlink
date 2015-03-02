@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="ssn3">
+<component id="ssn3" support="S">
   <version>1</version>
   <path>docs/ssn/003</path>
   <description>The ECH Echelle Spectrograph Model Package</description>

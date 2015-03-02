@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sc5">
+<component id="sc5" support="S">
   <version>3</version>
   <path>docs/sc/005</path>
   <description>The 2-D CCD Data Reduction Cookbook</description>

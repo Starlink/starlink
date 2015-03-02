@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="pamela">
+<component id="pamela" support="S">
   <version>1.0.6</version>
   <path>applications/pamela</path>
   <description>PAMELA</description>
