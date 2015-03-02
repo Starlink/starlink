@@ -352,3 +352,23 @@
 \Css{.subsectionToc{padding-left:4em;}}
 \Css{.subsubsectionToc{padding-left:7em}}
 \fi
+
+
+
+%%%%%%%%%%%%%%%--------------FONTS
+
+% Set up small caps, bf sf and tt text as appropriately named spans/or
+% use built in: [Don't use \Tg for the opening. but instead the
+% \ifvmode...\Hcode stuff to avoid a bug at start of paragraphs.]
+
+%% textsc has to bre renewed, as otherwise tex4ht will have set it in
+%% ALL-CAPS before the css code ever does anything.
+\Newconfigure{textsc}{2}
+\renewcommand\textsc[1]{\a:textsc#1\b:textsc}
+\Configure{textsc}{\ifvmode \ShowPar\fi \HCode{<span class="sc">}}{\Tg</span>}
+
+\Configure{texttt}{\ifvmode \ShowPar\fi \HCode{<code>}}{\Tg</code>}
+\Configure{textbf}{\ifvmode \ShowPar\fi \HCode{<b>}}{\Tg</b>}
+\Configure{textsf}{\ifvmode \ShowPar\fi \HCode{<span  class="sf">}}{\Tg</span>}
+\Configure{textit}{\ifvmode \ShowPar\fi \HCode{<em>}}{\HCode{</em>}}
+\Configure{emph}{\ifvmode \ShowPar\fi \HCode{<em>}}{\HCode{</em>}}
