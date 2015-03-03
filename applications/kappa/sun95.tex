@@ -2235,7 +2235,7 @@ and \att{label(2)}.  The whole group must be enclosed in single quotes to
 prevent the parameter system splitting the string at the commas.  The
 string must then also be enclosed in double quotes to prevent the UNIX shell
 from interpreting the parantheses and equals signs.  A simpler way of
-specifying a ploting style is to put the attribute settings in a
+specifying a plotting style is to put the attribute settings in a
 \htmlref{text file}{se:style} \latex{(see Section~\ref{se:style})}.}.
 There are more examples in the \xref{{\sl C-Shell Cookbook}}{sc4}{}.
 
@@ -2509,7 +2509,7 @@ the attribute called \att{Border}, and the second assigns the string
 
 Here is a list of the available attributes, with a brief description
 of each.  Full descriptions are included \slhyperref{later}{in
-  Section~}{}{se:plotting_attr}.
+  Appendix~}{}{ap:plotting_attr}.
 
 
 \begin{aligndesc}
@@ -2527,8 +2527,8 @@ of each.  Full descriptions are included \slhyperref{later}{in
 \item[\att{LabelUnits(axis)}] Include unit descriptions in axis labels?
 \item[\att{LabelUp(axis)}] Draw numerical axis labels upright?
 \item[\att{Labelling}] Label and tick placement option
-\item[\att{MajTickLen}] Length of major tick marks 
-\item[\att{MinTickLen}] Length of minor tick marks 
+\item[\att{MajTickLen}] Length of major tick marks
+\item[\att{MinTickLen}] Length of minor tick marks
 \item[\att{MinTick(axis)}] Density of minor tick marks
 \item[\att{NumLab(axis)}] Draw numerical axis labels?
 \item[\att{NumLabGap(axis)}] Spacing of numerical axis labels
@@ -2794,7 +2794,7 @@ the histogram for NDF ndf1.  (Recall \verb+\\+ is a synonym for the
 accept keyword, so other defaults are used for the likes of the data
 range and number of bins omitted for clarity.)  The second NDF's
 histogram is plotted in yellow.  For the third NDF the locus is again
-in the colour of the first plot, since the yellow was only temporary
+in the colour of the first plot (since the yellow was only temporary)
 but has thickness four times normal.  If you ran
 \htmlref{HISTOGRAM}{HISTOGRAM} again, the line thickness would return
 to its original value used in the first graph.
@@ -2917,8 +2917,9 @@ Note, if you produce a plot on an X-window and then change the representation
 of pens using PALENTRY, then any components of the existing plot that were
 drawn with the modified pens will change colour immediately \emph{if and
 only if} your X window is set to 256 colours (\emph{i.e.} if you have an 8 bit
-pseudo-colour visual).  If you have a 16- or 24-bit display, then changes
-to pen colours will only affect subsequently drawn graphics.
+pseudo-colour visual).  If you are in the more usual situation of having a 16-
+or 24-bit display, then changes to pen colours will only affect subsequently
+drawn graphics.
 
 \subsection{Establishing Defaults for Plotting Attributes}
 
@@ -2932,9 +2933,9 @@ are `sticky'.\footnote{The exceptions are the TEMPSTYLE parameters. These
 parameters are used to make temporary style changes and always forget any
 previous values assigned to them.} That is, once a group of attribute
 settings has been specified for a style parameter, that group continues
-to be used by subsequent applications until a new group is supplied for
-the parameter. If the group is supplied within a text file, then the
-`current value' stored for the parameter is the list of attribute
+to be used by subsequent invocations of the application until a new group is
+supplied for the parameter. If the group is supplied within a text file, then
+the `current value' stored for the parameter is the list of attribute
 settings read from the file, \emph{not} the name of the file.  Thus,
 changing the contents of the file at a later time will have no effect on
 the value used for the parameter unless you re-specify the parameter on
@@ -2980,8 +2981,7 @@ value is used for the attribute, determined as follows:
 (either because no file was found, or the file did not contain a setting
 for the attribute), then the default value supplied by the AST library is
 used.  These defaults are included in the full description of the relevant
-attributes later in this section.
-
+attributes in Appendix~\ref{ap:plotting_attr}.
 \end{enumerate}
 
 From the above, you can see that defaults can be specified either for
@@ -3077,943 +3077,6 @@ digits):
 \end{itemize}
 
 \PGPLOT\  escape sequences may also be included in strings that are to be drawn.
-
-\subsection{\xlabel{se_plotting_attr}Descriptions of Plotting Attributes\label{se:plotting_attr}}
-
-This section lists the available plotting attributes.  Note, the default
-value included in each description is the value that will be used if no
-other default value is supplied (for instance within a defaults file).
-In particular, the standard \KAPPA\ default style files
-contained in \texttt{\$KAPPA\_DIR} include alternative default values for several
-attributes which will be used in preference to those described below.
-
-Individual applications may override the normal behaviour of
-particular attributes, in which case the description of the application
-will include details.
-
-It is often useful to specify values for some of the attributes of the current
-\xref{Frame}{sun210}{Frame}~ when giving a plotting style (title, axis labels,
-\emph{etc.}).  These additional attributes are described
-\slhyperref{here}{in Section~}{}{se:frmatt}.
-
-\sstattribute{
-   Border
-}{
-   Draw a border around valid regions?
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by determining
-      whether a border is drawn around regions corresponding to the
-      valid co-ordinates.
-
-      If the \att{Border} value of a plot is non-zero, then this border will
-      be drawn as part of the axes.  Otherwise, the border is not drawn
-      (although axis labels and tick marks will still appear, unless
-      other relevant attributes indicate that they should
-      not).  The default behaviour is to draw the border if tick marks
-      and numerical labels will be drawn around the edges of the
-      plotting area (see the \htmlref{\att{Labelling}}{Labelling}~ attribute),
-      but to omit it otherwise.
-   }
-   \sstattributetype{
-      Integer (boolean).
-   }
-}
-\sstattribute{
-   Colour(element)
-}{
-   Colour index for a plot element
-}{
-   \sstdescription{
-      This attribute determines the colour index used when drawing each
-      element of of a plot.  It takes a separate value for each graphical
-      element so that, for instance, the setting \texttt{"Colour(title)=2"} causes
-      the title to be drawn using colour index 2.  Standard X colour
-      names, space-separated floating-point RGB triples, or
-      \htmlref{HTML colour codes}{htmlcolour}
-      (optionally using a \texttt{"@"} inplace of a \texttt{"\#"} to avoid the code
-      being interpreted as a comment within a style file) can also be
-      specified, and the nearest available colour will be used if
-      the requested colour is not currently in the palette.
-
-      The default behaviour is for all graphical elements to be drawn
-      using Pen~1.
-   }
-   \sstattributetype{
-      Integer.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         For a list of the graphical elements available, see
-         \slhyperref{here}{Section~}{}{se:styles}.
-
-         \sstitem
-
-         If no graphical element is specified, (\emph{e.g.} \att{Colour} instead
-         of \att{Colour(title)}), then all graphical elements are affected.
-
-      }
-   }
-}
-\sstattribute{
-   DrawAxes
-}{
-   Draw axes?
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by
-      determining whether curves representing co-ordinate axes should be
-      drawn.
-
-      If drawn, these axis lines will pass through any tick marks
-      associated with numerical labels drawn to mark values on the
-      axes.  The location of these tick marks and labels (and hence the
-      axis lines) is determined by the
-      \htmlattref{LabelAt(axis)}{LabelAt(axis)}~ attribute.
-
-      If the \att{DrawAxes} value is non-zero (the default), then
-      axis lines will be drawn, otherwise they will be omitted.
-   }
-   \sstattributetype{
-      Integer (boolean).
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         Axis lines are drawn independently of any co-ordinate grid
-         lines (see the \htmlref{\att{Grid}}{Grid}~ attribute) so grid lines may be used to
-         substitute for axis lines if required.
-
-         \sstitem
-         In some circumstances, numerical labels and tick marks are
-         drawn around the edges of the plotting area (see the
-         \htmlattref{Labelling}{Labelling}~ attribute).  In this case,
-         the value of the \att{DrawAxes} attribute is ignored.
-      }
-   }
-}
-\sstattribute{
-   DrawDSB
-}{
-   Annotate both sidebands if the spectral axis represents a dual
-   sideband spectrum?
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by
-      determining what to draw for a spectral axis representing a dual
-      sideband spectrum. The sideband selected using the
-      \xref{\att{SideBand}}{sun210}{SideBand} attribute will always be
-      annotated on the edge of the Plot selected using the
-      \htmlattref{Edge(axis)}{Edge(axis)} attribute. In addition, if the
-      DrawDSB attribute is non-zero (the default) the other sideband will
-      be annotated on the opposite edge of the Plot. If DrawDSB is zero,
-      then the other sideband will not be annotated.
-   }
-   \sstattributetype{
-      Integer (boolean).
-   }
-}
-\sstattribute{
-   DrawTitle
-}{
-   Draw a title?
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by determining
-      whether a title is drawn.
-
-      If the \att{DrawTitle}~ value is non-zero (the default), then
-      the title will be drawn, otherwise it will be omitted.
-   }
-   \sstattributetype{
-      Integer (boolean).
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The text used for the title is obtained from the
-         \htmlattref{Title}{plotel:Title}~ attribute.
-
-         \sstitem
-         The vertical placement of the title can be controlled using
-         the \htmlattref{TitleGap}{TitleGap}~ attribute.
-      }
-   }
-}
-\sstattribute{
-   Edge(axis)
-}{
-   Which edges to label
-}{
-   \sstdescription{
-
-      This attribute controls the appearance of annotated axes by
-      determining which edges are used for displaying numerical and
-      descriptive axis labels.  It takes a separate value for each
-      physical axis so that, for instance, the setting \texttt{Edge(2)=left}~
-      specifies which edge to use to display labels for the second axis.
-
-      The values \texttt{left}, \texttt{top}, \texttt{right} and \texttt{bottom} (or any
-      abbreviation) can be supplied for this attribute.  The default is
-      usually \texttt{bottom} for the first axis and \texttt{left} for the second
-      axis.  However, if exterior labelling was requested (see the
-      \htmlattref{Labelling}{Labelling}~ attribute) but cannot be produced
-      using these default \att{Edge} values, then the default
-      values will be swapped if this enables exterior labelling to be produced.
-   }
-   \sstattributetype{
-      String.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         In some circumstances, numerical labels will be drawn along
-         internal grid lines instead of at the edges of the plotting
-         area (see the \htmlattref{Labelling}{Labelling}~ attribute).
-         In this case, the \att{Edge} attribute only affects the
-         placement of the descriptive labels (these are drawn at the
-         edges of the plotting area, rather than along the axis lines).
-      }
-   }
-}
-\sstattribute{
-   FileInTitle
-}{
-   Include the NDF name as a second line in the title?
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by
-      determining whether or not the title at the top of the plot will
-      include a second line giving the NDF name. The default value of
-      zero results in the title containing only the text given by the
-      Title attribute. A non-zero value will result in a second line
-      containing the NDF name being added to the title.
-   }
-   \sstattributetype{
-      Integer (boolean).
-   }
-}
-\sstattribute{
-   Font(element)
-}{
-   Character fount for a plot element
-}{
-   \sstdescription{
-      This attribute determines the character fount index used when
-      drawing each element of a plot.  It takes a separate value for
-      graphical element so that, for instance, the setting
-      \texttt{Font(title)=2}~ causes the title to be drawn using fount number 2.
-
-      The range of integer fount indices available and the appearance
-      of the resulting text is determined by the \PGPLOT\  graphics package,
-      but include:
-
-      \begin{enumerate}
-      \item A simple single-stroke fount (the default)
-      \item A roman fount
-      \item An italic fount
-      \item A script fount
-      \end{enumerate}
-
-   }
-   \sstattributetype{
-      Integer.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         For a list of the graphical elements available, see
-         \slhyperref{here}{Section~}{}{se:styles}.
-
-         \sstitem
-         If no graphical element is specified, (\emph{e.g.} \att{Font} instead
-         of \att{Font(title)}), then all graphical elements are affected.
-      }
-   }
-}
-\sstattribute{
-   Gap(axis)
-}{
-   Interval between major axis values
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by
-      determining the interval between the major axis values at which
-      (for example) major tick marks are drawn.  It takes a separate value
-      for each physical axis so that, for instance, the setting \texttt{
-      Gap(2)=3.0}~ specifies the interval between major values along the
-      second axis.
-
-      The \att{Gap} value supplied will usually be rounded to the nearest
-      `nice' value, suitable (\emph{e.g.}) for generating axis labels, before
-      use.  To avoid this `nicing' you should set an explicit format for
-      the axis using the \htmlattref{Format(axis)}{Format(axis)}~ or
-      \htmlattref{Digits/Digits(axis)}{Digits/Digits(axis)}~
-      attribute.  The default behaviour is for the
-      application to generate its own \att{Gap} value when required, based on
-      the range of axis values to be represented.
-   }
-   \sstattributetype{
-      Floating point.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The \att{Gap} value should use the same units as are used internally
-         for storing co-ordinate values on the corresponding axis.  For
-         example, with a celestial co-ordinate system, the \att{Gap} value
-         should be in radians, not hours or degrees.
-
-         \sstitem
-         If no axis is specified, (\emph{e.g.} \att{Gap} instead of \att{Gap(2)}),
-         then both axes are affected.
-      }
-   }
-}
-\sstattribute{
-   Grid
-}{
-   Draw grid lines?
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by
-      determining whether grid lines (a grid of curves marking the
-      `major' values on each axis) are drawn across the plotting area.
-
-      If the \att{Grid} attribute is non-zero, then grid lines will be
-      drawn.  Otherwise, short tick marks on the axes are used to mark
-      the major axis values.  The default behaviour is to use tick
-      marks if the entire plotting area is filled by valid
-      co-ordinates, but to draw grid lines otherwise.
-   }
-   \sstattributetype{
-      Integer (boolean).
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The spacing between major axis values, which determines the
-         spacing of grid lines, may be set using the
-         \htmlattref{Gap(axis)}{Gap(axis)}~ attribute.
-      }
-   }
-}
-\sstattribute{
-   LabelAt(axis)
-}{
-   Where to place numerical labels for a Plot
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by determining
-      where numerical axis labels and associated tick marks are
-      placed.  It takes a separate value for each physical axis
-      so that, for instance, the setting \texttt{"LabelAt(2)=10.0"}~
-      specifies where the numerical labels and tick marks for the
-      second axis should be drawn.
-
-      For each axis, the \att{LabelAt} value gives the value on the other
-      axis at which numerical labels and tick marks should be placed.
-      For example, in a celestial (right ascension, declination) co-ordinate
-      system, \att{LabelAt(1)} gives a declination value that defines a line (of
-      constant declination) along which the numerical right-ascension labels and their
-      associated tick marks will be drawn.  Similarly, \att{LabelAt(2)} gives
-      the right-ascension value at which the declination labels and ticks will be drawn.
-
-      The default bahaviour is for the application to generate its own
-      position for numerical labels and tick marks.
-   }
-   \sstattributetype{
-      Floating point.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The \att{LabelAt} value should use the same units as are used
-         internally for storing co-ordinate values on the appropriate
-         axis.  For example, with a celestial co-ordinate system, the
-         \att{LabelAt} value should be in radians, not hours or degrees.
-
-         \sstitem
-         Normally, the \att{LabelAt} value also determines where the lines
-         representing co-ordinate axes will be drawn, so that the tick
-         marks will lie on these lines (but also see the
-         \htmlattref{DrawAxes}{DrawAxes}~ attribute).
-
-         \sstitem
-         In some circumstances, numerical labels and tick marks are
-         drawn around the edges of the plotting area (see the
-         \htmlattref{Labelling}{Labelling}~ attribute).  In this case,
-         the value of the \att{LabelAt} attribute is ignored.
-      }
-   }
-}
-\sstattribute{
-   LabelUnits(axis)
-}{
-   Include unit descriptions in axis labels?
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by determining
-      whether the descriptive labels drawn for each axis
-      should include a description of the units being used on the
-      axis.  It takes a separate value for each physical axis
-      so that, for instance, the setting \texttt{"LabelUnits(2)=1"}~
-      specifies that a unit description should be included in the
-      label for the second axis.
-
-      If the \att{LabelUnits} value axis is non-zero, a unit
-      description will be included in the descriptive label for that
-      axis, otherwise it will be omitted.  The default behaviour is to
-      include a unit description unless the
-      \xref{Frame}{sun210}{Frame}~ being annotated
-      is a \xref{SkyFrame}{sun210}{SkyFrame}~ (\emph{i.e.} a celestial
-      co-ordinate system), in which case it is omitted.
-   }
-   \sstattributetype{
-      Integer (boolean).
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The text used for the unit description is obtained from
-         \htmlattref{Unit(axis)}{Unit(axis)}~ attribute.
-
-         \sstitem
-         If no axis is specified, (\emph{e.g.} \att{LabelUnits} instead of
-         \att{LabelUnits(2)}), then both axes are affected.
-      }
-   }
-}
-\sstattribute{
-   LabelUp(axis)
-}{
-   Draw numerical axis labels upright?
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by determining
-      whether the numerical labels for each axis should be
-      drawn upright or not.  It takes a separate value for each
-      physical axis so that, for instance, the setting
-      \texttt{"LabelUp(2)=1"}~ specifies that numerical labels for the second
-      axis should be drawn upright.
-
-      If the \att{LabelUp} value axis is non-zero, it causes
-      numerical labels for that axis to be plotted upright (\emph{i.e.} as
-      normal, horizontal text), otherwise (the default) these labels
-      rotate to follow the axis to which they apply.
-   }
-   \sstattributetype{
-      Integer (boolean).
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         In some circumstances, numerical labels and tick marks are
-         drawn around the edges of the plotting area (see the
-         \htmlattref{Labelling}{Labelling}~ attribute).  In this case,
-         the value of the \att{LabelUp} attribute is ignored.
-
-         \sstitem
-         If no axis is specified, (\emph{e.g.} \att{LabelUp} instead of
-         \att{LabelUp(2)}), then both axes are affected.
-      }
-   }
-}
-\sstattribute{
-   Labelling
-}{
-   Label and tick placement option
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by determining
-      the strategy for placing numerical labels and tick marks.
-
-      If the \att{Labelling} value is \texttt{"exterior"}~ (the default), then
-      numerical labels and their associated tick marks are placed
-      around the edges of the plotting area, if possible.  If this is
-      not possible, or if the \att{Labelling}~ value is \texttt{"interior"}, then they
-      are placed along grid lines inside the plotting area.
-   }
-   \sstattributetype{
-      String.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The \att{LabelAt(axis)} attribute may be used to determine the exact
-         placement of labels and tick marks that are drawn inside the
-         plotting area.
-      }
-   }
-}
-\sstattribute{
-   MajTickLen
-}{
-   Length of major tick marks
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by determining
-      the length of the major tick marks drawn on the axes.
-
-      The \att{MajTickLen}~ value should be given as a fraction of the
-      minimum dimension of the plotting area.  Negative values cause
-      major tick marks to be placed on the outside of the
-      corresponding grid line or axis (but subject to any clipping
-      imposed by \PGPLOT\ ), while positive
-      values cause them to be placed on the inside.
-
-      The default behaviour depends on whether a co-ordinate grid is
-      drawn inside the plotting area (see the \htmlattref{Grid}{Grid}~
-      attribute).  If so, the default \att{MajTickLen} value is zero (so that
-      major ticks are not drawn), otherwise the default is $+0.015$.
-   }
-   \sstattributetype{
-      Floating point.
-   }
-}
-\sstattribute{
-   MinTick(axis)
-}{
-   Density of minor tick marks
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by determining
-      the density of minor tick marks which appear between the major
-      axis values.  It takes a separate value for each
-      physical axis so that, for instance, the setting
-      \texttt{"MinTick(2)=2"}~ specifies the density of minor tick marks along
-      the second axis.
-
-      The value supplied should be the number of minor divisions
-      required between each pair of major axis values, this being one
-      more than the number of minor tick marks to be drawn.  By
-      default, a value is chosen that depends on the gap between major
-      axis values and the nature of the axis.
-   }
-   \sstattributetype{
-      Integer.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         If no axis is specified, (\emph{e.g.} \att{MinTick} instead of
-         \att{MinTick(2)}), then both axes are affected.
-      }
-   }
-}
-\sstattribute{
-   MinTickLen
-}{
-   Length of minor tick marks
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by determining
-      the length of the minor tick marks drawn on the axes.
-
-      The \att{MinTickLen}~ value should be given as a fraction of the
-      minimum dimension of the plotting area.  Negative values cause
-      minor tick marks to be placed on the outside of the
-      corresponding grid line or axis (but subject to any clipping
-      imposed by the underlying graphics system), while positive
-      values cause them to be placed on the inside.
-
-      The default value is $+0.007$.
-   }
-   \sstattributetype{
-      Floating point.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The number of minor tick marks drawn is determined by the
-         \att{MinTick(axis)} attribute.
-      }
-   }
-}
-\sstattribute{
-   NumLab(axis)
-}{
-   Draw numerical axis labels?
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by
-      determining whether labels should be drawn to represent the
-      numerical values along each axis.  It takes a separate value for
-      each physical axis so that, for instance, the setting \texttt{
-      "NumLab(2)=1"}~ specifies that numerical labels should be drawn for
-      the second axis.
-
-      If the \att{NumLab} value for an axis is non-zero (the default),
-      then numerical labels will be drawn for that axis, otherwise
-      they will be omitted.
-   }
-   \sstattributetype{
-      Integer (boolean).
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The drawing of associated descriptive axis labels
-         (describing the quantity being plotted along each axis) is
-         controlled by the \htmlattref{TextLab(axis)}{TextLab(axis)}~ attribute.
-
-         \sstitem
-         If no axis is specified, (\emph{e.g.} \att{NumLab} instead of
-         \att{NumLab(2)}), then both axes are affected.
-      }
-   }
-}
-\sstattribute{
-   NumLabGap(axis)
-}{
-   Spacing of numerical labels
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by determining
-      where numerical axis labels are placed relative to the axes they
-      describe.  It takes a separate value for each physical axis so that,
-      for instance, the setting \texttt{"NumLabGap(2)=-0.01"}~
-      specifies where the numerical label for the second axis should
-      be drawn.
-
-      For each axis, the \att{NumLabGap} value gives the spacing between the
-      axis line (or edge of the plotting area, if appropriate) and the
-      nearest edge of the corresponding numerical axis
-      labels.  Positive values cause the descriptive label to be placed
-      on the opposite side of the line to the default tick marks,
-      while negative values cause it to be placed on the same side.
-
-      The \att{NumLabGap} value should be given as a fraction of the minimum
-      dimension of the plotting area, the default value being $+0.01$.
-   }
-   \sstattributetype{
-      Floating point.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         If no axis is specified, (\emph{e.g.} \att{NumLabGap} instead of
-         \att{NumLabGap(2)}), then both axes are affected.
-      }
-   }
-}
-\sstattribute{
-   Size(element)
-}{
-   Character size for a plot element
-}{
-   \sstdescription{
-      This attribute determines the character size used when drawing
-      each element of graphical output.  It takes a
-      separate value for each graphical element so that, for instance,
-      the setting \texttt{"Size(title)=2.0"}~ causes the plot title to be drawn
-      using twice the default character size.
-   }
-   \sstattributetype{
-      Floating Point.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         For a list of the graphical elements available, see
-         \slhyperref{here}{Section~}{}{se:styles}.
-
-         \sstitem
-         If no graphical element is specified, (\emph{e.g.} \att{Size} instead
-         of \att{Size(title)}), then all graphical elements are affected.
-      }
-   }
-}
-\sstattribute{
-   Style(element)
-}{
-   Line style for a plot element
-}{
-   \sstdescription{
-      This attribute determines the line style used when drawing each
-      element of graphical output.  It takes a
-      separate value for each graphical element so that, for instance,
-      the setting \texttt{"Style(border)=2"}~ causes the border to be drawn
-      using line Style~2 (which results in a dashed line).
-
-      The range of integer line styles available and their appearance
-      is determined by the \PGPLOT\  graphics system, but includes the
-      following:
-
-      \begin{enumerate}
-      \item Full line (the default)
-      \item Dashed
-      \item Dot-dash-dot-dash
-      \item Dotted
-      \item Dash-dot-dot-dot
-      \end{enumerate}
-
-   }
-   \sstattributetype{
-      Integer.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         For a list of the graphical elements available, see
-         \slhyperref{here}{Section~}{}{se:styles}.
-
-         \sstitem
-         If no graphical element is specified, (\emph{e.g.} \att{Style} instead
-         of \att{Style(border)}), then all graphical elements are affected.
-      }
-   }
-}
-\sstattribute{
-   TextBackColour
-}{
-   The background colour to use when drawing text
-}{
-   \sstdescription{
-      This attribute determines the background colour index to use when
-      drawing textual strings - the foreground colour is determined by
-      the \htmlattref{Colour(strings)}{Colour(element)}~ attribute.  Standard
-      X colour names can also be specified, and the nearest colour will be used
-      if the requested colour is not currently in the palette.
-
-      If the value \texttt{"-1"} or \texttt{"clear"} is given, the background
-      will be transparent.
-   }
-   \sstattributetype{
-      Integer.
-   }
-}
-\sstattribute{
-   TextLab(axis)
-}{
-   Draw descriptive axis labels?
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by determining
-      whether textual labels should be drawn to describe the quantity
-      being represented on each axis.  It takes a separate
-      value for each physical axis so that, for instance,
-      the setting \texttt{"TextLab(2)=1"}~ specifies that descriptive labels
-      should be drawn for the second axis.
-
-      If the \att{TextLab} value of an axis is non-zero, then
-      descriptive labels will be drawn for that axis, otherwise they
-      will be omitted.  The default behaviour is to draw descriptive
-      labels if tick marks and numerical labels are being drawn around
-      the edges of the plotting area (see the
-      \htmlattref{Labelling}{Labelling}~ attribute),
-      but to omit them otherwise.
-   }
-   \sstattributetype{
-      Integer (boolean).
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The text used for the descriptive labels is derived from the
-         \htmlattref{Label(axis)}{Label(axis)}~ attribute, together with its
-         \htmlattref{Unit(axis)}{Unit(axis)}~ attribute if appropriate
-         (see the \htmlattref{LabelUnits(axis)}{LabelUnits(axis)}~ attribute).
-
-         \sstitem
-         The drawing of numerical axis labels (which indicate values on the
-         axis) is controlled by the \htmlattref{NumLab(axis)}{NumLab(axis)}~ attribute.
-
-         \sstitem
-         If no axis is specified, (\emph{e.g.} \att{TextLab} instead of
-         \att{TextLab(2)}), then both axes are affected.
-      }
-   }
-}
-\sstattribute{
-   TextLabGap(axis)
-}{
-   Spacing of descriptive axis labels
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by determining
-      where descriptive axis labels are placed relative to the axes they
-      describe.  It takes a separate value for each physical axis
-      so that, for instance, the setting \texttt{"TextLabGap(2)=0.01"}~
-      specifies where the descriptive label for the second axis should
-      be drawn.
-
-      For each axis, the \att{TextLabGap} value
-      gives the spacing between the descriptive label and the edge of
-      a box enclosing all other parts of the annotated grid (excluding
-      other descriptive labels).  The gap is measured to the nearest
-      edge of the label (\emph{i.e.} the top or the bottom).  Positive
-      values cause the descriptive label to be placed outside the
-      bounding box, while negative values cause it to be placed
-      inside.
-
-      The \att{TextLabGap} value should be given as a fraction of the minimum
-      dimension of the plotting area, the default value being $+0.01$.
-   }
-   \sstattributetype{
-      Floating point.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         If drawn, descriptive labels are always placed at the edges of
-         the plotting area, even although the corresponding numerical
-         labels may be drawn along axis lines in the interior of the
-         plotting area (see the \htmlattref{Labelling}{Labelling}~ attribute).
-
-         \sstitem
-         If no axis is specified, (\emph{e.g.} \att{TextLabGap} instead of
-         \att{TextLabGap(2)}), then both axes are affected.
-      }
-   }
-}
-\sstattribute{
-   TextMargin
-}{
-   The width of the margin to clear when drawing text
-}{
-   \sstdescription{
-      This attribute determines the width of the margin that is cleared
-      around the edges of each drawn text string, in units of the text
-      height. That is, if TEXTMARGIN is set to 0.5, the margin will be
-      half the height of the text. The default is zero.
-   }
-   \sstattributetype{
-      Floating point.
-   }
-}
-\sstattribute{
-   TickAll
-}{
-   Draw tick marks on all edges?
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by determining
-      whether tick marks should be drawn on all edges of the plot.
-
-      If the \att{TickAll}~ value is non-zero (the default), then
-      tick marks will be drawn on all edges of the plot.  Otherwise,
-      they will be drawn only on those edges where the numerical and
-      descriptive axis labels are drawn (see the
-      \htmlattref{Edge(axis)}{Edge(axis)}~ attribute).
-   }
-   \sstattributetype{
-      Integer (boolean).
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         In some circumstances, numerical labels and tick marks are
-         drawn along grid lines inside the plotting area, rather than
-         around its edges (see the \htmlattref{Labelling}{Labelling}~ attribute).
-         In this case, the value of the \att{TickAll} attribute is ignored.
-      }
-   }
-}
-\sstattribute{
-   TitleGap
-}{
-   Vertical spacing for the title
-}{
-   \sstdescription{
-      This attribute controls the appearance of annotated axes by determining
-      where the title is drawn.
-
-      Its value gives the spacing between the bottom edge of the title
-      and the top edge of a bounding box containing all the other parts
-      of the annotated grid.  Positive values cause the title to be
-      drawn outside the box, while negative values cause it to be drawn
-      inside.
-
-      The \att{TitleGap} value should be given as a fraction of the minimum
-      dimension of the plotting area, the default value being $+0.05$.
-   }
-   \sstattributetype{
-      Floating point.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The text used for the title is obtained from the
-         \htmlattref{Title}{Title}~ attribute.
-      }
-   }
-}
-\sstattribute{
-   Tol
-}{
-   Plotting tolerance
-}{
-   \sstdescription{
-      This attribute specifies the plotting tolerance (or resolution) to
-      be used for curves.  Smaller values will result in smoother and more
-      accurate curves being drawn (particularly in the presence of
-      discontinuities in the mapping between graphics co-ordinates and
-      physical co-ordinates), but may slow down the plotting process.
-      Conversely, larger values may speed up the plotting process in
-      cases where high resolution is not required.
-
-      The \texttt{Tol} value should be given as a fraction of the minimum
-      dimension of the plotting area, and should lie in the range
-      from 1.0E$-$7 to 1.0.  By default, a value of 0.001 is used.
-   }
-   \sstattributetype{
-      Floating point.
-   }
-}
-\sstattribute{
-   Width(element)
-}{
-   Line width for a plot element
-}{
-   \sstdescription{
-      This attribute determines the line width used when drawing each
-      element of graphical output.  It takes a
-      separate value for each graphical element so that, for instance,
-      the setting \texttt{"Width(border)=2.0"}~ causes the border to be
-      drawn using a line width of 2.0.  A value of 1.0 results in a
-      line thickness that is approximately 0.0005 times the length of
-      the diagonal of the entire display surface.
-   }
-   \sstattributetype{
-      Floating point.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         For a list of the graphical elements available, see
-         \slhyperref{here}{Section~}{}{se:styles}.
-
-         \sstitem
-         If no graphical element is specified, (\emph{e.g.} \att{Width} instead
-         of \att{Width(title)}), then all graphical elements are affected.
-
-      }
-   }
-}
 
 
 \newpage
@@ -7501,7 +6564,7 @@ attribute of the sky Frame, we could say:
 \sstattribute{
    ObsLon
 }{
-   The geodetic longitude of the observer (\xref{SpecFrames}{sun210}{SpecFrame} only) 
+   The geodetic longitude of the observer (\xref{SpecFrames}{sun210}{SpecFrame} only)
 }{
    \sstdescription{
       This attribute specifies the geodetic (or equivalently,
@@ -13376,7 +12439,7 @@ KAPPA: \htmlref{ARDGEN}{ARDGEN},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -13960,7 +13023,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).  \texttt{[}current value\texttt{{]}}
       }
@@ -15566,7 +14629,7 @@ KAPPA: \htmlref{ADD}{ADD},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
          \texttt{[}current value\texttt{{]}}
@@ -16591,7 +15654,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -16794,7 +15857,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -16836,7 +15899,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
          \texttt{[}current value\texttt{{]}}
@@ -18769,7 +17832,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -18968,7 +18031,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -20262,7 +19325,7 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM}.
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -20543,7 +19606,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
          \texttt{[}current value\texttt{{]}}
@@ -20658,7 +19721,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -20865,7 +19928,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
          \texttt{[}current value\texttt{{]}}
@@ -21369,7 +20432,7 @@ KAPPA: \htmlref{ADD}{ADD},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -21591,7 +20654,7 @@ KAPPA: \htmlref{ADD}{ADD},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -26421,7 +25484,7 @@ KAPPA: \htmlref{GDSET}{GDSET},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -27709,7 +26772,7 @@ KAPPA: \htmlref{LAPLACE}{LAPLACE},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -28802,7 +27865,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
          \texttt{[}current value\texttt{{]}}
@@ -28993,7 +28056,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -30078,7 +29141,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -30652,7 +29715,7 @@ KAPPA: \htmlref{LOG10}{LOG10},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -32073,7 +31136,7 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -34462,7 +33525,7 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -34686,7 +33749,7 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -37041,7 +36104,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -37534,7 +36597,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -41922,7 +40985,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
          The appearance of the model curve is controlled by the attributes
@@ -43547,7 +42610,7 @@ KAPPA: \htmlref{FLIP}{FLIP},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -43941,7 +43004,7 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -48540,7 +47603,7 @@ KAPPA: \htmlref{ADD}{ADD},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -48641,7 +47704,7 @@ KAPPA: \htmlref{ADD}{ADD},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -51810,7 +50873,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          style changes is achieved by listing all the persistent attributes
          followed by a plus sign then the list of temporary attributes.
 
-         See \slhyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         See \slhyperref{Plotting Attributes}{Section~}{}{ap:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
@@ -51998,7 +51061,944 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
 }
 
 \newpage
+\section{\xlabel{ap_plotting_attr}Descriptions of Plotting Attributes\label{ap:plotting_attr}}
+This appendix lists the available plotting attributes (see
+\latexhtml{Section~\ref{se:style}}{\htmlref{Plotting Styles and Attributes}
+{se:style}}). Note, the default value included in each description is the value
+that will be used if no other default value is supplied (for instance within a
+defaults file). In particular, the standard \KAPPA\ default style files
+contained in \texttt{\$KAPPA\_DIR} include alternative default values for several
+attributes which will be used in preference to those described below.
 
+Individual applications may override the normal behaviour of
+particular attributes, in which case the description of the application
+will include details.
+
+It is often useful to specify values for some of the attributes of the current
+\xref{Frame}{sun210}{Frame}~ when giving a plotting style (title, axis labels,
+\emph{etc.}).  These additional attributes are described
+\slhyperref{here}{in Section~}{}{se:frmatt}.
+
+\sstattribute{
+   Border
+}{
+   Draw a border around valid regions?
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by determining
+      whether a border is drawn around regions corresponding to the
+      valid co-ordinates.
+
+      If the \att{Border} value of a plot is non-zero, then this border will
+      be drawn as part of the axes.  Otherwise, the border is not drawn
+      (although axis labels and tick marks will still appear, unless
+      other relevant attributes indicate that they should
+      not).  The default behaviour is to draw the border if tick marks
+      and numerical labels will be drawn around the edges of the
+      plotting area (see the \htmlref{\att{Labelling}}{Labelling}~ attribute),
+      but to omit it otherwise.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+}
+\sstattribute{
+   Colour(element)
+}{
+   Colour index for a plot element
+}{
+   \sstdescription{
+      This attribute determines the colour index used when drawing each
+      element of of a plot.  It takes a separate value for each graphical
+      element so that, for instance, the setting \texttt{"Colour(title)=2"} causes
+      the title to be drawn using colour index 2.  Standard X colour
+      names, space-separated floating-point RGB triples, or
+      \htmlref{HTML colour codes}{htmlcolour}
+      (optionally using a \texttt{"@"} inplace of a \texttt{"\#"} to avoid the code
+      being interpreted as a comment within a style file) can also be
+      specified, and the nearest available colour will be used if
+      the requested colour is not currently in the palette.
+
+      The default behaviour is for all graphical elements to be drawn
+      using Pen~1.
+   }
+   \sstattributetype{
+      Integer.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         For a list of the graphical elements available, see
+         \slhyperref{here}{Section~}{}{se:styles}.
+
+         \sstitem
+
+         If no graphical element is specified, (\emph{e.g.} \att{Colour} instead
+         of \att{Colour(title)}), then all graphical elements are affected.
+
+      }
+   }
+}
+\sstattribute{
+   DrawAxes
+}{
+   Draw axes?
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by
+      determining whether curves representing co-ordinate axes should be
+      drawn.
+
+      If drawn, these axis lines will pass through any tick marks
+      associated with numerical labels drawn to mark values on the
+      axes.  The location of these tick marks and labels (and hence the
+      axis lines) is determined by the
+      \htmlattref{LabelAt(axis)}{LabelAt(axis)}~ attribute.
+
+      If the \att{DrawAxes} value is non-zero (the default), then
+      axis lines will be drawn, otherwise they will be omitted.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Axis lines are drawn independently of any co-ordinate grid
+         lines (see the \htmlref{\att{Grid}}{Grid}~ attribute) so grid lines may be used to
+         substitute for axis lines if required.
+
+         \sstitem
+         In some circumstances, numerical labels and tick marks are
+         drawn around the edges of the plotting area (see the
+         \htmlattref{Labelling}{Labelling}~ attribute).  In this case,
+         the value of the \att{DrawAxes} attribute is ignored.
+      }
+   }
+}
+\sstattribute{
+   DrawDSB
+}{
+   Annotate both sidebands if the spectral axis represents a dual
+   sideband spectrum?
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by
+      determining what to draw for a spectral axis representing a dual
+      sideband spectrum. The sideband selected using the
+      \xref{\att{SideBand}}{sun210}{SideBand} attribute will always be
+      annotated on the edge of the Plot selected using the
+      \htmlattref{Edge(axis)}{Edge(axis)} attribute. In addition, if the
+      DrawDSB attribute is non-zero (the default) the other sideband will
+      be annotated on the opposite edge of the Plot. If DrawDSB is zero,
+      then the other sideband will not be annotated.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+}
+\sstattribute{
+   DrawTitle
+}{
+   Draw a title?
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by determining
+      whether a title is drawn.
+
+      If the \att{DrawTitle}~ value is non-zero (the default), then
+      the title will be drawn, otherwise it will be omitted.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The text used for the title is obtained from the
+         \htmlattref{Title}{plotel:Title}~ attribute.
+
+         \sstitem
+         The vertical placement of the title can be controlled using
+         the \htmlattref{TitleGap}{TitleGap}~ attribute.
+      }
+   }
+}
+\sstattribute{
+   Edge(axis)
+}{
+   Which edges to label
+}{
+   \sstdescription{
+
+      This attribute controls the appearance of annotated axes by
+      determining which edges are used for displaying numerical and
+      descriptive axis labels.  It takes a separate value for each
+      physical axis so that, for instance, the setting \texttt{Edge(2)=left}~
+      specifies which edge to use to display labels for the second axis.
+
+      The values \texttt{left}, \texttt{top}, \texttt{right} and \texttt{bottom} (or any
+      abbreviation) can be supplied for this attribute.  The default is
+      usually \texttt{bottom} for the first axis and \texttt{left} for the second
+      axis.  However, if exterior labelling was requested (see the
+      \htmlattref{Labelling}{Labelling}~ attribute) but cannot be produced
+      using these default \att{Edge} values, then the default
+      values will be swapped if this enables exterior labelling to be produced.
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         In some circumstances, numerical labels will be drawn along
+         internal grid lines instead of at the edges of the plotting
+         area (see the \htmlattref{Labelling}{Labelling}~ attribute).
+         In this case, the \att{Edge} attribute only affects the
+         placement of the descriptive labels (these are drawn at the
+         edges of the plotting area, rather than along the axis lines).
+      }
+   }
+}
+\sstattribute{
+   FileInTitle
+}{
+   Include the NDF name as a second line in the title?
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by
+      determining whether or not the title at the top of the plot will
+      include a second line giving the NDF name. The default value of
+      zero results in the title containing only the text given by the
+      Title attribute. A non-zero value will result in a second line
+      containing the NDF name being added to the title.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+}
+\sstattribute{
+   Font(element)
+}{
+   Character fount for a plot element
+}{
+   \sstdescription{
+      This attribute determines the character fount index used when
+      drawing each element of a plot.  It takes a separate value for
+      graphical element so that, for instance, the setting
+      \texttt{Font(title)=2}~ causes the title to be drawn using fount number 2.
+
+      The range of integer fount indices available and the appearance
+      of the resulting text is determined by the \PGPLOT\  graphics package,
+      but include:
+
+      \begin{enumerate}
+      \item A simple single-stroke fount (the default)
+      \item A roman fount
+      \item An italic fount
+      \item A script fount
+      \end{enumerate}
+
+   }
+   \sstattributetype{
+      Integer.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         For a list of the graphical elements available, see
+         \slhyperref{here}{Section~}{}{se:styles}.
+
+         \sstitem
+         If no graphical element is specified, (\emph{e.g.} \att{Font} instead
+         of \att{Font(title)}), then all graphical elements are affected.
+      }
+   }
+}
+\sstattribute{
+   Gap(axis)
+}{
+   Interval between major axis values
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by
+      determining the interval between the major axis values at which
+      (for example) major tick marks are drawn.  It takes a separate value
+      for each physical axis so that, for instance, the setting \texttt{
+      Gap(2)=3.0}~ specifies the interval between major values along the
+      second axis.
+
+      The \att{Gap} value supplied will usually be rounded to the nearest
+      `nice' value, suitable (\emph{e.g.}) for generating axis labels, before
+      use.  To avoid this `nicing' you should set an explicit format for
+      the axis using the \htmlattref{Format(axis)}{Format(axis)}~ or
+      \htmlattref{Digits/Digits(axis)}{Digits/Digits(axis)}~
+      attribute.  The default behaviour is for the
+      application to generate its own \att{Gap} value when required, based on
+      the range of axis values to be represented.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The \att{Gap} value should use the same units as are used internally
+         for storing co-ordinate values on the corresponding axis.  For
+         example, with a celestial co-ordinate system, the \att{Gap} value
+         should be in radians, not hours or degrees.
+
+         \sstitem
+         If no axis is specified, (\emph{e.g.} \att{Gap} instead of \att{Gap(2)}),
+         then both axes are affected.
+      }
+   }
+}
+\sstattribute{
+   Grid
+}{
+   Draw grid lines?
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by
+      determining whether grid lines (a grid of curves marking the
+      `major' values on each axis) are drawn across the plotting area.
+
+      If the \att{Grid} attribute is non-zero, then grid lines will be
+      drawn.  Otherwise, short tick marks on the axes are used to mark
+      the major axis values.  The default behaviour is to use tick
+      marks if the entire plotting area is filled by valid
+      co-ordinates, but to draw grid lines otherwise.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The spacing between major axis values, which determines the
+         spacing of grid lines, may be set using the
+         \htmlattref{Gap(axis)}{Gap(axis)}~ attribute.
+      }
+   }
+}
+\sstattribute{
+   LabelAt(axis)
+}{
+   Where to place numerical labels for a Plot
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by determining
+      where numerical axis labels and associated tick marks are
+      placed.  It takes a separate value for each physical axis
+      so that, for instance, the setting \texttt{"LabelAt(2)=10.0"}~
+      specifies where the numerical labels and tick marks for the
+      second axis should be drawn.
+
+      For each axis, the \att{LabelAt} value gives the value on the other
+      axis at which numerical labels and tick marks should be placed.
+      For example, in a celestial (right ascension, declination) co-ordinate
+      system, \att{LabelAt(1)} gives a declination value that defines a line (of
+      constant declination) along which the numerical right-ascension labels and their
+      associated tick marks will be drawn.  Similarly, \att{LabelAt(2)} gives
+      the right-ascension value at which the declination labels and ticks will be drawn.
+
+      The default bahaviour is for the application to generate its own
+      position for numerical labels and tick marks.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The \att{LabelAt} value should use the same units as are used
+         internally for storing co-ordinate values on the appropriate
+         axis.  For example, with a celestial co-ordinate system, the
+         \att{LabelAt} value should be in radians, not hours or degrees.
+
+         \sstitem
+         Normally, the \att{LabelAt} value also determines where the lines
+         representing co-ordinate axes will be drawn, so that the tick
+         marks will lie on these lines (but also see the
+         \htmlattref{DrawAxes}{DrawAxes}~ attribute).
+
+         \sstitem
+         In some circumstances, numerical labels and tick marks are
+         drawn around the edges of the plotting area (see the
+         \htmlattref{Labelling}{Labelling}~ attribute).  In this case,
+         the value of the \att{LabelAt} attribute is ignored.
+      }
+   }
+}
+\sstattribute{
+   LabelUnits(axis)
+}{
+   Include unit descriptions in axis labels?
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by determining
+      whether the descriptive labels drawn for each axis
+      should include a description of the units being used on the
+      axis.  It takes a separate value for each physical axis
+      so that, for instance, the setting \texttt{"LabelUnits(2)=1"}~
+      specifies that a unit description should be included in the
+      label for the second axis.
+
+      If the \att{LabelUnits} value axis is non-zero, a unit
+      description will be included in the descriptive label for that
+      axis, otherwise it will be omitted.  The default behaviour is to
+      include a unit description unless the
+      \xref{Frame}{sun210}{Frame}~ being annotated
+      is a \xref{SkyFrame}{sun210}{SkyFrame}~ (\emph{i.e.} a celestial
+      co-ordinate system), in which case it is omitted.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The text used for the unit description is obtained from
+         \htmlattref{Unit(axis)}{Unit(axis)}~ attribute.
+
+         \sstitem
+         If no axis is specified, (\emph{e.g.} \att{LabelUnits} instead of
+         \att{LabelUnits(2)}), then both axes are affected.
+      }
+   }
+}
+\sstattribute{
+   LabelUp(axis)
+}{
+   Draw numerical axis labels upright?
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by determining
+      whether the numerical labels for each axis should be
+      drawn upright or not.  It takes a separate value for each
+      physical axis so that, for instance, the setting
+      \texttt{"LabelUp(2)=1"}~ specifies that numerical labels for the second
+      axis should be drawn upright.
+
+      If the \att{LabelUp} value axis is non-zero, it causes
+      numerical labels for that axis to be plotted upright (\emph{i.e.} as
+      normal, horizontal text), otherwise (the default) these labels
+      rotate to follow the axis to which they apply.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         In some circumstances, numerical labels and tick marks are
+         drawn around the edges of the plotting area (see the
+         \htmlattref{Labelling}{Labelling}~ attribute).  In this case,
+         the value of the \att{LabelUp} attribute is ignored.
+
+         \sstitem
+         If no axis is specified, (\emph{e.g.} \att{LabelUp} instead of
+         \att{LabelUp(2)}), then both axes are affected.
+      }
+   }
+}
+\sstattribute{
+   Labelling
+}{
+   Label and tick placement option
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by determining
+      the strategy for placing numerical labels and tick marks.
+
+      If the \att{Labelling} value is \texttt{"exterior"}~ (the default), then
+      numerical labels and their associated tick marks are placed
+      around the edges of the plotting area, if possible.  If this is
+      not possible, or if the \att{Labelling}~ value is \texttt{"interior"}, then they
+      are placed along grid lines inside the plotting area.
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The \att{LabelAt(axis)} attribute may be used to determine the exact
+         placement of labels and tick marks that are drawn inside the
+         plotting area.
+      }
+   }
+}
+\sstattribute{
+   MajTickLen
+}{
+   Length of major tick marks
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by determining
+      the length of the major tick marks drawn on the axes.
+
+      The \att{MajTickLen}~ value should be given as a fraction of the
+      minimum dimension of the plotting area.  Negative values cause
+      major tick marks to be placed on the outside of the
+      corresponding grid line or axis (but subject to any clipping
+      imposed by \PGPLOT\ ), while positive
+      values cause them to be placed on the inside.
+
+      The default behaviour depends on whether a co-ordinate grid is
+      drawn inside the plotting area (see the \htmlattref{Grid}{Grid}~
+      attribute).  If so, the default \att{MajTickLen} value is zero (so that
+      major ticks are not drawn), otherwise the default is $+0.015$.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+}
+\sstattribute{
+   MinTick(axis)
+}{
+   Density of minor tick marks
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by determining
+      the density of minor tick marks which appear between the major
+      axis values.  It takes a separate value for each
+      physical axis so that, for instance, the setting
+      \texttt{"MinTick(2)=2"}~ specifies the density of minor tick marks along
+      the second axis.
+
+      The value supplied should be the number of minor divisions
+      required between each pair of major axis values, this being one
+      more than the number of minor tick marks to be drawn.  By
+      default, a value is chosen that depends on the gap between major
+      axis values and the nature of the axis.
+   }
+   \sstattributetype{
+      Integer.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If no axis is specified, (\emph{e.g.} \att{MinTick} instead of
+         \att{MinTick(2)}), then both axes are affected.
+      }
+   }
+}
+\sstattribute{
+   MinTickLen
+}{
+   Length of minor tick marks
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by determining
+      the length of the minor tick marks drawn on the axes.
+
+      The \att{MinTickLen}~ value should be given as a fraction of the
+      minimum dimension of the plotting area.  Negative values cause
+      minor tick marks to be placed on the outside of the
+      corresponding grid line or axis (but subject to any clipping
+      imposed by the underlying graphics system), while positive
+      values cause them to be placed on the inside.
+
+      The default value is $+0.007$.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The number of minor tick marks drawn is determined by the
+         \att{MinTick(axis)} attribute.
+      }
+   }
+}
+\sstattribute{
+   NumLab(axis)
+}{
+   Draw numerical axis labels?
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by
+      determining whether labels should be drawn to represent the
+      numerical values along each axis.  It takes a separate value for
+      each physical axis so that, for instance, the setting \texttt{
+      "NumLab(2)=1"}~ specifies that numerical labels should be drawn for
+      the second axis.
+
+      If the \att{NumLab} value for an axis is non-zero (the default),
+      then numerical labels will be drawn for that axis, otherwise
+      they will be omitted.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The drawing of associated descriptive axis labels
+         (describing the quantity being plotted along each axis) is
+         controlled by the \htmlattref{TextLab(axis)}{TextLab(axis)}~ attribute.
+
+         \sstitem
+         If no axis is specified, (\emph{e.g.} \att{NumLab} instead of
+         \att{NumLab(2)}), then both axes are affected.
+      }
+   }
+}
+\sstattribute{
+   NumLabGap(axis)
+}{
+   Spacing of numerical labels
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by determining
+      where numerical axis labels are placed relative to the axes they
+      describe.  It takes a separate value for each physical axis so that,
+      for instance, the setting \texttt{"NumLabGap(2)=-0.01"}~
+      specifies where the numerical label for the second axis should
+      be drawn.
+
+      For each axis, the \att{NumLabGap} value gives the spacing between the
+      axis line (or edge of the plotting area, if appropriate) and the
+      nearest edge of the corresponding numerical axis
+      labels.  Positive values cause the descriptive label to be placed
+      on the opposite side of the line to the default tick marks,
+      while negative values cause it to be placed on the same side.
+
+      The \att{NumLabGap} value should be given as a fraction of the minimum
+      dimension of the plotting area, the default value being $+0.01$.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If no axis is specified, (\emph{e.g.} \att{NumLabGap} instead of
+         \att{NumLabGap(2)}), then both axes are affected.
+      }
+   }
+}
+\sstattribute{
+   Size(element)
+}{
+   Character size for a plot element
+}{
+   \sstdescription{
+      This attribute determines the character size used when drawing
+      each element of graphical output.  It takes a
+      separate value for each graphical element so that, for instance,
+      the setting \texttt{"Size(title)=2.0"}~ causes the plot title to be drawn
+      using twice the default character size.
+   }
+   \sstattributetype{
+      Floating Point.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         For a list of the graphical elements available, see
+         \slhyperref{here}{Section~}{}{se:styles}.
+
+         \sstitem
+         If no graphical element is specified, (\emph{e.g.} \att{Size} instead
+         of \att{Size(title)}), then all graphical elements are affected.
+      }
+   }
+}
+\sstattribute{
+   Style(element)
+}{
+   Line style for a plot element
+}{
+   \sstdescription{
+      This attribute determines the line style used when drawing each
+      element of graphical output.  It takes a
+      separate value for each graphical element so that, for instance,
+      the setting \texttt{"Style(border)=2"}~ causes the border to be drawn
+      using line Style~2 (which results in a dashed line).
+
+      The range of integer line styles available and their appearance
+      is determined by the \PGPLOT\  graphics system, but includes the
+      following:
+
+      \begin{enumerate}
+      \item Full line (the default)
+      \item Dashed
+      \item Dot-dash-dot-dash
+      \item Dotted
+      \item Dash-dot-dot-dot
+      \end{enumerate}
+
+   }
+   \sstattributetype{
+      Integer.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         For a list of the graphical elements available, see
+         \slhyperref{here}{Section~}{}{se:styles}.
+
+         \sstitem
+         If no graphical element is specified, (\emph{e.g.} \att{Style} instead
+         of \att{Style(border)}), then all graphical elements are affected.
+      }
+   }
+}
+\sstattribute{
+   TextBackColour
+}{
+   The background colour to use when drawing text
+}{
+   \sstdescription{
+      This attribute determines the background colour index to use when
+      drawing textual strings - the foreground colour is determined by
+      the \htmlattref{Colour(strings)}{Colour(element)}~ attribute.  Standard
+      X colour names can also be specified, and the nearest colour will be used
+      if the requested colour is not currently in the palette.
+
+      If the value \texttt{"-1"} or \texttt{"clear"} is given, the background
+      will be transparent.
+   }
+   \sstattributetype{
+      Integer.
+   }
+}
+\sstattribute{
+   TextLab(axis)
+}{
+   Draw descriptive axis labels?
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by determining
+      whether textual labels should be drawn to describe the quantity
+      being represented on each axis.  It takes a separate
+      value for each physical axis so that, for instance,
+      the setting \texttt{"TextLab(2)=1"}~ specifies that descriptive labels
+      should be drawn for the second axis.
+
+      If the \att{TextLab} value of an axis is non-zero, then
+      descriptive labels will be drawn for that axis, otherwise they
+      will be omitted.  The default behaviour is to draw descriptive
+      labels if tick marks and numerical labels are being drawn around
+      the edges of the plotting area (see the
+      \htmlattref{Labelling}{Labelling}~ attribute),
+      but to omit them otherwise.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The text used for the descriptive labels is derived from the
+         \htmlattref{Label(axis)}{Label(axis)}~ attribute, together with its
+         \htmlattref{Unit(axis)}{Unit(axis)}~ attribute if appropriate
+         (see the \htmlattref{LabelUnits(axis)}{LabelUnits(axis)}~ attribute).
+
+         \sstitem
+         The drawing of numerical axis labels (which indicate values on the
+         axis) is controlled by the \htmlattref{NumLab(axis)}{NumLab(axis)}~ attribute.
+
+         \sstitem
+         If no axis is specified, (\emph{e.g.} \att{TextLab} instead of
+         \att{TextLab(2)}), then both axes are affected.
+      }
+   }
+}
+\sstattribute{
+   TextLabGap(axis)
+}{
+   Spacing of descriptive axis labels
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by determining
+      where descriptive axis labels are placed relative to the axes they
+      describe.  It takes a separate value for each physical axis
+      so that, for instance, the setting \texttt{"TextLabGap(2)=0.01"}~
+      specifies where the descriptive label for the second axis should
+      be drawn.
+
+      For each axis, the \att{TextLabGap} value
+      gives the spacing between the descriptive label and the edge of
+      a box enclosing all other parts of the annotated grid (excluding
+      other descriptive labels).  The gap is measured to the nearest
+      edge of the label (\emph{i.e.} the top or the bottom).  Positive
+      values cause the descriptive label to be placed outside the
+      bounding box, while negative values cause it to be placed
+      inside.
+
+      The \att{TextLabGap} value should be given as a fraction of the minimum
+      dimension of the plotting area, the default value being $+0.01$.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If drawn, descriptive labels are always placed at the edges of
+         the plotting area, even although the corresponding numerical
+         labels may be drawn along axis lines in the interior of the
+         plotting area (see the \htmlattref{Labelling}{Labelling}~ attribute).
+
+         \sstitem
+         If no axis is specified, (\emph{e.g.} \att{TextLabGap} instead of
+         \att{TextLabGap(2)}), then both axes are affected.
+      }
+   }
+}
+\sstattribute{
+   TextMargin
+}{
+   The width of the margin to clear when drawing text
+}{
+   \sstdescription{
+      This attribute determines the width of the margin that is cleared
+      around the edges of each drawn text string, in units of the text
+      height. That is, if TEXTMARGIN is set to 0.5, the margin will be
+      half the height of the text. The default is zero.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+}
+\sstattribute{
+   TickAll
+}{
+   Draw tick marks on all edges?
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by determining
+      whether tick marks should be drawn on all edges of the plot.
+
+      If the \att{TickAll}~ value is non-zero (the default), then
+      tick marks will be drawn on all edges of the plot.  Otherwise,
+      they will be drawn only on those edges where the numerical and
+      descriptive axis labels are drawn (see the
+      \htmlattref{Edge(axis)}{Edge(axis)}~ attribute).
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         In some circumstances, numerical labels and tick marks are
+         drawn along grid lines inside the plotting area, rather than
+         around its edges (see the \htmlattref{Labelling}{Labelling}~ attribute).
+         In this case, the value of the \att{TickAll} attribute is ignored.
+      }
+   }
+}
+\sstattribute{
+   TitleGap
+}{
+   Vertical spacing for the title
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by determining
+      where the title is drawn.
+
+      Its value gives the spacing between the bottom edge of the title
+      and the top edge of a bounding box containing all the other parts
+      of the annotated grid.  Positive values cause the title to be
+      drawn outside the box, while negative values cause it to be drawn
+      inside.
+
+      The \att{TitleGap} value should be given as a fraction of the minimum
+      dimension of the plotting area, the default value being $+0.05$.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The text used for the title is obtained from the
+         \htmlattref{Title}{Title}~ attribute.
+      }
+   }
+}
+\sstattribute{
+   Tol
+}{
+   Plotting tolerance
+}{
+   \sstdescription{
+      This attribute specifies the plotting tolerance (or resolution) to
+      be used for curves.  Smaller values will result in smoother and more
+      accurate curves being drawn (particularly in the presence of
+      discontinuities in the mapping between graphics co-ordinates and
+      physical co-ordinates), but may slow down the plotting process.
+      Conversely, larger values may speed up the plotting process in
+      cases where high resolution is not required.
+
+      The \texttt{Tol} value should be given as a fraction of the minimum
+      dimension of the plotting area, and should lie in the range
+      from 1.0E$-$7 to 1.0.  By default, a value of 0.001 is used.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+}
+\sstattribute{
+   Width(element)
+}{
+   Line width for a plot element
+}{
+   \sstdescription{
+      This attribute determines the line width used when drawing each
+      element of graphical output.  It takes a
+      separate value for each graphical element so that, for instance,
+      the setting \texttt{"Width(border)=2.0"}~ causes the border to be
+      drawn using a line width of 2.0.  A value of 1.0 results in a
+      line thickness that is approximately 0.0005 times the length of
+      the diagonal of the entire display surface.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         For a list of the graphical elements available, see
+         \slhyperref{here}{Section~}{}{se:styles}.
+
+         \sstitem
+         If no graphical element is specified, (\emph{e.g.} \att{Width} instead
+         of \att{Width(title)}), then all graphical elements are affected.
+
+      }
+   }
+}
+
+\newpage
 \section{\xlabel{ap_colset}Standard Named Colours\label{ap:colset}}
 The standard set of named colours recognised by \KAPPA\ is
 tabulated below together with their red, green, and blue relative
