@@ -99,7 +99,7 @@
      \HCode{<div class="footnotes">}\box\fn:box\HCode{</div>}
      \IgnorePar\EndP
      \fi
-     % 
+     %
      \ifvmode \IgnorePar\fi \EndP
      \HCode{<div class="crosslinks">}
      \HCode{<div class="copyright">}\scpushright{\thestardoccopyright{}}\HCode{</div>}
@@ -322,7 +322,7 @@
 }
 
 
-% Fix bug in mathcal 
+% Fix bug in mathcal
 %\renewcommand{\cal}[1]{\HCode{<mi class="ltx_font_mathcalligraphic" mathvariant="script">}#1\HCode{</mi>}}
 %\renewcommand{\mathfrak}[1]{\HCode{<mi mathvariant="bold-fraktur">}#1\HCode{</mi>}}
 
@@ -363,7 +363,7 @@
 
 %% textsc has to bre renewed, as otherwise tex4ht will have set it in
 %% ALL-CAPS before the css code ever does anything.
-\Newconfigure{textsc}{2}
+\NewConfigure{textsc}{2}
 \renewcommand\textsc[1]{\a:textsc#1\b:textsc}
 \Configure{textsc}{\ifvmode \ShowPar\fi \HCode{<span class="sc">}}{\Tg</span>}
 
