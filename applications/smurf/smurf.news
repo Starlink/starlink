@@ -1,3 +1,21 @@
+1 SMURF_Version_1.6
+
+ o SUN/258 has been over-hauled, removing or relegating information
+   that is no longer relevant, or is repeated in other documents.
+
+ o New commands: JSATILEMOC.
+
+ o An experimental scan synchronous noise (SSN) model has been added
+   to MAKEMAP.
+
+ o The amount of multi-threading in MAKEMAP is reduced automatically
+   if doing so allows chunking to be avoided.
+
+ o The number of chunks used to make a SCUBA-2 map is now recorded in
+   the FITS extension of the map.
+
+ o MAKEMAP can now be told to abort if chunking would be used.
+
 1 SMURF_Version_1.5
 
  Some of the changes in this version of smurf include:

@@ -1016,7 +1016,7 @@ each frame is sorted by time. Once you have this cube you can load it
 into \GAIA\ for easy visualization, use \KAPPA\ \collapse\ with
 different estimators, or plot variations using \KAPPA\ \clinplot\ or \mlinplot.
 
-\section{\xlabel{dimm}SCUBA-2 Dynamic Iterative Map-Maker\label{se:dimm}}
+\subsection{\xlabel{dimm}Dynamic Iterative Map-Maker\label{se:dimm}}
 
 The Dynamic Iterative Map-Maker (DIMM) method within the \makemap\
 command is the preferred tool for producing maps of SCUBA-2 total power
@@ -1101,7 +1101,6 @@ task by Jen Balfour.
 
 
 \begin{thebibliography}{}
-\addcontentsline{toc}{section}{\protect\numberline{}References}
 
 \bibitem{archibald}
 Archibald~E.~N., et~al., 2002, MNRAS, 336, 1
@@ -1182,10 +1181,38 @@ Van Engelen~A., Scott~D., 2005, {\it A Correlation Study using SCUBA
 
 \section{Release Notes}
 
-
-\subsection{Changes since kapuahi}
-
+\subsection{2015A}
 \begin{itemize}
+\item This document has been over-hauled, removing or relegating
+information that is no longer relevant, or is repeated in other documents.
+\item New commands: JSATILEMOC.
+\item An experimental scan synchronous noise (SSN) model has been added
+to MAKEMAP.
+\item The amount of multi-threading in MAKEMAP is reduced automatically if doing so
+allows chunking to be avoided.
+\item The number of chunks used to make a SCUBA-2 map is now recorded in the
+FITS extension of the map.
+\item MAKEMAP can now be told to abort if chunking would be used.
+\end{itemize}
+
+\subsection{2014A}
+\begin{itemize}
+\item New commands: JSASPLIT, JSAJOIN, JSADICER, JSATILEINFO,
+JSATILELIST, CHECKCOORDS, FTS2MASKMAP and FITSMERGE.
+\item New MAKEMAP configuration parameters: AST.SKIP, CHUNKWEIGHT,
+COM.FREEZE\_FLAGS, COM.SIG\_LIMIT, FLT.FILT\_ORDER, FLT.RING\_BOX1, HITSLIMIT,
+xxx.ZERO\_SNR\_FFCLEAN, xxx.ZERO\_SNR\_HIPASS, xxx.ZERO\_SNR\_LOPASS (``xxx'' =
+AST, FLT, COM).
+\item New MAKEMAP ADAM parameters: JSATILES, ITERMAPS, INTOPTION.
+\item New MAKECUBE ADAM parameters: JSATILES, POSERRFATAL.
+\item New configuration files: \texttt{dimmconfig\_fix\_blobs.lis} and
+\texttt{dimmconfig\_fix\_convergence.lis}.
+\item Several values have been changed in \texttt{dimmconfig\_bright\_extended.lis}.
+\end{itemize}
+
+\subsection{Hikianalia}
+\begin{itemize}
+\item New commands: SKYLOOP and CONFIGMELD.
 \item If multiple types of mask are requested for any of the AST, FLT
 and COM models (e.g. ZERO\_LOWHITS and ZERO\_MASK both specified),
 they will now be combined into a single mask. Previously, only one
@@ -1193,9 +1220,56 @@ of the requested masks would be used.
 \item Up to three external masks can now be specified using ADAM parameters
 REF, MASK2 and MASK3. The ZERO\_MASK configuration parameter can be set
 for the AST, FLT or COM model, to indicate which ADAM parameter to use.
+\item The dimmconfig.lis file now uses maptol to specify the convergence
+criterion rather than chitol.
+\item The \texttt{textttdimmconfig\_bright\_extended.lis} file now inherits from
+\texttt{dimmconfig.lis}, rather than \texttt{dimmconfig\_bright.lis}. This means
+that the values used for COM.CORR\_TOL, COM.GAIN\_ABSTOL, COM.GAIN\_TOL, DCTHRESH and
+NOISECLIPHIGH have changed. In addition, \texttt{dimmconfig\_bright\_extended.lis}
+now sets the value of FLT.FILT\_EDGE\_LARGESCALE to 600 arc-seconds for
+both 450 and 850 um. Previously, the defaults of 600 (at 450 um) and 300
+(at 850 um) provided by \texttt{dimmconfig.lis} were accepted. {\bf Thus, the filter
+size has changed from 300 to 600 at 450 um.}
 \end{itemize}
 
-\subsection{kaulia}
+\subsection{Kapuahi}
+Many changes - the most significant were.
+\begin{itemize}
+\item New commands: UNMAKEMAP, SC2MAPFFT, SC2FILTERMAP, MCEHEAD2CAT, FIT1D.
+\item The QLMAKEMAP command has been removed.
+\item A new, more stable, common-mode estimation has been introduced into MAKEMAP.
+\item More code has been multi-threaded, making MAKEMAP significantly faster.
+\item Pointing corrections for the input raw data can now be specified via a
+text file, using new parameter POINTING.
+\item CONFIG parameters that specify a number of samples can now also be given
+in terms of seconds.
+\item New CONFIG parameter "COM.PERARRAY" allows a separate common mode signal
+to be estimated and used for each sub-array.
+\item The COM model can now be masked to omit source samples from the common
+mode estimation.
+\item The FLT model can now be masked to omit source samples when estimating
+the low frequency background of each bolometer time stream.
+\item SNR masks for the AST, COM and FLT models can now be taken down to much
+lower levels without introducing isolated noise spikes into the mask
+(using "xxx.ZERO\_SNRLO" parameters).
+\item A bug has been fixed that caused the memory requirements to grow
+monotonically when running MAKEMAP repeatedly as a monolith (e.g. from
+ORAC-DR or ICL).
+\item Updated Water Vapor Monitor calculation. The WVM samples are now smoothed
+before being used.
+\item Setting config parameter "DOWNSAMPSCALE" to -1 will auto-scale to the pixel
+size. This is now the default.
+\item New config parameter "MAPTOL" provides a map-based scheme for
+testing convergence.
+\item New config parameter "NOI.BOX\_SIZE" allows the estimate of the noise
+within a bolometer time stream to vary with time.
+\item JCMTSTATE2CAT now calculates telescope speed.
+\item CALCNOISE  now accepts a map-maker config file for pre-cleaning.
+The default config includes common-mode removal.
+\item CALCNOISE now calculates the effective noise and NEP.
+\end{itemize}
+
+\subsection{Kaulia}
 
 Supports compressed SCUBA-2 data files taken since February 2011.
 
@@ -1222,7 +1296,7 @@ Supports compressed SCUBA-2 data files taken since February 2011.
 \end{itemize}
 \end{itemize}
 
-\subsection{namaka}
+\subsection{Namaka}
 
 Major updates to \SMURF\ to support SCUBA-2 data processing.
 
@@ -1281,7 +1355,7 @@ Major updates to \SMURF\ to support SCUBA-2 data processing.
 \item Propagate QUALITY properly.
 \end{itemize}
 
-\subsection{V1.0.0 (hawaiki)}
+\subsection{Hawaiki}
 
 First official release supporting SCUBA-2 raw data (rather than simulated data).
 
@@ -1309,7 +1383,7 @@ First official release supporting SCUBA-2 raw data (rather than simulated data).
   raw WVM data.
 \end{itemize}
 
-\subsection{V0.5.2 (nanahope)}
+\subsection{Nanahope}
 
 \subsubsection*{Global changes}
 \begin{itemize}
@@ -1353,6 +1427,8 @@ First official release supporting SCUBA-2 raw data (rather than simulated data).
 
 \appendix
 %\renewcommand{\thesection}{\Alph{section}}%
+\ifdefined\HCode
+\else
 
 \section{\xlabel{ap_summary}An Alphabetical Summary of \SMURF\ Commands
 \label{ap:summary}}
@@ -1603,9 +1679,9 @@ SCUBA-2 simulator.
  Generate a simulated sky background.
 \end{description}
 
+\fi
 
-
-\section{\xlabel{ap_full}Specifications of \SMURF\ Applications\label{ap:full}}
+\section{\xlabel{ap_full}Full Specifications of all \SMURF\ Commands\label{ap:full}}
 %\CutAt{sstrefsection,section}
 
 The following pages describe all the \SMURF\ commands in detail. Default
@@ -1615,13 +1691,12 @@ time. Parameters for which an array should be supplied (or are
 returned) are shown with parentheses after the parameter name. A
 number within those parentheses indicates the size of the array.
 
-\section{ADAM routines}
 \input{../../libsmurf/smurfmon}
 \clearpage
 
 \section{Python Scripts}
 
-The following scripts use \KAPPA\ and \SMURF\ commands to do the number
+These scripts use \KAPPA\ and \SMURF\ commands to do the number
 crunching, but use Python rather than shell script to glue these commands
 together. The parameter system used by these scripts has been designed to
 be similar to the ADAM parameter system used by most other Starlink
