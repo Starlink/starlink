@@ -30,12 +30,12 @@
 *     Raw data will be flatfielded but this method will not apply any
 *     extinction correction, sky removal or filtering. It is assumed that
 *     this has been handled by other tasks prior to making the map.
-
-*     The "ITERATE" method takes a more holistic approach to map
+*
+*     The default "ITERATE" method takes a more holistic approach to map
 *     making using an iterative technique to fit for a number of
 *     models for noise and instrumental behaviour, one of which is the
-*     underlying astronomical image. Details of the map making can be
-*     controlled using the CONFIG file.
+*     underlying astronomical image. Details of the map making process
+*     can be controlled using the CONFIG parameter.
 
 *  ADAM Parameters:
 *     ALIGNSYS = _LOGICAL (Read)
@@ -58,7 +58,10 @@
 *          Specifies values for the configuration parameters used by the
 *          iterative map maker (METHOD=ITERATE). If the string "def"
 *          (case-insensitive) or a null (!) value is supplied, a set of
-*          default configuration parameter values will be used.
+*          default configuration parameter values will be used. A full
+*          list of the available configuration parameters is available
+*          in the appendix of SUN/258. A smaller list of the more
+*          commonly used configuration parameters is available in SC/21.
 *
 *          The supplied value should be either a comma-separated list of
 *          strings or the name of a text file preceded by an up-arrow
