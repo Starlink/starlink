@@ -207,9 +207,22 @@
 %% Change the \wedge command to something that looks better.
 \renewcommand{\wedge}{\mbox{\textasciicircum}}
 
-%% command to prevent sstroutines from appearing in the html tocs
+%% command to prevent sstroutines from appearing in the main html tocs
 %% (does nothing in pdf)
-\newcommand{\sstnotoc}{}
-%% Command to restart sstroutines from appearing in the html tocs
+\newcommand{\sstnomaintoc}{}
+%% Command to restart sstroutines appearing in the main html toc
 %% (does nothing in pdf)
-\newcommand{\ssttoc}{}
+\newcommand{\sstmaintoc}{}
+
+%% command to prevent sstroutines from appearing in the extra html toc
+%% called by \sstminitoc{Title of Toc} (does nothing in pdf)
+\newcommand{\sstnoextratoc}{}
+%% Command to restart sstroutines appearing in the extra html toc
+%% called by \sstminitoc{Title of Toc} (does nothing in pdf)
+\newcommand{\sstextratoc}{}
+
+
+% Command that in html typesets a listing of all
+% sstroutines/sstroutinenolables that occur before the next sectioning
+% command. Does nothing in pdf at the moment.
+\newcommand{\sstminitoc}[1]{}

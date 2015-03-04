@@ -4,9 +4,6 @@
 %%% starstyle.sty
 
 %%%%%%%%%%%%%%%%%%% Table of contents and sectioning formatting
-% This needs to occur before the TocAt commands.
-\ConfigureToc{sstrefsection}{}{}{}{}
-
 % Set up the places to cut and the places to put tocs.
 \ifwithchapters
    \typeout{...WithChapters starlinkxhtml.cfg...}
@@ -14,8 +11,8 @@
      \typeout{... typesetting html across multiple pages...}
      \CutAt{chapter}
      \CutAt{part}
-     \TocAt{chapter,section,subsection,sstrefsection}
-     \TocAt{part,chapter,section,subsection,sstrefsection}
+     \TocAt{chapter,section,subsection}
+     \TocAt{part,chapter,section,subsection}
      \else
      \typeout{... single page...}
     \fi
@@ -24,7 +21,7 @@
    \ifmultipage
      \typeout{... typesetting html across multiple pages...}
      \CutAt{section}
-     \TocAt{section,subsection,sstrefsection}
+     \TocAt{section,subsection}
      \else
      \typeout{... single page...}
    \fi
@@ -34,9 +31,9 @@
   \CutAt{appendix}
   \Configure{+CutAt}{appendix}{[}{]}
   \ifwithchapters
-    \TocAt{appendix, chapter,section,subsection,sstrefsection}
+    \TocAt{appendix, chapter,section,subsection}
   \else
-    \TocAt{appendix, section,subsection,sstrefsection}
+    \TocAt{appendix, section,subsection}
   \fi
   \CutAt{sstrefsection,sstrefsection}
   \Configure{+CutAt}{sstrefsection}{[}{]}
@@ -135,9 +132,9 @@
 
   %% Slightly different table of contents with or without chapters.
   \ifwithchapters
-  \tableofcontents[part,chapter,section,subsection,subsubsection,appendix]
+  \tableofcontents[part,chapter,section,subsection,likesstrefsection,subsubsection,appendix]
   \else
-  \tableofcontents[section,subsection,subsubsection,appendix]
+  \tableofcontents[section,subsection,likesstrefsection,subsubsection,appendix]
   \fi
 }
 
