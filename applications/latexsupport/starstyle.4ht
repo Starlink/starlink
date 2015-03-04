@@ -341,15 +341,23 @@
 
 % Css for toc (depends on whether or not chappters are included, so
 % not in standard css file)
-\Css{.sectionToc{}}
-\Css{.subsectionToc{padding-left:1em;}}
+\Css{.sectionToc{display:inline-block;padding-top:1em;padding-bottom:0.3em;}}
+\Css{.subsectionToc{padding-left:1em;
+white-space:nowrap;
+overflow:hidden;
+text-overflow: ellipsis;
+display:block;
+float:left;
+width:95\%;
+padding-left:1em;
+}}
 \Css{.subsubsectionToc{padding-left:3em;font-size:100\%}}
 \Css{.chapterHead,.appendixHead{line-height:150\%}}
 
 \ifwithchapters
-\Css{.chapterToc{}}
-\Css{.sectionToc{padding-left:1em}}
-\Css{.subsectionToc{padding-left:4em;}}
+\Css{.chapterToc{display:inline-block;padding-top:1em;padding-bottom:0.3em}}
+\Css{.sectionToc{padding-left:1em; display:inline-block;padding-top:0em;padding-bottom:0.3em}}
+\Css{.subsectionToc{padding-left:3em; width:90\%}}
 \Css{.subsubsectionToc{padding-left:7em}}
 \fi
 
