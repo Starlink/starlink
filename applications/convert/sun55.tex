@@ -19,7 +19,7 @@
 \stardocmanual      {User's Manual}
 \stardocabstract  {
 The \CONVERT\ package contains utilities for converting data files
-between Starlink's Extensible {\em n}-dimensional Data Format
+between Starlink's Extensible \emph{n}-dimensional Data Format
 \xref{(NDF)}{sun33}{},
 which is used by most Starlink applications, and a number of other common
 data formats.
@@ -94,7 +94,7 @@ procedures for handling NDFs from within IDL.}
 \section{\label{introduction}Introduction}
 
 If life were simple there would only be one data format, but in reality
-there are numerous formats for storing {\em{n}}-dimensional astronomical data
+there are numerous formats for storing \emph{n}-dimensional astronomical data
 associated with various software packages.   In Starlink we have not
 been immune to this, having the original INTERIM BDF, HDS IMAGE format,
 and \Figaroref\ DSTs to name but three.  However, Starlink is now taking the
@@ -102,7 +102,7 @@ novel approach of supporting different packages sharing a common data
 format---the
 \xref{NDF}{sun33}{}\latex{\footnote{
 See SUN/33 for an introduction to the NDF.}}
-(Extensible {\em{n}}-Dimensional-data format)---which most Starlink packages
+(Extensible \emph{n}-Dimensional-data format)---which most Starlink packages
 are already using.
 
 The purpose of \CONVERT\ is the interchange of data files
@@ -292,11 +292,11 @@ its name (or its name preceded by \texttt{con\_}\footnote{The
 \texttt{con\_<name>}
 form is defined for use where there may be confusion between commands of the
 same name from different packages.})---you will be prompted for any required
-{\em parameters}.
+\emph{parameters}.
 Alternatively, you may enter parameter values on the command line
 specified by position or by keyword.  If you want to override any
 defaulted parameters, then you specify the parameter's value on the
-command line.  Note that {\em from UNIX the commands are in lowercase}, whereas
+command line.  Note that \emph{from UNIX the commands are in lowercase}, whereas
 from \ICL\ the case does not matter.
 
 Most \CONVERT\ applications can be run as simply as:
@@ -379,7 +379,7 @@ HELP.)
 
 The help topics are mostly detailed descriptions of the applications
 but also include global information on matters such as using parameters.
-{\em{e.g.}}\ the following command gives help on the application
+\emph{e.g.}\ the following command gives help on the application
 \htmlref{UNF2NDF}{UNF2NDF}.
 
 
@@ -448,7 +448,7 @@ extensions tell the system which format the file is in. For the unformatted
 and ASCII conversions the format names and extensions are somewhat arbitrary.
 \end{latexonly}
 This list will nullify any existing list so private conversions must be added
-{\em after\/} \CONVERT\ startup.
+\emph{after} \CONVERT\ startup.
 
 For the unformatted and ASCII conversions the format names and
 extensions are somewhat arbitrary.  The FITS and STREAM formats have
@@ -533,14 +533,14 @@ GZIP & in & {\bf gzip} & & $\times$ \\
 Table~\ref{tab:conversions} also contains a column headed `Variable'.
 Most of the command lines issued to do the automatic conversion will include
 the translation of an environment variable named
-NDF\_FROM\_\-{\em fmt}\_\-PARS or NDF\_TO\_{\em fmt}\_PARS as appropriate
-(where {\em fmt} is the format name).
+NDF\_FROM\_\-\emph{fmt}\_\-PARS or NDF\_TO\_\emph{fmt}\_PARS as appropriate
+(where \emph{fmt} is the format name).
 This may be used to give additional parameters to the command if you do not
 want to define a completely new command for yourself.
 \end{latexonly}
 
 
-Where the `Variable' column contains a tick, the variable {\em must} be used
+Where the `Variable' column contains a tick, the variable \emph{must} be used
 to supply the SHAPE parameter; where it contains a cross, additional parameters
 cannot be specified.
 
@@ -655,7 +655,7 @@ of it.
 \section{\label{app_full}Specifications of \BCONVERT\ Applications}
 \subsection{\xlabel{explanatory_notes}Explanatory Notes}
 
-The {\em Parameters\/} section \label{app_parameters}
+The \emph{Parameters} section \label{app_parameters}
 lists the application's parameters, with the format:
 
 \begin{terminalv}
@@ -664,7 +664,7 @@ lists the application's parameters, with the format:
 \end{terminalv}
 
 The description entry has a notation scheme to indicate
-normally defaulted parameters, {\it i.e.}\ those for which there will
+normally defaulted parameters, \textit{i.e.} those for which there will
 be no prompt.
 For such parameters a matching pair of square brackets (\verb![]!)
 terminates the description.  The content between the brackets mean
@@ -682,22 +682,20 @@ If the brackets contain a value in teletype-fount, this is the explicit
 default value.
 \end{description}
 
-There is also a {\em Usage\/} entry.   \label{app_usage}
+There is also a \emph{Usage} entry.   \label{app_usage}
 This shows how the  application is invoked from the command line.   It
 lists the positional parameters in order followed by any prompted
-keyword parameters using  a \mbox{``KEYWORD=?''} syntax.  Defaulted
+keyword parameters using  a \texttt{``KEYWORD=?''} syntax.  Defaulted
 keyword parameters do not appear.  Positional parameters that are
 normally defaulted are indicated by being enclosed in square brackets.
-Keyword ({\it i.e.}\ not positional) parameters are needed where the
+Keyword (\textit{i.e.}\ not positional) parameters are needed where the
 number of parameters are large, and usually occur because they depend on
 the value of another parameter.  An example should clarify.
-\smallskip
 
 \begin{terminalv}
      ndf2ascii in out [comp] [reclen] noperec=?
 \end{terminalv}
-\normalsize
-\smallskip
+
 
 IN, OUT, COMP, and RECLEN are all positional
 parameters.  Only IN, and OUT would be prompted if not given
@@ -705,15 +703,15 @@ on the command line. The remaining parameter, NOPEREC, depends on the
 value of another parameter (it is FIXED), and will be prompted for when
 FIXED is \texttt{TRUE}.
 
-The {\em Examples\/} section  \label{app_example}
+The \emph{Examples} section  \label{app_example}
 shows how to run the application from the command line.  More often
 you'll enter the command name and just some of the parameters, and be
 prompted for the rest.
 
 Examples give command lines as accepted by the tasks themselves.  From
-the UNIX shell, {\em metacharacters\/} (notably \texttt{[}, \texttt{]} and
+the UNIX shell, \emph{metacharacters} (notably \texttt{[}, \texttt{]} and
 \texttt{"})
-{\em must be escaped or enclosed in single quotes}.  For example:
+\emph{must be escaped or enclosed in single quotes}.  For example:
 
  \begin{terminalv}
 ascii2ndf ngc253q.dat ngc253 q shape='[100,60]'
@@ -722,7 +720,6 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
 \sstminitoc{List of all Convert Commands}
 
-\newpage
 \sstroutine{
    ASCII2NDF
 }{
