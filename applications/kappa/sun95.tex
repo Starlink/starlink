@@ -101,6 +101,8 @@ and alphabetical summaries.}
 \providecommand{\CURSAref}{\xref{\CURSA}{sun190}{}}
 \providecommand{\ECHOMOPref}{\xref{{\footnotesize ECHOMOP}}{sun152}{}}
 \providecommand{\ESPref}{\xref{{\footnotesize ESP}}{sun180}{}}
+\providecommand{\EVINCE}{{\footnotesize EVINCE}\normalsize}
+\providecommand{\EVINCEref}{\htmladdnormallink{\EVINCE}{http://wiki.gnome.org/Apps/Evince}}
 \providecommand{\EXTRACTORref}{\xref{{\footnotesize EXTRACTOR}}{sun226}{}}
 \providecommand{\FIGARO}{{\footnotesize FIGARO}\normalsize}
 \providecommand{\Figaroref}{\xref{\FIGARO}{sun86}{}}
@@ -124,6 +126,8 @@ and alphabetical summaries.}
 \providecommand{\NDFref}[1]{\htmlref{#1}{ap:NDFformat}~}
 \providecommand{\NDFextref}[1]{\xref{#1}{sun33}{}}
 \providecommand{\NDFPACK}{{\footnotesize NDFPACK}\normalsize}
+\providecommand{\OKULAR}{{\footnotesize OKULAR}\normalsize}
+\providecommand{\OKULARref}{\htmladdnormallink{\OKULAR}{http://okular.kde.org/}}
 \providecommand{\PDAref}{\xref{PDA}{sun194}{}}
 \providecommand{\PGPLOT}{{\footnotesize PGPLOT}\normalsize}
 \providecommand{\PGPLOTref}{\htmladdnormallink{\PGPLOT}{http://astro.caltech.edu/\~{}tjp/pgplot/}}
@@ -2435,14 +2439,56 @@ issue this command that often.
 \KAPPA\ applications are modular so that you can build up
 more-complicated plots, and possibly add annotations with other packages
 especially \PONGOref\@.  This is fine if the device is some sort of
-screen.  However, when it is a hardcopy device, \PGPLOT\ ref\ puts the
-output from a command into a single disk file.  So how do you get the
-composite plot out on paper?  Well you can't just append these files to
-create a single output.
+screen.  However, care needs to be taken when using other types of
+device. For instance, some \PGPLOTref\ postscript devices put the
+output from each command into a separate disk file.  So how do you get the
+composite plot out on paper?  There are two solutions:
 
-What you must do is as follows.
+\begin{enumerate}
+\item The easy way - use an ``accumulating'' postscript device instead.
+If you look at the list of device names produced by
+\htmlref{GDNAMES}{GDNAMES} you will see that some of the encapsulated postscript
+(EPS) devices are described as ``accumulating''. For instance:
+
+\begin{terminalv}
+    % gdnames
+    ...
+    aps_p     (/AVPS)          Accumulating EPS, monochrome, portrait
+    aps_l     (/APS)           Accumulating EPS, monochrome, landscape
+    apscol_p  (/AVCPS)         Accumulating EPS, color, portrait
+    apscol_l  (/ACPS)          Accumulating EPS, color, landscape
+    ...
+\end{terminalv}
+
+If you use one of these devices, each subsequent graphics application
+will merge it's postscript output automatically into any existing
+\texttt{pgplot.ps} file. If you display \texttt{pgplot.ps} using a
+modern PDF/postscript viewer such \OKULARref\ or \EVINCEref, the
+display will update automatically as each subsequent graphics application modifies
+the file. Once the final graphics application has been run, you can rename
+the \texttt{pgplot.ps} file to something more covenenient\footnote{You
+could alternatively include the required final file name in the device
+name before running the graphics applications.}.
+
+To give an example, suppose we wanted to overlay a contour plot
+on an image.
+
+\begin{terminalv}
+    % gdset apscol_l
+    % display $KAPPA_DIR/comwest lut=$KAPPA_DIR/spectrum_lut mode=ra axes
+    % contour noclear mode=au noaxes \\
+    % mv pgplot.ps myplot.ps
+
+\end{terminalv}
+
+\item The hard way - use \PSMERGEref\ to merge separate postscript files.
+If you use one of the non-accumulating postscript devices, the output
+from each graphics application goes into a separate file which must then
+be merged. This is what you must do:
+
 \begin{itemize}
-\item  Select an encapsulated PostScript device, be it colour or monochrome.
+\item  Select one of the non-acculumlating encapsulated PostScript device, be
+it colour or monochrome.
 \item  Produce your graphics, being careful to rename the output file
 (usually \verb+pgplot.ps+) created by each command to avoid it being
 over-written by the output from the next command.  Alternatively, you can
@@ -2452,8 +2498,7 @@ explicit unique file name in each device specification (see above).
 combine the plots.
 \end{itemize}
 
-To give an example, suppose we wanted to overlay a contour plot
-on an image.
+To use the same example as above:
 
 \begin{terminalv}
     % gdset epsfcol_l
@@ -2477,6 +2522,7 @@ or alternatively:
 
 You then print \texttt{myplot.ps} to the colour PostScript printer.
 {\footnotesize PSMERGE} \normalsize also has options for scaling and rotating plots.
+\end{enumerate}
 
 \newpage
 \section{\xlabel{se_style}Plotting Styles and Attributes\label{se:style}}
@@ -4656,25 +4702,31 @@ again will often cure the problem.
 \subsection{\xlabel{se_psfiles}Working With PostScript Files\label{se:psfiles}}
 
 Having produced a pretty picture in an X-window, how do we get it on to a
-piece of paper? There are basically two ways.  The simplest way is to copy
-the pixel values from the X-window into a PostScript file, and then print
-the file on a suitable PostScript printer.  \texttt{GIMP}, or \texttt{xv} can be
-used to do this, using the \texttt{Grab} and \texttt{Save} commands.  The figures in
-this chapter were created using this method.  It's easy---but the results
-only have the resolution of your X screen (typically 72 dots per inch)
-which is usually not good enough for general publication.
+piece of paper? There are basically two ways.  The simplest way is to do
+a screen-shot (\emph{i.e.} copy the pixel values from the X-window into a
+PNG file, or some other suitable graphics format), and then print the file
+on a suitable printer.  There are many ways to do this, depending on your
+operating system (\texttt{GIMP}, \texttt{ImageMagick}, \texttt{ksnapshot},
+\texttt{print screen}, \emph{etc}). The figures in this chapter were created
+using this method.  It's easy---but the results only have the resolution of
+your X screen (typically 72 dots per inch) which is usually not good enough
+for general publication.
 
 The second method is more involved, but retains the full resolution of
-your PostScript printer (typically 600 dots per inch or more), producing
-far superior results.  It involves running all the \KAPPA
-applications again, but using a suitable encapsulated PostScript graphics
-device instead of the X-windows device used earlier in this chapter.
-Each application will then write its graphical output to one or more disk
-files.  Once all applications have been run, you combine all these
-files together using \PSMERGEref\ to create a single PostScript file
-containing the entire plot, which can be printed or included in another
-document.  We will look at this method in more detail in the rest of
-this section.
+your printer (typically 600 dots per inch or more), producing far
+superior results.  It involves running all the \KAPPA applications again,
+but using a suitable encapsulated PostScript graphics device instead of
+the X-windows device used earlier in this chapter. Each application will
+then write its graphical output to one or more disk files.  If you elect
+to use one of the ``accumulating'' PostScript devices (as indicated in
+the device description displayed by \htmlref{GDNAMES}{GDNAMES}), then the
+postscript output from each application will be merged automatically into
+a single file. If you use one of the other PostScript devices, each
+application will produce a separate output file, all of which must be
+combined using \PSMERGEref\ to create a single PostScript file containing
+the entire plot, which can be printed or included in another document.
+
+We will look at these method in more detail in the rest of this section.
 
 \subsubsection{The Choice of Graphics Device}
 
@@ -4684,52 +4736,61 @@ These differ from normal PostScript files in that they contain information
 which allows them to be included within other PostScript files.  The
 \htmlref{GDNAMES}{GDNAMES} command displays a list of all the available
 graphics devices, together with a brief description of each.  This should
-enable you to select an appropriate device name.\footnote{Most encapsulated
-PostScript devices start with the string \texttt{"epsf"}.}  There may be
-various encapsulated PostScript devices available.  For instance, you can
-choose between colour or monochrome devices, and between portrait or
-landscape devices.  The choice of colour or monochrome obviously depends
-on the printer you will use.  The choice of landscape or portrait depends
-on the shape of the total plot you are producing---for tall narrow
-plots choose portrait, for short wide plots choose landscape.\footnote{The
-choice or portrait or landscape may also affect the orientation of the
-plot when the resulting PostScript file is included in a document.}
+enable you to select an appropriate device name.\footnote{Most
+encapsulated PostScript devices start with the string \texttt{"epsf"} or
+\texttt{"aps"}.} There may be various encapsulated PostScript devices
+available.  For instance, you can choose between colour or monochrome
+devices, and between portrait or landscape devices.  The choice of colour
+or monochrome obviously depends on the printer you will use.  The choice
+of landscape or portrait depends on the shape of the total plot you are
+producing---for tall narrow plots choose portrait, for short wide plots
+choose landscape.\footnote{The choice or portrait or landscape may also
+affect the orientation of the plot when the resulting PostScript file is
+included in a document.}
+
+Creating composite graphical output will be easier if you choose one the
+devices that are described as ``accumulating'', as this will avoid the
+need for you to merge separate PostScript files yourself.
 
 For instance, if you want all applications to write graphical output to
-monochrome landscape encapsulated PostScript files set the graphics
+a single colour landscape encapsulated PostScript file set the graphics
 device as follows:
 
 \begin{terminalv}
-   % gdset epsf_l
+   % gdset apscol_l
 \end{terminalv}
 
 \subsubsection{The PostScript Files}
 
 Having selected a suitable encapsulated PostScript graphics device, each
-\KAPPA\ application will produce an output file in your
-current directory containing PostScript commands.  These files can be
-examined without needing to be printed by using the \texttt{ghostview}
-program.  By default, the output file will be called \texttt{pgplot.ps}.
+\KAPPA\ application will either modify an existing graphics file, or
+produce an new output file in your current directory containing PostScript
+commands, depending on whether you choose an accumulating device or not.  These
+files can be examined without needing to be printed by using \OKULARref,
+\EVINCEref, \texttt{ghostview}, \emph{etc}. By default, the output file
+will be called \texttt{pgplot.ps}.
 
 \begin{quote}
-\emph{ Note, subsequent graphics commands will overwrite any file
-created by earlier graphics commands.  For this reason you should
-rename the output file after running each graphics command.  An
-alternative approach is to assign a unique value to the DEVICE parameter
-for each graphics command (rather than just allowing it to default to the
-value of the global parameter set using GDSET).  For instance,
-\emph{\texttt{DEVICE="epsf\_l;contour.ps"}} would cause the command to write its
-output to file \texttt{contour.ps}.}
+\emph{ Note, if you choose not to use an accumulating device, subsequent graphics
+commands will overwrite any file created by earlier graphics commands.  For this
+reason you should rename the output file after running each graphics command.  An
+alternative approach is to assign a unique value to the DEVICE parameter for each
+graphics command (rather than just allowing it to default to the value of the global
+parameter set using GDSET).  For instance, \emph{\texttt{DEVICE="epsf\_l;contour.ps"}}
+would cause the command to write its output to file \texttt{contour.ps}.}
 \end{quote}
 
 \subsubsection{Combining the Files into a Single File}
 
+\emph{This section is only relevant if you are using a non-accumulating device.}
+
 Once all applications have been run, you will have a potentially long
-list of PostScript files in your current directory.  These need to be
+list of PostScript files in your current directory (unless you use an
+accumulating device, in which case you will have only one).  These need to be
 stacked together to produce a single PostScript file which can either be
-printed or included in a document.  To do this, we use
-\PSMERGEref\  as follows\footnote{You can include all the PostScript files,
-including any that do not contain any actual drawing commands.}:
+printed or included in a document.  To do this, we use \PSMERGEref\  as
+follows\footnote{You can include all the PostScript files, including any
+that do not contain any actual drawing commands.}:
 
 \begin{terminalv}
    % psmerge display.ps contour.ps stars.ps > total.ps
@@ -4790,8 +4851,8 @@ that are not available in PostScript.  To find the require aspect ratio,
 do:
 
 \begin{terminalv}
-   % gdclear device=epsf_l
-   % gdstate device=epsf_l
+   % gdclear device=apscol_l
+   % gdstate device=apscol_l
 \end{terminalv}
 
 This clears the PostScript device, and then displays the bounds of the
@@ -4801,7 +4862,7 @@ will look something like this:
 
 \begin{terminalv}
 
-Status of the epsf_l graphics device...
+Status of the apscol_l graphics device...
 
    The current picture is a BASE picture.
    Comment: Base picture
@@ -4844,17 +4905,40 @@ PostScript file containing a plot similar to that in Figure~
 sections of this chapter did not adhere to either of the tips given above
 when prototyping in an X-window; that is, we did not choose the shape of
 the X-window to match our PostScript device, and we did not save the
-output from each run of \htmlref{CURSOR}{CURSOR} in a positions list file.  For this reason,
-the steps taken here are a little more complicated than they need to be,
-and do not mimic exactly the steps taken while prototyping.
+output from each run of \htmlref{CURSOR}{CURSOR} in a positions list file.
+For this reason, the steps taken here are a little more complicated than
+they need to be, and do not mimic exactly the steps taken while prototyping.
 
-First, select and clear the graphics device.  We choose a monochrome,
+First, select and clear the graphics device.  We choose a accumulating, monochrome,
 portrait, encapsulated PostScript device:
 
 \begin{terminalv}
-   % gdset epsf_p
+   % gdset aps_p
    % gdclear
+   % okular pgplot.ps &
 \end{terminalv}
+
+Since we are using an accumulating PostScript device, we have chosen to use
+\OKULARref\ above to display the contents of \texttt{pgplot.ps}.  We have
+just run \htmlref{GDCLEAR}{GDCLEAR}, and so this will produce a blank display.
+Note that we have put \OKULAR\ into the background by appending texttt{\&} to
+the end of the command line.  This means that \OKULAR\ will continue to run
+throughtout the following example.  As each subsequent graphics application
+modifies the contents of \texttt{pgplot.ps}, the resulting composite plot will
+be displayed immediately within the \OKULAR\ window, allowing you to review
+progress.  Other modern document viewers such as \EVINCEref\ work in the same
+way.
+
+In order to produce higher quality axis annotations, we now tell \PGPLOT\ to use
+embedded PostScript fonts rather than it's own internal lower-quality
+fonts. Specifically, we use a Times New Roman font:
+
+\begin{terminalv}
+   % setenv PGPLOT_PS_FONT Times
+\end{terminalv}
+
+We could instead have set \texttt{PGPLOT\_PS\_FONT} to ``Helvetica'',
+``Courier'', ``NewCentury'' or ``Zapf'', to use other fonts.
 
 We will sometimes need to specify positions within the BASE picture.
 To do this we can either use the GRAPHICS, the BASEPIC or the NDC Frame,
@@ -4909,7 +4993,6 @@ optical image within it, including annotated axes:
    % piclabel main
    % display m31 axes mode=perc percentiles=\[30,99\] style="'colour=black,size=0.6'" \
              margin=\[0.2,0.02\]
-   % mv pgplot.ps display1.ps
 \end{terminalv}
 
 Note, we are using a monochrome PostScript device, and so the colour of
@@ -4920,11 +5003,7 @@ the MARGIN parameter when running DISPLAY in order to reduce the margin
 on the right hand side of the image.  By default, DISPLAY leaves a
 margin equal to 0.2 of the width of the DATA picture.  We reduced this to
 0.02 to make more room for the other components of the plot (the first
-value supplied for MARGIN is the bottom margin and is left at 0.2).  Note
-the \texttt{mv} command at the end of the above sequence.  This renames the
-output PostScript file created by DISPLAY so that it is not over-written
-by subsequent graphics commands.  Throughout the rest of this example, we
-will save each required PostScript file in this way.
+value supplied for MARGIN is the bottom margin and is left at 0.2).
 
 We now draw a box over this image to mark the `selected region'
 indicated in Figure~ \latexhtml{\ref{fi:agi3}}{3}.  In this
@@ -4939,8 +5018,14 @@ OUTCAT parameter.  In either case, we use \htmlref{LISTSHOW}{LISTSHOW} to draw t
      POSITION - A position for the output list /!/ > 0:39:25.0 40:54:17
      POSITION - A position for the output list /!/ >
    % listshow boxpos plot=box style='colour=black'
-   % mv pgplot.ps box.ps
 \end{terminalv}
+
+Note, the PostScript output generated by \htmlref{LISTSHOW}{LISTSHOW} is
+merged automatically into the \texttt{pgplot.ps} file created by the
+previous graphics applications. If we had chosen not to use an
+accumulating device, we would need to rename the new \texttt{pgplot.ps}
+file created by each graphics application, and then merge them all together at
+the end using PSMERGE.
 
 Specifying \texttt{ndf=m31} resulted in LISTMAKE interpreting the supplied
 positions as positions within the current co-ordinate Frame of the NDF
@@ -4963,11 +5048,9 @@ with twice the default width:
 \begin{terminalv}
    % display 'm31(173:213,79:114)' border noaxes mode=scale low=3889 high=10854.78 \
               borstyle='width=2'
-   % mv pgplot.ps display2.ps
    % picdata
    % piclabel mag
    % contour noclear noaxes nokey iras mode=perc percentiles=\[55,75,95\]
-   % mv pgplot.ps contour.ps
 \end{terminalv}
 
 What are those two extra commands in the middle? Well, we will need to be
@@ -4987,7 +5070,6 @@ top of the Frame:
      POSITION - A position for the output list /!/ > 0.8 0.6
      POSITION - A position for the output list /!/ >
    % listshow ttlpos plot=text strings='"IRAS 12 \gmm contours"' just=bc
-   % mv pgplot.ps title.ps
 \end{terminalv}
 
 LISTMAKE is used to store the position in a positions list, and then
@@ -5007,7 +5089,6 @@ the predominantly dark background of the image:
      POSITION - A position for the output list /!/ > 0:39:56.5 40:50:27
      POSITION - A position for the output list /!/ >
    % listshow prfpos plot=chain marker=3 style="'colour=white,width=3'"
-   % mv pgplot.ps line.ps
 \end{terminalv}
 
 The line is drawn with three times the default width.  We now create the
@@ -5026,9 +5107,7 @@ did when prototyping:
 \begin{terminalv}
    % picdef mode=xy lbound=\[0.6,0.0\] ubound=\[1.0,0.3\] outline=no
    % linplot m31_prof style=^style1 keystyle='size=0.7'
-   % mv pgplot.ps m31_prof.ps
    % linplot iras_prof noclear noalign style=^style2
-   % mv pgplot.ps iras_prof.ps
 \end{terminalv}
 
 The appearances of the two plots are controlled by the two plotting
@@ -5173,7 +5252,6 @@ Parameter NAME to BASE (we also revert to drawing in black):
      POSITION - A position for the output list /!/ > 0.6473798 0.5838399
      POSITION - A position for the output list /!/ >
    % listshow war1pos plot=poly style='colour=black' name=base
-   % mv pgplot.ps war1.ps
 \end{terminalv}
 
    \begin{figure}[hbt]
@@ -5193,19 +5271,24 @@ same way:
      POSITION - A position for the output list /!/ > 0.9524395 0.3159827
      POSITION - A position for the output list /!/ >
    % listshow war2pos plot=poly name=base
-   % mv pgplot.ps war2.ps
 \end{terminalv}
 
-We now have separate PostScript files containing the output from all the
-above applications.  These are stacked together in the order they were
-created to produce the final encapsulated PostScript file:
+That's it.  The final output is left in file \texttt{pgplot.ps} and
+should be visible in the \OKULAR\ window.  It should look like
+Figure~ \latexhtml{\ref{fi:agi9}}{9}.  However, if we had chosen not to use
+an accumulating PostScript device, we would now be left with lots of postscript
+files---one from each graphics application---that now need to be stacked together
+to produce the final encapsulated PostScript file:
 
 \begin{terminalv}
    % psmerge -e display1.ps box.ps display2.ps contour.ps title.ps \
                 line.ps m31_prof.ps iras_prof.ps war1.ps war2.ps > total.eps
 \end{terminalv}
 
-The file \texttt{total.eps} is displayed in Figure~ \latexhtml{\ref{fi:agi9}}{9}.
+Note, here we assume that each \texttt{pgplot.ps} file has been renamed
+to one of the above names immediately after it has been created, in
+order to avoid it being over-written by the next graphical application.
+
 
 \newpage
 \section{\xlabel{se_wcsuse}Using World Co-ordinate Systems\label{se:wcsuse}}
