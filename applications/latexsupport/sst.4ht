@@ -29,13 +29,22 @@
         \a:sstsubtitle #1 \b:sstsubtitle}
 \Configure{sstsubtitle}{\Tg<p class="subtitle">}{\Tg</p> \Tg</h3> \Tg</header>}
 
+%% Add an entry to the toc
+\newcommand{\ssttocline}[2]{\addcontentsline{toc}{subsection}{\protect\numberline{}#1--#2}}
 
+%% option to prevent sst routines from appearing in a toc.
+\renewcommand{\sstnotoc}{\renewcommand{\ssttocline}[2]{}}
+
+%% option to start them appearing again.
+\renewcommand{\ssttoc}{\renewcommand{\ssttocline}[2]{\addcontentsline{toc}{subsection}{\protect\numberline{}#1--#2}}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % .. Basic SSTROUTINE command.
 % Replace the \sstroutine with tex4ht appropriate command:
+
+
 \renewcommand{\sstroutine}[3]{%
    \ssttitle{#1}{#2}%
-   \addcontentsline{toc}{subsection}{\protect\numberline{}#1---#2}
+   \ssttocline{#1}{#1}
    \label{\RemoveSpaces{#1}} \xlabel{\RemoveSpaces{#1}}
    #3
 }
@@ -43,7 +52,7 @@
 % .. SSTROUINTE that does not define a label
 \renewcommand{\sstroutinenolabel}[3]{%
    \ssttitle{#1}{#2}%
-   \addcontentsline{toc}{subsection}{\protect\numberline{}#1---#2}
+   \ssttocline{#1}{#2}
    #3
 }
 
