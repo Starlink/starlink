@@ -21,10 +21,10 @@
   and the SCUBA-2 bolometer array on the James Clerk Maxwell Telescope
   (JCMT). This document describes the \SMURF\ tasks used to process raw
   ACSIS data into data cubes, and raw SCUBA-2 data into images. These
-  low-level tasks are used within automated \ORACDR\ pipelines that
-  produce calibrated data products. This document is intended for users
-  who wish to run the low-level tasks themselves, to explore
-  possibilities not provided by the automated pipelines.
+  low-level tasks are used within automated \ORACDR\ pipelines (documented
+  elsewhere) that produce calibrated data products. This document is
+  intended for users who wish to run the low-level tasks themselves, to
+  explore possibilities not provided by the automated pipelines.
 }
 \starfunders{University of British Columbia \& the Science \& Technology Facilities Council}
 \startitlepic{\includegraphics[width=0.55\textwidth]{sun258_logo}}
@@ -42,7 +42,7 @@ the appropriate \ORACDR\ pipeline.
 
 The main purpose of this document is to provided complete reference
 information for all facilities provided by \SMURF. Thus, for instance, it
-contains details of {\em all} available command parameters and configuration
+contains details of \emph{all} available command parameters and configuration
 parameters. It is not really intended to be read from start to finish as
 a complete document, but rather to be dipped into, as and when needed,
 for information about specific parameters or facilities. Most users
@@ -110,7 +110,7 @@ environment to be defined. For C shells (csh, tcsh), do:
 % source $STARLINK_DIR/etc/cshrc
 \end{terminalv}
 
-For Bourne shells (sh, bash, zsh), do:
+before using any Starlink commands. For Bourne shells (sh, bash, zsh), do:
 
 \begin{terminalv}
 % export STARLINK_DIR=<path to the starlink installation>
@@ -203,22 +203,25 @@ convenient overview of the Starlink parameter system. ADAM parameters are
 usually used to specify the main inputs and output for each command, and
 to select the main options to be used.
 
-Maybe the most difficult aspect of using ADAM parameter (i.e. command
-line parameters) is handling shell meta-characters. If the parameter
+Maybe the most difficult aspect of giving ADAM parameter values on the
+command line is handling shell meta-characters. If the parameter
 value includes any characters that would normally be interpreted and
 replaced by the Unix shell before invoking the requested command, such as
-wild-cards, dollars, commas, {\em etc}, then they must be protected in
+wild-cards, dollars, commas, \emph{etc}, then they must be protected in
 some way so that the Starlink software receives them unchanged. This can
 be done either by escaping each meta-character (i.e. preceding each one
 with a back-slash character - ``\textbackslash'') or by quoting the whole
 string. If all else fails, it may be necessary to enclose the parameter
 value in two layers of quotes, an inner layer of single quotes and an
-outer layer of double quotes.
+outer layer of double quotes. \emph{Note, the above comments only apply for ADAM
+parameter values that are supplied on the command line - when supplying a
+value in response to a prompt, ths Unix shell is not involved and so shell
+meta-characters should not be escaped or enclosed in quotes.}
 
 \item[Configuration parameters:] These are used to fine tune the details
-of specific algorithms, and may be much more numerous than ADAM
+of specific algorithms, and are usually much more numerous than ADAM
 parameters. If required, a \SMURF\ command will access an entire group of
-configuration parameter settings using a single ADAM parameter called
+configuration parameter settings using a single ADAM parameter usually called
 ``\aparam{CONFIG}''. The configuration parameter settings can be specified
 directly as a comma separated list in response to a prompt for
 \aparam{CONFIG}, or may be stored in a text file, the name of which is then
@@ -226,7 +229,8 @@ supplied (preceded by a caret - `\verb+^+') when prompted for
 \aparam{CONFIG}. Each \SMURF\ command that requires a group of configuration
 parameters will document what is needed, and how it can be supplied, in the
 reference documentation for \aparam{CONFIG}. Appendix \ref{par:full} describes
-individual configuration parameters in detail.
+individual configuration parameters in detail. \KAPPA\ \xref{(SUN/95)}{sun95}{se_groups}\
+has a complete description of the various ways in which groups can be specified.
 \end{description}
 
 \subsubsection{Message filter}
@@ -309,7 +313,7 @@ IN=^myfile.lis
 OUT=\*_out
 \end{terminalv}
 
-Note that if you are providing a text file containing {\em output} file names,
+Note that if you are providing a text file containing \emph{output} file names,
 those should be listed in the same order as the input file names, otherwise the
 processed data will be written under the wrong file names.
 
@@ -317,7 +321,9 @@ processed data will be written under the wrong file names.
 
 Data files for both ACSIS and SCUBA-2 \cite{sc2ic01} use the Starlink N-dimensional
 Data Format (NDF, see \ndfref), a hierarchical format which allows
-additional data and metadata to be stored within a single file. A single
+additional data and metadata to be stored within a single file. The KAPPA
+\KAPPA\ \xref{(SUN/95)}{sun95}{ap_classified}\ contains many commands for
+examining and manipulating NDF structures. A single
 NDF structure describes a single data array with associated meta-data.
 NDFs are usually stored within files of type ``\verb+.sdf+''. In most
 cases (but not all), a single \verb+.sdf+ file will contain just one
@@ -340,7 +346,7 @@ values;
 \item World Coordinate System information;
 \item History;
 \item Raw data units (``K'' for ACSIS, ``adu'' (possibly as compressed integers)
-for raw SCUBA-2 data,  ``pW'' for flat-fielded SCUBA-2 data, {\em etc}).
+for raw SCUBA-2 data,  ``pW'' for flat-fielded SCUBA-2 data, \emph{etc}).
 \end{itemize}
 For ACSIS, the raw data are stored as $N_{\textrm{chan}} \times N_{\textrm{receptors}} \times N_{\textrm{samp}}$, while SCUBA-2 data are stored as
 $N_{\textrm{columns}} \times N_{\textrm{rows}} \times N_{\textrm{samp}}$, where
@@ -422,7 +428,7 @@ were made (known as the \aparam{TRACKING} system within \SMURF).
 The mapping tasks \makemap\ and \makecube\ automatically
 deal with moving sources. There is no need to deal with moving sources
 explicitly for any processing with \SMURF. Maps and cubes made from
-moving sources will use a coordinate system that represents {\em offsets}
+moving sources will use a coordinate system that represents \emph{offsets}
 from the source centre, rather than absolute celestial coordinates.
 
 \subsection{File sizes and disk space}
@@ -455,7 +461,7 @@ due to its use of double precision for all calculations.
 SMURF contains a small number of commands specifically directed towards
 the reduction of ACSIS data. This section contains an introduction to
 each of these commands. The reduction of ACSIS data is described
-more fully in {\em The Heterodyne Data Reduction Cookbook}
+more fully in \emph{The Heterodyne Data Reduction Cookbook}
 (\xref{SC/20}{sc20}{}).
 
 \subsection{The makecube command}
@@ -484,7 +490,7 @@ Whilst being fast, this scheme can produce small geometric shifts in
 feature positions. Other available schemes include a bi-linear scheme
 that spreads each input value out linearly between the four closest
 output pixels, Gaussian weighting with a given radius, Sinc weighting,
-{\em etc}.
+\emph{etc}.
 
 There are many other aspects of the operation of \makecube\ that can be
 controlled via various program parameters, some the more important of
@@ -498,7 +504,7 @@ reducing the size of each individual cube.
 \item The world co-ordinate system used by the output cubes can be
 specified. This includes both the nature of the WCS axes themselves and
 the details of the tangent-plane projection (pixel size, orientation,
-{\em etc}). If required, optimal values for the projection details can be
+\emph{etc}). If required, optimal values for the projection details can be
 determined automatically to produce a regular grid (or as close to a
 regular grid as is possible given the input data). Alternatively, the WCS
 in the output cube be copied from a specified reference NDF.
@@ -693,8 +699,8 @@ To emphasise a number of issues:
   prominent negative features. By default these are set to zero in the
   fitted spectra: see information in the configuration file for the
   parameter \cparam{POS\_ONLY}.
-\item {\em ONLY for Gaussians} do the fitted parameters correspond
-  {\em exactly} to amplitude, centre, and FWHM! For the other functions
+\item \emph{ONLY for Gaussians} do the fitted parameters correspond
+  \emph{exactly} to amplitude, centre, and FWHM! For the other functions
   such correspondence does not exist: while they are related, the
   numerical values are not exact. Users are \textbf{strongly cautioned} to
   keep this in mind. The above-mentioned help for ``fitting\_functions''
@@ -927,7 +933,7 @@ described in Section \ref{se:dimm}.
 
 \subsection{Choosing input data files}
 In addition to on-sky data files, each observation usually includes
-other {\em calibration data files} such as flatfield ramps and noise
+other \emph{calibration data files} such as flatfield ramps and noise
 fields\footnote{The type of data in any individual file is recorded in
 the \texttt{SEQ\_TYPE} FITS header.}. It is usually safe to include all
 the files from an observation, whether on-sky or calibration, when
@@ -1034,7 +1040,7 @@ and represent the mean of the time-series bolometer values (after
 conversion into pW, down-sampling and removal of systematic noise) that
 fall in each pixel.
 
-See Chapin {\em et. al.} \cite{dimm} for a full description and analysis of the
+See Chapin \emph{et. al.} \cite{dimm} for a full description and analysis of the
 nature and behaviour of the Dynamic Iterative Map-Maker. Alternatively,
 see the SCUBA-2 cookbook (\xref{SC/21}{sc21}{dimm}) for shorter and more
 introductory description.
@@ -1048,7 +1054,7 @@ including the file name preceded by a caret `\verb+^+'. These two methods
 can also be combined, with later parameter settings over-riding earlier
 parameter settings.
 
-Appendix~\ref{par:full} gives details of {\em all} the available
+Appendix~\ref{par:full} gives details of \emph{all} the available
 configuration parameters - there are quite a lot! Many of these are of
 little interest to the majority of \SMURF\ users as they control either
 experimental features of the map-maker, or features that should not
@@ -1087,6 +1093,54 @@ running \makemap:
 % smurf
 % makemap in=^input.lis out=mapname config=^config.lis pixsize=3
 \end{verbatim}
+
+\subsection{Speeding up map-making by re-using previously cleaned data}
+
+If you want to compare configurations by making several maps from a
+single observation, each using a different configuration for the
+iterative stages, you can save considerable time by using pre-cleaned
+data each time you run \makemap.
+
+\emph{Note, this is only appropriate if the differences between the
+various configurations affect only the iterative stage of the map-making
+process. If any changes affect the cleaning stage, then it is clearly
+inappropriate to re-use the cleaned data from a previous run.}
+
+There are two possible ways to generate the pre-cleaned data:
+
+\begin{enumerate}
+
+\item Use the \SMURF\ \clean\ task. You can run \clean\ in exactly the
+same way you would run \makemap\ but instead of creating a map, it
+creates a set of files containing cleaned and concatenated time-series
+data that can then be supplied as input to \makemap. Any parameters in
+the configuration file that do not relate to cleaning are ignored by
+\clean\, so you can conveniently use the same file that you would supply
+when running \makemap. The ADAM parameter \aparam{OUT}, which specifies
+the names of the output data files, can conveniently be set to
+``\texttt{*\_cln}'', in which case the output files names will be copies
+of the input file names with the addition of ``\texttt{\_cln}'' to the
+end. There will usually be fewer output files than input files because
+the data from multiple input files will be concatenated together into a
+single file. However, data for different wavebands (450 or 850 $\mu$m)
+will always be stored in separate files.
+
+\item Alternatively, you can ask \makemap\ to generate the cleaned data.
+To do this, you should add \cparam{exportclean=1} to the \makemap\ configuration
+file. In addition to the output map, \makemap\ will then also create one or
+more files in the current directory with the suffix ``\texttt{...\_cln.sdf}''
+containing the cleaned and concatenated time-series data - the earlier part of
+these file-names will be derived from the names of the input raw data
+files. \emph{Note, remember to remove \cparam{exportclean=1} from your
+configuration before running \makemap\ again.}
+
+\end{enumerate}
+
+Then for your subsequent runs of \makemap\, you specify the cleaned data
+generated by one of the above two methods as the input, using ADAM
+parameter \aparam{IN}. In addition, you must add \cparam{doclean=0} to
+the configuration, which prevents \makemap\ from attempting to clean the
+already cleaned input data.
 
 \section{Acknowledgments}
 
@@ -2630,7 +2684,7 @@ traced out by the secondary mirror is known, the inverse of the matrix
 can be pre-calculated (a time-consuming task) for a given output grid
 and applied to data at the time of observation (quick).
 
-It is {\em strongly} recommended that users become familiar with the
+It is \emph{strongly} recommended that users become familiar with the
 details of DREAM \cite{dream} before using weights other than the
 default for science data processing.
 
