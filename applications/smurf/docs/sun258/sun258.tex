@@ -1736,7 +1736,6 @@ SCUBA-2 simulator.
 \fi
 
 \section{\xlabel{ap_full}Full Specifications of all \SMURF\ Commands\label{ap:full}}
-%\CutAt{sstrefsection,section}
 
 These pages describe all the \SMURF\ commands in detail. Default
 values for parameters are quoted in square brackets. Empty brackets
@@ -1745,7 +1744,10 @@ time. Parameters for which an array should be supplied (or are
 returned) are shown with parentheses after the parameter name. A
 number within those parentheses indicates the size of the array.
 
+\sstminitoc{ADAM commands}
 \input{../../libsmurf/smurfmon}
+
+
 \clearpage
 
 \section{Python Scripts}
@@ -1770,12 +1772,14 @@ value using an equal sign (\emph{e.g.} \verb+retain=yes+ rather than
 command with the \verb+--help+ option on the command line.
 \end{itemize}
 
+\sstminitoc{Python Scripts}
 \input{../../scripts/scripts}
 \clearpage
 
 \section{Other Scripts}
 
 %% These are currently generated manually
+\sstminitoc{\ }
 
 \sstroutine{
   ACSIS\_INDEX
@@ -2406,8 +2410,10 @@ dimmconfig.lis, or equivalent, configuration file. Other configuration
 files may over-ride this default.
 \end{itemize}
 
+\sstminitoc{\SMURF\ Configuration Parameters}
+\sstnomaintoc
 \input{../../defaults/params}
-
+\sstmaintoc
 
 
 \section{\xlabel{dsworkflow}DREAM/STARE data reduction workflow\label{se:dsworkflow}}
