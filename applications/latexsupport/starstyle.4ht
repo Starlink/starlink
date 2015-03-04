@@ -33,7 +33,11 @@
   \typeout{... typesetting html across multiple pages...}
   \CutAt{appendix}
   \Configure{+CutAt}{appendix}{[}{]}
-  \TocAt{appendix, section, subsection, sstrefsection}
+  \ifwithchapters
+    \TocAt{appendix, chapter,section,subsection,sstrefsection}
+  \else
+    \TocAt{appendix, section,subsection,sstrefsection}
+  \fi
   \CutAt{sstrefsection,sstrefsection}
   \Configure{+CutAt}{sstrefsection}{[}{]}
 \else
