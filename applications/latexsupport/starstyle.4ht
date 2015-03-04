@@ -347,10 +347,10 @@
 white-space:nowrap;
 overflow:hidden;
 text-overflow: ellipsis;
-display:block;
-float:left;
+display:inline-block;
 width:95\%;
 padding-left:1em;
+line-height:100\%;
 }}
 \Css{.subsubsectionToc{padding-left:3em;font-size:100\%}}
 \Css{.chapterHead,.appendixHead{line-height:150\%}}
