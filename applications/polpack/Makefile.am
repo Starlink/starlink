@@ -108,7 +108,12 @@ edit = sed \
 
 @PREDIST@polka.htx_tar: polka.tex
 @PREDIST@	star2html -splitlevel 3 polka.tex
-
+@PREDIST@	test -d polka.htx
+@PREDIST@	if test -f polka.htx_tar.extras; then \
+@PREDIST@	   for f in `cat polka.htx_tar.extras`; do \
+@PREDIST@	      test -f "$f" && cp "$f" polka.htx || true; \
+@PREDIST@	   done; else :; fi
+@PREDIST@	tar cf polka.htx_tar polka.htx
 
 
 # Polka needs to be installed as other .htx_tar files but into starhelp
