@@ -1940,7 +1940,7 @@ for a group expression, then the following steps occur:
 \begin{itemize}
 \item   Each element in some existing group of objects (identified in
      the description of the parameter concerned) is substituted
-     in turn for the verb+"*"+ character.
+     in turn for the \verb+"*"+ character.
 \item  Any occurrences of the string \texttt{"\_ds"} is replaced by the string
      \texttt{"\_im"}.
 \item  The string \texttt{"b"} is added to the end of the string.
@@ -5368,7 +5368,7 @@ co-ordinate Frames also have associated descriptive information such as
 axis labels, axis units, a Frame title, \emph{etc.} These are called the
 \emph{attributes} of the Frame, and the most commonly used are listed
 briefly below (full descriptions of these attributes are included
-\slhyperref{later}{in Section~}{}{se:frmatt}.
+\slhyperref{later}{in Appendix~}{}{ap:frmatt}.
 
 \begin{aligndesc}
 \item[\att{Digits}]: Number of digits of precision
@@ -5562,6 +5562,10 @@ any suitable system, but always stored internally in units of radians).
 \item [SPECTRUM] --- Reserved to represent position within an
 electro-magnetic spectrum (various spectral systems and units are
 supported).
+\item [TIME] --- Reserved to represent moments in time (various
+time-scales and units are supported).
+\item [DSBSPECTRUM] --- Reserved to represent position within an
+dual-sideband electro-magnetic spectrum.
 \item [GRAPHICS] --- Reserved to represent positions on a graphics device
 in units of millimetres, measured from the bottom-left corner
 of the device.
@@ -5661,11 +5665,11 @@ case a two-dimensional Frame is always created.
 
 The nature of the current Frame can also be changed using
 \htmlref{WCSATTRIB}{WCSATTRIB}, which allows new values to be assigned
-to specified \htmlref{Frame attributes}{se:frmatt}.  For instance,
+to specified \htmlref{Frame attributes}{ap:frmatt}.  For instance,
 assigning a new value to the \texttt{System} attribute will change the
 co-ordinate system used to describe positions within the domain
 covered by the Frame.  The main attributes relevant to Frames are
-described \slhyperref{here}{in Section~}{}{se:frmatt}.
+described \slhyperref{here}{in Appendix~}{}{ap:frmatt}.
 
 \subsection{Propagation of WCS Information}
 
@@ -5883,7 +5887,7 @@ example:
 
 These commands set new values for named attributes within the current
 Frame of NDF \texttt{fred}.  These attributes are described
-\slhyperref{here}{in Section~}{}{se:frmatt}.  The inclusion of \texttt{"remap=no"}
+\slhyperref{here}{in Appendix~}{}{ap:frmatt}.  The inclusion of \texttt{"remap=no"}
 is important: it tells the command to change the Frame attribute
 \emph{ without} changing the \xref{Mappings}{sun210}{Mapping}~ between
 Frames accordingly.  If the default value of \texttt{"remap=yes"} were
@@ -5921,18 +5925,7 @@ erroneously, thought to be a frequency value).  So here you would do:
 \end{terminalv}
 
 
-\subsection{\xlabel{se_frmatt}Frame Attributes\label{se:frmatt}}
-
-Each co-ordinate Frame has several \emph{attributes} that determine
-its properties.  This section lists the most important of these.  See
-\xref{SUN/210}{sun210}{} for a complete description of the properties of
-\xref{Frames}{sun210}{Frame}~ and their attributes.  The application
-\htmlref{WCSATTRIB}{WCSATTRIB}
-can be used to examine attribute values associated with the current Frame
-of an NDF, and change the values of those that are not read-only.
-
-
-\subsubsection{Specifying Attributes for sub-Frames within Compound Frames}
+\subsection{Specifying Attributes for sub-Frames within Compound Frames}
 
 Let's say you have a spectral cube in which the WCS axes are wavelength,
 RA and Dec.  In this case, the current co-ordinate Frame will actually be
@@ -5998,1435 +5991,6 @@ attribute of the sky Frame, we could say:
     % wcsattrib fred set "Equinox(2)" "J2003.5"
 \end{terminalv}
 
-
-\sstattribute{
-   Digits/Digits(axis)
-}{
-   Number of digits of precision
-}{
-   \sstdescription{
-      This attribute specifies how many digits of precision are
-      required by default when a co-ordinate value is formatted for a
-      \xref{Frame}{sun210}{Frame}~ axis (\emph{e.g.} when producing annotated
-      plot axes).  Its value may be set either
-      for a Frame as a whole, or (by subscripting the attribute name
-      with the number of an axis) for each axis individually.  Any
-      value set for an individual axis will override the value for
-      the Frame as a whole.
-
-      Note that the Digits value acts only as a means of determining a
-      default value for the \htmlattref{Format}{Format(axis)}~ attribute.  Its
-      effects are overridden if a Format string is set explicitly for an
-      axis.
-
-      The default Digits value for a Frame is \texttt{7}.  If a value fewer
-      than 1 is supplied, then \texttt{1} is used instead.
-
-      If the Frame is actually a \xref{SkyFrame}{sun210}{SkyFrame}~
-      (\emph{e.g.}~ describes celestial longitude and latitude), then the {\att
-      Digits} value specifies the total number of digits in the formatted
-      axis value---that is, the sum of the hours (or degrees), minutes
-      and seconds digits.
-
-   }
-   \sstattributetype{
-      Integer.
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         wcsattrib m51 set digits 4
-      }{
-         This sets the Digits attribute to the value 4 for all axes in
-         the current Frame of the NDF \texttt{m51}.  This results in axis
-         values being formatted with four digits of precision when they are
-         displayed by any application, so long as no value has been set
-         for the \att{Format} attribute.
-      }
-      \sstexamplesubsection{
-         wcsattrib m51 set digits(1) 4
-      }{
-         This is like the previous example, except that the \att{Digits} value
-         is only set for the first axis in the current Frame of the NDF.
-      }
-   }
-}
-
-\sstattribute{
-   Domain
-}{
-   Co-ordinate system domain
-}{
-   \sstdescription{
-      This attribute contains a string that identifies the physical
-      domain of the co-ordinate system that a
-      \xref{Frame}{sun210}{Frame}~ describes.
-
-      The \att{Domain} attribute also controls how Frames align with each other.
-      If the \att{Domain} value in a Frame is set, then only Frames with the
-      same \att{Domain} value can be aligned with it.
-
-      Some Frames are given standard \att{Domain} values when they are created
-      (\emph{e.g.} GRID, FRACTION, PIXEL, AXIS, SKY, SPECTRUM, CURPIC, NDC,
-      BASEPIC, GRAPHICS).
-      Frames created by the user (for instance, using \htmlref{WCSADD}{WCSADD})
-      can have any \att{Domain} value, but the standard \att{Domain} names should be
-      avoided unless the standard meanings are appropriate for the Frame
-      being created.
-
-   }
-   \sstattributetype{
-      String.
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         wcsattrib m51 set domain oldpixel
-      }{
-         If the current co-ordinate Frame in the NDF \texttt{m51} is the
-         PIXEL Frame, then this command takes a `snap-shot' of the PIXEL
-         Frame and stores it as a new Frame with Domain OLDPIXEL in the WCS
-         component.  Subsequent changes to the PIXEL Frame (for instance,
-         produced by applications that rotate, or move the contents of
-         the NDF) will not effect the OLDPIXEL Frame, which will thus
-         provide a `frozen' record of the original PIXEL Frame.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         All \att{Domain} values are converted to uppercase and white space
-         is removed before use.
-      }
-   }
-}
-
-\sstattribute{
-   DSBCentre
-}{
-   The central position of interest in a dual sideband spectrum
-   (DSBSpecFrames only)
-}{
-   \sstdescription{
-      This attribute specifies the central position of interest in a
-      \xref{dual sideband spectrum}{sun210}{DSBSpecFrame}. Its sole use
-      is to determine the local oscillator frequency (the frequency which
-      marks the boundary between the lower and upper sidebands). See the
-      description of the IF (intermediate frequency) attribute for
-      details of how the local oscillator frequency is calculated. The
-      sideband containing this central position is referred to as the
-      \texttt{{"}}observed\texttt{{"}} sideband, and the other sideband as the
-      \texttt{{"}}image\texttt{{"}} sideband.
-
-      The value is accessed as a position in the spectral system
-      specified by the System attribute, but is stored internally as
-      topocentric frequency. Thus, if the System attribute of the
-      DSBSpecFrame is set to \texttt{{"}}VRAD\texttt{{"}}, the Unit attribute
-      set to \texttt{{"}}m/s\texttt{{"}} and the StdOfRest attribute set to
-      \texttt{{"}}LSRK\texttt{{"}}, then values for the DSBCentre attribute
-      should be supplied as radio velocity in units of
-      \texttt{{"}}m/s\texttt{{"}} relative to the kinematic LSR (alternative
-      units may be used by appending a suitable units string to the end
-      of the value). This value is then converted to topocentric
-      frequency and stored. If (say) the Unit attribute is subsequently
-      changed to \texttt{{"}}km/s\texttt{{"}} before retrieving the current value
-      of the DSBCentre attribute, the stored topocentric frequency will
-      be converted back to LSRK radio velocity, this time in units of
-      \texttt{{"}}km/s\texttt{{"}}, before being returned.
-
-      The default value for this attribute is 30 GHz.
-   }
-   \sstattributetype{
-      Floating point.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The attributes which define the transformation to or from topocentric
-         frequency should be assigned their correct values before accessing
-         this attribute. These potentially include System, Unit, StdOfRest,
-         ObsLon, ObsLat, ObsAlt, Epoch, RefRA, RefDec and RestFreq.
-      }
-   }
-}
-\sstattribute{
-   Epoch
-}{
-   Epoch of observation
-}{
-   \sstdescription{
-      This attribute is used to qualify the co-ordinate system described by
-      a \xref{Frame}{sun210}{Frame}, by giving the moment in time when the
-      co-ordinates are known
-      to be correct.  Often, this will be the date of observation.
-
-      The \att{Epoch} value is important in cases where the co-ordinate
-      system changes with time.  For instance, when considering celestial
-      co-ordinate systems, possible reasons for change include:
-      (i) changing aberration of light caused by the observer's
-      velocity (\emph{e.g.} due to the Earth's motion around the Sun), (ii)
-      changing gravitational deflection by the Sun due to changes in
-      the observer's position with time, (iii) fictitious motion due
-      to rotation of non-inertial co-ordinate systems (\emph{e.g.} the
-      old FK4 system), and (iv) proper motion of the source itself
-      (although this last effect is not handled by the
-      \xref{SkyFrame}{sun210}{SkyFrame}~ class because it affects
-      individual sources rather than the co-ordinate system as a
-      whole).
-
-      The \att{Epoch} attribute is stored as a Modified Julian Date, and is not
-      usually changed.
-   }
-   \sstattributetype{
-      Floating point.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         Care must be taken to distinguish the Epoch value, which
-         relates to motion (or apparent motion) of the source, from the
-         superficially similar \htmlattref{Equinox}{Equinox}~ value.  The
-         latter is used to qualify a co-ordinate system which is
-         itself in motion in a (notionally) predictable way as a
-         result of being referred to a slowly moving reference plane
-         (\emph{e.g.} the equator).
-
-         \sstitem
-         See the description of the \htmlattref{System}{System}~ attribute
-         for details of which qualifying attributes apply to each celestial
-         co-ordinate system.
-      }
-   }
-   \label{epoch:input}
-   \sstdiytopic{
-      Input Formats
-   }{
-      The formats accepted when setting an \att{Epoch}~ value are listed
-      below.  They are all case-insensitive and are generally tolerant
-      of extra white space and alternative field delimiters.
-
-      \sstitemlist{
-
-         \sstitem
-         Besselian Epoch: Expressed in decimal years, with or without
-         decimal places (\texttt{"B1950"} or \texttt{"B1976.13"} for example).
-
-         \sstitem
-         Julian Epoch: Expressed in decimal years, with or without
-         decimal places (\texttt{"J2000"} or \texttt{"J2100.9"} for example).
-
-         \sstitem
-         Year: Decimal years, with or without decimal places (\texttt{"1996.8"}
-         for example).  Such values are interpreted as a Besselian epoch
-         (see above) if less than 1984.0 and as a Julian epoch otherwise.
-
-         \sstitem
-         Julian Date: With or without decimal places (\texttt{"JD 2454321.9"} for
-         example).
-
-         \sstitem
-         Modified Julian Date: With or without decimal places
-         (\texttt{"MJD 54321.4"} for example).
-
-         \sstitem
-         Gregorian Calendar Date: With the month expressed either as an
-         integer or a 3-character abbreviation, and with optional decimal
-         places to represent a fraction of a day (\texttt{"1996-10-2"} or
-         \texttt{"1996-Oct-2.6"} for example).  If no fractional part of a day is
-         given, the time refers to the start of the day (zero hours).
-
-         \sstitem
-         Gregorian Date and Time: Any calendar date (as above) but with
-         a fraction of a day expressed as hours, minutes and seconds
-         (\texttt{"1996-Oct-2 12:13:56.985"} for example).
-      }
-   }
-   \sstdiytopic{
-      Output Format
-   }{
-
-      When enquiring \att{Epoch} values, the format used is the
-      ``Year'' format described under \htmlref{``Input
-      Formats''}{epoch:input}.  This is a value in decimal years, which
-      will be a Besselian epoch if less than 1984.0, and a Julian epoch
-      otherwise.
-   }
-}
-\sstattribute{
-   Equinox
-}{
-   Epoch of the mean equinox (SkyFrames only)
-}{
-   \sstdescription{
-      This attribute is used to qualify those celestial co-ordinate
-      systems described by a \xref{SkyFrame}{sun210}{SkyFrame}~ that are
-      notionally based on
-      the ecliptic (the plane of the Earth's orbit around the Sun)
-      and/or the Earth's equator.
-
-      Both of these planes are in motion and their positions are
-      difficult to specify precisely.  In practice, therefore, a model
-      ecliptic and/or equator are used instead.  These, together with
-      the point on the sky that defines the co-ordinate origin (the
-      intersection of the two planes termed the `mean equinox') move
-      with time according to some models that remove the more-rapid
-      fluctuations.  The SkyFrame class supports both the old FK4 and
-      the current FK5 models.
-
-      The position of a fixed source expressed in any of these
-      co-ordinate systems will appear to change with time due to
-      movement of the co-ordinate system itself (rather than motion of
-      the source).  Such co-ordinate systems must therefore be
-      qualified by a moment in time (the `epoch of the mean equinox'
-      or `equinox' for short) which allows the position of the model
-      co-ordinate system on the sky to be determined.  This is the r\^{o}le
-      of the \att{Equinox} attribute.
-
-      The \att{Equinox} attribute is stored as a Modified Julian Date, but
-      when setting or getting its value you may use the same formats
-      as for the \htmlattref{Epoch}{Epoch}~ attribute (q.v.).
-
-   }
-   \sstattributetype{
-      Floating point.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         Care must be taken to distinguish the \att{Equinox} value, which
-         relates to the definition of a time-dependent co-ordinate system
-         (based on solar-system reference planes which are in motion),
-         from the superficially similar \att{Epoch} value.
-         The latter is used to qualify co-ordinate systems where the
-         positions of sources change with time (or appear to do so)
-         for a variety of other reasons, such as aberration of light
-         caused by the observer's motion, \emph{etc.}
-
-         \sstitem
-         See the description of the \htmlattref{System}{System}~ attribute
-         for details of which qualifying attributes apply to each celestial
-         co-ordinate system.
-      }
-   }
-}
-
-\sstattribute{
-   Format(axis)
-}{
-   Format specification for axis values
-}{
-   \sstdescription{
-      This attribute specifies the format to be used when displaying
-      co-ordinate values associated with a particular
-      \xref{Frame}{sun210}{Frame}~ axis
-      (\emph{i.e.} to convert values from binary to character form).
-
-      If no \att{Format} value is set for a Frame axis, a default value is
-      supplied instead.  This is based on the value of the
-      \htmlattref{Digits}{Digits/Digits(axis)}, or
-      \att{Digits(axis)} attribute and is chosen so that it displays the
-      requested number of digits of precision.
-
-      The interpretation of this string depends on whether or not the
-      Frame is a \xref{SkyFrame}{sun210}{SkyFrame}.  If it is not, the
-      string is interpreted as a format-specification string to be
-      passed to the C ``\texttt{printf}'' function (\emph{e.g.} \texttt{
-      "\%1.7G"}) in order to format a single co-ordinate value
-      (supplied as a double-precision number).
-
-      For SkyFrames, the syntax and default value of the \att{Format} string is
-      re-defined to allow the formatting of sexagesimal values as appropriate
-      for the particular celestial co-ordinate system being represented.  The
-      syntax of SkyFrame Format strings is described (below) in the
-      \htmlref{``SkyFrame Formats''}{SkyFrameFormats}~ section.
-
-   }
-   \sstattributetype{
-      String.
-   }
-   \label{SkyFrameFormats}
-   \sstdiytopic{
-      SkyFrame Formats
-   }{
-      The Format string supplied for a
-      \xref{SkyFrame}{sun210}{SkyFrame}~ should contain zero or more
-      of the following characters.  These may occur in any order, but
-      the following is recommended for clarity.
-
-      \sstitemlist{
-
-         \sstitem
-         \texttt{"$+$"}: Indicates that a plus sign should be prefixed to positive
-         values.  By default, no plus sign is used.
-
-         \sstitem
-         \texttt{"z"}: Indicates that leading zeros should be prefixed to the
-         value so that the first field is of constant width, as would be
-         required in a fixed-width table (leading zeros are always
-         prefixed to any fields that follow).  By default, no leading
-         zeros are added.
-
-         \sstitem
-         \texttt{"i"}: Use the standard ISO field separator (a colon) between
-         fields.  This is the default behaviour.
-
-         \sstitem
-         \texttt{"b"}: Use a blank to separate fields.
-
-         \sstitem
-         \texttt{"l"}: Use a letter (\texttt{"h"}/\texttt{"d"}, \texttt{"m"} or \texttt{"s"}
-         as appropriate) to separate fields.
-
-         \sstitem
-         \texttt{"g"}: This is the same as \texttt{"l"}, except that the
-         separator characters are displayed as small superscripts when drawn
-         on a graphical device.
-
-         \sstitem
-         \texttt{"d"}: Include a degrees field.  Expressing the angle purely in
-         degrees is also the default if none of \texttt{"h"}, \texttt{"m"},
-         \texttt{"s"} or \texttt{"t"} are given.
-
-         \sstitem
-         \texttt{"h"}: Express the angle as a time and include an hours field
-         (where 24 hours correspond to 360 degrees).  Expressing the angle
-         purely in hours is also the default if \texttt{"t"} is given without
-         either \texttt{"m"} or \texttt{"s"}.
-
-         \sstitem
-         \texttt{"m"}: Include a minutes field.  By default this is not included.
-
-         \sstitem
-         \texttt{"s"}: Include a seconds field.  By default this is not included.
-         This request is ignored if \texttt{"d"} or \texttt{"h"} is given, unless a minutes
-         field is also included.
-
-         \sstitem
-         \texttt{"t"}: Express the angle as a time (where 24 hours correspond to
-         360 degrees).  This option is ignored if either \texttt{"d"} or \texttt{"h"} is
-         given and is intended for use where the value is to be expressed
-         purely in minutes and/or seconds of time (with no hours field).  If
-         \texttt{"t"} is given without \texttt{"d"}, \texttt{"h"}, \texttt{"m"} or \texttt{"s"} being
-         present, then it is equivalent to \texttt{"h"}.
-
-         \sstitem
-         \texttt{"."}: Indicates that decimal places are to be given for the
-         final field in the formatted string (whichever field this
-         is).  The \texttt{"."} should be followed immediately by an unsigned
-         integer which gives the number of decimal places required.  By
-         default, no decimal places are given.
-
-      }
-      All of the above format specifiers are case-insensitive.  If
-      several characters make conflicting requests (\emph{e.g.} if both \texttt{"i"}
-      and \texttt{"b"} appear), then the character occurring last takes
-      precedence, except that \texttt{"d"} and \texttt{"h"} always override \texttt{"t"}.
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         wcsattrib my\_data set format(1) \%10.5G
-      }{
-         This sets the \att{Format} attribute for Axis 1 in the current
-         co-ordinate Frame in the NDF called \texttt{my\_data}, so that axis values
-         are formatted as floating-point values using a minimum field
-         width of ten characters, and displaying five significant figures.  An
-         exponent is used if necessary.
-      }
-      \sstexamplesubsection{
-         wcsattrib ngc5128 set format(2) bdms.2
-      }{
-         This sets the \att{Format} attribute for Axis 2 in the current
-         co-ordinate Frame in the NDF called \texttt{ngc5128}, so that axis
-         values are formatted as separate degrees, minutes and seconds field,
-         separated by blanks.  The seconds field has two decimal places.
-         This assumes the current co-ordinate Frame in the NDF is a
-         celestial co-ordinate Frame (\emph{i.e.} a SkyFrame).
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         When specifying this attribute by name, it should be
-         subscripted with the number of the Frame axis to which it
-         applies.
-      }
-   }
-}
-
-\sstattribute{
-   IF
-}{
-   The intermediate frequency in a dual sideband spectrum (DSBSpecFrames only)
-}{
-   \sstdescription{
-      This attribute specifies the (topocentric) intermediate frequency
-      in a \xref{dual sideband spectrum}{sun210}{DSBSpecFrame}. Its sole
-      use is to determine the local oscillator (LO) frequency (the
-      frequency which marks the boundary between the lower and upper
-      sidebands). The LO frequency is equal to the sum of the centre
-      frequency and the intermediate frequency. Here, the \texttt{{"}}centre
-      frequency\texttt{{"}} is the topocentric frequency in Hz corresponding
-      to the current value of the DSBCentre attribute. The value of the
-      IF attribute may be positive or negative: a positive value results
-      in the LO frequency being above the central frequency, whilst a
-      negative IF value results in the LO frequency being below the
-      central frequency. The sign of the IF attribute value determines
-      the default value for the SideBand attribute.
-
-      When setting a new value for this attribute, the units in which the
-      frequency value is supplied may be indicated by appending a
-      suitable string to the end of the formatted value. If the units are
-      not specified, then the supplied value is assumed to be in units of
-      GHz. For instance, the following strings all result in an IF of 4
-      GHz being used: \texttt{{"}}4.0\texttt{{"}}, \texttt{{"}}4.0 GHz\texttt{{"}},
-      \texttt{{"}}4.0E9 Hz\texttt{{"}}, \emph{etc.}
-
-      When getting the value of this attribute, the returned value is
-      always in units of GHz. The default value for this attribute is 4 GHz.
-   }
-   \sstattributetype{
-      Floating point.
-   }
-}
-
-\sstattribute{
-   ImagFreq
-}{
-   The image sideband equivalent of the rest frequency (DSBSpecFrames only)
-}{
-   \sstdescription{
-      This is a read-only attribute of a \xref{dual sideband
-      spectrum}{sun210}{DSBSpecFrame} that gives the frequency
-      corresponding to the rest frequency, but in the opposite sideband.
-
-      The value is calculated by first transforming the rest frequency
-      (given by the RestFreq attribute) from the standard of rest of the
-      source (given by the SourceVel and SourceVRF attributes) to the
-      standard of rest of the observer (i.e. the topocentric standard of
-      rest). The resulting topocentric frequency is assumed to be in the
-      same sideband as the value given for the DSBCentre attribute (the
-      \texttt{{"}}observed\texttt{{"}} sideband), and is transformed to the other
-      sideband (the \texttt{{"}}image\texttt{{"}} sideband). The new frequency is
-      converted back to the standard of rest of the source, and the
-      resulting value is returned as the attribute value, in units of
-      GHz.
-   }
-   \sstattributetype{
-      Floating point, read-only.
-   }
-}
-
-\sstattribute{
-   Label(axis)
-}{
-   Axis label
-}{
-   \sstdescription{
-      This attribute specifies a label to be attached to each axis of
-      a Frame when it is represented (\emph{e.g.}) in graphical output.
-
-      If a \att{Label} value has not been set for a Frame axis, then a
-      suitable default is supplied, depending on whether or not the
-      Frame is a \xref{SkyFrame}{sun210}{SkyFrame}.
-
-      The default for simple Frames is the string \texttt{"Axis <\texttt{{n}}>"}, where
-      \texttt{<$\texttt{{n}}$>} is \texttt{1}, \texttt{2}, \emph{etc.} for each successive axis.
-
-      The default labels for specialised Frames (SkyFrames,
-      \xref{SpecFrames}{sun210}{SpecFrame}, \emph{etc.}) depend on the
-      particular co-ordinate system represented by the Frame
-      (\emph{e.g.} \texttt{"Right ascension"}, \texttt{"Galactic latitude"},
-      \texttt{"Frequency"}, \texttt{"Wavelength in air"}, \emph{etc.}).
-
-   }
-   \sstattributetype{
-      String.
-   }
-
-   \sstexamples{
-      \sstexamplesubsection{
-         wcsattrib my\_data set label(2) "IRAS data (marked in white)"
-      }{
-         This sets the \att{Label} for Axis 2 in the current Frame in the NDF
-         called \texttt{my\_data}, to the string \texttt{"IRAS data (marked in white)"}.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         Axis labels are intended purely for interpretation by human
-         readers and not by software.
-
-         \sstitem
-         When specifying this attribute by name, it should be
-         subscripted with the number of the Frame axis to which it
-         applies.
-      }
-   }
-}
-
-\sstattribute{
-   LTOffset
-}{
-   The offset from UTC to Local Time, in hours (TimeFrames only)
-}{
-   \sstdescription{
-      This specifies the offset from UTC to Local Time, in hours, for a
-      \xref{TimeFrame}{sun210}{TimeFrame}. Fractional hours can be
-      supplied. It is positive for time zones east of Greenwich. AST uses
-      the figure as given, without making any attempt to correct for
-      daylight saving. The default value is zero.
-   }
-   \sstattributetype{
-      Floating point.
-   }
-}
-
-\sstattribute{
-   Naxes
-}{
-   Number of Frame axes
-}{
-   \sstdescription{
-      This is a read-only attribute giving the number of axes in a
-      Frame (\emph{i.e.} the number of dimensions of the
-      co-ordinate space that the Frame describes).  This value is determined
-      when the Frame is created.
-   }
-   \sstattributetype{
-      Integer, read-only.
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         wcsattrib my\_data get naxes
-      }{
-         This displays the number of axes in the current Frame of the NDF
-         called \texttt{my\_data}.
-      }
-   }
-}
-
-\clearpage
-\sstattribute{
-   ObsLat
-}{
-   The geodetic latitude of the observer (SpecFrames only)
-}{
-   \sstdescription{
-      This attribute specifies the geodetic latitude of the observer, in
-      degrees.  Together with the \htmlattref{ObsLon}{ObsLon},
-      \htmlattref{Epoch}{Epoch}, \htmlattref{RefRA}{RefRA}, and
-      \htmlattref{RefDec}{RefDec}~ attributes, it defines the Doppler
-      shift introduced by the observers diurnal motion around the
-      Earth's axis, which is needed when converting
-      \xref{SpecFrames}{sun210}{SpecFrame}~ to or from the topocentric
-      standard of rest.  The maximum velocity error, which can be
-      caused by an incorrect value, is 0.5~km/s.  The default value for
-      the attribute is zero.
-
-      The value is stored internally in radians, but is converted to
-      and from a degrees string for access.  Some example input
-      formats are: \texttt{"22:19:23.2"}, \texttt{"22 19 23.2"}, \texttt{
-        "22:19.387"}, \texttt{"22.32311"}, \texttt{"N22.32311"},
-      \texttt{"-45.6"}, \texttt{"S45.6"}.  As indicated, the sign of the
-      latitude can optionally be indicated using characters \texttt{"N"}
-      and \texttt{"S"} in place of the usual \texttt{"$+$"} and \texttt{"-"}.
-      When converting the stored value to a string, the format
-      \texttt{{"}}[s]dd:mm:ss.s\texttt{{"}} is used, when \texttt{"[s]"} is \texttt{
-        "N"} or \texttt{"S"}.
-   }
-   \sstattributetype{
-      String.
-   }
-}
-
-\sstattribute{
-   ObsLon
-}{
-   The geodetic longitude of the observer (\xref{SpecFrames}{sun210}{SpecFrame} only)
-}{
-   \sstdescription{
-      This attribute specifies the geodetic (or equivalently,
-      geocentric) longitude of the observer, in degrees, measured
-      positive eastwards.  See also attribute
-      \htmlattref{ObsLat}{ObsLat}.  The default value is zero.
-
-      The value is stored internally in radians, but is converted to
-      and from a degrees string for access.  Some example input
-      formats are: \texttt{"155:19:23.2"}, \texttt{"155 19 23.2"}, \texttt{
-      "155:19.387"}, \texttt{"155.32311"}, \texttt{"E155.32311"}, \texttt{
-      "-204.67689"}, \texttt{"W204.67689"}.  As indicated, the sign of
-      the longitude can optionally be indicated using characters \texttt{
-      "E"} and \texttt{"W"} in place of the usual \texttt{"$+$"} and
-      \texttt{"-"}.  When converting the stored value to a string, the
-      format \texttt{{"}}[s]ddd:mm:ss.s\texttt{{"}} is used, when \texttt{"[s]"}
-      is \texttt{"E"} or \texttt{"W"} and the numerical value is chosen to
-      be less than 180 degrees.
-   }
-   \sstattributetype{
-      String.
-   }
-}
-
-\sstattribute{
-   RefDec
-}{
-    The declination of the reference point (\htmlref{SpecFrames}{system:SpecFrame}~ only)
-}{
-   \sstdescription{
-      This attribute specifies the FK5 J2000.0 declination of a reference
-      point on the sky.  See the description of attribute
-      \htmlattref{RefRA}{RefRA}~ for details.
-      This attribute has a default value of zero.
-   }
-   \sstattributetype{
-      String.
-   }
-}
-
-
-\sstattribute{
-   RefRA
-}{
-   The right ascension of the reference point (\htmlref{SpecFrames}{system:SpecFrame}~ only)
-}{
-   \sstdescription{
-      This attribute, together with the \htmlattref{RefDec}{RefDec}~ attribute, specifies the FK5
-      J2000.0 co-ordinates of a reference point on the sky.  For one-dimensional
-      spectra, this should normally be the position of the source.  For
-      spectral data with spatial coverage (spectral cubes, \emph{etc.}), this should
-      be close to centre of the spatial coverage.  It is used to define the
-      correction for Doppler shift to be applied when converting between
-      different standards of rest.
-
-      The \att{RefRA} and \att{RefDec} attributes are stored internally in radians,
-      but are converted to and from a string for access.  The format
-      \texttt{{"}}hh:mm:ss.ss\texttt{{"}} is used for \att{RefRA}, and
-      \texttt{{"}}dd:mm:ss.s\texttt{{"}} is used for \att{RefDec}.
-
-      \att{RefRA} has a default value of zero.
-   }
-   \sstattributetype{
-      String.
-   }
-}
-\sstattribute{
-   RestFreq
-}{
-   The rest frequency (\htmlref{SpecFrames}{system:SpecFrame}~ only)
-}{
-   \sstdescription{
-     This attribute specifies the frequency corresponding to zero
-     velocity.  It is used when converting between between
-     velocity-based spectral co-ordinate systems and and other
-     co-ordinate systems (such as frequency, wavelength, energy,
-     \emph{etc.}).  The default value is 1.0E5 GHz.
-
-     When setting a new value for this attribute, the new value can be
-     supplied either directly as a frequency, or indirectly as a
-     wavelength or energy, in which case the supplied value is
-     converted to a frequency before being stored.  The nature of the
-     supplied value is indicated by appending text to the end of the
-     numerical value indicating the units in which the value is
-     supplied.  If the units are not specified, then the supplied
-     value is assumed to be a frequency in units of GHz.  If the
-     supplied unit is a unit of frequency, the supplied value is
-     assumed to be a frequency in the given units.  If the supplied
-     unit is a unit of length, the supplied value is assumed to be a
-     (vacuum) wavelength.  If the supplied unit is a unit of energy,
-     the supplied value is assumed to be an energy.  For instance, the
-     following strings all result in a rest frequency of around 1.4E14
-     Hz being used: \texttt{"1.4E5"}, \texttt{"1.4E14 Hz"}, \texttt{"1.4E14
-       s$*$$*$-1"}, \texttt{"1.4E5 GHz"}, \texttt{"2.14E-6 m"}, \texttt{"21400
-       Angstrom"}, \texttt{"9.28E-20 J"}, \texttt{"9.28E-13 erg"}, \texttt{
-       "0.58 eV"}, etc.
-
-      When getting the value of this attribute, the returned value is
-      always a frequency in units of GHz.
-   }
-   \sstattributetype{
-      Floating point.
-   }
-}
-\sstattribute{
-   SideBand
-}{
-   Indicates which sideband a dual sideband spectrum represents (DSBSpecFrames only)
-}{
-   \sstdescription{
-      This attribute indicates whether a \xref{dual sideband
-      spectrum}{sun210}{DSBSpecFrame} currently represents its lower or
-      upper sideband, or an offset from the local oscillator frequency.
-      When querying the current value, the returned string is always one
-      of \texttt{{"}}usb\texttt{{"}} (for upper sideband), \texttt{{"}}lsb\texttt{{"}}
-      (for lower sideband), or \texttt{{"}}lo\texttt{{"}} (for offset from the
-      local oscillator frequency). When setting a new value, any of the
-      strings \texttt{{"}}lsb\texttt{{"}}, \texttt{{"}}usb\texttt{{"}},
-      \texttt{{"}}observed\texttt{{"}}, \texttt{{"}}image\texttt{{"}} or
-      \texttt{{"}}lo\texttt{{"}} may be supplied (case insensitive). The
-      \texttt{{"}}observed\texttt{{"}} sideband is which ever sideband (upper or
-      lower) contains the central spectral position given by attribute
-      DSBCentre, and the \texttt{{"}}image\texttt{{"}} sideband is the other
-      sideband. It is the sign of the IF attribute which determines if
-      the observed sideband is the upper or lower sideband. The default
-      value for SideBand is the observed sideband.
-   }
-   \sstattributetype{
-      String.
-   }
-}
-\sstattribute{
-   SourceVel
-}{
-   The source velocity (\htmlref{SpecFrames}{system:SpecFrame}~ only)
-}{
-   \sstdescription{
-
-      This attribute (together with \htmlattref{SourceVRF}{SourceVRF},
-      \htmlattref{RefRA}{RefRA}, and \htmlattref{RefDec}{RefDec})
-      defines the `Source' standard of rest (see attribute
-      \htmlattref{StdOfRest}{StdOfRest}).  This is a rest frame that
-      is moving towards the position given by \att{RefRA} and {\att
-      RefDec} at a velocity given by SourceVel (in km/s).  When
-      setting a value for \htmlattref{SourceVel}{SourceVel}~ using
-      \htmlref{WCSATTRIB}{WCSATTRIB}, the velocity should be supplied
-      in the rest frame specified by the \att{SourceVRF} attribute.
-      Likewise, when getting the value of \att{SourceVel}, it will be
-      returned in the rest frame specified by the \att{SourceVRF}
-      attribute.
-
-      The default value is zero.
-
-   }
-   \sstattributetype{
-      Floating point.
-   }
-}
-
-\pagebreak
-\sstattribute{
-   SourceVRF
-}{
-   Rest frame in which the source velocity is stored (\htmlref{SpecFrames}{system:SpecFrame}~ only)
-}{
-   \sstdescription{
-      This attribute identifies the rest frame in which the source
-      velocity is stored (the source velocity is accessed using attribute
-      \htmlattref{SourceVel}{SourceVel}).  When setting a new value for the
-      SourceVel attribute, the source velocity should be supplied in the
-      rest frame indicated by this attribute.  Likewise, when getting the
-      value of the \att{SourceVel} attribute, the velocity will be returned in
-      this rest frame.
-
-      If the value of \att{SourceVRF} is changed, the value stored for
-      \att{SourceVel} will be converted from the old to the new rest frame.
-
-      The values that can be supplied are the same as for the
-      \htmlattref{StdOfRest}{StdOfRest}~ attribute (except that {\att
-      SourceVRF} cannot be set to \texttt{"Source"}).  The default value
-      is \texttt{"Helio"}.
-   }
-   \sstattributetype{
-      String.
-   }
-}
-
-\sstattribute{
-   StdOfRest
-}{
-   Standard of rest (SpecFrames only)
-}{
-   \sstdescription{
-      This attribute identifies the standard of rest to which the spectral
-      axis values of a \htmlref{SpecFrame}{system:SpecFrame}~ refer, and may take any of the values
-      listed in the \htmlref{``Standards of Rest''}{stdofrest:StdOfRest}~ section (below).
-
-      The default \att{StdOfRest} value is \texttt{"Helio"}.
-   }
-   \sstattributetype{
-      String.
-   }
-   \label{stdofrest:StdOfRest}
-   \sstdiytopic{
-      Standards of Rest
-   }{
-      The \xref{SpecFrame}{sun210}{SpecFrame}~ class supports the following
-      \att{StdOfRest} values (all are case-insensitive).
-
-      \sstitemlist{
-
-         \sstitem
-         \texttt{"Topocentric"}, \texttt{"Topocent"} or \texttt{"Topo"}: The observers rest-frame (assumed
-         to be on the surface of the earth).  Spectra recorded in this standard of
-         rest suffer a Doppler shift which varies over the course of a day
-         because of the rotation of the observer around the axis of the earth.
-         This standard of rest must be qualified using the \htmlattref{ObsLat}{ObsLat},
-         \htmlattref{ObsLon}{ObsLon}, \htmlattref{Epoch}{Epoch},
-         \htmlattref{RefRA}{RefRA}, and \htmlattref{RefDec}{RefDec}~ attributes.
-
-         \sstitem
-         \texttt{"Geocentric"}, \texttt{"Geocentr"} or \texttt{"Geo"}: The rest-frame of the earth centre.
-         Spectra recorded in this standard of rest suffer a Doppler shift which
-         varies over the course of a year because of the rotation of the earth
-         around the Sun.  This standard of rest must be qualified using the
-         \att{Epoch}, \att{RefRA}, and \att{RefDec} attributes.
-
-         \sstitem
-         \texttt{"Barycentric"}, \texttt{"Barycent"} or \texttt{"Bary"}: The rest-frame of the solar-system
-         barycentre.  Spectra recorded in this standard of rest suffer a Doppler
-         shift which depends both on the velocity of the Sun through the Local
-         Standard of Rest, and on the movement of the planets through the solar
-         system.  This standard of rest must be qualified using the
-         \att{Epoch}, \att{RefRA}, and \att{RefDec} attributes.
-
-         \sstitem
-         \texttt{"Heliocentric"}, \texttt{"Heliocen"} or \texttt{"Helio"}: The rest-frame of the Sun.
-         Spectra recorded in this standard of rest suffer a Doppler shift which
-         depends on the velocity of the Sun through the Local Standard of Rest.
-         This standard of rest must be qualified using the \att{RefRA} and
-         \att{RefDec} attributes.
-
-         \sstitem
-         \texttt{"LSR"}, \texttt{"LSRK"}: The rest-frame of the kinematical Local Standard of
-         Rest.  Spectra recorded in this standard of rest suffer a Doppler shift
-         which depends on the velocity of the kinematical Local Standard of Rest
-         through the galaxy.  This standard of rest must be qualified using the
-         \att{RefRA} and \att{RefDec} attributes.
-
-         \sstitem
-         \texttt{"LSRD"}: The rest-frame of the dynamical Local Standard of Rest.  Spectra
-         recorded in this standard of rest suffer a Doppler shift which depends
-         on the velocity of the dynamical Local Standard of Rest through the
-         galaxy.   This standard of rest must be qualified using the
-         \att{RefRA} and \att{RefDec} attributes.
-
-         \sstitem
-         \texttt{"Galactic"}, \texttt{"Galactoc"} or \texttt{"Gal"}: The rest-frame of the galactic centre.
-         Spectra recorded in this standard of rest suffer a Doppler shift which
-         depends on the velocity of the galactic centre through the local group.
-         This standard of rest must be qualified using the \att{RefRA} and
-         \att{RefDec} attributes.
-
-         \sstitem
-         \texttt{"Local\_group"}, \texttt{"Localgrp"} or \texttt{"LG"}: The rest-frame of the local group.
-         This standard of rest must be qualified using the \att{RefRA} and
-         \att{RefDec} attributes.
-
-         \sstitem
-         \texttt{"Source"}, or \texttt{"src"}: The rest-frame of the source.  This standard of
-         rest must be qualified using the \att{RefRA}, \att{RefDec}, and
-         \htmlattref{SourceVel}{SourceVel}~ attributes.
-
-      }
-      Where more than one alternative \htmlattref{System}{System}~ value is shown above, the
-      first of these will be returned when an enquiry is made.
-   }
-}
-\sstattribute{
-   Symbol(axis)
-}{
-   Axis symbol
-}{
-   \sstdescription{
-      This attribute specifies a short-form symbol to be used to
-      represent co-ordinate values for a particular axis of a
-      Frame.  This might be used (\emph{e.g.}) in algebraic
-      expressions where
-      a full description of the axis would be inappropriate.  Examples
-      include \texttt{"RA"} and \texttt{"Dec"} (for right ascension and declination).
-
-      If a \att{Symbol} value has not been set for a Frame axis, then a
-      suitable default is supplied.
-
-      The default \att{Symbol} value supplied for simple Frames is the
-      string ``$<$\texttt{Domain}$>$$<$\texttt{{n}}$>$'', where
-      $<$\texttt{{n}}$>$ is \texttt{1}, \texttt{2}, \emph{etc.} for successive
-      axes, and $<$Domain$>$ is the value of the Frame's \htmlattref{Domain}{Domain}~
-      attribute (truncated if necessary so that the final string
-      does not exceed 15 characters).  If no \att{Domain} value has been
-      set, \texttt{"x"} is used as the $<$Domain$>$ value in constructing
-      this default string.
-
-      Specialised Frames (\xref{SkyFrame}{sun210}{SkyFrame},
-      \xref{SpecFrame}{sun210}{SpecFrame},\emph{etc.}) re-define the
-      default \att{Symbol} value to be appropriate for
-      the particular co-ordinate system being represented.
-
-   }
-   \sstattributetype{
-      String.
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         wcsattrib my\_data set symbol(2)  AR
-      }{
-         This sets the \att{Symbol} for Axis 2 in the current Frame in the NDF
-         called \texttt{my\_data}, to the string \texttt{"AR"}.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         When specifying this attribute by name, it should be
-         subscripted with the number of the Frame axis to which it
-         applies.
-      }
-   }
-}
-\sstattribute{
-   System
-}{
-   Co-ordinate system used to describe positions within the domain
-}{
-   \sstdescription{
-      In general it is possible for positions within a given physical
-      domain to be described using one of several different co-ordinate
-      systems.  For instance, the \xref{SkyFrame}{sun210}{SkyFrame}~ class can
-      use galactic co-ordinates, equatorial co-ordinates \emph{etc.} to describe
-      positions on the sky.  As another example, the
-      \xref{SpecFrame}{sun210}{SpecFrame}~ class can use frequency, wavelength,
-      velocity \emph{etc.} to describe a position within an electromagnetic
-      spectrum.  The \att{System} attribute identifies the particular co-ordinate
-      system represented by a \xref{Frame}{sun210}{Frame}.  Each class of Frame
-      defines a set of acceptable values for this attribute, as listed
-      below (all are case insensitive).  Where more than one alternative
-      \att{System}~ value is shown, the first of will be returned when an
-      enquiry is made.
-   }
-   \sstattributetype{
-      String.
-   }
-   \sstapplicability{
-      \sstsubsection{
-         Frame
-      }{
-         The \att{System} attribute for a basic Frame always equals \texttt{"Cartesian"},
-         and may not be altered.
-      }
-      \label{system:SkyFrame}
-      \sstsubsection{
-         SkyFrame
-      }{
-         The \xref{SkyFrame class}{sun210}{SkyFrame}~ supports the following
-         \att{System} values and associated celestial co-ordinate systems.
-
-         \ssthitemlist{
-
-            \sstitem
-            \texttt{"FK4"}: The old FK4 (barycentric) equatorial
-            co-ordinate system, which should be qualified by an
-            \htmlattref{Equinox}{Equinox}~ value.  The underlying
-            model on which this is based is non-inertial and rotates slowly
-            with time, so for accurate work FK4 co-ordinate systems should
-            also be qualified by an \htmlattref{Epoch}{Epoch}~ value.
-
-            \sstitem
-            \texttt{"FK4-NO-E"} or \texttt{"FK4\_NO\_E"}: The old FK4 (barycentric) equatorial
-            system but without the \emph{E-terms of aberration} (\emph{e.g.} some radio
-            catalogues).  This co-ordinate system should also be qualified by
-            both an \att{Equinox} and an \att{Epoch} value.
-
-            \sstitem
-            \texttt{"FK5"} or \texttt{"EQUATORIAL"}: The modern FK5 (barycentric) equatorial
-            co-ordinate system.  This should be qualified by an
-            \htmlattref{Equinox}{Equinox}~ value.
-
-            \sstitem
-            \texttt{"GAPPT"}, \texttt{"GEOCENTRIC"} or \texttt{"APPARENT"}: The geocentric apparent
-            equatorial co-ordinate system, which gives the apparent positions
-            of sources relative to the true plane of the Earth's equator and
-            the equinox (the co-ordinate origin) at a time specified by the
-            qualifying \att{Epoch} value.  (Note that no \att{Equinox} is needed to
-            qualify this co-ordinate system because no model `mean equinox'
-            is involved.)  These co-ordinates give the apparent right
-            ascension and declination of a source for a specified date of
-            observation, and therefore form an approximate basis for
-            pointing a telescope.  Note, however, that they are applicable to
-            a fictitious observer at the Earth's centre, and therefore
-            ignore such effects as atmospheric refraction and the (normally
-            much smaller) aberration of light due to the rotational velocity
-            of the Earth's surface.   Geocentric apparent co-ordinates are
-            derived from the standard FK5 (J2000.0) barycentric co-ordinates
-            by taking account of the gravitational deflection of light by
-            the Sun (usually small), the aberration of light caused by the
-            motion of the Earth's centre with respect to the barycentre
-            (larger), and the precession and nutation of the Earth's spin
-            axis (normally larger still).
-
-            \sstitem
-            \texttt{"ECLIPTIC"}: Ecliptic co-ordinates (IAU 1980), referred to the
-            ecliptic and mean equinox specified by the qualifying \att{Equinox}
-            value.
-
-            \sstitem
-            \texttt{"GALACTIC"}: Galactic co-ordinates (IAU 1958).
-
-            \sstitem
-            \texttt{"SUPERGALACTIC"}: De Vaucouleurs Supergalactic co-ordinates.
-
-            \sstitem
-            \texttt{"UNKNOWN"}: Any other general spherical co-ordinate system.  No
-            \xref{Mapping}{sun210}{Mapping}~ can be created between a pair of
-            SkyFrames if either of the SkyFrames has System set to \texttt{"Unknown"}.
-
-         }
-         Currently, the default System value is \texttt{"FK5"}.
-      }
-      \label{system:SpecFrame}
-      \sstsubsection{
-         SpecFrame
-      }{
-         The \xref{SpecFrame}{sun210}{SpecFrame}~ \xref{DSBSpecFrame}{sun210}{DSBSpecFrame}~
-         classes supports the following \att{System} values and associated spectral co-ordinate
-         systems (the default is \texttt{"WAVE"} --- wavelength):
-
-         \ssthitemlist{
-
-            \sstitem
-            \texttt{"FREQ"}: Frequency (Hz)
-
-            \sstitem
-            \texttt{"ENER"} or \texttt{"ENERGY"}: Energy (J)
-
-            \sstitem
-            \texttt{"WAVN"} or \texttt{"WAVENUM"}: Wave-number (1/m)
-
-            \sstitem
-            \texttt{"WAVE"} or \texttt{"WAVELEN"}: Vacuum wave-length (m)
-
-            \sstitem
-            \texttt{"AWAV"} or \texttt{"AIRWAVE"}: Wave-length in air (m)
-
-            \sstitem
-            \texttt{"VRAD"} or \texttt{"VRADIO"}: Radio velocity (m/s)
-
-            \sstitem
-            \texttt{"VOPT"} or \texttt{"VOPTICAL"}: Optical velocity (m/s)
-
-            \sstitem
-            \texttt{"ZOPT"} or \texttt{"REDSHIFT"}: Redshift (dimensionless)
-
-            \sstitem
-            \texttt{"BETA"}: Beta factor (dimensionless)
-
-            \sstitem
-            \texttt{"VELO"} or \texttt{"VREL"}: Relativistic velocity (m/s)
-
-         }
-         The default value for the \htmlattref{Unit}{Unit(axis)}~ attribute
-         for each system is shown in parentheses.  Note, changes to
-         the Unit attribute for a SpecFrame will result in the Mapping
-         from pixel to spectral co-ordinates being modified in order
-         to reflect the change in units.
-      }
-
-      \label{system:TimeFrame}
-      \sstsubsection{
-         TimeFrame
-      }{
-         The TimeFrame class supports the following System values and
-         associated coordinate systems (the default is \texttt{{"}}MJD\texttt{{"}}):
-
-         \sstitemlist{
-
-            \sstitem
-            \texttt{{"}}MJD\texttt{{"}}: Modified Julian Date (d)
-
-            \sstitem
-            \texttt{{"}}JD\texttt{{"}}: Julian Date (d)
-
-            \sstitem
-            \texttt{{"}}JEPOCH\texttt{{"}}: Julian epoch (yr)
-
-            \sstitem
-            \texttt{{"}}BEPOCH\texttt{{"}}: Besselian (yr)
-
-         }
-
-         The default value for the Unit attribute for each system is
-	 shown in parentheses. Strictly, these systems should not allow
-	 changes to be made to the units. For instance, the usual
-	 definition of \texttt{{"}}MJD\texttt{{"}} and \texttt{{"}}JD\texttt{{"}} include
-	 the statement that the values will be in units of days. However,
-	 AST does allow the use of other units with all the above
-	 supported systems (except BEPOCH), on the understanding that
-	 conversion to the \texttt{{"}}correct\texttt{{"}} units involves nothing
-	 more than a simple scaling (1 yr = 365.25 d, 1 d = 24 h, 1 h =
-	 60 min, 1 min = 60 s). Besselian epoch values are defined in
-	 terms of tropical years of 365.2422 days, rather than the usual
-	 Julian year of 365.25 days. Therefore, to avoid any confusion,
-	 the Unit attribute is automatically cleared to
-	 \texttt{{"}}yr\texttt{{"}} when a System value of BEPOCH System is
-	 selected, and an error is reported if any attempt is
-	 subsequently made to change the Unit attribute.
-      }
-   }
-}
-\sstattribute{
-   TimeOrigin
-}{
-   The zero point for TimeFrame axis values (TimeFrames only)
-}{
-   \sstdescription{
-      This specifies the origin from which all time values are measured
-      within a \xref{TimeFrame}{sun210}{TimeFrame}.
-      The default value (zero) results in the TimeFrame describing
-      absolute time values in the system given by the System attribute
-      (e.g. MJD, Julian epoch, etc). If a TimeFrame is to be used to
-      describe elapsed time since some origin, the TimeOrigin attribute
-      should be set to hold the required origin value. The TimeOrigin value
-      stored inside the TimeFrame structure is modified whenever TimeFrame
-      attribute values are changed so that it refers to the original moment
-      in time.
-   }
-   \sstattributetype{
-      Floating point.
-   }
-   \sstdiytopic{
-      Input Formats
-   }{
-      The formats accepted when setting a TimeOrigin value are listed
-      below. They are all case-insensitive and are generally tolerant
-      of extra white space and alternative field delimiters:
-
-      \sstitemlist{
-
-         \sstitem
-         Besselian Epoch: Expressed in decimal years, with or without
-         decimal places (\texttt{{"}}B1950\texttt{{"}} or \texttt{{"}}B1976.13\texttt{{"}} for example).
-
-         \sstitem
-         Julian Epoch: Expressed in decimal years, with or without
-         decimal places (\texttt{{"}}J2000\texttt{{"}} or \texttt{{"}}J2100.9\texttt{{"}} for example).
-
-         \sstitem
-         Units: An unqualified decimal value is interpreted as a value in
-         the system specified by the TimeFrame's System attribute, in the
-         units given by the TimeFrame's Unit attribute. Alternatively, an
-         appropriate unit string can be appended to the end of the floating
-         point value (\texttt{{"}}123.4 d\texttt{{"}} for example), in which case the supplied value
-         is scaled into the units specified by the Unit attribute.
-
-         \sstitem
-         Julian Date: With or without decimal places (\texttt{{"}}JD 2454321.9\texttt{{"}} for
-         example).
-
-         \sstitem
-         Modified Julian Date: With or without decimal places
-         (\texttt{{"}}MJD 54321.4\texttt{{"}} for example).
-
-         \sstitem
-         Gregorian Calendar Date: With the month expressed either as an
-         integer or a 3-character abbreviation, and with optional decimal
-         places to represent a fraction of a day (\texttt{{"}}1996-10-2\texttt{{"}} or
-         \texttt{{"}}1996-Oct-2.6\texttt{{"}} for example). If no fractional part of a day is
-         given, the time refers to the start of the day (zero hours).
-
-         \sstitem
-         Gregorian Date and Time: Any calendar date (as above) but with
-         a fraction of a day expressed as hours, minutes and seconds
-         (\texttt{{"}}1996-Oct-2 12:13:56.985\texttt{{"}} for example). The date and time can be
-         separated by a space or by a \texttt{{"}}T\texttt{{"}} (as used by ISO8601 format).
-      }
-   }
-   \sstdiytopic{
-      Output Format
-   }{
-      When enquiring TimeOrigin values, the returned formatted floating
-      point value represents a value in the TimeFrame's System, in the unit
-      specified by the TimeFrame's Unit attribute.
-   }
-}
-\sstattribute{
-   TimeScale
-}{
-   Time scale (TimeFrames only)
-}{
-   \sstdescription{
-      This attribute identifies the time scale to which the time axis
-      values of a \xref{TimeFrame}{sun210}{TimeFrame} refer, and may take
-      any of the values listed in the \texttt{{"}}Time Scales\texttt{{"}} section
-      (below).
-
-      The default TimeScale value depends on the current System value; if
-      the current TimeFrame system is \texttt{{"}}Besselian epoch\texttt{{"}} the
-      default is \texttt{{"}}TT\texttt{{"}}, otherwise it is \texttt{{"}}TAI\texttt{{"}}.
-      Note, if the System attribute is set so that the TimeFrame
-      represents Besselian Epoch, then an error will be reported if an
-      attempt is made to set the TimeScale to anything other than TT.
-
-      Note, the supported time scales fall into two groups. The first
-      group containing UT1, GMST, LAST and LMST define time in terms of
-      the orientation of the earth. The second group (containing all the
-      remaining time scales) define time in terms of an atomic process.
-      Since the rate of rotation of the earth varies in an unpredictable
-      way, conversion between two timescales in different groups relies
-      on a value being supplied for the Dut1 attribute. This attribute
-      specifies the difference between the UT1 and UTC time scales, in
-      seconds, and defaults to zero. See the \ref{documentation for the Dut1
-      attribute}{sun210}{DUT1} in SUN/210 for further details.
-   }
-   \sstattributetype{
-      String.
-   }
-   \sstdiytopic{
-      Time Scales
-   }{
-      The TimeFrame class supports the following TimeScale values (all are
-      case-insensitive):
-
-      \sstitemlist{
-
-         \sstitem
-         \texttt{{"}}TAI\texttt{{"}} - International Atomic Time
-
-         \sstitem
-         \texttt{{"}}UTC\texttt{{"}} - Coordinated Universal Time
-
-         \sstitem
-         \texttt{{"}}UT1\texttt{{"}} - Universal Time
-
-         \sstitem
-         \texttt{{"}}GMST\texttt{{"}} - Greenwich Mean Sidereal Time
-
-         \sstitem
-         \texttt{{"}}LAST\texttt{{"}} - Local Apparent Sidereal Time
-
-         \sstitem
-         \texttt{{"}}LMST\texttt{{"}} - Local Mean Sidereal Time
-
-         \sstitem
-         \texttt{{"}}TT\texttt{{"}} - Terrestrial Time
-
-         \sstitem
-         \texttt{{"}}TDB\texttt{{"}} - Barycentric Dynamical Time
-
-         \sstitem
-         \texttt{{"}}TCB\texttt{{"}} - Barycentric Coordinate Time
-
-         \sstitem
-         \texttt{{"}}TCG\texttt{{"}} - Geocentric Coordinate Time
-
-         \sstitem
-         \texttt{{"}}LT\texttt{{"}} - Local Time (the offset from UTC is given by
-          attribute LTOffset)
-
-      }
-      An very informative description of these and other time scales is
-      available at http://www.ucolick.org/$\sim$sla/leapsecs/timescales.html.
-   }
-   \sstdiytopic{
-      UTC Warnings
-   }{
-      UTC should ideally be expressed using separate hours, minutes and
-      seconds fields (or at least in seconds for a given date) if leap seconds
-      are to be taken into account. Since the TimeFrame class represents
-      each moment in time using a single floating point number (the axis value)
-      there will be an ambiguity during a leap second. Thus an error of up to
-      1 second can result when using AST to convert a UTC time to another
-      time scale if the time occurs within a leap second. Leap seconds
-      occur at most twice a year, and are introduced to take account of
-      variation in the rotation of the earth. The most recent leap second
-      occurred on 1st January 1999. Although in the vast majority of cases
-      leap second ambiguities won't matter, there are potential problems in
-      on-line data acquisition systems and in critical applications involving
-      taking the difference between two times.
-   }
-}
-\sstattribute{
-   Title
-}{
-   Frame title
-}{
-   \sstdescription{
-      This attribute holds a string that is used as a title in (\emph{e.g.})
-      graphical output to describe the co-ordinate system that a
-      Frame represents.  Examples might be \texttt{"Detector Co-ordinates"} or
-      \texttt{"Galactic Co-ordinates"}.
-
-      If a \att{Title} value has not been set for a Frame, then a suitable
-      default is supplied.
-
-      The default supplied by the Frame class is \texttt{"<n>-d co-ordinate
-      system"}, where \texttt{<n>} is the number of Frame axes
-      (\htmlattref{Naxes}{Naxes}~ attribute).
-
-      Specialised Frames (\xref{SkyFrame}{sun210}{SkyFrame},
-      \xref{SpecFrame}{sun210}{SpecFrame}, \emph{etc.}) re-define the
-      default Title value to be appropriate to the particular co-ordinate
-      system being represented.
-   }
-   \sstattributetype{
-      String.
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         wcsattrib my\_data set Title "My own data"
-      }{
-         This sets the \att{Title} for the current Frame in the NDF
-         called \texttt{my\_data}, to the string \texttt{"My own data"}.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         A Frame's \att{Title} is intended purely for interpretation by human
-         readers and not by software.
-      }
-   }
-}
-
-\sstattribute{
-   Unit(axis)
-}{
-   Axis physical units
-}{
-   \sstdescription{
-      This attribute contains a textual representation of the physical
-      units used to represent co-ordinate values on a particular axis
-      of a \xref{Frame}{sun210}{Frame}.
-
-      Specialised Frames (\xref{SkyFrame}{sun210}{SkyFrame},
-      \xref{SpecFrame}{sun210}{SpecFrame}, \emph{etc.}) re-define the
-      default \att{Unit} values to be appropriate to the particular co-ordinate
-      system being represented.
-
-      For most classes, the \att{Unit} attribute is a purely descriptive
-      comment intended for human readers and makes no difference to
-      the operation of the software.  However, there are some classes
-      that have \emph{active} \att{Unit} attributes.  Changing the \att{Unit}
-      attribute for such classes will result in the
-      \xref{Mappings}{sun210}{Mapping}~ within the WCS
-      \xref{FrameSet}{sun210}{FrameSet}~ being modified in order
-      to reflect the change in units.
-      By default, only SpecFrames have an active \att{Unit} attribute.
-
-      In general, the syntax of the \att{Unit} attribute should follow the
-      recommendations made in the FITS standard (see the paper
-      ``Representation of world coordinates in FITS'' by Greisen \&
-      Calabretta (available at
-\htmladdnormallink{\texttt{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}}
-{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}).
-   }
-   \sstattributetype{
-      String.
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         When specifying this attribute by name, it should be
-         subscripted with the number of the Frame axis to which it
-         applies (unless the Frame has only one axis).
-      }
-   }
-}
 
 \newpage
 \section{\xlabel{se_interaction}Interaction Mode\label{se:interaction}}
@@ -48481,7 +47045,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
    Manages attribute values associated with the \htmlref{WCS}{apndf:wcs} component of an NDF
 }{
    \sstdescription{
-      This application can be used to manage the values of \htmlref{attributes}{se:frmatt}
+      This application can be used to manage the values of \htmlref{attributes}{ap:frmatt}
       associated with the current \htmlref{co-ordinate Frame}{se:domains}~  of an \NDFref{NDF} (title, axis
       labels, axis units, \emph{etc.}).
 
@@ -49626,7 +48190,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       attributes of the Objects parent classes can be displayed by
       clicking one of the class button to the top left of the window.
 
-      If the Object contains \htmlref{attributes}{se:frmatt}~ which are
+      If the Object contains \htmlref{attributes}{ap:frmatt}~ which are
       themselves AST Objects (such as the Frames within a
       \htmlref{FrameSet}{se:curframe}), then  new windows can be created
       to examine these attributes by clicking over the attribute name.
@@ -50718,6 +49282,1449 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
 }
 
 \newpage
+\section{\xlabel{ap_frmatt}Descriptions of Frame Attributes\label{ap:frmatt}}
+Each co-ordinate Frame has several \emph{attributes} that determine
+its properties.  This section lists the most important of these.  See
+\xref{SUN/210}{sun210}{} for a complete description of the properties of
+\xref{Frames}{sun210}{Frame}~ and their attributes.  The application
+\htmlref{WCSATTRIB}{WCSATTRIB}
+can be used to examine attribute values associated with the current Frame
+of an NDF, and change the values of those that are not read-only.
+
+\sstminitoc{}
+\sstnomaintoc
+
+\sstattribute{
+   Digits/Digits(axis)
+}{
+   Number of digits of precision
+}{
+   \sstdescription{
+      This attribute specifies how many digits of precision are
+      required by default when a co-ordinate value is formatted for a
+      \xref{Frame}{sun210}{Frame}~ axis (\emph{e.g.} when producing annotated
+      plot axes).  Its value may be set either
+      for a Frame as a whole, or (by subscripting the attribute name
+      with the number of an axis) for each axis individually.  Any
+      value set for an individual axis will override the value for
+      the Frame as a whole.
+
+      Note that the Digits value acts only as a means of determining a
+      default value for the \htmlattref{Format}{Format(axis)}~ attribute.  Its
+      effects are overridden if a Format string is set explicitly for an
+      axis.
+
+      The default Digits value for a Frame is \texttt{7}.  If a value fewer
+      than 1 is supplied, then \texttt{1} is used instead.
+
+      If the Frame is actually a \xref{SkyFrame}{sun210}{SkyFrame}~
+      (\emph{e.g.}~ describes celestial longitude and latitude), then the {\att
+      Digits} value specifies the total number of digits in the formatted
+      axis value---that is, the sum of the hours (or degrees), minutes
+      and seconds digits.
+
+   }
+   \sstattributetype{
+      Integer.
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsattrib m51 set digits 4
+      }{
+         This sets the Digits attribute to the value 4 for all axes in
+         the current Frame of the NDF \texttt{m51}.  This results in axis
+         values being formatted with four digits of precision when they are
+         displayed by any application, so long as no value has been set
+         for the \att{Format} attribute.
+      }
+      \sstexamplesubsection{
+         wcsattrib m51 set digits(1) 4
+      }{
+         This is like the previous example, except that the \att{Digits} value
+         is only set for the first axis in the current Frame of the NDF.
+      }
+   }
+}
+
+\sstattribute{
+   Domain
+}{
+   Co-ordinate system domain
+}{
+   \sstdescription{
+      This attribute contains a string that identifies the physical
+      domain of the co-ordinate system that a
+      \xref{Frame}{sun210}{Frame}~ describes.
+
+      The \att{Domain} attribute also controls how Frames align with each other.
+      If the \att{Domain} value in a Frame is set, then only Frames with the
+      same \att{Domain} value can be aligned with it.
+
+      Some Frames are given standard \att{Domain} values when they are created
+      (\emph{e.g.} GRID, FRACTION, PIXEL, AXIS, SKY, SPECTRUM, CURPIC, NDC,
+      BASEPIC, GRAPHICS).
+      Frames created by the user (for instance, using \htmlref{WCSADD}{WCSADD})
+      can have any \att{Domain} value, but the standard \att{Domain} names should be
+      avoided unless the standard meanings are appropriate for the Frame
+      being created.
+
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsattrib m51 set domain oldpixel
+      }{
+         If the current co-ordinate Frame in the NDF \texttt{m51} is the
+         PIXEL Frame, then this command takes a `snap-shot' of the PIXEL
+         Frame and stores it as a new Frame with Domain OLDPIXEL in the WCS
+         component.  Subsequent changes to the PIXEL Frame (for instance,
+         produced by applications that rotate, or move the contents of
+         the NDF) will not effect the OLDPIXEL Frame, which will thus
+         provide a `frozen' record of the original PIXEL Frame.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         All \att{Domain} values are converted to uppercase and white space
+         is removed before use.
+      }
+   }
+}
+
+\sstattribute{
+   DSBCentre
+}{
+   The central position of interest in a dual sideband spectrum
+   (DSBSpecFrames only)
+}{
+   \sstdescription{
+      This attribute specifies the central position of interest in a
+      \xref{dual sideband spectrum}{sun210}{DSBSpecFrame}. Its sole use
+      is to determine the local oscillator frequency (the frequency which
+      marks the boundary between the lower and upper sidebands). See the
+      description of the IF (intermediate frequency) attribute for
+      details of how the local oscillator frequency is calculated. The
+      sideband containing this central position is referred to as the
+      \texttt{{"}}observed\texttt{{"}} sideband, and the other sideband as the
+      \texttt{{"}}image\texttt{{"}} sideband.
+
+      The value is accessed as a position in the spectral system
+      specified by the System attribute, but is stored internally as
+      topocentric frequency. Thus, if the System attribute of the
+      DSBSpecFrame is set to \texttt{{"}}VRAD\texttt{{"}}, the Unit attribute
+      set to \texttt{{"}}m/s\texttt{{"}} and the StdOfRest attribute set to
+      \texttt{{"}}LSRK\texttt{{"}}, then values for the DSBCentre attribute
+      should be supplied as radio velocity in units of
+      \texttt{{"}}m/s\texttt{{"}} relative to the kinematic LSR (alternative
+      units may be used by appending a suitable units string to the end
+      of the value). This value is then converted to topocentric
+      frequency and stored. If (say) the Unit attribute is subsequently
+      changed to \texttt{{"}}km/s\texttt{{"}} before retrieving the current value
+      of the DSBCentre attribute, the stored topocentric frequency will
+      be converted back to LSRK radio velocity, this time in units of
+      \texttt{{"}}km/s\texttt{{"}}, before being returned.
+
+      The default value for this attribute is 30 GHz.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The attributes which define the transformation to or from topocentric
+         frequency should be assigned their correct values before accessing
+         this attribute. These potentially include System, Unit, StdOfRest,
+         ObsLon, ObsLat, ObsAlt, Epoch, RefRA, RefDec and RestFreq.
+      }
+   }
+}
+\sstattribute{
+   Epoch
+}{
+   Epoch of observation
+}{
+   \sstdescription{
+      This attribute is used to qualify the co-ordinate system described by
+      a \xref{Frame}{sun210}{Frame}, by giving the moment in time when the
+      co-ordinates are known
+      to be correct.  Often, this will be the date of observation.
+
+      The \att{Epoch} value is important in cases where the co-ordinate
+      system changes with time.  For instance, when considering celestial
+      co-ordinate systems, possible reasons for change include:
+      (i) changing aberration of light caused by the observer's
+      velocity (\emph{e.g.} due to the Earth's motion around the Sun), (ii)
+      changing gravitational deflection by the Sun due to changes in
+      the observer's position with time, (iii) fictitious motion due
+      to rotation of non-inertial co-ordinate systems (\emph{e.g.} the
+      old FK4 system), and (iv) proper motion of the source itself
+      (although this last effect is not handled by the
+      \xref{SkyFrame}{sun210}{SkyFrame}~ class because it affects
+      individual sources rather than the co-ordinate system as a
+      whole).
+
+      The \att{Epoch} attribute is stored as a Modified Julian Date, and is not
+      usually changed.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Care must be taken to distinguish the Epoch value, which
+         relates to motion (or apparent motion) of the source, from the
+         superficially similar \htmlattref{Equinox}{Equinox}~ value.  The
+         latter is used to qualify a co-ordinate system which is
+         itself in motion in a (notionally) predictable way as a
+         result of being referred to a slowly moving reference plane
+         (\emph{e.g.} the equator).
+
+         \sstitem
+         See the description of the \htmlattref{System}{System}~ attribute
+         for details of which qualifying attributes apply to each celestial
+         co-ordinate system.
+      }
+   }
+   \label{epoch:input}
+   \sstdiytopic{
+      Input Formats
+   }{
+      The formats accepted when setting an \att{Epoch}~ value are listed
+      below.  They are all case-insensitive and are generally tolerant
+      of extra white space and alternative field delimiters.
+
+      \sstitemlist{
+
+         \sstitem
+         Besselian Epoch: Expressed in decimal years, with or without
+         decimal places (\texttt{"B1950"} or \texttt{"B1976.13"} for example).
+
+         \sstitem
+         Julian Epoch: Expressed in decimal years, with or without
+         decimal places (\texttt{"J2000"} or \texttt{"J2100.9"} for example).
+
+         \sstitem
+         Year: Decimal years, with or without decimal places (\texttt{"1996.8"}
+         for example).  Such values are interpreted as a Besselian epoch
+         (see above) if less than 1984.0 and as a Julian epoch otherwise.
+
+         \sstitem
+         Julian Date: With or without decimal places (\texttt{"JD 2454321.9"} for
+         example).
+
+         \sstitem
+         Modified Julian Date: With or without decimal places
+         (\texttt{"MJD 54321.4"} for example).
+
+         \sstitem
+         Gregorian Calendar Date: With the month expressed either as an
+         integer or a 3-character abbreviation, and with optional decimal
+         places to represent a fraction of a day (\texttt{"1996-10-2"} or
+         \texttt{"1996-Oct-2.6"} for example).  If no fractional part of a day is
+         given, the time refers to the start of the day (zero hours).
+
+         \sstitem
+         Gregorian Date and Time: Any calendar date (as above) but with
+         a fraction of a day expressed as hours, minutes and seconds
+         (\texttt{"1996-Oct-2 12:13:56.985"} for example).
+      }
+   }
+   \sstdiytopic{
+      Output Format
+   }{
+
+      When enquiring \att{Epoch} values, the format used is the
+      ``Year'' format described under \htmlref{``Input
+      Formats''}{epoch:input}.  This is a value in decimal years, which
+      will be a Besselian epoch if less than 1984.0, and a Julian epoch
+      otherwise.
+   }
+}
+\sstattribute{
+   Equinox
+}{
+   Epoch of the mean equinox (SkyFrames only)
+}{
+   \sstdescription{
+      This attribute is used to qualify those celestial co-ordinate
+      systems described by a \xref{SkyFrame}{sun210}{SkyFrame}~ that are
+      notionally based on
+      the ecliptic (the plane of the Earth's orbit around the Sun)
+      and/or the Earth's equator.
+
+      Both of these planes are in motion and their positions are
+      difficult to specify precisely.  In practice, therefore, a model
+      ecliptic and/or equator are used instead.  These, together with
+      the point on the sky that defines the co-ordinate origin (the
+      intersection of the two planes termed the `mean equinox') move
+      with time according to some models that remove the more-rapid
+      fluctuations.  The SkyFrame class supports both the old FK4 and
+      the current FK5 models.
+
+      The position of a fixed source expressed in any of these
+      co-ordinate systems will appear to change with time due to
+      movement of the co-ordinate system itself (rather than motion of
+      the source).  Such co-ordinate systems must therefore be
+      qualified by a moment in time (the `epoch of the mean equinox'
+      or `equinox' for short) which allows the position of the model
+      co-ordinate system on the sky to be determined.  This is the r\^{o}le
+      of the \att{Equinox} attribute.
+
+      The \att{Equinox} attribute is stored as a Modified Julian Date, but
+      when setting or getting its value you may use the same formats
+      as for the \htmlattref{Epoch}{Epoch}~ attribute (q.v.).
+
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Care must be taken to distinguish the \att{Equinox} value, which
+         relates to the definition of a time-dependent co-ordinate system
+         (based on solar-system reference planes which are in motion),
+         from the superficially similar \att{Epoch} value.
+         The latter is used to qualify co-ordinate systems where the
+         positions of sources change with time (or appear to do so)
+         for a variety of other reasons, such as aberration of light
+         caused by the observer's motion, \emph{etc.}
+
+         \sstitem
+         See the description of the \htmlattref{System}{System}~ attribute
+         for details of which qualifying attributes apply to each celestial
+         co-ordinate system.
+      }
+   }
+}
+
+\sstattribute{
+   Format(axis)
+}{
+   Format specification for axis values
+}{
+   \sstdescription{
+      This attribute specifies the format to be used when displaying
+      co-ordinate values associated with a particular
+      \xref{Frame}{sun210}{Frame}~ axis
+      (\emph{i.e.} to convert values from binary to character form).
+
+      If no \att{Format} value is set for a Frame axis, a default value is
+      supplied instead.  This is based on the value of the
+      \htmlattref{Digits}{Digits/Digits(axis)}, or
+      \att{Digits(axis)} attribute and is chosen so that it displays the
+      requested number of digits of precision.
+
+      The interpretation of this string depends on whether or not the
+      Frame is a \xref{SkyFrame}{sun210}{SkyFrame}.  If it is not, the
+      string is interpreted as a format-specification string to be
+      passed to the C ``\texttt{printf}'' function (\emph{e.g.} \texttt{
+      "\%1.7G"}) in order to format a single co-ordinate value
+      (supplied as a double-precision number).
+
+      For SkyFrames, the syntax and default value of the \att{Format} string is
+      re-defined to allow the formatting of sexagesimal values as appropriate
+      for the particular celestial co-ordinate system being represented.  The
+      syntax of SkyFrame Format strings is described (below) in the
+      \htmlref{``SkyFrame Formats''}{SkyFrameFormats}~ section.
+
+   }
+   \sstattributetype{
+      String.
+   }
+   \label{SkyFrameFormats}
+   \sstdiytopic{
+      SkyFrame Formats
+   }{
+      The Format string supplied for a
+      \xref{SkyFrame}{sun210}{SkyFrame}~ should contain zero or more
+      of the following characters.  These may occur in any order, but
+      the following is recommended for clarity.
+
+      \sstitemlist{
+
+         \sstitem
+         \texttt{"$+$"}: Indicates that a plus sign should be prefixed to positive
+         values.  By default, no plus sign is used.
+
+         \sstitem
+         \texttt{"z"}: Indicates that leading zeros should be prefixed to the
+         value so that the first field is of constant width, as would be
+         required in a fixed-width table (leading zeros are always
+         prefixed to any fields that follow).  By default, no leading
+         zeros are added.
+
+         \sstitem
+         \texttt{"i"}: Use the standard ISO field separator (a colon) between
+         fields.  This is the default behaviour.
+
+         \sstitem
+         \texttt{"b"}: Use a blank to separate fields.
+
+         \sstitem
+         \texttt{"l"}: Use a letter (\texttt{"h"}/\texttt{"d"}, \texttt{"m"} or \texttt{"s"}
+         as appropriate) to separate fields.
+
+         \sstitem
+         \texttt{"g"}: This is the same as \texttt{"l"}, except that the
+         separator characters are displayed as small superscripts when drawn
+         on a graphical device.
+
+         \sstitem
+         \texttt{"d"}: Include a degrees field.  Expressing the angle purely in
+         degrees is also the default if none of \texttt{"h"}, \texttt{"m"},
+         \texttt{"s"} or \texttt{"t"} are given.
+
+         \sstitem
+         \texttt{"h"}: Express the angle as a time and include an hours field
+         (where 24 hours correspond to 360 degrees).  Expressing the angle
+         purely in hours is also the default if \texttt{"t"} is given without
+         either \texttt{"m"} or \texttt{"s"}.
+
+         \sstitem
+         \texttt{"m"}: Include a minutes field.  By default this is not included.
+
+         \sstitem
+         \texttt{"s"}: Include a seconds field.  By default this is not included.
+         This request is ignored if \texttt{"d"} or \texttt{"h"} is given, unless a minutes
+         field is also included.
+
+         \sstitem
+         \texttt{"t"}: Express the angle as a time (where 24 hours correspond to
+         360 degrees).  This option is ignored if either \texttt{"d"} or \texttt{"h"} is
+         given and is intended for use where the value is to be expressed
+         purely in minutes and/or seconds of time (with no hours field).  If
+         \texttt{"t"} is given without \texttt{"d"}, \texttt{"h"}, \texttt{"m"} or \texttt{"s"} being
+         present, then it is equivalent to \texttt{"h"}.
+
+         \sstitem
+         \texttt{"."}: Indicates that decimal places are to be given for the
+         final field in the formatted string (whichever field this
+         is).  The \texttt{"."} should be followed immediately by an unsigned
+         integer which gives the number of decimal places required.  By
+         default, no decimal places are given.
+
+      }
+      All of the above format specifiers are case-insensitive.  If
+      several characters make conflicting requests (\emph{e.g.} if both \texttt{"i"}
+      and \texttt{"b"} appear), then the character occurring last takes
+      precedence, except that \texttt{"d"} and \texttt{"h"} always override \texttt{"t"}.
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsattrib my\_data set format(1) \%10.5G
+      }{
+         This sets the \att{Format} attribute for Axis 1 in the current
+         co-ordinate Frame in the NDF called \texttt{my\_data}, so that axis values
+         are formatted as floating-point values using a minimum field
+         width of ten characters, and displaying five significant figures.  An
+         exponent is used if necessary.
+      }
+      \sstexamplesubsection{
+         wcsattrib ngc5128 set format(2) bdms.2
+      }{
+         This sets the \att{Format} attribute for Axis 2 in the current
+         co-ordinate Frame in the NDF called \texttt{ngc5128}, so that axis
+         values are formatted as separate degrees, minutes and seconds field,
+         separated by blanks.  The seconds field has two decimal places.
+         This assumes the current co-ordinate Frame in the NDF is a
+         celestial co-ordinate Frame (\emph{i.e.} a SkyFrame).
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         When specifying this attribute by name, it should be
+         subscripted with the number of the Frame axis to which it
+         applies.
+      }
+   }
+}
+
+\sstattribute{
+   IF
+}{
+   The intermediate frequency in a dual sideband spectrum (DSBSpecFrames only)
+}{
+   \sstdescription{
+      This attribute specifies the (topocentric) intermediate frequency
+      in a \xref{dual sideband spectrum}{sun210}{DSBSpecFrame}. Its sole
+      use is to determine the local oscillator (LO) frequency (the
+      frequency which marks the boundary between the lower and upper
+      sidebands). The LO frequency is equal to the sum of the centre
+      frequency and the intermediate frequency. Here, the \texttt{{"}}centre
+      frequency\texttt{{"}} is the topocentric frequency in Hz corresponding
+      to the current value of the DSBCentre attribute. The value of the
+      IF attribute may be positive or negative: a positive value results
+      in the LO frequency being above the central frequency, whilst a
+      negative IF value results in the LO frequency being below the
+      central frequency. The sign of the IF attribute value determines
+      the default value for the SideBand attribute.
+
+      When setting a new value for this attribute, the units in which the
+      frequency value is supplied may be indicated by appending a
+      suitable string to the end of the formatted value. If the units are
+      not specified, then the supplied value is assumed to be in units of
+      GHz. For instance, the following strings all result in an IF of 4
+      GHz being used: \texttt{{"}}4.0\texttt{{"}}, \texttt{{"}}4.0 GHz\texttt{{"}},
+      \texttt{{"}}4.0E9 Hz\texttt{{"}}, \emph{etc.}
+
+      When getting the value of this attribute, the returned value is
+      always in units of GHz. The default value for this attribute is 4 GHz.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+}
+
+\sstattribute{
+   ImagFreq
+}{
+   The image sideband equivalent of the rest frequency (DSBSpecFrames only)
+}{
+   \sstdescription{
+      This is a read-only attribute of a \xref{dual sideband
+      spectrum}{sun210}{DSBSpecFrame} that gives the frequency
+      corresponding to the rest frequency, but in the opposite sideband.
+
+      The value is calculated by first transforming the rest frequency
+      (given by the RestFreq attribute) from the standard of rest of the
+      source (given by the SourceVel and SourceVRF attributes) to the
+      standard of rest of the observer (i.e. the topocentric standard of
+      rest). The resulting topocentric frequency is assumed to be in the
+      same sideband as the value given for the DSBCentre attribute (the
+      \texttt{{"}}observed\texttt{{"}} sideband), and is transformed to the other
+      sideband (the \texttt{{"}}image\texttt{{"}} sideband). The new frequency is
+      converted back to the standard of rest of the source, and the
+      resulting value is returned as the attribute value, in units of
+      GHz.
+   }
+   \sstattributetype{
+      Floating point, read-only.
+   }
+}
+
+\sstattribute{
+   Label(axis)
+}{
+   Axis label
+}{
+   \sstdescription{
+      This attribute specifies a label to be attached to each axis of
+      a Frame when it is represented (\emph{e.g.}) in graphical output.
+
+      If a \att{Label} value has not been set for a Frame axis, then a
+      suitable default is supplied, depending on whether or not the
+      Frame is a \xref{SkyFrame}{sun210}{SkyFrame}.
+
+      The default for simple Frames is the string \texttt{"Axis <\texttt{{n}}>"}, where
+      \texttt{<$\texttt{{n}}$>} is \texttt{1}, \texttt{2}, \emph{etc.} for each successive axis.
+
+      The default labels for specialised Frames (SkyFrames,
+      \xref{SpecFrames}{sun210}{SpecFrame}, \emph{etc.}) depend on the
+      particular co-ordinate system represented by the Frame
+      (\emph{e.g.} \texttt{"Right ascension"}, \texttt{"Galactic latitude"},
+      \texttt{"Frequency"}, \texttt{"Wavelength in air"}, \emph{etc.}).
+
+   }
+   \sstattributetype{
+      String.
+   }
+
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsattrib my\_data set label(2) "IRAS data (marked in white)"
+      }{
+         This sets the \att{Label} for Axis 2 in the current Frame in the NDF
+         called \texttt{my\_data}, to the string \texttt{"IRAS data (marked in white)"}.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Axis labels are intended purely for interpretation by human
+         readers and not by software.
+
+         \sstitem
+         When specifying this attribute by name, it should be
+         subscripted with the number of the Frame axis to which it
+         applies.
+      }
+   }
+}
+
+\sstattribute{
+   LTOffset
+}{
+   The offset from UTC to Local Time, in hours (TimeFrames only)
+}{
+   \sstdescription{
+      This specifies the offset from UTC to Local Time, in hours, for a
+      \xref{TimeFrame}{sun210}{TimeFrame}. Fractional hours can be
+      supplied. It is positive for time zones east of Greenwich. AST uses
+      the figure as given, without making any attempt to correct for
+      daylight saving. The default value is zero.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+}
+
+\sstattribute{
+   Naxes
+}{
+   Number of Frame axes
+}{
+   \sstdescription{
+      This is a read-only attribute giving the number of axes in a
+      Frame (\emph{i.e.} the number of dimensions of the
+      co-ordinate space that the Frame describes).  This value is determined
+      when the Frame is created.
+   }
+   \sstattributetype{
+      Integer, read-only.
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsattrib my\_data get naxes
+      }{
+         This displays the number of axes in the current Frame of the NDF
+         called \texttt{my\_data}.
+      }
+   }
+}
+
+\clearpage
+\sstattribute{
+   ObsLat
+}{
+   The geodetic latitude of the observer (SpecFrames only)
+}{
+   \sstdescription{
+      This attribute specifies the geodetic latitude of the observer, in
+      degrees.  Together with the \htmlattref{ObsLon}{ObsLon},
+      \htmlattref{Epoch}{Epoch}, \htmlattref{RefRA}{RefRA}, and
+      \htmlattref{RefDec}{RefDec}~ attributes, it defines the Doppler
+      shift introduced by the observers diurnal motion around the
+      Earth's axis, which is needed when converting
+      \xref{SpecFrames}{sun210}{SpecFrame}~ to or from the topocentric
+      standard of rest.  The maximum velocity error, which can be
+      caused by an incorrect value, is 0.5~km/s.  The default value for
+      the attribute is zero.
+
+      The value is stored internally in radians, but is converted to
+      and from a degrees string for access.  Some example input
+      formats are: \texttt{"22:19:23.2"}, \texttt{"22 19 23.2"}, \texttt{
+        "22:19.387"}, \texttt{"22.32311"}, \texttt{"N22.32311"},
+      \texttt{"-45.6"}, \texttt{"S45.6"}.  As indicated, the sign of the
+      latitude can optionally be indicated using characters \texttt{"N"}
+      and \texttt{"S"} in place of the usual \texttt{"$+$"} and \texttt{"-"}.
+      When converting the stored value to a string, the format
+      \texttt{{"}}[s]dd:mm:ss.s\texttt{{"}} is used, when \texttt{"[s]"} is \texttt{
+        "N"} or \texttt{"S"}.
+   }
+   \sstattributetype{
+      String.
+   }
+}
+
+\sstattribute{
+   ObsLon
+}{
+   The geodetic longitude of the observer (\xref{SpecFrames}{sun210}{SpecFrame} only)
+}{
+   \sstdescription{
+      This attribute specifies the geodetic (or equivalently,
+      geocentric) longitude of the observer, in degrees, measured
+      positive eastwards.  See also attribute
+      \htmlattref{ObsLat}{ObsLat}.  The default value is zero.
+
+      The value is stored internally in radians, but is converted to
+      and from a degrees string for access.  Some example input
+      formats are: \texttt{"155:19:23.2"}, \texttt{"155 19 23.2"}, \texttt{
+      "155:19.387"}, \texttt{"155.32311"}, \texttt{"E155.32311"}, \texttt{
+      "-204.67689"}, \texttt{"W204.67689"}.  As indicated, the sign of
+      the longitude can optionally be indicated using characters \texttt{
+      "E"} and \texttt{"W"} in place of the usual \texttt{"$+$"} and
+      \texttt{"-"}.  When converting the stored value to a string, the
+      format \texttt{{"}}[s]ddd:mm:ss.s\texttt{{"}} is used, when \texttt{"[s]"}
+      is \texttt{"E"} or \texttt{"W"} and the numerical value is chosen to
+      be less than 180 degrees.
+   }
+   \sstattributetype{
+      String.
+   }
+}
+
+\sstattribute{
+   RefDec
+}{
+    The declination of the reference point (\htmlref{SpecFrames}{system:SpecFrame}~ only)
+}{
+   \sstdescription{
+      This attribute specifies the FK5 J2000.0 declination of a reference
+      point on the sky.  See the description of attribute
+      \htmlattref{RefRA}{RefRA}~ for details.
+      This attribute has a default value of zero.
+   }
+   \sstattributetype{
+      String.
+   }
+}
+
+
+\sstattribute{
+   RefRA
+}{
+   The right ascension of the reference point (\htmlref{SpecFrames}{system:SpecFrame}~ only)
+}{
+   \sstdescription{
+      This attribute, together with the \htmlattref{RefDec}{RefDec}~ attribute, specifies the FK5
+      J2000.0 co-ordinates of a reference point on the sky.  For one-dimensional
+      spectra, this should normally be the position of the source.  For
+      spectral data with spatial coverage (spectral cubes, \emph{etc.}), this should
+      be close to centre of the spatial coverage.  It is used to define the
+      correction for Doppler shift to be applied when converting between
+      different standards of rest.
+
+      The \att{RefRA} and \att{RefDec} attributes are stored internally in radians,
+      but are converted to and from a string for access.  The format
+      \texttt{{"}}hh:mm:ss.ss\texttt{{"}} is used for \att{RefRA}, and
+      \texttt{{"}}dd:mm:ss.s\texttt{{"}} is used for \att{RefDec}.
+
+      \att{RefRA} has a default value of zero.
+   }
+   \sstattributetype{
+      String.
+   }
+}
+\sstattribute{
+   RestFreq
+}{
+   The rest frequency (\htmlref{SpecFrames}{system:SpecFrame}~ only)
+}{
+   \sstdescription{
+     This attribute specifies the frequency corresponding to zero
+     velocity.  It is used when converting between between
+     velocity-based spectral co-ordinate systems and and other
+     co-ordinate systems (such as frequency, wavelength, energy,
+     \emph{etc.}).  The default value is 1.0E5 GHz.
+
+     When setting a new value for this attribute, the new value can be
+     supplied either directly as a frequency, or indirectly as a
+     wavelength or energy, in which case the supplied value is
+     converted to a frequency before being stored.  The nature of the
+     supplied value is indicated by appending text to the end of the
+     numerical value indicating the units in which the value is
+     supplied.  If the units are not specified, then the supplied
+     value is assumed to be a frequency in units of GHz.  If the
+     supplied unit is a unit of frequency, the supplied value is
+     assumed to be a frequency in the given units.  If the supplied
+     unit is a unit of length, the supplied value is assumed to be a
+     (vacuum) wavelength.  If the supplied unit is a unit of energy,
+     the supplied value is assumed to be an energy.  For instance, the
+     following strings all result in a rest frequency of around 1.4E14
+     Hz being used: \texttt{"1.4E5"}, \texttt{"1.4E14 Hz"}, \texttt{"1.4E14
+       s$*$$*$-1"}, \texttt{"1.4E5 GHz"}, \texttt{"2.14E-6 m"}, \texttt{"21400
+       Angstrom"}, \texttt{"9.28E-20 J"}, \texttt{"9.28E-13 erg"}, \texttt{
+       "0.58 eV"}, etc.
+
+      When getting the value of this attribute, the returned value is
+      always a frequency in units of GHz.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+}
+\sstattribute{
+   SideBand
+}{
+   Indicates which sideband a dual sideband spectrum represents (DSBSpecFrames only)
+}{
+   \sstdescription{
+      This attribute indicates whether a \xref{dual sideband
+      spectrum}{sun210}{DSBSpecFrame} currently represents its lower or
+      upper sideband, or an offset from the local oscillator frequency.
+      When querying the current value, the returned string is always one
+      of \texttt{{"}}usb\texttt{{"}} (for upper sideband), \texttt{{"}}lsb\texttt{{"}}
+      (for lower sideband), or \texttt{{"}}lo\texttt{{"}} (for offset from the
+      local oscillator frequency). When setting a new value, any of the
+      strings \texttt{{"}}lsb\texttt{{"}}, \texttt{{"}}usb\texttt{{"}},
+      \texttt{{"}}observed\texttt{{"}}, \texttt{{"}}image\texttt{{"}} or
+      \texttt{{"}}lo\texttt{{"}} may be supplied (case insensitive). The
+      \texttt{{"}}observed\texttt{{"}} sideband is which ever sideband (upper or
+      lower) contains the central spectral position given by attribute
+      DSBCentre, and the \texttt{{"}}image\texttt{{"}} sideband is the other
+      sideband. It is the sign of the IF attribute which determines if
+      the observed sideband is the upper or lower sideband. The default
+      value for SideBand is the observed sideband.
+   }
+   \sstattributetype{
+      String.
+   }
+}
+\sstattribute{
+   SourceVel
+}{
+   The source velocity (\htmlref{SpecFrames}{system:SpecFrame}~ only)
+}{
+   \sstdescription{
+
+      This attribute (together with \htmlattref{SourceVRF}{SourceVRF},
+      \htmlattref{RefRA}{RefRA}, and \htmlattref{RefDec}{RefDec})
+      defines the `Source' standard of rest (see attribute
+      \htmlattref{StdOfRest}{StdOfRest}).  This is a rest frame that
+      is moving towards the position given by \att{RefRA} and {\att
+      RefDec} at a velocity given by SourceVel (in km/s).  When
+      setting a value for \htmlattref{SourceVel}{SourceVel}~ using
+      \htmlref{WCSATTRIB}{WCSATTRIB}, the velocity should be supplied
+      in the rest frame specified by the \att{SourceVRF} attribute.
+      Likewise, when getting the value of \att{SourceVel}, it will be
+      returned in the rest frame specified by the \att{SourceVRF}
+      attribute.
+
+      The default value is zero.
+
+   }
+   \sstattributetype{
+      Floating point.
+   }
+}
+
+\pagebreak
+\sstattribute{
+   SourceVRF
+}{
+   Rest frame in which the source velocity is stored (\htmlref{SpecFrames}{system:SpecFrame}~ only)
+}{
+   \sstdescription{
+      This attribute identifies the rest frame in which the source
+      velocity is stored (the source velocity is accessed using attribute
+      \htmlattref{SourceVel}{SourceVel}).  When setting a new value for the
+      SourceVel attribute, the source velocity should be supplied in the
+      rest frame indicated by this attribute.  Likewise, when getting the
+      value of the \att{SourceVel} attribute, the velocity will be returned in
+      this rest frame.
+
+      If the value of \att{SourceVRF} is changed, the value stored for
+      \att{SourceVel} will be converted from the old to the new rest frame.
+
+      The values that can be supplied are the same as for the
+      \htmlattref{StdOfRest}{StdOfRest}~ attribute (except that {\att
+      SourceVRF} cannot be set to \texttt{"Source"}).  The default value
+      is \texttt{"Helio"}.
+   }
+   \sstattributetype{
+      String.
+   }
+}
+
+\sstattribute{
+   StdOfRest
+}{
+   Standard of rest (SpecFrames only)
+}{
+   \sstdescription{
+      This attribute identifies the standard of rest to which the spectral
+      axis values of a \htmlref{SpecFrame}{system:SpecFrame}~ refer, and may take any of the values
+      listed in the \htmlref{``Standards of Rest''}{stdofrest:StdOfRest}~ section (below).
+
+      The default \att{StdOfRest} value is \texttt{"Helio"}.
+   }
+   \sstattributetype{
+      String.
+   }
+   \label{stdofrest:StdOfRest}
+   \sstdiytopic{
+      Standards of Rest
+   }{
+      The \xref{SpecFrame}{sun210}{SpecFrame}~ class supports the following
+      \att{StdOfRest} values (all are case-insensitive).
+
+      \sstitemlist{
+
+         \sstitem
+         \texttt{"Topocentric"}, \texttt{"Topocent"} or \texttt{"Topo"}: The observers rest-frame (assumed
+         to be on the surface of the earth).  Spectra recorded in this standard of
+         rest suffer a Doppler shift which varies over the course of a day
+         because of the rotation of the observer around the axis of the earth.
+         This standard of rest must be qualified using the \htmlattref{ObsLat}{ObsLat},
+         \htmlattref{ObsLon}{ObsLon}, \htmlattref{Epoch}{Epoch},
+         \htmlattref{RefRA}{RefRA}, and \htmlattref{RefDec}{RefDec}~ attributes.
+
+         \sstitem
+         \texttt{"Geocentric"}, \texttt{"Geocentr"} or \texttt{"Geo"}: The rest-frame of the earth centre.
+         Spectra recorded in this standard of rest suffer a Doppler shift which
+         varies over the course of a year because of the rotation of the earth
+         around the Sun.  This standard of rest must be qualified using the
+         \att{Epoch}, \att{RefRA}, and \att{RefDec} attributes.
+
+         \sstitem
+         \texttt{"Barycentric"}, \texttt{"Barycent"} or \texttt{"Bary"}: The rest-frame of the solar-system
+         barycentre.  Spectra recorded in this standard of rest suffer a Doppler
+         shift which depends both on the velocity of the Sun through the Local
+         Standard of Rest, and on the movement of the planets through the solar
+         system.  This standard of rest must be qualified using the
+         \att{Epoch}, \att{RefRA}, and \att{RefDec} attributes.
+
+         \sstitem
+         \texttt{"Heliocentric"}, \texttt{"Heliocen"} or \texttt{"Helio"}: The rest-frame of the Sun.
+         Spectra recorded in this standard of rest suffer a Doppler shift which
+         depends on the velocity of the Sun through the Local Standard of Rest.
+         This standard of rest must be qualified using the \att{RefRA} and
+         \att{RefDec} attributes.
+
+         \sstitem
+         \texttt{"LSR"}, \texttt{"LSRK"}: The rest-frame of the kinematical Local Standard of
+         Rest.  Spectra recorded in this standard of rest suffer a Doppler shift
+         which depends on the velocity of the kinematical Local Standard of Rest
+         through the galaxy.  This standard of rest must be qualified using the
+         \att{RefRA} and \att{RefDec} attributes.
+
+         \sstitem
+         \texttt{"LSRD"}: The rest-frame of the dynamical Local Standard of Rest.  Spectra
+         recorded in this standard of rest suffer a Doppler shift which depends
+         on the velocity of the dynamical Local Standard of Rest through the
+         galaxy.   This standard of rest must be qualified using the
+         \att{RefRA} and \att{RefDec} attributes.
+
+         \sstitem
+         \texttt{"Galactic"}, \texttt{"Galactoc"} or \texttt{"Gal"}: The rest-frame of the galactic centre.
+         Spectra recorded in this standard of rest suffer a Doppler shift which
+         depends on the velocity of the galactic centre through the local group.
+         This standard of rest must be qualified using the \att{RefRA} and
+         \att{RefDec} attributes.
+
+         \sstitem
+         \texttt{"Local\_group"}, \texttt{"Localgrp"} or \texttt{"LG"}: The rest-frame of the local group.
+         This standard of rest must be qualified using the \att{RefRA} and
+         \att{RefDec} attributes.
+
+         \sstitem
+         \texttt{"Source"}, or \texttt{"src"}: The rest-frame of the source.  This standard of
+         rest must be qualified using the \att{RefRA}, \att{RefDec}, and
+         \htmlattref{SourceVel}{SourceVel}~ attributes.
+
+      }
+      Where more than one alternative \htmlattref{System}{System}~ value is shown above, the
+      first of these will be returned when an enquiry is made.
+   }
+}
+\sstattribute{
+   Symbol(axis)
+}{
+   Axis symbol
+}{
+   \sstdescription{
+      This attribute specifies a short-form symbol to be used to
+      represent co-ordinate values for a particular axis of a
+      Frame.  This might be used (\emph{e.g.}) in algebraic
+      expressions where
+      a full description of the axis would be inappropriate.  Examples
+      include \texttt{"RA"} and \texttt{"Dec"} (for right ascension and declination).
+
+      If a \att{Symbol} value has not been set for a Frame axis, then a
+      suitable default is supplied.
+
+      The default \att{Symbol} value supplied for simple Frames is the
+      string ``$<$\texttt{Domain}$>$$<$\texttt{{n}}$>$'', where
+      $<$\texttt{{n}}$>$ is \texttt{1}, \texttt{2}, \emph{etc.} for successive
+      axes, and $<$Domain$>$ is the value of the Frame's \htmlattref{Domain}{Domain}~
+      attribute (truncated if necessary so that the final string
+      does not exceed 15 characters).  If no \att{Domain} value has been
+      set, \texttt{"x"} is used as the $<$Domain$>$ value in constructing
+      this default string.
+
+      Specialised Frames (\xref{SkyFrame}{sun210}{SkyFrame},
+      \xref{SpecFrame}{sun210}{SpecFrame},\emph{etc.}) re-define the
+      default \att{Symbol} value to be appropriate for
+      the particular co-ordinate system being represented.
+
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsattrib my\_data set symbol(2)  AR
+      }{
+         This sets the \att{Symbol} for Axis 2 in the current Frame in the NDF
+         called \texttt{my\_data}, to the string \texttt{"AR"}.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         When specifying this attribute by name, it should be
+         subscripted with the number of the Frame axis to which it
+         applies.
+      }
+   }
+}
+\sstattribute{
+   System
+}{
+   Co-ordinate system used to describe positions within the domain
+}{
+   \sstdescription{
+      In general it is possible for positions within a given physical
+      domain to be described using one of several different co-ordinate
+      systems.  For instance, the \xref{SkyFrame}{sun210}{SkyFrame}~ class can
+      use galactic co-ordinates, equatorial co-ordinates \emph{etc.} to describe
+      positions on the sky.  As another example, the
+      \xref{SpecFrame}{sun210}{SpecFrame}~ class can use frequency, wavelength,
+      velocity \emph{etc.} to describe a position within an electromagnetic
+      spectrum.  The \att{System} attribute identifies the particular co-ordinate
+      system represented by a \xref{Frame}{sun210}{Frame}.  Each class of Frame
+      defines a set of acceptable values for this attribute, as listed
+      below (all are case insensitive).  Where more than one alternative
+      \att{System}~ value is shown, the first of will be returned when an
+      enquiry is made.
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
+         The \att{System} attribute for a basic Frame always equals \texttt{"Cartesian"},
+         and may not be altered.
+      }
+      \label{system:SkyFrame}
+      \sstsubsection{
+         SkyFrame
+      }{
+         The \xref{SkyFrame class}{sun210}{SkyFrame}~ supports the following
+         \att{System} values and associated celestial co-ordinate systems.
+
+         \ssthitemlist{
+
+            \sstitem
+            \texttt{"FK4"}: The old FK4 (barycentric) equatorial
+            co-ordinate system, which should be qualified by an
+            \htmlattref{Equinox}{Equinox}~ value.  The underlying
+            model on which this is based is non-inertial and rotates slowly
+            with time, so for accurate work FK4 co-ordinate systems should
+            also be qualified by an \htmlattref{Epoch}{Epoch}~ value.
+
+            \sstitem
+            \texttt{"FK4-NO-E"} or \texttt{"FK4\_NO\_E"}: The old FK4 (barycentric) equatorial
+            system but without the \emph{E-terms of aberration} (\emph{e.g.} some radio
+            catalogues).  This co-ordinate system should also be qualified by
+            both an \att{Equinox} and an \att{Epoch} value.
+
+            \sstitem
+            \texttt{"FK5"} or \texttt{"EQUATORIAL"}: The modern FK5 (barycentric) equatorial
+            co-ordinate system.  This should be qualified by an
+            \htmlattref{Equinox}{Equinox}~ value.
+
+            \sstitem
+            \texttt{"GAPPT"}, \texttt{"GEOCENTRIC"} or \texttt{"APPARENT"}: The geocentric apparent
+            equatorial co-ordinate system, which gives the apparent positions
+            of sources relative to the true plane of the Earth's equator and
+            the equinox (the co-ordinate origin) at a time specified by the
+            qualifying \att{Epoch} value.  (Note that no \att{Equinox} is needed to
+            qualify this co-ordinate system because no model `mean equinox'
+            is involved.)  These co-ordinates give the apparent right
+            ascension and declination of a source for a specified date of
+            observation, and therefore form an approximate basis for
+            pointing a telescope.  Note, however, that they are applicable to
+            a fictitious observer at the Earth's centre, and therefore
+            ignore such effects as atmospheric refraction and the (normally
+            much smaller) aberration of light due to the rotational velocity
+            of the Earth's surface.   Geocentric apparent co-ordinates are
+            derived from the standard FK5 (J2000.0) barycentric co-ordinates
+            by taking account of the gravitational deflection of light by
+            the Sun (usually small), the aberration of light caused by the
+            motion of the Earth's centre with respect to the barycentre
+            (larger), and the precession and nutation of the Earth's spin
+            axis (normally larger still).
+
+            \sstitem
+            \texttt{"ECLIPTIC"}: Ecliptic co-ordinates (IAU 1980), referred to the
+            ecliptic and mean equinox specified by the qualifying \att{Equinox}
+            value.
+
+            \sstitem
+            \texttt{"GALACTIC"}: Galactic co-ordinates (IAU 1958).
+
+            \sstitem
+            \texttt{"SUPERGALACTIC"}: De Vaucouleurs Supergalactic co-ordinates.
+
+            \sstitem
+            \texttt{"UNKNOWN"}: Any other general spherical co-ordinate system.  No
+            \xref{Mapping}{sun210}{Mapping}~ can be created between a pair of
+            SkyFrames if either of the SkyFrames has System set to \texttt{"Unknown"}.
+
+         }
+         Currently, the default System value is \texttt{"FK5"}.
+      }
+      \label{system:SpecFrame}
+      \sstsubsection{
+         SpecFrame
+      }{
+         The \xref{SpecFrame}{sun210}{SpecFrame}~ \xref{DSBSpecFrame}{sun210}{DSBSpecFrame}~
+         classes supports the following \att{System} values and associated spectral co-ordinate
+         systems (the default is \texttt{"WAVE"} --- wavelength):
+
+         \ssthitemlist{
+
+            \sstitem
+            \texttt{"FREQ"}: Frequency (Hz)
+
+            \sstitem
+            \texttt{"ENER"} or \texttt{"ENERGY"}: Energy (J)
+
+            \sstitem
+            \texttt{"WAVN"} or \texttt{"WAVENUM"}: Wave-number (1/m)
+
+            \sstitem
+            \texttt{"WAVE"} or \texttt{"WAVELEN"}: Vacuum wave-length (m)
+
+            \sstitem
+            \texttt{"AWAV"} or \texttt{"AIRWAVE"}: Wave-length in air (m)
+
+            \sstitem
+            \texttt{"VRAD"} or \texttt{"VRADIO"}: Radio velocity (m/s)
+
+            \sstitem
+            \texttt{"VOPT"} or \texttt{"VOPTICAL"}: Optical velocity (m/s)
+
+            \sstitem
+            \texttt{"ZOPT"} or \texttt{"REDSHIFT"}: Redshift (dimensionless)
+
+            \sstitem
+            \texttt{"BETA"}: Beta factor (dimensionless)
+
+            \sstitem
+            \texttt{"VELO"} or \texttt{"VREL"}: Relativistic velocity (m/s)
+
+         }
+         The default value for the \htmlattref{Unit}{Unit(axis)}~ attribute
+         for each system is shown in parentheses.  Note, changes to
+         the Unit attribute for a SpecFrame will result in the Mapping
+         from pixel to spectral co-ordinates being modified in order
+         to reflect the change in units.
+      }
+
+      \label{system:TimeFrame}
+      \sstsubsection{
+         TimeFrame
+      }{
+         The TimeFrame class supports the following System values and
+         associated coordinate systems (the default is \texttt{{"}}MJD\texttt{{"}}):
+
+         \sstitemlist{
+
+            \sstitem
+            \texttt{{"}}MJD\texttt{{"}}: Modified Julian Date (d)
+
+            \sstitem
+            \texttt{{"}}JD\texttt{{"}}: Julian Date (d)
+
+            \sstitem
+            \texttt{{"}}JEPOCH\texttt{{"}}: Julian epoch (yr)
+
+            \sstitem
+            \texttt{{"}}BEPOCH\texttt{{"}}: Besselian (yr)
+
+         }
+
+         The default value for the Unit attribute for each system is
+	 shown in parentheses. Strictly, these systems should not allow
+	 changes to be made to the units. For instance, the usual
+	 definition of \texttt{{"}}MJD\texttt{{"}} and \texttt{{"}}JD\texttt{{"}} include
+	 the statement that the values will be in units of days. However,
+	 AST does allow the use of other units with all the above
+	 supported systems (except BEPOCH), on the understanding that
+	 conversion to the \texttt{{"}}correct\texttt{{"}} units involves nothing
+	 more than a simple scaling (1 yr = 365.25 d, 1 d = 24 h, 1 h =
+	 60 min, 1 min = 60 s). Besselian epoch values are defined in
+	 terms of tropical years of 365.2422 days, rather than the usual
+	 Julian year of 365.25 days. Therefore, to avoid any confusion,
+	 the Unit attribute is automatically cleared to
+	 \texttt{{"}}yr\texttt{{"}} when a System value of BEPOCH System is
+	 selected, and an error is reported if any attempt is
+	 subsequently made to change the Unit attribute.
+      }
+   }
+}
+\sstattribute{
+   TimeOrigin
+}{
+   The zero point for TimeFrame axis values (TimeFrames only)
+}{
+   \sstdescription{
+      This specifies the origin from which all time values are measured
+      within a \xref{TimeFrame}{sun210}{TimeFrame}.
+      The default value (zero) results in the TimeFrame describing
+      absolute time values in the system given by the System attribute
+      (e.g. MJD, Julian epoch, etc). If a TimeFrame is to be used to
+      describe elapsed time since some origin, the TimeOrigin attribute
+      should be set to hold the required origin value. The TimeOrigin value
+      stored inside the TimeFrame structure is modified whenever TimeFrame
+      attribute values are changed so that it refers to the original moment
+      in time.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstdiytopic{
+      Input Formats
+   }{
+      The formats accepted when setting a TimeOrigin value are listed
+      below. They are all case-insensitive and are generally tolerant
+      of extra white space and alternative field delimiters:
+
+      \sstitemlist{
+
+         \sstitem
+         Besselian Epoch: Expressed in decimal years, with or without
+         decimal places (\texttt{{"}}B1950\texttt{{"}} or \texttt{{"}}B1976.13\texttt{{"}} for example).
+
+         \sstitem
+         Julian Epoch: Expressed in decimal years, with or without
+         decimal places (\texttt{{"}}J2000\texttt{{"}} or \texttt{{"}}J2100.9\texttt{{"}} for example).
+
+         \sstitem
+         Units: An unqualified decimal value is interpreted as a value in
+         the system specified by the TimeFrame's System attribute, in the
+         units given by the TimeFrame's Unit attribute. Alternatively, an
+         appropriate unit string can be appended to the end of the floating
+         point value (\texttt{{"}}123.4 d\texttt{{"}} for example), in which case the supplied value
+         is scaled into the units specified by the Unit attribute.
+
+         \sstitem
+         Julian Date: With or without decimal places (\texttt{{"}}JD 2454321.9\texttt{{"}} for
+         example).
+
+         \sstitem
+         Modified Julian Date: With or without decimal places
+         (\texttt{{"}}MJD 54321.4\texttt{{"}} for example).
+
+         \sstitem
+         Gregorian Calendar Date: With the month expressed either as an
+         integer or a 3-character abbreviation, and with optional decimal
+         places to represent a fraction of a day (\texttt{{"}}1996-10-2\texttt{{"}} or
+         \texttt{{"}}1996-Oct-2.6\texttt{{"}} for example). If no fractional part of a day is
+         given, the time refers to the start of the day (zero hours).
+
+         \sstitem
+         Gregorian Date and Time: Any calendar date (as above) but with
+         a fraction of a day expressed as hours, minutes and seconds
+         (\texttt{{"}}1996-Oct-2 12:13:56.985\texttt{{"}} for example). The date and time can be
+         separated by a space or by a \texttt{{"}}T\texttt{{"}} (as used by ISO8601 format).
+      }
+   }
+   \sstdiytopic{
+      Output Format
+   }{
+      When enquiring TimeOrigin values, the returned formatted floating
+      point value represents a value in the TimeFrame's System, in the unit
+      specified by the TimeFrame's Unit attribute.
+   }
+}
+\sstattribute{
+   TimeScale
+}{
+   Time scale (TimeFrames only)
+}{
+   \sstdescription{
+      This attribute identifies the time scale to which the time axis
+      values of a \xref{TimeFrame}{sun210}{TimeFrame} refer, and may take
+      any of the values listed in the \texttt{{"}}Time Scales\texttt{{"}} section
+      (below).
+
+      The default TimeScale value depends on the current System value; if
+      the current TimeFrame system is \texttt{{"}}Besselian epoch\texttt{{"}} the
+      default is \texttt{{"}}TT\texttt{{"}}, otherwise it is \texttt{{"}}TAI\texttt{{"}}.
+      Note, if the System attribute is set so that the TimeFrame
+      represents Besselian Epoch, then an error will be reported if an
+      attempt is made to set the TimeScale to anything other than TT.
+
+      Note, the supported time scales fall into two groups. The first
+      group containing UT1, GMST, LAST and LMST define time in terms of
+      the orientation of the earth. The second group (containing all the
+      remaining time scales) define time in terms of an atomic process.
+      Since the rate of rotation of the earth varies in an unpredictable
+      way, conversion between two timescales in different groups relies
+      on a value being supplied for the Dut1 attribute. This attribute
+      specifies the difference between the UT1 and UTC time scales, in
+      seconds, and defaults to zero. See the \ref{documentation for the Dut1
+      attribute}{sun210}{DUT1} in SUN/210 for further details.
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstdiytopic{
+      Time Scales
+   }{
+      The TimeFrame class supports the following TimeScale values (all are
+      case-insensitive):
+
+      \sstitemlist{
+
+         \sstitem
+         \texttt{{"}}TAI\texttt{{"}} - International Atomic Time
+
+         \sstitem
+         \texttt{{"}}UTC\texttt{{"}} - Coordinated Universal Time
+
+         \sstitem
+         \texttt{{"}}UT1\texttt{{"}} - Universal Time
+
+         \sstitem
+         \texttt{{"}}GMST\texttt{{"}} - Greenwich Mean Sidereal Time
+
+         \sstitem
+         \texttt{{"}}LAST\texttt{{"}} - Local Apparent Sidereal Time
+
+         \sstitem
+         \texttt{{"}}LMST\texttt{{"}} - Local Mean Sidereal Time
+
+         \sstitem
+         \texttt{{"}}TT\texttt{{"}} - Terrestrial Time
+
+         \sstitem
+         \texttt{{"}}TDB\texttt{{"}} - Barycentric Dynamical Time
+
+         \sstitem
+         \texttt{{"}}TCB\texttt{{"}} - Barycentric Coordinate Time
+
+         \sstitem
+         \texttt{{"}}TCG\texttt{{"}} - Geocentric Coordinate Time
+
+         \sstitem
+         \texttt{{"}}LT\texttt{{"}} - Local Time (the offset from UTC is given by
+          attribute LTOffset)
+
+      }
+      An very informative description of these and other time scales is
+      available at http://www.ucolick.org/$\sim$sla/leapsecs/timescales.html.
+   }
+   \sstdiytopic{
+      UTC Warnings
+   }{
+      UTC should ideally be expressed using separate hours, minutes and
+      seconds fields (or at least in seconds for a given date) if leap seconds
+      are to be taken into account. Since the TimeFrame class represents
+      each moment in time using a single floating point number (the axis value)
+      there will be an ambiguity during a leap second. Thus an error of up to
+      1 second can result when using AST to convert a UTC time to another
+      time scale if the time occurs within a leap second. Leap seconds
+      occur at most twice a year, and are introduced to take account of
+      variation in the rotation of the earth. The most recent leap second
+      occurred on 1st January 1999. Although in the vast majority of cases
+      leap second ambiguities won't matter, there are potential problems in
+      on-line data acquisition systems and in critical applications involving
+      taking the difference between two times.
+   }
+}
+\sstattribute{
+   Title
+}{
+   Frame title
+}{
+   \sstdescription{
+      This attribute holds a string that is used as a title in (\emph{e.g.})
+      graphical output to describe the co-ordinate system that a
+      Frame represents.  Examples might be \texttt{"Detector Co-ordinates"} or
+      \texttt{"Galactic Co-ordinates"}.
+
+      If a \att{Title} value has not been set for a Frame, then a suitable
+      default is supplied.
+
+      The default supplied by the Frame class is \texttt{"<n>-d co-ordinate
+      system"}, where \texttt{<n>} is the number of Frame axes
+      (\htmlattref{Naxes}{Naxes}~ attribute).
+
+      Specialised Frames (\xref{SkyFrame}{sun210}{SkyFrame},
+      \xref{SpecFrame}{sun210}{SpecFrame}, \emph{etc.}) re-define the
+      default Title value to be appropriate to the particular co-ordinate
+      system being represented.
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsattrib my\_data set Title "My own data"
+      }{
+         This sets the \att{Title} for the current Frame in the NDF
+         called \texttt{my\_data}, to the string \texttt{"My own data"}.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         A Frame's \att{Title} is intended purely for interpretation by human
+         readers and not by software.
+      }
+   }
+}
+
+\sstattribute{
+   Unit(axis)
+}{
+   Axis physical units
+}{
+   \sstdescription{
+      This attribute contains a textual representation of the physical
+      units used to represent co-ordinate values on a particular axis
+      of a \xref{Frame}{sun210}{Frame}.
+
+      Specialised Frames (\xref{SkyFrame}{sun210}{SkyFrame},
+      \xref{SpecFrame}{sun210}{SpecFrame}, \emph{etc.}) re-define the
+      default \att{Unit} values to be appropriate to the particular co-ordinate
+      system being represented.
+
+      For most classes, the \att{Unit} attribute is a purely descriptive
+      comment intended for human readers and makes no difference to
+      the operation of the software.  However, there are some classes
+      that have \emph{active} \att{Unit} attributes.  Changing the \att{Unit}
+      attribute for such classes will result in the
+      \xref{Mappings}{sun210}{Mapping}~ within the WCS
+      \xref{FrameSet}{sun210}{FrameSet}~ being modified in order
+      to reflect the change in units.
+      By default, only SpecFrames have an active \att{Unit} attribute.
+
+      In general, the syntax of the \att{Unit} attribute should follow the
+      recommendations made in the FITS standard (see the paper
+      ``Representation of world coordinates in FITS'' by Greisen \&
+      Calabretta (available at
+\htmladdnormallink{\texttt{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}}
+{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}).
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         When specifying this attribute by name, it should be
+         subscripted with the number of the Frame axis to which it
+         applies (unless the Frame has only one axis).
+      }
+   }
+}
+\sstmaintoc
+
+\newpage
 \section{\xlabel{ap_plotting_attr}Descriptions of Plotting Attributes\label{ap:plotting_attr}}
 This appendix lists the available plotting attributes (see
 \latexhtml{Section~\ref{se:style}}{\htmlref{Plotting Styles and Attributes}
@@ -50734,7 +50741,10 @@ will include details.
 It is often useful to specify values for some of the attributes of the current
 \xref{Frame}{sun210}{Frame}~ when giving a plotting style (title, axis labels,
 \emph{etc.}).  These additional attributes are described
-\slhyperref{here}{in Section~}{}{se:frmatt}.
+\slhyperref{here}{in Appendix~}{}{ap:frmatt}.
+
+\sstminitoc{}
+\sstnomaintoc
 
 \sstattribute{
    Border
@@ -51654,6 +51664,7 @@ It is often useful to specify values for some of the attributes of the current
       }
    }
 }
+\sstmaintoc
 
 \newpage
 \section{\xlabel{ap_colset}Standard Named Colours\label{ap:colset}}
