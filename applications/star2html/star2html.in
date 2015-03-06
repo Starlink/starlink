@@ -50,6 +50,8 @@
 #     PDRAPER: P.W.Draper (Starlink - Durham University)
 #     AJC: A.J.Chipperfield (Starlink - RAL)
 #     TIMJ: Tim Jenness (JACH)
+#     SFG: Sarah Graves (EAO)
+#     DSB: David S Berry (EAO)
 #     {enter_new_authors_here}
 
 #  History:
@@ -172,6 +174,10 @@
 #     11-FEB-2015 (SFG):
 #        - Remove all latex2html specific code and only leave htlatex
 #          aspects.
+#     6-MAR-2015 (DSB):
+#        Remove any pre-existing .aux file (aux files created by previous
+#        runs of pdflatex can foul up the links created by the hyperref
+#        package).
 
 #  Bugs:
 #     {note_any_bugs_here}
@@ -248,6 +254,12 @@ my ($TEXDIR, $TEXNAME) = &get_filename_and_directory( $TEXFILE );
 $TEXDIR = File::Spec->rel2abs( $TEXDIR );
 $TEXFILE = File::Spec->catfile($TEXDIR, $TEXNAME);
 $TEXNAME =~ s/.tex$//;
+
+#  Get the name of any existing ".aux" file and attempt to delete it.
+#  This is because aux files left over from previous runs of pdflatex
+#  can trash the links created by the hyperref package.
+my $AUXFILE = File::Spec->catfile($TEXDIR, $TEXNAME).".aux";
+unlink( $AUXFILE ) if ( -f $AUXFILE );
 
 #  The output from conversion will be placed into a subdirectory of
 #  the directory containing the input file. This will be called the
