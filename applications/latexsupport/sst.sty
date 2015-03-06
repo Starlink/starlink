@@ -148,11 +148,11 @@
 
 % .. SST attribute command: similar to an sstroutine, but slightly
 % different formatting and doesn't force a new page. See SUN/95 for
-% example of usage.
+% example of usage. Also doesn't appear in the table of contents.
 
 \newcommand{\sstattribute}[3]{
   % Create the section.
-  \subsubsection[#1]{\centering \rule{\textwidth}{0.5mm}\\\Large\ignorespaces#1
+  \subsubsection*{\centering \rule{\textwidth}{0.5mm}\\\Large\ignorespaces#1
     \\#2\\\rule{\textwidth}{0.5mm}}
 
   % Set the first parameter as the label; need to remove spaces first.

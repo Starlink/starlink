@@ -96,10 +96,11 @@
 % Hide from toc.
 \ConfigureToc{attributesec}{}{}{}{}
 
-% Replace \sstattribute with tex4ht version:
+% Replace \sstattribute with tex4ht version: This will show up in
+% a \sstminitoc command but not in the main table of contents.
 \renewcommand{\sstattribute}[3]{
     \attributesec{#1 --- #2}%
-    \addcontentsline{toc}{subsubsection}{\protect\numberline{}#1---#2}
+    \sstextratocline{#1}{#2}
     \label{\RemoveSpaces{#1}}
     #3
 }
