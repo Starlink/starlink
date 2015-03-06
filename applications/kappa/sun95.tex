@@ -35,42 +35,9 @@ and alphabetical summaries.}
 \stardocname{\stardocinitials /\stardocnumber}
 
 
-\ifpdf
-\newcommand{\dgs}{\si{\degree}}
-\else
-\newcommand{\dgs}{\HCode{&deg}}
-\fi
-
-\providecommand{\arcm}{\si{\arcminute}}
 
 
 
-% arcsec symbol
-\providecommand{\arcsec}{\si{\arcsecond}}
-
-% hours symbol
-\providecommand{\hr}{\hbox{$^{\textrm{h}}$}}
-
-% minutes symbol
-\providecommand{\mn}{\hbox{$^{\textrm{m}}$}}
-
-% seconds symbol
-\providecommand{\scn}{\hbox{$^{\textrm{s}}$}}
-
-% decimal-minutes symbol
-\providecommand{\um}{\hskip-0.3em\hbox{$^{\textrm{m}}$}\hskip-0.08em}
-
-% decimal-degree symbol
-\providecommand{\udeg}{\hskip-0.3em\dgs\hskip-0.08em}
-
-% decimal-second symbol
-\providecommand{\us}{\hskip-0.27em\hbox{$^{\text{s}}$}\hskip-0.06em}
-
-% decimal-arcminute symbol
-\providecommand{\uarcm}{\hskip-0.28em\arcm\hskip-0.04em}
-
-% decimal-arcsecond symbol
-\providecommand{\uarcs}{\hskip-0.27em\arcsec\hskip-0.02em}
 
 % centre an asterisk
 \providecommand{\lsk}{\raisebox{-0.4ex}{\textrm{*}}}
@@ -3464,8 +3431,8 @@ This could specify a region of a spectrum between 9000 and 20000
 \latex{\normalsize}
 This could refer to a region approximately one degree on each side
 centred the Coma Cluster.  The section is 4.5 minutes of time along
-the right-ascension axis centred at $12{\hr}59{\mn}49{\scn}$, and
-extends from $+27{\dgs}30{\arcm}$ to $+28{\dgs}29{\arcm}48{\arcsec}$
+the right-ascension axis centred at \ra{12;59;49}, and
+extends from \dec{+27;30;} to \dec{+28;29;48}
 in declination.\smallskip
 
 \latex{\small}
@@ -3514,8 +3481,8 @@ do not mix colons for the two uses in the same expression.  Hence
 there is a semicolon to define the range in the third co-ordinate.
 The semicolon expression delimiter works with all classes of
 co-ordinate system.  This example might extract a spectrum from a cube
-at the right ascension $12{\hr}34{\mn}56.{\us}7$ declination
-$-41{\dgs}52{\arcm}09{\arcsec}$ between $-100$ and 250 km~s$^{-1}$
+at the right ascension \ra{12;34;56.7} declination
+\dec{-41;52;09} between $-100$ and 250\,km\,s$^{-1}$
 velocity.
 
 You should also be aware that the non-integer co-ordinates within an
@@ -4207,9 +4174,9 @@ first one (SHOWPIXEL) causes the pixel co-ordinates at each selected
 position to be displayed, in addition to the co-ordinates selected using
 Parameter FRAME (which defaults in this case to RA/DEC since FRAME was
 not specified).  For instance, the first position is at a right
-ascension of $0^{\textrm{h}} 41^{\textrm{m}} 33.5^{\textrm{s}}$
+ascension of \ra{0;41;33.5}
 and a declination of
-$40$\dgs $33$\arcm $01$\arcsec, and has pixel
+\dec{+40;33;01}, and has pixel
 co-ordinates $(172.4,78.2)$.\footnote{Pixel \emph{co-ordinates} are
 fractional, where-as pixel \emph{indices} are integer.  The pixel with
 indices $(1,1)$ covers a range of pixel co-ordinates between $0.0$ and
@@ -6494,7 +6461,7 @@ selects all the pixels with a rotated box except those in thirteenth
 column or eighth row.  Note the use of parentheses to adjust or
 clarify the precedence.  The box is centred on grid pixel (12,~15) has
 sides of length 20 and 10 pixels.  The first side of the box---the one
-with length 20---is at an angle of 36$\udeg$3 measured anticlockwise
+with length 20---is at an angle of  \ang{36.3}  measured anticlockwise
 from the X axis.
 \medskip
 
@@ -37657,7 +37624,7 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
          The NDF omc1 is a spectral-imaging cube with
          (Right ascension, declination, frequency) World Co-ordinate
          axes.  This example extracts a spectrum at
-         RA=$5{\hr}35{\mn}13.{\us}7$, Dec=$-5{\dgs}22{\arcm}13.{\uarcs}6$
+         RA=\ra{5;35;13.7}, Dec=\dec{-5;22;13.6}
          using the SincGauss interpolation method.
          Three pixels either side of the point are used to interpolate,
          the full-width half-maximum of the Gaussian is five pixels.
