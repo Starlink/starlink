@@ -2,6 +2,55 @@
 %  ---------
 
 
+%% Handling angles
+\ifpdf
+\typeout{... Using standard SIunitx degrees}
+\else
+\sisetup{
+  math-degree=\HCode{<mo>&deg;</mo>},
+  text-degree=\HCode{&deg;}
+}
+\fi
+
+%% Symbol for degrees;
+\ifpdf
+  \newcommand{\dgs}{\si{\degree}}
+\else
+  \newcommand{\dgs}{\ifmmode \HCode{<mo>&deg;</mo>} \else \HCode{&deg;} \fi}
+\fi
+
+%%
+% arcminute symbol
+\newcommand{\arcm}{\si{\arcminute}}
+
+% arcsec symbol
+\newcommand{\arcsec}{\si{\arcsecond}}
+
+% hours symbol
+\newcommand{\hr}{\textsuperscript{h}}
+
+% minutes symbol
+\newcommand{\mn}{\textsuperscript{m}}
+
+% seconds symbol
+\newcommand{\rsec}{\textsuperscript{s}}
+
+
+% commands for ra and dec (These do not put the angle symbol over the
+% decimal.
+\newcommand{\dec}[1]{\ang[retain-explicit-plus]{#1}}
+\newcommand{\ra}[1]{
+  \ang[text-degree=\textsuperscript{h},
+       math-degree=\textsuperscript{h},
+       math-arcminute=\textsuperscript{m},
+       math-arcsecond=\textsuperscript{s},
+       text-arcminute=\textsuperscript{m},
+       text-arcsecond=\textsuperscript{s}]%
+      {#1}
+}
+
+
+
 %% Note that due to limitations in tex4ht, you need to use \sb for _
 %% and \sp for ^ if the macro is defined before the \begin{document}
 %% command.
