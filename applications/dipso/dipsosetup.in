@@ -9,21 +9,8 @@
 if( $?DIPSO_DIR ) then
    setenv DIPSODIR $DIPSO_DIR
    setenv DIPSOLIB $DIPSO_DIR
-
-   set star = "$DIPSO_DIR/../.."
-
-   if( -d "$star/bin" ) then
-      setenv DIPSOSTARBIN `(cd $star/bin; pwd)`
-   else
-      setenv DIPSOSTARBIN @prefix@/bin
-   endif
-
-   if( -d "$star/etc/dipso" ) then
-      setenv SPECDAT `(cd $star/etc/dipso; pwd)`
-   else
-      setenv SPECDAT  @staretcdir@
-   endif
-
+   setenv DIPSOSTARBIN ${STARLINK_DIR}/bin
+   setenv SPECDAT ${STARLINK_DIR}/etc/dipso
 else
    setenv DIPSODIR @bindir@
    setenv DIPSOLIB @bindir@

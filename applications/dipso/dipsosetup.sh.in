@@ -10,21 +10,8 @@
 if test "$DIPSO_DIR" != ""; then
    export DIPSODIR="$DIPSO_DIR"
    export DIPSOLIB="$DIPSO_DIR"
-
-   STAR="$DIPSO_DIR/../.."
-
-   if test -d "$STAR/bin"; then
-      export DIPSOSTARBIN=`(cd $STAR/bin; pwd)`
-   else
-      export DIPSOSTARBIN=@prefix@/bin
-   fi
-
-   if test -d "$STAR/etc/dipso"; then
-      export SPECDAT=`(cd $STAR/etc/dipso; pwd)`
-   else
-      export SPECDAT=@staretcdir@
-   fi
-
+   export DIPSOSTARBIN="$STARLINK_DIR/bin"
+   export SPECDAT="$STARLINK_DIR/etc/dipso"
 else
    export DIPSODIR=@bindir@
    export DIPSOLIB=@bindir@
