@@ -5309,7 +5309,7 @@ indices (see Figure~\latexhtml{\ref{fi:pixind}}{10}).
 
    \begin{figure}[hbt]
    \begin{center}
-   \includegraphics[clip,height=100mm]{sun95_pixind}
+   \includegraphics[clip,width=0.65\textwidth]{sun95_pixind}
    \caption{Pixel indices.}
    \label{fi:pixind}
    \end{center}
@@ -5321,7 +5321,7 @@ as indicated in Figure~\latexhtml{\ref{fi:pixco}}{11}).
 
    \begin{figure}[hbt]
    \begin{center}
-   \includegraphics[clip,height=54mm]{sun95_pixco}
+   \includegraphics[clip,width=0.75\textwidth]{sun95_pixco}
    \caption{Pixel co-ordinates.}
    \label{fi:pixco}
    \end{center}
@@ -5339,7 +5339,7 @@ Figure~\latexhtml{\ref{fi:gridco}}{12}).
 
    \begin{figure}[hbt]
    \begin{center}
-   \includegraphics[clip,height=76mm]{sun95_gridco}
+   \includegraphics[clip,width=0.75\textwidth]{sun95_gridco}
    \caption{Grid co-ordinates.}
    \label{fi:gridco}
    \end{center}
@@ -5354,7 +5354,7 @@ co-ordinates.
 
    \begin{figure}[hbt]
    \begin{center}
-   \includegraphics[clip,height=76mm]{sun95_fraco}
+   \includegraphics[clip,width=0.7\textwidth]{sun95_fraco}
    \caption{Fraction co-ordinates.}
    \label{fi:fraco}
    \end{center}
@@ -6116,12 +6116,10 @@ Such co-ordinate files can also be created interactively with images by
 
 The \PGPLOT\ ref\ graphics package, which is used by \KAPPA\ ,
 draws images and line graphics using a set of `pens'.  The number of pens
-available is limited to 256, even on 16- or 24-bit graphics devices which
-nominally have `millions' of colours.  On 8-bit graphics devices, the
+available is limited to 256, even on modern 16- or 24-bit graphics devices which
+nominally have `millions' of colours.  On older 8-bit graphics devices, the
 number of available pens may be fewer than 256 if any other applications
-have `grabbed' colours for their own use\footnote{Netscape is notorious
-for this.  If you have problems allocating sufficient colours, try killing
-any netscape browsers you have running.}.
+have `grabbed' colours for their own use.
 
 Each \PGPLOT\  pen draws in a single colour, but you can choose what that
 colour will be for each pen.  This allocation of colours to pens is called
