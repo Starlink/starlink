@@ -66,11 +66,12 @@ set. \textsc{smurf} is multi-threaded so multiple cores do help
 although above eight cores the price/performance gains tend to drop
 off.
 
-If you have a very large machine (128\,GB and 24 cores) you can to run
-two instances of the map-maker in parallel. Use the
-\envvar{SMURF\_THREADS} environment variable to restrict each
-map-maker to half the available cores.
-
+If you have a very large machine (128\,GB and 24 cores) you may be able
+to run two instances of the map-maker in parallel without chunking. Use
+the \envvar{SMURF\_THREADS}\footnote{\envvar{SMURF\_THREADS} should be
+set to an integer value indicating the number of threads to be used by
+each process.} environment variable to restrict each map-maker to half
+the available cores.
 
 \section{\xlabel{software}Before you start: software}
 
