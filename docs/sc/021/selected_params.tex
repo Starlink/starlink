@@ -27,6 +27,43 @@
    }
 }
 \sstroutine{
+   AST.SKIP
+}{
+   Skip subtraction of astronomical signal
+}{
+   \sstdescription{
+      If ast.skip is non-zero, it gives the number of initial
+      iterations for which no AST model (astronomical signal)
+      should be subtracted. A map is still formed at the end of
+      these iterations but the astronomical signal implied by this
+      map is not removed from the residuals (neither is it added
+      back prior to forming the next map). This means that the
+      residuals at the start of each of these iterations are
+      unchanging and essentially equal to the cleaned raw data.
+      The value supplied for parameter {\tt{"}}\xref{numiter}{sun258}{numiter}{\tt{"}} should therefore
+      be greater than the value of {\tt{"}}ast.skip{\tt{"}}.
+
+      This option is useful, for instance, when using SNR-based
+      masking for the FLT and/or COM models, since it allows a
+      reasonable mask to be formed before subtracting off the
+      first estimate of the astronommical signal.
+
+      If ast.skip is set to a negative value, it gives the
+      largest number of iterations to perform and indicates
+      that the AST model should be skipped on all of them. In
+      this case the value supplied for parameter {\tt{"}}\xref{numiter}{sun258}{numiter}{\tt{"}} is
+      ignored. [0]
+   }
+   \sstattributetype{
+      integer
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      MAKEMAP, CALCQU
+   }
+}
+\sstroutine{
    AST.ZERO\_CIRCLE
 }{
    Reduces spurious large scale structure in the final map
@@ -331,7 +368,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -350,7 +387,29 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
+   }
+}
+\sstroutine{
+   COM.FREEZE\_FLAGS
+}{
+   Controls flagging of samples that differ from the common-mode
+}{
+   \sstdescription{
+      If non-zero, the flags marking bolometers that differ
+      from the common-mode are frozen after the specified number
+      of iterations. this can help convergence. See parameter
+      {\tt{"}}\xref{com.corr\_abstol}{sun258}{com.corr\_abstol}{\tt{"}}. Note - any initial iterations
+      specified by parameter {\tt{"}}\xref{ast.skip}{sun258}{ast.skip}{\tt{"}} are not included in the
+      count of iterations. [0]
+   }
+   \sstattributetype{
+      integer
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -369,7 +428,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -390,7 +449,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -408,7 +467,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -426,7 +485,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -445,7 +504,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -463,7 +522,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -483,7 +542,56 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
+   }
+}
+\sstroutine{
+   COM.SIG\_LIMIT
+}{
+   Controls the rejection of time slices with inconsistent
+   common-modes
+}{
+   \sstdescription{
+      This value is only used if data from more than one
+      sub-array is being included in the map, and parameter
+      {\tt{"}}\xref{com.perarray}{sun258}{com.perarray}{\tt{"}} is zero, causing a single mean COM model to
+      be used for all sub-arrays. In such cases, if the
+      common-mode signals estimated from the individual
+      sub-arrays show significantly different structure,
+      subtracting a mean COM model will leave large residuals in
+      the bolometer time streams. If a FLT model is being used,
+      the high pass filter will remove much of this residual
+      signal, but any high frequency component will remain,
+      often causing strong {\tt{"}}blobs{\tt{"}} in the map.
+
+      The COM model can identify and flag time slices where the
+      individual common-mode signals appear to be significantly
+      different to the mean common-mode signal. The individual
+      common-mode signals are first high-pass filtered using the
+      same filter as the FLT model. At each time slice, the
+      mean and standard deviation of the remaining high frequency
+      common-modes are found. The RMS of these standard
+      deviations, taken over the whole time stream, is then found.
+      All bolometers within individual time slices for which the
+      standard deviation exceeds {\tt{"}}com.sig\_limit{\tt{"}} times the RMS value
+      are flagged in all sub-arrays, causing them to be excluded
+      from the FLT model and the map. Note, this flagging process is
+      performed from scratch on each iteration - that is, samples
+      flagged on a previous iteration are tested again on each
+      subsequent iteration and may be {\tt{"}}unflagged{\tt{"}} if the differences
+      between individual common-mode signal become smaller.
+
+      Setting this parameter to 3 is a good starting point.
+      Setting it to zero (the default) causes this consistency
+      filter to be skipped. See also parameter {\tt{"}}\xref{com.sig\_wing}{sun258}{com.sig\_wing}{\tt{"}}. [0]
+   }
+   \sstattributetype{
+      real
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -690,7 +798,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -712,7 +820,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -734,7 +842,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -756,7 +864,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -776,7 +884,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -802,7 +910,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -960,6 +1068,48 @@
    }
 }
 \sstroutine{
+   EXT.TAURELATION.450
+}{
+   Controls the 450 um extinction values used in the EXT model
+   and the EXTINCTION task
+}{
+   \sstdescription{
+      Each tau relation is parameterised in the form:
+      {\tt{"}}tau\_filt = a ( tau\_cso $+$ b ){\tt{"}}, where {\tt{"}}a{\tt{"}} and {\tt{"}}b{\tt{"}} are the
+      two values supplied for this parameter. See also parameter
+      {\tt{"}}\xref{ext.taurelation.850}{sun258}{ext.taurelation.850}{\tt{"}}. Here, the trailing {\tt{"}}.450{\tt{"}} in the
+      parameter name is the filter name, not the sub-instrument
+      name as would be the case if it appeared at the start of
+      parameter name. [(26.0,-0.012)]
+   }
+   \sstattributetype{
+      (real,real)
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      EXTINCTION, CALCQU, MAKEMAP
+   }
+}
+\sstroutine{
+   EXT.TAURELATION.850
+}{
+   Controls the 850 um extinction values used in the EXT model
+   and the EXTINCTION task
+}{
+   \sstdescription{
+      The 850 um equivalent to the parameter {\tt{"}}\xref{ext.taurelation.450}{sun258}{ext.taurelation.450}{\tt{"}}. [(4.6,-0.0043)]
+   }
+   \sstattributetype{
+      (real,real)
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      EXTINCTION, CALCQU, MAKEMAP
+   }
+}
+\sstroutine{
    EXT.TAUSRC
 }{
    Controls the extinction values used in the EXT model
@@ -1035,6 +1185,40 @@
    }
 }
 \sstroutine{
+   FILT\_EDGE\_LARGESCALE
+}{
+   Specifies the largest scale size to be retained by the
+   initial data cleaning
+}{
+   \sstdescription{
+      Together with parameter {\tt{"}}\xref{filt\_edge\_smallscale}{sun258}{filt\_edge\_smallscale}{\tt{"}}, this
+      specifies the frequencies which the initial data cleaning is
+      to remove from the data streams, based on a range of requested
+      spatial scales (in arcsec), and using internal measurements of
+      the average slew speed. These will override parameter
+      {\tt{"}}\xref{filt\_edgehigh}{sun258}{filt\_edgehigh}{\tt{"}} and parameter {\tt{"}}\xref{filt\_edgelow}{sun258}{filt\_edgelow}{\tt{"}}. For example,
+      suppose the slew speed is 100 arcsec/sec. We want to ensure
+      that the beam is fully sampled, say 2 arcsec at 450um.
+      That scale is crossed in 2/100 = 0.02 s, so we don't need
+      frequencies in the data above 1/0.02 = 50 Hz in this case
+      (i.e. internally it will set filt\_edgelow to 50Hz if
+      filt\_edge\_smallscale is set to 2 arcsec). Similarly, if
+      we would like to attempt to preserve scales of 10 arcmin =
+      600 arcsec, we would want to keep frequencies that are
+      greater than 1/(600/100.) = 0.17 Hz (i.e. setting
+      filt\_edge\_largescale=600 would translate into
+      filt\_edgehigh = 0.17 Hz). [0]
+   }
+   \sstattributetype{
+      real
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      SC2CLEAN, CALCQU, MAKEMAP
+   }
+}
+\sstroutine{
    FILT\_EDGELOW
 }{
    Specifies the highest frequency to be retained by the
@@ -1052,7 +1236,33 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
+   }
+}
+\sstroutine{
+   FILT\_ORDER
+}{
+   Indicates the shape of the filter
+}{
+   \sstdescription{
+      If filt\_order is zero or negative, a the edge filters
+      defined by the other {\tt{"}}filt\_...{\tt{"}} parameters are hard-edged.
+      That is, they change from zero to one without any intermediate
+      values. If filt\_order is larger than zero, the edge
+      filters are soft-edged Butterworth filters with order
+      given by the value of this parameter. An order of 1 is
+      the softest, and will thus produce least ringing, at the
+      expense of poorer frequency response. Higher orders
+      produce sharper filters that have better frequency response
+      but at the expense of greater ringing. [0]
+   }
+   \sstattributetype{
+      integer
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -1075,7 +1285,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -1100,7 +1310,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -1130,6 +1340,77 @@
    }
    \sstattributetype{
       real
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      MAKEMAP, CALCQU
+   }
+}
+\sstroutine{
+   FLT.FILT\_EDGE\_LARGESCALE\_LAST
+}{
+   Specifies the largest scale size to be retained by the
+   FLT model on the last iteration
+}{
+   \sstdescription{
+      This is the value to be used for parameter {\tt{"}}\xref{flt.filt\_edge\_largescale}{sun258}{flt.filt\_edge\_largescale}{\tt{"}}
+      on the last iteration. If it is {\tt{"}}{\tt $<$undef$>$}{\tt{"}}, then the same value
+      will be used as for earlier iterations. [{\tt $<$undef$>$}]
+   }
+   \sstattributetype{
+      real
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      MAKEMAP, CALCQU
+   }
+}
+\sstroutine{
+   FLT.FILT\_ORDER
+}{
+   Indicates the shape of the filter
+}{
+   \sstdescription{
+      If flt.filt\_order is zero or negative, a the edge filters
+      defined by the other {\tt{"}}flt.filt\_...{\tt{"}} parameters are hard-edged.
+      That is, they change from zero to one without any intermediate
+      values. If flt.filt\_order is larger than zero, the edge
+      filters are soft-edged Butterworth filters with order
+      given by the value of this parameter. An order of 1 is
+      the softest, and will thus produce least ringing, at the
+      expense of poorer frequency response. Higher orders
+      produce sharper filters that have better frequency response
+      but at the expense of greater ringing. [0]
+   }
+   \sstattributetype{
+      integer
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      MAKEMAP, CALCQU
+   }
+}
+\sstroutine{
+   FLT.RING\_BOX1
+}{
+   Controls the flagging of samples that suffer from ringing
+}{
+   \sstdescription{
+      If this is non-zero, then a ringing filter is applied to
+      the residuals once the FLT model has been removed. This
+      filter attempts to locate and flag residuals that suffer
+      from ringing. It gives the size of the box used to smooth
+      the residuals in order to determine the background. It
+      is specified as a multiple of the filter size. A value of
+      0.5 could be a good starting point. Note, the ringing
+      filter is not applied on any initial iterations specified
+      by parameter {\tt{"}}\xref{ast.skip}{sun258}{ast.skip}{\tt{"}}. [0]
+   }
+   \sstattributetype{
+      float
    }
    \sstdiytopic{
       SMURF Usage
@@ -1556,7 +1837,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -1573,7 +1854,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -1590,7 +1871,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -1631,7 +1912,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -1678,7 +1959,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -1699,6 +1980,26 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
+   }
+}
+\sstroutine{
+   WHITEN
+}{
+   Experimental
+}{
+   \sstdescription{
+      If non-zero, then a whitening filter will be applied to
+      each time stream prior to any filtering that is done as
+      part of the initial data cleaning, as specified by
+      parameter {\tt{"}}flt\_edge\_largescale{\tt{"}}, etc. [0]
+   }
+   \sstattributetype{
+      integer
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }

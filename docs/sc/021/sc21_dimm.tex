@@ -143,7 +143,7 @@ explanation of each model is given in \cref{Section}{sec:models}{The individual 
 
 The particular sequence of the models evaluated (and removed) by the
 map-maker during the iterative stage is indicated by the
-\texttt{modelorder} parameter in the configuration file. These models
+\xparam{MODELORDER}{modelorder} parameter in the configuration file. These models
 are modular however, so their order may be changed. The default model
 order in \file{dimmconfig.lis} is given below.
 
@@ -248,7 +248,7 @@ criterion specified in the configuration file is reached.
 \textbf{Option 1: Fixed number of iterations}
 
 Specifying the number of iterations in the configuration file is done
-via the \param{numiter} parameter. This is shown below for
+via the \xparam{NUMITER}{numiter} parameter. This is shown below for
 \file{dimmconfig.lis}.
 
 \begin{terminalv}
@@ -263,7 +263,7 @@ performed, \emph{but} that it may stop at fewer if convergence
 
 \textbf{Option 2: Convergence parameter}
 
-The convergence criterion is set by the \texttt{maptol} parameter.
+The convergence criterion is set by the \xparam{MAPTOL}{maptol} parameter.
 
 When running the map-maker, \texttt{maptol} gives the average
 normalised change in the value of map pixels
@@ -281,7 +281,7 @@ lower than 0.05 will dramatically increase the length of time to
 produce the final map and possibly never achieve convergence.
 
 The best way of checking the progress of convergence while running the
-map-maker is to use the \param{itermap} option by setting the parameter
+map-maker is to use the \xparam{ITERMAP}{itermap} option by setting the parameter
 \param{itermap~=~1} (see \cref{Section}{sec:tweak}{Tweaking the
 configuration file}).
 
@@ -310,7 +310,7 @@ noise.}
 
 By default, the final values of these fitted models are \emph{not}
 written out. However, this can be changed by setting
-\texttt{exportndf} in the configuration file to the list of models
+\xparam{EXPORTNDF}{exportndf} in the configuration file to the list of models
 that you wish to view.
 %\vspace{0cm}
 
@@ -402,7 +402,7 @@ pre-processing step (corresponding to 200-arcsec scales at both
 remove noisy/problematic bolometers. Only 4 (positive) iterations are
 requested as there is no signal to confuse to models.
 
-The option \texttt{com.perarray}~=~1 requires the \model{COM} model to
+The option \xparam{COM.PERARRAY}{com.perarray}~=~1 requires the \model{COM} model to
 be fit to each sub-array independently. This improves the overall fit
 but with the loss of any structure on scales larger than a single
 sub-array---not an issue for blank fields.
@@ -453,18 +453,17 @@ sources that are isolated at the centre of the map (i.e. calibrators). It refere
 \file{dimmconfig\_bright.lis}, and thus the parameters from both `bright'
 recipes override the default values in \file{dimmconfig.lis}.
 
-The addition of \param{ast.zero\_circle} and
-\param{ast.zero\_notlast} parameters are used to constrain the map to
-zero beyond a radius of 1\,arcmin for all but the final iteration.
-This strategy helps with map convergence significantly, and can
-provide good maps of bright sources, even in cases where scan patterns
-failed to complete in full.
+The addition of the \xparam{AST.ZERO_CIRCLE}{ast.zero\_circle} parameter
+is used to constrain the map to zero beyond a radius of 1\,arcmin. This
+strategy helps with map convergence significantly, and can provide good
+maps of bright sources, even in cases where scan patterns failed to
+complete in full.
 
-\param{com.perarray} is set to 1 indicating that a \model{COM} model
+\xparam{COM.PERARRAY}{com.perarray} is set to 1 indicating that a \model{COM} model
 should be fit separately for each sub-array. This is not advised for
 extended sources as signal on scales larger than a single sub-array is
 lost, but is fine for a compact central source. Likewise, the filtering
-is tighter. The S/N threshold for DC steps (\param{dcthresh}) is relaxed from
+is tighter. The S/N threshold for DC steps (\xparam{DCTHRESH}{dcthresh}) is relaxed from
 25 in the default file to 100 to avoid problems associated with bright sources.
 
 % The tildes around the equal sign are to ensure HTML table field is
@@ -505,10 +504,10 @@ is tighter. The S/N threshold for DC steps (\param{dcthresh}) is relaxed from
 
 This configuration is for reducing maps that do not fall into the
 other two categories. The emission is usually extended to some degree
-and contains some bright regions. Here \param{ast.zero\_snr} is used
+and contains some bright regions. Here \xparam{AST.ZERO_SNR}{ast.zero\_snr} is used
 to constrain the \model{AST} model to zero wherever the S/N is lower
 than 5$\sigma$.  Everywhere the signal is below this threshold, the
-map is set to zero for all but the final iteration. \param{numiter}
+map is set to zero for all but the final iteration. \xparam{NUMITER}{numiter}
 has been raised to \texttt{-40}, as more iterations are required to
 maximise the sensitivity to large dynamic signal ranges in the map.
 

@@ -293,7 +293,7 @@ main data array they can be passed the error (\param{comp=err}), variance
 
 The reported statistics include the pixel maximum and minimum,
 standard deviation, number of pixels used and omitted, along with
-pixel mode, and mean.  If you supply the \param{order} keyword,
+pixel mode, and mean.  If you supply the \xparam{ORDER}{order} keyword,
 the median is also shown.
 \begin{terminalv}
 % stats comp=err map_cal_crop order
@@ -601,7 +601,7 @@ This is very versatile and will display the name and value of one or
 all configuration parameters either from a configuration file or from
 the history of an NDF.
 
-The first example below will return the value of \param{numiter} from
+The first example below will return the value of \xparam{NUMITER}{numiter} from
 the map \file{850map.sdf}. The second example will display the values of all
 the parameters in \file{850map.sdf} and will prefix them with a `+' if they
 differ from the the values given in \file{dimmconfig.lis}.

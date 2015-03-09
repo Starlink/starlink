@@ -272,8 +272,8 @@ removed in doing so.
 \vspace{0.2cm}\\
 We run the map-maker using \file{dimmconfig\_bright\_extended.lis};
 we have also specified a couple of overrides on the command
-line---\param{maptol}~=~0.04 is slightly more stringent than default and
-\param{ast.zero\_snr}~=~3.5 constrains emission everything below
+line---\xparam{MAPTOL}{maptol}~=~0.04 is slightly more stringent than default and
+\xparam{AST.ZERO_SNR}{ast.zero\_snr}~=~3.5 constrains emission everything below
 3.5\,$\sigma$ to zero.
 
 In this example we give the map-maker a file containing a list of the
@@ -351,7 +351,7 @@ config=^mydimmconfig.lis ref=850map_mask_zm
 The configuration file, \file{mydimmconfig.lis}, has the following
 format---note how it is based on
 \file{dimmconfig\_bright\_extended.lis}. It has decreased the
-convergence parameter to \param{MAPTOL}=0.03 but increased the number
+convergence parameter to \xparam{MAPTOL}{maptol}~=~0.03 but increased the number
 of iterations to compensate as 40 is unlikely to be sufficient.
 \begin{terminalv}
 ^$STARLINK_DIR/share/smurf/dimmconfig_bright_extended.lis
