@@ -37,10 +37,12 @@
 #        Added COM zero masking options.
 #     2013-02-07 (DSB):
 #        This file is now the primary source of documentation for these
-#	 parameters. It has been reformatted to enable automatic documentation.
+#        parameters. It has been reformatted to enable automatic documentation.
 #     2014-07-17 (DSB):
 #        Added memcheck.
-
+#     2015-03-09 (DSB):
+#        Modified to ensure that the defaults in this file match those 
+#        provided by dimmconfig.lis.
 #-
 
 #  Include parameters defined in other files...
@@ -1766,14 +1768,14 @@ importlut = 0
 #-----------------------------------------------------------------
 #  Name: 	hitslimit
 #  Type: 	real
-#  Default: 	0.0
+#  Default: 	0.01
 #  Purpose: 	Rejects map pixels that receive very few samples.
 #  Description: If non-zero, pixels that receive very few bolometer samples
 #               are set to bad in the final map. The limiting number of
 #               bolometer samples is equal to "hitslimt" times the mean
 #               number of hits per pixel, averaged over the map pixels
 #               that recieve at least one bolometer sample.
-hitslimit = 0.0
+hitslimit = 0.01
 
 #-----------------------------------------------------------------
 #  Name: 	importsky
@@ -1974,7 +1976,7 @@ noexportsetbad = 0
 #-----------------------------------------------------------------
 #  Name: 	noi.box_size
 #  Type: 	real
-#  Default: 	0
+#  Default: 	-15
 #  Purpose: 	Allow finer estimation of the noise levels in the time-series
 #		data.
 #  Description: Specifies the number of time slices used to determine the
@@ -1990,15 +1992,15 @@ noexportsetbad = 0
 #		time slices. Note, very small box sizes may produce
 #		unrepresentative noise levels, and there is a hard minimum
 #		of 101 on the number of downsampled time slices in a noise
-#       box. Also, if the number of time slices in the data is smaller
-#       than two times the requested box size, then a single noise
-#       value is used for each bolometer.
-noi.box_size = 0
+#		box. Also, if the number of time slices in the data is smaller
+#		than two times the requested box size, then a single noise
+#		value is used for each bolometer.
+noi.box_size = -15
 
 #-----------------------------------------------------------------
 #  Name: 	noi.box_type
 #  Type: 	integer
-#  Default: 	0
+#  Default: 	1
 #  Purpose: 	Determines how the noise in each box is found.
 #  Description: If this is zero, the noise in each box (see parameter
 #               "noi.box_size") is found by taking Fourier transform of the
@@ -2014,7 +2016,7 @@ noi.box_size = 0
 #               value of "noi.box_type" is ignored and the noise is always
 #               calculated on the basis of the mean power in the 2 to 10
 #               Hz band.
-noi.box_type = 0
+noi.box_type = 1
 
 #-----------------------------------------------------------------
 #  Name: 	noi.calcfirst
