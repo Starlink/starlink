@@ -16,6 +16,7 @@
 
 #  Are we processing just a selection of parameters, or all parameters? Get a hash
 #  containing all the selected parameter names in upper case.
+   $tex_header = "% This file was created using:\n%\n%	applications/smurf/defaults/make_pardocs ";
    %selected = ();
    $defdir = ".";
    $subset = 0;
@@ -28,12 +29,16 @@
       }
       close( INFILE );
       $outfile = "$ARGV[1]";
+      $tex_header .= "\\\n%		$ARGV[0] ";
+      $tex_header .= "\\\n%		$ARGV[1] ";
       if( $#ARGV > 1 ) {
          $defdir = $ARGV[2];
+         $tex_header .= "\\\n%		$ARGV[2] ";
       }
    } else {
       $outfile = "./params.tex";
    }
+   $tex_header .= "\n%\n";
 
 #  Create an empty hash to hold the contents of all .def files. One entry
 #  for every .def file. The key is the smurf command associated with the
@@ -247,6 +252,7 @@
 
 #  Write the modified latex out to the output file.
    open( OUTPUT, ">$outfile" );
+   print OUTPUT $tex_header;
    print OUTPUT $document;
    close( OUTPUT );
 
