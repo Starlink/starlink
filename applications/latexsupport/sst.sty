@@ -26,12 +26,24 @@
 % added in manually at the correct section.
 \newcommand{\nocontentsline}[3]{}
 \newcommand{\tocless}[2]{\bgroup\let\addcontentsline=\nocontentsline#1{#2}\egroup}
+%% Add a toc entry which will be used in  the main toc
+\newcommand{\sstmaintocline}[2]{\addcontentsline{toc}{subsection}{\protect\numberline{}#1}}
+
+%% commands to temporarily stop sstroutines from writing anything into the main toc
+\newcommand{\sstnomaintoc}{\renewcommand{\sstmaintocline}[2]{}}
+%% Command to restart sstroutines appearing in the main html toc
+%% (does nothing in pdf)
+\newcommand{\sstmaintoc}{\renewcommand{\sstmaintocline}[2]{\addcontentsline{toc}{subsection}{\protect\numberline{}##1}}}
+
+
 
 %% .. command to format the sst title
 \newcommand{\ssttitle}[2]{
   \tocless\sstrefsection{\centering\rule{\textwidth}{0.5mm}\\%
     #1\\#2\\\rule{\textwidth}{0.5mm}}
-  \addcontentsline{toc}{subsection}{\protect\numberline{}\RemoveSpaces{#1}}}
+  \sstmaintocline{\RemoveSpaces{#1}}{#2}
+}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -207,12 +219,6 @@
 %% Change the \wedge command to something that looks better.
 \renewcommand{\wedge}{\mbox{\textasciicircum}}
 
-%% command to prevent sstroutines from appearing in the main html tocs
-%% (does nothing in pdf)
-\newcommand{\sstnomaintoc}{}
-%% Command to restart sstroutines appearing in the main html toc
-%% (does nothing in pdf)
-\newcommand{\sstmaintoc}{}
 
 %% command to prevent sstroutines from appearing in the extra html toc
 %% called by \sstminitoc{Title of Toc} (does nothing in pdf)

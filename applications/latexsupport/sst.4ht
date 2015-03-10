@@ -44,7 +44,7 @@
 \Configure{sstsubtitle}{\Tg<p class="subtitle">}{\Tg</p> \Tg</h3> \Tg</header>}
 
 %% Add a toc entry which will be used in  the main toc
-\newcommand{\sstmaintocline}[2]{\addcontentsline{toc}{likesstrefsection}{\protect\numberline{}#1--#2}}
+\renewcommand{\sstmaintocline}[2]{\addcontentsline{toc}{likesstrefsection}{\protect\numberline{}#1--#2}}
 %% Add a toc entry which will be used in a mini-toc
 \newcommand{\sstextratocline}[2]{\addcontentsline{toc}{extrasstrefsection}{\protect\numberline{}#1--#2}}
 
