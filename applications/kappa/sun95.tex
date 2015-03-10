@@ -3206,7 +3206,7 @@ floating-point NaN or Inf values with the appropriate Starlink bad value.
 The following converts all the HDS files in the current directory.
 
 \begin{terminalv}
-     % native "*"
+% native "*"
 \end{terminalv}
 
 \newpage
@@ -3235,7 +3235,7 @@ within parentheses and may be given in several ways.  Here is a simple
 example.
 
 \begin{terminalv}
-     ICL> stats cluster(101:200,51:150)
+ICL> stats cluster(101:200,51:150)
 \end{terminalv}
 
 This would derive statistics of a 100$\times$100-pixel region
@@ -3255,8 +3255,8 @@ you must escape the parentheses.}  For example, the following
 are both equivalent to the earlier example.
 
 \begin{terminalv}
-     % stats cluster"(101:200,51:150)"
-     % stats cluster\(101:200,51:150\)
+% stats cluster"(101:200,51:150)"
+% stats cluster\(101:200,51:150\)
 \end{terminalv}
 
 
@@ -3269,13 +3269,9 @@ may be given in several ways.  One possible method (corresponding with
 the example above) is to give the lower and upper bounds in each
 dimension, as follows
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{NAME( a:b, c:d, ... )}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+NAME( a:b, c:d, ... )
+\end{terminalv}
 
 where `\texttt{a:b}', `\texttt{c:d}', (\emph{etc.}) specify the lower and upper
 bounds.  The bounds specified need not necessarily lie within the actual
@@ -3293,23 +3289,15 @@ be selected for that dimension.  Omitting the bounds entirely for a
 dimension (but still retaining the comma) will cause the entire extent
 of that dimension to be used.  Thus,
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{image(,64)}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+image(,64)
+\end{terminalv}
 
 could be used to specify row 64 of a two-dimensional image, while
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{cube( 1, 257:, 100 )}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+cube( 1, 257:, 100 )
+\end{terminalv}
 
 would specify column 1, pixels 257 onwards, selected from plane number
 100 of a three-dimensional `data cube', forming a one-dimensional section.
@@ -3321,25 +3309,17 @@ An alternative form for the subscript expression involves specifying the
 centre and extent of the region required along each dimension, as
 follows
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{name( p}$\sim$\texttt{q, r}$\sim$\texttt{s, ... )}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+name( p~q, r~s ... )
+\end{terminalv}
 
 where `\texttt{p}$\sim$\texttt{q}', `\texttt{r}$\sim$\texttt{s}', (\emph{etc.})
 specify the centre and extent respectively.  The extent must be positive.
 Thus,
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{name(100}$\sim$\texttt{11,200}$\sim$\texttt{5)}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+name(100~11,200~5)
+\end{terminalv}
 
 would refer to an 11$\times$5-pixel region of an image centred on pixel
 (100,~200).
@@ -3350,24 +3330,16 @@ if there are an even number of pixels).  If the value following the
 `$\sim$' is omitted, it will default to the number of pixels in that
 dimension.  Thus,
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{image( }$\sim$\texttt{100, }$\sim$\texttt{100)}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+image( ~100, ~100)
+\end{terminalv}
 
 could be used to refer to a 100$\times$100-pixel region located
 centrally within an image, while
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{image( 10}$\sim$\texttt{, 20}$\sim$ \texttt{)}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+image( 10~, 20~ )
+\end{terminalv}
 
 would specify a section that is the same size as the original image, but
 displaced so that it is centred on pixel (10,~20).
@@ -3404,7 +3376,7 @@ optionally all the WCS Frames present), if the NDF has a \htmlref{WCS
 component}{apndf:wcs}.  You can change the current Frame
 with \htmlref{WCSFRAME}{WCSFRAME}.
 
-{\bf World co-ordinates:}\\
+\subsubsection{World co-ordinates:}
 The standard formats used to specify WCS co-ordinates apply.\latex{See
 SUN/210 AST\_UNFORMAT}\html{See \xref{AST\_UNFORMAT}{sun210}{AST_UNFORMAT}}
 sections ``Frame Input Format'' and``SkyFrame Input Format''
@@ -3412,50 +3384,37 @@ for details and examples.
 
 Here are some examples of WCS co-ordinates defining NDF sections.
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{spectrum(9000:2E4)}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+spectrum(9000:2E4)
+\end{terminalv}
+
 This could specify a region of a spectrum between 9000 and 20000
 {\AA}ngstrom.\smallskip
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{image(12h59m49s}$\sim$\texttt{4.5m,27.5d:28d29.8m)}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+image(12h59m49s~4.5m,27.5d:28d29.8m)
+\end{terminalv}
+
 This could refer to a region approximately one degree on each side
 centred the Coma Cluster.  The section is 4.5 minutes of time along
 the right-ascension axis centred at \ra{12;59;49}, and
 extends from \dec{+27;30;} to \dec{+28;29;48}
 in declination.\smallskip
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{ifu(1h34m10.1s:1h34m12.4s,-2d35m:-2d35.5m,6563)}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+ifu(1h34m10.1s:1h34m12.4s,-2d35m:-2d35.5m,6563)
+\end{terminalv}
+
 This might specify a region of sky 2.3 seconds of time by 0.5 arcminutes
 in $H_\alpha$ light from an integral-field unit.\smallskip
 
 It is possible to use a colon to separate the fields in sexagesimal
 celestial and time co-ordinates, as in the following example that
 defines the equivalent section as the preceding Coma Cluster example.
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{image(12:57:34;13:02:04,27:30:00;28:29:48)}
-\end{center}
-\end{quote}
-\latex{\normalsize}
-\smallskip
+
+\begin{terminalv}
+image(12:57:34;13:02:04,27:30:00;28:29:48)
+\end{terminalv}
 
 There is a cost; you must use a semicolon to demarcate lower and upper
 bounds.  This is to enable differentiation of the two uses of the
@@ -3470,13 +3429,10 @@ strong recommendation is to use the {\em dms} and {\em hms} notation
 for celestial and time co-ordinates.
 
 Even given no sky co-ordinate range as in this example,
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{cube(12:34:56.7,-41:52:09,-100.0;250.0)}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+cube(12:34:56.7,-41:52:09,-100.0;250.0)
+\end{terminalv}
+
 do not mix colons for the two uses in the same expression.  Hence
 there is a semicolon to define the range in the third co-ordinate.
 The semicolon expression delimiter works with all classes of
@@ -3493,7 +3449,7 @@ permuted.  If the WCS axes are rotated, the NDF section actually used
 will be a box just large enough to hold the requested range of
 WCS-axis values.   Be careful.
 
-{\bf Axis co-ordinates:}\\
+\subsubsection{Axis co-ordinates:}
 For axis co-ordinates double-precision arithmetic is used to process the
 section values, but either double- or single-precision notation may be used
 when supplying them.  Both linear and non-linear {\em axis\/}
@@ -3501,36 +3457,24 @@ co-ordinates are supported, the values supplied being automatically
 converted into the corresponding pixel indices before use.  For
 instance,
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{spectrum(6500.0:7250.0)}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+spectrum(6500.0:7250.0)
+\end{terminalv}
 
 could be used to select the appropriate region of a spectrum calibrated
 in {\AA}ngstroms, while
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{spectrum(6000.0}$\sim$\texttt{500.0)}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+spectrum(6000.0~500.0)
+\end{terminalv}
 
 would select a region of the spectrum approximately from 5750 to
 6250.0~{\AA}ngstroms (the exact extent depending the values of the
 axis co-ordinates), and
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{spectrum(5500.0}$\sim$\texttt{21)}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+spectrum(5500.0~21)
+\end{terminalv}
 
 would select a 21-pixel-wide region of the spectrum centred on
 5500~{\AA}ngstroms.
@@ -3542,24 +3486,16 @@ would select a 21-pixel-wide region of the spectrum centred on
 A further form for the subscript expression involves specifying
 a fractional position along each dimension as a percentage, as follows
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{name( p\%}$\sim$\texttt{q\%, r\%:s\%, ... )}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+name( p%~q%, r%:s%, ... )
+\end{terminalv}
 
 where `\texttt{p\%}$\sim$\texttt{q\%}' specifies the centre and extent as
 percentages, and `\texttt{r\%:s\%}' specifies a percentage range. Thus,
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{image(25\%:75\%,50\%:}$\sim$\texttt{50\%)}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+image(25%:75%,50%:~50%)
+\end{terminalv}
 
 would refer to the central quarter of the image.  Both sections
 are equivalent.  The percentages are converted to the nearest pixel
@@ -3568,13 +3504,9 @@ centre to decide the centre and extents of the sections.
 The \htmlref{rules}{se:ndfsec-cenext} concerning omitted values before
 or after the delimiting $\sim$ apply. Thus,
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{image(40\%}$\sim$\texttt{, }$\sim$\texttt{50\%)}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+image(40%~, ~50%)
+\end{terminalv}
 
 could be used to refer to a full-width, half-height section centred at
 the (40\%, 50\%) fractional position.
@@ -3583,13 +3515,9 @@ A percentage value is not limited to the range 0--100\%.  In such
 circumstances the areas beyond the bounds of the NDF are set to bad.
 For example,
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\texttt{image(}$\sim$\texttt{110\%, -5\%:105\%)}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+image(~110%, -5%:105%)
+\end{terminalv}
 
 would give an enclosing border of bad pixels, extending 5\% of the original
 dimensions.  Both sections are equivalent.
@@ -3643,23 +3571,18 @@ refer to the same co-ordinate system.
 Thus, all the following might be used as valid specifications for NDF
 sections
 
-\latex{\small}
-\begin{quote}
-\begin{center}
-\begin{tabular}{l}
-\texttt{ndf(3.7)}\\
-\texttt{ndf(,5:)}\\
-\texttt{ndf(-77:01h23m45s,,4)}\\
-\texttt{ndf(66}$\sim$\texttt{9,4:17)}\\
-\texttt{ndf(}$\sim$\texttt{5,6}$\sim$\texttt{)}\\
-\texttt{ndf(}$\sim$\texttt{,:)}\\
-\texttt{ndf(5500.0}$\sim$\texttt{150,)}\\
-\texttt{ndf(2.137}$\sim$\texttt{10\%)}\\
-\texttt{ndf(3.0}$\sim$\texttt{1.5,-78.06D-3:13.0545,,,,)}\\
-\end{tabular}
-\end{center}
-\end{quote}
-\latex{\normalsize}
+\begin{terminalv}
+ndf(3.7)
+ndf(,5:)
+ndf(-77:01h23m45s,,4)
+ndf(66~9,4:17)
+ndf(~5,6~)
+ndf(~,:)
+ndf(5500.0~150,)
+ndf(2.137~10%)
+ndf(3.0~1.5,-78.06D-3:13.0545,,,,)
+\end{terminalv}
+
 
 Many other combinations are obviously possible. In cases where some
 bounds are given in pixel indices and some in WCS co-ordinates, two
