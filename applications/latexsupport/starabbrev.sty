@@ -8,7 +8,9 @@
 \else
 \sisetup{
   math-degree=\HCode{<mo>&deg;</mo>},
-  text-degree=\HCode{&deg;}
+  text-degree=\HCode{&deg;},
+  text-arcminute=\HCode{&prime;},
+  text-arcsecond=\HCode{&prime;&prime;}
 }
 \fi
 
@@ -39,16 +41,38 @@
 % commands for ra and dec (These do not put the angle symbol over the
 % decimal.
 \newcommand{\dec}[1]{\ang[retain-explicit-plus]{#1}}
-\newcommand{\ra}[1]{
-  \ang[text-degree=\textsuperscript{h},
-       math-degree=\textsuperscript{h},
-       math-arcminute=\textsuperscript{m},
-       math-arcsecond=\textsuperscript{s},
-       text-arcminute=\textsuperscript{m},
-       text-arcsecond=\textsuperscript{s}]%
+\ifpdf
+\newcommand{\ra}[1]{%
+  \ang[%
+    math-degree=\textsuperscript{h},
+    math-arcminute=\textsuperscript{m},
+    math-arcsecond=\textsuperscript{s},
+    text-degree=\textsuperscript{h},
+    text-arcminute=\textsuperscript{m},
+    text-arcsecond=\textsuperscript{s}]
       {#1}
+      }
+\else
+\newcommand{\ra}[1]{%
+  \ifmmode
+  \ang[%
+    text-degree=\HCode{<sup>h</sup>},
+    math-degree=\HCode{<sup>h</sup>},
+    math-arcminute=\HCode{<sup>m</sup>},
+    math-arcsecond=\HCode{<sup>s</sup>},
+    text-arcminute=\HCode{<sup>m</sup>},
+    text-arcsecond=\HCode{<sup>s</sup>},
+  ]%
+  {#1}%
+  \else
+  \ang[%
+    text-degree=\textsuperscript{h},
+    text-arcminute=\textsuperscript{m},
+    text-arcsecond=\textsuperscript{s}]
+      {#1}
+  \fi
 }
-
+\fi
 
 
 %% Note that due to limitations in tex4ht, you need to use \sb for _
