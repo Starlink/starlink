@@ -17,13 +17,13 @@ This guide covers the following topics.
 \itemsep0em
 \item \cref{Chapter}{sec:intro}{Chapter 1} -- Computer resources you'll need before getting started.
 \item \cref{Chapter}{sec:s2}{Chapter 2} -- A description of SCUBA-2 and its observing modes.
-\item \cref{Chapter}{sec:raw}{Chapter 3}  -- Data acquisition and instructions for examining raw data.
-\item \cref{Chapter}{sec:dimm}{Chapter 4}  -- An introduction to the Dynamic Iterative Map-Maker and a description of the configuration files.
-\item \cref{Chapter}{sec:pipe}{Chapter 5}  -- Instructions for using the \oracdr\ pipeline to reduce your data along with details on data retrieved from the JSA.
+\item \cref{Chapter}{sec:dimm}{Chapter 3}  -- An introduction to the Dynamic Iterative Map-Maker and a description of the configuration files.
+\item \cref{Chapter}{sec:pipe}{Chapter 4}  -- Instructions for using the \oracdr\ pipeline to reduce your data along with details on data retrieved from the JSA.
+\item \cref{Chapter}{sec:tweak}{Chapter 5}  -- Options for tailoring the configuration parameters to improve your final map.
 \item \cref{Chapter}{sec:eg}{Chapter 6}  -- Two worked examples covering a \htmlref{blank cosmology field}{sec:cosmology} and a \htmlref{galactic field}{sec:bright_ex}.
-\item \cref{Chapter}{sec:tweak}{Chapter 7}  -- Options for tailoring the configuration parameters to improve your final map.
-\item \cref{Chapter}{sec:postprocess}{Chapter 8}  -- Post-processing reduction steps such as applying the FCF, co-adding multiple maps and estimating the noise.
-\item \cref{Chapter}{sec:maps}{Chapter 9}  -- How to reduce your data using the map-maker.
+\item \cref{Chapter}{sec:postprocess}{Chapter 7}  -- Post-processing reduction steps such as applying the FCF, co-adding multiple maps and estimating the noise.
+\item \cref{Chapter}{sec:maps}{Chapter 8}  -- How to reduce your data using the map-maker.
+\item \cref{Chapter}{sec:raw}{Chapter 9}  -- SCUBA-2 Diagnostic Tools.
 
 
 \end{itemize}
@@ -202,10 +202,8 @@ passed to \picard.
 \hline
 \task{showme} & If you know the name of the Starlink document you want to view
                 use \task{showme}. When run, it launches a new webpage or tab
-                displaying the hypertext version of the document. &
-                \begin{terminalv}
-% showme sun95
-\end{terminalv}
+                displaying the hypertext version of the document. & \texttt{\% showme sun95}\\
+
 \\
 \hline
 \task{findme} & \task{findme} searches Starlink documents for a keyword. When
