@@ -617,8 +617,10 @@ The parameters in these recipes are discussed further
 \section{\xlabel{running_dimm}Manually running the iterative map-maker}
 \label{sec:running}
 
-The next chapter describes hot to run \cref{Chapter}{sec:pipe}{the SCUBA-2 Pipeline}.
-It is possible to run the map-maker outside of the Pipeline.
+The next chapter describes how to run \cref{Chapter}{sec:pipe}{the SCUBA-2 Pipeline}.
+Users - particularly new users - are encourage to make use of the \oracdr\ pipeline.
+It is possible to run the map-maker outside of this Pipeline and this detailed in 
+this section.
 
 When running the map-maker, you can call any of the provided
 configuration files directly from the Starlink path (e.g.
@@ -643,7 +645,7 @@ The default pixel sizes are:
 
 These can be changed by adding the \texttt{pixsize=}$x$ to the
 command string\footnote{The default sizes are defined as one quarter
-of the Airy disk rounded up to the nearest half arcsecond.}, where $x$
+of the array rounded up to the nearest half arcsecond.}, where $x$
 is your desired pixel size in arcsecs. We advise that you do not
 increase the pixel size at this stage as it will compromise model
 fitting---instead regrid your map as a post-processing step.

@@ -1,6 +1,42 @@
 \chapter{\xlabel{special}Specialised configuration files}
 \label{app:special}
 
+\section{\file{dimmconfig\_jsa\_generic.lis}}
+\begin{terminalv}
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
+
+#  Less aggressive cleaning to cope with bright sources
+noisecliphigh=10.0
+dcthresh = 100
+
+#  Don't want extended structure, so avoid problems with COM model by using
+#  individual common-mode models for each subarray.
+com.perarray = 1
+
+#  Aggressive filtering.
+flt.filt_edge_largescale=200
+
+#  Allow bolometer noise to vary with time, and using a box filter to
+#  determine mean noise in each box, in order to presevre as many samples
+#  as possible.
+noi.box_size=-15
+noi.box_type=1
+
+#  Use a maximum of 20 iterations
+numiter=-25
+maptol_mean=1
+maptol=0.01
+
+# new recommendations and using an ast model
+ast.zero_snr = 5
+ast.zero_snrlo = 3
+
+ast.skip=5
+flt.zero_snr=5
+flt.zero_snrlo=3
+\end{terminalv}
+
+
 \section{\file{dimmconfig\_bright\_extended.lis}}
 \begin{terminalv}
 ^$STARLINK_DIR/share/smurf/dimmconfig.lis
