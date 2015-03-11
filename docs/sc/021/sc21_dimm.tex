@@ -11,8 +11,8 @@ This chapter describes how the map-maker produces a science images
 from raw SCUBA-2 data. It is essential reading to gain an
 understanding of what has happened to produce your reduced image,
 especially if you wish to modify the default map-maker parameters.
-\color{red} If you prefer to jump straight in to the data reduction go
-to \cref{Chapter}{sec:maps}{Reducing Your Data}.\color{black}
+\color{red}\textbf{ If you prefer to jump straight in to the data reduction go
+to \cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline}.}\color{black}
 
 
 \section{\xlabel{dimm_theory}How it works}
@@ -610,6 +610,161 @@ the values specified in \file{dimmconfig\_bright\_extended.lis}.
 
 The parameters in these recipes are discussed further
 \cref{Chapter}{sec:tweak}{Tailoring Your Reduction}.
+
+
+
+
+\section{\xlabel{running_dimm}Manually running the iterative map-maker}
+\label{sec:running}
+
+The next chapter describes hot to run \cref{Chapter}{sec:pipe}{the SCUBA-2 Pipeline}.
+It is possible to run the map-maker outside of the Pipeline.
+
+When running the map-maker, you can call any of the provided
+configuration files directly from the Starlink path (e.g.
+\file{\^{}\$STARLINK\_DIR/share/smurf/dimmconfig.lis}). Alternatively,
+a local copy can be made and edited. Advice on which parameters to
+edit can be found in \cref{Section}{sec:tweak}{Tweaking the
+configuration file}.
+
+\begin{tip}
+  An up-caret (\,\texttt{\^{}}\,) is required any time you are reading
+  in a group text file in \starlink. For the map-maker this includes
+  the configuration file (a group of parameters) and a list of your
+  input files (e.g. \texttt{in=\^{}\,myrawfiles.txt}).
+\end{tip}
+
+
+The default pixel sizes are:
+\begin{itemize}
+\item 2\,arcsec at 450$\mu$m
+\item 4\,arcsec at 850$\mu$m
+\end{itemize}
+
+These can be changed by adding the \texttt{pixsize=}$x$ to the
+command string\footnote{The default sizes are defined as one quarter
+of the Airy disk rounded up to the nearest half arcsecond.}, where $x$
+is your desired pixel size in arcsecs. We advise that you do not
+increase the pixel size at this stage as it will compromise model
+fitting---instead regrid your map as a post-processing step.
+
+% Other ADAM parameter available with \makemap\ include ref, maxmem
+% and msg\_filter. Some of these appear in the example below but see
+% \cref{Appendix}{app:adam}{MAKEMAP ADAM Parameters} for
+% descriptions. A complete list of all ADAM parameters can be found in
+% \smurfsun.
+
+\begin{tip}
+  Map-maker not finding your raw files from a path? Check you have
+  double quotes around your `in' option and are not using
+  \texttt{*sdf}---use either \texttt{*.sdf} or just \texttt{*}.
+\end{tip}
+
+
+
+\begin{terminalv}
+% makemap in="/jcmtdata/raw/scuba2/s8*/20120720/00030/*.sdf" out=850_crl2688 \
+  config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
+
+Out of 32 input files, 4 were darks, 8 were fast flats and 20 were science
+Processing data from instrument 'SCUBA-2' for object 'CRL2688' from the
+following observation  :
+  20120720 #30 scan  /shutter
+
+MAKEMAP: Map-maker will use no more than 68401 MiB of memory
+
+Projection parameters used:
+CRPIX1 = 0
+CRPIX2 = 0
+CRVAL1 = 315.578333333333 ( RA = 21:02:18.800 )
+CRVAL2 = 36.6938055555556 ( Dec = 36:41:37.70 )
+CDELT1 = -0.00111111111111111 ( -4 arcsec )
+CDELT2 = 0.00111111111111111 ( 4 arcsec )
+CROTA2 = 0
+
+Output map pixel bounds: ( -132:122, -126:129 )
+
+Output map WCS bounds:
+Right ascension: 21:01:38.318 -> 21:03:03.280
+Declination: 36:33:07.19 -> 36:50:11.70
+
+smf_iteratemap: will down-sample data to match angular scale of 4 arcsec
+smf_iteratemap: Iterate to convergence (max 5)
+smf_iteratemap: stop when change in chi^2 < 0.001
+smf_iteratemap: provided data are in 1 continuous chunks, the largest of which
+has 5957 samples (153.729 s)
+smf_iteratemap: map-making requires 1376 MiB (map=3 MiB model calc=1372 MiB)
+smf_iteratemap: Continuous chunk 1 / 1 =========
+smf_calc_smoothedwvm: 0.977444 s to calculate unsmoothed WVM tau values
+smf_iteratemap: Iteration 1 / 5 ---------------
+--- Size of the entire data array ------------------------------------------
+bolos  : 5120
+tslices: bnd:0(0.0 min), map:5957(2.6 min), tot:5957(2.6 min)
+Total samples: 30499840
+--- Quality flagging statistics --------------------------------------------
+ BADDA:   10972794 (35.98%),        1842 bolos
+BADBOL:   11818688 (38.75%),        1984 bolos
+DCJUMP:      38809 ( 0.13%),
+  STAT:      71680 ( 0.24%),          14 tslices
+ NOISE:     810152 ( 2.66%),         136 bolos
+Total samples available for map:   18634826, 61.10% of max (3128.22 bolos)
+smf_iteratemap: Calculate time-stream model components
+smf_iteratemap: Rebin residual to estimate MAP
+smf_iteratemap: Calculate ast
+--- Quality flagging statistics --------------------------------------------
+ BADDA:   10972794 (35.98%),        1842 bolos  ,change          0 (+0.00%)
+BADBOL:   11925914 (39.10%),        2002 bolos  ,change     107226 (+0.91%)
+DCJUMP:      38809 ( 0.13%),                    ,change          0 (+0.00%)
+  STAT:      71680 ( 0.24%),          14 tslices,change          0 (+0.00%)
+   COM:     323165 ( 1.06%),                    ,change     323165 (+0.00%)
+ NOISE:     810152 ( 2.66%),         136 bolos  ,change          0 (+0.00%)
+Total samples available for map:   18312771, 60.04% of max (3074.16 bolos)
+     Change from last report:    -322055, -1.73% of previous
+smf_iteratemap: Will calculate chi^2 next iteration
+smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.874979 (mean) 73.7106 (max)
+smf_iteratemap: Iteration 2 / 5 ---------------
+smf_iteratemap: Calculate time-stream model components
+smf_iteratemap: Rebin residual to estimate MAP
+smf_iteratemap: Calculate ast
+--- Quality flagging statistics --------------------------------------------
+ BADDA:   10972794 (35.98%),        1842 bolos  ,change          0 (+0.00%)
+BADBOL:   11949742 (39.18%),        2006 bolos  ,change      23828 (+0.20%)
+ SPIKE:         34 ( 0.00%),                    ,change         34 (+0.00%)
+DCJUMP:      38809 ( 0.13%),                    ,change          0 (+0.00%)
+  STAT:      71680 ( 0.24%),          14 tslices,change          0 (+0.00%)
+   COM:     357816 ( 1.17%),                    ,change      34651 (+10.72%)
+ NOISE:     810152 ( 2.66%),         136 bolos  ,change          0 (+0.00%)
+Total samples available for map:   18278374, 59.93% of max (3068.39 bolos)
+     Change from last report:     -34397, -0.19% of previous
+smf_iteratemap: *** CHISQUARED = 0.983228126551834
+smf_iteratemap: *** NORMALIZED MAP CHANGE: 1.29181 (mean) 15.0552 (max)
+smf_iteratemap: Iteration 3 / 5 ---------------
+.....
+.....
+.....
+smf_iteratemap: Iteration 5 / 5 ---------------
+smf_iteratemap: Calculate time-stream model components
+smf_iteratemap: Rebin residual to estimate MAP
+smf_iteratemap: Calculate ast
+--- Quality flagging statistics --------------------------------------------
+ BADDA:   10972794 (35.98%),        1842 bolos  ,change          0 (+0.00%)
+BADBOL:   11949742 (39.18%),        2006 bolos  ,change          0 (+0.00%)
+ SPIKE:         34 ( 0.00%),                    ,change          0 (+0.00%)
+DCJUMP:      38809 ( 0.13%),                    ,change          0 (+0.00%)
+  STAT:      71680 ( 0.24%),          14 tslices,change          0 (+0.00%)
+   COM:     362902 ( 1.19%),                    ,change          0 (+0.00%)
+ NOISE:     810152 ( 2.66%),         136 bolos  ,change          0 (+0.00%)
+Total samples available for map:   18273302, 59.91% of max (3067.53 bolos)
+     Change from last report:          0, +0.00% of previous
+smf_iteratemap: *** CHISQUARED = 0.952708604771402
+smf_iteratemap: *** change: -0.000109049487216351
+smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.107427 (mean) 2.96138 (max)
+smf_iteratemap: ****** Completed in 5 iterations
+smf_iteratemap: ****** Solution CONVERGED
+Total samples available from all chunks: 18273302 (3067.53 bolos)
+%%%%\end{}
+\end{terminalv}
+
 
 
 
