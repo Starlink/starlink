@@ -195,7 +195,7 @@
 %\renewcommand\pm{\HCode{&plusmn}}
 
 %% Starlink xreferences.
-\renewcommand{\xref}[3]{\href{http://starlink.jach.hawaii.edu/cgi-bin/htxserver/#2.htx/#2.html?xref_#3}{#1}}
+\renewcommand{\xref}[3]{\href{http://www.starlink.ac.uk/cgi-bin/htxserver/#2.htx/#2.html?xref_#3}{#1}}
 \renewcommand{\xlabel}[1]{\HCode{<a name="xref_#1">}\Tg</a>}
 
 %% latexhtml stuff, should be removed from texts eventually. Set to
