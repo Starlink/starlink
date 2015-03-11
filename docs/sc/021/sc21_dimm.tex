@@ -362,17 +362,22 @@ been successfully accounted for by the other model components.
 
 \section{\xlabel{config}Specialised configuration files}
 \label{sec:config}
-The default configuration file \file{dimmconfig.lis} is intended to
-provide a reasonably good map for all types of observations. However,
-compromises have been made to reach that balance.
 
-Whilst \file{dimmconfig.lis} is always a good recipe to start with
+Currently all data reduced by the JCMT amd made public through the JCMT Science 
+Archive are reduced with \file{dimmconfig\_jsa\_generic.lis}. If 
+If unspecified an observation reduced with the pipeline using REDUCE\_SCAN
+This configuration file is intended to provide a reasonably good map 
+for all types of observations. However, compromises have been made to reach 
+that balance.
+
+Whilst \file{dimmconfig\_jsa\_generic.lis} is always a good recipe to start with
 you will want to follow this up with a specialised recipe that will suit
 your observation. A few specialised configuration files are supplied with
 \smurf\ and can be found in \file{\$STARLINK\_DIR/share/smurf/}.
 
-The specialised files are all based on \file{dimmconfig.lis}. This
-is illustrated by \cref{Figure}{fig:configtree}{figure below} where
+The specialised files are all built off a base configuration file called 
+\file{dimmconfig.lis}. This base file is common to all specialised configuration files.
+This common base file is illustrated by \cref{Figure}{fig:configtree}{figure below} where
 the parameters in \file{dimmconfig\_bright\_compact.lis} override
 any identical ones in the hidden file \file{dimmconfig\_bright.lis} which in turn
 override the values in \file{dimmconfig.lis}. The hierarchical
@@ -388,6 +393,49 @@ Below is a description of each of the specialised configuration files.
 The tables following each description list the parameters set for each
 recipe. A verbatim copy of these files can be found in
 \cref{Appendix}{app:special}{Specialised configuration files}.
+
+\subsection{dimmconfig\_jsa\_generic.lis}
+
+This configuration is designed to handle all science data. This is a good 
+configuration file to start if you are unsure how to proceed with your 
+data reduction. This file also utilises the base configuration file \file{dimmconfig.lis}.
+
+You may notice that elements of this 
+configuration are common to the other specialised configuration files.
+
+Iteratively applying a high-pass filter (\model{FLT}) can result in
+convergence problems when there is little or no signal in the
+map. Instead, a single, harsher high-pass filter is applied as a
+pre-processing step (corresponding to 200-arcsec scales at both
+450\,$\mu$m and 850\,$\mu$m). 
+
+\xparam{COM.PERARRAY}{com.perarray} is set to 1 indicating that a \model{COM} model
+should be fit separately for each sub-array. This is not ideal for extended structure 
+but can prevent issues from arising from variations in the common mode.
+In addition the S/N threshold for DC steps (\xparam{DCTHRESH}{dcthresh}) is relaxed from
+25 in the default file to 100 to avoid problems associated with bright sources.
+
+
+\latex{\renewcommand*\arraystretch{1}}
+\begin{table}[h!]
+\centering
+\begin{tabular}{|p{6.5cm}p{6.5cm}|}
+\hline
+\multicolumn{2}{|l|}{\file{dimmconfig\_jsa\_generic.lis}}\\
+\hline
+\param{numiter~=~-25}&\param{flt.filt\_edge\_largescale~=~200}\\
+\param{ast.zero\_snr~=~5}&\param{ast.zero\_snrlo~=~3}\\
+\param{ast.skip~=~5}&\param{flt.zero\_snr~=~5}\\
+\param{flt.zero\_snrlo~=~3}& \param{maptol~=~0.01}\\
+\param{maptol\_mean~=~1}&\param{noi.box\_type~=~1}\\
+\param{noisecliphigh~=~10.0}&\param{dcthresh~=~100}\\
+\param{com.perarray~=~1}&\\
+\hline
+\end{tabular}
+\end{table}
+
+
+
 
 \subsection{dimmconfig\_blank\_field.lis}
 
