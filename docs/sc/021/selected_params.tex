@@ -40,7 +40,7 @@
       back prior to forming the next map). This means that the
       residuals at the start of each of these iterations are
       unchanging and essentially equal to the cleaned raw data.
-      The value supplied for parameter {\tt{"}}\xref{numiter}{sun258}{numiter}{\tt{"}} should therefore
+      The value supplied for parameter {\tt{"}}\xref{numiter}{sun258}{NUMITER}{\tt{"}} should therefore
       be greater than the value of {\tt{"}}ast.skip{\tt{"}}.
 
       This option is useful, for instance, when using SNR-based
@@ -51,7 +51,7 @@
       If ast.skip is set to a negative value, it gives the
       largest number of iterations to perform and indicates
       that the AST model should be skipped on all of them. In
-      this case the value supplied for parameter {\tt{"}}\xref{numiter}{sun258}{numiter}{\tt{"}} is
+      this case the value supplied for parameter {\tt{"}}\xref{numiter}{sun258}{NUMITER}{\tt{"}} is
       ignored. [0]
    }
    \sstattributetype{
@@ -72,7 +72,7 @@
    \sstdescription{
       Using ast.zero\_circle defines a circle on the map outside
       of which the map will be constrained to zero on each
-      iteration (but see parameter {\tt{"}}\xref{ast.zero\_notlast}{sun258}{ast.zero\_notlast}{\tt{"}}). If a value
+      iteration (but see parameter {\tt{"}}\xref{ast.zero\_notlast}{sun258}{AST.ZERO_NOTLAST}{\tt{"}}). If a value
       is supplied for this parameter, it can be a single real value,
       or a comma-separated list of three real values in parentheses.
       If one value is supplied, it should be the radius of the
@@ -101,7 +101,7 @@
       If ast.zero\_freeze is non-zero, the AST mask will be frozen
       after the specified number of iterations. A value of zero
       means that the mask is never frozen. Note, any initial
-      iterations specified by parameter {\tt{"}}\xref{ast.skip}{sun258}{ast.skip}{\tt{"}} are not
+      iterations specified by parameter {\tt{"}}\xref{ast.skip}{sun258}{AST.SKIP}{\tt{"}} are not
       included in the count of iterations. [0]
    }
    \sstattributetype{
@@ -179,13 +179,13 @@
       iterations for which the AST model should be masked.
       Subsequent iterations are not masked. A value of zero
       means {\tt{"}}mask on all iterations{\tt{"}}. However, if parameter
-      {\tt{"}}\xref{ast.zero\_notlast}{sun258}{ast.zero\_notlast}{\tt{"}} is set, the mask will will not be
+      {\tt{"}}\xref{ast.zero\_notlast}{sun258}{AST.ZERO_NOTLAST}{\tt{"}} is set, the mask will will not be
       applied on the last iteration, even if ast.zero\_niter
       is zero. This feature will probably be useful for deep
       point-source observations for which the large-scale noise
       is not as important, but keeping as much data around the
       edges of the map is. Note, any initial iterations
-      specified by parameter {\tt{"}}\xref{ast.skip}{sun258}{ast.skip}{\tt{"}} are not included in
+      specified by parameter {\tt{"}}\xref{ast.skip}{sun258}{AST.SKIP}{\tt{"}} are not included in
       the count of iterations. [0]
    }
    \sstattributetype{
@@ -210,7 +210,7 @@
       iteration all map pixels with an SNR below this threshold
       will be forced to zero. the mask is re-evaluated on each
       iteration. An ast.zero\_snr value of zero means no SNR mask
-      is used. See also parameter {\tt{"}}\xref{ast.zero\_snr\_ffclean}{sun258}{ast.zero\_snr\_ffclean}{\tt{"}}. [0.0]
+      is used. See also parameter {\tt{"}}\xref{ast.zero\_snr\_ffclean}{sun258}{AST.ZERO_SNR_FFCLEAN}{\tt{"}}. [0.0]
    }
    \sstattributetype{
       real
@@ -229,7 +229,7 @@
    \sstdescription{
       If ast.zero\_snr\_fwhm is non-zero, the map-maker produces
       two maps: the first is created normally using the mask
-      specified by parameter {\tt{"}}\xref{ast.zero\_snr}{sun258}{ast.zero\_snr}{\tt{"}}. The final SNR-based
+      specified by parameter {\tt{"}}\xref{ast.zero\_snr}{sun258}{AST.ZERO_SNR}{\tt{"}}. The final SNR-based
       mask associated with this map is then smoothed using a
       Gaussian with FWHM equal to the ast.zero\_snr\_fwhm value (in
       arcsec). The whole iterative map-making process is then
@@ -255,7 +255,7 @@
    \sstdescription{
       The ast.zero\_snr\_low parameter gives the value (in the range
       0.0 to 1.0) at which to threshold the smoothed mask specified
-      by parameter {\tt{"}}\xref{ast.zero\_snr\_fwhm}{sun258}{ast.zero\_snr\_fwhm}{\tt{"}}. If it is negative, the value
+      by parameter {\tt{"}}\xref{ast.zero\_snr\_fwhm}{sun258}{AST.ZERO_SNR_FWHM}{\tt{"}}. If it is negative, the value
       is taken as the max smoothed value of a blob containing
       {\tt{"}}ast.zero\_snr\_low{\tt{"}} pixels. Thus a value of {\tt{"}}-1.1{\tt{"}} will cut at
       a height just sufficient to remove blobs of a single pixel
@@ -279,7 +279,7 @@
 }{
    \sstdescription{
       If non-zero values are supplied for ast.zero\_snrlo and
-      parameter {\tt{"}}\xref{ast.zero\_snr}{sun258}{ast.zero\_snr}{\tt{"}}, then the basic mask created by
+      parameter {\tt{"}}\xref{ast.zero\_snr}{sun258}{AST.ZERO_SNR}{\tt{"}}, then the basic mask created by
       thresholding at the SNR value specified by ast.zero\_snr is
       modified by expanding each un-masked {\tt{"}}source{\tt{"}} area down to
       an SNR equal to ast.zero\_snrlo, without introducing any new
@@ -302,8 +302,8 @@
 }{
    \sstdescription{
       If more than one AST mask is specified (for instance, if
-      values are supplied for both parameter {\tt{"}}\xref{ast.zero\_lowhits}{sun258}{ast.zero\_lowhits}{\tt{"}}
-      and parameter {\tt{"}}\xref{ast.zero\_snr}{sun258}{ast.zero\_snr}{\tt{"}}), then they are combined
+      values are supplied for both parameter {\tt{"}}\xref{ast.zero\_lowhits}{sun258}{AST.ZERO_LOWHITS}{\tt{"}}
+      and parameter {\tt{"}}\xref{ast.zero\_snr}{sun258}{AST.ZERO_SNR}{\tt{"}}), then they are combined
       into a single mask. If ast.zero\_union is true (i.e.
       non-zero), then the source region in the combined mask is
       the union of the source regions in the individual masks.
@@ -360,7 +360,7 @@
       completely disable the flagging of outlier bolometers
       compared with the common-mode, simply set com.noflag=1.
       The flags may be frozen after a specified number of
-      iterations - see parameter {\tt{"}}\xref{com.freeze\_flags}{sun258}{com.freeze\_flags}{\tt{"}}. [0.2]
+      iterations - see parameter {\tt{"}}\xref{com.freeze\_flags}{sun258}{COM.FREEZE_FLAGS}{\tt{"}}. [0.2]
    }
    \sstattributetype{
       real
@@ -379,7 +379,7 @@
    \sstdescription{
       The maximum number of standard deviations away from the
       mean correlation coefficient that a bolometer can be
-      without being rejected. See parameter {\tt{"}}\xref{com.corr\_abstol}{sun258}{com.corr\_abstol}{\tt{"}}. [5.0]
+      without being rejected. See parameter {\tt{"}}\xref{com.corr\_abstol}{sun258}{COM.CORR_ABSTOL}{\tt{"}}. [5.0]
    }
    \sstattributetype{
       real
@@ -399,8 +399,8 @@
       If non-zero, the flags marking bolometers that differ
       from the common-mode are frozen after the specified number
       of iterations. this can help convergence. See parameter
-      {\tt{"}}\xref{com.corr\_abstol}{sun258}{com.corr\_abstol}{\tt{"}}. Note - any initial iterations
-      specified by parameter {\tt{"}}\xref{ast.skip}{sun258}{ast.skip}{\tt{"}} are not included in the
+      {\tt{"}}\xref{com.corr\_abstol}{sun258}{COM.CORR_ABSTOL}{\tt{"}}. Note - any initial iterations
+      specified by parameter {\tt{"}}\xref{ast.skip}{sun258}{AST.SKIP}{\tt{"}} are not included in the
       count of iterations. [0]
    }
    \sstattributetype{
@@ -420,7 +420,7 @@
    \sstdescription{
       The maximum absolute ratio between a bolometer's gain
       coefficient, and the mean gain coefficient for the bolometer
-      not to be rejected. See parameter {\tt{"}}\xref{com.corr\_abstol}{sun258}{com.corr\_abstol}{\tt{"}}. [3.0]
+      not to be rejected. See parameter {\tt{"}}\xref{com.corr\_abstol}{sun258}{COM.CORR_ABSTOL}{\tt{"}}. [3.0]
    }
    \sstattributetype{
       real
@@ -441,7 +441,7 @@
       a box. The gain, offset and correlation coefficient
       describing the relationship between a bolometer time
       stream and the common-mode is re-evauated for each such
-      box of time slices. See parameter {\tt{"}}\xref{com.corr\_abstol}{sun258}{com.corr\_abstol}{\tt{"}}. [-30.0]
+      box of time slices. See parameter {\tt{"}}\xref{com.corr\_abstol}{sun258}{COM.CORR_ABSTOL}{\tt{"}}. [-30.0]
    }
    \sstattributetype{
       real
@@ -459,7 +459,7 @@
 }{
    \sstdescription{
       The minimum fraction of good gain boxes for a usable bolometer.
-      See parameter {\tt{"}}\xref{com.corr\_abstol}{sun258}{com.corr\_abstol}{\tt{"}}. [0.25]
+      See parameter {\tt{"}}\xref{com.corr\_abstol}{sun258}{COM.CORR_ABSTOL}{\tt{"}}. [0.25]
    }
    \sstattributetype{
       integer
@@ -477,7 +477,7 @@
 }{
    \sstdescription{
       The ratio of the largest usable gain to the mean gain for a
-      bolometer not to be rejected. See parameter {\tt{"}}\xref{com.corr\_abstol}{sun258}{com.corr\_abstol}{\tt{"}}. [4.0]
+      bolometer not to be rejected. See parameter {\tt{"}}\xref{com.corr\_abstol}{sun258}{COM.CORR_ABSTOL}{\tt{"}}. [4.0]
    }
    \sstattributetype{
       real
@@ -496,7 +496,7 @@
    \sstdescription{
       The maximum number of standard deviations away from the
       mean gain coefficient that a bolometer can be without being
-      rejected. See parameter {\tt{"}}\xref{com.corr\_abstol}{sun258}{com.corr\_abstol}{\tt{"}}. [5]
+      rejected. See parameter {\tt{"}}\xref{com.corr\_abstol}{sun258}{COM.CORR_ABSTOL}{\tt{"}}. [5]
    }
    \sstattributetype{
       real
@@ -514,7 +514,7 @@
 }{
    \sstdescription{
       If non-zero, disable flagging of bad bolometers using the
-      common-mode. See parameter {\tt{"}}\xref{com.corr\_abstol}{sun258}{com.corr\_abstol}{\tt{"}}. [0]
+      common-mode. See parameter {\tt{"}}\xref{com.corr\_abstol}{sun258}{COM.CORR_ABSTOL}{\tt{"}}. [0]
    }
    \sstattributetype{
       integer
@@ -554,7 +554,7 @@
    \sstdescription{
       This value is only used if data from more than one
       sub-array is being included in the map, and parameter
-      {\tt{"}}\xref{com.perarray}{sun258}{com.perarray}{\tt{"}} is zero, causing a single mean COM model to
+      {\tt{"}}\xref{com.perarray}{sun258}{COM.PERARRAY}{\tt{"}} is zero, causing a single mean COM model to
       be used for all sub-arrays. In such cases, if the
       common-mode signals estimated from the individual
       sub-arrays show significantly different structure,
@@ -583,7 +583,7 @@
 
       Setting this parameter to 3 is a good starting point.
       Setting it to zero (the default) causes this consistency
-      filter to be skipped. See also parameter {\tt{"}}\xref{com.sig\_wing}{sun258}{com.sig\_wing}{\tt{"}}. [0]
+      filter to be skipped. See also parameter {\tt{"}}\xref{com.sig\_wing}{sun258}{COM.SIG_WING}{\tt{"}}. [0]
    }
    \sstattributetype{
       real
@@ -625,7 +625,7 @@
       If com.zero\_freeze is non-zero, the COM mask will be frozen
       after the specified number of iterations. A value of zero
       means that the mask is never frozen. Note, any initial
-      iterations specified by parameter {\tt{"}}\xref{ast.skip}{sun258}{ast.skip}{\tt{"}} are not
+      iterations specified by parameter {\tt{"}}\xref{ast.skip}{sun258}{AST.SKIP}{\tt{"}} are not
       included in the count of iterations. [0]
    }
    \sstattributetype{
@@ -704,7 +704,7 @@
       Setting the com.zero\_snr parameter will exclude samples from
       the COM estimate that fall within map pixels with SNR values
       greater than com.zero\_snr. A com.zero\_snr value of zero means
-      no SNR mask is used. See also parameter {\tt{"}}\xref{com.zero\_snr\_ffclean}{sun258}{com.zero\_snr\_ffclean}{\tt{"}}.
+      no SNR mask is used. See also parameter {\tt{"}}\xref{com.zero\_snr\_ffclean}{sun258}{COM.ZERO_SNR_FFCLEAN}{\tt{"}}.
 
       Note, the SNR values are only available once a map has been
       created, and so using this parameter results in no COM masking
@@ -714,7 +714,7 @@
       would polute the AST model derived from the map, and thus
       polute the residuals on the next iteration, resulting in
       the bowls remaining in later maps. To avoid this, parameter
-      {\tt{"}}\xref{ast.skip}{sun258}{ast.skip}{\tt{"}} can be set to a positive value. This causes the
+      {\tt{"}}\xref{ast.skip}{sun258}{AST.SKIP}{\tt{"}} can be set to a positive value. This causes the
       AST model to be skipped (i.e. no AST signal is subtracted from
       the residuals) for the first {\tt{"}}ast.skip{\tt{"}} iterations. This means
       that a good COM mask can be formed from these initial iterations
@@ -737,7 +737,7 @@
 }{
    \sstdescription{
       If non-zero values are supplied for com.zero\_snrlo and
-      parameter {\tt{"}}\xref{com.zero\_snr}{sun258}{com.zero\_snr}{\tt{"}}, then the basic mask created by
+      parameter {\tt{"}}\xref{com.zero\_snr}{sun258}{COM.ZERO_SNR}{\tt{"}}, then the basic mask created by
       thresholding at the SNR value specified by com.zero\_snr is
       modified by expanding each un-masked {\tt{"}}source{\tt{"}} area down to
       an SNR equal to com.zero\_snrlo, without introducing any new
@@ -760,8 +760,8 @@
 }{
    \sstdescription{
       If more than one COM mask is specified (for instance, if
-      values are supplied for both parameter {\tt{"}}\xref{com.zero\_lowhits}{sun258}{com.zero\_lowhits}{\tt{"}}
-      and parameter {\tt{"}}\xref{com.zero\_snr}{sun258}{com.zero\_snr}{\tt{"}}), then they are combined
+      values are supplied for both parameter {\tt{"}}\xref{com.zero\_lowhits}{sun258}{COM.ZERO_LOWHITS}{\tt{"}}
+      and parameter {\tt{"}}\xref{com.zero\_snr}{sun258}{COM.ZERO_SNR}{\tt{"}}), then they are combined
       into a single mask. If com.zero\_union is true (i.e.
       non-zero), then the source region in the combined mask is
       the union of the source regions in the individual masks.
@@ -833,7 +833,7 @@
       time, then all bolometers are corrected for a step at that
       time, using lower thresholds. A value of zero switches off
       the correction of correlated steps within the initial
-      data cleaning phase. Only used if parameter {\tt{"}}\xref{dcfitbox}{sun258}{dcfitbox}{\tt{"}} is
+      data cleaning phase. Only used if parameter {\tt{"}}\xref{dcfitbox}{sun258}{DCFITBOX}{\tt{"}} is
       non-zero. [0]
    }
    \sstattributetype{
@@ -856,7 +856,7 @@
       before the entire bolometer is flagged as bad. A value of
       zero will cause a bolometer to be rejected if any steps are
       found in the bolometer data stream. Only used if parameter
-      {\tt{"}}\xref{dcfitbox}{sun258}{dcfitbox}{\tt{"}} is non-zero. [10]
+      {\tt{"}}\xref{dcfitbox}{sun258}{DCFITBOX}{\tt{"}} is non-zero. [10]
    }
    \sstattributetype{
       integer
@@ -876,7 +876,7 @@
       The width of the median filter used to smooth a bolometer
       data stream prior to finding DC jumps. If positive, in units
       of samples. If negative, in units of seconds. Only used if
-      parameter {\tt{"}}\xref{dcfitbox}{sun258}{dcfitbox}{\tt{"}} is non-zero. [50]
+      parameter {\tt{"}}\xref{dcfitbox}{sun258}{DCFITBOX}{\tt{"}} is non-zero. [50]
    }
    \sstattributetype{
       integer
@@ -896,12 +896,12 @@
       The SNR threshold at which to detect DC steps. Note, this
       refers to the noise level in the bolometer data after it
       has been smoothed with a median filter of width given by
-      parameter {\tt{"}}\xref{dcsmooth}{sun258}{dcsmooth}{\tt{"}}. In order to find the equivalent
+      parameter {\tt{"}}\xref{dcsmooth}{sun258}{DCSMOOTH}{\tt{"}}. In order to find the equivalent
       threshold in the unsmoothed data, multiply the dcthresh
       value by 1.25/sqrt(dcsmooth). For instance, the default
       values for dcsmooth (50) and dcthresh (25) correspond
       to a threshold of 25$*$1.25/sqrt(50) = 4.4 sigma in the
-      unsmoothed data. Only used if parameter {\tt{"}}\xref{dcfitbox}{sun258}{dcfitbox}{\tt{"}} is
+      unsmoothed data. Only used if parameter {\tt{"}}\xref{dcfitbox}{sun258}{DCFITBOX}{\tt{"}} is
       non-zero. [25.0]
    }
    \sstattributetype{
@@ -971,7 +971,7 @@
       If non-zero, the data will be saved to an NDF immediately
       after data cleaning and before map-making. The NDF name will
       be the same as model components, except with the suffix
-      {\tt{"}}\_cln{\tt{"}}. Even if parameter {\tt{"}}\xref{doclean}{sun258}{doclean}{\tt{"}} ise set to zero, the
+      {\tt{"}}\_cln{\tt{"}}. Even if parameter {\tt{"}}\xref{doclean}{sun258}{DOCLEAN}{\tt{"}} ise set to zero, the
       data will be exported immediately before map-making. [0]
    }
    \sstattributetype{
@@ -994,7 +994,7 @@
       specify a comma-separated list of component names, enclosed
       in parentheses, to be exported. Note that you can specify
       additional components RES and QUA to what may be provided to
-      parameter {\tt{"}}\xref{modelorder}{sun258}{modelorder}{\tt{"}} if you wish to export the residual
+      parameter {\tt{"}}\xref{modelorder}{sun258}{MODELORDER}{\tt{"}} if you wish to export the residual
       model or quality arrays respectively. Exportation of RES is
       implied if NOI is specified as it becomes the variance
       component of the resulting NDF for RES. QUA will become the
@@ -1019,7 +1019,7 @@
    \sstdescription{
       Specifies the CSO tau value to be used by the EXT model.
       If {\tt $<$undef$>$}, the default value to use is derived from the
-      FITS headers. See parameter {\tt{"}}\xref{ext.tausrc}{sun258}{ext.tausrc}{\tt{"}}. [{\tt $<$undef$>$}]
+      FITS headers. See parameter {\tt{"}}\xref{ext.tausrc}{sun258}{EXT.TAUSRC}{\tt{"}}. [{\tt $<$undef$>$}]
    }
    \sstattributetype{
       real
@@ -1036,7 +1036,7 @@
    Controls the extinction values used in the EXT model
 }{
    \sstdescription{
-      Used if parameter {\tt{"}}\xref{ext.tausrc}{sun258}{ext.tausrc}{\tt{"}} is set to {\tt{"}}filtertau{\tt{"}}. If
+      Used if parameter {\tt{"}}\xref{ext.tausrc}{sun258}{EXT.TAUSRC}{\tt{"}} is set to {\tt{"}}filtertau{\tt{"}}. If
       {\tt $<$undef$>$}, the default value to use is derived from the
       FITS headers. [{\tt $<$undef$>$}]
    }
@@ -1056,7 +1056,7 @@
 }{
    \sstdescription{
       The method to use for determing tau. Can be {\tt{"}}adaptive{\tt{"}},
-      {\tt{"}}full{\tt{"}} or {\tt{"}}quick{\tt{"}}. See parameter {\tt{"}}\xref{ext.tausrc}{sun258}{ext.tausrc}{\tt{"}}. [adaptive]
+      {\tt{"}}full{\tt{"}} or {\tt{"}}quick{\tt{"}}. See parameter {\tt{"}}\xref{ext.tausrc}{sun258}{EXT.TAUSRC}{\tt{"}}. [adaptive]
    }
    \sstattributetype{
       string
@@ -1077,7 +1077,7 @@
       Each tau relation is parameterised in the form:
       {\tt{"}}tau\_filt = a ( tau\_cso $+$ b ){\tt{"}}, where {\tt{"}}a{\tt{"}} and {\tt{"}}b{\tt{"}} are the
       two values supplied for this parameter. See also parameter
-      {\tt{"}}\xref{ext.taurelation.850}{sun258}{ext.taurelation.850}{\tt{"}}. Here, the trailing {\tt{"}}.450{\tt{"}} in the
+      {\tt{"}}\xref{ext.taurelation.850}{sun258}{EXT.TAURELATION.850}{\tt{"}}. Here, the trailing {\tt{"}}.450{\tt{"}} in the
       parameter name is the filter name, not the sub-instrument
       name as would be the case if it appeared at the start of
       parameter name. [(26.0,-0.012)]
@@ -1098,7 +1098,7 @@
    and the EXTINCTION task
 }{
    \sstdescription{
-      The 850 um equivalent to the parameter {\tt{"}}\xref{ext.taurelation.450}{sun258}{ext.taurelation.450}{\tt{"}}. [(4.6,-0.0043)]
+      The 850 um equivalent to the parameter {\tt{"}}\xref{ext.taurelation.450}{sun258}{EXT.TAURELATION.450}{\tt{"}}. [(4.6,-0.0043)]
    }
    \sstattributetype{
       (real,real)
@@ -1191,12 +1191,12 @@
    initial data cleaning
 }{
    \sstdescription{
-      Together with parameter {\tt{"}}\xref{filt\_edge\_smallscale}{sun258}{filt\_edge\_smallscale}{\tt{"}}, this
+      Together with parameter {\tt{"}}\xref{filt\_edge\_smallscale}{sun258}{FILT_EDGE_SMALLSCALE}{\tt{"}}, this
       specifies the frequencies which the initial data cleaning is
       to remove from the data streams, based on a range of requested
       spatial scales (in arcsec), and using internal measurements of
       the average slew speed. These will override parameter
-      {\tt{"}}\xref{filt\_edgehigh}{sun258}{filt\_edgehigh}{\tt{"}} and parameter {\tt{"}}\xref{filt\_edgelow}{sun258}{filt\_edgelow}{\tt{"}}. For example,
+      {\tt{"}}\xref{filt\_edgehigh}{sun258}{FILT_EDGEHIGH}{\tt{"}} and parameter {\tt{"}}\xref{filt\_edgelow}{sun258}{FILT_EDGELOW}{\tt{"}}. For example,
       suppose the slew speed is 100 arcsec/sec. We want to ensure
       that the beam is fully sampled, say 2 arcsec at 450um.
       That scale is crossed in 2/100 = 0.02 s, so we don't need
@@ -1228,7 +1228,7 @@
       If non-zero, this is the cut-off frequency of a
       low pass filter that is applied to the data stream as
       part of the initial data cleaning. See also parameter
-      {\tt{"}}\xref{filt\_edge\_largescale}{sun258}{filt\_edge\_largescale}{\tt{"}}. [0]
+      {\tt{"}}\xref{filt\_edge\_largescale}{sun258}{FILT_EDGE_LARGESCALE}{\tt{"}}. [0]
    }
    \sstattributetype{
       real
@@ -1320,12 +1320,12 @@
    FLT model
 }{
    \sstdescription{
-      Together with parameter {\tt{"}}\xref{flt.filt\_edge\_smallscale}{sun258}{flt.filt\_edge\_smallscale}{\tt{"}}, this
+      Together with parameter {\tt{"}}\xref{flt.filt\_edge\_smallscale}{sun258}{FLT.FILT_EDGE_SMALLSCALE}{\tt{"}}, this
       specifies the frequencies which the FLT model is to remove
       from the data streams, based on a range of requested spatial
       scales (in arcsec), and using internal measurements of
       the average slew speed. These will override parameter
-      {\tt{"}}\xref{flt.filt\_edgehigh}{sun258}{flt.filt\_edgehigh}{\tt{"}} and parameter {\tt{"}}\xref{flt.filt\_edgelow}{sun258}{flt.filt\_edgelow}{\tt{"}}. For
+      {\tt{"}}\xref{flt.filt\_edgehigh}{sun258}{FLT.FILT_EDGEHIGH}{\tt{"}} and parameter {\tt{"}}\xref{flt.filt\_edgelow}{sun258}{FLT.FILT_EDGELOW}{\tt{"}}. For
       example, suppose the slew speed is 100 arcsec/sec. We want to
       ensure that the beam is fully sampled, say 2 arcsec at 450um.
       That scale is crossed in 2/100 = 0.02 s, so we don't need
@@ -1354,7 +1354,7 @@
    FLT model on the last iteration
 }{
    \sstdescription{
-      This is the value to be used for parameter {\tt{"}}\xref{flt.filt\_edge\_largescale}{sun258}{flt.filt\_edge\_largescale}{\tt{"}}
+      This is the value to be used for parameter {\tt{"}}\xref{flt.filt\_edge\_largescale}{sun258}{FLT.FILT_EDGE_LARGESCALE}{\tt{"}}
       on the last iteration. If it is {\tt{"}}{\tt $<$undef$>$}{\tt{"}}, then the same value
       will be used as for earlier iterations. [{\tt $<$undef$>$}]
    }
@@ -1407,7 +1407,7 @@
       is specified as a multiple of the filter size. A value of
       0.5 could be a good starting point. Note, the ringing
       filter is not applied on any initial iterations specified
-      by parameter {\tt{"}}\xref{ast.skip}{sun258}{ast.skip}{\tt{"}}. [0]
+      by parameter {\tt{"}}\xref{ast.skip}{sun258}{AST.SKIP}{\tt{"}}. [0]
    }
    \sstattributetype{
       float
@@ -1448,7 +1448,7 @@
       If flt.zero\_freeze is non-zero, the FLT mask will be frozen
       after the specified number of iterations. A value of zero
       means that the mask is never frozen. Note, any initial
-      iterations specified by parameter {\tt{"}}\xref{ast.skip}{sun258}{ast.skip}{\tt{"}} are not
+      iterations specified by parameter {\tt{"}}\xref{ast.skip}{sun258}{AST.SKIP}{\tt{"}} are not
       included in the count of iterations. [0]
    }
    \sstattributetype{
@@ -1529,11 +1529,11 @@
       iterations for which the FLT model should be masked.
       Subsequent iterations are not masked. A value of zero
       means {\tt{"}}mask on all iterations{\tt{"}}. However, if parameter
-      {\tt{"}}\xref{flt.zero\_notlast}{sun258}{flt.zero\_notlast}{\tt{"}} is set, the mask will will not be applied
+      {\tt{"}}\xref{flt.zero\_notlast}{sun258}{FLT.ZERO_NOTLAST}{\tt{"}} is set, the mask will will not be applied
       on the last iteration, even if flt.zero\_niter is zero.
       Note, using FLT masking on many iterations can inhibit
       convergence. Also, any initial iterations specified by
-      parameter {\tt{"}}\xref{ast.skip}{sun258}{ast.skip}{\tt{"}} are not included in the count of
+      parameter {\tt{"}}\xref{ast.skip}{sun258}{AST.SKIP}{\tt{"}} are not included in the count of
       iterations. [2]
    }
    \sstattributetype{
@@ -1556,7 +1556,7 @@
       contributing to the FLT model if they fall within map pixels
       that have SNR values greater than flt.zero\_snr. A flt.zero\_snr
       value of zero means no SNR mask is used. See also parameter
-      {\tt{"}}\xref{flt.zero\_snr\_ffclean}{sun258}{flt.zero\_snr\_ffclean}{\tt{"}}.
+      {\tt{"}}\xref{flt.zero\_snr\_ffclean}{sun258}{FLT.ZERO_SNR_FFCLEAN}{\tt{"}}.
 
       Note, the SNR values are only available once a map has been
       created, and so using this parameter results in no FLT masking
@@ -1566,7 +1566,7 @@
       would polute the AST model derived from the map, and thus
       polute the residuals on the next iteration, resulting in
       the rings remaining in later maps. To avoid this, parameter
-      {\tt{"}}\xref{ast.skip}{sun258}{ast.skip}{\tt{"}} can be set to a positive value. This causes the
+      {\tt{"}}\xref{ast.skip}{sun258}{AST.SKIP}{\tt{"}} can be set to a positive value. This causes the
       AST model to be skipped (i.e. no AST signal is subtracted from
       the residuals) for the first {\tt{"}}ast.skip{\tt{"}} iterations. This means
       that a good FLT mask can be formed from these initial iterations
@@ -1589,7 +1589,7 @@
 }{
    \sstdescription{
       If non-zero values are supplied for flt.zero\_snrlo and
-      parameter {\tt{"}}\xref{flt.zero\_snr}{sun258}{flt.zero\_snr}{\tt{"}}, then the basic mask created by
+      parameter {\tt{"}}\xref{flt.zero\_snr}{sun258}{FLT.ZERO_SNR}{\tt{"}}, then the basic mask created by
       thresholding at the SNR value specified by flt.zero\_snr is
       modified by expanding each un-masked {\tt{"}}source{\tt{"}} area down to
       an SNR equal to flt.zero\_snrlo, without introducing any new
@@ -1612,8 +1612,8 @@
 }{
    \sstdescription{
       If more than one FLT mask is specified (for instance, if
-      values are supplied for both parameter {\tt{"}}\xref{flt.zero\_lowhits}{sun258}{flt.zero\_lowhits}{\tt{"}}
-      and parameter {\tt{"}}\xref{flt.zero\_snr}{sun258}{flt.zero\_snr}{\tt{"}}), then they are combined
+      values are supplied for both parameter {\tt{"}}\xref{flt.zero\_lowhits}{sun258}{FLT.ZERO_LOWHITS}{\tt{"}}
+      and parameter {\tt{"}}\xref{flt.zero\_snr}{sun258}{FLT.ZERO_SNR}{\tt{"}}), then they are combined
       into a single mask. If flt.zero\_union is true (i.e.
       non-zero), then the source region in the combined mask is
       the union of the source regions in the individual masks.
@@ -1665,16 +1665,16 @@
 }{
    \sstdescription{
       If the normalised change (either the mean or maximum change -
-      see parameter {\tt{"}}\xref{maptol\_mean}{sun258}{maptol\_mean}{\tt{"}}) between the maps created on
+      see parameter {\tt{"}}\xref{maptol\_mean}{sun258}{MAPTOL_MEAN}{\tt{"}}) between the maps created on
       subsequent iterations falls below the value of maptol, then the
       map-maker performs one more iteration and then terminates. Only
-      used if parameter {\tt{"}}\xref{numiter}{sun258}{numiter}{\tt{"}} is negative. The normalised mean
+      used if parameter {\tt{"}}\xref{numiter}{sun258}{NUMITER}{\tt{"}} is negative. The normalised mean
       (or maximum) change between maps is defined as the mean (or
       maximum) of the absolute change in map pixel value, taken
       over all pixels within the region of the AST mask (if any,
-      see parameter {\tt{"}}\xref{ast.zero\_mask}{sun258}{ast.zero\_mask}{\tt{"}}, etc), and normalised by the RMS
+      see parameter {\tt{"}}\xref{ast.zero\_mask}{sun258}{AST.ZERO_MASK}{\tt{"}}, etc), and normalised by the RMS
       of the square root of the pixel variances. Compared to parameter
-      {\tt{"}}\xref{chitol}{sun258}{chitol}{\tt{"}}, this is much more like a {\tt{"}}by eye{\tt{"}} test, that will stop
+      {\tt{"}}\xref{chitol}{sun258}{CHITOL}{\tt{"}}, this is much more like a {\tt{"}}by eye{\tt{"}} test, that will stop
       the solution when the map stops changing. [0.05]
    }
    \sstattributetype{
@@ -1846,7 +1846,7 @@
    Reject bolometers based on their noise
 }{
    \sstdescription{
-      See parameter {\tt{"}}\xref{noisecliphigh}{sun258}{noisecliphigh}{\tt{"}}. [0]
+      See parameter {\tt{"}}\xref{noisecliphigh}{sun258}{NOISECLIPHIGH}{\tt{"}}. [0]
    }
    \sstattributetype{
       real
@@ -1863,7 +1863,7 @@
    Reject bolometers based on their noise
 }{
    \sstdescription{
-      See parameter {\tt{"}}\xref{noisecliphigh}{sun258}{noisecliphigh}{\tt{"}}. [0]
+      See parameter {\tt{"}}\xref{noisecliphigh}{sun258}{NOISECLIPHIGH}{\tt{"}}. [0]
    }
    \sstattributetype{
       integer
@@ -1884,8 +1884,8 @@
       iterations will always be performed. If a negative number is
       supplied, the absolute value gives the maximum number of
       iterations to perform. Fewer iterations will be performed if
-      the termination criteria specified by parameter {\tt{"}}\xref{maptol}{sun258}{maptol}{\tt{"}} and
-      parameter {\tt{"}}\xref{chitol}{sun258}{chitol}{\tt{"}} are both met before {\tt{"}}-numiter{\tt{"}}
+      the termination criteria specified by parameter {\tt{"}}\xref{maptol}{sun258}{MAPTOL}{\tt{"}} and
+      parameter {\tt{"}}\xref{chitol}{sun258}{CHITOL}{\tt{"}} are both met before {\tt{"}}-numiter{\tt{"}}
       iterations have been performed. [-5]
    }
    \sstattributetype{
@@ -1951,7 +1951,7 @@
       initial data cleaning, in units of samples if positive and
       seconds if negative. For instance, setting spikebox to 50
       will check for excursions from a rolling median filter in a
-      box of length 50 samples. Also see parameter {\tt{"}}\xref{spikethresh}{sun258}{spikethresh}{\tt{"}}. [50]
+      box of length 50 samples. Also see parameter {\tt{"}}\xref{spikethresh}{sun258}{SPIKETHRESH}{\tt{"}}. [50]
    }
    \sstattributetype{
       integer
@@ -1971,7 +1971,7 @@
    \sstdescription{
       The SNR value at which to flag spikes within the
       sigma-clipper used within initial data cleaning. Also see
-      parameter {\tt{"}}\xref{spikebox}{sun258}{spikebox}{\tt{"}}. No de-spiking is performed in the
+      parameter {\tt{"}}\xref{spikebox}{sun258}{SPIKEBOX}{\tt{"}}. No de-spiking is performed in the
       initial data cleaning if a value of zero is supplied. [0]
    }
    \sstattributetype{

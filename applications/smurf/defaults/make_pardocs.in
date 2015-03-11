@@ -238,7 +238,7 @@
        if( $subset == 0 ) {
           $document =~ s/(arameter\s*\{\\tt \"\})$rname(\{\\tt \"\})/$1\\htmlref{$pname}{$qname}$2/gs;
        } else {
-          $document =~ s/(arameter\s*\{\\tt \"\})$rname(\{\\tt \"\})/$1\\xref{$pname}{sun258}{$pname}$2/gs;
+          $document =~ s/(arameter\s*\{\\tt \"\})$rname(\{\\tt \"\})/$1\\xref{$pname}{sun258}{$qname}$2/gs;
        }
    }
 
