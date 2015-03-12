@@ -3,11 +3,12 @@
       include 'SAE_PAR'
       include 'AST_PAR'
 
-      integer plot3d, status, pgbeg
+      integer fset, plot3d, status, pgbeg
       real gbox(6), lbnd(3), ubnd(3)
       double precision bbox(6)
       integer readtest
       logical ok, pg3d_autocamera
+      character device*30
 
       status = sai__ok
 
@@ -21,8 +22,12 @@ c      call ast_watchmemory( 130836 )
       ubnd( 2 ) = 1.0
       ubnd( 3 ) = 1.0
 
-c      ok = ( pgbeg( 0, '/VCPS', 1, 1 ) .eq. 1 )
-      ok = ( pgbeg( 0, '/XSERVE', 1, 1 ) .eq. 1 )
+      if( iargc() .gt. 0 ) then
+         call getarg( 1, device )
+      else
+         device = '/XSERVE'
+      end if
+      ok = ( pgbeg( 0, device, 1, 1 ) .eq. 1 )
 
       if( .not. ok ) write(*,*) 'PGPLOT OPEN FIALED'
 
@@ -269,7 +274,7 @@ c      call ast_grid( plot3d, status )
       up( 2 ) = -0.03
       up( 3 ) = 1.0
       ok = pg3d_setup( up )
-      diag = 2
+      diag = 1
       common_x = AST__BAD
       common_y = AST__BAD
       common_map = AST__NULL

@@ -14,7 +14,7 @@
  IsA Frame 	# Coordinate system description
     Nframe = 4 	# Number of Frames in FrameSet
 #   Base = 1 	# Index of base Frame
-    Currnt = 1 	# Index of current Frame
+    Currnt = 4 	# Index of current Frame
     Nnode = 5 	# Number of nodes in FrameSet
     Nod1 = 3 	# Frame 1 is associated with node 3
     Nod2 = 4 	# Frame 2 is associated with node 4
