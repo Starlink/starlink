@@ -3,8 +3,10 @@
 
 
 \section{Adding and amending parameters}
-The default configuration file \file{dimmconfig.lis} contains all of
-the parameters that most users would wish to play with.
+The base configuration file \file{dimmconfig.lis} contains all of
+the parameters that most users would wish to play with. The default
+configuration file \file{dimmconfig\_jsa\_generic.lis} is a good
+configuration file to use as a first pass for reducing any data.
 
 \textbf{You can create your own personalised configuration file from
 scratch or copy one of the provided ones to your local directory and
@@ -26,7 +28,7 @@ all the necessary quotation marks.
 
 \begin{terminalv}
 % makemap in='s8*.sdf' out=850map method=iterate \
-config='"^dimmconfig.lis,numiter=20,exportndf=(flt,noi),itermap=1"'
+config='"^dimmconfig\_jsa\_generic.lis,numiter=-50,exportndf=(flt,noi),itermap=1"'
 \end{terminalv}
 
 \textbf{What parameters can be changed?}\\*
@@ -182,15 +184,15 @@ applied to the data:
 
 The filtering options set in \file{dimmconfig.lis} are:
 
-\param{450.flt.filt\_edge\_largescale~=~600} \\
-\param{850.flt.filt\_edge\_largescale~=~300}.
+\param{450.flt.filt\_edge\_largescale~=~200} \\
+\param{850.flt.filt\_edge\_largescale~=~480}.
 
 To make your life easier, these parameters allow you to specify the
 filter limits in terms of spatial scale in arcsecs---in this case
-300\,arcsec at 850\,$\mu$m and 600\,arcsec at 450\,$\mu$m. For example,
-at 850\,$\mu$m, recovering scales of 300\,arcsec at a scan speed of
+480\,arcsec at 850\,$\mu$m and 200\,arcsec at 450\,$\mu$m. For example,
+at 850\,$\mu$m, recovering scales of 480\,arcsec at a scan speed of
 600\,arcsec/sec (default for a 1 degree \textsc{pong}) corresponds to
-a frequency of 2\,Hz.
+a frequency of 1.25\,Hz.
 
 Choosing a high-pass filter is especially important for the recovery
 of extended emission. The \file{dimmconfig\_bright\_extended.lis}
