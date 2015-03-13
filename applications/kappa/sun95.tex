@@ -46466,12 +46466,12 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstsubsection{
          ALIGNREF = \_LOGICAL (Read)
       }{
-         Determines the coordinate system in which each input NDF is
-         aligned with the reference NDF. If TRUE, alignment is performed
-         in the coordinate system described by the current Frame of the WCS
-         FrameSet in the reference NDF. If FALSE, alignment is performed
-         in the coordinate system specified by the following set of WCS
-         attributes in the reference NDF: AlignSystem AlignStdOfRest,
+         Determines the co-ordinate system in which each input NDF is
+         aligned with the reference NDF. If \texttt{TRUE}, alignment is performed
+         in the co-ordinate system described by the current Frame of the WCS
+         FrameSet in the reference NDF. If \texttt{FALSE}, alignment is performed
+         in the co-ordinate system specified by the following set of WCS
+         attributes in the reference NDF: AlignSystem, AlignStdOfRest,
          AlignOffset, AlignSpecOffset, AlignSideBand, AlignTimeScale. The
          AST library provides fixed defaults for all these. So for
          instance, AlignSystem defaults to ICRS for celestial axes and
@@ -46483,11 +46483,11 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
 
          As an example, if you are aligning two spectra which both use
          radio velocity as the current WCS, but which have different rest
-         frequencies, then setting ALIGNREF to TRUE will cause alignment
+         frequencies, then setting ALIGNREF to \texttt{TRUE} will cause alignment
          to be performed in radio velocity, meaning that the differences
          in rest frequency are ignored. That is, a channel with 10 Km/s
          in the input is mapping onto the channel with 10 km/s in the output.
-         If ALIGNREF is FALSE (and no value has been set for the AlignSystem
+         If ALIGNREF is \texttt{FALSE} (and no value has been set for the AlignSystem
          attribute in the reference WCS), then alignment will be performed
          in wavelength, meaning that the different rest frequencies cause
          an additional shift. That is, a channel with 10 Km/s in the input
@@ -46495,22 +46495,22 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          wavelength, taking into account the different rest frequencies.
 
          As another example, consider aligning two maps which both have
-         (azimuth,elevation) axes. If ALIGNREF is TRUE, then any given
+         (azimuth,elevation) axes. If ALIGNREF is \texttt{TRUE}, then any given
          (az,el) values in one image will be mapped onto the exact same
          (az,el) values in the other image, regardless of whether the
-         two images were taken at the same time. But if ALIGNREF is FALSE,
+         two images were taken at the same time. But if ALIGNREF is \texttt{FALSE},
          then a given (az,el) value in one image will be mapped onto
-         pixel that has the same ICRS coordinates in the other image
+         pixel that has the same ICRS co-ordinates in the other image
          (since AlignSystem default to ICRS for celestial axes). Thus any
          different in the observation time of the two images will result
          in an additional shift.
 
          As yet another example, consider aligning two spectra which are
          both in frequency with respect to the LSRK, but which refer to
-         different points on the sky. If ALIGNREF is TRUE, then a given
-         LSRK frequency in one spectra will be mapped onto the exact same
+         different points on the sky. If ALIGNREF is \texttt{TRUE}, then a given
+         LSRK frequency in one spectrum will be mapped onto the exact same
          LSRK frequency in the other image, regardless of the different sky
-         positions. But if ALIGNREF is FALSE, then a given input frequency
+         positions. But if ALIGNREF is \texttt{FALSE}, then a given input frequency
          will first be converted to Heliocentric frequency (the default
          value for AlignStdOfRest is ``Heliocentric''), and will be mapped
          onto the output channel that has the same Heliocentric frequency.
@@ -47591,11 +47591,11 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstsubsection{
          ALIGNREF = \_LOGICAL (Read)
       }{
-         Determines the coordinate system in which each input NDF is
-         aligned with the reference NDF. If TRUE, alignment is performed
-         in the coordinate system described by the current Frame of the WCS
-         FrameSet in the reference NDF. If FALSE, alignment is performed
-         in the coordinate system specified by the following set of WCS
+         Determines the co-ordinate system in which each input NDF is
+         aligned with the reference NDF. If \texttt{TRUE}, alignment is performed
+         in the co-ordinate system described by the current Frame of the WCS
+         FrameSet in the reference NDF. If \texttt{FALSE}, alignment is performed
+         in the co-ordinate system specified by the following set of WCS
          attributes in the reference NDF: AlignSystem AlignStdOfRest,
          AlignOffset, AlignSpecOffset, AlignSideBand, AlignTimeScale. The
          AST library provides fixed defaults for all these. So for
@@ -47608,11 +47608,11 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
 
          As an example, if you are mosaicing two spectra which both use
          radio velocity as the current WCS, but which have different rest
-         frequencies, then setting ALIGNREF to TRUE will cause alignment
+         frequencies, then setting ALIGNREF to \texttt{TRUE} will cause alignment
          to be performed in radio velocity, meaning that the differences
          in rest frequency are ignored. That is, a channel with 10 Km/s
          in the input is mapping onto the channel with 10 km/s in the output.
-         If ALIGNREF is FALSE (and no value has been set for the AlignSystem
+         If ALIGNREF is \texttt{FALSE} (and no value has been set for the AlignSystem
          attribute in the reference WCS), then alignment will be performed
          in wavelength, meaning that the different rest frequencies cause
          an additional shift. That is, a channel with 10 Km/s in the input
@@ -47620,26 +47620,26 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          wavelength, taking into account the different rest frequencies.
 
          As another example, consider mosaicing two maps which both have
-         (azimuth,elevation) axes. If ALIGNREF is TRUE, then any given
+         (azimuth,elevation) axes. If ALIGNREF is \texttt{TRUE}, then any given
          (az,el) values in one image will be mapped onto the exact same
          (az,el) values in the other image, regardless of whether the
-         two images were taken at the same time. But if ALIGNREF is FALSE,
+         two images were taken at the same time. But if ALIGNREF is \texttt{FALSE},
          then a given (az,el) value in one image will be mapped onto
-         pixel that has the same ICRS coordinates in the other image
+         pixel that has the same ICRS co-ordinates in the other image
          (since AlignSystem default to ICRS for celestial axes). Thus any
          different in the observation time of the two images will result
          in an additional shift.
 
-         As yet another example, consider mosaicing two spectra which are
+         As yet another example, consider mosaicking two spectra which are
          both in frequency with respect to the LSRK, but which refer to
-         different points on the sky. If ALIGNREF is TRUE, then a given
-         LSRK frequency in one spectra will be mapped onto the exact same
+         different points on the sky. If ALIGNREF is \texttt{TRUE}, then a given
+         LSRK frequency in one spectrum will be mapped onto the exact same
          LSRK frequency in the other image, regardless of the different sky
-         positions. But if ALIGNREF is FALSE, then a given input frequency
+         positions. But if ALIGNREF is \texttt{FALSE}, then a given input frequency
          will first be converted to Heliocentric frequency (the default
          value for AlignStdOfRest is ``Heliocentric''), and will be mapped
          onto the output channel that has the same Heliocentric frequency.
-         Thus the differecen in sky positions will result in an additional
+         Thus the difference in sky positions will result in an additional
          shift.   \texttt{[FALSE]}
       }
       \sstsubsection{
