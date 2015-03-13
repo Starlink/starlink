@@ -6,11 +6,18 @@
 SCUBA-2 data reduction pipelines have been developed based on the
 existing \oracdr\ pipeline (Cavanagh et al., 2008\cite{oracdr}) used
 for ACSIS. There are three distinct pipelines currently utilised by
-SCUBA-2: two of these, the quick-look (QL) and summit pipelines, are
-run in real time at the JCMT during data acquisition; the third, the science
-pipeline, offers a comprehensive reduction, which users can run locally.
+SCUBA-2. Users will likely only need to run the science pipeline. The 
+other two pipelines are designed to run at the JCMT - the quick-look (QL) and 
+summit pipelines. The latter two are run in real time at the JCMT 
+during data acquisition.
 
 \begin{itemize}
+\item The science pipeline has access to all the data observed for a 
+given project and adopts a best-possible reduction approach. Images are 
+made for each complete observation which are combined to create the final 
+image. Users wishing to reduce their own data should use this pipeline. 
+This pipeline is responsible for producing the reduced data that is 
+accessible to users via CADC.
 \item The QL runs quality assurance checks on the data as it comes in.
 For science data it calculates the noise between 2\,Hz and 10\,Hz,
 along with the NEP and effective NEP, for each 30-second scan. These
@@ -20,11 +27,7 @@ an acceptable operating range.
 data, it does this by running fewer iterations and chunking the data
 more. This is a useful guide to observers who wish to check the
 quality of their data.
-\item The science pipeline is run at CADC. This is normally the next
-day once the data have transferred there.  This nightly processing
-uses an optimal reduction routine, that includes the map-maker and a
-number of post-processing steps (outlined below). Both the raw data
-and reduced products are available for download by project members the
+
 following day.
 \end{itemize}
 
@@ -47,9 +50,10 @@ The science pipeline will perform the following:
 \subsection{\xlabel{pl_output}Pipeline recipes}
 \label{sec:recipes}
 
-When MSBs are created, the PI can select a pipeline recipe to assign
+When a project is initially created and MSBs (Minimum Scheduling Blocks) 
+are created int he Observing Tool, the PI can select a pipeline recipe to assign
 to the data. When the data are run through the science pipeline this
-recipe is then called by default. This can overridden on the command
+recipe is then called by default. This can be overridden on the command
 line---see \cref{Section}{sec:parameterfile}{Changing the defaults}.
 Described below are the five main \oracdr\ science recipes.
 
@@ -125,46 +129,6 @@ in mJy/beam using a corrected FCF.  See \cref{Section}{sec:jk}{Example
   2 -- Advanced pipeline method} for a more-detailed description of
 this recipe and the files produced.
 
-\section{Changing the defaults}
-\label{sec:parameterfile}
-\subsection{Changing the pipeline recipe}
-You can override the recipe set in the header by listing any different
-one on the command line when starting \oracdr. For example
-\begin{terminalv}
-% oracdr -file mylist -loop file -log x REDUCE_SCAN_CHECKRMS
-\end{terminalv}
-
-You can find out which recipe is set in the data header via the FITS
-header \texttt{RECIPE} keyword in any of your raw files.  For
-example both of these options will return the same result:
-\begin{terminalv}
-% fitsval s8a20120725_00045_0003 RECIPE
-% fitslist s8a20120725_00045_0003 | grep RECIPE
-\end{terminalv}
-
-\subsection{Changing the configuration file}
-
-Although each recipe calls one of the standard configuration files
-you can specify your own. You will need to create a recipe parameter
-file. This file will set the parameter \param{MAKEMAP\_CONFIG} to be
-your new configuration file. The first line must be the name of the
-recipe used in the reduction.
-
-For example, to run the pipeline with \drrecipe{REDUCE\_SCAN\_CHECKRMS} with a
-configuration file called \file{myconfig.lis}, the recipe parameter file
-(\file{mypars.ini}) will look like this.
-\vspace{0.2cm}
-\begin{terminalv}
-[REDUCE_SCAN_CHECKRMS]
-MAKEMAP_CONFIG = myconfig.lis
-\end{terminalv}
-
-Then run the pipeline calling the parameter file via the
-\texttt{-recpars} option.
-\begin{terminalv}
-% oracdr -file mylist -loop file -log xf -recpars myparams.ini REDUCE_SCAN_CHECKRMS
-\end{terminalv}
-
 
 \section{\xlabel{running_pl}Running the Science Pipeline}
 \label{sec:plsteps}
@@ -197,31 +161,169 @@ written. Also used as the location for a user-specified configuration file.
 \end{itemize}
 
 \item[Step 3:]
-\textbf{(Optional) Create a personalised configuration file and/or parameter file}
+\textbf{Run the pipeline}
 
-See \cref{Section}{sec:parameterfile}{Changing the defaults} for
-details. In this example we find the recipe \drrecipe{REDUCE\_SCAN}
-assigned to our data. We are happy with the steps in this recipe but
-want to supply a new configuration file and a different set of
-clump-finding parameters. To do so we create a parameter file called
-\file{mypars.ini} which contains the following text.
+This is done by:
+\begin{terminalv}
+% oracdr -files inputlist.txt -loop file 
+\end{terminalv}
+
+\end{aligndesc}
+
+
+\begin{tip}
+  If you run with -verbose on the command line then you will obtain all messages
+ from the Starlink engines (rather than just ORAC-DR messages). This is 
+ particularly useful for understanding what is occurring during the map-maker stage
+ of reduction. This is particularly recommended for new users.
+\end{tip}
+
+When executing the \oracdr command a new Xwindow will appear within which 
+will contain the pipeline output, as shown in Figures \ref{pipeline-oracdr-1} - \ref{pipeline-oracdr-4}.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.7\linewidth]{sc21-pipeline-oracdr-1}
+\caption[Output from the pipeline]{The Xwindows output from the \oracdr\ 
+pipeline showing the initial log - here we see the pipeline is checking 
+for the raw files. \label{pipeline-oracdr-1}}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.7\linewidth]{sc21-pipeline-oracdr-2}
+\caption[Output from the pipeline]{The Xwindows output from the \oracdr\ 
+pipeline - here we see the data being reduced with the recipe 
+REDUCE\_SCAN\_EXTENDED\_SOURCES. The pipeline also reports the name of the 
+observation being reduced and the duration of the observation. \label{pipeline-oracdr-2}}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.7\linewidth]{sc21-pipeline-oracdr-3}
+\caption[Output from the pipeline]{The Xwindows output from the \oracdr\ 
+pipeline - here we we see the FCF being applied, the graphics 
+being created along with a group file (file containing co-added observations 
+from a single night - if provided). \label{pipeline-oracdr-3}}
+\end{center}
+\end{figure}
+
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.7\linewidth]{sc21-pipeline-oracdr-4}
+\caption[Output from the pipeline]{The Xwindows output from the \oracdr\ 
+pipeline - here we see the pipeline process has completed. \label{pipeline-oracdr-4}}
+\end{center}
+\end{figure}
+
+
+
+
+\section{Changing the defaults}
+\label{sec:parameterfile}
+
+
+\subsection{Changing ORAC-DR's behavior}
+
+ORAC-DR's behavior cab be changed on the command line. For help simply type
+
+
+\begin{terminalv}
+% oracdr -help
+\end{terminalv}
+
+To run the pipeline and obtain all messages from the Starlink engines 
+(rather than just ORAC-DR messages) you will need to run with verbose (\emph{recommended})
+
+\begin{terminalv}
+% oracdr -files inputlist.txt -loop file  -verbose
+\end{terminalv}
+
+
+To run the pipeline and have the results sent to the screen (s) and to a 
+file (f -  the file produced is usually called \file{.oracdr\_NNNN.log} 
+where NNNN is the current process ID. It is written to \$ORAC\_DATA\_OUT 
+and is a hidden file) is specified using the -log command.
+
+\begin{terminalv}
+% oracdr -files inputlist.txt -loop file  -log sf -verbose
+\end{terminalv}
+
+
+
+\subsection{Changing the pipeline recipe}
+You can override the recipe set in the header by listing any different
+one on the command line when starting \oracdr. For example
+\begin{terminalv}
+% oracdr -file mylist -loop file -log sf REDUCE_SCAN_CHECKRMS
+\end{terminalv}
+
+You can find out which recipe is set in the data header via the FITS
+header \texttt{RECIPE} keyword in any of your raw files.  For
+example both of these options will return the same result:
+\begin{terminalv}
+% fitsval s8a20120725_00045_0003 RECIPE
+% fitslist s8a20120725_00045_0003 | grep RECIPE
+\end{terminalv}
+
+\subsection{Changing the configuration file}
+
+Although each recipe calls one of the standard configuration files
+you can specify your own. You will need to create a recipe parameter
+file. This file will set the parameter \param{MAKEMAP\_CONFIG} to be
+your new configuration file. The first line must be the name of the
+recipe used in the reduction.
+
+For example, to run the pipeline with \drrecipe{REDUCE\_SCAN\_CHECKRMS} with a
+configuration file called \file{myconfig.lis}, the recipe parameter file
+(\file{mypars.ini}) will look like this.
+\vspace{0.2cm}
+\begin{terminalv}
+[REDUCE_SCAN_CHECKRMS]
+MAKEMAP_CONFIG = myconfig.lis
+\end{terminalv}
+
+Then run the pipeline calling the parameter file via the
+\texttt{-recpars} option.
+\begin{terminalv}
+% oracdr -file mylist -loop file -log sf -recpars myparams.ini REDUCE_SCAN_CHECKRMS
+\end{terminalv}
+
+\subsection{Parameter file options}
+
+To supply both a new configuration file and a different set of
+clump-finding parameters we would updated the parameter file 
+\file{mypars.ini} to look like:
 
 \begin{terminalv}
 [REDUCE_SCAN]
 MAKEMAP_CONFIG = mynewconfig.lis
 FINDCLUMPS_CFG = myfellwalkerparams.lis
-
 \end{terminalv}
 
-\item[Step 4:]
-\textbf{Run the pipeline}
+Other options we can change in the parameter file include - changing the pixel size
 
-Run the pipeline using the \texttt{-recpars} option to specify a
-parameter file if required.
 \begin{terminalv}
-% oracdr -files inputlist.txt -loop file  -log xf -recpars mypars.ini
+[REDUCE_SCAN]
+MAKEMAP_PIXSIZE = 2
 \end{terminalv}
-\end{aligndesc}
+
+changing output units to mJy/beam
+
+\begin{terminalv}
+[REDUCE_SCAN]
+CALUNITS = beam
+\end{terminalv}
+
+changing output units to mJy/arcsec
+
+\begin{terminalv}
+[REDUCE_SCAN]
+CALUNITS = arcsec
+\end{terminalv}
 
 
 
@@ -235,12 +337,15 @@ output written to the terminal as you run the map-maker. There are a
 number of clues in this output that indicate the status of the
 reduction.
 
-\starfig{sc21_crl2688}{[t!]}{width=0.7\linewidth}{fig:itermap}{
-  CRL~2688 produced with \makemap}{
-  Map of CRL~2688 produced with the \smurf\ task \makemap\ using the
-  iterative algorithm with default parameters.
-}
 
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.7\linewidth]{sc21_crl2688}
+\caption[CRL~2688 produced with \makemap]s{
+  Map of CRL~2688 produced with the \smurf\ task \makemap\ using the
+  iterative algorithm with default parameters. \label{fig:itermap}}
+\end{center}
+\end{figure}
 
 \begin{description}
 \item[The number of input files] The first to note is the number of
