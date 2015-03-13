@@ -132,13 +132,13 @@ function add_rpath_starlink()
 }
 
 
-# 1. Go through each .dylib living under lib/ and set all the loaded
+# 1. Go through each .dylib or .so living under lib/ and set all the loaded
 # libraries that live within starlink to be relative paths.
 # Then add the appropriate rpath to the library
-echo "Fixing up .dylibs under $STARLINK_DIR/lib"
+echo "Fixing up .dylibs and .so under $STARLINK_DIR/"
 echo
 echo
-for i in $(find $STARLINK_DIR/lib -name '*.dylib' -type f); do
+for i in $(find $STARLINK_DIR/ -name '*.dylib' -or -name '*.so' -type f); do
      # echo $i
      fixup_starlink_dylib_links $i
      add_rpath_starlink $i
@@ -152,6 +152,8 @@ for i in $(find $STARLINK_DIR/Perl -name '*.bundle' -type f); do
     fixup_starlink_dylib_links $i
     add_rpath_starlink $i
 done
+
+
 
 # 2. Do the same thing for each binary living under bin/
 echo "Fixing up binaries under $STARLINK_DIR/bin"

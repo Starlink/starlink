@@ -46,4 +46,8 @@ for i in $(find $STARLINK_DIR/Perl -name '*.bundle' -type f); do
     install_name_tool -change "$libpath" "$newpath" "$i";
 done
 
+for i in $(find $STARLINK_DIR/lib -name '*.so' -type f); do
+    install_name_tool -change "$libpath" "$newpath" "$i";
+done
+
 
