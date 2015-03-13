@@ -41,7 +41,6 @@ We recommend the following:
     \hline
     Large maps (\textsc{pong})& 96 GB\\
     Small maps (\textsc{daisy})&32 - 64 GB\\
-    850\,$\mu$m data only&32 - 64 GB\\
     Blank fields&32 - 64 GB\\
     \hline
   \end{tabular}
@@ -58,7 +57,7 @@ the memory is as fast as can be afforded, as RAM speed has a direct
 linear effect on processing time given that the time-series data are
 continually being funnelled through the CPU.
 
-For blank-field surveys, data that only use 850\,$\mu$m, or smaller
+For blank-field surveys or smaller
 regions of the sky you can usefully run the map-maker with less memory
 and 32 to 64\,GB is reasonable depending on the specifics of your data
 set. \textsc{smurf} is multi-threaded so multiple cores do help
@@ -66,7 +65,8 @@ although above eight cores the price/performance gains tend to drop
 off.
 
 If you have a very large machine (128\,GB and 24 cores) you may be able
-to run two instances of the map-maker in parallel without chunking. Use
+to run two instances of the map-maker in parallel without chunking, 
+depending on the nature of the data. Use
 the \envvar{SMURF\_THREADS}\footnote{\envvar{SMURF\_THREADS} should be
 set to an integer value indicating the number of threads to be used by
 each process.} environment variable to restrict each map-maker to half
