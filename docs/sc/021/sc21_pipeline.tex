@@ -165,8 +165,11 @@ written. Also used as the location for a user-specified configuration file.
 
 This is done by:
 \begin{terminalv}
-% oracdr -files inputlist.txt -loop file 
+% oracdr  -loop file -files <list_of_files>
 \end{terminalv}
+
+where the list of files that you wish to reduce can be 
+an individual or multiple observations.
 
 \end{aligndesc}
 
@@ -239,7 +242,7 @@ To run the pipeline and obtain all messages from the Starlink engines
 (rather than just ORAC-DR messages) you will need to run with verbose (\emph{recommended})
 
 \begin{terminalv}
-% oracdr -files inputlist.txt -loop file  -verbose
+% oracdr -loop file -files <list_of_files>  -verbose
 \end{terminalv}
 
 
@@ -249,7 +252,7 @@ where NNNN is the current process ID. It is written to \$ORAC\_DATA\_OUT
 and is a hidden file) is specified using the -log command.
 
 \begin{terminalv}
-% oracdr -files inputlist.txt -loop file  -log sf -verbose
+% oracdr -files <list_of_files> -loop file  -log sf -verbose
 \end{terminalv}
 
 
@@ -258,7 +261,7 @@ and is a hidden file) is specified using the -log command.
 You can override the recipe set in the header by listing any different
 one on the command line when starting \oracdr. For example
 \begin{terminalv}
-% oracdr -file mylist -loop file -log sf REDUCE_SCAN_CHECKRMS
+% oracdr -file <list_of_files> -loop file -log sf REDUCE_SCAN_CHECKRMS
 \end{terminalv}
 
 You can find out which recipe is set in the data header via the FITS
@@ -289,7 +292,7 @@ MAKEMAP_CONFIG = myconfig.lis
 Then run the pipeline calling the parameter file via the
 \texttt{-recpars} option.
 \begin{terminalv}
-% oracdr -file mylist -loop file -log sf -recpars myparams.ini REDUCE_SCAN_CHECKRMS
+% oracdr -file <list_of_files> -loop file -log sf -recpars myparams.ini REDUCE_SCAN_CHECKRMS
 \end{terminalv}
 
 \subsection{Parameter file options}
