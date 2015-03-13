@@ -5348,7 +5348,7 @@ Frame have additional attributes indicating the particular celestial
 or spectral co-ordinate system in use (\emph{e.g.} equatorial,
 galactic, ecliptic, wavelength, frequency, radio velocity, optical
 velocity, \emph{etc.}), and any required qualifying parameters
-(equinox, rest frequency, standard of rest, {\it etc.}).  Instances of
+(equinox, rest frequency, standard of rest, \emph{etc.}).  Instances of
 these Frames can be added to an NDF by importing suitable FITS headers
 using \htmlref{FITSDIN}{FITSDIN},
 \htmlref{FITSIN}{FITSIN} or the CONVERT package (see \xref{SUN/55}{sun55}{}).
@@ -20502,7 +20502,7 @@ KAPPA: \htmlref{FITSMOD}{FITSMOD},
          The name of the keyword whose existence in the FITS extension
          is to be tested.  A name may be compound to handle hierarchical
          keywords, and it has the form keyword1.keyword2.keyword3
-         {\em etc.}\  The maximum number of keywords per \FITSref\ ~card is 20.
+         \emph{etc.}\  The maximum number of keywords per \FITSref\ ~card is 20.
          Each keyword must be no longer than 8 characters, and be a
          valid FITS keyword comprising only alphanumeric characters,
          hyphen, and underscore.  Any lowercase letters are converted to
@@ -21600,7 +21600,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
       }{
          The name of the keyword to be edited in the FITS extension.  A
          name may be compound to handle hierarchical keywords, and it
-         has the form keyword1.keyword2.keyword3 {\em etc.}\  The maximum
+         has the form keyword1.keyword2.keyword3  \emph{etc.}\  The maximum
          number of keywords per FITS card is twenty.  Each keyword must be
          no longer than eight characters, and be a valid FITS keyword
          comprising only alphanumeric characters, hyphen, and underscore.
@@ -21642,7 +21642,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          The name of the keyword to replace the KEYWORD keyword.  It is
          only accessed when EDIT=\texttt{"Rename"}.  A name may be compound to
          handle hierarchical keywords, and it has the form
-         keyword1.keyword2.keyword3 {\em etc.}\  The maximum number of
+         keyword1.keyword2.keyword3  \emph{etc.}\  The maximum number of
          keywords per FITS card is twenty.  Each keyword must be no longer
          than eight characters, and be a valid FITS keyword comprising only
          alphanumeric characters, hyphen, and underscore.
@@ -21652,7 +21652,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
       }{
          The position keyword name.  A position name may be compound to
          handle hierarchical keywords, and it has the form
-         keyword1.keyword2.keyword3 {\em etc.}\  The maximum number of
+         keyword1.keyword2.keyword3 \emph{etc.}\  The maximum number of
          keywords per FITS card is twenty.  Each keyword must be no longer
          than eight characters.  When locating the position card,
          comparisons are made in uppercase and with the blanks removed.
@@ -21934,7 +21934,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
 
             Both the editing keyword and position keyword may be
             compound to handle hierarchical keywords.  In this case the
-            form is keyword1.keyword2.keyword3 {\em etc.}\  All
+            form is keyword1.keyword2.keyword3 \emph{etc.}\  All
             keywords must be valid FITS keywords.  This means they must
             be no more than eight characters long, and the only permitted
             characters are uppercase alphabetic, numbers, hyphen,
@@ -22516,7 +22516,7 @@ KAPPA: \htmlref{MAKESURFACE}{MAKESURFACE},
          The name of an existing keyword in the FITS extension whose
          value is to be reported.  A name may be compound to handle
          hierarchical keywords, and it has the form
-         keyword1.keyword2.keyword3 {\em etc.}\  The maximum number of
+         keyword1.keyword2.keyword3 \emph{etc.}\  The maximum number of
          keywords per \FITSref\ ~card is 20.  Each keyword must be no
          longer than 8 characters, and be a valid FITS keyword
          comprising only alphanumeric characters, hyphen, and
@@ -22609,7 +22609,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
       }{
          The name of the new keyword in the FITS extension.  A name may
          be compound to handle hierarchical keywords, and it has the
-         form keyword1.keyword2.keyword3 {\em etc.}\  The maximum number
+         form keyword1.keyword2.keyword3 \emph{etc.}\  The maximum number
          of keywords per FITS card is 20.  Each keyword must be no
          longer than 8 characters, and be a valid FITS keyword comprising
          only alphanumeric characters, hyphen, and underscore.  Any
@@ -22632,7 +22632,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
       }{
          The position keyword name.  A position name may be compound to
          handle hierarchical keywords, and it has the form
-         keyword1.keyword2.keyword3 {\em etc.}\  The maximum number of
+         keyword1.keyword2.keyword3 \emph{etc.}\  The maximum number of
          keywords per FITS card is 20.  Each keyword must be no longer
          than 8 characters.  When locating the position card,
          comparisons are made in uppercase and with the blanks removed.
@@ -25137,7 +25137,7 @@ KAPPA: \htmlref{HISTAT}{HISTAT},
             the name of a text file, preceded by an up-arrow character
             \texttt{"$\wedge$"}.  Each line in the text file should contain a
             comma-separated list of elements, each of which can in turn
-            be an NDF name (with optional wild-cards, etc.), or another
+            be an NDF name (with optional wild-cards, \emph{etc.}), or another
             file specification (preceded by a caret).  Comments can be
             included in the file by commencing lines with a hash
             character \texttt{"\#"}.
@@ -35191,7 +35191,7 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
          \hspace{2.1em}\texttt{set perval = `parget perval histat`}
 
       would assign elements of the shell array perval[1], perval[2],
-      {\em etc.}\ to the last-computed percentile values of HISTAT.
+      \emph{etc.}\ to the last-computed percentile values of HISTAT.
       For other scripting languages such as Python, the alternative
       vector format produced by setting parameter VECTOR to \texttt{TRUE}
       may be more appropriate.
@@ -49922,17 +49922,17 @@ of an NDF, and change the values of those that are not read-only.
      unit is a unit of length, the supplied value is assumed to be a
      (vacuum) wavelength.  If the supplied unit is a unit of energy,
      the supplied value is assumed to be an energy.  For instance, the
-     following strings all result in a rest frequency of around 1.4E14
-     Hz being used: \texttt{"1.4E5"}, \texttt{"1.4E14 Hz"}, \texttt{"1.4E14
-       s$*$$*$-1"}, \texttt{"1.4E5 GHz"}, \texttt{"2.14E-6 m"}, \texttt{"21400
-       Angstrom"}, \texttt{"9.28E-20 J"}, \texttt{"9.28E-13 erg"}, \texttt{
-       "0.58 eV"}, etc.
+     following strings all result in a rest frequency of around 1.4E14~Hz
+     being used: \texttt{"1.4E5"}, \texttt{"1.4E14 Hz"}, \texttt{"1.4E14
+     s$*$$*$-1"}, \texttt{"1.4E5 GHz"}, \texttt{"2.14E-6 m"}, \texttt{"21400
+     Angstrom"}, \texttt{"9.28E-20 J"}, \texttt{"9.28E-13 erg"}, \texttt{
+     "0.58 eV"}, \emph{etc.}
 
       When getting the value of this attribute, the returned value is
       always a frequency in units of GHz.
    }
    \sstattributetype{
-      Floating point.
+      Floating point
    }
 }
 \sstattribute{
