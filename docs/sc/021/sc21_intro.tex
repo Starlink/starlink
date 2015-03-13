@@ -9,8 +9,8 @@
 
 This guide is designed to instruct SCUBA-2 users on the best ways to
 reduce and visualise their data using \starlink\ packages:
-\smurf \cite{smurf}, \Kappa \cite{kappa}, \gaia \cite{gaia} and \picard
-\cite{picard}.
+\smurf \cite{smurf}, \Kappa \cite{kappa}, \gaia \cite{gaia}, \oracdr\
+\cite{oracdr} and \picard \cite{picard}.
 
 This guide covers the following topics.
 \begin{itemize}
@@ -27,6 +27,9 @@ This guide covers the following topics.
 
 \end{itemize}
 
+Throughout this document, a percent sign (\texttt{\%}) is used to
+represent the Unix shell prompt. What follows each \texttt{\%} will be
+text that should be typed by the user to initiate the described action.
 
 \section{\xlabel{computing} Before you start: computing resources}
 
@@ -81,6 +84,23 @@ installed on your system, and Starlink aliases and environment
 variables must be defined before attempting to reduce any SCUBA-2
 data.
 
+\subsection{Initialising Starlink}
+The commands and environment variables needed to start up the required
+Starlink packages (\smurf \cite{smurf}, \Kappa, \emph{etc.}) must first
+be defined. For C shells (csh, tcsh), do:
+
+\begin{terminalv}
+% setenv STARLINK_DIR <path to the starlink installation>
+% source $STARLINK_DIR/etc/login
+% source $STARLINK_DIR/etc/cshrc
+\end{terminalv}
+
+before using any Starlink commands. For Bourne shells (sh, bash, zsh), do:
+
+\begin{terminalv}
+% export STARLINK_DIR=<path to the starlink installation>
+% source $STARLINK_DIR/etc/profile
+\end{terminalv}
 
 \subsection{KAPPA and SMURF for data processing}
 
@@ -97,7 +117,8 @@ any data reduction you will want to initiate both \textsc{Smurf} and
 % kappa
 \end{terminalv}
 
-You can access the help information by typing \texttt{smurfhelp} or
+After entering the above commands, you can access the help information
+for either package by typing \texttt{smurfhelp} or
 \texttt{kaphelp} respectively in a terminal, or by using the
 \task{showme} facility to access the hypertext documentation. See
 \cref{Section}{sec:help}{How to get help} for more information.
@@ -105,8 +126,8 @@ You can access the help information by typing \texttt{smurfhelp} or
 
 
 \begin{tip}
-The .sdf extension on filenames is not required when running
-Starlink commands.
+The .sdf extension on filenames need not be specified when running most
+Starlink commands (the exception is \picard).
 \end{tip}
 
 
@@ -120,6 +141,12 @@ and overlay on-line or local catalogues.
 \begin{terminalv}
 % gaia map.sdf
 \end{terminalv}
+
+Alternatively, the \Kappa\ package includes many command-line driven
+visualisation tools - see Appendix ``\xref{Classified KAPPA
+commands}{sun95}{cl_datadisplay}'' in SUN/95\footnote{Particularly useful is the
+ability of \Kappa\ to divide the screen up into many pictures, displaying
+a different plot in each one.}.
 
 \subsection{ORAC-DR for running the pipeline}
 
@@ -139,8 +166,8 @@ see \cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline}.
 
 \subsection{PICARD for post-reduction processing}
 
-\textsc{Picard} uses a similar pipeline system as \oracdr\ for
-post-processing analysis of reduced data. \textsc{Picard}
+\textsc{Picard} uses a pipeline system similar to \oracdr\ for
+post-processing and analysis of reduced data. \textsc{Picard}
 documentation can be found at
 \href{http://www.oracdr.org/oracdr/PICARD}{\textsc{Orac-dr} web page},
 or at \picardsun. All \textsc{Picard} recipes follow the same
@@ -180,7 +207,8 @@ quotes. You must also include the \file{.sdf} extension on any files
 passed to \picard.
 
 \begin{tip}
-  The .sdf extension on filenames is required by \textsc{Picard}.
+  Unlike other Starlink packages, the .sdf extension must be included
+  when supplying the names of Starlink data files to \textsc{Picard}.
 \end{tip}
 
 \begin{tip}
@@ -219,6 +247,13 @@ Run routines with prompts & You can run any routine with the option
                             then want a further description of any parameter
                             type  \texttt{?} at the relevant prompt. &
                             \texttt{\% makemap prompt \newline\ \% REF - Ref. NDF /!/$>$ ?}\\
+\hline
+Google & A simple Google search such as ``\texttt{starlink kappa fitslist}''
+will usually return links to the appropriatre documents. However, be
+aware that the results may include links to out of date versions of the
+document hosted at non-Starlink sites. Always look for results in
+\texttt{"www.starlink.ac.uk/docs} (or \texttt{"www.starlink.ac.uk/devdocs}
+for the cutting-edge development version of the document). & \\
 \hline
 \end{tabular}
 \end{table}
