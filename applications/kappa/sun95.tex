@@ -49197,29 +49197,29 @@ of an NDF, and change the values of those that are not read-only.
       value set for an individual axis will override the value for
       the Frame as a whole.
 
-      Note that the Digits value acts only as a means of determining a
+      Note that the \att{Digits} value acts only as a means of determining a
       default value for the \htmlattref{Format}{Format(axis)}~ attribute.  Its
-      effects are overridden if a Format string is set explicitly for an
+      effects are overridden if a \att{Format} string is set explicitly for an
       axis.
 
-      The default Digits value for a Frame is \texttt{7}.  If a value fewer
+      The default \att{Digits} value for a Frame is \texttt{7}.  If a value fewer
       than 1 is supplied, then \texttt{1} is used instead.
 
       If the Frame is actually a \xref{SkyFrame}{sun210}{SkyFrame}~
-      (\emph{e.g.}~ describes celestial longitude and latitude), then the {\att
-      Digits} value specifies the total number of digits in the formatted
+      (\emph{e.g.}~ describes celestial longitude and latitude), then the
+      \att{Digits} value specifies the total number of digits in the formatted
       axis value---that is, the sum of the hours (or degrees), minutes
       and seconds digits.
 
    }
    \sstattributetype{
-      Integer.
+      Integer
    }
    \sstexamples{
       \sstexamplesubsection{
          wcsattrib m51 set digits 4
       }{
-         This sets the Digits attribute to the value 4 for all axes in
+         This sets the \att{Digits} attribute to the value 4 for all axes in
          the current Frame of the NDF \texttt{m51}.  This results in axis
          values being formatted with four digits of precision when they are
          displayed by any application, so long as no value has been set
@@ -49258,7 +49258,7 @@ of an NDF, and change the values of those that are not read-only.
 
    }
    \sstattributetype{
-      String.
+      String
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -49286,12 +49286,12 @@ of an NDF, and change the values of those that are not read-only.
 \sstattribute{
    DSBCentre
 }{
-   The central position of interest in a dual sideband spectrum
+   The central position of interest in a dual-sideband spectrum
    (DSBSpecFrames only)
 }{
    \sstdescription{
       This attribute specifies the central position of interest in a
-      \xref{dual sideband spectrum}{sun210}{DSBSpecFrame}. Its sole use
+      \xref{dual-sideband spectrum}{sun210}{DSBSpecFrame}. Its sole use
       is to determine the local oscillator frequency (the frequency which
       marks the boundary between the lower and upper sidebands). See the
       description of the IF (intermediate frequency) attribute for
@@ -49300,26 +49300,27 @@ of an NDF, and change the values of those that are not read-only.
       \texttt{{"}}observed\texttt{{"}} sideband, and the other sideband as the
       \texttt{{"}}image\texttt{{"}} sideband.
 
-      The value is accessed as a position in the spectral system
-      specified by the System attribute, but is stored internally as
-      topocentric frequency. Thus, if the System attribute of the
-      DSBSpecFrame is set to \texttt{{"}}VRAD\texttt{{"}}, the Unit attribute
-      set to \texttt{{"}}m/s\texttt{{"}} and the StdOfRest attribute set to
-      \texttt{{"}}LSRK\texttt{{"}}, then values for the DSBCentre attribute
+      The value is accessed as a position in the spectral system specified
+      by the \htmlattref{System}{System}~ attribute, but is stored internally as
+      topocentric frequency. Thus, if the \att{System} attribute of the
+      DSBSpecFrame is set to \texttt{{"}}VRAD\texttt{{"}}, the
+      \htmlattref{Unit}{Unit(axis)}~ attribute set to \texttt{{"}}m/s\texttt{{"}}
+      and the \htmlattref{StdOfRest}{StdOfRest}~ attribute set to
+      \texttt{{"}}LSRK\texttt{{"}}, then values for the \att{DSBCentre} attribute
       should be supplied as radio velocity in units of
       \texttt{{"}}m/s\texttt{{"}} relative to the kinematic LSR (alternative
       units may be used by appending a suitable units string to the end
       of the value). This value is then converted to topocentric
-      frequency and stored. If (say) the Unit attribute is subsequently
+      frequency and stored. If (say) the \att{Unit} attribute is subsequently
       changed to \texttt{{"}}km/s\texttt{{"}} before retrieving the current value
-      of the DSBCentre attribute, the stored topocentric frequency will
+      of the \att{DSBCentre} attribute, the stored topocentric frequency will
       be converted back to LSRK radio velocity, this time in units of
       \texttt{{"}}km/s\texttt{{"}}, before being returned.
 
       The default value for this attribute is 30 GHz.
    }
    \sstattributetype{
-      Floating point.
+      Floating point
    }
    \sstnotes{
       \sstitemlist{
@@ -49327,8 +49328,11 @@ of an NDF, and change the values of those that are not read-only.
          \sstitem
          The attributes which define the transformation to or from topocentric
          frequency should be assigned their correct values before accessing
-         this attribute. These potentially include System, Unit, StdOfRest,
-         ObsLon, ObsLat, ObsAlt, Epoch, RefRA, RefDec and RestFreq.
+         this attribute. These potentially include \att{System}, \att{Unit}, \att{StdOfRest},
+         \htmlattref{ObsLon}{ObsLon}, \htmlattref{ObsLat}{ObsLat},
+         \htmlattref{ObsAlt}{ObsAlt}, \htmlattref{Epoch}{Epoch},
+         \htmlattref{RefRA}{RefRA}, \htmlattref{RefDec}{RefDec}, and
+         \htmlattref{RestFreq}{RestFreq}.
       }
    }
 }
@@ -49361,13 +49365,13 @@ of an NDF, and change the values of those that are not read-only.
       usually changed.
    }
    \sstattributetype{
-      Floating point.
+      Floating point
    }
    \sstnotes{
       \sstitemlist{
 
          \sstitem
-         Care must be taken to distinguish the Epoch value, which
+         Care must be taken to distinguish the \att{Epoch} value, which
          relates to motion (or apparent motion) of the source, from the
          superficially similar \htmlattref{Equinox}{Equinox}~ value.  The
          latter is used to qualify a co-ordinate system which is
@@ -49472,7 +49476,7 @@ of an NDF, and change the values of those that are not read-only.
 
    }
    \sstattributetype{
-      Floating point.
+      Floating point
    }
    \sstnotes{
       \sstitemlist{
@@ -49527,7 +49531,7 @@ of an NDF, and change the values of those that are not read-only.
 
    }
    \sstattributetype{
-      String.
+      String
    }
    \label{SkyFrameFormats}
    \sstdiytopic{
@@ -49642,22 +49646,23 @@ of an NDF, and change the values of those that are not read-only.
 \sstattribute{
    IF
 }{
-   The intermediate frequency in a dual sideband spectrum (DSBSpecFrames only)
+   The intermediate frequency in a dual-sideband spectrum (DSBSpecFrames only)
 }{
    \sstdescription{
       This attribute specifies the (topocentric) intermediate frequency
-      in a \xref{dual sideband spectrum}{sun210}{DSBSpecFrame}. Its sole
+      in a \xref{dual-sideband spectrum}{sun210}{DSBSpecFrame}. Its sole
       use is to determine the local oscillator (LO) frequency (the
       frequency which marks the boundary between the lower and upper
       sidebands). The LO frequency is equal to the sum of the centre
       frequency and the intermediate frequency. Here, the \texttt{{"}}centre
       frequency\texttt{{"}} is the topocentric frequency in Hz corresponding
-      to the current value of the DSBCentre attribute. The value of the
+      to the current value of the \htmlattref{DSBCentre}{DSBCentre}~
+      attribute. The value of the
       IF attribute may be positive or negative: a positive value results
       in the LO frequency being above the central frequency, whilst a
       negative IF value results in the LO frequency being below the
       central frequency. The sign of the IF attribute value determines
-      the default value for the SideBand attribute.
+      the default value for the \htmlattref{SideBand}{SideBand}~ attribute.
 
       When setting a new value for this attribute, the units in which the
       frequency value is supplied may be indicated by appending a
@@ -49671,7 +49676,7 @@ of an NDF, and change the values of those that are not read-only.
       always in units of GHz. The default value for this attribute is 4 GHz.
    }
    \sstattributetype{
-      Floating point.
+      Floating point
    }
 }
 
@@ -49681,16 +49686,18 @@ of an NDF, and change the values of those that are not read-only.
    The image sideband equivalent of the rest frequency (DSBSpecFrames only)
 }{
    \sstdescription{
-      This is a read-only attribute of a \xref{dual sideband
+      This is a read-only attribute of a \xref{dual-sideband
       spectrum}{sun210}{DSBSpecFrame} that gives the frequency
       corresponding to the rest frequency, but in the opposite sideband.
 
       The value is calculated by first transforming the rest frequency
-      (given by the RestFreq attribute) from the standard of rest of the
-      source (given by the SourceVel and SourceVRF attributes) to the
-      standard of rest of the observer (i.e. the topocentric standard of
+      (given by the \htmlattref{RestFreq}{RestFreq}~ attribute) from the standard of rest of the
+      source (given by the \htmlattref{SourceVel}{SourceVel} and
+      \htmlattref{SourceVRF}{SourceVRF}~ attributes) to the
+      standard of rest of the observer (\emph{i.e.} the topocentric standard of
       rest). The resulting topocentric frequency is assumed to be in the
-      same sideband as the value given for the DSBCentre attribute (the
+      same sideband as the value given for the
+      \htmlattref{DSBCentre}{DSBCentre}~ attribute (the
       \texttt{{"}}observed\texttt{{"}} sideband), and is transformed to the other
       sideband (the \texttt{{"}}image\texttt{{"}} sideband). The new frequency is
       converted back to the standard of rest of the source, and the
@@ -49698,7 +49705,7 @@ of an NDF, and change the values of those that are not read-only.
       GHz.
    }
    \sstattributetype{
-      Floating point, read-only.
+      Floating point, read-only
    }
 }
 
@@ -49726,7 +49733,7 @@ of an NDF, and change the values of those that are not read-only.
 
    }
    \sstattributetype{
-      String.
+      String
    }
 
    \sstexamples{
@@ -49765,7 +49772,7 @@ of an NDF, and change the values of those that are not read-only.
       daylight saving. The default value is zero.
    }
    \sstattributetype{
-      Floating point.
+      Floating point
    }
 }
 
@@ -49819,11 +49826,11 @@ of an NDF, and change the values of those that are not read-only.
       latitude can optionally be indicated using characters \texttt{"N"}
       and \texttt{"S"} in place of the usual \texttt{"$+$"} and \texttt{"-"}.
       When converting the stored value to a string, the format
-      \texttt{{"}}[s]dd:mm:ss.s\texttt{{"}} is used, when \texttt{"[s]"} is \texttt{
-        "N"} or \texttt{"S"}.
+      \texttt{{"}}[s]dd:mm:ss.s\texttt{{"}} is used, when \texttt{"[s]"} is
+      \texttt{"N"} or \texttt{"S"}.
    }
    \sstattributetype{
-      String.
+      String
    }
 }
 
@@ -49851,7 +49858,7 @@ of an NDF, and change the values of those that are not read-only.
       be less than 180 degrees.
    }
    \sstattributetype{
-      String.
+      String
    }
 }
 
@@ -49867,7 +49874,7 @@ of an NDF, and change the values of those that are not read-only.
       This attribute has a default value of zero.
    }
    \sstattributetype{
-      String.
+      String
    }
 }
 
@@ -49894,7 +49901,7 @@ of an NDF, and change the values of those that are not read-only.
       \att{RefRA} has a default value of zero.
    }
    \sstattributetype{
-      String.
+      String
    }
 }
 \sstattribute{
@@ -49941,7 +49948,7 @@ of an NDF, and change the values of those that are not read-only.
    Indicates which sideband a dual sideband spectrum represents (DSBSpecFrames only)
 }{
    \sstdescription{
-      This attribute indicates whether a \xref{dual sideband
+      This attribute indicates whether a \xref{dual-sideband
       spectrum}{sun210}{DSBSpecFrame} currently represents its lower or
       upper sideband, or an offset from the local oscillator frequency.
       When querying the current value, the returned string is always one
@@ -49954,12 +49961,12 @@ of an NDF, and change the values of those that are not read-only.
       \texttt{{"}}observed\texttt{{"}} sideband is which ever sideband (upper or
       lower) contains the central spectral position given by attribute
       DSBCentre, and the \texttt{{"}}image\texttt{{"}} sideband is the other
-      sideband. It is the sign of the IF attribute which determines if
-      the observed sideband is the upper or lower sideband. The default
-      value for SideBand is the observed sideband.
+      sideband. It is the sign of the \htmlattref{IF}{IF}~ attribute
+      which determines if the observed sideband is the upper or lower
+      sideband. The default value for \att{SideBand} is the observed sideband.
    }
    \sstattributetype{
-      String.
+      String
    }
 }
 \sstattribute{
@@ -49986,7 +49993,7 @@ of an NDF, and change the values of those that are not read-only.
 
    }
    \sstattributetype{
-      Floating point.
+      Floating point
    }
 }
 
@@ -50014,7 +50021,7 @@ of an NDF, and change the values of those that are not read-only.
       is \texttt{"Helio"}.
    }
    \sstattributetype{
-      String.
+      String
    }
 }
 
@@ -50031,7 +50038,7 @@ of an NDF, and change the values of those that are not read-only.
       The default \att{StdOfRest} value is \texttt{"Helio"}.
    }
    \sstattributetype{
-      String.
+      String
    }
    \label{stdofrest:StdOfRest}
    \sstdiytopic{
@@ -50141,7 +50148,7 @@ of an NDF, and change the values of those that are not read-only.
 
    }
    \sstattributetype{
-      String.
+      String
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -50182,7 +50189,7 @@ of an NDF, and change the values of those that are not read-only.
       enquiry is made.
    }
    \sstattributetype{
-      String.
+      String
    }
    \sstapplicability{
       \sstsubsection{
@@ -50280,7 +50287,7 @@ of an NDF, and change the values of those that are not read-only.
             \texttt{"WAVN"} or \texttt{"WAVENUM"}: Wave-number (1/m)
 
             \sstitem
-            \texttt{"WAVE"} or \texttt{"WAVELEN"}: Vacuum wave-length (m)
+            \texttt{"WAVE"} or \texttt{"WAVELEN"}: Vacuum wavelength (m)
 
             \sstitem
             \texttt{"AWAV"} or \texttt{"AIRWAVE"}: Wave-length in air (m)
@@ -50313,7 +50320,7 @@ of an NDF, and change the values of those that are not read-only.
          TimeFrame
       }{
          The TimeFrame class supports the following System values and
-         associated coordinate systems (the default is \texttt{{"}}MJD\texttt{{"}}):
+         associated co-ordinate systems (the default is \texttt{{"}}MJD\texttt{{"}}):
 
          \sstitemlist{
 
@@ -50331,7 +50338,7 @@ of an NDF, and change the values of those that are not read-only.
 
          }
 
-         The default value for the Unit attribute for each system is
+         The default value for the \att{Unit} attribute for each system is
 	 shown in parentheses. Strictly, these systems should not allow
 	 changes to be made to the units. For instance, the usual
 	 definition of \texttt{{"}}MJD\texttt{{"}} and \texttt{{"}}JD\texttt{{"}} include
@@ -50343,10 +50350,10 @@ of an NDF, and change the values of those that are not read-only.
 	 60 min, 1 min = 60 s). Besselian epoch values are defined in
 	 terms of tropical years of 365.2422 days, rather than the usual
 	 Julian year of 365.25 days. Therefore, to avoid any confusion,
-	 the Unit attribute is automatically cleared to
+	 the \att{Unit} attribute is automatically cleared to
 	 \texttt{{"}}yr\texttt{{"}} when a System value of BEPOCH System is
 	 selected, and an error is reported if any attempt is
-	 subsequently made to change the Unit attribute.
+	 subsequently made to change the \att{Unit} attribute.
       }
    }
 }
@@ -50359,21 +50366,23 @@ of an NDF, and change the values of those that are not read-only.
       This specifies the origin from which all time values are measured
       within a \xref{TimeFrame}{sun210}{TimeFrame}.
       The default value (zero) results in the TimeFrame describing
-      absolute time values in the system given by the System attribute
-      (e.g. MJD, Julian epoch, etc). If a TimeFrame is to be used to
+      absolute time values in the system given by the 
+      \htmlattref{System}{System}~ attribute
+      (\emph{e.g.} MJD, Julian epoch, \emph{etc}). If a TimeFrame is to be used to
       describe elapsed time since some origin, the TimeOrigin attribute
-      should be set to hold the required origin value. The TimeOrigin value
-      stored inside the TimeFrame structure is modified whenever TimeFrame
+      should be set to hold the required origin value. The
+      \att{TimeOrigin} value stored inside the TimeFrame structure is
+      modified whenever \att{TimeFrame}
       attribute values are changed so that it refers to the original moment
       in time.
    }
    \sstattributetype{
-      Floating point.
+      Floating point
    }
    \sstdiytopic{
       Input Formats
    }{
-      The formats accepted when setting a TimeOrigin value are listed
+      The formats accepted when setting a \att{TimeOrigin} value are listed
       below. They are all case-insensitive and are generally tolerant
       of extra white space and alternative field delimiters:
 
@@ -50389,11 +50398,12 @@ of an NDF, and change the values of those that are not read-only.
 
          \sstitem
          Units: An unqualified decimal value is interpreted as a value in
-         the system specified by the TimeFrame's System attribute, in the
-         units given by the TimeFrame's Unit attribute. Alternatively, an
+         the system specified by the TimeFrame's \att{System} attribute, in
+         the units given by the TimeFrame's \htmlattref{Unit}{Unit(axis)}~
+         attribute. Alternatively, an
          appropriate unit string can be appended to the end of the floating
          point value (\texttt{{"}}123.4 d\texttt{{"}} for example), in which case the supplied value
-         is scaled into the units specified by the Unit attribute.
+         is scaled into the units specified by the \att{Unit} attribute.
 
          \sstitem
          Julian Date: With or without decimal places (\texttt{{"}}JD 2454321.9\texttt{{"}} for
@@ -50405,7 +50415,7 @@ of an NDF, and change the values of those that are not read-only.
 
          \sstitem
          Gregorian Calendar Date: With the month expressed either as an
-         integer or a 3-character abbreviation, and with optional decimal
+         integer or a three-character abbreviation, and with optional decimal
          places to represent a fraction of a day (\texttt{{"}}1996-10-2\texttt{{"}} or
          \texttt{{"}}1996-Oct-2.6\texttt{{"}} for example). If no fractional part of a day is
          given, the time refers to the start of the day (zero hours).
@@ -50420,9 +50430,9 @@ of an NDF, and change the values of those that are not read-only.
    \sstdiytopic{
       Output Format
    }{
-      When enquiring TimeOrigin values, the returned formatted floating
-      point value represents a value in the TimeFrame's System, in the unit
-      specified by the TimeFrame's Unit attribute.
+      When enquiring \att{TimeOrigin} values, the returned formatted floating
+      point value represents a value in the TimeFrame's \att{System}, in the
+      unit specified by the TimeFrame's \att{Unit} attribute.
    }
 }
 \sstattribute{
@@ -50436,12 +50446,13 @@ of an NDF, and change the values of those that are not read-only.
       any of the values listed in the \texttt{{"}}Time Scales\texttt{{"}} section
       (below).
 
-      The default TimeScale value depends on the current System value; if
-      the current TimeFrame system is \texttt{{"}}Besselian epoch\texttt{{"}} the
-      default is \texttt{{"}}TT\texttt{{"}}, otherwise it is \texttt{{"}}TAI\texttt{{"}}.
-      Note, if the System attribute is set so that the TimeFrame
+      The default \att{TimeScale} value depends on the current
+      \htmlattref{System}{System} value; if the current \att{TimeFrame}
+      system is \texttt{{"}}Besselian epoch\texttt{{"}} the default
+      is \texttt{{"}}TT\texttt{{"}}, otherwise it is \texttt{{"}}TAI\texttt{{"}}.
+      Note, if the \att{System} attribute is set so that the TimeFrame
       represents Besselian Epoch, then an error will be reported if an
-      attempt is made to set the TimeScale to anything other than TT.
+      attempt is made to set the \att{TimeScale} to anything other than TT.
 
       Note, the supported time scales fall into two groups. The first
       group containing UT1, GMST, LAST and LMST define time in terms of
@@ -50451,16 +50462,16 @@ of an NDF, and change the values of those that are not read-only.
       way, conversion between two timescales in different groups relies
       on a value being supplied for the Dut1 attribute. This attribute
       specifies the difference between the UT1 and UTC time scales, in
-      seconds, and defaults to zero. See the \ref{documentation for the Dut1
+      seconds, and defaults to zero. See the \xref{documentation for the Dut1
       attribute}{sun210}{DUT1} in SUN/210 for further details.
    }
    \sstattributetype{
-      String.
+      String
    }
    \sstdiytopic{
       Time Scales
    }{
-      The TimeFrame class supports the following TimeScale values (all are
+      The TimeFrame class supports the following \att{TimeScale} values (all are
       case-insensitive):
 
       \sstitemlist{
@@ -50545,7 +50556,7 @@ of an NDF, and change the values of those that are not read-only.
       system being represented.
    }
    \sstattributetype{
-      String.
+      String
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -50598,7 +50609,7 @@ of an NDF, and change the values of those that are not read-only.
 {http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}).
    }
    \sstattributetype{
-      String.
+      String
    }
    \sstnotes{
       \sstitemlist{
@@ -53370,13 +53381,13 @@ The following applications have been modified:
    \item [\htmlref{WCSALIGN}{WCSALIGN}]\mbox{}
       \begin{itemize}
         \item  A new parameter ALIGNREF can be used to control the
-        coordinate system in which the input NDFs are aligned.
+        co-ordinate system in which the input NDFs are aligned.
       \end{itemize}
 
    \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}]\mbox{}
       \begin{itemize}
         \item  A new parameter ALIGNREF can be used to control the
-        coordinate system in which the input NDFs are aligned.
+        co-ordinate system in which the input NDFs are aligned.
       \end{itemize}
 
 \end{description}
