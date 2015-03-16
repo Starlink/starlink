@@ -6,7 +6,8 @@
 The Submillimetre Common User Bolometer Array-2 (SCUBA-2) is a
 10,000-pixel bolometer camera. It has two arrays operating
 simultaneously to map the sky in the atmospheric windows of 450 and
-850$\mu$m.
+850$\mu$m. Each array is made up of four sub-arrays as shown in
+\cref{Figure}{fig:arrays}{}.
 
 \subsubsection*{How it works}
 The SCUBA-2 bolometers are integrated arrays of superconducting
@@ -140,12 +141,14 @@ designed and optimised to meet both these criteria.
 
 \starfig{sc21_wayne_scan}{[t!]}{width=0.98\linewidth}{fig:scan}{%
   Illustration of the SCUBA-2 observing patterns}{%
-  From left: telescope track over a single rotation of the pattern;
-  telescope track after multiple rotations of the pattern; resulting
-  exposure time map. The scan pattern for your observation can be
-  visualised in this way with \topcat\ using the output from
-  \jcmtstate.  See \cref{section}{sec:scan}{Displaying scan patterns} for
-  more details.  Figure modified from Holland et al. (2013).
+
+  The top row shows a \textsc{daisy} and the bottom row shows a
+  \textsc{pong}.  The left column shows the telescope track over a
+  single rotation of the pattern.  The right column shows the telescope
+  track after multiple rotations of the pattern.  The scan pattern for
+  an observation can be visualised in this way with \topcat\ using the
+  output from \jcmtstate.  See \cref{section}{sec:scan}{Displaying
+  scan patterns} for more details.  Figure modified from Holland et al. (2013).
 }
 
 
@@ -200,22 +203,30 @@ to complete the observation.
 for each of the eight sub-arrays.
 
 The main data arrays of each file are cubes, with the first two
-dimensions enumerating columns and rows, and the third time slices
-(sampled at 200\,Hz).
+dimensions enumerating bolometer columns and rows within a sub-array,
+and the third time slices (sampled at roughly 200\,Hz).
+
+A standardised file naming scheme is used in which each file name starts
+with the sub-array name, followed by the UT date of the observation in
+the format \texttt{yyyymmdd}, followed by a five-digit observation
+number, followed by the scub-scan number. The name ends with the standard
+suffix \texttt{.sdf} used by all Starlink data files. For instance, the files
+listed above hold data from the s8a sub-array for observation 34 taken on
+27th December 2013.
 
 \subsubsection*{Units}
 
 Raw SCUBA-2 data come in uncalibrated units. The first calibration
-step is to scale the raw data to units proportional to picowatts (pW)
+step is to scale the raw data to units of picowatts (pW)
 by applying the flat-field solution. This step is performed internally
 by the map-maker but can be done manually when examining the raw
 data---see \cref{Section}{sec:concat}{Concatenate \& apply a
   flat-field}.
 
-The second step is to scale the data by the flux conversion factor
-(FCF) to give units of janskys. When running the 
+The second step is to scale the resulting map by the flux conversion factor
+(FCF) to give units of janskys. When running the
 \textsc{Orac-dr} pipeline this is done automatically.
-However it is good to check that the FCF value applied to your data is sensible. 
+However it is good to check that the FCF value applied to your data is sensible.
 Checking FCF's must be done manually, instructions for this is
 given in \cref{Section}{sec:own_fcf}{Determining your own Flux conversion
   factors}.
