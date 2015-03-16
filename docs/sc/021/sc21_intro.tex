@@ -29,7 +29,7 @@ This guide covers the following topics.
 
 Throughout this document, a percent sign (\texttt{\%}) is used to
 represent the Unix shell prompt. What follows each \texttt{\%} will be
-text that should be typed by the user to initiate the described action.
+the text that should be typed by the user to initiate the described action.
 
 \section{\xlabel{computing} Before you start: computing resources}
 
@@ -68,7 +68,7 @@ although above eight cores the price/performance gains tend to drop
 off.
 
 If you have a very large machine (128\,GB and 24 cores) you may be able
-to run two instances of the map-maker in parallel without chunking, 
+to run two instances of the map-maker in parallel without chunking,
 depending on the nature of the data. Use
 the \envvar{SMURF\_THREADS}\footnote{\envvar{SMURF\_THREADS} should be
 set to an integer value indicating the number of threads to be used by
@@ -229,24 +229,23 @@ passed to \picard.
 \hline
 \task{showme} & If you know the name of the Starlink document you want to view
                 use \task{showme}. When run, it launches a new webpage or tab
-                displaying the hypertext version of the document. & \texttt{\% showme sun95}\\
-
-\\
+                displaying the hypertext version of the document. &
+\texttt{\%~showme~sun95}\\
 \hline
 \task{findme} & \task{findme} searches Starlink documents for a keyword. When
                 run, it launches a new webpage or tab listing the results. &
-                \texttt{\% findme kappa}\\
+                \texttt{\% findme~kappa}\\
 \hline
 \task{docfind} & \task{docfind} searches the internal list files for keywords. It then
                  searches the document titles. The result is displayed using the
-                 Unix \task{more} command. & \texttt{\% docfind kappa}\\
+                 Unix \task{more} command. & \texttt{\%~docfind~kappa}\\
 \hline
 Run routines with prompts & You can run any routine with the option
                             \texttt{prompt} after the command. This will
                             prompt for every parameter available. If you
                             then want a further description of any parameter
                             type  \texttt{?} at the relevant prompt. &
-                            \texttt{\% makemap prompt \newline\ \% REF - Ref. NDF /!/$>$ ?}\\
+                            \texttt{\%~makemap~prompt~\newline\~\%~REF~-~Ref.~NDF~/!/$>$~?}\\
 \hline
 Google & A simple Google search such as ``\texttt{starlink kappa fitslist}''
 will usually return links to the appropriatre documents. However, be
