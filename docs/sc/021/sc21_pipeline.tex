@@ -6,17 +6,17 @@
 SCUBA-2 data reduction pipelines have been developed based on the
 existing \oracdr\ pipeline (Cavanagh et al., 2008\cite{oracdr}) used
 for ACSIS. There are three distinct pipelines currently utilised by
-SCUBA-2. Users will likely only need to run the science pipeline. The 
-other two pipelines are designed to run at the JCMT - the quick-look (QL) and 
-summit pipelines. The latter two are run in real time at the JCMT 
+SCUBA-2. Users will likely only need to run the science pipeline. The
+other two pipelines are designed to run at the JCMT - the quick-look (QL) and
+summit pipelines. The latter two are run in real time at the JCMT
 during data acquisition.
 
 \begin{itemize}
-\item The science pipeline has access to all the data observed for a 
-given project and adopts a best-possible reduction approach. Images are 
-made for each complete observation which are combined to create the final 
-image. Users wishing to reduce their own data should use this pipeline. 
-This pipeline is responsible for producing the reduced data that is 
+\item The science pipeline has access to all the data observed for a
+given project and adopts a best-possible reduction approach. Images are
+made for each complete observation which are combined to create the final
+image. Users wishing to reduce their own data should use this pipeline.
+This pipeline is responsible for producing the reduced data that is
 accessible to users via CADC.
 \item The QL runs quality assurance checks on the data as it comes in.
 For science data it calculates the noise between 2\,Hz and 10\,Hz,
@@ -50,7 +50,7 @@ The science pipeline will perform the following:
 \subsection{\xlabel{pl_output}Pipeline recipes}
 \label{sec:recipes}
 
-When a project is initially created and MSBs (Minimum Scheduling Blocks) 
+When a project is initially created and MSBs (Minimum Scheduling Blocks)
 are created int he Observing Tool, the PI can select a pipeline recipe to assign
 to the data. When the data are run through the science pipeline this
 recipe is then called by default. This can be overridden on the command
@@ -67,7 +67,8 @@ been processed the data are co-added and calibrated in mJy/beam using
 the default FCF. The noise and NEFD properties for the co-add are
 calculated and written to log files (\file{log.noise} and
 \file{log.nefd} respectively). Finally, the \cupid\ task \findclumps\
-is run using the FellWalker algorithm to create a source catalogue.
+is run using the FellWalker algorithm (Berry, 2015\cite{fellwalker}) to
+create a source catalogue.
 
 For calibrators, \file{dimmconfig\_bright\_compact.lis} is used and
 FCFs are derived from the map.
@@ -168,7 +169,7 @@ This is done by:
 % oracdr  -loop file -files <list_of_files>
 \end{terminalv}
 
-where the list of files that you wish to reduce can be 
+where the list of files that you wish to reduce can be
 an individual or multiple observations.
 
 \end{aligndesc}
@@ -176,19 +177,19 @@ an individual or multiple observations.
 
 \begin{tip}
   If you run with -verbose on the command line then you will obtain all messages
- from the Starlink engines (rather than just ORAC-DR messages). This is 
+ from the Starlink engines (rather than just ORAC-DR messages). This is
  particularly useful for understanding what is occurring during the map-maker stage
  of reduction. This is particularly recommended for new users.
 \end{tip}
 
-When executing the \oracdr command a new Xwindow will appear within which 
+When executing the \oracdr command a new Xwindow will appear within which
 will contain the pipeline output, as shown in Figures \ref{pipeline-oracdr-1} - \ref{pipeline-oracdr-4}.
 
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.7\linewidth]{sc21-pipeline-oracdr-1}
-\caption[Output from the pipeline]{The Xwindows output from the \oracdr\ 
-pipeline showing the initial log - here we see the pipeline is checking 
+\caption[Output from the pipeline]{The Xwindows output from the \oracdr\
+pipeline showing the initial log - here we see the pipeline is checking
 for the raw files. \label{pipeline-oracdr-1}}
 \end{center}
 \end{figure}
@@ -196,9 +197,9 @@ for the raw files. \label{pipeline-oracdr-1}}
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.7\linewidth]{sc21-pipeline-oracdr-2}
-\caption[Output from the pipeline]{The Xwindows output from the \oracdr\ 
-pipeline - here we see the data being reduced with the recipe 
-REDUCE\_SCAN\_EXTENDED\_SOURCES. The pipeline also reports the name of the 
+\caption[Output from the pipeline]{The Xwindows output from the \oracdr\
+pipeline - here we see the data being reduced with the recipe
+REDUCE\_SCAN\_EXTENDED\_SOURCES. The pipeline also reports the name of the
 observation being reduced and the duration of the observation. \label{pipeline-oracdr-2}}
 \end{center}
 \end{figure}
@@ -206,9 +207,9 @@ observation being reduced and the duration of the observation. \label{pipeline-o
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.7\linewidth]{sc21-pipeline-oracdr-3}
-\caption[Output from the pipeline]{The Xwindows output from the \oracdr\ 
-pipeline - here we we see the FCF being applied, the graphics 
-being created along with a group file (file containing co-added observations 
+\caption[Output from the pipeline]{The Xwindows output from the \oracdr\
+pipeline - here we we see the FCF being applied, the graphics
+being created along with a group file (file containing co-added observations
 from a single night - if provided). \label{pipeline-oracdr-3}}
 \end{center}
 \end{figure}
@@ -217,7 +218,7 @@ from a single night - if provided). \label{pipeline-oracdr-3}}
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.7\linewidth]{sc21-pipeline-oracdr-4}
-\caption[Output from the pipeline]{The Xwindows output from the \oracdr\ 
+\caption[Output from the pipeline]{The Xwindows output from the \oracdr\
 pipeline - here we see the pipeline process has completed. \label{pipeline-oracdr-4}}
 \end{center}
 \end{figure}
@@ -238,7 +239,7 @@ ORAC-DR's behavior cab be changed on the command line. For help simply type
 % oracdr -help
 \end{terminalv}
 
-To run the pipeline and obtain all messages from the Starlink engines 
+To run the pipeline and obtain all messages from the Starlink engines
 (rather than just ORAC-DR messages) you will need to run with verbose (\emph{recommended})
 
 \begin{terminalv}
@@ -246,9 +247,9 @@ To run the pipeline and obtain all messages from the Starlink engines
 \end{terminalv}
 
 
-To run the pipeline and have the results sent to the screen (s) and to a 
-file (f -  the file produced is usually called \file{.oracdr\_NNNN.log} 
-where NNNN is the current process ID. It is written to \$ORAC\_DATA\_OUT 
+To run the pipeline and have the results sent to the screen (s) and to a
+file (f -  the file produced is usually called \file{.oracdr\_NNNN.log}
+where NNNN is the current process ID. It is written to \$ORAC\_DATA\_OUT
 and is a hidden file) is specified using the -log command.
 
 \begin{terminalv}
@@ -298,7 +299,7 @@ Then run the pipeline calling the parameter file via the
 \subsection{Parameter file options}
 
 To supply both a new configuration file and a different set of
-clump-finding parameters we would updated the parameter file 
+clump-finding parameters we would updated the parameter file
 \file{mypars.ini} to look like:
 
 \begin{terminalv}
