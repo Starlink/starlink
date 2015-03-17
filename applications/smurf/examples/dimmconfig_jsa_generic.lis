@@ -23,8 +23,8 @@
 #     size. Otherwise, it is similar to dimmconfig_bright_extended.lis.
 
 #  Notes:
-#     - This file inherits the parameter values defined in file
-#     /star/share/smurf/dimmconfig.lis.
+#     - Any parameter not set in this configuration defaults to the value
+#     specified in file $STARLINK_DIR/smurf_makemap.def.
 #     - For a full list of all available parameters, and their purposes,
 #     see the file $SMURF_DIR/smurf_makemap.def. All available parameters
 #     are also documented in SUN/258, appendix "Configuration Parameters".
@@ -40,6 +40,7 @@
 #     17-MAR-2015 (DSB,SG):
 #        - Prologue added.
 #        - Values which are the same as th default values removed.
+#        - Remove dependence on dimmconfig.lis.
 #-
 
 #  Inherit the values defined in the parent dimmconfig file

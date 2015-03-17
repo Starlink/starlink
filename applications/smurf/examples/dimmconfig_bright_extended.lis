@@ -21,8 +21,8 @@
 #     sources, but will completely flatten the map in low-SNR regions.
 
 #  Notes:
-#     - This file inherits the parameter values defined in file
-#     /star/share/smurf/dimmconfig.lis.
+#     - Any parameter not set in this configuration defaults to the value
+#     specified in file $STARLINK_DIR/smurf_makemap.def.
 #     - For a full list of all available parameters, and their purposes,
 #     see the file $SMURF_DIR/smurf_makemap.def. All available parameters
 #     are also documented in SUN/258, appendix "Configuration Parameters".
@@ -50,10 +50,9 @@
 #        side effect of smoothing the perimeter of the mask and removing
 #        isolated pixels. (DSB)
 #        - Reduce the filter scale from 600 to 480 (HP)
+#     17-MAR-2015 (DSB):
+#        Remove dependence on dimmconfig.lis.
 #-
-
-#  Inherit the values defined in the parent dimmconfig file
-   ^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
    numiter=-40
    flt.filt_edge_largescale=480

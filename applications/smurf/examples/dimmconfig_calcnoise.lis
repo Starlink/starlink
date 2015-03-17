@@ -1,5 +1,3 @@
-^$STARLINK_DIR/share/smurf/dimmconfig.lis
-
 # *** Specialized config for CALCNOISE with common-mode subtraction ***
 #
 # This variant on the CALCNOISE cleaning configuration uses

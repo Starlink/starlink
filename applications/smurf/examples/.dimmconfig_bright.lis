@@ -25,8 +25,8 @@
 #     dynamic signal ranges in the map.
 
 #  Notes:
-#     - This file inherits the parameter values defined in file
-#     /star/share/smurf/dimmconfig.lis.
+#     - Any parameter not set in this configuration defaults to the value
+#     specified in file $STARLINK_DIR/smurf_makemap.def.
 #     - For a full list of all available parameters, and their purposes,
 #     see the file $SMURF_DIR/smurf_makemap.def. All available parameters
 #     are also documented in SUN/258, appendix "Configuration Parameters".
@@ -48,11 +48,10 @@
 #     25-FEB-2013 (DSB):
 #        Change the name to include an initial dot, thus making the file
 #        hidden.
+#     17-MAR-2015 (DSB):
+#        Remove dependence on dimmconfig.lis.
 #-
 
-
-#  Inherit the values defined in the parent dimmconfig file
-   ^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
    numiter = 20
 
