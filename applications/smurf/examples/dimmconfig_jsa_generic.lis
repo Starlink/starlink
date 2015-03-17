@@ -1,3 +1,48 @@
+#+
+#  Name:
+#     dimmconfig_jsa_generic.lis
+
+#  Purpose:
+#     A MAKEMAP configuration suitable for general purpose use.
+
+#  Description:
+#     This file provides values for parameters used by the SMURF:MAKEMAP
+#     command to control the details of the map-making algorithm. To
+#     use it, assign it to the CONFIG parameter on the command line when
+#     running MAKEMAP. For instance:
+#
+#     % makemap config=^/star/share/smurf/dimmconfig_jsa_generic.lis
+#
+#     (substitute the path to your Starlink installation in place of
+#     "/star").
+#
+#     This file aims to be conservative and so sacrifices some real
+#     extended structure in order to reduce the risk of artificial
+#     extended structures appearing in the map. It does this by using a
+#     separate common mode for each sub-array, and by using a smaller filter
+#     size. Otherwise, it is similar to dimmconfig_bright_extended.lis.
+
+#  Notes:
+#     - This file inherits the parameter values defined in file
+#     /star/share/smurf/dimmconfig.lis.
+#     - For a full list of all available parameters, and their purposes,
+#     see the file $SMURF_DIR/smurf_makemap.def. All available parameters
+#     are also documented in SUN/258, appendix "Configuration Parameters".
+#     - A single parameter can be given different values to use when
+#     processing 450 or 850 um data. This is done by including the
+#     parameter twice, prefixing the parameter name with "450." and "850."
+
+#  Authors:
+#     SG: Sarah Graves (EAO, Hawaii)
+#     DSB: David Berry (EAO, Hawaii)
+
+#  History:
+#     17-MAR-2015 (DSB,SG):
+#        - Prologue added.
+#        - Values which are the same as th default values removed.
+#-
+
+#  Inherit the values defined in the parent dimmconfig file
 ^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
 #  Less aggressive cleaning to cope with bright sources
@@ -11,15 +56,8 @@ com.perarray = 1
 #  Aggressive filtering.
 flt.filt_edge_largescale=200
 
-#  Allow bolometer noise to vary with time, and using a box filter to
-#  determine mean noise in each box, in order to presevre as many samples
-#  as possible.
-noi.box_size=-15
-noi.box_type=1
-
 #  Use a maximum of 20 iterations
 numiter=-25
-maptol_mean=1
 maptol=0.01
 
 # new recommendations and using an ast model
