@@ -1,196 +1,38 @@
-#+
-#  Name:
-#     dimmconfig.lis
+#  This file is retained for historical purposes only, and should no
+#  longer be used.
 
-#  Purpose:
-#     A MAKEMAP configuration suitable for general purpose usage.
-
-#  Description:
-#     This file provides values for parameters used by the SMURF:MAKEMAP
-#     command to control the details of the map-making algorithm. To
-#     use it, assign it to the CONFIG parameter on the command line when
-#     running MAKEMAP. For instance:
+#  Before Starlink release 2015A, this file contained values for a
+#  selection of configuration parameters.  However those values were
+#  simply copies of the default values defined in file
+#  $SMURF_DIR/smurf_makemap.def and so were unneeded (any parameter for
+#  which no value is supplied in a configuration file defaults to the
+#  value in smurf_makemap.def).
 #
-#     % makemap config=^/star/share/smurf/dimmconfig.lis
+#  In addition, JCMT would like to move users away from the idea that
+#  dimmconfig.lis is a good default configuration. We are now
+#  recommending that people use dimmconfig_jsa_generic.lis as the
+#  starting point for their map-making experiments since it produces
+#  superior results (but one of the more specific dimmconfigs such as
+#  dimmconfig_bright_extended.lis etc will usually be more appropriate).
 #
-#     (substitute the path to your Starlink installation in place of
-#     "/star").
+#  Users existing personal configuration files that start by including
+#  dimmconfig.lis should be unaffected by this change. In future, if you
+#  want to create a configuration file that starts from the defaults that
+#  were previously in dimmconfig.lis, you should simply omit the starting
+#  line  "^$STARLINK_DIR/share/smurf/dimmconfig.lis". So for instance if
+#  you config used to be:
 #
-#     The values specified in this file provide a basic configuration
-#     that can be used with most SCUBA-2 observations. But note, SMURF
-#     includes alternative configurations that produce better results
-#     in certain specialised cases. These configurations are defined
-#     within files that start with "dimmconfig..." and are located in
-#     /star/share/smurf. Each of these files inherits, and possibly
-#     modifies, the values specified in this file.
+#  	^$STARLINK_DIR/share/smurf/dimmconfig.lis
+#  	maptol = 0.01
+#  	numiter = -40
+#
+#  It can now just be:
+#
+#  	maptol = 0.01
+#  	numiter = -40
+#
+#  Note, since this file is now empty (other than these comment lines),
+#  continuing to include it as in the first example above is safe, but
+#  unnecessary.
 
-#  Notes:
-#     - This file specifies values for only a sub-set of the available
-#     parameters. This sub-set includes all the parameters that are
-#     likely to be of interest to most users. The full list of all
-#     parameters, together with default values and a description of each
-#     parameter, is stored in the file $SMURF_DIR/smurf_makemap.def.
-#     - All available parameters are also documented in SUN/258, appendix
-#     "Configuration Parameters".
-#     - A single parameter can be given different values to use when
-#     processing 450 or 850 um data. This is done by including the
-#     parameter twice, prefixing the parameter name with "450." and "850."
-
-#  Authors:
-#     HP: Harriet Parsons (JAC, Hawaii)
-#     DSB: David Berry (JAC, Hawaii)
-
-#  History:
-#     12-FEB-2013 (HP):
-#        Removed parameter documention (which is now in smurf_makemap.def,
-#        etc). Re-ordered into function groups. Removed specialised or
-#        experimental values that are simple duplicates of the values set
-#        in the defaults files (smurf_makemap.def, etc)
-#     12-FEB-2013 (DSB):
-#        Added this prologue.
-#     5-JUN-2014 (DSB):
-#        - Add noi.box_size=-15 and noi.box_type=1 in order to allow for
-#        variations in the noise level of each bolometer with time.
-#        - Add hitslimit=0.01 to assign bad values to map pixels that
-#        receive very few hits.
-#-
-
-
-########################
-#   General Iterative  #
-########################
-
-numiter = -5
-maptol = 0.05
-
-modelorder = (com,gai,ext,flt,ast,noi)
-exportndf = 0
-
-itermap = 0
-bolomap = 0
-shortmap = 0
-
-chitol = <undef>
-varmapmethod = 1
-
-hitslimit = 0.01
-
-########################
-#   Preprocessing      #
-########################
-
-downsampscale = -1
-
-maxlen = 0
-doclean = 1
-
-exportclean = 0
-
-order = 1
-badfrac = 0.05
-compreprocess = 0
-pcathresh = 0
-pcalen = 0
-
-dcthresh = 25.0
-dcfitbox = 30
-dcmaxsteps = 10
-dclimcorr = 0
-dcsmooth = 50
-
-spikethresh = 0
-spikebox = 50
-
-whiten = 0
-
-noisecliphigh = 4.0
-noisecliplow = 0
-noiseclipprecom = 0
-
-flagslow = 30
-flagfast = 1000
-
-filt_edgelow = 0
-
-########################
-# Preprocess: fakemaps #
-########################
-
-fakemap = <undef>
-fakescale = 1
-
-########################
-# Iterative: com model #
-########################
-
-com.perarray = 0
-
-com.noflag = 0
-com.corr_tol = 5
-com.corr_abstol = 0.2
-com.gain_tol = 5
-com.gain_abstol = 3
-com.gain_box = -30.0
-com.gain_fgood = 0.25
-com.gain_rat = 4
-
-com.zero_mask = 0
-com.zero_circle = <undef>
-com.zero_lowhits = 0
-com.zero_snr = 0
-com.zero_snrlo = 0
-com.zero_union = 1
-com.zero_freeze = 0
-
-########################
-# Iterative: noi model #
-########################
-
-noi.calcfirst = 0
-noi.box_size = -15
-noi.box_type = 1
-
-########################
-# Iterative: flt model #
-########################
-
-450.flt.filt_edge_largescale=600
-850.flt.filt_edge_largescale=300
-
-flt.notfirst = 0
-
-flt.zero_mask = 0
-flt.zero_circle = <undef>
-flt.zero_lowhits = 0
-flt.zero_snr = 0
-flt.zero_snrlo = 0
-flt.zero_niter = 2
-flt.zero_union = 1
-flt.zero_freeze = 0
-
-########################
-# Iterative: ext model #
-########################
-
-ext.tausrc    = auto
-ext.taumethod = adaptive
-
-ext.csotau = <undef>
-ext.filtertau = <undef>
-
-########################
-# Iterative: ast model #
-########################
-
-ast.mapspike = 10
-
-ast.zero_mask = 0
-ast.zero_circle = <undef>
-ast.zero_lowhits = 0
-ast.zero_snr = 0
-ast.zero_snrlo = 0
-ast.zero_snr_fwhm = 0
-ast.zero_snr_low = -1.1
-ast.zero_union = 1
-ast.zero_freeze = 0
 
