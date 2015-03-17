@@ -33,6 +33,7 @@
 \scfrontmatter
 
 \newcommand{\xparam}[2]{\hyperref[#1]{\param{#2}}}
+\newcommand{\setparam}[3]{\xparam{#1}{#2}\param{~=~#3}}
 
 % Acronyms section
 \Acronyms
@@ -75,6 +76,8 @@
 \input{sc21_dimm.tex}
 \newpage
 \input{sc21_pipeline.tex}
+\newpage
+\input{sc21_using_smurf.tex}
 \newpage
 \input{sc21_tweak.tex}
 \newpage
@@ -181,8 +184,6 @@ SCUBA-2 Data Reduction document SC2/ANA/S210/005
 \input{sc21_fits.tex}
 \newpage
 \input{sc21_defconfig.tex}
-\newpage
-\input{sc21_special.tex}
 \newpage
 \input{sc21_selected_params.tex}
 

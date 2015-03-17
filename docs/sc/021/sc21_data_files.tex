@@ -329,3 +329,45 @@ map-maker instead---see \cref{Section}{sec:models}{The individual
   models} for a description and \cref{Section}{sec:export}{Exporting
   individual models} for details on how to examine it.
 
+\section{\xlabel{export}Exporting individual models}
+\label{sec:export}
+
+By default, the final values of the models fitted by the map-maker are
+\emph{not} written out. However, this can be changed by setting
+\xparam{EXPORTNDF}{exportndf} in the configuration file to the list of models
+that you wish to view.
+%\vspace{0cm}
+
+\begin{terminalv}
+exportndf = (com,gai,ast,flt,res,noi,qua)
+\end{terminalv}
+
+In addition to the models listed in \cref{Section}{sec:models}{The
+individual models}, you can request \model{RES} in order to export the
+\model{RES} model --- the residual signal remaining after
+the other models have been removed.  If \model{NOI} (the estimate of
+the bolometer noise levels) is exported, it is stored as the VARIANCE
+component of the \model{RES} model; thus, export of \model{RES} is implied
+if \model{NOI} is specified.
+
+The \texttt{exportndf} parameter will write out the requested models
+as NDF files with names based on the first input file that went into
+the maps for each sub-array. This is first suffixed by \texttt{con},
+indicating that several data files may have been concatenated
+together. The three-letter code for each model is then appended to the
+filename (such as \file{s8a20120720\_00030\_0003\_con\_com.sdf},
+\file{s8a20120720\_00030\_0003\_con\_flt.sdf},
+\file{s8a20120720\_00030\_0003\_con\_res.sdf})\footnote{The filename
+shows the third sub-scan of Observation 30 since this is the first science
+file that is encountered (see \cref{Chapter}{sec:raw}{Handling Raw
+SCUBA-2 Data}).~} The variance and quality for the data are stored as
+the VARIANCE and QUALITY components within the residual file NDF.
+
+\begin{tip}
+  These exported model components are 3-dimensional arrays with axes \texttt{
+  (bolometer column, bolometer row, time slice index)}, and so can be viewed
+  using the cube visualisation facilities within \gaia\ (see \gaiasun).
+\end{tip}
+
+
+

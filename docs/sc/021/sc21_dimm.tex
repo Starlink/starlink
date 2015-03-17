@@ -4,7 +4,7 @@
 The Dynamic Iterative Map-Maker, hereafter just referred to as the
 map-maker is the tool you will use to produce SCUBA-2 maps. It performs
 all pre-processing steps to clean the data, followed by solving for
-multiple signal components using an iterative algorithm, and regridding
+multiple signal components using an iterative algorithm, and binning
 the resulting time-series data to produce a final science map.
 
 This chapter describes how the map-maker produces a science image
@@ -55,7 +55,7 @@ models are subtracted, a sky map created and the convergence checked.
 
 
 \begin{enumdesc}
-\item[Initial cleaning and downsampling]
+\item[Initial cleaning and down-sampling]
   The separate raw data files are first concatenated into a single time
   series for each sub-array (if possible --- see \latexhtml{the description
   of \emph{Data Chunking} on Page~\pageref{box:chunk})~}{\htmlref{Data
@@ -95,7 +95,7 @@ models are subtracted, a sky map created and the convergence checked.
   influenced by the astronomical signal. In turn, this allows us to
   create a more accurate map.  We repeat this process until the map does
   not change significantly with further iterations. Whilst not
-  mathematically rigourous, we expect the process to converge because the
+  mathematically rigorous, we expect the process to converge because the
   astronomical signal is in general much smaller than any of the other
   components and so each iteration introduces a very small fractional
   change in the model estimates.
@@ -103,11 +103,15 @@ models are subtracted, a sky map created and the convergence checked.
   Within each iteration, the first components to be modelled and removed
   are \model{COM} and \model{GAI}, which work together to calculate and
   remove the average signal template of all bolometers, allowing each
-  bolometer to have an arbitrary gain and offset. The next model
+  bolometer to have an arbitrary gain and offset. In addition, the
+  \model{GAI} model will flag as unusable any bolometer in which the
+  signal looks very different to the common-mode.
+
+  The next model
   (\model{EXT}) applies a multiplicative extinction correction to the
   data. Following this, the \model{FLT} model filters each bolometer
   time-stream independently to remove low frequencies that correspond
-  to angular scales larger than 600\,arcsec and 300\,arcsec at
+  to angular scales larger than 600\,arc-sec and 300\,arc-sec at
   450$\mu$m and 850$\mu$m, respectively.
 
   After these models have been removed, the AST model (\emph{i.e.} the
@@ -195,9 +199,12 @@ iterative stage but instead includes an equivalent high-pass filter
 as part of the cleaning stage (see \cref{Section}{sec:config}{Specialised
 configuration files}).
 
-Below is an introduction to each model. More complete descriptions of
-the models and all the associated caveats can be found in Chapin et
-al.  (2013) \cite{mapmaker}.
+Below is an introduction to each model. More complete descriptions of the
+models and all the associated caveats can be found in Chapin et al.
+(2013) \cite{mapmaker}. Details of each model are controlled by a set of
+configuration parameters that begin with the name of the model. For
+instance, all parameters related to the \model{COM} model will be of the
+form ``\param{COM.xxx}''.
 
 \begin{longtable}{c p{0.8\textwidth}}
   \hline
@@ -226,7 +233,9 @@ GAI& \model{GAI} model works with \model{COM} in removing the
   and offset for each bolometer, which scales the \model{COM} model
   so that it resembles the original bolometer data as closely as possible.
   It is the scaled version of \model{COM} that is removed from the
-  bolometer time-series.\\
+  bolometer time-series.  In addition, the \model{GAI} model identifies
+  any bolometers that looks very different to the common-mode signal, and
+  flags them as unusable. \\
 \hline
 EXT& \model{EXT} applies the extinction correction. This is a
   time-varying scaling factor that is derived from the JCMT
@@ -258,19 +267,27 @@ AST& The \model{AST} model is generated in conjunction with a
   and removed as the \model{AST} model.\\
 \hline
 NOI& \model{NOI} should come last in the model order and
-  calculates the RMS noise in each bolometer.  \model{NOI} is
-  determined by running \calcnoise\ (see
-  \cref{Section}{sec:calcnoise}{Checking the array performance}) on
-  the residual signal (the \model{RES} model, see
-  \cref{Section}{sec:export}{Exporting individual models}).  Unlike
-  the other models, \model{NOI} is not a subtraction or a correction
-  but if specified, is used (from the second iteration onwards) to
-  weight the bolometers in the map estimate.\\
+  calculates the RMS noise level in each bolometer.  It is only
+  calculated on the first iteration. The same noise levels are then used
+  on all subsequent iterations to weight the bolometer values when
+  binning them into a map. Each bolometer may have a single noise estimate
+  that remains fixed over the whole observation, or may have multiple
+  noise levels, each of which relate to a different part of the observation.
+  See parameters \xparam{NOI.BOX_SIZE}{noi.box\_size}
+  and \xparam{NOI.BOX_TYPE}{noi.box\_type}. \\
 \hline
 \end{longtable}
 
-
-
+Examples of the time traces for a single bolometer from these
+models is shown in \cref{Figure}{fig:itercomp}{time-domain
+components}. These traces cover a subset of an observation of the
+secondary calibrator CRL~2688. You can clearly see the dominance of the
+\model{COM} model which is removed first. The \model{FLT} model
+stores the data removed by the high-pass filter. In the \model{AST}
+model, CRL~2688 is clearly seen as positive spikes which appear when
+the bolometer passes over the source. Finally, the residual signal
+stored in \model{RES} is flat, indicating that most of the signal has
+been successfully accounted for by the other model components.
 
 
 \section{\xlabel{convergence}Stopping criteria}
@@ -285,10 +302,10 @@ criterion specified in the configuration file is reached.
 
 Specifying the number of iterations in the configuration file is done
 via the \xparam{NUMITER}{numiter} parameter. This is shown below for
-\file{dimmconfig.lis}.
+\file{dimmconfig\_jsa\_generic.lis}.
 
 \begin{terminalv}
-numiter = -5
+numiter = -25
 \end{terminalv}
 
 A positive value for \param{numiter} means that the requested number
@@ -305,20 +322,23 @@ When running the map-maker, \texttt{maptol} gives the average
 normalised change in the value of map pixels
 between subsequent iterations. Convergence is reached when the  mean
 change across all pixels is less than the parameter \param{maptol}.
-It has units of the noise
-in the map, thus \texttt{maptol}$=$0.05 means a change of
-$<$0.05\,$\sigma$. This option has the advantage of directly assessing
-the noise in the resulting map.
+It has units of the noise in the map, thus \texttt{maptol}$=$0.05 means
+a mean change in pixel value of $<$0.05\,$\sigma$. This option has the
+advantage of directly assessing the noise in the resulting map.
 
-Typically the normalized change in pixel values between iterations
-drops rapidly to begin with and then flattens out, decreasing
-increasingly slowly.  Be aware that setting \texttt{maptol} to much
-lower than 0.05 will dramatically increase the length of time to
-produce the final map and possibly never achieve convergence.
+The map-maker displays the normalised change in pixel values between
+iterations at the end of each iteration. This value typically drops
+rapidly to begin with and then flattens out, decreasing increasingly
+slowly.  The printed values can be inspected to check convergence is
+proceeding as expected. Be aware that setting \texttt{maptol} to much
+lower than 0.05 will dramatically increase the length of time needed to
+produce the final map, and may possibly result in convergence never being
+achieved.
 
-The best way of checking the progress of convergence while running the
-map-maker is to use the \xparam{ITERMAP}{itermap} option by setting the parameter
-\param{itermap~=~1} (see \cref{Section}{sec:tweak}{Tweaking the
+If you wish to perform further checks on the progress of convergence
+while running the map-maker, you can use the \xparam{ITERMAP}{itermap}
+option. This causes the map created by each iteration to be dumped to
+disk for inspection (see \cref{Section}{sec:tweak}{Tweaking the
 configuration file}).
 
 \begin{figure}
@@ -328,83 +348,30 @@ configuration file}).
   \includegraphics[width=\linewidth]{sc21_ast} \\
   \includegraphics[width=\linewidth]{sc21_res} \\
 \end{center}
-\caption[Iterative models in the time domain]{\small Time-domain
-components of the iterative models. These show the solution for the
-same single bolometer for part of an observation of CRL~2688. From top
-to bottom: the \model{COM} model containing signal common to all
-bolometers, the \model{FLT} model containing residual low-frequency
-noise missed by \model{COM}, the \model{AST} model with the signal
-showing as a positive spike when this bolometer passes over the
-source, and the \model{RES} model looking (as expected) like white
-noise.}
+\caption[Iterative models in the time domain]{\small These plots show
+some of the models for a single bolometer, for part of an
+observation of CRL~2688. From top to bottom: the \model{COM} model
+containing signal common to all bolometers, the \model{FLT} model
+containing residual low-frequency noise missed by \model{COM}, the
+\model{AST} model with the astronomical signal showing as a positive
+spike when this bolometer passes over the source, and the \model{RES}
+model looking (as expected) like white noise.}
 \label{fig:itercomp}
 \end{figure}
-
-
-\section{\xlabel{export}Exporting individual models}
-\label{sec:export}
-
-By default, the final values of these fitted models are \emph{not}
-written out. However, this can be changed by setting
-\xparam{EXPORTNDF}{exportndf} in the configuration file to the list of models
-that you wish to view.
-%\vspace{0cm}
-
-\begin{terminalv}
-exportndf = (com,gai,ast,flt,res,noi,qua)
-\end{terminalv}
-
-In addition to the models listed in \cref{Section}{sec:models}{The
-individual models}, you request \model{RES} in order to export the
-residual model. \model{RES} is the residual signal remaining after
-the other models have been removed. By contrast, the \model{NOI}
-model is the noise in \model{RES}, as determined by running
-\model{RES} through \calcnoise\ (see
-\cref{Section}{sec:calcnoise}{Checking the array performance}). If
-\model{NOI} is exported, it can be viewed as the VARIANCE component
-of the \model{RES} model; thus, export of \model{RES} is implied if
-\model{NOI} is specified.
-
-
-The \texttt{exportndf} parameter will write out the requested models
-as NDF files with names based on the first input file that went into
-the maps for each sub-array. This is first suffixed by \texttt{con},
-indicating that several data files may have been concatenated
-together. The three-letter code for each model is then appended to the
-filename (such as \file{s8a20120720\_00030\_0003\_con\_com.sdf},
-\file{s8a20120720\_00030\_0003\_con\_flt.sdf},
-\file{s8a20120720\_00030\_0003\_con\_res.sdf})\footnote{The filename
-shows the third sub-scan of Observation 30 since this is the first science
-file that is encountered (see \cref{Chapter}{sec:raw}{Handling Raw
-SCUBA-2 Data}).~} The variance and quality for the data are stored as
-the VARIANCE and QUALITY components within the residual file NDF.
-
-\begin{tip}
-  You can examine any of these model components as you would the final
-  map.
-\end{tip}
-
-Examples of the time traces for a single bolometer from these output
-models is shown in \cref{Figure}{fig:itercomp}{time-domain
-components}. These traces cover a subset of an observation of the
-secondary calibrator CRL~2688. You can clearly see the dominance of the
-\model{COM} model which is removed first. The \model{FLT} model
-stores the data removed by the high-pass filter. In the \model{AST}
-model, CRL~2688 is clearly seen as positive spikes which appear when
-the bolometer passes over the source. Finally, the residual signal
-stored in \model{RES} is flat, indicating that most of the signal has
-been successfully accounted for by the other model components.
 
 
 \section{\xlabel{config}Specialised configuration files}
 \label{sec:config}
 
-Currently all data reduced by the JCMT amd made public through the JCMT Science
-Archive are reduced with \file{dimmconfig\_jsa\_generic.lis}. If
-If unspecified an observation reduced with the pipeline using REDUCE\_SCAN
-This configuration file is intended to provide a reasonably good map
-for all types of observations. However, compromises have been made to reach
-that balance.
+Currently all data reduced by the JCMT and made public through the JCMT
+Science Archive are reduced with the \file{dimmconfig\_jsa\_generic.lis}
+configuration file. Also, maps made by the pipe-line using the
+REDUCE\_SCAN recipe will use \file{dimmconfig\_jsa\_generic.lis} unless some
+alternative configuration has been specified. This configuration file is
+intended to provide a reasonably good map for all types of observations.
+However, compromises have been made to reach that balance, the main one
+being that some real extended structure is sacrificed in order to avoid
+introducing artificial large scale structures.
 
 Whilst \file{dimmconfig\_jsa\_generic.lis} is always a good recipe to start with
 you will want to follow this up with a specialised recipe that will suit
@@ -426,31 +393,51 @@ encountered) override any other instance of them.
 }
 
 Below is a description of each of the specialised configuration files.
-The tables following each description list the parameters set for each
-recipe. A verbatim copy of these files can be found in
-\cref{Appendix}{app:special}{Specialised configuration files}.
+The tables following each description list the parameters set by each file.
+The files themselves are stored in \file{\$STARLINK\_DIR/share/smurf/} ---
+they are simple text files and so can be inspected easily.
 
 \subsection{dimmconfig\_jsa\_generic.lis}
+The \htmladdnormallink{\file{dimmconfig\_jsa\_generic.lis}}
+{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_jsa_generic.lis}
+configuration file is designed to handle all science data. This is a good
+configuration file to start with if you are unsure how to proceed with your
+data reduction.  You may notice that elements of this configuration are
+common to the other specialised configuration files.
 
-This configuration is designed to handle all science data. This is a good
-configuration file to start if you are unsure how to proceed with your
-data reduction. This file also utilises the base configuration file \file{dimmconfig.lis}.
+This configuration is optimised to suppress the creation of artificial
+large scale structure within the final map. Consequently, some real
+extended emission may be lost if this configuration is used. This goal is
+achieved by:
 
-You may notice that elements of this
-configuration are common to the other specialised configuration files.
+\begin{enumerate}
 
-Iteratively applying a high-pass filter (\model{FLT}) can result in
-convergence problems when there is little or no signal in the
-map. Instead, a single, harsher high-pass filter is applied as a
-pre-processing step (corresponding to 200-arcsec scales at both
-450\,$\mu$m and 850\,$\mu$m).
+\item Setting
+\xparam{FLT.FILT_EDGE_LARGESCALE}{flt.filt\_edge\_largescale}) to 200
+arc-seconds so that the \model{FLT} model uses a  heavier than normal
+filter.
 
-\xparam{COM.PERARRAY}{com.perarray} is set to 1 indicating that a \model{COM} model
-should be fit separately for each sub-array. This is not ideal for extended structure
-but can prevent issues from arising from variations in the common mode.
-In addition the S/N threshold for DC steps (\xparam{DCTHRESH}{dcthresh}) is relaxed from
-25 in the default file to 100 to avoid problems associated with bright sources.
+\item Setting \xparam{COM.PERARRAY}{com.perarray} to 1, indicating that four separate
+\model{COM} models should be used, one for each sub-array\footnote{By default, a single
+\model{COM} model is used that represents the mean data value across all
+four sub-arrays.}.
 
+\item Using a mask to force the \model{AST} model to zero in the background regions
+after each iteration (see parameters \xparam{AST.ZERO_SNR}{ast.zero\_snr}
+and \xparam{AST.ZERO_SNRLO}{ast.zero\_snrlo} --- also see
+\cref{Section}{sec:astmask}{AST masking}).
+
+\end{enumerate}
+
+In addition the S/N threshold for DC steps (\xparam{DCTHRESH}{dcthresh})
+is relaxed from 25 in the default file to 100 to avoid problems bright
+sources triggering the step detection algorithm.
+
+The other major feature of this configuration is that the subtraction of
+the \model{AST} model is skipped on the first five iterations. In
+conjunction with the use of \model{FLT} masking, this helps to speed up
+convergence and minimise dark rings around bright source (see
+\cref{Section}{sec:fltrings}{Minimising Rings Around Sources}.
 
 \latex{\renewcommand*\arraystretch{1}}
 \begin{table}[h!]
@@ -459,13 +446,12 @@ In addition the S/N threshold for DC steps (\xparam{DCTHRESH}{dcthresh}) is rela
 \hline
 \multicolumn{2}{|l|}{\file{dimmconfig\_jsa\_generic.lis}}\\
 \hline
-\param{numiter~=~-25}&\param{flt.filt\_edge\_largescale~=~200}\\
-\param{ast.zero\_snr~=~5}&\param{ast.zero\_snrlo~=~3}\\
-\param{ast.skip~=~5}&\param{flt.zero\_snr~=~5}\\
-\param{flt.zero\_snrlo~=~3}& \param{maptol~=~0.01}\\
-\param{maptol\_mean~=~1}&\param{noi.box\_type~=~1}\\
-\param{noisecliphigh~=~10.0}&\param{dcthresh~=~100}\\
-\param{com.perarray~=~1}&\\
+\setparam{AST.SKIP}{ast.skip}{5}&\setparam{AST.ZERO_SNRLO}{ast.zero\_snrlo}{3}\\
+\setparam{AST.ZERO_SNR}{ast.zero\_snr}{5}&\setparam{COM.PERARRAY}{com.perarray}{1}\\
+\setparam{DCTHRESH}{dcthresh}{100}&\setparam{FLT.FILT_EDGE_LARGESCALE}{flt.filt\_edge\_largescale}{200}\\
+\setparam{FLT.ZERO_SNRLO}{flt.zero\_snrlo}{3}&\setparam{FLT.ZERO_SNR}{flt.zero\_snr}{5}\\
+\setparam{MAPTOL}{maptol}{0.01}&\setparam{NUMITER}{numiter}{-25}\\
+\setparam{NOISECLIPHIGH}{noisecliphigh}{10.0}\\
 \hline
 \end{tabular}
 \end{table}
@@ -475,13 +461,16 @@ In addition the S/N threshold for DC steps (\xparam{DCTHRESH}{dcthresh}) is rela
 
 \subsection{dimmconfig\_blank\_field.lis}
 
-This configuration is tuned for blank field surveys for which the goal
-is to detect extremely low signal-to-noise point sources.
+The \htmladdnormallink{\file{dimmconfig\_blank\_field.lis}}
+{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_blank_field.lis}
+configuration is tuned for blank field surveys for which the goal
+is to detect extremely low signal-to-noise point sources within otherwise
+blank fields.
 
-Iteratively applying a high-pass filter (\model{FLT}) can result in
+Applying a high-pass filter (\model{FLT}) on each iteration can result in
 convergence problems when there is little or no signal in the
 map. Instead, a single, harsher high-pass filter is applied as a
-pre-processing step (corresponding to 200-arcsec scales at both
+pre-processing step (corresponding to 200-arc-sec scales at both
 450\,$\mu$m and 850\,$\mu$m). There are also more conservative cuts to
 remove noisy/problematic bolometers. Only 4 (positive) iterations are
 requested as there is no signal to confuse to models.
@@ -495,9 +484,10 @@ sub-array---not an issue for blank fields.
 contrast in the output map between reducing data with the default
 configuration file and using \file{dimmconfig\_blank\_field.lis}.
 
-Blank-field maps commonly have a matched filter applied to aid source
-detection (see \cref{Section}{sec:mf}{Point-source detection}),
-however this is not applied by the map-maker.
+Blank-field maps commonly have a matched filter applied as part of the
+post-processing to aid source detection (see
+\cref{Section}{sec:mf}{Point-source detection}), however this is not
+applied by the map-maker.
 
 \begin{figure}[t!]
 \includegraphics[width=0.47\linewidth]{sc21_cosmo1-def}
@@ -520,9 +510,9 @@ however this is not applied by the map-maker.
 \hline
 \multicolumn{2}{|l|}{\file{dimmconfig\_blank\_field.lis}}\\
 \hline
-\param{numiter~=~4}&\param{flt\_edge\_largescale~=~200}\\
-\param{spikethresh~=~10}&\param{model order~=~(com,ext,ast,noi)}\\
-\param{com.perarray~=~1}&\\
+\setparam{NUMITER}{numiter}{4}&\setparam{FLT_EDGE_LARGESCALE}{flt\_edge\_largescale}{200}\\
+\setparam{SPIKETHRESH}{spikethresh}{10}&\setparam{MODELORDER}{modelorder}{(com,ext,ast,noi)}\\
+\setparam{COM.PERARRAY}{com.perarray}{1}&\\
 \hline
 \end{tabular}
 \end{table}
@@ -532,13 +522,15 @@ however this is not applied by the map-maker.
 
 \subsection{dimmconfig\_bright\_compact.lis}
 
-This configuration is aimed at reducing maps of bright, compact
-sources that are isolated at the centre of the map (i.e. calibrators). It references
-\file{dimmconfig\_bright.lis}, and thus the parameters from both `bright'
-recipes override the default values in \file{dimmconfig.lis}.
+The \htmladdnormallink{\file{dimmconfig\_bright\_compact.lis}}
+{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_bright_compact.lis}
+configuration should be used for producing maps of bright, isolated compact
+sources that are positioned at the centre of the map (\emph{e.g.} calibrators).
+mask
 
 The addition of the \xparam{AST.ZERO_CIRCLE}{ast.zero\_circle} parameter
-is used to constrain the map to zero beyond a radius of 1\,arcmin. This
+is used to constrain the map to zero beyond a radius of 1\,arc-min from
+the source centre (see \cref{Section}{sec:astmask}{AST masking}).  This
 strategy helps with map convergence significantly, and can provide good
 maps of bright sources, even in cases where scan patterns failed to
 complete in full.
@@ -550,6 +542,13 @@ lost, but is fine for a compact central source. Likewise, the filtering
 is tighter. The S/N threshold for DC steps (\xparam{DCTHRESH}{dcthresh}) is relaxed from
 25 in the default file to 100 to avoid problems associated with bright sources.
 
+The values of the parameters controlling the \model{COM} model are
+modified to relax the test that compares each bolometer to the common
+mode. This is because the algorithm that compares each bolometer to the
+common-mode can be fooled by a bright compact source passing across
+individual bolometers. Likewise the test for DC steps within each
+bolometer baseline is also relaxes (parameter \xparam{DCTHRESH}{dcthresh}).
+
 % The tildes around the equal sign are to ensure HTML table field is
 % not wrapped after the parameter name.
 \latex{\renewcommand*\arraystretch{0.95}}
@@ -559,15 +558,12 @@ is tighter. The S/N threshold for DC steps (\xparam{DCTHRESH}{dcthresh}) is rela
 \hline
 \multicolumn{2}{|l|}{\file{dimmconfig\_bright\_compact.lis}}\\
 \hline
-\param{numiter = -40}&\param{flt.filt\_edge\_largescale~=~200}\\
-\param{com.perarray~=~1}&\param{flt.zero\_circle~=~(0.016666)}\\
- \param{ast.zero\_circle~=~(0.0166666666)}&\\
-\hline
-\multicolumn{2}{|l|}{\param{dimmconfig\_bright.lis}}\\
-\hline
-\param{noisecliphigh~=~10.0} & \param{dcthresh~=~100}\\
-\param{com.corr\_tol~=~7}& \param{com.gain\_tol~=~7}\\
-\param{com.gain\_abstol~=~5}& \\
+\setparam{NUMITER}{numiter}{-40}&\setparam{FLT.FILE_EDGE_LARGESCALE}{flt.filt\_edge\_largescale}{200}\\
+\setparam{COM.PERARRAY}{com.perarray}{1}&\setparam{FLT.ZERO_CIRCLE}{flt.zero\_circle}{(0.016666)}\\
+\setparam{AST.ZERO_CIRCLE}{ast.zero\_circle}{(0.0166666666)}&\\
+\setparam{NOISECLIPHIGH}{noisecliphigh}{10.0} & \setparam{DCTHRESH}{dcthresh}{100}\\
+\setparam{COM.CORR_TOL}{com.corr\_tol}{7}& \setparam{COM.GAIN_TOL}{com.gain\_tol}{7}\\
+\setparam{COM.GAIN_ABSTOL}{com.gain\_abstol}{5}& \\
 \hline
 \end{tabular}
 \end{table}
@@ -586,18 +582,21 @@ is tighter. The S/N threshold for DC steps (\xparam{DCTHRESH}{dcthresh}) is rela
    \file{dimmconfig\_bright\_extended.lis}.\label{fig:becompare}}
 \end{figure}
 
-This configuration is for reducing maps that do not fall into the
-other two categories. The emission is usually extended to some degree
+The \htmladdnormallink{\file{dimmconfig\_bright\_extended.lis}}
+{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_bright_extended.lis}
+configuration is for reducing maps that contain emission that is extended to some degree
 and contains some bright regions. Here \xparam{AST.ZERO_SNR}{ast.zero\_snr} is used
 to constrain the \model{AST} model to zero wherever the S/N is lower
-than 5$\sigma$.  Everywhere the signal is below this threshold, the
-map is set to zero for all but the final iteration. \xparam{NUMITER}{numiter}
+than 5$\sigma$ (see \cref{Section}{sec:astmask}{AST masking}).
+\xparam{NUMITER}{numiter}
 has been raised to \texttt{-40}, as more iterations are required to
 maximise the sensitivity to large dynamic signal ranges in the map.
 
-Recovering both faint extended structure and bright sources in the
-same field poses an extra challenge. Strategies for this are explored
-in \cref{Chapter}{sec:tweak}{Tailoring Your Reduction}.
+The other major feature of this configuration is that the subtraction of
+the \model{AST} model is skipped on the first five iterations. In
+conjunction with the use of \model{FLT} masking, this helps to speed up
+convergence and minimise dark bowls around bright source (see
+\cref{Section}{sec:fltrings}{Minimising Rings Around Sources}.
 
 \cref{Figure}{fig:becompare}{The images below} shows a comparison
 between maps reduced with the default configuration file and using
@@ -611,28 +610,49 @@ difference is the improvement in the bowling around strong sources.
 \hline
 \multicolumn{2}{|l|}{\file{dimmconfig\_bright\_extended.lis}}\\
 \hline
-\param{numiter~=~-40}&\param{flt.filt\_edge\_largescale~=~480}\\
-\param{ast.zero\_snr~=~3}&\param{ast.zero\_snrlo~=~2}\\
-\param{ast.skip~=~5}&\param{flt.zero\_snr~=~5}\\
-\param{flt.zero\_snrlo~=~3}& \\
+\setparam{NUMITER}{numiter}{-40}&\setparam{FLT.FILT_EDGE_LARGESCAPE}{flt.filt\_edge\_largescale}{480}\\
+\setparam{AST.ZERO_SNR}{ast.zero\_snr}{3}&\setparam{AST.ZERO_SNRLO}{ast.zero\_snrlo}{2}\\
+\setparam{AST.SKIP}{ast.skip}{5}&\setparam{FLT.ZERO_SNR}{flt.zero\_snr}{5}\\
+\setparam{FLT.ZERO_SNRLO}{flt.zero\_snrlo}{3}& \\
 \hline
 \end{tabular}
 \end{table}
 
 
-\section{\xlabel{problem}Solving configuration-file problems}
+\section{\xlabel{problem}Configuration files for solving specific problems}
 \label{sec:problem}
 
-Two trouble-shooting configuration files are available to supplement your
-configuration file.
+Two additional configuration files are available that can be used to supplement your
+configuration file in order to solve specific problems:
+xxx
 \begin{itemize}[noitemsep]
-\item \file{dimmconfig\_fix\_convergence} to help your map converge.
-\item \file{dimmconfig\_fix\_blobs} to remove large blooms or blobs of spurious
-emission in your map.
+
+
+\item \htmladdnormallink{\file{dimmconfig\_fix\_convergence.lis}}
+{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_fix_convergence.lis}
+to help your map converge. It does this by preventing masks from changing,
+and by freezing the flags that identify aberrant bolometers. Both of
+these restrictions are imposed only after 10 iterations have been
+performed.
+
+\item \htmladdnormallink{\file{dimmconfig\_fix\_blobs.lis}}
+{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_blobs.lis}
+to remove large ``blooms'' or smooth blobs of spurious emission in your
+map. These can be caused by ringing induced by unidentified steps or spikes in the bolometer
+time-streams. The fix is to look for oscillations within the time-streams
+following the \model{FLT} model, and flag such time-slices as unusable.
+In addition, time slices at which the four sub-arrays see significantly
+different common-mode values are also flagged as unusable.
+
 \end{itemize}
-By default these recipes do not point to any existing configuration file. To use
-these recipes in addition to  \file{dimmconfig\_bright\_extended.lis} you should
-create a parameter file containing the following lines.
+
+Unlike the other configuration files described above, these recipes do not provide
+a complete set of parameter values. Instead, they provide a few
+additional settings that should be added to some other configuration in
+order to achieve the desired fix. For instance, a configuration file
+containing the following two lines would indicate that values from both
+\file{dimmconfig\_bright\_extended.lis} and \file{dimmconfig\_fix\_blobs.lis} should
+be used:
 
 \begin{terminalv}
 ^/star/share/smurf/dimmconfig_bright_extended.lis
@@ -646,164 +666,6 @@ the values specified in \file{dimmconfig\_bright\_extended.lis}.
 
 The parameters in these recipes are discussed further
 \cref{Chapter}{sec:tweak}{Tailoring Your Reduction}.
-
-
-
-
-\section{\xlabel{running_dimm}Manually running the iterative map-maker}
-\label{sec:running}
-
-The next chapter describes how to run \cref{Chapter}{sec:pipe}{the SCUBA-2 Pipeline}.
-Users - particularly new users - are encourage to make use of the \oracdr\ pipeline.
-However, greater control of the map-making process is available by running the \makemap\
-command directly, rather than from within the pipeline. This section describes how
-to do this, but should be seen as ``advanced usage''.
-
-When running the map-maker, you can call any of the provided
-configuration files directly from the Starlink path (e.g.
-\file{\^{}\$STARLINK\_DIR/share/smurf/dimmconfig.lis}). Alternatively,
-a local copy can be made and edited. Advice on which parameters to
-edit can be found in \cref{Section}{sec:tweak}{Tweaking the
-configuration file}.
-
-\begin{tip}
-  An up-caret (\,\texttt{\^{}}\,) is required any time you are reading
-  in a group text file in \starlink. For the map-maker this includes
-  the configuration file (a group of parameters) and a list of your
-  input files (e.g. \texttt{in=\^{}\,myrawfiles.txt}).
-\end{tip}
-
-
-The default pixel sizes are:
-\begin{itemize}
-\item 2\,arcsec at 450$\mu$m
-\item 4\,arcsec at 850$\mu$m
-\end{itemize}
-
-These can be changed by adding the \texttt{pixsize=}$x$ to the
-command string\footnote{The default sizes are defined as one quarter
-of the Airy disk rounded up to the nearest half arcsecond.}, where $x$
-is your desired pixel size in arcsecs. We advise that you do not
-increase the pixel size at this stage as it will compromise model
-fitting---instead regrid your map as a post-processing step.
-
-% Other ADAM parameter available with \makemap\ include ref, maxmem
-% and msg\_filter. Some of these appear in the example below but see
-% \cref{Appendix}{app:adam}{MAKEMAP ADAM Parameters} for
-% descriptions. A complete list of all ADAM parameters can be found in
-% \smurfsun.
-
-\begin{tip}
-  Map-maker not finding your raw files from a path? Check you have
-  double quotes around your `in' option and are not using
-  \texttt{*sdf}---use either \texttt{*.sdf} or just \texttt{*}.
-\end{tip}
-
-
-
-\begin{terminalv}
-% makemap in="/jcmtdata/raw/scuba2/s8*/20120720/00030/*.sdf" out=850_crl2688 \
-  config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
-
-Out of 32 input files, 4 were darks, 8 were fast flats and 20 were science
-Processing data from instrument 'SCUBA-2' for object 'CRL2688' from the
-following observation  :
-  20120720 #30 scan  /shutter
-
-MAKEMAP: Map-maker will use no more than 68401 MiB of memory
-
-Projection parameters used:
-CRPIX1 = 0
-CRPIX2 = 0
-CRVAL1 = 315.578333333333 ( RA = 21:02:18.800 )
-CRVAL2 = 36.6938055555556 ( Dec = 36:41:37.70 )
-CDELT1 = -0.00111111111111111 ( -4 arcsec )
-CDELT2 = 0.00111111111111111 ( 4 arcsec )
-CROTA2 = 0
-
-Output map pixel bounds: ( -132:122, -126:129 )
-
-Output map WCS bounds:
-Right ascension: 21:01:38.318 -> 21:03:03.280
-Declination: 36:33:07.19 -> 36:50:11.70
-
-smf_iteratemap: will down-sample data to match angular scale of 4 arcsec
-smf_iteratemap: Iterate to convergence (max 5)
-smf_iteratemap: stop when change in chi^2 < 0.001
-smf_iteratemap: provided data are in 1 continuous chunks, the largest of which
-has 5957 samples (153.729 s)
-smf_iteratemap: map-making requires 1376 MiB (map=3 MiB model calc=1372 MiB)
-smf_iteratemap: Continuous chunk 1 / 1 =========
-smf_calc_smoothedwvm: 0.977444 s to calculate unsmoothed WVM tau values
-smf_iteratemap: Iteration 1 / 5 ---------------
---- Size of the entire data array ------------------------------------------
-bolos  : 5120
-tslices: bnd:0(0.0 min), map:5957(2.6 min), tot:5957(2.6 min)
-Total samples: 30499840
---- Quality flagging statistics --------------------------------------------
- BADDA:   10972794 (35.98%),        1842 bolos
-BADBOL:   11818688 (38.75%),        1984 bolos
-DCJUMP:      38809 ( 0.13%),
-  STAT:      71680 ( 0.24%),          14 tslices
- NOISE:     810152 ( 2.66%),         136 bolos
-Total samples available for map:   18634826, 61.10% of max (3128.22 bolos)
-smf_iteratemap: Calculate time-stream model components
-smf_iteratemap: Rebin residual to estimate MAP
-smf_iteratemap: Calculate ast
---- Quality flagging statistics --------------------------------------------
- BADDA:   10972794 (35.98%),        1842 bolos  ,change          0 (+0.00%)
-BADBOL:   11925914 (39.10%),        2002 bolos  ,change     107226 (+0.91%)
-DCJUMP:      38809 ( 0.13%),                    ,change          0 (+0.00%)
-  STAT:      71680 ( 0.24%),          14 tslices,change          0 (+0.00%)
-   COM:     323165 ( 1.06%),                    ,change     323165 (+0.00%)
- NOISE:     810152 ( 2.66%),         136 bolos  ,change          0 (+0.00%)
-Total samples available for map:   18312771, 60.04% of max (3074.16 bolos)
-     Change from last report:    -322055, -1.73% of previous
-smf_iteratemap: Will calculate chi^2 next iteration
-smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.874979 (mean) 73.7106 (max)
-smf_iteratemap: Iteration 2 / 5 ---------------
-smf_iteratemap: Calculate time-stream model components
-smf_iteratemap: Rebin residual to estimate MAP
-smf_iteratemap: Calculate ast
---- Quality flagging statistics --------------------------------------------
- BADDA:   10972794 (35.98%),        1842 bolos  ,change          0 (+0.00%)
-BADBOL:   11949742 (39.18%),        2006 bolos  ,change      23828 (+0.20%)
- SPIKE:         34 ( 0.00%),                    ,change         34 (+0.00%)
-DCJUMP:      38809 ( 0.13%),                    ,change          0 (+0.00%)
-  STAT:      71680 ( 0.24%),          14 tslices,change          0 (+0.00%)
-   COM:     357816 ( 1.17%),                    ,change      34651 (+10.72%)
- NOISE:     810152 ( 2.66%),         136 bolos  ,change          0 (+0.00%)
-Total samples available for map:   18278374, 59.93% of max (3068.39 bolos)
-     Change from last report:     -34397, -0.19% of previous
-smf_iteratemap: *** CHISQUARED = 0.983228126551834
-smf_iteratemap: *** NORMALIZED MAP CHANGE: 1.29181 (mean) 15.0552 (max)
-smf_iteratemap: Iteration 3 / 5 ---------------
-.....
-.....
-.....
-smf_iteratemap: Iteration 5 / 5 ---------------
-smf_iteratemap: Calculate time-stream model components
-smf_iteratemap: Rebin residual to estimate MAP
-smf_iteratemap: Calculate ast
---- Quality flagging statistics --------------------------------------------
- BADDA:   10972794 (35.98%),        1842 bolos  ,change          0 (+0.00%)
-BADBOL:   11949742 (39.18%),        2006 bolos  ,change          0 (+0.00%)
- SPIKE:         34 ( 0.00%),                    ,change          0 (+0.00%)
-DCJUMP:      38809 ( 0.13%),                    ,change          0 (+0.00%)
-  STAT:      71680 ( 0.24%),          14 tslices,change          0 (+0.00%)
-   COM:     362902 ( 1.19%),                    ,change          0 (+0.00%)
- NOISE:     810152 ( 2.66%),         136 bolos  ,change          0 (+0.00%)
-Total samples available for map:   18273302, 59.91% of max (3067.53 bolos)
-     Change from last report:          0, +0.00% of previous
-smf_iteratemap: *** CHISQUARED = 0.952708604771402
-smf_iteratemap: *** change: -0.000109049487216351
-smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.107427 (mean) 2.96138 (max)
-smf_iteratemap: ****** Completed in 5 iterations
-smf_iteratemap: ****** Solution CONVERGED
-Total samples available from all chunks: 18273302 (3067.53 bolos)
-%%%%\end{}
-\end{terminalv}
-
 
 
 

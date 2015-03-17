@@ -1797,6 +1797,36 @@
    }
 }
 \sstroutine{
+   NOI.BOX\_TYPE
+}{
+   Determines how the noise in each box is found
+}{
+   \sstdescription{
+      If this is zero, the noise in each box (see parameter
+      {\tt{"}}\xref{noi.box\_size}{sun258}{NOI.BOX_SIZE}{\tt{"}}) is found by taking Fourier transform of the
+      residuals in each box and then using the mean power in the
+      range 2 to 10 Hz as the noise. If it is non-zero, the noise
+      for each residual is set to the variance of the neighbouring
+      residuals in a box centred on the residual. Using this
+      scheme causes the noise values to vary continuously with
+      time, whereas the FFT scheme produced blocks of equal
+      noise values. When using a small box size, {\tt{"}}noi.box\_type=1{\tt{"}}
+      will often result in far fewer samples being flagged as
+      unusable. Note, if {\tt{"}}noi.box\_size{\tt{"}} is set to zero, then the
+      value of {\tt{"}}noi.box\_type{\tt{"}} is ignored and the noise is always
+      calculated on the basis of the mean power in the 2 to 10
+      Hz band. [1]
+   }
+   \sstattributetype{
+      integer
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      MAKEMAP, CALCQU
+   }
+}
+\sstroutine{
    NOI.CALCFIRST
 }{
    Determines when the noise in each bolometer is estimated
