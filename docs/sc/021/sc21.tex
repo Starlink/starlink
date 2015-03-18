@@ -10,17 +10,16 @@
 \stardocversion  {1.3}
 \stardocmanual   {\ }
 \stardocabstract {
-  This cookbook provides a short introduction to Starlink facilities,
-   especially \textsc{Smurf}, the Sub-Millimetre User Reduction
-   Facility, for reducing, displaying, and calibrating SCUBA-2 data.
-   It describes some of the data artefacts present in SCUBA-2
-   time-series and methods to mitigate them. In particular, this
-   cookbook illustrates the various steps required to reduce the data;
-   and gives an overview of the Dynamic Iterative Map-Maker, which
-   carries out all of these steps using a single command controlled by
-   a configuration file. Specialised configuration files are
-   presented.
- }
+   This cookbook provides an introduction to Starlink facilities,
+   especially \textsc{smurf}, the Sub-Millimetre User Reduction Facility,
+   and the \textsc{orac-dr} pipeline for reducing, displaying, and
+   calibrating SCUBA-2 data. It describes some of the data artefacts
+   present in SCUBA-2 time-series and methods to mitigate them. In
+   particular, this cookbook illustrates the various steps required to
+   reduce the data; and gives an overview of the Dynamic Iterative
+   Map-Maker, which carries out all of these steps using a single command
+   controlled by a configuration file. Specialised configuration files
+   are presented. }
 \stardocauthors{H.\ S.\ Thomas, M.\ J.\ Currie}
 \stardocdate{26 June 2014}
 \startitlepic{\includegraphics[width=0.7\textwidth]{sc21_s2logo}}
@@ -34,6 +33,26 @@
 
 \newcommand{\xparam}[2]{\hyperref[#1]{\param{#2}}}
 \newcommand{\setparam}[3]{\xparam{#1}{#2}\param{~=~#3}}
+
+\newcommand{\jsageneric}{\htmladdnormallink{\file{dimmconfig\_jsa\_generic}}
+{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_jsa_generic.lis}}
+
+\newcommand{\brightextended}{\htmladdnormallink{\file{dimmconfig\_bright\_extended}}
+{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_bright_extended.lis}}
+
+\newcommand{\brightcompact}{\htmladdnormallink{\file{dimmconfig\_bright\_compact}}
+{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_bright_compact.lis}}
+
+\newcommand{\blankfield}{\htmladdnormallink{\file{dimmconfig\_blank\_field}}
+{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_blank_field.lis}}
+
+\newcommand{\fixconvergence}{\htmladdnormallink{\file{dimmconfig\_fix\_convergence}}
+{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_fix_convergence.lis}}
+
+\newcommand{\fixblobs}{\htmladdnormallink{\file{dimmconfig\_fix\_blobs}}
+{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_fix_blobs.lis}}
+
+
 
 % Acronyms section
 \Acronyms
@@ -182,8 +201,6 @@ SCUBA-2 Data Reduction document SC2/ANA/S210/005
 \input{sc21_cog.tex}
 \newpage
 \input{sc21_fits.tex}
-\newpage
-\input{sc21_defconfig.tex}
 \newpage
 \input{sc21_selected_params.tex}
 

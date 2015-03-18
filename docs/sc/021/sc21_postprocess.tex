@@ -605,11 +605,11 @@ the history of an NDF.
 The first example below will return the value of \xparam{NUMITER}{numiter} from
 the map \file{850map.sdf}. The second example will display the values of all
 the parameters in \file{850map.sdf} and will prefix them with a `+' if they
-differ from the the values given in \file{dimmconfig.lis}.
+differ from the the default parameter values defined in \file{\$SMURF\_DIR/smurf\_makemap.def}.
 
 \begin{terminalv}
 % configecho name=numiter config=! ndf=850map.sdf
-% configecho name=! config=^dimmconfig.lis ndf=850map.sdf
+% configecho name=! config=^$SMURF_DIR/smurf_makemap.def ndf=850map.sdf
 \end{terminalv}
 \end{description}
 

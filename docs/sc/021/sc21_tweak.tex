@@ -3,23 +3,59 @@
 
 
 \section{Adding and amending parameters}
-The base configuration file \file{dimmconfig.lis} contains all of
-the parameters that most users would wish to play with. The default
-configuration file \file{dimmconfig\_jsa\_generic.lis} is a good
-configuration file to use as a first pass for reducing any data.
+The configuration file \file{dimmconfig\_jsa\_generic.lis} is a good
+configuration file to use as a first pass for reducing any data, and is
+the default configuration used by the pipeline's \drrecipe{REDUCE\_SCAN}
+recipe.
 
 \textbf{You can create your own personalised configuration file from
 scratch or copy one of the provided ones to your local directory and
 edit it.}
 
-The first line of each specialised configuration file is always a path
-to the recipe upon which it is built. These paths all lead to
-recipes in the \starlink\ tree which cannot be edited. If you are
-creating your own file from scratch, make sure to include this
-reference to an existing configuration file on the first line.
-Remember any parameters appearing your configuration file
-automatically override their values in the default file (see
-\cref{Figure}{fig:configtree}{this figure}).
+The first line of each specialised configuration file is usually the path
+to another configuration file --- known as the \emph{parent} configuration
+file. The new configuration file inherits all the parameter values
+defined by the parent configuration file, and then goes on to specify
+additional parameter settings which may supplement or over-ride those
+defined in the parent configuration file. Parameters that are not set to
+a specific value by \emph{either} configuration file asssume the default
+values listed in \cref{Appendix}{app:parameters}{Configuration-parameter
+descriptions}\footnote{These default values are defined in the file
+\texttt{\$SMURF\_DIR/smurf\_makemap.def}.}.
+
+Often you will want to use one of the pre-defined configuration files
+included within \starlink\ tree as the parent configuration. Remember
+that any parameters appearing in your configuration file
+automatically override the values supplied by the parent file. As an
+example, consider the following text file ``\texttt{myconf}'':
+
+\begin{terminalv}
+% cat myconf
+
+#  This is an example configuration file.
+^$STARLINK_DIR/share/smurf/dimmconfig_jsa_generic.lis
+
+numiter=-100
+maptol=0.01
+
+\end{terminalv}
+
+The first thing to note is that blank lines and comment lines
+(\emph{i.e.} lines beginning with the hash character ``\texttt{\#}'') are
+ignored and can be used to document your configuration file. Next note
+that this example file uses
+\texttt{\$STARLINK\_DIR/share/smurf/dimmconfig\_jsa\_generic.lis} as its
+parent (the path to the parent file must be preceeded
+by an up-caret (\texttt{\^}) character). Thus, all the paremeter values
+set by \texttt{\$STARLINK\_DIR/share/smurf/dimmconfig\_jsa\_generic.lis} are
+first read, before adding in other parameter settings. In this case, values
+are assigned to \param{maptol} and \param{numiter}, over-riding the
+values provided by the parent file.
+
+You can use more than one parent file if required (each one a separate
+line, and preceded by an up-caret). Each specified parent will be read in
+turn, with parameter settings read from later ones having priority over
+those read from earlier ones.
 
 You can also add or amend parameters by listing them directly on the
 command line. They are appended to the configuration filename as a
@@ -31,24 +67,27 @@ all the necessary quotation marks.
 config='"^dimmconfig\_jsa\_generic.lis,numiter=-50,exportndf=(flt,noi),itermap=1"'
 \end{terminalv}
 
-\textbf{What parameters can be changed?}\\*
-Any of the parameters listed in \file{dimmconfig.lis} can be
-changed. For comprehensive list of the parameters in
-\file{dimmconfig.lis} see \cref{Appendix}{app:dimm}{an appendix}.
+For full details of all the possible ways of specifying groups of
+paramneter values, see Section ``\xref{Specifying Groups of
+Objects}{sun95}{SE_GROUPS}'' in ``\xref{Starlink User Note 95}{sun95}{}.
 
-The map-maker uses other parameters beyond those described in the
-configuration files. These can be found in the default makemap file,
-\file{smurf\_makemap.def}. This file lives in your \file{\$SMURF\_DIR}
-directory or online at the \starlink\ \htmladdnormallinkfoot{github
-  repository}{https://github.com/Starlink/starlink/blob/master/applications/smurf/defaults/smurf\_makemap.def}
-However, we do not advise users to alter any of these default
-parameters.
+\textbf{What parameters can be changed?}\\*
+\cref{Appendix}{app:parameters}{Configuration-parameter descriptions}
+lists the parameters that are more likely to be of interest to you when
+creating your own configuration files. You can also change any of the
+other more esoteric parameters not included in that list --- see
+Appendix \xref{SUN/258} {sun258}{par_full} within \xref{Starlink
+User Note 258}{sun258}{} for a full list -- but we do not advise this.
 
 \begin{tip}
-  If you wish to disable an active parameter in the default file, set
-  it as \param{<undef>} in your personalised file.
+  If some feature is switched on either by default or within
+  the parent configuration file, it can be switched off if required
+  by assigning a suitable value to the corresponding parameter within
+  your own configuration file. The value needed to do this will be
+  given in the parameter description in \cref{Appendix}{app:parameters}
+  {Configuration-parameter descriptions} --- for instance it may be
+  \param{<undef>}, or \param{0}, or some other special value.
 \end{tip}
-
 
 \textbf{Note:} any parameter can be made wavelength dependent by
 adding the prefix \param{450.} or \param{850.}, e.g.
@@ -61,7 +100,7 @@ values (no prefix) take priority over qualified values.
 
 
 \textbf{itermaps}\\
-Setting the parameter \param{itermap~=~1} writes out an astronomical
+Setting the parameter \setparam{ITERMAP}{itermap}{1} writes out an astronomical
 map after each iteration. Setting \param{itermap~=~2} adds the QUALITY
 component.  These can be visually inspected with
 
@@ -182,10 +221,10 @@ applied to the data:
     cut}[\textrm{Hz}]}=\textrm{scale size}[\prime\prime]
 \end{equation}
 
-The filtering options set in \file{dimmconfig.lis} are:
+The default (\emph{i.e.} if no configuration is supplied) filtering options are:
 
-\param{450.flt.filt\_edge\_largescale~=~200} \\
-\param{850.flt.filt\_edge\_largescale~=~480}.
+\setparam{FLT.FILT_EDGE_LARGESCALE}{450.flt.filt\_edge\_largescale}{200} \\
+\setparam{FLT.FILT_EDGE_LARGESCALE}{850.flt.filt\_edge\_largescale}{480}.
 
 To make your life easier, these parameters allow you to specify the
 filter limits in terms of spatial scale in arcsecs---in this case
@@ -196,12 +235,12 @@ a frequency of 1.25\,Hz.
 
 Choosing a high-pass filter is especially important for the recovery
 of extended emission. The \file{dimmconfig\_bright\_extended.lis}
-recipe sets \param{flt.filt\_edge\_largescale~=~480} (i.e. both 450
-and 850\,$\mu$m). Be aware that increasing filtering scales decreases
-the flatness of your background. A compromise must be made between
-extended structure and the flatness of your map. See
-\cref{Figure}{fig:fltcompare}{the figure below} for an illustration of
-the effect of \xparam{FLT.FILT_EDGE_LARGESCALE}{flt.filt\_edge\_largescale} on your map.
+configuration file sets \setparam{FLT.FILT_EDGE_LARGESCALE}{flt.filt\_edge\_largescale}{480}
+(i.e. both 450 and 850\,$\mu$m). Be aware that increasing filtering scales
+decreases the flatness of your background. A compromise must be made between
+extended structure and the flatness of your map. See \cref{Figure}{fig:fltcompare}
+{the figure below} for an illustration of the effect of
+\xparam{FLT.FILT_EDGE_LARGESCALE}{flt.filt\_edge\_largescale} on your map.
 
 The scanning speeds are fixed for a given observing mode; you can find
 out the speed at which your data were taken from the
@@ -226,8 +265,8 @@ iteration to avoid having artificially reduced values.
 \includegraphics[width=0.46\linewidth]{sc21_brex_18}
 \caption[Illustrating the effects of high-pass filtering]{
   Highlighting the effects of high-pass filtering on your map.
-  \textbf{(Left)} Map made with \param{850.flt.filt\_edge\_largescale~=~300}.
-  \textbf{(Right)} Map made with \param{850.flt.filt\_edge\_largescale~=~1000}.
+  \textbf{(Left)} Map made with \param{850.flt.filt\_edge\_largescale}{300}.
+  \textbf{(Right)} Map made with \param{850.flt.filt\_edge\_largescale}{1000}.
   All other configuration parameters remain the same.\label{fig:fltcompare}
 }
 \end{figure}
@@ -246,7 +285,7 @@ any scales larger than the area covered by a single sub-array. It is
 therefore not recommended if you have very large-scale extended
 structure.
 
-To initialise this option set \param{com.perarray~=~1}.
+To initialise this option set \setparam{COM.PERARRAY}{com.perarray}{1}.
 
 
 \section{\xlabel{noibox}Flagging bad data}
@@ -264,7 +303,7 @@ estimated noise levels are preferable.
 The parameter \param{noi.box\_size} helps remove `scuffs' or other
 noise artefacts you might see in your error map due to a sub-array (or
 arrays) temporarily jumping to a higher noise state. The default file
-has \param{noi.box\_size = - 15} (i.e. half a sub-scan). As the
+has \setparam{NOI.BOX_SIZE}{noi.box\_size}{-15} (i.e. half a sub-scan). As the
 value tends to $-$1 (one second) we find some of the source signal being
 down-weighted. Higher than this $-$15 value and the map-maker becomes
 less sensitive to the higher noise states.
@@ -325,7 +364,7 @@ iteration. This can help prevent ringing in the final map. S/N based
 \model{FLT} masking cannot be used on the first iteration and
 \model{FLT} masking should be used sparingly to aid convergence (it
 is limited to the first two iterations by default with
-\param{flt.zero\_niter~=~2}).
+\setparam{FLT.ZERO_NITER}{flt.zero\_niter}{2}).
 
 \item[COM mask]
 \model{COM} masking is used to omit very bright sources from the
@@ -336,7 +375,7 @@ mask should always be small.
 
 \item[Signal-to-noise masking]
 Masking based on the signal-to-noise ratio is used for both the \model{AST}
-and \model{FLT} models for extended emission. The recipe
+and \model{FLT} models for extended emission. The configuration file
 \file{dimmconfig\_bright\_extended.lis} sets \xparam{AST.ZERO_SNR}{ast.zero\_snr}
 to 5 and \param{ast.zero\_snr} to 3. Setting \param{ast.zero\_snr}
 too low can cause noise spikes to be interpreted as signal so
@@ -346,7 +385,7 @@ resulting map so it is worth experimenting with. Note that \model{AST}
 masking is not applied on the final iteration to allow data outside
 the mask to remain in the final map.
 
-The bright-extended recipe also sets \xparam{AST.SKIP}{ast.skip} to 5. This
+The bright-extended configuration file also sets \xparam{AST.SKIP}{ast.skip} to 5. This
 means the \model{AST} model is not determined at all for the first
 five iterations. This used in conjunction with \model{FLT} masking
 which is performed in these \model{AST}-free iterations.
@@ -464,7 +503,7 @@ before co-adding them as a final step in the the reduction---see
 
 This means for each chunk the map-maker has to start from scratch
 determining the \model{AST} model and the benefit of long integration
-times spent building up the signal is lost. Recipes which use
+times spent building up the signal is lost. Configuration files that use
 signal-to-noise masks especially suffer from this approach as the
 signal-to-noise in each individual chunk can remain low and fainter
 extended structure is not recovered.
@@ -510,13 +549,14 @@ The parameters in this file are designed to prevent smooth blobs of bright
 emission appearing in the final map. These parameters are explained below.
 
 \begin{itemize}[nolistsep]
-\item \param{flt.filt\_order~=~4} to set a 4th-order Butterworth
+\item \setparam{FLT.FILT_ORDER}{flt.filt\_order}{4} to set a 4th-order Butterworth
   filter for the \model{FLT} model.
 
-  \item \param{flt.ring\_box1~=~0.5} uses a filter to identify and flag
+\item \setparam{FLT.RING_BOX1}{flt.ring\_box1}{0.5} uses a filter to identify and flag
   time-samples that are ringing after the \model{FLT} model. This only starts
   after the \xparam{AST.SKIP}{ast.skip} iterations (in bright\_extended) have completed.
-  \item \param{com.sig\_limit~=~5} flags time slices where the
+
+\item \setparam{COM.SIG_LIMIT}{com.sig\_limit}{5} flags time slices where the
   \model{COM} model is very different from the average for each
   sub-array. This should only be used when \xparam{FLT.FILT_ORDER}{flt.filt\_order} is set. If
   it is set too stringently it can throw out a lot of data so modify with
@@ -530,19 +570,20 @@ The parameters in this file are designed to help a map which will not
 converge within a reasonable number of iterations. The parameters are
 listed below.
 \begin{itemize}[nolistsep]
-\item \param{com.freeze\_flags~=~10} stops flags generated by the \model{COM}
+\item \setparam{COM.FREEZE_FLAGS}{com.freeze\_flags}{10} stops flags generated by the \model{COM}
 model determination from changing after the first ten iterations.
-\item \param{ast.zero\_freeze~=~10}
-\item \param{flt.zero\_freeze~=~10}
-\item \param{com.zero\_freeze~=~10}
+\item \setparam{AST.ZERO_FREEZE}{ast.zero\_freeze}{10}
+\item \setparam{FLT.ZERO_FREEZE}{flt.zero\_freeze}{10}
+\item \setparam{COM.ZERO_FREEZE}{com.zero\_freeze}{10}
 \end{itemize}
+
 These \param{xxx.zero\_freeze} parameters stop the respective masks
 growing after ten iterations. By this stage they have essentially reached
 their final shape and it is only a few pixels around the edge of the masks
 which oscillate in and out and prevent convergence.
 \end{itemize}
 
-These recipes can either be called directly by an external configuration
+These configuration files can either be called directly by an external configuration
 file---see \cref{Section}{sec:problem}{Solving configuration-file problems}
 or the parameters can be included (and edited) in your personalised
 configuration file.
@@ -555,11 +596,11 @@ configuration file.
 \hline
 I have blobs in my map that look like big thumbprints. & Try using
 \file{dimmconfig\_fix\_blobs.lis} in addition to your current configuration
-file.  Note that this sets \param{com.sig\_limit~=~5} which is somewhat
+file.  Note that this sets \setparam{COM.SIG_LIMIT}{5} which is somewhat
 conservative. You can experiment by lowering this, but we would not recommend
 lower than $\sim$2 before you lose too many samples.
 
-In addition, check you are not using \param{flt.notfirst~=~1} as this
+In addition, check you are not using \setparam{FLT.NOTFIRST}{flt.notfirst}{1} as this
 can make blobs worse.\\
 \hline
 I want to recover more extended structure. & There is a trade off
@@ -567,21 +608,21 @@ between extended emission and noise in your map. If you are willing to
 accept more low frequency noise you can increase the filter scale with
 \xparam{FLT.FILT_EDGE_LARGESCALE}{flt.filt\_edge\_largescale}. The default is 480\,arcsec but you
 could try 600\,arcsec. To cosmetically reduce the increased background
-noise you can set \param{flt.filt\_edge\_largescale\_last~=~200}. This
+noise you can set \setparam{FLT.FILT_EDGE_LARGESCALE_LAST}{flt.filt\_edge\_largescale\_last}{200}. This
 sets the background filtering to 200\,arcsec for the final iteration
 only, though you can go as low as you want with it. \\
 \hline
-I want a flatter background.  & Try \param{com.perarray~=~1}, although
+I want a flatter background.  & Try \setparam{COM.PERARRAY}{com.perarray}{1}, although
 be aware this will lose structure on scales larger than a sub-array. In
-conjunction with \param{com.perarray~=~1} you can also use the
-\param{ast.skip~=~8} parameter. This makes a map without subtracting an
+conjunction with \param{com.perarray=~=1} you can also use the
+\setparam{AST.SKIP}{ast.skip}{8} parameter. This makes a map without subtracting an
 \param{AST} model for the first eight iterations. If you are chasing
 extended emission see the point above. For a more uniform background set
 \xparam{FLT.FILT_EDGE_LARGESCALE_LAST}{flt.filt\_edge\_largescale\_last} to a small value to get harsh
 filtering on your final iteration.\\
 \hline
 I have linear striations in my map making my background look
-scratchy.& Try setting \param{com.corr\_abstol~=~0.8} [default=0.2].
+scratchy.& Try setting \setparam{COM.CORR_ABSTOL}{com.corr\_abstol}{0.8} [default=0.2].
 This rejects more bolometers with deviant common-mode signals.
 However, as more bolometers are removed there are fewer data available
 for your final map, resulting in higher noise.\\

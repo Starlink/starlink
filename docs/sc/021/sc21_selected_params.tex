@@ -15,9 +15,11 @@ listed commands actually \emph{use} the parameter - it just means that
 any commands \emph{not} in the list will report an error if the parameter
 is supplied.
 \item The default value for each parameter is shown in square brackets at
-the end of the description. This is the default value provided by the
-\texttt{dimmconfig.lis} configuration file. Other configuration files may
-over-ride this default.
+the end of the description. These default values are defined in the file
+\texttt{\$SMURF\_DIR/smurf\_makemap.def} and are the values that are used
+for any parameters that are not assigned a value within the configuration
+file supplied to \makemap. In other words, any parameter values supplied
+within a configuration file will be used instead of these default values.
 \end{itemize}
 
 \sstminitoc{}

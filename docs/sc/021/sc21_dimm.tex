@@ -18,29 +18,42 @@ to \cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline}.}\color{black}
 \section{\xlabel{dimm_theory}How it works}
 
 The map-maker works by producing individual models of the various
-components that make up the signal recorded by each bolometer, one of
-which is the required astronomical signal.  It models and removes each of
-these components in order of decreasing magnitude, ultimately leaving
-just the astronomical signal plus residual noise.  The modelled
+components that make up the signal recorded by each bolometer, one
+component being the required astronomical signal.  It models and removes
+each of the other components in order of decreasing magnitude, ultimately
+leaving just the astronomical signal plus residual noise.  The modelled
 components are listed in \cref{Table}{tab:mods}{tabulated} and described
 more fully in \cref{Section}{sec:models}{The individual models}.
 
-\textbf{The map-maker requires a configuration file to accompany each
-reduction.} This file controls all aspects of the map-maker, including
-details of the the pre-processing steps, which model components to include,
-parameters that control the determination of each model, and the stopping
-(or convergence) criteria.  There is a single generic default configuration
-file called \file{dimmconfig.lis}.  Its configuration parameters are tabulated
-in \cref{Appendix}{app:dimm}{an appendix}.
+\textbf{A \emph{configuration file} should usually be supplied when
+running \makemap directly.} This file holds a set of parameter values
+that control all aspects of the map-maker, including details of the
+pre-processing steps, which model components to include, parameters that
+control the determination of each model, and the stopping (or
+convergence) criteria. If no configuration file is supplied when running
+\makemap\footnote{\emph{i.e.} you include ``\texttt{config=def}'' on the
+\makemap\ command line.}, a set of default parameter values will be used.
+There are a great number of these parameters, but fortunately not all of
+them are of interest to the typical user. \cref{Appendix}{app:parameters}{}
+documents the parameters you are more likely to find of interest,
+including the default value that is assigned to each parameter if you do
+not give it a value in your configuration file.  For a full list of all
+available parameters, see the appendix \xref{``Configuration Parameters''}
+{sun258}{PAR_FULL} within \xref{Starlink User Note 258}{sun258}{}.
 
-Often, the default configuration file will not give optimal results
+It is possible to create a map without supplying a configuration file to
+\makemap\ (\emph{i.e.} leaving all configuration parameters set to their default
+values) but it is not recommeneded since it will not give optimal results
 for your particular observation. For this reason, specialised
-configuration files have been developed which are tailored to
-different science goals, be they detecting faint galaxies or mapping
-large molecular clouds. A description of these specialised
-configuration files can be found \cref{in Section}{sec:config}{here}
-with listings \cref{in Appendix}{app:special}{this appendix}.
+configuration files have been developed which are tailored to different
+science goals, be they detecting faint galaxies or mapping large
+molecular clouds. A description of these specialised configuration files
+can be found \cref{in Section}{sec:config}{here}.
 
+Note, when using the pipeline to create a map, rather than running
+\makemap\ directly, the pipeline will always use a configuration file ---
+a default configuration file will be used if none is specified by the
+user.
 
 \section{The reduction step-by-step}
 
@@ -187,7 +200,7 @@ The list of models to be evaluated (and removed) by the map-maker, and
 the order in which they are used during the iterative stage, is given by
 the \xparam{MODELORDER}{modelorder} parameter in the configuration file.
 These models are modular however, so their order may be changed. The
-default model order in \file{dimmconfig.lis} is given below.
+default model order is given below.
 
 \begin{terminalv}
 modelorder = (com,gai,ext,flt,ast,noi)
@@ -378,19 +391,9 @@ you will want to follow this up with a specialised recipe that will suit
 your observation. A few specialised configuration files are supplied with
 \smurf\ and can be found in \file{\$STARLINK\_DIR/share/smurf/}.
 
-The specialised files are all built off a base configuration file called
-\file{dimmconfig.lis}. This base file is common to all specialised configuration files.
-This common base file is illustrated by \cref{Figure}{fig:configtree}{figure below} where
-the parameters in \file{dimmconfig\_bright\_compact.lis} override
-any identical ones in the hidden file \file{dimmconfig\_bright.lis} which in turn
-override the values in \file{dimmconfig.lis}. The hierarchical
-structure means the parameters at the top of the tree (or first
-encountered) override any other instance of them.
-
-\starfig{sc21_dimmcongitree}{[t]}{width=\linewidth}{fig:configtree}{
-  Hierarchy of the configuration files}{
-  Hierarchy of the configuration files.
-}
+Note, any parameter for which no value is specified within the supplied
+configuration will take on the default value listed in
+\cref{Appendix}{app:parameters}{Configuration-parameter descriptions}.
 
 Below is a description of each of the specialised configuration files.
 The tables following each description list the parameters set by each file.
@@ -398,9 +401,7 @@ The files themselves are stored in \file{\$STARLINK\_DIR/share/smurf/} ---
 they are simple text files and so can be inspected easily.
 
 \subsection{dimmconfig\_jsa\_generic.lis}
-The \htmladdnormallink{\file{dimmconfig\_jsa\_generic.lis}}
-{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_jsa_generic.lis}
-configuration file is designed to handle all science data. This is a good
+The \jsageneric\ configuration file is designed to handle all science data. This is a good
 configuration file to start with if you are unsure how to proceed with your
 data reduction.  You may notice that elements of this configuration are
 common to the other specialised configuration files.
@@ -461,9 +462,7 @@ convergence and minimise dark rings around bright source (see
 
 \subsection{dimmconfig\_blank\_field.lis}
 
-The \htmladdnormallink{\file{dimmconfig\_blank\_field.lis}}
-{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_blank_field.lis}
-configuration is tuned for blank field surveys for which the goal
+The \blankfield\ configuration is tuned for blank field surveys for which the goal
 is to detect extremely low signal-to-noise point sources within otherwise
 blank fields.
 
@@ -495,8 +494,8 @@ applied by the map-maker.
 \includegraphics[width=0.47\linewidth]{sc21_cosmo1-bf}
 \caption[Example map reduced with \file{dimmconfig\_blank\_field.lis}]{
     Maps of a deep cosmology field reduced with \textbf{(left)}
-    \file{dimmconfig.lis} and \textbf{(right)}
-    \file{dimmconfig\_blank\_field.lis} \label{fig:bfcompare}}.
+    default parameter values (\emph{i.e.} no configuration file) and
+    \textbf{(right)} \file{dimmconfig\_blank\_field.lis} \label{fig:bfcompare}}.
 \end{figure}
 
 
@@ -522,11 +521,9 @@ applied by the map-maker.
 
 \subsection{dimmconfig\_bright\_compact.lis}
 
-The \htmladdnormallink{\file{dimmconfig\_bright\_compact.lis}}
-{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_bright_compact.lis}
-configuration should be used for producing maps of bright, isolated compact
-sources that are positioned at the centre of the map (\emph{e.g.} calibrators).
-mask
+The \brightcompact\ configuration should be used for producing maps of
+bright, isolated compact sources that are positioned at the centre of the
+map (\emph{e.g.} calibrators).
 
 The addition of the \xparam{AST.ZERO_CIRCLE}{ast.zero\_circle} parameter
 is used to constrain the map to zero beyond a radius of 1\,arc-min from
@@ -577,18 +574,16 @@ bolometer baseline is also relaxes (parameter \xparam{DCTHRESH}{dcthresh}).
 \includegraphics[width=0.47\linewidth]{sc21_gal_brex}
 \caption[Example map reduced with
   \file{dimmconfig\_bright\_extended.lis}]
- {A region towards the Galactic Centre reduced with \textbf{(left)}
-   \file{dimmconfig.lis} and \textbf{(right)}
+   {A region towards the Galactic Centre reduced with \textbf{(left)}
+   default parameter values (\emph{i.e.} no configuration file) \textbf{(right)}
    \file{dimmconfig\_bright\_extended.lis}.\label{fig:becompare}}
 \end{figure}
 
-The \htmladdnormallink{\file{dimmconfig\_bright\_extended.lis}}
-{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_bright_extended.lis}
-configuration is for reducing maps that contain emission that is extended to some degree
-and contains some bright regions. Here \xparam{AST.ZERO_SNR}{ast.zero\_snr} is used
-to constrain the \model{AST} model to zero wherever the S/N is lower
-than 5$\sigma$ (see \cref{Section}{sec:astmask}{AST masking}).
-\xparam{NUMITER}{numiter}
+The \brightextended\ configuration is for reducing maps that contain
+emission that is extended to some degree and contains some bright
+regions. Here \xparam{AST.ZERO_SNR}{ast.zero\_snr} is used to constrain
+the \model{AST} model to zero wherever the S/N is lower than 5$\sigma$
+(see \cref{Section}{sec:astmask}{AST masking}). \xparam{NUMITER}{numiter}
 has been raised to \texttt{-40}, as more iterations are required to
 maximise the sensitivity to large dynamic signal ranges in the map.
 
@@ -624,25 +619,19 @@ difference is the improvement in the bowling around strong sources.
 
 Two additional configuration files are available that can be used to supplement your
 configuration file in order to solve specific problems:
-xxx
+
 \begin{itemize}[noitemsep]
 
+\item \fixconvergence\ to help your map converge. It does this by preventing masks
+from changing, and by freezing the flags that identify aberrant bolometers. Both of
+these restrictions are imposed only after 10 iterations have been performed.
 
-\item \htmladdnormallink{\file{dimmconfig\_fix\_convergence.lis}}
-{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_fix_convergence.lis}
-to help your map converge. It does this by preventing masks from changing,
-and by freezing the flags that identify aberrant bolometers. Both of
-these restrictions are imposed only after 10 iterations have been
-performed.
-
-\item \htmladdnormallink{\file{dimmconfig\_fix\_blobs.lis}}
-{https://github.com/Starlink/starlink/blob/master/applications/smurf/examples/dimmconfig_blobs.lis}
-to remove large ``blooms'' or smooth blobs of spurious emission in your
-map. These can be caused by ringing induced by unidentified steps or spikes in the bolometer
-time-streams. The fix is to look for oscillations within the time-streams
-following the \model{FLT} model, and flag such time-slices as unusable.
-In addition, time slices at which the four sub-arrays see significantly
-different common-mode values are also flagged as unusable.
+\item \fixblobs\ to remove large ``blooms'' or smooth blobs of spurious emission
+in your map. These can be caused by ringing induced by unidentified steps or
+spikes in the bolometer time-streams. The fix is to look for oscillations
+within the time-streams following the \model{FLT} model, and flag such
+time-slices as unusable.  In addition, time slices at which the four sub-arrays
+see significantly different common-mode values are also flagged as unusable.
 
 \end{itemize}
 

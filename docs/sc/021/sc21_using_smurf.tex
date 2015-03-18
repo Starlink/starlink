@@ -1,4 +1,4 @@
-\chapter{\xlabel{dimm}Running \makemap\ Outside the Pipeline}
+\chapter{\xlabel{dimm}Running \task{makemap} Outside the Pipeline}
 \label{sec:running}
 
 The previous chapter described how to run \cref{Chapter}{sec:pipe}{the SCUBA-2 Pipeline}.
@@ -9,10 +9,9 @@ to do this, but should be seen as ``advanced usage''.
 
 When running the map-maker, you can call any of the provided
 configuration files directly from the Starlink path (e.g.
-\file{\^{}\$STARLINK\_DIR/share/smurf/dimmconfig.lis}). Alternatively,
-a local copy can be made and edited. Advice on which parameters to
-edit can be found in \cref{Section}{sec:tweak}{Tweaking the
-configuration file}.
+\brightextended). Alternatively, a local copy can be made and
+edited. Advice on which parameters to edit can be found in
+\cref{Section}{sec:tweak}{Tweaking the configuration file}.
 
 \begin{tip}
   An up-caret (\,\texttt{\^{}}\,) is required any time you are reading
@@ -43,15 +42,16 @@ fitting---instead regrid your map as a post-processing step.
 
 \begin{tip}
   Map-maker not finding your raw files from a path? Check you have
-  double quotes around your `in' option and are not using
-  \texttt{*sdf}---use either \texttt{*.sdf} or just \texttt{*}.
+  escaped or proteced any shell mata-characters in your `in' value,
+  for instance by putting double quotes around it or escaping
+  wildcards using a backslash (\emph{e.g.} \texttt{in=\textbackslash*.sdf} or just
+  \texttt{in=\textbackslash*}).
 \end{tip}
-
 
 
 \begin{terminalv}
 % makemap in="/jcmtdata/raw/scuba2/s8*/20120720/00030/*.sdf" out=850_crl2688 \
-  config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
+  config=def
 
 Out of 32 input files, 4 were darks, 8 were fast flats and 20 were science
 Processing data from instrument 'SCUBA-2' for object 'CRL2688' from the

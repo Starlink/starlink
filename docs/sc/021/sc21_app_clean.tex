@@ -11,11 +11,14 @@ etc.). It uses the same configuration files as the iterative map-maker
 In this first basic example, we just want to clean up some data enough
 to see whether the bolometers have been flat-fielded correctly, and
 more-or-less exhibit the same behaviour over time. The pre-processing
-or cleaning steps used by the default configuration file are
-summarised in \cref{Table}{tab:dimmdef}{this table}.
+or cleaning steps used by default (\emph{i.e.} if ``\texttt{config=def}''
+is included on the command line) are summarised in \cref{Table}{tab:dimmdef}{this
+table}. Note, whilst it is not recommended to run \makemap\ in this way
+(\emph{i.e.} without a configuration file), it is not so critical when running
+\sc2clean.
 
 \begin{terminalv}
-% sc2clean $FILES clean config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
+% sc2clean $FILES clean config=def
 \end{terminalv}
 
 Here \file{\$FILES} can just be a single file from a sub-array, or a
@@ -56,14 +59,16 @@ Another very useful option is to remove the common signal observed by
 all of the bolometers. This may be accomplished by
 
 \begin{terminalv}
-% sc2clean $FILES clean \
-   config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,compreprocess=1"'
+% sc2clean $FILES clean config='"compreprocess=1"'
 \end{terminalv}
 
-The residual of this signal will exhibit second-order time-varying
-correlated signals across the focal plane. Usually these are not very
-large, but in some cases some very large localized signals have been
-detected, particularly in the 850\,$\mu$m arrays in early 2011.
+This \texttt{config} setting causes the default values to be used for all
+configuration parameters except \xparam{COMPREPROCESS}{compreprocess},
+which is set to 1 (the default is 0).  The residual signal left by this
+command will exhibit second-order time-varying correlated signals across
+the focal plane.  Usually these are not very large, but in some cases some
+very large localized signals have been detected, particularly in the
+850\,$\mu$m arrays in early 2011.
 
 Another variation on this is to accentuate the residual low-frequency
 noise by low-pass filtering the result. This can again be accomplished
@@ -71,8 +76,7 @@ by simply adding a filter command in the \param{config} parameter,
 which in this case low-pass filters with a cutoff at 10\,Hz:
 
 \begin{terminalv}
-% sc2clean $FILES clean \
-config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,compreprocess=1,filt_edgelow=10"'
+% sc2clean $FILES clean config='"compreprocess=1,filt_edgelow=10"'
 \end{terminalv}
 
 Finally, in some cases you might just want to fit and remove
@@ -81,18 +85,26 @@ removed). This example will remove a line, but you can increase the
 value of \xparam{ORDER}{order} to remove higher-order polynomials
 
 \begin{terminalv}
-% sc2clean $FILES clean \
-   config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,order=1"'
+% sc2clean $FILES clean config='"order=1"'
 \end{terminalv}
 
-Any of the cleaning parameter can be specified independently of the
-default configuration files like so:
+Non-default values for any of the cleaning parameter can be specified like so:
 \begin{terminalv}
 % sc2clean $FILES clean config='"order=1,dcfitbox=30,dcthresh=25,dcsmooth=50"'
 \end{terminalv}
-Or you can create your own customised configuration file. All the
-pre-processing options that may be specified are listed and described
-in \file{dimmconfig.lis}---see \cref{Appendix}{app:dimm}{here}.
+Or you can create your own customised configuration file. For instance:
+
+\begin{terminalv}
+% cat myconf
+order=1
+dcfitbox=30
+dcthresh=25
+dcsmooth=50
+% sc2clean $FILES clean config=^myconf
+\end{terminalv}
+
+The more interesting pre-processing options that may be specified are listed
+and described in \cref{Appendix}{app:parameters}{here}.
 
 
 
