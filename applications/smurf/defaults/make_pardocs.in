@@ -7,11 +7,12 @@
 #
 #  If a file name is supplied as the first command line argument, it is
 #  expected to be a text file containing a list of config parameter names,
-#  one on each line. In this case, only the named parameters are documented,
-#  and the output is put into a file with the name given by the second
-#  command line argument. In this case a third argument can be supplied
-#  giving the path to the .def files to read. In this case, the script does
-#  not need to be run from the directory containing the .def files.
+#  (see docs/sc/021/selected_params.lis as an example). In this case, only
+#  the named parameters are documented, and the output is put into a file 
+#  with the name given by the second command line argument. In this case a
+#  third argument can be supplied giving the path to the .def files to read.
+#  In this case, the script does not need to be run from the directory 
+#  containing the .def files.
 
 
 #  Are we processing just a selection of parameters, or all parameters? Get a hash
@@ -22,10 +23,15 @@
    $subset = 0;
    if( $#ARGV > 0 ) {
       $subset = 1;
-      open INFILE, "<$ARGV[0]" or die "Cannot find file $ARGV[0] $!\n";
+      @selfile_contents = ();
+      $selfile = $ARGV[0];
+      open INFILE, "<$selfile" or die "Cannot find file $selfile $!\n";
       while( $line = <INFILE> ){
          chomp( $line );
-         $selected{uc($line)} = 1;
+         push( @selfile_contents, $line );
+         if( $line =~ /^([\w_\.]+)\s+$/ ) {
+            $selected{uc($1)} = 1;
+         }
       }
       close( INFILE );
       $outfile = "$ARGV[1]";
@@ -250,6 +256,12 @@
    $document =~ s/{\\tt \"}/{\\tt{\"}}/gs;
    $document =~ s/(\$<\$undef\$>\$)/{\\tt $1}/gs;
 
+#  We are processing selected parameters, we need to copy any extra
+#  stuff in the supplied list file into the output.
+   if( defined $selfile ) {
+      $document = &addextra( $document, @selfile_contents );
+   }
+
 #  Write the modified latex out to the output file.
    open( OUTPUT, ">$outfile" );
    print OUTPUT $tex_header;
@@ -289,4 +301,46 @@ sub trimws {
    return $string;
 }
 
+#  Add extra stuff into the output document.
+sub addextra {
+   my ($doc,@selfile_contents) = @_;
+
+#  put each prologue into a map.
+   $pro = "";
+   $name = "";
+   $isname = 0;
+   %map = ();
+   foreach $line (split(/\n/, $doc)) {
+      if( $line =~ /\\sstroutine\{/ ) {
+         if( $name ne "" ) {
+            $map{$name} = $pro;
+         }
+         $pro = $line."\n";
+         $isname = 1;
+      } else {
+         $pro .= $line."\n";
+         if( $isname ) {
+            $line =~ s/^\s*(.*?)\s*$/$1/;
+            $line =~ s/\\//;
+            $name = $line;
+            $isname = 0;
+         }
+      }
+   }
+
+#  Loop round lines in the supplied selection file.
+   $result = "";
+   foreach $line (@selfile_contents) {
+      if( $line =~ /^# *(\S+.*\S*) +#? *$/ ) {
+         $result .= "\n\\section{$1}\n\\sstminitoc{}\n";
+      } elsif( $line =~ /^([\w_\.]+)\s+$/ ) {
+         $result .= "$map{$1}\n";
+      } else {
+         $result .= "\n";
+      }
+   }
+
+   return $result;
+
+}
 
