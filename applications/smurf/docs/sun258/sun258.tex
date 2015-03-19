@@ -1047,12 +1047,14 @@ introductory description.
 
 When using \makemap\ with the \aparam{Method=Iterate} option (which is
 the default and so does not need to be specified explicitly), it is first
-necessary to create a plain text file containing all the required
+necessary to create a plain text file containing settings for any required
 configuration parameters. They can be listed explicitly in the form
 `keyword=value', or they can be ``inherited'' from another file by
 including the file name preceded by a caret `\verb+^+'. These two methods
 can also be combined, with later parameter settings over-riding earlier
-parameter settings.
+parameter settings. Any parameters that are not assigned a value using
+one of these two methods will revert to a default value, as listed in
+Appendix~\ref{par:full}.
 
 Appendix~\ref{par:full} gives details of \emph{all} the available
 configuration parameters - there are quite a lot! Many of these are of
@@ -1247,6 +1249,11 @@ allows chunking to be avoided.
 \item The number of chunks used to make a SCUBA-2 map is now recorded in the
 FITS extension of the map.
 \item MAKEMAP can now be told to abort if chunking would be used.
+\item The \texttt{dimmconfig.lis} configuration file has been deprecated. It
+should no longer be used either directly or as the basis for derived
+configuration files. Configurations that previously would have inherited from 
+\texttt{dimmconfig.lis} should instead rely on the default parameter values 
+listed in \texttt{\$SMURF\_DIR/smurf\_makemap.def}.
 \end{itemize}
 
 \subsection{2014A}
@@ -1481,8 +1488,7 @@ First official release supporting SCUBA-2 raw data (rather than simulated data).
 
 \appendix
 %\renewcommand{\thesection}{\Alph{section}}%
-\ifdefined\HCode
-\else
+\ifpdf
 
 \section{\xlabel{ap_summary}An Alphabetical Summary of \SMURF\ Commands
 \label{ap:summary}}
@@ -1583,9 +1589,9 @@ Stack multiple 2-d images into a 3d cube, optionally sorted by time.}
 Produce simulated time-series data from a SCUBA-2 map.}
 
 \end{description}
-
-
 \newpage
+\fi
+
 \section{\xlabel{ap_classified}Classified \SMURF\ Commands
 \label{ap:classified}}
 
@@ -1732,8 +1738,6 @@ SCUBA-2 simulator.
 \classitem{SKYNOISE}
  Generate a simulated sky background.
 \end{description}
-
-\fi
 
 \section{\xlabel{ap_full}Full Specifications of all \SMURF\ Commands\label{ap:full}}
 
@@ -2405,9 +2409,11 @@ listed commands actually \emph{use} the parameter - it just means that
 any commands \emph{not} in the list will report an error if the parameter
 is supplied.
 \item The default value for each parameter is shown in square brackets at
-the end of the description. This is the default value provided by the
-\texttt{dimmconfig.lis} configuration file. Other configuration files may
-over-ride this default.
+the end of the description. These default values are defined in the file
+\texttt{\$SMURF\_DIR/smurf\_makemap.def} and are the values that are used
+for any parameters that are not assigned a value within the configuration
+file supplied to \makemap. In other words, any parameter values supplied
+within a configuration file will be used instead of these default values.
 \end{itemize}
 
 \sstminitoc{\SMURF\ Configuration Parameters}
