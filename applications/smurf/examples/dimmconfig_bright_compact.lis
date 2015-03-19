@@ -64,11 +64,11 @@
    flt.filt_edge_largescale=200
 
 #  Use boundary constraints since the source is assumed to be isolated
-   ast.zero_circle = (0.0166666666)
+   ast.zero_circle = (0.016666)
 
 #  Mask the data when forming th FLT model in order to exclude the
 #  source. This only happends on the first two iterations. This usually
 #  speeds up convergence.
-   flt.zero_circle = (0.0166666666)
+   flt.zero_circle = (0.016666)
 
 

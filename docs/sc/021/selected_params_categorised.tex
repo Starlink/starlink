@@ -1,0 +1,570 @@
+% This file was auto-generated and should not be edited!!!
+% It was created using:
+%
+%	applications/smurf/defaults/make_pardocs \
+%		selected_params.lis \
+%		selected_params.tex \
+%		../../../applications/smurf/defaults 
+%
+
+\section{General}
+\begin{center}
+{\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{| p{4.5cm} | p{6cm} | p{6.5cm} | }
+\hline
+\textbf{Parameter} & \textbf{Purpose} & \textbf{Values} \\
+\hline
+
+\hline
+\xparam{NUMITER}{numiter} &
+Specifies when to stop iterating. &
+default~:~-5 \newline
+\jsageneric~:~-25 \newline
+\brightextended~:~-40 \newline
+\brightcompact~:~-40 \newline
+\blankfield~:~4 \\
+
+\hline
+\xparam{MAPTOL}{maptol} &
+Specifies when to stop iterating. &
+default~:~0.05 \newline
+\jsageneric~:~0.01 \\
+
+\hline
+\xparam{MODELORDER}{modelorder} &
+Specifies which models to include in the iterative process, and the order in which they are evaluated. &
+default~:~(com,gai,ext,flt,ast,noi) \newline
+\blankfield~:~(com,ext,ast,noi) \\
+
+\hline
+\xparam{HITSLIMIT}{hitslimit} &
+Rejects map pixels that receive very few samples. &
+default~:~0.01 \\
+\hline
+\end{longtable}
+}
+\end{center}
+
+
+\section{Diagnostics}
+\begin{center}
+{\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{| p{4.5cm} | p{6cm} | p{6.5cm} | }
+\hline
+\textbf{Parameter} & \textbf{Purpose} & \textbf{Values} \\
+\hline
+
+\hline
+\xparam{FAKEMAP}{fakemap} &
+Diagnostic tool to explore the effects of the map-making process on known sources. &
+default~:~<undef> \\
+
+\hline
+\xparam{FAKESCALE}{fakescale} &
+Control the use oif the supplied fake map. &
+default~:~1 \\
+
+\hline
+\xparam{EXPORTNDF}{exportndf} &
+Create NDFs holding final model values. &
+default~:~0 \\
+
+\hline
+\xparam{ITERMAP}{itermap} &
+Create NDFs holding the map created by each iteration. &
+default~:~0 \\
+
+\hline
+\xparam{BOLOMAP}{bolomap} &
+Create NDFs holding the map made form each bolometer. &
+default~:~0 \\
+
+\hline
+\xparam{SHORTMAP}{shortmap} &
+Create NDFs holding the map made form a short chunk of data. &
+default~:~0 \\
+
+\hline
+\xparam{DIAG.OUT}{diag.out} &
+Switches on the dumping of various diagnostic information. &
+default~:~<undef> \\
+\hline
+\end{longtable}
+}
+\end{center}
+
+
+\section{Pre-processing}
+\begin{center}
+{\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{| p{4.5cm} | p{6cm} | p{6.5cm} | }
+\hline
+\textbf{Parameter} & \textbf{Purpose} & \textbf{Values} \\
+\hline
+
+\hline
+\xparam{DOWNSAMPSCALE}{downsampscale} &
+Speeds up map-making, and reduces memory requirements. &
+default~:~-1 \\
+
+\hline
+\xparam{MAXLEN}{maxlen} &
+Determines how the input time-series data is split into chunks &
+default~:~0 \\
+
+\hline
+\xparam{DOCLEAN}{doclean} &
+Allows pre-cleaned data to be used. &
+default~:~1 \\
+
+\hline
+\xparam{EXPORTCLEAN}{exportclean} &
+Allows the initial cleaned data to examined or saved for later use. &
+default~:~0 \\
+
+\hline
+\xparam{ORDER}{order} &
+Baseline removal &
+default~:~1 \\
+
+\hline
+\xparam{BADFRAC}{badfrac} &
+ &
+default~:~0.05 \\
+
+\hline
+\xparam{COMPREPROCESS}{compreprocess} &
+Remove common-mode before the iterative algorithm begins. &
+default~:~0 \\
+
+\hline
+\xparam{DCTHRESH}{dcthresh} &
+Control the cleaning of DC steps in bolometer time streams &
+default~:~25.0 \newline
+\jsageneric~:~100 \newline
+\brightcompact~:~100 \\
+
+\hline
+\xparam{DCFITBOX}{dcfitbox} &
+Control the cleaning of DC steps in bolometer time streams &
+default~:~30 \\
+
+\hline
+\xparam{DCMAXSTEPS}{dcmaxsteps} &
+Control the cleaning of DC steps in bolometer time streams &
+default~:~10 \\
+
+\hline
+\xparam{DCLIMCORR}{dclimcorr} &
+Control the cleaning of DC steps in bolometer time streams &
+default~:~0 \\
+
+\hline
+\xparam{DCSMOOTH}{dcsmooth} &
+Control the cleaning of DC steps in bolometer time streams &
+default~:~50 \\
+
+\hline
+\xparam{SPIKETHRESH}{spikethresh} &
+Controls time-based spike detection within initial data cleaning. &
+default~:~0 \newline
+\blankfield~:~10 \\
+
+\hline
+\xparam{SPIKEBOX}{spikebox} &
+Controls time-based spike detection within initial data cleaning. &
+default~:~50 \\
+
+\hline
+\xparam{WHITEN}{whiten} &
+Experimental. &
+default~:~0 \\
+
+\hline
+\xparam{NOISECLIPHIGH}{noisecliphigh} &
+Reject bolometers based on their noise. &
+default~:~4 \newline
+\jsageneric~:~10.0 \newline
+\brightcompact~:~10.0 \\
+
+\hline
+\xparam{NOISECLIPLOW}{noisecliplow} &
+Reject bolometers based on their noise. &
+default~:~0 \\
+
+\hline
+\xparam{NOISECLIPPRECOM}{noiseclipprecom} &
+Reject bolometers based on their noise. &
+default~:~0 \\
+
+\hline
+\xparam{FLAGSLOW}{flagslow} &
+Flag data when we're moving too slowly &
+default~:~30 \\
+
+\hline
+\xparam{FLAGFAST}{flagfast} &
+Flag data when we're moving too fast &
+default~:~1000 \\
+
+\hline
+\xparam{FILT_EDGELOW}{filt\_edgelow} &
+Specifies the highest frequency to be retained by the initial data cleaning. &
+default~:~0 \\
+
+\hline
+\xparam{FILT_EDGE_LARGESCALE}{filt\_edge\_largescale} &
+Specifies the largest scale size to be retained by the initial data cleaning. &
+default~:~0 \newline
+\blankfield~:~200 \\
+
+\hline
+\xparam{FILT_ORDER}{filt\_order} &
+Indicates the shape of the filter. &
+default~:~0 \\
+\hline
+\end{longtable}
+}
+\end{center}
+
+
+\section{Iterative: COM model}
+\begin{center}
+{\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{| p{4.5cm} | p{6cm} | p{6.5cm} | }
+\hline
+\textbf{Parameter} & \textbf{Purpose} & \textbf{Values} \\
+\hline
+
+\hline
+\xparam{COM.PERARRAY}{com.perarray} &
+Controls the estimate of the common-mode signal &
+default~:~0 \newline
+\jsageneric~:~1 \newline
+\brightcompact~:~1 \newline
+\blankfield~:~1 \\
+
+\hline
+\xparam{COM.SIG_LIMIT}{com.sig\_limit} &
+Controls the rejection of time slices with inconsistent common-modes. &
+default~:~0 \\
+
+\hline
+\xparam{COM.NOFLAG}{com.noflag} &
+Controls the rejection of bad samples from the COM estimate &
+default~:~0 \\
+
+\hline
+\xparam{COM.CORR_TOL}{com.corr\_tol} &
+Controls the rejection of bad samples from the COM estimate &
+default~:~5 \newline
+\brightcompact~:~7 \\
+
+\hline
+\xparam{COM.CORR_ABSTOL}{com.corr\_abstol} &
+Controls the rejection of bad samples from the COM estimate &
+default~:~0.2 \\
+
+\hline
+\xparam{COM.FREEZE_FLAGS}{com.freeze\_flags} &
+Controls flagging of samples that differ from the common-mode. &
+default~:~0 \\
+
+\hline
+\xparam{COM.GAIN_TOL}{com.gain\_tol} &
+Controls the rejection of bad samples from the COM estimate &
+default~:~5 \newline
+\brightcompact~:~7 \\
+
+\hline
+\xparam{COM.GAIN_ABSTOL}{com.gain\_abstol} &
+Controls the rejection of bad samples from the COM estimate &
+default~:~3 \newline
+\brightcompact~:~5 \\
+
+\hline
+\xparam{COM.GAIN_BOX}{com.gain\_box} &
+Controls the rejection of bad samples from the COM estimate &
+default~:~-30.0 \\
+
+\hline
+\xparam{COM.GAIN_FGOOD}{com.gain\_fgood} &
+Controls the rejection of bad samples from the COM estimate &
+default~:~0.25 \\
+
+\hline
+\xparam{COM.GAIN_RAT}{com.gain\_rat} &
+Controls the rejection of bad samples from the COM estimate &
+default~:~4 \\
+
+\hline
+\xparam{COM.ZERO_MASK}{com.zero\_mask} &
+Provides a better estimate of the common-mode ("COM") signal, by excluding samples that fall within fixed regions on the sky specified by an external mask. &
+default~:~0 \\
+
+\hline
+\xparam{COM.ZERO_CIRCLE}{com.zero\_circle} &
+Improves common-mode estimation by excluding sources within a circle of given radius from the COM estimate. &
+default~:~<undef> \\
+
+\hline
+\xparam{COM.ZERO_LOWHITS}{com.zero\_lowhits} &
+Improves common-mode estimation by excluding sources in regions containing many data samples. &
+default~:~0 \\
+
+\hline
+\xparam{COM.ZERO_SNR}{com.zero\_snr} &
+Improve the estimate of the common-mode by excluding samples that correspond to high SNR pixels in the map. &
+default~:~0 \\
+
+\hline
+\xparam{COM.ZERO_SNRLO}{com.zero\_snrlo} &
+Improve estimate of the common-mode by increasing the size of the SNR mask without introducing noise. &
+default~:~0 \\
+
+\hline
+\xparam{COM.ZERO_UNION}{com.zero\_union} &
+Controls how multiple COM masks are combined. &
+default~:~1 \\
+
+\hline
+\xparam{COM.ZERO_FREEZE}{com.zero\_freeze} &
+Prevent the COM mask from changing after a given number of iterations. This can help convergence. &
+default~:~0 \\
+\hline
+\end{longtable}
+}
+\end{center}
+
+
+\section{Iterative: NOI model}
+\begin{center}
+{\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{| p{4.5cm} | p{6cm} | p{6.5cm} | }
+\hline
+\textbf{Parameter} & \textbf{Purpose} & \textbf{Values} \\
+\hline
+
+\hline
+\xparam{NOI.CALCFIRST}{noi.calcfirst} &
+Determines when the noise in each bolometer is estimated. &
+default~:~0 \\
+
+\hline
+\xparam{NOI.BOX_SIZE}{noi.box\_size} &
+Allow finer estimation of the noise levels in the time-series data. &
+default~:~-15 \\
+
+\hline
+\xparam{NOI.BOX_TYPE}{noi.box\_type} &
+Determines how the noise in each box is found. &
+default~:~1 \\
+\hline
+\end{longtable}
+}
+\end{center}
+
+
+\section{Iterative: FLT model}
+\begin{center}
+{\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{| p{4.5cm} | p{6cm} | p{6.5cm} | }
+\hline
+\textbf{Parameter} & \textbf{Purpose} & \textbf{Values} \\
+\hline
+
+\hline
+\xparam{FLT.FILT_EDGE_LARGESCALE}{flt.filt\_edge\_largescale} &
+Specifies the largest scale size to be retained by the FLT model. &
+default~:~ \newline
+\jsageneric~:~200 \newline
+\brightextended~:~480 \newline
+\brightcompact~:~200 \\
+
+\hline
+\xparam{FLT.FILT_EDGE_LARGESCALE_LAST}{flt.filt\_edge\_largescale\_last} &
+Specifies the largest scale size to be retained by the FLT model on the last iteration. &
+default~:~<undef> \\
+
+\hline
+\xparam{FLT.FILT_ORDER}{flt.filt\_order} &
+Indicates the shape of the filter. &
+default~:~0 \\
+
+\hline
+\xparam{FLT.RING_BOX1}{flt.ring\_box1} &
+Controls the flagging of samples that suffer from ringing. &
+default~:~0 \\
+
+\hline
+\xparam{FLT.ZERO_MASK}{flt.zero\_mask} &
+Speeds up convergences and reduces ringing by excluding sources within a region specified by an external mask file from the filtering performed by the FLT model. &
+default~:~0 \\
+
+\hline
+\xparam{FLT.ZERO_CIRCLE}{flt.zero\_circle} &
+Speeds up convergences and reduces ringing by excluding sources within a circle of given radius from the FLT estimate. &
+default~:~<undef> \newline
+\brightcompact~:~0.016666 \\
+
+\hline
+\xparam{FLT.ZERO_LOWHITS}{flt.zero\_lowhits} &
+Experimental. &
+default~:~0 \\
+
+\hline
+\xparam{FLT.ZERO_SNR}{flt.zero\_snr} &
+Speeds up convergences and reduces ringing by excluding samples that correspond to high SNR pixels in the map. &
+default~:~0 \newline
+\jsageneric~:~5 \newline
+\brightextended~:~5 \\
+
+\hline
+\xparam{FLT.ZERO_SNRLO}{flt.zero\_snrlo} &
+Speeds up convergences and reduces ringing by increasing the size of the SNR mask without introducing noise. &
+default~:~0 \newline
+\jsageneric~:~3 \newline
+\brightextended~:~3 \\
+
+\hline
+\xparam{FLT.ZERO_NITER}{flt.zero\_niter} &
+Allows FLT masking to be switched off after a given number of iterations. &
+default~:~2 \\
+
+\hline
+\xparam{FLT.ZERO_UNION}{flt.zero\_union} &
+Controls how multiple FLT masks are combined. &
+default~:~1 \\
+
+\hline
+\xparam{FLT.ZERO_FREEZE}{flt.zero\_freeze} &
+Prevent the FLT mask from changing after a given number of iterations. This can help convergence. &
+default~:~0 \\
+\hline
+\end{longtable}
+}
+\end{center}
+
+
+\section{Iterative: EXT model}
+\begin{center}
+{\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{| p{4.5cm} | p{6cm} | p{6.5cm} | }
+\hline
+\textbf{Parameter} & \textbf{Purpose} & \textbf{Values} \\
+\hline
+
+\hline
+\xparam{EXT.TAUSRC}{ext.tausrc} &
+Controls the extinction values used in the EXT model. &
+default~:~auto \\
+
+\hline
+\xparam{EXT.TAUMETHOD}{ext.taumethod} &
+Controls the extinction values used in the EXT model. &
+default~:~adaptive \\
+
+\hline
+\xparam{EXT.TAURELATION.450}{ext.taurelation.450} &
+Controls the 450 um extinction values used in the EXT model and the EXTINCTION task. &
+default~:~(26.0,-0.012) \\
+
+\hline
+\xparam{EXT.TAURELATION.850}{ext.taurelation.850} &
+Controls the 850 um extinction values used in the EXT model and the EXTINCTION task. &
+default~:~(4.6,-0.0043) \\
+
+\hline
+\xparam{EXT.CSOTAU}{ext.csotau} &
+Controls the extinction values used in the EXT model. &
+default~:~<undef> \\
+
+\hline
+\xparam{EXT.FILTERTAU}{ext.filtertau} &
+Controls the extinction values used in the EXT model. &
+default~:~<undef> \\
+\hline
+\end{longtable}
+}
+\end{center}
+
+
+\section{Iterative: AST model}
+\begin{center}
+{\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{| p{4.5cm} | p{6cm} | p{6.5cm} | }
+\hline
+\textbf{Parameter} & \textbf{Purpose} & \textbf{Values} \\
+\hline
+
+\hline
+\xparam{AST.MAPSPIKE}{ast.mapspike} &
+Removes spikes from the map. &
+default~:~10 \\
+
+\hline
+\xparam{AST.SKIP}{ast.skip} &
+Skip subtraction of astronomical signal. &
+default~:~0 \newline
+\jsageneric~:~5 \newline
+\brightextended~:~5 \\
+
+\hline
+\xparam{AST.ZERO_MASK}{ast.zero\_mask} &
+Reduces spurious large scale structure in the final map within fixed regions specified by an external mask. &
+default~:~0 \\
+
+\hline
+\xparam{AST.ZERO_CIRCLE}{ast.zero\_circle} &
+Reduces spurious large scale structure in the final map outside a circle of given radius. &
+default~:~<undef> \newline
+\brightcompact~:~0.016666 \\
+
+\hline
+\xparam{AST.ZERO_LOWHITS}{ast.zero\_lowhits} &
+Reduces spurious large scale structure in the final map in regions containing few data samples. &
+default~:~0 \\
+
+\hline
+\xparam{AST.ZERO_SNR}{ast.zero\_snr} &
+Reduces spurious large scale structure in the final map within regions of low signal-to-noise. &
+default~:~0.0 \newline
+\jsageneric~:~5 \newline
+\brightextended~:~3 \\
+
+\hline
+\xparam{AST.ZERO_SNRLO}{ast.zero\_snrlo} &
+Can help to remove bowls around sources by increasing the size of the SNR mask without introducing noise. &
+default~:~0 \newline
+\jsageneric~:~3 \newline
+\brightextended~:~2 \\
+
+\hline
+\xparam{AST.ZERO_SNR_FWHM}{ast.zero\_snr\_fwhm} &
+Can help to remove bowls around sources. &
+default~:~0 \\
+
+\hline
+\xparam{AST.ZERO_SNR_LOW}{ast.zero\_snr\_low} &
+Can help to remove bowls around sources. &
+default~:~-1.1 \\
+
+\hline
+\xparam{AST.ZERO_UNION}{ast.zero\_union} &
+Controls how multiple AST masks are combined. &
+default~:~1 \\
+
+\hline
+\xparam{AST.ZERO_FREEZE}{ast.zero\_freeze} &
+Prevent the AST mask from changing after a given number of iterations. This can help convergence. &
+default~:~0 \\
+
+\hline
+\xparam{AST.ZERO_NITER}{ast.zero\_niter} &
+Allows AST masking to be switched off after a given number of iterations. &
+default~:~0 \\
+\hline
+\end{longtable}
+}
+\end{center}
+

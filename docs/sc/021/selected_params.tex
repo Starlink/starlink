@@ -1,4 +1,5 @@
-% This file was created using:
+% This file was auto-generated and should not be edited!!!
+% It was created using:
 %
 %	applications/smurf/defaults/make_pardocs \
 %		selected_params.lis \
@@ -323,7 +324,7 @@
 \sstroutine{
    BOLOMAP
 }{
-   Creates diagnostic information
+   Create NDFs holding the map made form each bolometer
 }{
    \sstdescription{
       If non-zero, a separate map will be created from each
@@ -914,6 +915,47 @@
    }
 }
 \sstroutine{
+   DIAG.OUT
+}{
+   Switches on the dumping of various diagnostic information
+}{
+   \sstdescription{
+      The full path/name for the HDS container file in which to
+      store the diagnostic info. This will contain components for
+      each requested model (see parameter {\tt{"}}\xref{diag.models}{sun258}{DIAG.MODELS}{\tt{"}}), with
+      names like {\tt{"}}COM{\tt{"}}, {\tt{"}}FLT{\tt{"}}, etc. Each of these components will
+      contain multiple NDFs with names in the following format:
+      {\tt{"}}$<$where$>$\_$<$chunk$>$\_$<$what$>${\tt{"}}, where $<$what$>$ is {\tt{"}}power{\tt{"}} or {\tt{"}}time{\tt{"}},
+      $<$chunk$>$ is the integer chunk index, and $<$where$>$ is one of:
+
+      \sstitemlist{
+
+         \sstitem
+         {\tt{"}}bef{\tt{"}}: the NDF contains the residuals as they were
+         before the model was subtracted.
+
+         \sstitem
+         {\tt{"}}mod{\tt{"}}: the NDF contains the model values themselves.
+
+         \sstitem
+         {\tt{"}}aft{\tt{"}}: the NDF contains the residuals as they were after
+         the model was subtracted.
+
+      }
+      Each NDF will be 2-dimensional, with the first pixel axis
+      representing time or frequency, and the second pixel axis
+      representing iteration number. [{\tt $<$undef$>$}]
+   }
+   \sstattributetype{
+      string
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      MAKEMAP, CALCQU
+   }
+}
+\sstroutine{
    DOCLEAN
 }{
    Allows pre-cleaned data to be used
@@ -986,7 +1028,7 @@
 \sstroutine{
    EXPORTNDF
 }{
-   Provides diagnostic information
+   Create NDFs holding final model values
 }{
    \sstdescription{
       Specify a value of 1 or 0 to export all or none of the
@@ -1631,9 +1673,30 @@
    }
 }
 \sstroutine{
+   HITSLIMIT
+}{
+   Rejects map pixels that receive very few samples
+}{
+   \sstdescription{
+      If non-zero, pixels that receive very few bolometer samples
+      are set to bad in the final map. The limiting number of
+      bolometer samples is equal to {\tt{"}}hitslimt{\tt{"}} times the mean
+      number of hits per pixel, averaged over the map pixels
+      that recieve at least one bolometer sample. [0.01]
+   }
+   \sstattributetype{
+      real
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      MAKEMAP, CALCQU
+   }
+}
+\sstroutine{
    ITERMAP
 }{
-   Provide extra diagnostic information
+   Create NDFs holding the map created by each iteration
 }{
    \sstdescription{
       If itermap is set to a positive value, the map from each iteration
@@ -1708,7 +1771,7 @@
 \sstroutine{
    MODELORDER
 }{
-   Determines which models to include in the iterative
+   Specifies which models to include in the iterative
    process, and the order in which they are evaluated
 }{
    \sstdescription{
@@ -1907,7 +1970,7 @@
 \sstroutine{
    NUMITER
 }{
-   Determines when to stop iterating
+   Specifies when to stop iterating
 }{
    \sstdescription{
       If a positive number is supplied, the specified number of
@@ -1948,7 +2011,7 @@
 \sstroutine{
    SHORTMAP
 }{
-   Provides extra diagnostic information
+   Create NDFs holding the map made form a short chunk of data
 }{
    \sstdescription{
       If non-zero, then an extension called .MORE.SMURF.SHORTMAPS

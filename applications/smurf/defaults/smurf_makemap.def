@@ -41,7 +41,7 @@
 #     2014-07-17 (DSB):
 #        Added memcheck.
 #     2015-03-09 (DSB):
-#        Modified to ensure that the defaults in this file match those 
+#        Modified to ensure that the defaults in this file match those
 #        provided by dimmconfig.lis.
 #-
 
@@ -364,7 +364,7 @@ ast.zero_union = 1
 #  Name: 	bolomap
 #  Type: 	integer
 #  Default: 	0
-#  Purpose: 	Creates diagnostic information.
+#  Purpose: 	Create NDFs holding the map made form each bolometer.
 #  Description: If non-zero, a separate map will be created from each
 #		individual bolometer. These maps are placed in the BOLOMAPS
 #		component of the SMURF extension in the main output map.
@@ -764,7 +764,7 @@ diag.models = (com,ext,flt,ast,res)
 #  Name: 	diag.out
 #  Type: 	string
 #  Default: 	<undef>
-#  Purpose: 	Switches on the dumping of diagnostic information.
+#  Purpose: 	Switches on the dumping of various diagnostic information.
 #  Description: The full path/name for the HDS container file in which to
 # 		store the diagnostic info. This will contain components for
 #		each requested model (see parameter "diag.models"), with
@@ -1005,7 +1005,7 @@ exportlonlat = 0
 #  Name: 	exportndf
 #  Type: 	integer or list of strings
 #  Default: 	0
-#  Purpose: 	Provides diagnostic information.
+#  Purpose: 	Create NDFs holding final model values.
 #  Description: Specify a value of 1 or 0 to export all or none of the
 #		model components after the final iteration. You can also
 #		specify a comma-separated list of component names, enclosed
@@ -1806,7 +1806,7 @@ importsky = 0
 #  Name: 	itermap
 #  Type: 	integer
 #  Default: 	0
-#  Purpose: 	Provide extra diagnostic information.
+#  Purpose: 	Create NDFs holding the map created by each iteration.
 #  Description: If itermap is set to a positive value, the map from each iteration
 #               of each chunk will be stored in an output NDF. If itermap is set
 #               to a negative value, only the final iteration will be written from
@@ -1931,7 +1931,7 @@ memcheck=0
 #  Name: 	modelorder
 #  Type: 	list of strings
 #  Default: 	(com,gai,ext,flt,ast,noi)
-#  Purpose: 	Determines which models to include in the iterative
+#  Purpose: 	Specifies which models to include in the iterative
 #		process, and the order in which they are evaluated.
 #  Description: This should be a comma-separated list, in parentheses,
 #		containing one or more of the following model names, in the
@@ -2176,7 +2176,7 @@ noi.zeropad = 0
 #  Name: 	numiter
 #  Type: 	real
 #  Default: 	-5
-#  Purpose: 	Determines when to stop iterating.
+#  Purpose: 	Specifies when to stop iterating.
 #  Description: If a positive number is supplied, the specified number of
 #		iterations will always be performed. If a negative number is
 #		supplied, the absolute value gives the maximum number of
@@ -2224,7 +2224,7 @@ sampcube = 0
 #  Name: 	shortmap
 #  Type: 	integer
 #  Default: 	0
-#  Purpose: 	Provides extra diagnostic information.
+#  Purpose: 	Create NDFs holding the map made form a short chunk of data.
 #  Description: If non-zero, then an extension called .MORE.SMURF.SHORTMAPS
 #               is added to the output map NDF, holding maps made from every
 #		group of "shortmap" adjacent time slices. Alternatively, set

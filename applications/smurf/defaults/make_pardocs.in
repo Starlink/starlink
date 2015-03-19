@@ -7,25 +7,39 @@
 #
 #  If a file name is supplied as the first command line argument, it is
 #  expected to be a text file containing a list of config parameter names,
-#  one on each line. In this case, only the named parameters are documented,
-#  and the output is put into a file with the name given by the second
-#  command line argument. In this case a third argument can be supplied
-#  giving the path to the .def files to read. In this case, the script does
-#  not need to be run from the directory containing the .def files.
+#  (see docs/sc/021/selected_params.lis as an example). In this case, only
+#  the named parameters are documented, and the output is put into a file
+#  with the name given by the second command line argument. In this case a
+#  third argument can be supplied giving the path to the .def files to read.
+#  In this case, the script does not need to be run from the directory
+#  containing the .def files.
+#
+#  If the file specified by the first argument contains any category
+#  definitions (see for instance docs/sc/021/selected_params.lis) then
+#  an additional output file is created with the same name as the main
+#  output file but with "_categorised" appemded to the file base name.
 
 
 #  Are we processing just a selection of parameters, or all parameters? Get a hash
 #  containing all the selected parameter names in upper case.
-   $tex_header = "% This file was created using:\n%\n%	applications/smurf/defaults/make_pardocs ";
+   $tex_header = "% This file was auto-generated and should not be edited!!!\n% It was created using:\n%\n%	applications/smurf/defaults/make_pardocs ";
    %selected = ();
    $defdir = ".";
    $subset = 0;
+   $create_categories = 0;
    if( $#ARGV > 0 ) {
       $subset = 1;
-      open INFILE, "<$ARGV[0]" or die "Cannot find file $ARGV[0] $!\n";
+      @selfile_contents = ();
+      $selfile = $ARGV[0];
+      open INFILE, "<$selfile" or die "Cannot find file $selfile $!\n";
       while( $line = <INFILE> ){
          chomp( $line );
-         $selected{uc($line)} = 1;
+         push( @selfile_contents, $line );
+         if( $line =~ /^([\w\.]+)\s*$/ ) {
+            $selected{uc($1)} = 1;
+         } elsif( $line =~ /^ *</ ) {
+            $create_categories = 1;
+         }
       }
       close( INFILE );
       $outfile = "$ARGV[1]";
@@ -256,6 +270,12 @@
    print OUTPUT $document;
    close( OUTPUT );
 
+#  We are processing selected parameters, we may also need to generate a
+#  category appendix.
+   if( $create_categories == 1 ) {
+      &createCategories( $outfile );
+   }
+
 #  Add command "$com2" to the "Applicability" field for each parameter defined
 #  in the .def file for command "$com1", and then also add "$com2" to the
 #  parameters defined in any .def files from which "$com2" inherits.
@@ -289,4 +309,123 @@ sub trimws {
    return $string;
 }
 
+#  Add extra stuff into the output document.
+sub createCategories {
+   my $outfile = shift;
+
+#  Read default values
+   my %defvals = &readconf( "" );
+
+#  Read values from all dimmconfig files
+   my %jsavals = &readconf( "jsa_generic" );
+   my %extvals = &readconf( "bright_extended" );
+   my %comvals = &readconf( "bright_compact" );
+   my %blavals = &readconf( "blank_field" );
+
+#  Create the name of the categorised output file and open it.
+   my @parts = split( /\./, $outfile );
+   my $ftype = pop @parts;
+   my $fname = pop @parts;
+   $fname .= "_categorised";
+   push @parts, $fname;
+   push @parts, $ftype;
+   $outfile = join '.', @parts;
+
+   open( CATOUT, ">$outfile" );
+   print CATOUT $tex_header;
+
+#  Loop round lines in the supplied selection file.
+   my $first = 1;
+   foreach $line (@selfile_contents) {
+
+#  Start of a new category.
+      if( $line =~ /^ *<CAT +(.*) *>/ ) {
+
+#  Finish any previously started table.
+         if( $first == 0 ) {
+            print( CATOUT "\\hline\n");
+            print( CATOUT "\\end{longtable}\n");
+            print( CATOUT "}\n");
+            print( CATOUT "\\end{center}\n");
+            print( CATOUT "\n");
+         }
+
+#  Start a new table.
+         print( CATOUT "\n");
+         print( CATOUT "\\section{$1}\n");
+         print( CATOUT "\\begin{center}\n");
+         print( CATOUT "{\\renewcommand{\\arraystretch}{1.2}\n");
+         print( CATOUT "\\begin{longtable}{| p{4.5cm} | p{6cm} | p{6.5cm} | }\n");
+         print( CATOUT "\\hline\n");
+         print( CATOUT "\\textbf{Parameter} & \\textbf{Purpose} & \\textbf{Values} \\\\\n");
+         print( CATOUT "\\hline\n");
+
+         $first = 0;
+
+#  A parameter name
+      } elsif( $line =~ /^([\w_\.]+)\s*$/ ) {
+         my $upar = uc( $1 );
+         my $lpar = lc( $1 );
+         my $texpar = $lpar;
+         $texpar =~ s/_/\\_/g;
+
+         my $purpose = &trimws( $allparams{$lpar}{"purpose"} );
+         $purpose =~ s/\*//g;
+         $purpose =~ s/\s+/ /g;
+
+         print( CATOUT "\n");
+         print( CATOUT "\\hline\n");
+         print( CATOUT "\\xparam{$upar}{$texpar} &\n");
+         print( CATOUT "$purpose &\n");
+         print( CATOUT "default~:~$defvals{$upar} ");
+         if( exists $jsavals{$upar} ) {
+            print( CATOUT "\\newline\n\\jsageneric\~:~$jsavals{$upar} ");
+         }
+         if( exists $extvals{$upar} ) {
+            print( CATOUT "\\newline\n\\brightextended\~:~$extvals{$upar} ");
+         }
+         if( exists $comvals{$upar} ) {
+            print( CATOUT "\\newline\n\\brightcompact\~:~$comvals{$upar} ");
+         }
+         if( exists $blavals{$upar} ) {
+            print( CATOUT "\\newline\n\\blankfield\~:~$blavals{$upar} ");
+         }
+         print( CATOUT "\\\\\n");
+      }
+   }
+
+#  Finish the last table.
+   print( CATOUT "\\hline\n");
+   print( CATOUT "\\end{longtable}\n");
+   print( CATOUT "}\n");
+   print( CATOUT "\\end{center}\n");
+   print( CATOUT "\n");
+
+#  Close the output file.
+   close( CATOUT );
+}
+
+
+#  Read values from a config file into a hash.
+sub readconf {
+   my ($conf) = @_;
+
+   if( $conf eq "" ) {
+      $file = "\$SMURF_DIR/smurf_makemap.def";
+   } else {
+      $file = "/star/share/smurf/dimmconfig_$conf.lis";
+   }
+
+   $text = `\$KAPPA_DIR/configecho ! ^$file`;
+
+
+   %result = ();
+   foreach $line (split( /\n/, $text )) {
+      if( $line =~ /^ *(\S+) *= *(.*?) *$/ ) {
+         $result{$1} = $2;
+
+      }
+   }
+   return %result;
+}
 
