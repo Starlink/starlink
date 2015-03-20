@@ -1,155 +1,388 @@
-\chapter{\xlabel{dimm}Running \task{makemap} Outside the Pipeline}
-\label{sec:running}
+\chapter{\xlabel{manual}Running \task{makemap} Outside the Pipeline}
+\label{sec:manual}
 
-The previous chapter described how to run \cref{Chapter}{sec:pipe}{the SCUBA-2 Pipeline}.
-Users - particularly new users - are encourage to make use of the \oracdr\ pipeline.
-However, greater control of the map-making process is available by running the \makemap\
-command directly, rather than from within the pipeline. This chapter describes how
-to do this, but should be seen as ``advanced usage''.
+The previous chapter described how to run \cref{Chapter}{sec:pipe}{the
+SCUBA-2 Pipeline}. Users - particularly new users - are encourage to make
+use of the \oracdr\ pipeline. However, greater control of the map-making
+process is available by running the \makemap\ command directly, rather
+than from within the pipeline. This chapter describes how to do this, but
+should be seen as ``advanced usage''.
 
-When running the map-maker, you can call any of the provided
-configuration files directly from the Starlink path (e.g.
-\brightextended). Alternatively, a local copy can be made and
-edited. Advice on which parameters to edit can be found in
+\begin{quote}
+\emph{
+Note, when \makemap\ is run manually (rather than from the pipeline) the
+resulting image will be in units of pW, not Jy. Each pixel value
+in the map represents the weighted mean value of the bolometer samples
+(in pW) that fall within the pixel, after removal of the noise components
+described in \cref{Section}{sec:models}{The individual models}. Each
+weight is the reciprocal of the variance associated with the bolometer.
+Thus each pixel value can be thought of as the astronomical power
+received by a typical bolometer at each point on the sky.
+}
+\end{quote}
+
+\section{Running \texttt{makemap}}
+
+Before running \makemap\ directly, you need to ensure that the Starlink
+environment has been initialised and the \smurf\ package started (see
+\cref{Section}{sec:starinit}{Initialising Starlink} and
+\cref{Section}{sec:packinit}{KAPPA and SMURF for data processing}).
+
+To run \makemap, you  need to supply values for the following
+command-line parameters\footnote{Note the distinction between
+``command-line parameters'' (also known as ``ADAM'' parameters) that are
+supplied on the \texttt{makemap} command line, and ``configuration parameters''
+that are specified within a configuration file. Values for all
+\emph{configuration} parameters are obtained using a single \emph{command-line}
+parameter called \texttt{CONFIG}.}:
+
+\begin{itemize}
+
+\item \texttt{IN} - a list of input NDFs containing raw SCUBA-2 data (see
+\cref{Section}{sec:rawdata}{The raw data} and \cref{Section}{sec:ndf}
+{Data formats}). There are many ways in which the list of files can be supplied,
+as described in Section ``\xref{Specifying Groups of Objects}{sun95}{se_groups}''
+in ``\xref{SUN/95}{sun95}{}. The easiest is to create a simple text
+file containing the names of the raw data files -- one per line --- and
+then supply the name of the text file, preceded by an up-caret character
+(\,\texttt{\^{}}\,), as the value for parameter \texttt{IN}. Note, the names of
+the raw data files can contain wild-cards such as ``$*$'' and ``\%''.
+
+\item \texttt{OUT} - the name of the NDF in which to store the final
+map. The supplied file name should either have a file type of
+``\texttt{.sdf}'', or no file type at all (in which case \texttt{.sdf}
+will be appended to the supplied value). Any existing file with the same
+name will be over-written.
+
+\item \texttt{CONFIG} - a string that specifies new values for a selection of
+configuration parameters. These values are used in place of the
+\xref{default values}{sun258}{PAR_FULL} described in
+\xref{SUN/258}{sun258}{}. Any configuration parameter not specified by
+the \texttt{CONFIG} string retains its default value. As with files
+names, there are many ways in which the group of parameter values can be
+specified, and the same documentation should be consulted for details
+(\xref{SUN/95}{sun95}{se_groups}). Again, the easiest way is to list the
+parameter values in a simple text file with one parameter setting (a
+``<name>=<value>'' string) on each line. See \cref{Section}{sec:config}
+{Specialised configuration files} for a list of the pre-defined
+configuration files that come with \smurf. Note, \texttt{CONFIG}
+can be set to the special value ``\texttt{def}'' to force \makemap\ to
+use the default values for all parameters. It is possible to create a map
+using just default parameter values, but it will not usually be a very
+good map. Advice on which parameters to edit can be found in
 \cref{Section}{sec:tweak}{Tweaking the configuration file}.
+
+\end{itemize}
+
+If any of the above parameters are \emph{not} given on the \texttt{makemap}
+command line, prompts will be issued and the user invited to supply values
+for the missing parameters.
+
+So an example command line would be:
+\begin{terminalv}
+% makemap in=^myfiles.lis out=850_crl2688 \
+          config=^$STARLINK_DIR/share/smurf/dimmconfig_bright_compact.lis
+\end{terminalv}
+
+Here, the file \texttt{myfiles.lis} contains a list of the raw data
+files to be included in the map, and could for instance look like this:
+
+\begin{terminalv}
+% cat myfiles.lis
+/jcmtdata/raw/scuba2/s8a/20120720/00030/*
+/jcmtdata/raw/scuba2/s8b/20120720/00030/*
+/jcmtdata/raw/scuba2/s8c/20120720/00030/*
+/jcmtdata/raw/scuba2/s8d/20120720/00030/*
+\end{terminalv}
+
+This uses all available data for all four 850\,$\mu$m sub-arrays, for
+observation 30 taken on 20th July 2012\footnote{The input files should all be
+for a single waveband and a single observation --- do not mix files from
+different wavebands and/or observations.}.
+
+The file \brightcompact\ is one of the pre-defined configuration files
+supplied with \smurf. It contains configuration parameter values that are
+optimised for creating maps from bright compact sources.
 
 \begin{tip}
   An up-caret (\,\texttt{\^{}}\,) is required any time you are reading
   in a group text file in \starlink. For the map-maker this includes
-  the configuration file (a group of parameters) and a list of your
-  input files (e.g. \texttt{in=\^{}\,myrawfiles.txt}).
+  the configuration file (a group of configuration parameters) and a list
+  of your input files (e.g. \texttt{in=\^{}\,myfiles.lis}).
 \end{tip}
 
+After the \makemap\ command completes, the final map will be left in file
+\texttt{850\_crl2688.sdf} and can be displayed using \gaia:
 
-The default pixel sizes are:
+\begin{terminalv}
+% gaia 850_crl2688
+\end{terminalv}
+
+There are many other command-line parameters that can be supplied when
+running \makemap, but only the three listed above are mandatory. All the
+others assume default values if not supplied on the command-line. For a
+full list of all available command-line parameters, their functions and
+default values, see the description of \makemap\ within the \smurf\
+document, \xref{Starlink User Note 258}{sun258}{}.
+
+You can supply values for any of these extra parameter on the command
+line. For instance, one of the command-line parameters that is usually
+defaulted is \texttt{PIXSIZE}, which specifies the pixel size for the final
+map, in arc-seconds. The default pixel sizes, defined as one quarter of the
+Airy disk rounded up to the nearest half arcsecond, are:
+
 \begin{itemize}
 \item 2\,arcsec at 450$\mu$m
 \item 4\,arcsec at 850$\mu$m
 \end{itemize}
 
-These can be changed by adding the \texttt{pixsize=}$x$ to the
-command string\footnote{The default sizes are defined as one quarter
-of the Airy disk rounded up to the nearest half arcsecond.}, where $x$
-is your desired pixel size in arcsecs. We advise that you do not
-increase the pixel size at this stage as it will compromise model
-fitting---instead regrid your map as a post-processing step.
+So for instance, the above command-line could be modified as follows to
+produce a map with 3 arc-second pixels:
 
-% Other ADAM parameter available with \makemap\ include ref, maxmem
-% and msg\_filter. Some of these appear in the example below but see
-% \cref{Appendix}{app:adam}{MAKEMAP ADAM Parameters} for
-% descriptions. A complete list of all ADAM parameters can be found in
-% \smurfsun.
+\begin{terminalv}
+% makemap in=^myfiles.lis out=850_crl2688 pixsize=3 \
+          config=^$STARLINK_DIR/share/smurf_bright_compact.lis
+\end{terminalv}
+
+Note, if parameters are specified by name on the command-line, as
+in these examples, then the order in which they are specified is
+insignificant. Also, parameter names are case-insensitive.
 
 \begin{tip}
   Map-maker not finding your raw files from a path? Check you have
-  escaped or proteced any shell mata-characters in your `in' value,
+  escaped or protected any shell mata-characters in your `in' value,
   for instance by putting double quotes around it or escaping
   wildcards using a backslash (\emph{e.g.} \texttt{in=\textbackslash*.sdf} or just
   \texttt{in=\textbackslash*}).
 \end{tip}
 
+\section{Screen output from \task{makemap}}
+
+Whilst \makemap\ runs, it outputs information continuously to the screen
+about what it is doing. The amount of information displayed can be
+controlled using the \xref{\texttt{MSG\_FILTER}}{sun258}{SEC_MSG} command-line
+parameter. It defaults to ``\texttt{normal}'', but if you wanted more
+information, you could set it to (say) ``\texttt{verbose}'':
 
 \begin{terminalv}
-% makemap in="/jcmtdata/raw/scuba2/s8*/20120720/00030/*.sdf" out=850_crl2688 \
-  config=def
+% makemap in=^myfiles.lis out=850_crl2688 msg_filter=verb \
+          config=^$STARLINK_DIR/share/smurf_bright_compact.lis
+\end{terminalv}
+
+Note - unambiguous abbreviations may be used for many command line
+parameters --- so ``\texttt{verb}'' is acceptable instead of
+``\texttt{verbose}''.
+
+The following shows the screen output generated by \makemap\ if
+\texttt{MSG\_FILTER} is left set to its default value of
+``\texttt{normal}''. Explanatory comments, which are not actually
+part of the output generated by \makemap, are included in \emph{emphasised
+type}:
+
+\begin{terminalv}
+% makemap in=^myfiles.lis out=850_crl2688 \
+          config=^$STARLINK_DIR/share/smurf_bright_compact.lis
 
 Out of 32 input files, 4 were darks, 8 were fast flats and 20 were science
 Processing data from instrument 'SCUBA-2' for object 'CRL2688' from the
 following observation  :
-  20120720 #30 scan  /shutter
+  20120720 #30 scan
+\end{terminalv}
 
-MAKEMAP: Map-maker will use no more than 68401 MiB of memory
+\emph{The output starts by reporting information about the input data,
+including the number that contain on-sky bolometer values (``science''
+data), the astronomical object and the SCUBA-2 observation number.}
 
-Projection parameters used:
-CRPIX1 = 0
-CRPIX2 = 0
-CRVAL1 = 315.578333333333 ( RA = 21:02:18.800 )
-CRVAL2 = 36.6938055555556 ( Dec = 36:41:37.70 )
-CDELT1 = -0.00111111111111111 ( -4 arcsec )
-CDELT2 = 0.00111111111111111 ( 4 arcsec )
-CROTA2 = 0
+\begin{terminalv}
 
-Output map pixel bounds: ( -132:122, -126:129 )
+MAKEMAP: Map-maker will use no more than 92586 MiB of memory
 
-Output map WCS bounds:
-Right ascension: 21:01:38.318 -> 21:03:03.280
-Declination: 36:33:07.19 -> 36:50:11.70
+   Projection parameters used:
+      CRPIX1 = 0
+      CRPIX2 = 0
+      CRVAL1 = 315.578333333333 ( RA = 21:02:18.800 )
+      CRVAL2 = 36.6938055555556 ( Dec = 36:41:37.70 )
+      CDELT1 = -0.00111111111111111 ( -4 arcsec )
+      CDELT2 = 0.00111111111111111 ( 4 arcsec )
+      CROTA2 = 0
 
+   Output map pixel bounds: ( -132:122, -126:129 )
+
+   Output map WCS bounds:
+        Right ascension: 21:01:38.318 -> 21:03:03.280
+        Declination: 36:33:07.19 -> 36:50:11.70
+
+\end{terminalv}
+
+\emph{Next comes information about the output map. The world coordinate
+system is described by means of the equivalent \htmladdnormallink{FITS-WCS}
+{http://fits.gsfc.nasa.gov/fits_wcs.html} keywords\footnote{In fact, NDF
+data structures do not use FITS-WCS to describe WCS --- instead they use the
+\htmladdnormallink{AST}{http://www.starlink.ac.uk/ast} library, which
+provides a much more flexible scheme for handling WCS.}}
+
+\emph{The reported pixel bounds of the output map refer to a pixel coordinate
+system in which the source is at position (0,0). Note, the definition of
+pixel coordinates within the NDF format allows the origin of pixel
+coordinates to be at any nominated position within the array --- it does
+not have to be at the bottom left corner as in FITS.}
+
+\emph{Finally, the bounds of the map are given in the celestial coordinate
+system specified by the \xref{\texttt{SYSTEM}}{sun258}{MAKEMAP} command-line
+parameter.  This parameter defaults to ``\texttt{tracking}'', which causes
+the map to be created in the celestial coordinate system in which the
+observation parameters were originally defined. It may instead be set to a
+specific coordinate system (e.g. ``galactic'', ``icrs'', etc.) to force the
+map to be made in that system.}
+
+\begin{terminalv}
 smf_iteratemap: will down-sample data to match angular scale of 4 arcsec
-smf_iteratemap: Iterate to convergence (max 5)
-smf_iteratemap: stop when change in chi^2 < 0.001
+smf_iteratemap: Iterate to convergence (max 40)
+smf_iteratemap: stop when mean normalized map change < 0.05
+\end{terminalv}
+
+\emph{The data is down-sampled so that the on-sky distance between
+adjacent samples is roughly equal to the pixel size (4 arc-seconds in
+this case). This saves memory and computing time without adversely
+affecting the final map. The degree of down-sampling can be controlled
+using the \xparam{DOWNSAMPSCALE}{downsampscale} configuration parameter.}
+
+\emph{Next come information about the stopping criteria for the iterative
+map-making algorithm (see \cref{Section}{sec:algorithm}{The reduction
+step-by-step}). In this case, iterations will stop when 40 iterations are
+completed, or the normalised change in the map between iterations reduces
+to less that 0.05. These values are specified by configuration parameters
+\xparam{NUMITER}{numiter} and \xparam{MAPTOL}{maptol} (see \cref{Section}
+{sec:converge}{Stopping criteria}).}
+
+\begin{terminalv}
 smf_iteratemap: provided data are in 1 continuous chunks, the largest of which
 has 5957 samples (153.729 s)
-smf_iteratemap: map-making requires 1376 MiB (map=3 MiB model calc=1372 MiB)
+smf_iteratemap: map-making requires 1626 MiB (map=28 MiB model calc=1598 MiB)
 smf_iteratemap: Continuous chunk 1 / 1 =========
-smf_calc_smoothedwvm: 0.977444 s to calculate unsmoothed WVM tau values
-smf_iteratemap: Iteration 1 / 5 ---------------
+\end{terminalv}
+\emph{In almost all cases, the raw data files constituting a SCUBA-2
+observation will correspond to a single continuous stream of data
+samples, taken at roughly 200 Hz. Sometimes however, this may not be the
+case\footnote{A common cause of this is if some sub-scans are omitted
+from the list of input files supplied to \task{makemap}.}, so the user is
+now told how many chunks of data were found, and how long they were.
+Something may be wrong if the input data contains any breaks.}
+
+\emph{Next comes information about the amount of memory needed to make
+the map. If unsufficient memory is available to process all the input
+data together, it will be split into chunks, and a separate map made from
+each chunk. These maps are later co-added to form the final output map.
+This can often result in a poorer map --- see \latexhtml{the box
+describing \emph{Data Chunking} on Page~\pageref{box:chunk})~}
+{\htmlref{Data Chunking)}{box:chunk}}.}
+
+\emph{Finally, a loop is entered to process each chunk in turn, and the
+user is told which chunk is currently being processed. In this
+case there  is only one chunk (which is good).}
+
+\begin{terminalv}
+smf_iteratemap: Iteration 1 / 40 ---------------
 --- Size of the entire data array ------------------------------------------
 bolos  : 5120
 tslices: bnd:0(0.0 min), map:5957(2.6 min), tot:5957(2.6 min)
 Total samples: 30499840
 --- Quality flagging statistics --------------------------------------------
- BADDA:   10972794 (35.98%),        1842 bolos
-BADBOL:   11818688 (38.75%),        1984 bolos
-DCJUMP:      38809 ( 0.13%),
+ BADDA:   10805998 (35.43%),        1814 bolos
+BADBOL:   10865568 (35.62%),        1824 bolos
+DCJUMP:      19631 ( 0.06%),
   STAT:      71680 ( 0.24%),          14 tslices
- NOISE:     810152 ( 2.66%),         136 bolos
-Total samples available for map:   18634826, 61.10% of max (3128.22 bolos)
+ NOISE:      41699 ( 0.14%),           7 bolos
+Total samples available for map:   19586411, 64.22% of max (3287.97 bolos)
 smf_iteratemap: Calculate time-stream model components
 smf_iteratemap: Rebin residual to estimate MAP
 smf_iteratemap: Calculate ast
 --- Quality flagging statistics --------------------------------------------
- BADDA:   10972794 (35.98%),        1842 bolos  ,change          0 (+0.00%)
-BADBOL:   11925914 (39.10%),        2002 bolos  ,change     107226 (+0.91%)
-DCJUMP:      38809 ( 0.13%),                    ,change          0 (+0.00%)
+ BADDA:   10805998 (35.43%),        1814 bolos  ,change          0 (+0.00%)
+BADBOL:   11008536 (36.09%),        1848 bolos  ,change     142968 (+1.32%)
+DCJUMP:      19631 ( 0.06%),                    ,change          0 (+0.00%)
   STAT:      71680 ( 0.24%),          14 tslices,change          0 (+0.00%)
-   COM:     323165 ( 1.06%),                    ,change     323165 (+0.00%)
- NOISE:     810152 ( 2.66%),         136 bolos  ,change          0 (+0.00%)
-Total samples available for map:   18312771, 60.04% of max (3074.16 bolos)
-     Change from last report:    -322055, -1.73% of previous
+   COM:     372786 ( 1.22%),                    ,change     372786 (+0.00%)
+ NOISE:      41699 ( 0.14%),           7 bolos  ,change          0 (+0.00%)
+Total samples available for map:   19214687, 63.00% of max (3225.56 bolos)
+     Change from last report:    -371724, -1.90% of previous
 smf_iteratemap: Will calculate chi^2 next iteration
-smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.874979 (mean) 73.7106 (max)
-smf_iteratemap: Iteration 2 / 5 ---------------
+smf_iteratemap: *** NORMALIZED MAP CHANGE: 2.22778 (mean) 60.5292 (max)
+smf_iteratemap: Iteration 2 / 40 ---------------
+smf_iteratemap: Calculate time-stream model components
+smf_calcmodel_noi: Calculating a NOI variance for each box of 581 samples
+using variance of neighbouring residuals.
+smf_iteratemap: Rebin residual to estimate MAP
+smf_iteratemap: Calculate ast
+--- Quality flagging statistics --------------------------------------------
+ BADDA:   10805998 (35.43%),        1814 bolos  ,change          0 (+0.00%)
+BADBOL:   11038321 (36.19%),        1853 bolos  ,change      29785 (+0.27%)
+ SPIKE:         36 ( 0.00%),                    ,change         36 (+0.00%)
+DCJUMP:      19631 ( 0.06%),                    ,change          0 (+0.00%)
+  STAT:      71680 ( 0.24%),          14 tslices,change          0 (+0.00%)
+   COM:     393125 ( 1.29%),                    ,change      20339 (+5.46%)
+ NOISE:      41699 ( 0.14%),           7 bolos  ,change          0 (+0.00%)
+Total samples available for map:   19194401, 62.93% of max (3222.16 bolos)
+     Change from last report:     -20286, -0.11% of previous
+smf_iteratemap: *** CHISQUARED = 0.997314089857974
+smf_iteratemap: *** NORMALIZED MAP CHANGE: 1.78691 (mean) 8.09056 (max)
+smf_iteratemap: Iteration 3 / 40 ---------------
 smf_iteratemap: Calculate time-stream model components
 smf_iteratemap: Rebin residual to estimate MAP
 smf_iteratemap: Calculate ast
 --- Quality flagging statistics --------------------------------------------
- BADDA:   10972794 (35.98%),        1842 bolos  ,change          0 (+0.00%)
-BADBOL:   11949742 (39.18%),        2006 bolos  ,change      23828 (+0.20%)
- SPIKE:         34 ( 0.00%),                    ,change         34 (+0.00%)
-DCJUMP:      38809 ( 0.13%),                    ,change          0 (+0.00%)
+ BADDA:   10805998 (35.43%),        1814 bolos  ,change          0 (+0.00%)
+BADBOL:   11050235 (36.23%),        1855 bolos  ,change      11914 (+0.11%)
+ SPIKE:         36 ( 0.00%),                    ,change          0 (+0.00%)
+DCJUMP:      19631 ( 0.06%),                    ,change          0 (+0.00%)
   STAT:      71680 ( 0.24%),          14 tslices,change          0 (+0.00%)
-   COM:     357816 ( 1.17%),                    ,change      34651 (+10.72%)
- NOISE:     810152 ( 2.66%),         136 bolos  ,change          0 (+0.00%)
-Total samples available for map:   18278374, 59.93% of max (3068.39 bolos)
-     Change from last report:     -34397, -0.19% of previous
-smf_iteratemap: *** CHISQUARED = 0.983228126551834
-smf_iteratemap: *** NORMALIZED MAP CHANGE: 1.29181 (mean) 15.0552 (max)
-smf_iteratemap: Iteration 3 / 5 ---------------
-.....
-.....
-.....
-smf_iteratemap: Iteration 5 / 5 ---------------
+   COM:     401600 ( 1.32%),                    ,change       8475 (+2.16%)
+ NOISE:      41699 ( 0.14%),           7 bolos  ,change          0 (+0.00%)
+Total samples available for map:   19185947, 62.91% of max (3220.74 bolos)
+     Change from last report:      -8454, -0.04% of previous
+smf_iteratemap: *** CHISQUARED = 0.976599086972009
+smf_iteratemap: *** change: -0.0207150028859653
+smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.305 (mean) 1.24407 (max)
+smf_iteratemap: Iteration 4 / 40 ---------------
 smf_iteratemap: Calculate time-stream model components
 smf_iteratemap: Rebin residual to estimate MAP
 smf_iteratemap: Calculate ast
 --- Quality flagging statistics --------------------------------------------
- BADDA:   10972794 (35.98%),        1842 bolos  ,change          0 (+0.00%)
-BADBOL:   11949742 (39.18%),        2006 bolos  ,change          0 (+0.00%)
- SPIKE:         34 ( 0.00%),                    ,change          0 (+0.00%)
-DCJUMP:      38809 ( 0.13%),                    ,change          0 (+0.00%)
+ BADDA:   10805998 (35.43%),        1814 bolos  ,change          0 (+0.00%)
+BADBOL:   11056192 (36.25%),        1856 bolos  ,change       5957 (+0.05%)
+ SPIKE:         36 ( 0.00%),                    ,change          0 (+0.00%)
+DCJUMP:      19631 ( 0.06%),                    ,change          0 (+0.00%)
   STAT:      71680 ( 0.24%),          14 tslices,change          0 (+0.00%)
-   COM:     362902 ( 1.19%),                    ,change          0 (+0.00%)
- NOISE:     810152 ( 2.66%),         136 bolos  ,change          0 (+0.00%)
-Total samples available for map:   18273302, 59.91% of max (3067.53 bolos)
-     Change from last report:          0, +0.00% of previous
-smf_iteratemap: *** CHISQUARED = 0.952708604771402
-smf_iteratemap: *** change: -0.000109049487216351
-smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.107427 (mean) 2.96138 (max)
+   COM:     409883 ( 1.34%),                    ,change       8283 (+2.06%)
+ NOISE:      41699 ( 0.14%),           7 bolos  ,change          0 (+0.00%)
+Total samples available for map:   19177684, 62.88% of max (3219.35 bolos)
+     Change from last report:      -8263, -0.04% of previous
+smf_iteratemap: *** CHISQUARED = 0.96404406922676
+smf_iteratemap: *** change: -0.0125550177452489
+smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.0401588 (mean) 0.151877 (max)
+smf_iteratemap: Iteration 5 / 40 ---------------
+smf_iteratemap: Calculate time-stream model components
+smf_iteratemap: Rebin residual to estimate MAP
+smf_iteratemap: Calculate ast
+--- Quality flagging statistics --------------------------------------------
+ BADDA:   10805998 (35.43%),        1814 bolos  ,change          0 (+0.00%)
+BADBOL:   11068106 (36.29%),        1858 bolos  ,change      11914 (+0.11%)
+ SPIKE:         36 ( 0.00%),                    ,change          0 (+0.00%)
+DCJUMP:      19631 ( 0.06%),                    ,change          0 (+0.00%)
+  STAT:      71680 ( 0.24%),          14 tslices,change          0 (+0.00%)
+   COM:     414727 ( 1.36%),                    ,change       4844 (+1.18%)
+ NOISE:      41699 ( 0.14%),           7 bolos  ,change          0 (+0.00%)
+Total samples available for map:   19172853, 62.86% of max (3218.54 bolos)
+     Change from last report:      -4831, -0.03% of previous
+smf_iteratemap: *** CHISQUARED = 0.964032127175568
+smf_iteratemap: *** change: -1.19420511923707e-05
+smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.0157131 (mean) 0.103135 (max)
 smf_iteratemap: ****** Completed in 5 iterations
 smf_iteratemap: ****** Solution CONVERGED
-Total samples available from all chunks: 18273302 (3067.53 bolos)
-%%%%\end{}
+Setting 24282 map pixels bad because they contain fewer than 4 samples (=0.01
+of the mean samples per pixel).
+Total samples available from all chunks: 19172853 (3218.54 bolos)
+
 \end{terminalv}
 
 

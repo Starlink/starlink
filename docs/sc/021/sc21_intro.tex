@@ -17,11 +17,18 @@ This guide covers the following topics.
 \itemsep0em
 \item \cref{Chapter}{sec:intro}{Chapter 1} -- Computer resources you'll need before getting started.
 \item \cref{Chapter}{sec:s2}{Chapter 2} -- A description of SCUBA-2 and its observing modes.
-\item \cref{Chapter}{sec:dimm}{Chapter 3}  -- An introduction to the Dynamic Iterative Map-Maker and a description of the configuration files.
-\item \cref{Chapter}{sec:pipe}{Chapter 4}  -- Instructions for using the \oracdr\ pipeline to reduce your data along with details on data retrieved from the JSA.
-\item \cref{Chapter}{sec:tweak}{Chapter 5}  -- Options for tailoring the configuration parameters to improve your final map.
-\item \cref{Chapter}{sec:eg}{Chapter 6}  -- Two worked examples covering a \htmlref{blank cosmology field}{sec:cosmology} and a \htmlref{galactic field}{sec:bright_ex}.
-\item \cref{Chapter}{sec:postprocess}{Chapter 7}  -- Post-processing reduction steps such as applying the FCF, co-adding multiple maps and estimating the noise.
+\item \cref{Chapter}{sec:dimm}{Chapter 3}  -- An introduction to the Dynamic Iterative Map-Maker and
+a description of the configuration files.
+\item \cref{Chapter}{sec:pipe}{Chapter 4}  -- Instructions for using the \oracdr\ pipeline to reduce
+your data ``the easy way'', along with details on data retrieved from the JSA.
+\item \cref{Chapter}{sec:manual}{Chapter 5}  -- Instructions for using individual \smurf\ commands to
+reduce your data ---  useful if you need extra flexibity.
+\item \cref{Chapter}{sec:tweak}{Chapter 6}  -- Options for tailoring the configuration parameters to
+improve your final map.
+\item \cref{Chapter}{sec:eg}{Chapter 7}  -- Two worked examples covering a \htmlref{blank cosmology
+field}{sec:cosmology} and a \htmlref{galactic field}{sec:bright_ex}.
+\item \cref{Chapter}{sec:postprocess}{Chapter 8}  -- Post-processing reduction steps such as applying
+the FCF, co-adding multiple maps and estimating the noise.
 \item \cref{Chapter}{sec:raw}{Chapter 9}  -- SCUBA-2 Diagnostic Tools.
 
 
@@ -33,7 +40,8 @@ the text that should be typed by the user to initiate the described action.
 
 \section{\xlabel{computing} Before you start: computing resources}
 
-Before reducing SCUBA-2 data using the Dynamic Iterative Map-Maker you should confirm you have sufficient computing resources for your type of map.
+Before reducing SCUBA-2 data using the Dynamic Iterative Map-Maker you should confirm you have
+sufficient computing resources for your type of map.
 
 We recommend the following:
 \begin{table}[h!]
@@ -84,7 +92,54 @@ installed on your system, and Starlink aliases and environment
 variables must be defined before attempting to reduce any SCUBA-2
 data.
 
+\subsection{Data formats}
+\label{sec:ndf}
+
+Data files for SCUBA-2 use the Starlink N-dimensional Data Format (NDF,
+see Jenness et al 2014\cite{ndf}), a hierarchical format which allows
+additional data and metadata to be stored within a single file. \Kappa\
+contains \xref{many commands}{sun95} {ap_classified}\ for examining and
+manipulating NDF structures. The introductory sections of the \Kappa\
+document (\xref{SUN/95}{sun95}{}) contain much useful information on
+the contents of an NDF structure and how to manipulate them.
+
+A single NDF structure describes a single data array with associated
+meta-data. NDFs are usually stored within files of type ``\verb+.sdf+''.
+In most cases (but not all), a single \verb+.sdf+ file will contain just
+one top-level NDF structure, and the NDF can be referred to simply by
+giving the name of the file (with or without the ``\verb+.sdf+'' prefix).
+In many cases, a top-level NDF containing JCMT data will contain other
+``extension'' NDFs buried inside them at a lower level. For instance, raw
+files contain a number of NDF components which store observation-specific
+data necessary for subsequent processing. The contents of these (and
+other NDF) files may be listed with \HDSTRACEref. Each file holding raw
+JCMT data on disk is also known as a `sub-scan'.
+
+The main components of any NDF structure are:
+\begin{itemize}
+\item An array of numerical data (may have up to 7 dimensions - usually 3
+for JCMT data);
+\item An array of variance values corresponding to the numerical data
+values;
+\item An array holding up to eight boolean flags (known as ``quality
+flags'') for each pixel;
+\item World Coordinate System information;
+\item History;
+\item Data units
+\item Other extensions items. These are defined by particular packages,
+but usually include a list of FITS-like headers together with provenance
+information that indicates how the NDF was created. Raw JCMT file also
+include extensions that define the state of the telescope and instrument
+at each time slice within the observation.
+\end{itemize}
+
+The \convert\ package contains commands \xref{\task{fits2ndf}}{sun55}{FITS2NDF} and
+\xref{\task{ndf2fits}}{sun55}{NDF2FITS} that allow interchange between FITS
+and NDF format.
+
 \subsection{Initialising Starlink}
+\label{sec:starinit}
+
 The commands and environment variables needed to start up the required
 Starlink packages (\smurf \cite{smurf}, \Kappa, \emph{etc.}) must first
 be defined. For C shells (csh, tcsh), do:
@@ -103,6 +158,7 @@ before using any Starlink commands. For Bourne shells (sh, bash, zsh), do:
 \end{terminalv}
 
 \subsection{KAPPA and SMURF for data processing}
+\label{sec:packinit}
 
 The Sub-Millimetre User Reduction Facility, or \textsc{Smurf},
 contains the Dynamic Iterative Map-Maker, which will process raw
@@ -266,15 +322,17 @@ You have two options for processing your data:
 \item performing each step manually.
 \end{enumerate}
 
-The pipeline approach works well if you have a lot of data to process.
+The pipeline approach is simpler and works well if you have a
+lot of data to process.
 Performing each step by hand allows more fine-tuned control of certain
 processing and analysis steps, and is especially useful for refining
 the parameters used by the map-maker. However, once the optimal
 parameters have been determined, it is possible to pass them to the
-pipeline. \cref{Chapter}{sec:dimm}{The Dynamic Iterative Map-maker
-  Explained} and \cref{Chapter}{sec:maps}{Reducing Your Data} discuss
-the manual approach; to use the science pipeline, skip straight to
-\cref{Section}{sec:pipe}{The SCUBA-2 Pipeline}.
+pipeline to process other observations using the same configuration.
+\cref{Chapter}{sec:dimm}{The Dynamic Iterative Map-maker
+Explained} and \cref{Chapter}{sec:manual}{Running makemap Outside the
+Pipeline} discuss the manual approach; to use the science pipeline,
+skip straight to \cref{Section}{sec:pipe}{The SCUBA-2 Pipeline}.
 
 The JCMT will produce pipeline reduced files for each observation and
 group of repeat observations for each night. These are reduced using

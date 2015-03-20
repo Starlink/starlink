@@ -453,7 +453,7 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
     }
     job_data = astFree( job_data );
 
-    msgOutiff( MSG__NORM, "", FUNC_NAME ": %f s to calculate unsmoothed WVM tau values",
+    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": %f s to calculate unsmoothed WVM tau values",
                status, smf_timerupdate(&tv1,&tv2,status) );
 
   }
