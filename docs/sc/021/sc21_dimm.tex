@@ -50,7 +50,8 @@ available parameters, see the appendix \xref{``Configuration Parameters''}
 
 It is possible to create a map without supplying a configuration file to
 \makemap\ (\emph{i.e.} leaving all configuration parameters set to their default
-values) but it is not recommeneded since it will not give optimal results
+values - ``\texttt{config=def}'' when running \texttt{makemap}) but it is not
+recommeneded since it will not give optimal results
 for your particular observation. For this reason, specialised
 configuration files have been developed which are tailored to different
 science goals, be they detecting faint galaxies or mapping large
@@ -275,8 +276,8 @@ default model order is given below.
 modelorder = (com,gai,ext,flt,ast,noi)
 \end{terminalv}
 
-The only recipe not following this model order is the one tailored for
-blank field maps which does not include a \model{FLT} model in the
+The only configuration file not following this model order is the one tailored
+for blank field maps which does not include a \model{FLT} model in the
 iterative stage but instead includes an equivalent high-pass filter
 as part of the cleaning stage (see \cref{Section}{sec:config}{Specialised
 configuration files}).
@@ -704,20 +705,18 @@ see significantly different common-mode values are also flagged as unusable.
 
 \end{itemize}
 
-Unlike the other configuration files described above, these files do not provide
-a complete set of parameter values. Instead, they provide a few
-additional settings that should be added to some other configuration in
-order to achieve the desired fix. For instance, a configuration file
-containing the following two lines would indicate that values from both
-\file{dimmconfig\_bright\_extended.lis} and \file{dimmconfig\_fix\_blobs.lis} should
-be used:
+These files provide a few additional settings that should be added to
+some other configuration in order to achieve the desired fix. For
+instance, a configuration file containing the following two lines would
+indicate that values from both \file{dimmconfig\_bright\_extended.lis} and
+\file{dimmconfig\_fix\_blobs.lis} should be used:
 
 \begin{terminalv}
 ^/star/share/smurf/dimmconfig_bright_extended.lis
 ^/star/share/smurf/dimmconfig_fix_blobs.lis
 \end{terminalv}
 
-This reads a complete set of configuration parameter from the
+This reads a set of configuration parameter from the
 \file{dimmconfig\_bright\_extended.lis} file, and then assigns new values for just
 those parameters defined in \file{dimmconfig\_fix\_blobs.lis}. These values override
 the values specified in \file{dimmconfig\_bright\_extended.lis}.
