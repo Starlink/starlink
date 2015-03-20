@@ -17,11 +17,18 @@ This guide covers the following topics.
 \itemsep0em
 \item \cref{Chapter}{sec:intro}{Chapter 1} -- Computer resources you'll need before getting started.
 \item \cref{Chapter}{sec:s2}{Chapter 2} -- A description of SCUBA-2 and its observing modes.
-\item \cref{Chapter}{sec:dimm}{Chapter 3}  -- An introduction to the Dynamic Iterative Map-Maker and a description of the configuration files.
-\item \cref{Chapter}{sec:pipe}{Chapter 4}  -- Instructions for using the \oracdr\ pipeline to reduce your data along with details on data retrieved from the JSA.
-\item \cref{Chapter}{sec:tweak}{Chapter 5}  -- Options for tailoring the configuration parameters to improve your final map.
-\item \cref{Chapter}{sec:eg}{Chapter 6}  -- Two worked examples covering a \htmlref{blank cosmology field}{sec:cosmology} and a \htmlref{galactic field}{sec:bright_ex}.
-\item \cref{Chapter}{sec:postprocess}{Chapter 7}  -- Post-processing reduction steps such as applying the FCF, co-adding multiple maps and estimating the noise.
+\item \cref{Chapter}{sec:dimm}{Chapter 3}  -- An introduction to the Dynamic Iterative Map-Maker and
+a description of the configuration files.
+\item \cref{Chapter}{sec:pipe}{Chapter 4}  -- Instructions for using the \oracdr\ pipeline to reduce
+your data ``the easy way'', along with details on data retrieved from the JSA.
+\item \cref{Chapter}{sec:manual}{Chapter 5}  -- Instructions for using individual \smurf\ commands to
+reduce your data ---  useful if you need extra flexibity.
+\item \cref{Chapter}{sec:tweak}{Chapter 6}  -- Options for tailoring the configuration parameters to
+improve your final map.
+\item \cref{Chapter}{sec:eg}{Chapter 7}  -- Two worked examples covering a \htmlref{blank cosmology
+field}{sec:cosmology} and a \htmlref{galactic field}{sec:bright_ex}.
+\item \cref{Chapter}{sec:postprocess}{Chapter 8}  -- Post-processing reduction steps such as applying
+the FCF, co-adding multiple maps and estimating the noise.
 \item \cref{Chapter}{sec:raw}{Chapter 9}  -- SCUBA-2 Diagnostic Tools.
 
 
@@ -33,7 +40,8 @@ the text that should be typed by the user to initiate the described action.
 
 \section{\xlabel{computing} Before you start: computing resources}
 
-Before reducing SCUBA-2 data using the Dynamic Iterative Map-Maker you should confirm you have sufficient computing resources for your type of map.
+Before reducing SCUBA-2 data using the Dynamic Iterative Map-Maker you should confirm you have
+sufficient computing resources for your type of map.
 
 We recommend the following:
 \begin{table}[h!]
@@ -272,9 +280,9 @@ processing and analysis steps, and is especially useful for refining
 the parameters used by the map-maker. However, once the optimal
 parameters have been determined, it is possible to pass them to the
 pipeline. \cref{Chapter}{sec:dimm}{The Dynamic Iterative Map-maker
-  Explained} and \cref{Chapter}{sec:maps}{Reducing Your Data} discuss
-the manual approach; to use the science pipeline, skip straight to
-\cref{Section}{sec:pipe}{The SCUBA-2 Pipeline}.
+Explained} and \cref{Chapter}{sec:manual}{Running makemap Outside the
+Pipeline} discuss the manual approach; to use the science pipeline,
+skip straight to \cref{Section}{sec:pipe}{The SCUBA-2 Pipeline}.
 
 The JCMT will produce pipeline reduced files for each observation and
 group of repeat observations for each night. These are reduced using
