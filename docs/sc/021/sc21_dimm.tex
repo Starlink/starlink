@@ -2,10 +2,17 @@
 \label{sec:dimm}
 
 The Dynamic Iterative Map-Maker, hereafter just referred to as the
-map-maker is the tool you will use to produce SCUBA-2 maps. It performs
+map-maker is the tool you will use to produce SCUBA-2 maps, and is
+implemented by the \smurf\ \makemap\ command. It performs
 all pre-processing steps to clean the data, followed by solving for
 multiple signal components using an iterative algorithm, and binning
 the resulting time-series data to produce a final science map.
+
+The \makemap\ command can be invoked in two ways: 1) directly by typing
+``\texttt{makemap}'' in response to a unix shell prompt (see
+\cref{Chapter}{sec:manual}{Running the iterative map-maker}), or 2)
+indirectly as part of an ORAC-DR recipe (see
+\cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline}).
 
 This chapter describes how the map-maker produces a science image
 from raw SCUBA-2 data. It should be considered essential reading as it
