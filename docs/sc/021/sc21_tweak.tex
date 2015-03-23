@@ -97,7 +97,7 @@ adding the prefix \param{450.} or \param{850.}, e.g.
 values (no prefix) take priority over qualified values.
 
 \section{\xlabel{inter}Writing out models \& intermediate maps}
-
+\label{sec:inter}
 
 \textbf{itermaps}\\
 Setting the parameter \setparam{ITERMAP}{itermap}{1} writes out an astronomical
@@ -110,7 +110,8 @@ component.  These can be visually inspected with
 to help determine an appropriate number of iterations. This is useful
 when a fixed number of iterations have been requested (i.e. a positive
 value for \xparam{NUMITER}{numiter}) and the map solution diverges before
-they have completed.
+they have completed. See also \cref{Section}{sec:itermaps}{Monitoring the map
+at the end of each iteration} for how to view these maps whilst \makemap\ is still running.
 \newline\newline
 \textbf{shortmaps}\\
 If the parameter \param{shortmaps} is non-zero, a map is made from

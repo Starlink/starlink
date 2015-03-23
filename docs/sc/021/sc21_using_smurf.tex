@@ -560,7 +560,336 @@ the total number of samples (and equivalent number of bolometers) used
 from all chunks. In this case there was only one chunk, so these values
 are equal to the numbers reported at the end of the last iteration.}
 
+\section{Interacting with \texttt{makemap} during a long run}
+For long observations, \makemap\ can take several hour to run,
+particularly on slow or low memory computers. For this reason it is
+useful to be able to monitor progress so that potential problems can be
+detected early, in order to avoid wasting time.
+
+\subsection{Monitoring screen output}
+The most straight-forward way of monitoring progress is to check the
+values written to the screen by makemap at the end of each iteration (see
+the previous section). For instance, if you run \makemap\ as follows:
+
+\begin{terminalv}
+% makemap in=^infiles out=outmap config=^conf | tee makemap.log
+\end{terminalv}
+
+then the messages displayed by makemap on the screen will also be written
+to text file \texttt{makemap.log}. This makes it easy to search the log
+file whilst \makemap\ is still running, for instance from another terminal
+window:
+
+\begin{terminalv}
+% grep NORMALIZED makemap.log
+smf_iteratemap: *** NORMALIZED MAP CHANGE: 1.02829 (mean) 20.7922 (max)
+smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.739832 (mean) 9.81836 (max)
+smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.370128 (mean) 5.42933 (max)
+smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.258304 (mean) 3.2717 (max)
+smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.205415 (mean) 2.66815 (max)
+smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.177044 (mean) 2.28417 (max)
+smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.159569 (mean) 2.05803 (max)
+\end{terminalv}
+
+This displays the normalised change in maps between successive
+iterations. If the mean normalised map change is not decreasing smoothly,
+(for instance if it is oscillating around a fixed value), then there is a
+potential problem. In which case you may want to interrupt the
+\texttt{makemap} process, rather than waiting potentially for several
+hours to create a bad map.
+
+Likewise, it is useful to monitor the total number of samples that are
+being pasted into the map at the end of each iteration:
+
+\begin{terminalv}
+% grep "Total samples" makemap.log
+Total samples: 299919360
+Total samples available for map:  174105275, 58.05% of max (2972.2 bolos)
+Total samples available for map:  171284110, 57.11% of max (2924.03 bolos)
+Total samples available for map:  171242020, 57.10% of max (2923.32 bolos)
+Total samples available for map:  171239147, 57.10% of max (2923.27 bolos)
+\end{terminalv}
+
+The lower the percentage of samples included in the map, the greater will
+be the noise in the map. If this number drops much below 50\% then you
+may want to think about aborting \texttt{makemap} and investigating why
+the number is so low (\emph{e.g.} by looking at the ``quality
+statistics'' displayed at the end of each iteration, to determine the
+cause of the data loss).
+
+Likewise, information can be gather about chunking:
+
+\begin{terminalv}
+% grep chunk makemap.log
+smf_iteratemap: provided data are in 7 continuous chunks, the largest of
+which has 487 samples (10.1534 s)
+smf_iteratemap: Continuous chunk 1 / 7 =========
+smf_iteratemap: Adding map estimated from this continuous chunk to total
+smf_iteratemap: Continuous chunk 2 / 7 =========
+smf_iteratemap: Adding map estimated from this continuous chunk to total
+smf_iteratemap: Continuous chunk 3 / 7 =========
+smf_iteratemap: Adding map estimated from this continuous chunk to total
+\end{terminalv}
+
+This indicates that the raw data has gaps in it, resulting in seven maps
+being made, one from each continuous chunk, before the final map is made
+by combining all the individual maps. Chunking can produce sub-optimal
+maps, and should normally be investigated - see \latexhtml{the description
+of \emph{Data Chunking} on Page~\pageref{box:chunk})~}{\htmlref{Data
+Chunking}{box:chunk}}.
+
+\subsection{Monitoring the map at the end of each iteration}
+\label{sec:itermaps}
+The map created at the end of each iteration is normally discarded, but can
+be saved by setting configuration parameter \xparam{ITERMAP}{itermap}
+to either 1 or 2. By default, these ``itermaps'' are written to an
+extension of the main output NDF as described in
+\cref{Section}{sec:inter}{Writing out models and intermediate maps}, and
+cannot be viewed until \makemap\ has completed. However, an alternative
+destination for these itermaps can be specified on the \texttt{makemap}
+command-line as follows, allowing them to be viewed whilst \texttt{makemap}
+is still running:
+
+\begin{terminalv}
+% cat conf
+^STARLINK_DIR/share/smurf/dimmconfig_jsa_generic.lis
+itermap=1
+%
+% makemap in=^infiles out=outmap config=^conf itermaps=myitermaps
+\end{terminalv}
+
+Note the distinction between the ``\texttt{itermaps}'' (plural)
+\emph{command-line} option, and the ``\texttt{itermap}'' (singular)
+\emph{configuration} parameter.  The above command will create a new file
+called \texttt{myitermaps.sdf} in which each itermap will be stored as soon
+as it is created. The file is closed after each itermap is written, and
+re-opened again before writing the next itermap. This is an example of a
+\emph{container file}, where a single \texttt{.sdf} file contains several
+NDFs, each holding a different map (see \cref{Section}{sec:ndf}{Data
+formats}). You can list the maps in such a file using \textsc{Kappa}
+\xref{\task{ndfecho}}{sun95}{NDFECHO} as follows:
+
+\begin{terminalv}
+% ndfecho myitermaps
+myitermaps.CH00I001
+myitermaps.CH00I002
+myitermaps.CH00I003
+myitermaps.CH00I004
+myitermaps.CH00I005
+myitermaps.CH00I006
+myitermaps.CH00I007
+...
+\end{terminalv}
+
+The name of each itermap is of the form ``CHxxIyyy'', where ``xx'' is the
+chunk number and ``yyy'' is the iteration number. In the common case
+where all raw data is processed in a single chunk, ``xx'' will be ``00''
+for all itermaps.
+
+You can view a single itermap using:
+\begin{terminalv}
+% gaia myitermaps.CH00I004
+\end{terminalv}
+
+If you want to view several itermaps side-by-side, you can use \textsc{Kappa}
+\xref{\task{picdef}}{sun95}{PICDEF} to divide the screen up into a grid
+of ``pictures'', then use \xref{\task{picsel}}{sun95}{PICSEL} to pick each
+picture in turn, and use \xref{\task{display}}{sun95}{DISPLAY} to display
+an itermap in each one. For instance to display the first six itermaps
+side-by-side in a $3 \times 2$ grid, all with the same scaling, without
+any axes, do:
+
+\begin{terminalv}
+% gdclear
+% picdef mode=array xpic=3 ypic=2 prefix=pic
+% picsel pic1
+% display myitermaps.CH00I001 axes=no mode=percentiles percentiles=\[2,98\]
+% picsel pic2
+% display myitermaps.CH00I002 mode=current
+% picsel pic3
+% display myitermaps.CH00I003 mode=current
+% picsel pic4
+% display myitermaps.CH00I004 mode=current
+% picsel pic5
+% display myitermaps.CH00I005 mode=current
+% picsel pic6
+% display myitermaps.CH00I006 mode=current
+\end{terminalv}
+
+This produces the display shown in \cref{Figure}{fig:itermaps}{Initial
+six itermaps}. \textsc{Kappa} \xref{\task{display}}{sun95}{DISPLAY} has
+many options for controlling things like data scaling, axis annotation
+and style, colour table, graphics device, \emph{etc.}.
+
+\begin{figure}
+\begin{center}
+  \includegraphics[width=\linewidth]{sc21_itermaps}
+\end{center}
+\caption[Initial six itermaps]{\small The maps created on the first six
+iterations of \texttt{makemap}, from an observation of Orion A, using the
+\texttt{dimmconfig\_jsa\_generic.lis} configuration file with the addition
+of ``\texttt{itermap=1}''. The first map is bottom left, and the sixth
+map is top right. This illustrates the initial fast improvement
+in the map over the first few iterations.}
+\label{fig:itermaps}
+\end{figure}
+
+Alternatively, you can combine the itermaps into a 3D cube, and then use
+the cube-viewing facilities of gaia to scroll through the itermaps in the
+style of a movie (see \cref{Section}{sec:inter}{Writing out models and
+intermediate maps}):
+
+\begin{terminalv}
+% paste in=myitermaps out=itercube shift=\[0,0,1\]
+% gaia itercube
+\end{terminalv}
+
+It is sometimes informative to look at the \emph{change} between
+itermaps, to see the incremental effect of each iteration. This is most
+easily done if the itermaps are first stacked into a cube as described
+above. The next step is to produce a copy of the cube in which the pixel
+origin is moved by one pixel along the third axis (\emph{i.e.} the axis
+that enumerates iteration). Finally subtract one cube from the other, and
+display the resulting difference cube (this example shows how command-line
+parameters can often be specified by position instead of by name ---
+check the help information for each command to see the order in which
+options should be supplied):
+
+\begin{terminalv}
+% paste myitermaps out=itercube shift=\[0,0,1\]
+% slide itercube itercube-shifted \[0,0,1\] near
+% sub itercube-shifted itercube diffcube
+%
+% picsel pic1
+% display diffcube'(,,1)' axes=no mode=percentiles percentiles=\[2,98\]
+% picsel pic2
+% display diffcube'(,,2)' mode=current
+% picsel pic3
+% display diffcube'(,,3)' mode=current
+% picsel pic4
+% display diffcube'(,,4)' mode=current
+% picsel pic5
+% display diffcube'(,,5)' mode=current
+% picsel pic6
+% display diffcube'(,,6)' mode=current
+\end{terminalv}
+
+This produces the display shown in \cref{Figure}{fig:diffmaps}{Initial
+six difference maps}.
+
+\begin{figure}
+\begin{center}
+  \includegraphics[width=\linewidth]{sc21_diffmaps}
+\end{center}
+\caption[Initial six difference maps]{\small The difference between each
+pair of adjacent maps shown in \cref{Figure}{fig:itermaps}{Initial
+six itermaps}.}
+\label{fig:diffmaps}
+\end{figure}
+
+\textbf{Viewing the mask after each iteration:}
+
+The above plots are based on the itermaps that are created by adding
+``\texttt{itermaps=1}'' to your \texttt{makemap} configuration. You can
+instead use ``\texttt{itermaps=2}'', which causes each itermap to be
+masked so that pixels outside the current source mask are set bad
+(\emph{i.e.} blank). \cref{Figure}{fig:maskeditermaps}{Initial
+six itermaps with masking} shows the resulting itermaps.
+
+\begin{figure}
+\begin{center}
+  \includegraphics[width=\linewidth]{sc21_itermaps_masked}
+\end{center}
+\caption[Initial six itermaps with masking]{\small The first six
+itermaps, create by using \texttt{itermap=2} in the configuration. This
+causes pixels outside the source mask to be set blank, allowing the evolution
+off the mask to be seen (the first iteration is not masked). In this
+case, the mask includes all pixels above a signal-to-noise ratio of five.}
+\label{fig:maskeditermaps}
+\end{figure}
+
+The main point of this section is to emphasise that all the above
+investigations can be performed \emph{whilst makemap is still running},
+if you specify an explicit file for the itermaps using the
+``\texttt{itermaps} command-line option. This allows you to decide if
+the reduction is progressing as expected, and whether to interrupt the
+reduction.
 
 
+\subsection{Interrupting \texttt{makemap}}
 
+If you interrupt \makemap\ by pressing control-C on the keyboard (or
+equivalently by sending an \texttt{INT} signal to the \texttt{makemap}
+process), it will continue until the current iteration is completed
+and then will issue a prompt with options allowing you to save the current
+map before closing, as in the following example:
+
+\begin{terminalv}
+% makemap in=^infiles out=outmap config=^conf itermaps=myitermaps
+Out of 29 input files, 1 was a dark, 1 was a fast flat and 27 were science
+Processing data from instrument 'SCUBA-2' for object 'OMC1 tile10' from the
+following observation  :
+...
+...
+\end{terminalv}
+
+\texttt{<press control-C>}
+
+\begin{terminalv}
+...
+...
+--- Quality flagging statistics
+--------------------------------------------
+ BADDA:   25525734 (20.86%),         267 bolos  ,change          0 (+0.00%)
+BADBOL:   31261854 (25.55%),         327 bolos  ,change          0 (+0.00%)
+ SPIKE:        339 ( 0.00%),                    ,change          4 (+1.19%)
+DCJUMP:     146703 ( 0.12%),                    ,change          0 (+0.00%)
+  STAT:     160000 ( 0.13%),         125 tslices,change          0 (+0.00%)
+   COM:    1827454 ( 1.49%),                    ,change       3000 (+0.16%)
+ NOISE:    5640518 ( 4.61%),          59 bolos  ,change          0 (+0.00%)
+Total samples available for map:   89135553, 72.84% of max (932.361 bolos)
+     Change from last report:      -3001, -0.00% of previous
+smf_iteratemap: *** CHISQUARED = 0.998314983615372
+smf_iteratemap: *** change: -0.0014711436109287
+smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.00941492 (mean) 2.9521 (max)
+
+
+>>>> Interrupt detected!!! What should we do now? Options are:
+1 - abort immediately with an error status
+2 - close the application returning the current output map
+3 - do one more iteration to finalise the map and then close
+
+NOTE - another interrupt will abort the application, potentially leaving
+files in an unclean state.
+
+INTOPTION - What to do now (1-3) /3/ >
+\end{terminalv}
+
+At this point you should respond to the prompt for parameter
+\texttt{INTOPTION} by typing 1, 2 or 3 followed by \texttt{<return>}. Options 2
+and 3 cause \texttt{makemap} to tidy up its internals and create a map
+from the current models just as if the iterative process had reached
+convergence. Option 3 causes one further iteration to be performed,
+without masking. You should use this option if you have been using AST
+masking (see \cref{Section}{sec:astmask}{AST masking}).
+
+\begin{tip}
+Note if you are running \texttt{makemap} from within a script, then the
+handling of control-C interrupts will probably be quite different, because
+the shell process (or perl, python or whatever) will catch the interrupt
+before it gets to the \texttt{makemap} process. This usually causes the
+shell process to die but leaves the \texttt{makemap} process running in
+the background. Instead of pressing control-C on the keyboard, you should
+find the process ID for the \texttt{makemap} process itself, and then send an
+INT signal to that process explicitly:
+
+\begin{terminalv}
+
+% ps aux | grep makemap
+dsb      25407  0.0  0.0  43716  1952 pts/5    0:00 makemap
+% kill -s INT 25407
+
+\end{terminalv}
+
+\end{tip}
 
