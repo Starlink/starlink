@@ -88,6 +88,8 @@
 *        Add ability to ignore padding.
 *     2011-04-15 (TIMJ):
 *        Add SMF__Q_EXT
+*     2015-03-23 (TIMJ):
+*        Do not report count of boundary slices if "nopad" is non-zero.
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -203,11 +205,16 @@ void smf_qualstats_report( ThrWorkForce *wf, msglev_t msglev, smf_qfam_t qfamily
       msgOutiff(msglev, "", "--- Size of the entire data array ------------------------------------------",
               status );
       msgOutiff(msglev, "", "bolos  : %zu", status, nbolo_tot );
-      msgOutiff(msglev, "", "tslices: bnd:%zu(%.1lf min), map:%zu(%.1lf min), tot:%"
-                DIM_T_FMT "(%.1lf min)", status,
-                (size_t)ntslice-(nmax/nbolo_tot), tbound*steptime/60.,
-                nmax/nbolo_tot, ntgood*steptime/60.,
-                ntslice, ntslice*steptime/60.);
+      if( nopad ) {
+         msgOutiff(msglev, "", "tslices: %"
+                   DIM_T_FMT "(%.1lf min)", status, ntslice, ntslice*steptime/60.);
+      } else {
+         msgOutiff(msglev, "", "tslices: bnd:%zu(%.1lf min), map:%zu(%.1lf min), tot:%"
+                   DIM_T_FMT "(%.1lf min)", status,
+                   (size_t)ntslice-(nmax/nbolo_tot), tbound*steptime/60.,
+                   nmax/nbolo_tot, ntgood*steptime/60.,
+                   ntslice, ntslice*steptime/60.);
+      }
       msgOutiff(msglev, "", "Total samples: %zu", status, ndata );
     }
 
