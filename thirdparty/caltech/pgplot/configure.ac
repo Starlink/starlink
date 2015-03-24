@@ -6,6 +6,7 @@ dnl    Note that for GKS the RAL version number is 1.37 but
 dnl    Starlink does not increment that version. Rather than use
 dnl    non-standard nomenclature use the patch level for starlink patching.
 AC_INIT([pgplot],[5.2.2-2],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ([2.69])
@@ -29,7 +30,7 @@ AC_HEADER_STDC
 AC_PATH_XTRA
 AC_CHECK_HEADERS(values.h)
 
-dnl    %VAL is used for some memory handling. Under 64bit pointers are 
+dnl    %VAL is used for some memory handling. Under 64bit pointers are
 dnl    8 bytes. Need to know this.
 AC_CHECK_SIZEOF([void *])
 
@@ -72,7 +73,7 @@ AC_SUBST(STAR_BUILT_DRIVERS)
 
 dnl    Stuff required for xathena
 have_athena="yes"
-AC_ARG_WITH([athena], 
+AC_ARG_WITH([athena],
              AS_HELP_STRING([--with-athena[=path]],[use Xaw3d (default location /usr/X11R6/)]),
   [if test "$withval" = "yes"; then
     # Default place
@@ -88,11 +89,11 @@ AC_ARG_WITH([athena],
     CPPFLAGS="$CPPFLAGS -I$XAINCDIR"
   fi])
 
-dnl    Hack and slash for the Mac. This should only add goodness to 
-dnl    non-Mac builds in the case where whoever did their filesystem 
+dnl    Hack and slash for the Mac. This should only add goodness to
+dnl    non-Mac builds in the case where whoever did their filesystem
 dnl    have done something as wierd as Apple.
 if test "$have_athena" = "yes"; then
-  AC_CHECK_HEADER([X11/Xaw3d/Simple.h], have_xa3dheader=yes ) 
+  AC_CHECK_HEADER([X11/Xaw3d/Simple.h], have_xa3dheader=yes )
   AC_CHECK_LIB(Xaw3d, XawInitializeWidgetSet, have_xa3dlib=yes )
 else
   have_xa3dheader="no"
@@ -103,7 +104,7 @@ AM_CONDITIONAL( HAVE_XATHENA, \
     [test "$have_xa3dheader" = "yes" && test "$have_xa3dlib" = "yes" ])
 
 dnl    xtk & ptk, use the Starlink version of Tcl/Tk, so don't need to check
-dnl    for it (declared as a build dependency). To keep the various 
+dnl    for it (declared as a build dependency). To keep the various
 dnl    sub-components happy we need to define HAVE_TK as a conditional.
 dnl    This will always be true.
 STAR_PATH_TCLTK(8.5,[tk])
@@ -128,7 +129,7 @@ AC_ARG_WITH([motif],
   fi])
 
 if test "$have_motif" = "yes"; then
-   AC_CHECK_HEADER([Xm/XmP.h], have_xmheader=yes ) 
+   AC_CHECK_HEADER([Xm/XmP.h], have_xmheader=yes )
    AC_CHECK_LIB(Xm, XmScrolledWindowSetAreas, have_xmlib=yes )
 else
    have_xmheader="no"
