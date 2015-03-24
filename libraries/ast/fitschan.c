@@ -1117,6 +1117,13 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        converted to any other data type. For instance, this causes
 *        a warning to be issued if an equals sign is misplaced in a
 *        WCS-related card (causing it to be treated as a comment card).
+*     24-MAR-2015 (DSB):
+*        Modify SpecTrans to avoid modifying the CRPIC value for CAR
+*        projections when they do not need to be modified. The princiuple
+*        is that the bulk of the array should be witin the native longitude
+*        range [-180,+180]. Prompted by bug report from Bill Joye "yet
+*        another CAR issue" on 24-MAR-2015 (file CHIPASS_Equ.head in
+*        ast_tester).
 *class--
 */
 
@@ -28675,7 +28682,6 @@ static AstMapping *SpectralAxes( AstFitsChan *this, AstFrameSet *fs,
 
 static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                                const char *method, const char *class, int *status ){
-
 /*
 *  Name:
 *     SpecTrans
@@ -28852,6 +28858,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    int axlat;                     /* Index of latitude axis */
    int axlon;                     /* Index of longitude axis */
    int diag;                      /* Sign of diagonal CDi_j element */
+   int dim;                       /* Length of pixel axis */
    int gotpcij;                   /* Does FitsChan contain any PCi_j keywords? */
    int i,j;                       /* Indices */
    int iaxis;                     /* Axis index */
@@ -29785,21 +29792,30 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 
 /* MSX CAR projections.
    ------------------- */
-      if( !Ustrcmp( prj, "-CAR", status ) ) {
+      if( !Ustrcmp( prj, "-CAR", status ) && !astGetCarLin( this ) ) {
 
-/* If the projection is a CAR projection, check that the CRPIX value for
-   the longitude axis corresponds to a projection plane point which has
-   valid native longitude. The CAR projection has valid projection plane
-   points only for native longitudes in the range [-180,+180, so we
-   modify the CRPIX value if necessary by the number of pixels corresponding
-   to 360 degres of longitude in order to bring the refernce pixel into
-   the valid domain of the projection. */
+/* The CAR projection has valid projection plane points only for native
+   longitudes in the range [-180,+180]. The reference pixel (CRPIX) is at
+   native longitude zero.  We need to check that the reference point is not
+   so far outside the image that the entire image lies outside the range
+   [-180,+180]. If it is, we modify the CRPIX value by the number of
+   pixels corresponding to 360 degres of longitude in order to bring the
+   array into the valid domain ([-180,+180]) of the projection. */
          if( GetValue2( ret, this, FormatKey( "CDELT", axlon + 1, -1, s, status ),
                         AST__FLOAT, (void *) &cdelti, 1, method, class, status ) &&
              GetValue2( ret, this, FormatKey( "CRPIX", axlon + 1, -1, s, status ),
                         AST__FLOAT, (void *) &dval, 0, method, class, status ) ) {
+
+/* We check if the mid point of the array is in the valiud longitude range. Use the
+   bottom left corner as a fallback if the image size is unknown. */
+            if( !GetValue( this, FormatKey( "NAXIS", axlon + 1, -1, ' ', status ),
+                           AST__INT, &dim, 0, 0, method, class, status ) ) {
+               dim = 0;
+            }
+
             if( cdelti != 0.0 ) {
-               dval = 0.5 + AST__DR2D*palDrange( AST__DD2R*( dval - 0.5 )*cdelti )/cdelti;
+               double offset = 0.5*( dim + 1 );
+               dval = offset + AST__DR2D*palDrange( AST__DD2R*( dval - offset )*cdelti )/cdelti;
                SetValue( ret, FormatKey( "CRPIX", axlon + 1, -1, s, status ),
                          (void *) &dval, AST__FLOAT, CardComm( this, status ), status );
             }

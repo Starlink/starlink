@@ -1,0 +1,53 @@
+#!/bin/tcsh
+
+   if( ! $?STARLINK ) then
+      setenv STARLINK /star
+   endif
+
+   if( ! $?AST ) then
+      setenv AST $STARLINK
+   endif
+
+   if( ! $?LDFLAGS ) then
+      setenv LDFLAGS ""
+   endif
+
+   setenv PATH $AST/bin\:$STARLINK/bin\:$PATH
+
+   gfortran -fno-second-underscore -o plotter plotter.f -fno-range-check $LDFLAGS -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -pgp -ems` `pgplot_link`
+
+   set bn = $1
+   set n = "${bn}.head"
+
+   set atfile = "${bn}.attr"
+   if( -e $atfile ) then
+      set attr1 = `cat $atfile`
+   else
+      set attr1 = ' '
+   endif
+
+   set atfile = "${bn}.fattr"
+   if( -e $atfile ) then
+      set attr2 = `cat $atfile`
+   else
+      set attr2 = ' '
+   endif
+
+   set boxfile = "${bn}.box"
+   if( -e $boxfile ) then
+      set box = `cat $boxfile`
+   else
+      set box = ' '
+   endif
+
+
+   plotter $n "$attr1" "$attr2" a.ps $box
+
+   if( -e $STARLINK/bin/psmerge ) then
+      $STARLINK/bin/psmerge -t300x300 -r90 a.ps > b.ps
+   else
+      cp a.ps b.ps
+   endif
+
+   gv b.ps -orientation=landscape
+

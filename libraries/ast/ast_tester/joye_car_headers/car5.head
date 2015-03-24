@@ -1,0 +1,38 @@
+SIMPLE  =                    T / Written by IDL:  Thu Apr 27 08:52:27 2000
+BITPIX  =                  -32 /
+NAXIS   =                    2 /
+NAXIS1  =                  951 /
+NAXIS2  =                 1851 /
+CRPIX1  =           -4932.0204 /
+CRVAL1  =          0.000000000 /
+CTYPE1  = 'GLON-CAR'           /
+CRPIX2  =            475.39400 /
+CRVAL2  =          0.000000000 /
+CTYPE2  = 'GLAT-CAR'           /
+CROTA2  =          0.000000000 /
+LONPOLE =              0.00000 / Defined by Greisen and Calabretta
+CD1_1   =        -0.0016666667 /
+CD1_2   =              0.00000 /
+CD2_1   =              0.00000 /
+CD2_2   =         0.0016666667 /
+WAVELENG=          8.28000e-06 / Isophotal wavelength in meters
+BUNIT   = 'W/m^2-sr'           /
+SECURITY= 'Unclassified'       /
+TELESCOP= 'MSX     '           /
+INSTRUME= 'SPIRITIII'          /
+ORIGIN  = 'AFRL-VSBC'          /
+MJD-OBS =              50295.5 / Mean modified Julian date of observation
+DATE    = '16/02/2000'         / Date of file generation
+HISTORY Convert Version 6.2.X
+HISTORY Level-2A Deshadow Version 4.0
+HISTORY Level-2A Saturation Correction Version 1.0
+HISTORY Pointing Convert Version 6.0.1
+HISTORY Makeimage Version 3.2
+HISTORY Destriped
+HISTORY Data collected in J2000 FK5 coordinates
+HISTORY Data samples transformed to Galactic coordinates
+HISTORY and convolved onto image grid using sigma=3.0 arcsec
+HISTORY Gaussian kernel
+HISTORY Master Plate: GP_351.0_+0.0_A.fits
+HISTORY  Written by IDL:  28-Jan-2000 17:44:54.00
+END

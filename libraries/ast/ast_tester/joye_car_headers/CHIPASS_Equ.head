@@ -1,0 +1,39 @@
+FITS headers in CHIPASS_Equ.fits:
+SIMPLE  =                    T / file does conform to FITS standard
+BITPIX  =                  -32 / IEEE (big-endian) 32-bit floating point data
+NAXIS   =                    2 / number of data axes
+NAXIS1  =                 5401 / length of data axis 1
+NAXIS2  =                 1741 / length of data axis 2
+EXTEND  =                    T / FITS dataset may contain extensions
+COMMENT   FITS (Flexible Image Transport System) format is defined in 'Astronomy
+COMMENT   and Astrophysics', volume 376, page 359; bibcode: 2001A&A...376..359H
+BUNIT   = 'mK      '           / Using 438.5 mK/(Jy/beam) plus 3300 mK offset
+CTYPE1  = 'RA---CAR'
+CRPIX1  =                2701.
+CDELT1  =  -0.0666666666666667
+CRVAL1  =                 180.
+CTYPE2  = 'DEC--CAR'
+CRPIX2  =                1351.
+CDELT2  =   0.0666666666666667
+CRVAL2  =                   0.
+LONPOLE =                   0. / Native longitude of celestial pole
+LATPOLE =                  90. / Native latitude  of celestial pole
+RADESYS = 'FK5     '           / Equatorial coordinate system
+EQUINOX =               2000.0 / Equinox of equatorial coordinates
+BMAJ    =              0.24000 / [deg] Beam major axis
+BMIN    =              0.24000 / [deg] Beam minor axis
+BPA     =                  0.0 / [deg] Beam position angle
+FREQENCY=           1.3945E+09 / [Hz] Centre frequency
+BANDWID =              6.4E+07 / [Hz] Bandwidth
+DATE    = '2013-04-20T13:20:39' / file creation date (YYYY-MM-DDThh:mm:ss UT)
+COMMENT ------------------------------------------------------------------------
+COMMENT This file contains a 1.4 GHz continuum map of the sky south of dec +26
+COMMENT produced from HIPASS and ZOA data.  These surveys were undertaken with
+COMMENT the 13-beam multibeam system on the Parkes radio telescope.
+COMMENT Details may be found in the following paper:
+COMMENT   Calabretta, M.R., Staveley-Smith, L., and Barnes, D.G., (2013)
+COMMENT   PASA (in preparation).
+COMMENT ------------------------------------------------------------------------
+COMMENT    THIS IS A PRE-PUBLICATION IMAGE, FOR RESTRICTED DISTRIBUTION ONLY
+COMMENT ------------------------------------------------------------------------
+END
