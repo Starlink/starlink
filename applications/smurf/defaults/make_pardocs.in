@@ -229,7 +229,8 @@
 
 #  Run PROLAT on the temp file and then delete it.
    print( STDERR
-      `rm -f /tmp/prolat.tex;
+      `PATH=\$PATH:@STARLINK@/bin/sst export PATH;
+      rm -f /tmp/prolat.tex;
       @PROLAT@ in=/tmp/make_pardocs.tmp atask=f single=f page=f document=f out=/tmp/prolat.tex;
       rm -f /tmp/make_pardocs.tmp`
    );
