@@ -28,17 +28,17 @@ f-
 c+
 \stardocmanual      {Programmer's Guide\\(C Version)}
 \startitlepic{
-   \includegraphics[scale=0.3,angle=-90]{sun211_figures/fronta}\hfill
-   \includegraphics[scale=0.3,angle=-90]{sun211_figures/frontb}\hfill
-   \includegraphics[scale=0.3,angle=-90]{sun211_figures/frontc}
+   \includegraphics[width=0.25\textwidth]{sun211_figures/fronta}~~~~~\hfill
+   \includegraphics[width=0.25\textwidth]{sun211_figures/frontb}~~~~~\hfill
+   \includegraphics[width=0.25\textwidth]{sun211_figures/frontc}
 }
 c-
 f+
 \stardocmanual      {Programmer's Guide\\(Fortran Version)}
 \startitlepic{
-   \includegraphics[scale=0.3,angle=-90]{sun210_figures/fronta}\hfill
-   \includegraphics[scale=0.3,angle=-90]{sun210_figures/frontb}\hfill
-   \includegraphics[scale=0.3,angle=-90]{sun210_figures/frontc}
+   \includegraphics[width=0.25\textwidth]{sun210_figures/fronta}~~~~~\hfill
+   \includegraphics[width=0.25\textwidth]{sun210_figures/frontb}~~~~~\hfill
+   \includegraphics[width=0.25\textwidth]{sun210_figures/frontc}
 }
 f-
 \stardocabstract  {
@@ -295,10 +295,10 @@ coordinate system to another related one.
    \begin{figure}[bhtp]
    \begin{center}
 c+
-   \includegraphics[scale=0.7]{sun211_figures/mapping}
+   \includegraphics[width=0.7\textwidth]{sun211_figures/mapping}
 c-
 f+
-   \includegraphics[scale=0.7]{sun210_figures/mapping}
+   \includegraphics[width=0.7\textwidth]{sun210_figures/mapping}
 f-
    \caption{A Mapping viewed as a ``black box'' for transforming coordinates.}
    \label{fig:mapping}
@@ -404,10 +404,10 @@ CmpMap is therefore a container for another pair of Mappings.
    \begin{figure}
    \begin{center}
 c+
-   \includegraphics[scale=0.5]{sun211_figures/series}
+   \includegraphics[width=0.7\textwidth]{sun211_figures/series}
 c-
 f+
-   \includegraphics[scale=0.5]{sun210_figures/series}
+   \includegraphics[width=0.7\textwidth]{sun210_figures/series}
 f-
    \caption[A CmpMap composed of two component Mappings joined in series]{A CmpMap (compound Mapping) composed of two component
    Mappings joined in series. The output coordinates of the first Mapping
@@ -425,10 +425,10 @@ f-
    \begin{figure}
    \begin{center}
 c+
-   \includegraphics[scale=0.75]{sun211_figures/parallel}
+   \includegraphics[width=0.5\textwidth]{sun211_figures/parallel}
 c-
 f+
-   \includegraphics[scale=0.75]{sun210_figures/parallel}
+   \includegraphics[width=0.5\textwidth]{sun210_figures/parallel}
 f-
    \caption[A CmpMap composed of two Mappings joined in parallel.]{A CmpMap composed of two Mappings joined in parallel. Each
    component Mapping acts on a complementary subset of the input and
@@ -452,10 +452,10 @@ transformation of another to produce a single Mapping.}
    \begin{figure}
    \begin{center}
 c+
-   \includegraphics[scale=0.6]{sun211_figures/complex}
+   \includegraphics[width=0.65\textwidth]{sun211_figures/complex}
 c-
 f+
-   \includegraphics[scale=0.6]{sun210_figures/complex}
+   \includegraphics[width=0.65\textwidth]{sun210_figures/complex}
 f-
    \caption[CmpMaps may be nested in order to
    construct complex Mappings out of simpler building blocks.]{CmpMaps
@@ -480,10 +480,10 @@ see \secref{ss:cmpmaps}. Also see the CmpMap entry in
    \begin{figure}
    \begin{center}
 c+
-   \includegraphics[scale=0.75]{sun211_figures/frames}
+   \includegraphics[width=0.55\textwidth]{sun211_figures/frames}
 c-
 f+
-   \includegraphics[scale=0.75]{sun210_figures/frames}
+   \includegraphics[width=0.55\textwidth]{sun210_figures/frames}
 f-
    \caption[Representing coordinate systems as Frames.]{(a) A basic Frame is used to represent a Cartesian coordinate
    system, here 2-dimensional. (b) A SkyFrame represents a (spherical)
@@ -542,10 +542,10 @@ domain, and these may be selected by setting appropriate attributes.
    \begin{figure}
    \begin{center}
 c+
-   \includegraphics[scale=0.85]{sun211_figures/cmpframe}
+   \includegraphics[width=0.4\textwidth]{sun211_figures/cmpframe}
 c-
 f+
-   \includegraphics[scale=0.85]{sun210_figures/cmpframe}
+   \includegraphics[width=0.4\textwidth]{sun210_figures/cmpframe}
 f-
    \caption[A CmpFrame (compound Frame) formed by combining two simpler
    Frames.]{A CmpFrame (compound Frame) formed by combining two simpler
@@ -570,10 +570,10 @@ SpecFrame, TimeFrame and CmpFrame entries in \appref{ss:classdescriptions}.
    \begin{figure}
    \begin{center}
 c+
-   \includegraphics[scale=0.75]{sun211_figures/frameset}
+   \includegraphics[width=0.65\textwidth]{sun211_figures/frameset}
 c-
 f+
-   \includegraphics[scale=0.75]{sun210_figures/frameset}
+   \includegraphics[width=0.65\textwidth]{sun210_figures/frameset}
 f-
    \caption[A FrameSet is a network of Frames.]{A FrameSet is a network of Frames inter-connected by Mappings
    such that there is exactly one conversion path, \emph{via} Mappings,
@@ -704,10 +704,10 @@ class includes an option for axes to be plotted logarithmically.
    \begin{figure}
    \begin{center}
 c+
-   \includegraphics[scale=0.8,angle=-90]{sun211_figures/gridplot_bw}
+   \includegraphics[width=0.6\textwidth]{sun211_figures/gridplot_bw}
 c-
 f+
-   \includegraphics[scale=0.8,angle=-90]{sun210_figures/gridplot_bw}
+   \includegraphics[width=0.6\textwidth]{sun210_figures/gridplot_bw}
 f-
    \caption[A labelled coordinate grid for an all-sky zenithal equal area
    projection in ecliptic coordinates.]{A labelled coordinate grid for an all-sky zenithal equal area
@@ -2131,10 +2131,10 @@ should read \secref{ss:nativefits} and \secref{ss:foreignfits}.
    \begin{figure}
    \begin{center}
 c+
-   \includegraphics[scale=0.7]{sun211_figures/overgrid_bw}
+   \includegraphics[width=0.7\textwidth]{sun211_figures/overgrid_bw}
 c-
 f+
-   \includegraphics[scale=0.7]{sun210_figures/overgrid_bw}
+   \includegraphics[width=0.7\textwidth]{sun210_figures/overgrid_bw}
 f-
    \caption[An example of a displayed image with a coordinate grid
    plotted over it.]{An example of a displayed image with a coordinate grid
@@ -5433,10 +5433,10 @@ f-
    \begin{figure}
    \begin{center}
 c+
-   \includegraphics[scale=0.65]{sun211_figures/simpexamp}
+   \includegraphics[width=0.7\textwidth]{sun211_figures/simpexamp}
 c-
 f+
-   \includegraphics[scale=0.65]{sun210_figures/simpexamp}
+   \includegraphics[width=0.7\textwidth]{sun210_figures/simpexamp}
 f-
    \caption[An over-complex compound Mapping.]{An over-complex compound Mapping, consisting of PermMaps,
    ZoomMaps and a UnitMap, which can be simplified to become a single
@@ -10081,10 +10081,10 @@ f-
    \begin{figure}
    \begin{center}
 c+
-   \includegraphics[scale=0.6]{sun211_figures/fsexample}
+   \includegraphics[width=0.7\textwidth]{sun211_figures/fsexample}
 c-
 f+
-   \includegraphics[scale=0.6]{sun210_figures/fsexample}
+   \includegraphics[width=0.7\textwidth]{sun210_figures/fsexample}
 f-
    \caption[An example FrameSet.]{An example FrameSet, in which Frames~2 and 3 are related to
    Frame~1 by multiplying its coordinates by factors of 10 and 5
@@ -10609,10 +10609,10 @@ f-
    \begin{figure}[bhtp]
    \begin{center}
 c+
-   \includegraphics[scale=0.65]{sun211_figures/fsconvert}
+   \includegraphics[width=0.7\textwidth]{sun211_figures/fsconvert}
 c-
 f+
-   \includegraphics[scale=0.65]{sun210_figures/fsconvert}
+   \includegraphics[width=0.7\textwidth]{sun210_figures/fsconvert}
 f-
 c+
    \caption[FrameSet produced when converting between two SkyFrames.]{The FrameSet produced when astConvert is used to convert
@@ -10692,10 +10692,10 @@ f-
    \begin{figure}
    \begin{center}
 c+
-   \includegraphics[scale=0.6]{sun211_figures/fsalign}
+   \includegraphics[width=0.7\textwidth]{sun211_figures/fsalign}
 c-
 f+
-   \includegraphics[scale=0.6]{sun210_figures/fsalign}
+   \includegraphics[width=0.7\textwidth]{sun210_figures/fsalign}
 f-
    \caption[Conversion between two FrameSets is performed by establishin a link between a pair of Frames, one from each FrameSet.]{Conversion
    between two FrameSets is performed by establishing
@@ -11159,10 +11159,10 @@ current Frame.
    \begin{figure}[hbtp]
    \begin{center}
 c+
-   \includegraphics[scale=0.6]{sun211_figures/fsremap}
+   \includegraphics[width=0.7\textwidth]{sun211_figures/fsremap}
 c-
 f+
-   \includegraphics[scale=0.6]{sun210_figures/fsremap}
+   \includegraphics[width=0.7\textwidth]{sun210_figures/fsremap}
 f-
 \caption[Interposing a Mapping into a FrameSet]{The effect
 c+
@@ -11523,10 +11523,10 @@ f-
    \begin{figure}[hbtp]
    \begin{center}
 c+
-   \includegraphics[scale=0.6]{sun211_figures/fsmerge}
+   \includegraphics[width=0.7\textwidth]{sun211_figures/fsmerge}
 c-
 f+
-   \includegraphics[scale=0.6]{sun210_figures/fsmerge}
+   \includegraphics[width=0.7\textwidth]{sun210_figures/fsmerge}
 f-
    \caption[Two FrameSets in the process of being merged.]{Two FrameSets in the process of being merged using
 c+
