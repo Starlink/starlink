@@ -893,3 +893,163 @@ dsb      25407  0.0  0.0  43716  1952 pts/5    0:00 makemap
 
 \end{tip}
 
+
+\section{Tips and Tricks}
+\subsection{Aligning your map with a pre-existing image}
+If you want to compare SCUBA-2 data with a map of the same region taken
+with a different instrument, you will usually want to create the
+SCUBA-2 map using the same pixel grid as other map so that you can
+compare pixel values directly in the two maps\footnote{Creating the map on the
+required pixel grid is better than creating it on a default grid and then
+re-sampling it onto the required grid later.}. You can use the
+\aparam{REF} command-line parameter to do this. For instance, if your
+other map is in file \texttt{herschel.sdf}, you can do:
+
+\begin{terminalv}
+% makemap in=^infiles out=outmap config=^conf ref=herschel
+\end{terminalv}
+
+This will cause the output map in file \texttt{outmap.sdf} to be gridded
+on the same pixel grid as \texttt{herschel.sdf}.  This means that a given
+point on the sky will have the same \emph{pixel coordinates} in both
+maps, and so for instance you could divide one by the other to get a
+ratio map:
+
+\begin{terminalv}
+% div outmap herschel ratio_map
+\end{terminalv}
+
+This will divide \texttt{outmap.sdf} by \texttt{herschel.sdf} and put the
+ratio in \texttt{ratio\_map.sdf}\footnote{In reality you would probably
+want to take account of differing resolutions and /or units in the two
+maps before dividing them.}.
+
+However, by default \texttt{makemap} will trim the output map to
+exclude blank borders, thus allowing the two maps to have differing
+\emph{dimensions}. NDF-based applications such as \textsc{Kappa}
+\xref{\task{div}}{sun95}{DIV} automatically take account of this when
+comparing corresponding pixels in two NDFs --- see
+\cref{Figure}{fig:pixelco}{Pixel coordinates}.
+
+\begin{figure}
+\begin{center}
+  \includegraphics[width=0.8\linewidth]{sc21_pixelco}
+\end{center}
+\caption[Pixel coordinates]{\small The curved dotted line represents a
+contour of an astronomical object. The heavy black lines represent the
+X and Y axes of the pixel coordinate system, crossing at the pixel origin
+(\texttt{pixel\_x},\texttt{pixel\_y})=(0,0). The numerical values
+represent pixel X and Y values. The blue box represents the
+bounds of the reference map supplied when running makemap. The
+red box represents the bounds of the map created by makemap.
+The reference image and the output image share the same pixel
+coordinate system, so a given point on the sky has the same pixel
+coordinates in both images. However, the output image is cropped to
+remove blank borders and so has smaller dimensions than the reference
+image. All this is made possible by the fact that the NDF format, unlike
+FITS, does not require the origin of pixel coordinates to be at the
+bottom left corner of each map. NDF applications account for any
+difference in pixel origin when comparing pixels in different files.}
+ \label{fig:pixelco}
+\end{figure}
+
+If you want to force the output map to have certain bounds within pixel
+coordinates you can do so by assigning values to the \aparam{LBND} and
+\aparam{UBND} parameters when running \texttt{makemap}. For instance, if
+you want to force the output map to have the same dimensions as the
+reference map, you could use \textsc{Kappa} \xref{\task{ndftrace}}{sun95}{NDFTRACE}
+to list the properties of the reference NDF, including its pixel bounds, and
+then assign these bounds to \aparam{LBND} and \aparam{UBND} parameters when
+running \texttt{makemap}:
+
+\begin{terminalv}
+% ndftrace herschel
+
+   NDF structure /home/dberry/herschel1:
+      Title:  Example Herschel data
+
+   Shape:
+      No. of dimensions:  2
+      Dimension size(s):  351 x 400
+      Pixel bounds     :  -50:300, 1:400
+      Total pixels     :  140400
+...
+...
+% makemap in=^infiles out=outmap config=^conf ref=herschel \
+          lbnd=\[-50,1\] ubnd=\[300,400\]
+\end{terminalv}
+
+The resulting map in \texttt{outmap.sdf} will have the same pixel bounds
+as \texttt{hershel.sdf}.
+
+\subsection{Limiting the amount of memory used by \texttt{makemap}}
+There may be occasions when you need to limit the amount of memory used
+by \makemap\ --- for instance to leave enough memory for other processes
+to function correctly. For machines with more than 20 GB of memory, the
+default is to leave 4 GB free for other processes. For machines with less
+than than 20 GB of memory, the default is to leave 20\% of the total
+memory free. This default can be over-ridden by indicating the maximum
+amount of memory that \texttt{makemap} should use by setting a value for
+the command-line parameter \aparam{MAXMEM}. For instance:
+
+\begin{terminalv}
+% makemap in=^infiles out=outmap config=^conf maxmem=50000
+\end{terminalv}
+
+will ensure that \texttt{makemap} never uses more than 50000
+MiB\footnote{One MiB is 1048576 bytes.} of memory. Be aware though that
+for larger observations this may cause the data to be processed in
+multiple chunks rather than a single continuous chunk, resulting in a
+poorer map.
+
+\subsection{Re-using previously cleaned data to speed up map-making}
+
+Usually, you will create your SCUBA-2 maps using one of the standard
+configuration files distributed with \smurf\ (see
+\cref{Section}{sec:config} {Specialised configuration files}). However,
+for certain problematic observations it may sometimes be necessary to
+experiment with several different configurations to find one that
+produces an acceptable map. In such cases a significant amount of time
+can be saved by re-using pre-cleaned raw data each time you make a map,
+rather than re-cleaning it each time.
+
+By default \makemap\ assumes that the supplied data is raw data that
+requires cleaning before being used to make a map (see \cref{Section}
+{sec:algorithm}{The reduction step-by-step}. However, if you include
+``\setparam{DOCLEAN}{doclean}{0}'' in your configuration, then
+\texttt{makemap} will skip the entire cleaning process and move directly
+on to the iterative map-making stage, thus saving significant time.
+
+Obviously though, in this case you need to make sure that the data you
+supply to \texttt{makemap} has already been cleaned. There are two ways
+to do get cleaned data:
+
+\begin{enumerate}
+
+\item You can run \texttt{makemap} initially on the \emph{un}-cleaned
+data (\emph{i.e.} the original raw data), and force \texttt{makemap} to
+dump the cleaned data to disk before going onto the iterative map-making
+stage. You can then re-use this cleaned data in subsequent invocations of
+\texttt{makemap}. To dump the cleaned data, you need to add
+``\setparam{EXPORTCLEAN}{exportclean}{1}'' to the configuration on your
+initial run of \texttt{makemap} --- don't forget to remove it for
+subsequent runs! The cleaned data are put into files in the current
+directory, one for each sub-array, with names such as
+\texttt{s8c20120706\_00037\_0003\_con\_res\_cln.sdf}. Note the \texttt{\_cln} on
+the end of the name indicates cleaned data. The base name,
+``\texttt{s8c20120706\_00037\_0003}'' in this case, is taken from the first
+raw data file that contributes to each chunk. If the entire observation
+is processed in one chunk (as it should usually be) then there will be
+one such \texttt{\_cln} file for each sub-array. If the observation is
+split into multiple chunks, then there will be multiple  \texttt{\_cln} files
+for each sub-array (one for each chunk).
+
+\item You can use the separate \smurf\ task \clean\ to clean the data
+as described in \cref{Appendix}{app:clean}{Cleaning the raw data}.
+
+\end{enumerate}
+
+
+
+
+
