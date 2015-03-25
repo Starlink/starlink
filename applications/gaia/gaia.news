@@ -1,10 +1,47 @@
   Development Version
   ===================
     
+  Star-2015A Release
+  ==================
+
     Version 4.4-6
     =============
 
+    It is now possible to do limited catalogue queries using the Table
+    Access Protocol (TAP) and then plot the results. A new toolbox in 
+    the VO support section of the "Data-Servers" menu is provided for this.
+
+    RegTap can now be used when query for VO resources, such as catalogues
+    and images. This uses TAP to form the query offering greater flexibility
+    and ease.
+
+    Various usability issues in the VO support toolboxes have been fixed.
+    These should now be more robust against failure.
+
+    Support for the VOTable 1.3 standard has been added.
+        
+    A bug that caused GAIA to exit uncontrollably when interrupting
+    a stalled skycat-style catalogue download has been fixed.
+
+    The GAIA 3D visualisation toolbox has been updated to work with
+    VTK 6.1.
+
+    The object detection toolbox has been updated to work with the
+    latest version of EXTRACTOR (2.19-5).
+
+    A problem capturing images under OS X and XQuartz 2.7.7 has been
+    worked around.
+
+    A problem when using a FITS mask with a displayed NDF has been fixed.
+    Previously this would always generate NaN values instead of BAD ones.
+
+    Masking now does the documented action of not masking areas with
+    non zero values when no value is supplied.
+
     Compound images now respect the blank pixel colour selection.
+
+    A bug in the handling of special characters in file names when
+    interoperating with other VO enabled applications has been fixed.
 
   Star-2014A Release
   ==================

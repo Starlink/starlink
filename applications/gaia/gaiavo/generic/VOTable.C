@@ -231,11 +231,11 @@ namespace gaia {
 
     /**
      *  Create an instance for modification. Only supports the namespace
-     *  qualified version.
+     *  qualified version. Default is version 1.2.
      */
     void VOTable::create()
     {
-        using namespace votable_11;
+        using namespace votable_12;
 
         //  Release any currently open tables.
         if ( votable1_ ) {
@@ -256,7 +256,7 @@ namespace gaia {
         }
 
         //  Create new instance.
-        votable2_ = new VOTABLE();
+        votable3_ = new VOTABLE();
     }
 
     /**
@@ -549,13 +549,13 @@ namespace gaia {
      */
     int VOTable::readTST( AstroCatalog *cat )
     {
-        using namespace votable_11;
+        using namespace votable_12;
 
-        //  Create an empty votable_1.1::VOTABLE.
+        //  Create an empty votable_1.2::VOTABLE.
         create();
 
         //  Populate this from cat.
-        votable_read( cat, *votable2_ );
+        votable_read( cat, *votable3_ );
 
         return 1;
     }

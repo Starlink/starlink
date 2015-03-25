@@ -9,15 +9,16 @@
     <h2 align=center><font color=red>Virtual Observatory Resources</font></h2>
     <p>
       Currently access to VO resources cover catalogues using so called cone
-      search (CS) and images using simple image access protocol
-      (SIAP). Toolboxes for accessing these are found in the "Data-Servers"
-      menu.
+      search (CS), Table Access Protocol (TAP) and images using simple image
+      access protocol (SIAP). Toolboxes for accessing these are found in the
+      "Data-Servers" menu.
     </p>
     <p>
-      The two toolboxes offer differing approaches to accessing resources, but
-      fundamentally work the same way: locate what services are available by
-      querying a registry and then querying individual services for a
-      catalogue or image that covers a given region of sky.
+      The various toolboxes offer differing approaches to accessing resources,
+      but fundamentally work the same way: locate what services are available
+      by querying a VO registry and going on to query individual services for
+      catalogue results or images. For the cone and image services these will
+      cover a given region of sky, usually the displayed image.
     </p>
     <p>
       VO resources are registered in a registry, so typically you find what
@@ -27,20 +28,34 @@
       additional constraints.
     </p>
     <p>
+      How you query registries has developed over time, so currently two types
+      of registry query are provided. The old style R1.0 is no longer the 
+      default as it is less flexible than the newer "RegTap" based ones 
+      (the flexibility comes from being able to query the registry in the 
+      same way that you query a TAP service, using ADQL, although the details
+      of that are hidden for convenience).
+    </p>
+    <p>
       In the case of images, for which there are fewer servers and generally
       you'll only want a single image at a time, this step needs to be
       accessed using "View image servers..." dialog in the toolbox.
     </p>
     <p>
-      For catalogues, of which they are many, restricting the list of services
-      is a more immediate need, so this forms the first part of the dialog.
+      For cone search catalogues, of which they are many, restricting the list
+      of services is a more immediate need, so this forms the first part of
+      the dialog.
     </p>
+    <p>
+      TAP services allow you to query many of the same catalogues as through
+      the cone search, but using the full power of ADQL, the Astronomical
+      Data Query Language, a subset of SQL with Astronomy specific support.
     <p>
       See the individual toolbox help pages for more.
     </p>
     <ul>
       <li><a href="cone.html">Catalogue cone search</a></li>
       <li><a href="siap.html">Simple image access search</a></li>
+      <li><a href="tap.html">Table Access Protocol search</a></li>
     </ul>
 
   </body>

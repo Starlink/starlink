@@ -3,12 +3,12 @@
  *     VOTableReadFunctions
 
  *  Purpose:
- *     Member unctions for reading a Skycat catalog and converting
+ *     Member functions for reading a Skycat catalog and converting
  *     it into a VOTable.
 
  *  Description:
  *     Member functions for reading an AstroCat catalog and populating a
- *     votable_11::VOTABLE element with a RESOURCE and TABLE element that
+ *     votable_12::VOTABLE element with a RESOURCE and TABLE element that
  *     describes the content (along with the required PARAM, FIELD and COOSYS
  *     elements). The DATA element is populated using a TABLEDATA, no BINARY
  *     or FITS streams are supported. Part of the VOTable class.
@@ -75,9 +75,9 @@ namespace gaia {
      *  into a DOM rooted at the given VOTABLE.
      */
     int VOTable::votable_read( AstroCatalog *cat,
-                               votable_11::VOTABLE &votable )
+                               votable_12::VOTABLE &votable )
     {
-        using namespace votable_11;
+        using namespace votable_12;
 
         //  RESOURCE to hold everything.
         RESOURCE resource;
@@ -116,10 +116,10 @@ namespace gaia {
     /**
      *  Add a COOSYS element to a RESOURCE.
      */
-    void VOTable::resource_coosys( votable_11::RESOURCE &resource,
+    void VOTable::resource_coosys( votable_12::RESOURCE &resource,
                                    AstroCatalog *cat )
     {
-        using namespace votable_11;
+        using namespace votable_12;
 
         //    VOTABLE System values:
         //           - ICRS
@@ -198,9 +198,9 @@ namespace gaia {
     /**
      *  Add known PARAMs to a TABLE.
      */
-    void VOTable::table_params( votable_11::TABLE &table, AstroCatalog *cat )
+    void VOTable::table_params( votable_12::TABLE &table, AstroCatalog *cat )
     {
-        using namespace votable_11;
+        using namespace votable_12;
 
         CatalogInfoEntry *e = cat->entry();
 
@@ -300,9 +300,9 @@ namespace gaia {
     /**
      *  Add the FIELD and DATA.
      */
-    void VOTable::table_data( votable_11::TABLE &table, AstroCatalog *cat )
+    void VOTable::table_data( votable_12::TABLE &table, AstroCatalog *cat )
     {
-        using namespace votable_11;
+        using namespace votable_12;
 
         CatalogInfoEntry *e = cat->entry();
 
@@ -314,14 +314,16 @@ namespace gaia {
         const int x_col = e->x_col();
         const int y_col = e->y_col();
 
-        //  UCDs, UNITSs, UTYPEs and DATATYPEs, if present parse these into
-        //  one per field.
+        //  UCDs, UNITSs, UTYPEs, XTYPEs and DATATYPEs, if present parse these
+        //  into one per field.
         vector<string> ucd;
         split_tabbed( e->ucd(), ucd );
         vector<string> unit;
         split_tabbed( e->unit(), unit );
         vector<string> utype;
         split_tabbed( e->utype(), utype );
+        vector<string> xtype;
+        split_tabbed( e->xtype(), xtype );
         vector<string> datatype;
         split_tabbed( e->datatype(), datatype );
 
@@ -343,7 +345,7 @@ namespace gaia {
             field.name( cat->colName( i ) );
             field.datatype( "char" );
 
-            //  UCD, unit and utype.
+            //  UCD, unit, utype and xtype.
             ucd_set = false;
             if ( (int) ucd.size() > i && ucd[i] != "---" ) {
                 field.ucd( ucd[i] );
@@ -354,6 +356,9 @@ namespace gaia {
             }
             if ( (int) utype.size() > i && utype[i] != "---") {
                 field.utype( utype[i] );
+            }
+            if ( (int) xtype.size() > i && xtype[i] != "---") {
+                field.xtype( xtype[i] );
             }
 
             //  Ref to COOSYS, and make sure UCDs to those columns are defined.

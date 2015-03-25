@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Query VO Registry for TAP services</title>
+  </head>
+
+  <body>
+    <h1>Query VO Registry for TAP services</h1>
+
+    <p>
+      Using this window you can find any TAP (Table Access Protocol) services
+      that have been registered in the VO.
+    </p>
+    <p>
+      You can use the old style R1.0 registries (from Astrogrid or the NVO) or
+      the newer RegTap based ones (from GAVO at the time of writing). RegTap
+      allows more flexible queries of the resources held by a registry, so is
+      the default. In fact RegTap uses TAP itself, so is a more natural fit
+      for queries.
+    </p>
+
+    <p>
+      To select a subset of services, add some qualifying substring to select
+      amongst the various titles and press <tt>Query</tt>, you can then make
+      TAP queries against the tables held by that service using by opening a
+      query window by either selecting a row and pressing <tt>Open</tt> or
+      by double clicking on a row.
+    </p>
+
+    <p>
+      Currently RegTap queries do not make use of the <tt>Column:</tt>
+      attribute, so changing that will not have any effect. The registries
+      column searched for the substring are: <tt>short_name</tt>,
+      <tt>res_title</tt>, <tt>res_subjects</tt>, <tt>ivoid</tt> and
+      <tt>res_description</tt>.
+    </p>
+
+    <p>
+      Once you have selected a suitable service. either double click on its
+      name or select it and press <tt>Open</tt> that will open a further
+      window in which you will enter the TAP query, but before you do that you
+      may want to read the query window <a href="tapquery.html">help</a>.
+    </p>
+
+  </body>
+</html>

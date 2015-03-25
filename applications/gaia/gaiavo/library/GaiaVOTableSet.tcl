@@ -143,7 +143,7 @@ itcl::class gaiavo::GaiaVOTableSet {
             -hscroll 1 \
             -selectmode $selectmode_ \
             -exportselection $exportselection_ \
-            -headings {column description datatype units ucd utype} \
+            -headings {column description datatype units ucd utype xtype} \
             -height 15 \
             -width 80
       }
@@ -369,8 +369,9 @@ itcl::class gaiavo::GaiaVOTableSet {
             set units [get_node_text_ $column "unit"]
             set ucd [get_node_text_ $column "ucd"]
             set utype [get_node_text_ $column "utype"]
+            set xtype [get_node_text_ $column "xtype"]
 
-            lappend info [list $name $desc $datatype $units $ucd $utype]
+            lappend info [list $name $desc $datatype $units $ucd $utype $xtype]
          }
       }
       set_contents 0 $info

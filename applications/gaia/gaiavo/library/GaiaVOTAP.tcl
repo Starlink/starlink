@@ -10,8 +10,10 @@
 
 #  Description:
 #     Extends the GaiaVOCat class to query a given TAP service.
-#     XXX what kind of results are we expecting, simple catalogue?
-#     Links to images/cubes etc?
+#     Will plot any RA/Dec coordinates as positions over the displayed
+#     image, and attempt to download and display any images that are
+#     present in a selected row.
+#     XXX need to support STC-S region display.
 
 #  Invocations:
 #
@@ -110,8 +112,22 @@ itcl::class gaiavo::GaiaVOTAP {
       pack $itk_component(plot) -side left -before $itk_component(open) -expand 1 -pady 2m
       add_short_help $itk_component(plot) {Plot positions over image}
 
-      #  Loose the "Open" button.
-      pack forget $itk_component(open)
+      #  The "Open" button is now generic and means download an image (or
+      #  cube), if this is present as part of the reponse.
+      $itk_component(open) configure -text "Display"
+      add_short_help $itk_component(open) \
+         {Download and handle any displayables}
+
+      #  Display into new window.
+      itk_component add displaynew {
+         button $itk_component(buttons).displaynew \
+            -text "Display in new" \
+            -command [code $this display_in_new]
+      }
+      pack $itk_component(displaynew) -before $itk_component(close) \
+         -side left -expand 1 -pady 2m
+      add_short_help $itk_component(displaynew) \
+         {Download and handle any displayables in new window}
 
       #  Set names for the canvas tags used for all symbols. This defined
       #  in the imgplot command.
@@ -160,10 +176,55 @@ itcl::class gaiavo::GaiaVOTAP {
       }
    }
 
+   #  Display the selected row in a new window.
+   public method display_in_new {} {
+      set new_window_ 1
+      foreach row [$itk_component(results) get_selected] {
+         open_service_ $row
+      }
+      set new_window_ 0
+   }
+
    #  Open a service, "args" is a list of values from a row of the current
-   #  table.
+   #  table. Assumes that this means, display an image... XXX Could probably
+   #  check for other "displayables", tables and cubes as well..
    protected method open_service_ {args} {
-      #  Do nothing.
+      #  Need to locate a field to get the URL for downloading any images...
+      set ucds [$w_.cat ucd]
+      set n 0
+      foreach ucd $ucds {
+         if { [string match -nocase "*accessref*" $ucd] } {
+            break
+         }
+         incr n
+      }
+      set accessref [eval lindex $args $n]
+
+      if { $itk_option(-gaia) != {} } {
+         if { $urlget_ == {} } {
+            set urlget_ [gaia::GaiaUrlGet .\#auto \
+                            -notify_cmd \
+                            [code $this display_image_ $new_window_]]
+            blt::busy hold $w_
+            $urlget_ get $accessref
+         }
+      }
+   }
+
+   #  Display an image, if it exists.
+   protected method display_image_ {new_window filename type} {
+      blt::busy release $w_
+      if { [::file exists $filename] } {
+         if { $new_window } {
+            $itk_option(-gaia) newimage_clone $filename
+         } else {
+            $itk_option(-gaia) open $filename
+         }
+      }
+      if { $urlget_ != {} } {
+         catch {delete object $urlget_}
+      }
+      set urlget_ {}
    }
 
    #  Plot the RA and Dec positions on the image using the defined symbols.
@@ -194,6 +255,18 @@ itcl::class gaiavo::GaiaVOTAP {
 
       #  Create the AST FrameSet.
       set astref [gaiautils::astskyframeset $att]
+
+      #  See if we have an STC region column, if so make that available.
+      set xtypes [$w_.cat xtype]
+      set n 0
+      foreach xtype $xtypes {
+         if { [string match -nocase "adql:region" $xtype] } {
+            #  STC column.
+            $w_.cat entry update [list "stc_col $n"] $last_result_
+            break
+         }
+         incr n
+      }
 
       #  Do the plot.
       if {[catch {$w_.cat imgplot $rtdimage_ $info_ $astref $headings_} msg]} {
@@ -235,7 +308,7 @@ itcl::class gaiavo::GaiaVOTAP {
             "Please make a query first so that the column names are known" $w_
          return
       }
-      utilReUseWidget cat::SymbolConfig $w_.symconf \
+      utilReUseWidget gaia::GaiaSymbolConfig $w_.symconf \
          -catalog $itk_option(-catalog) \
          -astrocat [code $w_.cat] \
          -columns $columns \
@@ -411,11 +484,17 @@ itcl::class gaiavo::GaiaVOTAP {
    protected variable colour_ {}
    protected variable size_ {}
 
+   #  Handler for downloading images.
+   protected variable urlget_ {}
+
+   #  Whether to display into new window.
+   protected variable new_window_ 0
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
    protected common symbol_types_ \
-      {circle square cross triangle diamond}
+      {circle square cross triangle diamond stcshape}
 
    protected common colours_ {white grey90 grey80 grey70 grey60 grey50
       grey40 grey30 grey20 grey10 black red green blue cyan magenta yellow}
