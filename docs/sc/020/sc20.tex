@@ -3127,14 +3127,22 @@ files are expected but do not appear in your working directory.
 
 \section{Converting a FITS file to NDF}
 
-A FITS file can be converted to NDF using the \starlink\
-package \convert. Note that the \file{.sdf} file extension NDF may
-be omitted to save typing.
+A FITS file can be converted to NDF using the \starlink\ package
+\convert.  The \texttt{convert} instruction sets up the definitions
+for this package and only needs to be entered once,
 
 \begin{terminalv}
 % convert
+\end{terminalv}
+
+the relevant one here being \texttt{fits2ndf}.
+
+\begin{terminalv}
 % fits2ndf file.fits file.sdf
 \end{terminalv}
+
+Note that the \file{.sdf} file extension NDF may be omitted to save
+typing.
 
 Unless your FITS file is from a recognised source, \fitstondf\ puts the
 various FITS extensions into NDF extensions called FITS\_EXT\_$<n>$,
@@ -3167,6 +3175,23 @@ The \convert\ package can also be used to convert an NDF file to FITS format.
 % ndf2fits file file.fits
 \end{terminalv}
 
+There are options to control whether or not to export all of the NDF
+extensions ({\texttt PROEXTS}) and history records \texttt{PROHIS}),
+and whether or not to merge the contents of the FITS airlock
+\texttt{PROFITS}.
+
+For historical reasons the specific set of headers encoding the world
+co-ordinate system varies from package to package.  There is a parameter
+to select the appropriate encoding for the destination of the FITS file.
+A common one in the submillimetre world is the CLASS package used
+for spectroscopic reductions.
+
+\begin{terminalv}
+% ndf2fits ga20091011_37_1_reduced \* encoding=fits-class
+\end{terminalv}
+
+This will create a \texttt{ga20091011\_37\_1\_reduced.fit} file with the
+CLASS-style of WCS headers.
 
 \newpage
 \chapter{\xlabel{script}Scripting your reduction}
