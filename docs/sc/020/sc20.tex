@@ -3150,7 +3150,7 @@ Note that the \file{.sdf} file extension NDF may be omitted to save
 typing.
 
 Unless your FITS file is from a recognised source, \fitstondf\ puts the
-various FITS extensions into NDF extensions called FITS\_EXT\_$<n>$,
+various FITS extensions into NDF extensions called FITS\_EXT\_$<\!n\!>$,
 where $n$ counts from one for the first FITS extension. These are
 located in the top-level MORE component of the NDF. If one of these is
 the array you want---it should be an NDF too---it will be easier to
@@ -3181,22 +3181,22 @@ The \convert\ package can also be used to convert an NDF file to FITS format.
 \end{terminalv}
 
 There are options to control whether or not to export all of the NDF
-extensions ({\texttt PROEXTS}) and history records \texttt{PROHIS}),
+extensions (\param{PROEXTS}) and history records (\param{PROHIS}),
 and whether or not to merge the contents of the FITS airlock
-\texttt{PROFITS}.
+(\param{PROFITS}).
 
 For historical reasons the specific set of headers encoding the world
 co-ordinate system varies from package to package.  There is a parameter
 to select the appropriate encoding for the destination of the FITS file.
-A common one in the submillimetre world is the CLASS package used
+A common one in the submillimetre world is the \textsc{Class} package used
 for spectroscopic reductions.
 
 \begin{terminalv}
 % ndf2fits ga20091011_37_1_reduced \* encoding=fits-class
 \end{terminalv}
 
-This will create a \texttt{ga20091011\_37\_1\_reduced.fit} file with the
-CLASS-style of WCS headers.
+This will create a \file{ga20091011\_37\_1\_reduced.fit} file with the
+\textsc{Class}-style of WCS headers.
 
 \newpage
 \chapter{\xlabel{script}Scripting your reduction}
