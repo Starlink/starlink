@@ -96,6 +96,7 @@
 \textbf{SDF}& Starlink Data File\\
 \textbf{S/N}& Signal-to-Noise ratio\\
 \textbf{USB}& Upper sideband\\
+\textbf{WCS}& World Co-ordinate System\\
 \textbf{WVM}& Water Vapour radioMeter\\
 \end{tabular}
 \end{table}
@@ -366,10 +367,14 @@ use the \fitsval\ command instead, e.g.
 \item[\textbf{ndftrace}]
 \task{ndftrace} displays the attributes of the NDF data structure.
 This will tell you, for example, the units of the data, pixel bounds,
-dimensions, world co-ordinates, and axis assignations.
+dimensions, world co-ordinates (WCS), and axis assignations.
 \begin{terminalv}
 % ndftrace map fullframe fullwcs
 \end{terminalv}
+
+An NDF can contain more than one set of world co-ordinates. The
+\param{fullwcs} parameter requests that all sets be listed rather
+than the currently chosen one.
 
 \item[\textbf{hdstrace}]
 \task{hdstrace} lists the name, data type and values of an HDS
