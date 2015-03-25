@@ -234,8 +234,10 @@ While you have the option of running the pipeline yourself, you can
 find pipeline reduced files for individual and coadded observations by
 night in the \htmladdnormallink{JCMT Science
 Archive}{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/} (JSA).
+
 These have been reduced using the \oracdr\ pipeline with the recipe
-specified in the MSB. PIs and co-Is can access this data through the
+specified in the MSB.  Principal investigators (PIs) and
+co-investigators (co-Is) can access these data through the
 JSA before it becomes public by following the instructions in
 \cref{Section}{sec:fromcadc}{Getting your data from CADC}.
 
@@ -561,7 +563,7 @@ source and the reference position).
 observations where half the time is spend off source at the reference
 position. It may be omitted for frequency switched observations.
 
-\item $T_{\textnormal{sys}}$ is the system temperature in kelvins and
+\item $T_{\textnormal{sys}}$ is the system temperature in kelvin and
 describes the total noise of the system. It includes contributions
 from the background sky temperature, the Earth's atmosphere, ground
 spillover picked up by the side lobes and the noise from the receiver
@@ -571,7 +573,7 @@ looking at hot and cold loads, where the cold load is black-body
 source.
 
 \item $T^*_{\textnormal{A}}(rms)$ is the rms value of the noise observed
-in the spectrum in kelvins.
+in the spectrum in kelvin.
 \end{itemize}
 
 
@@ -776,7 +778,7 @@ Plane. The main disadvantage is that it takes a longer time resulting
 in less-accurate sky subtraction or non-flat baselines.
 
 \item[\textbf{Beam-switch}]
-In beam-switch (BSW) mode, the secondary-mirror chops onto the reference
+In beam-switch (BSW) mode, the secondary mirror chops onto the reference
 position. This results in fast and accurate sky subtraction but it is
 limited to targets which have a blank reference position within
 180\arcsec (the maximum chop distance of the SMU).
@@ -1465,7 +1467,7 @@ the advanced method outlined above.
 \label{sec:mult}
 
 Your cube will come out of \makecube\, and the pipeline, in units of
-$T_{\textnormal{A}}^*$. To convert this to main beam brightness temperature, $T_{\textnormal{MB}}$
+$T_{\textnormal{A}}^*$. To convert this to main-beam brightness temperature, $T_{\textnormal{MB}}$
 divide your cube by the main-beam efficiency, $\eta_{\textnormal{MB}}$. Alternatively,
 to convert to receiver temperature, $T_{rec}$, divide by the forward
 scattering and spillover efficiency, $\eta_{\textnormal{\,fss}}$.  See
@@ -1927,7 +1929,7 @@ which is 0.04 in the example below.
 \end{terminalv}
 
 You can then apply the offset to the second subsystem with \cadd.
-This the the first subsystem can then be merged using \wcsmosaic.
+Then the first subsystem can then be merged using \wcsmosaic.
 \begin{terminalv}
 % wcsmosaic in='"rawfile_01,offsetfile_02"' out=rawfile12 lbnd=! method=nearest accept
 \end{terminalv}
@@ -2878,7 +2880,7 @@ single reduced cube.
                     rsp PNG \\
 \file{iwc}        & Intensity weighted co-ordinate image \\
 \file{noise}      & Noise map \\
-\file{reduced00n} & Final trimmed, baselined cube of the $n^{\textnormal{th}}$ tile.
+\file{reduced00$n$} & Final trimmed, baselined cube of the $n^{\textnormal{th}}$ tile.
                     There may be a few of these as large maps will be split into
                     tiles of 512\,MB. \\
 \file{rmslo}      & Low-frequency noise \\
@@ -2893,7 +2895,7 @@ single reduced cube.
 \file{blmask001}  & Baseline mask cube. Regions of emission have been
                     masked out. \\
 \file{bl001}      & Baselined cube \\
-\file{linteg00n}  & Integrated intensity image formed around the
+\file{linteg00$n$} & Integrated intensity image formed around the
                     $n^{\textnormal{th}}$ line. \\
 \hline
 \end{tabular}
@@ -2929,6 +2931,7 @@ unless something has gone wrong.
 
 
 \section{\xlabel{cadc}Getting your data from CADC}
+\label{sec:fromcadc}
 
 The JCMT Science Archive is hosted by The Canadian Astronomy Data
 Centre (CADC). Both raw data and data processed by the science pipeline
@@ -3774,10 +3777,10 @@ RMSTSYSTOL     & The rms that is measured for each receptor should agree with th
                  and integration time to within RMSTOL. \\
 RMSMEANTSYSTOL & Data with an RMS $>$ RMSMEANTSYSTOL\% of the mean RMS will get
                  masked out. \\
-CALPEAKTOL     & Observations of the spectral line calibrators shall agree with
+CALPEAKTOL     & Observations of the spectral-line calibrators shall agree with
                  their expected values for line peak intensity to within
                  $\pm$CALPEAKTOL.\\
-CALINTTOL      & Observations of the spectral line calibrators shall agree with
+CALINTTOL      & Observations of the spectral-line calibrators shall agree with
                  their expected values for integrated intensities to within
                  $\pm$CALINTTOL. \\
 RESTOL         & Remaining residuals after subtraction of the baseline shall be
