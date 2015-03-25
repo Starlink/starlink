@@ -204,7 +204,7 @@ explanation of each model is given in \cref{Section}{sec:models}{The individual 
 \raggedbottom
 
 \begin{sltextbox}{Data Chunking}
-  \label{box:chunk}
+  \caption{\label{box:chunk}}
   Chunking occurs when there is insufficient computer memory available
   for the map-maker to process all the time-series data together, or when
   there is a gap in the data (e.g.  from a missing sub-scan). In these
@@ -582,7 +582,7 @@ applied by the map-maker.
 \hline
 \multicolumn{2}{|l|}{\file{dimmconfig\_blank\_field.lis}}\\
 \hline
-\setparam{NUMITER}{numiter}{4}&\setparam{FLT_EDGE_LARGESCALE}{flt\_edge\_largescale}{200}\\
+\setparam{NUMITER}{numiter}{4}&\setparam{FILT_EDGE_LARGESCALE}{flt\_edge\_largescale}{200}\\
 \setparam{SPIKETHRESH}{spikethresh}{10}&\setparam{MODELORDER}{modelorder}{(com,ext,ast,noi)}\\
 \setparam{COM.PERARRAY}{com.perarray}{1}&\\
 \hline
@@ -628,7 +628,7 @@ bolometer baseline is also relaxes (parameter \xparam{DCTHRESH}{dcthresh}).
 \hline
 \multicolumn{2}{|l|}{\file{dimmconfig\_bright\_compact.lis}}\\
 \hline
-\setparam{NUMITER}{numiter}{-40}&\setparam{FLT.FILE_EDGE_LARGESCALE}{flt.filt\_edge\_largescale}{200}\\
+\setparam{NUMITER}{numiter}{-40}&\setparam{FLT.FILT_EDGE_LARGESCALE}{flt.filt\_edge\_largescale}{200}\\
 \setparam{COM.PERARRAY}{com.perarray}{1}&\setparam{FLT.ZERO_CIRCLE}{flt.zero\_circle}{(0.016666)}\\
 \setparam{AST.ZERO_CIRCLE}{ast.zero\_circle}{(0.0166666666)}&\\
 \setparam{NOISECLIPHIGH}{noisecliphigh}{10.0} & \setparam{DCTHRESH}{dcthresh}{100}\\
@@ -678,7 +678,7 @@ difference is the improvement in the bowling around strong sources.
 \hline
 \multicolumn{2}{|l|}{\file{dimmconfig\_bright\_extended.lis}}\\
 \hline
-\setparam{NUMITER}{numiter}{-40}&\setparam{FLT.FILT_EDGE_LARGESCAPE}{flt.filt\_edge\_largescale}{480}\\
+\setparam{NUMITER}{numiter}{-40}&\setparam{FLT.FILT_EDGE_LARGESCALE}{flt.filt\_edge\_largescale}{480}\\
 \setparam{AST.ZERO_SNR}{ast.zero\_snr}{3}&\setparam{AST.ZERO_SNRLO}{ast.zero\_snrlo}{2}\\
 \setparam{AST.SKIP}{ast.skip}{5}&\setparam{FLT.ZERO_SNR}{flt.zero\_snr}{5}\\
 \setparam{FLT.ZERO_SNRLO}{flt.zero\_snrlo}{3}& \\

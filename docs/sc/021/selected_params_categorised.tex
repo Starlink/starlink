@@ -94,7 +94,8 @@ default~:~<undef> \\
 \end{center}
 
 
-\section{Pre-processing}
+\section{Pre-processing }
+\label{cat:preproc}
 \begin{center}
 {\renewcommand{\arraystretch}{1.2}
 \begin{longtable}{| p{4.5cm} | p{6cm} | p{6.5cm} | }
@@ -129,7 +130,7 @@ default~:~1 \\
 
 \hline
 \xparam{BADFRAC}{badfrac} &
- &
+Ensures that bad data from DA system are ignored &
 default~:~0.05 \\
 
 \hline
@@ -439,6 +440,11 @@ default~:~1 \\
 \hline
 \xparam{FLT.ZERO_FREEZE}{flt.zero\_freeze} &
 Prevent the FLT mask from changing after a given number of iterations. This can help convergence. &
+default~:~0 \\
+
+\hline
+\xparam{FLT.NOTFIRST}{flt.notfirst} &
+May improve convergence by avoiding the filtering of strong sources on the first iteration. &
 default~:~0 \\
 \hline
 \end{longtable}

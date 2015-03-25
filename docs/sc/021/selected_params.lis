@@ -19,7 +19,7 @@ SHORTMAP
 
 DIAG.OUT
 
-<CAT Pre-processing>
+<CAT Pre-processing label=cat:preproc>
 
 DOWNSAMPSCALE
 
@@ -99,6 +99,8 @@ FLT.ZERO_SNRLO
 FLT.ZERO_NITER
 FLT.ZERO_UNION
 FLT.ZERO_FREEZE
+
+FLT.NOTFIRST
 
 <CAT Iterative: EXT model>
 

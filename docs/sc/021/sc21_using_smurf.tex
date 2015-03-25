@@ -44,11 +44,11 @@ parameter called \texttt{CONFIG}.}:
 \cref{Section}{sec:rawdata}{The raw data} and \cref{Section}{sec:ndf}
 {Data formats}). There are many ways in which the list of files can be supplied,
 as described in Section ``\xref{Specifying Groups of Objects}{sun95}{se_groups}''
-in ``\xref{SUN/95}{sun95}{}. The easiest is to create a simple text
+in \xref{SUN/95}{sun95}{}. The easiest is to create a simple text
 file containing the names of the raw data files -- one per line --- and
 then supply the name of the text file, preceded by an up-caret character
 (\,\texttt{\^{}}\,), as the value for parameter \texttt{IN}. Note, the names of
-the raw data files can contain wild-cards such as ``$*$'' and ``\%''.
+the raw data files can contain wild-cards such as ``$*$'' and ``?''.
 
 \item \texttt{OUT} - the name of the NDF in which to store the final
 map. The supplied file name should either have a file type of
@@ -58,7 +58,7 @@ name will be over-written.
 
 \item \texttt{CONFIG} - a string that specifies new values for one or more
 configuration parameters. These new values are used in place of the
-\xref{default values}{sun258}{PAR_FULL} described in
+\xref{default values}{sun258}{par_full} described in
 \xref{SUN/258}{sun258}{}. Any configuration parameter not specified by
 the \texttt{CONFIG} string retains its default value. As with files
 names, there are many ways in which the group of parameter values can be
@@ -69,8 +69,8 @@ parameter values in a simple text file with one parameter setting (a
 {Specialised configuration files} for a list of the pre-defined
 configuration files that come with \smurf. Note, \texttt{CONFIG}
 can be set to the special value ``\texttt{def}'' to force \makemap\ to
-use the default values for all parameters. It is possible to create a map
-using just default parameter values, but it will not usually be a very
+use the default values for all parameters. It \emph{is} possible to create
+a map using just these default values, but it will not usually be a very
 good map. Advice on which parameters to edit can be found in
 \cref{Section}{sec:tweak}{Tweaking the configuration file}.
 
@@ -109,11 +109,11 @@ optimised for creating maps from bright compact sources.
 \begin{tip}
   An up-caret (\,\texttt{\^{}}\,) is required any time you are reading
   in a group text file in \starlink. For the map-maker this includes
-  the configuration file (a group of configuration parameters) and a list
-  of your input files (e.g. \texttt{in=\^{}\,myfiles.lis}).
+  the configuration file (a group of configuration parameters) and the
+  list of input files ( a group of NDFs --- \emph{e.g.}  \texttt{in=\^{}\,myfiles.lis}).
 \end{tip}
 
-After the \makemap\ command completes, the final map will be left in file
+After the \texttt{makemap} command completes, the final map will be left in file
 \texttt{850\_crl2688.sdf} and can be displayed using \gaia:
 
 \begin{terminalv}
@@ -121,11 +121,11 @@ After the \makemap\ command completes, the final map will be left in file
 \end{terminalv}
 
 There are many other command-line parameters that can be supplied when
-running \makemap, but only the three listed above are mandatory. All the
+running \texttt{makemap}, but only the three listed above are mandatory. All the
 others assume default values if not supplied on the command-line. For a
 full list of all available command-line parameters, their functions and
 default values, see the description of \makemap\ within the \textsc{smurf}
-document, \xref{Starlink User Note 258}{sun258}{}.
+document, \xref{SUN/258}{sun258}{}.
 
 You can supply values for any of these extra parameter on the command
 line. For instance, one of the command-line parameters that is usually
@@ -148,23 +148,28 @@ produce a map with 3 arc-second pixels:
 
 Note, if parameters are specified by name on the command-line, as
 in these examples, then the order in which they are specified is
-insignificant. Also, parameter names are case-insensitive.
+insignificant\footnote{Some commands, for instance most \textsc{Kappa}
+commands, allow the most important parameters to be specified by position
+rather than name, in which case their order \emph{is} significant ---
+see \xref{\texttt{Specifying Parameter Values on Command Lines}}{sun95}
+{se_cmdlindef} in \xref{SUN/95}{sun95}{}.}. Also, parameter names are
+case-insensitive.
 
 \begin{tip}
   Map-maker not finding your raw data files from a path? Check you have
   escaped or protected any shell meta-characters in your `in' value,
   for instance by putting double quotes around it or escaping
-  wild-cards using a backslash (\emph{e.g.} \texttt{in=\textbackslash*.sdf} or just
-  \texttt{in=\textbackslash*}) Note, this issue applies only to wild-cards
-  included directly on the command line --- there is no need to escape or
-  protect wild cards within a text file.
+  wild-cards using a backslash (\emph{e.g.} ``\texttt{in=\textbackslash*.sdf}''
+  or just ``\texttt{in=\textbackslash*}''). Note, this issue applies only to
+  wild-cards included directly on the command line --- there is no need to
+  escape or protect wild cards within a text file.
 \end{tip}
 
 \section{Interpreting the screen output from \task{makemap}}
 
 Whilst \makemap\ runs, it outputs information continuously to the screen
 about what it is doing. The amount of information displayed can be
-controlled using the \xref{\texttt{MSG\_FILTER}}{sun258}{SEC_MSG} command-line
+controlled using the \xref{\texttt{MSG\_FILTER}}{sun258}{sec_msg} command-line
 parameter. It defaults to ``\texttt{normal}'', but if you want more
 information you could set it to (say) ``\texttt{verbose}'':
 
@@ -189,11 +194,12 @@ will suppress all screen output.
   safe to pay less attention to the other screen output.
 \end{tip}
 
-The following shows the screen output generated by \makemap\ if
-\texttt{MSG\_FILTER} is left set to its default value of
+The following shows the screen output generated by a typical run of \makemap\
+if \texttt{MSG\_FILTER} is left set to its default value of
 ``\texttt{normal}''. Explanatory comments, which are not actually
 part of the output generated by \makemap, are included in \emph{emphasised
-type}:
+type}. The input data is a short observation of a bright compact source
+(CRL 2688):
 
 \begin{terminalv}
 % makemap in=^myfiles.lis out=850_crl2688 \
@@ -241,7 +247,7 @@ provides a much more flexible scheme for handling WCS.}}
 system in which the source is centred at position (0,0). Note, the definition of
 pixel coordinates within the NDF format allows the origin of pixel
 coordinates to be at any nominated position within the array --- it does
-not have to be at the bottom left corner as in FITS. \texttt{makemap}
+not have to be at the bottom left corner as in FITS --- and \texttt{makemap}
 chooses to put the pixel origin at the specified source position. }
 
 \emph{Finally, the bounds of the map are given in the celestial coordinate
@@ -259,7 +265,7 @@ smf_iteratemap: Iterate to convergence (max 40)
 smf_iteratemap: stop when mean normalized map change < 0.05
 \end{terminalv}
 
-\emph{The data is down-sampled so that the on-sky distance between
+\emph{By default, the data is down-sampled so that the on-sky distance between
 adjacent samples is roughly equal to the pixel size (4 arc-seconds in
 this case). This saves memory and computing time without adversely
 affecting the final map. The degree of down-sampling can be controlled
@@ -303,6 +309,15 @@ case there  is only one chunk (which is good).}
 ~
 \begin{terminalv}
 smf_iteratemap: Iteration 1 / 40 ---------------
+\end{terminalv}
+
+We now start the first iteration of the iterative algorithm described in
+\cref{Section}{sec:algorithm}{The reduction step-by-step}, to create a
+map from the current chunk of  input data. We will be performing ----
+at most --- 40 iterations, as set by \xparam{NUMITER}{numiter}.
+
+~
+\begin{terminalv}
 --- Size of the entire data array ------------------------------------------
 bolos  : 5120
 tslices: 5957(2.6 min)
@@ -325,19 +340,19 @@ generate more information about the cleaning process.}.}
 \emph{Each sub-array contains a grid of $32\times40$ bolometers, making 5120
 bolometers in total over all four sub-arrays. The number of time slices in
 the concatenated data after down-sampling is reported. In this case, 5957
-time slices over 2.6 minutes equates to a down-sampled frequency of about
+time slices over 2.6 minutes, equating to a down-sampled frequency of about
 38 Hz. The total number of samples is the product of the number of
 bolometers and the number of time slices. Each of the following lines
 indicates the percentage of the data that has been flagged as unusable for
 various reasons:}
 
 \begin{itemize}
-\item \emph{BADDA - flagged as inoperative during data acquisition.}
-\item \emph{DCJUMP - flagged as bad because of a sudden step change in
+\item \emph{BADDA - flagged as unusable during data acquisition.}
+\item \emph{DCJUMP - flagged as unusable because of a sudden step change in
 the base-line.}
-\item \emph{STAT - flagged as bad because the telescope was stationary
+\item \emph{STAT - flagged as unusable because the telescope was stationary
 (or at least moving too slowly).}
-\item \emph{NOISE - flagged as bad because they were too noisy.}
+\item \emph{NOISE - flagged as unusable because they were too noisy.}
 \end{itemize}
 
 \emph{The BADBOL item gives the fraction of bolometers that have been
@@ -405,7 +420,7 @@ smf_iteratemap: *** NORMALIZED MAP CHANGE: 1.78691 (mean) 8.09056 (max)
 
 \end{terminalv}
 
-\emph{The next iteration starts, and proceeds in much the same way as the
+\emph{The second iteration starts, and proceeds in much the same way as the
 first iteration. The main difference is that the NOI model is generated
 at the start of the second iteration. This model measures the variance
 within each bolometer time-stream. It is used to weight the bolometer
@@ -417,14 +432,14 @@ removal of all other models, and is only calculated once --- subsequent
 iterations re-use the same NOI values.}
 
 \emph{The \texttt{SPIKE:} item that has appeared in the quality flagging
-statistics record the number of samples that have been rejected as
+statistics records the number of samples that have been rejected as
 transient spikes in the time-series. This flagging is done by comparing
-the bolometer values that fall in each map pixel and flagging any that
+the bolometer values that fall in each map pixel, and flagging any that
 appear to be statistical out-liers - see configuration parameter
 \xparam{AST.MAPSPIKE}{ast.mapspike}.}
 
 \emph{The mean ``\texttt{NORMALIZED MAP CHANGE}'' value should drop with each
-subsequent iteration (note, the \emph{max} normalised map change value
+subsequent iteration (note, the ``max'' normalised map change value
 can usually be ignored as it records the maximum normalised change in any
 single map pixel and is thus highly subject to random variations).}
 
@@ -485,7 +500,7 @@ Consequently, \texttt{makemap} considers the map to have converged. However,
 in view of the fact that the \brightcompact\ configuration file uses
 ``AST masking'' (see \cref{Section}{sec:astmask}{AST masking}), it is
 necessary to do one final iteration in order to assign correct values to
-the pixels that lie outside the source mask. When AST masking is being
+the pixels that lie outside the source mask. Note, when AST masking is being
 used, the reported normalised map change values only include pixels that
 are within the source mask.}
 
@@ -534,10 +549,10 @@ require more than 40 iterations to converge to a \texttt{maptol} of 0.05.
 In such cases the screen output will end with a message saying that the
 solution ``FAILED TO CONVERGE''\footnote{However a map will still be
 created, but should be used with caution.}. In such cases, you \emph{could}
-simply increase \texttt{numiter}, but you may also want to investigate
-the cause of the slow convergence using one or more of the techniques
-described in \cref{Chapter}{sec:raw}{Chapter 9}, as it may indicate
-some issue with the raw data.}
+simply increase \texttt{numiter} and re-run \texttt{makemap}, but you may
+also want to investigate the cause of the slow convergence using one or more
+of the techniques described in \cref{Chapter}{sec:raw}{Chapter 9}, as it
+may indicate some issue with the raw data.}
 
 \emph{Map pixels that receive a very small number of samples are automatically
 set bad. These are usually the pixels around the periphery of the
@@ -568,8 +583,8 @@ detected early, in order to avoid wasting time.
 
 \subsection{Monitoring screen output}
 The most straight-forward way of monitoring progress is to check the
-values written to the screen by makemap at the end of each iteration (see
-the previous section). For instance, if you run \makemap\ as follows:
+values written to the screen by \texttt{makemap} at the end of each iteration (see
+the previous section). For instance, if you run \texttt{makemap} as follows:
 
 \begin{terminalv}
 % makemap in=^infiles out=outmap config=^conf | tee makemap.log
@@ -577,7 +592,7 @@ the previous section). For instance, if you run \makemap\ as follows:
 
 then the messages displayed by makemap on the screen will also be written
 to text file \texttt{makemap.log}. This makes it easy to search the log
-file whilst \makemap\ is still running, for instance from another terminal
+file whilst \texttt{makemap} is still running, for instance from another terminal
 window:
 
 \begin{terminalv}
@@ -592,11 +607,12 @@ smf_iteratemap: *** NORMALIZED MAP CHANGE: 0.159569 (mean) 2.05803 (max)
 \end{terminalv}
 
 This displays the normalised change in maps between successive
-iterations. If the mean normalised map change is not decreasing smoothly,
+iterations, for the iterations that have so far been completed. If the mean
+normalised map change is not decreasing smoothly,
 (for instance if it is oscillating around a fixed value), then there is a
 potential problem. In which case you may want to interrupt the
 \texttt{makemap} process, rather than waiting potentially for several
-hours to create a bad map.
+hours just to end up with a bad map.
 
 Likewise, it is useful to monitor the total number of samples that are
 being pasted into the map at the end of each iteration:
@@ -660,7 +676,8 @@ itermap=1
 
 Note the distinction between the ``\texttt{itermaps}'' (plural)
 \emph{command-line} option, and the ``\texttt{itermap}'' (singular)
-\emph{configuration} parameter.  The above command will create a new file
+\emph{configuration} parameter.  As soon as the first iteration has
+finished, the above command will create a new file
 called \texttt{myitermaps.sdf} in which each itermap will be stored as soon
 as it is created. The file is closed after each itermap is written, and
 re-opened again before writing the next itermap. This is an example of a
@@ -692,7 +709,7 @@ You can view a single itermap using:
 \end{terminalv}
 
 If you want to view several itermaps side-by-side, you can use \textsc{Kappa}
-\xref{\task{picdef}}{sun95}{PICDEF} to divide the screen up into a grid
+\xref{\task{picgrid}}{sun95}{PICGRID} to divide the screen up into a grid
 of ``pictures'', then use \xref{\task{picsel}}{sun95}{PICSEL} to pick each
 picture in turn, and use \xref{\task{display}}{sun95}{DISPLAY} to display
 an itermap in each one. For instance to display the first six itermaps
@@ -701,18 +718,18 @@ any axes, do:
 
 \begin{terminalv}
 % gdclear
-% picdef mode=array xpic=3 ypic=2 prefix=pic
-% picsel pic1
+% picgrid 3 2
+% picsel 1
 % display myitermaps.CH00I001 axes=no mode=percentiles percentiles=\[2,98\]
-% picsel pic2
+% picsel 2
 % display myitermaps.CH00I002 mode=current
-% picsel pic3
+% picsel 3
 % display myitermaps.CH00I003 mode=current
-% picsel pic4
+% picsel 4
 % display myitermaps.CH00I004 mode=current
-% picsel pic5
+% picsel 5
 % display myitermaps.CH00I005 mode=current
-% picsel pic6
+% picsel 6
 % display myitermaps.CH00I006 mode=current
 \end{terminalv}
 
@@ -735,42 +752,44 @@ in the map over the first few iterations.}
 \end{figure}
 
 Alternatively, you can combine the itermaps into a 3D cube, and then use
-the cube-viewing facilities of gaia to scroll through the itermaps in the
+the cube-viewing facilities of \gaia\ to scroll through the itermaps in the
 style of a movie (see \cref{Section}{sec:inter}{Writing out models and
-intermediate maps}):
+intermediate maps})\footnote{Note, \textsc{smurf} \stackframes\ can be used
+instead of \textsc{Kappa} \xref{\task{paste}}{sun95}{PASTE} if preferred.}:
 
 \begin{terminalv}
 % paste in=myitermaps out=itercube shift=\[0,0,1\]
 % gaia itercube
 \end{terminalv}
 
-It is sometimes informative to look at the \emph{change} between
+It is sometimes informative
+to look at the \emph{change} between
 itermaps, to see the incremental effect of each iteration. This is most
 easily done if the itermaps are first stacked into a cube as described
 above. The next step is to produce a copy of the cube in which the pixel
 origin is moved by one pixel along the third axis (\emph{i.e.} the axis
 that enumerates iteration). Finally subtract one cube from the other, and
 display the resulting difference cube (this example shows how command-line
-parameters can often be specified by position instead of by name ---
-check the help information for each command to see the order in which
-options should be supplied):
+parameters can often be specified by position instead of by name when
+running \textsc{Kappa} commands --- check the help information for each
+command to see the order in which options should be supplied):
 
 \begin{terminalv}
 % paste myitermaps out=itercube shift=\[0,0,1\]
 % slide itercube itercube-shifted \[0,0,1\] near
 % sub itercube-shifted itercube diffcube
 %
-% picsel pic1
+% picsel 1
 % display diffcube'(,,1)' axes=no mode=percentiles percentiles=\[2,98\]
-% picsel pic2
+% picsel 2
 % display diffcube'(,,2)' mode=current
-% picsel pic3
+% picsel 3
 % display diffcube'(,,3)' mode=current
-% picsel pic4
+% picsel 4
 % display diffcube'(,,4)' mode=current
-% picsel pic5
+% picsel 5
 % display diffcube'(,,5)' mode=current
-% picsel pic6
+% picsel 6
 % display diffcube'(,,6)' mode=current
 \end{terminalv}
 
@@ -793,8 +812,10 @@ The above plots are based on the itermaps that are created by adding
 ``\texttt{itermaps=1}'' to your \texttt{makemap} configuration. You can
 instead use ``\texttt{itermaps=2}'', which causes each itermap to be
 masked so that pixels outside the current source mask are set bad
-(\emph{i.e.} blank). \cref{Figure}{fig:maskeditermaps}{Initial
-six itermaps with masking} shows the resulting itermaps.
+(\emph{i.e.} blank)\footnote{If no masking is being used, then
+\texttt{itermaps=2} has the same effect as \texttt{itermaps=1}.}.
+\cref{Figure}{fig:maskeditermaps}{Initial six itermaps with masking}
+shows the resulting itermaps.
 
 \begin{figure}
 \begin{center}
@@ -870,8 +891,8 @@ At this point you should respond to the prompt for parameter
 and 3 cause \texttt{makemap} to tidy up its internals and create a map
 from the current models just as if the iterative process had reached
 convergence. Option 3 causes one further iteration to be performed,
-without masking. You should use this option if you have been using AST
-masking (see \cref{Section}{sec:astmask}{AST masking}).
+without masking (you should use this option if you have been using AST
+masking --- see \cref{Section}{sec:astmask}{AST masking}).
 
 \begin{tip}
 Note if you are running \texttt{makemap} from within a script, then the
@@ -898,7 +919,7 @@ dsb      25407  0.0  0.0  43716  1952 pts/5    0:00 makemap
 \subsection{Aligning your map with a pre-existing image}
 If you want to compare SCUBA-2 data with a map of the same region taken
 with a different instrument, you will usually want to create the
-SCUBA-2 map using the same pixel grid as other map so that you can
+SCUBA-2 map using the same pixel grid as the other map so that you can
 compare pixel values directly in the two maps\footnote{Creating the map on the
 required pixel grid is better than creating it on a default grid and then
 re-sampling it onto the required grid later.}. You can use the
@@ -909,11 +930,11 @@ other map is in file \texttt{herschel.sdf}, you can do:
 % makemap in=^infiles out=outmap config=^conf ref=herschel
 \end{terminalv}
 
-This will cause the output map in file \texttt{outmap.sdf} to be gridded
-on the same pixel grid as \texttt{herschel.sdf}.  This means that a given
+This will cause the output map in file \texttt{outmap.sdf} to use
+the same pixel grid as \texttt{herschel.sdf}.  This means that a given
 point on the sky will have the same \emph{pixel coordinates} in both
 maps, and so for instance you could divide one by the other to get a
-ratio map:
+ratio map without any further alignment step:
 
 \begin{terminalv}
 % div outmap herschel ratio_map
@@ -925,7 +946,7 @@ want to take account of differing resolutions and /or units in the two
 maps before dividing them.}.
 
 However, by default \texttt{makemap} will trim the output map to
-exclude blank borders, thus allowing the two maps to have differing
+exclude blank borders, thus the two maps may have different
 \emph{dimensions}. NDF-based applications such as \textsc{Kappa}
 \xref{\task{div}}{sun95}{DIV} automatically take account of this when
 comparing corresponding pixels in two NDFs --- see
@@ -944,17 +965,17 @@ bounds of the reference map supplied when running makemap. The
 red box represents the bounds of the map created by makemap.
 The reference image and the output image share the same pixel
 coordinate system, so a given point on the sky has the same pixel
-coordinates in both images. However, the output image is cropped to
+coordinates in both images. However, the output (red) image is cropped to
 remove blank borders and so has smaller dimensions than the reference
-image. All this is made possible by the fact that the NDF format, unlike
+(blue) image. All this is made possible by the fact that the NDF format, unlike
 FITS, does not require the origin of pixel coordinates to be at the
 bottom left corner of each map. NDF applications account for any
 difference in pixel origin when comparing pixels in different files.}
  \label{fig:pixelco}
 \end{figure}
 
-If you want to force the output map to have certain bounds within pixel
-coordinates you can do so by assigning values to the \aparam{LBND} and
+If you want to force the output map to have certain bounds in pixel
+coordinates, you can do so by assigning values to the \aparam{LBND} and
 \aparam{UBND} parameters when running \texttt{makemap}. For instance, if
 you want to force the output map to have the same dimensions as the
 reference map, you could use \textsc{Kappa} \xref{\task{ndftrace}}{sun95}{NDFTRACE}
@@ -1005,7 +1026,7 @@ poorer map.
 \subsection{Re-using previously cleaned data to speed up map-making}
 
 Usually, you will create your SCUBA-2 maps using one of the standard
-configuration files distributed with \smurf\ (see
+configuration files distributed with \textsc{smurf} (see
 \cref{Section}{sec:config} {Specialised configuration files}). However,
 for certain problematic observations it may sometimes be necessary to
 experiment with several different configurations to find one that
@@ -1014,8 +1035,7 @@ can be saved by re-using pre-cleaned raw data each time you make a map,
 rather than re-cleaning it each time.
 
 By default \makemap\ assumes that the supplied data is raw data that
-requires cleaning before being used to make a map (see \cref{Section}
-{sec:algorithm}{The reduction step-by-step}. However, if you include
+requires cleaning before being used to make a map. However, if you include
 ``\setparam{DOCLEAN}{doclean}{0}'' in your configuration, then
 \texttt{makemap} will skip the entire cleaning process and move directly
 on to the iterative map-making stage, thus saving significant time.
@@ -1036,7 +1056,7 @@ initial run of \texttt{makemap} --- don't forget to remove it for
 subsequent runs! The cleaned data are put into files in the current
 directory, one for each sub-array, with names such as
 \texttt{s8c20120706\_00037\_0003\_con\_res\_cln.sdf}. Note the \texttt{\_cln} on
-the end of the name indicates cleaned data. The base name,
+the end of the name indicating cleaned data. The base name,
 ``\texttt{s8c20120706\_00037\_0003}'' in this case, is taken from the first
 raw data file that contributes to each chunk. If the entire observation
 is processed in one chunk (as it should usually be) then there will be
