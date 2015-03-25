@@ -2728,12 +2728,10 @@ bad\_receptors} flag when running the pipeline.}
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
-\item Initialise the pipeline software.  The \param{cwd} option
-requests that the current working directory is used for all input and
-output.
+\item Initialise the pipeline software.  This may be as simple as
 
 \begin{terminalv}
-% oracdr_acsis -cwd
+% oracdr_acsis
 \end{terminalv}
 
 \item Define environment variables to ensure the data is read from,
@@ -2746,6 +2744,16 @@ are created.
 % setenv ORAC_DATA_IN <path to raw data>
 % setenv ORAC_DATA_OUT <where you want reduced data to go>
 \end{terminalv}
+
+These extra definitions can be avoided if you initialise with the
+following command.
+
+\begin{terminalv}
+% oracdr_acsis -cwd
+\end{terminalv}
+
+The \param{cwd} option requests that the current working directory is
+used for all input and output, which is most likely what you require.
 
 If you are supplying a text file listing the raw data
 \param{\$ORAC\_DATA\_IN} should be the location of this file. If
