@@ -2822,13 +2822,15 @@ options and their descriptions see \oracdrsun.
 \hline
 \param{-calib}    & Under the calibration flag you can specify QA parameters by including
                     \param{qaparams=<myqa.ini>} and bad receptors via
-                    \param{bad\_receptors=index}.\\
+                    \param{bad\_receptors=index}.  If you do not set the
+                    \texttt{qaparams} option but have a file called \texttt{qa.ini}
+                    in your output directory, the QA settings will come from this file.\\
 -recpars & Allows you to provide recipe parameters as a \file{.ini} file.  \\
 \hline
 \multicolumn{2}{l}{\textbf{Logs/Display}} \\
 \hline
 \param{-nodisplay} & Shorten processing times by turning off all graphical output. \\
-\param{-log sxfh}  & Send log to a screen (\param{s}), an xwindow (\param{x}), file
+\param{-log sxfh}  & Send the log to a screen (\param{s}), an xwindow (\param{x}), file
                      (\param{f}) or html (\param{h}). The logfile
                      (\param{f}) has the name \file{.oracdr\_}$NNNN$\file{.log} where
                      $NNNN$ is the current process ID. Only include the options you want.
