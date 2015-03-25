@@ -223,6 +223,32 @@
    }
 }
 \sstroutine{
+   AST.ZERO\_SNR\_FFCLEAN
+}{
+   Provides alternative method for SNR masking
+}{
+   \sstdescription{
+      Setting this parameter to a non-zero value causes the
+      SNR mask requested by parameter {\tt{"}}\xref{ast.zero\_snr}{sun258}{AST.ZERO_SNR}{\tt{"}} to be
+      created using an algorithm like that used by the KAPPA
+      command {\tt{"}}FFCLEAN{\tt{"}} (see SUN/95), instead of using a simple
+      thresholding of the SNR map. The parameter {\tt{"}}\xref{ast.zero\_snr}{sun258}{AST.ZERO_SNR}{\tt{"}}
+      gives the clipping level of the ffclean algorithm, and the
+      parameter {\tt{"}}\xref{ast.zero\_snr\_hipass}{sun258}{AST.ZERO_SNR_HIPASS}{\tt{"}} gives the box size. Using
+      an ffclean algorithm prevents the source regions within
+      the mask being larger than the box size, and may thus
+      produce faster convergence and avoid blobs developing. [0]
+   }
+   \sstattributetype{
+      int
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      MAKEMAP, CALCQU
+   }
+}
+\sstroutine{
    AST.ZERO\_SNR\_FWHM
 }{
    Can help to remove bowls around sources
@@ -741,6 +767,31 @@
    }
    \sstattributetype{
       real
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      MAKEMAP, CALCQU
+   }
+}
+\sstroutine{
+   COM.ZERO\_SNR\_FFCLEAN
+}{
+   Provides alternative method for SNR masking
+}{
+   \sstdescription{
+      Setting this parameter to a non-zero value causes the
+      SNR mask requested by parameter {\tt{"}}\xref{com.zero\_snr}{sun258}{COM.ZERO_SNR}{\tt{"}} to be
+      created using an algorithm like that used by the KAPPA
+      command {\tt{"}}FFCLEAN{\tt{"}} (see SUN/95), instead of using a simple
+      thresholding of the SNR map. The parameter {\tt{"}}\xref{com.zero\_snr}{sun258}{COM.ZERO_SNR}{\tt{"}}
+      gives the clipping level of the ffclean algorithm, and the
+      parameter {\tt{"}}\xref{com.zero\_snr\_hipass}{sun258}{COM.ZERO_SNR_HIPASS}{\tt{"}} gives the box size. Using
+      an ffclean algorithm prevents the source regions within
+      the mask being larger than the box size. [0]
+   }
+   \sstattributetype{
+      int
    }
    \sstdiytopic{
       SMURF Usage
@@ -1653,6 +1704,32 @@
    }
    \sstattributetype{
       real
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      MAKEMAP, CALCQU
+   }
+}
+\sstroutine{
+   FLT.ZERO\_SNR\_FFCLEAN
+}{
+   Provides alternative method for SNR masking
+}{
+   \sstdescription{
+      Setting this parameter to a non-zero value causes the
+      SNR mask requested by parameter {\tt{"}}\xref{flt.zero\_snr}{sun258}{FLT.ZERO_SNR}{\tt{"}} to be
+      created using an algorithm like that used by the KAPPA
+      command {\tt{"}}FFCLEAN{\tt{"}} (see SUN/95), instead of using a simple
+      thresholding of the SNR map. The parameter {\tt{"}}\xref{flt.zero\_snr}{sun258}{FLT.ZERO_SNR}{\tt{"}}
+      gives the clipping level of the ffclean algorithm, and the
+      parameter {\tt{"}}\xref{flt.zero\_snr\_hipass}{sun258}{FLT.ZERO_SNR_HIPASS}{\tt{"}} gives the box size. Using
+      an ffclean algorithm prevents the source regions within
+      the mask being larger than the box size, and may thus
+      produce faster convergence and avoid blobs developing. [0]
+   }
+   \sstattributetype{
+      int
    }
    \sstdiytopic{
       SMURF Usage

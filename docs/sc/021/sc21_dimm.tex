@@ -46,7 +46,7 @@ documents the parameters you are more likely to find of interest,
 including the default value that is assigned to each parameter if you do
 not give it a value in your configuration file.  For a full list of all
 available parameters, see the appendix \xref{``Configuration Parameters''}
-{sun258}{par_full} within \xref{Starlink User Note 258}{sun258}{}.
+{sun258}{par_full} within \xref{SUN/258}{sun258}{}.
 
 It is possible to create a map without supplying a configuration file to
 \makemap\ (\emph{i.e.} leaving all configuration parameters set to their default
@@ -447,6 +447,235 @@ model looking (as expected) like white noise.}
 \label{fig:itercomp}
 \end{figure}
 
+\section{\xlabel{sec_masking}Masking}
+\label{sec:masking}
+
+The term \emph{masking} refers to the inclusion or exclusion of selected
+bolometer samples from the estimate of specific models, based on the
+positions of those samples within the output map. Masking can be applied
+independently to the \model{AST}, \model{FLT} and \model{COM} models, as
+described in the later sub-sections within this section.
+
+A \emph{mask} is a selection of pixels within the output map. Normally
+these pixels form one or more contiguous regions that enclose the areas
+where significant sub-mm emission is expected (the ``source'' regions).
+Pixels outside this mask are referred to as ``background pixels''. The use
+to which such masks are put differs from model to model as described
+later in model-specific sub-sections. For more information on the available
+masking options, see \cref{Section}{sec:mask}{Masking options}.
+
+Masks fall into two broad categories:
+\begin{itemize}
+
+\item \textbf{dynamic masks} - these are masks that change shape from one
+iteration to the next.
+
+\item \textbf{static masks} - these are masks that retain the same shape
+for all iterations.
+
+\end{itemize}
+
+Static masks are appropriate in cases where the areas containing significant
+sub-mm emission are known in advance. If this is not the case, then the
+mask needs to be based on evidence within the maps created at the end of
+each iteration, resulting in the masks evolving from iteration to iteration
+as the maps converge towards the final solution. Such \emph{dynamic} masks
+have a potential problem  in that can upset the convergence process by
+introducing extra flexibility into the algorithm. For this reason, an
+option is provided to freeze these masks after a fixed number of
+iterations\footnote{Although by default masks are never frozen.}
+(\emph{e.g.} see \xparam{AST.ZERO_FREEZE}{ast.zero\_freeze}) and this
+is used within the specialist configuration file \fixconvergence\
+described in \cref{Section}{sec:problem}{Configuration files for solving
+specific problems}.
+
+Each of the three models --- \model{AST}, \model{FLT} and \model{COM}
+--- have an equivalent set of parameters to specify the masking (if any)
+that should be used. Each set starts with the model name, followed by a
+dot, followed by the parameter name. To enable masking, one or more of
+these parameters needs to be set to a suitable value to define a mask, as
+described below.
+
+Static masks can be defined either as circles of specified radius,
+centred on the source position (suitable for compact sources - see for
+instance \xparam{AST.ZERO_CIRCLE}{ast.zero\_circle}), or by an external
+image that uses special pixel values to indicate the source regions and
+the background regions (suitable for extended sources - see for
+instance \xparam{AST.ZERO_MASK}{ast.zero\_mask}). Within such ``external
+masks'' all background pixels should be set to the Starlink \emph{bad} value
+(see \xref{``Bad-pixel Masking''}{sun95}{se_badmasking} in SUN/95).
+Pixels with any other value are treated as source pixels.
+\cref{Section}{sec:maskbe}{Supplying an external mask} describes some
+ways in which external masks can be generated.
+
+Dynamic masks can be defined in several different ways:
+\begin{enumerate}
+\item By applying a simple threshold on the S/N ratio within the map
+created at the end of each iteration (\emph{e.g.} see
+\xparam{AST.ZERO_SNR}{ast.zero\_snr}).
+\item By applying a simple threshold on the S/N ratio as above, and then
+extending the resulting source regions down to a lower S/N value (\emph{e.g.}
+see \xparam{AST.ZERO_SNRLO}{ast.zero\_snrlo}). This allows a low S/N
+threshold to be used without introducing lots of isolated pixels into the
+mask because of noise spikes in the map.
+\item By applying a threshold on the number of bolometer samples falling
+in each map pixel (\emph{e.g.} see \xparam{AST.ZERO_LOWHITS}
+{ast.zero\_lowhits}). Because of the scanning strategy used with SCUBA-2
+(see \cref{Section}{sec:mmodes}{Observing modes}), pixels near the edge of
+the map will receive fewer bolometer samples than those near the centre,
+and will therefore be noisier. Thus this scheme allows the noisy edges of
+the map to be masked out. Whilst this is technically a dynamic mask ---
+because the number of samples falling in each pixel could potentially change
+from iteration to iteration --- in fact a mask based on hits per pixel
+will usually only change very slightly from iteration to iteration.
+\item By using an algorithm that automatically identifies features of a
+given size in the map, similar to that used by the \textsc{Kappa}
+\xref{\task{ffclean}}{sun95}{FFCLEAN} command (\emph{e.g.} see
+\xparam{AST.ZERO_SNR_FFCLEAN}{ast.zero\_snr\_ffclean}). This can be a
+useful alternative to simple S/N thresholding in cases where bright artificial
+large-scale structures appear in the map. Such structures will result in
+artificially large source regions in a simple S/N mask, which may in turn
+cause the artificial structures to become even brighter and larger in
+subsequent iterations. Using an \task{ffclean}-based mask instead, will
+restrict the mask to the brighter astronomical cores on top of such artificial
+large-scale structures.
+\end{enumerate}
+
+The masks used on the last iteration are stored in the \xref{\texttt{Quality}}
+{sun95}{se_qualitymask} component of the NDF containing the output map.
+A separate bit of the quality component is used for each model (\model{AST},
+\model{FLT} or \model{COM}) that is being masked. These bits can be
+viewed in various ways - see \cref{Section}{sec:maskshow}{Displaying masks}
+and \cref{Section}{sec:itermaps}{Monitoring the map at the end of each
+iteration}.
+
+\begin{tip}
+Be aware that the S/N ratio within individual map pixels depends on pixel
+size --- larger pixels will have higher S/N ratios than small pixels.
+Therefore masks based on a specific S/N threshold will grow or shrink in
+area as a function of pixel size. As a rough rule, if you double the pixel
+size, you should also double the S/N thresholds to get a mask that covers a
+similar area of the sky.
+\end{tip}
+
+\subsection{\xlabel{sec_astmask}AST Masking}
+\label{sec:astmask}
+The iterative map-maker algorithm described earlier in this chapter
+divides each cleaned bolometer value into four additive parts:
+\begin{enumerate}
+\item The common-mode signal (\model{COM}).
+\item The low frequency background drift in each bolometer (\model{FLT}).
+\item The astronomical signal (\model{AST}).
+\item The left-over residual noise (\model{RES}).
+\end{enumerate}
+
+Whilst the value of each model is constrained to some extent by the
+manner in which the model is calculated, there remains a large degree of
+degeneracy in the algorithm. In other words, there are many different
+ways in which each bolometer value can be divided up into the four values
+listed above. For instance, any arbitrary change in the \model{AST} model
+can be accommodated provided that equal and opposite changes are introduced
+into the other model values so that the total value of all four components
+remains the same.
+
+The degeneracy between \model{COM} and \model{AST} is particularly
+problematic, since it allows large scale features to appear in the map
+(on the scale of the sub-array footprint) that are corrected for by equal
+and opposite features in the \model{COM} model. Such features can appear
+as gradients or ``saddles'' across the final map.
+
+The purpose of masking the \model{AST} model is to apply an extra
+constraint to the system to help break this degeneracy, and so avoid
+these large-scale features. It functions by forcing the \model{AST} model
+to zero t the end of each iteration for all samples that fall outside the
+masked area on the sky (\emph{i.e.} samples that fall in the ``background''
+areas of the map). Forcing the \model{AST} model to zero in this way means
+that the \model{COM} is more closely constrained.
+
+Whilst this constraint is applied only in the background regions, its
+effects are also felt part way into the source region because of the way in
+which the \model{COM} model averages over a sub-array footprint. Thus source
+regions that are much larger than a sub-array will still suffer from the
+degeneracy between \model{COM} and \model{AST}, allowing arbitrary
+large-scale background features to develop within the region, but these
+features will become weaker as the edge so the mask are approached.
+
+In order to avoid the final  map containing zero values in the background
+region, it is necessary to avoid using \model{AST}-masking on the final
+iteration. For this reason, one further iteration is performed ---
+without \model{AST}-masking --- once the basic iterative algorithm has
+converged.
+
+All the configuration files supplied with \smurf\ use \model{AST}
+masking, with the exception of \blankfield.
+
+\subsection{\xlabel{sec_fltmask}FLT Masking}
+\label{sec:fltmask}
+
+The \model{FLT} model estimates and removes a low frequency background
+from each bolometer time-stream. To do this it uses a FFT-based high-pass
+filter. Ringing around sudden transients --- such as astronomical sources
+--- is a natural consequence of all such filters, resulting in alternating
+bright and dark rings around sources in the map. In most cases, the iterative
+nature of the map-making algorithm eventually results in the rings
+reducing to a much lower level, as more of the astronomical signal is removed
+from the time stream on each iteration, causing the ring-inducing
+transients to become weaker. However, this is not always completely
+effective, and also slows down convergence.
+
+For these reasons, it is often helpful to mask the \model{FLT} model.
+This causes each bolometer time stream to be blanked out as the
+bolometer passes over the source regions in the mask. Such blanked
+sections are replaced by linear interpolation between the data on either
+side of the blanked section. The effect of this is to remove the
+transients that cause the ringing in the \model{FLT} model, and thus get
+a better estimate of the low frequency background in each bolometer.
+
+Such masking is most useful at the start of the iterative process,
+before the bulk of the astronomical signal has been removed from the
+time-streams. Indeed, if it is allowed to continue for too many iterations
+it can cause its own problems that tend to slow down convergence. For
+this reason, if \model{FLT} masking is used, it is (by default) limited
+to two iterations ---  see \xparam{FLT.ZERO_NITER}{flt.zero\_niter}.
+
+A difficulty with \model{FLT} masking is that the \model{FLT} model is
+evaluated \emph{before} the map is made on each iteration. This means
+that when the \model{FLT} model is evaluated on the first iteration,
+there is no map available. This is not a problem if a static mask is
+used, but if a dynamic mask is used, then it is not possible to calculate
+the \model{FLT} mask on the first iteration *(subsequent iterations will
+create the mask on the basis of the map created at the end of the
+previous iteration). This is a shame since \model{FLT} masking is most
+beneficial on the first few iterations, whilst the bulk of the astronomical
+signal is still present in the time streams. A scheme to get round this
+problem is described in \cref{Section}{sec:skip}{Skipping the AST model}.
+
+All the configuration files supplied with \smurf\ use \model{FLT}
+masking, with the exception of \blankfield.
+
+\subsection{\xlabel{sec_commask}COM Masking}
+\label{sec:commask}
+
+The value of the \model{COM} model at a specific time-slice is the mean
+of all remaining bolometer values at that time slice. If the \model{COM}
+model is masked, bolometer samples that fall within the source regions
+defined by the mask are excluded from this mean, thus removing the bias
+introduced into the mean by bright astronomical sources. This results in
+the \model{COM} model more accurately representing the varying common-mode
+background value at each time slice. This can help to reduce negative
+bowling around sources in the map, and can help to reduce the amount of
+data that is rejected as being too poorly correlated with the common-mode
+signal.
+
+\model{COM} masking has the same difficulty as \model{FLT} masking in that
+the \model{COM} model is evaluated \emph{before} the map is made on each
+iteration, and so it is difficult to use dynamic masks with \model{COM}
+masking. However, the solution described in \cref{Section}{sec:skip}{Skipping
+the AST model} can be used for \model{COM} masking as for \model{FLT}
+masking.
+
+Currently, none of the configuration files supplied with \smurf\ use
+\model{COM} masking.
 
 \section{\xlabel{config}Specialised configuration files}
 \label{sec:config}

@@ -319,6 +319,11 @@ Improve the estimate of the common-mode by excluding samples that correspond to 
 default~:~0 \\
 
 \hline
+\xparam{COM.ZERO_SNR_FFCLEAN}{com.zero\_snr\_ffclean} &
+Provides alternative method for SNR masking. &
+default~:~0 \\
+
+\hline
 \xparam{COM.ZERO_SNRLO}{com.zero\_snrlo} &
 Improve estimate of the common-mode by increasing the size of the SNR mask without introducing noise. &
 default~:~0 \\
@@ -419,6 +424,11 @@ Speeds up convergences and reduces ringing by excluding samples that correspond 
 default~:~0 \newline
 \jsageneric~:~5 \newline
 \brightextended~:~5 \\
+
+\hline
+\xparam{FLT.ZERO_SNR_FFCLEAN}{flt.zero\_snr\_ffclean} &
+Provides alternative method for SNR masking. &
+default~:~0 \\
 
 \hline
 \xparam{FLT.ZERO_SNRLO}{flt.zero\_snrlo} &
@@ -537,6 +547,11 @@ Reduces spurious large scale structure in the final map within regions of low si
 default~:~0.0 \newline
 \jsageneric~:~5 \newline
 \brightextended~:~3 \\
+
+\hline
+\xparam{AST.ZERO_SNR_FFCLEAN}{ast.zero\_snr\_ffclean} &
+Provides alternative method for SNR masking. &
+default~:~0 \\
 
 \hline
 \xparam{AST.ZERO_SNRLO}{ast.zero\_snrlo} &
