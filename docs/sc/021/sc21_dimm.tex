@@ -545,9 +545,9 @@ large-scale structures.
 Multiple masks can be used by selecting the appropriate configuration
 parameters as described above. Whether the combined mask represents the
 \emph{union} or \emph{intersection} of the individual masks is selected
-using the parameters \xparam{AST.ZERO_UNION}{ast.zero_union},
-\xparam{FLT.ZERO_UNION}{flt.zero_union} and \xparam{COM.ZERO_UNION}
-{com.zero_union}. By default, the union is used.
+using the parameters \xparam{AST.ZERO_UNION}{ast.zero\_union},
+\xparam{FLT.ZERO_UNION}{flt.zero\_union} and \xparam{COM.ZERO_UNION}
+{com.zero\_union}. By default, the union is used.
 
 
 
@@ -614,7 +614,7 @@ In order to avoid the final  map containing zero values in the background
 region, it is necessary to avoid using \model{AST}-masking on the final
 iteration. For this reason, by default one further iteration is performed ---
 without \model{AST}-masking --- once the basic iterative algorithm has
-converged (see \xparam(AST.ZERO_NOTLAST}{ast.zero\_notlast}).
+converged (see \xparam{AST.ZERO_NOTLAST}{ast.zero\_notlast}).
 
 All the configuration files supplied with \smurf\ use \model{AST}
 masking, with the exception of \blankfield.
@@ -687,6 +687,44 @@ masking.
 Currently, none of the configuration files supplied with \smurf\ use
 \model{COM} masking.
 
+\section{\xlabel{sec_skip}Skipping the AST model}
+\label{sec:skip}
+As discussed in \cref{Section}{sec:masking}{Masking} - \model{FLT}
+masking is most effective on the early iterations (particularly the very
+first iteration). This is because the bulk of the astronomical signal is
+still present in the time streams and is likely to cause bad ringing if
+\model{FLT} masking is not used. However, since the \model{FLT} model
+is evaluated before the map is made within each iteration, there is no map
+available to use as the basis for a \model{FLT} mask on the very first
+iteration.
+
+One way to get round this is simply to use a static mask that does not
+require a map to be available. However, this may not be possible -
+particularly for extended sources where no \emph{a-priori} knowledge of the
+source areas in the sub-mm may be available.
+
+Another scheme is provided by the \xparam{AST.SKIP}{ast.skip}
+configuration parameter. If \param{ast.skip} is set to a positive integer
+$N$, the subtraction of the \model{AST} model from the time-series that
+normally occurs at the end of each iteration is not performed on the
+first $N$ iterations. This means that for the first $N$ iterations, the
+time-series data remain unchanged, and consequently the models and the
+resulting map are unchanged. Of itself, this does nothing useful --- it
+merely delays the first useful iteration. However, when combined with
+\model{FLT} masking, it can be very beneficial because it allows a mask
+to be created \emph{before} the first ``real'' iteration occurs
+(\emph{i.e.} the first iteration that subtracts off the \model{AST}
+model). This means that the first ``real'' map will have far less
+ringing around bright sources than would otherwise be the case.  This in
+turn means that far fewer iterations are required to correct this ringing.
+
+It is also possible to use \param{ast.skip} with \model{COM} masking, but
+the benefits are no so noticeable as for \model{FLT} masking.
+
+The default value for \param{ast.skip} is zero, but the \brightextended\
+and \jsageneric\ configuration files supplied with \smurf\ both set
+\setparam{AST.SKIP}{ast.skip}{5} (and also use \model{FLT} masking).
+
 \section{\xlabel{config}Specialised configuration files}
 \label{sec:config}
 
@@ -750,7 +788,7 @@ The other major feature of this configuration is that the subtraction of
 the \model{AST} model is skipped on the first five iterations. In
 conjunction with the use of \model{FLT} masking, this helps to speed up
 convergence and minimise dark rings around bright source (see
-\cref{Section}{sec:fltrings}{Minimising Rings Around Sources}.
+\cref{Section}{sec:skip}{Skipping the AST model}.
 
 \latex{\renewcommand*\arraystretch{1}}
 \begin{table}[h!]
@@ -903,7 +941,7 @@ The other major feature of this configuration is that the subtraction of
 the \model{AST} model is skipped on the first five iterations. In
 conjunction with the use of \model{FLT} masking, this helps to speed up
 convergence and minimise dark bowls around bright source (see
-\cref{Section}{sec:fltrings}{Minimising Rings Around Sources}.
+\cref{Section}{sec:skip}{Skipping the AST model}.
 
 \cref{Figure}{fig:becompare}{The images below} shows a comparison
 between maps reduced with the default configuration file and using
