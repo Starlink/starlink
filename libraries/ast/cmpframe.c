@@ -185,6 +185,8 @@ f     The CmpFrame class does not define any new routines beyond those
 *        When checking attribute settings for attribute names that end with
 *        an axis index, stop looking for the axis index when the first equals
 *        sign is encountered.
+*     26-MAR-2015 (DSB):
+*        Increase size of "buf2" buffer in SetAttrib, and trap buffer overflow. 
 *class--
 */
 
@@ -7981,11 +7983,13 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 *     method and makes additional attributes accessible to it.
 */
 
+#define BUF_LEN 1024
+
 /* Local Vaiables: */
    AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
    AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
-   char buf1[80];                /* For for un-indexed attribute name */
-   char buf2[80];                /* For for indexed attribute name */
+   char buf1[BUF_LEN];           /* For for un-indexed attribute name */
+   char buf2[BUF_LEN];           /* For for indexed attribute name */
    int axis;                     /* Supplied (1-base) axis index */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by astSscanf */
@@ -8056,27 +8060,36 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 
 /* Create a new setting with the same name but with the axis index
    appropriate to the primary Frame. */
-               sprintf( buf2, "%s(%d)=%s", buf1, paxis + 1, setting+value );
+               nc = sprintf( buf2, "%s(%d)=%s", buf1, paxis + 1, 
+                             setting+value );
+               if( nc < BUF_LEN ) {
 
 /* Attempt to access the attribute. */
-               astSetAttrib( pfrm, buf2 );
-
-/* Indicate success. */
-               if( astOK ) {
-                  ok = 1;
-
-/* Otherwise clear the status value, and try again without any axis index. */
-               } else {
-                  astClearStatus;
-                  sprintf( buf2, "%s=%s", buf1, setting+value );
                   astSetAttrib( pfrm, buf2 );
 
-/* Indicate success, or clear the status value. */
+/* Indicate success. */
                   if( astOK ) {
                      ok = 1;
+
+/* Otherwise clear the status value, and try again without any axis index. */
                   } else {
                      astClearStatus;
+                     sprintf( buf2, "%s=%s", buf1, setting+value );
+                     astSetAttrib( pfrm, buf2 );
+
+/* Indicate success, or clear the status value. */
+                     if( astOK ) {
+                        ok = 1;
+                     } else {
+                        astClearStatus;
+                     }
                   }
+
+/* Buffer overflow */
+               } else if( astOK ) {
+                  astError( AST__INTER, "SetAttrib(CmpFrame): Buffer "
+                            "over-flow (internal AST programming error).",
+                            status );
                }
 
 /* Free the primary frame pointer. */
@@ -8119,6 +8132,8 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
       astError( AST__BADAT, "astSet: The attribute setting \"%s\" is invalid "
                "for the given %s.", status, setting, astGetClass( this ) );
    }
+
+#undef BUF_LEN
 }
 
 static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis, int *status ) {
