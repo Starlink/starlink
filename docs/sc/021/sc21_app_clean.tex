@@ -1,7 +1,17 @@
 \chapter{\xlabel{app_clean}Cleaning the raw data}
 \label{app:clean}
 
-You can use the \smurf\ task \clean\ to help inspect time-series.
+There are two ways to clean time-series data:
+
+\begin{enumerate}
+\item Run \makemap\ and add \setparam{DOCLEAN}{doclean}{1} to your
+configuration (see \cref{Section}{sec:reuse}{Re-using previously cleaned
+data to speed up map-making}).
+\item Run \clean\ to clean the time-series data without making a map.
+\end{enumerate}
+
+The rest of this appendix gives more details on using \clean.
+
 \task{sc2clean} can be used to do two basic tasks in one go:
 concatenate data (with or without applying a flatfield); and cleaning
 (fix up steps and spikes, remove the means, filter, remove common-mode
@@ -18,10 +28,10 @@ recommended to run \makemap\ in this way (\emph{i.e.} without a
 configuration file), it is not so critical when running \clean.
 
 \begin{terminalv}
-% sc2clean $FILES clean config=def
+% sc2clean ^files.lis clean config=def
 \end{terminalv}
 
-Here \file{\$FILES} can just be a single file from a sub-array, or a
+Here \file{files.lis} can just contain a single file from a sub-array, or a
 subset, e.g. \file{s8a20110417\_00051\_0003.sdf} (the first file
 containing science data), \file{s8a20110417\_00051\_000"[1234]"} (File
 1 is a noise observation with shutter closed that gets ignored, File 2
@@ -59,7 +69,7 @@ Another very useful option is to remove the common signal observed by
 all of the bolometers. This may be accomplished by
 
 \begin{terminalv}
-% sc2clean $FILES clean config='"compreprocess=1"'
+% sc2clean ^files.lis clean config='"compreprocess=1"'
 \end{terminalv}
 
 This \texttt{config} setting causes the default values to be used for all
@@ -76,7 +86,7 @@ by simply adding a filter command in the \param{config} parameter,
 which in this case low-pass filters with a cutoff at 10\,Hz:
 
 \begin{terminalv}
-% sc2clean $FILES clean config='"compreprocess=1,filt_edgelow=10"'
+% sc2clean ^files.lis clean config='"compreprocess=1,filt_edgelow=10"'
 \end{terminalv}
 
 Finally, in some cases you might just want to fit and remove
@@ -85,12 +95,12 @@ removed). This example will remove a line, but you can increase the
 value of \xparam{ORDER}{order} to remove higher-order polynomials
 
 \begin{terminalv}
-% sc2clean $FILES clean config='"order=1"'
+% sc2clean ^files.lis clean config='"order=1"'
 \end{terminalv}
 
 Non-default values for any of the cleaning parameter can be specified like so:
 \begin{terminalv}
-% sc2clean $FILES clean config='"order=1,dcfitbox=30,dcthresh=25,dcsmooth=50"'
+% sc2clean ^files.lis clean config='"order=1,dcfitbox=30,dcthresh=25,dcsmooth=50"'
 \end{terminalv}
 Or you can create your own customised configuration file. For instance:
 
@@ -100,7 +110,7 @@ order=1
 dcfitbox=30
 dcthresh=25
 dcsmooth=50
-% sc2clean $FILES clean config=^myconf
+% sc2clean ^files.lis clean config=^myconf
 \end{terminalv}
 
 The more interesting pre-processing options that may be specified are listed
