@@ -480,7 +480,7 @@ sub-mm emission are known in advance. If this is not the case, then the
 mask needs to be based on evidence within the maps created at the end of
 each iteration, resulting in the masks evolving from iteration to iteration
 as the maps converge towards the final solution. Such \emph{dynamic} masks
-have a potential problem  in that can upset the convergence process by
+have a potential problem  in that they can upset the convergence process by
 introducing extra flexibility into the algorithm. For this reason, an
 option is provided to freeze these masks after a fixed number of
 iterations\footnote{Although by default masks are never frozen.}
@@ -516,8 +516,9 @@ created at the end of each iteration (\emph{e.g.} see
 \item By applying a simple threshold on the S/N ratio as above, and then
 extending the resulting source regions down to a lower S/N value (\emph{e.g.}
 see \xparam{AST.ZERO_SNRLO}{ast.zero\_snrlo}). This allows a low S/N
-threshold to be used without introducing lots of isolated pixels into the
-mask because of noise spikes in the map.
+threshold to be used (which can sometimes help to avoid negative bowling
+around the edges of extended sources) without introducing lots of isolated
+pixels into the mask because of noise spikes in the map.
 \item By applying a threshold on the number of bolometer samples falling
 in each map pixel (\emph{e.g.} see \xparam{AST.ZERO_LOWHITS}
 {ast.zero\_lowhits}). Because of the scanning strategy used with SCUBA-2
@@ -536,10 +537,19 @@ useful alternative to simple S/N thresholding in cases where bright artificial
 large-scale structures appear in the map. Such structures will result in
 artificially large source regions in a simple S/N mask, which may in turn
 cause the artificial structures to become even brighter and larger in
-subsequent iterations. Using an \task{ffclean}-based mask instead, will
+subsequent iterations. Using an \task{ffclean}-based mask instead will
 restrict the mask to the brighter astronomical cores on top of such artificial
 large-scale structures.
 \end{enumerate}
+
+Multiple masks can be used by selecting the appropriate configuration
+parameters as described above. Whether the combined mask represents the
+\emph{union} or \emph{intersection} of the individual masks is selected
+using the parameters \xparam{AST.ZERO_UNION}{ast.zero_union},
+\xparam{FLT.ZERO_UNION}{flt.zero_union} and \xparam{COM.ZERO_UNION}
+{com.zero_union}. By default, the union is used.
+
+
 
 The masks used on the last iteration are stored in the \xref{\texttt{Quality}}
 {sun95}{se_qualitymask} component of the NDF containing the output map.
@@ -587,10 +597,10 @@ as gradients or ``saddles'' across the final map.
 The purpose of masking the \model{AST} model is to apply an extra
 constraint to the system to help break this degeneracy, and so avoid
 these large-scale features. It functions by forcing the \model{AST} model
-to zero t the end of each iteration for all samples that fall outside the
+to zero at the end of each iteration for all samples that fall outside the
 masked area on the sky (\emph{i.e.} samples that fall in the ``background''
 areas of the map). Forcing the \model{AST} model to zero in this way means
-that the \model{COM} is more closely constrained.
+that the \model{COM} model is more closely constrained.
 
 Whilst this constraint is applied only in the background regions, its
 effects are also felt part way into the source region because of the way in
@@ -598,13 +608,13 @@ which the \model{COM} model averages over a sub-array footprint. Thus source
 regions that are much larger than a sub-array will still suffer from the
 degeneracy between \model{COM} and \model{AST}, allowing arbitrary
 large-scale background features to develop within the region, but these
-features will become weaker as the edge so the mask are approached.
+features will become weaker as the edges of the mask are approached.
 
 In order to avoid the final  map containing zero values in the background
 region, it is necessary to avoid using \model{AST}-masking on the final
-iteration. For this reason, one further iteration is performed ---
+iteration. For this reason, by default one further iteration is performed ---
 without \model{AST}-masking --- once the basic iterative algorithm has
-converged.
+converged (see \xparam(AST.ZERO_NOTLAST}{ast.zero\_notlast}).
 
 All the configuration files supplied with \smurf\ use \model{AST}
 masking, with the exception of \blankfield.
@@ -613,7 +623,7 @@ masking, with the exception of \blankfield.
 \label{sec:fltmask}
 
 The \model{FLT} model estimates and removes a low frequency background
-from each bolometer time-stream. To do this it uses a FFT-based high-pass
+from each bolometer time-stream. To do this it uses an FFT-based high-pass
 filter. Ringing around sudden transients --- such as astronomical sources
 --- is a natural consequence of all such filters, resulting in alternating
 bright and dark rings around sources in the map. In most cases, the iterative
@@ -643,7 +653,7 @@ evaluated \emph{before} the map is made on each iteration. This means
 that when the \model{FLT} model is evaluated on the first iteration,
 there is no map available. This is not a problem if a static mask is
 used, but if a dynamic mask is used, then it is not possible to calculate
-the \model{FLT} mask on the first iteration *(subsequent iterations will
+the \model{FLT} mask on the first iteration (subsequent iterations will
 create the mask on the basis of the map created at the end of the
 previous iteration). This is a shame since \model{FLT} masking is most
 beneficial on the first few iterations, whilst the bulk of the astronomical

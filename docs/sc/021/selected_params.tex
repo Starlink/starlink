@@ -199,6 +199,28 @@
    }
 }
 \sstroutine{
+   AST.ZERO\_NOTLAST
+}{
+   Allows flux to be present in masked areas in the final map
+}{
+   \sstdescription{
+      If ast.zero\_notlast is 1, then the map is not masked on
+      the final iteration. This means that data samples that fall
+      outside the masked areas are allowed to remain in the final
+      map. If ast.zero\_notlast is 0, then the map is masked even on
+      the final iteration, meaning that the masked areas will
+      be zero in the final map. [1]
+   }
+   \sstattributetype{
+      int
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      MAKEMAP, CALCQU
+   }
+}
+\sstroutine{
    AST.ZERO\_SNR
 }{
    Reduces spurious large scale structure in the final map
@@ -362,7 +384,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -413,7 +435,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -432,7 +454,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -454,7 +476,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -473,7 +495,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -494,7 +516,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -512,7 +534,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -530,7 +552,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -549,7 +571,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -567,7 +589,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -587,7 +609,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -636,7 +658,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -868,7 +890,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -890,7 +912,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -912,7 +934,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -934,7 +956,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -954,7 +976,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -980,7 +1002,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -1199,7 +1221,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      EXTINCTION, MAKEMAP, CALCQU
+      EXTINCTION, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -1217,7 +1239,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      EXTINCTION, MAKEMAP, CALCQU
+      EXTINCTION, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -1326,7 +1348,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -1347,7 +1369,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -1373,7 +1395,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -1396,7 +1418,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -1421,7 +1443,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -2044,7 +2066,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -2061,7 +2083,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -2078,7 +2100,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -2119,7 +2141,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -2166,7 +2188,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -2187,7 +2209,7 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -2207,6 +2229,6 @@
    \sstdiytopic{
       SMURF Usage
    }{
-      SC2CLEAN, MAKEMAP, CALCQU
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
