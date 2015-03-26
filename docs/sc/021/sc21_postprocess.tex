@@ -91,9 +91,11 @@ changed significantly.
 \item Determine the FCF value by passing the output map to the
   \picard\ recipe
   \xref{\drrecipe{SCUBA2\_CHECK\_CAL}}{sun265}{SCUBA2_CHECK_CAL}.
+
 \begin{terminalv}
 % picard SCUBA2_CHECK_CAL 850calibrator.sdf
 \end{terminalv}
+
 This will produce a log file (\file{log.checkcal}) which records the
 both \fcfb\ and \fcfa. Check that these values closely approximate the
 standard FCF values given above.
@@ -125,9 +127,9 @@ header.
 \begin{terminalv}
 % picard CALIBRATE_SCUBA2_DATA  mapinpW.sdf
 \end{terminalv}
+
 Note that the recipe will also take account of the pixel size when
 applying \fcfa.
-
 
 \section{\xlabel{crop}Cropping your map}
 \label{sec:crop}
@@ -144,12 +146,15 @@ You can crop your map to the map-size set in the data header or to any
 requested size of box or circle using the \picard\ recipe
 \xref{\drrecipe{CROP\_SCUBA2\_IMAGES}}{sun265}{CROP\_SCUBA2\_IMAGES}.
 The centre of the cropping area will always be the centre of your map.
+
 \begin{terminalv}
 % picard -recpars mypar.lis CROP_SCUBA2_IMAGES map_cal.sdf
 \end{terminalv}
+
 The example above includes a parameter file specifying the radius of
 the circle to be extracted (in arcsecs).  The format for the parameter
 file is shown below.
+
 \begin{terminalv}
 [CROP_SCUBA2_IMAGES]
 MAP_RADIUS = 1800.0
@@ -178,9 +183,11 @@ co-add. \picard\ has a recipe called
 that co-adds maps while correctly dealing with the exposure time and
 weights NDF extensions. The images are combined using inverse-variance
 weighting and the output variance is derived from the input variances.
+
 \begin{terminalv}
 % picard -recpars mypar.lis MOSAIC_JCMT_IMAGES 850map*_cal_crop.sdf
 \end{terminalv}
+
 This creates a single output file based on the name of the last file
 in the list, and with a suffix \file{\_mos}.
 
@@ -220,6 +227,7 @@ position using the \picard\ recipe
 This is only possible if a there is a common, known source that is
 present in \textit{all} of the input maps. This should be done before
 combining your maps.
+
 \begin{terminalv}
 % picard -recpars myparams.ini SCUBA2_REGISTER_IMAGES `cat listoffiles.txt`
 \end{terminalv}
@@ -228,12 +236,14 @@ Here the parameter file contains the equatorial position of the
 reference source as in the example below. See \picardsun\ for more
 details.
 \begin{center}
+
 \begin{terminalv}
 [SCUBA2_REGISTER_IMAGES]
 REGISTER_IMAGES = 1
 REGISTER_X  = HH:MM:SS.S
 REGISTER_Y  = DD:MM:SS.S
 \end{terminalv}
+
 \end{center}
 
 \param{REGISTER\_X} and \param{REGISTER\_Y} may also be galactic
@@ -269,14 +279,18 @@ executes the following steps to get the map noise.
 
 \begin{enumerate}
 \item Crops the map to remove the noisy edges.
+
 \begin{terminalv}
 % picard CROP_JCMT_IMAGES map_cal.sdf
 \end{terminalv}
+
 \item Runs the \Kappa\ command \stats\ to extract the median value from
 the error array.
+
 \begin{terminalv}
 % stats map_cal_crop comp=err order
 \end{terminalv}
+
 \end{enumerate}
 
 \begin{tip}
@@ -296,6 +310,7 @@ The reported statistics include the pixel maximum and minimum,
 standard deviation, number of pixels used and omitted, along with
 pixel mode, and mean.  If you supply the \xparam{ORDER}{order} keyword,
 the median is also shown.
+
 \begin{terminalv}
 % stats comp=err map_cal_crop order
 \end{terminalv}
@@ -381,16 +396,78 @@ by using a compression factor of 2.
 \section{\xlabel{maskshow}Displaying masks}
 \label{sec:maskshow}
 
-Both \file{dimmconfig\_bright\_compact.lis} and
-\file{dimmconfig\_bright\_extended.lis} configuration files use
-masking (see \cref{Section}{sec:masking}{Masking}). You can see
-where any masks were applied by viewing the QUALITY component in
-\gaia.
+SCUBA-2 maps created using ``\model{AST}-masking'' (see \cref{Section}
+{sec:masking}{Masking}) will contain a \texttt{Quality} array indicating the
+background pixels that were masked (i.e. forced to zero). In itself this
+is fairly simple - background pixels have a non-zero Quality value and
+source pixels have a Quality value of zero. However, it is also possible
+to have independent masks for the \model{FLT} and \model{COM} models,
+in addition to the \model{AST} mask. For instance, maps created using
+\brightextended\ or \jsageneric\ will have \texttt{Quality} arrays that
+contain both a \model{FLT} and an \model{AST} mask, and so some care needs
+to be used when interpreting the \texttt{Quality} array.
 
-First open your map in \textsc{Gaia}. Select the top level NDF from
-list in the pop-up window then click the \gaiathing{Quality}
-button. You will need to rescale the map to bring out the masks--see
-\cref{Figure}{fig:qualdisp}{below}.
+Each value in the \texttt{Quality} array is restricted to taking integer values
+between 0 and 255, and so can be thought of as 8 separate bits. Each ``bit
+plane'' within the \texttt{Quality} array holds a single mask - \model{AST},
+\model{FLT} or \model{COM}. The \xref{\task{showqual}}{sun95}{SHOWQUAL}
+command can be used to find out which mask is held by which bit plane:
+
+\begin{terminalv}
+% showqual fred.sdf
+   AST (bit 1) - "Set iff AST model is zeroed at the output pixel"
+   FLT (bit 2) - "Set iff FLT model is blanked at the output pixel"
+\end{terminalv}
+
+This means that the \model{AST} mask is stored in bit 1 (the least significant
+bit), the \model{FLT} mask is stored in bit 2, and there is no \model{COM}
+mask. Note, if
+a map was produced using \model{FLT} masking but no \model{AST} masking,
+then the \model{FLT} mask would be stored in bit 1.
+
+The decimal integer value of any element of the \texttt{Quality} array is
+equal to the binary value formed from the bits listed by \task{showqual}.
+So in the above case the maximum \texttt{Quality} value is 3 (the decimal
+equivalent of binary ``11'' --- both bits set). Remembering that a bit is set
+(\emph{i.e.} is 1) for background pixels and cleared (\emph{i.e.} is 0) for
+source pixels, it follows that the four possible decimal \texttt{Quality}
+values in the above case (0-3) are:
+
+\begin{enumerate}
+\item - neither bit set, so the pixel is inside both the \model{AST} and the \model{FLT} mask
+(a source pixel).
+
+\item - bit 1 set but not bit 2, so the pixel is outside the \model{AST} mask but
+inside the \model{FLT} mask (a border-line pixel).
+
+\item - bit 2 set but not bit 1, so the pixel is inside the \model{AST} mask but
+outside the \model{FLT} mask (a border-line pixel).
+
+\item - both bits set, so the pixel is inside neither mask (a background
+pixel).
+\end{enumerate}
+
+\cref{Figure}{fig:qualmap}{Quality component displayed as an image} shows
+a simple map of the \texttt{Quality} array values --- the black areas have
+value zero and are thus inside both masks, the dark brown areas have value 2
+and are thus inside the \model{AST} mask but outside the \model{FLT} mask.
+The light brown areas have value 3 and are inside neither mask. In this
+particular case, there are no  areas with a quality value of 1, so the
+\model{FLT} mask is contained entirely within the \model{AST} mask:
+
+\begin{figure}[t!]
+\includegraphics[width=0.6\linewidth]{sc21_qual}
+\caption[Quality component displayed as an image]{The quality component
+from a typical map.}
+\label{fig:qualmap}
+\end{figure}
+
+To produce a plot like this, first open your map in \textsc{Gaia}. Select
+the top level NDF from list in the pop-up window then click the
+\gaiathing{Quality} button. You will need to rescale the map to bring
+out the masks--see \cref{Figure}{fig:qualdisp}{} for another example
+showing the full \textsc{Gaia} window (using rather brighter colours this
+time!).
 
 \starfig{sc21_qualitygaia}{[t!]}{width=0.9\hsize}{fig:qualdisp}{
    Display of the mask made by the map-maker}{
@@ -398,43 +475,62 @@ button. You will need to rescale the map to bring out the masks--see
    QUALITY component of your map.
 }
 
+There are several commands within \textsc{Kappa} that manipulate
+\texttt{Quality} arrays in various ways. For instance, the
+\xref{\task{setbb}}{sun95}{SETBB} command allows pixel data values to
+be set bad if the associated \texttt{Quality} value has a specified
+collection of set bits. Thus:
 
-Each value in the QUALITY component of an NDF contains eight ``on/off''
-flags used to indicate a specific binary property of the pixel. The
-first three of these flags indicate whether a pixel is inside or outside a
-specific mask (1=\model{AST}, 2=\model{FLT} or 3=\model{COM}).
-
-There are four potential values for the common combination of
-\model{AST} and \model{FLT} masks:
-
-0 = pixel is inside both \model{FLT} and \model{AST} mask (i.e. is a source pixel)\\
-1 = pixel is inside \model{AST} mask but not \model{FLT} mask\\
-2 = pixel is inside \model{FLT} mask but not \model{AST} mask\\
-3 = pixel is inside neither mask (i.e. is a background pixel)
-
-
-The maximum quality value increases from 3 to 7 if \model{COM} masking
-is also included.
-
-You can see which bit is used for each mask with \showqual.
 \begin{terminalv}
-% showqual map count
+% setbb fred 1
 \end{terminalv}
 
-As an example, you can set bad all pixel outside the \model{FLT} mask
-by doing:
+will set all pixels bad in \texttt{fred.sdf} except for those inside the
+\model{AST} mask. Likewise,
+
 \begin{terminalv}
-% setbb map 2
+% setbb fred 2
 \end{terminalv}
 
+will set all pixels bad except for those inside the \model{FLT} mask.  Note, the
+change made by \task{setbb} is temporary - it can be undone by doing:
 
-\subsubsection{Contouring a mask over your map}
-If you would like to plot a mask over your map you will need to copy
-out the QUALITY component of the data to a separate file using
-\task{ndfcopy}.
+\begin{terminalv}
+% setbb fred 0
+\end{terminalv}
+
+To display the \texttt{fred.sdf} map and then overlay the \model{AST} mask in blue
+and the \model{FLT} mask in red, do:
+
+\begin{terminalv}
+% gdclear
+% display fred mode=perc percentiles=\[2,98\]
+% setbb fred 1
+% contour fred clear=no mode=good labpos=! style='colour=blue'
+% setbb fred 2
+% contour fred clear=no mode=good labpos=! style='colour=red'
+% setbb fred 0
+\end{terminalv}
+
+The resulting plot is shown in \cref{Figure}{fig:masks}{AST and FLT masks
+shown together}.
+
+\begin{figure}[t!]
+\includegraphics[width=0.6\linewidth]{sc21_masks}
+\caption[AST and FLT masks shown together]{The AST and FLT masks contoured
+together over an image.}
+\label{fig:masks}
+\end{figure}
+
+Alternatively, \gaia\ can be used to contour the \texttt{Quality} array
+over an image, but you cannot then distinguish the \model{AST} mask from
+the \model{FLT} mask. First you will need to copy out the QUALITY component
+of the data to a separate file using \task{ndfcopy}:
+
 \begin{terminalv}
 % ndfcopy comp=qua map map_mask
 \end{terminalv}
+
 Then open your map in \gaia\ and contour the mask NDF on top.
 Select \gaiathing{Contouring...} from the \gaiathing{Image-Analysis}
 menu, and supply the name of the mask NDF either by entering its name in
@@ -443,8 +539,7 @@ the \gaiathing{Other image:} box, or selecting with
 \cref{Figure}{fig:maskdisp}{the figure below}.
 
 For more information on the use of masks by \makemap\ and the
-parameters that affect them see \cref{Chapter}{sec:tweak}{Tailoring
-your Reduction}.
+parameters that affect them see \cref{sectyion}{sec:masking}{Masking}.
 
 \starfig{sc21_dispmask3}{[hb!]}{width=0.95\linewidth}{fig:maskdisp}{
    Contours of an \model{AST} mask overlaid on a map}{
@@ -502,10 +597,10 @@ parameters.
 The \cupid\ application \findclumps\ can be used to generate a clump
 catalogue. It identifies clumps of emission in one-, two- or
 three-dimensional NDFs. The user can select from the clump-finding
-algorithms FellWalker\cite{fellwalker}, Gaussclumps, ClumpFind or Reinhold
-and must supply a configuration file specific to each method. See the
-\xref{\textsc{Cupid} manual}{sun255}{} for descriptions of the various
-algorithms.
+algorithms ``FellWalker''\cite{fellwalker}, ``Gaussclumps'',
+``ClumpFind'' or ``Reinhold'' and must supply a configuration file
+specific to each method. See the \xref{\textsc{Cupid} manual}{sun255}{}
+for descriptions of the various algorithms.
 
 The result is returned as a catalogue in a text file and as a NDF
 pixel mask showing the clump boundaries.
@@ -558,12 +653,13 @@ with this:
 
 \begin{description}
 \item[Map provenance]
-  \provshow\ will list all the NDFs that were used in the creation of
-  your map, while \hislist\ will show a truncated list of input files
-  but will list every configuration parameter used by the map-maker.
-  This includes all the hidden default values as well as those
-  specified in your supplied configuration file. These commands are
+  \provshow\ will list all the NDFs and operations that were used in the
+  creation of your map, while \hislist\ will show a truncated list of input
+  files and operations but will list every configuration parameter used by
+  the map-maker.  This includes all the hidden default values as well as
+  those specified in your supplied configuration file. These commands are
   executed like this:
+
 \begin{terminalv}
 % provshow 850map
 % hislist 850map
@@ -579,25 +675,26 @@ root ancestors.
 
 
 \item[Map-maker parameters]
-The task \configmeld\ will identify what configuration parameters were
-used by the map-maker when your data were reduced. \task{configmeld}
-requires a visual-differences tool to be installed on your machine;
-those currently recognised are
-\htmladdnormallinkfoot{\texttt{meld}}{http://meldmerge.org/}
+The task \configmeld\ will compare two maps and highlight any differences
+between the configuration parameters that were used to create the maps. A
+configuration file can be supplied in place of a map, in which case the
+parameters used to create the map are compared with those in the
+configuration file. \task{configmeld} requires a visual-differences tool
+to be installed on your machine; those currently recognised are:
+\htmladdnormallink{\texttt{meld}}{http://meldmerge.org/}
 \htmladdnormallink{\texttt{opendiff}}{http://developer.apple.com/},
 \htmladdnormallink{\texttt{diffmerge}}{http://www.sourcegear.com/diffmerge},
 \htmladdnormallink{\texttt{kdiff3}}{http://kdiff3.sourceforge.net},
 \htmladdnormallink{\texttt{tkdiff}}{http://sourceforge.net/projects/tkdiff}, and
 \htmladdnormallink{\texttt{diffuse}}{http://diffuse.sourceforge.net},
-and are searched for in that order. It will compare the
-configuration parameters for two reduced maps or configuration files
-(which can be mixed and matched). The follow example illustrates two
-ways to run it.
+and are searched for in that order. The follow example illustrates two
+ways to run \task{configmeld}:
 
 \begin{terminalv}
 % configmeld 850map1.sdf 850map2.sdf
 % configmeld 850map1.sdf ^mydimmconfig2.lis
 \end{terminalv}
+
 Another useful command is the \Kappa\ command \configecho.
 This is very versatile and will display the name and value of one or
 all configuration parameters either from a configuration file or from

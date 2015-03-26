@@ -1352,6 +1352,26 @@
    }
 }
 \sstroutine{
+   FILT\_EDGE\_SMALLSCALE
+}{
+   Specifies the smallest largest scale size to be retained by
+   the initial data cleaning
+}{
+   \sstdescription{
+      If non-zero, features with spatial sizes less than this
+      value (in arcsec) will be removed by the initial data
+      cleaning. See parameter {\tt{"}}\xref{filt\_edge\_largescale}{sun258}{FILT_EDGE_LARGESCALE}{\tt{"}}. [0]
+   }
+   \sstattributetype{
+      real
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      SC2CLEAN, CALCQU, MAKEMAP
+   }
+}
+\sstroutine{
    FILT\_EDGELOW
 }{
    Specifies the highest frequency to be retained by the
