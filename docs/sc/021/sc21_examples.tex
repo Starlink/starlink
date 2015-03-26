@@ -30,14 +30,14 @@ In this example the raw data are stored locally in a directory called
 which we will reduced independently.
 
 \begin{terminalv}
-% makemap data/s8*00013_00\*.sdf cosmo1 method=iterate \
-config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
+% makemap data/s8*00013_00\*.sdf cosmo1 \
+          config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
 
-% makemap data/s8*00018_00\*.sdf cosmo2 method=iterate \
-config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
+% makemap data/s8*00018_00\*.sdf cosmo2 \
+          config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
 
-% makemap data/s8*00021_00\*.sdf cosmo3 method=iterate \
-config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
+% makemap data/s8*00021_00\*.sdf cosmo3 \
+          config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
 
 \end{terminalv}
 
@@ -281,8 +281,8 @@ input files (\file{filelist.txt}) and
 \file{dimmconfig\_bright\_extended.lis} is in the local directory.
 
 \begin{terminalv}
-% makemap in=^filelist.txt 850galactic method=iterate \
-config='"^dimmconfig_bright_extended.lis,maptol=0.04,ast.zero_snr=3.5"'
+% makemap in=^filelist.txt 850galactic \
+          config='"^dimmconfig_bright_extended.lis,maptol=0.04,ast.zero_snr=3.5"'
 \end{terminalv}
 The resulting map is shown in \cref{Figure}{fig:galmakemap}{the figure below}.
 
@@ -344,8 +344,8 @@ As a last step the map is re-made with this mask supplied as an external
 file. For this run we apply the additional parameters in a
 personalised configuration file, \file{mydimmconfig.lis}.
 \begin{terminalv}
-% makemap in=^filelist.txt 850galactic method=iterate \
-config=^mydimmconfig.lis ref=850map_mask_zm
+% makemap in=^filelist.txt 850galactic \
+          config=^mydimmconfig.lis ref=850map_mask_zm
 \end{terminalv}
 
 The configuration file, \file{mydimmconfig.lis}, has the following
