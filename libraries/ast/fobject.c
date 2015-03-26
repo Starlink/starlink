@@ -46,12 +46,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -335,6 +335,9 @@ F77_SUBROUTINE(ast_set)( INTEGER(THIS),
    astWatchSTATUS(
       setting = astString( SETTING, SETTING_length );
 
+/* Truncate the string to exclude any trailing spaces. */
+      astChrTrunc( setting );
+
 /* Change ',' to '\n' (which is what astSet normally does to its second
    argument internally to separate the fields). This then allows "setting"
    to be provided as an additional string value to be formatted using "%s".
@@ -397,6 +400,11 @@ F77_SUBROUTINE(ast_setc)( INTEGER(THIS),
    astWatchSTATUS(
       attrib = astString( ATTRIB, ATTRIB_length );
       value = astString( VALUE, VALUE_length );
+
+/* Truncate the strings to exclude any trailing spaces. */
+      astChrTrunc( attrib );
+      astChrTrunc( value );
+
       astSetC( astI2P( *THIS ), attrib, value );
       astFree( attrib );
       astFree( value );

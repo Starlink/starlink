@@ -27,12 +27,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -90,6 +90,9 @@ F77_INTEGER_FUNCTION(ast_selectormap)( INTEGER(NREG),
    astWatchSTATUS(
       options = astString( OPTIONS, OPTIONS_length );
       regs = astMalloc( sizeof(AstObject *) * (*NREG) );
+
+/* Truncate the options string to exlucde any trailing spaces. */
+      astChrTrunc( options );
 
 /* Change ',' to '\n' (see AST_SET in fobject.c for why). */
       if ( astOK ) {

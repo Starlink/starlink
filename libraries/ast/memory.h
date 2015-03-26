@@ -50,6 +50,8 @@
 *           Convert a string to upper or lower case.
 *        astChrLen
 *           Returns length of a string without trailing white space, etc.
+*        astChrTrunc
+*           Terminate a string to exclude trailing spaces.
 *        astSscanf
 *           Like sscanf, but fixes certain platform-specific bugs in the
 *           native sscanf implementation.
@@ -113,6 +115,8 @@
 *        Added astChrSub.
 *     19-MAY-2010 (DSB):
 *        Added astStringCase.
+*     26-MAR-2015 (DSB):
+*        Added astChrTrunc.
 
 *-
 */
@@ -226,6 +230,7 @@ void astRemoveLeadingBlanks_( char *, int * );
 char *astAppendString_( char *, int *, const char *, int * );
 char *astAppendStringf_( char *, int *, const char *, ... )__attribute__((format(printf,3,4)));
 char *astChrSub_( const char *, const char *, const char *[], int, int * );
+void astChrTrunc_( char *, int * );
 
 #ifdef MEM_PROFILE
 void astStartTimer_( const char *, int, const char *, int * );
@@ -275,6 +280,7 @@ void astEndPM_( int * );
 #define astStringArray(chars,nel,len) astERROR_INVOKE(astStringArray_(chars,nel,len,STATUS_PTR))
 #define astStringCase(string,toupper) astERROR_INVOKE(astStringCase_(string,toupper,STATUS_PTR))
 #define astChrLen(string) astERROR_INVOKE(astChrLen_(string,STATUS_PTR))
+#define astChrTrunc(string) astERROR_INVOKE(astChrTrunc_(string,STATUS_PTR))
 #define astChr2Double(string) astERROR_INVOKE(astChr2Double_(string,STATUS_PTR))
 #define astRemoveLeadingBlanks(string) astERROR_INVOKE(astRemoveLeadingBlanks_(string,STATUS_PTR))
 #define astChrSub(test,template,subs,nsub) astERROR_INVOKE(astChrSub_(test,template,subs,nsub,STATUS_PTR))

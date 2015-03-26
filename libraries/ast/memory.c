@@ -158,6 +158,8 @@
 *     20-OCT-2014 (DSB):
 *        Revert the change to astAppendString made on 23-SEP-2014 as it is
 *        insecure. Instead add new function astAppendStringf.
+*     26-MAR-2015 (DSB):
+*        Added astChrTrunc.
 */
 
 /* Configuration results. */
@@ -2047,6 +2049,36 @@ c     the supplied test string does not match the template.
 /* Call ChrSuber to do the work, without saving the matching parts of the
    test string. */
    return ChrSuber( test, pattern, subs, nsub, 0, NULL, NULL, NULL, status );
+}
+
+void astChrTrunc_( char *text, int *status ){
+/*
+*++
+*  Name:
+*     astChrTrunc
+
+*  Purpose:
+*     Terminate a string to exclude trailing spaces.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void astChrTrunc( char *text )
+
+*  Description:
+*     This function pokes a null character into the supplied string to
+*     remove any trailing spaces.
+
+*  Parameters:
+*     text
+*        The string to be truncated.
+
+*--
+*/
+   if( !text ) return;
+   text[ astChrLen( text ) ] = 0;
 }
 
 void *astFree_( void *ptr, int *status ) {
