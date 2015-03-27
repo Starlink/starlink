@@ -50,7 +50,7 @@ available parameters, see the appendix \xref{``Configuration Parameters''}
 
 It is possible to create a map without supplying a configuration file to
 \makemap\ (\emph{i.e.} leaving all configuration parameters set to their default
-values - ``\texttt{config=def}'' when running \texttt{makemap}) but it is not
+values---``\texttt{config=def}''---when running \texttt{makemap}) but it is not
 recommeneded since it will not give optimal results
 for your particular observation. For this reason, specialised
 configuration files have been developed which are tailored to different
@@ -59,8 +59,8 @@ molecular clouds. A description of these specialised configuration files
 can be found \cref{in Section}{sec:config}{here}.
 
 Note, when using the pipeline to create a map, rather than running
-\makemap\ directly, the pipeline will always use a configuration file ---
-one of the standard configuration files will be used if none is specified
+\makemap\ directly, the pipeline will always use a configuration
+file---one of the standard configuration files will be used if none is specified
 by the user.
 
 \section{The reduction step-by-step}
@@ -79,14 +79,14 @@ models are subtracted, a sky map created and the convergence checked.
 \begin{enumdesc}
 \item[Initial cleaning and down-sampling]
   The separate raw data files are first concatenated into a single time
-  series for each sub-array (if possible --- see \latexhtml{the description
+  series for each sub-array (if possible---see \latexhtml{the description
   of \emph{Data Chunking} on Page~\pageref{box:chunk})~}{\htmlref{Data
   Chunking)}{box:chunk}} and have the flat-field from the associated
   fast-flat scans applied to calibrate the bolometers.  This resulting
   time-series are in units of pW.
 
   These time-series are then re-sampled at a rate that matches the
-  requested pixel size --- the equivalent to applying a low-pass filter.
+  requested pixel size---the equivalent to applying a low-pass filter.
   Down-sampling saves time and memory usage when running the map-maker,
   without loosing any significant information. The degree of
   down-sampling applied depends on how fast the telescope was moving
@@ -164,7 +164,7 @@ models are subtracted, a sky map created and the convergence checked.
   map pixel values is less than a specified fraction of a standard
   deviation (see parameter \xparam{MAPTOL}{maptol}).  If more iterations
   are required or (in the latter case) the map is still changing
-  significantly, all the model --- \emph{except for AST} --- are added
+  significantly, all the model---\emph{except for AST}---are added
   back onto the residuals, thus reconstructing the original time-series
   but without the astronomical signal.  This is the signal upon which the
   model estimates will be based on the next iteration.
@@ -248,7 +248,7 @@ FALSE
   \end{terminalv}
   indicates that the time-series data from which \texttt{mymap.sdf} was
   created was broken into two contiguous groups of samples. This
-  indicates a potential problem with the data - the NCONTIG header
+  indicates a potential problem with the data---the NCONTIG header
   should normally be one.
   \end{itemize}
 
@@ -488,18 +488,18 @@ is used within the specialist configuration file \fixconvergence\
 described in \cref{Section}{sec:problem}{Configuration files for solving
 specific problems}.
 
-Each of the three models --- \model{AST}, \model{FLT} and \model{COM}
---- have an equivalent set of parameters to specify the masking (if any)
+Each of the three models---\model{AST}, \model{FLT} and \model{COM}
+---have an equivalent set of parameters to specify the masking (if any)
 that should be used. Each set starts with the model name, followed by a
 dot, followed by the parameter name. To enable masking, one or more of
 these parameters needs to be set to a suitable value to define a mask, as
 described below.
 
 Static masks can be defined either as circles of specified radius,
-centred on the source position (suitable for compact sources - see for
+centred on the source position (suitable for compact sources---see for
 instance \xparam{AST.ZERO_CIRCLE}{ast.zero\_circle}), or by an external
 image that uses special pixel values to indicate the source regions and
-the background regions (suitable for extended sources - see for
+the background regions (suitable for extended sources---see for
 instance \xparam{AST.ZERO_MASK}{ast.zero\_mask}). Within such ``external
 masks'' all background pixels should be set to the Starlink \emph{bad} value
 (see \xref{``Bad-pixel Masking''}{sun95}{se_badmasking} in SUN/95).
@@ -524,9 +524,9 @@ in each map pixel (\emph{e.g.} see \xparam{AST.ZERO_LOWHITS}
 (see \cref{Section}{sec:mmodes}{Observing modes}), pixels near the edge of
 the map will receive fewer bolometer samples than those near the centre,
 and will therefore be noisier. Thus this scheme allows the noisy edges of
-the map to be masked out. Whilst this is technically a dynamic mask ---
-because the number of samples falling in each pixel could potentially change
-from iteration to iteration --- in fact a mask based on hits per pixel
+the map to be masked out. Whilst this is technically a dynamic mask---because
+the number of samples falling in each pixel could potentially change
+from iteration to iteration---in fact a mask based on hits per pixel
 will usually only change very slightly from iteration to iteration.
 \item By using an algorithm that automatically identifies features of a
 given size in the map, similar to that used by the \textsc{Kappa}
@@ -554,13 +554,13 @@ The masks used on the last iteration are stored in the \xref{\texttt{Quality}}
 {sun95}{se_qualitymask} component of the NDF containing the output map.
 A separate bit of the quality component is used for each model (\model{AST},
 \model{FLT} or \model{COM}) that is being masked. These bits can be
-viewed in various ways - see \cref{Section}{sec:maskshow}{Displaying masks}
+viewed in various ways---see \cref{Section}{sec:maskshow}{Displaying masks}
 and \cref{Section}{sec:itermaps}{Monitoring the map at the end of each
 iteration}.
 
 \begin{tip}
 Be aware that the S/N ratio within individual map pixels depends on pixel
-size --- larger pixels will have higher S/N ratios than small pixels.
+size---larger pixels will have higher S/N ratios than small pixels.
 Therefore masks based on a specific S/N threshold will grow or shrink in
 area as a function of pixel size. As a rough rule, if you double the pixel
 size, you should also double the S/N thresholds to get a mask that covers a
@@ -611,8 +611,8 @@ features will become weaker as the edges of the mask are approached.
 
 In order to avoid the final  map containing zero values in the background
 region, it is necessary to avoid using \model{AST}-masking on the final
-iteration. For this reason, by default one further iteration is performed ---
-without \model{AST}-masking --- once the basic iterative algorithm has
+iteration. For this reason, by default one further iteration is
+performed---without \model{AST}-masking---once the basic iterative algorithm has
 converged (see \xparam{AST.ZERO_NOTLAST}{ast.zero\_notlast}).
 
 All the configuration files supplied with \smurf\ use \model{AST}
@@ -623,7 +623,7 @@ masking, with the exception of \blankfield.
 
 The \model{FLT} model estimates and removes a low frequency background
 from each bolometer time-stream. To do this it uses an FFT-based high-pass
-filter. Ringing around sudden transients --- such as astronomical sources
+filter. Ringing around sudden transients---such as astronomical sources
 --- is a natural consequence of all such filters, resulting in alternating
 bright and dark rings around sources in the map. In most cases, the iterative
 nature of the map-making algorithm eventually results in the rings
@@ -645,7 +645,7 @@ before the bulk of the astronomical signal has been removed from the
 time-streams. Indeed, if it is allowed to continue for too many iterations
 it can cause its own problems that tend to slow down convergence. For
 this reason, if \model{FLT} masking is used, it is (by default) limited
-to two iterations ---  see \xparam{FLT.ZERO_NITER}{flt.zero\_niter}.
+to two iterations---see \xparam{FLT.ZERO_NITER}{flt.zero\_niter}.
 
 A difficulty with \model{FLT} masking is that the \model{FLT} model is
 evaluated \emph{before} the map is made on each iteration. This means
@@ -688,8 +688,8 @@ Currently, none of the configuration files supplied with \smurf\ use
 
 \section{\xlabel{sec_skip}Skipping the AST model}
 \label{sec:skip}
-As discussed in \cref{Section}{sec:masking}{Masking} - \model{FLT}
-masking is most effective on the early iterations (particularly the very
+As discussed in \cref{Section}{sec:masking}{Masking}, \model{FLT}
+masking is most effective on the early iterations (particularly the
 first iteration). This is because the bulk of the astronomical signal is
 still present in the time streams and is likely to cause bad ringing if
 \model{FLT} masking is not used. However, since the \model{FLT} model
@@ -698,7 +698,7 @@ available to use as the basis for a \model{FLT} mask on the very first
 iteration.
 
 One way to get round this is simply to use a static mask that does not
-require a map to be available. However, this may not be possible -
+require a map to be available. However, this may not be possible,
 particularly for extended sources where no \emph{a-priori} knowledge of the
 source areas in the sub-mm may be available.
 
@@ -708,7 +708,7 @@ $N$, the subtraction of the \model{AST} model from the time-series that
 normally occurs at the end of each iteration is not performed on the
 first $N$ iterations. This means that for the first $N$ iterations, the
 time-series data remain unchanged, and consequently the models and the
-resulting map are unchanged. Of itself, this does nothing useful --- it
+resulting map are unchanged. Of itself, this does nothing useful---it
 merely delays the first useful iteration. However, when combined with
 \model{FLT} masking, it can be very beneficial because it allows a mask
 to be created \emph{before} the first ``real'' iteration occurs
@@ -746,8 +746,8 @@ configuration will take on the default value listed in
 
 Below is a description of each of the specialised configuration files.
 The tables following each description list the parameters set by each file.
-The files themselves are stored in \file{\$STARLINK\_DIR/share/smurf/} ---
-they are simple text files and so can be inspected easily.
+The files themselves are stored in \file{\$STARLINK\_DIR/share/smurf/}---they
+are simple text files and so can be inspected easily.
 
 \subsection{dimmconfig\_jsa\_generic.lis}
 The \jsageneric\ configuration file is designed to handle all science data. This is a good
@@ -774,7 +774,7 @@ four sub-arrays.}.
 
 \item Using a mask to force the \model{AST} model to zero in the background regions
 after each iteration (see parameters \xparam{AST.ZERO_SNR}{ast.zero\_snr}
-and \xparam{AST.ZERO_SNRLO}{ast.zero\_snrlo} --- also see
+and \xparam{AST.ZERO_SNRLO}{ast.zero\_snrlo}---also see
 \cref{Section}{sec:astmask}{AST masking}).
 
 \end{enumerate}

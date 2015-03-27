@@ -2,7 +2,7 @@
 \label{sec:manual}
 
 The previous chapter described how to make maps using the SCUBA-2 Pipeline.
-Users - particularly new users - are encourage to use the pipeline for
+Users---particularly new users---are encourage to use the pipeline for
 their map-making. However, greater control of the map-making
 process is available by running the \makemap\ command directly, rather
 than from within the pipeline. This chapter describes how to do this, but
@@ -40,7 +40,7 @@ parameter called \texttt{CONFIG}.}:
 
 \begin{itemize}
 
-\item \texttt{IN} - a list of input NDFs containing raw SCUBA-2 data (see
+\item \texttt{IN}---a list of input NDFs containing raw SCUBA-2 data (see
 \cref{Section}{sec:rawdata}{The raw data} and \cref{Section}{sec:ndf}
 {Data formats}). There are many ways in which the list of files can be supplied,
 as described in Section ``\xref{Specifying Groups of Objects}{sun95}{se_groups}''
@@ -50,13 +50,13 @@ then supply the name of the text file, preceded by an up-caret character
 (\,\texttt{\^{}}\,), as the value for parameter \texttt{IN}. Note, the names of
 the raw data files can contain wild-cards such as ``$*$'' and ``?''.
 
-\item \texttt{OUT} - the name of the NDF in which to store the final
+\item \texttt{OUT}---the name of the NDF in which to store the final
 map. The supplied file name should either have a file type of
 ``\texttt{.sdf}'', or no file type at all (in which case \texttt{.sdf}
 will be appended to the supplied value). Any existing file with the same
 name will be over-written.
 
-\item \texttt{CONFIG} - a string that specifies new values for one or more
+\item \texttt{CONFIG}---a string that specifies new values for one or more
 configuration parameters. These new values are used in place of the
 \xref{default values}{sun258}{par_full} described in
 \xref{SUN/258}{sun258}{}. Any configuration parameter not specified by
@@ -178,7 +178,7 @@ information you could set it to (say) ``\texttt{verbose}'':
           config=^$STARLINK_DIR/share/smurf_bright_compact.lis
 \end{terminalv}
 
-Note - unambiguous abbreviations may be used for many command line
+Note---unambiguous abbreviations may be used for many command line
 parameters --- so ``\texttt{verb}'' is acceptable instead of
 ``\texttt{verbose}''. Setting \texttt{MSG\_FILTER} to ``\texttt{quiet}''
 will suppress all screen output.
@@ -428,14 +428,14 @@ samples when forming the mean sample value in each map
 pixel\footnote{Bolometers are given equal weight in the map created at
 the end of the first iteration since the NOI model has not yet been
 calculated at that point.}. NOI is calculated from the residuals left after
-removal of all other models, and is only calculated once --- subsequent
+removal of all other models, and is only calculated once---subsequent
 iterations re-use the same NOI values.}
 
 \emph{The \texttt{SPIKE:} item that has appeared in the quality flagging
 statistics records the number of samples that have been rejected as
 transient spikes in the time-series. This flagging is done by comparing
 the bolometer values that fall in each map pixel, and flagging any that
-appear to be statistical out-liers - see configuration parameter
+appear to be statistical outliers---see configuration parameter
 \xparam{AST.MAPSPIKE}{ast.mapspike}.}
 
 \emph{The mean ``\texttt{NORMALIZED MAP CHANGE}'' value should drop with each
@@ -650,7 +650,7 @@ smf_iteratemap: Adding map estimated from this continuous chunk to total
 This indicates that the raw data has gaps in it, resulting in seven maps
 being made, one from each continuous chunk, before the final map is made
 by combining all the individual maps. Chunking can produce sub-optimal
-maps, and should normally be investigated - see \latexhtml{the description
+maps, and should normally be investigated---see \latexhtml{the description
 of \emph{Data Chunking} on Page~\pageref{box:chunk})~}{\htmlref{Data
 Chunking}{box:chunk}}.
 

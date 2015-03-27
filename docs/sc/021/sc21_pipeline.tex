@@ -7,7 +7,7 @@ SCUBA-2 data reduction pipelines have been developed based on the
 existing \oracdr\ pipeline (Cavanagh et al., 2008\cite{oracdr}) used
 for ACSIS. There are three distinct pipelines currently utilised by
 SCUBA-2. Users will likely only need to run the science pipeline. The
-other two pipelines are designed to run at the JCMT - the quick-look (QL) and
+other two pipelines are designed to run at the JCMT---the quick-look (QL) and
 summit pipelines. The latter two are run in real time at the JCMT
 during data acquisition.
 
@@ -183,13 +183,14 @@ an individual or multiple observations.
 \end{tip}
 
 When executing the \oracdr command a new Xwindow will appear within which
-will contain the pipeline output, as shown in Figures \ref{pipeline-oracdr-1} - \ref{pipeline-oracdr-4}.
+will contain the pipeline output, as shown in Figures
+\ref{pipeline-oracdr-1}--\ref{pipeline-oracdr-4}.
 
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.7\linewidth]{sc21-pipeline-oracdr-1}
 \caption[Output from the pipeline]{The Xwindows output from the \oracdr\
-pipeline showing the initial log - here we see the pipeline is checking
+pipeline showing the initial log---here we see the pipeline is checking
 for the raw files. \label{pipeline-oracdr-1}}
 \end{center}
 \end{figure}
@@ -198,7 +199,7 @@ for the raw files. \label{pipeline-oracdr-1}}
 \begin{center}
 \includegraphics[width=0.7\linewidth]{sc21-pipeline-oracdr-2}
 \caption[Output from the pipeline]{The Xwindows output from the \oracdr\
-pipeline - here we see the data being reduced with the recipe
+pipeline---here we see the data being reduced with the recipe
 REDUCE\_SCAN\_EXTENDED\_SOURCES. The pipeline also reports the name of the
 observation being reduced and the duration of the observation. \label{pipeline-oracdr-2}}
 \end{center}
@@ -208,7 +209,7 @@ observation being reduced and the duration of the observation. \label{pipeline-o
 \begin{center}
 \includegraphics[width=0.7\linewidth]{sc21-pipeline-oracdr-3}
 \caption[Output from the pipeline]{The Xwindows output from the \oracdr\
-pipeline - here we we see the FCF being applied, the graphics
+pipeline---here we we see the FCF being applied, the graphics
 being created along with a group file (file containing co-added observations
 from a single night - if provided). \label{pipeline-oracdr-3}}
 \end{center}
@@ -219,7 +220,7 @@ from a single night - if provided). \label{pipeline-oracdr-3}}
 \begin{center}
 \includegraphics[width=0.7\linewidth]{sc21-pipeline-oracdr-4}
 \caption[Output from the pipeline]{The Xwindows output from the \oracdr\
-pipeline - here we see the pipeline process has completed. \label{pipeline-oracdr-4}}
+pipeline---here we see the pipeline process has completed. \label{pipeline-oracdr-4}}
 \end{center}
 \end{figure}
 
@@ -247,10 +248,10 @@ To run the pipeline and obtain all messages from the Starlink engines
 \end{terminalv}
 
 
-To run the pipeline and have the results sent to the screen (s) and to a
-file (f -  the file produced is usually called \file{.oracdr\_NNNN.log}
+To run the pipeline and have the results sent to the screen (\param{s)} and to a
+file (\param{f}---the file produced is usually called \file{.oracdr\_NNNN.log}
 where NNNN is the current process ID. It is written to \$ORAC\_DATA\_OUT
-and is a hidden file) is specified using the -log command.
+and is a hidden file) is specified using the \param{-log} command.
 
 \begin{terminalv}
 % oracdr -files <list_of_files> -loop file  -log sf -verbose
@@ -308,7 +309,7 @@ MAKEMAP_CONFIG = mynewconfig.lis
 FINDCLUMPS_CFG = myfellwalkerparams.lis
 \end{terminalv}
 
-Other options we can change in the parameter file include - changing the pixel size
+Other options we can change in the parameter file include---changing the pixel size
 
 \begin{terminalv}
 [REDUCE_SCAN]
