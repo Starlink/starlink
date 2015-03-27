@@ -10,7 +10,7 @@
 
 #  Description:
 #     Provides a number of methods that can be used to construct
-#     AQDL queries for making RegTAP queries. The methods are meant
+#     ADQL queries for making RegTAP queries. The methods are meant
 #     to cover the standard cases, i.e. TAP services, Registries,
 #     SIA servers etc.
 
