@@ -13,7 +13,7 @@
 #     Will plot any RA/Dec coordinates as positions over the displayed
 #     image, and attempt to download and display any images that are
 #     present in a selected row.
-#     XXX need to support STC-S region display.
+#     Also supports STC-S region display for columns with the correct xtype.
 
 #  Invocations:
 #
@@ -192,22 +192,23 @@ itcl::class gaiavo::GaiaVOTAP {
       #  Need to locate a field to get the URL for downloading any images...
       set ucds [$w_.cat ucd]
       set n 0
+      set accessref {}
       foreach ucd $ucds {
          if { [string match -nocase "*accessref*" $ucd] } {
+            set accessref [eval lindex $args $n]
             break
          }
          incr n
       }
-      set accessref [eval lindex $args $n]
 
-      if { $itk_option(-gaia) != {} } {
+      if { $itk_option(-gaia) != {} && $accessref != {} } {
          if { $urlget_ == {} } {
             set urlget_ [gaia::GaiaUrlGet .\#auto \
                             -notify_cmd \
                             [code $this display_image_ $new_window_]]
-            blt::busy hold $w_
-            $urlget_ get $accessref
          }
+         blt::busy hold $w_
+         $urlget_ get $accessref
       }
    }
 

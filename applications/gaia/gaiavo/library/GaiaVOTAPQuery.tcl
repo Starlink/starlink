@@ -147,6 +147,9 @@ itcl::class gaiavo::GaiaVOTAPQuery {
             -hscrollmode dynamic
       }
 
+      #  Hint about where to start.
+      $itk_component(adqlframe) insert end "SELECT * FROM <TABLE> WHERE\n"
+
       pack $itk_component(adqlframe) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(adqlframe) {ADQL query, press Query button to activate}
    }

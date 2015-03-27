@@ -178,22 +178,22 @@ itcl::class gaiavo::GaiaVOCatSIAP {
       #  downloading the image.
       set ucds [$w_.cat ucd]
       set n 0
+      set accessref {}
       foreach ucd $ucds {
          if { [string match -nocase "*accessref*" $ucd] } {
-            break
+            set accessref [eval lindex $args $n]
          }
          incr n
       }
-      set accessref [eval lindex $args $n]
 
-      if { $itk_option(-gaia) != {} } {
+      if { $itk_option(-gaia) != {} && $accessref != {} } {
          if { $urlget_ == {} } {
             set urlget_ [gaia::GaiaUrlGet .\#auto \
                             -notify_cmd \
                             [code $this display_image_ $new_window_]]
-            blt::busy hold $w_
-            $urlget_ get $accessref
          }
+         blt::busy hold $w_
+         $urlget_ get $accessref
       }
    }
 
