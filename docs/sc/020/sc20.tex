@@ -2950,7 +2950,8 @@ unless something has gone wrong.
 
 The JCMT Science Archive is hosted by The Canadian Astronomy Data
 Centre (CADC). Both raw data and data processed by the science pipeline
-are made available to PIs and co-Is through the CADC interface
+are made available to PIs and co-Is through the CADC Advanced Search
+interface linked from the JCMT landing page
 (\url{http://www3.cadc-ccda.hia-iha.nrc-cnr c.gc.ca/jcmt/}).
 
 To access proprietary data you will need to have your CADC username
@@ -2959,6 +2960,14 @@ registered by the JAC and thereby associated with the project code.
 When searching the JCMT Science Archive, be sure to select the correct
 search option from the `JSA Queries' tab. Here you can select public
 versus proprietary, raw versus reduced, and SCUBA-2 versus ACSIS data.
+
+\begin{figure}[b!]
+\begin{center}
+\includegraphics[width=0.98\linewidth]{sc20_cadc}
+\caption{Screenshot of the CADC search window for reduced HARP data.}
+\label{fig:cadc}
+\end{center}
+\end{figure}
 
 An important search option to be aware of is `Group Type', where your
 options are Simple, Night, Project and Public. Simple (which becomes
@@ -2969,13 +2978,30 @@ project option is generated if an entire project has been run through
 the pipeline and identical sources across the project are co-added
 into master group files.
 
-\begin{figure}[b!]
-\begin{center}
-\includegraphics[width=0.98\linewidth]{sc20_cadc}
-\caption{Screenshot of the CADC search window for reduced HARP data.}
-\label{fig:cadc}
-\end{center}
-\end{figure}
+The format and file naming conventions are different in the JSA for
+\emph{reduced} data compared with merely running \oracdr.  Reduced
+observations will be in FITS format with the \file{.fits} file
+extension.  File names begin with the \file{jcmth} prefix followed by
+the UT date, observation number, subsystem number, the product name
+and subscan number, the grouping algorithm, and finally a version
+number (in practice zero), with adjacent elements separated by an
+underscore.  The product name of most interest will be \file{reduced},
+but others include \file{rimg} and \file{rsp} for the representative
+image and spectrum.  The grouping algorithm is \file{obs} for a single
+observation, and \file{nit} where all the good data for an object observed
+with the same instrumental setup during a night are combined to create
+products of better quality.  A further grouping is \file{pro}) where
+matching observations within a project are combined, which may extend
+over many nights spanning years.
+
+Here is are some examples:
+\file{jcmth20070728\_00066\_01\_reduced002\_obs\_000.fits}, \\
+\file{jcmth20070728\_00066\_01\_rimg001\_nit\_000.fits}, and
+\file{jcmth20070728\_00066\_02\_rsp001\_pro\_000.fits}.
+
+For a detailed guide to using the Advanced Search see
+\htmladdnormallink{JSA User's Guide}{http://www.eaobservatory.org/jcmt/science/archive/guide/}.
+
 
 \clearpage
 
