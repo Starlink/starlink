@@ -2401,15 +2401,16 @@ issue this command that often.
 more-complicated plots, and possibly add annotations with other packages
 especially \PONGOref\@.  This is fine if the device is some sort of
 screen.  However, care needs to be taken when using other types of
-device. For instance, some \PGPLOTref\ postscript devices put the
+device. For instance, some \PGPLOTref\ PostScript devices put the
 output from each command into a separate disk file.  So how do you get the
 composite plot out on paper?  There are two solutions:
 
 \begin{enumerate}
-\item The easy way - use an ``accumulating'' postscript device instead.
+\item the easy way---use an ``accumulating'' PostScript device instead.
 If you look at the list of device names produced by
-\htmlref{GDNAMES}{GDNAMES} you will see that some of the encapsulated postscript
-(EPS) devices are described as ``accumulating''. For instance:
+\htmlref{GDNAMES}{GDNAMES} you will see that some of the encapsulated
+PostScript (EPS) devices are described as ``accumulating'' such as the
+following.
 
 \begin{terminalv}
     % gdnames
@@ -2422,12 +2423,12 @@ If you look at the list of device names produced by
 \end{terminalv}
 
 If you use one of these devices, each subsequent graphics application
-will merge it's postscript output automatically into any existing
-\texttt{pgplot.ps} file. If you display \texttt{pgplot.ps} using a
-modern PDF/postscript viewer such \OKULARref\ or \EVINCEref, the
+will merge its PostScript output automatically into any existing
+\file{pgplot.ps} file. If you display \file{pgplot.ps} using a
+modern PDF/PostScript viewer such \OKULARref\ or \EVINCEref, the
 display will update automatically as each subsequent graphics application modifies
 the file. Once the final graphics application has been run, you can rename
-the \texttt{pgplot.ps} file to something more covenenient\footnote{You
+the \file{pgplot.ps} file to something more covenenient\footnote{You
 could alternatively include the required final file name in the device
 name before running the graphics applications.}.
 
@@ -2442,10 +2443,10 @@ on an image.
 
 \end{terminalv}
 
-\item The hard way - use \PSMERGEref\ to merge separate postscript files.
-If you use one of the non-accumulating postscript devices, the output
+\item The hard way---use \PSMERGEref\ to merge separate PostScript files.
+If you use one of the non-accumulating PostScript devices, the output
 from each graphics application goes into a separate file which must then
-be merged. This is what you must do:
+be merged.  Here is what you must do.
 
 \begin{itemize}
 \item  Select one of the non-acculumlating encapsulated PostScript device, be
@@ -2455,8 +2456,8 @@ it colour or monochrome.
 over-written by the output from the next command.  Alternatively, you can
 specified the device to use separately when running each command, including an
 explicit unique file name in each device specification (see above).
-\item Use \PSMERGEref\ (the Starlink version, usually in /star/bin) to
-combine the plots.
+\item Use \PSMERGEref\ (the Starlink version, usually in
+\file{/star/bin}) to combine the plots.
 \end{itemize}
 
 To use the same example as above:
@@ -2481,9 +2482,9 @@ or alternatively:
     % rm display.ps contour.ps
 \end{terminalv}
 
-You then print \texttt{myplot.ps} to the colour PostScript printer.
-{\footnotesize PSMERGE} \normalsize also has options for scaling and rotating plots.
-\end{enumerate}
+to form the merged graphic.  You then print \file{myplot.ps} to the
+colour PostScript printer. {\footnotesize PSMERGE} \normalsize also
+has options for scaling and rotating plots. \end{enumerate}
 
 \newpage
 \section{\xlabel{se_style}Plotting Styles and Attributes\label{se:style}}
@@ -4604,7 +4605,7 @@ the X-windows device used earlier in this chapter. Each application will
 then write its graphical output to one or more disk files.  If you elect
 to use one of the ``accumulating'' PostScript devices (as indicated in
 the device description displayed by \htmlref{GDNAMES}{GDNAMES}), then the
-postscript output from each application will be merged automatically into
+PostScript output from each application will be merged automatically into
 a single file. If you use one of the other PostScript devices, each
 application will produce a separate output file, all of which must be
 combined using \PSMERGEref\ to create a single PostScript file containing
