@@ -2407,15 +2407,15 @@ the check boxes on the side bar.
 \chapter{\xlabel{pipeline}The ACSIS Pipeline}
 \label{sec:pipe}
 
-The ORAC-DR pipeline (\cite{oracdr}) is an generic automated data
+The ORAC-DR pipeline (\cite{oracdr}) is a generic automated data
 reduction pipeline that can process your raw JCMT data and return
 advanced data products: baselined single observation cubes, mosaicked
 and coadded cubes, moments map and clump catalogues.
 
 It has advanced algorithms for the common routines such as baseline
-subtraction. The data processing is performed using standard \Kappa\
-and \smurf\ routines, the main ones of which have been described in
-previous chapters.
+subtraction. The data processing is performed using standard \Kappa,
+\smurf, and \cupid\ applications, the main ones of which have been
+described in previous chapters.
 
 \section{\xlabel{recipes}Recipes and primitives}
 \label{sec:recipes}
@@ -2423,23 +2423,26 @@ previous chapters.
 Reduction recipes in ORAC-DR consist of a series of stand-alone
 processes, known as primitives. These primitives are linked together
 to form data reduction recipes. Each primitive can be fed different
-input depending on the nature of the recipe in question and may
+input data depending on the nature of the recipe in question and may
 sometimes be omitted altogether.
 
-There are three science recipes available, each tailored to different
-type of observation:\\
-REDUCE\_SCIENCE\_NARROWLINE\\
-REDUCE\_SCIENCE\_BROADLINE\\
-REDUCE\_SCIENCE\_GRADIENT
+There are four main science recipes available, each tailored to different
+type of observation:
+\begin{itemize}[noitemsep,,nolistsep]
+\item REDUCE\_SCIENCE\_NARROWLINE\\
+\item REDUCE\_SCIENCE\_BROADLINE\\
+\item REDUCE\_SCIENCE\_GRADIENT\\
+\item REDUCE\_SCIENCE\_LINEFOREST
+\end{itemize}
 
-A summary of the recipes is given below.
+A summary of these recipes is given below.
 
 \begin{table}[h!]
 \begin{tabular}{p{2.9cm}|p{7.3cm}|p{4.5cm}}
 \hline
 \textbf{RECIPE} & \textbf{DESCRIPTION OF EMISSION} & \textbf{BASELINE METHOD} \\
 \hline
-NARROWLINE & One of more narrow lines are expected across the band.
+NARROWLINE & One or more narrow lines are expected across the band.
 Select this recipe if the expected lines are less than about 20
 channels wide.& Smoothing: \newline spatial = 5$\times$5 pixels
 \newline frequency = 10 channels\\
@@ -2458,16 +2461,28 @@ and probably not wider than 20\% of the available bandwidth &
 Smoothing: \newline spatial = 3$\times$3 pixels \newline frequency =
 25 channels\\
 \hline
-%LINEFOREST & A forest of lines is expected across the band. Bright,
-%nearby star formation sources may fall in this category.  This recipe
-%also creates a separate moments map for each line (as defined by the
-%parameter PER\_LINE).& Smoothing: \newline spatial = 5$\times$5 pixels
-%\newline frequency = 10 channels \\
-%\hline
+LINEFOREST & A forest of lines is expected across the band. Bright,
+nearby star-formation sources may fall in this category.  This recipe
+also creates a separate moments map for each line (as defined by the
+parameter \param{PER\_LINE}).& Smoothing: \newline spatial = 5$\times$5 pixels
+\newline frequency = 10 channels \\
+\hline
 \end{tabular}
 \end{table}
 
-\section{\xlabel{recipe_process}The process}
+There are also variants of the recipes with the following suffixes.
+
+\begin{tabular}{p{2cm}p{10cm}}
+\_POL & polarimetry \\
+\_QL & Quick Look which merely runs \makecube\ to turn the raw time-series
+spectra into a spectral cube for display during data acquisition. \\
+\_SUMMIT & A limited reduction to keep pace with data acquisition at the
+JCMT.  It excludes any bad spectra rejection, quality assurance, or
+iterative baseline determination. \\
+\end{tabular}
+
+\newpage
+\section{\xlabel{recipe_process}The workflow}
 You can follow this commentary via the flow chart in Figure \ref{fig:pipeline}.
 
 Two notations are used in the following list:\\
