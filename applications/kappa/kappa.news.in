@@ -4,7 +4,23 @@
    changes are listed below.  For complete details of all
    changes, see the "Release Notes" appendix in SUN/95.
 
+2 Documentation_Changes
+   - SUN/95 has been upgraded to the new style of documentation.
+   Some residual collateral damage to the typesetting is likely to be
+   present.
+   -  Most of the old release notes have been removed from SUN/95,
+   with just the few most-recent sets of notes retained in a separate
+   appendix.
+   -  The detailed descriptions of plotting and AST attributes are
+   now in bappendices.
+
 2 Modified_applications
+
+   o  COLLAPSE
+
+      -  Fixed bug in the calculation of the variance for the Sum
+      estimator.  Note that this applies to other collapsing commands
+      such as MSTATS.
 
    o  CONFIGECHO
 
@@ -17,6 +33,11 @@
       -  Restore setting the BAD_PIXEL flag for the DATA and VARIANCE
       components, only setting it false if no bad pixels were copied
       and none existed in the input NDF.
+
+   o SEGMENT
+
+      -  A bug that caused a crash for NDFs with degenerate axes has
+      been fixed.
 
    o  SETQUAL
 
