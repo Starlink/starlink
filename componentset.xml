@@ -2826,7 +2826,7 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="ssn78" support="U">
+<component id="ssn78" support="S">
   <version>0.1</version>
   <path>docs/ssn/078</path>
   <description>Description of the build system</description>

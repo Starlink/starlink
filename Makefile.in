@@ -118,6 +118,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/sc7 \
 	$(MANIFESTS)/sc9 \
 	$(MANIFESTS)/sc12 \
+	$(MANIFESTS)/sc13 \
 	$(MANIFESTS)/sc14 \
 	$(MANIFESTS)/sc15 \
 	$(MANIFESTS)/sc17 \
@@ -134,6 +135,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/ssn22 \
 	$(MANIFESTS)/ssn64 \
 	$(MANIFESTS)/ssn75 \
+	$(MANIFESTS)/ssn78 \
 	$(MANIFESTS)/sun1 \
 	$(MANIFESTS)/sun101 \
 	$(MANIFESTS)/sun202 \

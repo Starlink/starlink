@@ -2987,6 +2987,7 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/ssn3 \
 	$(MANIFESTS)/ssn64 \
 	$(MANIFESTS)/ssn75 \
+	$(MANIFESTS)/ssn78 \
 	$(MANIFESTS)/ssn8 \
 	$(MANIFESTS)/sst \
 	$(MANIFESTS)/star2html \
