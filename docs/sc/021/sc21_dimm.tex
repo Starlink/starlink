@@ -88,7 +88,7 @@ models are subtracted, a sky map created and the convergence checked.
   These time-series are then re-sampled at a rate that matches the
   requested pixel size---the equivalent to applying a low-pass filter.
   Down-sampling saves time and memory usage when running the map-maker,
-  without loosing any significant information. The degree of
+  without losing any significant information. The degree of
   down-sampling applied depends on how fast the telescope was moving
   during the observation, the requested pixel size. In general, slower
   scans will be more heavily down-sampled than faster scans, and fast
@@ -718,7 +718,7 @@ ringing around bright sources than would otherwise be the case.  This in
 turn means that far fewer iterations are required to correct this ringing.
 
 It is also possible to use \param{ast.skip} with \model{COM} masking, but
-the benefits are no so noticeable as for \model{FLT} masking.
+the benefits are not so noticeable as for \model{FLT} masking.
 
 The default value for \param{ast.skip} is zero, but the \brightextended\
 and \jsageneric\ configuration files supplied with \smurf\ both set
@@ -893,7 +893,7 @@ modified to relax the test that compares each bolometer to the common
 mode. This is because the algorithm that compares each bolometer to the
 common-mode can be fooled by a bright compact source passing across
 individual bolometers. Likewise the test for DC steps within each
-bolometer baseline is also relaxes (parameter \xparam{DCTHRESH}{dcthresh}).
+bolometer baseline is also relaxed (parameter \xparam{DCTHRESH}{dcthresh}).
 
 % The tildes around the equal sign are to ensure HTML table field is
 % not wrapped after the parameter name.
