@@ -139,6 +139,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/sun1 \
 	$(MANIFESTS)/sun101 \
 	$(MANIFESTS)/sun202 \
+	$(MANIFESTS)/sun242 \
 	$(MANIFESTS)/sun249
 
 
