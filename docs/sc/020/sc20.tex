@@ -1834,6 +1834,56 @@ TIP: You can write out the error component into a new file using
 \end{figure}
 
 
+\subsection{HARP Flatfielding}
+\label{sec:flatfield}
+
+The individual detectors in the HARP array do not respond exactly the
+same to the incoming signal, returning different temperatures for the
+same flux.  If uncorrected, this can lead to artificial net-like
+patterns in the reduced spectral cube.  As with any flatfield
+correction, the goal is to expose to a uniform source to measure the
+relative responses of the detectors.  However, this is not possible
+with HARP observations, and the approach is assume that during an
+observation the detectors see approximately the same signal from the
+various sources.  For extended emission at low galactic latitudes this
+is a reasonable assumption.  For isolated compact sources it is likely
+to be invalid.
+
+It may be possible to use a flatfield determined on the same night
+in a high-signal region and apply that to a low-signal or
+compact-source observation.  The flatfield can change during the
+night, but it might better than no flatfield.
+
+The method of Curtis et al. (2010) creates a map for each detector
+and integrates the measured flux in the main spectral line.  Use the
+\param{DETECTORS} parameter to create a spectral cube from just that
+detector.
+
+\begin{terminalv}
+% makecube in=rawfile out=cube_H01 detectors="'H01'" autogrid
+\end{terminalv}
+
+The simplests way to sum the flux across a line run \stats\ over a chosen
+spectral range, such as $-5$ km/s to 7.2 km/s.
+
+\begin{terminalv}
+% stats cube_H01"(,,-5.0:7.2)"
+\end{terminalv}
+
+If there might be bad pixels present, the mean is more accurate than the sum.
+This assumes that the line is located within these bounds across the whole
+spatial region.  It is wise not to push too far into the wings of the line and
+baseline errors and noise have a greater impact on the integrated flux.
+
+The receptors are normalised to the flux of the reference receptor,
+near the centre, normally H05, but given by the FITS header \param{REFRECEP}.
+
+
+There are other methods in \oracdr, one to cope with multiple lines.
+It sums all the signal above some threshold, such as the median plus four
+standard deviations, to exclude the baseline noise.  Since the flat
+ratio biases this sum, \oracdr\ iterates to converge to a solution.
+
 \clearpage
 \chapter{\xlabel{advanced}Advanced Analysis}
 \label{sec:advanced}
@@ -3056,6 +3106,11 @@ Paper 38.2}{sgp38}{}
 \bibitem{kappa}
 Currie~M.~J., Berry~D.~S, 2013, \textit{KAPPA -- Kernel Application Package},
 \xref{Starlink User Note 95}{sun95}{}
+
+\bibitem{flat}
+Curtis~E.~I., Richer~J.~S. and Buckle~J.~V. 2010, \htmladdnormallink{\textit{A submillimetre
+survey of the kinematics of the Perseus molecular cloud -- I. Data}}{
+http://dx.doi.org/10.1111/j.1365-2966.2009.15658.x}, MNRAS, 401, 455 (DOI:10.1111/j.1365-2966.2009.15658.x)
 
 \bibitem{gaia}
 Draper~P.~W., Gray~N., Berry~D.~S., Taylor~M., 2012,
