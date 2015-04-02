@@ -273,7 +273,7 @@ removed in doing so.
 We run the map-maker using \file{dimmconfig\_bright\_extended.lis};
 we have also specified a couple of overrides on the command
 line---\xparam{MAPTOL}{maptol}~=~0.04 is slightly more stringent than default and
-\xparam{AST.ZERO_SNR}{ast.zero\_snr}~=~3.5 constrains emission everything below
+\xparam{AST.ZERO_SNR}{ast.zero\_snr}~=~3.5 constrains everything below
 3.5\,$\sigma$ to zero.
 
 In this example we give the map-maker a file containing a list of the
@@ -317,7 +317,7 @@ of 4 for the FWHM parameter.
 \end{terminalv}
 
 We threshold the map again to produce our mask. In this case all
-values below out threshold are set to `bad'. The the smoothed map now
+values below our threshold are set to `bad'. The smoothed map now
 has values scaled between 0 and 1, we set our threshold at 0.02 to
 include more of the emission beyond the 3\,$\sigma$ edge.
 \begin{terminalv}
