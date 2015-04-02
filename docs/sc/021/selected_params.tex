@@ -199,6 +199,28 @@
    }
 }
 \sstroutine{
+   AST.ZERO\_NOTLAST
+}{
+   Allows flux to be present in masked areas in the final map
+}{
+   \sstdescription{
+      If ast.zero\_notlast is 1, then the map is not masked on
+      the final iteration. This means that data samples that fall
+      outside the masked areas are allowed to remain in the final
+      map. If ast.zero\_notlast is 0, then the map is masked even on
+      the final iteration, meaning that the masked areas will
+      be zero in the final map. [1]
+   }
+   \sstattributetype{
+      int
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      MAKEMAP, CALCQU
+   }
+}
+\sstroutine{
    AST.ZERO\_SNR
 }{
    Reduces spurious large scale structure in the final map
@@ -215,6 +237,32 @@
    }
    \sstattributetype{
       real
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      MAKEMAP, CALCQU
+   }
+}
+\sstroutine{
+   AST.ZERO\_SNR\_FFCLEAN
+}{
+   Provides alternative method for SNR masking
+}{
+   \sstdescription{
+      Setting this parameter to a non-zero value causes the
+      SNR mask requested by parameter {\tt{"}}\xref{ast.zero\_snr}{sun258}{AST.ZERO_SNR}{\tt{"}} to be
+      created using an algorithm like that used by the KAPPA
+      command {\tt{"}}FFCLEAN{\tt{"}} (see SUN/95), instead of using a simple
+      thresholding of the SNR map. The parameter {\tt{"}}\xref{ast.zero\_snr}{sun258}{AST.ZERO_SNR}{\tt{"}}
+      gives the clipping level of the ffclean algorithm, and the
+      parameter {\tt{"}}\xref{ast.zero\_snr\_hipass}{sun258}{AST.ZERO_SNR_HIPASS}{\tt{"}} gives the box size. Using
+      an ffclean algorithm prevents the source regions within
+      the mask being larger than the box size, and may thus
+      produce faster convergence and avoid blobs developing. [0]
+   }
+   \sstattributetype{
+      int
    }
    \sstdiytopic{
       SMURF Usage
@@ -319,6 +367,24 @@
       SMURF Usage
    }{
       MAKEMAP, CALCQU
+   }
+}
+\sstroutine{
+   BADFRAC
+}{
+   Ensures that bad data from DA system are ignored
+}{
+   \sstdescription{
+      The fraction of samples to be bad to flag entire bolo as
+      dead. [0.05]
+   }
+   \sstattributetype{
+      real
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      SC2CLEAN, CALCQU, MAKEMAP
    }
 }
 \sstroutine{
@@ -731,6 +797,31 @@
    }
 }
 \sstroutine{
+   COM.ZERO\_SNR\_FFCLEAN
+}{
+   Provides alternative method for SNR masking
+}{
+   \sstdescription{
+      Setting this parameter to a non-zero value causes the
+      SNR mask requested by parameter {\tt{"}}\xref{com.zero\_snr}{sun258}{COM.ZERO_SNR}{\tt{"}} to be
+      created using an algorithm like that used by the KAPPA
+      command {\tt{"}}FFCLEAN{\tt{"}} (see SUN/95), instead of using a simple
+      thresholding of the SNR map. The parameter {\tt{"}}\xref{com.zero\_snr}{sun258}{COM.ZERO_SNR}{\tt{"}}
+      gives the clipping level of the ffclean algorithm, and the
+      parameter {\tt{"}}\xref{com.zero\_snr\_hipass}{sun258}{COM.ZERO_SNR_HIPASS}{\tt{"}} gives the box size. Using
+      an ffclean algorithm prevents the source regions within
+      the mask being larger than the box size. [0]
+   }
+   \sstattributetype{
+      int
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      MAKEMAP, CALCQU
+   }
+}
+\sstroutine{
    COM.ZERO\_SNRLO
 }{
    Improve estimate of the common-mode by increasing the size
@@ -1013,7 +1104,7 @@
       If non-zero, the data will be saved to an NDF immediately
       after data cleaning and before map-making. The NDF name will
       be the same as model components, except with the suffix
-      {\tt{"}}\_cln{\tt{"}}. Even if parameter {\tt{"}}\xref{doclean}{sun258}{DOCLEAN}{\tt{"}} ise set to zero, the
+      {\tt{"}}\_cln{\tt{"}}. Even if parameter {\tt{"}}\xref{doclean}{sun258}{DOCLEAN}{\tt{"}} is set to zero, the
       data will be exported immediately before map-making. [0]
    }
    \sstattributetype{
@@ -1210,7 +1301,7 @@
 \sstroutine{
    FAKESCALE
 }{
-   Control the use oif the supplied fake map
+   Control the use of the supplied fake map
 }{
    \sstdescription{
       Each pixel in the supplied fake map (see paramater {\tt{"}}fakemap{\tt{"}})
@@ -1250,6 +1341,26 @@
       greater than 1/(600/100.) = 0.17 Hz (i.e. setting
       filt\_edge\_largescale=600 would translate into
       filt\_edgehigh = 0.17 Hz). [0]
+   }
+   \sstattributetype{
+      real
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      SC2CLEAN, CALCQU, MAKEMAP
+   }
+}
+\sstroutine{
+   FILT\_EDGE\_SMALLSCALE
+}{
+   Specifies the smallest largest scale size to be retained by
+   the initial data cleaning
+}{
+   \sstdescription{
+      If non-zero, features with spatial sizes less than this
+      value (in arcsec) will be removed by the initial data
+      cleaning. See parameter {\tt{"}}\xref{filt\_edge\_largescale}{sun258}{FILT_EDGE_LARGESCALE}{\tt{"}}. [0]
    }
    \sstattributetype{
       real
@@ -1425,6 +1536,25 @@
       expense of poorer frequency response. Higher orders
       produce sharper filters that have better frequency response
       but at the expense of greater ringing. [0]
+   }
+   \sstattributetype{
+      integer
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      MAKEMAP, CALCQU
+   }
+}
+\sstroutine{
+   FLT.NOTFIRST
+}{
+   May improve convergence by avoiding the filtering of
+   strong sources on the first iteration
+}{
+   \sstdescription{
+      If this is non-zero, then low frequencies will not be
+      removed from the time streams on the first iteration. [0]
    }
    \sstattributetype{
       integer
@@ -1616,6 +1746,32 @@
    }
    \sstattributetype{
       real
+   }
+   \sstdiytopic{
+      SMURF Usage
+   }{
+      MAKEMAP, CALCQU
+   }
+}
+\sstroutine{
+   FLT.ZERO\_SNR\_FFCLEAN
+}{
+   Provides alternative method for SNR masking
+}{
+   \sstdescription{
+      Setting this parameter to a non-zero value causes the
+      SNR mask requested by parameter {\tt{"}}\xref{flt.zero\_snr}{sun258}{FLT.ZERO_SNR}{\tt{"}} to be
+      created using an algorithm like that used by the KAPPA
+      command {\tt{"}}FFCLEAN{\tt{"}} (see SUN/95), instead of using a simple
+      thresholding of the SNR map. The parameter {\tt{"}}\xref{flt.zero\_snr}{sun258}{FLT.ZERO_SNR}{\tt{"}}
+      gives the clipping level of the ffclean algorithm, and the
+      parameter {\tt{"}}\xref{flt.zero\_snr\_hipass}{sun258}{FLT.ZERO_SNR_HIPASS}{\tt{"}} gives the box size. Using
+      an ffclean algorithm prevents the source regions within
+      the mask being larger than the box size, and may thus
+      produce faster convergence and avoid blobs developing. [0]
+   }
+   \sstattributetype{
+      int
    }
    \sstdiytopic{
       SMURF Usage

@@ -61,7 +61,7 @@ default~:~<undef> \\
 
 \hline
 \xparam{FAKESCALE}{fakescale} &
-Control the use oif the supplied fake map. &
+Control the use of the supplied fake map. &
 default~:~1 \\
 
 \hline
@@ -94,7 +94,8 @@ default~:~<undef> \\
 \end{center}
 
 
-\section{Pre-processing}
+\section{Pre-processing }
+\label{cat:preproc}
 \begin{center}
 {\renewcommand{\arraystretch}{1.2}
 \begin{longtable}{| p{4.5cm} | p{6cm} | p{6.5cm} | }
@@ -129,7 +130,7 @@ default~:~1 \\
 
 \hline
 \xparam{BADFRAC}{badfrac} &
- &
+Ensures that bad data from DA system are ignored &
 default~:~0.05 \\
 
 \hline
@@ -217,6 +218,11 @@ default~:~0 \\
 Specifies the largest scale size to be retained by the initial data cleaning. &
 default~:~0 \newline
 \blankfield~:~200 \\
+
+\hline
+\xparam{FILT_EDGE_SMALLSCALE}{filt\_edge\_smallscale} &
+Specifies the smallest largest scale size to be retained by the initial data cleaning. &
+default~:~0 \\
 
 \hline
 \xparam{FILT_ORDER}{filt\_order} &
@@ -315,6 +321,11 @@ default~:~0 \\
 \hline
 \xparam{COM.ZERO_SNR}{com.zero\_snr} &
 Improve the estimate of the common-mode by excluding samples that correspond to high SNR pixels in the map. &
+default~:~0 \\
+
+\hline
+\xparam{COM.ZERO_SNR_FFCLEAN}{com.zero\_snr\_ffclean} &
+Provides alternative method for SNR masking. &
 default~:~0 \\
 
 \hline
@@ -420,6 +431,11 @@ default~:~0 \newline
 \brightextended~:~5 \\
 
 \hline
+\xparam{FLT.ZERO_SNR_FFCLEAN}{flt.zero\_snr\_ffclean} &
+Provides alternative method for SNR masking. &
+default~:~0 \\
+
+\hline
 \xparam{FLT.ZERO_SNRLO}{flt.zero\_snrlo} &
 Speeds up convergences and reduces ringing by increasing the size of the SNR mask without introducing noise. &
 default~:~0 \newline
@@ -439,6 +455,11 @@ default~:~1 \\
 \hline
 \xparam{FLT.ZERO_FREEZE}{flt.zero\_freeze} &
 Prevent the FLT mask from changing after a given number of iterations. This can help convergence. &
+default~:~0 \\
+
+\hline
+\xparam{FLT.NOTFIRST}{flt.notfirst} &
+May improve convergence by avoiding the filtering of strong sources on the first iteration. &
 default~:~0 \\
 \hline
 \end{longtable}
@@ -533,6 +554,11 @@ default~:~0.0 \newline
 \brightextended~:~3 \\
 
 \hline
+\xparam{AST.ZERO_SNR_FFCLEAN}{ast.zero\_snr\_ffclean} &
+Provides alternative method for SNR masking. &
+default~:~0 \\
+
+\hline
 \xparam{AST.ZERO_SNRLO}{ast.zero\_snrlo} &
 Can help to remove bowls around sources by increasing the size of the SNR mask without introducing noise. &
 default~:~0 \newline
@@ -563,6 +589,11 @@ default~:~0 \\
 \xparam{AST.ZERO_NITER}{ast.zero\_niter} &
 Allows AST masking to be switched off after a given number of iterations. &
 default~:~0 \\
+
+\hline
+\xparam{AST.ZERO_NOTLAST}{ast.zero\_notlast} &
+Allows flux to be present in masked areas in the final map. &
+default~:~1 \\
 \hline
 \end{longtable}
 }

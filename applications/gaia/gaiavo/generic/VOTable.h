@@ -153,13 +153,13 @@ namespace gaia
 #undef NSVERS
 
         //  Similar functions for reading a tab table and writing a VOTable.
-        //  Only support writing in the VOTable 1.1 namespace so no need for
+        //  Only support writing in the VOTable 1.2 namespace so no need for
         //  macro funnies. Defined in VOTableReadFunctions.C.
-        int votable_read( AstroCatalog *cat, votable_11::VOTABLE &votable );
-        void resource_coosys( votable_11::RESOURCE &resource,
+        int votable_read( AstroCatalog *cat, votable_12::VOTABLE &votable );
+        void resource_coosys( votable_12::RESOURCE &resource,
                               AstroCatalog *cat );
-        void table_params( votable_11::TABLE &table, AstroCatalog *cat );
-        void table_data( votable_11::TABLE &table, AstroCatalog *cat );
+        void table_params( votable_12::TABLE &table, AstroCatalog *cat );
+        void table_data( votable_12::TABLE &table, AstroCatalog *cat );
 
         /**
          *  Return an NS::TABLE reference that can be used when no other

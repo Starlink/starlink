@@ -266,13 +266,13 @@ details.\footnote{\url{http://www.starlink.ac.uk/docs/sun214.htx/sun214.html}}
 
 Any raw time-series data can be quickly regridded into sky frame
 coordinates using the \smurf\ \makemap\ task in rebin mode. This
-involves no processing of the data. The following command produces a
-map from the raw concatenated data; unlike the iterative mode of
+involves no further processing of the data. The following command produces
+a map from the raw concatenated data; unlike the iterative mode of
 \task{makemap} described in the next chapter, no configuration file is
 required.
 
 \begin{terminalv}
-% makemap s8a20120725_00058_con.sdf crl2688_sky method=rebin
+% makemap s8a20120725_00058_con.sdf crl2688_sky method=rebin spread=near
 \end{terminalv}
 
 The output map here is called \file{crl2688\_sky.sdf} and is shown in
@@ -287,7 +287,7 @@ arcsec).
   map of CRL~2688 with the s8a sub-array displayed with \gaia.  }
 
 \begin{tip}
-  If you do not include \param{method=rebin}, the map-maker will will
+  If you do not include \param{method=rebin}, the map-maker will
   default to \param{method=iterate}.
 \end{tip}
 
@@ -316,9 +316,10 @@ white noise on the array (between 2 and 10\,Hz by default).
 % calcnoise s8a20110720_00030\*.sdf s8a_noise power=!
 \end{terminalv}
 It will prompt for a configuration file to describe the cleaning
-steps. The default is the supplied \file{dimmconfig\_calcnoise.lis}.
-Two noise measurements are reported in the terminal: the `Effective
-noise' and the `Effective NEP'.
+steps. The default is the file
+\file{\$STARLINK\_DIR\allowbreak/share\allowbreak/smurf\allowbreak/dimmconfig\allowbreak\_calcnoise.lis} that is
+included in \smurf. Two noise measurements are reported in the terminal:
+the `Effective noise' and the `Effective NEP'.
 
 An output file is created for each sub-array with the NEP map stored
 in the \texttt{.MORE.SMURF.NEP} extension.

@@ -445,6 +445,9 @@ itcl::class gaiavo::GaiaVOCat {
             $w_.cat open $result
             $w_.cat query
 
+            #  Remember this result for any updates to catalogue.
+            set last_result_ $result
+
             #  Need to update GaiaQueryResult with content.
             #  Update table headings.
             set prev_headings $headings_
@@ -630,6 +633,9 @@ itcl::class gaiavo::GaiaVOCat {
 
    #  Temporary file for modified table contents.
    protected variable newfile_ {}
+
+   #  Name of last resultt catalogue.
+   protected variable last_result_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

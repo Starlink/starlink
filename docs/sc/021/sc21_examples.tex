@@ -30,14 +30,14 @@ In this example the raw data are stored locally in a directory called
 which we will reduced independently.
 
 \begin{terminalv}
-% makemap data/s8*00013_00\*.sdf cosmo1 method=iterate \
-config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
+% makemap data/s8*00013_00\*.sdf cosmo1 \
+          config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
 
-% makemap data/s8*00018_00\*.sdf cosmo2 method=iterate \
-config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
+% makemap data/s8*00018_00\*.sdf cosmo2 \
+          config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
 
-% makemap data/s8*00021_00\*.sdf cosmo3 method=iterate \
-config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
+% makemap data/s8*00021_00\*.sdf cosmo3 \
+          config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
 
 \end{terminalv}
 
@@ -273,7 +273,7 @@ removed in doing so.
 We run the map-maker using \file{dimmconfig\_bright\_extended.lis};
 we have also specified a couple of overrides on the command
 line---\xparam{MAPTOL}{maptol}~=~0.04 is slightly more stringent than default and
-\xparam{AST.ZERO_SNR}{ast.zero\_snr}~=~3.5 constrains emission everything below
+\xparam{AST.ZERO_SNR}{ast.zero\_snr}~=~3.5 constrains everything below
 3.5\,$\sigma$ to zero.
 
 In this example we give the map-maker a file containing a list of the
@@ -281,8 +281,8 @@ input files (\file{filelist.txt}) and
 \file{dimmconfig\_bright\_extended.lis} is in the local directory.
 
 \begin{terminalv}
-% makemap in=^filelist.txt 850galactic method=iterate \
-config='"^dimmconfig_bright_extended.lis,maptol=0.04,ast.zero_snr=3.5"'
+% makemap in=^filelist.txt 850galactic \
+          config='"^dimmconfig_bright_extended.lis,maptol=0.04,ast.zero_snr=3.5"'
 \end{terminalv}
 The resulting map is shown in \cref{Figure}{fig:galmakemap}{the figure below}.
 
@@ -294,7 +294,8 @@ The resulting map is shown in \cref{Figure}{fig:galmakemap}{the figure below}.
 \textbf{Step 2: Generating an external mask}
 \vspace{0.2cm}\\
 Next we create an external mask from the output of \makemap. Here we
-follow the steps outlined in \cref{Section}{sec:mask}{Masking options}.
+follow the steps outlined in \cref{Section}{sec:maskbe}{Using external
+masks}.
 
 \begin{terminalv}
 % makesnr 850map 850map_snr
@@ -316,7 +317,7 @@ of 4 for the FWHM parameter.
 \end{terminalv}
 
 We threshold the map again to produce our mask. In this case all
-values below out threshold are set to `bad'. The the smoothed map now
+values below our threshold are set to `bad'. The smoothed map now
 has values scaled between 0 and 1, we set our threshold at 0.02 to
 include more of the emission beyond the 3\,$\sigma$ edge.
 \begin{terminalv}
@@ -344,13 +345,13 @@ As a last step the map is re-made with this mask supplied as an external
 file. For this run we apply the additional parameters in a
 personalised configuration file, \file{mydimmconfig.lis}.
 \begin{terminalv}
-% makemap in=^filelist.txt 850galactic method=iterate \
-config=^mydimmconfig.lis ref=850map_mask_zm
+% makemap in=^filelist.txt 850galactic \
+          config=^mydimmconfig.lis ref=850map_mask_zm
 \end{terminalv}
 
 The configuration file, \file{mydimmconfig.lis}, has the following
 format---note how it is based on
-\file{dimmconfig\_bright\_extended.lis}. It has decreased the
+\file{dimmconfig\allowbreak\_bright\allowbreak\_extended.lis}. It has decreased the
 convergence parameter to \xparam{MAPTOL}{maptol}~=~0.03 but increased the number
 of iterations to compensate as 40 is unlikely to be sufficient.
 \begin{terminalv}
@@ -380,12 +381,11 @@ at the exposure-time image with \gaia.  See
 
 The exposure-time map shows a sharp drop off at a radius of 30\,arcmin.
 We can thus specify a parameter file like below.
-\begin{center}
+
 \begin{terminalv}
 [CROP_JCMT_IMAGES]
 MAP_RADIUS = 1800
 \end{terminalv}
-\end{center}
 
 \begin{terminalv}
 % picard CROP_JCMT_IMAGES 850galactic.sdf

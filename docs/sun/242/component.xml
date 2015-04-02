@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sun242" support="S">
+  <version>1</version>
+  <path>docs/sun/242</path>
+  <description>Autoastrometry for Mosaics</description>
+  <abstract><p>
+    We describe the autoastrom package, which provides an interface to the
+    ASTROM application. This creates a semi-automatic route to doing astrometry
+    on CCD images.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Norman Gray</name>
+    </person>
+    <person>
+      <name>Brad Cavanagh</name>
+    </person>
+  </developers>
+  <documentation> sun242</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <copyright>
+    <year>2008</year>
+    <name>STFC</name>
+  </copyright>
+</component>

@@ -22,7 +22,7 @@ a description of the configuration files.
 \item \cref{Chapter}{sec:pipe}{Chapter 4}  -- Instructions for using the \oracdr\ pipeline to reduce
 your data ``the easy way'', along with details on data retrieved from the JSA.
 \item \cref{Chapter}{sec:manual}{Chapter 5}  -- Instructions for using individual \smurf\ commands to
-reduce your data ---  useful if you need extra flexibity.
+reduce your data ---  useful if you need extra flexibility.
 \item \cref{Chapter}{sec:tweak}{Chapter 6}  -- Options for tailoring the configuration parameters to
 improve your final map.
 \item \cref{Chapter}{sec:eg}{Chapter 7}  -- Two worked examples covering a \htmlref{blank cosmology
@@ -39,6 +39,7 @@ represent the Unix shell prompt. What follows each \texttt{\%} will be
 the text that should be typed by the user to initiate the described action.
 
 \section{\xlabel{computing} Before you start: computing resources}
+\label{sec:computing}
 
 Before reducing SCUBA-2 data using the Dynamic Iterative Map-Maker you should confirm you have
 sufficient computing resources for your type of map.
@@ -51,8 +52,8 @@ We recommend the following:
     \textbf{Reduction type} &\textbf{Memory} \\
     \hline
     Large maps (\textsc{pong})& 96 GB\\
-    Small maps (\textsc{daisy})&32 - 64 GB\\
-    Blank fields&32 - 64 GB\\
+    Small maps (\textsc{daisy})&32--64 GB\\
+    Blank fields&32--64 GB\\
     \hline
   \end{tabular}
 \end{table}
@@ -61,8 +62,8 @@ We recommend the following:
 
 For large-area maps it is important to process a full observation in a
 single chunk. See the text box on
-\latexhtml{Page~\pageref{box:chunk}}{\htmlref{Chunking}{box:chunk}}\
-for an explanation of chunking. For large maps, using normal map-maker
+\latexhtml{Page~\pageref{box:chunk}}{\htmlref{Chunking}{box:chunk}}\ for
+an explanation of chunking. For large maps, using normal map-maker
 parameters a machine having 96\,GB is acceptable. It is important that
 the memory is as fast as can be afforded, as RAM speed has a direct
 linear effect on processing time given that the time-series data are
@@ -96,7 +97,7 @@ data.
 \label{sec:ndf}
 
 Data files for SCUBA-2 use the Starlink N-dimensional Data Format (NDF,
-see Jenness et al 2014\cite{ndf}), a hierarchical format which allows
+see Jenness et al.\ 2014\cite{ndf}), a hierarchical format which allows
 additional data and metadata to be stored within a single file. \Kappa\
 contains \xref{many commands}{sun95} {ap_classified}\ for examining and
 manipulating NDF structures. The introductory sections of the \Kappa\
@@ -117,8 +118,8 @@ JCMT data on disk is also known as a `sub-scan'.
 
 The main components of any NDF structure are:
 \begin{itemize}
-\item An array of numerical data (may have up to 7 dimensions - usually 3
-for JCMT data);
+\item An array of numerical data (may have up to seven
+dimensions---usually three for JCMT data);
 \item An array of variance values corresponding to the numerical data
 values;
 \item An array holding up to eight boolean flags (known as ``quality
@@ -190,7 +191,7 @@ Starlink commands (the exception is \picard).
 \subsection{GAIA for viewing your map}
 
 Image visualisation can be done with \gaia\ (see
-\gaiasun). \textsc{Gaia} is an image and data-cube display and
+\gaiasun). \textsc{Gaia} is a GUI-driven image and data-cube display and
 analysis tool, which incorporates facilities such as source detection,
 three-dimensional visualisation, photometry and the ability to query
 and overlay on-line or local catalogues.
@@ -198,11 +199,13 @@ and overlay on-line or local catalogues.
 % gaia map.sdf
 \end{terminalv}
 
-Alternatively, the \Kappa\ package includes many command-line driven
-visualisation tools - see Appendix ``\xref{Classified KAPPA
-commands}{sun95}{cl_datadisplay}'' in SUN/95\footnote{Particularly useful is the
-ability of \Kappa\ to divide the screen up into many pictures, displaying
-a different plot in each one.}.
+Alternatively, the \Kappa\ package includes many visualisation commands
+that can be run from the shell comand-line or incorporated easily into your
+own scripts---see Appendix ``\xref{Classified KAPPA commands}{sun95}{cl_datadisplay}''
+in SUN/95. These tools are particularly useful for creating more complex
+composite plots including multiple images, line-plots, \emph{etc}, such
+as the multi-image plots in \cref{Section}{sec:itermaps}{Monitoring the
+map at the end of each iteration}.
 
 \subsection{ORAC-DR for running the pipeline}
 
@@ -237,7 +240,7 @@ to be run (note the caps). The list of files to be processed is given
 by  \param{<input\_files>}. These must be in the current directory or a
 directory defined by the environment variable \envvar{ORAC\_DATA\_IN}. A
 number of \textsc{Picard} recipes will be demonstrated in
-\cref{Chapter}{sec:maps}{Reducing your data}.
+\cref{Chapter}{sec:postprocess}{Post-processing Reduction Steps}.
 
 Other command-line options include \texttt{-log xsf} where the log
 file is written to any combination of the screen [\texttt{s}], a file
@@ -283,7 +286,7 @@ passed to \picard.
 \hline
 \textbf{Help\newline command} & \textbf{Description} & \textbf{Usage}\\
 \hline
-\task{showme} & If you know the name of the Starlink document you want to view
+\task{showme} & If you know the name of the Starlink document you want to view,
                 use \task{showme}. When run, it launches a new webpage or tab
                 displaying the hypertext version of the document. &
 \texttt{\%~showme~sun95}\\
@@ -334,7 +337,7 @@ Explained} and \cref{Chapter}{sec:manual}{Running makemap Outside the
 Pipeline} discuss the manual approach; to use the science pipeline,
 skip straight to \cref{Section}{sec:pipe}{The SCUBA-2 Pipeline}.
 
-The JCMT will produce pipeline reduced files for each observation and
+The JCMT will produce pipeline-reduced files for each observation and
 group of repeat observations for each night. These are reduced using
 the \oracdr\ pipeline with the recipe specified in the MSB.
 \cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline} gives instruction on

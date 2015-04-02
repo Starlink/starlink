@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Query TAP service</title>
+  </head>
+
+  <body>
+    <h1>Query TAP service</h1>
+
+    <p>
+      Using this window you can send a query to a TAP server to generate a
+      results table, hopefully with some identifiable coordinate columns that
+      can be used to plot over the displayed image.
+    </p>
+    <p>
+      TAP queries are written using Astronomical Data Query Language (ADQL).
+      The scope of ADQL is outside of this document and you should consult
+      various on-line resources about it, such as <a
+      href="http://docs.g-vo.org/adql">http://docs.g-vo.org/adql</a> and the
+      various documents about ADQL at the IVOA:
+      <a href="http://www.ivoa.net/astronomers/index.html">
+        http://www.ivoa.net/astronomers/index.html</a>.  There may also be
+        information about the available tables kept with the primary source.
+    </p>
+    <p>
+      Important issues when writing a query are which tables are available,
+      these are enumerated in the <tt>Tables...</tt> dialog, along with their
+      columns and column descriptions.
+    </p>
+
+    <h2>Simple example</h2>
+    <p>
+      As a simple example, we can attempt to find out which SCUBA-2 images are
+      available for a region of sky from the TAP service at CADC. To try this
+      enter <tt>CADC</tt> in the <tt>Substring:</tt> field and press
+      <tt>Query</tt>. At the time of writing this returned one entry <tt>CADC
+      Table Query (TAP) Service</tt>, double click on this to open a new
+      window. In the <tt>ADQL Query</tt> text area enter:
+<pre>
+SELECT * from caom2.SIAv1 WHERE 
+</pre>
+      now press <tt>Insert area fragment...</tt> (assumes you have a suitable
+      image displayed, this example assumes that you have the NGC1275 area
+      displayed, an image of that can be found in the
+      <tt>$GAIA_DIR/demodata.tar</tt> file). That will give you:
+<pre>
+SELECT * from caom2.SIAv1 WHERE
+ &lt;RA&gt; BETWEEN 49.8427477105 AND 50.0577638558 
+ AND 
+ &lt;DEC&gt; BETWEEN 41.4259083699 AND 41.5971742773
+</pre>
+      Now you need to replace the <tt>&lt;RA&gt;</tt> and <tt>&lt;DEC&gt;</tt>
+      strings with the names of the RA and Dec columns from the
+      <tt>caom2.SIAv1</tt> table.  Those can be guessed using the
+      <tt>Tables...</tt> window where you should select <tt>caom2.SIAv1</tt>
+      to see the names of its columns. In this case the RA and Dec columns are
+      <tt>position_center_ra</tt> and <tt>position_center_dec</tt>, so we now
+      have:
+<pre>
+SELECT * from caom2.SIAv1 WHERE 
+position_center_ra BETWEEN 49.8427477105 AND 50.0577638558 
+ AND 
+position_center_dec BETWEEN 41.4259083699 AND 41.5971742773
+</pre>
+      Pressing <tt>Query</tt> will now get a list of observations. The
+      pointing centres of the observations will be overlaid on your image.  If
+      the observations have images associated with them you can double click
+      and display them, either in the same display or a new one.
+  </p>
+    <p>
+      Now we can refine the query further by asking for exposures only from
+      SCUBA-2 and with a good exposure time to give:
+<pre>
+SELECT * from caom2.SIAv1 WHERE 
+position_center_ra BETWEEN 49.8427477105 AND 50.0577638558 
+AND 
+position_center_dec BETWEEN 41.4259083699 AND 41.5971742773
+AND
+instrument_name = 'SCUBA-2'
+AND
+time_exposure > 30
+</pre>
+      And so one until the observations we want to really look at have been
+      discovered, improving on the scatter shot approach of the general show
+      me all the images approach. Note there are better ways to 
+      describe a region on the sky, see the ADQL documents, but this
+      works for simple queries that don't include <tt>RA=0</tt> and
+      <tt>Dec=+/-90</tt>.
+  </p>
+    
+    <h2>STC regions</h2>
+    <p>
+      You can change the plotting symbols using the <tt>Markers</tt>
+      menu or <tt>Options->Set plot symbols...</tt> window, in which you'll
+      find the <tt>STC</tt> option. If your response has an STC region column
+      that can be identified you can use this to plot more complex shapes,
+      like the actual footprint of the observation. In the <tt>Tables...</tt>
+      descriptions if a column has a <tt>xtype</tt> of <tt>adql:REGION</tt>
+      this may work.
+    </p>
+
+  </body>
+</html>

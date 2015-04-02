@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@" support="S">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sun/242</path>
+  <description>Autoastrometry for Mosaics</description>
+  <abstract><p>
+    We describe the autoastrom package, which provides an interface to the
+    ASTROM application. This creates a semi-automatic route to doing astrometry
+    on CCD images.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Norman Gray</name>
+    </person>
+    <person>
+      <name>Brad Cavanagh</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>2008</year>
+    <name>STFC</name>
+  </copyright>
+</component>

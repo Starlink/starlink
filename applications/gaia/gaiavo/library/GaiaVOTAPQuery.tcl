@@ -11,7 +11,8 @@
 #  Description:
 #     Provides controls for constructing and doing a query of a TAP version
 #     1 service. The service is defined by an URL representing the service
-#     resource root. XXX just using /sync for testing...
+#     resource root. Note just uses /sync, future versions may consider
+#     an async service, but that could be overkill for GAIA.
 
 #  Invocations:
 #
@@ -123,9 +124,19 @@ itcl::class gaiavo::GaiaVOTAPQuery {
             -text "Tables..." \
             -command [code $this query_tables_]
       }
-      pack $itk_component(queryservice) -side right -fill none -expand 0 -ipadx 1m
+      pack $itk_component(queryservice) -side right -fill none -expand 0 -padx 1m
       add_short_help $itk_component(queryservice) \
          {Query the service for information about the tables available}
+
+      #  Insert query with range of displayed image.
+      itk_component add imagerange {
+         button $itk_component(actionframe).imagerange \
+            -text "Insert area fragment..." \
+            -command [code $this insert_image_range_]
+      }
+      pack $itk_component(imagerange) -side right -fill none -expand 0 -padx 1m
+      add_short_help $itk_component(imagerange) \
+         {Insert query fragment with displayed image range in RA and Dec}
 
       #  Get the ADQL query.
       itk_component add adqlframe {
@@ -135,6 +146,9 @@ itcl::class gaiavo::GaiaVOTAPQuery {
             -vscrollmode static \
             -hscrollmode dynamic
       }
+
+      #  Hint about where to start.
+      $itk_component(adqlframe) insert end "SELECT * FROM <TABLE> WHERE\n"
 
       pack $itk_component(adqlframe) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(adqlframe) {ADQL query, press Query button to activate}
@@ -275,7 +289,7 @@ itcl::class gaiavo::GaiaVOTAPQuery {
    protected method query_tables_output_ {msg} {
       append tables_doc_ $msg
    }
-   
+
    #  Query table completed, so pass on result to viewer.
    protected method query_tables_done_ {} {
       blt::busy release $w_
@@ -285,6 +299,66 @@ itcl::class gaiavo::GaiaVOTAPQuery {
          $w_.tableset update
       }
    }
+
+   #  Insert a symbolic fragment of text that shows the range of the
+   #  displayed image in RA and Dec.
+   protected method insert_image_range_ {} {
+      set range [get_image_area]
+      if { [llength $range] == 4 } {
+         lassign $range ramin ramax decmin decmax
+         $itk_component(adqlframe) insert end "\
+<RA> BETWEEN $ramin AND $ramax \n\
+AND \n\
+<DEC> BETWEEN $decmin AND $decmax"
+      } else {
+         info_dialog "Displayed image does not have an RA/Dec range"
+      }
+   }
+
+   #  Return a list of RA/Dec values covering the area of the image.
+   #  Not going to work near the poles, also if RA/Dec are swapped.
+   public method get_image_area {} {
+      set image [$itk_option(-gaiactrl) get_image]
+
+      #  Use the corners of the image, so make sure these are available.
+      set width [$image width]
+      set height [$image height]
+      if { ! [$image isclear] && $width > 0 && $height > 0 } {
+
+         #  Coordinates have to be in J2000, so make sure image is set to
+         #  that. Catch this so that any problems are not fatal.
+         if { [$image astcelestial] } {
+            catch {
+               set oldsystem [$image astget "System"]
+               $image astset "System" "FK5"
+            }
+            catch {
+               set oldequinox [$image astget "Equinox"]
+               $image astset "Equinox" "2000"
+            }
+         }
+
+         #  Get cordinates of corners.
+         lassign [$image astpix2wcs 1 1 1] ramin decmin
+         lassign [$image astpix2wcs $width $height 1] ramax decmax
+
+         if { [$image astcelestial] } {
+            catch {
+               $image astset "System" $oldsystem
+            }
+            catch {
+               $image astset "Equinox" $oldequinox
+            }
+         }
+
+         return [list [min $ramin $ramax] [max $ramin $ramax] \
+                    [min $decmin $decmax] [max $decmin $decmax]]
+      }
+      return {}
+   }
+
+
+
 
    #  Configuration options: (public variables)
    #  ----------------------

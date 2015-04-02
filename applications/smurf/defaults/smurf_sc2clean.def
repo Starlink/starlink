@@ -46,7 +46,7 @@
 apod = <undef>
 
 #-----------------------------------------------------------------
-#  Name:
+#  Name:    badfrac
 #  Type: 	real
 #  Default: 	0.05
 #  Purpose: 	Ensures that bad data from DA system are ignored

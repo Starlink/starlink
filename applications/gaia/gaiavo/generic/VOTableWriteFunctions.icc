@@ -357,9 +357,9 @@ int VOTable::table_params( const NS::TABLE& table, ofstream& out )
 
 /**
  *  Write the data of a table, this includes the FIELD elements as Skycat
- *  column names and other column metadata such as the units, ucd and utypes.
- *  The derivation of the column indices for ID, RA, Dec, X and Y (if not
- *  found they will be set to -1). If the RA or Dec columns require
+ *  column names and other column metadata such as the units, ucd, utypes and
+ *  xtypes.  The derivation of the column indices for ID, RA, Dec, X and Y (if
+ *  not found they will be set to -1). If the RA or Dec columns require
  *  transforming to degrees from radians then that will also be done. Finally
  *  the DATA elements will be expanded into the actual columns.
  */
@@ -372,6 +372,9 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
         string name;
         string ucd;
         string utype;
+#if NSVERS > 11
+        string xtype;
+#endif
         string unit;
 
         //  Local decs for parameters we want to locate.
@@ -394,6 +397,9 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
         //  FIELD meta-data items as TST parameter.
         string ucds;
         string utypes;
+#if NSVERS > 11
+        string xtypes;
+#endif
         string units;
         string datatypes;
 
@@ -430,6 +436,11 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
             if ( fiter->utype() ) {
                 to_lower( fiter->utype().get(), utype );
             }
+#if NSVERS > 11
+            if ( fiter->xtype() ) {
+                to_lower( fiter->xtype().get(), xtype );
+            }
+#endif
             if ( fiter->unit() ) {
                 to_lower( fiter->unit().get(), unit );
             }
@@ -528,6 +539,14 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
                 else {
                     utypes = "---";
                 }
+#if NSVERS > 11
+                if ( fiter->xtype() ) {
+                    xtypes = fiter->xtype().get();
+                }
+                else {
+                    xtypes = "---";
+                }
+#endif
                 if ( fiter->unit() ) {
                     units = fiter->unit().get();
                 }
@@ -550,7 +569,7 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
                         header += '\t' + fiter->ID().get();
                     }
                     else {
-                        header += '\t' + "unnamed";
+                        header += "\tunnamed";
                     }
                 }
 
@@ -569,6 +588,15 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
                 else {
                     utypes += "---";
                 }
+#if NSVERS > 11
+                xtypes += '\t';
+                if ( fiter->xtype() ) {
+                    xtypes += fiter->xtype().get();
+                }
+                else {
+                    xtypes += "---";
+                }
+#endif
                 units += '\t';
                 if ( fiter->unit() ) {
                     units += fiter->unit().get();
@@ -608,6 +636,9 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
         //  FIELD meta-data.
         out << "ucd: " << ucds << '\n';
         out << "utype: " << utypes << '\n';
+#if NSVERS > 11
+        out << "xtype: " << xtypes << '\n';
+#endif
         out << "unit: " << units << '\n';
         out << "datatype: " << datatypes << '\n';
 

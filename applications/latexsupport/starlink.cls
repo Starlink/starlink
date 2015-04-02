@@ -383,10 +383,11 @@
 
 % A starlink Hyperref (defined a bit differently to regular hyperref,
 % and with a first argument that doesn't do anything. Deprecated; only
-% provided for consistency with old documents.
-\newcommand{\slhyperref}[4]{#2\ref{#4}#3}
+% provided for consistency with old documents.  Include the string, not
+% just the cross reference number or letter in the hyperlink.
+\newcommand{\slhyperref}[4]{\hyperref[#4]{#2\ref*{#4}#3}}
 
-\newcommand{\latexhtml}[3]{#1}
+\newcommand{\latexhtml}[2]{#1}
 
 % %.. Empty environment latex only.
 \newenvironment{latexonly}{}{}

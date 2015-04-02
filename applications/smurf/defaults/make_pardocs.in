@@ -229,7 +229,8 @@
 
 #  Run PROLAT on the temp file and then delete it.
    print( STDERR
-      `rm -f /tmp/prolat.tex;
+      `PATH=\$PATH:@STARLINK@/bin/sst export PATH;
+      rm -f /tmp/prolat.tex;
       @PROLAT@ in=/tmp/make_pardocs.tmp atask=f single=f page=f document=f out=/tmp/prolat.tex;
       rm -f /tmp/make_pardocs.tmp`
    );
@@ -350,9 +351,22 @@ sub createCategories {
             print( CATOUT "\n");
          }
 
+#  Check for a label
+         $text = $1;
+         if( $text =~ /(.*) *label=(\S+)/ ) {
+            $title = $1;
+            $label = $2;
+         } else {
+            $title = $text;
+            $label = "";
+         }
+
 #  Start a new table.
          print( CATOUT "\n");
-         print( CATOUT "\\section{$1}\n");
+         print( CATOUT "\\section{$title}\n");
+         if( $label ) {
+            print( CATOUT "\\label{$label}\n");
+         }
          print( CATOUT "\\begin{center}\n");
          print( CATOUT "{\\renewcommand{\\arraystretch}{1.2}\n");
          print( CATOUT "\\begin{longtable}{| p{4.5cm} | p{6cm} | p{6.5cm} | }\n");

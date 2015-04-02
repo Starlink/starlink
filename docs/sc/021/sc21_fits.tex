@@ -13,27 +13,66 @@ be omitted to save typing.
 % fits2ndf file.fits file.sdf
 \end{terminalv}
 
-Unless your FITS file is from a recognised source, \fitstondf\ puts the
-various FITS extensions into NDF extensions called FITS\_EXT\_$<n>$,
-where $n$ counts from one for the first FITS extension. These are
-located in the top-level MORE component of the NDF. If one of these is
-the array you want---it should be an NDF too---it will be easier to
-handle if you copy out of the NDF extension to its own NDF.
+FITS files from certain recognised sources have special rules applied
+when converting from FITS to NDF, as described in the documentation for
+\xref{\task{fits2ndf}}{sun55}{FITS2NDF}. For FITS files from other sources, the
+primary array in the FITS file is stored as the main NDF in the output
+file. Any FITS extensions present in the FITS file will be placed into
+NDF extensions called FITS\_EXT\_$<n>$, where $n$ counts from one for
+the first FITS extension.  To see a list of the extension NDFs in
+\file{fred.sdf}, do:
 
 \begin{terminalv}
-% ndfcopy in=file.more.fits_ext_1 out=file_data
+% ndfecho fred.more
+fred.MORE.FITS_EXT_1
+fred.MORE.FITS_EXT_2
+fred.MORE.FITS_EXT_3
 \end{terminalv}
 
-If there is a variance array stored in another extension that you want
-to attach to your new NDF, a command like the following will do that.
+When running a \textsc{Kappa} ot \textsc{smurf} command, you can refer
+to these extension just as they are listed above. So for instance:
 
 \begin{terminalv}
-% setvar ndf=file_data from=file.more.fits_ext_2
+% ndftrace fred.MORE.FITS_EXT_1
+
+   NDF structure /home/dsb/fred.MORE.FITS_EXT_1:
+      Units:  COUNTS/S
+
+   Shape:
+      No. of dimensions:  2
+      Dimension size(s):  270 x 263
+      Pixel bounds     :  1:270, 1:263
+      Total pixels     :  71010
+...
+...
 \end{terminalv}
 
-\task{fits2ndf} does offer a way of mapping FITS extensions to familiar NDF
-array components DATA, VARIANCE, and QUALITY through the \param{EXTABLE} file,
-avoiding the \ndfcopy\ and possible \setvar\ steps.
+Alternatively, you can copy the NDF into its own separate file:
+
+\begin{terminalv}
+% ndfcopy in=fred.MORE.FITS_EXT_1 out=new_file
+\end{terminalv}
+
+If one of the extensions contains a variance array that you would like to
+as the \texttt{Variance} component of the main NDF, a command like the
+following will do that:
+
+\begin{terminalv}
+% setvar ndf=new_file from=fred.MORE.FITS_EXT_2
+\end{terminalv}
+
+The \task{fits2ndf} command offers a way of mapping FITS extensions to
+familiar NDF array components DATA, VARIANCE, and QUALITY
+through the \param{EXTABLE} file, avoiding the \ndfcopy\ and possible
+\setvar\ steps.
+
+You can convert an NDF to a FITS file using the command
+\xref{\task{ndf2fits}}{sun55}{NDF2FITS}:
+
+\begin{terminalv}
+% convert
+% ndf2fits file.sdf file.fits
+\end{terminalv}
 
 
 

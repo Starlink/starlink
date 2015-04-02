@@ -1,0 +1,17 @@
+#!/bin/tcsh
+
+foreach n (*.head)
+   set bn = `basename $n .head`
+   echo "Doing $bn"
+
+   set fat = "${bn}.fattr"
+   if( -e "$fat" ) then
+      set fattr = `cat $fat`
+   else
+      set fattr = ""
+   endif
+
+   $HOME/work/ast/fplottest $n ps_l "$fattr" n
+   mv gks74.ps ${bn}.ps
+end
+

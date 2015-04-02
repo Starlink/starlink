@@ -309,8 +309,8 @@ only be issued once per login session.  Thus you will see
 Let's run a \KAPPA\ \normalsize application.  \htmlref{CADD}{CADD} adds a
 scalar constant to an \NDFref{NDF} file---the Starlink standard data
 format---to make a new NDF file (usually called an {\em NDF\/} for
-short).  In this case ten is added to the pixels in \texttt{\$KAPPA\_DIR/comwest.sdf} to create \texttt{test.sdf} in the current
-directory.
+short).  In this case ten is added to the pixels in \file{\$KAPPA\_DIR/comwest.sdf}
+to create \file{test.sdf} in the current directory.
 
 \begin{terminalv}
      % cadd $KAPPA_DIR/comwest 10 test
@@ -322,10 +322,10 @@ constant.  Notice that these parameters are separated by spaces.  Most
 applications have a few of these positional parameters, usually the
 most commonly used.  Parameters given on the command line are not
 subsequently prompted for by the application.  Also you see that the
-NDF file extensions are not given.  The \texttt{.sdf} extension indicates
+NDF file extensions are not given.  The \file{.sdf} extension indicates
 that it was created by the \xref{Hierarchical Data System}{sun92}{}
 \latex{ (SUN/92)}, or HDS for short.  Note that an arbitrary
-\texttt{.sdf} file is not necessarily an NDF.
+\file{.sdf} file is not necessarily an NDF.
 
 Next we run the statistics task.  Here we have not given any parameters.
 In this case the application will ask for the values of any parameters
@@ -349,9 +349,9 @@ accept this default as the parameter's value.  Here the suggested
 default is the name of the NDF created by CADD.  (Ignore the \texttt{@} for
 the moment---it just tells the application that it is a file.)
 \KAPPA\ remembers the last NDF used or created, and uses it for the
-suggested default to save typing.  Since \texttt{test} is the NDF whose
+suggested default to save typing.  Since \file{test} is the NDF whose
 statistics we want we just hit the return key.  Again we exclude the
-\texttt{.sdf} extension.  Here is the output from STATS.
+\file{.sdf} extension.  Here is the output from STATS.
 
 \begin{terminalv}
         Pixel statistics for the NDF structure /home/scratch/mjc/test
@@ -373,9 +373,9 @@ statistics we want we just hit the return key.  Again we exclude the
 
 \end{terminalv}
 
-Of course, in your case the current directory will not be \texttt{
+Of course, in your case the current directory will not be \file{
 /home/scratch/mjc}.  The NDF title is the unchanged from the
-\texttt{\$KAPPA\_DIR/comwest} NDF.  This is the normal behaviour for tasks
+\file{\$KAPPA\_DIR/comwest} NDF.  This is the normal behaviour for tasks
 that create a new NDF from an old one; they do, however, have a
 parameter for changing this default.  To alter a defaulted parameter you
 supply its new value on the command line.  Defaulted parameters exist to
@@ -410,7 +410,7 @@ know \ldots the parameter system is trying to be too clever.)
 
 The description of Parameter FWHM is too brief for us to select a value.
 So we obtain some help on this parameter, and then GAUSMOOTH reprompts
-for a value.  The smoothed NDF is written to the NDF called \texttt{testsm}
+for a value.  The smoothed NDF is written to the NDF called \file{testsm}
 in the current directory.
 
 \begin{terminalv}
@@ -493,7 +493,8 @@ between the current percentile limits---10 and 90.  The keyword can be
 abbreviated to double backslash from the shell.  Aside: the parameter
 system actually requires a single backslash.  From the shell, however,
 backslash is a {\em metacharacter\/}, and so must be `escaped' to
-treat the character literally.  One way is to place a \texttt{\textbackslash} before each metacharacter.  You can escape a series of
+treat the character literally.  One way is to place a \texttt{\textbackslash}
+before each metacharacter.  You can escape a series of
 characters by placing them inside single quotes \texttt{' '}.  Other
 metacharacters to watch out for when using \KAPPA\ include
 \texttt{[]()\textbackslash"*?\$}.
@@ -565,7 +566,7 @@ You should see something like the following.
 \end{terminalv}
 
 Now we run an application, \htmlref{ADD}{ADD}, that adds the pixels in
-\texttt{\$KAPPA\_DIR/comwest.sdf} to those in \texttt{\$KAPPA\_DIR/ccdframec.sdf}.
+\file{\$KAPPA\_DIR/comwest.sdf} to those in \file{\$KAPPA\_DIR/ccdframec.sdf}.
 Although these images have different
 dimensions, the intersection is made.
 
@@ -610,7 +611,7 @@ ADD prompts for it.  Notice that literal parameters are case insensitive.
             Bad pixels may be present
 \end{terminalv}
 
-This shows that the \texttt{demo1} NDF has the same dimensions as the
+This shows that the \file{demo1} NDF has the same dimensions as the
 smaller of the two NDFs.
 
 We were going to display the image on the current graphics device, but
@@ -650,7 +651,7 @@ to be used.
      !  NDF_ASSOC: Unable to associate an NDF structure with the '%IN' parameter.
 \end{terminalv}
 
-\htmlref{DISPLAY}{DISPLAY} could not find the a \texttt{comwest.sdf} in
+\htmlref{DISPLAY}{DISPLAY} could not find the a \file{comwest.sdf} in
 the current directory.  So there is an error message and we are
 prompted.  This time we remember to add the environment variable.
 
@@ -676,7 +677,7 @@ We select the right-hand picture created earlier.
 
 As above we display the current NDF, the bas-relief image, with annotated
 axes on the right of the raw comet image (we do not need to request the
-axes explicitly this time, since the \texttt{axes} parameter retains the
+axes explicitly this time, since the \param{axes} parameter retains the
 value used in the previous invocation until changed).
 
 \begin{terminalv}
@@ -770,18 +771,18 @@ command names and to make help information available.  Then you'll be
 able to mix \KAPPA\ commands with the familiar shell ones.
 
 If the \texttt{kappa} command is not recognised, you probably haven't
-enabled the Starlink software.  In your \texttt{.cshrc} or \texttt{.tcshrc}
+enabled the Starlink software.  In your \file{.cshrc} or \file{.tcshrc}
 file, you insert the line
 
 \begin{terminalv}
      source /star/etc/cshrc
 \end{terminalv}
-and in \texttt{.login} you include the equivalent line
+and in \file{.login} you include the equivalent line
 
 \begin{terminalv}
      source /star/etc/login
 \end{terminalv}
-At non-Starlink sites the \texttt{/star} path may be different.
+At non-Starlink sites the \file{/star} path may be different.
 
 To run \KAPPA\ from \ICL\ you have to start up the
 command language if you are not already using it.  This requires just
@@ -1000,7 +1001,7 @@ DEFAULT command, and not {\bf cd}.  Thus
 \begin{terminalv}
      ICL> default /home/scratch/dro
 \end{terminalv}
-makes \texttt{/home/scratch/dro} the default directory for the
+makes \file{/home/scratch/dro} the default directory for the
 \ICL\ \normalsize session, and for existing and future subprocesses,
 including application packages.
 
@@ -1266,15 +1267,15 @@ suggested values at the second prompt.
 
 Current values of parameters are stored in a {\em parameter file}, and
 so they persist between sessions.  For tasks run from the shell, this
-is an \HDSref\ file \texttt{\$ADAM\_USER/}{\it $<$application$>$}\texttt{.sdf},
+is an \HDSref\ file \file{\$ADAM\_USER/}{\it $<$application$>$}\file{.sdf},
 where {\it $<$application$>$} is the name of the application. (If the
 environment variable \texttt{ADAM\_USER} is not defined the parameter
-file is situated in \texttt{\$HOME/adam}).
+file is situated in \file{\$HOME/adam}).
 
 Unfortunately, tasks invoked from \ICLref\ \normalsize use a monolith parameter
 file, which contains the individual application parameter files for
-the members.  So for example, \KAPPA\ has \texttt{kappa\_mon.sdf},
-\texttt{kapview\_mon.sdf}, and \texttt{ndfpack\_mon.sdf} stored in the same
+the members.  So for example, \KAPPA\ has \file{kappa\_mon.sdf},
+\file{kapview\_mon.sdf}, and \file{ndfpack\_mon.sdf} stored in the same
 directory as the individual files.  This duality means that there are
 two independent sets of current values for each task depending on
 where you ran it from.
@@ -1294,13 +1295,13 @@ as defaults to reduce typing in response to prompts.  Global means that
 they are shared between applications.  The most common is the last
 dataset (usually \xref{NDF}{sun33}{overview_of_an_ndf}) written or
 accessed.  In the example above, this
-was \texttt{horsehead.sdf}.  If you just press \texttt{<CR>} in response to the
+was \file{horsehead.sdf}.  If you just press \texttt{<CR>} in response to the
 prompt, the global value is unchanged.  Only when you modify the
 parameter and the application completes without error is the global value
 updated.
 
-All global parameters are stored in the HDS file \texttt{
-\$ADAM\_USER/GLOBAL.sdf}, or \texttt{\$HOME/adam/GLOBAL.sdf} if the \texttt{
+All global parameters are stored in the HDS file \file{
+\$ADAM\_USER/GLOBAL.sdf}, or \file{\$HOME/adam/GLOBAL.sdf} if the \texttt{
 ADAM\_USER} environment variable is not defined.  The full list is
 given below.
 \newline
@@ -1344,7 +1345,7 @@ is defined by the \texttt{MSG\_FILTER} environment variable.  It controls
 the verbosity of informational messages.  Since it applies to all
 tasks that report such messages, it is convenient to allow GLOBALS to
 show its value.  Further details are in \slhyperref{Verbosity of
-Messages}{Section }{}{se:msglev} for details.  Since it is not a
+Messages}{Section~}{}{se:msglev} for details.  Since it is not a
 parameter as such, the message-reporting level is not unset by
 \htmlref{NOGLOBALS}{NOGLOBALS}.
 
@@ -1371,8 +1372,8 @@ a file name, and not a literal value.
 \begin{terminalv}
      TITLE - New NDF title /' '/ @$ADAM_USER/galaxy.mytitle
 \end{terminalv}
-In this example TITLE has the value of object MYTITLE in \texttt{
-galaxy.sdf}.  If the \texttt{@} were omitted TITLE would be \texttt{
+In this example TITLE has the value of object MYTITLE in \file{
+galaxy.sdf}.  If the \texttt{@} were omitted TITLE would be \file{
 "\$ADAM\_USER/galaxy.mytitle"}.  You will need the \texttt{@} prefix if your
 file name is a number.  Note that the file extension should not be
 included when giving the name of an \HDSref\ data file, including
@@ -1682,7 +1683,7 @@ However, if we run CREFRAME like this:
      ICL> creframe out=stars accept
 \end{terminalv}
 it would generate an output image using default values for all the
-parameters except OUT, and write the output to file \texttt{stars.sdf}.
+parameters except OUT, and write the output to file \file{stars.sdf}.
 Another point to be wary of is that some applications have loops,
 {\emph{e.g.}}\ \htmlref{LOOK}{LOOK},
 \htmlref{LUTABLE}{LUTABLE}, and if you use the ACCEPT keyword
@@ -1979,7 +1980,7 @@ to be processed.  The user is then re-prompted for another group
 expression, using the same parameter.
 
 If an HDS container file\footnote{HDS container files can usually be
-identified by the fact they have a file type of \texttt{.sdf}.  They can be
+identified by the fact they have a file type of \file{.sdf}.  They can be
 used to store one or more standard Starlink NDF structures.} is supplied
 that contains two or more NDF structures, then each NDF within the
 container file is processed as a separate image.  NDFs that are contained
@@ -2018,8 +2019,8 @@ up data files with the highest priority data format (\emph{i.e.} the
 format nearest to the start of the list of formats supplied in
 environment variable \texttt{NDF\_FORMATS\_IN}).  So for instance, if the current
 directory contained both \verb+b1.sdf+ and \verb+b1.fit+, then only one
-file would be used, depending on the relative positions of the \texttt{.sdf}
-and \texttt{.fit} formats within \texttt{NDF\_FORMATS\_IN}.  If you want to restrict
+file would be used, depending on the relative positions of the \file{.sdf}
+and \file{.fit} formats within \texttt{NDF\_FORMATS\_IN}.  If you want to restrict
 things explicitly to a particular data format, then you should include
 the corresponding file type in the group expression.  An example such as:
 
@@ -2213,7 +2214,7 @@ first example above from \ICL, you would enter something like this.
 \end{terminalv}
 \texttt{vmean} is an ICL variable.  The parentheses have the same effect
 as the \verb+$+ in the C-shell example, meaning ``the value of'' the
-variable.  Note that you can't redirect the output to \texttt{/dev/null}.
+variable.  Note that you can't redirect the output to \file{/dev/null}.
 
 If you use the \htmlref{PROMPT keyword}{se:parspeckey}
 \latex{(see Section~\ref{se:parspeckey})} for an application with output
@@ -2331,7 +2332,7 @@ preparation before you select a device.  Starlink graphics use
 separate applications; or to be shared by different applications,
 potentially even running on different machines.  See
 \xref{SUN/130}{sun130}{} for details of \GWM\ and how to
-change your X-defaults file (\texttt{{\$HOME/.Xdefaults}}), but the salient
+change your X-defaults file (\file{{\$HOME/.Xdefaults}}), but the salient
 points are given below.
 
 If the window appears on a terminal or workstation other than the one
@@ -2401,15 +2402,16 @@ issue this command that often.
 more-complicated plots, and possibly add annotations with other packages
 especially \PONGOref\@.  This is fine if the device is some sort of
 screen.  However, care needs to be taken when using other types of
-device. For instance, some \PGPLOTref\ postscript devices put the
+device. For instance, some \PGPLOTref\ PostScript devices put the
 output from each command into a separate disk file.  So how do you get the
 composite plot out on paper?  There are two solutions:
 
 \begin{enumerate}
-\item The easy way - use an ``accumulating'' postscript device instead.
+\item the easy way---use an ``accumulating'' PostScript device instead.
 If you look at the list of device names produced by
-\htmlref{GDNAMES}{GDNAMES} you will see that some of the encapsulated postscript
-(EPS) devices are described as ``accumulating''. For instance:
+\htmlref{GDNAMES}{GDNAMES} you will see that some of the encapsulated
+PostScript (EPS) devices are described as ``accumulating'' such as the
+following.
 
 \begin{terminalv}
     % gdnames
@@ -2422,12 +2424,12 @@ If you look at the list of device names produced by
 \end{terminalv}
 
 If you use one of these devices, each subsequent graphics application
-will merge it's postscript output automatically into any existing
-\texttt{pgplot.ps} file. If you display \texttt{pgplot.ps} using a
-modern PDF/postscript viewer such \OKULARref\ or \EVINCEref, the
+will merge its PostScript output automatically into any existing
+\file{pgplot.ps} file. If you display \file{pgplot.ps} using a
+modern PDF/PostScript viewer such \OKULARref\ or \EVINCEref, the
 display will update automatically as each subsequent graphics application modifies
 the file. Once the final graphics application has been run, you can rename
-the \texttt{pgplot.ps} file to something more covenenient\footnote{You
+the \file{pgplot.ps} file to something more covenenient\footnote{You
 could alternatively include the required final file name in the device
 name before running the graphics applications.}.
 
@@ -2442,10 +2444,10 @@ on an image.
 
 \end{terminalv}
 
-\item The hard way - use \PSMERGEref\ to merge separate postscript files.
-If you use one of the non-accumulating postscript devices, the output
+\item The hard way---use \PSMERGEref\ to merge separate PostScript files.
+If you use one of the non-accumulating PostScript devices, the output
 from each graphics application goes into a separate file which must then
-be merged. This is what you must do:
+be merged.  Here is what you must do.
 
 \begin{itemize}
 \item  Select one of the non-acculumlating encapsulated PostScript device, be
@@ -2455,8 +2457,8 @@ it colour or monochrome.
 over-written by the output from the next command.  Alternatively, you can
 specified the device to use separately when running each command, including an
 explicit unique file name in each device specification (see above).
-\item Use \PSMERGEref\ (the Starlink version, usually in /star/bin) to
-combine the plots.
+\item Use \PSMERGEref\ (the Starlink version, usually in
+\file{/star/bin}) to combine the plots.
 \end{itemize}
 
 To use the same example as above:
@@ -2481,9 +2483,9 @@ or alternatively:
     % rm display.ps contour.ps
 \end{terminalv}
 
-You then print \texttt{myplot.ps} to the colour PostScript printer.
-{\footnotesize PSMERGE} \normalsize also has options for scaling and rotating plots.
-\end{enumerate}
+to form the merged graphic.  You then print \file{myplot.ps} to the
+colour PostScript printer. {\footnotesize PSMERGE} \normalsize also
+has options for scaling and rotating plots. \end{enumerate}
 
 \newpage
 \section{\xlabel{se_style}Plotting Styles and Attributes\label{se:style}}
@@ -2661,7 +2663,7 @@ unambiguous abbreviations may be used):
 A collection of attribute settings is called a \emph{plotting style}.
 Attributes that are not specified in a plotting style take on default
 values as described later.  An example of a plotting style is contained in
-the file \texttt{\$KAPPA\_DIR/kappa\_style.def}.  This file defines the default
+the file \file{\$KAPPA\_DIR/kappa\_style.def}.  This file defines the default
 style used by \KAPPA.
 
 In general each graphical application will determine the plotting style
@@ -2716,7 +2718,7 @@ All this means that there are several ways in which plotting styles can be
 supplied.  The simplest method is probably to store all your attribute
 setting strings in a text file, one per line, and then just give the name
 of this text file (preceded by an up-arrow) as the value for the STYLE
-parameter.  For instance, the file \texttt{style.dat} may contain:
+parameter.  For instance, the file \file{style.dat} may contain:
 
 \begin{terminalv}
    # A test plotting style
@@ -2763,21 +2765,21 @@ on the command line.  For instance:
    % display style="'^style.dat,width=3'"
 \end{terminalv}
 
-This reads the contents of our test style file \texttt{style.dat}, which
+This reads the contents of our test style file \file{style.dat}, which
 includes the attribute setting \texttt{width=2}.  It then also applies the
 attribute setting \texttt{width=3}, over-writing the effect of the \texttt{Width}
 value included in the style file.  If you wanted to try temporarily changing
 the value of several attributes at once, you could put the new attribute
-settings into a second file, say \texttt{style2.dat}, and then run the
+settings into a second file, say \file{style2.dat}, and then run the
 application as follows:
 
 \begin{terminalv}
    % display style="'^style.dat,^style2.dat'"
 \end{terminalv}
 
-Again, the contents of \texttt{style.dat} would be read, followed by the
-contents of \texttt{style2.dat}, over-writing any settings for the same
-attributes included in \texttt{style.dat}.
+Again, the contents of \file{style.dat} would be read, followed by the
+contents of \file{style2.dat}, over-writing any settings for the same
+attributes included in \file{style.dat}.
 
 \subsubsection{\xlabel{se_temp_attr}Temporary Attributes\label{se:temp_attr}}
 
@@ -2814,7 +2816,7 @@ a list that can include indirection to text files.
 \end{terminalv}
 
 Here \htmlref{LINPLOT}{LINPLOT} uses three temporary attributes plus
-whatever is defined in the text file file \texttt{temp.sty}.  Note for a
+whatever is defined in the text file file \file{temp.sty}.  Note for a
 list the string requires an extra set of enclosing quotes to protect
 these from being misinterpreted by the UNIX shell.  The experimental
 method that used a second parameter called TEMPSTYLE will be
@@ -2970,25 +2972,25 @@ value is used for the attribute, determined as follows:
       \$HOME/kappa\_<app>\_<param>.def} is used (where \texttt{<app>} and
       \texttt{<param>} are in lower case this time).
 
-\item If the file \texttt{\$HOME/kappa\_<app>\_<param>.def} cannot be accessed,
-      the file \linebreak \texttt{\$KAPPA\_DIR/kappa\_<app>\_<param>.def} is used.
+\item If the file \file{\$HOME/kappa\_<app>\_<param>.def} cannot be accessed,
+      the file \linebreak \file{\$KAPPA\_DIR/kappa\_<app>\_<param>.def} is used.
 
-\item If the file \texttt{\$KAPPA\_DIR/kappa\_<app>\_<param>.def} cannot be
+\item If the file \file{\$KAPPA\_DIR/kappa\_<app>\_<param>.def} cannot be
       accessed, then the value of the environment variable
       \texttt{KAPPA\_<PARAM>} is used as the full path to the defaults file.
 
 \item If \texttt{KAPPA\_<PARAM>} is not defined, the file \texttt{
       \$HOME/kappa\_<param>.def} is used.
 
-\item If the file \texttt{\$HOME/kappa\_<param>.def} cannot be accessed, the file
-      \linebreak \texttt{\$KAPPA\_DIR/kappa\_<param>.def} is used.
+\item If the file \file{\$HOME/kappa\_<param>.def} cannot be accessed, the file
+      \linebreak \file{\$KAPPA\_DIR/kappa\_<param>.def} is used.
 \end{itemize}
 
 \item If the above process failed to produce a value for the attribute
 (either because no file was found, or the file did not contain a setting
 for the attribute), then the default value supplied by the AST library is
 used.  These defaults are included in the full description of the relevant
-attributes in Appendix~\ref{ap:plotting_attr}.
+attributes \slhyperref{later}{in Appendix~}{}{ap:plotting_attr}.
 \end{enumerate}
 
 From the above, you can see that defaults can be specified either for
@@ -3100,7 +3102,7 @@ The official standard data format used by Starlink applications is the
 \NDFextref{NDF}\ (Extensible \textit{n}-dimensional Data Format, SUN/33).  The
 data in an NDF is stored using \HDSref\ which has numerous advantages,
 not least that {\em HDS files are portable between operating systems};
-both have file extension \texttt{.sdf}.
+both have file extension \file{.sdf}.
 
 The NDF has been carefully designed to facilitate processing by both
 general applications like \KAPPA\ and specialist packages.
@@ -3120,7 +3122,7 @@ The NDF format permits arrays to have seven dimensions, but some
 applications only handle one-dimensional and/or two-dimen\-sional data
 arrays.  The data and variance arrays are not constrained to a single
 data type.  Valid types are the \htmlref{HDS numeric primitive
-types}{ap:HDStypes}\latex{, see Appendix~\ref{ap:HDStypes}}.
+types}{ap:HDStypes}\latex{, see \slhyperref{}{Appendix~}{}{ap:HDStypes}}.
 
 Many applications are generic, that is they can work on all or some of
 these data types directly.  This makes these applications faster, since
@@ -3699,7 +3701,7 @@ contents to the history records.  Thus
 \begin{terminalv}
      % hiscom hr1068 f file=comments.lis
 \end{terminalv}
-appends the text contained in \texttt{comments.lis} to the history
+appends the text contained in \file{comments.lis} to the history
 records of NDF hr1068.
 
 \subsection{\xlabel{se_listhistory}Listing History Records
@@ -4262,7 +4264,7 @@ The pointer is positioned at the two ends of the required profile, and the
 left button clicked at each position.  The supplied positions are marked by
 two markers of \PGPLOT\  type 3 (small crosses), and a white line is drawn between
 them (forming a `chain').  The selected positions are written to an
-output catalogue stored in file \texttt{zz.FIT}.  We now sample the data in the
+output catalogue stored in file \file{zz.FIT}.  We now sample the data in the
 two images along this profile to create a pair of  one-dimensional NDFs
 (\verb+m31_prof+ and \verb+iras_prof+):
 
@@ -4563,9 +4565,9 @@ again depends on the application.
 The location of the graphics database file can be controlled by setting the
 environment variable \texttt{AGI\_USER} to the desired location.  If \texttt{AGI\_USER}
 is undefined, the database file is placed in your home directory.
-Thus by default the file is \texttt{\$HOME/agi\_}{\it $<$node$>$}\texttt{{.sdf}},
+Thus by default the file is \file{\$HOME/agi\_}{\it $<$node$>$}\file{{.sdf}},
 where you substitute your computer's node name for {\it
-$<$node$>$}, {\it{e.g.}}\ \texttt{/home/dro/agi\_rlsaxp.sdf}.  A new
+$<$node$>$}, {\it{e.g.}}\ \file{/home/dro/agi\_rlsaxp.sdf}.  A new
 database is created when you run a graphics application if none exists.
 AGI will purge the database for a device if the graph window has
 changed size, or if you switch between portrait and landscape formats
@@ -4604,7 +4606,7 @@ the X-windows device used earlier in this chapter. Each application will
 then write its graphical output to one or more disk files.  If you elect
 to use one of the ``accumulating'' PostScript devices (as indicated in
 the device description displayed by \htmlref{GDNAMES}{GDNAMES}), then the
-postscript output from each application will be merged automatically into
+PostScript output from each application will be merged automatically into
 a single file. If you use one of the other PostScript devices, each
 application will produce a separate output file, all of which must be
 combined using \PSMERGEref\ to create a single PostScript file containing
@@ -4652,7 +4654,7 @@ produce an new output file in your current directory containing PostScript
 commands, depending on whether you choose an accumulating device or not.  These
 files can be examined without needing to be printed by using \OKULARref,
 \EVINCEref, \texttt{ghostview}, \emph{etc}. By default, the output file
-will be called \texttt{pgplot.ps}.
+will be called \file{pgplot.ps}.
 
 \begin{quote}
 \emph{ Note, if you choose not to use an accumulating device, subsequent graphics
@@ -4661,7 +4663,7 @@ reason you should rename the output file after running each graphics command.  A
 alternative approach is to assign a unique value to the DEVICE parameter for each
 graphics command (rather than just allowing it to default to the value of the global
 parameter set using GDSET).  For instance, \emph{\texttt{DEVICE="epsf\_l;contour.ps"}}
-would cause the command to write its output to file \texttt{contour.ps}.}
+would cause the command to write its output to file \file{contour.ps}.}
 \end{quote}
 
 \subsubsection{Combining the Files into a Single File}
@@ -4681,7 +4683,7 @@ that do not contain any actual drawing commands.}:
 \end{terminalv}
 
 This stacks the three specified PostScript files into a single file called
-\texttt{total.ps}.  This will be a normal (\emph{i.e.} not encapsulated) PostScript
+\file{total.ps}.  This will be a normal (\emph{i.e.} not encapsulated) PostScript
 file, so you can print it, but it will be difficult to include it in a
 document.  If you include the \texttt{-e} option when running
 PSMERGE, then an encapsulated PostScript file is created instead:
@@ -4803,12 +4805,12 @@ portrait, encapsulated PostScript device:
 \end{terminalv}
 
 Since we are using an accumulating PostScript device, we have chosen to use
-\OKULARref\ above to display the contents of \texttt{pgplot.ps}.  We have
+\OKULARref\ above to display the contents of \file{pgplot.ps}.  We have
 just run \htmlref{GDCLEAR}{GDCLEAR}, and so this will produce a blank display.
 Note that we have put \OKULAR\ into the background by appending texttt{\&} to
 the end of the command line.  This means that \OKULAR\ will continue to run
 throughtout the following example.  As each subsequent graphics application
-modifies the contents of \texttt{pgplot.ps}, the resulting composite plot will
+modifies the contents of \file{pgplot.ps}, the resulting composite plot will
 be displayed immediately within the \OKULAR\ window, allowing you to review
 progress.  Other modern document viewers such as \EVINCEref\ work in the same
 way.
@@ -4905,15 +4907,15 @@ OUTCAT parameter.  In either case, we use \htmlref{LISTSHOW}{LISTSHOW} to draw t
 \end{terminalv}
 
 Note, the PostScript output generated by \htmlref{LISTSHOW}{LISTSHOW} is
-merged automatically into the \texttt{pgplot.ps} file created by the
+merged automatically into the \file{pgplot.ps} file created by the
 previous graphics applications. If we had chosen not to use an
-accumulating device, we would need to rename the new \texttt{pgplot.ps}
+accumulating device, we would need to rename the new \file{pgplot.ps}
 file created by each graphics application, and then merge them all together at
 the end using PSMERGE.
 
 Specifying \texttt{ndf=m31} resulted in LISTMAKE interpreting the supplied
 positions as positions within the current co-ordinate Frame of the NDF
-\texttt{m31}.  It also results in all the \htmlref{WCS}{apndf:wcs}~ information being copied from the
+\file{m31}.  It also results in all the \htmlref{WCS}{apndf:wcs}~ information being copied from the
 NDF into the output positions list.
 
 We now create a Frame in the top-right corner of the reduced `page' in
@@ -4926,7 +4928,7 @@ picture occupies the remainder of the width left over by the main image
 \end{terminalv}
 
 We now display the selected image section within the FRAME picture just
-created, and overlay contours from \texttt{iras.sdf}.  We draw the border
+created, and overlay contours from \file{iras.sdf}.  We draw the border
 with twice the default width:
 
 \begin{terminalv}
@@ -4995,8 +4997,8 @@ did when prototyping:
 \end{terminalv}
 
 The appearances of the two plots are controlled by the two plotting
-styles contained in the text files \texttt{style1} and \texttt{style2}.
-\texttt{style1} contains the following attribute settings:
+styles contained in the text files \file{style1} and \file{style2}.
+\file{style1} contains the following attribute settings:
 
 \begin{terminalv}
    tickall=0
@@ -5008,7 +5010,7 @@ styles contained in the text files \texttt{style1} and \texttt{style2}.
    labelunits=0
 \end{terminalv}
 
-The file \texttt{style2} contains the following attribute settings:
+The file \file{style2} contains the following attribute settings:
 
 \begin{terminalv}
    edge(2)=r
@@ -5037,7 +5039,7 @@ ends of each line must be given within the same co-ordinate Frame.
 We start with the `selection box' drawn over the main image.  The
 corners of this box are currently stored in the \texttt{boxpos} positions
 list.  This file contains the RA and DEC at the corners of the box,
-together with WCS information copied from the NDF \texttt{m31}.  But this
+together with WCS information copied from the NDF \file{m31}.  But this
 does \emph{not} include the BASEPIC, NDC or CURPIC Frame, which are only
 available within
 the WCS information stored with graphics database pictures.  In order to
@@ -5157,10 +5159,10 @@ same way:
    % listshow war2pos plot=poly name=base
 \end{terminalv}
 
-That's it.  The final output is left in file \texttt{pgplot.ps} and
+That's it.  The final output is left in file \file{pgplot.ps} and
 should be visible in the \OKULAR\ window.  It should look like
 Figure~ \latexhtml{\ref{fi:agi9}}{9}.  However, if we had chosen not to use
-an accumulating PostScript device, we would now be left with lots of postscript
+an accumulating PostScript device, we would now be left with lots of PostScript
 files---one from each graphics application---that now need to be stacked together
 to produce the final encapsulated PostScript file:
 
@@ -5169,7 +5171,7 @@ to produce the final encapsulated PostScript file:
                 line.ps m31_prof.ps iras_prof.ps war1.ps war2.ps > total.eps
 \end{terminalv}
 
-Note, here we assume that each \texttt{pgplot.ps} file has been renamed
+Note, here we assume that each \file{pgplot.ps} file has been renamed
 to one of the above names immediately after it has been created, in
 order to avoid it being over-written by the next graphical application.
 
@@ -5728,7 +5730,7 @@ two spectra.
 So the question arises; ``How can I add a SpecFrame to my existing NDFs
 that only have an AXIS structure?''.  This is simple to do using the
 \htmlref{WCSADD}{WCSADD} command.  Let's assume you have a one-dimensional
-NDF called \texttt{fred} containing an AXIS structure holding the frequency
+NDF called \file{fred} containing an AXIS structure holding the frequency
 at the centre of each pixel in units of GHz.  The following command will add
 an appropriate SpecFrame to the WCS component of the NDF (and will also
 make it the \emph{current} Frame):
@@ -5770,7 +5772,7 @@ example:
 \end{terminalv}
 
 These commands set new values for named attributes within the current
-Frame of NDF \texttt{fred}.  These attributes are described
+Frame of NDF \file{fred}.  These attributes are described
 \slhyperref{here}{in Appendix~}{}{ap:frmatt}.  The inclusion of \texttt{"remap=no"}
 is important: it tells the command to change the Frame attribute
 \emph{ without} changing the \xref{Mappings}{sun210}{Mapping}~ between
@@ -5973,7 +5975,7 @@ prompt for the co-ordinates.  A null ends the loop.
 
      INIT - Guess at co-ordinates of star-like feature /73.3,319/ > !
 \end{terminalv}
-Finally, we can create a text file called \texttt{starlist.dat} and run
+Finally, we can create a text file called \file{starlist.dat} and run
 CENTROID in file mode.
 
 \begin{terminalv}
@@ -6160,7 +6162,7 @@ choose the second option remember that all RGB intensities must lie in
 the range 0.0--1.0, where 1.0 is the maximum intensity; and that equal
 red, green, and blue intensities yields a shade of grey.  So for
 example if you want a six equal blocks of red, blue, yellow, pink,
-sienna and turquoise you could create the text file \texttt{col6.dat}
+sienna and turquoise you could create the text file \file{col6.dat}
 with contents
 
 \begin{terminalv}
@@ -6232,9 +6234,9 @@ Separate palettes and colour tables are maintained for each known
 graphics device, so running \htmlref{LUTGREY}{LUTGREY} on an xwindows
 device will have no effect on the colour table used for PostScript
 devices (for instance).  The palettes for all known devices are stored in
-a file called \texttt{kappa\_palette.sdf} located within your ADAM directory
-(usually \texttt{\$HOME/adam}).  The colour tables for all known devices are stored
-in a file called \texttt{kappa\_lut.sdf} located within the same directory.
+a file called \file{kappa\_palette.sdf} located within your ADAM directory
+(usually \file{\$HOME/adam}).  The colour tables for all known devices are stored
+in a file called \file{kappa\_lut.sdf} located within the same directory.
 
 \newpage
 \section{\xlabel{se_masking}Masking, Bad Values, and Quality\label{se:masking}}
@@ -6481,7 +6483,7 @@ Parameter REGIONS, and no regions are deleted.
 
 Now suppose you want to combine or invert regions in some way, you
 supply \texttt{Combine} at the OPTION prompt.  So suppose we have
-created the following regions in \texttt{\$KAPPA\_DIR/ccdframe}.
+created the following regions in \file{\$KAPPA\_DIR/ccdframe}.
 
 \begin{terminalv}
        Region          Region Description
@@ -6580,7 +6582,7 @@ outline of the selected regions on top of a display image using
    \begin{figure}[hbt]
    \begin{center}
    \includegraphics[clip,height=118mm]{sun95_ardwork}
-   \caption{Masking of \texttt{\$KAPPA\_DIR/ccdframec}.  To the left shows
+   \caption{Masking of \file{\$KAPPA\_DIR/ccdframec}.  To the left shows
    the original ARDMASK regions, and to the right shows the final
    masked regions after some have been combined.}
    \label{fi:ardwork}
@@ -7242,7 +7244,7 @@ undefine \texttt{KAPPA\_LOOP\_DISABLE}. In C-shell:
 \section{\xlabel{se_datainput}Getting Data into KAPPA\label{se:datainput}}
 
 \KAPPA\ utilises general data structures within an
-\HDSref\ container file, with file extension \texttt{.sdf}.  Most of
+\HDSref\ container file, with file extension \file{.sdf}.  Most of
 the examples in this documentation processing is performed on data in
 this \NDFref{NDF} format generated from within \KAPPA.
 Generally, you will already have data in `foreign' formats, that is
@@ -7281,17 +7283,17 @@ Once defined it lets you run \KAPPA\ tasks on FITS,
      % stats m51.fit
      % stats m51.dst
 \end{terminalv}
-would compute the statistics of a FITS file \texttt{m51.fit}, and then
-a \FIGARO\ file \texttt{m51.dst}.
+would compute the statistics of a FITS file \file{m51.fit}, and then
+a \FIGARO\ file \file{m51.dst}.
 
 The environment variable also defines a search order.  Had you entered
 
 \begin{terminalv}
      % stats m51
 \end{terminalv}
-\htmlref{STATS}{STATS} would first look for an NDF called m51 (stored in file \texttt{
+\htmlref{STATS}{STATS} would first look for an NDF called m51 (stored in file \file{
 m51.sdf}). If it could not locate that NDF, STATS would then look for
-a file called \texttt{m51.fit}, and then \texttt{m51.imh}, and finally \texttt{
+a file called \file{m51.fit}, and then \file{m51.imh}, and finally \file{
 m51.dst}, stopping once a file was found and associating the
 appropriate format with it. If none of the files exist, you'll receive
 a ``file not found'' error message.
@@ -7305,7 +7307,7 @@ format.  Thus
      % stats m51.imh"(100:200,200~81)"
 \end{terminalv}
 would derive the statistics for \textit{x} pixels between 100 and 200, and
-\textit{y} pixels 160 to 240 in the \IRAF\ file \texttt{m51.imh}.
+\textit{y} pixels 160 to 240 in the \IRAF\ file \file{m51.imh}.
 
 The conversion tasks may be your own for some private format, but
 normally they will come from the \CONVERTref\ \normalsize package
@@ -7328,7 +7330,7 @@ that format.  So for instance,
      % ffclean in=m51.dst out=m51_cleaned.dst \\
 \end{terminalv}
 
-cleans \texttt{m51.dst} and stores the result in \texttt{m51\_cleaned.dst}.
+cleans \file{m51.dst} and stores the result in \file{m51\_cleaned.dst}.
 On the other hand, if you only give the dataset name
 \begin{terminalv}
      % ffclean in=m51.dst out=m51_cleaned \\
@@ -7357,7 +7359,7 @@ propagated from an existing dataset.  For instance, if the above
 \begin{terminalv}
      % ffclean in=m51.dst out=m51_cleaned \\
 \end{terminalv}
-would now create \texttt{m51\_cleaned.dst}.  If there is no propagation
+would now create \file{m51\_cleaned.dst}.  If there is no propagation
 in the given application, the asterisk is ignored.
 
 You can retain the scratch NDF by setting the environment variable
@@ -7414,8 +7416,8 @@ commands described in \xref{SUN/55}{sun55}{}.
 
 \htmlref{FITSIN}{FITSIN} reads FITS files stored on tape.  For
 efficiency, you should select the `no-rewind' device for the
-particular tape drive, for example \texttt{/dev/nrmt0h} on OSF/1 and
-\texttt{/dev/rmt/1n} on Solaris.
+particular tape drive, for example \file{/dev/nrmt0h} on OSF/1 and
+\file{/dev/rmt/1n} on Solaris.
 
 We ask for the second file on the tape, and the headers are displayed
 so we can decide whether this is the file we want.  It is so we supply
@@ -7512,10 +7514,10 @@ identify the files you want to convert.  So for instance,
 \begin{terminalv}
      % fitshead /dev/nrmt1h > headers.lis
 \end{terminalv}
-lists all the FITS headers from a FITS tape on device \texttt{/dev/nrmt1h}
-to file \texttt{headers.lis}.
+lists all the FITS headers from a FITS tape on device \file{/dev/nrmt1h}
+to file \file{headers.lis}.
 
-After running FITSIN you may notice a file \texttt{USRDEVDATASET.sdf} in
+After running FITSIN you may notice a file \file{USRDEVDATASET.sdf} in
 the current directory.  This \HDSref\ file records the current
 position of the tape, so you can use FITSIN to read a few files, and
 then run it again a little later, and FITSIN can carry on from where
@@ -7662,7 +7664,7 @@ NDF also allows independent {\em extensions\/} to be defined and
 added, which can store auxiliary information to suit the needs of a
 specialised software package.  (Note that the term extension here
 refers to a structure within the NDF for storing additional data, and
-is neither the file extension \texttt{.sdf} nor extensions like BINTABLE
+is neither the file extension \file{.sdf} nor extensions like BINTABLE
 within the FITS file.) An extension is only processed by software that
 understands the meanings obeys the processing rules of the various
 components of the extension.  Other programmes propagate the extension
@@ -7812,7 +7814,7 @@ FITS-like header in a text file.  For example,
 \end{terminalv}
 
 \latex{\normalsize}
-places the contents of \texttt{myfile} in the NDF called myndf.  This is
+places the contents of \file{myfile} in the NDF called myndf.  This is
 not advised unless you are familiar with the rules for writing FITS
 headers.  See the NOST
 \htmladdnormallink{{\em A User's Guide to FITS}}
@@ -7847,7 +7849,7 @@ is simple.
      % fitsedit myndf
 \end{terminalv}
 This edits the FITS extension of the NDF called myndf.
-FITSEDIT extracts the file into a temporary file (\texttt{{zzfitsedit.tmp}})
+FITSEDIT extracts the file into a temporary file (\file{{zzfitsedit.tmp}})
 which you edit, and then uses FITSTEXT to restore the FITS extension.
 It therefore has the same parsing of the edited FITS headers as FITSTEXT
 provides.
@@ -7906,7 +7908,7 @@ processing.
 The \xref{{\sl C-shell Cookbook}}{sc4}{} contains many ingredients and
 recipes, and features many \KAPPA\ commands.  So there is little
 point repeating them here other than to direct you to a documented
-script in \texttt{\$KAPPA\_DIR/multiplot.csh}.
+script in \file{\$KAPPA\_DIR/multiplot.csh}.
 
 \subsection{\xlabel{se_ICLproc}ICL Procedures\label{se:ICLproc}}
 
@@ -7939,7 +7941,7 @@ command
 \begin{terminalv}
      ICL> LOAD FLASH
 \end{terminalv}
-will load the file \texttt{FLASH.ICL}.
+will load the file \file{FLASH.ICL}.
 Thereafter in the \ICL\ session you can invoke FLASH for many
 NDFs.  The following will display the NDFs called GORDON and FLOOD
 side-by-side.
@@ -7962,9 +7964,9 @@ and you'd define it like this.
      % setenv ICL_LOGIN $HOME/login.icl
 \end{terminalv}
 However, the file doesn't have to be in your home directory, or called
-\texttt{login.icl}, but it's convenient to do so.  Suppose you have three
-procedures: FLASH, PICGREY in file \texttt{\$MY\_DIR/display\_proc.icl},
-and FILTER in \texttt{/home/user1/dro/improc.icl}.  In your \texttt{
+\file{login.icl}, but it's convenient to do so.  Suppose you have three
+procedures: FLASH, PICGREY in file \file{\$MY\_DIR/display\_proc.icl},
+and FILTER in \file{/home/user1/dro/improc.icl}.  In your \file{
 \$HOME/login.icl} you could add the following
 
 \begin{terminalv}
@@ -8256,7 +8258,7 @@ accommodate your large datasets this way, you should fragment your
 data array, and process the pieces separately.
 
 After receiving this error message in an \ICLref\normalsize session you may
-need to delete the scratch file by hand.  The file is called \texttt{
+need to delete the scratch file by hand.  The file is called \file{
 txxx.sdf}, where \texttt{xxxx} is a process identifier.  A normal exit
 from \ICL\normalsize will delete the work-space container file.
 
@@ -8288,7 +8290,7 @@ For some reason the database was corrupted due to reasons external to
 \KAPPA.  Don't worry, usually your plot will have appeared, and
 to fix the problem run \htmlref{GDCLEAR}{GDCLEAR}
 or delete the database file
-(\texttt{{\$AGI\_USER/agi\_}}{\it $<$node$>$}\texttt{.sdf}, where you substitute your
+(\file{{\$AGI\_USER/agi\_}}{\it $<$node$>$}\file{.sdf}, where you substitute your
 system's node name for {\it $<$node$>$}).  You will need to redraw the
 last plot if you still require it, say for interaction.
 
@@ -8399,14 +8401,14 @@ Thus you should first attempt to convert the inaccessible FITS files
 on tape to disc files using the UNIX {\bf dd} command, and then use
 the \htmlref{FITSDIN}{FITSDIN} application to generate the output NDF
 or foreign format.  For example to convert a FITS file from device
-\texttt{/dev/nrst0} to an NDF called ndfname, you might enter
+\file{/dev/nrst0} to an NDF called ndfname, you might enter
 
 \begin{terminalv}
      % dd if=/dev/nrst0 ibs=2880 of=file.fits
      % fitsdin files=file.fits out=ndfname
      % rm file.fits
 \end{terminalv}
-where \texttt{file.fits} is the temporary disc-FITS file.  The 2880 is
+where \file{file.fits} is the temporary disc-FITS file.  The 2880 is
 the length of a FITS record in bytes.  Repeated {\bf dd} commands to
 a no-rewind tape device (those with the \texttt{n} prefix on OSF/1 and the
 \texttt{n} suffix on Solaris) will copy successive files.  To skip over
@@ -8417,7 +8419,7 @@ files or rewind the tape, use the {\bf mt} command.  For example,
            :       :       :
      % mt -f /dev/rmt/1n asf 4
 \end{terminalv}
-moves the tape on device \texttt{/dev/rmt/1n} forward three files,
+moves the tape on device \file{/dev/rmt/1n} forward three files,
 then moves to the fourth file,
 
 \begin{terminalv}
@@ -8429,7 +8431,7 @@ environment variable \texttt{TAPE}), and
 \begin{terminalv}
      % mt -f /dev/nrmt0h rewind
 \end{terminalv}
-rewinds to the start of the tape on device \texttt{/dev/nrmt0h}.
+rewinds to the start of the tape on device \file{/dev/nrmt0h}.
 Thus it is possible to write a script for extracting and converting a
 series of files including ranges, just like FITSIN does.
 
@@ -8459,7 +8461,7 @@ position of the tape between invocations of Starlink applications.
 
 When FITSIN is given a name, the magnetic-tape system validates the
 name to check that it is a known device.  There should be a
-\texttt{devdataset.sdf} file (within \texttt{/star/etc} at Starlink sites)
+\file{devdataset.sdf} file (within \file{/star/etc} at Starlink sites)
 containing a list of at least all the available drives at your site.
 What FITSIN is complaining about above, is that the device you have
 given is not included in the DEVDATASET file.  Now this might be
@@ -8503,7 +8505,7 @@ Assuming that \$ADAM\_USER and \$AGI\_USER are defined,
      % hdstrace $ADAM_USER/ardmask full
      % hdstrace $AGI_USER/agi_cacvad full
 \end{terminalv}
-traces the \texttt{GLOBALS} file, the application you were running when the
+traces the \file{GLOBALS} file, the application you were running when the
 weird error occurred (here \htmlref{ARDMASK}{ARDMASK}), and the
 graphics database for machine \texttt{cacvad}.  Once you have identified
 the problem file, delete it.  If that proves to be the globals file,
@@ -8542,14 +8544,14 @@ author for details until a new Programmer's Guide appears to replace
 the old \xref{SUN/101}{sun101}{}, which {\em was\/} a good summary of
 Starlink infrastructure libraries and programming.
 
-All the source files can be found in \texttt{/star/kappa/*.tar} on
-Starlink machines.  The \texttt{/star} path may be different outside of
+All the source files can be found in \file{/star/kappa/*.tar} on
+Starlink machines.  The \file{/star} path may be different outside of
 Starlink, so check with your computer manager.  There is a separate
 tar file for each \KAPPA\ subroutine library (with a \texttt{
 \_sub} suffix) and the interface files, with obvious names.  The
 remaining files: the monolith routines, link scripts, include files,
 the help source, shell scripts, \ICL\ procedures, and test data
-are in \texttt{kappa\_source.tar}.  There is also a Starlink standard
+are in \file{kappa\_source.tar}.  There is also a Starlink standard
 \texttt{makefile} and \texttt{mk} script.
 
 Many of the general-purpose subroutines which previously formed part of
@@ -8577,11 +8579,11 @@ we extract the source files to change.
      % tar xf $KAPPA/kappa_source.tar kappa_link_adam
 \end{terminalv}
 
-We modify \texttt{kpg1\_statr.f} to compute the additional statistics;
-\texttt{kpg1\_stdsr.f} to list the statistics; \texttt{stats.f} to update the
+We modify \file{kpg1\_statr.f} to compute the additional statistics;
+\file{kpg1\_stdsr.f} to list the statistics; \file{stats.f} to update the
 documentation, to use the revised argument lists of the subroutines,
-and to output the new statistics to parameters; and \texttt{stats.ifl}
-to add the output parameters.  \texttt{kappa\_link\_adam} need not be
+and to output the new statistics to parameters; and \file{stats.ifl}
+to add the output parameters.  \file{kappa\_link\_adam} need not be
 modified, but it is needed during linking.
 
 Next some soft links to include files need to be made.
@@ -8634,20 +8636,20 @@ the modules you need.
 If you don't like \KAPPA's parameter defaults, or its choice
 of which parameters get prompted for and which get defaulted, then you
 can change them.  Extract the interface file from \linebreak
-\texttt{/star/kappa/kappa\_ifls.tar} to your work directory and make the
+\file{/star/kappa/kappa\_ifls.tar} to your work directory and make the
 required modifications, and then recompile it.  See
 \xref{SUN/115}{sun115}{} on the meanings and possible values of the
 fieldnames, and how to recompile the interface file.  If you use
-\ICLref , you'll need to modify a monolith interface file: \texttt{
-\$KAPPA\_DIR/kappa\_mon.ifl}, \texttt{kapview\_mon.ifl} or \texttt{
+\ICLref , you'll need to modify a monolith interface file: \file{
+\$KAPPA\_DIR/kappa\_mon.ifl}, \file{kapview\_mon.ifl} or \file{
 ndfpack\_mon.ifl}.  Finally, you will need to specify a search path
 that includes the directory containing your modified interface file.
 
 \begin{terminalv}
      % setenv ADAM_IFL /home/scratch/dro/ifls:/usr/local/kappa
 \end{terminalv}
-This asks Starlink programmes to look in \texttt{/home/scratch/dro/ifls}
-to find the interface file, and if there isn't one to look in \texttt{
+This asks Starlink programmes to look in \file{/home/scratch/dro/ifls}
+to find the interface file, and if there isn't one to look in \file{
 /usr/local/kappa}.  If the interface file search is unsuccessful, the
 directory containing the executable is assumed.  Thus if you've not
 created your own interface file for a task, you'll get the released
@@ -8661,13 +8663,13 @@ There is an easier method of tailoring \KAPPA\ to your
 requirements.  If you frequently use certain commands, especially
 those with a long list of keywords and fixed values, you can define
 some C-shell aliases or \ICLref\ symbols for the commands.  Like
-the shell's \texttt{\$HOME/.login}, \ICL\ has a {\em login file}.
+the shell's \file{\$HOME/.login}, \ICL\ has a {\em login file}.
 (See \xref{``ICL for Unix'' Appendix in SUN/144}{sun144}{icl_for_unix}, or
 \xref{SSN/64}{ssn64}{} for details.)  If you add symbols to this file,
 each time you activate \ICL\ these abbreviations will be
 available to you without further typing.  What you should do is to
-create a \texttt{login.icl} in a convenient directory, and assign the
-environment variable \texttt{ICL\_LOGIN} to that directory in your \texttt{
+create a \file{login.icl} in a convenient directory, and assign the
+environment variable \texttt{ICL\_LOGIN} to that directory in your \file{
 \$HOME/.login} file.
 
 It is possible to have several \ICL\ login files, each for
@@ -9534,7 +9536,7 @@ is only relevant when Parameter MODE is \texttt{"Cursor"}.
 The description entry has a notation scheme to indicate
 normally defaulted parameters, \emph{i.e.} those for which there will
 be no prompt.
-For such parameters a matching pair of square brackets (\texttt{{[]}})
+For such parameters a matching pair of square brackets (\file{{[]}})
 terminates the description.  The content between the brackets mean
 \begin{description}
 \item[\texttt{{[]}}]
@@ -42545,7 +42547,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
       This routine assigns (or optionally removes) the quality
       specified by Parameter QNAME to (or from) selected pixels in an
       \NDFref{NDF}.  For more information about using quality within
-      {\KAPPA}~ see  \slhyperref{``Using Quality Names''}{Section }{}{se:qnames}.
+      {\KAPPA}~ see  \slhyperref{``Using Quality Names''}{Section~}{}{se:qnames}.
 
       The user can select the pixels to be operated on in one of three
       ways (see Parameter SELECT).
@@ -50361,7 +50363,7 @@ of an NDF, and change the values of those that are not read-only.
       This specifies the origin from which all time values are measured
       within a \xref{TimeFrame}{sun210}{TimeFrame}.
       The default value (zero) results in the TimeFrame describing
-      absolute time values in the system given by the 
+      absolute time values in the system given by the
       \htmlattref{System}{System}~ attribute
       (\emph{e.g.} MJD, Julian epoch, \emph{etc}). If a TimeFrame is to be used to
       describe elapsed time since some origin, the TimeOrigin attribute
@@ -52775,595 +52777,49 @@ and HDS data types is as follows:
 
 \newpage
 
-\section{Release Notes}
+\section{\xlabel{se_changes}Release Notes---V2.2\label{se:changes}}
 
+\subsubsection{Documentation Changes}
+\begin{itemize}
+   \item SUN/95 has been upgraded to the new style of documentation.
+   Some residual collateral damage to the typesetting is likely to be
+   present.
+   \item Most of the old release notes have been removed from SUN/95,
+   with just the few most-recent sets of notes retained in a separate
+   appendix.
+   \item The detailed descriptions of plotting and AST attributes are now in
+   appendices.
+\end{itemize}
 
 \subsection{Modified Commands}
 The following applications have been modified:
-   \begin{description}[style=nextline]
+\begin{description}[style=nextline]
+
+   \item [\htmlref{COLLAPSE}{COLLAPSE}]\mbox{}
+      \begin{itemize}
+        \item  Fixed bug in the calculation of the variance for the Sum
+        estimator.  Note that this applies to other collapsing commands
+        such as \htmlref{MSTATS}{MSTATS}.
+      \end{itemize}
 
-      \item [\htmlref{CENTROID}{CENTROID}] \mbox{}
-         \begin{itemize}
-
-            \item Positions can now be read from and written to position
-            list catalogues such as created by CURSOR and LISTMAKE.
-
-            \item All positions, both given by the user and returned by
-            the program, now refer to the Current Frame of the NDF.
-
-            \item Either the initial or final positions may now be marked
-            on the screen (see Parameter MARK).
-
-            \item There is now much greater control over the appearance
-            of any annotation draw over the screen.  This is provided
-            through the PLOTSTYLE parameter which allow plotting
-            attributes to be set.
-
-            \item The error on the final position is now returned in
-            Parameters XERR and YERR.
-
-            \item The following parameters have been removed
-            (alternatives to using these old parameters are indicated):
-
-               \begin{description}
-                  \item[COSYS] --- Use application WCSFRAME to set the required
-                                  \htmlref{co-ordinate Frame}{se:domains}~  first.
-               \end{description}
-
-            \item The following new parameters have been added: DESCRIBE,
-            ERROR, GUESS, INCAT, MARKER, OUTCAT, PLOTSTYLE, QUIET, \htmlref{TITLE}{apndf:title},
-            XERR, YERR.
-
-            \item The following parameters have been modified:
-               \begin{description}
-
-                  \item[CENTRE] --- This is now a string parameter in
-                  which is returned the formatted co-ordinates of the
-                  last centroid position, in the current Frame of the
-                  NDF.
-
-                  \item[INIT] --- This is now a string parameter which
-                  should be given the co-ordinates of the initial guess
-                  in the Current Frame of the NDF.
-
-                  \item[MARK] --- Now indicates whether the initial or
-                  final positions should be marked on the screen.
-
-                  \item[MODE] --- Now accepts the extra value "Catalogue".
-
-                  \item[XCEN,YCEN] --- These are now string parameters
-                  which return the formatted \textit{x} and \textit{y} co-ordinates of the
-                  last centroid position, in the current Frame of the
-                  NDF.
-
-               \end{description}
-         \end{itemize}
-
-      \item [\htmlref{COMPADD}{COMPADD}] \mbox{}
-         A bug has been fixed which could produce incorrect WCS
-         co-ordinates in the output NDF if the lower bounds of the input
-         NDF were not (1,~1).
-
-      \item [\htmlref{COMPAVE}{COMPAVE}] \mbox{}
-         A bug has been fixed which could produce incorrect WCS
-         co-ordinates in the output NDF if the lower bounds of the input
-         NDF were not (1,~1).
-
-      \item [\xref{CONTOVER}{sun239}{CONTOVER}] \mbox{}
-         CONTOVER has been scheduled for withdrawl at the next release of
-         \KAPPA, and a warning message is now displayed every time
-         CONTOVER is run.  Use \texttt{"contour clear=no"} instead to draw a contour
-         map over an existing data picture.
-
-      \item [\htmlref{CURSOR}{CURSOR}] \mbox{}
-         A bug has been fixed which resulted in CURSOR running out of
-         picture identifiers (and consequently aborting) if more than
-         40 positions were given.
-
-      \item [\htmlref{DISPLAY}{DISPLAY}] \mbox{}
-         New Parameters KEY, KEYPOS and KEYSTYLE have been added, allowing
-         DISPLAY to create a key containing a colour ramp in the same style
-         as LUTVIEW.
-
-      \item [\htmlref{DRAWSIG}{DRAWSIG}] \mbox{}
-         \begin{itemize}
-            \item There is now much greater control over the appearance
-                  of the lines drawn.  Each line may be drawn with a
-                  different appearance.  This is provided through the
-                  STYLE parameter which allow plotting attributes to
-                  be set for each line drawn.
-
-            \item The following parameters have been removed (alternatives to
-                  using these old parameters are indicated):
-
-               \begin{description}
-                  \item[LINESTYLE] --- Use the STYLE parameter to specify a
-                                   value for the plotting attribute
-                                   \htmlattref{Style(Lines)}{Style(element)}.
-                  \item[SIGCOL] --- Use the \htmlattref{Colour(Lines)}{Colour(element)}~
-                                   plotting attributes.
-                  \item[THICK]  --- Use the \htmlattref{Width(Lines)}{Width(element)}~
-                                   plotting attributes.
-               \end{description}
-
-            \item The following new parameters have been added: STYLE.
-
-         \end{itemize}
-
-      \item [\htmlref{EXP10}{EXP10}] \mbox{}
-         This command is now a synonym for \texttt{expon base=10D0}.
-
-      \item [\htmlref{EXPE}{EXPE}] \mbox{}
-         This command is now a synonym for \texttt{expon base=natural}.
-
-      \item [\htmlref{EXPON}{EXPON}] \mbox{}
-         Re-written to use NDF data structures.
-
-      \item [\htmlref{FITSMOD}{FITSMOD}] \mbox{}
-         A new output Parameter EXISTS has been added to store the result
-         of the final "Exist" operation.
-
-      \item [\xref{GREYPLOT}{sun239}{GREYPLOT}] \mbox{}
-         GREYPLOT has been scheduled for withdrawl at the next release of
-         \KAPPA, and a warning message is now displayed every time
-         GREYPLOT is run.  DISPLAY can now produce a key to the colour
-         table using the new KEY parameter, so there is no longer any
-         real need for GREYPLOT.
-
-      \item [\htmlref{HISTOGRAM}{HISTOGRAM}] \mbox{}
-         \begin{itemize}
-            \item There is now much greater control over the appearance
-                  of the plot.  This is provided through the STYLE parameter
-                  which allow plotting attributes to be set.
-
-            \item The following parameters have been removed (alternatives to
-                  using these old parameters are indicated):
-
-               \begin{description}
-                  \item[ABSLAB] --- Use the STYLE parameter to specify a
-                                   value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
-                  \item[FONT]   --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
-                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
-                  \item[MINTIC] --- Use the \att{MinTick} plotting attribute.
-                  \item[ORDLAB] --- Use \att{Label(2)} plotting attribute.
-                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and \htmlattref{MinTickLen}{MinTickLen}~
-                                   plotting attributes.
-                  \item[PLTITL] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
-                  \item[PXSIZE] --- Create the picture first with the
-                                   required picture size using PICDEF.
-                  \item[PYSIZE] --- See PXSIZE.
-                  \item[THICK]  --- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
-               \end{description}
-
-            \item The following new parameters have been added: AXES, MARGIN,
-                  MARKER, STYLE, XLEFT, XRIGHT, YBOT, YTOP.
-
-            \item The following parameters have been modified:
-               \begin{description}
-
-                  \item[XLOG] --- If a logarithmic horizontal axis is
-                  requested, the axis is now annotated with equally spaced
-                  values of the logarithm (base 10) of the data value.
-
-                  \item[YLOG] --- If a logarithmic vertical axis is requested,
-                  the vertical axis is now annotated with equally spaced
-                  values of the logarithm (base 10) of the pixel count.
-
-               \end{description}
-
-         \end{itemize}
-
-      \item [\htmlref{LINPLOT}{LINPLOT}] \mbox{}
-         A new Parameter LMODE has been added to allow the default limits
-         for the vertical axis to be chosen in various ways (for instance
-         using percentiles, multiples of the standard deviation, \emph{etc.}).
-
-      \item [\htmlref{LOG10}{LOG10}] \mbox{}
-         This command is now a synonym for \texttt{logar base=10D0}.
-
-      \item [\htmlref{LOGAR}{LOGAR}] \mbox{}
-         Re-written to use NDF data structures.
-
-      \item [\htmlref{LOGE}{LOGE}] \mbox{}
-         This command is now a synonym for \texttt{logar base=natural}.
-
-      \item [\htmlref{LUTVIEW}{LUTVIEW}] \mbox{}
-         \begin{itemize}
-
-            \item The annotation placed around the colour ramp can now be
-            controlled in much greater detail using the new STYLE
-            parameter.
-
-            \item If MODE=\texttt{"XY"}, the bounds of the area occupied by the colour
-            ramp and annotation can be specified in a variety of co-ordinate
-            systems (specified by the new Parameter FRAME).
-
-            \item The following parameters have been removed
-            (alternatives to using these old parameters are indicated):
-
-               \begin{description}
-
-                  \item[ANNOTA] --- Use the STYLE parameter to specify
-                  which elements of the annotation (if any) are required.
-                  For instance, set \texttt{"NumLab(1)=0"} to suppress the
-                  numerical data values.
-
-                  \item[OUTLINE] --- Use the STYLE parameter to specify
-                  which elements of the annotation (if any) are required.
-                  For instance, set \texttt{"BORDER=0"} to suppress the box drawn
-                  around the colour ramp.
-
-               \end{description}
-
-            \item The following new parameters have been added: FRAME,
-            STYLE.
-
-            \item The following parameters have been modified:
-               \begin{description}
-
-                  \item[LBOUND] --- Now gives the lower bounds in the
-                  co-ordinate Frame specified by Parameter FRAME.  The
-                  parameter type is now LITERAL rather than \_REAL.
-
-                  \item[UBOUND] --- Now gives the upper bounds in the
-                  co-ordinate Frame specified by Parameter FRAME.  The
-                  parameter type is now LITERAL rather than \_REAL.
-
-               \end{description}
-         \end{itemize}
-
-      \item [\htmlref{MLINPLOT}{MLINPLOT}] \mbox{}
-         \begin{itemize}
-
-            \item The appearance of the annotated axes can now be
-            controlled in much greater detail using the new STYLE
-            parameter.
-
-            \item The horizontal axis may now be annotated with values
-            from one of the axes in the Current co-ordinate Frame of the
-            NDF (see new Parameter USEAXIS).
-
-            \item The appearance of the data curves (colour, line style,
-            line width, \emph{etc.}) can now be specified individually using the
-            new PENS and MODE parameters.
-
-            \item Vertical error bars can now be displayed if the
-            supplied NDF has a VARIANCE component (see new Parameter
-            ERRBAR).
-
-            \item If the display is not cleared (using Parameter CLEAR),
-            then an attempt is made to align the new plot with any
-            existing plot.
-
-            \item The vertical and horizontal position of the key can now
-            be controlled using new Parameter KEYPOS, and its appearance
-            can be controlled using new Parameter KEYSTYLE.
-
-            \item The strings which which to label the data curves can
-            now be given explicitly using new Parameter LABELS.
-
-            \item Whether or not vertical offset markers are drawn for
-            each curve is now controlled by the new Parameter ZMARK.
-
-            \item The following parameters have been removed
-            (alternatives to using these old parameters are indicated):
-
-               \begin{description}
-
-                  \item[ABSLAB] --- Use the STYLE parameter to specify a
-                  value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
-
-                  \item[FONT] --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
-
-                  \item[LBSIZE] --- Use the \htmlattref{Size(Labels)}{Size(element)}~
-                                   plotting attribute.
-
-                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
-
-                  \item[MINTIC] --- Use the \att{MinTick} plotting attribute.
-
-                  \item[ORDLAB] --- Use \att{Label(2)} plotting attribute.
-
-                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and
-                                   \htmlattref{MinTickLen}{MinTickLen}~ plotting attributes.
-
-                  \item[PLTITL] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
-
-                  \item[PXSIZE] --- Create the picture first using PICDEF,
-                  the required picture size using the SIZE.
-
-                  \item[PYSIZE] --- See PXSIZE.
-
-                  \item[TICLN] --- Use the \htmlattref{MajTickLen}{MajTickLen}~ and
-                                  \htmlattref{MinTickLen}{MinTickLen}~ plotting attributes.
-
-                  \item[XLOG] --- Logarithmic \textit{x} axes are not currently
-                  supported.
-
-                  \item[YLIMIT] --- Use new Parameters YBOT and YTOP.
-
-               \end{description}
-
-            \item The following new parameters have been added: AXES,
-            ERRBAR, FREQ, KEYPOS, KEYSTYLE, LABELS, MARGIN, MARKER, MODE,
-            PENS, SIGMA, STYLE, USEAXIS, XLEFT, XRIGHT, YBOT, YTOP, ZMARK.
-
-            \item The following parameters have been modified:
-               \begin{description}
-
-                  \item[LNINDX] --- Ranges of pixel indices are now
-                  specified using a colon (\texttt{":"}) instead of a hyphen
-                  (\texttt{"-"}).  So for instance, pixel rows 5 to 10 would now
-                  be given as \texttt{"5:10"} and not \texttt{"5-10"}.
-
-                  \item[OFFSET] --- Now double precision.
-
-                  \item[SPACE] --- Now accepts the additional value \texttt{"None"}
-                  which specifies that all curves should be drawn with
-                  the same vertical zero point.
-
-                  \item[YLOG] --- If a logarithmic vertical axis is requested,
-                  the vertical axis is now annotated with equally spaced
-                  values of the logarithm (base 10) of the supplied data.
-                  Also, the curves are drawn with the vertical offsets
-                  specified by Parameter SPACE, and the appearance
-                  specified by Parameters PENS and STYLE.
-
-               \end{description}
-         \end{itemize}
-
-      \item [\htmlref{NORMALIZE}{NORMALIZE}] \mbox{}
-         \begin{itemize}
-            \item There is now much greater control over the appearance
-                  of the normalization plot.  This is provided through the
-                  STYLE parameter which allow plotting attributes to
-                  be set.
-
-            \item The following parameters have been removed (alternatives to
-                  using these old parameters are indicated):
-
-               \begin{description}
-                  \item[ABSLAB] --- Use the STYLE parameter to specify a
-                                   value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
-                  \item[FONT] --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
-                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
-                  \item[MINTIC] --- Use the \att{MinTick} plotting attribute.
-                  \item[ORDLAB] --- Use \att{Label(2)} plotting attribute.
-                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and
-                                   \htmlattref{MinTickLen}{MinTickLen}~
-                                   plotting attributes.
-                  \item[PTITLE] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
-               \end{description}
-
-            \item The following new parameters have been added: AXES, MARGIN,
-                  MARKER, STYLE, XLEFT, XRIGHT, YBOT, YTOP.
-
-         \end{itemize}
-
-      \item [\htmlref{PIXDUPE}{PIXDUPE}] \mbox{}
-         \begin{itemize}
-            \item Modified so that pixel origin information is not lost.
-            For instance, if you expand two aligned images by the same
-            factor, they will still be aligned after the expansion.
-         \end{itemize}
-
-      \item [\htmlref{PSF}{PSF}] \mbox{}
-         \begin{itemize}
-
-            \item Positions can now be read from position list catalogues
-            such as created by CURSOR and LISTMAKE.
-
-            \item All positions and distances, both given by the user and
-            returned by program, now refer to the Current Frame of the NDF.
-            For instance, this means that if the Current Frame of the NDF
-            is a SKY Frame, then:
-
-               \begin{itemize}
-               \item celestial co-ordinates must be provided for the star
-               positions.
-               \item the FWHM will be displayed in arcseconds.
-               \item the radial distance in the plot will be displayed in
-               arcseconds.
-               \item the orientation of the major axis will be given as a
-               position angle (from north through east).
-               \end{itemize}
-
-            Note, it is assumed that the image scale does not vary
-            significantly across the image, so you should be cautious
-            about using PSF with very large images.
-
-            If, instead, the Current Frame of the NDF is the PIXEL Frame,
-            then:
-
-               \begin{itemize}
-               \item pixel co-ordinates must be provided for the star
-               positions.
-               \item the FWHM will be displayed in pixels.
-               \item the plot will be annotated in pixels.
-               \item the orientation of the major axis will be given as the
-               angle from the first (X) axis through the second (Y) axis.
-               \end{itemize}
-
-            \item The appearance of the annotated axes can now be
-            controlled in much greater detail using the new STYLE
-            parameter.
-
-            \item If the display is not cleared (using Parameter CLEAR),
-            then an attempt is made to align the new plot with any
-            existing plot.
-
-            \item The following parameters have been removed
-            (alternatives to using these old parameters are indicated):
-
-               \begin{description}
-
-                  \item[ABSLAB] --- Use the STYLE parameter to specify a
-                  value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
-
-                  \item[COSYS] --- Use application WCSFRAME to set the required
-                                  co-ordinate Frame first.
-                  \item[FONT] --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
-
-                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
-
-                  \item[MINTIC] --- Use the \att{MinTick} plotting attribute.
-
-                  \item[ORDLAB] --- Use \att{Label(2)} plotting attribute.
-
-                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and \htmlattref{MinTickLen}{MinTickLen}~ plotting attributes.
-
-                  \item[PLTITL] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
-
-                  \item[PXSIZE] --- Create the picture first using PICDEF,
-                  the required picture size using the SIZE.
-
-                  \item[PYSIZE] --- See PXSIZE.
-
-                  \item[RADUNITS] --- Use application WCSFRAME to set the required
-                                  co-ordinate Frame first, or set the Unit
-                                  attribute for Axis 1 of the input NDF
-                                  using application \htmlref{WCSATTRIB}{WCSATTRIB}.
-
-                  \item[SCALE] --- Use application WCSFRAME to set the required
-                                  co-ordinate Frame first.  Create a new
-                                  Frame if necessary using application \htmlref{WCSADD}{WCSADD}.
-
-               \end{description}
-
-            \item The following new parameters have been added: AXES,
-            INCAT, MARGIN, MARKER, STYLE, USEAXIS, XLEFT, XRIGHT, YBOT, YTOP.
-
-            \item The following parameters have been modified:
-               \begin{description}
-
-                  \item[OUT] --- The pixel origin is no longer [1,1].
-                  Instead, the pixel bounds are chosen to align the model
-                  PSF with the first fitted star in pixel co-ordinates.
-                  As a consequence, the PSF centre may not be exactly at
-                  the centre of the output image (it will, however, still
-                  be within one pixel of the centre).  A WCS component is
-                  stored in the output NDF holding a copy of the input
-                  WCS component.  An additional Frame with Domain name
-                  OFFSET is added, and is made the current Frame.  This
-                  Frame measures the distance from the PSF centre in the
-                  units in which the FWHM is reported.  These changes
-                  allows the model PSF to be aligned with the input NDF
-                  for comparison purposes, using WCSALIGN, CONTOUR,
-                     \emph{etc}.  Also, the output NDF is now created with
-                  the same type as the input NDF.
-
-               \end{description}
-
-         \end{itemize}
-
-      \item [\htmlref{ROTATE}{ROTATE}] \mbox{}
-         \begin{itemize}
-            \item Modified so that rotation occurs around the origin of
-            pixel co-ordinates.  This means that origin information is not
-            lost.  For instance, if you rotate two aligned images by the
-            same angle, they will still be aligned after the rotation.
-            Negative rotation angles are now accepted.
-         \end{itemize}
-
-      \item [\xref{TURBOCONT}{sun239}{TURBOCONT}] \mbox{}
-         TURBOCONT has been scheduled for withdrawl at the next release of
-         \KAPPA, and a warning message is now displayed every time
-         TURBOCONT is run.  To retain TURBOCONT would require it to be
-         converted to use \PGPLOT\ /AST.  This would slow it down so that it
-         would offer little speed benefit over CONTOUR.  In these days of
-         higher powered workstatations the small difference in speed would
-         not justify having two essentially identical applications.
-
-      \item [\htmlref{VECPLOT}{VECPLOT}] \mbox{}
-         \begin{itemize}
-            \item Axes are now annotated with values in the current co-ordinate
-                  Frame of the supplied NDF.
-            \item Information describing the co-ordinate Frames available
-                  in the supplied NDF is stored with the DATA picture in
-                  the AGI graphics database.
-            \item If the screen is not cleared before plotting a vector
-                  map (\emph{i.e.} if the Parameter CLEAR is set to \texttt{FALSE}), then
-                  an attempt will be made to align the new contour map
-                  spatially with any existing DATA picture.  This alignment
-                  occurs by preference in the current co-ordinate Frame
-                  of the supplied vector magnitude NDF, but may occur in
-                  another Frame if the existing DATA picture does not have
-                  suitable WCS information stored with it.
-            \item There is now much greater control over the appearance
-                  of the map.  This is provided through the STYLE and
-                  KEYSTYLE parameters which allow plotting attributes to
-                  be set.
-            \item The position of the key can now be controlled both
-                  vertically and horizontally.
-            \item The following parameters have been removed (alternatives to
-                  using these old parameters are indicated):
-
-               \begin{description}
-                  \item[ABSLAB] --- Use the STYLE parameter to specify a
-                                   value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
-                  \item[BORDER] --- Set AXES=\texttt{TRUE}, and suppress everything
-                                   but the border by setting suitable plotting
-                                   attributes (\emph{e.g.} \texttt{MajTickLen=0,
-                                   MinTickLen=0, TextLab=0} \emph{etc.}).
-                  \item[COSYS] --- Use application WCSFRAME to set the required
-                                   co-ordinate Frame first.
-                  \item[FONT] --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
-                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
-                  \item[MINTIC] --- Use the \att{MinTick} plotting attribute.
-                  \item[ORDLAB] --- Use \att{Label(2)} plotting attribute.
-                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and
-                                   \htmlattref{MinTickLen}{MinTickLen}~
-                                   plotting attributes.
-                  \item[PLTITL] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
-                  \item[PXSIZE] --- Create the picture first using PICDEF,
-                                   specifying the required picture size using
-                                   the new Parameter SIZE.
-                  \item[PYSIZE] --- See PXSIZE.
-                  \item[THICK] --- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
-                  \item[VECCOL] --- Use the \htmlattref{Colour(vectors)}{Colour(element)}~
-                                   plotting attributes.
-                  \item[VTYPE] --- Use the new Parameter ARROW.
-               \end{description}
-
-            \item The following new parameters have been added: ARROW,
-                  FILL, KEYPOS, KEYSTYLE, MARGIN, STYLE, USEAXIS.
-
-            \item The following parameters have been modified:
-               \begin{description}
-                  \item [AXES] --- Axes are now annotated with the current
-                                  co-ordinate Frame of the NDF.
-                  \item [CLEAR] --- Setting CLEAR=\texttt{FALSE} cause the new contour map
-                               to be aligned spatially with any existing DATA
-                               picture (if possible).
-                  \item [KEY] --- The appearance of the key can now be controlled
-                              using Parameter KEYSTYLE, and the position of the
-                              key can be controlled using Parameter KEYPOS.
-               \end{description}
-         \end{itemize}
-
-      \item [\htmlref{WCSALIGN}{WCSALIGN}] \mbox{}
-         \begin{itemize}
-            \item Several new interpolation methods have been added, and an
-            improved algorithm is now used which should be more efficient in
-            some cases.
-         \end{itemize}
-
-   \end{description}
-
-\subsubsection{New applications}
-\begin{description}
    \item [\htmlref{CONFIGECHO}{CONFIGECHO}]\mbox{}
       \begin{itemize}
-        \item A new parameter called LOGFILE has been added that allows
+        \item  A new parameter called LOGFILE has been added that allows
         the list of displayed configuration parameters to be written to a
         text file.
       \end{itemize}
 
    \item [\htmlref{COPYBAD}{COPYBAD}]\mbox{}
       \begin{itemize}
-        \item Restore setting the BAD\_PIXEL flag for the DATA and VARIANCE
+        \item  Restore setting the BAD\_PIXEL flag for the DATA and VARIANCE
         components, only setting it false if no bad pixels were copied
         and none existed in the input NDF.
+      \end{itemize}
+
+   \item [\htmlref{SEGMENT}{SEGMENT}]\mbox{}
+      \begin{itemize}
+        \item  A bug that caused a crash for NDFs with degenerate axes
+        has been fixed.
       \end{itemize}
 
    \item [\htmlref{SETQUAL}{SETQUAL}]\mbox{}
@@ -53386,6 +52842,7 @@ The following applications have been modified:
       \end{itemize}
 
 \end{description}
+
 
 
 \section{Notes from Previous Few Releases}

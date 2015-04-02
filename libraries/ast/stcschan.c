@@ -161,6 +161,8 @@ f     The StcsChan class does not define any new routines beyond those
 *     21-FEB-2014 (DSB):
 *        Split long properties up into words when writing out an STC-S
 *        description.
+*     26-MAR-2015 (DSB):
+*        Guard against seg faults if an error has already occured.
 *class--
 */
 
@@ -4810,9 +4812,11 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
       }
 
 /* Remove the trailing space, and store the property value in the KeyMap. */
-      prop[ nc - 1 ] = 0;
-      astMapPut0C( props, "LOLIMIT", prop, NULL );
-      astMapPut1D( props, "DLOLIMIT", naxes, vals, NULL );
+      if( prop && nc > 0 ) {
+         prop[ nc - 1 ] = 0;
+         astMapPut0C( props, "LOLIMIT", prop, NULL );
+         astMapPut1D( props, "DLOLIMIT", naxes, vals, NULL );
+      }
 
 /* Get a hilimit value for every space axis. */
       nc = 0;
@@ -4830,11 +4834,11 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
       }
 
 /* Remove the trailing space, and store the property value in the KeyMap. */
-      prop[ nc - 1 ] = 0;
-      astMapPut0C( props, "HILIMIT", prop, NULL );
-      astMapPut1D( props, "DLOLIMIT", naxes, vals, NULL );
-
-
+      if( prop && nc > 0 ) {
+         prop[ nc - 1 ] = 0;
+         astMapPut0C( props, "HILIMIT", prop, NULL );
+         astMapPut1D( props, "DLOLIMIT", naxes, vals, NULL );
+      }
 
 /* If we are currently looking for information needed to create a spatial
    AllSky ... */
@@ -4862,9 +4866,11 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
       }
 
 /* Remove the trailing space, and store the property value in the KeyMap. */
-      if( astOK ) prop[ nc - 1 ] = 0;
-      astMapPut0C( props, "CENTRE", prop, NULL );
-      astMapPut1D( props, "DCENTRE", naxes, vals, NULL );
+      if( prop && nc > 0 ) {
+         prop[ nc - 1 ] = 0;
+         astMapPut0C( props, "CENTRE", prop, NULL );
+         astMapPut1D( props, "DCENTRE", naxes, vals, NULL );
+      }
 
 /* Get the radius value. */
       val = astChr2Double( word );
@@ -4903,9 +4909,11 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
       }
 
 /* Remove the trailing space, and store the property value in the KeyMap. */
-      prop[ nc - 1 ] = 0;
-      astMapPut0C( props, "CENTRE", prop, NULL );
-      astMapPut1D( props, "DCENTRE", naxes, vals, NULL );
+      if( prop && nc > 0 ) {
+         prop[ nc - 1 ] = 0;
+         astMapPut0C( props, "CENTRE", prop, NULL );
+         astMapPut1D( props, "DCENTRE", naxes, vals, NULL );
+      }
 
 /* Get the first radius value . */
       val = astChr2Double( word );
@@ -4970,9 +4978,11 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
       }
 
 /* Remove the trailing space, and store the property value in the KeyMap. */
-      prop[ nc - 1 ] = 0;
-      astMapPut0C( props, "CENTRE", prop, NULL );
-      astMapPut1D( props, "DCENTRE", naxes, vals, NULL );
+      if( prop && nc > 0 ) {
+         prop[ nc - 1 ] = 0;
+         astMapPut0C( props, "CENTRE", prop, NULL );
+         astMapPut1D( props, "DCENTRE", naxes, vals, NULL );
+      }
 
 /* Get bsize value for every space axis. */
       nc = 0;
@@ -4990,10 +5000,11 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
       }
 
 /* Remove the trailing space, and store the property value in the KeyMap. */
-      prop[ nc - 1 ] = 0;
-      astMapPut0C( props, "BSIZE", prop, NULL );
-      astMapPut1D( props, "DBSIZE", naxes, vals, NULL );
-
+      if( prop && nc > 0 ) {
+         prop[ nc - 1 ] = 0;
+         astMapPut0C( props, "BSIZE", prop, NULL );
+         astMapPut1D( props, "DBSIZE", naxes, vals, NULL );
+      }
 
 
 /* If we are currently looking for information needed to create a spatial
@@ -5049,9 +5060,11 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
          }
 
 /* Remove the trailing space, and store the property value in the KeyMap. */
-         prop[ nc - 1 ] = 0;
-         astMapPut0C( props, "VERTICES", prop, NULL );
-         astMapPut1D( props, "DVERTICES", naxes*nvert, temp, NULL );
+         if( prop && nc > 0 ) {
+            prop[ nc - 1 ] = 0;
+            astMapPut0C( props, "VERTICES", prop, NULL );
+            astMapPut1D( props, "DVERTICES", naxes*nvert, temp, NULL );
+         }
          temp = astFree( temp );
       }
 
@@ -5087,10 +5100,11 @@ static const char *ReadSpaceArgs( AstStcsChan *this, const char *word,
       }
 
 /* Remove the trailing space, and store the property value in the KeyMap. */
-      prop[ nc - 1 ] = 0;
-      astMapPut0C( props, "POSITION", prop, NULL );
-      astMapPut1D( props, "DPOSITION", naxes, vals, NULL );
-
+      if( prop && nc > 0 ) {
+         prop[ nc - 1 ] = 0;
+         astMapPut0C( props, "POSITION", prop, NULL );
+         astMapPut1D( props, "DPOSITION", naxes, vals, NULL );
+      }
 
 
 /* All remaining space id values require the argument list to be enclosed
@@ -6903,8 +6917,10 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
 
 /* Remove the trailing space, and store the property value in the KeyMap. */
                if( ! allthesame ) {
-                  prop[ nc - 1 ] = 0;
-                  astMapPut0C( spprops, "UNIT", prop, NULL );
+                  if( prop && nc > 0 ) {
+                     prop[ nc - 1 ] = 0;
+                     astMapPut0C( spprops, "UNIT", prop, NULL );
+                  }
                } else {
                   astMapPut0C( spprops, "UNIT", unit1, NULL );
                }
@@ -7086,7 +7102,7 @@ static int WriteRegion( AstStcsChan *this, AstRegion *reg, AstKeyMap *props,
 
 /* If the bounds were all good, store the string holding the formatted
    error values in the properties KeyMap. */
-               if( nc > 0 ) {
+               if( prop && nc > 0 ) {
                   prop[ nc - 1 ] = 0;
                   astMapPut0C( spprops, "ERROR", prop, NULL );
                }

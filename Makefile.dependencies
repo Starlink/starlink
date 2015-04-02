@@ -2756,6 +2756,11 @@ $(MANIFESTS)/sun202: \
 	cd docs/sun/202 \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/sun242: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/242 \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/sun249: \
 		$(MANIFESTS)/star2html
 	cd docs/sun/249 \
@@ -2987,6 +2992,7 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/ssn3 \
 	$(MANIFESTS)/ssn64 \
 	$(MANIFESTS)/ssn75 \
+	$(MANIFESTS)/ssn78 \
 	$(MANIFESTS)/ssn8 \
 	$(MANIFESTS)/sst \
 	$(MANIFESTS)/star2html \
@@ -2996,6 +3002,7 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/sun1 \
 	$(MANIFESTS)/sun101 \
 	$(MANIFESTS)/sun202 \
+	$(MANIFESTS)/sun242 \
 	$(MANIFESTS)/sun249 \
 	$(MANIFESTS)/surf \
 	$(MANIFESTS)/thr \

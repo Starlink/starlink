@@ -137,7 +137,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       add_short_help $itk_component(service) {Type of service being queried}
 
       #  Simple column and substring to form predicate.
-      #  XXX enumerate some column names (xpath form for AQDL query, bit much
+      #  XXX enumerate some column names (xpath form for ADQL query, bit much
       #  for the typical end-user).
       itk_component add column {
          LabelEntry $w_.column \

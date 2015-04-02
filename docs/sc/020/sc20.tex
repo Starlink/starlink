@@ -45,17 +45,17 @@
 % degrees, arcminutes, arcseconds symbols
 %\usepackage{siunitx}
 \ifpdf
-  \newcommand{\dgs}{\si{\degree}}%$^{\circ}$}
+%  \newcommand{\dgs}{\si{\degree}}%$^{\circ}$}
   \newcommand{\udeg}{\hspace{-0.3em}\dgs\hspace{-0.08em}}
-  \newcommand{\arcm}{\si{\arcminute}}%\hbox{$^{\prime$}}}
-  \newcommand{\arcsec}{\si{\arcsecond}}%\arcm\hspace{-0.1em}\arcm}
+%  \newcommand{\arcm}{\si{\arcminute}}%\hbox{$^{\prime$}}}
+%  \newcommand{\arcsec}{\si{\arcsecond}}%\arcm\hspace{-0.1em}\arcm}
   \newcommand{\uarcs}{\hspace{-0.27em}\arcsec\hspace{-0.07em}}
 
 \else
-  \newcommand{\dgs}{\HCode{&deg}}
+%  \newcommand{\dgs}{\HCode{&deg}}
   \newcommand{\udeg}{\HCode{&deg}}
-   \newcommand{\arcm}{$'$}
-   \newcommand{\arcsec}{$''$}
+%   \newcommand{\arcm}{$'$}
+%   \newcommand{\arcsec}{$''$}
    \newcommand{\uarcs}{$''$}
 \fi
 
@@ -88,6 +88,7 @@
 \textbf{HDS}& Hierarchical Data System\\
 \textbf{JCMT}& James Clerk Maxwell Telescope\\
 \textbf{LSB}& Lower sideband\\
+\textbf{MSB}& Minimum Schedulable Block\\
 \textbf{NDF}& Extensible $N$-Dimensional Data Format\\
 \textbf{HARP}& Heterodyne Array Receiver Programme\\
 \textbf{QA}& Quality Assurance\\
@@ -95,6 +96,7 @@
 \textbf{SDF}& Starlink Data File\\
 \textbf{S/N}& Signal-to-Noise ratio\\
 \textbf{USB}& Upper sideband\\
+\textbf{WCS}& World Co-ordinate System\\
 \textbf{WVM}& Water Vapour radioMeter\\
 \end{tabular}
 \end{table}
@@ -117,9 +119,9 @@ This guide covers the following:
 \item \cref{Chapter}{sec:reduce}{Chapter 5}  -- Regridding your data with \makecube.
 \item \cref{Chapter}{sec:analyse}{Chapter 6}  -- Analysing your reduced cube.
 \item \cref{Chapter}{sec:advanced}{Chapter 7}  -- Advanced analysis techniques such as changing co-ordinate frames.
-\item \cref{Chapter}{sec:gaia}{Chapter 7}  -- Using \gaia\ to analyse your data.
-\item \cref{Chapter}{sec:pipe}{Chapter 8}  -- The ACSIS pipeline and recipes explained.
-\item \cref{Chapter}{sec:runpipe}{Chapter 9}  -- How to run the pipeline.
+\item \cref{Chapter}{sec:gaia}{Chapter 8}  -- Using \gaia\ to analyse your data.
+\item \cref{Chapter}{sec:pipe}{Chapter 9}  -- The ACSIS pipeline and recipes explained.
+\item \cref{Chapter}{sec:runpipe}{Chapter 10}  -- How to run the pipeline.
 \end{itemize}
 
 \textbf{Style convention}\\
@@ -142,7 +144,7 @@ This manual utilises software from the \starlink\ package; \smurf\
 \picard\ \cite{picard}. Starlink software must be installed on your
 system, and Starlink aliases and environment variables must be defined
 before attempting any ACSIS data reduction. You can download Starlink
-from  \htmladdnormallink{the Starlink webpage}{http://starlink.jach.hawaii.edu}.
+from  \htmladdnormallink{the Starlink webpage}{http://www.starlink.ac.uk}.
 
 Below is a brief summary of the packages used in this cookbook and how
 to initialise them. Note that all the example commands are shown within
@@ -208,30 +210,37 @@ a UNIX shell.
 
 You have three options for processing your data:
 \\\\
-(1) Performing each step manually.\\
-(2) Write your own scripts, and \\
-(3) Running the automated pipeline.
+(1) performing each step manually,\\
+(2) write your own scripts, or \\
+(3) running the automated pipeline.
 \\\\
+\emph{The automated pipeline is recommended for new users of JCMT
+heterodyne data or those unfamiliar with the Starlink software.}
 The pipeline approach works well if your project is suited to using
-one of the standard recipes, and if you have a lot of data to process.
+one of the standard recipes, as are most projects.  Running the pipeline
+is probably essential if you have a lot of data to process.
+
 Performing each step by hand allows more fine-tuned control of certain
-processing and analysis steps, although some fine tuning is available
+processing and analysis steps, although some fine-tuning is available
 in the pipeline via recipe parameters (see
 \cref{Section}{sec:recpars}{Recipe parameters}).
 
-Once you have determined you optimal parameters you can pass them to
-the pipeline or a script. Chapters~5 and 6 discuss the manual
-approach. To use the science pipeline, skip straight to
+Once you have determined your optimal parameters you can pass them to
+the pipeline or a script. \cref{Chapter}{sec:reduce}{Regridding your
+Data} and \cref{Chapter}{sec:analyse}{Analysing your Cube} discuss the
+manual approach. To use the science pipeline, skip straight to
 \cref{Chapter}{sec:pipe}{The ACSIS Pipeline}.
 
 While you have the option of running the pipeline yourself, you can
 find pipeline reduced files for individual and coadded observations by
 night in the \htmladdnormallink{JCMT Science
 Archive}{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/} (JSA).
+
 These have been reduced using the \oracdr\ pipeline with the recipe
-specified in the MSB. PIs and co-Is can access this data through the
+specified in the MSB.  Principal investigators (PIs) and
+co-investigators (co-Is) can access these data through the
 JSA before it becomes public by following the instructions in
-\cref{Chapter}{sec:runpipe}{The ACSIS Pipeline}.
+\cref{Section}{sec:fromcadc}{Getting your data from CADC}.
 
 \newpage
 \chapter{\xlabel{starlink}Good to know: Starlink}
@@ -358,10 +367,14 @@ use the \fitsval\ command instead, e.g.
 \item[\textbf{ndftrace}]
 \task{ndftrace} displays the attributes of the NDF data structure.
 This will tell you, for example, the units of the data, pixel bounds,
-dimensions, world co-ordinates, and axis assignations.
+dimensions, world co-ordinates (WCS), and axis assignations.
 \begin{terminalv}
 % ndftrace map fullframe fullwcs
 \end{terminalv}
+
+An NDF can contain more than one set of world co-ordinates. The
+\param{fullwcs} parameter requests that all sets be listed rather
+than the currently chosen one.
 
 \item[\textbf{hdstrace}]
 \task{hdstrace} lists the name, data type and values of an HDS
@@ -528,7 +541,7 @@ incoming signal and mix it with a reference frequency known as the
 local oscillator (LO). This results in a signal of lower
 (intermediate) frequency (IF) which can be amplified and more easily
 sampled. The current JCMT receivers have an IF of 4\,GHz (RxA) or
-5\,GHz (ACSIS). This mixing produces two frequencies for each value of
+5\,GHz (HARP). This mixing produces two frequencies for each value of
 the LO ($\nu_{sky} = \nu_{LO}\pm\nu_{IF}$) which are known as the
 upper sideband (USB) and lower sideband (LSB).
 
@@ -555,7 +568,7 @@ source and the reference position).
 observations where half the time is spend off source at the reference
 position. It may be omitted for frequency switched observations.
 
-\item $T_{\textnormal{sys}}$ is the system temperature in kelvins and
+\item $T_{\textnormal{sys}}$ is the system temperature in kelvin and
 describes the total noise of the system. It includes contributions
 from the background sky temperature, the Earth's atmosphere, ground
 spillover picked up by the side lobes and the noise from the receiver
@@ -565,7 +578,7 @@ looking at hot and cold loads, where the cold load is black-body
 source.
 
 \item $T^*_{\textnormal{A}}(rms)$ is the rms value of the noise observed
-in the spectrum in kelvins.
+in the spectrum in kelvin.
 \end{itemize}
 
 
@@ -770,7 +783,7 @@ Plane. The main disadvantage is that it takes a longer time resulting
 in less-accurate sky subtraction or non-flat baselines.
 
 \item[\textbf{Beam-switch}]
-In beam-switch (BSW) mode, the secondary-mirror chops onto the reference
+In beam-switch (BSW) mode, the secondary mirror chops onto the reference
 position. This results in fast and accurate sky subtraction but it is
 limited to targets which have a blank reference position within
 180\arcsec (the maximum chop distance of the SMU).
@@ -1459,7 +1472,7 @@ the advanced method outlined above.
 \label{sec:mult}
 
 Your cube will come out of \makecube\, and the pipeline, in units of
-$T_{\textnormal{A}}^*$. To convert this to main beam brightness temperature, $T_{\textnormal{MB}}$
+$T_{\textnormal{A}}^*$. To convert this to main-beam brightness temperature, $T_{\textnormal{MB}}$
 divide your cube by the main-beam efficiency, $\eta_{\textnormal{MB}}$. Alternatively,
 to convert to receiver temperature, $T_{rec}$, divide by the forward
 scattering and spillover efficiency, $\eta_{\textnormal{\,fss}}$.  See
@@ -1921,7 +1934,7 @@ which is 0.04 in the example below.
 \end{terminalv}
 
 You can then apply the offset to the second subsystem with \cadd.
-This the the first subsystem can then be merged using \wcsmosaic.
+Then the first subsystem can then be merged using \wcsmosaic.
 \begin{terminalv}
 % wcsmosaic in='"rawfile_01,offsetfile_02"' out=rawfile12 lbnd=! method=nearest accept
 \end{terminalv}
@@ -2394,15 +2407,15 @@ the check boxes on the side bar.
 \chapter{\xlabel{pipeline}The ACSIS Pipeline}
 \label{sec:pipe}
 
-The ORAC-DR pipeline (\cite{oracdr}) is an generic automated data
+The ORAC-DR pipeline (\cite{oracdr}) is a generic automated data
 reduction pipeline that can process your raw JCMT data and return
 advanced data products: baselined single observation cubes, mosaicked
 and coadded cubes, moments map and clump catalogues.
 
 It has advanced algorithms for the common routines such as baseline
-subtraction. The data processing is performed using standard \Kappa\
-and \smurf\ routines, the main ones of which have been described in
-previous chapters.
+subtraction. The data processing is performed using standard \Kappa,
+\smurf, and \cupid\ applications, the main ones of which have been
+described in previous chapters.
 
 \section{\xlabel{recipes}Recipes and primitives}
 \label{sec:recipes}
@@ -2410,23 +2423,26 @@ previous chapters.
 Reduction recipes in ORAC-DR consist of a series of stand-alone
 processes, known as primitives. These primitives are linked together
 to form data reduction recipes. Each primitive can be fed different
-input depending on the nature of the recipe in question and may
+input data depending on the nature of the recipe in question and may
 sometimes be omitted altogether.
 
-There are three science recipes available, each tailored to different
-type of observation:\\
-REDUCE\_SCIENCE\_NARROWLINE\\
-REDUCE\_SCIENCE\_BROADLINE\\
-REDUCE\_SCIENCE\_GRADIENT
+There are four main science recipes available, each tailored to different
+type of observation:
+\begin{itemize}[noitemsep,,nolistsep]
+\item REDUCE\_SCIENCE\_NARROWLINE\\
+\item REDUCE\_SCIENCE\_BROADLINE\\
+\item REDUCE\_SCIENCE\_GRADIENT\\
+\item REDUCE\_SCIENCE\_LINEFOREST
+\end{itemize}
 
-A summary of the recipes is given below.
+A summary of these recipes is given below.
 
 \begin{table}[h!]
 \begin{tabular}{p{2.9cm}|p{7.3cm}|p{4.5cm}}
 \hline
 \textbf{RECIPE} & \textbf{DESCRIPTION OF EMISSION} & \textbf{BASELINE METHOD} \\
 \hline
-NARROWLINE & One of more narrow lines are expected across the band.
+NARROWLINE & One or more narrow lines are expected across the band.
 Select this recipe if the expected lines are less than about 20
 channels wide.& Smoothing: \newline spatial = 5$\times$5 pixels
 \newline frequency = 10 channels\\
@@ -2445,16 +2461,28 @@ and probably not wider than 20\% of the available bandwidth &
 Smoothing: \newline spatial = 3$\times$3 pixels \newline frequency =
 25 channels\\
 \hline
-%LINEFOREST & A forest of lines is expected across the band. Bright,
-%nearby star formation sources may fall in this category.  This recipe
-%also creates a separate moments map for each line (as defined by the
-%parameter PER\_LINE).& Smoothing: \newline spatial = 5$\times$5 pixels
-%\newline frequency = 10 channels \\
-%\hline
+LINEFOREST & A forest of lines is expected across the band. Bright,
+nearby star-formation sources may fall in this category.  This recipe
+also creates a separate moments map for each line (as defined by the
+parameter \param{PER\_LINE}).& Smoothing: \newline spatial = 5$\times$5 pixels
+\newline frequency = 10 channels \\
+\hline
 \end{tabular}
 \end{table}
 
-\section{\xlabel{recipe_process}The process}
+There are also variants of the recipes with the following suffixes.
+
+\begin{tabular}{p{2cm}p{10cm}}
+\_POL & polarimetry \\
+\_QL & Quick Look which merely runs \makecube\ to turn the raw time-series
+spectra into a spectral cube for display during data acquisition. \\
+\_SUMMIT & A limited reduction to keep pace with data acquisition at the
+JCMT.  It excludes any bad spectra rejection, quality assurance, or
+iterative baseline determination. \\
+\end{tabular}
+
+\newpage
+\section{\xlabel{recipe_process}The workflow}
 You can follow this commentary via the flow chart in Figure \ref{fig:pipeline}.
 
 Two notations are used in the following list:\\
@@ -2720,12 +2748,10 @@ bad\_receptors} flag when running the pipeline.}
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
-\item Initialise the pipeline software.  The \param{cwd} option
-requests that the current working directory is used for all input and
-output.
+\item Initialise the pipeline software.  This may be as simple as
 
 \begin{terminalv}
-% oracdr_acsis -cwd
+% oracdr_acsis
 \end{terminalv}
 
 \item Define environment variables to ensure the data is read from,
@@ -2738,6 +2764,16 @@ are created.
 % setenv ORAC_DATA_IN <path to raw data>
 % setenv ORAC_DATA_OUT <where you want reduced data to go>
 \end{terminalv}
+
+These extra definitions can be avoided if you initialise with the
+following command.
+
+\begin{terminalv}
+% oracdr_acsis -cwd
+\end{terminalv}
+
+The \param{cwd} option requests that the current working directory is
+used for all input and output, which is most likely what you require.
 
 If you are supplying a text file listing the raw data
 \param{\$ORAC\_DATA\_IN} should be the location of this file. If
@@ -2806,13 +2842,15 @@ options and their descriptions see \oracdrsun.
 \hline
 \param{-calib}    & Under the calibration flag you can specify QA parameters by including
                     \param{qaparams=<myqa.ini>} and bad receptors via
-                    \param{bad\_receptors=index}.\\
+                    \param{bad\_receptors=index}.  If you do not set the
+                    \texttt{qaparams} option but have a file called \texttt{qa.ini}
+                    in your output directory, the QA settings will come from this file.\\
 -recpars & Allows you to provide recipe parameters as a \file{.ini} file.  \\
 \hline
 \multicolumn{2}{l}{\textbf{Logs/Display}} \\
 \hline
 \param{-nodisplay} & Shorten processing times by turning off all graphical output. \\
-\param{-log sxfh}  & Send log to a screen (\param{s}), an xwindow (\param{x}), file
+\param{-log sxfh}  & Send the log to a screen (\param{s}), an xwindow (\param{x}), file
                      (\param{f}) or html (\param{h}). The logfile
                      (\param{f}) has the name \file{.oracdr\_}$NNNN$\file{.log} where
                      $NNNN$ is the current process ID. Only include the options you want.
@@ -2872,7 +2910,7 @@ single reduced cube.
                     rsp PNG \\
 \file{iwc}        & Intensity weighted co-ordinate image \\
 \file{noise}      & Noise map \\
-\file{reduced00n} & Final trimmed, baselined cube of the $n^{\textnormal{th}}$ tile.
+\file{reduced00$n$} & Final trimmed, baselined cube of the $n^{\textnormal{th}}$ tile.
                     There may be a few of these as large maps will be split into
                     tiles of 512\,MB. \\
 \file{rmslo}      & Low-frequency noise \\
@@ -2887,7 +2925,7 @@ single reduced cube.
 \file{blmask001}  & Baseline mask cube. Regions of emission have been
                     masked out. \\
 \file{bl001}      & Baselined cube \\
-\file{linteg00n}  & Integrated intensity image formed around the
+\file{linteg00$n$} & Integrated intensity image formed around the
                     $n^{\textnormal{th}}$ line. \\
 \hline
 \end{tabular}
@@ -2923,10 +2961,12 @@ unless something has gone wrong.
 
 
 \section{\xlabel{cadc}Getting your data from CADC}
+\label{sec:fromcadc}
 
 The JCMT Science Archive is hosted by The Canadian Astronomy Data
 Centre (CADC). Both raw data and data processed by the science pipeline
-are made available to PIs and co-Is through the CADC interface
+are made available to PIs and co-Is through the CADC Advanced Search
+interface linked from the JCMT landing page
 (\url{http://www3.cadc-ccda.hia-iha.nrc-cnr c.gc.ca/jcmt/}).
 
 To access proprietary data you will need to have your CADC username
@@ -2935,6 +2975,14 @@ registered by the JAC and thereby associated with the project code.
 When searching the JCMT Science Archive, be sure to select the correct
 search option from the `JSA Queries' tab. Here you can select public
 versus proprietary, raw versus reduced, and SCUBA-2 versus ACSIS data.
+
+\begin{figure}[b!]
+\begin{center}
+\includegraphics[width=0.98\linewidth]{sc20_cadc}
+\caption{Screenshot of the CADC search window for reduced HARP data.}
+\label{fig:cadc}
+\end{center}
+\end{figure}
 
 An important search option to be aware of is `Group Type', where your
 options are Simple, Night, Project and Public. Simple (which becomes
@@ -2945,13 +2993,30 @@ project option is generated if an entire project has been run through
 the pipeline and identical sources across the project are co-added
 into master group files.
 
-\begin{figure}[b!]
-\begin{center}
-\includegraphics[width=0.98\linewidth]{sc20_cadc}
-\caption{Screenshot of the CADC search window for reduced HARP data.}
-\label{fig:cadc}
-\end{center}
-\end{figure}
+The format and file naming conventions are different in the JSA for
+\emph{reduced} data compared with merely running \oracdr.  Reduced
+observations will be in FITS format with the \file{.fits} file
+extension.  File names begin with the \file{jcmth} prefix followed by
+the UT date, observation number, subsystem number, the product name
+and subscan number, the grouping algorithm, and finally a version
+number (in practice zero), with adjacent elements separated by an
+underscore.  The product name of most interest will be \file{reduced},
+but others include \file{rimg} and \file{rsp} for the representative
+image and spectrum.  The grouping algorithm is \file{obs} for a single
+observation, and \file{nit} where all the good data for an object observed
+with the same instrumental setup during a night are combined to create
+products of better quality.  A further grouping is \file{pro}) where
+matching observations within a project are combined, which may extend
+over many nights spanning years.
+
+Here is are some examples:
+\file{jcmth20070728\_00066\_01\_reduced002\_obs\_000.fits}, \\
+\file{jcmth20070728\_00066\_01\_rimg001\_nit\_000.fits}, and
+\file{jcmth20070728\_00066\_02\_rsp001\_pro\_000.fits}.
+
+For a detailed guide to using the Advanced Search see
+\htmladdnormallink{JSA User's Guide}{http://www.eaobservatory.org/jcmt/science/archive/guide/}.
+
 
 \clearpage
 
@@ -3108,17 +3173,25 @@ files are expected but do not appear in your working directory.
 
 \section{Converting a FITS file to NDF}
 
-A FITS file can be converted to NDF using the \starlink\
-package \convert. Note that the \file{.sdf} file extension NDF may
-be omitted to save typing.
+A FITS file can be converted to NDF using the \starlink\ package
+\convert.  The \texttt{convert} instruction sets up the definitions
+for this package and only needs to be entered once,
 
 \begin{terminalv}
 % convert
+\end{terminalv}
+
+the relevant one here being \texttt{fits2ndf}.
+
+\begin{terminalv}
 % fits2ndf file.fits file.sdf
 \end{terminalv}
 
+Note that the \file{.sdf} file extension NDF may be omitted to save
+typing.
+
 Unless your FITS file is from a recognised source, \fitstondf\ puts the
-various FITS extensions into NDF extensions called FITS\_EXT\_$<n>$,
+various FITS extensions into NDF extensions called FITS\_EXT\_$<\!n\!>$,
 where $n$ counts from one for the first FITS extension. These are
 located in the top-level MORE component of the NDF. If one of these is
 the array you want---it should be an NDF too---it will be easier to
@@ -3148,6 +3221,23 @@ The \convert\ package can also be used to convert an NDF file to FITS format.
 % ndf2fits file file.fits
 \end{terminalv}
 
+There are options to control whether or not to export all of the NDF
+extensions (\param{PROEXTS}) and history records (\param{PROHIS}),
+and whether or not to merge the contents of the FITS airlock
+(\param{PROFITS}).
+
+For historical reasons the specific set of headers encoding the world
+co-ordinate system varies from package to package.  There is a parameter
+to select the appropriate encoding for the destination of the FITS file.
+A common one in the submillimetre world is the \textsc{Class} package used
+for spectroscopic reductions.
+
+\begin{terminalv}
+% ndf2fits ga20091011_37_1_reduced \* encoding=fits-class
+\end{terminalv}
+
+This will create a \file{ga20091011\_37\_1\_reduced.fit} file with the
+\textsc{Class}-style of WCS headers.
 
 \newpage
 \chapter{\xlabel{script}Scripting your reduction}
@@ -3768,10 +3858,10 @@ RMSTSYSTOL     & The rms that is measured for each receptor should agree with th
                  and integration time to within RMSTOL. \\
 RMSMEANTSYSTOL & Data with an RMS $>$ RMSMEANTSYSTOL\% of the mean RMS will get
                  masked out. \\
-CALPEAKTOL     & Observations of the spectral line calibrators shall agree with
+CALPEAKTOL     & Observations of the spectral-line calibrators shall agree with
                  their expected values for line peak intensity to within
                  $\pm$CALPEAKTOL.\\
-CALINTTOL      & Observations of the spectral line calibrators shall agree with
+CALINTTOL      & Observations of the spectral-line calibrators shall agree with
                  their expected values for integrated intensities to within
                  $\pm$CALINTTOL. \\
 RESTOL         & Remaining residuals after subtraction of the baseline shall be
