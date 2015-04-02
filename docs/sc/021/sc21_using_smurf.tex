@@ -38,9 +38,8 @@ that are specified within a configuration file. Values for all
 \emph{configuration} parameters are obtained using a single \emph{command-line}
 parameter called \texttt{CONFIG}.}:
 
-\begin{itemize}
-
-\item \texttt{IN}---a list of input NDFs containing raw SCUBA-2 data (see
+\begin{aligndesc}
+\item[\texttt{IN}] A list of input NDFs containing raw SCUBA-2 data (see
 \cref{Section}{sec:rawdata}{The raw data} and \cref{Section}{sec:ndf}
 {Data formats}). There are many ways in which the list of files can be supplied,
 as described in Section ``\xref{Specifying Groups of Objects}{sun95}{se_groups}''
@@ -50,13 +49,13 @@ then supply the name of the text file, preceded by an up-caret character
 (\,\texttt{\^{}}\,), as the value for parameter \texttt{IN}. Note, the names of
 the raw data files can contain wild-cards such as ``$*$'' and ``?''.
 
-\item \texttt{OUT}---the name of the NDF in which to store the final
+\item[\texttt{OUT}] The name of the NDF in which to store the final
 map. The supplied file name should either have a file type of
 ``\texttt{.sdf}'', or no file type at all (in which case \texttt{.sdf}
 will be appended to the supplied value). Any existing file with the same
 name will be over-written.
 
-\item \texttt{CONFIG}---a string that specifies new values for one or more
+\item[\texttt{CONFIG}] A string that specifies new values for one or more
 configuration parameters. These new values are used in place of the
 \xref{default values}{sun258}{par_full} described in
 \xref{SUN/258}{sun258}{}. Any configuration parameter not specified by
@@ -74,7 +73,7 @@ a map using just these default values, but it will not usually be a very
 good map. Advice on which parameters to edit can be found in
 \cref{Section}{sec:tweak}{Tweaking the configuration file}.
 
-\end{itemize}
+\end{aligndesc}
 
 If any of the above parameters are \emph{not} given on the \texttt{makemap}
 command line, prompts will be issued and the user invited to supply values
