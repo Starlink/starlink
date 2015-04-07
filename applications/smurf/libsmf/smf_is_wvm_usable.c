@@ -68,6 +68,11 @@
 #include "sae_par.h"
 #include "ast.h"
 
+typedef struct {
+    int date_start;
+    int date_end;
+} date_range;
+
 int
 smf_is_wvm_usable( const smfHead * hdr, int *status ) {
 
@@ -123,6 +128,13 @@ smf_is_wvm_usable( const smfHead * hdr, int *status ) {
     0    /* Sentinenl */
   };
 
+  /* Also list date ranges for times the WVM is unusable for extended
+     periods. */
+  const date_range badwvm_range[] = {
+    {20150401, 20151231}, /* Black WVM installed, unknown if working. */
+    {0, 0},               /* End marker */
+  };
+
   if (*status != SAI__OK) return 0;
 
   /* Get the UT date from the header */
@@ -132,6 +144,13 @@ smf_is_wvm_usable( const smfHead * hdr, int *status ) {
     if (utdate == badwvm[i]) {
       isusable = 0;
       break;
+    }
+  }
+
+  for (i = 0; badwvm_range[i].date_start && isusable; i ++) {
+    if (utdate >= badwvm_range[i].date_start &&
+        utdate <= badwvm_range[i].date_end) {
+      isusable = 0;
     }
   }
 
