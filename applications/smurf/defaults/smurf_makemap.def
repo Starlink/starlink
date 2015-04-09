@@ -986,7 +986,7 @@ epsout = <undef>
 #  Description: If non-zero, the data will be saved to an NDF immediately
 #		after data cleaning and before map-making. The NDF name will
 #		be the same as model components, except with the suffix
-#		"_cln". Even if parameter "doclean" ise set to zero, the
+#		"_cln". Even if parameter "doclean" is set to zero, the
 #		data will be exported immediately before map-making.
 exportclean = 0
 
