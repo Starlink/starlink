@@ -98,12 +98,12 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -223,6 +223,11 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        owning the object itself.
 *     6-JAN-2014 (DSB):
 *        Added method astEnvSet.
+*     9-APR-2015 (DSB):
+*        Modify VSet to handle "%s" setting strings (i.e. where the whole
+*        list of settings is provided as a single variable argument).
+*        This is needed because supplying the while settings string in
+*        place of "%s" is considered a security issue by many compilers.
 *class--
 */
 
@@ -4646,12 +4651,13 @@ static void VSet( AstObject *this, const char *settings, char **text,
 *-
 */
 
-/* Local Constants: */
-   const int min_buff_len = 1024; /* Minimum size of formatting buffer */
+#define MIN_BUFF_LEN 1024
 #define ERRBUF_LEN 80
 
 /* Local Variables: */
    char errbuf[ ERRBUF_LEN ];    /* Buffer for system error message */
+   char setting_buf[ MIN_BUFF_LEN ]; /* Expanded "%s" settting string */
+   char *dyn_buf;                /* Pointer to dynamic buffer for expanded setting */
    char *errstat;                /* Pointer to error message */
    char *assign;                 /* Pointer to assigment substring */
    char *assign_end;             /* Pointer to null at end of assignment */
@@ -4660,6 +4666,7 @@ static void VSet( AstObject *this, const char *settings, char **text,
    char *buff3;                  /* Pointer to temporary string buffer */
    char *eq1;                    /* Pointer to 1st equals sign */
    int buff_len;                 /* Length of temporary buffer */
+   int expanded;                 /* Has the Settings string been expanded yet? */
    int i;                        /* Loop counter for characters */
    int j;                        /* Offset for revised assignment character */
    int len;                      /* Length of settings string */
@@ -4679,6 +4686,41 @@ static void VSet( AstObject *this, const char *settings, char **text,
    zero. If it is, there is nothing more to do. */
    len = (int) strlen( settings );
    if ( len != 0 ) {
+
+/* If the setting string is just "%s" (with optional trailing and leading
+   white space) then the variable argument potentially contains more than
+   one attribute setting, in which case we expand the setting string now
+   and use the expanded string in place of the supplied string in the rest
+   of this function. */
+      nc = 0;
+      sscanf( settings, " %%s %n", &nc );
+      if( nc == len ) {
+
+/* Expand the supplied string using a fixed-length buffer. This writes at
+   most MIN_BUFF_LEN characters to "buf", but returns the number of
+   characters that would have been needed to write the whole string. */
+         len =  vsnprintf( setting_buf, sizeof(setting_buf), settings, args );
+
+/* If the fixed-length buffer is too short, use a dynamically allocated
+   buffer instead. */
+         if( len + 1 > MIN_BUFF_LEN ) {
+            dyn_buf = astMalloc( len + 1 );
+            if( astOK ) {
+               len =  vsnprintf( dyn_buf, len + 1, settings, args );
+               settings = dyn_buf;
+            }
+         } else {
+            dyn_buf = NULL;
+            settings = setting_buf;
+         }
+
+/* Indicate that "settings" has been expanded. */
+         expanded = 1;
+
+      } else {
+         expanded = 0;
+         dyn_buf = NULL;
+      }
 
 /* Allocate memory and store a copy of the string. */
       buff1 = astStore( NULL, settings, (size_t) ( len + 1 ) );
@@ -4710,15 +4752,21 @@ static void VSet( AstObject *this, const char *settings, char **text,
    one.  Ensure it is not less than a minimum size and then allocate
    this buffer. */
          buff_len = 2 * len;
-         if ( buff_len < min_buff_len ) buff_len = min_buff_len;
+         if ( buff_len < MIN_BUFF_LEN ) buff_len = MIN_BUFF_LEN;
          buff2 = astMalloc( (size_t) ( buff_len + 1 ) );
          if ( astOK ) {
 
 /* Use "vsprintf" to substitute values for any format specifiers in
    the "settings" string, writing the resulting string into the second
-   buffer. */
+   buffer. If the "settings" string has already been expanded, then just
+   copy it. */
             errno = 0;
-            nc = vsprintf( buff2, buff1, args );
+            if( !expanded ) {
+               nc = vsprintf( buff2, buff1, args );
+            } else {
+               strcpy( buff2, buff1 );
+               nc = strlen( buff1 );
+            }
 
 /* Get a copy of the expanded string to return as the function value and
    convert newlines back to commas. */
@@ -4868,11 +4916,13 @@ static void VSet( AstObject *this, const char *settings, char **text,
 
 /* Free the memory allocated for string buffers. */
          buff2 = astFree( buff2 );
+         dyn_buf = astFree( dyn_buf );
       }
       buff1 = astFree( buff1 );
    }
 }
 #undef ERRBUF_LEN
+#undef MIN_BUFF_LEN
 
 /* Attribute access functions. */
 /* --------------------------- */
