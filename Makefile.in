@@ -122,6 +122,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/sc14 \
 	$(MANIFESTS)/sc15 \
 	$(MANIFESTS)/sc17 \
+	$(MANIFESTS)/sc20 \
 	$(MANIFESTS)/sc21 \
 	$(MANIFESTS)/sg4 \
 	$(MANIFESTS)/sg6 \
