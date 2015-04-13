@@ -1,5 +1,9 @@
   Development Version
   ===================
+
+  Fix problem with object detection toolbox failing to set the correct
+  number of objects detected in the catalogue window.
+
     
   Star-2015A Release
   ==================

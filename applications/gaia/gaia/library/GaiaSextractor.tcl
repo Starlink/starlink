@@ -2727,7 +2727,7 @@ itcl::class gaia::GaiaSextractor {
       }
       set v2 {}
       if { $line != {} } {
-         scan $line "Objects: detected %d / sextracted %d" v1 v2
+         scan $line " Objects: detected %d / sextracted %d" v1 v2
          if { $v2 != {} } {
             set maxobjs_ $v2
          }
