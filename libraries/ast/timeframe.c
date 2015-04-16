@@ -78,12 +78,12 @@ f     - AST_CURRENTTIME: Return the current system time
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -155,6 +155,8 @@ f     - AST_CURRENTTIME: Return the current system time
 *     29-APR-2011 (DSB):
 *        Prevent astFindFrame from matching a subclass template against a
 *        superclass target.
+*     16-APR-2015 (DSB):
+*        Add more choices when chosing gaps on time axes.
 *class--
 */
 
@@ -1488,6 +1490,10 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick, int *
             mjdgap = 2.0/24.0;
             *ntick = 4;
 
+         } else if( mjdgap >= 30.0/1440.0 ) {     /* 1 hour */
+            mjdgap = 60.0/1440.0;
+            *ntick = 4;
+
          } else if( mjdgap >= 15.0/1440.0 ) {  /* 30 minutes */
             mjdgap = 30.0/1440.0;
             *ntick = 3;
@@ -1495,6 +1501,14 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick, int *
          } else if( mjdgap >= 5.0/1440.0 ) {  /* 10 minutes */
             mjdgap = 10.0/1440.0;
             *ntick = 5;
+
+         } else if( mjdgap >= 2.5/1440.0 ) {  /* 5 minutes */
+            mjdgap = 5.0/1440.0;
+            *ntick = 5;
+
+         } else if( mjdgap >= 1.0/1440.0 ) {  /* 2 minutes */
+            mjdgap = 2.0/1440.0;
+            *ntick = 4;
 
          } else if( mjdgap >= 0.5/1440.0 ) {   /* 1 minute */
             mjdgap = 1.0/1440.0;
@@ -1507,6 +1521,14 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick, int *
          } else if( mjdgap >= 5.0/86400.0 ) { /* 10 seconds */
             mjdgap = 10.0/86400.0;
             *ntick = 5;
+
+         } else if( mjdgap >= 2.5/86400.0 ) { /* 5 seconds */
+            mjdgap = 5.0/86400.0;
+            *ntick = 5;
+
+         } else if( mjdgap >= 1.0/86400.0 ) { /* 2 seconds */
+            mjdgap = 2.0/86400.0;
+            *ntick = 4;
 
          } else if( mjdgap >= 0.5/86400.0 ) {  /* 1 second */
             mjdgap = 1.0/86400.0;
