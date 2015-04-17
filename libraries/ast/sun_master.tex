@@ -20413,10 +20413,9 @@ f-
 function will now return a Region, if possible, when applied to a Region. If
 this is not possible, a Frame will be returned as before.
 
-\item The default gap size between the ISO date/time labels used by the Plot
-class when displaying an annotated axis described by a TimeFrame has been
-changed. The changes are meant to improve the labelling of calendar time
-axes that span intervals from a day to a few years.
+\item The choice of default tick-mark for time axes has been improved, to avoid
+previous issues which could result in no suitable gap being found, or
+inappropriate tick marks when using formatted dates.
 
 \item A new function called
 c+

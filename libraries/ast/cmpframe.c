@@ -186,7 +186,7 @@ f     The CmpFrame class does not define any new routines beyond those
 *        an axis index, stop looking for the axis index when the first equals
 *        sign is encountered.
 *     26-MAR-2015 (DSB):
-*        Increase size of "buf2" buffer in SetAttrib, and trap buffer overflow. 
+*        Increase size of "buf2" buffer in SetAttrib, and trap buffer overflow.
 *class--
 */
 
@@ -707,6 +707,7 @@ static const char *SystemString( AstFrame *, AstSystemType, int * );
 static const int *GetPerm( AstFrame *, int * );
 static double Angle( AstFrame *, const double[], const double[], const double[], int * );
 static double Distance( AstFrame *, const double[], const double[], int * );
+static double Centre( AstFrame *, int, double, double, int * );
 static double Gap( AstFrame *, int, double, int *, int * );
 static int ComponentMatch( AstCmpFrame *, AstFrame *, int, int, int **, int **, AstMapping **, AstFrame **, int * );
 static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double *, int * );
@@ -1335,6 +1336,107 @@ static AstObject *Cast( AstObject *this_object, AstObject *obj, int *status ) {
 
 /* Return the new pointer. */
    return new;
+}
+
+static double Centre( AstFrame *this_frame, int axis, double value, double gap, int *status ) {
+/*
+*  Name:
+*     Centre
+
+*  Purpose:
+*     Find a "nice" central value for tabulating CmpFrame axis values.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     double  Centre( AstFrame *this_frame, int axis, double value,
+*                     double gap, int *status )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the protected astCentre method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function returns an axis value which produces a nice formatted
+*     value suitable for a major tick mark on a plot axis, close to the
+*     supplied axis value.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     axis
+*        The number of the axis (zero-based) for which a central value
+*        is to be found.
+*     value
+*        An arbitrary axis value in the section that is being plotted.
+*     gap
+*        The gap size.
+
+*  Returned Value:
+*     The nice central axis value.
+
+*  Notes:
+*     - A value of zero is returned if the supplied gap size is zero.
+*     - A value of zero will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to CmpFrame structure */
+   AstFrame *frame;              /* Pointer to Frame containing axis */
+   double result;                /* Result value to return */
+   int naxes1;                   /* Number of axes in frame1 */
+   int set1;                     /* Digits attribute set? */
+   int set2;                     /* Format attribute set? */
+
+/* Initialise. */
+   result = 0.0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Validate and permute the axis index supplied. */
+   axis = astValidateAxis( this, axis, 1, "astCentre" );
+
+/* Determine the number of axes in the first component Frame. */
+   naxes1 = astGetNaxes( this->frame1 );
+   if ( astOK ) {
+
+/* Decide which component Frame contains the axis and adjust the axis
+   index if necessary. */
+      frame = ( axis < naxes1 ) ? this->frame1 : this->frame2;
+      axis = ( axis < naxes1 ) ? axis : axis - naxes1;
+
+/* Since the component Frame is "managed" by the enclosing CmpFrame,
+   we next test if any Frame attributes which may affect the result
+   are undefined (i.e. have not been explicitly set). If so, we
+   over-ride them, giving them temporary values dictated by the
+   CmpFrame. Only the Digits and Format attributes are relevant here. */
+      set1 = astTestDigits( frame );
+      if ( !set1 ) astSetDigits( frame, astGetDigits( this ) );
+
+      set2 = astTestFormat( frame, axis );
+      if ( !set2 ) astSetFormat( frame, axis, astGetFormat( this, axis ) );
+
+/* Invoke the Frame's astCentre method to find the central value. */
+      result = astCentre( frame, axis, value, gap );
+
+/* Clear Frame attributes which were temporarily over-ridden. */
+      if ( !set1 ) astClearDigits( frame );
+      if ( !set2 ) astClearFormat( frame, axis );
+   }
+
+/* If an error occurred, clear the returned value. */
+   if ( !astOK ) result = 0.0;
+
+/* Return the result. */
+   return result;
 }
 
 static void ClearAlignSystem( AstFrame *this_frame, int *status ) {
@@ -4598,6 +4700,7 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name, int *status
    frame->Fields = Fields;
    frame->Format = Format;
    frame->FrameGrid = FrameGrid;
+   frame->Centre = Centre;
    frame->Gap = Gap;
    frame->GetAxis = GetAxis;
    frame->GetDirection = GetDirection;
@@ -8060,7 +8163,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 
 /* Create a new setting with the same name but with the axis index
    appropriate to the primary Frame. */
-               nc = sprintf( buf2, "%s(%d)=%s", buf1, paxis + 1, 
+               nc = sprintf( buf2, "%s(%d)=%s", buf1, paxis + 1,
                              setting+value );
                if( nc < BUF_LEN ) {
 

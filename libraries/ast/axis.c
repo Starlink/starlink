@@ -29,12 +29,12 @@ f     only within textual output (e.g. from AST_WRITE).
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -83,6 +83,8 @@ f     only within textual output (e.g. from AST_WRITE).
 *        Override astGetObjSize.
 *     30-JUN-2006 (DSB):
 *        Guard against a null "str1" value in AxisAbbrev.
+*     17-APR-2015 (DSB):
+*        Added astAxisCentre.
 *class--
 */
 
@@ -203,6 +205,7 @@ static const char *GetAxisNormUnit( AstAxis *, int * );
 static const char *GetDefaultFormat( AstAxis *, int * );
 static char *ParseAxisFormat( const char *, int, int *, int *, int *, int *, int * );
 static double AxisDistance( AstAxis *, double, double, int * );
+static double AxisCentre( AstAxis *, double, double, int * );
 static double AxisGap( AstAxis *, double, int *, int * );
 static double AxisOffset( AstAxis *, double, double, int * );
 static int AxisFields( AstAxis *, const char *, const char *, int, char **, int *, double *, int * );
@@ -830,6 +833,68 @@ static const char *AxisFormat( AstAxis *this, double value, int *status ) {
 
 }
 #undef ERRBUF_LEN
+
+static double AxisCentre( AstAxis *this, double value, double gap, int *status ) {
+/*
+*+
+*  Name:
+*     astAxisCentre
+
+*  Purpose:
+*     Find a "nice" central value for tabulating Axis values.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "axis.h"
+*     double astAxisCentre( AstAxis *this, double value, double gap )
+
+*  Class Membership:
+*     Axis method.
+
+*  Description:
+*     This function returns an axis value which produces a nice formatted
+*     value suitable for a major tick mark on a plot axis.
+
+*  Parameters:
+*     this
+*        Pointer to the Axis.
+*     value
+*        An arbitrary axis value in the section that is being plotted.
+*     gap
+*        The gap size.
+
+*  Returned Value:
+*     The nice central axis value.
+
+*  Notes:
+*     - A value of zero is returned if the supplied gap size is zero.
+*     - A value of zero will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Local Variables: */
+   double result;                /* Returned central axis value */
+
+/* Initialise. */
+   result = 0.0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* The returned central value is an integral number of gaps away from the
+   origin and is close to the supplied axis value. This would result in
+   the origin being at a major tick mark. */
+   if( gap != 0.0 && gap != AST__BAD && value != AST__BAD ) {
+      result = gap*floor( 0.5 + value/gap );
+   }
+
+/* Return the result. */
+   return result;
+}
 
 static double AxisGap( AstAxis *this, double gap, int *ntick, int *status ) {
 /*
@@ -1767,6 +1832,7 @@ void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name, int *status ) {
    vtab->AxisFormat = AxisFormat;
    vtab->AxisDistance = AxisDistance;
    vtab->AxisOffset = AxisOffset;
+   vtab->AxisCentre = AxisCentre;
    vtab->AxisGap = AxisGap;
    vtab->AxisIn = AxisIn;
    vtab->AxisNorm = AxisNorm;
@@ -3220,6 +3286,10 @@ double astAxisDistance_( AstAxis *this, double v1, double v2, int *status ) {
 double astAxisOffset_( AstAxis *this, double v1, double dist, int *status ) {
    if ( !astOK ) return AST__BAD;
    return (**astMEMBER(this,Axis,AxisOffset))( this, v1, dist, status );
+}
+double astAxisCentre_( AstAxis *this, double value, double gap, int *status ) {
+   if ( !astOK ) return 0.0;
+   return (**astMEMBER(this,Axis,AxisCentre))( this, value, gap, status );
 }
 double astAxisGap_( AstAxis *this, double gap, int *ntick, int *status ) {
    if ( !astOK ) return 0.0;

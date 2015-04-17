@@ -144,12 +144,12 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -219,6 +219,8 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *        Added method astGetRegionFrameSet.
 *     3-FEB-2014 (DSB):
 *        Fix bug masking regions that have no overlap with the supplied array.
+*     17-APR-2015 (DSB):
+*        Added Centre.
 *class--
 
 *  Implementation Notes:
@@ -923,6 +925,7 @@ static double AxAngle( AstFrame *, const double[], const double[], int, int * );
 static double AxDistance( AstFrame *, int, double, double, int * );
 static double AxOffset( AstFrame *, int, double, double, int * );
 static double Distance( AstFrame *, const double[], const double[], int * );
+static double Centre( AstFrame *, int, double, double, int * );
 static double Gap( AstFrame *, int, double, int *, int * );
 static double Offset2( AstFrame *, const double[2], double, double, double[2], int * );
 static int Equal( AstObject *, AstObject *, int * );
@@ -1903,6 +1906,80 @@ static AstObject *Cast( AstObject *this_object, AstObject *obj, int *status ) {
 
 /* Return the new pointer. */
    return new;
+}
+
+static double Centre( AstFrame *this_frame, int axis, double value, double gap, int *status ) {
+/*
+*  Name:
+*     Centre
+
+*  Purpose:
+*     Find a "nice" central value for tabulating Frame axis values.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "region.h"
+*     double  Centre( AstFrame *this_frame, int axis, double value,
+*                     double gap, int *status )
+
+*  Class Membership:
+*     Region member function (over-rides the protected astCentre method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function returns an axis value which produces a nice formatted
+*     value suitable for a major tick mark on a plot axis, close to the
+*     supplied axis value.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     axis
+*        The number of the axis (zero-based) for which a central value
+*        is to be found.
+*     value
+*        An arbitrary axis value in the section that is being plotted.
+*     gap
+*        The gap size.
+
+*  Returned Value:
+*     The nice central axis value.
+
+*  Notes:
+*     - A value of zero is returned if the supplied gap size is zero.
+*     - A value of zero will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstRegion *this;              /* Pointer to the Region structure */
+   double result;                /* Value to return */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0.0;
+
+/* Obtain a pointer to the Region structure. */
+   this = (AstRegion *) this_frame;
+
+/* Validate the axis index. */
+   (void) astValidateAxis( this, axis, 1, "astCentre" );
+
+/* Obtain a pointer to the Region's current Frame and invoke this
+   Frame's astCentre method to obtain the required value. Annul the
+   Frame pointer afterwards. */
+   fr = astGetFrame( this->frameset, AST__CURRENT );
+   result = astCentre( fr, axis, value, gap );
+   fr = astAnnul( fr );
+
+/* If an error occurred, clear the result. */
+   if ( !astOK ) result = 0.0;
+
+/* Return the result. */
+   return result;
 }
 
 static void CheckPerm( AstFrame *this_frame, const int *perm, const char *method, int *status ) {
@@ -4497,6 +4574,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
    frame->Distance = Distance;
    frame->FindFrame = FindFrame;
    frame->Format = Format;
+   frame->Centre = Centre;
    frame->Gap = Gap;
    frame->GetAxis = GetAxis;
    frame->GetDigits = GetDigits;

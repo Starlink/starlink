@@ -280,6 +280,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        When checking attribute settings for attribute names that end with
 *        an axis index, stop looking for the axis index when the first equals
 *        sign is encountered.
+*     17-APR-2015 (DSB):
+*        Added astCentre.
 *class--
 */
 
@@ -832,6 +834,7 @@ static double AxAngle( AstFrame *, const double[], const double[], int, int * );
 static double AxDistance( AstFrame *, int, double, double, int * );
 static double AxOffset( AstFrame *, int, double, double, int * );
 static double Distance( AstFrame *, const double[], const double[], int * );
+static double Centre( AstFrame *, int, double, double, int * );
 static double Gap( AstFrame *, int, double, int *, int * );
 static double Offset2( AstFrame *, const double[2], double, double, double[2], int * );
 static int AxIn( AstFrame *, int, double, double, double, int, int * );
@@ -1686,6 +1689,76 @@ f     invoked with STATUS set to an error value, or if it should fail for
 /* Return the result. */
    return result;
 
+}
+
+static double Centre( AstFrame *this, int axis, double value, double gap, int *status ) {
+/*
+*+
+*  Name:
+*     astCentre
+
+*  Purpose:
+*     Find a "nice" central value for tabulating Axis values.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     double astCentre( AstFrame *this, int axis, double value, double gap )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function returns an axis value which produces a nice formatted
+*     value suitable for a major tick mark on a plot axis, close to the
+*     supplied axis value.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     axis
+*        The number of the axis (zero-based) for which a gap is to be found.
+*     value
+*        An arbitrary axis value in the section that is being plotted.
+*     gap
+*        The gap size.
+
+*  Returned Value:
+*     The nice central axis value.
+
+*  Notes:
+*     - A value of zero is returned if the supplied gap size is zero.
+*     - A value of zero will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Local Variables: */
+   AstAxis *ax;                  /* Pointer to Axis object */
+   double result;                /* The nice central value */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0.0;
+
+/* Validate the axis index and obtain a pointer to the required
+   Axis. */
+   (void) astValidateAxis( this, axis, 1, "astCentre" );
+   ax = astGetAxis( this, axis );
+
+/* Find the nice central value. */
+   result = astAxisCentre( ax, value, gap );
+
+/* Annul the Axis pointer. */
+   ax = astAnnul( ax );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0.0;
+
+/* Return the result. */
+   return result;
 }
 
 static void CheckPerm( AstFrame *this, const int *perm, const char *method, int *status ) {
@@ -5816,6 +5889,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
    vtab->MatchAxes = MatchAxes;
    vtab->MatchAxesX = MatchAxesX;
    vtab->Format = Format;
+   vtab->Centre = Centre;
    vtab->Gap = Gap;
    vtab->GetAxis = GetAxis;
    vtab->GetDigits = GetDigits;
@@ -14674,6 +14748,10 @@ void astMatchAxesX_( AstFrame *frm2, AstFrame *frm1, int *axes, int *status ) {
 const char *astFormat_( AstFrame *this, int axis, double value, int *status ) {
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Frame,Format))( this, axis, value, status );
+}
+double astCentre_( AstFrame *this, int axis, double value, double gap, int *status ) {
+   if ( !astOK ) return 0.0;
+   return (**astMEMBER(this,Frame,Centre))( this, axis, value, gap, status );
 }
 double astGap_( AstFrame *this, int axis, double gap, int *ntick, int *status ) {
    if ( !astOK ) return 0.0;

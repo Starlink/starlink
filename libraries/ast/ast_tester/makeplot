@@ -1,0 +1,47 @@
+#!/bin/tcsh
+
+if( "$1" == "" ) then
+   echo "Usage: makeplot <plot>"
+   echo "   (e.g. makeplot serpens)"
+   exit
+endif
+
+gfortran -fno-second-underscore -w -g -fno-range-check -o plotter plotter.f \
+         -I$GITSTAR/include -L$GITSTAR/lib `ast_link -pgp -ems` `pgplot_link`
+
+set bn = $1
+
+set atfile = "${bn}.attr"
+if( -e $atfile ) then
+   set attr1 = `cat $atfile`
+else
+   set attr1 = ' '
+endif
+
+set atfile = "${bn}.fattr"
+if( -e $atfile ) then
+   set attr2 = `cat $atfile`
+else
+   set attr2 = ' '
+endif
+
+set boxfile = "${bn}.box"
+if( -e $boxfile ) then
+   set box = `cat $boxfile`
+else
+   set box = ' '
+endif
+
+
+set psfile = "${bn}-new.ps"
+echo "plotter $bn.head '$attr1' '$attr2' a.ps $box"
+plotter $bn.head "$attr1" "$attr2" a.ps $box
+
+if( -e $GITSTAR/bin/psmerge ) then
+   $GITSTAR/bin/psmerge -t300x300 -r90 a.ps > $psfile
+else
+   cp a.ps $psfile
+endif
+
+gv $psfile -orientation=landscape
+

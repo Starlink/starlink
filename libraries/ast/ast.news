@@ -16,9 +16,9 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-- The choice of default tick-mark gaps for time axes has been
-improved, to avoid a previous issue which could result in no suitable gap
-being found.
+- The choice of default tick-mark for time axes has been improved, to avoid
+previous issues which could result in no suitable gap being found, or
+inappropriate tick marks when using formatted dates.
 
 - A new method called astRegionOutline has been added to the Plot class.
 It draws the outline of a supplied AST Region.

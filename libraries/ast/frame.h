@@ -290,6 +290,8 @@
 *           Determine how to convert between two coordinate systems.
 *        astFields
 *           Identify the fields within a formatted Frame axis value.
+*        astCentre
+*           Find a "nice" central value for tabulating Frame axis values.
 *        astGap
 *           Find a "nice" gap for tabulating Frame axis values.
 *        astGetAxis
@@ -475,12 +477,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -534,6 +536,8 @@
 *        Added astIntersect method.
 *     18-JUN-2009 (DSB):
 *        Added ObsAlt attribute.
+*     17-APR-2015 (DSB):
+*        Added astCentre.
 *-
 */
 
@@ -678,6 +682,7 @@ typedef struct AstFrameVtab {
    const int *(* GetPerm)( AstFrame *, int * );
    double (* Angle)( AstFrame *, const double[], const double[], const double[], int * );
    double (* Distance)( AstFrame *, const double[], const double[], int * );
+   double (* Centre)( AstFrame *, int, double, double, int * );
    double (* Gap)( AstFrame *, int, double, int *, int * );
    int (* Fields)( AstFrame *, int, const char *, const char *, int, char **, int *, double *, int * );
    double (* AxDistance)( AstFrame *, int, double, double, int * );
@@ -931,6 +936,7 @@ const char *astGetTitle_( AstFrame *, int * );
 const char *astGetUnit_( AstFrame *, int, int * );
 const char *astGetNormUnit_( AstFrame *, int, int * );
 const int *astGetPerm_( AstFrame *, int * );
+double astCentre_( AstFrame *, int, double, double, int * );
 double astGap_( AstFrame *, int, double, int *, int * );
 int astFields_( AstFrame *, int, const char *, const char *, int, char **, int *, double *, int * );
 int astGetDigits_( AstFrame *, int * );
@@ -1201,6 +1207,8 @@ astINVOKE(V,astClearTitle_(astCheckFrame(this),STATUS_PTR))
 astINVOKE(V,astClearUnit_(astCheckFrame(this),axis,STATUS_PTR))
 #define astConvertX(to,from,domainlist) \
 astINVOKE(O,astConvertX_(astCheckFrame(to),astCheckFrame(from),domainlist,STATUS_PTR))
+#define astCentre(this,axis,value,gap) \
+astINVOKE(V,astCentre_(astCheckFrame(this),axis,value,gap,STATUS_PTR))
 #define astGap(this,axis,gap,ntick) \
 astINVOKE(V,astGap_(astCheckFrame(this),axis,gap,ntick,STATUS_PTR))
 #define astGetAxis(this,axis) \

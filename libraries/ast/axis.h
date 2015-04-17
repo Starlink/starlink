@@ -103,6 +103,8 @@
 *           Find the distance between two axis values.
 *        astAxisFields
 *           Identify the fields within a formatted SkyAxis value.
+*        astAxisCentre
+*           Find a "nice" central axis value.
 *        astAxisGap
 *           Find a "nice" gap for tabulating Axis values.
 *        astAxisOffset
@@ -209,12 +211,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -240,6 +242,8 @@
 *        Added Top and Bottom.
 *     8-JAN-2003 (DSB):
 *        Added protected astInitAxisVtab method.
+*     17-APR-2015 (DSB):
+*        Added astAxisCentre.
 *-
 */
 
@@ -311,6 +315,7 @@ typedef struct AstAxisVtab {
    const char *(* GetAxisSymbol)( AstAxis *, int * );
    const char *(* GetAxisUnit)( AstAxis *, int * );
    const char *(* GetAxisNormUnit)( AstAxis *, int * );
+   double (* AxisCentre)( AstAxis *, double, double, int * );
    double (* AxisGap)( AstAxis *, double, int *, int * );
    double (* AxisDistance)( AstAxis *, double, double, int * );
    double (* AxisOffset)( AstAxis *, double, double, int * );
@@ -418,6 +423,7 @@ const char *astGetAxisLabel_( AstAxis *, int * );
 const char *astGetAxisSymbol_( AstAxis *, int * );
 const char *astGetAxisUnit_( AstAxis *, int * );
 const char *astGetAxisNormUnit_( AstAxis *, int * );
+double astAxisCentre_( AstAxis *, double, double, int * );
 double astAxisGap_( AstAxis *, double, int *, int * );
 double astAxisDistance_( AstAxis *, double, double, int * );
 double astAxisOffset_( AstAxis *, double, double, int * );
@@ -513,6 +519,8 @@ astINVOKE(V,astAxisUnformat_(astCheckAxis(this),string,value,STATUS_PTR))
 #if defined(astCLASS)            /* Protected */
 #define astAxisAbbrev(this,fmt,str1,str2) \
 astINVOKE(V,astAxisAbbrev_(astCheckAxis(this),fmt,str1,str2,STATUS_PTR))
+#define astAxisCentre(this,value,gap) \
+astINVOKE(V,astAxisCentre_(astCheckAxis(this),value,gap,STATUS_PTR))
 #define astAxisGap(this,gap,ntick) \
 astINVOKE(V,astAxisGap_(astCheckAxis(this),gap,ntick,STATUS_PTR))
 #define astAxisFields(this,fmt,str,maxfld,fields,nc,val) \

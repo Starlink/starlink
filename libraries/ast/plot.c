@@ -12382,7 +12382,7 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
    if( cen && *cen != AST__BAD ) {
       centre = *cen;
    } else {
-      centre = gap*floor( 0.5 + data[ 0 ]/gap );
+      centre = astCentre( frame, axis, data[ 0 ], gap );
       if( cen ) *cen = centre;
    }
 

@@ -157,6 +157,9 @@ f     - AST_CURRENTTIME: Return the current system time
 *        superclass target.
 *     16-APR-2015 (DSB):
 *        Add more choices when chosing gaps on time axes.
+*     17-APR-2015 (DSB):
+*        - Added Centre.
+*        - Remove some "set but unused" variables.
 *class--
 */
 
@@ -260,6 +263,7 @@ static int class_check;
    class. */
 static AstSystemType (* parent_getalignsystem)( AstFrame *, int * );
 static AstSystemType (* parent_getsystem)( AstFrame *, int * );
+static double (* parent_centre)( AstFrame *, int, double, double, int * );
 static double (* parent_gap)( AstFrame *, int, double, int *, int * );
 static const char *(* parent_abbrev)( AstFrame *, int, const char *, const char *, const char *, int * );
 static const char *(* parent_format)( AstFrame *, int, double, int * );
@@ -376,6 +380,7 @@ static void VerifyAttrs( AstTimeFrame *, const char *, const char *, const char 
 static AstMapping *ToMJDMap( AstSystemType, double, int * );
 static int Unformat( AstFrame *, int, const char *, double *, int * );
 static const char *Abbrev( AstFrame *, int, const char *, const char *, const char *, int * );
+static double Centre( AstFrame *, int, double, double, int * );
 static double Gap( AstFrame *, int, double, int *, int * );
 
 static AstSystemType GetSystem( AstFrame *, int * );
@@ -568,6 +573,216 @@ static const char *Abbrev( AstFrame *this_frame, int axis,  const char *fmt,
 
 /* If an error occurred, clear the returned value. */
    if ( !astOK ) result = str2;
+
+/* Return the result. */
+   return result;
+}
+
+static double Centre( AstFrame *this_frame, int axis, double value,
+                      double gap, int *status ) {
+/*
+*  Name:
+*     Centre
+
+*  Purpose:
+*     Find a "nice" central value for tabulating Frame axis values.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "timeframe.h"
+*     double Centre( AstFrame *this_frame, int axis, double value,
+*                    double gap, int *status )
+
+*  Class Membership:
+*     TimeFrame member function (over-rides the protected astCentre method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function returns an axis value which produces a nice formatted
+*     value suitable for a major tick mark on a plot axis, close to the
+*     supplied axis value.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     axis
+*        The number of the axis (zero-based) for which a central value
+*        is to be found.
+*     value
+*        An arbitrary axis value in the section that is being plotted.
+*     gap
+*        The gap size.
+
+*  Returned Value:
+*     The nice central axis value.
+
+*  Notes:
+*     - The supplied axis value is returned if the supplied gap size is
+*     zero, or if this function is invoked with the global error status
+*     set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstTimeFrame *this;
+   char *date1;
+   char *date2;
+   char *f1;
+   char *f2;
+   char *fres;
+   char *p1;
+   char *p2;
+   char *pres;
+   const char *fmt;
+   const char *date;
+   double result;
+   int df;
+   int fmod;
+   int nc1;
+   int nc2;
+   int ndp;
+   int nres;
+   int v1;
+   int v2;
+
+/* Initialise. */
+   result = value;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Validate the axis index. */
+   astValidateAxis( this_frame, axis, 1, "astCentre" );
+
+/* Obtain a pointer to the TimeFrame structure. */
+   this = (AstTimeFrame *) this_frame;
+
+/* Use the parent astCentre function unless the Format attribute indicates
+   that axis values are to be formatted as multi-field date/time strings. */
+   fmt = astGetFormat( this, 0 );
+   df = DateFormat( fmt, &ndp, NULL, status );
+   if( !df ) {
+      result = (*parent_centre)( this_frame, axis, value, gap, status );
+
+/* Otherwise. */
+   } else {
+
+/* Format time values one gap above the supplied axis value and one gap below
+   it. Take copies of each string since the astFormat buffer will be
+   over-written by each call. */
+      date = astFormat( this, 0, value - gap );
+      if( date ) date1 = astStore( NULL, date, strlen( date ) + 1 );
+      date = astFormat( this, 0, value + gap );
+      if( date ) date2 = astStore( NULL, date, strlen( date ) + 1 );
+      if( astOK ) {
+
+/* Initialise a formatted version of the returned central value to be
+   equal to "date1". */
+         nres = strlen( date1 );
+         fres = astStore( NULL, date1, nres + 1 );
+
+/* Loop over all characters within the first date. */
+         fmod = 0;
+         nc1 = 0;
+         f1 = NULL;
+         p1 = date1;
+         nc2 = 0;
+         f2 = NULL;
+         p2 = date2;
+         while( 1 ) {
+
+/* If we have not yet found the length of the next numerical field in
+   date1, continue looking for it. */
+            if( !nc1 ) {
+
+/* If we are currently looking for the start of a numerical field, indicate
+   we have found one if the current character is a digit. */
+               if( !f1 ) {
+                  if( isdigit( *p1 ) ) f1 = p1;
+
+/* If we are currently looking for the end of a numeric field, we have
+   found the end if the current character is not a digit. */
+               } else {
+                  if( !isdigit( *p1 ) ) {
+                     nc1 = p1 - f1;
+                  }
+               }
+
+/* Look at the next character */
+               p1++;
+            }
+
+/* If we have not yet found the length of the next numerical field in
+   date2, continue looking for it. */
+            if( !nc2 ) {
+
+/* If we are currently looking for the start of a numerical field, indicate
+   we have found one if the current character is a digit. */
+               if( !f2 ) {
+                  if( isdigit( *p2 ) ) f2 = p2;
+
+/* If we are currently looking for the end of a numeric field, we have
+   found the end if the current character is not a digit. */
+               } else {
+                  if( !isdigit( *p2 ) ) {
+                     nc2 = p2 - f2;
+                  }
+               }
+
+/* Look at the next character */
+               p2++;
+            }
+
+/* If we have found the next numerical field in both dates, convert them
+   to integers. */
+            if( nc1 && nc2 ) {
+               v1 = atoi( f1 );
+               v2 = atoi( f2 );
+
+/* If the values are different, replace this field and all subsequent
+   fields with zeros in the formatted version of the returned central
+   value, and leave the loop. */
+               if( v1 != v2 ) {
+
+                  pres = fres + ( f1 - date1 ) - 1;
+                  while( *(++pres) ) {
+                     if( isdigit( *pres ) ) *pres = '0';
+                  }
+                  fmod = 1;
+
+                  break;
+               }
+
+/* Prepare to look for the next numerical field in both strings. */
+               nc1 = nc2 = 0;
+               f1 = f2 = NULL;
+
+/* If either string has been exhausted, leave the loop. */
+               if( !*p1 || !*p2 ) break;
+            }
+         }
+
+/* If the formatted "nice" value was changed, unformatted it to get the
+   returned axis value. Otherwise we rettina the returned value set
+   earlier. */
+         if( fmod ) {
+            if( astUnformat( this, 0, fres, &result ) != nres && astOK ) {
+               astError( AST__INTER, "astCentre(%s): Error unformatting "
+                         "the central time axis value '%s' (internal AST "
+                         "programming error).", status, astClass( this ), fres );
+            }
+         }
+
+/* Free resources. */
+         fres = astFree( fres );
+      }
+      date1 = astFree( date1 );
+      date2 = astFree( date2 );
+   }
+
+/* If an error occurred, clear the returned value. */
+   if ( !astOK ) result = 0.0;
 
 /* Return the result. */
    return result;
@@ -1133,7 +1348,6 @@ static const char *Format( AstFrame *this_frame, int axis, double value, int *st
    int iy;
    int j;
    int ndp;
-   int tlen;
 
 /* Initialise */
    result = NULL;
@@ -1193,11 +1407,11 @@ static const char *Format( AstFrame *this_frame, int axis, double value, int *st
 
 /* Format the time fields. */
                if( ndp > 0 ) {
-                  tlen = sprintf( tbuf, "%c%2.2d:%2.2d:%2.2d.%*.*d", sep,
+                  (void) sprintf( tbuf, "%c%2.2d:%2.2d:%2.2d.%*.*d", sep,
                                   ihmsf[0], ihmsf[1], ihmsf[2], ndp, ndp,
                                   ihmsf[3] );
                } else {
-                  tlen = sprintf( tbuf, "%c%2.2d:%2.2d:%2.2d", sep, ihmsf[0],
+                  (void) sprintf( tbuf, "%c%2.2d:%2.2d:%2.2d", sep, ihmsf[0],
                                   ihmsf[1], ihmsf[2] );
                }
 
@@ -2948,6 +3162,9 @@ void astInitTimeFrameVtab_(  AstTimeFrameVtab *vtab, const char *name, int *stat
    parent_gap = frame->Gap;
    frame->Gap = Gap;
 
+   parent_centre = frame->Centre;
+   frame->Centre = Centre;
+
 /* Store replacement pointers for methods which will be over-ridden by new
    member functions implemented here. */
    frame->GetActiveUnit = GetActiveUnit;
@@ -3962,9 +4179,6 @@ static void Overlay( AstFrame *template, const int *template_axes,
 
 
 /* Local Variables: */
-   const char *new_class;        /* Pointer to template class string */
-   const char *old_class;        /* Pointer to result class string */
-   const char *method;           /* Pointer to method string */
    AstSystemType new_alignsystem;/* Code identifying new alignment coords */
    AstSystemType new_system;     /* Code identifying new cordinates */
    AstSystemType old_system;     /* Code identifying old coordinates */
@@ -3973,11 +4187,6 @@ static void Overlay( AstFrame *template, const int *template_axes,
 
 /* Check the global error status. */
    if ( !astOK ) return;
-
-/* Initialise strings used in error messages. */
-   new_class = astGetClass( template );
-   old_class = astGetClass( result );
-   method = "astOverlay";
 
 /* Get the old and new systems. */
    old_system = astGetSystem( result );
@@ -4111,7 +4320,6 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    int nc;                       /* Number of characters read by astSscanf */
    int off;                      /* Offset of attribute value */
    int rep;                      /* Original error reporting state */
-   int ulen;                     /* Used length of setting string */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -4121,9 +4329,6 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 
 /* Obtain the length of the setting string. */
    len = strlen( setting );
-
-/* Obtain the used length of the setting string. */
-   ulen = astChrLen( setting );
 
 /* Test for each recognised attribute in turn, using "astSscanf" to parse the
    setting string and extract the attribute value (or an offset to it in the
