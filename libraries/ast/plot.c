@@ -24465,7 +24465,6 @@ f     CALL AST_REGIONOUTLINE( THIS, REGION, STATUS )
 
 *  Description:
 *     This function draws an outline around the supplied AST Region object.
-*     xxx
 
 *  Parameters:
 c     this

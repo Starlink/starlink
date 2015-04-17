@@ -18218,7 +18218,7 @@ into AST are passed). In this case, no distortion code will be appended to
 the resulting CTYPE\emph{i} keyword values.
 
 \newpage
-\section{\xlabel{changes_and_new_features}\label{ss:changes}Changes and New Features}
+\section{\xlabel{changes_and_new_features}\label{ss:changes}Release Notes}
 
 \subsection{Changes Introduced in V1.1}
 
@@ -21478,12 +21478,10 @@ f-
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V8.0.2}
+\subsection{Changes Introduced in V8.0.2}
 c+
-The following describes the most significant changes which have
-occurred in the AST library between versions V8.0.1 and V8.0.2 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V8.0.1 and V8.0.2:
 
 \begin{enumerate}
 \item For security reasons, the change introduced to astAppendString in
@@ -21499,6 +21497,59 @@ The changes that occurred in the AST library between versions V8.0.1 and
 V8.0.2 only affect the C interface. The Fortran interface remains the
 same as V8.0.1.
 f-
+
+\subsection{Changes Introduced in V8.0.3}
+The following describes the most significant changes which
+occurred in the AST library between versions V8.0.2 and V8.0.3:
+
+\begin{enumerate}
+
+\item Methods
+c+
+astRebin, astRebinSeq, astResample and astTranGrid
+c-
+f+
+AST\_REBIN, AST\_REBINSEQ, AST\_RESAMPLE and AST\_TRANGRID.
+f-
+now report an error if an array is specified that has more pixels than
+can be counted by a 32 bit integer.
+\item The hypertext documentation is now generated using Tex4HT rather
+than latex2html. The format of the hypertext docs has changed significantly.
+\item Another bug fix associated with reading CAR projections from
+FITS-WCS headers.
+f+
+\item Trailing spaces supplied within attribute setting strings are now ignored.
+f-
+c+
+\item Constructor options strings of the form ``\texttt{..., "\%s", text );}''
+can now be supplied. This avoids a security issue associated with the
+alternative form ``\texttt{..., text );}''.
+c-
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V8.0.4}
+The following describes the most significant changes which have
+occurred in the AST library between versions V8.0.3 and V8.0.4 (the
+current version):
+
+\begin{enumerate}
+
+\item The choice of default tick-mark gaps for time axes has been
+improved, to avoid a previous issue which could result in no suitable gap
+being found.
+
+- A new method called
+c+
+astRegionOutline
+c-
+f+
+AST\_REGIONOUTLINE
+f-
+has been added to the Plot class. It draws the outline of a supplied AST
+Region.
+
+\end{enumerate}
 
 % Programs which are statically linked will need to be re-linked in
 % order to take advantage of these new facilities.

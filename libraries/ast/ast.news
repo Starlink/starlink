@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V8.0.2) of the Starlink AST (astrometry) library is
+   A new release (V8.0.4) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -16,9 +16,39 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- The choice of default tick-mark gaps for time axes has been
+improved, to avoid a previous issue which could result in no suitable gap
+being found.
+
+- A new method called astRegionOutline has been added to the Plot class.
+It draws the outline of a supplied AST Region.
+
+
+Main Changes in V8.0.3
+----------------------
+
+- Methods astRebin, astRebinSeq, astResample and astTranGrid now report an
+error if an array is specified that has more pixels than can be counted by
+a 32 bit integer.
+
+- The hypertext documentation is now generated using Tex4HT rather
+than latex2html. The format of the hypertext docs has changed
+significantly.
+
+- Another bug fix associated with reading CAR projections from FITS-WCS headers.
+
+- Constructor options strings of the form "..., "%s", text );" can now be
+supplied. This avoids a security issue associated with the alternative
+form "..., text );".
+
+
+Main Changes in V8.0.2
+----------------------
+
 - For security reasons, the change introduced to astAppendString in
   V8.0.1 has been moved to a new function called astAppendStringf, and
   astAppendString itself has been reverted to its V8.0.0 version.
+
 
 Main Changes in V8.0.1
 ----------------------
@@ -26,11 +56,15 @@ Main Changes in V8.0.1
 - The macro used to invoke the astAppendString utility function has
   changed to allow printf-style converstions to be included in the
   supplied text. Any code that uses this macro must be re-compiled.
+
 - The astRebin and astRebinSeq family of functions now include support
   for arrays with char (byte) and unsigned char (unsigned byte) data types.
+
 - The Base and Current attributes of a FrameSet may now be set using the
   Domain name or the index of the required Frame.
+
 - The FITS XPH projection is now supported.
+
 - The order of WCS axes within new FITS-WCS headers created by astWrite
   can now be controlled using a new attribute called FitsAxisOrder.
 
