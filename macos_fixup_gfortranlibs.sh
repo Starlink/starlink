@@ -33,14 +33,11 @@ for i in $(find $STARLINK_DIR/lib -name '*.dylib' -type f); do
     install_name_tool -change "$libpath" "$newpath" "$i";
 done
 
-for i in $(find $STARLINK_DIR/bin -type f -perm +111 -not -name '*.csh' \
-    -not -name '*.sh' -not -name '*_link_adam' -not -name '*.icl' \
-    -not -name '*.py' -not -name '*.pl' -not -name '*.tcl' \
-    -not -name '*.tab' -not -name '*.cfg' -not -name '*.ids' \
-    -not -name '*.def' -not -name '*.class'); do
-    install_name_tool -change "$libpath" "$newpath" "$i";
+for i in $(find $STARLINK_DIR/bin -type f -perm +111); do
+    if file $i | grep -q Mach-O; then
+	install_name_tool -change "$libpath" "$newpath" "$i";
+    fi
 done
-
 
 for i in $(find $STARLINK_DIR/Perl -name '*.bundle' -type f); do
     install_name_tool -change "$libpath" "$newpath" "$i";

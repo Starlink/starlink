@@ -159,15 +159,13 @@ done
 echo "Fixing up binaries under $STARLINK_DIR/bin"
 echo
 echo
-for i in $(find $STARLINK_DIR/bin -type f -perm +111 -not -name '*.csh' \
-    -not -name '*.sh' -not -name '*_link_adam' -not -name '*.icl' \
-    -not -name '*.py' -not -name '*.pl' -not -name '*.tcl' \
-    -not -name '*.tab' -not -name '*.cfg' -not -name '*.ids' \
-    -not -name '*.def' -not -name '*.class'); do
+for i in $(find $STARLINK_DIR/bin -type f -perm +111); do
 
-    # echo $i
-    fixup_starlink_dylib_links $i
-    add_rpath_starlink $i
+    # Check if a Mach-O type file.
+    if file $i | grep -q Mach-O; then
+	fixup_starlink_dylib_links $i
+	add_rpath_starlink $i
+    fi
 
 done
 
