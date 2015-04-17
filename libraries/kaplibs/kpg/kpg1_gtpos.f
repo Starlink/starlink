@@ -120,6 +120,11 @@
 *        Pass the FrameSet pointer to KPG1_DSFRM, rather than the current
 *        Frame pointer. This is so that KPG1_DSFRM can calculate the
 *        pixel sizes.
+*     17-APR-2015 (DSB):
+*        Only normalise the supplied WCS position if normalisation does
+*        not produce any significant change in the base frame position.
+*        This fixes a problem whereby normalisation would cause the wrong
+*        part of the image to be displayed for CAR projection.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -164,6 +169,8 @@
       CHARACTER NEXT*1           ! Next character to be read
       CHARACTER POS*255          ! Position string
       CHARACTER SYM( NDF__MXDIM )*10 ! Axis symbols
+      DOUBLE PRECISION CCN( NDF__MXDIM ) ! Curr position after norm
+      DOUBLE PRECISION BCN( NDF__MXDIM ) ! Base position after norm
       INTEGER BASFRM             ! Pointer to the Base Frame
       INTEGER CURFRM             ! Pointer to the Current Frame
       INTEGER F                  ! Index of first non-blank character
@@ -177,6 +184,7 @@
       INTEGER NBAXES             ! No. of axes in base Frame
       INTEGER NC                 ! No. of characters read from string
       INTEGER NCAXES             ! No. of axes in current Frame
+      LOGICAL DONORM             ! Use the normalised WCS position?
       LOGICAL GOOD               ! Is position good?
       LOGICAL GOTFS              ! Was a FrameSet supplied?
       LOGICAL LOOP               ! Get a new parameter value?
@@ -187,6 +195,9 @@
 
 *  See if a FrameSet has been supplied.
       GOTFS = AST_ISAFRAMESET( IWCS, STATUS )
+
+*  Get the number of axes in the Current Frame.
+      NCAXES = AST_GETI( IWCS, 'NAXES', STATUS )
 
 *  If so, get a pointer to the Current and Base Frames, and get the
 *  number of axes in the Base Frame. Also get a simplified Mapping for
@@ -200,14 +211,48 @@
          MAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT, STATUS )
          MAP = AST_SIMPLIFY( MAP, STATUS )
 
+*  Find the base Frame position corresponding to the supplied WCS position.
+         CALL AST_TRANN( MAP, 1, NCAXES, 1, CC, .FALSE., NBAXES,
+     :                   1, BC, STATUS )
+
+*  Normalize the supplied WCS position.
+         DO I = 1, NCAXES
+            CCN( I ) = CC( I )
+         END DO
+         CALL AST_NORM( CURFRM, CCN, STATUS )
+
+*  Find the base Frame position corresponding to the normalised WCS position.
+         CALL AST_TRANN( MAP, 1, NCAXES, 1, CCN, .FALSE., NBAXES,
+     :                   1, BCN, STATUS )
+
+*  If the normalisation process moves the base frame position significantly
+*  then we use the supplied position as-is, without normalising. This
+*  will be the case, for instance, for CAR projections of the sky.
+         DONORM = .TRUE.
+         DO I = 1, NBAXES
+            IF( ABS( BCN( I ) - BC( I ) ) .GT.
+     :          0.1*( ABS( BCN( I ) + BC( I ) ) ) ) THEN
+               WRITE(*,*) 'Not norming...........'
+               DONORM = .FALSE.
+            END IF
+            CCN( I ) = CC( I )
+         END DO
+
+         IF( DONORM ) THEN
+            DO I = 1, NCAXES
+               CC( I ) = CCN( I )
+            END DO
+         END IF
+
 *  If a Frame was supplied, use a clone of the Frame as the "Current
 *  Frame".
       ELSE
          CURFRM = AST_CLONE( IWCS, STATUS )
-      END IF
 
-*  Get the number of axes in the Current Frame.
-      NCAXES = AST_GETI( CURFRM, 'NAXES', STATUS )
+*  Normalize the supplied WCS position.
+         CALL AST_NORM( CURFRM, CC, STATUS )
+
+      END IF
 
 *  See if a good position has been supplied in CC. At the same time,
 *  save the axis labels and symbols for use in messages. Also, form a comma
@@ -249,9 +294,6 @@
 *  If a good position has been supplied in CC we use it as a dynamic
 *  default for the parameter.
       IF( GOOD ) THEN
-
-*  Normalize it.
-         CALL AST_NORM( CURFRM, CC, STATUS )
 
 *  Construct a string holding the default position (a comma separated
 *  list of formatted axis values).
