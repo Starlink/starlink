@@ -128,11 +128,12 @@ smf_is_wvm_usable( const smfHead * hdr, int *status ) {
     0    /* Sentinenl */
   };
 
-  /* Also list date ranges for times the WVM is unusable for extended
-     periods. */
+  /* Also list date ranges (inclusive) for times the WVM is unusable for
+     extended periods. */
   const date_range badwvm_range[] = {
-    {20150401, 20151231}, /* Black WVM installed, unknown if working. */
-    {0, 0},               /* End marker */
+    {20150407, 20150407}, /* Black WVM mirror out of alignment
+                             (see fault 20150407.002). */
+    {0, 0},               /* End marker. */
   };
 
   if (*status != SAI__OK) return 0;
