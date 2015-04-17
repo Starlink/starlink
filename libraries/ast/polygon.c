@@ -66,12 +66,12 @@ f     - AST_OUTLINE<X>: Create a Polygon outlining values in a pixel array
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -3070,24 +3070,33 @@ c     lbnd
 f     LBND( 2 ) = INTEGER (Given)
 c        Pointer to an array of two integers
 f        An array
-*        containing the coordinates of the centre of the first pixel
-*        in the input grid along each dimension.
+*        containing the pixel index of the first pixel in the input grid
+*        along each dimension.
 c     ubnd
 f     UBND( 2) = INTEGER (Given)
 c        Pointer to an array of two integers
 f        An array
-*        containing the coordinates of the centre of the last pixel in
-*        the input grid along each dimension.
+*        containing the pixel index of the last pixel in the input grid
+*        along each dimension.
 *
 c        Note that "lbnd" and "ubnd" together define the shape
 f        Note that LBND and UBND together define the shape
-*        and size of the input grid, its extent along a particular
-c        (j'th) dimension being ubnd[j]-lbnd[j]+1 (assuming the
-c        index "j" to be zero-based). They also define
-f        (J'th) dimension being UBND(J)-LBND(J)+1. They also define
-*        the input grid's coordinate system, each pixel having unit
-*        extent along each dimension with integral coordinate values
-*        at its centre or upper corner, as selected by parameter
+*        and size of the input pixel grid, its extent along a particular
+c        (j'th) dimension being ubnd[j]-lbnd[j]+1 pixels.
+f        (J'th) dimension being UBND(J)-LBND(J)+1 pixels.
+*        For FITS images,
+c        the lbnd values will be 1 and the ubnd
+f        the LBND values will be 1 and the UBND
+*        values will be equal to the NAXISi header values. Other
+*        data systems, such as the Starlink NDF system, allow an
+c        arbitrary pixel origin to be used (i.e. lbnd
+f        arbitrary pixel origin to be used (i.e. LBND
+*        is not necessarily 1).
+*
+*        These bounds also define the input grid's floating point coordinate
+*        system, each pixel having unit extent along each dimension with
+*        integral coordinate values at its centre or upper corner, as selected
+*        by parameter
 c        "starpix".
 f        STARPIX.
 c     maxerr
@@ -3137,7 +3146,7 @@ c     inside
 f     INSIDE( 2 ) = INTEGER (Given)
 c        Pointer to an array of two integers
 f        An array
-*        containing the indices of a pixel known to be inside the
+*        containing the pixel indices of a pixel known to be inside the
 *        required region. This is needed because the supplied data
 *        array may contain several disjoint areas of pixels that satisfy
 *        the criterion specified by
