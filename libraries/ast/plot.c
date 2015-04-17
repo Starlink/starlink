@@ -125,6 +125,7 @@ c     - astGrid: Draw a set of labelled coordinate axes
 c     - astGridLine: Draw a grid line (or axis) for a Plot
 c     - astMark: Draw a set of markers for a Plot
 c     - astPolyCurve: Draw a series of connected geodesic curves
+c     - astRegionOutline: Draw the outline of an AST Region
 c     - astText: Draw a text string for a Plot
 f     - AST_BBUF: Begin a new graphical buffering context
 f     - AST_BORDER: Draw a border around valid regions of a Plot
@@ -141,6 +142,7 @@ f     - AST_GRID: Draw a set of labelled coordinate axes
 f     - AST_GRIDLINE: Draw a grid line (or axis) for a Plot
 f     - AST_MARK: Draw a set of markers for a Plot
 f     - AST_POLYCURVE: Draw a series of connected geodesic curves
+f     - AST_REGIONOUTLINE: Draw the outline of an AST Region
 f     - AST_TEXT: Draw a text string for a Plot
 
 *  Graphical Elements:
@@ -162,8 +164,8 @@ c     - Axis1: Axis line drawn through tick marks on axis 1 using astGrid
 f     - Axis1: Axis line drawn through tick marks on axis 1 using AST_GRID
 c     - Axis2: Axis line drawn through tick marks on axis 2 using astGrid
 f     - Axis2: Axis line drawn through tick marks on axis 2 using AST_GRID
-c     - Border: The Plot border drawn using astBorder or astGrid
-f     - Border: The Plot border drawn using AST_BORDER or AST_GRID
+c     - Border: The Plot border drawn using astBorder, astGrid or astRegionOutline
+f     - Border: The Plot border drawn using AST_BORDER, AST_GRID or AST_REGIONOUTLINE
 c     - Curves: Geodesic curves drawn using astCurve, astGenCurve or astPolyCurve
 f     - Curves: Geodesic curves drawn using AST_CURVE, AST_GENCURVE or AST_POLYCURVE
 c     - Grid: Grid lines drawn using astGridLine or astGrid
@@ -711,6 +713,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *        - Prevent seg fault in PlotLabels caused by accessing
 *        uninitialised "atext" field stored within purged labels.
 *        - Choose a label with non-negative priority as the fall-back root label.
+*     17-APR-2015 (DSB):
+*        Added method astRegionOutline.
 *class--
 */
 
@@ -2225,6 +2229,7 @@ static int Compared( const void *, const void * );
 static int CountGood( int, double *, int * );
 static int Cross( float, float, float, float, float, float, float, float, int * );
 static int CvBrk( AstPlot *, int, double *, double *, double *, int * );
+static int DrawRegion( AstPlot *, AstFrame *, const char *, const char *, int * );
 static int EdgeCrossings( AstPlot *, int, int, double, double *, double **, EdgeCrossingsStatics **, const char *, const char *, int * );
 static int EdgeLabels( AstPlot *, int, TickInfo **, AstPlotCurveData **, int, const char *, const char *, int * );
 static int FindDPTZ( AstFrame *, int, const char *, const char *, int *, int *, int * );
@@ -2248,7 +2253,6 @@ static int IsASkyFrame( AstObject *, int * );
 static int Labelat( AstPlot *, TickInfo **, AstPlotCurveData **, double *, const char *, const char *, int * );
 static int Overlap( AstPlot *, int, int, const char *, float, float, const char *, float, float, float **, const char *, const char *, int * );
 static int PopGat( AstPlot *, float *, const char *, const char *, int * );
-static int RegionOutline( AstPlot *, AstFrame *, const char *, const char *, int * );
 static int TestUseColour( AstPlot *, int, int * );
 static int TestUseFont( AstPlot *, int, int * );
 static int TestUseSize( AstPlot *, int, int * );
@@ -2312,6 +2316,7 @@ static void PlotLabels( AstPlot *, int, AstFrame *, int, LabelList *, char *, in
 static void PolyCurve( AstPlot *, int, int, int, const double *, int * );
 static void PurgeCdata( AstPlotCurveData *, int * );
 static void PushGat( AstPlot *, float, const char *, const char *, int * );
+static void RegionOutline( AstPlot *, AstRegion *, int * );
 static void RemoveFrame( AstFrameSet *, int, int * );
 static void RightVector( AstPlot *, float *, float *, float *, float *, const char *, const char *, int * );
 static void SaveTick( AstPlot *, int, double, double, int, int * );
@@ -4887,7 +4892,7 @@ static int Boundary( AstPlot *this, const char *method, const char *class, int *
 /* If it is a region, we use a special method, if possible, to trace the
    Region boundary. Otherwise, we use a grid tracing method that makes no
    assumptions about the nature of the Mapping or Frame. */
-   if( !RegionOutline( this, cfrm, method, class, status ) ) {
+   if( !DrawRegion( this, cfrm, method, class, status ) ) {
 
 /* Each basic element of the boundary drawn by the following algorithm
    will be drawn at a multiple of 45 degrees to the horizontal. This can
@@ -9473,6 +9478,165 @@ static AstPlotCurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid
 /* Return. */
    return cdata;
 
+}
+
+static int DrawRegion( AstPlot *this, AstFrame *frm, const char *method,
+                       const char *class, int *status ){
+/*
+*
+*  Name:
+*     DrawRegion
+
+*  Purpose:
+*     Draw the outline of a Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int DrawRegion( AstPlot *this, AstFrame *frm, const char *method,
+*                     const char *class, int *status )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     If the current Frame in the supplied Plot is a Region, this function
+*     draws a curve marking the outline of the Region. It returns without
+*     action otherwise.
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     frm
+*        Pointer to the current Frame in the Plot (possibly a Region).
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Non-zero if and only if a Region outline was drawn.
+
+*/
+
+/* Local Variables: */
+   AstMapping *map;        /* Mapping with Region masking included */
+   AstPlotCurveData cdata; /* Stores information about curve breaks */
+   AstRegion **comps;      /* List of component Regions */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
+   double d[ CRV_NPNT ];   /* Offsets to evenly spaced points along curve */
+   double tol;             /* Absolute tolerance value */
+   double x[ CRV_NPNT ];   /* X coords at evenly spaced points along curve */
+   double y[ CRV_NPNT ];   /* Y coords at evenly spaced points along curve */
+   int i;                  /* Loop count */
+   int icomp;              /* Index of component Region */
+   int ncomp;              /* Number of component Regions */
+   int result;             /* The returned value */
+
+/* Initialise */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
+/* Check the current Frame is a Region, and is of a class that implements
+   the astRegTrace method. */
+   if( astIsARegion( frm ) &&
+       astRegTrace( (AstRegion *) frm, 0, NULL, NULL ) ){
+
+/* Set up the externals used to communicate with the Map5 function...
+   The number of axes in the physical coordinate system (i.e. the
+   Region). */
+      Map5_ncoord =  astGetNaxes( frm );
+
+/* A pointer to the Plot, the Region, and the Mapping. */
+      Map5_plot = this;
+      Map5_region = (AstRegion *) frm;
+
+/* Also store a pointer to the Mapping, ensuring that the Mapping does
+   not contain any masking effects from the Region. */
+      map = astGetMapping( this, AST__BASE, AST__CURRENT );
+      Map5_map = astRemoveRegions( map );
+      map = astAnnul( map );
+
+/* Convert the tolerance from relative to absolute graphics coordinates. */
+      tol = astGetTol( this )*MAX( this->xhi - this->xlo,
+                                   this->yhi - this->ylo );
+
+/* Ensure the globals holding the scaling from graphics coords to equally
+   scaled coords are available. */
+      GScales( this, NULL, NULL, method, class, status );
+
+/* Now set up the external variables used by the Crv and CrvLine function. */
+      Crv_scerr = ( astGetLogPlot( this, 0 ) ||
+                    astGetLogPlot( this, 1 ) ) ? 100.0 : 1.5;
+      Crv_ux0 = AST__BAD;
+      Crv_tol = tol;
+      Crv_limit = 0.5*tol*tol;
+      Crv_map = Map5;
+      Crv_ink = 1;
+      Crv_xlo = this->xlo;
+      Crv_xhi = this->xhi;
+      Crv_ylo = this->ylo;
+      Crv_yhi = this->yhi;
+      Crv_out = 1;
+      Crv_xbrk = cdata.xbrk;
+      Crv_ybrk = cdata.ybrk;
+      Crv_vxbrk = cdata.vxbrk;
+      Crv_vybrk = cdata.vybrk;
+      Crv_clip = astGetClip( this ) & 1;
+
+/* Attempt to split the Region into a set of disjoint component Regions. */
+      comps = astRegSplit( (AstRegion *) frm, &ncomp );
+
+/* Draw each one. */
+      for( icomp = 0; icomp < ncomp; icomp++ ) {
+
+/* A pointer to the Region. */
+         Map5_region = comps[ icomp ];
+
+/* Set up a list of points spread evenly over the curve. */
+         for( i = 0; i < CRV_NPNT; i++ ){
+           d[ i ] = ( (double) i)/( (double) CRV_NSEG );
+         }
+
+/* Map these points into graphics coordinates. */
+         Map5( CRV_NPNT, d, x, y, method, class, status GLOBALS_NAME );
+
+/* Use Crv and Map5 to draw the curve. */
+         Crv( this, d, x, y, 0, NULL, NULL, method, class, status );
+
+/* End the current poly line. */
+         Opoly( this, status );
+
+/* Tidy up the static data used by Map5. */
+         Map5( 0, NULL, NULL, NULL, method, class, status GLOBALS_NAME );
+
+/* Annul the component Region pointer. */
+         comps[ icomp ] = astAnnul( Map5_region );
+      }
+
+/* Free the memory holding the list of component Region pointers. */
+      comps = astFree( comps );
+
+/* Annul the Mapping. */
+      Map5_map = astAnnul( Map5_map );
+
+/* Indicate the outline was drawn. */
+      result = 1;
+   }
+
+/* Return. */
+   return result;
 }
 
 static void DrawText( AstPlot *this, int ink, int esc, const char *text,
@@ -19486,6 +19650,7 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name, int *status ) {
    vtab->Mark = Mark;
    vtab->Mirror = Mirror;
    vtab->PolyCurve = PolyCurve;
+   vtab->RegionOutline = RegionOutline;
    vtab->SetGrid = SetGrid;
    vtab->SetTickValues = SetTickValues;
    vtab->SetTol = SetTol;
@@ -24277,163 +24442,104 @@ static void PushGat( AstPlot *this, float rise, const char *method,
    }
 }
 
-static int RegionOutline( AstPlot *this, AstFrame *frm, const char *method,
-                          const char *class, int *status ){
+static void RegionOutline( AstPlot *this, AstRegion *region, int *status ){
 /*
-*
+*++
 *  Name:
-*     RegionOutline
+c     astRegionOutline
+f     AST_RegionOutline
 
 *  Purpose:
-*     Draw the outline of a Region.
+*     Draw the outline of an AST Region.
 
 *  Type:
-*     Private function.
+*     Public virtual function.
 
 *  Synopsis:
-*     #include "plot.h"
-*     int RegionOutline( AstPlot *this, AstFrame *frm, const char *method,
-*                        const char *class, int *status )
+c     #include "plot.h"
+c     void astRegionOutline( AstPlot *this, AstRegion *region )
+f     CALL AST_REGIONOUTLINE( THIS, REGION, STATUS )
 
 *  Class Membership:
-*     Plot member function.
+*     Plot method.
 
 *  Description:
-*     If the current Frame in the supplied Plot is a Region, this function
-*     draws a curve marking the outline of the Region. It returns without
-*     action otherwise.
+*     This function draws an outline around the supplied AST Region object.
+*     xxx
 
 *  Parameters:
-*     this
+c     this
+f     THIS = INTEGER (Given)
 *        Pointer to the Plot.
-*     frm
-*        Pointer to the current Frame in the Plot (possibly a Region).
-*     method
-*        Pointer to a string holding the name of the calling method.
-*        This is only for use in constructing error messages.
-*     class
-*        Pointer to a string holding the name of the supplied object class.
-*        This is only for use in constructing error messages.
-*     status
-*        Pointer to the inherited status variable.
+c     region
+f     REGION = INTEGER (Given)
+*        Pointer to the Region.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
 
-*  Returned Value:
-*     Non-zero if and only if a Region outline was drawn.
-
+*--
 */
-
 /* Local Variables: */
-   AstMapping *map;        /* Mapping with Region masking included */
-   AstPlotCurveData cdata; /* Stores information about curve breaks */
-   AstRegion **comps;      /* List of component Regions */
-   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
-   double d[ CRV_NPNT ];   /* Offsets to evenly spaced points along curve */
-   double tol;             /* Absolute tolerance value */
-   double x[ CRV_NPNT ];   /* X coords at evenly spaced points along curve */
-   double y[ CRV_NPNT ];   /* Y coords at evenly spaced points along curve */
-   int i;                  /* Loop count */
-   int icomp;              /* Index of component Region */
-   int ncomp;              /* Number of component Regions */
-   int result;             /* The returned value */
-
-/* Initialise */
-   result = 0;
+   AstFrameSet *fs;
+   AstMapping *map;
+   const char *class;
+   const char *method;
+   int ibase;
+   int icurr;
 
 /* Check the global error status. */
-   if ( !astOK ) return result;
+   if ( !astOK ) return;
 
-/* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(this);
+/* Store the current method, and the class of the supplied object for use
+   in error messages.*/
+   method = "astRegionOutline";
+   class = astGetClass( this );
 
-/* Check the current Frame is a Region, and is of a class that implements
-   the astRegTrace method. */
-   if( astIsARegion( frm ) &&
-       astRegTrace( (AstRegion *) frm, 0, NULL, NULL ) ){
+/* Save the base Frame index within the Plot, since astConvert will
+   change it. */
+   ibase = astGetBase( this );
 
-/* Set up the externals used to communicate with the Map5 function...
-   The number of axes in the physical coordinate system (i.e. the
-   Region). */
-      Map5_ncoord =  astGetNaxes( frm );
+/* Get the FrameSet that converts from the current Frame of the Plot, to the
+   Frame represented by the Region. Check a conversion was found. */
+   fs = astConvert( this, region, " " );
 
-/* A pointer to the Plot, the Region, and the Mapping. */
-      Map5_plot = this;
-      Map5_region = (AstRegion *) frm;
+/* Re-instate the original base Frame. */
+   astSetBase( this, ibase );
 
-/* Also store a pointer to the Mapping, ensuring that the Mapping does
-   not contain any masking effects from the Region. */
-      map = astGetMapping( this, AST__BASE, AST__CURRENT );
-      Map5_map = astRemoveRegions( map );
-      map = astAnnul( map );
-
-/* Convert the tolerance from relative to absolute graphics coordinates. */
-      tol = astGetTol( this )*MAX( this->xhi - this->xlo,
-                                   this->yhi - this->ylo );
-
-/* Ensure the globals holding the scaling from graphics coords to equally
-   scaled coords are available. */
-      GScales( this, NULL, NULL, method, class, status );
-
-/* Now set up the external variables used by the Crv and CrvLine function. */
-      Crv_scerr = ( astGetLogPlot( this, 0 ) ||
-                    astGetLogPlot( this, 1 ) ) ? 100.0 : 1.5;
-      Crv_ux0 = AST__BAD;
-      Crv_tol = tol;
-      Crv_limit = 0.5*tol*tol;
-      Crv_map = Map5;
-      Crv_ink = 1;
-      Crv_xlo = this->xlo;
-      Crv_xhi = this->xhi;
-      Crv_ylo = this->ylo;
-      Crv_yhi = this->yhi;
-      Crv_out = 1;
-      Crv_xbrk = cdata.xbrk;
-      Crv_ybrk = cdata.ybrk;
-      Crv_vxbrk = cdata.vxbrk;
-      Crv_vybrk = cdata.vybrk;
-      Crv_clip = astGetClip( this ) & 1;
-
-/* Attempt to split the Region into a set of disjoint component Regions. */
-      comps = astRegSplit( (AstRegion *) frm, &ncomp );
-
-/* Draw each one. */
-      for( icomp = 0; icomp < ncomp; icomp++ ) {
-
-/* A pointer to the Region. */
-         Map5_region = comps[ icomp ];
-
-/* Set up a list of points spread evenly over the curve. */
-         for( i = 0; i < CRV_NPNT; i++ ){
-           d[ i ] = ( (double) i)/( (double) CRV_NSEG );
-         }
-
-/* Map these points into graphics coordinates. */
-         Map5( CRV_NPNT, d, x, y, method, class, status GLOBALS_NAME );
-
-/* Use Crv and Map5 to draw the curve. */
-         Crv( this, d, x, y, 0, NULL, NULL, method, class, status );
-
-/* End the current poly line. */
-         Opoly( this, status );
-
-/* Tidy up the static data used by Map5. */
-         Map5( 0, NULL, NULL, NULL, method, class, status GLOBALS_NAME );
-
-/* Annul the component Region pointer. */
-         comps[ icomp ] = astAnnul( Map5_region );
+/* Report an error if the Region could not be mapped into the current
+   Frame of the Plot. */
+   if( !fs ) {
+      if( astOK ) {
+         astError( AST__NOCNV, "%s(%s): Cannot find a mapping from the "
+                   "%d-dimensional Plot coordinate system (%s) to the "
+                   "%d-dimensional Region coordinate system (%s).", status,
+                   method, class, astGetNout( this ), astGetTitle( this ),
+                   astGetNout( region ), astGetTitle( region ) );
       }
 
-/* Free the memory holding the list of component Region pointers. */
-      comps = astFree( comps );
+/* If a transformation from Plot to Region was found... */
+   } else {
 
-/* Annul the Mapping. */
-      Map5_map = astAnnul( Map5_map );
+/* Add the Region as a new Frame into the Plot, connecting it to the
+   current Frame using the FrameSet found above. It becomes the new current
+   Frame. First record the index of the original current Frame since
+   astAddFrame will modify the FrameSet to use a different current Frame. */
+      icurr = astGetCurrent( this );
+      map = astGetMapping( fs, AST__BASE, AST__CURRENT );
+      astAddFrame( this, icurr, map, region );
 
-/* Indicate the outline was drawn. */
-      result = 1;
+/* Draw the outline of the Region (now the current Frame in the Plot). */
+      astBorder( this );
+
+/* Tidy up by removing the Region (i.e. the current Frame) from the Plot and
+   re-instating the original current Frame. */
+      astRemoveFrame( this, AST__CURRENT );
+      astSetCurrent( this, icurr );
+
+/* Free resources. */
+      map = astAnnul( map );
+      fs = astAnnul( fs );
    }
-
-/* Return. */
-   return result;
 }
 
 static void RemoveFrame( AstFrameSet *this_fset, int iframe, int *status ) {
@@ -31660,6 +31766,11 @@ void astPolyCurve_( AstPlot *this, int npoint, int ncoord, int dim,
                     const double *in, int *status ){
    if( !astOK ) return;
    (**astMEMBER(this,Plot,PolyCurve))(this,npoint,ncoord,dim,in, status );
+}
+
+void astRegionOutline_( AstPlot *this, AstRegion *region, int *status ){
+   if( !astOK ) return;
+   (**astMEMBER(this,Plot,RegionOutline))(this,region,status);
 }
 
 void astGrfSet_( AstPlot *this, const char *name, AstGrfFun fun, int *status ){

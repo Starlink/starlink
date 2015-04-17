@@ -202,4 +202,7 @@ MNPCK           <Error in cminpack Levenberg-Marquardt code>
 ! New codes introduced for V8.0.3
 EXSPIX          <Supplied array has too many pixels>
 
+! New codes introduced for V8.0.4
+NOCNV           <No mapping found between coordinate systems>
+
 .END

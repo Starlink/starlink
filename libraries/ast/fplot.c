@@ -25,6 +25,7 @@
 *     AST_MARK
 *     AST_PLOT
 *     AST_POLYCURVE
+*     AST_REGIONOUTLINE
 *     AST_TEXT
 *     AST_GRFSET
 *     AST_GRFPUSH
@@ -293,6 +294,18 @@ F77_SUBROUTINE(ast_polycurve)( INTEGER(THIS),
    astWatchSTATUS(
       astPolyCurve( astI2P( *THIS ), *NPOINT, *NCOORD, *INDIM,
                 (const double *)IN );
+   )
+}
+
+F77_SUBROUTINE(ast_regionoutline)( INTEGER(THIS),
+                                   INTEGER(REGION),
+                                   INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(REGION)
+
+   astAt( "AST_REGIONOUTLINE", NULL, 0 );
+   astWatchSTATUS(
+      astRegionOutline( astI2P( *THIS ), astI2P( *REGION ) );
    )
 }
 

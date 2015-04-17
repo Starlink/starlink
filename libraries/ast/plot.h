@@ -37,12 +37,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -376,6 +376,7 @@ typedef struct AstPlotVtab {
    void (* Mark)( AstPlot *, int, int, int, const double *, int, int * );
    void (* Mirror)( AstPlot *, int, int * );
    void (* PolyCurve)( AstPlot *, int, int, int, const double *, int * );
+   void (* RegionOutline)( AstPlot *, AstRegion *, int * );
    void (* SetTickValues)( AstPlot *, int, int, double *, int, double *, int * );
    void (* Text)( AstPlot *, const char *, const double [], const float [], const char *, int * );
 
@@ -732,6 +733,7 @@ void astInitPlotGlobals_( AstPlotGlobals * );
    void astGrid_( AstPlot *, int * );
    void astMark_( AstPlot *, int, int, int, const double *, int, int * );
    void astPolyCurve_( AstPlot *, int, int, int, const double *, int * );
+   void astRegionOutline_( AstPlot *, AstRegion *, int * );
    void astText_( AstPlot *, const char *, const double [], const float [], const char *, int * );
 
    void astGrfWrapper_( AstPlot *, const char *, AstGrfWrap, int * );
@@ -1014,6 +1016,9 @@ astINVOKE(V,astGenCurve_(astCheckPlot(this),astCheckMapping(map),STATUS_PTR))
 
 #define astPolyCurve(this,npoint,ncoord,dim,in) \
 astINVOKE(V,astPolyCurve_(astCheckPlot(this),npoint,ncoord,dim,in,STATUS_PTR))
+
+#define astRegionOutline(this,region) \
+astINVOKE(V,astRegionOutline_(astCheckPlot(this),astCheckRegion(region),STATUS_PTR))
 
 #define astGrfSet(this,name,fun) \
 astINVOKE(V,astGrfSet_(astCheckPlot(this),name,fun,STATUS_PTR))
