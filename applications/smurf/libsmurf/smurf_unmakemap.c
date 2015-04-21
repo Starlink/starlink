@@ -47,6 +47,14 @@
 *          The angle from the focal plane X axis to the fixed analyser, in
 *          degrees. Measured positive in the same sense as rotation from focal
 *          plane X to focal plane Y. [90.0]
+*     COM = NDF (Read)
+*          A group of existing time series NDFs that supply the
+*          common-mode signal to be added to the output time series data. The
+*          number of NDFs supplied should match the number of NDFs supplied
+*          for parameter REF. Each supplied NDF should be one-dimensional,
+*          with length equal to the length of the time axis of the
+*          corresponding REF cube. No common-mode is added to the data if
+*          null (!) is supplied. [!]
 *     HARMONIC = _INTEGER (Read)
 *          The Q and U values are derived from the fourth harmonic of the
 *          half-wave plate rotation. However, to allow investigation of
@@ -59,6 +67,28 @@
 *     IN = NDF (Read)
 *          The input 2D image of the sky. If NDFs are supplied for the
 *          QIN and UIN parameters, then IN should hold I values.
+*     INSTQ = NDF (Read)
+*          An optional 2D input NDF holding the instrumental normalised Q
+*          value for each bolometer, with respect to the second pixel axis
+*          (i.e. the pixel Y axis). The NDF should have dimensions of
+*          (32,40). The total intensity falling on each bolometer is
+*          multiplied by the corresponding value in this file, to get the
+*          instrumental Q value that is added onto the value read from the
+*          QIN parameter. Bad values are treated as zero values. Note,
+*          if INSTQ is specified, an error is reported if the supplied
+*          template files (see parameter REF) include data for more than
+*          one SCUBA-2 sub-array. [!]
+*     INSTU = NDF (Read)
+*          An optional 2D input NDF holding the instrumental normalised U
+*          value for each bolometer, with respect to the second pixel axis
+*          (i.e. the pixel Y axis). The NDF should have dimensions of
+*          (32,40). The total intensity falling on each bolometer is
+*          multiplied by the corresponding value in this file, to get the
+*          instrumental U value that is added onto the value read from the
+*          UIN parameter. Bad values are treated as zero values. Note,
+*          INSTU is specified, an error is reported if the supplied
+*          template files (see parameter REF) include data for more than
+*          one SCUBA-2 sub-array. [!]
 *     INTERP = LITERAL (Read)
 *          The method to use when resampling the input sky image pixel values.
 *          For details of these schemes, see the descriptions of routines
@@ -181,6 +211,8 @@
 *        Added ADAM parameter HARMONIC.
 *     5-JAN-2015 (DSB):
 *        Added ADAM parameter ALIGNSYS.
+*     15-APR-2015 (DSB):
+*        Added ADAM parameter COM.
 
 *  Copyright:
 *     Copyright (C) 2011 Science and Technology Facilities Council.
@@ -248,6 +280,7 @@ void smurf_unmakemap( int *status ) {
    AstSkyFrame *skyfrm = NULL;/* SkyFrame from the input WCS Frameset */
    Grp *igrp1 = NULL;         /* Group of input sky files */
    Grp *igrp2 = NULL;         /* Group of input template files */
+   Grp *igrpc = NULL;         /* Group of input COM files */
    Grp *igrpq = NULL;         /* Group of input Q  sky files */
    Grp *igrpu = NULL;         /* Group of input U sky files */
    Grp *ogrp = NULL;          /* Group containing output file */
@@ -258,6 +291,7 @@ void smurf_unmakemap( int *status ) {
    dim_t ntslice;             /* Number of time slices in array */
    double *ang_data = NULL;   /* Pointer to the FP orientation angles */
    double *in_data = NULL;    /* Pointer to the input I sky map */
+   double *inc_data = NULL;   /* Pointer to the input COM data */
    double *inq_data = NULL;   /* Pointer to the input Q sky map */
    double *inu_data = NULL;   /* Pointer to the input U sky map */
    double *outq_data = NULL;  /* Pointer to the Q time series data */
@@ -265,29 +299,41 @@ void smurf_unmakemap( int *status ) {
    double *pd;                /* Pointer to next element */
    double *pq = NULL;         /* Pointer to next Q time series value */
    double *pu = NULL;         /* Pointer to next U time series value */
+   double *qinst_data = NULL; /* Pointer to the instrumental Q data */
+   double *uinst_data = NULL; /* Pointer to the instrumental U data */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double params[ 4 ];        /* astResample parameters */
    double sigma;              /* Standard deviation of noise to add to output */
    int alignsys;              /* Align data in the map's system? */
+   int dims[ NDF__MXDIM ];    /* NDF dimensions */
    int flag;                  /* Was the group expression flagged? */
    int harmonic;              /* The requested harmonic */
    int ifile;                 /* Input file index */
    int indf;                  /* Input sky map NDF identifier */
+   int indfc;                 /* Input COM NDF identifier */
    int indfin;                /* Input template cube NDF identifier */
+   int indfiq;                /* Input instrumental Q NDF */
+   int indfiu;                /* Input instrumental U NDF */
    int indfout;               /* Output cube NDF identifier */
    int indfq;                 /* Input Q map NDF identifier */
    int indfu;                 /* Input U map NDF identifier */
    int interp = 0;            /* Pixel interpolation method */
    int moving;                /* Is the telescope base position changing? */
+   int ndim;                  /* Number of pixel axes in NDF */
    int nel;                   /* Number of elements in array */
+   int nelc;                  /* Number of elements in COM array */
    int nelqu;                 /* Number of elements in Q or U array */
    int ngood;                 /* No. of good values in putput cube */
    int nparam = 0;            /* No. of parameters required for interpolation scheme */
    int pasign;                /* Indicates sense of POL_ANG value */
    int sdim[ 2 ];             /* Array of significant pixel axes */
+   int singlesub;             /* Only one subarray allowed? */
    int slbnd[ 2 ];            /* Array of lower bounds of input map */
    int subnd[ 2 ];            /* Array of upper bounds of input map */
+   sc2ast_subarray_t subnum;  /* Identifier for subarray */
+   sc2ast_subarray_t subnum0 = SC2AST__NULLSUB; /* Identifier for subarray */
+   size_t ncom;               /* Number of com files */
    size_t nskymap;            /* Number of supplied sky cubes */
    size_t outsize;            /* Number of files in output group */
    size_t size;               /* Number of files in input group */
@@ -442,6 +488,55 @@ void smurf_unmakemap( int *status ) {
       }
    }
 
+/* Get any common-mode files. */
+   if( *status == SAI__OK ) {
+      kpg1Rgndf( "COM", size, size, "", &igrpc, &ncom, status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+         ncom = 0;
+      }
+   }
+
+/* Get any instrumental polarisation files. */
+   singlesub = 0;
+   if( *status == SAI__OK ) {
+      ndfAssoc( "INSTQ", "Read", &indfiq, status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+         qinst_data = NULL;
+      } else {
+         ndfDim( indfiq, 2, dims, &ndim, status );
+         if( dims[ 0 ] != 32 || dims[ 1 ] != 40 ) {
+            *status = SAI__ERROR;
+            ndfMsg( "N", indfiq );
+            errRep( " ", "Instrumental polarisation file ^N has bad "
+                    "dimensions - should be 32x40.", status );
+         } else {
+            ndfMap( indfiq, "DATA", "_DOUBLE", "READ", (void **) &qinst_data,
+                    &nel, status );
+            singlesub = 1;
+         }
+      }
+
+      ndfAssoc( "INSTU", "Read", &indfiu, status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+         uinst_data = NULL;
+      } else {
+         ndfDim( indfiu, 2, dims, &ndim, status );
+         if( dims[ 0 ] != 32 || dims[ 1 ] != 40 ) {
+            *status = SAI__ERROR;
+            ndfMsg( "N", indfiu );
+            errRep( " ", "Instrumental polarisation file ^N has bad "
+                    "dimensions - should be 32x40.", status );
+         } else {
+            ndfMap( indfiu, "DATA", "_DOUBLE", "READ", (void **) &uinst_data,
+                    &nel, status );
+            singlesub = 1;
+         }
+      }
+   }
+
 /* Loop round all the template time series files. */
    for( ifile = 1; ifile <= (int) size && *status == SAI__OK; ifile++ ) {
 
@@ -486,12 +581,53 @@ void smurf_unmakemap( int *status ) {
          }
       }
 
+/* If instrumental Q/U arrays have been supplied, then all data must
+   refer to a single subarray (since the same instrument Q/U values are used
+   for all data). */
+      if( singlesub ) {
+         smf_find_subarray( odata->hdr, NULL, 0, &subnum, status );
+         if( ifile == 1 ) {
+            subnum0 = subnum;
+         } else if( subnum != subnum0 && *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRep( FUNC_NAME, "Supplied REF data refer to more than one "
+                    "sub-array", status );
+            errRep( FUNC_NAME, "All data must be for one subarray since "
+                    "instrumental polarisation has been specified.", status );
+            break;
+         }
+      }
+
 /* Check the reference time series contains double precision values. */
      smf_dtype_check_fatal( odata, NULL, SMF__DOUBLE, status );
 
 /* Get the total number of data elements, and the number of time slices. */
      smf_get_dims( odata, NULL, NULL, NULL, &ntslice, &ndata, NULL,
                    NULL, status );
+
+/* Open any COM file. */
+      if( ncom ) {
+         ndgNdfas( igrpc, ifile, "READ", &indfc, status );
+         ndfMap( indfc, "DATA", "_DOUBLE", "READ", (void **) &inc_data,
+                 &nelc, status );
+
+/* Check its dimensions. */
+         if( *status == SAI__OK ) {
+            if( nelc != (int) ntslice ) {
+               *status = SAI__ERROR;
+               ndfMsg( "C", indfc );
+               ndfMsg( "R", indfin );
+               msgSeti( "N", nelc );
+               msgSeti( "M", ntslice );
+               errRep( " ", "Supplied COM file (^C) has ^N samples, but "
+                       "the reference NDF (^R) has ^M time-slices.", status );
+            }
+         }
+
+      } else {
+         indfc = NDF__NOID;
+         inc_data = NULL;
+      }
 
 /* Fill the output with bad values. */
       if( *status == SAI__OK ) {
@@ -503,6 +639,9 @@ void smurf_unmakemap( int *status ) {
       smf_resampmap( wf, odata, abskyfrm, skymap, moving, slbnd, subnd,
                      interp, params, sigma, in_data, odata->pntr[ 0 ],
                      NULL, &ngood, status );
+
+/* Add on any COM data. */
+      smf_addcom( wf, odata, inc_data, status );
 
 /* Issue a wrning if there is no good data in the output cube. */
       if( ngood == 0 ) msgOutif( MSG__NORM, " ", "   Output contains no "
@@ -536,6 +675,10 @@ void smurf_unmakemap( int *status ) {
                         interp, params, sigma, inu_data, outu_data,
                         NULL, &ngood, status );
 
+/* Add on any extra Q and U caused by instrumental polarisation. */
+         smf_addinst( wf, odata, qinst_data, outq_data, status );
+         smf_addinst( wf, odata, uinst_data, outu_data, status );
+
 /* Combine these time series with the main output time series so that the
    main output is analysed intensity. */
          smf_uncalc_iqu( wf, odata, odata->pntr[ 0 ], outq_data, outu_data,
@@ -567,6 +710,7 @@ void smurf_unmakemap( int *status ) {
    if( igrp2 != NULL) grpDelet( &igrp2, status);
    if( igrpq != NULL) grpDelet( &igrpq, status);
    if( igrpu != NULL) grpDelet( &igrpu, status);
+   if( igrpc != NULL) grpDelet( &igrpc, status);
    if( ogrp != NULL) grpDelet( &ogrp, status);
 
 /* End the NDF context. */
@@ -582,3 +726,5 @@ void smurf_unmakemap( int *status ) {
       msgOutif(MSG__VERB," ",TASK_NAME " failed.", status);
    }
 }
+
+

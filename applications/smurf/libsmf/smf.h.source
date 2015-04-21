@@ -558,11 +558,17 @@ void smf_add_smu_pcorr( JCMTState *state, int isazel, double dlon,
 
 void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status );
 
+void smf_addinst( ThrWorkForce *wf, smfData *data, const double *inst,
+                  double *values, int *status );
+
 void smf_addmap1( int contchunk, double *map1, double *mapweight1, double *boloweight1,
                   int *hitsmap1, double *mapvar1, smf_qual_t *mapqual1,
                   double *map2, double *boloweight2,
                   int *hitsmap2, double *mapvar2, smf_qual_t *mapqual2,
                   dim_t msize, double chunkweight2, int *status );
+
+void smf_addcom( ThrWorkForce *wf, smfData *data, const double *com,
+                 int *status );
 
 void smf_addto_smfArray( smfArray *ary, smfData *data, int *status );
 

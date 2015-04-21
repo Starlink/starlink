@@ -5782,6 +5782,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter com {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                default !
+                prompt {Common-mode time-series NDFs}
+                helpkey *
+            }
+
             parameter harmonic {
                 type _INTEGER
                 prompt {The half-wave plate harmonic to use}
@@ -5799,6 +5809,26 @@ package @PACKAGE@ {
                 ppath GLOBAL CURRENT
                 association <-GLOBAL.DATA_ARRAY
                 prompt {Input sky map}
+                helpkey *
+            }
+
+            parameter instq {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                default !
+                prompt {Instrumental Q value for each boloemeter}
+                helpkey *
+            }
+
+            parameter instu {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                default !
+                prompt {Instrumental U value for each boloemeter}
                 helpkey *
             }
 

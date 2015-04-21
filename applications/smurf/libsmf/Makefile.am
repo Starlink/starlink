@@ -18,6 +18,8 @@ smf_add_grp_metadata.c \
 smf_add_smu_pcorr.c \
 smf_add_spectral_axis.c \
 smf_addmap1.c \
+smf_addcom.c \
+smf_addinst.c \
 smf_addto_smfArray.c \
 smf_apodize.c \
 smf_apply_dark.c \
