@@ -160,6 +160,8 @@ f     - AST_CURRENTTIME: Return the current system time
 *     17-APR-2015 (DSB):
 *        - Added Centre.
 *        - Remove some "set but unused" variables.
+*     21-APR-2016 (DSB):
+*        - Over-ride astFields.
 *class--
 */
 
@@ -274,6 +276,7 @@ static const char *(* parent_getsymbol)( AstFrame *, int, int * );
 static const char *(* parent_gettitle)( AstFrame *, int * );
 static const char *(* parent_getunit)( AstFrame *, int, int * );
 static double (* parent_getepoch)( AstFrame *, int * );
+static int (* parent_fields)( AstFrame *, int, const char *, const char *, int, char **, int *, double *, int * );
 static int (* parent_match)( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
 static int (* parent_subframe)( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
@@ -366,6 +369,7 @@ static double GetTimeOriginCur( AstTimeFrame *, int * );
 static double ToMJD( AstSystemType, double, int * );
 static double ToUnits( AstTimeFrame *, const char *, double, const char *, int * );
 static int DateFormat( const char *, int *, char *, int * );
+static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double *, int * );
 static int GetActiveUnit( AstFrame *, int * );
 static int MakeTimeMapping( AstTimeFrame *, AstTimeFrame *, AstTimeFrame *, int, AstMapping **, int * );
 static int Match( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
@@ -819,7 +823,7 @@ static int DateFormat( const char *fmt, int *ndp, char *sep, int *status ){
 *        if a time is required as well as a date. A value of -1 will be
 *        returned in no time is required, otherwise the returned value will
 *        equal the number of decimal places required for the seconds field.
-*     ndp
+*     sep
 *        A pointer to a char in which is returned the character that
 *        should be used to separate the date and time fields. Ignored if
 *        NULL.
@@ -853,7 +857,7 @@ static int DateFormat( const char *fmt, int *ndp, char *sep, int *status ){
    required (the interegr following the dot). */
       if( !strncmp( c, "iso", 3 ) ) {
          result = 1;
-         if( sscanf( c, "iso.%d%n", ndp, &nc ) == 1 ) {
+         if( astSscanf( c, "iso.%d%n", ndp, &nc ) == 1 ) {
 
 /* Check the separate character (if any) at the end of the format string.
    Only "T" is allowed. A space is used if no separator is given. */
@@ -1281,6 +1285,297 @@ static const char *DefUnit( AstSystemType system, const char *method,
    return result;
 }
 
+static int Fields( AstFrame *this_frame, int axis, const char *fmt,
+                   const char *str, int maxfld, char **fields,
+                   int *nc, double *val, int *status ) {
+/*
+*  Name:
+*     Fields
+
+*  Purpose:
+*     Identify numerical fields within a formatted Axis value.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     int Fields( AstFrame *this, int axis, const char *fmt,
+*                 const char *str, int maxfld, char **fields,
+*                 int *nc, double *val )
+
+*  Class Membership:
+*     TimeFrame member function (over-rides the astFields protected
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function identifies the numerical fields within a Frame axis
+*     value that has been formatted using astAxisFormat. It assumes that
+*     the value was formatted using the supplied format string. It also
+*     returns the equivalent floating point value.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     axis
+*        The number of the Frame axis for which the values have been
+*        formatted (axis numbering starts at zero for the first axis).
+*     fmt
+*        Pointer to a constant null-terminated string containing the
+*        format used when creating "str".
+*     str
+*        Pointer to a constant null-terminated string containing the
+*        formatted value.
+*     maxfld
+*        The maximum number of fields to identify within "str".
+*     fields
+*        A pointer to an array of at least "maxfld" character pointers.
+*        Each element is returned holding a pointer to the start of the
+*        corresponding field  in "str" (in the order in which they occur
+*        within "str"), or NULL if no corresponding field can be found.
+*     nc
+*        A pointer to an array of at least "maxfld" integers. Each
+*        element is returned holding the number of characters in the
+*        corresponding field, or zero if no corresponding field can be
+*        found.
+*     val
+*        Pointer to a location at which to store the value
+*        equivalent to the returned field values. If this is NULL,
+*        it is ignored.
+
+*  Returned Value:
+*     The number of fields succesfully identified and returned.
+
+*  Notes:
+*     - Leading and trailing spaces are ignored.
+*     - If the formatted value is not consistent with the supplied format
+*     string, then a value of zero will be returned, "fields" will be
+*     returned holding NULLs, "nc" will be returned holding zeros, and
+*     "val" is returned holding VAL__BAD.
+*     - Fields are counted from the start of the formatted string. If the
+*     string contains more than "maxfld" fields, then trailing fields are
+*     ignored.
+*/
+
+/* Local Variables: */
+   AstTimeFrame *this;
+   char *p;
+   int bad;
+   int df;
+   int ifld;
+   int ndp;
+   int result;
+   int state;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the TimeFrame structure. */
+   this = (AstTimeFrame *) this_frame;
+
+/* Validate the axis index. */
+   (void) astValidateAxis( this, axis, 1, "astFields" );
+
+/* Call the method inherited from the parent Frame class, unless the
+   format string indicates date-time formatting. */
+   df = DateFormat( fmt, &ndp, NULL, status );
+   if( !df ) {
+      result = (*parent_fields)( this_frame, axis, fmt, str, maxfld, fields,
+                                 nc, val, status );
+
+/* Now handle date/time formats.... */
+   } else {
+
+/* Initialise. */
+      for( ifld = 0; ifld < maxfld; ifld++ ) {
+         fields[ ifld ] = NULL;
+         nc[ ifld ] = 0;
+      }
+      if( val ) *val = AST__BAD;
+
+/* The formatted string should always include a date in ISO format - three
+   integer fields separated by dashes. Loop round each character until
+   all characters have been read, or the max number of fields have been
+   obtained, or it is shown that the string is badly formatted. */
+      bad = 0;
+      state = 0;
+      ifld = 0;
+      p = (char *) str - 1;
+      while( *(++p)  && ifld < maxfld && !bad ){
+
+/* Looking for the start of the year field. */
+         if( state == 0 ) {
+            if( isdigit( *p ) ) {
+               fields[ ifld ] = p;
+               nc[ ifld ] = 1;
+               state = 1;
+            } else if( !isspace( *p ) ) {
+               bad = 1;
+            }
+
+/* Looking for the end of the year field. */
+         } else if( state == 1 ) {
+            if( isdigit( *p ) ) {
+               nc[ ifld ]++;
+            } else if( *p != '-' ){
+               bad = 1;
+            } else {
+               state = 2;
+               ifld++;
+            }
+
+/* Looking for the start of the month field. */
+         } else if( state == 2 ) {
+            if( isdigit( *p ) ) {
+               fields[ ifld ] = p;
+               nc[ ifld ] = 1;
+               state = 3;
+            } else {
+               bad = 1;
+            }
+
+/* Looking for the end of the month field. */
+         } else if( state == 3 ) {
+            if( isdigit( *p ) ) {
+               nc[ ifld ]++;
+            } else if( *p != '-' ){
+               bad = 1;
+            } else {
+               state = 4;
+               ifld++;
+            }
+
+/* Looking for the start of the day field. */
+         } else if( state == 4 ) {
+            if( isdigit( *p ) ) {
+               fields[ ifld ] = p;
+               nc[ ifld ] = 1;
+               state = 5;
+            } else {
+               bad = 1;
+            }
+
+/* Looking for the end of the day field. */
+         } else if( state == 5 ) {
+            if( isdigit( *p ) ) {
+               nc[ ifld ]++;
+            } else if( *p != ' ' && *p != 'T' ){
+               bad = 1;
+            } else {
+               state = 6;
+               ifld++;
+            }
+
+/* Looking for the start of the hour field. */
+         } else if( state == 6 ) {
+            if( isdigit( *p ) ) {
+               fields[ ifld ] = p;
+               nc[ ifld ] = 1;
+               state = 7;
+            } else {
+               bad = 1;
+            }
+
+/* Looking for the end of the hour field. */
+         } else if( state == 7 ) {
+            if( isdigit( *p ) ) {
+               nc[ ifld ]++;
+            } else if( *p != ':' ){
+               bad = 1;
+            } else {
+               state = 8;
+               ifld++;
+            }
+
+/* Looking for the start of the minute field. */
+         } else if( state == 8 ) {
+            if( isdigit( *p ) ) {
+               fields[ ifld ] = p;
+               nc[ ifld ] = 1;
+               state = 9;
+            } else {
+               bad = 1;
+            }
+
+/* Looking for the end of the minute field. */
+         } else if( state == 9 ) {
+            if( isdigit( *p ) ) {
+               nc[ ifld ]++;
+            } else if( *p != ':' ){
+               bad = 1;
+            } else {
+               state = 10;
+               ifld++;
+            }
+
+/* Looking for the start of the integer part of the seconds field. */
+         } else if( state == 10 ) {
+            if( isdigit( *p ) ) {
+               fields[ ifld ] = p;
+               nc[ ifld ] = 1;
+               state = 11;
+            } else {
+               bad = 1;
+            }
+
+/* Looking for the end of the integer part of the seconds field. */
+         } else if( state == 11 ) {
+            if( isdigit( *p ) ) {
+               nc[ ifld ]++;
+            } else if( *p != '.' ){
+               bad = 1;
+            } else {
+               state = 12;
+               ifld++;
+            }
+
+/* Looking for the start of the decimal part of the seconds field. */
+         } else if( state == 12 ) {
+            if( isdigit( *p ) ) {
+               fields[ ifld ] = p;
+               nc[ ifld ] = 1;
+               state = 13;
+            } else {
+               bad = 1;
+            }
+
+/* Looking for the end of the decimal part of the seconds field. */
+         } else if( state == 13 ) {
+            if( isdigit( *p ) ) {
+               nc[ ifld ]++;
+            } else if( !isspace( *p ) ){
+               bad = 1;
+            }
+
+         } else {
+            bad = 1;
+         }
+      }
+
+/* If he string is badly formatted, return null values. */
+      if( bad ) {
+         result = 0;
+         for( ifld = 0; ifld < maxfld; ifld++ ) {
+            fields[ ifld ] = NULL;
+            nc[ ifld ] = 0;
+         }
+
+/* Otherwise, unformat the string if required. */
+      } else if( val ) {
+         (void) astUnformat( this, axis, str, val );
+      }
+   }
+
+/* If an error occurred, clear the returned value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result. */
+   return result;
+}
+
 static const char *Format( AstFrame *this_frame, int axis, double value, int *status ) {
 /*
 *  Name:
@@ -1541,6 +1836,7 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick, int *
 *     TimeFrame member function (over-rides the astGap protected
 *     method inherited from the Frame class).
 
+*  Description:
 *     This function returns a gap size which produces a nicely spaced
 *     series of formatted values for a Frame axis, the returned gap
 *     size being as close as possible to the supplied target gap
@@ -3158,6 +3454,9 @@ void astInitTimeFrameVtab_(  AstTimeFrameVtab *vtab, const char *name, int *stat
 
    parent_abbrev = frame->Abbrev;
    frame->Abbrev = Abbrev;
+
+   parent_fields = frame->Fields;
+   frame->Fields = Fields;
 
    parent_gap = frame->Gap;
    frame->Gap = Gap;
