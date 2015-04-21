@@ -52,7 +52,7 @@
 *          common-mode signal to be added to the output time series data. The
 *          number of NDFs supplied should match the number of NDFs supplied
 *          for parameter REF. Each supplied NDF should be one-dimensional,
-*          with length equal to the length of the time axis of the
+*          with length at least equal to the length of the time axis of the
 *          corresponding REF cube. No common-mode is added to the data if
 *          null (!) is supplied. [!]
 *     HARMONIC = _INTEGER (Read)
@@ -306,12 +306,14 @@ void smurf_unmakemap( int *status ) {
    double params[ 4 ];        /* astResample parameters */
    double sigma;              /* Standard deviation of noise to add to output */
    int alignsys;              /* Align data in the map's system? */
+   int cdims[ 3 ];            /* Common-mode NDF dimensions */
    int dims[ NDF__MXDIM ];    /* NDF dimensions */
    int flag;                  /* Was the group expression flagged? */
    int harmonic;              /* The requested harmonic */
    int ifile;                 /* Input file index */
    int indf;                  /* Input sky map NDF identifier */
    int indfc;                 /* Input COM NDF identifier */
+   int indfcs;                /* NDF identifier for matching section of COM */
    int indfin;                /* Input template cube NDF identifier */
    int indfiq;                /* Input instrumental Q NDF */
    int indfiu;                /* Input instrumental U NDF */
@@ -319,8 +321,10 @@ void smurf_unmakemap( int *status ) {
    int indfq;                 /* Input Q map NDF identifier */
    int indfu;                 /* Input U map NDF identifier */
    int interp = 0;            /* Pixel interpolation method */
+   int lbndc[ 3 ];            /* Array of lower bounds of COM NDF */
    int moving;                /* Is the telescope base position changing? */
    int ndim;                  /* Number of pixel axes in NDF */
+   int ndimc;                 /* Number of pixel axes in common-mode NDF */
    int nel;                   /* Number of elements in array */
    int nelc;                  /* Number of elements in COM array */
    int nelqu;                 /* Number of elements in Q or U array */
@@ -331,8 +335,9 @@ void smurf_unmakemap( int *status ) {
    int singlesub;             /* Only one subarray allowed? */
    int slbnd[ 2 ];            /* Array of lower bounds of input map */
    int subnd[ 2 ];            /* Array of upper bounds of input map */
-   sc2ast_subarray_t subnum;  /* Identifier for subarray */
+   int ubndc[ 3 ];            /* Array of upper bounds of COM NDF */
    sc2ast_subarray_t subnum0 = SC2AST__NULLSUB; /* Identifier for subarray */
+   sc2ast_subarray_t subnum;  /* Identifier for subarray */
    size_t ncom;               /* Number of com files */
    size_t nskymap;            /* Number of supplied sky cubes */
    size_t outsize;            /* Number of files in output group */
@@ -608,24 +613,58 @@ void smurf_unmakemap( int *status ) {
 /* Open any COM file. */
       if( ncom ) {
          ndgNdfas( igrpc, ifile, "READ", &indfc, status );
-         ndfMap( indfc, "DATA", "_DOUBLE", "READ", (void **) &inc_data,
-                 &nelc, status );
+         ndfDim( indfc, 3, cdims, &ndimc, status );
 
 /* Check its dimensions. */
          if( *status == SAI__OK ) {
-            if( nelc != (int) ntslice ) {
+            if( ndimc == 1 ) {
+               if( cdims[ 0 ] < (int) ntslice ) {
+                  *status = SAI__ERROR;
+                  ndfMsg( "C", indfc );
+                  ndfMsg( "R", indfin );
+                  msgSeti( "N", cdims[ 0 ] );
+                  msgSeti( "M", ntslice );
+                  errRep( " ", "Supplied COM file (^C) has ^N time-slices, but "
+                          "the reference NDF (^R) has ^M time-slices.", status );
+               } else {
+                  ndfBound( indfc, 3, lbndc, ubndc, &ndimc, status );
+                  ubndc[ 0 ] = lbndc[ 0 ] + ntslice - 1;
+                  ndfSect( indfc, 1, lbndc, ubndc, &indfcs, status );
+               }
+            } else if( ndimc == 3 ) {
+               if( cdims[ 0 ] != 1 || cdims[ 1 ] != 1 ) {
+                  *status = SAI__ERROR;
+                  ndfMsg( "C", indfc );
+                  errRep( " ", "Supplied 3D COM file (^C) has bad "
+                          "dimensions for axis 1 and/or 2 (should "
+                          "both be 1 pixel long).", status );
+               } else if( cdims[ 2 ] < (int) ntslice ) {
+                  *status = SAI__ERROR;
+                  ndfMsg( "C", indfc );
+                  ndfMsg( "R", indfin );
+                  msgSeti( "N", cdims[ 2 ] );
+                  msgSeti( "M", ntslice );
+                  errRep( " ", "Supplied COM file (^C) has ^N time-slices, but "
+                          "the reference NDF (^R) has ^M time-slices.", status );
+               } else {
+                  ndfBound( indfc, 3, lbndc, ubndc, &ndimc, status );
+                  ubndc[ 2 ] = lbndc[ 2 ] + ntslice - 1;
+                  ndfSect( indfc, 1, lbndc, ubndc, &indfcs, status );
+               }
+            } else {
                *status = SAI__ERROR;
                ndfMsg( "C", indfc );
-               ndfMsg( "R", indfin );
-               msgSeti( "N", nelc );
-               msgSeti( "M", ntslice );
-               errRep( " ", "Supplied COM file (^C) has ^N samples, but "
-                       "the reference NDF (^R) has ^M time-slices.", status );
+               msgSeti( "N", ndimc );
+               errRep( " ", "Supplied COM file (^C) has ^N dimensions - "
+                       "must be 3.", status );
             }
          }
 
+         ndfMap( indfcs, "DATA", "_DOUBLE", "READ", (void **) &inc_data,
+                 &nelc, status );
+
       } else {
-         indfc = NDF__NOID;
+         indfcs = NDF__NOID;
          inc_data = NULL;
       }
 
