@@ -1,10 +1,26 @@
-1 KAPPA_Version_2.2
+1 KAPPA_Version_2.3
 
    A new release of KAPPA (@PACKAGE_VERSION@) is under development.  The main
    changes are listed below.  For complete details of all
    changes, see the "Release Notes" appendix in SUN/95.
 
+2 Modified_applications
+
+   o  FITSMOD
+
+      -  A missing END header may be appended using the Write mode.
+      Any associated value and/or comment are ignored.  The easiest way
+      to append an END header is with the wrapper FITSWRITE.
+
+
+1 KAPPA_Version_2.2
+
+   A new release of KAPPA is available in Starlink 2015A.  The main
+   changes are listed below.  For complete details of all
+   changes, see the "Release Notes" appendix in SUN/95.
+
 2 Documentation_Changes
+
    - SUN/95 has been upgraded to the new style of documentation.
    Some residual collateral damage to the typesetting is likely to be
    present.

@@ -77,7 +77,7 @@
 *        The maximum number of keywords per FITS card is twenty.  Each
 *        keyword must be no longer than eight characters, and be a valid
 *        FITS keyword comprising alphanumeric characters, hyphen, and
-*        unsderscore.  Any lowercase letters are converted to uppercase
+*        underscore.  Any lowercase letters are converted to uppercase
 *        and blanks are removed before inserted or comparison with the
 *        existing keywords.
 *
@@ -178,12 +178,14 @@
 *     modifiable nor movable: SIMPLE, BITPIX, NAXIS, NAXISn, EXTEND,
 *     PCOUNT, GCOUNT, XTENSION, BLOCKED, and END.  This is because
 *     order in the extension should be fixed and should not be
-*     changed by any routine.
+*     changed by any routine.  There is one exception: an END keyword
+*     may be appended if one does not exist.
 
 *  Copyright:
 *     Copyright (C) 1996, 2000 Central Laboratory of the Research
 *                   Councils.
-*     Copyright (C) 2008, 2009 Science and Technology Facilties Council.
+*     Copyright (C) 2008, 2009, 2011, 2015 Science and Technology
+*                   Facilties Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -224,6 +226,9 @@
 *     22-JUN-2011 (DSB):
 *        Allow read-only operations to be performed without needing
 *        write-access to anything.
+*     2015 April 22 (MJC):
+*        Permit an END keyword to be written at the end if one does not
+*        already exist.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -284,6 +289,7 @@
       PARAMETER ( VALLN = 68 )
 
 *  Local Variables:
+      LOGICAL ADDEND             ! Write an END card requested?
       INTEGER CARD               ! A card number
       INTEGER CCARD              ! Number of reference-comment card
       INTEGER CDELIM             ! Character pointer to a delimiter
@@ -334,6 +340,7 @@
       INTEGER REVOC              ! Reference-value-keyword occurrence
                                  ! number
       REAL RVALUE                ! FITS value
+      LOGICAL TERMIN8            ! Write a persistent END card?
       LOGICAL THERE              ! Does the keyword exist?
       INTEGER TMP                ! Temporary card number in chain1
       INTEGER TMP2               ! Temporary card number in chain2
@@ -391,6 +398,7 @@
       DO I = 1, NOCARD
          IF ( FTSCAR( I )( :KEYLEN ) .EQ. 'END' ) ENDCAR = I
       END DO
+      TERMIN8 = .FALSE.
 
 *  If there is a end-card in the original FITS array, the card before
 *  it is the last FITS card.  Allow for the first card to be the END
@@ -471,6 +479,16 @@
             IF ( KEYNAM( :KEYLN ) .EQ.
      :           FTS__REKEY( J )( :FTS__RKLEN( J ) ) ) RESVED = .TRUE.
          END DO
+
+*  Permit one exception to the reserved keywords, namely allow an END
+*  header to terminate the headers if one does not already exist.
+         ADDEND = ( KEYNAM .EQ. 'END' .AND. EDIT .EQ. 'W' ) .AND.
+     :              .NOT. WREND
+         TERMIN8 = ADDEND .OR. TERMIN8
+
+*  Do not need to write the END card.  It has been written if it
+*  didn't xist and will be retained at the end of the edits.
+         IF ( ADDEND ) GOTO 100
 
 *  Cannot modify, move, delete, or write a reserved keyword.  Report a
 *  warning message.  Decrement the card count for a new card that is no
@@ -1294,7 +1312,7 @@
       END IF
 
 *  If there was no END-card originally, remove the END-card that was
-*  added.
-      IF ( .NOT. WREND ) ACTNUM = ACTNUM - 1
+*  added unless its addition had been requested.
+      IF ( .NOT. TERMIN8 ) ACTNUM = ACTNUM - 1
 
       END

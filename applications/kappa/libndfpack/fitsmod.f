@@ -472,7 +472,8 @@
 *  Copyright:
 *     Copyright (C) 1996, 1999-2000, 2004 Central Laboratory of the
 *     Research Councils.
-*     Copyright (C) 2008, 2009 Science and Technology Facilties Council.
+*     Copyright (C) 2008, 2009, 2011, 2015 Science and Technology
+*     Facilties Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -514,6 +515,9 @@
 *        Add Null editing option.
 *     22-JUN-2011 (DSB):
 *        Added READONLY parameter.
+*     2015 April 22 (MJC):
+*        Allow an END header to be written after the other headers if
+*        one does not exist.  It has no associated value or comment.
 *     {enter_further_changes_here}
 
 *-
@@ -891,9 +895,10 @@
          IF ( EDIT .EQ. 'UPDATE' .OR. EDIT .EQ. 'WRITE' .OR.
      :        EDIT .EQ. 'AMEND' ) THEN
 
-*  The value is not needed for certain named comment cards.
+*  The value is not needed for certain named comment cards or the END
+*  card.
             IF ( KEYWRD .NE. 'COMMENT' .AND. KEYWRD .NE. 'HISTORY' .AND.
-     :           KEYWRD .NE. ' ' ) THEN
+     :           KEYWRD .NE. ' ' .AND. KEYWRD .NE. 'END' ) THEN
 
 *  Obtain the value.
                CALL ERR_MARK
@@ -986,26 +991,29 @@
 *  routine.
             COMENT = ' '
 
+*  The comment is not needed for the END card.
+            IF ( KEYWRD .NE. 'END' ) THEN
+
 *  Obtain the comment string.
-            CALL ERR_MARK
-            CALL PAR_GET0C( 'COMMENT', COMENT, STATUS )
+               CALL ERR_MARK
+               CALL PAR_GET0C( 'COMMENT', COMENT, STATUS )
 
 *  A null value means the string is blank, posssibly for a comment card.
 *  insert before at the END card or at the end.
-            IF ( STATUS .EQ. PAR__NULL ) THEN
-               CALL ERR_ANNUL( STATUS )
-               COMENT = ' '
+               IF ( STATUS .EQ. PAR__NULL ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  COMENT = ' '
 
-            ELSE IF ( STATUS .NE. SAI__OK ) THEN
+               ELSE IF ( STATUS .NE. SAI__OK ) THEN
+                  CALL ERR_RLSE
+                  GOTO 999
+               END IF
                CALL ERR_RLSE
-               GOTO 999
-            END IF
-            CALL ERR_RLSE
 
 *   Preserved the comment when making a keyword's value null.
-         ELSE IF ( EDIT .EQ. 'NULL' ) THEN
-            COMENT = '$C'
-
+            ELSE IF ( EDIT .EQ. 'NULL' ) THEN
+               COMENT = '$C'
+            END IF
          END IF
 
 *  Obtain the new keyword.

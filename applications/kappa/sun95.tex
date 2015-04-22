@@ -52777,7 +52777,23 @@ and HDS data types is as follows:
 
 \newpage
 
-\section{\xlabel{se_changes}Release Notes---V2.2\label{se:changes}}
+\section{\xlabel{se_changes}Release Notes---V2.3\label{se:changes}}
+
+\subsection{Modified Commands}
+The following applications have been modified:
+\begin{description}[style=nextline]
+
+   \item [\htmlref{FITSMOD}{FITSMOD}]\mbox{}
+      \begin{itemize}
+        \item A missing END header may be appended using the Write mode.
+        Any associated value and/or comment are ignored.  The easiest way
+        to append an END header is with the wrapper
+        \htmlref{FITSWRITE}{FITSWRITE}.
+      \end{itemize}
+
+\end{description}
+
+\section{Release Notes---V2.2}
 
 \subsubsection{Documentation Changes}
 \begin{itemize}
