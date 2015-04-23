@@ -228,7 +228,7 @@
 *  Copyright:
 *     Copyright (C) 2002, 2004 Central Laboratory of the Research
 *     Councils.
-*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     Copyright (C) 2012, 2015 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -270,7 +270,9 @@
 *     2012 May 9 (MJC):
 *        Add _INT64 support.
 *     30-AUG-2012 (DSB):
-*        Added paremeter CONSERVE.
+*        Added parameter CONSERVE.
+*     2015 April 23 (MJC):
+*        Propagate the UNITS component as documented.
 *     {enter_further_changes_here}
 
 *-
@@ -640,7 +642,7 @@
       END IF
 
 *  Create a new NDF by propagation from the input one.
-      CALL LPG_PROP( NDFI, 'AXIS', 'OUT', NDFO, STATUS )
+      CALL LPG_PROP( NDFI, 'AXIS,UNITS', 'OUT', NDFO, STATUS )
 
 *  Get a title from the parameter system.
       CALL NDF_CINP( 'TITLE', NDFO, 'TITLE', STATUS )
