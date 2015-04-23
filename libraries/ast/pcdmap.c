@@ -57,12 +57,12 @@ f     The PcdMap class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -80,6 +80,15 @@ f     The PcdMap class does not define any new routines beyond those
 *        method.
 *     23-AUG-2006 (DSB):
 *        Override astEqual.
+*     23-APR-2015 (DSB):
+*        Improve MapMerge. If a PcdMap can merge with its next-but-one
+*        neighbour, then swap the PcdMap with its neighbour, so that
+*        it is then next its next-but-one neighbour, and then merge the
+*        two Mappings into a single Mapping. Previously, only the swap
+*        was performed - not the merger. And the swap was only performed
+*        if the intervening neighbour could not itself merge. This could
+*        result in an infinite simplification loop, which was detected by
+*        CmpMap and and aborted, resulting in no useful simplification.
 *class--
 */
 
@@ -762,7 +771,6 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2, int 
    int invert[ 2 ];          /* Original invert flags */
    int nin;                  /* No. of input coordinates for the PermMap */
    int nout;                 /* No. of output coordinates for the PermMap */
-   int pcdinv;               /* Use inverted PcdMap? */
    int ret;                  /* Returned flag */
 
 /* Check the global error status. */
@@ -788,11 +796,9 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2, int 
       if( !strcmp( class1, "PcdMap" ) ){
          nopcd = map2;
          nopcd_class = class2;
-         pcdinv = inv1;
       } else {
          nopcd = map1;
          nopcd_class = class1;
-         pcdinv = inv2;
       }
 
 /* If the other Mapping is a ZoomMap, the Mappings can be swapped. */
@@ -1362,8 +1368,6 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int ic[2];            /* Copies of supplied invert flags to swap */
    int invert;           /* Should the inverted Mapping be used? */
    int *invlt;           /* New invert flags list pointer */
-   int neighbour;        /* Index of Mapping with which to swap */
-   int nin;              /* Number of coordinates for PcdMap */
    int nmapt;            /* No. of Mappings in list */
    int nstep1;           /* No. of Mappings backwards to next mergable Mapping */
    int nstep2;           /* No. of Mappings forward to next mergable Mapping */
@@ -1379,12 +1383,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Initialise variables to avoid "used of uninitialised variable"
    messages from dumb compilers. */
-   neighbour = 0;
    i1 = 0;
    i2 = 0;
-
-/* Get the number of axes for the PcdMap. */
-   nin = astGetNin( ( *map_list )[ where ] );
 
 /* First of all, see if the PcdMap can be replaced by a simpler Mapping,
    without reference to the neighbouring Mappings in the list.           */
@@ -1575,12 +1575,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                nclass = class1;
                i1 = where - 1;
                i2 = where;
-               neighbour = i1;
             } else if( nstep2 != -1 ){
                nclass = class2;
                i1 = where;
                i2 = where + 1;
-               neighbour = i2;
             } else {
                nclass = NULL;
             }
@@ -1590,42 +1588,37 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    PcdMap closer to the target Mapping. */
             if( nclass ){
 
-/* It is possible that the neighbouring Mapping with which we are about to
-   swap could also merge with the target Mapping. When the neighbouring
-   Mapping is reconsidered it may well swap the pair back to put itself nearer
-   the target Mapping. We need to be careful not to end up in an infinite loop
-   in which the pair of neighbouring Mappings are constantly swapped backwards
-   and forwards as each attempts to put itself closer to the target Mapping.
-   To prevent this, we only swap the pair of Mappings if the neighbouring
-   Mapping could not itself merge with the target Mapping. Check to see
-   if this is the case by attempting to merge the neighbouring Mapping with
-   the target Mapping. */
-               map2 = astClone( (*map_list)[ neighbour ] );
-               nmapt = *nmap - neighbour;
-               maplt = *map_list + neighbour;
-               invlt = *invert_list + neighbour;
-               result = astMapMerge( map2, 0, series, &nmapt, &maplt, &invlt );
-               map2 = astAnnul( map2 );
+/* Swap the Mappings. */
+               if( !strcmp( nclass, "ZoomMap" ) ){
+                  PcdZoom( (*map_list) + i1, (*invert_list) + i1, where - i1, status );
 
-/* If the above call produced a change in the  Mapping list, return the
-   remaining number of mappings.. */
-               if( result != -1 ){
-                  *nmap = nmapt + neighbour;
-
-/* Otherwise, if there was no change in the mapping list, swap the
-   Mappings. */
-               } else {
-
-                  if( !strcmp( nclass, "ZoomMap" ) ){
-                     PcdZoom( (*map_list) + i1, (*invert_list) + i1, where - i1, status );
-
-                  } else if( !strcmp( nclass, "PermMap" ) ){
-                     PcdPerm( (*map_list) + i1, (*invert_list) + i1, where - i1, status );
-                  }
-
-/* Store the index of the first modified Mapping. */
-                  result = i1;
+               } else if( !strcmp( nclass, "PermMap" ) ){
+                  PcdPerm( (*map_list) + i1, (*invert_list) + i1, where - i1, status );
                }
+
+/* And then merge them. */
+               if( where == i1 && where + 1 < *nmap ) {    /* Merging upwards */
+                  map2 = astClone( (*map_list)[ where + 1 ] );
+                  nmapt = *nmap - where - 1;
+                  maplt = *map_list + where + 1;
+                  invlt = *invert_list + where + 1;
+
+                  (void) astMapMerge( map2, 0, series, &nmapt, &maplt, &invlt );
+                  map2 = astAnnul( map2 );
+                  *nmap = where + 1 + nmapt;
+
+               } else if( where - 2 >= 0 ) {               /* Merging downwards */
+                  map2 = astClone( (*map_list)[ where - 2 ] );
+                  nmapt = *nmap - where + 2;
+                  maplt = *map_list + where - 2 ;
+                  invlt = *invert_list + where - 2;
+
+                  (void) astMapMerge( map2, 0, series, &nmapt, &maplt, &invlt );
+                  map2 = astAnnul( map2 );
+                  *nmap = where - 2 + nmapt;
+               }
+
+               result = i1;
 
 /* If there is no Mapping available for merging, it may still be
    advantageous to swap with a neighbour because the swapped Mapping may

@@ -403,6 +403,12 @@ typedef unsigned long long int UINT_BIG;
 #define UINT_BIG "no uint64_t type available"
 #endif
 
+/* Flags defining the meaning of each bit in the "flags" field of the
+   Mapping structure. */
+#if defined(astCLASS)         /* Protected */
+#define AST__ISSIMPLE_FLAG 1  /* Mapping has been simplified */
+#define AST__FROZEN_FLAG 2    /* Mapping cannot be nominated for simplification */
+#endif
 
 
 /* Type Definitions. */
@@ -418,7 +424,7 @@ typedef struct AstMapping {
 
 /* Attributes specific to objects in this class. */
    char invert;                   /* Mapping inverted? */
-   char issimple;                 /* Has Mapping been simplified? */
+   char flags;                    /* Bit-wise flags describing the Mapping */
    int nin;                       /* Number of input coordinates */
    int nout;                      /* Number of output coordinates */
    char report;                   /* Report when converting coordinates? */

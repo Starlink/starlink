@@ -23,6 +23,11 @@ inappropriate tick marks when using formatted dates.
 - A new method called astRegionOutline has been added to the Plot class.
 It draws the outline of a supplied AST Region.
 
+- A bug has been fixed that could cause astSimplfy to enter an infinite loop.
+
+- Some improvements have been made to the Mapping simplification process
+that allow more Mappings to be simplified.
+
 
 Main Changes in V8.0.3
 ----------------------

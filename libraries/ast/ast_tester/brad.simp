@@ -1,21 +1,23 @@
  Begin CmpMap 	# Compound Mapping
     Nin = 3 	# Number of input coordinates
-    IsSimp = 1 	# Mapping has been simplified
+    Invert = 1 	# Mapping inverted
  IsA Mapping 	# Mapping between coordinate systems
-    Series = 0 	# Component Mappings applied in parallel
     MapA = 	# First component Mapping
-       Begin CmpMap 	# Compound Mapping
-          Nin = 1 	# Number of input coordinates
-          Invert = 0 	# Mapping not inverted
+       Begin WinMap 	# Map one window on to another
+          Nin = 3 	# Number of input coordinates
+          IsSimp = 1 	# Mapping has been simplified
        IsA Mapping 	# Mapping between coordinate systems
+          Sft1 = -0.215698 	# Shift for axis 1
+          Scl2 = 5.23598775598299e-06 	# Scale factor for axis 2
+          Scl3 = 5.23598775598299e-06 	# Scale factor for axis 3
+       End WinMap
+    MapB = 	# Second component Mapping
+       Begin CmpMap 	# Compound Mapping
+          Nin = 3 	# Number of input coordinates
+          IsSimp = 1 	# Mapping has been simplified
+       IsA Mapping 	# Mapping between coordinate systems
+          Series = 0 	# Component Mappings applied in parallel
           MapA = 	# First component Mapping
-             Begin WinMap 	# Map one window on to another
-                Nin = 1 	# Number of input coordinates
-                Invert = 0 	# Mapping not inverted
-             IsA Mapping 	# Mapping between coordinate systems
-                Sft1 = -0.215698 	# Shift for axis 1
-             End WinMap
-          MapB = 	# Second component Mapping
              Begin LutMap 	# Map 1-d coordinates using a lookup table
                 Nin = 1 	# Number of input coordinates
                 Invert = 0 	# Mapping not inverted
@@ -36,19 +38,6 @@
                 L10 = 2.37632012367249
                 L11 = 2.48532009124756
              End LutMap
-       End CmpMap
-    MapB = 	# Second component Mapping
-       Begin CmpMap 	# Compound Mapping
-          Nin = 2 	# Number of input coordinates
-          Invert = 0 	# Mapping not inverted
-       IsA Mapping 	# Mapping between coordinate systems
-          MapA = 	# First component Mapping
-             Begin ZoomMap 	# Zoom about the origin
-                Nin = 2 	# Number of input coordinates
-                Invert = 0 	# Mapping not inverted
-             IsA Mapping 	# Mapping between coordinate systems
-                Zoom = 5.23598775598299e-06 	# Zoom factor
-             End ZoomMap
           MapB = 	# Second component Mapping
              Begin WcsMap 	# FITS-WCS sky projection
                 Nin = 2 	# Number of input coordinates

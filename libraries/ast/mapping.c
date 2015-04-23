@@ -370,6 +370,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     23-OCT-2014 (DSB):
 *        Report an error if arrays have too many pixels to count in a 32
 *        bit int (astTranGrid, astResample, astRebin and astRebinSeq).
+*     23-APR-2015 (DSB):
+*        Use one bit of this->flags to store the "IsSimple" attribute
+*        rather using a whole char (this->issimple).
 *class--
 */
 
@@ -22838,7 +22841,7 @@ f     performed with the AST_INVERT routine.
 astMAKE_CLEAR(Mapping,Invert,invert,CHAR_MAX)
 astMAKE_GET(Mapping,Invert,int,0,( ( this->invert == CHAR_MAX ) ?
                                    0 : this->invert ))
-astMAKE_SET(Mapping,Invert,int,invert,( this->issimple=0,(value!=0) ))
+astMAKE_SET(Mapping,Invert,int,invert,( (this->flags&=~AST__ISSIMPLE_FLAG),(value!=0) ))
 astMAKE_TEST(Mapping,Invert,( this->invert != CHAR_MAX ))
 
 /*
@@ -22925,7 +22928,7 @@ f     AST_SIMPLIFY
 
 *att--
 */
-astMAKE_GET(Mapping,IsSimple,int,0,this->issimple)
+astMAKE_GET(Mapping,IsSimple,int,0,((this->flags)&AST__ISSIMPLE_FLAG))
 
 /*
 *att++
@@ -23525,7 +23528,7 @@ AstMapping *astInitMapping_( void *mem, size_t size, int init,
 /* Initialise other attributes to their undefined values. */
       new->invert = CHAR_MAX;
       new->report = CHAR_MAX;
-      new->issimple = 0;
+      new->flags = 0;
 
 /* If an error occurred, clean up by deleting the new object. */
       if ( !astOK ) new = astDelete( new );
@@ -23662,6 +23665,9 @@ AstMapping *astLoadMapping_( void *mem, size_t size,
    obtained, we then use the appropriate (private) Set... member
    function to validate and set the value properly. */
 
+/* Initialise bitwise flags to zero. */
+      new->flags = 0;
+
 /* Nin. */
 /* ---- */
       new->nin = astReadInt( channel, "nin", 0 );
@@ -23679,7 +23685,7 @@ AstMapping *astLoadMapping_( void *mem, size_t size,
 
 /* IsSimple. */
 /* --------- */
-      new->issimple = astReadInt( channel, "issimp", 0 );
+      if( astReadInt( channel, "issimp", 0 ) ) new->flags |= AST__ISSIMPLE_FLAG;
 
 /* TranForward. */
 /* ------------ */
@@ -23925,7 +23931,7 @@ AstMapping *astSimplify_( AstMapping *this, int *status ) {
    if ( !astOK ) return NULL;
    if( !astGetIsSimple( this ) && !astDoNotSimplify( this ) ) {
       result = (**astMEMBER(this,Mapping,Simplify))( this, status );
-      if( result ) result->issimple = 1; /* Indicate simplification has been done */
+      if( result ) result->flags |= AST__ISSIMPLE_FLAG; /* Indicate simplification has been done */
    } else {
       result = astClone( this );
    }

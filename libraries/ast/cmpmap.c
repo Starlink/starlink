@@ -47,12 +47,12 @@ f     The CmpMap class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -147,8 +147,11 @@ f     The CmpMap class does not define any new routines beyond those
 *        Take account of Invert flags when combining parallel CmpMaps in
 *        series.
 *     29-APR-2013 (DSB):
-*        In MapList, use the astDoNotSimplify method to check that it is 
+*        In MapList, use the astDoNotSimplify method to check that it is
 *        OK to expand the CmpMap.
+*     23-APR-2015 (DSB):
+*        In Simplify, prevent mappings that are known to cause infinite
+*        loops from being nominated for simplification.
 *class--
 */
 
@@ -3417,6 +3420,16 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    simpler = astMapList( this_mapping, this->series, astGetInvert( this ), &nmap,
                          &map_list, &invert_list );
 
+/* Each Mapping has a flag that indicates if the mapping is frozen (i.e. cannot
+   be nominated for simplification). Mappings become frozen if nominating them
+   would create an infinite loop in which neighbouring mappings argue as to
+   their form. Freezing a mapping prevents the frozen mapping contributing any
+   further to the argument, so the other Mapping "wins" the argument.
+   Ensure no Mappings are frozen to begin with. */
+   for( i = 0; i < nmap; i++ ) {
+      map_list[ i ]->flags &= ~AST__FROZEN_FLAG;
+   }
+
 /* Initialise pointers to memory used to hold lists of the modified
    Mapping index and the number of mappings after each call of
    astMapMerge. */
@@ -3433,6 +3446,14 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
       nominated = 0;
       while ( astOK && ( nominated < nmap ) ) {
 
+/* If the current nominated mapping has been frozen, then we do not allow
+   it to suggest changes to the mapping sequence. Instead, just increment
+   the index of the next mapping to be checked and continue on to the next
+   pass round the while loop. */
+         if( map_list[ nominated ]->flags & AST__FROZEN_FLAG ) {
+            nominated++;
+            continue;
+         }
 
 /* Clone a pointer to the nominated Mapping and attempt to merge it
    with its neighbours. Annul the cloned pointer afterwards. */
@@ -3470,8 +3491,14 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
                if( ( wlen2 % wlen1 ) != 0 ) wlen1 = 0;
             }
 
-/* Ignore the simplication if a repeating pattern is occurring. */
-            if( wlen1 == 0 ) {
+/* If a repeating pattern is occurring, set the frozen flag in order to
+   prevent the modified mapping from being modified any more. */
+            if( wlen1 > 0 ) {
+               map_list[ modified ]->flags |= AST__FROZEN_FLAG;
+
+/* Otherwise, indicate we have improved the mapping and go round to test
+   the next nominated mapping. */
+            } else {
                improved = 1;
                simpler = 1;
 
@@ -3485,8 +3512,8 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    }
 
 /* Free resources */
-   if( mlist ) mlist = astFree( mlist );
-   if( nlist ) nlist = astFree( nlist );
+   mlist = astFree( mlist );
+   nlist = astFree( nlist );
 
 /* Construct the output Mapping. */
 /* ============================= */
