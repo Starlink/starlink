@@ -37,6 +37,11 @@ flagslow = 0
 order = 0
 spikethresh = 5
 
+#  Do not mask noisy bolometers since the noise is calculated in the 2-10
+# Hz band, which includes 8Hz and 4Hz !
+noisecliphigh=0
+
+
 #  CALCQU specific parameters:
 
 
