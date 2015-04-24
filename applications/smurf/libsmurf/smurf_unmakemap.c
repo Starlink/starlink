@@ -649,7 +649,7 @@ void smurf_unmakemap( int *status ) {
                } else {
                   ndfBound( indfc, 3, lbndc, ubndc, &ndimc, status );
                   ubndc[ 2 ] = lbndc[ 2 ] + ntslice - 1;
-                  ndfSect( indfc, 1, lbndc, ubndc, &indfcs, status );
+                  ndfSect( indfc, 3, lbndc, ubndc, &indfcs, status );
                }
             } else {
                *status = SAI__ERROR;
