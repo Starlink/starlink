@@ -198,6 +198,19 @@ c      call ast_activememory( 'testregions' )
       frm2 = ast_specframe( 'Unit=Angstrom', status )
       frm3 = ast_cmpframe( frm1, frm2, ' ', status )
 
+      if( ast_getc( frm1, 'InternalUnit(1)', status ) .ne. 'rad' )
+     :    call stopit( status, 'InternalUnit 1' )
+      if( ast_getc( frm1, 'InternalUnit(2)', status ) .ne. 'rad' )
+     :    call stopit( status, 'InternalUnit 2' )
+      if( ast_getc( frm2, 'InternalUnit(1)', status ) .ne. 'Angstrom' )
+     :    call stopit( status, 'InternalUnit 3' )
+      if( ast_getc( frm3, 'InternalUnit(1)', status ) .ne. 'rad' )
+     :    call stopit( status, 'InternalUnit 4' )
+      if( ast_getc( frm3, 'InternalUnit(2)', status ) .ne. 'rad' )
+     :    call stopit( status, 'InternalUnit 5' )
+      if( ast_getc( frm3, 'InternalUnit(3)', status ) .ne. 'Angstrom' )
+     :    call stopit( status, 'InternalUnit 6' )
+
       lbnd( 1 ) = AST__BAD
       lbnd( 2 ) = AST__BAD
       lbnd( 3 ) = 5000.0

@@ -7584,7 +7584,7 @@ When it is first created, a SkyFrame's axes are always in the order
 astPermAxes function (\secref{ss:permutingaxes}). The order of the axes
 can be determined at any time using the LatAxis and LonAxis attributes. A
 SkyFrame's coordinate values are always stored as angles in (double
-precision) radians, regardless of the setting of the Unit attribute.
+precision) radians, regardless of the setting of the Unit attribute
 c-
 f+
 When it is first created, a SkyFrame's axes are always in the order
@@ -7592,8 +7592,12 @@ When it is first created, a SkyFrame's axes are always in the order
 AST\_PERMAXES routine (\secref{ss:permutingaxes}). The order of the axes
 can be determined at any time using the LatAxis and LonAxis attributes. A
 SkyFrame's coordinate values are always stored as angles in (double
-precision) radians, regardless of the setting of the Unit attribute.
+precision) radians, regardless of the setting of the Unit attribute
 f-
+\footnote{The units used for the internal floating-point representation of an
+axis value can be determined by examining the InternalUnit attribute of
+the Frame. For most Frames, the Unit and InternalUnit attributes will be
+equal, but InternalUnit is always set to ``\texttt{rad}'' for SkyFrames.}.
 
 \subsection{Creating a SkyFrame}
 
@@ -21552,6 +21556,15 @@ Region.
 
 \item Some improvements have been made to the Mapping simplification process
 that allow more Mappings to be simplified.
+
+\item The Frame class has a new read-only attribute called InternalUnit,
+which gives the units used for the unformatted (i.e. floating-point) axis
+values used internally by application code. For most Frames, the
+InternalUnit value is just the same as the Unit value (i.e. formatted and
+unformatted axis values use the same units). However, the SkyFrame class
+always returns ``\texttt{rad}'' for InternalUnit, regardless of the value of
+Unit, indicating that floating-point SkyFrame axis values are always in units
+of radians.
 
 \end{enumerate}
 

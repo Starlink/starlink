@@ -44,12 +44,13 @@ f     AST_FRAME
 *     - Dut1: Difference between the UT1 and UTC timescale
 *     - Epoch: Epoch of observation
 *     - Format(axis): Format specification for axis values
+*     - InternalUnit(axis): Physical units for unformated axis values
 *     - Label(axis): Axis label
 *     - MatchEnd: Match trailing axes?
 *     - MaxAxes: Maximum number of Frame axes to match
 *     - MinAxes: Minimum number of Frame axes to match
 *     - Naxes: Number of Frame axes
-*     - NormUnit(axis): Normalised axis physical units
+*     - NormUnit(axis): Normalised physical units for formatted axis values
 *     - ObsAlt: Geodetic altitude of observer
 *     - ObsLat: Geodetic latitude of observer
 *     - ObsLon: Geodetic longitude of observer
@@ -59,7 +60,7 @@ f     AST_FRAME
 *     - System: Coordinate system used to describe the domain
 *     - Title: Frame title
 *     - Top(axis): Highest axis value to display
-*     - Unit(axis): Axis physical units
+*     - Unit(axis): Physical units for formatted axis values
 
 *  Functions:
 c     In addition to those functions applicable to all Mappings, the
@@ -282,6 +283,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        sign is encountered.
 *     17-APR-2015 (DSB):
 *        Added astCentre.
+*     27-APR-2015 (DSB):
+*        Added read-only attribute InternalUnit.
 *class--
 */
 
@@ -823,6 +826,7 @@ static const char *GetDefaultSymbol( AstFrame *, int, int * );
 static const char *GetDefaultTitle( AstFrame *, int * );
 static const char *GetDomain( AstFrame *, int * );
 static const char *GetFormat( AstFrame *, int, int * );
+static const char *GetInternalUnit( AstFrame *, int, int * );
 static const char *GetLabel( AstFrame *, int, int * );
 static const char *GetNormUnit( AstFrame *, int, int * );
 static const char *GetSymbol( AstFrame *, int, int * );
@@ -2217,7 +2221,8 @@ L1:
 /* Test if the attribute name matches any of the read-only attributes
    of this class. If it does, then report an error. */
    } else if ( !strcmp( attrib, "naxes" ) ||
-               !strncmp( attrib, "normunit", 8 ) ) {
+               !strncmp( attrib, "normunit", 8 ) ||
+               !strncmp( attrib, "internalunit", 12 ) ) {
       astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
                 "value for a %s.", status, attrib, astGetClass( this ) );
       astError( AST__NOWRT, "This is a read-only attribute." , status);
@@ -4917,6 +4922,13 @@ L1:
                && ( nc >= len ) ) {
       result = astGetNormUnit( this, axis - 1 );
 
+/* InternalUnit(axis). */
+/* --------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "internalunit(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      result = astGetInternalUnit( this, axis - 1 );
+
 /* ObsLat. */
 /* ------- */
    } else if ( !strcmp( attrib, "obslat" ) ) {
@@ -5907,6 +5919,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
    vtab->GetSymbol = GetSymbol;
    vtab->GetTitle = GetTitle;
    vtab->GetUnit = GetUnit;
+   vtab->GetInternalUnit = GetInternalUnit;
    vtab->GetNormUnit = GetNormUnit;
    vtab->Intersect = Intersect;
    vtab->IsUnitFrame = IsUnitFrame;
@@ -9852,7 +9865,8 @@ L1:
 /* Use this macro to report an error if a read-only attribute has been
    specified. */
    } else if ( MATCH( "naxes" ) ||
-               !strncmp( setting, "normunit", 8 ) ) {
+               !strncmp( setting, "normunit", 8 ) ||
+               !strncmp( setting, "internalunit", 12 ) ) {
       astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.", status,
                 setting, astGetClass( this ) );
       astError( AST__NOWRT, "This is a read-only attribute." , status);
@@ -10987,7 +11001,8 @@ L1:
 /* Test if the attribute name matches any of the read-only attributes
    of this class. If it does, then return zero. */
    } else if ( !strcmp( attrib, "naxes" ) ||
-               !strncmp( attrib, "normunit", 8 ) ) {
+               !strncmp( attrib, "normunit", 8 ) ||
+               !strncmp( attrib, "internalunit", 12 ) ) {
       result = 0;
 
 /* Other axis attributes. */
@@ -12312,7 +12327,7 @@ MAKE_TEST(Symbol)
 *     Unit(axis)
 
 *  Purpose:
-*     Axis physical units.
+*     Physical units for formatted axis values
 
 *  Type:
 *     Public attribute.
@@ -12322,9 +12337,10 @@ MAKE_TEST(Symbol)
 
 *  Description:
 *     This attribute contains a textual representation of the physical
-*     units used to represent coordinate values on a particular axis
-c     of a Frame. The astSetActiveUnit function controls how the Unit values
-f     of a Frame. The AST_SETACTIVEUNIT routine controls how the Unit values
+*     units used to represent formatted coordinate values on a particular
+*     axis of a Frame.
+c     The astSetActiveUnit function controls how the Unit values
+f     The AST_SETACTIVEUNIT routine controls how the Unit values
 *     are used.
 
 *  Applicability:
@@ -12350,6 +12366,15 @@ f        the AST_FORMAT function when formatting coordinate values.
 *        its current Frame (as specified by the Current attribute).
 
 *  Notes:
+*     - This attribute described the units used when an axis value is
+*     formatted into a string using
+c     astFormat.
+f     AST_FORMAT.
+*     In some cases these units may be different to those used to represent
+*     floating point axis values within application code (for instance a
+*     SkyFrame always uses radians to represent floating point axis values).
+*     The InternalUnit attribute described the units used for floating
+*     point values.
 *     - When specifying this attribute by name, it should be
 *     subscripted with the number of the Frame axis to which it
 *     applies.
@@ -12366,7 +12391,7 @@ MAKE_TEST(Unit)
 *     NormUnit(axis)
 
 *  Purpose:
-*     Normalised Axis physical units.
+*     Normalised physical units for formatted axis values
 
 *  Type:
 *     Public attribute.
@@ -12393,8 +12418,48 @@ MAKE_TEST(Unit)
 *att--
 */
 /* This simply provides an interface to the Axis methods for accessing
-   the Unit string. */
+   the NormUnit string. */
 MAKE_GET(NormUnit,const char *,NULL,0,0)
+
+/*
+*att++
+*  Name:
+*     InternalUnit(axis)
+
+*  Purpose:
+*     Physical units for unformated axis values
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String, read-only.
+
+*  Description:
+*     This read-only attribute contains a textual representation of the
+*     physical units used to represent unformatted (i.e. floating point)
+*     values on a particular axis of a Frame, typically handled internally
+*     within application code. In most cases, the value of the InternalUnit
+*     attribute will be the same as Unit attribute (i.e. formatted and
+*     unformatted axis values will normally uses the system of units).
+*     The main exception to this is the SkyFrame class, which represents
+*     unformatted axis values in radians, regardless of the current
+*     setting of the Unit attribute.
+
+*  Applicability:
+*     Frame
+*        All Frames have this attribute.
+
+*  Notes:
+*     - When specifying this attribute by name, it should be
+*     subscripted with the number of the Frame axis to which it
+*     applies.
+*att--
+*/
+/* If the Axis structure provides a value for InternalUnit, then use
+   that value. Otherwise, use a default equal to the value of the Unit
+   attribute for the axis. */
+MAKE_GET(InternalUnit,const char *,NULL,1,astGetUnit(this,axis))
 
 /* Implement member functions to access the attributes associated with
    the Frame as a whole using the macros defined for this purpose in

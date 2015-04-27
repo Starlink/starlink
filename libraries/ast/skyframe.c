@@ -29,6 +29,13 @@ f     AST_SKYFRAME
 *     radians. These may be formatted in more conventional ways for
 c     display by using astFormat.
 f     display by using AST_FORMAT.
+*     For a SkyFrame, the Unit attribute describes the formatted value of
+*     a SkyFrame axis, and may for instance be "h:m:s", indicating that a
+*     formatted axis value contains colon-separated fields for hours, minutes
+*     and seconds. On the other hand, the InternalUnit attribute for a
+*     SkyFrame is always set to "rad" (i.e. radians), indicating that the
+*     unformatted (i.e. floating point) axis values used by application code
+*     are always in units of radians
 
 *  Inheritance:
 *     The SkyFrame class inherits from the Frame class.
@@ -74,12 +81,12 @@ f     - AST_SKYOFFSETMAP: Obtain a Mapping from absolute to offset coordinates
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -331,7 +338,7 @@ f     - AST_SKYOFFSETMAP: Obtain a Mapping from absolute to offset coordinates
 *        cause occasional problems where an AST pointer would became
 *        invalid for no apparent reason.
 *     21-FEB-2014 (DSB):
-*        Rounding errors in the SkyLineDef constructor could result in the line 
+*        Rounding errors in the SkyLineDef constructor could result in the line
 *        between coincident points being given a non-zero length.
 *class--
 */

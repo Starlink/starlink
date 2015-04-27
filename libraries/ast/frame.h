@@ -538,6 +538,8 @@
 *        Added ObsAlt attribute.
 *     17-APR-2015 (DSB):
 *        Added astCentre.
+*     27-APR-2015 (DSB):
+*        Added InternalUnit attribute.
 *-
 */
 
@@ -677,6 +679,7 @@ typedef struct AstFrameVtab {
    const char *(* GetLabel)( AstFrame *, int, int * );
    const char *(* GetSymbol)( AstFrame *, int, int * );
    const char *(* GetTitle)( AstFrame *, int * );
+   const char *(* GetInternalUnit)( AstFrame *, int, int * );
    const char *(* GetNormUnit)( AstFrame *, int, int * );
    const char *(* GetUnit)( AstFrame *, int, int * );
    const int *(* GetPerm)( AstFrame *, int * );
@@ -934,6 +937,7 @@ const char *astGetLabel_( AstFrame *, int, int * );
 const char *astGetSymbol_( AstFrame *, int, int * );
 const char *astGetTitle_( AstFrame *, int * );
 const char *astGetUnit_( AstFrame *, int, int * );
+const char *astGetInternalUnit_( AstFrame *, int, int * );
 const char *astGetNormUnit_( AstFrame *, int, int * );
 const int *astGetPerm_( AstFrame *, int * );
 double astCentre_( AstFrame *, int, double, double, int * );
@@ -1245,6 +1249,8 @@ astINVOKE(V,astGetTitle_(astCheckFrame(this),STATUS_PTR))
 astINVOKE(V,astGetUnit_(astCheckFrame(this),axis,STATUS_PTR))
 #define astGetNormUnit(this,axis) \
 astINVOKE(V,astGetNormUnit_(astCheckFrame(this),axis,STATUS_PTR))
+#define astGetInternalUnit(this,axis) \
+astINVOKE(V,astGetInternalUnit_(astCheckFrame(this),axis,STATUS_PTR))
 #define astMatch(template,target,matchsub,template_axes,target_axes,map,result) \
 astINVOKE(V,astMatch_(astCheckFrame(template),astCheckFrame(target),matchsub,template_axes,target_axes,(AstMapping **)(map),(AstFrame **)(result),STATUS_PTR))
 #define astIsUnitFrame(this) \

@@ -201,6 +201,7 @@ static const char *GetAxisFormat( AstAxis *, int * );
 static const char *GetAxisLabel( AstAxis *, int * );
 static const char *GetAxisSymbol( AstAxis *, int * );
 static const char *GetAxisUnit( AstAxis *, int * );
+static const char *GetAxisInternalUnit( AstAxis *, int * );
 static const char *GetAxisNormUnit( AstAxis *, int * );
 static const char *GetDefaultFormat( AstAxis *, int * );
 static char *ParseAxisFormat( const char *, int, int *, int *, int *, int *, int * );
@@ -220,6 +221,7 @@ static int TestAxisFormat( AstAxis *, int * );
 static int TestAxisLabel( AstAxis *, int * );
 static int TestAxisSymbol( AstAxis *, int * );
 static int TestAxisUnit( AstAxis *, int * );
+static int TestAxisInternalUnit( AstAxis *, int * );
 static int TestAxisNormUnit( AstAxis *, int * );
 static void AxisNorm( AstAxis *, double *, int * );
 static void AxisOverlay( AstAxis *, AstAxis *, int * );
@@ -1405,7 +1407,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 /* --------------------- */
 /* Test if the attribute name matches any of the read-only attributes
    of this class. If it does, then report an error. */
-   } else if ( !strcmp( attrib, "normunit" ) ) {
+   } else if ( !strcmp( attrib, "normunit" ) ||
+               !strcmp( attrib, "internalunit" ) ) {
       astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
                 "value for a %s.", status, attrib, astGetClass( this ) );
       astError( AST__NOWRT, "This is a read-only attribute." , status);
@@ -1415,6 +1418,50 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    } else {
       (*parent_clearattrib)( this_object, attrib, status );
    }
+}
+
+static const char *GetAxisInternalUnit( AstAxis *this, int *status ){
+/*
+*+
+*  Name:
+*     astGetAxisInternalUnit
+
+*  Purpose:
+*     Return the unit string for unformatted Axis values
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "axis.h"
+*     const char *astGetAxisInternalUnit( AstAxis *this ){
+
+*  Class Membership:
+*     Axis method.
+
+*  Description:
+*     This function returns the axis InternalUnit attribute. For basic
+*     axes, the InternalUnit and Unit attributes are the same.
+
+*  Parameters:
+*     this
+*        Pointer to the Axis.
+
+*  Returned Value:
+*     - Pointer to a null-terminated string containing the internal
+*     unit string.
+
+*  Notes:
+*     - The returned pointer points to a static memory buffer. The
+*     contents of this buffer will be over-written on each invocation of
+*     this function. A copy of the returned string should therefore be
+*     taken if it will be needed later.
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+   return astGetAxisUnit( this );
 }
 
 static const char *GetAxisNormUnit( AstAxis *this, int *status ){
@@ -1700,6 +1747,11 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    } else if ( !strcmp( attrib, "normunit" ) ) {
       result = astGetAxisNormUnit( this );
 
+/* InternalUnit. */
+/* ------------- */
+   } else if ( !strcmp( attrib, "internalunit" ) ) {
+      result = astGetAxisInternalUnit( this );
+
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
@@ -1850,6 +1902,7 @@ void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name, int *status ) {
    vtab->GetAxisLabel = GetAxisLabel;
    vtab->GetAxisSymbol = GetAxisSymbol;
    vtab->GetAxisUnit = GetAxisUnit;
+   vtab->GetAxisInternalUnit = GetAxisInternalUnit;
    vtab->GetAxisNormUnit = GetAxisNormUnit;
    vtab->SetAxisDigits = SetAxisDigits;
    vtab->SetAxisDirection = SetAxisDirection;
@@ -1863,6 +1916,7 @@ void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name, int *status ) {
    vtab->TestAxisLabel = TestAxisLabel;
    vtab->TestAxisSymbol = TestAxisSymbol;
    vtab->TestAxisUnit = TestAxisUnit;
+   vtab->TestAxisInternalUnit = TestAxisInternalUnit;
    vtab->TestAxisNormUnit = TestAxisNormUnit;
 
    vtab->ClearAxisTop = ClearAxisTop;
@@ -2264,7 +2318,8 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 
 /* Use this macro to report an error if a read-only attribute has been
    specified. */
-   } else if ( MATCH( "normunit" ) ) {
+   } else if ( MATCH( "normunit" ) ||
+               MATCH( "internalunit" ) ) {
       astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.", status,
                 setting, astGetClass( this ) );
       astError( AST__NOWRT, "This is a read-only attribute." , status);
@@ -2375,6 +2430,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
    } else if ( !strcmp( attrib, "unit" ) ) {
       result = astTestAxisUnit( this );
 
+/* InternalUnit. */
+/* --------- */
+   } else if ( !strcmp( attrib, "internalunit" ) ) {
+      result = astTestAxisInternalUnit( this );
+
 /* NormUnit. */
 /* --------- */
    } else if ( !strcmp( attrib, "normunit" ) ) {
@@ -2388,6 +2448,47 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 
 /* Return the result, */
    return result;
+}
+
+static int TestAxisInternalUnit( AstAxis *this, int *status ){
+/*
+*  Name:
+*     TestAxisInternalUnit
+
+*  Purpose:
+*     Test if a InternalUnit attribute value is set for an Axis.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "axis.h"
+*     int TestAxisInternalUnit( AstAxis *this, int *status )
+
+*  Class Membership:
+*     Axis member function
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate
+*     whether a value has been set for the InternalUnit string.
+
+*  Parameters:
+*     this
+*        Pointer to the Axis.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     One if a value has been set, otherwise zero.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Tell the world that we know what value to use for InternalUnit if and
+   only if a value has been set for Unit. */
+   return astTestAxisUnit( this );
 }
 
 static int TestAxisNormUnit( AstAxis *this, int *status ){
@@ -3323,6 +3424,14 @@ const char *astGetAxisNormUnit_( AstAxis *this, int *status ) {
 int astTestAxisNormUnit_( AstAxis *this, int *status ) {
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Axis,TestAxisNormUnit))( this, status );
+}
+const char *astGetAxisInternalUnit_( AstAxis *this, int *status ) {
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Axis,GetAxisInternalUnit))( this, status );
+}
+int astTestAxisInternalUnit_( AstAxis *this, int *status ) {
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Axis,TestAxisInternalUnit))( this, status );
 }
 
 

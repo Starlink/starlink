@@ -28,6 +28,15 @@ It draws the outline of a supplied AST Region.
 - Some improvements have been made to the Mapping simplification process
 that allow more Mappings to be simplified.
 
+- The Frame class has a new read-only attribute called "InternalUnit",
+which gives the units used for the unformatted (i.e. floating-point) axis
+values used internally by application code. For most Frames, the
+InternalUnit value is just the same as the Unit value (i.e. formatted and
+unformatted axis values use the same units). However, the SkyFrame class
+always returns "rad" for InternalUnit, regardless of the value of Unit,
+indicating that floating-point SkyFrame axis values are always in units
+of radians.
+
 
 Main Changes in V8.0.3
 ----------------------

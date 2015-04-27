@@ -31,12 +31,12 @@ f     only within textual output (e.g. from AST_WRITE).
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -111,6 +111,8 @@ f     only within textual output (e.g. from AST_WRITE).
 *        an exponent.
 *     13-OCT-2011 (DSB):
 *        Use tuning parameters to store graphical delimiters.
+*     27-APR-2015 (DSB):
+*        Added InternalUNit attribute..
 *class--
 */
 
@@ -240,6 +242,7 @@ static const char *AxisFormat( AstAxis *, double, int * );
 static int GetObjSize( AstObject *, int * );
 static const char *GetAttrib( AstObject *, const char *, int * );
 static const char *GetAxisFormat( AstAxis *, int * );
+static const char *GetAxisInternalUnit( AstAxis *, int * );
 static const char *GetAxisLabel( AstAxis *, int * );
 static const char *GetAxisSymbol( AstAxis *, int * );
 static const char *GetAxisUnit( AstAxis *, int * );
@@ -261,6 +264,7 @@ static int GetAxisCentreZero( AstSkyAxis *, int * );
 static int TestAttrib( AstObject *, const char *, int * );
 static int TestAxisAsTime( AstSkyAxis *, int * );
 static int TestAxisFormat( AstAxis *, int * );
+static int TestAxisInternalUnit( AstAxis *, int * );
 static int TestAxisIsLatitude( AstSkyAxis *, int * );
 static int TestAxisCentreZero( AstSkyAxis *, int * );
 static void AxisNorm( AstAxis *, double *, int * );
@@ -2493,6 +2497,49 @@ static double GetAxisBottom( AstAxis *this_axis, int *status ) {
    return result;
 }
 
+static const char *GetAxisInternalUnit( AstAxis *this, int *status ){
+/*
+*  Name:
+*     GetAxisInternalUnit
+
+*  Purpose:
+*     Return the unit string for unformatted Axis values
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "axis.h"
+*     const char *GetAxisInternalUnit( AstAxis *this )
+
+*  Class Membership:
+*     SkyAxis member function (over-rides the astGetAxisInternalUnit method
+*     inherited from the Axis class).
+
+*  Description:
+*     This function returns the axis InternalUnit attribute. For sky
+*     axes, the InternalUnit is always "rad" (radians).
+
+*  Parameters:
+*     this
+*        Pointer to the Axis.
+
+*  Returned Value:
+*     - Pointer to a null-terminated string containing the internal
+*     unit string.
+
+*  Notes:
+*     - The returned pointer points to a static memory buffer. The
+*     contents of this buffer will be over-written on each invocation of
+*     this function. A copy of the returned string should therefore be
+*     taken if it will be needed later.
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+   return "rad";
+}
+
 static double GetAxisTop( AstAxis *this_axis, int *status ) {
 /*
 *  Name:
@@ -3141,6 +3188,8 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name, int *status )
    axis->GetAxisFormat = GetAxisFormat;
    axis->SetAxisFormat = SetAxisFormat;
    axis->TestAxisFormat = TestAxisFormat;
+   axis->GetAxisInternalUnit = GetAxisInternalUnit;
+   axis->TestAxisInternalUnit = TestAxisInternalUnit;
 
 /* Declare the destructor, copy constructor and dump function. */
    astSetDelete( vtab, Delete );
@@ -3652,6 +3701,48 @@ static int TestAxisFormat( AstAxis *this_axis, int *status ) {
 
 /* Return the result. */
    return result;
+}
+
+static int TestAxisInternalUnit( AstAxis *this, int *status ){
+/*
+*  Name:
+*     TestAxisInternalUnit
+
+*  Purpose:
+*     Test if a InternalUnit attribute value is set for an Axis.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "axis.h"
+*     int TestAxisInternalUnit( AstAxis *this, int *status )
+
+*  Class Membership:
+*     SkyAxis member function (over-rides the astTestAxisInternalUnit
+*     protected method inherited from the Axis class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate
+*     whether a value has been set for the InternalUnit string.
+
+*  Parameters:
+*     this
+*        Pointer to the Axis.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     One if a value has been set, otherwise zero.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Tell the world that we know what value to use for InternalUnit (i.e.
+   "rad"). */
+   return 1;
 }
 
 static int AxisUnformat( AstAxis *this_axis, const char *string,

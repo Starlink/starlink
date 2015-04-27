@@ -314,6 +314,7 @@ typedef struct AstAxisVtab {
    const char *(* GetAxisLabel)( AstAxis *, int * );
    const char *(* GetAxisSymbol)( AstAxis *, int * );
    const char *(* GetAxisUnit)( AstAxis *, int * );
+   const char *(* GetAxisInternalUnit)( AstAxis *, int * );
    const char *(* GetAxisNormUnit)( AstAxis *, int * );
    double (* AxisCentre)( AstAxis *, double, double, int * );
    double (* AxisGap)( AstAxis *, double, int *, int * );
@@ -330,6 +331,7 @@ typedef struct AstAxisVtab {
    int (* TestAxisLabel)( AstAxis *, int * );
    int (* TestAxisSymbol)( AstAxis *, int * );
    int (* TestAxisUnit)( AstAxis *, int * );
+   int (* TestAxisInternalUnit)( AstAxis *, int * );
    int (* TestAxisNormUnit)( AstAxis *, int * );
    void (* AxisNorm)( AstAxis *, double *, int * );
    void (* AxisOverlay)( AstAxis *, AstAxis *, int * );
@@ -423,6 +425,7 @@ const char *astGetAxisLabel_( AstAxis *, int * );
 const char *astGetAxisSymbol_( AstAxis *, int * );
 const char *astGetAxisUnit_( AstAxis *, int * );
 const char *astGetAxisNormUnit_( AstAxis *, int * );
+const char *astGetAxisInternalUnit_( AstAxis *, int * );
 double astAxisCentre_( AstAxis *, double, double, int * );
 double astAxisGap_( AstAxis *, double, int *, int * );
 double astAxisDistance_( AstAxis *, double, double, int * );
@@ -438,6 +441,7 @@ int astTestAxisLabel_( AstAxis *, int * );
 int astTestAxisSymbol_( AstAxis *, int * );
 int astTestAxisUnit_( AstAxis *, int * );
 int astTestAxisNormUnit_( AstAxis *, int * );
+int astTestAxisInternalUnit_( AstAxis *, int * );
 void astAxisOverlay_( AstAxis *, AstAxis *, int * );
 void astClearAxisDigits_( AstAxis *, int * );
 void astClearAxisDirection_( AstAxis *, int * );
@@ -558,7 +562,9 @@ astINVOKE(V,astGetAxisSymbol_(astCheckAxis(this),STATUS_PTR))
 #define astGetAxisUnit(this) \
 astINVOKE(V,astGetAxisUnit_(astCheckAxis(this),STATUS_PTR))
 #define astGetAxisNormUnit(this) \
-astINVOKE(V,astGetAxisNormUnit_(astCheckAxis(this),STATUS_PTR))
+astINVOKE(V,astGetAxisInternalUnit_(astCheckAxis(this),STATUS_PTR))
+#define astGetAxisInternalUnit(this) \
+astINVOKE(V,astGetAxisInternalUnit_(astCheckAxis(this),STATUS_PTR))
 #define astSetAxisDigits(this,digits) \
 astINVOKE(V,astSetAxisDigits_(astCheckAxis(this),digits,STATUS_PTR))
 #define astSetAxisDirection(this,direction) \
@@ -585,6 +591,8 @@ astINVOKE(V,astTestAxisSymbol_(astCheckAxis(this),STATUS_PTR))
 astINVOKE(V,astTestAxisUnit_(astCheckAxis(this),STATUS_PTR))
 #define astTestAxisNormUnit(this) \
 astINVOKE(V,astTestAxisNormUnit_(astCheckAxis(this),STATUS_PTR))
+#define astTestAxisInternalUnit(this) \
+astINVOKE(V,astTestAxisInternalUnit_(astCheckAxis(this),STATUS_PTR))
 
 #define astClearAxisTop(this) \
 astINVOKE(V,astClearAxisTop_(astCheckAxis(this),STATUS_PTR))
