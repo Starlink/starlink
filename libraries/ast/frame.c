@@ -12441,7 +12441,7 @@ MAKE_GET(NormUnit,const char *,NULL,0,0)
 *     values on a particular axis of a Frame, typically handled internally
 *     within application code. In most cases, the value of the InternalUnit
 *     attribute will be the same as Unit attribute (i.e. formatted and
-*     unformatted axis values will normally uses the system of units).
+*     unformatted axis values will normally use the same system of units).
 *     The main exception to this is the SkyFrame class, which represents
 *     unformatted axis values in radians, regardless of the current
 *     setting of the Unit attribute.
