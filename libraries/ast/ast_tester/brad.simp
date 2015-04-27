@@ -1,6 +1,7 @@
  Begin CmpMap 	# Compound Mapping
     Nin = 3 	# Number of input coordinates
-    Invert = 1 	# Mapping inverted
+exit
+    IsSimp = 1 	# Mapping has been simplified
  IsA Mapping 	# Mapping between coordinate systems
     MapA = 	# First component Mapping
        Begin WinMap 	# Map one window on to another
