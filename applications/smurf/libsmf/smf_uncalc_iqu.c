@@ -16,7 +16,8 @@
 *     void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, int nel,
 *                          double *idata, double *qdata, double *udata,
 *                          double *angdata, int pasign, double paoff,
-*                          double angrot, int harmonic, int *status );
+*                          double angrot, double amp4, double phase4,
+*                          int harmonic, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -49,6 +50,14 @@
 *        The angle from the focal plane X axis to the fixed analyser, in
 *        radians. Measured positive in the same sense as rotation from focal
 *        plane X to focal plane Y.
+*     amp4 = double (Given)
+*        Ignored if "harmonic" is not 4. It gives the amplitude of the
+*        4Hz signal to include in the returned analysed intensity signal, as
+*        a fraction of the total intensity. This is an alternative to setting
+*        using "harmonic" to 2.
+*     phase4 = double (Given)
+*        Ignored if "harmonic" is not 4. It gives the phase offset for the
+*        4Hz signal to include in the returned Q and U signal, in radians.
 *     harmonic = int  (Given)
 *        The harmonic of the half-wave plate rotation from which the Q
 *        and U values should be derived. This should normally be 4, but
@@ -74,6 +83,8 @@
 *        Added arguments pasign, paoff and angrot.
 *     20-SEP-2013 (DSB):
 *        Added parameter "harmonic".
+*     29-APR-2015 (DSB):
+*        Added arguments amp4 and phase4.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -123,6 +134,8 @@ typedef struct smfUncalcIQUJobData {
    double angfac;
    double angrot;
    double paoff;
+   double amp4;
+   double phase4;
    int ipolcrd;
    int ntslice;
    int old;
@@ -143,8 +156,8 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status );
 
 void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
                      double *qdata, double *udata, double *angdata,
-                     int pasign, double paoff, double angrot, int harmonic,
-                     int *status ){
+                     int pasign, double paoff, double angrot, double amp4,
+                     double phase4, int harmonic, int *status ){
 
 /* Local Variables: */
    const JCMTState *state;    /* JCMTState info for current time slice */
@@ -274,6 +287,8 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
          pdata->paoff = paoff;
          pdata->angrot = angrot;
          pdata->angfac = harmonic/4.0;
+         pdata->amp4 = amp4;
+         pdata->phase4 = phase4;
 
 /* Pass the job to the workforce for execution. */
          thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_uncalc_iqu_job, 0, NULL,
@@ -331,10 +346,13 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    double *ipu;               /* Pointer to supplied U array */
    double *qin;               /* Pointer to Q array for each bolometer*/
    double *uin;               /* Pointer to U array for each bolometer*/
+   double amp4;
+   double phase4;
    double angfac;
    double angle;              /* Phase angle for FFT */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
    double cosval;             /* Cos of twice reference rotation angle */
+   double ival;               /* I  value */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double phi;                /* Angle from fixed analyser to effective analyser */
    double qval;               /* Q value wrt fixed analyser */
@@ -373,6 +391,8 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    paoff = pdata->paoff;
    angrot = pdata->angrot;
    angfac = pdata->angfac;
+   amp4 = pdata->amp4;
+   phase4 = pdata->phase4;
 
 /* Check we have something to do. */
    if( b1 < nbolo ) {
@@ -452,8 +472,16 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    A phi value of zero corresponds to the fixed analyser (i.e. the new Q/U
    reference direction). Allow the angle to be scaled by some user-specified
    factor. This is to allow the investigation of other harmonics. */
-               *iin = 0.5*( (*iin) + qval*cos( 2*phi*angfac ) +
-                                     uval*sin( 2*phi*angfac ) );
+               ival = *iin;
+               *iin = 0.5*( ival + qval*cos( 2*phi*angfac ) +
+                                   uval*sin( 2*phi*angfac ) );
+
+/* If producing the usuall 8Hz harmonic, optionally add in a 4Hz
+   component to the signal. */
+               if( angfac == 1 && amp4 != 0.0 ) {
+                  *iin += amp4*ival*sin( phi + phase4 );
+               }
+
             } else {
                *iin = VAL__BADD;
             }

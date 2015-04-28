@@ -43,6 +43,13 @@
 *          to TRUE will result in the template data being aligned in AZEL
 *          directly, disregarding the fact that a given AZEL will correspond
 *          to different positions on the sky at different times. [FALSE]
+*     AMP4 = _DOUBLE (Read)
+*          Controls the amplitude of the 4 Hz signal in the analysed
+*          intensity streams created in polarimetry mode (see "QIN" and
+*          "UIN"). This parameter is only used if HARMONIC is set to its
+*          default value of 4 (a value of zero is assumed otherwise). It
+*          gives the amplitude of the 4 Hz signal as a fraction of the
+*          total intensity. See also "PHASE4". [0.0]
 *     ANGROT = _DOUBLE (Read)
 *          The angle from the focal plane X axis to the fixed analyser, in
 *          degrees. Measured positive in the same sense as rotation from focal
@@ -168,6 +175,9 @@
 *          to rotation from focal plane X to focal plane Y axis. If FALSE, it
 *          is assumed that a positive POL_ANG value corresponds to rotation
 *          from focal plane Y to focal plane X axis. [TRUE]
+*     PHASE4 = _DOUBLE (Read)
+*          The phase offset to apply to the 4 Hz signal specified via
+*          parameter AMP4, in degrees. [0.0]
 *     QIN = NDF (Read)
 *          The input 2D image of the sky Q values, with respect to the
 *          second pixel axis (i.e. the pixel Y axis). If QIN and UIN are
@@ -213,6 +223,8 @@
 *        Added ADAM parameter ALIGNSYS.
 *     15-APR-2015 (DSB):
 *        Added ADAM parameter COM.
+*     28-APR-2015 (DSB):
+*        Added ADAM parameters AMP4 and PHASE4.
 
 *  Copyright:
 *     Copyright (C) 2011 Science and Technology Facilities Council.
@@ -301,9 +313,11 @@ void smurf_unmakemap( int *status ) {
    double *pu = NULL;         /* Pointer to next U time series value */
    double *qinst_data = NULL; /* Pointer to the instrumental Q data */
    double *uinst_data = NULL; /* Pointer to the instrumental U data */
+   double amp4;               /* Amplitude of 4 Hz signal */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double params[ 4 ];        /* astResample parameters */
+   double phase4;             /* Phase of 4 Hz signal */
    double sigma;              /* Standard deviation of noise to add to output */
    int alignsys;              /* Align data in the map's system? */
    int cdims[ 3 ];            /* Common-mode NDF dimensions */
@@ -701,6 +715,16 @@ void smurf_unmakemap( int *status ) {
 /* Determine the harmonic to use. */
          parGet0i( "HARMONIC", &harmonic, status );
 
+/* If producing the normal 8 Hz harmonic, get the amplitude and phase of a
+   4 Hz signal to add onto the 8 Hz signal. */
+         if( harmonic == 4 ) {
+            parGet0d( "AMP4", &amp4, status );
+            parGet0d( "PHASE4", &phase4, status );
+         } else {
+            amp4 = 0.0;
+            phase4 = 0.0;
+         }
+
 /* Allocate room for an array to hold the anti-clockwise angle from the
    focal plane Y axis to the Y pixel axis in the reference map, at each
    time slice. */
@@ -722,7 +746,7 @@ void smurf_unmakemap( int *status ) {
    main output is analysed intensity. */
          smf_uncalc_iqu( wf, odata, odata->pntr[ 0 ], outq_data, outu_data,
                          ang_data, pasign, AST__DD2R*paoff, AST__DD2R*angrot,
-                         harmonic, status );
+                         amp4, AST__DD2R*phase4, harmonic, status );
 
 /* Release work space. */
          outq_data = astFree( outq_data );

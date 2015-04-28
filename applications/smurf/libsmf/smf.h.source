@@ -1986,8 +1986,8 @@ void smf_tswcsOrder( AstFrameSet **tswcs, int isTordered, int *status );
 
 void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
                      double *qdata, double *udata, double *angdata,
-                     int pasign, double paoff, double angrot, int harmonic,
-                     int *status );
+                     int pasign, double paoff, double angrot, double amp4,
+                     double phase4, int harmonic, int *status );
 
 void smf_update_quality( ThrWorkForce *wf, smfData *data, int syncbad,
                          const int *badmask, smf_qual_t addqual, double badfrac,

@@ -5773,6 +5773,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter amp4 {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                prompt {Amplitude of 4 Hz signal as a fraction of I}
+                default 0.0
+                helpkey *
+            }
+
             parameter angrot {
                 type _DOUBLE
                 vpath DEFAULT
@@ -5875,6 +5884,15 @@ package @PACKAGE@ {
                 ppath CURRENT, DEFAULT
                 prompt {POL_ANG in sense of rotation from focal plane X to Y?}
                 default TRUE
+                helpkey *
+            }
+
+            parameter phase4 {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                prompt {Phase of 4 Hz signal in degrees}
+                default 0.0
                 helpkey *
             }
 
