@@ -16,6 +16,15 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- The behaviour of the astAddFrame method has been changed slightly.
+Previously, astAddFrame modified the FrameSet by storing references to
+the supplied Mapping and Frame objects within the FrameSet. This meant
+that any subsequent changes to the current Frame of the modified FrameSet
+also affected the supplied Frame object. Now, astAddFrame stores deep
+copies of the Mapping and Frame objects (rather than references) within
+the modified FrameSet. This means that subsequent changes to the modified
+FrameSet will now have no effect on the supplied Frame.
+
 - The choice of default tick-mark for time axes has been improved, to avoid
 previous issues which could result in no suitable gap being found, or
 inappropriate tick marks when using formatted dates.

@@ -1,6 +1,5 @@
  Begin CmpMap 	# Compound Mapping
     Nin = 3 	# Number of input coordinates
-exit
     IsSimp = 1 	# Mapping has been simplified
  IsA Mapping 	# Mapping between coordinate systems
     MapA = 	# First component Mapping

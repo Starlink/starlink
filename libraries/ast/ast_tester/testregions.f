@@ -1319,9 +1319,9 @@ c      call ast_activememory( 'testregions' )
      :         call stopit( status, 'map1 is not a Region' )
 
       call ast_setl( fs, 'Negated', .true., status )
-      if( .not. ast_getl( box1, 'Negated', status ) )
+      if( ast_getl( box1, 'Negated', status ) )
      :           call stopit( status,
-     :           'FrameSet Negated attribute not reflected in box1' )
+     :           'FrameSet Negated attribute reflected in box1' )
       call ast_clear( fs, 'Negated', status )
 
       map1 = ast_getmapping( fs, ast__base, ast__current, status )
@@ -2030,6 +2030,8 @@ C
          call stopit( status, 'Box: Error mesh 3' )
       endif
 
+      if( status .ne. SAI__OK ) go to 991
+
       do i = 1, npoint
          if( abs( grid(i,1) - 100 ) .gt. 50.0D0 ) then
              call stopit( status, 'Box: Error mesh 1' )
@@ -2042,6 +2044,8 @@ C
      :                        status )
       if( npoint .ne. 198 )
      :    call stopit( status, 'Box: Error mesh 4' )
+
+      if( status .ne. SAI__OK ) go to 991
 
       do i = 1, npoint
          if( grid(i,1) .ne. 50.0D0 .and. grid(i,1) .ne. 150.0D0 .and.
@@ -2058,6 +2062,8 @@ C
      :                                            'Box: poly simp 1' )
       if( .not. ast_isapolygon( reg1, status) ) call stopit( status,
      :                                            'Box: poly simp 2' )
+
+ 991  continue
 
       call ast_end( status )
       if( status .ne. sai__ok ) write(*,*) 'Box tests failed'

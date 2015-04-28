@@ -21538,6 +21538,21 @@ current version):
 
 \begin{enumerate}
 
+\item The behaviour of the
+c+
+astAddFrame method has been changed slightly. Previously, astAddFrame
+c-
+f+
+AST\_ADDFRAME method has been changed slightly. Previously, AST\_ADDFRAME
+f-
+modified the FrameSet by storing references to the supplied Mapping and
+Frame objects within the FrameSet. This meant that any subsequent changes
+to the current Frame of the modified FrameSet also affected the supplied
+Frame object. Now, deep copies of the Mapping and Frame objects (rather
+than references) are stored within the modified FrameSet. This means that
+subsequent changes to the modified FrameSet will now have no effect on
+the supplied Frame.
+
 \item The choice of default tick-mark gaps for time axes has been
 improved, to avoid a previous issue which could result in no suitable gap
 being found.

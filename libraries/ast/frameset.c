@@ -259,6 +259,11 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *        Domain name.
 *     17-APR-2015 (DSB):
 *        Added Centre.
+*     28-APR-2015 (DSB):
+*        astAdFrame now takes deep copies of the supplied mapping and
+*        frame, rather than just cloning their pointers. So the modified
+*        FrameSet is now independent of the supplied Mapping and Frame
+*        objects.
 *class--
 */
 
@@ -1221,6 +1226,12 @@ f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
 *  Notes:
+*     - Deep copies of the supplied
+c     "mapping" and "frame"
+f     MAPPING and FRAME
+*     objects are stored within the modified FrameSet. So any changes made
+*     to the FrameSet after calling this method will have no effect on the
+*     supplied Mapping and Frame objects.
 *     - A value of AST__BASE or AST__CURRENT may be given for the
 c     "iframe" parameter to specify the base Frame or the current
 f     IFRAME argument to specify the base Frame or the current
@@ -1373,10 +1384,10 @@ f     AST_SIMPLIFY
       this->invert = astGrow( this->invert, this->nnode, sizeof( int ) );
       if ( astOK ) {
 
-/* Clone pointers to the Frame and Mapping supplied and store these pointers
+/* Copy pointers to the Frame and Mapping supplied and store these pointers
    in the FrameSet arrays. */
-         this->frame[ this->nframe ] = astClone( frame );
-         this->map[ this->nnode - 1 ] = astClone( map );
+         this->frame[ this->nframe ] = astCopy( frame );
+         this->map[ this->nnode - 1 ] = astCopy( map );
 
 /* Indicate the Frame does not reflect the variant Mappings of any other
    Frame. */
@@ -1400,7 +1411,7 @@ f     AST_SIMPLIFY
             astSetCurrent( this, this->nframe );
 
 /* If an error occurred while filling the FrameSet's arrays, clear any values
-   that may have been added, annulling any cloned pointers. */
+   that may have been added, annulling any copied pointers. */
          } else {
             this->frame[ this->nframe ] =
                   astAnnul( this->frame[ this->nframe ] );
@@ -1441,7 +1452,7 @@ f     AST_SIMPLIFY
       if ( astOK ) {
          for ( ifr = 1; ifr <= frameset->nframe; ifr++ ) {
             this->frame[ this->nframe + ifr - 1 ] =
-               astClone( frameset->frame[ ifr - 1 ] );
+               astCopy( frameset->frame[ ifr - 1 ] );
             this->node[ this->nframe + ifr - 1 ] =
                frameset->node[ ifr - 1 ] + this->nnode;
             if( frameset->varfrm[ ifr - 1 ] > 0 ) {
@@ -1457,7 +1468,7 @@ f     AST_SIMPLIFY
    numbering. */
          for ( inode = 1; inode < frameset->nnode; inode++ ) {
             this->map[ this->nnode + inode - 1 ] =
-               astClone( frameset->map[ inode - 1 ] );
+               astCopy( frameset->map[ inode - 1 ] );
             this->link[ this->nnode + inode - 1 ] =
                frameset->link[ inode - 1 ] + this->nnode;
             this->invert[ this->nnode + inode - 1 ] =
@@ -1564,7 +1575,7 @@ f     AST_SIMPLIFY
 
 /* Once the necessary links have been re-structured, establish the new
    link that inter-relates the Frames from the two FrameSets. */
-            this->map[ current_node - 1 ] = astClone( map );
+            this->map[ current_node - 1 ] = astCopy( map );
             this->link[ current_node - 1 ] = this->node[ iframe - 1 ];
             this->invert[ current_node - 1 ] = astGetInvert( map );
          }
