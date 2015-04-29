@@ -772,3 +772,12 @@ ast_test_SOURCES = ast_test.c
 #ast_test_LDADD = `ast_link`
 # Expand ast_link to avoid libast_pass2, which causes problems for Solaris
 ast_test_LDADD = @LIBPAL@ libast.la libast_pal.la libast_grf_3.2.la libast_grf_5.6.la libast_grf_2.0.la libast_grf3d.la libast_err.la -lm
+
+#  Need to include latex support files in the distribution tar ball so
+#  that the docs can be built from the tex source files. Requires environment
+#  variable STARLATEXSUPPORT to be deined. Is there a better way to do this?
+dist-hook:
+	cp -p $(STARLATEXSUPPORT)/starlink.cls $(distdir)/
+	cp -p $(STARLATEXSUPPORT)/starabbrev.sty $(distdir)/
+	cp -p $(STARLATEXSUPPORT)/starstyle.sty $(distdir)/
+	cp -p $(STARLATEXSUPPORT)/sst.sty $(distdir)/
