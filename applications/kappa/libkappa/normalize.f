@@ -745,7 +745,12 @@
          CALL PAR_GDR0I( 'NITER', 2, 0, 100, .TRUE., NITER, STATUS )
          CALL PAR_GDR0R( 'NSIGMA', 3.0, 0.1, 1.0E6, .TRUE., NSIGMA,
      :                   STATUS )
-         CALL PAR_GDR0I( 'MINPIX', 2, 1, NELS / NBIN, .TRUE., MINPIX,
+         IF( NBIN .GT. 0 ) THEN
+            MINPIX = NELS / NBIN
+         ELSE
+            MINPIX = 1
+         END IF
+         CALL PAR_GDR0I( 'MINPIX', 2, 1, MINPIX, .TRUE., MINPIX,
      :                   STATUS )
 
 *  Get temporary workspace for use in KPS1_NMPLT, and map it.
