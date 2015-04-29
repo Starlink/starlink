@@ -1128,6 +1128,9 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        Modify MakeFitsFrameSet so that isolated SkyAxes (e.g.
 *        individual axes that have been oicked from a SkyFrame) are
 *        re-mapped into degrees before being used.
+*     20-APR-2015 (DSB):
+*        In MakeIntWorld, relax tolerance for checking that each FITS-WCS IWC 
+*        axis is linear, from 0.01 of a pixel to 0.1 of a pixel.
 *class--
 */
 
@@ -20843,7 +20846,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
             err = fabs( ptrw[ j ][ i + 1 ] - w0[ j ] );
             if( err > tol[ j ] ) tol[ j ] = err;
          }
-         tol[ j ] *= 0.01;
+         tol[ j ] *= 0.1;
 
 /* If the tolerance is zero (e.g. as is produced for degenerate axes),
    then use a tolerance equal to a very small fraction of hte degenerate
