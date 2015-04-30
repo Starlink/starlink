@@ -347,6 +347,10 @@
 *        doing th extinction correction.
 *     20-SEP-2013 (DSB):
 *        Provide some support for masks that are larger than a single subarray.
+*     30-APR-2015 (DSB):
+*        Remove median background value before mosaicing Q and U images. 
+*        This reduces the noise in the mosaics in cases where the sky Q/U is 
+*        varying strongly between grid points.
 *-
 '''
 
@@ -737,6 +741,21 @@ try:
             method = "median"
             qmasked = qff
 
+#  Remove the median value from each Q image. This is important if the sky
+#  brightness changes a lot between grid points, resulting in big changes
+#  in background Q and U values (due to instrumental polarisation). Without
+#  it, the Q images may be so spaced out that the median of them (as created
+#  by makemos) is just a copy of the grid point with the middle sky brightness
+#  level.
+         qbk = NDG(qff)
+         for mm in range(len( qff )):
+            qm = qmasked[ mm ];
+            invoke( "$KAPPA_DIR/stats {0} order quiet".format(qm) )
+            medval = starutil.get_task_par( "median", "stats" )
+            invoke( "$KAPPA_DIR/stats {0} order quiet".format(qm) )
+            qb = qbk[ mm ];
+            invoke( "$KAPPA_DIR/csub {0} {1} {2}".format(qm,medval,qb) )
+
 #  There seems to be a tendency for each bolometer to have its own fixed
 #  bias in Q and U. We now try to remove these biases by removing the Q and
 #  U values that are common to each image (as opposed to astronomical Q/U
@@ -747,7 +766,7 @@ try:
          msg_out( "Removing background Q level from {0} bolometers...".format(a))
          qcom = NDG(1)
          qcom.comment = "qcom"
-         invoke( "$CCDPACK_DIR/makemos method={2} in={0} out={1}".format(qmasked,qcom,method) )
+         invoke( "$CCDPACK_DIR/makemos method={2} in={0} out={1}".format(qbk,qcom,method) )
 
 #  We simply assume that the fixed bolometer Q bias is linearly related to
 #  the mean Q value per bolometer. Astronomical sources will affect this
@@ -874,9 +893,18 @@ try:
             method = "median"
             umasked = uff
 
+         ubk = NDG(uff)
+         for mm in range(len( uff )):
+            um = umasked[ mm ];
+            invoke( "$KAPPA_DIR/stats {0} order quiet".format(um) )
+            medval = starutil.get_task_par( "median", "stats" )
+            invoke( "$KAPPA_DIR/stats {0} order quiet".format(um) )
+            ub = ubk[ mm ];
+            invoke( "$KAPPA_DIR/csub {0} {1} {2}".format(um,medval,ub) )
+
          msg_out( "Removing background U level from {0} bolometers...".format(a))
          ucom = NDG(1)
-         invoke( "$CCDPACK_DIR/makemos method={2} in={0} out={1}".format(umasked,ucom,method) )
+         invoke( "$CCDPACK_DIR/makemos method={2} in={0} out={1}".format(ubk,ucom,method) )
 
          unm = NDG(uff)
          unm.comment = "unm"
