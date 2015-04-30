@@ -76,26 +76,26 @@
 *          QIN and UIN parameters, then IN should hold I values.
 *     INSTQ = NDF (Read)
 *          An optional 2D input NDF holding the instrumental normalised Q
-*          value for each bolometer, with respect to the second pixel axis
-*          (i.e. the pixel Y axis). The NDF should have dimensions of
-*          (32,40). The total intensity falling on each bolometer is
-*          multiplied by the corresponding value in this file, to get the
-*          instrumental Q value that is added onto the value read from the
-*          QIN parameter. Bad values are treated as zero values. Note,
-*          if INSTQ is specified, an error is reported if the supplied
-*          template files (see parameter REF) include data for more than
-*          one SCUBA-2 sub-array. [!]
+*          value for each bolometer, with respect to fixed analyser.
+*          The NDF should have dimensions of (32,40). The total intensity
+*          falling on each bolometer is multiplied by the corresponding
+*          value in this file, to get the instrumental Q value that is
+*          added onto the value read from the QIN parameter. Bad values
+*          are treated as zero values. Note, if INSTQ is specified, an
+*          error is reported if the supplied template files (see
+*          parameter REF) include data for more than one SCUBA-2
+*          sub-array. [!]
 *     INSTU = NDF (Read)
 *          An optional 2D input NDF holding the instrumental normalised U
-*          value for each bolometer, with respect to the second pixel axis
-*          (i.e. the pixel Y axis). The NDF should have dimensions of
-*          (32,40). The total intensity falling on each bolometer is
-*          multiplied by the corresponding value in this file, to get the
-*          instrumental U value that is added onto the value read from the
-*          UIN parameter. Bad values are treated as zero values. Note,
-*          INSTU is specified, an error is reported if the supplied
-*          template files (see parameter REF) include data for more than
-*          one SCUBA-2 sub-array. [!]
+*          value for each bolometer, with respect to fixed analyser.
+*          The NDF should have dimensions of (32,40). The total intensity
+*          falling on each bolometer is multiplied by the corresponding
+*          value in this file, to get the instrumental U value that is
+*          added onto the value read from the UIN parameter. Bad values
+*          are treated as zero values. Note, if INSTU is specified, an
+*          error is reported if the supplied template files (see
+*          parameter REF) include data for more than one SCUBA-2
+*          sub-array. [!]
 *     INTERP = LITERAL (Read)
 *          The method to use when resampling the input sky image pixel values.
 *          For details of these schemes, see the descriptions of routines
@@ -730,7 +730,8 @@ void smurf_unmakemap( int *status ) {
    time slice. */
          ang_data = astMalloc( ntslice*sizeof( *ang_data ) );
 
-/* Resample them both into 3D time series. */
+/* Resample them both into 3D time series. These Q/U values arw with
+  respect to the sky image Y axis. */
          smf_resampmap( wf, odata, abskyfrm, skymap, moving, slbnd, subnd,
                         interp, params, sigma, inq_data, outq_data,
                         ang_data, &ngood, status );
@@ -738,15 +739,12 @@ void smurf_unmakemap( int *status ) {
                         interp, params, sigma, inu_data, outu_data,
                         NULL, &ngood, status );
 
-/* Add on any extra Q and U caused by instrumental polarisation. */
-         smf_addinst( wf, odata, qinst_data, outq_data, status );
-         smf_addinst( wf, odata, uinst_data, outu_data, status );
-
 /* Combine these time series with the main output time series so that the
    main output is analysed intensity. */
          smf_uncalc_iqu( wf, odata, odata->pntr[ 0 ], outq_data, outu_data,
                          ang_data, pasign, AST__DD2R*paoff, AST__DD2R*angrot,
-                         amp4, AST__DD2R*phase4, harmonic, status );
+                         amp4, AST__DD2R*phase4, qinst_data, uinst_data,
+                         harmonic, status );
 
 /* Release work space. */
          outq_data = astFree( outq_data );

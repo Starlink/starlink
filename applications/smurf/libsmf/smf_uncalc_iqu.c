@@ -17,6 +17,7 @@
 *                          double *idata, double *qdata, double *udata,
 *                          double *angdata, int pasign, double paoff,
 *                          double angrot, double amp4, double phase4,
+*                          const double *qinst, const double *uinst,
 *                          int harmonic, int *status );
 
 *  Arguments:
@@ -58,6 +59,16 @@
 *     phase4 = double (Given)
 *        Ignored if "harmonic" is not 4. It gives the phase offset for the
 *        4Hz signal to include in the returned Q and U signal, in radians.
+*     qinst = const double * (Given)
+*        Array of normalised Q values for each bolometer. The
+*        instrumental Q seen by each bolometer is found by multiplying
+*        the corresponding total intensity by this factor. The fixed
+*        analyser is assumed to be the reference direction.
+*     uinst = const double * (Given)
+*        Array of normalised U values for each bolometer. The
+*        instrumental U seen by each bolometer is found by multiplying
+*        the corresponding total intensity by this factor. The fixed
+*        analyser is assumed to be the reference direction.
 *     harmonic = int  (Given)
 *        The harmonic of the half-wave plate rotation from which the Q
 *        and U values should be derived. This should normally be 4, but
@@ -85,6 +96,8 @@
 *        Added parameter "harmonic".
 *     29-APR-2015 (DSB):
 *        Added arguments amp4 and phase4.
+*     30-APR-2015 (DSB):
+*        Added arguments qinst and uinst.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -123,6 +136,8 @@
 
 /* Local data types: */
 typedef struct smfUncalcIQUJobData {
+   const double *qinst;
+   const double *uinst;
    const JCMTState *allstates;
    dim_t b1;
    dim_t b2;
@@ -157,7 +172,8 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status );
 void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
                      double *qdata, double *udata, double *angdata,
                      int pasign, double paoff, double angrot, double amp4,
-                     double phase4, int harmonic, int *status ){
+                     double phase4, const double *qinst, const double *uinst,
+                     int harmonic, int *status ){
 
 /* Local Variables: */
    const JCMTState *state;    /* JCMTState info for current time slice */
@@ -289,6 +305,8 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
          pdata->angfac = harmonic/4.0;
          pdata->amp4 = amp4;
          pdata->phase4 = phase4;
+         pdata->qinst = qinst;
+         pdata->uinst = uinst;
 
 /* Pass the job to the workforce for execution. */
          thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_uncalc_iqu_job, 0, NULL,
@@ -352,6 +370,8 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    double angle;              /* Phase angle for FFT */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
    double cosval;             /* Cos of twice reference rotation angle */
+   double ip_qi;              /* normalised instrument Q for current bolo */
+   double ip_ui;              /* normalised instrument U for current bolo */
    double ival;               /* I  value */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double phi;                /* Angle from fixed analyser to effective analyser */
@@ -405,6 +425,12 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
 
 /* Loop round all bolometers to be processed by this thread. */
       for( ibolo = b1; ibolo <= b2; ibolo++ ) {
+
+/* The instrumental polarisation seen by this bolometer. These are
+   normalised Q and U values. Multiply them by the total intensity to 
+   get the instrument Q and U, with respect to the fixed analyser. */
+         ip_qi = pdata->qinst[ ibolo ];
+         ip_ui = pdata->uinst[ ibolo ];
 
 /* Initialise pointers to the next I, Q and U time slice values for
    the current bolometer. */
@@ -468,11 +494,17 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
                qval = (*qin)*cosval + (*uin)*sinval;
                uval = (*uin)*cosval - (*qin)*sinval;
 
+/* Add in the instrumental polarisation. This is assumed to be fixed in
+   focal planee coords, which means it is also fixed with respect to the
+   analyser. */
+               ival = *iin;
+               qval += ip_qi*ival;
+               uval += ip_ui*ival;
+
 /* Calculate the analysed intensity and store it in place of the I value.
    A phi value of zero corresponds to the fixed analyser (i.e. the new Q/U
    reference direction). Allow the angle to be scaled by some user-specified
    factor. This is to allow the investigation of other harmonics. */
-               ival = *iin;
                *iin = 0.5*( ival + qval*cos( 2*phi*angfac ) +
                                    uval*sin( 2*phi*angfac ) );
 
