@@ -715,6 +715,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *        - Choose a label with non-negative priority as the fall-back root label.
 *     17-APR-2015 (DSB):
 *        Added method astRegionOutline.
+*     20-APR-2015 (DSB):
+*        Draw Regions with higher accuracy, because Regions (i.e. Polygons)
+*        can be very non-smooth.
 *class--
 */
 
@@ -9568,9 +9571,11 @@ static int DrawRegion( AstPlot *this, AstFrame *frm, const char *method,
       Map5_map = astRemoveRegions( map );
       map = astAnnul( map );
 
-/* Convert the tolerance from relative to absolute graphics coordinates. */
-      tol = astGetTol( this )*MAX( this->xhi - this->xlo,
-                                   this->yhi - this->ylo );
+/* Convert the tolerance from relative to absolute graphics coordinates.
+   Make the tolerance smaller by a factor of 10 because Regions
+   (specifically Polygonsd) can have very crinkly edges. */
+      tol = 0.1* astGetTol( this )*MAX( this->xhi - this->xlo,
+                                        this->yhi - this->ylo );
 
 /* Ensure the globals holding the scaling from graphics coords to equally
    scaled coords are available. */
