@@ -207,6 +207,8 @@
 *     1-JUN-2012 (DSB):
 *        Replace gains and offsets for bad blocks with values
 *        interpolated from the neighbouring good blocks.
+*     1-MAY-2015 (DSB):
+*        Correct usage of FIT_BOX value (previously ignored if negative).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -384,6 +386,10 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
 /* Check the inherited status. */
    if( *status != SAI__OK ) return nbad;
 
+/* Avoid compiler warnings. */
+   prevgain =  1.0;
+   prevoffset = 0.0;
+
 /* Check we have double precision data. */
    smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status );
    smf_dtype_check_fatal( gain, NULL, SMF__DOUBLE, status );
@@ -440,16 +446,14 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
    }
 
 /* FIT_BOX defaults to GAIN_BOX (it should be null in the defaults file). */
-   if( smf_get_nsamp( keymap, "FIT_BOX", data, &fit_box, status ) > 0.0 ) {
-      if( fit_box < gain_box && *status == SAI__OK ) {
-         *status = SAI__ERROR;
-        msgSeti( "F", (int) fit_box );
-        msgSeti( "G", (int) gain_box );
-        errRep( "", "FIT_BOX (^F samples) must not be smaller than GAIN_BOX "
-                "(^G samples)", status );
-      }
-   } else {
-      fit_box = gain_box;
+   fit_box = gain_box;
+   smf_get_nsamp( keymap, "FIT_BOX", data, &fit_box, status );
+   if( fit_box < gain_box && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+     msgSeti( "F", (int) fit_box );
+     msgSeti( "G", (int) gain_box );
+     errRep( "", "FIT_BOX (^F samples) must not be smaller than GAIN_BOX "
+             "(^G samples)", status );
    }
 
 /* Find the minimum number of good blocks required for a usable bolometer. */
