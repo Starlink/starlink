@@ -14433,6 +14433,26 @@ iraf! {
             helpkey *
          }
 
+         parameter outoffset {
+            type NDF
+            access WRITE
+            ppath CURRENT,DEFAULT
+            vpath DEFAULT
+            default !
+            prompt {NDF to hold offset for each row/column}
+            helpkey *
+         }
+
+         parameter outslope {
+            type NDF
+            access WRITE
+            ppath CURRENT,DEFAULT
+            vpath DEFAULT
+            default !
+            prompt {NDF to hold slope for each row/column}
+            helpkey *
+         }
+
          parameter pcrange {
             size *
             type _REAL

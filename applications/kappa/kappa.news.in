@@ -12,6 +12,11 @@
       Any associated value and/or comment are ignored.  The easiest way
       to append an END header is with the wrapper FITSWRITE.
 
+   o NORMALIZE
+
+     -  New parameters OUTSLOPE and OUTOFFSET added. These are
+     1-dimensional NDFs in which the slopes and offsets are stored
+     when operating in looping mode (i.e. LOOP=TRUE).
 
 1 KAPPA_Version_2.2
 

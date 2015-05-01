@@ -1,3 +1,4 @@
+
       SUBROUTINE NORMALIZE( STATUS )
 *+
 *  Name:
@@ -100,7 +101,8 @@
 *        normalised in turn by each row or column of IN2. Any output NDF
 *        (see parameter OUT) will then have the shape and size of IN2. In
 *        either case, the details of the fit for each row or column will
-*        be displayed separately. [FALSE]
+*        be displayed separately.  Also see Parameters OUTSLOPE and
+*        OUTOFFSET. [FALSE]
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave for axis annotation, given
 *        as fractions of the corresponding dimension of the current
@@ -137,6 +139,14 @@
 *        An optional output NDF to hold a version of IN1 which is
 *        normalised to IN2.  A null (!) value indicates that an output
 *        NDF is not required. See also parameter LOOP.
+*     OUTOFFSET = NDF (Write)
+*        An optional 1-dimensonal output NDF to hold the offset used for
+*        each row or column when LOOP=YES. See parameter OFFSET. Ignored
+*        if LOOP=NO.
+*     OUTSLOPE = NDF (Write)
+*        An optional 1-dimensonal output NDF to hold the slope used for
+*        each row or column when LOOP=YES. See parameter SLOPE. Ignored
+*        if LOOP=NO.
 *     PCRANGE( 2 ) = _REAL (Read)
 *        This parameter takes two real values in the range 0 to 100 and
 *        is used to modify the action of the auto-scaling algorithm
@@ -377,6 +387,8 @@
 *        Fix a bug in looping mode that caused a "no pixels in common"
 *        error from NDF_MBND if the single line NDF did not have an
 *        origin of 1 on the axis that spans a single pixel.
+*     1-MAY-2015 (DSB):
+*        Added parameters OUTOFFSET and OUTSLOPE.
 *     {enter_further_changes_here}
 
 *-
@@ -402,12 +414,16 @@
 
 *  Local Variables:
       INTEGER  AXIS              ! Index of axis to loop over
+      INTEGER  NOL               ! Number of elements in OUTOFFSET/SLOPE
       INTEGER  I                 ! Pixel index on looping axis
       INTEGER  IHI               ! Highest looping pixel index
       INTEGER  ILO               ! Lowest looping pixel index
+      INTEGER  IPOFF             ! Pointer to OUTOFFSET data array
+      INTEGER  IPSLP             ! Pointer to OUTSLOPE data array
       INTEGER  ISTAT             ! Temporary status value
       INTEGER  LBND1( NDF__MXDIM )! Lower pixel bounds of ndf1
       INTEGER  LBND2( NDF__MXDIM )! Lower pixel bounds of ndf2
+      INTEGER  LBNDOL( 2 )       ! Lower pixel bounds of OUTOFFSEL/SLOPE
       INTEGER  MAXPOS( 2 )       ! Position of maximum in IN2 data array
       INTEGER  MINPIX            ! Minimum number of good pixels per bin
                                  ! when fitting
@@ -420,6 +436,8 @@
       INTEGER  NDF2S             ! NDF section identifier for input IN2
       INTEGER  NDF2T             ! Identifier for supplied IN2 NDF
       INTEGER  NDFO              ! Identifier for output NDF
+      INTEGER  NDFOF             ! Identifier for OUTOFFSET NDF
+      INTEGER  NDFOL             ! Identifier for OUTSLOPE NDF
       INTEGER  NDFOUT            ! NDF identifier for OUT
       INTEGER  NDIM1             ! No. of axis in ndf1
       INTEGER  NDIM2             ! No. of axis in ndf2
@@ -432,6 +450,7 @@
       INTEGER  PNT1BD( 1 )       ! Pointer to mapped base IN1 data array
       INTEGER  UBND1( NDF__MXDIM )! Upper pixel bounds of ndf1
       INTEGER  UBND2( NDF__MXDIM )! Upper pixel bounds of ndf2
+      INTEGER  UBNDOL( 2 )       ! Upper pixel bounds of OUTOFFSEL/SLOPE
       INTEGER  PNT1BV( 1 )       ! Pointer to mapped base IN1 variance
                                  ! array
       INTEGER  PNT1S( 1 )        ! Pointer to mapped IN1 section data
@@ -579,6 +598,57 @@
          NDF2S = NDF2T
          NDFOUT = NDFO
       END IF
+
+
+*  If looping, see if we need to create output NDFs to hold the scale and
+*  offset. If so create them and map them.
+      IF( LOOP ) THEN
+         IF( LPOVR1 ) THEN
+            LBNDOL( 1 ) = LBND1( 1 )
+            UBNDOL( 1 ) = UBND1( 1 )
+            LBNDOL( 2 ) = LBND1( 2 )
+            UBNDOL( 2 ) = UBND1( 2 )
+         ELSE
+            LBNDOL( 1 ) = LBND2( 1 )
+            UBNDOL( 1 ) = UBND2( 1 )
+            LBNDOL( 2 ) = LBND2( 2 )
+            UBNDOL( 2 ) = UBND2( 2 )
+         END IF
+
+         LBNDOL( 3 - AXIS ) = 1
+         UBNDOL( 3 - AXIS ) = 1
+
+         CALL NDF_CREAT( 'OUTOFFSET', '_REAL', 2, LBNDOL, UBNDOL, NDFOF,
+     :                   STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+         ELSE
+            CALL NDF_CPUT( 'Offset', NDFOF, 'Label', STATUS )
+            CALL NDF_CPUT( 'Offsets calculated by KAPPA:NORMALIZE',
+     :                     NDFOF, 'Title', STATUS )
+            CALL NDF_MAP( NDFOF, 'Data', '_REAL', 'WRITE/BAD', IPOFF,
+     :                    NOL, STATUS )
+         END IF
+
+         CALL NDF_CREAT( 'OUTSLOPE', '_REAL', 2, LBNDOL, UBNDOL, NDFOL,
+     :                   STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+         ELSE
+            CALL NDF_CPUT( 'Slope', NDFOL, 'Label', STATUS )
+            CALL NDF_CPUT( 'Slopes calculated by KAPPA:NORMALIZE',
+     :                     NDFOL, 'Title', STATUS )
+            CALL NDF_MAP( NDFOL, 'Data', '_REAL', 'WRITE/BAD', IPSLP,
+     :                    NOL, STATUS )
+         END IF
+
+      END IF
+
+
+
+
+
+
 
 *  Do all required values on the looping axis (if any)
       DO I = ILO, IHI
@@ -821,6 +891,13 @@
 *  Parameters SLOPE and OFFSET.
          CALL PAR_PUT0R( 'SLOPE', SLOPE, STATUS )
          CALL PAR_PUT0R( 'OFFSET', OFFSET, STATUS )
+
+*  Store them in any output NDFs.
+         IF( NDFOL .NE. NDF__NOID ) CALL KPG1_STORR( NOL, I, SLOPE,
+     :                               %VAL( CNF_PVAL( IPSLP ) ), STATUS )
+
+         IF( NDFOF .NE. NDF__NOID ) CALL KPG1_STORR( NOL, I, OFFSET,
+     :                               %VAL( CNF_PVAL( IPOFF ) ), STATUS )
 
 *  If an output NDF is to be made containing a normalised copy of IN1,
 *  check that calculated slope was not zero.

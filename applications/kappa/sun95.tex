@@ -34110,7 +34110,8 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
 	 then it will be normalised in turn by each row or column of IN2.
 	 Any output NDF (see parameter OUT) will then have the shape and
 	 size of IN2. In either case, the details of the fit for each row
-	 or column will be displayed separately. \texttt{[FALSE]}
+	 or column will be displayed separately.  Also see Parameters
+         OUTSLOPE and OUTOFFSET. \texttt{[FALSE]}
       }
       \sstsubsection{
          MARGIN( 4 ) = \_REAL (Read)
@@ -34164,6 +34165,20 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          An optional output NDF to hold a version of IN1 which is
          normalised to IN2.  A null (\texttt{{!}}) value indicates that an output
          NDF is not required. See also parameter LOOP.
+      }
+      \sstsubsection{
+         OUTOFFSET = NDF (Write)
+      }{
+         An optional 1-dimensonal output NDF to hold the offset used for
+         each row or column when LOOP=YES. See Parameter OFFSET. Ignored
+         if LOOP=NO.  \texttt{[!]}
+      }
+      \sstsubsection{
+         OUTSLOPE = NDF (Write)
+      }{
+         An optional 1-dimensonal output NDF to hold the slope used for
+         each row or column when LOOP=YES. See Parameter SLOPE. Ignored
+         if LOOP=NO.  \texttt{[!]}
       }
       \sstsubsection{
          PCRANGE( 2 ) = \_REAL (Read)
@@ -52791,6 +52806,12 @@ The following applications have been modified:
         \htmlref{FITSWRITE}{FITSWRITE}.
       \end{itemize}
 
+   \item [\htmlref{NORMALIZE}{NORMALIZE}]\mbox{}
+      \begin{itemize}
+        \item New parameters OUTSLOPE and OUTOFFSET added. These are
+        1-dimensional NDFs in which the slopes and offsets are stored
+        when operating in looping mode (\emph{i.e.} LOOP=\texttt{TRUE}).
+      \end{itemize}
 \end{description}
 
 \section{Release Notes---V2.2}
