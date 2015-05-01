@@ -72,6 +72,9 @@
 *        with the existing picture.  Thus you can generate a composite
 *        plot within a single set of axes, say using different colours
 *        or modes to distinguish data from different datasets.  [TRUE]
+*     CORR = _REAL (Write)
+*        An output parameter giving Pearson's coefficient of linear
+*        correlation for the data included in the last fit.
 *     DATARANGE( 2 ) = _REAL (Read)
 *        This parameter may be used to override the auto-scaling
 *        feature.   If given, two real numbers should be supplied
@@ -101,8 +104,8 @@
 *        normalised in turn by each row or column of IN2. Any output NDF
 *        (see parameter OUT) will then have the shape and size of IN2. In
 *        either case, the details of the fit for each row or column will
-*        be displayed separately.  Also see Parameters OUTSLOPE and
-*        OUTOFFSET. [FALSE]
+*        be displayed separately.  Also see Parameters OUTSLOPE,
+*        OUTOFFSET and OUTCORR. [FALSE]
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave for axis annotation, given
 *        as fractions of the corresponding dimension of the current
@@ -139,6 +142,10 @@
 *        An optional output NDF to hold a version of IN1 which is
 *        normalised to IN2.  A null (!) value indicates that an output
 *        NDF is not required. See also parameter LOOP.
+*     OUTCORR = NDF (Write)
+*        An optional 1-dimensonal output NDF to hold the correlation
+*        coefficient for each row or column when LOOP=YES. See parameter
+*        CORR. Ignored if LOOP=NO.
 *     OUTOFFSET = NDF (Write)
 *        An optional 1-dimensonal output NDF to hold the offset used for
 *        each row or column when LOOP=YES. See parameter OFFSET. Ignored
@@ -388,7 +395,8 @@
 *        error from NDF_MBND if the single line NDF did not have an
 *        origin of 1 on the axis that spans a single pixel.
 *     1-MAY-2015 (DSB):
-*        Added parameters OUTOFFSET and OUTSLOPE.
+*        - Added parameters OUTOFFSET and OUTSLOPE.
+*        - Added parameters CORR and OUTCORR.
 *     {enter_further_changes_here}
 
 *-
@@ -418,6 +426,7 @@
       INTEGER  I                 ! Pixel index on looping axis
       INTEGER  IHI               ! Highest looping pixel index
       INTEGER  ILO               ! Lowest looping pixel index
+      INTEGER  IPCOR             ! Pointer to OUTCORR data array
       INTEGER  IPOFF             ! Pointer to OUTOFFSET data array
       INTEGER  IPSLP             ! Pointer to OUTSLOPE data array
       INTEGER  ISTAT             ! Temporary status value
@@ -436,6 +445,7 @@
       INTEGER  NDF2S             ! NDF section identifier for input IN2
       INTEGER  NDF2T             ! Identifier for supplied IN2 NDF
       INTEGER  NDFO              ! Identifier for output NDF
+      INTEGER  NDFOC             ! Identifier for OUTCORR NDF
       INTEGER  NDFOF             ! Identifier for OUTOFFSET NDF
       INTEGER  NDFOL             ! Identifier for OUTSLOPE NDF
       INTEGER  NDFOUT            ! NDF identifier for OUT
@@ -474,6 +484,7 @@
       LOGICAL  OUTRQD            ! Is an output NDF is to be generated?
       LOGICAL  VAR1              ! IN1 has a defined variance component?
       LOGICAL  ZEROFF            ! Fix fit offset at zero?
+      REAL     CORR              ! Correlation coefficient
       REAL     DRANGE( 2 )       ! Limits on IN2 data values to be used
       REAL     DRDEF( 2 )        ! Suggested default limits on IN2
                                  ! values
@@ -642,13 +653,20 @@
      :                    NOL, STATUS )
          END IF
 
+         CALL NDF_CREAT( 'OUTCORR', '_REAL', 2, LBNDOL, UBNDOL, NDFOC,
+     :                   STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+         ELSE
+            CALL NDF_CPUT( 'Correlation', NDFOC, 'Label', STATUS )
+            CALL NDF_CPUT( 'Correlation coefficients calculated '//
+     :                     'by KAPPA:NORMALIZE', NDFOC, 'Title',
+     :                     STATUS )
+            CALL NDF_MAP( NDFOC, 'Data', '_REAL', 'WRITE/BAD', IPCOR,
+     :                    NOL, STATUS )
+         END IF
+
       END IF
-
-
-
-
-
-
 
 *  Do all required values on the looping axis (if any)
       DO I = ILO, IHI
@@ -861,7 +879,7 @@
      :                %VAL( CNF_PVAL( PNTW3 ) ),
      :                %VAL( CNF_PVAL( PNTW4 ) ),
      :                %VAL( CNF_PVAL( PNTW5 ) ), SLOPE, OFFSET,
-     :                STATUS )
+     :                CORR, STATUS )
 
 *  If we are looping and the normalisation failed, annull the error
 *  and pass on to the next row/column leaving bad values in the output
@@ -891,6 +909,7 @@
 *  Parameters SLOPE and OFFSET.
          CALL PAR_PUT0R( 'SLOPE', SLOPE, STATUS )
          CALL PAR_PUT0R( 'OFFSET', OFFSET, STATUS )
+         CALL PAR_PUT0R( 'CORR', CORR, STATUS )
 
 *  Store them in any output NDFs.
          IF( NDFOL .NE. NDF__NOID ) CALL KPG1_STORR( NOL, I, SLOPE,
@@ -898,6 +917,9 @@
 
          IF( NDFOF .NE. NDF__NOID ) CALL KPG1_STORR( NOL, I, OFFSET,
      :                               %VAL( CNF_PVAL( IPOFF ) ), STATUS )
+
+         IF( NDFOC .NE. NDF__NOID ) CALL KPG1_STORR( NOL, I, CORR,
+     :                               %VAL( CNF_PVAL( IPCOR ) ), STATUS )
 
 *  If an output NDF is to be made containing a normalised copy of IN1,
 *  check that calculated slope was not zero.

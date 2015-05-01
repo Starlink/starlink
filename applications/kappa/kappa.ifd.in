@@ -14314,6 +14314,14 @@ iraf! {
             helpkey *
          }
 
+         parameter corr {
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            helpkey *
+            default 0.0
+         }
+
          parameter datarange {
             size *
             type _REAL
@@ -14430,6 +14438,16 @@ iraf! {
             vpath PROMPT
             association ->GLOBAL.DATA_ARRAY
             prompt {The output NDF}
+            helpkey *
+         }
+
+         parameter outcorr {
+            type NDF
+            access WRITE
+            ppath CURRENT,DEFAULT
+            vpath DEFAULT
+            default !
+            prompt {NDF to hold correlation coeff. for each row/column}
             helpkey *
          }
 

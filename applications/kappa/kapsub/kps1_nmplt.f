@@ -1,7 +1,7 @@
       SUBROUTINE KPS1_NMPLT( VA, VB, NEL, AMIN, AMAX, NBIN, NITER,
      :                       SIGLIM, MINPIX, NDFA, NDFB, ZEROFF, NSUM,
      :                       ASUM, BSUM, B2SUM, VARLIM, SLOPE, OFFSET,
-     :                       STATUS )
+     :                       CORR, STATUS )
 *+
 *  Name:
 *     KPS1_NMPLT
@@ -16,7 +16,7 @@
 *  Invocation:
 *     CALL KPS1_NMPLT( VA, VB, NEL, AMIN, AMAX, NBIN, NITER, SIGLIM,
 *    :                 MINPIX, NDFA, NDFB, ZEROFF, NSUM, ASUM, BSUM,
-*    :                 B2SUM, VARLIM, SLOPE, OFFSET, STATUS )
+*    :                 B2SUM, VARLIM, SLOPE, OFFSET, CORR, STATUS )
 
 *  Description:
 *     Intensities which are valid in each input vector and lie within
@@ -78,6 +78,9 @@
 *        B=SLOPE*A+OFFSET.
 *     OFFSET = REAL (Returned)
 *        The constant C in B=SLOPE*A+OFFSET.
+*     CORR = REAL (Returned)
+*        The Pearson linear correlation coefficient for the VA and VB
+*        values.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -135,6 +138,8 @@
 *        HISTOGRAM).
 *     16-SEP-2011 (DSB):
 *        Added argument ZEROFF.
+*     1-MAY-2015 (DSB):
+*        Added argument CORR.
 *     {enter_further_changes_here}
 
 *-
@@ -171,6 +176,7 @@
 *  Arguments Returned:
       REAL SLOPE
       REAL OFFSET
+      REAL CORR
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -180,10 +186,16 @@
                                  ! component path)
       CHARACTER XL*( 255 )       ! Default Xaxis label
       CHARACTER YL*( 255 )       ! Default Y-axis label
+      DOUBLE PRECISION DA        ! Vector A value
+      DOUBLE PRECISION DB        ! Vector B value
       DOUBLE PRECISION ABOT      ! Lowest vector A value actually used
       DOUBLE PRECISION ATOP      ! Highest vector A value actually used
       DOUBLE PRECISION BSCALE( 2 )! Scaling for plot labels
+      DOUBLE PRECISION DEN       ! Denominator
       DOUBLE PRECISION FINISH( 2 ) ! End of best fitting line
+      DOUBLE PRECISION SAA       ! Sum of remaining A*A values
+      DOUBLE PRECISION SAB       ! Sum of remaining A*B values
+      DOUBLE PRECISION SBB       ! Sum of remaining B*B values
       DOUBLE PRECISION START( 2 ) ! Start of best fitting line
       DOUBLE PRECISION WT        ! Weight for current bin
       DOUBLE PRECISION WTSUM     ! Sum of bin weights
@@ -202,6 +214,7 @@
       INTEGER NDATA              ! Number of non-empty bins
       INTEGER NMLEN              ! Used length of NDFNAM
       INTEGER NPIX               ! Number of vector B values used
+      INTEGER SN                 ! Number of remaining values
       REAL A                     ! Vector A value
       REAL A0                    ! Bin number for zero A value
       REAL A1                    ! Number of bins in unit A value
@@ -211,7 +224,10 @@
       REAL BFIT                  ! Expected vector B value
       REAL DET                   ! Denominator of normal equations
       REAL Q0                    ! Min. possible variance for a bin
+      DOUBLE PRECISION SA        ! Sum of remaining A values
+      DOUBLE PRECISION SB        ! Sum of remaining B values
       REAL WTMAX                 ! Max. allowed bin weight
+
 *.
 
 *  Check inherited global status.
@@ -245,20 +261,27 @@
             B2SUM( I ) = 0.0D0
          END DO
 
+*  Initialise sums needed to find the correlation coefficient.
+         SA = 0.0D0
+         SB = 0.0D0
+         SAB = 0.0D0
+         SAA = 0.0D0
+         SBB = 0.0D0
+         SN = 0
+
 *  Scan through the input vectors.
          DO I = 1, NEL
 
 *  Use pixels which are good in both vectors.
-            IF ( VA( I ) .NE. VAL__BADR .AND.
-     :          VB( I ) .NE. VAL__BADR ) THEN
+            A = VA( I )
+            B = VB( I )
+            IF ( A .NE. VAL__BADR .AND. B .NE. VAL__BADR ) THEN
 
 *  Check if the A intensity is in the required data range.
-               A = VA( I )
                IF ( A .GE. AAMIN .AND. A .LE. AAMAX ) THEN
 
 *  Calculate the bin number and form sums for this bin
                   IBIN = INT( A0 + A1 * A )
-                  B = VB( I )
                   BFIT = A * SLOPE + OFFSET
 
                   IF ( ( B - BFIT )**2 .LE. VARLIM( IBIN ) ) THEN
@@ -266,6 +289,18 @@
                      BSUM( IBIN ) = BSUM( IBIN ) + B
                      B2SUM( IBIN ) = B2SUM( IBIN ) + DBLE( B * B )
                      ASUM( IBIN ) = ASUM( IBIN ) + A
+
+*  Increment sums needed to calculate the correlation.
+                     DA = DBLE( A )
+                     DB = DBLE( B )
+
+                     SN = SN + 1
+                     SA = SA + DA
+                     SB = SB + DB
+                     SAB = SAB + DA * DB
+                     SAA = SAA + DA * DA
+                     SBB = SBB + DB * DB
+
                   END IF
 
                END IF
@@ -284,6 +319,14 @@
 *  Calculate the max. weight to be applied to any bin (this is the
 *  number of points per bin if the points are uniformly distributed).
          WTMAX = REAL( NPIX ) / REAL( NBIN )
+
+*  Calculate the correlation of the remaining data.
+         DEN = ( SN*SAA - SA*SA )*( SN*SBB - SB*SB )
+         IF( DEN .GT. 0.0D0 ) THEN
+            CORR = ( SN*SAB - SA*SB ) / SQRT( DEN )
+         ELSE
+            CORR = VAL__BADR
+         END IF
 
 *  Initialise sums for the straight line fit.
          XSUM = 0.0D0
@@ -387,6 +430,13 @@
          CALL MSG_OUT( 'REPORT',
      :    ' Iteration ^ITER used ^NPIX pixels '//
      :    'in the range ^ABOT and ^ATOP in ^VA', STATUS )
+
+         IF( CORR .NE. VAL__BADR ) THEN
+            CALL MSG_SETR( 'CORR', CORR )
+         ELSE
+            CALL MSG_SETC( 'CORR', 'unknown' )
+         END IF
+         CALL MSG_OUT( 'REPORT', ' Correlation: ^CORR', STATUS )
 
          CALL MSG_OUT( 'REPORT', ' ', STATUS )
 

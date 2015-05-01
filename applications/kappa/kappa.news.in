@@ -14,9 +14,14 @@
 
    o NORMALIZE
 
-     -  New parameters OUTSLOPE and OUTOFFSET added. These are
-     1-dimensional NDFs in which the slopes and offsets are stored
-     when operating in looping mode (i.e. LOOP=TRUE).
+     -  Now calculates and displays Pearson's coefficient of linear
+     correlation on the remaining data at every iteration.
+     -  New parameters CORR added to hold the last displayed correlation
+     coefficient.
+     -  New parameters OUTSLOPE, OUTOFFSET and OUTCORR added. These
+     are 1-dimensional NDFs in which the slopes, offsets and correlation
+     coefficients are stored when operating in looping mode (i.e.
+     LOOP=TRUE).
 
 1 KAPPA_Version_2.2
 

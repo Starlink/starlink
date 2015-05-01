@@ -34111,7 +34111,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
 	 Any output NDF (see parameter OUT) will then have the shape and
 	 size of IN2. In either case, the details of the fit for each row
 	 or column will be displayed separately.  Also see Parameters
-         OUTSLOPE and OUTOFFSET. \texttt{[FALSE]}
+         OUTSLOPE, OUTOFFSET and OUTCORR. \texttt{[FALSE]}
       }
       \sstsubsection{
          MARGIN( 4 ) = \_REAL (Read)
@@ -34165,6 +34165,13 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          An optional output NDF to hold a version of IN1 which is
          normalised to IN2.  A null (\texttt{{!}}) value indicates that an output
          NDF is not required. See also parameter LOOP.
+      }
+      \sstsubsection{
+         OUTCORR = NDF (Write)
+      }{
+         An optional 1-dimensonal output NDF to hold the correlation
+         coefficient for each row or column when LOOP=YES. See Parameter
+         CORR. Ignored if LOOP=NO.  \texttt{[!]}
       }
       \sstsubsection{
          OUTOFFSET = NDF (Write)
@@ -34292,6 +34299,12 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
       }
    }
    \sstresparameters{
+      \sstsubsection{
+         CORR = \_REAL (Write)
+      }{
+         Pearson's coefficient of linear correlation for the data included
+         in the last fit.
+      }
       \sstsubsection{
          OFFSET = \_REAL (Write)
       }{
@@ -52808,9 +52821,14 @@ The following applications have been modified:
 
    \item [\htmlref{NORMALIZE}{NORMALIZE}]\mbox{}
       \begin{itemize}
-        \item New parameters OUTSLOPE and OUTOFFSET added. These are
-        1-dimensional NDFs in which the slopes and offsets are stored
-        when operating in looping mode (\emph{i.e.} LOOP=\texttt{TRUE}).
+        \item Now calculates and displays Pearson's coefficient of linear
+        correlation on the remaining data at every iteration.
+        \item New parameters CORR added to hold the last displayed correlation
+        coefficient.
+        \item New parameters OUTSLOPE, OUTOFFSET and OUTCORR added. These
+        are 1-dimensional NDFs in which the slopes, offsets and correlation
+        coefficients are stored when operating in looping mode (\emph{i.e.}
+        LOOP=\texttt{TRUE}).
       \end{itemize}
 \end{description}
 
