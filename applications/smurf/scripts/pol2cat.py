@@ -352,8 +352,10 @@
 *        This reduces the noise in the mosaics in cases where the sky Q/U is
 *        varying strongly between grid points.
 *     5-MAY-2015 (DSB):
-*        Only import smurfutil if needed. This avoids problems if the mdp 
+*        - Only import smurfutil if needed. This avoids problems if the mdp 
 *        and/or pyndf module are not available locally.
+*        - Report an error if the mask blanks out out nearly all of a Q or U image.
+*        - Report an error if the supplied ref image does not have the requested Domain.
 *-
 '''
 
@@ -365,6 +367,7 @@ from starutil import NDG
 from starutil import Parameter
 from starutil import ParSys
 from starutil import msg_out
+from starutil import AtaskError
 
 #  Assume for the moment that we will not be retaining temporary files.
 retain = 0
@@ -520,6 +523,9 @@ try:
 #  Get the source mask
    mask = parsys["MASK"].value
 
+#  Get the alignment domain.
+   domain = parsys["DOMAIN"].value
+
 #  Get the image to use for the total flux (I) map.
    iref = parsys["IREF"].value
 
@@ -535,6 +541,18 @@ try:
       if iunits != "pW":
          raise starutil.InvalidParameterError("Reference image ({0}) has "
                     "incorrect units '{1} - must be 'pW'.".format(iref,iunits))
+
+#  Ensure the I image has the requested domain.
+      icur = int( starutil.get_task_par( "CURRENT", "ndftrace" ))
+      try:
+         invoke( "$KAPPA_DIR/wcsframe ndf={0} frame={1}".format(iref,domain) )
+         invoke( "$KAPPA_DIR/wcsframe ndf={0} frame={1}".format(iref,icur) )
+      except AtaskError:
+         raise starutil.InvalidParameterError("\nThe reference image ({0}) "
+                    "has no {1} Frame in its WCS component. Try again with "
+                    "no reference image or use a different Domain.\n".
+                    format(iref,domain))
+
 #  We do not yet have any cut-outs of the IREF image.
    icuts = None
 
@@ -553,9 +571,6 @@ try:
 #  Get the output catalogue now to avoid a long wait before the user gets
 #  prompted for it.
    outcat = parsys["CAT"].value
-
-#  Get the alignment domain.
-   domain = parsys["DOMAIN"].value
 
 #  Get the clipping limit and create a string to use for the FFCLEAN CLIP
 #  parameter.
@@ -759,7 +774,15 @@ try:
             qm = qmasked[ mm ];
             invoke( "$KAPPA_DIR/stats {0} order quiet".format(qm) )
             medval = starutil.get_task_par( "median", "stats" )
-            invoke( "$KAPPA_DIR/stats {0} order quiet".format(qm) )
+
+            ngood = starutil.get_task_par( "numgood", "stats" )
+            if ngood < 100:
+               text = "\n\nOnly {0} good Q values remain for grid point {1}. ".format(ngood,mm+1)
+               text += "Have you set NSIGMA (={0}) too low? ".format(nsigma)
+               if mask:
+                  text += "Or maybe the blanked out source regions in your mask ({0}) are too large.\n".format(mask)
+               raise starutil.InvalidParameterError( text )
+
             qb = qbk[ mm ];
             invoke( "$KAPPA_DIR/csub {0} {1} {2}".format(qm,medval,qb) )
 
@@ -905,7 +928,15 @@ try:
             um = umasked[ mm ];
             invoke( "$KAPPA_DIR/stats {0} order quiet".format(um) )
             medval = starutil.get_task_par( "median", "stats" )
-            invoke( "$KAPPA_DIR/stats {0} order quiet".format(um) )
+
+            ngood = starutil.get_task_par( "numgood", "stats" )
+            if ngood < 100:
+               text = "Only {0} good U values remain for grid point {1}.".format(ngood,mm+1)
+               text += "Have you set NSIGMA (={0}) too low? ".format(nsigma)
+               if mask:
+                  text += "Or maybe the source regions in your mask ({0}) are too large.".format(mask)
+               raise starutil.InvalidParameterError( text )
+
             ub = ubk[ mm ];
             invoke( "$KAPPA_DIR/csub {0} {1} {2}".format(um,medval,ub) )
 
