@@ -348,16 +348,18 @@
 *     20-SEP-2013 (DSB):
 *        Provide some support for masks that are larger than a single subarray.
 *     30-APR-2015 (DSB):
-*        Remove median background value before mosaicing Q and U images. 
-*        This reduces the noise in the mosaics in cases where the sky Q/U is 
+*        Remove median background value before mosaicing Q and U images.
+*        This reduces the noise in the mosaics in cases where the sky Q/U is
 *        varying strongly between grid points.
+*     5-MAY-2015 (DSB):
+*        Only import smurfutil if needed. This avoids problems if the mdp 
+*        and/or pyndf module are not available locally.
 *-
 '''
 
 import os
 import math
 import starutil
-import smurfutil
 from starutil import invoke
 from starutil import NDG
 from starutil import Parameter
@@ -596,9 +598,14 @@ try:
 
 #  See if backgrounds refinements are to be performed.
    refine = parsys["REFINE"].value
-   if refine and mask == None:
-      raise starutil.InvalidParameterError("REFINE is True but no mask "
-                                           "was supplied.")
+   if refine:
+      if mask == None:
+         raise starutil.InvalidParameterError("REFINE is True but no mask "
+                                              "was supplied.")
+
+#  Only import smurfutil if needed, since importing smurfutil requires
+#  pyndf and mdp modules to be installed.
+      import smurfutil
 
 #  See if the Q and U backgrounds are to be force flat by smoothing, and
 #  then removing the low frequency structure.
