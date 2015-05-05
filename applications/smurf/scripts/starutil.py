@@ -2168,9 +2168,21 @@ class NDG(object):
       else:
          return shell_quote("")
 
+   # Test equivalence of two NDGs
+   def __eq__(self, other):
+      if isinstance(other, self.__class__):
+         if len(self) == len(other):
+            for (sndf,ondf) in zip( self.__ndfs, other.__ndfs ):
+               if sndf != ondf:
+                  return false
+            return True
+         else:
+            return False
+      else:
+         return False
 
-
-
+   def __ne__(self, other):
+      return not (self == other)
 
 
 #  -------------------  Exceptions ---------------------------
