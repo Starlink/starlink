@@ -198,7 +198,7 @@ STATICSCRIPTS = scripts/jcmtstate2cat scripts/mcehead2cat scripts/dumpocscfg scr
 scripts/distortion scripts/showdistortion scripts/tobeam scripts/print_index \
 scripts/pol2cat.py scripts/pol2stack.py scripts/starutil.py scripts/skyloop.py \
 scripts/cbas scripts/bolcoords scripts/matched-filter scripts/smas scripts/canfar_scuba2_map.sh \
-scripts/sc2tsnoise scripts/canfar_sc2noise scripts/configmeld.py scripts/pol2catb.py \
+scripts/sc2tsnoise scripts/canfar_sc2noise scripts/configmeld.py \
 scripts/fts2gaia.py scripts/tilepaste.py scripts/tilecutout.py scripts/smurfutil.py \
 scripts/jsajoin.py scripts/jsasplit.py scripts/jsatilemoc.py
 

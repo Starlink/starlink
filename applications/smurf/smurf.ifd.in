@@ -6003,10 +6003,6 @@ package @PACKAGE@ {
         obey {python $SMURF_DIR/pol2cat.py}
     }
 
-    command pol2catb {
-        obey {python $SMURF_DIR/pol2catb.py}
-    }
-
     command pol2stack {
         obey {python $SMURF_DIR/pol2stack.py}
     }
