@@ -513,6 +513,7 @@
 *  Get an NDF identifier for the output NDF. The output is based on IN1
 *  and inherits all the components of IN1 except the data and variance
 *  arrays.
+      OUTRQD = .FALSE.
       CALL LPG_PROP( NDF1T, 'WCS,Axis,Quality,Units', 'OUT', NDFO,
      :               STATUS )
 
@@ -526,7 +527,6 @@
 *  If a null value for OUT was given, set OUTRQD flag appropriately
 *  and clear the error condition.
       ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
-         OUTRQD = .FALSE.
          CALL ERR_ANNUL( STATUS )
 
          CALL MSG_OUT( 'REPORT', ' ', STATUS )
@@ -563,10 +563,12 @@
             AXIS = 2
             LPOVR1 = .TRUE.
          ELSE
+            LPOVR1 = .FALSE.
             AXIS = 0
          END IF
 
       ELSE
+         LPOVR1 = .FALSE.
          AXIS = 0
       END IF
 
@@ -575,6 +577,8 @@
       IF( AXIS .GT. 0 ) THEN
          CALL PAR_GET0L( 'LOOP', LOOP, STATUS )
          IF( .NOT. LOOP ) AXIS = 0
+      ELSE
+         LOOP = .FALSE.
       END IF
 
 *  If we are looping over the rows or columns of IN2, we need to reshape
@@ -666,6 +670,10 @@
      :                    NOL, STATUS )
          END IF
 
+      ELSE
+         NDFOL = NDF__NOID
+         NDFOC = NDF__NOID
+         NDFOF = NDF__NOID
       END IF
 
 *  Do all required values on the looping axis (if any)
