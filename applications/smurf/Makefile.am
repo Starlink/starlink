@@ -200,7 +200,7 @@ scripts/pol2cat.py scripts/pol2stack.py scripts/starutil.py scripts/skyloop.py \
 scripts/cbas scripts/bolcoords scripts/matched-filter scripts/smas scripts/canfar_scuba2_map.sh \
 scripts/sc2tsnoise scripts/canfar_sc2noise scripts/configmeld.py \
 scripts/fts2gaia.py scripts/tilepaste.py scripts/tilecutout.py scripts/smurfutil.py \
-scripts/jsajoin.py scripts/jsasplit.py scripts/jsatilemoc.py
+scripts/jsajoin.py scripts/jsasplit.py scripts/jsatilemoc.py scripts/pol2sim.py
 
 # IFL files
 IFL_FILES = $(smurf_mon_TASKS:=.ifl) smurf_mon.ifl
