@@ -243,6 +243,12 @@ def invoke(command,aslist=False,buffer=None,annul=False):
    It may also be written to the screen and to the log file, depending
    on the value of the "ilevel" and "glevel" module variables.
 
+   Note - this command should only be used to invoke ADAM tasks. It is
+   not re-entrant. That is, you should not use it to invoke a command
+   that may possible then use "invoke" itself (i.e. do not use it to
+   invoke other python scripts, or ADAM tasks that result in other 
+   python scripts being run).
+
    Invocation:
       value = invoke(command,aslist=False,buffer=None,annul=False)
 
@@ -1805,6 +1811,13 @@ class NDG(object):
          supplied pattern. If "pattern" is None, the new NDF is a copy of
          the supplied NDF, but excluding the names of any NDFs that do not
          exist.
+      ndg_instance.remove( ndf )
+         If "ndf " is a string, this removes the NDF with the specified
+         path from the NDG (it does nothing if the NDF is not found in the
+         NDG). If "ndf " is an integer, it removes all NDFs with index
+         greater than or equal to the supplied integer.
+      ndg_instance.list()
+         Print the list of NDF paths.
 
    Class Variables:
       NDG.tempdir = string
@@ -2083,6 +2096,22 @@ class NDG(object):
          result = NDG( ndfs )
       return result
 
+
+   #  Remove a single NDF (specified by path) from an NDG, or remove all
+   #  NDFs with index greater than or equal to a given index
+   def remove( self, ndf ):
+      if isinstance(ndf,str):
+         if ndf in self.__ndfs:
+            self.__ndfs.remove(ndf)
+      elif isinstance(ndf,int):
+         if len(self.__ndfs) > ndf:
+            del self.__ndfs[ndf:]
+      self.__writeFile()
+
+   #  Print the NDFs in a NDG.
+   def list( self ):
+      for ndf in self.__ndfs:
+         print( ndf )
 
    # Allow the NDG to be indexed like a list of NDF names
    def __len__(self):
