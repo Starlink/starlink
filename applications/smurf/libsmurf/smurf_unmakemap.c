@@ -81,10 +81,12 @@
 *          falling on each bolometer is multiplied by the corresponding
 *          value in this file, to get the instrumental Q value that is
 *          added onto the value read from the QIN parameter. Bad values
-*          are treated as zero values. Note, if INSTQ is specified, an
-*          error is reported if the supplied template files (see
-*          parameter REF) include data for more than one SCUBA-2
-*          sub-array. [!]
+*          are treated as zero values. Note, currently there is no
+*          facility to use different INSTQ values for different
+*          sub-arrays - all data supplied via IN will use the same
+*          INSTQ values regardless of sub-array. To overcome this
+*          restriction, run unmakemap separately for each sub-array
+*          supplying a differnt INSTQ each time. [!]
 *     INSTU = NDF (Read)
 *          An optional 2D input NDF holding the instrumental normalised U
 *          value for each bolometer, with respect to fixed analyser.
@@ -92,10 +94,12 @@
 *          falling on each bolometer is multiplied by the corresponding
 *          value in this file, to get the instrumental U value that is
 *          added onto the value read from the UIN parameter. Bad values
-*          are treated as zero values. Note, if INSTU is specified, an
-*          error is reported if the supplied template files (see
-*          parameter REF) include data for more than one SCUBA-2
-*          sub-array. [!]
+*          are treated as zero values. Note, currently there is no
+*          facility to use different INSTU values for different
+*          sub-arrays - all data supplied via IN will use the same
+*          INSTU values regardless of sub-array. To overcome this
+*          restriction, run unmakemap separately for each sub-array
+*          supplying a differnt INSTU each time. [!]
 *     INTERP = LITERAL (Read)
 *          The method to use when resampling the input sky image pixel values.
 *          For details of these schemes, see the descriptions of routines
@@ -225,6 +229,10 @@
 *        Added ADAM parameter COM.
 *     28-APR-2015 (DSB):
 *        Added ADAM parameters AMP4 and PHASE4.
+*     7-MAY-2015 (DSB):
+*        Allow same instrumental polarisation to be used with all
+*        sub-arrays (previously an error was reported if IP was
+*        specified and the IN data contained more than one sub-array).
 
 *  Copyright:
 *     Copyright (C) 2011 Science and Technology Facilities Council.
@@ -346,12 +354,9 @@ void smurf_unmakemap( int *status ) {
    int nparam = 0;            /* No. of parameters required for interpolation scheme */
    int pasign;                /* Indicates sense of POL_ANG value */
    int sdim[ 2 ];             /* Array of significant pixel axes */
-   int singlesub;             /* Only one subarray allowed? */
    int slbnd[ 2 ];            /* Array of lower bounds of input map */
    int subnd[ 2 ];            /* Array of upper bounds of input map */
    int ubndc[ 3 ];            /* Array of upper bounds of COM NDF */
-   sc2ast_subarray_t subnum0 = SC2AST__NULLSUB; /* Identifier for subarray */
-   sc2ast_subarray_t subnum;  /* Identifier for subarray */
    size_t ncom;               /* Number of com files */
    size_t nskymap;            /* Number of supplied sky cubes */
    size_t outsize;            /* Number of files in output group */
@@ -517,7 +522,6 @@ void smurf_unmakemap( int *status ) {
    }
 
 /* Get any instrumental polarisation files. */
-   singlesub = 0;
    if( *status == SAI__OK ) {
       ndfAssoc( "INSTQ", "Read", &indfiq, status );
       if( *status == PAR__NULL ) {
@@ -533,7 +537,6 @@ void smurf_unmakemap( int *status ) {
          } else {
             ndfMap( indfiq, "DATA", "_DOUBLE", "READ", (void **) &qinst_data,
                     &nel, status );
-            singlesub = 1;
          }
       }
 
@@ -551,7 +554,6 @@ void smurf_unmakemap( int *status ) {
          } else {
             ndfMap( indfiu, "DATA", "_DOUBLE", "READ", (void **) &uinst_data,
                     &nel, status );
-            singlesub = 1;
          }
       }
    }
@@ -596,23 +598,6 @@ void smurf_unmakemap( int *status ) {
             *status = SAI__ERROR;
             errRep( FUNC_NAME, "No smfHead associated with smfData.",
                     status );
-            break;
-         }
-      }
-
-/* If instrumental Q/U arrays have been supplied, then all data must
-   refer to a single subarray (since the same instrument Q/U values are used
-   for all data). */
-      if( singlesub ) {
-         smf_find_subarray( odata->hdr, NULL, 0, &subnum, status );
-         if( ifile == 1 ) {
-            subnum0 = subnum;
-         } else if( subnum != subnum0 && *status == SAI__OK ) {
-            *status = SAI__ERROR;
-            errRep( FUNC_NAME, "Supplied REF data refer to more than one "
-                    "sub-array", status );
-            errRep( FUNC_NAME, "All data must be for one subarray since "
-                    "instrumental polarisation has been specified.", status );
             break;
          }
       }
