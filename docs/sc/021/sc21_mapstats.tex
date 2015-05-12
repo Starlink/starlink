@@ -1,0 +1,52 @@
+\chapter{\xlabel{mapstats}\drrecipe{SCUBA2\_MAPSTATS}}
+\label{app:mapstats}
+
+The \picard\ recipe \drrecipe{SCUBA2\_MAPSTATS} estimates the RMS
+and NEFD for a given observation.
+
+The average NEP is calculated from the QL pipeline log file
+(\file{log.nep}) corresponding to the date and wavelength. The FCF
+(either from the file or the standard value) and mean transmission
+over the observation is used to convert this to a zenith NEFD
+(NEFD).
+
+The input images are cropped to the given size (as specified in the
+FITS headers or via the MAP\_HEIGHT and MAP\_WIDTH recipe parameters)
+before the mean exposure time is derived, along with the mean/median
+noise and NEFD (RMS and NEFDs).
+
+The parameters written out to \file{log.mapstats} are listed below:
+\begin{table}[h!]
+  \begin{center}
+    \begin{tabular}{|p{2.5cm}|p{12cm}|}
+      \hline
+      \textbf{Parameter} & \textbf{Description}\\
+      \hline
+      UT & UT date including day fraction\\
+      HST & HST date and time stamp \\
+      Obs & observation number\\
+      Source & object name\\
+      Mode & observation mode (either daisy or pong)\\
+      FILTER & filter (wavelength)\\
+      El & mean elevation of observation\\
+      Airmass & mean airmass of observation\\
+      Trans & mean line-of-sight transmission\\
+      Tau225 & mean zenith optical depth at 225 GHz, derived from WVM\\
+      telapsed & elapsed time of observation in seconds\\
+      texp & mean exposure time, derived from EXP\_TIME NDF component (sec)\\
+      rms & RMS noise in map, obtained from median of error array\\
+      rms\_units & RMS units\\
+      nefd & NEFD derived from combination of variance and exposure time images\\
+      nefd\_units & NEFD units\\
+      mapsize & size (requested diameter) of input map (arcsec)\\
+      pixscale & pixel scale in arcsec\\
+      project & project ID\\
+      recipe & reduction recipe used\\
+      filename & name of input file\\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+
+

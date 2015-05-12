@@ -250,38 +250,43 @@ degrees.
 \section{\xlabel{noise}Sensitivity}
 
 \subsection{Getting the noise}
-\label{sec:checkrms}
+\label{sec:mapstats}
 
-You can use the \picard\ recipe \drrecipe{SCUBA2\_CHECK\_RMS} get the
+You can use the \picard\ recipe \drrecipe{SCUBA2\_MAPSATS} get the
 noise. This recipe estimates the RMS from both the map, the NEP, and
 the RMS predicted by the Integration Time Calculator. It then writes out
-a series of results in a log file called \file{log.checkrms}. The
+a series of results in a log file called \file{log.mapstats}. The
 parameters written to this file are listed in
-\cref{Appendix}{app:checkrmsparams}{SCUBA2_CHECK_RMS}.
+\cref{Appendix}{app:mapstats}{SCUBA2_MAPSTATS}.
 
 \begin{terminalv}
-% picard SCUBA2_CHECK_RMS map.sdf
+% picard SCUBA2_MAPSTATS map.sdf
 \end{terminalv}
-If you have not yet applied an FCF, this recipe will apply the
-appropriate default FCF before estimating the noise.
+This recipe will report the noise in the same input units provided. 
 
 
-\textbf{Note:} \drrecipe{SCUBA2\_CHECK\_RMS} can only be run on single
-observations. To get the map noise from a co-add you should perform the steps below.
+\textbf{Note:} \drrecipe{SCUBA2\_MAPSTATS} is only designed to work on
+reductions of a single observations. On coadded observations it could
+produce misleading results, or even fail completely to work.
 
+If multiple files are run through \drrecipe{SCUBA2\_MAPSTATS}, either in a single call
+of PICARD or by repeatedly running PICARD in the same terminal on different
+files, the results will be appended to the existing log.mapstats file.
+The final columns — project, recipe and filename — are given to ensure it
+is clear to users which line of the logfile corresponds to which input file.
 
-\subsubsection*{Steps for getting your map noise}
-After applying any necessary FCF, \drrecipe{SCUBA2\_CHECK\_RMS} simply
-executes the following steps to get the map noise.
+\subsubsection*{Steps for getting your coadded-map noise}
+After applying any necessary FCF, \drrecipe{SCUBA2\_MAPSTATS} simply
+executs the following steps to get the map noise.
 
 \begin{enumerate}
-\item Crops the map to remove the noisy edges.
+\item Crop the map to remove the noisy edges.
 
 \begin{terminalv}
 % picard CROP_JCMT_IMAGES map_cal.sdf
 \end{terminalv}
 
-\item Runs the \Kappa\ command \stats\ to extract the median value from
+\item Run the \Kappa\ command \stats\ to extract the median value from
 the error array.
 
 \begin{terminalv}
