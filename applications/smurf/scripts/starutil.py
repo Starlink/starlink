@@ -246,7 +246,7 @@ def invoke(command,aslist=False,buffer=None,annul=False):
    Note - this command should only be used to invoke ADAM tasks. It is
    not re-entrant. That is, you should not use it to invoke a command
    that may possible then use "invoke" itself (i.e. do not use it to
-   invoke other python scripts, or ADAM tasks that result in other 
+   invoke other python scripts, or ADAM tasks that result in other
    python scripts being run).
 
    Invocation:
@@ -2203,7 +2203,7 @@ class NDG(object):
          if len(self) == len(other):
             for (sndf,ondf) in zip( self.__ndfs, other.__ndfs ):
                if sndf != ondf:
-                  return false
+                  return False
             return True
          else:
             return False

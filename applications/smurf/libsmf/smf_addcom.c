@@ -105,7 +105,7 @@ void smf_addcom( ThrWorkForce *wf, smfData *data, const double *com,
 /* Check the inherited status. */
    if( *status != SAI__OK || !com ) return;
 
-/* Check supplied smfData is time ordered. */
+/* Check supplied smfData is time ordered (i.e. bstride=1, tstride=nbolo). */
    if( !data->isTordered ) {
       *status = SAI__ERROR;
       errRep( " ", "smf_addcom: Supplied smfData is not time-ordered.",

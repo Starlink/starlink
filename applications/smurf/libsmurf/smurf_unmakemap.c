@@ -43,6 +43,13 @@
 *          to TRUE will result in the template data being aligned in AZEL
 *          directly, disregarding the fact that a given AZEL will correspond
 *          to different positions on the sky at different times. [FALSE]
+*     AMP2 = _DOUBLE (Read)
+*          Controls the amplitude of the 2 Hz signal in the analysed
+*          intensity streams created in polarimetry mode (see "QIN" and
+*          "UIN"). This parameter is only used if HARMONIC is set to its
+*          default value of 4 (a value of zero is assumed otherwise). It
+*          gives the amplitude of the 2 Hz signal as a fraction of the
+*          total intensity. See also "PHASE2". [0.0]
 *     AMP4 = _DOUBLE (Read)
 *          Controls the amplitude of the 4 Hz signal in the analysed
 *          intensity streams created in polarimetry mode (see "QIN" and
@@ -50,6 +57,13 @@
 *          default value of 4 (a value of zero is assumed otherwise). It
 *          gives the amplitude of the 4 Hz signal as a fraction of the
 *          total intensity. See also "PHASE4". [0.0]
+*     AMP16 = _DOUBLE (Read)
+*          Controls the amplitude of the 16 Hz signal in the analysed
+*          intensity streams created in polarimetry mode (see "QIN" and
+*          "UIN"). This parameter is only used if HARMONIC is set to its
+*          default value of 4 (a value of zero is assumed otherwise). It
+*          gives the amplitude of the 16 Hz signal as a fraction of the
+*          total intensity. See also "PHASE16". [0.0]
 *     ANGROT = _DOUBLE (Read)
 *          The angle from the focal plane X axis to the fixed analyser, in
 *          degrees. Measured positive in the same sense as rotation from focal
@@ -62,6 +76,13 @@
 *          with length at least equal to the length of the time axis of the
 *          corresponding REF cube. No common-mode is added to the data if
 *          null (!) is supplied. [!]
+*     GAI = NDF (Read)
+*          A group of existing 2D NDFs that specify the gain of each
+*          bolometer for the corresponding IN file. If null (!) is
+*          supplied, all bolometer gains are set to unity. Otherwise,
+*          each of the supplied 2D NDFs must have dimensions of (32,40).
+*          The number of NDFs in the group must equal the number of NDFs
+*          supplied for IN.  [!]
 *     HARMONIC = _INTEGER (Read)
 *          The Q and U values are derived from the fourth harmonic of the
 *          half-wave plate rotation. However, to allow investigation of
@@ -179,9 +200,15 @@
 *          to rotation from focal plane X to focal plane Y axis. If FALSE, it
 *          is assumed that a positive POL_ANG value corresponds to rotation
 *          from focal plane Y to focal plane X axis. [TRUE]
+*     PHASE2 = _DOUBLE (Read)
+*          The phase offset to apply to the 2 Hz signal specified via
+*          parameter AMP2, in degrees. [0.0]
 *     PHASE4 = _DOUBLE (Read)
 *          The phase offset to apply to the 4 Hz signal specified via
 *          parameter AMP4, in degrees. [0.0]
+*     PHASE16 = _DOUBLE (Read)
+*          The phase offset to apply to the 16 Hz signal specified via
+*          parameter AMP16, in degrees. [0.0]
 *     QIN = NDF (Read)
 *          The input 2D image of the sky Q values, with respect to the
 *          second pixel axis (i.e. the pixel Y axis). If QIN and UIN are
@@ -233,6 +260,8 @@
 *        Allow same instrumental polarisation to be used with all
 *        sub-arrays (previously an error was reported if IP was
 *        specified and the IN data contained more than one sub-array).
+*     11-MAY-2015 (DSB):
+*        Added ADAM parameters AMP2, AMP16, PHASE2 and PHASE16.
 
 *  Copyright:
 *     Copyright (C) 2011 Science and Technology Facilities Council.
@@ -321,11 +350,15 @@ void smurf_unmakemap( int *status ) {
    double *pu = NULL;         /* Pointer to next U time series value */
    double *qinst_data = NULL; /* Pointer to the instrumental Q data */
    double *uinst_data = NULL; /* Pointer to the instrumental U data */
+   double amp2;               /* Amplitude of 2 Hz signal */
    double amp4;               /* Amplitude of 4 Hz signal */
+   double amp16;              /* Amplitude of 16 Hz signal */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double params[ 4 ];        /* astResample parameters */
+   double phase2;             /* Phase of 2 Hz signal */
    double phase4;             /* Phase of 4 Hz signal */
+   double phase16;            /* Phase of 16 Hz signal */
    double sigma;              /* Standard deviation of noise to add to output */
    int alignsys;              /* Align data in the map's system? */
    int cdims[ 3 ];            /* Common-mode NDF dimensions */
@@ -701,13 +734,21 @@ void smurf_unmakemap( int *status ) {
          parGet0i( "HARMONIC", &harmonic, status );
 
 /* If producing the normal 8 Hz harmonic, get the amplitude and phase of a
-   4 Hz signal to add onto the 8 Hz signal. */
+   other signals to add onto the 8 Hz signal. */
          if( harmonic == 4 ) {
+            parGet0d( "AMP2", &amp2, status );
+            parGet0d( "PHASE2", &phase2, status );
             parGet0d( "AMP4", &amp4, status );
             parGet0d( "PHASE4", &phase4, status );
+            parGet0d( "AMP16", &amp16, status );
+            parGet0d( "PHASE16", &phase16, status );
          } else {
+            amp2 = 0.0;
+            phase2 = 0.0;
             amp4 = 0.0;
             phase4 = 0.0;
+            amp16 = 0.0;
+            phase16 = 0.0;
          }
 
 /* Allocate room for an array to hold the anti-clockwise angle from the
@@ -728,7 +769,8 @@ void smurf_unmakemap( int *status ) {
    main output is analysed intensity. */
          smf_uncalc_iqu( wf, odata, odata->pntr[ 0 ], outq_data, outu_data,
                          ang_data, pasign, AST__DD2R*paoff, AST__DD2R*angrot,
-                         amp4, AST__DD2R*phase4, qinst_data, uinst_data,
+                         amp2, AST__DD2R*phase2, amp4, AST__DD2R*phase4,
+                         amp16, AST__DD2R*phase16, qinst_data, uinst_data,
                          harmonic, status );
 
 /* Release work space. */

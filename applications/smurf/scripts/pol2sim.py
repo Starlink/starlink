@@ -36,8 +36,8 @@
 *       (i.e. each sub-array sees the same instrumental polarisation -
 *       this needs exapnding at some point to allow for different IPs for
 *       each sub-array).
-*     - 4Hz signal proportional to the total intensity, including sky
-*       brightness in included in the simulated POL2 data.
+*     - 2, 4 and 16 Hz signals proportional to the total intensity (including
+*       sky brightness) in included in the simulated POL2 data.
 *     - Each bolometer has a separate gain, which is allowed to vary over
 *       time (like the GAI model used by smurf:makemap). The GAI values
 *       are derived from the template POL2 data supplied for parameter
@@ -51,10 +51,18 @@
 *     pol2sim in out newart arti artq artu
 
 *  Parameters:
+*     AMP2 = _DOUBLE (Read)
+*        Controls the amplitude of the 2 Hz signal. It gives the amplitude
+*        of the 2 Hz signal as a fraction of the total intensity. See
+*        also "PHASE2". [0.0001]
 *     AMP4 = _DOUBLE (Read)
 *        Controls the amplitude of the 4 Hz signal. It gives the amplitude
 *        of the 4 Hz signal as a fraction of the total intensity. See
 *        also "PHASE4". [0.00027]
+*     AMP16 = _DOUBLE (Read)
+*        Controls the amplitude of the 16 Hz signal. It gives the amplitude
+*        of the 16 Hz signal as a fraction of the total intensity. See
+*        also "PHASE16". [0.00005]
 *     ARTI = NDF (Read or write)
 *        A 2D NDF holding the artificial total intensity map from which the
 *        returned time-stream data is derived. If the NEWART parameter
@@ -83,7 +91,7 @@
 *     GFACTOR = _DOUBLE (Read)
 *        A factor by which to expand the GAI model values derived from
 *        the supplied time-series data. The expansion is centred on the
-*        value 1.0. [1.0]
+*        value 1.0. No GAI model is used if GFACTOR is zero. [1.0]
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
 *        Allowed values are as for "ILEVEL". The log file to create is
@@ -180,16 +188,23 @@
 *        coord (0,0), with peak total intensity given by parameter IPEAK
 *        and width given by parameter IFWHM. The polarisation vectors are
 *        tangential, centred on the source. The fractional polarisation is
-*        zero at the centre and increases at larger radii to the value
-*        given by parameter PMAX. The Y pixel axis is reference direction.
+*        constant at the value given by POL. The Y pixel axis is reference
+*        direction (suitable POLANAL Frames are included in the WCS to
+*        indicate this, as required by POLPACK).
 *     OUT = NDF (Write)
 *        A group of output NDFs to hold the simulated POL2 time series
 *        data. Equal in number to the files in "IN".
+*     PHASE2 = _DOUBLE (Read)
+*        The phase offset to apply to the 2 Hz signal specified via
+*        parameter AMP2, in degrees. [0.0]
 *     PHASE4 = _DOUBLE (Read)
 *        The phase offset to apply to the 4 Hz signal specified via
 *        parameter AMP4, in degrees. [-30.0]
-*     PMAX = _DOUBLE (Read)
-*        Maximum fractional polarisation for new artificial Q and U maps.
+*     PHASE16 = _DOUBLE (Read)
+*        The phase offset to apply to the 16 Hz signal specified via
+*        parameter AMP16, in degrees. [0.0]
+*     POL = _DOUBLE (Read)
+*        The fractional polarisation for new artificial Q and U maps.
 *        [0.05]
 *     RESTART = LITERAL (Read)
 *        If a value is assigned to this parameter, it should be the path
@@ -324,7 +339,7 @@ try:
                                 "artificial I map (pW)", 0.08, True ))
    params.append(starutil.Par0F("IFWHM", "Width of source in artificial I "
                                 "map (pixels)", 8, True ))
-   params.append(starutil.Par0F("PMAX", "Maximum fractional polarisation in "
+   params.append(starutil.Par0F("POL", "Fractional polarisation in "
                                 "artificial Q/U maps", 0.05, True ))
    params.append(starutil.Par0F("IPMAX", "Maximum fractional instrumental "
                                 "polarisation", 0.0008, True ))
@@ -336,10 +351,18 @@ try:
                                 1.0, True ))
    params.append(starutil.Par0F("CFACTOR", "Expansion factor for COM values",
                                 0.2, True ))
+   params.append(starutil.Par0F("AMP2", "Amplitude for 2Hz signal",
+                                0.0001, True ))
    params.append(starutil.Par0F("AMP4", "Amplitude for 4Hz signal",
                                 0.00027, True ))
+   params.append(starutil.Par0F("AMP16", "Amplitude for 16Hz signal",
+                                0.00005, True ))
+   params.append(starutil.Par0F("PHASE2", "Phase for 2Hz signal (deg.s)",
+                                0.0, True ))
    params.append(starutil.Par0F("PHASE4", "Phase for 4Hz signal (deg.s)",
                                 -30.0, True ))
+   params.append(starutil.Par0F("PHASE16", "Phase for 16Hz signal (deg.s)",
+                                0.0, True ))
    params.append(starutil.Par0F("SIGMA", "Noise level in pW", 0.004, True ))
 
 #  Initialise the parameters to hold any values supplied on the command
@@ -383,7 +406,7 @@ try:
                if ncom > nin:
                   remlist.append( ndf )
 
-      msg_out("Ignoring {0} surplus file in INCOM".format(len(remlist) ))
+      msg_out("Ignoring {0} surplus files in INCOM".format(len(remlist) ))
       for ndf in remlist:
         incom.remove( ndf )
 
@@ -407,8 +430,12 @@ try:
    uart = parsys["ARTU"].value
 
 #  Other required params
+   amp2 = parsys["AMP2"].value
+   phase2 = parsys["PHASE2"].value
    amp4 = parsys["AMP4"].value
    phase4 = parsys["PHASE4"].value
+   amp16 = parsys["AMP16"].value
+   phase16 = parsys["PHASE16"].value
    sigma = parsys["SIGMA"].value
 
 #  See if old temp files are to be re-used.
@@ -457,7 +484,7 @@ try:
 #  Get the parameters defining the artificial data
       ipeak = parsys["IPEAK"].value
       ifwhm = parsys["IFWHM"].value
-      pmax = parsys["PMAX"].value
+      pol = parsys["POL"].value
 
 #  Determine the spatial extent of the data on the sky.
       invoke("$SMURF_DIR/makemap in={0} out=! config=def".format(ff))
@@ -480,25 +507,35 @@ try:
 #  Generate Q,U and I for a single gaussian bump.  Tangential vectors
 #  centred on the bump, with increasing percentage polarisation at larger
 #  radii. Y pixel axis is reference direction. First create the I map.
-      invoke("$KAPPA_DIR/maths exp='pa*exp(-pc*(xa**2+xb**2)/(pf**2))' "
-             "pa={0} pc=1.66511 pf={1} type=_double lbound=\[{2},{3}\] "
-             "ubound=\[{4},{5}\] out={6}".format(ipeak,ifwhm,lx,ly,ux,uy,iart))
+      if ipeak != 0.0:
+         invoke("$KAPPA_DIR/maths exp='pa*exp(-pc*(xa**2+xb**2)/(pf**2))' "
+                "pa={0} pc=1.66511 pf={1} type=_double lbound=\[{2},{3}\] "
+                "ubound=\[{4},{5}\] out={6}".format(ipeak,ifwhm,lx,ly,ux,uy,iart))
 
 #  Now create the fractional polarisation map.
-      fp = NDG(1)
-      invoke("$KAPPA_DIR/maths exp='pm*(pa-ia)/pa' ia={0} out={1} pa={2} pm={3}".
-             format(iart,fp,ipeak,pmax) )
+         fp = NDG(1)
+         invoke("$KAPPA_DIR/maths exp='ia*0+pa' ia={0} out={1} pa={2}".
+                format(iart,fp,pol) )
 
 #  Polarised intensity.
-      pi = NDG(1)
-      invoke( "$KAPPA_DIR/mult {0} {1} {2}".format(iart,fp,pi) )
+         pi = NDG(1)
+         invoke( "$KAPPA_DIR/mult {0} {1} {2}".format(iart,fp,pi) )
 
 #  Get q and u values that give radial vectors.
-      theta = NDG(1)
-      invoke( "$KAPPA_DIR/maths exp=\"'ia*0+atan2(-xa,xb)'\" ia={0} out={1}".
-              format(iart,theta) )
-      invoke("$KAPPA_DIR/maths exp='-ia*cos(2*ib)' ia={0} ib={1} out={2}".format(pi,theta,qart) )
-      invoke("$KAPPA_DIR/maths exp='-ia*sin(2*ib)' ia={0} ib={1} out={2}".format(pi,theta,uart) )
+         theta = NDG(1)
+         invoke( "$KAPPA_DIR/maths exp=\"'ia*0+atan2(-xa,xb)'\" ia={0} out={1}".
+                 format(iart,theta) )
+         invoke("$KAPPA_DIR/maths exp='-ia*cos(2*ib)' ia={0} ib={1} out={2}".format(pi,theta,qart) )
+         invoke("$KAPPA_DIR/maths exp='-ia*sin(2*ib)' ia={0} ib={1} out={2}".format(pi,theta,uart) )
+
+#  Fill I, Q and U images with zeros if IPEAK is zero.
+      else:
+         invoke("$KAPPA_DIR/creframe mode=fl mean=0 lbound=\[{0},{1}\] "
+                "ubound=\[{2},{3}\] out={4}".format(lx,ly,ux,uy,iart))
+         invoke("$KAPPA_DIR/creframe mode=fl mean=0 lbound=\[{0},{1}\] "
+                "ubound=\[{2},{3}\] out={4}".format(lx,ly,ux,uy,qart))
+         invoke("$KAPPA_DIR/creframe mode=fl mean=0 lbound=\[{0},{1}\] "
+                "ubound=\[{2},{3}\] out={4}".format(lx,ly,ux,uy,uart))
 
 #  Put WCS into the artificial images, indicating that the pol. ref.
 #  direction is the pixel Y axis.
@@ -654,103 +691,101 @@ try:
       msg_out( "Re-using old instrumental polarisation values...")
 
 #  Create GAI values from the supplied template data.
-   gai = loadndg( "GAI" )
-   if not gai:
-      msg_out( "Creating new artificial GAI models...")
-      gai = NDG(ff)
-      m2 = NDG(ff)
+   gfactor = parsys["GFACTOR"].value
+   if gfactor != 0.0:
+      gai = loadndg( "GAI" )
+      if not gai:
+         msg_out( "Creating new artificial GAI models...")
+         gai = NDG(ff)
+         m2 = NDG(ff)
 
-      for igai in range(len( gai )):
-         msg_out( "   sub-scan {0}/{1}".format(igai+1,len(gai)))
-         this_ff = ff[ igai ]
-         this_m2 = m2[ igai ]
+         for igai in range(len( gai )):
+            msg_out( "   sub-scan {0}/{1}".format(igai+1,len(gai)))
+            this_ff = ff[ igai ]
+            this_m2 = m2[ igai ]
 
 #  Get the number of time slices in the current flat-fielded time-series.
-         invoke("$KAPPA_DIR/ndftrace {0}".format(this_ff) )
-         ns = int( starutil.get_task_par( "dims(3)", "ndftrace" ))
+            invoke("$KAPPA_DIR/ndftrace {0}".format(this_ff) )
+            ns = int( starutil.get_task_par( "dims(3)", "ndftrace" ))
 
 #  Reshape each flat-fielded IN file to a 2D array in which axis
 #  1 is bolometer and axis 2 is time-slice.
-         n2d = NDG(1)
-         invoke("$KAPPA_DIR/reshape {0} out={1} shape=\[1280,{2}\]".format(this_ff,n2d,ns) )
+            n2d = NDG(1)
+            invoke("$KAPPA_DIR/reshape {0} out={1} shape=\[1280,{2}\]".format(this_ff,n2d,ns) )
 
 #  Collapse this 2D array along pixel axis 2 (time) to get the mean value
 #  in each bolometer.
-         n1dmean = NDG(1)
-         invoke("$KAPPA_DIR/collapse {0} estimator=mean axis=2 out={1} wlim=0".
-                format(n2d,n1dmean))
+            n1dmean = NDG(1)
+            invoke("$KAPPA_DIR/collapse {0} estimator=mean axis=2 out={1} wlim=0".
+                   format(n2d,n1dmean))
 
 #  Expand it out again to full 2d, and subtract it off the original to
 #  get a version in which each bolometer has a mean value of zero.
-         n2dmean = NDG(1)
-         invoke("$KAPPA_DIR/manic {0} axes=\[1,0\] lbound=1 ubound={1} out={2}".
-                format(n1dmean,ns,n2dmean))
+            n2dmean = NDG(1)
+            invoke("$KAPPA_DIR/manic {0} axes=\[1,0\] lbound=1 ubound={1} out={2}".
+                   format(n1dmean,ns,n2dmean))
 
-         n2dres = NDG(1)
-         invoke("$KAPPA_DIR/sub {0} {1} {2}".format(n2d,n2dmean,n2dres))
+            n2dres = NDG(1)
+            invoke("$KAPPA_DIR/sub {0} {1} {2}".format(n2d,n2dmean,n2dres))
 
 #  Now collapse these residuals along the bolometer axis to get the
 #  mean-subtracted common mode. Use a median estimator. The above removal
 #  of the mean was necessary so that the resulting common mode is not
 #  determined just by the bolometers with the middle background levels.
-         tmpcom = NDG(1)
-         invoke("$KAPPA_DIR/collapse {0} estimator=median axis=1 out={1} wlim=0".
-                format(n2dres,tmpcom))
+            tmpcom = NDG(1)
+            invoke("$KAPPA_DIR/collapse {0} estimator=median axis=1 out={1} wlim=0".
+                   format(n2dres,tmpcom))
 
 #  We need the time axis to be axis 2 when running NORMALIZE below, so
 #  permute the axes.
-         permcom = NDG(1)
-         invoke("$KAPPA_DIR/permaxes {0}\(,1\) perm=\[2,1\] out={1}".
-                format(tmpcom,permcom))
+            permcom = NDG(1)
+            invoke("$KAPPA_DIR/permaxes {0}\(,1\) perm=\[2,1\] out={1}".
+                   format(tmpcom,permcom))
 
 #  USe NORMALIZE to fit each individual bolometer to the above
 #  common-mode, returning NDFs holding the scale and correlation
 #  coefficients for all bolometers.
-         slp = NDG(1)
-         corr = NDG(1)
-         invoke("$KAPPA_DIR/normalize {0} {1} loop=yes quiet device=! out=! "
-                "outslope={2} outcorr={3}".format(permcom,n2d,slp,corr))
+            slp = NDG(1)
+            corr = NDG(1)
+            invoke("$KAPPA_DIR/normalize {0} {1} loop=yes quiet device=! out=! "
+                   "outslope={2} outcorr={3}".format(permcom,n2d,slp,corr))
 
 #  Blank out bolometers that are poorly correlated to the common-mode.
-         m1 = NDG(1)
-         invoke("$KAPPA_DIR/thresh {0} thrlo=0.96 newlo=bad thrhi=10 "
-                "newhi=bad out={1} quiet".format(corr,m1))
+            m1 = NDG(1)
+            invoke("$KAPPA_DIR/thresh {0} thrlo=0.96 newlo=bad thrhi=10 "
+                   "newhi=bad out={1} quiet".format(corr,m1))
 
 #  Reshape the slopes into a 2d array, and give it the correct origin
-         invoke("$KAPPA_DIR/reshape {0} shape=\[32,40\] out={1}".
-                format(m1,this_m2))
-         invoke("$KAPPA_DIR/setorigin {0} \[0,0\]".format(this_m2))
+            invoke("$KAPPA_DIR/reshape {0} shape=\[32,40\] out={1}".
+                   format(m1,this_m2))
+            invoke("$KAPPA_DIR/setorigin {0} \[0,0\]".format(this_m2))
 
 #  Fill holes smoothly
-      invoke("$KAPPA_DIR/fillbad {0} variance=no niter=3 size=10 out={1}".
-             format(m2,gai))
-      savendg( "GAI", gai )
-   else:
-      msg_out( "Re-using old artificial GAI models...")
+         invoke("$KAPPA_DIR/fillbad {0} variance=no niter=3 size=10 out={1}".
+                format(m2,gai))
+         savendg( "GAI", gai )
+      else:
+         msg_out( "Re-using old artificial GAI models...")
 
 #  Amplify the GAI values.
-   gfactor = parsys["GFACTOR"].value
-   if gfactor != 1.0:
-      msg_out( "Scaling GAI values by {0}".format(gfactor) )
-      fgai = NDG( gai )
-      invoke("$KAPPA_DIR/maths exp='pa*(ia-1.0)+1.0' ia={0} pa={1} out={2}".
-             format(gai,gfactor,fgai))
+      if gfactor != 1.0:
+         msg_out( "Scaling GAI values by {0}".format(gfactor) )
+         fgai = NDG( gai )
+         invoke("$KAPPA_DIR/maths exp='pa*(ia-1.0)+1.0' ia={0} pa={1} out={2}".
+                format(gai,gfactor,fgai))
+      else:
+         fgai = gai
    else:
-      fgai = gai
+      fgai = "!"
 
 #  Finally, create the simulated POL2 time-streams.
    msg_out( "Generating simulated POL2 time-stream data..." )
    invoke("$SMURF_DIR/unmakemap in={0} qin={1} uin={2} ref={3} "
           "sigma={4} out={5} interp=sincsinc params=\[0,3\] com={6} "
-          "instq={7} instu={8} amp4={9} phase4={10}".
+          "instq={7} instu={8} amp4={9} phase4={10} "
+          "amp2={11} phase2={12} amp16={13} phase16={14}".
           format(iart,qart,uart,ff,sigma,outdata,com,ipqu[0],
-                 ipqu[1],amp4,phase4) )
-
-
-
-
-
-
+                 ipqu[1],amp4,phase4,amp2,phase2,amp16,phase16) )
 
 #  Remove temporary files.
    cleanup()

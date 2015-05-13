@@ -13,11 +13,11 @@
 *     C function
 
 *  Invocation:
-*     void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, int nel,
-*                          double *idata, double *qdata, double *udata,
-*                          double *angdata, int pasign, double paoff,
-*                          double angrot, double amp4, double phase4,
-*                          const double *qinst, const double *uinst,
+*     void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
+*                          double *qdata, double *udata, double *angdata,
+*                          int pasign, double paoff, double angrot, double amp2,
+*                          double phase2, double amp4, double phase4, double amp16,
+*                          double phase16, const double *qinst, const double *uinst,
 *                          int harmonic, int *status );
 
 *  Arguments:
@@ -25,8 +25,6 @@
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given)
 *        Pointer to the time series data.
-*     nel
-*        The number of values in each array.
 *     idata = double * (Given and Returned)
 *        On entry an array of I values. On exit, an array of analysed
 *        intensity values.
@@ -51,21 +49,37 @@
 *        The angle from the focal plane X axis to the fixed analyser, in
 *        radians. Measured positive in the same sense as rotation from focal
 *        plane X to focal plane Y.
+*     amp2 = double (Given)
+*        Ignored if "harmonic" is not 4. It gives the amplitude of the
+*        2Hz signal to include in the returned analysed intensity signal, as
+*        a fraction of the total intensity. This is an alternative to setting
+*        using "harmonic" to 1.
 *     amp4 = double (Given)
 *        Ignored if "harmonic" is not 4. It gives the amplitude of the
 *        4Hz signal to include in the returned analysed intensity signal, as
 *        a fraction of the total intensity. This is an alternative to setting
 *        using "harmonic" to 2.
+*     amp16 = double (Given)
+*        Ignored if "harmonic" is not 4. It gives the amplitude of the
+*        16Hz signal to include in the returned analysed intensity signal, as
+*        a fraction of the total intensity. This is an alternative to setting
+*        using "harmonic" to 8.
+*     phase2 = double (Given)
+*        Ignored if "harmonic" is not 4. It gives the phase offset for the
+*        2Hz signal to include in the returned Q and U signal, in radians.
 *     phase4 = double (Given)
 *        Ignored if "harmonic" is not 4. It gives the phase offset for the
 *        4Hz signal to include in the returned Q and U signal, in radians.
+*     phase16 = double (Given)
+*        Ignored if "harmonic" is not 4. It gives the phase offset for the
+*        16Hz signal to include in the returned Q and U signal, in radians.
 *     qinst = const double * (Given)
-*        Array of normalised Q values for each bolometer. The
+*        Array of normalised Q values for each bolometer, or NULL. The
 *        instrumental Q seen by each bolometer is found by multiplying
 *        the corresponding total intensity by this factor. The fixed
 *        analyser is assumed to be the reference direction.
 *     uinst = const double * (Given)
-*        Array of normalised U values for each bolometer. The
+*        Array of normalised U values for each bolometer, or NULL. The
 *        instrumental U seen by each bolometer is found by multiplying
 *        the corresponding total intensity by this factor. The fixed
 *        analyser is assumed to be the reference direction.
@@ -98,6 +112,8 @@
 *        Added arguments amp4 and phase4.
 *     30-APR-2015 (DSB):
 *        Added arguments qinst and uinst.
+*     11-MAY-2015 (DSB):
+*        Added arguments amp2, phase2, amp16 and phase16.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -149,8 +165,12 @@ typedef struct smfUncalcIQUJobData {
    double angfac;
    double angrot;
    double paoff;
+   double amp2;
    double amp4;
+   double amp16;
+   double phase2;
    double phase4;
+   double phase16;
    int ipolcrd;
    int ntslice;
    int old;
@@ -171,8 +191,9 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status );
 
 void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
                      double *qdata, double *udata, double *angdata,
-                     int pasign, double paoff, double angrot, double amp4,
-                     double phase4, const double *qinst, const double *uinst,
+                     int pasign, double paoff, double angrot, double amp2,
+                     double phase2, double amp4, double phase4, double amp16,
+                     double phase16, const double *qinst, const double *uinst,
                      int harmonic, int *status ){
 
 /* Local Variables: */
@@ -303,8 +324,12 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
          pdata->paoff = paoff;
          pdata->angrot = angrot;
          pdata->angfac = harmonic/4.0;
+         pdata->amp2 = amp2;
          pdata->amp4 = amp4;
+         pdata->amp16 = amp16;
+         pdata->phase2 = phase2;
          pdata->phase4 = phase4;
+         pdata->phase16 = phase16;
          pdata->qinst = qinst;
          pdata->uinst = uinst;
 
@@ -364,8 +389,12 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    double *ipu;               /* Pointer to supplied U array */
    double *qin;               /* Pointer to Q array for each bolometer*/
    double *uin;               /* Pointer to U array for each bolometer*/
+   double amp2;
    double amp4;
+   double amp16;
+   double phase2;
    double phase4;
+   double phase16;
    double angfac;
    double angle;              /* Phase angle for FFT */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
@@ -411,8 +440,12 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    paoff = pdata->paoff;
    angrot = pdata->angrot;
    angfac = pdata->angfac;
+   amp2 = pdata->amp2;
+   phase2 = pdata->phase2;
    amp4 = pdata->amp4;
    phase4 = pdata->phase4;
+   amp16 = pdata->amp16;
+   phase16 = pdata->phase16;
 
 /* Check we have something to do. */
    if( b1 < nbolo ) {
@@ -427,10 +460,10 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
       for( ibolo = b1; ibolo <= b2; ibolo++ ) {
 
 /* The instrumental polarisation seen by this bolometer. These are
-   normalised Q and U values. Multiply them by the total intensity to 
+   normalised Q and U values. Multiply them by the total intensity to
    get the instrument Q and U, with respect to the fixed analyser. */
-         ip_qi = pdata->qinst[ ibolo ];
-         ip_ui = pdata->uinst[ ibolo ];
+         ip_qi = pdata->qinst ? pdata->qinst[ ibolo ] : 0.0;
+         ip_ui = pdata->uinst ? pdata->uinst[ ibolo ] : 0.0;
 
 /* Initialise pointers to the next I, Q and U time slice values for
    the current bolometer. */
@@ -508,10 +541,12 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
                *iin = 0.5*( ival + qval*cos( 2*phi*angfac ) +
                                    uval*sin( 2*phi*angfac ) );
 
-/* If producing the usuall 8Hz harmonic, optionally add in a 4Hz
-   component to the signal. */
-               if( angfac == 1 && amp4 != 0.0 ) {
-                  *iin += amp4*ival*sin( phi + phase4 );
+/* If producing the usuall 8Hz harmonic, optionally add in 2, 4 and 16 Hz
+   components to the signal. */
+               if( angfac == 1 ) {
+                  if( amp2 != 0.0 ) *iin += amp2*ival*sin( phi/2 + phase2 );
+                  if( amp4 != 0.0 ) *iin += amp4*ival*sin( phi + phase4 );
+                  if( amp16 != 0.0 ) *iin += amp16*ival*sin( 4*phi + phase16 );
                }
 
             } else {

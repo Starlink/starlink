@@ -5773,11 +5773,29 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter amp2 {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                prompt {Amplitude of 2 Hz signal as a fraction of I}
+                default 0.0
+                helpkey *
+            }
+
             parameter amp4 {
                 type _DOUBLE
                 vpath DEFAULT
                 ppath CURRENT, DEFAULT
                 prompt {Amplitude of 4 Hz signal as a fraction of I}
+                default 0.0
+                helpkey *
+            }
+
+            parameter amp16 {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                prompt {Amplitude of 16 Hz signal as a fraction of I}
                 default 0.0
                 helpkey *
             }
@@ -5887,11 +5905,29 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter phase2 {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                prompt {Phase of 2 Hz signal in degrees}
+                default 0.0
+                helpkey *
+            }
+
             parameter phase4 {
                 type _DOUBLE
                 vpath DEFAULT
                 ppath CURRENT, DEFAULT
                 prompt {Phase of 4 Hz signal in degrees}
+                default 0.0
+                helpkey *
+            }
+
+            parameter phase16 {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                prompt {Phase of 16 Hz signal in degrees}
                 default 0.0
                 helpkey *
             }
