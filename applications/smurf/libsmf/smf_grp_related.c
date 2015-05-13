@@ -262,6 +262,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   /* Local variables */
   size_t *chunk=NULL;         /* Array of flags for continuous chunks */
   dim_t * chunklen = NULL;    /* Length of continuous chunk */
+  dim_t chunkminlen;          /* Min length of continuous chunk */
   size_t currentindex = 0;    /* Counter */
   char cwave[10];             /* String containing wavelength */
   smfData *data = NULL;       /* Current smfData */
@@ -283,6 +284,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   size_t ngroups = 0;         /* Counter for subgroups to be stored */
   size_t nkeep = 0;           /* Number of chunks to keep */
   dim_t * piecelen = NULL;    /* Length of single file */
+  int pol2;                   /* Got pol2 stokes parameter data? */
   smf_subinst_t refsubinst;   /* Subinst of first file */
   size_t **subgroups = NULL;  /* Array containing index arrays to parent Grp */
   smf_subinst_t subinst;      /* Subinst of current file */
@@ -316,6 +318,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   refsubinst = SMF__SUBINST_NONE;
 
   /* Loop over files in input Grp: remember Grps are indexed from 1 */
+  pol2 = 0;
   grouped = astKeyMap( "SortBy=KeyUp" );
   for (i=1; i<=grpsize; i++) {
     char newkey[128];
@@ -343,6 +346,10 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
     if( !maxlen && maxlen_s && data->hdr->steptime) {
       maxlen = (dim_t) (maxlen_s / data->hdr->steptime );
     }
+
+    /* Check for pol2 data . */
+    if( !strcmp( data->hdr->dlabel, "Q" ) || !strcmp( data->hdr->dlabel, "U" )
+        || !strcmp( data->hdr->dlabel, "I" ) ) pol2 = 1;
 
     /* Return srate_maxlen if requested: may want to know this number
        even if maxlen_s is not set. Only calculate once, although it
@@ -646,7 +653,10 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
     }
   }
 
-  /* Decide if we are keeping a chunk by looking at the length. */
+  /* Decide if we are keeping a chunk by looking at the length. "Stare and
+     spin" POl2 data has very short chunks, so relax the check for this. */
+  chunkminlen = pol2 ? 10 : SMF__MINCHUNKSAMP;
+
   maxconcat = 0;
   nkeep = 0;
   keepchunk = astMalloc( ngroups*sizeof(*keepchunk) );
@@ -654,10 +664,10 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
     size_t thischunk;
 
     thischunk = chunk[i];
-    if ( chunklen[thischunk] < SMF__MINCHUNKSAMP ) {
+    if ( chunklen[thischunk] < chunkminlen ) {
       /* Warning message */
       msgSeti("LEN",chunklen[thischunk]);
-      msgSeti("MIN",SMF__MINCHUNKSAMP);
+      msgSeti("MIN", chunkminlen );
       msgOut( " ", "SMF_GRP_RELATED: ignoring short chunk (^LEN<^MIN)",
               status);
       keepchunk[i] = 0;
