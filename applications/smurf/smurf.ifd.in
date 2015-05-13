@@ -5828,6 +5828,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter gai {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                default !
+                prompt {2-dimensional GAI model NDFs}
+                helpkey *
+            }
+
             parameter harmonic {
                 type _INTEGER
                 prompt {The half-wave plate harmonic to use}

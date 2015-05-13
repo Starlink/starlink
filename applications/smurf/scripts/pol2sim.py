@@ -6,7 +6,7 @@
 *     pol2sim
 
 *  Purpose:
-*     Create simulated POL2 data form known I, Q and U maps
+*     Create simulated POL2 data from known I, Q and U maps
 
 *  Language:
 *     python (2.7 or 3.*)
@@ -760,9 +760,14 @@ try:
                    format(m1,this_m2))
             invoke("$KAPPA_DIR/setorigin {0} \[0,0\]".format(this_m2))
 
-#  Fill holes smoothly
-         invoke("$KAPPA_DIR/fillbad {0} variance=no niter=3 size=10 out={1}".
-                format(m2,gai))
+#  Remove spikes.
+         m3 = NDG(m2)
+         invoke("$KAPPA_DIR/ffclean {0} out={1} box=5 clip=\[3,3,3\] ".
+                format(m2,m3))
+
+#  Smooth and fill holes
+         invoke("$KAPPA_DIR/gausmooth {0} fwhm=3 wlim=1E-6 out={1}".
+                format(m3,gai))
          savendg( "GAI", gai )
       else:
          msg_out( "Re-using old artificial GAI models...")
@@ -783,9 +788,9 @@ try:
    invoke("$SMURF_DIR/unmakemap in={0} qin={1} uin={2} ref={3} "
           "sigma={4} out={5} interp=sincsinc params=\[0,3\] com={6} "
           "instq={7} instu={8} amp4={9} phase4={10} "
-          "amp2={11} phase2={12} amp16={13} phase16={14}".
+          "amp2={11} phase2={12} amp16={13} phase16={14} gai={15}".
           format(iart,qart,uart,ff,sigma,outdata,com,ipqu[0],
-                 ipqu[1],amp4,phase4,amp2,phase2,amp16,phase16) )
+                 ipqu[1],amp4,phase4,amp2,phase2,amp16,phase16,fgai) )
 
 #  Remove temporary files.
    cleanup()

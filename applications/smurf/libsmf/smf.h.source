@@ -570,6 +570,9 @@ void smf_addmap1( int contchunk, double *map1, double *mapweight1, double *bolow
 void smf_addcom( ThrWorkForce *wf, smfData *data, const double *com,
                  int *status );
 
+void smf_addgai( ThrWorkForce *wf, smfData *data, const double *gai,
+                 int *status );
+
 void smf_addto_smfArray( smfArray *ary, smfData *data, int *status );
 
 void smf_apodize( smfData *data, size_t len, int forward, int *status );

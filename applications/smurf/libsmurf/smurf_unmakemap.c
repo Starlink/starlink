@@ -262,9 +262,12 @@
 *        specified and the IN data contained more than one sub-array).
 *     11-MAY-2015 (DSB):
 *        Added ADAM parameters AMP2, AMP16, PHASE2 and PHASE16.
+*     13-MAY-2015 (DSB):
+*        Added ADAM parameter GAI.
 
 *  Copyright:
 *     Copyright (C) 2011 Science and Technology Facilities Council.
+*     Copyright (C) 2015 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -330,6 +333,7 @@ void smurf_unmakemap( int *status ) {
    Grp *igrp1 = NULL;         /* Group of input sky files */
    Grp *igrp2 = NULL;         /* Group of input template files */
    Grp *igrpc = NULL;         /* Group of input COM files */
+   Grp *igrpg = NULL;         /* Group of input GAI files */
    Grp *igrpq = NULL;         /* Group of input Q  sky files */
    Grp *igrpu = NULL;         /* Group of input U sky files */
    Grp *ogrp = NULL;          /* Group containing output file */
@@ -339,6 +343,7 @@ void smurf_unmakemap( int *status ) {
    dim_t ndata;               /* Number of elements in array */
    dim_t ntslice;             /* Number of time slices in array */
    double *ang_data = NULL;   /* Pointer to the FP orientation angles */
+   double *gai_data = NULL;   /* Pointer to the input GAI map */
    double *in_data = NULL;    /* Pointer to the input I sky map */
    double *inc_data = NULL;   /* Pointer to the input COM data */
    double *inq_data = NULL;   /* Pointer to the input Q sky map */
@@ -362,12 +367,14 @@ void smurf_unmakemap( int *status ) {
    double sigma;              /* Standard deviation of noise to add to output */
    int alignsys;              /* Align data in the map's system? */
    int cdims[ 3 ];            /* Common-mode NDF dimensions */
+   int gdims[ 3 ];            /* GAI model NDF dimensions */
    int dims[ NDF__MXDIM ];    /* NDF dimensions */
    int flag;                  /* Was the group expression flagged? */
    int harmonic;              /* The requested harmonic */
    int ifile;                 /* Input file index */
    int indf;                  /* Input sky map NDF identifier */
    int indfc;                 /* Input COM NDF identifier */
+   int indfg;                 /* Input GAI NDF identifier */
    int indfcs;                /* NDF identifier for matching section of COM */
    int indfin;                /* Input template cube NDF identifier */
    int indfiq;                /* Input instrumental Q NDF */
@@ -380,8 +387,10 @@ void smurf_unmakemap( int *status ) {
    int moving;                /* Is the telescope base position changing? */
    int ndim;                  /* Number of pixel axes in NDF */
    int ndimc;                 /* Number of pixel axes in common-mode NDF */
+   int ndimg;                 /* Number of pixel axes in GAI NDF */
    int nel;                   /* Number of elements in array */
    int nelc;                  /* Number of elements in COM array */
+   int nelg;                  /* Number of elements in GAI array */
    int nelqu;                 /* Number of elements in Q or U array */
    int ngood;                 /* No. of good values in putput cube */
    int nparam = 0;            /* No. of parameters required for interpolation scheme */
@@ -391,6 +400,7 @@ void smurf_unmakemap( int *status ) {
    int subnd[ 2 ];            /* Array of upper bounds of input map */
    int ubndc[ 3 ];            /* Array of upper bounds of COM NDF */
    size_t ncom;               /* Number of com files */
+   size_t ngai;               /* Number of gai files */
    size_t nskymap;            /* Number of supplied sky cubes */
    size_t outsize;            /* Number of files in output group */
    size_t size;               /* Number of files in input group */
@@ -554,6 +564,15 @@ void smurf_unmakemap( int *status ) {
       }
    }
 
+/* Get any GAI files. */
+   if( *status == SAI__OK ) {
+      kpg1Rgndf( "GAI", size, size, "", &igrpg, &ngai, status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+         ngai = 0;
+      }
+   }
+
 /* Get any instrumental polarisation files. */
    if( *status == SAI__OK ) {
       ndfAssoc( "INSTQ", "Read", &indfiq, status );
@@ -636,11 +655,11 @@ void smurf_unmakemap( int *status ) {
       }
 
 /* Check the reference time series contains double precision values. */
-     smf_dtype_check_fatal( odata, NULL, SMF__DOUBLE, status );
+      smf_dtype_check_fatal( odata, NULL, SMF__DOUBLE, status );
 
 /* Get the total number of data elements, and the number of time slices. */
-     smf_get_dims( odata, NULL, NULL, NULL, &ntslice, &ndata, NULL,
-                   NULL, status );
+      smf_get_dims( odata, NULL, NULL, NULL, &ntslice, &ndata, NULL,
+                    NULL, status );
 
 /* Open any COM file. */
       if( ncom ) {
@@ -698,6 +717,34 @@ void smurf_unmakemap( int *status ) {
       } else {
          indfcs = NDF__NOID;
          inc_data = NULL;
+      }
+
+/* Open any GAI files. */
+      if( ngai ) {
+         ndgNdfas( igrpg, ifile, "READ", &indfg, status );
+         ndfDim( indfg, 3, gdims, &ndimg, status );
+
+/* Check its dimensions, and map it if OK. */
+         if( *status == SAI__OK ) {
+            if( ndimg != 2 ) {
+               *status = SAI__ERROR;
+               ndfMsg( "C", indfg );
+               msgSeti( "N", ndimg );
+               errRep( " ", "Supplied GAI file (^C) has ^N dimensions - "
+                       "must be 2.", status );
+            } else if( gdims[ 0 ] != 32 || gdims[ 1 ] != 40 ) {
+               *status = SAI__ERROR;
+               ndfMsg( "C", indfg );
+               errRep( " ", "Supplied GAI file (^C) has has bad "
+                       "dimensions - should be 32x40.", status );
+            }
+         }
+         ndfMap( indfg, "DATA", "_DOUBLE", "READ", (void **) &gai_data,
+                 &nelg, status );
+
+      } else {
+         indfg = NDF__NOID;
+         gai_data = NULL;
       }
 
 /* Fill the output with bad values. */
@@ -779,6 +826,9 @@ void smurf_unmakemap( int *status ) {
          ang_data = astFree( ang_data );
       }
 
+/* Factor in any GAI data. */
+      smf_addgai( wf, odata, gai_data, status );
+
 /* Close the output time series file. */
       smf_close_file( wf, &odata, status );
 
@@ -799,6 +849,7 @@ void smurf_unmakemap( int *status ) {
    if( igrpq != NULL) grpDelet( &igrpq, status);
    if( igrpu != NULL) grpDelet( &igrpu, status);
    if( igrpc != NULL) grpDelet( &igrpc, status);
+   if( igrpg != NULL) grpDelet( &igrpg, status);
    if( ogrp != NULL) grpDelet( &ogrp, status);
 
 /* End the NDF context. */
