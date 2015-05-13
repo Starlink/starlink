@@ -89,5 +89,14 @@ angrot = 90.0
 #		typically has very little effect.
 submean = 0
 
+#-----------------------------------------------------------------
+#  Name: 	polbox
+#  Type: 	integer
+#  Default: 	1
+#  Purpose: 	Controls the least squares fit used to determine Q and U
+#  Description: The number of half-waveplate rotations in a fitting box.
+#       Only used if ADAM parameter LSQFIT is set to TRUE.
+polbox = 1
+
 
 

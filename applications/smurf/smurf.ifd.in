@@ -778,6 +778,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter lsqfit {
+                type _LOGICAL
+                prompt {Use least-squares method?}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default FALSE
+                helpkey *
+            }
+
             parameter maxsize {
                 type _INTEGER
                 prompt {Max no. of time slices in one block (0=no limit)}
@@ -802,7 +811,7 @@ package @PACKAGE@ {
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
                 default !
-                prompt {Container file for output I NDFs}
+                prompt {Output I NDFs}
                 helpkey *
             }
 
@@ -811,7 +820,7 @@ package @PACKAGE@ {
                 type NDF
                 access WRITE
                 association ->GLOBAL.DATA_ARRAY
-                prompt {Container file for output Q NDFs}
+                prompt {Output Q NDFs}
                 helpkey *
             }
 
@@ -819,7 +828,7 @@ package @PACKAGE@ {
                 position 3
                 type NDF
                 access WRITE
-                prompt {Container file for output U NDFs}
+                prompt {Output U NDFs}
                 helpkey *
             }
 

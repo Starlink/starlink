@@ -187,6 +187,7 @@ smf_find_science.c \
 smf_find_seqcount.c \
 smf_find_subarray.c \
 smf_find_thetabins.c \
+smf_fit_qui.c \
 smf_fit_poly.c \
 smf_fit_poly1d.c \
 smf_fit_pspec.c \
