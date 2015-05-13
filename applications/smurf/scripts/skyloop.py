@@ -596,9 +596,8 @@ try:
    fd.write("flt.whiten_last=<undef>\n")               # case they are set in
    fd.write("com.perarray_last=<undef>\n")             # the supplied config.
    if precleaned:
-      add["downsampscale"] = 0 # Cleaned data will have been downsampled already.
-      add["downsampfreq"] = 0
-
+      fd.write("downsampscale = 0\n")   # Cleaned data will have been downsampled already.
+      fd.write("downsampfreq = 0\n")
    fd.close()                 # Close the config file.
 
 #  Get the name of a temporary NDF that can be used to store the first
