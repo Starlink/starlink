@@ -51,7 +51,8 @@
 *        Q = 2*B
 *        I = 2*( G*box/2 + H )
 *
-*     The Q and U values are specified with respect to tracking north.
+*     The Q and U values are specified with respect to either tracking
+*     north, or the focal plane Y axis (see parameter NORTH).
 *
 *     If LSQFIT is set FALSE, then the output NDFs associated with
 *     parameters OUTQ, OUTU and OUTI are each 2D and contain a single Q,
@@ -168,6 +169,12 @@
 *        Control the verbosity of the application. Values can be
 *        NONE (no messages), QUIET (minimal messages), NORMAL,
 *        VERBOSE, DEBUG or ALL. [NORMAL]
+*     NORTH = _LOCAL (Read)
+*        Only used if LSQFIT is TRUE. Specifies the reference direction
+*        for the returned Q and U values - north in the tracking system
+*        if NORTH is TRUE, and Y axis of the focal plane system if NORTH
+*        is FALSE. Stokes parameters created with LSQFIT=FALSE always use
+*        focal plane Y as the reference direction. [TRUE]
 *     OUTI = LITERAL (Write)
 *        The output file to receive total intensity values. If LSQFIT is
 *        FALSE, this will be an HDS container file containing the I images.
@@ -325,6 +332,7 @@ void smurf_calcqu( int *status ) {
    int maxsize;               /* Max no. of time slices in a block */
    int minsize;               /* Min no. of time slices in a block */
    int nc;                    /* Number of characters written to a string */
+   int north;                 /* Use tracking north as ref. direction ? */
    int nskipped;              /* Number of skipped blocks */
    int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
    int qplace;                /* NDF placeholder for current block's Q image */
@@ -662,11 +670,12 @@ void smurf_calcqu( int *status ) {
 /* Least squares approach..
    ========================  */
             if( lsqfit && *status == SAI__OK ) {
+               parGet0l( "NORTH", &north, status );
 
 /* Generate the I, Q and U time-streams for the current chunk. */
                smf_fit_qui( wf, data, &odataq, &odatau, ogrpi ? &odatai : NULL,
                             (dim_t) polbox, ipolcrd, pasign, AST__DD2R*paoff,
-                            AST__DD2R*angrot, status );
+                            AST__DD2R*angrot, north, status );
 
 /* Copy the smfData structures to the output NDFs. */
                smf_write_smfData ( wf, odataq, NULL, NULL, ogrpq, gcount,

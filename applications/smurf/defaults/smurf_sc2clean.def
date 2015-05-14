@@ -869,7 +869,9 @@ opteffs8d = <undef>
 #  Default: 	1
 #  Purpose: 	Baseline removal
 #  Description: Subtract a baseline polynomial of this order as part of
-#		the initial cleaning phase.
+#		the initial cleaning phase. Setting order to zero causes
+#               a constant value to be removed from each bolometer. Setting
+#               it negative causes no background to be removed.
 order = 1
 
 #-----------------------------------------------------------------

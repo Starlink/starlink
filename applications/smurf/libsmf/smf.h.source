@@ -1154,7 +1154,7 @@ void smf_find_thetabins( const smfData *data, int nosign, double **bins,
 void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
                   smfData **odatau, smfData **odatai, dim_t box,
                   int ipolcrd, int pasign, double paoff, double angrot,
-                  int *status );
+                  int north, int *status );
 
 void smf_fit_poly( ThrWorkForce *wf, smfData *data, const size_t order,
                    int remove, double *poly, int *status);

@@ -17,7 +17,7 @@
 *     smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 *                  smfData **odatau, smfData **odatai, dim_t box,
 *                  int ipolcrd, int pasign, double paoff, double angrot,
-*                  int *status )
+*                  int north, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -50,6 +50,10 @@
 *        The angle from the focal plane X axis to the fixed analyser, in
 *        radians. Measured positive in the same sense as rotation from focal
 *        plane X to focal plane Y.
+*     north = int (Given)
+*        If non-zero, the returned Q/U values use north in the tracking
+*        system as their reference direction. Otherwise, the reference
+*        direction is the focal plane Y axis.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -76,7 +80,8 @@
 *        Q = 2*B
 *        I = 2*( G*box/2 + H )
 *
-*     The Q and U values are specified with respect to tracking north.
+*     The Q and U values are specified with respect to either tracking
+*     north, or focal plane Y axis (see argument "north").
 *
 *     Care is taken to ensure that each fitting box spans exactly the same
 *     range of "w" values. This is needed because the POL_ANG values are
@@ -159,6 +164,7 @@ typedef struct smfFitQUIJobData {
    double paoff;
    dim_t *box_starts;
    int ipolcrd;
+   int north;
    int pasign;
    smf_qual_t *qua;
 } smfFitQUIJobData;
@@ -180,7 +186,8 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
 
 void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
                   smfData **odatau, smfData **odatai, dim_t box, int ipolcrd,
-                  int pasign, double paoff, double angrot, int *status ){
+                  int pasign, double paoff, double angrot, int north,
+                  int *status ){
 
 /* Local Variables: */
    JCMTState *instate=NULL; /* Pointer to input JCMTState */
@@ -340,6 +347,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
          pdata->paoff = paoff;
          pdata->box_starts = box_starts;
          pdata->angrot = angrot;
+         pdata->north = north;
 
 /* Pass the job to the workforce for execution. */
          thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_fit_qui_job, 0, NULL,
@@ -602,9 +610,11 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 /* Get the POL_ANG value for this time slice. */
                   angle = state->pol_ang;
 
-/* Get the angle from tracking north to focal plane Y, measured positive
-   in the sense of rotation from focal plane Y to focal plane X. */
-                  tr_angle = state->tcs_tr_ang;
+/* If the returned STokes parameters are to be with respect to Tracking
+   North, get the angle from tracking north to focal plane Y, measured
+   positive in the sense of rotation from focal plane Y to focal plane X.
+   Otherwise, use zero. */
+                  tr_angle = pdata->north ? state->tcs_tr_ang : 0.0;
 
 /* Check the input sample has not been flagged during cleaning and is
    not bad. */
@@ -874,8 +884,8 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
                   gsl_linalg_cholesky_solve( &gsl_m.matrix, &gsl_b.vector,
                                              &gsl_x.vector );
 
-/* Modify Q and U so they use the Tracking North as the reference direction,
-   and store in the output arrays. */
+/* Modify Q and U so they use the requested reference direction, and store in
+   the output arrays. */
                   cosval = cos( 2*( angrot - tr_angle ) );
                   sinval = sin( 2*( angrot - tr_angle ) );
                   *(ipq++) = 2*( -solution[ 1 ]*cosval + solution[ 0 ]*sinval );

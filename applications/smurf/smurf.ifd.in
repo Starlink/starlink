@@ -805,6 +805,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter north {
+                type _LOGICAL
+                prompt {Use tracking north as the reference direction?}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default TRUE
+                helpkey *
+            }
+
             parameter outi {
                 type NDF
                 access WRITE
