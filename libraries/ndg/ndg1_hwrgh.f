@@ -120,7 +120,6 @@
       INTEGER NPAR
       INTEGER NREM
       INTEGER PKM
-      LOGICAL JUNK
 *.
 
 *  Check inherited status
@@ -130,7 +129,13 @@
 *  that have already been written out to the NDF's history component.
       CALL NDF_MSG( 'T', INDF )
       CALL MSG_LOAD( ' ', '^T', NDFNAM, NDFLEN, STATUS )
-      JUNK = AST_MAPGET0A( DHKMP_COM2, NDFNAM( : NDFLEN ), PKM, STATUS )
+      IF( .NOT. AST_MAPGET0A( DHKMP_COM2, NDFNAM( : NDFLEN ), PKM,
+     :                        STATUS ) .AND. STATUS == SAI__OK ) THEN
+         CALL NDF_MSG( 'T', INDF )
+         STATUS = SAI__ERROR
+         CALL ERR_REP( ' ', 'NDG_ENDGH: Failed to find KeyMap holding'//
+     :                 ' pre-written group params for ^T.', STATUS )
+      END IF
 
 *  Loop round every entry in the GRP NDF history keymap. Each entry has a
 *  key equal to an ADAM parameter name, and an integer value holding the
