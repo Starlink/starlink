@@ -464,6 +464,7 @@ void smurf_calcqu( int *status ) {
          smf_concat_smfGroup( wf, NULL, sgroup, NULL, NULL, flatramps,
                               heateffmap, ichunk, 1, 1, NULL, 0, NULL, NULL,
                               NO_FTS, 0, 0, 0, &concat, NULL, status );
+         if( *status != SAI__OK ) goto L999;
 
 /* Get a KeyMap holding values for the configuration parameters. Since we
    sorted by wavelength when calling smf_grp_related, we know that all
@@ -858,6 +859,8 @@ void smurf_calcqu( int *status ) {
          datCancl( "OUTI", status );
       }
    }
+
+L999:
 
 /* Free resources. */
    smf_close_related( wf, &flatramps, status );
