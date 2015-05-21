@@ -70,6 +70,8 @@
 *        dimensions changes.
 *     4-AUG-2009 (DSB):
 *        Add FRACTION Frame.
+*     21-MAY-2015 (DSB):
+*        Set LutEpsilon attribute in the AXIS Frame LutMaps.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -88,6 +90,7 @@
       INCLUDE 'NDF_CONST'        ! NDF_ private constants
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
       INCLUDE 'AST_PAR'          ! AST_ public interface
+      INCLUDE 'PRM_PAR'          ! VAL_ constants
 
 *  Global Variables:
       INCLUDE 'NDF_DCB'          ! NDF_ Data Control Block
@@ -129,17 +132,24 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER * ( NDF__SZTYP ) AXTYPE ! Axis data array numeric type
       DOUBLE PRECISION ACA( NDF__MXDIM ) ! Axis coordinate, 1st point
       DOUBLE PRECISION ACB( NDF__MXDIM ) ! Axis coordinate, 2nd point
       DOUBLE PRECISION CONST( NDF__MXDIM ) ! Constants array for PermMap
+      DOUBLE PRECISION EPS       ! Value for LutEpsilon attribute
       DOUBLE PRECISION IAA( NDF__MXDIM ) ! Index in ACB array, 1st point
       DOUBLE PRECISION IAB( NDF__MXDIM ) ! Index in ACB array, 2nd point
       DOUBLE PRECISION IDA( NDF__MXDIM ) ! Index in DCB array, 1st point
       DOUBLE PRECISION IDB( NDF__MXDIM ) ! Index in DCB array, 2nd point
+      DOUBLE PRECISION MAXV      ! Max value in AXIS data array
+      DOUBLE PRECISION MEAN      ! Mean value in AXIS data array
+      DOUBLE PRECISION MINV      ! Min value in AXIS data array
       DOUBLE PRECISION NPCA( NDF__MXDIM ) ! Normalised Pix. coord., 1st point
       DOUBLE PRECISION NPCB( NDF__MXDIM ) ! Normalised Pix. coord., 2nd point
       DOUBLE PRECISION PCA( NDF__MXDIM ) ! Pixel coordinate, 1st point
       DOUBLE PRECISION PCB( NDF__MXDIM ) ! Pixel coordinate, 2nd point
+      DOUBLE PRECISION RMS       ! RMS value in AXIS data array
+      DOUBLE PRECISION SIGMA     ! Standard deviation of values in AXIS data array
       INTEGER AXMAP              ! Mapping pointer for NDF axis
       INTEGER CMPMAP             ! Base GRID to section FRACTION Mapping
       INTEGER EL                 ! Number of mapped values
@@ -155,13 +165,14 @@
       INTEGER IFRAME             ! Loop counter for Frame indices
       INTEGER LBNDA( NDF__MXDIM ) ! Lower pixel index bound (ACB entry)
       INTEGER LBNDD( NDF__MXDIM ) ! Lower pixel index bound (DCB entry)
-      INTEGER MAP0               ! Pointer to base->section GRID Mapping
       INTEGER MAP                ! Pointer to Mapping
+      INTEGER MAP0               ! Pointer to base->section GRID Mapping
       INTEGER NCONST             ! Number of PermMap constants
       INTEGER NDIMA              ! No. NDF dimensions (ACB entry)
       INTEGER NDIMD              ! No. NDF dimensions (DCB entry)
       INTEGER NERR               ! No. data conversion errors (junk)
       INTEGER NEW                ! Pointer to new FrameSet
+      INTEGER NGOOD              ! Number of good values in AXIS data array
       INTEGER PERMA( NDF__MXDIM ) ! Permutation array for ACB axes
       INTEGER PERMD( NDF__MXDIM ) ! Permutation array for DCB axes
       INTEGER PLACE              ! ARY_ placeholder
@@ -480,6 +491,31 @@
                IF ( EL .GT. 1 ) THEN
                   AXMAP = AST_LUTMAP( EL, %VAL( CNF_PVAL( PNTR ) ),
      :                                1.0D0, 1.0D0, ' ', STATUS )
+
+*  Set an appropriate value for the LutEpsilon attribute (the relative
+*  error of the values in the table), based on the data type of the AXIS
+*  structure.
+                  CALL NDF1_ADTYP( IDIM, IACB, AXTYPE, STATUS )
+                  IF( AXTYPE .EQ. '_DOUBLE' ) THEN
+                     EPS = VAL__EPSD
+                  ELSE IF( AXTYPE .EQ. '_REAL' ) THEN
+                     EPS = VAL__EPSR
+
+*  For integer type data, calculate a relative error using an absolute
+*  error of 1.0 and the RMS data value in the array.
+                  ELSE
+                     CALL NDF1_STATS( EL, %VAL( CNF_PVAL( PNTR ) ),
+     :                                MAXV, MINV, MEAN, SIGMA, RMS,
+     :                                NGOOD, STATUS )
+                     IF( RMS .GT. 0.0D0 .AND. RMS .NE. VAL__BADD ) THEN
+                        EPS = 1.0/RMS
+                     ELSE
+                        EPS = 1.0D0
+                     END IF
+                  END IF
+
+*  Set the relative error of the LutMap.
+                  CALL AST_SETD( AXMAP, 'LutEpsilon', EPS, STATUS )
 
 *  If only one value is available (the size of this NDF dimension is
 *  only 1 pixel), then copy the mapped value to a double precision

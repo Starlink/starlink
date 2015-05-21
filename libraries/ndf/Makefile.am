@@ -118,7 +118,8 @@ ndf_xname.f ndf_xnew.f ndf_xnumb.f ndf_xstat.f ndf1_cvcmd.f \
 ndf1_farg.f ndf_sctyp.f ndf1_sctyp.f ndf1_vstyp.f ndf1_wcspm.f \
 ndf1_wclim.f ndf1_wplim.f ndf1_mpanl.f ndf1_mpspt.f ndf_hgmod.f \
 ndf_hsdat.f ndf1_chtim.f ndf1_hcopy.f ndf1_hsrt.f ndf_isin.f ndf_zscal.f \
-ndf1_zpsca.f ndf1_vclst.f ndf_zdelt.f ndf1_cmpac.f ndf_gtdlt.f ndf_hcopy.f
+ndf1_zpsca.f ndf1_vclst.f ndf_zdelt.f ndf1_cmpac.f ndf_gtdlt.f \
+ndf_hcopy.f ndf1_stats.f
 
 NDF_N_GEN = \
 ndf1_adex.gn ndf1_adix.gn ndf1_avex.gn ndf1_awex.gn \
