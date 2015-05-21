@@ -243,7 +243,7 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
 /* Use the FITS headers in the first raw data file to create an AST Circle
    describing the approximate area of the observation within the tracking
    system. */
-                  circle = smf_mapregion_approx( igrp, 1, status );
+                  circle = smf_mapregion_approx( igrp, status );
 
 /* Convert the circle to ICRS (as used by the JSA all-sky grid). */
                   astSetC( circle, "System", "ICRS" );

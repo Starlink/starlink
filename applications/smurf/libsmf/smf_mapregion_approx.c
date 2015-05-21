@@ -14,19 +14,16 @@
 *     C function
 
 *  Invocation:
-*     AstRegion *smf_mapregion_approx( Grp *igrp, int index, int *status )
+*     AstRegion *smf_mapregion_approx( Grp *igrp, int *status )
 
 *  Arguments:
 *     igrp = Grp * (Given)
 *        Group of time-stream NDF data files.
-*     index = int (Given)
-*        Index of the file to use for determining the map region,
-*        usually 1 to use the first file in the Grp.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Returned Value:
-*     A pointer to an AST Region (a Circle) defining the appximate extent
+*     A pointer to an AST Region (a Circle) defining the appoximate extent
 *     of the observation on the sky, defined within the tracking system.
 
 *  Description:
@@ -44,10 +41,13 @@
 *     24-JUL-2014 (DSB):
 *        If the FITS headers that give the map size are not available,
 *        use reasonable defaults rather than reporting an error.
+*     21-MAY-2015 (DSB):
+*        Handle cases where the first subscan is crazy.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2014 Science & Technology Facilities Council.
+*     Copyright (C) 2015 East Asian Observatory
 *     All Rights Reserved.
 
 *  Licence:
@@ -80,7 +80,7 @@
 #include "libsmf/smf.h"
 #include "sc2da/sc2ast.h"
 
-AstRegion *smf_mapregion_approx( Grp *igrp, int index, int *status ){
+AstRegion *smf_mapregion_approx( Grp *igrp, int *status ){
 
 /* Local Variables: */
    AstFrame *azelfrm;
@@ -88,6 +88,8 @@ AstRegion *smf_mapregion_approx( Grp *igrp, int index, int *status ){
    AstRegion *result = NULL;
    char tracksys[ 80 ];
    const char *system;
+   dim_t isize;
+   dim_t ntslice;
    double basec1;
    double basec2;
    double centre[ 2 ];
@@ -96,20 +98,44 @@ AstRegion *smf_mapregion_approx( Grp *igrp, int index, int *status ){
    double mapx;
    double mapy;
    double radius;
+   size_t index;
    smfData *data;
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return result;
 
+/* Loop until we find a sub-scan that can be used. */
+   isize = grpGrpsz( igrp, status );
+   for( index = 1; index <= isize && *status == SAI__OK; index++ ) {
+
 /* Open the requested file. */
-   smf_open_file( NULL, igrp, index, "READ", SMF__NOCREATE_DATA, &data, status );
+      smf_open_file( NULL, igrp, index, "READ", SMF__NOCREATE_DATA, &data,
+                     status );
 
 /* Check that the data is 3-dimensional. */
-   if( data->ndims != 3 && *status == SAI__OK ) {
-      smf_smfFile_msg( data->file, "FILE", 1, "<unknown>" );
-      msgSeti( "ND", data->ndims );
+      if( data->ndims != 3 && *status == SAI__OK ) {
+         smf_smfFile_msg( data->file, "FILE", 1, "<unknown>" );
+         msgSeti( "ND", data->ndims );
+         *status = SAI__ERROR;
+         errRepf( "", "^FILE data has ^ND dimensions, should be 3.", status );
+      }
+
+/* Get the WCS FrameSet describing the mid time slice. */
+      smf_get_dims( data, NULL, NULL, NULL, &ntslice, NULL, NULL, NULL,
+                    status );
+      smf_tslice_ast( data, ntslice/2, 1, NO_FTS, status );
+
+/* If we got a FrameSet we can leave the loop. Otherwise, we try again
+   on the next file. The WCS for some files is blanked by
+   smf_fix_metadata_scuba2 because the telescope goes crazy. */
+      if( data->hdr->wcs ) break;
+   }
+
+/* Report an error if no valid WCS information was found in any file. */
+   if( !data->hdr->wcs && *status == SAI__OK ) {
       *status = SAI__ERROR;
-      errRepf( "", "^FILE data has ^ND dimensions, should be 3.", status );
+      errRep( "", "No subscan with valid WCS found in the supplied files.",
+              status );
    }
 
 /* Set defaults for the required FITS headers. */
@@ -156,10 +182,9 @@ AstRegion *smf_mapregion_approx( Grp *igrp, int index, int *status ){
    boresight. Note, map dimensions are in arc-seconds. */
    radius = AST__DD2R*( 0.5*sqrt( maphght*maphght + mapwdth*mapwdth )/3600.0 + 5.0/60.0 );
 
-/* Get the WCS FrameSet describing the first time slice. This is just to
-   get a SkyFrame with the extra info (observatory position, date/time,
-   etc) needed to describe the tracking system. */
-   smf_tslice_ast( data, 1, 1, NO_FTS, status );
+/* Get the SkyFrame from the WCS FrameSet. This is used just to get
+   the extra info (observatory position, date/time, etc) needed to
+   describe the tracking system. */
    azelfrm = astGetFrame( data->hdr->wcs, AST__CURRENT );
 
 /* Get the AST equivalent to the tracking system, and change the skyframe

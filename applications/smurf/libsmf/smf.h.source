@@ -1541,7 +1541,7 @@ void smf_mapbounds_approx( Grp *igrp, size_t index, char *system,
                            AstFrameSet **outframeset, int *moving,
                            int *status );
 
-AstRegion *smf_mapregion_approx( Grp *igrp, int index, int *status );
+AstRegion *smf_mapregion_approx( Grp *igrp, int *status );
 
 void smf_mask_noisy( ThrWorkForce *wf, smfData *data, smfData **noise,
                      double sigcliphigh, double sigcliplow, int cliplog,
