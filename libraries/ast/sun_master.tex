@@ -21581,6 +21581,10 @@ always returns ``\texttt{rad}'' for InternalUnit, regardless of the value of
 Unit, indicating that floating-point SkyFrame axis values are always in units
 of radians.
 
+\item The LutMap class has a new attribute called LutEpsilon, which specifies
+the relative error of the values in the table. It is used to decide if
+the LutMap can be simplified to a straight line.
+
 \end{enumerate}
 
 % Programs which are statically linked will need to be re-linked in

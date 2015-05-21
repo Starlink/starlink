@@ -96,12 +96,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -164,6 +164,7 @@ typedef struct AstLutMap {
    double start;                /* Input value for first table entry */
    int *flagsi;                 /* Flags indicating adjacent bad values */
    int *indexi;                 /* Translates reduced to original indices */
+   double lutepsilon;           /* Relative error of table values */
    int lutinterp;               /* Interpolation method */
    int nlut;                    /* Number of table entries */
    int nluti;                   /* Reduced number of table entries */
@@ -187,6 +188,10 @@ typedef struct AstLutMapVtab {
    int (* TestLutInterp)( AstLutMap *, int * );
    void (* ClearLutInterp)( AstLutMap *, int * );
    void (* SetLutInterp)( AstLutMap *, int, int * );
+   double (*GetLutEpsilon)( AstLutMap *, int * );
+   int (* TestLutEpsilon)( AstLutMap *, int * );
+   void (* ClearLutEpsilon)( AstLutMap *, int * );
+   void (* SetLutEpsilon)( AstLutMap *, double, int * );
    double *(* GetLutMapInfo)( AstLutMap *, double *, double *, int *, int * );
 
 } AstLutMapVtab;
@@ -244,6 +249,12 @@ void astInitLutMapGlobals_( AstLutMapGlobals * );
    int astTestLutInterp_( AstLutMap *, int * );
    void astClearLutInterp_( AstLutMap *, int * );
    void astSetLutInterp_( AstLutMap *, int, int * );
+
+   double astGetLutEpsilon_( AstLutMap *, int * );
+   int astTestLutEpsilon_( AstLutMap *, int * );
+   void astClearLutEpsilon_( AstLutMap *, int * );
+   void astSetLutEpsilon_( AstLutMap *, double, int * );
+
    double *astGetLutMapInfo_( AstLutMap *, double *, double *, int *, int * );
 #endif
 
@@ -305,6 +316,14 @@ astINVOKE(O,astLoadLutMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
         astINVOKE(V,astTestLutInterp_(astCheckLutMap(this),STATUS_PTR))
 #define astGetLutMapInfo(this,start,inc,nlut) \
         astINVOKE(V,astGetLutMapInfo_(astCheckLutMap(this),start,inc,nlut,STATUS_PTR))
+#define astClearLutEpsilon(this) \
+        astINVOKE(V,astClearLutEpsilon_(astCheckLutMap(this),STATUS_PTR))
+#define astGetLutEpsilon(this) \
+        astINVOKE(V,astGetLutEpsilon_(astCheckLutMap(this),STATUS_PTR))
+#define astSetLutEpsilon(this,value) \
+        astINVOKE(V,astSetLutEpsilon_(astCheckLutMap(this),value,STATUS_PTR))
+#define astTestLutEpsilon(this) \
+        astINVOKE(V,astTestLutEpsilon_(astCheckLutMap(this),STATUS_PTR))
 
 #endif
 

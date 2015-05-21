@@ -41,6 +41,7 @@ f     AST_LUTMAP
 *     In addition to those attributes common to all Mappings, every
 *     LutMap also has the following attributes:
 *
+*     - LutEpsilon: The relative error of the values in the table.
 *     - LutInterp: The interpolation method to use between table entries.
 
 *  Functions:
@@ -60,12 +61,12 @@ f     The LutMap class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -108,6 +109,8 @@ f     The LutMap class does not define any new routines beyond those
 *        inverse transform.
 *     2-OCT-2012 (DSB):
 *        Check for Infs as well as NaNs.
+*     21-MAY-2015 (DSB):
+*        Aded LutEpsilon
 *class--
 */
 
@@ -227,6 +230,11 @@ static int TestLutInterp( AstLutMap *, int * );
 static void ClearLutInterp( AstLutMap *, int * );
 static void SetLutInterp( AstLutMap *, int, int * );
 
+static double GetLutEpsilon( AstLutMap *, int * );
+static int TestLutEpsilon( AstLutMap *, int * );
+static void ClearLutEpsilon( AstLutMap *, int * );
+static void SetLutEpsilon( AstLutMap *, double, int * );
+
 /* Member functions. */
 /* ================= */
 static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
@@ -278,6 +286,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 /* ---------- */
    if ( !strcmp( attrib, "lutinterp" ) ) {
       astClearLutInterp( this );
+
+/* LutEpsilon. */
+/* ------------- */
+   } else if ( !strcmp( attrib, "lutepsilon" ) ) {
+      astClearLutEpsilon( this );
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
@@ -440,9 +453,10 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS           /* Pointer to thread-specific global data */
    AstLutMap *this;             /* Pointer to the LutMap structure */
+   astDECLARE_GLOBALS           /* Pointer to thread-specific global data */
    const char *result;          /* Pointer value to return */
+   double luteps;               /* LutEpsilon attribute value */
    int lutinterp;               /* LutInterp attribute value */
 
 /* Initialise. */
@@ -468,6 +482,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
       lutinterp = astGetLutInterp( this );
       if ( astOK ) {
          (void) sprintf( getattrib_buff, "%d", lutinterp );
+         result = getattrib_buff;
+      }
+
+/* LutEpsilon. */
+/* ------------- */
+   } else if ( !strcmp( attrib, "lutepsilon" ) ) {
+      luteps = astGetLutEpsilon( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, luteps );
          result = getattrib_buff;
       }
 
@@ -521,6 +544,7 @@ static int GetLinear( AstMapping *this_mapping, int *status ) {
 /* Local Variables: */
    AstLutMap *this;              /* Pointer to the LutMap structure */
    double *lut;                  /* Pointer to the lookup table */
+   double eps;                   /* Relative error on the table values */
    double fract;                 /* Fractional position within table */
    double hi;                    /* Largest value */
    double interp;                /* Interpolated value */
@@ -563,9 +587,12 @@ static int GetLinear( AstMapping *this_mapping, int *status ) {
       linear = ( hi == lo );
       if ( !linear ) {
 
+/* Get the relative error associated with the table values. */
+         eps = astGetLutEpsilon( this );
+
 /* Form a tolerance estimate based on the overall range of values in
-      the lookup table. */
-         tol1 = fabs( hi - lo ) * DBL_EPSILON;
+   the lookup table. */
+         tol1 = fabs( hi - lo ) * eps;
 
 /* Now loop to inspect all the lookup table elements except the first
       and last. */
@@ -583,7 +610,7 @@ static int GetLinear( AstMapping *this_mapping, int *status ) {
 /* Form a second tolerance estimate from this interpolated
    value. Select whichever tolerance estimate is larger (this avoids
    problems when values are near zero). */
-            tol2 = fabs( interp ) * DBL_EPSILON;
+            tol2 = fabs( interp ) * eps;
             tol = ( tol1 > tol2 ) ? tol1 : tol2;
 
 /* Test for linearity within a small multiple of the tolerance. */
@@ -899,6 +926,10 @@ void astInitLutMapVtab_(  AstLutMapVtab *vtab, const char *name, int *status ) {
    vtab->GetLutInterp = GetLutInterp;
    vtab->SetLutInterp = SetLutInterp;
    vtab->TestLutInterp = TestLutInterp;
+   vtab->ClearLutEpsilon = ClearLutEpsilon;
+   vtab->GetLutEpsilon = GetLutEpsilon;
+   vtab->SetLutEpsilon = SetLutEpsilon;
+   vtab->TestLutEpsilon = TestLutEpsilon;
    vtab->GetLutMapInfo = GetLutMapInfo;
 
 /* Save the inherited pointers to methods that will be extended, and
@@ -1245,6 +1276,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 
 /* Local Variables: */
    AstLutMap *this;              /* Pointer to the LutMap structure */
+   double luteps;                /* LutEpsilon attribute value */
    int lutinterp;                /* LutInterp attribute value */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by astSscanf */
@@ -1270,6 +1302,13 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
         ( 1 == astSscanf( setting, "lutinterp= %d %n", &lutinterp, &nc ) )
         && ( nc >= len ) ) {
       astSetLutInterp( this, lutinterp );
+
+/* LutEpsilon. */
+/* ------------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "lutepsilon= %lf %n", &luteps, &nc ) )
+        && ( nc >= len ) ) {
+      astSetLutEpsilon( this, luteps );
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
@@ -1338,6 +1377,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 /* ---------- */
    if ( !strcmp( attrib, "lutinterp" ) ) {
       result = astTestLutInterp( this );
+
+/* LutEpsilon. */
+/* ------------- */
+   } else if ( !strcmp( attrib, "lutepsilon" ) ) {
+      result = astTestLutEpsilon( this );
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
@@ -1734,6 +1778,44 @@ astMAKE_GET(LutMap,LutInterp,int,LINEAR,( ( this->lutinterp == -INT_MAX ) ?
 astMAKE_SET(LutMap,LutInterp,int,lutinterp,(( value == LINEAR ) ? LINEAR : NEAR ))
 astMAKE_TEST(LutMap,LutInterp,( this->lutinterp != -INT_MAX ))
 
+/*
+*att++
+*  Name:
+*     LutEpsilon
+
+*  Purpose:
+*     The relative error of the values held in the took-up table.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Double precision.
+
+*  Description:
+*     This attribute holds the relative error of the values held in the
+*     took-up table. It is used when simplifying a LutMap, to determine
+*     if the LutMap should be considered linear. Setting a larger value
+*     makes it more likely that a LutMap will be replaced by a WinMap
+*     (i.e. a linear Mapping) when simplified.
+*
+*     The default value is the value of the system constant DBL_EPSILON
+*     (typically around 1e-16 or 2E-16). If the values in the look-up
+*     table were derived from single precision data, it may be appropriate
+*     to set this attribute to a value around 1E-7.
+
+*  Applicability:
+*     LutMap
+*        All LutMaps have this attribute.
+
+*att--
+*/
+astMAKE_CLEAR(LutMap,LutEpsilon,lutepsilon,AST__BAD)
+astMAKE_GET(LutMap,LutEpsilon,double,DBL_EPSILON,( ( this->lutepsilon == AST__BAD ) ?
+                                          DBL_EPSILON : this->lutepsilon ))
+astMAKE_SET(LutMap,LutEpsilon,double,lutepsilon,(value))
+astMAKE_TEST(LutMap,LutEpsilon,( this->lutepsilon != AST__BAD ))
+
 /* Copy constructor. */
 /* ----------------- */
 static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
@@ -1866,6 +1948,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* Local Variables: */
    AstLutMap *this;              /* Pointer to the LutMap structure */
    char buff[ KEY_LEN + 1 ];     /* Buffer for keyword string */
+   double dval;                  /* Double value */
    int ilut;                     /* Loop counter for table elements */
    int ival;                     /* Integer value */
    int set;                      /* Attribute value set? */
@@ -1896,6 +1979,12 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    set = TestLutInterp( this, status );
    ival = set ? GetLutInterp( this, status ) : astGetLutInterp( this );
    astWriteInt( channel, "LutInt", set, 1, ival, "Interpolation method" );
+
+/* Precision */
+   if( TestLutEpsilon( this, status ) ) {
+      dval = GetLutEpsilon( this, status );
+      astWriteDouble( channel, "LutEps", 1, 1, dval, "Table relative error" );
+   }
 
 /* Lookup table contents. */
    for ( ilut = 0; ilut < this->nlut; ilut++ ) {
@@ -2287,6 +2376,7 @@ AstLutMap *astInitLutMap_( void *mem, size_t size, int init,
          new->start = start;
          new->inc = inc;
          new->lutinterp = LINEAR;
+         new->lutepsilon = AST__BAD;
          new->nluti = nluti;
          new->luti = luti;
          new->flagsi = flagsi;
@@ -2455,6 +2545,10 @@ AstLutMap *astLoadLutMap_( void *mem, size_t size,
 /* Interpolation method */
       new->lutinterp = astReadInt( channel, "lutint", LINEAR );
       if ( TestLutInterp( new, status ) ) SetLutInterp( new, new->lutinterp, status );
+
+/* Precision */
+      new->lutepsilon = astReadDouble( channel, "luteps", AST__BAD );
+      if ( TestLutEpsilon( new, status ) ) SetLutEpsilon( new, new->lutepsilon, status );
 
 /* Allocate memory to hold the lookup table elements. */
       new->lut = astMalloc( sizeof( double ) * (size_t) new->nlut );
