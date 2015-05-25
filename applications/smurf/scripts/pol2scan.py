@@ -77,7 +77,13 @@
 *        starutil.PROGRESS, starutil.ATASK or starutil.DEBUG) to the module
 *        variable starutil.glevel. ["PROGRESS"]
 *     IN = NDF (Read)
-*        A group of POL-2 scan&spin time series NDFs.
+*        A group of POL-2 time series NDFs. Only used if a null (!) value is
+*        supplied for INQU.
+*     INQU = NDF (Read)
+*        A group of NDFs containing Q and U time-series calculated by a
+*        previous run of SMURF:CALCQU (the LSQFIT parameter must be set
+*        to TRUE when running CALCQU). If not supplied, the IN parameter
+*        is used to get input NDFs holding POL-2 time series data. [!]
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -188,6 +194,9 @@ try:
    params.append(starutil.Par0S("CONFIG", "Map-maker tuning parameters",
                                 "def", noprompt=True))
 
+   params.append(starutil.ParNDG("INQU", "NDFs containing previously calculated Q and U values",
+                                 None,noprompt=True))
+
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
 
@@ -199,10 +208,18 @@ try:
 #  the user goes off for a coffee whilst the script is running and does not
 #  see a later parameter propmpt or error...
 
+#  See if pre-calculated Q and U values have been supplied on the command
+#  line. If so, we use these in preference to any raw time-series files
+#  specified via parameter "IN".
+   inqu = parsys["INQU"].value
+
 #  Get the raw POL-2 data files. They should be supplied as the first item on
 #  the command line, in the form of a Starlink "group expression" (i.e.
 #  the same way they are supplied to other SMURF commands such as makemap).
-   indata = parsys["IN"].value
+   if inqu == None:
+      indata = parsys["IN"].value
+   else:
+      indata = None
 
 #  Now get the Q and U values to use.
    qmap = parsys["Q"].value
@@ -214,15 +231,39 @@ try:
 #  See if temp files are to be retained.
    retain = parsys["RETAIN"].value
 
-#  Create a set of Q and U time streams from the supplied analysed
-#  intensity time streams.
-   msg_out( "Calculating Q and U time streams for each bolometer...")
-   invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config=def outq={1}/\*_QT "
-          "outu={1}/*_UT".format( indata, NDG.tempdir ) )
+#  If no Q and U values were supplied, create a set of Q and U time
+#  streams from the supplied analysed intensity time streams.
+   if inqu == None:
+      msg_out( "Calculating Q and U time streams for each bolometer...")
+      invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config=def outq={1}/\*_QT "
+             "outu={1}/\*_UT".format( indata, NDG.tempdir ) )
 
 #  Get groups listing the time series files created by calcqu.
-   qts = NDG( "{0}/*_QT".format( NDG.tempdir ) )
-   uts = NDG( "{0}/*_UT".format( NDG.tempdir ) )
+      qts = NDG( "{0}/*_QT".format( NDG.tempdir ) )
+      uts = NDG( "{0}/*_UT".format( NDG.tempdir ) )
+
+#  If pre-calculated Q and U values were supplied, identifiy the Q and U
+#  files.
+   else:
+      msg_out( "Using pre-calculating Q and U values...")
+
+      qndfs = []
+      undfs = []
+      for ndf in inqu:
+         invoke("$KAPPA_DIR/ndftrace {0} quiet".format(ndf) )
+         label = starutil.get_task_par( "LABEL", "ndftrace" )
+         if label == "Q":
+            qndfs.append( ndf )
+         elif label == "U":
+            undfs.append( ndf )
+         else:
+            raise starutil.InvalidParameterError("Q/U time-series {0} has "
+                    "an unknown Label {1} - must be 'Q' or 'U'.".
+                    format(ndf,label))
+
+      qts = NDG( qndfs )
+      uts = NDG( undfs )
+
 
 #  Create a config file to use with makemap.
    conf = os.path.join(NDG.tempdir,"conf")
