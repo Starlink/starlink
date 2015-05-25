@@ -22,9 +22,25 @@
 *     POL2 spin&scan data.
 
 *  Usage:
-*     pol2scan in q u [retain] [msg_filter] [ilevel] [glevel] [logfile]
+*     pol2scan in q u [config] [retain] [msg_filter] [ilevel] [glevel] [logfile]
 
 *  Parameters:
+*     CONFIG = LITERAL (Read)
+*        The MAKEMAP configuration parameter values to use. The following
+*        defaults will be used if the supplied configuration does not
+*        specify any values for the following parameters:
+*
+*           numiter=2
+*           dcfitbox=0
+*           flt.filt_edge_largescale=200
+*
+*        The following values will always over-ride any values in the
+*        supplied configuration:
+*
+*           flagslow = 0.01
+*           downsampscale = 0
+*
+*        All the above values are used if a null (!) value is supplied. [!]
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
 *        Allowed values are as for "ILEVEL". The log file to create is
@@ -169,6 +185,9 @@ try:
                                  default=None, exists=False, minsize=1,
                                  maxsize=1 ))
 
+   params.append(starutil.Par0S("CONFIG", "Map-maker tuning parameters",
+                                "def", noprompt=True))
+
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
 
@@ -189,6 +208,9 @@ try:
    qmap = parsys["Q"].value
    umap = parsys["U"].value
 
+#  The user-supplied makemap config.
+   config = parsys["CONFIG"].value
+
 #  See if temp files are to be retained.
    retain = parsys["RETAIN"].value
 
@@ -205,10 +227,21 @@ try:
 #  Create a config file to use with makemap.
    conf = os.path.join(NDG.tempdir,"conf")
    fd = open(conf,"w")
-   fd.write("downsampscale = 0\n")
-   fd.write("modelorder = (com,gai,ext,ast,noi)\n")
-   fd.write("flagfast = 0\n")
-   fd.write("flagslow = 0\n")
+
+#  First put in the defaults supplied by this script. These may be
+#  over-written by the user-supplied config.
+   fd.write("numiter=2\n")
+   fd.write("dcfitbox=0\n")
+   fd.write("flt.filt_edge_largescale=200\n")
+
+#  Now put in the user-supplied config.
+   if config != "def":
+      fd.write("{0}\n".format(config))
+
+#  Now put in values that are absolutely required by this script. These
+#  over-write any values in the user-supplied config.
+   fd.write("flagslow=0.01\n")
+   fd.write("downsampscale=0\n")
    fd.close()
 
 #  Make a map from the Q time series.
