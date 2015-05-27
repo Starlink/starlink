@@ -52,7 +52,14 @@
 *        I = 2*( G*box/2 + H )
 *
 *     The Q and U values are specified with respect to either tracking
-*     north, or the focal plane Y axis (see parameter NORTH).
+*     north, or the focal plane Y axis (see parameter NORTH). Each single
+*     pair of corresponding Q and U values in the output NDFs are created
+*     from a single least-squares fit, and the residuals of each fit are
+*     used to calculate a weight for the corresponding pair of Q and U
+*     values. The weight is the reciprocal of the variance of the residuals,
+*     in units of 1/pw**2. These weights are stored as a 3D NDF in the WEIGHTS
+*     component of the Q output NDF (the same weights should also be usd
+*     for the U data).
 *
 *     If LSQFIT is set FALSE, then the output NDFs associated with
 *     parameters OUTQ, OUTU and OUTI are each 2D and contain a single Q,
@@ -238,6 +245,8 @@
 *        Report fraction of data rejected due to short blocks.
 *     13-MAY-2015 (DSB):
 *        Added LSQFIT mode.
+*     27-MAY-2015 (DSB):
+*        Added weights to output Q NDF when using LSQFIT=YES.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -309,13 +318,14 @@ void smurf_calcqu( int *status ) {
    HDSLoc *loci = NULL;       /* Locator for output I container file */
    HDSLoc *locq = NULL;       /* Locator for output Q container file */
    HDSLoc *locu = NULL;       /* Locator for output U container file */
+   HDSLoc *smurfloc=NULL;     /* HDS locator for SMURF extension */
    NdgProvenance *oprov;      /* Provenance to store in each output NDF */
    ThrWorkForce *wf;          /* Pointer to a pool of worker threads */
    char headval[ 81 ];        /* FITS header value */
    char ndfname[ 30 ];        /* Name of output Q or U NDF */
    char polcrd[ 81 ];         /* FITS 'POL_CRD' header value */
    char subarray[ 10 ];       /* Subarray name (e.g. "s4a", etc) */
-   int polbox;                /* HWP cycles in a fitting box */
+   double *weights;           /* Pointer to weights array */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    float arcerror;            /* Max acceptable error (arcsec) in one block */
@@ -335,10 +345,12 @@ void smurf_calcqu( int *status ) {
    int north;                 /* Use tracking north as ref. direction ? */
    int nskipped;              /* Number of skipped blocks */
    int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
+   int polbox;                /* HWP cycles in a fitting box */
    int qplace;                /* NDF placeholder for current block's Q image */
    int skipped;               /* Number of skipped samples */
    int submean;               /* Subtract mean value from each time slice? */
    int total;                 /* Total number of time salices in sub-array */
+   int ubnd[3];               /* Upper bounds of time stream axes */
    int uplace;                /* NDF placeholder for current block's U image */
    size_t bsize;              /* Number of files in base group */
    size_t gcount;             /* Output grp index counter */
@@ -357,6 +369,7 @@ void smurf_calcqu( int *status ) {
    smfData *odatai = NULL;    /* Output I data for one subarray */
    smfData *odataq = NULL;    /* Output Q data for one subarray */
    smfData *odatau = NULL;    /* Output U data for one subarray */
+   smfData *odataw = NULL;    /* Output weights data for one subarray */
    smfGroup *sgroup = NULL;   /* smfGroup corresponding to sgrp */
 
 /* Check inhereited status */
@@ -676,7 +689,7 @@ void smurf_calcqu( int *status ) {
 /* Generate the I, Q and U time-streams for the current chunk. */
                smf_fit_qui( wf, data, &odataq, &odatau, ogrpi ? &odatai : NULL,
                             (dim_t) polbox, ipolcrd, pasign, AST__DD2R*paoff,
-                            AST__DD2R*angrot, north, status );
+                            AST__DD2R*angrot, north, &weights, status );
 
 /* Copy the smfData structures to the output NDFs. */
                smf_write_smfData ( wf, odataq, NULL, NULL, ogrpq, gcount,
@@ -688,13 +701,56 @@ void smurf_calcqu( int *status ) {
                                       0, MSG__VERB, 0, status );
                }
 
-/* Increment the group index counter */
-               gcount++;
-
 /* Free the smfData structures. */
                smf_close_file( wf, &odataq, status );
                smf_close_file( wf, &odatau, status );
                if( ogrpi ) smf_close_file( wf, &odatai, status );
+
+/* Re-open the Q output file so that we can add the weights. */
+               smf_open_file( wf, ogrpq, gcount, "UPDATE", SMF__NOCREATE_HEAD|
+                              SMF__NOCREATE_DATA|SMF__NOCREATE_FTS|SMF__NOFIX_DATA|
+                              SMF__NOFIX_METADATA, &odataq, status );
+
+/* Get a locator to the a SMURF extension, creating the extension if
+   necessary. */
+               smurfloc = smf_get_xloc( odataq, SMURF__EXTNAME, SMURF__EXTTYPE,
+                                        "UPDATE", 0, 0, status );
+
+/* Create a WEIGHTS NDF component in the extension. */
+               if( *status == SAI__OK ) {
+                  ubnd[ 0 ] = odataq->lbnd[ 0 ] + odataq->dims[ 0 ] - 1;
+                  ubnd[ 1 ] = odataq->lbnd[ 1 ] + odataq->dims[ 1 ] - 1;
+                  ubnd[ 2 ] = odataq->lbnd[ 2 ] + odataq->dims[ 2 ] - 1;
+               }
+               smf_open_ndfname ( smurfloc, "WRITE", "WEIGHTS", "NEW", "_DOUBLE",
+                                  3, odataq->lbnd, ubnd, "Weight", "pW**(-2)",
+                                  NULL, &odataw, status );
+
+/* The weights returned by smf_fit_qui are bolo-ordered, so ensure the
+   smfData is also bolo-ordered. */
+               odataw->isFFT = -1;
+               smf_dataOrder( wf, odataw, 0, status );
+
+/* Copy the weights into the extension item. */
+               if( *status == SAI__OK ) memcpy( (odataw->pntr)[0], weights,
+                                                odataq->dims[ 0 ]*odataq->dims[ 1 ]*
+                                                odataq->dims[ 2 ]*sizeof(*weights) );
+
+/* Free the weights array. */
+               weights = astFree( weights );
+
+/* Erase the History from the weights extension NDF. */
+               ndfReset( odataw->file->ndfid, "History", status );
+
+/* Revert to time ordering. */
+               smf_dataOrder( wf, odataw, 1, status );
+
+/* Free the smfData structures. */
+               smf_close_file( wf, &odataq, status );
+               smf_close_file( wf, &odataw, status );
+
+/* Increment the group index counter */
+               gcount++;
 
 /* Non-least squares approach..
    ============================  */

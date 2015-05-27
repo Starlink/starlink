@@ -17,7 +17,7 @@
 *     smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 *                  smfData **odatau, smfData **odatai, dim_t box,
 *                  int ipolcrd, int pasign, double paoff, double angrot,
-*                  int north, int *status )
+*                  int north, double **weights, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -54,6 +54,13 @@
 *        If non-zero, the returned Q/U values use north in the tracking
 *        system as their reference direction. Otherwise, the reference
 *        direction is the focal plane Y axis.
+*     weights = double ** (Returned)
+*        Address of a pointer in which to return a pointer to a newly
+*        allocated array holding the weight associated with each element
+*        of each of the three returned smfDatas. The same weights should
+*        be used with all three returned smfDatas. Each weight is the
+*        reciprocal of the variance of the residuals between the supplied
+*        time stream data and the least squares fit.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -160,6 +167,7 @@ typedef struct smfFitQUIJobData {
    double *ipi;
    double *ipq;
    double *ipu;
+   double *ipw;
    double angrot;
    double paoff;
    dim_t *box_starts;
@@ -187,21 +195,21 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
 void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
                   smfData **odatau, smfData **odatai, dim_t box, int ipolcrd,
                   int pasign, double paoff, double angrot, int north,
-                  int *status ){
+                  double **weights, int *status ){
 
 /* Local Variables: */
    JCMTState *instate=NULL; /* Pointer to input JCMTState */
    JCMTState *outstate=NULL;/* Pointer to output JCMTState */
+   dim_t *box_starts;       /* Array holding time slice at start of each box */
    dim_t intslice;          /* ntslice of idata */
+   dim_t itime;             /* Time slice index */
    dim_t nbolo;             /* No. of bolometers */
+   dim_t ntime;             /* Time slices to check */
    dim_t ondata;            /* ndata of odata */
    dim_t ontslice;          /* ntslice of odata */
    double scale;            /* how much longer new samples are */
    int bstep;               /* Bolometer step between threads */
-   dim_t itime;             /* Time slice index */
    int iworker;             /* Index of a worker thread */
-   dim_t ntime;             /* Time slices to check */
-   dim_t *box_starts;       /* Array holding time slice at start of each box */
    int nworker;             /* No. of worker threads */
    size_t i;                /* loop counter */
    smfData *indksquid=NULL; /* Pointer to input dksquid data */
@@ -308,6 +316,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    (*odataq)->pntr[0] = astCalloc( ondata, sizeof(double) );
    (*odatau)->pntr[0] = astCalloc( ondata, sizeof(double) );
    if( odatai ) (*odatai)->pntr[0] = astCalloc( ondata, sizeof(double) );
+   *weights = astCalloc( ondata, sizeof(double) );
 
 /* Create structures used to pass information to the worker threads. */
    nworker = wf ? wf->nworker : 1;
@@ -337,6 +346,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
          pdata->ipi = odatai ? (*odatai)->pntr[0] : NULL;
          pdata->ipq = (*odataq)->pntr[0];
          pdata->ipu = (*odatau)->pntr[0];
+         pdata->ipw = *weights;
          pdata->nbolo = nbolo;
          pdata->intslice = intslice;
          pdata->ontslice = ontslice;
@@ -487,22 +497,23 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 /* Local Variables: */
    const JCMTState *allstates;/* Pointer to array of JCMTState structures */
    const JCMTState *state;    /* JCMTState info for current time slice */
+   dim_t *box_starts;         /* First time slice in each box */
    dim_t b1;                  /* First bolometer index */
    dim_t b2;                  /* Last bolometer index */
-   dim_t *box_starts;         /* First time slice in each box */
    dim_t box_size;            /* NFirst time slice in box */
    dim_t ibolo;               /* Bolometer index */
    dim_t ibox;
    dim_t intslice;            /* Number of time-slices in input data */
+   dim_t istart;              /* Input time index at start of fitting box */
    dim_t itime;               /* Time slice index */
    dim_t nbolo;               /* Total number of bolometers */
    dim_t ontslice;            /* Number of time-slices in output data */
-   dim_t istart;              /* Input time index at start of fitting box */
    double *dat;               /* Pointer to start of input data values */
    double *din;               /* Pointer to input data array for bolo/time */
    double *ipi;               /* Pointer to output I array */
    double *ipq;               /* Pointer to output Q array */
    double *ipu;               /* Pointer to output U array */
+   double *ipw;               /* Pointer to output weights array */
    double *pm;
    double *ps;
    double angle;              /* Phase angle for FFT */
@@ -512,9 +523,12 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    double c4;
    double c8;
    double cosval;             /* Cos of angrot */
+   double fit;
    double matrix[ NPAR*NPAR ];
+   double sum1;               /* Sum of squared residuals */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double phi;                /* Angle from fixed analyser to effective analyser */
+   double res;
    double s1;                 /* Sum of weighted cosine terms */
    double s2;                 /* Sum of weighted sine terms */
    double s4;
@@ -530,6 +544,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    gsl_vector_view gsl_b;
    gsl_vector_view gsl_x;
    int ipolcrd;               /* Reference direction for pol_ang */
+   int nsum1;
    int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
    smfFitQUIJobData *pdata;   /* Pointer to job data */
    smf_qual_t *qin;           /* Pointer to input quality array for bolo/time */
@@ -560,6 +575,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    ipi = pdata->ipi ? pdata->ipi + b1*ontslice : NULL;
    ipq = pdata->ipq + b1*ontslice;
    ipu = pdata->ipu + b1*ontslice;
+   ipw = pdata->ipw + b1*ontslice;
 
    ipolcrd = pdata->ipolcrd;
    pasign = pdata->pasign;
@@ -579,6 +595,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
                if( ipi ) *(ipi++) = VAL__BADD;
                *(ipq++) = VAL__BADD;
                *(ipu++) = VAL__BADD;
+               *(ipw++) = VAL__BADD;
             }
 
 /* If the bolometer is good, calculate and store the i, q and u values. */
@@ -894,68 +911,90 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 /* Store the correspoinding I value. */
                   if( ipi ) *(ipi++) = solution[ 6 ]*box_size + 2*solution[ 7 ];
 
+/* Loop over the data again in the same way to calculate the variance of the
+   residuals between the above fit and the supplied data. */
+                  istart = box_starts[ itime ];
+                  box_size = box_starts[ itime + 1 ] - istart;
+                  din = dat + istart;
+                  qin = qua + istart;
+                  state = allstates + istart;
+                  sum1 = 0.0;
+                  nsum1 = 0;
 
 
 
-
-if( 0 && ibolo == 800 ) {
-
+double qfit, ufit, ifit;
+if( 0 && ibolo == 526 && itime < 2000 ) {
    if( itime == 0 ) {
       printf("xxx # itimeout ibox itimein din fit qfit ufit ifit s0 s1 s6 s7 wp pop\n");
-   }
-
-   double fit, qfit, ufit, ifit;
-   istart = box_starts[ itime ];
-   box_size = box_starts[ itime + 1 ] - istart;
-   din = dat + istart;
-   qin = qua + istart;
-   state = allstates + istart;
-
-   for( ibox = 0; ibox <  box_size; ibox++,state++,din++,qin++ ) {
-      angle = state->pol_ang;
-      if( !( *qin & SMF__Q_FIT ) && *din != VAL__BADD &&
-            angle != VAL__BADD ) {
-         wplate = pasign*angle + paoff;
-         phi = 2*wplate;
-         twophi = 2*phi;
-
-         s8 = sin( 2*twophi );
-         c8 = cos( 2*twophi );
-         s4 = sin( twophi );
-         c4 = cos( twophi );
-         s2 = sin( phi );
-         c2 = cos( phi );
-         s1 = sin( wplate );
-         c1 = cos( wplate );
-
-         fit = solution[0]*s4 +
-               solution[1]*c4 +
-               solution[2]*s2 +
-               solution[3]*c2 +
-               solution[4]*s1 +
-               solution[5]*c1 +
-               solution[6]*ibox +
-               solution[7] +
-               solution[8]*s8 +
-               solution[9]*c8;
-
-         qfit = solution[0]*s4;
-         ufit = solution[1]*c4;
-         ifit = solution[6]*ibox + solution[7];
-
-         printf("xxx %zu %zu %zu %.20g %.20g %.20g %.20g %.20g %.20g "
-                "%.20g %.20g %.20g %.20g %g\n", itime,
-                ibox, ibox + istart, *din, fit,
-                qfit, ufit, ifit, solution[0],  solution[1],
-                solution[6],  solution[7], wplate, sums[42] );
-
-      }
    }
 }
 
 
 
 
+                  for( ibox = 0; ibox <  box_size; ibox++,state++,din++,qin++ ) {
+                     angle = state->pol_ang;
+                     tr_angle = pdata->north ? state->tcs_tr_ang : 0.0;
+
+                     if( !( *qin & SMF__Q_FIT ) && *din != VAL__BADD &&
+                           angle != VAL__BADD && tr_angle != VAL__BADD ) {
+                        wplate = pasign*angle + paoff;
+/*
+                        if( ipolcrd == 1 ) {
+                           wplate += state->tcs_az_ang;
+                        } else if( ipolcrd == 2 ) {
+                           wplate += state->tcs_tr_ang;
+                        }
+*/
+                        phi = 2*wplate;
+                        twophi = 2*phi;
+
+                        s8 = sin( 2*twophi );
+                        c8 = cos( 2*twophi );
+                        s4 = sin( twophi );
+                        c4 = cos( twophi );
+                        s2 = sin( phi );
+                        c2 = cos( phi );
+                        s1 = sin( wplate );
+                        c1 = cos( wplate );
+
+                        fit = solution[0]*s4 +
+                              solution[1]*c4 +
+                              solution[2]*s2 +
+                              solution[3]*c2 +
+                              solution[4]*s1 +
+                              solution[5]*c1 +
+                              solution[6]*ibox +
+                              solution[7] +
+                              solution[8]*s8 +
+                              solution[9]*c8;
+
+                        res = *din - fit;
+
+                        sum1 += res*res;
+                        nsum1++;
+
+
+if( 0 && ibolo == 526 && itime < 2000 ) {
+   qfit = solution[0]*s4;
+   ufit = solution[1]*c4;
+   ifit = solution[6]*ibox + solution[7];
+
+   printf("xxx %zu %zu %zu %.20g %.20g %.20g %.20g %.20g %.20g "
+          "%.20g %.20g %.20g %.20g %g\n", itime,
+          ibox, ibox + istart, *din, fit,
+          qfit, ufit, ifit, solution[0],  solution[1],
+          solution[6],  solution[7], wplate, sums[42] );
+
+}
+
+                     }
+                  }
+
+/* The returned weight is the reciprocal of the variance of the
+   residuals. */
+                  *(ipw++) = nsum1/sum1;
 
 /* Store bad values if there were too few good samples in the fitting
    box. */
@@ -963,6 +1002,7 @@ if( 0 && ibolo == 800 ) {
                   if( ipi ) *(ipi++) = VAL__BADD;
                   *(ipq++) = VAL__BADD;
                   *(ipu++) = VAL__BADD;
+                  *(ipw++) = VAL__BADD;
                }
             }
          }
