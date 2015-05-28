@@ -2165,6 +2165,18 @@ noi.spikebox = 50
 noi.spikethresh = 0
 
 #-----------------------------------------------------------------
+#  Name: 	noi.usevar
+#  Type: 	int
+#  Default: 	0
+#  Purpose: 	Controls how the NOI model is created.
+#  Description: If non-zero, then the NOI model is created prior to the
+#               first iteration from the variance values in the supplied
+#               data files. Otherwise, it is found by analysing the
+#               residual bolometer values in the manner specified by
+#               parameter "noi.box_type".
+noi.usevar = 0
+
+#-----------------------------------------------------------------
 #  Name: 	noi.zeropad
 #  Type: 	real
 #  Default: 	0

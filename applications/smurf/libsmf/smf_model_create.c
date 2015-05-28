@@ -341,6 +341,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
   size_t tstride;               /* Time slice stride in data array */
   struct timeval tv1;           /* Timer */
   struct timeval tv2;           /* Timer */
+  int usevar = 0;               /* Value of NOI.USEVAR */
   int zeropad;                  /* Pad with zeros instead of artificial data? */
 
   /* Main routine */
@@ -638,15 +639,16 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
           case SMF__NOI: /* Noise model */
 
             /* Get the number of variance values per bolometer. This is
-               one, unless NOI.BOX_SIZE is set non-zero in which case it
-               is "ntslice". But if the time stream contains insufficient
-               time slices to create two boxes, then we use a single
-               variance per bolometer. */
+               one, unless NOI.BOX_SIZE or NOI.USEVAR is set non-zero in
+               which case it is "ntslice". But if the time stream contains
+               insufficient time slices to create two boxes, then we use a
+               single variance per bolometer. */
             astMapGet0A( keymap, "NOI", &kmap );
             smf_get_nsamp( kmap, "BOX_SIZE", idata, &noi_boxsize, status );
             astMapGet0I( kmap, "CALCFIRST", &calcfirst );
+            astMapGet0I( kmap, "USEVAR", &usevar );
             kmap = astAnnul( kmap );
-            if( noi_boxsize ) {
+            if( noi_boxsize && !usevar ) {
                if( calcfirst && *status == SAI__OK ) {
                   *status = SAI__ERROR;
                   errRep( " ", FUNC_NAME ": Configuration parameters "
@@ -656,7 +658,8 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
             }
 
             dim_t nointslice = idata->dims[isTordered?2:0];
-            if( noi_boxsize == 0 || nointslice < 2*noi_boxsize ) {
+            if( !usevar && ( noi_boxsize == 0 ||
+                             nointslice < 2*noi_boxsize ) ) {
                nointslice = 1;
             }
 
@@ -1017,6 +1020,30 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                                   dataptr, status ) ) {
                  msgOutiff( MSG__VERB, "", FUNC_NAME ": using external NOI "
                            "model imported from '%s'.", status, name );
+
+              /* If usevar flag is set, we set the noise component equal
+                 to the square root of the Variance values in the input
+                 time-series data. */
+              } else if( usevar ) {
+                  if( idata->pntr[1] ) {
+
+                     msgOutiff( MSG__VERB, "", FUNC_NAME ": using input "
+                                "Variances for NOI model.", status );
+
+                     double *pn = idata->pntr[1];
+                     for( l=0; l<ndata; l++,pn++ ) {
+                       if( *pn > 0.0 && *pn != VAL__BADD ) {
+                          ((double *) dataptr)[l] = sqrt( *pn );
+                       } else {
+                          ((double *) dataptr)[l] = VAL__BADD;
+                       }
+                     }
+                  } else {
+                    *status = SAI__ERROR;
+                    errRep(FUNC_NAME, "NOI.USEVAR is set but some of the "
+                           "input data files do not have Variances.",
+                           status );
+                  }
 
               /* If calcfirst flag is set, we know that there is one
                  variance for each bolometer. initialize NOI using noise

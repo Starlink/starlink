@@ -723,6 +723,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   dim_t nmodels=0;              /* Number of model components / iteration */
   int noidone;                  /* Has the NOI model been calculated yet? */
   int noi_export;               /* Export the compressed NOI model? */
+  int noi_usevar;               /* Use the input Variances to make the NOI model? */
   size_t nsamples_tot = 0;      /* Number of valid samples in all chunks */
   dim_t nthetabin;              /* Number of scan angle bins */
   size_t ntgood_tot = 0;        /* Number of good time slices in all chunks */
@@ -857,9 +858,13 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   if( *status == SAI__OK ) {
     if( *status == SAI__OK ) {
 
+      /* See if the NOI model is to be derived from the Variance
+         components of the input data files. */
+      if( astMapGet0A( keymap, "NOI", &kmap ) ) {
+         astMapGet0I( kmap, "USEVAR", &noi_usevar );
+
       /* See if the NOI model is to be exported in compressed form in its
          own NDF (i.e. NOT as the Variance component of the "_res" ndf). */
-      if( astMapGet0A( keymap, "NOI", &kmap ) ) {
          astMapGet0I( kmap, "EXPORT", &noi_export );
          kmap = astAnnul( kmap );
       }
@@ -1613,11 +1618,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Allocate length 1 array of smfArrays. */
       res = astCalloc( 1, sizeof(*res) );
 
-      /* Concatenate (no variance since we calculate it ourselves -- NOI) */
+      /* Concatenate */
       smf_concat_smfGroup( wf, keymap, igroup, darks, bbms, flatramps, heateffmap,
                            contchunk, ensureflat, 0, outfset, moving,
                            lbnd_out, ubnd_out, fts_port, pad, pad,
-                           SMF__NOCREATE_VARIANCE, &res[0], NULL, status );
+                           noi_usevar?0:SMF__NOCREATE_VARIANCE, &res[0],
+                           NULL, status );
 
       /* Assign each time slice to a scan angle bin */
       if (*status == SAI__OK) {
