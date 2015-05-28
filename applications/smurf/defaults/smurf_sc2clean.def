@@ -435,6 +435,19 @@ com.sig_limit = 0
 com.sig_wing = 1.0
 
 #-----------------------------------------------------------------
+#  Name: 	com.weight
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls the estimate of the common-mode signal
+#  Description: If non-zero, the bolometer data is weighted when it is
+#               combined to form the common mode signal. Each weight
+#               is the reciprocal of the assocoiated bolometer noise
+#               estimate. If the data has no noise estimates, the
+#               common-mode is formed from the unweighted mean of the
+#               bolometer data.
+com.weight = 0
+
+#-----------------------------------------------------------------
 #  Name: 	compreprocess
 #  Type: 	integer
 #  Default: 	0

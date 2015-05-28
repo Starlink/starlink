@@ -136,6 +136,7 @@ typedef struct smfCalcModelComData {
    dim_t ncol;
    dim_t nrow;
    dim_t ntslice;
+   dim_t nointslice;
    dim_t nvar;
    dim_t t1;
    dim_t t2;
@@ -159,6 +160,7 @@ typedef struct smfCalcModelComData {
    smfArray *lut;
    smfArray *model;
    smfArray *res;
+   smfArray *noi;
    unsigned char *mask;
 } SmfCalcModelComData;
 
@@ -186,6 +188,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    dim_t ncol;
    dim_t nrow;
    dim_t ntslice;
+   dim_t nointslice;
    dim_t nvar;
    dim_t timestep;
    double *com_datas[ 4 ];
@@ -210,10 +213,12 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    int oldalg;
    int perarray;
    int sig_wing;
+   int weight;
    int whiten;
    smfArray *gai;
    smfArray *lut;
    smfArray *model;
+   smfArray *noi;
    smfArray *res;
    smfFilter *filt=NULL;
    unsigned char *mask;
@@ -253,15 +258,30 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    this function. */
    astBegin;
 
+/* Get some initial configuration parameters. */
+   astMapGet0I( kmap, "NITER", &niter );
+   astMapGet0I( kmap, "FREEZE_FLAGS", &freeze_flags );
+   astMapGet0D( kmap, "NSIGMA", &nsigma );
+   astMapGet0D( kmap, "SIG_LIMIT", &sig_limit );
+   astMapGet0I( kmap, "SIG_WING", &sig_wing );
+   astMapGet0I( kmap, "FILL", &fill );
+   if( fill ) msgOutif( MSG__VERB, "", "  Flagged values will be filled "
+                        "before finding COM.", status );
+   astMapGet0I( kmap, "WEIGHT", &weight );
+
+/* We do not need the NOI model if we are just adding on an old COM model. */
+   if( flags & SMF__DIMM_INVERT ) weight = 0;
+
 /* Ensure the data is bolo-ordered (i.e. adjacent values in memory are
    adjacent time slices from the same bolometer). */
    smf_model_dataOrder( wf, dat, NULL, chunk, SMF__RES|SMF__QUA|SMF__GAI|
-                        SMF__LUT, 0, status );
+                        SMF__NOI|SMF__LUT, 0, status );
 
 /* Obtain pointers to relevant smfArrays for this chunk */
    res = dat->res[ chunk ];
    lut = dat->lut ? dat->lut[ chunk ] : NULL;
    gai = dat->gai ? dat->gai[ chunk ] : NULL;
+   noi = ( weight && dat->noi ) ? dat->noi[ chunk ] : NULL;
    model = allmodel[ chunk ];
 
 /* See if a mask should be used to exclude bright source areas from
@@ -271,7 +291,6 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 /* If we have a mask, copy it into the quality array of the map.
    Also set map pixels that are not used (e.g. corner pixels, etc)
    to be background pixels in the mask. */
-
    if( mask ) {
       double *map = dat->map;
       smf_qual_t *mapqual = dat->mapqual;
@@ -292,16 +311,9 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       }
    }
 
-/* Get some configuration parameters. */
+/* Get the number of adjacent time slices for which the same gain should
+   be used. */
    smf_get_nsamp( kmap, "GAIN_BOX", res->sdata[ 0 ], &gain_box, status );
-   astMapGet0I( kmap, "NITER", &niter );
-   astMapGet0I( kmap, "FREEZE_FLAGS", &freeze_flags );
-   astMapGet0D( kmap, "NSIGMA", &nsigma );
-   astMapGet0D( kmap, "SIG_LIMIT", &sig_limit );
-   astMapGet0I( kmap, "SIG_WING", &sig_wing );
-   astMapGet0I( kmap, "FILL", &fill );
-   if( fill ) msgOutif( MSG__VERB, "", "  Flagged values will be filled "
-                        "before finding COM.", status );
 
 /* If the COM flags are to be frozen at any point, we need to find out
    how many initial AST-skipped iterations are being used (the
@@ -315,7 +327,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
 /* Convert "freeze_flags" from an iteration count into a boolean flag
    indicating if the COM flags are now frozen. We always switch freezing
-   on if freeze_flags is less than zero, saince this i show skylopp 
+   on if freeze_flags is less than zero, saince this i show skylopp
    indicates that freezing is required. */
       if( dat->iter == freeze_flags + skip || freeze_flags < 0 ) {
          msgOutif( MSG__VERB, "", "  COM flagging is now frozen due to "
@@ -337,6 +349,8 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    time slices (except for GAI). */
    smf_get_dims( res->sdata[ 0 ], NULL, NULL, &nbolo, &ntslice, NULL, NULL,
                  NULL, status );
+   if( noi ) smf_get_dims( noi->sdata[ 0 ], NULL, NULL, NULL, &nointslice,
+                           NULL, NULL, NULL, status );
    if( *status != SAI__OK ) goto L999;
 
 /* Find the number of blocks of time slices per bolometer. Each block
@@ -389,10 +403,12 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
 /* Store other values common to all jobs. */
          pdata->ntslice = ntslice;
+         pdata->nointslice = nointslice;
          pdata->nbolo = nbolo;
          pdata->nrow = nrow;
          pdata->ncol = ncol;
          pdata->res = res;
+         pdata->noi = noi;
          pdata->gai = gai;
          pdata->lut = lut;
          pdata->model = model;
@@ -478,7 +494,8 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
 /* Otherwise, form a new COM model and subtract from the residuals. */
    } else {
-
+      if( weight ) msgOutif( MSG__VERB, "", "  Bolometer data will be "
+                             "weighted when forming COM.", status );
 
 /* If this is the last iteration, the user may request a different value
    for COM.PERARRAY by assigning a value ot COM.PERARRAY_LAST. For
@@ -773,12 +790,15 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
    double *pb;
    double *pm;
    double *pmi[ 4 ];
+   double *pn;
    double *pr;
+   double *pw;
    double *pwg;
    double *pwoff;
    double *res_data;
    double *resbuf;
    double *wg;
+   double *wgtbuf = NULL;
    double *woff;
    double s1;
    double s2;
@@ -953,6 +973,12 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
       resbuf = astMalloc( pdata->nbolo*( pdata->idx_hi - pdata->idx_lo + 1 )*
                           sizeof( *resbuf ) );
 
+/* Buffer to hold all bolometer weights at a single time slice. */
+      if( pdata->noi ) {
+         wgtbuf = astMalloc( pdata->nbolo*( pdata->idx_hi - pdata->idx_lo + 1 )*
+                             sizeof( *wgtbuf ) );
+      }
+
 /* Loop over the time slices to be processed by this thread. */
       for( itime = pdata->t1; itime <= pdata->t2 && *status == SAI__OK;
            itime++,pm++ ) {
@@ -967,6 +993,7 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
 /* Initialise pointers to the buffers holding the normalised residual,
    and the weights. */
             pb = resbuf;
+            pw = wgtbuf;
 
 /* Loop over all subarrays that contribute to the current common-mode
    model. */
@@ -976,6 +1003,8 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
    Increment them to point to the first time slice processed by this thread. */
                pr = pdata->res->sdata[ idx ]->pntr[ 0 ];
                pr += itime;
+               pn = ( pdata->noi ) ? pdata->noi->sdata[ idx ]->pntr[ 0 ] : NULL;
+               if( pn ) pn += (itime % pdata->nointslice);
                pq = itime + smf_select_qualpntr( pdata->res->sdata[ idx ], NULL, status );
                if( pdata->lut ) {
                   pl = pdata->lut->sdata[ idx ]->pntr[ 0 ];
@@ -988,7 +1017,8 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
                for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
 
 /* Check the sample has not been flagged as unusable. */
-                  if( !(*pq & qmask) && *pr != VAL__BADD ) {
+                  if( !(*pq & qmask) && *pr != VAL__BADD &&
+                      ( !pn || ( *pn != VAL__BADD && *pn > 0.0 ) ) ) {
 
 /* If a mask and LUT have been supplied, check that the sample is not
    masked out. */
@@ -1000,29 +1030,37 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
                         if( *pr >= thr_lo && *pr <= thr_hi ) {
                            *(pb++) = *pr;
 
+/* Also store the weight if required. */
+                           if( wgtbuf ) *(pw++) = 1.0/( (*pn)*(*pn) );
+
 /* If required store a magic value in the buffer that indicates that the
    bolometer value needs to be replaced by interpolation from the
    surrounding spatial neighbours. Entirely bad bolometers are excluded
    from this process. */
                         } else if( pdata->fill ) {
                            *(pb++) = FILLVAL;
+                           if( wgtbuf ) *(pw++) = FILLVAL;
                         }
 
                      } else if( pdata->fill ) {
                         *(pb++) = FILLVAL;
+                        if( wgtbuf ) *(pw++) = FILLVAL;
                      }
 
                   } else if( pdata->fill ){
                      if( !(*pq & SMF__Q_BADB) ) {
                         *(pb++) = FILLVAL;
+                        if( wgtbuf ) *(pw++) = FILLVAL;
                      } else {
                         *(pb++) = VAL__BADD;
+                        if( wgtbuf ) *(pw++) = VAL__BADD;
                      }
                   }
 
 /* Increment residual and quality pointers to point to the next
    bolometer. */
                   pr += pdata->ntslice;
+                  if( pn ) pn += pdata->nointslice;
                   if( pl ) pl += pdata->ntslice;
                   pq += pdata->ntslice;
                }
@@ -1034,11 +1072,16 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
                   smf_fill2d( 50, 5, FILLVAL, pdata->ncol, pdata->nrow,
                               resbuf + ( idx - pdata->idx_lo )*pdata->nbolo,
                               fillwork, status );
+                  if( wgtbuf ) {
+                     smf_fill2d( 50, 5, FILLVAL, pdata->ncol, pdata->nrow,
+                                 wgtbuf + ( idx - pdata->idx_lo )*pdata->nbolo,
+                                 fillwork, status );
+                  }
                }
             }
 
 /* Find the mean and sigma of the samples now in the buffer. */
-            *pm = smf_sigmaclipD( (int)( pb - resbuf ), resbuf, NULL, 0.0,
+            *pm = smf_sigmaclipD( (int)( pb - resbuf ), resbuf, wgtbuf, 0.0,
                                   1, &sigma, status );
 
 /* Update the thresholds for the next iteration. */
@@ -1049,6 +1092,7 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
 
 /* Free resources. */
       resbuf = astFree( resbuf );
+      wgtbuf = astFree( wgtbuf );
       fillwork = astFree( fillwork );
 
 /* Combined individual common-mode signals into a single COM model.
