@@ -17,7 +17,7 @@
 *     smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 *                  smfData **odatau, smfData **odatai, dim_t box,
 *                  int ipolcrd, int pasign, double paoff, double angrot,
-*                  int north, double **weights, int *status )
+*                  int north, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -54,13 +54,6 @@
 *        If non-zero, the returned Q/U values use north in the tracking
 *        system as their reference direction. Otherwise, the reference
 *        direction is the focal plane Y axis.
-*     weights = double ** (Returned)
-*        Address of a pointer in which to return a pointer to a newly
-*        allocated array holding the weight associated with each element
-*        of each of the three returned smfDatas. The same weights should
-*        be used with all three returned smfDatas. Each weight is the
-*        reciprocal of the variance of the residuals between the supplied
-*        time stream data and the least squares fit.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -93,6 +86,13 @@
 *     Care is taken to ensure that each fitting box spans exactly the same
 *     range of "w" values. This is needed because the POL_ANG values are
 *     not exactly regular.
+*
+*     The residuals of the fit in each box are used to determine
+*     notional variances for the retruned Q, U and I. These are not
+*     "real" variances, but are just a scaled form of th residuals
+*     variance using a scalaing factor that seems to give a reasonable
+*     similarity to the noise in the Q and U values measured in several
+*     test observations.
 
 *  Notes:
 *     - It is assumed that all output smfData structures have the same
@@ -167,7 +167,7 @@ typedef struct smfFitQUIJobData {
    double *ipi;
    double *ipq;
    double *ipu;
-   double *ipw;
+   double *ipv;
    double angrot;
    double paoff;
    dim_t *box_starts;
@@ -195,7 +195,7 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
 void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
                   smfData **odatau, smfData **odatai, dim_t box, int ipolcrd,
                   int pasign, double paoff, double angrot, int north,
-                  double **weights, int *status ){
+                  int *status ){
 
 /* Local Variables: */
    JCMTState *instate=NULL; /* Pointer to input JCMTState */
@@ -316,7 +316,11 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    (*odataq)->pntr[0] = astCalloc( ondata, sizeof(double) );
    (*odatau)->pntr[0] = astCalloc( ondata, sizeof(double) );
    if( odatai ) (*odatai)->pntr[0] = astCalloc( ondata, sizeof(double) );
-   *weights = astCalloc( ondata, sizeof(double) );
+
+/* Allocate arrays for the output variances. */
+   (*odataq)->pntr[1] = astCalloc( ondata, sizeof(double) );
+   (*odatau)->pntr[1] = astCalloc( ondata, sizeof(double) );
+   if( odatai ) (*odatai)->pntr[1] = astCalloc( ondata, sizeof(double) );
 
 /* Create structures used to pass information to the worker threads. */
    nworker = wf ? wf->nworker : 1;
@@ -346,7 +350,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
          pdata->ipi = odatai ? (*odatai)->pntr[0] : NULL;
          pdata->ipq = (*odataq)->pntr[0];
          pdata->ipu = (*odatau)->pntr[0];
-         pdata->ipw = *weights;
+         pdata->ipv = (*odataq)->pntr[1];
          pdata->nbolo = nbolo;
          pdata->intslice = intslice;
          pdata->ontslice = ontslice;
@@ -457,9 +461,15 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
       }
    }
 
-/* Free resources. */
-   job_data = astFree( job_data );
-   box_starts = astFree( box_starts );
+/* Copy the variances from the Q smfData into the U and (and I) smfData. */
+   if( *odataq && *status == SAI__OK ) {
+      if( *odatau ) {
+         memcpy( (*odatau)->pntr[1], (*odataq)->pntr[1], ondata*sizeof(double));
+      }
+      if( odatai && *odatai ) {
+         memcpy( (*odatai)->pntr[1], (*odataq)->pntr[1], ondata*sizeof(double));
+      }
+   }
 
 /* Ensure all smfDatas are time-ordered. */
    smf_dataOrder( wf, idata, 1, status );
@@ -467,6 +477,9 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    if( *odataq ) smf_dataOrder( wf, *odataq, 1, status );
    if( *odatau ) smf_dataOrder( wf, *odatau, 1, status );
 
+/* Free resources. */
+   job_data = astFree( job_data );
+   box_starts = astFree( box_starts );
 }
 
 static void smf1_fit_qui_job( void *job_data, int *status ) {
@@ -513,7 +526,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    double *ipi;               /* Pointer to output I array */
    double *ipq;               /* Pointer to output Q array */
    double *ipu;               /* Pointer to output U array */
-   double *ipw;               /* Pointer to output weights array */
+   double *ipv;               /* Pointer to output weights array */
    double *pm;
    double *ps;
    double angle;              /* Phase angle for FFT */
@@ -575,7 +588,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    ipi = pdata->ipi ? pdata->ipi + b1*ontslice : NULL;
    ipq = pdata->ipq + b1*ontslice;
    ipu = pdata->ipu + b1*ontslice;
-   ipw = pdata->ipw + b1*ontslice;
+   ipv = pdata->ipv + b1*ontslice;
 
    ipolcrd = pdata->ipolcrd;
    pasign = pdata->pasign;
@@ -595,7 +608,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
                if( ipi ) *(ipi++) = VAL__BADD;
                *(ipq++) = VAL__BADD;
                *(ipu++) = VAL__BADD;
-               *(ipw++) = VAL__BADD;
+               *(ipv++) = VAL__BADD;
             }
 
 /* If the bolometer is good, calculate and store the i, q and u values. */
@@ -992,9 +1005,16 @@ if( 0 && ibolo == 526 && itime < 2000 ) {
                      }
                   }
 
-/* The returned weight is the reciprocal of the variance of the
-   residuals. */
-                  *(ipw++) = nsum1/sum1;
+/* Calculate the variance of the residuals, and then scale it to get the
+   notional variance for the returned Q,. U and I values. The scaling
+   factor is determined emprically to get reasonable agreement between these
+   notional variances and the noise actually seen in the Q and U values
+   for 10 test observations. The reason for storing these as Q/U variances
+   rather than as a weights component in the SMURF extension is so that
+   makemap can pick them up easily and use them to initialise the NOI
+   model, which is used for weighting the bolometer data when forming the
+   COM model on the first iteration. */
+                  *(ipv++) = 0.0253*sum1/nsum1;
 
 /* Store bad values if there were too few good samples in the fitting
    box. */
@@ -1002,7 +1022,7 @@ if( 0 && ibolo == 526 && itime < 2000 ) {
                   if( ipi ) *(ipi++) = VAL__BADD;
                   *(ipq++) = VAL__BADD;
                   *(ipu++) = VAL__BADD;
-                  *(ipw++) = VAL__BADD;
+                  *(ipv++) = VAL__BADD;
                }
             }
          }
