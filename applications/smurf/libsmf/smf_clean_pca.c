@@ -76,7 +76,8 @@
 *     means removed before entry.
 
 *  Authors:
-*     Ed Chapin (UBC)
+*     EC: Ed Chapin (UBC)
+*     DSB: David Berry (EAO)
 
 *  History:
 *     2011-03-16 (EC):
@@ -86,6 +87,10 @@
 *        -Parallelize as much as possible over exclusive time chunks
 *     2011-10-12 (EC):
 *        Add t_first, t_last
+*     2015-06-03 (DSB):
+*        Check for bad values in the supplied data. These are now ignored, 
+*        which is equivalent to treating them as zero. This should be 
+*        reasonable given that the supplied data is known to have zero mean.
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
@@ -187,6 +192,8 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   size_t t_first;         /* First time slice being analyzed */
   size_t t_last;          /* First time slice being analyzed */
   size_t tstride;         /* time slice stride */
+  double v1;              /* A data value */
+  double v2;              /* A data value */
 
   double check=0;
 
@@ -257,8 +264,11 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
         sum_xy = 0;
 
         for( k=pdata->t1; k<=pdata->t2; k++ ) {
-          sum_xy += d[goodbolo[i]*bstride + k*tstride] *
-            d[goodbolo[j]*bstride + k*tstride];
+          v1 = d[goodbolo[i]*bstride + k*tstride];
+          v2 = d[goodbolo[j]*bstride + k*tstride];
+          if( v1 != VAL__BADD && v2 != VAL__BADD ) {
+             sum_xy += v1*v2;
+          }
         }
 
         /* Store sums in work array and normalize once all threads finish */
@@ -291,10 +301,11 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
 
         for( k=pdata->t1; k<=pdata->t2; k++ ) {
           l = k - t_first;
-          comp[i*ccompstride+l*ctstride] += d[goodbolo[j] *
-                                              bstride + k*tstride] * u;
-
-          check += d[goodbolo[j] * bstride + k*tstride] * u;
+          v2 = d[goodbolo[j]*bstride + k*tstride];
+          if( v2 != VAL__BADD ) {
+             comp[i*ccompstride+l*ctstride] += v2 * u;
+             check += v2 * u;
+          }
         }
       }
     }
@@ -312,10 +323,12 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
       /*msgOutiff( MSG__DEBUG, "", "   bolo %zu", status, goodbolo[i] );*/
       for( j=0; j<ngoodbolo; j++ ) {  /* loop over component */
         for( k=pdata->t1; k<=pdata->t2; k++ ) {
-          l = k - t_first;
-          amp[goodbolo[i]*abstride + j*acompstride] +=
-            d[goodbolo[i]*bstride + k*tstride] *
-            comp[j*ccompstride + l*ctstride];
+          v1 = d[goodbolo[i]*bstride + k*tstride];
+          if( v1 != VAL__BADD ) {
+             l = k - t_first;
+             amp[goodbolo[i]*abstride + j*acompstride] +=
+                    v1 * comp[j*ccompstride + l*ctstride];
+          }
         }
       }
     }
@@ -340,9 +353,11 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
         for( i=0; i<ngoodbolo; i++ ) {    /* loop over bolometer */
           a =  amp[goodbolo[i]*abstride + j*acompstride];
           for( k=pdata->t1; k<=pdata->t2; k++ ) {
-            l = k - t_first;
-            d[goodbolo[i]*bstride + k*tstride] -=
-              a*comp[j*ccompstride + l*ctstride];
+            if( d[goodbolo[i]*bstride + k*tstride] != VAL__BADD ) {
+               l = k - t_first;
+               d[goodbolo[i]*bstride + k*tstride] -=
+                 a*comp[j*ccompstride + l*ctstride];
+            }
           }
         }
       }
@@ -379,7 +394,6 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   size_t ccompstride;     /* component stride in comp array */
   size_t ctstride;        /* time stride in comp array */
   gsl_matrix *cov=NULL;   /* bolo-bolo covariance matrix */
-  double *d = NULL;       /* Pointer to data array */
   size_t i;               /* Loop counter */
   int ii;                 /* Loop counter */
   size_t j;               /* Loop counter */
@@ -530,9 +544,6 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
      axis is now the component number */
   abstride = 1;
   acompstride = nbolo;
-
-  /* input bolo data pointer */
-  d = data->pntr[0];
 
   /* Allocate job data for threads */
   job_data = astCalloc( nw, sizeof(*job_data) );
