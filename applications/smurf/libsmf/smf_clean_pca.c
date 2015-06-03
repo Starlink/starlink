@@ -88,9 +88,11 @@
 *     2011-10-12 (EC):
 *        Add t_first, t_last
 *     2015-06-03 (DSB):
-*        Check for bad values in the supplied data. These are now ignored, 
-*        which is equivalent to treating them as zero. This should be 
+*        - Check for bad values in the supplied data. These are now ignored,
+*        which is equivalent to treating them as zero. This should be
 *        reasonable given that the supplied data is known to have zero mean.
+*        - Likewise ignore samples that are flagged as unfittable in the
+*        quality array
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
@@ -163,6 +165,7 @@ typedef struct smfPCAData {
   size_t t_first;         /* First index for total data being analyzed */
   size_t t_last;          /* Last index for total data being analyzed */
   size_t tstride;         /* time slice stride */
+  smf_qual_t *qua;        /* Pointer to quality array */
 } smfPCAData;
 
 /* Function to be executed in thread: FFT all of the bolos from b1 to b2 */
@@ -188,6 +191,9 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   size_t ngoodbolo;       /* number good bolos = number principal components */
   dim_t tlen;             /* number of time slices */
   smfPCAData *pdata=NULL; /* Pointer to job data */
+  smf_qual_t q1;          /* A quality value */
+  smf_qual_t q2;          /* A quality value */
+  smf_qual_t *qua=NULL;   /* Pointer to quality array */
   double *rms_amp=NULL;   /* VAL__BADD for components to remove */
   size_t t_first;         /* First time slice being analyzed */
   size_t t_last;          /* First time slice being analyzed */
@@ -202,6 +208,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   /* Pointer to the data that this thread will process */
   pdata = job_data_ptr;
 
+  qua = pdata->qua;
   amp = pdata->amp;
   abstride = pdata->abstride;
   acompstride = pdata->acompstride;
@@ -266,7 +273,10 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
         for( k=pdata->t1; k<=pdata->t2; k++ ) {
           v1 = d[goodbolo[i]*bstride + k*tstride];
           v2 = d[goodbolo[j]*bstride + k*tstride];
-          if( v1 != VAL__BADD && v2 != VAL__BADD ) {
+          q1 = qua[goodbolo[i]*bstride + k*tstride];
+          q2 = qua[goodbolo[j]*bstride + k*tstride];
+          if( v1 != VAL__BADD && v2 != VAL__BADD &&
+              !(q1 & SMF__Q_FIT) && !(q2 & SMF__Q_FIT) ) {
              sum_xy += v1*v2;
           }
         }
@@ -302,7 +312,8 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
         for( k=pdata->t1; k<=pdata->t2; k++ ) {
           l = k - t_first;
           v2 = d[goodbolo[j]*bstride + k*tstride];
-          if( v2 != VAL__BADD ) {
+          q2 = qua[goodbolo[j]*bstride + k*tstride];
+          if( v2 != VAL__BADD && !(q2 & SMF__Q_FIT) ) {
              comp[i*ccompstride+l*ctstride] += v2 * u;
              check += v2 * u;
           }
@@ -324,7 +335,8 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
       for( j=0; j<ngoodbolo; j++ ) {  /* loop over component */
         for( k=pdata->t1; k<=pdata->t2; k++ ) {
           v1 = d[goodbolo[i]*bstride + k*tstride];
-          if( v1 != VAL__BADD ) {
+          q1 = qua[goodbolo[i]*bstride + k*tstride];
+          if( v1 != VAL__BADD && !(q1 & SMF__Q_FIT) ) {
              l = k - t_first;
              amp[goodbolo[i]*abstride + j*acompstride] +=
                     v1 * comp[j*ccompstride + l*ctstride];
@@ -353,7 +365,8 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
         for( i=0; i<ngoodbolo; i++ ) {    /* loop over bolometer */
           a =  amp[goodbolo[i]*abstride + j*acompstride];
           for( k=pdata->t1; k<=pdata->t2; k++ ) {
-            if( d[goodbolo[i]*bstride + k*tstride] != VAL__BADD ) {
+            if( ( d[goodbolo[i]*bstride + k*tstride] != VAL__BADD ) &&
+                !(SMF__Q_FIT & qua[goodbolo[i]*bstride + k*tstride]) ) {
                l = k - t_first;
                d[goodbolo[i]*bstride + k*tstride] -=
                  a*comp[j*ccompstride + l*ctstride];
@@ -588,6 +601,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     pdata->tlen = tlen;
     pdata->operation = 0;
     pdata->tstride = tstride;
+    pdata->qua = qua;
 
     /* Each thread will accumulate the projection of its own portion of
        the time-series. We'll add them to the master amp at the end */
