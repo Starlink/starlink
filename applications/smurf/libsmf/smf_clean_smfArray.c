@@ -169,7 +169,7 @@
 void smf__noisymask( ThrWorkForce *wf, smfData *data, smfArray **noisemaps,
                      double noisecliphigh, double noisecliplow,
                      int zeropad, struct timeval *tv1,
-                     struct timeval *tv2, int *status );
+                     struct timeval *tv2, AstKeyMap *keymap, int *status );
 
 void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
                          smfArray **noisemaps, smfArray **com, smfArray **gai,
@@ -409,7 +409,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
       noiseclipprecom ) {
 
     smf__noisymask( wf, data, noisemaps, noisecliphigh, noisecliplow,
-                    zeropad, &tv1, &tv2, status );
+                    zeropad, &tv1, &tv2, keymap, status );
   }
 
 
@@ -559,7 +559,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
         !noiseclipprecom ) {
 
       smf__noisymask( wf, data, noisemaps, noisecliphigh, noisecliplow,
-                      zeropad, &tv1, &tv2, status );
+                      zeropad, &tv1, &tv2, keymap, status );
     }
 
   }
@@ -569,20 +569,26 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
 void smf__noisymask( ThrWorkForce *wf, smfData *data, smfArray **noisemaps,
                      double noisecliphigh, double noisecliplow,
                      int zeropad, struct timeval *tv1,
-                     struct timeval *tv2, int *status ) {
+                     struct timeval *tv2, AstKeyMap *keymap, int *status ) {
 
+  AstObject *kmap = NULL;   /* KeyMap holding NOI parameters */
   smfData *noisemap=NULL;   /* Individual noisemap */
 
   if( *status != SAI__OK ) return;
 
   msgOutif( MSG__VERB, "", FUNC_NAME ": masking noisy bolometers", status );
-  smf_mask_noisy( wf, data,
+
+  astMapGet0A( keymap, "NOI", &kmap );
+
+  smf_mask_noisy( wf, data, (AstKeyMap *) kmap,
                   (noisemaps && *noisemaps) ? (&noisemap) : NULL,
                   noisecliphigh, noisecliplow, 1, zeropad, status );
 
   if( noisemaps && *noisemaps && noisemap ) {
     smf_addto_smfArray( *noisemaps, noisemap, status );
   }
+
+  if( kmap ) kmap = astAnnul( kmap );
 
   /*** TIMER ***/
   msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s masking noisy",

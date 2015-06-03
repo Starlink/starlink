@@ -88,6 +88,7 @@ smf_close_mapcoord.c \
 smf_close_related.c \
 smf_close_smfDream.c \
 smf_close_smfGroup.c \
+smf_collapse.c \
 smf_collapse_quality.c \
 smf_collapse_tseries.c \
 smf_concat_smfGroup.c \

@@ -798,6 +798,11 @@ void smf_close_smfDream( smfDream **dream, int * status );
 
 void smf_close_smfGroup( smfGroup **group, int *status );
 
+void smf_collapse( ThrWorkForce *wf, const double *array,
+                   const smf_qual_t *qua, smf_qual_t mask, dim_t nx,
+                   dim_t ny, dim_t nz, int axis, double **mean,
+                   double **sigma, int **ngood, int *status );
+
 void smf_collapse_quality( const smf_qual_t *inqual, smf_qfam_t qfamily,
                            dim_t nbolo, dim_t ntslice,
                            size_t bstride, size_t tstride,
@@ -1543,7 +1548,7 @@ void smf_mapbounds_approx( Grp *igrp, size_t index, char *system,
 
 AstRegion *smf_mapregion_approx( Grp *igrp, int *status );
 
-void smf_mask_noisy( ThrWorkForce *wf, smfData *data, smfData **noise,
+void smf_mask_noisy( ThrWorkForce *wf, smfData *data, AstKeyMap *kmap, smfData **noise,
                      double sigcliphigh, double sigcliplow, int cliplog,
                      int zeropad, int * status );
 

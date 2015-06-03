@@ -13,15 +13,17 @@
 *     Library routine
 
 *  Invocation:
-*     smf_mask_noisy( ThrWorkForce *wf, smfData *data, smfData **noise,
-*                     double sigcliphigh, double sigcliplow, int cliplog,
-*                     int zeropad, int * status );
+*     smf_mask_noisy( ThrWorkForce *wf, smfData *data, AstKeyMap *kmap,
+*                     smfData **noise, double sigcliphigh, double sigcliplow,
+*                     int cliplog, int zeropad, int * status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads. Can be NULL.
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged
+*     kmap = AstKeyMap * (Given)
+*        KeyMap holding parameters for NOI model.
 *     noise = smfData ** (Returned)
 *        Optionally return pointer to smfData containing noise map. Can be NULL.
 *     sigcliphigh = double (Given)
@@ -76,6 +78,9 @@
 *          log instead of actual values if desired.
 *        - sigcliphigh and sigcliplow instead of sigclip
 *        - median instead of mean for central measure
+*     2015-06-03 (DSB):
+*        Added argument kmap, and allow clipping to be done on the basis
+*        of any variances associated with the supplied smfData.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -111,15 +116,16 @@
 
 #define FUNC_NAME "smf_mask_noise"
 
-void smf_mask_noisy( ThrWorkForce *wf, smfData *data, smfData **noise,
-                     double sigcliphigh, double sigcliplow, int cliplog,
-                     int zeropad, int * status ) {
+void smf_mask_noisy( ThrWorkForce *wf, smfData *data, AstKeyMap *kmap,
+                     smfData **noise, double sigcliphigh, double sigcliplow,
+                     int cliplog, int zeropad, int * status ){
 
   size_t i;
   dim_t nbolo = 0;             /* Number of bolometers */
   double *noisedata = NULL;    /* Pointer to the noise data array */
   smfData * noisemap = NULL;   /* Somewhere to receive the result */
   double *work = NULL;         /* Temporary work array */
+  int usevar;                  /* Get noise fom the supplied Variance values? */
 
   if (*status != SAI__OK) return;
 
@@ -134,10 +140,23 @@ void smf_mask_noisy( ThrWorkForce *wf, smfData *data, smfData **noise,
                       SMF__MAP_VAR, &noisemap, status );
   if (noisemap) noisedata = (noisemap->pntr)[0];
 
-  /* Calculate the noise on each bolometer */
-  smf_bolonoise( wf, data, -1.0, 0, 0.5, SMF__F_WHITELO,
-                 SMF__F_WHITEHI, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
-                 (noisemap->pntr)[0], NULL, NULL, status );
+  /* Calculate the noise on each bolometer. If the supplied smfData has a
+     variance component AND the noi.usevar parameter is non-zero, then
+     use the mean variance associated with each bolometer. Otherwise, find
+     the noise in the specified frequency range using an FFT. */
+  astMapGet0I( kmap, "USEVAR", &usevar );
+  if( usevar && data->pntr[1] ) {
+     msgOutif( MSG__VERB, "", FUNC_NAME
+            ": Using supplied variances to flag outlier noise values. ", status );
+     smf_collapse( wf, data->pntr[1], data->qual, SMF__Q_FIT, data->dims[0],
+                   data->dims[1], data->dims[2],
+                   data->isTordered?2:0, (noisemap->pntr)[0], NULL,
+                   NULL, status );
+  } else {
+     smf_bolonoise( wf, data, -1.0, 0, 0.5, SMF__F_WHITELO,
+                    SMF__F_WHITEHI, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
+                    (noisemap->pntr)[0], NULL, NULL, status );
+  }
 
   /* Now need to convert this to noise by square rooting */
   if (*status == SAI__OK) {
