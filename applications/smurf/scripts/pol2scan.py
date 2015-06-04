@@ -30,15 +30,17 @@
 *        defaults will be used if the supplied configuration does not
 *        specify any values for the following parameters:
 *
-*           numiter=2
-*           dcfitbox=0
-*           flt.filt_edge_largescale=200
+*           numiter=1
+*           modelorder=(flt,ext,ast,noi)
+*           noisecliphigh=3
+*           pcathresh=4
 *
 *        The following values will always over-ride any values in the
 *        supplied configuration:
 *
 *           flagslow = 0.01
 *           downsampscale = 0
+*           noi.usevar=1
 *
 *        All the above values are used if a null (!) value is supplied. [!]
 *     GLEVEL = LITERAL (Read)
@@ -271,9 +273,10 @@ try:
 
 #  First put in the defaults supplied by this script. These may be
 #  over-written by the user-supplied config.
-   fd.write("numiter=2\n")
-   fd.write("dcfitbox=0\n")
-   fd.write("flt.filt_edge_largescale=200\n")
+   fd.write("numiter=1\n")
+   fd.write("modelorder=(ext,flt,ast,noi)\n")
+   fd.write("noisecliphigh=3\n")
+   fd.write("pcathresh=4\n")
 
 #  Now put in the user-supplied config.
    if config != "def":
@@ -281,6 +284,7 @@ try:
 
 #  Now put in values that are absolutely required by this script. These
 #  over-write any values in the user-supplied config.
+   fd.write("noi.usevar=1\n")
    fd.write("flagslow=0.01\n")
    fd.write("downsampscale=0\n")
    fd.close()
