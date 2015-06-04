@@ -139,8 +139,8 @@
 *        On exit, a gain of VAL__BADD is assigned to any blocks that could
 *        not be fit to the template, or that were rejected.
 *     nrej = int * (Given and Returned)
-*        Pointer to an array with one element for each bolometer block.
-*        That is, the size of this array should equal the number of
+*        NULL, or a pointer to an array with one element for each bolometer
+*        block. That is, the size of this array should equal the number of
 *        blocks per bolometer, (i.e. one third of the size of the "time"
 *        axis in "gai"). The array should be filled with arbitrary non
 *        zero values before calling this function for the first time. On
@@ -209,6 +209,9 @@
 *        interpolated from the neighbouring good blocks.
 *     1-MAY-2015 (DSB):
 *        Correct usage of FIT_BOX value (previously ignored if negative).
+*     4-JUN-2015 (DSB):
+*        Allow a NULL value to be supplied for "nrej" (in which case it
+*        is assumed that no blocks have converged).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -495,15 +498,19 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
 
 /* Now calculate and store the convergence flag for each block. */
       for( iblock = 0; iblock < nblock && *status == SAI__OK; iblock++ ){
-         ib_lo = iblock - nboff;
-         if( ib_lo < 0 ) ib_lo = 0;
+         if( nrej ) {
+            ib_lo = iblock - nboff;
+            if( ib_lo < 0 ) ib_lo = 0;
 
-         ib_hi = iblock + nboff;
-         if( ib_hi >= (int) nblock ) ib_hi = nblock - 1;
+            ib_hi = iblock + nboff;
+            if( ib_hi >= (int) nblock ) ib_hi = nblock - 1;
 
-         conv = 1;
-         for( ib = ib_lo; ib <= ib_hi; ib++ ) {
-            if( nrej[ ib ] > 0 ) conv = 0;
+            conv = 1;
+            for( ib = ib_lo; ib <= ib_hi; ib++ ) {
+               if( nrej[ ib ] > 0 ) conv = 0;
+            }
+         } else {
+            conv = 0;
          }
          converged[ iblock ] = conv;
       }
@@ -559,7 +566,7 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
       memset( reason, 0, NREASON*sizeof( *reason ) );
 
 /* Zero the returned "nrej" array. */
-      memset( nrej, 0, nblock*sizeof( *reason ) );
+      if( nrej ) memset( nrej, 0, nblock*sizeof( *reason ) );
 
 /* Get the vector offsets within "gai", from a gain value to the
    corresponding offset, and correlation coefficient. */
@@ -716,7 +723,7 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
                 gai[ igbase + corr_offset ] = VAL__BADD;
 
 /* Increment the number of bolometers rejected from this block. */
-                nrej[ iblock ]++;
+                if( nrej ) nrej[ iblock ]++;
 
 /* Increment the total number of new rejected bolo-blocks. */
                 nbad++;
@@ -791,7 +798,7 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
                     }
 
                     gai[ igbase + corr_offset ] = VAL__BADD;
-                    nrej[ iblock ]++;
+                    if( nrej ) nrej[ iblock ]++;
                     nbad++;
 
                     if( g > gmax ) {
@@ -824,7 +831,7 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
               igbase = ibolo*gbstride;
               for( iblock = 0; iblock < nblock; iblock++ ) {
                 if( gai[ igbase + corr_offset ] != VAL__BADD ) {
-                  nrej[ iblock ]++;
+                  if( nrej ) nrej[ iblock ]++;
                   gai[ igbase + corr_offset ] = VAL__BADD;
                   reason[ 10 ]++;
                   nbad++;
@@ -840,26 +847,28 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
 
 /* Find the number of blocks that have now converged. */
           nconverged = 0;
-          for( iblock = 0; iblock < nblock && *status == SAI__OK; iblock++ ){
-             ib_lo = iblock - nboff;
-             if( ib_lo < 0 ) ib_lo = 0;
+          if( nrej ) {
+             for( iblock = 0; iblock < nblock && *status == SAI__OK; iblock++ ){
+                ib_lo = iblock - nboff;
+                if( ib_lo < 0 ) ib_lo = 0;
 
-             ib_hi = iblock + nboff;
-             if( ib_hi >= (int) nblock ) ib_hi = nblock - 1;
+                ib_hi = iblock + nboff;
+                if( ib_hi >= (int) nblock ) ib_hi = nblock - 1;
 
-             conv = 1;
-             for( ib = ib_lo; ib <= ib_hi; ib++ ) {
-                if( nrej[ ib ] > 0 ) conv = 0;
+                conv = 1;
+                for( ib = ib_lo; ib <= ib_hi; ib++ ) {
+                   if( nrej[ ib ] > 0 ) conv = 0;
+                }
+                if( conv ) nconverged++;
              }
-             if( conv ) nconverged++;
-          }
 
 /* Display it. */
-          if( !( flags & 2 ) ) {
-             msgSeti( "N", nconverged );
-             msgSeti( "M", nblock );
-             msgOutif( MSG__VERB, "",
-                       "    ^N out of ^M time-slice blocks have now converged", status );
+             if( !( flags & 2 ) ) {
+                msgSeti( "N", nconverged );
+                msgSeti( "M", nblock );
+                msgOutif( MSG__VERB, "",
+                          "    ^N out of ^M time-slice blocks have now converged", status );
+             }
           }
 
           msgSeti( "NEW", nbad );

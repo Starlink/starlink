@@ -843,7 +843,6 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     smfArray *gain_array=NULL;
     smfGroup *gain_group=NULL;
     AstKeyMap *kmap=NULL;         /* Local keymap */
-    int nrej;
     AstObject *obj=NULL;          /* Used to avoid compiler warnings */
     double *template=NULL;
 
@@ -876,7 +875,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
 
     /* Compare bolometers to the template in order to flag outliers */
     smf_find_gains( wf, 0, data, NULL, NULL, template, kmap, SMF__Q_GOOD,
-                    SMF__Q_COM, gain_array->sdata[0], &nrej, status );
+                    SMF__Q_COM, gain_array->sdata[0], NULL, status );
 
     /* Clean up */
     template = astFree( template );
