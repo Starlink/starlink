@@ -340,8 +340,20 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
                        nflag);
 
             if( msgIflev( NULL, status ) >= MSG__VERB ) {
-              msgOutf( "", FUNC_NAME ": mean SCANVEL=%.2lf arcsec/sec"
-                       " (was %.2lf)", status, scanvel, data->hdr->scanvel );
+              if( scanvel != VAL__BADD ) {
+                 msgSetd( "W1", scanvel );
+              } else {
+                 msgSetc( "W1", "<unknown>" );
+              }
+
+              if( data->hdr->scanvel != VAL__BADD ) {
+                 msgSetd( "W2", data->hdr->scanvel );
+              } else {
+                 msgSetc( "W2", "<unknown>" );
+              }
+
+              msgOut( "", FUNC_NAME ": mean SCANVEL=^W1 arcsec/sec"
+                      " (was ^W2)", status );
             }
 
             data->hdr->scanvel = scanvel;
