@@ -150,7 +150,7 @@ void smf_mask_noisy( ThrWorkForce *wf, smfData *data, AstKeyMap *kmap,
             ": Using supplied variances to flag outlier noise values. ", status );
      smf_collapse( wf, data->pntr[1], data->qual, SMF__Q_FIT, data->dims[0],
                    data->dims[1], data->dims[2],
-                   data->isTordered?2:0, (noisemap->pntr)[0], NULL,
+                   data->isTordered?2:0, (double **) noisemap->pntr, NULL,
                    NULL, status );
   } else {
      smf_bolonoise( wf, data, -1.0, 0, 0.5, SMF__F_WHITELO,
