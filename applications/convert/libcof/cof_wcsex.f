@@ -142,6 +142,9 @@
 *        *did not* have a WCS component.
 *        - Check that the WCS in the FITS extension describes the same
 *        number of pixel axes as the NDF before adding it to the NDFs WCS.
+*     5-JUN-2015 (DSB):
+*        Always attempt to read a FrameSet from the FITS extension, so that
+*        we have a fall-back in case there is no WCS component in the NDF.
 *     {enter_further_changes_here}
 
 *-
@@ -264,67 +267,66 @@
       ASTCOD( 6 ) = 'FITS-PC'
       ASTCOD( 7 ) = 'FITS-CLASS'
 
-*  If we need to choose a default encoding, we need to decide on the
-*  order in which to use the available encodings. The first to be used
-*  will be the encoding implied by the WCS information in the NDFs FITS
-*  extension (if any). We now find what this encoding is.
-      IF( ENCOD .EQ. ' ' ) THEN
-
-*  Check for the presence of an NDF FITS extension.
-         CALL NDF_XSTAT( INDF, 'FITS', FITSPR, STATUS )
-         IF ( FITSPR ) THEN
+*  If the NDF has a FITS extension, we may need to use any WCS definesd
+*  within the FITS extension as a fall-back (if there is no WCS component
+*  in the NDF). We may also need it to decide on the default encoding to
+*  use when writing the WCS info to the output FITS header. Check for the 
+*  presence of an NDF FITS extension.
+      CALL NDF_XSTAT( INDF, 'FITS', FITSPR, STATUS )
+      IF ( FITSPR ) THEN
 
 *  Get a locator to the NDF FITS extension, and determine the number of
 *  cards in the extension.
-            CALL NDF_XLOC( INDF, 'FITS', 'READ', FTLOC, STATUS )
-            CALL DAT_SIZE( FTLOC, NCARD, STATUS )
+         CALL NDF_XLOC( INDF, 'FITS', 'READ', FTLOC, STATUS )
+         CALL DAT_SIZE( FTLOC, NCARD, STATUS )
 
 *  Create an AST FitsChan to hold the headers in the FITS extension.
-            FCT = AST_FITSCHAN( AST_NULL, AST_NULL, FCATTR, STATUS )
+         FCT = AST_FITSCHAN( AST_NULL, AST_NULL, FCATTR, STATUS )
 
 *  We want to guard against bad headers in the FITS extension causing
 *  the whole conversion process to abort. Therefore we will annul any
 *  errors that occur while reading the FITS extension into the FitsChan.
 *  First we need to check that an error has not already occurred.
-            IF( STATUS .EQ. SAI__OK ) THEN
+         IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Loop for each header in the NDF FITS extension.
-               DO I = 1, NCARD
+            DO I = 1, NCARD
 
 *  Get a locator to successive elements in the FITS extension.
-                  CALL DAT_CELL( FTLOC, 1, I, FTLOCI, STATUS )
+               CALL DAT_CELL( FTLOC, 1, I, FTLOCI, STATUS )
 
 *  Read the FITS string, and extract the keyword and value.
-                  CALL DAT_GET0C( FTLOCI, CARD, STATUS )
+               CALL DAT_GET0C( FTLOCI, CARD, STATUS )
 
 *  Store the card in the FitsChan.
-                  CALL AST_PUTFITS( FCT, CARD, .FALSE., STATUS )
+               CALL AST_PUTFITS( FCT, CARD, .FALSE., STATUS )
 
 *  Annul any error so that bad headers do not cause the whole conversion
 *  process to abort.
-                  IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+               IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
 
-               END DO
+            END DO
 
 *  Determine the default WCS encoding on the basis of the contents of the
 *  FITS header.
-               DEFENC = AST_GETC( FCT, 'ENCODING', STATUS )
+            DEFENC = AST_GETC( FCT, 'ENCODING', STATUS )
 
 *  Attempt to read a FrameSet from the FITS extension.
-               CALL AST_CLEAR( FCT, 'Card', STATUS )
-               XWCS = AST_READ( FCT, STATUS )
+            CALL AST_CLEAR( FCT, 'Card', STATUS )
+            XWCS = AST_READ( FCT, STATUS )
 
 *  Annul the FitsChan used to determine the default WCS encoding.
-               CALL AST_ANNUL( FCT, STATUS )
+            CALL AST_ANNUL( FCT, STATUS )
 
 *  Annul any error, and ensure the default encoding is blank.
-               IF( STATUS .NE. SAI__OK ) THEN
-                  CALL ERR_ANNUL( STATUS )
-                  DEFENC = ' '
-               END IF
+            IF( STATUS .NE. SAI__OK ) THEN
+               CALL ERR_ANNUL( STATUS )
+               DEFENC = ' '
+            END IF
 
 *  Re-order the list of foreign encodings to put the default encoding
 *  (if any) first. The order of the others is retained.
+            IF( ENCOD .EQ. ' ' ) THEN
                J = DEFNCD
                DO I = DEFNCD, 1, -1
                   IF( DEFENC .NE. ASTCOD( I ) ) THEN
