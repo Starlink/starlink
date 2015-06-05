@@ -97,6 +97,8 @@
 *        orientation in the output NDFs.
 *     12-MAR-2013 (DSB):
 *        Correct rotation of Variance values.
+*     5-JUN-2015 (DSB):
+*        Ensure the output NDFs have exactly two pixel axes.
 *     {enter_further_changes_here}
 
 *-
@@ -146,6 +148,7 @@
       INTEGER SLBNDL( NDF__MXDIM )! Lower pixel bounbds on significat anxes
       INTEGER SUBNDL( NDF__MXDIM )! Upper pixel bounbds on significat anxes
       LOGICAL QVAR               ! Q NDF has variance?
+      LOGICAL THERE              ! Does component exist?
       LOGICAL UVAR               ! U NDF has variance?
       REAL ANGLE                 ! Clockwise radians rotation
       REAL ANGROT                ! Orientation of reference direction
@@ -295,10 +298,14 @@
       END IF
 
 *  Propagate the two input NDFs to form the output NDFs.
-      CALL LPG_PROP( INDFQI, 'Title,Label,Units,QUALITY,AXIS',
-     :               'QOUT', INDFQO, STATUS )
-      CALL LPG_PROP( INDFUI, 'Title,Label,Units,QUALITY,AXIS',
-     :               'UOUT', INDFUO, STATUS )
+      CALL LPG_PROP( INDFQI, 'Title,Label,Units', 'QOUT', INDFQO,
+     :               STATUS )
+      CALL LPG_PROP( INDFUI, 'Title,Label,Units', 'UOUT', INDFUO,
+     :               STATUS )
+
+*  Set their shapes to exclude any insignificant axes
+      CALL NDF_SBND( 2, SLBND, SUBND, INDFQO, STATUS )
+      CALL NDF_SBND( 2, SLBND, SUBND, INDFUO, STATUS )
 
 *  Map the data array of the two input and two output NDFs.
       CALL NDF_MAP( INDFQI, 'Data', '_DOUBLE', 'Read', IPQIN, EL,
@@ -346,6 +353,28 @@
 
 *  Create a new POLANAL Frame describing the new ANGROT value.
       CALL POL1_PTANG( REAL( ANGROT - ANGLE ), IWCS, STATUS )
+
+*  If the Q input NDF has a Quality array, copy it to the output.
+      CALL NDF_STATE( INDFQI, 'Quality', THERE, STATUS )
+      IF( THERE ) THEN
+         CALL NDF_MAP( INDFQI, 'Quality', '_UBYTE', 'Read', IPQIN, EL,
+     :                 STATUS )
+         CALL NDF_MAP( INDFQO, 'Quality', '_UBYTE', 'Write', IPQOUT, EL,
+     :                 STATUS )
+         CALL KPG1_COPY( '_UBYTE', EL, IPQIN, IPQOUT, STATUS )
+         CALL NDF_UNMAP( INDFQI, 'Quality', STATUS )
+      END IF
+
+*  If the U input NDF has a Quality array, copy it to the output.
+      CALL NDF_STATE( INDFUI, 'Quality', THERE, STATUS )
+      IF( THERE ) THEN
+         CALL NDF_MAP( INDFUI, 'Quality', '_UBYTE', 'Read', IPUIN, EL,
+     :                 STATUS )
+         CALL NDF_MAP( INDFUO, 'Quality', '_UBYTE', 'Write', IPUOUT, EL,
+     :                 STATUS )
+         CALL KPG1_COPY( '_UBYTE', EL, IPUIN, IPUOUT, STATUS )
+         CALL NDF_UNMAP( INDFUI, 'Quality', STATUS )
+      END IF
 
 * Store the modified WCS FrameSets.
       CALL NDF_PTWCS( IWCS, INDFQO, STATUS )
