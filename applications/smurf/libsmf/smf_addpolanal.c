@@ -132,10 +132,10 @@ void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, int *status ){
 /* Create a PermMap that ensures that axis 1 of the POLANAL Frame is parallel
    to the latitude axis (i.e. north) of the curent Frame (the current Frame axes
    may have been swapped). */
-            outperm[0] = astGetI( cfrm, "LatAxis" );
-            outperm[1] = astGetI( cfrm, "LonAxis" );
-            inperm[outperm[0]] = 0;
-            inperm[outperm[1]] = 1;
+            outperm[ 0 ] = astGetI( cfrm, "LatAxis" );
+            outperm[ 1 ] = astGetI( cfrm, "LonAxis" );
+            inperm[ outperm[ 0 ] - 1 ] = 1;
+            inperm[ outperm[ 1 ] - 1 ] = 2;
             pm = astPermMap( 2, inperm, 2, outperm, NULL, " " );
 
 /* Record the index of the original current Frame. */
