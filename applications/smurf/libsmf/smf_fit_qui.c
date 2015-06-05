@@ -443,6 +443,12 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
          }
       }
 
+/* Add a keyword to the Q header indicating the polarimetric reference
+   direction. */
+      smf_fits_updateL( (*odataq)->hdr, "POLNORTH", north,
+                        north ? "Pol ref dir is tracking north" :
+                                "Pol ref dir is focal plane Y", status );
+
 /* Copy the Q header to the other outputs. */
       hdr = smf_deepcopy_smfHead( (*odataq)->hdr, status );
       (*odatau)->hdr = hdr;

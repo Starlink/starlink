@@ -548,6 +548,10 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
           /* Now add the SkyFrame to it */
           astAddFrame( *outframeset, AST__BASE, oskymap, oskyframe );
 
+          /* Now add a POLANAL Frame if required (i.e. if the input time
+             series are POL-2 Q/U values). */
+          smf_addpolanal( *outframeset, hdr, status );
+
           /* Invert the oskymap mapping */
           astInvert( oskymap );
 
