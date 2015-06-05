@@ -106,11 +106,23 @@
 *        The output NDF in which to return the Q intensity map.
 *     U = NDF (Read)
 *        The output NDF in which to return the U intensity map.
+*     QREF = NDF (Read)
+*        An optional map defining the pixel grid for the output Q 
+*        map. If both QREF and UREF are supplied, the polarimetric
+*        reference direction used by the Q and U maps will be rotated to
+*        match the reference direction in the supplied QREF and UREF
+*        maps. [!]
 *     RETAIN = _LOGICAL (Read)
 *        Should the temporary directory containing the intermediate files
 *        created by this script be retained? If not, it will be deleted
 *        before the script exits. If retained, a message will be
 *        displayed at the end specifying the path to the directory. [FALSE]
+*     UREF = NDF (Read)
+*        An optional map defining the pixel grid for the output U
+*        map. If both QREF and UREF are supplied, the polarimetric
+*        reference direction used by the Q and U maps will be rotated to
+*        match the reference direction in the supplied QREF and UREF
+*        maps. [!]
 
 *  Copyright:
 *     Copyright (C) 2015 East Asian Observatory.
@@ -202,6 +214,13 @@ try:
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
 
+   params.append(starutil.ParNDG("QREF", "The reference Q map", default=None,
+                                 noprompt=True, minsize=0, maxsize=1 ))
+
+   params.append(starutil.ParNDG("UREF", "The reference U map", default=None,
+                                 noprompt=True, minsize=0, maxsize=1 ))
+
+
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
    parsys = ParSys( params )
@@ -232,6 +251,10 @@ try:
 
 #  See if temp files are to be retained.
    retain = parsys["RETAIN"].value
+
+#  Get the Q and U reference maps
+   qref = parsys["QREF"].value
+   uref = parsys["UREF"].value
 
 #  If no Q and U values were supplied, create a set of Q and U time
 #  streams from the supplied analysed intensity time streams.
@@ -289,15 +312,40 @@ try:
    fd.write("downsampscale=0\n")
    fd.close()
 
+#  If both QREF and UREF were supplied, we will be rotating the
+#  polarimetric reference direction. So store the orignal maps in
+#  intermediate NDFs rather than the final NDFs.
+   if qref and uref:
+      tqmap = NDG(1)
+      tumap = NDG(1)
+   else:
+      tqmap = qmap
+      tumap = umap
+
 #  Make a map from the Q time series.
    msg_out( "Making a map from the Q time series...")
-   invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2}".
-          format(qts,conf,qmap))
+   if qref:
+      ref = qref
+   else:
+      ref = "!"
+   invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3}".
+          format(qts,conf,tqmap,ref))
 
 #  Make a map from the U time series.
    msg_out( "Making a map from the U time series..." )
-   invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2}".
-          format(uts,conf,umap))
+   if uref:
+      ref = uref
+   else:
+      ref = "!"
+   invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3}".
+          format(uts,conf,tumap,ref))
+
+#  Rotate the polarimetric reference direction if required.
+   if qref and uref:
+      msg_out( "Rotating the polarimetric reference direction to "
+               "match {0}...".format(qref) )
+      invoke("$POLPACK_DIR/polrotref qin={0} uin={1} qout={2} uout={3} "
+             "like={4}".format(tqmap,tumap,qmap,umap,qref) )
 
 #  Remove temporary files.
    cleanup()
