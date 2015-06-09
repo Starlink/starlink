@@ -282,6 +282,9 @@
 *        it.
 *     9-JUL-2014 (DSB):
 *        Added argument AXORD.
+*     2015 June 8 (MJC):
+*        Respect FITS WCS headers when there is neither a WCS nor an
+*        AXIS component, and PROPEX is true.
 *     {enter_further_changes_here}
 
 *-
@@ -370,6 +373,7 @@
       CHARACTER FTLOC * ( DAT__SZLOC ) ! Locator to NDF FITS extension
       CHARACTER FTLOCI * ( DAT__SZLOC ) ! Locator to element of NDF
                                  ! FITS extension
+      LOGICAL   GOTWCS           ! Does NDF have a WCS component?
       INTEGER   I                ! Loop variable
       LOGICAL   ICKEY            ! Not a data-integrity header?
       INTEGER   IVALUE           ! Indexed header number
@@ -923,8 +927,19 @@
 
 *  Write out the NDF WCS information.
 *  ==================================
-      CALL COF_FPWCS( FUNIT, NDFI, ENCOD, NATIVE, USEAXS, ALWTAB,
-     :                AXORD, STATUS )
+
+*  If the NDF has a WCS component do not propagate the AXIS information
+*  in a table.
+      CALL NDF_STATE( NDFI, 'WCS', GOTWCS, STATUS )
+
+      IF ( PROPEX .AND. .NOT. ( GOTWCS .OR. AXIFND ) ) THEN
+         CALL MSG_OUTIF( MSG__VERB, 'COF_WHEAD_WAR4',
+     :     'Note that the WCS information is progapated verbatim '/
+     :     /'from the NDF''s FITS airlock.', STATUS )
+      ELSE
+         CALL COF_FPWCS( FUNIT, NDFI, ENCOD, NATIVE, USEAXS, ALWTAB,
+     :                   AXORD, STATUS )
+      END IF
 
   999 CONTINUE
 
