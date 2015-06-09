@@ -579,12 +579,18 @@ try:
       com = loadndg( "COM" )
       if not com:
          msg_out( "Creating new artificial common-mode signals...")
-         com = NDG(ff)
-         for icom in range(len( com )):
-            msg_out( "   sub-scan {0}/{1}".format(icom+1,len(com)))
+
+         comlen = 0
+         totcom = NDG(1)
+         lbnd = []
+         ubnd = []
+
+         tcom = NDG(ff)
+         for icom in range(len( tcom )):
+            msg_out( "   sub-scan {0}/{1}".format(icom+1,len(tcom)))
             this_ff = ff[ icom ]
             this_cff = cff[ icom ]
-            this_com = com[ icom ]
+            this_com = tcom[ icom ]
 
 #  Get the number of time slices in the current flat-fielded time-series.
             invoke("$KAPPA_DIR/ndftrace {0}".format(this_ff) )
@@ -650,7 +656,44 @@ try:
 #  Add this mean value onto the common mode.
             invoke("$KAPPA_DIR/cadd {0} scalar={1} out={2}".format(attcom,mean_com,this_com))
 
+#  Append the current COM file to the end of the total COM file.
+            lbnd.append( comlen + 1 )
+            if comlen > 0:
+               temp = NDG(1)
+               invoke("$KAPPA_DIR/paste in={0} p1={1} shift={2} out={3}".
+                      format(totcom,this_com,comlen,temp))
+               invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(temp,totcom))
+            else:
+               invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(this_com,totcom))
+
+            comlen += ns
+            ubnd.append( comlen )
+
+#  Now attempt to ensure that there are no jumps between common mode
+#  files. First reshape the total com signal into a 3D array as required
+#  by fixsteps.
+         com3d = NDG(1)
+         invoke("$KAPPA_DIR/reshape in={0} shape=\[1,1,{1}\] out={2}".
+                format(totcom,comlen,com3d))
+
+#  Now fix the steps.
+         com3d_fixed = NDG(1)
+         invoke("$SMURF_DIR/fixsteps in={0} out={1} meanshift=no".
+                format(com3d,com3d_fixed))
+
+#  Reshape it back to 1-dimension.
+         com_fixed = NDG(1)
+         invoke("$KAPPA_DIR/reshape in={0} shape={1} out={2}".
+                format(com3d_fixed,comlen,com_fixed))
+
+#  Now split the corrected COM signal up into individual files.
+         com = NDG(ff)
+         for icom in range(len( com )):
+            invoke("$KAPPA_DIR/ndfcopy in={0}\({1}:{2}\) out={3}".
+                   format(com_fixed,lbnd[icom],ubnd[icom],com[icom]))
+
          savendg( "COM", com  )
+
       else:
          msg_out( "Re-using old artificial common-mode signals...")
    else:
