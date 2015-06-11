@@ -455,10 +455,15 @@ Ubuntu:
    texi2html
 
 Fedora:
-   As for Ubuntu, but note that package names are usually changed from
-   "libxyz-dev" to "libXyz-devel".
+   Mainly as for Ubuntu, but note that package names are usually changed
+   from "libxyz-dev" to "libXyz-devel".
+
+   ncurses-devel
+
    For the new documentation build, it may be necessary to install the
    following (at least on Fedora 20 and 21):
+   texlive-latex
+   texlive-tex4ht.noarch
    texlive-siunitx.noarch
    texlive-titlesec.noarch
    texlive-abstract.noarch
