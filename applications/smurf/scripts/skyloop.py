@@ -87,6 +87,7 @@
 *           diag.append=1
 *           downsampscale=0
 *           downsampfreq=0
+*           fakemap=<undef>
 *
 *        - Last iteration:
 *           numiter=1
@@ -109,6 +110,7 @@
 *           diag.append=1
 *           downsampscale=0
 *           downsampfreq=0
+*           fakemap=<undef>
 *
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
@@ -283,6 +285,8 @@
 *        Do not update quality flags at the end of each iteration.
 *     14-MAY-2014 (DSB):
 *        Abort if ast.skip is negative.
+*     11-JUN-2015 (DSB):
+*        Only add on any fakemap on the first iteration.
 *-
 '''
 
@@ -722,6 +726,7 @@ try:
       add["downsampscale"] = 0 # Iter. 1 did any required downsampling. Later iters
       add["downsampfreq"] = 0  # must not further downsampling because the cache files
                                # are only appropriate for the origin downsampling.
+      add["fakemap"] = "<undef>" # Iter. 1 added any required fakemap.
 
 #  Now create the config, inheriting the config from the first invocation.
       iconf = 1
