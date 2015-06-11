@@ -70,6 +70,10 @@
 *        Initial Version
 *     2010-09-14 (EC):
 *        Parallelize over blocks of bolometers
+*     2015-06-11 (DSB):
+*        Five years later, we discover that time-based de-spiking has
+*        been completely broken the whole time because of incorrect
+*        indexing within the parallel code.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -214,13 +218,13 @@ static void smfFlagSpikesPar( void *job_data_ptr, int *status ) {
 
 /* Initialise pointers to the first data value and quality value for the
    first bolometer. */
-   pdat0 = dat;
-   pqua0 = qua;
+   pdat0 = dat + pdata->b1*bstride;
+   pqua0 = qua + pdata->b1*bstride;
 
 /* Initialise pointers to the last data value and quality value for the first
    bolometer. */
-   pdat1 = dat + ( ntime - 1 )*tstride;
-   pqua1 = qua + ( ntime - 1 )*tstride;
+   pdat1 = dat + ( ntime - 1 )*tstride + pdata->b1*bstride;
+   pqua1 = qua + ( ntime - 1 )*tstride + pdata->b1*bstride;
 
 /* We process each bolometer in turn for this block. */
    for( ibolo=pdata->b1; ibolo<=pdata->b2 && *status == SAI__OK; ibolo++ ) {
