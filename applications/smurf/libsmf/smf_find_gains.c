@@ -212,6 +212,10 @@
 *     4-JUN-2015 (DSB):
 *        Allow a NULL value to be supplied for "nrej" (in which case it
 *        is assumed that no blocks have converged).
+*     12-JUN-2015 (DSB):
+*        If NOFLAG is set, we still need to ensure that there are no BAD
+*        or NOFIT values in the returned GAI data, so that smf_gandoff can
+*        interpolate them.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -891,94 +895,94 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
                     status );
         }
 
-/* Now replace gains and offsets stored for rejected bolo-blocks, so that
-   smf_gandoff produces smooth interpolation within neighbouring good
-   bolo-blocks. */
-        for( ibolo = 0; ibolo < nbolo && *status == SAI__OK; ibolo++ ) {
-
-/* Skip entirely bad bolometers. */
-           ibase = ibolo*bstride;
-           if( !( qua[ ibase ] & SMF__Q_BADB) ) {
-
-/* Get the index within "gai" of the gain value for the first block for
-   the current bolometer. */
-              igbase = ibolo*gbstride;
-
-/* No previous good block as yet. */
-              prevblock = -1;
-
-/* Loop round all blocks of time slices from the current bolometer. */
-              for( iblock = 0; iblock < nblock; iblock++ ) {
-
-/* If this block has not been rejected... */
-                 if( gai[ igbase + corr_offset ] != VAL__BADD ) {
-                    g =  gai[ igbase ];
-                    o = gai[ igbase + off_offset ];
-
-/* If one or more previous blocks were bad, we assign them new gains and
-   offsets by interpolation between the current (good) block and the
-   previous good block. */
-                    if( iblock - prevblock > 1 ) {
-                       endgain = g;
-                       endoffset = o;
-
-/* If this is the first good block, arrange that the same values are used
-   for all previous bad blocks. */
-                       if( prevblock == -1 ) {
-                          startgain = g;
-                          startoffset = o;
-                       } else {
-                          startgain = prevgain;
-                          startoffset = prevoffset;
-                       }
-
-/* Loop over all bad blocks since the previous good block. */
-                       pg = gai + ibolo*gbstride + (prevblock + 1)*gcstride;
-                       for( jblock = prevblock + 1; jblock < iblock; jblock++ ) {
-
-/* Assign new interpolated gain and offset to the bad block. */
-                          wend = jblock - prevblock;
-                          wstart = iblock - jblock;
-                          wsum = wstart + wend;
-                          pg[ 0 ] = ( startgain*wstart + endgain*wend )/wsum;
-                          pg[ off_offset ] = ( startoffset*wstart + endoffset*wend )/wsum;
-
-                          pg += gcstride;
-                       }
-                    }
-
-/* Record the index of this block as the most recent good block. Also,
-   record its gain and offset. */
-                    prevblock = iblock;
-                    prevgain =  g;
-                    prevoffset = o;
-                 }
-
-/* Get the index within "gai" of the gain value for the first block for
-   the next bolometer. */
-                 igbase += gcstride;
-              }
-
-/* If one or more blocks at the end of the time stream were rejected,
-   replace their gains and offsets with the gains and offsets of the
-   previous good block. */
-              if( prevblock < (int) nblock - 1 ) {
-                 pg = gai + ibolo*gbstride + (prevblock + 1)*gcstride;
-                 for( jblock = prevblock + 1; jblock < nblock; jblock++ ) {
-                    pg[ 0 ] = prevgain;
-                    pg[ off_offset ] = prevoffset;
-                    pg += gcstride;
-                 }
-              }
-           }
-        }
-
       } else {
         msgOutif( MSG__VERB, "",
                   "    NOFLAG is set, template will not be used to flag outlier"
                   " bolometers", status );
       }
 
+/* Now replace gains and offsets stored for rejected or bad bolo-blocks, so
+   that smf_gandoff produces smooth interpolation within neighbouring good
+   bolo-blocks. */
+      for( ibolo = 0; ibolo < nbolo && *status == SAI__OK; ibolo++ ) {
+
+/* Skip entirely bad bolometers. */
+        ibase = ibolo*bstride;
+        if( !( qua[ ibase ] & SMF__Q_BADB) ) {
+
+/* Get the index within "gai" of the gain value for the first block for
+   the current bolometer. */
+           igbase = ibolo*gbstride;
+
+/* No previous good block as yet. */
+           prevblock = -1;
+
+/* Loop round all blocks of time slices from the current bolometer. */
+           for( iblock = 0; iblock < nblock; iblock++ ) {
+
+/* If this block has not been rejected, and is not bad for any reason... */
+              if( gai[ igbase + corr_offset ] != VAL__BADD &&
+                  gai[ igbase ] != VAL__BADD && gai[ igbase ] != NOFIT ) {
+                 g =  gai[ igbase ];
+                 o = gai[ igbase + off_offset ];
+
+/* If one or more previous blocks were bad, we assign them new gains and
+   offsets by interpolation between the current (good) block and the
+   previous good block. */
+                 if( iblock - prevblock > 1 ) {
+                    endgain = g;
+                    endoffset = o;
+
+/* If this is the first good block, arrange that the same values are used
+   for all previous bad blocks. */
+                    if( prevblock == -1 ) {
+                       startgain = g;
+                       startoffset = o;
+                    } else {
+                       startgain = prevgain;
+                       startoffset = prevoffset;
+                    }
+
+/* Loop over all bad blocks since the previous good block. */
+                    pg = gai + ibolo*gbstride + (prevblock + 1)*gcstride;
+                    for( jblock = prevblock + 1; jblock < iblock; jblock++ ) {
+
+/* Assign new interpolated gain and offset to the bad block. */
+                       wend = jblock - prevblock;
+                       wstart = iblock - jblock;
+                       wsum = wstart + wend;
+                       pg[ 0 ] = ( startgain*wstart + endgain*wend )/wsum;
+                       pg[ off_offset ] = ( startoffset*wstart + endoffset*wend )/wsum;
+
+                       pg += gcstride;
+                    }
+                 }
+
+/* Record the index of this block as the most recent good block. Also,
+   record its gain and offset. */
+                 prevblock = iblock;
+                 prevgain =  g;
+                 prevoffset = o;
+              }
+
+/* Get the index within "gai" of the gain value for the first block for
+   the next bolometer. */
+              igbase += gcstride;
+           }
+
+/* If one or more blocks at the end of the time stream were rejected,
+   replace their gains and offsets with the gains and offsets of the
+   previous good block. */
+           if( prevblock < (int) nblock - 1 ) {
+              pg = gai + ibolo*gbstride + (prevblock + 1)*gcstride;
+              for( jblock = prevblock + 1; jblock < nblock; jblock++ ) {
+                 pg[ 0 ] = prevgain;
+                 pg[ off_offset ] = prevoffset;
+                 pg += gcstride;
+              }
+           }
+        }
+      }
    }
 
 /* Free resources. */
