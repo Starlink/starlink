@@ -330,6 +330,19 @@ ast.zero_snr_fwhm = 0
 ast.zero_snr_low = -1.1
 
 #-----------------------------------------------------------------
+#  Name: 	ast.zero_snr_neg
+#  Type: 	int
+#  Default: 	0
+#  Purpose: 	Controls FFCLEAN-style masking.
+#  Description: Setting this parameter to a non-zero value causes the
+#               FFCLEAN algorithm to mask out negative sources as well
+#               as positive sources. This is appropriate say when making
+#               maps of Stokes Q and U parameters, which can be negative.
+#               It is only used of parameter "ast.zero_snr_ffclean" is
+#               non-zero.
+ast.zero_snr_neg = 0
+
+#-----------------------------------------------------------------
 #  Name: 	ast.zero_snrlo
 #  Type: 	real
 #  Default: 	0
@@ -588,6 +601,19 @@ com.zero_snr_hipass = 0.0
 #               oscillating in and out of the mask on successive
 #               iterations, and thus aid smoother convergence.
 com.zero_snr_lopass = 0.0
+
+#-----------------------------------------------------------------
+#  Name: 	com.zero_snr_neg
+#  Type: 	int
+#  Default: 	0
+#  Purpose: 	Controls FFCLEAN-style masking.
+#  Description: Setting this parameter to a non-zero value causes the
+#               FFCLEAN algorithm to mask out negative sources as well
+#               as positive sources. This is appropriate say when making
+#               maps of Stokes Q and U parameters, which can be negative.
+#               It is only used of parameter "com.zero_snr_ffclean" is
+#               non-zero.
+com.zero_snr_neg = 0
 
 #-----------------------------------------------------------------
 #  Name: 	com.zero_snrlo
@@ -1693,6 +1719,19 @@ flt.zero_snr_hipass = 0.0
 #               oscillating in and out of the mask on successive
 #               iterations, and thus aid smoother convergence.
 flt.zero_snr_lopass = 0.0
+
+#-----------------------------------------------------------------
+#  Name: 	flt.zero_snr_neg
+#  Type: 	int
+#  Default: 	0
+#  Purpose: 	Controls FFCLEAN-style masking.
+#  Description: Setting this parameter to a non-zero value causes the
+#               FFCLEAN algorithm to mask out negative sources as well
+#               as positive sources. This is appropriate say when making
+#               maps of Stokes Q and U parameters, which can be negative.
+#               It is only used of parameter "flt.zero_snr_ffclean" is
+#               non-zero.
+flt.zero_snr_neg = 0
 
 #-----------------------------------------------------------------
 #  Name: 	flt.zero_snrlo

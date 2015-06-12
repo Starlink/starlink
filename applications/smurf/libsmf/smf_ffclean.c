@@ -16,7 +16,7 @@
 *     double *smf_ffclean( ThrWorkForce *wf, const double *map,
 *                          const double *mapvar, const dim_t dims[2],
 *                          dim_t box, dim_t box0, double thresh,
-*                          int resids, double *sigma, int *status )
+*                          int resids, int neg, double *sigma, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -42,6 +42,8 @@
 *        residuals rather than the cleaned image. If negative, the
 *        returned array will contain the smoothed image rather than the
 *        cleaned image.
+*     neg = int (Given)
+*        If non-zero, allows sources to have negative values.
 *     sigma = double * (Returned)
 *        If not NULL, returned holding the global noise level within the
 *        supplied map.
@@ -87,6 +89,8 @@
 *        - Allow SNR map to be masked and returned.
 *        - Only clip positive outliers.
 *        - Added argument "box0"/
+*     12-JUN-2015 (DSB):
+*        Add argument "neg".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -134,6 +138,7 @@ typedef struct smfFFCleanJobData {
    double lim;
    double sum1;
    double sum2;
+   int neg;
    int oper;
    size_t nsum;
    size_t pixhi;
@@ -146,7 +151,7 @@ static void smf1_ffclean_job( void *job_data, int *status );
 /* Main entry point. */
 double *smf_ffclean( ThrWorkForce *wf, const double *map, const double *mapvar,
                      const dim_t dims[2], dim_t box, dim_t box0, double thresh,
-                     int resids, double *sigma, int *status ){
+                     int resids, int neg, double *sigma, int *status ){
 
 /* Local Variables: */
    double *result = NULL;
@@ -280,6 +285,7 @@ double *smf_ffclean( ThrWorkForce *wf, const double *map, const double *mapvar,
          for( iw = 0; iw < nw; iw++ ) {
             pdata = job_data + iw;
             pdata->lim = lim;
+            pdata->neg = neg;
             pdata->oper = 2;
             pdata->resid = residuals;
             pdata->result = result;
@@ -415,17 +421,36 @@ static void smf1_ffclean_job( void *job_data, int *status ) {
 
       p0 = pdata->resid + pdata->pixlo;
       p1 = pdata->result + pdata->pixlo;
-      for( ipix = pdata->pixlo; ipix <= pdata->pixhi; ipix++,p0++,p1++ ) {
-         if( *p0 != VAL__BADD && *p1 != VAL__BADD ) {
-            if( *p0 > pdata->lim ) {
-               *p1 = VAL__BADD;
+      if( pdata->neg ) {
+
+         for( ipix = pdata->pixlo; ipix <= pdata->pixhi; ipix++,p0++,p1++ ) {
+            if( *p0 != VAL__BADD && *p1 != VAL__BADD ) {
+               if( fabs( *p0 ) > pdata->lim ) {
+                  *p1 = VAL__BADD;
+               } else {
+                  pdata->sum1 += *p0;
+                  pdata->sum2 += (*p0)*(*p0);
+                  (pdata->nsum)++;
+               }
             } else {
-               pdata->sum1 += *p0;
-               pdata->sum2 += (*p0)*(*p0);
-               (pdata->nsum)++;
+               *p1 = VAL__BADD;
             }
-         } else {
-            *p1 = VAL__BADD;
+         }
+
+      } else {
+
+         for( ipix = pdata->pixlo; ipix <= pdata->pixhi; ipix++,p0++,p1++ ) {
+            if( *p0 != VAL__BADD && *p1 != VAL__BADD ) {
+               if( *p0 > pdata->lim ) {
+                  *p1 = VAL__BADD;
+               } else {
+                  pdata->sum1 += *p0;
+                  pdata->sum2 += (*p0)*(*p0);
+                  (pdata->nsum)++;
+               }
+            } else {
+               *p1 = VAL__BADD;
+            }
          }
       }
 

@@ -1058,7 +1058,7 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
 
 double *smf_ffclean( ThrWorkForce *wf, const double *map, const double *mapvar,
                      const dim_t dims[2], dim_t box, dim_t box0, double thresh,
-                     int resids, double *sigma, int *status );
+                     int resids, int neg, double *sigma, int *status );
 
 smfData *smf_fft_2dazav( const smfData *data, double *df, int *status );
 
