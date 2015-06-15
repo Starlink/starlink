@@ -2683,3 +2683,5 @@ two.bmap = <undef>
 varmapmethod = 1
 
 
+pca.pcathresh=4
+pca.pcalen=0

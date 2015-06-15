@@ -695,6 +695,10 @@ void smf_calcmodel_smo( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status );
 
+void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
+                        AstKeyMap *keymap, smfArray **allmodel, int flags,
+                        int *status );
+
 void smf_calcmodel_ssn( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status );
@@ -774,11 +778,11 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window,
 
 void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
                     size_t t_last, double thresh, smfData **components,
-                    smfData **amplitudes, int flagbad, AstKeyMap *keymap,
+                    smfData **amplitudes, int flagbad, int sub, AstKeyMap *keymap,
                     int *status );
 
 void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
-                           double thresh, AstKeyMap *keymap, int *status );
+                           double thresh, int sub, AstKeyMap *keymap, int *status );
 
 void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
                          smfArray **noisemaps, smfArray **com, smfArray **gai,

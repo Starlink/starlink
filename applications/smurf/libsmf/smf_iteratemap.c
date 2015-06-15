@@ -493,6 +493,8 @@
 *        support multi-threading in smf_rebinmap1.
 *     2014-12-18 (DSB):
 *        Added SSN.
+*     2015-06-15 (DSB):
+*        Added PCA.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -659,6 +661,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int haveext=0;                /* Set if EXT is one of the models */
   int havecom=0;                /* Set if COM is one of the models */
   int haveflt=0;                /* Set if FLT is one of the models */
+  int havepca=0;                /* Set if PCA is one of the models */
   int havessn=0;                /* Set if SSN is one of the models */
   int havegai=0;                /* Set if GAI is one of the models */
   int havenoi=0;                /* Set if NOI is one of the models */
@@ -769,6 +772,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   dim_t whichast=0;             /* Model index of AST (must be specified) */
   dim_t whichext=0;             /* Model index of EXT if present */
   dim_t whichflt=0;             /* Model index of FLT if present */
+  dim_t whichpca=0;             /* Model index of PCA if present */
   dim_t whichssn=0;             /* Model index of SSN if present */
   dim_t whichcom=0;             /* Model index of COM if present */
   dim_t whichgai=0;             /* Model index of GAI if present */
@@ -835,6 +839,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   dat.com_mask = NULL;
   dat.flt_mask = NULL;
   dat.ssn_mask = NULL;
+  dat.pca_mask = NULL;
 
   /* Get size of the input group */
   isize = grpGrpsz( igrp, status );
@@ -1136,6 +1141,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           if( thismodel == SMF__SSN ) {
             havessn = 1;
             whichssn = imodel;
+          }
+
+          /* set havepca/whichpca */
+          if( thismodel == SMF__PCA ) {
+            havepca = 1;
+            whichpca = imodel;
           }
 
           /* set havegai/whichgai */
@@ -1944,7 +1955,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
         /* Associate quality with some models */
         if( ( modeltyps[imodel] == SMF__FLT ||
-              modeltyps[imodel] == SMF__SSN ) && *status == SAI__OK ) {
+              modeltyps[imodel] == SMF__SSN ||
+              modeltyps[imodel] == SMF__PCA ) && *status == SAI__OK ) {
           for( idx=0; idx<res[0]->ndat; idx++ ) {
             smfData *thisqua = qua[0]->sdata[idx];
             model[imodel][0]->sdata[idx]->sidequal = thisqua;
@@ -2263,6 +2275,16 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                      SMF__DIMM_INVERT, status );
                   msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                              ": ** %f s undoing SSN",
+                             status, smf_timerupdate(&tv1,&tv2,status) );
+
+                } else if( jj == whichpca && havepca ) {
+                  msgOutiff( MSG__VERB, "",
+                             "  ** undoing PCA from previous iteration",
+                             status );
+                  smf_calcmodel_pca( wf, &dat, 0, keymap, model[whichpca],
+                                     SMF__DIMM_INVERT, status );
+                  msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                             ": ** %f s undoing PCA",
                              status, smf_timerupdate(&tv1,&tv2,status) );
                 }
 
@@ -3429,6 +3451,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       dat.com_mask = astFree( dat.com_mask );
       dat.flt_mask = astFree( dat.flt_mask );
       dat.ssn_mask = astFree( dat.ssn_mask );
+      dat.pca_mask = astFree( dat.pca_mask );
     }
 
 #ifdef __ITERATEMAP_SHOW_MEM

@@ -55,6 +55,8 @@
 *        Add SMF__TWO
 *     2014-12-18 (DSB):
 *        Added SSN.
+*     2015-06-15 (DSB):
+*        Added PCA.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -138,6 +140,10 @@ smf_calcmodelptr smf_model_getptr( smf_modeltype type, int *status) {
 
   case SMF__SMO:
     retval = (smf_calcmodelptr) &smf_calcmodel_smo;
+    break;
+
+  case SMF__PCA:
+    retval = (smf_calcmodelptr) &smf_calcmodel_pca;
     break;
 
   case SMF__SSN:

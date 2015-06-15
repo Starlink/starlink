@@ -69,7 +69,9 @@
 *        Add SMF__TWO
 *     2014-12-18 (DSB):
 *        Added SSN.
-*     {enter_further_changes_here}
+*     2015-06-15 (DSB):
+*        Added PCA.
+     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2010 Science & Technology Facilities Council.
@@ -213,6 +215,10 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
       break;
 
     case SMF__SSN:
+      fset = astCopy( refwcs );
+      break;
+
+    case SMF__PCA:
       fset = astCopy( refwcs );
       break;
 

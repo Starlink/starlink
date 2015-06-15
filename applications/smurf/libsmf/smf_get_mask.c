@@ -21,7 +21,7 @@
 *     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     mtype = (Given)
-*        The type of model (COM, SSN, FLT or AST) for which the mask is
+*        The type of model (COM, SSN, PCA, FLT or AST) for which the mask is
 *        required.
 *     config = AstKeyMap * (Given)
 *        Configuration parameters that control the map-maker.
@@ -264,12 +264,15 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    } else if( mtype == SMF__SSN ) {
       modname = "SSN";
       mask = &(dat->ssn_mask);
+   } else if( mtype == SMF__PCA ) {
+      modname = "PCA";
+      mask = &(dat->pca_mask);
    } else {
       modname = NULL;
       mask = NULL;
       *status = SAI__ERROR;
       errRepf( " ", "smf_get_mask: Unsupported model type %d supplied - "
-               "must be COM, SSN, FLT or AST.", status, mtype );
+               "must be COM, PCA, SSN, FLT or AST.", status, mtype );
    }
    subkm = NULL;
    astMapGet0A( config, modname, &subkm );

@@ -57,6 +57,8 @@
 *        Add SMF__TWO
 *     2014-12-18 (DSB):
 *        Added SSN.
+*     2015-06-15 (DSB):
+*        Added PCA.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -164,6 +166,10 @@ const char *smf_model_getname( smf_modeltype type, int *status ) {
 
   case SMF__SMO:
     retval = "smo";
+    break;
+
+  case SMF__PCA:
+    retval = "pca";
     break;
 
   case SMF__SSN:

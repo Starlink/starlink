@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
-*                           double thresh, AstKeyMap *keymap, int *status )
+*                           double thresh, int sub, AstKeyMap *keymap, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -26,17 +26,17 @@
 *        Chunk length for the PCA cleaning in time slices.
 *     thresh = double (Given)
 *        Outlier threshold for amplitudes to remove from data for cleaning
+*     sub = int (Given)
+*        If non-zero, the values returned in "data" are the supplied data
+*        values minus the select PCA components. If zero, the values returned
+*        in "data" are the select PCA components themselves.
 *     keymap = AstKeyMap * (Given)
 *        Keymap containing parameters that control how flagbad works. See
 *        smf_find_gains for details.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
-*  Return Value:
-
 *  Description:
-*
-
 *     This is a wrapper function to the lower-level smf_clean_pca function.
 *     It runs the PCA cleaning operation independently on every chunklen
 *     samples (using parallelization). The very last chunk processed will
@@ -56,6 +56,8 @@
 *        Initial version
 *     2012-11-12 (DSB):
 *        Fill gaps in the data before cleaning.
+*     2015-06-15 (DSB):
+*        Add argument "sub".
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
@@ -108,6 +110,7 @@ typedef struct smfPCAChunkData {
   size_t t1;              /* Index of first time slice for chunk */
   size_t t2;              /* Index of last time slice */
   double thresh;          /* PCA threshold */
+  int sub;                /* Return cleaned data? (return components otherwise) */
 } smfPCAChunkData;
 
 /* Function to be executed in thread: FFT all of the bolos from b1 to b2 */
@@ -153,7 +156,7 @@ void smfPCAChunkParallel( void *job_data_ptr, int *status ) {
 
   /* PCA clean this chunk */
   smf_clean_pca( NULL, pdata->data, pdata->t1, pdata->t2, pdata->thresh,
-                 NULL, NULL, 0, pdata->keymap, status );
+                 NULL, NULL, 0, pdata->sub, pdata->keymap, status );
 
   /* Debugging message indicating thread finished work */
   msgOutiff( MSG__DEBUG, "",
@@ -168,7 +171,7 @@ void smfPCAChunkParallel( void *job_data_ptr, int *status ) {
 #define FUNC_NAME "smf_clean_pca_chunks"
 
 void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
-                           double thresh, AstKeyMap *keymap, int *status ) {
+                           double thresh, int sub, AstKeyMap *keymap, int *status ) {
 
   size_t clen=0;          /* Local chunk length */
   size_t i;               /* Loop counter */
@@ -258,7 +261,7 @@ void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
     msgOutif( MSG__VERB, "", FUNC_NAME
              ": only 1 chunk, smf_clean_pca will parallelize internally",
              status );
-    smf_clean_pca( wf, data, 0, 0, thresh, NULL, NULL, 0, keymap, status);
+    smf_clean_pca( wf, data, 0, 0, thresh, NULL, NULL, 0, sub, keymap, status);
   } else {
     msgOutiff( MSG__VERB, "", FUNC_NAME
              ": will clean %zu separate time chunks", status, nchunks );
@@ -279,6 +282,7 @@ void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
       pdata->data = data;
       pdata->keymap = astCopy(keymap);
       pdata->thresh = thresh;
+      pdata->sub = sub;
 
       pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata, smfPCAChunkParallel,
                                0, NULL, status );

@@ -210,6 +210,11 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
       ldescr = "Set iff samples flag as bad by the Scan-Synchronous Noise model";
       break;
 
+    case SMF__Q_PCA:
+      retval = "PCA";
+      ldescr = "Set iff samples flag as bad by the PCA model";
+      break;
+
     default:
       retval = NULL;
     }

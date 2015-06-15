@@ -95,6 +95,8 @@
 *        is non-zero.
 *     2014-12-18 (DSB):
 *        Added SSN.
+*     2015-06-15 (DSB):
+*        Added PCA
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -344,6 +346,9 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
           total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
           break;
         case SMF__SMO:
+          total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+          break;
+        case SMF__PCA:
           total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
           break;
         case SMF__SSN:

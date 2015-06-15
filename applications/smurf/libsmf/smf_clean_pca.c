@@ -15,8 +15,8 @@
 *  Invocation:
 *     smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
 *                    size_t t_last, double thresh, smfData **components,
-*                    smfData **amplitudes, int flagbad, AstKeyMap *keymap,
-*                    int *status )
+*                    smfData **amplitudes, int flagbad, int sub,
+*                    AstKeyMap *keymap, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -41,13 +41,15 @@
 *        If set, compare each bolometer to the first component as a template
 *        to decide whether the data are good or not. Not supported if t_first
 *        and t_last don't correspond to the full length of data.
+*     sub = int (Given)
+*        If non-zero, the values returned in "data" are the supplied data
+*        values minus the select PCA components. If zero, the values returned
+*        in "data" are the select PCA components themselves.
 *     keymap = AstKeyMap * (Given)
 *        Keymap containing parameters that control how flagbad works. See
 *        smf_find_gains for details.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
-
-*  Return Value:
 
 *  Description:
 *     This function uses principal component analysis (PCA) to remove
@@ -93,9 +95,12 @@
 *        reasonable given that the supplied data is known to have zero mean.
 *        - Likewise ignore samples that are flagged as unfittable in the
 *        quality array
+*     2015-06-15 (DSB):
+*        Add argument "sub".
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
+*     Copyright (C) 2015 East Asian Observatory.
 *     All Rights Reserved.
 
 *  Licence:
@@ -159,6 +164,7 @@ typedef struct smfPCAData {
   size_t ngoodbolo;       /* Number of good bolos */
   dim_t tlen;             /* Number of time slices */
   int operation;          /* 0=covar,1=eigenvect,2=projection */
+  int sub;                /* Subtract the selected PCA components? */
   double *rms_amp;        /* VAL__BADD where modes need to be removed */
   size_t t1;              /* Index of first time slice for chunk */
   size_t t2;              /* Index of last time slice */
@@ -354,6 +360,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   } else if( (pdata->operation == 3) && (*status == SAI__OK) ) {
     /* Operation 3: clean --------------------------------------------------- */
     double a;
+    double factor = pdata->sub ? 1 : -1;
 
     for( j=0; j<ngoodbolo; j++ ) {        /* loop over component */
       if( rms_amp[j] == VAL__BADD ) {
@@ -363,7 +370,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
            each bolometer at all relevant time-slices */
 
         for( i=0; i<ngoodbolo; i++ ) {    /* loop over bolometer */
-          a =  amp[goodbolo[i]*abstride + j*acompstride];
+          a =  factor*amp[goodbolo[i]*abstride + j*acompstride];
           for( k=pdata->t1; k<=pdata->t2; k++ ) {
             if( ( d[goodbolo[i]*bstride + k*tstride] != VAL__BADD ) &&
                 !(SMF__Q_FIT & qua[goodbolo[i]*bstride + k*tstride]) ) {
@@ -395,8 +402,8 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
 
 void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
                     size_t t_last, double thresh, smfData **components,
-                    smfData **amplitudes, int flagbad, AstKeyMap *keymap,
-                    int *status ) {
+                    smfData **amplitudes, int flagbad, int sub,
+                    AstKeyMap *keymap, int *status ) {
 
 
   double *amp=NULL;       /* matrix of components amplitudes for each bolo */
@@ -981,11 +988,14 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
                ngoodbolo );
 
     /* Now that we know which modes to remove, call the parallel routine
-       for doing the hard work */
+       for doing the hard work. If we are returning the selected PCA
+       components rather than the cleaned data, zero the data array first. */
+    if( !sub ) memset( data->pntr[0], 0, ndata*sizeof(double) );
 
     for( ii=0; ii<nw; ii++ ) {
       pdata = job_data + ii;
       pdata->operation = 3;
+      pdata->sub = sub;
       pdata->rms_amp = rms_amp;
       pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata, smfPCAParallel,
                                  0, NULL, status );

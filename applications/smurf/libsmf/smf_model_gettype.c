@@ -51,6 +51,8 @@
 *        of strcmp calls.
 *     2014-12-18 (DSB):
 *        Added SSN.
+*     2015-06-15 (DSB):
+*        Added PCA.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -143,7 +145,11 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status ) {
     break;
   case 'P':
   case 'p':
-    retval = SMF__PLN;
+    if (strncasecmp( modelname, "PLN", 3 ) == 0) {
+      retval = SMF__PLN;
+    } else if (strncasecmp( modelname, "PCA", 3 ) == 0) {
+      retval = SMF__PCA;
+    }
     break;
   case 'R':
   case 'r':
