@@ -30,10 +30,23 @@
 *        defaults will be used if the supplied configuration does not
 *        specify any values for the following parameters:
 *
-*           numiter=1
-*           modelorder=(flt,ext,ast,noi)
-*           noisecliphigh=3
-*           pcathresh=4
+*        numiter=-20
+*        maptol=0.05
+*        itermap=2
+*        ast.zero_snr_ffclean=1
+*        ast.zero_snr_hipass=200
+*        ast.zero_snr=4
+*        ast.zero_snr_neg=1
+*        ast.skip=2
+*        com.zero_snr_ffclean=1
+*        com.zero_snr_hipass=200
+*        com.zero_snr=4
+*        com.zero_snr_neg=1
+*        noisecliphigh=3
+*        com.perarray=1
+*        com.noflag=1
+*        spikethresh = 5
+*        spikebox = 10
 *
 *        The following values will always over-ride any values in the
 *        supplied configuration:
@@ -107,7 +120,7 @@
 *     U = NDF (Read)
 *        The output NDF in which to return the U intensity map.
 *     QREF = NDF (Read)
-*        An optional map defining the pixel grid for the output Q 
+*        An optional map defining the pixel grid for the output Q
 *        map. If both QREF and UREF are supplied, the polarimetric
 *        reference direction used by the Q and U maps will be rotated to
 *        match the reference direction in the supplied QREF and UREF
@@ -296,10 +309,23 @@ try:
 
 #  First put in the defaults supplied by this script. These may be
 #  over-written by the user-supplied config.
-   fd.write("numiter=1\n")
-   fd.write("modelorder=(ext,flt,ast,noi)\n")
+   fd.write("numiter=-20\n")
+   fd.write("maptol=0.05\n")
+   fd.write("itermap=2\n")
+   fd.write("ast.zero_snr_ffclean=1\n")
+   fd.write("ast.zero_snr_hipass=200\n")
+   fd.write("ast.zero_snr=4\n")
+   fd.write("ast.zero_snr_neg=1\n")
+   fd.write("ast.skip=2\n")
+   fd.write("com.zero_snr_ffclean=1\n")
+   fd.write("com.zero_snr_hipass=200\n")
+   fd.write("com.zero_snr=4\n")
+   fd.write("com.zero_snr_neg=1\n")
    fd.write("noisecliphigh=3\n")
-   fd.write("pcathresh=4\n")
+   fd.write("com.perarray=1\n")
+   fd.write("com.noflag=1\n")
+   fd.write("spikethresh=5\n")
+   fd.write("spikebox=10\n")
 
 #  Now put in the user-supplied config.
    if config != "def":
