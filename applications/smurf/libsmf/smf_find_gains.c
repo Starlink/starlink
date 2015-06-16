@@ -633,7 +633,10 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
                 } else if( ((gain_positive) && (g < 0)) || (g == 0) ){
                   reason[ 1 ]++;
 
-                } else if( c <= corr_abstol ){
+                } else if( !gain_positive && fabs( c ) <= corr_abstol ){
+                  reason[ 2 ]++;
+
+                } else if( gain_positive && c <= corr_abstol ){
                   reason[ 2 ]++;
 
 /* Otherwise, store the correlation coefficient and the logarithm of the
