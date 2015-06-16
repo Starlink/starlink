@@ -26,9 +26,8 @@
 
 *  Parameters:
 *     CONFIG = LITERAL (Read)
-*        The MAKEMAP configuration parameter values to use. The following
-*        defaults will be used if the supplied configuration does not
-*        specify any values for the following parameters:
+*        The MAKEMAP configuration parameter values to use. If a null
+*        value (!) or "def" is supplied, the following defaults will be used:
 *
 *        numiter=-20
 *        maptol=0.05
@@ -48,14 +47,12 @@
 *        spikethresh = 5
 *        spikebox = 10
 *
-*        The following values will always over-ride any values in the
-*        supplied configuration:
+*        In addition, the following values are always appended to the end
+*        of the used config (whether supplied or defaulted):
 *
-*           flagslow = 0.01
-*           downsampscale = 0
-*           noi.usevar=1
-*
-*        All the above values are used if a null (!) value is supplied. [!]
+*        flagslow = 0.01
+*        downsampscale = 0
+*        noi.usevar=1
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
 *        Allowed values are as for "ILEVEL". The log file to create is
@@ -307,29 +304,30 @@ try:
    conf = os.path.join(NDG.tempdir,"conf")
    fd = open(conf,"w")
 
-#  First put in the defaults supplied by this script. These may be
-#  over-written by the user-supplied config.
-   fd.write("numiter=-20\n")
-   fd.write("maptol=0.05\n")
-   fd.write("itermap=2\n")
-   fd.write("ast.zero_snr_ffclean=1\n")
-   fd.write("ast.zero_snr_hipass=200\n")
-   fd.write("ast.zero_snr=4\n")
-   fd.write("ast.zero_snr_neg=1\n")
-   fd.write("ast.skip=2\n")
-   fd.write("com.zero_snr_ffclean=1\n")
-   fd.write("com.zero_snr_hipass=200\n")
-   fd.write("com.zero_snr=4\n")
-   fd.write("com.zero_snr_neg=1\n")
-   fd.write("noisecliphigh=3\n")
-   fd.write("com.perarray=1\n")
-   fd.write("com.noflag=1\n")
-   fd.write("spikethresh=5\n")
-   fd.write("spikebox=10\n")
-
-#  Now put in the user-supplied config.
-   if config != "def":
+#  If a non-default config was supplied, put it in as the first item in
+#  the config.
+   if config and config != "def":
       fd.write("{0}\n".format(config))
+
+#  Otherwise put in the default values.
+   else:
+      fd.write("numiter=-20\n")
+      fd.write("maptol=0.05\n")
+      fd.write("itermap=2\n")
+      fd.write("ast.zero_snr_ffclean=1\n")
+      fd.write("ast.zero_snr_hipass=200\n")
+      fd.write("ast.zero_snr=4\n")
+      fd.write("ast.zero_snr_neg=1\n")
+      fd.write("ast.skip=2\n")
+      fd.write("com.zero_snr_ffclean=1\n")
+      fd.write("com.zero_snr_hipass=200\n")
+      fd.write("com.zero_snr=4\n")
+      fd.write("com.zero_snr_neg=1\n")
+      fd.write("noisecliphigh=3\n")
+      fd.write("com.perarray=1\n")
+      fd.write("com.noflag=1\n")
+      fd.write("spikethresh=5\n")
+      fd.write("spikebox=10\n")
 
 #  Now put in values that are absolutely required by this script. These
 #  over-write any values in the user-supplied config.
