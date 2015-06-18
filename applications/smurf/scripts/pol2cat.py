@@ -352,7 +352,7 @@
 *        This reduces the noise in the mosaics in cases where the sky Q/U is
 *        varying strongly between grid points.
 *     5-MAY-2015 (DSB):
-*        - Only import smurfutil if needed. This avoids problems if the mdp 
+*        - Only import smurfutil if needed. This avoids problems if the mdp
 *        and/or pyndf module are not available locally.
 *        - Report an error if the mask blanks out out nearly all of a Q or U image.
 *        - Report an error if the supplied ref image does not have the requested Domain.
@@ -536,7 +536,7 @@ try:
       parsys["PI"].noprompt = True
 
 #  Ensure the I image has the expected units (pW).
-      invoke( "$KAPPA_DIR/ndftrace {0} quiet".format(iref) )
+      invoke( "$KAPPA_DIR/ndftrace ndf={0} quiet".format(iref) )
       iunits = starutil.get_task_par( "UNITS", "ndftrace" )
       if iunits != "pW":
          raise starutil.InvalidParameterError("Reference image ({0}) has "
@@ -772,7 +772,7 @@ try:
          qbk = NDG(qff)
          for mm in range(len( qff )):
             qm = qmasked[ mm ];
-            invoke( "$KAPPA_DIR/stats {0} order quiet".format(qm) )
+            invoke( "$KAPPA_DIR/stats ndf={0} order quiet".format(qm) )
             medval = starutil.get_task_par( "median", "stats" )
 
             ngood = starutil.get_task_par( "numgood", "stats" )
@@ -784,7 +784,7 @@ try:
                raise starutil.InvalidParameterError( text )
 
             qb = qbk[ mm ];
-            invoke( "$KAPPA_DIR/csub {0} {1} {2}".format(qm,medval,qb) )
+            invoke( "$KAPPA_DIR/csub in={0} scalar={1} out={2}".format(qm,medval,qb) )
 
 #  There seems to be a tendency for each bolometer to have its own fixed
 #  bias in Q and U. We now try to remove these biases by removing the Q and
@@ -926,7 +926,7 @@ try:
          ubk = NDG(uff)
          for mm in range(len( uff )):
             um = umasked[ mm ];
-            invoke( "$KAPPA_DIR/stats {0} order quiet".format(um) )
+            invoke( "$KAPPA_DIR/stats ndf={0} order quiet".format(um) )
             medval = starutil.get_task_par( "median", "stats" )
 
             ngood = starutil.get_task_par( "numgood", "stats" )
@@ -938,7 +938,7 @@ try:
                raise starutil.InvalidParameterError( text )
 
             ub = ubk[ mm ];
-            invoke( "$KAPPA_DIR/csub {0} {1} {2}".format(um,medval,ub) )
+            invoke( "$KAPPA_DIR/csub in={0} scalar={1} out={2}".format(um,medval,ub) )
 
          msg_out( "Removing background U level from {0} bolometers...".format(a))
          ucom = NDG(1)
@@ -1097,7 +1097,7 @@ try:
                   iref_tmp = NDG( 1 )
                   invoke( "$KAPPA_DIR/copybad in={0} out={1} ref={2} "
                           "invert=yes".format(iref,iref_tmp,maska) )
-                  invoke( "$KAPPA_DIR/erase {0}.variance ok=yes".format(iref_tmp) )
+                  invoke( "$KAPPA_DIR/erase object={0}.variance ok=yes".format(iref_tmp) )
                   iref_masked = NDG( 1 )
                   invoke( "$KAPPA_DIR/nomagic in={0} out={1} repval=0".
                           format(iref_tmp,iref_masked) )
@@ -1111,7 +1111,7 @@ try:
                        "method=bilin rebin=no accept". format(iref_masked,icut,ipref) )
 
 #  Get the elevation (in degs) at the centre of the observation.
-            elev = float( invoke("$KAPPA_DIR/fitsmod {0} edit=print keyword=ELSTART".
+            elev = float( invoke("$KAPPA_DIR/fitsmod ndf={0} edit=print keyword=ELSTART".
                                  format( qff2[ nstare/2 ] )))
 
 #  Calculate the factors by which to multiply the total intensity image
@@ -1205,17 +1205,17 @@ try:
    tmp = NDG( 1 )
    invoke( "$KAPPA_DIR/maths exp='ia+ib+ic' ia={0} ib={1} ic={2} out={3}".format(qtotal,utotal,iref,tmp) )
    qtrim = NDG( 1 )
-   invoke( "$KAPPA_DIR/ndfcopy {0} like={1} out={2}".format(qtotal,tmp,qtrim) )
+   invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(qtotal,tmp,qtrim) )
    utrim = NDG( 1 )
-   invoke( "$KAPPA_DIR/ndfcopy {0} like={1} out={2}".format(utotal,tmp,utrim) )
+   invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(utotal,tmp,utrim) )
    itrim = NDG( 1 )
-   invoke( "$KAPPA_DIR/ndfcopy {0} like={1} out={2}".format(iref,tmp,itrim) )
+   invoke( "$KAPPA_DIR/ndfcopy in={0} like={1} out={2}".format(iref,tmp,itrim) )
 
 #  If required, save the Q, U and I images.
    if qui != None:
-      invoke( "$KAPPA_DIR/ndfcopy {0} out={1}.Q".format(qtrim,qui) )
-      invoke( "$KAPPA_DIR/ndfcopy {0} out={1}.U".format(utrim,qui) )
-      invoke( "$KAPPA_DIR/ndfcopy {0} out={1}.I".format(itrim,qui) )
+      invoke( "$KAPPA_DIR/ndfcopy in={0} out={1}.Q".format(qtrim,qui) )
+      invoke( "$KAPPA_DIR/ndfcopy in={0} out={1}.U".format(utrim,qui) )
+      invoke( "$KAPPA_DIR/ndfcopy in={0} out={1}.I".format(itrim,qui) )
 
 #  The polarisation vectors are calculated by the polpack:polvec command,
 #  which requires the input Stokes vectors in the form of a 3D cube. Paste
@@ -1226,23 +1226,23 @@ try:
 
 #  Check that the cube has a POLANAL frame, as required by POLPACK.
    try:
-      invoke( "$KAPPA_DIR/wcsframe {0} POLANAL".format(cube) )
+      invoke( "$KAPPA_DIR/wcsframe ndf={0} frame=POLANAL".format(cube) )
 
 #  If it does not, see if it has a "POLANAL-" Frame (kappa:paste can
 #  cause this by appending "-" to the end of the domain name to account for
 #  the extra added 3rd axis).
    except AtaskError:
-      invoke( "$KAPPA_DIR/wcsframe {0} POLANAL-".format(cube) )
+      invoke( "$KAPPA_DIR/wcsframe ndf={0} frame=POLANAL-".format(cube) )
 
 #  We only arrive here if the POLANAL- frame was found, so rename it to POLANAL
-      invoke( "$KAPPA_DIR/wcsattrib {0} set domain POLANAL".format(cube) )
+      invoke( "$KAPPA_DIR/wcsattrib ndf={0} mode=set name=domain newval=POLANAL".format(cube) )
 
 #  Re-instate the required current Frame
-   invoke( "$KAPPA_DIR/wcsframe {0} {1}".format(cube,domain) )
+   invoke( "$KAPPA_DIR/wcsframe ndf={0} polanal={1}".format(cube,domain) )
 
 #  POLPACK needs to know the order of I, Q and U in the 3D cube. Store
 #  this information in the POLPACK enstension within "cube.sdf".
-   invoke( "$POLPACK_DIR/polext {0} stokes=qui".format(cube) )
+   invoke( "$POLPACK_DIR/polext in={0} stokes=qui".format(cube) )
 
 #  Create a FITS catalogue containing the polarisation vectors.
    command = "$POLPACK_DIR/polvec {0} cat={1} debias={2}".format(cube,outcat,debias)
@@ -1271,12 +1271,12 @@ try:
 #  image, and plot the vectors over the top.
       if iref:
          invoke( "$KAPPA_DIR/lutable mapping=linear coltab=grey device={0}".format(device), buffer=True)
-         invoke( "$KAPPA_DIR/display {0}'(,,3)' mode=perc percentiles=\[1,99\] badcol=black device={1}".format(cube,device), buffer=True)
-         invoke( "$POLPACK_DIR/polplot {0} clear=no axes=no colmag={1} key=yes style='colour=red' device={2}".format(selcat,plot,device), buffer=True)
+         invoke( "$KAPPA_DIR/display in={0}'(,,3)' mode=perc percentiles=\[1,99\] badcol=black device={1}".format(cube,device), buffer=True)
+         invoke( "$POLPACK_DIR/polplot cat={0} clear=no axes=no colmag={1} key=yes style='colour=red' device={2}".format(selcat,plot,device), buffer=True)
 
 #  Otherwise, just plot the vectors.
       else:
-         invoke( "$POLPACK_DIR/polplot {0} colmag={1} key=yes style=def device={2}".format(selcat,plot,device), buffer=True)
+         invoke( "$POLPACK_DIR/polplot cat={0} colmag={1} key=yes style=def device={2}".format(selcat,plot,device), buffer=True)
 
 #  Remove temporary files.
    cleanup()

@@ -519,7 +519,7 @@ try:
 
 #  Polarised intensity.
          pi = NDG(1)
-         invoke( "$KAPPA_DIR/mult {0} {1} {2}".format(iart,fp,pi) )
+         invoke( "$KAPPA_DIR/mult in1={0} in2={1} out={2}".format(iart,fp,pi) )
 
 #  Get q and u values that give radial vectors.
          theta = NDG(1)
@@ -539,12 +539,12 @@ try:
 
 #  Put WCS into the artificial images, indicating that the pol. ref.
 #  direction is the pixel Y axis.
-      invoke("$KAPPA_DIR/setsky {0} projtype=TAN positions=! coords='eq(j2000)' "
+      invoke("$KAPPA_DIR/setsky ndf={0} projtype=TAN positions=! coords='eq(j2000)' "
              "refcode=pixel pixelref=\[0,0\] lon=\"'{1}'\" lat=\"'{2}'\" "
              "pixelsize='{3}s' orient=0 epoch=2015".
              format(iart,reflon.replace(":"," "),reflat.replace(":",""),pixsize) )
-      invoke("$KAPPA_DIR/wcscopy {0} {1}".format(qart,iart) )
-      invoke("$KAPPA_DIR/wcscopy {0} {1}".format(uart,iart) )
+      invoke("$KAPPA_DIR/wcscopy ndf={0} like={1}".format(qart,iart) )
+      invoke("$KAPPA_DIR/wcscopy ndf={0} like={1}".format(uart,iart) )
 
    else:
       msg_out( "Using supplied artificial I, Q and U maps...")
@@ -552,12 +552,12 @@ try:
 #  Ensure the artificial maps have a defined polarimetric reference
 #  direction parallel to the pixel Y axis, and ensure they are in units
 #  of pW.
-   invoke("$POLPACK_DIR/polext {0} angrot=90".format(iart) )
-   invoke("$POLPACK_DIR/polext {0} angrot=90".format(qart) )
-   invoke("$POLPACK_DIR/polext {0} angrot=90".format(uart) )
-   invoke("$KAPPA_DIR/setunits {0} pW".format(iart) )
-   invoke("$KAPPA_DIR/setunits {0} pW".format(qart) )
-   invoke("$KAPPA_DIR/setunits {0} pW".format(uart) )
+   invoke("$POLPACK_DIR/polext in={0} angrot=90".format(iart) )
+   invoke("$POLPACK_DIR/polext in={0} angrot=90".format(qart) )
+   invoke("$POLPACK_DIR/polext in={0} angrot=90".format(uart) )
+   invoke("$KAPPA_DIR/setunits ndf={0} units=pW".format(iart) )
+   invoke("$KAPPA_DIR/setunits ndf={0} units=pW".format(qart) )
+   invoke("$KAPPA_DIR/setunits ndf={0} units=pW".format(uart) )
 
 #  If required, create an artificial common-mode (i.e. unpolarised emission
 #  from the sky) for each sub-scan/grid-point.
@@ -593,11 +593,11 @@ try:
             this_com = tcom[ icom ]
 
 #  Get the number of time slices in the current flat-fielded time-series.
-            invoke("$KAPPA_DIR/ndftrace {0}".format(this_ff) )
+            invoke("$KAPPA_DIR/ndftrace ndf={0}".format(this_ff) )
             ns = int( starutil.get_task_par( "dims(3)", "ndftrace" ))
 
 #  Check the INCOM file is at least as long
-            invoke("$KAPPA_DIR/ndftrace {0}".format(this_cff) )
+            invoke("$KAPPA_DIR/ndftrace ndf={0}".format(this_cff) )
             cns = int( starutil.get_task_par( "dims(3)", "ndftrace" ))
             if cns < ns:
                raise UsageError("\n\nAn INCOM file has been found which is "
@@ -607,39 +607,39 @@ try:
 #  Reshape each flat-fielded INCOM file to a 2D array in which axis
 #  1 is bolometer and axis 2 is time-slice.
             n2d = NDG(1)
-            invoke("$KAPPA_DIR/reshape {0}\(,,:{2}\) out={1} shape=\[1280,{2}\]".format(this_cff,n2d,ns) )
+            invoke("$KAPPA_DIR/reshape in={0}\(,,:{2}\) out={1} shape=\[1280,{2}\]".format(this_cff,n2d,ns) )
 
 #  Collapse this 2D array along pixel axis 2 (time) to get the mean value
 #  in each bolometer.
             n1dmean = NDG(1)
-            invoke("$KAPPA_DIR/collapse {0} estimator=mean axis=2 out={1} wlim=0".
+            invoke("$KAPPA_DIR/collapse in={0} estimator=mean axis=2 out={1} wlim=0".
                    format(n2d,n1dmean))
 
 #  Expand it out again to full 2d, and subtract it off the original to
 #  get a version in which each bolometer has a mean value of zero.
             n2dmean = NDG(1)
-            invoke("$KAPPA_DIR/manic {0} axes=\[1,0\] lbound=1 ubound={1} out={2}".
+            invoke("$KAPPA_DIR/manic in={0} axes=\[1,0\] lbound=1 ubound={1} out={2}".
                    format(n1dmean,ns,n2dmean))
 
             n2dres = NDG(1)
-            invoke("$KAPPA_DIR/sub {0} {1} {2}".format(n2d,n2dmean,n2dres))
+            invoke("$KAPPA_DIR/sub in1={0} in2={1} out={2}".format(n2d,n2dmean,n2dres))
 
 #  Now collapse these residuals along the bolometer axis to get the
 #  mean-subtracted common mode. Use a median estimator. The above removal
 #  of the mean was necessary so that the resulting common mode is not
 #  determined just by the bolometers with the middle background levels.
             tmpcom = NDG(1)
-            invoke("$KAPPA_DIR/collapse {0} estimator=median axis=1 out={1} wlim=0".
+            invoke("$KAPPA_DIR/collapse in={0} estimator=median axis=1 out={1} wlim=0".
                    format(n2dres,tmpcom))
 
 #  Smooth it a bit.
             smocom = NDG(1)
-            invoke("$KAPPA_DIR/gausmooth {0} fwhm=3 out={1}".format(tmpcom,smocom))
+            invoke("$KAPPA_DIR/gausmooth in={0} fwhm=3 out={1}".format(tmpcom,smocom))
 
 #  Attenuate the variations in the COM signal, since real POL2 data seems to
 #  have a much flatter common mode than real scan data.
             attcom = NDG(1)
-            invoke("$KAPPA_DIR/cmult {0} scalar={1} out={2}".format(smocom,cfactor,attcom))
+            invoke("$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(smocom,cfactor,attcom))
 
 #  Get the amplitude of the oscillations in each bolometer of the template
 #  POL2 data (=sqrt(2) times the standard deviation). The mean of these
@@ -647,14 +647,14 @@ try:
 #  the zero-mean common-mode which is currently in "attcom". We choose mean
 #  sky value to give a 4Hz signal with amplitude equal to the mean range.
             sigff = NDG(1)
-            invoke("$KAPPA_DIR/collapse {0} estimator=sigma axis=3 out={1} wlim=0".
+            invoke("$KAPPA_DIR/collapse in={0} estimator=sigma axis=3 out={1} wlim=0".
                    format(this_ff,sigff))
-            invoke("$KAPPA_DIR/stats {0}".format(sigff))
+            invoke("$KAPPA_DIR/stats ndf={0}".format(sigff))
             means = float( starutil.get_task_par( "mean", "stats" ) )
             mean_com = 1.4142*means/amp4
 
 #  Add this mean value onto the common mode.
-            invoke("$KAPPA_DIR/cadd {0} scalar={1} out={2}".format(attcom,mean_com,this_com))
+            invoke("$KAPPA_DIR/cadd in={0} scalar={1} out={2}".format(attcom,mean_com,this_com))
 
 #  Append the current COM file to the end of the total COM file.
             lbnd.append( comlen + 1 )
@@ -748,41 +748,41 @@ try:
             this_m2 = m2[ igai ]
 
 #  Get the number of time slices in the current flat-fielded time-series.
-            invoke("$KAPPA_DIR/ndftrace {0}".format(this_ff) )
+            invoke("$KAPPA_DIR/ndftrace ndf={0}".format(this_ff) )
             ns = int( starutil.get_task_par( "dims(3)", "ndftrace" ))
 
 #  Reshape each flat-fielded IN file to a 2D array in which axis
 #  1 is bolometer and axis 2 is time-slice.
             n2d = NDG(1)
-            invoke("$KAPPA_DIR/reshape {0} out={1} shape=\[1280,{2}\]".format(this_ff,n2d,ns) )
+            invoke("$KAPPA_DIR/reshape in={0} out={1} shape=\[1280,{2}\]".format(this_ff,n2d,ns) )
 
 #  Collapse this 2D array along pixel axis 2 (time) to get the mean value
 #  in each bolometer.
             n1dmean = NDG(1)
-            invoke("$KAPPA_DIR/collapse {0} estimator=mean axis=2 out={1} wlim=0".
+            invoke("$KAPPA_DIR/collapse in={0} estimator=mean axis=2 out={1} wlim=0".
                    format(n2d,n1dmean))
 
 #  Expand it out again to full 2d, and subtract it off the original to
 #  get a version in which each bolometer has a mean value of zero.
             n2dmean = NDG(1)
-            invoke("$KAPPA_DIR/manic {0} axes=\[1,0\] lbound=1 ubound={1} out={2}".
+            invoke("$KAPPA_DIR/manic in={0} axes=\[1,0\] lbound=1 ubound={1} out={2}".
                    format(n1dmean,ns,n2dmean))
 
             n2dres = NDG(1)
-            invoke("$KAPPA_DIR/sub {0} {1} {2}".format(n2d,n2dmean,n2dres))
+            invoke("$KAPPA_DIR/sub in1={0} in2={1} out={2}".format(n2d,n2dmean,n2dres))
 
 #  Now collapse these residuals along the bolometer axis to get the
 #  mean-subtracted common mode. Use a median estimator. The above removal
 #  of the mean was necessary so that the resulting common mode is not
 #  determined just by the bolometers with the middle background levels.
             tmpcom = NDG(1)
-            invoke("$KAPPA_DIR/collapse {0} estimator=median axis=1 out={1} wlim=0".
+            invoke("$KAPPA_DIR/collapse in={0} estimator=median axis=1 out={1} wlim=0".
                    format(n2dres,tmpcom))
 
 #  We need the time axis to be axis 2 when running NORMALIZE below, so
 #  permute the axes.
             permcom = NDG(1)
-            invoke("$KAPPA_DIR/permaxes {0}\(,1\) perm=\[2,1\] out={1}".
+            invoke("$KAPPA_DIR/permaxes in={0}\(,1\) perm=\[2,1\] out={1}".
                    format(tmpcom,permcom))
 
 #  USe NORMALIZE to fit each individual bolometer to the above
@@ -790,26 +790,26 @@ try:
 #  coefficients for all bolometers.
             slp = NDG(1)
             corr = NDG(1)
-            invoke("$KAPPA_DIR/normalize {0} {1} loop=yes quiet device=! out=! "
+            invoke("$KAPPA_DIR/normalize in1={0} in2={1} loop=yes quiet device=! out=! "
                    "outslope={2} outcorr={3}".format(permcom,n2d,slp,corr))
 
 #  Blank out bolometers that are poorly correlated to the common-mode.
             m1 = NDG(1)
-            invoke("$KAPPA_DIR/thresh {0} thrlo=0.96 newlo=bad thrhi=10 "
+            invoke("$KAPPA_DIR/thresh in={0} thrlo=0.96 newlo=bad thrhi=10 "
                    "newhi=bad out={1} quiet".format(corr,m1))
 
 #  Reshape the slopes into a 2d array, and give it the correct origin
-            invoke("$KAPPA_DIR/reshape {0} shape=\[32,40\] out={1}".
+            invoke("$KAPPA_DIR/reshape in={0} shape=\[32,40\] out={1}".
                    format(m1,this_m2))
-            invoke("$KAPPA_DIR/setorigin {0} \[0,0\]".format(this_m2))
+            invoke("$KAPPA_DIR/setorigin ndf={0} origin=\[0,0\]".format(this_m2))
 
 #  Remove spikes.
          m3 = NDG(m2)
-         invoke("$KAPPA_DIR/ffclean {0} out={1} box=5 clip=\[3,3,3\] ".
+         invoke("$KAPPA_DIR/ffclean in={0} out={1} box=5 clip=\[3,3,3\] ".
                 format(m2,m3))
 
 #  Smooth and fill holes
-         invoke("$KAPPA_DIR/gausmooth {0} fwhm=3 wlim=1E-6 out={1}".
+         invoke("$KAPPA_DIR/gausmooth in={0} fwhm=3 wlim=1E-6 out={1}".
                 format(m3,gai))
          savendg( "GAI", gai )
       else:

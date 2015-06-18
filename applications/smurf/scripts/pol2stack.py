@@ -239,9 +239,9 @@ try:
 
 #  If required, save the Q, U and I images.
    if qui != None:
-      invoke( "$KAPPA_DIR/ndfcopy {0} out={1}.Q".format(qmos,qui) )
-      invoke( "$KAPPA_DIR/ndfcopy {0} out={1}.U".format(umos,qui) )
-      invoke( "$KAPPA_DIR/ndfcopy {0} out={1}.I".format(imos,qui) )
+      invoke( "$KAPPA_DIR/ndfcopy in={0} out={1}.Q".format(qmos,qui) )
+      invoke( "$KAPPA_DIR/ndfcopy in={0} out={1}.U".format(umos,qui) )
+      invoke( "$KAPPA_DIR/ndfcopy in={0} out={1}.I".format(imos,qui) )
 
 #  The polarisation vectors are calculated by the polpack:polvec command,
 #  which requires the input Stokes vectors in the form of a 3D cube. Paste
@@ -252,28 +252,28 @@ try:
 
 #  Check that the cube has a POLANAL frame, as required by POLPACK. First
 #  note the DOmain of the original current Frame
-   domain = invoke( "$KAPPA_DIR/wcsattrib {0} get Domain".format(cube) )
+   domain = invoke( "$KAPPA_DIR/wcsattrib ndf={0} mode=get name=Domain".format(cube) )
    try:
-      invoke( "$KAPPA_DIR/wcsframe {0} POLANAL".format(cube) )
+      invoke( "$KAPPA_DIR/wcsframe ndf={0} frame=POLANAL".format(cube) )
 
 #  If it does not, see if it has a "POLANAL-" Frame (kappa:paste can
 #  cause this by appending "-" to the end of the domain name to account for
 #  the extra added 3rd axis).
    except AtaskError:
-      invoke( "$KAPPA_DIR/wcsframe {0} POLANAL-".format(cube) )
+      invoke( "$KAPPA_DIR/wcsframe ndf={0} frame=POLANAL-".format(cube) )
 
 #  We only arrive here if the POLANAL- frame was found, so rename it to POLANAL
-      invoke( "$KAPPA_DIR/wcsattrib {0} set domain POLANAL".format(cube) )
+      invoke( "$KAPPA_DIR/wcsattrib ndf={0} mode=set name=domain newval=POLANAL".format(cube) )
 
 #  Re-instate the original current Frame
-   invoke( "$KAPPA_DIR/wcsframe {0} {1}".format(cube,domain) )
+   invoke( "$KAPPA_DIR/wcsframe ndf={0} frame={1}".format(cube,domain) )
 
 #  POLPACK needs to know the order of I, Q and U in the 3D cube. Store
 #  this information in the POLPACK enstension within "cube.sdf".
-   invoke( "$POLPACK_DIR/polext {0} stokes=qui".format(cube) )
+   invoke( "$POLPACK_DIR/polext in={0} stokes=qui".format(cube) )
 
 #  Create a FITS catalogue containing the polarisation vectors.
-   command = "$POLPACK_DIR/polvec {0} cat={1} debias={2}".format(cube,outcat,debias)
+   command = "$POLPACK_DIR/polvec in={0} cat={1} debias={2}".format(cube,outcat,debias)
    if pimap:
       command = "{0} ip={1}".format(command,pimap)
       msg_out( "Creating the output catalogue {0} and polarised intensity map {1}...".format(outcat,pimap) )

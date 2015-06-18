@@ -288,7 +288,7 @@ def invoke(command,aslist=False,buffer=None,annul=False):
       from the command (see "aslist").
 
    Example
-      out = invoke("$KAPPA_DIR/stats $KAPPA_DIR/m31 clip=\[3,3,3\]")
+      out = invoke("$KAPPA_DIR/stats ndf=$KAPPA_DIR/m31 clip=\[3,3,3\]")
          kappa:stats is run.
 
    """
@@ -395,9 +395,9 @@ def invoke(command,aslist=False,buffer=None,annul=False):
 
 def get_fits_header( ndf, keyword, report=False ):
    try:
-      there = invoke("$KAPPA_DIR/fitsmod {0} edit=exist keyword={1}".format( ndf, keyword ), False ).strip()
+      there = invoke("$KAPPA_DIR/fitsmod ndf={0} edit=exist keyword={1}".format( ndf, keyword ), False ).strip()
       if there == "TRUE":
-         value = invoke("$KAPPA_DIR/fitsmod {0} edit=print keyword={1}".format( ndf, keyword ), False )
+         value = invoke("$KAPPA_DIR/fitsmod ndf={0} edit=print keyword={1}".format( ndf, keyword ), False )
       else:
          value = None
 
@@ -441,7 +441,7 @@ def get_task_par( parname, taskname, **kwargs ):
 
    """
 
-   cmd = "$KAPPA_DIR/parget {0} {1} vector=yes".format( shell_quote(parname),taskname)
+   cmd = "$KAPPA_DIR/parget parname={0} applic={1} vector=yes".format( shell_quote(parname),taskname)
 
    if 'default' in kwargs:
       try:
@@ -1944,11 +1944,11 @@ class NDG(object):
          # list.
          if exists:
             try:
-               self.__ndfs = invoke("$KAPPA_DIR/ndfecho \"{0}\" abspath=yes".format(gexp),True)
+               self.__ndfs = invoke("$KAPPA_DIR/ndfecho ndf=\"{0}\" abspath=yes".format(gexp),True)
             except AtaskError:
                raise NoNdfError("\n\nCannot access one or more of the NDFs specified by '{0}'.".format(p1))
          else:
-            self.__ndfs = invoke("$KAPPA_DIR/ndfecho ! \"{0}\" abspath=yes".format(p1),True)
+            self.__ndfs = invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" abspath=yes".format(p1),True)
 
       # If the first argument is a list or tuple, create a group containing
       # the contents of the list or tuple as NDF names. Flag that we do not
@@ -1982,12 +1982,12 @@ class NDG(object):
       # an error occurs.
       elif isinstance(p1,NDG) and p2 == None:
          try:
-            invoke("$KAPPA_DIR/ndfecho \"{0}\" quiet".format(p1))
+            invoke("$KAPPA_DIR/ndfecho ndf=\"{0}\" quiet".format(p1))
             nfile = get_task_par( "size", "ndfecho" )
             intemp = True
          except AtaskError:
             try:
-               invoke("$KAPPA_DIR/ndfecho ! \"{0}\" quiet".format(p1))
+               invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" quiet".format(p1))
                nfile = get_task_par( "size", "ndfecho" )
             except AtaskError:
                nfile = len(p1.__ndfs)
@@ -2000,7 +2000,7 @@ class NDG(object):
          gexp2 = shell_quote(p2)
 
          try:
-            self.__ndfs = invoke("$KAPPA_DIR/ndfecho \"{0}\" \"{1}\" abspath=yes".format(gexp1,gexp2),True)
+            self.__ndfs = invoke("$KAPPA_DIR/ndfecho ndf=\"{0}\" mod=\"{1}\" abspath=yes".format(gexp1,gexp2),True)
          except AtaskError:
             raise NoNdfError("\n\nCannot access one or more of the NDFs specified by '{0}'.".format(gexp1))
 
@@ -2042,7 +2042,7 @@ class NDG(object):
 
       # Ensure the NDF paths are absolute.
       if not isabs:
-         self.__ndfs = invoke("$KAPPA_DIR/ndfecho ! \"{0}\" abspath=yes".format(self),True)
+         self.__ndfs = invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" abspath=yes".format(self),True)
          if len(self.__ndfs) > 1:
             if not self.__file:
                self.__tmpdir = NDG._gettmpdir()
@@ -2066,7 +2066,7 @@ class NDG(object):
       msg_out( "Emptying NDG \"group{0}\" in {1}".format(self.__nobj,self.__tmpdir), DEBUG )
 
       for ndf in self.__ndfs:
-         invoke("$KAPPA_DIR/erase \"{0}\" ok=yes".format(ndf),annul=True)
+         invoke("$KAPPA_DIR/erase object=\"{0}\" ok=yes".format(ndf),annul=True)
       if self.__file != None:
          try:
             os.remove( self.__file )
@@ -2086,11 +2086,11 @@ class NDG(object):
       result = None
       if pattern:
          try:
-            ndfs = invoke("$KAPPA_DIR/ndfecho \"{0}\" abspath=yes pattern={1}".format(self,pattern),True)
+            ndfs = invoke("$KAPPA_DIR/ndfecho ndf=\"{0}\" abspath=yes pattern={1}".format(self,pattern),True)
          except AtaskError:
-            ndfs = invoke("$KAPPA_DIR/ndfecho ! \"{0}\" abspath=yes pattern={1}".format(self,pattern),True)
+            ndfs = invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" abspath=yes pattern={1}".format(self,pattern),True)
       else:
-         ndfs = invoke("$KAPPA_DIR/ndfecho ! \"{0}\" abspath=yes exists=yes".format(self),True)
+         ndfs = invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" abspath=yes exists=yes".format(self),True)
 
       if get_task_par( "nmatch", "ndfecho" ) > 0:
          result = NDG( ndfs )

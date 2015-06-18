@@ -285,7 +285,7 @@ try:
       qndfs = []
       undfs = []
       for ndf in inqu:
-         invoke("$KAPPA_DIR/ndftrace {0} quiet".format(ndf) )
+         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(ndf) )
          label = starutil.get_task_par( "LABEL", "ndftrace" )
          if label == "Q":
             qndfs.append( ndf )
