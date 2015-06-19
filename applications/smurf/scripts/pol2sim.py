@@ -456,12 +456,6 @@ try:
                           "refers to different time-series data".format(restart) )
       msg_out( "Re-using data in {0}".format(restart) )
 
-#  Ensure no distortion is used in smurf. This is because such distortion
-#  causes bolometers to be slightly non-square on the sky, and the
-#  polpack:polrotref task assumes pixels are square (so it produces
-#  slightly wrong answers - how does this affect reduction of real data?).
-   os.environ["SMURF_DISTORTION"] = "NONE"
-
 #  Initialise the starlink random number seed to a known value so that
 #  results are repeatable.
    os.environ["STAR_SEED"] = "65"
