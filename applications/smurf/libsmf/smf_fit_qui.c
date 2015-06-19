@@ -157,12 +157,14 @@
 
 /* Local data types: */
 typedef struct smfFitQUIJobData {
+   AstFrameSet *wcs;
    const JCMTState *allstates;
+   dim_t *box_starts;
    dim_t b1;
    dim_t b2;
+   dim_t box_size;
    dim_t nbolo;
-   dim_t intslice;
-   dim_t ontslice;
+   dim_t ncol;
    double *dat;
    double *ipi;
    double *ipq;
@@ -170,7 +172,6 @@ typedef struct smfFitQUIJobData {
    double *ipv;
    double angrot;
    double paoff;
-   dim_t *box_starts;
    int ipolcrd;
    int north;
    int pasign;
@@ -198,12 +199,17 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
                   int *status ){
 
 /* Local Variables: */
+   AstFrameSet *wcs;        /* WCS FrameSet for current time slice */
    JCMTState *instate=NULL; /* Pointer to input JCMTState */
    JCMTState *outstate=NULL;/* Pointer to output JCMTState */
+   const char *usesys;      /* Tracking system */
    dim_t *box_starts;       /* Array holding time slice at start of each box */
+   dim_t box_size;          /* First time slice in box */
    dim_t intslice;          /* ntslice of idata */
+   dim_t istart;            /* Input time index at start of fitting box */
    dim_t itime;             /* Time slice index */
    dim_t nbolo;             /* No. of bolometers */
+   dim_t ncol;              /* No. of columns of bolometers in the array */
    dim_t ntime;             /* Time slices to check */
    dim_t ondata;            /* ndata of odata */
    dim_t ontslice;          /* ntslice of odata */
@@ -216,6 +222,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    smfFitQUIJobData *job_data = NULL; /* Pointer to all job data */
    smfFitQUIJobData *pdata = NULL;/* Pointer to next job data */
    smfHead *hdr;            /* Pointer to data header this time slice */
+   smf_qual_t *qua;         /* Input quality pointer */
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -233,13 +240,16 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
       return;
    }
 
-/* Ensure the supplied smfData is bolo-ordered. So "tstride" is 1 and "bstride"
+/* Ensure the supplied smfData is time-ordered. So "bstride" is 1 and "tstride"
    is nbolo. */
-   smf_dataOrder( wf, idata, 0, status );
+   smf_dataOrder( wf, idata, 1, status );
 
 /* Dimensions of input. */
-   smf_get_dims( idata, NULL, NULL, &nbolo, &intslice, NULL, NULL, NULL,
+   smf_get_dims( idata, NULL, &ncol, &nbolo, &intslice, NULL, NULL, NULL,
                  status );
+
+/* Store a pointer to the quality array for the input smfData. */
+   qua = smf_select_qualpntr( idata, NULL, status );;
 
 /* Go through the first thousand POL_ANG values to see if they are in
    units of radians (new data) or arbitrary encoder units (old data).
@@ -304,13 +314,13 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    if( indksquid ) idata->da->dksquid = indksquid;
 
 /* Store the required length for the output time axis. The time axis is
-   axis zero because the data is bolo-rdered. */
-   (*odataq)->dims[ 0 ] = ontslice;
-   (*odatau)->dims[ 0 ] = ontslice;
-   if( odatai) (*odatai)->dims[ 0 ] = ontslice;
+   axis two because the data is time-ordered. */
+   (*odataq)->dims[ 2 ] = ontslice;
+   (*odatau)->dims[ 2 ] = ontslice;
+   if( odatai) (*odatai)->dims[ 2 ] = ontslice;
 
 /* Get output dimensions - assumed to be the same for all three outputs. */
-   ondata = ontslice*idata->dims[1]*idata->dims[2];
+   ondata = ontslice*idata->dims[0]*idata->dims[1];
 
 /* Allocate the data arrays for the outputs. */
    (*odataq)->pntr[0] = astCalloc( ondata, sizeof(double) );
@@ -340,36 +350,75 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 /* Ensure that the last thread picks up any left-over bolometers */
       pdata->b2 = nbolo - 1;
 
-/* Store all the other info needed by the worker threads, and submit the
-   jobs to calculate the Q and U values in each bolo, and then wait for
-   them to complete. */
-      for( iworker = 0; iworker < nworker; iworker++ ) {
-         pdata = job_data + iworker;
+/* Loop round all output time slices. */
+      for( itime = 0; itime < ontslice; itime++ ) {
 
-         pdata->dat = idata->pntr[0];
-         pdata->ipi = odatai ? (*odatai)->pntr[0] : NULL;
-         pdata->ipq = (*odataq)->pntr[0];
-         pdata->ipu = (*odatau)->pntr[0];
-         pdata->ipv = (*odataq)->pntr[1];
-         pdata->nbolo = nbolo;
-         pdata->intslice = intslice;
-         pdata->ontslice = ontslice;
-         pdata->qua = smf_select_qualpntr( idata, NULL, status );;
-         pdata->allstates = hdr->allState;
-         pdata->ipolcrd = ipolcrd;
-         pdata->pasign = pasign ? +1: -1;
-         pdata->paoff = paoff;
-         pdata->box_starts = box_starts;
-         pdata->angrot = angrot;
-         pdata->north = north;
+/* Get the index of the first input time slice that contributes to the
+   current output time slice. */
+         istart = box_starts[ itime ];
+
+/* Get the number of input time slices that contribute to the output time
+   slice. */
+         box_size = box_starts[ itime + 1 ] - istart;
+
+/* If we are using north as the reference direction, get the WCS FrameSet
+   for the input time slice that is at the middle of the output time
+   slice, and set its current Frame to the tracking frame. */
+         if( north ) {
+            smf_tslice_ast( idata, istart + box_size/2, 1, NO_FTS, status );
+            wcs = idata->hdr->wcs;
+            usesys = sc2ast_convert_system( (idata->hdr->allState)[0].tcs_tr_sys,
+                                            status );
+            astSetC( wcs, "System", usesys );
+         } else {
+            wcs = NULL;
+         }
+
+/* Now enter the parellel code in which each thread calculates the values
+   for a range of bolometers at the current output slice. */
+         for( iworker = 0; iworker < nworker; iworker++ ) {
+            pdata = job_data + iworker;
+
+            pdata->dat = ((double *) idata->pntr[0] ) + istart*nbolo;
+            pdata->qua = qua + istart*nbolo;
+            pdata->allstates = hdr->allState + istart;
+
+            pdata->ipi = odatai ? ( (double*) (*odatai)->pntr[0] ) + itime*nbolo : NULL;
+            pdata->ipq = ( (double*) (*odataq)->pntr[0] ) + itime*nbolo;
+            pdata->ipu = ( (double*) (*odatau)->pntr[0] ) + itime*nbolo;
+            pdata->ipv = ( (double*) (*odataq)->pntr[1] ) + itime*nbolo;
+
+            pdata->nbolo = nbolo;
+            pdata->ncol = ncol;
+            pdata->box_size = box_size;
+            pdata->ipolcrd = ipolcrd;
+            pdata->pasign = pasign ? +1: -1;
+            pdata->paoff = paoff;
+            pdata->angrot = angrot;
+            if( wcs ) {
+               pdata->wcs = astCopy( wcs );
+               astUnlock( pdata->wcs, 1 );
+            } else {
+               pdata->wcs = NULL;
+            }
 
 /* Pass the job to the workforce for execution. */
-         thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_fit_qui_job, 0, NULL,
-                      status );
-      }
+            thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_fit_qui_job, 0, NULL,
+                         status );
+         }
 
 /* Wait for the workforce to complete all jobs. */
-      thrWait( wf, status );
+         thrWait( wf, status );
+
+/* Lock and annul the AST objects used by each thread. */
+         if( wcs ) {
+            for( iworker = 0; iworker < nworker; iworker++ ) {
+               pdata = job_data + iworker;
+               astLock( pdata->wcs, 0 );
+               pdata->wcs = astAnnul( pdata->wcs );
+            }
+         }
+      }
 
 /* Down-sample the smfHead -------------------------------------------------*/
       smfHead *hdr = (*odataq)->hdr;
@@ -514,19 +563,18 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 */
 
 /* Local Variables: */
+   AstFrameSet *wcs;          /* WCS FrameSet for current time slice */
+   AstMapping *g2s;           /* GRID to SKY mapping */
+   AstMapping *s2f;           /* SKY to focal plane mapping */
    const JCMTState *allstates;/* Pointer to array of JCMTState structures */
    const JCMTState *state;    /* JCMTState info for current time slice */
-   dim_t *box_starts;         /* First time slice in each box */
    dim_t b1;                  /* First bolometer index */
    dim_t b2;                  /* Last bolometer index */
    dim_t box_size;            /* NFirst time slice in box */
    dim_t ibolo;               /* Bolometer index */
    dim_t ibox;
-   dim_t intslice;            /* Number of time-slices in input data */
-   dim_t istart;              /* Input time index at start of fitting box */
-   dim_t itime;               /* Time slice index */
+   dim_t ncol;
    dim_t nbolo;               /* Total number of bolometers */
-   dim_t ontslice;            /* Number of time-slices in output data */
    double *dat;               /* Pointer to start of input data values */
    double *din;               /* Pointer to input data array for bolo/time */
    double *ipi;               /* Pointer to output I array */
@@ -543,8 +591,11 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    double c8;
    double cosval;             /* Cos of angrot */
    double fit;
+   double fx[2];              /* Focal plane X coord at bolometer and northern point*/
+   double fy[2];              /* Focal plane Y coord at bolometer and northern point*/
+   double gx;                 /* GRID X coord at bolometer */
+   double gy;                 /* GRID Y coord at bolometer */
    double matrix[ NPAR*NPAR ];
-   double sum1;               /* Sum of squared residuals */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double phi;                /* Angle from fixed analyser to effective analyser */
    double res;
@@ -554,7 +605,10 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    double s8;
    double sinval;             /* Sin of angrot */
    double solution[ NPAR ];
+   double sum1;               /* Sum of squared residuals */
    double sums[NSUM];         /* Sum of bolometer values */
+   double sx[2];              /* SKY X coord at bolometer and northern point*/
+   double sy[2];              /* SKY Y coord at bolometer and northern point*/
    double tr_angle;
    double twophi;
    double vector[ NPAR ];
@@ -584,23 +638,37 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    b1 = pdata->b1;
    b2 = pdata->b2;
    nbolo = pdata->nbolo;
-   intslice = pdata->intslice;
-   ontslice = pdata->ontslice;
+   ncol = pdata->ncol;
 
-   dat = pdata->dat + b1*intslice;
-   qua = pdata->qua + b1*intslice;
+   dat = pdata->dat;
+   qua = pdata->qua;
    allstates = pdata->allstates;
 
-   ipi = pdata->ipi ? pdata->ipi + b1*ontslice : NULL;
-   ipq = pdata->ipq + b1*ontslice;
-   ipu = pdata->ipu + b1*ontslice;
-   ipv = pdata->ipv + b1*ontslice;
+   ipi = pdata->ipi ? pdata->ipi + b1 : NULL;
+   ipq = pdata->ipq + b1;
+   ipu = pdata->ipu + b1;
+   ipv = pdata->ipv + b1;
 
    ipolcrd = pdata->ipolcrd;
    pasign = pdata->pasign;
    paoff = pdata->paoff;
    angrot = pdata->angrot;
-   box_starts = pdata->box_starts;
+   box_size = pdata->box_size;
+
+   wcs = pdata->wcs;
+   if( wcs ) {
+      astLock( wcs, 0 );
+
+/* Get the mapping from GRID to SKY. */
+      g2s = astGetMapping( wcs, AST__BASE, AST__CURRENT );
+
+/* Get the mapping from SKY to focal plane (x,y) (the index of the FPLANE
+   Frame is fixed at 3 by file sc2ast.c). */
+      s2f = astGetMapping( wcs, AST__CURRENT, 3 );
+
+   } else{
+      g2s = s2f = NULL;
+   }
 
 /* Check we have something to do. */
    if( b1 < nbolo && *status == SAI__OK ) {
@@ -608,54 +676,70 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 /* Loop round all bolometers to be processed by this thread. */
       for( ibolo = b1; ibolo <= b2; ibolo++ ) {
 
-/* If the whole bolometer is bad, fill all outputs with bad values. */
-         if( *qua & SMF__Q_BADB ) {
-            for( itime = 0; itime < ontslice; itime++ ) {
-               if( ipi ) *(ipi++) = VAL__BADD;
-               *(ipq++) = VAL__BADD;
-               *(ipu++) = VAL__BADD;
-               *(ipv++) = VAL__BADD;
+/* If the returned Stokes parameters are to be with respect to Tracking
+   North, get the angle from tracking north at the current bolometer to
+   focal plane Y, measured positive in the sense of rotation from focal
+   plane Y to focal plane X (note this angle may change across the focal
+   plane due to focal plane distortion). Otherwise, use zero. */
+         if( pdata->wcs ) {
+
+/* Get the grid coords of the current bolometer, and transform them to SKY
+   coordinates using the FrameSet. */
+            gx = ibolo % ncol + 1;
+            gy = ibolo / ncol + 1;
+            astTran2( g2s, 1, &gx, &gy, 1, sx, sy );
+
+/* Increment the sky position slightly to the north. */
+            sx[ 1 ] = sx[ 0 ];
+            sy[ 1 ] = sy[ 0 ] + 0.01;
+
+/* Transform both sky positions into focal plane coords. */
+            astTran2( s2f, 2, sx, sy, 1, fx, fy );
+
+/* Get the angle from north to focal plane Y, measured positive in the
+   sense of rotation from focal plane Y to focal plane X. */
+            if( fx[0] != VAL__BADD && fy[0] != VAL__BADD &&
+                fx[1] != VAL__BADD && fy[1] != VAL__BADD ) {
+               tr_angle = atan2( fx[0] - fx[1], fy[1] - fy[0] );
+            } else {
+               tr_angle = VAL__BADD;
             }
 
-/* If the bolometer is good, calculate and store the i, q and u values. */
          } else {
+            tr_angle = 0.0;
+         }
 
-/* Loop over all output data values for the current bolometer. */
-            for( itime = 0; itime <  ontslice; itime++ ) {
+/* If the whole bolometer is bad, put bad values into the outputs. */
+         if( *qua & SMF__Q_BADB || tr_angle == VAL__BADD ) {
+            if( ipi ) *(ipi++) = VAL__BADD;
+            *(ipq++) = VAL__BADD;
+            *(ipu++) = VAL__BADD;
+            *(ipv++) = VAL__BADD;
 
-/* Get the index of the first input time slice to include in the fit that
-   produces the I, Q and U values for the current output time slice. */
-               istart = box_starts[ itime ];
-
-/* Get the number of input time slices to include in the fit. */
-               box_size = box_starts[ itime + 1 ] - istart;
+/* If the bolometer is good, calculate and store the output i, q and u
+   values. */
+         } else {
 
 /* Initialise pointers to the first input data value, quality value and
    state info to be used in the current fitting box. */
-               din = dat + istart;
-               qin = qua + istart;
-               state = allstates + istart;
+            din = dat + ibolo;
+            qin = qua + ibolo;
+            state = allstates;
 
 /* Form the sums needed to calculate the best fit Q, U and I. This
    involves looping over all input samples that fall within the fitting box
    centred on the current output sample. The 44 sums are stored in the
    "sums" array. Initialise it to hold zeros.  */
-               memset( sums, 0, NSUM*sizeof(*sums) );
-               for( ibox = 0; ibox <  box_size; ibox++,state++,din++,qin++ ) {
+            memset( sums, 0, NSUM*sizeof(*sums) );
+            for( ibox = 0; ibox <  box_size; ibox++,state++ ) {
 
 /* Get the POL_ANG value for this time slice. */
-                  angle = state->pol_ang;
-
-/* If the returned STokes parameters are to be with respect to Tracking
-   North, get the angle from tracking north to focal plane Y, measured
-   positive in the sense of rotation from focal plane Y to focal plane X.
-   Otherwise, use zero. */
-                  tr_angle = pdata->north ? state->tcs_tr_ang : 0.0;
+               angle = state->pol_ang;
 
 /* Check the input sample has not been flagged during cleaning and is
    not bad. */
-                  if( !( *qin & SMF__Q_FIT ) && *din != VAL__BADD &&
-                      angle != VAL__BADD && tr_angle != VAL__BADD ) {
+               if( !( *qin & SMF__Q_FIT ) && *din != VAL__BADD &&
+                   angle != VAL__BADD ) {
 
 /* Following SUN/223 (section "Single-beam polarimetry"/"The Polarimeter"),
    get the angle from the fixed analyser to the half-waveplate axis, in radians.
@@ -663,15 +747,15 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 
    Not sure about the sign of tcs_az/tr_ang at the moment so do not use them
    yet. */
-                     wplate = 0.0;
-                     if( ipolcrd == 0 ) {
-                        wplate = pasign*angle + paoff;
+                  wplate = 0.0;
+                  if( ipolcrd == 0 ) {
+                     wplate = pasign*angle + paoff;
 
-                     } else if( *status == SAI__OK ) {
-                        *status = SAI__ERROR;
-                        errRepf( "", "smf_fit_qui: currently only POL_CRD = "
-                                 "FPLANE is supported.", status );
-                     }
+                  } else if( *status == SAI__OK ) {
+                     *status = SAI__ERROR;
+                     errRepf( "", "smf_fit_qui: currently only POL_CRD = "
+                              "FPLANE is supported.", status );
+                  }
 
 /*
                      if( ipolcrd == 1 ) {
@@ -684,10 +768,281 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 /* Get the angle from the fixed analyser to the effective analyser
    position (see SUN/223 again). The effective analyser angle rotates twice
    as fast as the half-wave plate which is why there is a factor of 2 here. */
+                  phi = 2*wplate;
+                  twophi = 2*phi;
+
+/* Form the trig values needed for the sums. */
+                  s8 = sin( 2*twophi );
+                  c8 = cos( 2*twophi );
+                  s4 = sin( twophi );
+                  c4 = cos( twophi );
+                  s2 = sin( phi );
+                  c2 = cos( phi );
+                  s1 = sin( wplate );
+                  c1 = cos( wplate );
+
+/* Update the sums. The order of the following lines define the index
+   within "sums" at which each sum is stored. */
+                  ps = sums;
+                  *(ps++) += s4*s4;
+                  *(ps++) += s4*c4;
+                  *(ps++) += s4*s2;
+                  *(ps++) += s4*c2;
+                  *(ps++) += s4*s1;
+                  *(ps++) += s4*c1;
+                  *(ps++) += s4*ibox;
+                  *(ps++) += s4;
+                  *(ps++) += s4*(*din);
+
+                  *(ps++) += s2*c4;
+                  *(ps++) += s2*s2;
+                  *(ps++) += s2*c2;
+                  *(ps++) += s2*s1;
+                  *(ps++) += s2*c1;
+                  *(ps++) += s2*ibox;
+                  *(ps++) += s2;
+                  *(ps++) += s2*(*din);
+
+                  *(ps++) += s1*c4;
+                  *(ps++) += s1*c2;
+                  *(ps++) += s1*s1;
+                  *(ps++) += s1*c1;
+                  *(ps++) += s1*ibox;
+                  *(ps++) += s1;
+                  *(ps++) += s1*(*din);
+
+                  *(ps++) += c4*c4;
+                  *(ps++) += c4*c2;
+                  *(ps++) += c4*c1;
+                  *(ps++) += c4*ibox;
+                  *(ps++) += c4;
+                  *(ps++) += c4*(*din);
+
+                  *(ps++) += c2*c2;
+                  *(ps++) += c2*c1;
+                  *(ps++) += c2*ibox;
+                  *(ps++) += c2;
+                  *(ps++) += c2*(*din);
+
+                  *(ps++) += c1*c1;
+                  *(ps++) += c1*ibox;
+                  *(ps++) += c1;
+                  *(ps++) += c1*(*din);
+
+                  *(ps++) += ibox*ibox;
+                  *(ps++) += ibox;
+                  *(ps++) += ibox*(*din);
+
+                  *(ps++) += 1.0;
+                  *(ps++) += *din;
+
+                  *(ps++) += s4*s8;
+                  *(ps++) += s4*c8;
+
+                  *(ps++) += s2*s8;
+                  *(ps++) += s2*c8;
+
+                  *(ps++) += s1*s8;
+                  *(ps++) += s1*c8;
+
+                  *(ps++) += s8*c4;
+                  *(ps++) += s8*c2;
+                  *(ps++) += s8*c1;
+                  *(ps++) += s8*ibox;
+                  *(ps++) += s8;
+                  *(ps++) += s8*(*din);
+                  *(ps++) += s8*s8;
+                  *(ps++) += s8*c8;
+
+                  *(ps++) += c4*c8;
+
+                  *(ps++) += c2*c8;
+
+                  *(ps++) += c1*c8;
+
+                  *(ps++) += c8*ibox;
+                  *(ps++) += c8;
+                  *(ps++) += c8*(*din);
+                  *(ps++) += c8*c8;
+               }
+
+               din += nbolo;
+               qin += nbolo;
+
+            }
+
+/* Now find the parameters of the best fit. First check that there were
+   sufficient good samples in the fitting box. */
+            if( sums[42] > 0.8*box_size ) {
+
+/* Copy the sums to the correct elements of the 10x10 matrix. */
+               pm = matrix;
+               *(pm++) = sums[ 0 ];
+               *(pm++) = sums[ 1 ];
+               *(pm++) = sums[ 2 ];
+               *(pm++) = sums[ 3 ];
+               *(pm++) = sums[ 4 ];
+               *(pm++) = sums[ 5 ];
+               *(pm++) = sums[ 6 ];
+               *(pm++) = sums[ 7 ];
+               *(pm++) = sums[ 44 ];
+               *(pm++) = sums[ 45 ];
+
+
+               *(pm++) = sums[ 1 ];
+               *(pm++) = sums[ 24 ];
+               *(pm++) = sums[ 9 ];
+               *(pm++) = sums[ 25 ];
+               *(pm++) = sums[ 17 ];
+               *(pm++) = sums[ 26 ];
+               *(pm++) = sums[ 27 ];
+               *(pm++) = sums[ 28 ];
+               *(pm++) = sums[ 50 ];
+               *(pm++) = sums[ 58 ];
+
+               *(pm++) = sums[ 2 ];
+               *(pm++) = sums[ 9 ];
+               *(pm++) = sums[ 10 ];
+               *(pm++) = sums[ 11 ];
+               *(pm++) = sums[ 12 ];
+               *(pm++) = sums[ 13 ];
+               *(pm++) = sums[ 14 ];
+               *(pm++) = sums[ 15 ];
+               *(pm++) = sums[ 46 ];
+               *(pm++) = sums[ 47 ];
+
+               *(pm++) = sums[ 3 ];
+               *(pm++) = sums[ 25 ];
+               *(pm++) = sums[ 11 ];
+               *(pm++) = sums[ 30 ];
+               *(pm++) = sums[ 18 ];
+               *(pm++) = sums[ 31 ];
+               *(pm++) = sums[ 32 ];
+               *(pm++) = sums[ 33 ];
+               *(pm++) = sums[ 51 ];
+               *(pm++) = sums[ 59 ];
+
+               *(pm++) = sums[ 4 ];
+               *(pm++) = sums[ 17 ];
+               *(pm++) = sums[ 12 ];
+               *(pm++) = sums[ 18 ];
+               *(pm++) = sums[ 19 ];
+               *(pm++) = sums[ 20 ];
+               *(pm++) = sums[ 21 ];
+               *(pm++) = sums[ 22 ];
+               *(pm++) = sums[ 48 ];
+               *(pm++) = sums[ 49 ];
+
+               *(pm++) = sums[ 5 ];
+               *(pm++) = sums[ 26 ];
+               *(pm++) = sums[ 13 ];
+               *(pm++) = sums[ 31 ];
+               *(pm++) = sums[ 20 ];
+               *(pm++) = sums[ 35 ];
+               *(pm++) = sums[ 36 ];
+               *(pm++) = sums[ 37 ];
+               *(pm++) = sums[ 52 ];
+               *(pm++) = sums[ 60 ];
+
+               *(pm++) = sums[ 6 ];
+               *(pm++) = sums[ 27 ];
+               *(pm++) = sums[ 14 ];
+               *(pm++) = sums[ 32 ];
+               *(pm++) = sums[ 21 ];
+               *(pm++) = sums[ 36 ];
+               *(pm++) = sums[ 39 ];
+               *(pm++) = sums[ 40 ];
+               *(pm++) = sums[ 53 ];
+               *(pm++) = sums[ 61 ];
+
+               *(pm++) = sums[ 7 ];
+               *(pm++) = sums[ 28 ];
+               *(pm++) = sums[ 15 ];
+               *(pm++) = sums[ 33 ];
+               *(pm++) = sums[ 22 ];
+               *(pm++) = sums[ 37 ];
+               *(pm++) = sums[ 40 ];
+               *(pm++) = sums[ 42 ];
+               *(pm++) = sums[ 54 ];
+               *(pm++) = sums[ 62 ];
+
+               *(pm++) = sums[ 44 ];
+               *(pm++) = sums[ 50 ];
+               *(pm++) = sums[ 46 ];
+               *(pm++) = sums[ 51 ];
+               *(pm++) = sums[ 48 ];
+               *(pm++) = sums[ 52 ];
+               *(pm++) = sums[ 53 ];
+               *(pm++) = sums[ 54 ];
+               *(pm++) = sums[ 56 ];
+               *(pm++) = sums[ 57 ];
+
+               *(pm++) = sums[ 45 ];
+               *(pm++) = sums[ 58 ];
+               *(pm++) = sums[ 47 ];
+               *(pm++) = sums[ 59 ];
+               *(pm++) = sums[ 49 ];
+               *(pm++) = sums[ 60 ];
+               *(pm++) = sums[ 61 ];
+               *(pm++) = sums[ 62 ];
+               *(pm++) = sums[ 57 ];
+               *(pm++) = sums[ 64 ];
+
+/* Copy the remaining sums to the correct elements of the 8 vector. */
+               pm = vector;
+               *(pm++) = sums[ 8 ];
+               *(pm++) = sums[ 29 ];
+               *(pm++) = sums[ 16 ];
+               *(pm++) = sums[ 34 ];
+               *(pm++) = sums[ 23 ];
+               *(pm++) = sums[ 38 ];
+               *(pm++) = sums[ 41 ];
+               *(pm++) = sums[ 43 ];
+               *(pm++) = sums[ 55 ];
+               *(pm++) = sums[ 63 ];
+
+/* Find the solution to the 10x10 set of linear equations. The matrix is
+   symmetric and positive-definite so use Cholesky decomposition.  */
+               memset( solution, 0, NPAR*sizeof(*solution) );
+               gsl_linalg_cholesky_decomp( &gsl_m.matrix );
+               gsl_linalg_cholesky_solve( &gsl_m.matrix, &gsl_b.vector,
+                                          &gsl_x.vector );
+
+/* Modify Q and U so they use the requested reference direction, and store in
+   the output arrays. */
+               cosval = cos( 2*( angrot - tr_angle ) );
+               sinval = sin( 2*( angrot - tr_angle ) );
+               *(ipq++) = 2*( -solution[ 1 ]*cosval + solution[ 0 ]*sinval );
+               *(ipu++) = 2*( -solution[ 1 ]*sinval - solution[ 0 ]*cosval );
+
+/* Store the correspoinding I value. */
+               if( ipi ) *(ipi++) = solution[ 6 ]*box_size + 2*solution[ 7 ];
+
+/* Loop over the data again in the same way to calculate the variance of the
+   residuals between the above fit and the supplied data. */
+               din = dat + ibolo;
+               qin = qua + ibolo;
+               state = allstates;
+
+               sum1 = 0.0;
+               nsum1 = 0;
+
+               for( ibox = 0; ibox <  box_size; ibox++,state++ ) {
+                  angle = state->pol_ang;
+
+                  if( !( *qin & SMF__Q_FIT ) && *din != VAL__BADD &&
+                        angle != VAL__BADD ) {
+                     wplate = pasign*angle + paoff;
+/*
+                        if( ipolcrd == 1 ) {
+                           wplate += state->tcs_az_ang;
+                        } else if( ipolcrd == 2 ) {
+                           wplate += state->tcs_tr_ang;
+                        }
+*/
                      phi = 2*wplate;
                      twophi = 2*phi;
 
-/* Form the trig values needed for the sums. */
                      s8 = sin( 2*twophi );
                      c8 = cos( 2*twophi );
                      s4 = sin( twophi );
@@ -697,319 +1052,26 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
                      s1 = sin( wplate );
                      c1 = cos( wplate );
 
-/* Update the sums. The order of the following lines define the index
-   within "sums" at which each sum is stored. */
-                     ps = sums;
-                     *(ps++) += s4*s4;
-                     *(ps++) += s4*c4;
-                     *(ps++) += s4*s2;
-                     *(ps++) += s4*c2;
-                     *(ps++) += s4*s1;
-                     *(ps++) += s4*c1;
-                     *(ps++) += s4*ibox;
-                     *(ps++) += s4;
-                     *(ps++) += s4*(*din);
+                     fit = solution[0]*s4 +
+                           solution[1]*c4 +
+                           solution[2]*s2 +
+                           solution[3]*c2 +
+                           solution[4]*s1 +
+                           solution[5]*c1 +
+                           solution[6]*ibox +
+                           solution[7] +
+                           solution[8]*s8 +
+                           solution[9]*c8;
 
-                     *(ps++) += s2*c4;
-                     *(ps++) += s2*s2;
-                     *(ps++) += s2*c2;
-                     *(ps++) += s2*s1;
-                     *(ps++) += s2*c1;
-                     *(ps++) += s2*ibox;
-                     *(ps++) += s2;
-                     *(ps++) += s2*(*din);
+                     res = *din - fit;
 
-                     *(ps++) += s1*c4;
-                     *(ps++) += s1*c2;
-                     *(ps++) += s1*s1;
-                     *(ps++) += s1*c1;
-                     *(ps++) += s1*ibox;
-                     *(ps++) += s1;
-                     *(ps++) += s1*(*din);
-
-                     *(ps++) += c4*c4;
-                     *(ps++) += c4*c2;
-                     *(ps++) += c4*c1;
-                     *(ps++) += c4*ibox;
-                     *(ps++) += c4;
-                     *(ps++) += c4*(*din);
-
-                     *(ps++) += c2*c2;
-                     *(ps++) += c2*c1;
-                     *(ps++) += c2*ibox;
-                     *(ps++) += c2;
-                     *(ps++) += c2*(*din);
-
-                     *(ps++) += c1*c1;
-                     *(ps++) += c1*ibox;
-                     *(ps++) += c1;
-                     *(ps++) += c1*(*din);
-
-                     *(ps++) += ibox*ibox;
-                     *(ps++) += ibox;
-                     *(ps++) += ibox*(*din);
-
-                     *(ps++) += 1.0;
-                     *(ps++) += *din;
-
-                     *(ps++) += s4*s8;
-                     *(ps++) += s4*c8;
-
-                     *(ps++) += s2*s8;
-                     *(ps++) += s2*c8;
-
-                     *(ps++) += s1*s8;
-                     *(ps++) += s1*c8;
-
-                     *(ps++) += s8*c4;
-                     *(ps++) += s8*c2;
-                     *(ps++) += s8*c1;
-                     *(ps++) += s8*ibox;
-                     *(ps++) += s8;
-                     *(ps++) += s8*(*din);
-                     *(ps++) += s8*s8;
-                     *(ps++) += s8*c8;
-
-                     *(ps++) += c4*c8;
-
-                     *(ps++) += c2*c8;
-
-                     *(ps++) += c1*c8;
-
-                     *(ps++) += c8*ibox;
-                     *(ps++) += c8;
-                     *(ps++) += c8*(*din);
-                     *(ps++) += c8*c8;
+                     sum1 += res*res;
+                     nsum1++;
                   }
+
+                  din += nbolo;
+                  qin += nbolo;
                }
-
-/* Now find the parameters of the best fit. First check that there were
-   sufficient good samples in the fitting box. */
-               if( sums[42] > 0.8*box_size ) {
-
-/* Copy the sums to the correct elements of the 10x10 matrix. */
-                  pm = matrix;
-                  *(pm++) = sums[ 0 ];
-                  *(pm++) = sums[ 1 ];
-                  *(pm++) = sums[ 2 ];
-                  *(pm++) = sums[ 3 ];
-                  *(pm++) = sums[ 4 ];
-                  *(pm++) = sums[ 5 ];
-                  *(pm++) = sums[ 6 ];
-                  *(pm++) = sums[ 7 ];
-                  *(pm++) = sums[ 44 ];
-                  *(pm++) = sums[ 45 ];
-
-
-                  *(pm++) = sums[ 1 ];
-                  *(pm++) = sums[ 24 ];
-                  *(pm++) = sums[ 9 ];
-                  *(pm++) = sums[ 25 ];
-                  *(pm++) = sums[ 17 ];
-                  *(pm++) = sums[ 26 ];
-                  *(pm++) = sums[ 27 ];
-                  *(pm++) = sums[ 28 ];
-                  *(pm++) = sums[ 50 ];
-                  *(pm++) = sums[ 58 ];
-
-                  *(pm++) = sums[ 2 ];
-                  *(pm++) = sums[ 9 ];
-                  *(pm++) = sums[ 10 ];
-                  *(pm++) = sums[ 11 ];
-                  *(pm++) = sums[ 12 ];
-                  *(pm++) = sums[ 13 ];
-                  *(pm++) = sums[ 14 ];
-                  *(pm++) = sums[ 15 ];
-                  *(pm++) = sums[ 46 ];
-                  *(pm++) = sums[ 47 ];
-
-                  *(pm++) = sums[ 3 ];
-                  *(pm++) = sums[ 25 ];
-                  *(pm++) = sums[ 11 ];
-                  *(pm++) = sums[ 30 ];
-                  *(pm++) = sums[ 18 ];
-                  *(pm++) = sums[ 31 ];
-                  *(pm++) = sums[ 32 ];
-                  *(pm++) = sums[ 33 ];
-                  *(pm++) = sums[ 51 ];
-                  *(pm++) = sums[ 59 ];
-
-                  *(pm++) = sums[ 4 ];
-                  *(pm++) = sums[ 17 ];
-                  *(pm++) = sums[ 12 ];
-                  *(pm++) = sums[ 18 ];
-                  *(pm++) = sums[ 19 ];
-                  *(pm++) = sums[ 20 ];
-                  *(pm++) = sums[ 21 ];
-                  *(pm++) = sums[ 22 ];
-                  *(pm++) = sums[ 48 ];
-                  *(pm++) = sums[ 49 ];
-
-                  *(pm++) = sums[ 5 ];
-                  *(pm++) = sums[ 26 ];
-                  *(pm++) = sums[ 13 ];
-                  *(pm++) = sums[ 31 ];
-                  *(pm++) = sums[ 20 ];
-                  *(pm++) = sums[ 35 ];
-                  *(pm++) = sums[ 36 ];
-                  *(pm++) = sums[ 37 ];
-                  *(pm++) = sums[ 52 ];
-                  *(pm++) = sums[ 60 ];
-
-                  *(pm++) = sums[ 6 ];
-                  *(pm++) = sums[ 27 ];
-                  *(pm++) = sums[ 14 ];
-                  *(pm++) = sums[ 32 ];
-                  *(pm++) = sums[ 21 ];
-                  *(pm++) = sums[ 36 ];
-                  *(pm++) = sums[ 39 ];
-                  *(pm++) = sums[ 40 ];
-                  *(pm++) = sums[ 53 ];
-                  *(pm++) = sums[ 61 ];
-
-                  *(pm++) = sums[ 7 ];
-                  *(pm++) = sums[ 28 ];
-                  *(pm++) = sums[ 15 ];
-                  *(pm++) = sums[ 33 ];
-                  *(pm++) = sums[ 22 ];
-                  *(pm++) = sums[ 37 ];
-                  *(pm++) = sums[ 40 ];
-                  *(pm++) = sums[ 42 ];
-                  *(pm++) = sums[ 54 ];
-                  *(pm++) = sums[ 62 ];
-
-                  *(pm++) = sums[ 44 ];
-                  *(pm++) = sums[ 50 ];
-                  *(pm++) = sums[ 46 ];
-                  *(pm++) = sums[ 51 ];
-                  *(pm++) = sums[ 48 ];
-                  *(pm++) = sums[ 52 ];
-                  *(pm++) = sums[ 53 ];
-                  *(pm++) = sums[ 54 ];
-                  *(pm++) = sums[ 56 ];
-                  *(pm++) = sums[ 57 ];
-
-                  *(pm++) = sums[ 45 ];
-                  *(pm++) = sums[ 58 ];
-                  *(pm++) = sums[ 47 ];
-                  *(pm++) = sums[ 59 ];
-                  *(pm++) = sums[ 49 ];
-                  *(pm++) = sums[ 60 ];
-                  *(pm++) = sums[ 61 ];
-                  *(pm++) = sums[ 62 ];
-                  *(pm++) = sums[ 57 ];
-                  *(pm++) = sums[ 64 ];
-
-/* Copy the remaining sums to the correct elements of the 8 vector. */
-                  pm = vector;
-                  *(pm++) = sums[ 8 ];
-                  *(pm++) = sums[ 29 ];
-                  *(pm++) = sums[ 16 ];
-                  *(pm++) = sums[ 34 ];
-                  *(pm++) = sums[ 23 ];
-                  *(pm++) = sums[ 38 ];
-                  *(pm++) = sums[ 41 ];
-                  *(pm++) = sums[ 43 ];
-                  *(pm++) = sums[ 55 ];
-                  *(pm++) = sums[ 63 ];
-
-/* Find the solution to the 10x10 set of linear equations. The matrix is
-   symmetric and positive-definite so use Cholesky decomposition.  */
-                  memset( solution, 0, NPAR*sizeof(*solution) );
-                  gsl_linalg_cholesky_decomp( &gsl_m.matrix );
-                  gsl_linalg_cholesky_solve( &gsl_m.matrix, &gsl_b.vector,
-                                             &gsl_x.vector );
-
-/* Modify Q and U so they use the requested reference direction, and store in
-   the output arrays. */
-                  cosval = cos( 2*( angrot - tr_angle ) );
-                  sinval = sin( 2*( angrot - tr_angle ) );
-                  *(ipq++) = 2*( -solution[ 1 ]*cosval + solution[ 0 ]*sinval );
-                  *(ipu++) = 2*( -solution[ 1 ]*sinval - solution[ 0 ]*cosval );
-
-/* Store the correspoinding I value. */
-                  if( ipi ) *(ipi++) = solution[ 6 ]*box_size + 2*solution[ 7 ];
-
-/* Loop over the data again in the same way to calculate the variance of the
-   residuals between the above fit and the supplied data. */
-                  istart = box_starts[ itime ];
-                  box_size = box_starts[ itime + 1 ] - istart;
-                  din = dat + istart;
-                  qin = qua + istart;
-                  state = allstates + istart;
-                  sum1 = 0.0;
-                  nsum1 = 0;
-
-
-
-double qfit, ufit, ifit;
-if( 0 && ibolo == 526 && itime < 2000 ) {
-   if( itime == 0 ) {
-      printf("xxx # itimeout ibox itimein din fit qfit ufit ifit s0 s1 s6 s7 wp pop\n");
-   }
-}
-
-
-
-
-                  for( ibox = 0; ibox <  box_size; ibox++,state++,din++,qin++ ) {
-                     angle = state->pol_ang;
-                     tr_angle = pdata->north ? state->tcs_tr_ang : 0.0;
-
-                     if( !( *qin & SMF__Q_FIT ) && *din != VAL__BADD &&
-                           angle != VAL__BADD && tr_angle != VAL__BADD ) {
-                        wplate = pasign*angle + paoff;
-/*
-                        if( ipolcrd == 1 ) {
-                           wplate += state->tcs_az_ang;
-                        } else if( ipolcrd == 2 ) {
-                           wplate += state->tcs_tr_ang;
-                        }
-*/
-                        phi = 2*wplate;
-                        twophi = 2*phi;
-
-                        s8 = sin( 2*twophi );
-                        c8 = cos( 2*twophi );
-                        s4 = sin( twophi );
-                        c4 = cos( twophi );
-                        s2 = sin( phi );
-                        c2 = cos( phi );
-                        s1 = sin( wplate );
-                        c1 = cos( wplate );
-
-                        fit = solution[0]*s4 +
-                              solution[1]*c4 +
-                              solution[2]*s2 +
-                              solution[3]*c2 +
-                              solution[4]*s1 +
-                              solution[5]*c1 +
-                              solution[6]*ibox +
-                              solution[7] +
-                              solution[8]*s8 +
-                              solution[9]*c8;
-
-                        res = *din - fit;
-
-                        sum1 += res*res;
-                        nsum1++;
-
-
-if( 0 && ibolo == 526 && itime < 2000 ) {
-   qfit = solution[0]*s4;
-   ufit = solution[1]*c4;
-   ifit = solution[6]*ibox + solution[7];
-
-   printf("xxx %zu %zu %zu %.20g %.20g %.20g %.20g %.20g %.20g "
-          "%.20g %.20g %.20g %.20g %g\n", itime,
-          ibox, ibox + istart, *din, fit,
-          qfit, ufit, ifit, solution[0],  solution[1],
-          solution[6],  solution[7], wplate, sums[42] );
-
-}
-
-                     }
-                  }
 
 /* Calculate the variance of the residuals, and then scale it to get the
    notional variance for the returned Q,. U and I values. The scaling
@@ -1020,23 +1082,24 @@ if( 0 && ibolo == 526 && itime < 2000 ) {
    makemap can pick them up easily and use them to initialise the NOI
    model, which is used for weighting the bolometer data when forming the
    COM model on the first iteration. */
-                  *(ipv++) = 0.0253*sum1/nsum1;
+               *(ipv++) = 0.0253*sum1/nsum1;
 
 /* Store bad values if there were too few good samples in the fitting
    box. */
-               } else {
-                  if( ipi ) *(ipi++) = VAL__BADD;
-                  *(ipq++) = VAL__BADD;
-                  *(ipu++) = VAL__BADD;
-                  *(ipv++) = VAL__BADD;
-               }
+            } else {
+               if( ipi ) *(ipi++) = VAL__BADD;
+               *(ipq++) = VAL__BADD;
+               *(ipu++) = VAL__BADD;
+               *(ipv++) = VAL__BADD;
             }
          }
-
-/* Move the pointers on to the first input sample for the next bolometer. */
-         qua += intslice;
-         dat += intslice;
       }
+   }
+
+   if( wcs ) {
+      g2s = astAnnul( g2s );
+      s2f = astAnnul( s2f );
+      astUnlock( wcs, 1 );
    }
 }
 
@@ -1089,10 +1152,10 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
 */
 
 /* Local Variables: */
-   dim_t itime;
-   const JCMTState *state;
    char more;
+   const JCMTState *state;
    dim_t iel;
+   dim_t itime;
    dim_t nrot;
    double ang0 = 0.5*AST__DPI;
 
