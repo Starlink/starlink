@@ -6,7 +6,7 @@
 *   directly measured fluxes, and should be used accordingly.
 *   This file is designed for use with the Figaro routine GSPIKE.
 *
-SET .Z.UNITS = "micro-Janskys"
+SET .Z.UNITS = "uJy"
 SET .Z.LABEL = "Flux"
 SET .TABLE.BANDWIDTH = 80
 SET .TABLE.LAMBDA_DOUBLE = 6000

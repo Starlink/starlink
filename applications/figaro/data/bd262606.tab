@@ -6,7 +6,7 @@
 *   points are all for 40 A bands. This file is designed for
 *   use with the Figaro routine GSPIKE.
 *
-SET .Z.UNITS = "micro-Janskys"
+SET .Z.UNITS = "uJy"
 SET .Z.LABEL = "Flux"
 SET .TABLE.BANDWIDTH = 40
 *

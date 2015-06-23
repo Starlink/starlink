@@ -10,7 +10,7 @@
 *   given to 3 decimal places and was supplied directly by
 *   Alex Filippenko.
 *
-SET .Z.UNITS = "micro- Janskys"
+SET .Z.UNITS = "uJy"
 SET .Z.LABEL = "Flux"
 *
  3300   891.251
