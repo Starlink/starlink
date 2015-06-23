@@ -92,99 +92,101 @@ void pol1Rotqu( int nrow, int ncol, AstFrameSet *wcs, float angle, int var,
 */
 
 /* Local Variables: */
+   AstFrameSet *fs;
    ThrWorkForce *wf;
-   const char *dom;
    int el;
    int icur;
-   int ifrm;
    int iworker;
-   int nfrm;
+   int ndim;
    int nw;
    int pstep;
-   pol1RotquJobData *pdata;
    pol1RotquJobData *job_data;
+   pol1RotquJobData *pdata;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
 
+/* Get the number of axes in the Base Frame. */
+   ndim = astGetI( wcs, "nin" );
+
 /* Record the index of the current Frame and then find the POLANAL Frame
-   and make it current. */
+   (it becomes the current Frame in "fs" - the base Frame in "fs" is the
+   base frame from "wcs"). */
    icur = astGetI( wcs, "Current" );
-   nfrm = astGetI( wcs, "NFrame" );
-   for( ifrm = 1; ifrm <= nfrm; ifrm++ ) {
-      astSetI( wcs, "Current", ifrm );
-      dom = astGetC( wcs, "Domain" );
-      if( dom && !strcmp( dom, "POLANAL" ) ) break;
-   }
-
-   if( ifrm > nfrm && *status == SAI__OK ) {
-      *status = SAI__ERROR;
-      errRep( "", "Cannot find a POLANAL Frame in the input Q or U "
-              "WCS FrameSet", status );
-   }
-
-/* Find the number of cores/processors available and create a pool of
-   threads of the same size. */
-   nw = thrGetNThread( POLPACK__THREADS, status );
-   wf = thrGetWorkforce( nw, status );
-
-/* Create structures used to pass information to the worker threads. */
-   if( nw < 1 ) nw = 1;
-   job_data = astMalloc( nw*sizeof( *job_data ) );
-   if( *status == SAI__OK ) {
-
-/* Determine which pixels are to be processed by which threads. */
-      el = nrow*ncol;
-      pstep = el/nw;
-      if( pstep < 1 ) pstep = 1;
-
-      for( iworker = 0; iworker < nw; iworker++ ) {
-         pdata = job_data + iworker;
-         pdata->p1 = iworker*pstep;
-
-/* Ensure that the last thread picks up any left-over pixels. */
-         if( iworker < nw - 1 ) {
-            pdata->p2 = pdata->p1 + pstep - 1;
-         } else {
-            pdata->p2 = el - 1;
-         }
-
-/* Each thread needs its own unlocked copy of the FrameSet. */
-         pdata->wcs = astCopy( wcs );
-         astUnlock( pdata->wcs, 1 );
-
-/* Other stuff. */
-         pdata->qin = qin;
-         pdata->uin = uin;
-         pdata->qout = qout;
-         pdata->uout = uout;
-         pdata->angle = angle;
-         pdata->var = var;
-         pdata->nrow = nrow;
-         pdata->ncol = ncol;
-         pdata->var = var;
-
-/* Pass the job to the workforce for execution. */
-         thrAddJob( wf, 0, pdata, pol1RotquJob, 0, NULL, status );
-      }
-
-/* Wait for the workforce to complete all jobs. */
-      thrWait( wf, status );
-
-/* Lock and annul the AST objects used by each thread. */
-      for( iworker = 0; iworker < nw; iworker++ ) {
-         pdata = job_data + iworker;
-         astLock( pdata->wcs, 0 );
-         pdata->wcs = astAnnul( pdata->wcs );
-      }
-   }
+   fs = astFindFrame( wcs, astFrame( ndim, "minaxes=1,maxaxes=20" ),
+                      "POLANAL" );
 
 /* Re-instate the original current Frame. */
    astSetI( wcs, "Current", icur );
 
-   icur = astGetI( wcs, "Current" );
+/* Report an error if no POLANAL Frame was found. */
+   if( !fs && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRep( "", "Cannot find a POLANAL Frame in the input Q or U "
+              "WCS FrameSet", status );
+
+/* Find the number of cores/processors available and create a pool of
+   threads of the same size. */
+   } else if( *status == SAI__OK ){
+      nw = thrGetNThread( POLPACK__THREADS, status );
+      wf = thrGetWorkforce( nw, status );
+
+/* Create structures used to pass information to the worker threads. */
+      if( nw < 1 ) nw = 1;
+      job_data = astMalloc( nw*sizeof( *job_data ) );
+      if( *status == SAI__OK ) {
+
+/* Determine which pixels are to be processed by which threads. */
+         el = nrow*ncol;
+         pstep = el/nw;
+         if( pstep < 1 ) pstep = 1;
+
+         for( iworker = 0; iworker < nw; iworker++ ) {
+            pdata = job_data + iworker;
+            pdata->p1 = iworker*pstep;
+
+/* Ensure that the last thread picks up any left-over pixels. */
+            if( iworker < nw - 1 ) {
+               pdata->p2 = pdata->p1 + pstep - 1;
+            } else {
+               pdata->p2 = el - 1;
+            }
+
+/* Each thread needs its own unlocked copy of the FrameSet. */
+            pdata->wcs = astCopy( fs );
+            astUnlock( pdata->wcs, 1 );
+
+/* Other stuff. */
+            pdata->qin = qin;
+            pdata->uin = uin;
+            pdata->qout = qout;
+            pdata->uout = uout;
+            pdata->angle = angle;
+            pdata->var = var;
+            pdata->nrow = nrow;
+            pdata->ncol = ncol;
+            pdata->var = var;
+
+/* Pass the job to the workforce for execution. */
+            thrAddJob( wf, 0, pdata, pol1RotquJob, 0, NULL, status );
+         }
+
+/* Wait for the workforce to complete all jobs. */
+         thrWait( wf, status );
+
+/* Lock and annul the AST objects used by each thread. */
+         for( iworker = 0; iworker < nw; iworker++ ) {
+            pdata = job_data + iworker;
+            astLock( pdata->wcs, 0 );
+            pdata->wcs = astAnnul( pdata->wcs );
+         }
+      }
+
+
 /* Free resources. */
-   job_data = astFree( job_data );
+      job_data = astFree( job_data );
+      fs = astAnnul( fs );
+   }
 }
 
 
