@@ -90,8 +90,9 @@
 *                  No concurrent mapping. This was in fact a bug:
 *                  If the user gave two input images, the first one
 *                  would be mapped twice and the second not at all.
-C     2005 June 1  MJC / Starlink.  Use CNF_PVAL for pointers to mapped
-C                  data.
+*     2005 June 1  MJC / Starlink.  Use CNF_PVAL for pointers to mapped
+*                  data.
+*     2015 June 19 MJC /EAO.  Permit units of um for microns.
 *+
 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
@@ -115,6 +116,8 @@ C                  data.
       CHARACTER IMAGE1*80,IXUNITS*16,I1XUNITS*16
       CHARACTER OIDENT*16
       CHARACTER*64 CITEMS(2)
+      LOGICAL      ANGST         ! Units in Angstrom?
+      LOGICAL      MICRONS       ! Wavelength in microns?
 *
 *     Functions
 *
@@ -183,19 +186,34 @@ C                  data.
 *        ... that their X units are the same and are known wavelength units ...
 *
          CALL DSA_GET_AXIS_INFO('IMAGE',1,2,CITEMS,1,DITEMS,STATUS)
-         IXUNITS=CITEMS(1)
-         IGNORE=ICH_FOLD(IXUNITS)
-         IF (STATUS.NE.0.OR.(IXUNITS.NE.'ANGSTROMS'.AND.IXUNITS.NE.
-     :                                             'MICRONS')) THEN
-            CALL PAR_WRUSER('First image does not have X units of '//
+         IXUNITS = CITEMS(1)
+         IGNORE = ICH_FOLD(IXUNITS)
+
+         MICRONS = INDEX(IXUNITS,'MICRON').NE.0.OR.
+     :             INDEX(IXUNITS,'icron') .NE.0.OR.
+     :             INDEX(IXUNITS,'UM')    .NE.0.OR.
+     :             INDEX(IXUNITS,'um')    .NE.0
+         ANGST = INDEX(IXUNITS,'ANGSTROM').NE.0.OR.
+     :           INDEX(IXUNITS,'ngstrom') .NE.0
+
+          IF (STATUS.NE.0.OR..NOT.(MICRONS.OR.ANGST)) THEN
+             CALL PAR_WRUSER('First image does not have X units of '//
      :                                 'Angstroms or microns',STATUS)
             GOTO 500
          END IF
+
          CALL DSA_GET_AXIS_INFO('IMAGE1',1,2,CITEMS,1,DITEMS,STATUS)
-         I1XUNITS=CITEMS(1)
+         I1XUNITS = CITEMS(1)
          IGNORE = ICH_FOLD(I1XUNITS)
-         IF (STATUS.NE.0.OR.(I1XUNITS.NE.'ANGSTROMS'.AND.I1XUNITS.NE.
-     :                                               'MICRONS')) THEN
+
+         MICRONS = INDEX(I1XUNITS,'MICRON').NE.0.OR.
+     :             INDEX(I1XUNITS,'icron') .NE.0.OR.
+     :             INDEX(I1XUNITS,'UM')    .NE.0.OR.
+     :             INDEX(I1XUNITS,'um')    .NE.0
+         ANGST = INDEX(I1XUNITS,'ANGSTROM').NE.0.OR.
+     :           INDEX(I1XUNITS,'ngstrom') .NE.0
+
+          IF (STATUS.NE.0.OR..NOT.(MICRONS.OR.ANGST)) THEN
             CALL PAR_WRUSER('Second image does not have X units of '//
      :                                  'Angstroms or microns',STATUS)
             GOTO 500

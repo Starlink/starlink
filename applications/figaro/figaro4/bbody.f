@@ -60,7 +60,7 @@
 *     XUNIT = CHARACTER (Read)
 *        The unit for the spectroscopic axis.
 *        If the label is "wavelength" then the unit can basically be "m"
-*        for metre, "micron" for micrometre, or "Angstrom" for
+*        for metre, "um" or "micron" for micrometre, or "Angstrom" for
 *        Angstroem. If the label is "frequency" then the unit must be
 *        basically "Hz" for Hertz.
 *        Any of these units may be preceded by a power of ten, so it

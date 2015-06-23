@@ -55,6 +55,7 @@ C     24th Jul 1996  MJCL / Starlink, UCL.  Abuse of SORTED as INTEGER
 C                    removed.
 C     2005 June 1    MJC / Starlink Use CNF_PVAL for pointers to mapped
 C                    data.
+*     2015 June 19   MJC /EAO.  Permit units of um for microns.
 C+
       IMPLICIT NONE
 
@@ -226,7 +227,7 @@ C
          CALL PAR_WRUSER('Error writing wavelength array',STATUS)
          GO TO 500
       END IF
-      CITEMS(1)='Microns'
+      CITEMS(1)='um'
       CITEMS(2)='Wavelength'
       CALL DSA_SET_AXIS_INFO('OUTPUT',1,2,CITEMS,0,0D0,STATUS)
 C

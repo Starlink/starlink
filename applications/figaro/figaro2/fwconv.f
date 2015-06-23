@@ -4,7 +4,7 @@ C
 C     F W C O N V
 C
 C     Converts flux units of a spectrum from/to either
-C     F_lambda (ergs/sec/cm**2/A), AB magnitudes or F_nu (Janskys).
+C     F_lambda (erg/s/cm**2/Angstrom), AB magnitudes or F_nu (Jy).
 C
 C     Command parameters -
 C
@@ -33,6 +33,8 @@ C     3rd  Jul 2001  VGG / RAL. Error propagation included.
 C     7th  Jul 200.  ACD / UoE. Tidied up.
 C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
 C                    mapped data.
+C     2015 June 19   MJC / EAO  Switch to IAU/FITS standard naming for
+C                    the units.
 C+
       IMPLICIT NONE
 
@@ -63,7 +65,7 @@ C
       INTEGER      STATUS        ! Running status for DSA_ routines
       INTEGER      ULEN(5)       ! Length in characters of the different
                                  ! units
-      CHARACTER    UNITAB(5)*14  ! The names of the different units
+      CHARACTER    UNITAB(5)*20  ! The names of the different units
       CHARACTER    UNITS*64      ! The units of the data
       LOGICAL      VEXIST        ! TRUE if a variance array exists
       INTEGER      VPTR          ! Dynamic-memory pointer to input
@@ -79,9 +81,9 @@ C
       INTEGER      XSLOT         ! Map slot number of x-axis data
       CHARACTER    XUNITS*64     ! The units of the x-axis data
 C
-      DATA UNITAB/'Janskys','Milli-Janskys','Micro-Janskys',
-     :            'Ergs/s/cm**2/A','AB magnitudes'/
-      DATA ULEN/7,13,13,14,13/
+      DATA UNITAB/'Jy','mJy','uJy',
+     :            'erg/s/cm**2/Angstrom','AB magnitudes'/
+      DATA ULEN/2,3,3,20,13/
 C
 C     Initialisation of DSA_ routines
 C
@@ -161,7 +163,8 @@ C
       CALL DSA_GET_AXIS_INFO('SPECT',1,1,XUNITS,0,DUMMY,STATUS)
       NCH=ICH_FOLD(XUNITS)
       NCH=ICH_CLEAN(XUNITS)
-      IF (INDEX(XUNITS,'ANGSTROM').EQ.0) THEN
+      IF (INDEX(XUNITS,'ANGSTROM').EQ.0.AND.
+     :    INDEX(XUNITS,'ngstrom').EQ.0 ) THEN
          CALL PAR_WRUSER(
      :      'Warning: X-data does not appear to be in Angstroms',
      :                                                         IGNORE)
@@ -251,7 +254,7 @@ C     To determine flux units and return a coded integer (TYPE) such that
 C        (1) = micro-Janskys
 C        (2) = milli-Janskys
 C        (3) = Janskys
-C        (4) = Ergs/s/cm**2/A
+C        (4) = erg/s/cm**2/Angstrom
 C        (5) = AB magnitudes
 C+
       INTEGER TYPE
@@ -264,13 +267,18 @@ C
      :                             .OR.(INDEX(UNITS,'erg').NE.0)) THEN
          TYPE=4
       ELSE IF ((INDEX(UNITS,'JANSKY').NE.0).OR.
-     :   (INDEX(UNITS,'ansky').NE.0).OR.(INDEX(UNITS,'JY').NE.0)) THEN
+     :         (INDEX(UNITS,'ansky').NE.0).OR.
+     :         (INDEX(UNITS,'Jy').NE.0).OR.
+     :         (INDEX(UNITS,'JY').NE.0)) THEN
          IF ((INDEX(UNITS,'MICRO').NE.0).OR.
-     :                      (INDEX(UNITS,'icro').NE.0)) THEN
+     :       (INDEX(UNITS,'icro').NE.0).OR.
+     :       (INDEX(UNITS,'uJy').NE.0).OR.
+     :       (INDEX(UNITS,'UJY').NE.0)) THEN
             TYPE=3
          ELSE IF ((INDEX(UNITS,'MILLI').NE.0).OR.
-     :      (INDEX(UNITS,'illi').NE.0).OR.(INDEX(UNITS,'MJY').NE.0).OR.
-     :      (INDEX(UNITS,'mJy').NE.0)) THEN
+     :            (INDEX(UNITS,'illi').NE.0).OR.
+     :            (INDEX(UNITS,'mJy').NE.0).OR.
+     :            (INDEX(UNITS,'MJY').NE.0)) THEN
             TYPE=2
          ELSE
             TYPE=1
@@ -283,18 +291,18 @@ C+
 C
 C     F I G _ F W C O N V
 C
-C     Converts units of a spectrum, with options of ergs/cm**2/sec/A,
-C     milli-Janskys, or AB magnitudes.
+C     Converts units of a spectrum, with options of
+C     erg/s/cm**2/Angstrom, mJy, or AB magnitudes.
 C
 C     Parameters -  (">" input, "<" output)
 C
 C     (>) IN     (Real array IN(NELM)) The input data.
 C     (>) NELM   (Integer) The number of elements in IN.
 C     (>) INTYPE (Integer) Indicates input units of either
-C                1 => Janskys
-C                2 => Milli-Janskys
-C                3 => Micro-Janskys
-C                4 => Ergs/cm**2/sec/A
+C                1 => Jy (Janskys)
+C                2 => mJy (Milli-Janskys)
+C                3 => uJy (Micro-Janskys)
+C                4 => erg/s/cm**2/Angstrom
 C                5 => AB magnitudes
 C     (>) OUTYPE (Integer) Indicates output units (as for INTYPE)
 C     (>) WAVES  (Real array WAVES(NWAV)) The wavelengths of the
@@ -315,8 +323,8 @@ C
 C     Note: The conversions are based on the relations
 C         FL=(2.998E-8/WAVELENGTH**2)*FV
 C         LOG(FV)=-0.4AB+6.56
-C     where FL is flux in Ergs/cm**2/sec/A
-C           FV is flux in milli-Janskys and
+C     where FL is flux in erg/s/cm**2/Angstrom
+C           FV is flux in mJy and
 C           AB is in AB magnitudes
 C     (quoted in Fillipenko and Greenstein, PASP 1984)
 C
@@ -351,7 +359,7 @@ C         Simple conversion to other Jansky subunit
             IF (IWPTR.GT.NWAV) IWPTR=1
           END DO
         ELSE IF (OUTYPE.EQ.4) THEN
-C         Conversion to Ergs/cm**2/sec/A
+C         Conversion to erg/s/cm**2/Angstrom
           SCALE=SCALE*2.998E-8
           IWPTR=1
           DO IELM=1,NELM
@@ -380,7 +388,7 @@ C         Conversion to AB magnitudes
 
 
       ELSE IF (INTYPE.EQ.4) THEN
-C       Input units in Ergs/cm**2/sec/A
+C       Input units in erg/s/cm**2/Angstrom
         SCALE=SCALE/2.998E-8
         IWPTR=1
         IF (OUTYPE.LE.3) THEN
@@ -417,7 +425,7 @@ C         Conversion to Jansky (or a subunit)
             OUT(IELM)=(10.0**(6.56-0.4*IN(IELM)))*SCALE
           END DO
         ELSE IF (OUTYPE.EQ.4) THEN
-C         Conversion to Ergs/cm**2/sec/A
+C         Conversion to erg/s/cm**2/Angstrom
           SCALE=SCALE*2.998E-8
           IWPTR=1
           DO IELM=1,NELM
@@ -437,17 +445,17 @@ C
 C     F I G _ F W C O N V _ V A R
 C
 C     Converts units of the variance of a spectrum, with options of
-C     ergs/cm**2/sec/A, milli-Janskys, or AB magnitudes.
+C     erg/s/cm**2/Angstrom, mJy, or AB magnitudes.
 C
 C     Parameters -  (">" input, "<" output)
 C
 C     (>) IN     (Real array IN(NELM)) The input variance data.
 C     (>) NELM   (Integer) The number of elements in IN.
 C     (>) INTYPE (Integer) Indicates input units of either
-C                1 => Janskys
-C                2 => Milli-Janskys
-C                3 => Micro-Janskys
-C                4 => Ergs/cm**2/sec/A
+C                1 => Jy (Janskys)
+C                2 => mJy (Milli-Janskys)
+C                3 => uJy (Micro-Janskys)
+C                4 => erg/s/cm**2/Angstrom
 C                5 => AB magnitudes
 C     (>) OUTYPE (Integer) Indicates output units (as for INTYPE)
 C     (>) WAVES  (Real array WAVES(NWAV)) The wavelengths of the
@@ -468,8 +476,8 @@ C
 C     Note: The conversions are based on the relations
 C         FL=(2.998E-8/WAVELENGTH**2)*FV
 C         LOG(FV)=-0.4AB+6.56
-C     where FL is flux in Ergs/cm**2/sec/A
-C           FV is flux in milli-Janskys and
+C     where FL is flux in erg/s/cm**2/Angstrom
+C           FV is flux in mJy and
 C           AB is in AB magnitudes
 C     (quoted in Fillipenko and Greenstein, PASP 1984)
 C
@@ -508,7 +516,7 @@ C         Simple conversion to other Jansky subunit
             IF (IWPTR.GT.NWAV) IWPTR=1
           END DO
         ELSE IF (OUTYPE.EQ.4) THEN
-C         Conversion to Ergs/cm**2/sec/A
+C         Conversion to erg/s/cm**2/Angstrom
           SCALE=SCALE*2.998E-8
           IWPTR=1
           DO IELM=1,NELM
@@ -541,7 +549,7 @@ C         Conversion to AB magnitudes
 
 
       ELSE IF (INTYPE.EQ.4) THEN
-C       Input units in Ergs/cm**2/sec/A
+C       Input units in erg/s/cm**2/Angstrom
         SCALE=SCALE/2.998E-8
         IWPTR=1
         IF (OUTYPE.LE.3) THEN
@@ -592,7 +600,7 @@ C         Conversion to Jansky (or a subunit)
           END DO
 
         ELSE IF (OUTYPE.EQ.4) THEN
-C         Conversion to Ergs/cm**2/sec/A
+C         Conversion to erg/s/cm**2/Angstrom
           SCALE=SCALE*2.998E-8
           IWPTR=1
           DO IELM=1,NELM

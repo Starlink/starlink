@@ -3736,7 +3736,7 @@ ICL> splot smooth noaxes noerase accept
 
 
    As far as linear units go, there are objections to using `ergs per
-   sec per square cm per Hz' and even more so to `ergs per sec per
+   sec per square cm per Hz' and even more so to `erg per sec per
    square cm per Angstrom' on the grounds that the numbers involved are
    ridiculously small (and in the latter case can easily go outside the
    floating point range, which is a serious problem!).  So, mainly to be
@@ -3749,7 +3749,7 @@ ICL> splot smooth noaxes noerase accept
    tables are provided: one in AB magnitudes, usually a direct copy of
    the published data, and one in (milli- or micro-) Janskys, usually
    the result of a semi-automatic conversion from the former.  If you
-   particularly like ergs/s/cm**2/A, then you can either provide your
+   particularly like erg/s/cm**2/Angstrom, then you can either provide your
    own flux tables in these units and work from them directly, or you
    can use the `flconv' command to convert from a spectrum calibrated in
    Janskys into these units.
@@ -7784,7 +7784,7 @@ ICL> echmerge image=objs image1='' box=7 cutoff=4 output=objl
 \htmlref{CSET}{CSET} --- Interactively set regions of a spectrum to a constant value\\
 \htmlref{CSPIKE}{CSPIKE} --- Create calibration spiketrum given spiketrum and standard spectrum\\
 \htmlref{FIGSFLUX}{FIGSFLUX} --- Flux calibrates a FIGS spectrum\\
-\htmlref{FLCONV}{FLCONV} --- Convert a spectrum in Janskys into one in Ergs/cm**2/s/A\\
+\htmlref{FLCONV}{FLCONV} --- Convert a spectrum in Janskys into one in erg/s/cm**2/Angstrom\\
 \htmlref{FWCONV}{FWCONV} --- General unit conversion for spectra\\
 \htmlref{GSPIKE}{GSPIKE} --- Generates a 'spiketrum' from a table of values\\
 \htmlref{INTERP}{INTERP} --- Interpolates between the points of a 'spiketrum' -$>$ a spectrum\\

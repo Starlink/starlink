@@ -188,6 +188,8 @@ C     24 Jul 1996    MJCL / Starlink, UCL.  Corrected type of
 C                    DSA_SAME_DATA.
 C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
 C                    mapped data.
+C     2015 June 19   MJC / EAO  Switch to IAU/FITS standard naming for
+C                    the units.
 C+
       IMPLICIT NONE
 
@@ -637,9 +639,9 @@ C     Change the x- label and units
 C
       IF (APPLY) THEN
          IF (MICRONS) THEN
-            STRINGS(1)='Microns'
+            STRINGS(1)='um'
          ELSE
-            STRINGS(1)='Angstroms'
+            STRINGS(1)='Angstrom'
          END IF
          STRINGS(2)='Wavelength'
          CALL DSA_SET_AXIS_INFO('OUTPUT',1,2,STRINGS,0,DUMMY,STATUS)

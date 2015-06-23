@@ -23,10 +23,10 @@
  A B C O N V  /  F L C O N V  /  I R C O N V
 
  Converts a spectrum into AB magnitudes (ABCONV) or f-lambda
- units (ergs/sec/cm**2/A) (FLCONV), or W/m**2/um (IRCONV).
- The original units of the
- data may be Janskys, milli-Janskys, or micro-Janskys.  Other
- possibilities may be added later.
+ units (erg/s/cm**2/Angstrom) (FLCONV), or W/m**2/um (IRCONV).
+ The original units of the data may be Jy (Janskys), mJy
+ (milli-Janskys), or uJy (micro-Janskys). Other possibilities
+ may be added later.
 
  Command parameters -
 
@@ -1802,7 +1802,7 @@ XLABEL = CHARACTER (Read)
 XUNIT = CHARACTER (Read)
    The unit for the spectroscopic axis.
    If the label is "wavelength" then the unit can basically be "m"
-   for metre, "micron" for micrometre, or "Angstrom" for
+   for metre, "um" or "micron" for micrometre, or "Angstrom" for
    Angstroem. If the label is "frequency" then the unit must be
    basically "Hz" for Hertz.
    Any of these units may be preceded by a power of ten, so it
@@ -9154,11 +9154,12 @@ This routine works in situ and modifies the input file.
 
 \end{terminalv}
 \end{description}
-\subsection{FLCONV\xlabel{FLCONV}-\label{FLCONV}Convert a spectrum in Janskys into one in Ergs/cm**2/s/A}
+\subsection{FLCONV\xlabel{FLCONV}-\label{FLCONV}Convert a spectrum in
+Janskys into one in erg/s/cm**2/Angstrom}
 \begin{description}
 
 \item [\textbf{Description:}]
- FLCONV generates a spectrum in ergs/sec/cm**2/A, given a spectrum
+ FLCONV generates a spectrum in erg/s/cm**2/Angstrom, given a spectrum
  in some other units.  At present, only Janskys, milli-Janskys and
  micro-Janskys can be handled.
 
@@ -9179,10 +9180,10 @@ This routine works in situ and modifies the input file.
  A B C O N V  /  F L C O N V  /  I R C O N V
 
  Converts a spectrum into AB magnitudes (ABCONV) or f-lambda
- units (ergs/sec/cm**2/A) (FLCONV), or W/m**2/um (IRCONV).
- The original units of the
- data may be Janskys, milli-Janskys, or micro-Janskys.  Other
- possibilities may be added later.
+ units (erg/s/cm**2/Angstrom) (FLCONV), or W/m**2/um (IRCONV).
+ The original units of the data may be Jy (Janskys), mJy
+ (milli-Janskys), or uJy (micro-Janskys). Other possibilities
+ may be added later.
 
  Command parameters -
 
@@ -9464,21 +9465,21 @@ This routine works in situ and modifies the input file.
 
 \item [\textbf{Description:}]
  FWCONV converts the flux units of a spectrum from AB magnitudes,
- Janskys, milli-Janskys, micro-Janskys or erg/s/cm**2/A to any of
- these.
+ Janskys, milli-Janskys, micro-Janskys or erg/s/cm**2/Angstrom to
+ any of these.
 
 \item [\textbf{Parameters:}]
 \begin{description}
 \item [\textbf{SPECTRUM}]
  A spectrum whose units are either Janskys,
- milli-Janskys, micro-Janskys, erg/s/cm**2/A
+ milli-Janskys, micro-Janskys, erg/s/cm**2/Angstrom
  or AB magnitudes.
 \item [\textbf{FLUX\_UNIT}]
  Units of either Janskys, milli-Janskys,
- micro-Janskys, erg/s/cm**2/A or AB magnitudes.
+ micro-Janskys, erg/s/cm**2/Angstrom or AB magnitudes.
 \item [\textbf{OUTPUT}]
  The resulting spectrum, whose units will be either
- Janskys, milli-Janskys, micro-Janskys, erg/s/cm**2/A or
+ Janskys, milli-Janskys, micro-Janskys, erg/s/cm**2/Angstrom or
  AB magnitudes.  OUTPUT can be the same as SPECTRUM, in which
  case the conversion will be performed in situ.
 \end{description}
@@ -12494,10 +12495,10 @@ FIGARO: \htmlref{ESPLOT}{ESPLOT}, \htmlref{MSPLOT}{MSPLOT}, \htmlref{SPLOT}{SPLO
  A B C O N V  /  F L C O N V  /  I R C O N V
 
  Converts a spectrum into AB magnitudes (ABCONV) or f-lambda
- units (ergs/sec/cm**2/A) (FLCONV), or W/m**2/um (IRCONV).
- The original units of the
- data may be Janskys, milli-Janskys, or micro-Janskys.  Other
- possibilities may be added later.
+ units (erg/s/cm**2/Angstrom) (FLCONV), or W/m**2/um (IRCONV).
+ The original units of the data may be Jy (Janskys), mJy
+ (milli-Janskys), or uJy (micro-Janskys). Other possibilities
+ may be added later.
 
  Command parameters -
 

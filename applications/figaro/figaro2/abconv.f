@@ -4,9 +4,9 @@ C
 C     A B C O N V  /  F L C O N V  /  I R C O N V
 C
 C     Converts a spectrum into AB magnitudes (ABCONV) or f-lambda
-C     units (ergs/sec/cm**2/A) (FLCONV), or W/m**2/um (IRCONV).
-C     The original units of the
-C     data may be Janskys, milli-Janskys, or micro-Janskys.  Other
+C     units (erg/s/cm**2/Angstrom) (FLCONV), or W/m**2/um (IRCONV).
+C     The original units of the data may be Jy (Janskys), mJy
+C     (milli-Janskys), or uJy (micro-Janskys).  Other
 C     possibilities may be added later.
 C
 C     Command parameters -
@@ -47,6 +47,8 @@ C                  Bad pixel handling.
 C     10 Apr 1997  MJCL / Starlink, UCL.  PAR_ABORT checking.
 C     2005 June 10 MJC / Starlink  Use CNF_PVAL for pointers to
 C                  mapped data.
+C     2015 June 19 MJC / EAO  Switch to IAU/FITS standard naming for
+C                  the units.
 C+
       IMPLICIT NONE
 
@@ -58,6 +60,7 @@ C
 C
 C     Local variables
 C
+      LOGICAL      ANGST         ! Units in Angstrom?
       REAL         BADVAL        ! Bad value
       CHARACTER    COMMAND*64    ! The actual Figaro command entered
       INTEGER      DIMS(10)      ! Sizes of dimensions of data
@@ -84,7 +87,7 @@ C
       INTEGER      STATUS        ! Running status for DSA_ routines
       INTEGER      ULEN(3)       ! Length in characters of the different
                                  ! units
-      CHARACTER    UNITAB(3)*14  ! The names of the different units
+      CHARACTER    UNITAB(3)*3   ! The names of the different units
       CHARACTER    UNITS*64      ! The units of the data
       INTEGER      XDIMS(10)     ! X-axis data array dimensions
       LOGICAL      XEXIST        ! TRUE if an x-axis array exists
@@ -94,8 +97,8 @@ C
       INTEGER      XSLOT         ! Map slot number of x-axis data
       CHARACTER    XUNITS*64     ! The units of the x-axis data
 C
-      DATA UNITAB/'Janskys','Milli-Janskys','Micro-Janskys'/
-      DATA ULEN/7,13,13/
+      DATA UNITAB/'Jy','mJy','uJy'/
+      DATA ULEN/2,3,3/
 C
 C     Initialisation of DSA_ routines
 C
@@ -126,11 +129,19 @@ C
       NTYPE=0
       NCH=ICH_FOLD(UNITS)
       NCH=ICH_CLEAN(UNITS)
-      IF ((INDEX(UNITS,'JANSKY').NE.0).OR.(INDEX(UNITS,'JY').NE.0)) THEN
-         IF (INDEX(UNITS,'MICRO').NE.0) THEN
+      IF ((INDEX(UNITS,'JANSKY').NE.0).OR.
+     :    (INDEX(UNITS,'ansky').NE.0).OR.
+     :    (INDEX(UNITS,'Jy').NE.0).OR.
+     :    (INDEX(UNITS,'JY').NE.0)) THEN
+         IF ((INDEX(UNITS,'MICRO').NE.0).OR.
+     :       (INDEX(UNITS,'icro').NE.0).OR.
+     :       (INDEX(UNITS,'uJy').NE.0).OR.
+     :       (INDEX(UNITS,'UJY').NE.0)) THEN
             NTYPE=3
          ELSE IF ((INDEX(UNITS,'MILLI').NE.0).OR.
-     :                      (INDEX(UNITS,'MJY').NE.0)) THEN
+     :            (INDEX(UNITS,'illi').NE.0).OR.
+     :            (INDEX(UNITS,'mJy').NE.0).OR.
+     :            (INDEX(UNITS,'MJY').NE.0)) THEN
             NTYPE=2
          ELSE
             NTYPE=1
@@ -165,8 +176,13 @@ C
          CALL DSA_GET_AXIS_INFO('SPECT',1,1,XUNITS,0,DUMMY,STATUS)
          NCH=ICH_FOLD(XUNITS)
          NCH=ICH_CLEAN(XUNITS)
-         MICRONS = INDEX(XUNITS,'MICRON') .NE. 0
-         IF ((.NOT. MICRONS) .AND. INDEX(XUNITS,'ANGSTROM').EQ.0) THEN
+         MICRONS = INDEX(XUNITS,'MICRON').NE.0.OR.
+     :             INDEX(XUNITS,'icron') .NE.0.OR.
+     :             INDEX(XUNITS,'UM')    .NE.0.OR.
+     :             INDEX(XUNITS,'um')    .NE.0
+         ANGST = INDEX(XUNITS,'ANGSTROM').NE.0.OR.
+     :           INDEX(XUNITS,'ngstrom') .NE.0
+         IF ((.NOT. MICRONS).AND..NOT.ANGST) THEN
             CALL PAR_WRUSER('Warning: Cannot interpret X unit, '//
      :                                     'assume Angstrom.', IGNORE)
          END IF
@@ -225,7 +241,7 @@ C
      :                     NELM,NTYPE,%VAL(CNF_PVAL(XPTR)),NXELM,
      :                     ERRORS,MICRONS,%VAL(CNF_PVAL(OPTR)),
      :                     %VAL(CNF_PVAL(EPTR)),BADVAL)
-         UNITS='W/(m**2*micron)'
+         UNITS='W/(m**2*um)'
 
       ELSE IF (.NOT.FLCO) THEN
          CALL ABCONV_ABCON(%VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(EPTR)),
@@ -238,7 +254,7 @@ C
      :                     NELM,NTYPE,%VAL(CNF_PVAL(XPTR)),NXELM,
      :                     ERRORS,MICRONS,%VAL(CNF_PVAL(OPTR)),
      :                     %VAL(CNF_PVAL(EPTR)),BADVAL)
-         UNITS='erg/(s*cm**2*Ang)'
+         UNITS='erg/(s*cm**2*Angstrom)'
       END IF
 C
 C     Say what we did
@@ -343,7 +359,8 @@ C+
 C
 C     A B C O N V _ F L C O N
 C
-C     Converts a spectrum from its current units into ergs/cm**2/sec/A.
+C     Converts a spectrum from its current units into
+C     erg/s/cm**2/Angstrom.
 C     Only a limited set of units are supported as yet, listed below.
 C
 C     Parameters -  (">" input, "<" output)
@@ -352,9 +369,9 @@ C     (>) IN     (Real array IN(NELM)) The input data.
 C     (>) INE    (Real array INE(NELM)) The input errors.
 C     (>) NELM   (Integer) The number of elements in IN.
 C     (>) NTYPE  (Integer) Indicates the current units.  Can be
-C                1 => Janskys
-C                2 => Milli-Janskys
-C                3 => Micro-Janskys
+C                1 => Jy (Janskys)
+C                2 => mJy (Milli-Janskys)
+C                3 => uJy (Micro-Janskys)
 C     (>) WAVES  (Real array WAVES(NWAV)) The wavelengths of the
 C                elements of the input data.  If NELM>NWAV, the
 C                routine re-uses the WAVES values from 1 once it
@@ -376,7 +393,7 @@ C
 C     Functions / subroutines used - None
 C
 C     Note: The conversion from Jansky units is based on the relation
-C     FL=(2.998E-5/WAVELENGTH**2)*FV which holds if FV is in Janskys
+C     FL=(2.998E-5/WAVELENGTH**2)*FV which holds if FV is in Janskys.
 C
 C                                            KS / CIT 16th Jan 1985
 C     06-DEC-1990  JAB:
@@ -435,7 +452,7 @@ C+
 C
 C     A B C O N V _ I R C O N
 C
-C     Converts a spectrum from its current units into W/m**2/micron.
+C     Converts a spectrum from its current units into W/m**2/um.
 C     Only a limited set of units are supported as yet, listed below.
 C
 C     Parameters -  (">" input, "<" output)
@@ -444,9 +461,9 @@ C     (>) IN     (Real array IN(NELM)) The input data.
 C     (>) INE    (Real array INE(NELM)) The input errors.
 C     (>) NELM   (Integer) The number of elements in IN.
 C     (>) NTYPE  (Integer) Indicates the current units.  Can be
-C                1 => Janskys
-C                2 => Milli-Janskys
-C                3 => Micro-Janskys
+C                1 => Jy (Janskys)
+C                2 => mJy (Milli-Janskys)
+C                3 => uJy (Micro-Janskys)
 C     (>) WAVES  (Real array WAVES(NWAV)) The wavelengths of the
 C                elements of the input data.  If NELM>NWAV, the
 C                routine re-uses the WAVES values from 1 once it

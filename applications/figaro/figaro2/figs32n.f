@@ -78,6 +78,7 @@ C     13th Mar 1996  HME / UoE, Starlink.  Fixed broken-up format string
 C                    in WRITE.
 C     2005 June 14   MJC / Starlink  Use CNF_PVAL for pointers to
 C                    mapped data.
+*     2015 June 19   MJC /EAO.  Permit units of um for microns.
 C+
       IMPLICIT NONE
 
@@ -480,7 +481,7 @@ C
       BYTES=NX*DSA_TYPESIZE('FLOAT',STATUS)
       CALL GEN_MOVE(BYTES,WAVES,%VAL(CNF_PVAL(OXPTR)))
 
-      CITEMS(1)='Microns      '
+      CITEMS(1)='um           '
       CITEMS(2)='Wavelength   '
       CALL DSA_SET_AXIS_INFO('OUTPUT',1,NCITEMS,CITEMS,NNITEMS,NITEMS,
      :                        STATUS)
