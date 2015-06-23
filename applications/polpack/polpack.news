@@ -1,12 +1,12 @@
 1 POLPACK
 
- Version 3.3 of POLPACK (an applications package for processing imaging
+ Version 3.4 of POLPACK (an applications package for processing imaging
  polarimetry data) is now available. It is fully documented in SUN/223.
 
- The main changes since V3.3 are:
+ The main changes since V3.4 are:
 
- o  POLKA no longer supports an unconstrained full 6-coefficient linear fit.
-
- o  A bug has been fixed in POLKA that could cause dialog boxes to flash
-    uncontrollably when partially obscured by the main polka window.
+ o The ANGLE parameter of the POLROTREF command now specifies the
+ position angle of the required referecne direction, rather than the
+ angle though which to rotate the reference direction. ANY EXISTING
+ SCRIPTS THAT USE "ANGLE" WILL NEED TO BE CHANGED.
 

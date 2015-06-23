@@ -10,10 +10,10 @@
 \stardocsource      {sun\stardocnumber}
 \stardocnumber      {223.7}
 \stardocauthors     {D.S. Berry \& T.M. Gledhill }
-\stardocdate        {27th February 2015}
+\stardocdate        {22nd JUne 2015}
 \stardoctitle       {POLPACK \\
                             An Imaging Polarimetry Reduction Package}
-\stardocversion     {Version 3.3-0}
+\stardocversion     {Version 3.4-0}
 \stardocmanual      {Users' Manual}
 \startitlepic {\includegraphics[clip,width=0.75\textwidth]{sun223_figures/fig}}
 \stardocabstract  {POLPACK is a package of applications for
@@ -4488,8 +4488,8 @@ for NDF applications.
 }{
    \sstdescription{
       This application creates a new pair of Q and U images from a
-      supplied pair of Q and U images, by rotating the reference
-      direction by a specified angle. It is assumed that the supplied
+      supplied pair of Q and U images, by setting the reference
+      direction to a specified angle. It is assumed that the supplied
       Q and U images are aligned in pixel coordinates, and have the
       same reference direction.
    }
@@ -4500,25 +4500,20 @@ for NDF applications.
       \sstsubsection{
          ANGLE = \_REAL (Read)
       }{
-        Number of clockwise degrees by which the reference direction is
-        to be rotated. It must lie between -360 and 360 degrees. Only
-        accessed if parameter LIKE is set to null (!). The suggested
-        default is the current value.  If a null (!) value is supplied,
-        then the direction of north at the centre of the field is used
-        as the new reference direction. If the current co-ordinate Frame
-        in the input NDF is not a celestial co-ordinate frame, then the
-        second axis of the current Frame is used as the new reference
-        direction.
+         The angle, in degrees, from north to the required new reference
+         direction, measured positive in the same sense as rotation from
+         north to east. It must lie between -360 and 360 degrees. Only
+         accessed if parameter LIKE is set to null.
       }
       \sstsubsection{
          LIKE = NDF (Read)
       }{
-        A 2D Q or U NDF that defines the new reference direction. The
-        supplied NDF should have a Frame with Domain "POLANAL" in its
-        WCS component. The supplied Q and U images are modified so that
-        they use the same reference direction as the supplied NDF. If
-        null (!) is supplied, the rotation is defined by parametrer
-        ANGLE. [!]
+         A 2D Q or U NDF that defines the new reference direction. The
+         supplied NDF should have a Frame with Domain {\tt "}POLANAL{\tt "} in its
+         WCS component. The supplied Q and U images are modified so that
+         they use the same reference direction as the supplied NDF. If
+         null (!) is supplied, the rotation is defined by parametrer
+         ANGLE. [!]
       }
       \sstsubsection{
          QIN = NDF (Read)
@@ -4558,6 +4553,23 @@ for NDF applications.
 
          \sstitem
          Quality arrays are copied unchanged from input to output.
+
+         \sstitem
+         The reference direction in the output NDFs and in {\tt "}LIKE{\tt "} (if
+         supplied) is defined within the PIXEL coordinate system, and is
+         parallel to the projection of the first axis of the POLANAL Frame
+         at the centre of the map.
+
+         \sstitem
+         The reference direction in the input NDFs is defined within the
+         POLANAL Frame itself, and is parallel to the first axis of the
+         POLANAL Frame. For instance, if the first axis of the POLANAL Frame
+         in the input Q or U image corresponds to the RA axis within an
+         (RA,Dec) Frame (i.e. the POLANAL Frame is connected to the SKY
+         Frame using a UnitMap), then the reference direction is parallel to
+         RA at every point in the map.  If the map is close to a pole, this
+         means that the reference direction will vary across the map as it
+         rotates round the pole.
       }
    }
 }
@@ -5921,6 +5933,16 @@ assumed that the reference direction is parallel to the first image axis).
 This section describes the major changes introduced at each release of
 POLPACK.
 
+
+
+\subsection{V3.4-0}
+
+\begin{itemize}
+ \item The ANGLE parameter of the POLROTREF command now specifies the
+ position angle of the required reference direction, rather than the angle
+ though which to rotate the reference direction. {\bf Any existing
+ scripts that use ANGLE will need to be changed.}
+\end{itemize}
 
 
 \subsection{V3.3-0}

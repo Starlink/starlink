@@ -66,7 +66,7 @@
 #-
 
       echo @TCL_LIBS@ -lsla `kaplibs_link_adam -nogks` \
-           `shl_link_adam` \
+           `shl_link_adam` `thr_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
