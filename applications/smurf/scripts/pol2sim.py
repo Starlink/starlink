@@ -645,7 +645,10 @@ try:
                    format(this_ff,sigff))
             invoke("$KAPPA_DIR/stats ndf={0}".format(sigff))
             means = float( starutil.get_task_par( "mean", "stats" ) )
-            mean_com = 1.4142*means/amp4
+            if amp4 > 0.0:
+               mean_com = 1.4142*means/amp4
+            else:
+               mean_com = means
 
 #  Add this mean value onto the common mode.
             invoke("$KAPPA_DIR/cadd in={0} scalar={1} out={2}".format(attcom,mean_com,this_com))
