@@ -1238,7 +1238,7 @@ try:
       invoke( "$KAPPA_DIR/wcsattrib ndf={0} mode=set name=domain newval=POLANAL".format(cube) )
 
 #  Re-instate the required current Frame
-   invoke( "$KAPPA_DIR/wcsframe ndf={0} polanal={1}".format(cube,domain) )
+   invoke( "$KAPPA_DIR/wcsframe ndf={0} frame={1}".format(cube,domain) )
 
 #  POLPACK needs to know the order of I, Q and U in the 3D cube. Store
 #  this information in the POLPACK enstension within "cube.sdf".
