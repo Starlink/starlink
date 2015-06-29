@@ -640,8 +640,8 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    nbolo = pdata->nbolo;
    ncol = pdata->ncol;
 
-   dat = pdata->dat;
-   qua = pdata->qua;
+   dat = pdata->dat + b1;
+   qua = pdata->qua + b1;
    allstates = pdata->allstates;
 
    ipi = pdata->ipi ? pdata->ipi + b1 : NULL;
@@ -674,7 +674,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    if( b1 < nbolo && *status == SAI__OK ) {
 
 /* Loop round all bolometers to be processed by this thread. */
-      for( ibolo = b1; ibolo <= b2; ibolo++ ) {
+      for( ibolo = b1; ibolo <= b2; ibolo++,qua++,dat++ ) {
 
 /* If the returned Stokes parameters are to be with respect to Tracking
    North, get the angle from tracking north at the current bolometer to
@@ -722,8 +722,8 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 
 /* Initialise pointers to the first input data value, quality value and
    state info to be used in the current fitting box. */
-            din = dat + ibolo;
-            qin = qua + ibolo;
+            din = dat;
+            qin = qua;
             state = allstates;
 
 /* Form the sums needed to calculate the best fit Q, U and I. This
@@ -1020,8 +1020,8 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 
 /* Loop over the data again in the same way to calculate the variance of the
    residuals between the above fit and the supplied data. */
-               din = dat + ibolo;
-               qin = qua + ibolo;
+               din = dat;
+               qin = qua;
                state = allstates;
 
                sum1 = 0.0;
