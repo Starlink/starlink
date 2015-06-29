@@ -976,6 +976,46 @@ void kpg1Asffr( AstFrameSet *target, const char *domain, int *ifrm, int *status 
 
 /* ------------------------------- */
 
+F77_SUBROUTINE(kpg1_asmrg)( INTEGER(IWCS1),
+                            INTEGER(IWCS2),
+                            CHARACTER(DOMAIN),
+                            LOGICAL(QUIET),
+                            INTEGER(IND),
+                            INTEGER(STATUS)
+                            TRAIL(DOMAIN) );
+
+void kpg1Asmrg( AstFrameSet *iwcs1, AstFrameSet *iwcs2, const char *domain,
+                int quiet, int ind, int *status ){
+   DECLARE_INTEGER(IWCS1);
+   DECLARE_INTEGER(IWCS2);
+   DECLARE_CHARACTER_DYN(DOMAIN);
+   DECLARE_LOGICAL(QUIET);
+   DECLARE_INTEGER(IND);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( astP2I( iwcs1 ), IWCS1 );
+   F77_EXPORT_INTEGER( astP2I( iwcs2 ), IWCS2 );
+   F77_CREATE_EXPORT_CHARACTER( domain, DOMAIN );
+   F77_EXPORT_LOGICAL( quiet, QUIET );
+   F77_EXPORT_INTEGER( ind, IND );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(kpg1_asmrg)( INTEGER_ARG(&IWCS1),
+                                   INTEGER_ARG(&IWCS2),
+                                   CHARACTER_ARG(DOMAIN),
+                                   LOGICAL_ARG(&QUIET),
+                                   INTEGER_ARG(&IND),
+                                   INTEGER_ARG(&STATUS)
+                                   TRAIL_ARG(DOMAIN) ); )
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_FREE_CHARACTER( DOMAIN );
+}
+
+
+
+/* ------------------------------- */
+
 F77_SUBROUTINE(kpg1_datcp)( CHARACTER(LOC1),
                             CHARACTER(LOC2),
                             CHARACTER(NAME),
