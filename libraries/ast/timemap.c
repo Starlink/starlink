@@ -56,12 +56,12 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -1464,8 +1464,12 @@ double astDat_( double in, int forward, int *status ){
    } else {
 
 
+/* 2015 July 1 */
+      if ( in >= 57204.0 + 36.0/SPD ) {
+         result = -36.0;
+
 /* 2012 July 1 */
-      if( in >= 56109.0 + 35.0/SPD ) {
+      } else if( in >= 56109.0 + 35.0/SPD ) {
          result = -35.0;
 
 /* 2009 January 1 */
