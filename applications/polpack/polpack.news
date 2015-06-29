@@ -5,8 +5,9 @@
 
  The main changes since V3.4 are:
 
- o The ANGLE parameter of the POLROTREF command now specifies the
- position angle of the required referecne direction, rather than the
- angle though which to rotate the reference direction. ANY EXISTING
- SCRIPTS THAT USE "ANGLE" WILL NEED TO BE CHANGED.
+ o  The ANGLE parameter of the POLROTREF command has been removed. A new
+ parameter called AXIS has been added, which allows the new reference
+ direction to be specified. ANY EXISTING SCRIPTS THAT USE "ANGLE" WILL
+ NEED TO BE CHANGED - MAYBE BY USING "KAPPA:WCSADD" TO DEFINE A NEW COORDINATE
+ FRAME IN WHICH ONE OF THE AXES IS TO BE USED AS THE REFERENCE DIRECTION.
 

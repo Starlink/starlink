@@ -5,8 +5,9 @@
 #include "polsub.h"
 #include "math.h"
 
-void pol1Pa2gr( AstFrameSet *iwcs, int axis, int npos, const double *gx0,
-                const double *gy0, double *angle, int *status ){
+void pol1Pa2gr( AstMapping *map, AstFrame *frm, int axis, int npos,
+                const double *gx0, const double *gy0, double *angle,
+                int *status ){
 /*
 *+
 *  Name:
@@ -19,19 +20,25 @@ void pol1Pa2gr( AstFrameSet *iwcs, int axis, int npos, const double *gx0,
 *     Starlink Fortran 77
 
 *  Synopsis:
-*     void pol1Pa2gr( AstFrameSet *iwcs, int axis, int npos, const double *gx0,
-*                     const double *gy0, double *angle, int *status )
+*     void pol1Pa2gr( AstMapping *map, AstFrame *frm, int axis, int npos,
+*                     const double *gx0, const double *gy0, double *angle,
+*                     int *status )
 
 *  Description:
-*     The routine finds the orientation of a WCS axis within GRID coords,
-*     at a given set of GRID positions.
+*     The routine finds the orientation within GRID coords of a specified
+*     axis of the current frame in a supplied FrameSet, a given set
+*     of GRID positions.
 
 *  Arguments:
-*     iwcs
-*        An AST identifier for a WCS FrameSet. Base Frame should be GRID.
+*     map
+*        The Mapping from GRID coords to the Frame specified by "frm". It
+*        should have 2 inputs and 2 outputs.
+*     frm
+*        The 2-dimensional Frame defining the axis for which the position
+*        angle is required.
 *     axis
-*        The index of the axis (0 or 1) defining the position angle to be
-*        converted.
+*        The index of the axis (0 or 1) within "frm" for which the position
+*        angle within GRID coords to be calculated.
 *     npos
 *        The number of supplied positions at which to do the calculation.
 *     gx0
@@ -59,6 +66,9 @@ void pol1Pa2gr( AstFrameSet *iwcs, int axis, int npos, const double *gx0,
 *  History:
 *     22-JUN-2015 (DSB):
 *        Original version.
+*     26-JUN-2015 (DSB):
+*        Use separate Mapping and Frame as arguments, rather than a
+*        FrameSet.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,14 +117,14 @@ void pol1Pa2gr( AstFrameSet *iwcs, int axis, int npos, const double *gx0,
       gy[ 0 ] = gy0[ ipos ];
       gx[ 1 ] = gx[ 0 ] + 0.3536;
       gy[ 1 ] = gy[ 0 ] + 0.3536;
-      astTran2( iwcs, 2, gx, gy, 1, sx, sy );
+      astTran2( map, 2, gx, gy, 1, sx, sy );
 
 /* Find the distance between the two points, within the current Frame. */
       p1[ 0 ] = sx[ 0 ];
       p1[ 1 ] = sy[ 0 ];
       p2[ 0 ] = sx[ 1 ];
       p2[ 1 ] = sy[ 1 ];
-      delta = astDistance( iwcs, p1, p2 );
+      delta = astDistance( frm, p1, p2 );
 
       ipos++;
    }
@@ -130,7 +140,7 @@ void pol1Pa2gr( AstFrameSet *iwcs, int axis, int npos, const double *gx0,
    } else if( *status == SAI__OK ) {
 
 /* Transform the supplied GRID positions into SKY. */
-      astTran2( iwcs, npos, gx0, gy0, 1, sx, sy );
+      astTran2( map, npos, gx0, gy0, 1, sx, sy );
 
 /* Increment each sky position by delta along the required axis. */
       if( axis == 0 ) {
@@ -144,7 +154,7 @@ void pol1Pa2gr( AstFrameSet *iwcs, int axis, int npos, const double *gx0,
       }
 
 /* Transform the incremented sky positions back to GRID. */
-      astTran2( iwcs, npos, sx, sy, 0, gx, gy );
+      astTran2( map, npos, sx, sy, 0, gx, gy );
 
 /* For each position, get the angle from the GRID X axis to the required
    axis. */

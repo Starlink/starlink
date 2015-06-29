@@ -2291,6 +2291,31 @@ package polpack {
 
          helplib {$POLPACK_HELP}
 
+         parameter axis {
+            position 6
+            type _INTEGER
+            vpath DEFAULT
+            ppath DEFAULT
+            default {2}
+            prompt {Index of axis to use as reference direction}
+            helpkey *
+         }
+
+         parameter epoch {
+            type _DOUBLE
+            ppath DYNAMIC CURRENT
+            prompt {Epoch of observation}
+            helpkey *
+         }
+
+         parameter frame {
+            type LITERAL
+            ppath DYNAMIC CURRENT DEFAULT
+            prompt {Co-ordinate Frame defining new reference direction}
+            helpkey *
+            default {PIXEL}
+         }
+
          parameter qin {
             position 1
             type NDF
@@ -2335,15 +2360,6 @@ package polpack {
             vpath DEFAULT
             prompt {Template Q or U NDF}
             default !
-            helpkey *
-         }
-
-         parameter angle {
-            position 6
-            type _REAL
-            vpath PROMPT
-            ppath CURRENT
-            prompt {Number of degrees clockwise rotation, or null}
             helpkey *
          }
 

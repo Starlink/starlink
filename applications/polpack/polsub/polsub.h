@@ -6,12 +6,15 @@
   threads to use. */
 #define POLPACK__THREADS "POLPACK_THREADS"
 
+void pol1Pa2gr( AstMapping *map, AstFrame *frm, int axis, int npos,
+                const double *gx0, const double *gy0, double *angle,
+                int *status );
 
-void pol1Pa2gr( AstFrameSet *iwcs, int axis, int npos, const double *gx0,
-                const double *gy0, double *angle, int *status );
+void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
+                int ifrm, int iaxis, const double *qin,
+                const double *uin, double *qout, double *uout,
+                const double *qinv, const double *uinv, double *qoutv,
+                double *uoutv, int *status );
 
-void pol1Rotqu( int nrow, int ncol, AstFrameSet *wcs, float angle,
-                int var, const double *qin, const double *uin,
-                double *qout, double *uout, int *status );
 
 #endif

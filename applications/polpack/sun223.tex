@@ -4488,22 +4488,50 @@ for NDF applications.
 }{
    \sstdescription{
       This application creates a new pair of Q and U images from a
-      supplied pair of Q and U images, by setting the reference
-      direction to a specified angle. It is assumed that the supplied
-      Q and U images are aligned in pixel coordinates, and have the
-      same reference direction.
+      supplied pair of Q and U images, by changing the polarimetric
+      reference direction. The required direction can either be inherited
+      from another NDF (see parameter LIKE) or specified as a fixed angle
+      within a specified coordinate Frame (see parameters ANGLE and FRAME).
+      It is assumed that the supplied Q and U images are aligned in pixel
+      coordinates, and have the same reference direction.
    }
    \sstusage{
       polrotref qin uin qout uout like angle
    }
    \sstparameters{
       \sstsubsection{
-         ANGLE = \_REAL (Read)
+         AXIS = \_INTEGER (Read)
       }{
-         The angle, in degrees, from north to the required new reference
-         direction, measured positive in the same sense as rotation from
-         north to east. It must lie between -360 and 360 degrees. Only
-         accessed if parameter LIKE is set to null.
+         Parameter AXIS is used only if a null value is supplied for parameter
+         LIKE, in which case AXIS is the index of the axis within the
+         coordinate frame specified by parameter FRAME that is to be used
+         as the reference direction in the output NDFs. The first axis has
+         index 1. [2]
+      }
+      \sstsubsection{
+         FRAME = LITERAL (Read)
+      }{
+         A string specifying the co-ordinate Frame to which parameter
+         AXIS refers. If a null parameter value is supplied, then the
+         current Frame within the NDF specified by parameter QIN is used.
+         The string can be one of the following:
+
+         \sstitemlist{
+
+            \sstitem
+            A domain name such as SKY, SPECTRUM, AXIS, PIXEL, etc.
+
+            \sstitem
+            An integer value giving the index of the required Frame within
+            the WCS component.
+
+            \sstitem
+            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) (see
+            section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95). Using an SCS value
+            is equivalent to specifying {\tt "}SKY{\tt "} for this parameter and then setting
+            the System attribute (to {\tt "}FK5{\tt "}, {\tt "}Galactic{\tt "}, etc.) using KAPPA command
+            WCSATTRIB. [{\tt "}PIXEL{\tt "}]
+         }
       }
       \sstsubsection{
          LIKE = NDF (Read)
@@ -4513,7 +4541,7 @@ for NDF applications.
          WCS component. The supplied Q and U images are modified so that
          they use the same reference direction as the supplied NDF. If
          null (!) is supplied, the rotation is defined by parametrer
-         ANGLE. [!]
+         AXIS. [!]
       }
       \sstsubsection{
          QIN = NDF (Read)
@@ -4555,21 +4583,9 @@ for NDF applications.
          Quality arrays are copied unchanged from input to output.
 
          \sstitem
-         The reference direction in the output NDFs and in {\tt "}LIKE{\tt "} (if
-         supplied) is defined within the PIXEL coordinate system, and is
-         parallel to the projection of the first axis of the POLANAL Frame
-         at the centre of the map.
-
-         \sstitem
-         The reference direction in the input NDFs is defined within the
-         POLANAL Frame itself, and is parallel to the first axis of the
-         POLANAL Frame. For instance, if the first axis of the POLANAL Frame
-         in the input Q or U image corresponds to the RA axis within an
-         (RA,Dec) Frame (i.e. the POLANAL Frame is connected to the SKY
-         Frame using a UnitMap), then the reference direction is parallel to
-         RA at every point in the map.  If the map is close to a pole, this
-         means that the reference direction will vary across the map as it
-         rotates round the pole.
+         The reference direction is defined as being constant within the
+         POLANAL Frame. It will not be constant within another Frame if the
+         transformation from POLANAL to that Frame is non-linear.
       }
    }
 }
@@ -5938,10 +5954,11 @@ POLPACK.
 \subsection{V3.4-0}
 
 \begin{itemize}
- \item The ANGLE parameter of the POLROTREF command now specifies the
- position angle of the required reference direction, rather than the angle
- though which to rotate the reference direction. {\bf Any existing
- scripts that use ANGLE will need to be changed.}
+ \item The ANGLE parameter of the POLROTREF command has been removed. A new
+ parameter called AXIS has been added, which allows the new reference
+ direction to be specified. {\bf Any existing scripts that use ANGLE will
+ need to be changed - maybe by using KAPPA:WCSADD to define a new coordinate
+ frame in which one of the axes is to be used as the reference direction.}
 \end{itemize}
 
 

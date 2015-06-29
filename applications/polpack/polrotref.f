@@ -21,27 +21,46 @@
 
 *  Description:
 *     This application creates a new pair of Q and U images from a
-*     supplied pair of Q and U images, by setting the reference
-*     direction to a specified angle. It is assumed that the supplied
-*     Q and U images are aligned in pixel coordinates, and have the
-*     same reference direction.
+*     supplied pair of Q and U images, by changing the polarimetric
+*     reference direction. The required direction can either be inherited
+*     from another NDF (see parameter LIKE) or specified as a fixed angle
+*     within a specified coordinate Frame (see parameters ANGLE and FRAME).
+*     It is assumed that the supplied Q and U images are aligned in pixel
+*     coordinates, and have the same reference direction.
 
 *  Usage:
 *     polrotref qin uin qout uout like angle
 
 *  ADAM Parameters:
-*     ANGLE = _REAL (Read)
-*        The angle, in degrees, from north to the required new reference
-*        direction, measured positive in the same sense as rotation from
-*        north to east. It must lie between -360 and 360 degrees. Only
-*        accessed if parameter LIKE is set to null.
+*     AXIS = _INTEGER (Read)
+*        Parameter AXIS is used only if a null value is supplied for parameter
+*        LIKE, in which case AXIS is the index of the axis within the
+*        coordinate frame specified by parameter FRAME that is to be used
+*        as the reference direction in the output NDFs. The first axis has
+*        index 1. [2]
+*     FRAME = LITERAL (Read)
+*        A string specifying the co-ordinate Frame to which parameter
+*        AXIS refers. If a null parameter value is supplied, then the
+*        current Frame within the NDF specified by parameter QIN is used.
+*        The string can be one of the following:
+*
+*        - A domain name such as SKY, SPECTRUM, AXIS, PIXEL, etc.
+*
+*        - An integer value giving the index of the required Frame within
+*        the WCS component.
+*
+*        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
+*        section "Sky Co-ordinate Systems" in SUN/95). Using an SCS value
+*        is equivalent to specifying "SKY" for this parameter and then setting
+*        the System attribute (to "FK5", "Galactic", etc.) using KAPPA command
+*        WCSATTRIB. ["PIXEL"]
 *     LIKE = NDF (Read)
 *        A 2D Q or U NDF that defines the new reference direction. The
 *        supplied NDF should have a Frame with Domain "POLANAL" in its
 *        WCS component. The supplied Q and U images are modified so that
 *        they use the same reference direction as the supplied NDF. If
 *        null (!) is supplied, the rotation is defined by parametrer
-*        ANGLE. [!]
+*        AXIS. [!]
 *     QIN = NDF (Read)
 *        The 2D input Q image. The WCS component of this NDF must contain
 *        a POLANAL Frame.
@@ -59,19 +78,9 @@
 *     - The supplied Q and U arrays are mapped as double precision values.
 *     - Variance arrays are rotated in the same was as Data arrays.
 *     - Quality arrays are copied unchanged from input to output.
-*     - The reference direction in the output NDFs and in "LIKE" (if
-*     supplied) is defined within the PIXEL coordinate system, and is
-*     parallel to the projection of the first axis of the POLANAL Frame
-*     at the centre of the map.
-*     - The reference direction in the input NDFs is defined within the
-*     POLANAL Frame itself, and is parallel to the first axis of the
-*     POLANAL Frame. For instance, if the first axis of the POLANAL Frame
-*     in the input Q or U image corresponds to the RA axis within an
-*     (RA,Dec) Frame (i.e. the POLANAL Frame is connected to the SKY
-*     Frame using a UnitMap), then the reference direction is parallel to
-*     RA at every point in the map.  If the map is close to a pole, this
-*     means that the reference direction will vary across the map as it
-*     rotates round the pole.
+*     - The reference direction is defined as being constant within the
+*     POLANAL Frame. It will not be constant within another Frame if the
+*     transformation from POLANAL to that Frame is non-linear.
 
 *  Copyright:
 *     Copyright (C) 2012 Science and Technology Facilities Council.
@@ -112,6 +121,10 @@
 *        - Changed ANGLE from a rotation angle to a position angle.
 *        - Take account of variations iun the direction of north across
 *        the map.
+*     26-JUN-2015 (DSB):
+*        Added parameter FRAME.
+*     29-JUN-2015 (DSB):
+*        Replace parameter ANGLE with parameter AXIS.
 *     {enter_further_changes_here}
 
 *-
@@ -131,20 +144,27 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      DOUBLE PRECISION ANGLE     ! New position angle for POLANAL
+      INTEGER AXIS               ! The FRAME axis to use
       INTEGER DIMS( NDF__MXDIM)  ! Lengths of significant dimensions
       INTEGER EL                 ! Number of elements mapped
+      INTEGER ICUR               ! Index of current Frame
+      INTEGER IFRM               ! Index of required frame
       INTEGER INDFL              ! Template NDF identifier
       INTEGER INDFQI             ! Input Q NDF identifier
       INTEGER INDFQO             ! Output Q NDF identifier
       INTEGER INDFUI             ! Input U NDF identifier
       INTEGER INDFUO             ! Output U NDF identifier
       INTEGER IPQIN              ! Pointer to mapped input Q array
+      INTEGER IPQINV             ! Pointer to mapped input Q variances
       INTEGER IPQOUT             ! Pointer to mapped output Q array
+      INTEGER IPQOUTV            ! Pointer to mapped output Q variances
       INTEGER IPUIN              ! Pointer to mapped input U array
+      INTEGER IPUINV             ! Pointer to mapped input U variances
       INTEGER IPUOUT             ! Pointer to mapped output U array
+      INTEGER IPUOUTV            ! Pointer to mapped output U variances
       INTEGER IWCS               ! WCS FrameSet for input Q and U NDFs
       INTEGER IWCSL              ! WCS FrameSet for template NDF
+      INTEGER NAX                ! No. of axes in required frame
       INTEGER NTHAX              ! Zero-based index of north axis
       INTEGER SDIM( NDF__MXDIM)  ! Indices of significant dimensions
       INTEGER SDIML( NDF__MXDIM)  ! Indices of significant dimensions
@@ -155,7 +175,6 @@
       LOGICAL QVAR               ! Q NDF has variance?
       LOGICAL THERE              ! Does component exist?
       LOGICAL UVAR               ! U NDF has variance?
-      REAL RANGLE                ! REAL angle value
 *.
 
 *  Check the global inherited status.
@@ -186,76 +205,6 @@
       DIMS( 1 ) = SUBND( 1 ) - SLBND( 1 ) + 1
       DIMS( 2 ) = SUBND( 2 ) - SLBND( 2 ) + 1
 
-*  If an NDF is specified via parameter LIKE, get it, and determine the
-*  position angle of the new reference direction.
-      IF( STATUS .NE. SAI__OK ) GO TO 999
-      CALL LPG_ASSOC( 'LIKE', 'READ', INDFL, STATUS )
-      IF( STATUS .EQ. SAI__OK ) THEN
-
-*  Get the WCS FrameSet from the template NDF.
-         CALL KPG1_ASGET( INDFL, 2, .FALSE., .TRUE., .TRUE., SDIML,
-     :                    SLBNDL, SUBNDL, IWCSL, STATUS )
-
-*  Get the anti-clockwise angle from the GRID X axis to the reference
-*  direction in the template, in degrees.
-         CALL POL1_GTANG( INDFL, 0, IWCSL, RANGLE, STATUS )
-
-*  Modify this angle to that it refers to the GRID coordinate system of
-*  the supplied Q image.
-         CALL POL1_TRANG( IWCS, IWCSL, SLBND, SUBND, RANGLE, STATUS )
-
-*  Convert to double precision radians.
-         IF( RANGLE .NE. VAL__BADD ) THEN
-            ANGLE = AST__DD2R*RANGLE
-         ELSE
-            ANGLE = AST__BAD
-         END IF
-
-*  Otherwise, annul the error and get the angle via parameter ANGLE.
-      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
-         CALL ERR_ANNUL( STATUS )
-
-*  Get the position angle of the new reference direction.
-         CALL PAR_GDR0R( 'ANGLE', 0.0, -360.0 + VAL__SMLR,
-     :                   360.0 - VAL__SMLR, .FALSE., RANGLE, STATUS )
-
-*  If a null value was supplied, use zero (i.e. put the reference
-*  direction parallel to north).
-         IF ( STATUS .EQ. PAR__NULL ) THEN
-            CALL ERR_ANNUL( STATUS )
-            RANGLE = 0.0
-         END IF
-
-*  Convert to double precision radians.
-         ANGLE = AST__DD2R*RANGLE
-
-*  Get the zero-based index of the latitude (north) axis in the current
-*  Frame of the FrameSet. If it is not a SkyFrame, annull the error and
-*  assume that north is the second axis (i.e. zero-based axis index 1).
-         IF( STATUS .EQ. SAI__OK ) THEN
-            NTHAX = AST_GETI( IWCS, 'LatAxis', STATUS )
-            IF( STATUS .EQ. SAI__OK ) THEN
-               NTHAX = NTHAX - 1
-            ELSE
-               CALL ERR_ANNUL( STATUS )
-               NTHAX = 1
-            END IF
-         END IF
-
-*  Convert the position angle into an angle from the GRID X axis within
-*  the output Q WCS.
-         CALL POL1_PA2GR( IWCS, NTHAX, 0.5D0*(SLBND(1)+SLBND(2)),
-     :                    0.5D0*(SUBND(1)+SUBND(2)), ANGLE,
-     :                    STATUS )
-      END IF
-
-*  Check the angle is OK.
-      IF ( ANGLE .EQ. AST__BAD .AND. STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'POLROTREF_ERR1', 'Required reference '//
-     :                 'direction is undefined.', STATUS )
-      END IF
-
 *  Propagate the two input NDFs to form the output NDFs.
       CALL LPG_PROP( INDFQI, 'Title,Label,Units', 'QOUT', INDFQO,
      :               STATUS )
@@ -265,6 +214,41 @@
 *  Set their shapes to exclude any insignificant axes
       CALL NDF_SBND( 2, SLBND, SUBND, INDFQO, STATUS )
       CALL NDF_SBND( 2, SLBND, SUBND, INDFUO, STATUS )
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  If an NDF is specified via parameter LIKE, get its WCS FrameSet.
+      CALL LPG_ASSOC( 'LIKE', 'READ', INDFL, STATUS )
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL KPG1_ASGET( INDFL, 2, .FALSE., .TRUE., .TRUE., SDIML,
+     :                    SLBNDL, SUBNDL, IWCSL, STATUS )
+
+*  Otherwise, annul the error and get the required AXIS and FRAME.
+      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         IWCSL = AST__NULL
+
+*  Record the index of the original current Frame.
+         ICUR = AST_GETI( IWCS, 'CURRENT', STATUS )
+
+*  Set the new Current Frame using parameter FRAME. If "WORLD" co-ordinates
+*  are requested, use PIXEL. If "DATA" co-ordinates are requested, use
+*  "AXIS".
+         CALL NDF_MSG( 'NDF', INDFQI )
+         CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IWCS, 'PIXEL', 'AXIS',
+     :                    .TRUE., '^NDF', STATUS )
+
+*  Get the index of the Frame, and the number of axes in the Frame, and
+*  then restore the original current Frame.
+         IFRM = AST_GETI( IWCS, 'CURRENT', STATUS )
+         NAX = AST_GETI( IWCS, 'NAXES', STATUS )
+         CALL AST_SETI( IWCS, 'CURRENT', ICUR, STATUS )
+
+*  Get the index of the Frame to use.
+         CALL PAR_GDR0I( 'AXIS', 2, 1, NAX, .TRUE., AXIS, STATUS )
+
+      END IF
 
 *  Map the data array of the two input and two output NDFs.
       CALL NDF_MAP( INDFQI, 'Data', '_DOUBLE', 'Read', IPQIN, EL,
@@ -276,44 +260,31 @@
       CALL NDF_MAP( INDFUO, 'Data', '_DOUBLE', 'Write', IPUOUT, EL,
      :              STATUS )
 
-*  Produce the rotated Q and U values.
-      CALL POL1_ROTQU( DIMS(2), DIMS(1), IWCS, ANGLE, .FALSE.,
-     :                 %VAL( CNF_PVAL( IPQIN ) ),
-     :                 %VAL( CNF_PVAL( IPUIN ) ),
-     :                 %VAL( CNF_PVAL( IPQOUT ) ),
-     :                 %VAL( CNF_PVAL( IPUOUT ) ), STATUS )
-
-*  Unmap the DATA arrays.
-      CALL NDF_UNMAP( INDFQI, '*', STATUS )
-      CALL NDF_UNMAP( INDFUI, '*', STATUS )
-      CALL NDF_UNMAP( INDFQO, '*', STATUS )
-      CALL NDF_UNMAP( INDFUO, '*', STATUS )
-
-*  If both input NDFs have a Variance array, rotate them.
+*  If both input NDFs have a Variance array, map them, and also the
+*  output variance arrays.
       CALL NDF_STATE( INDFQI, 'Variance', QVAR, STATUS )
       CALL NDF_STATE( INDFUI, 'Variance', UVAR, STATUS )
       IF( QVAR .AND. UVAR ) THEN
-         CALL NDF_MAP( INDFQI, 'Variance', '_DOUBLE', 'Read', IPQIN, EL,
-     :                 STATUS )
-         CALL NDF_MAP( INDFUI, 'Variance', '_DOUBLE', 'Read', IPUIN, EL,
-     :                 STATUS )
-         CALL NDF_MAP( INDFQO, 'Variance', '_DOUBLE', 'Write', IPQOUT,
+         CALL NDF_MAP( INDFQI, 'Variance', '_DOUBLE', 'Read', IPQINV,
      :                 EL, STATUS )
-         CALL NDF_MAP( INDFUO, 'Variance', '_DOUBLE', 'Write', IPUOUT,
+         CALL NDF_MAP( INDFUI, 'Variance', '_DOUBLE', 'Read', IPUINV,
      :                 EL, STATUS )
-         CALL POL1_ROTQU( DIMS(2), DIMS(1), IWCS, ANGLE, .TRUE.,
-     :                    %VAL( CNF_PVAL( IPQIN ) ),
-     :                    %VAL( CNF_PVAL( IPUIN ) ),
-     :                    %VAL( CNF_PVAL( IPQOUT ) ),
-     :                    %VAL( CNF_PVAL( IPUOUT ) ), STATUS )
-         CALL NDF_UNMAP( INDFQI, '*', STATUS )
-         CALL NDF_UNMAP( INDFUI, '*', STATUS )
-         CALL NDF_UNMAP( INDFQO, '*', STATUS )
-         CALL NDF_UNMAP( INDFUO, '*', STATUS )
+         CALL NDF_MAP( INDFQO, 'Variance', '_DOUBLE', 'Write', IPQOUTV,
+     :                 EL, STATUS )
+         CALL NDF_MAP( INDFUO, 'Variance', '_DOUBLE', 'Write', IPUOUTV,
+     :                 EL, STATUS )
       END IF
 
-*  Create a new POLANAL Frame describing the new ANGROT value.
-      CALL POL1_PTANG( REAL( AST__DR2D*ANGLE ), IWCS, STATUS )
+*  Rotate everything.
+      CALL POL1_ROTRF( DIMS(2), DIMS(1), IWCS, IWCSL, IFRM, AXIS - 1,
+     :                 QVAR .AND. UVAR, %VAL( CNF_PVAL( IPQIN ) ),
+     :                 %VAL( CNF_PVAL( IPUIN ) ),
+     :                 %VAL( CNF_PVAL( IPQOUT ) ),
+     :                 %VAL( CNF_PVAL( IPUOUT ) ),
+     :                 %VAL( CNF_PVAL( IPQINV ) ),
+     :                 %VAL( CNF_PVAL( IPUINV ) ),
+     :                 %VAL( CNF_PVAL( IPQOUTV ) ),
+     :                 %VAL( CNF_PVAL( IPUOUTV ) ), STATUS )
 
 *  If the Q input NDF has a Quality array, copy it to the output.
       CALL NDF_STATE( INDFQI, 'Quality', THERE, STATUS )

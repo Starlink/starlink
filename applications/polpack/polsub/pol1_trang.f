@@ -105,8 +105,8 @@
 
 *  Get the base Frame position (=GRID coords) at the centre of the array
 *  associated with IWCS.
-      GX = 0.5D0*( LBND( 1 ) + UBND( 1 ) )
-      GY = 0.5D0*( LBND( 2 ) + UBND( 2 ) )
+      GX = 0.5D0*( UBND( 1 ) - LBND( 1 ) ) + 1
+      GY = 0.5D0*( UBND( 2 ) - LBND( 2 ) ) + 1
 
 *  Transform into the base Frame of IWCSL.
       CALL AST_TRAN2( MAP, 1, GX, GY, .FALSE., GXL, GYL, STATUS )
