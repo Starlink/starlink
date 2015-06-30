@@ -217,9 +217,6 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
    The GRID frame had index "ibase" within "wcs" so now has index
    "ibase+nf" within "twcs". */
       map = astGetMapping( twcs, ibase + nf, AST__BASE );
-      printf("%d %d\n", ibase, nf );
-      printf("%d \n", astGetI( twcs, "Base" ) );
-      astShow( map );
 
 /* Combine this Mapping with the Mapping from twcs GRID coords to twcs
    POLANAL coords, to get the Mapping from wcs GRID coords to twcs
@@ -527,8 +524,6 @@ static void pol1RotrfJob( void *job_data, int *status ) {
 
 /* Find the anti-clockwise rotation to apply to the Q/U values. */
             rot = *pbeta1 - *pbeta2;
-
-printf("rot=%g ((%g)-(%g))\n", rot*AST__DR2D, *pbeta1*AST__DR2D, *pbeta2*AST__DR2D );
 
 /*  Calculate the trig terms. */
             cos2a = cos( 2*rot );
