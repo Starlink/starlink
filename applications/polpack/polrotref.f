@@ -224,6 +224,10 @@
          CALL KPG1_ASGET( INDFL, 2, .FALSE., .TRUE., .TRUE., SDIML,
      :                    SLBNDL, SUBNDL, IWCSL, STATUS )
 
+*  The reference direction is axis 1 (i.e. the first axis) of the POLANAL
+*  Frame within IWCSL.
+         AXIS = 1
+
 *  Otherwise, annul the error and get the required AXIS and FRAME.
       ELSE IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
