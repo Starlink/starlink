@@ -3277,6 +3277,7 @@ static AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1,
    double *b0;                   /* Pointer to next scale term from WinMap 1 */
    double *b1;                   /* Pointer to next scale term from WinMap 2 */
    double *br;                   /* Pointer to next scale term in result */
+   double amean;                 /* Geometric mean of the offset terms */
    int cancel;                   /* Do the two WinMaps cancel out? */
    int i;                        /* Axis index */
    int invert[ 2 ];              /* Array of invert flags */
@@ -3314,7 +3315,7 @@ static AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1,
 
 /* Check for equal and opposite WinMaps. Do this explicitly using the
    supplied Mappings rather than the values returned by astWinTerms to
-   avoid the affects of rounding error sin the inversions performed by
+   avoid the affects of rounding errors in the inversions performed by
    astWinTerms. */
          if( ( inv1 == 0 ) != ( inv2 == 0 ) ) {
             cancel = 1;
@@ -3341,7 +3342,8 @@ static AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1,
 /* Otherwise, merge the scale and shift terms for the two WinMaps, overwriting
    the terms for the first WinMap. To be merged in series, both WinMaps must
    have the same number of axes, so it matters not whether we use nin[ 0 ]
-   or nin[ 1 ] to specify the number of axes. */
+   or nin[ 1 ] to specify the number of axes. Include rounding checks for values
+   close to a unit mapping. */
          } else {
             a0 = a[ 0 ];
             b0 = b[ 0 ];
@@ -3352,9 +3354,14 @@ static AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1,
                if( *a0 != AST__BAD && *b0 != AST__BAD &&
                    *a1 != AST__BAD && *b1 != AST__BAD ){
 
+                  amean = sqrt(fabs((*a0)*(*a1)));
+
                   *a0 *= (*b1);
                   *a0 += (*a1);
                   *b0 *= (*b1);
+
+                  if( fabs( *a0 ) < amean*1E-15 ) *a0 = 0.0;
+                  if( fabs( *b0 - 1.0 ) < 1E-15 ) *b0 = 1.0;
 
                } else {
                   *a0 = AST__BAD;
