@@ -15,8 +15,8 @@
 *  Description:
 *     This routine returns a permutation array that embodies a guess at
 *     the correspondance between pixel and WCS axes. In some cases there
-*     is no defined correspondance between WCS adn pixel axes, and so we
-*     need to just guess at what he user mean when entering WCS axis
+*     is no defined correspondance between WCS and pixel axes, and so we
+*     need to just guess at what the user means when entering WCS axis
 *     values in a certain order (e.g. in an NDF section specified in WCS).
 *     For instance in a 2D image of the sky there no way of assigning one
 *     pixel axis to the RA axis and the other pixel axis to the Dec axis.
@@ -28,6 +28,10 @@
 *     Having said that, the 45 degree case is rare and we will usually be
 *     able to have some confidence that the user will associate each WCS
 *     axis with the "closest" pixel axis.
+*
+*     In the 45 degree case, the returned permuatation array is based on
+*     the assumption that each WCS axis corresponds to the pixel axis with
+*     the same index as the WCS axis.
 
 *  Arguments:
 *     MAP = INTEGER (Given)
@@ -74,6 +78,9 @@
 *     27-JUN-2012 (DSB):
 *        Return 0 for any pixel axis that has no WCS axis rather than
 *        reporting an error.
+*     1-JUL-2015 (DSB):
+*        Identify the 45 degree case, and return a PERM array that
+*        assumes that pixel and wcs axes have the same index.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -108,14 +115,17 @@
       DOUBLE PRECISION DLBNDD( NDF__MXDIM )
       DOUBLE PRECISION DUBNDD( NDF__MXDIM )
       DOUBLE PRECISION MAXCHANGE
+      DOUBLE PRECISION MAXCHANGE2
       DOUBLE PRECISION TESTPIX( NDF__MXDIM )
       DOUBLE PRECISION TESTWCS( NDF__MXDIM )
       DOUBLE PRECISION TESTWCS2( NDF__MXDIM )
+      INTEGER DIFF
       INTEGER ICELL
       INTEGER IPIX
       INTEGER IWCS
       INTEGER JPIX
       INTEGER JWCS
+      INTEGER MINDIFF
       INTEGER NCELL
       INTEGER NCELLTOT
       INTEGER NPIX
@@ -253,8 +263,10 @@
 
 *  Find the WCS axis that has changed the most from the original TESTWCS
 *  position. Ignore WCS axes that have already been assined to a pixel axis.
+*  We keep a note of the second best axis.
                   JWCS = 0
                   MAXCHANGE = -1.0
+                  MAXCHANGE2 = -1.0
                   DO IWCS = 1, NWCS
 
                      USED = .FALSE.
@@ -266,6 +278,7 @@
                         CHANGE = ABS( TESTWCS( IWCS )
      :                                - TESTWCS2( IWCS ) )
                         IF( CHANGE .GT. MAXCHANGE ) THEN
+                           MAXCHANGE2 = MAXCHANGE
                            MAXCHANGE = CHANGE
                            JWCS = IWCS
                         END IF
@@ -273,11 +286,47 @@
 
                   END DO
 
-                  IF( JWCS .GE. 1 .AND. JWCS .LE. NWCS )
+*  Only assign the axis if the best axis was significantly better than
+*  the second best axis. This means that WCS axes at 45 degrees to the
+*  pixel axes will not be assigned.
+                  IF( JWCS .GE. 1 .AND. JWCS .LE. NWCS .AND.
+     :                MAXCHANGE .GT. MAXCHANGE2*1.1 )
      :              PERM( IPIX ) = JWCS
 
 *  Reset the test pixel position back to its original value.
                   TESTPIX( IPIX ) = TESTPIX( IPIX ) - 0.1
+
+               END IF
+            END DO
+
+*  Loop round any pixel axes that have still not been associated with a WCS
+*  axis. Each is associated with the remaining unassigned WCS axis that
+*  has the closest index.
+            DO IWCS = 1, NWCS
+               WCSAX( IWCS ) = 0
+            END DO
+
+            DO IPIX = 1, NPIX
+               IF( PERM( IPIX ) .GT. 0 ) THEN
+                  WCSAX( PERM( IPIX ) ) = IPIX
+               END IF
+            END DO
+
+            DO IPIX = 1, NPIX
+               IF( PERM( IPIX ) .EQ. 0 ) THEN
+
+                  MINDIFF = 2*NDF__MXDIM
+                  DO IWCS = 1, NWCS
+                     IF( WCSAX( IWCS ) .EQ. 0 ) THEN
+                        DIFF = ABS( IWCS - IPIX )
+                        IF( DIFF .LT. MINDIFF ) THEN
+                           PERM( IPIX ) = IWCS
+                           MINDIFF = DIFF
+                        END IF
+                     END IF
+                  END DO
+
+                  IF( PERM( IPIX ) .GT. 0 ) WCSAX( PERM( IPIX ) ) = IPIX
 
                END IF
             END DO
