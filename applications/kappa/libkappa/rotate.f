@@ -50,6 +50,10 @@
 *        Frame in the input NDF is not a celestial co-ordinate frame, then
 *        the rotation angle is chosen to make the second axis of the
 *        current Frame vertical.
+*     ANGLEUSED = _REAL (Write)
+*        An output parameter holding the rotation angle actually used, in
+*        degrees. This is useful if a null value is supplied for parameter
+*        ANGLE.
 *     AXES(2) = _INTEGER (Read)
 *        This parameter is only accessed if the NDF has exactly three
 *        significant pixel axes.  It should be set to the indices of the
@@ -636,6 +640,9 @@
       DO WHILE ( ANGLE .GT. 360.0 )
          ANGLE = ANGLE - 360.0
       END DO
+
+*  Write out the angle actually used.
+      CALL PAR_PUT0R( 'ANGLEUSED', ANGLE, STATUS )
 
 *  Look for the special cases.
 *  A simple 0-degree rotation...

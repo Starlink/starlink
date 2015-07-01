@@ -40358,6 +40358,15 @@ KAPPA: \htmlref{CADD}{CADD},
    \sstusage{
       rotate in out angle
    }
+   \sstresparameters{
+      \sstsubsection{
+         ANGLEUSED( ) = \_REAL (Write)
+      }{
+         An output parameter holding the rotation angle actually used, in
+         degrees. This is useful if a null value is supplied for parameter
+         ANGLE.
+      }
+   }
    \sstparameters{
       \sstsubsection{
          ANGLE = \_REAL (Read)
@@ -52830,6 +52839,13 @@ The following applications have been modified:
         coefficients are stored when operating in looping mode (\emph{i.e.}
         LOOP=\texttt{TRUE}).
       \end{itemize}
+
+   \item [\htmlref{ROTATE}{ROTATE}]\mbox{}
+      \begin{itemize}
+        \item Now writes out the rotation angle actually used to an output
+         parameter (ANGLEUSED).
+      \end{itemize}
+
 \end{description}
 
 \section{Release Notes---V2.2}

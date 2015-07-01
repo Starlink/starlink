@@ -23,6 +23,11 @@
      coefficients are stored when operating in looping mode (i.e.
      LOOP=TRUE).
 
+   o ROTATE
+
+     -  Now writes out the rotation angle actually used to an output
+     parameter (ANGLEUSED).
+
 1 KAPPA_Version_2.2
 
    A new release of KAPPA is available in Starlink 2015A.  The main

@@ -15957,6 +15957,14 @@ iraf! {
             helpkey *
          }
 
+         parameter angleused {
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+         }
+
          parameter axes {
             type _INTEGER
             vpath DYNAMIC DEFAULT
