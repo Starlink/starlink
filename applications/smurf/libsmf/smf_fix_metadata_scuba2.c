@@ -97,12 +97,9 @@
 *        If airmass cannot be determined, only annull the error if it
 *        is SAI__ERROR (i.e. do not hide errors from instra-structure
 *        libraries that might indicate a programming problem).
-*     2014-12-16 (DSB):
-*        Do an explicit check to see if the supplied scan goes crazy,
-*        rather than using a blacklist of known crazy scans.
 
 *  Copyright:
-*     Copyright (C) 2009-2014 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -132,7 +129,6 @@
 #include "prm_par.h"
 #include "mers.h"
 #include "star/one.h"
-#include "star/pal.h"
 
 #include "smf.h"
 #include "smf_err.h"
@@ -151,7 +147,6 @@ struct FitsHeaderStruct {
 
 /* Local helper routines */
 static void smf__calc_wvm_index( smfHead * hdr, const char * amhdr, size_t index, double *tau, double * time, int * status );
-static int smf__validate_scan( smfHead *hdr, int *status );
 
 
 #define FUNC_NAME "smf_fix_metadata_scuba2"
@@ -511,19 +506,27 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     have_fixed |= SMF__FIXED_FITSHDR;
   }
 
-  /* If the telescope goes crazy during the subscan (i.e. spends a significant 
-     amount of time outside the expected map area), null the telescope data
-     for the subscan. */
-  if ( !smf__validate_scan( hdr, status ) ) {
-    size_t nframes = hdr->nframes;
-    JCMTState * curstate;
-    size_t i;
-    for ( i=0; i<nframes; i++ ) {
-      curstate = &((hdr->allState)[i]);
-      curstate->jos_drcontrol |= DRCNTRL__PTCS_BIT;
+  /* The telescope goes crazy at the end of observation 56 on 20110530. Null
+     the telescope data for subscans 30, 31 and 32 */
+  if (fitsvals.utdate == 20110530) {
+    char obsid[81];
+    smf_getobsidss( hdr->fitshdr, obsid, sizeof(obsid), NULL, 0, status);
+
+    if (strcmp(obsid, "scuba2_00056_20110530T135530") == 0 ) {
+      int subscan;
+      smf_getfitsi( hdr, "NSUBSCAN", &subscan, status );
+      if (subscan == 30 || subscan == 31 || subscan == 32) {
+        size_t nframes = hdr->nframes;
+        JCMTState * curstate;
+        size_t i;
+        for ( i=0; i<nframes; i++ ) {
+          curstate = &((hdr->allState)[i]);
+          curstate->jos_drcontrol |= DRCNTRL__PTCS_BIT;
+        }
+        msgOutif( msglev, "", INDENT "Blanking telescope data due to extreme excursion", status );
+        have_fixed |= SMF__FIXED_JCMTSTATE;
+      }
     }
-    msgOutif( msglev, "", INDENT "Blanking telescope data due to extreme excursion", status );
-    have_fixed |= SMF__FIXED_JCMTSTATE;
   }
 
   /* The second half of observation 14 on 20111215 (scuba2_00014_20111215T061536)
@@ -579,6 +582,53 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     }
   }
 
+  /* The telescope goes crazy at the end of observation 61 on 2013-03-29. Null
+     the telescope data for subscans 64 and 65*/
+  if (fitsvals.utdate == 20130329) {
+    char obsid[61];
+    smf_getobsidss( hdr->fitshdr, obsid, sizeof(obsid), NULL, 0, status);
+
+    if (strcmp(obsid, "scuba2_00061_20130329T163501") == 0 ) {
+      int subscan;
+      smf_getfitsi( hdr, "NSUBSCAN", &subscan, status );
+      if (subscan == 64 || subscan == 65) {
+        size_t nframes = hdr->nframes;
+        JCMTState * curstate;
+        size_t i;
+        for ( i=0; i<nframes; i++ ) {
+          curstate = &((hdr->allState)[i]);
+          curstate->jos_drcontrol |= DRCNTRL__PTCS_BIT;
+        }
+        msgOutif( msglev, "", INDENT "Blanking telescope data due to extreme excursion", status );
+        have_fixed |= SMF__FIXED_JCMTSTATE;
+      }
+    }
+  }
+
+  /* The telescope goes crazy at the start of observation 71 on 2012-10-04. Null
+     the telescope data for subscans 3*/
+  if (fitsvals.utdate == 20121004) {
+    char obsid[71];
+    smf_getobsidss( hdr->fitshdr, obsid, sizeof(obsid), NULL, 0, status);
+
+    if (strcmp(obsid, "scuba2_00071_20121004T153603") == 0 ) {
+      int subscan;
+      smf_getfitsi( hdr, "NSUBSCAN", &subscan, status );
+      if (subscan == 3 ){
+        size_t nframes = hdr->nframes;
+        JCMTState * curstate;
+        size_t i;
+        for ( i=0; i<nframes; i++ ) {
+          curstate = &((hdr->allState)[i]);
+          curstate->jos_drcontrol |= DRCNTRL__PTCS_BIT;
+        }
+        msgOutif( msglev, "", INDENT "Blanking telescope data due to extreme excursion", status );
+        have_fixed |= SMF__FIXED_JCMTSTATE;
+      }
+    }
+  }
+
+
   return have_fixed;
 }
 
@@ -603,81 +653,3 @@ static void smf__calc_wvm_index( smfHead * hdr, const char * amhdr, size_t index
   }
   return;
 }
-
-
-static int smf__validate_scan( smfHead *hdr, int *status ) {
-
-/* Local Variables: */
-   JCMTState *state;
-   dim_t iframe;
-   dim_t maxbad;
-   dim_t nbad;
-   double az0;
-   double az;
-   double el0;
-   double el;
-   double map_hght;
-   double map_wdth;
-   double rad;
-   double sep;
-   int result = 1;
-
-/* Check inherited status. */
-   if( *status != SAI__OK ) return result;
-
-/* Get the expected map dimensions, in arc-seconds. */
-   map_hght = 0.0;
-   smf_getfitsd( hdr, "MAP_HGHT", &map_hght, status );
-
-   map_wdth = 0.0;
-   smf_getfitsd( hdr, "MAP_WDTH", &map_wdth, status );
-
-/* If the above keywords do not have usable values, we cannot do this
-   check, so play safe and assume all is well. */
-   if( map_hght > 0.0 && map_wdth > 0.0 ) {
-
-/* Get the maximum expected distance of the boresight from the tracking
-   centre, and convert from arc-seconds to radians. */
-      rad = AST__DD2R*sqrt( map_hght*map_hght + map_hght*map_hght )/3600.0;
-
-/* Set the maximum number of bad time slices that can be found before the
-   whole scan is rejected as bad. This is 10% of the total number of frames. */
-      maxbad = hdr->nframes/10;
-
-/* Loop round all time slices. */
-      nbad = 0;
-      state = hdr->allState;
-      for( iframe = 0; iframe < hdr->nframes; iframe++,state++ ) {
-
-/* Check the boresight az and el values are good in the header. */
-         az = state->tcs_az_ac1;
-         el = state->tcs_az_ac2;
-         az0 = state->tcs_az_bc1;
-         el0 = state->tcs_az_bc2;
-         if( az != VAL__BADD && el != VAL__BADD &&
-             az0 != VAL__BADD && el0 != VAL__BADD ) {
-
-/* Get the arc-distance from the boresight to the tracking centre at
-   the current time slice. */
-            sep = palDsep( az, el, az0, el0 );
-
-/* If it is greater than the expected radius of the map, increment the
-   count of such time slices. If the number of bad slices exceeds the
-   limit, there is no point in doing any more time slices so break out
-   of the loop and return zero to indicate the scan pattern has gone
-   crazy. */
-            if( sep > rad ) {
-               if( ++nbad > maxbad ) {
-                  result = 0;
-                  break;
-               }
-            }
-         }
-      }
-   }
-
-   return result;
-
-}
-
-
