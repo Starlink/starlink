@@ -117,6 +117,9 @@
 *        Added parameter "harmonic".
 *     10-JUL-2013 (DSB):
 *        Take account of moving sources.
+*     2-JUL-2015 (DSB):
+*        Take account of focal plane rotation during the course of one
+*        stare position.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -159,6 +162,8 @@ typedef struct smfCalcIQUJobData {
    dim_t b1;
    dim_t b2;
    dim_t nbolo;
+   double fpr0;
+   double fprinc;
    double *dat;
    double *ipi;
    double *ipq;
@@ -202,20 +207,37 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
                   int harmonic, int *status ){
 
 /* Local Variables: */
+   AstCmpMap *cm1;
+   AstCmpMap *cm2;
    AstFrameSet *wcs;          /* WCS FrameSet for output NDFs */
+   AstMapping *fpmap1;
+   AstMapping *fpmap2;
+   AstMapping *oskymap;
+   AstMapping *totmap;
+   AstSkyFrame *oskyfrm;
    AstWinMap *wm;             /* Mapping to reverse the X GRID axis */
-   const char *usesys;        /* Used system string */
    const JCMTState *state;    /* JCMTState info for current time slice */
+   const char *usesys;        /* Used system string */
+   dim_t itime;               /* Time slice index */
    dim_t nbolo;               /* No. of bolometers */
    dim_t ncol;                /* No. of columns of bolometers */
    dim_t nrow;                /* No. of rows of bolometers */
+   dim_t ntime;               /* Time slices to check */
    dim_t ntslice;             /* Number of time-slices in data */
    double *ipi;               /* Pointer to output I array */
-   double *ipq;               /* Pointer to output Q array */
-   double *ipu;               /* Pointer to output U array */
    double *ipiv;              /* Pointer to output I variance array */
+   double *ipq;               /* Pointer to output Q array */
    double *ipqv;              /* Pointer to output Q variance array */
+   double *ipu;               /* Pointer to output U array */
    double *ipuv;              /* Pointer to output U variance array */
+   double *mean;
+   double ang_data[2];
+   double fox[2];
+   double foy[2];
+   double fpr0;
+   double fprinc;
+   double fx[2];
+   double fy[2];
    double ina[ 2 ];           /* Bolometer coords at bottom left */
    double inb[ 2 ];           /* Bolometer coords at top right */
    double outa[ 2 ];          /* NDF GRID coords at bottom left */
@@ -226,20 +248,18 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
    int indfi;                 /* Identifier for NDF holding I values */
    int indfq;                 /* Identifier for NDF holding Q values */
    int indfu;                 /* Identifier for NDF holding Q values */
-   int itime;                 /* Time slice index */
    int iworker;               /* Index of a worker thread */
    int lbnd[ 2 ];             /* Lower pixel bounds of output NDF */
-   int ntime;                 /* Time slices to check */
+   int moving;
    int nworker;               /* No. of worker threads */
    int old;                   /* Data has old-style POL_ANG values? */
+   int tstep;                 /* Time slice step between threads */
    int ubnd[ 2 ];             /* Upper pixel bounds of output NDF */
    size_t bstride;            /* Stride between adjacent bolometer values */
    size_t tstride;            /* Stride between adjacent time slice values */
    smfCalcIQUJobData *job_data = NULL; /* Pointer to all job data */
    smfCalcIQUJobData *pdata = NULL;/* Pointer to next job data */
    smfHead *hdr;              /* Pointer to data header this time slice */
-   double *mean;
-   int tstep;                 /* Time slice step between threads */
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
@@ -301,6 +321,10 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
                                     status );
    astSetC( hdr->wcs, "System", usesys );
 
+/* Get the Mapping from focal plane coords to bolometer grid coords. This
+   is the same for all time slices. sc2ast ensures that frame 3 is FPLANE. */
+   fpmap1 = astGetMapping( hdr->wcs, 3, AST__BASE );
+
 /* Take a copy and then reverse the X axis of the GRID Frame by remaping the
    base Frame using a WinMap. This produces a pixel grid such as you would
    see by looking up at the sky from underneath the array, rather than looking
@@ -320,19 +344,24 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
    astRemapFrame( wcs, AST__BASE, wm );
    wm = astAnnul( wm );
 
+/* Get the Mapping from output grid coords to focal plane coords. */
+   fpmap2 = astGetMapping( wcs, AST__BASE, 3 );
+
 /* If the target is moving (assumed to be the case if the tracking
    system is AZEL or GAPPT), make the FrameSet current Frame represent
    offsets from the reference position (i.e. the moving target), and
    indicate that the offset coord system should be used for alignment. */
    if( !strcmp( usesys, "AZEL" ) || !strcmp( usesys, "GAPPT" ) ){
       astSet( wcs, "SkyRefIs=Origin,AlignOffset=1" );
+      moving = 1;
+   } else {
+      moving = 0;
    }
 
-/* Store the FrameSet in the output NDFs, then annull the copy. */
+/* Store the FrameSet in the output NDFs. */
    ndfPtwcs( wcs, indfq, status );
    ndfPtwcs( wcs, indfu, status );
    if( indfi != NDF__NOID ) ndfPtwcs( wcs, indfi, status );
-   wcs = astAnnul( wcs );
 
 /* Map the Data array in each NDF. */
    ndfMap( indfq, "Data", "_DOUBLE", "WRITE", (void **) &ipq, &el, status );
@@ -420,6 +449,59 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
 
       }
 
+/* Get the Frame representing absolute sky coords in the output NDF,
+   and the Mapping from sky to grid in the output NDF. */
+      oskyfrm = astCopy( astGetFrame( wcs, AST__CURRENT ) );
+      astSet( oskyfrm, "SkyRefIs=Ignored" );
+      oskymap = astGetMapping( wcs, AST__CURRENT, AST__BASE );
+      wcs = astAnnul( wcs );
+
+/* Find the first and last time slices, calculate the angle between the
+   focal pane Y axis at the time slice, and the focal plane Y axis in
+   the output NDF. For intervening time-slices, the angle is found by
+   linear interpolation between the extreme time slices. */
+      for( el = 0; el < 2; el++ ) {
+
+/* Get the mapping from GRID coords in the input time slice to GRID
+   coords in the output. */
+         totmap = smf_rebin_totmap( data, el?ntslice-1:0, oskyfrm, oskymap,
+                                    moving, NO_FTS, status );
+
+/* Modify it to be the Mapping from focal plane coords in the input time
+   slice to focal plane coords in the output. */
+         cm1 = astCmpMap( fpmap1, totmap, 1, " " );
+         cm2 = astCmpMap( cm1, fpmap2, 1, " " );
+
+/* Use this Mapping to convert two points on the focal plane Y axis from
+   the input to the output. */
+         fx[0] = 0.0;
+         fy[0] = 0.0;
+         fx[1] = 0.0;
+         fy[1] = 4.0;
+         astTran2( cm2, 2, fx, fy, 1, fox, foy );
+
+/* The angle from the focal plane Y axis in the output to the focal plane
+   Y axis in the input time slice, measured positive in sense of rotation
+   from Fy to Fx. */
+         ang_data[ el ] = atan2( fox[1]-fox[0], foy[1]-foy[0] );
+
+/* Free resources for this time slice. */
+         totmap = astAnnul( totmap );
+         cm1 = astAnnul( cm1 );
+         cm2 = astAnnul( cm2 );
+      }
+
+/* Annul objects. */
+      oskymap = astAnnul( oskymap );
+      oskyfrm = astAnnul( oskyfrm );
+      fpmap1 = astAnnul( fpmap1 );
+      fpmap2 = astAnnul( fpmap2 );
+
+/* Get the constants of the linear relationship between focal plane
+   rotation and time slice index "fpr = fpr0 + itime*fprinc". */
+      fpr0 = ang_data[ 0 ];
+      fprinc = ( ang_data[ 1 ] - fpr0 )/( ntslice - 1 );
+
 /* Determine which bolometers are to be processed by which threads. */
       bstep = nbolo/nworker;
       if( bstep < 1 ) bstep = 1;
@@ -459,6 +541,8 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
          pdata->pasign = pasign ? +1: -1;
          pdata->paoff = paoff;
          pdata->angrot = angrot;
+         pdata->fpr0 = fpr0;
+         pdata->fprinc = fprinc;
          pdata->angfac = harmonic/4.0;
          pdata->action = 0;
          pdata->mean = mean;
@@ -554,6 +638,7 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    double *ipu;               /* Pointer to output U array */
    double *ipuv;
    double *pm;                /* Pointer to next time slice mean value */
+   double ang;
    double angfac;
    double angle;              /* Phase angle for FFT */
    double angle_l;
@@ -561,6 +646,8 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    double cosval;             /* Cos of twice reference rotation angle */
    double dang;
    double den;
+   double fpr0;
+   double fprinc;
    double i;                  /* Output I value */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double phi;                /* Angle from fixed analyser to effective analyser */
@@ -570,15 +657,15 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    double s1;                 /* Sum of weighted cosine terms */
    double s2;                 /* Sum of weighted sine terms */
    double s3;                 /* Sum of weights */
+   double sinval;             /* Sin of twice reference rotation angle */
+   double sum;                /* Sum of bolometer values */
+   double sw;
    double swi;
    double swii;
-   double sinval;             /* Sin of twice reference rotation angle */
    double swq;
    double swqq;
    double swu;
-   double sum;                /* Sum of bolometer values */
    double swuu;
-   double sw;
    double sww;
    double u0;                 /* U value with respect to fixed analyser */
    double u;                  /* Output U value */
@@ -593,8 +680,9 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    int block_start;           /* First time slice to process */
    int ipolcrd;               /* Reference direction for pol_ang */
    int itime;                 /* Time slice index */
-   int limit;                 /* Min no of good i/p values for a good o/p value */
+   int itime_start;           /* Time slice index at start of section */
    int limit2;                /* Min no of good i/p values for a good single estimate */
+   int limit;                 /* Min no of good i/p values for a good o/p value */
    int n;                     /* Number of contributing values in S1, S2 and S3 */
    int ncol;                  /* No. of bolometers in one row */
    int nn;                    /* Number of good bolometer values */
@@ -638,6 +726,8 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    paoff = pdata->paoff;
    angrot = pdata->angrot;
    angfac = pdata->angfac;
+   fpr0 = pdata->fpr0;
+   fprinc = pdata->fprinc;
 
 /* Assume we are not returning any variance values. */
    pdata->gotvar = 0;
@@ -700,6 +790,7 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
                pm = pdata->mean;
                if( pm )  pm += block_start;
                state = allstates + block_start;
+               itime_start = block_start;
                for( itime = block_start; itime <= block_end; itime++,state++ ) {
 
 /* Get the POL_ANG value for this time slice. */
@@ -759,9 +850,18 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    revolution that has just ended, and then update the running sums used
    to find the final values and variances. */
                         if( n > limit2 ) {
-                           q = 4*s1/n;
-                           u = 4*s2/n;
+                           q0 = 4*s1/n;
+                           u0 = 4*s2/n;
                            i = 2*s3/n;
+
+/* Rotate the Q and U values to take account of the difference between the
+   orientation of the focal plane at the middle time slice included in
+   the current values, and the focal plane in the output NDF. */
+                           ang = fpr0 + 0.5*fprinc*( itime_start + itime - 1 );
+                           cosval = cos(2*ang);
+                           sinval = sin(2*ang);
+                           q = q0*cosval + u0*sinval;
+                           u = -q0*sinval + u0*cosval;
 
                            swq += n*q;
                            swqq += n*q*q;
@@ -772,6 +872,8 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
                            sw += n;
                            sww += n*n;
                            nrot++;
+
+                           itime_start = itime;
                         }
 
 /* Prepare for a new revolution. */
@@ -804,9 +906,15 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
 
 /* Add in the I, Q and U values determined from the final block. */
                if( n > limit2 ) {
-                  q = 4*s1/n;
-                  u = 4*s2/n;
+                  q0 = 4*s1/n;
+                  u0 = 4*s2/n;
                   i = 2*s3/n;
+
+                  ang = fpr0 + 0.5*fprinc*( itime_start + itime - 1 );
+                  cosval = cos(2*ang);
+                  sinval = sin(2*ang);
+                  q = q0*cosval + u0*sinval;
+                  u = -q0*sinval + u0*cosval;
 
                   swq += n*q;
                   swqq += n*q*q;
@@ -820,7 +928,7 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
                }
 
 /* Calculate the mean q, u and i values variances. These use the
-   fixed analyser as the reference direction. */
+   fixed analyser in the output as the reference direction. */
                q = VAL__BADD;
                u = VAL__BADD;
                i = VAL__BADD;
@@ -909,10 +1017,6 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
             *pm = VAL__BADD;
          }
       }
-
    }
-
-
 }
-
 
