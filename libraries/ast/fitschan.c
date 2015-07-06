@@ -1129,8 +1129,13 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        individual axes that have been oicked from a SkyFrame) are
 *        re-mapped into degrees before being used.
 *     20-APR-2015 (DSB):
-*        In MakeIntWorld, relax tolerance for checking that each FITS-WCS IWC 
+*        In MakeIntWorld, relax tolerance for checking that each FITS-WCS IWC
 *        axis is linear, from 0.01 of a pixel to 0.1 of a pixel.
+*     6-JUL-2015 (DSB):
+*        When checking a sub-string, ensure the whole string is at least as 
+*        long as the offset to the start of the sub-string. Without this, you 
+*        can get erroneous sub-string matches by chance, depending on what 
+*        characters happen to be present in memory after the end of the string. 
 *class--
 */
 
@@ -3232,7 +3237,7 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
          } else {
             cval = GetItemC( &(store->ctype), i, 0, s, NULL, method, class, status );
          }
-         if( cval && strcmp( cval + 4, "-TAB" ) ) {
+         if( cval && ( strlen(cval) < 5 || strcmp( cval + 4, "-TAB" ) ) ) {
             comm = GetItemC( &(store->ctype_com), i, 0, s, NULL, method, class, status );
             if( !comm ) {
                sprintf( combuf, "Type of co-ordinate on axis %d", i + 1 );
@@ -3737,7 +3742,7 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
          } else {
             cval = GetItemC( &(store->ctype), i, 0, s, NULL, method, class, status );
          }
-         if( cval && strcmp( cval + 4, "-TAB" ) ) {
+         if( cval && ( strlen(cval) < 5 || strcmp( cval + 4, "-TAB" ) ) ) {
             comm = GetItemC( &(store->ctype_com), i, 0, s, NULL, method, class, status );
             if( !comm ) {
                sprintf( combuf, "Type of co-ordinate on axis %d", i + 1 );
@@ -6012,7 +6017,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
          } else {
             cval = GetItemC( &(store->ctype), i, 0, s, NULL, method, class, status );
          }
-         if( cval && strcmp( cval + 4, "-TAB" ) ) {
+         if( cval && ( strlen(cval) < 5 || strcmp( cval + 4, "-TAB" ) ) ) {
             comm = GetItemC( &(store->ctype_com), i, 0, s, NULL, method, class, status );
             if( !comm ) {
                sprintf( combuf, "Type of co-ordinate on axis %d", i + 1 );
@@ -6305,7 +6310,7 @@ static void ClassTrans( AstFitsChan *this, AstFitsChan *ret, int axlat,
    keyname = FormatKey( "CTYPE", axlon + 1, -1, ' ', status );
    if( GetValue2( ret, this, keyname, AST__STRING, (void *) &cval, 0, method,
                   class, status ) ){
-      if( !strncmp( "    ", cval + 4, 4 ) ) {
+      if( strlen(cval) > 4 && !strncmp( "    ", cval + 4, 4 ) ) {
          strncpy( newtype, cval, 4 );
          strcpy( newtype + 4, "-GLS" );
          cval = newtype;
@@ -6315,7 +6320,7 @@ static void ClassTrans( AstFitsChan *this, AstFitsChan *ret, int axlat,
    keyname = FormatKey( "CTYPE", axlat + 1, -1, ' ', status );
    if( GetValue2( ret, this, keyname, AST__STRING, (void *) &cval, 0, method,
                   class, status ) ){
-      if( !strncmp( "    ", cval + 4, 4 ) ) {
+      if( strlen(cval) > 4 && !strncmp( "    ", cval + 4, 4 ) ) {
          strncpy( newtype, cval, 4 );
          strcpy( newtype + 4, "-GLS" );
          cval = newtype;
@@ -18021,7 +18026,7 @@ static int IRAFFromStore( AstFitsChan *this, FitsStore *store,
          cval = GetItemC( &(store->ctype), i, 0, s, NULL, method, class, status );
          if( !cval ) return ret;
       }
-      if( !strcmp( cval + 4, "-TAB" ) ) return ret;
+      if( strlen(cval) > 4 && !strcmp( cval + 4, "-TAB" ) ) return ret;
       comm = GetItemC( &(store->ctype_com), i, 0, s, NULL, method, class, status );
       if( !comm ) {
          sprintf( combuf, "Type of co-ordinate on axis %d", i + 1 );
@@ -23368,6 +23373,7 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
    int m;              /* Parameter index */
    int maxm;           /* Upper limit on m */
    int naxis;          /* No. of axes */
+   int nc;             /* Length of string */
    int ok;             /* Frame written out succesfully? */
    int prj;            /* Projection type */
    int ret;            /* Returned value. */
@@ -23536,7 +23542,8 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
    ------ */
       for( i = 0; i < naxis; i++ ){
          cval = GetItemC( &(store->ctype), i, 0, s, NULL, method, class, status );
-         if( !cval || !strcmp( cval + 4, "-TAB" ) ) {
+         nc = strlen( cval );
+         if( !cval || ( nc > 4 && !strcmp( cval + 4, "-TAB" ) ) ) {
             ok = 0;
             goto next;
          }
@@ -23553,9 +23560,9 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
 
 /* FITS-PC cannot handle celestial axes of type "xxLT" or "xxLN".
    Neither can it handle the "-TAB". */
-         if( !strncmp( cval + 2, "LT-", 3 ) ||
-             !strncmp( cval + 2, "LN-", 3 ) ||
-             !strncmp( cval + 4, "-TAB", 4 ) ){
+         if( ( nc > 2 && !strncmp( cval + 2, "LT-", 3 ) ) ||
+             ( nc > 2 && !strncmp( cval + 2, "LN-", 3 ) ) ||
+             ( nc > 4 && !strncmp( cval + 4, "-TAB", 4 ) ) ){
             ok = 0;
             goto next;
          }
@@ -28947,6 +28954,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    int lbnd[ 2 ];                 /* Lower index bounds */
    int m;                         /* Co-ordinate version index */
    int naxis;                     /* Number of axes */
+   int nc;                        /* Length of string */
    int ncoeff;                    /* Number of PVi_m values */
    int ok;                        /* Can projection be represented in FITS-WCS?*/
    int shifted;                   /* Non-zero if there is an origin shift */
@@ -28994,18 +29002,19 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
          if( GetValue2( ret, this, FormatKey( "CTYPE", j + 1, -1, s, status ),
                        AST__STRING, (void *) &cval, 0, method,
                        class, status ) ){
+            nc = strlen( cval );
             if( !strncmp( cval, "RA--", 4 ) ||
                 !strncmp( cval, "AZ--", 4 ) ||
-                !strncmp( cval + 1, "LON", 3 ) ||
-                !strncmp( cval + 2, "LN", 2 ) ) {
+                ( nc > 1 && !strncmp( cval + 1, "LON", 3 ) ) ||
+                ( nc > 2 && !strncmp( cval + 2, "LN", 2 ) ) ) {
                axlon = j;
                strncpy( prj, cval + 4, 4 );
                strncpy( lontype, cval, 10 );
                prj[ 4 ] = 0;
             } else if( !strncmp( cval, "DEC-", 4 ) ||
                 !strncmp( cval, "EL--", 4 ) ||
-                !strncmp( cval + 1, "LAT", 3 ) ||
-                !strncmp( cval + 2, "LT", 2 ) ) {
+                ( nc > 1 && !strncmp( cval + 1, "LAT", 3 ) ) ||
+                ( nc > 2 && !strncmp( cval + 2, "LT", 2 ) ) ) {
                axlat = j;
                strncpy( prj, cval + 4, 4 );
                strncpy( lattype, cval, 10 );
@@ -29014,11 +29023,11 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* Check for spectral algorithms from early drafts of paper III */
             } else {
                sprj[ 0 ] = '-';
-               if( !strncmp( cval + 4, "-WAV", 4 ) ) {
+               if( ( nc > 4 && !strncmp( cval + 4, "-WAV", 4 ) ) ) {
                   sprj[ 1 ] = 'W';
-               } else if( !strncmp( cval + 4, "-FRQ", 4 ) ) {
+               } else if( ( nc > 4 && !strncmp( cval + 4, "-FRQ", 4 ) ) ) {
                   sprj[ 1 ] = 'F';
-               } else if( !strncmp( cval + 4, "-VEL", 4 ) ) {
+               } else if( ( nc > 4 && !strncmp( cval + 4, "-VEL", 4 ) ) ) {
                   sprj[ 1 ] = 'V';
                } else {
                   sprj[ 0 ] = 0;
@@ -31406,7 +31415,7 @@ static AstMapping *TabMapping( AstFitsChan *this, FitsStore *store, char s,
 /* See if this WCS axis uses the -TAB algorithm. */
                ctype = GetItemC( &(store->ctype), iaxis, 0, s, NULL, method,
                                  class, status );
-               if( ctype && !strncmp( ctype + 4, "-TAB", 4 ) ) {
+               if( ctype && strlen(ctype) > 4 && !strncmp( ctype + 4, "-TAB", 4 ) ) {
 
 /* Get the name of the FITS binary table extension holding the coordinate
    info. No default, so report an error if not present. */
@@ -33414,6 +33423,7 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
    int mxpar_lat;            /* Max. projection parameter index on lat axis */
    int mxpar_lon;            /* Max. projection parameter index on lon axis */
    int naxes;                /* Number of axes */
+   int nc;                   /* String length */
    int np;                   /* Max parameter index */
    int prj;                  /* Projection type identifier */
 
@@ -33471,6 +33481,7 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
    are "RA--" or "xLON" or "yzLN" ). If so, store the value of "x" or "yz"
    (or "EQU" for equatorial coordinates) in variable "type" to indicate which
    coordinate system is being used. */
+         nc = strlen( ctype );
          gotax = 0;
          if( !strcmp( ctype, "RA" ) || !strncmp( ctype, "RA--", 4 ) ){
             strcpy( wcscelestial_type, "EQU" );
@@ -33478,11 +33489,13 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
          } else if( !strcmp( ctype, "AZ" ) || !strncmp( ctype, "AZ--", 4 ) ){
             strcpy( wcscelestial_type, "AZL" );
             gotax = 1;
-         } else if( !strcmp( ctype + 1, "LON" ) || !strncmp( ctype + 1, "LON-", 4 ) ){
+         } else if( nc > 1 && ( !strcmp( ctype + 1, "LON" ) ||
+                                !strncmp( ctype + 1, "LON-", 4 ) ) ){
             wcscelestial_type[ 0 ] = ctype[ 0 ];
             wcscelestial_type[ 1 ] = 0;
             gotax = 1;
-         } else if( !strcmp( ctype + 2, "LN" ) || !strncmp( ctype + 2, "LN-", 3 ) ){
+         } else if( nc > 2 && ( !strcmp( ctype + 2, "LN" ) ||
+                                !strncmp( ctype + 2, "LN-", 3 ) ) ){
             wcscelestial_type[ 0 ] = ctype[ 0 ];
             wcscelestial_type[ 1 ] = ctype[ 1 ];
             wcscelestial_type[ 2 ] = 0;
