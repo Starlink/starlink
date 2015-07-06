@@ -97,12 +97,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -206,6 +206,7 @@ typedef struct AstSlaMapVtab {
 
 /* Properties (e.g. methods) specific to this class. */
    void (* SlaAdd)( AstSlaMap *, const char *, const double[], int * );
+   int (* SlaIsEmpty)( AstSlaMap *, int * );
 } AstSlaMapVtab;
 
 #if defined(THREAD_SAFE)
@@ -265,6 +266,7 @@ void astSTPConv_( double, int, int, double[3], double *[3], int, double[3], doub
 /* Prototypes for member functions. */
 /* -------------------------------- */
 void astSlaAdd_( AstSlaMap *, const char *, const double[], int * );
+int astSlaIsEmpty_( AstSlaMap *, int * );
 
 /* Function interfaces. */
 /* ==================== */
@@ -317,6 +319,7 @@ astINVOKE(V,astSlaAdd_(astCheckSlaMap(this),cvt,args,STATUS_PTR))
 #if defined(astCLASS)            /* Protected */
 #define astSTPConv astSTPConv_
 #define astSTPConv1 astSTPConv1_
+#define astSlaIsEmpty(this) astINVOKE(V,astSlaIsEmpty_(astCheckSlaMap(this),STATUS_PTR))
 #endif
 
 #endif

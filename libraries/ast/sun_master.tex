@@ -21530,11 +21530,9 @@ alternative form ``\texttt{..., text );}''.
 c-
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V8.0.4}
-The following describes the most significant changes which have
-occurred in the AST library between versions V8.0.3 and V8.0.4 (the
-current version):
+\subsection{Changes Introduced in V8.0.4}
+The following describes the most significant changes which
+occurred in the AST library between versions V8.0.3 and V8.0.4:
 
 \begin{enumerate}
 
@@ -21584,6 +21582,22 @@ of radians.
 \item The LutMap class has a new attribute called LutEpsilon, which specifies
 the relative error of the values in the table. It is used to decide if
 the LutMap can be simplified to a straight line.
+
+\end{enumerate}
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V8.0.5}
+The following describes the most significant changes which have
+occurred in the AST library between versions V8.0.4 and V8.0.5 (the
+current version):
+
+\begin{enumerate}
+
+\item The SkyFrame class has a new attribute called SkyTol, which specifies
+the smallest significant distance within the SkyFrame. It is used to
+decide if the Mapping between two SkyFrames can be considered a unit
+transformation. The default value is 0.001 arc-seconds.
 
 \end{enumerate}
 

@@ -58,12 +58,12 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -115,6 +115,8 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *        Fix bug in merging of adjacent AMP and MAP conversions (MapMerge
 *        did not take account of the fact that the arguments for these
 *        two conversions are stored in swapped order).
+*     6-JUL-2015 (DSB):
+*        Added method astSlaIsEmpty.
 
 *class--
 */
@@ -272,6 +274,7 @@ static const char *CvtString( int, const char **, int *, const char *[ MAX_SLA_A
 static int CvtCode( const char *, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static int SlaIsEmpty( AstSlaMap *, int * );
 static void AddSlaCvt( AstSlaMap *, int, const double *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void De2h( double, double, double, double, double *, double *, int * );
@@ -2492,6 +2495,7 @@ void astInitSlaMapVtab_(  AstSlaMapVtab *vtab, const char *name, int *status ) {
 /* Store pointers to the member functions (implemented here) that
    provide virtual methods for this class. */
    vtab->SlaAdd = SlaAdd;
+   vtab->SlaIsEmpty = SlaIsEmpty;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -3370,6 +3374,39 @@ f     This value should then be supplied to AST_SLAADD in ARGS(1).
    AddSlaCvt( this, cvttype, args, status );
 }
 
+static int SlaIsEmpty( AstSlaMap *this, int *status ){
+/*
+*+
+*  Name:
+*     astSlaIsEmpty
+
+*  Purpose:
+*     Indicates if a SlaMap is empty (i.e. has no conversions).
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "slamap.h"
+*     result = astSlaIsEmpty( AstSlaMap *this )
+
+*  Class Membership:
+*     SlaMap method.
+
+*  Description:
+*     This function returns a flag indicating if the SlaMap is empty
+*     (i.e. has not yet had any conversions added to it using astSlaAdd).
+
+*  Parameters:
+*     this
+*        The SlaMap.
+*-
+*/
+   if( !astOK ) return 1;
+   return ( this->ncvt == 0 );
+}
+
+
 static void SolarPole( double mjd, double pole[3], int *status ) {
 /*
 *  Name:
@@ -3527,7 +3564,6 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    int ct;                       /* Conversion type */
    int end;                      /* Termination index for conversion loop */
    int inc;                      /* Increment for conversion loop */
-   int ncoord_in;                /* Number of coordinates per input point */
    int npoint;                   /* Number of points */
    int point;                    /* Loop counter for points */
    int start;                    /* Starting index for conversion loop */
@@ -3554,7 +3590,6 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Determine the numbers of points and coordinates per point from the input
    PointSet and obtain pointers for accessing the input and output coordinate
    values. */
-   ncoord_in = astGetNcoord( in );
    npoint = astGetNpoint( in );
    ptr_in = astGetPoints( in );
    ptr_out = astGetPoints( result );
@@ -4974,7 +5009,8 @@ void astSlaAdd_( AstSlaMap *this, const char *cvt, const double args[], int *sta
    (**astMEMBER(this,SlaMap,SlaAdd))( this, cvt, args, status );
 }
 
-
-
-
+int astSlaIsEmpty_( AstSlaMap *this, int *status ) {
+   if ( !astOK ) return 1;
+   return (**astMEMBER(this,SlaMap,SlaIsEmpty))( this, status );
+}
 

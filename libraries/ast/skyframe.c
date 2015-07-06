@@ -56,6 +56,7 @@ f     display by using AST_FORMAT.
 *     - SkyRef: Position defining location of the offset coordinate system
 *     - SkyRefIs: Selects the nature of the offset coordinate system
 *     - SkyRefP: Position defining orientation of the offset coordinate system
+*     - SkyTol: Smallest significant shift in sky coordinates
 
 *  Functions:
 *     In addition to those
@@ -340,6 +341,8 @@ f     - AST_SKYOFFSETMAP: Obtain a Mapping from absolute to offset coordinates
 *     21-FEB-2014 (DSB):
 *        Rounding errors in the SkyLineDef constructor could result in the line
 *        between coincident points being given a non-zero length.
+*     6-JUL-2015 (DSB):
+*        Added SkyTol attribute.
 *class--
 */
 
@@ -995,6 +998,7 @@ static int TestAttrib( AstObject *, const char *, int * );
 static int TestEquinox( AstSkyFrame *, int * );
 static int TestNegLon( AstSkyFrame *, int * );
 static int TestProjection( AstSkyFrame *, int * );
+static int TestSlaUnit( AstSkyFrame *, AstSkyFrame *, AstSlaMap *, int * );
 static int Unformat( AstFrame *, int, const char *, double *, int * );
 static void ClearAsTime( AstSkyFrame *, int, int * );
 static void ClearAttrib( AstObject *, const char *, int * );
@@ -1050,6 +1054,11 @@ static int GetAlignOffset( AstSkyFrame *, int * );
 static int TestAlignOffset( AstSkyFrame *, int * );
 static void SetAlignOffset( AstSkyFrame *, int, int * );
 static void ClearAlignOffset( AstSkyFrame *, int * );
+
+static double GetSkyTol( AstSkyFrame *, int * );
+static int TestSkyTol( AstSkyFrame *, int * );
+static void SetSkyTol( AstSkyFrame *, double, int * );
+static void ClearSkyTol( AstSkyFrame *, int * );
 
 /* Member functions. */
 /* ================= */
@@ -1437,6 +1446,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    } else if ( !strcmp( attrib, "skyref" ) ) {
       astClearSkyRef( this, 0 );
       astClearSkyRef( this, 1 );
+
+/* SkyTol. */
+/* ------- */
+   } else if ( !strcmp( attrib, "skytol" ) ) {
+      astClearSkyTol( this );
 
 /* SkyRef(axis). */
 /* ------------- */
@@ -2619,6 +2633,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
       neglon = astGetNegLon( this );
       if ( astOK ) {
          (void) sprintf( getattrib_buff, "%d", neglon );
+         result = getattrib_buff;
+      }
+
+/* SkyTol */
+/* ------ */
+   } else if ( !strcmp( attrib, "skytol" ) ) {
+      dval = astGetSkyTol( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
          result = getattrib_buff;
       }
 
@@ -4720,6 +4743,11 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name, int *status
    vtab->TestNegLon = TestNegLon;
    vtab->TestProjection = TestProjection;
 
+   vtab->TestSkyTol = TestSkyTol;
+   vtab->SetSkyTol = SetSkyTol;
+   vtab->GetSkyTol = GetSkyTol;
+   vtab->ClearSkyTol = ClearSkyTol;
+
    vtab->TestSkyRef = TestSkyRef;
    vtab->SetSkyRef = SetSkyRef;
    vtab->GetSkyRef = GetSkyRef;
@@ -5768,6 +5796,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    double result_equinox;        /* Result frame Epoch */
    double target_epoch;          /* Target frame Epoch */
    double target_equinox;        /* Target frame Epoch */
+   int isunit;                   /* Is the SlaMap effectively a unit mapping? */
    int match;                    /* Mapping can be generated? */
    int step1;                    /* Convert target to FK5 J2000? */
    int step2;                    /* Convert FK5 J2000 to align sys? */
@@ -6380,6 +6409,10 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
       }
    }
 
+/* See of the slamap created above is effectively a unit mapping to
+   within the tolerance of the more accurate SkyFrame (target or result). */
+   isunit = TestSlaUnit( target, result, slamap, status );
+
 /* Now need to take account of the possibility that the input or output
    SkyFrame may represent an offset system rather than a coordinate system.
    Form the Mapping from the target coordinate system to the associated
@@ -6392,9 +6425,13 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    astInvert( omap );
 
 /* Combine it with the slamap created earlier, so that its coordinate
-   outputs feed the inputs of the slamap. Annul redundant pointers
-   afterwards. */
-   tmap = (AstMapping *) astCmpMap( omap, slamap, 1, "", status );
+   outputs feed the inputs of the slamap. We only do this if the slamap
+   is not effectively a unit mapping. Annul redundant pointers afterwards. */
+   if( ! isunit ) {
+      tmap = (AstMapping *) astCmpMap( omap, slamap, 1, "", status );
+   } else {
+      tmap = astClone( omap );
+   }
    omap = astAnnul( omap );
    slamap =astAnnul( slamap );
 
@@ -7836,6 +7873,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
       OVERLAY(Equinox);
       OVERLAY(Projection);
       OVERLAY(NegLon);
+      OVERLAY(SkyTol);
       OVERLAY(AlignOffset);
       OVERLAY(SkyRefIs);
       OVERLAY2(SkyRef);
@@ -8515,6 +8553,13 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
              ( 1 == astSscanf( setting, "neglon= %d %n", &neglon, &nc ) )
                && ( nc >= len ) ) {
       astSetNegLon( this, neglon );
+
+/* SkyTol. */
+/* ------- */
+   } else if ( nc = 0,
+             ( 1 == astSscanf( setting, "skytol= %lg %n", &dval, &nc ) )
+               && ( nc >= len ) ) {
+      astSetSkyTol( this, dval );
 
 /* Projection. */
 /* ----------- */
@@ -10179,6 +10224,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
    } else if ( !strcmp( attrib, "neglon" ) ) {
       result = astTestNegLon( this );
 
+/* SkyTol. */
+/* ------- */
+   } else if ( !strcmp( attrib, "skytol" ) ) {
+      result = astTestSkyTol( this );
+
 /* Projection. */
 /* ----------- */
    } else if ( !strcmp( attrib, "projection" ) ) {
@@ -10234,6 +10284,113 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
    }
 
 /* Return the result, */
+   return result;
+}
+
+static int TestSlaUnit( AstSkyFrame *sf1, AstSkyFrame *sf2, AstSlaMap *slamap,
+                        int *status ){
+/*
+*  Name:
+*     Unformat
+
+*  Purpose:
+*     See if a slamap is effectively a unit mapping.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     int TestSlaUnit( AstSkyFrame *sf1, AstSkyFrame *sf2, AstSlaMap *slamap,
+*                      int *status )
+
+*  Class Membership:
+*     SkyFrame member function.
+
+*  Description:
+*     This function tests a SlaMap to see if it is effectively a unit
+*     transformatuon to within a tolerance given by the smaller tolerance
+*     of the two supplied SkyFrames.
+
+*  Parameters:
+*     sf1
+*        Pointer to the first SkyFrame.
+*     sf2
+*        Pointer to the second SkyFrame (may be NULL)
+*     slamap
+*        Pointer to the SlaMap to test.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Non-zero if the SlaMap is effectively a unit mapping, and zero
+*     otherwise.
+
+*/
+
+/*  Number of test points. */
+#define NTEST 14
+
+/* Local Variables: */
+   double maxshift;            /* Max. shift produced by slamap (rads) */
+   double olat[NTEST];         /* Transformed latitudes */
+   double olon[NTEST];         /* Transformed longitudes */
+   double shift;               /* Shift produced by slamap (rads) */
+   double tol2;                /* Second tolerance (in radians) */
+   double tol;                 /* Used tolerance (in radians) */
+   int i;                      /* Loop count */
+   int result;                 /* Returned flag */
+
+/* A grid of lon/lat points covering the sphere. */
+   double lat[ NTEST ] = { 0.0,  0.0,  0.0,  0.0,
+                           0.8,  0.8,  0.8,  0.8,
+                          -0.8, -0.8, -0.8, -0.8,
+                           1.570796, -1.570796 };
+   double lon[ NTEST ] = { 0.0,  1.57,  3.14,  4.71,
+                           0.8,  2.37,  3.94,  5.51,
+                           0.8,  2.37,  3.94,  5.51,
+                           0.0, 0.0 };
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* If the SlaMap is empty (i.e. has no conversions in it), then is it a
+   UnitMap. So save time by not transforming the test values. */
+   if( astSlaIsEmpty( slamap ) ) {
+      result = 1;
+
+/* Otherwise, get the smaller of the tolerances associated with the
+   supplied SkyFrames, in radians. */
+   } else {
+      tol = astGetSkyTol( sf1 );
+      if( sf2 ) {
+         tol2 = astGetSkyTol( sf2 );
+         if( tol2 < tol ) tol = tol2;
+      }
+
+/* If the tolerance is zero, there is no need to do the test. */
+      if( tol > 0.0 ) {
+
+/* Transform the test point using the SlaMap. */
+         astTran2( slamap, NTEST, lon, lat, 1, olon, olat );
+
+/* Find the maximum shift produced by the SlaMap at any of the test
+   positions. Again, to avoid the slow-down produced by checking for
+   axis permutation, use palDsep rather than astDistance. */
+         maxshift = 0.0;
+         for( i = 0; i < NTEST; i++ ) {
+            shift = palDsep( lon[ i ], lat[ i ], olon[ i ], olat[ i ] );
+            if( shift > maxshift ) maxshift = shift;
+         }
+
+/* Convert the max shift to arc-seconds and do the check. */
+         result = ( maxshift*AST__DR2D*3600 < tol );
+      }
+   }
+
    return result;
 }
 
@@ -10944,6 +11101,66 @@ astMAKE_TEST(SkyFrame,NegLon,( this->neglon != -INT_MAX ))
 /*
 *att++
 *  Name:
+*     SkyTol
+
+*  Purpose:
+*     The smallest significant shift in sky coordinates.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Floating point.
+
+*  Description:
+*     This attribute indicates the accuracy of the axis values that will
+*     be represented by the SkyFrame. If the arc-distance between two
+*     positions within the SkyFrame is smaller than the value of SkyTol,
+*     then the two positions will (for the puposes indicated below) be
+*     considered to be co-incident.
+*
+*     This value is used only when constructing the Mapping between
+*     two different SkyFrames (for instance, when calling
+c     astConvert or astFindFrame).
+f     AST_CONVERT or AST_FINDFRAME).
+*     If the transformation between the two SkyFrames causes positions to
+*     shift by less than SkyTol arc-seconds, then the transformation is
+*     replaced by a UnitMap.  This could in certain circumatances allow
+*     major simplifications to be made to the transformation between
+*     any pixel grids associated with the two SkyFrames (for instance, if
+*     each SkyFrame is part of the WCS FrameSet associated with an image).
+*
+*     A common case is when two SkyFrames use the FK5 system, but have
+*     slightly different Epoch values. If the AlignSystem attribute has
+*     its default value of "ICRS", then the transformation between the
+*     two SkyFrames will include a very small rotation (FK5 rotates with
+*     respect to ICRS as a rate of about 0.0005 arc-seconds per year). In
+*     most circumstances such a small rotation is insignificant. Setting
+*     SkyTol to some suitably small non-zero value will cause this
+*     rotation to be ignored, allowing much simpler transformations to
+*     be used.
+*
+*     The test to determine the shift introduced by transforming between
+*     the two SkyFrames is performed by transforming a set of 14 position
+*     spread evenly over the whole sky. The largest shift produced at any
+*     of these 14 positions is compared to the value of SkyTol.
+*
+*     The SkyTol value is in units of arc-seconds, and the default value
+*     is 0.001.
+
+*  Applicability:
+*     SkyFrame
+*        All SkyFrames have this attribute.
+*att--
+*/
+astMAKE_CLEAR(SkyFrame,SkyTol,skytol,AST__BAD)
+astMAKE_GET(SkyFrame,SkyTol,double,0.001,((this->skytol!=AST__BAD)?this->skytol:0.001))
+astMAKE_SET(SkyFrame,SkyTol,double,skytol,fabs(value))
+astMAKE_TEST(SkyFrame,SkyTol,(this->skytol!=AST__BAD))
+
+/*
+*att++
+*  Name:
 *     Projection
 
 *  Purpose:
@@ -11384,6 +11601,13 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
                 ival ? "Display negative longitude values" :
                        "Display positive longitude values" );
 
+/* SkyTol. */
+/* ------- */
+   set = TestSkyTol( this, status );
+   dval = set ? GetSkyTol( this, status ) : astGetSkyTol( this );
+   astWriteDouble( channel, "SkyTol", set, 1, dval,
+                   "Smallest significant separation [arc-sec]");
+
 /* Equinox. */
 /* -------- */
    set = TestEquinox( this, status );
@@ -11643,6 +11867,7 @@ AstSkyFrame *astInitSkyFrame_( void *mem, size_t size, int init,
       new->equinox = AST__BAD;
       new->projection = NULL;
       new->neglon = -INT_MAX;
+      new->skytol = AST__BAD;
       new->alignoffset = -INT_MAX;
       new->skyrefis = AST__BAD_REF;
       new->skyref[ 0 ] = AST__BAD;
@@ -11922,6 +12147,11 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
 /* ------- */
       new->neglon = astReadInt( channel, "neglon", -INT_MAX );
       if ( TestNegLon( new, status ) ) SetNegLon( new, new->neglon, status );
+
+/* SkyTol. */
+/* ------- */
+      new->skytol = astReadDouble( channel, "skytol", AST__BAD );
+      if ( TestSkyTol( new, status ) ) SetSkyTol( new, new->skytol, status );
 
 /* Other values */
 /* ------------ */

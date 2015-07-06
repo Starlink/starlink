@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V8.0.4) of the Starlink AST (astrometry) library is
+   A new release (V8.0.5) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,15 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- The SkyFrame class has a new attribute called SkyTol, which specifies
+the smallest significant distance within the SkyFrame. It is used to
+decide if the Mapping between two SkyFrames can be considered a unit
+transformation. The default value is 0.001 arc-seconds.
+
+
+Main Changes in V8.0.4
+----------------------
 
 - The behaviour of the astAddFrame method has been changed slightly.
 Previously, astAddFrame modified the FrameSet by storing references to

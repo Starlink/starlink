@@ -63,7 +63,7 @@ gfortran -fno-second-underscore -o simplify simplify.f -fno-range-check $LDFLAGS
 echo ""
 
 
-foreach prog (testframeset testchannel testpolymap testcmpmap testlutmap testfitstable testtable teststcschan teststc testspecframe testfitschan testswitchmap testrebin testrebinseq testtrangrid testnormmap testtime testrate testflux testratemap testspecflux testxmlchan testregions testkeymap )
+foreach prog (testskyframe testframeset testchannel testpolymap testcmpmap testlutmap testfitstable testtable teststcschan teststc testspecframe testfitschan testswitchmap testrebin testrebinseq testtrangrid testnormmap testtime testrate testflux testratemap testspecflux testxmlchan testregions testkeymap )
 
 gfortran -fno-second-underscore -w -g -o $prog -g $prog.f -fno-range-check $LDFLAGS -I$AST/include \
      -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` \

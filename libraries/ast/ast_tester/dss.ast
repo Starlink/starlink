@@ -56,6 +56,7 @@
              End SkyAxis
        IsA Frame 	# Coordinate system description
           Proj = "gnomonic polynomial" 	# Description of sky projection
+#         SkyTol = 0.001 	# Smallest significant separation [arc-sec]
           Eqnox = 2000 	# Julian epoch of mean equinox
           SRefIs = "Ignored" 	# Not rotated (ref. pos. is ignored)
           SRef1 = 2.82723746556841 	# Ref. pos. RA 10:47:57.3
