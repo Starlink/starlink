@@ -275,6 +275,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   double skyref[ 2 ];          /* Values for output SkyFrame SkyRef attribute */
   struct timeval tv1;          /* Timer */
   struct timeval tv2;          /* Timer */
+  AstMapping *tmap;            /* Temporary Mapping */
   int trim;                    /* Trim borders of bad pixels from o/p image? */
   int ubnd0[ 2 ];              /* Defaults for UBND parameter */
   double x_array_corners[4];   /* X-Indices for corner bolos in array */
@@ -589,7 +590,9 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
              AstSkyFrame *tempsf = astCopy( abskyframe );
              astSetC( tempsf, "System", tracksys );
              AstFrameSet *tempfs = astConvert( tempsf, abskyframe, "" );
-             fast_map = astGetMapping( tempfs, AST__BASE, AST__CURRENT );
+             tmap = astGetMapping( tempfs, AST__BASE, AST__CURRENT );
+             fast_map = astSimplify( tmap );
+             tmap = astAnnul( tmap );
              tempsf = astAnnul( tempsf );
              tempfs = astAnnul( tempfs );
           } else {

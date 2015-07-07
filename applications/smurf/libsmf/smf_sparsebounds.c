@@ -154,6 +154,8 @@ void smf_sparsebounds( ThrWorkForce *wf, Grp *igrp,  int size, AstSkyFrame *osky
    AstFrameSet *swcsin = NULL;  /* FrameSet describing spatial input WCS */
    AstLutMap *lutmap1;          /* Longitude LutMap */
    AstLutMap *lutmap2;          /* Latitude LutMap */
+   AstMapping *smap = NULL;     /* Simplified Mapping */
+   AstMapping *tmap = NULL;     /* Temporary Mapping */
    AstMapping *fsmap = NULL;    /* Base->Current Mapping extracted from a FrameSet */
    AstMapping *ospecmap = NULL; /* Spec <> PIXEL mapping in output FrameSet */
    AstMapping *specmap = NULL;  /* PIXEL -> Spec mapping in input FrameSet */
@@ -500,9 +502,13 @@ void smf_sparsebounds( ThrWorkForce *wf, Grp *igrp,  int size, AstSkyFrame *osky
             break;
          }
 
+/* Get a simplified Mapping form the FrameSet. */
+         tmap = astGetMapping( fs, AST__BASE, AST__CURRENT );
+         smap = astSimplify( tmap );
+
 /* Transform the positions of the detectors from input GRID to oskyframe
    coords. */
-         astTran2( fs, (data->dims)[ 1 ], xin, yin, 1, xout, yout );
+         astTran2( smap, (data->dims)[ 1 ], xin, yin, 1, xout, yout );
 
 /* Loop round all detectors. */
          for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
@@ -536,6 +542,8 @@ void smf_sparsebounds( ThrWorkForce *wf, Grp *igrp,  int size, AstSkyFrame *osky
 /* For efficiency, explicitly annul the AST Objects created in this tight
    loop. */
          fs = astAnnul( fs );
+         tmap = astAnnul( tmap );
+         smap = astAnnul( smap );
       }
 
 /* Close the current input data file. */

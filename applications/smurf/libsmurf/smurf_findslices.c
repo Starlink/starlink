@@ -115,6 +115,8 @@ void smurf_findslices( int *status ) {
    AstFrame *frm = NULL;
    AstFrameSet *fs;
    AstFrameSet *iwcs;
+   AstMapping *smap;
+   AstMapping *tmap;
    Grp *igrp = NULL;
    JCMTState *state;
    char xpos[ 40 ];
@@ -223,8 +225,15 @@ void smurf_findslices( int *status ) {
                         "to the tracking frame (%s).", status, dom, sys );
             }
 
+/* For accuracy, get a simplified Mapping. */
+            tmap = astGetMapping( fs, AST__BASE, AST__CURRENT );
+            smap = astSimplify( tmap );
+
 /* Convert the supplied position to the tracking Frame. */
-            astTranN( fs, 1, nax, 1, pos, 1, 2, 1, pos );
+            astTranN( smap, 1, nax, 1, pos, 1, 2, 1, pos );
+
+            smap = astAnnul( smap );
+            tmap = astAnnul( tmap );
          }
       }
 

@@ -137,8 +137,10 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
 
 /* Local Variables */
    AstFrame *cfrm = NULL;/* Pointer to output sky frame */
-   AstFrame *polfrm = NULL;/* Frame in which POL_ANG is given */
-   AstFrameSet *fs = NULL;/* FrameSet connecting POL_ANG frame and output sky frame */
+   AstFrame *polfrm = NULL; /* Frame in which POL_ANG is given */
+   AstFrameSet *fs = NULL;  /* FrameSet connecting POL_ANG frame and output sky frame */
+   AstMapping *tmap1 = NULL;/* Mapping connecting POL_ANG frame and output sky frame */
+   AstMapping *tmap2 = NULL;/* Mapping connecting POL_ANG frame and output sky frame */
    char *polcrd = NULL;  /* Name of frame in which POL_ANG values are defined */
    const JCMTState *state = NULL; /* Local pointer to STATE */
    double **polang_ptr = NULL; /* Holds pointers to arrays of POL_ANG values */
@@ -256,9 +258,10 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
                astSet( polfrm, "System=AZEL,Epoch=MJD %.*g", DBL_DIG,
                        state->tcs_tai + 32.184/SPD );
 
-/* Get a Mapping (actually a FrameSet) from AZEL coords to the output sky
-   coordinate system. */
+/* Get a Mapping from AZEL coords to the output sky coordinate system. */
                fs = astConvert( polfrm, cfrm, "" );
+               tmap1 = astGetMapping( fs, AST__BASE, AST__CURRENT );
+               tmap2 = astSimplify( tmap1 );
 
 /* Get two AZEL positions, the first is the base telescope pointing
    position and the second is offset by 1 arc-second from the base telescope
@@ -286,7 +289,7 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
                xin[ 1 ] = point2[ 0 ];
                yin[ 0 ] = point1[ 1 ];
                yin[ 1 ] = point2[ 1 ];
-               astTran2( fs, 2, xin, yin, 1, xout, yout );
+               astTran2( tmap2, 2, xin, yin, 1, xout, yout );
 
 /* Find the angle between north in the output frame, and the line joining
    these two positions. Measured positive north through east. */
@@ -341,6 +344,8 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
 /* For efficiency, annul expplicitly AST objects created in this tight
    loop. */
                fs = astAnnul( fs );
+               tmap1 = astAnnul( tmap1 );
+               tmap2 = astAnnul( tmap2 );
 
 /* Report an error for an unknown POL_CRD system. */
             } else if( *status == SAI__OK ) {

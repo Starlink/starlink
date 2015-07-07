@@ -192,7 +192,9 @@ int *smf_jsatiles_region( AstRegion *region, smfJSATiling *skytiling,
       astSetI( space_region, "SimpVertices", 0 );
    }
 
-   region2 = astMapRegion( space_region, fs, fs );
+   region2 = astMapRegion( space_region, astSimplify(
+                           astGetMapping( fs, AST__BASE, AST__CURRENT ) ),
+                           fs );
 
    if( astIsAPolygon( space_region ) ){
       if( old_sv == -999 ) {

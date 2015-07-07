@@ -390,6 +390,7 @@ static void smf1_checkslices( smfData *data, AstFrameSet *fs, double search,
 
 /* Local Variables: */
    AstFrame *frm = NULL;
+   AstMapping *tmap = NULL;
    AstFrameSet *azeltogrid;
    dim_t iframe;
    dim_t ilast;
@@ -464,8 +465,13 @@ static void smf1_checkslices( smfData *data, AstFrameSet *fs, double search,
       if( !hdr->wcs ) break;
       frm = astGetFrame( hdr->wcs, AST__CURRENT );
 
-/* Get a Mapping from AZEL to GRID coords in the hits map. */
+/* Get a simplified Mapping from AZEL to GRID coords in the hits map.
+   Annul temporary objects afterwards. */
       azeltogrid = astConvert( frm, fs, "SKY" );
+      tmap = astGetMapping( azeltogrid, AST__BASE, AST__CURRENT );
+      (void) astAnnul( azeltogrid );
+      azeltogrid = astSimplify( tmap );
+      tmap = astAnnul( tmap );
 
 /* Get the AZEL positions of the biresight, plus four points on the
    circumference of a search circle centred on the boresight position. */

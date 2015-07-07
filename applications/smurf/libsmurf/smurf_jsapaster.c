@@ -650,7 +650,7 @@ static void smf1_jsapaster( int nndf, Grp *grp1, int *idlist, int indf_out,
       }
 
 /* Get the Mapping. */
-      g2gmap = astGetMapping( fs, AST__BASE, AST__CURRENT );
+      g2gmap = astSimplify( astGetMapping( fs, AST__BASE, AST__CURRENT ) );
 
 /* If this is the first input NDF, we use it to decide which array
    components are to be created in the output NDF. Map the selected

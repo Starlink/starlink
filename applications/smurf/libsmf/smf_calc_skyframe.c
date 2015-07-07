@@ -124,9 +124,11 @@ void smf_calc_skyframe( const AstFrame *skyin, const char * system,
                         int * moving, int * status ) {
 
 /* Local Variables: */
-   AstMapping	 *azel2usesys = NULL; /* Mapping form AZEL to requested system */
-   AstFrame 	 *sf1 = NULL;    /* Spatial Frame representing AZEL system */
-   const char 	 *usesys = NULL; /* AST system for output cube */
+   AstFrame    *sf1 = NULL;    /* Spatial Frame representing AZEL system */
+   AstFrameSet *fs = NULL;     /* FrameSet from AZEL to requested system */
+   AstMapping  *azel2usesys = NULL; /* Mapping from AZEL to requested system */
+   AstMapping  *tmap = NULL;   /* Mapping from AZEL to requested system */
+   const char  *usesys = NULL; /* AST system for output cube */
 
 /* Check inherited status */
   if (*status != SAI__OK) return;
@@ -156,10 +158,17 @@ void smf_calc_skyframe( const AstFrame *skyin, const char * system,
    use the Mapping to transform the stored position. */
   sf1 = astCopy( *skyframe );
   astSetC( sf1, "System", "AZEL" );
-  azel2usesys = astConvert( sf1, *skyframe, "" );
+
+  fs = astConvert( sf1, *skyframe, "" );
+  tmap = astGetMapping( fs, AST__BASE, AST__CURRENT );
+  azel2usesys = astSimplify( tmap );
+
   astTran2( azel2usesys, 1, &(hdr->state->tcs_az_bc1),
             &(hdr->state->tcs_az_bc2), 1, skyref, skyref + 1 );
+
   azel2usesys = astAnnul( azel2usesys );
+  tmap = astAnnul( tmap );
+  fs = astAnnul( fs );
 
 /* Normalise these values. */
   astNorm( *skyframe, skyref );

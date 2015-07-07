@@ -98,6 +98,8 @@ int smf_check_detpos( smfData *data, int report, int *status ){
 /* Local Variables */
    AstFrame *frm = NULL;      /* Sky Frame from input WCS FrameSet */
    AstFrameSet *fs = NULL;    /* FPLANEX/Y WCS FrameSet matching RECEPPOS */
+   AstMapping *tmap1 = NULL;  /* FPLANEX/Y WCS Mapping matching RECEPPOS */
+   AstMapping *tmap2 = NULL;  /* FPLANEX/Y WCS Mapping matching RECEPPOS */
    double *old_detpos = NULL; /* Pointer to old detpos array */
    double *xin = NULL;   /* Workspace for detector input grid positions */
    double *xout_f = NULL;/* Workspace for detector FPLANEX/Y sky positions */
@@ -206,7 +208,9 @@ int smf_check_detpos( smfData *data, int report, int *status ){
 /* Use the above FrameSet to transform the input receptor GRID positions into
    the required SKY coords. */
                if( fs ) {
-                  astTran2( fs, (data->dims)[ 1 ], xin, yin, 1, xout_f,
+                  tmap1 = astGetMapping( fs, AST__BASE, AST__CURRENT );
+                  tmap2 = astSimplify( tmap1 );
+                  astTran2( tmap2, (data->dims)[ 1 ], xin, yin, 1, xout_f,
                                                                    yout_f );
 
 /* Loop round each detector, finding the maximum distance on the sky
@@ -252,6 +256,8 @@ int smf_check_detpos( smfData *data, int report, int *status ){
 
 /* For efficincy within this loop, annul AST objects explicitly. */
                   fs = astAnnul( fs );
+                  tmap1 = astAnnul( tmap1 );
+                  tmap2 = astAnnul( tmap2 );
                }
             }
             frm = astAnnul( frm );

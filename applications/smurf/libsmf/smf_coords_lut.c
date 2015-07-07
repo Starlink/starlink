@@ -262,7 +262,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
           errRep( " ", "smf_coords_lut: Failed to convert from "
                   "tracking system to output WCS system.", status );
         }
-        tr2skyabs = astGetMapping( fs, AST__BASE, AST__CURRENT );
+        tr2skyabs = astSimplify( astGetMapping( fs, AST__BASE, AST__CURRENT ) );
 
 /* For moving targets, we also need a Frame describing offset sky
    coordinates in the output map, in which the reference point is the

@@ -85,6 +85,8 @@ void smf_check_coords( smfData *data, int *status ) {
 
 /* Local Variables: */
    AstFrameSet *fs;
+   AstMapping *tmap1;
+   AstMapping *tmap2;
    AstSkyFrame *azel = NULL;
    AstSkyFrame *tracking = NULL;
    JCMTState *state;
@@ -181,10 +183,12 @@ void smf_check_coords( smfData *data, int *status ) {
 
 /* Get a Mapping from (az,el) to the tracking system. */
       fs = astConvert( azel, tracking, "SKY" );
+      tmap1 = astGetMapping( fs, AST__BASE, AST__CURRENT );
+      tmap2 = astSimplify( tmap1 );
 
 /* Use this mapping to transform the boresight (az,el) position to
    tracking. */
-      astTran2( fs, 1, &(state->tcs_az_ac1), &(state->tcs_az_ac2), 1,
+      astTran2( tmap1, 1, &(state->tcs_az_ac1), &(state->tcs_az_ac2), 1,
                 p1, p1 + 1 );
 
 /* Find the arc-distance from this transformed positon to the tracking
@@ -214,6 +218,8 @@ void smf_check_coords( smfData *data, int *status ) {
       }
 
 /* Free resources. */
+      tmap1 = astAnnul( tmap1 );
+      tmap2 = astAnnul( tmap2 );
       fs = astAnnul( fs );
    }
 

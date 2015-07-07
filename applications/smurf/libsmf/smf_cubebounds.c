@@ -301,12 +301,14 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    AstFrame *specframe = NULL;  /* Spectral Frame in input FrameSet */
    AstFrameSet *fs = NULL;      /* A general purpose FrameSet pointer */
    AstFrameSet *swcsin = NULL;  /* FrameSet describing spatial input WCS */
+   AstFrameSet *azel2usesys_fs = NULL;/* FrameSet from AZEL to the output sky frame */
    AstMapping *azel2usesys = NULL;/* Mapping from AZEL to the output sky frame */
    AstMapping *fsmap = NULL;    /* Base->Current Mapping extracted from a FrameSet */
    AstMapping *oskymap = NULL;  /* Sky <> PIXEL mapping in output FrameSet */
    AstMapping *oskymap2 = NULL; /* Sky offsets <> PIXEL mapping in output FrameSet */
    AstMapping *ospecmap = NULL; /* Spec <> PIXEL mapping in output FrameSet */
    AstMapping *specmap = NULL;  /* PIXEL -> Spec mapping in input FrameSet */
+   AstCmpMap *tmap = NULL;      /* Temporary Mapping */
    const char *name;     /* Pointer to current detector name */
    dim_t irec;           /* Index of current input detector */
    dim_t ispec;          /* Index of current spectral sample */
@@ -577,8 +579,8 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                                           1, " " ),
                                ospecmap, 1, " " );
 
+            ssmap = astSimplify( ssmap );
          }
-
 
 /* Use this Mapping to transform the first and last spectral values
    in the input into the corresponding values on the output spectral
@@ -714,7 +716,12 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                skyin = astGetFrame( swcsin, AST__CURRENT );
                sf1 = astCopy( skyin );
                astSetC( sf1, "System", "AZEL" );
-               azel2usesys = astConvert( sf1, oskyframe, "" );
+               azel2usesys_fs = astConvert( sf1, oskyframe, "" );
+               tmap = astGetMapping( azel2usesys_fs, AST__BASE, AST__CURRENT );
+               azel2usesys = astSimplify( tmap );
+               tmap = astAnnul( tmap );
+               azel2usesys_fs = astAnnul( azel2usesys_fs );
+
                astTran2( azel2usesys, 1, &(hdr->state->tcs_az_bc1),
                          &(hdr->state->tcs_az_bc2), 1, &a, &b );
                if( aref ) *aref = a;
@@ -853,7 +860,9 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    whether the target is moving or not. Combine the input GRID to output
    SKY Mapping with the output SKY to output interim grid Mapping found
    earlier. */
-         totmap = astCmpMap( fsmap, oskymap2, 1, " " );
+         tmap = astCmpMap( fsmap, oskymap2, 1, " " );
+         totmap = astSimplify( tmap );
+         tmap = astAnnul( tmap );
 
 /* Initialise a string to point to the name of the first detector for which
    data is available */

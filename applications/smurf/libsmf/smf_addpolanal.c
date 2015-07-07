@@ -87,6 +87,7 @@ void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, int *status ){
    AstFrame *pfrm;
    AstFrame *tfrm;
    AstFrameSet *tfs;
+   AstCmpMap *tmap;
    AstPermMap *pm;
    const char *cursys;
    const char *trsys;
@@ -166,10 +167,10 @@ void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, int *status ){
 
 /* Use it, in series with with the above PermMap, to connect the POLANAL frame
    to the current Frame. */
-                  astAddFrame( fset, AST__CURRENT,
-                               astCmpMap( astGetMapping( tfs, AST__BASE,
-                                                         AST__CURRENT ),
-                                          pm, 1, " " ), pfrm );
+                  tmap = astCmpMap( astGetMapping( tfs, AST__BASE,
+                                                   AST__CURRENT ),
+                                    pm, 1, " " );
+                  astAddFrame( fset, AST__CURRENT, astSimplify( tmap ), pfrm );
 
 /* Report an error if the mapping from current to tracking systems could
    not be found. */

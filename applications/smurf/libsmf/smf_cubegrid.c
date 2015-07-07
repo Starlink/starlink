@@ -262,6 +262,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    AstKeyMap *cols_km = NULL; /* A KeyMap holding values for extra columns */
    AstMapping *azel2usesys = NULL; /* Mapping form AZEL to requested system */
    AstMapping *fsmap = NULL;  /* Mapping from the "fs" FrameSet */
+   AstMapping *tmap = NULL;   /* Temporary Mapping */
    Grp *colgrp = NULL;   /* Group holding names of extra catalogue columns */
    Grp *labgrp = NULL;   /* Group holding used detector labels */
    char outcatnam[ 41 ]; /* Output catalogue name */
@@ -524,6 +525,11 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
             sf1 = astCopy( skyin );
             astSetC( sf1, "System", "AZEL" );
             azel2usesys = astConvert( sf1, *skyframe, "" );
+            tmap = astGetMapping( azel2usesys, AST__BASE, AST__CURRENT );
+            (void) astAnnul( azel2usesys );
+            azel2usesys = astSimplify( tmap );
+            tmap = astAnnul( tmap );
+
             astTran2( azel2usesys, 1, &(hdr->state->tcs_az_bc1),
                            &(hdr->state->tcs_az_bc2), 1, &a, &b );
 
@@ -551,6 +557,11 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
          } else {
             fsmap = astGetMapping( fs, AST__BASE, AST__CURRENT );
          }
+
+/* Simplify the Mapping, and annul the original Mapping. */
+         tmap = astSimplify( fsmap );
+         (void) astAnnul( fsmap );
+         fsmap = tmap;
 
 /* Transform the positions of the detectors from input GRID to output SKY
    coords (or offset coords if the target is moving). */

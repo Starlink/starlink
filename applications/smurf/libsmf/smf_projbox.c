@@ -179,6 +179,9 @@ void smf_projbox( Grp *igrp, AstFrameSet *refwcs, int lbnd[ NDF__MXDIM ],
 /* Check the alignment was possible. */
          if( fs ) {
 
+/* Replace the FrameSet pointer by a simplified Mapping pointer. */
+            fs = astSimplify( astGetMapping( fs, AST__BASE, AST__CURRENT ) );
+
 /* Get the pixel index bounds of the NDF. */
             ndfBound( indf, NDF__MXDIM, ilbnd, iubnd, &indim, status );
 

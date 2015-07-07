@@ -92,6 +92,7 @@ double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
 /* Local Variables */
    AstFrameSet *fs = NULL;    /* FrameSet joining tracking and requested systems */
    AstFrame *sf2 = NULL;      /* Frame in requested system */
+   AstMapping *fmap = NULL;   /* Mapping from tracking to requested */
    const char *oldsys = NULL; /* Original System value for supplied Frame */
    const char *trsys = NULL;  /* AST tracking system */
    const char *usesys = NULL; /* AST system for output cube */
@@ -107,6 +108,9 @@ double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
 
 /* Check inherited status */
    if (*status != SAI__OK) return 0.0;
+
+/* Begin an AST context. */
+   astBegin;
 
 /* Determine the tracking system, and choose the celestial coordinate system
    for the output cube. */
@@ -140,6 +144,7 @@ double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
 
 /* Find a Mapping from the tracking system to the requested system. */
    fs = astConvert( sf, sf2, "" );
+   fmap = astSimplify( astGetMapping( fs, AST__BASE, AST__CURRENT ) );
 
 /* Use this Mapping to transform the above two positions from tracking to
    the requested system. */
@@ -147,7 +152,7 @@ double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
    yin[ 0 ] = p1[ 1 ];
    xin[ 1 ] = p2[ 0 ];
    yin[ 1 ] = p2[ 1 ];
-   astTran2( fs, 2, xin, yin, 1, xout, yout );
+   astTran2( fmap, 2, xin, yin, 1, xout, yout );
    p1[ 0 ] = xout[ 0 ];
    p1[ 1 ] = yout[ 0 ];
    p2[ 0 ] = xout[ 1 ];
@@ -165,8 +170,7 @@ double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
    astSetC( sf, "System", oldsys );
 
 /* Free resources. */
-   fs = astAnnul( fs );
-   sf2 = astAnnul( sf2 );
+   astEnd;
 
 /* Return the required angle. */
    return result;
