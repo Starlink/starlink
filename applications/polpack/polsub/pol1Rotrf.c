@@ -221,7 +221,7 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
 /* Combine this Mapping with the Mapping from twcs GRID coords to twcs
    POLANAL coords, to get the Mapping from wcs GRID coords to twcs
    POLANAL coords. */
-      gptmap = (AstMapping *) astCmpMap( map, gpmapt, 1, " " );
+      gptmap = astSimplify( astCmpMap( map, gpmapt, 1, " " ) );
 
 /* If "twcs" was not supplied, we use suitable Mappings and Frames
    derived from "wcs" that result in the "ifrm" Frame being used as the
@@ -324,7 +324,7 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
       perm[ 0 ] = 2;
       perm[ 1 ] = 1;
       pm = astPermMap( 2, perm, 2, perm, NULL, " " );
-      gptmap = (AstMapping *) astCmpMap( gptmap, pm, 1, " " );
+      gptmap = astSimplify( astCmpMap( gptmap, pm, 1, " " ) );
    }
 
 /* Add a new POLANAL Frame into the wcs FrameSet. */
