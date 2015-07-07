@@ -35,6 +35,9 @@
 *  History:
 *     25-NOV-2013 (DSB):
 *        Original version.
+*     7-JUL-2015 (DSB):
+*        Indicate that sky separations below 0.05 arc-seconds (SC2AST__SKYTOL)
+*        are insignificant.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -70,6 +73,7 @@
 /* SMURF includes */
 #include "smf.h"
 #include "smf_typ.h"
+#include "sc2da/sc2ast.h"
 
 /* Seconds per day */
 #define SPD 86400.0
@@ -144,6 +148,7 @@ void smf_check_coords( smfData *data, int *status ) {
    astSetD( azel, "ObsLon", -hdr->telpos[ 0 ] );
    astSetD( azel, "ObsLat", hdr->telpos[ 1 ] );
    astSetD( azel, "Dut1", dut1 );
+   astSetD( azel, "SkyTol", SC2AST__SKYTOL );
 
 /* Take a copy of this SkyFrame, and set the System of the copy to the
    AST equivalent of the TCS tracking system. */

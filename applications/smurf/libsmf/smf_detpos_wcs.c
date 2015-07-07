@@ -78,6 +78,9 @@
 *        For extra speed, clone the cached SkyFrame rather than copying it.
 *     13-JAN-2009 (TIMJ):
 *        Add dut1 argument.
+*     7-JUL-2015 (DSB):
+*        Indicate that sky separations below 0.05 arc-seconds (SC2AST__SKYTOL)
+*        are insignificant.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -250,6 +253,7 @@ smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
       cache->sky = astSkyFrame( "System=AzEl" );
       astSetD( cache->sky, "ObsLon", -telpos[ 0 ] );
       astSetD( cache->sky, "ObsLat", telpos[ 1 ] );
+      astSetD( cache->sky, "SkyTol", SC2AST__SKYTOL );
       astExempt( cache->sky );
 
 /* If the detpos positions are referred to the TRACKING frame, change

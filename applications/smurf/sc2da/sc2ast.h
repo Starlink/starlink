@@ -69,6 +69,13 @@
 
 #define SC2AST_SPD 86400.0  /* Seconds per day */
 
+/* Minimum significant separation between sky positions, in arc-seconds.
+   This is used to determine when the mapping between two SkyFrames can
+   be considered to be a unit transformation for the purposes of
+   simplification. If the Mapping between two SkyFrames produces shifts
+   smaller than this amount, then they are considered to be identical. */
+#define SC2AST__SKYTOL 0.05
+
 /* Following include is for JCMTState definition */
 #include "jcmt/state.h"
 

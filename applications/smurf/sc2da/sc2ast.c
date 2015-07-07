@@ -344,6 +344,8 @@ int *status             /* global status (given and returned) */
                  the code on the basis that there are only two possible situations
                  (TRACKING and IMAGE) rather than four. (GSB)
      10Jun2014:  Store the telescope altitude in the returned skyframe.
+     07Jul2015:  Indicate that sky distances of less than 0.05 arc-seconds
+                 are insignificatnt.
 */
 {
 
@@ -1726,9 +1728,11 @@ int *status             /* global status (given and returned) */
    observations. We have to do this because the cache does not (yet)
    get cleared between observations, especially in the DA. Benchmarking
    indicates that there is no penalty in calling this every time for
-   non-moving objects. */
+   non-moving objects. Indicate that Mappings between SkyFrames can be
+   considered as unit transformations for the purposes of simplification
+   if the Mapping causes shifts of less than 0.05 arc-seconds. */
       if( !cache->skyframe ) {
-         cache->skyframe = astSkyFrame ( "system=AzEl" );
+         cache->skyframe = astSkyFrame ( "system=AzEl,SkyTol=%g", SC2AST__SKYTOL );
 
          /* Ast assumes longitude increases eastward, so change sign to
    	 be consistent with smf_calc_telpos here */
@@ -2065,7 +2069,7 @@ int *status             /* global status (given and returned) */
 
    unitmap = astUnitMap ( 1, " " );
    cmpmap = astCmpMap ( frameset, unitmap, 0, " " );
-   skyframe = astSkyFrame ( " " );
+   skyframe = astSkyFrame ( "SkyTol=%g", SC2AST__SKYTOL );
    polframe = astCmpFrame ( skyframe, extframe, " " );
    astAddFrame ( *fset, AST__CURRENT, cmpmap, polframe );
 

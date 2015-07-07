@@ -126,6 +126,9 @@
 *     2013-6-27 (DSB):
 *        Return FrameSet that give sbad output values if any of the required state
 *        information is bad.
+*     2015-07-07 (DSB):
+*        Indicate that sky separations below 0.05 arc-seconds (SC2AST__SKYTOL)
+*        are insignificant.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -485,7 +488,7 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
          SkyFrame to avoid the overhead of constantly re-creating it. The Epoch
          is set every time though since this will vary from call to call. */
       if( !cache->skyframe ) {
-        cache->skyframe = astSkyFrame ( "system=AzEl" );
+        cache->skyframe = astSkyFrame ( "system=AzEl,SkyTol=%g", SC2AST__SKYTOL );
 
         /* Ast assumes longitude increases eastward, so change sign to
   	 be consistent with smf_calc_telpos here */

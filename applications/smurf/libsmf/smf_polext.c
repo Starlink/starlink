@@ -67,6 +67,9 @@
 *        Ensure that the original current WCS Frame is not changed.
 *     8-JAN-2013 (DSB):
 *        Add argument "axis".
+*     7-JUL-2015 (DSB):
+*        Indicate that sky separations below 0.05 arc-seconds (SC2AST__SKYTOL)
+*        are insignificant.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -150,7 +153,7 @@ void smf_polext( int ondf, int store_angle, double angle, const char *domain,
    we create a default SkyFrame, permute its axes to make north (latitude)
    the first axis, and then search the 3D current WCS Frame to find a
    Frame that looks like the template. */
-      template = (AstFrame *) astSkyFrame( "MaxAxes=3" );
+      template = (AstFrame *) astSkyFrame( "MaxAxes=3,SkyTol=%g", SC2AST__SKYTOL );
       perm[ 0 ] = 2;
       perm[ 1 ] = 1;
       astPermAxes( template, perm );
