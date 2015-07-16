@@ -53034,6 +53034,15 @@ and HDS data types is as follows:
 
 \section{\xlabel{se_changes}Release Notes---V2.3\label{se:changes}}
 
+\subsection{New Commands}
+The following new applications have been added:
+
+\begin{description}
+   \item [\htmlref{NDFCOMPARE}{NDFCOMPARE}] \mbox{}
+   Compares two NDFs and reports whether they are equivalent, based
+   on a range of different tests.
+\end{description}
+
 \subsection{Modified Commands}
 The following applications have been modified:
 \begin{description}[style=nextline]
@@ -53050,11 +53059,11 @@ The following applications have been modified:
       \begin{itemize}
         \item Now calculates and displays Pearson's coefficient of linear
         correlation on the remaining data at every iteration.
-        \item New parameters CORR added to hold the last displayed correlation
+        \item New Parameter CORR added to hold the last displayed correlation
         coefficient.
-        \item New parameters OUTSLOPE, OUTOFFSET and OUTCORR added. These
-        are 1-dimensional NDFs in which the slopes, offsets and correlation
-        coefficients are stored when operating in looping mode (\emph{i.e.}
+        \item New Parameters OUTSLOPE, OUTOFFSET and OUTCORR added. These
+        are one-dimensional NDFs in which the slopes, offsets and correlation
+        coefficients respectively are stored when operating in looping mode (\emph{i.e.}
         LOOP=\texttt{TRUE}).
       \end{itemize}
 
@@ -53065,74 +53074,6 @@ The following applications have been modified:
       \end{itemize}
 
 \end{description}
-
-\section{Release Notes---V2.2}
-
-\subsubsection{Documentation Changes}
-\begin{itemize}
-   \item SUN/95 has been upgraded to the new style of documentation.
-   Some residual collateral damage to the typesetting is likely to be
-   present.
-   \item Most of the old release notes have been removed from SUN/95,
-   with just the few most-recent sets of notes retained in a separate
-   appendix.
-   \item The detailed descriptions of plotting and AST attributes are now in
-   appendices.
-\end{itemize}
-
-\subsection{Modified Commands}
-The following applications have been modified:
-\begin{description}[style=nextline]
-
-   \item [\htmlref{COLLAPSE}{COLLAPSE}]\mbox{}
-      \begin{itemize}
-        \item  Fixed bug in the calculation of the variance for the Sum
-        estimator.  Note that this applies to other collapsing commands
-        such as \htmlref{MSTATS}{MSTATS}.
-      \end{itemize}
-
-   \item [\htmlref{CONFIGECHO}{CONFIGECHO}]\mbox{}
-      \begin{itemize}
-        \item  A new parameter called LOGFILE has been added that allows
-        the list of displayed configuration parameters to be written to a
-        text file.
-      \end{itemize}
-
-   \item [\htmlref{COPYBAD}{COPYBAD}]\mbox{}
-      \begin{itemize}
-        \item  Restore setting the BAD\_PIXEL flag for the DATA and VARIANCE
-        components, only setting it false if no bad pixels were copied
-        and none existed in the input NDF.
-      \end{itemize}
-
-   \item [\htmlref{SEGMENT}{SEGMENT}]\mbox{}
-      \begin{itemize}
-        \item  A bug that caused a crash for NDFs with degenerate axes
-        has been fixed.
-      \end{itemize}
-
-   \item [\htmlref{SETQUAL}{SETQUAL}]\mbox{}
-      \begin{itemize}
-        \item  A new parameter QVALUE can be used to store a constant
-        integer value in the range 0 to 255 in the QUALITY component for
-        all pixels.
-      \end{itemize}
-
-   \item [\htmlref{WCSALIGN}{WCSALIGN}]\mbox{}
-      \begin{itemize}
-        \item  A new parameter ALIGNREF can be used to control the
-        co-ordinate system in which the input NDFs are aligned.
-      \end{itemize}
-
-   \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}]\mbox{}
-      \begin{itemize}
-        \item  A new parameter ALIGNREF can be used to control the
-        co-ordinate system in which the input NDFs are aligned.
-      \end{itemize}
-
-\end{description}
-
-
 
 \section{Notes from Previous Few Releases}
 
@@ -53501,17 +53442,71 @@ The following applications have been modified:
       \end{itemize}
 \end{description}
 
-\subsection{Release Notes---V2.3}
+\subsection{Release Notes---V2.2}
 
-\subsubsection{New Commands}
-The following new applications have been added:
+\subsubsection{Documentation Changes}
+\begin{itemize}
+   \item SUN/95 has been upgraded to the new style of documentation.
+   Some residual collateral damage to the typesetting is likely to be
+   present.
+   \item Most of the old release notes have been removed from SUN/95,
+   with just the few most-recent sets of notes retained in a separate
+   appendix.
+   \item The detailed descriptions of plotting and AST attributes are now in
+   appendices.
+\end{itemize}
 
-\begin{description}
-   \item [\htmlref{NDFCOMPARE}{NDFCOMPARE}] \mbox{}
-   Compares two NDFs and reports whether they are equivalent, based
-   on a range of different tests.
+\subsubsection{Modified Commands}
+The following applications have been modified:
+\begin{description}[style=nextline]
+
+   \item [\htmlref{COLLAPSE}{COLLAPSE}]\mbox{}
+      \begin{itemize}
+        \item  Fixed bug in the calculation of the variance for the Sum
+        estimator.  Note that this applies to other collapsing commands
+        such as \htmlref{MSTATS}{MSTATS}.
+      \end{itemize}
+
+   \item [\htmlref{CONFIGECHO}{CONFIGECHO}]\mbox{}
+      \begin{itemize}
+        \item  A new parameter called LOGFILE has been added that allows
+        the list of displayed configuration parameters to be written to a
+        text file.
+      \end{itemize}
+
+   \item [\htmlref{COPYBAD}{COPYBAD}]\mbox{}
+      \begin{itemize}
+        \item  Restore setting the BAD\_PIXEL flag for the DATA and VARIANCE
+        components, only setting it false if no bad pixels were copied
+        and none existed in the input NDF.
+      \end{itemize}
+
+   \item [\htmlref{SEGMENT}{SEGMENT}]\mbox{}
+      \begin{itemize}
+        \item  A bug that caused a crash for NDFs with degenerate axes
+        has been fixed.
+      \end{itemize}
+
+   \item [\htmlref{SETQUAL}{SETQUAL}]\mbox{}
+      \begin{itemize}
+        \item  A new parameter QVALUE can be used to store a constant
+        integer value in the range 0 to 255 in the QUALITY component for
+        all pixels.
+      \end{itemize}
+
+   \item [\htmlref{WCSALIGN}{WCSALIGN}]\mbox{}
+      \begin{itemize}
+        \item  A new parameter ALIGNREF can be used to control the
+        co-ordinate system in which the input NDFs are aligned.
+      \end{itemize}
+
+   \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}]\mbox{}
+      \begin{itemize}
+        \item  A new parameter ALIGNREF can be used to control the
+        co-ordinate system in which the input NDFs are aligned.
+      \end{itemize}
+
 \end{description}
-
 
 \begin{latexonly}
 \newpage
