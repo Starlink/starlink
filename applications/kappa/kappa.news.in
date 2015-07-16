@@ -4,6 +4,13 @@
    changes are listed below.  For complete details of all
    changes, see the "Release Notes" appendix in SUN/95.
 
+2 New_applications
+
+   o  NDFCOMPARE
+
+      -  Compares two NDFs and reports whether they are equivalent, based
+      on a range of different tests.
+
 2 Modified_applications
 
    o  FITSMOD

@@ -1043,6 +1043,147 @@ package kappa {
 
       }
 
+      action ndfcompare {
+         alias {ndfcompare}
+
+         helplib {$KAPPA_HELP}
+
+         parameter accdat {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Maximum difference allowed between DATA values}
+            helpkey *
+            default {1E-6 R}
+         }
+
+         parameter accpos {
+            type _DOUBLE
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Maximum allowed positional difference in pixels}
+            helpkey *
+            default 0.2
+         }
+
+         parameter accvar {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Maximum difference allowed between VARIANCE values}
+            helpkey *
+            default {1E-6 R}
+         }
+
+         parameter case {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Case sensitive string comparisons?}
+            helpkey *
+            default TRUE
+         }
+
+         parameter comp {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {List of NDF components to check for existence}
+            helpkey *
+            default !
+         }
+
+         parameter dotests {
+            size *
+            type _INTEGER
+            access READ
+            ppath DEFAULT
+            vpath DEFAULT
+            prompt {The initial list of tests to perform}
+            default !
+            helpkey *
+         }
+
+         parameter in1 {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The first NDF to compare}
+            helpkey *
+         }
+
+         parameter in2 {
+            position 2
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The second NDF to compare}
+            helpkey *
+         }
+
+         parameter nbad {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Maximum difference in bad pixel counts}
+            helpkey *
+            default {0.001 R}
+         }
+
+         parameter report {
+            position 3
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Text file in which to store the report}
+            helpkey *
+            default !
+         }
+
+         parameter skiptests {
+            size *
+            type _INTEGER
+            access READ
+            ppath DEFAULT
+            vpath DEFAULT
+            prompt {The list of tests to skip}
+            default 15
+            helpkey *
+         }
+
+         parameter similar {
+            type _LOGICAL
+            access WRITE
+            vpath DEFAULT
+            default FALSE
+            prompt {Object to store result of comparison}
+            helpkey *
+         }
+
+         parameter white {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Ignore leading and traing spaces in string comparisons?}
+            helpkey *
+            default FALSE
+         }
+
+      }
+
       action ndfcopy {
          alias {ndfc(opy)}
 

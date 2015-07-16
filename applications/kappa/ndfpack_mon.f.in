@@ -306,6 +306,10 @@
          ELSE IF ( NAME .EQ. 'NDFECHO' ) THEN
             CALL NDFECHO ( STATUS )
 
+*  Compare two NDFs
+         ELSE IF ( NAME .EQ. 'NDFCOMPARE' ) THEN
+            CALL NDFCOMPARE ( STATUS )
+
 *  Compresses an NDF
          ELSE IF ( NAME .EQ. 'NDFCOMPRESS' ) THEN
             CALL NDFCOMPRESS ( STATUS )

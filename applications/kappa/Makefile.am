@@ -149,7 +149,7 @@ native ndfcompress ndfcopy ndfecho ndftrace setaxis setbad setbb setbound \
 setext setlabel \
 setnorm setorigin setsky settitle settype setunits setvar wcsadd \
 wcsattrib wcscopy wcsframe wcsremove wcsshow chain reshape showqual \
-setqual remqual qualtobad provshow provadd provmod provrem
+setqual remqual qualtobad provshow provadd provmod provrem ndfcompare
 
 
 
@@ -284,7 +284,7 @@ cmult.ifc collapse.ifc compadd.ifc compave.ifc compick.ifc \
 convolve.ifc copybad.ifc creframe.ifc csub.ifc cumulvec.ifc \
 div.ifc beamfit.ifc pluck.ifc pow.ifc ndfpack_mon.ifc \
 kapview_mon.ifc kappa_mon.ifc wcsslide.ifc regionmask.ifc \
-configecho.ifc excludebad.ifc
+configecho.ifc excludebad.ifc ndfcompare.ifc
 
 
 BUILT_IFL_FILES = kappa_mon.ifl beamfit.ifl carpet.ifl \
@@ -327,7 +327,7 @@ setqual.ifl setsky.ifl settitle.ifl settype.ifl provmod.ifl provrem.ifl \
 setunits.ifl setvar.ifl showqual.ifl provshow.ifl provadd.ifl \
 vecplot.ifl wcsadd.ifl wcsattrib.ifl wcscopy.ifl wcsframe.ifl \
 wcsremove.ifl wcsshow.ifl axconv.ifl mem2d.ifl wcsslide.ifl \
-regionmask.ifl configecho.ifl excludebad.ifl
+regionmask.ifl configecho.ifl excludebad.ifl ndfcompare.ifl
 
 EXTRA_DIST = multiplot.csh.in kappa_master.hlp $(HELP_FILES)
 
