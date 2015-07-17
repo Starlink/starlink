@@ -695,7 +695,7 @@ F77_SUBROUTINE(ndfcompare)( INTEGER(status) ){
             ndfCget( indf1, "UNITS", cbuf1, sizeof(cbuf1), status );
 
             cbuf2[0] = 0;
-            ndfCget( indf2, "UNITS", cbuf1, sizeof(cbuf2), status );
+            ndfCget( indf2, "UNITS", cbuf2, sizeof(cbuf2), status );
 
             if( white ){
                astRemoveLeadingBlanks( cbuf1 );
@@ -717,7 +717,7 @@ F77_SUBROUTINE(ndfcompare)( INTEGER(status) ){
             ndfCget( indf1, "LABEL", cbuf1, sizeof(cbuf1), status );
 
             cbuf2[0] = 0;
-            ndfCget( indf2, "LABEL", cbuf1, sizeof(cbuf2), status );
+            ndfCget( indf2, "LABEL", cbuf2, sizeof(cbuf2), status );
 
             if( white ){
                astRemoveLeadingBlanks( cbuf1 );
@@ -882,8 +882,17 @@ F77_SUBROUTINE(ndfcompare)( INTEGER(status) ){
             maxerr = FindMaxPixelDiff( indf1, indf2, "DATA", cbuf2[0],
                                         status );
 
+/* Make a report if there is no overlap (but only if the test on pixel
+   bounds has not already reported this). */
+            if( maxerr == VAL__MAXD ) {
+               if( !dotest[ 1 ] ) {
+                  similar = Report( reports, itest, "The pixel data values in"
+                                   " IN1 and IN2 cannot be compared since "
+                                   "the NDFs do not overlap.", status );
+               }
+
 /* Make a report if the difference is too large. */
-            if( maxerr > acc ) {
+            } else if( maxerr > acc ) {
                if( cbuf2[0] == 'R' ){
                   unit = "%";
                   maxerr *= 100.0;
@@ -918,8 +927,17 @@ F77_SUBROUTINE(ndfcompare)( INTEGER(status) ){
                maxerr = FindMaxPixelDiff( indf1, indf2, "VARIANCE",
                                           cbuf2[0], status );
 
+/* Make a report if there is no overlap (but only if the test on pixel
+   bounds or data values has not already reported this). */
+               if( maxerr == VAL__MAXD ) {
+                  if( !dotest[ 1 ] && !dotest[ 12 ] ) {
+                     similar = Report( reports, itest, "The pixel variances in"
+                                      " IN1 and IN2 cannot be compared since "
+                                      "the NDFs do not overlap.", status );
+                  }
+
 /* Make a report if the difference is too large. */
-               if( maxerr > acc ) {
+               } else if( maxerr > acc ) {
                   if( cbuf2[0] == 'R' ){
                      unit = "%";
                      maxerr *= 100.0;
@@ -957,8 +975,15 @@ F77_SUBROUTINE(ndfcompare)( INTEGER(status) ){
                ndiff = CountQualityDiff( indf1, indf2, &nel, status );
 
 /* Make a report if these numbers differ by too much. */
-               if( ( cbuf2[0] == 'R' && ndiff > acc*nel ) ||
-                   ( cbuf2[0] == 'A' && ndiff > acc ) ){
+               if( ndiff == VAL__MAXI ){
+                  if( !dotest[ 1 ] && !dotest[ 12 ] && !dotest[ 13 ] ) {
+                     similar = Report( reports, itest, "The Quality values in "
+                                       "IN1 and IN2 cannot be compared since the"
+                                       "NDFs do not overlap.", status );
+                  }
+
+               } else if( ( cbuf2[0] == 'R' && ndiff > acc*nel ) ||
+                          ( cbuf2[0] == 'A' && ndiff > acc ) ){
                   similar = Report( reports, itest, "%d pixels have differing "
                                    "quality values in IN1 and IN2.", status,
                                    ndiff );
@@ -1443,6 +1468,8 @@ static int CountQualityDiff( int indf1, int indf2, int *nel, int *status ){
    const unsigned char *ip1;
    const unsigned char *ip2;
    int i;
+   int indf1s;
+   int indf2s;
 
 /* Initialise */
    result = 0;
@@ -1450,18 +1477,34 @@ static int CountQualityDiff( int indf1, int indf2, int *nel, int *status ){
 /* Check inherited status */
    if( *status != SAI__OK ) return result;
 
-/* Map the two quality arrays. */
-   ndfMap( indf1, "QUALITY", "_UBYTE", "READ", (void **) &ip1, nel, status );
-   ndfMap( indf2, "QUALITY", "_UBYTE", "READ", (void **) &ip2, nel, status );
+/* Begin an NDF context so we do not need to worry about unmapping and
+   annulling NDFs created in this function. */
+   ndfBegin();
+
+/* Ensure we are dealing with NDFs that have equal bounds. */
+   ndfClone( indf1, &indf1s, status );
+   ndfClone( indf2, &indf2s, status );
+   ndfMbnd( "TRIM", &indf1s, &indf2s, status );
+
+/* If the two NDFs have no overlap, annull the error and return VAL__MAXI
+   to indicate this. */
+   if( *status == NDF__NOTRM ) {
+      errAnnul( status );
+      result = VAL__MAXI;
+
+/* Map the Quality component. */
+   } else {
+      ndfMap( indf1s, "QUALITY", "_UBYTE", "READ", (void **) &ip1, nel, status );
+      ndfMap( indf2s, "QUALITY", "_UBYTE", "READ", (void **) &ip2, nel, status );
 
 /* Loop round counting the pixels with different quality values. */
-   for( i = 0; i < *nel; i++ ) {
-      if( *(ip1++) != *(ip2++) ) result++;
+      for( i = 0; i < *nel; i++ ) {
+         if( *(ip1++) != *(ip2++) ) result++;
+      }
    }
 
-/* Unmap the arrays. */
-   ndfUnmap( indf1, "QUALITY", status );
-   ndfUnmap( indf2, "QUALITY", status );
+/* End the NDF context. */
+   ndfEnd( status );
 
 /* Return the count. */
    return result;
@@ -1610,66 +1653,74 @@ static double FindMaxPixelDiff( int indf1, int indf2, const char *comp,
    ndfClone( indf2, &indf2s, status );
    ndfMbnd( "TRIM", &indf1s, &indf2s, status );
 
+/* If the two NDFs have no overlap, annull the error and return VAL__MAXD
+   to indicate this. */
+   if( *status == NDF__NOTRM ) {
+      errAnnul( status );
+      result = VAL__MAXD;
+
 /* Map the requested component using an appropriate data type. */
-   ndfMtype( "_INTEGER,_REAL,_DOUBLE", indf1s, indf2s, comp, type,
-             sizeof(type), dtype, sizeof(dtype), status );
-   ndfMap( indf1s, comp, type, "READ", &ip1, &el, status );
-   ndfMap( indf2s, comp, type, "READ", &ip2, &el, status );
+   } else {
+      ndfMtype( "_INTEGER,_REAL,_DOUBLE", indf1s, indf2s, comp, type,
+                sizeof(type), dtype, sizeof(dtype), status );
+      ndfMap( indf1s, comp, type, "READ", &ip1, &el, status );
+      ndfMap( indf2s, comp, type, "READ", &ip2, &el, status );
 
 /* First handle cases where the accuracy is specified as a
    signal-to-noise value. */
-   if( qual == 'V' ) {
+      if( qual == 'V' ) {
 
 /* We need to map the Variance arrays as well. */
-      ndfMap( indf1s, "VARIANCE", type, "READ", &ipv1, &el, status );
-      ndfMap( indf2s, "VARIANCE", type, "READ", &ipv2, &el, status );
+         ndfMap( indf1s, "VARIANCE", type, "READ", &ipv1, &el, status );
+         ndfMap( indf2s, "VARIANCE", type, "READ", &ipv2, &el, status );
 
-      if( !strcmp( type, "_INTEGER" ) ) {
-         MAXERROR_V(int,VAL__BADI)
-      } else if( !strcmp( type, "_REAL" ) ) {
-         MAXERROR_V(float,VAL__BADR)
-      } else if( !strcmp( type, "_DOUBLE" ) ) {
-         MAXERROR_V(double,VAL__BADD)
-      } else if( *status == SAI__OK ) {
-         *status = SAI__ERROR;
-         errRepf( "", "Unsupported data type '%s' - programming error in "
-                  "FindMaxPixelDiff.", status, type );
-      }
+         if( !strcmp( type, "_INTEGER" ) ) {
+            MAXERROR_V(int,VAL__BADI)
+         } else if( !strcmp( type, "_REAL" ) ) {
+            MAXERROR_V(float,VAL__BADR)
+         } else if( !strcmp( type, "_DOUBLE" ) ) {
+            MAXERROR_V(double,VAL__BADD)
+         } else if( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRepf( "", "Unsupported data type '%s' - programming error in "
+                     "FindMaxPixelDiff.", status, type );
+         }
 
 /* Now handle cases where the accuracy is specified as a relative error. */
-   } else if( qual == 'R' ) {
-      if( !strcmp( type, "_INTEGER" ) ) {
-         MAXERROR_R(int,VAL__BADI)
-      } else if( !strcmp( type, "_REAL" ) ) {
-         MAXERROR_R(float,VAL__BADR)
-      } else if( !strcmp( type, "_DOUBLE" ) ) {
-         MAXERROR_R(double,VAL__BADD)
-      } else if( *status == SAI__OK ) {
-         *status = SAI__ERROR;
-         errRepf( "", "Unsupported data type '%s' - programming error in "
-                  "FindMaxPixelDiff.", status, type );
-      }
+      } else if( qual == 'R' ) {
+         if( !strcmp( type, "_INTEGER" ) ) {
+            MAXERROR_R(int,VAL__BADI)
+         } else if( !strcmp( type, "_REAL" ) ) {
+            MAXERROR_R(float,VAL__BADR)
+         } else if( !strcmp( type, "_DOUBLE" ) ) {
+            MAXERROR_R(double,VAL__BADD)
+         } else if( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRepf( "", "Unsupported data type '%s' - programming error in "
+                     "FindMaxPixelDiff.", status, type );
+         }
 
 /* First handle cases where the accuracy is specified as an absolute
    error. */
-   } else if( qual == 'A' ) {
-      if( !strcmp( type, "_INTEGER" ) ) {
-         MAXERROR_A(int,VAL__BADI)
-      } else if( !strcmp( type, "_REAL" ) ) {
-         MAXERROR_A(float,VAL__BADR)
-      } else if( !strcmp( type, "_DOUBLE" ) ) {
-         MAXERROR_A(double,VAL__BADD)
-      } else if( *status == SAI__OK ) {
-         *status = SAI__ERROR;
-         errRepf( "", "Unsupported data type '%s' - programming error in "
-                  "FindMaxPixelDiff.", status, type );
-      }
+      } else if( qual == 'A' ) {
+         if( !strcmp( type, "_INTEGER" ) ) {
+            MAXERROR_A(int,VAL__BADI)
+         } else if( !strcmp( type, "_REAL" ) ) {
+            MAXERROR_A(float,VAL__BADR)
+         } else if( !strcmp( type, "_DOUBLE" ) ) {
+            MAXERROR_A(double,VAL__BADD)
+         } else if( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRepf( "", "Unsupported data type '%s' - programming error in "
+                     "FindMaxPixelDiff.", status, type );
+         }
 
 /* Report an error for any other type of qualifier. */
-   } else if( *status == SAI__OK ) {
-      *status = SAI__ERROR;
-      errRepf( "", "Bad qualifier (%c) supplied - programming error in "
-               "FindMaxPixelDiff.", status, qual );
+      } else if( *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRepf( "", "Bad qualifier (%c) supplied - programming error in "
+                  "FindMaxPixelDiff.", status, qual );
+      }
    }
 
 /* End the NDF context. */
