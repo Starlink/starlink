@@ -28,6 +28,9 @@ readline.parse_and_bind('tab: complete')
 
 #  -------------------  misc ---------------------------
 
+#  original adam directory
+__adam_user = None
+
 #  Function to return the name of the executing script, without any
 #  trailing ".py" suffix.
 __cmd = None
@@ -391,7 +394,14 @@ def invoke(command,aslist=False,buffer=None,annul=False):
    msg_out( "\n", ATASK )
    return outtxt
 
-
+def get_adam_user():
+   global __adam_user
+   if not __adam_user:
+      if "ADAM_USER" in os.environ:
+         __adam_user = os.environ["ADAM_USER"]
+      else:
+         __adam_user = os.path.join(os.environ["HOME"],"adam")
+   return __adam_user
 
 def get_fits_header( ndf, keyword, report=False ):
    try:
@@ -460,6 +470,59 @@ def get_task_par( parname, taskname, **kwargs ):
       result = eval( text )
 
    return result
+
+
+def put_task_par( parname, taskname, parvalue, partype ):
+   """
+
+   Stores the supplied value for an ATASK parameter.
+
+   Invocation:
+      put_task_par( parname, taskname, parvalue, partype )
+
+   Arguments:
+      parname = string
+         The name of the task parameter. Must be a scalar value.
+      taskname = string
+         The name of the task.
+      parvalue = ?
+         The value to store.
+      partype = string
+         The HDS type of the parameter.
+
+   """
+
+   parfile = os.path.join( get_adam_user(), "{0}.sdf".format(taskname))
+
+   if not os.path.isfile(parfile):
+      invoke( "$HDSTOOLS_DIR/hcreate {0} struc".format(parfile) )
+      exists = False
+   else:
+      try:
+         invoke( "$HDSTOOLS_DIR/hget {0}.{1} typ".format(parfile,parname) )
+         exists = True
+      except AtaskError:
+         exists = False
+
+   if not exists:
+      if partype:
+         invoke( "$HDSTOOLS_DIR/hcreate {0}.{1} {2}".format(parfile,parname,partype) )
+      else:
+         raise UsageError("No HDS type supplied for new parameter {0}.{1}".
+                           format(taskname,parname))
+
+   if partype == "_LOGICAL":
+      if parvalue:
+         hdsval = "TRUE"
+      else:
+         hdsval = "FALSE"
+   else:
+      hdsval = "{0}".format(parvalue)
+
+   invoke( "$HDSTOOLS_DIR/hmodify {0}.{1} {2}".format(parfile,parname,hdsval))
+
+
+
 
 
 def shell_quote(text,remove=False):
@@ -595,7 +658,7 @@ class ParSys(object):
 	 starutil.NONE, starutil.CRITICAL, starutil.PROGRESS,
 	 starutil.ATASK or starutil.DEBUG) to the module variable
 	 starutil.glevel. The default value is the value of
-         "starutil.ilevel" when the ParSys object is created, which is
+         "starutil.glevel" when the ParSys object is created, which is
          starutil.ATASK unless the caller changes it before creating
          the ParSys. []
 
@@ -804,7 +867,10 @@ class ParSys(object):
       ilevel = _getLevel(self.params["ILEVEL"].value)
       glevel = _getLevel(self.params["GLEVEL"].value)
 
-      #  Create a new ADAM directory in the user's home directory.
+      #  Ensure the original ADAM directory is recorded
+      get_adam_user()
+
+      #  Create a new ADAM directory in the NDG temp directory.
       if ParSys.adamdir == None:
          ParSys.adamdir = tempfile.mkdtemp( prefix="adam_", suffix="_py",
                                             dir=NDG._gettmpdir() )

@@ -6115,6 +6115,10 @@ package @PACKAGE@ {
         obey {python $SMURF_DIR/rawregion.py}
     }
 
+    command sc2compare {
+        obey {python $SMURF_DIR/sc2compare.py}
+    }
+
     icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
 
     display {
