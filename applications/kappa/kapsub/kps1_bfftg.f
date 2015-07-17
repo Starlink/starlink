@@ -142,6 +142,10 @@
 *           Are the separations fixed?
 *        SHAPEC = LOGICAL (Read)
 *           Exponent of the Gaussian function fixed by user?
+*        PIXAR = DOUBLE PRECISION (Read)
+*           Pixel aspect ratio.  Normal square pixels if set to 1.0.  If
+*           it is greater than one, it means that pixels have larger
+*           dimensions along the X axis.
 
 *  Arguments Given:
       INTEGER M
@@ -259,10 +263,10 @@
 *  Evaluate sum of Gaussian fits.  Recall PC( 1, IG ) and PC( 2, IG )
 *  are the x and y centre co-ordinates respectively for the IGth 
 *  Gaussian fit.
-                     E1 = ( XX - PC( 1, IG ) ) * CT +
+                     E1 = ( XX - PC( 1, IG ) ) * CT * PIXAR +
      :                    ( YY - PC( 2, IG ) ) * ST
                      E2 = ( YY - PC( 2, IG ) ) * CT -
-     :                    ( XX - PC( 1, IG ) ) * ST
+     :                    ( XX - PC( 1, IG ) ) * ST * PIXAR
 
 *  PC( 3, IG ) and PC( 4, IG ) are the major- and minor-axis standard
 *  deviations respectively for the IGth Gaussian fit.  PC( 8, IG ) is the
@@ -311,10 +315,10 @@
 *  Evaluate sum of Gaussian fits.  Recall PC( 1, IG ) and PC( 2, IG ) 
 *  are the x and y centre co-ordinates respectively for the IGth 
 *  Gaussian.
-                     E1 = ( XX - PC( 1, IG ) ) * CT +
+                     E1 = ( XX - PC( 1, IG ) ) * CT * PIXAR +
      :                    ( YY - PC( 2, IG ) ) * ST
                      E2 = ( YY - PC( 2, IG ) ) * CT -
-     :                    ( XX - PC( 1, IG ) ) * ST
+     :                    ( XX - PC( 1, IG ) ) * ST * PIXAR
 
 *  PC( 3, IG ) and PC( 4, IG ) are the major- and minor-axis standard
 *  deviations respectively for the IGth Gaussian fit.  PC( 8, IG ) is the

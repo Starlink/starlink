@@ -392,6 +392,12 @@
 *     RMS = _REAL (Write)
 *        The primary beam position's root mean-squared deviation from
 *        the fit.
+*     SQUARE = _LOGICAL (Read)
+*        Whether or not to correct for pixels that are not square in
+*        the current WCS.  If set to FALSE, pixels are assumed to be
+*        square and ned no correction.  If set to TRUE, the aspect ratio
+*        of pixels in the current WCS is determined and applied to
+*        determine the correct FWHMs and orientation.  [FALSE]
 *     SUM = _DOUBLE (Write)
 *        The total data sum of the multi-Gaussian fit above the
 *        background.  The fit is evaluated at the centre of every pixel
@@ -513,7 +519,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2009, 2010, 2011, 2013 Science & Technology
+*     Copyright (C) 2009, 2010, 2011, 2013, 2015 Science & Technology
 *     Facilities Council.
 *     All Rights Reserved.
 
@@ -606,6 +612,9 @@
 *     2013 July 29 (MJC):
 *        Seven output parameters now record the fit statistics for all
 *        beams, not just for the primary.
+*     2015 July 16 (MJC):
+*        Add Parameter SQUARE to cope with non-square pixels such as
+*        in a HEALPix projection.
 *     {enter_further_changes_here}
 
 *-
@@ -706,6 +715,8 @@
                                  ! parameter
       CHARACTER*( PAR__SZNAM + 1 ) PARNAM ! Parameter name for the
                                  ! current initial beam position
+      DOUBLE PRECISION PIXSC( BF__NDIM ) ! Pixel size
+      DOUBLE PRECISION PIXSCR    ! Pixel aspect ratio
       INTEGER PLACE              ! NDF placeholder
       LOGICAL POLAR              ! Use polar co-ordinates for POS2-POS5?
       LOGICAL QUIET              ! Suppress screen output?
@@ -718,6 +729,7 @@
       INTEGER SHIFT( NDF__MXDIM ) ! Pixel-index shifts to apply
       INTEGER SLBND( BF__NDIM )  ! Significant lower bounds of the image
       CHARACTER*7 SKYREF         ! Value of Frame attribute SkyRefIs
+      LOGICAL SQUARE             ! Correct for non-square pixels?
       INTEGER STATE              ! State of POSx parameter
       INTEGER SUBND( BF__NDIM )  ! Significant upper bounds of the image
       DOUBLE PRECISION SUM       ! Sum of fit evaluated at pixel centres
@@ -1088,6 +1100,9 @@
          FITREG( I ) = MIN( DIMS( I ), FITREG( I ) )
       END DO
 
+*  Correct for non-square pixels in the the current WCS?
+      CALL PAR_GET0L( 'SQUARE', SQUARE, STATUS )
+
 *  Reference position
 *  ------------------
 
@@ -1135,6 +1150,14 @@
 *  default when a null is supplied.
          CALL KPG1_GTPOS( 'REFPOS', CFRM, .TRUE., REFPOS, BC, STATUS )
          REFLAB = 'map centre'
+      END IF
+
+*  Derive the pixel aspect ratio from the pixel size along each axis
+*  at the pixel centre.
+      PIXSCR = 1.0D0
+      IF ( SQUARE ) THEN
+         CALL KPG1_PXSCL( IWCS, CENTRE, PIXSC, STATUS )
+         PIXSCR = PIXSC( 1 ) / PIXSC( 2 )
       END IF
 
 *  Is the amplitude fixed?
@@ -1398,8 +1421,8 @@
          CALL KPS1_BFINT( NDFC, IWCS, IPLOT, MAP3, MAP1, CFRM,
      :                    VAR, NPOS, POLAR, 'POS', CURSOR, MARK, IMARK,
      :                    NAXC, NAXIN, LOGF, FDL, FIXCON, AMPRAT, SLBND,
-     :                    SUBND, FAREA, FITREG, REFPOS, REFLAB, MXCOEF,
-     :                    FPAR, STATUS )
+     :                    SUBND, FAREA, FITREG, REFPOS, REFLAB, PIXSCR,
+     :                    MXCOEF, FPAR, STATUS )
 
 *  Delete the temporary NDF.
          IF ( NDIM .GT. BF__NDIM ) CALL NDF_ANNUL( NDFC, STATUS )
