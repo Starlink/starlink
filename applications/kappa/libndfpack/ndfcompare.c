@@ -91,7 +91,7 @@ F77_SUBROUTINE(ndfcompare)( INTEGER(status) ){
 *        14  - The pixel VARIANCE values (if any) are compared (ACCVAR).
 *        15  - The pixel QUALITY values (if any) are compared (NBAD).
 *        16  - The QUALITY names (if any) are compared.
-*        17  - The lists of root ancestor NDFs that were used to create
+*       [17] - The lists of root ancestor NDFs that were used to create
 *              each NDF are compared.
 
 *  Usage:
