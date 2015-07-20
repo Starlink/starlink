@@ -57,8 +57,6 @@
 *        Added SHAPEC.
 *     2013 July 15 (MJC):
 *        Added CIRC.
-*     2015 July 16 (MJC):
-*        Added PIXSHP.
 *     {enter_further_changes_here}
 
 *-
@@ -114,10 +112,6 @@
 *           Are the separations fixed by the user?
 *        SHAPEC = LOGICAL
 *           Is the shape exponent of the Gaussian fixed?
-*        PIXAR = DOUBLE PRECISION
-*           Pixel aspect ratio.  Normal square pixels if set to 1.0.  If
-*           it is greater than one, it means that pixels have larger
-*           dimensions along the X axis.
 *        ISTAT = INTEGER
 *           Local status value
 
@@ -138,10 +132,8 @@
       LOGICAL RATIOC             ! Amplitude ratios fixed by user?
       LOGICAL SEPARC             ! Separations fixed by user?
       LOGICAL SHAPEC             ! Shape exponent fixed by user?
-      DOUBLE PRECISION PIXAR     ! Aspect ratio of pixel (x/y)
       INTEGER ISTAT              ! Local status value
 
       COMMON /BF1_COM/ PC, PIXOFF, ARATIO, USEVAR, NBEAMS
       COMMON /BF2_COM/ IPWD, IPWV, LBND, UBND, AMPC, BACKC, FWHMC,
-     :                 CIRC, ORIC, POSC, RATIOC, SEPARC, SHAPEC,
-     :                 PIXAR, ISTAT
+     :                 CIRC, ORIC, POSC, RATIOC, SEPARC, SHAPEC, ISTAT

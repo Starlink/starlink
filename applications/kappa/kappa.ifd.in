@@ -8272,15 +8272,6 @@ package kappa {
          }
 
 
-         parameter square {
-            type _LOGICAL
-            prompt {Correct for non-square (in current WCS) pixels?}
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
-            default FALSE
-            helpkey *
-         }
-
          parameter sum {
             access WRITE
             type _DOUBLE

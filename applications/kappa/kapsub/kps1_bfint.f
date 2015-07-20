@@ -2,8 +2,7 @@
      :                       VAR, NPOS, POLPAR, PARAM, CURSOR, MARK,
      :                       MARKER, NAXR, NAXIN, LOGF, FDL, FIXCON,
      *                       AMPRAT, SLBND, SUBND, FAREA, FITREG,
-     :                       REFPOS, REFLAB, PIXSCR, NPAR, FPAR,
-     :                       STATUS )
+     :                       REFPOS, REFLAB, NPAR, FPAR, STATUS )
 *+
 *  Name:
 *     KPS1_BFINT
@@ -18,8 +17,8 @@
 *     CALL KPS1_BFINT( INDF, IWCS, IPLOT, MAP1, MAP2, RFRM, VAR,
 *                      NPOS, POLPAR, PARAM, CURSOR, MARK, MARKER, NAXR,
 *                      NAXIN, LOGF, FDL, FIXCON, AMPRAT, SLBND, SUBND,
-*                      FAREA, FITREG, REFPOS, REFLAB, PIXSCR, NPAR,
-*                      FPAR, STATUS )
+*                      FAREA, FITREG, REFPOS, REFLAB, NPAR, FPAR,
+*                      STATUS )
 
 *  Description:
 *     This routine finds the generalised Gaussian fits to a batch of
@@ -138,8 +137,6 @@
 *        the absence of a reference position stored with the original
 *        dataset; or "sky reference position".  If another value is
 *        supplied, "reference position" will be used.
-*     PIXSCR = DOUBLE PRECISION (Given)
-*        Pixel aspect ratio.   Normally set to 1.
 *     NPAR = INTEGER (Given)
 *        The maximum number of fit parameters.
 *     FPAR( NPAR ) = DOUBLE PRECISION (Given and Returned)
@@ -161,8 +158,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2009-2011, 2015 Science and Technology Facilities
-*     Council.
+*     Copyright (C) 2009-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -232,8 +228,6 @@
 *        the shape exponent.
 *     2011 May 11 (MJC):
 *        Removed no-longer-used argument MAP3.
-*     2015 July 16 (MJC):
-*        Add PIXSCR argument.
 *     {enter_further_changes_here}
 
 *-
@@ -262,8 +256,6 @@
 *           Pointer to work space for variance values
 *        USEVAR = LOGICAL (Write)
 *           Whether or not to use variance to weight the fit.
-*        PIXAR = DOUBLE PRECISION (Write)
-*           Pixel aspect ratio
 
 *  Arguments Given:
       INTEGER INDF
@@ -291,7 +283,6 @@
       INTEGER FITREG( 2 )
       DOUBLE PRECISION REFPOS( BF__NDIM )
       CHARACTER*(*) REFLAB
-      DOUBLE PRECISION PIXSCR
       INTEGER NPAR
 
 *  Arguments Given and Returned:
@@ -411,8 +402,6 @@
 
          FIXCON( 3 ) = .FALSE.
       END IF
-
-      PIXAR = PIXSCR
 
 *  Obtain the data and its type and ROI.
 *  =====================================
