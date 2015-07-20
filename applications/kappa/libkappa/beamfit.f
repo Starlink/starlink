@@ -606,6 +606,11 @@
 *     2013 July 29 (MJC):
 *        Seven output parameters now record the fit statistics for all
 *        beams, not just for the primary.
+*     20-JUL-2015 (DSB):
+*        Ensure the pixel origin is at the centre of the array to avoid
+*        numerical problems in the minimisation function caused by small
+*        dynamic range for the coordinates (e.g. JSA HPX images can have
+*        huge pixel origins).
 *     {enter_further_changes_here}
 
 *-
@@ -662,6 +667,7 @@
       LOGICAL GOTREF             ! Reference position obtained?
       LOGICAL HASVAR             ! Errors to be calculated
       INTEGER I                  ! Loop counter
+      INTEGER ICUR               ! Index of current Frame
       INTEGER IMARK              ! PGPLOT marker type
       LOGICAL ISSKY              ! Current Frame in SKY Domain?
       LOGICAL INTERF             ! Interface mode selected?
@@ -701,12 +707,15 @@
       INTEGER NDFI               ! Input NDF identifier
       INTEGER NDFR               ! Residuals map's NDF identifier
       INTEGER NDIM               ! Number of dimensions of the NDF
+      INTEGER NPFRM              ! Remapped PIXEL Frame
       INTEGER NPOS               ! Number of supplied beam positions
       INTEGER NVAL               ! Number of values returned for a
                                  ! parameter
       CHARACTER*( PAR__SZNAM + 1 ) PARNAM ! Parameter name for the
                                  ! current initial beam position
       INTEGER PLACE              ! NDF placeholder
+      DOUBLE PRECISION PLB( BF__NDIM ) ! Remapped PIXEL lower bounds
+      DOUBLE PRECISION PUB( BF__NDIM ) ! Remapped PIXEL upper bounds
       LOGICAL POLAR              ! Use polar co-ordinates for POS2-POS5?
       LOGICAL QUIET              ! Suppress screen output?
       CHARACTER*22 REFLAB        ! Label describing reference point
@@ -725,7 +734,7 @@
       INTEGER UBND( NDF__MXDIM ) ! Full NDF lower bounds
       LOGICAL VAR                ! Use variance for weighting
       INTEGER WAX                ! Index of axis measuring fixed FWHMs
-
+      INTEGER WM                 ! WinMap from GRID to remapped PIXEL
 *.
 
 *  Check the inherited status.
@@ -931,6 +940,57 @@
 *  insignificant axes.
       CALL KPG1_ASSIG( IWCS, BF__NDIM, SLBND, SUBND, STATUS )
 
+*  The minimisation function works in PIXEL coordinates, but it has
+*  numerical problems if the dynamic range of the PIXEL coordinates is
+*  small (as it can be for sintance with JSA HPX images). Therefore
+*  temporarily remap ther PIXEL Frame to put pixel (0,0) at the centre
+*  of the array. Usually this will not make any difference to the displayed
+*  WCS values, since the Mapping in the FrameSet are adjusted to take
+*  account of the change to PIXEL coords. The one case where it *would*
+*  make ia difference is if the current Frame is PIXEL coordinates, because
+*  then the user expects to see positions reported in the original pixel
+*  coordinate system, not the remapped system. For this reason, if the
+*  current Frame is PIXEL on entry, we rename it as "PIXEL_ORIG" and
+*  retain it as the current Frame used by the minimisation routine.
+
+*  Note the index of the original current Frame.
+      ICUR = AST_GETI( IWCS, 'Current', STATUS )
+
+*  Note the index of the original PIXEL Frame.
+      CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
+
+*  Create a WinMap that maps the GRID array onto a rectangle centred on
+*  the origin. At the same time, modify the integer pixel bounds of the
+*  NDF to refer to the new PIXEL Frame.
+      DO I = 1, BF__NDIM
+         SHIFT( I ) = ( SUBND( I ) + SLBND( I ) )/2
+         SLBND( I ) = SLBND( I ) - SHIFT( I )
+         SUBND( I ) = SUBND( I ) - SHIFT( I )
+         PLB( I ) = DBLE( SLBND( I ) ) - 1.0D0
+         PUB( I ) = DBLE( SUBND( I ) )
+      END DO
+      WM = AST_WINMAP( BF__NDIM, GLB, GUB, PLB, PUB, ' ', STATUS )
+
+*  Create a new PIXEL Frame.
+      NPFRM = AST_FRAME( BF__NDIM, 'Domain=PIXEL', STATUS )
+
+*  Add the new PIXEL Frame into the FrameSet, using the WinMap to connect
+*  the new PIXEL Frame to the existing GRID Frame. It becomes the new
+*  current Frame. We now have two PIXEL Frames present in the FrameSet.
+      CALL AST_ADDFRAME( IWCS, AST__BASE, WM, NPFRM, STATUS )
+
+*  Re-instate the original current Frame.
+      CALL AST_SETI( IWCS, 'Current', ICUR, STATUS )
+
+*  If the current Frame is the original PIXEL Frame, renamed it to PIXEL_ORIG.
+      IF( ICUR .EQ. IPIX ) THEN
+         CALL AST_SETC( IWCS, 'DOMAIN', 'PIXEL_ORIG', STATUS )
+
+*  Otherwise, delete the original PIXEL Frame.
+      ELSE
+         CALL AST_REMOVEFRAME( IWCS, IPIX, STATUS )
+      END IF
+
 *  Get a pointer to the possibly new Current Frame in the NDF.
       CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
@@ -940,12 +1000,13 @@
       NAXC = AST_GETI( CFRM, 'NAXES', STATUS )
 
 *  Get the Mapping from the Current Frame to PIXEL in the NDF.  First
-*  find the index of the PIXEL Frame, and then get the Mapping.
+*  find the index of the (possibly newly modified) PIXEL Frame, and then
+*  get the Mapping.
       CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
       MAP1 = AST_SIMPLIFY( AST_GETMAPPING( IWCS, IPIX, AST__CURRENT,
      :                                     STATUS ), STATUS )
 
-*  Is it a sky domain?
+*  Is the current Frame a sky domain?
       ISSKY = AST_ISASKYFRAME( CFRM, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) GO TO 999
@@ -1419,7 +1480,9 @@
       IPRES = 0
 
 *  Create a new NDF, by propagating the shape, size, WCS, etc. from the
-*  input NDF.
+*  input NDF. Note, this means that NDFR gets the *original* pixel bounds
+*  (as required), not the bounds that have been modified to put (0,0) at
+*  the centre.
       CALL LPG_PROP( NDFI, 'NOLABEL,WCS,AXIS', 'RESID', NDFR, STATUS )
 
 *  A null status can be ignored.  This means that no output NDF was

@@ -393,8 +393,8 @@
 *  Obtain some workspace for the region.
          RDIMS( 1 ) = RUBND( 1 ) - RLBND( 1 ) + 1
          RDIMS( 2 ) = RUBND( 2 ) - RLBND( 2 ) + 1
-         CALL PSX_CALLOC( RDIMS( 1 ) * RDIMS( 2 ), '_DOUBLE', IPREG,
-     :                    STATUS )
+         REL = RDIMS( 1 ) * RDIMS( 2 )
+         CALL PSX_CALLOC( REL, '_DOUBLE', IPREG, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 999
 
          CALL KPG1_CPNDD( 2, LBND, UBND, %VAL( CNF_PVAL( IPWD ) ),
