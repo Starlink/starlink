@@ -611,6 +611,9 @@
 *        numerical problems in the minimisation function caused by small
 *        dynamic range for the coordinates (e.g. JSA HPX images can have
 *        huge pixel origins).
+*     22-JUL-2015 (DSB):
+*        Ensure the NDF passed to KPS1_BFINT and KPS1_BFFIL incorporates
+*        the modified pixel origin.
 *     {enter_further_changes_here}
 
 *-
@@ -706,6 +709,7 @@
       INTEGER NDFC               ! Copied-NDF identifier
       INTEGER NDFI               ! Input NDF identifier
       INTEGER NDFR               ! Residuals map's NDF identifier
+      INTEGER NDFS               ! NDF section identifier
       INTEGER NDIM               ! Number of dimensions of the NDF
       INTEGER NPFRM              ! Remapped PIXEL Frame
       INTEGER NPOS               ! Number of supplied beam positions
@@ -920,11 +924,6 @@
          VAR = .FALSE.
       END IF
 
-*  We need to know how many significant axes there are (i.e. pixel axes
-*  spanning more than a single pixel), and there must not be more than
-*  two.
-      CALL KPG1_SGDIM( NDFI, BF__NDIM, SDIM, STATUS )
-
 *  Now get the WCS FrameSet from the NDF.
       CALL KPG1_ASGET( NDFI, BF__NDIM, .TRUE., .FALSE., .FALSE., SDIM,
      :                 SLBND, SUBND, IWCS, STATUS )
@@ -953,6 +952,19 @@
 *  current Frame is PIXEL on entry, we rename it as "PIXEL_ORIG" and
 *  retain it as the current Frame used by the minimisation routine.
 
+*  Later on, we will shift the pixel origin of the NDF to match the
+*  change to the PIXEL coordinate system that we are about to make. But
+*  the NDF is read-only, so we need to create a section first (modifying
+*  the bounds of a section does not affect the associated base NDF). So
+*  create a section covering the whole NDF.
+      CALL NDF_BOUND( NDFI, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+      CALL NDF_SECT( NDFI, NDIM, LBND, UBND, NDFS, STATUS )
+
+*  Ensure any insignificant axes have zero shift below.
+      DO I = 1, NDIM
+         SHIFT( I ) = 0
+      END DO
+
 *  Note the index of the original current Frame.
       ICUR = AST_GETI( IWCS, 'Current', STATUS )
 
@@ -961,15 +973,23 @@
 
 *  Create a WinMap that maps the GRID array onto a rectangle centred on
 *  the origin. At the same time, modify the integer pixel bounds of the
-*  NDF to refer to the new PIXEL Frame.
+*  NDF to refer to the new PIXEL Frame. Also store the shifts needed to
+*  put the NDF origin at the centre.
       DO I = 1, BF__NDIM
-         SHIFT( I ) = ( SUBND( I ) + SLBND( I ) )/2
-         SLBND( I ) = SLBND( I ) - SHIFT( I )
-         SUBND( I ) = SUBND( I ) - SHIFT( I )
+         J = ( SUBND( I ) + SLBND( I ) )/2
+         SLBND( I ) = SLBND( I ) - J
+         SUBND( I ) = SUBND( I ) - J
+
+         SHIFT( SDIM( I ) ) = -J
+
          PLB( I ) = DBLE( SLBND( I ) ) - 1.0D0
          PUB( I ) = DBLE( SUBND( I ) )
       END DO
       WM = AST_WINMAP( BF__NDIM, GLB, GUB, PLB, PUB, ' ', STATUS )
+
+*  Now shift the pixel origin in the NDF to match. The NDF is read-only,
+*  so we use the section created earlier.
+      CALL NDF_SHIFT( NDIM, SHIFT, NDFS, STATUS )
 
 *  Create a new PIXEL Frame.
       NPFRM = AST_FRAME( BF__NDIM, 'Domain=PIXEL', STATUS )
@@ -1415,7 +1435,7 @@
       IF ( CAT .OR. FILE ) THEN
 
 *  Find the beam parameters and determine errors, and report them.
-         CALL KPS1_BFFIL( NDFI, IWCS, MAP3, MAP1, CFRM, VAR, NPOS,
+         CALL KPS1_BFFIL( NDFS, IWCS, MAP3, MAP1, CFRM, VAR, NPOS,
      :                    NAXC, NAXIN, %VAL( CNF_PVAL( IPIN ) ), LOGF,
      :                    FDL, FIXCON, AMPRAT, SLBND, SUBND, FAREA,
      :                    FITREG, REFPOS, REFLAB, MXCOEF, FPAR, STATUS )
@@ -1430,10 +1450,10 @@
 *  additional dimensions, resulting in an array full of bad values, and
 *  hence no fit.  So shift the bounds along these dimensions to match
 *  the default used by NDF_SECT called in KPS1_BFINT.
-         CALL NDF_BOUND( NDFI, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+         CALL NDF_BOUND( NDFS, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
          IF ( NDIM .GT. BF__NDIM ) THEN
             CALL NDF_TEMP( PLACE, STATUS )
-            CALL NDF_SCOPY( NDFI,
+            CALL NDF_SCOPY( NDFS,
      :                      'Data,Variance,NoHistory,NoExtension()',
      :                      PLACE, NDFC, STATUS )
 
@@ -1451,7 +1471,7 @@
 
 *  Just the right number of dimensions so use the original input NDF.
          ELSE
-            NDFC = NDFI
+            NDFC = NDFS
          END IF
 
 *  Fit the beams obtained interactively, and determine errors.
