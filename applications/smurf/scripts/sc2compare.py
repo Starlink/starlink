@@ -191,7 +191,7 @@ try:
 #  same. Always create a report file so we can echo it to the screen.
    report0 = os.path.join(NDG.tempdir,"report0")
    invoke( "$KAPPA_DIR/ndfcompare in1={0} in2={1} report={2} skiptests=! "
-           "quiet".format(in1,in2,report0) )
+           "accdat=5E-6 accvar=5E-6 quiet".format(in1,in2,report0) )
 
 #  See if any differences were found. If so, append the lines of the
 #  report to the report_lines list.
