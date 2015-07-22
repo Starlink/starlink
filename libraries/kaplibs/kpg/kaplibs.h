@@ -173,6 +173,7 @@ void kpgPutOutline( int, float, int, int * );
 void kpg1Pxscl( AstFrameSet *, const double *, double *, int * );
 
 void kpg1Rgndf( const char *, size_t, size_t, const char *, Grp **, size_t *, int * );
+void kpg1Rnorm( int el, double *array, int seed, int *status );
 
 void kpg1Sdimp( int, int, int *, int * );
 

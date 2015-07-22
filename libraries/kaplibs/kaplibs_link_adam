@@ -28,7 +28,7 @@
          esac
       done
 
-      if test "${nogrf}" = 'y'; then 
+      if test "${nogrf}" = 'y'; then
 #   No graphics
          echo -lkpg_adam -lkpg -lira_adam -lira \
            -lfts_adam -lfts -laif_adam -laif -lccg \
@@ -40,11 +40,12 @@
            `grp_link_adam` `trn_link_adam` \
            `prm_link_adam` \
            `psx_link_adam` `pda_link_adam` \
+            -lgsl -lgslcblas \
            `one_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
-      elif test "${nogks}" = 'y'; then 
+      elif test "${nogks}" = 'y'; then
 #  Form list of graphics libraries.
          echo -lkpg_grf_adam -lkpg_adam -lkpg_grf -lkpg \
            -lira_adam -lira -lfts_adam -lfts -laif_adam \
@@ -57,6 +58,7 @@
            `grp_link_adam` `trn_link_adam` \
            `prm_link_adam` \
            `psx_link_adam` `pda_link_adam` \
+            -lgsl -lgslcblas \
            `pgplot_link_adam`  `one_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
@@ -75,6 +77,7 @@
            `grp_link_adam` `trn_link_adam` \
            `prm_link_adam` \
            `psx_link_adam` `pda_link_adam` \
+            -lgsl -lgslcblas \
            `pgp_link_adam`  `one_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
