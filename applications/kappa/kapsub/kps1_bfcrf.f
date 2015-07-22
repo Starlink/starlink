@@ -141,6 +141,12 @@
 *        - Re-write the code that calculates the WCS centre position,
 *        widths and orientations, to generate the returned errors using a
 *        statistical simulation.
+*     22-JUL-2015 (DSB):
+*        Change the variance calculations so that they use Welford's
+*        method rather than the usual "mean of the squares minus the
+*        square of the mean". The old variances were extremely poorly
+*        conditioned due to taking the difference of two large and
+*        nearly equal numbers. Welford's method is much better.
 *     {enter_further_changes_here}
 
 *-
@@ -198,6 +204,7 @@
       INTEGER CFRM               ! Current/reporting Frame
       DOUBLE PRECISION COSVAL    ! Cosine of orientation
       DOUBLE PRECISION DATAN     ! Differentiating atan factor
+      DOUBLE PRECISION DELTA     ! Welford's variance constant
       DOUBLE PRECISION DX        ! Increment along first axis
       DOUBLE PRECISION DY        ! Increment along second axis
       DOUBLE PRECISION GRAD      ! Gradient DY/DX
@@ -215,11 +222,6 @@
       INTEGER PFRM               ! PIXEL Frame
       DOUBLE PRECISION POS( 3, 2 ) ! Reporting positions
       DOUBLE PRECISION PIXPOS( 3, 2 ) ! Pixel positions
-      DOUBLE PRECISION S1        ! Sum of WCS X centre values
-      DOUBLE PRECISION S2        ! Sum of WCS Y centre values
-      DOUBLE PRECISION S3        ! Sum of WCS width 1 values
-      DOUBLE PRECISION S4        ! Sum of WCS width 2 values
-      DOUBLE PRECISION S5        ! Sum of WCS orientation angle
       DOUBLE PRECISION SIGMA1    ! Standard deviation for X pixel centre
       DOUBLE PRECISION SIGMA2    ! Standard deviation for Y pixel centre
       DOUBLE PRECISION SIGMA3    ! Standard deviation for pixel width 1
@@ -227,11 +229,6 @@
       DOUBLE PRECISION SIGMA5    ! Standard deviation for pixel orientation
       DOUBLE PRECISION SINVAL    ! Sine of orientation
       DOUBLE PRECISION SPOS( 2 ) ! Single reporting position
-      DOUBLE PRECISION SQ1       ! Sum of squared WCS X centre values
-      DOUBLE PRECISION SQ2       ! Sum of squared WCS Y centre values
-      DOUBLE PRECISION SQ3       ! Sum of squared WCS width 1 values
-      DOUBLE PRECISION SQ4       ! Sum of squared WCS width 2 values
-      DOUBLE PRECISION SQ5       ! Sum of squared WCS orientation angles
       LOGICAL SWAP               ! Swap width 1 and width 2 ?
       REAL THETA                 ! Orientation in radians
       DOUBLE PRECISION UPOS( 3*MXTEST ) ! WCS axis 1 positions
@@ -241,6 +238,16 @@
       DOUBLE PRECISION VARY      ! Sum of latitude-axis variances
       DOUBLE PRECISION WIDTH1    ! Width 1
       DOUBLE PRECISION WIDTH2    ! Width 2
+      DOUBLE PRECISION WM1       ! Welford's variance constant
+      DOUBLE PRECISION WM2       ! Welford's variance constant
+      DOUBLE PRECISION WM3       ! Welford's variance constant
+      DOUBLE PRECISION WM4       ! Welford's variance constant
+      DOUBLE PRECISION WM5       ! Welford's variance constant
+      DOUBLE PRECISION WS1       ! Welford's variance constant
+      DOUBLE PRECISION WS2       ! Welford's variance constant
+      DOUBLE PRECISION WS3       ! Welford's variance constant
+      DOUBLE PRECISION WS4       ! Welford's variance constant
+      DOUBLE PRECISION WS5       ! Welford's variance constant
       DOUBLE PRECISION XC        ! Centre - axis 1
       DOUBLE PRECISION XIN( 2 )  ! X co-ordinate pair to convert
       DOUBLE PRECISION XOUT( 2 ) ! Converted X co-ordinate pair
@@ -406,7 +413,7 @@
          B( 2 ) =  VPOS( 3 )
          WIDTH2 = AST_DISTANCE( CFRM, A, B, STATUS )
 
-*  Store then in the returned array. Ensure that parameter 3 is the major
+*  Store them in the returned array. Ensure that parameter 3 is the major
 *  axis and parameter 4 is the minor axis.
          SWAP = ( WIDTH1 .LT. WIDTH2 )
          RP( 1, IB ) = A( 1 )
@@ -425,17 +432,19 @@
          IF( NTEST .EQ. MXTEST ) THEN
 
 *  Initialise the required running sums to hold just the unperturbed
-*  values found above.
-            S1 = RP( 1, IB )
-            S2 = RP( 2, IB )
-            S3 = RP( 3, IB )
-            S4 = RP( 4, IB )
-            S5 = RP( 5, IB )
-            SQ1 = S1*S1
-            SQ2 = S2*S2
-            SQ3 = S3*S3
-            SQ4 = S4*S4
-            SQ5 = S5*S5
+*  values found above. We use Welford's method for comuting variance,
+*  which is numerically more stable than the usual "mean of the squares
+*  minus square of the mean" approach.
+            WM1 = RP( 1, IB )
+            WM2 = RP( 2, IB )
+            WM3 = RP( 3, IB )
+            WM4 = RP( 4, IB )
+            WM5 = RP( 5, IB )
+            WS1 = 0.0D0
+            WS2 = 0.0D0
+            WS3 = 0.0D0
+            WS4 = 0.0D0
+            WS5 = 0.0D0
 
 *  Loop round all remaining tests.
             J = 4
@@ -467,58 +476,65 @@
                END IF
 
 *  Increment the running sums.
-               S1 = S1 + A( 1 )
-               SQ1 = SQ1 + A( 1 )**2
-               S2 = S2 + A( 2 )
-               SQ2 = SQ2 + A( 2 )**2
+               DELTA = A( 1 ) - WM1
+               WM1 = WM1 + DELTA/I
+               WS1 = WS1 + DELTA**2
+               DELTA = A( 2 ) - WM2
+               WM2 = WM2 + DELTA/I
+               WS2 = WS2 + DELTA**2
 
                IF( SWAP ) THEN
-                  S3 = S3 + WIDTH2
-                  SQ3 = SQ3 + WIDTH2**2
-                  S4 = S4 + WIDTH1
-                  SQ4 = SQ4 + WIDTH1**2
+                  DELTA = WIDTH2 - WM3
+                  WM3 = WM3 + DELTA/I
+                  WS3 = WS3 + DELTA**2
+                  DELTA = WIDTH1 - WM4
+                  WM4 = WM4 + DELTA/I
+                  WS4 = WS4 + DELTA**2
                ELSE
-                  S3 = S3 + WIDTH1
-                  SQ3 = SQ3 + WIDTH1**2
-                  S4 = S4 + WIDTH2
-                  SQ4 = SQ4 + WIDTH2**2
+                  DELTA = WIDTH1 - WM3
+                  WM3 = WM3 + DELTA/I
+                  WS3 = WS3 + DELTA**2
+                  DELTA = WIDTH2 - WM4
+                  WM4 = WM4 + DELTA/I
+                  WS4 = WS4 + DELTA**2
                END IF
 
-               S5 = S5 + ANGLE
-               SQ5 = SQ5 + ANGLE**2
+               DELTA = ANGLE - WM5
+               WM5 = WM5 + DELTA/I
+               WS5 = WS5 + DELTA**2
 
             END DO
 
 *  Now calculate the standard deviations of the WCS parameter values. Do
 *  not assign errors to parameters that did not origianlly have an error.
             IF( PSIGMA( 1, IB ) .NE. VAL__BADD ) THEN
-               RSIGMA( 1, IB ) = SQRT( SQ1/NTEST - ( S1/NTEST )**2 )
+               RSIGMA( 1, IB ) = SQRT( WS1/(NTEST - 1) )
             ELSE
                RSIGMA( 1, IB ) = VAL__BADD
             END IF
 
             IF( PSIGMA( 2, IB ) .NE. VAL__BADD ) THEN
-               RSIGMA( 2, IB ) = SQRT( SQ2/NTEST - ( S2/NTEST )**2 )
+               RSIGMA( 2, IB ) = SQRT( WS2/(NTEST - 1) )
             ELSE
                RSIGMA( 2, IB ) = VAL__BADD
             END IF
 
             IF( ( .NOT. SWAP .AND. PSIGMA( 3, IB ) .NE. VAL__BADD ) .OR.
      :          ( SWAP .AND. PSIGMA( 4, IB ) .NE. VAL__BADD ) ) THEN
-               RSIGMA( 3, IB ) = SQRT( SQ3/NTEST - ( S3/NTEST )**2 )
+               RSIGMA( 3, IB ) = SQRT( WS3/(NTEST - 1) )
             ELSE
                RSIGMA( 3, IB ) = VAL__BADD
             END IF
 
             IF( ( .NOT. SWAP .AND. PSIGMA( 4, IB ) .NE. VAL__BADD ) .OR.
      :          ( SWAP .AND. PSIGMA( 3, IB ) .NE. VAL__BADD ) ) THEN
-               RSIGMA( 4, IB ) = SQRT( SQ4/NTEST - ( S4/NTEST )**2 )
+               RSIGMA( 4, IB ) = SQRT( WS4/(NTEST - 1) )
             ELSE
                RSIGMA( 4, IB ) = VAL__BADD
             END IF
 
             IF( PSIGMA( 5, IB ) .NE. VAL__BADD ) THEN
-               RSIGMA( 5, IB ) = SQRT( SQ5/NTEST - ( S5/NTEST )**2 )
+               RSIGMA( 5, IB ) = SQRT( WS5/(NTEST - 1) )
             ELSE
                RSIGMA( 5, IB ) = VAL__BADD
             END IF
