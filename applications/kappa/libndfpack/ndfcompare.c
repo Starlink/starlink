@@ -1239,6 +1239,7 @@ static void GetValueAndQual( const char *param, const char *quals,
 /* Local Variables: */
    char cbuf[200];
    int nc;
+   int ntry;
 
 /* Initialise returned values. */
    *value = 0.0;
@@ -1248,9 +1249,12 @@ static void GetValueAndQual( const char *param, const char *quals,
    if( *status != SAI__OK ) return;
 
 /* Loop until good values are obtained. */
-   while( *status == SAI__OK ) {
+   ntry = 0;
+   while( *status == SAI__OK && ++ntry < 10 ) {
 
 /* Get a string from the environment. */
+      *value = 0.0;
+      *qual = ' ';
       parGet0c( param, cbuf, sizeof(cbuf), status );
 
 /* Attempt to extract a numerical value from the start of the string. */
@@ -1259,6 +1263,7 @@ static void GetValueAndQual( const char *param, const char *quals,
 /* If nothing else followed the numerical value, use the default qualifier. */
          if( nc >= strlen( cbuf ) ) {
             *qual = defqual;
+            break;
          } else {
 
 /* Remove leading and trailing white space from the remaining string, and
@@ -1302,6 +1307,13 @@ static void GetValueAndQual( const char *param, const char *quals,
          parCancl( param, status );
       }
    }
+
+   if( ntry == 10 && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( "", "Failed to get a value for paramater %s after 10 "
+               "attempts.", status, param );
+   }
+
 }
 
 
