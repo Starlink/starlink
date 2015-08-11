@@ -21,6 +21,11 @@ the smallest significant distance within the SkyFrame. It is used to
 decide if the Mapping between two SkyFrames can be considered a unit
 transformation. The default value is 0.001 arc-seconds.
 
+- A bug has been fixed in the FitsChan class that prevented an error
+being reported if any FITS keyword names containing illegal characters
+(i.e. not allowed by the FITS standard) are encountered. This bug could
+under some circumstances cause a subsequent segmentation violation to
+occur.
 
 Main Changes in V8.0.4
 ----------------------
