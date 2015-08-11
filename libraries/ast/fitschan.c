@@ -1132,10 +1132,13 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        In MakeIntWorld, relax tolerance for checking that each FITS-WCS IWC
 *        axis is linear, from 0.01 of a pixel to 0.1 of a pixel.
 *     6-JUL-2015 (DSB):
-*        When checking a sub-string, ensure the whole string is at least as 
-*        long as the offset to the start of the sub-string. Without this, you 
-*        can get erroneous sub-string matches by chance, depending on what 
-*        characters happen to be present in memory after the end of the string. 
+*        When checking a sub-string, ensure the whole string is at least as
+*        long as the offset to the start of the sub-string. Without this, you
+*        can get erroneous sub-string matches by chance, depending on what
+*        characters happen to be present in memory after the end of the string.
+*     11-AUG-2015 (DSB):
+*        Fix bug in CheckFitsName that prevented an error from being reported
+*        if the FITS keyword name contained any illegal printable characters.
 *class--
 */
 
@@ -5217,7 +5220,7 @@ static int CheckFitsName( const char *name, const char *method,
                                "name ('%s') contains an illegal non-printing "
                                "character (ascii value %d).", status, method, class,
                                name, *c );
-                  } else if( *c < ' ' ) {
+                  } else if( *c > ' ' ) {
                      astError( AST__BDFTS, "%s(%s): The supplied FITS keyword "
                                "name ('%s') contains an illegal character ('%c').",
                                status, method, class, name, *c );
