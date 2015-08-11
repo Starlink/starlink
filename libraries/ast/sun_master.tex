@@ -21599,11 +21599,20 @@ the smallest significant distance within the SkyFrame. It is used to
 decide if the Mapping between two SkyFrames can be considered a unit
 transformation. The default value is 0.001 arc-seconds.
 
-\item A bug has been fixed in the FitsChan class that prevented an error
-being reported if any FITS keyword names containing illegal characters
-(i.e. not allowed by the FITS standard) are encountered. This bug could
-under some circumstances cause a subsequent segmentation violation to
-occur.
+\item A bug has been fixed in the FitsChan class that prevented illegal
+characters within FITS keyword names (i.e. characters not allowed by the
+FITS standard) being detected. This bug could under some circumstances
+cause a subsequent segmentation violation to occur.
+
+- A ``BadKeyName'' warning is now issued by the FitsChan class if a FITS 
+keyword name is encountered that contains any illegal characters. See 
+attribute ``Warnings'' and
+c+
+function ``astWarnings''.
+c-
+f+
+routine ``AST\_WARNINGS''.
+f-
 
 \end{enumerate}
 

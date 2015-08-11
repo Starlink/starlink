@@ -1137,8 +1137,10 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        can get erroneous sub-string matches by chance, depending on what
 *        characters happen to be present in memory after the end of the string.
 *     11-AUG-2015 (DSB):
-*        Fix bug in CheckFitsName that prevented an error from being reported
+*        - Fix bug in CheckFitsName that prevented an error from being reported
 *        if the FITS keyword name contained any illegal printable characters.
+*        - Add new Warning "badkeyname", and issue such a warning instead
+*        of an error if illegal characters are found in a keyword name.
 *class--
 */
 
@@ -1245,7 +1247,7 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 #define LATAX              1
 #define NDESC              9
 #define MXCTYPELEN        81
-#define ALLWARNINGS       " distortion noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat badmat badval badctype badpv "
+#define ALLWARNINGS       " distortion noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat badmat badval badctype badpv badkeyname "
 #define NPFIT             10
 #define SPD               86400.0
 #define FL  1.0/298.257  /*  Reference spheroid flattening factor */
@@ -1752,7 +1754,7 @@ static int AddEncodingFrame( AstFitsChan *, AstFrameSet *, int, const char *, co
 static int AddVersion( AstFitsChan *, AstFrameSet *, int, int, FitsStore *, double *, char, int, int, const char *, const char *, int * );
 static int CLASSFromStore( AstFitsChan *, FitsStore *, AstFrameSet *, double *, const char *, const char *, int * );
 static int CardType( AstFitsChan *, int * );
-static int CheckFitsName( const char *, const char *, const char *, int * );
+static int CheckFitsName( AstFitsChan *, const char *, const char *, const char *, int * );
 static int ChrLen( const char *, int * );
 static int CnvType( int, void *, size_t, int, int, void *, const char *, const char *, const char *, int * );
 static int CnvValue( AstFitsChan *, int , int, void *, const char *, int * );
@@ -1813,7 +1815,7 @@ static int SearchCard( AstFitsChan *, const char *, const char *, const char *, 
 static int SetFits( AstFitsChan *, const char *, void *, int, const char *, int, int * );
 static int Similar( const char *, const char *, int * );
 static int SkySys( AstFitsChan *, AstSkyFrame *, int, int, FitsStore *, int, int, char c, int, const char *, const char *, int * );
-static int Split( const char *, char **, char **, char **, const char *, const char *, int * );
+static int Split( AstFitsChan *, const char *, char **, char **, char **, const char *, const char *, int * );
 static int SplitMap( AstMapping *, int, int, int, AstMapping **, AstWcsMap **, AstMapping **, int * );
 static int SplitMap2( AstMapping *, int, AstMapping **, AstWcsMap **, AstMapping **, int * );
 static int SplitMat( int , double *, double *, int * );
@@ -2795,7 +2797,6 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
 *     FitsStore into the supplied FitsChan, using FITS-AIPS encoding.
 *
 *     AIPS encoding is like FITS-WCS encoding but with the following
-
 *     restrictions:
 *
 *     1) The celestial projection must not have any projection parameters
@@ -3360,7 +3361,6 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
 *     FitsStore into the supplied FitsChan, using FITS-AIPS++ encoding.
 *
 *     AIPS++ encoding is like FITS-WCS encoding but with the following
-
 *     restrictions:
 *
 *     1) The celestial axes must be RA/DEC, galactic or ecliptic.
@@ -5115,8 +5115,8 @@ static double *Cheb2Poly( double *c, int nx, int ny, double xmin, double xmax,
    return d;
 }
 
-static int CheckFitsName( const char *name, const char *method,
-                          const char *class, int *status ){
+static int CheckFitsName( AstFitsChan *this, const char *name,
+                          const char *method, const char *class, int *status ){
 /*
 *  Name:
 *     CheckFitsName
@@ -5129,7 +5129,7 @@ static int CheckFitsName( const char *name, const char *method,
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     int CheckFitsName( const char *name, const char *method,
+*     int CheckFitsName( AstFitsChan *this, const char *name, const char *method,
 *                        const char *class, int *status )
 
 *  Class Membership:
@@ -5141,8 +5141,15 @@ static int CheckFitsName( const char *name, const char *method,
 *     an underscore, or a hyphen. Leading, trailing or embedded white space
 *     is not allowed, with the exception of totally blank or null keyword
 *     names.
+*
+*     If the supplied keyword name is invalid, either a warning is issued
+*     (for violations that can be handled - such as illegal characters in
+*     keywords), or an error is reported (for more major violations such
+*     as the keyname containing an equals sign).
 
 *  Parameters:
+*     this
+*        Pointer to the FitsChan.
 *     name
 *        Pointer to a string holding the name to check.
 *     method
@@ -5164,6 +5171,7 @@ static int CheckFitsName( const char *name, const char *method,
 */
 
 /* Local Variables: */
+   char buf[100];     /* Buffer for warning text */
    const char *c;     /* Pointer to next character in name */
    size_t n;          /* No. of characters in supplied name */
    int ret;           /* Returned value */
@@ -5215,15 +5223,18 @@ static int CheckFitsName( const char *name, const char *method,
                      astError( AST__BDFTS, "%s(%s): An equals sign ('=') was found "
                                "before column %d within a FITS keyword name or header "
                                "card.", status, method, class, FITSNAMLEN + 1 );
+
                   } else if( *c < ' ' ) {
-                     astError( AST__BDFTS, "%s(%s): The supplied FITS keyword "
-                               "name ('%s') contains an illegal non-printing "
-                               "character (ascii value %d).", status, method, class,
-                               name, *c );
+                     sprintf( buf, "The FITS keyword name ('%s') contains an "
+                              "illegal non-printing character (ascii value "
+                              "%d).", name, *c );
+                     Warn( this, "badkeyname", buf, method, class, status );
+
+
                   } else if( *c > ' ' ) {
-                     astError( AST__BDFTS, "%s(%s): The supplied FITS keyword "
-                               "name ('%s') contains an illegal character ('%c').",
-                               status, method, class, name, *c );
+                     sprintf( buf, "The FITS keyword name ('%s') contains an "
+                              "illegal character ('%c').", name, *c );
+                     Warn( this, "badkeyname", buf, method, class, status );
                   }
                   break;
                }
@@ -5234,9 +5245,9 @@ static int CheckFitsName( const char *name, const char *method,
 
 /* Report an error if no pointer was supplied. */
    } else if( astOK ){
-      astError( AST__INTER, "CheckFitsName(fitschan): AST internal "
-                "error; a NULL pointer was supplied for the keyword name. ",
-                status );
+      astError( AST__INTER, "CheckFitsName(%s): AST internal error; a NULL "
+                "pointer was supplied for the keyword name. ", status,
+                astGetClass( this ) );
    }
 
 /* If an error has occurred, return 0. */
@@ -14452,7 +14463,7 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value, int 
 \
 /* Extract the keyword name from the supplied string. */ \
    if( name ) { \
-      (void) Split( name, &lname, &lvalue, &lcom, method, class, status ); \
+      (void) Split( this, name, &lname, &lvalue, &lcom, method, class, status ); \
    } else { \
       lname = NULL; \
       lvalue = NULL; \
@@ -14618,7 +14629,7 @@ static int FitsGetCom( AstFitsChan *this, const char *name,
 
 /* Extract the keyword name from the supplied string (if supplied). */
    if( name ){
-      (void) Split( name, &lname, &lvalue, &lcom, method, class, status );
+      (void) Split( this, name, &lname, &lvalue, &lcom, method, class, status );
    } else {
       lname = NULL;
       lcom = NULL;
@@ -14998,7 +15009,7 @@ static void SetFits##code( AstFitsChan *this, const char *name, ctype value, con
    method = "astSetFits"#code; \
 \
 /* Extract the keyword name from the supplied string. */ \
-   (void) Split( name, &lname, &lvalue, &lcom, method, class, status ); \
+   (void) Split( this, name, &lname, &lvalue, &lcom, method, class, status ); \
 \
 /* Initialise a pointer to the comment to be stored. If the supplied \
    comment is blank, use the comment given with "name". */ \
@@ -15144,7 +15155,7 @@ f        The global status.
    method = "astSetFitsU";
 
 /* Extract the keyword name from the supplied string. */
-   (void) Split( name, &lname, &lvalue, &lcom, method, class, status );
+   (void) Split( this, name, &lname, &lvalue, &lcom, method, class, status );
 
 /* Initialise a pointer to the comment to be stored. If the supplied
    comment is blank, use the comment given with "name". */
@@ -15341,7 +15352,7 @@ static void SetFitsCom( AstFitsChan *this, const char *name,
    class = astGetClass( this );
 
 /* Extract the keyword name, etc, from the supplied string. */
-   (void) Split( name, &lname, &lvalue, &lcom, method, class, status );
+   (void) Split( this, name, &lname, &lvalue, &lcom, method, class, status );
 
 /* If a blank comment has been supplied, use NULL instead. */
    com = ChrLen( comment, status )? comment : NULL;
@@ -17820,7 +17831,6 @@ static int IRAFFromStore( AstFitsChan *this, FitsStore *store,
 *     FitsStore into the supplied FitsChan, using FITS-IRAF encoding.
 *
 *     IRAF encoding is like FITS-WCS encoding but with the following
-
 *     restrictions:
 *
 *     1) The celestial projection must not have any projection parameters
@@ -24191,7 +24201,7 @@ f        The global status.
 /* Split the supplied card up into name, value and commment strings, and
    get pointers to local copies of them. The data type associated with the
    keyword is returned. */
-   type = Split( card, &name, &value, &comment, method, class, status );
+   type = Split( this, card, &name, &value, &comment, method, class, status );
 
 /* Check that the pointers can be used. */
    if( astOK ){
@@ -30042,7 +30052,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    return ret;
 }
 
-int Split( const char *card, char **name, char **value,
+int Split( AstFitsChan *this, const char *card, char **name, char **value,
            char **comment, const char *method, const char *class, int *status ){
 /*
 *  Name:
@@ -30056,7 +30066,7 @@ int Split( const char *card, char **name, char **value,
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     int Split( const char *card, char **name, char **value,
+*     int Split( AstFitsChan *this, const char *card, char **name, char **value,
 *                char **comment, const char *method, const char *class, int *status  )
 
 *  Class Membership:
@@ -30067,6 +30077,8 @@ int Split( const char *card, char **name, char **value,
 *     supplied card text and returned.
 
 *  Parameters:
+*     this
+*        Pointer to the FitsCHan.
 *     card
 *        Pointer to a string holding the FITS header card.
 *     name
@@ -30175,7 +30187,7 @@ int Split( const char *card, char **name, char **value,
       }
 
 /* Check the keyword name is legal. */
-      CheckFitsName( *name, method, class, status );
+      CheckFitsName( this, *name, method, class, status );
 
 /* Allocate memory to hold the keyword value and comment strings. */
       *value = (char *) astMalloc( sizeof(char)*( 2 + nc ) );
@@ -30285,8 +30297,10 @@ int Split( const char *card, char **name, char **value,
 /* The end of the value field is marked by the first "/". Find the number
    of characters in the value field. Pointer "d" is left pointing to the
    first character in the comment (if any). Only use "/" characters which
-   occur within the first nc characters. */
-               d = strchr( card, '/' );
+   occur within the first nc characters, and do not occur wiuthin the
+   keyword name (not strictly legal, but a warning will have been issued
+   by CheckFitsName in such cases). */
+               d = strchr( card + FITSNAMLEN, '/' );
                if( !d || ( d - card ) >= nc ){
                   ncv = nc - FITSNAMLEN - 1;
                   d = NULL;
@@ -32182,7 +32196,7 @@ f     -  .FALSE.
    ret = 0;
 
 /* Extract the keyword name from the supplied string. */
-   (void) Split( name, &lname, &lvalue, &lcom, method, class, status );
+   (void) Split( this, name, &lname, &lvalue, &lcom, method, class, status );
 
 /* Store the current card index. */
    icard = astGetCard( this );
@@ -32767,7 +32781,6 @@ static int Ustrncmp( const char *a, const char *b, size_t n, int *status ){
 
 static void Warn( AstFitsChan *this, const char *condition, const char *text,
                   const char*method, const char *class, int *status ){
-
 /*
 *  Name:
 *     Warn
@@ -32780,7 +32793,6 @@ static void Warn( AstFitsChan *this, const char *condition, const char *text,
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     int Warn( AstFitsChan *this, const char *condition, const char *text,
 *               const char*method, const char *class, int *status );
 
@@ -40599,7 +40611,7 @@ astMAKE_TEST(FitsChan,FitsDigits,( this->fitsdigits != DBL_DIG ))
 *     consist of a space separated list of condition names (see the
 *     AllWarnings attribute for a list of the currently defined names).
 *     Each name indicates a condition which should be reported. The default
-*     value for Warnings is the string "Tnx Zpx BadCel BadMat BadPV BadCTYPE".
+*     value for Warnings is the string "BadKeyName Tnx Zpx BadCel BadMat BadPV BadCTYPE".
 *
 *     The text of any warning will be stored within the FitsChan in the
 *     form of one or more new header cards with keyword ASTWARN. If
@@ -40632,9 +40644,9 @@ f     AST_WARNINGS
 astMAKE_CLEAR(FitsChan,Warnings,warnings,astFree( this->warnings ))
 
 /* If the Warnings value is not set, supply a default in the form of a
-   pointer to the constant string "Tnx Zpx BadCel BadMat BadCTYPE". */
+   pointer to the constant string "BadKeyName Tnx Zpx BadCel BadMat BadCTYPE". */
 astMAKE_GET(FitsChan,Warnings,const char *,NULL,( this->warnings ? this->warnings :
-                                                            "Tnx Zpx BadPV BadCel BadMat BadCTYPE" ))
+                                                            "BadKeyName Tnx Zpx BadPV BadCel BadMat BadCTYPE" ))
 
 /* Set a Warnings value by freeing any previously allocated memory, allocating
    new memory, storing the string and saving the pointer to the copy.
@@ -40672,7 +40684,6 @@ astMAKE_TEST(FitsChan,Warnings,( this->warnings != NULL ))
 
 *  Conditions:
 *     The following conditions are currently recognised (all are
-
 *     case-insensitive):
 *
 *     - "BadCel": This condition arises when reading a FrameSet from a
@@ -40683,6 +40694,10 @@ astMAKE_TEST(FitsChan,Warnings,( this->warnings != NULL ))
 *     non-Native encoded FitsChan if an illegal algorithm code is specified
 *     by a CTYPE keyword, and the illegal code can be converted to an
 *     equivalent legal code.
+*
+*     - "BadKeyName": This condition arises if a FITS keyword name is
+*     encountered that contains an illegal character (i.e. one not allowed
+*     by the FITS standard).
 *
 *     - "BadLat": This condition arises when reading a FrameSet from a
 *     non-Native encoded FitsChan if the latitude of the reference point
