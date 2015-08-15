@@ -6119,6 +6119,10 @@ package @PACKAGE@ {
         obey {python $SMURF_DIR/sc2compare.py}
     }
 
+    command startester {
+        obey {python $SMURF_DIR/startester.py}
+    }
+
     icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
 
     display {
