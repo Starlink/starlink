@@ -757,6 +757,11 @@ class ParSys(object):
       #  contains msg_filter, ilevel or glevel.
       self.params = {}
       for p in params:
+         if p.name in self.params:
+            raise UsageError("{0}The list of starutil parameters includes "
+                             "more than one occurrence of parameter name {1}.".
+                             format(_cmd_token(),p.name))
+
          self.params[p.name] = p
          p._parsys = self
          if p.name == "MSG_FILTER" or p.name == "ILEVEL" or p.name == "GLEVEL":
