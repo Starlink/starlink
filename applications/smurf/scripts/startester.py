@@ -108,65 +108,75 @@
 *  Test Types:
 *     The startester script can support different types of tests. The
 *     basic concept of a test of any type is that it takes zero or more
-*     input files (input data files, configuration files, script files,
-*     etc), which may reside anywhere, and generates one or more output
-*     NDFs (which the test must place in the current working directory).
-*
-*     Each individual test is defined by the values in a single row of a
-*     TDF file. The columns that are required in a TDF file depend on the
-*     specific sub-type of tests included in the file (and specified in
-*     the header of the file). All types of  test require the following
-*     columns:
-*
-*     - "ID": A single-word identifier for the test. All the ID values in
-*     a single TDF file should be unique. IDs are case insensitive.
-*
-*     - "OUT": A GRP group expression listing the output NDFs generated
-*     by the test, relative to the current working directory ("./").
-*     These are the NDFs that are compared against the reference NDFs.
-*
-*     Each specific type of test requires extra columns as described
-*     below. The list of currently supported test types is:
+*     input files, which may reside anywhere, and generates one or more
+*     output NDFs. Each individual test is defined by the values in a
+*     single row of a TDF file. The columns that are required in a TDF
+*     file depend on the specific sub-type of tests included in the file
+*     (and specified by the "# type = <type>" line in the header of the
+*     file). The list of currently supported test types is:
 *
 *     "type=shell": Shell tests generate the output NDFs by running an
-*     arbitrary shell command under a standard POSIX shell. Shell tests
-*     require a single extra column called "CMD" in the TDF file, which
-*     gives the command to be executed. An extra header line is also
-*     required of the form "# compare = <value>", where value is either
+*     arbitrary shell command under a standard POSIX shell. An extra
+*     header line is required (in addition to the "# type = shell"
+*     line) of the form "# compare = <value>", where value is either
 *     "ndfcompare" or "sc2compare" (without the quotes). This indicates
 *     the command that is to be used to compare each output NDF with the
-*     corresponding reference NDF.
+*     corresponding reference NDF. The following columns are required in
+*     the TDF file:
 *
-*     "type=makemap": MAKEMAP tests generate the output NDFs by running the
-*     SMURF:MAKEMAP command. The SMURF:SC2COMPARE command is used to
-*     compare each output NDF is compared to the corresponding reference
-*     NDF. The header should include an extra line of the form "# sc2data
-*     = <path>" where "<path>" is the the absolute path to a directory
-*     containing raw SCUBA-2 data. The specified directory should contain
-*     a subdirectory for each SCUBA-2 array, named "s8a", "s8b", etc.
-*     Each of these subdirectory should contain a subdirectory for each UT
-*     date, which in turn should contain subdirectories for each observation.
-*     The following extra columns are required in the TDF file:
+*        - "ID": A single-word identifier for the test. All the ID values
+*        in a single TDF file should be unique. IDs are case insensitive.
 *
-*     - "OBS": A comma-separated list of observations to be supplied as
-*     input to MAKEMAP. Each obseravtion is specified in the form
-*     "ut/obs", where "ut" is a UT date in "yyymmdd" format, and "obs" is
-*     an observation number.
+*        - "OUT": A GRP group expression listing the output NDFs generated
+*        by the test, relative to its current working directory ("./").
+*        These are the NDFs that are compared against the reference NDFs.
 *
-*     - "ARRAYS": The SCUBA-2 sub-arrays to use. This may be "s8" for all
-*     850 um arrays, "s4" for all 450 um arrays, or a comma separated list
-*     of individual array names (e.g. "s8a,s8c")
+*        - "CMD": The command to be executed.
 *
-*     - "CONFIG": The name of a standard config file, or "null". If a
-*     name is supplied, it must be the name (without any path or leading "^"
-*     character) of one of the makemap config files supplied with smurf.
-*     If "null" is supplied, the PARAMS column should include a setting
-*     for the CONFIG parameter.
+*     "type=makemap": MAKEMAP tests generate a single output NDF ("called
+*     "map.sdf") by running the SMURF:MAKEMAP command. Note, this type of
+*     test cannot be used for generating tiled maps (see "type=makemap-jsa"
+*     instead). The SMURF:SC2COMPARE command is used to compare the output
+*     NDF to the corresponding reference NDF. The header should include an
+*     extra line (in addition to the "# type = makemap" line) of the form
+*     "# sc2data = <path>" where "<path>" is the absolute path to a directory
+*     containing raw SCUBA-2 data. The specified directory should contain a
+*     subdirectory for each SCUBA-2 array, named "s8a", "s8b", etc. Each of
+*     these subdirectory should contain a subdirectory for each UT date, which
+*     in turn should contain subdirectories for each observation. The following
+*     columns are required in the TDF file:
 *
-*     - "PARAMS": Any extra parameter settings that are to be used when
-*     running MAKEMAP. This list should not include the IN parameter. The
-*     CONFIG parameter may be included only if the value in column CONFIG
-*     is "null".
+*        - "ID": A single-word identifier for the test. All the ID values
+*        in a single TDF file should be unique. IDs are case insensitive.
+*
+*        - "OBS": A comma-separated list of observations to be supplied as
+*        input to MAKEMAP. Each obseravtion is specified in the form
+*        "ut/obs", where "ut" is a UT date in "yyymmdd" format, and "obs" is
+*        an observation number.
+*
+*        - "ARRAYS": The SCUBA-2 sub-arrays to use. This may be "s8" for all
+*        850 um arrays, "s4" for all 450 um arrays, or a comma separated list
+*        of individual array names (e.g. "s8a,s8c")
+*
+*        - "CONFIG": The name of a standard config file, or "null". If a
+*        name is supplied, it must be the name (without any path or leading "^"
+*        character) of one of the makemap config files supplied with smurf.
+*        If "null" is supplied, the PARAMS column should include a setting
+*        for the CONFIG parameter.
+*
+*        - "PARAMS": Any extra parameter settings that are to be used when
+*        running MAKEMAP. This list should not include the IN, OUT, JSATILES
+*        or TILEDIMS parameter. The CONFIG parameter may be included only
+*        if the value in column CONFIG is "null".
+*
+*     "type=makemap_jsa": MAKEMAP_JSA tests are like MAKEMAP tests except that
+*     they run MAKEMAP with the JSATILES=YES parameter set. Each one generates
+*     a set of output NDFs of the form "tile_xxx.sdf" , each corresponding to
+*     a single JSA tile. An extra column is required (over and above those
+*     required by the basic makemap test described above):
+*
+*        - "TILES": A comma-separated list of integer JSA tile identifiers.
+*        These are the tiles for which output NDFs are generated by the test.
 
 *  Usage:
 *     startester rootdir
@@ -415,6 +425,7 @@ class TestSet(object):
          this_id = testVals["ID"]
          test_id = "{0}_{1}".format(self._name,this_id)
          msg_out("Running test {0} ...".format(test_id))
+         addBlank = False
 
 #  Ensure the directory exists for the current test ID and move into it.
          testdir = "test_{0}".format(this_id)
@@ -448,7 +459,11 @@ class TestSet(object):
          os.chdir("failures")
 
 #  Generate new output NDFs, and write standard output to the test's log file.
-         stdoutText = self._generateNDFs( testVals )
+         try:
+            stdoutText = self._generateNDFs( testVals )
+         except Exception as err:
+            stdoutText = str(err)
+
          if stdoutText and not stdoutText.isspace():
             log = open( logFile, "w" )
             log.write( stdoutText )
@@ -459,11 +474,14 @@ class TestSet(object):
 #  Report any expected output NDFs that were not created.
          testOK = True
          realNDFs = []
+         missingNDFs = []
          for newNDF in NDG( testVals["OUT"], False ):
             if not starutil.ndfExists( newNDF ):
                msg_out("   Expected output NDF '{0}' was not created !!!".
                        format(newNDF), starutil.CRITICAL)
+               addBlank = True
                testOK = False
+               missingNDFs.append(os.path.basename(newNDF)+".sdf")
             else:
                realNDFs.append( newNDF )
 
@@ -472,6 +490,14 @@ class TestSet(object):
          if os.path.exists("../temp"):
             shutil.rmtree("../temp")
          os.makedirs("../temp")
+
+#  Include a list of any missing outputs in the temp directory so that
+#  subsequent SUMMARY operations will mention them.
+         if missingNDFs:
+            mf = open("../temp/missing","w")
+            for ndf in missingNDFs:
+               mf.write("{0}\n".format(ndf))
+            mf.close()
 
 #  Check we have some output NDFs to check.
          if realNDFs:
@@ -483,49 +509,43 @@ class TestSet(object):
             failNDG = NDG( newNDG, "../temp/*" )
             for (newNDF,refNDF,failNDF) in zip(newNDG,refNDG,failNDG):
 
-#  Check the output NDF was created.
-               if not starutil.ndfExists( newNDF ):
-                  msg_out("   Expected output NDF '{0}' was not created !!!".
-                          format(newNDF), starutil.CRITICAL)
-                  testOK = False
-               else:
-
 #  If the reference NDF does not exist, just copy the new NDF to the
 #  reference NDF.
-                  if not starutil.ndfExists( refNDF ):
-                     msg_out("   Retaining new output NDF '{0}' as a reference NDF".
-                             format(os.path.basename(newNDF)), starutil.CRITICAL)
-                     invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(newNDF,refNDF) )
+               if not starutil.ndfExists( refNDF ):
+                  msg_out("   Retaining new output NDF '{0}' as a reference NDF".
+                          format(os.path.basename(newNDF)), starutil.CRITICAL)
+                  addBlank = True
+                  invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(newNDF,refNDF) )
 
 #  Otherwise, compare the new and reference NDFs, using the appropriate
 #  tool.
-                  else:
-                     allNew = False
-                     if self._compare == "sc2compare":
-                        invoke("$SMURF_DIR/sc2compare.py in1={0} in2={1} report=report".format(newNDF,refNDF) )
-                        ok = starutil.get_task_par( "SIMILAR", "sc2compare" )
+               else:
+                  allNew = False
+                  if self._compare == "sc2compare":
+                     invoke("$SMURF_DIR/sc2compare.py in1={0} in2={1} report=report".format(newNDF,refNDF) )
+                     ok = starutil.get_task_par( "SIMILAR", "sc2compare" )
 
-                     else:
-                        invoke("$KAPPA_DIR/ndfcompare in1={0} in2={1} report=report".format(newNDF,refNDF) )
-                        ok = starutil.get_task_par( "SIMILAR", "ndfcompare" )
+                  else:
+                     invoke("$KAPPA_DIR/ndfcompare in1={0} in2={1} report=report".format(newNDF,refNDF) )
+                     ok = starutil.get_task_par( "SIMILAR", "ndfcompare" )
 
 #  If the test failed, copy the NDF into the failures directory, and
 #  append the report file for this NDF to the total report file for the
 #  current test (which includes reports on all changed NDFs created by
 #  the test).
-                     if not ok:
-                        invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(newNDF,failNDF) )
-                        if testOK:
-                           os.system( "echo ' ' > ../report" )
-                        else:
-                           os.system( "echo ' ' >> ../report" )
-                        os.system( "echo '===========================================================' >> ../report" )
-                        os.system( "echo 'Report on new NDF \"{0}\" generated by test \"{1}\"...' >> ../report".format(os.path.basename(newNDF),test_id) )
-                        os.system( "echo '===========================================================' >> ../report" )
+                  if not ok:
+                     invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(newNDF,failNDF) )
+                     if testOK:
+                        os.system( "echo ' ' > ../report" )
+                     else:
                         os.system( "echo ' ' >> ../report" )
-                        os.system( "cat report >> ../report" )
+                     os.system( "echo '===========================================================' >> ../report" )
+                     os.system( "echo 'Report on new NDF \"{0}\" generated by test \"{1}\"...' >> ../report".format(os.path.basename(newNDF),test_id) )
+                     os.system( "echo '===========================================================' >> ../report" )
+                     os.system( "echo ' ' >> ../report" )
+                     os.system( "cat report >> ../report" )
 
-                        testOK = False
+                     testOK = False
 
 #  Move up into the current test's main directory.
          os.chdir("..")
@@ -546,11 +566,16 @@ class TestSet(object):
             if os.path.exists(reportFile):
                msg_out( "   (see {0} for details)".format(reportFile),
                         starutil.CRITICAL)
+            addBlank = True
             os.rename("temp","failures")
             success = False
 
 #  Move up into the test set's main directory.
          os.chdir("..")
+
+#  Display a nice blank line after a critical message.
+         if addBlank:
+            msg_out( " ", starutil.CRITICAL )
 
 #  After completeing all tests in the test set, move back up to the main
 #  root directory.
@@ -679,20 +704,32 @@ class TestSet(object):
                else:
                   os.chdir("failures")
 
+#  Get a list of any output NDFs that were not created.
+                  if os.path.exists("missing"):
+                     with open("missing") as f:
+                        missing = f.readlines()
+                  else:
+                     missing = []
+
 #  Get a list of the files in the failures directory. If there are some,
 #  report failures.
-                  fails = glob.glob("*")
-                  if fails:
+                  fails = glob.glob("*.sdf")
+                  if fails or missing:
                      reportFile = "{0}/report".format(os.getcwd())
                      if os.path.exists(reportFile):
-                        msg_out("Test {0} failed for the following NDFs (see "
+                        msg_out("Test {0} failed for the following output NDFs (see "
                                 "{1} for details):".format(test_id,reportFile))
                      else:
-                        msg_out("Test {0} failed for the following NDFs:"
+                        msg_out("Test {0} failed for the following output NDFs:"
                                 .format(test_id))
 
-                     for failpath in fails:
-                        msg_out("   {0}".format(failpath))
+                     if fails:
+                        for failpath in fails:
+                           msg_out("   {0}".format(failpath))
+
+                     if missing:
+                        for failpath in missing:
+                           msg_out("   {0}".format(failpath))
 
                      msg_out(" ")
                   else:
@@ -787,6 +824,8 @@ class TestSet(object):
             result = ShellTestSet( tdfpath, rootdir, headerValues, table )
          elif type == "makemap":
             result = MakeMapTestSet( tdfpath, rootdir, headerValues, table )
+         elif type == "makemap_jsa":
+            result = MakeMapJSATestSet( tdfpath, rootdir, headerValues, table )
          else:
             raise TDFError("Bad TDF file '{0}': Header specifies unknown "
                            "test type '{1}'".format(tdfpath,type) )
@@ -834,7 +873,8 @@ class ShellTestSet(TestSet):
 
 
 
-#  A class of test based on running smurf:makemap
+#  A class of test based on running smurf:makemap to generate a
+#  SCUBA-2 map in a single output NDF .
 #  ==========================================================
 class MakeMapTestSet(TestSet):
 
@@ -842,7 +882,14 @@ class MakeMapTestSet(TestSet):
       super(MakeMapTestSet,self).__init__( tdfpath, rootdir, table )
       self._sc2data = None
       self._compare = "sc2compare"
+      self._addOutputs()
       self._verify( headerValues )
+
+#  -------------------------------------------
+#  Add the "OUT" column to the table of tests.
+#  -------------------------------------------
+   def _addOutputs( self ):
+      self._table["OUT"] = ["map"] * len( self._table["ID"] )
 
 #  -------------------------------------------
 #  Verify the table contents and header values.
@@ -899,14 +946,23 @@ class MakeMapTestSet(TestSet):
 
 #  Output file names (may be more than one if it is being split into
 #  tiles).
-      outfiles = NDG( testVals["OUT"], False )
+      outfiles = self._getOut()
 
 #  Test the supplied params settings for disallowed parameters.
       params = testVals["PARAMS"]
       if params != "null":
+         if re.search( params, 'in=', re.IGNORECASE ):
+            raise TDFError( "Bad TDF file '{0}': MAKEMAP parameter list includes "
+                            "IN, which is not allowed.".format(self._tdfpath))
          if re.search( params, 'out=', re.IGNORECASE ):
             raise TDFError( "Bad TDF file '{0}': MAKEMAP parameter list includes "
                             "OUT, which is not allowed.".format(self._tdfpath))
+         if re.search( params, 'jsatiles', re.IGNORECASE ):
+            raise TDFError( "Bad TDF file '{0}': MAKEMAP parameter list includes "
+                            "JSATILES, which is not allowed.".format(self._tdfpath))
+         if re.search( params, 'tiledims', re.IGNORECASE ):
+            raise TDFError( "Bad TDF file '{0}': MAKEMAP parameter list includes "
+                            "TILEDIMS, which is not allowed.".format(self._tdfpath))
          if config != "null" and re.search( params, 'config=', re.IGNORECASE ):
             raise TDFError( "Bad TDF file '{0}': MAKEMAP parameter list "
                             "include CONFIG, but a value has been supplied "
@@ -914,15 +970,80 @@ class MakeMapTestSet(TestSet):
       else:
          params = ''
 
+#  Get any extra parameter settings required by the particular class of
+#  makemap test.
+      extrapars = self._getExtraPars()
+
 #  Construct the makemap command line.
-      cmd = "$SMURF_DIR/makemap in=^infiles out={0} {1}".format(outfiles,params)
+      cmd = "$SMURF_DIR/makemap in=^infiles out={0} {1} {2}".format(outfiles,params,extrapars)
       if config != "null":
          cmd = "{0} config=^{1}".format(cmd,config)
 
 #  Run the command.
       return invoke( cmd )
 
+# ----------------------------------------------------------------------
+#  Return a string holding any extra parameter settings required by this
+#  particular class of makemap test.
+# ----------------------------------------------------------------------
+   def _getExtraPars( self ):
+      return ''
 
+# -------------------------------------------------------------------------------
+#  Return a string holding the value to be assigned to the makemap OUT parameter.
+# -------------------------------------------------------------------------------
+   def _getOut( self ):
+      return 'map'
+
+
+
+#  A class of test based on running smurf:makemap to generate a
+#  SCUBA-2 map as a set of JSA tiles..
+#  ==========================================================
+class MakeMapJSATestSet(MakeMapTestSet):
+
+   def __init__( self, tdfpath, rootdir, headerValues, table ):
+      super(MakeMapJSATestSet,self).__init__( tdfpath, rootdir, headerValues,
+                                              table )
+      self._sc2data = None
+      self._compare = "sc2compare"
+      self._addOutputs()
+      self._verify( headerValues )
+
+#  -------------------------------------------
+#  Add the "OUT" column to the table of tests.
+#  -------------------------------------------
+   def _addOutputs( self ):
+      self._table["OUT"] = []
+      if "TILES" not in self._table:
+         raise TDFError( "Bad TDF file '{0}': Column 'TILES' not found.".
+                         format(self._tdfpath,colName))
+      for tiles in self._table["TILES"]:
+         outs = None
+         for tile in tiles.split(','):
+            tile = tile.strip()
+            if not tile.isdigit():
+               raise TDFError( "Bad TDF file '{0}': Column 'TILES' "
+                               "contains non-integer value '{1}'.".
+                               format(self._tdfpath,tile))
+            elif outs:
+               outs = "{0},tile_{1}".format( outs, tile )
+            else:
+               outs = "tile_{0}".format( tile )
+         self._table["OUT"].append( outs )
+
+# ----------------------------------------------------------------------
+#  Return a string holding any extra parameter settings required by this
+#  particular class of makemap test.
+# ----------------------------------------------------------------------
+   def _getExtraPars( self ):
+      return 'jsatiles=yes'
+
+# -----------------------------------------------------------------
+#  Return a string holding a setting for the makemap OUT parameter.
+# -----------------------------------------------------------------
+   def _getOut( self ):
+      return 'tile'
 
 
 
@@ -946,9 +1067,9 @@ try:
                                 "definitions" ))
    params.append(starutil.Par0S("UPDATE", "Tests for which the reference "
                                 "data is to be updated", None, noprompt=True))
-   params.append(starutil.Par0L("OK", "Update the test?"))
    params.append(starutil.Par0L("SUMMARY", "Produce a summary of the "
                                 "previous run?", False,noprompt=True))
+   params.append(starutil.Par0L("OK", "Update the test?"))
 
 #  Set the default value for GLEVEL parameter, created by the ParSys
 #  constructor. This means that no logfile will be created by default.
@@ -958,9 +1079,11 @@ try:
 #  line.
    parsys = ParSys( params )
 
-#  Get the root directory path, and change directory to it.
+#  Get the root directory path, and check it exists. If so, convert it to
+#  an absolute path and change directory into it.
    rootdir = parsys["ROOTDIR"].value
    if os.path.exists(rootdir):
+      rootdir = os.path.abspath(rootdir)
       os.chdir(rootdir)
    else:
       raise starutil.InvalidParameterError("\nThe specified root directory "
@@ -996,6 +1119,11 @@ try:
 #  Loop round all ".tdf" files in the root directory.
    for tdfpath in glob.glob("*.tdf"):
 
+#  An error on a previous test could have left the current directory anywhere,
+#  so ensure we are in the root directory.
+      os.chdir(rootdir)
+
+
 #  Create an object that describes the tests defined in the current tdf
 #  file.
       testset = TestSet.create( tdfpath, rootdir )
@@ -1009,9 +1137,15 @@ try:
          update = testset.update( parsys, update )
 
 #  otherwise run the tests, and set the success flag false if any of the
-#  tests fail.
-      elif not testset.run():
-         success = False
+#  tests fail. Use a Try caluse so that failure of one test does not
+#  prevent other tests running.
+      else:
+         try:
+            if not testset.run():
+               success = False
+         except Exception as err:
+            success = False
+            msg_out( str(err), starutil.CRITICAL )
 
 #  Report an error if any non-existent test IDs were included in UPDATE.
 #  Legal ones will have been removed by the above calls to the "update"
@@ -1028,7 +1162,7 @@ try:
 #  If an StarUtilError of any kind occurred, display the message but hide the
 #  python traceback. To see the trace back, uncomment "raise" instead.
 except starutil.StarUtilError as err:
-   raise
+#   raise
    print( err )
    cleanup()
 
