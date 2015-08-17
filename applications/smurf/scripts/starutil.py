@@ -238,6 +238,31 @@ def _findLevel( level, default  ):
 
 #  -------------------  Using ATASKS ---------------------------
 
+def ndfExists( ndf ):
+   """
+
+   Test if an NDF exists.
+
+   Invocation:
+      value = ndfExists(ndf)
+
+   Arguments:
+      ndf = string
+         The full specificiation for the NDF to test.
+
+   Returned Value:
+      True if hte NDF exists, False otherwise.
+
+   """
+
+   result = True
+   try:
+      invoke("$KAPPA_DIR/ndftrace ndf=\"{0}\" quiet".format(ndf))
+   except AtaskError:
+      result = False
+   return result
+
+
 def invoke(command,aslist=False,buffer=None,annul=False):
    """
 
@@ -1098,7 +1123,11 @@ class Parameter(object):
    def _testValue(self):
       return self.__value != Parameter.__unset
 
-
+   # Define a function to cancel a parameter value, so that the next
+   # access to the "value" property forces a prompt (or the default to be
+   # used if prompting is not allowed)
+   def cancel(self):
+      self._clearValue()
 
    # Define a function to get the public value of the parameter,
    # prompting the user if required.
