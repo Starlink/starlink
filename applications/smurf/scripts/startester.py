@@ -364,6 +364,10 @@ class TDFError(Exception):
 
 #  The abstract base class from which all classes of test are derived.
 #  ===================================================================
+#  All classes of testset have and "ID" column and an "OUT" column. Some
+#  classes of testset may generate the "OUT" column from other columns
+#  before invoking the _verify() method, and so do not require the supplied
+#  TDF file to contain an OUT column.
 class TestSet(object):
    __metaclass__ = abc.ABCMeta
 
@@ -463,6 +467,7 @@ class TestSet(object):
             stdoutText = self._generateNDFs( testVals )
          except Exception as err:
             stdoutText = str(err)
+            msg_out( stdoutText, starutil.CRITICAL )
 
          if stdoutText and not stdoutText.isspace():
             log = open( logFile, "w" )
