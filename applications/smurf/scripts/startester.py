@@ -1151,8 +1151,6 @@ try:
                                 "data is to be updated", None, noprompt=True))
    params.append(starutil.Par0L("SUMMARY", "Produce a summary of the "
                                 "previous run?", False,noprompt=True))
-   params.append(starutil.Par0S("UPDATE", "Tests for which the reference "
-                                "data is to be updated", None, noprompt=True))
    params.append(starutil.Par0S("TDFFILES","TDF files to process","All",noprompt=True))
 
 #  Set the default value for GLEVEL parameter, created by the ParSys
