@@ -32,9 +32,9 @@
 *     directory tree (see parameter ROOTDIR). The details of each test to
 *     be performed are specified by one or more "test definition files",
 *     which should reside in the top level of the ROOTDIR directory tree.
-*     These files should have suffix ".tdf". All TDF files present in
-*     the specified ROOTDIR are processed sequentially when startester
-*     is run.
+*     These files should have suffix ".tdf". By default, all TDF files
+*     present in the specified ROOTDIR are processed sequentially when
+*     startester is run (see parameter TDFFILES).
 *
 *     Each TDF file has the format of a TOPCAT "ASCII" catalogue. This
 *     format is documented in section "Supported Input Formats/ASCII"
@@ -121,8 +121,8 @@
 *     line) of the form "# compare = <value>", where value is either
 *     "ndfcompare" or "sc2compare" (without the quotes). This indicates
 *     the command that is to be used to compare each output NDF with the
-*     corresponding reference NDF. The following columns are required in
-*     the TDF file:
+*     corresponding reference NDF. The following columns are allowed in
+*     the TDF file (all are required unless listed as optional):
 *
 *        - "ID": A single-word identifier for the test. All the ID values
 *        in a single TDF file should be unique. IDs are case insensitive.
@@ -132,6 +132,9 @@
 *        These are the NDFs that are compared against the reference NDFs.
 *
 *        - "CMD": The command to be executed.
+*
+*        - "COMMENT": An optional column that can be used to attach a
+*        descriptive human-readable comment to each test.
 *
 *     "type=makemap": MAKEMAP tests generate a single output NDF ("called
 *     "map.sdf") by running the SMURF:MAKEMAP command. Note, this type of
@@ -164,10 +167,14 @@
 *        If "null" is supplied, the PARAMS column should include a setting
 *        for the CONFIG parameter.
 *
-*        - "PARAMS": Any extra parameter settings that are to be used when
-*        running MAKEMAP. This list should not include the IN, OUT, JSATILES
-*        or TILEDIMS parameter. The CONFIG parameter may be included only
-*        if the value in column CONFIG is "null".
+*        - "PARAMS": An optional column holding any extra parameter settings
+*        that are to be used when running MAKEMAP. This list should not
+*        include the IN, OUT, JSATILES or TILEDIMS parameter. The CONFIG
+*        parameter may be included only if the value in column CONFIG is
+*        "null".
+*
+*        - "COMMENT": An optional column that can be used to attach a
+*        descriptive human-readable comment to each test.
 *
 *     "type=makemap_jsa": MAKEMAP_JSA tests are like MAKEMAP tests except that
 *     they run MAKEMAP with the JSATILES=YES parameter set. Each one generates
@@ -240,6 +247,11 @@
 *        If set TRUE, then a summary of the successes and failures of
 *        the previous run (in the same ROOTDIR) is displayed, but no
 *        further tests are performed. [FALSE]
+*     TDFFILES = LITERAL (Read)
+*        Specifies the TDF files to use within the directory specified by
+*        parameter ROOTDIR. It may be "All", or a comma-separated list of
+*        wild-card (glob) templates (each of which should end with ".tdf").
+*        ["All"]
 *     UPDATE = LITERAL (Read)
 *        Only used if SUMMARY is FALSE. If a non-null list of tests is
 *        supplied for UPDATE, no tests are performed. Instead, the most
@@ -378,6 +390,7 @@ class TestSet(object):
    def __init__( self, tdfpath, rootdir, table ):
       self._tdfpath = tdfpath
       self._rootdir = rootdir
+      self._type = ""
       self._name = os.path.basename( os.path.splitext(tdfpath)[0] )
       self._table = table
       self._ntest = 0
@@ -394,15 +407,43 @@ class TestSet(object):
          raise TDFError( "Bad TDF file '{0}': Column 'OUT' not found.".
                          format(self._tdfpath))
       else:
+         badcols = self._findBadCols()
+         if len(badcols) == 1:
+            raise TDFError( "Bad TDF file '{0}': Column name '{1}' not "
+                            "allowed for tests of type '{2}'.".
+                            format(self._tdfpath,badcols[0], self._type) )
+         elif len(badcols) > 1:
+            raise TDFError( "Bad TDF file '{0}': Column names '{1}' not "
+                            "allowed for tests of type '{2}'.".
+                            format(self._tdfpath,badcols, self._type) )
+
          self._ntest = len( self._table["ID"] )
          idset = set()
          for id in self._table["ID"]:
             lid = id.lower()
             if lid in idset:
-               raise TDFError( "Bad TDF file '{0}': Identifier '{0}' is "
-                               "used more than once.".format(id))
+               raise TDFError( "Bad TDF file '{0}': Test identifier '{1}' is "
+                               "used more than once.".format(self._tdfpath,id))
             else:
                idset.add(lid)
+
+#  -----------------------------------------------------------
+#  Return a list of unrecognised columns present in the table.
+#  -----------------------------------------------------------
+   def _findBadCols( self ):
+      result = []
+      for colName in self._table:
+         if colName not in ["ID", "OUT", "COMMENT"]:
+            result.append( colName )
+      return result
+
+#  ------------------------------------------------
+#  Invoke a command and generate the returned text.
+#  ------------------------------------------------
+   def _runCmd( self, cmd ):
+      result = "% {0}\n\n".format(cmd)
+      result += invoke( cmd )
+      return result
 
 #  -------------------------------------------
 #  Run all the tests described by the TestSet.
@@ -851,6 +892,7 @@ class ShellTestSet(TestSet):
 #  ------------
    def __init__( self, tdfpath, rootdir, headerValues, table ):
       super(ShellTestSet,self).__init__( tdfpath, rootdir, table )
+      self._type = "shell"
       self._verify( headerValues )
 
 #  -------------------------------------------
@@ -870,12 +912,21 @@ class ShellTestSet(TestSet):
             raise TDFError( "Bad TDF file '{0}': Illegal value ({1}) found for "
                             "'compare' in the header.".format(self._tdfpath,self._compare))
 
+#  -----------------------------------------------------------
+#  Return a list of unrecognised columns present in the table.
+#  -----------------------------------------------------------
+   def _findBadCols( self ):
+      result = []
+      for colName in super(ShellTestSet,self)._findBadCols():
+         if colName not in ["CMD"]:
+            result.append( colName )
+      return result
+
 #  -----------------------------
 #  Generate the new output NDFs.
 #  -----------------------------
    def _generateNDFs( self, testVals ):
-      return invoke( testVals[ "CMD" ] )
-
+      return self._runCmd( testVals[ "CMD" ] )
 
 
 #  A class of test based on running smurf:makemap to generate a
@@ -885,6 +936,7 @@ class MakeMapTestSet(TestSet):
 
    def __init__( self, tdfpath, rootdir, headerValues, table ):
       super(MakeMapTestSet,self).__init__( tdfpath, rootdir, table )
+      self._type = "makemap"
       self._sc2data = None
       self._compare = "sc2compare"
       self._addOutputs()
@@ -902,7 +954,7 @@ class MakeMapTestSet(TestSet):
    def _verify( self, headerValues ):
       super(MakeMapTestSet,self)._verify( headerValues )
 
-      for colName in ["OBS", "ARRAYS", "CONFIG", "PARAMS"]:
+      for colName in ["OBS", "ARRAYS", "CONFIG"]:
          if colName not in self._table:
             raise TDFError( "Bad TDF file '{0}': Column '{1}' not found.".
                             format(self._tdfpath,colName))
@@ -915,6 +967,16 @@ class MakeMapTestSet(TestSet):
          if not os.path.isdir(self._sc2data):
             raise TDFError( "Bad TDF file '{0}': Bad value ({1}) found for "
                             "'sc2data' in the header.".format(self._tdfpath,self._sc2data))
+
+#  -----------------------------------------------------------
+#  Return a list of unrecognised columns present in the table.
+#  -----------------------------------------------------------
+   def _findBadCols( self ):
+      result = []
+      for colName in super(MakeMapTestSet,self)._findBadCols():
+         if colName not in ["OBS", "ARRAYS", "CONFIG", "PARAMS"]:
+            result.append( colName )
+      return result
 
 #  -----------------------------
 #  Generate the new output NDFs.
@@ -954,7 +1016,11 @@ class MakeMapTestSet(TestSet):
       outfiles = self._getOut()
 
 #  Test the supplied params settings for disallowed parameters.
-      params = testVals["PARAMS"]
+      if "PARAMS" in testVals:
+         params = testVals["PARAMS"]
+      else:
+         params = "null"
+
       if params != "null":
          if re.search( params, 'in=', re.IGNORECASE ):
             raise TDFError( "Bad TDF file '{0}': MAKEMAP parameter list includes "
@@ -984,8 +1050,8 @@ class MakeMapTestSet(TestSet):
       if config != "null":
          cmd = "{0} config=^{1}".format(cmd,config)
 
-#  Run the command.
-      return invoke( cmd )
+#  Run the command, and return the standard output generated by it.
+      return self._runCmd( cmd )
 
 # ----------------------------------------------------------------------
 #  Return a string holding any extra parameter settings required by this
@@ -1008,8 +1074,9 @@ class MakeMapTestSet(TestSet):
 class MakeMapJSATestSet(MakeMapTestSet):
 
    def __init__( self, tdfpath, rootdir, headerValues, table ):
-      super(MakeMapJSATestSet,self).__init__( tdfpath, rootdir, headerValues,
-                                              table )
+      super(MakeMapJSATestSet,self).__init__( tdfpath, rootdir,
+                                              headerValues, table )
+      self._type = "makemap_jsa"
       self._sc2data = None
       self._compare = "sc2compare"
       self._addOutputs()
@@ -1050,6 +1117,16 @@ class MakeMapJSATestSet(MakeMapTestSet):
    def _getOut( self ):
       return 'tile'
 
+#  -----------------------------------------------------------
+#  Return a list of unrecognised columns present in the table.
+#  -----------------------------------------------------------
+   def _findBadCols( self ):
+      result = []
+      for colName in super(MakeMapJSATestSet,self)._findBadCols():
+         if colName not in ["TILES"]:
+            result.append( colName )
+      return result
+
 
 
 #  Main Entry point
@@ -1074,7 +1151,9 @@ try:
                                 "data is to be updated", None, noprompt=True))
    params.append(starutil.Par0L("SUMMARY", "Produce a summary of the "
                                 "previous run?", False,noprompt=True))
-   params.append(starutil.Par0L("OK", "Update the test?"))
+   params.append(starutil.Par0S("UPDATE", "Tests for which the reference "
+                                "data is to be updated", None, noprompt=True))
+   params.append(starutil.Par0S("TDFFILES","TDF files to process","All",noprompt=True))
 
 #  Set the default value for GLEVEL parameter, created by the ParSys
 #  constructor. This means that no logfile will be created by default.
@@ -1111,7 +1190,7 @@ try:
             update = [testId.strip() for testId in update.split(',')]
          msg_out("Updating reference NDFs in root directory '{0}'".format(os.getcwd()))
       else:
-         msg_out("Performing all tests in root directory '{0}'".format(os.getcwd()))
+         msg_out("Performing tests in root directory '{0}'".format(os.getcwd()))
    else:
       msg_out("Summarising results of previous startest run in root "
               "directory '{0}'".format(os.getcwd()))
@@ -1121,13 +1200,28 @@ try:
 #  Assume all tests pass.
    success = True
 
+#  Get the TDF files to process.
+   tdffiles = parsys["TDFFILES"].value
+   if tdffiles.lower() == "all":
+      tdfpaths = glob.glob("*.tdf")
+   else:
+      tdfpaths = []
+      for pattern in tdffiles.split(','):
+         pattern = pattern.strip()
+         if pattern.endswith(".tdf"):
+            tdfpaths.extend( glob.glob(pattern) )
+         else:
+            tdfpaths.extend( glob.glob(pattern+".tdf") )
+
+   if not tdfpaths:
+      msg_out("No TDF files found to process.")
+
 #  Loop round all ".tdf" files in the root directory.
-   for tdfpath in glob.glob("*.tdf"):
+   for tdfpath in tdfpaths:
 
 #  An error on a previous test could have left the current directory anywhere,
 #  so ensure we are in the root directory.
       os.chdir(rootdir)
-
 
 #  Create an object that describes the tests defined in the current tdf
 #  file.
