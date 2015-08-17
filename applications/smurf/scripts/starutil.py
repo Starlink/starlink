@@ -361,11 +361,14 @@ def invoke(command,aslist=False,buffer=None,annul=False):
       p = subprocess.Popen("{0} > {1} 2>&1".format(command,stdout_file), shell=True)
       status = p.wait()
 
-      fd = open(stdout_file,"r")
-      outtxt = fd.read().strip()
-      fd.close()
-      os.remove(stdout_file)
-      msg_out( outtxt, ATASK )
+      if os.path.exists( stdout_file ):
+         fd = open(stdout_file,"r")
+         outtxt = fd.read().strip()
+         fd.close()
+         os.remove(stdout_file)
+         msg_out( outtxt, ATASK )
+      else:
+         outtxt = ""
 
       if status != 0:
          if not annul:
@@ -2043,7 +2046,7 @@ class NDG(object):
             except AtaskError:
                raise NoNdfError("\n\nCannot access one or more of the NDFs specified by '{0}'.".format(p1))
          else:
-            self.__ndfs = invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" abspath=yes".format(p1),True)
+            self.__ndfs = invoke("$KAPPA_DIR/ndfecho ndf=! mod=\"{0}\" abspath=yes".format(gexp),True)
 
       # If the first argument is a list or tuple, create a group containing
       # the contents of the list or tuple as NDF names. Flag that we do not
