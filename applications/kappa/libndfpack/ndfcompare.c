@@ -857,15 +857,15 @@ F77_SUBROUTINE(ndfcompare)( INTEGER(status) ){
 /* Make a report if these numbers differ by too much. */
                if( cbuf2[0] == 'R' ) {
                   if( fabs( nbad1 - nbad2 ) > acc*( nbad1 + nbad2 )/2 ) {
-                     similar = Report( reports, itest, "The number of bad data "
-                                       "values in IN1 and IN2 differ by %d %%.",
+                     similar = Report( reports, itest, "The number of bad variance "
+                                       "values in IN1 and IN2 differ by %g %%.",
                                        status, 200*fabs( nbad1 - nbad2 )/
                                                        ( nbad1 + nbad2 ) );
                   }
                } else if( fabs( nbad1 - nbad2 ) > acc ) {
-                  similar = Report( reports, itest, "The number of bad data "
+                  similar = Report( reports, itest, "The number of bad variance "
                                     "values in IN1 and IN2 differ by %d.",
-                                    status, fabs( nbad1 - nbad2 ) );
+                                    status, abs( nbad1 - nbad2 ) );
                }
             }
 
