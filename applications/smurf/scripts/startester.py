@@ -264,8 +264,9 @@
 *        recently generated output NDFs for the specified tests are copied
 *        so that they are used as the corresponding reference NDFs on the
 *        next invocation of startester. This replaces any previously
-*        existing reference NDFs. The supplied value for UPDATE can be a
-*        comma separated list of test identifiers, the world "All" or the
+*        existing reference NDFs. A copy of any log file is also saved
+*        with the new reference NDFs. The supplied value for UPDATE can be
+*        a comma separated list of test identifiers, the world "All" or the
 *        word "Prompt". A test identifier consists of the basename of the
 *        TDF file followed by "_<id>", where "<id>" is the test identifier
 *        as specified in the "ID" column of the TDF file. Any tests that
@@ -310,6 +311,7 @@ import glob
 import re
 import abc
 import starutil
+import datetime
 from starutil import invoke
 from starutil import NDG
 from starutil import Parameter
@@ -443,11 +445,19 @@ class TestSet(object):
             result.append( colName )
       return result
 
-#  ------------------------------------------------
-#  Invoke a command and generate the returned text.
-#  ------------------------------------------------
+#  ---------------------------------------------------------------------
+#  Invoke a command and generate the returned text including the command,
+#  the starlink version and the date/time.
+#  ---------------------------------------------------------------------
    def _runCmd( self, cmd ):
-      result = "% {0}\n\n".format(cmd)
+      result = "\nStarlink version:\n"
+      result += "----------------\n"
+      with open(os.environ['SMURF_DIR']+"/../../manifests/starlink.version") as f:
+         result += f.read()
+      result += "\nCurrent time:\n"
+      result += "------------\n"
+      result += "{0}\n\n\n".format(datetime.datetime.now().strftime("%d-%b-%Y %H:%M"))
+      result += "% {0}\n\n".format(cmd)
       result += invoke( cmd )
       return result
 
@@ -699,6 +709,10 @@ class TestSet(object):
                            if os.path.exists(dst):
                               os.remove(dst)
                            shutil.move( failpath, dst )
+
+# If a log file exists, put a copy in the ref directory.
+                        if os.path.exists( "../log" ):
+                           shutil.copyfile( "../log", "../ref/log" )
 
                         if nfail == 1:
                            msg_out("Updated 1 reference NDF for test {0}".format(test_id) )
@@ -1184,6 +1198,7 @@ try:
    params.append(starutil.Par0L("SUMMARY", "Produce a summary of the "
                                 "previous run?", False,noprompt=True))
    params.append(starutil.Par0S("TDFFILES","TDF files to process","All",noprompt=True))
+   params.append(starutil.Par0L("OK", "Update the named test?"))
 
 #  Set the default value for GLEVEL parameter, created by the ParSys
 #  constructor. This means that no logfile will be created by default.
