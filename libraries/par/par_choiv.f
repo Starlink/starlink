@@ -151,6 +151,9 @@
 
 *.
 
+*  Initialise returned value to safe values in case an error occurs.
+      ACTVAL = 0
+
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
