@@ -47,17 +47,18 @@
 *     single TDF file must be of the same type). Here, "<test type>"
 *     must be one of the recognised test types listed in section "Test
 *     Types:" below (case insensitive). The "#" character starting the
-*     final line in the header should be followed by a space separated
-*     list of column names. The column names must match those required by
-*     the specified test type, although they may appear in any order. All
-*     other header lines are ignored (except for any extra header lines
-*     required by specific test type) and may be used to document the TDF
-*     file. Each row within the table following the header can include the
-*     word "null" (unquoted) to indicate that no value is avalaible for
-*     a particular column. If a column value need to include spaces, then
-*     the whole column value should be quoted (single or double). Literal
-*     quotes  may be included within quoted strings by escaping them
-*     using a backslash character ("\").
+*     final line in the header prior to the start of the table should be
+*     followed by a space separated list of column names. The column names
+*     must match those required by the specified test type, although they
+*     may appear in any order. All other header lines are ignored (except
+*     for any extra header lines required by specific test type) and may
+*     be used to document the TDF file. Each row within the table following
+*     the header can include the word "null" (unquoted) to indicate that no
+*     value is avalaible for a particular column. If a column value need to
+*     include spaces, then the whole column value should be quoted (single
+*     or double). Literal quotes  may be included within quoted strings by
+*     escaping them using a backslash character ("\"). Table rows that
+*     start with a "#" character are ignored.
 
 *  Reference NDFs:
 *     Each test should generate one or more output NDFs. These are
@@ -839,10 +840,7 @@ class TestSet(object):
 
 #  Header lines...
          if line[0:1] == '#':
-            if not inHeader:
-               raise TDFError("Bad TDF file '{0}': Unexpected header line "
-                              "found at line {1}:\n{2}".format(tdfpath,iline,line) )
-            else:
+            if inHeader:
                match = headerValueRE.search( line )
                if match:
                   headerValues[ match.group(1).lower() ] = match.group(2).lower()
