@@ -4,6 +4,8 @@
   Fix problem with object detection toolbox failing to set the correct
   number of objects detected in the catalogue window.
 
+  The URAT1 catalogue has been added to the standard Skycat catalogues.
+
     
   Star-2015A Release
   ==================
