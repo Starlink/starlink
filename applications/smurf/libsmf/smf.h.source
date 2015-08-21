@@ -586,7 +586,7 @@ void smf_apply_mask( ThrWorkForce *wf, smfData *indata,
                      const smfArray *bpms, smf_bbm_meth method,
                      smf_qual_t addqual, int *status );
 
-int smf_block_end( smfData *data, int block_start, int ipolcrd,
+int smf_block_end( smfData *data, int *block_start,
                    float arcerror, int maxsize, int *status );
 
 void smf_bolonoise( ThrWorkForce *wf, smfData *data, double gfrac,

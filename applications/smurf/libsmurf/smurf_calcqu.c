@@ -74,17 +74,20 @@
 *     image should be used as the reference image when running WCSMOSIAC).
 *     Likewise, the set of U images can be combined in the same way. All
 *     the created Q and U images use the focal plane Y axis as the
-*     reference direction. Since this direction may vary from block to
-*     block due to sky rotation, the idividual Q and U images should be
-*     processed using POLPACK:POLROTREF before combining them using
-*     KAPPA:WCSMOSAIC, to ensure that they all use the same reference
-*     direction. Q and U values are determined from the Fourier component
-*     of each time series corresponding to the frequency of the spinning
-*     half-waveplate (6 - 12 Hz), and should be largely unaffected by
-*     signal at other frequencies. For this reason, the cleaning specified
-*     by parameter CONFIG should usually not include any filtering. There is
-*     an option (see configuration parameter SUBMEAN) to subtract the mean
-*     value from each time slice before using them to calculate Q and U.
+*     reference direction (positive polarisation angles are in the same
+*     sense as rotation from the focal plane X axis to the focal plane
+*     Y axis). Since this direction may vary from block to block due to
+*     sky rotation, the idividual Q and U images should be processed
+*     using POLPACK:POLROTREF before combining them using KAPPA:WCSMOSAIC,
+*     to ensure that they all use the same reference direction. Q and U
+*     values are determined from the Fourier component of each time series
+*     corresponding to the frequency of the spinning half-waveplate
+*     (6 - 12 Hz), and should be largely unaffected by signal at other
+*     frequencies. For this reason, the cleaning specified by parameter
+*     CONFIG should usually not include any filtering that affects
+*     frequencies in the range 2 -16 Hz. There is an option (see
+*     configuration parameter SUBMEAN) to subtract the mean value from
+*     each time slice before using them to calculate Q and U.
 *
 *     Separate Q, U and I esimates are made for each half revolution of
 *     the half-wave plate. The Data values in the returned NDFs are the
@@ -753,7 +756,7 @@ void smurf_calcqu( int *status ) {
    positions at the start of the block. Then back off some time slices
    to ensure that the block holds an integral number of half-waveplate
    rotations. */
-               block_end = smf_block_end( data, block_start, ipolcrd, arcerror,
+               block_end = smf_block_end( data, &block_start, arcerror,
                                           maxsize, status );
 
 /* Loop round creating I/Q/U images for each block. Count them. */
@@ -829,7 +832,7 @@ void smurf_calcqu( int *status ) {
    positions at the start of the block. Then back off some time slices
    to ensure that the block holds an integral number of half-waveplate
    rotations. This returns -1 if all time slices have been used. */
-                  block_end = smf_block_end( data, block_start, ipolcrd,
+                  block_end = smf_block_end( data, &block_start,
                                              arcerror, maxsize, status );
                }
 
