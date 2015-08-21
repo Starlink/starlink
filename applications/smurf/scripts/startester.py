@@ -381,6 +381,20 @@ def splitter( line, iline, tdfpath ):
 
 
 
+#  Copy an NDF without adding provenance (unless it already exists).
+def ndfcopy( inndf, outndf, params="" ):
+   if "AUTOPROV" in os.environ:
+      old_autoprov = os.environ['AUTOPROV']
+      del os.environ['AUTOPROV']
+   else:
+      old_autoprov = None
+   invoke("$KAPPA_DIR/ndfcopy in={0} out={1} {2}".format(inndf,outndf,params))
+   if old_autoprov:
+      os.environ['AUTOPROV'] = old_autoprov
+
+
+
+
 #  An exception raise if an error is found within a TDF file.
 #  ==========================================================
 class TDFError(Exception):
@@ -585,7 +599,7 @@ class TestSet(object):
                   msg_out("   Retaining new output NDF '{0}' as a reference NDF".
                           format(os.path.basename(newNDF)), starutil.CRITICAL)
                   addBlank = True
-                  invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(newNDF,refNDF) )
+                  ndfcopy( newNDF, refNDF )
 
 #  Otherwise, compare the new and reference NDFs, using the appropriate
 #  tool.
@@ -604,7 +618,7 @@ class TestSet(object):
 #  current test (which includes reports on all changed NDFs created by
 #  the test).
                   if not ok:
-                     invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(newNDF,failNDF) )
+                     ndfcopy( newNDF, failNDF )
                      if testOK:
                         os.system( "echo ' ' > ../report" )
                      else:
