@@ -116,6 +116,18 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
 *  History:
 *     22-JUN-2015 (DSB):
 *        Original version.
+*     21-AUG-2015 (DSB):
+*        Previously the rotation angle at each pixel was found by calculating
+*        the PA of the reference direction in the two FrameSets separately,
+*        and then finding their difference. This led to potentially big errors
+*        if the FrameSets include a SCUBA-2 focal plane distortion PolyMap.
+*        Now, the total Mapping between the two POLANAL Frames is found and
+*        simplified, and then used to calculate the rotation angle directly.
+*        This gives chance for the PolyMaps to cancel out, producing more
+*        accurate results (the issue being that the PolyMap inverse is only
+*        an accurate inverse for positions within the subarray to which it
+*        applies and becomes bad very rapidly when positions outside the
+*        subarray are transformed).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -319,7 +331,9 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
    astRemoveFrame( wcs, ipfrm );
 
 /* If the new POLANAL Frame is parallel to the second axis of the
-   specified Frame, we need a PermMap to make it parallel to the first axis. */
+   specified Frame, we need a PermMap to make it parallel to the first
+   axis. Or should we rotate by 180 degs (which is different since it
+   retains the handedness of the POLANAL Frame)? */
    if( iaxis == 1 ) {
       perm[ 0 ] = 2;
       perm[ 1 ] = 1;
@@ -367,6 +381,8 @@ static void pol1RotrfJob( void *job_data, int *status ) {
 /* Local Variables: */
    AstMapping *gpmap;
    AstMapping *gptmap;
+   AstCmpMap *tmap;
+   AstMapping *totmap;
    AstFrame *pfrm;
    AstFrame *ptfrm;
    const double *qin;
@@ -377,8 +393,19 @@ static void pol1RotrfJob( void *job_data, int *status ) {
    double *beta2;
    double *gx0;
    double *gy0;
-   double *pbeta1;
-   double *pbeta2;
+   double *px0;
+   double *py0;
+   double *px1;
+   double *py1;
+   double *qx0;
+   double *qy0;
+   double *qx1;
+   double *qy1;
+   double *pqx0;
+   double *pqy0;
+   double *pqx1;
+   double *pqy1;
+   double delta;
    double *qout;
    double *uout;
    double *qoutv;
@@ -401,6 +428,8 @@ static void pol1RotrfJob( void *job_data, int *status ) {
    int pb2;
    int var;
    pol1RotrfJobData *pdata;
+   double pos1[2];
+   double pos2[2];
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -448,6 +477,13 @@ static void pol1RotrfJob( void *job_data, int *status ) {
    astLock( gptmap, 0 );
    astLock( ptfrm, 0 );
 
+/* Get the simplified mapping from the POLANAL Frame in wcs to the
+   POLANAL Frame in twcs. */
+   astInvert( gpmap );
+   tmap = astCmpMap( gpmap, gptmap, 1, " " );
+   totmap = astSimplify( tmap );
+   tmap = astAnnul( tmap );
+
 /* Number of pixels to be processed by this thread. */
    npix = p2 - p1 + 1;
 
@@ -461,8 +497,14 @@ static void pol1RotrfJob( void *job_data, int *status ) {
 /* Allocate work space. */
    gx0 = astMalloc( block_size*sizeof( *gx0 ) );
    gy0 = astMalloc( block_size*sizeof( *gy0 ) );
-   beta1 = astMalloc( block_size*sizeof( *beta1 ) );
-   beta2 = astMalloc( block_size*sizeof( *beta2 ) );
+   px0 = astMalloc( block_size*sizeof( *px0 ) );
+   py0 = astMalloc( block_size*sizeof( *py0 ) );
+   px1 = astMalloc( block_size*sizeof( *px1 ) );
+   py1 = astMalloc( block_size*sizeof( *py1 ) );
+   qx0 = astMalloc( block_size*sizeof( *qx0 ) );
+   qy0 = astMalloc( block_size*sizeof( *qy0 ) );
+   qx1 = astMalloc( block_size*sizeof( *qx1 ) );
+   qy1 = astMalloc( block_size*sizeof( *qy1 ) );
 
 /* Process each block of pixels. */
    nblock = 1 + ( npix - 1 )/block_size;
@@ -503,65 +545,92 @@ static void pol1RotrfJob( void *job_data, int *status ) {
          }
       }
 
-/* For each pixel in the block, find the angle from the GRID X axis in
-   the Q/U arrays to the original reference direction. Store them in
-   the "beta1" array. */
-      pol1Pa2gr( gpmap, pfrm, 0, npix, gx0, gy0, beta1, status );
+/* Get the POLANAL positions (in wcs) at each GRID position. */
+      astTran2( gpmap, npix, gx0, gy0, 1, px0, py0 );
 
-/* For each pixel in the block, find the angle from the GRID X axis in
-   the Q/U arrays to the new reference direction. Store them in
-   the "beta2" array. */
-      pol1Pa2gr( gptmap, ptfrm, iaxis, npix, gx0, gy0, beta2, status );
+/* Find 0.1 of the distance in the POLANAL Frame between the first two pixels. */
+      pos1[ 0 ] = px0[ 0 ];
+      pos1[ 1 ] = py0[ 0 ];
+      pos2[ 0 ] = px0[ 1 ];
+      pos2[ 1 ] = py0[ 1 ];
+      delta = 0.1*astDistance( pfrm, pos1, pos2 );
+
+/* For each POLANAL position, get a corresponding position that is
+   "delta" away from it along the axis corresponding to the reference
+   direction. */
+      if( iaxis == 0 ) {
+         for( ipix = 0; ipix < npix; ipix++ ) {
+            px1[ ipix ] = px0[ ipix ] + delta;
+            py1[ ipix ] = py0[ ipix ];
+         }
+      } else {
+         for( ipix = 0; ipix < npix; ipix++ ) {
+            px1[ ipix ] = px0[ ipix ];
+            py1[ ipix ] = py0[ ipix ] + delta;
+         }
+      }
+
+/* Transform the (px0,py0) positions into the POLANAL Frame in twcs. */
+      astTran2( totmap, npix, px0, py0, 1, qx0, qy0 );
+
+/* Transform the (px1,py1) positions into the POLANAL Frame in twcs. */
+      astTran2( totmap, npix, px1, py1, 1, qx1, qy1 );
 
 /* Loop round all pixels being processed in this block. */
-      pbeta1 = beta1;
-      pbeta2 = beta2;
-      for( ipix = 0; ipix < npix; ipix++,qin++,uin++,qout++,uout++,pbeta1++,pbeta2++) {
+      pqx0 = qx0;
+      pqy0 = qy0;
+      pqx1 = qx1;
+      pqy1 = qy1;
+      if( *status == SAI__OK ) {
+         for( ipix = 0; ipix < npix; ipix++,qin++,uin++,qout++,uout++,
+                                     pqx0++,pqy0++,pqx1++,pqy1++){
 
 /* Check both inputs and angles are good. */
-         if( *qin != VAL__BADD && *uin != VAL__BADD &&
-             *pbeta1 != AST__BAD && *pbeta2 != AST__BAD ) {
+            if( *qin != VAL__BADD && *uin != VAL__BADD &&
+                *pqx0 != AST__BAD && *pqy0 != AST__BAD &&
+                *pqx1 != AST__BAD && *pqy1 != AST__BAD ) {
 
 /* Find the anti-clockwise rotation to apply to the Q/U values. */
-            rot = *pbeta1 - *pbeta2;
+               rot = atan2( (*pqy1 - *pqy0), (*pqx1 - *pqx0) );
 
 /*  Calculate the trig terms. */
-            cos2a = cos( 2*rot );
-            sin2a = sin( 2*rot );
+               cos2a = cos( 2*rot );
+               sin2a = sin( 2*rot );
 
 /* Calculate the rotated Q/U values or variances. */
-            *qout = (*qin)*cos2a - (*uin)*sin2a;
-            *uout = (*uin)*cos2a + (*qin)*sin2a;
+               *qout = (*qin)*cos2a - (*uin)*sin2a;
+               *uout = (*uin)*cos2a + (*qin)*sin2a;
 
 /* Calculate variances if required. */
-            if( var ) {
-               if( *qinv != VAL__BADD && *uinv != VAL__BADD ) {
-                  cos2a *= cos2a;
-                  sin2a *= sin2a;
-                  *qoutv = (*qinv)*cos2a + (*uinv)*sin2a;
-                  *uoutv = (*uinv)*cos2a + (*qinv)*sin2a;
-               } else {
+               if( var ) {
+                  if( *qinv != VAL__BADD && *uinv != VAL__BADD ) {
+                     cos2a *= cos2a;
+                     sin2a *= sin2a;
+                     *qoutv = (*qinv)*cos2a + (*uinv)*sin2a;
+                     *uoutv = (*uinv)*cos2a + (*qinv)*sin2a;
+                  } else {
+                     *qoutv = VAL__BADD;
+                     *uoutv = VAL__BADD;
+                  }
+               }
+
+/* Store bad output values for bad input values. */
+            } else {
+               *qout = VAL__BADD;
+               *uout = VAL__BADD;
+               if( var ) {
                   *qoutv = VAL__BADD;
                   *uoutv = VAL__BADD;
                }
             }
 
-/* Store bad output values for bad input values. */
-         } else {
-            *qout = VAL__BADD;
-            *uout = VAL__BADD;
-            if( var ) {
-               *qoutv = VAL__BADD;
-               *uoutv = VAL__BADD;
-            }
-         }
-
 /* If required, increment the variance pointers to the next pixel. */
-         if( var ) {
-            qoutv++;
-            uoutv++;
-            qinv++;
-            uinv++;
+            if( var ) {
+               qoutv++;
+               uoutv++;
+               qinv++;
+               uinv++;
+            }
          }
       }
    }
@@ -569,8 +638,15 @@ static void pol1RotrfJob( void *job_data, int *status ) {
 /* Free resources. */
    gx0 = astFree( gx0 );
    gy0 = astFree( gy0 );
-   beta1 = astFree( beta1 );
-   beta2 = astFree( beta2 );
+   px0 = astFree( px0 );
+   py0 = astFree( py0 );
+   px1 = astFree( px1 );
+   py1 = astFree( py1 );
+   qx0 = astFree( qx0 );
+   qy0 = astFree( qy0 );
+   qx1 = astFree( qx1 );
+   qy1 = astFree( qy1 );
+   totmap = astAnnul( totmap );
 
 /* Unlock the AST objects so they can be locked for use by the main
    thread. */
@@ -579,5 +655,4 @@ static void pol1RotrfJob( void *job_data, int *status ) {
    astUnlock( gptmap, 1 );
    astUnlock( ptfrm, 1 );
 }
-
 
