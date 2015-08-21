@@ -65,9 +65,9 @@
 *          gives the amplitude of the 16 Hz signal as a fraction of the
 *          total intensity. See also "PHASE16". [0.0]
 *     ANGROT = _DOUBLE (Read)
-*          The angle from the focal plane X axis to the fixed analyser, in
-*          degrees. Measured positive in the same sense as rotation from focal
-*          plane X to focal plane Y. [90.0]
+*          The angle from the focal plane X axis to the POL2 fixed analyser,
+*          in degrees. Measured positive in the same sense as rotation from
+*          focal plane X to focal plane Y. [90.0]
 *     COM = NDF (Read)
 *          A group of existing time series NDFs that supply the
 *          common-mode signal to be added to the output time series data. The
@@ -210,10 +210,12 @@
 *          The phase offset to apply to the 16 Hz signal specified via
 *          parameter AMP16, in degrees. [0.0]
 *     QIN = NDF (Read)
-*          The input 2D image of the sky Q values, with respect to the
-*          second pixel axis (i.e. the pixel Y axis). If QIN and UIN are
-*          both supplied, then the time series specified by the REF parameter
-*          should contain flat-fielded POL2 data. [!]
+*          The input 2D image of the sky Q values, with respect to
+*          the second pixel axis (i.e. the pixel Y axis). Positive
+*          polarisation angles are in the same sense as rotation from
+*          the pixel X axis to the pixel Y axis. If QIN and UIN are
+*          both supplied, then the time series specified by the REF
+*          parameter should contain flat-fielded POL2 data. [!]
 *     REF = NDF (Read)
 *          A group of existing time series data cubes. These act as templates
 *          for the new time series cubes created by this application, and
@@ -223,10 +225,12 @@
 *          The standard deviation of the Gaussian noise to add to the
 *          output data. [0.0]
 *     UIN = NDF (Read)
-*          The input 2D image of the sky U values, with respect to the
-*          second pixel axis (i.e. the pixel Y axis). If QIN and UIN are
-*          both supplied, then the time series specified by the REF parameter
-*          should contain flat-fielded POL2 data. [!]
+*          The input 2D image of the sky U values, with respect to
+*          the second pixel axis (i.e. the pixel Y axis). Positive
+*          polarisation angles are in the same sense as rotation from
+*          the pixel X axis to the pixel Y axis. If QIN and UIN are
+*          both supplied, then the time series specified by the REF
+*          parameter should contain flat-fielded POL2 data. [!]
 *     USEAXIS = LITERAL (Read)
 *          A set of 2 axes to be selected from the Current Frame in the sky
 *          map. Each axis can be specified either by giving its index within
@@ -798,9 +802,10 @@ void smurf_unmakemap( int *status ) {
             phase16 = 0.0;
          }
 
-/* Allocate room for an array to hold the anti-clockwise angle from the
-   focal plane Y axis to the Y pixel axis in the reference map, at each
-   time slice. */
+/* Allocate room for an array to hold the angle from the Y pixel axis
+   in the sky map to the focal plane Y axis, in radians, at each time
+   slice. Positive rotation is in the same sense as rotation from
+   focal plane X to focal plane Y. */
          ang_data = astMalloc( ntslice*sizeof( *ang_data ) );
 
 /* Resample them both into 3D time series. These Q/U values arw with

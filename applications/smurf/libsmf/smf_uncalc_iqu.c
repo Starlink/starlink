@@ -35,8 +35,10 @@
 *     angdata = double * (Given)
 *        An array holding the angle from the reference direction used by
 *        the supplied Q and U values, to the focal plane Y axis, in radians,
-*        at each time slice. Positive rotation is in the same sense as
-*        rotation from focal plane X to focal plane Y.
+*        at each time slice (at each time slice, all bolometers are
+*        assumed to have the same reference direction in focal plane
+*        coordinates). Positive rotation is in the same sense as rotation
+*        from focal plane X to focal plane Y.
 *     pasign = int (Given)
 *        Should be supplied non-zero if a positive POL_ANG value
 *        corresponds to rotation from focal plane X to focal plane Y axis,
