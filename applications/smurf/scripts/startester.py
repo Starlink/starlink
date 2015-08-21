@@ -122,8 +122,13 @@
 *     line) of the form "# compare = <value>", where value is either
 *     "ndfcompare" or "sc2compare" (without the quotes). This indicates
 *     the command that is to be used to compare each output NDF with the
-*     corresponding reference NDF. The following columns are allowed in
-*     the TDF file (all are required unless listed as optional):
+*     corresponding reference NDF. An optional header line of the form
+*     "# path = <dir>" can be supplied, in which case the specified
+*     directory will be added to the front of the current PATH. This
+*     means that any scripts within that directory that are included in
+*     the CMD column do not need to include a path. The following columns
+*     are allowed in the TDF file (all are required unless listed as
+*     optional):
 *
 *        - "ID": A single-word identifier for the test. All the ID values
 *        in a single TDF file should be unique. IDs are case insensitive.
@@ -459,7 +464,9 @@ class TestSet(object):
       result += "------------\n"
       result += "{0}\n\n\n".format(datetime.datetime.now().strftime("%d-%b-%Y %H:%M"))
       result += "% {0}\n\n".format(cmd)
+      os.environ["STARUTIL_NOPROMPT"] = "1"
       result += invoke( cmd )
+      del os.environ["STARUTIL_NOPROMPT"]
       return result
 
 #  -------------------------------------------
@@ -911,6 +918,8 @@ class ShellTestSet(TestSet):
    def __init__( self, tdfpath, rootdir, headerValues, table ):
       super(ShellTestSet,self).__init__( tdfpath, rootdir, table )
       self._type = "shell"
+      self._compare = None
+      self._path = None
       self._verify( headerValues )
 
 #  -------------------------------------------
@@ -929,6 +938,13 @@ class ShellTestSet(TestSet):
          if self._compare != "sc2compare" and self._compare != "ndfcompare":
             raise TDFError( "Bad TDF file '{0}': Illegal value ({1}) found for "
                             "'compare' in the header.".format(self._tdfpath,self._compare))
+         if "path" in headerValues:
+            if not os.path.isdir(headerValues["path"]):
+               raise TDFError( "Bad TDF file '{0}': Bad path ({1}) specified.".
+                               format(self._tdfpath,headerValues["path"]))
+            else:
+               self._path = headerValues["path"].strip()
+               os.environ['PATH'] = self._path+os.pathsep+os.environ['PATH']
 
 #  -----------------------------------------------------------
 #  Return a list of unrecognised columns present in the table.

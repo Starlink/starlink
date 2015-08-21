@@ -1264,6 +1264,10 @@ class Parameter(object):
    #  Prompt the user for a value
    def __promptUser(self):
 
+      if "STARUTIL_NOPROMPT" in os.environ:
+         raise NoValueError("\nNo value obtained for parameter '{0}' - "
+                            "prompting is disallowed.".format(self.__name))
+
       name = self._getName()
       pmt = "{0} ".format(name)
 
