@@ -707,7 +707,10 @@ try:
          msg_out( "Performing extinction correction on the time series data...")
          invoke("$SMURF_DIR/extinction in={0} out={1} tausrc=auto "
                 "method=adaptive csotau=! hasskyrem=yes".format(nosky,noext) )
-         config += ",doclean=0"
+         if config and config != "def":
+            config += ",doclean=0"
+         else:
+            config = "doclean=0"
 
 #  Use the supplied input data from now on if no extinction correction is
 #  required.
