@@ -81,8 +81,9 @@
 *     is assumed not to move significantly over the duration of this block of
 *     time slices. The I, Q and U values stored in the output NDFs are
 *     referenced to the focal plane Y axis, and are defined using the
-*     conventions described in SUN/223. The current WCS Frame in the output
-*     NDFs is "SKY".
+*     conventions described in SUN/223. Positive polarisation angles are in
+*     the same sense as rotation from the focal plane X axis to the focal
+*     plane Y axis. The current WCS Frame in the output NDFs is "SKY".
 
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
@@ -120,6 +121,9 @@
 *     2-JUL-2015 (DSB):
 *        Take account of focal plane rotation during the course of one
 *        stare position.
+*     21-AUG-2015 (DSB):
+*        - More mapping simplifications to overcome possible numerical 
+*        problems with focal plane distortion.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -212,6 +216,7 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
    AstFrameSet *wcs;          /* WCS FrameSet for output NDFs */
    AstMapping *fpmap1;
    AstMapping *fpmap2;
+   AstMapping *cm3;
    AstMapping *oskymap;
    AstMapping *totmap;
    AstSkyFrame *oskyfrm;
@@ -273,7 +278,7 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
    smf_get_dims( data, &nrow, &ncol, &nbolo, &ntslice, NULL, &bstride,
                  &tstride, status );
 
-/* Report an error if the block of time slices extends of either end. */
+/* Report an error if the block of time slices extends off either end. */
    if( block_start < 0 || block_end >= (int) ntslice ) {
       if( *status == SAI__OK ) {
          *status = SAI__ERROR;
@@ -328,7 +333,8 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
 /* Take a copy and then reverse the X axis of the GRID Frame by remaping the
    base Frame using a WinMap. This produces a pixel grid such as you would
    see by looking up at the sky from underneath the array, rather than looking
-   down at the ground from above the array. */
+   down at the ground from above the array. NB is this needed for 450 *and*
+   850 data, or just 850 ? */
    wcs = astCopy( hdr->wcs );
    ina[ 0 ] = 1.0;
    inb[ 0 ] = ncol;
@@ -458,8 +464,9 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
 
 /* Find the first and last time slices, calculate the angle between the
    focal pane Y axis at the time slice, and the focal plane Y axis in
-   the output NDF. For intervening time-slices, the angle is found by
-   linear interpolation between the extreme time slices. */
+   the output NDF (aligning them on the sky - the output NDF WCS is taken
+   from the central time slice). For intervening time-slices, the angle
+   is found by linear interpolation between the extreme time slices. */
       for( el = 0; el < 2; el++ ) {
 
 /* Get the mapping from GRID coords in the input time slice to GRID
@@ -471,6 +478,7 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
    slice to focal plane coords in the output. */
          cm1 = astCmpMap( fpmap1, totmap, 1, " " );
          cm2 = astCmpMap( cm1, fpmap2, 1, " " );
+         cm3 = astSimplify( cm2 );
 
 /* Use this Mapping to convert two points on the focal plane Y axis from
    the input to the output. */
@@ -478,7 +486,7 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
          fy[0] = 0.0;
          fx[1] = 0.0;
          fy[1] = 4.0;
-         astTran2( cm2, 2, fx, fy, 1, fox, foy );
+         astTran2( cm3, 2, fx, fy, 1, fox, foy );
 
 /* The angle from the focal plane Y axis in the output to the focal plane
    Y axis in the input time slice, measured positive in sense of rotation
@@ -489,6 +497,7 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
          totmap = astAnnul( totmap );
          cm1 = astAnnul( cm1 );
          cm2 = astAnnul( cm2 );
+         cm3 = astAnnul( cm3 );
       }
 
 /* Annul objects. */

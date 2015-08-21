@@ -331,7 +331,8 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
    AstMapping *fpmap;
    AstMapping *fullmap;
    AstMapping *sky2map;
-   AstCmpMap *tmap;
+   AstMapping *tmap;
+   AstCmpMap *tmap2;
    AstSkyFrame *abskyfrm;
    const double *params;
    dim_t ibolo;
@@ -423,7 +424,9 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
       if( pdata->ang ) {
 
 /* Get the Mapping from grid coords in the sky map to focal plane coords. */
-         tmap = astCmpMap( fullmap, fpmap, 1, " " );
+         tmap2 = astCmpMap( fullmap, fpmap, 1, " " );
+         tmap = astSimplify( tmap2 );
+         tmap2 = astAnnul( tmap2 );
 
 /* Transform a central bolometer into sky map grid coords. */
          xout[ 0 ] = 16.0;
@@ -432,7 +435,10 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
 
 /* Get a position that is displaced from the above position by one pixel
    along the skymap grid Y axis. Transform both position into focal
-   plane coords. */
+   plane coords. The focal plane to sky map mapping should not include
+   any polynomial distortion (the distortion is between focal plane and
+   bolometer coords), and so the angle derived from the following results
+   should be independent of the specific bolometer used above. */
          xin[ 1 ] = xin[ 0 ];
          yin[ 1 ] = yin[ 0 ] + 1.0;
          astTran2( tmap, 2, xin, yin, 1, xout, yout );
