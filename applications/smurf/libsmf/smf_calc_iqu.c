@@ -124,6 +124,8 @@
 *     21-AUG-2015 (DSB):
 *        - More mapping simplifications to overcome possible numerical 
 *        problems with focal plane distortion.
+*        - Calculate Q/U/I using matrix inversion rather than assuming 
+*        that sums of trig functions can be taken to be zero.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -194,6 +196,14 @@ typedef struct smfCalcIQUJobData {
 
 /* Prototypes for local functions */
 static void smf1_calc_iqu_job( void *job_data, int *status );
+static void smf1_solv3x3( double a11, double a12, double a13,
+                          double a21, double a22, double a23,
+                          double a31, double a32, double a33,
+                          double d1, double d2, double d3,
+                          double *x, double *y, double *z );
+static double smf1_det3x3( double a11, double a12, double a13,
+                           double a21, double a22, double a23,
+                           double a31, double a32, double a33 );
 
 
 /* Old data has POL_ANG given in arbitrary integer units where
@@ -652,6 +662,8 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    double angle;              /* Phase angle for FFT */
    double angle_l;
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
+   double ca;
+   double sa;
    double cosval;             /* Cos of twice reference rotation angle */
    double dang;
    double den;
@@ -663,9 +675,15 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    double q0;                 /* Q value with respect to fixed analyser */
    double q;                  /* Output Q value */
    double rot;                /* Rotation angle included in current s1/2/3 values */
+   double rot_target;
    double s1;                 /* Sum of weighted cosine terms */
    double s2;                 /* Sum of weighted sine terms */
    double s3;                 /* Sum of weights */
+   double s4;
+   double s5;
+   double s6;
+   double s7;
+   double s8;
    double sinval;             /* Sin of twice reference rotation angle */
    double sum;                /* Sum of bolometer values */
    double sw;
@@ -781,6 +799,12 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
                s1 = 0.0;
                s2 = 0.0;
                s3 = 0.0;
+               s4 = 0.0;
+               s5 = 0.0;
+               s6 = 0.0;
+               s7 = 0.0;
+               s8 = 0.0;
+
                n = 0.0;
                rot = 0.0;
                angle_l = VAL__BADD;
@@ -794,6 +818,7 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
                sw = 0.0;
                sww = 0.0;
                nrot = 0;
+               rot_target = ROT_PER_SAMPLE;
 
 /* Loop round all time slices. */
                pm = pdata->mean;
@@ -853,43 +878,50 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
 
 /* If we have now done the required amount of rotation, calculate new Q and
    U values. */
-                     if( rot >= ROT_PER_SAMPLE ) {
+                     if( rot >= rot_target ) {
 
 /* If we have sufficient points, calculate the I, Q and U values for the
    revolution that has just ended, and then update the running sums used
    to find the final values and variances. */
                         if( n > limit2 ) {
-                           q0 = 4*s1/n;
-                           u0 = 4*s2/n;
-                           i = 2*s3/n;
+                           smf1_solv3x3( s4/2, s6/2, s8/2, s5/2, s8/2,
+                                         s7/2, n/2, s4/2, s5/2, s1, s2, s3,
+                                         &i, &q0, &u0 );
 
 /* Rotate the Q and U values to take account of the difference between the
    orientation of the focal plane at the middle time slice included in
    the current values, and the focal plane in the output NDF. */
-                           ang = fpr0 + 0.5*fprinc*( itime_start + itime - 1 );
-                           cosval = cos(2*ang);
-                           sinval = sin(2*ang);
-                           q = q0*cosval + u0*sinval;
-                           u = -q0*sinval + u0*cosval;
+                           if( i != VAL__BADD ) {
+                              ang = fpr0 + 0.5*fprinc*( itime_start + itime - 1 );
+                              cosval = cos(2*ang);
+                              sinval = sin(2*ang);
+                              q = q0*cosval + u0*sinval;
+                              u = -q0*sinval + u0*cosval;
 
-                           swq += n*q;
-                           swqq += n*q*q;
-                           swu += n*u;
-                           swuu += n*u*u;
-                           swi += n*i;
-                           swii += n*i*i;
-                           sw += n;
-                           sww += n*n;
-                           nrot++;
-
+                              swq += n*q;
+                              swqq += n*q*q;
+                              swu += n*u;
+                              swuu += n*u*u;
+                              swi += n*i;
+                              swii += n*i*i;
+                              sw += n;
+                              sww += n*n;
+                              nrot++;
+                           }
                            itime_start = itime;
                         }
 
 /* Prepare for a new revolution. */
                         s1 = 0.0;
                         s2 = 0.0;
+                        s3 = 0.0;
+                        s4 = 0.0;
+                        s5 = 0.0;
+                        s6 = 0.0;
+                        s7 = 0.0;
+                        s8 = 0.0;
                         n = 0;
-                        rot = 0.0;
+                        rot_target += ROT_PER_SAMPLE;
                      }
 
 /* Increment the total rotation angle since the last calculation of Q and U. */
@@ -900,9 +932,17 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
 
 /* Increment the sums to include the current time slice. */
                      v = pm ? *din - *pm : *din;
-                     s1 += v*cos( angle );
-                     s2 += v*sin( angle );
+
+                     ca = cos( angle );
+                     sa = sin( angle );
+                     s1 += v*ca;
+                     s2 += v*sa;
                      s3 += v;
+                     s4 += ca;
+                     s5 += sa;
+                     s6 += ca*ca;
+                     s7 += sa*sa;
+                     s8 += sa*ca;
                      n++;
                   }
 
@@ -915,25 +955,27 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
 
 /* Add in the I, Q and U values determined from the final block. */
                if( n > limit2 ) {
-                  q0 = 4*s1/n;
-                  u0 = 4*s2/n;
-                  i = 2*s3/n;
+                  smf1_solv3x3( s4/2, s6/2, s8/2, s5/2, s8/2,
+                                s7/2, n/2, s4/2, s5/2, s1, s2, s3,
+                                &i, &q0, &u0 );
 
-                  ang = fpr0 + 0.5*fprinc*( itime_start + itime - 1 );
-                  cosval = cos(2*ang);
-                  sinval = sin(2*ang);
-                  q = q0*cosval + u0*sinval;
-                  u = -q0*sinval + u0*cosval;
+                  if( i != VAL__BADD ) {
+                     ang = fpr0 + 0.5*fprinc*( itime_start + itime - 1 );
+                     cosval = cos(2*ang);
+                     sinval = sin(2*ang);
+                     q = q0*cosval + u0*sinval;
+                     u = -q0*sinval + u0*cosval;
 
-                  swq += n*q;
-                  swqq += n*q*q;
-                  swu += n*u;
-                  swuu += n*u*u;
-                  swi += n*i;
-                  swii += n*i*i;
-                  sw += n;
-                  sww += n*n;
-                  nrot++;
+                     swq += n*q;
+                     swqq += n*q*q;
+                     swu += n*u;
+                     swuu += n*u*u;
+                     swi += n*i;
+                     swii += n*i*i;
+                     sw += n;
+                     sww += n*n;
+                     nrot++;
+                  }
                }
 
 /* Calculate the mean q, u and i values variances. These use the
@@ -1028,4 +1070,58 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
       }
    }
 }
+
+
+
+
+/* Solve 3x3 linear equations using Cramer's rule. */
+static void smf1_solv3x3( double a11, double a12, double a13,
+                          double a21, double a22, double a23,
+                          double a31, double a32, double a33,
+                          double d1, double d2, double d3,
+                          double *x, double *y, double *z ){
+
+
+   double d = smf1_det3x3( a11, a12, a13,
+                           a21, a22, a23,
+                           a31, a32, a33 );
+
+   double dx = smf1_det3x3( d1, a12, a13,
+                            d2, a22, a23,
+                            d3, a32, a33 );
+
+   double dy = smf1_det3x3( a11, d1, a13,
+                            a21, d2, a23,
+                            a31, d3, a33 );
+
+   double dz = smf1_det3x3( a11, a12, d1,
+                            a21, a22, d2,
+                            a31, a32, d3 );
+
+   if( d != 0.0 ) {
+      *x = dx/d;
+      *y = dy/d;
+      *z = dz/d;
+   } else {
+      *x = VAL__BADD;
+      *y = VAL__BADD;
+      *z = VAL__BADD;
+   }
+
+}
+
+
+/* Return the deteminant of a 3x3 matrix */
+static double smf1_det3x3( double a11, double a12, double a13,
+                           double a21, double a22, double a23,
+                           double a31, double a32, double a33 ){
+   double sd1 = a22*a33 - a23*a32;
+   double sd2 = a21*a33 - a23*a31;
+   double sd3 = a21*a32 - a22*a31;
+   return a11*sd1 - a12*sd2 + a13*sd3;
+}
+
+
+
+
 
