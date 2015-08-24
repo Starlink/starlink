@@ -146,16 +146,14 @@
 *        The minimum instrumental polarisation within the focal plane,
 *        expressed as a fraction. The IP varies linearly across each
 *        array from IPMIN to IPMAX. The IP is fixed in focal plane
-*        coordinates over all stare positions. If null (!) is supplied
-*        for either IPMIN or IPMAX, then no instrumental polaristion is
-*        included in the simulated data. [0.0004]
+*        coordinates over all stare positions. [0.0004]
 *     IPMAX = _DOUBLE (Read)
 *        The maximum instrumental polarisation within the focal plane,
 *        expressed as a fraction. The IP varies linearly across each
 *        array from IPMIN to IPMAX. The IP is fixed in focal plane
-*        coordinates over all stare positions. If null (!) is supplied
-*        for either IPMIN or IPMAX, then no instrumental polaristion is
-*        included in the simulated data. [0.0008]
+*        coordinates over all stare positions. If zero is supplied for
+*        IPMAX, then no instrumental polaristion is included in the
+*        simulated data. [0.0008]
 *     IPTHETA = _DOUBLE (Read)
 *        The angle from the focal plane Y axis to the instrumental
 *        polarisation vectors, in degrees. [15]
@@ -714,7 +712,7 @@ try:
       ipmax = parsys["IPMAX"].value
       ipmin = parsys["IPMIN"].value
       iptheta = parsys["IPTHETA"].value
-      if ipmax and ipmin and iptheta:
+      if ipmax > 0.0:
          msg_out( "Creating new instrumental polarisation values...")
          ipqu = NDG( 2 )
 
