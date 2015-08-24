@@ -146,12 +146,16 @@
 *        The minimum instrumental polarisation within the focal plane,
 *        expressed as a fraction. The IP varies linearly across each
 *        array from IPMIN to IPMAX. The IP is fixed in focal plane
-*        coordinates over all stare positions. [0.0004]
+*        coordinates over all stare positions. If null (!) is supplied
+*        for either IPMIN or IPMAX, then no instrumental polaristion is
+*        included in the simulated data. [0.0004]
 *     IPMAX = _DOUBLE (Read)
 *        The maximum instrumental polarisation within the focal plane,
 *        expressed as a fraction. The IP varies linearly across each
 *        array from IPMIN to IPMAX. The IP is fixed in focal plane
-*        coordinates over all stare positions. [0.0008]
+*        coordinates over all stare positions. If null (!) is supplied
+*        for either IPMIN or IPMAX, then no instrumental polaristion is
+*        included in the simulated data. [0.0008]
 *     IPTHETA = _DOUBLE (Read)
 *        The angle from the focal plane Y axis to the instrumental
 *        polarisation vectors, in degrees. [15]
@@ -221,7 +225,7 @@
 *        before the script exits. If retained, a message will be
 *        displayed at the end specifying the path to the directory. [FALSE]
 *     SIGMA = _DOUBLE (Read)
-*        Gaussian noise level (in pW) to add to the final data.
+*        Gaussian noise level (in pW) to add to the final data. [0.004]
 
 *  Copyright:
 *     Copyright (C) 2015 East Asian Observatory
@@ -705,28 +709,32 @@ try:
 # to the real thing. The iP is at 15 degrees to the fixed analyser.
    ipqu = loadndg( "IPQU" )
    if not ipqu:
-      msg_out( "Creating instrumental polarisation values...")
-      ipqu = NDG( 2 )
 
 #  Get the parameters defining the instrumental polarisation
       ipmax = parsys["IPMAX"].value
       ipmin = parsys["IPMIN"].value
       iptheta = parsys["IPTHETA"].value
+      if ipmax and ipmin and iptheta:
+         msg_out( "Creating new instrumental polarisation values...")
+         ipqu = NDG( 2 )
 
 #  Create a map of the fractional instrumental polarisation across each
 #  array. Note, all subarrays are given the same IP pattern.
-      ipi = NDG(1)
-      invoke("$KAPPA_DIR/maths exp='xa*(pa-pb)/31+pb+xb*0' type=_REAL "
-             "pa={0} pb={1} lbound=\[0,0\] ubound=\[31,39\] out={2}".
-             format(ipmax,ipmin,ipi))
+         ipi = NDG(1)
+         invoke("$KAPPA_DIR/maths exp='xa*(pa-pb)/31+pb+xb*0' type=_REAL "
+                "pa={0} pb={1} lbound=\[0,0\] ubound=\[31,39\] out={2}".
+                format(ipmax,ipmin,ipi))
 
 #  Create the corresponding normalised Q and U maps.
-      invoke("$KAPPA_DIR/maths exp='ip*cosd(2*pt)' ip={0} pt={1} out={2}".
-             format(ipi,iptheta,ipqu[0] ))
-      invoke("$KAPPA_DIR/maths exp='ip*sind(2*pt)' ip={0} pt={1} out={2}".
-             format(ipi,iptheta,ipqu[1] ))
+         invoke("$KAPPA_DIR/maths exp='ip*cosd(2*pt)' ip={0} pt={1} out={2}".
+                format(ipi,iptheta,ipqu[0] ))
+         invoke("$KAPPA_DIR/maths exp='ip*sind(2*pt)' ip={0} pt={1} out={2}".
+                format(ipi,iptheta,ipqu[1] ))
 
-      savendg( "IPQU", ipqu  )
+         savendg( "IPQU", ipqu  )
+      else:
+         ipqu = [ "!", "!" ]
+
    else:
       msg_out( "Re-using old instrumental polarisation values...")
 
