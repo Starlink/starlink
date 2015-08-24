@@ -483,6 +483,7 @@ static void pol1RotrfJob( void *job_data, int *status ) {
    tmap = astCmpMap( gpmap, gptmap, 1, " " );
    totmap = astSimplify( tmap );
    tmap = astAnnul( tmap );
+   astInvert( gpmap );
 
 /* Number of pixels to be processed by this thread. */
    npix = p2 - p1 + 1;
