@@ -191,7 +191,7 @@ try:
 #  same. Always create a report file so we can echo it to the screen.
    report0 = os.path.join(NDG.tempdir,"report0")
    invoke( "$KAPPA_DIR/ndfcompare in1={0} in2={1} report={2} skiptests=! "
-           "accdat=0.1v accvar=1E-4 quiet".format(in1,in2,report0) )
+           "accdat=0.3v accvar=1E-3 quiet".format(in1,in2,report0) )
 
 #  See if any differences were found. If so, append the lines of the
 #  report to the report_lines list.
@@ -203,7 +203,7 @@ try:
 #  Now compare the WEIGHTS extension NDF (no need for the roots ancestor
 #  check since its already been done).
    report1 = os.path.join(NDG.tempdir,"report1")
-   invoke( "$KAPPA_DIR/ndfcompare in1={0}.more.smurf.weights accdat=1E-4 "
+   invoke( "$KAPPA_DIR/ndfcompare in1={0}.more.smurf.weights accdat=1E-3 "
            "in2={1}.more.smurf.weights report={2} quiet".format(in1,in2,report1) )
 
 #  See if any differences were found. If so, append the report to any
@@ -216,7 +216,7 @@ try:
 
 #  Likewise compare the EXP_TIME extension NDF.
    report2 = os.path.join(NDG.tempdir,"report1")
-   invoke( "$KAPPA_DIR/ndfcompare in1={0}.more.smurf.exp_time accdat=1E-4 "
+   invoke( "$KAPPA_DIR/ndfcompare in1={0}.more.smurf.exp_time accdat=1E-3 "
            "in2={1}.more.smurf.exp_time report={2} quiet".format(in1,in2,report2) )
 
    if not starutil.get_task_par( "similar", "ndfcompare" ):
