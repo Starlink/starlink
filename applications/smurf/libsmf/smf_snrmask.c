@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     void smf_snrmask( ThrWorkForce *wf,  unsigned char *oldmask,
+*     void smf_snrmask( ThrWorkForce *wf,  int abssnr, unsigned char *oldmask,
 *                       const double *map, const double *mapvar,
 *                       const dim_t *dims, double snr_hi, double snr_lo,
 *                       unsigned char *mask, int *status )
@@ -21,6 +21,11 @@
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
+*     abssnr = int (Given)
+*        Should be supplied non-zero if sources can be negative as well
+*        as positive (e.g. when making maps of Q or U Stokes parameters).
+*        If non-zero, large negative SNR values are treated as source rather
+*        than background.
 *     oldmask = unsigned char * (Given)
 *        May be NULL. If supplied, any source pixels in the old mask (i.e.
 *        zero values) are copied unchanged into the returned new mask. Only
@@ -80,8 +85,10 @@
 *     10-MAR-2014 (DSB):
 *        Added argument oldmask.
 *     2-APR-2014 (DSB):
-*        Allow SNR values to be supplied, rather than separate data and 
+*        Allow SNR values to be supplied, rather than separate data and
 *        variance values.
+*     28-AUG-2015 (DSB):
+*        Added argument abssnr.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -140,7 +147,7 @@ static void smf1_snrmask_job( void *job_data, int *status );
 
 
 
-void smf_snrmask( ThrWorkForce *wf,  unsigned char *oldmask,
+void smf_snrmask( ThrWorkForce *wf, int abssnr, unsigned char *oldmask,
                   const double *map, const double *mapvar,
                   const dim_t *dims, double snr_hi, double snr_lo,
                   unsigned char *mask, int *status ){
@@ -222,6 +229,10 @@ void smf_snrmask( ThrWorkForce *wf,  unsigned char *oldmask,
          } else {
             snr = *pm;
          }
+
+/* If source can be negative as well as positive, use the absolute SNR in
+   the following check. */
+         if( abssnr && snr != VAL__BADD ) snr = fabs( snr );
 
 /* Check the SNR is good and above the lower limit. */
          if( snr != VAL__BADD && snr > snr_lo ){
@@ -331,6 +342,9 @@ void smf_snrmask( ThrWorkForce *wf,  unsigned char *oldmask,
          } else {
             snr = *pm;
          }
+
+/* If source can be negative as well as positive, use the absolute SNR. */
+         if( abssnr && snr != VAL__BADD ) snr = fabs( snr );
 
 /* Check the SNR is good and above the upper limit. */
          if( snr != VAL__BADD && snr > snr_hi ){

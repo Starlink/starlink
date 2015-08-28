@@ -132,6 +132,10 @@
 *        when making maps of Q/U values). This uses the zero_snr_neg
 *        flag. NOTE, this only affects ffclean masking - basic SNR
 *        thresholding has always allowed sources to be negative.
+*     28-AUG-2015 (DSB):
+*        When creating maps of polarimetry data (Q or U), the sources can
+*        be negative, so treat large negative SNR values as source rather
+*        than background.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -208,6 +212,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    double zero_snr_hipass;    /* Size of box for high-pass smoothing SNR map */
    double zero_snrlo;         /* Lower SNR at which to threshold */
    int *ph;                   /* Pointer to next hits value */
+   int abssnr;                /* Can sources be negative as well as positive? */
    int have_mask;             /* Did a mask already exist on entry? */
    int hipass;                /* mask filter size in pixels */
    int imask;                 /* Index of next mask type */
@@ -276,6 +281,11 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    }
    subkm = NULL;
    astMapGet0A( config, modname, &subkm );
+
+/* If we are masking the SSN model, or if the data values represent
+   signed Q/U values, indicate that the masking should be based on the
+   absolute value of the SNR. */
+   abssnr = ( mtype == SMF__SSN || dat->poldata );
 
 /* See if the source pixels should be acculated from iteration to
    iteration, rather than being replaced. */
@@ -674,13 +684,15 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                         }
 
 /* If the higher and lower SNR limits are equal, just do a simple
-   threshold on the SNR values to get the mask. */
+   threshold on the SNR values to get the mask. In cases where the signal
+   can be positive or negative (e.g. when masking Q/U values or using
+   the SSNmodel), treat large negative SNR values in the same way as
+   large positive SNR values.  */
                         if( zero_snr == zero_snrlo ) {
                            pd = mapuse;
                            pn = newmask;
 
-
-                           if( mtype == SMF__SSN ) {
+                           if( abssnr ) {
 
                               if( accmask ) {
                                  pa = accmask;
@@ -737,7 +749,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    mask by thresholding at the ZERO_SNR value, and then extend the source
    areas within the mask down to an SNR limit of ZERO_SNRLO. */
                         } else {
-                           smf_snrmask( wf, accmask, mapuse, NULL,
+                           smf_snrmask( wf, abssnr, accmask, mapuse, NULL,
                                         dat->mdims, zero_snr, zero_snrlo,
                                         newmask, status );
 

@@ -1928,7 +1928,7 @@ double *smf_smoothmask( ThrWorkForce * wf, smf_qual_t qual, const smf_qual_t *ma
                         dim0, int dim1, AstFrameSet *fset, double fwhm,
                         double low, int *status );
 
-void smf_snrmask( ThrWorkForce *wf, unsigned char *oldmask, const double *map,
+void smf_snrmask( ThrWorkForce *wf, int abssnr, unsigned char *oldmask, const double *map,
                   const double *mapvar, const dim_t *dims, double snr_hi,
                   double snr_lo, unsigned char *mask, int *status );
 

@@ -615,7 +615,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   /* Local Variables */
   float ast_filt_diff;          /* Size of map-change filter */
   int ast_skip;                 /* Number of iterations with no AST model */
-  int flt_skip;                 /* Number of iterations with no FLT model */
   int bolomap=0;                /* If set, produce single bolo maps */
   size_t bstride;               /* Bolometer stride */
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
@@ -2056,6 +2055,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       } else {
         dat.com = NULL;
       }
+      dat.poldata = ( !strcmp( res[0]->sdata[0]->hdr->dlabel, "Q" ) ||
+                      !strcmp( res[0]->sdata[0]->hdr->dlabel, "U" ) );
 
       /* We can close noisemaps here because they will already have
          been used to initialize the NOI model if needed. */

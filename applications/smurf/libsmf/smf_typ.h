@@ -801,6 +801,7 @@ typedef struct smfDIMMData {
                                 on the previous iteration */
   dim_t noi_boxsize;         /* The number of samples in a NOI box. */
   double pixsize;            /* Nominal map pixel size in arc-seconds */
+  int poldata;               /* Are we mapping polarimetric Q or U values? */
 } smfDIMMData;
 
 
