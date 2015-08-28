@@ -1094,7 +1094,7 @@ class MakeMapTestSet(TestSet):
       extrapars = self._getExtraPars()
 
 #  Construct the makemap command line.
-      cmd = "$SMURF_DIR/makemap in=^infiles out={0} {1} {2}".format(outfiles,params,extrapars)
+      cmd = "$SMURF_DIR/makemap in=^infiles out={0} {1} {2} msg_filter=debug".format(outfiles,params,extrapars)
       if config != "null":
          cmd = "{0} config=^{1}".format(cmd,config)
 
