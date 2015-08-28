@@ -85,6 +85,16 @@
 *     6-JUN-2014 (DSB):
 *        Allow COM flagging to be frozen after a specified number of
 *        iterations. This can help convergence.
+*     28-AUG-2015 (DSB):
+*        Fix bug that could cause more data than necessary to be rejected by
+*        the GAI model when using COM.PERARRAY=1. A hang-over from the long
+*        past days when the COM model used to iterate round forming new GAI
+*        models until the rejection of samples converged. Any bolo-blocks
+*        rejected when forming the GAI model for the first subarray would
+*        also be rejected for subsequent subarrays regardless of whether
+*        those bolo-blocks were bad or not. The effect was cumulative -
+*        any additional genuinely bad bolo-block rejected from the second
+*        subarray would be passed on to the third and fourth subarrays, etc.
 
 *  Copyright:
 *     Copyright (C) 2012-2014 Science and Technology Facilities Council.
@@ -199,11 +209,9 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    double period;
    double sig_limit;
    double svar;
-   int *nrej = NULL;
    int dofft;
    int fill;
    int freeze_flags;
-   int iblock;
    int icom;
    int iw;
    int nblock;
@@ -360,18 +368,6 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    and correlation values. */
    nblock = ntslice/gain_box;
    if( nblock == 0 ) nblock = 1;
-
-/* Allocate an array to hold number of blocks rejected - used by
-   smf_find_gains, one for each block. Fill them with ones to indicate
-   that all blocks should be fitted. */
-   if( gai ) {
-      nrej = astMalloc( nblock*sizeof( *nrej ) );
-      if( *status == SAI__OK ) {
-         for( iblock = 0; iblock < nblock; iblock++ ) {
-            nrej[ iblock ] = 1;
-         }
-      }
-   }
 
 /* How many threads do we get to play with */
    nw = wf ? wf->nworker : 1;
@@ -707,12 +703,12 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                                lut ? lut->sdata[ icom ] : NULL,
                                model->sdata[ icom ]->pntr[0], kmap,
                                ( SMF__Q_GOOD & ~SMF__Q_RING ),
-                               SMF__Q_COM, gai->sdata[ icom ], nrej, status );
+                               SMF__Q_COM, gai->sdata[ icom ], NULL, status );
             } else {
                smf_find_gains_array( wf, gai_flags, res, mask, lut,
                                      model->sdata[ icom ]->pntr[0], kmap,
                                      ( SMF__Q_GOOD & ~SMF__Q_RING ),
-                                     SMF__Q_COM, gai, nrej, status );
+                                     SMF__Q_COM, gai, NULL, status );
             }
          }
 
@@ -741,7 +737,6 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
 /* Free resources allocated in this function. */
 L999:
-   if( nrej ) nrej = astFree( nrej );
    job_data = astFree( job_data );
 
 /* End the AST context, thus deleting any AST objects created in this
