@@ -2683,5 +2683,30 @@ two.bmap = <undef>
 varmapmethod = 1
 
 
+
+
+
+
+
+#  The following parameters control the experimental PCA iterative
+#  model, which is primarily intended for use when reducing POL2 scan
+#  and spin data. They should be documented properly if use of a PCA
+#  model turns out to be a useful thing.
 pca.pcathresh=4
 pca.pcalen=0
+pca.zero_accum = 0
+pca.zero_circle = <undef>
+pca.zero_freeze = 0
+pca.zero_lowhits = 0
+pca.zero_mask = 0
+pca.zero_niter = 0
+pca.zero_notlast = 1
+pca.zero_snr = 0.0
+pca.zero_snr_ffclean = 0
+pca.zero_snr_hipass = 0.0
+pca.zero_snr_lopass = 0.0
+pca.zero_snr_fwhm = 0
+pca.zero_snr_low = -1.1
+pca.zero_snr_neg = 0
+pca.zero_snrlo = 0
+pca.zero_union = 1
