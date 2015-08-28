@@ -626,6 +626,9 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 /* Check inherited status */
    if( *status != SAI__OK ) return;
 
+/* Begin an AST context */
+   astBegin;
+
 /* Create views of the matrix and vector buffers that can be used by GSL. */
    gsl_m = gsl_matrix_view_array( matrix, NPAR, NPAR );
    gsl_b = gsl_vector_view_array( vector, NPAR );
@@ -660,11 +663,11 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
       astLock( wcs, 0 );
 
 /* Get the mapping from GRID to SKY. */
-      g2s = astGetMapping( wcs, AST__BASE, AST__CURRENT );
+      g2s = astSimplify( astGetMapping( wcs, AST__BASE, AST__CURRENT ));
 
 /* Get the mapping from SKY to focal plane (x,y) (the index of the FPLANE
    Frame is fixed at 3 by file sc2ast.c). */
-      s2f = astGetMapping( wcs, AST__CURRENT, 3 );
+      s2f = astSimplify( astGetMapping( wcs, AST__CURRENT, 3 ) );
 
    } else{
       g2s = s2f = NULL;
@@ -691,7 +694,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 
 /* Increment the sky position slightly to the north. */
             sx[ 1 ] = sx[ 0 ];
-            sy[ 1 ] = sy[ 0 ] + 0.01;
+            sy[ 1 ] = sy[ 0 ] + 1.0E-6;
 
 /* Transform both sky positions into focal plane coords. */
             astTran2( s2f, 2, sx, sy, 1, fx, fy );
@@ -1101,6 +1104,9 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
       s2f = astAnnul( s2f );
       astUnlock( wcs, 1 );
    }
+
+/* End the AST context */
+   astEnd;
 }
 
 
