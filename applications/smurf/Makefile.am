@@ -127,7 +127,8 @@ data/sg850_m0906d1005_heateff.sdf \
 data/sg850_m1002d1006_heateff.sdf \
 data/sg850_m1003d1004_heateff.sdf \
 data/sg850_m1005d1007_heateff.sdf \
-data/csofit2.dat
+data/csofit2.dat \
+data/ipdata.sdf
 
 # Files not for use by general users go in share/smurf/experimental
 experimentaldir = $(pkgdatadir)/experimental

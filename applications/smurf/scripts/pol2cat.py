@@ -151,16 +151,11 @@
 *        Should a correction for instrumental polarisation be applied? The
 *        default is True if a total intensity map has been supplied (see
 *        parameter IREF) and False otherwise. []
-*     IP_P0 = _REAL (Read)
-*        The "p0" term in the instrumental polarisation model. [0.0025]
-*     IP_P1 = _REAL (Read)
-*        The "p1" term in the instrumental polarisation model. [0.01]
-*     IP_ANGLE_C = _REAL (Read)
-*        The "angle_c" term in the instrumental polarisation model, in
-*        degrees. [-53.0]
-*     IP_C_0 = _REAL (Read)
-*        The "C_0" term in the instrumental polarisation model, in
-*        degrees. [90.0]
+*     IPDATA = NDF (Read)
+*        An HDS container file holding the NDFs containing the individual
+*        pixel "ps","pf","ang_IP", and "Co" terms in the instrumental
+*        polarisation model. This parameter is accessed only if parameter
+*        IP is set to TRUE. [$SMURF_DIR/../../share/smurf/ipdata.sdf]
 *     IREF = NDF (Read)
 *        An optional total intensity map covering the same area. If
 *        supplied, this will be used to determine the expected
@@ -482,17 +477,8 @@ try:
    params.append(starutil.Par0L("IP", "Do instrumental polarisation correction?",
                                 True, noprompt=True))
 
-   params.append(starutil.Par0F("IP_P0", "The p0 constant for the IP correction",
-                                0.0025, minval=0, noprompt=True))
-
-   params.append(starutil.Par0F("IP_P1", "The p1 constant for the IP correction",
-                                0.01, minval=0, noprompt=True))
-
-   params.append(starutil.Par0F("IP_ANGLE_C", "The Angle_C constant for the IP correction",
-                                -53.0, noprompt=True))
-
-   params.append(starutil.Par0F("IP_C_0", "The C_0 constant for the IP correction",
-                                90.0, noprompt=True))
+   params.append(starutil.Par0S("IPDATA", "A file  containing pixel IP data",
+                                "$SMURF_DIR/../../share/smurf/ipdata",noprompt=True,))
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
@@ -643,10 +629,9 @@ try:
 
    if doip:
       if iref:
-         ip_p0 = parsys["IP_P0"].value
-         ip_p1 = parsys["IP_P1"].value
-         ip_angle_c = parsys["IP_ANGLE_C"].value
-         ip_c_0 = parsys["IP_C_0"].value
+         ipdata = parsys["IPDATA"].value
+         if ipdata.endswith('.sdf'):
+           ipdata = ipdata[:-4]
       else:
          raise starutil.InvalidParameterError("Cannot correct for instrumental"
              " polarisation since no total intensity map was supplied (IREF)")
@@ -741,6 +726,11 @@ try:
 
 #  If any data was found for the current subarray...
       if qarray != None and uarray != None:
+
+#  Checking if IP correction is set for 450 um data. If so, throw an error
+         if (doip) and (a in ['S4A','S4B','S4C','S4D']):
+            raise starutil.InvalidParameterError("No IP correction exists for the"
+                   " 450 um data.")
 
 #  Remove spikes from the Q images for the current subarray. The cleaned NDFs
 #  are written to temporary NDFs specified by the new NDG object "qff", which
@@ -1117,17 +1107,35 @@ try:
             elev = float( invoke("$KAPPA_DIR/fitsmod ndf={0} edit=print keyword=ELSTART".
                                  format( qff2[ nstare/2 ] )))
 
+#  Get the instrumental polarisation parameters.
+            ipC0 = "{0}.{1}.c0".format(ipdata,a)
+            ipP0 = "{0}.{1}.p0".format(ipdata,a)
+            ipP1 = "{0}.{1}.p1".format(ipdata,a)
+            ipANGC = "{0}.{1}.angc".format(ipdata,a)
+
 #  Calculate the factors by which to multiply the total intensity image
 #  to get the Q and U corrections.
-            qfac = ip_p0*math.cos(math.radians(2*ip_angle_c)) + ip_p1*math.cos(math.radians(2*(ip_angle_c+elev+ip_c_0)))
-            ufac = ip_p0*math.sin(math.radians(2*ip_angle_c)) + ip_p1*math.sin(math.radians(2*(ip_angle_c+elev+ip_c_0)))
+            qfac = NDG( nstare )
+            ufac = NDG( nstare )
+
+            el_temp = NDG( nstare )
+            el_temp2 = NDG( nstare )
+            invoke( "$KAPPA_DIR/cadd in={0} scalar={1} out={2}".format(ipC0,elev,el_temp))
+            invoke( "$KAPPA_DIR/add in1={0} in2={1} out={2}".format(el_temp,ipANGC,el_temp2))
+            invoke( "$KAPPA_DIR/maths exp='ia*COSD(2*ib)+ic*COSD(2*id)' ia={0} ib={1} ic={2} id={3} out={4}".format(ipP0,ipANGC,ipP1,el_temp2,qfac))
+            invoke( "$KAPPA_DIR/maths exp='ia*SIND(2*ib)+ic*SIND(2*id)' ia={0} ib={1} ic={2} id={3} out={4}".format(ipP0,ipANGC,ipP1,el_temp2,ufac))
+
+            #invoke( "$KAPPA_DIR/maths exp='ia*COSD(2*ib)+ic*COSD(2*(id+ie+pa))' ia={0} ib={1} ic={2} id={3} ie={4} pa={5} out={6}".
+            #        format(ipP0,ipANGC,ipP1,ipANGC,ipC0,elev,qfac))
+            #invoke( "$KAPPA_DIR/maths exp='ia*SIND(2*ib)+ic*SIND(2*(id+ie+pa))' ia={0} ib={1} ic={2} id={3} ie={4} pa={5} out={6}"
+            #        .format(ipP0,ipANGC,ipP1,ipANGC,ipC0,elev,ufac))
 
 #  Correct the Q and U images.
             qip = NDG( nstare )
             uip = NDG( nstare )
-            invoke( "$KAPPA_DIR/maths exp='ia-ib*pa' ia={0} ib={1} pa={2} out={3}".
+            invoke( "$KAPPA_DIR/maths exp='ia-ib*ic' ia={0} ib={1} ic={2} out={3}".
                     format(qff2,icuts,qfac,qip))
-            invoke( "$KAPPA_DIR/maths exp='ia-ib*pa' ia={0} ib={1} pa={2} out={3}".
+            invoke( "$KAPPA_DIR/maths exp='ia-ib*ic' ia={0} ib={1} ic={2} out={3}".
                     format(uff2,icuts,ufac,uip))
          else:
             qip = qff2
