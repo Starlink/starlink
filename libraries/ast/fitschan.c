@@ -1141,6 +1141,12 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        if the FITS keyword name contained any illegal printable characters.
 *        - Add new Warning "badkeyname", and issue such a warning instead
 *        of an error if illegal characters are found in a keyword name.
+*     31-AUG-2015 (DSB):
+*        In FitLine, use the whole axis rather than 0.1 of the axis (if "dim" 
+*        is supplied). This is because non-linearity can become greater at 
+*        further distances along the axis. In practice, it meant that SIP 
+*        distortion were being treated as linear because the test did not 
+*        explore a large enough region of pixel space.
 *class--
 */
 
@@ -14065,10 +14071,10 @@ static double *FitLine( AstMapping *map, double *g, double *g0, double *w0,
    }
 
 /* We use NP points in the fit. If a value for "dim" has been supplied,
-   we use points evenly distributed over one tenth of this size, If
-   not, we use a gap of 1.0 (corresponds to an axis length of 100 pixels).
+   we use points evenly distributed over the whole axis. If not, we use 
+   a gap of 1.0 (corresponds to an axis length of 100 pixels).
    Choose the gap. */
-   gap = ( dim != AST__BAD ) ? 0.1*dim/NP : 1.0;
+   gap = ( dim != AST__BAD ) ? dim/NP : 1.0;
 
 /* Create PointSets to hold the input and output positions. */
    pset1 = astPointSet( NP, nin, "", status );
@@ -20857,7 +20863,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
          w0[ j ] = ptrw[ j ][ 0 ];
 
 /* Find the tolerance for positions on the j'th IWC axis. This is one
-   hundredth of the largest change in the j'th IWC axis value caused by
+   tenth of the largest change in the j'th IWC axis value caused by
    moving out 1 pixel along any grid axis. */
          tol[ j ] = 0.0;
          for( i = 0; i < nin; i++ ) {

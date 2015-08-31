@@ -255,6 +255,27 @@ c      call ast_setl( fc, 'Clean', .true., status )
       call checktab( status )
       call checktab2( status )
 
+*  Read a SIP header and then attempt to write it out. It should fail
+*  because the SIP header is non-linear.
+      call ast_emptyfits( fc, status )
+      call ast_set( fc, 'SourceFile=sip.head', status )
+      call ast_clear( fc, 'Card', status )
+      fs = ast_read( fc, status )
+      call ast_set( fc, 'Encoding=FITS-WCS', status )
+      if( fs .eq. AST__NULL ) then
+         call stopit( 12, 'Failed to read SIP header', status )
+      else if( ast_write( fc, fs, status ) .gt. 0 ) then
+         call stopit( 13, 'Test on SIP header non-linearity failed',
+     :                status )
+      end if
+
+
+
+
+
+
+
+
  999  continue
 
       call ast_end( status )
