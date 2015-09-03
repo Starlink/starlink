@@ -18,7 +18,8 @@
 *                          int pasign, double paoff, double angrot, double amp2,
 *                          double phase2, double amp4, double phase4, double amp16,
 *                          double phase16, const double *qinst, const double *uinst,
-*                          int harmonic, int *status );
+*                          const double *c0, const double *p0, const double *p1,
+*                          const double *angc, int harmonic, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -85,6 +86,22 @@
 *        instrumental U seen by each bolometer is found by multiplying
 *        the corresponding total intensity by this factor. The fixed
 *        analyser is assumed to be the reference direction.
+*     c0 = const double * (Given)
+*        Array of C0 values for each bolometer, or NULL. Only used if
+*        qinst is NULL. C0 is one of terms in the POL2 instrumental
+*        polarisation model creted by Doug Johnstone and James Kennedy.
+*     p0 = const double * (Given)
+*        Array of P0 values for each bolometer, or NULL. Only used if
+*        qinst is NULL. P0 is one of terms in the POL2 instrumental
+*        polarisation model creted by Doug Johnstone and James Kennedy.
+*     p1 = const double * (Given)
+*        Array of P1 values for each bolometer, or NULL. Only used if
+*        qinst is NULL. P1 is one of terms in the POL2 instrumental
+*        polarisation model creted by Doug Johnstone and James Kennedy.
+*     angc = const double * (Given)
+*        Array of ANGC values for each bolometer, or NULL. Only used if
+*        qinst is NULL. ANGC is one of terms in the POL2 instrumental
+*        polarisation model creted by Doug Johnstone and James Kennedy.
 *     harmonic = int  (Given)
 *        The harmonic of the half-wave plate rotation from which the Q
 *        and U values should be derived. This should normally be 4, but
@@ -116,6 +133,8 @@
 *        Added arguments qinst and uinst.
 *     11-MAY-2015 (DSB):
 *        Added arguments amp2, phase2, amp16 and phase16.
+*     3-SEP-2015 (DSB):
+*        Added arguments c0, p0, p1 and angc.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -156,6 +175,10 @@
 typedef struct smfUncalcIQUJobData {
    const double *qinst;
    const double *uinst;
+   const double *c0;
+   const double *p0;
+   const double *p1;
+   const double *angc;
    const JCMTState *allstates;
    dim_t b1;
    dim_t b2;
@@ -170,6 +193,7 @@ typedef struct smfUncalcIQUJobData {
    double amp2;
    double amp4;
    double amp16;
+   double elev;
    double phase2;
    double phase4;
    double phase16;
@@ -196,12 +220,14 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
                      int pasign, double paoff, double angrot, double amp2,
                      double phase2, double amp4, double phase4, double amp16,
                      double phase16, const double *qinst, const double *uinst,
-                     int harmonic, int *status ){
+                     const double *c0, const double *p0, const double *p1,
+                     const double *angc, int harmonic, int *status ){
 
 /* Local Variables: */
    const JCMTState *state;    /* JCMTState info for current time slice */
    dim_t nbolo;               /* No. of bolometers */
    dim_t ntslice;             /* Number of time-slices in data */
+   double elev;               /* Elevation (rads) at the central time slice */
    int bstep;                 /* Bolometer step between threads */
    int itime;                 /* Time slice index */
    int iworker;               /* Index of a worker thread */
@@ -269,6 +295,9 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
    smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, NULL, &bstride,
                  &tstride, status );
 
+/* Get the elevation (in rads) at the central time slice. */
+   elev = data->hdr->allState[ntslice/2].tcs_az_bc2;
+
 /* Create structures used to pass information to the worker threads. */
    nworker = wf ? wf->nworker : 1;
    job_data = astMalloc( nworker*sizeof( *job_data ) );
@@ -334,6 +363,11 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
          pdata->phase16 = phase16;
          pdata->qinst = qinst;
          pdata->uinst = uinst;
+         pdata->c0 = c0;
+         pdata->p0 = p0;
+         pdata->p1 = p1;
+         pdata->angc = angc;
+         pdata->elev = elev;
 
 /* Pass the job to the workforce for execution. */
          thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_uncalc_iqu_job, 0, NULL,
@@ -408,6 +442,7 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    double phi;                /* Angle from fixed analyser to effective analyser */
    double qval;               /* Q value wrt fixed analyser */
    double sinval;             /* Sin of twice reference rotation angle */
+   double t1;
    double uval;               /* U value wrt fixed analyser */
    double wplate;             /* Angle from fixed analyser to have-wave plate */
    int ipolcrd;               /* Reference direction for pol_ang */
@@ -464,8 +499,19 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
 /* The instrumental polarisation seen by this bolometer. These are
    normalised Q and U values. Multiply them by the total intensity to
    get the instrument Q and U, with respect to the fixed analyser. */
-         ip_qi = pdata->qinst ? pdata->qinst[ ibolo ] : 0.0;
-         ip_ui = pdata->uinst ? pdata->uinst[ ibolo ] : 0.0;
+         if( pdata->qinst ) {
+            ip_qi = pdata->qinst[ ibolo ];
+            ip_ui = pdata->uinst[ ibolo ];
+         } else if( pdata->p0 ) {
+            t1 = AST__DD2R*( pdata->c0[ ibolo ] + pdata->angc[ ibolo ] ) + pdata->elev ;
+            ip_qi = pdata->p0[ ibolo ]*cos( 2*pdata->angc[ ibolo ]*AST__DD2R ) +
+                    pdata->p1[ ibolo ]*cos( 2*t1 );
+            ip_ui = pdata->p0[ ibolo ]*sin( 2*pdata->angc[ ibolo ]*AST__DD2R ) +
+                    pdata->p1[ ibolo ]*sin( 2*t1 );
+         } else {
+            ip_qi = 0.0;
+            ip_ui = 0.0;
+         }
 
 /* Initialise pointers to the next I, Q and U time slice values for
    the current bolometer. */

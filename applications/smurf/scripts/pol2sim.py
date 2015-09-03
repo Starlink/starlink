@@ -29,13 +29,10 @@
 *       flatter than the common-mode for real non-POL2 data. For this
 *       reason, there is an option to flatten the common-mode before using
 *       it in the simulation (see parameter CFACTOR).
-*     - Instrumental polarisation is included. Some fraction of the total
-*       intensity falling on each bolometer is converted into Q and U
-*       (see parameters IPMAX, IPMIN and IPTHETA). This fraction varies
-*       from boloemeter to bolometer, and is fixed in bolometer coordinates.
-*       (i.e. each sub-array sees the same instrumental polarisation -
-*       this needs exapnding at some point to allow for different IPs for
-*       each sub-array).
+*     - Instrumental polarisation is included (see parameter IPFORM). Two
+*       forms of instrumental polarisation can be used: the Johnstone/Kennedy
+*       IPDATA model, or an arbitrary user-define IP model (see parameters
+*       IPMAX, IPMIN and IPTHETA).
 *     - 2, 4 and 16 Hz signals proportional to the total intensity (including
 *       sky brightness) in included in the simulated POL2 data.
 *     - Each bolometer has a separate gain, which is allowed to vary over
@@ -140,23 +137,35 @@
 *        equal the number supplied for IN. Each INCOM file must be at least
 *        as long (in time) as the corresponding IN file. If null (!) is
 *        supplied, no common-mode is included in the simulated POL2 data.
+*     IPFORM = LITERAL (Read)
+*        The form of instrumental polarisation to use. Can be "JK" for the
+*        Johnstone/Kennedy model (see parameter IPDATA), "User" for a
+*        user-defined model (see parameters IPMAX, IPMIN and IPTHETA),
+*        or "None" if no instrumental polarisation is to be added to the
+*        simulated data. ["JK"]
+*     IPDATA = LITERAL (Read)
+*        The path to an HDS container file containing the data values
+*        defining the Johnstone/Kennedy model for POL2 instrumental
+*        polarisation. This parameter is only accessed if IPFORM is set
+*        to "JK". ['$STARLINK_DIR/share/smurf/ipdata.sdf']
 *     IPEAK = _DOUBLE (Read)
 *        Peak intensity for new artificial total instensity map, in pW. [0.08]
 *     IPMIN = _DOUBLE (Read)
 *        The minimum instrumental polarisation within the focal plane,
 *        expressed as a fraction. The IP varies linearly across each
 *        array from IPMIN to IPMAX. The IP is fixed in focal plane
-*        coordinates over all stare positions. [0.0004]
+*        coordinates over all stare positions. This parameter is only
+*        accessed if IPFORM is set to "User". [0.0004]
 *     IPMAX = _DOUBLE (Read)
 *        The maximum instrumental polarisation within the focal plane,
 *        expressed as a fraction. The IP varies linearly across each
 *        array from IPMIN to IPMAX. The IP is fixed in focal plane
-*        coordinates over all stare positions. If zero is supplied for
-*        IPMAX, then no instrumental polaristion is included in the
-*        simulated data. [0.0008]
+*        coordinates over all stare positions. This parameter is only
+*        accessed if IPFORM is set to "User". [0.0008]
 *     IPTHETA = _DOUBLE (Read)
 *        The angle from the focal plane Y axis to the instrumental
-*        polarisation vectors, in degrees. [15]
+*        polarisation vectors, in degrees. This parameter is only
+*        accessed if IPFORM is set to "User". [15]
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -343,12 +352,17 @@ try:
                                 "map (pixels)", 8, True ))
    params.append(starutil.Par0F("POL", "Fractional polarisation in "
                                 "artificial Q/U maps", 0.05, True ))
+   params.append(starutil.ParChoice("IPFORM", ['JK', 'User', 'None'],
+                                "The form of instrumental polarisation "
+                                "to add to the simulated data", "JK", True ))
    params.append(starutil.Par0F("IPMAX", "Maximum fractional instrumental "
                                 "polarisation", 0.0008, True ))
    params.append(starutil.Par0F("IPMIN", "Minimum fractional instrumental "
                                 "polarisation", 0.0004, True ))
    params.append(starutil.Par0F("IPTHETA", "Angle for for instrumental "
                                 "polarisation (deg.s)", 15.0, True ))
+   params.append(starutil.Par0S("IPDATA", "Path to IP Model data file",
+                                '$STARLINK_DIR/share/smurf/ipdata.sdf', True ))
    params.append(starutil.Par0F("GFACTOR", "Expansion factor for GAI values",
                                 1.0, True ))
    params.append(starutil.Par0F("CFACTOR", "Expansion factor for COM values",
@@ -708,12 +722,21 @@ try:
    ipqu = loadndg( "IPQU" )
    if not ipqu:
 
+#  Initialise value to "use no IP".
+      ipqu = [ "!", "!" ]
+      ipdata = "!"
+
+#  See what form of IP to use.
+      ipform = parsys["IPFORM"].value
+
+#  First case: user defined IP Model.
+      if ipform == "USER":
+
 #  Get the parameters defining the instrumental polarisation
-      ipmax = parsys["IPMAX"].value
-      ipmin = parsys["IPMIN"].value
-      iptheta = parsys["IPTHETA"].value
-      if ipmax > 0.0:
-         msg_out( "Creating new instrumental polarisation values...")
+         ipmax = parsys["IPMAX"].value
+         ipmin = parsys["IPMIN"].value
+         iptheta = parsys["IPTHETA"].value
+         msg_out( "Creating new user-defined instrumental polarisation values...")
          ipqu = NDG( 2 )
 
 #  Create a map of the fractional instrumental polarisation across each
@@ -730,10 +753,13 @@ try:
                 format(ipi,iptheta,ipqu[1] ))
 
          savendg( "IPQU", ipqu  )
-      else:
-         ipqu = [ "!", "!" ]
+
+#  Johnstone/Kennedy IP model.
+      elif ipform == "JK":
+         ipdata = parsys["IPDATA"].value
 
    else:
+      ipdata = "!"
       msg_out( "Re-using old instrumental polarisation values...")
 
 #  Create GAI values from the supplied template data.
@@ -833,10 +859,11 @@ try:
    msg_out( "Generating simulated POL2 time-stream data..." )
    invoke("$SMURF_DIR/unmakemap in={0} qin={1} uin={2} ref={3} "
           "sigma={4} out={5} interp=sincsinc params=\[0,3\] com={6} "
-          "instq={7} instu={8} amp4={9} phase4={10} "
+          "instq={7} instu={8} ipdata='{16}' amp4={9} phase4={10} "
           "amp2={11} phase2={12} amp16={13} phase16={14} gai={15}".
           format(iart,qart,uart,ff,sigma,outdata,com,ipqu[0],
-                 ipqu[1],amp4,phase4,amp2,phase2,amp16,phase16,fgai) )
+                 ipqu[1],amp4,phase4,amp2,phase2,amp16,phase16,
+                 fgai,ipdata) )
 
 #  Remove temporary files.
    cleanup()

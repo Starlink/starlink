@@ -5896,6 +5896,15 @@ package @PACKAGE@ {
                 default {Nearest}
             }
 
+            parameter ipdata {
+                type LITERAL
+                vpath DEFAULT
+                ppath DEFAULT
+                prompt {Johnstone/Kennedy IP model data}
+                helpkey *
+                default {$STARLINK_DIR/share/smurf/ipdata.sdf}
+            }
+
             parameter out {
                 position 3
                 type NDF

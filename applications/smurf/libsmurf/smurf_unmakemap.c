@@ -97,28 +97,32 @@
 *          QIN and UIN parameters, then IN should hold I values.
 *     INSTQ = NDF (Read)
 *          An optional 2D input NDF holding the instrumental normalised Q
-*          value for each bolometer, with respect to fixed analyser.
-*          The NDF should have dimensions of (32,40). The total intensity
-*          falling on each bolometer is multiplied by the corresponding
-*          value in this file, to get the instrumental Q value that is
-*          added onto the value read from the QIN parameter. Bad values
-*          are treated as zero values. Note, currently there is no
-*          facility to use different INSTQ values for different
-*          sub-arrays - all data supplied via IN will use the same
-*          INSTQ values regardless of sub-array. To overcome this
+*          value for each bolometer, with respect to fixed analyser
+*          (alternatively, the instrumental polarisation may be specified
+*          in terms of the parameters of the Johnstone/Kennedy IP Model
+*          using parameter IPDATA). The NDF should have dimensions of
+*          (32,40). The total intensity falling on each bolometer is
+*          multiplied by the corresponding value in this file, to get the
+*          instrumental Q value that is added onto the value read from
+*          the QIN parameter. Bad values are treated as zero values. Note,
+*          currently there is no facility to use different INSTQ values
+*          for different sub-arrays - all data supplied via IN will use
+*          the same INSTQ values regardless of sub-array. To overcome this
 *          restriction, run unmakemap separately for each sub-array
 *          supplying a differnt INSTQ each time. [!]
 *     INSTU = NDF (Read)
 *          An optional 2D input NDF holding the instrumental normalised U
-*          value for each bolometer, with respect to fixed analyser.
-*          The NDF should have dimensions of (32,40). The total intensity
-*          falling on each bolometer is multiplied by the corresponding
-*          value in this file, to get the instrumental U value that is
-*          added onto the value read from the UIN parameter. Bad values
-*          are treated as zero values. Note, currently there is no
-*          facility to use different INSTU values for different
-*          sub-arrays - all data supplied via IN will use the same
-*          INSTU values regardless of sub-array. To overcome this
+*          value for each bolometer, with respect to fixed analyser
+*          (alternatively, the instrumental polarisation may be specified
+*          in terms of the parameters of the Johnstone/Kennedy IP Model
+*          using parameter IPDATA). The NDF should have dimensions of
+*          (32,40). The total intensity falling on each bolometer is
+*          multiplied by the corresponding value in this file, to get the
+*          instrumental U value that is added onto the value read from
+*          the UIN parameter. Bad values are treated as zero values. Note,
+*          currently there is no facility to use different INSTU values
+*          for different sub-arrays - all data supplied via IN will use
+*          the same INSTU values regardless of sub-array. To overcome this
 *          restriction, run unmakemap separately for each sub-array
 *          supplying a differnt INSTU each time. [!]
 *     INTERP = LITERAL (Read)
@@ -160,6 +164,14 @@
 *          scheme is similar to the "SincCos" scheme.
 *
 *          [current value]
+*     IPDATA = LITERAL (Read)
+*          The path to an HDS container file holding data defining the
+*          parameters of the Johnstone/Kennedy model of POL2 instrumental
+*          polarisation that is to be added to the returned Q and U values.
+*          This parameter is only used if a null (!) value is supplied for
+*          INSTQ or INSTU. If a null value is also supplied for IPDATA,
+*          then no instrumental polsaristion is added to the simulated
+*          data. ['$STARLINK_DIR/share/smurf/ipdata.sdf']
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
@@ -268,6 +280,8 @@
 *        Added ADAM parameters AMP2, AMP16, PHASE2 and PHASE16.
 *     13-MAY-2015 (DSB):
 *        Added ADAM parameter GAI.
+*     3-SEP-2015 (DSB):
+*        Added ADAM parameter IPDATA.
 
 *  Copyright:
 *     Copyright (C) 2011 Science and Technology Facilities Council.
@@ -341,12 +355,18 @@ void smurf_unmakemap( int *status ) {
    Grp *igrpq = NULL;         /* Group of input Q  sky files */
    Grp *igrpu = NULL;         /* Group of input U sky files */
    Grp *ogrp = NULL;          /* Group containing output file */
+   HDSLoc *cloc = NULL;       /* HDS locator for component ipdata structure */
+   HDSLoc *iploc = NULL;      /* HDS locator for top level ipdata structure */
    ThrWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
+   char ipdata[ 200 ];        /* Text buffer for IPDATA value */
    char pabuf[ 10 ];          /* Text buffer for parameter value */
+   char subarray[ 5 ];        /* Name of SCUBA-2 subarray (s8a,s8b,etc) */
    dim_t iel;                 /* Index of next element */
    dim_t ndata;               /* Number of elements in array */
    dim_t ntslice;             /* Number of time slices in array */
    double *ang_data = NULL;   /* Pointer to the FP orientation angles */
+   double *angc_data = NULL;  /* Pointer to the instrumental ANGC data */
+   double *c0_data = NULL;    /* Pointer to the instrumental C0 data */
    double *gai_data = NULL;   /* Pointer to the input GAI map */
    double *in_data = NULL;    /* Pointer to the input I sky map */
    double *inc_data = NULL;   /* Pointer to the input COM data */
@@ -354,36 +374,42 @@ void smurf_unmakemap( int *status ) {
    double *inu_data = NULL;   /* Pointer to the input U sky map */
    double *outq_data = NULL;  /* Pointer to the Q time series data */
    double *outu_data = NULL;  /* Pointer to the U time series data */
+   double *p0_data = NULL;    /* Pointer to the instrumental P0 data */
+   double *p1_data = NULL;    /* Pointer to the instrumental P1 data */
    double *pd;                /* Pointer to next element */
    double *pq = NULL;         /* Pointer to next Q time series value */
    double *pu = NULL;         /* Pointer to next U time series value */
    double *qinst_data = NULL; /* Pointer to the instrumental Q data */
    double *uinst_data = NULL; /* Pointer to the instrumental U data */
+   double amp16;              /* Amplitude of 16 Hz signal */
    double amp2;               /* Amplitude of 2 Hz signal */
    double amp4;               /* Amplitude of 4 Hz signal */
-   double amp16;              /* Amplitude of 16 Hz signal */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double params[ 4 ];        /* astResample parameters */
+   double phase16;            /* Phase of 16 Hz signal */
    double phase2;             /* Phase of 2 Hz signal */
    double phase4;             /* Phase of 4 Hz signal */
-   double phase16;            /* Phase of 16 Hz signal */
    double sigma;              /* Standard deviation of noise to add to output */
    int alignsys;              /* Align data in the map's system? */
    int cdims[ 3 ];            /* Common-mode NDF dimensions */
-   int gdims[ 3 ];            /* GAI model NDF dimensions */
    int dims[ NDF__MXDIM ];    /* NDF dimensions */
    int flag;                  /* Was the group expression flagged? */
+   int gdims[ 3 ];            /* GAI model NDF dimensions */
    int harmonic;              /* The requested harmonic */
    int ifile;                 /* Input file index */
    int indf;                  /* Input sky map NDF identifier */
+   int indfangc;              /* IP ANGC values NDF identifier */
+   int indfc0;                /* IP C0 values NDF identifier */
    int indfc;                 /* Input COM NDF identifier */
-   int indfg;                 /* Input GAI NDF identifier */
    int indfcs;                /* NDF identifier for matching section of COM */
+   int indfg;                 /* Input GAI NDF identifier */
    int indfin;                /* Input template cube NDF identifier */
    int indfiq;                /* Input instrumental Q NDF */
    int indfiu;                /* Input instrumental U NDF */
    int indfout;               /* Output cube NDF identifier */
+   int indfp0;                /* IP P0 values NDF identifier */
+   int indfp1;                /* IP P1 values NDF identifier */
    int indfq;                 /* Input Q map NDF identifier */
    int indfu;                 /* Input U map NDF identifier */
    int interp = 0;            /* Pixel interpolation method */
@@ -579,11 +605,20 @@ void smurf_unmakemap( int *status ) {
 
 /* Get any instrumental polarisation files. */
    if( *status == SAI__OK ) {
+
+/* First see if the user wants to use the "INSTQ/INSTU" scheme for
+   specifying instrumental polarisation. */
       ndfAssoc( "INSTQ", "Read", &indfiq, status );
+      ndfAssoc( "INSTUQ", "Read", &indfiu, status );
+
       if( *status == PAR__NULL ) {
+         ndfAnnul( &indfiq, status );
+         ndfAnnul( &indfiu, status );
          errAnnul( status );
-         qinst_data = NULL;
+
       } else {
+         msgOut( " ", "Using user-defined IP model", status );
+
          ndfDim( indfiq, 2, dims, &ndim, status );
          if( dims[ 0 ] != 32 || dims[ 1 ] != 40 ) {
             *status = SAI__ERROR;
@@ -594,13 +629,7 @@ void smurf_unmakemap( int *status ) {
             ndfMap( indfiq, "DATA", "_DOUBLE", "READ", (void **) &qinst_data,
                     &nel, status );
          }
-      }
 
-      ndfAssoc( "INSTU", "Read", &indfiu, status );
-      if( *status == PAR__NULL ) {
-         errAnnul( status );
-         uinst_data = NULL;
-      } else {
          ndfDim( indfiu, 2, dims, &ndim, status );
          if( dims[ 0 ] != 32 || dims[ 1 ] != 40 ) {
             *status = SAI__ERROR;
@@ -610,6 +639,21 @@ void smurf_unmakemap( int *status ) {
          } else {
             ndfMap( indfiu, "DATA", "_DOUBLE", "READ", (void **) &uinst_data,
                     &nel, status );
+         }
+      }
+
+/* If not, see if the user wants to use the Johnstone/Kennedy instrumental
+   polarisation model. The IPDATA parameter gives the path to an HDS
+   container file contining NDFs holding the required IP data for all
+   subarrays. */
+      if( !qinst_data ) {
+         parGet0c( "IPDATA", ipdata, sizeof(ipdata), status );
+         if( *status == PAR__NULL ) {
+            errAnnul( status );
+         } else {
+            msgOutf( " ", "Using Johnstone/Kennedy IP model in %s",
+                     status, ipdata );
+            hdsOpen( ipdata, "READ", &iploc, status );
          }
       }
    }
@@ -664,6 +708,64 @@ void smurf_unmakemap( int *status ) {
 /* Get the total number of data elements, and the number of time slices. */
       smf_get_dims( odata, NULL, NULL, NULL, &ntslice, &ndata, NULL,
                     NULL, status );
+
+/* Get the subarray name */
+      smf_fits_getS( odata->hdr, "SUBARRAY", subarray, sizeof(subarray),
+                     status );
+
+/* If we are using the Johnstone/Kennedy IP model, open and map the
+   relevant parameter NDFs within the IPDATA container file. */
+      if( iploc ) {
+         datFind( iploc, subarray, &cloc, status );
+
+         ndfFind( cloc, "C0", &indfc0, status );
+         ndfDim( indfc0, 2, dims, &ndim, status );
+         if( dims[ 0 ] != 32 || dims[ 1 ] != 40 ) {
+            *status = SAI__ERROR;
+            ndfMsg( "N", indfc0 );
+            errRep( " ", "Instrumental polarisation file ^N has bad "
+                    "dimensions - should be 32x40.", status );
+         } else {
+            ndfMap( indfc0, "DATA", "_DOUBLE", "READ", (void **) &c0_data,
+                    &nel, status );
+         }
+
+         ndfFind( cloc, "P0", &indfp0, status );
+         ndfDim( indfp0, 2, dims, &ndim, status );
+         if( dims[ 0 ] != 32 || dims[ 1 ] != 40 ) {
+            *status = SAI__ERROR;
+            ndfMsg( "N", indfp0 );
+            errRep( " ", "Instrumental polarisation file ^N has bad "
+                    "dimensions - should be 32x40.", status );
+         } else {
+            ndfMap( indfp0, "DATA", "_DOUBLE", "READ", (void **) &p0_data,
+                    &nel, status );
+         }
+
+         ndfFind( cloc, "P1", &indfp1, status );
+         ndfDim( indfp1, 2, dims, &ndim, status );
+         if( dims[ 0 ] != 32 || dims[ 1 ] != 40 ) {
+            *status = SAI__ERROR;
+            ndfMsg( "N", indfp1 );
+            errRep( " ", "Instrumental polarisation file ^N has bad "
+                    "dimensions - should be 32x40.", status );
+         } else {
+            ndfMap( indfp1, "DATA", "_DOUBLE", "READ", (void **) &p1_data,
+                    &nel, status );
+         }
+
+         ndfFind( cloc, "ANGC", &indfangc, status );
+         ndfDim( indfangc, 2, dims, &ndim, status );
+         if( dims[ 0 ] != 32 || dims[ 1 ] != 40 ) {
+            *status = SAI__ERROR;
+            ndfMsg( "N", indfangc );
+            errRep( " ", "Instrumental polarisation file ^N has bad "
+                    "dimensions - should be 32x40.", status );
+         } else {
+            ndfMap( indfangc, "DATA", "_DOUBLE", "READ", (void **) &angc_data,
+                    &nel, status );
+         }
+      }
 
 /* Open any COM file. */
       if( ncom ) {
@@ -823,7 +925,8 @@ void smurf_unmakemap( int *status ) {
                          ang_data, pasign, AST__DD2R*paoff, AST__DD2R*angrot,
                          amp2, AST__DD2R*phase2, amp4, AST__DD2R*phase4,
                          amp16, AST__DD2R*phase16, qinst_data, uinst_data,
-                         harmonic, status );
+                         c0_data, p0_data, p1_data, angc_data, harmonic,
+                         status );
 
 /* Release work space. */
          outq_data = astFree( outq_data );
@@ -836,6 +939,9 @@ void smurf_unmakemap( int *status ) {
 
 /* Close the output time series file. */
       smf_close_file( wf, &odata, status );
+
+/* Close the IP data container for the current subarray, if it is open. */
+      if( cloc ) datAnnul( &cloc, status );
 
 /* End the NDF context. */
       ndfEnd( status );
@@ -856,6 +962,7 @@ void smurf_unmakemap( int *status ) {
    if( igrpc != NULL) grpDelet( &igrpc, status);
    if( igrpg != NULL) grpDelet( &igrpg, status);
    if( ogrp != NULL) grpDelet( &ogrp, status);
+   if( iploc ) datAnnul( &iploc, status );
 
 /* End the NDF context. */
    ndfEnd( status );
