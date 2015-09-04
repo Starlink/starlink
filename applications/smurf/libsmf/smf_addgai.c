@@ -197,7 +197,7 @@ static void smf1AddGai( void *job_data_ptr, int *status ) {
 /* Factor in the GAI model into all bolometers. */
       gai = pdata->gai;
       for( ibolo = 0; ibolo < nbolo; ibolo++,out++,gai++ ) {
-         if( *gai != VAL__BADD ) {
+         if( *gai != VAL__BADD && *out != VAL__BADD ) {
             *out *= *gai;
          } else {
             *out = VAL__BADD;
