@@ -609,7 +609,7 @@ void smurf_unmakemap( int *status ) {
 /* First see if the user wants to use the "INSTQ/INSTU" scheme for
    specifying instrumental polarisation. */
       ndfAssoc( "INSTQ", "Read", &indfiq, status );
-      ndfAssoc( "INSTUQ", "Read", &indfiu, status );
+      ndfAssoc( "INSTU", "Read", &indfiu, status );
 
       if( *status == PAR__NULL ) {
          ndfAnnul( &indfiq, status );
