@@ -397,6 +397,10 @@
 *     1-MAY-2015 (DSB):
 *        - Added parameters OUTOFFSET and OUTSLOPE.
 *        - Added parameters CORR and OUTCORR.
+*     3-SEP-2015 (DSB):
+*        When looping, do not abort if a histogram could not be formed
+*        for a row/column, but continue to normalise any remaining
+*        rows/columns.
 *     {enter_further_changes_here}
 
 *-
@@ -825,6 +829,20 @@
          CALL KPG1_HSTFR( HISIZE, %VAL( CNF_PVAL( PNTW0 ) ),
      :                    MAX2, MIN2, 2, PCRANG,
      :                    DRDEF, STATUS )
+
+*  If we are looping and the histogram creation failed, annull the error
+*  and pass on to the next row/column leaving bad values in the output
+*  NDF.
+         IF( AXIS .GT. 0 .AND. STATUS .EQ. SAI__ERROR ) THEN
+            CALL ERR_ANNUL( STATUS )
+            CALL MSG_OUT( ' ', '   Unable to calculate the scaling '//
+     :                    'limits - the dynamic range of the data '//
+     :                    'is too small.', STATUS )
+            IF( OUTRQD ) CALL KPG1_MAP( NDFOUT, 'DATA', '_REAL',
+     :                                  'WRITE/BAD', PNTOD, NEL1B,
+     :                                  STATUS )
+            GO TO 998
+         END IF
 
 *  Unmap and release the temporary work space used to hold the
 *  histogram.
