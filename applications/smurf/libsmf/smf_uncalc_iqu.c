@@ -135,6 +135,8 @@
 *        Added arguments amp2, phase2, amp16 and phase16.
 *     3-SEP-2015 (DSB):
 *        Added arguments c0, p0, p1 and angc.
+*     7-SEP-2015 (DSB):
+*        Check for bad c0, p0, p1 and angc values.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -503,11 +505,19 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
             ip_qi = pdata->qinst[ ibolo ];
             ip_ui = pdata->uinst[ ibolo ];
          } else if( pdata->p0 ) {
-            t1 = AST__DD2R*( pdata->c0[ ibolo ] + pdata->angc[ ibolo ] ) + pdata->elev ;
-            ip_qi = pdata->p0[ ibolo ]*cos( 2*pdata->angc[ ibolo ]*AST__DD2R ) +
-                    pdata->p1[ ibolo ]*cos( 2*t1 );
-            ip_ui = pdata->p0[ ibolo ]*sin( 2*pdata->angc[ ibolo ]*AST__DD2R ) +
-                    pdata->p1[ ibolo ]*sin( 2*t1 );
+            if( pdata->c0[ ibolo ] != VAL__BADD &&
+                pdata->angc[ ibolo ] != VAL__BADD &&
+                pdata->p0[ ibolo ] != VAL__BADD &&
+                pdata->p1[ ibolo ] != VAL__BADD ) {
+               t1 = AST__DD2R*( pdata->c0[ ibolo ] + pdata->angc[ ibolo ] ) + pdata->elev ;
+               ip_qi = pdata->p0[ ibolo ]*cos( 2*pdata->angc[ ibolo ]*AST__DD2R ) +
+                       pdata->p1[ ibolo ]*cos( 2*t1 );
+               ip_ui = pdata->p0[ ibolo ]*sin( 2*pdata->angc[ ibolo ]*AST__DD2R ) +
+                       pdata->p1[ ibolo ]*sin( 2*t1 );
+            } else {
+               ip_qi = VAL__BADD;
+               ip_ui = VAL__BADD;
+            }
          } else {
             ip_qi = 0.0;
             ip_ui = 0.0;
@@ -533,7 +543,8 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
 /* Check the I, Q, U and angle values are good. */
             if( *iin != VAL__BADD && *qin != VAL__BADD &&
                 *uin != VAL__BADD && angle != VAL__BADD &&
-                *ipang != VAL__BADD ) {
+                *ipang != VAL__BADD &&
+                ip_qi != VAL__BADD && ip_ui != VAL__BADD ) {
 
 /* If POL_ANG is stored in arbitrary encoder units, convert to radians. */
                if( old ) angle = angle*TORADS;
