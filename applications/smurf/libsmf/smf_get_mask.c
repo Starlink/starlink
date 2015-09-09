@@ -136,6 +136,9 @@
 *        When creating maps of polarimetry data (Q or U), the sources can
 *        be negative, so treat large negative SNR values as source rather
 *        than background.
+*     9-SEP-2015 (DSB):
+*        Allow masks to be frozen when the convergence process reaches a
+*        specified mean map change per iteration.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -422,17 +425,19 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                accmask = NULL;
             }
 
-/* Get the number of iterations after which the mask is to be frozen.
-   Zero means "never freeze the mask". */
-            int zero_freeze = 0;
-            astMapGet0I( subkm, "ZERO_FREEZE", &zero_freeze );
+/* Get the number of iterations, or the mean map-change per iteration, after
+   which the mask is to be frozen. Zero means "never freeze the mask". */
+            double zero_freeze = 0.0;
+            astMapGet0D( subkm, "ZERO_FREEZE", &zero_freeze );
 
 /* Loop round each type of mask to be used. */
             for( imask = 0; imask < nmask && *status == SAI__OK; imask++ ){
 
 /* If the mask is now frozen, we just return the existing mask. So leave the
    loop. */
-               if( zero_freeze != 0 && dat->iter > zero_freeze + skip ) {
+               if( zero_freeze > 0 && (
+                   ( zero_freeze < 1.0 && dat->mapchange < zero_freeze ) ||
+                   ( zero_freeze >= 1.0 && dat->iter > (int)( zero_freeze + 0.5 ) + skip ) ) ) {
                   msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s mask "
                              "is now frozen.", status, modname );
                   break;

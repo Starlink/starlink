@@ -2016,6 +2016,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Stuff pointers into smfDIMMData to pass around to model component
          solvers */
       dat.ast_skipped = 1;
+      dat.mapchange = VAL__MAXD;
       dat.res = res;
       dat.qua = qua;
       dat.lut = lut;
@@ -2818,6 +2819,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
           msgOutf( "", FUNC_NAME ": *** NORMALIZED MAP CHANGE: %lg (mean) "
                    "%lg (max)", status, mapchange_mean, mapchange_max );
+          dat.mapchange = mapchange_mean;
 
           /* Check for the map change stopping criterion. Do not modify
              the converged flag on the extra iteration that is done after

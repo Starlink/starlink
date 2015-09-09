@@ -155,16 +155,20 @@ ast.zero_circle = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	ast.zero_freeze
-#  Type: 	integer
-#  Default: 	0
+#  Type: 	real
+#  Default: 	0.0
 #  Purpose: 	Prevent the AST mask from changing after a given number
 #		of iterations. This can help convergence.
-#  Description: If ast.zero_freeze is non-zero, the AST mask will be frozen
-#		after the specified number of iterations. A value of zero
-#		means that the mask is never frozen. Note, any initial
-#               iterations specified by parameter "ast.skip" are not
-#               included in the count of iterations.
-ast.zero_freeze = 0
+#  Description: If ast.zero_freeze is 1.0 or more, the AST mask will be
+#               frozen after the specified number of iterations (the
+#               nearest integer value is used). Note, any initial iterations
+#               specified by parameter "ast.skip" are not included in the
+#               count of iterations. If ast.zero_freeze is greater than
+#               zero but less than 1.0, the AST mask will be frozen when
+#               the normalized change in the map between iterations drops
+#               below the ast.zero_freeze value. A value less than or
+#               equal to zero means that the mask is never frozen.
+ast.zero_freeze = 0.0
 
 #-----------------------------------------------------------------
 #  Name: 	ast.zero_lowhits
@@ -452,16 +456,20 @@ com.zero_circle = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	com.zero_freeze
-#  Type: 	integer
-#  Default: 	0
+#  Type: 	real
+#  Default: 	0.0
 #  Purpose: 	Prevent the COM mask from changing after a given number
 #		of iterations. This can help convergence.
-#  Description: If com.zero_freeze is non-zero, the COM mask will be frozen
-#		after the specified number of iterations. A value of zero
-#		means that the mask is never frozen. Note, any initial
-#               iterations specified by parameter "ast.skip" are not
-#               included in the count of iterations.
-com.zero_freeze = 0
+#  Description: If com.zero_freeze is 1.0 or more, the COM mask will be
+#               frozen after the specified number of iterations (the
+#               nearest integer value is used). Note, any initial iterations
+#               specified by parameter "ast.skip" are not included in the
+#               count of iterations. If com.zero_freeze is greater than
+#               zero but less than 1.0, the COM mask will be frozen when
+#               the normalized change in the map between iterations drops
+#               below the com.zero_freeze value. A value less than or
+#               equal to zero means that the mask is never frozen.
+com.zero_freeze = 0.0
 
 #-----------------------------------------------------------------
 #  Name: 	com.zero_lowhits
@@ -1569,16 +1577,20 @@ flt.zero_circle = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	flt.zero_freeze
-#  Type: 	integer
-#  Default: 	0
+#  Type: 	real
+#  Default: 	0.0
 #  Purpose: 	Prevent the FLT mask from changing after a given number
 #		of iterations. This can help convergence.
-#  Description: If flt.zero_freeze is non-zero, the FLT mask will be frozen
-#		after the specified number of iterations. A value of zero
-#		means that the mask is never frozen. Note, any initial
-#               iterations specified by parameter "ast.skip" are not
-#               included in the count of iterations.
-flt.zero_freeze = 0
+#  Description: If flt.zero_freeze is 1.0 or more, the FLT mask will be
+#               frozen after the specified number of iterations (the
+#               nearest integer value is used). Note, any initial iterations
+#               specified by parameter "ast.skip" are not included in the
+#               count of iterations. If flt.zero_freeze is greater than
+#               zero but less than 1.0, the FLT mask will be frozen when
+#               the normalized change in the map between iterations drops
+#               below the flt.zero_freeze value. A value less than or
+#               equal to zero means that the mask is never frozen.
+flt.zero_freeze = 0.0
 
 #-----------------------------------------------------------------
 #  Name: 	flt.zero_lowhits
@@ -2412,16 +2424,20 @@ ssn.zero_circle = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	ssn.zero_freeze
-#  Type: 	integer
-#  Default: 	0
+#  Type: 	real
+#  Default: 	0.0
 #  Purpose: 	Prevent the SSN mask from changing after a given number
 #		of iterations. This can help convergence.
-#  Description: If ssn.zero_freeze is non-zero, the SSN mask will be frozen
-#		after the specified number of iterations. A value of zero
-#		means that the mask is never frozen. Note, any initial
-#               iterations specified by parameter "ast.skip" are not
-#               included in the count of iterations.
-ssn.zero_freeze = 0
+#  Description: If ssn.zero_freeze is 1.0 or more, the SSN mask will be
+#               frozen after the specified number of iterations (the
+#               nearest integer value is used). Note, any initial iterations
+#               specified by parameter "ast.skip" are not included in the
+#               count of iterations. If ssn.zero_freeze is greater than
+#               zero but less than 1.0, the SSN mask will be frozen when
+#               the normalized change in the map between iterations drops
+#               below the ssn.zero_freeze value. A value less than or
+#               equal to zero means that the mask is never frozen.
+ssn.zero_freeze = 0.0
 
 #-----------------------------------------------------------------
 #  Name: 	ssn.zero_lowhits
@@ -2696,7 +2712,7 @@ pca.pcathresh=4
 pca.pcalen=0
 pca.zero_accum = 0
 pca.zero_circle = <undef>
-pca.zero_freeze = 0
+pca.zero_freeze = 0.0
 pca.zero_lowhits = 0
 pca.zero_mask = 0
 pca.zero_niter = 0
