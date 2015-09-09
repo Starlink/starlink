@@ -436,7 +436,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* If the mask is now frozen, we just return the existing mask. So leave the
    loop. */
                if( zero_freeze > 0 && (
-                   ( zero_freeze < 1.0 && dat->mapchange < zero_freeze ) ||
+                   ( zero_freeze < 1.0 && dat->mapchange < zero_freeze && dat->iter > skip + 1 ) ||
                    ( zero_freeze >= 1.0 && dat->iter > (int)( zero_freeze + 0.5 ) + skip ) ) ) {
                   msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s mask "
                              "is now frozen.", status, modname );
