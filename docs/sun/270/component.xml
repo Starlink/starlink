@@ -5,7 +5,7 @@
 <component id="sun270" support="U">
   <version>0.1</version>
   <path>docs/sun/270</path>
-  <description>Starlink Latex Suppport for pdf and html</description>
+  <description>Starlink Latex Support for pdf and html</description>
   <abstract><p>Documentation and advice for using the starlink.cls
       \LaTeX\ class and its TeX4HT configurations when building pdf
       and html starlink documentation.</p></abstract>
