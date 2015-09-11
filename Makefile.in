@@ -180,7 +180,7 @@ all: all-recursive
 # but other names for release branches are possible), the sha1 of the
 # last commit which reflects the current state of the checkout and the
 # date and time in of that commit in ISO8601 format.
-world: $(ALL_TARGETS)
+world: componentset.html $(ALL_TARGETS)
 	- if test -d $(prefix)/starjava/docs; then \
 	  test -f $(prefix)/bin/hlink \
 	    && test -d $(prefix)/docs \
@@ -189,6 +189,10 @@ world: $(ALL_TARGETS)
 	  test -f $(prefix)/bin/hlink \
 	    && test -d $(prefix)/docs \
 	    && $(prefix)/bin/hlink $(prefix)/docs $(prefix)/help ; \
+	fi
+	- if test -d $(prefix)/docs; then  \
+		cp componentset.html $(prefix)/docs/starlinksummary.html && \
+		cp buildsupport/misc/starlinksummary.css $(prefix)/docs/starlinksummary.css; \
 	fi
 	rm -f world-stamp
 	date >world-stamp

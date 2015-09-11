@@ -1,0 +1,422 @@
+/* css.sty */
+
+/*Basic body styling */
+html{
+    background-color:silver;
+}
+
+body{
+    background-color:white;
+}
+
+/* Set up css for the spans:*/
+.sc{font-variant: small-caps;}
+
+.sf{
+    font-family: "Verdana";
+    font-size:85%;
+}
+
+.small{font-size: .8em;}
+
+.tt{
+    font-family: "Droid Sans Mono",monospace;
+    white-space: normal;
+    font-size: 85%;
+    line-space:85%;
+}
+
+/* terminal listings and similar*/
+.terminalv,.verb,.verbatim,.fancyvrb,pre{
+    font-family: "Droid Sans Mono",monospace;
+    white-space: nowrap;
+    color: #191970;
+    font-size: 85%;
+    line-space:85%;
+}
+
+/* starlink tasks*/
+.task{
+    font-family: "Verdana";
+    font-size: 85%;
+}
+
+/*right aligned object*/
+.pushright{
+    float:right;
+}
+
+/*.titlesection{font-size: 100%; line-height: 120%; width:100%}*/
+div.titleformat{
+    font-size: 200%;
+    line-height: 150%;
+    text-align: center;
+    display: block;
+    font-weight: bold;
+}
+
+/*General css for regular body:*/
+body{
+    margin-top: 2em;
+    margin-bottom: 1em;
+    max-width: 55em;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 3em;
+    color: #444;
+    font-family: serif;
+    font-style: normal;
+    font-size: 1em;
+    line-height: 130%;
+    border: 1px solid #fefeef;
+    padding:1em 3em;
+}
+
+/*Turn off indenting of text.*/
+p.indent{
+    text-indent: 0em;
+}
+
+/*CSS font face option*/
+@font-face{font-family: "Droid Sans Mono";}
+
+/*Font for .figure*/
+.figure{
+    font-family: "Verdana",sans-serif;
+    font-size: 80%;
+}
+
+/*Fonts for section headings.*/
+.sectionHead, .likesectionHead, .subsectionHead,.likesubsectionHead, .sstattributeHead{
+    font-family:"Georgia", serif;
+    font-weight:bold;
+    font-size:110%;
+}
+.subsubsectionHead, .likesubsubsectionHead {
+    font-family: "Georgia", serif;
+    font-weight: bold;
+    font-size: 105%;
+}
+
+/* spacing for sectionheads*/
+.sectionHead, .likesectionHead{
+    padding:5px;
+}
+
+/*Fonts for some headings and table of contents entries.*/
+strong, b, .partToc a, .partToc, .likepartToc a, .likepartToc,
+.chapterToc a, .chapterToc, .likechapterToc a, .likechapterToc,
+.appendixToc a, .appendixToc, .addchapToc,
+.paragraphHead, .likeparagraphHead,
+.subparagraphHead, .likesubparagraphHead,
+.caption td.id, .ecbx-0700{
+    font-family: "EB Garamond Bold", serif;
+}
+
+/*Fonts for small caps stuff.*/
+.booksubtitle, .dvday, .sectionHead, .likesectionHead,
+.dvquote-ref, .dvbox .lettrine-line{
+    font-family: "EB Garamond SC", serif;
+}
+
+/*Background colour for sectionHeads (blue)*/
+.likesectionHead,
+.sectionHead{
+    background-color:#ACCFE6;
+    padding:0.5;
+}
+
+/*Fonts for chapter and appendix head*/
+.appendixHead,.chapterHead{
+    line-height:140%;
+}
+
+/*Minipage??? This will be problematic...*/
+div.minipage {
+ float: left;
+ margin: 1ex 1em 1ex 0;
+}
+
+div.minipage:last-child ::after {
+    content "<par></par>";
+    clear: both;
+}
+
+div.minipage + h3{
+  clear:both;
+}
+
+/*Style for tipbox and starlinktextbox (blue background)*/
+.sltextbox,.tipbox{
+    width:80%;
+    border-color:#ACCFE6;
+    margin:0px auto;
+    border-style:solid;
+    border-width:thick;
+    border-radius:15px;
+}
+
+/* tiptox title spacing */
+span.tbtitle + div.tipbox-text{
+    margin-top:10px;
+}
+
+/* tip box title */
+.tbtitle{
+    display:block;
+    font-weight:bold;
+    background-color:#ACCFE6;
+    border-color:#ACCFE6;
+    padding: 1%;
+}
+
+/* tip box text*/
+.tipbox-text{
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+/*framed page*/
+.fmpage{
+    border: 1px solid black;
+    display: inline-block;
+}
+
+/*Hide the rules around figures and floats*/
+hr.figure, hr.endfigure, hr.float, hr.endfloat{
+    display:none;
+}
+
+/*Css various for images and captions*/
+img, img.graphics{
+    max-width:100%;
+    display:inline;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.figure img.graphics{
+    margin-left:auto;
+    margin-right:auto;
+}
+
+div.float{
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:3em;
+    margin-bottom:3em;
+    display:block;
+}
+
+div.figure{
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:3em;
+    margin-bottom:3em;
+    display:block;
+}
+
+/* captions */
+div.caption{
+    display:inline-block;
+    caption-side:bottom;
+    max-width:100%;
+}
+
+
+/* enumerated list */
+dd.enumerate-enumitem{
+    padding-left:0.5em;
+}
+
+dt.enumerate-enumitem{
+    float:left;
+    clear:left;
+    margin-left:1em;
+    margin-right:0em;
+}
+
+/*Css for enumerated description list.*/
+.enumdesc{
+    counter-reset: enumdesc-counter;
+}
+
+.enumdesc dt {
+    position: relative;
+    font-weight: bold;
+    font-size: 100%;
+    left: 2.5%;
+    right: 2.5%;
+}
+
+.enumdesc dt:before{
+    content: "(" counter(enumdesc-counter) ")";
+    counter-increment: enumdesc-counter;
+    font-weight: bold;
+    font-size: 100%;
+    padding-left:2.5%;
+    padding-right:1em;
+}
+
+.enumdesc dt, .enumdesc dd{
+    padding-left: 2.5%;
+    padding-right: 2.5%;
+}
+
+/*Css for starlink description list */
+.sldes dl {
+    width: 100%;
+    display:block;
+}
+
+.sldes dt {
+  float:left;
+  clear: left;
+  width: 15%;
+}
+
+.sldes dd {%
+    float: left;
+    width:85%;
+    display:inline-block;
+    margin-left:0%;
+    margin-bottom: 2em;}
+
+.sldes dd p:first-child{
+    margin-top:0%;
+}
+
+/* general description class */
+.description dt {
+    font-weight: bold;
+    margin-left:1.5em;
+}
+
+.description dd{
+    margin-bottom:1em;
+    margin-left:1.5em;
+}
+
+
+/* foot notes */
+div.footnotes{
+    margin-right:0px;
+}
+
+div.footnotes span.footnote-mark{
+    padding-right:5px;
+    padding-left:2px;
+}
+
+/*Css to align div.centers in center*/
+div.center >div {text-align: center;}
+
+
+/* cross links */
+div.crosslinks{
+    display: block;
+    width: 100%;
+    color: #808080;
+    font-size: 85%;
+}
+
+div.crosslinks:first-of-type{
+    margin-bottom: 5ex;
+}
+div.crosslinks:last-of-type{
+    margin-top:5ex;
+}
+
+/* copyright */
+div.copyright{
+    padding-bottom:3ex;
+}
+
+/* navbar */
+ul.nav{
+    list-style: none;
+    padding:0px;
+    text-align:center;
+    clear:both;
+}
+ul.nav li, ul.nav li a {
+    display: inline-block;
+    vertical-align: middle;
+}
+ul.nav li a{
+    border: none;
+    padding:0.1ex 1ex;
+}
+
+ul.nav li.toc-hidden{
+ visibility:hidden;
+ float:left;
+}
+ul.nav li.next{
+    float:right;
+}
+ul.nav li.prev{
+    float:left;
+}
+
+ul.nav li.title{
+    border:none;
+    font-variant:small-caps;
+}
+
+ul.nav li.toc, ul.nav li.toc-hidden{
+    margin:0px 3ex;
+}
+
+ul.nav li.toc{
+       float: right;
+}
+div.crosslinks li a{
+    display:inline-block;
+    text-decoration:none;
+    color:#808080;
+}
+
+div.titlebar{
+    text-align:center;
+    color:silver;
+}
+.crosslinks li > a:hover, .crosslinksr li > a:focus {
+    text-decoration: none;
+    background-color: #ACCFE6;
+}
+div.crosslinks li a:hover, div.crosslinks li a:focus{
+    color:black;
+}
+table {
+    border-collapse: collapse;
+    padding:0.5em;
+}
+
+table td, table th{
+    padding:0.5em;
+    vertical-align:top;
+    border: solid 1px black;
+    text-align:center;
+}
+
+td p{
+    text-align:left;
+}
+
+td p:first-child{ margin-top:0em; }
+td p:last-child{ margin-bottom:0em; }
+
+
+
+
+
+/* default latex vertical align is center, not baseline?*/
+td {
+   vertical-align: top;
+}
+
+
+
+
