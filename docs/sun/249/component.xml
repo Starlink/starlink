@@ -5,7 +5,7 @@
 <component id="sun249" support="S">
   <version>2</version>
   <path>docs/sun/249</path>
-  <description>Starlink Standard Data Structures</description>
+  <description>INT-WFC - Astrometric Calibration for the INT Wide Field Camera</description>
   <abstract><p>
    Images observed using the Wide Field Camera instrument on the Isaac
    Newton Telescope contain nonlinear optical distortions. This note
