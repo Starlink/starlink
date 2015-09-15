@@ -140,6 +140,8 @@
 #include "smf_typ.h"
 #include "smf_err.h"
 
+#define CHECK 0
+
 /* ------------------------------------------------------------------------ */
 /* Local variables and functions */
 
@@ -295,7 +297,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
       }
     }
 
-    //printf("--- check %i: %lf\n", pdata->operation, check);
+    if( CHECK ) printf("--- check %i: %lf\n", pdata->operation, check);
 
   } else if( (pdata->operation == 1) && (*status == SAI__OK) ) {
     /* Operation 1: normalized eigenvectors --------------------------------- */
@@ -327,7 +329,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
       }
     }
 
-    //printf("--- check %i: %lf\n", pdata->operation, check);
+    if( CHECK ) printf("--- check %i: %lf\n", pdata->operation, check);
 
   } else if( (pdata->operation == 2) && (*status == SAI__OK) ) {
     /* Operation 2: project data along eigenvectors ------------------------- */
@@ -353,9 +355,9 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
 
     for( i=0; i<(1280l*ngoodbolo); i++ ) check += amp[i];
 
-    //printf(" counter=%zu\n", counter );
-
-    //printf("--- check %i: %lf\n", pdata->operation, check);
+    if( CHECK ) {
+       printf("--- check %i: %lf\n", pdata->operation, check);
+    }
 
   } else if( (pdata->operation == 3) && (*status == SAI__OK) ) {
     /* Operation 3: clean --------------------------------------------------- */
@@ -679,11 +681,8 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   msgOutif( MSG__VERB, "", FUNC_NAME
             ": perfoming singular value decomposition...", status );
 
-  if( *status == SAI__OK ) {
-    gsl_linalg_SV_decomp( cov, v, s, work );
-  }
-
-  {
+  smf_svd( wf, ngoodbolo, cov->data, s->data, 1.0E-10, status );
+  if( CHECK ) {
     double check=0;
 
     for( i=0; i<ngoodbolo; i++ ) {
@@ -692,7 +691,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
       }
     }
 
-    //printf("--- check inverted: %lf\n", check);
+    printf("--- check inverted: %lf\n", check);
   }
 
   /* Calculate normalized eigenvectors with parallel code --------------------*/
@@ -780,22 +779,22 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     }
   }
 
-  {
+  if( CHECK ){
     double check=0;
 
     for( i=0; i<nbolo*ngoodbolo; i++ ) {
       check += amp[i];
     }
-    //printf("--- check combined amp: %lf\n", check);
+    printf("--- check combined amp: %lf\n", check);
   }
 
-  {
+  if( CHECK ){
     double check=0;
     for( i=0; i<ngoodbolo*tlen; i++ ) {
       check += comp[i];
     }
 
-    //printf("--- check component A: %lf\n", check);
+    printf("--- check component A: %lf\n", check);
   }
 
   /* Check to see if the amplitudes are mostly negative or positive. If
@@ -834,13 +833,13 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     }
   }
 
-  {
+  if( CHECK ){
     double check=0;
     for( i=0; i<ngoodbolo*tlen; i++ ) {
       check += comp[i];
     }
 
-    //printf("--- check component B: %lf\n", check);
+    printf("--- check component B: %lf\n", check);
   }
 
   /* Flag outlier bolometers if requested ------------------------------------*/
@@ -1097,13 +1096,13 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     }
   }
 
-  if( comp ) {
+  if( comp && CHECK ) {
     double check=0;
     for( i=0; i<ngoodbolo*tlen; i++ ) {
       check += comp[i];
     }
 
-    //printf("--- check component again: %lf\n", check);
+    printf("--- check component again: %lf\n", check);
   }
 
   /* Clean up */

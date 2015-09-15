@@ -427,6 +427,7 @@ smf_subtract_plane2.c \
 smf_subtract_plane3.c \
 smf_subtract_poly.c \
 smf_summarize_obs.c \
+smf_svd.c \
 smf_swmode_str.c \
 smf_tai2unix.c \
 smf_tausrc_str.c \
