@@ -45,6 +45,9 @@
 *     21-SEP-2012 (DSB):
 *        Recent data contains POL_ANG values in radians rather than
 *        arbitrary encoder units.
+*     11-SEP-2015 (DSB):
+*        Re-written because the old algorithm found 100 bonus points in
+*        20150716/00021 when in fact there were none.
 
 *  Copyright:
 *     Copyright (C) 2012 Science and Technology Facilities Council.
@@ -80,10 +83,11 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-/* The half-width of the box over which a linear fit is done to the
-   POL_ANG values. */
-#define HALF_BOX 25
+/* Prototypes for local functions. */
+static int smf1_findlag( dim_t iframe, int curlag, dim_t nframe, const double *agaps,
+                         const double *tgaps, int *status );
 
+/* Main entry point . */
 void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
 
 /* Local Variables: */
@@ -93,40 +97,26 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
    dim_t idx;
    dim_t iframe;
    dim_t ijump;
-   dim_t j;
-   dim_t jtop;
    dim_t next_jump;
    dim_t njump;
+   double *agaps;
    double *angles;
    double *pa;
-   double *pcenx;
-   double *pceny;
-   double *pnewx;
-   double *pnewy;
-   double *pnewytop;
-   double *poldx;
-   double *poldy;
+   double *pga;
+   double *pgt;
    double *pt;
+   double *tgaps;
    double *times;
    double ang_change;
    double ang_offset;
    double angle;
-   double c;
-   double denom;
    double langle;
-   double limit;
-   double lresid;
-   double m;
+   double ltime;
    double maxang;
-   double pop;
-   double resid;
    double rts_origin;
-   double sx;
-   double sxx;
-   double sxy;
-   double sy;
-   double syy;
    double time;
+   int curlag;
+   int newlag;
    smfHead *hdr;
 
 /* Check inherited status. */
@@ -138,7 +128,7 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
    new data until we find a POL_ANG value greater than 2*PI. */
    maxang = 2*AST__DPI;
 
-/* Loop over subarray. They probably all shre the same header, but is it
+/* Loop over subarray. They probably all share the same header, but is it
    guaranteed? */
    for( idx = 0; idx < array->ndat && *status == SAI__OK; idx++ ) {
       hdr = array->sdata[ idx ]->hdr;
@@ -146,8 +136,10 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
 /* Allocate work arrays to hold the offset from the start of the chunk in
    days, and the rotation since the start of the chunk, in arbitrary encoder
    units. */
-      times = astMalloc( hdr->nframes*sizeof(*pt) );
-      angles = astMalloc( hdr->nframes*sizeof(*pt) );
+      times = astMalloc( hdr->nframes*sizeof(*times) );
+      angles = astMalloc( hdr->nframes*sizeof(*angles) );
+      tgaps = astMalloc( hdr->nframes*sizeof(*tgaps) );
+      agaps = astMalloc( hdr->nframes*sizeof(*agaps) );
 
 /* Loop round all frames. The "langle" variable is used to record the angle
    for the previous frame. The "rts_origin" value is the RTS_END value at
@@ -159,14 +151,18 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
    "angles" and "times" to which the angle and time at the next Frame
    should be written. */
       langle = VAL__BADD;
+      ltime = VAL__BADD;
       rts_origin = VAL__BADD;
       ang_offset = VAL__BADD;
 
       pa = angles;
       pt = times;
 
+      pga = agaps;
+      pgt = tgaps;
+
       state = hdr->allState;
-      for( iframe = 0; iframe < hdr->nframes; iframe++,state++,pa++,pt++ ) {
+      for( iframe = 0; iframe < hdr->nframes; iframe++,state++,pa++,pt++,pga++,pgt++ ) {
 
 /* Not sure if there ever will be bad RTS_END or POL_ANG values, but just
    in case... */
@@ -213,176 +209,55 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
          }
 
 /* Store the final time and angle in the work arrays. */
+         if( time != VAL__BADD && ltime != VAL__BADD ) {
+            *pgt = time - ltime;
+         } else {
+            *pgt = VAL__BADD;
+         }
+
+         if( angle != VAL__BADD && langle != VAL__BADD ) {
+            *pga = angle - langle;
+         } else {
+            *pga = VAL__BADD;
+         }
+
          *pt = time;
          *pa = angle;
 
 /* Record the angle of the current frame for use on the next pass round this
    loop. */
          langle = angle;
+         ltime = time;
       }
 
-/* Now we have the angles and time, we step through the array, and at
-   each frame perform a least squares linear fit to produce the gradient of
-   offset of the line through a box of values centred on the current frame.
-   We find the residual between this line and the POL_ANG value at the
-   central time. As a bonus point is approached, the residual will get
-   more and more negative until it suddenly switches sign at the bonus
-   point itself. We then remove the bonus point by shuffling down later
-   POL_ANG values to replace it, and continue to look for the next bonus
-   point. The least squares fitting is done by maining the required
-   statistics for a box of values centred on the required frame. As we
-   move to a new frame, a new point is added to the statistics, and the
-   oldest point is removed..
+/* Initialise the lag (i.e. change in index) that produces the best
+   correlation between the angle gaps and the time gaps. */
+      curlag = 0;
 
-   First initialise the required running sums to hold the sums of the data
-   in the first HALF_BOX+1 data values. The independent variable in the fit
-   is time. This means the "x*y" product summed in "sxy" does not depend
-   on the current centre of the box, which is good. */
-      sy = 0.0;
-      sx = 0.0;
-      sxy = 0.0;
-      sxx = 0.0;
-      syy = 0.0;
-      pop = 0;
-
-      pnewy = angles;
-      pnewx = times;
-      for( iframe = 0; iframe <= HALF_BOX; iframe++,pnewy++,pnewx++ ) {
-         if( *pnewy != VAL__BADD && *pnewx != VAL__BADD ) {
-            sy += *pnewy;
-            sx += *pnewx;
-            sxy += ( *pnewx )*( *pnewy );
-            sxx += ( *pnewx )*( *pnewx );
-            syy += ( *pnewy )*( *pnewy );
-            pop++;
-         }
-      }
-
-/* The "pnewy" and "pnewx" pointers now point to the input values that are
-   about to be added to the fit box. Initialise another pair of pointers
-   "poldx" and "poldy" to point to the input values that are about to leave
-   the fit box. These will initially point to elements before the start of
-   the input arrays. */
-      poldy = angles - HALF_BOX;
-      poldx = times - HALF_BOX;
-
-/* Initialise another pair of pointers to point to the central values
-   in the fit box. */
-      pceny = angles;
-      pcenx = times;
-
-/* Store a pointer to the fist value after the end of the angles array. */
-      pnewytop = angles + hdr->nframes;
-
-/* Initialise the list of POL_ANG values to remove. */
-      jumps = NULL;
+/* Loop over all time slices. */
       njump = 0;
+      jumps = NULL;
+      for( iframe = 0; iframe < hdr->nframes; iframe++ ) {
 
-/* Do each frame in turn. */
-      lresid = VAL__BADD;
-      for( iframe = 0; iframe < hdr->nframes; iframe++,poldx++,pcenx++,pnewx++,poldy++,pceny++,pnewy++ ) {
-         resid = VAL__BADD;
+/* Find the lag that produces thes best correlation between angle gaps
+   and time gaps within a small box centred on the current time slice. */
+         newlag = smf1_findlag( iframe, curlag, hdr->nframes, agaps,
+                                tgaps, status );
 
-/* Calculate the gradient  and offset of the least squares fit to the data
-   currently in the fittting box. The offset here ("c") is the value of the
-   fitted line at time == 0*/
-         denom =  pop*sxx - sx*sx;
-         if( denom > 0 && pop > 0 ) {
-            m =  ( pop*sxy - sx*sy )/denom;
-            c =  ( sxx*sy - sx*sxy )/denom;
+/* If the lag has dropped, indicate that the corresponding angle value is
+   a bonus point. */
+         if( newlag == curlag - 1 ) {
+            curlag = newlag;
+            jumps = astGrow( jumps, ++njump, sizeof( *jumps ) );
+            jumps[ njump - 1 ] = iframe + njump - 1;
 
-/* Correct the offset to be the value of the line at the centre of the
-   box. All this least square sfitting would be unnecessary if we knew
-   that the mean time in the box was equal to the central time. If that
-   were the case we could use the mean angle in the box as "c", but alas
-   it's not the case. */
-            c += m*( *pcenx );
-
-/* Get the residual between the central fit value and the central angle
-   value. */
-            if( *pceny != VAL__BADD ) {
-               resid = c - *pceny;
-
-/* If the previous residual was large and negative, and the current
-   residual is large and positive, then we have found a bonus point.
-   Here, "large" is defined as more than 25% of the angular step since the
-   last sample. */
-               if( pceny[ -1 ] != VAL__BADD ) {
-                  limit = 0.25*( pceny[0] - pceny[-1] );
-                  if( lresid != VAL__BADD && lresid < -limit && resid > limit ) {
-
-/* Remove the central value and the upper half of the box from the stats. */
-                     jtop = iframe + HALF_BOX + 1;
-                     if( jtop > hdr->nframes ) jtop = hdr->nframes;
-                     for( j = iframe; j < jtop; j++ ) {
-                        if( angles[ j ] != VAL__BADD && times[ j ] != VAL__BADD ) {
-                           sy -= angles[ j ];
-                           sx -= times[ j ];
-                           sxy -= times[ j ]*angles[ j ];
-                           sxx -= times[ j ]*times[ j ];
-                           syy -= angles[ j ]*angles[ j ];
-                           pop--;
-                        }
-                     }
-
-/* Shuffle down the remaining angle values to replace the hole left by
-   removing the central value. Pad the end with a blank value. */
-                     for( j = iframe + 1; j < hdr->nframes; j++ ) {
-                        angles[ j - 1 ] = angles[ j ];
-                     }
-                     angles[ j - 1 ] = VAL__BADD;
-
-/* Add back the new central value and the upper half of the box into the
-   stats. */
-                     for( j = iframe; j < jtop; j++ ) {
-                        if( angles[ j ] != VAL__BADD && times[ j ] != VAL__BADD ) {
-                           sy += angles[ j ];
-                           sx += times[ j ];
-                           sxy += times[ j ]*angles[ j ];
-                           sxx += times[ j ]*times[ j ];
-                           syy += angles[ j ]*angles[ j ];
-                           pop++;
-                        }
-                     }
-
-/* Ensure we use a bad value for "lresid" next time. */
-                     resid = VAL__BADD;
-
-/* Add the *original* index of the current frame (i.e. assuming no points
-   have been removed) to the list of POL_ANG values to remove. */
-                     jumps = astGrow( jumps, ++njump, sizeof( *jumps ) );
-                     jumps[ njump - 1 ] = iframe + njump - 1;
-                  }
-               }
-            }
-         }
-
-/* If there will be another pass through the "iframe" loop... */
-         if( iframe < hdr->nframes ) {
-
-/* Record the residual */
-            lresid = resid;
-
-/* Add the next input value into the running sums. */
-            if( pnewy < pnewytop && *pnewy != VAL__BADD && *pnewx != VAL__BADD ) {
-               sy += *pnewy;
-               sx += *pnewx;
-               sxy += ( *pnewx )*( *pnewy );
-               sxx += ( *pnewx )*( *pnewx );
-               syy += ( *pnewy )*( *pnewy );
-               pop++;
-            }
-
-/* Remove the oldest input value from the running sums. There is nothing
-   to add in on the last pass through the "i" loop. */
-            if( poldy >= angles && *poldy != VAL__BADD && *poldx != VAL__BADD ) {
-               sy -= *poldy;
-               sx -= *poldx;
-               sxy -= ( *poldx )*( *poldy );
-               sxx -= ( *poldx )*( *poldx );
-               syy -= ( *poldy )*( *poldy );
-               pop--;
-            }
+/* The lag should only ever drop by one, or remain the same. If anything
+   else happens, it is either a bug in this function, or something very
+   strange in the data, so report an error. */
+         } else if( newlag != curlag ) {
+            errRep( "", "smf_fix_pol2: Unexpected features found in the "
+                    "JCMTSTATE.POL_ANG array.", status );
+            break;
          }
       }
 
@@ -395,8 +270,8 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
             if( iframe < next_jump ) {
                (wstate++)->pol_ang = state->pol_ang;
             } else {
-               msgOutiff( MSG__VERB, "", "smf_fix_pol2: Removing "
-                          "POL_ANG[%d]", status, (int) iframe );
+               msgOutf( " ", "WARNING: Removing spurious POL_ANG value at time "
+                        "slice %d", status, (int) iframe );
                ijump++;
                if( ijump == njump ) {
                   next_jump = hdr->nframes + 1;
@@ -415,8 +290,150 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
 /* Free work space. */
       jumps = astFree( jumps );
       times = astFree( times );
-      angles = astFree( times );
+      angles = astFree( angles );
+      agaps = astFree( agaps );
+      tgaps = astFree( tgaps );
    }
 
+}
+
+
+static int smf1_findlag( dim_t iframe, int curlag, dim_t nframe, const double *agaps,
+                         const double *tgaps, int *status ){
+/*
+*  Name:
+*     smf1_findlag
+
+*  Purpose:
+*     Find the shift in frame index that gives the best correlation between
+*     changes in angle and changes in time.
+
+*  Invocation:
+*     int smf1_findlag( dim_t iframe, int curlag, dim_t nframe, const double *agaps,
+*                       const double *tgaps, int *status )
+
+*  Arguments:
+*     iframe = dim_t * (Given)
+*        The index of the central tgaps value within the box.
+*     curlag = int * (Given)
+*        The lag at which to start searching. A range of lags between
+*        curlag - 5 and curlag + 5 are checked and the lag that gives the
+*        highest correlation between agaps and tagps values is returned.
+*     nframe = dim_t * (Given)
+*        The number of values in the agaps and tgaps arrays.
+*     agaps = cont double * (Given)
+*        An array holding the changes in POL_ANG value between adjacent
+*        time slices. The value in agaps[i] is the change in POL_ANG between
+*        time slice i and time slice i+1. May contain VAL__BADD values.
+*     tgaps = cont double * (Given)
+*        An array holding the time intervals between adjacent time slices.
+*        The value in tgaps[i] is the interval between time slice i and time
+*        slice i+1. May contain VAL__BADD values.
+*     status = int* (Given and Returned)
+*        Pointer to global status.
+
+*  Returned Value:
+*     The integer lag between the agaps and tgaps arrays that produces
+*     the highest correlation, within a box centred on "iframe".
+
+*  Description:
+*     This function shifts the "agaps" array backwards and forwards,
+*     looking for the shift (lag) that gives the best correlation between
+*     the agaps values and the tgaps values within a small box centred on
+*     a specified index. This shift is returned.
+
+
+*/
+
+/* Local Constants: */
+#define CBOX 40
+#define LBOX 5
+
+/* Local Variables: */
+   double cor;
+   double cormax;
+   double sa2;
+   double sa;
+   double sat;
+   double st2;
+   double st;
+   int ia;
+   int ihit;
+   int ilot;
+   int it;
+   int lag;
+   int laghi;
+   int laglo;
+   int ns;
+   int result;
+
+/* Initialise the returned value */
+   result = curlag;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return result;
+
+/* Initialise the smallest and greatest lags to test. */
+   laglo = curlag - LBOX;
+   laghi = curlag + LBOX;
+
+/* Initialise the greatest correlation found so far. */
+   cormax = VAL__MIND;
+
+/* Test each lag in turn. */
+   for( lag = laglo; lag <= laghi; lag++ ) {
+
+/* Set up the indices of the first and last tgaps values to include in
+   the calculation of the correlation produced by the current lag. */
+      ilot = iframe - CBOX;
+      ihit = iframe + CBOX;
+
+/* Initialise the runing sums> */
+      sa = 0.0;
+      st = 0.0;
+      sa2 = 0.0;
+      st2 = 0.0;
+      sat = 0.0;
+      ns = 0;
+
+/* Loop over all pairs of tgaps/agaps values to be included in
+   the calculation of the correlation produced by the current lag. */
+      for( it = ilot; it <= ihit; it++ ) {
+
+/* "it" is the index of the tgaps value. FInd the index of the
+   corresponding agaps value, taking into account the current lag. */
+         ia = it - lag;
+
+/* Check they are both within the bounds of the arrays. */
+         if( ia > 0 && ia < (int) nframe &&
+             it > 0 && it < (int) nframe ) {
+
+/* If neither is bad, update the running sums needed to find the
+   correlation. */
+            if( agaps[ia] != VAL__BADD && tgaps[it] != VAL__BADD ) {
+               sa += agaps[ia];
+               st += tgaps[it];
+               sa2 += agaps[ia]*agaps[ia];
+               st2 += tgaps[it]*tgaps[it];
+               sat += agaps[ia]*tgaps[it];
+               ns++;
+            }
+         }
+      }
+
+/* Find the correlation coefficient between the tgaps values and the
+   lagged agaps values. */
+      cor = ( ns*sat - sa*st )/sqrt( ( ns*st2 - st*st )*( ns*sa2 - sa*sa ));
+
+/* If this is the largest correlation found so far, record it together
+   with the current lag. */
+      if( cor > cormax ) {
+         cormax = cor;
+         result = lag;
+      }
+   }
+
+/* Return the best lag. */
+   return result;
 }
 
