@@ -5,9 +5,10 @@
 <component id="@PACKAGE@" support="S">
   <version>@PACKAGE_VERSION@</version>
   <path>libraries/thr</path>
-  <description>Starlink Memory Management Library</description>
+  <description>THR - A Thread Management Library</description>
   <abstract>
-	<p>C Memory management wrapper routines.</p>
+	<p>THR provides high level utility functions for creating and
+	using pools of persistent execution thread.</p>
   </abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
