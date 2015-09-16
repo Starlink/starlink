@@ -3219,7 +3219,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>8.0.3</version>
+  <version>8.0.5</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
