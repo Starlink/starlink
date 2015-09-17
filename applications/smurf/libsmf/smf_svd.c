@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_svd( ThrWorkForce *wf, dim_t n, double *a, double *sigma,
-*              double eps, int *status )
+*              double *u, double eps, int sort, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -22,13 +22,24 @@
 *     n = dim_t * (Given)
 *        The size of the nxn square matrix.
 *     a = double * (Given and Returned)
-*        The A matrix on entry, and the U matrix on exit (both nxn
-*        elements). All the elements of row 1 come first, followed by
-*        all the elements of row 2, etc.
+*        The A matrix on entry, and V' (i.e. V transposed) matrix on exit.
+*        All the elements of row 1 come first, followed by all the elements
+*        of row 2, etc.
 *     sigma = double * (Returned)
 *        The vector of N singular values. These are *not* sorted into
 *        descending order. These are the diagonal elements of the S
 *        matrix (see below).
+*     u = double * (Returned)
+*        The U matrixt. All the elements of row 1 come first, followed by
+*        all the elements of row 2, etc. May be NULL if the U matrix is
+*        not required.
+*     eps = double (Given)
+*        The required precision.
+*     sort = int (Given)
+*        If non-zero, sort the returned arrays so that the singular
+*        values are in descending order.
+*     status = int * (Given)
+*        Pointer to the inherited status value.
 
 *  Description:
 *     Finds U and S, given A where:
@@ -36,11 +47,7 @@
 *        A = U . S . V'
 *
 *     (V' is V transposed). U and V are both orthogonal nxn matrices, and
-*     S is an nxn diagonal matrix. The V matrix is:
-*
-*        V = ( S-1 . U' . A )'
-*
-*     where S-1 is the inverse of S, and U' is the transpose of U.
+*     S is an nxn diagonal matrix.
 *
 *     The algorithm used is multi-threaded, unlike the GSL SVD function.
 *     It is the "Block JRS Algorithm", as described in "A Block JRS
@@ -81,7 +88,7 @@
 *     {note_any_bugs_here}
 *-
 */
-
+#include <stdlib.h>
 
 /* Starlink includes */
 #include "mers.h"
@@ -94,6 +101,9 @@
 /* Prototypes for local static functions. */
 static void smf1_svd( void *job_data_ptr, int *status );
 static void smf1_roundrobin( dim_t p, int *up, int *dn );
+static int smf1_compare( const void *a, const void *b );
+
+static double *Sigma_array = NULL;
 
 /* Local data types */
 typedef struct smfSvdData {
@@ -101,6 +111,8 @@ typedef struct smfSvdData {
    dim_t dnsoblow;
    dim_t i1;
    dim_t i2;
+   dim_t j1;
+   dim_t j2;
    dim_t n;
    dim_t sobhigh;
    dim_t soblow;
@@ -108,6 +120,8 @@ typedef struct smfSvdData {
    dim_t upsoblow;
    double *a;
    double *sigma;
+   double *u;
+   double *aorig;
    double delta;
    int converged;
    int oper;
@@ -117,7 +131,7 @@ typedef struct smfSvdData {
 
 
 void smf_svd( ThrWorkForce *wf, dim_t n, double *a, double *sigma,
-              double eps, int *status ) {
+              double *u, double eps, int sort, int *status ) {
 
 /* Local Variables */
    SmfSvdData *job_data = NULL;
@@ -125,6 +139,8 @@ void smf_svd( ThrWorkForce *wf, dim_t n, double *a, double *sigma,
    dim_t *sobhigh = NULL;
    dim_t *soblow = NULL;
    dim_t i;
+   dim_t j;
+   dim_t k;
    dim_t irow;
    dim_t iter;
    dim_t nbig;
@@ -133,6 +149,8 @@ void smf_svd( ThrWorkForce *wf, dim_t n, double *a, double *sigma,
    dim_t p;
    dim_t rpb;
    dim_t s;
+   double *aorig;
+   double sigold;
    double delta;
    int *dn = NULL;
    int *up = NULL;
@@ -159,6 +177,7 @@ void smf_svd( ThrWorkForce *wf, dim_t n, double *a, double *sigma,
    up = astMalloc( p*sizeof( *up ) );
    dn = astMalloc( p*sizeof( *dn ) );
    job_data = astMalloc( 2*p*sizeof( *job_data ) );
+   aorig = u ? astStore( NULL, a, n*n*sizeof(*a) ) : NULL;
 
 /* Check pointers can be used safely. */
    if( *status == SAI__OK ) {
@@ -320,11 +339,11 @@ void smf_svd( ThrWorkForce *wf, dim_t n, double *a, double *sigma,
       nstep = n/p;
       for( i = 0; i < p; i++ ) {
          pdata = job_data + i;
-         pdata->i1 = i*nstep;
+         pdata->j1 = i*nstep;
          if( i < p - 1 ){
-            pdata->i2 = pdata->i1 + nstep - 1;
+            pdata->j2 = pdata->j1 + nstep - 1;
          } else {
-            pdata->i2 = n - 1;
+            pdata->j2 = n - 1;
          }
          pdata->sigma = sigma;
          pdata->oper  = 3;
@@ -332,6 +351,51 @@ void smf_svd( ThrWorkForce *wf, dim_t n, double *a, double *sigma,
       }
 
       thrWait( wf, status );
+
+/* If required, sort the singular values into descending order. */
+      if( sort ) {
+         Sigma_array = sigma;
+
+         double *arowold = astMalloc( n*sizeof( *arowold ) );
+         int *index = astMalloc( n*sizeof( *index ) );
+         if( *status == SAI__OK ) {
+
+            for( i = 0; i < n; i++ ) index[ i ] = i;
+            qsort( index, n, sizeof(*index), smf1_compare );
+            for( i = 0; i < n; i++ ) {
+               sigold = sigma[ i ];
+               memcpy( arowold, a + i*n, n*sizeof(*a) );
+               j = i;
+               while( 1 ) {
+                  k = index[ j ];
+                  index[ j ] = j;
+                  if( k == i ) break;
+                  sigma[ j ] = sigma[ k ];
+                  memcpy( a + j*n, a + k*n, n*sizeof(*a) );
+
+                  j = k;
+               }
+               sigma[ j ] = sigold;
+               memcpy( a + j*n, arowold, n*sizeof(*a) );
+            }
+         }
+         index = astFree( index );
+         arowold = astFree( arowold );
+      }
+
+/* If required, calculate the U matrix. */
+      if( u ) {
+         for( i = 0; i < p; i++ ) {
+            pdata = job_data + i;
+            pdata->u = u;
+            pdata->aorig = aorig;
+            pdata->oper = 4;
+            thrAddJob( wf, 0, pdata, smf1_svd, 0, NULL, status );
+         }
+
+         thrWait( wf, status );
+      }
+
    }
 
 /* Free resources. */
@@ -341,6 +405,7 @@ L999:
    dn = astFree( dn );
    soblow = astFree( soblow );
    sobhigh = astFree( sobhigh );
+   aorig = astFree( aorig );
 
 }
 
@@ -369,21 +434,27 @@ static void smf1_svd( void *job_data_ptr, int *status ) {
 
 /* Local Variables: */
    SmfSvdData *pdata;
-   dim_t bsize;
    dim_t bsize2;
+   dim_t bsize;
    dim_t i;
+   dim_t icol;
    dim_t ind;
+   dim_t irow;
    dim_t j;
    dim_t k;
    dim_t n;
    double *c;
    double *pa;
+   double *paorig;
    double *pi;
    double *pj;
+   double *ps;
+   double *pu;
    double *s;
    double dii;
    double dij;
    double djj;
+   double sum;
    double sv;
    double t;
    double tau;
@@ -513,8 +584,8 @@ static void smf1_svd( void *job_data_ptr, int *status ) {
       s = astFree( s );
 
    } else if( pdata->oper == 3 ) {
-      pa = pdata->a + n*pdata->i1;
-      for( i = pdata->i1; i <= pdata->i2; i++ ) {
+      pa = pdata->a + n*pdata->j1;
+      for( i = pdata->j1; i <= pdata->j2; i++ ) {
          sv = 0.0;
          for( k = 0; k < n; k++,pa++ ) {
             sv += (*pa)*(*pa);
@@ -530,14 +601,37 @@ static void smf1_svd( void *job_data_ptr, int *status ) {
          }
       }
 
+   } else if( pdata->oper == 4 ) {
+      pu = pdata->u + pdata->i1;
+
+      for( i = pdata->i1; i <= pdata->i2; i++ ) {
+         irow = i/n;
+         icol = i - n*irow;
+
+         paorig = pdata->aorig + irow*n;
+         pa = pdata->a + icol*n;
+         ps = pdata->sigma;
+
+         sum = 0.0;
+         for( k = 0; k < n; k++ ) {
+            if( pdata->sigma[icol] != 0.0 ) {
+               sum += (*(paorig++))*(*(pa++))/pdata->sigma[icol];
+            } else {
+               paorig++;
+               pa++;
+               ps++;
+            }
+         }
+
+         *(pu++) = sum;
+      }
+
    } else if( *status == SAI__OK ){
       *status = SAI__ERROR;
       errRepf( "", "smf1_svd: Invalid operation (%d) supplied.",
                status, pdata->oper );
    }
 }
-
-
 
 static void smf1_roundrobin( dim_t p, int *up, int *dn ){
    double saved;
@@ -559,6 +653,16 @@ static void smf1_roundrobin( dim_t p, int *up, int *dn ){
 
 }
 
-
+static int smf1_compare( const void *a, const void *b ){
+   double aval = Sigma_array[ *( (const int *) a ) ];
+   double bval = Sigma_array[ *( (const int *) b ) ];
+   if( aval < bval ){
+      return 1;
+   } else if( aval > bval ){
+      return -1;
+   } else {
+      return 0;
+   }
+}
 
 

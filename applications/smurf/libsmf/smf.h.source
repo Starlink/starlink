@@ -1980,7 +1980,8 @@ void smf_subtract_poly( smfData *data, int rel, int *status );
 
 void smf_summarize_obs( const Grp * igrp, int * status );
 
-void smf_svd( ThrWorkForce *wf, dim_t n, double *a, double *sigma, double eps, int *status );
+void smf_svd( ThrWorkForce *wf, dim_t n, double *a, double *sigma,
+              double *u, double eps, int sort, int *status );
 
 const char * smf_swmode_str( smf_swmode mode, int * status );
 

@@ -433,7 +433,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   size_t step;            /* step size for job division */
   size_t tlen;            /* Length of the time-series used for PCA */
   size_t tstride;         /* time slice stride */
-  gsl_matrix *v=NULL;     /* orthogonal square matrix for SVD */
+  gsl_matrix *u=NULL;     /* orthogonal square matrix for SVD */
   gsl_vector *work=NULL;  /* workspace for SVD */
 
   if (*status != SAI__OK) return;
@@ -555,7 +555,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   comp = astCalloc( ngoodbolo*tlen, sizeof(*comp) );
   cov = gsl_matrix_alloc( ngoodbolo, ngoodbolo );
   s = gsl_vector_alloc( ngoodbolo );
-  v = gsl_matrix_alloc( ngoodbolo, ngoodbolo );
+  u = gsl_matrix_alloc( ngoodbolo, ngoodbolo );
   work = gsl_vector_alloc( ngoodbolo );
 
   /* These strides will make comp time-ordered */
@@ -675,19 +675,19 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     }
   }
 
-  /* Factor cov = u s v^T, noting that the gsl routine calculates u in
+  /* Factor cov = u s v^T, noting that the SVD routine calculates v in
      in-place of cov. --------------------------------------------------------*/
 
   msgOutif( MSG__VERB, "", FUNC_NAME
             ": perfoming singular value decomposition...", status );
 
-  smf_svd( wf, ngoodbolo, cov->data, s->data, 1.0E-10, status );
+  smf_svd( wf, ngoodbolo, cov->data, s->data, u->data, 1.0E-10, 1, status );
   if( CHECK ) {
     double check=0;
 
     for( i=0; i<ngoodbolo; i++ ) {
       for( j=0; j<ngoodbolo; j++ ) {
-        check += gsl_matrix_get( cov, i, j );
+        check += gsl_matrix_get( u, i, j );
       }
     }
 
@@ -707,7 +707,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   if( *status == SAI__OK ) {
     for( ii=0; ii<nw; ii++ ) {
       pdata = job_data + ii;
-      pdata->cov = cov;
+      pdata->cov = u;
       pdata->operation = 1;
       pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata, smfPCAParallel,
                                  0, NULL, status );
@@ -1112,7 +1112,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   goodbolo = astFree( goodbolo );
   if( cov ) gsl_matrix_free( cov );
   if( s ) gsl_vector_free( s );
-  if( v ) gsl_matrix_free( v );
+  if( u ) gsl_matrix_free( u );
   if( work ) gsl_vector_free( work );
 
   if( job_data ) {
