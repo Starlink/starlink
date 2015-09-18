@@ -1925,6 +1925,11 @@ class NDG(object):
          greater than or equal to the supplied integer.
       ndg_instance.list()
          Print the list of NDF paths.
+      ndg_instance.save( label ):
+         Save the paths to the NDFs that form a specified NDG, within
+         a file with the given label, so that the NDG can be identified
+         on any subequent restarted runs (see the "load" class method).
+
 
    Class Variables:
       NDG.tempdir = string
@@ -1949,6 +1954,9 @@ class NDG(object):
 	 All NDG objects created so far that refer to the deleted
 	 temporary directory are then reset so that each one represents
 	 an empty group.
+      ndg_instance = NDG.load( label ):
+         Create a new NDG from the names in a previously saved file with
+         the given label (see method "save").
       NDG.tempfile(suffix=".lis"):
          Returns the path to a new file in the temporary directory. It is
          guaranteed that this file does not exist, and so can be created
@@ -2203,6 +2211,16 @@ class NDG(object):
          result = NDG( ndfs )
       return result
 
+   #  Save an NDG to a text file with a given label in the tempdir.
+   def save( self, label ):
+      fpath = os.path.join(NDG.tempdir,"{0}.grp".format(label))
+      if os.path.exists(fpath):
+         raise UsageError("\n\nThe directory {0} already has an NDG group "
+                          "called {1}".format(NDG.tempdir,label) )
+      fd = open( fpath, "w" )
+      for ndf in self:
+         fd.write("{0}\n".format(ndf))
+      fd.close()
 
    #  Remove a single NDF (specified by path) from an NDG, or remove all
    #  NDFs with index greater than or equal to a given index
@@ -2276,6 +2294,18 @@ class NDG(object):
             fd.write("{0}\n".format(ndf))
          fd.close()
 
+
+   # Create a new NDG from a previously saved NDG.
+   @classmethod
+   def load( cls, label, report=False ):
+      fpath = os.path.join(NDG.tempdir,"{0}.grp".format(label))
+      if os.path.exists(fpath):
+         return NDG( "^{0}".format(fpath) )
+      elif report:
+         raise UsageError("\n\nNo NDG labelled '{0}' can be found in "
+                          "directory {1}".format(label,NDG.tempdir) )
+      else:
+         return None
 
    # Each active NDG object is reset so that it represents an empty
    # group. The NDG.tempdir directory is then deleted.

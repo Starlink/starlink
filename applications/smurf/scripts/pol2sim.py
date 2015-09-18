@@ -292,32 +292,6 @@ def cleanup():
    else:
       NDG.cleanup()
 
-#  Save the paths to the NDFs that form a specified NDG, within a file with given
-#  label, so that the NDG can be identified on any subequent restarted runs.
-def savendg( label, ndg ):
-   global retain
-   if retain:
-      fpath = os.path.join(NDG.tempdir,"{0}.grp".format(label))
-      if os.path.exists(fpath):
-         raise UsageError("\n\nThe directory {0} already has a group "
-                          "called {1}".format(NDG.tempdir,label) )
-      fd = open( fpath, "w" )
-      for ndf in ndg:
-         fd.write("{0}\n".format(ndf))
-      fd.close()
-
-#  Create a new NDG from the names in a previously stored file.
-def loadndg( label, report=False ):
-   fpath = os.path.join(NDG.tempdir,"{0}.grp".format(label))
-   if os.path.exists(fpath):
-      return NDG( "^{0}".format(fpath) )
-   elif report:
-      raise UsageError("\n\nThe directory {0} does not contain a list of "
-                       "the '{1}' group of NDFs".format(NDG.tempdir,label) )
-   else:
-      return None
-
-
 #  Catch any exception so that we can always clean up, even if control-C
 #  is pressed.
 try:
@@ -458,7 +432,7 @@ try:
    restart = parsys["RESTART"].value
    if restart == None:
       retain = parsys["RETAIN"].value
-      savendg( "IN", indata )
+      indata.save( "IN" )
 
    else:
       retain = True
@@ -466,7 +440,7 @@ try:
       if not os.path.isdir(restart):
          raise UsageError("\n\nThe directory specified by parameter RESTART ({0}) "
                           "does not exist".format(restart) )
-      fred = loadndg( "IN", True )
+      fred = NDG.load( "IN", True )
       if indata != fred:
          raise UsageError("\n\nThe directory specified by parameter RESTART ({0}) "
                           "refers to different time-series data".format(restart) )
@@ -477,13 +451,13 @@ try:
    os.environ["STAR_SEED"] = "65"
 
 #  Flat field the supplied template data
-   ff = loadndg( "FF" )
+   ff = NDG.load( "FF" )
    if not ff:
       ff = NDG(indata)
       msg_out( "Flatfielding template data...")
       invoke("$SMURF_DIR/flatfield in={0} out={1}".format(indata,ff) )
       ff = ff.filter()
-      savendg( "FF", ff  )
+      ff.save( "FF" )
    else:
       msg_out( "Re-using old flatfielded template data...")
 
@@ -574,19 +548,19 @@ try:
    if incom:
 
 #  First flat-field all the INCOM files.
-      cff = loadndg( "CFF" )
+      cff = NDG.load( "CFF" )
       if not cff:
          cff = NDG(incom)
          msg_out( "Flatfielding common-mode data...")
          invoke("$SMURF_DIR/flatfield in={0} out={1}".format(incom,cff) )
          cff = cff.filter()
-         savendg( "CFF", cff  )
+         cff.save( "CFF" )
       else:
          msg_out( "Re-using old flatfielded common-mode data...")
 
 #  Process each sub-scan separately as they may have different lengths.
       cfactor = parsys["CFACTOR"].value
-      com = loadndg( "COM" )
+      com = NDG.load( "COM" )
       if not com:
          msg_out( "Creating new artificial common-mode signals...")
 
@@ -705,7 +679,7 @@ try:
             invoke("$KAPPA_DIR/ndfcopy in={0}\({1}:{2}\) out={3}".
                    format(com_fixed,lbnd[icom],ubnd[icom],com[icom]))
 
-         savendg( "COM", com  )
+         com.save( "COM" )
 
       else:
          msg_out( "Re-using old artificial common-mode signals...")
@@ -719,7 +693,7 @@ try:
 # there is a gradient in X). This value, together with the amp4 and phase4
 # values used by unmakemap below, produce time-streams that look similar
 # to the real thing. The iP is at 15 degrees to the fixed analyser.
-   ipqu = loadndg( "IPQU" )
+   ipqu = NDG.load( "IPQU" )
    if not ipqu:
 
 #  Initialise value to "use no IP".
@@ -752,7 +726,7 @@ try:
          invoke("$KAPPA_DIR/maths exp='ip*sind(2*pt)' ip={0} pt={1} out={2}".
                 format(ipi,iptheta,ipqu[1] ))
 
-         savendg( "IPQU", ipqu  )
+         ipqu.save( "IPQU" )
 
 #  Johnstone/Kennedy IP model.
       elif ipform == "JK":
@@ -765,7 +739,7 @@ try:
 #  Create GAI values from the supplied template data.
    gfactor = parsys["GFACTOR"].value
    if gfactor != 0.0:
-      gai = loadndg( "GAI" )
+      gai = NDG.load( "GAI" )
       if not gai:
          msg_out( "Creating new artificial GAI models...")
          gai = NDG(ff)
@@ -840,7 +814,7 @@ try:
 #  Smooth and fill holes
          invoke("$KAPPA_DIR/gausmooth in={0} fwhm=3 wlim=1E-6 out={1}".
                 format(m3,gai))
-         savendg( "GAI", gai )
+         gai.save( "GAI" )
       else:
          msg_out( "Re-using old artificial GAI models...")
 
