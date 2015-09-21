@@ -108,6 +108,11 @@
 *  History:
 *     8-MAY-2015 (DSB):
 *        Initial version
+*     21-SEP-2015 (DSB):
+*        Check for sections of the time stream where the sample rate goes
+*        bananas, resulting in far fewer samples per rotation of the HWP
+*        than usual. For instamce, in s8a20150918_00018_0017 around sample
+*        4040, the sample rate drops briefly from 178 Hz to 9 Hz.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -181,7 +186,8 @@ typedef struct smfFitQUIJobData {
 /* Prototypes for local functions */
 static void smf1_fit_qui_job( void *job_data, int *status );
 static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t box,
-                             dim_t *ontslice, dim_t **box_starts, int *status );
+                             dim_t *ontslice, dim_t **box_starts, dim_t *lolim,
+                             dim_t *hilim, int *status );
 
 /* Number of free parameters in the fit */
 #define NPAR 10
@@ -205,9 +211,11 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    const char *usesys;      /* Tracking system */
    dim_t *box_starts;       /* Array holding time slice at start of each box */
    dim_t box_size;          /* First time slice in box */
+   dim_t hilim;             /* Max no. of samples in a box */
    dim_t intslice;          /* ntslice of idata */
    dim_t istart;            /* Input time index at start of fitting box */
    dim_t itime;             /* Time slice index */
+   dim_t lolim;             /* Min no. of samples in a box */
    dim_t nbolo;             /* No. of bolometers */
    dim_t ncol;              /* No. of columns of bolometers in the array */
    dim_t ntime;             /* Time slices to check */
@@ -216,6 +224,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    double scale;            /* how much longer new samples are */
    int bstep;               /* Bolometer step between threads */
    int iworker;             /* Index of a worker thread */
+   int nodd;                /* No. of straneg box lengths found and ignored */
    int nworker;             /* No. of worker threads */
    size_t i;                /* loop counter */
    smfData *indksquid=NULL; /* Pointer to input dksquid data */
@@ -270,7 +279,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 /* Find the input time slice at which each fitting box starts, and the
    length of the output time axis (in time-slices). */
    smf1_find_boxes( intslice, hdr->allState, box, &ontslice, &box_starts,
-                    status );
+                    &lolim, &hilim, status );
 
 /* Time axis scaling factor. */
    scale = (double) intslice / (double) ontslice;
@@ -351,6 +360,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
       pdata->b2 = nbolo - 1;
 
 /* Loop round all output time slices. */
+      nodd = 0;
       for( itime = 0; itime < ontslice; itime++ ) {
 
 /* Get the index of the first input time slice that contributes to the
@@ -360,6 +370,13 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 /* Get the number of input time slices that contribute to the output time
    slice. */
          box_size = box_starts[ itime + 1 ] - istart;
+
+/* Check this box is of a usable length. If not, set the box size to zero
+   and increent the number of strange boxes. */
+         if( box_size < lolim || box_size > hilim ) {
+            nodd++;
+            box_size = 0;
+         }
 
 /* If we are using north as the reference direction, get the WCS FrameSet
    for the input time slice that is at the middle of the output time
@@ -374,7 +391,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
             wcs = NULL;
          }
 
-/* Now enter the parellel code in which each thread calculates the values
+/* Now enter the parallel code in which each thread calculates the values
    for a range of bolometers at the current output slice. */
          for( iworker = 0; iworker < nworker; iworker++ ) {
             pdata = job_data + iworker;
@@ -418,6 +435,12 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
                pdata->wcs = astAnnul( pdata->wcs );
             }
          }
+      }
+
+      if( nodd ) {
+         msgOutf( "", "WARNING: %d block(s) of POL_ANG values had unusual lengths "
+                  "(i.e. outside the range of %zu to %zu samples) and were ignored.",
+                  status, nodd, lolim, hilim );
       }
 
 /* Down-sample the smfHead -------------------------------------------------*/
@@ -713,7 +736,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
          }
 
 /* If the whole bolometer is bad, put bad values into the outputs. */
-         if( *qua & SMF__Q_BADB || tr_angle == VAL__BADD ) {
+         if( *qua & SMF__Q_BADB || tr_angle == VAL__BADD || box_size == 0 ) {
             if( ipi ) *(ipi++) = VAL__BADD;
             *(ipq++) = VAL__BADD;
             *(ipu++) = VAL__BADD;
@@ -1007,9 +1030,17 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 /* Find the solution to the 10x10 set of linear equations. The matrix is
    symmetric and positive-definite so use Cholesky decomposition.  */
                memset( solution, 0, NPAR*sizeof(*solution) );
-               gsl_linalg_cholesky_decomp( &gsl_m.matrix );
-               gsl_linalg_cholesky_solve( &gsl_m.matrix, &gsl_b.vector,
-                                          &gsl_x.vector );
+               gsl_set_error_handler_off();
+               if( gsl_linalg_cholesky_decomp( &gsl_m.matrix ) != 0 ) {
+                  *status = SAI__ERROR;
+                  errRepf( "", "smf_fit_qui: Error returned by "
+                          "gsl_linalg_cholesky_decomp (bolo %zu)", status, ibolo );
+               } else if( gsl_linalg_cholesky_solve( &gsl_m.matrix, &gsl_b.vector,
+                                                     &gsl_x.vector ) != 0 ) {
+                  *status = SAI__ERROR;
+                  errRepf( "", "smf_fit_qui: Error returned by "
+                          "gsl_linalg_cholesky_solve  (bolo %zu)", status, ibolo );
+               }
 
 /* Modify Q and U so they use the requested reference direction, and store in
    the output arrays. */
@@ -1111,7 +1142,8 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 
 
 static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t box,
-                             dim_t *ontslice, dim_t **box_starts, int *status ) {
+                             dim_t *ontslice, dim_t **box_starts, dim_t *lolim,
+                             dim_t *hilim, int *status ) {
 /*
 *  Name:
 *     smf1_find_boxes
@@ -1128,7 +1160,8 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
 
 *  Invocation:
 *     smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t box,
-*                      dim_t *ontslice, dim_t **box_starts, int *status )
+*                      dim_t *ontslice, dim_t **box_starts, dim_t *lolim,
+*                      dim_t *hilim, int *status )
 
 *  Arguments:
 *     intslice = dim_t (Given)
@@ -1146,6 +1179,10 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
 *        equal to (*ontslice) + 1  - the extra last element is the index
 *        of the first input time slice beyond the end of the last fitting
 *        box.
+*     lolim = dim_t * (Returned)
+*        The lowest box length that should be used.
+*     hilim = dim_t * (Returned)
+*        The highest box length that should be used.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -1160,10 +1197,13 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
 /* Local Variables: */
    char more;
    const JCMTState *state;
+   dim_t length;
    dim_t iel;
    dim_t itime;
    dim_t nrot;
    double ang0 = 0.5*AST__DPI;
+   double s1;
+   double s2;
 
 /* Initialise returned values. */
    *ontslice = 0;
@@ -1200,6 +1240,8 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
    }
 
 /* Loop over all rotations. */
+   s1 = 0.0;
+   s2 = 0.0;
    while( 1 ) {
 
 /* Move on until the HWP angle wraps round back to zero. */
@@ -1226,7 +1268,14 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
          nrot = 0;
          iel = (*ontslice)++;
          *box_starts = astGrow( *box_starts, *ontslice, sizeof( **box_starts ) );
-         if( *status == SAI__OK ) (*box_starts)[ iel ] = itime;
+         if( *status == SAI__OK ) {
+            (*box_starts)[ iel ] = itime;
+            if( iel > 0 ) {
+               length = itime-(*box_starts)[iel-1];
+               s1 += length;
+               s2 += length*length;
+            }
+         }
       }
    }
 
@@ -1234,6 +1283,16 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
    values in "box_Starts", because the last value in "box_starts" is the end
    of the last box. */
    (*ontslice)--;
+
+/* Find the mean and standard deviation of the box lengths. */
+   s1 /= (*ontslice);
+   s2 = s2/(*ontslice) - s1*s1;
+   s2 = ( s2 > 0.0 ) ? sqrt( s2 ) : 0.0;
+
+/* Return the limits for usable box lengths. */
+   *lolim = (dim_t) ( s1 - 3.0*s2 );
+   *hilim = (dim_t) ( s1 + 3.0*s2 );
+
 }
 
 
