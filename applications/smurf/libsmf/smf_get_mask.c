@@ -238,7 +238,6 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    int zero_notlast;          /* Don't zero on last iteration? */
    int zero_snr_ffclean;      /* Define mask using ffclean algorithm? */
    int zero_snr_lopass;       /* Size of box for low-pass smoothing SNR map */
-   int zero_snr_neg;          /* Can ffclean sources have negative values? */
    size_t ngood;              /* Number good samples for stats */
    unsigned char **mask;      /* Address of model's mask pointer */
    unsigned char *accmask;    /* Mask to be accumulated into the new mask */
@@ -372,7 +371,6 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
          zero_snr_lopass = 0;
          zero_snr_hipass = 0.0;
          zero_snr = 0.0;
-         zero_snr_neg = 0;
          astMapGet0D( subkm, "ZERO_SNR", &zero_snr );
          if( zero_snr > 0.0 ) {
             if( dat->mapok ) {
@@ -381,7 +379,6 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                astMapGet0D( subkm, "ZERO_SNR_HIPASS", &zero_snr_hipass );
                astMapGet0I( subkm, "ZERO_SNR_LOPASS", &zero_snr_lopass );
                astMapGet0I( subkm, "ZERO_SNR_FFCLEAN", &zero_snr_ffclean );
-               astMapGet0I( subkm, "ZERO_SNR_NEG", &zero_snr_neg );
             }
          } else if( zero_snr <  0.0 && *status == SAI__OK ) {
             *status = SAI__ERROR;
@@ -615,7 +612,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                         mapuse = smf_ffclean( wf, dat->map, dat->mapvar,
                                               dat->mdims, hipass,
                                               zero_snr_lopass, zero_snr, 0,
-                                              zero_snr_neg, NULL, status );
+                                              abssnr, NULL, status );
                         if( *status == SAI__OK ) {
                            pd = mapuse;
                            pn = newmask;
