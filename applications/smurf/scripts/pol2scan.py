@@ -29,23 +29,15 @@
 *        The MAKEMAP configuration parameter values to use. If a null
 *        value (!) or "def" is supplied, the following defaults will be used:
 *
-*        numiter=-20
+*        ast.zero_snr=3
+*        ast.zero_snrlo=2
 *        maptol=0.05
-*        itermap=2
-*        ast.zero_snr_ffclean=1
-*        ast.zero_snr_hipass=200
-*        ast.zero_snr=4
-*        ast.zero_snr_neg=1
-*        ast.skip=2
-*        com.zero_snr_ffclean=1
-*        com.zero_snr_hipass=200
-*        com.zero_snr=4
-*        com.zero_snr_neg=1
+*        modelorder=(pca,ext,ast,noi)
 *        noisecliphigh=3
-*        com.perarray=1
-*        com.noflag=1
-*        spikethresh = 5
-*        spikebox = 10
+*        numiter=-20
+*        pca.pcathresh=4
+*        spikebox=10
+*        spikethresh=5
 *
 *        In addition, the following values are always appended to the end
 *        of the used config (whether supplied or defaulted):
@@ -165,6 +157,8 @@
 *  History:
 *     20-MAY-2015 (DSB):
 *        Original version
+*     21-SEP-2015 (DSB):
+*        Update default config to use PCA instead of COM/GAI.
 *-
 '''
 
@@ -325,23 +319,15 @@ try:
 
 #  Otherwise put in the default values.
    else:
-      fd.write("numiter=-20\n")
+      fd.write("ast.zero_snr=3\n")
+      fd.write("ast.zero_snrlo=2\n")
       fd.write("maptol=0.05\n")
-      fd.write("itermap=2\n")
-      fd.write("ast.zero_snr_ffclean=1\n")
-      fd.write("ast.zero_snr_hipass=200\n")
-      fd.write("ast.zero_snr=4\n")
-      fd.write("ast.zero_snr_neg=1\n")
-      fd.write("ast.skip=2\n")
-      fd.write("com.zero_snr_ffclean=1\n")
-      fd.write("com.zero_snr_hipass=200\n")
-      fd.write("com.zero_snr=4\n")
-      fd.write("com.zero_snr_neg=1\n")
+      fd.write("modelorder=(pca,ext,ast,noi)\n")
       fd.write("noisecliphigh=3\n")
-      fd.write("com.perarray=1\n")
-      fd.write("com.noflag=1\n")
-      fd.write("spikethresh=5\n")
+      fd.write("numiter=-20\n")
+      fd.write("pca.pcathresh=4\n")
       fd.write("spikebox=10\n")
+      fd.write("spikethresh=5\n")
 
 #  Now put in values that are absolutely required by this script. These
 #  over-write any values in the user-supplied config.
