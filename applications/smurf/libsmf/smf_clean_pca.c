@@ -681,7 +681,8 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   msgOutif( MSG__VERB, "", FUNC_NAME
             ": perfoming singular value decomposition...", status );
 
-  smf_svd( wf, ngoodbolo, cov->data, s->data, u->data, 1.0E-10, 1, status );
+  smf_svd( wf, ngoodbolo, cov->data, s->data, u->data, 10*VAL__EPSD,
+           1, status );
   if( CHECK ) {
     double check=0;
 
