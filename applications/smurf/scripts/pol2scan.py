@@ -279,7 +279,7 @@ try:
 
       msg_out( "Calculating Q and U time streams for each bolometer...")
       invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config=def outq={1}/\*_QT "
-             "outu={1}/\*_UT".format( indata, qudir ) )
+             "outu={1}/\*_UT fix=yes".format( indata, qudir ) )
 
 #  Get groups listing the time series files created by calcqu.
       qts = NDG( "{0}/*_QT".format( qudir ) )
