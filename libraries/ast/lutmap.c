@@ -111,6 +111,10 @@ f     The LutMap class does not define any new routines beyond those
 *        Check for Infs as well as NaNs.
 *     21-MAY-2015 (DSB):
 *        Aded LutEpsilon
+*     23-SEP-2015 (DSB):
+*        The GetMonotonic function had a bug that caused all LutMaps
+*        to be considered monotonic, and thus have an inverse
+*        transformation.
 *class--
 */
 
@@ -805,6 +809,8 @@ static int GetMonotonic( int nlut, const double *lut, int *nluti, double **luti,
                break;
             }
 
+/* Record the current good value. */
+            lval = lut[ ilut ];
          }
       } else {
          nbad++;
