@@ -528,6 +528,21 @@ try:
          raise starutil.InvalidParameterError("Reference image ({0}) has "
                     "incorrect units '{1} - must be 'pW'.".format(iref,iunits))
 
+#  Ensure it is 2-dimensional (remove a degenerate 3rd pixel axis if necessary)
+      ndim = starutil.get_task_par( "NDIM", "ndftrace" )
+      if ndim == 3:
+         if starutil.get_task_par( "DIMS(3)", "ndftrace" ) == 1:
+            newref = NDG(1)
+            invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".
+                    format(iref,newref) )
+            iref = newref
+         else:
+            raise starutil.InvalidParameterError("Reference image ({0}) is "
+                    "a cube!It must be a 2-d image.'.".format(iref))
+      elif ndim != 2:
+         raise starutil.InvalidParameterError("Reference image ({0}) is "
+                 "{1} dimensional - it must be a 2-d image.'.".format(iref,ndim))
+
 #  Ensure the I image has the requested domain.
       icur = int( starutil.get_task_par( "CURRENT", "ndftrace" ))
       try:
