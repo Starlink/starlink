@@ -109,6 +109,17 @@ at each step.  This recipe also performs a source finder routine; the
 results are written as a FITS catalogue (with file extension
 \file{.FIT}) which can be read as a local catalogue into \gaia.
 
+\subsection{\xlabel{brightcom}\drrecipe{REDUCE\_SCAN\_ISOLATED\_SOURCE}}
+
+\textbf{Configuration file: \file{dimmconfig\_bright\_compact.lis}}
+
+This is the recipe used for processing calibrator data. It can also
+be used for any map of a single bright, isolated source at the
+tracking position. 
+
+This reduction constrains the map to zero beyond a radius of 1 arc-min
+from the source centre. See \cref{Section}{sec:brightcompact}{dimmconfig\_bright\_compact.lis}
+
 
 \subsection{\xlabel{faintjk}\drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE}}
 
