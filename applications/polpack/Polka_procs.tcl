@@ -2843,16 +2843,25 @@ proc DrawGwm {} {
 
       } {
          if { [Obey kappa stats "ndf=$data"] } {
-            set maxm [GetParamED kappa stats:maximum]
-            set minm [GetParamED kappa stats:minimum]
+            set ngood [GetParamED kappa stats:numgood]
+            if { $ngood > 2 } {
+               set maxm [GetParamED kappa stats:maximum]
+               set minm [GetParamED kappa stats:minimum]
+               puts "DATA $data"
+               puts "MAXM $maxm"
+               puts "MINM $minm"
 
-            if { abs( $maxm/2.0 - $minm/2.0 ) <
-                 2.0E-4 * ( abs($maxm)/2.0 + abs($minm)/2.0 ) } {
-               set pars "mode=flash"
-               set scalow $minm
-               set scahigh $maxm
+               if { abs( $maxm/2.0 - $minm/2.0 ) <
+                    2.0E-4 * ( abs($maxm)/2.0 + abs($minm)/2.0 ) } {
+                  set pars "mode=flash"
+                  set scalow $minm
+                  set scahigh $maxm
+               } {
+                  set pars "mode=perc percentiles=\[$PLO_REQ,$PHI_REQ\]"
+               }
+
             } {
-               set pars "mode=perc percentiles=\[$PLO_REQ,$PHI_REQ\]"
+               set pars "mode=scale low=0 high=1"
             }
          }
       }
@@ -9501,6 +9510,13 @@ proc PixIndSection {imsec} {
 
 # Use KAPPA:NDFTRACE to find the pixel index bounds of the supplied image.
    Obey ndfpack ndftrace "ndf=\"$imsec\" quiet" 1
+
+#  Check it is 2-dimensional.
+   set ndim [GetParamED ndfpack ndftrace:ndim]
+   if { $ndim != 2 } {
+      Message "Image \"$imsec\" has $ndim pixel axes - images must have 2 pixel axes."
+      exit
+   }
 
 # Get the lower and upper bounds.
    set lbound [GetParamED ndfpack ndftrace:lbound]
