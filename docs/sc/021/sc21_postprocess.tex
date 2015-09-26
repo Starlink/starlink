@@ -252,7 +252,7 @@ degrees.
 \subsection{Getting the noise}
 \label{sec:mapstats}
 
-You can use the \picard\ recipe \drrecipe{SCUBA2\_MAPSATS} get the
+You can use the \picard\ recipe \drrecipe{SCUBA2\_MAPSTATS} get the
 noise. This recipe estimates the RMS from both the map, the NEP, and
 the RMS predicted by the Integration Time Calculator. It then writes out
 a series of results in a log file called \file{log.mapstats}. The
@@ -277,7 +277,7 @@ is clear to users which line of the logfile corresponds to which input file.
 
 \subsubsection*{Steps for getting your coadded-map noise}
 After applying any necessary FCF, \drrecipe{SCUBA2\_MAPSTATS} simply
-executs the following steps to get the map noise.
+executes the following steps to get the map noise.
 
 \begin{enumerate}
 \item Crop the map to remove the noisy edges.
