@@ -39,8 +39,11 @@
 *        spikebox=10
 *        spikethresh=5
 *
-*        In addition, the following values are always appended to the end
-*        of the used config (whether supplied or defaulted):
+*        Any values supplied via an external config file for these
+*        parameters override the above values (any of these parameters
+*        that are unspecified in the external config retain the above
+*        defaults). In addition, the following values are always appended
+*        to the end of the used config (whether external or defaulted):
 *
 *        flagslow = 0.01
 *        downsampscale = 0
@@ -159,7 +162,10 @@
 *        Original version
 *     21-SEP-2015 (DSB):
 *        Update default config to use PCA instead of COM/GAI.
-*-
+*     28-SEP-2015 (DSB):
+*        - Add azel pointing correction for old data.
+*        - Allow default config values to be used as the defaults even
+*          if an external config is supplied.
 '''
 
 import os
@@ -312,22 +318,21 @@ try:
    conf = os.path.join(NDG.tempdir,"conf")
    fd = open(conf,"w")
 
-#  If a non-default config was supplied, put it in as the first item in
-#  the config.
+#  Start off with the default values.
+   fd.write("ast.zero_snr=3\n")
+   fd.write("ast.zero_snrlo=2\n")
+   fd.write("maptol=0.05\n")
+   fd.write("modelorder=(pca,ext,ast,noi)\n")
+   fd.write("noisecliphigh=3\n")
+   fd.write("numiter=-20\n")
+   fd.write("pca.pcathresh=4\n")
+   fd.write("spikebox=10\n")
+   fd.write("spikethresh=5\n")
+
+#  If a non-default config was supplied, append it to end of the above
+#  config.
    if config and config != "def":
       fd.write("{0}\n".format(config))
-
-#  Otherwise put in the default values.
-   else:
-      fd.write("ast.zero_snr=3\n")
-      fd.write("ast.zero_snrlo=2\n")
-      fd.write("maptol=0.05\n")
-      fd.write("modelorder=(pca,ext,ast,noi)\n")
-      fd.write("noisecliphigh=3\n")
-      fd.write("numiter=-20\n")
-      fd.write("pca.pcathresh=4\n")
-      fd.write("spikebox=10\n")
-      fd.write("spikethresh=5\n")
 
 #  Now put in values that are absolutely required by this script. These
 #  over-write any values in the user-supplied config.
@@ -347,7 +352,7 @@ try:
       tumap = umap
 
 #  AZ/EL pointing correction, for pre 20150929 data.
-   if int(get_fits_header( qts[0], "UTDATE", True )) < 20150929:
+   if int(starutil.get_fits_header( qts[0], "UTDATE", True )) < 20150929:
       pntfile = os.path.join(NDG.tempdir,"pointing")
       fd = open(pntfile,"w")
       fd.write("# system=azel\n")
