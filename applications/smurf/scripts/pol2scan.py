@@ -346,14 +346,26 @@ try:
       tqmap = qmap
       tumap = umap
 
+#  AZ/EL pointing correction, for pre 20150929 data.
+   if int(get_fits_header( qts[0], "UTDATE", True )) < 20150929:
+      pntfile = os.path.join(NDG.tempdir,"pointing")
+      fd = open(pntfile,"w")
+      fd.write("# system=azel\n")
+      fd.write("# tai dlon dlat\n")
+      fd.write("54000 32.1 27.4\n")
+      fd.write("56000 32.1 27.4\n")
+      fd.close()
+   else:
+      pntfile = "!"
+
 #  Make a map from the Q time series.
    msg_out( "Making a map from the Q time series...")
    if qref:
       ref = qref
    else:
       ref = "!"
-   invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3}".
-          format(qts,conf,tqmap,ref))
+   invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4}".
+          format(qts,conf,tqmap,ref,pntfile))
 
 #  Make a map from the U time series.
    msg_out( "Making a map from the U time series..." )
@@ -361,8 +373,8 @@ try:
       ref = uref
    else:
       ref = "!"
-   invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3}".
-          format(uts,conf,tumap,ref))
+   invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4}".
+          format(uts,conf,tumap,ref,pntfile))
 
 #  Rotate the polarimetric reference direction if required.
    if qref and uref:
