@@ -17,7 +17,7 @@
 *     smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 *                  smfData **odatau, smfData **odatai, dim_t box,
 *                  int ipolcrd, int pasign, double paoff, double angrot,
-*                  int north, int *status )
+*                  int north, int harmonic, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -54,6 +54,15 @@
 *        If non-zero, the returned Q/U values use north in the tracking
 *        system as their reference direction. Otherwise, the reference
 *        direction is the focal plane Y axis.
+*     harmonic = int  (Given)
+*        The harmonic(s) of the half-wave plate rotation from which the Q
+*        and U values should be derived. This should normally be 4, but
+*        other values can be used to investigate the effects of asymetry in
+*        the half-wave plate, etc. The returned Q and U values are the
+*        sum of the requested harmonics. For instance if "harmonic" is 13,
+*        i.e. 1 + 4 + 8, then the returned Q and U values will be the sum
+*        of the individual Q and U values formed from the first, fourth and
+*        eigth harmonic.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -79,6 +88,22 @@
 *        U = 2*A
 *        Q = 2*B
 *        I = 2*( G*box/2 + H )
+*
+*     This is assuming "harmonic" is supplied set to 4. If it is set to
+*     1, the returned Q/U values are (I remains unchanged):
+*
+*        U = 2*E
+*        Q = 2*F
+*
+*     If "harmonic" is set to 2, the returned Q/U values are:
+*
+*        U = 2*C
+*        Q = 2*D
+*
+*     If "harmonic" is set to 8, the returned Q/U values are:
+*
+*        U = 2*J
+*        Q = 2*K
 *
 *     The Q and U values are specified with respect to either tracking
 *     north, or focal plane Y axis (see argument "north").
@@ -113,6 +138,8 @@
 *        bananas, resulting in far fewer samples per rotation of the HWP
 *        than usual. For instamce, in s8a20150918_00018_0017 around sample
 *        4040, the sample rate drops briefly from 178 Hz to 9 Hz.
+*     29-SEP-2015 (DSB):
+*        Added parameter "harmonic".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -177,6 +204,7 @@ typedef struct smfFitQUIJobData {
    double *ipv;
    double angrot;
    double paoff;
+   int harmonic;
    int ipolcrd;
    int north;
    int pasign;
@@ -202,7 +230,7 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
 void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
                   smfData **odatau, smfData **odatai, dim_t box, int ipolcrd,
                   int pasign, double paoff, double angrot, int north,
-                  int *status ){
+                  int harmonic, int *status ){
 
 /* Local Variables: */
    AstFrameSet *wcs;        /* WCS FrameSet for current time slice */
@@ -246,6 +274,13 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    if( idata->ndims != 3 ) {
       *status = SAI__ERROR;
       errRep( "", "smf_fit_qui: idata is not 3-dimensional", status );
+      return;
+   }
+
+   if( harmonic > 15 ) {
+      *status = SAI__ERROR;
+      errRepf( "", "smf_fit_qui: supplied 'harmonic' value (%d) is illegal",
+               status, harmonic );
       return;
    }
 
@@ -412,6 +447,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
             pdata->pasign = pasign ? +1: -1;
             pdata->paoff = paoff;
             pdata->angrot = angrot;
+            pdata->harmonic = harmonic;
             if( wcs ) {
                pdata->wcs = astCopy( wcs );
                astUnlock( pdata->wcs, 1 );
@@ -621,6 +657,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    double matrix[ NPAR*NPAR ];
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double phi;                /* Angle from fixed analyser to effective analyser */
+   double qval;
    double res;
    double s1;                 /* Sum of weighted cosine terms */
    double s2;                 /* Sum of weighted sine terms */
@@ -634,11 +671,13 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    double sy[2];              /* SKY Y coord at bolometer and northern point*/
    double tr_angle;
    double twophi;
+   double uval;
    double vector[ NPAR ];
    double wplate;             /* Angle from fixed analyser to have-wave plate */
    gsl_matrix_view gsl_m;
    gsl_vector_view gsl_b;
    gsl_vector_view gsl_x;
+   int harmonic;
    int ipolcrd;               /* Reference direction for pol_ang */
    int nsum1;
    int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
@@ -680,6 +719,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    paoff = pdata->paoff;
    angrot = pdata->angrot;
    box_size = pdata->box_size;
+   harmonic = pdata->harmonic;
 
    wcs = pdata->wcs;
    if( wcs ) {
@@ -1042,12 +1082,38 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
                           "gsl_linalg_cholesky_solve  (bolo %zu)", status, ibolo );
                }
 
+/* Get the required Q/U values. Which coefficients to use depends on the
+   requested harmonic (usually 4). The "solution" array holds A, B, C,
+   etc, in order (see prologue description). */
+               if( harmonic & 4 ) {
+                  qval = 2*solution[ 1 ];
+                  uval = 2*solution[ 0 ];
+               } else {
+                  qval = 0.0;
+                  uval = 0.0;
+               }
+
+               if( harmonic & 1 ) {
+                  qval += 2*solution[ 5 ];
+                  uval += 2*solution[ 4 ];
+               }
+
+               if( harmonic & 2 ) {
+                  qval += 2*solution[ 3 ];
+                  uval += 2*solution[ 2 ];
+               }
+
+               if( harmonic & 8 ) {
+                  qval += 2*solution[ 9 ];
+                  uval += 2*solution[ 8 ];
+               }
+
 /* Modify Q and U so they use the requested reference direction, and store in
    the output arrays. */
                cosval = cos( 2*( angrot - tr_angle ) );
                sinval = sin( 2*( angrot - tr_angle ) );
-               *(ipq++) = 2*( -solution[ 1 ]*cosval + solution[ 0 ]*sinval );
-               *(ipu++) = 2*( -solution[ 1 ]*sinval - solution[ 0 ]*cosval );
+               *(ipq++) = -qval*cosval + uval*sinval;
+               *(ipu++) = -qval*sinval - uval*cosval;
 
 /* Store the correspoinding I value. */
                if( ipi ) *(ipi++) = solution[ 6 ]*box_size + 2*solution[ 7 ];

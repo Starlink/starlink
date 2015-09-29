@@ -409,11 +409,11 @@ void smurf_calcqu( int *status ) {
 /* See if least-squares method is to be used. */
       parGet0l( "LSQFIT", &lsqfit, status );
 
+/* See what harmonic is to bused. */
+      parGdr0i( "HARMONIC", 4, 1, 15, 1, &harmonic, status );
+
 /* Set up for non-lsq approach. */
       if( !lsqfit ) {
-
-/* See what harmonic is to bused. */
-         parGet0i( "HARMONIC", &harmonic, status );
 
 /* Create HDS container files to hold the output NDFs. */
          datCreat( "OUTQ", "CALCQU", 0, 0, status );
@@ -695,7 +695,7 @@ void smurf_calcqu( int *status ) {
 /* Generate the I, Q and U time-streams for the current chunk. */
                smf_fit_qui( wf, data, &odataq, &odatau, ogrpi ? &odatai : NULL,
                             (dim_t) polbox, ipolcrd, pasign, AST__DD2R*paoff,
-                            AST__DD2R*angrot, north, status );
+                            AST__DD2R*angrot, north, harmonic, status );
 
 /* Copy the smfData structures to the output NDFs. */
                smf_write_smfData ( wf, odataq, NULL, NULL, ogrpq, gcount,
