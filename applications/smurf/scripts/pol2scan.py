@@ -22,7 +22,7 @@
 *     POL2 spin&scan data.
 
 *  Usage:
-*     pol2scan in q u [config] [qudir] [retain] [msg_filter] [ilevel] [glevel] [logfile]
+*     pol2scan in q u [config] [pixsize] [qudir] [retain] [msg_filter] [ilevel] [glevel] [logfile]
 
 *  Parameters:
 *     CONFIG = LITERAL (Read)
@@ -107,6 +107,9 @@
 *        within the command string passed to the "invoke" function. The
 *        accepted values are the list defined in SUN/104 ("None", "Quiet",
 *        "Normal", "Verbose", etc). ["Normal"]
+*     PIXSIZE = _REAL (Read)
+*        Pixel dimensions in the output Q and U maps, in arcsec. The default
+*        is 4 arc-sec for 850 um data and 2 arc-sec for 450 um data. []
 *     Q = NDF (Read)
 *        The output NDF in which to return the Q intensity map.
 *     QUDIR = LITTERAL (Read)
@@ -166,6 +169,8 @@
 *        - Add azel pointing correction for old data.
 *        - Allow default config values to be used as the defaults even
 *          if an external config is supplied.
+*     29-SEP-2015 (DSB):
+*        - Add parameter PIXSIZE.
 '''
 
 import os
@@ -222,6 +227,9 @@ try:
    params.append(starutil.Par0S("CONFIG", "Map-maker tuning parameters",
                                 "def", noprompt=True))
 
+   params.append(starutil.Par0F("PIXSIZE", "Pixel size (arcsec)", None,
+                                 maxval=1000, minval=0.01))
+
    params.append(starutil.Par0S("QUDIR", "Directory in which to save the "
                                 "Q/U time series", None, noprompt=True))
 
@@ -263,8 +271,13 @@ try:
    qmap = parsys["Q"].value
    umap = parsys["U"].value
 
-#  The user-supplied makemap config.
+#  The user-supplied makemap config, and pixel size.
    config = parsys["CONFIG"].value
+   pixsize = parsys["PIXSIZE"].value
+   if pixsize:
+      pixsize = "pixsize={0}".format(pixsize)
+   else:
+      pixsize = ""
 
 #  See if temp files are to be retained.
    retain = parsys["RETAIN"].value
@@ -369,8 +382,8 @@ try:
       ref = qref
    else:
       ref = "!"
-   invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4}".
-          format(qts,conf,tqmap,ref,pntfile))
+   invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} {5}".
+          format(qts,conf,tqmap,ref,pntfile,pixsize))
 
 #  Make a map from the U time series.
    msg_out( "Making a map from the U time series..." )
@@ -378,8 +391,8 @@ try:
       ref = uref
    else:
       ref = "!"
-   invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4}".
-          format(uts,conf,tumap,ref,pntfile))
+   invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} {5}".
+          format(uts,conf,tumap,ref,pntfile,pixsize))
 
 #  Rotate the polarimetric reference direction if required.
    if qref and uref:
