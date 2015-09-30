@@ -5979,6 +5979,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter pointing {
+                type _CHAR
+                prompt {Text file containing pointing corrections}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                helpkey *
+            }
+
             parameter ref {
                 position 2
                 type NDF

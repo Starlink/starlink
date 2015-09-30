@@ -288,8 +288,10 @@
 *        - Base names of output NDFs on the names of the flatfielded
 *        NDFs, rather than the supplied input NDFs. This is because
 *        the input NDFs include non-science files (flatfields, darks,
-*        etc). 
+*        etc). This bug caused pol2sim to loose track of sub-scan numbers
+*        when processing data form multiple subarrays.
 *        - Added parameter ADDON.
+*        - Add azel pointing correction for old data.
 
 *-
 '''
@@ -401,6 +403,18 @@ try:
 #  makemap). Quote the string so that it can be used as command line
 #  argument when running an atask from the shell.
    indata = parsys["IN"].value
+
+#  AZ/EL pointing correction, for pre 20150929 data.
+   if int(starutil.get_fits_header( indata[0], "UTDATE", True )) < 20150929:
+      pntfile = os.path.join(NDG.tempdir,"pointing")
+      fd = open(pntfile,"w")
+      fd.write("# system=azel\n")
+      fd.write("# tai dlon dlat\n")
+      fd.write("54000 32.1 27.4\n")
+      fd.write("56000 32.1 27.4\n")
+      fd.close()
+   else:
+      pntfile = "!"
 
 #  Are we inheriting noise from the input (real) time-streams, rather
 #  than generating artificial noise?
@@ -894,10 +908,11 @@ try:
    invoke("$SMURF_DIR/unmakemap in={0} qin={1} uin={2} ref={3} "
           "sigma={4} out={5} interp=sincsinc params=\[0,3\] com={6} "
           "instq={7} instu={8} ipdata='{16}' amp4={9} phase4={10} "
-          "amp2={11} phase2={12} amp16={13} phase16={14} gai={15}".
+          "amp2={11} phase2={12} amp16={13} phase16={14} gai={15} "
+          "pointing={17}".
           format(iart,qart,uart,ff,sigma,artdata,com,ipqu[0],
                  ipqu[1],amp4,phase4,amp2,phase2,amp16,phase16,
-                 fgai,ipdata) )
+                 fgai,ipdata,pntfile) )
 
 #  If required, add the artificial time-stream data onto the real
 #  time-stream data.

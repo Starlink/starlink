@@ -221,6 +221,27 @@
 *     PHASE16 = _DOUBLE (Read)
 *          The phase offset to apply to the 16 Hz signal specified via
 *          parameter AMP16, in degrees. [0.0]
+*     POINTING = LITERAL (Read)
+*          The name of a text file containing corrections to the pointing
+*          read from the reference data files. If null (!) is supplied, no
+*          corrections are used. If a file is supplied, it should start
+*          with one or more lines containing "#" in column one. These are
+*          comment lines, but if any comment line has the form "# SYSTEM=AZEL"
+*          or "# SYSTEM=TRACKING" then it determines the system in which the
+*          pointing correction are specified (SYSTEM defaults to AZEL). The
+*          last comment line should be a space-separated list of column names,
+*          including "TAI", "DLON" and "DLAT". Each remaining line should
+*          contain numerical values for each column, separated by white space.
+*          The TAI column should contain the TAI time given as an MJD. The
+*          DLON and DLAT columns should give arc-distance offsets parallel
+*          to the longitude and latitude axes, in arc-seconds. The TAI values
+*          should be monotonic increasing with row number. The longitude and
+*          latitude axes are either AXEL or TRACKING as determined by the
+*          SYSTEM value in the header comments. Blank lines are ignored.
+*          The DLON and DLAT values are added onto the SMU jiggle positions
+*          stored in the JCMTSTATE extension of the reference NDFs. DLON
+*          and DLAT values for non-tabulated times are determined by
+*          interpolation. [!]
 *     QIN = NDF (Read)
 *          The input 2D image of the sky Q values, with respect to
 *          the second pixel axis (i.e. the pixel Y axis). Positive
@@ -282,6 +303,8 @@
 *        Added ADAM parameter GAI.
 *     3-SEP-2015 (DSB):
 *        Added ADAM parameter IPDATA.
+*     30-SEP-2015 (DSB):
+*        Added ADAM parameter POINTING.
 
 *  Copyright:
 *     Copyright (C) 2011 Science and Technology Facilities Council.
@@ -544,8 +567,15 @@ void smurf_unmakemap( int *status ) {
    kpg1Wgndf( "OUT", igrp2, size, size, "More output files required...",
               &ogrp, &outsize, status );
 
-/* Get he noise level to add to the output data. */
+/* Get the noise level to add to the output data. */
    parGet0d( "SIGMA", &sigma, status );
+
+/* Allow the user to specify a text file containing a table of pointing
+   corrections. Corresponding Mappings are created from the column data
+   and stored in the "ogrp" group as items of metadata. This information
+   is read by smf_pcorr, called from within smf_open_file when each output
+   file is opened. */
+   smf_pread( ogrp, "POINTING", status );
 
 /* Get any Q and U input maps. */
    if( *status == SAI__OK ) {
