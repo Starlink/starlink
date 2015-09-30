@@ -261,6 +261,12 @@
 *  History:
 *     4-MAY-2015 (DSB):
 *        Original version
+*     20-SEP-2015 (DSB):
+*        Base names of output NDFs on the names of the flatfielded
+*        NDFs, rather than the supplied input NDFs. This is because
+*        the input NDFs include non-science files (flatfields, darks,
+*        etc). 
+
 *-
 '''
 
@@ -370,10 +376,6 @@ try:
 #  argument when running an atask from the shell.
    indata = parsys["IN"].value
 
-#  Output files.
-   gexp = parsys["OUT"].value
-   outdata = NDG( indata, gexp )
-
 #  Common mode files.
    incom = parsys["INCOM"].value
    if incom:
@@ -453,13 +455,19 @@ try:
 #  Flat field the supplied template data
    ff = NDG.load( "FF" )
    if not ff:
-      ff = NDG(indata)
+      ffdir = NDG.subdir()
       msg_out( "Flatfielding template data...")
-      invoke("$SMURF_DIR/flatfield in={0} out={1}".format(indata,ff) )
-      ff = ff.filter()
+      invoke("$SMURF_DIR/flatfield in={0} out=\"{1}/*\"".format(indata,ffdir) )
+      ff = NDG("{0}/\*".format(ffdir))
       ff.save( "FF" )
    else:
       msg_out( "Re-using old flatfielded template data...")
+
+#  Output files. Base the modification on "ff" rather than "indata",
+#  since "indata" may include non-science files (flatfields, darks etc)
+#  for which no corresponding output file should be created.
+   gexp = parsys["OUT"].value
+   outdata = NDG( ff, gexp )
 
 #  If required, create new artificial I, Q and U maps.
    if newart:

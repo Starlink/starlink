@@ -1962,6 +1962,10 @@ class NDG(object):
          guaranteed that this file does not exist, and so can be created
          safely. The file type (suffix) fo the file may be specified, but
          defaults to ".lis".
+      NDG.subdir():
+         Creates a new subdirectory within the NDG temporary directory,
+         and returns its absolute path. The name of the subdirectory is
+         created automatically, beginning with "TMP_".
 
    To Do:
       - Allow comment property to be supplied as an argument to each
@@ -2324,6 +2328,13 @@ class NDG(object):
    def tempfile(cls,suffix=".lis"):
       tmpdir = NDG.__setnobj()
       return NDG.__getfile( tmpdir, suffix )
+
+   # Create a new subdirectory within the temporary directory, and return
+   # its absolute path.
+   @classmethod
+   def subdir(cls):
+      dir = NDG._gettmpdir()
+      return tempfile.mkdtemp( prefix='TMP_', dir=dir )
 
    # Format an NDG into a shell quoted group expression
    def __str__(self):
