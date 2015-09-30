@@ -218,12 +218,13 @@
 *
 *        If NEWART is True, then new artificial I, Q and U data is
 *        created representing a single Gaussian source centred at pixel
-*        coord (0,0), with peak total intensity given by parameter IPEAK
-*        and width given by parameter IFWHM. The polarisation vectors are
-*        tangential, centred on the source. The fractional polarisation is
-*        constant at the value given by POL. The Y pixel axis is reference
-*        direction (suitable POLANAL Frames are included in the WCS to
-*        indicate this, as required by POLPACK).
+*        coordinates given by parameters XC and YC (default is (0,0)), with
+*        peak total intensity given by parameter IPEAK and width given by
+*        parameter IFWHM. The polarisation vectors are tangential, centred on
+*        the source. The fractional polarisation is constant at the value
+*        given by POL. The Y pixel axis is reference direction (suitable
+*        POLANAL Frames are included in the WCS to indicate this, as
+*        required by POLPACK).
 *     OUT = NDF (Write)
 *        A group of output NDFs to hold the simulated POL2 time series
 *        data. Equal in number to the files in "IN".
@@ -256,6 +257,12 @@
 *     SIGMA = _DOUBLE (Read)
 *        Gaussian noise level (in pW) to add to the final data. Only used
 *        if ADDON is False. [0.004]
+*     XC = _DOUBLE (Read)
+*        The X pixel coordinate at which to place the artificial blob if
+*        NEWART is YES. [0.0]
+*     YC = _DOUBLE (Read)
+*        The Y pixel coordinate at which to place the artificial blob if
+*        NEWART is YES. [0.0]
 
 *  Copyright:
 *     Copyright (C) 2015 East Asian Observatory
@@ -292,6 +299,7 @@
 *        when processing data form multiple subarrays.
 *        - Added parameter ADDON.
 *        - Add azel pointing correction for old data.
+*        - Added parameters XC and YC.
 
 *-
 '''
@@ -388,6 +396,10 @@ try:
    params.append(starutil.Par0F("SIGMA", "Noise level in pW", 0.004, True ))
    params.append(starutil.Par0L("ADDON", "Add artificial and real time-stream data?",
                                 False, noprompt=True))
+   params.append(starutil.Par0F("XC", "X pixel coord at blob centre",
+                                0.0, True ))
+   params.append(starutil.Par0F("YC", "Y pixel coord at blob centre",
+                                0.0, True ))
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
@@ -533,6 +545,8 @@ try:
 #  Get the parameters defining the artificial data
       ipeak = parsys["IPEAK"].value
       ifwhm = parsys["IFWHM"].value
+      xc = parsys["XC"].value
+      yc = parsys["YC"].value
       pol = parsys["POL"].value
 
 #  Determine the spatial extent of the data on the sky.
@@ -557,9 +571,10 @@ try:
 #  centred on the bump, with increasing percentage polarisation at larger
 #  radii. Y pixel axis is reference direction. First create the I map.
       if ipeak != 0.0:
-         invoke("$KAPPA_DIR/maths exp='pa*exp(-pc*(xa**2+xb**2)/(pf**2))' "
+         invoke("$KAPPA_DIR/maths exp='pa*exp(-pc*((xa-px)**2+(xb-py)**2)/(pf**2))' "
                 "pa={0} pc=1.66511 pf={1} type=_double lbound=\[{2},{3}\] "
-                "ubound=\[{4},{5}\] out={6}".format(ipeak,ifwhm,lx,ly,ux,uy,iart))
+                "ubound=\[{4},{5}\] out={6} px={7} py={8}".
+                format(ipeak,ifwhm,lx,ly,ux,uy,iart,xc,yc))
 
 #  Now create the fractional polarisation map.
          fp = NDG(1)
@@ -572,8 +587,8 @@ try:
 
 #  Get q and u values that give radial vectors.
          theta = NDG(1)
-         invoke( "$KAPPA_DIR/maths exp=\"'ia*0+atan2(-xa,xb)'\" ia={0} out={1}".
-                 format(iart,theta) )
+         invoke( "$KAPPA_DIR/maths exp=\"'ia*0+atan2(-(xa-px),(xb-py))'\" "
+                 "ia={0} out={1} px={2} py={3}".format(iart,theta,xc,yc) )
          invoke("$KAPPA_DIR/maths exp='-ia*cos(2*ib)' ia={0} ib={1} out={2}".format(pi,theta,qart) )
          invoke("$KAPPA_DIR/maths exp='-ia*sin(2*ib)' ia={0} ib={1} out={2}".format(pi,theta,uart) )
 
