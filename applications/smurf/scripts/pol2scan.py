@@ -228,7 +228,7 @@ try:
                                 "def", noprompt=True))
 
    params.append(starutil.Par0F("PIXSIZE", "Pixel size (arcsec)", None,
-                                 maxval=1000, minval=0.01))
+                                 maxval=1000, minval=0.01, noprompt=True))
 
    params.append(starutil.Par0S("QUDIR", "Directory in which to save the "
                                 "Q/U time series", None, noprompt=True))
