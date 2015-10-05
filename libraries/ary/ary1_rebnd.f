@@ -183,6 +183,12 @@
 *        arrays has been deferred - as is done by ARY_DUPE).
 *     1-SEP-2006 (DSB):
 *        Add an explicit DEFER argument.
+*     2-OCT-2015 (DSB):
+*        If the returned array uses a slice from the original array to 
+*        hold its values, ensure that the slice does not include elements 
+*        before the start of the original array. Previously, this was the 
+*        case if there was a gap between the output and input arrays on 
+*        the last dimension. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -458,6 +464,12 @@
      :                            + 1
                      USLICE( 1 ) = STRIDE *
      :                           ( NUBND( NNDIM ) - NLBND( NNDIM ) + 1 )
+
+*  If there is a gap between the two arrays (i.e. they do not overlap on
+*  the last pixel axis), UBND( NNDIM ) will be less than NLBND( NNDIM )
+*  and so the above LSLICE( 1 ) value will be negative, causing DAT_SLICE
+*  to report an error.
+                     LSLICE( 1 ) = MAX( 1, LSLICE( 1 ) )
 
 *  Vectorise the data object.
                      LOCV = ARY__NOLOC
