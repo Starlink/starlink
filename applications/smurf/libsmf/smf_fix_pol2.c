@@ -254,7 +254,8 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
 /* The lag should only ever drop by one, or remain the same. If anything
    else happens, it is either a bug in this function, or something very
    strange in the data, so report an error. */
-         } else if( newlag != curlag ) {
+         } else if( newlag != curlag && *status == SAI__OK ) {
+            *status = SAI__ERROR;
             errRep( "", "smf_fix_pol2: Unexpected features found in the "
                     "JCMTSTATE.POL_ANG array.", status );
             break;
