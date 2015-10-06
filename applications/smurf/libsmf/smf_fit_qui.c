@@ -208,6 +208,7 @@ typedef struct smfFitQUIJobData {
    int ipolcrd;
    int north;
    int pasign;
+   int setbad;
    smf_qual_t *qua;
 } smfFitQUIJobData;
 
@@ -254,6 +255,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    int iworker;             /* Index of a worker thread */
    int nodd;                /* No. of straneg box lengths found and ignored */
    int nworker;             /* No. of worker threads */
+   int setbad;              /* Set all output values bad for this slice? */
    size_t i;                /* loop counter */
    smfData *indksquid=NULL; /* Pointer to input dksquid data */
    smfFitQUIJobData *job_data = NULL; /* Pointer to all job data */
@@ -416,12 +418,21 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 /* If we are using north as the reference direction, get the WCS FrameSet
    for the input time slice that is at the middle of the output time
    slice, and set its current Frame to the tracking frame. */
+         setbad = 0;
          if( north ) {
             smf_tslice_ast( idata, istart + box_size/2, 1, NO_FTS, status );
             wcs = idata->hdr->wcs;
             usesys = sc2ast_convert_system( (idata->hdr->allState)[0].tcs_tr_sys,
                                             status );
-            astSetC( wcs, "System", usesys );
+
+/* If this time slice has not got usable WCS info, set the setbad flag to 
+   indicate that it should be filled it with bad values. */ 
+            if( wcs ) {
+               astSetC( wcs, "System", usesys );
+            } else {
+               setbad = 1;
+            }
+
          } else {
             wcs = NULL;
          }
@@ -440,6 +451,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
             pdata->ipu = ( (double*) (*odatau)->pntr[0] ) + itime*nbolo;
             pdata->ipv = ( (double*) (*odataq)->pntr[1] ) + itime*nbolo;
 
+            pdata->setbad = setbad;
             pdata->nbolo = nbolo;
             pdata->ncol = ncol;
             pdata->box_size = box_size;
@@ -747,7 +759,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    focal plane Y, measured positive in the sense of rotation from focal
    plane Y to focal plane X (note this angle may change across the focal
    plane due to focal plane distortion). Otherwise, use zero. */
-         if( pdata->wcs ) {
+         if( wcs ) {
 
 /* Get the grid coords of the current bolometer, and transform them to SKY
    coordinates using the FrameSet. */
@@ -776,7 +788,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
          }
 
 /* If the whole bolometer is bad, put bad values into the outputs. */
-         if( *qua & SMF__Q_BADB || tr_angle == VAL__BADD || box_size == 0 ) {
+         if( pdata->setbad || *qua & SMF__Q_BADB || tr_angle == VAL__BADD || box_size == 0 ) {
             if( ipi ) *(ipi++) = VAL__BADD;
             *(ipq++) = VAL__BADD;
             *(ipu++) = VAL__BADD;
