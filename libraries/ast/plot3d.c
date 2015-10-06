@@ -93,7 +93,12 @@ f     AST_GRFSET, AST_GRFPOP, AST_GRFPUSH, and AST_GETGRFCONTEXT routines.
 *
 *     Certain Plot attributes are ignored by the Plot3D class (e.g. Edge,
 *     DrawTitle, TitleGap, etc). Consult the Plot attribute documentation
-*     for details.
+*     for details. All other Plot attributes can be set for a specific
+*     plane of the 3-d plot by appending one of the strings "_XY", "_XZ"
+*     or "_YZ" to the end of the Plot attribute name. For instance,
+*     "Grid_YZ" refers to the "Grid" attribute for the plane spanning
+*     the second (Y) and third (Z) axes of the 3-d plot.
+
 
 *  Functions:
 c     The Plot3D class does not define any new functions beyond those
@@ -118,12 +123,12 @@ f    AST_GRIDLINE, AST_POLYCURVE.
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -144,6 +149,8 @@ f    AST_GRIDLINE, AST_POLYCURVE.
 *        In astLoadPlot3D, do not call SetRootCorner as it requires an
 *        active graphics system to be present which may not yet have been
 *        established. Also establish the grf routines to be used.
+*     5-OCT-2015 (DSB):
+*        Allow Plot attributes to be set for specific planes.
 *class--
 */
 
@@ -2324,6 +2331,10 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 
 /* Local Variables: */
    AstPlot3D *this;              /* Pointer to the Plot3D structure */
+   AstPlot *plot;                /* Pointer to specific Plot */
+   char attname[50];             /* Plot attribute base name */
+   char patt[50];                /* Plot attribute full name */
+   char spec[10];                /* Plane specification */
    int axis;                     /* Axis index */
    int len;                      /* Length of attrib string */
    int nc;                       /* Number of characters read */
@@ -2357,6 +2368,30 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 /* ----------- */
    } else if ( !strcmp( attrib, "rootcorner" ) ) {
       astClearRootCorner( this );
+
+/* ..._XY etc */
+/* ---------- */
+   } else if ( nc = 0,
+               ( 2 == astSscanf( attrib, "%[a-z]_%[xyz]%n", attname, spec,
+                 &nc ) ) ) {
+
+      if( !strcmp( spec, "xy" ) || !strcmp( spec, "yx" ) ) {
+         plot = this->plotxy;
+      } else if( !strcmp( spec, "xz" ) || !strcmp( spec, "zx" ) ) {
+         plot = this->plotyz;
+      } else if( !strcmp( spec, "yz" ) || !strcmp( spec, "zy" ) ) {
+         plot = this->plotxz;
+      } else {
+         plot = NULL;
+      }
+
+      if( plot ) {
+         sprintf( patt, "%s%s", attname, attrib + nc );
+         astClearAttrib( plot, patt );
+
+      } else {
+         (*parent_clearattrib)( this_object, attrib, status );
+      }
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
@@ -3177,8 +3212,12 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
+   AstPlot *plot;                /* Pointer to specific Plot */
    AstPlot3D *this;              /* Pointer to the Plot3D structure */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
+   char attname[50];             /* Plot attribute base name */
+   char patt[50];                /* Plot attribute full name */
+   char spec[10];                /* Plane specification */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Floating point attribute value */
    int axis;                     /* Axis index */
@@ -3226,6 +3265,30 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
          astError( AST__INTER, "astGetAttrib(Plot3D): Illegal value %d "
                    "for RootCorner attribute (internal AST programming "
                    "error).", status, ival );
+      }
+
+/* ..._XY etc */
+/* ---------- */
+   } else if ( nc = 0,
+               ( 2 == astSscanf( attrib, "%[a-z]_%[xyz]%n", attname, spec,
+                 &nc ) ) ) {
+
+      if( !strcmp( spec, "xy" ) || !strcmp( spec, "yx" ) ) {
+         plot = this->plotxy;
+      } else if( !strcmp( spec, "xz" ) || !strcmp( spec, "zx" ) ) {
+         plot = this->plotyz;
+      } else if( !strcmp( spec, "yz" ) || !strcmp( spec, "zy" ) ) {
+         plot = this->plotxz;
+      } else {
+         plot = NULL;
+      }
+
+      if( plot ) {
+         sprintf( patt, "%s%s", attname, attrib + nc );
+         result = astGetAttrib( plot, patt );
+
+      } else {
+         result = (*parent_getattrib)( this_object, attrib, status );
       }
 
 /* If the attribute name was not recognised, pass it on to the parent
@@ -5539,7 +5602,12 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 */
 
 /* Local Variables: */
+   AstPlot *plot;                /* Pointer to specific Plot */
    AstPlot3D *this;              /* Pointer to the Plot3D structure */
+   char pat[30];                 /* Regular expression pattern */
+   char spec[10];                /* Plane specification */
+   const char *null = "";        /* Pointer to null string */
+   const char *psetting;         /* Pointer to plot-specific attrib setting */
    double dval;                  /* Floating point attribute value */
    int axis;                     /* Axis index */
    int ival;                     /* Int attribute value */
@@ -5580,6 +5648,31 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
                    "given for attribute RootCorner.", status, setting + ival );
       } else {
          astSetRootCorner( this, ival );
+      }
+
+/* ..._XY etc */
+/* ---------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( setting, "%*[a-z]_%[xyz]%n", spec, &nc ) ) ) {
+
+      if( !strcmp( spec, "xy" ) || !strcmp( spec, "yx" ) ) {
+         plot = this->plotxy;
+      } else if( !strcmp( spec, "xz" ) || !strcmp( spec, "zx" ) ) {
+         plot = this->plotyz;
+      } else if( !strcmp( spec, "yz" ) || !strcmp( spec, "zy" ) ) {
+         plot = this->plotxz;
+      } else {
+         plot = NULL;
+      }
+
+      if( plot ) {
+         sprintf( pat, ".*(_%s).*", spec );
+         psetting = astChrSub( setting, pat, &null, 1 );
+         astSetAttrib( plot, psetting );
+         psetting = astFree( (void *) psetting );
+
+      } else {
+         (*parent_setattrib)( this_object, setting, status );
       }
 
 /* If the attribute is still not recognised, pass it on to the parent
@@ -6425,7 +6518,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 */
 
 /* Local Variables: */
+   AstPlot *plot;                /* Pointer to specific Plot */
    AstPlot3D *this;              /* Pointer to the Plot3D structure */
+   char attname[50];             /* Plot attribute base name */
+   char patt[50];                /* Plot attribute full name */
+   char spec[10];                /* Plane specification */
    int axis;                     /* Axis index */
    int len;                      /* Length of attrib string */
    int nc;                       /* Number of character read */
@@ -6463,6 +6560,31 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 /* ----------- */
    } else if ( !strcmp( attrib, "rootcorner" ) ) {
       result = astTestRootCorner( this );
+
+
+/* ..._XY etc */
+/* ---------- */
+   } else if ( nc = 0,
+               ( 2 == astSscanf( attrib, "%[a-z]_%[xyz]%n", attname, spec,
+                 &nc ) ) ) {
+
+      if( !strcmp( spec, "xy" ) || !strcmp( spec, "yx" ) ) {
+         plot = this->plotxy;
+      } else if( !strcmp( spec, "xz" ) || !strcmp( spec, "zx" ) ) {
+         plot = this->plotyz;
+      } else if( !strcmp( spec, "yz" ) || !strcmp( spec, "zy" ) ) {
+         plot = this->plotxz;
+      } else {
+         plot = NULL;
+      }
+
+      if( plot ) {
+         sprintf( patt, "%s%s", attname, attrib + nc );
+         result = astTestAttrib( plot, patt );
+
+      } else {
+         result = (*parent_testattrib)( this_object, attrib, status );
+      }
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
