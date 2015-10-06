@@ -256,8 +256,9 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
    strange in the data, so report an error. */
          } else if( newlag != curlag && *status == SAI__OK ) {
             *status = SAI__ERROR;
-            errRep( "", "smf_fix_pol2: Unexpected features found in the "
-                    "JCMTSTATE.POL_ANG array.", status );
+            errRepf( "", "smf_fix_pol2: Unexpected features found in the "
+                    "JCMTSTATE.POL_ANG array at RTS_NUM=%d.",
+                    status, (int) hdr->allState[iframe].rts_num );
             break;
          }
       }
@@ -335,7 +336,9 @@ static int smf1_findlag( dim_t iframe, int curlag, dim_t nframe, const double *a
 
 *  Returned Value:
 *     The integer lag between the agaps and tgaps arrays that produces
-*     the highest correlation, within a box centred on "iframe".
+*     the highest correlation, within a box centred on "iframe". The
+*     supplied curlag value is returned if the lag cannot be calculated
+*     reliably.
 
 *  Description:
 *     This function shifts the "agaps" array backwards and forwards,
@@ -422,15 +425,20 @@ static int smf1_findlag( dim_t iframe, int curlag, dim_t nframe, const double *a
          }
       }
 
+/* We require at least 50% of the total box (i.e. one CBOX) to have good 
+   values to produce a reliable correlation. */
+      if( ns > CBOX ) {
+
 /* Find the correlation coefficient between the tgaps values and the
    lagged agaps values. */
-      cor = ( ns*sat - sa*st )/sqrt( ( ns*st2 - st*st )*( ns*sa2 - sa*sa ));
+         cor = ( ns*sat - sa*st )/sqrt( ( ns*st2 - st*st )*( ns*sa2 - sa*sa ));
 
 /* If this is the largest correlation found so far, record it together
    with the current lag. */
-      if( cor > cormax ) {
-         cormax = cor;
-         result = lag;
+         if( cor > cormax ) {
+            cormax = cor;
+            result = lag;
+         }
       }
    }
 
