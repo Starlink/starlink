@@ -155,6 +155,27 @@
 *          If set, this parameter should be "tracking" or "image". [!]
 *     IN = NDF (Read)
 *          Input file(s).
+*     IPREF = NDF (Read)
+*          An existing NDF that is to be used to define the correction
+*          to be made for instrumental polarisation (IP). It is only
+*          accessed if the input data contains POL2 Q or U time-series
+*          values, as created by SMURF:CALCQU. No IP correction is made
+*          if a null (!) value is supplied. If a non-null value is supplied,
+*          it should be an NDF that holds the total intensity (in pW) at
+*          each point of the area of sky covered by the output map. It is
+*          assumed that the NDF is gridded on the same grid as the output
+*          map (i.e. pixel (0,0) in IPREF refers to the same place on the
+*          sky as pixel (0,0) in the output map). For each Q or U value
+*          in the input time-streams, the corresponding total intensity
+*          (I) value is found by sampling the supplied IPREF map at the
+*          position of the Q/U value. This I value is multipled by a factor
+*          that depends on elevation and focal plane position, to get the
+*          IP correction, which is subtracted from the input Q or U value
+*          before going on to make a map from the corrected values. The
+*          factors are determined using an IP model derived by James
+*          Kennedy and Doug Johnstone. The static parameters of this model
+*          are read from an NDF specified by configuration parameter
+*          "IPDATA" (which defaults to $STARLINK/share/smurf/ipdata.sdf). [!]
 *     ITERMAPS = LITERAL (Read)
 *          Specifies the name of a file in which to place a copy of the
 *          current map at the end of each iteration. If a null (!) value is

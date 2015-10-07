@@ -1752,6 +1752,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 status );
       }
 
+      /* Do any required correction for instrumental polarisation. */
+      smf_addip( wf, res[0], lut[0], lbnd_out, ubnd_out, keymap, status );
+
+
       /*** TIMER ***/
       msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                  ": ** %f s pre-conditioning data",

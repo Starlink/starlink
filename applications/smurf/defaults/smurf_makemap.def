@@ -1815,6 +1815,17 @@ hitslimit = 0.01
 importsky = 0
 
 #-----------------------------------------------------------------
+#  Name: 	ipdata
+#  Type: 	string
+#  Default: 	$STARLINK_DIR/share/smurf/updata.sdf
+#  Purpose: 	Defines the Instrumental Polarisation model for POL2 data.
+#  Description: This should be the path to an HDS container file holding
+#               the parameters required for the Johnstone/Kennedy IP model
+#               for POL2 data. Only used when processing POL2 Q or U
+#               time-streams as created by SMURF:CALCQU.
+ipdata = $STARLINK_DIR/share/smurf/updata.sdf
+
+#-----------------------------------------------------------------
 #  Name: 	itermap
 #  Type: 	integer
 #  Default: 	0

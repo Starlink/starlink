@@ -3682,6 +3682,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter ipref {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Total intensity map for IP calculation}
+                default !
+                helpkey *
+            }
+
             parameter itermaps {
                 type LITERAL
                 access READ

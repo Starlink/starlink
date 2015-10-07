@@ -215,6 +215,11 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
       ldescr = "Set iff samples flag as bad by the PCA model";
       break;
 
+    case SMF__Q_IP:
+      retval = "IP";
+      ldescr = "Set iff samples flag as bad by the Instrumental Polarisation model";
+      break;
+
     default:
       retval = NULL;
     }

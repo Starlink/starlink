@@ -166,6 +166,9 @@ smf_qual_t smf_qual_str_to_val( const char *qname, smf_qfam_t * family, int * st
   } else if ( strcmp(qname, "PCA") == 0 ) {
     retval = SMF__Q_PCA;
     lfamily = SMF__QFAM_TSERIES;
+  } else if ( strcmp(qname, "IP") == 0 ) {
+    retval = SMF__Q_IP;
+    lfamily = SMF__QFAM_TSERIES;
   } else {
     *status = SMF__BADQNM;
     errRepf( "", "Unrecognized quality name (%s)",

@@ -519,7 +519,8 @@ typedef enum {
   SMF__Q_BADEF   = BIT_TO_VAL(12),  /* Optical efficiency correction is bad */
   SMF__Q_RING    = BIT_TO_VAL(13),  /* Sample suffers from FLT ringing */
   SMF__Q_SSN     = BIT_TO_VAL(14),  /* Flagged as bad by the SSN model */
-  SMF__Q_PCA     = BIT_TO_VAL(15)   /* Flagged as bad by the PCA model */
+  SMF__Q_PCA     = BIT_TO_VAL(15),  /* Flagged as bad by the PCA model */
+  SMF__Q_IP      = BIT_TO_VAL(16)   /* Flagged as bad by the PCA model */
 } smf_qual_bits;
 
 /* These macros are for several commonly-used combinations of quality flags */
@@ -574,7 +575,7 @@ typedef enum {
 /* Number of quality bits in each family. SMF__NQBITS can be used
    for declaring array sizes. */
 typedef enum {
-  SMF__NQBITS_TSERIES = 16,
+  SMF__NQBITS_TSERIES = 17,
   SMF__NQBITS_MAP     = 4,
   SMF__NQBITS_TCOMP   = 6,
   SMF__NQBITS         = 16    /* Largest number of bits in a family */
