@@ -495,6 +495,8 @@
 *        Added SSN.
 *     2015-06-15 (DSB):
 *        Added PCA.
+*     2015-10-07 (DSB):
+*        Move fakemap stuff into a separate function (smf_addfakemap).
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -627,7 +629,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int converged=0;              /* Has stopping criteria been met? */
   smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
-  double fakedelay = 0.0;       /* Extra fake time stream delay, in seconds */
   double downsampscale;         /* Downsample factor to preserve this scale */
   int dimmflags;                /* Control flags for DIMM model components */
   int doclean=1;                /* Are we doing data pre-processing? */
@@ -643,17 +644,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int exportclean=0;            /* Are we doing to export clean data? */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int *exportNDF_which=NULL;    /* Which models in modelorder will be exported*/
-  char *fakemap=NULL;           /* Name of external map with fake sources */
-  int fakemce;                  /* Smooth fake data with MCE response? */
-  int fakendf=NDF__NOID;        /* NDF id for fakemap */
-  double fakescale;             /* Scale factor for fakemap */
-  double *fakestream = NULL;    /* Time series data from fake map */
   int firstiter;                /* First iteration in this invocation of makemap? */
   size_t count_mcnvg=0;         /* # chunks fail to converge */
   size_t count_minsmp=0;        /* # chunks fail due to insufficient samples */
   smf_qual_t flagmap=0;         /* bit mask for flagmaps */
   int flt_undofirst = 1;        /* Undo FLT model at start of iteration? */
-  double *fmapdata=NULL;        /* fakemap for adding external ast signal */
   int groupsubarray;            /* Handle subarrays separately? */
   int noexportsetbad=0;         /* Don't set bad values in exported models */
   int haveast=0;                /* Set if AST is one of the models */
@@ -716,7 +711,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   smf_calcmodelptr modelptr=NULL; /* Pointer to current model calc function */
   dim_t mdims[2];               /* Dimensions of map */
   dim_t msize;                  /* Number of elements in map */
-  int mw;                       /* No. of threads to use when rebinning data into a map */
+  int mw = 0;                   /* No. of threads to use when rebinning data into a map */
   char name[GRP__SZNAM+1];      /* Buffer for storing exported model names */
   dim_t nbolo;                  /* Number of bolometers */
   size_t ncontchunks=0;         /* Number continuous chunks outside iter loop*/
@@ -1035,18 +1030,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       msgOutf( "", FUNC_NAME
                ": will down-sample data to match angular scale of %lg "
                "arcsec", status, downsampscale );
-
-      /* Adding in signal from an external fakemap? */
-      tempstr = NULL;
-      astMapGet0C( keymap, "FAKEMAP", &tempstr );
-      if( tempstr ) {
-        fakemap = astCalloc( 255, 1 );
-        one_strlcpy( fakemap, tempstr, 255, status );
-      }
-
-      astMapGet0D( keymap, "FAKESCALE", &fakescale );
-      astMapGet0I( keymap, "FAKEMCE", &fakemce );
-      astMapGet0D( keymap, "FAKEDELAY", &fakedelay );
 
       /* Subtracting an error map after each iteration? */
       tempstr = NULL;
@@ -1513,23 +1496,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              " iteration loop.", status);
   }
 
-  /* Load in the fakemap */
-  if( fakemap && (*status==SAI__OK) ) {
-    int nmap, tndf;
-    void *ptr;
-    msgOutf( "", FUNC_NAME ": loading external fakemap `%s'", status, fakemap );
-
-    /* Open the NDF, get a section from it matching the bounds of the
-       output map, then close the original NDF - retaining the section. .  */
-    ndfFind( NULL, fakemap, &tndf, status );
-    ndfSect( tndf, 2, lbnd_out, ubnd_out, &fakendf, status );
-    ndfAnnul( &tndf, status );
-
-    /* Map the data as double precision */
-    ndfMap( fakendf, "DATA", "_DOUBLE", "READ", &ptr, &nmap, status );
-    fmapdata = ptr;
-  }
-
   /* Load in the error map */
   if( epsin && (*status==SAI__OK) ) {
     int nmap, tndf;
@@ -1766,139 +1732,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* We now have RES, LUT, and EXT loaded into memory. Add fake
          astronomical signal to RES at this stage if requested */
-
-      if( fakemap && fmapdata && (*status==SAI__OK) ) {
-        double *resptr=NULL;
-        int *lutptr=NULL;
-        double *extptr=NULL;
-
-        /* Add in the signal from the map */
-        msgOutf( "", FUNC_NAME ": adding signal from external map %s "
-                 "(* %lf) to time series", status, fakemap,
-                 fakescale );
-
-        for( idx=0; idx<res[0]->ndat; idx++ ) {
-          smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL, &dsize,
-                        NULL, NULL, status );
-
-          resptr = res[0]->sdata[idx]->pntr[0];
-          lutptr = lut[0]->sdata[idx]->pntr[0];
-
-          /* If we will later be filtering the data to remove the MCE response
-             or delay, we need to apply the opposite effects the fake data
-             before adding it to the real data, so that the later filtering
-             will affect only the real data and not the fake data. */
-          if( fakemce || fakedelay != 0.0 ) {
-
-             /* Sample the fake map at the position of each sample,
-                applying extinction correction or not as
-                required. Note that fakestream is set to 0 wherever
-                there are no data, bad value encountered, etc. The
-                quality normally flags wherever there are gaps (which
-                then get filled), but in the case where fmapdata are
-                missing values, QUALITY won't know about it, and we'll
-                get junk when we do the filtering. A better way to do
-                this would be to actually (temporarily) set some sort
-                of quality (so that we can gap fill)... but probably
-                not worth the effort. */
-             fakestream = astGrow( fakestream, dsize, sizeof(*fakestream));
-             if( haveext ) {
-
-               extptr = model[whichext][0]->sdata[idx]->pntr[0];
-
-               for( k=0; k<dsize; k++ ) {
-                 if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) &&
-                     (extptr[k] > 0) && (fmapdata[lutptr[k]] != VAL__BADD) &&
-                     (resptr[k] != VAL__BADD) ) {
-                   fakestream[k] = fakescale*fmapdata[lutptr[k]] / extptr[k];
-                 } else {
-                   fakestream[k] = 0;
-                 }
-               }
-             } else {
-               for( k=0; k<dsize; k++ ) {
-                 if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) &&
-                     (fmapdata[lutptr[k]] != VAL__BADD) &&
-                     (resptr[k] != VAL__BADD) ) {
-                   fakestream[k] = fakescale*fmapdata[lutptr[k]];
-                 } else {
-                   fakestream[k] = 0;
-                 }
-               }
-             }
-
-             /* Apply any delay specified by the "fakedelay" config parameter,
-                and also smooth with the MCE response. These are done in the
-                opposite order to that used in smf_clean_smfArray. We
-                temporarily hijack the RES smfData for this purpose. */
-             res[0]->sdata[idx]->pntr[0] = fakestream;
-
-             smfFilter *filt = smf_create_smfFilter(res[0]->sdata[idx], status);
-             if( fakedelay != 0.0 ) {
-               msgOutiff( MSG__VERB, "", FUNC_NAME
-                          ": delay fake data by %.4lf s",
-                          status, fakedelay );
-               smf_filter_delay( filt, fakedelay, status );
-             }
-
-             if( fakemce ) {
-               msgOutif( MSG__VERB, "", FUNC_NAME
-                          ": convolve fake data with anti-aliasing filter",
-                         status );
-               smf_filter_mce( filt, 1, status );
-             }
-
-             smf_update_quality( wf, res[0]->sdata[idx], 1, NULL, 0, 0.05, status );
-             smf_filter_execute( wf, res[0]->sdata[idx], filt, 0, 0, status );
-
-             filt = smf_free_smfFilter( filt, status );
-
-             res[0]->sdata[idx]->pntr[0] = resptr;
-
-             /* Add the modified fake time stream data onto the residuals. */
-             for( k=0; k<dsize; k++ ) {
-                if( resptr[k] != VAL__BADD && fakestream[k] != VAL__BADD ){
-                  resptr[k] += fakestream[k];
-                }
-             }
-
-          /* If we will not be filtering the data later, we do not need
-             to find the intermediate fake time stream data. */
-          } else {
-                if( haveext ) {
-               /* Version in which we are applying extinction correction */
-
-               extptr = model[whichext][0]->sdata[idx]->pntr[0];
-
-               for( k=0; k<dsize; k++ ) {
-                 if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) &&
-                     (extptr[k] > 0) && (fmapdata[lutptr[k]] != VAL__BADD) &&
-                     (resptr[k] != VAL__BADD) ) {
-                   resptr[k] += fakescale*fmapdata[lutptr[k]] / extptr[k];
-                 }
-               }
-             } else {
-               /* No extinction correction */
-
-               for( k=0; k<dsize; k++ ) {
-                 if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) &&
-                     (fmapdata[lutptr[k]] != VAL__BADD) &&
-                     (resptr[k] != VAL__BADD) ) {
-                   resptr[k] += fakescale*fmapdata[lutptr[k]];
-                 }
-               }
-             }
-          }
-        }
-
-        fakestream = astFree( fakestream );
-
-      }
-
-      /*** TIMER ***/
-      msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                 ": ** %f s adding fakemap signal to residual",
-                 status, smf_timerupdate(&tv1,&tv2,status) );
+      smf_addfakemap( wf, res[0], haveext?model[whichext][0]:NULL, lut[0],
+                      lbnd_out, ubnd_out, keymap, status );
 
       /* Do data cleaning */
       if( doclean ) {
@@ -3653,9 +3488,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
   epsin = astFree( epsin );
   if( epsndf != NDF__NOID ) ndfAnnul( &epsndf, status );
-
-  fakemap = astFree( fakemap );
-  if( fakendf != NDF__NOID ) ndfAnnul( &fakendf, status );
 
   lastmap = astFree( lastmap );
   mapchange = astFree( mapchange );

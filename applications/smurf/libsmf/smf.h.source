@@ -550,6 +550,9 @@ void smf_accumulate_prov( const smfData * data, const Grp* igrp, size_t index,
                           int ondf, const char *creator,
                           NdgProvenance ** modprov, int * status );
 
+void smf_addfakemap(  ThrWorkForce *wf, smfArray *res, smfArray *ext, smfArray *lut,
+                      int *lbnd_out, int *ubnd_out, AstKeyMap *keymap, int *status );
+
 void smf_add_grp_metadata( Grp *grp, const char *name, const char *value,
                            int *status );
 

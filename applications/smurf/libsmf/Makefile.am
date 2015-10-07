@@ -17,6 +17,7 @@ smf_accumulate_prov.c \
 smf_add_grp_metadata.c \
 smf_add_smu_pcorr.c \
 smf_add_spectral_axis.c \
+smf_addfakemap.c \
 smf_addmap1.c \
 smf_addcom.c \
 smf_addgai.c \
