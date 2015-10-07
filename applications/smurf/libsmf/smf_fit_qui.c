@@ -425,8 +425,8 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
             usesys = sc2ast_convert_system( (idata->hdr->allState)[0].tcs_tr_sys,
                                             status );
 
-/* If this time slice has not got usable WCS info, set the setbad flag to 
-   indicate that it should be filled it with bad values. */ 
+/* If this time slice has not got usable WCS info, set the setbad flag to
+   indicate that it should be filled it with bad values. */
             if( wcs ) {
                astSetC( wcs, "System", usesys );
             } else {
@@ -816,8 +816,8 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 
 /* Check the input sample has not been flagged during cleaning and is
    not bad. */
-               if( !( *qin & SMF__Q_FIT ) && *din != VAL__BADD &&
-                   angle != VAL__BADD ) {
+               if( state->jos_drcontrol == 0 && !( *qin & SMF__Q_FIT ) &&
+                   *din != VAL__BADD && angle != VAL__BADD ) {
 
 /* Following SUN/223 (section "Single-beam polarimetry"/"The Polarimeter"),
    get the angle from the fixed analyser to the half-waveplate axis, in radians.

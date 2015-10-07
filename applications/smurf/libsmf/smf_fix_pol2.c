@@ -165,8 +165,9 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
       for( iframe = 0; iframe < hdr->nframes; iframe++,state++,pa++,pt++,pga++,pgt++ ) {
 
 /* Not sure if there ever will be bad RTS_END or POL_ANG values, but just
-   in case... */
-         if( state->rts_end != VAL__BADD && state->pol_ang != VAL__BADD ) {
+   in case... Also ignore slices that have a non-zero JOS_DRCONTROL value. */
+         if( state->jos_drcontrol == 0 && state->rts_end != VAL__BADD &&
+            state->pol_ang != VAL__BADD ) {
 
 /* If the POL_ANG value is a lot more than 2.PI we must be dealing with
    old data in which the POL_ANG value was given in arbitrary encoder units.
@@ -425,7 +426,7 @@ static int smf1_findlag( dim_t iframe, int curlag, dim_t nframe, const double *a
          }
       }
 
-/* We require at least 50% of the total box (i.e. one CBOX) to have good 
+/* We require at least 50% of the total box (i.e. one CBOX) to have good
    values to produce a reliable correlation. */
       if( ns > CBOX ) {
 
