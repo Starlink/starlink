@@ -4,7 +4,7 @@
 *     smf_addfakemap
 
 *  Purpose:
-*     Detect and correct any steps in the DC level in each bolometer.
+*     Add signal for a fake source onto the bolometer data values.
 
 *  Language:
 *     Starlink ANSI C
