@@ -3683,7 +3683,7 @@ package @PACKAGE@ {
             }
 
             parameter ipref {
-                type NDF
+                type LITERAL
                 access READ
                 vpath DEFAULT
                 ppath CURRENT DEFAULT

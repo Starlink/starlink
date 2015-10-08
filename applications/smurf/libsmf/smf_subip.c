@@ -15,7 +15,7 @@
 *  Invocation:
 *     void smf_subip( ThrWorkForce *wf, smfArray *res, smfArray *lut,
 *                     int *lbnd_out, int *ubnd_out, AstKeyMap *keymap,
-*                     int *status )
+*                     AstFrameSet *outfs, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -32,6 +32,8 @@
 *        A 2-element array - the upper pixel index bounds of the output map.
 *     keymap = AstKeyMap * (Given)
 *        A KeyMap holding all configuration parameters.
+*     outfs = AstFrameSet * (Given)
+*        The WCS FrameSet for the output map.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -116,7 +118,7 @@ typedef struct smfSubIPData {
 
 
 void smf_subip(  ThrWorkForce *wf, smfArray *res, smfArray *lut, int *lbnd_out,
-                 int *ubnd_out, AstKeyMap *keymap, int *status ) {
+                 int *ubnd_out, AstKeyMap *keymap, AstFrameSet *outfs, int *status ) {
 
 /* Local Variables: */
    HDSLoc *loc = NULL;
@@ -143,7 +145,6 @@ void smf_subip(  ThrWorkForce *wf, smfArray *res, smfArray *lut, int *lbnd_out,
    int nw;
    int p0ndf;
    int p1ndf;
-   int tndf;
    size_t bstride;
    size_t idx;
    size_t tstride;
@@ -210,15 +211,15 @@ void smf_subip(  ThrWorkForce *wf, smfArray *res, smfArray *lut, int *lbnd_out,
                "correction based on total intensity map `%s'", status,
                qu, ipref );
 
-/* Open the IPREF NDF, get a section from it matching the bounds of
-   the output map, then close the original NDF - retaining the section. */
-      ndfFind( NULL, ipref, &tndf, status );
-      ndfSect( tndf, 2, lbnd_out, ubnd_out, &imapndf, status );
-      ndfAnnul( &tndf, status );
+/* Get an identifier for the IPREF NDF. */
+      ndfFind( NULL, ipref, &imapndf, status );
 
-/* Map the data as double precision */
-      ndfMap( imapndf, "DATA", "_DOUBLE", "READ", (void **) &imapdata,
-              &nmap, status );
+/* Resample the NDFs data values onto the output map grid. */
+      imapdata = smf_alignndf( imapndf, outfs, lbnd_out, ubnd_out,
+                               status );
+
+/* Annul the NDF identifier. */
+      ndfAnnul( &imapndf, status );
 
 /* Create structures used to pass information to the worker threads. */
       nw = wf ? wf->nworker : 1;
@@ -342,8 +343,8 @@ void smf_subip(  ThrWorkForce *wf, smfArray *res, smfArray *lut, int *lbnd_out,
 
 /* Free resources. */
       datAnnul( &loc, status );
+      imapdata = astFree( imapdata );
       job_data = astFree( job_data );
-      ndfAnnul( &imapndf, status );
    }
 }
 
@@ -381,6 +382,7 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    double angc;
    double c0;
    double ipfactor;
+   double ival;
    double p0;
    double p1;
    double tmp1;
@@ -448,11 +450,16 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
             state = pdata->allstate;
             for( itime = 0; itime < ntslice; itime++,state++ ) {
 
+/* Get the total intensity for the sample. If it is bad, flag the sample. */
+               ival = imapdata[ *pl ];
+               if( ival == VAL__BADD ) {
+                  *pq |= SMF__Q_IP;
+
 /* Skip this sample if the residual is bad or flagged, of the
    corresponding map pixel is undefined, or the telescope elevation is
    unknown. */
-               if( *pr != VAL__BADD && !( *pq & SMF__Q_MOD ) &&
-                   *pl != VAL__BADI && state->tcs_az_ac2 != VAL__BADD) {
+               } else if( *pr != VAL__BADD && !( *pq & SMF__Q_MOD ) &&
+                          *pl != VAL__BADI && state->tcs_az_ac2 != VAL__BADD) {
 
 /* Find the factor by which to multiply the total intensity value
    to get the required IP correction to Q or U. */

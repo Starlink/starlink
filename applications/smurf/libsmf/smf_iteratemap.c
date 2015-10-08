@@ -1754,7 +1754,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
 
       /* Do any required correction for instrumental polarisation. */
-      smf_subip( wf, res[0], lut[0], lbnd_out, ubnd_out, keymap, status );
+      smf_subip( wf, res[0], lut[0], lbnd_out, ubnd_out, keymap, outfset,
+                 status );
 
 
       /*** TIMER ***/

@@ -532,7 +532,7 @@ typedef enum {
 #define SMF__Q_FIT ~(SMF__Q_APOD|SMF__Q_STAT)            /* Samples that can't
                                                            be used to fit
                                                            time-domain models */
-#define SMF__Q_GAP (SMF__Q_PCA|SMF__Q_SSN|SMF__Q_RING|SMF__Q_BADDA|SMF__Q_SPIKE|SMF__Q_JUMP|SMF__Q_COM|SMF__Q_EXT|SMF__Q_LOWAP)/* Samples
+#define SMF__Q_GAP (SMF__Q_IP|SMF__Q_PCA|SMF__Q_SSN|SMF__Q_RING|SMF__Q_BADDA|SMF__Q_SPIKE|SMF__Q_JUMP|SMF__Q_COM|SMF__Q_EXT|SMF__Q_LOWAP)/* Samples
                                                            that should
                                                            be gap-filled */
 #define SMF__Q_BOUND (SMF__Q_PAD|SMF__Q_APOD)            /* apodized/padded
@@ -578,7 +578,7 @@ typedef enum {
   SMF__NQBITS_TSERIES = 17,
   SMF__NQBITS_MAP     = 4,
   SMF__NQBITS_TCOMP   = 6,
-  SMF__NQBITS         = 16    /* Largest number of bits in a family */
+  SMF__NQBITS         = 17    /* Largest number of bits in a family */
 } smf_qfam_count_t;
 
 

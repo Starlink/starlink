@@ -23,6 +23,7 @@ smf_addcom.c \
 smf_addgai.c \
 smf_addpolanal.c \
 smf_addto_smfArray.c \
+smf_alignndf.c \
 smf_apodize.c \
 smf_apply_dark.c \
 smf_apply_mask.c \
