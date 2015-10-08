@@ -171,6 +171,9 @@
 *          if an external config is supplied.
 *     29-SEP-2015 (DSB):
 *        - Add parameter PIXSIZE.
+*     8-OCT-2015 (DSB):
+*        Only correct azel pointing error for data between 20150606 and
+*        20150930.
 '''
 
 import os
@@ -364,8 +367,9 @@ try:
       tqmap = qmap
       tumap = umap
 
-#  AZ/EL pointing correction, for pre 20150929 data.
-   if int(starutil.get_fits_header( qts[0], "UTDATE", True )) < 20150929:
+#  AZ/EL pointing correction, for data between 20150606 and 20150930.
+   ut = int(starutil.get_fits_header( qts[0], "UTDATE", True ))
+   if ut >= 20150606 and ut <= 20150929:
       pntfile = os.path.join(NDG.tempdir,"pointing")
       fd = open(pntfile,"w")
       fd.write("# system=azel\n")
