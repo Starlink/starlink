@@ -496,7 +496,8 @@
 *     2015-06-15 (DSB):
 *        Added PCA.
 *     2015-10-07 (DSB):
-*        Move fakemap stuff into a separate function (smf_addfakemap).
+*        - Move fakemap stuff into a separate function (smf_addfakemap).
+*        - Add IP correction for POL2 data.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1753,7 +1754,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
 
       /* Do any required correction for instrumental polarisation. */
-      smf_addip( wf, res[0], lut[0], lbnd_out, ubnd_out, keymap, status );
+      smf_subip( wf, res[0], lut[0], lbnd_out, ubnd_out, keymap, status );
 
 
       /*** TIMER ***/

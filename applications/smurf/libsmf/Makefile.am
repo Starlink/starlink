@@ -18,7 +18,6 @@ smf_add_grp_metadata.c \
 smf_add_smu_pcorr.c \
 smf_add_spectral_axis.c \
 smf_addfakemap.c \
-smf_addip.c \
 smf_addmap1.c \
 smf_addcom.c \
 smf_addgai.c \
@@ -422,6 +421,7 @@ smf_store_outputbounds.c \
 smf_stripsuffix.c \
 smf_subinst_keymap.c \
 smf_subinst_str.c \
+smf_subip.c \
 smf_subtract_dark.c \
 smf_subtract_plane.c \
 smf_subtract_plane1.c \

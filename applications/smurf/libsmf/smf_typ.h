@@ -520,7 +520,7 @@ typedef enum {
   SMF__Q_RING    = BIT_TO_VAL(13),  /* Sample suffers from FLT ringing */
   SMF__Q_SSN     = BIT_TO_VAL(14),  /* Flagged as bad by the SSN model */
   SMF__Q_PCA     = BIT_TO_VAL(15),  /* Flagged as bad by the PCA model */
-  SMF__Q_IP      = BIT_TO_VAL(16)   /* Flagged as bad by the PCA model */
+  SMF__Q_IP      = BIT_TO_VAL(16)   /* Flagged as bad by the IP correction */
 } smf_qual_bits;
 
 /* These macros are for several commonly-used combinations of quality flags */
