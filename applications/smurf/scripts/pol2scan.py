@@ -18,11 +18,11 @@
 *     holding Q and U values in each bolometer. These time series are
 *     then converted into separate Q and U maps using SMURF:MAKEMAP.
 *
-*     This mainly a test bed for experiments in creating maps from
-*     POL2 spin&scan data.
+*     Correction for instrumental polarisation is made only if a value
+*     is supplied for parameter IREF.  
 
 *  Usage:
-*     pol2scan in q u [config] [pixsize] [qudir] [retain] [msg_filter] [ilevel] [glevel] [logfile]
+*     pol2scan in q u [iref] [config] [pixsize] [qudir] [retain] [msg_filter] [ilevel] [glevel] [logfile]
 
 *  Parameters:
 *     CONFIG = LITERAL (Read)
@@ -91,6 +91,14 @@
 *        previous run of SMURF:CALCQU (the LSQFIT parameter must be set
 *        to TRUE when running CALCQU). If not supplied, the IN parameter
 *        is used to get input NDFs holding POL-2 time series data. [!]
+*     IREF = NDF (Read)
+*        A 2D NDF holding a map of total intensity within the sky area
+*        covered by the input POL2 data, in units of pW. If supplied,
+*        the returned Q and U maps will be corrected for instrumental
+*        polarisation, based on the total intensity values in IREF.
+*        The supplied IREF map need not be pre-aligned with the output
+*        Q and U maps - it will be resampled as necessary using a
+*        transformation derived form its WCS information. [!]
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -227,6 +235,9 @@ try:
                                  default=None, exists=False, minsize=1,
                                  maxsize=1 ))
 
+   params.append(starutil.ParNDG("IREF", "The reference I map", default=None,
+                                 noprompt=True, minsize=0, maxsize=1 ))
+
    params.append(starutil.Par0S("CONFIG", "Map-maker tuning parameters",
                                 "def", noprompt=True))
 
@@ -285,7 +296,10 @@ try:
 #  See if temp files are to be retained.
    retain = parsys["RETAIN"].value
 
-#  Get the Q and U reference maps
+#  Get the I, Q and U reference maps
+   iref = parsys["IREF"].value
+   if not iref:
+      iref = "!"
    qref = parsys["QREF"].value
    uref = parsys["UREF"].value
 
@@ -386,8 +400,8 @@ try:
       ref = qref
    else:
       ref = "!"
-   invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} {5}".
-          format(qts,conf,tqmap,ref,pntfile,pixsize))
+   invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
+          "ipref={5} {6}".format(qts,conf,tqmap,ref,pntfile,iref,pixsize))
 
 #  Make a map from the U time series.
    msg_out( "Making a map from the U time series..." )
@@ -395,8 +409,8 @@ try:
       ref = uref
    else:
       ref = "!"
-   invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} {5}".
-          format(uts,conf,tumap,ref,pntfile,pixsize))
+   invoke("$SMURF_DIR/makemap in={0} config=^{1} out={2} ref={3} pointing={4} "
+          "ipref={5} {6}".format(uts,conf,tumap,ref,pntfile,iref,pixsize))
 
 #  Rotate the polarimetric reference direction if required.
    if qref and uref:
