@@ -549,10 +549,18 @@ try:
       yc = parsys["YC"].value
       pol = parsys["POL"].value
 
-#  Determine the spatial extent of the data on the sky.
-      invoke("$SMURF_DIR/makemap in={0} out=! config=def".format(ff))
-      reflon = starutil.get_task_par( "reflon", "makemap" )
-      reflat = starutil.get_task_par( "reflat", "makemap" )
+#  Make a junk map from the reference data. This is just to define the
+#  WCS for the artifical I,Q,U maps. The data values in the map are not used.
+      conf = os.path.join(NDG.tempdir,"junkconf")
+      fd = open(conf,"w")
+      fd.write("doclean=0\n")
+      fd.write("numiter=1\n")
+      fd.write("modelorder=(ast)\n")
+      fd.write("flagslow=0.01\n")
+      fd.write("downsampscale=0\n")
+      fd.close()
+      junk = NDG(1)
+      invoke("$SMURF_DIR/makemap in={0} out={1} config=^{2}".format(ff,junk,conf))
       pixsize = starutil.get_task_par( "pixsize", "makemap" )
       lx = int( starutil.get_task_par( "lbnd(1)", "makemap" ))
       ly = int( starutil.get_task_par( "lbnd(2)", "makemap" ))
@@ -571,10 +579,13 @@ try:
 #  centred on the bump, with increasing percentage polarisation at larger
 #  radii. Y pixel axis is reference direction. First create the I map.
       if ipeak != 0.0:
-         invoke("$KAPPA_DIR/maths exp='pa*exp(-pc*((xa-px)**2+(xb-py)**2)/(pf**2))' "
-                "pa={0} pc=1.66511 pf={1} type=_double lbound=\[{2},{3}\] "
-                "ubound=\[{4},{5}\] out={6} px={7} py={8}".
-                format(ipeak,ifwhm,lx,ly,ux,uy,iart,xc,yc))
+         invoke("$KAPPA_DIR/maths exp='ia*0+pa*exp(-pc*((xa-px)**2+(xb-py)**2)/(pf**2))' "
+                "pa={0} pc=1.66511 pf={1} out={2} px={3} py={4} "
+                "ia={5}'({6}:{7},{8}:{9})'".
+                format(ipeak,ifwhm,iart,xc,yc,junk,lx,ux,ly,uy))
+
+#  Copy the WCS from the junk map. */
+         invoke("$KAPPA_DIR/wcscopy ndf={0} like={1}'(,)' ok=yes".format(iart,junk) )
 
 #  Now create the fractional polarisation map.
          fp = NDG(1)
@@ -596,19 +607,13 @@ try:
       else:
          invoke("$KAPPA_DIR/creframe mode=fl mean=0 lbound=\[{0},{1}\] "
                 "ubound=\[{2},{3}\] out={4}".format(lx,ly,ux,uy,iart))
+         invoke("$KAPPA_DIR/wcscopy ndf={0} like={1}'(,)' ok=yes".format(iart,junk) )
          invoke("$KAPPA_DIR/creframe mode=fl mean=0 lbound=\[{0},{1}\] "
                 "ubound=\[{2},{3}\] out={4}".format(lx,ly,ux,uy,qart))
+         invoke("$KAPPA_DIR/wcscopy ndf={0} like={1}'(,)' ok=yes".format(qart,junk) )
          invoke("$KAPPA_DIR/creframe mode=fl mean=0 lbound=\[{0},{1}\] "
                 "ubound=\[{2},{3}\] out={4}".format(lx,ly,ux,uy,uart))
-
-#  Put WCS into the artificial images, indicating that the pol. ref.
-#  direction is the pixel Y axis.
-      invoke("$KAPPA_DIR/setsky ndf={0} projtype=TAN positions=! coords='eq(j2000)' "
-             "refcode=pixel pixelref=\[0,0\] lon=\"'{1}'\" lat=\"'{2}'\" "
-             "pixelsize='{3}s' orient=0 epoch=2015".
-             format(iart,reflon.replace(":"," "),reflat.replace(":",""),pixsize) )
-      invoke("$KAPPA_DIR/wcscopy ndf={0} like={1}".format(qart,iart) )
-      invoke("$KAPPA_DIR/wcscopy ndf={0} like={1}".format(uart,iart) )
+         invoke("$KAPPA_DIR/wcscopy ndf={0} like={1}'(,)' ok=yes".format(uart,junk) )
 
    else:
       msg_out( "Using supplied artificial I, Q and U maps...")
