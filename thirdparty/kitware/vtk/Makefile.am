@@ -43,20 +43,26 @@ all:
 	        -D TK_INCLUDE_PATH:PATH=$(prefix)/include \
                 -D TK_XLIB_PATH:PATH=$(X11_INCLUDES) \
 	        -D TK_LIBRARY:FILEPATH=$(prefix)/lib/libtk8.5$(SHLIB_EXT) \
-	        -D Module_vtkRenderingTk:BOOL=ON \
-	        -D VTK_Group_Tk:BOOL=ON \
-	        -D VTK_Group_Imaging:BOOL=ON \
+		-D VTK_USE_TK:BOOL=ON \
+                -D VTK_WRAP_TCL:BOOL=ON \
+                -D VTK_USE_X:BOOL=ON \
+                -D Module_vtkFiltersGeneric:BOOL=ON \
+                -D Module_vtkFiltersProgrammable:BOOL=ON \
+                -D Module_vtkRenderingLOD:BOOL=ON \
+                -D Module_vtkRenderingTk:BOOL=ON \
+                -D Module_vtkRenderingVolumeOpenGL:BOOL=ON \
+                -D Module_vtkWrappingTcl:BOOL=ON \
+                -D Module_vtkexpat:BOOL=ON \
 	        -D VTK_OPENGL_HAS_OSMESA:BOOL=OFF \
                 -D CMAKE_FIND_FRAMEWORK=NEVER $(GLPATH_INFO) \
 	        -D VTK_USE_CARBON:BOOL=OFF \
 	        -D VTK_USE_COCOA:BOOL=OFF  \
 	        -D VTK_USE_GEOVIS:BOOL=OFF \
-	        -D VTK_USE_GUISUPPORT:BOOL=ON \
+	        -D VTK_USE_GUISUPPORT:BOOL=OFF \
 	        -D VTK_USE_INFOVIS:BOOL=OFF \
 	        -D VTK_USE_MANGLED_MESA:BOOL=OFF \
 	        -D VTK_USE_VIEWS:BOOL=OFF \
-	        -D VTK_USE_X:BOOL=ON \
-	        -D VTK_WRAP_TCL:BOOL=ON . && \
+		. && \
 	  $(MAKE) )
 
 ##  Automake really requires local versions for these targets.
