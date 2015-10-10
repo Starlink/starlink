@@ -379,8 +379,8 @@ fi
 #  PERL
 
 if [ ${relocate} -ne 0 ]; then
-   export PERL5LIB=${exec_prefix}/Perl/lib/perl5/site_perl
-   export PERL5LIB=${exec_prefix}/Perl/lib/perl5/:${PERL5LIB}
+   export PERL5LIB=${exec_prefix}/Perl/lib/perl5
+   export PERL5LIB=${exec_prefix}/Perl/lib/perl5/site_perl:${PERL5LIB}
 fi
 
 #  PGPLOT
