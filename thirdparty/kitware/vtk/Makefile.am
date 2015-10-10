@@ -53,6 +53,7 @@ all:
                 -D Module_vtkRenderingVolumeOpenGL:BOOL=ON \
                 -D Module_vtkWrappingTcl:BOOL=ON \
                 -D Module_vtkexpat:BOOL=ON \
+		-D VTK_Group_StandAlone:BOOL=False \
 	        -D VTK_OPENGL_HAS_OSMESA:BOOL=OFF \
                 -D CMAKE_FIND_FRAMEWORK=NEVER $(GLPATH_INFO) \
 	        -D VTK_USE_CARBON:BOOL=OFF \
