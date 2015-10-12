@@ -4,7 +4,7 @@
 #include "wcstrig.h"
 #include "proj.h"
 
-#define copysign(X, Y) ((Y) < 0.0 ? -fabs(X) : fabs(X))
+#define icopysign(X, Y) ((Y) < 0.0 ? -abs(X) : abs(X))
 #define TPN 999
 
 /*============================================================================
@@ -39,7 +39,7 @@ struct AstPrjPrm *prj;
 {
    int m;
 
-   prj->flag   = copysign(TPN, prj->flag);
+   prj->flag   = icopysign(TPN, prj->flag);
    prj->phi0   =  0.0;
    prj->theta0 = 90.0;
 

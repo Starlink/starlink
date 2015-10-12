@@ -343,6 +343,7 @@ const char *astPRJrev_errmsg[] = {
 
 
 #define copysign(X, Y) ((Y) < 0.0 ? -fabs(X) : fabs(X))
+#define icopysign(X, Y) ((Y) < 0.0 ? -abs(X) : abs(X))
 
 
 
@@ -476,7 +477,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "AZP");
-   prj->flag   = copysign(WCS__AZP, prj->flag);
+   prj->flag   = icopysign(WCS__AZP, prj->flag);
    prj->phi0   =  0.0;
    prj->theta0 = 90.0;
 
@@ -658,7 +659,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "SZP");
-   prj->flag   = copysign(WCS__SZP, prj->flag);
+   prj->flag   = icopysign(WCS__SZP, prj->flag);
    prj->phi0   =  0.0;
    prj->theta0 = 90.0;
 
@@ -844,7 +845,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "TAN");
-   prj->flag   = copysign(WCS__TAN, prj->flag);
+   prj->flag   = icopysign(WCS__TAN, prj->flag);
    prj->phi0   =  0.0;
    prj->theta0 = 90.0;
 
@@ -1036,7 +1037,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "SIN");
-   prj->flag   = copysign(WCS__SIN, prj->flag);
+   prj->flag   = icopysign(WCS__SIN, prj->flag);
    prj->phi0   =  0.0;
    prj->theta0 = 90.0;
 
@@ -1324,7 +1325,7 @@ struct AstPrjPrm *prj;
    const double tol = 1.0e-13;
 
    strcpy(prj->code, "ZPN");
-   prj->flag   = copysign(WCS__ZPN, prj->flag);
+   prj->flag   = icopysign(WCS__ZPN, prj->flag);
    prj->phi0   =  0.0;
    prj->theta0 = 90.0;
 
@@ -2713,7 +2714,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "COP");
-   prj->flag   = copysign(WCS__COP, prj->flag);
+   prj->flag   = icopysign(WCS__COP, prj->flag);
    prj->phi0   = 0.0;
    prj->theta0 = prj->p[1];
 

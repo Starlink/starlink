@@ -632,7 +632,7 @@ DECLARE_GENERIC(D,double)
 DECLARE_GENERIC(F,float)
 DECLARE_GENERIC(I,int)
 DECLARE_GENERIC(UB,unsigned char)
-DECLARE_GENERIC(B,char)
+DECLARE_GENERIC(B,signed char)
 
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 DECLARE_GENERIC(LD,long double)
@@ -10049,7 +10049,7 @@ MAKE_REBIN(LD,long double,0)
 MAKE_REBIN(D,double,0)
 MAKE_REBIN(F,float,0)
 MAKE_REBIN(I,int,1)
-MAKE_REBIN(B,char,1)
+MAKE_REBIN(B,signed char,1)
 MAKE_REBIN(UB,unsigned char,1)
 
 /* Undefine the macro. */
@@ -11107,7 +11107,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                CASE_NEAREST(D,double)
                CASE_NEAREST(F,float)
                CASE_NEAREST(I,int)
-               CASE_NEAREST(B,char)
+               CASE_NEAREST(B,signed char)
                CASE_NEAREST(UB,unsigned char)
 
                case ( TYPE_L ): break;
@@ -11150,7 +11150,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                CASE_LINEAR(D,double)
                CASE_LINEAR(F,float)
                CASE_LINEAR(I,int)
-               CASE_LINEAR(B,char)
+               CASE_LINEAR(B,signed char)
                CASE_LINEAR(UB,unsigned char)
 
                case ( TYPE_L ): break;
@@ -11349,7 +11349,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                CASE_KERNEL1(D,double)
                CASE_KERNEL1(F,float)
                CASE_KERNEL1(I,int)
-               CASE_KERNEL1(B,char)
+               CASE_KERNEL1(B,signed char)
                CASE_KERNEL1(UB,unsigned char)
 
                case ( TYPE_L ): break;
@@ -12445,7 +12445,7 @@ MAKE_REBINSEQ(LD,long double,0)
 MAKE_REBINSEQ(D,double,0)
 MAKE_REBINSEQ(F,float,0)
 MAKE_REBINSEQ(I,int,1)
-MAKE_REBINSEQ(B,char,1)
+MAKE_REBINSEQ(B,signed char,1)
 MAKE_REBINSEQ(UB,unsigned char,1)
 
 /* Undefine the macro. */
@@ -18290,7 +18290,7 @@ MAKE_SPREAD_KERNEL1(LD,long double,0)
 MAKE_SPREAD_KERNEL1(D,double,0)
 MAKE_SPREAD_KERNEL1(F,float,0)
 MAKE_SPREAD_KERNEL1(I,int,1)
-MAKE_SPREAD_KERNEL1(B,char,1)
+MAKE_SPREAD_KERNEL1(B,signed char,1)
 MAKE_SPREAD_KERNEL1(UB,unsigned char,1)
 
 /* Undefine the macros used above. */
@@ -19129,7 +19129,7 @@ MAKE_SPREAD_LINEAR(LD,long double,0)
 MAKE_SPREAD_LINEAR(D,double,0)
 MAKE_SPREAD_LINEAR(F,float,0)
 MAKE_SPREAD_LINEAR(I,int,1)
-MAKE_SPREAD_LINEAR(B,char,1)
+MAKE_SPREAD_LINEAR(B,signed char,1)
 MAKE_SPREAD_LINEAR(UB,unsigned char,1)
 
 /* Undefine the macros used above. */
@@ -19813,7 +19813,7 @@ MAKE_SPREAD_NEAREST(LD,long double,0)
 MAKE_SPREAD_NEAREST(D,double,0)
 MAKE_SPREAD_NEAREST(F,float,0)
 MAKE_SPREAD_NEAREST(I,int,1)
-MAKE_SPREAD_NEAREST(B,char,1)
+MAKE_SPREAD_NEAREST(B,signed char,1)
 MAKE_SPREAD_NEAREST(UB,unsigned char,1)
 
 /* Undefine the macros used above. */
@@ -23860,7 +23860,7 @@ MAKE_REBIN_(LD,long double)
 MAKE_REBIN_(D,double)
 MAKE_REBIN_(F,float)
 MAKE_REBIN_(I,int)
-MAKE_REBIN_(B,char)
+MAKE_REBIN_(B,signed char)
 MAKE_REBIN_(UB,unsigned char)
 #undef MAKE_REBIN_
 
@@ -23893,7 +23893,7 @@ MAKE_REBINSEQ_(LD,long double)
 MAKE_REBINSEQ_(D,double)
 MAKE_REBINSEQ_(F,float)
 MAKE_REBINSEQ_(I,int)
-MAKE_REBINSEQ_(B,char)
+MAKE_REBINSEQ_(B,signed char)
 MAKE_REBINSEQ_(UB,unsigned char)
 
 #undef MAKE_REBINSEQ_

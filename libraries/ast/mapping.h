@@ -520,7 +520,7 @@ DECLARE_GENERIC_ALL(LD,long double)
 DECLARE_GENERIC_DFI(D,double)
 DECLARE_GENERIC_DFI(F,float)
 DECLARE_GENERIC_DFI(I,int)
-DECLARE_GENERIC_DFI(B,char)
+DECLARE_GENERIC_DFI(B,signed char)
 DECLARE_GENERIC_DFI(UB,unsigned char)
 
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
@@ -621,7 +621,7 @@ PROTO_GENERIC_ALL(LD,long double)
 PROTO_GENERIC_DFI(D,double)
 PROTO_GENERIC_DFI(F,float)
 PROTO_GENERIC_DFI(I,int)
-PROTO_GENERIC_DFI(B,char)
+PROTO_GENERIC_DFI(B,signed char)
 PROTO_GENERIC_DFI(UB,unsigned char)
 
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
