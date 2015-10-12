@@ -1142,11 +1142,15 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        - Add new Warning "badkeyname", and issue such a warning instead
 *        of an error if illegal characters are found in a keyword name.
 *     31-AUG-2015 (DSB):
-*        In FitLine, use the whole axis rather than 0.1 of the axis (if "dim" 
-*        is supplied). This is because non-linearity can become greater at 
-*        further distances along the axis. In practice, it meant that SIP 
-*        distortion were being treated as linear because the test did not 
+*        In FitLine, use the whole axis rather than 0.1 of the axis (if "dim"
+*        is supplied). This is because non-linearity can become greater at
+*        further distances along the axis. In practice, it meant that SIP
+*        distortion were being treated as linear because the test did not
 *        explore a large enough region of pixel space.
+*     12-OCT-2015 (DSB):
+*        Only add sky axes to a SpecFrame if the WCS Frame contains no
+*        other axes other than the SpecFrame (MakeFitsFrameSet).
+*
 *class--
 */
 
@@ -1162,6 +1166,10 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
    keyword. We include lower case letters here, but they are considered
    as equivalent to upper case letter. */
 #define isFits(a) ( islower(a) || isupper(a) || isdigit(a) || (a)=='-' || (a)=='_' )
+
+/* A amacro to test if a Frame is a SkyFrame, and is used to describe the
+   sky (skyframes could be used for other purposes - eg a POLANAL Frame). */
+#define IsASkyFrame(frame) (astIsASkyFrame(frame)&&!strcmp("SKY",astGetDomain(frame)))
 
 /* Macros which return the maximum and minimum of two values. */
 #define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
@@ -2198,7 +2206,7 @@ static int AddEncodingFrame( AstFitsChan *this, AstFrameSet *fs, int encoding,
          astPrimaryFrame( cfrm, i, &pfrm, &paxis );
          if( astIsASpecFrame( pfrm ) ) {
             if( !specfrm ) specfrm = astCopy( pfrm );
-         } else if( astIsASkyFrame( pfrm ) ) {
+         } else if( IsASkyFrame( pfrm ) ) {
             if( !skyfrm ) skyfrm = astCopy( pfrm );
          }
          pfrm = astAnnul( pfrm );
@@ -4338,7 +4346,7 @@ static AstMapping *CelestialAxes( AstFitsChan *this, AstFrameSet *fs, double *di
    axis. Keep a pointer to it, and note the indices of the celestial axes
    within the complete WCS Frame. The MakeFitsFrameSet function will have
    ensured that the WCS Frame only contains at most a single SkyFrame. */
-      if( astIsASkyFrame( pframe ) ) {
+      if( IsASkyFrame( pframe ) ) {
          if( !skyfrm ) skyfrm = astClone( pframe );
          if( paxis == 0 ) {
             ilon = iax;
@@ -14071,7 +14079,7 @@ static double *FitLine( AstMapping *map, double *g, double *g0, double *w0,
    }
 
 /* We use NP points in the fit. If a value for "dim" has been supplied,
-   we use points evenly distributed over the whole axis. If not, we use 
+   we use points evenly distributed over the whole axis. If not, we use
    a gap of 1.0 (corresponds to an axis length of 100 pixels).
    Choose the gap. */
    gap = ( dim != AST__BAD ) ? dim/NP : 1.0;
@@ -20095,7 +20103,7 @@ static AstFrameSet *MakeFitsFrameSet( AstFitsChan *this, AstFrameSet *fset,
 
 *     Currently, this function does the following:
 *
-*     - if the WCS Frame contains a spectral axis with a defined celestial
+*     - if the WCS Frame contains a 1D spectral Frame with a defined celestial
 *     reference position (SpecFrame attributes RefRA and RefDec), then
 *     it ensures that the WCS Frame also contains a pair of celestial
 *     axes (such axes are added if they do not already exist within the
@@ -20231,7 +20239,7 @@ static AstFrameSet *MakeFitsFrameSet( AstFitsChan *this, AstFrameSet *fset,
 
 /* If the current axis is a SkyFrame, save a pointer to it, and its WCS
    index. If we have already found a different SkyFrame, abort. */
-      } else if( astIsASkyFrame( pframe ) ) {
+      } else if( IsASkyFrame( pframe ) ) {
          if( skyfrm ) {
             if( pframe != (AstFrame *) skyfrm ) {
                ok = 0;
@@ -20325,8 +20333,12 @@ static AstFrameSet *MakeFitsFrameSet( AstFitsChan *this, AstFrameSet *fset,
 
 /* Check that both the RefRA and RefDec attributes of the SpecFrame are set.
    If not, return a FrameSet made from the base and current Frames in the
-   supplied FrameSet.*/
-         if( !astTestRefRA( specfrm ) || !astTestRefDec( specfrm ) ) {
+   supplied FrameSet. Also do this if the original WCS Frame contains 3
+   or more axes (since it is almost always inappropriate to add extra sky
+   axes in such circumestances). But if the other axes form a skyfram,
+   then we need to make sure they use the right refrence point. */
+         if( !astTestRefRA( specfrm ) || !astTestRefDec( specfrm ) ||
+             ( nwcs > 2 && !skyfrm ) ) {
             ret = astFrameSet( pixfrm, "", status );
             astAddFrame( ret, AST__BASE, map, wcsfrm );
 
@@ -20941,7 +20953,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
          for( i = 0; i < nout; i++ ) {
             pperm[ wperm[ i ] ] = i;
             astPrimaryFrame( fr, i, &pfrm, &paxis );
-            if( astIsASkyFrame( pfrm ) ) {
+            if( IsASkyFrame( pfrm ) ) {
                skycol[ wperm[ i ] ] = paxis + 1;
                lin[ i ] = 0;
                if( !sfrm ) {
@@ -23057,6 +23069,10 @@ static AstMapping *OtherAxes( AstFitsChan *this, AstFrameSet *fs, double *dim,
 /* Only proceed if there are some axes to described. */
    if( nother ) {
 
+if( s == 'D' ) astShow( fs );
+
+
+
 /* Get a pointer to the WCS Frame. */
       wcsfrm = astGetFrame( fs, AST__CURRENT );
 
@@ -23118,6 +23134,7 @@ static AstMapping *OtherAxes( AstFitsChan *this, AstFrameSet *fs, double *dim,
 
 /* See if the axis is linear. If so, create a ShiftMap which subtracts off
    the CRVAL value. */
+
             if( IsMapLinear( map, lbnd_p, ubnd_p, iax, status ) ) {
                crval = -crval;
                tmap0 = (AstMapping *) astShiftMap( 1, &crval, "", status );
@@ -27680,7 +27697,7 @@ static int SkySys( AstFitsChan *this, AstSkyFrame *skyfrm, int wcstype,
    astGET_GLOBALS(this);
 
 /* Check we have a SkyFrame. */
-   if( !astIsASkyFrame( skyfrm ) ) return 0;
+   if( !IsASkyFrame( skyfrm ) ) return 0;
 
 /* Initialise */
    ret = 1;
@@ -32303,7 +32320,7 @@ static void TidyOffsets( AstFrameSet *fset, int *status ) {
       nax = astGetNaxes( frm );
       for( iax = 0; iax < nax; iax++ ) {
          astPrimaryFrame( frm, iax, &pfrm, &pax );
-         if( astIsASkyFrame( pfrm ) ) {
+         if( IsASkyFrame( pfrm ) ) {
             dom = astGetDomain( pfrm );
             if( dom ) {
                if( !strcmp( dom, "SKY_OFFSETS" ) ){
@@ -32346,7 +32363,7 @@ static void TidyOffsets( AstFrameSet *fset, int *status ) {
          nax = astGetNaxes( frm );
          for( iax = 0; iax < nax; iax++ ) {
             astPrimaryFrame( frm, iax, &pfrm, &pax );
-            if( astIsASkyFrame( pfrm ) ) {
+            if( IsASkyFrame( pfrm ) ) {
                dom = astGetDomain( pfrm );
                if( dom ) {
                   if( !strcmp( dom, "SKY_OFFSETS" ) ){
