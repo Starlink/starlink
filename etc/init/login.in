@@ -480,8 +480,8 @@ endif
 #
 #  PERL
 if ( ${relocate} ) then
-   setenv PERL5LIB ${exec_prefix}/Perl/lib/perl5/site_perl
-   setenv PERL5LIB ${exec_prefix}/Perl/lib/perl5/:${PERL5LIB}
+   setenv PERL5LIB ${exec_prefix}/Perl/lib/perl5
+   setenv PERL5LIB ${exec_prefix}/Perl/lib/perl5/site_perl:${PERL5LIB}
 endif
 
 #
