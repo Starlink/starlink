@@ -23,10 +23,10 @@
 *     This application creates a new pair of Q and U images from a
 *     supplied pair of Q and U images, by changing the polarimetric
 *     reference direction. The required direction can either be inherited
-*     from another NDF (see parameter LIKE) or specified as a fixed angle
-*     within a specified coordinate Frame (see parameters ANGLE and FRAME).
-*     It is assumed that the supplied Q and U images are aligned in pixel
-*     coordinates, and have the same reference direction.
+*     from another NDF (see parameter LIKE) or specified as a specified
+*     axis within a specified coordinate Frame (see parameters AXIS and
+*     FRAME). It is assumed that the supplied Q and U images are aligned
+*     in pixel coordinates, and have the same reference direction.
 
 *  Usage:
 *     polrotref qin uin qout uout like angle
