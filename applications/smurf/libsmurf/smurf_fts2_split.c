@@ -439,7 +439,7 @@ void smurf_fts2_split(int* status)
                 errRepf(TASK_NAME, "Error saving outData file name", status);
                 goto CLEANUP;
             }
-            smf_write_smfData(NULL, outData, NULL, outData->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+            smf_write_smfData(NULL, outData, NULL, outData->file->name, gOut, fIndex, 0, MSG__VERB, 0, NULL, NULL, status);
             if(*status != SAI__OK) {
                 errRepf(TASK_NAME, "Error writing outData file", status);
                 goto CLEANUP;

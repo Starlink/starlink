@@ -680,7 +680,7 @@ void smurf_calcnoise( int *status ) {
             /* open a reference input file for provenance propagation */
             ndgNdfas( basegrp, gcount, "READ", &provid, status );
             smf_write_smfData( wf, powdata, NULL, NULL, powgrp, gcount, provid,
-                               MSG__VERB, 0, status );
+                               MSG__VERB, 0, NULL, NULL, status );
             smf_close_file( wf, &powdata, status );
             ndfAnnul( &provid, status );
           }
@@ -695,7 +695,7 @@ void smurf_calcnoise( int *status ) {
 
             /* Write it out */
             smf_write_smfData( wf, thedata, NULL, NULL, tsgrp, gcount, provid,
-                               MSG__VERB, 0, status );
+                               MSG__VERB, 0, NULL, NULL, status );
             ndfAnnul( &provid, status );
           }
 

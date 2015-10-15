@@ -230,7 +230,7 @@ void smf_calcmodel_smo( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       /* Uncomment to aid debugging */
       /*
       smf_write_smfData( res->sdata[idx], NULL, qua_data, "res_in",
-                         NULL, 0, 0, MSG__VERB, 0, status );
+                         NULL, 0, 0, MSG__VERB, 0, NULL, NULL, status );
       */
 
       if( *status == SAI__OK ) {
@@ -245,10 +245,10 @@ void smf_calcmodel_smo( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       /* Uncomment to aid debugging */
       /*
       smf_write_smfData( model->sdata[idx], NULL, qua_data, "model_b4",
-                         NULL, 0, 0, MSG__VERB, 0, status );
+                         NULL, 0, 0, MSG__VERB, 0, NULL, NULL, status );
 
       smf_write_smfData( res->sdata[idx], NULL, qua_data, "res_b4",
-                         NULL, 0, 0, MSG__VERB, 0, status );
+                         NULL, 0, 0, MSG__VERB, 0, NULL, NULL, status );
       */
 
       /* Determine which bolometers are to be processed by which threads. */
@@ -293,9 +293,9 @@ void smf_calcmodel_smo( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       /* Uncomment to aid debugging */
       /*
       smf_write_smfData( res->sdata[idx], NULL, qua_data, "res_af",
-                         NULL, 0, 0, MSG__VERB, 0, status );
+                         NULL, 0, 0, MSG__VERB, 0, NULL, NULL, status );
       smf_write_smfData( model->sdata[idx], NULL, qua_data, "model_af",
-                         NULL, 0, 0, MSG__VERB, 0, status );
+                         NULL, 0, 0, MSG__VERB, 0, NULL, NULL, status );
       */
 
     }

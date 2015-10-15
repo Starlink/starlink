@@ -464,7 +464,7 @@ void smurf_sc2clean( int *status ) {
             smf_dataOrder( wf, com->sdata[idx], 1, status );
 
             smf_write_smfData( wf, com->sdata[idx], NULL, filename, NULL, 0,
-                               NDF__NOID, MSG__NORM, 0, status );
+                               NDF__NOID, MSG__NORM, 0, NULL, NULL, status );
           }
         }
 
@@ -477,7 +477,7 @@ void smurf_sc2clean( int *status ) {
 
             smf_dataOrder( wf, gai->sdata[idx], 1, status );
             smf_write_smfData( wf, gai->sdata[idx], NULL, filename, NULL, 0,
-                               NDF__NOID, MSG__NORM, 0, status );
+                               NDF__NOID, MSG__NORM, 0, NULL, NULL, status );
           }
         }
 
@@ -513,7 +513,7 @@ void smurf_sc2clean( int *status ) {
 
       if( odata->file && odata->file->name ) {
         smf_write_smfData( wf, odata, NULL, NULL, ogrp, gcount, NDF__NOID,
-                           MSG__VERB, 0, status );
+                           MSG__VERB, 0, NULL, NULL, status );
       } else {
         *status = SAI__ERROR;
         errRep( FUNC_NAME,

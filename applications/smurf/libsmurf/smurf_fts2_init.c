@@ -665,7 +665,8 @@ void smurf_fts2_init(int* status)
 
     /* Write to output */
     outData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, dead, a, b, c, d, phaseFit, cosmicRays, fluxJumps, status);
-    smf_write_smfData(NULL, outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
+    smf_write_smfData( NULL, outData, NULL, NULL, gOut, fIndex, 0,
+                       MSG__VERB, 0, NULL, NULL, status);
     smf_close_file( NULL,&outData, status);
   }
   CLEANUP:

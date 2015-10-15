@@ -133,7 +133,8 @@ void smurf_sc2expandmodel( int *status ) {
 
       if( *status == SAI__OK ) {
         (*expptr)( idata, &odata, status );
-        smf_write_smfData( NULL, odata, NULL, NULL, ogrp, i, 0, MSG__VERB, 0, status );
+        smf_write_smfData( NULL, odata, NULL, NULL, ogrp, i, 0,
+                           MSG__VERB, 0, NULL, NULL, status );
       }
     }
   }

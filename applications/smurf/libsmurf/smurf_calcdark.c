@@ -158,7 +158,8 @@ void smurf_calcdark( int *status ) {
     ndgNdfas( dgrp, i, "READ", &indf, status );
 
     smf_apply_mask( NULL, dark, bbms, SMF__BBM_DATA, 0, status );
-    smf_write_smfData( NULL, dark, NULL, NULL, ogrp, i, indf, MSG__VERB, 0, status );
+    smf_write_smfData( NULL, dark, NULL, NULL, ogrp, i, indf, MSG__VERB,
+                       0, NULL, NULL, status );
     ndfAnnul( &indf, status);
   }
 

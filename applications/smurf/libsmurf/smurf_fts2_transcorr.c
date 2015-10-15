@@ -360,7 +360,7 @@ void smurf_fts2_transcorr(int* status)
       astFree(TAtmNew);
 
       smf_write_smfData(NULL, outData, NULL, NULL, outGrp, fIndex, 0, MSG__VERB,
-                        0, status);
+                        0, NULL, NULL, status);
       smf_close_file( NULL,&outData, status);
       smf_close_file( NULL,&inData, status);
     } else {

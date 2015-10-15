@@ -14,9 +14,10 @@
 
 *  Invocation:
 *     smf_write_smfData ( ThrWorkForce *wf, const smfData *data, const smfData *variance,
-*                        const char * filename,
-*                        const Grp * igrp, size_t grpindex,
-*                        int provid, msglev_t msglev, int single, int * status );
+*                         const char * filename, const Grp * igrp, size_t grpindex,
+*                         int provid, msglev_t msglev, int single,
+*                         void (*func)(ThrWorkForce *wf,int indf,void *info,int *status),
+*                         void *info, int * status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -48,6 +49,15 @@
 *        first one found to contain any good, unflagged, values. If zero,
 *        then the full 3D data array is written out. Only used if the
 *        smfData is 3-dimensional.
+*     func = void (*func)( ThrWorkForce *wf, int indf, void *info, int *status )
+*        Pointer to a function, or NULL. If not NULL, the function is
+*        invoked just before the output NDF is closed. It is supplied
+*        with the workforce, the identifier for the output NDF, and an arbitrary
+*        pointer supplied by the caller ("info"). This facility may be used to
+*        store extra information in the NDF.
+*     info = void *
+*        A pointer to arbitrary information to pass to the "func"
+*        function. May be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -121,6 +131,8 @@
 *        the data into a subsequent run of makemap (i.e. SKYLOOP).
 *     2015-02-20 (MS):
 *        Added new smfFts fields for quality statistics
+*     2015-02-20 (DSB):
+*        Added arguments "func" and "info".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -173,10 +185,11 @@
 
 #define FUNC_NAME "smf_write_smfData"
 
-void smf_write_smfData( ThrWorkForce *wf, const smfData *data,
-                        const smfData *variance, const char * filename,
-                        const Grp * igrp, size_t grpindex,
-                        int provid, msglev_t msglev, int single, int * status ) {
+void smf_write_smfData ( ThrWorkForce *wf, const smfData *data, const smfData *variance,
+                         const char * filename, const Grp * igrp, size_t grpindex,
+                         int provid, msglev_t msglev, int single,
+                         void (*func)( ThrWorkForce *wf, int indf, void *info, int *status ),
+                         void *info, int * status ){
 
   double *pd=NULL;              /* Pointer to DATA buffer */
   size_t dbstride;              /* bolo stride of data */
@@ -724,6 +737,9 @@ void smf_write_smfData( ThrWorkForce *wf, const smfData *data,
         datAnnul(&loc, status);
       }
     }
+
+  /* If required, call the user supplied function. */
+    if( func ) (*func)( wf, outfile->ndfid, info, status );
   }
 
   /* Close the output file */

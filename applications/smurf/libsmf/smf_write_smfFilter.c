@@ -149,7 +149,7 @@ void smf_write_smfFilter( ThrWorkForce *wf, const smfFilter *filt, const char *f
 
   /* Write out the file */
   smf_write_smfData( wf, data, NULL, filename, igrp, grpindex, 0, MSG__NORM,
-                     0, status );
+                     0, NULL, NULL, status );
 
   if( data ) smf_close_file( wf, &data, status );
 

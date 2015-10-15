@@ -684,7 +684,8 @@ void smurf_fts2_spectrum(int* status)
 
         /* Write output */
         /* outData->fts = smf_construct_smfFts(NULL, sfp, fpm, sigma, status);   // TODO: Add interpolated SFP to FITS header */
-        smf_write_smfData(NULL, outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outData, NULL, NULL, gOut, fIndex, 0,
+                          MSG__VERB, 0, NULL, NULL, status);
         if(*status != SAI__OK) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, "Unable to write the output file!", status);

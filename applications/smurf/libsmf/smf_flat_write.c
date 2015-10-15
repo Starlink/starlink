@@ -312,7 +312,7 @@ void smf_flat_write( ThrWorkForce *wf, smf_flatmeth flatmeth, const char * flatn
 
     /* create the file */
     smf_write_smfData( wf, polyfit, NULL, fitfile, NULL, 0, NDF__NOID,
-                       MSG__VERB, 0, status );
+                       MSG__VERB, 0, NULL, NULL, status );
 
     /* Same WCS as the main file */
     ndfOpen( NULL, fitfile, "UPDATE", "OLD", &fndf, &place, status );

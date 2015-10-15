@@ -316,7 +316,8 @@ void smurf_sc2filtermap( int *status ) {
     }
 
     /* Export the data to a new file */
-    smf_write_smfData( wf, odata, NULL, NULL, ogrp, i, 0, MSG__NORM, 0, status );
+    smf_write_smfData( wf, odata, NULL, NULL, ogrp, i, 0, MSG__NORM, 0,
+                       NULL, NULL, status );
 
     /* Write out filters? */
     if( fgrp ) smf_write_smfFilter( wf, filt, NULL, fgrp, i, status );

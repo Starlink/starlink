@@ -699,12 +699,12 @@ void smurf_calcqu( int *status ) {
 
 /* Copy the smfData structures to the output NDFs. */
                smf_write_smfData ( wf, odataq, NULL, NULL, ogrpq, gcount,
-                                   0, MSG__VERB, 0, status );
+                                   0, MSG__VERB, 0, NULL, NULL, status );
                smf_write_smfData ( wf, odatau, NULL, NULL, ogrpu, gcount,
-                                   0, MSG__VERB, 0, status );
+                                   0, MSG__VERB, 0, NULL, NULL, status );
                if( ogrpi ) {
                   smf_write_smfData ( wf, odatai, NULL, NULL, ogrpi, gcount,
-                                      0, MSG__VERB, 0, status );
+                                      0, MSG__VERB, 0, NULL, NULL, status );
                }
 
 /* Free the smfData structures. */
