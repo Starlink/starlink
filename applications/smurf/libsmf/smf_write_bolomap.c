@@ -342,7 +342,7 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
 
             /* Write WCS */
             if( outfset ) {
-               smf_set_moving(outfset,NULL,status);
+               smf_set_moving( (AstFrame *) outfset, NULL, status );
                ndfPtwcs( outfset, mapdata->file->ndfid, status );
             }
           }

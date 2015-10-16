@@ -259,7 +259,7 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[],
       /* Take a copy of the input WCS and modify if necessary that
 	 before writing to the NDF */
       ndfwcs = astCopy( wcs );
-      smf_set_moving( ndfwcs, NULL, status );
+      smf_set_moving( (AstFrame *) ndfwcs, NULL, status );
       ndfPtwcs( ndfwcs, ndfid, status );
       if (ndfwcs) ndfwcs = astAnnul( ndfwcs );
     }

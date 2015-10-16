@@ -73,6 +73,10 @@
 *        valid for SCUBA-2 on 20091205)
 *     2010-01-14 (TIMJ):
 *        Check for bad SMU explicitly.
+*     16-OCT-2015 (DSB):
+*        Use smf_set_moving to assign attributes for a moving target,
+*        rather than just setting SkyRefIs (smf_set_moving also sets
+*        AlignOffset).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -232,7 +236,6 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
    the current Frame pointer rather than the FrameSet pointer avoid the
    extra time spent re-mapping the FrameSet - the FrameSet will be re-mapped
    when we set SkyRefIs below). */
-
       skyout = astGetFrame( tempfs, AST__CURRENT );
       astSetD( skyout, "SkyRef(1)", a );
       astSetD( skyout, "SkyRef(2)", b );
@@ -241,14 +244,13 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
    Frame represents offsets from the origin (set above). We use the FrameSet
    pointer "tempfs" now rather than "skyout" so that the Mapping in the FrameSet
    will be modified to remap the current Frame. */
-      astSet( tempfs, "SkyRefIs=origin" );
+      smf_set_moving( (AstFrame *) tempfs, NULL, status );
 
 /* Get the Mapping and then clean up. We do not have to clear any attributes
    because we are working on a complete copy. */
       fsmap = astGetMapping( tempfs, AST__BASE, AST__CURRENT );
       skyout = astAnnul( skyout );
       tempfs = astAnnul( tempfs );
-
 
 /* If the target is not moving, just get the Mapping. */
    } else {

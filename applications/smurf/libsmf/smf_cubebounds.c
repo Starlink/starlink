@@ -230,6 +230,10 @@
 *        Handle cases where the target is moving but the output cube has
 *        absolute sky coords (e.g. when creating JSA tiles for moving targets).
 *        Included adding arguments aref and bref.
+*     16-OCT-2015 (DSB):
+*        Use smf_set_moving to assign attributes for a moving target,
+*        rather than just setting SkyRefIs (smf_set_moving also sets
+*        AlignOffset).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -732,7 +736,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                oldb = astTest( fs, "SkyRef(2)" ) ? astGetD( fs, "SkyRef(2)" ) : AST__BAD;
                astSetD( fs, "SkyRef(1)", a );
                astSetD( fs, "SkyRef(2)", b );
-               astSet( fs, "SkyRefIs=origin" );
+               smf_set_moving( (AstFrame *) fs, NULL, status );
 
 /* Get the Mapping and then reset the SkyRef attributes. */
                oskymap2 = astGetMapping( fs, AST__BASE, AST__CURRENT );
@@ -841,7 +845,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    modified to remap the current Frame. */
             astSetD( fs, "SkyRef(1)", a );
             astSetD( fs, "SkyRef(2)", b );
-            astSet( fs, "SkyRefIs=origin" );
+            smf_set_moving( (AstFrame *) fs, NULL, status );
 
 /* Get the Mapping and then clear the SkyRef attributes (this is because
    the current Frame in "fs" may be "*skyframe" and we do not want to make a

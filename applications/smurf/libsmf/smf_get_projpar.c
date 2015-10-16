@@ -99,6 +99,10 @@
 *     2012-05-28 (DSB):
 *        If the user supplies a new celestial reference position, then store
 *        it in the skyframe.
+*     2015-10-16 (DSB):
+*        Use smf_set_moving to assign attributes for a moving target,
+*        rather than just setting SkyRefIs (smf_set_moving also sets
+*        AlignOffset).
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -190,7 +194,7 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
 /* If the target is moving, ensure the returned SkyFrame represents
    offsets from the first telescope base pointing position rather than
    absolute coords. */
-   if( moving ) astSet( skyframe, "SkyRefIs=Origin" );
+   if( moving ) smf_set_moving( (AstFrame *) skyframe, NULL, status );
 
 /* Set a flag indicating if all the points are co-incident. */
    coin = 0;

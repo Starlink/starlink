@@ -181,6 +181,10 @@
 *        Fix memory leak (ac1list and ac2list not being freed).
 *     2014-12-16 (DSB):
 *        Do not assume the first subscan will always be usable.
+*     2015-10-16 (DSB):
+*        Use smf_set_moving to assign attributes for a moving target,
+*        rather than just setting SkyRefIs (smf_set_moving also sets
+*        AlignOffset).
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -512,7 +516,8 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
              reference position rather than absolute coords. */
           astSetD( oskyframe, "SkyRef(1)", skyref[ 0 ] );
           astSetD( oskyframe, "SkyRef(2)", skyref[ 1 ] );
-          if( *moving ) astSet( oskyframe, "SkyRefIs=Origin" );
+          if( *moving ) smf_set_moving( (AstFrame *) oskyframe, NULL,
+status );
 
           /* Ensure the Epoch attribute in the map is set to the date of
              the first data in the map, rather than the date in supplied

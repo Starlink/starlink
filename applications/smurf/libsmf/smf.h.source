@@ -1925,7 +1925,7 @@ smf_qual_t * smf_select_qualpntr( smfData * data, smf_qfam_t * qfamily, int * st
 void smf_set_clabels( const char title[], const char label[],
                       const char units[], smfHead* hdr, int * status );
 
-void smf_set_moving( AstFrameSet* wcs, AstFitsChan * fchan, int *status );
+void smf_set_moving( AstFrame *wcs, AstFitsChan *fchan, int *status );
 
 void smf_smfFile_msg( const smfFile * file, const char token[],
                       int strip, const char fallback[] );

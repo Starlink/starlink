@@ -13,21 +13,22 @@
 *     Library routine
 
 *  Invocation:
-*     smf_set_moving( AstFrameSet * wcs, AstFitsChan *fchan, int *status);
+*     smf_set_moving( AstFrame *wcs, AstFitsChan *fchan, int *status);
 
 *  Arguments:
-*     wcs = AstFrameSet * (Given and Returned)
+*     wcs = AstFrame * (Given and Returned)
 *        World coordinate system information to be checked and modified.
+*        This can be a Frame or a FrameSet.
 *     fchan = AstFitsChan * (Given and Returned)
 *        If the source is moving but no BASECx header is present, they
-*        will be constructed from the frameset reference position. Can
+*        will be constructed from the Frame reference position. Can
 *        be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
 *     This routine checks the coordinate system attribute in the given
-*     FrameSet and sets the SkyRefIs and AlignOffset attributes to the
+*     Frame and sets the SkyRefIs and AlignOffset attributes to the
 *     appropriate values for objects which have a moving BASE position
 *     (e.g. planets). The routine performs no action if the SYSTEM is
 *     not AZEL or GAPPT. BASECx headers are written to the FitsChan
@@ -46,7 +47,7 @@
 *        Add Fitschan to fill in BASECx
 *     2011-04-01 (TIMJ):
 *        BASECx must be stored in TRACKSYS coordinates, not the
-*        system of the current frameset.
+*        system of the current Frame.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -97,14 +98,14 @@
 
 #define FUNC_NAME "smf_set_moving"
 
-void smf_set_moving ( AstFrameSet* wcs, AstFitsChan * fchan, int *status ) {
+void smf_set_moving ( AstFrame *wcs, AstFitsChan *fchan, int *status ) {
 
   /* Local variables */
   const char *astsys = NULL;    /* Name of AST-supported coordinate system */
 
   if ( *status != SAI__OK ) return;
 
-  /* Check for valid WCS FrameSet */
+  /* Check for valid WCS Frame */
   if ( wcs ) {
     astsys = astGetC( wcs, "SYSTEM" );
     if ( astsys ) {
@@ -118,7 +119,7 @@ void smf_set_moving ( AstFrameSet* wcs, AstFitsChan * fchan, int *status ) {
       if (fchan) {
         double dtemp = 0.0;
         /* If we are missing one of the BASE headers add in new versions
-           with the base position from the frameset */
+           with the base position from the Frame */
         if (!astGetFitsF( fchan, "BASEC1", &dtemp ) ||
             !astGetFitsF( fchan, "BASEC2", &dtemp ) ) {
           char * tracksys = NULL;
@@ -126,7 +127,7 @@ void smf_set_moving ( AstFrameSet* wcs, AstFitsChan * fchan, int *status ) {
              frame. So take a copy of the WCS before we modify things */
           if (astGetFitsS( fchan, "TRACKSYS", &tracksys )) {
             const char * asttracksys = sc2ast_convert_system( tracksys, status );
-            AstFrameSet * wcs2 = astCopy( wcs );
+            AstFrame * wcs2 = astCopy( wcs );
 
             astSet( wcs2, "System=%s", asttracksys );
             atlPtftd( fchan, "BASEC1", AST__DR2D * astGetD( wcs2, "SkyRef(1)"),

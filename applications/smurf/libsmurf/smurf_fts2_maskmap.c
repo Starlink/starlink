@@ -250,7 +250,7 @@ void smurf_fts2_maskmap(int* status) {
               break;
             }
             slicefrm = astCopy(hdr->wcs);
-            smf_set_moving(slicefrm, NULL, status);
+            smf_set_moving( (AstFrame *) slicefrm, NULL, status);
             astTranGrid(slicefrm, 2, lbnd, ubnd, /*Tol:*/ tol,
                         /*Maxpix:*/ 1000, /*Forward:*/ 1, 2, 32 * 40, coord);
           }

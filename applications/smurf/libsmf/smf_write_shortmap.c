@@ -342,7 +342,7 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res,
     shortstart = shortend+1;
 
     /* Write WCS */
-    smf_set_moving(outfset,NULL,status);
+    smf_set_moving( (AstFrame *) outfset, NULL, status );
     ndfPtwcs( outfset, mapdata->file->ndfid, status );
 
     /* Clean up */

@@ -1507,7 +1507,7 @@ void smurf_makemap( int *status ) {
 
       /* Write WCS */
       if (wcstile2d) {
-	smf_set_moving(wcstile2d,fchan,status);
+	smf_set_moving( (AstFrame *) wcstile2d, fchan, status );
 	ndfPtwcs( wcstile2d, ondf, status );
       }
 
@@ -1839,7 +1839,7 @@ void smurf_makemap( int *status ) {
     }
 
     /* Write WCS */
-    smf_set_moving(outfset,fchan,status);
+    smf_set_moving( (AstFrame *) outfset, fchan, status );
     ndfPtwcs( outfset, ondf, status );
 
     /* If the map was completed prematurely due to an interupt, add an

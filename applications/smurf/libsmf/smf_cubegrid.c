@@ -199,6 +199,10 @@
 *        specified by environment parameter EXTRACOLS.
 *     26-NOV-2013 (DSB):
 *        Add "poserrfatal" parameter.
+*     16-OCT-2015 (DSB):
+*        Use smf_set_moving to assign attributes for a moving target,
+*        rather than just setting SkyRefIs (smf_set_moving also sets
+*        AlignOffset).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -543,7 +547,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    modified to remap the current Frame. */
             astSetD( fs, "SkyRef(1)", a );
             astSetD( fs, "SkyRef(2)", b );
-            astSet( fs, "SkyRefIs=origin" );
+            smf_set_moving( (AstFrame *) fs, NULL, status );
 
 /* Get the Mapping and then clear the SkyRef attributes (this is because
    the current Frame in "fs" may be "*skyframe" and we do not want to make a

@@ -223,7 +223,7 @@ void smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapva
   }
 
   /* Write WCS (protecting the pointer dereference) */
-  smf_set_moving(outfset,NULL,status);
+  smf_set_moving( (AstFrame *) outfset, NULL, status );
   if (*status == SAI__OK && imapdata) {
     ndfPtwcs( outfset, imapdata->file->ndfid, status );
   }

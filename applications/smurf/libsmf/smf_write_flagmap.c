@@ -184,7 +184,7 @@ void smf_write_flagmap( ThrWorkForce *wf, smf_qual_t mask, smfArray *lut, smfArr
   }
 
   /* Write WCS */
-  smf_set_moving(outfset,NULL,status);
+  smf_set_moving( (AstFrame *) outfset, NULL, status );
   ndfPtwcs( outfset, mapdata->file->ndfid, status );
 
   /* Clean up */
