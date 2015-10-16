@@ -472,36 +472,37 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    info for the slice (we need this to get the elevation for each slice). */
             state = pdata->allstate;
             for( itime = 0; itime < ntslice; itime++,state++ ) {
+               if( *pl != VAL__BADI ) {
 
 /* Get the total intensity for the sample. If it is bad, flag the sample. */
-               ival = imapdata[ *pl ];
-               if( ival == VAL__BADD ) {
-                  *pq |= SMF__Q_IP;
+                  ival = imapdata[ *pl ];
+                  if( ival == VAL__BADD ) {
+                     *pq |= SMF__Q_IP;
 
 /* Skip this sample if the residual is bad or flagged, of the
    corresponding map pixel is undefined, or the telescope elevation is
    unknown. */
-               } else if( *pr != VAL__BADD && !( *pq & SMF__Q_MOD ) &&
-                          *pa != VAL__BADD && *pl != VAL__BADI &&
-                          state->tcs_az_ac2 != VAL__BADD) {
+                  } else if( *pr != VAL__BADD && !( *pq & SMF__Q_MOD ) &&
+                             *pa != VAL__BADD && state->tcs_az_ac2 != VAL__BADD) {
 
 /* Find the normalised instrumental Q and U. These are with respect to the
    focal plane Y axis. */
-                  qfp = tmp1 + p1*cos( tmp3 + 2*state->tcs_az_ac2 );
-                  ufp = tmp2 + p1*sin( tmp3 + 2*state->tcs_az_ac2 );
+                     qfp = tmp1 + p1*cos( tmp3 + 2*state->tcs_az_ac2 );
+                     ufp = tmp2 + p1*sin( tmp3 + 2*state->tcs_az_ac2 );
 
 /* Rotate them to match the reference frame of the supplied Q and U
    values (should be tracking north). */
-                  cosval = cos( 2*( *pa ) );
-                  sinval = sin( 2*( *pa ) );
-                  qtr = qfp*cosval + ufp*sinval;
-                  utr = -qfp*sinval + ufp*cosval;
+                     cosval = cos( 2*( *pa ) );
+                     sinval = sin( 2*( *pa ) );
+                     qtr = qfp*cosval + ufp*sinval;
+                     utr = -qfp*sinval + ufp*cosval;
 
 /* Correct the residual Q or U value. */
-                  if( *qu == 'Q' ) {
-                     *pr -= imapdata[ *pl ]*qtr;
-                  } else {
-                     *pr -= imapdata[ *pl ]*utr;
+                     if( *qu == 'Q' ) {
+                        *pr -= ival*qtr;
+                     } else {
+                        *pr -= ival*utr;
+                     }
                   }
                }
 
