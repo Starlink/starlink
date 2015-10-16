@@ -29,8 +29,10 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain_list,
 *     FrameSet are also split and added to the returned FrameSet.
 *
 *     If the search is unsuccessful, or if the required current Frame axes
-*     are not independent of the other axes, then a NULL pointer is returned
-*     but no error is reported.
+*     are not independent of the other axes, then each of the other Frames
+*     in the FrameSet is searched in the same way (excluding the base Frame).
+*     If no suitable Frame can be found, a NULL pointer is returned but no
+*     error is reported.
 
 *  Arguments:
 *     fset
@@ -97,24 +99,27 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain_list,
 *        same as in the supplied FrameSet.
 *     24-JUL-2014 (DSB):
 *        Allow a space-separated list of Domains to be supplied.
+*     16-OCT-2015 (DSB):
+*        Search all other Frames in the supplied FrameSet if the original current
+*        Frame does not match the given requirements.
 *     {enter_further_changes_here}
 *-
 */
 
 
 /* Local Variables: */
-   AstFrame *bfrm_in;
    AstFrame *bfrm_out;
-   AstFrame *cfrm_in;
+   AstFrame *bfrm_in;
    AstFrame *cfrm_out;
-   AstFrame *ffrm;
+   AstFrame *cfrm_in;
    AstFrame *frm;
+   AstFrame *ffrm;
    AstFrameSet *result;
-   AstMapping *bcmap;
-   AstMapping *fmap;
    AstMapping *oldmap;
-   char *domain;
+   AstMapping *fmap;
+   AstMapping *bcmap;
    char **domains;
+   char *domain;
    char attrib[20];
    const char *axis_domain;
    int *baxes;
@@ -123,8 +128,10 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain_list,
    int i;
    int ibase;
    int icurr;
+   int jcurr;
    int idom;
    int iframe;
+   int jframe;
    int nax;
    int nb_in;
    int nb_out;
@@ -143,134 +150,161 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain_list,
    are freed automatically when the context is ended. */
    astBegin;
 
+/* Get the indicies of the original base and current frames. */
+   ibase = astGetI( fset, "Base" );
+   icurr = astGetI( fset, "Current" );
+
+/* How many Frames in the FrameSet?> */
+   nframe = astGetI( fset, "NFrame" );
+
+/* Loop over all Frames until a match is found. The current Frame is used
+   for jframe zero. Break out of the loop if we have found a result. */
+   for( jframe = 0; jframe <= nframe && !result; jframe++ ) {
+
+/* Skip the base Frame. */
+      if( jframe == ibase ) {
+         continue;
+
+/* Otherwise, set the current frame to be frame "iframe". Iframe zero
+   corresponds to the original current frame so leave the current Frame
+   unchanegd  if iframe is zero. */
+      } else if( jframe != 0 ) {
+         astSetI( fset, "Current", jframe );
+         jcurr = jframe;
+
+      } else {
+         jcurr = icurr;
+      }
+
 /* Get a pointer to the current Frame in the supplied FrameSet, and get
    the number of axes it contains. */
-   cfrm_in = astGetFrame( fset, AST__CURRENT );
-   nc_in = astGetI( cfrm_in, "Naxes" );
+      cfrm_in = astGetFrame( fset, AST__CURRENT );
+      nc_in = astGetI( cfrm_in, "Naxes" );
 
 /* Get a pointer to the base Frame in the supplied FrameSet, and get
    the number of axes it contains. */
-   bfrm_in = astGetFrame( fset, AST__BASE );
-   nb_in = astGetI( bfrm_in, "Naxes" );
+      bfrm_in = astGetFrame( fset, AST__BASE );
+      nb_in = astGetI( bfrm_in, "Naxes" );
 
 /* Allocate arrays to hold the indicies of the axes that are to be used
    to create the returned FrameSet. */
-   caxes = astMalloc( nc_in*sizeof( *caxes ) );
-   baxes = astMalloc( nb_in*sizeof( *baxes ) );
+      caxes = astMalloc( nc_in*sizeof( *caxes ) );
+      baxes = astMalloc( nb_in*sizeof( *baxes ) );
 
 /* Extract all words from the supplied list of Domains. */
-   domains = astChrSplit( domain_list, &ndom );
+      domains = astChrSplit( domain_list, &ndom );
 
 /* Loop round each supplied Domain until one is found which allows the
    supplied FrameSet to be split. */
-   for( idom = 0; !result && idom < ndom && *status == SAI__OK; idom++ ) {
-      domain = domains[ idom ];
+      for( idom = 0; !result && idom < ndom && *status == SAI__OK; idom++ ) {
+         domain = domains[ idom ];
 
 /* Check each axis of the current Frame of the supplied FrameSet. If its
    Domain matches the required Domain, add its index to the above array. */
-      nc_out = 0;
-      for( i = 0; i < nc_in; i++ ) {
-         sprintf( attrib, "Domain(%d)", i + 1 );
-         axis_domain = astGetC( cfrm_in, attrib );
-         if( axis_domain ) {
-            if( !strcmp( axis_domain, domain ) ) caxes[ nc_out++ ] = i + 1;
-         } else {
-            break;
+         nc_out = 0;
+         for( i = 0; i < nc_in; i++ ) {
+            sprintf( attrib, "Domain(%d)", i + 1 );
+            axis_domain = astGetC( cfrm_in, attrib );
+            if( axis_domain ) {
+               if( !strcmp( axis_domain, domain ) ) caxes[ nc_out++ ] = i + 1;
+            } else {
+               break;
+            }
          }
-      }
 
 /* Check some axes were found. */
-      if( nc_out > 0 ) {
+         if( nc_out > 0 ) {
 
 /* Attempt to find a set of corresponding base Frame axes. We need to
    invert the FrameSet first since astMapSplit selects inputs, not outputs. */
-         astInvert( fset );
-         astMapSplit( fset, nc_out, caxes, baxes, &bcmap );
+            astInvert( fset );
+            astMapSplit( fset, nc_out, caxes, baxes, &bcmap );
 
 /* Invert the FrameSet again so that it is returned in its original state. */
-         astInvert( fset );
+            astInvert( fset );
 
 /* Check the required axes are independent of the other axes. */
-         if( bcmap ) {
+            if( bcmap ) {
 
 /* The Mapping returned by astMapSplit above, goes from current Frame to
    base Frame, so invert it. */
-            astInvert( bcmap );
+               astInvert( bcmap );
 
 /* Select the required axes from the current Frame of the supplied
    FrameSet. */
-            cfrm_out = astPickAxes( cfrm_in, nc_out, caxes, NULL );
+               cfrm_out = astPickAxes( cfrm_in, nc_out, caxes, NULL );
 
 /* Select the required axes from the base Frame of the supplied
    FrameSet. */
-            nb_out = astGetI( bcmap, "Nin" );
-            bfrm_out = astPickAxes( bfrm_in, nb_out, baxes, NULL );
+               nb_out = astGetI( bcmap, "Nin" );
+               bfrm_out = astPickAxes( bfrm_in, nb_out, baxes, NULL );
 
 /* Initialise the returned FrameSet to hold the required base Frame axes. */
-            result = astFrameSet( bfrm_out, " " );
+               result = astFrameSet( bfrm_out, " " );
 
 /* Now attempt to add other Frames to the returned FrameSet. We leave the
    current Frame until last. */
-            ibase = astGetI( fset, "Base" );
-            icurr = astGetI( fset, "Current" );
-            nframe = astGetI( fset, "NFrame" );
-            for( iframe = 1; iframe <= nframe; iframe++ ) {
+               for( iframe = 1; iframe <= nframe; iframe++ ) {
 
 /* Skip the current and base Frames as they are dealt with separately. */
-               if( iframe != ibase && iframe != icurr ) {
+                  if( iframe != ibase && iframe != jcurr ) {
 
 /* Get the Mapping from the base Frame to this Frame. */
-                  oldmap = astGetMapping( fset, ibase, iframe );
+                     oldmap = astGetMapping( fset, ibase, iframe );
 
 /* An array to hold the indicies of the axes to pick from this Frame. */
-                  faxes = astMalloc( astGetI( oldmap, "Nout" )*sizeof( *faxes ) );
+                     faxes = astMalloc( astGetI( oldmap, "Nout" )*sizeof( *faxes ) );
 
 /* See if the selected base Frame axes feed a distinct subset of axes in
    this Frame. If so, we can add this Frame into the returned FrameSet. */
-                  astMapSplit( oldmap, nb_out, baxes, faxes, &fmap );
-                  if( fmap ) {
+                     astMapSplit( oldmap, nb_out, baxes, faxes, &fmap );
+                     if( fmap ) {
 
 /* Select the required axes from this Frame. */
-                     frm = astGetFrame( fset, iframe );
-                     nax = astGetI( fmap, "Nout" );
-                     ffrm = astPickAxes( frm, nax, faxes, NULL );
+                        frm = astGetFrame( fset, iframe );
+                        nax = astGetI( fmap, "Nout" );
+                        ffrm = astPickAxes( frm, nax, faxes, NULL );
 
 /* Add the axes into the returned FrameSet. */
-                     astAddFrame( result, AST__BASE, fmap, ffrm );
-                  }
+                        astAddFrame( result, AST__BASE, fmap, ffrm );
+                     }
 
-                  faxes = astFree( faxes );
+                     faxes = astFree( faxes );
+                  }
                }
-            }
 
 /* Finally add in the current Frame (which then remains the curent Frame
    because this is the last call to astAddFrame). */
-            astAddFrame( result, AST__BASE, bcmap, cfrm_out );
+               astAddFrame( result, AST__BASE, bcmap, cfrm_out );
+            }
          }
       }
-   }
 
 /* If required, return pointers to the used base and current Frame axes. */
-   if( result && *status == SAI__OK ) {
-      if( bax ) {
-         *bax = baxes;
-         baxes = NULL;
+      if( result && *status == SAI__OK ) {
+         if( bax ) {
+            *bax = baxes;
+            baxes = NULL;
+         }
+         if( cax ) {
+            *cax = caxes;
+            caxes = NULL;
+         }
       }
-      if( cax ) {
-         *cax = caxes;
-         caxes = NULL;
+
+/* Free remaining resources. */
+      caxes = astFree( caxes );
+      baxes = astFree( baxes );
+      if( domains ) {
+         for( idom = 0; idom < ndom; idom++ ) {
+            domains[ idom ] = astFree( domains[ idom ] );
+         }
+         domains = astFree( domains );
       }
    }
 
-/* Free remaining resources. */
-   caxes = astFree( caxes );
-   baxes = astFree( baxes );
-   if( domains ) {
-      for( idom = 0; idom < ndom; idom++ ) {
-         domains[ idom ] = astFree( domains[ idom ] );
-      }
-      domains = astFree( domains );
-   }
+/* Re-instate the original current Frame in the supplied FrameSet. */
+   astSetI( fset, "Current", icurr );
 
 /* Export the result from the current AST context so the pointer is not
    annulled by the following call to astEnd. */
