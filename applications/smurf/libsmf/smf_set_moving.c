@@ -37,7 +37,8 @@
 *  Notes:
 
 *  Authors:
-*     Andy Gibb (UBC)
+*     AGG: Andy Gibb (UBC)
+*     DSB: David Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -48,6 +49,10 @@
 *     2011-04-01 (TIMJ):
 *        BASECx must be stored in TRACKSYS coordinates, not the
 *        system of the current Frame.
+*     2015-10-16 (DSB):
+*        - The "wcs" argument may be a Frame rather than a FrameSet, so
+*        change its type to "AstFrame *" (since a FrameSet is a Frame).
+*        - This function is not called a lot, so make it silent.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -84,7 +89,6 @@
 /* Starlink includes */
 #include "sae_par.h"
 #include "mers.h"
-#include "msg_par.h"
 #include "prm_par.h"
 #include "par.h"
 #include "ast.h"
@@ -110,8 +114,6 @@ void smf_set_moving ( AstFrame *wcs, AstFitsChan *fchan, int *status ) {
     astsys = astGetC( wcs, "SYSTEM" );
     if ( astsys ) {
       if (strcmp(astsys,"AZEL") == 0 || strcmp(astsys, "GAPPT") == 0 ) {
-	msgOutif( MSG__DEBUG, "",
-		  "SMF_SET_MOVING: setting attributes for moving sources", status );
 	astSet( wcs, "SkyRefIs=Origin,AlignOffset=1" );
       }
 
@@ -138,8 +140,6 @@ void smf_set_moving ( AstFrame *wcs, AstFitsChan *fchan, int *status ) {
         }
       }
     }
-  } else {
-    msgOutif( MSG__DEBUG, "", "SMF_SET_MOVING: Input WCS is NULL", status );
   }
 
 }
