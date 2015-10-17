@@ -18,6 +18,10 @@ Main Changes in this Version
 
 - Avoid some more compiler warnings.
 
+- A "BadKeyValue" warning is now issued by the FitsChan class if an illegal
+FITS keyword value is encountered. See attribute "Warnings" and function
+"astWarnings".
+
 Main Changes in V8.0.6
 ----------------------
 
