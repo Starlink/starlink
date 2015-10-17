@@ -9815,8 +9815,8 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
 /* Report an error if there are too many pixels in the input. */ \
    if ( astOK && (int) mpix != mpix ) { \
       astError( AST__EXSPIX, "astRebin"#X"(%s): Supplied input array " \
-                "contains too many pixels (%zu): must be fewer than %d.", \
-                status, astGetClass( this ), mpix, INT_MAX ); \
+                "contains too many pixels (%g): must be fewer than %d.", \
+                status, astGetClass( this ), (double) mpix, INT_MAX ); \
    } \
 \
 /* Check that the positional accuracy tolerance supplied is valid and \
@@ -9858,8 +9858,8 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
 /* Report an error if there are too many pixels in the output. */ \
    if ( astOK && (int) mpix != mpix ) { \
       astError( AST__EXSPIX, "astRebin"#X"(%s): Supplied output array " \
-                "contains too many pixels (%zu): must be fewer than %d.", \
-                status, astGetClass( this ), mpix, INT_MAX ); \
+                "contains too many pixels (%g): must be fewer than %d.", \
+                status, astGetClass( this ), (double) mpix, INT_MAX ); \
    } \
 \
 /* Similarly check the bounds of the input region. */ \
@@ -9900,8 +9900,8 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
 /* Report an error if there are too many pixels in the input region. */ \
    if ( astOK && (int) mpix != mpix ) { \
       astError( AST__EXSPIX, "astRebin"#X"(%s): Supplied input region " \
-                "contains too many pixels (%zu): must be fewer than %d.", \
-                status, astGetClass( this ), mpix, INT_MAX ); \
+                "contains too many pixels (%g): must be fewer than %d.", \
+                status, astGetClass( this ), (double) mpix, INT_MAX ); \
    } \
 \
 /* If OK, loop to determine how many input pixels are to be binned. */ \
@@ -12107,8 +12107,8 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 /* Report an error if there are too many pixels in the input. */ \
       if ( astOK && (int) mpix != mpix ) { \
          astError( AST__EXSPIX, "astRebinSeq"#X"(%s): Supplied input array " \
-                   "contains too many pixels (%zu): must be fewer than %d.", \
-                   status, astGetClass( this ), mpix, INT_MAX ); \
+                   "contains too many pixels (%g): must be fewer than %d.", \
+                   status, astGetClass( this ), (double) mpix, INT_MAX ); \
       } \
 \
 /* Ensure any supplied "in_var" pointer is ignored if no input variances are \
@@ -12162,8 +12162,8 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 /* Report an error if there are too many pixels in the output. */ \
    if ( astOK && (int) mpix != mpix ) { \
       astError( AST__EXSPIX, "astRebinSeq"#X"(%s): Supplied output array " \
-                "contains too many pixels (%zu): must be fewer than %d.", \
-                status, astGetClass( this ), mpix, INT_MAX ); \
+                "contains too many pixels (%g): must be fewer than %d.", \
+                status, astGetClass( this ), (double) mpix, INT_MAX ); \
    } \
 \
 /* Similarly check the bounds of the input region. */ \
@@ -12204,8 +12204,8 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 /* Report an error if there are too many pixels in the input region. */ \
       if ( astOK && (int) mpix != mpix ) { \
          astError( AST__EXSPIX, "astRebinSeq"#X"(%s): Supplied input region " \
-                   "contains too many pixels (%zu): must be fewer than %d.", \
-                   status, astGetClass( this ), mpix, INT_MAX ); \
+                   "contains too many pixels (%g): must be fewer than %d.", \
+                   status, astGetClass( this ), (double) mpix, INT_MAX ); \
       } \
 \
 /* Check that only one of AST__USEVAR and ASR__GENVAR has been supplied. */ \
@@ -13974,8 +13974,8 @@ static int Resample##X( AstMapping *this, int ndim_in, \
 /* Report an error if there are too many pixels in the input. */ \
    if ( astOK && (int) mpix != mpix ) { \
       astError( AST__EXSPIX, "astResample"#X"(%s): Supplied input array " \
-                "contains too many pixels (%zu): must be fewer than %d.", \
-                status, astGetClass( this ), mpix, INT_MAX ); \
+                "contains too many pixels (%g): must be fewer than %d.", \
+                status, astGetClass( this ), (double) mpix, INT_MAX ); \
    } \
 \
 /* Check that the positional accuracy tolerance supplied is valid and \
@@ -14018,8 +14018,8 @@ static int Resample##X( AstMapping *this, int ndim_in, \
 /* Report an error if there are too many pixels in the output. */ \
    if ( astOK && (int) mpix != mpix ) { \
       astError( AST__EXSPIX, "astResample"#X"(%s): Supplied output array " \
-                "contains too many pixels (%zu): must be fewer than %d.", \
-                status, astGetClass( this ), mpix, INT_MAX ); \
+                "contains too many pixels (%g): must be fewer than %d.", \
+                status, astGetClass( this ), (double) mpix, INT_MAX ); \
    } \
 \
 /* Similarly check the bounds of the output region. */ \
@@ -14060,8 +14060,8 @@ static int Resample##X( AstMapping *this, int ndim_in, \
 /* Report an error if there are too many pixels in the output region. */ \
    if ( astOK && (int) mpix != mpix ) { \
       astError( AST__EXSPIX, "astResample"#X"(%s): Supplied output region " \
-                "contains too many pixels (%zu): must be fewer than %d.", \
-                status, astGetClass( this ), mpix, INT_MAX ); \
+                "contains too many pixels (%g): must be fewer than %d.", \
+                status, astGetClass( this ), (double) mpix, INT_MAX ); \
    } \
 \
 /* If we are conserving flux, check "tol" is not zero. */ \
@@ -20347,15 +20347,15 @@ f     be reversed.
    npoint = mpix;
    if ( astOK && npoint != mpix ) {
       astError( AST__EXSPIX, "astTranGrid(%s): Supplied grid "
-                "contains too many points (%zu): must be fewer than %d.",
-                status, astGetClass( this ), mpix, INT_MAX/ncoord_out );
+                "contains too many points (%g): must be fewer than %d.",
+                status, astGetClass( this ), (double) mpix, INT_MAX/ncoord_out );
    }
 
    mpix = outdim*ncoord_out;
    if ( astOK && (int) mpix != mpix ) {
       astError( AST__EXSPIX, "astTranGrid(%s): Supplied output array "
-                "contains too many pixels (%zu): must be fewer than %d.",
-                status, astGetClass( this ), mpix, INT_MAX );
+                "contains too many pixels (%g): must be fewer than %d.",
+                status, astGetClass( this ), (double) mpix, INT_MAX );
    }
 
 

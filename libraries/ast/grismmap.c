@@ -59,12 +59,12 @@ f     The GrismMap class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -283,11 +283,6 @@ void astSet##attribute##_( Ast##class *this, type value, int *status ) { \
 #define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
 #define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
 
-/* Macros to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /* Module Variables. */
 /* ================= */
 
@@ -476,14 +471,14 @@ static AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2,
          gmap2 = (AstGrismMap *) map2;
 
 /* Check that the two GrismMaps have the same attribute values. */
-         if( EQUAL( astGetGrismNR( gmap ), astGetGrismNR( gmap2 )) &&
-             EQUAL( astGetGrismNRP( gmap ), astGetGrismNRP( gmap2 )) &&
-             EQUAL( astGetGrismWaveR( gmap ), astGetGrismWaveR( gmap2 )) &&
-             EQUAL( astGetGrismAlpha( gmap ), astGetGrismAlpha( gmap2 )) &&
-             EQUAL( astGetGrismG( gmap ), astGetGrismG( gmap2 )) &&
-             EQUAL( astGetGrismM( gmap ), astGetGrismM( gmap2 )) &&
-             EQUAL( astGetGrismEps( gmap ), astGetGrismEps( gmap2 )) &&
-             EQUAL( astGetGrismTheta( gmap ), astGetGrismTheta( gmap2 )) ){
+         if( astEQUAL( astGetGrismNR( gmap ), astGetGrismNR( gmap2 )) &&
+             astEQUAL( astGetGrismNRP( gmap ), astGetGrismNRP( gmap2 )) &&
+             astEQUAL( astGetGrismWaveR( gmap ), astGetGrismWaveR( gmap2 )) &&
+             astEQUAL( astGetGrismAlpha( gmap ), astGetGrismAlpha( gmap2 )) &&
+             astEQUAL( astGetGrismG( gmap ), astGetGrismG( gmap2 )) &&
+             astGetGrismM( gmap ) != astGetGrismM( gmap2 ) &&
+             astEQUAL( astGetGrismEps( gmap ), astGetGrismEps( gmap2 )) &&
+             astEQUAL( astGetGrismTheta( gmap ), astGetGrismTheta( gmap2 )) ){
 
 /* If so, check that the GrismMaps are applied in opposite senses. If so
    we can cancel the two GrismMaps, so return a UnitMap. */
@@ -730,7 +725,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                 astEQUAL( this->waver, that->waver ) &&
                 astEQUAL( this->alpha, that->alpha ) &&
                 astEQUAL( this->g, that->g ) &&
-                astEQUAL( this->m, that->m ) &&
+                this->m == that->m &&
                 astEQUAL( this->eps, that->eps ) &&
                 astEQUAL( this->theta, that->theta ) &&
                 astEQUAL( this->k1, that->k1 ) &&
@@ -1168,9 +1163,6 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Local Variables: */
    AstMapping *merged_map; /* Merger of two Mappings */
-   AstMapping *neighbour;  /* Pointer to neighbouring Mapping */
-   const char *class1;     /* Pointer to first Mapping class string */
-   const char *class2;     /* Pointer to second Mapping class string */
    int i1;                 /* Lower index of the two GrismMaps being merged */
    int i2;                 /* Upper index of the two GrismMaps being merged */
    int i;                  /* Mapping index */
@@ -1192,10 +1184,6 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* ===================================================================== */
    if( series ) {
 
-/* Store the classes of the neighbouring Mappings in the list. */
-      class1 = ( where > 0 ) ? astGetClass( ( *map_list )[ where - 1 ] ) : NULL;
-      class2 = ( where < *nmap - 1 ) ? astGetClass( ( *map_list )[ where + 1 ] ) : NULL;
-
 /* Set a flag indicating that we have not yet found a neighbour with which
    the GrismMap can be merged. */
       merged_map = NULL;
@@ -1204,7 +1192,6 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       if( where > 0 ) {
          i1 = where - 1;
          i2 = where;
-         neighbour = ( *map_list )[ i1 ];
          merged_map = CanMerge( ( *map_list )[ i1 ], (* invert_list)[ i1 ],
                                 ( *map_list )[ i2 ], (* invert_list)[ i2 ], status );
       }
@@ -1214,7 +1201,6 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       if( !merged_map && where < *nmap - 1 ) {
          i1 = where;
          i2 = where + 1;
-         neighbour = ( *map_list )[ i2 ];
          merged_map = CanMerge( ( *map_list )[ i1 ], (* invert_list)[ i1 ],
                                 ( *map_list )[ i2 ], (* invert_list)[ i2 ], status );
       }

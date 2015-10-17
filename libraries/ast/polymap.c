@@ -102,11 +102,6 @@ f     - AST_POLYTRAN: Fit a PolyMap inverse or forward transformation
 #define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
 #define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
 
-/* Macro to check for equality of floating point values. We cannot
-compare bad values directory because of the danger of floating point
-exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /* Include files. */
 /* ============== */
 /* Interface definitions. */
@@ -420,7 +415,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
             if( this->coeff_f && that->coeff_f ) {
                for( i = 0; i < nout && result; i++ ) {
                   for( j = 0; j < this->ncoeff_f[ i ] && result; j++ ) {
-                     if( !EQUAL( this->coeff_f[ i ][ j ],
+                     if( !astEQUAL( this->coeff_f[ i ][ j ],
                                  that->coeff_f[ i ][ j ] ) ) {
                         result = 0;
                      }
@@ -452,7 +447,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
             if( this->coeff_i && that->coeff_i ) {
                for( i = 0; i < nin && result; i++ ) {
                   for( j = 0; j < this->ncoeff_i[ i ] && result; j++ ) {
-                     if( !EQUAL( this->coeff_i[ i ][ j ],
+                     if( !astEQUAL( this->coeff_i[ i ][ j ],
                                  that->coeff_i[ i ][ j ] ) ) {
                         result = 0;
                      }
@@ -464,8 +459,8 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                for( i = 0; i < nin && result; i++ ) {
                   for( j = 0; j < this->ncoeff_i[ i ] && result; j++ ) {
                      for( k = 0; k < nout && result; k++ ) {
-                        if( !EQUAL( this->power_i[ i ][ j ][ k ],
-                                    that->power_i[ i ][ j ][ k ] ) ) {
+                        if( this->power_i[ i ][ j ][ k ] !=
+                            that->power_i[ i ][ j ][ k ] ) {
                            result = 0;
                         }
                      }
@@ -2653,8 +2648,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
             for( ico = 0; ico < nc && ok; ico++ ) {
 
-               if( !EQUAL( pmap1->coeff_f[ iax_out ][ ico ],
-                           pmap0->coeff_f[ iax_out ][ ico ] ) ){
+               if( !astEQUAL( pmap1->coeff_f[ iax_out ][ ico ],
+                              pmap0->coeff_f[ iax_out ][ ico ] ) ){
                   ok = 0;
 
                } else {
@@ -2675,8 +2670,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
             for( ico = 0; ico < nc && ok; ico++ ) {
 
-               if( !EQUAL( pmap1->coeff_i[ iax_in ][ ico ],
-                           pmap0->coeff_i[ iax_in ][ ico ] ) ){
+               if( !astEQUAL( pmap1->coeff_i[ iax_in ][ ico ],
+                              pmap0->coeff_i[ iax_in ][ ico ] ) ){
                   ok = 0;
 
                } else {
