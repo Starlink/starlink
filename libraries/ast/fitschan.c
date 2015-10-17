@@ -1150,7 +1150,11 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *     12-OCT-2015 (DSB):
 *        Only add sky axes to a SpecFrame if the WCS Frame contains no
 *        other axes other than the SpecFrame (MakeFitsFrameSet).
-*
+*     17-OCT-2015 (DSB):
+*        - Add new Warning "badkeyvalue", and issue such a warning instead
+*        of an error if the Split function cannot determine the keyword value.
+*        - Move the check for PLTRAH (i.e. DSS encoding) higher up in GetEncoding.
+*        This is because some DSS file slaos have CD and/or PC keywords.
 *class--
 */
 
@@ -1261,7 +1265,7 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 #define LATAX              1
 #define NDESC              9
 #define MXCTYPELEN        81
-#define ALLWARNINGS       " distortion noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat badmat badval badctype badpv badkeyname "
+#define ALLWARNINGS       " distortion noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat badmat badval badctype badpv badkeyname badkeyvalue "
 #define NPFIT             10
 #define SPD               86400.0
 #define FL  1.0/298.257  /*  Reference spheroid flattening factor */
@@ -11717,6 +11721,11 @@ static int GetEncoding( AstFitsChan *this, int *status ){
             ret = FITSAIPS_ENCODING;
          }
 
+/* Otherwise, if the FitsChan contains the "PLTRAH" keywords, use "DSS"
+   encoding. */
+      } else if( astKeyFields( this, "PLTRAH", 0, NULL, NULL ) ){
+         ret = DSS_ENCODING;
+
 /* Otherwise, if the FitsChan contains any keywords with the format
    "PCiiijjj" then return "FITS-PC" encoding. */
       } else if( haswcs && astKeyFields( this, "PC%3d%3d", 0, NULL, NULL ) ){
@@ -11762,11 +11771,6 @@ static int GetEncoding( AstFitsChan *this, int *status ){
    "CRVALi" then return "FITS-WCS" encoding. */
       } else if( haswcs && astKeyFields( this, "CRVAL%d", 0, NULL, NULL ) ){
          ret = FITSWCS_ENCODING;
-
-/* Otherwise, if the FitsChan contains the "PLTRAH" keywords, use "DSS"
-   encoding. */
-      } else if( astKeyFields( this, "PLTRAH", 0, NULL, NULL ) ){
-         ret = DSS_ENCODING;
 
 /* If none of these conditions is met, assume Native encoding. */
       } else {
@@ -30146,16 +30150,18 @@ int Split( AstFitsChan *this, const char *card, char **name, char **value,
    char *dd;                  /* Pointer to intermediate character */
    char *slash;               /* Pointer to comment character */
    char *v;                   /* Pointer to returned value string */
+   char buf[255];             /* Buffer for warning text */
    const char *d;             /* Pointer to first comment character */
    const char *v0;            /* Pointer to first non-blank value character */
    double fi, fr;             /* Values read from value string */
+   int badval;                /* Is the keyword value illegal? */
    int blank_name;            /* Is keyword name blank? */
    int cont;                  /* Is this a continuation card? */
    int i;                     /* Character index */
    int ii, ir;                /* Values read from value string */
    int iopt;                  /* Index of option within list */
-   int lq;                    /* Was previous character an escaping quote? */
    int len;                   /* Used length of value string */
+   int lq;                    /* Was previous character an escaping quote? */
    int nch;                   /* No. of characters used */
    int ndig;                  /* No. of digits in the formatted integer */
    int type;                  /* Keyword data type */
@@ -30171,6 +30177,9 @@ int Split( AstFitsChan *this, const char *card, char **name, char **value,
 
 /* Check the global status. */
    if( !astOK ) return type;
+
+/* Assume initially that the keyword value is legal. */
+   badval = 0;
 
 /* Store the number of characters to be read from the supplied card. This
    is not allowed to be more than the length of a FITS header card. */
@@ -30430,10 +30439,13 @@ int Split( AstFitsChan *this, const char *card, char **name, char **value,
                   }
                }
 
-/* If the value type could not be determined report an error. */
+/* If the value type could not be determined, indicate that a warning
+   should be issued. */
                if( type == AST__COMMENT && astOK ) {
-                  astError( AST__BDFTS, "%s(%s): Illegal keyword value "
-                            "supplied.", status, method, class );
+                  badval = 1;
+                  (*value)[ 0 ] = 0;
+                  (*comment)[ 0 ] = 0;
+                  d = NULL;
                }
             }
 
@@ -30491,15 +30503,26 @@ int Split( AstFitsChan *this, const char *card, char **name, char **value,
       if( ndig >= int_dig ) type = AST__FLOAT;
    }
 
-/* If an error occurred, free the returned strings and issue a context
-   message. */
+/* If an error occurred, free the returned strings and issue a context message. */
    if( !astOK ){
       *name = (char *) astFree( (void *) *name );
       *value = (char *) astFree( (void *) *value );
       *comment = (char *) astFree( (void *) *comment );
       type = AST__COMMENT;
-      astError( astStatus, "%s(%s): Unable to store the following FITS "
-                "header card:\n%s\n", status, method, class, card );
+      if( !astOK ) {
+         astError( astStatus, "%s(%s): Unable to store the following FITS "
+                   "header card:\n%s\n", status, method, class, card );
+      } else {
+         sprintf( buf, "The keyword value in the FITS header card '%s' "
+                  " is illegal.", card );
+         Warn( this, "badkeyvalue", buf, method, class, status );
+      }
+
+/* If a bad keyword value was encountered, issue a warning. */
+   } else if( badval ){
+      sprintf( buf, "The keyword value in the FITS header card '%s' "
+               " is illegal.", card );
+      Warn( this, "badkeyvalue", buf, method, class, status );
    }
 
 /* Return the data type. */
@@ -40634,7 +40657,8 @@ astMAKE_TEST(FitsChan,FitsDigits,( this->fitsdigits != DBL_DIG ))
 *     consist of a space separated list of condition names (see the
 *     AllWarnings attribute for a list of the currently defined names).
 *     Each name indicates a condition which should be reported. The default
-*     value for Warnings is the string "BadKeyName Tnx Zpx BadCel BadMat BadPV BadCTYPE".
+*     value for Warnings is the string "BadKeyName BadKeyValue Tnx Zpx
+*     BadCel BadMat BadPV BadCTYPE".
 *
 *     The text of any warning will be stored within the FitsChan in the
 *     form of one or more new header cards with keyword ASTWARN. If
@@ -40667,9 +40691,9 @@ f     AST_WARNINGS
 astMAKE_CLEAR(FitsChan,Warnings,warnings,astFree( this->warnings ))
 
 /* If the Warnings value is not set, supply a default in the form of a
-   pointer to the constant string "BadKeyName Tnx Zpx BadCel BadMat BadCTYPE". */
+   pointer to the constant string "BadKeyName BadKeyValue Tnx Zpx BadCel BadMat BadCTYPE". */
 astMAKE_GET(FitsChan,Warnings,const char *,NULL,( this->warnings ? this->warnings :
-                                                            "BadKeyName Tnx Zpx BadPV BadCel BadMat BadCTYPE" ))
+                                                            "BadKeyName BadKeyValue Tnx Zpx BadPV BadCel BadMat BadCTYPE" ))
 
 /* Set a Warnings value by freeing any previously allocated memory, allocating
    new memory, storing the string and saving the pointer to the copy.
@@ -40721,6 +40745,9 @@ astMAKE_TEST(FitsChan,Warnings,( this->warnings != NULL ))
 *     - "BadKeyName": This condition arises if a FITS keyword name is
 *     encountered that contains an illegal character (i.e. one not allowed
 *     by the FITS standard).
+*
+*     - "BadKeyValue": This condition arises if the value of a FITS keyword
+*     cannot be determined from the content of the header card.
 *
 *     - "BadLat": This condition arises when reading a FrameSet from a
 *     non-Native encoded FitsChan if the latitude of the reference point
