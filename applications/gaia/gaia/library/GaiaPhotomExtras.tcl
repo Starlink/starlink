@@ -355,6 +355,12 @@ itcl::class gaia::GaiaPhotomExtras {
    #  Methods:
    #  --------
 
+   public method init {} {
+      if { $itk_option(-phottype) != "aperture" } {
+         $itk_component(Centroid) configure -state disabled
+      }
+   }
+
    # "Close" the window. What is actually does is make it
    #  invisible. The object must survive to be quieried about its
    #  state.
@@ -643,6 +649,9 @@ itcl::class gaia::GaiaPhotomExtras {
    itk_option define -etime etime Etime {1.0} {
       $itk_component(Etime) configure -value $itk_option(-etime)
    }
+
+   #  Type of photometry, aperture or optimal.
+   itk_option define -phottype phottype Phottype aperture
 
    #  Protected variables: (available to instance)
    #  --------------------

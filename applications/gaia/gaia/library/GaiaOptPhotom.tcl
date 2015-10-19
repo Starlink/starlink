@@ -296,7 +296,7 @@ itcl::class gaia::GaiaOptPhotom {
       #  Create a GaiaPhotomExtras object to deal with any additional
       #  parameters for AUTOPHOTOM.
       itk_component add Extras {
-         GaiaPhotomExtras $child_(params).extras
+         GaiaPhotomExtras $child_(params).extras -phottype optimal
       }
 
       #  Add an options menu for setting options that should probably
