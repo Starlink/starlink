@@ -30509,19 +30509,16 @@ int Split( AstFitsChan *this, const char *card, char **name, char **value,
       *value = (char *) astFree( (void *) *value );
       *comment = (char *) astFree( (void *) *comment );
       type = AST__COMMENT;
-      if( !astOK ) {
-         astError( astStatus, "%s(%s): Unable to store the following FITS "
-                   "header card:\n%s\n", status, method, class, card );
-      } else {
-         sprintf( buf, "The keyword value in the FITS header card '%s' "
-                  " is illegal.", card );
-         Warn( this, "badkeyvalue", buf, method, class, status );
-      }
+      astError( astStatus, "%s(%s): Unable to store the following FITS "
+                "header card:\n%.*s\n", status, method, class, 
+                AST__FITSCHAN_FITSCARDLEN, card );
 
-/* If a bad keyword value was encountered, issue a warning. */
+/* If a bad keyword value was encountered, issue a warning. Remember that 
+   "card" may not be null terminated, so ensure that only one header is 
+   included from "card". */
    } else if( badval ){
-      sprintf( buf, "The keyword value in the FITS header card '%s' "
-               " is illegal.", card );
+      snprintf( buf, sizeof(buf), "The keyword value is illegal in "
+                "'%.*s'", AST__FITSCHAN_FITSCARDLEN, card );
       Warn( this, "badkeyvalue", buf, method, class, status );
    }
 
