@@ -29,7 +29,7 @@
 *     in pixel coordinates, and have the same reference direction.
 
 *  Usage:
-*     polrotref qin uin qout uout like angle
+*     polrotref qin uin qout uout like
 
 *  ADAM Parameters:
 *     AXIS = _INTEGER (Read)
@@ -249,7 +249,7 @@
          NAX = AST_GETI( IWCS, 'NAXES', STATUS )
          CALL AST_SETI( IWCS, 'CURRENT', ICUR, STATUS )
 
-*  Get the index of the Frame to use.
+*  Get the index of the axis to use.
          CALL PAR_GDR0I( 'AXIS', 2, 1, NAX, .TRUE., AXIS, STATUS )
 
       END IF

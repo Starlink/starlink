@@ -10,7 +10,6 @@
 
 typedef struct pol1RotrfJobData {
    AstFrame *pfrm;
-   AstFrame *ptfrm;
    AstMapping *gpmap;
    AstMapping *gptmap;
    const double *qin;
@@ -138,6 +137,7 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
 
 /* Local Variables: */
    AstFrame *pfrm;
+   AstFrame *nptfrm;
    AstFrame *ptfrm;
    AstFrameSet *fs;
    AstMapping *gpmap;
@@ -244,7 +244,7 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
       if( astGetI( ptfrm, "Naxes" ) != 2 && *status == SAI__OK ) {
          *status = SAI__ERROR;
          errRep( "", "The coordinate frame specified by parameter FRAME "
-                 "is not -2-dimensional.", status );
+                 "is not 2-dimensional.", status );
       }
    }
 
@@ -284,9 +284,6 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
          pdata->gptmap = astCopy( gptmap );
          astUnlock( pdata->gptmap, 1 );
 
-         pdata->ptfrm = astCopy( ptfrm );
-         astUnlock( pdata->ptfrm, 1 );
-
 /* Other stuff. */
          pdata->iaxis = iaxis;
          pdata->ncol = ncol;
@@ -320,8 +317,6 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
          astLock( pdata->gptmap, 0 );
          pdata->gptmap = astAnnul( pdata->gptmap );
 
-         astLock( pdata->ptfrm, 0 );
-         pdata->ptfrm = astAnnul( pdata->ptfrm );
       }
    }
 
@@ -342,11 +337,13 @@ void pol1Rotrf( int nrow, int ncol, AstFrameSet *wcs, AstFrameSet *twcs,
    }
 
 /* Add a new POLANAL Frame into the wcs FrameSet. */
-   astSetC( ptfrm, "Label(1)", "Polarimetric reference direction" );
-   astSetC( ptfrm, "Label(2)", " " );
-   astSetC( ptfrm, "Title", "Polarimetric reference frame" );
+   nptfrm = astCopy( ptfrm );
+   astSet( nptfrm, "Domain(%d)=POLANAL", iaxis + 1 );
+   astSetC( nptfrm, "Label(1)", "Polarimetric reference direction" );
+   astSetC( nptfrm, "Label(2)", " " );
+   astSetC( nptfrm, "Title", "Polarimetric reference frame" );
    icur = astGetI( wcs, "Current" );
-   astAddFrame( wcs, AST__BASE, gptmap, ptfrm );
+   astAddFrame( wcs, AST__BASE, gptmap, nptfrm );
    astSetI( wcs, "Current", icur );
 
 /* Free resources. */
@@ -384,7 +381,6 @@ static void pol1RotrfJob( void *job_data, int *status ) {
    AstCmpMap *tmap;
    AstMapping *totmap;
    AstFrame *pfrm;
-   AstFrame *ptfrm;
    const double *qin;
    const double *uin;
    const double *qinv;
@@ -444,7 +440,6 @@ static void pol1RotrfJob( void *job_data, int *status ) {
    p1 = pdata->p1;
    p2 = pdata->p2;
    pfrm = pdata->pfrm;
-   ptfrm = pdata->ptfrm;
    qin = pdata->qin;
    qinv = pdata->qinv;
    qout = pdata->qout;
@@ -475,7 +470,6 @@ static void pol1RotrfJob( void *job_data, int *status ) {
    astLock( gpmap, 0 );
    astLock( pfrm, 0 );
    astLock( gptmap, 0 );
-   astLock( ptfrm, 0 );
 
 /* Get the simplified mapping from the POLANAL Frame in wcs to the
    POLANAL Frame in twcs. */
@@ -654,6 +648,5 @@ static void pol1RotrfJob( void *job_data, int *status ) {
    astUnlock( gpmap, 1 );
    astUnlock( pfrm, 1 );
    astUnlock( gptmap, 1 );
-   astUnlock( ptfrm, 1 );
 }
 
