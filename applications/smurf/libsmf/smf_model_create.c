@@ -759,8 +759,12 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
             } else {
               ntslice = (idata->dims)[0];
             }
-            nblock = ntslice/gain_box;
-            if( nblock == 0 ) nblock = 1;
+            if( gain_box > 0 ) {
+               nblock = ntslice/gain_box;
+               if( nblock == 0 ) nblock = 1;
+            } else {
+               nblock = 1;
+            }
 
             /* Note that we're using the time axis to store the coefficients */
             if( isTordered ) {

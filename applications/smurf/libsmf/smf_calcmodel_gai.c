@@ -201,6 +201,10 @@ void smf_calcmodel_gai( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       smf_get_dims( model->sdata[idx],  NULL, NULL, NULL, &npar, NULL,
                     &gbstride, &gcstride, status);
 
+      /* If com.gain_box is zero, use a value of ntslice, so that a single
+         box will be used covering the whoel time stream. */
+      if( gain_box == 0 ) gain_box = ntslice;
+
       /* Allocate work space for the gain and offset for each time slice. */
       woff = astMalloc( ntslice*sizeof( *woff ) );
       wg = astMalloc( ntslice*sizeof( *wg ) );

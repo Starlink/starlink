@@ -327,8 +327,12 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
              we are erring on the conservative side by assuming 200 Hz. */
           if( astMapGet0A( keymap, "COM", &kmap ) ) {
              smf_get_nsamp( kmap, "GAIN_BOX", NULL, &gain_box, status );
-             nblock = maxlen/gain_box;
-             if( nblock == 0 ) nblock = 1;
+             if( gain_box > 0 ) {
+                nblock = maxlen/gain_box;
+                if( nblock == 0 ) nblock = 1;
+             } else {
+                nblock = 1;
+             }
              total += nblock*3*nrow*ncol*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
              kmap = astAnnul( kmap );
           }

@@ -361,6 +361,10 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                            NULL, NULL, NULL, status );
    if( *status != SAI__OK ) goto L999;
 
+/* If com.gain_box is zero, use a vleu of ntslice, so that a single box
+   will be used covering the whoel time stream. */
+   if( gain_box == 0 ) gain_box = ntslice;
+
 /* Find the number of blocks of time slices per bolometer. Each block
    contains "gain_box" time slices (except possibly for the last time slice
    which may contain more than gain_box but will be less than 2*gain_box).

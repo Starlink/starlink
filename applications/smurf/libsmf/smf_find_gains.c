@@ -447,10 +447,7 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
    astMapGet0I( keymap, "GAIN_IS_ONE", &nogains );
    astMapGet0I( keymap, "OFFSET_IS_ZERO", &nooffs );
    smf_get_nsamp( keymap, "GAIN_BOX", data, &gain_box, status );
-   if( *status == SAI__OK && gain_box == 0 ) {
-     *status = SAI__ERROR;
-     errRep( "", "GAIN_BOX must be greater than 0", status );
-   }
+   if( gain_box == 0 ) gain_box = ntslice;
 
 /* FIT_BOX defaults to GAIN_BOX (it should be null in the defaults file). */
    fit_box = gain_box;
