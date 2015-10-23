@@ -632,137 +632,73 @@ try:
 #  from the sky) for each sub-scan/grid-point.
    if incom:
 
-#  First flat-field all the INCOM files.
-      cff = NDG.load( "CFF" )
-      if not cff:
-         cff = NDG(incom)
-         msg_out( "Flatfielding common-mode data...")
-         invoke("$SMURF_DIR/flatfield in={0} out={1}".format(incom,cff) )
-         cff = cff.filter()
-         cff.save( "CFF" )
-      else:
-         msg_out( "Re-using old flatfielded common-mode data...")
-
 #  Process each sub-scan separately as they may have different lengths.
       cfactor = parsys["CFACTOR"].value
       com = NDG.load( "COM" )
       if not com:
          msg_out( "Creating new artificial common-mode signals...")
 
-         comlen = 0
-         totcom = NDG(1)
-         lbnd = []
-         ubnd = []
+         conf = os.path.join(NDG.tempdir,"junkconf")
+         fd = open(conf,"w")
+         fd.write("numiter=1\n")
+         fd.write("order=-1\n")
+         fd.write("modelorder=(com,gai,ast)\n")
+         fd.write("exportndf=(com,gai)\n")
+         fd.write("com.gain_box = 2000\n")
+         fd.write("downsampscale=0\n")
+         fd.close()
 
-         tcom = NDG(ff)
-         for icom in range(len( tcom )):
-            msg_out( "   sub-scan {0}/{1}".format(icom+1,len(tcom)))
-            this_ff = ff[ icom ]
-            this_cff = cff[ icom ]
-            this_com = tcom[ icom ]
+         junk = NDG(1)
 
-#  Get the number of time slices in the current flat-fielded time-series.
-            invoke("$KAPPA_DIR/ndftrace ndf={0}".format(this_ff) )
-            ns = int( starutil.get_task_par( "dims(3)", "ndftrace" ))
+#  Use makemap to create NDFs holding the COM and GAI models formed from
+#  the supplied data.
+         invoke("$SMURF_DIR/makemap in={0} out={1} config=^{2}".
+                format(incom, junk, conf ) )
 
-#  Check the INCOM file is at least as long
-            invoke("$KAPPA_DIR/ndftrace ndf={0}".format(this_cff) )
-            cns = int( starutil.get_task_par( "dims(3)", "ndftrace" ))
-            if cns < ns:
-               raise UsageError("\n\nAn INCOM file has been found which is "
-                                "shorter than the correspoinding IN file "
-                                "({0} < {1}).".format(cns,ns) )
+#  Identify the COM and GAI NDFs created above in the current directory,
+#  and copy them to the temp directory. Then delete them from the current
+#  directory.
+         ar = starutil.get_fits_header( incom[0], "SUBARRAY", True )
+         ut = int(starutil.get_fits_header( incom[0], "UTDATE", True ))
+         obs = int(starutil.get_fits_header( incom[0], "OBSNUM", True ))
+         comndf = invoke("$KAPPA_DIR/ndfecho {0}{1}_{2:05}_0\*_con_com".format(ar,ut,obs))
+         gaindf = invoke("$KAPPA_DIR/ndfecho {0}{1}_{2:05}_0\*_con_gai".format(ar,ut,obs))
 
-#  Reshape each flat-fielded INCOM file to a 2D array in which axis
-#  1 is bolometer and axis 2 is time-slice.
-            n2d = NDG(1)
-            invoke("$KAPPA_DIR/reshape in={0}\(,,:{2}\) out={1} shape=\[1280,{2}\]".format(this_cff,n2d,ns) )
+         commod = NDG(1)
+         invoke("$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes trimbad=yes".format(comndf,commod) )
+         os.remove( "{0}.sdf".format(comndf) )
 
-#  Collapse this 2D array along pixel axis 2 (time) to get the mean value
-#  in each bolometer.
-            n1dmean = NDG(1)
-            invoke("$KAPPA_DIR/collapse in={0} estimator=mean axis=2 out={1} wlim=0".
-                   format(n2d,n1dmean))
+         gaimod = NDG(1)
+         invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(gaindf,gaimod) )
+         os.remove( "{0}.sdf".format(gaindf) )
 
-#  Expand it out again to full 2d, and subtract it off the original to
-#  get a version in which each bolometer has a mean value of zero.
-            n2dmean = NDG(1)
-            invoke("$KAPPA_DIR/manic in={0} axes=\[1,0\] lbound=1 ubound={1} out={2}".
-                   format(n1dmean,ns,n2dmean))
+#  Smooth and fill the COM signal.
+         smocom = NDG(1)
+         invoke("$KAPPA_DIR/gausmooth in={0} fwhm=3 out={1}".format(commod,smocom))
+         fillcom = NDG(1)
+         invoke("$KAPPA_DIR/fillbad in={0} out={1}".format(smocom,fillcom) )
 
-            n2dres = NDG(1)
-            invoke("$KAPPA_DIR/sub in1={0} in2={1} out={2}".format(n2d,n2dmean,n2dres))
+#  Find the mean value.
+         invoke("$KAPPA_DIR/stats ndf={0} clip=\[3,3,3\] quiet".format(fillcom) )
+         mean = int( starutil.get_task_par( "mean", "stats" ))
 
-#  Now collapse these residuals along the bolometer axis to get the
-#  mean-subtracted common mode. Use a median estimator. The above removal
-#  of the mean was necessary so that the resulting common mode is not
-#  determined just by the bolometers with the middle background levels.
-            tmpcom = NDG(1)
-            invoke("$KAPPA_DIR/collapse in={0} estimator=median axis=1 out={1} wlim=0".
-                   format(n2dres,tmpcom))
+#  Apply the CFACTOR expansion.
+         tmpcom = NDG(1)
+         invoke("$KAPPA_DIR/maths exp='pa*(ia-pb)+pb' ia={0} pa={1} pb={2} out={3}".
+                format(fillcom,cfactor,mean,tmpcom) )
 
-#  Smooth it a bit.
-            smocom = NDG(1)
-            invoke("$KAPPA_DIR/gausmooth in={0} fwhm=3 out={1}".format(tmpcom,smocom))
+#  Now split the COM signal up into individual files.
+         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(tmpcom) )
+         lbnd = int( starutil.get_task_par( "lbound(1)", "ndftrace" ))
 
-#  Attenuate the variations in the COM signal, since real POL2 data seems to
-#  have a much flatter common mode than real scan data.
-            attcom = NDG(1)
-            invoke("$KAPPA_DIR/cmult in={0} scalar={1} out={2}".format(smocom,cfactor,attcom))
-
-#  Get the amplitude of the oscillations in each bolometer of the template
-#  POL2 data (=sqrt(2) times the standard deviation). The mean of these
-#  amplitude is used to determine the mean sky brightness to add back onto
-#  the zero-mean common-mode which is currently in "attcom". We choose mean
-#  sky value to give a 4Hz signal with amplitude equal to the mean range.
-            sigff = NDG(1)
-            invoke("$KAPPA_DIR/collapse in={0} estimator=sigma axis=3 out={1} wlim=0".
-                   format(this_ff,sigff))
-            invoke("$KAPPA_DIR/stats ndf={0}".format(sigff))
-            means = float( starutil.get_task_par( "mean", "stats" ) )
-            if amp4 > 0.0:
-               mean_com = 1.4142*means/amp4
-            else:
-               mean_com = means
-
-#  Add this mean value onto the common mode.
-            invoke("$KAPPA_DIR/cadd in={0} scalar={1} out={2}".format(attcom,mean_com,this_com))
-
-#  Append the current COM file to the end of the total COM file.
-            lbnd.append( comlen + 1 )
-            if comlen > 0:
-               temp = NDG(1)
-               invoke("$KAPPA_DIR/paste in={0} p1={1} shift={2} out={3}".
-                      format(totcom,this_com,comlen,temp))
-               invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(temp,totcom))
-            else:
-               invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(this_com,totcom))
-
-            comlen += ns
-            ubnd.append( comlen )
-
-#  Now attempt to ensure that there are no jumps between common mode
-#  files. First reshape the total com signal into a 3D array as required
-#  by fixsteps.
-         com3d = NDG(1)
-         invoke("$KAPPA_DIR/reshape in={0} shape=\[1,1,{1}\] out={2}".
-                format(totcom,comlen,com3d))
-
-#  Now fix the steps.
-         com3d_fixed = NDG(1)
-         invoke("$SMURF_DIR/fixsteps in={0} out={1} meanshift=no".
-                format(com3d,com3d_fixed))
-
-#  Reshape it back to 1-dimension.
-         com_fixed = NDG(1)
-         invoke("$KAPPA_DIR/reshape in={0} shape={1} out={2}".
-                format(com3d_fixed,comlen,com_fixed))
-
-#  Now split the corrected COM signal up into individual files.
          com = NDG(ff)
          for icom in range(len( com )):
-            invoke("$KAPPA_DIR/ndfcopy in={0}\({1}:{2}\) out={3}".
-                   format(com_fixed,lbnd[icom],ubnd[icom],com[icom]))
+            invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(ff[icom]) )
+            ns = int( starutil.get_task_par( "dims(3)", "ndftrace" ))
+            ubnd = lbnd + ns - 1
+            invoke("$KAPPA_DIR/ndfcopy in={0}\({1}:{2}\) out={3} trim=yes".
+                   format(tmpcom,lbnd,ubnd,com[icom]))
+            lbnd = ubnd + 1
 
          com.save( "COM" )
 
@@ -770,7 +706,6 @@ try:
          msg_out( "Re-using old artificial common-mode signals...")
    else:
       com = "!"
-
 
 
 
@@ -831,92 +766,42 @@ try:
       gai = NDG.load( "GAI" )
       if not gai:
          msg_out( "Creating new artificial GAI models...")
+
+#  The number of GAI planes in the GAI cube. */
+         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(gaimod) )
+         ns = int( starutil.get_task_par( "dims(3)", "ndftrace" ))/3
+         if ns < len(ff):
+            raise UsageError("\n\nInsufficient GAI planes - need {0}, "
+                             "have {1}".format(len(ff), ns ) )
+
+#  Smooth and fill the GAI signal.
+         smogai = NDG(1)
+         invoke("$KAPPA_DIR/gausmooth in={0}'(,,:{2})' fwhm=3 out={1}".
+                format(gaimod,smogai,ns))
+         fillgai = NDG(1)
+         invoke("$KAPPA_DIR/fillbad in={0} out={1}".format(smogai,fillgai) )
+
+#  Apply the GFACTOR expansion.
+         tmpgai = NDG(1)
+         invoke("$KAPPA_DIR/maths exp='pa*(ia-1)+1' ia={0} pa={1} out={2}".
+                format(fillgai,cfactor,tmpgai) )
+
+#  Now split the GAI signal up into individual files.
+         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet".format(tmpcom) )
+         lbnd = int( starutil.get_task_par( "lbound(1)", "ndftrace" ))
+
          gai = NDG(ff)
-         m2 = NDG(ff)
-
          for igai in range(len( gai )):
-            msg_out( "   sub-scan {0}/{1}".format(igai+1,len(gai)))
-            this_ff = ff[ igai ]
-            this_m2 = m2[ igai ]
+            invoke("$KAPPA_DIR/ndfcopy in={0}\(,,{1}:{1}\) out={2} trim=yes".
+                   format(tmpgai,igai+1,gai[igai]))
+            lbnd = ubnd + 1
 
-#  Get the number of time slices in the current flat-fielded time-series.
-            invoke("$KAPPA_DIR/ndftrace ndf={0}".format(this_ff) )
-            ns = int( starutil.get_task_par( "dims(3)", "ndftrace" ))
-
-#  Reshape each flat-fielded IN file to a 2D array in which axis
-#  1 is bolometer and axis 2 is time-slice.
-            n2d = NDG(1)
-            invoke("$KAPPA_DIR/reshape in={0} out={1} shape=\[1280,{2}\]".format(this_ff,n2d,ns) )
-
-#  Collapse this 2D array along pixel axis 2 (time) to get the mean value
-#  in each bolometer.
-            n1dmean = NDG(1)
-            invoke("$KAPPA_DIR/collapse in={0} estimator=mean axis=2 out={1} wlim=0".
-                   format(n2d,n1dmean))
-
-#  Expand it out again to full 2d, and subtract it off the original to
-#  get a version in which each bolometer has a mean value of zero.
-            n2dmean = NDG(1)
-            invoke("$KAPPA_DIR/manic in={0} axes=\[1,0\] lbound=1 ubound={1} out={2}".
-                   format(n1dmean,ns,n2dmean))
-
-            n2dres = NDG(1)
-            invoke("$KAPPA_DIR/sub in1={0} in2={1} out={2}".format(n2d,n2dmean,n2dres))
-
-#  Now collapse these residuals along the bolometer axis to get the
-#  mean-subtracted common mode. Use a median estimator. The above removal
-#  of the mean was necessary so that the resulting common mode is not
-#  determined just by the bolometers with the middle background levels.
-            tmpcom = NDG(1)
-            invoke("$KAPPA_DIR/collapse in={0} estimator=median axis=1 out={1} wlim=0".
-                   format(n2dres,tmpcom))
-
-#  We need the time axis to be axis 2 when running NORMALIZE below, so
-#  permute the axes.
-            permcom = NDG(1)
-            invoke("$KAPPA_DIR/permaxes in={0}\(,1\) perm=\[2,1\] out={1}".
-                   format(tmpcom,permcom))
-
-#  USe NORMALIZE to fit each individual bolometer to the above
-#  common-mode, returning NDFs holding the scale and correlation
-#  coefficients for all bolometers.
-            slp = NDG(1)
-            corr = NDG(1)
-            invoke("$KAPPA_DIR/normalize in1={0} in2={1} loop=yes quiet device=! out=! "
-                   "outslope={2} outcorr={3}".format(permcom,n2d,slp,corr))
-
-#  Blank out bolometers that are poorly correlated to the common-mode.
-            m1 = NDG(1)
-            invoke("$KAPPA_DIR/thresh in={0} thrlo=0.96 newlo=bad thrhi=10 "
-                   "newhi=bad out={1} quiet".format(corr,m1))
-
-#  Reshape the slopes into a 2d array, and give it the correct origin
-            invoke("$KAPPA_DIR/reshape in={0} shape=\[32,40\] out={1}".
-                   format(m1,this_m2))
-            invoke("$KAPPA_DIR/setorigin ndf={0} origin=\[0,0\]".format(this_m2))
-
-#  Remove spikes.
-         m3 = NDG(m2)
-         invoke("$KAPPA_DIR/ffclean in={0} out={1} box=5 clip=\[3,3,3\] ".
-                format(m2,m3))
-
-#  Smooth and fill holes
-         invoke("$KAPPA_DIR/gausmooth in={0} fwhm=3 wlim=1E-6 out={1}".
-                format(m3,gai))
          gai.save( "GAI" )
-      else:
-         msg_out( "Re-using old artificial GAI models...")
 
-#  Amplify the GAI values.
-      if gfactor != 1.0:
-         msg_out( "Scaling GAI values by {0}".format(gfactor) )
-         fgai = NDG( gai )
-         invoke("$KAPPA_DIR/maths exp='pa*(ia-1.0)+1.0' ia={0} pa={1} out={2}".
-                format(gai,gfactor,fgai))
       else:
-         fgai = gai
+         msg_out( "Re-using old GAI models...")
    else:
-      fgai = "!"
+      gai = "!"
 
 #  Now create the simulated POL2 time-streams.
    msg_out( "Generating simulated POL2 time-stream data..." )
@@ -932,7 +817,7 @@ try:
           "pointing={17}".
           format(iart,qart,uart,ff,sigma,artdata,com,ipqu[0],
                  ipqu[1],amp4,phase4,amp2,phase2,amp16,phase16,
-                 fgai,ipdata,pntfile) )
+                 gai,ipdata,pntfile) )
 
 #  If required, add the artificial time-stream data onto the real
 #  time-stream data.
