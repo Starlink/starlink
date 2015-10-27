@@ -109,7 +109,7 @@
 *          for different sub-arrays - all data supplied via IN will use
 *          the same INSTQ values regardless of sub-array. To overcome this
 *          restriction, run unmakemap separately for each sub-array
-*          supplying a differnt INSTQ each time. [!]
+*          supplying a different INSTQ each time. [!]
 *     INSTU = NDF (Read)
 *          An optional 2D input NDF holding the instrumental normalised U
 *          value for each bolometer, with respect to fixed analyser
@@ -124,7 +124,7 @@
 *          for different sub-arrays - all data supplied via IN will use
 *          the same INSTU values regardless of sub-array. To overcome this
 *          restriction, run unmakemap separately for each sub-array
-*          supplying a differnt INSTU each time. [!]
+*          supplying a different INSTU each time. [!]
 *     INTERP = LITERAL (Read)
 *          The method to use when resampling the input sky image pixel values.
 *          For details of these schemes, see the descriptions of routines
