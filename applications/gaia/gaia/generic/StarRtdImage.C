@@ -5678,35 +5678,42 @@ int StarRtdImage::colorrampCmd( int argc, char *argv[] )
         }
         ImageData *rtdimagedata = rtdimage->image();
 
-        //  Create a frameset that maps from BASE pixels to
+        //  Create a frameset that maps from GRID to intensity.
         AstFrame *base = (AstFrame *) astFrame( 2, "Domain=GRID" );
         AstFrameSet *fset = (AstFrameSet *) astFrameSet( base, " " );
         AstMapping *map = (AstMapping *) astUnitMap( 2, " " );
         AstFrame *current = (AstFrame *) astFrame( 2, "Domain=PIXEL" );
         astAddFrame( fset, 1, map, current );
 
-        // Add a linear mapping that transforms from the base map to the
+        // Add a mapping that transforms from the base map to the
         // current as intensity along the X axis.
-        double tr[6];
         double low = rtdimagedata->lowCut();
         double high = rtdimagedata->highCut();
         double width = image_->width();
-        double scale = ( high - low ) / width;
-        tr[0] = low ;
-        tr[1] = scale;
-        tr[2] = 0.0;
-        tr[3] = 0.0;
-        tr[4] = 0.0;
-        tr[5] = 1.0;
-        addLinear( 2, fset, tr, 2 );
+
+        double ina[2], inb[2], outa[2], outb[2];
+        ina[0] = 0.0;
+        ina[1] = 0.0;
+        inb[0] = width;
+        inb[1] = 1.0;
+
+        outa[0] = low;
+        outa[1] = 0.0;
+        outb[0] = high;
+        outb[1] = 1.0;
+        AstMapping *winmap = (AstMapping *) astWinMap( 2, ina, inb, outa,
+                                                       outb, " " );
+        astRemapFrame( fset, 2, winmap );
 
         //  And make the new FrameSet current.
         StarWCS* wcsp = getStarWCSPtr();
         wcsp->astWCSReplace( fset );
+
         (void) astAnnul( base );
         (void) astAnnul( current );
         (void) astAnnul( fset );
         (void) astAnnul( map );
+        (void) astAnnul( winmap );
     }
     return TCL_OK;
 }
@@ -7147,7 +7154,7 @@ int StarRtdImage::xyHistogramCmd(int argc, char *argv[])
             status = Blt_GraphElement( interp_, argv[0], argv[1],
                                        histogram.nbin*2, values,
                                        argv[9], argv[10] );
-            
+
             if ( status == TCL_OK ) {
                 //  Same for gaussian fit.
                 for ( int i = 0, j = 0; i < histogram.nbin; i++, j += 2 ) {
@@ -7160,20 +7167,20 @@ int StarRtdImage::xyHistogramCmd(int argc, char *argv[])
             }
             delete[] values;
         }
-        
+
         set_result( histogram.nbin );
         append_element( histogram.mode * histogram.width + histogram.zero );
         append_element( histogram.hist[histogram.mode] );
-        
+
         append_element( histogram.ppeak * histogram.width + histogram.zero );
         append_element( histogram.hist[(int)round(histogram.ppeak)] );
         append_element( histogram.pfwhm * histogram.width );
-        
+
         append_element( histogram.gpeak * histogram.width + histogram.zero );
         append_element( histogram.gdpeak* histogram.width );
         append_element( histogram.gsd * histogram.width );
         append_element( histogram.gdsd * histogram.width );
-        
+
     }
     return status;
 }

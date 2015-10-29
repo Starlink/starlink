@@ -8,6 +8,9 @@
 
   The centroid option in optimal photometry is now disabled. This has
   always been true, just previously toggling this control had no effect.
+
+  Add work around for problems when printing a colour ramp from an image
+  that has a very large data range. Previously this failed completely.
     
   Star-2015A Release
   ==================

@@ -224,11 +224,13 @@ itcl::class gaia::GaiaRampPrint {
    }
 
    #  Add the border and numeric labels to the ramp. This is done by adding
-   #  a pseudo AST WCS and using the "grid" command.
+   #  a pseudo AST WCS and using the "grid" command. Just catch any failures
+   #  as these are not fatal, you still get a ramp, just no intensity values.
    method add_border {} {
-      $image_ configure -ast_tag "${this}_border"
-      $image_ colorramp setwcs $itk_option(-mainimage)
-      $image_ plotgrid "font(numlab)=$lfont_
+      catch {
+         $image_ configure -ast_tag "${this}_border"
+         $image_ colorramp setwcs $itk_option(-mainimage)
+         $image_ plotgrid "font(numlab)=$lfont_
                         size(numlab)=$lsize_
                         colour(border)=$bcolour_
                         colour(numlab)=$lcolour_
@@ -237,6 +239,7 @@ itcl::class gaia::GaiaRampPrint {
                         edge(1)=top labelup(1)=0 labelling=exterior
                         numlabgap(1)=1.0 width(border)=0.005
                         labelunits(1)=0 majticklen=0.0 minticklen=0.0"
+      }
    }
 
    #  Print the contents of the canvas to the open file descriptor
