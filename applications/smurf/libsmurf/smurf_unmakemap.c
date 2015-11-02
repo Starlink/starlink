@@ -74,8 +74,13 @@
 *          number of NDFs supplied should match the number of NDFs supplied
 *          for parameter REF. Each supplied NDF should be one-dimensional,
 *          with length at least equal to the length of the time axis of the
-*          corresponding REF cube. No common-mode is added to the data if
-*          null (!) is supplied. [!]
+*          corresponding REF cube. If null (!) is supplied, the common
+*          mode is set to a constant value given by parameter COMVAL. [!]
+*     COMVAL = _DOUBLE (Read)
+*          A value in pW to be used as the common mode signal for all time
+*          slices. Only accessed if parameter "COM" is set to null (!).
+*          supplying zero or null results in no common mode being
+*          included in the output time series data. [0.0]
 *     GAI = NDF (Read)
 *          A group of existing 2D NDFs that specify the gain of each
 *          bolometer for the corresponding IN file. If null (!) is
@@ -305,6 +310,8 @@
 *        Added ADAM parameter IPDATA.
 *     30-SEP-2015 (DSB):
 *        Added ADAM parameter POINTING.
+*     2-NOV-2015 (DSB):
+*        Added ADAM parameter COMVAL.
 
 *  Copyright:
 *     Copyright (C) 2011 Science and Technology Facilities Council.
@@ -408,6 +415,7 @@ void smurf_unmakemap( int *status ) {
    double amp2;               /* Amplitude of 2 Hz signal */
    double amp4;               /* Amplitude of 4 Hz signal */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
+   double comval;             /* Constant common mode value (pW) */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double params[ 4 ];        /* astResample parameters */
    double phase16;            /* Phase of 16 Hz signal */
@@ -850,9 +858,17 @@ void smurf_unmakemap( int *status ) {
          ndfMap( indfcs, "DATA", "_DOUBLE", "READ", (void **) &inc_data,
                  &nelc, status );
 
-      } else {
+/* Otherwise see if a time-constant common  mode signal is to be used. */
+      } else if( *status == SAI__OK ) {
+         parGet0d( "COMVAL", &comval, status );
+         if( *status == PAR__NULL ) {
+            errAnnul( status );
+            comval = 0.0;
+         }
          indfcs = NDF__NOID;
          inc_data = NULL;
+         if( comval != 0.0 ) msgOutiff( MSG__DEBUG, "", "Using constant "
+                                        "COM value of %g\n", status, comval );
       }
 
 /* Open any GAI files. */
@@ -895,7 +911,7 @@ void smurf_unmakemap( int *status ) {
                      NULL, &ngood, status );
 
 /* Add on any COM data. */
-      smf_addcom( wf, odata, inc_data, status );
+      smf_addcom( wf, odata, inc_data, comval, status );
 
 /* Issue a wrning if there is no good data in the output cube. */
       if( ngood == 0 ) msgOutif( MSG__NORM, " ", "   Output contains no "

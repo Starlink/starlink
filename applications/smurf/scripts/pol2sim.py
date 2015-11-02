@@ -40,7 +40,7 @@
 *       I values amapled from the supplied ARTI map. The sky brightness
 *       is common to all bolometers, and is derived from the time-series
 *       data for a a real scan map (see parameter INCOM). For some
-*       unknown rason, the common-mode for real POL2 data seems to be much
+*       unknown reason, the common-mode for real POL2 data seems to be much
 *       flatter than the common-mode for real non-POL2 data. For this
 *       reason, there is an option to flatten the common-mode before using
 *       it in the simulation (see parameter CFACTOR).
@@ -106,11 +106,17 @@
 *        value. Real POL2 data seems to have a much flatter common-mode
 *        than real non-POL2 data, so the default flattens the common-mode
 *        to some extent. Only used if ADDON is False. [0.2]
+*     COMVAL = _DOUBLE (Read)
+*        Only used if a null value is supplied for INCOM, in which case
+*        COMVAL should be the constant common-mode value in pW to be added
+*        on to all time slices (i.e. a perfectly flat common mode is used).
+*        If zero is supplied (and INCOM is null), no common-mode is included
+*        in the simulated POL2 data. Only used if ADDON is False. [0.0]
 *     GFACTOR = _DOUBLE (Read)
 *        A factor by which to expand the GAI model values derived from
 *        the supplied time-series data. The expansion is centred on the
 *        value 1.0. No GAI model is used if GFACTOR is zero. Only used if
-*        ADDON is False. [1.0]
+*        ADDON is False and INCOM is not null (!). [1.0]
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
 *        Allowed values are as for "ILEVEL". The log file to create is
@@ -157,8 +163,8 @@
 *        simulated POL2 data. The number of NDFs supplied for INCOM must
 *        equal the number supplied for IN. Each INCOM file must be at least
 *        as long (in time) as the corresponding IN file. If null (!) is
-*        supplied, no common-mode is included in the simulated POL2 data.
-*        Only used if ADDON is False.
+*        supplied, the common-mode is defined by parameter COMVAL instead.
+*        Only used if ADDON is False. [!]
 *     IPFORM = LITERAL (Read)
 *        The form of instrumental polarisation to use. Can be "JK" for the
 *        Johnstone/Kennedy model (see parameter IPDATA), "User" for a
@@ -168,8 +174,9 @@
 *     IPDATA = LITERAL (Read)
 *        The path to an HDS container file containing the data values
 *        defining the Johnstone/Kennedy model for POL2 instrumental
-*        polarisation. This parameter is only accessed if IPFORM is set
-*        to "JK". ['$STARLINK_DIR/share/smurf/ipdata.sdf']
+*        polarisation. This parameter is only accessed if IPFORM is
+*        set to "JK". If null (!) is supplied, a default value of
+*        $STARLINK_DIR/share/smurf/ipdata.sdf will be used. [!]
 *     IPEAK = _DOUBLE (Read)
 *        Peak intensity for new artificial total instensity map, in pW. [0.08]
 *     IPMIN = _DOUBLE (Read)
@@ -355,7 +362,9 @@ try:
    params.append(starutil.ParNDG("ARTQ", "Artificial Q map", maxsize=1 ))
    params.append(starutil.ParNDG("ARTU", "Artificial U map", maxsize=1 ))
    params.append(starutil.ParNDG("INCOM", "Non-POL2 data files to define COM",
-                                 None ))
+                                 None, noprompt=True ))
+   params.append(starutil.Par0F("COMVAL", "Constant common mode value (pW)",
+                                 0.0, noprompt=True ))
    params.append(starutil.Par0S("RESTART", "Restart using old files?", None,
                                  noprompt=True))
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
@@ -376,7 +385,7 @@ try:
    params.append(starutil.Par0F("IPTHETA", "Angle for for instrumental "
                                 "polarisation (deg.s)", 15.0, True ))
    params.append(starutil.Par0S("IPDATA", "Path to IP Model data file",
-                                '$STARLINK_DIR/share/smurf/ipdata.sdf', True ))
+                                None, True ))
    params.append(starutil.Par0F("GFACTOR", "Expansion factor for GAI values",
                                 1.0, True ))
    params.append(starutil.Par0F("CFACTOR", "Expansion factor for COM values",
@@ -435,8 +444,13 @@ try:
 #  Common mode files.
    if addon:
       incom = None
+      comval = 0.0
    else:
       incom = parsys["INCOM"].value
+      if not incom:
+         comval = parsys["COMVAL"].value
+      else:
+         comval = 0.0
 
    if incom:
       if len(incom) < len(indata):
@@ -707,8 +721,6 @@ try:
    else:
       com = "!"
 
-
-
 # Generate instrumental normalised Q and U images - 0.07% IP (on average -
 # there is a gradient in X). This value, together with the amp4 and phase4
 # values used by unmakemap below, produce time-streams that look similar
@@ -751,13 +763,15 @@ try:
 #  Johnstone/Kennedy IP model.
       elif ipform == "JK":
          ipdata = parsys["IPDATA"].value
+         if ipdata == None:
+            ipdata = "!"
 
    else:
       ipdata = "!"
       msg_out( "Re-using old instrumental polarisation values...")
 
 #  Create GAI values from the supplied template data.
-   if addon:
+   if addon or not incom:
       gfactor = 0.0
    else:
       gfactor = parsys["GFACTOR"].value
@@ -803,21 +817,45 @@ try:
    else:
       gai = "!"
 
-#  Now create the simulated POL2 time-streams.
+#  Now create the simulated POL2 time-streams. Try to keep the unmakemap
+#  command line as short as possible by omitting defaulted parameters,
+#  as it is possible for the command line to be too big for the ADAM
+#  parameter system to handle.
    msg_out( "Generating simulated POL2 time-stream data..." )
    if addon:
       artdata = NDG( outdata )
    else:
       artdata = outdata
 
+   if ipdata != "!":
+      params = "ipdata='{0}' ".format(ipdata)
+   else:
+      params = " "
+
+   if pntfile != "!":
+      params = "{0} pointing={1} ".format(params,pntfile)
+
+   if ipqu[0] != "!":
+      params = "{0} instq={1} ".format(params,ipqu[0])
+
+   if ipqu[1] != "!":
+      params = "{0} instu={1} ".format(params,ipqu[1])
+
+   if com != "!":
+      params = "{0} com={1} ".format(params,com)
+   elif comval != 0.0:
+      params = "{0} comval={1} ".format(params,comval)
+
+   if gai != "!":
+      params = "{0} gai={1} ".format(params,gai)
+
+
    invoke("$SMURF_DIR/unmakemap in={0} qin={1} uin={2} ref={3} "
-          "sigma={4} out={5} interp=sincsinc params=\[0,3\] com={6} "
-          "instq={7} instu={8} ipdata='{16}' amp4={9} phase4={10} "
-          "amp2={11} phase2={12} amp16={13} phase16={14} gai={15} "
-          "pointing={17}".
-          format(iart,qart,uart,ff,sigma,artdata,com,ipqu[0],
-                 ipqu[1],amp4,phase4,amp2,phase2,amp16,phase16,
-                 gai,ipdata,pntfile) )
+          "sigma={4} out={5} interp=sincsinc params=\[0,3\] "
+          "amp4={6} phase4={7} amp2={8} phase2={9} amp16={10} "
+          "phase16={11} {12}".
+          format(iart,qart,uart,ff,sigma,artdata,amp4,phase4,
+                 amp2,phase2,amp16,phase16,params) )
 
 #  If required, add the artificial time-stream data onto the real
 #  time-stream data.

@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_addcom( ThrWorkForce *wf, smfData *data, const double *com,
-*                 int *status );
+*                 double comval, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -24,8 +24,12 @@
 *        will be added. Must be time-ordered (see smf_dataOrder.c).
 *     com = const double * (Given)
 *        A 1D data array holding the common mode value for each time
-*        slice. It's length should match the time axis of "data". Returns
-*        immediately if "com" is NULL.
+*        slice. It's length should match the time axis of "data". The
+*        common modeis defined instead by argument "comval" if "com"
+*        is NULL.
+*     comval = double (Given)
+*        A constant common mode value to use for all time slices. Only
+*        used if "com" is NULL. Returns immediately if "comval" is zero.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -40,6 +44,8 @@
 *  History:
 *     15-APR-2015 (DSB):
 *        Initial version.
+*     2-NOV-2015 (DSB):
+*        Added argument "comval".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -81,6 +87,7 @@
 typedef struct smfAddComData {
    const double *com;
    dim_t nbolo;
+   double comval;
    double *out;
    size_t t1;
    size_t t2;
@@ -91,7 +98,7 @@ static void smf1AddCom( void *job_data_ptr, int *status );
 
 
 void smf_addcom( ThrWorkForce *wf, smfData *data, const double *com,
-                 int *status ){
+                 double comval, int *status ){
 
 /* Local Variables */
    dim_t nbolo;
@@ -103,7 +110,7 @@ void smf_addcom( ThrWorkForce *wf, smfData *data, const double *com,
    smfAddComData *pdata;
 
 /* Check the inherited status. */
-   if( *status != SAI__OK || !com ) return;
+   if( *status != SAI__OK || ( !com && comval == 0.0 ) ) return;
 
 /* Check supplied smfData is time ordered (i.e. bstride=1, tstride=nbolo). */
    if( !data->isTordered ) {
@@ -146,7 +153,12 @@ void smf_addcom( ThrWorkForce *wf, smfData *data, const double *com,
          pdata->out = ( (double *) data->pntr[0] ) + pdata->t1*nbolo;
 
 /* Pointer to the first COM data element. */
-         pdata->com = com + pdata->t1;
+         if( com ) {
+            pdata->com = com + pdata->t1;
+         } else {
+            pdata->com = NULL;
+            pdata->comval = comval;
+         }
 
 /* Number of bolometers. */
          pdata->nbolo = nbolo;
@@ -177,6 +189,7 @@ static void smf1AddCom( void *job_data_ptr, int *status ) {
    dim_t nbolo;
    dim_t t1;
    dim_t t2;
+   double comval;
    double *out;
    smfAddComData *pdata;
 
@@ -188,20 +201,37 @@ static void smf1AddCom( void *job_data_ptr, int *status ) {
 
 /* Extract values from pdata */
    com = pdata->com;
+   comval = pdata->comval;
    out = pdata->out;
    t1 = pdata->t1;
    t2 = pdata->t2;
    nbolo = pdata->nbolo;
 
+/* First handle time varying common-mode signals. */
+   if( com ) {
+
 /* Loop round every time slice to be processed by this thread. */
-   for( itime = t1; itime <= t2; itime++,com++ ){
+      for( itime = t1; itime <= t2; itime++,com++ ){
 
 /* Add the common-mode value onto all bolometers. */
-      for( ibolo = 0; ibolo < nbolo; ibolo++,out++ ) {
-         if( *com != VAL__BADD ) {
-            *out += *com;
-         } else {
-            *out = VAL__BADD;
+         for( ibolo = 0; ibolo < nbolo; ibolo++,out++ ) {
+            if( *com != VAL__BADD && *out != VAL__BADD ) {
+               *out += *com;
+            } else {
+               *out = VAL__BADD;
+            }
+         }
+      }
+
+/* Now handle constant common-mode signals. */
+   } else {
+
+/* Loop round every time slice to be processed by this thread. */
+      for( itime = t1; itime <= t2; itime++ ){
+
+/* Add the common-mode value onto all bolometers. */
+         for( ibolo = 0; ibolo < nbolo; ibolo++,out++ ) {
+            if( *out != VAL__BADD ) *out += comval;
          }
       }
    }

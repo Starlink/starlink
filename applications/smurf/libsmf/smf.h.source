@@ -571,7 +571,7 @@ void smf_addmap1( int contchunk, double *map1, double *mapweight1, double *bolow
                   dim_t msize, double chunkweight2, int *status );
 
 void smf_addcom( ThrWorkForce *wf, smfData *data, const double *com,
-                 int *status );
+                 double comval, int *status );
 
 void smf_addgai( ThrWorkForce *wf, smfData *data, const double *gai,
                  int *status );

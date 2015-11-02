@@ -5847,6 +5847,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter comval {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                prompt {Constant comon-mode value for all time slices (pW)}
+                default 0.0
+                helpkey *
+            }
+
             parameter gai {
                 type NDF
                 access READ
