@@ -641,8 +641,9 @@ void smurf_unmakemap( int *status ) {
       }
    }
 
-/* Get any instrumental polarisation files. */
-   if( *status == SAI__OK ) {
+/* Get any instrumental polarisation files. Only do this if values for
+   parameter QIN/UIN were supplied. */
+   if( *status == SAI__OK && inq_data && inu_data ) {
 
 /* First see if the user wants to use the "INSTQ/INSTU" scheme for
    specifying instrumental polarisation. */
