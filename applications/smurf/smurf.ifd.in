@@ -806,11 +806,11 @@ package @PACKAGE@ {
             }
 
             parameter north {
-                type _LOGICAL
-                prompt {Use tracking north as the reference direction?}
+                type LITERAL
+                prompt {System to use as the reference direction}
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
-                default TRUE
+                default TRACKING
                 helpkey *
             }
 

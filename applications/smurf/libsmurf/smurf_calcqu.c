@@ -51,8 +51,8 @@
 *        Q = 2*B
 *        I = 2*( G*box/2 + H )
 *
-*     The Q and U values are specified with respect to either tracking
-*     north, or the focal plane Y axis (see parameter NORTH). Each single
+*     The Q and U values are specified with respect to either north
+*     or the focal plane Y axis (see parameter NORTH). Each single
 *     pair of corresponding Q and U values in the output NDFs are created
 *     from a single least-squares fit, and the residuals of each such fit
 *     are used to calculate a notional variance for the corresponding pair
@@ -166,8 +166,9 @@
 *        streams? If not, the the output I, Q and U values are found by
 *        convolving each input time stream with sine and cosine waves
 *        of the requested harmonic. Note, the reference direction for
-*        LSQFIT Stokes vectors is tracking north, whereas the reference
-*        direction for non-LSQFIT Stokes vectors is focal plane Y. [FALSE]
+*        LSQFIT Stokes vectors is specified by parameter NORTH, whereas
+*        the reference direction for non-LSQFIT Stokes vectors is always
+*        focal plane Y. [FALSE]
 *     MAXSIZE = _INTEGER (Read)
 *        The maximum number of time slices to include in any block. No upper
 *        limit is imposed on block size if MAXSIZE is zero or negative. Only
@@ -181,12 +182,17 @@
 *        Control the verbosity of the application. Values can be
 *        NONE (no messages), QUIET (minimal messages), NORMAL,
 *        VERBOSE, DEBUG or ALL. [NORMAL]
-*     NORTH = _LOCAL (Read)
-*        Only used if LSQFIT is TRUE. Specifies the reference direction
-*        for the returned Q and U values - north in the tracking system
-*        if NORTH is TRUE, and Y axis of the focal plane system if NORTH
-*        is FALSE. Stokes parameters created with LSQFIT=FALSE always use
-*        focal plane Y as the reference direction. [TRUE]
+*     NORTH = LITERAL (Read)
+*        Only used if LSQFIT is TRUE. Specifies the celestial coordinate
+*        system to use as the reference direction for the returned Q
+*        and U values. For instance if NORTH="AZEL", then they use the
+*        elevation axis as the reference direction, and if "ICRS" is
+*        supplied, they use the ICRS Declination axis. If "TRACKING" is
+*        supplied, they use north in the tracking system - what ever that
+*        may be. If a null (!) value is supplied, the Y axis of the focal
+*        plane system is used as the reference direction. Note, Stokes
+*        parameters created with LSQFIT=FALSE always use focal plane Y as
+*        the reference direction. ["TRACKING"]
 *     OUTI = LITERAL (Write)
 *        The output file to receive total intensity values. If LSQFIT is
 *        FALSE, this will be an HDS container file containing the I images.
@@ -332,8 +338,10 @@ void smurf_calcqu( int *status ) {
    ThrWorkForce *wf;          /* Pointer to a pool of worker threads */
    char headval[ 81 ];        /* FITS header value */
    char ndfname[ 30 ];        /* Name of output Q or U NDF */
+   char northbuf[10];         /* Celestial system to use as ref. direction  */
    char polcrd[ 81 ];         /* FITS 'POL_CRD' header value */
    char subarray[ 10 ];       /* Subarray name (e.g. "s4a", etc) */
+   const char *north;         /* Celestial system to use as ref. direction  */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    float arcerror;            /* Max acceptable error (arcsec) in one block */
@@ -350,7 +358,6 @@ void smurf_calcqu( int *status ) {
    int maxsize;               /* Max no. of time slices in a block */
    int minsize;               /* Min no. of time slices in a block */
    int nc;                    /* Number of characters written to a string */
-   int north;                 /* Use tracking north as ref. direction ? */
    int nskipped;              /* Number of skipped blocks */
    int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
    int polbox;                /* HWP cycles in a fitting box */
@@ -690,7 +697,17 @@ void smurf_calcqu( int *status ) {
 /* Least squares approach..
    ========================  */
             if( lsqfit && *status == SAI__OK ) {
-               parGet0l( "NORTH", &north, status );
+
+/* Get the celestial coordinate system to use as the reference direction. */
+               parChoic( "NORTH", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC"
+                         ",GAPPT,FK4,FK4-NO-E,ECLIPTIC", 0, northbuf,
+                         sizeof( northbuf ), status );
+               if( *status == PAR__NULL ) {
+                  errAnnul( status );
+                  north = NULL;
+               } else {
+                  north = northbuf;
+               }
 
 /* Generate the I, Q and U time-streams for the current chunk. */
                smf_fit_qui( wf, data, &odataq, &odatau, ogrpi ? &odatai : NULL,

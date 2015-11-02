@@ -17,7 +17,7 @@
 *     smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 *                  smfData **odatau, smfData **odatai, dim_t box,
 *                  int ipolcrd, int pasign, double paoff, double angrot,
-*                  int north, int harmonic, int *status )
+*                  const char *north, int harmonic, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -50,10 +50,12 @@
 *        The angle from the focal plane X axis to the fixed analyser, in
 *        radians. Measured positive in the same sense as rotation from focal
 *        plane X to focal plane Y.
-*     north = int (Given)
-*        If non-zero, the returned Q/U values use north in the tracking
-*        system as their reference direction. Otherwise, the reference
-*        direction is the focal plane Y axis.
+*     north = const char * (Given)
+*        If not NULL, the returned Q/U values use north in the specified
+*        SKY system as their reference direction. Otherwise, the reference
+*        direction is the focal plane Y axis. The value of "north" should
+*        be the AST "System" Value corresponding to the required SKY
+*        system (e.g. "AZEL", "FK5", etc).
 *     harmonic = int  (Given)
 *        The harmonic(s) of the half-wave plate rotation from which the Q
 *        and U values should be derived. This should normally be 4, but
@@ -105,8 +107,8 @@
 *        U = 2*J
 *        Q = 2*K
 *
-*     The Q and U values are specified with respect to either tracking
-*     north, or focal plane Y axis (see argument "north").
+*     The Q and U values are specified with respect to either north, or
+*     focal plane Y axis (see argument "north").
 *
 *     Care is taken to ensure that each fitting box spans exactly the same
 *     range of "w" values. This is needed because the POL_ANG values are
@@ -206,7 +208,7 @@ typedef struct smfFitQUIJobData {
    double paoff;
    int harmonic;
    int ipolcrd;
-   int north;
+   const char *north;
    int pasign;
    int setbad;
    smf_qual_t *qua;
@@ -230,7 +232,7 @@ static void smf1_find_boxes( dim_t intslice, const JCMTState *allstates, dim_t b
 
 void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
                   smfData **odatau, smfData **odatai, dim_t box, int ipolcrd,
-                  int pasign, double paoff, double angrot, int north,
+                  int pasign, double paoff, double angrot, const char *north,
                   int harmonic, int *status ){
 
 /* Local Variables: */
@@ -417,13 +419,17 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 
 /* If we are using north as the reference direction, get the WCS FrameSet
    for the input time slice that is at the middle of the output time
-   slice, and set its current Frame to the tracking frame. */
+   slice, and set its current Frame to the requested frame. */
          setbad = 0;
          if( north ) {
             smf_tslice_ast( idata, istart + box_size/2, 1, NO_FTS, status );
             wcs = idata->hdr->wcs;
-            usesys = sc2ast_convert_system( (idata->hdr->allState)[0].tcs_tr_sys,
-                                            status );
+            if( !strcmp( north, "TRACKING" ) ) {
+               usesys = sc2ast_convert_system( (idata->hdr->allState)[0].tcs_tr_sys,
+                                               status );
+            } else {
+               usesys = north;
+            }
 
 /* If this time slice has not got usable WCS info, set the setbad flag to
    indicate that it should be filled it with bad values. */
@@ -565,7 +571,7 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
 
 /* Add a keyword to the Q header indicating the polarimetric reference
    direction. */
-      smf_fits_updateL( (*odataq)->hdr, "POLNORTH", north,
+      smf_fits_updateS( (*odataq)->hdr, "POLNORTH", north ? north : "FPLANE",
                         north ? "Pol ref dir is tracking north" :
                                 "Pol ref dir is focal plane Y", status );
 
@@ -754,11 +760,11 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
 /* Loop round all bolometers to be processed by this thread. */
       for( ibolo = b1; ibolo <= b2; ibolo++,qua++,dat++ ) {
 
-/* If the returned Stokes parameters are to be with respect to Tracking
-   North, get the angle from tracking north at the current bolometer to
-   focal plane Y, measured positive in the sense of rotation from focal
-   plane Y to focal plane X (note this angle may change across the focal
-   plane due to focal plane distortion). Otherwise, use zero. */
+/* If the returned Stokes parameters are to be with respect to North, get
+   the angle from north at the current bolometer to focal plane Y, measured
+   positive in the sense of rotation from focal plane Y to focal plane X
+   (note this angle may change across the focal plane due to focal plane
+   distortion). Otherwise, use zero. */
          if( wcs ) {
 
 /* Get the grid coords of the current bolometer, and transform them to SKY

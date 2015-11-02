@@ -19,7 +19,7 @@
 *     then converted into separate Q and U maps using SMURF:MAKEMAP.
 *
 *     Correction for instrumental polarisation is made only if a value
-*     is supplied for parameter IREF.  
+*     is supplied for parameter IREF.
 
 *  Usage:
 *     pol2scan in q u [iref] [config] [pixsize] [qudir] [retain] [msg_filter] [ilevel] [glevel] [logfile]
@@ -115,6 +115,14 @@
 *        within the command string passed to the "invoke" function. The
 *        accepted values are the list defined in SUN/104 ("None", "Quiet",
 *        "Normal", "Verbose", etc). ["Normal"]
+*     NORTH = LITERAL (Read)
+*        Specifies the celestial coordinate system to use as the reference
+*        direction in the created Q and U maps. For instance if NORTH="AZEL",
+*        then they use the elevation axis as the reference direction, and if
+*        "ICRS" is supplied, they use the ICRS Declination axis. If "TRACKING"
+*        is supplied, they use north in the tracking system - what ever
+*        that may be. Note, this parameter is only used if null (!) is
+*        supplied for parameter INQU. ["TRACKING"]
 *     PIXSIZE = _REAL (Read)
 *        Pixel dimensions in the output Q and U maps, in arcsec. The default
 *        is 4 arc-sec for 850 um data and 2 arc-sec for 450 um data. []
@@ -259,6 +267,11 @@ try:
    params.append(starutil.ParNDG("UREF", "The reference U map", default=None,
                                  noprompt=True, minsize=0, maxsize=1 ))
 
+   params.append(starutil.ParChoice( "NORTH", ("TRACKING","FK5","ICRS","AZEL",
+                                     "GALACTIC","GAPPT","FK4","FK4-NO-E",
+                                     "ECLIPTIC"), "Celestial system to "
+                                     "use as reference direction", "TRACKING",
+                                     noprompt=True ))
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
@@ -307,6 +320,7 @@ try:
 #  streams from the supplied analysed intensity time streams. Put them in
 #  the QUDIR directory, or the temp directory if QUDIR is null.
    if inqu == None:
+      north = parsys["NORTH"].value
       qudir =  parsys["QUDIR"].value
       if not qudir:
          qudir = NDG.tempdir
@@ -315,7 +329,7 @@ try:
 
       msg_out( "Calculating Q and U time streams for each bolometer...")
       invoke("$SMURF_DIR/calcqu in={0} lsqfit=yes config=def outq={1}/\*_QT "
-             "outu={1}/\*_UT fix=yes".format( indata, qudir ) )
+             "outu={1}/\*_UT fix=yes north={2}".format( indata, qudir, north ) )
 
 #  Get groups listing the time series files created by calcqu.
       qts = NDG( "{0}/*_QT".format( qudir ) )

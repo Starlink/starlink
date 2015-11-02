@@ -30,21 +30,24 @@
 *     the supplied FrameSet, which POLPACK will use to define the
 *     polarimetric reference direction. The new Frame has domain POLANAL,
 *     and its first axis (which defines the reference direction) is
-*     parallel to tracking north.
+*     parallel to celestial north in the coordinate system specified by
+*     FITS Header POLNORTH.
 *
 *     The input data is assumed to be POL-2 data if the FITS header
-*     contains a boolean keyword "POLNORTH" (as written by smurf task
-*     CALCQU). An error is reported if POLNORTH is false (i.e. if the Q/U
-*     values use focal plane Y as the reference direction rather than
-*     tracking north).
+*     contains a keyword "POLNORTH" (as written by smurf task CALCQU). An
+*     error is reported if POLNORTH is "FPLANE" (i.e. if the Q/U values use
+*     focal plane Y as the reference direction rather than celestial north).
 
 *  Authors:
-*     David S Berry (JAC, UCLan)
+*     DSB: David S Berry (EAO)
 *     {enter_new_authors_here}
 
 *  History:
 *     5-JUN-2015 (DSB):
 *        Initial version.
+*     2-NOV-2015 (DSB):
+*        POLNORTH now gives the celestial system in which north defines
+*        the reference direction (before, it was always the tracking system).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -83,18 +86,18 @@
 void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, int *status ){
 
 /* Local Variables */
+   AstCmpMap *tmap;
    AstFrame *cfrm;
    AstFrame *pfrm;
    AstFrame *tfrm;
    AstFrameSet *tfs;
-   AstCmpMap *tmap;
    AstPermMap *pm;
+   char *polnorth = NULL;
    const char *cursys;
    const char *trsys;
    int icurr;
    int inperm[2];
    int outperm[2];
-   int polnorth;
 
 /* Check inherited status, and also check the supplied angle is not bad. */
    if( *status != SAI__OK ) return;
@@ -104,19 +107,18 @@ void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, int *status ){
 
 /* Get the value of the POLNORTH FITS keyword from the supplied header.
    The rest only happens if the keyword is found. */
-   if( astGetFitsL( hdr->fitshdr, "POLNORTH", &polnorth ) ) {
+   if( astGetFitsS( hdr->fitshdr, "POLNORTH", &polnorth ) ) {
 
 /* Report an error if the Q/U data uses focal plane Y as the reference
    direction. */
-      if( !polnorth && *status == SAI__OK ) {
+      if( !strcmp( polnorth, "FPLANE" ) && *status == SAI__OK ) {
          *status = SAI__ERROR;
          errRep( "", "The input NDFs hold POL-2 Q/U data specified with "
                  "respect to focal plane Y.",status );
          errRep( "", "Maps can only be made from POL-2 data specified with "
-                 "respect to tracking north.",status );
+                 "respect to celestial north.",status );
 
-
-/* If the ref. direction is tracking north, create a suitable Frame and
+/* If the ref. direction is celestial north, create a suitable Frame and
    Mapping and add them into the supplied FrameSet. */
       } else {
 
@@ -142,8 +144,12 @@ void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, int *status ){
 /* Record the index of the original current Frame. */
             icurr = astGetI( fset, "Current" );
 
-/* Determine the tracking system. */
-            trsys = sc2ast_convert_system( hdr->state->tcs_tr_sys, status );
+/* Determine the system to use. */
+            if( !strcmp( polnorth, "TRACKING" ) ) {
+               trsys = sc2ast_convert_system( hdr->state->tcs_tr_sys, status );
+            } else {
+               trsys = polnorth;
+            }
 
 /* If the current Frame in the supplied FrameSet has this system. Then we
    use the above PermMap to connect the POLANAL Frame directly to the current
@@ -153,11 +159,11 @@ void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, int *status ){
                astAddFrame( fset, AST__CURRENT, pm, pfrm );
 
 /* Otherwise we need to get a Mapping from the current Frame to the
-   tracking frame. */
+   required frame. */
             } else {
 
 /* Take a copy of the current Frame (in order to pick up epoch, observatory
-   position, etc), and set its System to the tracking system. */
+   position, etc), and set its System to the required system. */
                tfrm = astCopy( cfrm );
                astSetC( tfrm, "System", trsys );
 
@@ -172,7 +178,7 @@ void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, int *status ){
                                     pm, 1, " " );
                   astAddFrame( fset, AST__CURRENT, astSimplify( tmap ), pfrm );
 
-/* Report an error if the mapping from current to tracking systems could
+/* Report an error if the mapping from current to required system could
    not be found. */
                } else if( *status == SAI__OK ) {
                   *status = SAI__ERROR;
