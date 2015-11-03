@@ -95,6 +95,7 @@ void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, int *status ){
    char *polnorth = NULL;
    const char *cursys;
    const char *trsys;
+   int aloff;
    int icurr;
    int inperm[2];
    int outperm[2];
@@ -167,8 +168,19 @@ void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, int *status ){
                tfrm = astCopy( cfrm );
                astSetC( tfrm, "System", trsys );
 
-/* Get the Mapping from the original current Frame to this modified copy. */
+/* Get the Mapping from the original current Frame to this modified copy.
+   Ensure alignment happens in absolute coords (alignment in offset
+   coords is always a unit mapping and so no rotation occurs). */
+               aloff = astGetI( cfrm, "AlignOffset" );
+               if( aloff ) {
+                  astSetI( cfrm, "AlignOffset", 0 );
+                  astSetI( tfrm, "AlignOffset", 0 );
+               }
                tfs = astConvert( cfrm, tfrm, "SKY" );
+               if( aloff ) {
+                  astSetI( cfrm, "AlignOffset", 1 );
+                  astSetI( tfrm, "AlignOffset", 1 );
+               }
                if( tfs ) {
 
 /* Use it, in series with with the above PermMap, to connect the POLANAL frame
@@ -176,7 +188,8 @@ void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, int *status ){
                   tmap = astCmpMap( astGetMapping( tfs, AST__BASE,
                                                    AST__CURRENT ),
                                     pm, 1, " " );
-                  astAddFrame( fset, AST__CURRENT, astSimplify( tmap ), pfrm );
+                  astAddFrame( fset, AST__CURRENT, astSimplify( tmap ),
+                               pfrm );
 
 /* Report an error if the mapping from current to required system could
    not be found. */
