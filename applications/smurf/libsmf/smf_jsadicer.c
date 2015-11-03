@@ -115,6 +115,9 @@
 *        Remove lon/lat wrapping as a means of handling tiles that stradle
 *        RA=12h. It is no longer needed since the introduction of the HPX12
 *        projection.
+*     3-NOV-2015 (DSB):
+*        Ensure the alignment of the input NDF and the JSA grid is not
+*        done using offset coordinates (e.g. planet observations).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -283,6 +286,10 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
       errRep( "", "The input NDF (^N) does not appear to be gridded "
               "on the JSA all-sky pixel grid.", status );
    }
+
+/* Ensure the current Frame does not represent offset coords. */
+   astSetI( iwcs, "AlignOffset", 0 );
+   astSetC( iwcs, "SkyRefIs", "Ignored" );
 
 /* Get the bounds of the NDF in pixel indices and the the corresponding
    double precision GRID bounds (reduce the size of the grid by a small
