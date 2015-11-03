@@ -77,6 +77,9 @@
 *        Use smf_set_moving to assign attributes for a moving target,
 *        rather than just setting SkyRefIs (smf_set_moving also sets
 *        AlignOffset).
+*     3-NOV-2015 (DSB):
+*        Revert to setting SkyRefIs explicitly rather than calling
+*        smf_set_moving.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -243,8 +246,11 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
 /* Modified the SkyRefIs attribute in the FrameSet so that the current
    Frame represents offsets from the origin (set above). We use the FrameSet
    pointer "tempfs" now rather than "skyout" so that the Mapping in the FrameSet
-   will be modified to remap the current Frame. */
-      smf_set_moving( (AstFrame *) tempfs, NULL, status );
+   will be modified to remap the current Frame. Note, we do not use
+   smf_set_moving  since we want the modified FrameSet mapping to produce
+   alignment in absolute coords, but smf_set_moving generates alignment in
+   offset coords. */
+      astSet( tempfs, "SkyRefIs=origin" );
 
 /* Get the Mapping and then clean up. We do not have to clear any attributes
    because we are working on a complete copy. */
