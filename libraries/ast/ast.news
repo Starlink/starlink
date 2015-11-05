@@ -16,6 +16,11 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- A bug in FitsChan has been fixed which could cause a small shift in
+  spectral axis value when writing out a spectral cube to FITS-WCS headers,
+  This shift occurred only if the celestial axes in the cube were not FK5
+  (RA,Dec).
+
 - Avoid some more compiler warnings.
 
 - A "BadKeyValue" warning is now issued by the FitsChan class if an illegal

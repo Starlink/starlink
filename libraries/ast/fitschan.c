@@ -1155,6 +1155,15 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        of an error if the Split function cannot determine the keyword value.
 *        - Move the check for PLTRAH (i.e. DSS encoding) higher up in GetEncoding.
 *        This is because some DSS file slaos have CD and/or PC keywords.
+*     5-NOV-2015 (DSB):
+*        Fix bug in MakeFitsFrameSet that could cause an inappropriate
+*        RefRA and RefDec values to be used when writing out a SpecFrame
+*        using FITS-WCS. This bug was caused by the assumption that
+*        changing the current Frame of a FRameSet also changes the Frame
+*        that was added into the FRameSet. This used to be the  case as
+*        astAddFrame took a clone of the supplied Frame pointer, but it
+*        now takes a deep copy, so the original Frame and the FrameSet's
+*        current Frame are now independent of each other.
 *class--
 */
 
@@ -20470,9 +20479,12 @@ static AstFrameSet *MakeFitsFrameSet( AstFitsChan *this, AstFrameSet *fset,
 /* Use reflon and reflat (which represent FK5 J2000 RA and Dec) to set
    the values of the SpecFrame RefRA and RefDec attributes. Format the
    values first so that we can use the FrameSet astSetC method, and so
-   maintain the FrameSet integrity. */
-                     astSetC( tfs, "RefRA", astFormat( wcsfrm, ilon, reflon ) );
-                     astSetC( tfs, "RefDec", astFormat( wcsfrm, ilat, reflat ) );
+   maintain the FrameSet integrity. Use "tfs" rather than "wcsfrm" when
+   calling astFormat, as "wcsfrm" is not affected by the above change
+   to the current frame of "tfs" (i.e. astAddFrame takes a deep copy of the
+   supplied Frame). */
+                     astSetC( tfs, "RefRA", astFormat( tfs, ilon, reflon ) );
+                     astSetC( tfs, "RefDec", astFormat( tfs, ilat, reflat ) );
 
 /* If succesfull, return a pointer to the FrameSet. */
                      if( astOK ) ret = astClone( tfs );
@@ -23072,10 +23084,6 @@ static AstMapping *OtherAxes( AstFitsChan *this, AstFrameSet *fs, double *dim,
 
 /* Only proceed if there are some axes to described. */
    if( nother ) {
-
-if( s == 'D' ) astShow( fs );
-
-
 
 /* Get a pointer to the WCS Frame. */
       wcsfrm = astGetFrame( fs, AST__CURRENT );
@@ -30510,11 +30518,11 @@ int Split( AstFitsChan *this, const char *card, char **name, char **value,
       *comment = (char *) astFree( (void *) *comment );
       type = AST__COMMENT;
       astError( astStatus, "%s(%s): Unable to store the following FITS "
-                "header card:\n%.*s\n", status, method, class, 
+                "header card:\n%.*s\n", status, method, class,
                 AST__FITSCHAN_FITSCARDLEN, card );
 
-/* If a bad keyword value was encountered, issue a warning. Remember that 
-   "card" may not be null terminated, so ensure that only one header is 
+/* If a bad keyword value was encountered, issue a warning. Remember that
+   "card" may not be null terminated, so ensure that only one header is
    included from "card". */
    } else if( badval ){
       snprintf( buf, sizeof(buf), "The keyword value is illegal in "
