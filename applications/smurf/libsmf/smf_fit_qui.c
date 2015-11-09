@@ -385,11 +385,6 @@ void smf_fit_qui( ThrWorkForce *wf, smfData *idata, smfData **odataq,
    job_data = astMalloc( nworker*sizeof( *job_data ) );
    if( *status == SAI__OK ) {
 
-/* Modify angrot so that it is the angle from focal plane Y to the fixed
-   analyser, in radians. Measured positive in the same sense as rotation
-   from focal plane X to focal plane Y. */
-      angrot -= AST__DPIBY2;
-
 /* Determine which bolometers are to be processed by which threads. */
       bstep = nbolo/nworker;
       if( bstep < 1 ) bstep = 1;
@@ -666,7 +661,7 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    double *pm;
    double *ps;
    double angle;              /* Phase angle for FFT */
-   double angrot;             /* Angle from focal plane Y axis to fixed analyser */
+   double angrot;             /* Angle from focal plane X axis to fixed analyser */
    double c1;
    double c2;
    double c4;
@@ -1135,8 +1130,8 @@ static void smf1_fit_qui_job( void *job_data, int *status ) {
    the output arrays. */
                cosval = cos( 2*( angrot - tr_angle ) );
                sinval = sin( 2*( angrot - tr_angle ) );
-               *(ipq++) = qval*cosval + uval*sinval;
-               *(ipu++) = -qval*sinval + uval*cosval;
+               *(ipq++) = -qval*cosval + uval*sinval;
+               *(ipu++) = -qval*sinval - uval*cosval;
 
 /* Store the correspoinding I value. */
                if( ipi ) *(ipi++) = solution[ 6 ]*box_size + 2*solution[ 7 ];
