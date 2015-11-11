@@ -56,7 +56,7 @@ noisecliphigh=0
 #		axis. If zero, it is assumed that a positive POL_ANG value
 #		corresponds to rotation from focal plane Y to focal plane X
 #		axis.
-pasign = 1
+pasign = 0
 
 #-----------------------------------------------------------------
 #  Name: 	paoff
@@ -67,7 +67,7 @@ pasign = 1
 #		plate for a POL_ANG value of zero, in degrees. Measured
 #		positive in the same sense as rotation from focal plane X
 #		to focal plane Y.
-paoff = 0.0
+paoff = 18.65
 
 #-----------------------------------------------------------------
 #  Name: 	angrot
