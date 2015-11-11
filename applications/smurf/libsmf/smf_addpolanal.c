@@ -130,14 +130,14 @@ void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, AstKeyMap *config,
          astMapGet0I( config, "POL2FP", &pol2fp );
 
          if( pol2fp ) {
-            msgBlank( status )
+            msgBlank( status );
             msgOut( "", "WARNING: The input NDFs hold POL-2 Q/U data specified "
                     "with respect to focal plane Y.",status );
             msgOut( "", "Maps should normally be made from POL-2 data specified "
                     "with respect to celestial north.",status );
             msgOut( "", "The output map will not contain a POLANAL Frame and "
                     "so will be unusable by POLPACK applications.",status );
-            msgBlank( status )
+            msgBlank( status );
 
          } else if( *status == SAI__OK ) {
             *status = SAI__ERROR;
