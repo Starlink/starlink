@@ -17,7 +17,8 @@
 *     smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
 *                    AstFrameSet *refwcs, int alignsys, int *lbnd_out,
 *                    int *ubnd_out, AstFrameSet **outframeset, int *moving,
-*                    smfBox ** boxes, fts2Port fts_port, int *status );
+*                    smfBox ** boxes, fts2Port fts_port, AstKeyMap *config,
+*                    int *status );
 
 *  Arguments:
 *     fast = int (Given)
@@ -54,6 +55,9 @@
 *        using astFree when no longer needed.
 *     fts_port = fts2Port (Given)
 *        FTS-2 port.
+*     config = AstKeyMap * (Given)
+*        A KeyMap containing the user-supplied configuration parameter
+*        values.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -185,6 +189,8 @@
 *        Use smf_set_moving to assign attributes for a moving target,
 *        rather than just setting SkyRefIs (smf_set_moving also sets
 *        AlignOffset).
+*     2015-11-11 (DSB):
+*        Added argument "config".
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -239,7 +245,8 @@
 void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
                     AstFrameSet *spacerefwcs, int alignsys, int *lbnd_out,
                     int *ubnd_out, AstFrameSet **outframeset, int *moving,
-                    smfBox ** boxes, fts2Port fts_port, int *status ) {
+                    smfBox ** boxes, fts2Port fts_port, AstKeyMap *config,
+                    int *status ) {
 
   /* Local Variables */
   AstSkyFrame *abskyframe = NULL; /* Output Absolute SkyFrame */
@@ -556,7 +563,7 @@ status );
 
           /* Now add a POLANAL Frame if required (i.e. if the input time
              series are POL-2 Q/U values). */
-          smf_addpolanal( *outframeset, hdr, status );
+          smf_addpolanal( *outframeset, hdr, config, status );
 
           /* Invert the oskymap mapping */
           astInvert( oskymap );

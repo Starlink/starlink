@@ -2246,6 +2246,26 @@ pad = <undef>
 pln.notfirst = 0
 
 #-----------------------------------------------------------------
+#  Name: 	pol2fp
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls creation of maps holding POL2 Q/U values.
+#  Description: If zero, an error is reported if an attempt is made to
+#               create a map from Q or U time series that uses the focal
+#               plane Y axis as the reference direction. Normally, maps
+#               should be made from Q/U values that use celestial north
+#               as the reference direction in order to avoid problems
+#               caused by sky rotation. However, if "pol2fp" is set
+#               non-zero, then no error will be reported if the Q/U
+#               time series uses focal plane Y as the reference direction.
+#               This may be necessary, for instance, when processing data
+#               to determine the parameters of the IP (Instrumental
+#               Polarisation) model. Note, in such cases the output map
+#               will not contain a POLANAL Frame in the WCS FrameSet, and
+#               so will be unusable with any POLPACK applications.
+pol2fp = 0
+
+#-----------------------------------------------------------------
 #  Name: 	sampcube
 #  Type: 	integer
 #  Default: 	0

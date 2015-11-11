@@ -576,7 +576,8 @@ void smf_addcom( ThrWorkForce *wf, smfData *data, const double *com,
 void smf_addgai( ThrWorkForce *wf, smfData *data, const double *gai,
                  int *status );
 
-void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, int *status );
+void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, AstKeyMap *config,
+                     int *status );
 
 void smf_addto_smfArray( smfArray *ary, smfData *data, int *status );
 
@@ -1551,7 +1552,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
                     AstFrameSet * spacesrefwcs, int alignsys,
                     int *lbnd_out, int *ubnd_out, AstFrameSet **outframeset,
                     int *moving, smfBox ** boxes, fts2Port fts_port,
-                    int *status );
+                    AstKeyMap *config, int *status );
 
 void smf_mapbounds_approx( Grp *igrp, size_t index, char *system,
                            int *lbnd_out, int *ubnd_out,

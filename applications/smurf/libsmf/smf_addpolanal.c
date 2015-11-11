@@ -13,7 +13,8 @@
 *     C function
 
 *  Invocation:
-*     smf_addpolanal( AstFrameSet *fset, smfHead *hdr, int *status )
+*     smf_addpolanal( AstFrameSet *fset, smfHead *hdr,
+*                     AstKeyMap *config, int *status )
 
 *  Arguments:
 *     fset = AstFrameSet * (Given)
@@ -21,6 +22,9 @@
 *        original base and current Frames are unchanged on exit.
 *     hdr = SmfHead * (Given)
 *        The header for an example input time-series file.
+*     config = AstKeyMap * (Given)
+*        A KeyMap containing the user-supplied configuration parameter
+*        values.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -48,6 +52,10 @@
 *     2-NOV-2015 (DSB):
 *        POLNORTH now gives the celestial system in which north defines
 *        the reference direction (before, it was always the tracking system).
+*     11-NOV-2015 (DSB):
+*        Add argument "config", and allow maps to be made with focal
+*        plane Y axis as the reference direction (but only if "pol2fp"
+*        is non-zero).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -83,7 +91,8 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, int *status ){
+void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, AstKeyMap *config,
+                     int *status ){
 
 /* Local Variables */
    AstCmpMap *tmap;
@@ -99,6 +108,7 @@ void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, int *status ){
    int icurr;
    int inperm[2];
    int outperm[2];
+   int pol2fp;
 
 /* Check inherited status, and also check the supplied angle is not bad. */
    if( *status != SAI__OK ) return;
@@ -110,14 +120,32 @@ void smf_addpolanal( AstFrameSet *fset, smfHead *hdr, int *status ){
    The rest only happens if the keyword is found. */
    if( astGetFitsS( hdr->fitshdr, "POLNORTH", &polnorth ) ) {
 
-/* Report an error if the Q/U data uses focal plane Y as the reference
-   direction. */
-      if( !strcmp( polnorth, "FPLANE" ) && *status == SAI__OK ) {
-         *status = SAI__ERROR;
-         errRep( "", "The input NDFs hold POL-2 Q/U data specified with "
-                 "respect to focal plane Y.",status );
-         errRep( "", "Maps can only be made from POL-2 data specified with "
-                 "respect to celestial north.",status );
+/* Normally, we do not allow maps to be made from Q/U time streams that
+   use focal plane Y as the reference direction (because of the problems
+   of sky rotation). Therefore we report an error. However, we do need to
+   make such maps as part of the process of determining the parameters of
+   the Instrumental Polarisation (IP) model. So only report the error if
+   "pol2fp" config parameter is non-zero. */
+      if( !strcmp( polnorth, "FPLANE" ) ) {
+         astMapGet0I( config, "POL2FP", &pol2fp );
+
+         if( pol2fp ) {
+            msgBlank( status )
+            msgOut( "", "WARNING: The input NDFs hold POL-2 Q/U data specified "
+                    "with respect to focal plane Y.",status );
+            msgOut( "", "Maps should normally be made from POL-2 data specified "
+                    "with respect to celestial north.",status );
+            msgOut( "", "The output map will not contain a POLANAL Frame and "
+                    "so will be unusable by POLPACK applications.",status );
+            msgBlank( status )
+
+         } else if( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRep( "", "The input NDFs hold POL-2 Q/U data specified with "
+                    "respect to focal plane Y.",status );
+            errRep( "", "Maps can only be made from POL-2 data specified with "
+                    "respect to celestial north.",status );
+         }
 
 /* If the ref. direction is celestial north, create a suitable Frame and
    Mapping and add them into the supplied FrameSet. */

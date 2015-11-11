@@ -1124,7 +1124,7 @@ void smurf_makemap( int *status ) {
 
   smf_mapbounds( 1, igrp, size, system, spacerefwcs, alignsys,
                  lbnd_out, ubnd_out, &outfset, &moving, &boxes, fts_port,
-                 status );
+                 keymap, status );
 
   msgBlank( status );
 
