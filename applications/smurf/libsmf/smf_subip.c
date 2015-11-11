@@ -55,6 +55,10 @@
 *  History:
 *     7-OCT-2015 (DSB):
 *        Original version.
+*     11-NOV-2015 (DSB):
+*        Take account of the fact that the Q/U time streams may use
+*        north in any system as the ref. direction - it need not be
+*        the tracking system.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -96,7 +100,7 @@
 
 /* Prototypes for local static functions. */
 static void smf1_subip( void *job_data_ptr, int *status );
-static double *smf1_calcang( smfData *data, int *status );
+static double *smf1_calcang( smfData *data, const char *trsys, int *status );
 
 /* Local data types */
 typedef struct smfSubIPData {
@@ -128,10 +132,12 @@ void smf_subip(  ThrWorkForce *wf, smfArray *res, smfArray *lut, int *lbnd_out,
    HDSLoc *sloc = NULL;
    SmfSubIPData *job_data = NULL;
    SmfSubIPData *pdata;
+   char *polnorth;
    char ipref[200];
    char subname[10];
    const char *ipdata;
    const char *qu;
+   const char *trsys;
    dim_t bolostep;
    dim_t nbolo;
    dim_t ntslice;
@@ -199,8 +205,8 @@ void smf_subip(  ThrWorkForce *wf, smfArray *res, smfArray *lut, int *lbnd_out,
 
 /* If we have pol2 data, get the path to the total intensity image that
    is to be used to define the level of IP correction required. If no
-   value is supplied, annul the error and set "qu" NULL to indicate we should
-   leave immediately. */
+   value is supplied, annul the error and set "qu" NULL to indicate we
+   should leave immediately. */
    } else if( qu && *status == SAI__OK ) {
       parGet0c( "IPREF", ipref, sizeof(ipref), status );
       if( *status == PAR__NULL ) {
@@ -214,6 +220,24 @@ void smf_subip(  ThrWorkForce *wf, smfArray *res, smfArray *lut, int *lbnd_out,
       msgOutf( "", "smf_subip: applying instrumental polarisation %s "
                "correction based on total intensity map `%s'", status,
                qu, ipref );
+
+/* Get the value of the POLNORTH FITS keyword from the supplied header. */
+      if( !astGetFitsS( data->hdr->fitshdr, "POLNORTH", &polnorth ) &&
+           *status == SAI__OK ) {
+         errRep( "", "smf_subip: Input POL2 data contains no POLNORTH "
+                 "keyword in the FITS header.", status );
+      }
+
+/* Determine the AST system corresponding to polarimetric reference direction
+   of the Q/U bolometer values. Set "trsys" to NULL if the focal plane Y axis
+   is the reference direction. */
+      if( !strcmp( polnorth, "TRACKING" ) ) {
+         trsys = sc2ast_convert_system( data->hdr->state->tcs_tr_sys, status );
+      } else if( !strcmp( polnorth, "FPLANE" ) ) {
+         trsys = NULL;
+      } else {
+         trsys = polnorth;
+      }
 
 /* Get an identifier for the IPREF NDF. */
       ndfFind( NULL, ipref, &imapndf, status );
@@ -240,11 +264,12 @@ void smf_subip(  ThrWorkForce *wf, smfArray *res, smfArray *lut, int *lbnd_out,
       for( idx = 0; idx < res->ndat && *status == SAI__OK; idx++ ) {
          data = res->sdata[idx];
 
-/* Get an array holding the angle (rad.s) from north to focal plane Y,
-   measured positive in the sense of rotation from focal plane Y to focal
-   plane X, for every bolometer sample in the smfData. The values are bolo
-   ordered so that "bstride" is 1 and "tstsride" is nbolo. */
-         ipang = smf1_calcang( data, status );
+/* Get an array holding the angle (rad.s) from the reference direction
+   used by the Q/U bolometer values  to focal plane Y, measured positive
+   in the sense of rotation from focal plane Y to focal plane X, for
+   every bolometer sample in the smfData. The values are bolo ordered so
+   that "bstride" is 1 and "tstsride" is nbolo. */
+         ipang = smf1_calcang( data, trsys, status );
 
 /* Get the number of bolometers and time slices for the current subarray,
    together with the strides between adjacent bolometers and adjacent
@@ -466,7 +491,7 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    "bstride" is 1 and "tstride" is nbolo]. */
             pr = pdata->res_data + ibolo*bstride;
             pl = pdata->lut_data + ibolo*bstride;
-            pa = pdata->ipang + ibolo;
+            pa = pdata->ipang ? pdata->ipang + ibolo : NULL;
 
 /* Loop round each time slice, maintaining a pointer to the JCMTState
    info for the slice (we need this to get the elevation for each slice). */
@@ -483,7 +508,8 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    corresponding map pixel is undefined, or the telescope elevation is
    unknown. */
                   } else if( *pr != VAL__BADD && !( *pq & SMF__Q_MOD ) &&
-                             *pa != VAL__BADD && state->tcs_az_ac2 != VAL__BADD) {
+                             ( !pa || *pa != VAL__BADD ) &&
+                             state->tcs_az_ac2 != VAL__BADD) {
 
 /* Find the normalised instrumental Q and U. These are with respect to the
    focal plane Y axis. */
@@ -491,11 +517,17 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
                      ufp = tmp2 + p1*sin( tmp3 + 2*state->tcs_az_ac2 );
 
 /* Rotate them to match the reference frame of the supplied Q and U
-   values (should be tracking north). */
-                     cosval = cos( 2*( *pa ) );
-                     sinval = sin( 2*( *pa ) );
-                     qtr = qfp*cosval + ufp*sinval;
-                     utr = -qfp*sinval + ufp*cosval;
+   values (unless the supplied Q and U values are w.r.t focal plane Y,
+   in which case they already use the required reference direction). */
+                     if( pa ) {
+                        cosval = cos( 2*( *pa ) );
+                        sinval = sin( 2*( *pa ) );
+                        qtr = qfp*cosval + ufp*sinval;
+                        utr = -qfp*sinval + ufp*cosval;
+                     } else {
+                        qtr = qfp;
+                        utr = ufp;
+                     }
 
 /* Correct the residual Q or U value. */
                      if( *qu == 'Q' ) {
@@ -527,19 +559,19 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
 
 
 
-/* Returns an array holding the angle (rad.s) from north to focal plane Y,
+/* Returns an array holding the angle (rad.s) from the reference
+   direction used by the Q/U bolometer values to focal plane Y,
    measured positive in the sense of rotation from focal plane Y to focal
    plane X, for every bolometer sample in a smfData. The values are bolo
    ordered so that "bstride" is 1 and "tstsride" is nbolo. The returned
-   array should be freed using astFre when no longer needed. */
-static double *smf1_calcang( smfData *data, int *status ){
+   array should be freed using astFree when no longer needed. */
+static double *smf1_calcang( smfData *data, const char *trsys, int *status ){
 
 /* Local Variables: */
    AstFrameSet *fpfset;
    AstFrameSet *wcs;
    AstMapping *g2s;
    AstMapping *s2f;
-   const char *usesys;
    dim_t ibolo;
    dim_t itime;
    dim_t nbolo;
@@ -557,8 +589,10 @@ static double *smf1_calcang( smfData *data, int *status ){
    double *sy;
    int subsysnum;
 
-/* Check the inherited status. */
-   if( *status != SAI__OK ) return NULL;
+/* Check the inherited status. Also return NULL if the Q/U values are
+   already referenced to the focal plane Y axis (i.e. all returned angles
+   would be zero). */
+   if( *status != SAI__OK || !trsys ) return NULL;
 
 /* Get the number of bolometers and time slices, together with the strides
    between adjacent bolometers and adjacent time slices. */
@@ -584,9 +618,6 @@ static double *smf1_calcang( smfData *data, int *status ){
    the north of every bolometer. */
    fx2 = astMalloc( nbolo*sizeof( *fx2 ) );
    fy2 = astMalloc( nbolo*sizeof( *fy2 ) );
-
-/* Get the AST code equivalent to the tracking system. */
-   usesys = sc2ast_convert_system( (data->hdr->allState)[0].tcs_tr_sys, status );
    if( *status == SAI__OK ) {
 
 /* Initialise the arrays holding the grid coords for every bolometer. */
@@ -607,12 +638,12 @@ static double *smf1_calcang( smfData *data, int *status ){
       pr = result;
       for( itime = 0; itime < ntslice; itime++ ) {
 
-/* Get the WCS FrameSet for the time slice, and set its current Frame to the tracking
-   frame. */
+/* Get the WCS FrameSet for the time slice, and set its current Frame to the
+   frame used as the reference by the Q/U bolometer values. */
          smf_tslice_ast( data, itime, 1, NO_FTS, status );
          wcs = data->hdr->wcs;
          if( wcs ) {
-            astSetC( wcs, "System", usesys );
+            astSetC( wcs, "System", trsys );
 
 /* Get the mapping from GRID to SKY. */
             astBegin;
