@@ -116,7 +116,8 @@ dat1_cvt( int bad,
         ( imp->order == exp->order ) &&
         ( imp->format == exp->format ) )
    {
-      memcpy( (void *) exp->body, (void *) imp->body, nval * imp->length );
+      size_t nbyte = (size_t) nval * (size_t) imp->length;
+      memcpy( (void *) exp->body, (void *) imp->body, nbyte );
    }
 
 /* Case 2:                                                                  */
