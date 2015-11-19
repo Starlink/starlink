@@ -446,6 +446,19 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
         double scalelen;
 
         if( downsampscale ) {
+
+          /* If no SCAN_VEL value was read from the FITS header,
+             calculate a scan velocity from the pointing information. */
+          if( data->hdr->scanvel == VAL__BADD ) {
+             size_t nflagged;
+             smf_flag_slewspeed( data, 0.0, 0.0, &nflagged,
+                                 &data->hdr->scanvel, status );
+             if( data->hdr->scanvel != VAL__BADD ) {
+                msgOutf( "", FUNC_NAME ": adopting mean SCANVEL=%g arcsec/sec",
+                          status, data->hdr->scanvel );
+             }
+          }
+
           if( data->hdr->scanvel != VAL__BADD ) {
              double oldscale = steptime * data->hdr->scanvel;
              scalelen = oldscale / downsampscale;

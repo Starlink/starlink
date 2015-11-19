@@ -69,6 +69,9 @@
 *        Use SOFA instead of SLA.
 *     2015-02-23 (DSB):
 *        Flag time slices that have bad TCS values.
+*     2015-11-18 (DSB):
+*        Quality array is not needed if smin and smax indicate no flagging
+*        is required.
 
 *  Copyright:
 *     Copyright (C) 2011-2012 Science & Technology Facilities Council.
@@ -180,7 +183,7 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
 
   qua = smf_select_qualpntr( data, NULL, status );
 
-  if( !qua ) {
+  if( !qua && ( smax > 0.0 || smin > 0.0 ) ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": No valid QUALITY array was provided", status );
     return;
@@ -262,7 +265,7 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
   }
 
   /* Set first and last flag values to nearest estimate */
-  if( *status == SAI__OK ) {
+  if( *status == SAI__OK && qua ) {
     flag[0] = flag[1];
     flag[ntslice-1] = flag[ntslice-2];
 

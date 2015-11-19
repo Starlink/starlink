@@ -432,6 +432,7 @@ static void smf1_calcmodel_ast( void *job_data_ptr, int *status ) {
    SmfCalcModelAstData *pdata;
    dim_t ibolo;
    dim_t itime;
+   dim_t ngood;
    double *pr;
    double m;
    int *pl;
@@ -461,6 +462,7 @@ static void smf1_calcmodel_ast( void *job_data_ptr, int *status ) {
 
 /* Get a pointer to the first residual, quality and LUT value for the
    current bolo, and then loop round all time slices. */
+            ngood = 0;
             pr = pdata->res_data + ibase;
             pl = pdata->lut_data + ibase;
             for( itime = 0; itime < pdata->ntslice; itime++ ) {
@@ -479,13 +481,26 @@ static void smf1_calcmodel_ast( void *job_data_ptr, int *status ) {
                      m = pdata->map[ *pl ];
                   }
 
-                  if( m != VAL__BADD && !( *pq & SMF__Q_MOD ) ) *pr -= m;
+                  if( m != VAL__BADD && !( *pq & SMF__Q_MOD ) ) {
+                     *pr -= m;
+                     ngood++;
+                  }
                }
 
 /* Move residual, quality and LUT pointers on to the next time slice. */
                pr += pdata->tstride;
                pq += pdata->tstride;
                pl += pdata->tstride;
+            }
+
+/* As a fall-back for some models (like COM) that for speed reasons don't
+   always set SMF__Q_BADB if they flag all time slices in a bolometer as bad,
+   do the check now. */
+            if( ngood == 0 ) {
+               for( itime = 0; itime < pdata->ntslice; itime++ ) {
+                  *pq |= SMF__Q_BADB;
+                  pq += pdata->tstride;
+               }
             }
          }
 

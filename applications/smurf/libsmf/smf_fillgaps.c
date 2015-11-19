@@ -534,6 +534,13 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
                                          gsl_ran_gaussian( r, e + nx*f );
       }
 
+/* If no good samples were found, replace them all with zero. */
+    } else if( !good ) {
+      pd = dat + i*bstride;
+      for( j = 0; j < ntslice; j++ ) {
+        *pd = 0.0;
+        pd += tstride;
+      }
     }
   }
 }

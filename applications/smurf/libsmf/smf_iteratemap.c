@@ -1028,7 +1028,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          astMapPut0D( keymap, "DOWNSAMPSCALE", downsampscale, NULL );
       }
 
-      msgOutf( "", FUNC_NAME
+      if( downsampscale != 0.0 ) msgOutf( "", FUNC_NAME
                ": will down-sample data to match angular scale of %lg "
                "arcsec", status, downsampscale );
 
