@@ -94,7 +94,12 @@ Precipitable water vaport in the line of sight in mm.
 =item B<CSOFIT>
 
 CSO tau as derived from polynomial fits. The column only
-appears if a CSO fit is available.
+appears if a CSO or WVM fit is available.
+
+=item B<WVMFIT>
+
+WVM opacity as derived from polynomial fits. The column only
+appears if a CSO or WVM fit is available.
 
 =back
 
@@ -145,15 +150,19 @@ my %cols;
 my @wvmcol;
 my @fitcol;
 
-# Read the CSO fit information from the Starlink install tree
+# Read the CSO and WVM fit information from the Starlink install tree
 my $fitfile = File::Spec->catfile( $ENV{STARLINK_DIR}, "share", "smurf", "csofit2.dat" );
 my $csofit;
 $csofit = JCMT::Tau::CsoFit2->new( $fitfile ) if -e $fitfile;
+$fitfile = File::Spec->catfile($ENV{'STARLINK_DIR'}, qw/share smurf wvmfit2.dat/);
+my $wvmfit = undef;
+$wvmfit = JCMT::Tau::CsoFit2->new($fitfile) if -e $fitfile;
 
 for my $f (@files) {
 
-  # CSO fit information
+  # CSO and WVM fit information
   my $csosubset;
+  my $wvmsubset = undef;
 
   # Read JCMTSTATE information
   my %local = JSA::Headers::read_jcmtstate( $f );
@@ -172,16 +181,22 @@ for my $f (@files) {
     }
   }
 
-  # See if we have a CSO fit available for this night. If we have one we subset it.
-  if (defined $csofit) {
+  # See if we have a CSO or WVM fit available for this night. If we have one
+  # we subset it.
+  if ((defined $csofit) or (defined $wvmfit)) {
     if (exists $local{RTS_END}
         && defined $local{RTS_END}->[0] && $local{RTS_END}->[0] > 0.0
         && defined $local{RTS_END}->[-1] && $local{RTS_END}->[-1] > 0.0 ) {
       my $startepoch = tai2unix( $local{RTS_END}->[0] );
       my $endepoch = tai2unix( $local{RTS_END}->[-1] );
-      $csosubset = $csofit->get( $startepoch, $endepoch );
-      if (defined $csosubset && $isfirst) {
-        push(@fitcol, "CSOFIT" );
+      if (defined $csofit) {
+        $csosubset = $csofit->get( $startepoch, $endepoch );
+      }
+      if (defined $wvmfit) {
+        $wvmsubset = $wvmfit->get($startepoch, $endepoch);
+      }
+      if (((defined $csosubset) or (defined $wvmsubset)) && $isfirst) {
+        push @fitcol, qw/CSOFIT WVMFIT/;
       }
     }
   }
@@ -307,15 +322,18 @@ for my $f (@files) {
       push(@slice, $wvmtau, $pwvzen, $pwvlos );
     }
 
-    # CSO Fits
+    # CSO and WVM Fits
     if (@fitcol) {
-      if (defined $csosubset && $local{RTS_END}->[$i] > 0.0 ) {
+      my $csofittau = undef;
+      my $wvmfittau = undef;
+      if ($local{RTS_END}->[$i] > 0.0 ) {
         my $thisepoch = tai2unix( $local{RTS_END}->[$i] );
-        my $fittau = $csosubset->tau( $thisepoch );
-        push(@slice, (defined $fittau ? $fittau : "NaN" ));
-      } else {
-        push(@slice, "NaN" );
+        $csofittau = (defined $csosubset) ? $csosubset->tau($thisepoch)
+                                          : undef;
+        $wvmfittau = (defined $wvmsubset) ? $wvmsubset->tau($thisepoch)
+                                          : undef;
       }
+      push @slice, ($csofittau // 'NaN'), ($wvmfittau // 'NaN');
     }
 
     # And append the remaining columns
@@ -645,6 +663,7 @@ Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
 
 Copyright (C) 2007 Particle Physics and Astronomy Research Council.
 Copyright (C) 2007-2013 Science and Technology Facilities Council.
+Copyright (C) 2015 East Asian Observatory.
 All Rights Reserved.
 
 =head1 LICENCE
