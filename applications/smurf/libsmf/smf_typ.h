@@ -383,7 +383,7 @@ typedef enum smf_tausrc {
   SMF__TAUSRC_CSOTAU,   /* Use CSO tau scaled to filter */
   SMF__TAUSRC_CSOFIT,   /* Use an external fit to CSO data, scaled to filter */
   SMF__TAUSRC_TAU,      /* Use this tau number: implements FILTERTAU option */
-  SMF__TAUSRC_AUTO,     /* Use WVM or CSO */
+  SMF__TAUSRC_AUTO,     /* Use WVM, WVM fit or CSO fit */
   SMF__TAUSRC_CACHED,   /* Use a cached externally supplied time-series. Provenance unknown */
   SMF__TAUSRC_WVMFIT    /* Use an external fit to WVM data */
 } smf_tausrc;

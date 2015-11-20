@@ -25,7 +25,7 @@
 *     thetausrc = smf_tausrc (Given)
 *        Source of opacity value. On exit reflects the value that was used if a dynamic
 *        option was given. Options are:
-*          SMF__TAUSRC_AUTO: Use WVM if available and reliable, else use CSO fit.
+*          SMF__TAUSRC_AUTO: Use WVM if available and reliable, else use WVM or CSO fit.
 *          SMF__TAUSRC_CSOTAU: Use the supplied "tau" argument as if it is CSO tau.
 *          SMF__TAUSRC_CSOFIT: Use an external fit to the CSO data.
 *          SMF__TAUSRC_WVMRAW: Use the WVM time series data.

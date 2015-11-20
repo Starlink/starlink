@@ -119,7 +119,7 @@
 *          - CSOFIT    - use a fit to the CSO 225 GHz tau data
 *          - CSOTAU    - use a single 225 GHz tau value
 *          - FILTERTAU - use a single tau value for this wavelength
-*          - AUTO      - Use WVM if available and reliable, else CSO fit.
+*          - AUTO      - Use WVM if available and reliable, else a WVM or CSO fit.
 *
 *          [AUTO]
 
