@@ -200,9 +200,9 @@
 
 *  Copyright:
 *     Copyright (C) 2008-2010, 2012, 2013 Science and Technology Facilities Council.
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
-*     Council. Copyright (C) 2005-2008 University of British
-*     Columbia. All Rights Reserved.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2008 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
