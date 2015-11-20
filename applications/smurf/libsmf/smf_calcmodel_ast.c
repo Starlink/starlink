@@ -481,9 +481,9 @@ static void smf1_calcmodel_ast( void *job_data_ptr, int *status ) {
                      m = pdata->map[ *pl ];
                   }
 
-                  if( m != VAL__BADD && !( *pq & SMF__Q_MOD ) ) {
-                     *pr -= m;
+                  if( !( *pq & SMF__Q_MOD ) ) {
                      ngood++;
+                     if( m != VAL__BADD ) *pr -= m;
                   }
                }
 
