@@ -193,9 +193,12 @@
 *        Extend smfFilter to handle 2-d map filters
 *     2015-02-20 (MS):
 *        Added new smfFts fields for quality statistics
+*     2015-11-19 (GSB):
+*        Add WVMFIT option to smf_tausrc.
 *     {enter_further_changes_here}
 
  *  Copyright:
+ *     Copyright (C) 2015 East Asian Observatory.
  *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
  *     Copyright (C) 2005-2011 University of British Columbia.
@@ -381,7 +384,8 @@ typedef enum smf_tausrc {
   SMF__TAUSRC_CSOFIT,   /* Use an external fit to CSO data, scaled to filter */
   SMF__TAUSRC_TAU,      /* Use this tau number: implements FILTERTAU option */
   SMF__TAUSRC_AUTO,     /* Use WVM or CSO */
-  SMF__TAUSRC_CACHED    /* Use a cached externally supplied time-series. Provenance unknown */
+  SMF__TAUSRC_CACHED,   /* Use a cached externally supplied time-series. Provenance unknown */
+  SMF__TAUSRC_WVMFIT    /* Use an external fit to WVM data */
 } smf_tausrc;
 
 /* Method to use for extinction correction */

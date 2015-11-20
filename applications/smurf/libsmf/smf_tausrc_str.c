@@ -40,11 +40,14 @@
 *        Add ACSIS observing modes.
 *     2013-07-20 (TIMJ):
 *        Convert to TAUSRC
+*     2015-11-19 (GSB):
+*        Add WVMFIT option
 
 *  Notes:
 *     - See also smf_obstype_str
 
 *  Copyright:
+*     Copyright (C) 2015 East Asian Observatory.
 *     Copyright (C) 2008, 2009, 2013 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -100,6 +103,9 @@ const char * smf_tausrc_str( smf_tausrc mode, int * status ) {
     break;
   case SMF__TAUSRC_WVMRAW:
     retval = "WVM";
+    break;
+  case SMF__TAUSRC_WVMFIT:
+    retval = "WVMFIT";
     break;
   case SMF__TAUSRC_CSOTAU:
     retval = "CSOTAU";

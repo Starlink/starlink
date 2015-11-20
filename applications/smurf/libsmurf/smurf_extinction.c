@@ -115,6 +115,7 @@
 *     TAUSRC = _CHAR (Read)
 *          Source of optical depth data. Options are:
 *          - WVMRAW    - use the Water Vapour Monitor time series data
+*          - WVMFIT    - use a fit to the Water Vapor Monitor data
 *          - CSOFIT    - use a fit to the CSO 225 GHz tau data
 *          - CSOTAU    - use a single 225 GHz tau value
 *          - FILTERTAU - use a single tau value for this wavelength
@@ -208,6 +209,8 @@
 *     2013-08-21 (AGG):
 *        Do not call grpList if no output files are generated. This
 *        avoids a GRP__INVID error in such cases.
+*     2015-11-19 (GSB):
+*        Add WVMFIT TAUSRC option.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -336,7 +339,7 @@ void smurf_extinction( int * status ) {
 
   /* Get tau source */
   parChoic( "TAUSRC", "Auto",
-            "Auto,CSOtau,CSOFit, Filtertau, WVMraw", 1,
+            "Auto,CSOtau,CSOFit, Filtertau, WVMraw, WVMfit", 1,
             tausource, sizeof(tausource), status);
 
   /* Decide how the correction is to be applied - convert to flag */
@@ -402,7 +405,9 @@ void smurf_extinction( int * status ) {
           deftau = smf_cso2filt_tau( ohdr, deftau, extpars, status );
         }
         parGdr0d( param, deftau, 0.0,1.0, 1, &tau, status );
-      } else if ( tausrc == SMF__TAUSRC_CSOFIT || tausrc == SMF__TAUSRC_WVMRAW ) {
+      } else if ( tausrc == SMF__TAUSRC_CSOFIT ||
+                  tausrc == SMF__TAUSRC_WVMRAW ||
+                  tausrc == SMF__TAUSRC_WVMFIT ) {
         /* Defer a message until after extinction correction */
       } else {
         *status = SAI__ERROR;
@@ -418,6 +423,8 @@ void smurf_extinction( int * status ) {
 
     if ( tausrc == SMF__TAUSRC_WVMRAW ) {
       msgOutif(MSG__VERB," ", "Used Raw WVM data for extinction correction", status);
+    } else if ( tausrc == SMF__TAUSRC_WVMFIT ) {
+      msgOutif(MSG__VERB," ", "Used fit to WVM data for extinction correction", status);
     } else if ( tausrc == SMF__TAUSRC_CSOFIT ) {
       msgOutif(MSG__VERB," ", "Used fit to CSO data for extinction correction", status);
     } else if ( tausrc == SMF__TAUSRC_CSOTAU ) {

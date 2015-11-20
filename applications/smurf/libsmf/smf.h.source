@@ -605,7 +605,8 @@ void smf_bolonoise( ThrWorkForce *wf, smfData *data, double gfrac,
 double smf_calc_covar( const smfData *data, const size_t i, const size_t j,
                        size_t lo, size_t hi, int *status);
 
-void smf_calc_csofit( const smfData * data, AstKeyMap* extpars, double **tau,
+void smf_calc_taufit( const smfData * data, smf_tausrc tausrc,
+                      AstKeyMap* extpars, double **tau,
                       dim_t *nframes, int *status );
 
 double smf_calc_fcon( smfData *data, dim_t nchan, int report,

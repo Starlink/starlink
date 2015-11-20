@@ -43,6 +43,8 @@
 #     2015-03-09 (DSB):
 #        Modified to ensure that the defaults in this file match those
 #        provided by dimmconfig.lis.
+#     2015-11-19 (GSB):
+#        Update description to ext.tausrc to metion "csofit" and "wvmfit".
 #-
 
 #  Include parameters defined in other files...
@@ -1076,8 +1078,8 @@ ext.taumethod = adaptive
 #  Purpose: 	Controls the extinction values used in the EXT model.
 #  Description: Best is to use WVM, uses continuously varying measurements
 #		as a function of time stored with each observation. Allowed
-#		values are  "auto", "wvmraw", "csotau" and "filtertau". See
-#		EXTINCTION task for further information.
+#		values are  "auto", "wvmraw", "wvmfit", "csofit", "csotau"
+#		and "filtertau". See EXTINCTION task for further information.
 ext.tausrc = auto
 
 #-----------------------------------------------------------------

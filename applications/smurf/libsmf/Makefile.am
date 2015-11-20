@@ -30,7 +30,7 @@ smf_apply_mask.c \
 smf_block_end.c \
 smf_bolonoise.c \
 smf_calc_covar.c \
-smf_calc_csofit.c \
+smf_calc_taufit.c \
 smf_calc_fcon.c \
 smf_calc_mapcoord.c \
 smf_calc_mappa.c \

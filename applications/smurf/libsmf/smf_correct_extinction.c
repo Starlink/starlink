@@ -29,6 +29,7 @@
 *          SMF__TAUSRC_CSOTAU: Use the supplied "tau" argument as if it is CSO tau.
 *          SMF__TAUSRC_CSOFIT: Use an external fit to the CSO data.
 *          SMF__TAUSRC_WVMRAW: Use the WVM time series data.
+*          SMF__TAUSRC_WVMFIT: Use an external fit to the WVM data.
 *          SMF__TAUSRC_TAU: Use the tau value as if it is for this filter.
 *     method = smf_extmeth (Given)
 *        Flag to denote which method to use for calculating the airmass of a bolometer.
@@ -196,9 +197,12 @@
 *        Change AUTO mode so that it looks at WVM then CSO fit and then gives up.
 *     2013-07-20 (TIMJ):
 *        Update the tausrc argument so the caller knows which scheme was used.
+*     2015-11-19 (GSB):
+*        Try WVM fit before CSO fit in AUTO mode.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2015 East Asian Observatory.
 *     Copyright (C) 2008-2010, 2012, 2013 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2008 University of British Columbia.
@@ -397,6 +401,12 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausr
       errRep( FUNC_NAME, "Method CSOFIT not yet supported on 2-D image data", status );
       return allquick;
     }
+  } else if (ndims == 2 && tausrc == SMF__TAUSRC_WVMFIT ) {
+   if (*status == SAI__OK) {
+      *status = SAI__ERROR;
+      errRep( FUNC_NAME, "Method WVMFIT not yet supported on 2-D image data", status );
+      return allquick;
+    }
   } else if (ndims < 2 || ndims > 3) {
     if (*status == SAI__OK) {
       *status = SAI__ERROR;
@@ -406,10 +416,11 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausr
     }
   }
 
-  /* if we are WVMRAW, CSOFIT or AUTO and we have a cache we should always use it since
+  /* if we are WVMRAW, WVMFIT, CSOFIT or AUTO and we have a cache we should always use it since
      we assume it was filled in properly the previous time. */
   if (wvmtaucache && *wvmtaucache &&
       (tausrc == SMF__TAUSRC_WVMRAW ||
+       tausrc == SMF__TAUSRC_WVMFIT ||
        tausrc == SMF__TAUSRC_AUTO ||
        tausrc == SMF__TAUSRC_CSOFIT)) {
     wvmtau = *wvmtaucache;
@@ -433,12 +444,15 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausr
                (double)(100.0*(double)ngoodtau/(double)ntotaltau) );
   }
 
-  if (*status == SAI__OK && tausrc == SMF__TAUSRC_CSOFIT) {
+  if (*status == SAI__OK &&
+      (tausrc == SMF__TAUSRC_CSOFIT ||
+       tausrc == SMF__TAUSRC_WVMFIT)) {
     /* Calculate the fit but we can use the same cache that WVM uses */
     dim_t nframes = 0;
-    smf_calc_csofit( data, extpars, &wvmtau, &nframes, status );
+    smf_calc_taufit( data, tausrc, extpars, &wvmtau, &nframes, status );
     smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
-    msgOutiff( MSG__QUIET, "", "Using CSO fits for extinction correction of ^FILE",
+    msgSetc("FITSRC", (tausrc == SMF__TAUSRC_CSOFIT) ? "CSO" : "WVM");
+    msgOutiff( MSG__QUIET, "", "Using ^FITSRC fits for extinction correction of ^FILE",
                status );
     /* Rebrand as WVM data from this point on */
     tausrc = SMF__TAUSRC_WVMRAW;
@@ -498,11 +512,28 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausr
         }
       }
 
+      /* Next check for an available WVM fit. */
+      if (tausrc == SMF__TAUSRC_AUTO && *status == SAI__OK) {
+        dim_t nframes = 0;
+        smf_calc_taufit( data, SMF__TAUSRC_WVMFIT, extpars, &wvmtau, &nframes, status );
+        if (*status == SAI__OK) {
+          smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
+          msgOutiff( MSG__QUIET, "", "Using WVM fits for extinction correction of ^FILE",
+                     status );
+          /* Rebrand as WVM data from this point on */
+          tausrc = SMF__TAUSRC_WVMRAW;
+          *thetausrc = SMF__TAUSRC_WVMFIT;
+        } else if (*status == SMF__BADFIT) {
+          /* No fit, carry on. */
+          errAnnul( status );
+        }
+      }
+
       /* at this point we either have WVM data handled or we still think we are AUTO.
          Do a CSO FIT check */
       if (tausrc == SMF__TAUSRC_AUTO && *status == SAI__OK) {
         dim_t nframes = 0;
-        smf_calc_csofit( data, extpars, &wvmtau, &nframes, status );
+        smf_calc_taufit( data, SMF__TAUSRC_CSOFIT, extpars, &wvmtau, &nframes, status );
         if (*status == SAI__OK) {
           smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
           msgOutiff( MSG__QUIET, "", "Using CSO fits for extinction correction of ^FILE",
@@ -523,7 +554,7 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausr
          is no CSO fit for the night. */
       if (*status == SAI__OK && tausrc != SMF__TAUSRC_WVMRAW) {
         *status = SAI__ERROR;
-        errRep("", "Unable to determine opacity data for this observation. Both WVM and CSO fits failed. Please investigate and if necessary use CSO mode explicitly but proceed with caution.", status );
+        errRep("", "Unable to determine opacity data for this observation. Raw WVM, WVM fits and CSO fits failed. Please investigate and if necessary use CSO mode explicitly but proceed with caution.", status );
       }
     }
   }

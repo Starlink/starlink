@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     smf_calc_csofit
+*     smf_calc_taufit
 
 *  Purpose:
-*     Calculate a tau for each time slice using CSO fit parameters
+*     Calculate a tau for each time slice using CSO or WVM fit parameters
 
 *  Language:
 *     Starlink ANSI C
@@ -13,7 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calc_csofit ( const smfData * adata, AstKeyMap* extpars, double **tau,
+*     smf_calc_taufit ( const smfData * adata, smf_tausrc tausrc,
+                        AstKeyMap* extpars, double **tau,
 *                       dim_t *nframes, int *status );
 
 *  Arguments:
@@ -21,7 +22,7 @@
 *        Data for which tau is calculated.
 *     extpars = AstKeyMap * (Given)
 *        Extinction parameters from the config file. Uses the
-*        ext.csofit parameter to locate parameter file.
+*        ext.csofit or ext.wvmfit parameter to locate parameter file.
 *     tau = double ** (Returned)
 *        Pointer to array of double to receive the tau data.
 *        Will be malloced by this routine and should be freed
@@ -32,7 +33,7 @@
 *        Pointer to global status.
 
 *  Description:
-*     Calculates the tau for each time slice using the CSO fit parameters that are
+*     Calculates the tau for each time slice using the CSO or WVM fit parameters that are
 *     stored in the fit file.
 
 *  Authors:
@@ -43,7 +44,7 @@
 *     - Currently the CSOFIT routines use Unix epoch seconds but the RTS uses
 *       MJD TAI. For efficiency we convert the first TAI time to epoch and then
 *       offset from that. It would be easier if the fits were stored in TAI MJD.
-*     - The full CSOFIT data file is opened and read every single time this routine
+*     - The full CSO or WVM fit data file is opened and read every single time this routine
 *       is called. This will be extremely inefficient.
 
 *  History:
@@ -53,9 +54,13 @@
 *        Use new loop-friendly cso2filt functions.
 *     2013-06-16 (TIMJ):
 *        Use BADFIT error code if we do not have any fit information for this observation.
+*     2015-11-19 (GSB):
+*        Add tausrc parameter so that this routine can be used for both
+*        CSO and WVM fitted data.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2015 East Asian Observatory.
 *     Copyright (C) 2013 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -93,7 +98,8 @@
 #include <time.h>
 
 
-void smf_calc_csofit( const smfData * data, AstKeyMap* extpars, double **tau,
+void smf_calc_taufit( const smfData * data, smf_tausrc tausrc,
+                      AstKeyMap* extpars, double **tau,
                       dim_t *nframes, int *status ) {
 
   JCMTState *allState = NULL;       /* JCMTSTATE information */
@@ -105,6 +111,7 @@ void smf_calc_csofit( const smfData * data, AstKeyMap* extpars, double **tau,
   double startmjd = VAL__BADD;      /* MJD TAI of start of observation */
   double startepoch = VAL__BADD;    /* Unix epoch at start of observation */
   double *taudata = NULL;           /* Expansion of CSO fit into time series */
+  const char* tausrc_name = NULL;   /* Short name of tau source (for messages) */
 
 
   if (*status != SAI__OK) return;
@@ -119,13 +126,26 @@ void smf_calc_csofit( const smfData * data, AstKeyMap* extpars, double **tau,
   /* Ensure that we have a header */
   if (!data->hdr) {
     *status = SAI__ERROR;
-    errRep( "", "smfData has no header so we can not attached CSO fit data",
+    errRep( "", "smfData has no header so we can not attach tau fit data",
             status );
     return;
   }
 
   /* Work out where the parameter file is */
-  astMapGet0C( extpars, "CSOFIT", &csofit_entry );
+  if (tausrc == SMF__TAUSRC_CSOFIT) {
+    tausrc_name = "CSO";
+    astMapGet0C( extpars, "CSOFIT", &csofit_entry );
+  }
+  else if (tausrc == SMF__TAUSRC_WVMFIT) {
+    tausrc_name = "WVM";
+    astMapGet0C( extpars, "WVMFIT", &csofit_entry );
+  }
+  else {
+    *status = SAI__ERROR;
+    errRep("", "Can only use smf_calc_taufit for tau source CSOFIT or WVMFIT",
+           status);
+    return;
+  }
 
   /* this string will probably include environment variables so we need to expand those. */
   one_wordexp_noglob( csofit_entry, csofit_file, sizeof(csofit_file), status );
@@ -138,7 +158,7 @@ void smf_calc_csofit( const smfData * data, AstKeyMap* extpars, double **tau,
   fits = csofit2_open( csofit_file );
   if (!fits) {
     *status = SAI__ERROR;
-    errRepf("", "Error opening CSO fit file '%s'", status, csofit_file );
+    errRepf("", "Error opening %s fit file '%s'", status, tausrc_name, csofit_file );
     return;
   }
 
@@ -159,7 +179,7 @@ void smf_calc_csofit( const smfData * data, AstKeyMap* extpars, double **tau,
       /* we did not have any fits for this period */
       if (*status == SAI__OK) {
         *status = SMF__BADFIT;
-        errRep("", "No CSO fit data available for this observation", status );
+        errRepf("", "No %s fit data available for this observation", status, tausrc_name );
       }
     } else {
       size_t i;

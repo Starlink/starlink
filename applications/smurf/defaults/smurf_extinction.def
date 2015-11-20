@@ -55,6 +55,8 @@
 #        auto-docs extraction.
 #     2013-04-04 (TIMJ):
 #        Add location of CSO fits data file.
+#     2015-11-19 (GSB):
+#        Add location of WVM fits data file.
 
 #-
 
@@ -100,3 +102,11 @@ ext.smoothwvm = 10.0
 #  Purpose: 	Path to file containing the CSO fit parameters
 #  Description: Full path to file containing the CSO fit parameters.
 ext.csofit = ${STARLINK_DIR}/share/smurf/csofit2.dat
+
+#-----------------------------------------------------------------
+#  Name:	ext.wvmfit
+#  Type:	string
+#  Default:	${STARLINK_DIR}/share/smurf/wvmfit2.dat
+#  Purpose: 	Path to file containing the WVM fit parameters
+#  Description:	Full path to file containing the WVM fit parameters.
+ext.wvmfit = ${STARLINK_DIR}/share/smurf/wvmfit2.dat
