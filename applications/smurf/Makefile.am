@@ -115,6 +115,9 @@ examples/dimmconfig_veryshort_planet.lis \
 examples/dimmconfig_jsa_generic.lis \
 examples/dimmconfig_fix_blobs.lis \
 examples/dimmconfig_fix_convergence.lis \
+examples/.dimmconfig_pol2.lis \
+examples/dimmconfig_pol2_compact.lis \
+examples/dimmconfig_pol2_extended.lis \
 examples/resist.cfg \
 examples/s4a20091214_00015_0002.sdf \
 examples/s4a20091214_00015_0003.sdf \

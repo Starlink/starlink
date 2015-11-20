@@ -1,0 +1,50 @@
+#+
+#  Name:
+#     dimmconfig_pol2_compact.lis
+
+#  Purpose:
+#     A MAKEMAP configuration for POL2 data suitable for compact sources .
+
+#  Description:
+#     This file provides values for parameters used by the SMURF:MAKEMAP
+#     command to control the details of the map-making algorithm when
+#     making maps from POL2 "scan & spin" data. To use it, assign it to
+#     the CONFIG parameter on the command line when running MAKEMAP. For
+#     instance:
+#
+#     % makemap config=^/star/share/smurf/dimmconfig_pol2_compact.lis
+#
+#     (substitute the path to your Starlink installation in place of
+#     "/star").
+#
+#     The strategy provided by this configuration is aimed at isolated
+#     compact sources. We constrain the map using ast.zero_circle=(0.01666),
+#     which sets all pixels beyond 60 arcsec to zero until the last iteration.
+
+#  Notes:
+#     - This file inherits the parameter values defined in hidden file
+#     /star/share/smurf/.dimmconfig_pol2.lis (note the dot at the start
+#     of the file name).
+#     - For a full list of all available parameters, and their purposes,
+#     see the file $SMURF_DIR/smurf_makemap.def. All available parameters
+#     are also documented in SUN/258, appendix "Configuration Parameters".
+#     - A single parameter can be given different values to use when
+#     processing 450 or 850 um data. This is done by including the
+#     parameter twice, prefixing the parameter name with "450." and "850."
+
+#  Authors:
+#     DSB: David Berry (EAO)
+
+#  History:
+#     20-NOV-2015 (DSB):
+#        Initial version.
+#-
+
+#  Inherit the values defined in the parent dimmconfig file
+   ^$STARLINK_DIR/share/smurf/.dimmconfig_pol2.lis
+
+#  Use boundary constraints since the source is assumed to be isolated
+   ast.zero_circle = (0.016666)
+
+
+

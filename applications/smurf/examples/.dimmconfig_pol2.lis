@@ -1,0 +1,59 @@
+#+
+#  Name:
+#     .dimmconfig_pol2.lis
+
+#  Purpose:
+#     A MAKEMAP configuration for making POL2 scan & spin maps
+
+#  Description:
+#     This file provides values for parameters used by the SMURF:MAKEMAP
+#     command to control the details of the map-making algorithm.
+#
+#     This file is not intended to be used directly by users. Its purpose
+#     is to provide settings that are common to other, more specialised,
+#     POL2 configurations that handle various forms of sources. See
+#     for instance, /star/share/smurf/dimmconfig_pol2_compact.lis. For
+#     this reason, the file has been "hidden" by putting a dot at the
+#     start of the name.
+
+#  Notes:
+#     - Any parameter not set in this configuration defaults to the value
+#     specified in file $STARLINK_DIR/smurf_makemap.def.
+#     - For a full list of all available parameters, and their purposes,
+#     see the file $SMURF_DIR/smurf_makemap.def. All available parameters
+#     are also documented in SUN/258, appendix "Configuration Parameters".
+#     - A single parameter can be given different values to use when
+#     processing 450 or 850 um data. This is done by including the
+#     parameter twice, prefixing the parameter name with "450." and "850."
+
+#  Authors:
+#     DSB: David Berry (EAO, Hawaii)
+
+#  History:
+#     20-NOV-2015 (DSB):
+#        Initial version.
+#-
+
+
+#  Use PCA to model and remove the  background polarisation.
+   modelorder=(pca,ext,ast,noi)
+   pca.pcathresh=4
+
+#  Time based despiking.
+   spikebox=10
+   spikethresh=5
+
+#  POL" scans are very slow, so avoid flagging slow samples.
+   flagslow = 0.01
+
+#  Aggreive noise clipping.
+   noisecliphigh=3
+
+#  The data has already been downsampled by CALCQU, so don't  do any more
+#  down sampling.
+   downsampscale = 0
+
+#  Weight bolometers using the RMS residuals calculated by CALQU and
+#  stored i nthe variance component of the CALCQU output NDFs.
+   noi.usevar=1
+
