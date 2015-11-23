@@ -951,6 +951,7 @@
 #include "smurflib.h"
 #include "libsmf/smf.h"
 #include "libsmf/smf_typ.h"
+#include "libsmf/smf_err.h"
 #include "libsmf/jsatiles.h"
 
 #define FUNC_NAME "smurf_makecube"
@@ -1066,7 +1067,7 @@ void smurf_makecube( int *status ) {
    int ubnd_wgt[ 4 ];         /* Upper pixel bounds for weight array */
    int use_wgt;               /* Use input variance to weight input data? */
    int usedetpos;             /* Should the detpos array be used? */
-   int wgtsize;               /* No. of elements in the weights array */
+   int64_t wgtsize;           /* No. of elements in the weights array */
    int64_t nused;             /* No. of input samples pasted into output cube */
    size_t itile;              /* Output tile index */
    size_t ndet;               /* Number of detectors supplied for "DETECTORS" */
@@ -1674,6 +1675,15 @@ void smurf_makecube( int *status ) {
                ubnd_wgt[ nwgtdim ] = 2;
                nwgtdim++;
                wgtsize *= 2;
+            }
+
+/* Report an error if the weights array is too big for the current
+   version of HDS. */
+            if( wgtsize >= VAL__MAXI && *status == SAI__OK ) {
+               *status = SMF__TOOBIG;
+               errRepf( "", "Output cube is too big to create. The weights "
+                        "array would contain %lld elements.", status,
+                        (long long int) wgtsize );
             }
 
 /* Create the NDF extension, or allocate the work space, as required. */

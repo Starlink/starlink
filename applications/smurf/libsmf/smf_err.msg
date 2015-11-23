@@ -26,5 +26,6 @@ TELSTAT    <Telescope is stationary>
 BADFIT     <Fit failed>
 RCPPOS     <Inconsistent RECEPPOS detectors posisitions>
 MEMCHK     <Memory check passed OK but no map created>
+TOOBIG     <Output cube or map is too big to create>
 
 .END
