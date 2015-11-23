@@ -346,15 +346,15 @@ if (!_ok(*status))\
       void dat1_check_mode( const char *mode, INT mode_len, char *modechar,
 			    INT *status );
       int dat1_check_type( const struct DSC *type, char ptype[ DAT__SZTYP ] );
-      int dat1_cvt( int bad, int nval, struct PDD *imp, struct PDD *exp,
+      int dat1_cvt( int bad, UINT_BIG nval, struct PDD *imp, struct PDD *exp,
                     int *nbad );
-      int dat1_cvt_char( int bad, int nval, struct PDD *imp, struct PDD *exp,
+      int dat1_cvt_char( int bad, UINT_BIG nval, struct PDD *imp, struct PDD *exp,
                          int *nbad);
-      int dat1_cvt_dtype( int bad, int nval, struct PDD *imp, struct PDD *exp,
+      int dat1_cvt_dtype( int bad, UINT_BIG nval, struct PDD *imp, struct PDD *exp,
                           int *nbad );
-      void dat1_cvt_format( int bad, int nval, const struct PDD *imp,
+      void dat1_cvt_format( int bad, UINT_BIG nval, const struct PDD *imp,
                             struct PDD *exp, int *nbad, int *status );
-      void dat1_cvt_order( int nval, const struct PDD *imp, struct PDD *exp,
+      void dat1_cvt_order( UINT_BIG nval, const struct PDD *imp, struct PDD *exp,
                            int *status );
       void dat1_decoy( long int arg1, void *arg2 );
       void dat1_free_hdsloc( struct LOC ** loc );
@@ -395,7 +395,7 @@ if (!_ok(*status))\
       int dau_get_shape( struct LCP_DATA *data, int *naxes, HDS_PTYPE *axis );
       int dau_import_loc( struct DSC *locator, struct LCP **pntr );
       int dau_match_types( struct PDD *obj, struct PDD *app );
-      int dau_move_data( int nval, struct PDD *imp, struct PDD *exp );
+      int dau_move_data( UINT_BIG nval, struct PDD *imp, struct PDD *exp );
       int dau_refill_flq( void );
       int dau_scatter_data( int bad, struct LCP_DATA *data, int *nbad );
 

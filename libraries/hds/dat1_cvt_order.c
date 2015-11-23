@@ -10,7 +10,7 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
-   void dat1_cvt_order( int nval, const struct PDD *imp, struct PDD *exp,
+   void dat1_cvt_order( UINT_BIG nval, const struct PDD *imp, struct PDD *exp,
                         int *status )
    {
 /*+                                                                         */
@@ -29,7 +29,7 @@
 /*    between number representations on different machines.                 */
 
 /* Parameters:                                                              */
-/*    int nval                                                              */
+/*    UINT_BIG nval                                                         */
 /*       Number of data elements to be processed.                           */
 /*    const struct PDD *imp                                                 */
 /*       Pointer to a PDD descriptor for the array of input data.           */
@@ -58,6 +58,8 @@
 /*    26-JUL-1991 (RFWS);                                                   */
 /*       Changed to allow execution if status is set to DAT__CONER on       */
 /*       entry.                                                             */
+/*    20-NOV-2015 (DSB):                                                    */
+/*       Change nval from int to UNIT_BIG.                                  */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -66,7 +68,7 @@
 /*-                                                                         */
 
 /* Local Variables:                                                         */
-      int i;                     /* Loop counter for groups of chars        */
+      UINT_BIG i;                /* Loop counter for groups of chars        */
       int j;                     /* Loop counter for chars within groups    */
       int nswap;                 /* Number of characters to swap            */
       unsigned char *in;         /* Pointer to input array                  */

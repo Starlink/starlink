@@ -15,7 +15,7 @@
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
 int
-dau_move_data(int nval, struct PDD *imp, struct PDD *exp)
+dau_move_data(UINT_BIG nval, struct PDD *imp, struct PDD *exp)
 
 /*+
  * DAU_MOVE_DATA - Move data
@@ -45,8 +45,8 @@ dau_move_data(int nval, struct PDD *imp, struct PDD *exp)
    unsigned char *desbuf = exp->body;
    short          srclen = imp->length;
    short          deslen = exp->length;
-   int            n;
-   int            m;
+   UINT_BIG       n;
+   UINT_BIG       m;
 
 /* If the source strings are shorter than the destination strings, then they
    must be copied one by one and padded with spaces.    */

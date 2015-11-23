@@ -9,7 +9,7 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
-   void dat1_cvt_format( int bad, int nval, const struct PDD *imp,
+   void dat1_cvt_format( int bad, UINT_BIG nval, const struct PDD *imp,
                          struct PDD *exp, int *nbad, int *status )
    {
 /*+                                                                         */
@@ -32,7 +32,7 @@
 /*       If this value is non-zero, then the function will check for (and   */
 /*       propagate) "bad" data values. Otherwise, no bad-value propagation  */
 /*       will occur.                                                        */
-/*    int nval                                                              */
+/*    UINT_BIG nval                                                         */
 /*       Number of data elements to be processed.                           */
 /*    const struct PDD *imp                                                 */
 /*       Pointer to a PDD descriptor for the array of input data.           */
@@ -74,6 +74,8 @@
 /*       value propagation for logical data formats.                        */
 /*    10-SEP-1992 (RFWS):                                                   */
 /*       Corrected wrongly-set bit in bad IEEE double value.                */
+/*    20-NOV-2015 (DSB):                                                    */
+/*       Change nval from int to UNIT_BIG.                                  */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -94,7 +96,7 @@
       };
 
 /* Local Variables:                                                         */
-      int i;                     /* Loop counter for data elements          */
+      UINT_BIG i;                /* Loop counter for data elements          */
       static int init = 0;       /* Initialisation performed?               */
       static union I4 bad_ieee_s;/* IEEE_S bad value                        */
       static union I4 bad_vaxf;  /* VAXF bad value                          */

@@ -55,19 +55,21 @@ int dat1_cvt_dtype( bad, nval, imp, exp, nbad )
  *    2011-01-10 (TIMJ):
  *       Make sure the truncation error message includes the correct length of the
  *       source string by not including trailing spaces.
+ *    2015-11-20 (DSB):
+ *       Change nval from int to UNIT_BIG.       *
 
  *-
  */
 
    int bad;
-   int nval;
+   UINT_BIG nval;
    struct PDD *imp;
    struct PDD *exp;
    int *nbad;
 
 {
    int sl;
-   int n;
+   UINT_BIG n;
 
 /* Check the inherited global status. Allow the routine to execute if it is */
 /* set to DAT__CONER, indicating a previous conversion error.               */
@@ -1270,7 +1272,7 @@ dat1_cvt_char(bad, nval, imp, exp, nbad)
  */
 
    int bad;
-   int nval;
+   UINT_BIG nval;
    struct PDD *imp;
    struct PDD *exp;
    int *nbad;
@@ -1280,7 +1282,7 @@ dat1_cvt_char(bad, nval, imp, exp, nbad)
    struct PDD des = *exp;
    int nchar;
    int nitem;
-   int n;
+   UINT_BIG n;
    short int word;
    char buffer[STR_K_LENGTH + 1];/* Huge */
 

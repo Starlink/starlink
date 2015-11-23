@@ -41,7 +41,7 @@ dau_match_types(struct PDD *obj, struct PDD *app)
 
 int
 dat1_cvt( int bad,
-          int nval,
+          UINT_BIG nval,
           struct PDD *imp,
           struct PDD *exp,
           int *nbad )
@@ -66,10 +66,13 @@ dat1_cvt( int bad,
  * 6-AUG-1993 (RFWS):
  *    Changed to allow nval to be supplied as zero (dau_match_types calls
  *    this routine with this value).
+ * 20-NOV-2015 (DSB):
+ *    Changed "nval" from int to UINT_BIG.
  */
 
 #define MAXBUF ( 32 * 512 )
 {
+   UINT_BIG remain;              /* Number of values still to transfer      */
    int expfnat;                  /* Output number format native?            */
    int exponat;                  /* Output storage order native?            */
    int impfnat;                  /* Input number format native?             */
@@ -77,7 +80,6 @@ dat1_cvt( int bad,
    int nbad1;                    /* Local conversion error count            */
    int nbad2;                    /* Local conversion error count            */
    int nwrk;                     /* Number elements to store in workspace   */
-   int remain;                   /* Number of values still to transfer      */
    int temp_status;              /* Temporary store for global status       */
    int transfer;                 /* Number of values to transfer            */
    int wrklen;                   /* Length of data elements in workspace    */
@@ -116,8 +118,7 @@ dat1_cvt( int bad,
         ( imp->order == exp->order ) &&
         ( imp->format == exp->format ) )
    {
-      size_t nbyte = (size_t) nval * (size_t) imp->length;
-      memcpy( (void *) exp->body, (void *) imp->body, nbyte );
+      memcpy( (void *) exp->body, (void *) imp->body, nval*imp->length );
    }
 
 /* Case 2:                                                                  */
