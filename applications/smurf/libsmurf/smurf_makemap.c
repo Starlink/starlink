@@ -169,12 +169,12 @@
 *          intensity (I) value is found by sampling the supplied IPREF map
 *          at the sky position of the Q/U value. This I value is multipled
 *          by a factor that depends on elevation and focal plane position,
-*          to get the IP correction, which is subtracted from the input Q
-*          or U value before going on to make a map from the corrected
-*          values. The factors are determined using an IP model derived by
-*          James Kennedy and Doug Johnstone. The static parameters of this
-*          model are read from an NDF specified by configuration parameter
-*          "IPDATA" (which defaults to $STARLINK/share/smurf/ipdata.sdf). [!]
+*          to get the IP correction. These Q and U corrections are
+*          rotated so that they use the same reference direction as the input
+*          Q/U data, corrected for extinction, and are then subtracted from 
+*          the input Q or U value before going on to make a map from the 
+*          corrected values. The factors are determined using the IP model 
+*          specified by the "ipmodel" configuration parameter. [!]
 *     ITERMAPS = LITERAL (Read)
 *          Specifies the name of a file in which to place a copy of the
 *          current map at the end of each iteration. If a null (!) value is

@@ -1817,15 +1817,18 @@ hitslimit = 0.01
 importsky = 0
 
 #-----------------------------------------------------------------
-#  Name: 	ipdata
+#  Name: 	ipmodel
 #  Type: 	string
-#  Default: 	$STARLINK_DIR/share/smurf/ipdata.sdf
-#  Purpose: 	Defines the Instrumental Polarisation model for POL2 data.
-#  Description: This should be the path to an HDS container file holding
-#               the parameters required for the Johnstone/Kennedy IP model
-#               for POL2 data. Only used when processing POL2 Q or U
-#               time-streams as created by SMURF:CALCQU.
-ipdata = $STARLINK_DIR/share/smurf/ipdata.sdf
+#  Default: 	"pl1"
+#  Purpose: 	Selects the Instrumental Polarisation model to use.
+#  Description: This parameter is only used when processing POL2 Q or U
+#               time-streams as created by SMURF:CALCQU, and if a value
+#               is supplied for ADAM parameter IPREF. It specifies the
+#               model to be used for IP corection. It can be "JK" for the
+#               Johnstone-Kennedy model based on analysis skydip data (see
+#               parameter "jkdata"), or "PL1" for the simpler model based
+#               on analysis of planet data (see parameter "pl1data").
+ipmodel = pl1
 
 #-----------------------------------------------------------------
 #  Name: 	itermap
@@ -1845,6 +1848,18 @@ ipdata = $STARLINK_DIR/share/smurf/ipdata.sdf
 #               for ADAM parameter ITERMAPS. This is useful as it allows you
 #               to look at earlier itermaps whilst makemap is still running.
 itermap = 0
+
+#-----------------------------------------------------------------
+#  Name: 	jkdata
+#  Type: 	string
+#  Default: 	$STARLINK_DIR/share/smurf/ipdata.sdf
+#  Purpose: 	Defines the Johnstone-Kennedy IP model for POL2 data.
+#  Description: This should be the path to an HDS container file holding
+#               the parameters required for the Johnstone/Kennedy IP model
+#               for POL2 data. Only used when processing POL2 Q or U
+#               time-streams as created by SMURF:CALCQU, and if parameter
+#               "ipmodel" is set to "JK".
+jkdata = $STARLINK_DIR/share/smurf/ipdata.sdf
 
 #-----------------------------------------------------------------
 #  Name: 	maplag
@@ -2237,6 +2252,25 @@ numiter = -5
 #		filtering being performed by the FFT. See also parameter
 #		"zeropad".
 pad = <undef>
+
+#-----------------------------------------------------------------
+#  Name: 	pl1data
+#  Type: 	float[3]
+#  Default: 	( 3.288E-3, 2.178E-2, -1.156E-2 )
+#  Purpose: 	The numerical parameters of the PL1 IP model for POL2 data.
+#  Description: This should be a vector of three values, being the
+#               coefficients of a quadratic polynomial that gives the fractional
+#               polarisation produced by instrumental polarisation, as a
+#               function of elevation (in radians):
+#
+#               fractional IP = A + B*elev + C*elev*elev
+#
+#               where the vector (A,B,C) is given by "pl1data".  The PL1 model
+#               assumes that the IP is parallel to the elevation axis at all
+#               elevations. Only used when processing POL2 Q or U time-streams
+#               as created by SMURF:CALCQU, and if parameter "ipmodel" is set
+#               to "PL1".
+pl1data = ( 3.288E-3, 2.178E-2, -1.156E-2 )
 
 #-----------------------------------------------------------------
 #  Name: 	pln.notfirst

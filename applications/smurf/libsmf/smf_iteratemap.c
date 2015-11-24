@@ -1753,11 +1753,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 status );
       }
 
-      /* Do any required correction for instrumental polarisation. */
-      smf_subip( wf, res[0], lut[0], lbnd_out, ubnd_out, keymap, outfset,
-                 status );
-
-
       /*** TIMER ***/
       msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                  ": ** %f s pre-conditioning data",
@@ -1915,6 +1910,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          map at the end of the iteration. */
       if( importsky && *status == SAI__OK ) memcpy( lastmap, dat.map,
                                                     msize*sizeof(*lastmap) );
+
+      /* Do any required correction for instrumental polarisation. */
+      smf_subip( wf, &dat, keymap, status );
 
 
 
