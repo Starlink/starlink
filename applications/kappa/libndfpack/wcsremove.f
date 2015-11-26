@@ -96,6 +96,8 @@
 *        Check STATUS before main loop.
 *     11-JAN-2013 (DSB):
 *        Allow Frames to be specified by Domain name.
+*     26-NOV-2015 (DSB):
+*        Allow Domain name to be up to 50 characters (was 10).
 *     {enter_further_changes_here}
 
 *-
@@ -117,7 +119,7 @@
       PARAMETER ( MXSPEC = 20 )
 
 *  Local Variables:
-      CHARACTER SPECS( MXSPEC )*10! The given index specifications strings
+      CHARACTER SPECS( MXSPEC )*50! The given index specifications strings
       INTEGER FIRST              ! First Frame index implied by specification
       INTEGER GIVEN( MXGIVE )    ! The given Frame indices, sorted
       INTEGER FRM                ! Frame pointer
