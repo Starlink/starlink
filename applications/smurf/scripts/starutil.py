@@ -10,6 +10,7 @@ import glob
 import inspect
 import time
 import datetime
+import uuid
 
 #  Provide recall and editing facilities for parameter prompts
 import readline
@@ -357,7 +358,7 @@ def invoke(command,aslist=False,buffer=None,annul=False):
    #  the stdout file object to "have a real file number".
 
    if buffer:
-      stdout_file ="./starutil.stdout"
+      stdout_file = "starutil-{0}".format(uuid.uuid4())
       p = subprocess.Popen("{0} > {1} 2>&1".format(command,stdout_file), shell=True)
       status = p.wait()
 
